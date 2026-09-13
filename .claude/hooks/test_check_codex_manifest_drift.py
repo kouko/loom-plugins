@@ -62,7 +62,7 @@ def _make_repo(tmp_path: Path, *, drift: bool) -> Path:
 
 
 def test_non_manifest_path_is_noop():
-    result = run_hook("/somewhere/research-toolkit/SKILL.md")
+    result = run_hook("/somewhere/loom-design/SKILL.md")
     assert result.returncode == 0
 
 
@@ -91,7 +91,7 @@ def test_fires_on_claude_side_edit(tmp_path):
 
 def test_real_batch_a_plugin_in_sync():
     """A real in-repo Batch-A manifest path: all 21 are in sync -> exit 0."""
-    real = REPO_ROOT / "research-toolkit" / ".codex-plugin" / "plugin.json"
+    real = REPO_ROOT / "loom-design" / ".codex-plugin" / "plugin.json"
     assert real.exists()
     result = run_hook(str(real))
     assert result.returncode == 0, result.stderr

@@ -1,0 +1,113 @@
+{
+  "source_commit": "cc75999502ab2c12d416b159341233402c07ec73",
+  "source_ref": "origin/main",
+  "filter_repo_version": "a40bce548d2c",
+  "auxiliary_history": [
+    {
+      "commit": "1973ff35c4919e4c40795808240249c7ee40f506",
+      "citations": [
+        "loom-code/scripts/test_probes_cumulative_boundary_reassessment.py"
+      ]
+    },
+    {
+      "commit": "e2161e2fe6b3bf40d33b8a0c45cb035f77d2d73c",
+      "citations": [
+        "loom-code/scripts/test_probes_cumulative_boundary_reassessment.py"
+      ]
+    },
+    {
+      "commit": "4864ea08d96824f74a9b824f39ded1e27b910fd9",
+      "citations": [
+        "loom-code/scripts/test_probes_cumulative_boundary_reassessment.py"
+      ]
+    },
+    {
+      "commit": "d7e72bb348b8e0092c611992f1bee140ed2f2a6e",
+      "citations": [
+        "loom-code/scripts/test_probes_cumulative_boundary_reassessment.py"
+      ]
+    },
+    {
+      "commit": "923fb84a09fb405dcd2bbadaea6d15c1ec7ffb8d",
+      "citations": [
+        "docs/loom/KICKOFF-DEFAULTS.md"
+      ]
+    }
+  ],
+  "primary_source_commits": 1711,
+  "filtered_commit": "f77e0c2267449be0f88e3a158e01a882568eac8f",
+  "source_commits": 1722,
+  "verified_commits": 551,
+  "mixed_commits": 377,
+  "selected_files": 870,
+  "manifest": [
+    "loom-code/",
+    "loom-design/",
+    "loom-workflow/",
+    "loom-discovery/",
+    "loom-interface-design/",
+    "loom-pipeline/",
+    "loom-product-principles/",
+    "loom-spec/",
+    "loom-memory/",
+    "code-toolkit/",
+    "spec-toolkit/",
+    "interface-design-toolkit/",
+    "product-principles-toolkit/",
+    "dev-workflow/",
+    "docs/code-toolkit/",
+    ".github/workflows/code-toolkit-ci.yml",
+    ".github/workflows/dev-workflow-ci.yml",
+    ".github/workflows/loom-pipeline-ci.yml",
+    "scripts/run_package_tests.py",
+    "scripts/test_run_package_tests.py",
+    "scripts/check_plugin_boundaries.py",
+    "scripts/test_check_plugin_boundaries.py",
+    "scripts/sync_codex_manifests.py",
+    "scripts/test_sync_codex_manifests.py",
+    "scripts/test_loom_plugin_install_layout.py",
+    "scripts/test_loom_design_ci_unified_root.py",
+    "scripts/test_loom_skill_description_catalog.py",
+    "scripts/test_state_anchor_carrier_inventory.py",
+    "scripts/test_kickoff_defaults.py",
+    "scripts/fixtures/loom-memory-store/",
+    ".github/workflows/loom-code-ci.yml",
+    ".github/workflows/loom-design-ci.yml",
+    ".github/workflows/loom-workflow-ci.yml",
+    "requirements-dev.txt",
+    "requirements-package-tests.lock",
+    "LICENSE",
+    "CLAUDE.md",
+    "PRINCIPLES.md",
+    ".claude/hooks/test_remind_memory_mirror.py",
+    ".claude/hooks/remind-memory-mirror.sh",
+    ".claude/hooks/check-codex-manifest-drift.sh",
+    ".claude/hooks/test_check_codex_manifest_drift.py",
+    ".claude/hooks/test_check_memory_store_integrity.py",
+    ".claude/hooks/check-memory-store-integrity.sh",
+    ".claude/hooks/validate-skill-folder-structure.sh",
+    "docs/skill-dogfood/2026-09-13-compress-loom-skill-descriptions/cases.md",
+    "docs/loom/2026-09-02-simple-loom-flow/evidence/w1-checkpoint-reviews.md",
+    "docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md",
+    "docs/loom/2026-09-02-simple-loom-flow/evidence/cold-read-A.md",
+    "docs/loom/README.md",
+    "docs/loom/intent/2026-09-02-simple-loom-flow.md",
+    "docs/loom/intent/2026-09-04-adversary-three-way-attribution-measured.md",
+    "docs/loom/2026-09-04-adversary-three-way-attribution-measured/evidence/",
+    "docs/loom/2026-09-04-reviewer-and-adversary-positioning/evidence/coldread-findings-list.txt",
+    "docs/skill-dogfood/2026-09-13-cumulative-boundary-reassessment/cases.md",
+    "docs/skill-dogfood/2026-09-13-cumulative-boundary-reassessment/report.md",
+    "docs/skill-dogfood/2026-09-13-replaceable-boundary-standard/report.md",
+    "docs/skill-dogfood/2026-09-09-model-effort-cost-pilot/report.md",
+    "docs/loom/plans/2026-07-18-knowledge-triage-three-buckets.md",
+    "docs/loom/plans/2026-08-30-outcome-map-v3.md",
+    "docs/loom/evidence/outcome-map-v3/proposal.md",
+    "docs/loom/memory/",
+    "docs/loom/KICKOFF-DEFAULTS.md",
+    "docs/loom/evidence/mechanisms.yaml"
+  ],
+  "commit_map_sha256": "fb2e22a3730c7994d8e0a53a57068b39cfa6dce94ad266d07ac2a192c89ecdba",
+  "source_unchanged": true,
+  "destination_remotes": [],
+  "history_policy": "retain reviewed-path changes and explicitly cited evidence tips; preserve their merges and messages; discard unrelated commits"
+}

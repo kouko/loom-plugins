@@ -44,6 +44,7 @@ PROBES_DIR = EVIDENCE_DIR / "probes"
 SCRIPTS_DIR = REPO_ROOT / "loom-code" / "scripts"
 
 sys.path.insert(0, str(SCRIPTS_DIR))
+from _migration_history import migration_git_args  # noqa: E402
 import coldread_role_split as m  # noqa: E402
 
 FIXTURE = json.loads((EVIDENCE_DIR / "fixture-coldread-8.json").read_text(encoding="utf-8"))
@@ -159,7 +160,7 @@ def test_precap_contract_copies_byte_identical_to_git_history_4ab5224d() -> None
     for role, filename in (("adversary", "contract-precap-adversary.md"), ("reviewer", "contract-precap-reviewer.md")):
         committed = (EVIDENCE_DIR / filename).read_bytes()
         historical = subprocess.run(
-            ["git", "show", f"4ab5224d:loom-code/agents/{role}.md"],
+            migration_git_args(REPO_ROOT, ("git", "show", f"4ab5224d:loom-code/agents/{role}.md")),
             cwd=REPO_ROOT, capture_output=True, check=True,
         ).stdout
         assert committed == historical, f"{filename} differs from git show 4ab5224d:loom-code/agents/{role}.md"

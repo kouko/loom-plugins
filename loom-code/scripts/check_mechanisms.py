@@ -57,6 +57,7 @@ import json
 import re
 import subprocess
 import sys
+from _migration_history import migration_git_args
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -619,6 +620,7 @@ def recompute_baseline_words(repo: Path, sha: str) -> int | None:
     `loom-code/hooks` tree is extracted at that sha, and it is run with cwd
     set to an empty git repo -- the command KICKOFF-DEFAULTS records.
     Returns None when the sha or the tree cannot be resolved."""
+    sha = migration_git_args(repo, ("git", sha))[-1]
     with tempfile.TemporaryDirectory() as tmp:
         tree = Path(tmp) / "tree"
         tree.mkdir()

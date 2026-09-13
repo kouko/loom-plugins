@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
+from _migration_history import migration_git_args
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -125,6 +126,7 @@ def _sanitized_git_env(extra: dict[str, str] | None = None) -> dict[str, str]:
 
 
 def _run(repo: Path, *args: str, env: dict[str, str] | None = None) -> str:
+    args = migration_git_args(repo, args)
     command_env = _sanitized_git_env(env) if args[0] == "git" else env
     completed = subprocess.run(
         [*args],
@@ -139,6 +141,7 @@ def _run(repo: Path, *args: str, env: dict[str, str] | None = None) -> str:
 
 
 def _run_bytes(repo: Path, *args: str) -> bytes:
+    args = migration_git_args(repo, args)
     completed = subprocess.run(
         [*args],
         cwd=repo,

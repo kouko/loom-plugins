@@ -49,38 +49,8 @@ SHARED_FIELDS = (
 CLAUDE_MANIFEST = (".claude-plugin", "plugin.json")
 CODEX_MANIFEST = (".codex-plugin", "plugin.json")
 
-# Plugins whose Codex manifest is in scope for sync/scaffold: the 21 Batch-A
-# plugins plus loom-code (which shipped its Codex manifest first).
-# Phase 2b made the whole repo eligible: loom-workflow (a PostToolUse validation
-# hook, no SessionStart context-injection), collab-toolkit + salesforce-toolkit
-# (MCP servers) now ship Codex manifests too — every repo plugin has a
-# .codex-plugin/plugin.json under the SSOT.
-CODEX_ELIGIBLE = (
-    "ascii-graph-toolkit",
-    "briefing-toolkit",
-    "copywriting-toolkit",
-    "dbt-wiki",
-    "deconstruct-toolkit",
-    "domain-teams",
-    "four-dx-coach",
-    "gws-toolkit",
-    "investing-toolkit",
-    "legal-toolkit",
-    "loom-design",
-    "obsidian",
-    "philosophers-toolkit",
-    "repo-wiki",
-    "research-toolkit",
-    "skill-dev-toolkit",
-    "systems-thinking-toolkit",
-    "translation-toolkit",
-    "tsundoku",
-    "loom-code",
-    "loom-workflow",
-    "collab-toolkit",
-    "salesforce-toolkit",
-    "think-orbit",
-)
+# The independent repository publishes exactly the three Loom plugins.
+CODEX_ELIGIBLE = ("loom-code", "loom-design", "loom-workflow")
 
 
 def sync_shared_fields(source: dict, target: dict) -> dict:

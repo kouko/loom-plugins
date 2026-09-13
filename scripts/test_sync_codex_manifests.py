@@ -231,7 +231,7 @@ def test_check_all_reports_missing_manifest_cleanly(tmp_path):
     assert _run_all([], tmp_path).returncode == 0  # bring all into sync first
 
     # remove one eligible plugin's Codex manifest entirely
-    _codex_path(dirs["dbt-wiki"]).unlink()
+    _codex_path(dirs["loom-code"]).unlink()
 
     proc = _run_all(["--check"], tmp_path)
     assert proc.returncode != 0, "missing manifest must fail --all --check"
@@ -340,7 +340,7 @@ def test_cli_all_check_is_read_only_and_fails_on_drift(tmp_path):
     assert _run_all([], tmp_path).returncode == 0  # bring all into sync first
 
     # drift exactly one plugin's Codex shared field
-    victim = dirs["dbt-wiki"]
+    victim = dirs["loom-code"]
     codex = json.loads(_codex_path(victim).read_text(encoding="utf-8"))
     codex["version"] = "9.9.9"
     _codex_path(victim).write_text(
