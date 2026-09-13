@@ -39,11 +39,11 @@ literally wrong the text is:
 | Dimension | What it asks | Settled by |
 |---|---|---|
 | security | Injection, authn/authz, secrets, unsafe deserialization, encoding confusion in every changed path | OWASP ASVS; 徳丸本 Ch.6 for character-encoding attacks |
-| architecture | Does the shape the change produces hold — responsibilities, dependency direction, boundaries | SOLID (Martin) |
+| architecture | Verify boundaries that support independent understanding, focused testing, and local changes, with clear responsibilities and dependency direction. | SOLID (Martin) |
 | correctness | Does it do what it claims, at the boundaries as well as the middle; is there RED→GREEN evidence in the history | the tests, run |
-| naming | Names say what the thing is; functions stay short — 20 lines soft, 50 hard, 100 is a finding on its own | Clean Code Ch.2–3 (Martin) |
+| naming | Names say what the thing is; functions make their responsibility understandable. | Clean Code Ch.2–3 (Martin) |
 | tests | Every shipped behaviour has focused RED→GREEN evidence; the package suite and committed adversarial artifacts must exercise the changed behavior rather than merely exit successfully | Beck, *Test-Driven Development* (2002) |
-| refactoring | Duplication and smells; Rule of Three — three sites doing the same thing is an extraction | Fowler, *Refactoring*; the Pragmatic Programmer's DRY |
+| refactoring | Duplication and smells; Rule of Three — three sites doing the same thing is an extraction. Reject a shallow file split with anchored evidence that responsibilities, shared state, tests, or change scope remain coupled. Treat file length and style preference alone as insufficient for a boundary finding. | Fowler, *Refactoring*; the Pragmatic Programmer's DRY |
 | cross-task-coherence | Only a whole-delta reviewer can see this: abstractions that disagree between tasks, logic duplicated because each task saw one slice, a task that quietly did more than its title | — |
 | external-surface-grounding | Every call into a surface the author does not own — HTTP API, SDK package, MCP tool, CLI flag, a sibling team's contract — carries a grounding citation. Missing on the first four is fatal; missing on a sibling contract is important; two tasks calling the same surface with conflicting shapes is important | — |
 | principles-conformance | Does the change violate a falsifiable clause of the repo's `PRINCIPLES.md`? Scored only when that file exists, else `N/A` | the consumer's own `PRINCIPLES.md` |
