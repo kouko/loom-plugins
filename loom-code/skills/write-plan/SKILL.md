@@ -403,18 +403,11 @@ Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 
 **Task size.** A task is right-sized when it owns a coherent set of intent
 Acceptance lines, can name a positive case plus a negative or boundary case
-for each, owns one coherent module boundary, and can be done in isolation given
+for each, touches one module boundary, and can be done in isolation given
 only its declared dependencies. The compact case identifiers are the
 starting contract, not a ceiling; scenario detail stays in the spec. If a
 task needs tests for unrelated behaviours, split it. Never size a task by
 how long it will take.
-
-Choose a boundary around a separable responsibility when extraction reduces
-the dependencies and context needed for the requested change and enables
-independent testing. Keep cohesive code together when separation merely adds
-navigation. Treat file length as a warning only. Record the boundary reason
-as agent-decided in the existing task Risk line, using current callers,
-state ownership, and test isolation as evidence.
 
 **Shape.**
 

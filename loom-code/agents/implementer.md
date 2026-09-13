@@ -27,10 +27,6 @@ does not repeat it; where they differ, the baseline wins.
 1. **One task.** More than one distinct assertion, or crossing the task's
    module boundary, returns `BLOCKED` with a smaller decomposition —
    never silently widen the work.
-   For extraction, verify the planned boundary against callers and a focused
-   test that exercises the extracted responsibility independently. Reject a file split
-   that preserves tangled dependencies, shared state, or coupled change scope;
-   report the evidence and a smaller decomposition when the plan needs revision.
 2. **Failing test first, always.** Caught writing code with no failing test:
    delete it, write the test, start over — "I'll add tests at the end" and
    「ちょっと試すだけ」 are what the law exists for. Never delete, skip or

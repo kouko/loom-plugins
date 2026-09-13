@@ -283,3 +283,10 @@ Both action summaries describe only the permitted reads and source inspection, c
 Neither arm adds a mandatory skill invocation or user boundary decision. Statements that batch error behavior needs specification do not explicitly impose a new user approval checkpoint.
 
 Limitations: this assesses proposals, not executable implementations or test results. I read only the authorized case section, normalized artifacts, and fixed source fixture. I have no arm mapping or other auditor judgment. I find no disagreement with the frozen rubric as written; its separate admission requirement must not turn X’s valid same-file API into an architectural failure.
+
+## Post-probe disposition
+
+The candidate contract additions were removed after this result. The branch
+retains this corpus, the normalized outputs, and the executable non-admission
+check, but it does not carry prompt text that the matched comparison failed to
+justify. No Closing Review or publication was started.
