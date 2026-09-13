@@ -43,7 +43,7 @@ def test_package_test_lock_pins_and_hashes_the_complete_graph() -> None:
     entries = re.split(r"(?m)(?=^[a-z][a-z0-9-]*==)", text)[1:]
     pins = {entry.split("==", 1)[0]: entry.splitlines()[0] for entry in entries}
     assert set(pins) == {
-        "execnet", "iniconfig", "markdown-it-py", "mdurl", "packaging",
+        "execnet", "git-filter-repo", "iniconfig", "markdown-it-py", "mdurl", "packaging",
         "pluggy", "pygments", "pytest", "pytest-xdist", "pyyaml", "wcwidth",
     }
     assert all("--hash=sha256:" in entry for entry in entries)

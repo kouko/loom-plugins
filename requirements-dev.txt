@@ -13,3 +13,5 @@ pyyaml
 markdown-it-py
 # width-aware CJK diagram checks used by the package suite
 wcwidth
+# History extraction integration tests use the documented callback API.
+git-filter-repo==2.47.0
