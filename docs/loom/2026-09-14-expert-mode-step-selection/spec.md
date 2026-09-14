@@ -200,7 +200,27 @@ ship                ─► publish validates attestation + disclosure ─► PR
     branch rebased, skip confirmed, publish requires the `Prior failure:`
     line; typed cancel; code plus withdraw token cancels; `取消 review` starts a
     selection; `ls models/selections/` passes the guard.
-18. **Versioning and mechanisms** — agent-decided. Contract minor bump:
+18. **Closing-review re-look: session identity over command text** —
+    agent-decided. Two review rounds showed that denying nested host
+    sessions by command text keeps missing ordinary wrappers (`timeout`,
+    `script`, `npx`). A measurement on Claude Code showed a nested `claude
+    -p` gets a new `session_id`, and its hook process reports
+    `CLAUDE_CODE_SESSION_ATTENDED=0` and `CLAUDE_CODE_ENTRYPOINT=sdk-cli`
+    even after those variables are unset before launch. The design now
+    layers three checks: (a) `propose` records the host session id from
+    `CLAUDE_CODE_SESSION_ID` when present, and `capture` binds only a
+    prompt whose payload `session_id` equals it; (b) `capture` refuses when
+    its own process reports `CLAUDE_CODE_SESSION_ATTENDED=0`; (c)
+    finalize-review and publish accept a confirmation only when its
+    `session_id` equals the running process's `CLAUDE_CODE_SESSION_ID`
+    when that variable is present. The command-text guard stays as a third
+    layer. Consequences: a selection confirmed in one Claude Code session is
+    not honoured by finalization in another (the full process applies);
+    Codex exports no session variable, so Codex relies on the command-text
+    guard alone and discloses that limit; forging those environment values
+    or driving a resumed live session through a pseudo-terminal is a
+    deliberately disguised command, outside the local guarantee.
+19. **Versioning and mechanisms** — agent-decided. Contract minor bump:
     `check_intent_schema` (`rule_checks/intent.py:18`) reads only declared
     required fields, so a leftover `lane:` line is tolerated, and v1
     attestations stay valid. The skill, both hooks, the guard, the
