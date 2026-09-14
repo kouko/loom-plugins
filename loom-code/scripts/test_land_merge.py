@@ -243,6 +243,22 @@ def test_pending_checks_are_polled_until_they_pass(tmp_path: Path, monkeypatch) 
     assert sum("checks" in call for call in calls.calls) == 3
 
 
+def test_empty_checks_output_blocks(tmp_path: Path, monkeypatch) -> None:
+    """gh exiting 0 with blank stdout is an unobserved check state, not 'no checks'."""
+    def configure(calls: LandCalls) -> None:
+        calls.checks = [" \n"]
+        calls.check_returncodes = [0]
+
+    rc, out, err, calls, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", configure=configure
+    )
+
+    assert rc == 1
+    assert err == "BLOCK land.merge: checks on PR #7 could not be observed\n"
+    assert "Merged PR" not in out
+    assert no_merge(calls)
+
+
 def test_unknown_merge_state_is_reread_until_mergeable(tmp_path: Path, monkeypatch) -> None:
     def configure(calls: LandCalls) -> None:
         calls.merge_states = [

@@ -254,6 +254,64 @@ def test_ignored_env_refuses(tmp_path: Path, monkeypatch) -> None:
     assert not caches.wt.exists()
 
 
+def test_hidden_tracked_edit_refuses(tmp_path: Path, monkeypatch) -> None:
+    for flag in ("--skip-worktree", "--assume-unchanged"):
+        layout = Layout(tmp_path / flag.strip("-"))
+        (layout.wt / "feature.txt").write_text("hidden edit\n", encoding="utf-8")
+        git(layout.wt, "update-index", flag, "feature.txt")
+
+        rc, out, err, calls = run_land(monkeypatch, layout)
+
+        assert rc == 1, flag
+        assert err == (
+            f"BLOCK land.cleanup: worktree {layout.wt} has files hidden from git status "
+            "(feature.txt)\n"
+        ), flag
+        nothing_removed(layout, calls)
+        assert (layout.wt / "feature.txt").read_text(encoding="utf-8") == "hidden edit\n"
+
+
+def test_ignored_file_inside_cache_directory_refuses(tmp_path: Path, monkeypatch) -> None:
+    layout = Layout(tmp_path / "env")
+    (layout.wt / "pkg" / "__pycache__").mkdir(parents=True)
+    (layout.wt / "pkg" / "__pycache__" / "mod.cpython-312.pyc").write_bytes(b"\0")
+    (layout.wt / "pkg" / "__pycache__" / ".env").write_text("TOKEN=1\n", encoding="utf-8")
+
+    rc, _, err, calls = run_land(monkeypatch, layout)
+
+    assert rc == 1
+    assert err.startswith(f"BLOCK land.cleanup: worktree {layout.wt} has ignored files"), err
+    assert "pkg/__pycache__/.env" in err and ".pyc" not in err
+    nothing_removed(layout, calls)
+    assert (layout.wt / "pkg" / "__pycache__" / ".env").exists()
+
+    caches = Layout(tmp_path / "caches")
+    (caches.repo / ".git" / "info" / "exclude").write_text(".venv/\n", encoding="utf-8")
+    (caches.wt / "pkg" / "__pycache__").mkdir(parents=True)
+    (caches.wt / "pkg" / "__pycache__" / "mod.cpython-312.pyc").write_bytes(b"\0")
+    (caches.wt / ".venv" / "lib").mkdir(parents=True)
+    (caches.wt / ".venv" / "lib" / "site.py").write_text("x = 1\n", encoding="utf-8")
+    (caches.wt / ".venv" / ".env").write_text("VIRTUAL=1\n", encoding="utf-8")
+
+    rc, out, err, _ = run_land(monkeypatch, caches)
+
+    assert rc == 0, err
+    assert not caches.wt.exists()
+
+
+def test_untracked_hidden_by_config_refuses(tmp_path: Path, monkeypatch) -> None:
+    layout = Layout(tmp_path)
+    git(layout.repo, "config", "status.showUntrackedFiles", "no")
+    (layout.wt / "notes.txt").write_text("draft\n", encoding="utf-8")
+
+    rc, _, err, calls = run_land(monkeypatch, layout)
+
+    assert rc == 1
+    assert err == f"BLOCK land.cleanup: worktree {layout.wt} has untracked files\n"
+    nothing_removed(layout, calls)
+    assert (layout.wt / "notes.txt").exists()
+
+
 # A8 positive: similar-named-dirty-worktree-untouched
 def test_similar_named_dirty_worktree_untouched(tmp_path: Path, monkeypatch) -> None:
     layout = Layout(tmp_path)

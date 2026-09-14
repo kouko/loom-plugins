@@ -178,10 +178,17 @@ def _sync_and_clean(target: LandTarget, out, err) -> int:
     return cleanup_change(target, out, err, worktree=target.repo)
 
 
-REGENERABLE_IGNORED = {
-    "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".venv",
-    "node_modules", ".DS_Store",
-}
+REGENERABLE_DIRS = {".pytest_cache", ".mypy_cache", ".ruff_cache", ".venv", "node_modules"}
+
+
+def _regenerable(path: str) -> bool:
+    """An ignored path cleanup may delete: `.DS_Store`, a `.pyc` file (which
+    covers `__pycache__/*.pyc`), or anything inside a cache directory."""
+    parts = path.split("/")
+    name = parts[-1]
+    if name == ".DS_Store" or name.endswith(".pyc"):
+        return True
+    return any(part in REGENERABLE_DIRS for part in (parts if not name else parts[:-1]))
 
 
 @dataclass(frozen=True)
@@ -376,21 +383,27 @@ def plan_cleanup(
         if trunk_checkout is not None:
             return f"trunk is checked out in {trunk_checkout}"
     elif entry is not None:
-        status = _status_entries(target, entry.path)
+        # Explicit flags override status.showUntrackedFiles; `traditional` with
+        # `all` lists each file inside an ignored directory individually.
+        status = _status_entries(
+            target, entry.path, "--ignored=traditional", "--untracked-files=all"
+        )
         if isinstance(status, str):
             return status
-        if status:
-            kind = "untracked" if all(e.startswith("?? ") for e in status) else "modified"
+        changed = [e for e in status if not e.startswith("!! ")]
+        if changed:
+            kind = "untracked" if all(e.startswith("?? ") for e in changed) else "modified"
             return f"worktree {entry.path} has {kind} files"
-        # `matching` names each ignored path by the pattern it matched; the
-        # default mode collapses a directory of only ignored files (pkg/).
-        ignored = _status_entries(target, entry.path, "--ignored=matching")
-        if isinstance(ignored, str):
-            return ignored
-        outside = sorted(
-            name for name in (e[3:].rstrip("/") for e in ignored if e.startswith("!! "))
-            if name.rsplit("/", 1)[-1] not in REGENERABLE_IGNORED and not name.endswith(".pyc")
-        )
+        # assume-unchanged (lowercase tag) and skip-worktree (S) edits are
+        # invisible to status, and `git worktree remove` deletes them.
+        code, stdout, detail = _git_run(target, entry.path, "ls-files", "-v", "-z")
+        if code != 0:
+            return f"cannot list the index of {entry.path}: {detail}"
+        hidden = [e[2:] for e in stdout.split("\0")
+                  if e[:1].islower() or e[:1] == "S"]
+        if hidden:
+            return f"worktree {entry.path} has files hidden from git status ({hidden[0]})"
+        outside = sorted(e[3:] for e in status if e.startswith("!! ") and not _regenerable(e[3:]))
         if outside:
             return (f"worktree {entry.path} has ignored files outside the regenerable set: "
                     + ", ".join(outside))
@@ -987,8 +1000,10 @@ def _observe_all_checks(
         ):
             detail = (result.stderr or result.stdout or f"exit {result.returncode}").strip()
             return _block(f"checks could not be observed: {detail}", err)
-        if no_checks_yet or not result.stdout.strip():
+        if no_checks_yet:
             checks = []
+        elif not result.stdout.strip():
+            return _block(f"checks on PR #{number} could not be observed", err)
         else:
             try:
                 checks = json.loads(result.stdout)
