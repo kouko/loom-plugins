@@ -57,6 +57,28 @@ charter: 1.0
 - Test: A3 positive: capture-intent-names-agy-probe-order; negative: capture-intent-offers-host-vendor. A8 positive: drift-hook-message-names-both-manifests; boundary: codex-drift-block-unchanged.
 - Risk: agent-decided — added after W2-04 found loom-design's second-vendor copy lists only Codex and Claude hosts and W2-01 found the drift hook message Codex-only; wording mirrors the loom-code reference.
 
+### Wave 4 — fixes from the first blind run (intent re-confirmed 2026-09-14)
+
+**W4-01 Language anchor looks back past tool results**  after: W3-02  acceptance: 6
+- Files: loom-code/hooks/agy_adapter.py, loom-code/scripts/test_agy_adapter.py
+- Test: A6 positive: skill-read-before-tool-result-injects-anchor; negative: skill-read-in-earlier-user-turn-silent.
+- Risk: agent-decided — agy calls the model after the view_file result step lands, so match the latest skill read within the current user turn instead of only the newest model step; verified live on agy.
+
+**W4-02 Absolute agy workspace path and dispatch wording**  after: W3-02  acceptance: 5
+- Files: README.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md, loom-design/README.md, loom-workflow/README.md, loom-code/references/antigravity-tools.md, scripts/test_agy_install_docs.py
+- Test: A5 positive: readme-uses-absolute-add-dir; negative: readme-relative-add-dir-dot-rejected.
+- Risk: agent-decided — agy 1.2.2 ignores a relative `--add-dir .`; document `--add-dir "$PWD"`, narrow the no-workspace claim to observed `agy -p`, and say one self invocation per dispatch.
+
+**W4-03 Push gate names the missing attestation first**  after: W3-02  acceptance: 4, 8
+- Files: loom-code/scripts/loom_checker/command_handlers/push.py, loom-code/scripts/loom_checker/rule_checks/push.py, loom-code/scripts/test_loom_publish.py, loom-code/scripts/test_publish_command_detection.py
+- Test: A4 positive: plain-push-without-attestation-reason-names-attestation; negative: attested-noncanonical-push-still-blocked. A8 positive: blocked-push-set-unchanged; boundary: canonical-attested-push-allowed.
+- Risk: user-decided — report the missing attestation before the canonical-rendering refusal on every host; the set of blocked commands must stay identical, pinned by existing publish tests.
+
+**W4-04 Closing review commits the blind-run report**  after: W3-02  acceptance: 3
+- Files: loom-code/skills/closing-review/SKILL.md, loom-code/scripts/test_review_convergence_contract.py
+- Test: A3 positive: station-commits-report-before-finalize; negative: finalize-before-report-commit-not-instructed.
+- Risk: agent-decided — finalize-review already requires a clean tree; state explicitly that the blind-run report is committed before finalize so agy runs do not leave it untracked.
+
 ## Questions asked
 ① — what — 在 Antigravity 裡你希望做到多「能用」？（答：整條流程能走完）
 ① — what — 三個 plugin 都要支援 Antigravity 嗎？（答：三個都要）
@@ -64,6 +86,8 @@ charter: 1.0
 ① — consequence — review 在 agy 撞名：只改 Antigravity 版（A）或三邊都保留 review（B）？（答：改為三邊都改名）
 ① — what — 提案 loom 專屬的審查站名字（答：closing-review）
 ① — consequence — 覆述 intent，含：舊名不留轉接、agy 上審查由 Gemini 執行、clone 後逐一安裝、原則加入 Antigravity、審查通過後自動 push 並開 PR（答：對）
+① — what — 第 3 條驗收寫著「loom 的檢查程式接受盲跑報告」，但 loom 目前沒有任何規則在檢查盲跑報告，所以這半句永遠證明不了。你要怎麼處理？（答：改驗收說法）
+① — consequence — 被 push 閘門擋下時，一般人打的 `git push` 看到的第一個理由是「指令必須用標準全引號寫法」，看不出真正缺的是審查紀錄。要改嗎？（這個訊息三個平台共用，擋不擋的判斷不會變，只改看到的文字）（答：改，三平台都先說缺審查）
 
 ## Risks
 1. user-decided — review station renamed closing-review on all hosts with no alias, because agy de-duplicates skills by short name and an alias would collide again.
