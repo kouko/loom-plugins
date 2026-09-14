@@ -45,12 +45,7 @@ def test_entrypoint_has_required_sections_and_routes():
         "shape routing": [f"templates/{name}.md" for name in TEMPLATES],
         "client check": ["scripts/detect_client.py", "references/client-matrix.md"],
         "ascii generation": ["scripts/generate.py", "scripts/align.py"],
-        "page mode": [
-            "references/page-mode.md",
-            "python3 scripts/render_cot_html.py <file>.md",
-            "python3 scripts/verify_cot_html.py --render --stamp <file>.html",
-            "${TMPDIR:-/tmp}/loom-visualization/",
-        ],
+        "page mode": ["references/page-mode.md"],
     }
     for contract, needles in essence.items():
         missing = [needle for needle in needles if needle not in text]

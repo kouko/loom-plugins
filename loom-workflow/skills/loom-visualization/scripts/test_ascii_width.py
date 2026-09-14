@@ -70,7 +70,7 @@ def test_char_width_control_and_zero_width_is_zero():
     assert char_width("́") == 0        # combining acute accent
 
 
-def test_split_lines():
+def test_split_lines_plain_label_returns_physical_lines():
     # Always >= 1 element; a bare label is a single-element list.
     assert split_lines("abc") == ["abc"]
     assert split_lines("a\nb") == ["a", "b"]

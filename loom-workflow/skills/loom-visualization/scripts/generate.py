@@ -73,7 +73,11 @@ def main(argv=None) -> int:
         return 2
 
     payload = json.load(sys.stdin)
-    print(render(shape, payload))
+    try:
+        print(render(shape, payload))
+    except ValueError as exc:
+        print(f"generate.py {shape}: {exc}", file=sys.stderr)
+        return 1
     return 0
 
 

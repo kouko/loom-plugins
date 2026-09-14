@@ -75,14 +75,15 @@ def test_detect_client_nul_in_target_no_crash():
     assert detect({}, target="/nonexistent/\x00evil")["obsidian_vault"] in (True, False)
 
 
-def test_detect_client_cwd_in_vault_without_target_returns_none(tmp_path, monkeypatch):
-    """Chat output (no --target) from inside a vault is not checked: obsidian_vault is None.
+def test_detect_client_cwd_in_vault_without_target_reports_vault(tmp_path, monkeypatch):
+    """Chat output (no --target) from inside a vault checks cwd: obsidian_vault is True.
 
-    Records the gate gap reported against loom-visualization.obsidian-boundary.
+    Closes the gate gap reported against loom-visualization.obsidian-boundary.
     """
     (tmp_path / ".obsidian").mkdir()
-    monkeypatch.chdir(tmp_path)
-    assert detect({})["obsidian_vault"] is None
+    (tmp_path / "notes").mkdir()
+    monkeypatch.chdir(tmp_path / "notes")
+    assert detect({})["obsidian_vault"] is True
 
 
 # ---------- width engine and table check ----------
@@ -114,8 +115,6 @@ def test_width_table_empty_headers_raises_loudly():
         render_table([], [])
 
 
-@pytest.mark.xfail(strict=True, reason="finding: Cc chars (tab, ESC) measured 0 cells; "
-                   "generator misaligns and check_table reports clean")
 @pytest.mark.parametrize("cell", ["a\tb", "\x1b[31mred\x1b[0m"])
 def test_width_table_control_char_label_rejected_or_flagged(cell):
     """A tab or ANSI escape in a cell is rejected, or the check flags the table."""
@@ -124,6 +123,18 @@ def test_width_table_control_char_label_rejected_or_flagged(cell):
     except ValueError:
         return
     assert find_issues(lines) != []
+
+
+def test_generate_cli_control_char_label_exits_cleanly():
+    """generate.py turns the control-character ValueError into a message and exit 1."""
+    proc = subprocess.run(
+        [sys.executable, "-I", str(HERE / "generate.py"), "table"],
+        input='{"headers": ["h"], "rows": [["a\\tb"]]}', capture_output=True,
+        text=True, timeout=30,
+    )
+    assert proc.returncode == 1
+    assert "Traceback" not in proc.stderr
+    assert "U+0009" in proc.stderr
 
 
 # ---------- render_cot_html ----------
@@ -169,8 +180,6 @@ def test_render_cot_html_deep_nested_list_no_crash():
     rch.render_body("".join("  " * i + "- a\n" for i in range(400)))
 
 
-@pytest.mark.xfail(strict=True, raises=RecursionError,
-                   reason="finding: 3000 nested blockquotes raise RecursionError")
 def test_render_cot_html_deep_nested_blockquote_no_crash():
     """3000 nested blockquote markers render without raising."""
     rch.render_body("> " * 3000 + "x\n")
@@ -208,8 +217,6 @@ def test_validate_mermaid_no_blocks_fails(tmp_path):
     assert _validate(tmp_path, "plain text\n").returncode == 1
 
 
-@pytest.mark.xfail(strict=True, reason="finding: ```mermaid <info> fence is skipped by the "
-                   "validator but rendered as mermaid by render_cot_html")
 def test_validate_mermaid_info_string_bad_block_fails(tmp_path):
     """A broken block whose fence carries an info string after `mermaid` fails validation."""
     assert rch.render_body("```mermaid title\nflowchart TD\n```\n").startswith('<pre class="mermaid">')

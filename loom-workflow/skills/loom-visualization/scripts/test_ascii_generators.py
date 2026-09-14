@@ -44,7 +44,7 @@ def test_mixed_cjk_jp_en_table_lines_share_one_display_width():
     assert len(widths) == 1, f"lines misaligned: {sorted(widths)}"
 
 
-def test_multiline_cell():
+def test_gen_table_multiline_cell_stays_aligned():
     # One CJK cell spans 2 physical lines; its neighbor is single-line.
     headers = ["項目", "說明"]
     rows = [["使用者", "登入\n登出"]]
@@ -138,7 +138,7 @@ def test_connector_and_arrow_share_one_trunk_column():
     assert len(set(cols)) == 1, f"trunk column not constant: {cols}"
 
 
-def test_multiline_step():
+def test_gen_flow_multiline_step_grows_box_taller():
     """A \\n label renders one centered body line per physical line.
 
     The box grows taller (one body line per label line); a single-line
@@ -258,7 +258,7 @@ def test_grandchild_under_non_last_sibling_uses_bar_continuation():
     assert grandchild[6:] == "deep"
 
 
-def test_multiline_node():
+def test_gen_tree_multiline_node_keeps_branch_prefixes():
     # A NON-last child and a LAST child each carry a CJK two-line label;
     # the last child also has a grandchild under it.
     tree = {
@@ -570,7 +570,7 @@ def test_single_layer_single_component():
     assert "┬" not in lines[2], "single-component separator should have no ┬"
 
 
-def test_multiline_component():
+def test_gen_arch_multiline_component_grows_band_taller():
     """A layer with a `\n` component and a `\n` layer name grows taller.
 
     The band's row height = max line-count among its component cells, and a

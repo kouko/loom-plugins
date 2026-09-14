@@ -8,13 +8,20 @@ Width policy, derived from the interpreter's Unicode database (unicodedata):
 
 Standard library only. This agrees with terminal widths on CJK ideographs,
 kana, CJK punctuation and box-drawing glyphs; it can differ on some symbols
-and emoji, so keep those out of box labels.
+and emoji, so keep those out of box labels. Known divergences also include
+U+00AD SOFT HYPHEN: category Cf, so measured 0 cells here, while many
+terminals draw it as a visible 1-cell hyphen.
+
+Labels passed through split_lines may not contain control (Cc) characters
+other than line breaks (\\n, \\r): they measure 0 cells yet move the cursor
+or change rendering, so split_lines raises ValueError naming the code point.
 """
 
 import unicodedata
 
 _ZERO_WIDTH_CATEGORIES = frozenset(("Cc", "Mn", "Me", "Cf"))
 _WIDE = frozenset(("W", "F"))
+_LINE_BREAKS = frozenset("\n\r")
 
 
 def char_width(c: str) -> int:
@@ -38,5 +45,14 @@ def split_lines(label: str) -> list[str]:
     cursor-moving control char: left embedded it passes width checks yet
     silently corrupts terminal alignment, so it must become a real break.
     Empty input yields [""] (splitlines("") is [], normalized to one line).
+
+    Any other control (Cc) character, such as a tab or an ANSI escape, raises
+    ValueError naming its code point: it measures 0 cells, so a generator
+    would misalign while the width checks still report clean.
     """
+    for c in label:
+        if c not in _LINE_BREAKS and unicodedata.category(c) == "Cc":
+            raise ValueError(
+                f"label {label!r} contains control character U+{ord(c):04X}; remove it"
+            )
     return label.splitlines() or [""]

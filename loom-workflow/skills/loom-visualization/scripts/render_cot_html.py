@@ -718,8 +718,15 @@ def _block_html(kind, payload):
     return f"<p>{payload}</p>\n" if kind == "p" else payload
 
 
-def _blocks(lines):
-    """Parse block structure: ([(kind, payload)], blank-line-between-blocks)."""
+_MAX_QUOTE_DEPTH = 100
+
+
+def _blocks(lines, depth=0):
+    """Parse block structure: ([(kind, payload)], blank-line-between-blocks).
+
+    Blockquotes nest at most _MAX_QUOTE_DEPTH levels; deeper `>` markers are
+    paragraph text, so hostile input cannot exhaust the recursion limit.
+    """
     out, gap, pending_blank = [], False, False
     n, i = len(lines), 0
     while i < n:
@@ -767,7 +774,7 @@ def _blocks(lines):
             i = j + 1
             continue
 
-        if _QUOTE.match(line):
+        if depth < _MAX_QUOTE_DEPTH and _QUOTE.match(line):
             inner, j = [], i
             while j < n:
                 cur = lines[j]
@@ -779,7 +786,7 @@ def _blocks(lines):
                 else:
                     break
                 j += 1
-            blocks, _ = _blocks(inner)
+            blocks, _ = _blocks(inner, depth + 1)
             out.append(("b", "<blockquote>\n"
                         + "".join(_block_html(*b) for b in blocks) + "</blockquote>\n"))
             i = j

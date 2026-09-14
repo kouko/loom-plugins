@@ -49,7 +49,9 @@ function extractBlocks(text) {
   const lines = text.split('\n');
   const blocks = [];
   for (let i = 0; i < lines.length; i++) {
-    const open = lines[i].match(/^\s*(`{3,}|~{3,})mermaid\s*$/);
+    // First word of the info string decides, as in the page renderer:
+    // ```mermaid title is a mermaid block.
+    const open = lines[i].match(/^\s*(`{3,}|~{3,})mermaid(\s.*)?$/);
     if (!open) continue;
     const fence = open[1];
     const body = [];

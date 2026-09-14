@@ -21,7 +21,7 @@ The selected skill owns its procedure, permissions, and output contract.
 | Save state for another session or resume a saved HANDOFF | [handoff](../handoff/SKILL.md) |
 | Ask for a second opinion from another model, higher effort, or another vendor | [independent-advisor](../independent-advisor/SKILL.md) |
 | Remember, recall, reconcile, or forget a durable repository lesson; or a task needs a prior lesson | [loom-memory](../loom-memory/SKILL.md) |
-| Show a comparison, flow, decision, state, or reasoning chain as a table, ASCII, or Mermaid diagram in coding chat | [loom-visualization](../loom-visualization/SKILL.md) |
+| Show a comparison, flow, decision, state, or reasoning chain as a table, ASCII, or Mermaid diagram in coding chat, or render documented reasoning as a standalone page | [loom-visualization](../loom-visualization/SKILL.md) |
 | Re-orient within this conversation: 'where were we', '剛剛講到哪', '振り返り' | [recap-state](../recap-state/SKILL.md) |
 
 Do not select `goal-create` from an inferred need or an unnamed goal request.

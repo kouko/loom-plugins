@@ -198,8 +198,7 @@ Copy `assets/cot-report-template.md`, delete its authoring comment
 blocks, and fill it in. Its frontmatter follows the vault's note
 standard (`title` / `type` / `date` / `tags` / `aliases` / `status`, plus
 `language` / `processed_at` / `timezone` / `llm_*` as the vault's own
-notes carry), so the file can be moved into an Obsidian vault as-is if it
-turns out to be worth keeping. Leave `verified` and `fidelity_checked`
+notes carry). Leave `verified` and `fidelity_checked`
 empty; they are filled after the checks in Step 5 and Step 6 actually run.
 
 Structure the converter depends on:
@@ -250,9 +249,8 @@ one is current. The `.md` and the `.html` live side by side there;
 **both are temporary**, so say so when you report the paths.
 
 Do not move the `.md` by default. If asked to keep it, publish the HTML
-as an Artifact or move the `.md` into a vault. For the vault route, state
-that Obsidian and VS Code preview use mermaid 11.13.x; the Step 3 layout
-is compatible with it.
+as an Artifact, or tell the user the paths so they can move the files
+themselves. Never move or write the `.md` into an Obsidian vault.
 
 ## Step 5 — Convert, verify, then offer to publish
 

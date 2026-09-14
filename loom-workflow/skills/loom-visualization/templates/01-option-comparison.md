@@ -20,8 +20,9 @@ The default form. One row per option, one column per criterion, short cells.
 
 ## ASCII
 
-Use when the table must survive a plain-text channel that does not render
-markdown. Run `python3 scripts/generate.py table` with this input on stdin:
+A GFM markdown table is the form in every client. Use this ASCII table only
+when the answer goes into a code block or a plain-text destination that does
+not render markdown. Run `python3 scripts/generate.py table` with this input on stdin:
 
 ```json
 {"headers": ["方案", "延遲", "維護成本", "適合"], "rows": [

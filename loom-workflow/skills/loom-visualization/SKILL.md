@@ -20,9 +20,10 @@ message exchange, a structure, dates, or numbers to compare.
 ## Boundary
 
 <!-- gate: loom-visualization.obsidian-boundary -->
-When the output is written to a file, first run
-`python3 scripts/detect_client.py --target <path>`. If it reports
-`obsidian_vault: true`, the target is inside an Obsidian vault: decline, say
+First run `python3 scripts/detect_client.py --target <path>` when the output
+is written to a file, or `python3 scripts/detect_client.py` otherwise, which
+checks the working directory. If it reports `obsidian_vault: true`, the output
+target or the working directory is inside an Obsidian vault: decline, say
 this skill serves coding-harness chat, and name
 `obsidian:obsidian-mermaid-visualizer` as the skill for vault notes. Never
 put Obsidian-only syntax (wikilinks, callouts, `%%` comment lines) into
@@ -73,14 +74,18 @@ Use Mermaid only when you have no shell and your own host is claude.ai or the
 Claude Desktop chat, where Mermaid is reported to render. If you can run the
 client check at all, you have a shell, so do not use Mermaid. Everywhere else
 use a markdown table plus ASCII in a fenced code block. When
-`remote_viewer` is `true`, stay ASCII. A wrong Mermaid choice shows the user
+`remote_viewer` is `true`, send the ASCII form in a code block and add the
+table only when exact values matter. A wrong Mermaid choice shows the user
 raw source; a table plus ASCII reads everywhere.
 <!-- /gate -->
 
 Within the table plus ASCII form:
 
-- Option comparison, data model and quantity usually need only the markdown
-  table; add the ASCII form when the channel may not render markdown.
+- Option comparison always uses a GFM markdown table, in every client. Use the
+  ASCII table generator only when the answer goes into a code block or a
+  plain-text destination.
+- Data model and quantity usually need only the markdown table; add the ASCII
+  form when the channel may not render markdown.
 - Flows, decisions, chains, states, sequences, hierarchies, architecture and
   timelines get the ASCII diagram, with the table when exact values matter.
 
@@ -138,16 +143,6 @@ procedure: resolve the source, extract the chain before drawing, build the
 diagram to `references/mermaid-cot-spec.md`, write the markdown from
 `assets/cot-report-template.md`, convert and verify, then run the fidelity
 check in `references/fidelity-check.md` before the page is shared.
-
-The markdown is written to
-`${TMPDIR:-/tmp}/loom-visualization/<YYYY-MM-DD>-<slug>.md` unless the user
-names a path. Convert, verify, then convert again:
-
-```
-python3 scripts/render_cot_html.py <file>.md
-python3 scripts/verify_cot_html.py --render --stamp <file>.html
-python3 scripts/render_cot_html.py <file>.md
-```
 
 Ask once whether the user wants an Artifact; do not publish unprompted, and
 never publish before the fidelity check passes.
