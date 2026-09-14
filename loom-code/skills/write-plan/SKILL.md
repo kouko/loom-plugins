@@ -38,6 +38,8 @@ on any other host it is the directory two levels above this SKILL.md.
 Commands below show Claude Code; on any other host substitute `<loom-code>`
 for `${CLAUDE_PLUGIN_ROOT}`.
 `${CLAUDE_PLUGIN_ROOT}` is substituted by Claude Code. `PLUGIN_ROOT` is provided to Codex plugin hook commands; it is not a general skill-shell variable.
+On Antigravity CLI, map tool and agent names with
+[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
 ## Artifact vocabulary
 

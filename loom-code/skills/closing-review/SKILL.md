@@ -45,6 +45,9 @@ meets the contract's checkable definition; describe rejected routing
 parameters as a pre-execution host rejection, which selects the one atomic
 fallback instead of model escalation.
 
+On Antigravity CLI, map tool and agent names with
+[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
+
 After Build commits completed functional content, run:
 
 ```text
