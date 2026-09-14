@@ -24,8 +24,8 @@ enforced, while Claude Code and Codex installs keep working exactly as before.
 ## Acceptance
 1. On a machine with agy and no prior loom install, following the repository's written install steps from a fresh clone installs all three plugins, and agy's plugin validation passes for each.
 2. After installing, every station and skill of the three plugins appears in agy's skill list, including when another installed plugin ships a skill with the same short name.
-3. In agy, a small change in a throwaway repository is taken through capture-intent, write-plan, build, review and ship, and the loom checker accepts the intent, plan, attestation and blind-run report it produced.
-4. In agy, pushing a change branch that has no matching review attestation is blocked by the loom push gate, and the block reason is shown.
+3. In agy, a small change in a throwaway repository is taken through capture-intent, write-plan, build, closing-review and ship; the loom checker accepts the intent, plan and attestation it produced, and its blind-run report is produced and committed on the change branch.
+4. In agy, pushing a change branch that has no matching review attestation is blocked by the loom push gate, and the first reason shown says the review attestation is missing.
 5. In agy, a new session receives loom's station order and the repository's kickoff defaults without the user asking.
 6. In agy, after a loom skill is used in a Japanese or Chinese conversation, the language reminder that Claude Code gives also reaches the agent.
 7. In agy, writing a nested subfolder inside a skill folder is rejected by the loom-workflow folder-structure rule.
@@ -35,6 +35,7 @@ enforced, while Claude Code and Codex installs keep working exactly as before.
 
 ## Constraints
 - Claude Code and Codex install layout, skill names and behaviour must not change, except that the review station is renamed `closing-review` on every host (user-decided 2026-09-14; the old `review` name stops working and no alias is kept, because an alias named `review` would collide again on agy).
+- When the push gate blocks a push that lacks a review attestation, the missing attestation is named first on every host; which pushes are blocked does not change (user-decided 2026-09-14 after the first blind run).
 - Target is the Antigravity CLI (`agy`, verified on 1.2.2); hooks stay host-installed plugin hooks, never repository-local or git hooks.
 - Skill folders stay flat (no nested subfolders), per the repository's skill structure rule.
 
