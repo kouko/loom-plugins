@@ -8,8 +8,8 @@ Events: `proposal`, `confirmation`, `cancel`, `failure`.
 Lifetimes: proposals, confirmations and cancels apply only while the current
 branch AND merge base equal the ones they recorded, so a reused change-id on
 another branch inherits nothing and a rebase makes a bound selection lapse.
-Failures are scoped by change-id (the file) and branch only, so a rebase
-cannot drop them.
+Failures are scoped by change-id (the file) only; their `branch` is
+informational, so neither a rebase nor a branch rename can drop them.
 """
 from __future__ import annotations
 
@@ -152,7 +152,7 @@ def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
             proposal = proposals.get(event.get("proposal_id"))
             if proposal is not None and confirmation_is_valid(event, proposal):
                 bound = (event, proposal)
-    failures = [e for e in events if e.get("event") == "failure" and e.get("branch") == branch]
+    failures = [e for e in events if e.get("event") == "failure"]
     if bound is None:
         return {"change_id": change_id, "bound": False, "run": names, "skip": [],
                 "code": None, "failures": failures}

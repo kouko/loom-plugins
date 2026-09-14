@@ -23,6 +23,8 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py selection show <change-id>
     loom_checker.py selection cancel <change-id>
     loom_checker.py selection record-failure <change-id> --step <step> --rule <rule>
+    loom_checker.py selection capture --hook
+    loom_checker.py selection skipped-review
 
 Exit codes: 0 pass, 1 a rule failed (`BLOCK <rule.id>: <reason>` on
 stderr), 2 usage or internal error. Any unexpected exception fails

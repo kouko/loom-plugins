@@ -188,6 +188,40 @@ def test_failure_survives_rebase(tmp_path: Path) -> None:
     assert [(f["step"], f["rule"]) for f in failures] == [("reviewers", "verdict.needs-revision")]
 
 
+def test_failure_survives_branch_rename(tmp_path: Path) -> None:
+    """Failures are filtered by change-id only; `branch` is informational."""
+    from loom_checker.attestation import selection_evidence
+
+    repo = make_repo(tmp_path)
+    recorded = checker(repo, "record-failure", CHANGE, "--step", "reviewers", "--rule", "verdict.needs-revision")
+    assert recorded.returncode == 0, recorded.stderr
+    git(repo, "branch", "-m", "feature-clean")
+    assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "reviewers").returncode == 0
+    confirm(repo)
+    state = show(repo)
+    assert state["bound"] is True
+    assert [(f["step"], f["branch"]) for f in state["failures"]] == [("reviewers", "feature")]
+    prior = selection_evidence(repo, CHANGE)["prior_failures"]
+    assert [(f["step"], f["rule"]) for f in prior] == [("reviewers", "verdict.needs-revision")]
+
+
+def test_show_and_cancel_refuse_an_option_as_change_id(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    for sub in ("show", "cancel"):
+        result = checker(repo, sub, "--help")
+        assert result.returncode == 2, (sub, result.stdout, result.stderr)
+        assert f"selection {sub} <change-id>" in result.stderr
+        assert result.stdout == ""
+    assert not selection.store_dir(repo).exists()
+
+
+def test_checker_usage_lists_every_selection_subcommand(tmp_path: Path) -> None:
+    result = subprocess.run([sys.executable, str(CHECKER)], capture_output=True, text=True)
+    assert result.returncode == 2
+    for line in ("selection skipped-review", "selection capture --hook"):
+        assert line in result.stderr, line
+
+
 def test_selection_lapses_after_rebase(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "reviewers,adversarial").returncode == 0

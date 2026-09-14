@@ -55,12 +55,14 @@ DENIED_COMMANDS = [
     # relative-path record writes
     'cd "$(git rev-parse --git-common-dir)/loom" && echo x >> selections/c.jsonl',
     "cd ../../loom && tee -a selections/c.jsonl < ev.json",
-    "mv /tmp/forged.jsonl selections/c.jsonl",
-    "cp forged.jsonl ./selections/c.jsonl",
-    "dd if=forged of=selections/c.jsonl",
-    "install -m 644 forged selections/c.jsonl",
-    "sed -i '$d' selections/c.jsonl",
-    "perl -pi -e 's/a/b/' selections/c.jsonl",
+    # a bare selections/ write counts only next to a loom or .git name
+    "cd ../../loom && mv /tmp/forged.jsonl selections/c.jsonl",
+    "cd ../../loom && cp forged.jsonl ./selections/c.jsonl",
+    "cd ../../loom && dd if=forged of=selections/c.jsonl",
+    "cd ../../loom && install -m 644 forged selections/c.jsonl",
+    "cd ../../loom && sed -i '$d' selections/c.jsonl",
+    "cd ../../loom && perl -pi -e 's/a/b/' selections/c.jsonl",
+    "cd .git && cd loom && echo x >> selections/a.jsonl",
     # rev-parse / git-dir record writes
     'd=$(git rev-parse --git-common-dir); printf x > "$d/loom/s/c.jsonl"',
     'git rev-parse --git-dir | xargs -I{} cp forged {}/loom/x',
@@ -70,7 +72,18 @@ DENIED_COMMANDS = [
     'node -e "require(\'fs\').appendFileSync(process.env.GIT_DIR)"',
     "ruby -e 'File.write(ENV[\"GIT_DIR\"], 1)'",
     "sed -i.bak s/a/b/ $(git rev-parse --git-common-dir)/loom/x",
-    "bash -c 'cp forged selections/c.jsonl'",
+    "bash -c 'cd ../loom && cp forged selections/c.jsonl'",
+    # the capture command run by the checker program, however it is launched
+    "python3 -m loom_checker selection capture --hook",
+    "bash -c 'python3 x/loom_checker.py selection capture --hook < p'",
+    # a nested host session whose prompt would fire the capture hook
+    'claude -p "/loom-code:expert-mode K7Q2"',
+    'codex exec "$expert-mode K7Q2"',
+    "env FOO=1 claude -p '/expert-mode K7Q2'",
+    "exec claude -p '$loom-code:expert-mode K7Q2'",
+    "echo '/expert-mode K7Q2' | xargs claude -p",
+    "bash -c 'claude -p \"/expert-mode K7Q2\"'",
+    "/usr/local/bin/codex exec '/loom-code:expert-mode K7Q2'",
 ]
 
 
@@ -94,6 +107,17 @@ ALLOWED_COMMANDS = [
     "echo hi > out.txt",
     "git status --short",
     "git push origin HEAD",
+    # an application directory that merely ends in selections/
+    "echo cfg > app/selections/config.json",
+    "cp defaults.json app/selections/config.json",
+    # the capture words read or written as text, not run by the checker
+    'rg "selection capture" loom-code',
+    'git commit -m "fix selection capture race"',
+    # a host program with no entry-point token, or the token with no host
+    "claude --version",
+    "codex --help",
+    "rg expert-mode loom-code",
+    'git commit -m "expert-mode docs"',
 ]
 
 

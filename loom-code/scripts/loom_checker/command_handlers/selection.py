@@ -56,16 +56,21 @@ def _propose(repo: Path, args: list[str], out, err) -> int:
     return 0
 
 
+def _one_change_id(sub: str, args: list[str]) -> str:
+    """The single change-id argument; an option such as `--help` is usage."""
+    if len(args) != 1 or not args[0].strip() or args[0].startswith("-"):
+        raise UsageError(f"usage: loom_checker.py selection {sub} <change-id>")
+    return args[0]
+
+
 def _show(repo: Path, args: list[str], out, err) -> int:
-    if len(args) != 1 or not args[0].strip():
-        raise UsageError("selection show needs one change-id.")
+    _one_change_id("show", args)
     out.write(json.dumps(store.effective_selection(repo, args[0]), ensure_ascii=False, indent=2) + "\n")
     return 0
 
 
 def _cancel(repo: Path, args: list[str], out, err) -> int:
-    if len(args) != 1 or not args[0].strip():
-        raise UsageError("selection cancel needs one change-id.")
+    _one_change_id("cancel", args)
     branch, merge_base = store.current_scope(repo)
     store.append_event(repo, args[0], {
         "event": "cancel", "source": "agent-run", "prompt_ref": None,
@@ -96,23 +101,34 @@ def _record_failure(repo: Path, args: list[str], out, err) -> int:
 WITHDRAW_TOKENS = frozenset({"cancel", "取消", "キャンセル", "撤回"})
 
 
-def _scoped_proposals(repo: Path, branch: str, merge_base: str) -> list[tuple[str, dict, bool]]:
-    """(change-id, proposal, already confirmed) for every proposal in the
-    store recorded on this branch and merge base, in record order."""
+def _scoped_proposals(repo: Path, branch: str, merge_base: str) -> list[tuple[str, dict, str]]:
+    """(change-id, proposal, state) for every proposal in the store recorded
+    on this branch, in record order. State is `lapsed` (another merge base),
+    `withdrawn` (a later cancel), `confirmed`, or `pending`."""
     directory = store.store_dir(repo)
     found = []
     for path in sorted(directory.glob("*.jsonl")) if directory.is_dir() else []:
-        scoped = [e for e in store.read_events(repo, path.stem)
-                  if e.get("branch") == branch and e.get("merge_base") == merge_base]
-        confirmed = {e.get("proposal_id") for e in scoped if e.get("event") == "confirmation"}
-        found += [(path.stem, e, e.get("id") in confirmed)
-                  for e in scoped if e.get("event") == "proposal"]
+        events = [e for e in store.read_events(repo, path.stem) if e.get("branch") == branch]
+        confirmed = {e.get("proposal_id") for e in events
+                     if e.get("event") == "confirmation" and e.get("merge_base") == merge_base}
+        for index, event in enumerate(events):
+            if event.get("event") != "proposal":
+                continue
+            if event.get("merge_base") != merge_base:
+                state = "lapsed"
+            elif any(e.get("event") == "cancel" and e.get("merge_base") == merge_base
+                     for e in events[index + 1:]):
+                state = "withdrawn"
+            else:
+                state = "confirmed" if event.get("id") in confirmed else "pending"
+            found.append((path.stem, event, state))
     return found
 
 
 def _withdraw_targets(words: list[str], proposals) -> list[str] | None:
     """Change-ids a withdrawal prompt cancels; None when it is no withdrawal.
     A withdraw token counts only as the sole word or next to a code."""
+    proposals = [item for item in proposals if item[2] != "lapsed"]
     if len(words) == 1 and words[0].casefold() in WITHDRAW_TOKENS:
         return sorted({change for change, _, _ in proposals})
     codes = {}
@@ -128,10 +144,10 @@ def _withdraw_targets(words: list[str], proposals) -> list[str] | None:
 
 
 def _capture_prompt(repo: Path, payload: dict, out) -> None:
-    prompt = payload.get("prompt")
-    words = prompt.split() if isinstance(prompt, str) else []
-    if not words or words[0] not in store.ENTRY_TOKENS:
-        return
+    """Record what an entry-point prompt confirms or withdraws; the caller
+    has already checked the entry-point token."""
+    prompt = payload["prompt"]
+    words = prompt.split()
     prompt_ref = payload.get("prompt_id") or payload.get("turn_id")
     branch, merge_base = store.current_scope(repo)
     proposals = _scoped_proposals(repo, branch, merge_base)
@@ -147,9 +163,17 @@ def _capture_prompt(repo: Path, payload: dict, out) -> None:
                 f"Loom: selection for {', '.join(withdrawn)} withdrawn; "
                 "the full process resumes.")}, ensure_ascii=False) + "\n")
         return
-    pending = [(change, proposal) for change, proposal, confirmed in proposals
-               if not confirmed and store.confirmation_prompt_matches(prompt, proposal["code"])]
+    matching = [(change, proposal, state) for change, proposal, state in proposals
+                if store.confirmation_prompt_matches(prompt, proposal["code"])]
+    pending = [(change, proposal) for change, proposal, state in matching if state == "pending"]
     if not pending:
+        stale = [proposal["code"] for _, proposal, state in matching
+                 if state in {"withdrawn", "lapsed"}]
+        if stale and not any(state == "confirmed" for _, _, state in matching):
+            out.write(json.dumps({"systemMessage": (
+                f"Loom: code {stale[-1]} is no longer valid (its selection was withdrawn "
+                "or lapsed); nothing was recorded. The agent must show the table again.")},
+                ensure_ascii=False) + "\n")
         return
     change_id, proposal = max(pending, key=lambda item: item[1].get("created_at", ""))
     store.append_event(repo, change_id, {
@@ -180,6 +204,10 @@ def _capture(repo: Path | None, args: list[str], out, err) -> int:
             err.write("selection capture: not a UserPromptSubmit payload with a prompt "
                       "reference; nothing recorded.\n")
             return 0
+        prompt = payload.get("prompt")
+        words = prompt.split() if isinstance(prompt, str) else []
+        if not words or words[0] not in store.ENTRY_TOKENS:
+            return 0  # decided before any git subprocess runs
         _capture_prompt(repo_root(Path.cwd()), payload, out)
     except Exception as exc:  # the prompt must go through whatever happens here
         err.write(f"selection capture: nothing recorded ({type(exc).__name__}: {exc}).\n")

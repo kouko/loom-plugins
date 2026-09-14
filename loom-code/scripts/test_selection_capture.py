@@ -213,6 +213,49 @@ def test_proposal_from_another_branch_is_not_bound(repo):
     assert events(repo, "confirmation") == []
 
 
+def test_non_entry_prompt_runs_no_git_outside_a_repository(tmp_path):
+    """The entry-point token is checked before any git subprocess."""
+    outside = tmp_path / "not-a-repo"
+    outside.mkdir()
+    result = subprocess.run(
+        [sys.executable, str(CHECKER), "selection", "capture", "--hook"],
+        input=json.dumps(claude_payload("hello there")), capture_output=True, text=True,
+        cwd=str(outside), env=dict(os.environ, GIT_CEILING_DIRECTORIES=str(tmp_path)))
+    assert result.returncode == 0
+    assert result.stdout == "" and result.stderr == ""
+
+
+def assert_no_longer_valid(result: subprocess.CompletedProcess) -> None:
+    message = system_message(result)
+    assert "no longer valid" in message and "table again" in message
+
+
+def test_code_of_withdrawn_proposal_says_no_longer_valid(repo):
+    code = propose(repo)
+    system_message(capture(repo, claude_payload(f"/expert-mode {code}")))
+    checker(repo, "cancel", CHANGE)
+    assert_no_longer_valid(capture(repo, claude_payload(f"/expert-mode {code}", prompt_id="p2")))
+    assert len(events(repo, "confirmation")) == 1
+    assert show(repo)["bound"] is False
+
+
+def test_code_of_cancelled_unconfirmed_proposal_does_not_bind(repo):
+    code = propose(repo)
+    checker(repo, "cancel", CHANGE)
+    assert_no_longer_valid(capture(repo, claude_payload(f"/expert-mode {code}")))
+    assert events(repo, "confirmation") == []
+
+
+def test_code_of_lapsed_proposal_says_no_longer_valid(repo):
+    code = propose(repo)
+    git(repo, "checkout", "-q", "main")
+    commit(repo, "trunk.txt")
+    git(repo, "checkout", "-q", "feature")
+    git(repo, "rebase", "-q", "main")
+    assert_no_longer_valid(capture(repo, claude_payload(f"/expert-mode {code}")))
+    assert events(repo, "confirmation") == []
+
+
 def test_capture_binds_the_newest_unconfirmed_proposal(repo):
     code = propose(repo)
     system_message(capture(repo, claude_payload(f"/expert-mode {code}")))

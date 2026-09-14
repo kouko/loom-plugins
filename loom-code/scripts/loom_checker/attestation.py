@@ -35,7 +35,9 @@ def selection_evidence(repo: Path, change_id: str, manifest: dict | None = None)
 
     Only a valid confirmation whose source is `user-typed`, recorded on the
     current branch and merge base, binds; anything else is the full process.
-    `prior_failures` lists failures dated before the newest confirmation."""
+    `confirmations` lists only bindings no later cancel withdrew, and
+    `prior_failures` lists failures recorded before the newest of them (by
+    position in the append-only file, not by timestamp)."""
     events = selection.read_events(repo, change_id)
     if not any(event.get("event") == "confirmation" for event in events):
         return None
@@ -48,10 +50,18 @@ def selection_evidence(repo: Path, change_id: str, manifest: dict | None = None)
         return None
     if not effective["bound"] or effective.get("source") != "user-typed":
         return None
-    in_scope = [e for e in events if e.get("branch") == branch and e.get("merge_base") == merge_base]
-    proposals = {e.get("id"): e for e in in_scope if e.get("event") == "proposal"}
+    def in_scope(event: dict) -> bool:
+        return event.get("branch") == branch and event.get("merge_base") == merge_base
+
+    proposals = {e.get("id"): e for e in events if in_scope(e) and e.get("event") == "proposal"}
     confirmations = []
-    for event in in_scope:
+    latest = -1
+    for index, event in enumerate(events):
+        if not in_scope(event):
+            continue
+        if event.get("event") == "cancel":
+            confirmations, latest = [], -1  # withdrawn bindings are not disclosed
+            continue
         if event.get("event") != "confirmation" or event.get("source") != "user-typed":
             continue
         proposal = proposals.get(event.get("proposal_id"))
@@ -61,11 +71,11 @@ def selection_evidence(repo: Path, change_id: str, manifest: dict | None = None)
             "code": proposal["code"], "skip": [n for n in names if n in proposal["skip"]],
             "source": event["source"], "at": event.get("at"),
         })
-    latest = confirmations[-1]["at"] if confirmations else None
+        latest = index
     prior = [
         {key: failure.get(key) for key in FAILURE_FIELDS}
-        for failure in effective["failures"]
-        if isinstance(latest, str) and isinstance(failure.get("at"), str) and failure["at"] < latest
+        for failure in events[:max(latest, 0)]
+        if failure.get("event") == "failure"
     ]
     return {"confirmations": confirmations, "skip": effective["skip"],
             "source": "user-typed", "prior_failures": prior}

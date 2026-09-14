@@ -28,7 +28,9 @@ import sys
 import tempfile
 
 
-# The step a refused finalize rule belongs to; rules no step owns record `finalize`.
+# The step a refused finalize rule belongs to. Only these rules (execution
+# failures included) record a failure; refusals no step owns, such as a dirty
+# tree, a usage error or a malformed input, verify nothing and record none.
 STEP_BY_RULE = {
     "finalize.verdicts": "reviewers",
     "finalize.adversarial": "adversarial",
@@ -37,10 +39,13 @@ STEP_BY_RULE = {
 
 
 def _record_failure(repo: Path, change_id: str, rule: str) -> None:
-    """Append a failure event; a store that cannot be written never masks the refusal."""
+    """Append a failure event for a step's rule; a store that cannot be
+    written never masks the refusal."""
+    if rule not in STEP_BY_RULE:
+        return
     try:
         selection.append_event(repo, change_id, {
-            "event": "failure", "step": STEP_BY_RULE.get(rule, "finalize"), "rule": rule,
+            "event": "failure", "step": STEP_BY_RULE[rule], "rule": rule,
             "head_sha": git_maybe(repo, "rev-parse", "HEAD"),
             "branch": git_maybe(repo, "rev-parse", "--abbrev-ref", "HEAD"),
             "at": selection.now(),
@@ -55,11 +60,7 @@ def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         raise UsageError("finalize-review needs a change-id.")
     change_id, *rest = args
     repo = repo_root(Path.cwd())
-    try:
-        findings = _finalize(repo, change_id, rest, out)
-    except UsageError:
-        _record_failure(repo, change_id, "finalize.usage")
-        raise
+    findings = _finalize(repo, change_id, rest, out)
     if findings:
         _record_failure(repo, change_id, findings[0][0])
         return report(findings, err)

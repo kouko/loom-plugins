@@ -22,12 +22,19 @@ RULE_ID = "selection.guard"
 FILE_TOOLS = {"Write", "Edit", "MultiEdit", "NotebookEdit", "apply_patch"}
 
 ALWAYS_DENIED = [
-    (re.compile(r"selection\s+capture"), "the selection capture command runs only from the prompt hook"),
     (re.compile(r"loom/selections/"), "names the selection record store"),
     (re.compile(r"\.git/loom"), "names the loom record directory"),
 ]
 
+CHECKER_PROGRAM = re.compile(r"loom_checker(?:\.py)?")
+
+HOST_PROGRAMS = {"claude", "codex"}
+
+ENTRY_POINT = re.compile(r"(?<![\w-])[/$](?:loom-code:)?expert-mode(?![\w-])")
+
 BARE_SELECTIONS = re.compile(r"(?<![\w.-])selections/")
+
+LOOM_OR_GIT_NAME = re.compile(r"(?<![\w-])(?:loom|\.git)(?![\w-])")
 
 GIT_DIR_NAMES = re.compile(r"git-common-dir|--git-dir|\bGIT_DIR\b")
 
@@ -79,12 +86,45 @@ def _has_write_form(command: str, depth: int = 0) -> bool:
     return False
 
 
+def _token_lists(command: str, depth: int = 0):
+    """Tokens of every shell segment, including code quoted for `bash -c`."""
+    for segment in _shell_segments(command):
+        tokens = _tokenise(segment)
+        yield tokens
+        if depth < 2:
+            for token in tokens:
+                if " " in token:
+                    yield from _token_lists(token, depth + 1)
+
+
+def _runs_capture(tokens: list[str]) -> bool:
+    """The checker program followed by the `selection capture` words."""
+    for index, token in enumerate(tokens):
+        if CHECKER_PROGRAM.fullmatch(Path(token).name):
+            rest = tokens[index + 1:]
+            return any(rest[i:i + 2] == ["selection", "capture"] for i in range(len(rest)))
+    return False
+
+
+def _runs_host(tokens: list[str]) -> bool:
+    program = _strip_prefix(tokens)
+    while program and program[0].startswith("-"):
+        program = program[1:]  # options of a stripped wrapper such as xargs
+    return bool(program) and Path(program[0]).name in HOST_PROGRAMS
+
+
 def bash_guard_reason(command: str) -> str | None:
     """Why a Bash command is denied, or None when it passes."""
+    token_lists = list(_token_lists(command))
+    if any(_runs_capture(tokens) for tokens in token_lists):
+        return "the selection capture command runs only from the prompt hook"
     for pattern, reason in ALWAYS_DENIED:
         if pattern.search(command):
             return reason
-    if BARE_SELECTIONS.search(command) and _has_write_form(command):
+    if ENTRY_POINT.search(command) and any(_runs_host(tokens) for tokens in token_lists):
+        return "a nested host session's expert-mode prompt would pass as user-typed"
+    if (BARE_SELECTIONS.search(command) and LOOM_OR_GIT_NAME.search(command)
+            and _has_write_form(command)):
         return "writes a selections/ path"
     if GIT_DIR_NAMES.search(command) and _has_write_form(command):
         return "writes through the git directory"

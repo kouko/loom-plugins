@@ -257,6 +257,51 @@ def test_finalize_failure_recorded_and_listed_as_prior(tmp_path: Path) -> None:
     assert validate(repo, attestation) == []
 
 
+def test_cancelled_confirmation_is_not_disclosed(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    propose(repo, "reviewers")
+    confirm(repo, "2026-09-14T00:00:01Z")
+    selection.append_event(repo, CHANGE, {
+        "event": "cancel", "source": "agent-run", "prompt_ref": None,
+        "branch": attestation_branch(repo), "merge_base": event_base(repo),
+        "at": "2026-09-14T00:00:02Z",
+    })
+    propose(repo, "adversarial")
+    second = confirm(repo, "2026-09-14T00:00:03Z")
+    evidence = attestation_module.selection_evidence(repo, CHANGE)
+    assert evidence["skip"] == ["adversarial"]
+    assert evidence["confirmations"] == [{"code": second["code"], "skip": ["adversarial"],
+                                          "source": "user-typed", "at": "2026-09-14T00:00:03Z"}]
+
+
+def test_prior_failure_decided_by_record_order_not_timestamp(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    branch = attestation_branch(repo)
+    same_second = "2026-09-14T00:00:05Z"
+    selection.append_event(repo, CHANGE, {
+        "event": "failure", "step": "reviewers", "rule": "before", "head_sha": "h",
+        "branch": branch, "at": same_second})
+    propose(repo, "reviewers")
+    confirm(repo, same_second)
+    selection.append_event(repo, CHANGE, {
+        "event": "failure", "step": "reviewers", "rule": "after", "head_sha": "h",
+        "branch": branch, "at": "2026-09-14T00:00:00Z"})
+    prior = attestation_module.selection_evidence(repo, CHANGE)["prior_failures"]
+    assert [f["rule"] for f in prior] == ["before"]
+
+
+def test_non_verification_refusals_record_no_failure(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    usage = subprocess.run(
+        [sys.executable, str(CHECKER), "finalize-review", CHANGE, "--bogus"],
+        capture_output=True, text=True, cwd=str(repo))
+    assert usage.returncode == 2
+    (repo / "dirty.txt").write_text("x", encoding="utf-8")
+    dirty = finalize(repo, review_input(tmp_path, [], []))
+    assert dirty.returncode == 1 and "finalize.clean-tree" in dirty.stderr
+    assert failures(repo) == []
+
+
 def test_failure_after_confirmation_not_listed_as_prior(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     propose(repo, "reviewers")
