@@ -131,7 +131,10 @@ alone; a plain-text exit 2 is caller misuse rather than a routing signal.
 
 ## 3. Run blind and adversarial checks
 
-Use a blind run when an Acceptance line cannot be settled mechanically. For
+Use a blind run when an Acceptance line cannot be settled mechanically. When it
+produces `docs/loom/<change-id>/blind-run-report.md`, commit that report on the
+change branch before running `finalize-review`; it is functional content, and
+only `attestation.json` is publication metadata. For
 code, skill, spec, or gate changes, create committed adversarial programs that
 exercise the relevant boundary and pass their paths and commands to
 `finalize-review`. Do not record a claimed result; finalization executes them.

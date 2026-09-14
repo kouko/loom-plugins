@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 
@@ -51,6 +52,28 @@ def test_contract_adds_no_review_round_ledger_or_schema() -> None:
 def test_round_four_is_forbidden_in_context() -> None:
     assert "never dispatch Round 4" in REVIEW_WORDS
     assert "must not dispatch Round 4" in CONTRACT
+
+
+def _sentences(text: str) -> list[str]:
+    return [s for s in re.split(r"(?<=[.:;])\s+", text) if s]
+
+
+def test_station_commits_report_before_finalize() -> None:
+    instruction = "commit that report on the change branch before running `finalize-review`"
+    assert instruction in REVIEW_WORDS
+    assert "docs/loom/<change-id>/blind-run-report.md" in REVIEW_WORDS
+    command = "loom_checker.py finalize-review <change-id>"
+    assert REVIEW_WORDS.index(instruction) < REVIEW_WORDS.index(command)
+
+
+def test_finalize_before_report_commit_not_instructed() -> None:
+    finalize_then_commit = re.compile(
+        r"finaliz\w*.*\b(then|afterwards?|later)\b.*commit\w*.*blind-run report"
+        r"|commit\w*.*blind-run report.*\b(after|once)\b.*finaliz",
+        re.IGNORECASE,
+    )
+    offending = [s for s in _sentences(REVIEW_WORDS) if finalize_then_commit.search(s)]
+    assert offending == []
 
 
 def test_reviewer_yaml_is_converted_to_finalization_json() -> None:
