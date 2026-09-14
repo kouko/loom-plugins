@@ -260,6 +260,15 @@ def test_write_plan_names_typed_branch_and_types() -> None:
         "Step 6 has no affirmative sentence saying the agent picks the type "
         "and reuses it in the change's commit and PR title"
     )
+    fixed = [
+        s for s in _flat_sentences(section)
+        if "implementation commits" in s and "`docs(loom):`" in s
+        and "intent" in s and "plan commits" in s and "fixed form" in s
+    ]
+    assert fixed, (
+        "Step 6 must say the type applies to the implementation commits, "
+        "while the `docs(loom):` intent and plan commits keep their fixed form"
+    )
 
 
 def test_write_plan_bare_switch_absent() -> None:

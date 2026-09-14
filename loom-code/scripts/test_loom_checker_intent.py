@@ -469,7 +469,8 @@ def test_trunk_hint_bare_change_id_absent(tmp_path: Path) -> None:
     intent = write_intent(repo / "docs/loom/intent/a.md", needs_design="no — internal only")
     result = run_checker("intent", str(intent), cwd=repo)
     assert result.returncode == 2
-    assert "git switch -c <change-id>`" not in result.stderr
+    bare = "git switch -c " + "<change-id>`"  # split so the repo sweep grep skips this pin
+    assert bare not in result.stderr
 
 
 def test_typed_branch_base_resolves(tmp_path: Path) -> None:
