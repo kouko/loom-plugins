@@ -18,8 +18,12 @@
 - Limits: publication of a change with a bound selection must run from a
   checkout sharing the git common dir that holds its records, and a fresh
   clone refuses it; Codex older than PR #18391 does not guard file edits
-  against selection record writes; a nested `claude` or `codex` session whose
-  command names the entry point is denied.
+  against selection record writes; on Claude Code a confirmation binds only
+  when its prompt comes from the attended session that proposed it, and an
+  unattended hook process refuses to bind; a command-text guard that denies
+  nested `claude` or `codex` sessions naming the entry point is a further
+  layer and the only one on Codex; confirmation and finalization must share
+  the same Claude Code session.
 - Remove the unused lane settings from `KICKOFF-DEFAULTS.md`, the contract
   manifest and the templates.
 - Raise the counted-skill measurement ceiling from 21 to 22 for `expert-mode`;

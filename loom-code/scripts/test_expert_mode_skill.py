@@ -109,6 +109,15 @@ def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:
             "branch whose attestation skipped reviewers.") in boundary
     assert ("A change with a bound selection publishes only from a checkout sharing the git "
             "common dir that holds its records; a fresh clone refuses it.") in boundary
+    for phrase in (
+        "A confirmation binds only in the attended Claude Code session that proposed it; "
+        "finalization in another session applies the full process, so confirm again in "
+        "that session.",
+        "A nested unattended session (such as `claude -p`, even wrapped in `timeout`) "
+        "never binds.",
+        "Codex exports no session variable, so on Codex only the command-text guard applies.",
+    ):
+        assert phrase in boundary, phrase
     affirmative(text, "only confirm the full process resumed", ("withdraws",))
     affirmative(text, "the hook's lists differed from the table shown", ("show",))
     cancel = next(s for s in re.split(r"(?<=\.)\s+", flat) if "selection cancel <change-id>" in s)
@@ -144,7 +153,10 @@ def test_changelog_names_failure_sources_and_limits() -> None:
         "`loom_checker.py selection skipped-review` lists merged changes that skipped reviewers",
         "a fresh clone refuses it",
         "Codex older than PR #18391",
-        "nested `claude` or `codex` session",
+        "only when its prompt comes from the attended session that proposed it",
+        "an unattended hook process refuses to bind",
+        "is a further layer and the only one on Codex",
+        "confirmation and finalization must share the same Claude Code session",
         "separate from the net mechanism count",
     ):
         assert phrase in entry, phrase
