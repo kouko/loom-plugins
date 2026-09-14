@@ -307,10 +307,19 @@ def _language_anchor(payload: dict) -> str:
         steps = _read_steps(transcript)
     except (OSError, ValueError):
         return ""
-    model_steps = [(i, s) for i, s in enumerate(steps) if s.get("source") == "MODEL"]
-    if not model_steps or not _reads_loom_skill(model_steps[-1][1]):
+    # agy invokes the model again after the view_file result step lands, so look
+    # back through the current user turn for the latest loom skill read.
+    skill_read = None
+    for line_no in range(len(steps) - 1, -1, -1):
+        step = steps[line_no]
+        if step.get("type") == "USER_INPUT":
+            break
+        if step.get("source") == "MODEL" and _reads_loom_skill(step):
+            skill_read = (line_no, step)
+            break
+    if skill_read is None:
         return ""
-    line_no, step = model_steps[-1]
+    line_no, step = skill_read
     step_key = str(step.get("step_index", f"line{line_no}"))
 
     anchor = _load_module("loom_language_anchor", LANGUAGE_ANCHOR)
@@ -326,8 +335,8 @@ def _language_anchor(payload: dict) -> str:
     if not text:
         return ""
 
-    # One anchor per skill-read step: agy may call the model more than once
-    # before a new MODEL step lands in the transcript.
+    # One anchor per skill-read step: every later invocation in the same turn
+    # finds the same read again.
     state = _state_file("loom-code-agy-anchor", payload)
     if _read_state(state) == step_key:
         return ""

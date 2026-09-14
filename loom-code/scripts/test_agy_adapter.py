@@ -306,10 +306,38 @@ def test_anchor_fires_once_per_skill_read_step(tmp_path):
     assert second == {}
 
 
-def test_anchor_only_reads_most_recent_model_step(tmp_path):
-    steps = [_user(JA_TURN), _view(LOOM_SKILL), _view("/ws/README.md")]
+def test_anchor_not_repeated_by_later_steps_in_same_turn(tmp_path):
+    """Later steps in the same turn keep the same latest skill read: no second anchor."""
+    steps = [_user(JA_TURN), _view(LOOM_SKILL)]
+    first = _run("pre-invocation", _invocation(1, [str(tmp_path)], _transcript(tmp_path, steps)), tmp_path)
+    steps.append(_view("/ws/README.md"))
+    later = _run("pre-invocation", _invocation(2, [str(tmp_path)], _transcript(tmp_path, steps)), tmp_path)
+    assert _messages(first)
+    assert later == {}
+
+
+def test_skill_read_before_tool_result_injects_anchor(tmp_path):
+    """agy 1.2.2 live shape: the model is invoked after the view_file result step
+    (source MODEL, type GENERIC) lands, so the skill read is no longer the newest step."""
+    user = {"step_index": 0, "source": "USER_EXPLICIT", "type": "USER_INPUT", "status": "DONE",
+            "content": f"<USER_REQUEST>\n{JA_TURN}\n</USER_REQUEST>"}
+    result = {"step_index": 3, "source": "MODEL", "type": "GENERIC", "status": "DONE",
+              "content": "File Path: `file:///Users/u/.gemini/config/plugins/loom-workflow/skills/"
+                         "recap-state/SKILL.md`\nTotal Lines: 143"}
+    path = tmp_path / "transcript.jsonl"
+    path.write_text(json.dumps(user, ensure_ascii=False) + "\n" + QUOTED_VIEW_LINE + "\n"
+                    + json.dumps(result) + "\n", encoding="utf-8")
+    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], path), tmp_path)
+    (message,) = _messages(out)
+    assert JA_FRAGMENT in message
+
+
+def test_skill_read_in_earlier_user_turn_silent(tmp_path):
+    steps = [_user(JA_TURN), _view(LOOM_SKILL),
+             {"source": "MODEL", "type": "GENERIC", "content": "skill body"},
+             _user(JA_TURN)]
     transcript = _transcript(tmp_path, steps)
-    out = _run("pre-invocation", _invocation(2, [str(tmp_path)], transcript), tmp_path)
+    out = _run("pre-invocation", _invocation(3, [str(tmp_path)], transcript), tmp_path)
     assert out == {}
 
 
