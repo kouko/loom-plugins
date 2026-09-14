@@ -350,13 +350,24 @@ def test_isolated_codex_install_selects_only_its_native_hook_manifest(
     selected = (code_root / manifest["hooks"]).resolve()
     selected.relative_to(code_root.resolve())
     hooks = json.loads(selected.read_text(encoding="utf-8"))["hooks"]
-    assert set(hooks) == {"PreToolUse"}
+    assert set(hooks) == {"PreToolUse", "UserPromptSubmit"}
     assert "${PLUGIN_ROOT}" in hooks["PreToolUse"][0]["hooks"][0]["command"]
+    codex_commands = [
+        hook["command"]
+        for groups in hooks.values()
+        for group in groups
+        for hook in group["hooks"]
+    ]
+    assert codex_commands
+    for command in codex_commands:
+        assert "${PLUGIN_ROOT}" in command
 
     claude = json.loads(
         (code_root / "hooks/hooks.json").read_text(encoding="utf-8")
     )["hooks"]
-    assert {"SessionStart", "PreToolUse", "PostToolUse"} <= set(claude)
+    assert {"SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit"} <= set(
+        claude
+    )
     assert "${CLAUDE_PLUGIN_ROOT}" in json.dumps(claude)
 
 
