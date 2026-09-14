@@ -45,7 +45,8 @@ does not repeat it; where they differ, the baseline wins.
 6. **Never `git add -A`.** Add paths by name. No `git stash`;
    recover a file with `git show <ref>:<path>`.
 7. **Run the focused tests you claim.** Touched test files during the inner
-   loop. Closing Review owns the single package-level run.
+   loop. The complete package suite runs at the end of Build and again in
+   `finalize-review`, never per task.
 8. **Ask instead of guessing.** An ambiguity, or a task contradicting the
    spec, is `NEEDS_CONTEXT` with the question — a correct outcome, not a
    failure.

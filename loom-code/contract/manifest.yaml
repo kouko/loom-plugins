@@ -62,7 +62,7 @@ actions:             # executable steps inside a station; not skills (§3)
     owner: closing-review
     summary: "an agent that never touched the change builds/runs it in a clean environment and writes the blind-run report against every Acceptance line (plus UI flows for product)."
   - name: adversarial
-    owner: closing-review
+    owner: build
     summary: "mutation / fuzz / abuse cases for code, red-team for spec, and gate attacks for skills; execution results land in the generated attestation."
   - name: checkpoint
     owner: closing-review
