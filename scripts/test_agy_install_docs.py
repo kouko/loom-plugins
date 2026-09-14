@@ -54,10 +54,32 @@ def test_readme_agy_install_steps_from_clone() -> None:
         body = _agy_section(_read(rel))
         assert CLONE in body, rel
         assert f"agy plugin install ./{plugin}" in body, rel
-        if plugin == "loom-design":  # requires loom-code; loom-workflow does not
-            assert body.find("agy plugin install ./loom-code") < body.find(
+        if plugin != "loom-code":  # loom-design and loom-workflow skills refer to loom-code
+            assert -1 < body.find("agy plugin install ./loom-code") < body.find(
                 f"agy plugin install ./{plugin}"
             ), rel
+    assert "Install `loom-code` first." in _agy_section(_read("loom-workflow/README.md"))
+
+
+# The agy hook parenthetical in each loom-code README names its third hook.
+LANGUAGE_REMINDER = {
+    "loom-code/README.md": "language reminder",
+    "loom-code/README.ja.md": "言語リマインダー",
+    "loom-code/README.zh-TW.md": "語言提醒",
+}
+
+
+def test_loom_code_readmes_list_language_reminder_hook() -> None:
+    for rel, phrase in LANGUAGE_REMINDER.items():
+        assert phrase in _agy_section(_read(rel)), rel
+
+
+def test_manifest_descriptions_name_antigravity_cli() -> None:
+    import json
+
+    for plugin in ("loom-code", "loom-design"):
+        manifest = json.loads(_read(f"{plugin}/.claude-plugin/plugin.json"))
+        assert manifest["description"].endswith("Claude Code, Codex + Antigravity CLI."), plugin
 
 
 def test_readme_claims_agy_marketplace() -> None:

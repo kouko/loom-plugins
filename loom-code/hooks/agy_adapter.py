@@ -16,12 +16,14 @@ read-only commands is allowed (the same set as the Codex stale-root fallback).
 """
 from __future__ import annotations
 
+import getpass
 import hashlib
 import importlib.util
 import json
 import os
 import re
 import shlex
+import stat
 import subprocess
 import sys
 import tempfile
@@ -180,7 +182,49 @@ def _state_file(kind: str, payload: dict) -> Path:
     name = re.sub(r"[^A-Za-z0-9_.-]", "_", conversation)
     if not name.strip("."):  # "." and ".." name the directory itself, not a file in it
         name = "_" + hashlib.sha256(conversation.encode("utf-8")).hexdigest()[:16]
-    return Path(tempfile.gettempdir()) / kind / name
+    return Path(tempfile.gettempdir()) / f"{kind}-{_user_tag()}" / name
+
+
+def _user_tag() -> str:
+    """A per-user suffix so users sharing one tempdir never share marker files."""
+    if hasattr(os, "getuid"):
+        return str(os.getuid())
+    try:
+        user = getpass.getuser()
+    except Exception:  # no login name on this platform
+        return "user"
+    return re.sub(r"[^A-Za-z0-9_.-]", "_", user).strip(".") or "user"
+
+
+def _open_state(path: Path, flags: int) -> int:
+    """Open a marker inside a private (0o700) state directory this user owns,
+    never through a symlink."""
+    directory = path.parent
+    try:
+        directory.mkdir(mode=0o700)
+    except FileExistsError:
+        pass
+    info = os.lstat(directory)
+    if not stat.S_ISDIR(info.st_mode) or (hasattr(os, "getuid") and info.st_uid != os.getuid()):
+        raise OSError(f"untrusted state directory {directory}")
+    return os.open(path, flags | getattr(os, "O_NOFOLLOW", 0), 0o600)
+
+
+def _read_state(path: Path) -> str | None:
+    try:
+        with os.fdopen(_open_state(path, os.O_RDONLY), "r", encoding="utf-8") as fh:
+            return fh.read()
+    except (OSError, ValueError):
+        return None
+
+
+def _write_state(path: Path, text: str) -> None:
+    try:
+        with os.fdopen(_open_state(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC), "w",
+                       encoding="utf-8") as fh:
+            fh.write(text)
+    except OSError:
+        pass
 
 
 def _first_turn_session_context(payload: dict) -> tuple[str, Path | None]:
@@ -193,18 +237,14 @@ def _first_turn_session_context(payload: dict) -> tuple[str, Path | None]:
     if payload.get("invocationNum") != 0 or not isinstance(initial_steps, int) or initial_steps > 1:
         return "", None
     marker = _state_file("loom-code-agy-session", payload)
-    if marker.is_file():
+    if _read_state(marker) is not None:
         return "", None
     text = _session_context(payload)
     return (text, marker) if text else ("", None)
 
 
 def _write_marker(marker: Path) -> None:
-    try:
-        marker.parent.mkdir(parents=True, exist_ok=True)
-        marker.write_text("injected", encoding="utf-8")
-    except OSError:
-        pass
+    _write_state(marker, "injected")
 
 
 def _load_module(name: str, path: Path):
@@ -270,13 +310,9 @@ def _language_anchor(payload: dict) -> str:
     # One anchor per skill-read step: agy may call the model more than once
     # before a new MODEL step lands in the transcript.
     state = _state_file("loom-code-agy-anchor", payload)
-    try:
-        if state.is_file() and state.read_text(encoding="utf-8") == step_key:
-            return ""
-        state.parent.mkdir(parents=True, exist_ok=True)
-        state.write_text(step_key, encoding="utf-8")
-    except OSError:
-        pass
+    if _read_state(state) == step_key:
+        return ""
+    _write_state(state, step_key)
     return text
 
 

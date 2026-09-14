@@ -11,12 +11,12 @@
     },
     {
       "name": "loom-code",
-      "description": "Optional using-loom-code discovery routing and five stations carry one change from plan to PR with non-blocking cross-vendor suggestions, content-bound verification, one closing review, and a fast publication gate. Claude Code + Codex.",
+      "description": "Optional using-loom-code discovery routing and five stations carry one change from plan to PR with non-blocking cross-vendor suggestions, content-bound verification, one closing review, and a fast publication gate. Claude Code, Codex + Antigravity CLI.",
       "source": "./loom-code/"
     },
     {
       "name": "loom-design",
-      "description": "Optional using-loom-design discovery routing and two stations — capture-intent, write-spec — turn a rough idea into a confirmed intent and a risk-declared spec, route non-blocking second-vendor suggestions, and provide product-principles and design-system tools. Reads loom-code's contract package. Claude Code + Codex.",
+      "description": "Optional using-loom-design discovery routing and two stations — capture-intent, write-spec — turn a rough idea into a confirmed intent and a risk-declared spec, route non-blocking second-vendor suggestions, and provide product-principles and design-system tools. Reads loom-code's contract package. Claude Code, Codex + Antigravity CLI.",
       "source": "./loom-design/"
     }
   ]

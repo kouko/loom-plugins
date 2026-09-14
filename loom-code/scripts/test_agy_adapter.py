@@ -122,6 +122,72 @@ def test_missing_checker_allows_closed_read_only_set(checkerless_adapter, change
     assert out == {"decision": "allow"}
 
 
+PARITY_COMMANDS = [
+    "git status --short", "git log -3 --oneline", "git -C repo diff --stat", "git branch --list",
+    "ls -la", "cat -n README.md", "rg -n --glob=*.py foo", "find . -maxdepth 2 -name x",
+    "git push origin feat", "gh pr create --fill", "pytest -q", "git status; rm -rf x",
+    "git branch -D feat", "git log --output=x", "find . -delete", "/bin/ls", "cat $(id)",
+    "rg --pre=sh foo", "ls -la | sh", "git", "git -C", "echo hi", "cat 'unterminated",
+]
+
+
+def test_missing_checker_allow_set_matches_codex_stale_root(checkerless_adapter, change_repo, tmp_path):
+    """The agy fallback and the Codex stale-root command decide every command alike."""
+    hooks = json.loads((PLUGIN_ROOT / "hooks" / "hooks-codex.json").read_text(encoding="utf-8"))
+    codex_command = hooks["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+    empty_root = tmp_path / "stale-root"
+    empty_root.mkdir()
+    for command in PARITY_COMMANDS:
+        agy = _run("push-gate", _tool_payload(command, ".", [str(change_repo)]), tmp_path,
+                   adapter=checkerless_adapter)["decision"]
+        codex = subprocess.run(
+            ["sh", "-c", codex_command],
+            input=json.dumps({"tool_name": "Bash", "tool_input": {"command": command}}),
+            capture_output=True, text=True, timeout=30,
+            env={**os.environ, "PLUGIN_ROOT": str(empty_root)},
+        )
+        assert codex.returncode in (0, 2), (command, codex.stderr)
+        assert agy == ("allow" if codex.returncode == 0 else "deny"), command
+
+
+def _session_payload(conversation: str) -> dict:
+    return {"conversationId": conversation, "workspacePaths": [], "invocationNum": 0,
+            "initialNumSteps": 1}
+
+
+def _user_state_dir(tmp_path: Path, kind: str) -> Path:
+    return tmp_path / f"{kind}-{os.getuid()}"
+
+
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="per-uid state directory")
+def test_marker_dir_is_private_per_user(tmp_path):
+    _run("pre-invocation", _session_payload("priv"), tmp_path)
+    state = _user_state_dir(tmp_path, "loom-code-agy-session")
+    assert (state / "priv").is_file()
+    assert state.stat().st_mode & 0o777 == 0o700
+    assert not (tmp_path / "loom-code-agy-session").exists()
+
+
+@pytest.mark.skipif(not hasattr(os, "O_NOFOLLOW") or not hasattr(os, "getuid"),
+                    reason="O_NOFOLLOW and per-uid state directory")
+def test_marker_symlink_is_not_followed(tmp_path):
+    state = _user_state_dir(tmp_path, "loom-code-agy-session")
+    state.mkdir(mode=0o700)
+    victim = tmp_path / "victim"
+    (state / "sym").symlink_to(victim)
+    _run("pre-invocation", _session_payload("sym"), tmp_path)
+    assert not victim.exists()
+
+
+@pytest.mark.skipif(not hasattr(os, "getuid"), reason="per-uid state directory")
+def test_symlinked_marker_dir_is_not_used(tmp_path):
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+    _user_state_dir(tmp_path, "loom-code-agy-session").symlink_to(elsewhere)
+    _run("pre-invocation", _session_payload("redir"), tmp_path)
+    assert not (elsewhere / "redir").exists()
+
+
 def test_malformed_tool_payload_denies(tmp_path):
     out = _run("push-gate", {"toolCall": {"name": "run_command", "args": {}}}, tmp_path)
     assert out["decision"] == "deny"
