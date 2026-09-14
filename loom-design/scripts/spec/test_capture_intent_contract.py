@@ -343,6 +343,8 @@ def test_ask_and_fixed_never_silently_substitute_the_host() -> None:
     flat = " ".join(text.split())
     assert "Never offer the current host family" in flat
     assert "never replace it silently" in flat
+    assert "cannot run on Antigravity CLI" in flat
+    assert "reports the blocker and never silently drops the second vendor" in flat
 
 
 def test_antigravity_host_is_never_told_to_probe_gemini() -> None:

@@ -52,4 +52,6 @@ is computed later and independently from the complete branch delta.
 
 A **fixed CLI** is the standing reviewer choice and adds no intent question.
 Probe it with the same availability rule before downstream use; never replace
-it silently with another vendor.
+it silently with another vendor. A fixed CLI or an accepted `ask` answer cannot
+run on Antigravity CLI, so Closing Review follows the existing review failure
+behavior: it reports the blocker and never silently drops the second vendor.

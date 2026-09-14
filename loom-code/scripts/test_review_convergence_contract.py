@@ -243,3 +243,14 @@ def test_recording_passage_invokes_nothing_and_registers_no_mechanism() -> None:
             "#821 REQ-4 forbids a station calling memory by virtue of being "
             "reached. " + _WHY
         )
+
+
+def test_blind_run_before_first_reviewer_dispatch() -> None:
+    section = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
+    words = " ".join(section.split())
+    sentence = (
+        "When a blind run is needed, finish it and commit its report (§3) "
+        "before dispatching the first reviewers."
+    )
+    assert sentence in words
+    assert words.index(sentence) < words.index("loom_checker.py reviewer-count")

@@ -20,9 +20,11 @@ nothing else does. Never `which`: it reports shell aliases and stale
 hashes, and suggesting a tool that turns out not to run costs the user a
 question for nothing. Never suggest the host itself.
 
-Probe candidates in canonical order: Claude, Codex, Gemini, excluding the
-host vendor. Supply every passing candidate to `second_vendor_policy.py` as
-observed data. Do not install, authenticate, select models, or infer
+On Claude Code and Codex, probe candidates in canonical order: Claude, Codex,
+Gemini, excluding the host vendor. Supply every passing candidate to
+`second_vendor_policy.py` as observed data. On Antigravity CLI, pass
+`host_vendor: "gemini"` and an empty `usable_vendors` list to
+`second_vendor_policy.py`. Do not install, authenticate, select models, or infer
 availability from configuration. When the defaults file has no
 `second-vendor:` line, create it from the template if needed and record
 `- second-vendor: suggest — default non-blocking visibility (<date>)`.
@@ -115,7 +117,10 @@ is computed later and independently from the complete branch delta.
 
 A fixed CLI remains the standing reviewer choice. Probe it with the same
 rule before use and follow the existing review failure behavior if it is not
-usable; do not silently substitute another vendor.
+usable; do not silently substitute another vendor. A fixed CLI or an accepted
+`ask` answer cannot run on Antigravity CLI, so Closing Review follows the
+existing review failure behavior: it reports the blocker and never silently
+drops the second vendor.
 
 ## `docs-lint: <command> | none — <why>`
 

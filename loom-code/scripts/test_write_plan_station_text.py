@@ -258,3 +258,12 @@ def test_current_release_metadata_is_synchronized() -> None:
     assert claude_manifest["version"] == "3.1.4"
     assert codex_manifest["version"] == "3.1.4"
     assert "## [3.1.4]" in changelog
+
+
+def test_agy_host_passes_empty_usable_vendors() -> None:
+    text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
+    probe = " ".join(_section(text, "## Availability probe").split())
+    order = next(s for s in re.split(r"(?<=[.:])\s+(?=[A-Z])", probe) if "canonical order" in s)
+    assert "On Claude Code and Codex" in order
+    assert 'On Antigravity CLI, pass `host_vendor: "gemini"`' in probe
+    assert "an empty `usable_vendors` list to `second_vendor_policy.py`" in probe

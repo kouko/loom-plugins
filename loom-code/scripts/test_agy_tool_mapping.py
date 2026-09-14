@@ -178,3 +178,33 @@ def test_role_dispatch_checks_accept_self_and_reject_plugin_typename() -> None:
     assert _plugin_agent_typenames("`TypeName` `blind-runner`") == ["blind-runner"]
     assert _plugin_agent_typenames("`TypeName` (required), for example `reviewer`.") == ["reviewer"]
     assert _plugin_agent_typenames(f"Use `{SELF_TYPENAME}`. The `reviewer` reads.") == []
+
+
+WRITE_PLAN_VENDOR = PLUGIN / "skills" / "write-plan" / "references" / "second-vendor-ask-and-docs-lint.md"
+FIXED_CLI_BLOCKER = (
+    "A fixed CLI or an accepted `ask` answer cannot run on Antigravity CLI, "
+    "so Closing Review follows the existing review failure behavior: it "
+    "reports the blocker and never silently drops the second vendor."
+)
+
+
+def _h2(text: str, heading: str) -> str:
+    match = re.search(rf"^## {re.escape(heading)}$.*?(?=^## |\Z)", text, re.M | re.S)
+    assert match, f"section {heading!r} missing"
+    return _flat(match.group(0))
+
+
+def test_agy_fixed_cli_reports_blocker_not_silent_drop() -> None:
+    agy = _h2(REFERENCE.read_text(encoding="utf-8"), "Second vendor")
+    fixed = _h2(WRITE_PLAN_VENDOR.read_text(encoding="utf-8"), "Fixed CLI")
+    assert FIXED_CLI_BLOCKER in agy
+    assert FIXED_CLI_BLOCKER in fixed
+    assert "`suggest` and a declined `ask` continue without a second vendor" in agy
+    assert "continue the review without one" not in agy
+
+
+def test_agy_model_fallback_records_host_default_unverified() -> None:
+    section = _h2(REFERENCE.read_text(encoding="utf-8"), "Model and effort overrides")
+    assert "`host-default/unverified`" in section
+    assert "effort inheritance is unverified on agy 1.2.2" in section
+    assert "profile as `inherited`" not in section

@@ -72,14 +72,17 @@ items in one `Subagents` array run concurrently is unverified on agy 1.2.2.
 `invoke_subagent` has no effort parameter, so a resolved
 `dispatch_profile.py` profile cannot be applied atomically on agy. Follow the
 shared dispatch profile's atomic host fallback: omit both overrides, leave
-`Model` unset or `inherit`, and record the effective profile as `inherited`.
-Never set `Model` alone; a partial profile is never claimed.
+`Model` unset or `inherit`, and record the effective profile as
+`host-default/unverified`, because effort inheritance is unverified on agy
+1.2.2. Never set `Model` alone; a partial profile is never claimed.
 
 ## Second vendor
 
 Antigravity CLI has no verified second-vendor runner yet, so an agy host
-offers no cross-model reviewer: probe no vendor and continue the review
-without one.
+probes no vendor: `suggest` and a declined `ask` continue without a second
+vendor. A fixed CLI or an accepted `ask` answer cannot run on Antigravity CLI,
+so Closing Review follows the existing review failure behavior: it reports the
+blocker and never silently drops the second vendor.
 
 ## Plugin root
 

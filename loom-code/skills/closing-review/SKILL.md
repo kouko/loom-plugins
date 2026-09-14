@@ -48,7 +48,9 @@ fallback instead of model escalation.
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
-After Build commits completed functional content, run:
+When a blind run is needed, finish it and commit its report (§3) before
+dispatching the first reviewers. After Build commits completed functional
+content, run:
 
 ```text
 python3 <loom-code>/scripts/loom_checker.py reviewer-count <change-id>
