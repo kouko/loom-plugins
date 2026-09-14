@@ -69,6 +69,11 @@ You will receive (as JSON in the dispatched Agent prompt):
 - `date_str`: `YYYY-MM-DD` — the report date. Used in the top-level
   H1 heading.
 
+`<skill-dir>` in the command examples below means the distill-sessions
+skill folder (the directory holding its SKILL.md); every command line in
+your report must use the resolved absolute path the orchestrator provides
+in its place, never the literal `<skill-dir>` placeholder.
+
 You do not have file-system access, do not run code, and do not
 consult any external resource beyond these three inputs.
 

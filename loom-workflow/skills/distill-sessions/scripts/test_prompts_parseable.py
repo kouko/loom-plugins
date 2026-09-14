@@ -342,6 +342,29 @@ def test_advisory_prompt_forbids_orchestrator_memory_reference() -> None:
     _ = joined
 
 
+def test_advisory_prompt_defines_skill_dir_before_first_use() -> None:
+    """The advisory prompt's first ``<skill-dir>`` must sit in its definition.
+
+    The analyst's command examples use ``<skill-dir>/scripts/...``. An
+    undefined placeholder gets copied literally into the report the user
+    pastes from, so the paragraph holding the first occurrence must say what
+    it is (the folder holding SKILL.md) and that report command lines use the
+    resolved absolute path instead.
+    """
+    _, body = _split_frontmatter(ADVISORY_PATH.read_text(encoding="utf-8"))
+    first = body.find("<skill-dir>")
+    assert first != -1, f"{ADVISORY_PATH.name}: expected a <skill-dir> use"
+    start = body.rfind("\n\n", 0, first)
+    end = body.find("\n\n", first)
+    paragraph = body[start if start != -1 else 0 : end if end != -1 else len(body)]
+    paragraph_lower = " ".join(paragraph.split()).lower()
+    assert "skill.md" in paragraph_lower and "absolute path" in paragraph_lower, (
+        f"{ADVISORY_PATH.name}: the first <skill-dir> must appear in a sentence "
+        f"defining it (folder holding SKILL.md; reports use the absolute path); "
+        f"got paragraph: {paragraph.strip()!r}"
+    )
+
+
 def test_both_prompts_forbid_orchestrator_memory_reference() -> None:
     """Regression guard for v0.2 Finding #3 (orchestrator memory leak).
 

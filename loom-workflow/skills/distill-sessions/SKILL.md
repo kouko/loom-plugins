@@ -185,8 +185,9 @@ python <skill-dir>/scripts/report.py \
 `--lang` is mandatory and accepts `zh-TW`, `en`, or `ja`. The command creates
 a dispatch payload; it does not write the analyst's prose. Read the advisory
 prompt, dispatch one current-Sonnet subagent with
-`dispatch_payload.input`, then write its returned markdown verbatim to the
-reported `output_path`. Do not add a preamble or edit the response. Skip this
+`dispatch_payload.input` and the resolved absolute `<skill-dir>` path to
+substitute for the placeholder in its command lines, then write its returned
+markdown verbatim to the reported `output_path`. Do not add a preamble or edit the response. Skip this
 surface when only per-target proposals are needed.
 
 ## Configuration and operating invariants
