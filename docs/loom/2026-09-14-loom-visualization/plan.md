@@ -69,3 +69,4 @@ charter: 1.0
 2. The ported ASCII engine becomes a second copy of ascii-graph-toolkit; each file header records source commit e5b978e0 so later divergence is traceable.
 3. Acceptance 8 is behavioural and model-dependent; the fixed seven-prompt protocol with a control keeps the blind run decidable.
 4. Removing the markdown-it-py CI pin could hide another consumer; W1-03 checks the repository for remaining imports before dropping it.
+5. user-decided — 2026-09-14 kouko authorized merging origin/main into this branch to resolve README conflicts and re-confirmed the intent, starting a new review episode scoped to that resolution.
