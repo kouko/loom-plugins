@@ -54,7 +54,7 @@ charter: 1.0
 
 ### Wave 3 — mechanism accounting
 
-**W3-01 Register loom-workflow hooks and loom-visualization gates as mechanisms**  after: W2-04, W2-05  acceptance: 10
+**W3-01 Register loom-workflow hooks and loom-visualization gates as mechanisms**  after: W2-01, W2-05  acceptance: 10
 - Files: `loom-code/scripts/check_mechanisms.py`, `loom-code/scripts/test_check_mechanisms.py`, `docs/loom/evidence/mechanisms.yaml`, `loom-workflow/scripts/test_validate_skill_folder_structure_hook.py`, `loom-code/CHANGELOG.md`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`
 - Test: A10 positive: package-suite-and-check-mechanisms-green; negative: unregistered-workflow-hook-is-red.
 - Risk: net count rises by two hooks plus W2-01's two prose gates; loom-code minor bump carries four budget-exception lines. agent-decided.
