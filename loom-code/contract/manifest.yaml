@@ -186,6 +186,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
         - "executions"
         - "verdicts"
         - "findings"
+        - "selection"
       must_not:
         - {kind: "design reasoning", goes_to: spec}
       signoff: review
@@ -198,6 +199,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       - {name: executions,     kind: json, required: true, grammar: "[{kind, command, artifact, result, command_digest}]"}
       - {name: verdicts,       kind: json, required: true, grammar: "[{reviewer, vendor, model, lens, verdict, findings}]"}
       - {name: findings,       kind: json, required: true, grammar: "[{id, anchor, raised_by, resolution} | {severity, dimension, anchor, text}]"}
+      - {name: selection,      kind: json, required: true, grammar: "{confirmations: [{code, skip, source, at}], skip, source, prior_failures: [{step, rule, head_sha, branch, at}]} | null", note: "schema loom-attestation/v2; recomputed from the local selection records, and only steps in skip waive their checks; v1 attestations carry no selection and stay valid"}
 
   blind-run-report:
     path: docs/loom/<change-id>/blind-run-report.md

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from loom_checker import selection
 from loom_checker.attestation import ATTESTATION_SCHEMA
 from loom_checker.attestation import _command_digest
+from loom_checker.attestation import selection_evidence
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
 from loom_checker.helpers import load_manifest
@@ -25,11 +28,45 @@ import sys
 import tempfile
 
 
+# The step a refused finalize rule belongs to; rules no step owns record `finalize`.
+STEP_BY_RULE = {
+    "finalize.verdicts": "reviewers",
+    "finalize.adversarial": "adversarial",
+    "finalize.package-tests": "package-tests",
+}
+
+
+def _record_failure(repo: Path, change_id: str, rule: str) -> None:
+    """Append a failure event; a store that cannot be written never masks the refusal."""
+    try:
+        selection.append_event(repo, change_id, {
+            "event": "failure", "step": STEP_BY_RULE.get(rule, "finalize"), "rule": rule,
+            "head_sha": git_maybe(repo, "rev-parse", "HEAD"),
+            "branch": git_maybe(repo, "rev-parse", "--abbrev-ref", "HEAD"),
+            "at": selection.now(),
+        })
+    except (UsageError, OSError):
+        pass
+
+
 def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     """Run functional verification once and generate content-bound evidence."""
     if not args:
         raise UsageError("finalize-review needs a change-id.")
     change_id, *rest = args
+    repo = repo_root(Path.cwd())
+    try:
+        findings = _finalize(repo, change_id, rest, out)
+    except UsageError:
+        _record_failure(repo, change_id, "finalize.usage")
+        raise
+    if findings:
+        _record_failure(repo, change_id, findings[0][0])
+        return report(findings, err)
+    return 0
+
+
+def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[str, str]]:
     if len(rest) != 2 or rest[0] != "--input":
         raise UsageError("finalize-review expects `--input <review-input.json>`.")
     input_path = Path(rest[1])
@@ -39,53 +76,53 @@ def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         raise UsageError(f"cannot read review input: {exc}") from exc
     if not isinstance(review_input, dict):
         raise UsageError("review input must be a JSON object.")
-    repo = repo_root(Path.cwd())
     head_sha = git_text(repo, "rev-parse", "HEAD")
     status_before = git_text(repo, "status", "--porcelain")
     if status_before:
-        return report([("finalize.clean-tree", "commit functional content before finalizing review")], err)
-    verdicts = review_input.get("verdicts")
+        return [("finalize.clean-tree", "commit functional content before finalizing review")]
+    manifest = load_manifest()
+    bound = selection_evidence(repo, change_id, manifest)
+    skip = set(bound["skip"]) if bound else set()
+    verdicts = review_input.get("verdicts", [] if "reviewers" in skip else None)
     findings = review_input.get("findings", [])
     adversarial = review_input.get("adversarial", [])
-    if not isinstance(verdicts, list) or not verdicts:
-        return report([("finalize.verdicts", "review input has no verdicts")], err)
+    if not isinstance(verdicts, list) or (not verdicts and "reviewers" not in skip):
+        return [("finalize.verdicts", "review input has no verdicts")]
     if any(not isinstance(v, dict) or v.get("verdict") not in {
         "PASS", "PASS_WITH_NOTES"
     } for v in verdicts):
-        return report([("finalize.verdicts", "every reviewer verdict must pass")], err)
+        return [("finalize.verdicts", "every reviewer verdict must pass")]
     reviewers = {str(v.get("reviewer", "")).strip() for v in verdicts}
     reviewers.discard("")
-    reviewer_floor = required_reviewer_count(repo, change_id, head_sha)
+    reviewer_floor = 0 if "reviewers" in skip else required_reviewer_count(repo, change_id, head_sha)
     if len(reviewers) < reviewer_floor:
         needed = "two" if reviewer_floor == 2 else "one"
-        return report(
-            [("finalize.verdicts", f"{needed} distinct reviewers are required")],
-            err,
-        )
+        return [("finalize.verdicts", f"{needed} distinct reviewers are required")]
     if not isinstance(findings, list) or not isinstance(adversarial, list):
-        return report([("finalize.schema", "findings and adversarial must be lists")], err)
-    if not adversarial:
-        return report([("finalize.adversarial", "at least one adversarial artifact is required")], err)
+        return [("finalize.schema", "findings and adversarial must be lists")]
+    if not adversarial and "adversarial" not in skip:
+        return [("finalize.adversarial", "at least one adversarial artifact is required")]
 
-    manifest = load_manifest()
     config_before = git_text(repo, "config", "--list", "--null")
-    package_command, source = declared_test_command(repo)
-    if package_command is None or package_command.strip().lower() == NO_PACKAGE_TESTS:
-        return report([("finalize.package-tests", f"no executable package command ({source})")], err)
-    work: list[tuple[str, str, str]] = [("package-tests", package_command, "")]
+    work: list[tuple[str, str, str]] = []
+    if "package-tests" not in skip:
+        package_command, source = declared_test_command(repo)
+        if package_command is None or package_command.strip().lower() == NO_PACKAGE_TESTS:
+            return [("finalize.package-tests", f"no executable package command ({source})")]
+        work.append(("package-tests", package_command, ""))
     for item in adversarial:
         if not isinstance(item, dict):
-            return report([("finalize.adversarial", "malformed adversarial input")], err)
+            return [("finalize.adversarial", "malformed adversarial input")]
         command = str(item.get("command", "")).strip()
         artifact = str(item.get("artifact", "")).strip()
         if not command or not artifact:
-            return report([("finalize.adversarial", "adversarial input needs command and artifact")], err)
+            return [("finalize.adversarial", "adversarial input needs command and artifact")]
         if not command_names_artifact(command, artifact):
-            return report([("finalize.adversarial", "command must name its artifact argument")], err)
+            return [("finalize.adversarial", "command must name its artifact argument")]
         if not command_executes_artifact(command, artifact):
-            return report([("finalize.adversarial", "command must execute the artifact directly")], err)
+            return [("finalize.adversarial", "command must execute the artifact directly")]
         if not git_ok(repo, "cat-file", "-e", f"{head_sha}:{artifact}"):
-            return report([("finalize.adversarial", "artifact must exist in the selected commit")], err)
+            return [("finalize.adversarial", "artifact must exist in the selected commit")]
         work.append(("adversarial", command, artifact))
 
     executions: list[dict] = []
@@ -96,33 +133,33 @@ def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
                 timeout=PROBE_RUN_TIMEOUT,
             )
         except (ValueError, OSError, subprocess.TimeoutExpired) as exc:
-            return report([(f"finalize.{kind}", f"execution failed: {exc}")], err)
+            return [(f"finalize.{kind}", f"execution failed: {exc}")]
         if completed.returncode != 0:
             detail = (completed.stdout + completed.stderr).strip()
             suffix = f"\n{detail[-4000:]}" if detail else ""
-            return report([(
+            return [(
                 f"finalize.{kind}",
                 f"`{command}` exited {completed.returncode}{suffix}",
-            )], err)
+            )]
         executions.append({
             "kind": kind, "command": command, "artifact": artifact,
             "result": "pass", "command_digest": _command_digest(command),
         })
 
     if git_text(repo, "rev-parse", "HEAD") != head_sha:
-        return report([("finalize.stable-tree", "HEAD moved during functional verification")], err)
+        return [("finalize.stable-tree", "HEAD moved during functional verification")]
     if git_text(repo, "status", "--porcelain") != status_before:
-        return report([("finalize.stable-tree", "working tree or index changed during functional verification")], err)
+        return [("finalize.stable-tree", "working tree or index changed during functional verification")]
     if git_text(repo, "config", "--list", "--null") != config_before:
-        return report([("finalize.stable-tree", "git configuration changed during functional verification")], err)
+        return [("finalize.stable-tree", "git configuration changed during functional verification")]
 
     digest = functional_content_digest(repo, head_sha, change_id, manifest)
     if digest is None:
-        return report([("finalize.digest", "cannot compute functional content digest")], err)
+        return [("finalize.digest", "cannot compute functional content digest")]
     attestation = {
         "schema": ATTESTATION_SCHEMA, "change_id": change_id,
         "content_digest": digest, "executions": executions,
-        "verdicts": verdicts, "findings": findings,
+        "verdicts": verdicts, "findings": findings, "selection": bound,
     }
     target = artifact_path(manifest, "attestation", change_id, repo)
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -134,4 +171,4 @@ def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         temporary = Path(handle.name)
     temporary.replace(target)
     out.write(f"wrote {target.relative_to(repo)} for {digest}\n")
-    return 0
+    return []

@@ -204,7 +204,7 @@ def test_manifest_declares_generated_attestation(manifest):
     assert schema["path"] == "docs/loom/<change-id>/attestation.json"
     assert schema["template"] == "attestation.json"
     names = [field["name"] for field in schema["fields"]]
-    assert names == ["schema", "change_id", "content_digest", "executions", "verdicts", "findings"]
+    assert names == ["schema", "change_id", "content_digest", "executions", "verdicts", "findings", "selection"]
     assert "review" not in manifest["artifacts"]
 
 

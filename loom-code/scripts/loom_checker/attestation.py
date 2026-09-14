@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from loom_checker import selection
 from loom_checker.digest import functional_content_digest
+from loom_checker.helpers import UsageError
 from loom_checker.helpers import git_ok
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
@@ -10,16 +12,63 @@ from pathlib import Path
 import hashlib
 
 
-ATTESTATION_SCHEMA = "loom-attestation/v1"
+ATTESTATION_SCHEMA_V1 = "loom-attestation/v1"
+ATTESTATION_SCHEMA = "loom-attestation/v2"
 
 
-ATTESTATION_KEYS = {
+ATTESTATION_KEYS_V1 = {
     "schema", "change_id", "content_digest", "executions", "verdicts", "findings"
 }
+ATTESTATION_KEYS = ATTESTATION_KEYS_V1 | {"selection"}
+KEYS_BY_SCHEMA = {ATTESTATION_SCHEMA_V1: ATTESTATION_KEYS_V1, ATTESTATION_SCHEMA: ATTESTATION_KEYS}
+
+
+FAILURE_FIELDS = ("step", "rule", "head_sha", "branch", "at")
 
 
 def _command_digest(command: str) -> str:
     return hashlib.sha256(command.encode("utf-8")).hexdigest()
+
+
+def selection_evidence(repo: Path, change_id: str, manifest: dict | None = None) -> dict | None:
+    """The attestation `selection` the local records support, or None.
+
+    Only a valid confirmation whose source is `user-typed`, recorded on the
+    current branch and merge base, binds; anything else is the full process.
+    `prior_failures` lists failures dated before the newest confirmation."""
+    events = selection.read_events(repo, change_id)
+    if not any(event.get("event") == "confirmation" for event in events):
+        return None
+    vocabulary = manifest if isinstance(manifest, dict) and manifest.get("step_selection") else None
+    try:
+        effective = selection.effective_selection(repo, change_id, vocabulary)
+        branch, merge_base = selection.current_scope(repo)
+        names = [step["name"] for step in selection.step_vocabulary(vocabulary)]
+    except UsageError:
+        return None
+    if not effective["bound"] or effective.get("source") != "user-typed":
+        return None
+    in_scope = [e for e in events if e.get("branch") == branch and e.get("merge_base") == merge_base]
+    proposals = {e.get("id"): e for e in in_scope if e.get("event") == "proposal"}
+    confirmations = []
+    for event in in_scope:
+        if event.get("event") != "confirmation" or event.get("source") != "user-typed":
+            continue
+        proposal = proposals.get(event.get("proposal_id"))
+        if proposal is None or not selection.confirmation_is_valid(event, proposal):
+            continue
+        confirmations.append({
+            "code": proposal["code"], "skip": [n for n in names if n in proposal["skip"]],
+            "source": event["source"], "at": event.get("at"),
+        })
+    latest = confirmations[-1]["at"] if confirmations else None
+    prior = [
+        {key: failure.get(key) for key in FAILURE_FIELDS}
+        for failure in effective["failures"]
+        if isinstance(latest, str) and isinstance(failure.get("at"), str) and failure["at"] < latest
+    ]
+    return {"confirmations": confirmations, "skip": effective["skip"],
+            "source": "user-typed", "prior_failures": prior}
 
 
 def validate_attestation(
@@ -28,18 +77,31 @@ def validate_attestation(
 ) -> list[tuple[str, str]]:
     """Validate generated evidence without executing the recorded programs."""
     rule = "push.attestation"
-    if not isinstance(attestation, dict) or set(attestation) != ATTESTATION_KEYS:
+    if not isinstance(attestation, dict) or set(attestation) not in KEYS_BY_SCHEMA.values():
         return [(rule, "attestation has an unknown or incomplete schema")]
-    if attestation.get("schema") != ATTESTATION_SCHEMA:
-        return [(rule, f"unsupported attestation schema {attestation.get('schema')!r}")]
+    schema = attestation.get("schema")
+    if schema not in KEYS_BY_SCHEMA:
+        return [(rule, f"unsupported attestation schema {schema!r}")]
+    if set(attestation) != KEYS_BY_SCHEMA[schema]:
+        return [(rule, "attestation has an unknown or incomplete schema")]
     if attestation.get("change_id") != change_id:
         return [(rule, "attestation change_id does not match its path")]
     expected = functional_content_digest(repo, head_sha, change_id, manifest)
     if expected is None or attestation.get("content_digest") != expected:
         return [(rule, "attestation functional content digest does not match the selected tree")]
 
+    skip: set[str] = set()
+    if schema == ATTESTATION_SCHEMA:
+        recorded = selection_evidence(repo, change_id, manifest)
+        if attestation.get("selection") != recorded:
+            return [(rule, "attestation selection does not match the local selection records")]
+        if recorded is not None:
+            skip = set(recorded["skip"])
+
     executions = attestation.get("executions")
-    if not isinstance(executions, list) or not executions:
+    if not isinstance(executions, list) or (
+        not executions and not {"package-tests", "adversarial"} <= skip
+    ):
         return [(rule, "attestation records no successful functional executions")]
     package_runs = 0
     adversarial_runs = 0
@@ -71,17 +133,17 @@ def validate_attestation(
                 return [(rule, "adversarial execution names no committed artifact")]
         else:
             return [(rule, "attestation contains an unknown execution kind")]
-    if package_runs != 1:
+    if package_runs > 1 or (package_runs == 0 and "package-tests" not in skip):
         return [(rule, "attestation must record exactly one package-tests execution")]
-    if adversarial_runs < 1:
+    if adversarial_runs < 1 and "adversarial" not in skip:
         return [(rule, "attestation records no adversarial execution")]
 
     verdicts = attestation.get("verdicts")
-    if not isinstance(verdicts, list) or not verdicts:
+    if not isinstance(verdicts, list) or (not verdicts and "reviewers" not in skip):
         return [(rule, "attestation records no reviewer verdict")]
     reviewers = {str(v.get("reviewer", "")).strip() for v in verdicts if isinstance(v, dict)}
     reviewers.discard("")
-    reviewer_floor = required_reviewer_count(repo, change_id, head_sha)
+    reviewer_floor = 0 if "reviewers" in skip else required_reviewer_count(repo, change_id, head_sha)
     if len(reviewers) < reviewer_floor:
         needed = "two" if reviewer_floor == 2 else "one"
         return [(rule, f"attestation needs {needed} distinct reviewers")]
