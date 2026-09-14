@@ -34,6 +34,7 @@ Codex uses `request_user_input` only when the host exposes it in the active
 mode; its live tool schema owns the valid question shape and availability, and
 the official implementation enforces both mode and root-thread availability
 ([Codex handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/request_user_input.rs)).
+Antigravity CLI uses `ask_question`; its live tool schema owns the question shape.
 Treat the two choice meanings as `decline this change` and `use <tool>`, and
 render both choices in the user's current conversation language. If the
 interface requires a recommended choice, mark `decline this change` as

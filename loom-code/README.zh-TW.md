@@ -102,8 +102,8 @@ agy plugin list
 ```
 
 更新時在 clone 裡執行 `git pull`，再重跑 install（install 會取代已安裝的副本）；
-移除用 `agy plugin uninstall loom-code`。hook（publication gate 與 session
-context）只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。在 `agy`
+移除用 `agy plugin uninstall loom-code`。hook（publication gate、session
+context 與語言提醒）只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。在 `agy`
 上，reviewer、blind-runner、adversary subagent 以 Gemini 模型執行。審查站在所有
 host 上都叫 `closing-review`，舊名 `review` 已移除，沒有別名。
 

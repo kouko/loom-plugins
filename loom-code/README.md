@@ -114,8 +114,8 @@ agy plugin list
 
 To update, run `git pull` in the clone and install again; the install replaces
 the installed copy. `agy plugin uninstall loom-code` removes it. The hooks (the
-publication gate and the session context) run only in the `agy` CLI, not in
-the Antigravity desktop app or IDE. On `agy` the reviewer, blind-runner and
+publication gate, the session context and the language reminder) run only in
+the `agy` CLI, not in the Antigravity desktop app or IDE. On `agy` the reviewer, blind-runner and
 adversary subagents run on Gemini models. The review station is
 `closing-review` on every host; the old `review` name was removed and has no
 alias.

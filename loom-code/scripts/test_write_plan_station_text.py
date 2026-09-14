@@ -183,6 +183,7 @@ def test_ask_still_asks_once_per_full_lane_change() -> None:
     assert "every full-lane change" in flat
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
+    assert "Antigravity CLI uses `ask_question`; its live tool schema owns the question shape." in flat
     assert "render both choices in the user's current conversation language" in flat
     assert "decline this change" in flat
     assert "https://code.claude.com/docs/en/tools-reference" in text

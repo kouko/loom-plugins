@@ -112,7 +112,7 @@ agy plugin list
 
 更新は clone で `git pull` してから install を再実行します（install は
 インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
-です。hook（publication gate と session context）が走るのは `agy` CLI だけで、
+です。hook（publication gate・session context・言語リマインダー）が走るのは `agy` CLI だけで、
 Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では reviewer・
 blind-runner・adversary の subagent は Gemini モデルで動きます。review station は
 どの host でも `closing-review` で、旧名 `review` は別名なしで削除されました。

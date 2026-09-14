@@ -133,11 +133,13 @@ loom-workflow/
 
 ### Antigravity CLI
 
-Install from a clone of the repository:
+Install from a clone of the repository. Install `loom-code` first. `critique`,
+`decision-map` and `distill-sessions` refer to it.
 
 ```bash
 git clone https://github.com/kouko/loom-plugins.git
 cd loom-plugins
+agy plugin install ./loom-code
 agy plugin install ./loom-workflow
 ```
 
