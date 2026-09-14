@@ -193,3 +193,56 @@ def test_skill_declines_vault_target(tmp_path):
         capture_output=True, text=True, check=True,
     )
     assert json.loads(result.stdout)["obsidian_vault"] is True
+
+
+NEGATION_RE = re.compile(r"\b(?:not|never|no|none|without|unless|except|avoid)\b|n't", re.IGNORECASE)
+
+
+def gate_sentences(block):
+    return re.split(r"(?<=[.!?])\s+", " ".join(block.split()))
+
+
+def pinned_sentence_ok(sentence, verb, literals):
+    """True when every literal is in the sentence, an affirmative `verb`
+    precedes the primary literal (literals[0]), and no negation token remains once the
+    pinned literals themselves are removed."""
+    if not all(lit in sentence for lit in literals):
+        return False
+    head = sentence[:sentence.index(literals[0])]
+    if not re.search(rf"\b{re.escape(verb)}\b", head, re.IGNORECASE):
+        return False
+    rest = sentence
+    for lit in literals:
+        rest = rest.replace(lit, " ")
+    return not NEGATION_RE.search(rest)
+
+
+MERMAID_GATE = "loom-visualization.mermaid-only-when-confirmed"
+MERMAID_PIN = ("Use", ("Mermaid only when you have no shell", "claude.ai", "Claude Desktop chat"))
+TABLE_ASCII_PIN = ("use", ("markdown table plus ASCII", "Everywhere else"))
+
+
+def test_pinned_sentence_affirmative_example_accepted():
+    sentence = ("Use Mermaid only when you have no shell and your own host is "
+                "claude.ai or the Claude Desktop chat.")
+    assert pinned_sentence_ok(sentence, *MERMAID_PIN)
+
+
+def test_pinned_sentence_negated_example_rejected():
+    sentence = ("Never use Mermaid only when you have no shell and your own host is "
+                "claude.ai or the Claude Desktop chat.")
+    assert not pinned_sentence_ok(sentence, *MERMAID_PIN)
+
+
+def test_mermaid_gate_paragraph_present_requires_confirmed_host():
+    text = SKILL_MD.read_text(encoding="utf-8")
+    match = re.search(
+        rf"<!--\s*gate:\s*{re.escape(MERMAID_GATE)}\s*-->(.*?)<!--\s*/gate\s*-->",
+        text, re.DOTALL,
+    )
+    assert match, f"no {MERMAID_GATE} gate block in SKILL.md"
+    sentences = gate_sentences(match.group(1))
+    for verb, literals in (MERMAID_PIN, TABLE_ASCII_PIN):
+        assert any(pinned_sentence_ok(s, verb, literals) for s in sentences), (
+            f"no affirmative, un-negated sentence pins {literals!r}"
+        )

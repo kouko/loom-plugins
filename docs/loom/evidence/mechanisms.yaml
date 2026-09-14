@@ -313,4 +313,4 @@ mechanisms:
     eval: loom-workflow/skills/loom-visualization/scripts/test_templates.py::test_skill_declines_vault_target
   - id: "loom-visualization.mermaid-only-when-confirmed"
     class: prose-gate
-    eval: loom-workflow/skills/loom-visualization/scripts/test_detect_client.py::test_unrecognised_env_falls_back_table_ascii
+    eval: loom-workflow/skills/loom-visualization/scripts/test_templates.py::test_mermaid_gate_paragraph_present_requires_confirmed_host
