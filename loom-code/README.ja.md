@@ -19,7 +19,7 @@
 ```mermaid
 flowchart TD
     intent["① intent を確認する<br/>loom-design:capture-intent<br/>loom-design がなければ loom-code:write-plan"]
-    spec["任意・product の変更のみ<br/>loom-design:write-spec<br/>② 目に見える振る舞いを確認する"]
+    spec["needs-design: yes のときだけ<br/>loom-design:write-spec<br/>② product の変更: 目に見える振る舞いを確認する"]
     plan["loom-code:write-plan<br/>plan.md のタスク DAG"]
     build["loom-code:build<br/>テストファースト、タスクごとに implementer 1 つ"]
     review["loom-code:review<br/>fresh-context のレビュアー<br/>必要なら盲検と adversary"]
@@ -29,7 +29,7 @@ flowchart TD
     maintain["loom-code:maintain<br/>バグ・アラート・リグレッション・障害"]
 
     intent --> plan
-    intent -.->|"product の変更"| spec
+    intent -.->|"needs-design: yes"| spec
     spec -.-> plan
     plan --> build
     build --> review
@@ -53,9 +53,9 @@ flowchart TD
   attestation として生成されます。
 - **Ship** — ブランチを push し、PR を開き、必須チェックを確認します（③）。
   Ship はマージしません。マージは、あなた自身の明示的な許可が要る別の手順です。
-- **Maintain** — マージ後に来たバグ報告・アラート・リグレッション・障害を、
-  一致する open な intent に結び付けるか新しい intent を作り、`write-plan` に
-  渡します。
+- **Maintain** — 進行中の未マージ変更の外で起きたバグ報告・アラート・
+  リグレッション・障害を、一致する open な intent に結び付けるか新しい
+  intent を作り、`write-plan` に渡します。
 
 ## Skills
 

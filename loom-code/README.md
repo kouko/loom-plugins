@@ -19,7 +19,7 @@
 ```mermaid
 flowchart TD
     intent["① You confirm the intent<br/>loom-design:capture-intent<br/>or loom-code:write-plan without loom-design"]
-    spec["Optional, product changes only<br/>loom-design:write-spec<br/>② You confirm the visible behaviour"]
+    spec["Only when needs-design: yes<br/>loom-design:write-spec<br/>② product changes: you confirm the visible behaviour"]
     plan["loom-code:write-plan<br/>Task DAG in plan.md"]
     build["loom-code:build<br/>Test-first, one implementer per task"]
     review["loom-code:review<br/>Fresh-context reviewers<br/>blind run and adversary when needed"]
@@ -29,7 +29,7 @@ flowchart TD
     maintain["loom-code:maintain<br/>Bug, alert, regression or incident"]
 
     intent --> plan
-    intent -.->|"product change"| spec
+    intent -.->|"needs-design: yes"| spec
     spec -.-> plan
     plan --> build
     build --> review
@@ -53,9 +53,9 @@ flowchart TD
 - **Ship** — pushes the branch, opens the PR and verifies required checks
   (③). Ship never merges: merging is a separate step that needs your own
   explicit authorization.
-- **Maintain** — after a merge, a bug report, alert, regression or incident is
-  attached to a matching open intent, or a new one is created, and handed to
-  `write-plan`.
+- **Maintain** — outside an active unmerged change, a bug report, alert,
+  regression or incident is attached to a matching open intent, or a new one
+  is created, and handed to `write-plan`.
 
 ## Skills
 

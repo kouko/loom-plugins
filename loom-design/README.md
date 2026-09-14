@@ -99,9 +99,10 @@ loom-design requires `loom-code`:
 - **Its verdicts are rendered by loom-code.** The pre-build spec review and
   the closing review both run in `loom-code:review`, with fresh-context
   reviewers; loom-design only names the checker rules, it never runs them.
-- **It hands off to loom-code.** Both stations end at
-  `loom-code:write-plan`. Without loom-design installed, `write-plan` runs
-  decision point ① itself.
+- **It hands off to loom-code.** The flow leaves loom-design at
+  `loom-code:write-plan`: from `capture-intent` when `needs-design: no`,
+  otherwise from `write-spec`. Without loom-design installed, `write-plan`
+  runs decision point ① itself.
 
 The plugins compose only through plugin-qualified skill names such as
 `loom-design:write-spec`, the contract package and the project's own

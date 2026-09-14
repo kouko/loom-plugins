@@ -17,7 +17,7 @@
 ```mermaid
 flowchart TD
     intent["① 你確認 intent<br/>loom-design:capture-intent<br/>沒裝 loom-design 時由 loom-code:write-plan"]
-    spec["選配，僅 product 變更<br/>loom-design:write-spec<br/>② 你確認可見的行為"]
+    spec["只在 needs-design: yes 時<br/>loom-design:write-spec<br/>② product 變更：你確認可見的行為"]
     plan["loom-code:write-plan<br/>plan.md 裡的任務 DAG"]
     build["loom-code:build<br/>測試先行，每個任務一個 implementer"]
     review["loom-code:review<br/>fresh-context 審查者<br/>需要時加盲跑與 adversary"]
@@ -27,7 +27,7 @@ flowchart TD
     maintain["loom-code:maintain<br/>bug、告警、回歸或事故"]
 
     intent --> plan
-    intent -.->|"product 變更"| spec
+    intent -.->|"needs-design: yes"| spec
     spec -.-> plan
     plan --> build
     build --> review
@@ -48,8 +48,8 @@ flowchart TD
   綁定受審功能內容的 attestation。
 - **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
   另一步，需要你另外明確授權。
-- **Maintain** —— 合併之後出現的 bug 回報、告警、回歸或事故，會掛到相符的 open
-  intent 上，沒有就新建一份，再交給 `write-plan`。
+- **Maintain** —— 在進行中未合併變更之外發生的 bug 回報、告警、回歸或事故，
+  會掛到相符的 open intent 上，沒有就新建一份，再交給 `write-plan`。
 
 ## Skills
 

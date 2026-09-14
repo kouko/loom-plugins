@@ -155,7 +155,7 @@ loom-workflow/
 │   ├── loom-memory/
 │   ├── recap-state/
 │   └── using-loom-workflow/
-├── tests/                 git-memory and loom-memory shell tests
+├── tests/                 git-memory, loom-memory and cot-explain tests
 ├── CHANGELOG.md
 ├── README.md              (this file)
 ├── README.ja.md

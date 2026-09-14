@@ -92,8 +92,9 @@ loom-design 需要 `loom-code`：
 - **它的 verdict 由 loom-code 下。** 規劃前的 spec review 與最後的 closing
   review 都在 `loom-code:review` 由 fresh-context reviewer 進行；
   loom-design 只點名 checker 規則，從不執行它們。
-- **它交棒給 loom-code。** 兩個站最後都交給 `loom-code:write-plan`。沒裝
-  loom-design 時，`write-plan` 會自己跑決策點 ①。
+- **它交棒給 loom-code。** 流程離開 loom-design 都在 `loom-code:write-plan`：
+  `needs-design: no` 時從 `capture-intent` 離開，否則從 `write-spec` 離開。
+  沒裝 loom-design 時，`write-plan` 會自己跑決策點 ①。
 
 plugin 之間只透過帶 plugin 名的 skill 名稱（例如 `loom-design:write-spec`）、
 contract package，以及專案自己的 `docs/loom/` 產物相接。

@@ -98,9 +98,10 @@ loom-design には `loom-code` が必要：
 - **verdict は loom-code が下す。** 計画前の spec review も最後の
   closing review も `loom-code:review` で fresh-context の reviewer が行う。
   loom-design は checker のルール名を挙げるだけで、実行はしない。
-- **loom-code に引き渡す。** どちらのステーションも
-  `loom-code:write-plan` で終わる。loom-design が入っていなければ、
-  `write-plan` が決定ポイント ① を自分で行う。
+- **loom-code に引き渡す。** loom-design を抜ける先は `loom-code:write-plan`
+  で、`needs-design: no` のときは `capture-intent` から、それ以外は
+  `write-spec` から入る。loom-design が入っていなければ、`write-plan` が
+  決定ポイント ① を自分で行う。
 
 plugin 同士は `loom-design:write-spec` のような plugin 名付き skill 名、
 contract package、そしてプロジェクト自身の `docs/loom/` の artifact

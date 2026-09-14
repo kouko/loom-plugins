@@ -149,7 +149,7 @@ loom-workflow/
 │   ├── loom-memory/
 │   ├── recap-state/
 │   └── using-loom-workflow/
-├── tests/                 git-memory と loom-memory の shell テスト
+├── tests/                 git-memory・loom-memory・cot-explain のテスト
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md           (このファイル)

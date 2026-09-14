@@ -144,7 +144,7 @@ loom-workflow/
 │   ├── loom-memory/
 │   ├── recap-state/
 │   └── using-loom-workflow/
-├── tests/                 git-memory 與 loom-memory 的 shell 測試
+├── tests/                 git-memory、loom-memory 與 cot-explain 的測試
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md
