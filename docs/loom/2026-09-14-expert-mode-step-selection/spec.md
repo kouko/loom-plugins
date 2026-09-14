@@ -72,8 +72,8 @@ ship                ─► publish validates attestation + disclosure ─► PR
      (`prompt_id` on Claude Code, `turn_id` on Codex), and refuses to run
      without `--hook`.
    - The PreToolUse hook on both hosts denies any Bash command whose text
-     names `selection capture`, a `selections/` path segment or `.git/loom`,
-     or names `git-common-dir`, `--git-dir` or `GIT_DIR` together with a
+     names `selection capture`, a `loom/selections/` path or `.git/loom`,
+     names a bare `selections/` segment together with a write form, or names `git-common-dir`, `--git-dir` or `GIT_DIR` together with a
      write form (`>`, `>>`, `tee`, `cp`, `mv`, `dd`, `install`, `sed -i`, or
      inline `python`/`perl`/`ruby`/`node` code), and any file-writing
      tool call (Claude Code Write, Edit, MultiEdit, NotebookEdit; Codex
@@ -98,9 +98,10 @@ ship                ─► publish validates attestation + disclosure ─► PR
    confirmation on the branch; the guard does not block that command.
    Because that path depends on the agent, the capture hook also records a
    `user-typed` cancel when an entry-point prompt contains a withdraw token
-   (`cancel`, `取消`, `キャンセル`, `撤回`) and replies with a systemMessage
-   saying the full process resumed. A prompt carrying both a code and a
-   withdraw token is a cancel. A confirmation worded as a refusal without a
+   (`cancel`, `取消`, `キャンセル`, `撤回`) as the only word after the entry
+   token or next to a code, and replies with a systemMessage saying the full
+   process resumed; any other prompt, such as `取消 review`, is handed to
+   the skill as a new selection. A confirmation worded as a refusal without a
    withdraw token still binds; the hook message shows it and a cancel
    undoes it.
 5. **Proposal origin and suggestions** — agent-decided. `selection propose
@@ -114,8 +115,8 @@ ship                ─► publish validates attestation + disclosure ─► PR
    session; it records the hook payload's `session_id` and `prompt_ref`.
    Proposals, confirmations and cancels lapse when the branch or merge base
    differs from the current ones, so a reused change-id inherits nothing and
-   a rebase makes a bound selection lapse (the skill says so and the full
-   process resumes). Failures are scoped by change-id and branch only and
+   a rebase makes a bound selection lapse (the skill says so, the full
+   process resumes, and the agent re-runs `propose` to show the table again). Failures are scoped by change-id and branch only and
    are never filtered by merge base, so a rebase cannot drop them.
 7. **Stations query, gates recompute** — agent-decided. `selection show
    <change-id>` prints the effective JSON step set (full set when nothing is
@@ -187,7 +188,8 @@ ship                ─► publish validates attestation + disclosure ─► PR
     cover: displayed table differs from the proposed one; relative-path and
     `rev-parse --git-common-dir` record writes denied; failure recorded,
     branch rebased, skip confirmed, publish requires the `Prior failure:`
-    line; typed cancel; code plus withdraw token cancels.
+    line; typed cancel; code plus withdraw token cancels; `取消 review` starts a
+    selection; `ls models/selections/` passes the guard.
 18. **Versioning and mechanisms** — agent-decided. Contract minor bump:
     `check_intent_schema` (`rule_checks/intent.py:18`) reads only declared
     required fields, so a leftover `lane:` line is tolerated, and v1
@@ -221,7 +223,7 @@ ship                ─► publish validates attestation + disclosure ─► PR
 - Success: types the entry point with the code and any words, such as `/loom-code:expert-mode 確認 K7Q2` or `/expert-mode OK K7Q2` → a Loom hook message shows `已綁定 <change-id>：執行 …；跳過 …`, and the agent continues with the steps marked to run.
 - Error: the hook message's lists differ from the table the agent showed → says so in any words (for example `不對，剛剛那個不算`) → the agent withdraws the selection, says the full process resumed, and shows the table again.
 - Error: types `/loom-code:expert-mode 取消` (or `cancel`, `キャンセル`, `撤回`) → a Loom hook message says the selection was withdrawn and the full process resumed.
-- Error: rebases or merges the default branch into the change → the agent says the bound selection lapsed and the full process resumed; typing the confirmation again rebinds it.
+- Error: rebases or merges the default branch into the change → the agent says the bound selection lapsed and the full process resumed; the agent shows the table again with the same code, and typing the confirmation rebinds it.
 - Error: types the code inside a refusal without a withdraw word, such as `/expert-mode 不要 K7Q2` → the hook message shows it bound; a cancel undoes it.
 - Error: replies `對` → the agent answers that only the typed confirmation applies and repeats the confirmation line; nothing is skipped.
 - Error: types a stale or mistyped code → no hook message appears; the agent says the confirmation was not recorded and shows the current table and code again.
