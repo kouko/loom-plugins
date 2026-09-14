@@ -34,16 +34,9 @@ flowchart TD
     subgraph code["loom-code"]
         plan["write-plan<br/>task DAG"]
         build["build<br/>test-first, one commit per task"]
-        review["review<br/>fresh-context reviewers + blind run + adversary<br/>→ attestation"]
+        review["review<br/>fresh-context review<br/>→ attestation"]
         ship["ship<br/>push + PR<br/>③ you accept the blind-run report"]
         maintain["maintain<br/>bugs, alerts, regressions"]
-    end
-
-    subgraph workflow["loom-workflow"]
-        dmap["decision-map<br/>persistent Outcome Map"]
-        gitmem["git-memory<br/>commit and PR memory"]
-        loommem["loom-memory<br/>durable repository lessons"]
-        aside["independent-advisor, handoff, recap-state<br/>used on demand"]
     end
 
     merged(["Merged PR"])
@@ -59,11 +52,6 @@ flowchart TD
     ship --> merged
     merged -.-> maintain
     maintain -.->|"new or matching intent"| plan
-
-    dmap -.->|"writes a map: intent"| intent
-    build -.->|"before each commit"| gitmem
-    ship -.->|"PR body memory"| gitmem
-    review -.->|"lesson at convergence"| loommem
 ```
 
 - **① Intent** — `capture-intent` restates the change in your words, with
@@ -81,10 +69,36 @@ flowchart TD
   checks; the blind-run report is what you read to accept the change.
 - **Maintain** — `maintain` attaches an incident to a matching open intent, or
   creates one, and hands it to `write-plan`.
-- **loom-workflow** — tools beside the stations rather than stations
-  themselves: `decision-map` can start a change by writing its intent,
-  `git-memory` classifies memory before commits and in the PR body, and
-  `loom-memory` keeps lessons a review surfaced. Other tools run on demand.
+
+### Where loom-workflow plugs in
+
+`loom-workflow` tools are not stations; they attach to the flow at specific
+points or run on demand.
+
+| Tool | When it is used in the flow | What it does |
+| --- | --- | --- |
+| `decision-map` | Before the flow: writes the intent that starts a change | Keeps a long-running Outcome Map and turns a ready slice into an intent. |
+| `git-memory` | Before every commit in `build`; at `ship` for PR create and merge | Classifies decision, learning and gotcha memory for commits and the PR body. |
+| `loom-memory` | At `review` convergence | Records a durable lesson the branch taught in the repository memory store. |
+| `independent-advisor`, `handoff`, `recap-state` | On demand, not tied to a station | Second opinions, cross-session handoff and in-session recaps. |
+
+`decision-map` is for work whose whole route cannot be listed up front:
+
+- An **Outcome Map** is a persistent loop that survives across sessions and
+  many delivery arcs. It lives at `docs/loom/maps/<map-id>/` as `MAP.md` plus a
+  `tickets/` directory.
+- `MAP.md` holds the **Destination** with its acceptance criteria, a
+  **Decisions-so-far** log with one gist per closed ticket, and a
+  **Not-yet-specified (fog)** list of known unknowns.
+- Tickets are typed `grilling`, `research` or `prototype`. A fog entry
+  graduates exactly once into a ticket that records `graduated-from`, and
+  closing a ticket routes each unknown it exposed to fog, a new ticket or
+  out-of-scope.
+- When a slice is ready to deliver, the map writes an intent carrying
+  `map: <map-id>` and hands it to `loom-design:capture-intent`, or to
+  `loom-code:write-plan` without loom-design. That station owns the change from
+  there; the map never owns a delivery ticket and only reads the intent's
+  status.
 
 ## loom-design
 
@@ -119,7 +133,10 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 4.3.4. Workflow tools used around the stations; each works on its own.
+Version 4.3.4. Workflow tools used around the stations; all except
+`decision-map` work without `loom-code`. See
+[Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
+attach to the flow.
 
 | Skill | Role |
 | --- | --- |
