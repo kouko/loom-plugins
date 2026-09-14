@@ -12,6 +12,10 @@ Versioning follows [Semantic Versioning](https://semver.org/).
   18/18; the shipped text is the tested text, pinned by SHA-256 (evidence:
   the change's A/B results in
   `docs/loom/2026-09-14-loom-visualization-description-trigger/ab/results.md`).
+  All of the gain came from the blind-run report prompts (0/6 → 6/6), since
+  intent restatement and choices were already 12/12. Under the new wording,
+  option comparisons more often went into code-block ASCII tables instead of
+  markdown tables.
 
 ## [5.0.0] — 2026-09-14 — loom-visualization replaces cot-explain
 

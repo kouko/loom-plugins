@@ -19,6 +19,48 @@ def test_decision_rule_ships_only_on_strictly_greater() -> None:
     assert run_ab.decide(a_count=5, b_count=4) == "HOLD"
 
 
+def test_decision_rule_any_error_session_is_incomplete() -> None:
+    assert run_ab.decide(a_count=3, b_count=4, errors=1) == "INCOMPLETE"
+    assert run_ab.decide(a_count=3, b_count=4, errors=0) == "SHIP"
+
+
+def test_report_error_session_not_counted_and_not_ship(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(run_ab, "EVIDENCE", tmp_path / "evidence")
+    monkeypatch.setattr(run_ab, "CHANGE_DIR", tmp_path)
+    monkeypatch.setattr(run_ab, "RESULTS", tmp_path / "results.md")
+    final = json.dumps({"type": "result", "result": "prose"})
+    ids = [pid for pid, _ in run_ab.prompts()]
+    for variant in ("A", "B"):
+        (tmp_path / "evidence" / f"ab-{variant}").mkdir(parents=True)
+        for pid in ids:
+            (tmp_path / "evidence" / f"ab-{variant}" / f"{pid}-run1.jsonl").write_text(final + "\n")
+    (tmp_path / "evidence/ab-B" / f"{ids[0]}-run1.jsonl").write_text("\n".join([
+        json.dumps(_tool("Skill", {"skill": "loom-visualization"})),
+        json.dumps({"type": "result", "is_error": True, "api_error_status": 429, "result": "limit"}),
+    ]) + "\n")
+    run_ab.report(runs=1)
+    text = (tmp_path / "results.md").read_text(encoding="utf-8")
+    assert "**INCOMPLETE**" in text and "**SHIP**" not in text
+    assert "| B | 0/9 |" in text  # the errored session's invocation is not counted
+
+
+def test_parse_undecodable_nonempty_line_marks_error() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        tmp = Path(d)
+        path = tmp / "s.jsonl"
+        final = json.dumps({"type": "result", "result": "ok"})
+        path.write_text('{"type": "assist\n' + final + "\n", encoding="utf-8")
+        assert run_ab.parse_stream(path)["error"] is True
+        path.write_text("\n   \n" + final + "\n", encoding="utf-8")
+        assert run_ab.parse_stream(path)["error"] is False  # blank lines are not corrupt
+
+
+def test_scratch_default_is_under_system_temp_not_a_session_path() -> None:
+    assert run_ab.scratch_dir({}) == Path(tempfile.gettempdir()) / "loom-ab-desc"
+    assert run_ab.scratch_dir({"AB_SCRATCH": "/x/y"}) == Path("/x/y")
+    assert "claude-501" not in run_ab.Path(run_ab.__file__).read_text(encoding="utf-8")
+
+
 def test_candidate_hash_recorded_and_mismatch_detected() -> None:
     assert run_ab.sha256_text(run_ab.DESCRIPTION_B) == run_ab.DESCRIPTION_B_SHA256
     run_ab.check_hash(run_ab.DESCRIPTION_B)

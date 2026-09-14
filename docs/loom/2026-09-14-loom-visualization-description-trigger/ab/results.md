@@ -48,9 +48,16 @@ Protocol: [protocol.md](protocol.md). Runs per prompt per variant: 2 (18 session
 | A | 12/18 | 17/18 | 1/18 | 0 |
 | B | 18/18 | 8/18 | 10/18 | 0 |
 
+Note on rendering: the diagram measure counts box-drawn ASCII tables (every
+box-drawn answer here is a grid inside a code block). Among the 12
+option-comparison sessions per variant (prompt ids a\*/b\*), recounted from the
+evidence streams' final answers, A had 1 session with no markdown table
+(b3-monorepo-split run 2) and B had 9 (a1 run 1, a2 runs 1–2, a3 runs 1–2,
+b1 runs 1–2, b2 run 1, b3 run 2).
+
 ## Decision
 
-**SHIP** — rule: SHIP B only if B's invocation count (18) is strictly greater than A's (12).
+**SHIP** — rule: SHIP B only if no session errored and B's invocation count (18) is strictly greater than A's (12).
 
 B rendered description SHA-256: `e98a3ed165415900bf405fe07209dde634cd465ff035fbea4ac2c73f57f6fd45`
 
@@ -73,3 +80,6 @@ B rendered description SHA-256: `e98a3ed165415900bf405fe07209dde634cd465ff035fbe
   check ignores `__pycache__/` and `*.pyc` (hooks write bytecode into a copy
   once a session runs), and `run --limit N` chunks sessions under a tool timeout.
 - `test_run_ab.py` was added beside the runner for its pure parts.
+- The prompts simulate station reporting moments from a situation
+  description; no station skill ran, and live station sessions may behave
+  differently.

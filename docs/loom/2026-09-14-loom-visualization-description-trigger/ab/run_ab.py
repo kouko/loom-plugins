@@ -20,6 +20,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -29,11 +30,13 @@ REPO = CHANGE_DIR.parents[2]
 EVIDENCE = CHANGE_DIR / "evidence"
 PROTOCOL = HERE / "protocol.md"
 RESULTS = HERE / "results.md"
-SCRATCH = Path(os.environ.get(
-    "AB_SCRATCH",
-    "/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/"
-    "30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/ab-desc",
-))
+
+
+def scratch_dir(env) -> Path:
+    return Path(env.get("AB_SCRATCH") or Path(tempfile.gettempdir()) / "loom-ab-desc")
+
+
+SCRATCH = scratch_dir(os.environ)
 BASE_REF = "6ad80799"
 PLUGINS = ("loom-code", "loom-design", "loom-workflow")
 SKILL_REL = "loom-workflow/skills/loom-visualization/SKILL.md"
@@ -68,7 +71,9 @@ def check_hash(text: str) -> None:
         raise ValueError(f"B description hash mismatch: {sha256_text(text)}")
 
 
-def decide(a_count: int, b_count: int) -> str:
+def decide(a_count: int, b_count: int, errors: int = 0) -> str:
+    if errors:
+        return "INCOMPLETE"  # an unmeasured session leaves the comparison undecided
     return "SHIP" if b_count > a_count else "HOLD"
 
 
@@ -91,11 +96,16 @@ def build_argv(prompt: str, variant_dir: Path, settings_json: str) -> list[str]:
 
 
 def parse_stream(path: Path) -> dict:
-    invoked, result, failed = False, None, False
+    invoked, result, failed, corrupt = False, None, False, False
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if not line.strip():
+            continue
         try:
             event = json.loads(line)
         except json.JSONDecodeError:
+            event = None
+        if not isinstance(event, dict):
+            corrupt = True  # a corrupted line may have held the invocation
             continue
         if event.get("type") == "assistant":
             for item in event.get("message", {}).get("content", []) or []:
@@ -109,7 +119,7 @@ def parse_stream(path: Path) -> dict:
             failed = bool(event.get("is_error")) or event.get("api_error_status") is not None
     text = result or ""
     return {"invoked": invoked, "table": bool(TABLE.search(text)),
-            "diagram": bool(DIAGRAM.search(text)), "error": result is None or failed}
+            "diagram": bool(DIAGRAM.search(text)), "error": result is None or failed or corrupt}
 
 
 def _files(root: Path) -> set[str]:
@@ -207,7 +217,7 @@ def report(runs: int) -> None:
             for r in range(1, runs + 1):
                 stream = EVIDENCE / f"ab-{variant}" / f"{pid}-run{r}.jsonl"
                 got = parse_stream(stream)
-                counts[variant] += got["invoked"]
+                counts[variant] += got["invoked"] and not got["error"]
                 rows.append((variant, pid, r, got))
                 if stream.stat().st_size > MAX_STREAM_BYTES:
                     dropped.append(f"{stream.relative_to(CHANGE_DIR)} ({stream.stat().st_size} bytes)")
@@ -235,7 +245,8 @@ def report(runs: int) -> None:
         "",
         "## Decision",
         "",
-        f"**{decide(counts['A'], counts['B'])}** — rule: SHIP B only if B's invocation count "
+        f"**{decide(counts['A'], counts['B'], sum(g['error'] for *_, g in rows))}** — rule: "
+        f"SHIP B only if no session errored and B's invocation count "
         f"({counts['B']}) is strictly greater than A's ({counts['A']}).",
         "",
         f"B rendered description SHA-256: `{sha256_text(DESCRIPTION_B)}`",

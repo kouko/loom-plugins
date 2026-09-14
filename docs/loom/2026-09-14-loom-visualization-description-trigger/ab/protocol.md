@@ -1,6 +1,8 @@
 # A/B protocol — loom-visualization description on Loom station reporting prompts
 
-Fixed before any session ran (task W1-01, intent Acceptance 2, 3, 4).
+The decision rule comes from intent Acceptance 3 at commit `5cf73116`; the
+prompts and measures were written before the runs but committed together with
+the results (task W1-01, intent Acceptance 2, 3, 4).
 
 ## Variants
 

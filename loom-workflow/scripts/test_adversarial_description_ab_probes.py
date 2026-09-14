@@ -98,7 +98,6 @@ def test_parse_stream_empty_file_reports_error(run_ab, tmp_path: Path) -> None:
     assert run_ab.parse_stream(path)["error"] is True
 
 
-@pytest.mark.xfail(strict=True, reason="malformed lines are skipped silently: undercount with error=False")
 def test_parse_stream_malformed_invocation_line_reports_error(run_ab, tmp_path: Path) -> None:
     """A corrupted line mid-stream must make the session incomplete, not a silent no-invoke."""
     corrupted = json.dumps(_tool("Skill", {"skill": "loom-visualization"}))[:-3]
@@ -127,7 +126,6 @@ def test_decide_equal_and_zero_counts_hold(run_ab) -> None:
     assert run_ab.decide(18, 17) == "HOLD"
 
 
-@pytest.mark.xfail(strict=True, reason="report() counts invocations from error sessions; decide() never sees them")
 def test_report_errored_b_session_holds(run_ab, tmp_path: Path, monkeypatch) -> None:
     """A B win that rests on an errored (unmeasured) session must not be reported as SHIP."""
     monkeypatch.setattr(run_ab, "EVIDENCE", tmp_path / "evidence")
@@ -148,46 +146,17 @@ def test_report_errored_b_session_holds(run_ab, tmp_path: Path, monkeypatch) -> 
 # --- tested-hash guard ----------------------------------------------------
 
 
-def _results(tmp_path: Path, body: str) -> Path:
-    path = tmp_path / "results.md"
-    path.write_text(body, encoding="utf-8")
-    return path
+# The results.md probes (missing, uppercase, duplicate hash line; HOLD decision)
+# were removed: the guard now pins the tested hash as a literal and reads no results.md.
 
 
-def _shipped_hash(guard) -> str:
-    return guard.run_ab.sha256_text(guard._shipped())
-
-
-def test_guard_missing_hash_line_fails_closed(guard, tmp_path: Path, monkeypatch) -> None:
-    """results.md without the hash line fails the guard instead of passing vacuously."""
-    monkeypatch.setattr(guard, "RESULTS", _results(tmp_path, "## Decision\n\n**SHIP**\n"))
-    with pytest.raises(AssertionError):
-        guard.test_description_shipped_text_equals_tested_hash()
-
-
-def test_guard_uppercase_hash_fails_closed(guard, tmp_path: Path, monkeypatch) -> None:
-    """An uppercase-hex hash line does not match and fails the guard."""
-    line = f"B rendered description SHA-256: `{_shipped_hash(guard).upper()}`\n"
-    monkeypatch.setattr(guard, "RESULTS", _results(tmp_path, "**SHIP**\n\n" + line))
-    with pytest.raises(AssertionError):
-        guard.test_description_shipped_text_equals_tested_hash()
-
-
-@pytest.mark.xfail(strict=True, reason="HASH_LINE.search takes the first match; a conflicting second line is ignored")
-def test_guard_duplicate_conflicting_hash_lines_fails_closed(guard, tmp_path: Path, monkeypatch) -> None:
-    """Two hash lines that disagree make the tested text ambiguous, so the guard must fail."""
-    good = f"B rendered description SHA-256: `{_shipped_hash(guard)}`\n"
-    bad = f"B rendered description SHA-256: `{'0' * 64}`\n"
-    monkeypatch.setattr(guard, "RESULTS", _results(tmp_path, "**SHIP**\n\n" + good + bad))
-    with pytest.raises(AssertionError):
-        guard.test_description_shipped_text_equals_tested_hash()
-
-
-@pytest.mark.xfail(strict=True, reason="guard checks the hash only, never that the recorded decision is SHIP")
-def test_guard_hold_decision_with_matching_hash_fails(guard, tmp_path: Path, monkeypatch) -> None:
-    """Shipping B while results.md records HOLD (A/B lost) must fail the guard."""
-    line = f"B rendered description SHA-256: `{_shipped_hash(guard)}`\n"
-    monkeypatch.setattr(guard, "RESULTS", _results(tmp_path, "## Decision\n\n**HOLD**\n\n" + line))
+def test_guard_edited_skill_description_fails_closed(guard, tmp_path: Path, monkeypatch) -> None:
+    """A one-character edit to the shipped description fails the pinned-hash guard."""
+    text = SKILL.read_text(encoding="utf-8")
+    edited = tmp_path / "SKILL.md"
+    edited.write_text(text.replace("Obsidian notes.", "Obsidian notes!", 1), encoding="utf-8")
+    assert edited.read_text(encoding="utf-8") != text
+    monkeypatch.setattr(guard, "SKILL_PATH", edited)
     with pytest.raises(AssertionError):
         guard.test_description_shipped_text_equals_tested_hash()
 
@@ -211,7 +180,6 @@ def test_render_description_folded_scalar_fails_closed(run_ab) -> None:
             run_ab._render_description(text)
 
 
-@pytest.mark.xfail(strict=True, reason="block-scalar regex stops at a blank line; later paragraphs are invisible")
 def test_render_description_blank_line_paragraph_changes_hash(run_ab) -> None:
     """Text appended after a blank line inside the block scalar must change the rendered description."""
     text = SKILL.read_text(encoding="utf-8")
@@ -224,13 +192,11 @@ def test_render_description_blank_line_paragraph_changes_hash(run_ab) -> None:
 # --- guard dependency on the A/B runner -----------------------------------
 
 
-@pytest.mark.xfail(strict=True, reason="committed guard imports ab/run_ab.py; it cannot collect without the runner")
-def test_guard_without_runner_script_still_collects(tmp_path: Path) -> None:
-    """The committed guard needs only results.md and SKILL.md, not the A/B runner script."""
+def test_guard_without_docs_still_collects(tmp_path: Path) -> None:
+    """The committed guard needs only SKILL.md and the catalog renderer, nothing under docs/."""
     for rel in ("loom-workflow/scripts/test_loom_visualization_description_ab.py",
                 "loom-workflow/skills/loom-visualization/SKILL.md",
-                "scripts/test_loom_skill_description_catalog.py",
-                "docs/loom/2026-09-14-loom-visualization-description-trigger/ab/results.md"):
+                "scripts/test_loom_skill_description_catalog.py"):
         (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(REPO_ROOT / rel, tmp_path / rel)
     proc = subprocess.run(
