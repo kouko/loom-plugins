@@ -8,9 +8,8 @@ Reads environment markers and prints one JSON object:
 documented or reported to show Mermaid source raw, or is unverified. See
 references/client-matrix.md for the sources.
 
-`obsidian_vault` is true when the --target path, or the current working
-directory when no --target is given, or an ancestor of it holds a
-`.obsidian/` directory; false otherwise.
+`obsidian_vault` is true when the --target path or an ancestor of it holds a
+`.obsidian/` directory, false otherwise, and null when no --target is given.
 
 Stdlib only.
 """
@@ -62,15 +61,14 @@ def detect(env=None, target=None):
         "client": client,
         "mermaid": False,
         "remote_viewer": remote_viewer,
-        "obsidian_vault": _is_obsidian_vault(os.getcwd() if target is None else target),
+        "obsidian_vault": None if target is None else _is_obsidian_vault(target),
         "reason": reason,
     }
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--target", help="output path to check for an Obsidian vault "
-                        "(default: the current working directory)")
+    parser.add_argument("--target", help="output path to check for an Obsidian vault")
     args = parser.parse_args(argv)
     json.dump(detect(target=args.target), sys.stdout)
     sys.stdout.write("\n")

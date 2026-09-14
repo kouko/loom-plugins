@@ -246,3 +246,34 @@ def test_mermaid_gate_paragraph_present_requires_confirmed_host():
         assert any(pinned_sentence_ok(s, verb, literals) for s in sentences), (
             f"no affirmative, un-negated sentence pins {literals!r}"
         )
+
+
+OBSIDIAN_GATE = "loom-visualization.obsidian-boundary"
+CHAT_PROCEEDS_PIN = ("proceeds", ("even when the working directory is inside an Obsidian vault",
+                                  "chat answer"))
+
+
+def test_chat_proceeds_pin_affirmative_example_accepted():
+    sentence = ("A chat answer proceeds normally even when the working directory "
+                "is inside an Obsidian vault.")
+    assert pinned_sentence_ok(sentence, *CHAT_PROCEEDS_PIN)
+
+
+def test_chat_proceeds_pin_negated_example_rejected():
+    sentence = ("A chat answer never proceeds normally even when the working directory "
+                "is inside an Obsidian vault.")
+    assert not pinned_sentence_ok(sentence, *CHAT_PROCEEDS_PIN)
+
+
+def test_obsidian_gate_paragraph_chat_in_vault_cwd_proceeds():
+    text = SKILL_MD.read_text(encoding="utf-8")
+    match = re.search(
+        rf"<!--\s*gate:\s*{re.escape(OBSIDIAN_GATE)}\s*-->(.*?)<!--\s*/gate\s*-->",
+        text, re.DOTALL,
+    )
+    assert match, f"no {OBSIDIAN_GATE} gate block in SKILL.md"
+    block = match.group(1)
+    assert "--target" in block
+    assert any(pinned_sentence_ok(s, *CHAT_PROCEEDS_PIN) for s in gate_sentences(block)), (
+        "no affirmative, un-negated sentence says a chat answer proceeds in a vault cwd"
+    )

@@ -75,15 +75,17 @@ def test_detect_client_nul_in_target_no_crash():
     assert detect({}, target="/nonexistent/\x00evil")["obsidian_vault"] in (True, False)
 
 
-def test_detect_client_cwd_in_vault_without_target_reports_vault(tmp_path, monkeypatch):
-    """Chat output (no --target) from inside a vault checks cwd: obsidian_vault is True.
+def test_detect_client_cwd_in_vault_without_target_reports_null(tmp_path, monkeypatch):
+    """Chat output (no --target) from inside a vault reports obsidian_vault null.
 
-    Closes the gate gap reported against loom-visualization.obsidian-boundary.
+    Chat output from a vault working directory is outside the gate by intent
+    Acceptance 7, which declines only when the output is a note inside a vault.
+    This is by design, not a bypass.
     """
     (tmp_path / ".obsidian").mkdir()
     (tmp_path / "notes").mkdir()
     monkeypatch.chdir(tmp_path / "notes")
-    assert detect({})["obsidian_vault"] is True
+    assert detect({})["obsidian_vault"] is None
 
 
 # ---------- width engine and table check ----------

@@ -20,12 +20,13 @@ message exchange, a structure, dates, or numbers to compare.
 ## Boundary
 
 <!-- gate: loom-visualization.obsidian-boundary -->
-First run `python3 scripts/detect_client.py --target <path>` when the output
-is written to a file, or `python3 scripts/detect_client.py` otherwise, which
-checks the working directory. If it reports `obsidian_vault: true`, the output
-target or the working directory is inside an Obsidian vault: decline, say
-this skill serves coding-harness chat, and name
-`obsidian:obsidian-mermaid-visualizer` as the skill for vault notes. Never
+When the output is written to a file, first run
+`python3 scripts/detect_client.py --target <path>`. Decline only when that
+`--target` check reports `obsidian_vault: true`, or when the user asks for a
+note in their Obsidian vault: say this skill serves coding-harness chat, and
+name `obsidian:obsidian-mermaid-visualizer` as the skill for vault notes.
+A chat answer proceeds normally even when the working directory is inside an
+Obsidian vault. Never
 put Obsidian-only syntax (wikilinks, callouts, `%%` comment lines) into
 anything this skill produces.
 <!-- /gate -->

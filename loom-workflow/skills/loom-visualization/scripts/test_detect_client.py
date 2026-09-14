@@ -19,15 +19,15 @@ def test_claude_code_cli_env_mermaid_false(tmp_path, monkeypatch):
     assert result["client"] == "claude-code-cli"
     assert result["mermaid"] is False
     assert result["remote_viewer"] is False
-    assert result["obsidian_vault"] is False
+    assert result["obsidian_vault"] is None
 
 
-def test_no_target_cwd_inside_vault_reports_vault(tmp_path, monkeypatch):
+def test_detect_client_cwd_in_vault_without_target_reports_null(tmp_path, monkeypatch):
     (tmp_path / ".obsidian").mkdir()
     sub = tmp_path / "notes" / "deep"
     sub.mkdir(parents=True)
     monkeypatch.chdir(sub)
-    assert detect_client.detect({})["obsidian_vault"] is True
+    assert detect_client.detect({})["obsidian_vault"] is None
 
 
 def test_claude_code_missing_entrypoint_is_unknown_suffix():
@@ -115,7 +115,7 @@ def test_cli_prints_one_json_object(tmp_path):
     assert isinstance(data["reason"], str) and data["reason"]
 
 
-def test_cli_without_target_checks_cwd(tmp_path):
+def test_cli_without_target_reports_null_vault(tmp_path):
     plain = tmp_path / "plain"
     plain.mkdir()
     proc = subprocess.run(
@@ -125,7 +125,7 @@ def test_cli_without_target_checks_cwd(tmp_path):
     )
     data = json.loads(proc.stdout)
     assert data["client"] == "unknown"
-    assert data["obsidian_vault"] is False
+    assert data["obsidian_vault"] is None
 
     vault = tmp_path / "vault"
     (vault / ".obsidian").mkdir(parents=True)
@@ -134,4 +134,4 @@ def test_cli_without_target_checks_cwd(tmp_path):
         capture_output=True, text=True, env={"PATH": "/usr/bin:/bin"}, check=True,
         cwd=str(vault),
     )
-    assert json.loads(proc.stdout)["obsidian_vault"] is True
+    assert json.loads(proc.stdout)["obsidian_vault"] is None

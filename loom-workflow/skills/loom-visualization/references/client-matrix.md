@@ -5,7 +5,8 @@ Verified: 2026-09-14
 Which presentation form each client can display. `scripts/detect_client.py`
 reports the detection signal; this table says what to do with it. A cell
 nobody has confirmed is marked `unverified` and is treated as "does not
-render".
+render". That rule applies to the Mermaid column only: GFM markdown tables
+are the default form in every client.
 
 | Client | Detection signal | GFM table | Mermaid | Recommended form | Sources |
 |---|---|---|---|---|---|
