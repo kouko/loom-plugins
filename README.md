@@ -27,6 +27,14 @@ covers usage in depth.
 flowchart TD
     idea(["Idea or change request<br/>received by<br/>loom-design:capture-intent"])
 
+    subgraph dm["loom-workflow:decision-map"]
+        direction TB
+        dest["Destination<br/>where the map should end up"]
+        fog["Fog<br/>what is still unknown"]
+        ticket["Ticket<br/>grill, research or prototype one unknown"]
+        log["Decisions so far"]
+    end
+
     subgraph design["loom-design"]
         intent["loom-design:capture-intent<br/>① you confirm the intent"]
         spec["loom-design:write-spec<br/>only when needs-design: yes<br/>② you confirm visible behaviour"]
@@ -53,6 +61,12 @@ flowchart TD
     ship --> merged
     merged -.-> maintain
     maintain -.->|"new or matching intent"| plan
+
+    dest --> fog
+    fog -->|"pick one"| ticket
+    ticket -->|"record the answer"| log
+    ticket -.->|"new unknowns"| fog
+    dm -->|"a slice is ready: intent with map:"| intent
 ```
 
 - **① Intent** — `capture-intent` restates the change in your words, with
@@ -70,6 +84,8 @@ flowchart TD
   checks; the blind-run report is what you read to accept the change.
 - **Maintain** — `maintain` attaches an incident to a matching open intent, or
   creates one, and hands it to `write-plan`.
+- **Decision map** — the second way into `capture-intent`: when a slice of a
+  long-running map is ready, `decision-map` writes an intent carrying `map:`.
 
 ### Where loom-workflow plugs in
 
@@ -80,28 +96,11 @@ points or run on demand.
 | --- | --- | --- |
 | `decision-map` | Before the flow: writes the intent that starts a change | Keeps a long-running Outcome Map and turns a ready slice into an intent. |
 | `git-memory` | Before every commit in `build`; at `ship` for PR create and merge | Classifies decision, learning and gotcha memory for commits and the PR body. |
-| `loom-memory` | At `review` convergence | Records a durable lesson the branch taught in the repository memory store. |
+| `loom-memory` | Before the branch closes, when a lesson is worth keeping (on request or by agent judgment; no station calls it) | Records a durable lesson the branch taught in the repository memory store. |
 | `independent-advisor`, `handoff`, `recap-state` | On demand, not tied to a station | Second opinions, cross-session handoff and in-session recaps. |
 
-`decision-map` is for work whose whole route cannot be listed up front:
-
-```mermaid
-flowchart TD
-    subgraph dm["loom-workflow:decision-map"]
-        dest["Destination<br/>where the map should end up"]
-        fog["Fog<br/>what is still unknown"]
-        ticket["Ticket<br/>grill, research or prototype one unknown"]
-        log["Decisions so far"]
-    end
-    main(["Loom main flow<br/>loom-design:capture-intent"])
-
-    dest --> fog
-    fog -->|"pick one"| ticket
-    ticket -->|"record the answer"| log
-    ticket -.->|"new unknowns"| fog
-    dm -->|"a slice is ready: intent with map:"| main
-```
-
+`decision-map` is for work whose whole route cannot be listed up front; its
+loop is the `loom-workflow:decision-map` group in the flow diagram above.
 The map, called an Outcome Map, lives at `docs/loom/maps/<map-id>/` as
 `MAP.md` plus a `tickets/` directory and persists across sessions. An unknown
 becomes a ticket only once or is moved out of scope, and a grilling ticket hands
@@ -136,7 +135,7 @@ content-bound verification, one closing review and a fast publication gate.
 | `build` | Implement the plan test-first, one task at a time. |
 | `review` | Run the closing review (read, blind run, adversary) and generate an attestation. |
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
-| `maintain` | Route bug reports, alerts, regressions or incidents into a new intent. |
+| `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |
 
 It also ships the `implementer`, `reviewer`, `blind-runner` and `adversary`
