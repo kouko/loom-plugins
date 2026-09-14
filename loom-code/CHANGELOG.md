@@ -11,9 +11,9 @@
   named only confirmation and finalization.
 - Remove the unused `step_selection` step dependency field (`requires`) and
   its dependency check.
-- Correct the version shown in the three loom-code READMEs, which still read
-  3.1.4; the contract manifest version moves from 2.3.0 to 2.3.1 for the
-  removed field.
+- Correct the version shown in the three loom-code READMEs and the root
+  README loom-code section, which still read 3.1.4; the contract manifest
+  version moves from 2.3.0 to 2.3.1 for the removed field.
 
 ## [3.4.0] — 2026-09-15 — user-chosen Loom steps per change
 

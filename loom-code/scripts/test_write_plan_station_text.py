@@ -411,6 +411,7 @@ def test_changelog_3_4_1_session_limit_names_publication() -> None:
     assert "publication" in entry
     assert "selection propose" in entry
     assert "same attended Claude Code session" in entry
+    assert "the root README loom-code section, which still read 3.1.4" in entry
 
 
 def test_agy_host_passes_empty_usable_vendors() -> None:

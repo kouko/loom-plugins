@@ -85,9 +85,11 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
 - Confirmation, finalization and publication must all run in the same attended
   Claude Code session. In a new session, re-run
   `loom_checker.py selection propose` and have the user type the confirmation
-  again; reusing the old code binds nothing. A nested unattended session (such as `claude -p`,
-  even wrapped in `timeout`) never binds. Codex exports no session variable,
-  so on Codex only the command-text guard applies.
+  again; a confirmation typed before `selection propose` has run in this
+  session binds nothing; the code shown may be the same as before. A nested
+  unattended session (such as `claude -p`, even wrapped in `timeout`) never
+  binds. Codex exports no session variable, so on Codex only the command-text
+  guard applies.
 - On Antigravity CLI, or any other host that lacks prompt capture, a typed
   confirmation stays unrecorded: say that selections take effect only where
   prompts are captured, leave out the confirmation line, and keep the full

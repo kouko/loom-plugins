@@ -141,7 +141,9 @@ def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:
     assert "Confirmation, finalization and publication must all run" in same
     renew = affirmative(boundary, "have the user type the confirmation again", ("re-run",))
     assert "In a new session, re-run `loom_checker.py selection propose`" in renew
-    assert "reusing the old code binds nothing" in renew
+    assert ("a confirmation typed before `selection propose` has run in this session "
+            "binds nothing; the code shown may be the same as before.") in renew
+    assert "reusing the old code" not in boundary
     assert "finalization in another session applies the full process" not in boundary
     for phrase in (
         "A nested unattended session (such as `claude -p`, even wrapped in `timeout`) "
