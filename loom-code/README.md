@@ -21,8 +21,8 @@ flowchart TD
     intent["① You confirm the intent<br/>loom-design:capture-intent<br/>or loom-code:write-plan without loom-design"]
     spec["Only when needs-design: yes<br/>loom-design:write-spec<br/>② product changes: you confirm the visible behaviour"]
     plan["loom-code:write-plan<br/>Task DAG in plan.md"]
-    build["loom-code:build<br/>Test-first, one implementer per task"]
-    review["loom-code:closing-review<br/>Fresh-context reviewers<br/>blind run and adversary when needed"]
+    build["loom-code:build<br/>Test-first, one implementer per task<br/>ends with adversary and package suite"]
+    review["loom-code:closing-review<br/>Fresh-context reviewers<br/>blind run when needed"]
     attest[["Attestation generated<br/>by loom-code:closing-review"]]
     ship["loom-code:ship<br/>Push + PR + checks<br/>③ You accept the result<br/>through the blind-run report when required"]
     merged(["Merged separately<br/>after loom-code:ship, on your own authorization"])
@@ -47,7 +47,9 @@ flowchart TD
   spec: `loom-design:write-spec`, or `write-plan`'s minimal spec on a
   code-only install.
 - **Build and review** — `build` dispatches an implementer for every task,
-  test first. `closing-review` runs one closing review; `NEEDS_REVISION` returns the
+  test first, and ends with an independent adversary's adversarial programs
+  and the complete package suite, which must pass before hand-off.
+  `closing-review` runs one closing review of that checked content; `NEEDS_REVISION` returns the
   findings to `build`, and passing evidence becomes a generated attestation
   bound to the reviewed functional content.
 - **Ship** — pushes the branch, opens the PR and verifies required checks
@@ -62,8 +64,8 @@ flowchart TD
 | Skill | Role |
 |---|---|
 | [`write-plan`](skills/write-plan/SKILL.md) | Turn a confirmed intent into `docs/loom/<change-id>/plan.md`: waved tasks with files, owned Acceptance lines, test cases and risk. Runs ① itself when `loom-design` is absent. |
-| [`build`](skills/build/SKILL.md) | Implement the plan test-first, dispatching one implementer per task. |
-| [`closing-review`](skills/closing-review/SKILL.md) | Run the closing review — reviewers, a blind run and adversarial programs as needed — and generate `docs/loom/<change-id>/attestation.json`. |
+| [`build`](skills/build/SKILL.md) | Implement the plan test-first, dispatching one implementer per task, then run the adversary and the complete package suite, which must pass before hand-off. |
+| [`closing-review`](skills/closing-review/SKILL.md) | Run the closing review — reviewers and a blind run as needed — on content that passed Build's checks, and generate `docs/loom/<change-id>/attestation.json`. |
 | [`ship`](skills/ship/SKILL.md) | Validate the attestation, push, open the PR and verify required checks (decision point ③). Never merges. |
 | [`maintain`](skills/maintain/SKILL.md) | Reproduce an incident outside an active unmerged change, attach it to a matching open intent or create one, and hand it to `write-plan`. |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | Optional router that picks the station for a general Loom request; every station stays directly callable. |
@@ -78,7 +80,7 @@ The stations dispatch these agents; none reviews its own work.
 | [`implementer`](agents/implementer.md) | `build` | One task: failing test first, one commit, a status report — never a verdict. |
 | [`reviewer`](agents/reviewer.md) | `closing-review` | Fresh-context verdict (`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`) with anchored findings; never edits what it reviews. |
 | [`blind-runner`](agents/blind-runner.md) | `closing-review` | Runs the change in a clean environment against every Acceptance line and writes `docs/loom/<change-id>/blind-run-report.md`. |
-| [`adversary`](agents/adversary.md) | `closing-review` | Tries to make the change fail — mutation or fuzz tooling, or at least three executable abuse and boundary cases — and records every attempt as a probe. |
+| [`adversary`](agents/adversary.md) | `build` | Tries to make the change fail — mutation or fuzz tooling, or at least three executable abuse and boundary cases — and records every attempt as a probe. |
 
 The number of reviewers is not chosen by the agent: `loom_checker.py
 reviewer-count` computes it from the whole branch delta — one for a narrow,
@@ -117,8 +119,8 @@ from the repository instead of trusting a claim, and `--list-rules` is the
 source of truth for the rule list. It exits 0 on pass, 1 on a blocked rule
 and 2 on a usage or internal error, so a checker that cannot decide never
 says "fine". Stations call it at intake, for `reviewer-count` and for
-`finalize-review`, which runs the package tests and adversarial programs once
-and generates the content-bound attestation. The installed `PreToolUse` hook
+`finalize-review`, which runs the package tests and adversarial programs again
+on committed content and generates the content-bound attestation. The installed `PreToolUse` hook
 runs it again before `git push` and `gh pr create`: it recomputes the content
 digest and validates that evidence without replaying tests or probes.
 

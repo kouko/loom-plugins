@@ -74,12 +74,13 @@ flowchart TD
   installed, `loom-code:write-plan` captures the intent itself.
 - **② Specification** — `write-spec` runs only for changes that need design;
   for product changes you confirm the visible behaviour before planning.
-- **Build and review** — `build` implements each planned task test-first.
+- **Build and review** — `build` implements each planned task test-first and
+  ends with an independent adversary's adversarial programs and the complete
+  package suite, which must pass before hand-off.
   `closing-review` then dispatches the checker-computed number of fresh-context
-  reviewers (two unless the change is narrow and low-risk), a blind runner
-  when an acceptance line cannot be checked mechanically, and adversarial
-  programs for code, skill, spec or gate changes. Passing evidence becomes an
-  attestation bound to the reviewed content.
+  reviewers (two unless the change is narrow and low-risk) and a blind runner
+  when an acceptance line cannot be checked mechanically. Passing evidence
+  becomes an attestation bound to the reviewed content.
 - **③ Acceptance** — `ship` pushes the branch, opens the PR and verifies
   checks; you accept the change, through the blind-run report when one was
   required.
@@ -133,8 +134,8 @@ content-bound verification, one closing review and a fast publication gate.
 | Skill | Role |
 | --- | --- |
 | `write-plan` | Turn a confirmed intent into a task DAG with tests and risks per task. |
-| `build` | Implement the plan test-first, one task at a time. |
-| `closing-review` | Run the closing review (read, blind run, adversary) and generate an attestation. |
+| `build` | Implement the plan test-first, one task at a time, ending with the adversary and the package suite. |
+| `closing-review` | Run the closing review (read, blind run) on Build-checked content and generate an attestation. |
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
 | `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |

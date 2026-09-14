@@ -19,8 +19,8 @@ flowchart TD
     intent["① 你確認 intent<br/>loom-design:capture-intent<br/>沒裝 loom-design 時由 loom-code:write-plan"]
     spec["只在 needs-design: yes 時<br/>loom-design:write-spec<br/>② product 變更：你確認可見的行為"]
     plan["loom-code:write-plan<br/>plan.md 裡的任務 DAG"]
-    build["loom-code:build<br/>測試先行，每個任務一個 implementer"]
-    review["loom-code:closing-review<br/>fresh-context 審查者<br/>需要時加盲跑與 adversary"]
+    build["loom-code:build<br/>測試先行，每個任務一個 implementer<br/>最後跑 adversary 與完整 package 測試"]
+    review["loom-code:closing-review<br/>fresh-context 審查者<br/>需要時加盲跑"]
     attest[["產生 attestation<br/>由 loom-code:closing-review"]]
     ship["loom-code:ship<br/>push + PR + checks<br/>③ 你驗收結果<br/>需要時透過盲跑報告"]
     merged(["合併是另一步<br/>在 loom-code:ship 之後，由你另外授權"])
@@ -43,8 +43,9 @@ flowchart TD
   沒裝時，`write-plan` 自己覆述這次變更並問 ①。
 - **規格** —— 只有 product 變更會問 ②，由寫 spec 的那一方問：
   `loom-design:write-spec`，或只裝 code 時 `write-plan` 寫的最小 spec。
-- **建置與審查** —— `build` 為每個任務派一個 implementer，測試先行。`closing-review`
-  跑一次收尾審查；`NEEDS_REVISION` 把發現退回 `build`，通過的證據會產生為一份
+- **建置與審查** —— `build` 為每個任務派一個 implementer，測試先行，最後由獨立的
+  adversary 寫出對抗程式並跑完整 package 測試，全數通過才交出。`closing-review`
+  對這份已檢查的內容跑一次收尾審查；`NEEDS_REVISION` 把發現退回 `build`，通過的證據會產生為一份
   綁定受審功能內容的 attestation。
 - **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
   另一步，需要你另外明確授權。
@@ -56,8 +57,8 @@ flowchart TD
 | Skill | 角色 |
 |---|---|
 | [`write-plan`](skills/write-plan/SKILL.md) | 把確認過的 intent 變成 `docs/loom/<change-id>/plan.md`：分 wave 的任務，各帶檔案、負責的 Acceptance 行、測試案例與風險。沒裝 `loom-design` 時自己跑 ①。 |
-| [`build`](skills/build/SKILL.md) | 每個任務派一個 implementer，以測試先行實作 plan。 |
-| [`closing-review`](skills/closing-review/SKILL.md) | 跑收尾審查——審查者，視需要加盲跑與對抗程式——並產生 `docs/loom/<change-id>/attestation.json`。 |
+| [`build`](skills/build/SKILL.md) | 每個任務派一個 implementer，以測試先行實作 plan，最後跑 adversary 與完整 package 測試，全數通過才交出。 |
+| [`closing-review`](skills/closing-review/SKILL.md) | 對通過 Build 檢查的內容跑收尾審查——審查者，視需要加盲跑——並產生 `docs/loom/<change-id>/attestation.json`。 |
 | [`ship`](skills/ship/SKILL.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
 | [`maintain`](skills/maintain/SKILL.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
@@ -72,7 +73,7 @@ flowchart TD
 | [`implementer`](agents/implementer.md) | `build` | 一個任務：先寫會失敗的測試、一個 commit、一份狀態回報 —— 不下 verdict。 |
 | [`reviewer`](agents/reviewer.md) | `closing-review` | fresh-context 的 verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）與帶位置的發現；從不修改受審對象。 |
 | [`blind-runner`](agents/blind-runner.md) | `closing-review` | 在乾淨環境跑這次變更、逐條走過每一行 Acceptance，寫出 `docs/loom/<change-id>/blind-run-report.md`。 |
-| [`adversary`](agents/adversary.md) | `closing-review` | 設法讓變更失敗 —— mutation 或 fuzz 工具，或至少三個可執行的濫用與邊界案例 —— 並把每次嘗試記成 probe。 |
+| [`adversary`](agents/adversary.md) | `build` | 設法讓變更失敗 —— mutation 或 fuzz 工具，或至少三個可執行的濫用與邊界案例 —— 並把每次嘗試記成 probe。 |
 
 審查者人數不是 agent 自己選的：`loom_checker.py reviewer-count` 依整條分支的
 差異計算 —— 範圍窄且低風險的變更一位，其他情況或無法判斷時兩位。只有當某行
@@ -105,8 +106,8 @@ charter 與欄位，還有 standing document。空白範本在 `contract/templat
 `scripts/loom_checker.py` 是決定性層：每條規則都從 repo 重算，不採信宣稱，
 規則清單以 `--list-rules` 為準。通過時退出碼 0，規則擋下時 1，用法或內部
 錯誤時 2 —— 無法判斷的 checker 永遠不會說「沒問題」。各站在 intake、
-`reviewer-count` 與 `finalize-review` 時呼叫它；`finalize-review` 只跑一次
-package 測試與對抗程式，並產生綁定內容的 attestation。已安裝的 `PreToolUse`
+`reviewer-count` 與 `finalize-review` 時呼叫它；`finalize-review` 在已 commit 的
+內容上再跑一次 package 測試與對抗程式，並產生綁定內容的 attestation。已安裝的 `PreToolUse`
 hook 在 `git push` 與 `gh pr create` 之前再跑一次：重算內容 digest，並在不重跑
 測試或 probe 的情況下驗證那份證據。
 
