@@ -1,0 +1,75 @@
+{
+  "schema": "loom-attestation/v1",
+  "change_id": "2026-09-14-typed-branch-names",
+  "content_digest": "d75ae16f4643ca7124fe6d923737df642f036028",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-14-typed-branch-names/evidence/probes/probe_checker_typed_branch.py -q",
+      "artifact": "docs/loom/2026-09-14-typed-branch-names/evidence/probes/probe_checker_typed_branch.py",
+      "result": "pass",
+      "command_digest": "fcae6f7a83a43a2cfc66e3396ea0258e10366fe0e9641dd7d6e52fa2ed96e487"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-14-typed-branch-names/evidence/probes/probe_publish_typed_branch.py -q",
+      "artifact": "docs/loom/2026-09-14-typed-branch-names/evidence/probes/probe_publish_typed_branch.py",
+      "result": "pass",
+      "command_digest": "b09a987a424d326d339121c1ca35be7891007a6ea0fb7738763035ca4c9e4061"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-14-typed-branch-names/evidence/probes/probe_write_plan_step6_attack.py -q",
+      "artifact": "docs/loom/2026-09-14-typed-branch-names/evidence/probes/probe_write_plan_step6_attack.py",
+      "result": "pass",
+      "command_digest": "ce5fd25cac2574a3d3a6346fa3bee92267b6102fa087e1aa7308d4816f068929"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "loom-code:reviewer#code-afb16cf",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/scripts/test_write_plan_station_text.py :: test_repo_grep_no_bare_branch",
+          "text": "Sweep skips plugin docs/ folders and misses checkout -B, switch --create, worktree add -b spellings.",
+          "fix": "Drop the docs exclusion and widen the regex prefix."
+        }
+      ]
+    },
+    {
+      "reviewer": "loom-code:reviewer#skill-a6b7cd4",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "anchor": "loom-code/skills/ship/SKILL.md:96",
+      "text": "Ship's --title has no reminder that the title type matches the branch prefix; rule lives only in write-plan Step 6 (dismissed by skill reviewer: single home avoids drift).",
+      "fix": "none — dismissed"
+    },
+    {
+      "severity": "nit",
+      "anchor": "loom-code/scripts/loom_checker/helpers.py:222",
+      "text": "Pre-existing, out of scope: trunk guard reads --abbrev-ref, so a tag named main makes HEAD print heads/main and the guard fails open.",
+      "fix": "Follow-up change: compute trunk check from symbolic-ref --quiet --short HEAD."
+    }
+  ]
+}
