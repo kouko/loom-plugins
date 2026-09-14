@@ -83,9 +83,10 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
   default branch whose attestation skipped reviewers.
 - A change with a bound selection publishes only from a checkout sharing the
   git common dir that holds its records; a fresh clone refuses it.
-- A confirmation binds only in the attended Claude Code session that proposed
-  it; finalization in another session applies the full process, so confirm
-  again in that session. A nested unattended session (such as `claude -p`,
+- Confirmation, finalization and publication must all run in the same attended
+  Claude Code session. In a new session, re-run
+  `loom_checker.py selection propose` and have the user type the confirmation
+  again; reusing the old code binds nothing. A nested unattended session (such as `claude -p`,
   even wrapped in `timeout`) never binds. Codex exports no session variable,
   so on Codex only the command-text guard applies.
 - On Antigravity CLI, or any other host that lacks prompt capture, a typed

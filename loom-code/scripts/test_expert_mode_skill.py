@@ -134,10 +134,15 @@ def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:
             "branch whose attestation skipped reviewers.") in boundary
     assert ("A change with a bound selection publishes only from a checkout sharing the git "
             "common dir that holds its records; a fresh clone refuses it.") in boundary
+    # Acceptance 2: confirmation, finalization and publication share one session,
+    # and a new session re-proposes before the user confirms again.
+    same = affirmative(boundary, "the same attended Claude Code session", ("must",))
+    assert "Confirmation, finalization and publication must all run" in same
+    renew = affirmative(boundary, "have the user type the confirmation again", ("re-run",))
+    assert "In a new session, re-run `loom_checker.py selection propose`" in renew
+    assert "reusing the old code binds nothing" in renew
+    assert "finalization in another session applies the full process" not in boundary
     for phrase in (
-        "A confirmation binds only in the attended Claude Code session that proposed it; "
-        "finalization in another session applies the full process, so confirm again in "
-        "that session.",
         "A nested unattended session (such as `claude -p`, even wrapped in `timeout`) "
         "never binds.",
         "Codex exports no session variable, so on Codex only the command-text guard applies.",
