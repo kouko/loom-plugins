@@ -51,7 +51,7 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
 
     assert any("loom-code/scripts/ scripts/ .claude/hooks/" in command for command in rendered)
     assert any("loom-design/scripts/" in command for command in rendered)
-    assert any("loom-workflow/tests/test_cot_explain_scripts.py" in command for command in rendered)
+    assert any("loom-workflow/tests/test_loom_visualization_page_scripts.py" in command for command in rendered)
     assert any("loom-workflow/tests/test-privacy-gate-compose-commit.sh" in command for command in rendered)
 
     expected_skill_dirs = sorted(
@@ -64,6 +64,17 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
         and "/loom-workflow/skills/" in command[3]
     )
     assert actual_skill_dirs == expected_skill_dirs
+
+
+def test_workflow_mermaid_group_installs_then_validates_with_no_skip_path() -> None:
+    expected = [
+        ["npm", "ci", "--prefix", "loom-workflow/tests/mermaid"],
+        ["node", "loom-workflow/tests/mermaid/validate_mermaid.mjs"],
+        ["bash", "loom-workflow/tests/mermaid-validator-negative.sh"],
+    ]
+    assert loom_family_commands(REPO, verbosity="-q", only="workflow-mermaid") == expected
+    full = loom_family_commands(REPO, verbosity="-q")
+    assert all(command in full for command in expected)
 
 
 def test_loom_family_preset_discovers_relocated_memory_skill_tests() -> None:

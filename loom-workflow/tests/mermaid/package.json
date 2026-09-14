@@ -1,0 +1,13 @@
+{
+  "name": "loom-visualization-mermaid-validator",
+  "private": true,
+  "type": "module",
+  "description": "Test-only: parse every mermaid block the loom-visualization skill ships with Mermaid's own parser.",
+  "scripts": {
+    "validate": "node validate_mermaid.mjs"
+  },
+  "dependencies": {
+    "jsdom": "26.1.0",
+    "mermaid": "11.17.0"
+  }
+}

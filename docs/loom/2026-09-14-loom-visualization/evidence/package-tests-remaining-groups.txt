@@ -1,0 +1,33 @@
+== --only design
+204 passed, 1 skipped in 1.41s
+group exit=0
+== --only workflow-python
+115 passed in 0.26s
+64 passed in 10.00s
+43 passed in 0.16s
+13 passed in 0.03s
+1 passed in 0.01s
+78 passed, 3 skipped in 1.57s
+126 passed in 0.24s
+12 passed in 0.03s
+group exit=0
+== --only workflow-shell
+PASS — planted Slack bot token → exit 3, finding names slack_token
+PASS — planted generic secret assignment → exit 3, finding names generic_secret_assignment
+PASS — redaction: full AWS key literal absent from stdout
+PASS — stdin path (no --text-file) → exit 0, empty JSON list
+PASS — planted deny-list term (via --denylist) → exit 3, finding names denylist
+PASS — deny-list term matches differently-cased text (case-insensitive) → exit 3
+PASS — short deny-list term ('Visa') never revealed in full in stdout
+Summary: 11 PASS / 0 FAIL
+group exit=0
+== --only workflow-mermaid
+OK templates/05-state-lifecycle.md:39
+OK templates/06-actor-sequence.md:49
+OK templates/07-hierarchy.md:42
+OK templates/08-system-architecture.md:55
+OK templates/09-data-model.md:31
+OK templates/10-timeline.md:37
+OK templates/11-quantity.md:41
+11/11 mermaid blocks parsed
+group exit=0

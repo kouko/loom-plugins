@@ -2,9 +2,9 @@
 
 Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
-> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, reasoning explainers and second opinions.
+> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 4.3.4 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.0.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## What it is
 
@@ -67,7 +67,7 @@ flowchart TD
 
     subgraph anytime["Anytime"]
         advisor["loom-workflow:independent-advisor<br/>second opinion from<br/>another executor"]
-        cot["loom-workflow:cot-explain<br/>explain reasoning<br/>that already happened"]
+        cot["loom-workflow:loom-visualization<br/>show comparisons, flows<br/>and reasoning as visuals"]
         goal["loom-workflow:goal-create<br/>session goal or repository purpose,<br/>invoked by name only"]
         router["loom-workflow:using-loom-workflow<br/>unsure which tool:<br/>route to one"]
     end
@@ -103,7 +103,7 @@ flowchart TD
   resumes it in the next. `distill-sessions` mines past sessions for skill
   improvement proposals.
 - **Anytime** — `independent-advisor` asks a different executor for a second
-  opinion, `cot-explain` turns documented reasoning into a page,
+  opinion, `loom-visualization` shows comparisons, flows and reasoning as tables or diagrams (or a reasoning page),
   `goal-create` runs only when invoked by name, and `using-loom-workflow`
   routes a request when the right tool is unclear.
 
@@ -123,7 +123,7 @@ Twelve skills: eleven tools and one optional router.
 | [`handoff`](skills/handoff/) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
 | [`distill-sessions`](skills/distill-sessions/) | Mine past Claude Code and Codex sessions, with `/insights` facets when available, for friction ranked by skill and reviewable SKILL.md proposals. |
 | [`independent-advisor`](skills/independent-advisor/) | Get a second opinion on a plan or decision from a different executor: another model tier, higher effort or another vendor. Spending money or sending material off the machine needs approval. |
-| [`cot-explain`](skills/cot-explain/) | Render reasoning that already exists as one self-contained HTML page around a chain-of-thought Mermaid diagram. |
+| [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Not for Obsidian notes. |
 | [`goal-create`](skills/goal-create/) | Invoked by name only. SESSION drafts a four-field goal condition and activates it when accepted by the host, with an honest recovery action otherwise; ARC drafts the repository purpose (`Why` / `Done when`). |
 
 Loom's contract counts eight of these tools. `goal-create` and
@@ -140,10 +140,10 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  governance, audit, telemetry and design notes
 ├── hooks/
-│   └── hooks.json         skill folder structure check after Write/Edit
+│   ├── hooks.json         SessionStart card and skill folder structure check after Write/Edit
+│   └── visualization-card SessionStart trigger card for loom-visualization
 ├── scripts/               plugin-level tests and the structure check
 ├── skills/
-│   ├── cot-explain/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
@@ -153,9 +153,10 @@ loom-workflow/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
+│   ├── loom-visualization/
 │   ├── recap-state/
 │   └── using-loom-workflow/
-├── tests/                 git-memory, loom-memory and cot-explain tests
+├── tests/                 git-memory, loom-memory and loom-visualization tests
 ├── CHANGELOG.md
 ├── README.md              (this file)
 ├── README.ja.md

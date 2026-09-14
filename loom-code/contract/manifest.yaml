@@ -24,7 +24,7 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
   - {name: decision-map,        owner: loom-workflow}
   - {name: handoff,             owner: loom-workflow}
   - {name: recap-state,         owner: loom-workflow}
-  - {name: cot-explain,         owner: loom-workflow}
+  - {name: loom-visualization,  owner: loom-workflow}
   - {name: distill-sessions,    owner: loom-workflow}
   - {name: git-memory,          owner: loom-workflow}
   - {name: independent-advisor, owner: loom-workflow}

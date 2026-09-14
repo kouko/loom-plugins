@@ -1,0 +1,42 @@
+===== compare-1-databases.jsonl
+ vis skills: ['loom-workflow:loom-visualization']
+ hooks: [('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup')]  card-in-stream: True
+ tool_uses: [('Skill', '{"skill": "loom-workflow:loom-visualization"}'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio')]
+ table: False box: True mermaid: False len: 1340 is_error: False
+===== compare-2-frontend.jsonl
+ vis skills: ['loom-workflow:loom-visualization']
+ hooks: [('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup')]  card-in-stream: True
+ tool_uses: [('Skill', '{"skill": "loom-workflow:loom-visualization"}'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio')]
+ table: False box: True mermaid: False len: 2235 is_error: False
+===== compare-3-queues.jsonl
+ vis skills: ['loom-workflow:loom-visualization']
+ hooks: [('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup')]  card-in-stream: True
+ tool_uses: [('Skill', '{"skill": "loom-workflow:loom-visualization"}'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio')]
+ table: False box: True mermaid: False len: 1827 is_error: False
+===== control-1-fact.jsonl
+ vis skills: ['loom-workflow:loom-visualization']
+ hooks: [('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup')]  card-in-stream: True
+ tool_uses: []
+ table: False box: False mermaid: False len: 21 is_error: False
+===== flow-1-rebase.jsonl
+ vis skills: ['loom-workflow:loom-visualization']
+ hooks: [('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup')]  card-in-stream: True
+ tool_uses: [('Skill', '{"skill": "loom-workflow:loom-visualization"}'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio')]
+ table: True box: True mermaid: False len: 4126 is_error: False
+===== flow-2-oauth.jsonl
+ vis skills: ['loom-workflow:loom-visualization']
+ hooks: [('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup')]  card-in-stream: True
+ tool_uses: [('Skill', '{"skill": "loom-workflow:loom-visualization"}'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio')]
+ table: True box: True mermaid: False len: 2873 is_error: False
+===== flow-3-cicd.jsonl
+ vis skills: ['loom-workflow:loom-visualization']
+ hooks: [('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_started', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup'), ('hook_response', 'SessionStart:startup')]  card-in-stream: True
+ tool_uses: [('Skill', '{"skill": "loom-workflow:loom-visualization"}'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio'), ('Bash', '{"command": "cd /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualizatio')]
+ table: True box: True mermaid: False len: 3435 is_error: False
+compare-1-databases.jsonl full card: True coexist: False plugins: ['loom-code@inline', 'loom-design@inline', 'loom-workflow@inline']
+compare-2-frontend.jsonl full card: True coexist: False plugins: ['loom-code@inline', 'loom-design@inline', 'loom-workflow@inline']
+compare-3-queues.jsonl full card: True coexist: False plugins: ['loom-code@inline', 'loom-design@inline', 'loom-workflow@inline']
+control-1-fact.jsonl full card: True coexist: False plugins: ['loom-code@inline', 'loom-design@inline', 'loom-workflow@inline']
+flow-1-rebase.jsonl full card: True coexist: False plugins: ['loom-code@inline', 'loom-design@inline', 'loom-workflow@inline']
+flow-2-oauth.jsonl full card: True coexist: False plugins: ['loom-code@inline', 'loom-design@inline', 'loom-workflow@inline']
+flow-3-cicd.jsonl full card: True coexist: False plugins: ['loom-code@inline', 'loom-design@inline', 'loom-workflow@inline']

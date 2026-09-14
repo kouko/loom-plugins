@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.0] — 2026-09-14 — count loom-workflow hooks in the mechanism population
+
+- `check_mechanisms.py` now recomputes hooks declared in
+  `loom-workflow/hooks/hooks.json` alongside the loom-code manifests, so a
+  loom-workflow hook can no longer sit outside the counted population.
+- Register the two loom-workflow hooks and the two `loom-visualization` prose
+  gates, each with a regression eval; the net count rises from 122 to 126.
+- budget-exception: SessionStart:startup|clear|compact:visualization-card — a new imperative trigger card for loom-visualization; eval loom-workflow/scripts/test_visualization_card_hook.py.
+- budget-exception: PostToolUse:Write|Edit:validate-skill-folder-structure.sh — a counting correction for an already-shipping hook, not a new mechanism; eval loom-workflow/scripts/test_validate_skill_folder_structure_hook.py.
+- budget-exception: loom-visualization.obsidian-boundary — the new skill's Obsidian boundary: vault targets are declined and routed to the Obsidian visualizer.
+- budget-exception: loom-visualization.mermaid-only-when-confirmed — the new skill's conservative Mermaid rule: table plus ASCII unless Mermaid rendering is confirmed.
+
 ## [3.1.4] — 2026-09-13 — smaller write-plan entrypoint
 
 - Preserve `write-plan` behavior while reducing its entrypoint from 4,498 to

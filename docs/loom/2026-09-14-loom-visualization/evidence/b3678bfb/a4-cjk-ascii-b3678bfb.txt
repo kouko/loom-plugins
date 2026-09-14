@@ -1,0 +1,73 @@
+== python3 -I, wcwidth importable?
+== flow (CJK labels)
+┌──────────────┐
+│  讀取設定檔  │
+└──────────────┘
+        │
+        ▼
+┌──────────────┐
+│ 驗證輸入資料 │
+└──────────────┘
+        │
+        ▼
+┌──────────────┐
+│  寫入資料庫  │
+└──────────────┘
+        │
+        ▼
+┌──────────────┐
+│     完成     │
+└──────────────┘
+✓ no drift
+align exit=0
+== table (CJK labels)
+┌────────────┬──────┬────────────┐
+│ 選択肢     │ 速度 │ コスト     │
+├────────────┼──────┼────────────┤
+│ SQLite     │ 速い │ 無料       │
+│ PostgreSQL │ 普通 │ サーバー代 │
+└────────────┴──────┴────────────┘
+✓ no drift
+align exit=0
+== tree (CJK labels)
+專案
+├─ ソース
+└─ tests 測試
+✓ no drift
+align exit=0
+== arch (CJK labels)
+┌─────────────────┐
+│      前端       │
+├──────┬──────────┤
+│ 網頁 │ 手機 App │
+└──────┴──────────┘
+┌─────────────────┐
+│      後端       │
+├─────────────────┤
+│ API 伺服器      │
+└─────────────────┘
+✓ no drift
+align exit=0
+== negative: hand-padded CJK box
+line 2: col 11: '│' at display-col 11 connects to nothing vertically
+align exit=1
+== tab in a flow step (flow)
+stderr: generate.py flow: label '讀取\t設定' contains control character U+0009; remove it
+exit=1
+== ANSI escape in a table cell (table)
+stderr: generate.py table: label '\x1b[31m紅' contains control character U+001B; remove it
+exit=1
+== bell in a tree node (tree)
+stderr: generate.py tree: label '專案\x07' contains control character U+0007; remove it
+exit=1
+== line break in a flow step (allowed) (flow)
+┌──────┐
+│ 讀取 │
+│ 設定 │
+└──────┘
+    │
+    ▼
+┌──────┐
+│ 完成 │
+└──────┘
+exit=0

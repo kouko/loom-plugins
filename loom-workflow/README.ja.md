@@ -2,9 +2,9 @@
 
 Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
-> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、推論の解説ページ、second opinion。
+> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat の図表と推論ページ、second opinion。
 
-**Version**：4.3.4 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.0.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 概要
 
@@ -65,7 +65,7 @@ flowchart TD
 
     subgraph anytime["いつでも"]
         advisor["loom-workflow:independent-advisor<br/>別の executor から<br/>second opinion"]
-        cot["loom-workflow:cot-explain<br/>すでに行われた推論を<br/>解説する"]
+        cot["loom-workflow:loom-visualization<br/>比較・フロー・推論を<br/>図表で示す"]
         goal["loom-workflow:goal-create<br/>session goal または repository purpose、<br/>名前で呼んだ時のみ"]
         router["loom-workflow:using-loom-workflow<br/>どのツールか迷ったら<br/>振り分ける"]
     end
@@ -99,7 +99,7 @@ flowchart TD
 - **session をまたいで** — `handoff` は session の終わりに状態を保存し、次の
   session で再開します。`distill-sessions` は過去の session から skill の改善提案を掘り出します。
 - **いつでも** — `independent-advisor` は別の executor に second opinion を求め、
-  `cot-explain` は記録された推論をページにします。`goal-create` は名前で呼んだ時だけ動き、
+  `loom-visualization` は比較・フロー・推論を table や図で示し、推論ページも作ります。`goal-create` は名前で呼んだ時だけ動き、
   `using-loom-workflow` は適切なツールが分からない依頼を振り分けます。
 
 ## Skills
@@ -118,7 +118,7 @@ flowchart TD
 | [`handoff`](skills/handoff/) | session 状態を `.claude/handoffs/` の HANDOFF ファイルに保存し、あるいは新しい session でそこから再開する。 |
 | [`distill-sessions`](skills/distill-sessions/) | 過去の Claude Code と Codex の session（利用可能なら `/insights` facets も）を掘り、skill ごとに順位付けした friction とレビュー可能な SKILL.md 提案を出す。 |
 | [`independent-advisor`](skills/independent-advisor/) | plan や決定について、別の executor——別の model tier、より高い effort、あるいは別ベンダー——から second opinion を取る。費用の発生やマシン外への送信には承認が必要。 |
-| [`cot-explain`](skills/cot-explain/) | すでにある推論を、chain-of-thought の Mermaid 図を中心にした自己完結型 HTML ページ 1 枚に描き出す。 |
+| [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。Obsidian ノートには使わない。 |
 | [`goal-create`](skills/goal-create/) | 名前で呼んだ時のみ動く。SESSION は 4 項目の goal condition を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
 Loom の契約で数えるツールはこのうち 8 個です。`goal-create` と `dbt-model-style`
@@ -134,10 +134,10 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  ガバナンス、監査、テレメトリ、設計メモ
 ├── hooks/
-│   └── hooks.json         Write/Edit 後の skill フォルダ構成チェック
+│   ├── hooks.json         SessionStart のカードと Write/Edit 後の skill フォルダ構成チェック
+│   └── visualization-card loom-visualization の SessionStart トリガーカード
 ├── scripts/               plugin レベルのテストと構成チェック
 ├── skills/
-│   ├── cot-explain/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
@@ -147,9 +147,10 @@ loom-workflow/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
+│   ├── loom-visualization/
 │   ├── recap-state/
 │   └── using-loom-workflow/
-├── tests/                 git-memory・loom-memory・cot-explain のテスト
+├── tests/                 git-memory・loom-memory・loom-visualization のテスト
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md           (このファイル)

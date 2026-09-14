@@ -207,10 +207,15 @@ def _command_basename(command: str) -> str:
 
 
 def recompute_hooks(repo: Path) -> set[str]:
-    ids: set[str] = set()
+    # id -> the manifest that first produced it. The loom-workflow manifest
+    # shares the "" qualifier with loom-code's, so a same event, matcher and
+    # basename in both would collapse into one id and undercount; that
+    # collision raises (main -> exit 2) instead of passing silently.
+    owners: dict[str, Path] = {}
     manifests = (
         (repo / "loom-code" / "hooks" / "hooks.json", ""),
         (repo / "loom-code" / "hooks" / "hooks-codex.json", "@codex"),
+        (repo / "loom-workflow" / "hooks" / "hooks.json", ""),
     )
     for path, qualifier in manifests:
         if not path.is_file():
@@ -221,8 +226,14 @@ def recompute_hooks(repo: Path) -> set[str]:
                 matcher = entry.get("matcher", "")
                 for h in entry.get("hooks", []):
                     base = _command_basename(h.get("command", ""))
-                    ids.add(f"{event}:{matcher}:{base}{qualifier}")
-    return ids
+                    hook_id = f"{event}:{matcher}:{base}{qualifier}"
+                    owner = owners.setdefault(hook_id, path)
+                    if owner != path:
+                        raise ValueError(
+                            f"hook id {hook_id!r} is produced by both {owner} and "
+                            f"{path}; the population would undercount one hook"
+                        )
+    return set(owners)
 
 
 def recompute_contract(repo: Path) -> set[str]:
@@ -530,6 +541,7 @@ def compute_baseline_total(repo: Path, ref: str) -> tuple[int, bool]:
     for hook_path in (
         "loom-code/hooks/hooks.json",
         "loom-code/hooks/hooks-codex.json",
+        "loom-workflow/hooks/hooks.json",
     ):
         hooks_text = _git_show(repo, ref, hook_path)
         if hooks_text is not None:

@@ -1,0 +1,8 @@
+compare-2-frontend exit=0
+compare-3-queues exit=0
+compare-1-databases exit=0
+flow-3-cicd exit=0
+flow-2-oauth exit=0
+flow-1-rebase exit=0
+control-1-fact exit=0
+done

@@ -2,9 +2,9 @@
 
 Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
-> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、推理說明頁與 second opinion。
+> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：4.3.4 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.0.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 這是什麼
 
@@ -62,7 +62,7 @@ flowchart TD
 
     subgraph anytime["隨時"]
         advisor["loom-workflow:independent-advisor<br/>向另一個 executor<br/>取得 second opinion"]
-        cot["loom-workflow:cot-explain<br/>說明已經發生過的推理"]
+        cot["loom-workflow:loom-visualization<br/>把比較、流程與推理畫成圖表"]
         goal["loom-workflow:goal-create<br/>session goal 或 repository purpose，<br/>只在指名呼叫時"]
         router["loom-workflow:using-loom-workflow<br/>不確定用哪個工具時<br/>幫你分派"]
     end
@@ -94,7 +94,7 @@ flowchart TD
 - **跨 session** — `handoff` 在 session 結束時存下狀態，並在下一個 session
   接續。`distill-sessions` 從過去的 session 挖出 skill 改進提案。
 - **隨時** — `independent-advisor` 向另一個 executor 取得 second opinion，
-  `cot-explain` 把有紀錄的推理做成頁面，`goal-create` 只在指名呼叫時執行，
+  `loom-visualization` 把比較、流程與推理呈現成表格或圖（也能做成推理頁），`goal-create` 只在指名呼叫時執行，
   `using-loom-workflow` 在不確定該用哪個工具時分派請求。
 
 ## Skills
@@ -113,7 +113,7 @@ flowchart TD
 | [`handoff`](skills/handoff/) | 把 session 狀態存成 `.claude/handoffs/` 下的 HANDOFF 檔，或在新 session 中從它接續。 |
 | [`distill-sessions`](skills/distill-sessions/) | 挖掘過去的 Claude Code 與 Codex session（可用時加上 `/insights` facets），產出依 skill 排序的 friction 與可審閱的 SKILL.md 提案。 |
 | [`independent-advisor`](skills/independent-advisor/) | 對 plan 或決策，向另一個 executor——另一個 model tier、更高的 effort，或另一家廠商——取得 second opinion。花錢或把資料送出本機需經同意。 |
-| [`cot-explain`](skills/cot-explain/) | 把已經存在的推理，渲染成以 chain-of-thought Mermaid 圖為核心的單一自包含 HTML 頁面。 |
+| [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。不用於 Obsidian 筆記。 |
 | [`goal-create`](skills/goal-create/) | 只在指名呼叫時執行。SESSION 起草四欄 goal condition，在 host 接受時啟用，否則誠實提供復原操作；ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
 Loom 的契約計入其中八個工具。`goal-create` 與 `dbt-model-style` 是 Loom
@@ -129,10 +129,10 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  治理、稽核、遙測與設計筆記
 ├── hooks/
-│   └── hooks.json         Write/Edit 後檢查 skill 資料夾結構
+│   ├── hooks.json         SessionStart 卡片，以及 Write/Edit 後檢查 skill 資料夾結構
+│   └── visualization-card loom-visualization 的 SessionStart 觸發卡片
 ├── scripts/               plugin 層級測試與結構檢查
 ├── skills/
-│   ├── cot-explain/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
@@ -142,9 +142,10 @@ loom-workflow/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
+│   ├── loom-visualization/
 │   ├── recap-state/
 │   └── using-loom-workflow/
-├── tests/                 git-memory、loom-memory 與 cot-explain 的測試
+├── tests/                 git-memory、loom-memory 與 loom-visualization 的測試
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md
