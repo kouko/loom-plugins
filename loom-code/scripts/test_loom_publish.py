@@ -1083,3 +1083,119 @@ def test_publish_stops_permanent_pending_after_sixty_minutes_without_resume_stat
     assert "pending" not in out.casefold()
     created = set(tmp_path.rglob("*")) - before
     assert not any(path.name.endswith((".pid", ".state", ".resume")) for path in created)
+
+
+# --- Acceptance 5: skipped-steps disclosure (plan W2-04, spec decision 10) ---
+
+from loom_checker.rule_checks import publish as publish_rules  # noqa: E402
+
+SELECTION = {
+    "confirmations": [
+        {"code": "AB2C", "skip": ["adversarial"], "source": "user-typed",
+         "at": "2026-09-13T08:00:00Z"},
+        {"code": "QRST", "skip": ["reviewers", "adversarial"], "source": "user-typed",
+         "at": "2026-09-14T01:02:03Z"},
+    ],
+    "skip": ["reviewers", "adversarial"],
+    "source": "user-typed",
+    "prior_failures": [
+        {"step": "reviewers", "rule": "finalize.verdicts", "head_sha": "a" * 40,
+         "branch": "feature", "at": "2026-09-12T23:00:00Z"},
+        {"step": "finalize", "rule": "finalize.digest", "head_sha": "b" * 40,
+         "branch": "feature", "at": "2026-09-13T09:00:00Z"},
+    ],
+}
+DISCLOSURE = [
+    "Skipped steps: adversarial — authority: user-typed (AB2C, 2026-09-13)",
+    "Skipped steps: reviewers, adversarial — authority: user-typed (QRST, 2026-09-14)",
+    "Prior failure: reviewers finalize.verdicts 2026-09-12",
+    "Prior failure: finalize finalize.digest 2026-09-13",
+]
+
+
+def disclosed_body(lines: list[str]) -> str:
+    verification = "\n".join([*lines, CONTEXT_CONTENT["Verification"]])
+    return contextual_body(overrides={"Verification": verification})
+
+
+def test_disclosure_renderer_matches_attestation_order() -> None:
+    assert publish_rules.render_selection_disclosure({"selection": SELECTION}) == DISCLOSURE
+    assert publish_rules.render_selection_disclosure({"selection": None}) == []
+
+
+def test_matching_skipped_and_prior_failure_lines_publish() -> None:
+    body = disclosed_body(DISCLOSURE)
+    assert loom_checker.validate_contextual_pr_body(body) is None
+    assert publish_rules.validate_selection_disclosure(body, {"selection": SELECTION}) is None
+    # Null selection needs no line at all.
+    assert publish_rules.validate_selection_disclosure(contextual_body(), {"selection": None}) is None
+
+
+@pytest.mark.parametrize("name, lines", [
+    ("missing everything", []),
+    ("missing failure line", DISCLOSURE[:3]),
+    ("missing earlier confirmation", DISCLOSURE[1:]),
+    ("missing authority", [DISCLOSURE[0], "Skipped steps: reviewers, adversarial", *DISCLOSURE[2:]]),
+    ("wrong authority source", [DISCLOSURE[0], DISCLOSURE[1].replace("user-typed", "agent"), *DISCLOSURE[2:]]),
+    ("wrong code", [DISCLOSURE[0], DISCLOSURE[1].replace("QRST", "QRSX"), *DISCLOSURE[2:]]),
+    ("wrong date", [*DISCLOSURE[:3], DISCLOSURE[3].replace("2026-09-13", "2026-09-14")]),
+    ("steps reordered", [DISCLOSURE[0], DISCLOSURE[1].replace("reviewers, adversarial", "adversarial, reviewers"), *DISCLOSURE[2:]]),
+    ("failures before skipped", [*DISCLOSURE[2:], *DISCLOSURE[:2]]),
+    ("not first in Verification", ["Focused tests ran first.", *DISCLOSURE]),
+    ("extra failure line", [*DISCLOSURE, "Prior failure: package-tests finalize.package-tests 2026-09-13"]),
+])
+def test_missing_authority_or_failure_line_refused(name: str, lines: list[str]) -> None:
+    body = disclosed_body(lines)
+    assert publish_rules.validate_selection_disclosure(body, {"selection": SELECTION}) is not None, name
+
+
+def test_disclosure_elsewhere_or_false_disclosure_refused() -> None:
+    # The lines must sit under Verification, not another section.
+    moved = contextual_body(overrides={
+        "Context": "\n".join([*DISCLOSURE, CONTEXT_CONTENT["Context"]]),
+    })
+    assert publish_rules.validate_selection_disclosure(moved, {"selection": SELECTION}) is not None
+    # A null selection with a Skipped steps line is a false disclosure.
+    for line in (DISCLOSURE[1], DISCLOSURE[2]):
+        body = disclosed_body([line])
+        assert publish_rules.validate_selection_disclosure(body, {"selection": None}) is not None
+
+
+def selected_publication(tmp_path: Path, monkeypatch, lines: list[str]):
+    calls = ExternalCalls("")
+    repo = repository(tmp_path)
+    git(repo, "branch", "main")
+    target = attestation(repo)
+    target.write_text(json.dumps({"change_id": "change", "selection": SELECTION}), encoding="utf-8")
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "attested with a selection")
+    body = tmp_path / "body.md"
+    body.write_text(disclosed_body(lines), encoding="utf-8")
+    calls.head = git(repo, "rev-parse", "HEAD")
+    monkeypatch.chdir(repo)
+    monkeypatch.setattr(loom_checker, "run_publish_external", calls)
+    monkeypatch.setattr(loom_checker, "_cmd_push", lambda *args, **kwargs: 0)
+    monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
+    err = StringIO()
+    rc = loom_checker.cmd_publish([
+        "--confirm-authorized", "--title", "feat(loom): safe", "--body-file", str(body),
+    ], StringIO(), err)
+    return rc, err.getvalue(), calls
+
+
+def test_publish_refuses_undisclosed_selection_before_network(
+    tmp_path: Path, monkeypatch
+) -> None:
+    rc, err, calls = selected_publication(tmp_path, monkeypatch, DISCLOSURE[:3])
+
+    assert rc == 1
+    assert "push.contextual-body" in err
+    assert "Prior failure: finalize finalize.digest 2026-09-13" in err
+    assert calls.calls == []
+
+
+def test_publish_accepts_matching_selection_disclosure(tmp_path: Path, monkeypatch) -> None:
+    rc, err, calls = selected_publication(tmp_path, monkeypatch, DISCLOSURE)
+
+    assert rc == 0, err
+    assert any("pr" in call and "create" in call for call in calls.calls)

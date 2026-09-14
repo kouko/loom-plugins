@@ -6,11 +6,13 @@ from loom_checker.helpers import UsageError
 from loom_checker.helpers import git_text
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import repo_root
+from loom_checker.intent_state import remote_default_snapshot
 
 from pathlib import Path
 import argparse
 import hashlib
 import json
+import re
 import sys
 import uuid
 
@@ -97,7 +99,7 @@ WITHDRAW_TOKENS = frozenset({"cancel", "取消", "キャンセル", "撤回"})
 def _scoped_proposals(repo: Path, branch: str, merge_base: str) -> list[tuple[str, dict, bool]]:
     """(change-id, proposal, already confirmed) for every proposal in the
     store recorded on this branch and merge base, in record order."""
-    directory = store.store_path(repo, "_").parent
+    directory = store.store_dir(repo)
     found = []
     for path in sorted(directory.glob("*.jsonl")) if directory.is_dir() else []:
         scoped = [e for e in store.read_events(repo, path.stem)
@@ -184,13 +186,48 @@ def _capture(repo: Path | None, args: list[str], out, err) -> int:
     return 0
 
 
-# Extension point: `skipped-review` (W2-04, ledger) registers here.
+def _skipped_review(repo: Path, args: list[str], out, err) -> int:
+    """List merged changes on the remote default branch whose attestation
+    records reviewers as skipped."""
+    if args:
+        raise UsageError("selection skipped-review takes no arguments.")
+    _ref, snapshot, error = remote_default_snapshot(repo)
+    if snapshot is None:
+        err.write(f"selection skipped-review: cannot resolve the remote default branch: {error}; "
+                  "fetch the remote (or run `git remote set-head origin --auto`) and retry.\n")
+        return 1
+    template = load_manifest()["artifacts"]["attestation"]["path"]
+    pattern = re.compile(
+        re.escape(template).replace(re.escape("<change-id>"), r"(?P<change_id>[^/]+)"))
+    listing = git_text(repo, "ls-tree", "-r", "-z", "--name-only", snapshot, "--",
+                       template.split("<change-id>")[0])
+    found = 0
+    for path in sorted(name for name in listing.split("\0") if pattern.fullmatch(name)):
+        try:
+            recorded = json.loads(git_text(repo, "show", f"{snapshot}:{path}")).get("selection")
+        except (UsageError, json.JSONDecodeError, AttributeError):
+            err.write(f"selection skipped-review: {path} is unreadable; not listed.\n")
+            continue
+        if not isinstance(recorded, dict) or "reviewers" not in (recorded.get("skip") or []):
+            continue
+        added = git_text(repo, "log", "--first-parent", "--diff-filter=A", "--format=%h",
+                         snapshot, "--", path).splitlines()
+        merge = added[-1] if added else "unknown"
+        out.write(f"{pattern.fullmatch(path)['change_id']} {merge} "
+                  f"skipped: {', '.join(recorded['skip'])}\n")
+        found += 1
+    if not found:
+        out.write("no merged change skipped review\n")
+    return 0
+
+
 SUBCOMMANDS = {
     "propose": _propose,
     "show": _show,
     "cancel": _cancel,
     "record-failure": _record_failure,
     "capture": _capture,
+    "skipped-review": _skipped_review,
 }
 
 

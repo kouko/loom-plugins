@@ -23,6 +23,7 @@ from pathlib import Path
 import base64
 import hashlib
 import json
+import re
 
 
 ENTRY_TOKENS = frozenset(
@@ -68,14 +69,28 @@ def confirmation_is_valid(event: dict, proposal: dict) -> bool:
     return confirmation_prompt_matches(text, proposal["code"])
 
 
-def store_path(repo: Path, change_id: str) -> Path:
+SAFE_CHANGE_ID = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+")
+
+
+def store_dir(repo: Path) -> Path:
     common = Path(git_text(repo, "rev-parse", "--git-common-dir"))
     if not common.is_absolute():
         common = (repo / common).resolve()
-    return common / "loom" / "selections" / f"{change_id}.jsonl"
+    return common / "loom" / "selections"
+
+
+def store_path(repo: Path, change_id: str) -> Path:
+    """The record file for one change; a change-id that is not one safe path
+    segment is refused before any path is built."""
+    if not isinstance(change_id, str) or not SAFE_CHANGE_ID.fullmatch(change_id):
+        raise UsageError(f"change-id {change_id!r} is not a dated kebab-case change-id.")
+    return store_dir(repo) / f"{change_id}.jsonl"
 
 
 def read_events(repo: Path, change_id: str) -> list[dict]:
+    """Events for one change; an unsafe change-id holds none (full process)."""
+    if not isinstance(change_id, str) or not SAFE_CHANGE_ID.fullmatch(change_id):
+        return []
     path = store_path(repo, change_id)
     if not path.is_file():
         return []

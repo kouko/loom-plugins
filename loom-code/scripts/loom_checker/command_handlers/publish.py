@@ -14,6 +14,7 @@ from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
 from loom_checker.parsing import parse_document
 from loom_checker.rule_checks.publish import validate_contextual_pr_body
+from loom_checker.rule_checks.publish import validate_selection_disclosure
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
 from loom_checker.rule_checks.push import github_repo_from_origin
 from pathlib import Path
@@ -146,30 +147,36 @@ def _publish_args(args: list[str]) -> tuple[str, Path, Path | None, bool] | str:
     return title, body_file, intent_file, authorized
 
 
-def _publication_change_id(repo: Path) -> tuple[str | None, str | None]:
-    """Derive the publication identity from the sole attestation in the branch."""
+def _publication_attestation(repo: Path) -> tuple[str | None, dict | None, str | None]:
+    """The sole attested change in the branch and its attestation at HEAD."""
     manifest = load_manifest()
     template = manifest.get("artifacts", {}).get("attestation", {}).get("path")
     if not template:
-        return None, "contract manifest declares no attestation artifact"
+        return None, None, "contract manifest declares no attestation artifact"
     matcher = glob_to_regex(template.replace("<change-id>", "*"))
     candidates = sorted(path for path in changed_paths(repo) if matcher.fullmatch(path))
     if len(candidates) != 1:
-        return None, f"branch must carry exactly one attested change; found {len(candidates)}"
+        return None, None, f"branch must carry exactly one attested change; found {len(candidates)}"
     match = re.fullmatch(
         re.escape(template).replace(re.escape("<change-id>"), r"(?P<change_id>[^/]+)"),
         candidates[0],
     )
     if match is None:
-        return None, "cannot derive attested change id"
+        return None, None, "cannot derive attested change id"
     change_id = match.group("change_id")
     try:
         payload = json.loads(git_text(repo, "show", f"HEAD:{candidates[0]}"))
     except (UsageError, json.JSONDecodeError):
-        return None, "attestation must be committed at HEAD"
+        return None, None, "attestation must be committed at HEAD"
     if not isinstance(payload, dict) or payload.get("change_id") != change_id:
-        return None, "attestation change_id does not match its path"
-    return change_id, None
+        return None, None, "attestation change_id does not match its path"
+    return change_id, payload, None
+
+
+def _publication_change_id(repo: Path) -> tuple[str | None, str | None]:
+    """Derive the publication identity from the sole attestation in the branch."""
+    change_id, _payload, error = _publication_attestation(repo)
+    return change_id, error
 
 
 def _intent_authorizes_publication(
@@ -408,6 +415,16 @@ def _cmd_publish_trusted(
     if _cmd_push(["--head", head, "--require-live-head"], out, err) != 0:
         return 1
     out.write(f"Attestation validated for {head}\n")
+    # No derivable attestation means no selection: a disclosure line is then false.
+    try:
+        _change_id, attested, _error = _publication_attestation(repo)
+    except UsageError:  # no branch base: the attestation gate above already owns that
+        attested = None
+    disclosure_error = validate_selection_disclosure(
+        body_file.read_text(encoding="utf-8"), attested or {"selection": None}
+    )
+    if disclosure_error:
+        return report([("push.contextual-body", disclosure_error)], err)
 
     base_result = _external_or_block(
         # gh repo view accepts [HOST/]OWNER/REPO and exposes defaultBranchRef:
