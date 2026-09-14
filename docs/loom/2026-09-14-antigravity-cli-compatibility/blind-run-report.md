@@ -27,14 +27,22 @@
   - 用 `agy --add-dir "$PWD"` 啟動，並說明「.」不行、只在 agy 命令列有效。
   
   說明文字是對應的日文翻譯。這份 README 只講它自己和 loom-code 兩個外掛；三個一起裝的步驟在專案首頁的 README。
-- **Evidence**: `evidence/00-agy-plugin-list-baseline.txt`、`evidence/01-install-validate-list-d6e4e9f5.txt`；日文 README 對照：`evidence/01b-loom-workflow-readme-ja-vs-en-3d7f718e.txt`
+- **Evidence**: 關鍵輸出（原文）：
+  > `[ok] ./loom-code` skills: 6 processed / agents: 4 processed / hooks: 1 processed；`[ok] ./loom-design` skills: 5 processed；`[ok] ./loom-workflow` skills: 12 processed / hooks: 1 processed — 三個 install 都是 `exit=0`
+  > 日文 README 與英文版的指令區塊 `git clone … / agy plugin install ./loom-code / agy plugin install ./loom-workflow` 逐字相同（差異只在說明文字）
+
+  暫存區參考：`evidence/00-agy-plugin-list-baseline.txt`、`evidence/01-install-validate-list-d6e4e9f5.txt`；日文 README 對照：`evidence/01b-loom-workflow-readme-ja-vs-en-3d7f718e.txt`
 - **Verdict**: works — 照文件裝得起來，檢查全過。
 
 ### 2. After installing, every station and skill of the three plugins appears in agy's skill list, including when another installed plugin ships a skill with the same short name.
 試的版本：d6e4e9f5
 - **How I tried it**: 在一個空的練習資料夾啟動 agy（用完整路徑加入工作資料夾），請它列出看得到的所有技能。你原本裝的 conductor 外掛也有一個叫 `review` 的技能，所以這是真實的撞名情境。我再把清單逐一對照三個外掛的技能。
 - **What happened**: 23 個 loom 技能一個不少（6 + 5 + 12）。審查站 `closing-review` 和 conductor 的 `review` 同時出現在清單裡，沒有被藏起來。
-- **Evidence**: `evidence/02-agy-skills-d6e4e9f5.txt`、`evidence/02b-loom-skill-presence-d6e4e9f5.txt`（23 個都找到，0 個缺）
+- **Evidence**: 關鍵輸出（原文）：
+  > `closing-review	Run closing review and generate an attestation.`
+  > `review	Reviews the completed track work against guidelines and the plan`（conductor 的同名技能）；對照結果：23 個 `FOUND`，0 個 `MISSING`
+
+  暫存區參考：`evidence/02-agy-skills-d6e4e9f5.txt`、`evidence/02b-loom-skill-presence-d6e4e9f5.txt`
 - **Verdict**: works — 有撞名時也看得到 loom 的每一站。
 
 ### 3. In agy, a small change in a throwaway repository is taken through capture-intent, write-plan, build, closing-review and ship; the loom checker accepts the intent, plan and attestation it produced, and its blind-run report is produced and committed on the change branch.
@@ -58,14 +66,23 @@
     - loom 正式的「推送並開 PR」指令拒絕了，理由是遠端不是 GitHub 網址。這是練習環境本來就會發生的，所以沒有開 PR。
     - 它接著打一般的 `git push`，被推送閘門擋下，理由是指令格式。這個分支已經有審查紀錄，所以只剩格式問題，這是正確的行為。
     - 它隨後去讀檢查程式的原始碼，照裡面的規則自己拼出標準格式的推送指令，推送成功。
-- **Evidence**: `evidence/03-turn01-summary.txt`、`evidence/03-turn02-response.txt`、`evidence/03-dispatches-and-checker-d6e4e9f5.txt`（五次派工與每次檢查的結果）、`evidence/03-remote-and-checker-recheck-d6e4e9f5.txt`（遠端分支的檔案清單與我自己的重跑）
+- **Evidence**: 關鍵輸出（原文）：
+  > 派工（五次皆同樣式）：`TypeName= self Role= implementer` … `First, read loom-code/agents/implementer.md using view_file and follow it strictly as your agent contract.`（另有 `Role= adversary`、`blind-runner`、兩次 `reviewer`，各讀對應的 `agents/<role>.md`）
+  > 檢查程式：`intent … exit 0`、`plan … exit 0`、`wrote docs/loom/2026-09-14-add-subtract-function/attestation.json for bc07384512330ca2ff418e6c1d88aca2b4bf7a88`、`push … exit 0`
+  > 推上去的分支：`7e13704 docs(loom): attestation 2026-09-14-add-subtract-function` / `d4fbd6d docs(loom): blind-run report 2026-09-14-add-subtract-function`；檔案清單含 `docs/loom/2026-09-14-add-subtract-function/blind-run-report.md`；我的重跑 `10 passed`
+
+  暫存區參考：`evidence/03-turn01-summary.txt`、`evidence/03-turn02-response.txt`、`evidence/03-dispatches-and-checker-d6e4e9f5.txt`、`evidence/03-remote-and-checker-recheck-d6e4e9f5.txt`
 - **Verdict**: works — 整條流程走完，三份產出都被檢查程式接受，盲跑報告也提交在推上去的分支裡。沒有開 PR，因為練習用的遠端不是 GitHub。
 
 ### 4. In agy, pushing a change branch that has no matching review attestation is blocked by the loom push gate, and the first reason shown says the review attestation is missing.
 試的版本：d6e4e9f5
 - **How I tried it**: 在另一個練習專案開一個沒有審查紀錄的分支，請 agy 只執行一次最普通的 `git push origin <分支>`，被拒就不要繞路，並原文告訴我第一個理由。
 - **What happened**: 被擋下，遠端只有原本的主分支，沒收到這個分支。agy 原文轉述的第一句是「分支上必須剛好有一份審查紀錄，找到 0 份」，第二句才是指令格式的說明。上一輪「第一句在講格式」的問題修好了。
-- **Evidence**: `evidence/04-agy-push-block-d6e4e9f5.json`、`evidence/04-remote-branches-after.txt`
+- **Evidence**: 關鍵輸出（原文）：
+  > `tool call denied by pre-tool hook: BLOCK push.attestation: branch must carry exactly one generated attestation; found 0`
+  > `BLOCK push.attestation: the entire Git push command must use canonical quote-all rendering`；之後遠端分支只有 `* main`
+
+  暫存區參考：`evidence/04-agy-push-block-d6e4e9f5.json`、`evidence/04-remote-branches-after.txt`
 - **Verdict**: works — 擋得住，而且第一句就說出缺審查紀錄。
 
 ### 5. In agy, a new session receives loom's station order and the repository's kickoff defaults without the user asking.
@@ -74,7 +91,11 @@
 - **What happened**:
   - 第一次我自己寫的預設檔格式不對：不是 loom 規定的「一行一個設定」寫法。結果它答得出站序，但回答「沒收到開案預設」，也沒有收到任何提醒。這是我準備的檔案有錯，不是這次變更的問題。
   - 把預設檔改成 loom 的格式再試一次：站序答對（capture-intent → write-spec → write-plan → build → closing-review → ship，出事時 maintain），三個開案預設都原文說出，包括「預設流程：精簡」，也沒有收到「沒接上專案」的提醒。上一輪「照 README 寫法接不上專案」的問題修好了。
-- **Evidence**: `evidence/05b-session-context-pwd-d6e4e9f5.json`；格式不對那次：`evidence/05a-session-context-pwd-badfixture-d6e4e9f5.json`
+- **Evidence**: 關鍵輸出（原文）：
+  > `capture-intent → write-spec → write-plan → build → closing-review → ship` (with `maintain` on alerts)
+  > `second-vendor: suggest` / `default-lane: express` / `package-tests: python3 -m pytest -q`；missing workspace note: `NOT RECEIVED`
+
+  暫存區參考：`evidence/05b-session-context-pwd-d6e4e9f5.json`；格式不對那次：`evidence/05a-session-context-pwd-badfixture-d6e4e9f5.json`
 - **Verdict**: works — 照 README 的寫法開新對話，站序和開案預設都自動送到。
 
 ### 6. In agy, after a loom skill is used in a Japanese or Chinese conversation, the language reminder that Claude Code gives also reaches the agent.
@@ -84,21 +105,33 @@
   - 第一次 agy 需要執行指令，但印出模式沒辦法問我要不要允許，所以直接停下，什麼都沒回。這和這次變更無關。
   - 第二次限定在那個練習專案裡自動允許，就正常跑完。它先用日文回顧了專案現況，再原文引用提醒：「ユーザー向けの説明は常に会話言語（日本語）を使用してください。brief/verdict/commit などの機械向けアーティファクトは元の言語のままにします。」
   - 對話紀錄證實了這一點：它讀完技能檔之後，下一步就是系統插入的這段日文提醒。上一輪「提醒一次都沒送到」的問題修好了。
-- **Evidence**: `evidence/06b-language-reminder-ja-d6e4e9f5.json`、`evidence/06c-transcript-steps-d6e4e9f5.txt`（第 4 步就是插入的提醒）；停下那次：`evidence/06a-language-reminder-ja-permission-denied-d6e4e9f5.json`
+- **Evidence**: 關鍵輸出（原文）：
+  > 對話紀錄：`2 MODEL PLANNER_RESPONSE view_file … loom-workflow/skills/recap-state/SKILL.md` → `4 SYSTEM_SDK EPHEMERAL_MESSAGE ユーザー向けの説明は常に会話言語（日本語）を使用してください。brief/verdict/commit などの機械向けアーティファクトは元の言語のままにします。`
+  > agy 的回答引用了同一段文字
+
+  暫存區參考：`evidence/06b-language-reminder-ja-d6e4e9f5.json`、`evidence/06c-transcript-steps-d6e4e9f5.txt`；停下那次：`evidence/06a-language-reminder-ja-permission-denied-d6e4e9f5.json`
 - **Verdict**: works — 在實際的日文對話裡，語言提醒送到了 agy。
 
 ### 7. In agy, writing a nested subfolder inside a skill folder is rejected by the loom-workflow folder-structure rule.
 試的版本：d6e4e9f5
 - **How I tried it**: 在練習專案裡放一份 loom-workflow 的副本，請 agy 用它的寫檔工具在某個技能的參考資料夾下「再開一層子資料夾」寫檔。接著請它在同一層直接寫檔。兩次都用完整路徑加入工作資料夾。
 - **What happened**: 開子資料夾那次被擋下，agy 原文轉述了規則說明（技能資料夾裡只能有一層子資料夾，並建議怎麼改），子資料夾沒有產生。直接寫在同一層則成功。副本裡只多了那一個同層檔案。
-- **Evidence**: `evidence/07a-agy-nested-write-d6e4e9f5.json`、`evidence/07b-agy-flat-write-d6e4e9f5.json`、`evidence/07c-references-listing-after.txt`
+- **Evidence**: 關鍵輸出（原文）：
+  > `tool call denied by pre-tool hook: ❌ Skill folder structure violation (loom-workflow plugin hook)` … `Nested directory paths found: …/skills/handoff/references/deeper`
+  > 同層：`The file creation succeeded.`；之後資料夾內容 `handoff-schema.md`、`x.md`（沒有 `deeper`）
+
+  暫存區參考：`evidence/07a-agy-nested-write-d6e4e9f5.json`、`evidence/07b-agy-flat-write-d6e4e9f5.json`、`evidence/07c-references-listing-after.txt`
 - **Verdict**: works — 開子資料夾會被拒，同層寫檔可以。
 
 ### 8. The existing package test suite and the Codex manifest drift check still pass, so Claude Code and Codex installs are unchanged.
 試的版本：d6e4e9f5
 - **How I tried it**: 在乾淨複製上照 README「Development」段落跑完整測試，再跑同一段列出的四個設定檔檢查（包含 Codex 設定檔一致性檢查）。
 - **What happened**: Python 測試共 2090 個通過、6 個略過；17 組 shell 檢查共 145 項全過，整體結束狀態為成功。四個設定檔檢查都通過。第一次跑這四個檢查時，是我自己把指令打錯（shell 沒有把指令拆開），不是它們失敗；重跑後都通過，兩次紀錄都留在同一個檔案裡。跑完之後，複製裡沒有多出任何變更。
-- **Evidence**: `evidence/08-package-tests-d6e4e9f5.txt`
+- **Evidence**: 關鍵輸出（原文）：
+  > `1220 passed, 2 skipped`、`205 passed, 1 skipped`、`261 passed`、`78 passed, 3 skipped` 等 12 組相加 2090 passed / 6 skipped；shell 組每組 `Summary: N PASS / 0 FAIL`；整體 `exit=0`
+  > `$ python3 scripts/sync_codex_manifests.py --check --all` → `exit=0`（另外三個檢查同樣 `exit=0`）
+
+  暫存區參考：`evidence/08-package-tests-d6e4e9f5.txt`
 - **Verdict**: works — 測試全綠，Codex 設定沒有漂移。
 
 ### 9. The repository's product principles name Antigravity CLI alongside Claude Code and Codex as a supported host.
@@ -108,7 +141,11 @@
   - 「給誰用」那句寫的是 Claude Code、Codex CLI 或 Antigravity CLI。
   - 「掛鉤由誰安裝」那條也列了這三個平台。
   - 簽核行補了一句「2026-09-14 由 kouko 加入 Antigravity CLI」。
-- **Evidence**: `evidence/09-principles-d6e4e9f5.md`（第 2、5、24 行）
+- **Evidence**: 關鍵原文：
+  > 第 5 行 `… working alone or in a small team, on Claude Code, Codex CLI or Antigravity CLI.`
+  > 第 24 行 `- Host-installed plugin hooks (Claude Code, Codex and Antigravity CLI), never repository-local or git hooks.`；第 2 行 `hosts clause amended (Antigravity CLI added) by kouko 2026-09-14`
+
+  暫存區參考：`evidence/09-principles-d6e4e9f5.md`
 - **Verdict**: works
 
 ### 10. On Claude Code, Codex and agy the review station is invoked as `closing-review`, and loom's own station order and guidance use that name.
@@ -121,7 +158,11 @@
   - **agy**：清單裡是 `closing-review`。第 5 條它說出的站序寫 closing-review；第 3 條實際跑的也是這一站。
   - **Claude Code**：列出 `loom-code:build`、`closing-review`、`maintain`、`ship`、`using-loom-code`、`write-plan`，沒有 `review`。
   - **Codex**：列出來自這個分支副本的 `loom-code:closing-review`。同一份清單裡另一個 `loom-code:review`，來自你電腦上原本就裝著的舊版 loom，不是這個分支。
-- **Evidence**: `evidence/02-agy-skills-d6e4e9f5.txt`、`evidence/05b-session-context-pwd-d6e4e9f5.json`、`evidence/10-claude-plugin-dir-skills-d6e4e9f5.txt`；Codex：上一輪暫存區的 `blindrun/evidence/10b-codex-live-closing-review.txt`（協調者執行）
+- **Evidence**: 關鍵輸出（原文）：
+  > Claude Code：`loom-code:build` / `loom-code:closing-review` / `loom-code:maintain` / `loom-code:ship` / `loom-code:using-loom-code` / `loom-code:write-plan`
+  > Codex：`loom-code:closing-review — …/loom-live-check/loom-code/3.1.4/skills/closing-review/SKILL.md`；agy：`closing-review	Run closing review and generate an attestation.`
+
+  暫存區參考：`evidence/02-agy-skills-d6e4e9f5.txt`、`evidence/05b-session-context-pwd-d6e4e9f5.json`、`evidence/10-claude-plugin-dir-skills-d6e4e9f5.txt`；Codex：上一輪暫存區的 `blindrun/evidence/10b-codex-live-closing-review.txt`（協調者執行）
 - **Verdict**: works — 三個平台都叫得出 closing-review。Codex 那次不是我親手跑的，而且不是在 d6e4e9f5 上跑的。
 
 ## Review summary
@@ -135,9 +176,10 @@
 
 這一輪盲跑沒有另外問你問題。
 
-需求確認時你回答過的問題在計畫裡，最後兩個是這次重新確認新增的：
+需求確認時你回答過的問題在計畫裡，最後三個是第一次盲跑之後重新確認時新增的：
 - 第 3 條原本寫「檢查程式接受盲跑報告」，但沒有規則在檢查它。你決定改成「盲跑報告要提交在變更分支上」。
 - 推送被擋時，第一句要不要先說缺審查紀錄。你決定改，三個平台都先說。
+- 審查時發現推送閘門改成不分大小寫辨認 git／gh，所以 `GIT push` 這類寫法現在在 Claude Code 和 Codex 上也會被擋（以前會放行，但在 macOS 上它其實真的會推送）。這和「哪些推送會被擋不變」衝突。你決定保留，三個平台都擋。
 
 ## 對你既有的資料做了什麼 (what this did to data you already had)
 
@@ -165,10 +207,11 @@ agy 會照常把這幾次對話紀錄存在它自己的對話紀錄資料夾裡�
 - **安裝方式訂為「複製專案後，逐一安裝三個外掛」** — loom-code 要先裝；日文和繁中 README 都補上同一段。
 - **loom-design 的第二家審查說明補上 Antigravity** — 施工中發現那份說明只列了 Codex 和 Claude，所以追加一個任務補上，措辭照 loom-code 的版本。
 
-這次重新確認時，由你決定的兩件事：
+這次重新確認時，由你決定的三件事：
 
 - **第 3 條驗收的說法改了** — 不再要求「檢查程式接受盲跑報告」（本來就沒有規則在檢查它），改成「盲跑報告要產生並提交在變更分支上」。這次實測符合新說法。
-- **推送被擋時先說缺審查紀錄** — 三個平台共用同一段訊息；哪些推送會被擋不變，只改第一句先講什麼。這次實測第一句就是缺審查紀錄（第 4 條）。
+- **推送被擋時先說缺審查紀錄** — 三個平台共用同一段訊息；除了大小寫不同的 git／gh 寫法（例如 GIT push）現在三個平台都會被擋之外，哪些推送會被擋不變，只改第一句先講什麼。這次實測第一句就是缺審查紀錄（第 4 條）。
+- **大小寫不同的 git／gh 寫法也擋** — 推送閘門辨認 git／gh 時不分大小寫，所以 `GIT push`、`Gh pr create` 這類寫法在三個平台都會被擋。這是刻意保留的：在 macOS 上這種寫法其實真的會推送，舊的放行是個漏洞。這一條我沒有另外實測。
 
 我在這次盲跑中替你決定的：
 
