@@ -44,6 +44,26 @@ case "$FILE_PATH" in
     ;;
 esac
 
+# Lexically normalise the absolute path (collapse '//', '.', '..') so the
+# skill root and relative dir are derived from the path agy will really write,
+# and so no '..' can steer the scratch mirror outside its directory.
+normalise() {
+  local rest="${1#/}" seg out=""
+  while [ -n "$rest" ]; do
+    case "$rest" in
+      */*) seg="${rest%%/*}"; rest="${rest#*/}" ;;
+      *)   seg="$rest"; rest="" ;;
+    esac
+    case "$seg" in
+      ''|.) ;;
+      ..) out="${out%/*}" ;;
+      *)  out="$out/$seg" ;;
+    esac
+  done
+  printf '%s' "${out:-/}"
+}
+FILE_PATH=$(normalise "$FILE_PATH")
+
 # Same skill-root detection as the validator: <...>/skills/<name> with SKILL.md.
 case "$FILE_PATH" in */skills/*) ;; *) allow ;; esac
 SKILL_ROOT=$(printf '%s' "$FILE_PATH" | sed -E 's|(.*/skills/[^/]+).*|\1|')
@@ -51,6 +71,9 @@ SKILL_ROOT=$(printf '%s' "$FILE_PATH" | sed -E 's|(.*/skills/[^/]+).*|\1|')
 REL="${FILE_PATH#"$SKILL_ROOT"/}"
 [ "$REL" != "$FILE_PATH" ] || allow
 REL_DIR=$(dirname "$REL")
+# Defence in depth: after normalisation REL has no '..' segment; if one ever
+# appears, allow without mirroring rather than create anything outside scratch.
+case "/$REL/" in */../*) allow ;; esac
 
 SCRATCH=$(mktemp -d "${TMPDIR:-/tmp}/agy-skill-folder.XXXXXX") || allow
 trap 'rm -rf "$SCRATCH"' EXIT
