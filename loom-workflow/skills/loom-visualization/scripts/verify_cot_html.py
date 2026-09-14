@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify a cot-explain HTML report against references/mermaid-cot-spec.md.
+"""Verify a loom-visualization HTML report against references/mermaid-cot-spec.md.
 
 Usage:
   python3 scripts/verify_cot_html.py <report.html>
@@ -256,7 +256,7 @@ def check_spec_quotes(raw, r):
 
     Structure is checkable; punctuation is not. An earlier version looked
     for quotation characters in a list item and rejected every plain
-    ASCII `"`, because markdown-it escapes it to `&quot;` — six
+    ASCII `"`, because the renderer escapes it to `&quot;` — six
     characters that match no quote mark. It blamed the author for
     omitting marks they had typed. A `<blockquote>` either exists or does
     not.
@@ -719,8 +719,8 @@ def rebuild_page(md_path, md_text):
     """What the converter would build from this markdown, or None.
 
     None means the comparison could not be made — the renderer is not
-    importable here, usually because markdown-it-py is not installed on a
-    machine that only received the HTML. The caller then falls back to
+    importable here, usually because the script was copied without its
+    sibling renderer onto a machine that only received the HTML. The caller then falls back to
     the page's own fingerprint and is weaker for it, which is why this
     degrades loudly at the call site rather than silently returning the
     page unchanged.

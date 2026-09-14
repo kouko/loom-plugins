@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render a cot-explain markdown artifact to standalone HTML.
+"""Render a loom-visualization markdown artifact to standalone HTML.
 
 Usage:
   python3 scripts/render_cot_html.py <report.md> [-o <out.html>] [--artifact]
@@ -19,14 +19,17 @@ otherwise reach the browser as literal text.
 wrapper and no mermaid CDN script, because Artifacts render
 <pre class="mermaid"> natively and supply their own skeleton.
 
-Markdown is parsed by **markdown-it-py**, matching
-`loom-code/scripts/adjudication_render.py`, which is this repo's existing
-markdown→HTML renderer. A hand-rolled converter was written first and
-failed its own test suite within the hour: an unsupported `##` heading
-passed through unconverted *and* slipped past the leftover check, because
-the check only matched line-start markdown while the stray text had
-already been wrapped in `<p>`. Parsing is a solved problem; the parts
-worth writing here are the pipeline properties below.
+Markdown is parsed by a **standard-library** CommonMark subset (below):
+the skill must run on plain Python with no third-party packages. It
+reproduces the output of markdown-it-py, which this script used to
+depend on, and the script test suite is the equivalence oracle. An
+earlier hand-rolled converter failed its own test suite within the hour:
+an unsupported `##` heading passed through unconverted *and* slipped past
+the leftover check, because the check only matched line-start markdown
+while the stray text had already been wrapped in `<p>`. That is why the
+leftover check stays scoped to block tags and remains the backstop.
+Beyond parsing, the parts worth writing here are the pipeline properties
+below.
 
 Three of those, taken from a brief about a renderer of this exact kind
 that failed silently five times in five days:
@@ -47,11 +50,10 @@ import html
 import json
 import re
 import sys
+import unicodedata
+from html.entities import html5
 from pathlib import Path
-from urllib.parse import quote
-
-from markdown_it import MarkdownIt
-from markdown_it.rules_block import table
+from urllib.parse import quote, unquote
 
 CSS = """
 :root {
@@ -78,7 +80,7 @@ body {
 main { max-width: 52rem; margin: 0 auto; }
 h1 { font-size: 1.75rem; line-height: 1.35; margin: 0 0 .75rem; }
 /* The markdown uses the vault's heading levels: ### page section,
-   #### arc, ##### node. markdown-it maps those to h3/h4/h5 — do not
+   #### arc, ##### node. The renderer maps those to h3/h4/h5 — do not
    "fix" these selectors to h2/h3/h4 without changing the template too. */
 h3 { font-size: 1.15rem; margin: 3rem 0 1rem; padding-bottom: .4rem;
      border-bottom: 2px solid var(--rule); }
@@ -163,8 +165,662 @@ MERMAID_FENCE = re.compile(
     r'<pre><code class="language-mermaid">(.*?)</code></pre>', re.S
 )
 
-_MD = MarkdownIt("commonmark", {"html": False})
-_MD.block.ruler.before("fence", "table", table, {"alt": ["paragraph", "reference"]})
+# ------------------------------------------------------------------------
+# Markdown → HTML, standard library only.
+#
+# A CommonMark subset plus GFM pipe tables, written to emit byte-for-byte
+# what markdown-it-py ("commonmark" preset, html: False, table rule) emitted
+# for the constructs a report uses: ATX and setext headings, paragraphs,
+# emphasis and strong, inline code, links, images and autolinks, ordered
+# and unordered lists (tight and loose, nested), block quotes, thematic
+# breaks, fenced and indented code, and pipe tables. Raw HTML is never
+# passed through — every `<` in text is escaped, which is what html: False
+# meant. Not covered: reference-style links, raw HTML blocks, tab stops
+# inside indentation. The page script suite in loom-workflow/tests/ is the
+# equivalence oracle; the leftover check below is the backstop for anything
+# missed.
+
+_ASCII_PUNCT = set("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")
+_URL_SAFE = set(";/?:@&=+$,-_.!~*'()#"
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+_ESCAPABLE = re.compile(
+    r"\\([!-/:-@\[-`{-~])"
+    r"|(&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});)"
+)
+_ENTITY = re.compile(r"&(?:#[0-9]{1,7}|#[xX][0-9a-fA-F]{1,6}|[A-Za-z][A-Za-z0-9]{1,31});")
+_AUTOLINK = re.compile(r"<([A-Za-z][A-Za-z0-9+.\-]{1,31}:[^<>\x00-\x20]*)>")
+_EMAIL = re.compile(
+    r"<([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]"
+    r"(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
+    r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>"
+)
+_BAD_PROTO = re.compile(r"^(vbscript|javascript|file|data):")
+_GOOD_DATA = re.compile(r"^data:image/(gif|png|jpeg|webp);")
+
+_FENCE_OPEN = re.compile(r"^( {0,3})(`{3,}|~{3,})(.*)$")
+_ATX = re.compile(r"^ {0,3}(#{1,6})(?=[ \t]|$)(.*)$")
+_HR = re.compile(r"^ {0,3}(?:(?:\*[ \t]*){3,}|(?:-[ \t]*){3,}|(?:_[ \t]*){3,})$")
+_QUOTE = re.compile(r"^ {0,3}>")
+_ITEM = re.compile(r"^( {0,3})([-+*]|[0-9]{1,9}[.)])(?=[ \t]|$)")
+_SETEXT = re.compile(r"^ {0,3}(=+|-+)[ \t]*$")
+_DELIM_CELL = re.compile(r"^:?-+:?$")
+
+
+def _esc(s):
+    return (s.replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;").replace('"', "&quot;"))
+
+
+def _decode_entity(tok):
+    if tok[1] == "#":
+        cp = int(tok[3:-1], 16) if tok[2] in "xX" else int(tok[2:-1])
+        if cp == 0 or cp > 0x10FFFF or 0xD800 <= cp <= 0xDFFF:
+            return "\ufffd"
+        return chr(cp)
+    return html5.get(tok[1:], tok)
+
+
+def _unescape_md(s):
+    """Backslash escapes and entity references, in one pass."""
+    return _ESCAPABLE.sub(
+        lambda m: m.group(1) if m.group(1) is not None else _decode_entity(m.group(2)), s
+    )
+
+
+def _is_punct(ch):
+    return ch in _ASCII_PUNCT or unicodedata.category(ch)[0] in "PS"
+
+
+def _norm_url(url):
+    out = []
+    i = 0
+    while i < len(url):
+        c = url[i]
+        if c == "%" and re.match(r"[0-9a-fA-F]{2}", url[i + 1:i + 3]):
+            out.append(url[i:i + 3])
+            i += 3
+            continue
+        out.append(c if c in _URL_SAFE else quote(c, safe=""))
+        i += 1
+    return "".join(out)
+
+
+def _link_ok(url):
+    u = url.strip().lower()
+    return not _BAD_PROTO.match(u) or bool(_GOOD_DATA.match(u))
+
+
+def _run_len(src, i, ch):
+    j = i
+    while j < len(src) and src[j] == ch:
+        j += 1
+    return j - i
+
+
+def _code_close(src, start, k):
+    """Index of a backtick run of exactly `k` at or after `start`, or None."""
+    j = start
+    while True:
+        j = src.find("`", j)
+        if j < 0:
+            return None
+        r = _run_len(src, j, "`")
+        if r == k:
+            return j
+        j += r
+
+
+def _skip_ws(src, i, newlines=False):
+    while i < len(src) and (src[i] in " \t" or (newlines and src[i] == "\n")):
+        i += 1
+    return i
+
+
+def _link_tail(src, i):
+    """Parse `(dest "title")` starting at src[i]; (dest, title, end) or None."""
+    n = len(src)
+    if i >= n or src[i] != "(":
+        return None
+    k = _skip_ws(src, i + 1, newlines=True)
+    if k >= n:
+        return None
+    dest = ""
+    if src[k] == "<":
+        j = k + 1
+        while j < n and src[j] not in "\n<>":
+            j += 2 if src[j] == "\\" and j + 1 < n else 1
+        if j >= n or src[j] != ">":
+            return None
+        dest, k = _unescape_md(src[k + 1:j]), j + 1
+    else:
+        start, level = k, 0
+        while k < n:
+            c = src[k]
+            if c == " " or ord(c) < 0x20 or ord(c) == 0x7F:
+                break
+            if c == "\\" and k + 1 < n:
+                if src[k + 1] == " ":
+                    break
+                k += 2
+                continue
+            if c == "(":
+                level += 1
+                if level > 32:
+                    return None
+            elif c == ")":
+                if level == 0:
+                    break
+                level -= 1
+            k += 1
+        if level:
+            return None
+        dest = _unescape_md(src[start:k])
+    if dest and not _link_ok(_norm_url(dest)):
+        return None
+    after = _skip_ws(src, k, newlines=True)
+    title = ""
+    if after < n and after != k and src[after] in "\"'(":
+        close = ")" if src[after] == "(" else src[after]
+        j = after + 1
+        while j < n and src[j] != close:
+            if src[after] == "(" and src[j] == "(":
+                j = n
+                break
+            j += 2 if src[j] == "\\" and j + 1 < n else 1
+        if j < n:
+            title = _unescape_md(src[after + 1:j])
+            after = _skip_ws(src, j + 1, newlines=True)
+    if after < n and src[after] == ")":
+        return dest, title, after + 1
+    return None
+
+
+def _try_link(src, i):
+    """`[text](dest "title")` starting at src[i] == '['."""
+    n, j, depth = len(src), i + 1, 1
+    while j < n:
+        c = src[j]
+        if c == "\\":
+            j += 2
+            continue
+        if c == "`":
+            k = _run_len(src, j, "`")
+            close = _code_close(src, j + k, k)
+            j = close + k if close is not None else j + k
+            continue
+        if c == "[":
+            depth += 1
+        elif c == "]":
+            depth -= 1
+            if depth == 0:
+                break
+        j += 1
+    if j >= n:
+        return None
+    tail = _link_tail(src, j + 1)
+    if tail is None:
+        return None
+    return (src[i + 1:j],) + tail
+
+
+def _emphasis(nodes):
+    """CommonMark's delimiter-run algorithm over the node list, in place.
+
+    A delimiter node is ["d", char, count, original, can_open, can_close,
+    open_tags, close_tags]; it renders as close_tags, the unused
+    delimiters as literal text, then open_tags.
+    """
+    stack = [k for k, nd in enumerate(nodes) if nd[0] == "d"]
+    bottom = {}
+    ci = 0
+    while ci < len(stack):
+        cl = nodes[stack[ci]]
+        if not cl[5]:
+            ci += 1
+            continue
+        key = (cl[1], cl[4], cl[3] % 3)
+        floor = bottom.get(key, -1)
+        found = -1
+        oi = ci - 1
+        while oi >= 0 and stack[oi] > floor:
+            op = nodes[stack[oi]]
+            if op[1] == cl[1] and op[4]:
+                odd = ((op[5] or cl[4]) and (op[3] + cl[3]) % 3 == 0
+                       and not (op[3] % 3 == 0 and cl[3] % 3 == 0))
+                if not odd:
+                    found = oi
+                    break
+            oi -= 1
+        if found < 0:
+            bottom[key] = stack[ci - 1] if ci > 0 else -1
+            if not cl[4]:
+                del stack[ci]
+            else:
+                ci += 1
+            continue
+        op = nodes[stack[found]]
+        use = 2 if op[2] >= 2 and cl[2] >= 2 else 1
+        tag = "strong" if use == 2 else "em"
+        op[2] -= use
+        cl[2] -= use
+        op[6].insert(0, f"<{tag}>")
+        cl[7].append(f"</{tag}>")
+        del stack[found + 1:ci]
+        ci = found + 1
+        if op[2] == 0:
+            del stack[found]
+            ci -= 1
+        if cl[2] == 0:
+            del stack[ci]
+
+
+def _inline(src):
+    nodes, buf = [], []
+    n, i = len(src), 0
+
+    def flush():
+        if buf:
+            nodes.append(["t", _esc("".join(buf))])
+            buf.clear()
+
+    def emit(markup):
+        flush()
+        nodes.append(["t", markup])
+
+    while i < n:
+        c = src[i]
+        if c == "\\":
+            if i + 1 < n and src[i + 1] == "\n":
+                emit("<br />\n")
+                i = _skip_ws(src, i + 2)
+            elif i + 1 < n and src[i + 1] in _ASCII_PUNCT:
+                buf.append(src[i + 1])
+                i += 2
+            else:
+                buf.append(c)
+                i += 1
+        elif c == "`":
+            k = _run_len(src, i, "`")
+            close = _code_close(src, i + k, k)
+            if close is None:
+                buf.append("`" * k)
+                i += k
+                continue
+            code = src[i + k:close].replace("\n", " ")
+            if len(code) >= 2 and code[0] == " " and code[-1] == " " and code.strip(" "):
+                code = code[1:-1]
+            emit(f"<code>{_esc(code)}</code>")
+            i = close + k
+        elif c == "<":
+            m = _AUTOLINK.match(src, i)
+            e = None if m else _EMAIL.match(src, i)
+            if m and _link_ok(_norm_url(m.group(1))):
+                url = m.group(1)
+                emit(f'<a href="{_esc(_norm_url(url))}">{_esc(unquote(url))}</a>')
+                i = m.end()
+            elif e:
+                url = e.group(1)
+                emit(f'<a href="{_esc(_norm_url("mailto:" + url))}">{_esc(url)}</a>')
+                i = e.end()
+            else:
+                buf.append(c)
+                i += 1
+        elif c == "&":
+            m = _ENTITY.match(src, i)
+            if m:
+                buf.append(_decode_entity(m.group(0)))
+                i = m.end()
+            else:
+                buf.append(c)
+                i += 1
+        elif c in "![" and (c == "[" or (i + 1 < n and src[i + 1] == "[")):
+            image = c == "!"
+            link = _try_link(src, i + 1 if image else i)
+            if link is None:
+                buf.append(c)
+                i += 1
+                continue
+            text, dest, title, end = link
+            href = _esc(_norm_url(dest))
+            t_attr = f' title="{_esc(title)}"' if title else ""
+            if image:
+                alt = re.sub(r"<[^>]*>", "", _inline(text))
+                emit(f'<img src="{href}" alt="{alt}"{t_attr} />')
+            else:
+                emit(f'<a href="{href}"{t_attr}>{_inline(text)}</a>')
+            i = end
+        elif c in "*_":
+            k = _run_len(src, i, c)
+            before = src[i - 1] if i > 0 else " "
+            after = src[i + k] if i + k < n else " "
+            bw, aw = before.isspace(), after.isspace()
+            bp, ap = _is_punct(before), _is_punct(after)
+            left = not aw and (not ap or bw or bp)
+            right = not bw and (not bp or aw or ap)
+            if c == "*":
+                can_open, can_close = left, right
+            else:
+                can_open = left and (not right or bp)
+                can_close = right and (not left or ap)
+            flush()
+            nodes.append(["d", c, k, k, can_open, can_close, [], []])
+            i += k
+        elif c == "\n":
+            spaces = 0
+            while buf and buf[-1] == " ":
+                buf.pop()
+                spaces += 1
+            emit("<br />\n" if spaces >= 2 else "\n")
+            i = _skip_ws(src, i + 1)
+        else:
+            buf.append(c)
+            i += 1
+    flush()
+    _emphasis(nodes)
+    return "".join(
+        nd[1] if nd[0] == "t" else "".join(nd[7]) + nd[1] * nd[2] + "".join(nd[6])
+        for nd in nodes
+    )
+
+
+def _indent(line):
+    return len(line) - len(line.lstrip(" "))
+
+
+def _fence_open(line):
+    m = _FENCE_OPEN.match(line)
+    if m and not (m.group(2)[0] == "`" and "`" in m.group(3)):
+        return m
+    return None
+
+
+def _split_row(line):
+    s = line.strip()
+    cells, cur, i = [], [], 0
+    while i < len(s):
+        if s[i] == "\\" and i + 1 < len(s) and s[i + 1] == "|":
+            cur.append("|")
+            i += 2
+            continue
+        if s[i] == "|":
+            cells.append("".join(cur))
+            cur = []
+        else:
+            cur.append(s[i])
+        i += 1
+    cells.append("".join(cur))
+    if cells and cells[0] == "":
+        cells.pop(0)
+    if cells and cells[-1] == "":
+        cells.pop()
+    return cells
+
+
+def _table_head(lines, i):
+    if i + 1 >= len(lines):
+        return None
+    head, delim = lines[i], lines[i + 1]
+    if _indent(head) >= 4 or _indent(delim) >= 4 or "|" not in head:
+        return None
+    d = delim.strip()
+    lead = delim.lstrip(" ")
+    if not d or d[0] not in "|-:" or set(d) - set("|-: \t") or len(lead) < 2:
+        return None
+    # `- ` opens a list item, not a delimiter row — the same ambiguity rule
+    # markdown-it applies.
+    if lead[0] == "-" and lead[1] in " \t":
+        return None
+    parts = d.split("|")
+    aligns = []
+    for k, part in enumerate(parts):
+        t = part.strip()
+        if not t:
+            if k in (0, len(parts) - 1):
+                continue
+            return None
+        if not _DELIM_CELL.match(t):
+            return None
+        aligns.append("center" if t[0] == ":" and t[-1] == ":"
+                      else "right" if t[-1] == ":"
+                      else "left" if t[0] == ":" else "")
+    header = _split_row(head)
+    if not header or len(header) != len(aligns):
+        return None
+    return header, aligns
+
+
+def _starts_block(lines, j):
+    """Would lines[j] interrupt a paragraph?"""
+    line = lines[j]
+    if _indent(line) >= 4:
+        return False
+    if _fence_open(line) or _ATX.match(line) or _HR.match(line) or _QUOTE.match(line):
+        return True
+    m = _ITEM.match(line)
+    if m and line[m.end():].strip():
+        marker = m.group(2)
+        if marker in "-+*" or int(marker[:-1]) == 1:
+            return True
+    return _table_head(lines, j) is not None
+
+
+def _lazy_ok(item_lines):
+    """May an unindented line continue the item's last paragraph?"""
+    last = item_lines[-1]
+    if not last.strip() or _ATX.match(last) or _HR.match(last) or _fence_open(last):
+        return False
+    fences = sum(1 for ln in item_lines if _fence_open(ln) and _indent(ln) < 4)
+    return fences % 2 == 0
+
+
+def _table(lines, i, head):
+    header, aligns = head
+
+    def cell(tag, k, text):
+        style = f' style="text-align:{aligns[k]}"' if aligns[k] else ""
+        return f"<{tag}{style}>{_inline(text.strip())}</{tag}>\n"
+
+    out = ["<table>\n<thead>\n<tr>\n"]
+    out += [cell("th", k, h) for k, h in enumerate(header)]
+    out.append("</tr>\n</thead>\n")
+    j, rows = i + 2, []
+    while j < len(lines):
+        line = lines[j]
+        if not line.strip() or _indent(line) >= 4 or _starts_block(lines, j):
+            break
+        rows.append(_split_row(line))
+        j += 1
+    if rows:
+        out.append("<tbody>\n")
+        for row in rows:
+            out.append("<tr>\n")
+            out += [cell("td", k, row[k] if k < len(row) else "")
+                    for k in range(len(aligns))]
+            out.append("</tr>\n")
+        out.append("</tbody>\n")
+    out.append("</table>\n")
+    return "".join(out), j
+
+
+def _list(lines, i):
+    n = len(lines)
+    first = _ITEM.match(lines[i]).group(2)
+    ordered = first[-1] in ".)"
+    kind = first[-1] if ordered else first
+    items, loose, j = [], False, i
+    while j < n:
+        m = _ITEM.match(lines[j])
+        if not m or _HR.match(lines[j]):
+            break
+        marker = m.group(2)
+        if (marker[-1] if marker[-1] in ".)" else marker) != kind:
+            break
+        rest = lines[j][m.end():]
+        spaces = _indent(rest)
+        if not rest.strip():
+            width, item = m.end() + 1, [""]
+        elif spaces >= 5:
+            width, item = m.end() + 1, [rest[1:]]
+        else:
+            width, item = m.end() + spaces, [rest[spaces:]]
+        j += 1
+        while j < n:
+            line = lines[j]
+            if not line.strip():
+                if item == [""]:
+                    break
+                item.append("")
+            elif _indent(line) >= width:
+                item.append(line[width:])
+            elif (item[-1].strip() and not _ITEM.match(line)
+                  and not _starts_block(lines, j) and _lazy_ok(item)):
+                item.append(line.lstrip(" "))
+            else:
+                break
+            j += 1
+        trailing = 0
+        while len(item) > 1 and not item[-1].strip():
+            item.pop()
+            trailing += 1
+        blocks, gap = _blocks(item)
+        items.append(blocks)
+        loose = loose or gap
+        k = j
+        while k < n and not lines[k].strip():
+            k += 1
+        nxt = _ITEM.match(lines[k]) if k < n else None
+        same = (nxt and not _HR.match(lines[k])
+                and (nxt.group(2)[-1] if nxt.group(2)[-1] in ".)" else nxt.group(2)) == kind)
+        if same:
+            loose = loose or trailing > 0 or k > j
+            j = k
+        else:
+            j -= trailing
+            break
+    tag = "ol" if ordered else "ul"
+    start = int(first[:-1]) if ordered else 1
+    out = [f'<{tag} start="{start}">\n' if start != 1 else f"<{tag}>\n"]
+    for blocks in items:
+        li = "<li>"
+        for k, (kind_k, payload) in enumerate(blocks):
+            tight_p = kind_k == "p" and not loose
+            if k == 0 and not tight_p:
+                li += "\n"
+            elif k > 0 and blocks[k - 1][0] == "p" and not loose:
+                li += "\n"
+            li += payload if tight_p else _block_html(kind_k, payload)
+        out.append(li + "</li>\n")
+    out.append(f"</{tag}>\n")
+    return "".join(out), j
+
+
+def _block_html(kind, payload):
+    return f"<p>{payload}</p>\n" if kind == "p" else payload
+
+
+def _blocks(lines):
+    """Parse block structure: ([(kind, payload)], blank-line-between-blocks)."""
+    out, gap, pending_blank = [], False, False
+    n, i = len(lines), 0
+    while i < n:
+        line = lines[i]
+        if not line.strip():
+            pending_blank = bool(out)
+            i += 1
+            continue
+        if pending_blank:
+            gap = True
+            pending_blank = False
+
+        head = _table_head(lines, i)
+        if head:
+            html_, i = _table(lines, i, head)
+            out.append(("b", html_))
+            continue
+
+        if _indent(line) >= 4:
+            body, j = [], i
+            while j < n and (not lines[j].strip() or _indent(lines[j]) >= 4):
+                body.append(lines[j][4:] if _indent(lines[j]) >= 4 else lines[j].lstrip(" "))
+                j += 1
+            while body and not body[-1].strip():
+                body.pop()
+                j -= 1
+            out.append(("b", "<pre><code>" + _esc("".join(b + "\n" for b in body))
+                        + "</code></pre>\n"))
+            i = j
+            continue
+
+        m = _fence_open(line)
+        if m:
+            indent, mark = len(m.group(1)), m.group(2)
+            info = _unescape_md(m.group(3)).strip()
+            closer = re.compile(r"^ {0,3}" + re.escape(mark[0]) + "{%d,}[ \t]*$" % len(mark))
+            body, j = [], i + 1
+            while j < n and not closer.match(lines[j]):
+                body.append(lines[j][min(indent, _indent(lines[j])):])
+                j += 1
+            lang = info.split()[0] if info else ""
+            cls = f' class="language-{_esc(lang)}"' if lang else ""
+            out.append(("b", f"<pre><code{cls}>" + _esc("".join(b + "\n" for b in body))
+                        + "</code></pre>\n"))
+            i = j + 1
+            continue
+
+        if _QUOTE.match(line):
+            inner, j = [], i
+            while j < n:
+                cur = lines[j]
+                if _QUOTE.match(cur):
+                    s = cur.lstrip(" ")[1:]
+                    inner.append(s[1:] if s.startswith(" ") else s)
+                elif cur.strip() and inner and inner[-1].strip() and not _starts_block(lines, j):
+                    inner.append(cur)
+                else:
+                    break
+                j += 1
+            blocks, _ = _blocks(inner)
+            out.append(("b", "<blockquote>\n"
+                        + "".join(_block_html(*b) for b in blocks) + "</blockquote>\n"))
+            i = j
+            continue
+
+        if _HR.match(line):
+            out.append(("b", "<hr />\n"))
+            i += 1
+            continue
+
+        if _ITEM.match(line):
+            html_, i = _list(lines, i)
+            out.append(("b", html_))
+            continue
+
+        m = _ATX.match(line)
+        if m:
+            level = len(m.group(1))
+            text = re.sub(r"(?:^|[ \t]+)#+[ \t]*$", "", m.group(2).strip()).strip()
+            out.append(("b", f"<h{level}>{_inline(text)}</h{level}>\n"))
+            i += 1
+            continue
+
+        para, j, level = [line], i + 1, 0
+        while j < n and lines[j].strip():
+            setext = _SETEXT.match(lines[j])
+            if setext:
+                level = 1 if setext.group(1)[0] == "=" else 2
+                break
+            if _starts_block(lines, j):
+                break
+            para.append(lines[j])
+            j += 1
+        text = "\n".join(p.lstrip(" \t") for p in para).strip()
+        if level:
+            out.append(("b", f"<h{level}>{_inline(text)}</h{level}>\n"))
+            i = j + 1
+        else:
+            out.append(("p", _inline(text)))
+            i = j
+    return out, gap
 
 
 def version():
@@ -233,8 +889,8 @@ def unescape_label_markup(fence_body):
     """Un-escape what mermaid needs, and no tag outside the allow-list.
 
     A blanket `html.unescape` here is a cross-site scripting hole, and the
-    review that found it is the reason this function exists. markdown-it
-    runs with `html: False`, so every `<` in the document is escaped and
+    review that found it is the reason this function exists. The renderer
+    passes no raw HTML through, so every `<` in the document is escaped and
     the page is safe — except inside this fence, where the label syntax
     genuinely needs `<div>` and `<br/>` to arrive as markup. Unescaping
     the whole body to get them also delivers `<script>` and
@@ -287,9 +943,11 @@ def unescape_label_markup(fence_body):
 
 
 def render_body(md_text):
-    out = _MD.render(md_text)
+    lines = md_text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    blocks, _ = _blocks(lines)
+    out = "".join(_block_html(kind, payload) for kind, payload in blocks)
 
-    # markdown-it escapes fence bodies. Mermaid node labels are raw HTML
+    # The renderer escapes fence bodies. Mermaid node labels are raw HTML
     # (<div style='text-align:left'>) and must reach the browser as
     # markup, so the allowed tags — and only those — are un-escaped here.
     out = MERMAID_FENCE.sub(
@@ -321,7 +979,7 @@ def leftover_markdown(rendered):
     convert.
     """
     scoped = re.sub(r'<pre class="mermaid">.*?</pre>', "", rendered, flags=re.S)
-    # `<code[^>]*>` and not `<code>`: markdown-it tags a fence's inner code
+    # `<code[^>]*>` and not `<code>`: the renderer tags a fence's inner code
     # element with the language (`<code class="language-bash">`), so a bare
     # `<code>` scope leaves every language-tagged fence in the text being
     # searched — and a ```bash block holding `# install …` is then reported
@@ -457,7 +1115,7 @@ def build(md_text, artifact=False, out_dir=None):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Render cot-explain markdown to HTML.")
+    ap = argparse.ArgumentParser(description="Render loom-visualization markdown to HTML.")
     ap.add_argument("markdown")
     ap.add_argument("-o", "--out")
     ap.add_argument("--artifact", action="store_true")

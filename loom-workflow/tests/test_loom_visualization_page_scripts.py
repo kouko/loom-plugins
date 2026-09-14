@@ -162,7 +162,7 @@ def run(script, *args):
 def test_language_tagged_code_fence_is_not_survived_markdown(tmp_path):
     """A ```bash fence holding `#` and `**` is content, not unconverted markdown.
 
-    markdown-it emits `<pre><code class="language-bash">`; a scope regex
+    The renderer emits `<pre><code class="language-bash">`; a scope regex
     matching only a bare `<code>` tag condemns every page carrying one.
     """
     md = make_md(
@@ -393,7 +393,7 @@ def test_fail_loud_writes_no_file(tmp_path):
     passed the whole suite.
     """
     md = tmp_path / "r.md"
-    # A table row with no delimiter row: markdown-it leaves it in a
+    # A table row with no delimiter row: the renderer leaves it in a
     # paragraph, which is exactly what "markdown survived conversion"
     # means. Writing a literal <p> tag would not do — html:False escapes
     # it, so it never reaches the check.
@@ -549,7 +549,7 @@ def test_a_page_without_the_body_sha_is_not_stamped(tmp_path):
     # normally catches this case first, so without forcing the fallback
     # the meta arm could be deleted with the suite still green — it is
     # the only guard left on a machine that has this script but not
-    # markdown-it.
+    # its sibling renderer.
     md2 = make_md(tmp_path)
     run(RENDER, md2)
     page = md2.with_suffix(".html")
@@ -961,6 +961,92 @@ def test_stamping_preserves_crlf(tmp_path):
     after = md.read_bytes()
     assert after.count(b"\r\n") == before, "CRLF line endings were rewritten"
     assert b"\n" not in after.replace(b"\r\n", b""), "mixed line endings"
+
+
+# ------------------------------------- I. stdlib renderer (loom-visualization)
+#
+# The intent forbids third-party Python at run time, so markdown-it-py was
+# replaced by a stdlib CommonMark subset. Everything above is the
+# equivalence oracle; these pin what the swap itself must hold.
+
+def _tags(fragment):
+    return re.findall(r"</?[a-z][a-z0-9]*", fragment)
+
+
+def test_renderer_imports_without_any_third_party_markdown_parser():
+    """A machine with no markdown-it-py must still render and stamp."""
+    probe = (
+        "import sys, importlib.abc\n"
+        "class Block(importlib.abc.MetaPathFinder):\n"
+        "    def find_spec(self, name, path=None, target=None):\n"
+        "        if name.split('.')[0] in {'markdown_it', 'mdurl', 'markdown', 'mistune'}:\n"
+        "            raise ImportError('blocked: ' + name)\n"
+        "sys.meta_path.insert(0, Block())\n"
+        f"sys.path.insert(0, {str(SCRIPTS)!r})\n"
+        "import render_cot_html as R\n"
+        "print(R.render_body('# ok\\n'))\n"
+    )
+    r = subprocess.run([sys.executable, "-I", "-B", "-c", probe],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    assert "<h1>ok</h1>" in r.stdout
+
+
+def test_gfm_table_and_nested_list_keep_the_previous_tag_shape():
+    """Tag sequence captured from the markdown-it-py renderer before the swap."""
+    md = (
+        "- a\n- b\n  - nested\n  - nested2\n- c\n\n"
+        "1. one\n2. two\n   - sub\n3. three\n\n"
+        "| a | b |\n|---|:-:|\n| 1 | `x` |\n| **s** | [l](u) |\n"
+    )
+    previous = (
+        "<ul>\n<li>a</li>\n<li>b\n<ul>\n<li>nested</li>\n<li>nested2</li>\n"
+        "</ul>\n</li>\n<li>c</li>\n</ul>\n<ol>\n<li>one</li>\n<li>two\n<ul>\n"
+        "<li>sub</li>\n</ul>\n</li>\n<li>three</li>\n</ol>\n<table>\n<thead>\n"
+        "<tr>\n<th>a</th>\n<th style=\"text-align:center\">b</th>\n</tr>\n"
+        "</thead>\n<tbody>\n<tr>\n<td>1</td>\n"
+        "<td style=\"text-align:center\"><code>x</code></td>\n</tr>\n<tr>\n"
+        "<td><strong>s</strong></td>\n"
+        "<td style=\"text-align:center\"><a href=\"u\">l</a></td>\n</tr>\n"
+        "</tbody>\n</table>\n"
+    )
+    out = R.render_body(md)
+    assert _tags(out) == _tags(previous), out
+    assert out == previous
+
+
+def test_template_report_renders_standalone_page_with_loom_visualization_stamp(tmp_path):
+    """A6 positive: the shipped template, filled in, renders a full page."""
+    template = (SKILL / "assets" / "cot-report-template.md").read_text(encoding="utf-8")
+    filled = re.sub(r"<!--.*?-->\n*", "", template, flags=re.S)
+    filled = filled.replace("{{MERMAID_DIAGRAM}}", diagram())
+    filled = filled.replace("{{TOPIC_TAGS}}\n", "")
+    filled = re.sub(r"\{\{[A-Z_]+\}\}", "值", filled)
+    md = tmp_path / "report.md"
+    md.write_text(filled, encoding="utf-8")
+    r = run(RENDER, md)
+    assert r.returncode == 0, r.stderr
+    page = md.with_suffix(".html").read_text(encoding="utf-8")
+    assert page.startswith("<!doctype html>")
+    assert re.search(r'<meta name="generator" content="loom-workflow:loom-visualization/[^"]+">', page)
+    assert '<meta name="cot-generator" content="loom-workflow:loom-visualization">' in page
+    assert "cot-explain" not in page
+    assert "<blockquote>" in page and "<table>" in page and "<hr />" in page
+
+
+def test_leftover_markdown_in_output_fails_verify(tmp_path):
+    """A6 negative: markdown the stdlib renderer leaves unconverted blocks the page.
+
+    Two arms: the renderer refuses to write, and the verifier's rebuild
+    (the stamp path) gets no page to compare against.
+    """
+    md = make_md(tmp_path, body_extra="\n### 附註\n\n| 甲 | 乙 |\n")
+    out = tmp_path / "leftover.html"
+    r = run(RENDER, md, "-o", out)
+    assert r.returncode == 1
+    assert "literal | table rows" in r.stderr, r.stderr
+    assert not out.exists()
+    assert V.rebuild_page(md, md.read_text(encoding="utf-8")) is None
 
 
 if __name__ == "__main__":
