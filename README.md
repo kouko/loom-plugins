@@ -216,6 +216,11 @@ the install commands again; each install replaces the installed copy. To
 remove a plugin, run `agy plugin uninstall <name>`, for example
 `agy plugin uninstall loom-workflow`.
 
+To use loom, start `agy` from your project with the project added as a
+workspace: `agy --add-dir .` (interactive) or `agy --add-dir . -p "..."`
+(print mode). Without `--add-dir`, agy attaches no workspace, so loom's
+kickoff defaults are not loaded and the agent may act outside the project.
+
 Limits on Antigravity:
 
 - The plugin hooks (the push gate, the session context, the language reminder

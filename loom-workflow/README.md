@@ -143,6 +143,11 @@ agy plugin install ./loom-code
 agy plugin install ./loom-workflow
 ```
 
+To use loom, start `agy` from your project with the project added as a
+workspace: `agy --add-dir .` (interactive) or `agy --add-dir . -p "..."`
+(print mode). Without `--add-dir`, agy attaches no workspace, so loom's
+kickoff defaults are not loaded and the agent may act outside the project.
+
 Its hooks run only in the `agy` CLI, not in the Antigravity desktop app or IDE.
 
 ## Usage

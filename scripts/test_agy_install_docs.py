@@ -69,6 +69,15 @@ LANGUAGE_REMINDER = {
 }
 
 
+def test_agy_sections_tell_users_to_add_the_project_workspace() -> None:
+    # Without --add-dir agy attaches no workspace: kickoff defaults are not
+    # loaded and the agent may act outside the project.
+    for rel in AGY_READMES:
+        body = _agy_section(_read(rel))
+        assert "agy --add-dir ." in body, rel
+        assert 'agy --add-dir . -p "' in body, rel
+
+
 def test_loom_code_readmes_list_language_reminder_hook() -> None:
     for rel, phrase in LANGUAGE_REMINDER.items():
         assert phrase in _agy_section(_read(rel)), rel

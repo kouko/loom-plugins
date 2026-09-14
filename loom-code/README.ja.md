@@ -110,6 +110,11 @@ agy plugin install ./loom-code
 agy plugin list
 ```
 
+使うときは、プロジェクトのディレクトリでプロジェクトを workspace に追加して `agy`
+を起動します：`agy --add-dir .`（対話）または `agy --add-dir . -p "..."`（print
+モード）。`--add-dir` がないと agy は workspace を持たないため、loom の kickoff
+defaults が読み込まれず、agent がプロジェクトの外で作業することがあります。
+
 更新は clone で `git pull` してから install を再実行します（install は
 インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
 です。hook（publication gate・session context・言語リマインダー）が走るのは `agy` CLI だけで、

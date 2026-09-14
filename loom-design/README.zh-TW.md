@@ -98,6 +98,10 @@ agy plugin install ./loom-code
 agy plugin install ./loom-design
 ```
 
+使用時，在專案目錄啟動 `agy` 並把專案加為 workspace：`agy --add-dir .`（互動）或
+`agy --add-dir . -p "..."`（print 模式）。沒有 `--add-dir` 時 agy 不會掛上
+workspace，loom 的 kickoff defaults 不會載入，agent 也可能在專案外動作。
+
 loom-design 本身沒有 hook；loom-code 的 hook 只在 `agy` CLI 執行，Antigravity
 桌面 app 與 IDE 裡不會執行。
 

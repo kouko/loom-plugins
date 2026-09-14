@@ -112,6 +112,11 @@ agy plugin install ./loom-code
 agy plugin list
 ```
 
+To use loom, start `agy` from your project with the project added as a
+workspace: `agy --add-dir .` (interactive) or `agy --add-dir . -p "..."`
+(print mode). Without `--add-dir`, agy attaches no workspace, so loom's
+kickoff defaults are not loaded and the agent may act outside the project.
+
 To update, run `git pull` in the clone and install again; the install replaces
 the installed copy. `agy plugin uninstall loom-code` removes it. The hooks (the
 publication gate, the session context and the language reminder) run only in
