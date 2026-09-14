@@ -46,7 +46,7 @@
   - agy 第一輪：`<!-- Generated from skills/loom-visualization/assets/trigger-card.md by scripts/sync_codex_manifests.py; ... -->`，附註 `First markdown heading / content line: # Visualization trigger card (loom-workflow)`；第二輪同樣內容。
   - Codex：`"# Visualization trigger card (loom-workflow)" Separate visualization trigger cards received: 1.`
   - 暫存證據（次要）：`blindrun3/a3-agy-card.txt`、`blindrun3/agy-transcripts-summary.txt`（card 對話只有兩則使用者訊息、零工具呼叫）、`blindrun3/a3-codex-card.jsonl`、`blindrun3/codex-install.txt`。
-- **判定**：works — 兩個宿主都在沒被要求時收到卡片。Codex 的前提是你信任過一次鉤子；agy 看到的卡片前面多了一行內部產生註解。（版本 6603aca8）
+- **判定**：partly — agy 直接收到；Codex 需你信任一次鉤子後才收到（本次以略過信任旗標驗證）。agy 看到的卡片前面多了一行內部產生註解。（版本 6603aca8）
 
 ### 4. Claude Code sessions still receive the trigger card exactly once, and the existing package test suite passes.
 
@@ -64,7 +64,7 @@
 
 ## Review summary
 
-審查站尚未把審查紀錄交給我，這份報告只根據我自己試跑的結果：四條都成立；第 1 條原本缺的「agy 從專案資料夾做表」已在 41796371 重跑補上。沒有看到任何失敗。
+審查站尚未把審查紀錄交給我，這份報告只根據我自己試跑的結果：三條成立，第 3 條部分成立（agy 直接收到卡片；Codex 要你信任一次鉤子後才收到）；第 1 條原本缺的「agy 從專案資料夾做表」已在 41796371 重跑補上。沒有看到任何失敗。
 
 ## Questions I asked you
 
@@ -95,10 +95,10 @@
 
 | 文件 | 英文規則 | 同時適用的格式規則 | 證據 |
 |---|---|---|---|
-| 計畫 | 守住 | 不適用 | `plan.md` 標題與任務內容皆為英文；「Questions asked」依規定保留使用者原問句 |
-| 設計規格 | 不存在（這次不需要設計） | 需求條目格式不適用 | intent `needs-design: no` |
-| 審查紀錄的發現 | 尚未取得，無法判斷 | 發現的標籤格式無法判斷 | 審查資料夾只有 `plan.md` |
-| 試跑證據 | 守住 | 不適用 | `blindrun3/*.txt`、`*.jsonl` 皆為英文工具輸出 |
-| 測試說明文字 | 守住 | 不適用 | 例：`"""A3 negative: an edited rule, an edited card, or no rule fails --check."""` |
-| 測試名稱 | 守住 | 部分守住：多數是「對象＋預期」兩段式，缺少明確的「狀態」段 | 例：`test_bare_python3_scripts_command_flagged`、`test_claude_ignores_plugin_rules_dir` |
-| 提交訊息 | 守住 | 不適用 | 例：`feat(loom-workflow): deliver the visualization card to agy as a plugin rule` |
+| 計畫文件 | 守住 | 不適用 | 標題與任務內容皆為英文；「問過你的問題」一節依規定保留你原本的中文問答 |
+| 設計規格 | 不存在（這次不需要設計） | 需求條目格式不適用 | 需求文件標明這次不需要設計 |
+| 審查發現 | 試跑時尚未取得，無法判斷 | 發現的標籤格式無法判斷 | 試跑當時這次改動的資料夾裡只有計畫文件 |
+| 試跑證據 | 守住 | 不適用 | 我存下的輸出紀錄全是英文的工具輸出 |
+| 測試說明文字 | 守住 | 不適用 | 新增測試的說明句皆為英文，並寫明對應哪一條需求、是正例還是反例 |
+| 測試名稱 | 守住 | 部分守住：測試名稱多為「對象＋預期」兩段，缺少明確的「狀態」段 | 新增的約二十個測試名稱皆為英文 |
+| 提交訊息 | 守住 | 不適用 | 五個改動提交的標題與內文皆為英文，標題有標明類型與範圍 |
