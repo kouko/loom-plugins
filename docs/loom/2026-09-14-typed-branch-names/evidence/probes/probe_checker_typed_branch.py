@@ -21,7 +21,7 @@ INTENT = """# A change
 originator: tester
 kind: engineering
 needs-design: no — internal only
-status: status: open
+status: open
 
 ## Problem
 The thing is slow and the people who use it wait too long.
@@ -79,12 +79,18 @@ def test_intentcmd_typedbranch_resolvesbase(tmp_path: Path, branch: str) -> None
 
 
 def test_reviewercount_typedbranch_resolvesbase(tmp_path: Path) -> None:
-    """`reviewer-count` on a nested typed branch does not refuse for the name."""
+    """`reviewer-count` on a nested typed branch exits 0 and prints a count.
+    Observed: it also exits 0 on the trunk, so this case records that the
+    name is accepted; it cannot discriminate a trunk refusal."""
     repo = make_repo(tmp_path)
     git(repo, "switch", "-q", "-c", f"fix/scope/{CID}")
     commit_src(repo)
+    git(repo, "add", "docs")
+    git(repo, "commit", "-q", "-m", "intent")  # reviewer-count needs a clean tree
     result = run("reviewer-count", CID, cwd=repo)
     _assert_base_resolved(result)
+    assert result.returncode == 0, (result.returncode, result.stderr)
+    assert result.stdout.strip().isdigit(), result.stdout
 
 
 def test_gitswitch_trunkprefixedname_refusedbygit(tmp_path: Path) -> None:

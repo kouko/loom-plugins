@@ -166,10 +166,6 @@ def test_sweepregex_checkoutbarebranch_caught() -> None:
     assert _station_bare_re().search(mutant)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="finding round 2: bare-branch sweep regex misses common spellings",
-)
 @pytest.mark.parametrize(
     "spelling",
     [
@@ -205,15 +201,41 @@ def test_shipstation_squashmerge_claimholds() -> None:
     assert "gh pr merge <number> --squash" in SHIP.read_text(encoding="utf-8")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="finding round 2: ship station writes --title with no branch-type rule",
-)
 def test_shipstation_titleflag_namesbranchtype() -> None:
-    """The PR title is written at ship, not write-plan; an agent there never
-    reads Step 6, so ship should affirm reusing the branch `<type>` in `--title`."""
+    """The PR title is written at ship, not write-plan; ship affirms that the
+    `<title>` type equals the branch's `<type>/` prefix."""
     text = " ".join(SHIP.read_text(encoding="utf-8").split())
     assert any(
-        _affirms(s, ("use", "start", "reuse", "prefix"), "<type>")
-        for s in _sentences(text) if "title" in s.lower()
+        _affirms(s, ("use", "start", "reuse", "prefix", "equals"), "<type>")
+        for s in _sentences(text) if "<title>" in s
     )
+
+
+def test_affirmhelper_equalsnegated_rejects() -> None:
+    """Widening to 'equals' still rejects a negated binding."""
+    assert not _affirms(
+        "The `<title>` type never equals the branch's `<type>/` prefix.", ("equals",), "<type>"
+    )
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="finding round 2b: ship title rule has no fallback for a branch without a Conventional <type>/ prefix",
+)
+@pytest.mark.parametrize("branch", ["fix-agy-adapter", "w4-03-push-reason", "feature/2026-09-14-x"])
+def test_shipstation_untypedbranch_titlerulehasfallback(branch: str) -> None:
+    """Hurried agent on a legacy flat branch (or a non-Conventional prefix):
+    'type equals the current branch's `<type>/` prefix' has nothing valid to
+    copy. Ship should state what to do when the prefix is absent or not an
+    allowed type; otherwise the agent invents a type or ships `feature(...)`."""
+    prefix = branch.split("/", 1)[0] if "/" in branch else None
+    if prefix in TYPES:
+        return
+    text = " ".join(SHIP.read_text(encoding="utf-8").split())
+    fallback = [
+        s for s in _sentences(text)
+        if "<title>" in s or "prefix" in s
+        if re.search(r"\b(without|lacks|no|not|otherwise|flat|untyped)\b", s)
+        and re.search(r"prefix|<type>", s)
+    ]
+    assert fallback, f"ship gives no title-type rule for branch {branch!r}"
