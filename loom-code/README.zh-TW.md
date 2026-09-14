@@ -1,31 +1,81 @@
 # loom-code
 
-> **五個站，把一次變更從計畫送到合併的 PR；外加一個 checker，擋掉「審查
-> 其實沒發生」的 push。** loom-code 假設你具備基本軟體工程知識，而不是
-> 熟悉這個 plugin：每次變更只問你三個問題，其餘自己決定。因為品質的來源
-> 是機器檢查機器 —— 寫的 agent 永遠不會是審的 agent。
+> **五個站把一次變更從確認過的 intent 送到已發布的 pull request；任何東西
+> 離開本機之前，決定性的 checker 會重算一次證據。** loom-code 假設你具備
+> 基本軟體工程知識，而不是熟悉這個 plugin：每次變更最多問你三個問題，其餘
+> 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
+> 審的 agent。
 
-**Skills**：5 個站 + 1 個入口路由。版本資訊見 [CHANGELOG.md](CHANGELOG.md)。
+**版本**：3.1.4 · **Skills**：5 個站 + 1 個入口路由 · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
-**儲存庫**：[`monkey-skills`](https://github.com/kouko/monkey-skills) 的一部分
+**儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
 ---
 
-## 五個站
+## 一次變更怎麼走
 
-[using-loom-code](skills/using-loom-code/SKILL.md) 將未指定站點的 Loom 實作請求
-導向下列站點；每個站仍可直接呼叫。
+```mermaid
+flowchart TD
+    intent["① 你確認 intent<br/>loom-design:capture-intent<br/>沒裝 loom-design 時由 loom-code:write-plan"]
+    spec["只在 needs-design: yes 時<br/>loom-design:write-spec<br/>② product 變更：你確認可見的行為"]
+    plan["loom-code:write-plan<br/>plan.md 裡的任務 DAG"]
+    build["loom-code:build<br/>測試先行，每個任務一個 implementer"]
+    review["loom-code:review<br/>fresh-context 審查者<br/>需要時加盲跑與 adversary"]
+    attest[["產生 attestation<br/>由 loom-code:review"]]
+    ship["loom-code:ship<br/>push + PR + checks<br/>③ 你驗收結果<br/>需要時透過盲跑報告"]
+    merged(["合併是另一步<br/>在 loom-code:ship 之後，由你另外授權"])
+    maintain["loom-code:maintain<br/>bug、告警、回歸或事故"]
 
-| 站 | 產物 | 內文 |
+    intent --> plan
+    intent -.->|"needs-design: yes"| spec
+    spec -.-> plan
+    plan --> build
+    build --> review
+    review -->|"NEEDS_REVISION"| build
+    review -->|"PASS / PASS_WITH_NOTES"| attest
+    attest --> ship
+    ship --> merged
+    merged -.-> maintain
+    maintain -->|"相符或新的 intent"| plan
+```
+
+- **Intent** —— 裝了 `loom-design` 時由 `capture-intent` 確認 intent（①）；
+  沒裝時，`write-plan` 自己覆述這次變更並問 ①。
+- **規格** —— 只有 product 變更會問 ②，由寫 spec 的那一方問：
+  `loom-design:write-spec`，或只裝 code 時 `write-plan` 寫的最小 spec。
+- **建置與審查** —— `build` 為每個任務派一個 implementer，測試先行。`review`
+  跑一次收尾審查；`NEEDS_REVISION` 把發現退回 `build`，通過的證據會產生為一份
+  綁定受審功能內容的 attestation。
+- **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
+  另一步，需要你另外明確授權。
+- **Maintain** —— 在進行中未合併變更之外發生的 bug 回報、告警、回歸或事故，
+  會掛到相符的 open intent 上，沒有就新建一份，再交給 `write-plan`。
+
+## Skills
+
+| Skill | 角色 |
+|---|---|
+| [`write-plan`](skills/write-plan/SKILL.md) | 把確認過的 intent 變成 `docs/loom/<change-id>/plan.md`：分 wave 的任務，各帶檔案、負責的 Acceptance 行、測試案例與風險。沒裝 `loom-design` 時自己跑 ①。 |
+| [`build`](skills/build/SKILL.md) | 每個任務派一個 implementer，以測試先行實作 plan。 |
+| [`review`](skills/review/SKILL.md) | 跑收尾審查——審查者，視需要加盲跑與對抗程式——並產生 `docs/loom/<change-id>/attestation.json`。 |
+| [`ship`](skills/ship/SKILL.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
+| [`maintain`](skills/maintain/SKILL.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
+| [`using-loom-code`](skills/using-loom-code/SKILL.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
+
+## Agents
+
+各站派出下列 agent；沒有任何 agent 審自己的產出。
+
+| Agent | 派出者 | 角色 |
 |---|---|---|
-| `write-plan` | `docs/loom/<change-id>/plan.md` — 任務 DAG | [SKILL.md](skills/write-plan/SKILL.md) |
-| `build` | 功能 commit 與聚焦測試；不建立 dispatch ledger | [SKILL.md](skills/build/SKILL.md) |
-| `review` | 產生綁定功能內容的 `docs/loom/<change-id>/attestation.json` | [SKILL.md](skills/review/SKILL.md) |
-| `ship` | PR、memory trailer、合併 | [SKILL.md](skills/ship/SKILL.md) |
-| `maintain` | 把告警或事故變成一份 intent | [SKILL.md](skills/maintain/SKILL.md) |
+| [`implementer`](agents/implementer.md) | `build` | 一個任務：先寫會失敗的測試、一個 commit、一份狀態回報 —— 不下 verdict。 |
+| [`reviewer`](agents/reviewer.md) | `review` | fresh-context 的 verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）與帶位置的發現；從不修改受審對象。 |
+| [`blind-runner`](agents/blind-runner.md) | `review` | 在乾淨環境跑這次變更、逐條走過每一行 Acceptance，寫出 `docs/loom/<change-id>/blind-run-report.md`。 |
+| [`adversary`](agents/adversary.md) | `review` | 設法讓變更失敗 —— mutation 或 fuzz 工具，或至少三個可執行的濫用與邊界案例 —— 並把每次嘗試記成 probe。 |
 
-說出你要什麼，入口是 `write-plan`。裝了 `loom-design` 時，上游會多出
-`capture-intent` 與 `write-spec`；沒裝時，`write-plan` 自己兼這兩件事。
+審查者人數不是 agent 自己選的：`loom_checker.py reviewer-count` 依整條分支的
+差異計算 —— 範圍窄且低風險的變更一位，其他情況或無法判斷時兩位。只有當某行
+Acceptance 無法機械判定時才會盲跑。
 
 ## 會問你的三個問題
 
@@ -34,53 +84,75 @@
 1. **這是你要的嗎？** —— 在任何程式碼存在之前，用白話覆述你的意圖。
 2. **你打 X，會看到 Y，對嗎？** —— 可見的行為。只有 product 變更會問，
    engineering 不問。
-3. **做到了嗎？** —— 你讀的是一份盲跑報告，由從未碰過這次變更的 agent
-   寫的，不是 diff。
+3. **做到了嗎？** —— 你驗收結果；需要盲跑報告時，讀的是從未碰過這次變更的
+   agent 寫的那份報告。
 
-不可逆的岔路（刪資料、公開介面、單向遷移）併進當時開著的 ① 或 ②，
-用後果的形式問。
+不可逆的岔路（刪資料、公開介面、單向遷移）在 engineering 變更時併進 ①、
+product 變更時併進 ②，用後果的形式問 —— 不另開停頓點。
 
 ## contract package
 
-`contract/manifest.yaml` 宣告站、action，以及四種 artifact（intent、spec、
-plan、review）的每一個欄位。`loom-design` 讀它並宣告 `requires-contract`；
-`loom-workflow` 不宣告——只有它的 `decision-map` skill 在一次 delivery
-前跑 `contract --require`。只有 loom-code 寫它。空白範本在
-`contract/templates/`。
+`contract/manifest.yaml` 宣告站、工具、action，以及每一種 artifact ——
+intent、spec、plan、attestation、盲跑報告、`KICKOFF-DEFAULTS.md` —— 的
+charter 與欄位，還有 standing document。空白範本在 `contract/templates/`。
+只有 loom-code 寫它。`loom-design` 讀它並宣告 `requires-contract`；
+`loom-workflow` 不宣告——只有它的 `decision-map` skill 在一次 delivery 前跑
+`contract --require`。
 
 ## checker
 
-`scripts/loom_checker.py` 就是整個決定性層 —— 31 條規則（以 `--list-rules` 為準），`--list-rules`
-可列出。它掛在 SessionStart hook 與 `git push` / `gh pr create` /
-`gh pr merge` 之前，而且是重算而非採信：package 測試與對抗 probe 都由它
-自己重跑一次，看退出碼。它擋的是手滑，不宣稱擋得住蓄意作弊。
+`scripts/loom_checker.py` 是決定性層：每條規則都從 repo 重算，不採信宣稱，
+規則清單以 `--list-rules` 為準。通過時退出碼 0，規則擋下時 1，用法或內部
+錯誤時 2 —— 無法判斷的 checker 永遠不會說「沒問題」。各站在 intake、
+`reviewer-count` 與 `finalize-review` 時呼叫它；`finalize-review` 只跑一次
+package 測試與對抗程式，並產生綁定內容的 attestation。已安裝的 `PreToolUse`
+hook 在 `git push` 與 `gh pr create` 之前再跑一次：重算內容 digest，並在不重跑
+測試或 probe 的情況下驗證那份證據。
+
+## 與 loom-design、loom-workflow 組合
+
+三個 plugin 可獨立安裝：loom-code 不需要 `loom-design`，也不需要
+`loom-workflow`；某一站走到選配的交接而該 plugin 不在時，該交接以 N/A 加理由
+回報，並在自身契約允許的範圍內繼續。
+
+- **loom-design** 在 `write-plan` 上游加上 `capture-intent` 與 `write-spec`；
+  沒裝時，`write-plan` 自己確認 intent 並寫最小 spec。
+- **loom-workflow** 在各站周圍加上工具，例如 `ship` 用
+  `loom-workflow:git-memory` 為 PR 內文分類 memory。
+
+相接處只有帶 plugin 名的 skill 名（例如 `loom-design:write-spec`）、contract
+package，以及專案自己的 `docs/loom/` 產物 —— 不會去讀別的 plugin 的
+`hooks/`、`skills/`、`scripts/`。
 
 ## 安裝
+
+這個儲存庫是一個名為 `loom` 的 plugin marketplace。
 
 ### Claude Code
 
 ```bash
-claude plugin marketplace add https://github.com/kouko/monkey-skills.git
-claude plugin install loom-code@monkey-skills
-claude plugin list | grep loom-code       # 預期：enabled
+claude plugin marketplace add https://github.com/kouko/loom-plugins.git
+claude plugin install loom-code@loom
 ```
 
-`loom-design` 與 `loom-workflow` 安裝方式相同。三者可獨立安裝，loom-code
-不需要另外兩個；某一站走到選配的交接而該 plugin 不在時，該步驟以 N/A 加理由
-回報，並在自身契約允許的範圍內繼續。相接處只有帶 plugin 名的 skill 名（例如
-`loom-design:write-spec`）、contract package，以及專案自己的 `docs/loom/`
-產物 —— 不會去讀別的 plugin 的 `hooks/`、`skills/`、`scripts/`。
+`loom-design` 與 `loom-workflow` 安裝方式相同。
 
-### Codex CLI
+### Codex
 
-安裝 `loom-code` plugin 後，Codex 直接使用 plugin 內的 hook 與 checker；repo
-不再保存 `.codex` checker 副本，也不需要 trust probe 或 hook-firing ledger。
+```bash
+codex plugin marketplace add https://github.com/kouko/loom-plugins.git
+codex plugin add loom-code@loom
+codex plugin list
+```
+
+已安裝的 `PreToolUse` hook 負責攔截發布操作；採用的 repo 不需要保存 checker
+副本、複製的 contract 或 trust ledger。
 
 若要安全更新，請依序執行：
 
 ```bash
-codex plugin marketplace upgrade monkey-skills
-codex plugin add loom-code@monkey-skills
+codex plugin marketplace upgrade loom
+codex plugin add loom-code@loom
 codex plugin list
 ```
 
@@ -90,4 +162,5 @@ hook 路徑。安裝成功後，請立刻重新啟動 Codex，再執行任何其
 
 ## 授權
 
-MIT，作為 `monkey-skills` 的一部分。
+MIT。loom-code 原本在 `monkey-skills` 開發，現在位於
+[kouko/loom-plugins](https://github.com/kouko/loom-plugins)。
