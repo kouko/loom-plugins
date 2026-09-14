@@ -319,7 +319,7 @@ def test_code_only_field_boundaries_keep_problem_and_value_semantics() -> None:
 def test_stations_read_the_bound_selection_at_entry() -> None:
     prose_read = (
         "run `loom_checker.py selection show <change-id>` and omit only the prose steps "
-        "it lists as skipped (intent, spec, plan, implementer, tdd, blind-run)"
+        "it lists as skipped (spec, plan, implementer, tdd, blind-run)"
     )
     review_read = (
         "run `loom_checker.py selection show <change-id>` and omit the steps it lists as "
@@ -336,6 +336,7 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
         assert prose.count(read) == 1
         sentence = next(s for s in prose.split(". ") if read in s)
         assert not has_negation(sentence), sentence
+        assert "intent" not in sentence.replace("(", " ").replace(",", " ").split(), sentence
         own_words = (
             "When the user asks in their own words to run or skip Loom steps, read "
             "../expert-mode/SKILL.md and follow it with `--origin user`."

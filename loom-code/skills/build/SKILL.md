@@ -16,7 +16,7 @@ Read the confirmed intent, spec when present, plan, current branch, and branch
 base. Preserve unrelated and untracked work. Work only on planned paths.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
-prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
+prose steps it lists as skipped (spec, plan, implementer, tdd,
 blind-run). The agent may suggest skipping steps at most once per change: it
 runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
 table and the confirmation line (type `/loom-code:expert-mode` (Codex:

@@ -24,7 +24,7 @@ requires one publication decision before anything leaves the machine.
 The user may still explicitly stop publication before the outward action.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
-prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
+prose steps it lists as skipped (spec, plan, implementer, tdd,
 blind-run). The agent may
 suggest skipping steps at most once per change: it runs
 `loom_checker.py selection propose <change-id> --origin agent`, shows the

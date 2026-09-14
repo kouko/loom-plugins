@@ -42,7 +42,7 @@ On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
-prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
+prose steps it lists as skipped (spec, plan, implementer, tdd,
 blind-run). The agent may suggest skipping steps at most once per change: it
 runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
 table and the confirmation line (type `/loom-code:expert-mode` (Codex:
