@@ -61,41 +61,50 @@ def _closed_read_only(command: str) -> bool:
         return False
     if not tokens or any(ch in command for ch in "\n;&|<>$`()") or "/" in tokens[0]:
         return False
-    name = tokens[0]
-    if name == "git":
-        index = 3 if len(tokens) > 2 and tokens[1] == "-C" and not tokens[2].startswith("-") else 1
-        if len(tokens) <= index:
-            return False
-        sub, args = tokens[index], tokens[index + 1:]
-        common = {"--stat", "--shortstat", "--name-only", "--name-status", "--oneline", "--no-patch",
-                  "--patch", "-p", "--decorate", "--no-decorate", "--all", "--first-parent",
-                  "--reverse", "--check", "--cached", "--staged", "--quiet", "--exit-code", "--"}
-        prefixes = ("--max-count=", "--format=", "--pretty=", "--since=", "--until=", "--author=",
-                    "--grep=", "--date=", "--diff-filter=")
-        if sub == "status":
-            return _options_ok(
-                args,
-                {"-s", "--short", "-b", "--branch", "--porcelain", "--show-stash", "--ahead-behind",
-                 "--no-ahead-behind", "-z", "--ignored", "--no-renames", "--"},
-                ("--porcelain=", "--untracked-files=", "--ignored=", "--find-renames="),
-            )
-        if sub in {"log", "show", "diff"}:
-            return all(
-                not a.startswith("-") or a in common or re.fullmatch(r"-[0-9]+", a)
-                or any(a.startswith(p) for p in prefixes)
-                for a in args
-            )
-        if sub == "branch":
-            return all(not a.startswith("-") or a in {"--list", "--"} for a in args)
+    if tokens[0] == "git":
+        return _git_read_only(tokens)
+    return _file_tool_read_only(tokens[0], tokens[1:])
+
+
+def _git_read_only(tokens: list[str]) -> bool:
+    """git status / log / show / diff / branch with read-only options only."""
+    index = 3 if len(tokens) > 2 and tokens[1] == "-C" and not tokens[2].startswith("-") else 1
+    if len(tokens) <= index:
         return False
+    sub, args = tokens[index], tokens[index + 1:]
+    common = {"--stat", "--shortstat", "--name-only", "--name-status", "--oneline", "--no-patch",
+              "--patch", "-p", "--decorate", "--no-decorate", "--all", "--first-parent",
+              "--reverse", "--check", "--cached", "--staged", "--quiet", "--exit-code", "--"}
+    prefixes = ("--max-count=", "--format=", "--pretty=", "--since=", "--until=", "--author=",
+                "--grep=", "--date=", "--diff-filter=")
+    if sub == "status":
+        return _options_ok(
+            args,
+            {"-s", "--short", "-b", "--branch", "--porcelain", "--show-stash", "--ahead-behind",
+             "--no-ahead-behind", "-z", "--ignored", "--no-renames", "--"},
+            ("--porcelain=", "--untracked-files=", "--ignored=", "--find-renames="),
+        )
+    if sub in {"log", "show", "diff"}:
+        return all(
+            not a.startswith("-") or a in common or re.fullmatch(r"-[0-9]+", a)
+            or any(a.startswith(p) for p in prefixes)
+            for a in args
+        )
+    if sub == "branch":
+        return all(not a.startswith("-") or a in {"--list", "--"} for a in args)
+    return False
+
+
+def _file_tool_read_only(name: str, args: list[str]) -> bool:
+    """cat / ls / rg / find with read-only options only; any other program is refused."""
     if name == "cat":
-        return all(a == "--" or not a.startswith("-") or re.fullmatch(r"-[benstuv]+", a) for a in tokens[1:])
+        return all(a == "--" or not a.startswith("-") or re.fullmatch(r"-[benstuv]+", a) for a in args)
     if name == "ls":
         return all(a == "--" or not a.startswith("-") or re.fullmatch(r"-[AabdFfGghiklmnopqrstuwx1@%]+", a)
-                   for a in tokens[1:])
+                   for a in args)
     if name == "rg":
         return _options_ok(
-            tokens[1:],
+            args,
             {"-n", "--line-number", "-l", "--files-with-matches", "--files", "--hidden", "-S",
              "--smart-case", "-i", "--ignore-case", "-F", "--fixed-strings", "--no-heading", "--"},
             ("--glob=", "--type=", "--color="),
@@ -103,12 +112,12 @@ def _closed_read_only(command: str) -> bool:
     if name == "find":
         values = {"-maxdepth", "-mindepth", "-type", "-name", "-iname", "-path", "-ipath"}
         flags = {"-print", "-xdev", "-depth", "-L", "-H", "-P", "!"}
-        i = 1
-        while i < len(tokens):
-            token = tokens[i]
+        i = 0
+        while i < len(args):
+            token = args[i]
             if token in values:
                 i += 1
-                if i >= len(tokens):
+                if i >= len(args):
                     return False
             elif token.startswith("-") and token not in flags:
                 return False

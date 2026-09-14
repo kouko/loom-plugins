@@ -131,7 +131,11 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
 def attestation_reason(command: str, cwd: str, rest: list[str]) -> str:
     """BLOCK lines for the target branch's attestation, read-only and without
     replay; "" when it is valid or the repository cannot be determined
-    safely, so the caller's own refusal stands alone (fail closed)."""
+    safely, so the caller's own refusal stands alone (fail closed).
+
+    The reported attestation state reflects the target repository's
+    checked-out HEAD, not necessarily the ref being pushed; the push stays
+    blocked either way."""
     target = git_dash_c_push_cwd(command, cwd)
     if target is None:
         return ""

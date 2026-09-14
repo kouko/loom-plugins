@@ -1172,8 +1172,9 @@ def test_canonical_attested_push_allowed(tmp_path: Path, monkeypatch) -> None:
     assert (rc, err) == (0, "")
 
 
-# Allow (0) / block (2) outcomes pinned from the hook before the reason
-# reordering; the reordering changes stderr text only, never this table.
+# Allow (0) / block (2) outcomes pinned against commit 4e87e264, which
+# introduced case-folded publisher detection (``GIT push`` blocks); the later
+# reason reordering changes stderr text only, never this table.
 BLOCKED_PUSH_MATRIX = [
     ("git status", 0, 0),
     ("ls -la", 0, 0),
@@ -1211,3 +1212,23 @@ def test_blocked_push_set_unchanged(
     rc, _ = run_push_hook(monkeypatch, repo, command)
 
     assert rc == (attested_rc if attested else unattested_rc)
+
+
+# case-folded-publishers-blocked-on-every-host: publisher detection folds the
+# executable basename on every host, not only on case-insensitive filesystems.
+@pytest.mark.parametrize("command", [
+    "GIT push origin HEAD",
+    "/usr/bin/GIT push",
+    "bash -c 'GIT push'",
+    "GH pr create --fill",
+    "Gh pr merge 1",
+])
+def test_case_folded_publishers_blocked_on_every_host(
+    tmp_path: Path, monkeypatch, command: str
+) -> None:
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, command)
+
+    assert rc == 2
+    assert "BLOCK" in err
