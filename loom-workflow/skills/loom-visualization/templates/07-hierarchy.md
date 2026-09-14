@@ -20,7 +20,8 @@ architecture instead.
 
 ## ASCII
 
-Run `python3 scripts/generate.py tree` with this input on stdin:
+Run `python3 <skill-dir>/scripts/generate.py tree` (`<skill-dir>` is defined
+in `SKILL.md`) with this input on stdin:
 
 ```json
 {"node": {"label": "loom-workflow", "children": [{"label": "skills", "children": [{"label": "loom-visualization"}, {"label": "handoff"}]}, {"label": "hooks"}, {"label": "scripts"}]}}

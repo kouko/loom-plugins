@@ -20,7 +20,8 @@ linear steps.
 ## ASCII
 
 No generator covers timelines. Hand-author it, keeping the dates in one column,
-then verify it with `python3 scripts/align.py -`.
+then verify it with `python3 <skill-dir>/scripts/align.py -` (`<skill-dir>` is
+defined in `SKILL.md`).
 
 ```
 2026-07 ──┬── 需求確認

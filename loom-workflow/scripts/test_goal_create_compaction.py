@@ -56,7 +56,7 @@ def test_entrypoint_preserves_modes_floor_and_invocation():
     )
 
     # --- the floor's invocation ---
-    assert "python3 scripts/goal_lint.py <goal-file>" in text
+    assert "python3 <skill-dir>/scripts/goal_lint.py <goal-file>" in text
 
     # --- never-fires-on-its-own statement, from the invocation contract ---
     never_fires = _normalize(

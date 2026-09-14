@@ -19,7 +19,8 @@ rollback decision, which fix to apply. Every branch ends in an action.
 ## ASCII
 
 No generator covers branches. Hand-author the diagram, then verify it with
-`python3 scripts/align.py -` until it prints no drift.
+`python3 <skill-dir>/scripts/align.py -` (`<skill-dir>` is defined in
+`SKILL.md`) until it prints no drift.
 
 ```
          ┌──────────────────┐
