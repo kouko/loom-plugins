@@ -33,7 +33,6 @@ Claude Code 向けの skill 開発は反復的な作業です。skill を draft 
 | [`using-loom-workflow`](skills/using-loom-workflow/) | 広い・曖昧な workflow の依頼から既存ツールを選び、その手順を読み込む。 |
 | [`loom-memory`](skills/loom-memory/) | リポジトリの永続的な教訓を参照・記録・照合・廃止する。 |
 | [`critique`](skills/critique/) | 作る前に提案を裁く：`mode: proposal` は list・plan・散文の推奨を evidence grounding と YAGNI で KEEP / DEFER / DROP に振り分け、`mode: complexity` は 1 つの具体的変更を deletion-first で量る（before/after の LOC、何が obsolete になるか）。 |
-| [`cot-explain`](skills/cot-explain/) | すでにある推論——指定されたファイル、あるいは直前の作業——を、CoT 図を中心に据えた自己完結型ページに描き出す。各矢印にはその手順が続く理由がラベル付けされる。 |
 | [`dbt-model-style`](skills/dbt-model-style/) | dbt + Redshift モデルの style & structure contract を強制する — CTE の役割、zero-logic な final CTE、命名、YAML header、comment、syntax。 |
 | [`decision-map`](skills/decision-map/) | `docs/loom/maps/<map-id>/` にある永続的な decision map を作成・推進する — 目的地、育っていく Decisions-so-far ログ、そして複数 session にわたって ticket へ卒業していく Not-yet-specified（fog）list。一発 plan ではない。 |
 | [`distill-sessions`](skills/distill-sessions/) | 過去の Claude Code と Codex の session transcript ＋ `/insights` から friction pattern を掘り出し、skill ごとの改善提案 doc にまとめる。 |
@@ -41,6 +40,7 @@ Claude Code 向けの skill 開発は反復的な作業です。skill を draft 
 | [`goal-create`](skills/goal-create/) | goal condition を作成する — SESSION はホストに受理された場合に 4 項目ゴールを有効化し、それ以外は復旧操作を示す。ARC は repository の purpose artifact（`Why` / `Done when`）を起草する。 |
 | [`handoff`](skills/handoff/) | session 状態を構造化された HANDOFF ファイルに保存し、将来の agent がきれいに再開できるようにする。あるいは既存の HANDOFF を読み込み・検証する。 |
 | [`independent-advisor`](skills/independent-advisor/) | 現在の plan や決定について、**別の executor**——より強い model、より高い effort、あるいは別ベンダー——から second opinion を取る。変わるのは executor であって、critique の観点ではない。 |
+| [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。Obsidian ノートには使わない。 |
 | [`recap-state`](skills/recap-state/) | session 内での再オリエンテーション — user が話の筋を見失った時、Synthesis-check で締めくくる構造化 recap を出す。 |
 
 契約で数えるツールは 8 個、standalone skill は `goal-create`・`dbt-model-style` の 2 個です。`loom-memory` と任意の入口ルーターは契約の対象外です。lifecycle 状態と所有権：[`docs/skill-governance.md`](docs/skill-governance.md)。
@@ -106,7 +106,6 @@ loom-workflow/
 │   ├── quarterly-audit-runbook.md
 │   └── telemetry-setup.md
 ├── skills/
-│   ├── cot-explain/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
@@ -115,6 +114,7 @@ loom-workflow/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
+│   ├── loom-visualization/
 │   └── recap-state/
 ├── CHANGELOG.md
 ├── README.md

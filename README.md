@@ -160,7 +160,7 @@ attach to the flow.
 | `recap-state` | In-session recap of where the work stands. |
 | `handoff` | Save or resume state across sessions. |
 | `distill-sessions` | Mine past Claude Code or Codex sessions for skill improvement proposals. |
-| `cot-explain` | Explain documented reasoning as a page with a chain-of-thought diagram. |
+| `loom-visualization` | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
 | `goal-create` | Create a session goal or draft a repository purpose (invoked by name only). |
 | `dbt-model-style` | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
 | `using-loom-workflow` | Optional router to the right workflow tool. |

@@ -33,7 +33,6 @@ selects an existing tool; every tool remains directly invocable.
 | [`using-loom-workflow`](skills/using-loom-workflow/) | Route broad or ambiguous workflow requests to an existing tool, then load that tool's instructions. |
 | [`loom-memory`](skills/loom-memory/) | Recall, record, reconcile, or retire durable repository lessons. |
 | [`critique`](skills/critique/) | Judge a proposal before it is built: `mode: proposal` triages a list, plan, or prose recommendation into KEEP / DEFER / DROP by evidence grounding and YAGNI; `mode: complexity` weighs one specific change deletion-first — before/after LOC and what it obsoletes. |
-| [`cot-explain`](skills/cot-explain/) | Explain how something was reasoned — a named file, or the work just done — as a standalone page built around a chain-of-thought diagram, every arrow labeled with why that step follows. |
 | [`dbt-model-style`](skills/dbt-model-style/) | Enforce a dbt + Redshift model style & structure contract — CTE roles, zero-logic final CTE, naming, YAML header, comments, syntax. |
 | [`decision-map`](skills/decision-map/) | Chart and work through a persistent decision map at `docs/loom/maps/<map-id>/` — a destination, a growing Decisions-so-far log, and a Not-yet-specified (fog) list that graduates into tickets over many sessions instead of a one-shot plan. |
 | [`distill-sessions`](skills/distill-sessions/) | Mine past Claude Code and Codex session transcripts + `/insights` for friction patterns into a per-skill improvement-proposals doc. |
@@ -41,6 +40,7 @@ selects an existing tool; every tool remains directly invocable.
 | [`goal-create`](skills/goal-create/) | Create a goal condition — SESSION activates its four-field condition when accepted and gives an honest recovery action otherwise; ARC drafts the repository purpose artifact (`Why` / `Done when`). |
 | [`handoff`](skills/handoff/) | Save session state to a structured HANDOFF file so a future agent resumes cleanly, or load/verify a prior HANDOFF. |
 | [`independent-advisor`](skills/independent-advisor/) | Get a second opinion on the current plan or decision from a **different executor** — a stronger model, higher effort, or another vendor. The executor changes, not the critique lens. |
+| [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Not for Obsidian notes. |
 | [`recap-state`](skills/recap-state/) | In-session re-orientation — a structured recap ending with a Synthesis-check when the user loses the thread. |
 
 The contract retains eight counted tools and two standalone skills (`goal-create`, `dbt-model-style`). `loom-memory` and the optional discovery router remain outside that contract. Lifecycle states and ownership: [`docs/skill-governance.md`](docs/skill-governance.md).
@@ -106,7 +106,6 @@ loom-workflow/
 │   ├── quarterly-audit-runbook.md
 │   └── telemetry-setup.md
 ├── skills/
-│   ├── cot-explain/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
@@ -115,6 +114,7 @@ loom-workflow/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
+│   ├── loom-visualization/
 │   └── recap-state/
 ├── CHANGELOG.md
 ├── README.md          (this file)

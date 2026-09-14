@@ -24,16 +24,6 @@ INTENTIONAL = {
     "scripts/test_loom_skill_description_catalog.py",
 }
 
-# Known pending: task W2-04 renames these (READMEs, plugin keywords, Codex
-# longDescription). W2-04 empties this set.
-PENDING_W2_04 = {
-    "README.md",
-    "loom-workflow/README.md",
-    "loom-workflow/README.ja.md",
-    "loom-workflow/README.zh-TW.md",
-    "loom-workflow/.claude-plugin/plugin.json",
-    "loom-workflow/.codex-plugin/plugin.json",
-}
 
 
 def _is_live(relative: Path) -> bool:
@@ -62,7 +52,7 @@ def find_live_hits(root: Path, allowed: set[str] = frozenset()) -> list[str]:
 
 
 def test_no_live_path_names_the_removed_skill():
-    hits = find_live_hits(REPO_ROOT, INTENTIONAL | PENDING_W2_04)
+    hits = find_live_hits(REPO_ROOT, INTENTIONAL)
     assert not hits, "live references to the removed skill:\n" + "\n".join(hits)
 
 
