@@ -39,6 +39,13 @@ flowchart TD
         maintain["maintain<br/>bugs, alerts, regressions"]
     end
 
+    subgraph workflow["loom-workflow"]
+        dmap["decision-map<br/>persistent Outcome Map"]
+        gitmem["git-memory<br/>commit and PR memory"]
+        loommem["loom-memory<br/>durable repository lessons"]
+        aside["independent-advisor, handoff, recap-state<br/>used on demand"]
+    end
+
     merged(["Merged PR"])
 
     idea --> intent
@@ -48,10 +55,15 @@ flowchart TD
     plan --> build
     build --> review
     review -->|"NEEDS_REVISION"| build
-    review -->|"PASS"| ship
+    review -->|"PASS / PASS_WITH_NOTES"| ship
     ship --> merged
     merged -.-> maintain
-    maintain -.->|"new intent"| intent
+    maintain -.->|"new or matching intent"| plan
+
+    dmap -.->|"writes a map: intent"| intent
+    build -.->|"before each commit"| gitmem
+    ship -.->|"PR body memory"| gitmem
+    review -.->|"lesson at convergence"| loommem
 ```
 
 - **① Intent** — `capture-intent` restates the change in your words, with
@@ -60,14 +72,19 @@ flowchart TD
 - **② Specification** — `write-spec` runs only for changes that need design;
   for product changes you confirm the visible behaviour before planning.
 - **Build and review** — `build` implements each planned task test-first.
-  `review` then dispatches at least two fresh-context reviewers, a blind runner
-  that walks every acceptance line in a clean environment, and an adversary
-  that tries to make the change fail. Passing evidence becomes an attestation
-  bound to the reviewed content.
+  `review` then dispatches the checker-computed number of fresh-context
+  reviewers (two unless the change is narrow and low-risk), a blind runner
+  when an acceptance line cannot be checked mechanically, and adversarial
+  programs for code, skill, spec or gate changes. Passing evidence becomes an
+  attestation bound to the reviewed content.
 - **③ Acceptance** — `ship` pushes the branch, opens the PR and verifies
   checks; the blind-run report is what you read to accept the change.
-- **Maintain** — incidents after merge come back as a new intent, so every
-  change enters the same way.
+- **Maintain** — `maintain` attaches an incident to a matching open intent, or
+  creates one, and hands it to `write-plan`.
+- **loom-workflow** — tools beside the stations rather than stations
+  themselves: `decision-map` can start a change by writing its intent,
+  `git-memory` classifies memory before commits and in the PR body, and
+  `loom-memory` keeps lessons a review surfaced. Other tools run on demand.
 
 ## loom-design
 
@@ -143,6 +160,8 @@ compose only through plugin-qualified skill names such as
 ```sh
 codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-code@loom
+codex plugin add loom-design@loom
+codex plugin add loom-workflow@loom
 codex plugin list
 ```
 
