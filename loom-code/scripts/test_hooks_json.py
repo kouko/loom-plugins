@@ -86,15 +86,16 @@ def test_session_start_runs_the_rewritten_script(hooks):
     assert command.endswith('/hooks/session-start"')
 
 
-def test_pre_tool_use_matcher_set_is_exactly_bash(hooks):
-    assert _matchers(hooks["PreToolUse"]) == {"Bash"}
+def test_pre_tool_use_matcher_set_is_bash_and_file_tools(hooks):
+    """W2-02: the record-store guard judges file-writing tools too."""
+    assert _matchers(hooks["PreToolUse"]) == {"Bash|Write|Edit|MultiEdit|NotebookEdit"}
 
 
 def test_codex_pre_tool_use_uses_native_root_and_bash_matcher(codex_hooks):
-    assert _matchers(codex_hooks["PreToolUse"]) == {"Bash"}
-    (command,) = _commands(codex_hooks["PreToolUse"])
-    assert "${PLUGIN_ROOT}" in command
-    assert "${CLAUDE_PLUGIN_ROOT}" not in command
+    assert _matchers(codex_hooks["PreToolUse"]) == {"Bash", "apply_patch|Edit|Write"}
+    for command in _commands(codex_hooks["PreToolUse"]):
+        assert "${PLUGIN_ROOT}" in command
+        assert "${CLAUDE_PLUGIN_ROOT}" not in command
 
 
 def test_pre_tool_use_runs_the_single_checker_push_rule(hooks):

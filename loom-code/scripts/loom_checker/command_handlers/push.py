@@ -17,6 +17,9 @@ from loom_checker.rule_checks.push import is_git_push_command
 from loom_checker.rule_checks.push import is_pr_create_command
 from loom_checker.rule_checks.push import is_push_command
 from loom_checker.rule_checks.push import quote_all_shell_token
+from loom_checker.rule_checks.selection_guard import FILE_TOOLS as SELECTION_GUARD_FILE_TOOLS
+from loom_checker.rule_checks.selection_guard import RULE_ID as SELECTION_GUARD_RULE
+from loom_checker.rule_checks.selection_guard import guard_reason as selection_guard_reason
 from pathlib import Path
 import json
 import os
@@ -55,6 +58,13 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     payload = read_hook_payload()
     if payload is None:
         raise UsageError("push --hook expects a PreToolUse JSON payload on stdin.")
+    # The record-store guard judges every matched tool call first.
+    guard_reason = selection_guard_reason(payload)
+    if guard_reason:
+        print(f"BLOCK {SELECTION_GUARD_RULE}: {guard_reason}", file=err)
+        return 2
+    if payload.get("tool_name") in SELECTION_GUARD_FILE_TOOLS:
+        return 0
     # The matcher is the tool name, so every Bash command arrives here; only
     # push-shaped commands are judged.
     command = str((payload.get("tool_input") or {}).get("command", ""))
