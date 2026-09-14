@@ -101,9 +101,11 @@ agy plugin install ./loom-code
 agy plugin list
 ```
 
-使用時，在專案目錄啟動 `agy` 並把專案加為 workspace：`agy --add-dir .`（互動）或
-`agy --add-dir . -p "..."`（print 模式）。沒有 `--add-dir` 時 agy 不會掛上
-workspace，loom 的 kickoff defaults 不會載入，agent 也可能在專案外動作。
+使用時，在專案目錄啟動 `agy` 並以絕對路徑把專案加為 workspace：
+`agy --add-dir "$PWD"`（互動）或 `agy --add-dir "$PWD" -p "..."`（print 模式）；
+agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模式（`agy -p`）
+不會掛上 workspace，loom 的 kickoff defaults 不會載入，agent 也可能在專案外動作；
+互動模式也請一併指定。
 
 更新時在 clone 裡執行 `git pull`，再重跑 install（install 會取代已安裝的副本）；
 移除用 `agy plugin uninstall loom-code`。hook（publication gate、session

@@ -69,13 +69,21 @@ LANGUAGE_REMINDER = {
 }
 
 
-def test_agy_sections_tell_users_to_add_the_project_workspace() -> None:
-    # Without --add-dir agy attaches no workspace: kickoff defaults are not
-    # loaded and the agent may act outside the project.
+def test_readme_uses_absolute_add_dir() -> None:
+    # agy 1.2.2 attaches a workspace only for an absolute --add-dir path;
+    # without one, print mode loads no kickoff defaults.
     for rel in AGY_READMES:
         body = _agy_section(_read(rel))
-        assert "agy --add-dir ." in body, rel
-        assert 'agy --add-dir . -p "' in body, rel
+        assert 'agy --add-dir "$PWD"`' in body, rel
+        assert 'agy --add-dir "$PWD" -p "' in body, rel
+        assert "agy -p" in body, rel  # the no-workspace claim is scoped to print mode
+
+
+def test_readme_relative_add_dir_dot_rejected() -> None:
+    # A relative `.` is not honoured by agy 1.2.2 (live blind run).
+    for rel in AGY_READMES:
+        body = _agy_section(_read(rel))
+        assert not re.search(r"--add-dir \.(?=[\s`])", body), rel
 
 
 def test_loom_code_readmes_list_language_reminder_hook() -> None:

@@ -103,10 +103,12 @@ agy plugin install ./loom-code
 agy plugin install ./loom-design
 ```
 
-使うときは、プロジェクトのディレクトリでプロジェクトを workspace に追加して `agy`
-を起動する：`agy --add-dir .`（対話）または `agy --add-dir . -p "..."`（print
-モード）。`--add-dir` がないと agy は workspace を持たないため、loom の kickoff
-defaults が読み込まれず、agent がプロジェクトの外で作業することがある。
+使うときは、プロジェクトのディレクトリでプロジェクトを絶対パスで workspace に追加して
+`agy` を起動する：`agy --add-dir "$PWD"`（対話）または
+`agy --add-dir "$PWD" -p "..."`（print モード）。agy 1.2.2 は `.` のような相対パスを
+受け付けない。`--add-dir` がないと print モード（`agy -p`）では agy は workspace を
+持たないため、loom の kickoff defaults が読み込まれず、agent がプロジェクトの外で
+作業することがある。対話モードでも指定する。
 
 loom-design 自体は hook を持たない。loom-code の hook が走るのは `agy` CLI だけで、
 Antigravity のデスクトップアプリや IDE では走らない。

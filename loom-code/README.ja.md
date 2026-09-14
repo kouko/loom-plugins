@@ -110,10 +110,12 @@ agy plugin install ./loom-code
 agy plugin list
 ```
 
-使うときは、プロジェクトのディレクトリでプロジェクトを workspace に追加して `agy`
-を起動します：`agy --add-dir .`（対話）または `agy --add-dir . -p "..."`（print
-モード）。`--add-dir` がないと agy は workspace を持たないため、loom の kickoff
-defaults が読み込まれず、agent がプロジェクトの外で作業することがあります。
+使うときは、プロジェクトのディレクトリでプロジェクトを絶対パスで workspace に追加して
+`agy` を起動します：`agy --add-dir "$PWD"`（対話）または
+`agy --add-dir "$PWD" -p "..."`（print モード）。agy 1.2.2 は `.` のような相対パスを
+受け付けません。`--add-dir` がないと print モード（`agy -p`）では agy は workspace を
+持たないため、loom の kickoff defaults が読み込まれず、agent がプロジェクトの外で
+作業することがあります。対話モードでも指定してください。
 
 更新は clone で `git pull` してから install を再実行します（install は
 インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`

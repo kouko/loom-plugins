@@ -109,9 +109,11 @@ agy plugin install ./loom-design
 ```
 
 To use loom, start `agy` from your project with the project added as a
-workspace: `agy --add-dir .` (interactive) or `agy --add-dir . -p "..."`
-(print mode). Without `--add-dir`, agy attaches no workspace, so loom's
-kickoff defaults are not loaded and the agent may act outside the project.
+workspace by absolute path: `agy --add-dir "$PWD"` (interactive) or
+`agy --add-dir "$PWD" -p "..."` (print mode); agy 1.2.2 does not honour a
+relative path such as `.`. Without `--add-dir`, print mode (`agy -p`)
+attaches no workspace, so loom's kickoff defaults are not loaded and the
+agent may act outside the project; pass it in interactive mode too.
 
 loom-design ships no hooks; loom-code's hooks run only in the `agy` CLI, not
 in the Antigravity desktop app or IDE.

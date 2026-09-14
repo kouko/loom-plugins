@@ -59,8 +59,9 @@ Call `invoke_subagent` with a `Subagents` array. Each item carries:
 - `Workspace` (optional) — one of `inherit`, `branch`, `share`; the meaning
   of each value is unverified on agy 1.2.2.
 
-Use one `self` invocation per role. The subagent runs as a background task
-and the root agent waits for its reply. Every station requirement for
+Use one `self` invocation per dispatch: one per reviewer identity, and one
+each for the implementer task, the adversary and the blind runner. The
+subagent runs as a background task and the root agent waits for its reply. Every station requirement for
 fresh-context or distinct reviewers still applies: give each reviewer
 identity its own separate `self` invocation with a complete prompt, and never
 reuse one subagent's reply as another reviewer's verdict. Whether several
