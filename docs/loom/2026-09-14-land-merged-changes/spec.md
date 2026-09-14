@@ -6,7 +6,7 @@ pre-build-review: required — the change deletes branches and worktrees (irreve
 REQ-1 — Merge without a typed command
   WHEN the agent runs `loom_checker.py land --accepted-by <name>` from a change worktree whose attestation validates and whose open PR head equals HEAD, the checker shall squash-merge that PR itself, so the maintainer types no git or GitHub command → Acceptance #1
 REQ-2 — Refuse on failing checks or unmergeable PR
-  IF any check of the PR fails, is cancelled, or requires action, or GitHub reports the PR as conflicting, blocked, behind, or unstable THEN `land` shall not merge, shall exit 1, and shall name each failing check or the reported merge state → Acceptance #2
+  IF any check of the PR fails, is cancelled, or requires action, or GitHub reports the PR as conflicting, blocked, behind, unstable, or draft THEN `land` shall not merge, shall exit 1, and shall name each failing check or the reported merge state → Acceptance #2
 REQ-3 — Acceptance is the authorization
   IF `land` is run without `--accepted-by <name>`, or with a name that is neither the intent's `originator` nor the name in its `publication:` line, THEN it shall merge nothing, exit 1, and report that blind-run acceptance is not recorded; WHEN it merges, the squash commit body shall carry the line `Accepted-by: <name> <YYYY-MM-DD>` → Acceptance #3
 REQ-4 — PR title and body preserved
@@ -73,7 +73,7 @@ Land after acceptance:
 - `land` without `--accepted-by`, or with a name that is not the intent's originator or publication authorizer → `BLOCK land.merge: blind-run acceptance not recorded; pass --accepted-by <name> after the maintainer accepts` on stderr, exit 1, nothing merged.
 - checks still pending → prints `Waiting for checks on PR #<n>` once, then nothing until a terminal state (in progress).
 - a check fails, is cancelled, or requires action → `BLOCK land.merge: check <name>: <state>` per such check, exit 1, nothing merged; the way out is to fix the change and publish again.
-- PR conflicting, blocked, behind, or unstable → `BLOCK land.merge: PR #<n> is <mergeStateStatus>`, exit 1, nothing merged; the way out is to update the branch and return to Review.
+- PR conflicting, blocked, behind, unstable, or draft → `BLOCK land.merge: PR #<n> is <mergeStateStatus>`, exit 1, nothing merged; the way out is to update the branch and return to Review.
 - PR head differs from HEAD, no open PR, or attestation invalid → `BLOCK land.merge: <reason>`, exit 1; the way out is to publish again or return to Review.
 - merge command fails and GitHub shows the PR still open → `BLOCK land.merge: merge not performed: <gh message>`, exit 1; the way out is to rerun `land` after resolving the named cause.
 - success → `Merged PR #<n> as <sha7>`, `Trunk <trunk> fast-forwarded to <sha7>` or `trunk not updated: <reason>`, `Removed worktree <path>`, `Deleted local branch <branch>`, `Deleted remote branch <branch>` (or `remote branch already deleted`), `next: cd '<anchor path>'`, exit 0. Removal of the worktree is irreversible: ignored cache directories inside it are deleted with it; any other ignored, modified, or untracked file makes cleanup refuse instead.
