@@ -97,6 +97,20 @@ through another plugin's private `hooks/`, `skills/` or `scripts/` paths.
 Install the Codex plugin and use loom-code's installed checker and hook.
 Adopting repositories no longer keep a checker copy or hook-firing ledger.
 
+### Antigravity CLI
+
+Install from a clone of the repository, `loom-code` first:
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-design
+```
+
+loom-design ships no hooks; loom-code's hooks run only in the `agy` CLI, not
+in the Antigravity desktop app or IDE.
+
 ## Running the tests
 
 ```bash

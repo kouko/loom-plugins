@@ -99,6 +99,27 @@ hook path held by an active task. After it succeeds, restart Codex immediately
 before running another tool or command. Do not remove the plugin first; that
 only creates the same broken-path window earlier.
 
+### Antigravity CLI
+
+Antigravity CLI (`agy`) installs a plugin from a local directory. Clone the
+repository and install `loom-code` before its siblings:
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin validate ./loom-code
+agy plugin install ./loom-code
+agy plugin list
+```
+
+To update, run `git pull` in the clone and install again; the install replaces
+the installed copy. `agy plugin uninstall loom-code` removes it. The hooks (the
+publication gate and the session context) run only in the `agy` CLI, not in
+the Antigravity desktop app or IDE. On `agy` the reviewer, blind-runner and
+adversary subagents run on Gemini models. The review station is
+`closing-review` on every host; the old `review` name was removed and has no
+alias.
+
 ## Licence
 
 MIT, as part of `monkey-skills`.

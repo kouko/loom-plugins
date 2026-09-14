@@ -87,6 +87,20 @@ skill 名稱（例如 `loom-design:write-spec`）、contract package，以及專
 Codex 直接使用已安裝 loom-code plugin 內的 checker 與 hook；repo 不再保存
 checker 副本，也不需要 trust probe。
 
+### Antigravity CLI
+
+從 repo 的 clone 安裝，先裝 `loom-code`：
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-design
+```
+
+loom-design 本身沒有 hook；loom-code 的 hook 只在 `agy` CLI 執行，Antigravity
+桌面 app 與 IDE 裡不會執行。
+
 ## 跑測試
 
 ```bash

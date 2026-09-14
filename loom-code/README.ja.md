@@ -97,6 +97,26 @@ task が保持している version 付き hook path を削除する場合があ�
 別の tool や command を実行する前に Codex を直ちに再起動してください。先に
 plugin を削除しても、同じ path 不在期間が早く始まるだけなので行いません。
 
+### Antigravity CLI
+
+Antigravity CLI（`agy`）はローカルのディレクトリから plugin をインストール
+します。repo を clone し、`loom-code` を兄弟 plugin より先に入れます。
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin validate ./loom-code
+agy plugin install ./loom-code
+agy plugin list
+```
+
+更新は clone で `git pull` してから install を再実行します（install は
+インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
+です。hook（publication gate と session context）が走るのは `agy` CLI だけで、
+Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では reviewer・
+blind-runner・adversary の subagent は Gemini モデルで動きます。review station は
+どの host でも `closing-review` で、旧名 `review` は別名なしで削除されました。
+
 ## ライセンス
 
 MIT（`monkey-skills` の一部として）。

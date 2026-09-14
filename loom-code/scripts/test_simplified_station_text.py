@@ -233,7 +233,7 @@ def test_host_specific_skill_guidance_uses_each_native_contract() -> None:
 
 
 def test_principles_name_installed_hooks_for_both_hosts() -> None:
-    assert "Host-installed plugin hooks (Claude Code and Codex)" in PRINCIPLES
+    assert "Host-installed plugin hooks (Claude Code, Codex and Antigravity CLI)" in PRINCIPLES
     assert "Codex `.codex/hooks.json`" not in PRINCIPLES
 
 

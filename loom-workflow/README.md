@@ -131,6 +131,18 @@ loom-workflow/
 /plugin install loom-workflow@monkey-skills
 ```
 
+### Antigravity CLI
+
+Install from a clone of the repository:
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-workflow
+```
+
+Its hooks run only in the `agy` CLI, not in the Antigravity desktop app or IDE.
+
 ## Usage
 
 `loom-workflow` ships no slash commands. Skills accept natural-language requests; explicit-only tools such as `goal-create` still require an explicit request. For example:

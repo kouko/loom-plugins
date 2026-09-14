@@ -8,8 +8,8 @@ anything is published. You are asked only three times: to confirm what the
 change is, to confirm visible product behaviour when there is any, and to
 accept the result, through the blind-run report when one is required.
 
-Loom ships as three independently installable plugins for Claude Code and
-Codex:
+Loom ships as three independently installable plugins for Claude Code,
+Codex and Antigravity CLI:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
@@ -167,7 +167,8 @@ attach to the flow.
 
 ## Install
 
-This repository is a plugin marketplace named `loom`.
+For Claude Code and Codex, this repository is a plugin marketplace named
+`loom`.
 
 ### Claude Code
 
@@ -193,6 +194,36 @@ codex plugin add loom-design@loom
 codex plugin add loom-workflow@loom
 codex plugin list
 ```
+
+### Antigravity CLI
+
+Antigravity CLI (`agy`) installs plugins from a local directory, so clone the
+repository and install each plugin from the clone. Install `loom-code` first:
+the other two use its contract package and checker.
+
+```sh
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-design
+agy plugin install ./loom-workflow
+agy plugin list
+```
+
+`agy plugin validate ./loom-code` (or any other plugin directory) checks a
+plugin before you install it. To update, run `git pull` in the clone and run
+the install commands again; each install replaces the installed copy. To
+remove a plugin, run `agy plugin uninstall <name>`, for example
+`agy plugin uninstall loom-workflow`.
+
+Limits on Antigravity:
+
+- The plugin hooks (the push gate, the session context, the language reminder
+  and the skill-folder rule) run only in the `agy` CLI, not in the Antigravity
+  desktop app or IDE, so those gates are not enforced there.
+- The review, blind-run and adversary subagents run on Gemini models.
+- The review station is `closing-review` on every host; the old `review` name
+  was removed and has no alias.
 
 ## Development
 

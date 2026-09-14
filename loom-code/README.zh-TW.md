@@ -88,6 +88,25 @@ codex plugin list
 hook 路徑。安裝成功後，請立刻重新啟動 Codex，再執行任何其他工具或命令。不要
 先移除 plugin；那只會讓同一段路徑失效期間更早開始。
 
+### Antigravity CLI
+
+Antigravity CLI（`agy`）從本機目錄安裝 plugin。先 clone repo，並在另外兩個
+plugin 之前安裝 `loom-code`：
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin validate ./loom-code
+agy plugin install ./loom-code
+agy plugin list
+```
+
+更新時在 clone 裡執行 `git pull`，再重跑 install（install 會取代已安裝的副本）；
+移除用 `agy plugin uninstall loom-code`。hook（publication gate 與 session
+context）只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。在 `agy`
+上，reviewer、blind-runner、adversary subagent 以 Gemini 模型執行。審查站在所有
+host 上都叫 `closing-review`，舊名 `review` 已移除，沒有別名。
+
 ## 授權
 
 MIT，作為 `monkey-skills` 的一部分。

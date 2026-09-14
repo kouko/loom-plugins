@@ -92,6 +92,20 @@ claude plugin list | grep loom-design     # enabled と出れば OK
 Codex ではインストール済み loom-code plugin 内の checker と hook を直接使う。
 repo 内の checker コピーや trust probe は不要。
 
+### Antigravity CLI
+
+repo を clone し、`loom-code` を先にインストールする。
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-design
+```
+
+loom-design 自体は hook を持たない。loom-code の hook が走るのは `agy` CLI だけで、
+Antigravity のデスクトップアプリや IDE では走らない。
+
 ## テストの走らせ方
 
 ```bash
