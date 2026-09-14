@@ -88,8 +88,11 @@ is listed as an error.
 
 ## Decision rule
 
-SHIP B if and only if B's invocation count is strictly greater than A's;
-otherwise HOLD (equal counts mean HOLD). The table and diagram columns are
+SHIP B if and only if B's invocation count is strictly greater than A's and no
+session errored; INCOMPLETE if any session errored; otherwise HOLD (equal
+counts mean HOLD). The error condition and the INCOMPLETE outcome were added
+after the runs, during review; the original protocol counted an errored session
+as not invoked and allowed only SHIP or HOLD. The table and diagram columns are
 reported but do not enter the decision.
 
 ## Evidence

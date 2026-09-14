@@ -57,7 +57,7 @@ b1 runs 1–2, b2 run 1, b3 run 2).
 
 ## Decision
 
-**SHIP** — rule: SHIP B only if no session errored and B's invocation count (18) is strictly greater than A's (12).
+**SHIP** — rule: SHIP B if and only if B's invocation count (18) is strictly greater than A's (12) and no session errored (0 errored); INCOMPLETE if any session errored; otherwise HOLD.
 
 B rendered description SHA-256: `e98a3ed165415900bf405fe07209dde634cd465ff035fbea4ac2c73f57f6fd45`
 
@@ -80,6 +80,11 @@ B rendered description SHA-256: `e98a3ed165415900bf405fe07209dde634cd465ff035fbe
   check ignores `__pycache__/` and `*.pyc` (hooks write bytecode into a copy
   once a session runs), and `run --limit N` chunks sessions under a tool timeout.
 - `test_run_ab.py` was added beside the runner for its pure parts.
+- The decision rule's error condition and its INCOMPLETE outcome were added
+  after the runs, during review; the original protocol counted an errored
+  session as not invoked and allowed only SHIP or HOLD. The outcome is
+  unchanged: 0 measured sessions errored, and A 12/18 against B 18/18 is SHIP
+  under both the original and the tightened rule.
 - The prompts simulate station reporting moments from a situation
   description; no station skill ran, and live station sessions may behave
   differently.

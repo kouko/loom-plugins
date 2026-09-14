@@ -5,10 +5,9 @@ committed tested-hash guard (test_loom_visualization_description_ab.py), and the
 description renderer shared with the budget guard
 (scripts/test_loom_skill_description_catalog.py).
 
-Probes that pass record attacks the change survived. Probes marked
-``xfail(strict=True)`` record a real defect: they assert the behaviour that
-should hold and currently fail; a fix turns them into an XPASS, which fails the
-run so the marker gets removed.
+The probes are ordinary tests: each asserts the behaviour that should hold, and
+a passing probe records an attack the change survived. The probes that load
+ab/run_ab.py skip when docs/ is absent.
 """
 
 from __future__ import annotations
