@@ -19,9 +19,9 @@ cumulative diff. If only publication metadata changed and a matching
 attestation already exists, stop: the evidence is still valid and Ship owns
 the remaining work.
 
-At entry, run `loom_checker.py selection show <change-id>` and omit only the
-prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
-blind-run). The agent may suggest skipping steps at most once per change: it
+At entry, run `loom_checker.py selection show <change-id>` and omit the steps
+it lists as skipped; §2 and §3 say how skipped reviewers, adversarial and
+blind-run are handled. The agent may suggest skipping steps at most once per change: it
 runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
 table and the confirmation line (type `/loom-code:expert-mode` (Codex:
 `$expert-mode`) with the code shown), and keeps working on the full process at
@@ -66,7 +66,8 @@ classify the whole change. `finalize-review` and publication validation
 recompute the same policy; the orchestrator never declares or overrides it.
 When `selection show` lists `reviewers` as skipped, dispatch no reviewer and pass
 no `verdicts`.
-- A selected second vendor remains required. Resolve it from the standing
+- Unless reviewers are skipped, a selected second vendor remains required.
+  Resolve it from the standing
   fixed CLI, the per-change `ask` answer, or a `selection-confirmed` line
   naming the second vendor in the plan's `## Risks` section; the
   last form is write-plan's active-task handoff for a timely `suggest` opt-in.
