@@ -78,6 +78,103 @@ def _install_plugin(source_name: str, destination: Path) -> Path:
     return installed_root
 
 
+LOOM_PLUGINS = ("loom-code", "loom-design", "loom-workflow")
+
+
+def _install_agy_plugin(source_name: str, plugins_dir: Path) -> Path:
+    """Mirror `agy plugin install <dir>`: copy to <plugins>/<name>/, no version dir."""
+    manifest = json.loads(
+        (REPO_ROOT / source_name / "plugin.json").read_text(encoding="utf-8")
+    )
+    installed_root = plugins_dir / manifest["name"]
+    shutil.copytree(REPO_ROOT / source_name, installed_root)
+    return installed_root
+
+
+def _skill_short_names(plugin_root: Path) -> list[str]:
+    return sorted(p.parent.name for p in plugin_root.glob("skills/*/SKILL.md"))
+
+
+def _agy_visible_skills(plugins_dir: Path) -> set[tuple[str, str]]:
+    """agy de-duplicates skills by SHORT name: a clash hides the skill."""
+    owners: dict[str, list[str]] = {}
+    for plugin_root in sorted(p for p in plugins_dir.iterdir() if p.is_dir()):
+        for short in _skill_short_names(plugin_root):
+            owners.setdefault(short, []).append(plugin_root.name)
+    return {(plugins[0], short) for short, plugins in owners.items() if len(plugins) == 1}
+
+
+def test_agy_install_every_skill_folder_discoverable(tmp_path: Path) -> None:
+    """A2 positive: each plugin installs with a root manifest; every skill is
+    present and its short name unique across the three loom plugins."""
+    plugins_dir = tmp_path / "gemini" / "config" / "plugins"
+    expected: set[tuple[str, str]] = set()
+    for name in LOOM_PLUGINS:
+        root = _install_agy_plugin(name, plugins_dir)
+        assert root == plugins_dir / name
+        agy_manifest = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
+        assert re.fullmatch(r"[a-zA-Z0-9-_]+", agy_manifest["name"])
+        skills = _skill_short_names(root)
+        assert skills == sorted(
+            p.name for p in (REPO_ROOT / name / "skills").iterdir() if p.is_dir()
+        ), f"{name}: a skill folder lacks SKILL.md"
+        for short in skills:
+            text = (root / "skills" / short / "SKILL.md").read_text(encoding="utf-8")
+            assert re.search(rf"^name:\s*{re.escape(short)}\s*$", text, re.M), short
+            expected.add((name, short))
+
+    assert _agy_visible_skills(plugins_dir) == expected
+
+
+def test_agy_closing_review_visible_beside_foreign_review_skill(tmp_path: Path) -> None:
+    """A2 boundary: a foreign plugin's `review` cannot hide the review station."""
+    plugins_dir = tmp_path / "plugins"
+    for name in LOOM_PLUGINS:
+        _install_agy_plugin(name, plugins_dir)
+    foreign = plugins_dir / "foreign-reviewer" / "skills" / "review"
+    foreign.mkdir(parents=True)
+    (foreign / "SKILL.md").write_text(
+        "---\nname: review\ndescription: foreign\n---\n", encoding="utf-8"
+    )
+
+    code_skills = _skill_short_names(plugins_dir / "loom-code")
+    assert "closing-review" in code_skills and "review" not in code_skills
+    visible = _agy_visible_skills(plugins_dir)
+    assert ("loom-code", "closing-review") in visible
+    for name in LOOM_PLUGINS:
+        for short in _skill_short_names(plugins_dir / name):
+            assert (name, short) in visible, f"{name}:{short} hidden by a clash"
+
+
+def test_claude_and_codex_ignore_root_manifest(tmp_path: Path) -> None:
+    """A8 negative (structural): the Claude and Codex installs still resolve
+    their own manifests and hook files; neither references the root agy files."""
+    for name in LOOM_PLUGINS:
+        root = _install_plugin(name, tmp_path / "cache")
+        assert (root / "plugin.json").is_file()
+        agy_manifest = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
+        claude = _manifest(root)
+        codex = json.loads(
+            (root / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
+        )
+        # The root manifest carries no host wiring a Claude/Codex loader could adopt.
+        assert set(agy_manifest) <= {"name", "version", "description"}
+        for host_manifest in (claude, codex):
+            refs = [v for v in host_manifest.values() if isinstance(v, str) and v.startswith("./")]
+            for ref in refs:
+                assert (root / ref).resolve() not in {
+                    (root / "plugin.json").resolve(),
+                    (root / "hooks.json").resolve(),
+                }, f"{name}: host manifest points at a root agy file: {ref}"
+        if (root / "hooks").is_dir() and (root / "hooks" / "hooks.json").exists():
+            # Claude's hooks stay at the conventional hooks/hooks.json.
+            assert "hooks" in json.loads(
+                (root / "hooks" / "hooks.json").read_text(encoding="utf-8")
+            )
+        if "hooks" in codex:
+            assert codex["hooks"] == "./hooks/hooks-codex.json"
+
+
 def _manifest(plugin_root: Path) -> dict[str, object]:
     return json.loads(
         (plugin_root / ".claude-plugin" / "plugin.json").read_text(
