@@ -1,6 +1,5 @@
 # Product principles — loom (loom-plugins)
-ratified-by: kouko 2026-09-05; Fixed-choices plugin clause amended (three plugins to four, loom-memory independent) by kouko 2026-09-11; reverted (four plugins back to three, loom-memory retired into loom-workflow) by kouko 2026-09-11; reviewer-floor clause amended by kouko 2026-09-12; hosts clause amended (Antigravity CLI added) by kouko 2026-09-14
-pending-ratification: non-negotiable 2 user-skipped-steps amendment (2026-09-14) — awaiting kouko
+ratified-by: kouko 2026-09-05; Fixed-choices plugin clause amended (three plugins to four, loom-memory independent) by kouko 2026-09-11; reverted (four plugins back to three, loom-memory retired into loom-workflow) by kouko 2026-09-11; reviewer-floor clause amended by kouko 2026-09-12; hosts clause amended (Antigravity CLI added) by kouko 2026-09-14; non-negotiable 2 user-skipped-steps amendment ratified by kouko 2026-09-15
 
 ## Who
 People who describe what they want in plain words and have only basic software-engineering knowledge, working alone or in a small team, on Claude Code, Codex CLI or Antigravity CLI. They cannot judge the quality of a spec, a plan, or a diff.

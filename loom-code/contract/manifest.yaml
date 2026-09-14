@@ -2,7 +2,7 @@
 # Consumers: loom-design and loom-workflow read this file; only loom-code writes it.
 # Recomputed by check_mechanisms.py: every station / tool / action / artifact
 # field below is a mechanism and must be listed in docs/loom/evidence/mechanisms.yaml.
-version: 2.3.0
+version: 2.3.1
 
 # Paths matched here are publication metadata. They do not change the
 # functional content identity that executions and reviews attest to.
@@ -243,16 +243,16 @@ standing_docs:       # not per-change (§2a, §8)
     # lives at artifacts.kickoff-defaults.charter, not duplicated here --
     # one shape for the checker to read (wave-end:0-05).
 
-step_selection:      # the only step names a user selection may run or skip; the intent (landing requires it), publication, the merge decision and the attestation are deliberately absent
+step_selection:      # the only step names a user selection may run or skip; the intent (landing requires it), publication, the merge decision and the attestation are deliberately absent; steps carry no dependencies, so any one may be skipped alone
   steps:
-    - {name: spec,          requires: []}
-    - {name: plan,          requires: []}
-    - {name: implementer,   requires: []}
-    - {name: tdd,           requires: []}
-    - {name: reviewers,     requires: []}
-    - {name: adversarial,   requires: []}
-    - {name: blind-run,     requires: []}
-    - {name: package-tests, requires: []}
+    - {name: spec}
+    - {name: plan}
+    - {name: implementer}
+    - {name: tdd}
+    - {name: reviewers}
+    - {name: adversarial}
+    - {name: blind-run}
+    - {name: package-tests}
 
 kickoff_defaults:   # grammar: `- <key>: <value> — <reason> (<date>)`
   - {name: second-vendor,          grammar: "<cli> | ask | suggest", note: "`ask` blocks once per full-lane change; `suggest` reports availability without waiting and permits opt-in only before full-lane Review"}

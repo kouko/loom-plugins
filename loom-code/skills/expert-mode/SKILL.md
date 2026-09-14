@@ -30,9 +30,8 @@ the attestation are not steps.
 - Map the user's words, in any language, onto step names.
 - When the user asks to skip the intent, say the intent is always kept and
   show the table of the remaining steps.
-- A word that is no step (other than the intent, handled above), or a skip
-  another selected step needs: name the item, ask the user to rephrase, and
-  show no confirmation line.
+- A word that is no step (other than the intent, handled above): name the
+  item, ask the user to rephrase, and show no confirmation line.
 
 ## 2. Propose, show, wait
 
@@ -83,11 +82,14 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
   default branch whose attestation skipped reviewers.
 - A change with a bound selection publishes only from a checkout sharing the
   git common dir that holds its records; a fresh clone refuses it.
-- A confirmation binds only in the attended Claude Code session that proposed
-  it; finalization in another session applies the full process, so confirm
-  again in that session. A nested unattended session (such as `claude -p`,
-  even wrapped in `timeout`) never binds. Codex exports no session variable,
-  so on Codex only the command-text guard applies.
+- Confirmation, finalization and publication must all run in the same attended
+  Claude Code session. In a new session, re-run
+  `loom_checker.py selection propose` and have the user type the confirmation
+  again; a confirmation typed before `selection propose` has run in this
+  session binds nothing; the code shown may be the same as before. A nested
+  unattended session (such as `claude -p`, even wrapped in `timeout`) never
+  binds. Codex exports no session variable, so on Codex only the command-text
+  guard applies.
 - On Antigravity CLI, or any other host that lacks prompt capture, a typed
   confirmation stays unrecorded: say that selections take effect only where
   prompts are captured, leave out the confirmation line, and keep the full
