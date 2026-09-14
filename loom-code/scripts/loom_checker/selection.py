@@ -33,12 +33,12 @@ ENTRY_TOKENS = frozenset(
 
 
 def step_vocabulary(manifest=None) -> list[dict]:
-    """The checker-owned steps, in manifest order, each with `requires`."""
+    """The checker-owned steps, in manifest order, each a name only."""
     manifest = manifest if manifest is not None else load_manifest()
     steps = (manifest.get("step_selection") or {}).get("steps") or []
     if not steps:
         raise UsageError("the contract manifest declares no step_selection.steps.")
-    return [{"name": s["name"], "requires": list(s.get("requires") or [])} for s in steps]
+    return [{"name": s["name"]} for s in steps]
 
 
 def selection_code(change_id: str, run: list[str], skip: list[str]) -> str:
@@ -137,14 +137,6 @@ def validate_selection(skip: list[str], run: list[str], manifest=None) -> list[s
     reasons += [f"unknown step {name!r} (steps: {', '.join(names)})"
                 for name in [*skip, *run] if name not in names and name != "intent"]
     reasons += [f"step {name!r} is named in both --run and --skip" for name in run if name in skip]
-    if reasons:
-        return reasons
-    for step in steps:
-        if step["name"] in skip:
-            continue
-        for needed in step["requires"]:
-            if needed in skip:
-                reasons.append(f"step {step['name']!r} requires {needed!r}, which is skipped")
     return reasons
 
 

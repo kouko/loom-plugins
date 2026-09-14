@@ -112,22 +112,24 @@ def test_propose_prints_table_code_and_cancel_restores_full(tmp_path: Path) -> N
     assert [e["source"] for e in selection.read_events(repo, CHANGE) if e["event"] == "cancel"] == ["agent-run"]
 
 
-def test_unknown_step_or_unmet_dependency_refused(tmp_path: Path) -> None:
+def test_steps_carry_no_requires_and_propose_refuses_unknown_and_intent(tmp_path: Path) -> None:
+    raw = selection.load_manifest()["step_selection"]["steps"]
+    assert [s["name"] for s in raw] == FULL
+    assert all(set(s) == {"name"} for s in raw)
+    assert all(set(s) == {"name"} for s in selection.step_vocabulary())
     repo = make_repo(tmp_path)
     unknown = checker(repo, "propose", CHANGE, "--origin", "agent", "--skip", "publication")
     assert unknown.returncode != 0
     assert "publication" in unknown.stderr
+    intent = checker(repo, "propose", CHANGE, "--origin", "agent", "--skip", "intent")
+    assert intent.returncode != 0
+    assert "the intent is always kept" in intent.stderr
     assert selection.read_events(repo, CHANGE) == []
-    manifest = {"step_selection": {"steps": [
-        {"name": "spec", "requires": []}, {"name": "plan", "requires": ["spec"]}]}}
-    unmet = selection.validate_selection(["spec"], [], manifest)
-    assert unmet and "plan" in unmet[0] and "spec" in unmet[0]
 
 
-def test_intent_is_no_step_and_every_step_stands_alone() -> None:
-    steps = selection.step_vocabulary()
-    assert [s["name"] for s in steps] == FULL
-    assert all(s["requires"] == [] for s in steps)
+@pytest.mark.parametrize("step", FULL)
+def test_skipping_any_single_step_validates(step: str) -> None:
+    assert selection.validate_selection([step], []) == []
 
 
 @pytest.mark.parametrize("flag", ["--skip", "--run"])
