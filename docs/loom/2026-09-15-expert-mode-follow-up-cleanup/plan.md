@@ -19,7 +19,7 @@ charter: 1.0
 **W1-01 Sign the non-negotiable 2 amendment**  after: none  acceptance: 1
 - Files: `PRINCIPLES.md`, `scripts/test_principles_ratification.py`
 - Test: A1 positive: ratified-by-names-2026-09-15-non-negotiable-2-amendment; negative: pending-ratification-line-absent.
-- Risk: signing for kouko is legitimate only because his confirmation of this intent signs it; the commit cites that confirmation. agent-decided.
+- Risk: signing for kouko is legitimate only because his confirmation of this intent signs it; the commit cites that confirmation. user-decided.
 
 **W1-02 Complete the session-limit wording in expert-mode**  after: none  acceptance: 2
 - Files: `loom-code/skills/expert-mode/SKILL.md`, `loom-code/scripts/test_expert_mode_skill.py`
