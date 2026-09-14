@@ -22,7 +22,7 @@ REQ-8 — Skipped-review ledger
 REQ-9 — Both supported hosts
   The expert-mode entry point, the confirmation capture and the checker behaviour shall produce the same selection outcome on Claude Code (`/loom-code:expert-mode`) and Codex CLI (`$expert-mode`) → Acceptance #9
 REQ-10 — Unused lane settings removed
-  The contract manifest, the intent and KICKOFF templates, the intent checker and this repository's `KICKOFF-DEFAULTS.md` shall carry no `lane:` field, `default-lane` key or express/gate-only grammar, and the repository's package tests shall pass → Acceptance #10
+  The contract manifest, the intent and KICKOFF templates, the intent checker, the review lens text and this repository's `KICKOFF-DEFAULTS.md` shall carry no `lane:` field, `default-lane` key or express/gate-only grammar, and the repository's package tests shall pass → Acceptance #10
 
 ## Design decision
 **Shape.** One skill surface, one capture hook per host, one checker command
@@ -117,7 +117,8 @@ ship                ─► publish validates attestation + disclosure ─► PR
 14. **Lane residue** — agent-decided. Remove manifest `intent.lane` and
     kickoff `default-lane`, the template lines, `LANE_GRAMMAR`,
     `check_lane_schema`, `check_lane_reason` and the rule text's "or lane
-    line", and this repo's KICKOFF line. `second_vendor_policy.py`'s
+    line", the `lane:` sentence in `review/references/lenses.md`'s
+    user-judgment-leak row, and this repo's KICKOFF line. `second_vendor_policy.py`'s
     small/full lanes are a live, different concept and stay.
 15. **PRINCIPLES.md non-negotiable 2** — user-decided at ①: amended so
     user-skipped steps fall outside its guarantee and must be disclosed;
