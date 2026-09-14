@@ -255,9 +255,9 @@ def test_current_release_metadata_is_synchronized() -> None:
         (REPO / "loom-code/.codex-plugin/plugin.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-code/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "3.1.4"
-    assert codex_manifest["version"] == "3.1.4"
-    assert "## [3.1.4]" in changelog
+    assert claude_manifest["version"] == "3.2.0"
+    assert codex_manifest["version"] == "3.2.0"
+    assert "## [3.2.0]" in changelog
 
 
 def test_agy_host_passes_empty_usable_vendors() -> None:

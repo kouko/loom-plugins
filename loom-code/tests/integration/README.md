@@ -16,7 +16,7 @@
 All scripts gracefully skip when their prerequisites are missing — safe to run in CI without pre-installing every plugin.
 
 ```bash
-cd /path/to/monkey-skills/.worktrees/loom-code-design
+cd /path/to/loom-plugins/.worktrees/loom-code-design
 
 # Run individual test:
 bash loom-code/tests/integration/test-git-memory-delegation.sh

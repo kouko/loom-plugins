@@ -1,0 +1,2 @@
+== hook run as the --settings sessions saw it: project dir without its own settings file; the plugin is disabled only by the command-line settings flag, which the hook cannot see
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)

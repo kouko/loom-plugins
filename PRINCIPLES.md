@@ -1,4 +1,4 @@
-# Product principles — loom (monkey-skills)
+# Product principles — loom (loom-plugins)
 ratified-by: kouko 2026-09-05; Fixed-choices plugin clause amended (three plugins to four, loom-memory independent) by kouko 2026-09-11; reverted (four plugins back to three, loom-memory retired into loom-workflow) by kouko 2026-09-11; reviewer-floor clause amended by kouko 2026-09-12; hosts clause amended (Antigravity CLI added) by kouko 2026-09-14
 
 ## Who

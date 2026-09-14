@@ -1,0 +1,45 @@
+== ascii-graph-toolkit enabled
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)
+Before you explain any of these in chat, invoke the `loom-visualization`
+skill FIRST, lead with the form it prescribes, then narrate: an option
+comparison of 2+ options, a branching decision, a reasoning chain, a
+timeline, actor sequences, quantities to compare, a data model, or a
+reasoning page. For an option comparison it picks a markdown table,
+adding ASCII only when needed. Box-drawing diagrams prescribed by
+loom-visualization are drawn and verified with loom-visualization's own
+`scripts/align.py` and checks, while the ascii-graph card covers flows,
+state machines and architecture; follow that card for those. Skip the
+skill when one short paragraph fully covers the answer. Never draw for
+decoration.
+
+== ascii-graph-toolkit disabled
+# Visualization trigger card (loom-workflow)
+Before you explain any of these in chat, invoke the `loom-visualization`
+skill FIRST, lead with the table or diagram it prescribes, then narrate:
+an option comparison of 2+ options, a flow of 3+ steps, a branching
+decision, a state or lifecycle, an actor sequence, an architecture, or a
+reasoning chain. Before typing any box-drawing diagram (┌─┐, +--+),
+invoke `loom-visualization` FIRST. Skip the skill when one short
+paragraph fully covers the answer. Never draw for decoration.
+
+== malformed installed_plugins.json
+# Visualization trigger card (loom-workflow)
+== toolkit card fixture
+<!-- source: monkey-skills ascii-graph-toolkit/hooks/trigger-card.md @ e5b978e0 (verbatim copy below this line) -->
+# Diagram trigger card (ascii-graph-toolkit)
+Before typing any box-drawing / ASCII diagram (┌─┐, +--+) in chat or a
+text artifact: if the diagram has CJK (中/日) labels anywhere OR ≥3
+boxes, invoke the `ascii-graph` skill FIRST — its width-aware generators
+and verify-loop keep full-width characters aligned; eyeballed CJK padding
+silently breaks. Trivial all-ASCII sketches (≤2 boxes, no CJK) may be
+hand-drawn. Option comparisons stay markdown tables, not ASCII boxes.
+
+GENERATIVE trigger — when you are
+about to EXPLAIN in chat any flow / state machine / architecture
+involving ≥3 steps, states, or components: invoke the `ascii-graph`
+skill FIRST and lead the explanation with the generated diagram,
+then narrate. Skip when one short paragraph fully covers it —
+never draw for decoration; option comparisons keep the table rule
+above.
+== coexist card word count
+113

@@ -4,6 +4,19 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.0.0] — 2026-09-14 — loom-visualization replaces cot-explain
+
+- **BREAKING**: `cot-explain` is removed with no alias. Invocations of
+  `loom-workflow:cot-explain` must change to
+  `loom-workflow:loom-visualization`.
+- Added `loom-visualization`: tables, ASCII, or Mermaid for comparisons,
+  flows, decisions, states, and reasoning chains in coding-harness chat —
+  11 shape templates, a client check, a stdlib CJK-safe ASCII engine ported
+  from ascii-graph-toolkit v0.6.0, the reasoning page as a mode on a stdlib
+  renderer, SessionStart trigger cards that coexist with ascii-graph-toolkit,
+  and a Mermaid template validator.
+- Page output identifiers changed from `cot-explain` to `loom-visualization`.
+
 ## [4.3.4] — 2026-09-13 — Decision Map boundary integration
 
 - Completed the behavior-preserving Decision Map boundary split: document

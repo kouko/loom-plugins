@@ -1,34 +1,89 @@
 # loom-code
 
-> **一つの変更を計画からマージ済み PR まで運ぶ 5 つのステーションと、
-> レビューが実際に行われていない push を拒む checker。** loom-code が
-> 前提にするのは基本的なソフトウェア工学の知識であって、この plugin の
-> 知識ではありません。1 変更につき質問は 3 つだけ、残りは自分で決めます。
-> 品質の出どころは機械が機械を検査することだからです — 書く agent が
-> レビューする agent になることは決してありません。
+> **5 つのステーションが一つの変更を確認済みの intent から公開済みの
+> pull request まで運び、何かがマシンの外に出る前に決定的な checker が
+> 証拠を再計算します。** loom-code が前提にするのは基本的なソフトウェア工学の
+> 知識であって、この plugin の知識ではありません。1 変更につき質問は最大 3 つ、
+> 残りは理由を記録した上で自分で決めます。品質の出どころは機械が機械を
+> 検査することです — 書く agent がレビューする agent になることは決して
+> ありません。
 
-**Skills**: 5 ステーション + 1 ルーター。リリース情報は [CHANGELOG.md](CHANGELOG.md)。
+**バージョン**: 3.1.4 · **Skills**: 5 ステーション + 1 ルーター · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
-**リポジトリ**: [`monkey-skills`](https://github.com/kouko/monkey-skills) の一部
+**リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
 ---
 
-## 5 つのステーション
+## 変更の流れ
 
-[using-loom-code](skills/using-loom-code/SKILL.md) が、ステーション未指定の Loom
-実装依頼を振り分けます。各ステーションは引き続き直接呼び出せます。
+```mermaid
+flowchart TD
+    intent["① intent を確認する<br/>loom-design:capture-intent<br/>loom-design がなければ loom-code:write-plan"]
+    spec["needs-design: yes のときだけ<br/>loom-design:write-spec<br/>② product の変更: 目に見える振る舞いを確認する"]
+    plan["loom-code:write-plan<br/>plan.md のタスク DAG"]
+    build["loom-code:build<br/>テストファースト、タスクごとに implementer 1 つ"]
+    review["loom-code:closing-review<br/>fresh-context のレビュアー<br/>必要なら盲検と adversary"]
+    attest[["attestation を生成<br/>loom-code:closing-review による"]]
+    ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは盲検レポートで"]
+    merged(["マージは別手順<br/>loom-code:ship の後、あなた自身の許可で"])
+    maintain["loom-code:maintain<br/>バグ・アラート・リグレッション・障害"]
 
-| ステーション | 産出物 | 本文 |
+    intent --> plan
+    intent -.->|"needs-design: yes"| spec
+    spec -.-> plan
+    plan --> build
+    build --> review
+    review -->|"NEEDS_REVISION"| build
+    review -->|"PASS / PASS_WITH_NOTES"| attest
+    attest --> ship
+    ship --> merged
+    merged -.-> maintain
+    maintain -->|"一致する intent か新しい intent"| plan
+```
+
+- **Intent** — `loom-design` を入れている場合は `capture-intent` が intent を
+  確認し（①）、入れていない場合は `write-plan` が変更を言い直して ① を自分で
+  訊きます。
+- **仕様** — ② を訊くのは product の変更だけで、訊くのは spec を書いた側です：
+  `loom-design:write-spec`、または code のみのインストールでは `write-plan` の
+  最小 spec。
+- **ビルドとレビュー** — `build` は全タスクに implementer を割り当て、テストから
+  書きます。`closing-review` はクロージングレビューを 1 回行います。`NEEDS_REVISION` は
+  指摘を `build` に戻し、合格した証拠は、レビューされた機能内容に結び付く
+  attestation として生成されます。
+- **Ship** — ブランチを push し、PR を開き、必須チェックを確認します（③）。
+  Ship はマージしません。マージは、あなた自身の明示的な許可が要る別の手順です。
+- **Maintain** — 進行中の未マージ変更の外で起きたバグ報告・アラート・
+  リグレッション・障害を、一致する open な intent に結び付けるか新しい
+  intent を作り、`write-plan` に渡します。
+
+## Skills
+
+| Skill | 役割 |
+|---|---|
+| [`write-plan`](skills/write-plan/SKILL.md) | 確認済みの intent を `docs/loom/<change-id>/plan.md` に変える：ファイル、担当する Acceptance 行、テストケース、リスクを持つ wave 分けされたタスク。`loom-design` がなければ ① を自分で行う。 |
+| [`build`](skills/build/SKILL.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装する。 |
+| [`closing-review`](skills/closing-review/SKILL.md) | クロージングレビュー（レビュアー、必要に応じて盲検と敵対プログラム）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
+| [`ship`](skills/ship/SKILL.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
+| [`maintain`](skills/maintain/SKILL.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
+| [`using-loom-code`](skills/using-loom-code/SKILL.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
+
+## Agents
+
+ステーションが次の agent を派遣します。自分の成果物をレビューする agent は
+いません。
+
+| Agent | 派遣元 | 役割 |
 |---|---|---|
-| `write-plan` | `docs/loom/<change-id>/plan.md` — タスク DAG | [SKILL.md](skills/write-plan/SKILL.md) |
-| `build` | 機能コミットと focused test。dispatch ledger は作らない | [SKILL.md](skills/build/SKILL.md) |
-| `closing-review` | 機能内容に結び付く `docs/loom/<change-id>/attestation.json` を生成 | [SKILL.md](skills/closing-review/SKILL.md) |
-| `ship` | PR、memory trailer、マージ | [SKILL.md](skills/ship/SKILL.md) |
-| `maintain` | アラートや障害から intent を起こす | [SKILL.md](skills/maintain/SKILL.md) |
+| [`implementer`](agents/implementer.md) | `build` | 1 タスク：失敗するテストを先に書き、1 コミット、状態レポート — verdict は出さない。 |
+| [`reviewer`](agents/reviewer.md) | `closing-review` | fresh-context の verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）と位置付きの指摘。レビュー対象は編集しない。 |
+| [`blind-runner`](agents/blind-runner.md) | `closing-review` | クリーンな環境で変更を動かして全 Acceptance 行を確かめ、`docs/loom/<change-id>/blind-run-report.md` を書く。 |
+| [`adversary`](agents/adversary.md) | `closing-review` | 変更を壊しにいく — mutation や fuzz ツール、または実行可能な悪用・境界ケース 3 つ以上 — そしてすべての試行を probe として記録する。 |
 
-やりたいことを言えば入口は `write-plan` です。`loom-design` を入れている
-場合は上流に `capture-intent` と `write-spec` が付き、入れていない場合は
-`write-plan` が両方の役目を自分でこなします。
+レビュアーの人数は agent が選ぶのではありません。`loom_checker.py
+reviewer-count` がブランチ全体の差分から計算します — 狭く低リスクな変更なら
+1 人、それ以外や判定できないときは 2 人です。盲検が行われるのは、Acceptance
+行を機械的に判定できないときだけです。
 
 ## 訊かれる 3 つの質問
 
@@ -38,57 +93,81 @@
    言葉で言い直したもの。
 2. **X と打つと Y が見える。合っていますか？** — 目に見える振る舞い。
    product の変更でのみ訊かれ、engineering では訊かれません。
-3. **できましたか？** — その変更に一切触れていない agent が書いた
-   盲検レポートを読みます。diff は読みません。
+3. **できましたか？** — 結果を受け入れます。盲検レポートが必要だった場合は、
+   その変更に一切触れていない agent が書いたレポートを読みます。
 
-不可逆な分岐（データの削除、公開インターフェース、片道のマイグレーション）
-は ① か ② の開いている方に、結果の形で足されます。
+不可逆な分岐（データの削除、公開インターフェース、片道のマイグレーション）は、
+engineering の変更なら ①、product の変更なら ② に、結果の形で足されます —
+余分な停止点は増やしません。
 
 ## contract package
 
-`contract/manifest.yaml` がステーション、アクション、そして 4 つの
-artifact（intent・spec・plan・review）の全フィールドを宣言します。
-`loom-design` はこれを読み `requires-contract` を宣言します。
-`loom-workflow` はそうではなく——配信（delivery）の前に `decision-map`
-skill だけが `contract --require` を実行します。書き込むのは loom-code
-のみ。空のひな型は `contract/templates/` にあります。
+`contract/manifest.yaml` がステーション、ツール、アクション、そしてすべての
+artifact — intent・spec・plan・attestation・盲検レポート・`KICKOFF-DEFAULTS.md` —
+の charter とフィールド、さらに standing document を宣言します。空のひな型は
+`contract/templates/` にあります。書き込むのは loom-code のみ。`loom-design` は
+これを読み `requires-contract` を宣言します。`loom-workflow` はそうではなく
+——配信（delivery）の前に `decision-map` skill だけが `contract --require` を
+実行します。
 
 ## checker
 
-`scripts/loom_checker.py` が決定的な層のすべてです — ルール 31 個（`--list-rules` が正）、
-`--list-rules` で一覧できます。SessionStart hook と
-`git push` / `gh pr create` / `gh pr merge` の前に走り、宣言を信じずに
-再計算します：package テストと敵対 probe を自分で走らせ直し、終了コードを
-見ます。防げるのは手滑りであって、本気の不正ではありません。
+`scripts/loom_checker.py` が決定的な層です。どのルールも宣言を信じずに
+リポジトリから再計算し、ルール一覧は `--list-rules` が正です。終了コードは
+合格で 0、ルールによるブロックで 1、使い方や内部のエラーで 2 — 判定できない
+checker が「問題なし」と言うことはありません。ステーションは intake、
+`reviewer-count`、`finalize-review` でこれを呼びます。`finalize-review` は
+package テストと敵対プログラムを 1 回だけ走らせ、内容に結び付く attestation を
+生成します。インストール済みの `PreToolUse` hook は `git push` と
+`gh pr create` の前にもう一度走り、内容の digest を再計算して、テストや probe を
+再実行せずにその証拠を検証します。
+
+## loom-design・loom-workflow との組み合わせ
+
+3 つの plugin は独立してインストール可能です。loom-code は `loom-design` も
+`loom-workflow` も必要とせず、任意の受け渡し先が不在のときは、その受け渡しを
+理由付きで N/A と報告し、自分の契約が許す範囲で続行します。
+
+- **loom-design** は `write-plan` の上流に `capture-intent` と `write-spec` を
+  足します。入れていない場合は `write-plan` が intent の確認と最小 spec の
+  作成を自分で行います。
+- **loom-workflow** はステーションの周りにツールを足します。たとえば
+  `loom-workflow:git-memory` は、`ship` が PR 本文の memory を分類するのに
+  使います。
+
+接続点は `loom-design:write-spec` のような plugin 名付き skill 名、contract
+package、そしてプロジェクト自身の `docs/loom/` 成果物だけで、他 plugin の
+`hooks/`・`skills/`・`scripts/` を直接読むことはありません。
 
 ## インストール
+
+このリポジトリは `loom` という名前の plugin marketplace です。
 
 ### Claude Code
 
 ```bash
-claude plugin marketplace add https://github.com/kouko/monkey-skills.git
-claude plugin install loom-code@monkey-skills
-claude plugin list | grep loom-code       # 期待値: enabled
+claude plugin marketplace add https://github.com/kouko/loom-plugins.git
+claude plugin install loom-code@loom
 ```
 
-`loom-design` と `loom-workflow` も同じ手順で入ります。3 つは独立して
-インストール可能で、loom-code はどちらも必要としません。任意の受け渡し先が
-不在のときは、そのステップを理由付きで N/A と報告し、自分の契約が許す範囲で
-続行します。接続点は `loom-design:write-spec` のような plugin 名付き skill 名、
-contract package、そしてプロジェクト自身の `docs/loom/` 成果物だけで、
-他 plugin の `hooks/`・`skills/`・`scripts/` を直接読むことはありません。
+`loom-design` と `loom-workflow` も同じ手順で入ります。
 
-### Codex CLI
+### Codex
 
-`loom-code` plugin をインストールすると、Codex は plugin 内の hook と checker
-を直接使います。repo 内の `.codex` checker コピー、trust probe、hook-firing
-ledger は不要です。
+```bash
+codex plugin marketplace add https://github.com/kouko/loom-plugins.git
+codex plugin add loom-code@loom
+codex plugin list
+```
+
+インストール済みの `PreToolUse` hook が公開操作の割り込みを担います。導入先の
+repo に checker のコピー、複製した contract、trust ledger は要りません。
 
 安全に更新するには、次の順序で実行します。
 
 ```bash
-codex plugin marketplace upgrade monkey-skills
-codex plugin add loom-code@monkey-skills
+codex plugin marketplace upgrade loom
+codex plugin add loom-code@loom
 codex plugin list
 ```
 
@@ -127,4 +206,5 @@ agy の `self` subagent として Gemini モデルで動きます。review stati
 
 ## ライセンス
 
-MIT（`monkey-skills` の一部として）。
+MIT。loom-code は `monkey-skills` で開発され、現在は
+[kouko/loom-plugins](https://github.com/kouko/loom-plugins) にあります。

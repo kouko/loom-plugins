@@ -29,6 +29,12 @@ CORPUS = (
     / "docs/skill-dogfood/2026-09-13-compress-loom-skill-descriptions/cases.md"
 )
 CASE_BLOCK = re.compile(r"```json routing-cases\n(?P<body>.*?)\n```", re.DOTALL)
+# Leaves renamed after the baseline was frozen. The baseline in cases.md is a
+# historical record and is not re-frozen; its paths are mapped through this
+# table before comparing with the on-disk set, so the hash stays pinned.
+RENAMED_LEAVES = {
+    "loom-workflow/skills/cot-explain/SKILL.md": "loom-workflow/skills/loom-visualization/SKILL.md",
+}
 
 
 def _render_description(text: str) -> str:
@@ -84,7 +90,7 @@ def test_frozen_leaf_baseline_is_accounted_before_router_edits() -> None:
     }
 
     baseline = _baseline()
-    assert leaf_paths == set(baseline)
+    assert leaf_paths == {RENAMED_LEAVES.get(path, path) for path in baseline}
     assert len(baseline) == BASELINE_LEAF_COUNT
     assert hashlib.sha256("\n".join(baseline.values()).encode()).hexdigest() == (
         "96d9cc72c5fa5e35e28ecd3596ff797bb430261ee209b82c5a52ceb793ffc275"

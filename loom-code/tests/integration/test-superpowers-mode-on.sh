@@ -116,7 +116,7 @@ Offline checks PASSED. Live verification (manual, in fresh Claude session
 with BOTH loom-code + obra/superpowers installed):
 
   1. Ensure both plugins installed + enabled:
-     claude plugin install loom-code@monkey-skills    # if not already
+     claude plugin install loom-code@loom             # if not already
      claude plugin install superpowers                   # obra marketplace
      unset LOOM_CODE_MODE     # or set to "on"
 

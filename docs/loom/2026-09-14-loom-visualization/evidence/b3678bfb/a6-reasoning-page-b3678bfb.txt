@@ -1,0 +1,14 @@
+== same draft as the 55c80731 run, rendered with b3678bfb, python3 -I
+== render 1
+wrote <scratch>/page2/2026-09-14-client-check-reasoning.html  (5.0.0)
+exit=0
+== verify --render --stamp
+--stamp: verified: "pass --render @ 868b680416db" → 2026-09-14-client-check-reasoning.md. Re-render to carry it into the HTML
+PASS (parsed by mermaid: 1/1 diagram(s))
+exit=0
+== render 2
+wrote <scratch>/page2/2026-09-14-client-check-reasoning.html  (5.0.0)
+exit=0
+21:verified: "pass --render @ 868b680416db"
+22:fidelity_checked: ""
+閘：pass --render　·　

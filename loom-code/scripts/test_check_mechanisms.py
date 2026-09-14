@@ -130,6 +130,29 @@ def _build_repo(tmp_path: Path, *, mechanisms: list[dict] | None = None,
     return repo
 
 
+WORKFLOW_HOOKS_JSON = {
+    "hooks": {
+        "SessionStart": [
+            {
+                "matcher": "startup|clear|compact",
+                "hooks": [{"type": "command", "command": '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"'}],
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Write|Edit",
+                "hooks": [{"type": "command", "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-skill-folder-structure.sh"}],
+            }
+        ],
+    }
+}
+
+
+def _write_workflow_hooks(repo: Path) -> None:
+    (repo / "loom-workflow" / "hooks").mkdir(parents=True, exist_ok=True)
+    (repo / "loom-workflow" / "hooks" / "hooks.json").write_text(json.dumps(WORKFLOW_HOOKS_JSON))
+
+
 FULL_MECHANISMS = [
     {"id": "write-plan", "class": "skill", "eval": "cold-read: evidence/a.md"},
     {"id": "git-memory", "class": "skill", "eval": "cold-read: evidence/a.md"},
@@ -189,6 +212,19 @@ class TestRecompute:
             "PreToolUse:Bash:loom_checker.py@codex",
         }
 
+    def test_hooks_include_loom_workflow_manifest(self, tmp_path):
+        """W3-01 A10 positive: loom-workflow/hooks/hooks.json is recomputed
+        into the hook set with the same `<event>:<matcher>:<basename>` id."""
+        repo = _build_repo(tmp_path)
+        _write_workflow_hooks(repo)
+
+        assert cm.recompute_hooks(repo) == {
+            "SessionStart:startup:session-start",
+            "PreToolUse:Bash:loom_checker.py",
+            "SessionStart:startup|clear|compact:visualization-card",
+            "PostToolUse:Write|Edit:validate-skill-folder-structure.sh",
+        }
+
     def test_hook_id_uses_first_script_path_in_compound_command(self, tmp_path):
         repo = _build_repo(tmp_path)
         path = repo / "loom-code/hooks/hooks.json"
@@ -235,6 +271,19 @@ class TestChecks:
         result = cm.run_checks(repo)
         assert result.exit_code == 1
         assert any(f.rule == "R1" and f.mechanism_id == "git-memory" for f in result.findings)
+
+    def test_unregistered_workflow_hook_is_red(self, tmp_path):
+        """W3-01 A10 negative: a hook declared only in
+        loom-workflow/hooks/hooks.json and absent from the yaml is R1."""
+        repo = _build_repo(tmp_path, mechanisms=FULL_MECHANISMS)
+        _write_workflow_hooks(repo)
+        result = cm.run_checks(repo)
+        assert result.exit_code == 1
+        assert any(
+            f.rule == "R1"
+            and f.mechanism_id == "SessionStart:startup|clear|compact:visualization-card"
+            for f in result.findings
+        ), result.findings
 
     def test_r2_stale_is_red(self, tmp_path):
         mechs = FULL_MECHANISMS + [{"id": "ghost", "class": "skill", "eval": "cold-read: evidence/a.md"}]
@@ -520,6 +569,17 @@ class TestBaselineApproximation:
         assert approx is True
         # 3 SKILL.md files + 2 hook entries in the fixture
         assert total == 3 + 2
+
+    def test_approximate_baseline_counts_loom_workflow_hooks(self, tmp_path):
+        repo = _build_repo(tmp_path)  # no mechanisms.yaml written
+        _write_workflow_hooks(repo)
+        _git(repo, "init", "-q")
+        _git(repo, "add", "-A")
+        _git(repo, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "base")
+        total, approx = cm.compute_baseline_total(repo, "HEAD")
+        assert approx is True
+        # 3 SKILL.md files + 2 loom-code hook entries + 2 loom-workflow entries
+        assert total == 3 + 2 + 2
 
 
 class TestRealYaml:

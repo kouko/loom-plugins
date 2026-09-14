@@ -7,8 +7,8 @@ that directory is flat), `loom-design/skills/**/*.md`,
 backtick-quoted citation of a file under THIS repository's `docs/`
 development records (a dated entry under `specs/`, `plans/`, `audits/`,
 `design/`, `research/`, `dogfood/`, `backlog/`, or a named entry under
-`memory/`, etc.) — a path applicable only in `monkey-skills` itself, never
-in a repo that merely installed loom. Only `.md` files are scanned: a `.py`
+`memory/`, etc.) — a path applicable only in this repository
+(`loom-plugins`) itself, never in a repo that merely installed loom. Only `.md` files are scanned: a `.py`
 or `.sh` comment reaches no model, so those are out of scope by design (see
 `docs/loom/specs/2026-08-22-contracts-cite-only-what-ships.md`, this
 script's own governing spec).

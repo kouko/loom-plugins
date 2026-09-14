@@ -1,0 +1,8 @@
+== Claude Code terminal
+{"client": "claude-code-cli", "mermaid": false, "remote_viewer": false, "obsidian_vault": false, "reason": "CLAUDECODE=1; Claude Code surfaces show Mermaid source raw or are unverified"}
+== Codex CLI
+{"client": "codex", "mermaid": false, "remote_viewer": false, "obsidian_vault": false, "reason": "Codex marker set; Codex Mermaid rendering is unverified"}
+== env -i
+{"client": "unknown", "mermaid": false, "remote_viewer": false, "obsidian_vault": false, "reason": "no known client marker; use markdown table plus ASCII"}
+== remote
+{"client": "claude-code-remote_mobile", "mermaid": false, "remote_viewer": true, "obsidian_vault": false, "reason": "CLAUDECODE=1; Claude Code surfaces show Mermaid source raw or are unverified; remote viewer attached, stay ASCII"}
