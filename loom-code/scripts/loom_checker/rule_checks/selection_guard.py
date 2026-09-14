@@ -148,20 +148,31 @@ def _under(path: Path, directory: Path) -> bool:
     return path == directory or directory in path.parents
 
 
+def _loom_dir(cwd: Path) -> Path | None:
+    """`<git common dir>/loom` of the repository at cwd; None when git fails."""
+    common = git_maybe(cwd, "rev-parse", "--git-common-dir") if cwd.is_dir() else None
+    return Path(os.path.realpath(cwd / common / "loom")) if common else None
+
+
 def guard_reason(payload: dict) -> str | None:
     """Why a PreToolUse payload is denied, or None when it passes."""
     tool_name = payload.get("tool_name")
     tool_input = payload.get("tool_input") or {}
     if not isinstance(tool_input, dict):
         return None
+    cwd = Path(str(payload.get("cwd") or os.getcwd()))
     if tool_name not in FILE_TOOLS:
-        return bash_guard_reason(str(tool_input.get("command", "")))
+        command = str(tool_input.get("command", ""))
+        reason = bash_guard_reason(command)
+        if reason is None and re.search(r"\.git|loom", str(cwd)) and _has_write_form(command):
+            loom_dir = _loom_dir(cwd)  # git runs only for a cwd that could be the store
+            if loom_dir and _under(Path(os.path.realpath(cwd)), loom_dir):
+                return "writes from a working directory inside the loom record directory"
+        return reason
     targets = file_targets(tool_input)
     if not targets:
         return None
-    cwd = Path(str(payload.get("cwd") or os.getcwd()))
-    common = git_maybe(cwd, "rev-parse", "--git-common-dir") if cwd.is_dir() else None
-    loom_dir = Path(os.path.realpath(cwd / common / "loom")) if common else None
+    loom_dir = _loom_dir(cwd)
     for target in targets:
         resolved = Path(os.path.realpath(cwd / os.path.expanduser(target)))
         if (loom_dir and _under(resolved, loom_dir)) or "/.git/loom" in f"{resolved}/":

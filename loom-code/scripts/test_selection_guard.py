@@ -126,6 +126,31 @@ def test_ordinary_commands_pass(command):
     assert selection_guard.bash_guard_reason(command) is None, command
 
 
+# --- Bash working directory ------------------------------------------------
+
+def bash_payload(cwd: Path, command: str) -> dict:
+    return {"tool_name": "Bash", "cwd": str(cwd), "tool_input": {"command": command}}
+
+
+def test_write_from_cwd_inside_loom_dir_is_denied(repo: Path):
+    """The Bash tool keeps its cwd: an earlier `cd` into the store must not
+    let a later relative write pass."""
+    loom = repo / ".git" / "loom"
+    (loom / "selections").mkdir(parents=True)
+    assert selection_guard.guard_reason(bash_payload(loom, "mv x selections/c.jsonl"))
+    assert selection_guard.guard_reason(bash_payload(loom / "selections", "cp x c.jsonl"))
+
+
+def test_read_from_cwd_inside_loom_dir_passes(repo: Path):
+    loom = repo / ".git" / "loom"
+    (loom / "selections").mkdir(parents=True)
+    assert selection_guard.guard_reason(bash_payload(loom, "ls selections/")) is None
+
+
+def test_write_from_ordinary_repo_cwd_passes(repo: Path):
+    assert selection_guard.guard_reason(bash_payload(repo, "mv x app/selections/c.json")) is None
+
+
 # --- file-writing tools ----------------------------------------------------
 
 def test_relative_write_under_common_dir_loom_is_denied(repo: Path):
