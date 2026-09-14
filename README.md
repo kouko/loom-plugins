@@ -86,45 +86,30 @@ points or run on demand.
 `decision-map` is for work whose whole route cannot be listed up front:
 
 ```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
 flowchart TD
-    dest["loom-workflow:decision-map<br/>MAP.md Destination + DA-n criteria"]
-    ticket["loom-workflow:decision-map<br/>ticket: grilling / research / prototype"]
-    fog["loom-workflow:decision-map<br/>Not-yet-specified (fog) F-n"]
-    grill["loom-design:capture-intent<br/>grilling discussion"]
-    close["loom-workflow:decision-map<br/>close and re-chart"]
-    decisions["loom-workflow:decision-map<br/>Decisions-so-far gist"]
-    oos["loom-workflow:decision-map<br/>Out-of-scope"]
-    intent["loom-workflow:decision-map<br/>intent carrying map: map-id"]
-    flow(["loom-design:capture-intent<br/>or loom-code:write-plan"])
-    clear(["loom-workflow:decision-map<br/>Map clear"])
+    subgraph dm["loom-workflow:decision-map"]
+        dest["Destination<br/>where the map should end up"]
+        fog["Fog<br/>what is still unknown"]
+        ticket["Ticket<br/>grill, research or prototype one unknown"]
+        log["Decisions so far"]
+    end
+    main(["Loom main flow<br/>loom-design:capture-intent"])
 
-    dest -->|"first tickets"| ticket
-    dest -->|"charting"| fog
-    fog -->|"graduates once<br/>graduated-from: F-n"| ticket
-    fog -.->|"moves intact"| oos
-    ticket -.->|"grilling"| grill
-    ticket --> close
-    close -->|"one gist"| decisions
-    close -.->|"exposed unknown"| fog
-    close -.->|"new ticket"| ticket
-    dest -->|"slice ready"| intent
-    intent --> flow
-    flow -.->|"map reads status"| dest
-    dest -->|"every DA satisfied"| clear
+    dest --> fog
+    fog -->|"pick one"| ticket
+    ticket -->|"record the answer"| log
+    ticket -.->|"new unknowns"| fog
+    dm -->|"a slice is ready: intent with map:"| main
 ```
 
-- An **Outcome Map** is a persistent loop that survives across sessions and
-  many delivery arcs. It lives at `docs/loom/maps/<map-id>/` as `MAP.md` plus a
-  `tickets/` directory.
-- Closing a ticket can also send an exposed unknown straight to out-of-scope.
-  A grilling ticket hands its discussion to `loom-design:capture-intent` when
-  that plugin is installed.
-- The intent goes to `loom-design:capture-intent`, or to `loom-code:write-plan`
-  without loom-design, and that station owns the change from there. The map
-  never owns a delivery ticket; it only reads the intent's status.
-- A map clears only when fog is empty, every ticket is closed or withdrawn, and
-  every Destination acceptance criterion is satisfied.
+The map, called an Outcome Map, lives at `docs/loom/maps/<map-id>/` as
+`MAP.md` plus a `tickets/` directory and persists across sessions. An unknown
+becomes a ticket only once or is moved out of scope, and a grilling ticket hands
+its discussion to `loom-design:capture-intent` when that plugin is installed.
+The intent goes to `loom-design:capture-intent` (or `loom-code:write-plan`
+without loom-design), which owns the delivered change while the map only reads
+its status; the map is clear once every Destination acceptance criterion is
+satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
