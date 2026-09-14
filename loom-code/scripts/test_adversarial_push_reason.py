@@ -85,9 +85,30 @@ HOSTILE = [
     "git -C /tmp/\udcff\udcfe push origin feature",
     "git -C ../relative push origin feature",
 ]
+# Short ids: pytest exports the node id via PYTEST_CURRENT_TEST, and Linux
+# rejects any single environment string over 131072 bytes (E2BIG) for every
+# child process, so a 200 KB parameter must never become part of the id.
+HOSTILE_IDS = [
+    "bash-c", "env-prefix", "assignment-prefix", "git-c-config", "force", "mirror",
+    "multiple-refspecs", "remote-url", "git-dir-env", "git-dir-option", "200kb-refspec",
+    "unterminated-quote", "non-utf8-dash-c", "relative-dash-c",
+]
 
 
-@pytest.mark.parametrize("command", HOSTILE)
+def test_push_reason_probe_ids_short_under_limit():
+    """Every parametrize id in this file stays under 1000 characters."""
+    assert len(HOSTILE_IDS) == len(HOSTILE)
+    ids = []
+    for value in list(globals().values()):
+        for mark in getattr(value, "pytestmark", []):
+            if mark.name != "parametrize":
+                continue
+            explicit = mark.kwargs.get("ids")
+            ids.extend(explicit if explicit is not None else [str(v) for v in mark.args[1]])
+    assert ids and all(len(i) < 1000 for i in ids), [len(i) for i in ids]
+
+
+@pytest.mark.parametrize("command", HOSTILE, ids=HOSTILE_IDS)
 def test_push_hook_hostile_variant_unattested_blocks(tmp_path, command):
     """Every hostile push variant exits 2 and every stderr line is a BLOCK line."""
     repo = _repo(tmp_path, "repo")
@@ -97,7 +118,7 @@ def test_push_hook_hostile_variant_unattested_blocks(tmp_path, command):
     assert all(line.startswith("BLOCK ") for line in err.splitlines()), err
 
 
-@pytest.mark.parametrize("command", HOSTILE)
+@pytest.mark.parametrize("command", HOSTILE, ids=HOSTILE_IDS)
 def test_push_hook_hostile_variant_attested_blocks(tmp_path, monkeypatch, command):
     """With a (monkeypatched) valid attestation, no hostile variant becomes an allow."""
     repo = _repo(tmp_path, "repo", attestations=1)
