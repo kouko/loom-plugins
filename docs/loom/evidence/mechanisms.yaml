@@ -88,9 +88,9 @@ mechanisms:
   - id: recap-state
     class: skill
     eval: "loom-workflow/scripts/test_recap_state_compaction.py"
-  - id: cot-explain
+  - id: loom-visualization
     class: skill
-    eval: "loom-workflow/scripts/test_cot_explain_compaction.py"
+    eval: "loom-workflow/scripts/test_loom_visualization_compaction.py"
   - id: distill-sessions
     class: skill
     eval: "loom-workflow/scripts/test_distill_sessions_compaction.py"
@@ -199,7 +199,7 @@ mechanisms:
   - {id: "tool:decision-map",        class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:handoff",             class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:recap-state",         class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:cot-explain",         class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:loom-visualization",  class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:distill-sessions",    class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:git-memory",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:independent-advisor", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}

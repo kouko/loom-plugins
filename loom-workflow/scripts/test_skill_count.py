@@ -22,13 +22,13 @@ SKILLS_DIR = REPO_ROOT / "loom-workflow" / "skills"
 MANIFEST = REPO_ROOT / "loom-code" / "contract" / "manifest.yaml"
 
 COUNTED = {
-    "cot-explain",
     "critique",
     "decision-map",
     "distill-sessions",
     "git-memory",
     "handoff",
     "independent-advisor",
+    "loom-visualization",
     "recap-state",
 }
 STANDALONE = {"goal-create", "dbt-model-style"}
