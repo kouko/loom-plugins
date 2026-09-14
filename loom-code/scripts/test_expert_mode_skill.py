@@ -99,6 +99,18 @@ def test_skill_procedure_maps_proposes_reports_withdraws_and_relapses() -> None:
     assert "recorded only when Review hands it to the checker" in flat
 
 
+def test_ordinary_conversation_reaches_the_same_procedure() -> None:
+    router = (PLUGIN_ROOT / "skills" / "using-loom-code" / "SKILL.md").read_text(encoding="utf-8")
+    sentence = affirmative(
+        router, "`loom_checker.py selection propose <change-id> --origin user`", ("follow",))
+    assert "asks in their own words to run or skip Loom steps" in sentence
+    assert "wait for the typed confirmation" in sentence
+    assert 'a plain "yes" binds nothing' in sentence
+
+    sentence = affirmative(_skill(), "from ordinary conversation", ("applies",))
+    assert "the user still types the confirmation" in sentence
+
+
 # --- Acceptance 4 -----------------------------------------------------------
 
 def _git(repo: Path, *args: str) -> str:

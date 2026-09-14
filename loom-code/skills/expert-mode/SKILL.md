@@ -8,7 +8,9 @@ disable-model-invocation: true
 # Expert mode
 
 Talk to the user in the user's language. This skill proposes, shows and
-reports; the checker decides what is skipped.
+reports; the checker decides what is skipped. The same procedure applies when
+a station reaches it from ordinary conversation, such as "這次不用 review": the
+agent reads this file, and the user still types the confirmation.
 
 Checker prefix: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py` on
 Claude Code, `python3 <injected loom-code plugin root>/scripts/loom_checker.py`
