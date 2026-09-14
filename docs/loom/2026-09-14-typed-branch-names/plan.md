@@ -21,12 +21,12 @@ charter: 1.0
 **W1-02 Typed branch in station prose**  after: W1-01  acceptance: 1, 3, 4, 6
 - Files: loom-code/skills/write-plan/SKILL.md, loom-design/skills/capture-intent/SKILL.md
 - Test: A1 positive: write-plan-names-typed-branch-and-types; negative: write-plan-bare-switch-absent. A3 positive: capture-intent-names-typed-branch; negative: capture-intent-bare-branch-absent. A4 positive: repo-grep-no-bare-branch; negative: changelog-history-excluded. A6 positive: package-suite-pass; negative: station-text-test-regression.
-- Risk: agent-decided — allowed types are feat, fix, docs, refactor, test, chore, matching this repo's commit history; agent picks one and reuses it in commit and PR titles.
+- Risk: agent-decided — allowed types are feat, fix, docs, refactor, test, chore, ci, matching implementer.md; the agent picks one and applies it to the branch prefix and PR title.
 
 ## Questions asked
 ① — consequence — 回答「對」就表示你同意：review 和發布前檢查都通過後，agent 會自動 push，並開一個 Ready 狀態的 PR。merge 還是會另外問你。
 ① — what — 以上都對嗎？
 
 ## Risks
-1. agent-decided — this worktree's branch `branch-name` is renamed to `feat/2026-09-14-typed-branch-names` before the plan commit so the change dogfoods the new form; the worktree directory keeps its old name.
+1. agent-decided — the change branch was created as `feat/2026-09-14-typed-branch-names` per write-plan Step 6 (the worktree's placeholder branch `branch-name` was never a change branch); the worktree directory keeps its old name.
 2. The installed plugin cache still carries the old wording until a release; out of scope per intent.
