@@ -1,4 +1,4 @@
-# Kickoff Defaults — monkey-skills
+# Kickoff Defaults — loom-plugins
 
 <!-- One line per key, grammar `- <key>: <value> — <reason> (<date>)`.
 Keys are declared in loom-code/contract/manifest.yaml `kickoff_defaults`;
