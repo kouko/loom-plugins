@@ -101,6 +101,7 @@ charter: 1.0
 ① — what — 第 3 條驗收寫著「loom 的檢查程式接受盲跑報告」，但 loom 目前沒有任何規則在檢查盲跑報告，所以這半句永遠證明不了。你要怎麼處理？（答：改驗收說法）
 ① — consequence — 被 push 閘門擋下時，一般人打的 `git push` 看到的第一個理由是「指令必須用標準全引號寫法」，看不出真正缺的是審查紀錄。要改嗎？（這個訊息三個平台共用，擋不擋的判斷不會變，只改看到的文字）（答：改，三平台都先說缺審查）
 ① — consequence — 審查發現：第一輪對抗測試後，我們讓 push 閘門「不分大小寫」辨認 `git`／`gh`，所以現在 `GIT push`、`Gh pr create` 這類寫法在 Claude Code 和 Codex 上也會被擋（以前會放行）。這違反了你先前定的「哪些 push 會被擋不變」。在 macOS 上檔名不分大小寫，`GIT push` 其實真的會推送成功，所以舊行為是個漏洞。要怎麼處理？（答：保留，三平台都擋）
+① — consequence — CI 失敗只是測試本身的問題（測試名稱太長、超過 Linux 環境變數長度限制）；真正的 push 閘門在本機遇到同樣 20 萬字元的指令會正確擋下（2 秒）。修法是把那個測試的名稱改短，但這輪審查的版本額度用完了，要修就得請你再確認一次 intent（內容不變），開一輪新審查。要這樣做嗎？（答：是，重新確認並修）
 
 ## Risks
 1. user-decided — review station renamed closing-review on all hosts with no alias, because agy de-duplicates skills by short name and an alias would collide again.
