@@ -60,8 +60,8 @@ def test_entrypoint_preserves_scope_structure_and_self_check():
         "final self-check": [
             "After writing / editing",
             "checklists/dbt-model-self-check.md",
-            "python scripts/validate_header.py models/",
-            "python scripts/validate_header.py --manifest target/manifest.json models/",
+            "python <skill-dir>/scripts/validate_header.py models/",
+            "python <skill-dir>/scripts/validate_header.py --manifest target/manifest.json models/",
             "Ship / open the PR only after it passes.",
         ],
     }

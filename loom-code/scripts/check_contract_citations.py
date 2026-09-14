@@ -323,18 +323,52 @@ def lacks_other_host_fallback(text: str) -> bool:
     return True
 
 
-def scan_plugin_root_fallbacks(repo_root: Path) -> list[str]:
-    """Repo-root-relative posix paths of scoped files (citation scope plus the
-    plugin `references/` directories) that lack the fallback."""
+def _runtime_prose_files(repo_root: Path) -> list[Path]:
+    """Citation scope plus the plugin `references/` directories, sorted."""
     files = set(iter_scope_files(repo_root))
     for rel_dir in _FALLBACK_EXTRA_DIRS:
         base = repo_root / rel_dir
         if base.is_dir():
             files.update(base.glob("*.md"))
+    return sorted(files)
+
+
+def scan_plugin_root_fallbacks(repo_root: Path) -> list[str]:
+    """Repo-root-relative posix paths of scoped files (citation scope plus the
+    plugin `references/` directories) that lack the fallback."""
     return [
         path.relative_to(repo_root).as_posix()
-        for path in sorted(files)
+        for path in _runtime_prose_files(repo_root)
         if lacks_other_host_fallback(path.read_text(encoding="utf-8"))
+    ]
+
+
+# An interpreter run on a `scripts/` path with no anchor resolves against the
+# agent's working directory, not the skill folder, on every host. Anchored
+# forms (`<skill-dir>/scripts/...`, `${CLAUDE_SKILL_DIR}/scripts/...`) never
+# match: the path must start at `scripts/` or `./scripts/`. Fenced code is
+# scanned too — agents copy commands out of fences. No debt list.
+_BARE_SCRIPT_RE = re.compile(
+    r"(?<![\w-])(?:python3?|bash|sh)[ \t]+(?:\./)?scripts/", re.IGNORECASE
+)
+
+
+def find_bare_script_paths(text: str) -> list[int]:
+    """1-based line numbers in `text` running a bare `scripts/` path."""
+    return [
+        number
+        for number, line in enumerate(text.splitlines(), start=1)
+        if _BARE_SCRIPT_RE.search(line)
+    ]
+
+
+def scan_bare_script_paths(repo_root: Path) -> list[str]:
+    """`path:line` entries, over the fallback scope, that run a bare
+    `scripts/` path."""
+    return [
+        f"{path.relative_to(repo_root).as_posix()}:{number}"
+        for path in _runtime_prose_files(repo_root)
+        for number in find_bare_script_paths(path.read_text(encoding="utf-8"))
     ]
 
 
@@ -383,6 +417,16 @@ def main(argv: list[str] | None = None) -> int:
                 f"PLUGIN ROOT WITHOUT OTHER-HOST FALLBACK: {rel_path} names "
                 f"{PLUGIN_ROOT_TOKEN} but no prose clause says "
                 f"'{OTHER_HOST_MARKER}' with where the plugin root is",
+                file=sys.stderr,
+            )
+        return 1
+
+    bare_scripts = scan_bare_script_paths(repo_root)
+    if bare_scripts:
+        for location in bare_scripts:
+            print(
+                f"BARE BUNDLED-SCRIPT PATH: {location} runs scripts/ relative "
+                "to the working directory; anchor it as <skill-dir>/scripts/",
                 file=sys.stderr,
             )
         return 1

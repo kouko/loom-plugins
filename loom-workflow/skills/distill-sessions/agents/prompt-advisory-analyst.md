@@ -116,7 +116,7 @@ consult any external resource beyond these three inputs.
 
 6. **Prioritize action steps (3-5).** Recommend what to do first,
    what to defer, with rough effort estimates. Frame in `{{lang}}`;
-   wrap any concrete command lines (e.g. `python scripts/apply.py
+   wrap any concrete command lines (e.g. `python <skill-dir>/scripts/apply.py
    --approved ...`) in code blocks.
 
 ## Output template — exact 7-section structure
@@ -212,7 +212,7 @@ backticks) so the operator can copy-paste without reformatting:
   insert / replace).
 - Suggested CLAUDE.md candidate lines (the verbatim rule to add to
   CLAUDE.md).
-- Command lines (e.g. `python scripts/apply.py --approved ...`,
+- Command lines (e.g. `python <skill-dir>/scripts/apply.py --approved ...`,
   `pytest scripts/...`, `git ...`).
 - File paths in `path/to/file.md` form when the operator would paste
   the path into a tool / editor.

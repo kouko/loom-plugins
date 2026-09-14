@@ -13,6 +13,9 @@ SKILL.md proposals. The default target preset is `loom-code:*`; use
 `--target-skill-pattern` for another scope. This is post-hoc evidence mining,
 not real-time coaching or new-skill discovery.
 
+`<skill-dir>` is this skill's folder: `${CLAUDE_SKILL_DIR}` on Claude Code;
+on any other host, the directory that holds this SKILL.md.
+
 ## When to use
 
 Use this skill after several changes to a skill family, before a skill
@@ -36,7 +39,7 @@ Do not use it for:
 When the user names no target, run only the local Stage 1 preview:
 
 ```bash
-python scripts/main.py --target-skill-pattern 'loom-code:*'
+python <skill-dir>/scripts/main.py --target-skill-pattern 'loom-code:*'
 ```
 
 Show the stderr summary (top skills and per-session friction) verbatim. Then
@@ -76,7 +79,7 @@ participate through the friction heuristic.
 ### 1. Ingest, detect, and rank
 
 ```bash
-python scripts/main.py \
+python <skill-dir>/scripts/main.py \
   --target-skill-pattern 'loom-code:*' \
   [--config path/to/override.json] \
   [--top-n 5] \
@@ -126,7 +129,7 @@ changing configuration thresholds, or diagnosing folder/runtime failures.
 ### 4. Render proposals
 
 ```bash
-python scripts/propose.py \
+python <skill-dir>/scripts/propose.py \
   --input merged.json \
   --target-skill /path/to/target/SKILL.md \
   --output docs/skill-mining/<date>-<target>-proposals.md
@@ -148,7 +151,7 @@ The user must complete a Human review of each proposed addition and
 modification. Only after explicit approval run:
 
 ```bash
-python scripts/apply.py \
+python <skill-dir>/scripts/apply.py \
   --proposal docs/skill-mining/<date>-<target>-proposals.md \
   --target-skill /path/to/target/SKILL.md \
   --approved
@@ -172,7 +175,7 @@ After `merged.json` exists, a cross-target report can complement per-target
 proposals:
 
 ```bash
-python scripts/report.py \
+python <skill-dir>/scripts/report.py \
   --input merged.json \
   --lang zh-TW \
   [--output docs/skill-mining/<date>-advisory-report.md] \
