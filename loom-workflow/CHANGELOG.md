@@ -6,6 +6,19 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [5.2.0] — 2026-09-14 — Codex visualization-card hook
 
+- `loom-visualization`, `goal-create`, `distill-sessions` and
+  `dbt-model-style` now run their bundled scripts from the skill directory
+  on every host, so a command no longer fails when the working directory is
+  the user's repository.
+- The contract lint now rejects a bare `scripts/` command in skill docs, so
+  a command that only resolves from the skill folder cannot ship again.
+- agy now receives the loom-visualization trigger card as a generated
+  plugin `rules/AGENTS.md`.
+- Codex now receives the same trigger card through a SessionStart hook once
+  the user trusts the plugin's hooks.
+- `distill-sessions` passes `skill_dir` to the advisory analyst, in its
+  SKILL.md and in both host dispatch templates, so the report's command
+  lines use the real skill path instead of a guessed one.
 - The Codex SessionStart hook in `hooks/hooks-codex.json` is now part of the
   counted mechanism population as
   `SessionStart:startup|clear|compact:visualization-card@codex`; the net

@@ -24,8 +24,8 @@ instruction names multiple agents.
 ## Stage 5c single dispatch (`agents/prompt-advisory-analyst.md`)
 
 `spawn_agent` with `agents/prompt-advisory-analyst.md`'s content as the
-agent's instructions plus the `merged_data`/`lang`/`date_str` JSON as its
-input, then `wait_agent` for the result, then `close_agent`.
+agent's instructions plus the `dispatch_payload.input` JSON (`merged_data`,
+`lang`, `date_str`, `skill_dir`) as its input, then `wait_agent` for the result, then `close_agent`.
 
 ### Model selection
 

@@ -411,6 +411,20 @@ def test_skill_md_advisory_dispatch_names_skill_dir_key() -> None:
     )
 
 
+@pytest.mark.parametrize("host_file", ["claude-code-tools.md", "codex-tools.md"])
+def test_host_advisory_dispatch_template_passes_skill_dir(host_file: str) -> None:
+    """Each host's Stage 5c template must pass skill_dir to the analyst."""
+    text = (SKILL_ROOT / "references" / host_file).read_text(encoding="utf-8")
+    start = text.find("## Stage 5c single dispatch")
+    assert start != -1, f"{host_file}: missing Stage 5c dispatch section"
+    end = text.find("\n## ", start + 1)
+    section = text[start : end if end != -1 else len(text)]
+    assert "skill_dir" in section and "dispatch_payload.input" in section, (
+        f"{host_file}: Stage 5c dispatch must pass dispatch_payload.input "
+        "including `skill_dir`"
+    )
+
+
 def test_both_prompts_forbid_orchestrator_memory_reference() -> None:
     """Regression guard for v0.2 Finding #3 (orchestrator memory leak).
 
