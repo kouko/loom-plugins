@@ -20,7 +20,7 @@ STATIONS = {
     "write-spec": "loom-design",
     "write-plan": "loom-code",
     "build": "loom-code",
-    "review": "loom-code",
+    "closing-review": "loom-code",
     "ship": "loom-code",
     "maintain": "loom-code",
 }
@@ -217,3 +217,48 @@ def test_intent_contract_declares_machine_readable_publication_authorization(man
     assert publication["grammar"] == (
         "automatic — authorized <YYYY-MM-DD> by <name>"
     )
+
+
+def test_manifest_station_equals_closing_review_folder(manifest):
+    """Antigravity CLI de-duplicates skills by short name, so the closing
+    review station and its skill folder are both `closing-review`; no skill
+    or alias named `review` may remain."""
+    names = {s["name"] for s in manifest["stations"]}
+    assert "closing-review" in names
+    assert "review" not in names
+    skills = REPO / "loom-code" / "skills"
+    assert (skills / "closing-review" / "SKILL.md").is_file()
+    assert not (skills / "review").exists()
+    frontmatter = (skills / "closing-review" / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[0]
+    assert re.search(r"^name: closing-review$", frontmatter, re.MULTILINE)
+    for action in manifest["actions"]:
+        assert action["owner"] != "review", action["name"]
+
+
+def test_no_loom_code_review_invocation_remains():
+    stale = re.compile(r"loom-code:review\b(?!-)|loom-code/skills/review/|\.\./review/SKILL\.md|skills/review/SKILL\.md")
+    roots = [REPO / "README.md"] + [
+        path
+        for plugin in ("loom-code", "loom-design", "loom-workflow")
+        for sub in ("skills", "agents", "scripts", "hooks", "contract")
+        for path in (REPO / plugin / sub).rglob("*")
+        if path.is_file() and path.suffix in {".md", ".py", ".yaml", ".json", ""}
+    ] + list((REPO / "loom-code").glob("README*.md"))
+    this_file = Path(__file__).resolve()
+    hits = [
+        f"{path.relative_to(REPO)}:{n}"
+        for path in roots
+        if path.resolve() != this_file
+        for n, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1)
+        if stale.search(line)
+    ]
+    assert not hits, hits
+
+
+def test_finalize_review_command_and_gate_ids_unchanged():
+    """Internal ids keep their names: only the station and skill were renamed."""
+    checker = (REPO / "loom-code" / "scripts" / "loom_checker.py").read_text(encoding="utf-8")
+    assert '"finalize-review": cmd_finalize_review' in checker
+    station = (REPO / "loom-code" / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8")
+    for marker in ("review.atomic-claude-dispatch", "review.bounded-episode"):
+        assert f"<!-- gate: {marker} -->" in station

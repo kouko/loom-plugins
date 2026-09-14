@@ -141,6 +141,63 @@ def test_hook_dir_commands_resolve_to_existing_files(hooks):
             assert (REPO / "loom-code" / rel).is_file(), command
 
 
+AGY_HOOKS_JSON = REPO / "loom-code" / "hooks.json"
+AGY_EVENTS = {"PreToolUse", "PostToolUse", "PreInvocation", "PostInvocation", "Stop"}
+AGY_GROUPED_EVENTS = {"PreToolUse", "PostToolUse"}
+
+
+@pytest.fixture(scope="module")
+def agy_hooks() -> dict:
+    """Antigravity CLI reads ``<plugin-root>/hooks.json``: top level keyed by
+    hook name, then event; commands run via ``sh -c`` from the plugin root."""
+    return json.loads(AGY_HOOKS_JSON.read_text(encoding="utf-8"))
+
+
+def _agy_handlers(agy_hooks: dict):
+    for events in agy_hooks.values():
+        for event, entries in events.items():
+            for entry in entries:
+                handlers = entry["hooks"] if event in AGY_GROUPED_EVENTS else [entry]
+                yield event, entry, handlers
+
+
+def test_agy_hooks_use_agy_schema(agy_hooks):
+    assert "hooks" not in agy_hooks
+    for events in agy_hooks.values():
+        assert set(events) <= AGY_EVENTS
+        for event, entries in events.items():
+            for entry in entries:
+                if event in AGY_GROUPED_EVENTS:
+                    assert set(entry) == {"matcher", "hooks"}
+                else:
+                    assert entry["type"] == "command"
+
+
+def test_agy_hooks_wire_push_gate_and_pre_invocation(agy_hooks):
+    wired = {
+        (event, entry.get("matcher", ""), handler["command"])
+        for event, entry, handlers in _agy_handlers(agy_hooks)
+        for handler in handlers
+    }
+    assert wired == {
+        ("PreToolUse", "run_command", "python3 ./hooks/agy_adapter.py push-gate"),
+        ("PreInvocation", "", "python3 ./hooks/agy_adapter.py pre-invocation"),
+    }
+
+
+def test_agy_hooks_carry_no_host_root_variable(agy_hooks):
+    text = AGY_HOOKS_JSON.read_text(encoding="utf-8")
+    assert "${CLAUDE_PLUGIN_ROOT}" not in text
+    assert "${PLUGIN_ROOT}" not in text
+
+
+def test_agy_hook_commands_resolve_to_existing_files(agy_hooks):
+    for _event, _entry, handlers in _agy_handlers(agy_hooks):
+        for handler in handlers:
+            rel = handler["command"].split("./", 1)[1].split()[0]
+            assert (REPO / "loom-code" / rel).is_file(), handler["command"]
+
+
 def test_codex_manifest_selects_only_codex_hooks():
     manifest = json.loads(
         (REPO / "loom-code/.codex-plugin/plugin.json").read_text(encoding="utf-8")

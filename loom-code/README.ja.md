@@ -22,8 +22,8 @@ flowchart TD
     spec["needs-design: yes のときだけ<br/>loom-design:write-spec<br/>② product の変更: 目に見える振る舞いを確認する"]
     plan["loom-code:write-plan<br/>plan.md のタスク DAG"]
     build["loom-code:build<br/>テストファースト、タスクごとに implementer 1 つ"]
-    review["loom-code:review<br/>fresh-context のレビュアー<br/>必要なら盲検と adversary"]
-    attest[["attestation を生成<br/>loom-code:review による"]]
+    review["loom-code:closing-review<br/>fresh-context のレビュアー<br/>必要なら盲検と adversary"]
+    attest[["attestation を生成<br/>loom-code:closing-review による"]]
     ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは盲検レポートで"]
     merged(["マージは別手順<br/>loom-code:ship の後、あなた自身の許可で"])
     maintain["loom-code:maintain<br/>バグ・アラート・リグレッション・障害"]
@@ -48,7 +48,7 @@ flowchart TD
   `loom-design:write-spec`、または code のみのインストールでは `write-plan` の
   最小 spec。
 - **ビルドとレビュー** — `build` は全タスクに implementer を割り当て、テストから
-  書きます。`review` はクロージングレビューを 1 回行います。`NEEDS_REVISION` は
+  書きます。`closing-review` はクロージングレビューを 1 回行います。`NEEDS_REVISION` は
   指摘を `build` に戻し、合格した証拠は、レビューされた機能内容に結び付く
   attestation として生成されます。
 - **Ship** — ブランチを push し、PR を開き、必須チェックを確認します（③）。
@@ -63,7 +63,7 @@ flowchart TD
 |---|---|
 | [`write-plan`](skills/write-plan/SKILL.md) | 確認済みの intent を `docs/loom/<change-id>/plan.md` に変える：ファイル、担当する Acceptance 行、テストケース、リスクを持つ wave 分けされたタスク。`loom-design` がなければ ① を自分で行う。 |
 | [`build`](skills/build/SKILL.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装する。 |
-| [`review`](skills/review/SKILL.md) | クロージングレビュー（レビュアー、必要に応じて盲検と敵対プログラム）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
+| [`closing-review`](skills/closing-review/SKILL.md) | クロージングレビュー（レビュアー、必要に応じて盲検と敵対プログラム）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
 | [`ship`](skills/ship/SKILL.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
 | [`maintain`](skills/maintain/SKILL.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
@@ -77,9 +77,9 @@ flowchart TD
 | Agent | 派遣元 | 役割 |
 |---|---|---|
 | [`implementer`](agents/implementer.md) | `build` | 1 タスク：失敗するテストを先に書き、1 コミット、状態レポート — verdict は出さない。 |
-| [`reviewer`](agents/reviewer.md) | `review` | fresh-context の verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）と位置付きの指摘。レビュー対象は編集しない。 |
-| [`blind-runner`](agents/blind-runner.md) | `review` | クリーンな環境で変更を動かして全 Acceptance 行を確かめ、`docs/loom/<change-id>/blind-run-report.md` を書く。 |
-| [`adversary`](agents/adversary.md) | `review` | 変更を壊しにいく — mutation や fuzz ツール、または実行可能な悪用・境界ケース 3 つ以上 — そしてすべての試行を probe として記録する。 |
+| [`reviewer`](agents/reviewer.md) | `closing-review` | fresh-context の verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）と位置付きの指摘。レビュー対象は編集しない。 |
+| [`blind-runner`](agents/blind-runner.md) | `closing-review` | クリーンな環境で変更を動かして全 Acceptance 行を確かめ、`docs/loom/<change-id>/blind-run-report.md` を書く。 |
+| [`adversary`](agents/adversary.md) | `closing-review` | 変更を壊しにいく — mutation や fuzz ツール、または実行可能な悪用・境界ケース 3 つ以上 — そしてすべての試行を probe として記録する。 |
 
 レビュアーの人数は agent が選ぶのではありません。`loom_checker.py
 reviewer-count` がブランチ全体の差分から計算します — 狭く低リスクな変更なら
@@ -176,6 +176,37 @@ codex plugin list
 task が保持している version 付き hook path を削除する場合があります。成功後は、
 別の tool や command を実行する前に Codex を直ちに再起動してください。先に
 plugin を削除しても、同じ path 不在期間が早く始まるだけなので行いません。
+
+### Antigravity CLI
+
+Antigravity CLI（`agy`）はローカルのディレクトリから plugin をインストール
+します。repo を clone し、`loom-code` を兄弟 plugin より先に入れます。
+インストール前に `agy plugin list` で Claude Code から取り込まれた同名の plugin が
+ないか確認してください。install はその取り込み済みのコピーを置き換え、後の
+`agy plugin uninstall` はそれを削除します。
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin validate ./loom-code
+agy plugin install ./loom-code
+agy plugin list
+```
+
+使うときは、プロジェクトのディレクトリでプロジェクトを絶対パスで workspace に追加して
+`agy` を起動します：`agy --add-dir "$PWD"`（対話）または
+`agy --add-dir "$PWD" -p "..."`（print モード）。agy 1.2.2 は `.` のような相対パスを
+受け付けません。`--add-dir` がないと print モード（`agy -p`）では agy は workspace を
+持たないため、loom の kickoff defaults が読み込まれず、agent がプロジェクトの外で
+作業することがあります。対話モードでも指定してください。
+
+更新は clone で `git pull` してから install を再実行します（install は
+インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
+です。hook（publication gate・session context・言語リマインダー）が走るのは `agy` CLI だけで、
+Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では loom の役割
+（implementer・reviewer・adversary・blind-runner）は、loom の agent 契約に従う
+agy の `self` subagent として Gemini モデルで動きます。review station は
+どの host でも `closing-review` で、旧名 `review` は別名なしで削除されました。
 
 ## ライセンス
 

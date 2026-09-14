@@ -21,7 +21,8 @@ Draw one C4 level per diagram: context (systems and people), container
 
 ## ASCII
 
-Run `python3 scripts/generate.py arch` with this input on stdin. The layer
+Run `python3 <skill-dir>/scripts/generate.py arch` (`<skill-dir>` is defined
+in `SKILL.md`) with this input on stdin. The layer
 bands carry no arrows; state the dependencies in the table or below the diagram.
 
 ```json

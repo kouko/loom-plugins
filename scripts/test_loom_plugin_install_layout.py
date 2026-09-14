@@ -78,6 +78,103 @@ def _install_plugin(source_name: str, destination: Path) -> Path:
     return installed_root
 
 
+LOOM_PLUGINS = ("loom-code", "loom-design", "loom-workflow")
+
+
+def _install_agy_plugin(source_name: str, plugins_dir: Path) -> Path:
+    """Mirror `agy plugin install <dir>`: copy to <plugins>/<name>/, no version dir."""
+    manifest = json.loads(
+        (REPO_ROOT / source_name / "plugin.json").read_text(encoding="utf-8")
+    )
+    installed_root = plugins_dir / manifest["name"]
+    shutil.copytree(REPO_ROOT / source_name, installed_root)
+    return installed_root
+
+
+def _skill_short_names(plugin_root: Path) -> list[str]:
+    return sorted(p.parent.name for p in plugin_root.glob("skills/*/SKILL.md"))
+
+
+def _agy_visible_skills(plugins_dir: Path) -> set[tuple[str, str]]:
+    """agy de-duplicates skills by SHORT name: a clash hides the skill."""
+    owners: dict[str, list[str]] = {}
+    for plugin_root in sorted(p for p in plugins_dir.iterdir() if p.is_dir()):
+        for short in _skill_short_names(plugin_root):
+            owners.setdefault(short, []).append(plugin_root.name)
+    return {(plugins[0], short) for short, plugins in owners.items() if len(plugins) == 1}
+
+
+def test_agy_install_every_skill_folder_discoverable(tmp_path: Path) -> None:
+    """A2 positive: each plugin installs with a root manifest; every skill is
+    present and its short name unique across the three loom plugins."""
+    plugins_dir = tmp_path / "gemini" / "config" / "plugins"
+    expected: set[tuple[str, str]] = set()
+    for name in LOOM_PLUGINS:
+        root = _install_agy_plugin(name, plugins_dir)
+        assert root == plugins_dir / name
+        agy_manifest = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
+        assert re.fullmatch(r"[a-zA-Z0-9-_]+", agy_manifest["name"])
+        skills = _skill_short_names(root)
+        assert skills == sorted(
+            p.name for p in (REPO_ROOT / name / "skills").iterdir() if p.is_dir()
+        ), f"{name}: a skill folder lacks SKILL.md"
+        for short in skills:
+            text = (root / "skills" / short / "SKILL.md").read_text(encoding="utf-8")
+            assert re.search(rf"^name:\s*{re.escape(short)}\s*$", text, re.M), short
+            expected.add((name, short))
+
+    assert _agy_visible_skills(plugins_dir) == expected
+
+
+def test_agy_closing_review_visible_beside_foreign_review_skill(tmp_path: Path) -> None:
+    """A2 boundary: a foreign plugin's `review` cannot hide the review station."""
+    plugins_dir = tmp_path / "plugins"
+    for name in LOOM_PLUGINS:
+        _install_agy_plugin(name, plugins_dir)
+    foreign = plugins_dir / "foreign-reviewer" / "skills" / "review"
+    foreign.mkdir(parents=True)
+    (foreign / "SKILL.md").write_text(
+        "---\nname: review\ndescription: foreign\n---\n", encoding="utf-8"
+    )
+
+    code_skills = _skill_short_names(plugins_dir / "loom-code")
+    assert "closing-review" in code_skills and "review" not in code_skills
+    visible = _agy_visible_skills(plugins_dir)
+    assert ("loom-code", "closing-review") in visible
+    for name in LOOM_PLUGINS:
+        for short in _skill_short_names(plugins_dir / name):
+            assert (name, short) in visible, f"{name}:{short} hidden by a clash"
+
+
+def test_claude_and_codex_ignore_root_manifest(tmp_path: Path) -> None:
+    """A8 negative (structural): the Claude and Codex installs still resolve
+    their own manifests and hook files; neither references the root agy files."""
+    for name in LOOM_PLUGINS:
+        root = _install_plugin(name, tmp_path / "cache")
+        assert (root / "plugin.json").is_file()
+        agy_manifest = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
+        claude = _manifest(root)
+        codex = json.loads(
+            (root / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
+        )
+        # The root manifest carries no host wiring a Claude/Codex loader could adopt.
+        assert set(agy_manifest) <= {"name", "version", "description"}
+        for host_manifest in (claude, codex):
+            refs = [v for v in host_manifest.values() if isinstance(v, str) and v.startswith("./")]
+            for ref in refs:
+                assert (root / ref).resolve() not in {
+                    (root / "plugin.json").resolve(),
+                    (root / "hooks.json").resolve(),
+                }, f"{name}: host manifest points at a root agy file: {ref}"
+        if (root / "hooks").is_dir() and (root / "hooks" / "hooks.json").exists():
+            # Claude's hooks stay at the conventional hooks/hooks.json.
+            assert "hooks" in json.loads(
+                (root / "hooks" / "hooks.json").read_text(encoding="utf-8")
+            )
+        if "hooks" in codex:
+            assert codex["hooks"] == "./hooks/hooks-codex.json"
+
+
 def _manifest(plugin_root: Path) -> dict[str, object]:
     return json.loads(
         (plugin_root / ".claude-plugin" / "plugin.json").read_text(
@@ -505,6 +602,83 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
             )
 
 
+def test_sibling_lookup_allows_version_subdirectory() -> None:
+    """Every design station that locates `loom-code` by host covers the
+    non-Claude hosts too. Claude and Codex caches hold `<name>/<version>/`;
+    Antigravity CLI installs `<name>/` with no version directory, so the
+    other-host row must allow, not require, one version subdirectory."""
+    design_skills = REPO_ROOT / "loom-design" / "skills"
+    lookups = 0
+    for skill_md in sorted(design_skills.glob("*/SKILL.md")):
+        text = skill_md.read_text(encoding="utf-8")
+        if "| Where `loom-code` lives |" not in text:
+            continue
+        lookups += 1
+        rows = [line for line in text.splitlines() if line.startswith("| ")]
+        other = [
+            row
+            for row in rows
+            if "Codex CLI" in row and "Antigravity CLI" in row
+        ]
+        assert len(other) == 1, f"{skill_md} lacks one Codex/Antigravity row"
+        row = " ".join(other[0].split())
+        assert "on any other host" in row, skill_md
+        assert "two levels above this SKILL.md" in row, skill_md
+        assert "may contain one version subdirectory" in row, skill_md
+        assert "use the newest" in row, skill_md
+    assert lookups == 4
+
+
+# The version step every other-host row must carry: Codex installs
+# `<mkt>/loom-design/<version>/`, so two levels above SKILL.md is the version
+# directory, not the plugin root.
+VERSION_STEP = "if its parent directory is named `loom-design`"
+
+
+def _resolve_loom_code_by_row(skill_md: Path) -> Path:
+    """The other-host row, executed: two levels above SKILL.md; step up once
+    when that directory's parent is named `loom-design`; `loom-code` sits next
+    to it and may hold version subdirectories — take the newest."""
+    root = skill_md.parents[2]
+    if root.parent.name == "loom-design":
+        root = root.parent
+    code = root.parent / "loom-code"
+    versions = [p for p in code.iterdir() if p.is_dir() and re.fullmatch(r"\d+(\.\d+)*", p.name)]
+    if not versions:
+        return code
+    return max(versions, key=lambda p: tuple(int(x) for x in p.name.split(".")))
+
+
+def test_sibling_lookup_resolves_flat_and_versioned_installs(tmp_path: Path) -> None:
+    flat = tmp_path / "plugins"
+    versioned = tmp_path / "cache" / "loom"
+    layouts = {
+        flat / "loom-design" / "skills" / "capture-intent" / "SKILL.md": flat / "loom-code",
+        versioned / "loom-design" / "2.1.5" / "skills" / "capture-intent" / "SKILL.md":
+            versioned / "loom-code" / "3.1.4",
+    }
+    for version in ("3.0.0", "3.1.4"):
+        checker = versioned / "loom-code" / version / "scripts" / "loom_checker.py"
+        checker.parent.mkdir(parents=True)
+        checker.write_text("")
+    (flat / "loom-code" / "scripts").mkdir(parents=True)
+    (flat / "loom-code" / "scripts" / "loom_checker.py").write_text("")
+    for skill_md, expected in layouts.items():
+        skill_md.parent.mkdir(parents=True)
+        skill_md.write_text("")
+        resolved = _resolve_loom_code_by_row(skill_md)
+        assert resolved == expected, skill_md
+        assert (resolved / "scripts" / "loom_checker.py").is_file()
+
+    rows = 0
+    for skill_md in sorted((REPO_ROOT / "loom-design" / "skills").glob("*/SKILL.md")):
+        for line in skill_md.read_text(encoding="utf-8").splitlines():
+            if line.startswith("| Codex CLI, Antigravity CLI |"):
+                rows += 1
+                assert VERSION_STEP in " ".join(line.split()), skill_md
+    assert rows == 4
+
+
 def test_isolated_loom_workflow_bundle_contains_required_skills_and_executes(
     tmp_path: Path,
 ) -> None:
@@ -827,3 +1001,154 @@ def test_isolated_loom_memory_boundary_check_rejects_sibling_paths(tmp_path: Pat
         assert any("sibling internal path" in v for v in violations)
     finally:
         probe.unlink()
+
+
+# ---------- loom-workflow trigger card per host (W2-02) ----------
+
+CARD_SCRIPT = "hooks/visualization-card"
+TOOLKIT_KEY = "ascii-graph-toolkit@monkey-skills"
+
+
+def _codex_card_command_problems(command: object) -> list[str]:
+    """Why a Codex SessionStart command cannot deliver the card; [] when it can."""
+    if not isinstance(command, str):
+        return ["command is not a string"]
+    problems = []
+    if "${PLUGIN_ROOT}/" + CARD_SCRIPT not in command:
+        problems.append("does not run the card script through ${PLUGIN_ROOT}")
+    if "${CLAUDE_PLUGIN_ROOT}" in command:
+        problems.append("references ${CLAUDE_PLUGIN_ROOT}")
+    return problems
+
+
+def _card_commands(hooks: dict) -> list[str]:
+    return [
+        h["command"]
+        for group in hooks.get("SessionStart", [])
+        for h in group["hooks"]
+        if h.get("type") == "command" and CARD_SCRIPT in h.get("command", "")
+    ]
+
+
+def _run_hook_command(command: str, env_root: str, root: Path, home: Path, cwd: Path):
+    env = {
+        k: v
+        for k, v in os.environ.items()
+        if k not in {"PLUGIN_ROOT", "CLAUDE_PLUGIN_ROOT", "CLAUDE_CONFIG_DIR", "CLAUDE_PROJECT_DIR"}
+    }
+    env.update({"HOME": str(home), env_root: str(root)})
+    if env_root == "PLUGIN_ROOT":
+        env["CLAUDE_PLUGIN_ROOT"] = str(root)  # Codex exports both names.
+    return subprocess.run(
+        ["bash", "-c", command],
+        input=json.dumps({"hook_event_name": "SessionStart", "cwd": str(cwd)}),
+        capture_output=True,
+        text=True,
+        env=env,
+        cwd=cwd,
+        timeout=30,
+        check=False,
+    )
+
+
+def _card_context(proc: subprocess.CompletedProcess) -> str:
+    assert proc.returncode == 0, proc.stderr
+    return json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"].strip()
+
+
+def _card_text(root: Path, name: str) -> str:
+    return (root / "skills/loom-visualization/assets" / name).read_text(encoding="utf-8").strip()
+
+
+def test_codex_manifest_points_at_sessionstart_card_hook(tmp_path: Path) -> None:
+    """A3 positive: a Codex install selects hooks-codex.json, whose one
+    SessionStart command runs the card script through PLUGIN_ROOT."""
+    from scripts.sync_codex_manifests import sync_shared_fields
+
+    root = _install_plugin("loom-workflow", tmp_path / "renamed codex cache")
+    codex = json.loads((root / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+    assert codex["hooks"] == "./hooks/hooks-codex.json"
+    # Manifest sync copies shared fields only; the Codex hooks key survives it.
+    assert sync_shared_fields(_manifest(root), codex)["hooks"] == codex["hooks"]
+
+    hooks = json.loads((root / codex["hooks"]).read_text(encoding="utf-8"))["hooks"]
+    assert set(hooks) == {"SessionStart"}
+    (group,) = hooks["SessionStart"]
+    assert group["matcher"] == "startup|clear|compact"
+    (command,) = _card_commands(hooks)
+    assert _codex_card_command_problems(command) == []
+
+    consumer = tmp_path / "consumer project"
+    consumer.mkdir()
+    home = tmp_path / "home"
+    home.mkdir()
+    proc = _run_hook_command(command, "PLUGIN_ROOT", root, home, consumer)
+    assert _card_context(proc) == _card_text(root, "trigger-card.md")
+    # Codex 0.154.0 marks a SessionStart hook Failed when its JSON carries
+    # keys beyond hookSpecificOutput (live probe), dropping the card.
+    assert set(json.loads(proc.stdout)) == {"hookSpecificOutput"}
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"',
+        'python3 "hooks/visualization-card"',
+        'python3 "${PLUGIN_ROOT}/hooks/visualization-card" "${CLAUDE_PLUGIN_ROOT}"',
+        None,
+    ],
+)
+def test_codex_hook_without_plugin_root_rejected(command: object) -> None:
+    """A3 negative: the helper rejects a Codex card command lacking PLUGIN_ROOT."""
+    assert _codex_card_command_problems(command) != []
+
+
+def test_claude_selects_only_hooks_json(tmp_path: Path) -> None:
+    """A4 positive: Claude loads only hooks/hooks.json, which runs the card
+    once; the Codex file is reachable only through the Codex manifest."""
+    root = _install_plugin("loom-workflow", tmp_path / "claude cache")
+    claude = _manifest(root)
+    assert "hooks" not in claude  # conventional hooks/hooks.json only
+    claude_hooks = json.loads((root / "hooks/hooks.json").read_text(encoding="utf-8"))["hooks"]
+    assert _card_commands(claude_hooks) == ['"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"']
+    assert "hooks-codex" not in (root / "hooks/hooks.json").read_text(encoding="utf-8")
+
+    codex_file = root / "hooks/hooks-codex.json"
+    assert codex_file.is_file()
+    codex_hooks = json.loads(codex_file.read_text(encoding="utf-8"))["hooks"]
+    assert len(_card_commands(codex_hooks)) == 1
+    assert "${CLAUDE_PLUGIN_ROOT}" not in codex_file.read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("claude_config", ["absent", "toolkit-enabled"])
+def test_codex_card_falls_back_to_full_card(tmp_path: Path, claude_config: str) -> None:
+    """A4 boundary: on Codex the card is always the full card — with no Claude
+    config, and even when Claude's config enables ascii-graph-toolkit."""
+    root = _install_plugin("loom-workflow", tmp_path / "codex cache")
+    codex = json.loads((root / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+    (codex_command,) = _card_commands(
+        json.loads((root / codex["hooks"]).read_text(encoding="utf-8"))["hooks"]
+    )
+    home = tmp_path / "home"
+    home.mkdir()
+    consumer = tmp_path / "consumer"
+    consumer.mkdir()
+    if claude_config == "toolkit-enabled":
+        config = home / ".claude"
+        (config / "plugins").mkdir(parents=True)
+        (config / "plugins/installed_plugins.json").write_text(
+            json.dumps({"version": 2, "plugins": {TOOLKIT_KEY: [{"scope": "user"}]}}),
+            encoding="utf-8",
+        )
+        (config / "settings.json").write_text(
+            json.dumps({"enabledPlugins": {TOOLKIT_KEY: True}}), encoding="utf-8"
+        )
+        # Not vacuous: the same config gives Claude's hook the coexist card.
+        claude_proc = _run_hook_command(
+            '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"',
+            "CLAUDE_PLUGIN_ROOT", root, home, consumer,
+        )
+        assert _card_context(claude_proc) == _card_text(root, "trigger-card-coexist.md")
+
+    proc = _run_hook_command(codex_command, "PLUGIN_ROOT", root, home, consumer)
+    assert _card_context(proc) == _card_text(root, "trigger-card.md")

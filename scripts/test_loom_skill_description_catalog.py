@@ -43,10 +43,17 @@ RENAMED_LEAVES = {
 def _render_description(text: str) -> str:
     """Render the frontmatter block scalar as Codex receives it."""
 
-    frontmatter = text.split("\n---\n", 1)[0]
-    match = re.search(r"^description:\s*\|[-+]?\n(?P<body>(?:[ \t]+.*\n?)*)", frontmatter, re.MULTILINE)
-    assert match, "missing block-scalar description"
-    return " ".join(line.strip() for line in match.group("body").splitlines())
+    lines = text.split("\n---\n", 1)[0].splitlines()
+    header = re.compile(r"description:[ \t]*\|[-+]?[ \t]*")
+    start = next((i for i, line in enumerate(lines) if header.fullmatch(line)), None)
+    assert start is not None, "missing block-scalar description"
+    body = []
+    # The block runs over indented and blank lines until the next top-level key.
+    for line in lines[start + 1:]:
+        if line.strip() and not line[0].isspace():
+            break
+        body.append(line.strip())
+    return " ".join(part for part in body if part)
 
 
 def _description(skill_md: Path) -> str:
@@ -108,6 +115,11 @@ def test_description_accounting_excludes_bodies_and_other_metadata() -> None:
     assert _render_description(text + "description: |\n  decoy\n" * 1000) == (
         "Only this is counted."
     )
+
+
+def test_description_block_scalar_keeps_text_after_blank_line() -> None:
+    text = "---\nname: example\ndescription: |\n  First part.\n\n  Hidden part.\n\nversion: 1\n---\n"
+    assert _render_description(text) == "First part. Hidden part."
 
 
 def test_candidate_has_exactly_one_router_per_loom_plugin() -> None:

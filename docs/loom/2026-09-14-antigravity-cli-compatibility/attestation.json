@@ -1,0 +1,198 @@
+{
+  "schema": "loom-attestation/v1",
+  "change_id": "2026-09-14-antigravity-cli-compatibility",
+  "content_digest": "d96fdfa127ec902d245015103d05cfc50043dc33",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_agy_adapter.py -q -p no:cacheprovider",
+      "artifact": "loom-code/scripts/test_adversarial_agy_adapter.py",
+      "result": "pass",
+      "command_digest": "c0f16ba95f8f48988f16e489858c42c4fa4329d3d0a186b540c064f73a916fc9"
+    },
+    {
+      "kind": "adversarial",
+      "command": "bash loom-workflow/tests/test-adversarial-agy-skill-folder.sh",
+      "artifact": "loom-workflow/tests/test-adversarial-agy-skill-folder.sh",
+      "result": "pass",
+      "command_digest": "8149a28ffd8959e30964a44e5a6087510bfad14ca9bef795fa2bba65f754d18e"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest scripts/test_adversarial_agy_sync.py -q -p no:cacheprovider",
+      "artifact": "scripts/test_adversarial_agy_sync.py",
+      "result": "pass",
+      "command_digest": "2edf042b25ea5d080bba181753c37068192a86d685eae7571151d4c85cf9ce27"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_plugin_root_marker.py -q -p no:cacheprovider",
+      "artifact": "loom-code/scripts/test_adversarial_plugin_root_marker.py",
+      "result": "pass",
+      "command_digest": "86d2153e37a4f0f02c1e2ebc1aa977885637617295e077783978223313c48226"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_push_reason.py -q -p no:cacheprovider",
+      "artifact": "loom-code/scripts/test_adversarial_push_reason.py",
+      "result": "pass",
+      "command_digest": "022e6763d36a6f0df802a25cfb28892a326fbc9e2a253f9abe29d8cbacda6918"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_agy_anchor_turns.py -q -p no:cacheprovider",
+      "artifact": "loom-code/scripts/test_adversarial_agy_anchor_turns.py",
+      "result": "pass",
+      "command_digest": "5c9513a32fc2178a02b5020309bcf82e1b07608babfe8b379f6a009bc0f4e8a5"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "loom-code:reviewer#code-aa15607c",
+      "vendor": "anthropic",
+      "model": "claude-opus-5 (host-default/unverified)",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "status": "open",
+          "anchor": "loom-workflow/scripts/agy-validate-skill-folder.sh:69",
+          "text": "nitpick (non-blocking): greedy sed lets a nested directory named skills escape the rule; same as the pre-existing Claude-side validator.",
+          "fix": "Derive SKILL_ROOT as the shortest .../skills/<name> prefix holding SKILL.md in both scripts and add a deny case."
+        },
+        {
+          "severity": "nit",
+          "dimension": "architecture",
+          "status": "open",
+          "anchor": "loom-code/hooks/agy_adapter.py:339",
+          "text": "nitpick (non-blocking): adapter calls language-anchor.py private _load_lang_detect and _ANCHOR_TEXT; a rename would silently drop the agy anchor.",
+          "fix": "Expose a public anchor_text(texts) in language-anchor.py and call it from both hooks."
+        },
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "status": "open",
+          "anchor": "loom-code/scripts/test_loom_publish.py:1170",
+          "text": "nitpick (non-blocking): BLOCKED_PUSH_MATRIX is pinned to 4e87e264 inside the delta, not review base 2e4da589; reviewer's own differential run showed 21 of 58 commands moved allow->block, all case variants, none block->allow.",
+          "fix": "Record 2e4da589 outcomes per row or point the comment at the intent's user-decided case-folding exception."
+        }
+      ]
+    },
+    {
+      "reviewer": "loom-code:reviewer#skill-a485c678",
+      "vendor": "anthropic",
+      "model": "claude-opus-5 (host-default/unverified)",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "inconsistency",
+          "status": "fixed",
+          "anchor": "loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md:23",
+          "text": "issue: canonical-order probe sentence contradicted 'On Antigravity CLI, probe nothing'; scoped to Claude Code and Codex, agy passes host_vendor gemini with empty usable_vendors.",
+          "fix": "none needed"
+        },
+        {
+          "severity": "important",
+          "dimension": "inconsistency",
+          "status": "fixed",
+          "anchor": "loom-code/references/antigravity-tools.md:81",
+          "text": "issue: 'continue without one' contradicted fixed-CLI failure behaviour; all three texts now report the blocker for a fixed CLI or accepted ask and continue only for suggest or declined ask.",
+          "fix": "none needed"
+        },
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "status": "fixed",
+          "anchor": "docs/loom/2026-09-14-antigravity-cli-compatibility/blind-run-report.md:171",
+          "text": "nitpick: blocked-set sentence and missing case-folding question in report; fixed.",
+          "fix": "none needed"
+        },
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "status": "fixed",
+          "anchor": "loom-code/references/antigravity-tools.md:75",
+          "text": "nitpick: profile record now host-default/unverified per dispatch-profile.md.",
+          "fix": "none needed"
+        },
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "status": "fixed",
+          "anchor": "loom-code/skills/closing-review/SKILL.md:136",
+          "text": "suggestion: §2 now opens with finishing the blind run and committing its report before dispatching reviewers.",
+          "fix": "none needed"
+        },
+        {
+          "severity": "nit",
+          "dimension": "omission",
+          "status": "fixed",
+          "anchor": "docs/loom/2026-09-14-antigravity-cli-compatibility/blind-run-report.md:202",
+          "text": "nitpick: Evidence bullets now quote the deciding output inline.",
+          "fix": "none needed"
+        },
+        {
+          "severity": "nit",
+          "dimension": "omission",
+          "status": "open",
+          "anchor": "loom-workflow/README.md:204",
+          "text": "nitpick (non-blocking): after merging main, the README tree lists the SessionStart visualization card while agy only runs the skill-folder rule; an agy reader may expect the card.",
+          "fix": "Note that on agy only the skill-folder rule runs and the loom-visualization session-start card is Claude Code only (en/ja/zh-TW)."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "dimension": "correctness",
+      "status": "open",
+      "anchor": "loom-workflow/scripts/agy-validate-skill-folder.sh:69",
+      "text": "nitpick (non-blocking): greedy sed lets a nested directory named skills escape the rule; same as the pre-existing Claude-side validator.",
+      "fix": "Derive SKILL_ROOT as the shortest .../skills/<name> prefix holding SKILL.md in both scripts and add a deny case.",
+      "reviewer": "loom-code:reviewer#code-aa15607c",
+      "lens": "code"
+    },
+    {
+      "severity": "nit",
+      "dimension": "architecture",
+      "status": "open",
+      "anchor": "loom-code/hooks/agy_adapter.py:339",
+      "text": "nitpick (non-blocking): adapter calls language-anchor.py private _load_lang_detect and _ANCHOR_TEXT; a rename would silently drop the agy anchor.",
+      "fix": "Expose a public anchor_text(texts) in language-anchor.py and call it from both hooks.",
+      "reviewer": "loom-code:reviewer#code-aa15607c",
+      "lens": "code"
+    },
+    {
+      "severity": "nit",
+      "dimension": "tests",
+      "status": "open",
+      "anchor": "loom-code/scripts/test_loom_publish.py:1170",
+      "text": "nitpick (non-blocking): BLOCKED_PUSH_MATRIX is pinned to 4e87e264 inside the delta, not review base 2e4da589; reviewer's own differential run showed 21 of 58 commands moved allow->block, all case variants, none block->allow.",
+      "fix": "Record 2e4da589 outcomes per row or point the comment at the intent's user-decided case-folding exception.",
+      "reviewer": "loom-code:reviewer#code-aa15607c",
+      "lens": "code"
+    },
+    {
+      "severity": "nit",
+      "dimension": "omission",
+      "status": "open",
+      "anchor": "loom-workflow/README.md:204",
+      "text": "nitpick (non-blocking): after merging main, the README tree lists the SessionStart visualization card while agy only runs the skill-folder rule; an agy reader may expect the card.",
+      "fix": "Note that on agy only the skill-folder rule runs and the loom-visualization session-start card is Claude Code only (en/ja/zh-TW).",
+      "reviewer": "loom-code:reviewer#skill-a485c678",
+      "lens": "skill"
+    }
+  ]
+}

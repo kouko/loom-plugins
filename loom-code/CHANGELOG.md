@@ -31,7 +31,7 @@
   budget exception and separate from the net mechanism count, so a
   twenty-third counted skill still fails. The `expert-mode` budget-exception
   line below covers the skill's entry in that net count, not this ceiling.
-- Net mechanism count rises from 126 to 130: the five additions below, less
+- Net mechanism count rises from 127 to 131: the five additions below, less
   the removed `artifact:intent.lane`; the widened Claude PreToolUse matcher
   renames its existing hook row rather than adding one.
 - budget-exception: expert-mode — user-invoked entry point for choosing Loom steps per change; eval loom-code/scripts/test_expert_mode_skill.py.

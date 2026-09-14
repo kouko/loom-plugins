@@ -1,7 +1,7 @@
 ---
 name: loom-visualization
 description: |
-  Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat; not Obsidian notes.
+  Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, including when a Loom station reports to the user (intent restatement, choices, blind-run results); not Obsidian notes.
 ---
 
 # Loom Visualization
@@ -10,8 +10,10 @@ Pick the right shape and form for information in a coding-harness
 conversation, so the reader gets a table or a diagram that actually displays
 in their client instead of prose or broken Mermaid source.
 
-Run every script from this skill's directory; all paths below are relative
-to it. The scripts need only the Python standard library.
+`<skill-dir>` is this skill's folder: `${CLAUDE_SKILL_DIR}` on Claude Code;
+on any other host, the directory that holds this SKILL.md. Run every script
+as `python3 <skill-dir>/scripts/<name>.py`; all other paths below are
+relative to `<skill-dir>`. The scripts need only the Python standard library.
 
 A one-line fact needs no table. Reach for this skill when the answer has a
 shape: options side by side, three or more steps, a branch, a lifecycle, a
@@ -21,7 +23,7 @@ message exchange, a structure, dates, or numbers to compare.
 
 <!-- gate: loom-visualization.obsidian-boundary -->
 When the output is written to a file, first run
-`python3 scripts/detect_client.py --target <path>`. Decline only when that
+`python3 <skill-dir>/scripts/detect_client.py --target <path>`. Decline only when that
 `--target` check reports `obsidian_vault: true`, or when the user asks for a
 note in their Obsidian vault: say this skill serves coding-harness chat, and
 name `obsidian:obsidian-mermaid-visualizer` as the skill for vault notes.
@@ -65,7 +67,7 @@ worked example to adapt.
 
 ## Step 3 — Choose the form
 
-Run `python3 scripts/detect_client.py`. It prints
+Run `python3 <skill-dir>/scripts/detect_client.py`. It prints
 `{client, mermaid, remote_viewer, obsidian_vault, reason}`. What each client
 displays, with sources and a verified date, is in
 `references/client-matrix.md`.
@@ -95,7 +97,7 @@ Within the table plus ASCII form:
 Where the template names a generator, generate; do not hand-pad:
 
 ```
-printf '%s' '<json input from the template>' | python3 scripts/generate.py <shape>
+printf '%s' '<json input from the template>' | python3 <skill-dir>/scripts/generate.py <shape>
 ```
 
 Shapes: `table`, `flow`, `seq`, `tree`, `arch`, `bar`. Pass the JSON as the
@@ -110,7 +112,7 @@ no ASCII form; use its table substitute.
 Always verify before sending:
 
 ```
-printf '%s' '<your diagram>' | python3 scripts/align.py -
+printf '%s' '<your diagram>' | python3 <skill-dir>/scripts/align.py -
 ```
 
 It prints a per-line width report, then either `line N: col C: message` for

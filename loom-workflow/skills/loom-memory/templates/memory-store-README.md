@@ -27,8 +27,10 @@ single durable relevance-rule line), `type`, and at least one
 
 Run the `skills/loom-memory/scripts/loom_memory.py` file inside the
 `loom-workflow` plugin's own directory
-(`${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` on hosts
-that substitute that token):
+(`${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` on Claude
+Code, which substitutes that token; on any other host replace
+`${CLAUDE_PLUGIN_ROOT}` with the installed `loom-workflow` plugin directory,
+the one holding `skills/loom-memory/SKILL.md`):
 
 ```
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py regenerate-index <this-directory>

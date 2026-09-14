@@ -121,6 +121,9 @@ For a legacy intent, obtain one publication decision and acknowledge it with:
 python3 <loom-code>/scripts/loom_checker.py publish --confirm-authorized --title <title> --body-file <absolute-path>
 ```
 
+The `<title>` is a Conventional Commits subject whose type equals the current
+branch's `<type>/` prefix, because it becomes the squash-merge commit.
+
 The command verifies exactly one branch attestation, its schema, content
 digest, execution identities/results, reviewer verdicts, and live HEAD. It
 then derives the origin repository, default base, current branch, and exact

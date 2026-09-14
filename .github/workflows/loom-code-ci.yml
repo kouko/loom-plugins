@@ -9,7 +9,9 @@ name: loom-code CI
 #                             each CODEX_ELIGIBLE plugin's .codex-plugin/plugin.json
 #                             must stay in sync with its .claude-plugin/plugin.json.
 #                             Any manual edit that diverges the two, or a missing
-#                             eligible Codex manifest, fails the build. Repair
+#                             eligible Codex manifest, fails the build. The same
+#                             run gates each plugin's generated Antigravity CLI
+#                             root plugin.json. Repair
 #                             locally with: python scripts/sync_codex_manifests.py --all
 #
 # The sync_codex_manifests.py pytest suite is also run so the generator logic

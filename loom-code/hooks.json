@@ -1,0 +1,23 @@
+{
+  "loom-code": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./hooks/agy_adapter.py push-gate",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "python3 ./hooks/agy_adapter.py pre-invocation",
+        "timeout": 20
+      }
+    ]
+  }
+}

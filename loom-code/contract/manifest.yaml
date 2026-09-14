@@ -14,7 +14,7 @@ stations:            # produce one per-change artifact each (§3)
   - {name: write-spec,     owner: loom-design, produces: spec,    decision_point: 2}   # product only
   - {name: write-plan,     owner: loom-code,   produces: plan,    decision_point: 1}   # code-only path runs ① itself
   - {name: build,          owner: loom-code,   produces: diff}
-  - {name: review,         owner: loom-code,   produces: attestation}
+  - {name: closing-review, owner: loom-code,   produces: attestation}
   - {name: ship,           owner: loom-code,   produces: diff,    decision_point: 3}   # acceptance = blind-run report
   - {name: maintain,       owner: loom-code,   produces: intent}
 
@@ -47,7 +47,7 @@ actions:             # executable steps inside a station; not skills (§3)
     owner: write-plan
     summary: "code-only install, kind product, no ratified PRINCIPLES.md — run templates/PRINCIPLES-interview.md inside decision point ①; user confirms, agent writes ratified-by."
   - name: package-tests
-    owner: review
+    owner: closing-review
     summary: "run the package-level test command once during finalize-review; the generated attestation binds its result to functional content."
   - name: parallel-dispatch
     owner: build
@@ -56,16 +56,16 @@ actions:             # executable steps inside a station; not skills (§3)
     owner: build
     summary: "parallel implementers may use isolated git worktrees; the branch integrates before closing review."
   - name: read
-    owner: review
+    owner: closing-review
     summary: "fresh-context reviewers apply the artifact lens; reviewer-count mechanically computes a floor of one only for a narrow low-risk whole delta and two for every other or undecidable delta."
   - name: blind-run
-    owner: review
+    owner: closing-review
     summary: "an agent that never touched the change builds/runs it in a clean environment and writes the blind-run report against every Acceptance line (plus UI flows for product)."
   - name: adversarial
-    owner: review
+    owner: closing-review
     summary: "mutation / fuzz / abuse cases for code, red-team for spec, and gate attacks for skills; execution results land in the generated attestation."
   - name: checkpoint
-    owner: review
+    owner: closing-review
     summary: "one closing review after Build; fixes return to Build, and finalize-review generates a fresh content-bound attestation only after reviewers and checks pass."
   - name: alert-to-intent
     owner: maintain
@@ -189,7 +189,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
         - "selection"
       must_not:
         - {kind: "design reasoning", goes_to: spec}
-      signoff: review
+      signoff: closing-review
       edits_after:
         - {id: regenerate-after-functional-change, text: "the checker replaces the whole attestation after functional content changes and verification passes again"}
     fields:

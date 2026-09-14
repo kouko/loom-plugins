@@ -4,7 +4,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.0.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.2.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 這是什麼
 
@@ -170,6 +170,31 @@ claude plugin install loom-workflow@loom
 codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
+
+在 Codex 上，loom-visualization 的觸發卡透過 plugin 的 SessionStart hook 送達；Codex 只在你審閱並信任該 plugin 的 hook 之後才會執行它。
+
+### Antigravity CLI
+
+從 repo 的 clone 安裝，先裝 `loom-code`：`critique`、`decision-map`、
+`distill-sessions` 會參照它。安裝前先用 `agy plugin list` 確認有沒有從 Claude Code
+匯入的同名 plugin：install 會取代那份匯入的副本，之後的 `agy plugin uninstall`
+也會把它刪掉。
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-workflow
+```
+
+使用時，在專案目錄啟動 `agy` 並以絕對路徑把專案加為 workspace：
+`agy --add-dir "$PWD"`（互動）或 `agy --add-dir "$PWD" -p "..."`（print 模式）；
+agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模式（`agy -p`）
+不會掛上 workspace，loom 的 kickoff defaults 不會載入，agent 也可能在專案外動作；
+互動模式也請一併指定。
+
+hook 只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。
+在 agy 上，loom-visualization 的觸發卡以 plugin rule 送達，因此永遠生效。
 
 ## 使用
 

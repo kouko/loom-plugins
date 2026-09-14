@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 from io import StringIO
 from pathlib import Path
 
 from loom_checker.command_handlers import publish as loom_checker
+from loom_checker.command_handlers import push as push_handler
+from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
+from loom_checker.rule_checks.push import render_quote_all
 import pytest
 
 CONTEXT_HEADINGS = (
@@ -1199,3 +1203,148 @@ def test_publish_accepts_matching_selection_disclosure(tmp_path: Path, monkeypat
 
     assert rc == 0, err
     assert any("pr" in call and "create" in call for call in calls.calls)
+
+
+# --- push hook: the reason a blocked push names first -------------------------
+
+MISSING_ATTESTATION = "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
+NONCANONICAL = "the entire Git push command must use canonical quote-all rendering"
+
+
+def hook_repository(tmp_path: Path, *, attested: bool, monkeypatch) -> Path:
+    repo = tmp_path / "hook-repo"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    git(repo, "config", "user.email", "test@example.com")
+    git(repo, "config", "user.name", "Test")
+    (repo / "file.txt").write_text("content\n", encoding="utf-8")
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "initial")
+    git(repo, "switch", "-q", "-c", "feature")
+    git(repo, "remote", "add", "origin", "git@github.com:example/project.git")
+    if attested:
+        attestation(repo)
+        git(repo, "add", ".")
+        git(repo, "commit", "-q", "-m", "attest")
+        # Content validation is attestation.py's own contract; here only the
+        # push hook's ordering and outcome are under test.
+        monkeypatch.setattr(push_handler, "validate_attestation", lambda *_a, **_k: [])
+    return repo
+
+
+def canonical_push(repo: Path) -> str:
+    head = git(repo, "rev-parse", "HEAD")
+    return render_quote_all([
+        "command", str(Path(shutil.which("git")).resolve()), "-C", str(repo),
+        "push", *CANONICAL_PUSH_FLAGS, "origin", f"{head}:refs/heads/feature",
+    ])
+
+
+def run_push_hook(monkeypatch, repo: Path, command: str) -> tuple[int, str]:
+    payload = {
+        "cwd": str(repo),
+        "hook_event_name": "PreToolUse",
+        "tool_name": "Bash",
+        "tool_input": {"command": command},
+    }
+    monkeypatch.setattr(push_handler, "read_hook_payload", lambda: payload)
+    monkeypatch.chdir(repo)
+    err = StringIO()
+    rc = push_handler.cmd_push(["--hook"], StringIO(), err)
+    return rc, err.getvalue()
+
+
+@pytest.mark.parametrize("command", [
+    "git push origin feature",
+    "git push -u origin feature",
+])
+def test_plain_push_without_attestation_reason_names_attestation(
+    tmp_path: Path, monkeypatch, command: str
+) -> None:
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, command)
+
+    lines = err.splitlines()
+    assert rc == 2
+    assert lines[0] == MISSING_ATTESTATION
+    assert any(NONCANONICAL in line for line in lines[1:])
+
+
+def test_attested_noncanonical_push_still_blocked(tmp_path: Path, monkeypatch) -> None:
+    repo = hook_repository(tmp_path, attested=True, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    assert rc == 2
+    assert err.splitlines() == [f"BLOCK push.attestation: {NONCANONICAL}"]
+
+
+def test_canonical_attested_push_allowed(tmp_path: Path, monkeypatch) -> None:
+    repo = hook_repository(tmp_path, attested=True, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_push(repo))
+
+    assert (rc, err) == (0, "")
+
+
+# Allow (0) / block (2) outcomes pinned against commit 4e87e264, which
+# introduced case-folded publisher detection (``GIT push`` blocks); the later
+# reason reordering changes stderr text only, never this table.
+BLOCKED_PUSH_MATRIX = [
+    ("git status", 0, 0),
+    ("ls -la", 0, 0),
+    ("rg -n \"SEGMENT_SPLIT|publisher&&gh pr create|gh pr merge\" loom-code -g '*.py'", 0, 0),
+    ("printf '%s\\n' '$(git push origin HEAD)'", 0, 0),
+    ("git push origin HEAD", 2, 2),
+    ("git push origin feature", 2, 2),
+    ("git push -u origin feature", 2, 2),
+    ("git push --force origin main", 2, 2),
+    ("'git' 'push' '-u' 'origin' 'feature'", 2, 2),
+    ("zsh -c 'git push origin HEAD'", 2, 2),
+    ("GIT push origin HEAD", 2, 2),
+    ("cd relative && git push origin feature", 2, 2),
+    ("echo \"$(git push origin HEAD)\"", 2, 2),
+    ("gh pr create --fill", 2, 2),
+    ("gh pr merge 123 --squash", 2, 2),
+    ("eval 'gh pr create --fill'", 2, 2),
+    ("<canonical>", 2, 0),
+    ("<canonical-wrong-refspec>", 2, 2),
+]
+
+
+@pytest.mark.parametrize("attested", [False, True])
+@pytest.mark.parametrize("command,unattested_rc,attested_rc", BLOCKED_PUSH_MATRIX)
+def test_blocked_push_set_unchanged(
+    tmp_path: Path, monkeypatch, attested: bool,
+    command: str, unattested_rc: int, attested_rc: int,
+) -> None:
+    repo = hook_repository(tmp_path, attested=attested, monkeypatch=monkeypatch)
+    if command == "<canonical>":
+        command = canonical_push(repo)
+    elif command == "<canonical-wrong-refspec>":
+        command = canonical_push(repo).replace(":refs/heads/feature", ":refs/heads/other")
+
+    rc, _ = run_push_hook(monkeypatch, repo, command)
+
+    assert rc == (attested_rc if attested else unattested_rc)
+
+
+# case-folded-publishers-blocked-on-every-host: publisher detection folds the
+# executable basename on every host, not only on case-insensitive filesystems.
+@pytest.mark.parametrize("command", [
+    "GIT push origin HEAD",
+    "/usr/bin/GIT push",
+    "bash -c 'GIT push'",
+    "GH pr create --fill",
+    "Gh pr merge 1",
+])
+def test_case_folded_publishers_blocked_on_every_host(
+    tmp_path: Path, monkeypatch, command: str
+) -> None:
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, command)
+
+    assert rc == 2
+    assert "BLOCK" in err

@@ -10,9 +10,14 @@ touch any committed manifest. Stdlib only (json + subprocess to exercise the CLI
 """
 
 import json
+import os
+import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 SCRIPT = Path(__file__).resolve().parent / "sync_codex_manifests.py"
 
@@ -312,7 +317,19 @@ def _build_all_eligible(repo_root: Path) -> dict:
         claude = _claude_ssot()
         claude["name"] = name
         dirs[name] = _build_plugin(repo_root / name, claude, _stale_codex())
+    _write_card(dirs["loom-workflow"])
     return dirs
+
+
+CARD_REL = ("skills", "loom-visualization", "assets", "trigger-card.md")
+CARD_TEXT = "# Visualization trigger card (fixture)\nInvoke `loom-visualization` FIRST.\n"
+
+
+def _write_card(plugin_dir: Path, text: str = CARD_TEXT) -> Path:
+    card = plugin_dir.joinpath(*CARD_REL)
+    card.parent.mkdir(parents=True, exist_ok=True)
+    card.write_text(text, encoding="utf-8")
+    return card
 
 
 def _run_all(argv, repo_root: Path):
@@ -386,3 +403,272 @@ def test_all_eligible_codex_manifests_in_sync():
         "committed Codex manifests drifted or missing vs their Claude SSOT: "
         f"{offenders}. Run: python3 scripts/sync_codex_manifests.py --scaffold --all"
     )
+
+
+# --- Antigravity CLI (agy) root manifest: <plugin>/plugin.json ----------------
+# agy reads only a root plugin.json (Claude Code and Codex ignore it). It is
+# fully derived from the Claude SSOT — no hand-authored keys — so any byte of
+# difference from the derived form is drift.
+
+AGY_FIELDS = ("name", "version", "description")
+
+
+def _agy_path(plugin_dir: Path) -> Path:
+    return plugin_dir / "plugin.json"
+
+
+def test_root_manifest_generated_and_validates(tmp_path):
+    """A1 positive: sync writes a minimal, deterministic root manifest."""
+    import sync_codex_manifests as m
+
+    plugin = _build_plugin(tmp_path / "demo-plugin", _claude_ssot(), _stale_codex())
+    assert not _agy_path(plugin).exists()
+
+    m.sync_agy_manifest(plugin)
+
+    expected = {field: _claude_ssot()[field] for field in AGY_FIELDS}
+    text = _agy_path(plugin).read_text(encoding="utf-8")
+    assert json.loads(text) == expected
+    assert list(json.loads(text)) == list(AGY_FIELDS)  # stable key order
+    assert text == json.dumps(expected, indent=2, ensure_ascii=False) + "\n"
+    assert m.sync_agy_manifest(plugin, check=True) is True
+
+
+def test_cli_sync_writes_root_manifest(tmp_path):
+    plugin = _build_plugin(tmp_path / "demo-plugin", _claude_ssot(), _stale_codex())
+
+    assert _run([], plugin).returncode == 0
+    assert json.loads(_agy_path(plugin).read_text(encoding="utf-8"))["name"] == "demo-plugin"
+
+
+def test_drifted_root_manifest_fails_check(tmp_path):
+    """A1 negative: a hand-edited root manifest fails --check, read-only."""
+    plugin = _build_plugin(tmp_path / "demo-plugin", _claude_ssot(), _stale_codex())
+    assert _run([], plugin).returncode == 0
+
+    drifted = json.loads(_agy_path(plugin).read_text(encoding="utf-8"))
+    drifted["description"] = "hand-edited"
+    _agy_path(plugin).write_text(json.dumps(drifted, indent=2) + "\n", encoding="utf-8")
+    before = _agy_path(plugin).read_text(encoding="utf-8")
+
+    proc = _run(["--check"], plugin)
+    assert proc.returncode != 0
+    assert "DRIFT" in proc.stderr and "plugin.json" in proc.stderr, proc.stderr
+    assert _agy_path(plugin).read_text(encoding="utf-8") == before
+
+
+def test_root_manifest_extra_key_is_drift(tmp_path):
+    import sync_codex_manifests as m
+
+    plugin = _build_plugin(tmp_path / "demo-plugin", _claude_ssot(), _stale_codex())
+    m.sync_agy_manifest(plugin)
+    extra = json.loads(_agy_path(plugin).read_text(encoding="utf-8"))
+    extra["skills"] = "./skills/"
+    _agy_path(plugin).write_text(json.dumps(extra, indent=2) + "\n", encoding="utf-8")
+
+    assert m.sync_agy_manifest(plugin, check=True) is False
+
+
+def test_all_check_fails_on_drifted_or_missing_root_manifest(tmp_path):
+    dirs = _build_all_eligible(tmp_path)
+    assert _run_all([], tmp_path).returncode == 0
+    assert _run_all(["--check"], tmp_path).returncode == 0
+
+    _agy_path(dirs["loom-design"]).write_text('{"name": "loom-design"}\n', encoding="utf-8")
+    drift = _run_all(["--check"], tmp_path)
+    assert drift.returncode != 0 and "DRIFT" in drift.stderr, drift.stderr
+
+    _agy_path(dirs["loom-design"]).unlink()
+    missing = _run_all(["--check"], tmp_path)
+    assert missing.returncode != 0 and "MISSING" in missing.stderr, missing.stderr
+    assert "Traceback" not in missing.stderr
+
+
+def test_codex_manifests_unchanged_by_root_manifest_sync(tmp_path):
+    """A8 positive: generating the agy manifest never touches host manifests."""
+    import sync_codex_manifests as m
+
+    for name in m.CODEX_ELIGIBLE:
+        copy = tmp_path / name
+        for host in (".claude-plugin", ".codex-plugin"):
+            (copy / host).mkdir(parents=True)
+            (copy / host / "plugin.json").write_bytes(
+                (REPO_ROOT / name / host / "plugin.json").read_bytes()
+            )
+        before = {h: (copy / h / "plugin.json").read_bytes()
+                  for h in (".claude-plugin", ".codex-plugin")}
+
+        m.sync_agy_manifest(copy)
+
+        after = {h: (copy / h / "plugin.json").read_bytes()
+                 for h in (".claude-plugin", ".codex-plugin")}
+        assert after == before, f"{name}: host manifests mutated"
+        assert m.sync_plugin(copy, check=True), f"{name}: codex drift"
+
+
+def test_all_eligible_agy_root_manifests_in_sync():
+    import sync_codex_manifests as m
+
+    offenders = []
+    for name in m.CODEX_ELIGIBLE:
+        plugin_dir = REPO_ROOT / name
+        if not m.agy_manifest_path(plugin_dir).exists():
+            offenders.append(f"{name} (MISSING plugin.json)")
+        elif not m.sync_agy_manifest(plugin_dir, check=True):
+            offenders.append(name)
+    assert not offenders, (
+        f"committed agy root manifests drifted or missing: {offenders}. "
+        "Run: python3 scripts/sync_codex_manifests.py --all"
+    )
+
+
+@pytest.mark.skipif(shutil.which("agy") is None, reason="agy CLI not on PATH")
+@pytest.mark.parametrize("name", ("loom-code", "loom-design", "loom-workflow"))
+def test_agy_plugin_validate_accepts_committed_plugin(name):
+    """A1 live: `agy plugin validate` passes and processes every skill folder."""
+    proc = subprocess.run(
+        ["agy", "plugin", "validate", str(REPO_ROOT / name)],
+        capture_output=True, text=True, timeout=120,
+    )
+    out = re.sub(r"\x1b\[[0-9;]*m", "", proc.stdout + proc.stderr)
+    assert proc.returncode == 0, out
+    skills = len(list((REPO_ROOT / name / "skills").glob("*/SKILL.md")))
+    assert re.search(rf"skills\s*:\s*{skills} processed", out), out
+
+
+# --- agy plugin rule: loom-workflow/rules/AGENTS.md ----------------------------
+# agy keeps a plugin's rules/AGENTS.md active in every session; Claude Code and
+# Codex ignore it. The rule is generated from the trigger card so the card keeps
+# one source: a one-line generated-file header, then the card verbatim.
+
+def _rule_path(plugin_dir: Path) -> Path:
+    return plugin_dir / "rules" / "AGENTS.md"
+
+
+def _loom_workflow_fixture(tmp_path: Path) -> Path:
+    claude = _claude_ssot()
+    claude["name"] = "loom-workflow"
+    plugin = _build_plugin(tmp_path / "loom-workflow", claude, _stale_codex())
+    _write_card(plugin)
+    return plugin
+
+
+def test_agy_rule_matches_trigger_card_source(tmp_path):
+    """A3 positive: sync writes header + card; the committed rule is in sync."""
+    import sync_codex_manifests as m
+
+    plugin = _loom_workflow_fixture(tmp_path)
+    assert _run([], plugin).returncode == 0
+    lines = _rule_path(plugin).read_text(encoding="utf-8").split("\n", 1)
+    assert lines[0].startswith("<!--") and lines[0].endswith("-->"), lines[0]
+    assert "/".join(CARD_REL) in lines[0] and "edit" in lines[0].lower()
+    assert lines[1] == CARD_TEXT
+    assert _run(["--check"], plugin).returncode == 0
+
+    committed = REPO_ROOT / "loom-workflow"
+    body = _rule_path(committed).read_text(encoding="utf-8").split("\n", 1)[1]
+    assert body == committed.joinpath(*CARD_REL).read_text(encoding="utf-8")
+    assert m.sync_agy_rule(committed, check=True) is True
+
+
+def test_drifted_agy_rule_fails_check(tmp_path):
+    """A3 negative: an edited rule, an edited card, or no rule fails --check."""
+    plugin = _loom_workflow_fixture(tmp_path)
+    assert _run([], plugin).returncode == 0
+
+    rule = _rule_path(plugin)
+    rule.write_text(rule.read_text(encoding="utf-8") + "hand-edited\n", encoding="utf-8")
+    before = rule.read_text(encoding="utf-8")
+    proc = _run(["--check"], plugin)
+    assert proc.returncode != 0 and "DRIFT" in proc.stderr, proc.stderr
+    assert "rules/AGENTS.md" in proc.stderr, proc.stderr
+    assert rule.read_text(encoding="utf-8") == before  # --check is read-only
+
+    assert _run([], plugin).returncode == 0
+    _write_card(plugin, CARD_TEXT + "changed card\n")
+    assert _run(["--check"], plugin).returncode != 0
+
+    rule.unlink()
+    missing = _run(["--check"], plugin)
+    assert missing.returncode != 0 and "MISSING" in missing.stderr, missing.stderr
+    assert "Traceback" not in missing.stderr
+
+
+def test_agy_rule_only_for_mapped_plugin(tmp_path):
+    """Only loom-workflow has a card; other plugins never get a rules dir."""
+    dirs = _build_all_eligible(tmp_path)
+    assert _run_all([], tmp_path).returncode == 0
+    assert _rule_path(dirs["loom-workflow"]).exists()
+    assert not (dirs["loom-code"] / "rules").exists()
+    assert not (dirs["loom-design"] / "rules").exists()
+    assert _run_all(["--check"], tmp_path).returncode == 0
+
+    _rule_path(dirs["loom-workflow"]).write_text("drift\n", encoding="utf-8")
+    drift = _run_all(["--check"], tmp_path)
+    assert drift.returncode != 0 and "DRIFT" in drift.stderr, drift.stderr
+
+
+def test_agy_rule_absent_source_writes_nothing_and_orphan_fails_check(tmp_path):
+    """No card: sync writes no rule (no traceback); a leftover rule is drift."""
+    plugin = _loom_workflow_fixture(tmp_path)
+    plugin.joinpath(*CARD_REL).unlink()
+
+    proc = _run([], plugin)
+    assert proc.returncode == 0 and "Traceback" not in proc.stderr, proc.stderr
+    assert not _rule_path(plugin).exists()
+    assert _run(["--check"], plugin).returncode == 0
+
+    _rule_path(plugin).parent.mkdir()
+    _rule_path(plugin).write_text("orphan\n", encoding="utf-8")
+    orphan = _run(["--check"], plugin)
+    assert orphan.returncode != 0 and "DRIFT" in orphan.stderr, orphan.stderr
+
+
+def test_hand_written_orphan_rule_tells_user_to_remove_it_by_hand(tmp_path):
+    """No card and a rule without the generated header: sync would leave it,
+    so --check must say to delete it by hand, not to rerun the sync."""
+    plugin = _loom_workflow_fixture(tmp_path)
+    plugin.joinpath(*CARD_REL).unlink()
+    assert _run([], plugin).returncode == 0  # manifests in sync; only the rule is left
+    _rule_path(plugin).parent.mkdir()
+    _rule_path(plugin).write_text("hand-written\n", encoding="utf-8")
+
+    proc = _run(["--check"], plugin)
+    assert proc.returncode != 0, proc.stderr
+    assert "remove" in proc.stderr.lower() and "by hand" in proc.stderr, proc.stderr
+    assert "rules/AGENTS.md" in proc.stderr, proc.stderr
+    assert "Run: python3" not in proc.stderr, proc.stderr
+
+
+def test_claude_hook_still_injects_card_once(tmp_path):
+    """A4 positive: one SessionStart card command; it injects the full card once."""
+    plugin = REPO_ROOT / "loom-workflow"
+    hooks = json.loads((plugin / "hooks" / "hooks.json").read_text(encoding="utf-8"))
+    commands = [h["command"] for group in hooks["hooks"]["SessionStart"]
+                for h in group["hooks"] if h.get("type") == "command"]
+    card_commands = [c for c in commands if "visualization-card" in c]
+    assert len(card_commands) == 1, commands
+
+    env = {k: v for k, v in os.environ.items()
+           if k not in ("CLAUDE_PROJECT_DIR", "CLAUDE_PLUGIN_ROOT")}
+    env["CLAUDE_CONFIG_DIR"] = str(tmp_path)  # no ascii-graph-toolkit installed
+    proc = subprocess.run(
+        [sys.executable, str(plugin / "hooks" / "visualization-card")],
+        input=json.dumps({"cwd": str(tmp_path)}), capture_output=True,
+        text=True, env=env, cwd=tmp_path,
+    )
+    assert proc.returncode == 0, proc.stderr
+    context = json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"]
+    card = plugin.joinpath(*CARD_REL).read_text(encoding="utf-8")
+    assert context == card
+    assert context.count(card.splitlines()[0]) == 1
+
+
+def test_claude_ignores_plugin_rules_dir():
+    """A4 boundary: nothing Claude Code loads for loom-workflow points at rules/."""
+    plugin = REPO_ROOT / "loom-workflow"
+    assert _rule_path(plugin).exists()  # the agy rule is really there
+    for rel in (".claude-plugin/plugin.json", "hooks/hooks.json",
+                "hooks/visualization-card"):
+        text = (plugin / rel).read_text(encoding="utf-8")
+        assert "rules/" not in text and "AGENTS.md" not in text, rel

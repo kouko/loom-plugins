@@ -4,7 +4,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat の図表と推論ページ、second opinion。
 
-**Version**：5.0.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.2.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 概要
 
@@ -176,6 +176,32 @@ claude plugin install loom-workflow@loom
 codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
+
+Codex では loom-visualization のトリガーカードを plugin の SessionStart hook で届ける。Codex がこの hook を走らせるのは、plugin の hook を確認して信頼した後だけ。
+
+### Antigravity CLI
+
+repo を clone し、`loom-code` を先にインストールする。`critique`・`decision-map`・
+`distill-sessions` が loom-code を参照する。インストール前に `agy plugin list` で
+Claude Code から取り込まれた同名の plugin がないか確認する。install はその取り込み済みの
+コピーを置き換え、後の `agy plugin uninstall` はそれを削除する。
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-workflow
+```
+
+使うときは、プロジェクトのディレクトリでプロジェクトを絶対パスで workspace に追加して
+`agy` を起動する：`agy --add-dir "$PWD"`（対話）または
+`agy --add-dir "$PWD" -p "..."`（print モード）。agy 1.2.2 は `.` のような相対パスを
+受け付けない。`--add-dir` がないと print モード（`agy -p`）では agy は workspace を
+持たないため、loom の kickoff defaults が読み込まれず、agent がプロジェクトの外で
+作業することがある。対話モードでも指定する。
+
+hook が走るのは `agy` CLI だけで、Antigravity のデスクトップアプリや IDE では走らない。
+agy では loom-visualization のトリガーカードを plugin rule として届けるため、常に有効になる。
 
 ## 使い方
 

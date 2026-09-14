@@ -106,9 +106,9 @@ def test_page_mode_preserves_extraction_render_and_fidelity_gates():
 
     commands = "\n".join(
         [
-            "python3 scripts/render_cot_html.py <file>.md",
-            "python3 scripts/verify_cot_html.py --render --stamp <file>.html",
-            "python3 scripts/render_cot_html.py <file>.md",
+            "python3 <skill-dir>/scripts/render_cot_html.py <file>.md",
+            "python3 <skill-dir>/scripts/verify_cot_html.py --render --stamp <file>.html",
+            "python3 <skill-dir>/scripts/render_cot_html.py <file>.md",
         ]
     )
     assert commands in text

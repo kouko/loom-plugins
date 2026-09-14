@@ -1,0 +1,45 @@
+# Independent recount of committed A/B streams + spot check, blind run 2026-09-14, HEAD b8fbcc1f
+# invoked = assistant tool_use name Skill with skill loom-visualization or loom-workflow:loom-visualization
+A a1-csv-export-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A a1-csv-export-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A a2-login-lockout-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A a2-login-lockout-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A a3-image-upload-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A a3-image-upload-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A b1-sqlite-postgres-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A b1-sqlite-postgres-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A b2-auth-provider-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A b2-auth-provider-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A b3-monorepo-split-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+A b3-monorepo-split-run2.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+A c1-csv-export-run1.jsonl invoked=False table=True diagram=False is_error=False has_result=True
+A c1-csv-export-run2.jsonl invoked=False table=True diagram=False is_error=False has_result=True
+A c2-login-lockout-run1.jsonl invoked=False table=True diagram=False is_error=False has_result=True
+A c2-login-lockout-run2.jsonl invoked=False table=True diagram=False is_error=False has_result=True
+A c3-image-upload-run1.jsonl invoked=False table=True diagram=False is_error=False has_result=True
+A c3-image-upload-run2.jsonl invoked=False table=True diagram=False is_error=False has_result=True
+TOTAL A: invoked 12/18 table 17/18 diagram 1/18
+B a1-csv-export-run1.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B a1-csv-export-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+B a2-login-lockout-run1.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B a2-login-lockout-run2.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B a3-image-upload-run1.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B a3-image-upload-run2.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B b1-sqlite-postgres-run1.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B b1-sqlite-postgres-run2.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B b2-auth-provider-run1.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B b2-auth-provider-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+B b3-monorepo-split-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+B b3-monorepo-split-run2.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B c1-csv-export-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+B c1-csv-export-run2.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+B c2-login-lockout-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+B c2-login-lockout-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+B c3-image-upload-run1.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+B c3-image-upload-run2.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+TOTAL B: invoked 18/18 table 8/18 diagram 10/18
+# spot check: fresh sessions, same argv shape, variant copies from HEAD (A = old description restored)
+blind-spot-A-b1-sqlite-postgres.jsonl invoked=True table=True diagram=False is_error=False has_result=True
+blind-spot-A-c1-csv-export.jsonl invoked=False table=True diagram=False is_error=False has_result=True
+blind-spot-B-b1-sqlite-postgres.jsonl invoked=True table=False diagram=True is_error=False has_result=True
+blind-spot-B-c1-csv-export.jsonl invoked=True table=True diagram=False is_error=False has_result=True

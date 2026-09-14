@@ -275,6 +275,118 @@ DEBT_LIST: frozenset[str] = frozenset(
 )
 
 
+# Only Claude Code substitutes this token in skill text; Codex CLI and
+# Antigravity CLI pass it through literally. A scoped contract that names it
+# (braced or not) must also carry OTHER_HOST_MARKER in a prose clause that
+# locates the plugin root (e.g. "on any other host it is the directory two
+# levels above this SKILL.md"). No debt list: every live file was fixed when
+# the rule landed.
+PLUGIN_ROOT_TOKEN = "${CLAUDE_PLUGIN_ROOT}"
+OTHER_HOST_MARKER = "on any other host"
+
+_PLUGIN_ROOT_TOKEN_RE = re.compile(r"\$\{?CLAUDE_PLUGIN_ROOT\b")
+# A fenced code block: an example, not prose the reader follows.
+_CODE_FENCE_RE = re.compile(r"^[ \t]*(`{3,}|~{3,}).*?^[ \t]*\1", re.M | re.S)
+# Clause boundary: sentence end or semicolon. Colons and dashes stay inside a
+# clause — live fallbacks read "on any other host: the ... directory".
+_CLAUSE_SPLIT_RE = re.compile(r"[.;!?](?:\s|$)")
+# The location a fallback clause must give: a count of levels above/up from a
+# file, or the directory that holds a named file.
+_LOCATION_RE = re.compile(r"\blevels (?:above|up)\b|\bholding\b|\bthat holds\b")
+_NEGATION_RE = re.compile(r"\b(?:no|not|never|cannot|none)\b|n't\b")
+
+# Plugin-level reference directories hold runtime prose too; the fallback
+# lint covers them in addition to the citation scope.
+_FALLBACK_EXTRA_DIRS: tuple[str, ...] = (
+    "loom-code/references",
+    "loom-design/references",
+    "loom-workflow/references",
+)
+
+
+def lacks_other_host_fallback(text: str) -> bool:
+    """True when `text` names the Claude-only plugin-root token without an
+    other-host fallback clause: outside fenced code, one clause holding the
+    marker and a location (`levels above`/`levels up`, or the directory
+    `holding`/`that holds` a file), with no negation. Whitespace is collapsed
+    so wrapped prose still matches; case is ignored."""
+    if not _PLUGIN_ROOT_TOKEN_RE.search(text):
+        return False
+    prose = " ".join(_CODE_FENCE_RE.sub(" ", text).split()).lower()
+    for clause in _CLAUSE_SPLIT_RE.split(prose):
+        if (
+            OTHER_HOST_MARKER in clause
+            and _LOCATION_RE.search(clause)
+            and not _NEGATION_RE.search(clause)
+        ):
+            return False
+    return True
+
+
+def _runtime_prose_files(repo_root: Path) -> list[Path]:
+    """Citation scope plus the plugin `references/` directories, sorted."""
+    files = set(iter_scope_files(repo_root))
+    for rel_dir in _FALLBACK_EXTRA_DIRS:
+        base = repo_root / rel_dir
+        if base.is_dir():
+            files.update(base.glob("*.md"))
+    return sorted(files)
+
+
+def scan_plugin_root_fallbacks(repo_root: Path) -> list[str]:
+    """Repo-root-relative posix paths of scoped files (citation scope plus the
+    plugin `references/` directories) that lack the fallback."""
+    return [
+        path.relative_to(repo_root).as_posix()
+        for path in _runtime_prose_files(repo_root)
+        if lacks_other_host_fallback(path.read_text(encoding="utf-8"))
+    ]
+
+
+# An interpreter run on a `scripts/` path with no anchor resolves against the
+# agent's working directory, not the skill folder, on every host. Anchored
+# forms (`<skill-dir>/scripts/...`, `${CLAUDE_SKILL_DIR}/scripts/...`) never
+# match: the path must start at `scripts/` or `./scripts/`. Fenced code is
+# scanned too — agents copy commands out of fences. No debt list.
+# Interpreter names match case-sensitively (`python`, `python3`, `python3.12`,
+# `bash`, `sh`) so prose like "Python scripts/ folder" is not a command.
+# Interpreter flags (`-u`, `-X utf8`, `-W error`) and a quoted path still run
+# the bare path. A backslash-continued command is joined before matching.
+_BARE_SCRIPT_RE = re.compile(
+    r"(?<![\w-])(?:python(?:3(?:\.\d+)?)?|bash|sh)"
+    r"(?:[ \t]+(?:-[XW][ \t]*[^\s\"'-]\S*|-[A-Za-z]+))*"
+    r"[ \t]+[\"']?(?:\./)?scripts/"
+)
+
+
+def find_bare_script_paths(text: str) -> list[int]:
+    """1-based line numbers in `text` running a bare `scripts/` path. A
+    backslash-continued command reports its first line."""
+    hits: list[int] = []
+    lines = text.splitlines()
+    index = 0
+    while index < len(lines):
+        start = index
+        command = lines[index]
+        while command.endswith("\\") and index + 1 < len(lines):
+            index += 1
+            command = command[:-1] + " " + lines[index]
+        if _BARE_SCRIPT_RE.search(command):
+            hits.append(start + 1)
+        index += 1
+    return hits
+
+
+def scan_bare_script_paths(repo_root: Path) -> list[str]:
+    """`path:line` entries, over the fallback scope, that run a bare
+    `scripts/` path."""
+    return [
+        f"{path.relative_to(repo_root).as_posix()}:{number}"
+        for path in _runtime_prose_files(repo_root)
+        for number in find_bare_script_paths(path.read_text(encoding="utf-8"))
+    ]
+
+
 def find_repo_root(start: Path) -> Path:
     """Walk up from `start` to the nearest `.git` dir; else cwd."""
     current = start.resolve()
@@ -311,6 +423,27 @@ def main(argv: list[str] | None = None) -> int:
         for rel_path in sorted(set(actual) - DEBT_LIST):
             for cand in actual[rel_path]:
                 print(f"    {rel_path}: {cand}", file=sys.stderr)
+        return 1
+
+    no_fallback = scan_plugin_root_fallbacks(repo_root)
+    if no_fallback:
+        for rel_path in no_fallback:
+            print(
+                f"PLUGIN ROOT WITHOUT OTHER-HOST FALLBACK: {rel_path} names "
+                f"{PLUGIN_ROOT_TOKEN} but no prose clause says "
+                f"'{OTHER_HOST_MARKER}' with where the plugin root is",
+                file=sys.stderr,
+            )
+        return 1
+
+    bare_scripts = scan_bare_script_paths(repo_root)
+    if bare_scripts:
+        for location in bare_scripts:
+            print(
+                f"BARE BUNDLED-SCRIPT PATH: {location} runs scripts/ relative "
+                "to the working directory; anchor it as <skill-dir>/scripts/",
+                file=sys.stderr,
+            )
         return 1
 
     print(

@@ -4,6 +4,46 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.2.0] — 2026-09-14 — Codex visualization-card hook
+
+- `loom-visualization`, `goal-create`, `distill-sessions` and
+  `dbt-model-style` now run their bundled scripts from the skill directory
+  on every host, so a command no longer fails when the working directory is
+  the user's repository.
+- The contract lint now rejects a bare `scripts/` command in skill docs, so
+  a command that only resolves from the skill folder cannot ship again.
+- agy now receives the loom-visualization trigger card as a generated
+  plugin `rules/AGENTS.md`.
+- Codex now receives the same trigger card through a SessionStart hook once
+  the user trusts the plugin's hooks.
+- `distill-sessions` passes `skill_dir` to the advisory analyst, in its
+  SKILL.md and in both host dispatch templates, so the report's command
+  lines use the real skill path instead of a guessed one.
+- The Codex SessionStart hook in `hooks/hooks-codex.json` is now part of the
+  counted mechanism population as
+  `SessionStart:startup|clear|compact:visualization-card@codex`; the net
+  count rises from 126 to 127.
+- budget-exception: SessionStart:startup|clear|compact:visualization-card@codex — delivers the existing loom-visualization trigger card to Codex, where the manifest `hooks` key replaces default hook discovery; eval scripts/test_loom_plugin_install_layout.py::test_codex_manifest_points_at_sessionstart_card_hook.
+- The Codex manifest's long description no longer claims a PostToolUse
+  skill-folder hook: Codex runs only `hooks/hooks-codex.json`, so it names
+  the SessionStart visualization-card hook instead.
+- Sync `--check` now tells the user to remove a hand-written leftover
+  `rules/AGENTS.md` by hand when its source card is gone, because sync never
+  deletes a file without the generated header.
+
+## [5.1.0] — 2026-09-14 — loom-visualization triggers on Loom station reports
+
+- `loom-visualization`'s description now names Loom station reports to the
+  user (intent restatement, choices, blind-run results). An A/B on 18
+  station-reporting sessions per variant raised invocations from 12/18 to
+  18/18; the shipped text is the tested text, pinned by SHA-256 (evidence:
+  the change's A/B results in
+  `docs/loom/2026-09-14-loom-visualization-description-trigger/ab/results.md`).
+  All of the gain came from the blind-run report prompts (0/6 → 6/6), since
+  intent restatement and choices were already 12/12. Under the new wording,
+  option comparisons more often went into code-block ASCII tables instead of
+  markdown tables.
+
 ## [5.0.0] — 2026-09-14 — loom-visualization replaces cot-explain
 
 - **BREAKING**: `cot-explain` is removed with no alias. Invocations of

@@ -13,6 +13,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 from prose_pin import NEGATION_RE
 
 REPO = Path(__file__).resolve().parents[2]
@@ -183,6 +185,7 @@ def test_ask_still_asks_once_per_full_lane_change() -> None:
     assert "every full-lane change" in flat
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
+    assert "ask_question" not in text  # agy offers no candidate, so it never asks
     assert "render both choices in the user's current conversation language" in flat
     assert "decline this change" in flat
     assert "https://code.claude.com/docs/en/tools-reference" in text
@@ -196,6 +199,12 @@ def test_ask_is_host_aware_and_has_complete_fallbacks() -> None:
     flat = " ".join(text.split())
     assert "On Codex, probe `claude` then `gemini`" in flat
     assert "On Claude Code, probe `codex` then `gemini`" in flat
+    agy = flat.split("On Antigravity CLI,", 1)[1].split(".", 1)[0]
+    assert "probe nothing" in agy
+    assert "no verified second-vendor runner yet" in agy
+    assert "no such review tool is available" in agy
+    for vendor in ("claude", "codex", "gemini"):
+        assert f"`{vendor}`" not in agy
     assert "blocking plain-language Markdown question" in flat
     assert "no runnable different-model-family CLI" in flat
     assert "continue without asking" in flat
@@ -240,6 +249,113 @@ def test_confirmed_selection_is_recorded_for_closing_review() -> None:
     assert "before committing the plan" not in flat
 
 
+# --- typed-branch-names W1-02 -- the branch is `<type>/<change-id>` -------
+
+
+def test_write_plan_names_typed_branch_and_types() -> None:
+    section = _section(
+        SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off"
+    )
+    flat = " ".join(section.split())
+    assert "git switch -c <type>/<change-id>" in flat
+    sentences = _flat_sentences(section)
+    hits = [
+        s for s in sentences
+        if "pick" in s and "same type" in s and "commit" in s
+        and "PR title" in s and "squash-merge" in s and not _has_negation(s)
+    ]
+    assert hits, (
+        "Step 6 has no affirmative sentence saying the agent picks the type "
+        "and reuses it in the PR title, which becomes the squash-merge commit"
+    )
+    # The type list sits in the pick sentence and matches implementer.md.
+    listed = set(re.findall(r"`([a-z]+)`", hits[0]))
+    assert listed == {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}, listed
+    own = [
+        s for s in sentences
+        if "task commits" in s and "own" in s and "Conventional Commits" in s
+        and "implementer contract" in s and not _has_negation(s)
+    ]
+    assert own, (
+        "Step 6 must say individual task commits keep their own Conventional "
+        "Commits type as the implementer contract sets it"
+    )
+    fixed = [
+        s for s in sentences
+        if "`docs(loom):`" in s and "intent" in s and "plan commits" in s
+        and "fixed form" in s
+    ]
+    assert fixed, "Step 6 must say the `docs(loom):` intent and plan commits keep their fixed form"
+
+
+# Split literals so a repo grep for the bare form never matches this file.
+_BARE_BRANCH_RE = re.compile(
+    r"(?:switch (?:-c|--create)|checkout -[bB]|git branch|worktree add -b"
+    r"|branch named)\s+[`'\"]?" + "<change" + r"-id>"
+)
+
+_CID = "<change" + "-id>"
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        f"git switch -c {_CID}",
+        f"git switch --create {_CID}",
+        f"git switch -c `{_CID}`",
+        f"git switch -c '{_CID}'",
+        f'git switch -c "{_CID}"',
+        f"git checkout -b {_CID}",
+        f"git checkout -B {_CID}",
+        f"git branch {_CID}",
+        f"git worktree add -b {_CID} ../wt",
+        f"create a branch named `{_CID}`",
+    ],
+)
+def test_bare_branch_re_catches_spelling(line: str) -> None:
+    assert _BARE_BRANCH_RE.search(line), line
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        f"git switch -c <type>/{_CID}",
+        f"git switch --create `<type>/{_CID}`",
+        f"git checkout -B <type>/{_CID}",
+        f"git worktree add -b <type>/{_CID} ../wt",
+        f"create a branch named `<type>/{_CID}`",
+        f"write docs/loom/{_CID}/plan.md",
+        f"see `docs/loom/{_CID}/spec.md`",
+    ],
+)
+def test_bare_branch_re_ignores_typed_and_path(line: str) -> None:
+    assert not _BARE_BRANCH_RE.search(line), line
+
+
+def test_write_plan_bare_switch_absent() -> None:
+    section = _section(
+        SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off"
+    )
+    assert not _BARE_BRANCH_RE.search(section), _BARE_BRANCH_RE.search(section)
+
+
+def test_repo_grep_no_bare_branch() -> None:
+    hits = []
+    for plugin in ("loom-code", "loom-design", "loom-workflow"):
+        for path in sorted((REPO / plugin).rglob("*")):
+            if path.suffix not in {".md", ".py", ".sh"} or not path.is_file():
+                continue
+            rel = path.relative_to(REPO)
+            if path.name.startswith("CHANGELOG") or {
+                "node_modules", "__pycache__"
+            } & set(rel.parts):
+                continue
+            for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if _BARE_BRANCH_RE.search(line):
+                    hits.append(f"{rel}:{n}")
+    assert not hits, hits
+
+
 def test_current_release_metadata_is_synchronized() -> None:
     claude_manifest = json.loads(
         (REPO / "loom-code/.claude-plugin/plugin.json").read_text(encoding="utf-8")
@@ -251,3 +367,12 @@ def test_current_release_metadata_is_synchronized() -> None:
     assert claude_manifest["version"] == "3.3.0"
     assert codex_manifest["version"] == "3.3.0"
     assert "## [3.3.0]" in changelog
+
+
+def test_agy_host_passes_empty_usable_vendors() -> None:
+    text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
+    probe = " ".join(_section(text, "## Availability probe").split())
+    order = next(s for s in re.split(r"(?<=[.:])\s+(?=[A-Z])", probe) if "canonical order" in s)
+    assert "On Claude Code and Codex" in order
+    assert 'On Antigravity CLI, pass `host_vendor: "gemini"`' in probe
+    assert "an empty `usable_vendors` list to `second_vendor_policy.py`" in probe

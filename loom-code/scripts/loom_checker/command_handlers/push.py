@@ -21,6 +21,7 @@ from loom_checker.rule_checks.selection_guard import FILE_TOOLS as SELECTION_GUA
 from loom_checker.rule_checks.selection_guard import RULE_ID as SELECTION_GUARD_RULE
 from loom_checker.rule_checks.selection_guard import guard_reason as selection_guard_reason
 from pathlib import Path
+import io
 import json
 import os
 import re
@@ -94,6 +95,9 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     if git_push or malformed_canonical_push:
         repo, immutable_head, refspec_error = canonical_git_push(command, cwd)
         if refspec_error:
+            # The push stays blocked either way; a missing or invalid
+            # attestation is named first because it is what the user must fix.
+            print(attestation_reason(command, cwd, rest), end="", file=err)
             print(f"BLOCK push.attestation: {refspec_error}", file=err)
             return 2
         assert repo is not None and immutable_head is not None
@@ -132,6 +136,29 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
             print(f"BLOCK push.attestation: {remote_error}", file=err)
             return 2
     return 2 if rc == 1 else rc
+
+
+def attestation_reason(command: str, cwd: str, rest: list[str]) -> str:
+    """BLOCK lines for the target branch's attestation, read-only and without
+    replay; "" when it is valid or the repository cannot be determined
+    safely, so the caller's own refusal stands alone (fail closed).
+
+    The reported attestation state reflects the target repository's
+    checked-out HEAD, not necessarily the ref being pushed; the push stays
+    blocked either way."""
+    target = git_dash_c_push_cwd(command, cwd)
+    if target is None:
+        return ""
+    buffer = io.StringIO()
+    previous = os.getcwd()
+    try:
+        os.chdir(target)
+        rc = _cmd_push(list(rest), io.StringIO(), buffer)
+    except Exception:  # any doubt keeps today's single refusal
+        return ""
+    finally:
+        os.chdir(previous)
+    return buffer.getvalue() if rc == 1 else ""
 
 
 def _cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:

@@ -153,6 +153,23 @@ def _write_workflow_hooks(repo: Path) -> None:
     (repo / "loom-workflow" / "hooks" / "hooks.json").write_text(json.dumps(WORKFLOW_HOOKS_JSON))
 
 
+WORKFLOW_CODEX_HOOKS_JSON = {
+    "hooks": {
+        "SessionStart": [
+            {
+                "matcher": "startup|clear|compact",
+                "hooks": [{"type": "command", "command": 'python3 "${PLUGIN_ROOT}/hooks/visualization-card" --host=codex'}],
+            }
+        ],
+    }
+}
+
+
+def _write_workflow_codex_hooks(repo: Path) -> None:
+    (repo / "loom-workflow" / "hooks").mkdir(parents=True, exist_ok=True)
+    (repo / "loom-workflow" / "hooks" / "hooks-codex.json").write_text(json.dumps(WORKFLOW_CODEX_HOOKS_JSON))
+
+
 FULL_MECHANISMS = [
     {"id": "write-plan", "class": "skill", "eval": "cold-read: evidence/a.md"},
     {"id": "git-memory", "class": "skill", "eval": "cold-read: evidence/a.md"},
@@ -224,6 +241,18 @@ class TestRecompute:
             "SessionStart:startup|clear|compact:visualization-card",
             "PostToolUse:Write|Edit:validate-skill-folder-structure.sh",
         }
+
+    def test_hooks_include_loom_workflow_codex_manifest(self, tmp_path):
+        """A Codex hooks file for loom-workflow is counted, host-qualified
+        with `@codex` like loom-code's, so it cannot sit outside the population."""
+        repo = _build_repo(tmp_path)
+        _write_workflow_hooks(repo)
+        _write_workflow_codex_hooks(repo)
+
+        hooks = cm.recompute_hooks(repo)
+        assert "SessionStart:startup|clear|compact:visualization-card@codex" in hooks
+        assert "SessionStart:startup|clear|compact:visualization-card" in hooks
+        assert len(hooks) == 5
 
     def test_hook_id_uses_first_script_path_in_compound_command(self, tmp_path):
         repo = _build_repo(tmp_path)
@@ -605,6 +634,18 @@ class TestBaselineApproximation:
         assert approx is True
         # 3 SKILL.md files + 2 loom-code hook entries + 2 loom-workflow entries
         assert total == 3 + 2 + 2
+
+    def test_approximate_baseline_counts_loom_workflow_codex_hooks(self, tmp_path):
+        repo = _build_repo(tmp_path)  # no mechanisms.yaml written
+        _write_workflow_hooks(repo)
+        _write_workflow_codex_hooks(repo)
+        _git(repo, "init", "-q")
+        _git(repo, "add", "-A")
+        _git(repo, "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-q", "-m", "base")
+        total, approx = cm.compute_baseline_total(repo, "HEAD")
+        assert approx is True
+        # 3 SKILL.md + 2 loom-code + 2 loom-workflow + 1 loom-workflow Codex entry
+        assert total == 3 + 2 + 2 + 1
 
 
 class TestRealYaml:

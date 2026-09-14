@@ -1,0 +1,121 @@
+{
+  "schema": "loom-attestation/v1",
+  "change_id": "2026-09-14-agy-skill-script-paths",
+  "content_digest": "b8346c5aed826073d1a39692abeec1d7308293ed",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_bare_script_lint.py -q -p no:cacheprovider",
+      "artifact": "loom-code/scripts/test_adversarial_bare_script_lint.py",
+      "result": "pass",
+      "command_digest": "ff2da7497568cd88118cb5fafb8f99c167e46d6397b1c25212a6a08d966c3019"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest scripts/test_adversarial_agy_rule_sync.py -q -p no:cacheprovider",
+      "artifact": "scripts/test_adversarial_agy_rule_sync.py",
+      "result": "pass",
+      "command_digest": "3fda9182779e9e7419fa825908fa0e94afe2f04edb7b6c81fe4f56ef52b965f4"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/scripts/test_adversarial_visualization_card_hosts.py -q -p no:cacheprovider",
+      "artifact": "loom-workflow/scripts/test_adversarial_visualization_card_hosts.py",
+      "result": "pass",
+      "command_digest": "defa2401bf28ef1d31d81936c22a37a1a202d31dd3425bee32166ac8a2c44841"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "loom-code:reviewer#code-aa69977b",
+      "vendor": "anthropic",
+      "model": "claude-opus-5 (host-default/unverified)",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "status": "open",
+          "anchor": "loom-workflow/hooks/visualization-card",
+          "text": "nitpick (non-blocking): the two-token `--host codex` form is not accepted; a probe pins the fallback to the full Claude card.",
+          "fix": "Accept `--host codex` as well, or document only `--host=codex`."
+        },
+        {
+          "severity": "nit",
+          "dimension": "principles-conformance",
+          "status": "open",
+          "anchor": "loom-code/scripts/check_mechanisms.py:562",
+          "text": "nitpick (non-blocking): R3 reads loom-code's CHANGELOG and accepts any budget-exception line, so the loom-workflow 5.2.0 exception line is not actually gated (pre-existing gate weakness).",
+          "fix": "Match the exception id to the added mechanism id and read the owning plugin's CHANGELOG."
+        }
+      ]
+    },
+    {
+      "reviewer": "loom-code:reviewer#skill-af83702a",
+      "vendor": "anthropic",
+      "model": "claude-opus-5 (host-default/unverified)",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "deletion-first",
+          "status": "open",
+          "anchor": "loom-workflow/rules/AGENTS.md:1",
+          "text": "nitpick (non-blocking): the generated-file header comment is quoted by agy as part of the card.",
+          "fix": "Move the generation note out of model-visible text, updating the adversarial probe that pins it."
+        },
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "status": "open",
+          "anchor": "loom-workflow/CHANGELOG.md:13",
+          "text": "nitpick (non-blocking): the lint bullet can be read as blocking anchored commands; the section title names only the Codex hook.",
+          "fix": "Reword to 'a skill doc can no longer ship a command that works only from inside the skill folder' and retitle the section."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "dimension": "correctness",
+      "status": "open",
+      "anchor": "loom-workflow/hooks/visualization-card",
+      "text": "nitpick (non-blocking): the two-token `--host codex` form is not accepted; a probe pins the fallback to the full Claude card.",
+      "fix": "Accept `--host codex` as well, or document only `--host=codex`."
+    },
+    {
+      "severity": "nit",
+      "dimension": "principles-conformance",
+      "status": "open",
+      "anchor": "loom-code/scripts/check_mechanisms.py:562",
+      "text": "nitpick (non-blocking): R3 reads loom-code's CHANGELOG and accepts any budget-exception line, so the loom-workflow 5.2.0 exception line is not actually gated (pre-existing gate weakness).",
+      "fix": "Match the exception id to the added mechanism id and read the owning plugin's CHANGELOG."
+    },
+    {
+      "severity": "nit",
+      "dimension": "deletion-first",
+      "status": "open",
+      "anchor": "loom-workflow/rules/AGENTS.md:1",
+      "text": "nitpick (non-blocking): the generated-file header comment is quoted by agy as part of the card.",
+      "fix": "Move the generation note out of model-visible text, updating the adversarial probe that pins it."
+    },
+    {
+      "severity": "nit",
+      "dimension": "ambiguity",
+      "status": "open",
+      "anchor": "loom-workflow/CHANGELOG.md:13",
+      "text": "nitpick (non-blocking): the lint bullet can be read as blocking anchored commands; the section title names only the Codex hook.",
+      "fix": "Reword to 'a skill doc can no longer ship a command that works only from inside the skill folder' and retitle the section."
+    }
+  ]
+}

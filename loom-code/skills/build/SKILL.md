@@ -36,8 +36,10 @@ Apply the resolved overrides at invocation time; a static model or effort pin in
 an agent contract is invalid.
 
 Invoke `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py` from Claude
-Code or `python3 <injected loom-code plugin root>/scripts/dispatch_profile.py`
-from Codex, with the explicit observed JSON defined by the shared contract
+Code or `python3 <loom-code>/scripts/dispatch_profile.py` from any other host,
+where `<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude
+Code; on any other host it is the directory two levels above this SKILL.md.
+Supply the explicit observed JSON defined by the shared contract
 before each spawn. Pass its deterministic JSON result to the host-native spawn:
 apply both fields from `overrides`, or apply neither when it is `null`. Feed
 every completed result back as an `after-execution` event before any
@@ -46,6 +48,9 @@ task result as a post-execution capability-quality failure only when it meets
 the contract's checkable definition; describe rejected routing parameters as
 a pre-execution host rejection, which selects the one atomic fallback instead
 of model escalation.
+
+On Antigravity CLI, map tool and agent names with
+[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
 Unless `selection show` lists `tdd` as skipped, for every behavior change:
 
@@ -75,6 +80,6 @@ content-bound execution.
 ## 4. Hand off to Review
 
 Commit functional changes normally. Report the branch base, HEAD, changed
-paths, focused test results, and any unresolved risk. Call `loom-code:review`
+paths, focused test results, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after Review generates it.

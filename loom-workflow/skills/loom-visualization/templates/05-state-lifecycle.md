@@ -20,7 +20,8 @@ the states.
 ## ASCII
 
 No generator covers states. Hand-author the diagram, then verify it with
-`python3 scripts/align.py -`.
+`python3 <skill-dir>/scripts/align.py -` (`<skill-dir>` is defined in
+`SKILL.md`).
 
 ```
 ┌──────────┐  submit   ┌──────────┐  approve  ┌──────────┐

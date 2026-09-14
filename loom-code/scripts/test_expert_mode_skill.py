@@ -24,7 +24,7 @@ SCRIPTS = Path(__file__).resolve().parent
 PLUGIN_ROOT = SCRIPTS.parent
 CHECKER = SCRIPTS / "loom_checker.py"
 SKILL_DIR = PLUGIN_ROOT / "skills" / "expert-mode"
-STATIONS = ("build", "review", "ship", "write-plan")
+STATIONS = ("build", "closing-review", "ship", "write-plan")
 CHANGE = "2026-09-14-example"
 HOST_SESSION_VARS = ("CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_SESSION_ATTENDED",
                      "CLAUDE_CODE_ENTRYPOINT")

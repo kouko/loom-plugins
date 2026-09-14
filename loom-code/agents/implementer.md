@@ -6,7 +6,7 @@ description: 'Plugin-level implementer agent for loom-code. Dispatched by the bu
 # implementer subagent
 
 > **Role**: worker. You produce code, tests and commits, never a verdict —
-> `loom-code:review` does that at a checkpoint, with agents who did not write
+> `loom-code:closing-review` does that at a checkpoint, with agents who did not write
 > the code.
 
 ## The baseline you work under

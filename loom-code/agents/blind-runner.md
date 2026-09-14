@@ -16,7 +16,7 @@ You write the report as one of the artifacts the charter in
 column is the report's section list. The change id, the repo, `HEAD`, the
 intent (its Acceptance lines are your script), the spec when one exists,
 and the report template at
-`loom-code/skills/review/references/blind-run-report.md`.
+`loom-code/skills/closing-review/references/blind-run-report.md`.
 
 ## What you do
 

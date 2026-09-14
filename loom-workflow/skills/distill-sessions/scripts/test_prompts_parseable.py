@@ -342,6 +342,89 @@ def test_advisory_prompt_forbids_orchestrator_memory_reference() -> None:
     _ = joined
 
 
+def test_advisory_prompt_defines_skill_dir_before_first_use() -> None:
+    """The advisory prompt's first ``<skill-dir>`` must sit in its definition.
+
+    The analyst's command examples use ``<skill-dir>/scripts/...``. An
+    undefined placeholder gets copied literally into the report the user
+    pastes from, so the paragraph holding the first occurrence must say what
+    it is (the folder holding SKILL.md) and that report command lines use the
+    resolved absolute path instead.
+    """
+    _, body = _split_frontmatter(ADVISORY_PATH.read_text(encoding="utf-8"))
+    first = body.find("<skill-dir>")
+    assert first != -1, f"{ADVISORY_PATH.name}: expected a <skill-dir> use"
+    start = body.rfind("\n\n", 0, first)
+    end = body.find("\n\n", first)
+    paragraph = body[start if start != -1 else 0 : end if end != -1 else len(body)]
+    paragraph_lower = " ".join(paragraph.split()).lower()
+    assert "skill.md" in paragraph_lower and "absolute path" in paragraph_lower, (
+        f"{ADVISORY_PATH.name}: the first <skill-dir> must appear in a sentence "
+        f"defining it (folder holding SKILL.md; reports use the absolute path); "
+        f"got paragraph: {paragraph.strip()!r}"
+    )
+
+
+def test_advisory_prompt_declares_skill_dir_input() -> None:
+    """``skill_dir`` must be a named input, not a value the orchestrator guesses.
+
+    The prompt tells the analyst to replace ``<skill-dir>`` with a resolved
+    path, so that path has to arrive as an input: in the frontmatter
+    ``input_contract``, in the "Context you will receive" list, and in the
+    input count. A stale "three inputs" sentence contradicts the list.
+    """
+    fm, body = _split_frontmatter(ADVISORY_PATH.read_text(encoding="utf-8"))
+    assert "skill_dir" in (fm.get("input_contract") or {}), (
+        f"{ADVISORY_PATH.name}: input_contract must declare skill_dir"
+    )
+    start = body.find("## Context you will receive")
+    assert start != -1, f"{ADVISORY_PATH.name}: missing context section"
+    end = body.find("\n## ", start + 1)
+    section = body[start : end if end != -1 else len(body)]
+    assert re.search(r"^- `skill_dir`", section, re.MULTILINE), (
+        f"{ADVISORY_PATH.name}: context list must include a `skill_dir` bullet"
+    )
+    flat = " ".join(body.split()).lower()
+    assert "three inputs" not in flat, (
+        f"{ADVISORY_PATH.name}: input count must match the four declared inputs"
+    )
+
+
+def test_advisory_prompt_has_no_bare_relative_pytest_path() -> None:
+    """Command examples must root script paths at ``<skill-dir>``."""
+    text = ADVISORY_PATH.read_text(encoding="utf-8")
+    assert not re.search(r"pytest scripts/", text), (
+        f"{ADVISORY_PATH.name}: use `pytest <skill-dir>/scripts/...`"
+    )
+
+
+def test_skill_md_advisory_dispatch_names_skill_dir_key() -> None:
+    """SKILL.md's advisory dispatch step must name the payload's skill_dir key."""
+    text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    start = text.find("## Optional advisory report")
+    assert start != -1, "SKILL.md: missing advisory report section"
+    end = text.find("\n## ", start + 1)
+    section = " ".join(text[start : end if end != -1 else len(text)].split())
+    assert "`skill_dir`" in section and "dispatch_payload.input" in section, (
+        "SKILL.md: advisory dispatch step must name `skill_dir` from "
+        "dispatch_payload.input"
+    )
+
+
+@pytest.mark.parametrize("host_file", ["claude-code-tools.md", "codex-tools.md"])
+def test_host_advisory_dispatch_template_passes_skill_dir(host_file: str) -> None:
+    """Each host's Stage 5c template must pass skill_dir to the analyst."""
+    text = (SKILL_ROOT / "references" / host_file).read_text(encoding="utf-8")
+    start = text.find("## Stage 5c single dispatch")
+    assert start != -1, f"{host_file}: missing Stage 5c dispatch section"
+    end = text.find("\n## ", start + 1)
+    section = text[start : end if end != -1 else len(text)]
+    assert "skill_dir" in section and "dispatch_payload.input" in section, (
+        f"{host_file}: Stage 5c dispatch must pass dispatch_payload.input "
+        "including `skill_dir`"
+    )
+
+
 def test_both_prompts_forbid_orchestrator_memory_reference() -> None:
     """Regression guard for v0.2 Finding #3 (orchestrator memory leak).
 

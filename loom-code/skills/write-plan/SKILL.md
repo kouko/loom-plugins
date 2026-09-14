@@ -31,10 +31,15 @@ Use the installed checker's host-specific prefix:
 | Host | Command prefix |
 |---|---|
 | Claude Code | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py` |
-| Codex CLI | `python3 <injected loom-code plugin root>/scripts/loom_checker.py` |
+| Codex CLI, Antigravity CLI | `python3 <loom-code>/scripts/loom_checker.py` |
 
-Commands below show Claude Code; on Codex substitute the injected prefix.
+`<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude Code;
+on any other host it is the directory two levels above this SKILL.md.
+Commands below show Claude Code; on any other host substitute `<loom-code>`
+for `${CLAUDE_PLUGIN_ROOT}`.
 `${CLAUDE_PLUGIN_ROOT}` is substituted by Claude Code. `PLUGIN_ROOT` is provided to Codex plugin hook commands; it is not a general skill-shell variable.
+On Antigravity CLI, map tool and agent names with
+[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
 prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
@@ -60,7 +65,7 @@ or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
 | write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no blind run; `not-required`: none |
 | write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | no formal plan review; invokes the required spec review only when it authored the spec |
 | build | diff — commits on the change branch | agent-decided | task and integration tests | no formal review during Build; one closing review follows completed functional work |
-| review | generated `docs/loom/<change-id>/attestation.json`, plus a blind-run report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | package suite and adversarial programs execute once during `finalize-review` | branch end, or again only after functional content changes |
+| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus a blind-run report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | package suite and adversarial programs execute once during `finalize-review` | branch end, or again only after functional content changes |
 | ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.attestation` plus fast publication safety; no functional replay | before push; publication-only fixes reuse matching evidence |
 | maintain | intent — a fresh `docs/loom/intent/<change-id>.md` | agent (dedupe is mechanical) | `intent.schema`, `intent.needs-design-reason`, `intent.needs-design-recompute`, `intent.product-no-identifiers` on a new intent | before hand-off to write-plan |
 
@@ -422,7 +427,7 @@ Review has started as JSON on stdin to:
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/second_vendor_policy.py
 ```
 
-On Codex, use the injected loom-code plugin root as in step 0. Treat the
+On any other host, use the `<loom-code>` root defined in step 0. Treat the
 JSON result as the decision: render its `notice_kind`, `notice_vendor`, and
 `recommendation_reasons`; do not reproduce the risk mapping in prose. A
 notice is commentary, not a decision point, and work continues without
@@ -453,8 +458,15 @@ checkpoint measures its delta from the branch base — which would then be
 the plan commit itself:
 
 ```
-git switch -c <change-id>
+git switch -c <type>/<change-id>
 ```
+
+For example `feat/2026-09-14-push-reason`. You pick `<type>` from `feat`,
+`fix`, `docs`, `refactor`, `test`, `chore` or `ci` to match what the change
+does, and use the same type in the PR title, which becomes the change's
+squash-merge commit on the trunk. Individual task commits keep their own
+Conventional Commits type as the implementer contract sets it, and the
+`docs(loom):` intent and plan commits keep their fixed form.
 
 The intent may already be committed on the trunk; that is fine and nothing
 needs moving. It is the plan and everything after it that belongs on the

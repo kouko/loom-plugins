@@ -201,7 +201,7 @@ def test_floor_invocation_line_names_the_script():
     assert matching, "No fenced invocation line names scripts/goal_lint.py"
 
     invocation_line = matching[0]
-    assert "python3 scripts/goal_lint.py" in invocation_line
+    assert "python3 <skill-dir>/scripts/goal_lint.py" in invocation_line
 
     # Honest statement: the floor checks structure only, the bar stays
     # judgement — required somewhere in the SESSION mode section.

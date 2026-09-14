@@ -22,7 +22,7 @@ import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-LENSES = REPO / "loom-code/skills/review/references/lenses.md"
+LENSES = REPO / "loom-code/skills/closing-review/references/lenses.md"
 REVIEWER = REPO / "loom-code/agents/reviewer.md"
 
 from prose_pin import NEGATION_RE as _NEGATION_RE  # shared matcher, one place to widen

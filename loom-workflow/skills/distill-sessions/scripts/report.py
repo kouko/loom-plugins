@@ -13,7 +13,7 @@ Output (stdout JSON payload): ``{dispatch_payload, output_path}`` —
 - ``dispatch_payload.model``: ``claude-sonnet-4-6`` (parity with main.py
   Stage 3 per-trajectory subagent — 1M context, semantic clustering
   capable).
-- ``dispatch_payload.input``: ``{merged_data, lang, date_str}`` fed to
+- ``dispatch_payload.input``: ``{merged_data, lang, date_str, skill_dir}`` fed to
   the subagent. The subagent performs semantic clustering + 7-section
   narrative rendering in the user's working language and returns the
   finished markdown.
@@ -48,6 +48,10 @@ from pathlib import Path
 # Claude Code orchestrator dispatches this prompt; report.py only emits the
 # dispatch-payload JSON to stdout, no LLM call inside this script.
 SUBAGENT_MODEL_ID = "claude-sonnet-4-6"
+
+# Absolute distill-sessions skill folder (holds SKILL.md); the analyst
+# substitutes it for `<skill-dir>` in report command lines.
+SKILL_DIR = Path(__file__).resolve().parents[1]
 
 
 # ---------------------------------------------------------------------------
@@ -95,6 +99,7 @@ def build_dispatch_payload(
                 "merged_data": merged_data,
                 "lang": lang,
                 "date_str": date_str,
+                "skill_dir": str(SKILL_DIR),
             },
         },
         "output_path": str(output_path),

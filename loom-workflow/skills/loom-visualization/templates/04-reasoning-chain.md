@@ -20,7 +20,8 @@ For a standalone page explaining documented reasoning, use page mode instead.
 ## ASCII
 
 No generator covers labelled edges. Hand-author the chain, then verify it with
-`python3 scripts/align.py -`.
+`python3 <skill-dir>/scripts/align.py -` (`<skill-dir>` is defined in
+`SKILL.md`).
 
 ```
 ┌───────────────────────────┐

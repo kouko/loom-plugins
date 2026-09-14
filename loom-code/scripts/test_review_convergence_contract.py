@@ -1,8 +1,9 @@
+import re
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-REVIEW = (ROOT / "loom-code/skills/review/SKILL.md").read_text(encoding="utf-8")
+REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
 REVIEWER = (ROOT / "loom-code/agents/reviewer.md").read_text(encoding="utf-8")
 REVIEW_WORDS = " ".join(REVIEW.split())
 CONTRACT = " ".join((REVIEW + "\n" + REVIEWER).split())
@@ -51,6 +52,52 @@ def test_contract_adds_no_review_round_ledger_or_schema() -> None:
 def test_round_four_is_forbidden_in_context() -> None:
     assert "never dispatch Round 4" in REVIEW_WORDS
     assert "must not dispatch Round 4" in CONTRACT
+
+
+def _sentences(text: str) -> list[str]:
+    return [s for s in re.split(r"(?<=[.:;])\s+", text) if s]
+
+
+def test_station_commits_report_before_finalize() -> None:
+    instruction = "commit that report on the change branch before"
+    assert instruction in REVIEW_WORDS
+    assert "before running `finalize-review`" in REVIEW_WORDS
+    assert "docs/loom/<change-id>/blind-run-report.md" in REVIEW_WORDS
+    command = "loom_checker.py finalize-review <change-id>"
+    assert REVIEW_WORDS.index(instruction) < REVIEW_WORDS.index(command)
+
+
+def test_report_committed_before_reviewers_read_final_digest() -> None:
+    order = next(s for s in _sentences(REVIEW_WORDS) if "commit that report" in s)
+    assert "Finish the blind run" in order
+    assert "before the reviewers read the final functional-content digest" in order
+    reason = next(s for s in _sentences(REVIEW_WORDS) if "committed after their verdicts" in s)
+    assert "next round" in reason
+
+
+_COMMIT_AFTER_VERDICTS = re.compile(
+    r"\bcommit (?:that|the|its) (?:blind-run )?report\b[^.]*\bafter\b"
+    r"|\bafter\b[^.]*\b(?:verdicts?|reviewers? (?:read|return))\b[^.]*\bcommit (?:that|the|its) (?:blind-run )?report\b",
+    re.IGNORECASE,
+)
+
+
+def test_report_commit_after_verdicts_not_instructed() -> None:
+    assert _COMMIT_AFTER_VERDICTS.search("After the verdicts arrive, commit the blind-run report.")
+    assert _COMMIT_AFTER_VERDICTS.search("Commit that report after reviewers return.")
+    assert not _COMMIT_AFTER_VERDICTS.search("A report committed after their verdicts needs the next round.")
+    offending = [s for s in _sentences(REVIEW_WORDS) if _COMMIT_AFTER_VERDICTS.search(s)]
+    assert offending == []
+
+
+def test_finalize_before_report_commit_not_instructed() -> None:
+    finalize_then_commit = re.compile(
+        r"finaliz\w*.*\b(then|afterwards?|later)\b.*commit\w*.*blind-run report"
+        r"|commit\w*.*blind-run report.*\b(after|once)\b.*finaliz",
+        re.IGNORECASE,
+    )
+    offending = [s for s in _sentences(REVIEW_WORDS) if finalize_then_commit.search(s)]
+    assert offending == []
 
 
 def test_reviewer_yaml_is_converted_to_finalization_json() -> None:
@@ -196,3 +243,14 @@ def test_recording_passage_invokes_nothing_and_registers_no_mechanism() -> None:
             "#821 REQ-4 forbids a station calling memory by virtue of being "
             "reached. " + _WHY
         )
+
+
+def test_blind_run_before_first_reviewer_dispatch() -> None:
+    section = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
+    words = " ".join(section.split())
+    sentence = (
+        "When a blind run is needed, finish it and commit its report (§3) "
+        "before dispatching the first reviewers."
+    )
+    assert sentence in words
+    assert words.index(sentence) < words.index("loom_checker.py reviewer-count")

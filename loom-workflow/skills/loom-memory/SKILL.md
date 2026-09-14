@@ -15,7 +15,9 @@ generation are implemented in
 `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` (the
 `skills/loom-memory/scripts/loom_memory.py` file inside this skill's own
 directory); this skill is the only place that decides *when* and *how* to
-call them.
+call them. `${CLAUDE_PLUGIN_ROOT}` is this plugin's root, substituted on
+Claude Code; on any other host it is the directory two levels above this
+SKILL.md — use that path in its place wherever it appears below.
 
 This skill runs identically wherever agent skills and repository file
 access are available. Nothing in this file or in the store schema depends

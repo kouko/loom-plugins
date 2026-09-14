@@ -1,9 +1,9 @@
 # Product principles — loom (loom-plugins)
-ratified-by: kouko 2026-09-05; Fixed-choices plugin clause amended (three plugins to four, loom-memory independent) by kouko 2026-09-11; reverted (four plugins back to three, loom-memory retired into loom-workflow) by kouko 2026-09-11; reviewer-floor clause amended by kouko 2026-09-12
+ratified-by: kouko 2026-09-05; Fixed-choices plugin clause amended (three plugins to four, loom-memory independent) by kouko 2026-09-11; reverted (four plugins back to three, loom-memory retired into loom-workflow) by kouko 2026-09-11; reviewer-floor clause amended by kouko 2026-09-12; hosts clause amended (Antigravity CLI added) by kouko 2026-09-14
 pending-ratification: non-negotiable 2 user-skipped-steps amendment (2026-09-14) — awaiting kouko
 
 ## Who
-People who describe what they want in plain words and have only basic software-engineering knowledge, working alone or in a small team, on Claude Code or Codex CLI. They cannot judge the quality of a spec, a plan, or a diff.
+People who describe what they want in plain words and have only basic software-engineering knowledge, working alone or in a small team, on Claude Code, Codex CLI or Antigravity CLI. They cannot judge the quality of a spec, a plan, or a diff.
 
 ## Non-negotiables (ordered)
 1. The user answers only three kinds of questions — what do you want, does it react the way you expect, is it done — plus consequence-form choices for one-way doors; never a question that requires reading code.
@@ -22,5 +22,5 @@ Work that passes every gate while its quality is insufficient and the user canno
 
 ## Fixed choices
 - Three plugins with one-way dependency on loom-code's versioned contract package. (Briefly four, 2026-09-05 to 2026-09-11, while `loom-memory` shipped as its own independent plugin; retired back into loom-workflow the same day the fourth-plugin wording was ratified.)
-- Host-installed plugin hooks (Claude Code and Codex), never repository-local or git hooks.
+- Host-installed plugin hooks (Claude Code, Codex and Antigravity CLI), never repository-local or git hooks.
 - Hard cutover: pre-1.0 artifacts are archived in place, never converted.

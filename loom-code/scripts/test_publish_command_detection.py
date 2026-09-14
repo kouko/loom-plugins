@@ -27,6 +27,20 @@ def test_real_publishers_remain_detected() -> None:
     assert all(loom_checker.is_push_command(command) for command in commands)
 
 
+def test_uppercase_program_names_remain_detected() -> None:
+    # A case-insensitive filesystem (default macOS) resolves GIT/GH to git/gh.
+    commands = [
+        "GIT push origin HEAD",
+        "/usr/bin/Git push origin HEAD",
+        "GH pr create --fill",
+        "ENV GIT push origin HEAD",
+    ]
+
+    assert all(loom_checker.is_push_command(command) for command in commands)
+    assert loom_checker.is_pr_create_command("GH pr create --fill")
+    assert loom_checker.is_pr_merge_command("Gh pr merge 1")
+
+
 def test_unbalanced_quote_keeps_conservative_detection() -> None:
     assert loom_checker.is_push_command("rg -n 'needle|gh pr create")
 

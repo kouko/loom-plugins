@@ -14,7 +14,8 @@ agent reads this file, and the user still types the confirmation.
 
 Checker prefix: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py` on
 Claude Code, `python3 <injected loom-code plugin root>/scripts/loom_checker.py`
-on Codex. Commands below write `loom_checker.py`. `<change-id>` is the active
+on Codex; on any other host the plugin root is the directory two levels above
+this SKILL.md. Commands below write `loom_checker.py`. `<change-id>` is the active
 change's id; when no intent exists yet, it is the dated kebab-case id the
 change will use.
 

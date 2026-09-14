@@ -10,6 +10,18 @@ Codex-only ``interface`` block. This engine copies the shared fields into the
 Codex manifest in lock-step while preserving ``interface`` (and any other
 Codex-only key) verbatim.
 
+It also generates the Antigravity CLI (agy) root manifest
+(``<plugin>/plugin.json``). That file is wholly derived — ``AGY_FIELDS`` copied
+from the Claude SSOT, nothing hand-authored — so any difference from the
+derived form is drift. Claude Code and Codex ignore a root ``plugin.json``.
+Every mode below (sync, ``--check``, ``--scaffold``, ``--all``) covers both
+derived manifests; a MISSING root manifest fails only ``--all --check``.
+
+It also generates the agy plugin rule ``<plugin>/rules/AGENTS.md`` for each
+plugin in ``AGY_RULE_SOURCES`` (only loom-workflow: its visualization trigger
+card, prefixed with a one-line generated-file header). Every mode covers it;
+a MISSING or drifted rule fails both ``--check`` and ``--all --check``.
+
 This engine is REPO-LEVEL (not self-locating to a single plugin): the plugin to
 sync is passed in as a
 directory name or path. The public surface (``sync_plugin`` + a CLI taking a
@@ -48,9 +60,24 @@ SHARED_FIELDS = (
 
 CLAUDE_MANIFEST = (".claude-plugin", "plugin.json")
 CODEX_MANIFEST = (".codex-plugin", "plugin.json")
+AGY_MANIFEST = ("plugin.json",)
 
-# The independent repository publishes exactly the three Loom plugins.
+# agy needs only ``name``; ``version`` and ``description`` are accepted by
+# ``agy plugin validate`` and keep the listing informative. Nothing else, so
+# the root file carries no host wiring another loader could adopt.
+AGY_FIELDS = ("name", "version", "description")
+
+# The independent repository publishes exactly the three Loom plugins; the same
+# set gets both the Codex and the agy root manifest.
 CODEX_ELIGIBLE = ("loom-code", "loom-design", "loom-workflow")
+
+# agy keeps a plugin's ``rules/AGENTS.md`` active in every session; Claude Code
+# and Codex ignore it. It is generated from one source file per plugin — an
+# explicit map, not a scan: only loom-workflow ships a trigger card.
+AGY_RULE = ("rules", "AGENTS.md")
+AGY_RULE_SOURCES = {
+    "loom-workflow": ("skills", "loom-visualization", "assets", "trigger-card.md"),
+}
 
 
 def sync_shared_fields(source: dict, target: dict) -> dict:
@@ -110,6 +137,164 @@ def sync_plugin(plugin_dir, check: bool = False) -> bool:
     if synced != target:
         _dump(target_path, synced)
     return True
+
+
+def agy_manifest_path(plugin_dir: Path) -> Path:
+    return plugin_dir.joinpath(*AGY_MANIFEST)
+
+
+def derive_agy_manifest(source: dict) -> dict:
+    """The agy root manifest: ``AGY_FIELDS`` from the Claude SSOT, in order."""
+    return {field: source[field] for field in AGY_FIELDS if field in source}
+
+
+def sync_agy_manifest(plugin_dir, check: bool = False) -> bool:
+    """Generate (or, with ``check=True``, verify) ``<plugin>/plugin.json``.
+
+    ``check=True`` is a pure read: True iff the file exists and equals the
+    derived manifest exactly (an extra key is drift). ``check=False`` writes
+    the derived manifest when it differs and returns True.
+    """
+    plugin_dir = Path(plugin_dir)
+    derived = derive_agy_manifest(_load(claude_manifest_path(plugin_dir)))
+    target_path = agy_manifest_path(plugin_dir)
+    try:
+        current = _load(target_path)
+    except (OSError, ValueError):
+        # Absent, a directory, or undecodable: not the derived manifest, so
+        # --check reports drift and sync regenerates a regular file.
+        current = None
+
+    if check:
+        return current == derived
+
+    if current != derived:
+        _dump(target_path, derived)
+    return True
+
+
+def _check_agy(plugin_dir: Path, require: bool = True) -> int:
+    """CLI helper: print MISSING/DRIFT for the agy root manifest; 0 when clean.
+
+    ``require=False`` (single-plugin ``--check``, also run by the Codex drift
+    edit hook on any plugin) skips an absent root manifest; ``--all`` requires
+    it for every eligible plugin.
+    """
+    path = agy_manifest_path(plugin_dir)
+    if not path.exists():
+        if not require:
+            return 0
+        print(f"MISSING: {path} — run: python3 {Path(__file__).name} {plugin_dir}",
+              file=sys.stderr)
+        return 1
+    if not sync_agy_manifest(plugin_dir, check=True):
+        print(
+            f"DRIFT: {path} differs from the fields {list(AGY_FIELDS)} of "
+            f"{claude_manifest_path(plugin_dir)}. "
+            f"Run: python3 {Path(__file__).name} {plugin_dir}",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
+
+def agy_rule_path(plugin_dir: Path) -> Path:
+    return Path(plugin_dir).joinpath(*AGY_RULE)
+
+
+def _agy_rule_source(plugin_dir: Path):
+    """The source path tuple for this plugin's rule, or None when it has none."""
+    return AGY_RULE_SOURCES.get(Path(plugin_dir).resolve().name)
+
+
+def _agy_rule_header(source) -> str:
+    rel = "/".join(source)
+    return (
+        f"<!-- Generated from {rel} by scripts/{Path(__file__).name}; "
+        f"edit {rel}, not this file. -->\n"
+    )
+
+
+def derive_agy_rule(plugin_dir) -> str:
+    """A one-line generated-file header, then the source file verbatim."""
+    source = _agy_rule_source(plugin_dir)
+    header = _agy_rule_header(source)
+    return header + Path(plugin_dir).joinpath(*source).read_text(encoding="utf-8")
+
+
+def sync_agy_rule(plugin_dir, check: bool = False) -> bool:
+    """Generate (or, with ``check=True``, verify) ``<plugin>/rules/AGENTS.md``.
+
+    A plugin without an ``AGY_RULE_SOURCES`` entry has no rule: always True,
+    nothing written. A mapped plugin whose source file is absent gets no rule
+    either, so a leftover rule there is drift; sync deletes it when it carries
+    the generated header (a hand-written file is left for the user).
+    ``check=True`` is a pure read. Sync onto a directory at the rule path
+    prints a one-line error and returns False.
+    """
+    plugin_dir = Path(plugin_dir)
+    source = _agy_rule_source(plugin_dir)
+    if source is None:
+        return True
+    target_path = agy_rule_path(plugin_dir)
+    if not check and target_path.is_dir():
+        print(f"ERROR: {target_path} is a directory, not the generated rule; "
+              f"remove it and rerun: python3 {Path(__file__).name} {plugin_dir}",
+              file=sys.stderr)
+        return False
+    if not plugin_dir.joinpath(*source).is_file():
+        if check:
+            return not target_path.exists()
+        try:
+            orphan = target_path.read_text(encoding="utf-8")
+        except (OSError, ValueError):
+            orphan = ""
+        if orphan.startswith(_agy_rule_header(source)):
+            target_path.unlink()
+        return True
+    derived = derive_agy_rule(plugin_dir)
+    try:
+        current = target_path.read_text(encoding="utf-8")
+    except (OSError, ValueError):
+        current = None
+
+    if check:
+        return current == derived
+
+    if current != derived:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        target_path.write_text(derived, encoding="utf-8")
+    return True
+
+
+def _check_agy_rule(plugin_dir: Path) -> int:
+    """CLI helper: print MISSING/DRIFT for the agy plugin rule; 0 when clean."""
+    rel = _agy_rule_source(plugin_dir)
+    if rel is None:
+        return 0
+    path = agy_rule_path(plugin_dir)
+    source = Path(plugin_dir).joinpath(*rel)
+    fix = f"Run: python3 {Path(__file__).name} {plugin_dir}"
+    if source.is_file() and not path.is_file():
+        print(f"MISSING: {path} — {fix}", file=sys.stderr)
+        return 1
+    if not source.is_file() and path.is_file():
+        try:
+            leftover = path.read_text(encoding="utf-8")
+        except (OSError, ValueError):
+            leftover = ""
+        if not leftover.startswith(_agy_rule_header(rel)):
+            # Sync only deletes a rule carrying the generated header, so
+            # rerunning it would never clear this file.
+            print(f"DRIFT: {path} has no generated header and its source "
+                  f"{source} is gone; sync will not delete a hand-written "
+                  f"file — remove it by hand.", file=sys.stderr)
+            return 1
+    if not sync_agy_rule(plugin_dir, check=True):
+        print(f"DRIFT: {path} differs from its source {source} "
+              f"(or the source is gone). {fix}", file=sys.stderr)
+        return 1
+    return 0
 
 
 def _derive_interface(source: dict) -> dict:
@@ -235,6 +420,13 @@ def main(argv: list[str] | None = None) -> int:
                     file=sys.stderr,
                 )
                 exit_code = 1
+            if args.check:
+                exit_code |= _check_agy(plugin_dir)
+                exit_code |= _check_agy_rule(plugin_dir)
+            else:
+                sync_agy_manifest(plugin_dir)
+                if not sync_agy_rule(plugin_dir):
+                    exit_code = 1
         return exit_code
 
     if args.plugin is None:
@@ -242,7 +434,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.scaffold:
         scaffold_plugin(args.plugin)
-        return 0
+        sync_agy_manifest(args.plugin)
+        return 0 if sync_agy_rule(args.plugin) else 1
 
     if args.check:
         if not codex_manifest_path(args.plugin).exists():
@@ -251,18 +444,19 @@ def main(argv: list[str] | None = None) -> int:
                 file=sys.stderr,
             )
             return 1
-        if sync_plugin(args.plugin, check=True):
-            return 0
-        print(
-            f"DRIFT: {codex_manifest_path(args.plugin)} shared fields diverge "
-            f"from {claude_manifest_path(args.plugin)}. "
-            f"Run: python3 {Path(__file__).name} {args.plugin}",
-            file=sys.stderr,
-        )
-        return 1
+        if not sync_plugin(args.plugin, check=True):
+            print(
+                f"DRIFT: {codex_manifest_path(args.plugin)} shared fields diverge "
+                f"from {claude_manifest_path(args.plugin)}. "
+                f"Run: python3 {Path(__file__).name} {args.plugin}",
+                file=sys.stderr,
+            )
+            return 1
+        return _check_agy(args.plugin, require=False) | _check_agy_rule(args.plugin)
 
     sync_plugin(args.plugin)
-    return 0
+    sync_agy_manifest(args.plugin)
+    return 0 if sync_agy_rule(args.plugin) else 1
 
 
 if __name__ == "__main__":

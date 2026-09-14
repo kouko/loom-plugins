@@ -18,7 +18,7 @@ PILOT_REPORT = (
 )
 STATIONS = (
     PLUGIN / "skills" / "build" / "SKILL.md",
-    PLUGIN / "skills" / "review" / "SKILL.md",
+    PLUGIN / "skills" / "closing-review" / "SKILL.md",
 )
 
 
@@ -131,7 +131,7 @@ def test_failure_observations_define_conformance_and_trigger_requirements() -> N
 
 def test_nonconforming_output_retry_keeps_validation_and_retry_ownership_separate() -> None:
     profile = _flat(_contract())
-    review = _flat((PLUGIN / "skills" / "review" / "SKILL.md").read_text(encoding="utf-8"))
+    review = _flat((PLUGIN / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8"))
     runner = (PLUGIN / "scripts" / "claude_reviewer.py").read_text(encoding="utf-8")
 
     assert "retry the same effective profile without model or effort escalation" in profile
@@ -167,7 +167,7 @@ def test_build_and_review_resolve_the_shared_profile_before_every_dispatch() -> 
 
 
 def test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack() -> None:
-    review = (PLUGIN / "skills" / "review" / "SKILL.md").read_text(encoding="utf-8")
+    review = (PLUGIN / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8")
     flat = _flat(review)
 
     assert "--model <model> --effort <effort>" in flat
@@ -185,7 +185,7 @@ def test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack() -> 
 
 def test_atomic_claude_dispatch_gate_is_registered_with_executable_eval() -> None:
     gate_id = "review.atomic-claude-dispatch"
-    review = (PLUGIN / "skills" / "review" / "SKILL.md").read_text(encoding="utf-8")
+    review = (PLUGIN / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8")
     mechanisms = MECHANISMS.read_text(encoding="utf-8")
 
     assert review.count(f"<!-- gate: {gate_id} -->") == 1
@@ -201,7 +201,7 @@ def test_packaged_station_reference_resolves_after_isolated_install(tmp_path: Pa
     isolated = tmp_path / "standalone-loom-code"
     shutil.copytree(PLUGIN, isolated)
 
-    for relative in (Path("skills/build/SKILL.md"), Path("skills/review/SKILL.md")):
+    for relative in (Path("skills/build/SKILL.md"), Path("skills/closing-review/SKILL.md")):
         station = isolated / relative
         target = (station.parent / "../../references/dispatch-profile.md").resolve()
         assert target.is_relative_to(isolated.resolve())
