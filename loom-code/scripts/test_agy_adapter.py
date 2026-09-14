@@ -129,9 +129,10 @@ def test_malformed_tool_payload_denies(tmp_path):
 
 # --- acceptance 5: session context -----------------------------------------
 
-def _invocation(num: int, workspace: list[str], transcript: Path | None = None) -> dict:
-    payload = {"conversationId": "conv-1", "workspacePaths": workspace, "invocationNum": num,
-               "initialNumSteps": 1}
+def _invocation(num: int, workspace: list[str], transcript: Path | None = None,
+                initial_steps: int = 1, conversation: str = "conv-1") -> dict:
+    payload = {"conversationId": conversation, "workspacePaths": workspace, "invocationNum": num,
+               "initialNumSteps": initial_steps}
     if transcript is not None:
         payload["transcriptPath"] = str(transcript)
     return payload
@@ -149,6 +150,28 @@ def test_invocation_zero_injects_station_order(tmp_path):
     (message,) = _messages(out)
     assert "Station order:" in message
     assert "- second-vendor: ask" in message
+
+
+def test_first_turn_injects(tmp_path):
+    out = _run("pre-invocation", _invocation(0, [str(tmp_path)], initial_steps=1), tmp_path)
+    (message,) = _messages(out)
+    assert "Station order:" in message
+
+
+def test_second_turn_silent(tmp_path):
+    """agy resets invocationNum to 0 on every user turn; initialNumSteps grows."""
+    out = _run("pre-invocation", _invocation(0, [str(tmp_path)], initial_steps=3), tmp_path)
+    assert out == {}
+
+
+def test_marker_prevents_repeat(tmp_path):
+    first = _run("pre-invocation", _invocation(0, [str(tmp_path)], initial_steps=1), tmp_path)
+    again = _run("pre-invocation", _invocation(0, [str(tmp_path)], initial_steps=1), tmp_path)
+    other = _run("pre-invocation", _invocation(0, [str(tmp_path)], initial_steps=1,
+                                               conversation="conv-2"), tmp_path)
+    assert _messages(first)
+    assert again == {}
+    assert _messages(other)
 
 
 def test_later_invocations_inject_nothing(tmp_path):

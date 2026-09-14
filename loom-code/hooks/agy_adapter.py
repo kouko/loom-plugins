@@ -7,7 +7,7 @@ on stdout. It has no SessionStart and its PostToolUse cannot inject, so this
 adapter maps agy events onto the handlers Claude Code and Codex already use:
 
     push-gate       PreToolUse(run_command) -> scripts/loom_checker.py push --hook
-    pre-invocation  PreInvocation           -> hooks/session-start (invocationNum 0)
+    pre-invocation  PreInvocation           -> hooks/session-start (first turn only)
                                                + language-anchor on a loom SKILL.md read
 
 Exit status is always 0; decisions travel in the JSON. The push gate fails
@@ -171,6 +171,32 @@ def _session_context(payload: dict) -> str:
     return text if isinstance(text, str) else ""
 
 
+def _state_file(kind: str, payload: dict) -> Path:
+    conversation = str(payload.get("conversationId") or os.environ.get("ANTIGRAVITY_CONVERSATION_ID")
+                       or payload.get("transcriptPath") or "unknown")
+    return Path(tempfile.gettempdir()) / kind / re.sub(r"[^A-Za-z0-9_.-]", "_", conversation)
+
+
+def _first_turn_session_context(payload: dict) -> str:
+    """agy resets invocationNum to 0 on every user turn, so the first turn is
+    invocationNum 0 with at most one prior step; a per-conversation marker
+    keeps a resumed or compacted conversation from being re-injected."""
+    initial_steps = payload.get("initialNumSteps", 0)
+    if payload.get("invocationNum") != 0 or not isinstance(initial_steps, int) or initial_steps > 1:
+        return ""
+    marker = _state_file("loom-code-agy-session", payload)
+    if marker.is_file():
+        return ""
+    text = _session_context(payload)
+    if text:
+        try:
+            marker.parent.mkdir(parents=True, exist_ok=True)
+            marker.write_text("injected", encoding="utf-8")
+        except OSError:
+            pass
+    return text
+
+
 def _load_module(name: str, path: Path):
     spec = importlib.util.spec_from_file_location(name, path)
     assert spec and spec.loader
@@ -231,8 +257,7 @@ def _language_anchor(payload: dict) -> str:
 
     # One anchor per skill-read step: agy may call the model more than once
     # before a new MODEL step lands in the transcript.
-    conversation = str(payload.get("conversationId") or os.environ.get("ANTIGRAVITY_CONVERSATION_ID") or transcript)
-    state = Path(tempfile.gettempdir()) / "loom-code-agy-anchor" / re.sub(r"[^A-Za-z0-9_.-]", "_", conversation)
+    state = _state_file("loom-code-agy-anchor", payload)
     try:
         if state.is_file() and state.read_text(encoding="utf-8") == step_key:
             return ""
@@ -244,10 +269,7 @@ def _language_anchor(payload: dict) -> str:
 
 
 def pre_invocation(payload: dict) -> int:
-    messages = []
-    if payload.get("invocationNum") == 0:
-        messages.append(_session_context(payload))
-    messages.append(_language_anchor(payload))
+    messages = [_first_turn_session_context(payload), _language_anchor(payload)]
     steps = [{"ephemeralMessage": m} for m in messages if m]
     return _emit({"injectSteps": steps} if steps else {})
 
