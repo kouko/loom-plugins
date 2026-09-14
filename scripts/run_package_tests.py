@@ -45,6 +45,12 @@ def loom_family_commands(
             [["bash", test.as_posix()]
              for test in sorted((repo / "loom-workflow/tests").glob("test-*.sh"))]
         )
+    if only in {None, "workflow-mermaid"}:
+        # No skip path: a missing node or npm fails the group.
+        commands.extend([
+            ["npm", "ci", "--prefix", "loom-workflow/tests/mermaid"],
+            ["node", "loom-workflow/tests/mermaid/validate_mermaid.mjs"],
+        ])
     return commands
 
 
@@ -55,7 +61,7 @@ def main(argv: list[str]) -> int:
             print("run_package_tests: --only needs a group", file=sys.stderr)
             return 2
         only = argv[argv.index("--only") + 1] if "--only" in argv else None
-        if only not in {None, "code", "design", "workflow-python", "workflow-shell"}:
+        if only not in {None, "code", "design", "workflow-python", "workflow-shell", "workflow-mermaid"}:
             print(f"run_package_tests: unknown Loom group {only!r}", file=sys.stderr)
             return 2
         for command in loom_family_commands(Path.cwd(), verbosity, only):

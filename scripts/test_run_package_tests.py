@@ -66,6 +66,16 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
     assert actual_skill_dirs == expected_skill_dirs
 
 
+def test_workflow_mermaid_group_installs_then_validates_with_no_skip_path() -> None:
+    expected = [
+        ["npm", "ci", "--prefix", "loom-workflow/tests/mermaid"],
+        ["node", "loom-workflow/tests/mermaid/validate_mermaid.mjs"],
+    ]
+    assert loom_family_commands(REPO, verbosity="-q", only="workflow-mermaid") == expected
+    full = loom_family_commands(REPO, verbosity="-q")
+    assert all(command in full for command in expected)
+
+
 def test_loom_family_preset_discovers_relocated_memory_skill_tests() -> None:
     commands = loom_family_commands(REPO, verbosity="-q")
     rendered = [" ".join(command) for command in commands]

@@ -7,8 +7,9 @@ name: loom-workflow CI
 # test-memory-grep-verify.sh) that pin memory-grep.sh's frozen exit-code
 # contract. A regression there had no CI gate to catch it.
 #
-# Two jobs: the shell suite (glob over loom-workflow/tests/test-*.sh) and
-# a pytest job that runs both the loom-visualization page script suite and every
+# Three jobs: the shell suite (glob over loom-workflow/tests/test-*.sh),
+# a mermaid job that parses every mermaid block loom-visualization ships
+# (see that job's comment), and a pytest job that runs both the loom-visualization page script suite and every
 # skill's own `scripts/test_*.py` suite (loom-workflow/scripts/ plus each
 # loom-workflow/skills/<skill>/scripts/, discovered by glob — never a
 # named list, so a skill added after this file was written is covered
@@ -89,3 +90,23 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python3 scripts/run_package_tests.py --loom-family --only workflow-python -v
+
+  # Every mermaid block in loom-visualization's templates/ and references/
+  # must parse under Mermaid's own parser (pinned in the committed lockfile).
+  # The group has no skip path: without node it fails.
+  loom-visualization-mermaid:
+    name: loom-visualization mermaid validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate loom-visualization mermaid blocks
+        run: python3 scripts/run_package_tests.py --loom-family --only workflow-mermaid
