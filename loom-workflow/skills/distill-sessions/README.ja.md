@@ -198,14 +198,16 @@ v0.2+ で deferred になっている項目（完全な list は
 
 ## ライセンス
 
-この skill は [monkey-skills](https://github.com/kouko/monkey-skills)
-repository の一部で、MIT License で配布される — 詳細は repository
-root の `LICENSE` を参照。
+この skill はもともと monkey-skills で開発され、現在は
+[loom-plugins](https://github.com/kouko/loom-plugins) repository の
+loom-workflow の一部として、MIT License で配布される — 詳細は
+repository root の `LICENSE` を参照。
 
 ### 第三者帰属
 
 `agents/` 配下の 2 つの prompt-analyst template は Trace2Skill
 (arxiv 2603.25158 / github.com/Qwen-Applications/Trace2Skill, Apache 2.0
-License) の direct adaptation である。monkey-skills の MIT license は
+License) の direct adaptation である。本 repository
+([loom-plugins](https://github.com/kouko/loom-plugins)) の MIT license は
 upstream の Apache 2.0 license と互換性があり — 両方とも商用利用 +
 派生作成を attribution preservation 条件で許諾する。

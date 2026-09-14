@@ -74,7 +74,7 @@ DEFAULT_TOP_N = 5
 DEFAULT_TARGET_PATTERN = "loom-code:*"
 
 # Repo-root resolution: this file lives at
-# ``loom-workflow/skills/distill-sessions/scripts/main.py``. monkey-skills root
+# ``loom-workflow/skills/distill-sessions/scripts/main.py``. repository root
 # is 4 parents up.
 _REPO_ROOT = Path(__file__).resolve().parents[4]
 
@@ -86,7 +86,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[4]
 
 def _resolve_skill_md_path(skill_name: str) -> Path | None:
     """Map ``<plugin>:<skill>`` → ``<plugin>/skills/<skill>/SKILL.md`` under
-    the monkey-skills repo root.
+    the loom-plugins repo root.
 
     Returns the resolved Path (regardless of existence) or None when
     ``skill_name`` is not of the form ``<plugin>:<skill>``.

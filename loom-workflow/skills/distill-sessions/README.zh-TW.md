@@ -189,12 +189,15 @@ v0.2+ deferred 項目（完整 list 見 [`SKILL.md`](SKILL.md) §Future）：
 
 ## 授權
 
-本 skill 屬於 [monkey-skills](https://github.com/kouko/monkey-skills)
-repository，採 MIT License — 詳見 repository root 的 `LICENSE`。
+本 skill 最初於 monkey-skills 開發，現屬於
+[loom-plugins](https://github.com/kouko/loom-plugins) repository 中的
+loom-workflow，採 MIT License — 詳見 repository root 的 `LICENSE`。
 
 ### 第三方歸屬
 
 `agents/` 目錄下兩個 prompt-analyst template 為 Trace2Skill
 (arxiv 2603.25158 / github.com/Qwen-Applications/Trace2Skill, Apache 2.0
-License) 之直接改作。monkey-skills 的 MIT license 與 upstream 的 Apache 2.0
-license 相容 — 雙方皆允許商業使用與衍生作品,且需保留 attribution。
+License) 之直接改作。本 repository
+([loom-plugins](https://github.com/kouko/loom-plugins)) 的 MIT license 與
+upstream 的 Apache 2.0 license 相容 — 雙方皆允許商業使用與衍生作品,且需
+保留 attribution。
