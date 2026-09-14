@@ -7,7 +7,7 @@ publication: automatic — authorized 2026-09-15 by kouko
 
 ## Problem
 Every Loom change pays the full process regardless of size. A one-line
-parameter change still carries a written intent, a plan, two fresh reviewers,
+parameter change still carries a written intent, a plan, one or two fresh reviewers,
 an adversarial test program, a blind-run report and a long pull-request
 description. In one team repository, Loom records made up 59–87% of the added
 lines in recent small changes (one change added 618 record lines around a
@@ -53,10 +53,10 @@ instruction removes, and discloses what was skipped and on what authority.
 
 ## Value case
 - Beneficiary: kouko, working alone on Loom and adopting repositories.
-- Urgency: small changes in an adopting repository already spend most of their added lines on Loom records, and the workaround is abandoning Loom with no record.
-- Existing alternative: skip Loom entirely, which publication blocks here and which leaves no disclosure elsewhere.
-- Displaced work: none stated (weak answer).
-- GO — two concrete answers (urgency, alternative) outweigh the weak displaced-work answer.
+- Urgency (from the Problem kouko confirmed at ①): small changes in an adopting repository already spend most of their added lines on Loom records, and the workaround is abandoning Loom with no record.
+- Existing alternative (from the same confirmed Problem): skip Loom entirely, which publication blocks here and which leaves no disclosure elsewhere.
+- Displaced work: nothing — kouko, 2026-09-15 (weak answer).
+- GO — kouko chose to continue at every decision in this change; urgency and the alternative are concrete, displaced work is weak.
 
 ## Out of scope
 - A persistent expert mode, named presets, or a per-repository skip configuration.
