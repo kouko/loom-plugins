@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v1",
   "change_id": "2026-09-14-antigravity-cli-compatibility",
-  "content_digest": "28dae8659e8b77608f0a2ffadaa009476f828b3f",
+  "content_digest": "6b93647a89269f8c7c30146be0dfe5eb4cd4e86d",
   "executions": [
     {
       "kind": "package-tests",
@@ -37,112 +37,110 @@
       "artifact": "loom-code/scripts/test_adversarial_plugin_root_marker.py",
       "result": "pass",
       "command_digest": "86d2153e37a4f0f02c1e2ebc1aa977885637617295e077783978223313c48226"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_push_reason.py -q -p no:cacheprovider",
+      "artifact": "loom-code/scripts/test_adversarial_push_reason.py",
+      "result": "pass",
+      "command_digest": "022e6763d36a6f0df802a25cfb28892a326fbc9e2a253f9abe29d8cbacda6918"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_agy_anchor_turns.py -q -p no:cacheprovider",
+      "artifact": "loom-code/scripts/test_adversarial_agy_anchor_turns.py",
+      "result": "pass",
+      "command_digest": "5c9513a32fc2178a02b5020309bcf82e1b07608babfe8b379f6a009bc0f4e8a5"
     }
   ],
   "verdicts": [
     {
-      "reviewer": "loom-code:reviewer#code-afd8f508",
+      "reviewer": "loom-code:reviewer#code-aa15607c",
       "vendor": "anthropic",
-      "model": "claude-opus-5 (inherited)",
+      "model": "claude-opus-5 (host-default/unverified)",
       "lens": "code",
       "verdict": "PASS",
       "findings": [
         {
           "severity": "nit",
-          "dimension": "refactoring",
-          "status": "fixed",
-          "anchor": "loom-code/hooks/agy_adapter.py:54",
-          "text": "praise: agy/Codex missing-checker allow-set parity test added in round 2 still passes.",
-          "fix": "none needed"
+          "dimension": "correctness",
+          "status": "open",
+          "anchor": "loom-workflow/scripts/agy-validate-skill-folder.sh:69",
+          "text": "nitpick (non-blocking): greedy sed lets a nested directory named skills escape the rule; same as the pre-existing Claude-side validator.",
+          "fix": "Derive SKILL_ROOT as the shortest .../skills/<name> prefix holding SKILL.md in both scripts and add a deny case."
         },
         {
           "severity": "nit",
-          "dimension": "security",
-          "status": "fixed",
-          "anchor": "loom-code/hooks/agy_adapter.py:183",
-          "text": "praise: per-user 0o700 marker directory with O_NOFOLLOW 0o600 files.",
-          "fix": "none needed"
-        },
-        {
-          "severity": "nit",
-          "dimension": "cross-task-coherence",
-          "status": "fixed",
-          "anchor": "loom-code/plugin.json :: description",
-          "text": "praise: manifests and marketplace.json name Antigravity CLI; sync --check --all returns 0.",
-          "fix": "none needed"
+          "dimension": "architecture",
+          "status": "open",
+          "anchor": "loom-code/hooks/agy_adapter.py:339",
+          "text": "nitpick (non-blocking): adapter calls language-anchor.py private _load_lang_detect and _ANCHOR_TEXT; a rename would silently drop the agy anchor.",
+          "fix": "Expose a public anchor_text(texts) in language-anchor.py and call it from both hooks."
         },
         {
           "severity": "nit",
           "dimension": "tests",
-          "status": "fixed",
-          "anchor": "loom-code/scripts/test_adversarial_agy_adapter.py:221",
-          "text": "praise: 10ddac80 retargets the unwritable-marker-dir probe to the per-user directory the adapter uses.",
-          "fix": "none needed"
+          "status": "open",
+          "anchor": "loom-code/scripts/test_loom_publish.py:1170",
+          "text": "nitpick (non-blocking): BLOCKED_PUSH_MATRIX is pinned to 4e87e264 inside the delta, not review base 2e4da589; reviewer's own differential run showed 21 of 58 commands moved allow->block, all case variants, none block->allow.",
+          "fix": "Record 2e4da589 outcomes per row or point the comment at the intent's user-decided case-folding exception."
         }
       ]
     },
     {
-      "reviewer": "loom-code:reviewer#skill-a7dfadb2",
+      "reviewer": "loom-code:reviewer#skill-a485c678",
       "vendor": "anthropic",
-      "model": "claude-opus-5 (inherited)",
+      "model": "claude-opus-5 (host-default/unverified)",
       "lens": "skill",
       "verdict": "PASS",
       "findings": [
         {
           "severity": "important",
-          "dimension": "incorrect-fact",
-          "status": "fixed",
-          "anchor": "loom-design/skills/capture-intent/SKILL.md:64",
-          "text": "issue: sibling lookup failed on versioned Codex installs; fixed in e580684f (step past a version dir whose parent is loom-design) with a flat+versioned layout test.",
-          "fix": "none needed"
-        },
-        {
-          "severity": "nit",
-          "dimension": "incorrect-fact",
-          "status": "dismissed",
-          "anchor": "README.md:210",
-          "text": "question: agy plugin list and reinstall-replaces lacked support; dismissed on verified agy plugin list usage and agy changelog.",
-          "fix": "none needed"
-        },
-        {
-          "severity": "nit",
-          "dimension": "omission",
-          "status": "fixed",
-          "anchor": "loom-code/README.md:117",
-          "text": "nitpick: hook list omitted the language reminder; fixed en/ja/zh-TW.",
-          "fix": "none needed"
-        },
-        {
-          "severity": "nit",
           "dimension": "inconsistency",
           "status": "fixed",
-          "anchor": "loom-workflow/README.md:136",
-          "text": "nitpick: agy install order missing; loom-code first added.",
+          "anchor": "loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md:23",
+          "text": "issue: canonical-order probe sentence contradicted 'On Antigravity CLI, probe nothing'; scoped to Claude Code and Codex, agy passes host_vendor gemini with empty usable_vendors.",
+          "fix": "none needed"
+        },
+        {
+          "severity": "important",
+          "dimension": "inconsistency",
+          "status": "fixed",
+          "anchor": "loom-code/references/antigravity-tools.md:81",
+          "text": "issue: 'continue without one' contradicted fixed-CLI failure behaviour; all three texts now report the blocker for a fixed CLI or accepted ask and continue only for suggest or declined ask.",
           "fix": "none needed"
         },
         {
           "severity": "nit",
-          "dimension": "omission",
+          "dimension": "incorrect-fact",
           "status": "fixed",
-          "anchor": "loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md:94",
-          "text": "nitpick: ask sections named no agy question tool; ask_question sentence added in both references.",
+          "anchor": "docs/loom/2026-09-14-antigravity-cli-compatibility/blind-run-report.md:171",
+          "text": "nitpick: blocked-set sentence and missing case-folding question in report; fixed.",
+          "fix": "none needed"
+        },
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "status": "fixed",
+          "anchor": "loom-code/references/antigravity-tools.md:75",
+          "text": "nitpick: profile record now host-default/unverified per dispatch-profile.md.",
           "fix": "none needed"
         },
         {
           "severity": "nit",
           "dimension": "ambiguity",
-          "status": "open",
-          "anchor": "loom-code/references/antigravity-tools.md:62",
-          "text": "nitpick (non-blocking): 'one self invocation per role' can be misread as one invocation for all reviewers; the next sentence resolves it.",
-          "fix": "Say one self invocation per dispatch: one per reviewer identity, and one each for implementer task, adversary and blind runner."
+          "status": "fixed",
+          "anchor": "loom-code/skills/closing-review/SKILL.md:136",
+          "text": "suggestion: §2 now opens with finishing the blind run and committing its report before dispatching reviewers.",
+          "fix": "none needed"
         },
         {
           "severity": "nit",
-          "dimension": "incorrect-fact",
-          "status": "open",
-          "anchor": "README.md:220",
-          "text": "nitpick (non-blocking): missing-workspace behaviour was observed for agy -p only; README states it for interactive agy too (advice harmless).",
-          "fix": "Probe interactive agy or narrow the sentence to agy -p."
+          "dimension": "omission",
+          "status": "fixed",
+          "anchor": "docs/loom/2026-09-14-antigravity-cli-compatibility/blind-run-report.md:202",
+          "text": "nitpick: Evidence bullets now quote the deciding output inline.",
+          "fix": "none needed"
         }
       ]
     }
@@ -150,23 +148,33 @@
   "findings": [
     {
       "severity": "nit",
-      "dimension": "ambiguity",
+      "dimension": "correctness",
       "status": "open",
-      "anchor": "loom-code/references/antigravity-tools.md:62",
-      "text": "nitpick (non-blocking): 'one self invocation per role' can be misread as one invocation for all reviewers; the next sentence resolves it.",
-      "fix": "Say one self invocation per dispatch: one per reviewer identity, and one each for implementer task, adversary and blind runner.",
-      "reviewer": "loom-code:reviewer#skill-a7dfadb2",
-      "lens": "skill"
+      "anchor": "loom-workflow/scripts/agy-validate-skill-folder.sh:69",
+      "text": "nitpick (non-blocking): greedy sed lets a nested directory named skills escape the rule; same as the pre-existing Claude-side validator.",
+      "fix": "Derive SKILL_ROOT as the shortest .../skills/<name> prefix holding SKILL.md in both scripts and add a deny case.",
+      "reviewer": "loom-code:reviewer#code-aa15607c",
+      "lens": "code"
     },
     {
       "severity": "nit",
-      "dimension": "incorrect-fact",
+      "dimension": "architecture",
       "status": "open",
-      "anchor": "README.md:220",
-      "text": "nitpick (non-blocking): missing-workspace behaviour was observed for agy -p only; README states it for interactive agy too (advice harmless).",
-      "fix": "Probe interactive agy or narrow the sentence to agy -p.",
-      "reviewer": "loom-code:reviewer#skill-a7dfadb2",
-      "lens": "skill"
+      "anchor": "loom-code/hooks/agy_adapter.py:339",
+      "text": "nitpick (non-blocking): adapter calls language-anchor.py private _load_lang_detect and _ANCHOR_TEXT; a rename would silently drop the agy anchor.",
+      "fix": "Expose a public anchor_text(texts) in language-anchor.py and call it from both hooks.",
+      "reviewer": "loom-code:reviewer#code-aa15607c",
+      "lens": "code"
+    },
+    {
+      "severity": "nit",
+      "dimension": "tests",
+      "status": "open",
+      "anchor": "loom-code/scripts/test_loom_publish.py:1170",
+      "text": "nitpick (non-blocking): BLOCKED_PUSH_MATRIX is pinned to 4e87e264 inside the delta, not review base 2e4da589; reviewer's own differential run showed 21 of 58 commands moved allow->block, all case variants, none block->allow.",
+      "fix": "Record 2e4da589 outcomes per row or point the comment at the intent's user-decided case-folding exception.",
+      "reviewer": "loom-code:reviewer#code-aa15607c",
+      "lens": "code"
     }
   ]
 }
