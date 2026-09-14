@@ -127,7 +127,7 @@ contract package it reads.
 
 ## loom-code
 
-Version 3.1.4. Five stations carry one change from plan to PR with
+Version 3.4.1. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a fast publication gate.
 
 | Skill | Role |

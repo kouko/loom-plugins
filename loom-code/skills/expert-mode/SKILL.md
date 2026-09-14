@@ -30,9 +30,8 @@ the attestation are not steps.
 - Map the user's words, in any language, onto step names.
 - When the user asks to skip the intent, say the intent is always kept and
   show the table of the remaining steps.
-- A word that is no step (other than the intent, handled above), or a skip
-  another selected step needs: name the item, ask the user to rephrase, and
-  show no confirmation line.
+- A word that is no step (other than the intent, handled above): name the
+  item, ask the user to rephrase, and show no confirmation line.
 
 ## 2. Propose, show, wait
 

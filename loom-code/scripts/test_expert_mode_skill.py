@@ -121,8 +121,9 @@ def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:
     affirmative(text, "the intent is always kept", ("say",))
     # Literal pin, not affirmative(): the bullet's own "no step" / "no
     # confirmation line" are negation tokens the prose-pin helper rejects.
-    assert ("A word that is no step (other than the intent, handled above), or a skip "
-            "another selected step needs: name the item") in flat
+    assert ("A word that is no step (other than the intent, handled above): name the "
+            "item, ask the user to rephrase") in flat
+    assert "another selected step needs" not in flat
     affirmative(text, "show the table of the remaining steps", ("say",))
     boundary = _flat(text.split("## Boundary", 1)[1])
     affirmative(boundary, "a typed confirmation stays unrecorded", ("on antigravity cli",))

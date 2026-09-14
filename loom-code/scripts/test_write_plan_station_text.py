@@ -391,6 +391,16 @@ def test_readme_version_matches_manifest(readme: str, label: str) -> None:
     assert match.group(1) == manifest["version"]
 
 
+def test_root_readme_loom_code_section_version_matches_manifest() -> None:
+    manifest = json.loads(
+        (REPO / "loom-code/.claude-plugin/plugin.json").read_text(encoding="utf-8")
+    )
+    section = _section((REPO / "README.md").read_text(encoding="utf-8"), "## loom-code")
+    match = re.search(r"^Version (\d+\.\d+\.\d+)\.", section, re.M)
+    assert match, "README.md ## loom-code: version line missing"
+    assert match.group(1) == manifest["version"]
+
+
 def test_changelog_3_4_1_session_limit_names_publication() -> None:
     changelog = (REPO / "loom-code/CHANGELOG.md").read_text(encoding="utf-8")
     entry = " ".join(

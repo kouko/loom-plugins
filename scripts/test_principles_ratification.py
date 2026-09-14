@@ -4,6 +4,7 @@ non-negotiable 2 user-skipped-steps amendment, and no longer carries a
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
@@ -22,5 +23,8 @@ def test_ratified_by_names_2026_09_15_non_negotiable_2_amendment() -> None:
     assert ratified[0].endswith("; " + AMENDMENT)
 
 
+PENDING_RE = re.compile(r"^\s*pending[\s_-]*ratification\s*:", re.I | re.M)
+
+
 def test_pending_ratification_line_absent() -> None:
-    assert not [line for line in _lines() if line.startswith("pending-ratification:")]
+    assert not PENDING_RE.search(PRINCIPLES.read_text(encoding="utf-8"))
