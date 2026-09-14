@@ -1,27 +1,25 @@
 # Let the user choose which Loom steps a single change runs
 originator: kouko
-kind: engineering
+kind: product
 needs-design: yes — multi-state selection flow (proposed step table, user-confirmed binding, mid-change reissue) with no spec
 status: confirmed 2026-09-15
 publication: automatic — authorized 2026-09-15 by kouko
 
 ## Problem
 Every Loom change pays the full process regardless of size. A one-line
-parameter change still carries an intent, a plan, fresh-context reviewers, an
-adversarial program, a blind-run report and a nine-heading pull request. In
-iCHEF-dbt-pipeline, Loom records made up 59–87% of the added lines in the
-recent small changes (#550: 618 of 784 lines, for a 166-line workflow edit),
-and historically most pull requests there bypassed Loom entirely, leaving no
-record of what was skipped.
+parameter change still carries a written intent, a plan, two fresh reviewers,
+an adversarial test program, a blind-run report and a long pull-request
+description. In one team repository, Loom records made up 59–87% of the added
+lines in recent small changes (one change added 618 record lines around a
+166-line edit), and historically most pull requests there bypassed Loom
+entirely, leaving no record of what was skipped.
 
-There is no sanctioned way to lighten one change. The `lane:` field and the
-`default-lane` key still appear in the contract manifest, the templates and
-this repository's `KICKOFF-DEFAULTS.md`, but no checker code reads them since
-the reviewer floor became path-computed, so a declaration has no effect. The
-station texts assume every earlier station ran, and the push gate requires
-reviewer verdicts and an adversarial execution for every change. The only
-lighter path is to leave Loom, which the push hook blocks and which records
-nothing.
+There is no sanctioned way to lighten one change. The old "lane" setting still
+appears in the contract and the repository defaults, but nothing reads it any
+more, so declaring it has no effect. The stations assume every earlier station
+ran, and publication demands reviewer verdicts and an adversarial run for every
+change. The only lighter path is to leave Loom, which publication blocks and
+which records nothing.
 
 ## Proposed outcome
 The user can, for one change, say in natural language which Loom steps to run
@@ -52,6 +50,13 @@ instruction removes, and discloses what was skipped and on what authority.
 - Protection stops an agent that takes a shortcut, such as running a documented command or writing a record file; an agent that deliberately disguises its commands to evade the local guard is outside the local guarantee, the same boundary Loom's other local gates keep (user-decided 2026-09-14).
 - A reviewer rejection is recorded only when the review station hands it to the checker; the pull request states that limit (user-decided 2026-09-14).
 - New mechanisms arrive with regression evals (PRINCIPLES.md non-negotiable 4), including the case where the agent suggests a skip and the user replies with a plain "yes" instead of typing the confirmation.
+
+## Value case
+- Beneficiary: kouko, working alone on Loom and adopting repositories.
+- Urgency: small changes in an adopting repository already spend most of their added lines on Loom records, and the workaround is abandoning Loom with no record.
+- Existing alternative: skip Loom entirely, which publication blocks here and which leaves no disclosure elsewhere.
+- Displaced work: none stated (weak answer).
+- GO — two concrete answers (urgency, alternative) outweigh the weak displaced-work answer.
 
 ## Out of scope
 - A persistent expert mode, named presets, or a per-repository skip configuration.
