@@ -6,8 +6,8 @@
     "name": "kouko",
     "url": "https://github.com/kouko"
   },
-  "homepage": "https://github.com/kouko/monkey-skills/tree/main/loom-code",
-  "repository": "https://github.com/kouko/monkey-skills",
+  "homepage": "https://github.com/kouko/loom-plugins/tree/main/loom-code",
+  "repository": "https://github.com/kouko/loom-plugins",
   "license": "MIT",
   "keywords": [
     "loom-code",
@@ -42,7 +42,7 @@
       "I want to refactor this module.",
       "Fix this bug."
     ],
-    "websiteURL": "https://github.com/kouko/monkey-skills/tree/main/loom-code",
+    "websiteURL": "https://github.com/kouko/loom-plugins/tree/main/loom-code",
     "brandColor": "#2563EB"
   }
 }

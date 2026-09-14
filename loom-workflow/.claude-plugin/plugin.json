@@ -6,8 +6,8 @@
     "name": "kouko",
     "url": "https://github.com/kouko"
   },
-  "homepage": "https://github.com/kouko/monkey-skills/tree/main/loom-workflow",
-  "repository": "https://github.com/kouko/monkey-skills",
+  "homepage": "https://github.com/kouko/loom-plugins/tree/main/loom-workflow",
+  "repository": "https://github.com/kouko/loom-plugins",
   "license": "MIT",
   "keywords": [
     "decision-map",

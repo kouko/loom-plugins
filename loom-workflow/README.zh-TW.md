@@ -2,97 +2,122 @@
 
 Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
-> 適用 Claude Code 與 Codex 的 loom workflow plugin — 決策 brief、deletion-first critique gate、git-native project memory、recap、handoff 與 session distill。
+> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、推理說明頁與 second opinion。
 
-**Version**：4.3.2 ・ **Part of**：[monkey-skills](https://github.com/kouko/monkey-skills) ・ **License**：MIT
+**Version**：5.0.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
-## Background
+## 這是什麼
 
-為 Claude Code 開發 skill 是反覆的工作。你 draft 一個 skill 後上線，發現它太長、或輸出 tone 偏掉，想改進它 — 但 *如何* 改進取決於變更的種類。**token / structure 的 refactor** 可機械驗證（變更後輸出應相同）。**output quality 的 tuning** 是 taste-sensitive（哪個 variant 比較好只有人類能判斷）。像 `darwin-skill` 那樣把兩者塞進同一個 rubric，會讓 LLM-as-judge 朝著偏離人類偏好的方向 hill-climb（Goodhart drift）。
+Loom 讓一個變更依序走過各站：`loom-design` 整理 intent 與 spec，`loom-code`
+負責 plan、build、review、ship。`loom-workflow` 收的是圍繞這些站使用的工具。
+工具本身不是站：每個工具都在特定時機接上，或在需要時呼叫，而且每個工具都能直接以名稱呼叫。
 
-`loom-workflow` 源自兩個架構決定，其中一個已經搬走：
-
-1. **Two Hats split for skills**（把 Fowler 的 refactor-vs-feature 套用到 skill authoring）— `skill-refactor`（Phase A：behavior-preserving、auto-evaluable）與 `skill-tuning`（Phase B：taste-sensitive、human-judged）分開。這兩個 skill，連同 `skill-creator-advance` 與 `skill-judge`，已經搬到 `skill-dev-toolkit`；詳見下方「Skill-evolution architecture（已搬遷）」。
-2. **critique 閘** — 在 proposal 變成 commit 之前介入：一個 `critique` 兩個鏡頭（`mode: proposal` 做多項目 triage、`mode: complexity` 做單一變更的 deletion-first gate）→ simplify（實作後 review，存在於 Anthropic 自己的 toolkit）。這個決定仍留在 `loom-workflow`。
-
-plugin 還帶著 `git-memory`（寫進 commit trailer 與 PR 內文的可攜 project memory，任何能讀 git 的工具都能還原）。
-
-運維治理：[`docs/skill-governance.md`](docs/skill-governance.md)。季度健康檢查：[`docs/quarterly-audit-runbook.md`](docs/quarterly-audit-runbook.md)。
+每個工具只裝 `loom-workflow` 就能運作。唯一的例外是 `decision-map` 的 delivery
+步驟：它依 `loom-code` 的 contract template 寫出 intent，因此需要 `loom-code`；
+開地圖與推進 ticket 則不需要。
 
 ## 收錄準則（Admission rule）
 
-一個 skill 屬於 `loom-workflow`，條件是它做的是**跨站（cross-station）、跨 session 的協調** — 不是因為它「被好幾個 plugin 用到」就算數。用得廣不是判準；跨 station 協調工作、或跨 session 攜帶狀態，才是判準。`decision-map` 是這條規則的第一個實例：它把一份 decision map（`MAP.md` + ticket）持久化下來，供多個 station 在一個 project 的生命週期中讀寫，正是這個 plugin 存在的理由所對應的跨站、跨 session 形狀。這條規則只 gate **新** 收錄——plugin 裡既有的 utility skill 視為 grandfathered，會在延後的 family-relocation arc 裡一併重新評估。
+一個 skill 屬於這裡，條件是它跨站協調工作，或跨 session 攜帶狀態；只是被好幾個
+plugin 用到並不算數。`decision-map` 是這條規則的第一個實例。這條規則只 gate
+新收錄，plugin 裡既有的 utility skill 維持不動。
+
+## 什麼時候用哪個工具
+
+這不是一條依序執行的流程。工具依使用時機分組；圖中的箭頭只有 `decision-map`
+自己的迴圈，以及它交棒給各站的那一步。
+
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
+flowchart TD
+    subgraph before["變更之前"]
+        direction TB
+        subgraph dm["loom-workflow:decision-map"]
+            direction TB
+            dest["Destination<br/>地圖要抵達的終點"]
+            fog["Fog<br/>還不知道的事"]
+            ticket["Ticket<br/>用 grilling、research 或 prototype 解一個未知"]
+            log["Decisions so far<br/>目前為止的決策"]
+            slice["帶 map: 的 intent<br/>由 delivery 步驟寫出<br/>（需要 loom-code）"]
+        end
+        station["loom-design:capture-intent<br/>沒有 loom-design 時為<br/>loom-code:write-plan"]
+        critique["loom-workflow:critique<br/>動手做之前裁決提案"]
+    end
+
+    subgraph working["工作中"]
+        recap["loom-workflow:recap-state<br/>這個 session 目前做到哪"]
+        recall["loom-workflow:loom-memory<br/>被要求時，或任務需要<br/>過去的教訓時 Recall"]
+        dbt["loom-workflow:dbt-model-style<br/>每次撰寫、編輯或<br/>review dbt model 時"]
+    end
+
+    subgraph commit["commit / PR / merge 時"]
+        gitmem["loom-workflow:git-memory<br/>任何站的每次 commit 前、<br/>建立 PR 時、merge 前"]
+        record["loom-workflow:loom-memory<br/>branch 關閉前 Record，<br/>依要求或 agent 判斷；<br/>沒有任何站會呼叫它"]
+    end
+
+    subgraph sessions["跨 session"]
+        handoff["loom-workflow:handoff<br/>session 結束時存下狀態，<br/>下一個 session 接續"]
+        distill["loom-workflow:distill-sessions<br/>從過去的 session<br/>挖出 skill 改進點"]
+    end
+
+    subgraph anytime["隨時"]
+        advisor["loom-workflow:independent-advisor<br/>向另一個 executor<br/>取得 second opinion"]
+        cot["loom-workflow:loom-visualization<br/>把比較、流程與推理畫成圖表"]
+        goal["loom-workflow:goal-create<br/>session goal 或 repository purpose，<br/>只在指名呼叫時"]
+        router["loom-workflow:using-loom-workflow<br/>不確定用哪個工具時<br/>幫你分派"]
+    end
+
+    dest --> fog
+    fog -->|"挑一個"| ticket
+    ticket -->|"記下答案"| log
+    ticket -.->|"新的未知"| fog
+    log -->|"一個 slice 準備好了"| slice
+    slice -->|"交棒"| station
+
+    before ~~~ working
+    working ~~~ commit
+    commit ~~~ sessions
+    sessions ~~~ anytime
+```
+
+- **變更之前** — `decision-map` 用於無法一開始就列出完整路線的工作。Outcome Map
+  位於 `docs/loom/maps/<map-id>/`，跨 session 保存。一個 slice 準備好時，delivery
+  步驟寫出帶 `map:` 的 intent，交給 `loom-design:capture-intent`（沒有
+  `loom-design` 時交給 `loom-code:write-plan`）；此後這個變更由該站負責。`critique`
+  在動手做任何東西之前裁決提案。
+- **工作中** — `recap-state` 在目前的對話裡幫你重新定向。`loom-memory`
+  在被要求時或任務需要時 Recall 過去的教訓。`dbt-model-style` 在每次撰寫、編輯或
+  review dbt model 時套用。
+- **commit / PR / merge 時** — `git-memory` 在任何站的每次 commit 前、建立 PR
+  時，以及 `ship` 之後才進行的 PR merge 之前執行。`loom-memory` 在 branch
+  關閉前，依要求或 agent 判斷 Record 持久的教訓；沒有任何站會呼叫它。
+- **跨 session** — `handoff` 在 session 結束時存下狀態，並在下一個 session
+  接續。`distill-sessions` 從過去的 session 挖出 skill 改進提案。
+- **隨時** — `independent-advisor` 向另一個 executor 取得 second opinion，
+  `loom-visualization` 把比較、流程與推理呈現成表格或圖（也能做成推理頁），`goal-create` 只在指名呼叫時執行，
+  `using-loom-workflow` 在不確定該用哪個工具時分派請求。
 
 ## Skills
 
-共 12 個 skills：11 個工具與 1 個可選入口。`using-loom-workflow`
-負責選擇既有工具，每個工具仍可直接呼叫。
+共 12 個 skills：11 個工具與 1 個可選入口。
 
 | Skill | 角色 |
 |---|---|
-| [`using-loom-workflow`](skills/using-loom-workflow/) | 將廣泛或不明確的 workflow 請求路由到既有工具，再讀入該工具的指示。 |
-| [`loom-memory`](skills/loom-memory/) | 查詢、記錄、核對或淘汰持久的 repository 教訓。 |
-| [`critique`](skills/critique/) | 在動手做之前裁決提案：`mode: proposal` 用 evidence grounding 與 YAGNI 把清單、計畫或散文建議分成 KEEP / DEFER / DROP；`mode: complexity` 用 deletion-first 量一個具體改動——before/after LOC、什麼會 obsolete。 |
-| [`dbt-model-style`](skills/dbt-model-style/) | 強制執行 dbt + Redshift model 的 style & structure contract — CTE 角色、zero-logic 的 final CTE、命名、YAML header、註解、syntax。 |
-| [`decision-map`](skills/decision-map/) | 在 `docs/loom/maps/<map-id>/` 開一張持久化的 decision map 並持續推進——一個目的地、一份不斷成長的 Decisions-so-far 紀錄，以及一份會在多個 session 中逐步畢業成 ticket 的 Not-yet-specified（fog）清單，而非一次性 plan。 |
-| [`distill-sessions`](skills/distill-sessions/) | 從過去的 Claude Code 與 Codex session transcript ＋ `/insights` 中挖掘 friction pattern，整理成逐 skill 的改進提案文件。 |
-| [`git-memory`](skills/git-memory/) | 把決策的 context（不是 diff，而是 **why**）寫進 commit trailer 與 PR 內文，讓未來任何 session — Claude Code、Cursor、Codex、aider 或人類 — 只用 `git log` 就能重建 project knowledge。 |
-| [`goal-create`](skills/goal-create/) | 建立 goal condition — SESSION 在 host 接受時啟用四欄 Goal，否則提供復原操作；ARC 起草 repository 的 purpose artifact（`Why` / `Done when`）。 |
-| [`handoff`](skills/handoff/) | 把 session 狀態存成結構化的 HANDOFF 檔，讓未來的 agent 能乾淨接手；或讀取／驗證既有的 HANDOFF。 |
-| [`independent-advisor`](skills/independent-advisor/) | 對當前的 plan 或決策，向**另一個 executor**——更強的 model、更高的 effort，或另一家廠商——取得 second opinion。換的是 executor，不是 critique 的觀點。 |
+| [`using-loom-workflow`](skills/using-loom-workflow/) | 可選入口：為廣泛或不明確的請求挑出對應工具，並讀入該工具的指示。每個工具仍可直接呼叫。 |
+| [`decision-map`](skills/decision-map/) | 在 `docs/loom/maps/<map-id>/` 開一張持久化的 Outcome Map 並持續推進：Destination、fog、分型的 ticket 與 Decisions-so-far 紀錄；delivery 步驟會寫出 intent。 |
+| [`critique`](skills/critique/) | 在動手做之前裁決提案：`mode: proposal` 把清單或計畫分成 KEEP / DEFER / DROP；`mode: complexity` 用 deletion-first 量一個具體改動。 |
+| [`recap-state`](skills/recap-state/) | 在 session 內 recap 工作目前的位置，然後停下來等確認。不是內建的 `/recap`（away-summary）。 |
+| [`loom-memory`](skills/loom-memory/) | 查詢、記錄、核對或淘汰 commit 進 memory store 的持久 repository 教訓。 |
+| [`dbt-model-style`](skills/dbt-model-style/) | 撰寫、編輯或 review dbt model 時，套用 dbt + Redshift 的 style 與 structure（CTE 角色、zero-logic 的 final CTE、命名、註解）；計算邏輯不在範圍內。 |
+| [`git-memory`](skills/git-memory/) | 在每次 `git commit`、`gh pr create`、`gh pr merge` 之前分類 Decision、Learning、Gotcha memory；也能找回過去某個 Git 決策的理由。 |
+| [`handoff`](skills/handoff/) | 把 session 狀態存成 `.claude/handoffs/` 下的 HANDOFF 檔，或在新 session 中從它接續。 |
+| [`distill-sessions`](skills/distill-sessions/) | 挖掘過去的 Claude Code 與 Codex session（可用時加上 `/insights` facets），產出依 skill 排序的 friction 與可審閱的 SKILL.md 提案。 |
+| [`independent-advisor`](skills/independent-advisor/) | 對 plan 或決策，向另一個 executor——另一個 model tier、更高的 effort，或另一家廠商——取得 second opinion。花錢或把資料送出本機需經同意。 |
 | [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。不用於 Obsidian 筆記。 |
-| [`recap-state`](skills/recap-state/) | session 內的重新定向——當 user 跟丟話題時，輸出以 Synthesis-check 收尾的結構化 recap。 |
+| [`goal-create`](skills/goal-create/) | 只在指名呼叫時執行。SESSION 起草四欄 goal condition，在 host 接受時啟用，否則誠實提供復原操作；ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
-契約仍計入八個工具，以及 `goal-create`、`dbt-model-style` 兩個 standalone skill。`loom-memory` 與可選入口路由維持在契約之外。lifecycle 狀態與所有權：[`docs/skill-governance.md`](docs/skill-governance.md)。
-
-## critique 線
-
-一個 skill 的兩個鏡頭，加上 Anthropic 自己的實作後 reviewer，組成一條 deletion-first 的 pipeline，分別對應不同的 proposal 形狀：
-
-```
-critique · mode: proposal   critique · mode: complexity   Anthropic simplify
-─────────────────────────   ───────────────────────────   ──────────────────
-多項目的 proposal           單一具體的提案變更            實作後的 diff review
-（list / plan / 散文）       （refactor、新增 feature、
-                            debt cleanup，或
-                            「該不該做這個」）
-
-triage：每項判為            gate：三個 deletion-first     上線後的 review：
-  KEEP / DEFER / DROP         questions                     reuse、品質、效率
-依 evidence + YAGNI         • 最小可達狀態
-                              • before/after LOC
-                              • 什麼會 obsolete
-
-判定：KEEP / DEFER          判定：PROCEED /              （位於本 plugin 之外）
-       / DROP                      PROCEED-WITH-CAVEAT
-                                   / RESHAPE / REJECT
-```
-
-拿到 backlog 或編號 plan 時用 `mode: proposal`。檯面上是一個具體變更時用 `mode: complexity`。變更上線之後用 Anthropic 的 `simplify`。
-
-## Skill-evolution architecture（已搬遷）
-
-`skill-creator-advance`、`skill-refactor`、`skill-tuning`、`skill-judge` — 本節過去描述的、依變更尺寸 × 評估模式劃分的生命週期模型 — 已經和 `dogfood-skill-testing` 一起搬到 `skill-dev-toolkit`。`loom-workflow` 已不再收錄它們。原始設計理由（Two Hats split、機械性變更容許 auto-evaluation 但 taste-sensitive 變更需要人類判斷的 evaluation 成本論證）封存在 [`docs/skill-evolution-architecture.md`](docs/skill-evolution-architecture.md)；目前的所有權與後續設計請見 `skill-dev-toolkit` 自己的 README。
-
-## git-memory 三大支柱
-
-`git-memory` 立基於三個主張：
-
-1. **Carrier — git artifact 本身**。commit message 與 PR 內文就是 substrate。任何能讀 git 的工具都能讀到 memory。`git clone` 會把 memory 一起帶來。沒有 server，沒有 embedding store，沒有 vendor lock-in。
-2. **Structure — commit trailer**。結構化事實搭乘 git trailer — 與 `Co-Authored-By:`、`Signed-off-by:` 同樣的機制。三個 trailer 涵蓋約 80% 的價值：`Decision:`（為什麼用這個方式）、`Learning:`（過程中發現什麼）、`Gotcha:`（給未來自己的陷阱提示）。
-3. **Content — 不是 code，而是決策的 context**。diff 已經呈現 *什麼* 變了。memory 記錄 *why*。目標是六個月後原始 context 已遺失時仍有價值的 entry — 而非與 code 重複的 entry。
-
-`git-memory` 補強（而非取代）Claude Code 原生的 `~/.claude/.../MEMORY.md`。原生 memory 保存跨 project 的 user-level 偏好；`git-memory` 在 repo 內保存 project 決策。
-
-## Upstream chain
-
-其中一個 skill 源自 MIT-licensed 的 upstream。完整 attribution 在該 skill 的 `NOTICE` 檔案。（`skill-creator-advance` 與 `skill-judge` 的 upstream attribution 已隨它們一起搬到 `skill-dev-toolkit`。）
-
-| Skill | Upstream chain |
-|---|---|
-| `critique`（`mode: complexity`） | joshuadavidthomas [`reducing-entropy`](https://github.com/joshuadavidthomas/agent-skills/tree/main/skills/reducing-entropy) → softaworks fork → monkey-skills（`reducing-entropy` 改名為 `complexity-critique`，再併入 `critique`） |
-
-其他 skill 為原創設計，沒有外部 upstream 需要 attribution。詳情見各 skill 的 `NOTICE`（若存在）。
+Loom 的契約計入其中八個工具。`goal-create` 與 `dbt-model-style` 是 Loom
+流程之外的 standalone skill，`loom-memory` 與入口路由則維持在契約之外。
 
 ## Repository 結構
 
@@ -100,12 +125,14 @@ triage：每項判為            gate：三個 deletion-first     上線後的 r
 loom-workflow/
 ├── .claude-plugin/
 │   └── plugin.json
-├── docs/
-│   ├── skill-evolution-architecture.md
-│   ├── skill-governance.md
-│   ├── quarterly-audit-runbook.md
-│   └── telemetry-setup.md
+├── .codex-plugin/
+│   └── plugin.json
+├── docs/                  治理、稽核、遙測與設計筆記
+├── hooks/
+│   └── hooks.json         Write/Edit 後檢查 skill 資料夾結構
+├── scripts/               plugin 層級測試與結構檢查
 ├── skills/
+│   ├── loom-visualization/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
@@ -114,50 +141,71 @@ loom-workflow/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
-│   ├── loom-visualization/
-│   └── recap-state/
+│   ├── loom-memory/
+│   ├── recap-state/
+│   └── using-loom-workflow/
+├── tests/                 git-memory、loom-memory 與 loom-visualization 的測試
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md
-└── README.zh-TW.md       (本檔案)
+└── README.zh-TW.md        (本檔案)
 ```
 
 ## 安裝
 
-`loom-workflow` 以 [monkey-skills](https://github.com/kouko/monkey-skills) marketplace 的一部分發行。這是取代 `dev-workflow` 的 hard-cut rename；請將自訂 skill reference 改為 `loom-workflow:<skill>`。加入 marketplace 並安裝 plugin：
+這個 repository 是名為 `loom` 的 plugin marketplace。`loom-workflow` 可以單獨安裝；
+只有要用 `decision-map` 的 delivery 步驟時才需要再加裝 `loom-code`。
 
-```bash
-/plugin marketplace add kouko/monkey-skills
-/plugin install loom-workflow@monkey-skills
+### Claude Code
+
+```sh
+claude plugin marketplace add https://github.com/kouko/loom-plugins.git
+claude plugin install loom-workflow@loom
+```
+
+### Codex
+
+```sh
+codex plugin marketplace add https://github.com/kouko/loom-plugins.git
+codex plugin add loom-workflow@loom
 ```
 
 ## 使用
 
-`loom-workflow` 沒有內附 slash command。skill 可用自然語言呼叫；`goal-create` 等工具仍須明確提出使用要求。例如：
+`loom-workflow` 沒有內附 slash command。用自然語言提出，或直接指名 skill；
+`goal-create` 只在指名時執行。例如：
 
 ```
-「critique 這份 12 項的 plan」                     → critique（proposal）
-「值不值得改」/「該不該做這個」                     → critique（complexity）
-「我準備 commit — 幫我寫 trailer」                 → git-memory
-「開一張決策地圖」/「chart a decision map」         → decision-map
-「wrap up」/「save state」                          → handoff
-「where were we」/「我跟丟了」                      → recap-state
-「second opinion」/「換一個模型看看」               → independent-advisor
+「critique 這份 12 項的 plan」         → critique（proposal）
+「該不該做這個」/「是不是做過頭了」     → critique（complexity）
+「我準備 commit」                      → git-memory
+「開地圖」/「推進地圖」                 → decision-map
+「wrap up」/「save state」             → handoff
+「剛剛講到哪」/「我跟丟了」             → recap-state
+「second opinion」/「換一個模型看看」   → independent-advisor
 ```
 
-關於 `skill-refactor` vs `skill-tuning` 的 Two-Hats split（已搬遷），見上方「Skill-evolution architecture（已搬遷）」。
+## 開發
 
-## 貢獻
+在 repository 根目錄，於隔離環境中執行完整的 package 測試：
 
-貢獻遵守整個 repo 的 convention（repo 根目錄的 [`CLAUDE.md`](https://github.com/kouko/monkey-skills/blob/main/AGENTS.md)）。
+```sh
+uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q
+```
 
-- **問題**：在 [kouko/monkey-skills](https://github.com/kouko/monkey-skills/issues) 開 GitHub Discussion 或 issue。
-- **PR**：從 `main` 切 branch，遵守 Conventional Commits，push 前先在本機跑 convention-drift CI script（`scripts/check-shared-conventions-drift.py`）。
-- **skill 內部 README** 由 skill owner 直接撰寫，遵守較輕量的 rule set（見 [`docs/skill-governance.md`](docs/skill-governance.md) §README Authoring Discipline）。plugin 層級 README（本檔案及翻譯版本）需經 `domain-teams:docs-team`。
-- **新增 shared convention** 時，須在同一個 PR 內更新 [`docs/skill-governance.md`](docs/skill-governance.md) 的 SSOT registry，並在 drift CI manifest 加上對應 pair。
+## 來源
+
+- `loom-workflow` 原本在 `monkey-skills` 開發，之後抽出到這個 repository；manifest
+  內的 homepage 與 repository URL 仍指向該來源。它以 hard-cut rename 取代了
+  `dev-workflow`，因此自訂 reference 請使用 `loom-workflow:<skill>`。
+- `loom-memory` 在其獨立 plugin 退役時併入本 plugin。
+- `skill-creator-advance`、`skill-refactor`、`skill-tuning`、`skill-judge` 已搬到
+  `skill-dev-toolkit`；原始設計理由封存在
+  [`docs/skill-evolution-architecture.md`](docs/skill-evolution-architecture.md)。
 
 ## License
 
-MIT。plugin 內唯一具有 MIT-licensed upstream 的 `critique`（其 `mode: complexity` 的一半），在其 `LICENSE` 與 `NOTICE` 中完整保留 copyright chain。（`skill-creator-advance` 與 `skill-judge` 已搬到 `skill-dev-toolkit`，並在那裡保留各自的 copyright chain。）
-
-repo 根目錄的 umbrella license 見 [LICENSE](https://github.com/kouko/monkey-skills/blob/main/LICENSE)。
+MIT。見 [LICENSE](https://github.com/kouko/loom-plugins/blob/main/LICENSE)。`critique` 的 `mode: complexity` 源自 joshuadavidthomas
+採 MIT 授權的
+[`reducing-entropy`](https://github.com/joshuadavidthomas/agent-skills/tree/main/skills/reducing-entropy)，
+其 `LICENSE` 與 `NOTICE` 檔保留完整 copyright chain。
