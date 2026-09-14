@@ -15,6 +15,15 @@ from pathlib import Path
 
 from loom_checker import selection
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def no_host_session(monkeypatch):
+    """Tests never inherit the real Claude Code session running the suite."""
+    for name in ("CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_SESSION_ATTENDED", "CLAUDE_CODE_ENTRYPOINT"):
+        monkeypatch.delenv(name, raising=False)
+
 CHECKER = Path(__file__).with_name("loom_checker.py")
 CHANGE = "2026-09-14-example"
 FULL = ["intent", "spec", "plan", "implementer", "tdd", "reviewers",

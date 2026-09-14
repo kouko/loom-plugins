@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -19,8 +20,17 @@ from loom_checker import attestation as attestation_module
 from loom_checker import intent_state
 from loom_checker import selection
 
+import pytest
+
 CHECKER = Path(__file__).with_name("loom_checker.py")
 CHANGE = "2026-09-14-example"
+
+
+@pytest.fixture(autouse=True)
+def no_host_session(monkeypatch):
+    """Tests never inherit the real Claude Code session running the suite."""
+    for name in ("CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_SESSION_ATTENDED", "CLAUDE_CODE_ENTRYPOINT"):
+        monkeypatch.delenv(name, raising=False)
 
 
 def git(repo: Path, *args: str) -> str:
@@ -84,10 +94,10 @@ def review_input(tmp_path: Path, verdicts: list, adversarial: list) -> Path:
     return path
 
 
-def finalize(repo: Path, input_path: Path) -> subprocess.CompletedProcess:
+def finalize(repo: Path, input_path: Path, env: dict | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, str(CHECKER), "finalize-review", CHANGE, "--input", str(input_path)],
-        capture_output=True, text=True, cwd=str(repo),
+        capture_output=True, text=True, cwd=str(repo), env=dict(os.environ, **(env or {})),
     )
 
 
@@ -255,6 +265,28 @@ def test_finalize_failure_recorded_and_listed_as_prior(tmp_path: Path) -> None:
         {key: failure[key] for key in ("step", "rule", "head_sha", "branch", "at")}
     ]
     assert validate(repo, attestation) == []
+
+
+def test_confirmation_from_another_session_keeps_the_full_floor(tmp_path: Path, monkeypatch) -> None:
+    """Spec decision 18 (c): a confirmation recorded by a nested session
+    (`timeout 60 claude -p`, `script -q /dev/null claude -p`, `npx
+    @anthropic-ai/claude-code -p`) carries that session's id, so finalize in
+    the attended session refuses the skip; the recording session may use it."""
+    repo = make_repo(tmp_path)
+    propose(repo, "reviewers,adversarial")
+    confirm(repo, "2026-09-14T00:00:00Z")  # recorded with session_id "s1"
+
+    refused = finalize(repo, review_input(tmp_path, [], []), env={"CLAUDE_CODE_SESSION_ID": "other"})
+    assert refused.returncode == 1 and "finalize.verdicts" in refused.stderr
+
+    accepted = finalize(repo, review_input(tmp_path, [], []), env={"CLAUDE_CODE_SESSION_ID": "s1"})
+    assert accepted.returncode == 0, accepted.stderr
+    attestation = written(repo)
+    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", "s1")
+    assert validate(repo, attestation) == []
+    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", "other")
+    assert attestation_module.selection_evidence(repo, CHANGE) is None
+    assert any("selection" in reason for _, reason in validate(repo, attestation))
 
 
 def test_cancelled_confirmation_is_not_disclosed(tmp_path: Path) -> None:

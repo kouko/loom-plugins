@@ -12,6 +12,7 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import uuid
@@ -47,6 +48,7 @@ def _propose(repo: Path, args: list[str], out, err) -> int:
     store.append_event(repo, ns.change_id, {
         "event": "proposal", "id": uuid.uuid4().hex, "code": code, "origin": ns.origin,
         "run": run, "skip": skip, "branch": branch, "merge_base": merge_base,
+        "session_id": os.environ.get("CLAUDE_CODE_SESSION_ID") or None,
         "created_at": store.now(),
     })
     out.write(f"change: {ns.change_id}  code: {code}\n")
@@ -163,9 +165,13 @@ def _capture_prompt(repo: Path, payload: dict, out) -> None:
                 f"Loom: selection for {', '.join(withdrawn)} withdrawn; "
                 "the full process resumes.")}, ensure_ascii=False) + "\n")
         return
+    if os.environ.get("CLAUDE_CODE_SESSION_ATTENDED") == "0":
+        return  # a nested, unattended host session confirms nothing; cancels above still apply
     matching = [(change, proposal, state) for change, proposal, state in proposals
                 if store.confirmation_prompt_matches(prompt, proposal["code"])]
-    pending = [(change, proposal) for change, proposal, state in matching if state == "pending"]
+    pending = [(change, proposal) for change, proposal, state in matching
+               if state == "pending" and (not proposal.get("session_id")
+                                          or proposal["session_id"] == payload.get("session_id"))]
     if not pending:
         stale = [proposal["code"] for _, proposal, state in matching
                  if state in {"withdrawn", "lapsed"}]

@@ -23,6 +23,7 @@ from pathlib import Path
 import base64
 import hashlib
 import json
+import os
 import re
 
 
@@ -67,6 +68,14 @@ def confirmation_is_valid(event: dict, proposal: dict) -> bool:
     if hashlib.sha256(text.encode("utf-8")).hexdigest() != event.get("prompt_sha256"):
         return False
     return confirmation_prompt_matches(text, proposal["code"])
+
+
+def session_matches(event: dict) -> bool:
+    """A confirmation counts in this process only when it was recorded in
+    the host session the process runs in (`CLAUDE_CODE_SESSION_ID`); without
+    that variable (Codex, CI) every session counts."""
+    current = os.environ.get("CLAUDE_CODE_SESSION_ID")
+    return not current or event.get("session_id") == current
 
 
 SAFE_CHANGE_ID = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9-]+")
@@ -150,7 +159,8 @@ def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
             bound = None
         elif event.get("event") == "confirmation":
             proposal = proposals.get(event.get("proposal_id"))
-            if proposal is not None and confirmation_is_valid(event, proposal):
+            if (proposal is not None and confirmation_is_valid(event, proposal)
+                    and session_matches(event)):
                 bound = (event, proposal)
     failures = [e for e in events if e.get("event") == "failure"]
     if bound is None:

@@ -52,15 +52,27 @@ def repo(tmp_path: Path) -> Path:
     return repo
 
 
-def checker(repo: Path, *args: str, stdin: str = "") -> subprocess.CompletedProcess:
+HOST_ENV = ("CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_SESSION_ATTENDED", "CLAUDE_CODE_ENTRYPOINT")
+
+
+@pytest.fixture(autouse=True)
+def no_host_session(monkeypatch):
+    """Tests never inherit the real Claude Code session running the suite."""
+    for name in HOST_ENV:
+        monkeypatch.delenv(name, raising=False)
+
+
+def checker(repo: Path, *args: str, stdin: str = "", env: dict | None = None) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, str(CHECKER), "selection", *args],
         capture_output=True, text=True, cwd=str(repo), input=stdin,
+        env=dict(os.environ, **(env or {})),
     )
 
 
-def propose(repo: Path, skip: str = "reviewers,adversarial", change: str = CHANGE) -> str:
-    result = checker(repo, "propose", change, "--origin", "user", "--skip", skip)
+def propose(repo: Path, skip: str = "reviewers,adversarial", change: str = CHANGE,
+            env: dict | None = None) -> str:
+    result = checker(repo, "propose", change, "--origin", "user", "--skip", skip, env=env)
     assert result.returncode == 0, result.stderr
     return [e for e in selection.read_events(repo, change) if e["event"] == "proposal"][-1]["code"]
 
@@ -77,17 +89,17 @@ def codex_payload(prompt: str) -> dict:
             "session_id": "sess-2", "turn_id": "turn-7"}
 
 
-def capture(repo: Path, payload) -> subprocess.CompletedProcess:
+def capture(repo: Path, payload, env: dict | None = None) -> subprocess.CompletedProcess:
     stdin = payload if isinstance(payload, str) else json.dumps(payload, ensure_ascii=False)
-    return checker(repo, "capture", "--hook", stdin=stdin)
+    return checker(repo, "capture", "--hook", stdin=stdin, env=env)
 
 
 def events(repo: Path, kind: str, change: str = CHANGE) -> list[dict]:
     return [e for e in selection.read_events(repo, change) if e["event"] == kind]
 
 
-def show(repo: Path, change: str = CHANGE) -> dict:
-    result = checker(repo, "show", change)
+def show(repo: Path, change: str = CHANGE, env: dict | None = None) -> dict:
+    result = checker(repo, "show", change, env=env)
     assert result.returncode == 0, result.stderr
     return json.loads(result.stdout)
 
@@ -211,6 +223,86 @@ def test_proposal_from_another_branch_is_not_bound(repo):
     result = capture(repo, claude_payload(f"/expert-mode {code}"))
     assert result.returncode == 0 and result.stdout == ""
     assert events(repo, "confirmation") == []
+
+
+# --- Session identity (spec decision 18) -----------------------------------
+
+SESSION = "11111111-2222-3333-4444-555555555555"
+NESTED = "99999999-8888-7777-6666-555555555555"
+ATTENDED = {"CLAUDE_CODE_SESSION_ID": SESSION, "CLAUDE_CODE_SESSION_ATTENDED": "1",
+            "CLAUDE_CODE_ENTRYPOINT": "cli"}
+
+# Wrappers a text guard missed; each nested session's hook sees a new
+# session_id and re-stamps ATTENDED=0 / ENTRYPOINT=sdk-cli.
+NESTED_WRAPPERS = [
+    'timeout 60 claude -p "/expert-mode {code}"',
+    'script -q /dev/null claude -p "/expert-mode {code}"',
+    'npx @anthropic-ai/claude-code -p "/expert-mode {code}"',
+]
+
+
+def test_propose_records_host_session_id(repo):
+    propose(repo, env=ATTENDED)
+    propose(repo, skip="reviewers")
+    first, second = events(repo, "proposal")
+    assert first["session_id"] == SESSION
+    assert second["session_id"] is None
+
+
+@pytest.mark.parametrize("wrapper", NESTED_WRAPPERS)
+def test_nested_session_prompt_binds_nothing(repo, wrapper):
+    code = propose(repo, env=ATTENDED)
+    prompt = wrapper.format(code=code).split('"')[1]  # what the nested hook receives
+    nested_env = {"CLAUDE_CODE_SESSION_ID": NESTED, "CLAUDE_CODE_SESSION_ATTENDED": "0",
+                  "CLAUDE_CODE_ENTRYPOINT": "sdk-cli"}
+    result = capture(repo, claude_payload(prompt, session_id=NESTED), env=nested_env)
+    assert result.returncode == 0 and result.stdout == ""
+    assert events(repo, "confirmation") == []
+    assert show(repo, env=ATTENDED)["bound"] is False
+
+
+def test_unattended_process_binds_nothing_even_with_same_session(repo):
+    code = propose(repo, env=ATTENDED)
+    result = capture(repo, claude_payload(f"/expert-mode {code}", session_id=SESSION),
+                     env=dict(ATTENDED, CLAUDE_CODE_SESSION_ATTENDED="0"))
+    assert result.returncode == 0 and result.stdout == ""
+    assert events(repo, "confirmation") == []
+
+
+def test_payload_from_another_session_binds_nothing(repo):
+    code = propose(repo, env=ATTENDED)
+    result = capture(repo, claude_payload(f"/expert-mode {code}", session_id=NESTED), env=ATTENDED)
+    assert result.returncode == 0 and result.stdout == ""
+    assert events(repo, "confirmation") == []
+
+
+def test_same_attended_session_binds_and_show_follows_the_session(repo):
+    code = propose(repo, env=ATTENDED)
+    system_message(capture(repo, claude_payload(f"/expert-mode {code}", session_id=SESSION),
+                           env=ATTENDED))
+    (confirmation,) = events(repo, "confirmation")
+    assert confirmation["session_id"] == SESSION
+    assert show(repo, env=ATTENDED)["bound"] is True
+    assert show(repo, env={"CLAUDE_CODE_SESSION_ID": NESTED})["bound"] is False
+    assert show(repo)["bound"] is True  # no session variable: prior behaviour
+
+
+def test_proposal_without_session_keeps_prior_binding(repo):
+    """Codex exports no session variable: any payload session binds."""
+    code = propose(repo)
+    system_message(capture(repo, codex_payload(f"$expert-mode {code}")))
+    assert show(repo)["bound"] is True
+
+
+def test_cancel_still_works_when_unattended(repo):
+    code = propose(repo, env=ATTENDED)
+    system_message(capture(repo, claude_payload(f"/expert-mode {code}", session_id=SESSION),
+                           env=ATTENDED))
+    unattended = dict(ATTENDED, CLAUDE_CODE_SESSION_ATTENDED="0")
+    message = system_message(capture(repo, claude_payload("/expert-mode 取消", prompt_id="p3"),
+                                     env=unattended))
+    assert "withdrawn" in message
+    assert show(repo, env=ATTENDED)["bound"] is False
 
 
 def test_non_entry_prompt_runs_no_git_outside_a_repository(tmp_path):

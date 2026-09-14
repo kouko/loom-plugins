@@ -65,7 +65,8 @@ def selection_evidence(repo: Path, change_id: str, manifest: dict | None = None)
         if event.get("event") != "confirmation" or event.get("source") != "user-typed":
             continue
         proposal = proposals.get(event.get("proposal_id"))
-        if proposal is None or not selection.confirmation_is_valid(event, proposal):
+        if (proposal is None or not selection.confirmation_is_valid(event, proposal)
+                or not selection.session_matches(event)):
             continue
         confirmations.append({
             "code": proposal["code"], "skip": [n for n in names if n in proposal["skip"]],
