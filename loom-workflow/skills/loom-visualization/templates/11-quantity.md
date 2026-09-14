@@ -18,7 +18,8 @@ next to the bar.
 
 ## ASCII
 
-Run `python3 scripts/generate.py bar` with this input on stdin:
+Run `python3 <skill-dir>/scripts/generate.py bar` (`<skill-dir>` is defined
+in `SKILL.md`) with this input on stdin:
 
 ```json
 {"pairs": [

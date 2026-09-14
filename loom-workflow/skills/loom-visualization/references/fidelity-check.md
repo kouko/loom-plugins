@@ -54,11 +54,12 @@ again and tells you to re-run. A verdict that outlives the thing it
 judged is the same failure as a stale render.
 
 Then run the two commands that carry the verdict onto the page — the
-verdict file alone changes nothing a reader sees:
+verdict file alone changes nothing a reader sees (`<skill-dir>` is defined
+in `SKILL.md`):
 
 ```
-python3 scripts/verify_cot_html.py --render --stamp <file>.html
-python3 scripts/render_cot_html.py <file>.md
+python3 <skill-dir>/scripts/verify_cot_html.py --render --stamp <file>.html
+python3 <skill-dir>/scripts/render_cot_html.py <file>.md
 ```
 
 **Keep `--render`.** The outcome written into `verified:` is computed

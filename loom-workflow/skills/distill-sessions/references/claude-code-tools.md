@@ -44,7 +44,8 @@ Agent({
   model: "sonnet",
   description: "distill-sessions advisory report",
   prompt: "<agents/prompt-advisory-analyst.md content +
-            merged_data / lang / date_str JSON>"
+            dispatch_payload.input JSON (merged_data / lang / date_str /
+            skill_dir)>"
 })
 ```
 

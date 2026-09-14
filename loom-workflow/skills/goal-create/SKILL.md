@@ -11,6 +11,9 @@ One skill, two named modes: **SESSION** and **ARC**. Which mode runs is
 chosen by what the user asks for — a goal for this run, or a purpose for
 the repository — never by the agent guessing from context.
 
+`<skill-dir>` is this skill's folder: `${CLAUDE_SKILL_DIR}` on Claude Code;
+on any other host, the directory that holds this SKILL.md.
+
 ## SESSION mode
 
 SESSION emits the four-field goal condition defined in
@@ -26,7 +29,7 @@ quoting a recorded purpose and a user's own decision.
 Once a draft is ready, run the mechanical floor:
 
 ```
-python3 scripts/goal_lint.py <goal-file>
+python3 <skill-dir>/scripts/goal_lint.py <goal-file>
 ```
 
 (or pipe the goal text on stdin with no argument). This checker enforces

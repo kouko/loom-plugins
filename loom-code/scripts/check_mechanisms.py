@@ -216,6 +216,7 @@ def recompute_hooks(repo: Path) -> set[str]:
         (repo / "loom-code" / "hooks" / "hooks.json", ""),
         (repo / "loom-code" / "hooks" / "hooks-codex.json", "@codex"),
         (repo / "loom-workflow" / "hooks" / "hooks.json", ""),
+        (repo / "loom-workflow" / "hooks" / "hooks-codex.json", "@codex"),
     )
     for path, qualifier in manifests:
         if not path.is_file():
@@ -542,6 +543,7 @@ def compute_baseline_total(repo: Path, ref: str) -> tuple[int, bool]:
         "loom-code/hooks/hooks.json",
         "loom-code/hooks/hooks-codex.json",
         "loom-workflow/hooks/hooks.json",
+        "loom-workflow/hooks/hooks-codex.json",
     ):
         hooks_text = _git_show(repo, ref, hook_path)
         if hooks_text is not None:

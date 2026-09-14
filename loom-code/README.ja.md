@@ -180,6 +180,9 @@ plugin を削除しても、同じ path 不在期間が早く始まるだけな�
 
 Antigravity CLI（`agy`）はローカルのディレクトリから plugin をインストール
 します。repo を clone し、`loom-code` を兄弟 plugin より先に入れます。
+インストール前に `agy plugin list` で Claude Code から取り込まれた同名の plugin が
+ないか確認してください。install はその取り込み済みのコピーを置き換え、後の
+`agy plugin uninstall` はそれを削除します。
 
 ```bash
 git clone https://github.com/kouko/loom-plugins.git

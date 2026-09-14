@@ -4,7 +4,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.1.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.2.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## What it is
 
@@ -182,10 +182,17 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
+On Codex, the loom-visualization trigger card arrives through a plugin
+SessionStart hook, which Codex runs only after you review and trust the
+plugin's hooks.
+
 ### Antigravity CLI
 
 Install from a clone of the repository. Install `loom-code` first. `critique`,
-`decision-map` and `distill-sessions` refer to it.
+`decision-map` and `distill-sessions` refer to it. Before installing, check
+`agy plugin list` for a plugin of the same name imported from Claude Code:
+installing replaces that imported copy, and a later `agy plugin uninstall`
+removes it.
 
 ```bash
 git clone https://github.com/kouko/loom-plugins.git
@@ -202,6 +209,8 @@ attaches no workspace, so loom's kickoff defaults are not loaded and the
 agent may act outside the project; pass it in interactive mode too.
 
 Its hooks run only in the `agy` CLI, not in the Antigravity desktop app or IDE.
+On agy, the loom-visualization trigger card is delivered as a plugin rule, so it
+is always on.
 
 ## Usage
 

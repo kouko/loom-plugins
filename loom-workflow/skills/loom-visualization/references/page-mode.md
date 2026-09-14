@@ -254,12 +254,13 @@ themselves. Never move or write the `.md` into an Obsidian vault.
 
 ## Step 5 — Convert, verify, then offer to publish
 
-**Three commands, and the third is not optional:**
+**Three commands, and the third is not optional** (`<skill-dir>` is defined
+in `SKILL.md`):
 
 ```
-python3 scripts/render_cot_html.py <file>.md
-python3 scripts/verify_cot_html.py --render --stamp <file>.html
-python3 scripts/render_cot_html.py <file>.md
+python3 <skill-dir>/scripts/render_cot_html.py <file>.md
+python3 <skill-dir>/scripts/verify_cot_html.py --render --stamp <file>.html
+python3 <skill-dir>/scripts/render_cot_html.py <file>.md
 ```
 
 The render runs **twice** because the verifier can only stamp the

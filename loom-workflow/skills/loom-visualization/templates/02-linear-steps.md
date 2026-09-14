@@ -19,7 +19,8 @@ ways, use the branching decision template instead.
 
 ## ASCII
 
-Run `python3 scripts/generate.py flow` with this input on stdin:
+Run `python3 <skill-dir>/scripts/generate.py flow` (`<skill-dir>` is defined
+in `SKILL.md`) with this input on stdin:
 
 ```json
 {"steps": ["git pull", "uv sync", "pytest", "git push"]}

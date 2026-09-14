@@ -195,6 +195,9 @@ mechanisms:
   - id: "SessionStart:startup|clear|compact:visualization-card"
     class: hook
     eval: loom-workflow/scripts/test_visualization_card_hook.py
+  - id: "SessionStart:startup|clear|compact:visualization-card@codex"
+    class: hook
+    eval: scripts/test_loom_plugin_install_layout.py::test_codex_manifest_points_at_sessionstart_card_hook
   - id: "PostToolUse:Write|Edit:validate-skill-folder-structure.sh"
     class: hook
     eval: loom-workflow/scripts/test_validate_skill_folder_structure_hook.py::test_nested_subfolder_is_blocked

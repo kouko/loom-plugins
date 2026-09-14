@@ -163,7 +163,9 @@ hook 路徑。安裝成功後，請立刻重新啟動 Codex，再執行任何其
 ### Antigravity CLI
 
 Antigravity CLI（`agy`）從本機目錄安裝 plugin。先 clone repo，並在另外兩個
-plugin 之前安裝 `loom-code`：
+plugin 之前安裝 `loom-code`。安裝前先用 `agy plugin list` 確認有沒有從 Claude Code
+匯入的同名 plugin：install 會取代那份匯入的副本，之後的 `agy plugin uninstall`
+也會把它刪掉。
 
 ```bash
 git clone https://github.com/kouko/loom-plugins.git
