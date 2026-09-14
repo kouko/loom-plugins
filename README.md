@@ -23,23 +23,24 @@ covers usage in depth.
 ## The Loom flow
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
 flowchart TD
-    idea(["Idea, bug report or incident"])
+    idea(["Idea or change request<br/>received by<br/>loom-design:capture-intent"])
 
     subgraph design["loom-design"]
-        intent["capture-intent<br/>① you confirm the intent"]
-        spec["write-spec<br/>only when needs-design: yes<br/>② you confirm visible behaviour (product changes)"]
+        intent["loom-design:capture-intent<br/>① you confirm the intent"]
+        spec["loom-design:write-spec<br/>only when needs-design: yes<br/>② you confirm visible behaviour"]
     end
 
     subgraph code["loom-code"]
-        plan["write-plan<br/>task DAG"]
-        build["build<br/>test-first, one commit per task"]
-        review["review<br/>fresh-context review<br/>→ attestation"]
-        ship["ship<br/>push + PR<br/>③ you accept the blind-run report"]
-        maintain["maintain<br/>bugs, alerts, regressions"]
+        plan["loom-code:write-plan<br/>task DAG"]
+        build["loom-code:build<br/>test-first, one commit per task"]
+        review["loom-code:review<br/>fresh-context review<br/>→ attestation"]
+        ship["loom-code:ship<br/>push + PR<br/>③ you accept the blind-run report"]
+        maintain["loom-code:maintain<br/>bugs, alerts, regressions"]
     end
 
-    merged(["Merged PR"])
+    merged(["Merged PR<br/>produced by<br/>loom-code:ship"])
 
     idea --> intent
     intent -->|"needs-design: yes"| spec
@@ -84,21 +85,46 @@ points or run on demand.
 
 `decision-map` is for work whose whole route cannot be listed up front:
 
+```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
+flowchart TD
+    dest["loom-workflow:decision-map<br/>MAP.md Destination + DA-n criteria"]
+    ticket["loom-workflow:decision-map<br/>ticket: grilling / research / prototype"]
+    fog["loom-workflow:decision-map<br/>Not-yet-specified (fog) F-n"]
+    grill["loom-design:capture-intent<br/>grilling discussion"]
+    close["loom-workflow:decision-map<br/>close and re-chart"]
+    decisions["loom-workflow:decision-map<br/>Decisions-so-far gist"]
+    oos["loom-workflow:decision-map<br/>Out-of-scope"]
+    intent["loom-workflow:decision-map<br/>intent carrying map: map-id"]
+    flow(["loom-design:capture-intent<br/>or loom-code:write-plan"])
+    clear(["loom-workflow:decision-map<br/>Map clear"])
+
+    dest -->|"first tickets"| ticket
+    dest -->|"charting"| fog
+    fog -->|"graduates once<br/>graduated-from: F-n"| ticket
+    fog -.->|"moves intact"| oos
+    ticket -.->|"grilling"| grill
+    ticket --> close
+    close -->|"one gist"| decisions
+    close -.->|"exposed unknown"| fog
+    close -.->|"new ticket"| ticket
+    dest -->|"slice ready"| intent
+    intent --> flow
+    flow -.->|"map reads status"| dest
+    dest -->|"every DA satisfied"| clear
+```
+
 - An **Outcome Map** is a persistent loop that survives across sessions and
   many delivery arcs. It lives at `docs/loom/maps/<map-id>/` as `MAP.md` plus a
   `tickets/` directory.
-- `MAP.md` holds the **Destination** with its acceptance criteria, a
-  **Decisions-so-far** log with one gist per closed ticket, and a
-  **Not-yet-specified (fog)** list of known unknowns.
-- Tickets are typed `grilling`, `research` or `prototype`. A fog entry
-  graduates exactly once into a ticket that records `graduated-from`, and
-  closing a ticket routes each unknown it exposed to fog, a new ticket or
-  out-of-scope.
-- When a slice is ready to deliver, the map writes an intent carrying
-  `map: <map-id>` and hands it to `loom-design:capture-intent`, or to
-  `loom-code:write-plan` without loom-design. That station owns the change from
-  there; the map never owns a delivery ticket and only reads the intent's
-  status.
+- Closing a ticket can also send an exposed unknown straight to out-of-scope.
+  A grilling ticket hands its discussion to `loom-design:capture-intent` when
+  that plugin is installed.
+- The intent goes to `loom-design:capture-intent`, or to `loom-code:write-plan`
+  without loom-design, and that station owns the change from there. The map
+  never owns a delivery ticket; it only reads the intent's status.
+- A map clears only when fog is empty, every ticket is closed or withdrawn, and
+  every Destination acceptance criterion is satisfied.
 
 ## loom-design
 
