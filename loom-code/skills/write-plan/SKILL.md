@@ -448,8 +448,15 @@ checkpoint measures its delta from the branch base — which would then be
 the plan commit itself:
 
 ```
-git switch -c <change-id>
+git switch -c <type>/<change-id>
 ```
+
+For example `feat/2026-09-14-push-reason`. You pick `<type>` from `feat`,
+`fix`, `docs`, `refactor`, `test`, `chore` or `ci` to match what the change
+does, and use the same type in the PR title, which becomes the change's
+squash-merge commit on the trunk. Individual task commits keep their own
+Conventional Commits type as the implementer contract sets it, and the
+`docs(loom):` intent and plan commits keep their fixed form.
 
 The intent may already be committed on the trunk; that is fine and nothing
 needs moving. It is the plan and everything after it that belongs on the

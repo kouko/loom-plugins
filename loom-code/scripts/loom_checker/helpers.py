@@ -201,7 +201,7 @@ def _is_host_plumbing(path: str) -> bool:
 
 
 ON_A_BRANCH = (
-    "work on a branch: `git switch -c <change-id>`, then re-run -- "
+    "work on a branch: `git switch -c <type>/<change-id>`, then re-run -- "
     "loom recomputes every claim from the branch's diff."
 )
 

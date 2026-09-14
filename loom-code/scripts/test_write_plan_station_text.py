@@ -13,6 +13,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 from prose_pin import NEGATION_RE
 
 REPO = Path(__file__).resolve().parents[2]
@@ -245,6 +247,113 @@ def test_confirmed_selection_is_recorded_for_closing_review() -> None:
     assert "`plan-maintained`" in flat
     assert "commit that plan edit" in flat
     assert "before committing the plan" not in flat
+
+
+# --- typed-branch-names W1-02 -- the branch is `<type>/<change-id>` -------
+
+
+def test_write_plan_names_typed_branch_and_types() -> None:
+    section = _section(
+        SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off"
+    )
+    flat = " ".join(section.split())
+    assert "git switch -c <type>/<change-id>" in flat
+    sentences = _flat_sentences(section)
+    hits = [
+        s for s in sentences
+        if "pick" in s and "same type" in s and "commit" in s
+        and "PR title" in s and "squash-merge" in s and not _has_negation(s)
+    ]
+    assert hits, (
+        "Step 6 has no affirmative sentence saying the agent picks the type "
+        "and reuses it in the PR title, which becomes the squash-merge commit"
+    )
+    # The type list sits in the pick sentence and matches implementer.md.
+    listed = set(re.findall(r"`([a-z]+)`", hits[0]))
+    assert listed == {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}, listed
+    own = [
+        s for s in sentences
+        if "task commits" in s and "own" in s and "Conventional Commits" in s
+        and "implementer contract" in s and not _has_negation(s)
+    ]
+    assert own, (
+        "Step 6 must say individual task commits keep their own Conventional "
+        "Commits type as the implementer contract sets it"
+    )
+    fixed = [
+        s for s in sentences
+        if "`docs(loom):`" in s and "intent" in s and "plan commits" in s
+        and "fixed form" in s
+    ]
+    assert fixed, "Step 6 must say the `docs(loom):` intent and plan commits keep their fixed form"
+
+
+# Split literals so a repo grep for the bare form never matches this file.
+_BARE_BRANCH_RE = re.compile(
+    r"(?:switch (?:-c|--create)|checkout -[bB]|git branch|worktree add -b"
+    r"|branch named)\s+[`'\"]?" + "<change" + r"-id>"
+)
+
+_CID = "<change" + "-id>"
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        f"git switch -c {_CID}",
+        f"git switch --create {_CID}",
+        f"git switch -c `{_CID}`",
+        f"git switch -c '{_CID}'",
+        f'git switch -c "{_CID}"',
+        f"git checkout -b {_CID}",
+        f"git checkout -B {_CID}",
+        f"git branch {_CID}",
+        f"git worktree add -b {_CID} ../wt",
+        f"create a branch named `{_CID}`",
+    ],
+)
+def test_bare_branch_re_catches_spelling(line: str) -> None:
+    assert _BARE_BRANCH_RE.search(line), line
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        f"git switch -c <type>/{_CID}",
+        f"git switch --create `<type>/{_CID}`",
+        f"git checkout -B <type>/{_CID}",
+        f"git worktree add -b <type>/{_CID} ../wt",
+        f"create a branch named `<type>/{_CID}`",
+        f"write docs/loom/{_CID}/plan.md",
+        f"see `docs/loom/{_CID}/spec.md`",
+    ],
+)
+def test_bare_branch_re_ignores_typed_and_path(line: str) -> None:
+    assert not _BARE_BRANCH_RE.search(line), line
+
+
+def test_write_plan_bare_switch_absent() -> None:
+    section = _section(
+        SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off"
+    )
+    assert not _BARE_BRANCH_RE.search(section), _BARE_BRANCH_RE.search(section)
+
+
+def test_repo_grep_no_bare_branch() -> None:
+    hits = []
+    for plugin in ("loom-code", "loom-design", "loom-workflow"):
+        for path in sorted((REPO / plugin).rglob("*")):
+            if path.suffix not in {".md", ".py", ".sh"} or not path.is_file():
+                continue
+            rel = path.relative_to(REPO)
+            if path.name.startswith("CHANGELOG") or {
+                "node_modules", "__pycache__"
+            } & set(rel.parts):
+                continue
+            for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if _BARE_BRANCH_RE.search(line):
+                    hits.append(f"{rel}:{n}")
+    assert not hits, hits
 
 
 def test_current_release_metadata_is_synchronized() -> None:

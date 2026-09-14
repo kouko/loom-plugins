@@ -452,6 +452,49 @@ def test_working_on_the_trunk_fails_closed(tmp_path: Path) -> None:
     assert "git switch -c" in result.stderr
 
 
+def test_trunk_hint_names_typed_branch(tmp_path: Path) -> None:
+    """A2 positive: the trunk refusal teaches `<type>/<change-id>`."""
+    repo = make_repo(tmp_path, branch=None)
+    commit_file(repo, "src/cli/main.py")
+    intent = write_intent(repo / "docs/loom/intent/a.md", needs_design="no — internal only")
+    result = run_checker("intent", str(intent), cwd=repo)
+    assert result.returncode == 2
+    assert "git switch -c <type>/<change-id>" in result.stderr
+
+
+def test_trunk_hint_bare_change_id_absent(tmp_path: Path) -> None:
+    """A2 negative: the bare `<change-id>` branch form is no longer taught."""
+    repo = make_repo(tmp_path, branch=None)
+    commit_file(repo, "src/cli/main.py")
+    intent = write_intent(repo / "docs/loom/intent/a.md", needs_design="no — internal only")
+    result = run_checker("intent", str(intent), cwd=repo)
+    assert result.returncode == 2
+    bare = "git switch -c " + "<change-id>`"  # split so the repo sweep grep skips this pin
+    assert bare not in result.stderr
+
+
+def test_typed_branch_base_resolves(tmp_path: Path) -> None:
+    """A5 positive: a `<type>/<change-id>` branch still resolves its base."""
+    repo = make_repo(tmp_path, branch="feat/2026-09-14-demo")
+    commit_file(repo, "src/cli/main.py")
+    intent = write_intent(repo / "docs/loom/intent/a.md", needs_design="no — internal only")
+    result = run_checker("intent", str(intent), cwd=repo)
+    assert result.returncode == 1
+    assert "intent.needs-design-recompute" in blocked_rules(result)
+    assert "git switch -c" not in result.stderr
+
+
+def test_typed_branch_with_nested_slash_resolves(tmp_path: Path) -> None:
+    """A5 boundary: extra slashes in the branch name change nothing."""
+    repo = make_repo(tmp_path, branch="fix/scope/2026-09-14-demo")
+    commit_file(repo, "src/cli/main.py")
+    intent = write_intent(repo / "docs/loom/intent/a.md", needs_design="no — internal only")
+    result = run_checker("intent", str(intent), cwd=repo)
+    assert result.returncode == 1
+    assert "intent.needs-design-recompute" in blocked_rules(result)
+    assert "git switch -c" not in result.stderr
+
+
 def test_a_local_trunk_is_still_a_base_from_a_branch(tmp_path: Path) -> None:
     """The remote-less repo is the common case; only being ON the trunk is
     fatal. `main` alone still resolves the base from a feature branch."""
