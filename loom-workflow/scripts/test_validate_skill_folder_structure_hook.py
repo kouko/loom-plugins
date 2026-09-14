@@ -3,6 +3,7 @@ hook: a flat skill passes (exit 0), a nested subfolder is blocked (exit 2)."""
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -11,7 +12,11 @@ import pytest
 
 SCRIPT = Path(__file__).resolve().parent / "validate-skill-folder-structure.sh"
 
-pytestmark = pytest.mark.skipif(shutil.which("jq") is None, reason="hook reads stdin via jq")
+# A local checkout without jq skips; under CI a missing jq runs and fails.
+pytestmark = pytest.mark.skipif(
+    shutil.which("jq") is None and not os.environ.get("CI"),
+    reason="hook reads stdin via jq",
+)
 
 
 def _make_skill(tmp_path: Path) -> Path:

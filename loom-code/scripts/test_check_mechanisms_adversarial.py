@@ -47,11 +47,13 @@ def test_check_mechanisms_distinct_workflow_hook_counted(tmp_path):
                    "SessionStart:startup|clear|compact:visualization-card"}
 
 
-@pytest.mark.xfail(strict=True, reason="finding: loom-workflow qualifier is '' so a colliding "
-                   "basename merges into the loom-code id and one hook goes uncounted")
-def test_check_mechanisms_colliding_workflow_basename_counted_separately(tmp_path):
-    """Two hooks in two plugins with the same event, matcher and basename yield two ids."""
+def test_check_mechanisms_colliding_workflow_basename_fails_closed(tmp_path):
+    """Two hooks in two plugins with the same event, matcher and basename raise,
+    naming both manifests, instead of collapsing into one uncounted id."""
     repo = _repo(tmp_path, json.dumps(SESSION))
-    ids = cm.recompute_hooks(repo)
-    entries = cm._count_hooks_json_entries(SESSION) * 2
-    assert len(ids) == entries
+    with pytest.raises(ValueError) as excinfo:
+        cm.recompute_hooks(repo)
+    message = str(excinfo.value)
+    assert "SessionStart:startup|clear|compact:session-start" in message
+    assert str(repo / "loom-code" / "hooks" / "hooks.json") in message
+    assert str(repo / "loom-workflow" / "hooks" / "hooks.json") in message

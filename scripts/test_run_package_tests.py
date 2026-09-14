@@ -70,6 +70,7 @@ def test_workflow_mermaid_group_installs_then_validates_with_no_skip_path() -> N
     expected = [
         ["npm", "ci", "--prefix", "loom-workflow/tests/mermaid"],
         ["node", "loom-workflow/tests/mermaid/validate_mermaid.mjs"],
+        ["bash", "loom-workflow/tests/mermaid-validator-negative.sh"],
     ]
     assert loom_family_commands(REPO, verbosity="-q", only="workflow-mermaid") == expected
     full = loom_family_commands(REPO, verbosity="-q")

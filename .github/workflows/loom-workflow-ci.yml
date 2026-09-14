@@ -33,11 +33,13 @@ on:
     paths:
       - 'loom-workflow/**'
       - '.github/workflows/loom-workflow-ci.yml'
+      - 'scripts/run_package_tests.py'
   push:
     branches: [main]
     paths:
       - 'loom-workflow/**'
       - '.github/workflows/loom-workflow-ci.yml'
+      - 'scripts/run_package_tests.py'
 
 permissions:
   contents: read
@@ -80,7 +82,7 @@ jobs:
           python-version: '3.12'
 
       # Pinned, like every other external surface on this branch
-      # (checkout@v4, setup-python@v5, mermaid@11.16.0). The renderer is
+      # (checkout@v4, setup-python@v5, mermaid@11.17.0). The renderer is
       # stdlib-only, so no markdown parser is installed: CI tests exactly
       # what runs on a machine with plain Python.
       - name: Install test dependencies

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test-mermaid-validator-negative.sh
+# mermaid-validator-negative.sh
 #
 # A5 negative (known-bad-arrow-block-rejected): the Mermaid validator at
 # loom-workflow/tests/mermaid/validate_mermaid.mjs must exit 1 on a
@@ -7,27 +7,18 @@
 # name that block in a FAIL line. A validator that exits 0 here parses
 # nothing, so the positive run over the real templates would prove nothing.
 #
-# Skips only when the validator's node_modules is absent AND CI is unset
-# (a local checkout that never ran `npm ci`); under CI the same absence
-# fails instead.
+# No skip path: the workflow-mermaid group of scripts/run_package_tests.py
+# runs this after `npm ci`, so node_modules is present. The name does not
+# match the workflow-shell group's test-*.sh glob, which runs without node.
 #
 # Usage:
-#   bash loom-workflow/tests/test-mermaid-validator-negative.sh
+#   bash loom-workflow/tests/mermaid-validator-negative.sh
 
 set -u
 
 WORKFLOW_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 PROJECT="$WORKFLOW_DIR/tests/mermaid"
 VALIDATOR="$PROJECT/validate_mermaid.mjs"
-
-if [ ! -d "$PROJECT/node_modules" ]; then
-  if [ -z "${CI:-}" ]; then
-    echo "SKIP — $PROJECT/node_modules absent; run: npm ci --prefix loom-workflow/tests/mermaid"
-    exit 0
-  fi
-  echo "FAIL — $PROJECT/node_modules absent under CI"
-  exit 1
-fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT

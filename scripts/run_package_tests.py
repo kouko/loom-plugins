@@ -50,6 +50,7 @@ def loom_family_commands(
         commands.extend([
             ["npm", "ci", "--prefix", "loom-workflow/tests/mermaid"],
             ["node", "loom-workflow/tests/mermaid/validate_mermaid.mjs"],
+            ["bash", "loom-workflow/tests/mermaid-validator-negative.sh"],
         ])
     return commands
 
