@@ -190,6 +190,7 @@ agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模�
 互動模式也請一併指定。
 
 hook 只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。
+在 agy 上，loom-visualization 的觸發卡以 plugin rule 送達，因此永遠生效。
 
 ## 使用
 

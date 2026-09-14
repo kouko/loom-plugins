@@ -202,6 +202,8 @@ attaches no workspace, so loom's kickoff defaults are not loaded and the
 agent may act outside the project; pass it in interactive mode too.
 
 Its hooks run only in the `agy` CLI, not in the Antigravity desktop app or IDE.
+On agy, the loom-visualization trigger card is delivered as a plugin rule, so it
+is always on.
 
 ## Usage
 

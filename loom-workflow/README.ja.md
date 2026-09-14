@@ -197,6 +197,7 @@ agy plugin install ./loom-workflow
 作業することがある。対話モードでも指定する。
 
 hook が走るのは `agy` CLI だけで、Antigravity のデスクトップアプリや IDE では走らない。
+agy では loom-visualization のトリガーカードを plugin rule として届けるため、常に有効になる。
 
 ## 使い方
 
