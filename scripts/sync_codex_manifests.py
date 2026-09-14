@@ -145,7 +145,12 @@ def sync_agy_manifest(plugin_dir, check: bool = False) -> bool:
     plugin_dir = Path(plugin_dir)
     derived = derive_agy_manifest(_load(claude_manifest_path(plugin_dir)))
     target_path = agy_manifest_path(plugin_dir)
-    current = _load(target_path) if target_path.exists() else None
+    try:
+        current = _load(target_path)
+    except (OSError, ValueError):
+        # Absent, a directory, or undecodable: not the derived manifest, so
+        # --check reports drift and sync regenerates a regular file.
+        current = None
 
     if check:
         return current == derived
