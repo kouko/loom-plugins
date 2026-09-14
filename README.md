@@ -6,7 +6,7 @@ plan and code; fresh-context agents that did not write them review, blind-run
 and attack the result; a deterministic checker recomputes the evidence before
 anything is published. You are asked only three times: to confirm what the
 change is, to confirm visible product behaviour when there is any, and to
-accept the blind-run report.
+accept the result, through the blind-run report when one is required.
 
 Loom ships as three independently installable plugins for Claude Code and
 Codex:
@@ -44,7 +44,7 @@ flowchart TD
         plan["loom-code:write-plan<br/>task DAG"]
         build["loom-code:build<br/>test-first, one commit per task"]
         review["loom-code:review<br/>fresh-context review<br/>→ attestation"]
-        ship["loom-code:ship<br/>push + PR<br/>③ you accept the blind-run report"]
+        ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (blind-run report when required)"]
         maintain["loom-code:maintain<br/>bugs, alerts, regressions"]
     end
 
@@ -95,7 +95,7 @@ points or run on demand.
 | Tool | When it is used in the flow | What it does |
 | --- | --- | --- |
 | `decision-map` | Before the flow: writes the intent that starts a change | Keeps a long-running Outcome Map and turns a ready slice into an intent. |
-| `git-memory` | Before every commit in `build`; at `ship` for PR create and merge | Classifies decision, learning and gotcha memory for commits and the PR body. |
+| `git-memory` | Before every commit at any station (intent, plan, build, attestation); at `ship` when the PR is created; and before the PR is merged, which happens after `ship` | Classifies decision, learning and gotcha memory for commits and the PR body. |
 | `loom-memory` | Before the branch closes, when a lesson is worth keeping (on request or by agent judgment; no station calls it) | Records a durable lesson the branch taught in the repository memory store. |
 | `independent-advisor`, `handoff`, `recap-state` | On demand, not tied to a station | Second opinions, cross-session handoff and in-session recaps. |
 
@@ -143,8 +143,9 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 4.3.4. Workflow tools used around the stations; all except
-`decision-map` work without `loom-code`. See
+Version 4.3.4. Workflow tools used around the stations; all work without
+`loom-code`; only `decision-map`'s delivery step, which writes an intent,
+needs it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
 attach to the flow.
 
