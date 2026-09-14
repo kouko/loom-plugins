@@ -4,7 +4,9 @@ This is the compatibility surface `loom-memory` pins from Open Knowledge
 Format v0.2's generic bundle rules, implemented in full in
 `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` (the
 `skills/loom-memory/scripts/loom_memory.py` file inside this skill's own
-directory). It is not a restatement of the
+directory; `${CLAUDE_PLUGIN_ROOT}` is this plugin's root, substituted on
+Claude Code — on any other host it is the directory three levels above this
+file, two above `SKILL.md`). It is not a restatement of the
 upstream specification — only the six clauses this profile actually
 depends on, frozen at a fixed point so a later upstream edit has no effect
 until a separate change adopts it:

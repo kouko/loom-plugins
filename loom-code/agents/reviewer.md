@@ -35,7 +35,7 @@ lens: code | docs | spec | spec+adversarial | design | principles | skill
 reviewed_sha: <sha>            # the delta is `git diff <reviewed_sha>..HEAD`
 changed paths: <list>
 ground truth: intent, and the spec and plan when they exist
-dimensions: loom-code/skills/review/references/lenses.md
+dimensions: loom-code/skills/closing-review/references/lenses.md
 ```
 
 If any of these is missing, say so and stop; do not guess a lens or invent

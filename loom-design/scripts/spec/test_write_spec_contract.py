@@ -337,7 +337,7 @@ def test_intake_station_argument_is_this_station() -> None:
 
 def test_risk_triggered_spec_review_contract() -> None:
     text = _text()
-    assert "loom-code:review" in text
+    assert "loom-code:closing-review" in text
     assert "loom-code:write-plan" in text
     assert "pre-build-review: required|not-required — <reason>" in text
     assert "spec+adversarial" in text

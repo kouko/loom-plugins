@@ -26,7 +26,7 @@ fields carry facts to attack (a plan's Files and Current State Evidence),
 which carry the implementer's dispatch text as scope (Test and Risk), and
 which belong to the spec. The change id, `HEAD`, the changed paths and
 their artifact types, and the recipes at
-`loom-code/skills/review/references/adversarial.md` — read it first for
+`loom-code/skills/closing-review/references/adversarial.md` — read it first for
 the per-type recipes and exact probe shape.
 
 ## What you do
@@ -41,7 +41,7 @@ the per-type recipes and exact probe shape.
 - **Spec**: red-team each requirement — name a behaviour it permits that
   the author plainly did not want — then hunt the states it never mentions.
 - **Skill or gate**: work the classes of
-  `loom-code/skills/review/references/attack-catalogue.md` against the file, one
+  `loom-code/skills/closing-review/references/attack-catalogue.md` against the file, one
   attempt per class, prose temptations verbatim.
 
 ## What you return

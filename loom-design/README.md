@@ -4,7 +4,7 @@
 > confirmed intent and, when the change needs design, a spec; two tools give
 > a product its principles and its visual system.** loom-design drafts; it
 > never grades. Every verdict on what it produces is rendered by
-> `loom-code:review`, by an agent that did not write the draft.
+> `loom-code:closing-review`, by an agent that did not write the draft.
 
 **Version**: 2.1.5 — 4 skills + 1 optional router. See
 [CHANGELOG.md](CHANGELOG.md) for releases.
@@ -22,7 +22,7 @@ flowchart TD
         spec["loom-design:write-spec<br/>only when needs-design: yes<br/>② product changes: the user confirms<br/>the visible behaviour"]
     end
 
-    specreview["loom-code:review<br/>one fresh-context spec review<br/>only when pre-build-review: required"]
+    specreview["loom-code:closing-review<br/>one fresh-context spec review<br/>only when pre-build-review: required"]
     plan(["Hand-off to<br/>loom-code:write-plan"])
 
     subgraph tools["On-demand tools, not flow steps"]
@@ -46,7 +46,7 @@ flowchart TD
   `docs/loom/<change-id>/spec.md`. For a `kind: product` change it reads the
   visible behaviour back in plain words and records the yes; an engineering
   change is not stopped here. When the spec declares
-  `pre-build-review: required`, it goes to `loom-code:review` for one
+  `pre-build-review: required`, it goes to `loom-code:closing-review` for one
   fresh-context `spec+adversarial` reviewer before planning; otherwise it
   goes straight to `loom-code:write-plan`.
 - **Tools** — `product-principles` and `design-system` run when asked, each
@@ -97,7 +97,7 @@ loom-design requires `loom-code`:
   understand. On Codex, `<loom-code>` is the installed plugin directory;
   never create a repository-local checker copy.
 - **Its verdicts are rendered by loom-code.** The pre-build spec review and
-  the closing review both run in `loom-code:review`, with fresh-context
+  the closing review both run in `loom-code:closing-review`, with fresh-context
   reviewers; loom-design only names the checker rules, it never runs them.
 - **It hands off to loom-code.** The flow leaves loom-design at
   `loom-code:write-plan`: from `capture-intent` when `needs-design: no`,
@@ -128,6 +128,27 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-code@loom
 codex plugin add loom-design@loom
 ```
+
+### Antigravity CLI
+
+Install from a clone of the repository, `loom-code` first:
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-design
+```
+
+To use loom, start `agy` from your project with the project added as a
+workspace by absolute path: `agy --add-dir "$PWD"` (interactive) or
+`agy --add-dir "$PWD" -p "..."` (print mode); agy 1.2.2 does not honour a
+relative path such as `.`. Without `--add-dir`, print mode (`agy -p`)
+attaches no workspace, so loom's kickoff defaults are not loaded and the
+agent may act outside the project; pass it in interactive mode too.
+
+loom-design ships no hooks; loom-code's hooks run only in the `agy` CLI, not
+in the Antigravity desktop app or IDE.
 
 ## Tests
 

@@ -4,7 +4,7 @@
 > intent に変え、設計が要る変更ならさらに spec に変える。2 つのツールが
 > プロダクトの原則とビジュアルシステムを決める。** loom-design は下書きを
 > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
-> `loom-code:review` が、下書きを書いていない agent の手で下す。
+> `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
 
 **Version**: 2.1.5 — 4 skills + 任意のルーター 1 個。リリースは
 [CHANGELOG.md](CHANGELOG.md) を参照。
@@ -22,7 +22,7 @@ flowchart TD
         spec["loom-design:write-spec<br/>needs-design: yes のときだけ<br/>② product の変更：目に見える振る舞いを<br/>ユーザーが確認"]
     end
 
-    specreview["loom-code:review<br/>fresh-context の spec review を 1 回<br/>pre-build-review: required のときだけ"]
+    specreview["loom-code:closing-review<br/>fresh-context の spec review を 1 回<br/>pre-build-review: required のときだけ"]
     plan(["引き渡し先<br/>loom-code:write-plan"])
 
     subgraph tools["オンデマンドのツール（フローの段階ではない）"]
@@ -45,7 +45,7 @@ flowchart TD
   `docs/loom/<change-id>/spec.md` にする。`kind: product` の変更では目に
   見える振る舞いを平易な言葉で読み返し、yes を記録する。engineering の
   変更はここで止まらない。spec が `pre-build-review: required` を宣言した
-  ときは、計画の前に `loom-code:review` で fresh-context の
+  ときは、計画の前に `loom-code:closing-review` で fresh-context の
   `spec+adversarial` reviewer 1 人の review を受ける。そうでなければ
   `loom-code:write-plan` へ直接進む。
 - **ツール** — `product-principles` と `design-system` は頼まれたときに
@@ -96,7 +96,7 @@ loom-design には `loom-code` が必要：
   下書きを書くのではなく止まる。Codex では `<loom-code>` はインストール
   済みの plugin ディレクトリ。リポジトリ内に checker のコピーを作らない。
 - **verdict は loom-code が下す。** 計画前の spec review も最後の
-  closing review も `loom-code:review` で fresh-context の reviewer が行う。
+  closing review も `loom-code:closing-review` で fresh-context の reviewer が行う。
   loom-design は checker のルール名を挙げるだけで、実行はしない。
 - **loom-code に引き渡す。** loom-design を抜ける先は `loom-code:write-plan`
   で、`needs-design: no` のときは `capture-intent` から、それ以外は
@@ -127,6 +127,27 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-code@loom
 codex plugin add loom-design@loom
 ```
+
+### Antigravity CLI
+
+repo を clone し、`loom-code` を先にインストールする。
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-design
+```
+
+使うときは、プロジェクトのディレクトリでプロジェクトを絶対パスで workspace に追加して
+`agy` を起動する：`agy --add-dir "$PWD"`（対話）または
+`agy --add-dir "$PWD" -p "..."`（print モード）。agy 1.2.2 は `.` のような相対パスを
+受け付けない。`--add-dir` がないと print モード（`agy -p`）では agy は workspace を
+持たないため、loom の kickoff defaults が読み込まれず、agent がプロジェクトの外で
+作業することがある。対話モードでも指定する。
+
+loom-design 自体は hook を持たない。loom-code の hook が走るのは `agy` CLI だけで、
+Antigravity のデスクトップアプリや IDE では走らない。
 
 ## テスト
 

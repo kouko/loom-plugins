@@ -18,16 +18,20 @@ atomic fallback in this contract instead of inferring a portable baseline.
 ## Executable resolver
 
 Before a host-native spawn, a station invokes the packaged standard-library
-oracle by its host-provided absolute plugin root and supplies exactly one
+oracle by its absolute plugin root and supplies exactly one
 observed-state JSON object on standard input:
 
 ```text
 # Claude Code
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py
 
-# Codex
-python3 <injected loom-code plugin root>/scripts/dispatch_profile.py
+# Codex CLI, Antigravity CLI
+python3 <loom-code>/scripts/dispatch_profile.py
 ```
+
+`<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude Code;
+on any other host it is the directory that holds this file's `references/`
+directory — two levels above the invoking station's SKILL.md.
 
 The initial event has this shape (the five complex predicates are
 `changed_consumed_interface`, `multiple_plausible_causes`, `trust_boundary`,

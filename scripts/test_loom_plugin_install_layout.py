@@ -78,6 +78,103 @@ def _install_plugin(source_name: str, destination: Path) -> Path:
     return installed_root
 
 
+LOOM_PLUGINS = ("loom-code", "loom-design", "loom-workflow")
+
+
+def _install_agy_plugin(source_name: str, plugins_dir: Path) -> Path:
+    """Mirror `agy plugin install <dir>`: copy to <plugins>/<name>/, no version dir."""
+    manifest = json.loads(
+        (REPO_ROOT / source_name / "plugin.json").read_text(encoding="utf-8")
+    )
+    installed_root = plugins_dir / manifest["name"]
+    shutil.copytree(REPO_ROOT / source_name, installed_root)
+    return installed_root
+
+
+def _skill_short_names(plugin_root: Path) -> list[str]:
+    return sorted(p.parent.name for p in plugin_root.glob("skills/*/SKILL.md"))
+
+
+def _agy_visible_skills(plugins_dir: Path) -> set[tuple[str, str]]:
+    """agy de-duplicates skills by SHORT name: a clash hides the skill."""
+    owners: dict[str, list[str]] = {}
+    for plugin_root in sorted(p for p in plugins_dir.iterdir() if p.is_dir()):
+        for short in _skill_short_names(plugin_root):
+            owners.setdefault(short, []).append(plugin_root.name)
+    return {(plugins[0], short) for short, plugins in owners.items() if len(plugins) == 1}
+
+
+def test_agy_install_every_skill_folder_discoverable(tmp_path: Path) -> None:
+    """A2 positive: each plugin installs with a root manifest; every skill is
+    present and its short name unique across the three loom plugins."""
+    plugins_dir = tmp_path / "gemini" / "config" / "plugins"
+    expected: set[tuple[str, str]] = set()
+    for name in LOOM_PLUGINS:
+        root = _install_agy_plugin(name, plugins_dir)
+        assert root == plugins_dir / name
+        agy_manifest = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
+        assert re.fullmatch(r"[a-zA-Z0-9-_]+", agy_manifest["name"])
+        skills = _skill_short_names(root)
+        assert skills == sorted(
+            p.name for p in (REPO_ROOT / name / "skills").iterdir() if p.is_dir()
+        ), f"{name}: a skill folder lacks SKILL.md"
+        for short in skills:
+            text = (root / "skills" / short / "SKILL.md").read_text(encoding="utf-8")
+            assert re.search(rf"^name:\s*{re.escape(short)}\s*$", text, re.M), short
+            expected.add((name, short))
+
+    assert _agy_visible_skills(plugins_dir) == expected
+
+
+def test_agy_closing_review_visible_beside_foreign_review_skill(tmp_path: Path) -> None:
+    """A2 boundary: a foreign plugin's `review` cannot hide the review station."""
+    plugins_dir = tmp_path / "plugins"
+    for name in LOOM_PLUGINS:
+        _install_agy_plugin(name, plugins_dir)
+    foreign = plugins_dir / "foreign-reviewer" / "skills" / "review"
+    foreign.mkdir(parents=True)
+    (foreign / "SKILL.md").write_text(
+        "---\nname: review\ndescription: foreign\n---\n", encoding="utf-8"
+    )
+
+    code_skills = _skill_short_names(plugins_dir / "loom-code")
+    assert "closing-review" in code_skills and "review" not in code_skills
+    visible = _agy_visible_skills(plugins_dir)
+    assert ("loom-code", "closing-review") in visible
+    for name in LOOM_PLUGINS:
+        for short in _skill_short_names(plugins_dir / name):
+            assert (name, short) in visible, f"{name}:{short} hidden by a clash"
+
+
+def test_claude_and_codex_ignore_root_manifest(tmp_path: Path) -> None:
+    """A8 negative (structural): the Claude and Codex installs still resolve
+    their own manifests and hook files; neither references the root agy files."""
+    for name in LOOM_PLUGINS:
+        root = _install_plugin(name, tmp_path / "cache")
+        assert (root / "plugin.json").is_file()
+        agy_manifest = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
+        claude = _manifest(root)
+        codex = json.loads(
+            (root / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
+        )
+        # The root manifest carries no host wiring a Claude/Codex loader could adopt.
+        assert set(agy_manifest) <= {"name", "version", "description"}
+        for host_manifest in (claude, codex):
+            refs = [v for v in host_manifest.values() if isinstance(v, str) and v.startswith("./")]
+            for ref in refs:
+                assert (root / ref).resolve() not in {
+                    (root / "plugin.json").resolve(),
+                    (root / "hooks.json").resolve(),
+                }, f"{name}: host manifest points at a root agy file: {ref}"
+        if (root / "hooks").is_dir() and (root / "hooks" / "hooks.json").exists():
+            # Claude's hooks stay at the conventional hooks/hooks.json.
+            assert "hooks" in json.loads(
+                (root / "hooks" / "hooks.json").read_text(encoding="utf-8")
+            )
+        if "hooks" in codex:
+            assert codex["hooks"] == "./hooks/hooks-codex.json"
+
+
 def _manifest(plugin_root: Path) -> dict[str, object]:
     return json.loads(
         (plugin_root / ".claude-plugin" / "plugin.json").read_text(
@@ -492,6 +589,83 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
                 f"{rel} names its own plugin by repo path, which does not "
                 "exist in an install"
             )
+
+
+def test_sibling_lookup_allows_version_subdirectory() -> None:
+    """Every design station that locates `loom-code` by host covers the
+    non-Claude hosts too. Claude and Codex caches hold `<name>/<version>/`;
+    Antigravity CLI installs `<name>/` with no version directory, so the
+    other-host row must allow, not require, one version subdirectory."""
+    design_skills = REPO_ROOT / "loom-design" / "skills"
+    lookups = 0
+    for skill_md in sorted(design_skills.glob("*/SKILL.md")):
+        text = skill_md.read_text(encoding="utf-8")
+        if "| Where `loom-code` lives |" not in text:
+            continue
+        lookups += 1
+        rows = [line for line in text.splitlines() if line.startswith("| ")]
+        other = [
+            row
+            for row in rows
+            if "Codex CLI" in row and "Antigravity CLI" in row
+        ]
+        assert len(other) == 1, f"{skill_md} lacks one Codex/Antigravity row"
+        row = " ".join(other[0].split())
+        assert "on any other host" in row, skill_md
+        assert "two levels above this SKILL.md" in row, skill_md
+        assert "may contain one version subdirectory" in row, skill_md
+        assert "use the newest" in row, skill_md
+    assert lookups == 4
+
+
+# The version step every other-host row must carry: Codex installs
+# `<mkt>/loom-design/<version>/`, so two levels above SKILL.md is the version
+# directory, not the plugin root.
+VERSION_STEP = "if its parent directory is named `loom-design`"
+
+
+def _resolve_loom_code_by_row(skill_md: Path) -> Path:
+    """The other-host row, executed: two levels above SKILL.md; step up once
+    when that directory's parent is named `loom-design`; `loom-code` sits next
+    to it and may hold version subdirectories — take the newest."""
+    root = skill_md.parents[2]
+    if root.parent.name == "loom-design":
+        root = root.parent
+    code = root.parent / "loom-code"
+    versions = [p for p in code.iterdir() if p.is_dir() and re.fullmatch(r"\d+(\.\d+)*", p.name)]
+    if not versions:
+        return code
+    return max(versions, key=lambda p: tuple(int(x) for x in p.name.split(".")))
+
+
+def test_sibling_lookup_resolves_flat_and_versioned_installs(tmp_path: Path) -> None:
+    flat = tmp_path / "plugins"
+    versioned = tmp_path / "cache" / "loom"
+    layouts = {
+        flat / "loom-design" / "skills" / "capture-intent" / "SKILL.md": flat / "loom-code",
+        versioned / "loom-design" / "2.1.5" / "skills" / "capture-intent" / "SKILL.md":
+            versioned / "loom-code" / "3.1.4",
+    }
+    for version in ("3.0.0", "3.1.4"):
+        checker = versioned / "loom-code" / version / "scripts" / "loom_checker.py"
+        checker.parent.mkdir(parents=True)
+        checker.write_text("")
+    (flat / "loom-code" / "scripts").mkdir(parents=True)
+    (flat / "loom-code" / "scripts" / "loom_checker.py").write_text("")
+    for skill_md, expected in layouts.items():
+        skill_md.parent.mkdir(parents=True)
+        skill_md.write_text("")
+        resolved = _resolve_loom_code_by_row(skill_md)
+        assert resolved == expected, skill_md
+        assert (resolved / "scripts" / "loom_checker.py").is_file()
+
+    rows = 0
+    for skill_md in sorted((REPO_ROOT / "loom-design" / "skills").glob("*/SKILL.md")):
+        for line in skill_md.read_text(encoding="utf-8").splitlines():
+            if line.startswith("| Codex CLI, Antigravity CLI |"):
+                rows += 1
+                assert VERSION_STEP in " ".join(line.split()), skill_md
+    assert rows == 4
 
 
 def test_isolated_loom_workflow_bundle_contains_required_skills_and_executes(

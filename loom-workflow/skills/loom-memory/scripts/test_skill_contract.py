@@ -134,7 +134,7 @@ def test_no_fixed_station_mandatory_invocation() -> None:
     forbidden_station_names = {
         "loom-code:write-plan",
         "loom-code:build",
-        "loom-code:review",
+        "loom-code:closing-review",
         "loom-code:ship",
         "loom-code:maintain",
         "loom-design:capture-intent",
@@ -205,6 +205,16 @@ def test_no_bare_repo_root_relative_script_path() -> None:
     pairing is checked per blank-line-delimited paragraph, not per physical
     line)."""
     text = _all_skill_text()
+    # `${CLAUDE_PLUGIN_ROOT}` alone is Claude-only: Codex CLI and Antigravity
+    # CLI do not substitute it, so each shipped file that names it must also
+    # carry the hybrid phrase locating the plugin root on any other host.
+    files = [SKILL_MD, *sorted(REFERENCES_DIR.glob("*.md"))]
+    for path in files:
+        flat = " ".join(_read(path).split())
+        if "${CLAUDE_PLUGIN_ROOT}" in flat:
+            assert "on any other host" in flat and "levels above" in flat, (
+                f"{path.name} names ${{CLAUDE_PLUGIN_ROOT}} without the other-host root"
+            )
     for paragraph in re.split(r"\n\s*\n", text):
         if "skills/loom-memory/scripts/" in paragraph:
             assert "${CLAUDE_PLUGIN_ROOT}" in paragraph, (
