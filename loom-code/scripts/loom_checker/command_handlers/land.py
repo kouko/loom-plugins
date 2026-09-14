@@ -5,6 +5,7 @@ from datetime import date
 from loom_checker.command_handlers.publish import PUBLISH_CI_PENDING_WAITS
 from loom_checker.command_handlers.publish import PUBLISH_CI_POLL_SECONDS
 from loom_checker.command_handlers.publish import PUBLISH_CI_REGISTRATION_WAITS
+from loom_checker.command_handlers.publish import PUBLISH_REDIRECT_CONFIG
 from loom_checker.command_handlers.publish import PUBLISH_REDIRECT_ENV
 from loom_checker.command_handlers.publish import _publication_change_id
 from loom_checker.command_handlers.publish import _publish_env
@@ -23,6 +24,7 @@ from loom_checker.parsing import parse_document
 from loom_checker.rule_checks.push import github_repo_from_origin
 from pathlib import Path
 from urllib.parse import quote
+import hashlib
 import json
 import os
 import re
@@ -82,8 +84,8 @@ def _block(reason: str, err) -> int:
     return report([("land.merge", reason)], err)
 
 
-def _land_args(args: list[str]) -> tuple[str, str | None] | str:
-    """Return (form, value) for one of the three forms, or a usage error."""
+def _land_args(args: list[str]) -> tuple[str, str | None, str | None] | str:
+    """Return (form, value, confirm) for one of the three forms, or a usage error."""
     rest = list(args)
     form: str | None = None
     value: str | None = None
@@ -108,17 +110,15 @@ def _land_args(args: list[str]) -> tuple[str, str | None] | str:
         form, value = token, operand
     if confirm is not None and form != "--sweep":
         return "--confirm applies only to --sweep"
-    return form or "--accepted-by", value
+    return form or "--accepted-by", value, confirm
 
 
 def cmd_land(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
-    """Land one accepted change: merge preconditions, then the merge."""
+    """Land one accepted change, clean up one named merged change, or sweep."""
     parsed = _land_args(args)
     if isinstance(parsed, str):
         return _usage(parsed, err)
-    form, accepted_by = parsed
-    if form != "--accepted-by":
-        return _usage(f"{form} is not implemented yet", err)
+    form, value, confirm = parsed
 
     redirected = sorted(
         key for key in os.environ
@@ -140,7 +140,14 @@ def cmd_land(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         [str(Path(trusted_git).parent), str(Path(trusted_gh).parent), "/usr/bin", "/bin"]
     ))
     try:
-        return _land_accepted(accepted_by, trusted_git, trusted_gh, out, err)
+        if form == "--accepted-by":
+            return _land_accepted(value, trusted_git, trusted_gh, out, err)
+        context = _cleanup_context(trusted_git, trusted_gh, err)
+        if isinstance(context, int):
+            return context
+        if form == "--cleanup":
+            return _land_named_cleanup(context, value, out, err)
+        return _land_sweep(context, confirm, out, err)
     finally:
         if previous_path is None:
             os.environ.pop("PATH", None)
@@ -395,13 +402,21 @@ def plan_cleanup(
     )
 
 
-def execute_cleanup(target: LandTarget, plan: CleanupPlan, out, err) -> int:
-    """Spec 'Cleanup actions, in order', for a plan from `plan_cleanup`."""
+def execute_cleanup(
+    target: LandTarget, plan: CleanupPlan, out, err, *, label: str = "",
+    announce_next: bool = True,
+) -> int:
+    """Spec 'Cleanup actions, in order', for a plan from `plan_cleanup`.
+    `label` prefixes each refusal reason (the sweep names the branch);
+    `announce_next=False` leaves the `next:` line to the caller."""
     branch, anchor = plan.branch, plan.anchor
     removed = False
 
+    def _cleanup_block(reason: str, err) -> int:
+        return report([("land.cleanup", label + reason)], err)
+
     def finish(code: int) -> int:
-        if removed:
+        if removed and announce_next:
             quoted = str(anchor).replace("'", "'\\''")
             out.write(f"next: cd '{quoted}'\n")
         return code
@@ -461,6 +476,220 @@ def cleanup_change(
     if isinstance(plan, str):
         return _cleanup_block(plan, err)
     return execute_cleanup(target, plan, out, err)
+
+
+SWEEP_PR_LIMIT = 1000
+
+
+def _cleanup_context(trusted_git: str, trusted_gh: str, err) -> LandTarget | int:
+    """Repository, identity, environment and trunk for `--cleanup`/`--sweep`;
+    branch, head and number are filled in per change."""
+    try:
+        repo = repo_root(Path.cwd()).resolve()
+    except UsageError as exc:
+        return _cleanup_block(str(exc), err)
+    origin_urls = (git_maybe(repo, "config", "--get-all", "remote.origin.url") or "").splitlines()
+    if len(origin_urls) != 1:
+        return _cleanup_block("literal origin must have exactly one fetch URL", err)
+    if git_maybe(repo, "config", "--get-regexp", PUBLISH_REDIRECT_CONFIG):
+        return _cleanup_block(
+            "origin redirection, transport, remote executable, pushurl, insteadOf, "
+            "sshCommand, or proxy configuration must be removed", err,
+        )
+    identity = github_repo_from_origin(repo)
+    if not identity:
+        return _cleanup_block("literal origin is not a supported GitHub repository URL", err)
+    env = _publish_env(identity, repo, (trusted_git, trusted_gh))
+    base_result = _read(
+        [trusted_gh, "repo", "view", identity, "--json", "defaultBranchRef",
+         "--jq", ".defaultBranchRef.name"],
+        "default branch lookup", repo=repo, env=env, err=err, rule="land.cleanup",
+    )
+    if base_result is None:
+        return 1
+    base = base_result.stdout.strip()
+    if not base or not git_ok(repo, "check-ref-format", "--branch", base):
+        return _cleanup_block("origin default branch is missing or unsafe", err)
+    return LandTarget(repo, "", "", base, identity, 0, trusted_git, trusted_gh, env)
+
+
+def _merged_prs(context: LandTarget, err, *extra: str) -> list[dict] | None:
+    """`gh pr list --state merged` rows, or None after a reported block."""
+    result = _read(
+        [context.trusted_gh, "pr", "list", "--state", "merged", *extra],
+        "merged PR lookup", repo=context.repo, env=context.env, err=err, rule="land.cleanup",
+    )
+    if result is None:
+        return None
+    try:
+        rows = json.loads(result.stdout)
+        if not isinstance(rows, list):
+            raise ValueError("not a list")
+        return [{"number": int(row["number"]), "headRefOid": str(row["headRefOid"]),
+                 "headRefName": str(row.get("headRefName", ""))} for row in rows]
+    except (json.JSONDecodeError, KeyError, TypeError, ValueError, AttributeError) as exc:
+        _cleanup_block(f"cannot decode merged PR response: {exc}", err)
+        return None
+
+
+def _fetch_prune(context: LandTarget, err) -> int:
+    code, _stdout, detail = _git_run(
+        context, context.repo, "fetch", "--prune", "origin", timeout=LAND_WRITE_TIMEOUT
+    )
+    return 0 if code == 0 else _cleanup_block(f"cannot fetch origin: {detail}", err)
+
+
+def _branch_tips(context: LandTarget, branch: str) -> tuple[set[str], str | None]:
+    """(existing local and remote tips of branch, failure reason)."""
+    tips: set[str] = set()
+    for ref in (f"refs/heads/{branch}", f"refs/remotes/origin/{branch}"):
+        tip = _tip(context, context.repo, ref)
+        if isinstance(tip, tuple):
+            return set(), tip[0]
+        if tip is not None:
+            tips.add(tip)
+    return tips, None
+
+
+def _land_named_cleanup(context: LandTarget, branch: str, out, err) -> int:
+    """Spec 'Named cleanup': never merges and never syncs the trunk."""
+    if branch == context.base or not git_ok(context.repo, "check-ref-format", "--branch", branch):
+        return _cleanup_block(f"{branch} is not a change branch", err)
+    prs = _merged_prs(context, err, "--head", branch, "--json", "number,headRefOid,mergedAt")
+    if prs is None:
+        return 1
+    if not prs:
+        return _cleanup_block(f"no merged PR for {branch}", err)
+    if _fetch_prune(context, err) != 0:
+        return 1
+    if len(prs) > 1:
+        tips, failure = _branch_tips(context, branch)
+        if failure:
+            return _cleanup_block(failure, err)
+        prs = [pr for pr in prs if pr["headRefOid"] in tips]
+        if not prs:
+            return _cleanup_block(
+                f"no merged PR for {branch} has its local or remote tip as head", err
+            )
+    pr = prs[0]
+    target = _change_target(context, branch, pr)
+    plan = plan_cleanup(target, fetch=False)
+    if isinstance(plan, str):
+        return _cleanup_block(plan, err)
+    if plan.worktree is not None:
+        out.write(f"Worktree for {branch}: {plan.worktree}\n")
+    return execute_cleanup(target, plan, out, err)
+
+
+def _change_target(context: LandTarget, branch: str, pr: dict) -> LandTarget:
+    return LandTarget(
+        context.repo, pr["headRefOid"], branch, context.base, context.identity,
+        pr["number"], context.trusted_git, context.trusted_gh, context.env,
+    )
+
+
+def _sweep_list(
+    context: LandTarget, err
+) -> tuple[list[str], list[tuple[LandTarget, CleanupPlan]], bool] | int:
+    """Spec 'Sweep', read-only apart from one `git fetch --prune origin`:
+    (output lines, removable changes, PR list truncated) or an exit code."""
+    if _fetch_prune(context, err) != 0:
+        return 1
+    code, stdout, detail = _git_run(
+        context, context.repo, "for-each-ref", "--format=%(refname)",
+        "refs/heads", "refs/remotes/origin",
+    )
+    if code != 0:
+        return _cleanup_block(f"cannot list branches: {detail}", err)
+    branches: set[str] = set()
+    for ref in stdout.splitlines():
+        for prefix in ("refs/heads/", "refs/remotes/origin/"):
+            if ref.startswith(prefix):
+                branches.add(ref[len(prefix):])
+    branches.discard(context.base)
+    branches.discard("HEAD")
+    prs = _merged_prs(
+        context, err, "--json", "number,headRefName,headRefOid", "--limit", str(SWEEP_PR_LIMIT)
+    )
+    if prs is None:
+        return 1
+    invoking = git_maybe(context.repo, "symbolic-ref", "--quiet", "--short", "HEAD")
+
+    lines: list[str] = []
+    removable: list[tuple[LandTarget, CleanupPlan]] = []
+    for branch in sorted(branches):
+        tips, failure = _branch_tips(context, branch)
+        if failure:
+            lines.append(f"skip {branch} — {failure}")
+            continue
+        pr = next((pr for pr in prs
+                   if pr["headRefName"] == branch and pr["headRefOid"] in tips), None)
+        if pr is None:
+            continue
+        if branch == invoking:
+            lines.append(f"skip {branch} — current working directory")
+            continue
+        target = _change_target(context, branch, pr)
+        plan = plan_cleanup(target, fetch=False)
+        if isinstance(plan, str):
+            lines.append(f"skip {branch} — {plan}")
+            continue
+        if plan.worktree is not None:
+            where = f"worktree {plan.worktree}"
+        elif plan.in_main:
+            where = f"main worktree {plan.main} switches to {context.base}"
+        else:
+            where = "no worktree"
+        lines.append(
+            f"remove {branch} {plan.head[:7]} — {where}, "
+            f"{'local' if plan.local else 'no local'}, {'remote' if plan.remote else 'no remote'}"
+        )
+        removable.append((target, plan))
+    return lines, removable, len(prs) >= SWEEP_PR_LIMIT
+
+
+def sweep_token(lines: list[str]) -> str:
+    """First 12 hex digits of SHA-256 over the sorted `remove` lines."""
+    removes = sorted(line for line in lines if line.startswith("remove "))
+    return hashlib.sha256("\n".join(removes).encode("utf-8")).hexdigest()[:12]
+
+
+def _land_sweep(context: LandTarget, confirm: str | None, out, err) -> int:
+    listed = _sweep_list(context, err)
+    if isinstance(listed, int):
+        return listed
+    lines, removable, truncated = listed
+    token = sweep_token(lines)
+
+    if confirm is None:
+        for line in lines:
+            out.write(line + "\n")
+        if truncated:
+            out.write(f"only the latest {SWEEP_PR_LIMIT} merged PRs were checked; "
+                      "older merged PRs were not examined\n")
+        if not removable:
+            out.write("No merged changes to clean up\n")
+        else:
+            out.write(f"confirm with: land --sweep --confirm {token}\n")
+        return 0
+
+    if confirm != token or not removable:
+        return _cleanup_block(
+            "the sweep list differs from the one confirmed; run land --sweep again", err
+        )
+    refused = False
+    anchor: Path | None = None
+    for target, plan in removable:
+        code = execute_cleanup(
+            target, plan, out, err, label=f"{plan.branch}: ", announce_next=False
+        )
+        refused = refused or code != 0
+        if plan.worktree is not None and not plan.worktree.exists():
+            anchor = plan.anchor
+    if anchor is not None:
+        quoted = str(anchor).replace("'", "'\\''")
+        out.write(f"next: cd '{quoted}'\n")
+    return 1 if refused else 0
 
 
 def _normalized(text: str) -> str:
@@ -612,15 +841,16 @@ def _accepted_names(repo: Path) -> tuple[set[str], str | None]:
     return names, None
 
 
-def _read(argv: list[str], what: str, *, repo: Path, env: dict[str, str], err):
+def _read(argv: list[str], what: str, *, repo: Path, env: dict[str, str], err,
+          rule: str = "land.merge"):
     try:
         result = run_land_external(argv, LAND_READ_TIMEOUT, cwd=repo, env=env)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        _block(f"{what} could not run: {type(exc).__name__}: {exc}", err)
+        report([(rule, f"{what} could not run: {type(exc).__name__}: {exc}")], err)
         return None
     if result.returncode != 0:
         detail = (result.stderr or result.stdout or f"exit {result.returncode}").strip()
-        _block(f"{what} failed: {detail}", err)
+        report([(rule, f"{what} failed: {detail}")], err)
         return None
     return result
 
