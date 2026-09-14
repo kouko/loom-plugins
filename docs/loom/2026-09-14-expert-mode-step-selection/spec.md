@@ -57,7 +57,7 @@ ship                ─► publish validates attestation + disclosure ─► PR
    `confirmation {proposal_id, code, source, session_id, prompt_ref,
    prompt_text, prompt_sha256, branch, merge_base, at}`, `cancel {source,
    prompt_ref, branch, merge_base, at}` and `failure {step, rule, head_sha,
-   branch, at}`. Records are untracked and never
+   branch, at}`; failure `branch` is informational, never a filter. Records are untracked and never
    enter the functional digest. Threat model: an agent that takes a shortcut
    under pressure, including running a documented command or writing a file
    to get past a gate. Out of the model: an agent that deliberately disguises
@@ -81,6 +81,10 @@ ship                ─► publish validates attestation + disclosure ─► PR
      The Claude Code matcher widens from `Bash` to those tools; whether
      Codex fires PreToolUse for apply_patch is measured in the plan, and if
      it does not, that gap is disclosed as a Codex limitation.
+   - The guard also denies a Bash command that runs a nested host session
+     (`claude` or `codex` as a program token) together with an entry-point
+     token, because a nested session's prompt fires the capture hook with
+     the same payload fields as a user prompt.
    - A confirmation prompt is one whose first token is an entry-point token
      and which contains a pending proposal's code as a standalone token; the
      other words are free, in any language. The record keeps `prompt_text`,
@@ -116,8 +120,9 @@ ship                ─► publish validates attestation + disclosure ─► PR
    Proposals, confirmations and cancels lapse when the branch or merge base
    differs from the current ones, so a reused change-id inherits nothing and
    a rebase makes a bound selection lapse (the skill says so, the full
-   process resumes, and the agent re-runs `propose` to show the table again). Failures are scoped by change-id and branch only and
-   are never filtered by merge base, so a rebase cannot drop them.
+   process resumes, and the agent re-runs `propose` to show the table again). Failures are scoped by change-id only and are never
+   filtered by branch or merge base, so neither a rebase nor a branch rename
+   or recreation can drop them.
 7. **Stations query, gates recompute** — agent-decided. `selection show
    <change-id>` prints the effective JSON step set (full set when nothing is
    bound). write-plan, build, review and ship read it at entry and omit only
@@ -127,7 +132,7 @@ ship                ─► publish validates attestation + disclosure ─► PR
 8. **Failures are recorded where they are observed** — agent-decided.
    finalize-review appends a `failure` event on every non-zero exit. The
    review station passes each non-passing reviewer verdict to `selection
-   record-failure <change-id> --step reviewers --input <verdict>` before
+   record-failure <change-id> --step reviewers --rule <verdict>` before
    any fix round. `attestation.selection.prior_failures` lists failures
    dated before each confirmation. A reviewer failure the station never
    passes to the checker cannot be detected; that limit is stated in the
@@ -138,7 +143,12 @@ ship                ─► publish validates attestation + disclosure ─► PR
    steps in `selection.skip` — empty `verdicts` and zero reviewer floor for
    `reviewers`, no adversarial run for `adversarial`, no package run for
    `package-tests` — and nothing else; `executions` may then be empty.
-   v1 attestations stay valid for changes with no selection.
+   v1 attestations stay valid for changes with no selection. Validation
+   re-reads the untracked records, so a change with a bound selection is
+   published from a checkout that shares the git common dir holding them; a
+   fresh clone refuses it. Trusting the committed `selection` field instead
+   would let a hand-edited attestation waive checks. `confirmations` lists
+   only bindings no later cancel withdrew.
 10. **Disclosure placement** — agent-decided. Ship's nine headings stay
     exact. Under `## Verification` the first line reads `Skipped steps:
     <steps> — authority: <source> (<code>, <date>)`, followed by one
