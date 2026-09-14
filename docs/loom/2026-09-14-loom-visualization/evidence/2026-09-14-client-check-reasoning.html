@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="loom-workflow:loom-visualization/5.0.0">
+<meta name="cot-body-sha" content="868b680416db345b630b1bd5d6f0839bdca31feef9448fbc0edca7dbe999375a">
+<meta name="cot-title" content="為什麼聊天圖表預設不用 Mermaid">
+<meta name="cot-type" content="loom-visualization">
+<meta name="cot-date" content="2026-09-14">
+<meta name="cot-aliases" content="[]">
+<meta name="cot-source" content="/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean/docs/loom/2026-09-14-loom-visualization/spec.md">
+<meta name="cot-source_mode" content="file">
+<meta name="cot-language" content="zh-TW">
+<meta name="cot-status" content="completed">
+<meta name="cot-processed_at" content="2026-09-14T12:00:00+08:00">
+<meta name="cot-timezone" content="Asia/Taipei">
+<meta name="cot-llm_provider" content="anthropic">
+<meta name="cot-llm_model" content="claude-opus-5">
+<meta name="cot-generator" content="loom-workflow:loom-visualization">
+<meta name="cot-arcs" content="1">
+<meta name="cot-nodes" content="6">
+<meta name="cot-layout" content="rows 3/3">
+<meta name="cot-verified" content="pass --render @ 868b680416db">
+<title>為什麼聊天圖表預設不用 Mermaid</title>
+<style>
+:root {
+  --bg: #ffffff; --fg: #1a1c1e; --muted: #5c636a; --rule: #e3e5e8;
+  --card: #f8f9fa; --accent: #0c8599;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC",
+          "Hiragino Sans", "Yu Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16181a; --fg: #e6e8ea; --muted: #9aa1a8;
+    --rule: #2c3034; --card: #1e2124; --accent: #3bc9db;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #16181a; --fg: #e6e8ea; --muted: #9aa1a8;
+  --rule: #2c3034; --card: #1e2124; --accent: #3bc9db;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 2.5rem 1.25rem 5rem; background: var(--bg);
+  color: var(--fg); font-family: var(--font); line-height: 1.75; font-size: 16px;
+}
+main { max-width: 52rem; margin: 0 auto; }
+h1 { font-size: 1.75rem; line-height: 1.35; margin: 0 0 .75rem; }
+/* The markdown uses the vault's heading levels: ### page section,
+   #### arc, ##### node. The renderer maps those to h3/h4/h5 — do not
+   "fix" these selectors to h2/h3/h4 without changing the template too. */
+h3 { font-size: 1.15rem; margin: 3rem 0 1rem; padding-bottom: .4rem;
+     border-bottom: 2px solid var(--rule); }
+h4 { font-size: 1.05rem; margin: 2.25rem 0 .75rem; color: var(--accent); }
+h5 { font-size: 1rem; margin: 1.5rem 0 .4rem; }
+p { margin: 0 0 1rem; }
+.meta { color: var(--muted); font-size: .85rem; margin-bottom: 2rem; }
+.meta a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.meta strong { color: #c92a2a; font-weight: 600; }
+@media (prefers-color-scheme: dark) { .meta strong { color: #ff8787; } }
+pre.mermaid { overflow-x: auto; background: #ffffff; border: 1px solid var(--rule);
+              border-radius: 8px; padding: 1.25rem; margin: 1rem 0; }
+/* Presentation only. Nothing below moves, adds, or removes content — the
+   HTML's structure is the markdown's structure, so the two can be read
+   against each other with no translation step.
+   A node card is an h5 plus the list after it, styled where it stands. */
+h5 + ul { border: 1px solid var(--rule); border-radius: 8px;
+          padding: .85rem 1.25rem .85rem 2.4rem; margin: 0 0 .85rem;
+          background: var(--card); list-style: disc; }
+h5 { margin-bottom: .35rem; }
+/* The first section's first paragraph is the one-line conclusion, styled
+   in place. An earlier version lifted it to the top and deleted its
+   heading — deterministic, so it looked mechanical, but it left the two
+   files disagreeing about what the document contains. */
+h3:first-of-type + p { font-size: 1.1rem; background: var(--card);
+        border-left: 4px solid var(--accent); padding: 1rem 1.25rem;
+        border-radius: 0 6px 6px 0; margin-bottom: 1.5rem; }
+blockquote { margin: 0 0 1.25rem; padding: .6rem 1rem; border-left: 3px solid var(--muted);
+  background: transparent; color: var(--fg); font-size: .95rem; }
+blockquote p { margin: 0 0 .4rem; }
+blockquote p:last-child { margin: 0; }
+ul { margin: 0 0 1rem; padding-left: 1.3rem; }
+li { margin-bottom: .35rem; }
+table { border-collapse: collapse; width: 100%; margin: 0 0 1rem; font-size: .95rem; }
+th, td { border: 1px solid var(--rule); padding: .5rem .75rem; text-align: left;
+         vertical-align: top; }
+th { background: var(--card); font-weight: 600; }
+footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--rule);
+         color: var(--muted); font-size: .85rem; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+       font-size: .9em; background: var(--card); padding: .1em .35em;
+       border-radius: 3px; }
+</style>
+</head>
+<body>
+<main>
+<h1>為什麼聊天圖表預設不用 Mermaid</h1>
+<p class="meta">來源：<a href="file:///private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean/docs/loom/2026-09-14-loom-visualization/spec.md">/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean/docs/loom/2026-09-14-loom-visualization/spec.md</a>　·　產出：2026-09-14T12:00:00+08:00　·　loom-workflow:loom-visualization/5.0.0　·　閘：pass --render　·　<strong>忠實度檢查：未執行</strong></p>
+<h3>概述</h3>
+<p>在任何能被環境變數辨識出來的客戶端裡，聊天圖表一律用表格加 ASCII，Mermaid 只留給沒有 shell 的 claude.ai 或 Claude Desktop 對話。</p>
+<h3>推理鏈</h3>
+<h4>客戶端判斷規則怎麼來的</h4>
+<p>規格裡「客戶端判斷」這一條設計決定背後的推理。</p>
+<pre class="mermaid">
+graph TB
+subgraph r1["問題與證據"]
+direction LR
+  A["<div style='text-align:left'>問題<br/>━━━━━━<br/>• Mermaid 原始碼常被原樣顯示<br/>• 讀者看到的是一堆語法</div>"]
+  B["<div style='text-align:left'>客戶端證據<br/>━━━━━━<br/>• Claude Code 顯示原始碼<br/>• Codex 未驗證</div>"]
+  C["<div style='text-align:left'>可偵測訊號<br/>━━━━━━<br/>• CLAUDECODE 環境變數<br/>• CODEX_THREAD_ID 等</div>"]
+end
+subgraph r2["取捨與結論"]
+direction LR
+  D["<div style='text-align:left'>錯誤代價不對稱<br/>━━━━━━<br/>• 選錯 Mermaid 讀者看原始碼<br/>• 選錯 ASCII 仍可讀</div>"]
+  E["<div style='text-align:left'>否決工具名偵測<br/>━━━━━━<br/>• 只在單一宿主驗證過</div>"]
+  F["<div style='text-align:left'>結論<br/>━━━━━━<br/>• 偵測到的客戶端一律 mermaid false<br/>• 無 shell 的對話才可用 Mermaid</div>"]
+end
+A -->|查各家實況| B
+B -->|需要辨識手段| C
+r1 -->|比較選錯的後果| r2
+D -->|排除不穩訊號| E
+E ==>|定案| F
+style A fill:#f8f9fa,stroke:#868e96,stroke-width:2px
+style B fill:#fff4e6,stroke:#e8590c,stroke-width:2px
+style C fill:#fff4e6,stroke:#e8590c,stroke-width:2px
+style D fill:#e5dbff,stroke:#7048e8,stroke-width:2px
+style E fill:#ffe3e3,stroke:#e03131,stroke-width:2px
+style F fill:#c5f6fa,stroke:#0c8599,stroke-width:2px
+</pre>
+<h5>A — 問題</h5>
+<ul>
+<li><strong>主張</strong>：在程式助手的聊天裡，Mermaid 常常顯示成原始碼。</li>
+<li><strong>依據</strong>：規格的現況描述指出終端機會原樣顯示 Mermaid。</li>
+<li><strong>這一步改變了什麼</strong>：確定「看起來漂亮」不能當選擇依據。</li>
+</ul>
+<h5>B — 客戶端證據</h5>
+<ul>
+<li><strong>主張</strong>：Claude Code 各介面顯示原始碼，Codex 未經驗證。</li>
+<li><strong>依據</strong>：規格引用的客戶端能力對照表。</li>
+<li><strong>這一步改變了什麼</strong>：沒有一個可偵測的客戶端被確認能渲染。</li>
+</ul>
+<h5>C — 可偵測訊號</h5>
+<ul>
+<li><strong>主張</strong>：可以用環境變數分辨 Claude Code、Codex、Gemini CLI。</li>
+<li><strong>依據</strong>：規格列出的偵測規則。</li>
+<li><strong>這一步改變了什麼</strong>：判斷可以交給腳本，而不是模型的感覺。</li>
+</ul>
+<h5>D — 錯誤代價不對稱</h5>
+<ul>
+<li><strong>主張</strong>：選錯 Mermaid 的代價比選錯 ASCII 大。</li>
+<li><strong>依據</strong>：規格原文的理由。</li>
+<li><strong>這一步改變了什麼</strong>：預設往保守的一側倒。</li>
+</ul>
+<blockquote>
+<p>a wrong Mermaid choice shows the user raw source, a wrong ASCII choice still reads</p>
+</blockquote>
+<h5>E — 否決工具名偵測</h5>
+<ul>
+<li><strong>主張</strong>：不用可用工具名稱當主要訊號。</li>
+<li><strong>依據</strong>：規格的替代方案一節：只在一個宿主上驗證過。</li>
+<li><strong>這一步改變了什麼</strong>：只保留在無 shell 對話這一種情況。</li>
+</ul>
+<h5>F — 結論</h5>
+<ul>
+<li><strong>主張</strong>：偵測得到的客戶端一律不用 Mermaid。</li>
+<li><strong>依據</strong>：前面五步合起來。</li>
+<li><strong>這一步改變了什麼</strong>：技能的預設形式是表格加 ASCII。</li>
+</ul>
+<blockquote>
+<p><code>mermaid</code> is <code>false</code> for every environment-detected client in this change, because each is documented or reported to show Mermaid source raw, or is unverified.</p>
+</blockquote>
+<h3>岔路</h3>
+<table>
+<thead>
+<tr>
+<th>考慮過的選項</th>
+<th>否決理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>從可用工具名稱判斷客戶端</td>
+<td>只在一個宿主驗證過</td>
+</tr>
+<tr>
+<td>允許 Codex IDE 擴充用 Mermaid</td>
+<td>只有一則使用者回報，且環境上分不出 CLI</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>本頁是規格中一條設計決定的推理整理；要照做的人請以規格原文為準。</p>
+
+<footer class="stamp">loom-workflow:loom-visualization/5.0.0 — rendered from the markdown artifact; do not hand-edit this file.</footer>
+</main>
+<script type="module">
+  // Pinned to a release with mermaid's DOCUMENTED subgraph behaviour.
+  // The pin was 11.16.0, which is the one short-lived line that honoured a
+  // subgraph `direction` even when a node edge left the subgraph — the
+  // layout depended on that, so the page silently required the anomaly and
+  // every other renderer showed a collapsed diagram. The layout no longer
+  // depends on it (rows are joined subgraph-to-subgraph), so pinning to
+  // the outlier is now a liability rather than a crutch: the 11.16.x line
+  // (11.16.0 and 11.16.1) is where a regression in the row-joining rule
+  // would stay invisible, because it is the only line that tolerates the
+  // broken form.
+  //
+  // Grounded, not asserted. The behaviour split was measured by rendering
+  // both cross-row forms on each line and comparing node coordinates and
+  // PNG bytes; the table and the method are in
+  // references/mermaid-cot-spec.md's appendix, and the narrative is in
+  // references/why-these-rules.md. "Latest" claims came from
+  // `npm view mermaid version` / `npm view @mermaid-js/mermaid-cli version`
+  // on 2026-08-19. Re-probe before moving this pin: an inherited fact about
+  // an external tool is a claim with a version attached, which is the
+  // mistake that produced the pin being replaced here.
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.17.0/dist/mermaid.esm.min.mjs';
+  // 'antiscript', not 'loose': node labels are raw HTML by design (the
+  // left-align <div>), so 'strict' would render them as literal text.
+  // This is defence in depth over what mermaid itself renders, and NOT
+  // the control that keeps script out of the page — the browser parses
+  // <pre> content as markup before mermaid ever runs, so anything the
+  // converter emits raw is live regardless of this setting. The control
+  // is unescape_label_markup()'s allow-list, upstream, where the fence
+  // body is turned back into markup in the first place.
+  mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'antiscript' });
+</script>
+</body>
+</html>

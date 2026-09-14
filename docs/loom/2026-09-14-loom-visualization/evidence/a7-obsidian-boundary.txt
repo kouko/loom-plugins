@@ -1,0 +1,30 @@
+== note inside vault
+{"client": "claude-code-cli", "mermaid": false, "remote_viewer": true, "obsidian_vault": true, "reason": "CLAUDECODE=1; Claude Code surfaces show Mermaid source raw or are unverified; remote viewer attached, stay ASCII"}
+== sibling file of .obsidian at vault root
+{"client": "claude-code-cli", "mermaid": false, "remote_viewer": true, "obsidian_vault": true, "reason": "CLAUDECODE=1; Claude Code surfaces show Mermaid source raw or are unverified; remote viewer attached, stay ASCII"}
+== not a vault
+{"client": "claude-code-cli", "mermaid": false, "remote_viewer": true, "obsidian_vault": false, "reason": "CLAUDECODE=1; Claude Code surfaces show Mermaid source raw or are unverified; remote viewer attached, stay ASCII"}
+== templates/assets/references scan for [[ , > [! , %%
+templates hits exit=1 (1 = none)
+assets/references hits exit=1
+== SKILL.md boundary
+## Boundary
+
+<!-- gate: loom-visualization.obsidian-boundary -->
+When the output is written to a file, first run
+`python3 scripts/detect_client.py --target <path>`. If it reports
+`obsidian_vault: true`, the target is inside an Obsidian vault: decline, say
+this skill serves coding-harness chat, and name
+`obsidian:obsidian-mermaid-visualizer` as the skill for vault notes. Never
+put Obsidian-only syntax (wikilinks, callouts, `%%` comment lines) into
+anything this skill produces.
+<!-- /gate -->
+
+Also out of scope: diagram rules for commit messages, pull requests and
+repository documents. Those follow the rules of the skill that owns the
+artifact (`loom-workflow:git-memory`, `loom-code:ship`,
+`loom-design:write-spec`).
+
+Documented reasoning turned into a standalone page is page mode, below.
+
+## Step 1 — Classify the information shape

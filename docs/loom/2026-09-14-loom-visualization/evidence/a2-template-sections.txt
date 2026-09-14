@@ -1,0 +1,88 @@
+== templates/01-option-comparison.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+Use when the table must survive a plain-text channel that does not render
+markdown. Run `python3 scripts/generate.py table` with this input on stdin:
+== templates/02-linear-steps.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+Run `python3 scripts/generate.py flow` with this input on stdin:
+
+== templates/03-branching-decision.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+No generator covers branches. Hand-author the diagram, then verify it with
+`python3 scripts/align.py -` until it prints no drift.
+== templates/04-reasoning-chain.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+No generator covers labelled edges. Hand-author the chain, then verify it with
+`python3 scripts/align.py -`.
+== templates/05-state-lifecycle.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+No generator covers states. Hand-author the diagram, then verify it with
+`python3 scripts/align.py -`.
+== templates/06-actor-sequence.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+Run `python3 scripts/generate.py seq` with this input on stdin. The generator
+is correct by construction; lifelines outside a message's span are left blank
+== templates/07-hierarchy.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+Run `python3 scripts/generate.py tree` with this input on stdin:
+
+== templates/08-system-architecture.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+Run `python3 scripts/generate.py arch` with this input on stdin. The layer
+bands carry no arrows; state the dependencies in the table or below the diagram.
+== templates/09-data-model.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+No faithful ASCII form: crow's-foot cardinality and field lists do not survive
+box drawing. Use the table substitute above, one row per field with its key and
+== templates/10-timeline.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+No generator covers timelines. Hand-author it, keeping the dates in one column,
+then verify it with `python3 scripts/align.py -`.
+== templates/11-quantity.md
+target: coding-harness
+## When to use|## Table|## ASCII|## Mermaid|## Common mistakes|
+1
+## ASCII
+
+Run `python3 scripts/generate.py bar` with this input on stdin:
+

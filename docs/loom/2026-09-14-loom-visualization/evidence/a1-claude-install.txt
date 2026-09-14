@@ -1,0 +1,18 @@
+== CLAUDE_CONFIG_DIR=<temporary directory>
+== claude plugin marketplace add <clean copy>
+Adding marketplace…✔ Successfully added marketplace: loom (declared in user settings)
+== claude plugin install loom-workflow@loom
+Installing plugin "loom-workflow@loom"...✔ Successfully installed plugin: loom-workflow@loom (scope: user)
+== installed skills
+critique
+dbt-model-style
+decision-map
+distill-sessions
+git-memory
+goal-create
+handoff
+independent-advisor
+loom-memory
+loom-visualization
+recap-state
+using-loom-workflow

@@ -1,0 +1,26 @@
+== codex-cli codex-cli 0.154.0, CODEX_HOME=<temporary directory>
+== marketplace add <clean copy>
+Added marketplace `loom` from /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean.
+Installed marketplace root: /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean
+== plugin add loom-workflow@loom
+Added plugin `loom-workflow` from marketplace `loom`.
+Installed plugin root: /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/codexhome/plugins/cache/loom/loom-workflow/5.0.0
+== plugin list
+Marketplace `loom`
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean/.claude-plugin/marketplace.json
+loom-workflow@loom  installed, enabled  5.0.0    /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean/loom-workflow
+loom-code@loom      not installed                /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean/loom-code
+loom-design@loom    not installed                /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-loom-visualization/30f9cf4e-fddc-43dd-84bf-3c3c97261377/scratchpad/clean/loom-design
+== installed skill folders
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/critique
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/dbt-model-style
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/decision-map
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/distill-sessions
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/git-memory
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/goal-create
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/handoff
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/independent-advisor
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/loom-memory
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/loom-visualization
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/recap-state
+<home>/plugins/cache/loom/loom-workflow/5.0.0/skills/using-loom-workflow

@@ -1,0 +1,11 @@
+01-option-comparison.md block 1: exit=0 ✓ no drift
+02-linear-steps.md block 1: exit=0 ✓ no drift
+03-branching-decision.md block 1: exit=0 ✓ no drift
+04-reasoning-chain.md block 1: exit=0 ✓ no drift
+05-state-lifecycle.md block 1: exit=0 ✓ no drift
+06-actor-sequence.md block 1: exit=1 line 12: col 5: '│' at display-col 5 connects to nothing vertically
+07-hierarchy.md block 1: exit=0 ✓ no drift
+08-system-architecture.md block 1: exit=0 ✓ no drift
+09-data-model.md: no ASCII diagram block (table substitute or json only)
+10-timeline.md block 1: exit=0 ✓ no drift
+11-quantity.md block 1: exit=0 ✓ no drift

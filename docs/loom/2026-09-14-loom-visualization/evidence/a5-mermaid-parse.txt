@@ -1,0 +1,20 @@
+
+11 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm exit=
+OK templates/01-option-comparison.md:51
+OK templates/02-linear-steps.md:53
+OK templates/03-branching-decision.md:46
+OK templates/04-reasoning-chain.md:52
+OK templates/05-state-lifecycle.md:39
+OK templates/06-actor-sequence.md:49
+OK templates/07-hierarchy.md:42
+OK templates/08-system-architecture.md:55
+OK templates/09-data-model.md:31
+OK templates/10-timeline.md:37
+OK templates/11-quantity.md:41
+11/11 mermaid blocks parsed
+node exit=
+node exit=0
