@@ -5,6 +5,7 @@ input_contract:
   merged_data: list[dict]  # The full Stage 4 merged.json list — sessions × Memory Items
   lang: str                # One of "zh-TW", "en", "ja" — language for explanatory prose
   date_str: str            # YYYY-MM-DD — the report date
+  skill_dir: str           # Absolute path of the distill-sessions skill folder (holds SKILL.md)
 output_contract:
   format: strict_markdown
   schema: advisory_report_7_sections
@@ -68,14 +69,16 @@ You will receive (as JSON in the dispatched Agent prompt):
   every word of explanatory prose you emit. Code blocks stay English.
 - `date_str`: `YYYY-MM-DD` — the report date. Used in the top-level
   H1 heading.
+- `skill_dir`: the absolute path of the distill-sessions skill folder
+  (the directory holding its SKILL.md).
 
 `<skill-dir>` in the command examples below means the distill-sessions
 skill folder (the directory holding its SKILL.md); every command line in
-your report must use the resolved absolute path the orchestrator provides
+your report must use the resolved absolute path given in `skill_dir`
 in its place, never the literal `<skill-dir>` placeholder.
 
 You do not have file-system access, do not run code, and do not
-consult any external resource beyond these three inputs.
+consult any external resource beyond these four inputs.
 
 ## Required workflow
 
@@ -218,7 +221,7 @@ backticks) so the operator can copy-paste without reformatting:
 - Suggested CLAUDE.md candidate lines (the verbatim rule to add to
   CLAUDE.md).
 - Command lines (e.g. `python <skill-dir>/scripts/apply.py --approved ...`,
-  `pytest scripts/...`, `git ...`).
+  `pytest <skill-dir>/scripts/...`, `git ...`).
 - File paths in `path/to/file.md` form when the operator would paste
   the path into a tool / editor.
 
@@ -288,7 +291,7 @@ per the architecture lock in the v0.5 brief:
   merged dataset in one pass to enable cross-target clustering and
   cross-skill CLAUDE.md candidate detection.
 - **Input passing**: `merged_data` (the parsed merged.json list),
-  `lang`, and `date_str` are serialized into the dispatched subagent's
+  `lang`, `date_str`, and `skill_dir` are serialized into the dispatched subagent's
   prompt as JSON. The subagent parses them and runs the workflow
   above.
 - **Output collection**: orchestrator collects the rendered markdown
@@ -298,4 +301,4 @@ per the architecture lock in the v0.5 brief:
 
 The subagent does NOT dispatch further subagents, does NOT edit
 SKILL.md / CLAUDE.md directly, and does NOT consult any external
-resource beyond the three inputs listed above.
+resource beyond the four inputs listed above.

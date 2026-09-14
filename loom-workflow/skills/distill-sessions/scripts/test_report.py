@@ -141,7 +141,7 @@ def test_build_dispatch_payload_emits_correct_schema() -> None:
     dp = payload["dispatch_payload"]
     assert dp["prompt_path"] == "agents/prompt-advisory-analyst.md"
     assert dp["model"] == "claude-sonnet-4-6"
-    assert set(dp["input"].keys()) == {"merged_data", "lang", "date_str"}
+    assert set(dp["input"].keys()) == {"merged_data", "lang", "date_str", "skill_dir"}
     assert dp["input"]["lang"] == "zh-TW"
     assert dp["input"]["date_str"] == "2026-05-27"
     assert payload["output_path"] == "/tmp/x.md"
@@ -183,6 +183,10 @@ def test_main_emits_dispatch_payload_to_stdout(
     assert parsed["dispatch_payload"]["input"]["lang"] == "zh-TW"
     assert parsed["dispatch_payload"]["input"]["date_str"] == "2026-05-27"
     assert "merged_data" in parsed["dispatch_payload"]["input"]
+    skill_dir = Path(parsed["dispatch_payload"]["input"]["skill_dir"])
+    assert skill_dir.is_absolute(), f"skill_dir must be absolute: {skill_dir}"
+    assert (skill_dir / "SKILL.md").is_file(), f"no SKILL.md under {skill_dir}"
+    assert (skill_dir / "agents" / "prompt-advisory-analyst.md").is_file()
 
 
 # ---------------------------------------------------------------------------

@@ -365,6 +365,52 @@ def test_advisory_prompt_defines_skill_dir_before_first_use() -> None:
     )
 
 
+def test_advisory_prompt_declares_skill_dir_input() -> None:
+    """``skill_dir`` must be a named input, not a value the orchestrator guesses.
+
+    The prompt tells the analyst to replace ``<skill-dir>`` with a resolved
+    path, so that path has to arrive as an input: in the frontmatter
+    ``input_contract``, in the "Context you will receive" list, and in the
+    input count. A stale "three inputs" sentence contradicts the list.
+    """
+    fm, body = _split_frontmatter(ADVISORY_PATH.read_text(encoding="utf-8"))
+    assert "skill_dir" in (fm.get("input_contract") or {}), (
+        f"{ADVISORY_PATH.name}: input_contract must declare skill_dir"
+    )
+    start = body.find("## Context you will receive")
+    assert start != -1, f"{ADVISORY_PATH.name}: missing context section"
+    end = body.find("\n## ", start + 1)
+    section = body[start : end if end != -1 else len(body)]
+    assert re.search(r"^- `skill_dir`", section, re.MULTILINE), (
+        f"{ADVISORY_PATH.name}: context list must include a `skill_dir` bullet"
+    )
+    flat = " ".join(body.split()).lower()
+    assert "three inputs" not in flat, (
+        f"{ADVISORY_PATH.name}: input count must match the four declared inputs"
+    )
+
+
+def test_advisory_prompt_has_no_bare_relative_pytest_path() -> None:
+    """Command examples must root script paths at ``<skill-dir>``."""
+    text = ADVISORY_PATH.read_text(encoding="utf-8")
+    assert not re.search(r"pytest scripts/", text), (
+        f"{ADVISORY_PATH.name}: use `pytest <skill-dir>/scripts/...`"
+    )
+
+
+def test_skill_md_advisory_dispatch_names_skill_dir_key() -> None:
+    """SKILL.md's advisory dispatch step must name the payload's skill_dir key."""
+    text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    start = text.find("## Optional advisory report")
+    assert start != -1, "SKILL.md: missing advisory report section"
+    end = text.find("\n## ", start + 1)
+    section = " ".join(text[start : end if end != -1 else len(text)].split())
+    assert "`skill_dir`" in section and "dispatch_payload.input" in section, (
+        "SKILL.md: advisory dispatch step must name `skill_dir` from "
+        "dispatch_payload.input"
+    )
+
+
 def test_both_prompts_forbid_orchestrator_memory_reference() -> None:
     """Regression guard for v0.2 Finding #3 (orchestrator memory leak).
 
