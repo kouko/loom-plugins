@@ -161,9 +161,306 @@ def _land_accepted(
     out.write(f"Merged PR #{target.number} as {merge_commit[:7]}\n")
     if _verify_merge(target, merge_commit, title, body, err) != 0:
         return 1
-    # --- W3-01 extension point: the merge is verified; trunk fast-forward and
-    # change cleanup start here. ---------------------------------------------
-    return 0
+    return _sync_and_clean(target, out, err)
+
+
+def _sync_and_clean(target: LandTarget, out, err) -> int:
+    """After a verified merge: fast-forward the trunk, then clean up the
+    invoking worktree's change (spec 'Which worktree path')."""
+    sync_trunk(target, out)
+    return cleanup_change(target, out, err, worktree=target.repo)
+
+
+REGENERABLE_IGNORED = {
+    "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".venv",
+    "node_modules", ".DS_Store",
+}
+
+
+@dataclass(frozen=True)
+class Worktree:
+    path: Path
+    branch: str | None  # the porcelain `branch` field, e.g. refs/heads/main
+
+
+@dataclass(frozen=True)
+class CleanupPlan:
+    """What cleanup of one change would do, once every precondition held."""
+
+    branch: str
+    head: str
+    main: Path
+    anchor: Path
+    worktree: Path | None  # linked worktree to remove
+    in_main: bool  # the branch is checked out in the main worktree
+    local: bool
+    remote: bool
+
+
+def _cleanup_block(reason: str, err) -> int:
+    return report([("land.cleanup", reason)], err)
+
+
+def _git_run(
+    target: LandTarget, where: Path, *args: str, timeout: int = LAND_READ_TIMEOUT
+) -> tuple[int | None, str, str]:
+    """(returncode or None when it could not run, stdout, failure detail)."""
+    try:
+        result = run_land_external(
+            [target.trusted_git, "-C", str(where), *args], timeout,
+            cwd=where, env=target.env,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return None, "", f"{type(exc).__name__}: {exc}"
+    detail = (result.stderr or result.stdout or f"exit {result.returncode}").strip()
+    return result.returncode, result.stdout, detail
+
+
+def _worktrees(target: LandTarget, where: Path) -> tuple[list[Worktree], Path] | str:
+    """(porcelain worktree entries, main worktree) or a failure reason."""
+    code, stdout, detail = _git_run(target, where, "worktree", "list", "--porcelain", "-z")
+    if code != 0:
+        return f"cannot list worktrees: {detail}"
+    entries: list[Worktree] = []
+    path: Path | None = None
+    branch: str | None = None
+    for field in stdout.split("\0"):
+        if field.startswith("worktree "):
+            path, branch = Path(field[len("worktree "):]).resolve(), None
+        elif field.startswith("branch "):
+            branch = field[len("branch "):]
+        elif not field and path is not None:
+            entries.append(Worktree(path, branch))
+            path = None
+    code, stdout, detail = _git_run(
+        target, where, "rev-parse", "--path-format=absolute", "--git-common-dir"
+    )
+    if code != 0:
+        return f"cannot find the main worktree: {detail}"
+    main = Path(stdout.strip()).resolve().parent
+    if not entries or entries[0].path != main:
+        return f"main worktree {main} is not the first worktree entry"
+    return entries, main
+
+
+def _tip(target: LandTarget, where: Path, ref: str) -> str | None | tuple[str]:
+    """The ref's oid, None when absent, or a 1-tuple failure reason."""
+    code, stdout, detail = _git_run(target, where, "rev-parse", "--verify", "--quiet", ref)
+    if code == 0:
+        return stdout.strip()
+    if code == 1 and not stdout.strip():
+        return None
+    return (f"cannot read {ref}: {detail}",)
+
+
+def _status_entries(target: LandTarget, where: Path, *extra: str) -> list[str] | str:
+    code, stdout, detail = _git_run(target, where, "status", "--porcelain", "-z", *extra)
+    if code != 0:
+        return f"cannot read the status of {where}: {detail}"
+    return [entry for entry in stdout.split("\0") if entry]
+
+
+def sync_trunk(target: LandTarget, out) -> None:
+    """Spec 'Trunk sync': fast-forward only; a skipped sync never stops cleanup."""
+    trunk = target.base
+    listed = _worktrees(target, target.repo)
+    if isinstance(listed, str):
+        out.write(f"trunk not updated: {listed}\n")
+        return
+    entries, main = listed
+    checkout = next((e.path for e in entries if e.branch == f"refs/heads/{trunk}"), None)
+    if checkout is not None:
+        status = _status_entries(target, checkout)
+        if isinstance(status, str):
+            out.write(f"trunk not updated: {status}\n")
+            return
+        if status:
+            out.write(f"trunk not updated: {checkout} has local changes\n")
+            return
+        where = checkout
+        code, _stdout, detail = _git_run(
+            target, checkout, "merge", "--ff-only", f"origin/{trunk}", timeout=LAND_WRITE_TIMEOUT
+        )
+    else:
+        where = main
+        code, _stdout, detail = _git_run(
+            target, main, "fetch", "origin", f"{trunk}:{trunk}", timeout=LAND_WRITE_TIMEOUT
+        )
+    if code != 0:
+        out.write(f"trunk not updated: {detail}\n")
+        return
+    tip = _tip(target, where, f"refs/heads/{trunk}")
+    shown = tip[:7] if isinstance(tip, str) else "an unreadable tip"
+    out.write(f"Trunk {trunk} fast-forwarded to {shown}\n")
+
+
+def plan_cleanup(
+    target: LandTarget, *, worktree: Path | None = None, fetch: bool = True
+) -> CleanupPlan | str:
+    """Spec 'Cleanup preconditions, per change', read-only apart from
+    `git fetch --prune origin` (skip it with fetch=False when the caller has
+    already fetched). `target.head` is the merged PR's headRefOid.
+
+    `worktree` is the invoking worktree's own top-level path (`--accepted-by`);
+    None looks the worktree up by exact equality of the porcelain branch field.
+    Returns the plan, or the refusal reason."""
+    branch, head, ref = target.branch, target.head, f"refs/heads/{target.branch}"
+    where = target.repo
+    try:
+        view = run_land_external(
+            [target.trusted_gh, "pr", "view", str(target.number), "--json", "state,headRefOid"],
+            LAND_READ_TIMEOUT, cwd=where, env=target.env,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return f"PR state lookup could not run: {type(exc).__name__}: {exc}"
+    if view.returncode != 0:
+        return "PR state lookup failed: " + (
+            view.stderr or view.stdout or f"exit {view.returncode}"
+        ).strip()
+    try:
+        payload = json.loads(view.stdout)
+        state = str(payload.get("state", "")).upper()
+        pr_head = str(payload.get("headRefOid", ""))
+    except (json.JSONDecodeError, AttributeError) as exc:
+        return f"cannot decode PR state response: {exc}"
+    if state != "MERGED":
+        return f"PR #{target.number} is not merged ({state or 'UNKNOWN'})"
+    if pr_head != head:
+        return f"PR #{target.number} head {pr_head[:7]} is not {head[:7]}"
+
+    if fetch:
+        code, _stdout, detail = _git_run(
+            target, where, "fetch", "--prune", "origin", timeout=LAND_WRITE_TIMEOUT
+        )
+        if code != 0:
+            return f"cannot fetch origin: {detail}"
+    local = _tip(target, where, ref)
+    if isinstance(local, tuple):
+        return local[0]
+    if local is not None and local != head:
+        return f"local branch tip {local[:7]} is not PR head {head[:7]}"
+    remote = _tip(target, where, f"refs/remotes/origin/{branch}")
+    if isinstance(remote, tuple):
+        return remote[0]
+    if remote is not None and remote != head:
+        return f"remote branch tip {remote[:7]} is not PR head {head[:7]}"
+
+    listed = _worktrees(target, where)
+    if isinstance(listed, str):
+        return listed
+    entries, main = listed
+    if worktree is not None:
+        path = worktree.resolve()
+        entry = next((e for e in entries if e.path == path), None)
+        if entry is None or entry.branch != ref:
+            return f"worktree {path} does not have {branch} checked out"
+    else:
+        entry = next((e for e in entries if e.branch == ref), None)
+    trunk_checkout = next(
+        (e.path for e in entries if e.branch == f"refs/heads/{target.base}"), None
+    )
+    in_main = entry is not None and entry.path == main
+    if in_main:
+        status = _status_entries(target, main)
+        if isinstance(status, str):
+            return status
+        if status:
+            return f"main worktree {main} has local changes"
+        if trunk_checkout is not None:
+            return f"trunk is checked out in {trunk_checkout}"
+    elif entry is not None:
+        status = _status_entries(target, entry.path)
+        if isinstance(status, str):
+            return status
+        if status:
+            kind = "untracked" if all(e.startswith("?? ") for e in status) else "modified"
+            return f"worktree {entry.path} has {kind} files"
+        # `matching` names each ignored path by the pattern it matched; the
+        # default mode collapses a directory of only ignored files (pkg/).
+        ignored = _status_entries(target, entry.path, "--ignored=matching")
+        if isinstance(ignored, str):
+            return ignored
+        outside = sorted(
+            name for name in (e[3:].rstrip("/") for e in ignored if e.startswith("!! "))
+            if name.rsplit("/", 1)[-1] not in REGENERABLE_IGNORED and not name.endswith(".pyc")
+        )
+        if outside:
+            return (f"worktree {entry.path} has ignored files outside the regenerable set: "
+                    + ", ".join(outside))
+    return CleanupPlan(
+        branch=branch, head=head, main=main,
+        anchor=trunk_checkout or main,
+        worktree=entry.path if entry is not None and not in_main else None,
+        in_main=in_main, local=local is not None, remote=remote is not None,
+    )
+
+
+def execute_cleanup(target: LandTarget, plan: CleanupPlan, out, err) -> int:
+    """Spec 'Cleanup actions, in order', for a plan from `plan_cleanup`."""
+    branch, anchor = plan.branch, plan.anchor
+    removed = False
+
+    def finish(code: int) -> int:
+        if removed:
+            quoted = str(anchor).replace("'", "'\\''")
+            out.write(f"next: cd '{quoted}'\n")
+        return code
+
+    if plan.worktree is not None:
+        try:
+            cwd = Path.cwd().resolve()
+        except OSError:
+            cwd = None
+        if cwd is None or cwd == plan.worktree or plan.worktree in cwd.parents:
+            os.chdir(anchor)
+        code, _stdout, detail = _git_run(
+            target, anchor, "worktree", "remove", str(plan.worktree), timeout=LAND_WRITE_TIMEOUT
+        )
+        if code != 0:
+            err.write(f"{detail}\n")
+            return _cleanup_block(
+                f"worktree removal interrupted at {plan.worktree}; "
+                "run git worktree prune after checking the directory", err,
+            )
+        out.write(f"Removed worktree {plan.worktree}\n")
+        removed = True
+    elif plan.in_main:
+        code, _stdout, detail = _git_run(target, plan.main, "switch", target.base)
+        if code != 0:
+            return _cleanup_block(f"cannot switch {plan.main} to {target.base}: {detail}", err)
+
+    if plan.local:
+        code, _stdout, detail = _git_run(
+            target, anchor, "update-ref", "-d", f"refs/heads/{branch}", plan.head
+        )
+        if code != 0:
+            return finish(_cleanup_block(f"local branch {branch} not deleted: {detail}", err))
+        out.write(f"Deleted local branch {branch}\n")
+        # An absent section exits non-zero; that is the state we want.
+        _git_run(target, anchor, "config", "--remove-section", f"branch.{branch}")
+
+    if plan.remote:
+        code, _stdout, detail = _git_run(
+            target, anchor, "push", f"--force-with-lease=refs/heads/{branch}:{plan.head}",
+            "origin", f":refs/heads/{branch}", timeout=LAND_WRITE_TIMEOUT,
+        )
+        if code != 0:
+            return finish(_cleanup_block(f"remote branch {branch} not deleted: {detail}", err))
+        out.write(f"Deleted remote branch {branch}\n")
+    else:
+        out.write("remote branch already deleted\n")
+    return finish(0)
+
+
+def cleanup_change(
+    target: LandTarget, out, err, *, worktree: Path | None = None, fetch: bool = True
+) -> int:
+    """Check every precondition, then remove the change's worktree and refs.
+    Exit 1 with `BLOCK land.cleanup` and nothing removed on any refusal."""
+    plan = plan_cleanup(target, worktree=worktree, fetch=fetch)
+    if isinstance(plan, str):
+        return _cleanup_block(plan, err)
+    return execute_cleanup(target, plan, out, err)
 
 
 def _normalized(text: str) -> str:

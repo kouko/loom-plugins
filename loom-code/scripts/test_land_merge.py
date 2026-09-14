@@ -140,6 +140,8 @@ def invoke(tmp_path: Path, monkeypatch, *args: str, publication: str = "",
     monkeypatch.setattr(land, "run_land_external", calls)
     monkeypatch.setattr(land, "wait_land_interval", waits.append)
     monkeypatch.setattr(land, "_cmd_push", lambda *a, **k: 0)
+    # Trunk sync and cleanup after the merge are covered by test_land_cleanup.py.
+    monkeypatch.setattr(land, "_sync_and_clean", lambda *a, **k: 0)
     monkeypatch.setattr(
         land, "resolve_publish_executable",
         lambda name: "/usr/bin/git" if name == "git" else "/usr/local/bin/gh",
