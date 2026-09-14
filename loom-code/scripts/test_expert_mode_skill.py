@@ -8,6 +8,7 @@ full process continues; a plain "yes" binds nothing.
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 import sys
@@ -25,6 +26,19 @@ CHECKER = SCRIPTS / "loom_checker.py"
 SKILL_DIR = PLUGIN_ROOT / "skills" / "expert-mode"
 STATIONS = ("build", "review", "ship", "write-plan")
 CHANGE = "2026-09-14-example"
+HOST_SESSION_VARS = ("CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_SESSION_ATTENDED",
+                     "CLAUDE_CODE_ENTRYPOINT")
+
+
+@pytest.fixture(autouse=True)
+def _no_host_session(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Results must not depend on running inside a live host session."""
+    for name in HOST_SESSION_VARS:
+        monkeypatch.delenv(name, raising=False)
+
+
+def _clean_env() -> dict[str, str]:
+    return {k: v for k, v in os.environ.items() if k not in HOST_SESSION_VARS}
 
 
 def _skill() -> str:
@@ -177,7 +191,7 @@ def test_ordinary_conversation_reaches_the_same_procedure() -> None:
 # --- Acceptance 4 -----------------------------------------------------------
 
 def _git(repo: Path, *args: str) -> str:
-    return subprocess.run(["git", "-C", str(repo), *args],
+    return subprocess.run(["git", "-C", str(repo), *args], env=_clean_env(),
                           capture_output=True, text=True, check=True).stdout.strip()
 
 
@@ -199,7 +213,8 @@ def repo(tmp_path: Path) -> Path:
 
 def _selection(repo: Path, *args: str, stdin: str = "") -> subprocess.CompletedProcess:
     result = subprocess.run([sys.executable, str(CHECKER), "selection", *args],
-                            capture_output=True, text=True, cwd=str(repo), input=stdin)
+                            capture_output=True, text=True, cwd=str(repo), input=stdin,
+                            env=_clean_env())
     assert result.returncode == 0, result.stderr
     return result
 
