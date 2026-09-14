@@ -38,3 +38,4 @@ charter: 1.0
 2. The A/B spends Claude quota: two variants times a fixed prompt set, each a fresh non-interactive session; kept small and recorded.
 3. Session-start trigger cards are identical in both variants, so they add the same baseline to each side rather than biasing the comparison.
 4. The loom-memory lesson question went unanswered; this branch does not include it (agent-decided, conservative default).
+5. user-decided — 2026-09-14 kouko authorized merging origin/main (#8) into this branch to resolve the root README conflict and re-confirmed the intent, starting a new review episode scoped to that resolution.
