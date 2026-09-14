@@ -2,7 +2,7 @@
 
 Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
-> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、推論の解説ページ、second opinion。
+> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat の図表と推論ページ、second opinion。
 
 **Version**：5.0.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
@@ -134,10 +134,10 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  ガバナンス、監査、テレメトリ、設計メモ
 ├── hooks/
-│   └── hooks.json         Write/Edit 後の skill フォルダ構成チェック
+│   ├── hooks.json         SessionStart のカードと Write/Edit 後の skill フォルダ構成チェック
+│   └── visualization-card loom-visualization の SessionStart トリガーカード
 ├── scripts/               plugin レベルのテストと構成チェック
 ├── skills/
-│   ├── loom-visualization/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
@@ -147,6 +147,7 @@ loom-workflow/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
+│   ├── loom-visualization/
 │   ├── recap-state/
 │   └── using-loom-workflow/
 ├── tests/                 git-memory・loom-memory・loom-visualization のテスト

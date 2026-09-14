@@ -2,7 +2,7 @@
 
 Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
-> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, reasoning explainers and second opinions.
+> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
 **Version**: 5.0.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
@@ -140,10 +140,10 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  governance, audit, telemetry and design notes
 ├── hooks/
-│   └── hooks.json         skill folder structure check after Write/Edit
+│   ├── hooks.json         SessionStart card and skill folder structure check after Write/Edit
+│   └── visualization-card SessionStart trigger card for loom-visualization
 ├── scripts/               plugin-level tests and the structure check
 ├── skills/
-│   ├── loom-visualization/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
@@ -153,6 +153,7 @@ loom-workflow/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
+│   ├── loom-visualization/
 │   ├── recap-state/
 │   └── using-loom-workflow/
 ├── tests/                 git-memory, loom-memory and loom-visualization tests
