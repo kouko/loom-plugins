@@ -13,10 +13,10 @@ from loom_checker.command_handlers import push as loom_checker
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
 
 
-def test_ship_authorized_merge_renders_absolute_repository_in_command() -> None:
+def test_ship_accepted_land_renders_absolute_worktree_in_command() -> None:
     text = SHIP.read_text(encoding="utf-8")
 
-    assert "cd '<absolute-repository-root>' && gh pr merge" in text
+    assert "cd '<absolute worktree root>' && python3 <loom-code>/scripts/loom_checker.py land" in text
     assert "never rely on the Bash tool's workdir" in text
 
 

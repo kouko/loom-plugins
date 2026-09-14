@@ -145,12 +145,24 @@ mechanisms:
   - id: plan.field-caps
     class: checker-rule
     eval: loom-code/scripts/test_plan_field_caps.py::test_check_plan_field_caps_test_field_over_cap_names_task_and_field
+  - id: land.merge
+    class: checker-rule
+    eval: loom-code/scripts/test_land_merge.py::test_missing_or_foreign_name_blocks
+  - id: land.verify
+    class: checker-rule
+    eval: loom-code/scripts/test_land_merge.py::test_title_only_commit_verify_blocks
+  - id: land.cleanup
+    class: checker-rule
+    eval: loom-code/scripts/test_land_sweep.py::test_changed_list_token_removes_nothing
   - id: push.attestation
     class: checker-rule
     eval: loom-code/scripts/test_loom_attestation.py::test_push_reuses_matching_attestation_without_subprocesses
   - id: push.contextual-body
     class: checker-rule
     eval: loom-code/scripts/test_loom_publish.py::test_contextual_body_gate_rejects_malformed_or_unsafe_schema
+  - id: push.merge
+    class: checker-rule
+    eval: loom-code/scripts/test_ship_worktree_merge.py::test_hook_blocks_absolute_cd_merge_with_push_merge
   - id: spec.req-grammar
     class: checker-rule
     eval: loom-code/scripts/test_loom_checker_intake.py::test_a_skipped_req_number_is_blocked
