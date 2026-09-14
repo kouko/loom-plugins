@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import uuid
@@ -44,11 +45,29 @@ from loom_checker.rule_checks.publish import (  # noqa: E402
 
 CHANGE = "2026-09-14-example"
 CHECKER = str(SCRIPTS / "loom_checker.py")
+HOST_VARS = ("CLAUDE_CODE_SESSION_ID", "CLAUDE_CODE_SESSION_ATTENDED", "CLAUDE_CODE_ENTRYPOINT")
+SESSION = "sess-attended"
+NESTED = "sess-nested"
+
+
+@pytest.fixture(autouse=True)
+def no_host_session(monkeypatch):
+    """Probes never inherit the real Claude Code session running them."""
+    for name in HOST_VARS:
+        monkeypatch.delenv(name, raising=False)
+
+
+def clean_env(**host: str) -> dict:
+    """An explicit subprocess env with no inherited host-session variables."""
+    env = {k: v for k, v in os.environ.items() if k not in HOST_VARS}
+    env.update(host)
+    return env
 
 
 def git(repo: Path, *args: str) -> str:
     return subprocess.run(
-        ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True,
+        env=clean_env(),
     ).stdout.strip()
 
 
@@ -108,13 +127,82 @@ def add_cancel(repo: Path, at: str) -> None:
     })
 
 
-def finalize_via_cli(repo: Path, tmp_path: Path) -> subprocess.CompletedProcess:
+def finalize_via_cli(repo: Path, tmp_path: Path, **host: str) -> subprocess.CompletedProcess:
     review = tmp_path / "review-input.json"
     review.write_text(json.dumps({"verdicts": [], "findings": [], "adversarial": []}), "utf-8")
     return subprocess.run(
         [sys.executable, CHECKER, "finalize-review", CHANGE, "--input", str(review)],
-        capture_output=True, text=True, cwd=str(repo),
+        capture_output=True, text=True, cwd=str(repo), env=clean_env(**host),
     )
+
+
+def capture_via_cli(repo: Path, prompt: str, session_id: str, **host: str):
+    payload = {"hook_event_name": "UserPromptSubmit", "prompt": prompt,
+               "session_id": session_id, "prompt_id": "prompt-1"}
+    return subprocess.run(
+        [sys.executable, CHECKER, "selection", "capture", "--hook"],
+        input=json.dumps(payload), capture_output=True, text=True, cwd=str(repo),
+        env=clean_env(**host),
+    )
+
+
+def confirmations(repo: Path) -> list[dict]:
+    return [e for e in selection.read_events(repo, CHANGE) if e["event"] == "confirmation"]
+
+
+# ===========================================================================
+# NESTED-SESSION ATTACKS (round-2 bypass) — must bind nothing; these PASS.
+# ===========================================================================
+
+@pytest.mark.parametrize("wrapper", [
+    'timeout 60 claude -p "/expert-mode {code}"',
+    'script -q /dev/null claude -p "/expert-mode {code}"',
+    'npx @anthropic-ai/claude-code -p "/expert-mode {code}"',
+])
+def test_capture_survives_nested_session_confirmation_binds_nothing(
+    tmp_path: Path, wrapper: str,
+) -> None:
+    """The agent launches a nested headless session through a wrapper the text
+    guard misses. That session's prompt hook sees a new session_id and runs
+    with CLAUDE_CODE_SESSION_ATTENDED=0, so its `/expert-mode <code>` prompt
+    must record no confirmation and nothing may bind."""
+    repo = make_repo(tmp_path)
+    _pid, code = add_proposal(repo, ["reviewers", "adversarial"], "2026-09-14T00:00:00Z")
+    command = wrapper.format(code=code)
+    nested_prompt = command.split('"')[1]
+    result = capture_via_cli(repo, nested_prompt, NESTED, CLAUDE_CODE_SESSION_ID=NESTED,
+                             CLAUDE_CODE_SESSION_ATTENDED="0",
+                             CLAUDE_CODE_ENTRYPOINT="sdk-cli")
+    assert result.returncode == 0, result.stderr
+    assert confirmations(repo) == [], command
+    assert att.selection_evidence(repo, CHANGE, None) is None
+
+
+def test_capture_survives_same_session_unattended_binds_nothing(tmp_path: Path) -> None:
+    """Even a payload carrying the attended session's id binds nothing when the
+    capturing process is unattended (ATTENDED=0)."""
+    repo = make_repo(tmp_path)
+    _pid, code = add_proposal(repo, ["reviewers"], "2026-09-14T00:00:00Z")
+    result = capture_via_cli(repo, f"/expert-mode {code}", SESSION,
+                             CLAUDE_CODE_SESSION_ID=SESSION,
+                             CLAUDE_CODE_SESSION_ATTENDED="0")
+    assert result.returncode == 0, result.stderr
+    assert confirmations(repo) == []
+
+
+def test_finalize_survives_other_session_keeps_full_floor(tmp_path: Path) -> None:
+    """A confirmation genuinely captured in the attended session must not waive
+    anything for a finalize running in a different Claude Code session."""
+    repo = make_repo(tmp_path, with_package=True)
+    _pid, code = add_proposal(repo, ["reviewers", "adversarial"], "2026-09-14T00:00:00Z")
+    captured = capture_via_cli(repo, f"/expert-mode {code}", SESSION,
+                               CLAUDE_CODE_SESSION_ID=SESSION)
+    assert captured.returncode == 0, captured.stderr
+    assert len(confirmations(repo)) == 1, "precondition: the attended capture bound"
+    result = finalize_via_cli(repo, tmp_path, CLAUDE_CODE_SESSION_ID=NESTED)
+    assert result.returncode != 0, "finalize in another session waived the floor"
+    assert "finalize.verdicts" in result.stderr, result.stderr
+    assert not (repo / f"docs/loom/{CHANGE}/attestation.json").exists()
 
 
 # ===========================================================================
@@ -150,7 +238,7 @@ def test_capture_survives_and_never_blocks_garbage_stdin() -> None:
     """The capture hook exits 0 (never blocks the prompt) on junk input."""
     result = subprocess.run(
         [sys.executable, CHECKER, "selection", "capture", "--hook"],
-        input="not json at all", capture_output=True, text=True,
+        input="not json at all", capture_output=True, text=True, env=clean_env(),
     )
     assert result.returncode == 0
 
