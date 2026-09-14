@@ -180,7 +180,9 @@ only creates the same broken-path window earlier.
 ### Antigravity CLI
 
 Antigravity CLI (`agy`) installs a plugin from a local directory. Clone the
-repository and install `loom-code` before its siblings:
+repository and install `loom-code` before its siblings. Before installing, check
+`agy plugin list` for a `loom-code` imported from Claude Code: installing
+replaces that imported copy, and a later `agy plugin uninstall` removes it.
 
 ```bash
 git clone https://github.com/kouko/loom-plugins.git

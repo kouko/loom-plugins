@@ -199,7 +199,10 @@ codex plugin list
 
 Antigravity CLI (`agy`) installs plugins from a local directory, so clone the
 repository and install each plugin from the clone. Install `loom-code` first:
-the other two use its contract package and checker.
+the other two use its contract package and checker. Before installing, check
+`agy plugin list` for a plugin of the same name imported from Claude Code:
+installing replaces that imported copy, and a later `agy plugin uninstall`
+removes it.
 
 ```sh
 git clone https://github.com/kouko/loom-plugins.git

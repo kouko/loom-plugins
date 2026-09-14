@@ -182,7 +182,9 @@ Codex では loom-visualization のトリガーカードを plugin の SessionSt
 ### Antigravity CLI
 
 repo を clone し、`loom-code` を先にインストールする。`critique`・`decision-map`・
-`distill-sessions` が loom-code を参照する。
+`distill-sessions` が loom-code を参照する。インストール前に `agy plugin list` で
+Claude Code から取り込まれた同名の plugin がないか確認する。install はその取り込み済みの
+コピーを置き換え、後の `agy plugin uninstall` はそれを削除する。
 
 ```bash
 git clone https://github.com/kouko/loom-plugins.git

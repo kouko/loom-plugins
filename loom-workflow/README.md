@@ -189,7 +189,10 @@ plugin's hooks.
 ### Antigravity CLI
 
 Install from a clone of the repository. Install `loom-code` first. `critique`,
-`decision-map` and `distill-sessions` refer to it.
+`decision-map` and `distill-sessions` refer to it. Before installing, check
+`agy plugin list` for a plugin of the same name imported from Claude Code:
+installing replaces that imported copy, and a later `agy plugin uninstall`
+removes it.
 
 ```bash
 git clone https://github.com/kouko/loom-plugins.git

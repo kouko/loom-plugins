@@ -176,7 +176,9 @@ codex plugin add loom-workflow@loom
 ### Antigravity CLI
 
 從 repo 的 clone 安裝，先裝 `loom-code`：`critique`、`decision-map`、
-`distill-sessions` 會參照它。
+`distill-sessions` 會參照它。安裝前先用 `agy plugin list` 確認有沒有從 Claude Code
+匯入的同名 plugin：install 會取代那份匯入的副本，之後的 `agy plugin uninstall`
+也會把它刪掉。
 
 ```bash
 git clone https://github.com/kouko/loom-plugins.git
