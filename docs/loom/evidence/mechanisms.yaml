@@ -192,7 +192,7 @@ mechanisms:
                           # real hook entry, so it must still be listed.
     eval: loom-code/scripts/test_language_anchor_hook.py
 
-  # --- contract (63; loom-code/contract/manifest.yaml — stations, the 10
+  # --- contract (62; loom-code/contract/manifest.yaml — stations, the 10
   #     non-standalone tools, actions and per-field artifact schemas) ---
   - {id: "station:capture-intent", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "station:write-spec",     class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
@@ -229,7 +229,6 @@ mechanisms:
   - {id: "artifact:intent.originator",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.kind",                class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.needs-design",        class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.lane",                class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.map",                 class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.evidence",            class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.status",              class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
