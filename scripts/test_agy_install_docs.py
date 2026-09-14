@@ -26,11 +26,53 @@ AGY_READMES = (
     "loom-design/README.ja.md",
     "loom-design/README.zh-TW.md",
     "loom-workflow/README.md",
+    "loom-workflow/README.ja.md",
+    "loom-workflow/README.zh-TW.md",
 )
+
+# A Claude Code install section, in any language, installs from the marketplace.
+CLAUDE_INSTALL = re.compile(r"plugin install [\w-]+@")
+AGY_HEADING = re.compile(r"^### Antigravity CLI$", re.M)
 
 
 def _read(rel: str) -> str:
     return (REPO_ROOT / rel).read_text(encoding="utf-8")
+
+
+def _all_readmes() -> dict[str, str]:
+    paths = sorted(REPO_ROOT.glob("README*.md"))
+    for plugin in PLUGINS:
+        paths += sorted((REPO_ROOT / plugin).glob("README*.md"))
+    return {str(p.relative_to(REPO_ROOT)): p.read_text(encoding="utf-8") for p in paths}
+
+
+def _missing_agy_section(texts: dict[str, str]) -> list[str]:
+    """READMEs with a Claude install section but no Antigravity CLI section."""
+    return [
+        rel for rel, text in texts.items()
+        if CLAUDE_INSTALL.search(text) and not AGY_HEADING.search(text)
+    ]
+
+
+def test_loom_workflow_ja_zh_readmes_have_agy_section() -> None:
+    for rel in ("loom-workflow/README.ja.md", "loom-workflow/README.zh-TW.md"):
+        body = _agy_section(_read(rel))
+        assert CLONE in body, rel
+        assert -1 < body.find("agy plugin install ./loom-code") < body.find(
+            "agy plugin install ./loom-workflow"
+        ), rel
+        assert "agy" in body and "Antigravity" in body, rel
+    assert _missing_agy_section(_all_readmes()) == []
+
+
+def test_agy_section_missing_in_any_translation_fails() -> None:
+    texts = {
+        "p/README.md": "## Install\n\n/plugin install p@m\n\n### Antigravity CLI\n\nx\n",
+        "p/README.ja.md": "## インストール\n\n/plugin install p@m\n\n## 使い方\n",
+        "p/README.zh-TW.md": "## 安裝\n\nclaude plugin install p@m\n\n### Antigravity CLI\n",
+        "q/README.md": "## Usage\n\nno install here\n",
+    }
+    assert _missing_agy_section(texts) == ["p/README.ja.md"]
 
 
 def _agy_section(text: str) -> str:

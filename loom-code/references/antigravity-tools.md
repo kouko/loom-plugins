@@ -48,7 +48,7 @@ working tools, including `view_file`, `write_to_file` and `run_command`.
 
 Call `invoke_subagent` with a `Subagents` array. Each item carries:
 
-- `TypeName` (required) — always `"self"`: `TypeName: "self"`.
+- `TypeName` (required) — always `"self"`.
 - `Role` (required) — the loom role this dispatch fills, as in the table.
 - `Prompt` (required) — first, an instruction to read
   `<loom-code>/agents/<role>.md` (with `<loom-code>` resolved to an absolute
@@ -77,10 +77,9 @@ Never set `Model` alone; a partial profile is never claimed.
 
 ## Second vendor
 
-On agy the host vendor is `gemini`. Probe `claude` then `codex`, and pass
-`host_vendor: "gemini"` to `second_vendor_policy.py`. The Codex-to-Claude
-reviewer runner described in closing-review is the Codex path; this
-reference defines no Antigravity equivalent.
+Antigravity CLI has no verified second-vendor runner yet, so an agy host
+offers no cross-model reviewer: probe no vendor and continue the review
+without one.
 
 ## Plugin root
 
@@ -88,13 +87,6 @@ agy substitutes no variables in skill text. `<loom-code>` is the plugin
 directory two levels above a station's `SKILL.md`; after
 `agy plugin install` that is `~/.gemini/config/plugins/loom-code/`.
 
-## Hooks (orientation only)
+## Hooks
 
-agy reads a root `hooks.json`, runs each command through `sh -c` from the
-installed plugin root, and exposes no plugin-root environment variable.
-Events are `PreToolUse`, `PostToolUse`, `PreInvocation`, `PostInvocation`
-and `Stop`; there is no session-start or prompt-submit event. A `PreToolUse`
-hook on `run_command` can return `{"decision": "deny", "reason": "..."}` to
-block a command, and a `PreInvocation` hook can inject text with
-`{"injectSteps": [{"ephemeralMessage": "..."}]}`. loom-code's adapter uses
-these for the push gate and session context; a station never calls them.
+loom-code's root hooks.json adapter enforces the push gate, session context and language reminder on agy; stations do not invoke hooks.

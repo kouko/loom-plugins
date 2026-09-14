@@ -313,7 +313,7 @@ def test_ask_keeps_the_full_lane_question() -> None:
     assert "every full-lane change" in flat
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
-    assert "Antigravity CLI uses `ask_question`; its live tool schema owns the question shape." in flat
+    assert "ask_question" not in text  # agy offers no candidate, so it never asks
     assert "render both choices in the user's current conversation language" in flat
     assert "decline this change" in flat
     assert "https://code.claude.com/docs/en/tools-reference" in text
@@ -330,7 +330,7 @@ def test_ask_excludes_host_and_defines_unavailable_paths() -> None:
     flat = " ".join(text.split())
     assert "On Codex, probe `claude` then `gemini`" in flat
     assert "On Claude Code, probe `codex` then `gemini`" in flat
-    assert "On Antigravity CLI, probe `claude` then `codex`" in flat
+    assert "On Antigravity CLI, probe nothing" in flat
     assert "blocking plain-language Markdown question" in flat
     assert "no runnable different-model-family CLI" in flat
     assert "continue without asking" in flat
@@ -349,8 +349,10 @@ def test_antigravity_host_is_never_told_to_probe_gemini() -> None:
     text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
     flat = " ".join(text.split())
     sentence = flat.split("On Antigravity CLI,", 1)[1].split(".", 1)[0]
-    assert "`claude` then `codex`" in sentence
+    assert "no verified second-vendor runner yet" in sentence
+    assert "no such review tool is available" in sentence
     assert "gemini" not in sentence.lower()
+    assert "`claude`" not in sentence and "`codex`" not in sentence
 
 
 def test_second_vendor_modes_match_loom_code_contract() -> None:

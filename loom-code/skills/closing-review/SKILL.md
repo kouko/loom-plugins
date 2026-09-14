@@ -5,7 +5,7 @@ description: |
 version: 1.5.0
 ---
 
-# Review
+# Closing review
 
 Reviewer findings and generated evidence are written in English.
 
@@ -131,10 +131,13 @@ alone; a plain-text exit 2 is caller misuse rather than a routing signal.
 
 ## 3. Run blind and adversarial checks
 
-Use a blind run when an Acceptance line cannot be settled mechanically. When it
-produces `docs/loom/<change-id>/blind-run-report.md`, commit that report on the
-change branch before running `finalize-review`; it is functional content, and
-only `attestation.json` is publication metadata. For
+Use a blind run when an Acceptance line cannot be settled mechanically. Its
+`docs/loom/<change-id>/blind-run-report.md` is functional content; only
+`attestation.json` is publication metadata. Finish the blind run and commit
+that report on the change branch before the reviewers read the final
+functional-content digest, and so before running `finalize-review`. A report
+committed after their verdicts is new functional content and needs the next
+round. For
 code, skill, spec, or gate changes, create committed adversarial programs that
 exercise the relevant boundary and pass their paths and commands to
 `finalize-review`. Do not record a claimed result; finalization executes them.

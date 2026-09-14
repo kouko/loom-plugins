@@ -183,7 +183,7 @@ def test_ask_still_asks_once_per_full_lane_change() -> None:
     assert "every full-lane change" in flat
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
-    assert "Antigravity CLI uses `ask_question`; its live tool schema owns the question shape." in flat
+    assert "ask_question" not in text  # agy offers no candidate, so it never asks
     assert "render both choices in the user's current conversation language" in flat
     assert "decline this change" in flat
     assert "https://code.claude.com/docs/en/tools-reference" in text
@@ -197,6 +197,12 @@ def test_ask_is_host_aware_and_has_complete_fallbacks() -> None:
     flat = " ".join(text.split())
     assert "On Codex, probe `claude` then `gemini`" in flat
     assert "On Claude Code, probe `codex` then `gemini`" in flat
+    agy = flat.split("On Antigravity CLI,", 1)[1].split(".", 1)[0]
+    assert "probe nothing" in agy
+    assert "no verified second-vendor runner yet" in agy
+    assert "no such review tool is available" in agy
+    for vendor in ("claude", "codex", "gemini"):
+        assert f"`{vendor}`" not in agy
     assert "blocking plain-language Markdown question" in flat
     assert "no runnable different-model-family CLI" in flat
     assert "continue without asking" in flat

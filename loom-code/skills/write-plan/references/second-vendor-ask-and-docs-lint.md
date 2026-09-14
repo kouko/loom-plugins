@@ -9,8 +9,9 @@ An independent cross-model review only counts if it uses a non-interactive
 command-line tool from a **different model family than the current host**.
 Host identity comes from the environment running this skill, never from which
 executables happen to be installed. On Codex, probe `claude` then `gemini`.
-On Claude Code, probe `codex` then `gemini`. On Antigravity CLI, probe
-`claude` then `codex`. Never offer the current host
+On Claude Code, probe `codex` then `gemini`. On Antigravity CLI, probe nothing:
+Antigravity CLI has no verified second-vendor runner yet, so state that no
+such review tool is available. Never offer the current host
 family. Detect a candidate with `command -v <cli>` **and** a probe that it runs —
 `<cli> --version` must exit 0. In zsh `command -v` may print an alias or a
 function body rather than a path; do not try to parse it. **Any non-empty
@@ -91,7 +92,6 @@ Codex uses `request_user_input` only when the host exposes it in the active
 mode; its live tool schema owns the valid question shape and availability, and
 the official implementation enforces both mode and root-thread availability
 ([Codex handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/request_user_input.rs)).
-Antigravity CLI uses `ask_question`; its live tool schema owns the question shape.
 Ask whether to use the named candidate for an independent review by a different
 model family. Treat the two choice meanings as `decline this change` and
 `use <tool>`, and render both choices in the user's current conversation
