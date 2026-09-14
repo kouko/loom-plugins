@@ -19,6 +19,13 @@ cumulative diff. If only publication metadata changed and a matching
 attestation already exists, stop: the evidence is still valid and Ship owns
 the remaining work.
 
+At entry, run `loom_checker.py selection show <change-id>` and omit only the
+prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
+blind-run). The agent may suggest skipping steps at most once per change: it
+runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
+table, and keeps working on the full process at once; a plain "yes" binds
+nothing.
+
 ## 2. Compute review depth
 
 Before every host-native dispatch, the station must read the
@@ -172,6 +179,10 @@ ledger or committed state schema. Wording-only publication edits do not reopen
 Review.
 <!-- /gate -->
 
+Before any fix round, pass each non-passing reviewer verdict to
+`loom_checker.py selection record-failure <change-id> --step reviewers --rule <verdict>`;
+a rejection never handed over stays unrecorded.
+
 Convergence is where a lesson this branch taught is still cheap to keep.
 Whatever it taught has surfaced by now — through a finding, a probe, or the
 blind run — and writing it down after the merge costs a branch and a pull
@@ -217,6 +228,8 @@ python3 <loom-code>/scripts/loom_checker.py finalize-review <change-id> --input 
 ```
 
 The checker runs the declared package suite and each adversarial program once.
+`finalize-review` waives reviewers, adversarial and package-tests solely for a
+bound selection that lists them.
 Only after all executions and verdicts pass does it atomically generate the
 attestation bound to the functional-content digest. Commit the generated file
 with any remaining publication metadata; publication validates that single

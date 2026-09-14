@@ -16,6 +16,9 @@ follow its linked SKILL.md. A directly named station goes straight to that skill
 | Build completed, or functional changes invalidated review evidence | [review](../review/SKILL.md) |
 | Publish a branch with a matching review attestation | [ship](../ship/SKILL.md) |
 | Bug report, alert, regression, or dogfood incident outside an active unmerged change | [maintain](../maintain/SKILL.md) |
+| The user typed `/loom-code:expert-mode` (Codex: `$expert-mode`) to skip steps for one change | [expert-mode](../expert-mode/SKILL.md) |
+
+Only the user invokes `expert-mode`; do not select it from an inferred need.
 
 The selected station owns prerequisites, execution, and handoffs. Requests only
 for product design or workflow tools belong to their available skills, not this

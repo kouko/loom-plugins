@@ -64,6 +64,8 @@ def test_loom_code_station_names_match_skill_dirs(manifest):
     router = "using-loom-code"
     assert router not in declared
     assert router in on_disk
+    # expert-mode is a user-only step-selection surface, not a lifecycle station.
+    on_disk -= {"expert-mode"}
     assert declared == on_disk - {router}
 
 

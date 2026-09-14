@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from prose_pin import has_negation
+
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW = (ROOT / "loom-code/skills/review/SKILL.md").read_text(encoding="utf-8")
@@ -301,6 +303,41 @@ def test_code_only_field_boundaries_keep_problem_and_value_semantics() -> None:
     assert "who it affects, and the consequence" in PLAN_PROSE
     assert "beneficiary, urgency, and GO/NO-GO" in PLAN_PROSE
     assert "engineering intent omits obvious value" in PLAN_PROSE
+
+
+def test_stations_read_the_bound_selection_at_entry() -> None:
+    read = (
+        "run `loom_checker.py selection show <change-id>` and omit only the prose steps "
+        "it lists as skipped (intent, spec, plan, implementer, tdd, blind-run)"
+    )
+    for station in (BUILD, REVIEW, SHIP, PLAN):
+        prose = " ".join(station.split())
+        assert prose.count(read) == 1
+        sentence = next(s for s in prose.split(". ") if read in s)
+        assert not has_negation(sentence), sentence
+
+
+def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
+    review_prose = " ".join(REVIEW.split())
+    assert (
+        "Before any fix round, pass each non-passing reviewer verdict to "
+        "`loom_checker.py selection record-failure <change-id> --step reviewers --rule <verdict>`"
+    ) in review_prose
+    assert (
+        "`finalize-review` waives reviewers, adversarial and package-tests solely for a "
+        "bound selection that lists them"
+    ) in review_prose
+
+
+def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None:
+    assert (
+        "open the Verification section with exactly the lines `render_selection_disclosure` renders "
+        "for the attestation (`Skipped steps:` lines, then `Prior failure:` lines)"
+    ) in SHIP_PROSE
+    assert (
+        "When `selection show` lists the intent as skipped, obtain the one publication "
+        "decision and publish with `--confirm-authorized`"
+    ) in SHIP_PROSE
 
 
 def test_code_only_surface_routing_matches_capture_intent() -> None:

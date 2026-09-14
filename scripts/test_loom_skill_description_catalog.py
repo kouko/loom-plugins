@@ -32,6 +32,9 @@ CASE_BLOCK = re.compile(r"```json routing-cases\n(?P<body>.*?)\n```", re.DOTALL)
 # Leaves renamed after the baseline was frozen. The baseline in cases.md is a
 # historical record and is not re-frozen; its paths are mapped through this
 # table before comparing with the on-disk set, so the hash stays pinned.
+# Leaves added after the baseline was frozen; they stay outside the frozen
+# hash but still count toward the rendered description budget.
+ADDED_LEAVES = {"loom-code/skills/expert-mode/SKILL.md"}
 RENAMED_LEAVES = {
     "loom-workflow/skills/cot-explain/SKILL.md": "loom-workflow/skills/loom-visualization/SKILL.md",
 }
@@ -90,7 +93,7 @@ def test_frozen_leaf_baseline_is_accounted_before_router_edits() -> None:
     }
 
     baseline = _baseline()
-    assert leaf_paths == {RENAMED_LEAVES.get(path, path) for path in baseline}
+    assert leaf_paths - ADDED_LEAVES == {RENAMED_LEAVES.get(path, path) for path in baseline}
     assert len(baseline) == BASELINE_LEAF_COUNT
     assert hashlib.sha256("\n".join(baseline.values()).encode()).hexdigest() == (
         "96d9cc72c5fa5e35e28ecd3596ff797bb430261ee209b82c5a52ceb793ffc275"
@@ -119,7 +122,7 @@ def test_candidate_has_exactly_one_router_per_loom_plugin() -> None:
     assert not missing, f"missing Loom routers: {', '.join(missing)}"
 
     assert sum(len(skill_map) for skill_map in skills.values()) == (
-        BASELINE_LEAF_COUNT + len(ROUTER_NAMES)
+        BASELINE_LEAF_COUNT + len(ADDED_LEAVES) + len(ROUTER_NAMES)
     )
 
 
