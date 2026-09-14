@@ -48,7 +48,7 @@ flowchart TD
         maintain["loom-code:maintain<br/>bugs, alerts, regressions"]
     end
 
-    merged(["Merged PR<br/>produced by<br/>loom-code:ship"])
+    merged(["Merged PR<br/>merged separately after<br/>loom-code:ship"])
 
     idea --> intent
     intent -->|"needs-design: yes"| spec
@@ -81,7 +81,8 @@ flowchart TD
   programs for code, skill, spec or gate changes. Passing evidence becomes an
   attestation bound to the reviewed content.
 - **③ Acceptance** — `ship` pushes the branch, opens the PR and verifies
-  checks; the blind-run report is what you read to accept the change.
+  checks; you accept the change, through the blind-run report when one was
+  required.
 - **Maintain** — `maintain` attaches an incident to a matching open intent, or
   creates one, and hands it to `write-plan`.
 - **Decision map** — the second way into `capture-intent`: when a slice of a
