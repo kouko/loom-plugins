@@ -408,3 +408,31 @@ def test_code_only_surface_routing_matches_capture_intent() -> None:
     assert "Visible effects with an unknown surface and no spec require" in normalized
     assert "surface-neutral reason" in normalized
     assert "internal files alone do not" in normalized
+
+
+def _station_summary_rows(station: str) -> tuple[list[str], list[str]]:
+    rows = [line for line in station.splitlines() if line.startswith("| ")]
+    build = [row for row in rows if row.startswith("| build |")]
+    review = [row for row in rows if row.startswith("| closing-review |")]
+    return build, review
+
+
+def test_station_summary_rows_name_builds_mechanical_checks() -> None:
+    stations = [
+        CAPTURE,
+        PLAN,
+        *((ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
+          for name in ("write-spec", "product-principles", "design-system")),
+    ]
+    for station in stations:
+        build, review = _station_summary_rows(station)
+        assert len(build) == 1 and len(review) == 1
+        assert "independent adversary's committed adversarial programs" in build[0]
+        assert "complete package suite" in build[0]
+        assert "must pass before hand-off" in build[0]
+        assert "only content that passed Build's checks" in review[0]
+        assert "again on committed content" in review[0]
+        assert "execute once during" not in review[0]
+        for row in (*build, *review):
+            assert "closing review dispatches" not in row.lower()
+            assert "closing-review dispatches" not in row.lower()
