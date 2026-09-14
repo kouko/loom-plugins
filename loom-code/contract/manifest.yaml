@@ -2,7 +2,7 @@
 # Consumers: loom-design and loom-workflow read this file; only loom-code writes it.
 # Recomputed by check_mechanisms.py: every station / tool / action / artifact
 # field below is a mechanism and must be listed in docs/loom/evidence/mechanisms.yaml.
-version: 2.2.0
+version: 2.3.0
 
 # Paths matched here are publication metadata. They do not change the
 # functional content identity that executions and reviews attest to.
@@ -262,7 +262,7 @@ kickoff_defaults:   # grammar: `- <key>: <value> — <reason> (<date>)`
   - {name: standing-docs,          grammar: "waived"}
   - {name: session-start-baseline, grammar: "<sha> <words>"}
   - {name: interface-surfaces,     grammar: "<glob>[, <glob>…]", default: "**/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/**"}
-  - {name: artifact-types,         grammar: "<glob>=<type>[, …]", note: "reserved — declared, not read by the checker yet; the lane and the adversarial floor use the §6 mapping below"}
+  - {name: artifact-types,         grammar: "<glob>=<type>[, …]", note: "reserved — declared, not read by the checker yet; the reviewer floor and the adversarial floor use the §6 mapping below"}
 
 artifact_types:      # §6 type mapping; KICKOFF-DEFAULTS artifact-types is reserved — declared, not read by the checker yet
   - {glob: "docs/loom/intent/**",        type: intent}

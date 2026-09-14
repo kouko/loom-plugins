@@ -18,7 +18,7 @@ counting: >
   outside the loom flow and is not part of the skill budget. checker-rule
   = every rule id `loom_checker.py --list-rules` prints (the checker is
   the single source for its own rule population). hook = one entry per
-  PreToolUse / PostToolUse / SessionStart hook declared in the Claude
+  PreToolUse / PostToolUse / SessionStart / UserPromptSubmit hook declared in the Claude
   `loom-code/hooks/hooks.json` or Codex `hooks-codex.json` manifest, or in
   the Claude `loom-workflow/hooks/hooks.json` manifest, id'd
   as `<event>:<matcher>:<command basename>` with `@codex` appended for
@@ -42,7 +42,8 @@ counting: >
   is not host-hygiene.
 
 mechanisms:
-  # --- skill (21; 7 stations + 11 non-standalone tools + 3 optional routers;
+  # --- skill (22; 7 stations + 11 non-standalone tools + 3 optional routers
+  #     + the user-invoked expert-mode skill;
   #     the 2 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
@@ -107,6 +108,9 @@ mechanisms:
   - id: loom-memory
     class: skill
     eval: "loom-workflow/skills/loom-memory/scripts/test_skill_contract.py"
+  - id: expert-mode
+    class: skill
+    eval: "loom-code/scripts/test_expert_mode_skill.py::test_skill_procedure_maps_proposes_reports_withdraws_and_relapses"
 
   # --- checker-rule (19; loom_checker.py --list-rules) ---
   - id: contract.charter-complete
@@ -170,16 +174,25 @@ mechanisms:
     class: checker-rule
     eval: loom-code/scripts/test_loom_checker_standing.py::test_missing_standing_docs_warn_in_exactly_three_lines
 
-  # --- hook (6 raw entries across host manifests; 5 counted, 1 host-hygiene) ---
+  # --- hook (9 raw entries across host manifests; 8 counted, 1 host-hygiene) ---
   - id: "SessionStart:startup|clear|compact:session-start"
     class: hook
     eval: loom-code/scripts/test_session_start_words.py
-  - id: "PreToolUse:Bash:loom_checker.py"
+  - id: "PreToolUse:Bash|Write|Edit|MultiEdit|NotebookEdit:loom_checker.py"
     class: hook
-    eval: loom-code/scripts/test_loom_attestation.py::test_push_reuses_matching_attestation_without_subprocesses
+    eval: loom-code/scripts/test_selection_guard.py::test_claude_matcher_covers_bash_and_file_tools
   - id: "PreToolUse:Bash:loom_checker.py@codex"
     class: hook
     eval: loom-code/scripts/test_codex_stale_hook.py
+  - id: "PreToolUse:apply_patch|Edit|Write:loom_checker.py@codex"
+    class: hook
+    eval: loom-code/scripts/test_selection_guard.py::test_codex_file_tool_hook_delegates_to_checker_and_passes_when_missing
+  - id: "UserPromptSubmit::loom_checker.py"
+    class: hook
+    eval: loom-code/scripts/test_selection_capture.py::test_user_prompt_with_code_binds_and_returns_system_message
+  - id: "UserPromptSubmit::loom_checker.py@codex"
+    class: hook
+    eval: loom-code/scripts/test_selection_capture.py::test_codex_hook_never_blocks_when_checker_is_missing
   - id: "SessionStart:startup|clear|compact:visualization-card"
     class: hook
     eval: loom-workflow/scripts/test_visualization_card_hook.py
@@ -192,7 +205,7 @@ mechanisms:
                           # real hook entry, so it must still be listed.
     eval: loom-code/scripts/test_language_anchor_hook.py
 
-  # --- contract (62; loom-code/contract/manifest.yaml — stations, the 10
+  # --- contract (63; loom-code/contract/manifest.yaml — stations, the 10
   #     non-standalone tools, actions and per-field artifact schemas) ---
   - {id: "station:capture-intent", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "station:write-spec",     class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
@@ -259,6 +272,7 @@ mechanisms:
   - {id: "artifact:attestation.executions",     class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
   - {id: "artifact:attestation.verdicts",       class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
   - {id: "artifact:attestation.findings",       class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
+  - {id: "artifact:attestation.selection",      class: contract, eval: "loom-code/scripts/test_selection_finalize.py::test_bound_skip_of_reviewers_and_adversarial_validates"}
 
   # --- prose-gate: landed stations mark their real `<!-- gate: … -->`
   #     paragraphs in W1/W2, W3-06 §11 recomputes ---

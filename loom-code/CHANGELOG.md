@@ -1,5 +1,35 @@
 # Changelog
 
+## [3.3.0] — 2026-09-14 — user-chosen Loom steps per change
+
+- Add the user-invoked `expert-mode` skill: it proposes which Loom steps a
+  change runs or skips, reports what bound, and withdraws a selection.
+- Add a prompt capture hook on Claude Code and Codex (`UserPromptSubmit`) that
+  binds a selection only from the user's own typed confirmation code.
+- Widen the PreToolUse guard over file tools so an agent cannot write the
+  selection record store; records live untracked under the git common dir
+  with branch-and-base scoped selections and persistent failure events.
+- Attestation v2 carries a recomputed `selection` field; only confirmed skips
+  waive their checks, and v1 attestations stay valid.
+- Publication discloses every skipped step in the pull request and lists prior
+  reviewer failures from the skipped-review ledger.
+- Remove the unused lane settings from `KICKOFF-DEFAULTS.md`, the contract
+  manifest and the templates.
+- Raise the counted-skill measurement ceiling from 21 to 22 for `expert-mode`;
+  the skill budget is a constant in `check_mechanisms.py --measure`, not an R3
+  budget exception, so a twenty-third counted skill still fails.
+- Net mechanism count rises from 126 to 130: the five additions below, less
+  the removed `artifact:intent.lane`; the widened Claude PreToolUse matcher
+  renames its existing hook row rather than adding one.
+- budget-exception: expert-mode — user-invoked entry point for choosing Loom steps per change; eval loom-code/scripts/test_expert_mode_skill.py.
+- budget-exception: UserPromptSubmit::loom_checker.py — binds a selection only from the user's typed confirmation on Claude Code; eval loom-code/scripts/test_selection_capture.py.
+- budget-exception: UserPromptSubmit::loom_checker.py@codex — the same capture on Codex, never blocking when the checker is missing; eval loom-code/scripts/test_selection_capture.py.
+- budget-exception: PreToolUse:apply_patch|Edit|Write:loom_checker.py@codex — guards Codex file tools against selection record writes; eval loom-code/scripts/test_selection_guard.py.
+- budget-exception: artifact:attestation.selection — the attestation field that binds confirmed skips to the reviewed content; eval loom-code/scripts/test_selection_finalize.py.
+
+Contract 2.3 adds the attestation `selection` field and the step selection
+vocabulary; a leftover undeclared `lane:` line is tolerated.
+
 ## [3.2.0] — 2026-09-14 — count loom-workflow hooks in the mechanism population
 
 - `check_mechanisms.py` now recomputes hooks declared in

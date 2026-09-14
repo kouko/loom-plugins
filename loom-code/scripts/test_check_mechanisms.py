@@ -272,6 +272,31 @@ class TestChecks:
         assert result.exit_code == 1
         assert any(f.rule == "R1" and f.mechanism_id == "git-memory" for f in result.findings)
 
+    def test_unregistered_selection_capture_hook_is_red(self, tmp_path):
+        """W3-02 A10 negative: a UserPromptSubmit selection-capture hook
+        declared in hooks.json and absent from the yaml is R1."""
+        repo = _build_repo(tmp_path, mechanisms=FULL_MECHANISMS)
+        path = repo / "loom-code/hooks/hooks.json"
+        hooks = json.loads(path.read_text())
+        hooks["hooks"]["UserPromptSubmit"] = [{
+            "hooks": [{"type": "command", "command": (
+                'python3 "${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py" '
+                "selection capture --hook || true")}],
+        }]
+        path.write_text(json.dumps(hooks))
+        result = cm.run_checks(repo)
+        assert result.exit_code == 1
+        assert any(
+            f.rule == "R1" and f.mechanism_id == "UserPromptSubmit::loom_checker.py"
+            for f in result.findings
+        ), result.findings
+
+    def test_real_repo_checks_are_green(self):
+        """W3-02 A10 positive: every recomputed mechanism in this repo is
+        registered with an eval, and nothing registered is stale."""
+        result = cm.run_checks(REPO)
+        assert result.exit_code == 0, result.findings
+
     def test_unregistered_workflow_hook_is_red(self, tmp_path):
         """W3-01 A10 negative: a hook declared only in
         loom-workflow/hooks/hooks.json and absent from the yaml is R1."""
@@ -839,18 +864,7 @@ class TestMeasureFailsClosed:
     def test_real_repo_measure_is_green(self):
         assert cm.run_measure(REPO) == 0
 
-    def test_twenty_one_counted_skills_fit_admitted_router_budget(self, tmp_path):
-        repo = _measure_repo(tmp_path, words=10,
-                             baseline_line="- session-start-baseline: <sha> 10 — measured")
-        # The fixture already contains two counted skills.
-        for number in range(19):
-            skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
-            skill.parent.mkdir(parents=True, exist_ok=True)
-            skill.write_text("# Skill\n")
-        assert cm.measure_skill_count(repo) == 21
-        assert cm.run_measure(repo) == 0
-
-    def test_twenty_second_counted_skill_exceeds_budget(self, tmp_path, capsys):
+    def test_twenty_two_counted_skills_fit_admitted_expert_mode_budget(self, tmp_path):
         repo = _measure_repo(tmp_path, words=10,
                              baseline_line="- session-start-baseline: <sha> 10 — measured")
         # The fixture already contains two counted skills.
@@ -859,5 +873,16 @@ class TestMeasureFailsClosed:
             skill.parent.mkdir(parents=True, exist_ok=True)
             skill.write_text("# Skill\n")
         assert cm.measure_skill_count(repo) == 22
+        assert cm.run_measure(repo) == 0
+
+    def test_twenty_third_counted_skill_exceeds_budget(self, tmp_path, capsys):
+        repo = _measure_repo(tmp_path, words=10,
+                             baseline_line="- session-start-baseline: <sha> 10 — measured")
+        # The fixture already contains two counted skills.
+        for number in range(21):
+            skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
+            skill.parent.mkdir(parents=True, exist_ok=True)
+            skill.write_text("# Skill\n")
+        assert cm.measure_skill_count(repo) == 23
         assert cm.run_measure(repo) == 1
-        assert "skill count 22 exceeds the loom budget of 21" in capsys.readouterr().out
+        assert "skill count 23 exceeds the loom budget of 22" in capsys.readouterr().out
