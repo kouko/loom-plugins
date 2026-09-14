@@ -55,7 +55,7 @@ ship                ─► publish validates attestation + disclosure ─► PR
    at `<git common dir>/loom/selections/<change-id>.jsonl` with events
    `proposal {id, code, origin, run, skip, branch, merge_base, created_at}`,
    `confirmation {proposal_id, code, source, session_id, prompt_ref,
-   prompt_sha256, branch, merge_base, at}`, `cancel {...}` and
+   prompt_text, prompt_sha256, branch, merge_base, at}`, `cancel {...}` and
    `failure {step, rule, head_sha, at}`. Records are untracked and never
    enter the functional digest. Threat model: an agent that takes a shortcut
    under pressure, including running a documented command or writing a file
