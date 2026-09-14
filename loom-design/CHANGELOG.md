@@ -12,6 +12,14 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.1.6] — 2026-09-15 — station summaries name Build's mechanical checks
+
+Patch. Text-only update to the station summary tables of `capture-intent`,
+`write-spec`, `product-principles`, and `design-system`: the rows now say Build
+ends with an independent adversary's programs and the complete package suite,
+and closing review sees only Build-checked content while `finalize-review` runs
+the checks again.
+
 ## [2.1.5] — 2026-09-13 — capture-intent entrypoint reduction
 
 Patch. Behavior-preserving refactor of `capture-intent`: the entrypoint shrank
