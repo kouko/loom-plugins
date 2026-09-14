@@ -364,9 +364,43 @@ def test_current_release_metadata_is_synchronized() -> None:
         (REPO / "loom-code/.codex-plugin/plugin.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-code/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "3.4.0"
-    assert codex_manifest["version"] == "3.4.0"
-    assert "## [3.4.0]" in changelog
+    agy_manifest = json.loads(
+        (REPO / "loom-code/plugin.json").read_text(encoding="utf-8")
+    )
+    assert claude_manifest["version"] == "3.4.1"
+    assert codex_manifest["version"] == "3.4.1"
+    assert agy_manifest["version"] == "3.4.1"
+    assert "## [3.4.1]" in changelog
+
+
+@pytest.mark.parametrize(
+    ("readme", "label"),
+    [
+        ("README.md", "**Version**: "),
+        ("README.ja.md", "**バージョン**: "),
+        ("README.zh-TW.md", "**版本**："),
+    ],
+)
+def test_readme_version_matches_manifest(readme: str, label: str) -> None:
+    manifest = json.loads(
+        (REPO / "loom-code/.claude-plugin/plugin.json").read_text(encoding="utf-8")
+    )
+    text = (REPO / "loom-code" / readme).read_text(encoding="utf-8")
+    match = re.search(rf"^{re.escape(label)}(\d+\.\d+\.\d+)", text, re.M)
+    assert match, f"{readme}: version line missing"
+    assert match.group(1) == manifest["version"]
+
+
+def test_changelog_3_4_1_session_limit_names_publication() -> None:
+    changelog = (REPO / "loom-code/CHANGELOG.md").read_text(encoding="utf-8")
+    entry = " ".join(
+        _section(
+            changelog, "## [3.4.1] — 2026-09-15 — expert-mode follow-up cleanup"
+        ).split()
+    )
+    assert "publication" in entry
+    assert "selection propose" in entry
+    assert "same attended Claude Code session" in entry
 
 
 def test_agy_host_passes_empty_usable_vendors() -> None:

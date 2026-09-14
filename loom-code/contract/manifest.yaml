@@ -2,7 +2,7 @@
 # Consumers: loom-design and loom-workflow read this file; only loom-code writes it.
 # Recomputed by check_mechanisms.py: every station / tool / action / artifact
 # field below is a mechanism and must be listed in docs/loom/evidence/mechanisms.yaml.
-version: 2.3.0
+version: 2.3.1
 
 # Paths matched here are publication metadata. They do not change the
 # functional content identity that executions and reviews attest to.

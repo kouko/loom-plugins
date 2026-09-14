@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.4.1] — 2026-09-15 — expert-mode follow-up cleanup
+
+- The non-negotiable 2 amendment for user-skipped steps is ratified in
+  `PRINCIPLES.md`.
+- The expert-mode session limit now covers publication: confirmation,
+  finalization and publication must all run in the same attended Claude Code
+  session; a new session re-runs `loom_checker.py selection propose` and the
+  user types the confirmation again. This supersedes the 3.4.0 limit that
+  named only confirmation and finalization.
+- Remove the unused `step_selection` step dependency field (`requires`) and
+  its dependency check.
+- Correct the version shown in the three loom-code READMEs, which still read
+  3.1.4; the contract manifest version moves from 2.3.0 to 2.3.1 for the
+  removed field.
+
 ## [3.4.0] — 2026-09-15 — user-chosen Loom steps per change
 
 - Add the user-invoked `expert-mode` skill: it proposes which Loom steps a
