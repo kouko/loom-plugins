@@ -1,0 +1,27 @@
+== manifests changed 55c80731..b3678bfb?
+(empty = unchanged)
+== sync_codex_manifests --check --all
+exit=0
+== claude plugin validate loom-workflow
+✔ Validation passed
+== git grep -l cot-explain
+docs/loom/2026-09-14-loom-visualization/blind-run-report.md
+docs/loom/2026-09-14-loom-visualization/evidence/a1-install-and-references.txt
+docs/loom/2026-09-14-loom-visualization/plan.md
+docs/loom/2026-09-14-loom-visualization/spec.md
+docs/loom/intent/2026-09-14-loom-visualization.md
+docs/loom/memory/a-compaction-test-written-from-the-compacted-file-cannot-see-what-left.md
+docs/loom/memory/a-control-placed-downstream-of-what-it-guards-is-not-a-control.md
+docs/loom/memory/a-guard-whose-marker-restates-the-artifact-can-never-fire.md
+docs/loom/memory/a-proxy-metric-is-a-claim-about-what-it-measures.md
+docs/loom/memory/a-stamp-recording-an-outcome-without-its-subject-cannot-go-stale.md
+docs/loom/memory/a-stronger-guard-makes-the-fallback-beneath-it-untestable.md
+docs/loom/memory/an-inherited-external-tool-fact-is-a-claim-with-a-version-attached.md
+docs/loom/memory/two-skill-structure-checkers-disagree-name-which-one.md
+docs/loom/memory/widening-a-grammar-leaves-the-old-regexes-covering-half-of-it.md
+docs/skill-dogfood/2026-09-13-compress-loom-skill-descriptions/cases.md
+loom-workflow/CHANGELOG.md
+loom-workflow/scripts/test_loom_visualization_compaction.py
+loom-workflow/scripts/test_no_live_cot_explain_references.py
+loom-workflow/tests/test_loom_visualization_page_scripts.py
+scripts/test_loom_skill_description_catalog.py
