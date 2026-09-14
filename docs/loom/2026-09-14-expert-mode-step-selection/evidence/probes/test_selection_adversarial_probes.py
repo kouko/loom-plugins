@@ -8,8 +8,8 @@ Run from the repo root inside the package-tests uv environment:
 
 Two families, selectable by keyword:
 
-  -k "survives or synthetic"   attempts the change SURVIVES; these PASS and
-                               are safe to hand to finalize-review.
+  -k "survives or boundary"    attempts the change SURVIVES and accepted
+                               design boundaries; these PASS.
   -k defect                    attempts that EXPOSE a defect; these FAIL on
                                purpose. Do not weaken them.
 
@@ -244,12 +244,12 @@ def test_prior_failure_defect_branch_rename_sheds_recorded_failure(tmp_path: Pat
     )
 
 
-def test_validate_defect_bound_skip_unvalidatable_without_local_records(tmp_path: Path) -> None:
-    """A committed v2 attestation with a bound skip must still validate where
-    the untracked local selection records are absent (a fresh clone, CI, or
-    any second machine). The records live at <git common dir>/loom/selections
-    and are never pushed, so re-reading them there yields None and the
-    attestation is rejected as mismatched — the change becomes unpublishable.
+def test_boundary_fresh_clone_refuses_bound_selection_loudly(tmp_path: Path) -> None:
+    """Accepted boundary (spec decision 9): publication re-reads the untracked
+    local selection records instead of trusting the committed `selection`
+    field. Where those records are absent (a fresh clone, CI), a bound
+    selection is refused, and the refusal must be loud and name the
+    local-records mismatch rather than pass silently.
     """
     repo = make_repo(tmp_path, with_package=True)
     pid, code = add_proposal(
@@ -265,10 +265,37 @@ def test_validate_defect_bound_skip_unvalidatable_without_local_records(tmp_path
     # Simulate a clean clone / CI: the untracked selection records are gone.
     selection.store_path(repo, CHANGE).unlink()
     findings = att.validate_attestation(repo, head, CHANGE, attestation, None)
-    assert findings == [], (
-        "a validly-skipped change cannot be validated without the untracked "
-        f"local records: {findings}"
-    )
+    assert findings, "fresh clone silently accepted a bound selection"
+    assert any(rule == "push.attestation" and "local selection records" in reason
+               for rule, reason in findings), findings
+
+
+def test_boundary_hand_edited_selection_field_refused_without_record(tmp_path: Path) -> None:
+    """A hand-edited attestation.json whose `selection` claims reviewers were
+    skipped (with empty verdicts) must be refused when no matching user-typed
+    confirmation record exists — the committed field alone waives nothing.
+    """
+    from loom_checker.digest import functional_content_digest
+
+    repo = make_repo(tmp_path, with_package=True)
+    head = git(repo, "rev-parse", "HEAD")
+    forged = {
+        "schema": att.ATTESTATION_SCHEMA, "change_id": CHANGE,
+        "content_digest": functional_content_digest(repo, head, CHANGE, None),
+        "executions": [
+            {"kind": "package-tests", "command": "python3 -c pass", "artifact": "",
+             "result": "pass", "command_digest": att._command_digest("python3 -c pass")},
+        ],
+        "verdicts": [], "findings": [],
+        "selection": {
+            "confirmations": [{"code": "K7Q2", "skip": ["reviewers"],
+                               "source": "user-typed", "at": "2026-09-14T00:00:00Z"}],
+            "skip": ["reviewers"], "source": "user-typed", "prior_failures": [],
+        },
+    }
+    assert att.selection_evidence(repo, CHANGE, None) is None
+    findings = att.validate_attestation(repo, head, CHANGE, forged, None)
+    assert any("local selection records" in reason for _rule, reason in findings), findings
 
 
 def test_disclosure_defect_cancelled_confirmation_claims_reviewers_skipped(tmp_path: Path) -> None:
