@@ -76,7 +76,7 @@ does not match stays in the mismatch bucket with valid headings listed.
 2. Run `report.py --input <merged.json> --lang <zh-TW|en|ja>` and read stdout
    JSON.
 3. Dispatch one current-Sonnet subagent with the prompt body and
-   `dispatch_payload.input` (`merged_data`, `lang`, `date_str`).
+   `dispatch_payload.input` (`merged_data`, `lang`, `date_str`, `skill_dir`).
 4. Write the returned markdown verbatim to `output_path`; the response is the
    entire file.
 

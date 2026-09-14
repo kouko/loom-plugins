@@ -258,3 +258,56 @@ def test_live_contracts_name_other_host_plugin_root() -> None:
 
     repo_root = Path(__file__).resolve().parents[2]
     assert scan_plugin_root_fallbacks(repo_root) == []
+
+
+# --- bare bundled-script paths -------------------------------------------
+# An agent resolves `python3 scripts/x.py` against its working directory, not
+# the skill folder, so a skill instruction must anchor the path
+# (`<skill-dir>/scripts/x.py`). Fenced code counts: agents copy commands.
+
+
+def test_bare_python3_scripts_command_flagged(tmp_path: Path, capsys, monkeypatch) -> None:
+    import check_contract_citations as checker
+
+    text = (
+        "Run `python3 scripts/x.py` first.\n"  # 1 plain
+        "```bash\n"  # 2
+        "python3 scripts/y.py --flag\n"  # 3 fenced
+        "```\n"  # 4
+        "Then python ./scripts/z.py.\n"  # 5 ./scripts/
+        "Or bash scripts/x.sh, or sh scripts/x.sh.\n"  # 6 bash + sh
+        "PYTHON3 scripts/x.py\n"  # 7 uppercase: case-sensitive, not a command
+    )
+    assert checker.find_bare_script_paths(text) == [1, 3, 5, 6]
+    rel = "loom-workflow/skills/s/SKILL.md"
+    _write_scoped_file(tmp_path, rel, text)
+    assert checker.scan_bare_script_paths(tmp_path) == [
+        f"{rel}:{n}" for n in (1, 3, 5, 6)
+    ]
+    monkeypatch.setattr(checker, "DEBT_LIST", frozenset())
+    assert checker.main(["--repo-root", str(tmp_path)]) == 1
+    assert f"{rel}:3" in capsys.readouterr().err
+
+
+def test_skill_dir_anchored_command_not_flagged(tmp_path: Path, monkeypatch) -> None:
+    import check_contract_citations as checker
+
+    monkeypatch.setattr(checker, "DEBT_LIST", frozenset())
+    text = (
+        "Run `python3 <skill-dir>/scripts/x.py`.\n"
+        "python3 <loom-code>/scripts/loom_checker.py --list-rules\n"
+        "python3 ${CLAUDE_SKILL_DIR}/scripts/x.py\n"
+        "The scripts/ folder holds the helpers.\n"
+        "pytest scripts/test_x.py and ssh scripts/host stay unflagged.\n"
+    )
+    assert checker.find_bare_script_paths(text) == []
+    _write_scoped_file(tmp_path, "loom-code/references/r.md", text)
+    assert checker.scan_bare_script_paths(tmp_path) == []
+    assert checker.main(["--repo-root", str(tmp_path)]) == 0
+
+
+def test_live_contracts_run_bundled_scripts_from_skill_dir() -> None:
+    from check_contract_citations import scan_bare_script_paths
+
+    repo_root = Path(__file__).resolve().parents[2]
+    assert scan_bare_script_paths(repo_root) == []

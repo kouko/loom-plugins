@@ -15,7 +15,7 @@ Codex and Antigravity CLI:
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.1.5 | 5 | Front of the flow: intent, specification, product principles, visual design. |
 | [`loom-code`](loom-code/) | 3.2.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.1.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
+| [`loom-workflow`](loom-workflow/) | 5.2.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -199,7 +199,10 @@ codex plugin list
 
 Antigravity CLI (`agy`) installs plugins from a local directory, so clone the
 repository and install each plugin from the clone. Install `loom-code` first:
-the other two use its contract package and checker.
+the other two use its contract package and checker. Before installing, check
+`agy plugin list` for a plugin of the same name imported from Claude Code:
+installing replaces that imported copy, and a later `agy plugin uninstall`
+removes it.
 
 ```sh
 git clone https://github.com/kouko/loom-plugins.git

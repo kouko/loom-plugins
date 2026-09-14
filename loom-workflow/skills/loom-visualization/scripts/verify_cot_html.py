@@ -2,8 +2,8 @@
 """Verify a loom-visualization HTML report against references/mermaid-cot-spec.md.
 
 Usage:
-  python3 scripts/verify_cot_html.py <report.html>
-  python3 scripts/verify_cot_html.py --render <report.html>
+  python3 <skill-dir>/scripts/verify_cot_html.py <report.html>
+  python3 <skill-dir>/scripts/verify_cot_html.py --render <report.html>
 
 Two levels, and the split matters more than any individual rule:
 

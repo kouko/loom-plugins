@@ -2,7 +2,7 @@
 """Render a loom-visualization markdown artifact to standalone HTML.
 
 Usage:
-  python3 scripts/render_cot_html.py <report.md> [-o <out.html>] [--artifact]
+  python3 <skill-dir>/scripts/render_cot_html.py <report.md> [-o <out.html>] [--artifact]
 
 The `.md` is the artifact; this HTML is derived from it. Never hand-edit
 the HTML, and never let the two disagree.

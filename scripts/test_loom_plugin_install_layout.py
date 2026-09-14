@@ -990,3 +990,154 @@ def test_isolated_loom_memory_boundary_check_rejects_sibling_paths(tmp_path: Pat
         assert any("sibling internal path" in v for v in violations)
     finally:
         probe.unlink()
+
+
+# ---------- loom-workflow trigger card per host (W2-02) ----------
+
+CARD_SCRIPT = "hooks/visualization-card"
+TOOLKIT_KEY = "ascii-graph-toolkit@monkey-skills"
+
+
+def _codex_card_command_problems(command: object) -> list[str]:
+    """Why a Codex SessionStart command cannot deliver the card; [] when it can."""
+    if not isinstance(command, str):
+        return ["command is not a string"]
+    problems = []
+    if "${PLUGIN_ROOT}/" + CARD_SCRIPT not in command:
+        problems.append("does not run the card script through ${PLUGIN_ROOT}")
+    if "${CLAUDE_PLUGIN_ROOT}" in command:
+        problems.append("references ${CLAUDE_PLUGIN_ROOT}")
+    return problems
+
+
+def _card_commands(hooks: dict) -> list[str]:
+    return [
+        h["command"]
+        for group in hooks.get("SessionStart", [])
+        for h in group["hooks"]
+        if h.get("type") == "command" and CARD_SCRIPT in h.get("command", "")
+    ]
+
+
+def _run_hook_command(command: str, env_root: str, root: Path, home: Path, cwd: Path):
+    env = {
+        k: v
+        for k, v in os.environ.items()
+        if k not in {"PLUGIN_ROOT", "CLAUDE_PLUGIN_ROOT", "CLAUDE_CONFIG_DIR", "CLAUDE_PROJECT_DIR"}
+    }
+    env.update({"HOME": str(home), env_root: str(root)})
+    if env_root == "PLUGIN_ROOT":
+        env["CLAUDE_PLUGIN_ROOT"] = str(root)  # Codex exports both names.
+    return subprocess.run(
+        ["bash", "-c", command],
+        input=json.dumps({"hook_event_name": "SessionStart", "cwd": str(cwd)}),
+        capture_output=True,
+        text=True,
+        env=env,
+        cwd=cwd,
+        timeout=30,
+        check=False,
+    )
+
+
+def _card_context(proc: subprocess.CompletedProcess) -> str:
+    assert proc.returncode == 0, proc.stderr
+    return json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"].strip()
+
+
+def _card_text(root: Path, name: str) -> str:
+    return (root / "skills/loom-visualization/assets" / name).read_text(encoding="utf-8").strip()
+
+
+def test_codex_manifest_points_at_sessionstart_card_hook(tmp_path: Path) -> None:
+    """A3 positive: a Codex install selects hooks-codex.json, whose one
+    SessionStart command runs the card script through PLUGIN_ROOT."""
+    from scripts.sync_codex_manifests import sync_shared_fields
+
+    root = _install_plugin("loom-workflow", tmp_path / "renamed codex cache")
+    codex = json.loads((root / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+    assert codex["hooks"] == "./hooks/hooks-codex.json"
+    # Manifest sync copies shared fields only; the Codex hooks key survives it.
+    assert sync_shared_fields(_manifest(root), codex)["hooks"] == codex["hooks"]
+
+    hooks = json.loads((root / codex["hooks"]).read_text(encoding="utf-8"))["hooks"]
+    assert set(hooks) == {"SessionStart"}
+    (group,) = hooks["SessionStart"]
+    assert group["matcher"] == "startup|clear|compact"
+    (command,) = _card_commands(hooks)
+    assert _codex_card_command_problems(command) == []
+
+    consumer = tmp_path / "consumer project"
+    consumer.mkdir()
+    home = tmp_path / "home"
+    home.mkdir()
+    proc = _run_hook_command(command, "PLUGIN_ROOT", root, home, consumer)
+    assert _card_context(proc) == _card_text(root, "trigger-card.md")
+    # Codex 0.154.0 marks a SessionStart hook Failed when its JSON carries
+    # keys beyond hookSpecificOutput (live probe), dropping the card.
+    assert set(json.loads(proc.stdout)) == {"hookSpecificOutput"}
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"',
+        'python3 "hooks/visualization-card"',
+        'python3 "${PLUGIN_ROOT}/hooks/visualization-card" "${CLAUDE_PLUGIN_ROOT}"',
+        None,
+    ],
+)
+def test_codex_hook_without_plugin_root_rejected(command: object) -> None:
+    """A3 negative: the helper rejects a Codex card command lacking PLUGIN_ROOT."""
+    assert _codex_card_command_problems(command) != []
+
+
+def test_claude_selects_only_hooks_json(tmp_path: Path) -> None:
+    """A4 positive: Claude loads only hooks/hooks.json, which runs the card
+    once; the Codex file is reachable only through the Codex manifest."""
+    root = _install_plugin("loom-workflow", tmp_path / "claude cache")
+    claude = _manifest(root)
+    assert "hooks" not in claude  # conventional hooks/hooks.json only
+    claude_hooks = json.loads((root / "hooks/hooks.json").read_text(encoding="utf-8"))["hooks"]
+    assert _card_commands(claude_hooks) == ['"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"']
+    assert "hooks-codex" not in (root / "hooks/hooks.json").read_text(encoding="utf-8")
+
+    codex_file = root / "hooks/hooks-codex.json"
+    assert codex_file.is_file()
+    codex_hooks = json.loads(codex_file.read_text(encoding="utf-8"))["hooks"]
+    assert len(_card_commands(codex_hooks)) == 1
+    assert "${CLAUDE_PLUGIN_ROOT}" not in codex_file.read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("claude_config", ["absent", "toolkit-enabled"])
+def test_codex_card_falls_back_to_full_card(tmp_path: Path, claude_config: str) -> None:
+    """A4 boundary: on Codex the card is always the full card — with no Claude
+    config, and even when Claude's config enables ascii-graph-toolkit."""
+    root = _install_plugin("loom-workflow", tmp_path / "codex cache")
+    codex = json.loads((root / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+    (codex_command,) = _card_commands(
+        json.loads((root / codex["hooks"]).read_text(encoding="utf-8"))["hooks"]
+    )
+    home = tmp_path / "home"
+    home.mkdir()
+    consumer = tmp_path / "consumer"
+    consumer.mkdir()
+    if claude_config == "toolkit-enabled":
+        config = home / ".claude"
+        (config / "plugins").mkdir(parents=True)
+        (config / "plugins/installed_plugins.json").write_text(
+            json.dumps({"version": 2, "plugins": {TOOLKIT_KEY: [{"scope": "user"}]}}),
+            encoding="utf-8",
+        )
+        (config / "settings.json").write_text(
+            json.dumps({"enabledPlugins": {TOOLKIT_KEY: True}}), encoding="utf-8"
+        )
+        # Not vacuous: the same config gives Claude's hook the coexist card.
+        claude_proc = _run_hook_command(
+            '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"',
+            "CLAUDE_PLUGIN_ROOT", root, home, consumer,
+        )
+        assert _card_context(claude_proc) == _card_text(root, "trigger-card-coexist.md")
+
+    proc = _run_hook_command(codex_command, "PLUGIN_ROOT", root, home, consumer)
+    assert _card_context(proc) == _card_text(root, "trigger-card.md")

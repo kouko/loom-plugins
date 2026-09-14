@@ -4,10 +4,13 @@
 Prints the coexistence card when ascii-graph-toolkit is active for this
 project (so only one diagram trigger instruction reaches the session),
 otherwise the full card. Any error prints the full card. Always exits 0.
+With `--host=codex` (the Codex hook) it always prints the full card: the
+Claude plugin config it would read says nothing about a Codex session.
 
 Output shape follows loom-code/hooks/session-start: canonical
 hookSpecificOutput.additionalContext plus defensive `additional_context`
-and bare `additionalContext`. Stdlib only.
+and bare `additionalContext`. On Codex only the canonical key is printed:
+Codex marks a SessionStart hook failed on the extra keys. Stdlib only.
 """
 
 import json
@@ -95,6 +98,8 @@ def _read_card(name):
 
 def main():
     context = ""
+    # The exact token hooks/hooks-codex.json passes; keep the two in step.
+    codex = "--host=codex" in sys.argv[1:]
     try:
         try:
             hook_input = json.loads(sys.stdin.read() or "{}")
@@ -103,7 +108,10 @@ def main():
         if not isinstance(hook_input, dict):
             hook_input = {}
         try:
-            name = COEXIST if toolkit_active(hook_input) else FULL
+            if codex:
+                name = FULL
+            else:
+                name = COEXIST if toolkit_active(hook_input) else FULL
         except Exception:
             name = FULL
         context = _read_card(name)
@@ -112,11 +120,11 @@ def main():
             context = _read_card(FULL)
         except Exception:
             context = ""
-    sys.stdout.write(json.dumps({
-        "hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": context},
-        "additional_context": context,
-        "additionalContext": context,
-    }) + "\n")
+    output = {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": context}}
+    if not codex:
+        output["additional_context"] = context
+        output["additionalContext"] = context
+    sys.stdout.write(json.dumps(output) + "\n")
     return 0
 
 

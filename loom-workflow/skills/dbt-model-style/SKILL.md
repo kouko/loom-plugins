@@ -10,6 +10,8 @@ description: |
 
 An opinionated dbt + Redshift model-writing template. Tune `(adapt)` items per project; treat MUST as required, SHOULD as the default, and MAY as situational.
 
+`<skill-dir>` is this skill's folder: `${CLAUDE_SKILL_DIR}` on Claude Code; on any other host, the directory that holds this SKILL.md.
+
 **When it applies**: whenever you author / edit / review **any** dbt model. **Write comment text and frontmatter *values* in the user's working language** (the examples in this doc stay in Chinese as a demonstration).
 
 **Style & structure only — not computation.** This skill covers how CTEs are arranged, how columns are named, how comments are written, how JOINs are declared. It does **not** cover calculation logic, business rules, metric formulas, NULL/denominator semantics, or layer-dependency design — those are a separate matter, out of scope here.
@@ -255,9 +257,9 @@ FROM (
 2. Run mechanical validation:
    ```bash
    # Always checked: layered required header fields + parseable, keys/related shape, /* */ balance, materialized spelling
-   python scripts/validate_header.py models/
+   python <skill-dir>/scripts/validate_header.py models/
    # Opt-in: related/sources tables actually exist in the manifest (cures `related` staleness)
-   python scripts/validate_header.py --manifest target/manifest.json models/
+   python <skill-dir>/scripts/validate_header.py --manifest target/manifest.json models/
    ```
    A non-zero exit code = violations. Without `--manifest` it stays **zero-config and runs on a lone file** (only PyYAML, usually already in a dbt env). **(adapt)** the layered required-key lists are at the top of the script (`BASE_REQUIRED` / `CONSUMER_EXTRA`) — tune to your frontmatter schema; adopters wire it into pre-commit / CI / a dbt step.
 3. Ship / open the PR only after it passes.
