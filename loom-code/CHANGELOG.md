@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.5.0] — 2026-09-15 — mechanical checks before closing review
+
+- Build now ends with an independent adversary plus the complete package suite
+  and the adversarial programs; both must pass before Build hands off to
+  closing review.
+- Closing review dispatches no adversary and reviews only content Build has
+  already checked.
+- Reviewers never run the package suite or the adversarial programs; they run
+  the added or changed test files instead and flag any that were skipped.
+- A failed `finalize-review` needs the next review round, or ends the episode
+  as `NON_CONVERGENT` when no round is left.
+- `finalize-review` still executes the package suite and the adversarial
+  programs on committed content, so the suite runs at the end of Build and
+  again at finalize.
+
 ## [3.4.1] — 2026-09-15 — expert-mode follow-up cleanup
 
 - The non-negotiable 2 amendment for user-skipped steps is ratified in
