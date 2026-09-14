@@ -143,8 +143,9 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
 
 
 # Word separators for the merge text rule: whitespace, quotes and shell
-# punctuation, so `(gh`, `'gh'`, `{ gh` and `then gh` all yield the word `gh`.
-MERGE_TEXT_WORD = re.compile(r"[^\s'\"`;|&(){}<>!]+")
+# punctuation, so `(gh`, `'gh'`, `{ gh` and `then gh` all yield the word `gh`;
+# `$` separates too, so ANSI-C `$'merge'` and locale `$"merge"` yield `merge`.
+MERGE_TEXT_WORD = re.compile(r"[^\s'\"`;|&(){}<>!$]+")
 
 
 def mentions_pr_merge(command: str) -> bool:

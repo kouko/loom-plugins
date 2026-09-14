@@ -14,6 +14,10 @@
 - Breaking: the publication hook now refuses every hand-typed `gh pr merge`,
   including the absolute-`cd` form Ship previously prescribed. Callers that
   merged by hand merge through `land --accepted-by <name>`.
+- The hook fails closed: any Bash command whose text mentions the words gh,
+  pr, merge in that order is refused, including commit messages given with
+  `-m`, searches, `echo`, and `publish --title`. Pass commit messages and PR
+  bodies through files instead.
 - Known limits: the `gh api …/pulls/<n>/merge` REST form is not blocked; herdr
   workspace metadata may keep a stale entry for a removed worktree.
 - budget-exception: land.merge — one id for every refusal before and during land's merge (acceptance, attestation, PR identity, checks, merge state); eval loom-code/scripts/test_land_merge.py::test_missing_or_foreign_name_blocks.

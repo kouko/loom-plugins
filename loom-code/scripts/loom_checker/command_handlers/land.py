@@ -34,6 +34,17 @@ import tempfile
 import time
 
 
+# Manual pages this module relies on:
+# gh pr merge --match-head-commit, --subject, --body-file: https://cli.github.com/manual/gh_pr_merge
+# gh pr checks --json bucket and exit codes: https://cli.github.com/manual/gh_pr_checks
+# gh pr view mergeStateStatus values: https://docs.github.com/en/graphql/reference/enums#mergestatestatus
+# git update-ref -d <ref> <old>: https://git-scm.com/docs/git-update-ref
+# git push --force-with-lease=<ref>:<expect> with a delete refspec: https://git-scm.com/docs/git-push
+# git status --ignored=traditional --untracked-files=all: https://git-scm.com/docs/git-status
+# git ls-files -v tags: https://git-scm.com/docs/git-ls-files
+# git worktree list --porcelain -z (git >= 2.36): https://git-scm.com/docs/git-worktree
+
+
 LAND_READ_TIMEOUT = 30
 
 
@@ -44,7 +55,7 @@ LAND_WRITE_TIMEOUT = 300
 LAND_MERGE_STATE_WAITS = 6  # re-read UNKNOWN for up to 60 seconds
 
 
-BLOCKING_MERGE_STATES = {"BLOCKED", "DIRTY", "BEHIND", "UNSTABLE"}
+BLOCKING_MERGE_STATES = {"BLOCKED", "DIRTY", "BEHIND", "UNSTABLE", "DRAFT"}
 
 
 ACCEPTANCE_NOT_RECORDED = (
@@ -437,7 +448,7 @@ def execute_cleanup(
     branch, anchor = plan.branch, plan.anchor
     removed = False
 
-    def _cleanup_block(reason: str, err) -> int:
+    def labelled_block(reason: str, err) -> int:
         return report([("land.cleanup", label + reason)], err)
 
     def finish(code: int) -> int:
@@ -460,11 +471,11 @@ def execute_cleanup(
             # git refused before deleting anything (for example a locked
             # worktree): name its error line, never its force/override hint.
             reason = _git_reason(detail, f"exit {code}")
-            return _cleanup_block(
+            return labelled_block(
                 f"git refused to remove worktree {plan.worktree}: {reason}", err
             )
         if code != 0:
-            return _cleanup_block(
+            return labelled_block(
                 f"worktree removal interrupted at {plan.worktree}; "
                 "run git worktree prune after checking the directory", err,
             )
@@ -473,14 +484,14 @@ def execute_cleanup(
     elif plan.in_main:
         code, _stdout, detail = _git_run(target, plan.main, "switch", target.base)
         if code != 0:
-            return _cleanup_block(f"cannot switch {plan.main} to {target.base}: {detail}", err)
+            return labelled_block(f"cannot switch {plan.main} to {target.base}: {detail}", err)
 
     if plan.local:
         code, _stdout, detail = _git_run(
             target, anchor, "update-ref", "-d", f"refs/heads/{branch}", plan.head
         )
         if code != 0:
-            return finish(_cleanup_block(f"local branch {branch} not deleted: {detail}", err))
+            return finish(labelled_block(f"local branch {branch} not deleted: {detail}", err))
         out.write(f"Deleted local branch {branch}\n")
         # An absent section exits non-zero; that is the state we want.
         _git_run(target, anchor, "config", "--remove-section", f"branch.{branch}")
@@ -491,7 +502,7 @@ def execute_cleanup(
             "origin", f":refs/heads/{branch}", timeout=LAND_WRITE_TIMEOUT,
         )
         if code != 0:
-            return finish(_cleanup_block(f"remote branch {branch} not deleted: {detail}", err))
+            return finish(labelled_block(f"remote branch {branch} not deleted: {detail}", err))
         out.write(f"Deleted remote branch {branch}\n")
     else:
         out.write("remote branch already deleted\n")
@@ -848,7 +859,8 @@ def _verify_merge(
 
     _header, _sep, message = commit.stdout.partition("\n\n")
     normalized = _normalized(message)
-    if _normalized(title) not in normalized:
+    first_line = _normalized(message.split("\n", 1)[0])
+    if not first_line.startswith(_normalized(title)):
         return verify_block("squash commit lacks the PR title")
     if _normalized(body) not in normalized:
         return verify_block("squash commit lacks the PR body")
@@ -1004,6 +1016,9 @@ def _observe_all_checks(
         # gh exits 1 before a new branch's checks register (blank stdout,
         # quoted-branch message), 1 when a check failed, and 8 while pending;
         # the JSON stays authoritative whenever it is printed.
+        # https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks.go
+        # https://github.com/cli/cli/blob/v2.88.1/pkg/cmd/pr/checks/checks_test.go
+        # https://github.com/cli/cli/issues/7401
         no_checks_yet = (
             result.returncode == 1
             and not result.stdout.strip()

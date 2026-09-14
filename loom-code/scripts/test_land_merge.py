@@ -226,6 +226,21 @@ def test_unstable_state_blocks(tmp_path: Path, monkeypatch) -> None:
     assert no_merge(calls)
 
 
+# draft-state-blocks
+def test_draft_state_blocks(tmp_path: Path, monkeypatch) -> None:
+    def configure(calls: LandCalls) -> None:
+        calls.merge_states = [{"mergeable": "MERGEABLE", "mergeStateStatus": "DRAFT"}]
+
+    rc, out, err, calls, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", configure=configure
+    )
+
+    assert rc == 1
+    assert err == "BLOCK land.merge: PR #7 is DRAFT\n"
+    assert "Merged PR" not in out
+    assert no_merge(calls)
+
+
 def test_pending_checks_are_polled_until_they_pass(tmp_path: Path, monkeypatch) -> None:
     pending = {"name": "gate", "state": "IN_PROGRESS", "bucket": "pending"}
 
@@ -452,6 +467,19 @@ def test_title_only_commit_verify_blocks(tmp_path: Path, monkeypatch) -> None:
 def test_body_only_commit_verify_blocks_on_title(tmp_path: Path, monkeypatch) -> None:
     def configure(calls: LandCalls) -> None:
         calls.commit_message = f"Other subject\n\n{PR_BODY}"
+
+    rc, out, err, _, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", configure=configure
+    )
+
+    assert rc == 1
+    assert "Merged PR #7 as a1b2c3d\n" in out
+    assert err == "BLOCK land.verify: squash commit lacks the PR title\n"
+
+
+def test_title_only_in_body_verify_blocks_on_title(tmp_path: Path, monkeypatch) -> None:
+    def configure(calls: LandCalls) -> None:
+        calls.commit_message = f"Other subject (#7)\n\n{PR_TITLE}\n\n{PR_BODY}"
 
     rc, out, err, _, _ = invoke(
         tmp_path, monkeypatch, "--accepted-by", "kouko", configure=configure

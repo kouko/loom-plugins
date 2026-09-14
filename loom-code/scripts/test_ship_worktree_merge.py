@@ -107,6 +107,8 @@ def test_hook_blocks_every_merge_form_with_push_merge(
     "'gh' 'pr' 'merge' 7",
     "/opt/homebrew/bin/GH -R o/r PR Merge 7",
     "echo gh pr merge",
+    "gh pr $'merge' 5",
+    'gh pr $"merge" 5',
 ])
 def test_hook_text_rule_blocks_hand_typed_merge_forms(
     tmp_path: Path, monkeypatch, command: str,

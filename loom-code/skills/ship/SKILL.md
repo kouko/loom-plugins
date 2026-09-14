@@ -14,7 +14,7 @@ establish it from the confirmed intent or active conversation. Repository
 conventions still govern committed artifacts. Internal publication reports
 remain English.
 
-## 1. Confirm acceptance
+## 1. Confirm publication authorization
 
 Read the intent and blind-run report when one was required. A confirmed intent
 with `publication: automatic — authorized <YYYY-MM-DD> by <name>` carries that
@@ -160,6 +160,10 @@ After all checks pass, present the result and the blind-run report when one
 exists (decision point ③). Publication never authorizes or invokes merge; only
 the maintainer's explicit acceptance does. Never type `gh pr merge` yourself:
 the installed publication hook refuses it.
+Publication authorization, including `publication: automatic`, is not
+acceptance; always present the result and ask at decision point ③ before
+running land. Before running land, invoke `loom-workflow:git-memory` for the
+merge checkpoint.
 
 On that acceptance, take the root of the worktree whose branch carries the
 attestation — `git rev-parse --show-toplevel` run from that worktree, never the
@@ -174,7 +178,12 @@ the publication authorizer. Always render that absolute `cd`;
 never rely on the Bash tool's workdir, because Codex may report the task root
 rather than the executor worktree, and `land` acts on the worktree it runs in.
 `land` removes that worktree, so the agent's next Bash command starts with the
-`cd` printed on land's `next:` line.
+`cd` printed on land's `next:` line. When no `next:` line is printed, keep the
+current directory.
+
+If land prints `Merged PR` and then a BLOCK, do not rerun `--accepted-by`;
+resolve the named state and run `land --cleanup <branch>`. If it names a
+failing non-required check, repair it as in §4.
 
 For one merged change left from earlier work, run `land --cleanup <branch>`
 through the same command. `land --sweep` lists merged changes, removes nothing,

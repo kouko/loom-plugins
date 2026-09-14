@@ -63,6 +63,19 @@ def test_ship_text_runs_land_after_acceptance() -> None:
     assert "land" in handoff and "output" in handoff
 
 
+# ship-text-separates-authorization-from-acceptance
+def test_ship_text_separates_authorization_from_acceptance() -> None:
+    text = SHIP.read_text(encoding="utf-8")
+    assert not re.search(r"^## 1\. Confirm acceptance$", text, re.M)
+    assert re.search(r"^## 1\. Confirm publication authorization$", text, re.M)
+    land = " ".join(_section(text, "## 5. Land after acceptance").split())
+    assert (
+        "Publication authorization, including `publication: automatic`, is not "
+        "acceptance; always present the result and ask at decision point ③ "
+        "before running land."
+    ) in land
+
+
 # ship-text-has-no-direct-gh-pr-merge (A1 negative)
 def test_ship_text_has_no_direct_gh_pr_merge() -> None:
     flat = " ".join(SHIP.read_text(encoding="utf-8").split())

@@ -122,8 +122,8 @@ RULES.append((
 
 RULES.append((
     "push.merge",
-    "The publication hook refuses every Bash command containing a `gh pr merge` "
-    "invocation, directly or inside an unwrapped `bash -c` or `eval` form, before "
+    "The publication hook refuses every Bash command whose text contains the words "
+    "gh, pr, merge in order (wrappers, options and shell grammar included), before "
     "repository selection; loom_checker.py land is the only merge path.",
 ))
 

@@ -55,12 +55,12 @@ COMPOUND_GRAMMAR = [
     f"for n in 7; do {VERB} $n; done",
     f"! {VERB} 7",
     "gh pr \\\nmerge 7",
+    f"env -S '{VERB} 7'",
 ]
 
 # Deliberate obfuscation outside the spec's classifier scope: recorded as notes.
 OBFUSCATED = [
     "sh -c \"$(printf 'gh pr %s 7' merge)\"",
-    f"env -S '{VERB} 7'",
     "gh api -X PUT repos/o/r/pulls/7/merge",
 ]
 
