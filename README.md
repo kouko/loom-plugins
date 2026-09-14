@@ -140,10 +140,8 @@ compose only through plugin-qualified skill names such as
 
 ### Codex
 
-Add this repository as a Codex plugin marketplace, then install plugins from
-it:
-
 ```sh
+codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-code@loom
 codex plugin list
 ```
