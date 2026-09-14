@@ -1,6 +1,6 @@
 # Let the user choose which Loom steps a single change runs — spec
 intent: 2026-09-14-expert-mode-step-selection@17aaaa83
-confirmed-behavior: 2026-09-15 @8951835
+confirmed-behavior: 2026-09-15 @5838021
 pre-build-review: required — changes who may waive verification at the publication gate (a security boundary) and extends the public attestation and contract format
 
 ## Requirements
@@ -128,7 +128,7 @@ ship                ─► publish validates attestation + disclosure ─► PR
 7. **Stations query, gates recompute** — agent-decided. `selection show
    <change-id>` prints the effective JSON step set (full set when nothing is
    bound). write-plan, build, review and ship read it at entry and omit only
-   listed prose steps (intent, spec, plan, implementer, tdd, blind-run).
+   listed prose steps (spec, plan, implementer, tdd, blind-run).
    `reviewers`, `adversarial` and `package-tests` are waived only inside
    finalize-review and publish, which re-read the records themselves.
 8. **Failures are recorded where they are observed** — agent-decided.
