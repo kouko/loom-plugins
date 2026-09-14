@@ -270,7 +270,8 @@ When `finalize-review` fails, return the fix to Build, which repeats its
 end-of-Build mechanical checks, and the fixed content, a new functional-content
 digest, must pass the next review round (§4) before `finalize-review` runs
 again. Earlier verdicts are never reused for the fixed content. When no round
-remains, the episode ends, because §4 admits no fourth digest.
+remains, the fix would need a fourth distinct digest, which §4 forbids, so it
+ends the episode as `NON_CONVERGENT`.
 
 ## Handoff
 

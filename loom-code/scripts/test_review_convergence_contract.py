@@ -312,6 +312,13 @@ def test_finalize_failure_fix_needs_next_round() -> None:
     assert "The checker runs the declared package suite and each adversarial program once." in finalize
 
 
+def test_finalize_failure_without_round_is_non_convergent() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    sentence = next(s for s in _sentences(finalize) if s.startswith("When no round remains"))
+    assert "fourth distinct digest" in sentence, sentence
+    assert "ends the episode as `NON_CONVERGENT`" in sentence, sentence
+
+
 def test_earlier_verdicts_not_reused() -> None:
     finalize = _flat_section("## 5. Finalize")
     assert "Earlier verdicts are never reused for the fixed content." in finalize
