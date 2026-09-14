@@ -618,6 +618,56 @@ def test_sibling_lookup_allows_version_subdirectory() -> None:
     assert lookups == 4
 
 
+# The version step every other-host row must carry: Codex installs
+# `<mkt>/loom-design/<version>/`, so two levels above SKILL.md is the version
+# directory, not the plugin root.
+VERSION_STEP = "if its parent directory is named `loom-design`"
+
+
+def _resolve_loom_code_by_row(skill_md: Path) -> Path:
+    """The other-host row, executed: two levels above SKILL.md; step up once
+    when that directory's parent is named `loom-design`; `loom-code` sits next
+    to it and may hold version subdirectories — take the newest."""
+    root = skill_md.parents[2]
+    if root.parent.name == "loom-design":
+        root = root.parent
+    code = root.parent / "loom-code"
+    versions = [p for p in code.iterdir() if p.is_dir() and re.fullmatch(r"\d+(\.\d+)*", p.name)]
+    if not versions:
+        return code
+    return max(versions, key=lambda p: tuple(int(x) for x in p.name.split(".")))
+
+
+def test_sibling_lookup_resolves_flat_and_versioned_installs(tmp_path: Path) -> None:
+    flat = tmp_path / "plugins"
+    versioned = tmp_path / "cache" / "loom"
+    layouts = {
+        flat / "loom-design" / "skills" / "capture-intent" / "SKILL.md": flat / "loom-code",
+        versioned / "loom-design" / "2.1.5" / "skills" / "capture-intent" / "SKILL.md":
+            versioned / "loom-code" / "3.1.4",
+    }
+    for version in ("3.0.0", "3.1.4"):
+        checker = versioned / "loom-code" / version / "scripts" / "loom_checker.py"
+        checker.parent.mkdir(parents=True)
+        checker.write_text("")
+    (flat / "loom-code" / "scripts").mkdir(parents=True)
+    (flat / "loom-code" / "scripts" / "loom_checker.py").write_text("")
+    for skill_md, expected in layouts.items():
+        skill_md.parent.mkdir(parents=True)
+        skill_md.write_text("")
+        resolved = _resolve_loom_code_by_row(skill_md)
+        assert resolved == expected, skill_md
+        assert (resolved / "scripts" / "loom_checker.py").is_file()
+
+    rows = 0
+    for skill_md in sorted((REPO_ROOT / "loom-design" / "skills").glob("*/SKILL.md")):
+        for line in skill_md.read_text(encoding="utf-8").splitlines():
+            if line.startswith("| Codex CLI, Antigravity CLI |"):
+                rows += 1
+                assert VERSION_STEP in " ".join(line.split()), skill_md
+    assert rows == 4
+
+
 def test_isolated_loom_workflow_bundle_contains_required_skills_and_executes(
     tmp_path: Path,
 ) -> None:
