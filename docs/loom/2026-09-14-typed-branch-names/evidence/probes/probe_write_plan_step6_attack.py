@@ -146,8 +146,11 @@ def test_branchhistory_taskcommits_conventionalallowedtype() -> None:
     if not branch.endswith("/2026-09-14-typed-branch-names"):
         pytest.skip(f"not on the change branch ({branch!r})")
     assert branch.split("/", 1)[0] in TYPES, branch
-    base = git("merge-base", "HEAD", "main")
-    subjects = [s for s in git("log", "--format=%s", f"{base}..HEAD").splitlines() if s]
+    # Prefer origin/main: a stale local `main` would pull trunk commits into the range.
+    base = git("merge-base", "HEAD", "origin/main") or git("merge-base", "HEAD", "main")
+    assert base, "no merge base against origin/main or main"
+    # Merge commits (e.g. GitHub update-branch) are not task commits.
+    subjects = [s for s in git("log", "--no-merges", "--format=%s", f"{base}..HEAD").splitlines() if s]
     pattern = re.compile(rf"^(?:{'|'.join(sorted(TYPES))})\([a-z0-9-]+\): \S")
     offenders = [s for s in subjects if not pattern.match(s)]
     assert not offenders, f"commits without an allowed Conventional type: {offenders}"
