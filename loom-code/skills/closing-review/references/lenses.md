@@ -28,9 +28,13 @@ literally wrong the text is:
 - A finding with no anchor is opaque and flips the whole verdict to
   `NEEDS_REVISION` however small it is: "naming is off somewhere" cannot be
   fixed by anyone.
-- A dimension whose pass rests on evidence you did not run yourself scores
-  `PASS_WITH_NOTES`, naming what was not independently checked. Never
-  "could not see it, so it is fine".
+- Reviewers never run the complete package suite or the adversarial programs:
+  both run mechanically at the end of Build and again in `finalize-review`,
+  and not having run them is not grounds for `PASS_WITH_NOTES`. A dimension
+  whose pass rests on a claim you could check — by reading a source or by
+  running a changed test file — and did not, scores `PASS_WITH_NOTES`,
+  naming what was not independently checked. Never "could not see it, so it
+  is fine".
 - A conformance dimension with no document to conform to scores `N/A` with
   the reason. `N/A` is not a pass and is never given for convenience.
 
@@ -40,9 +44,9 @@ literally wrong the text is:
 |---|---|---|
 | security | Injection, authn/authz, secrets, unsafe deserialization, encoding confusion in every changed path | OWASP ASVS; 徳丸本 Ch.6 for character-encoding attacks |
 | architecture | Does the shape the change produces hold — responsibilities, dependency direction, boundaries | SOLID (Martin) |
-| correctness | Does it do what it claims, at the boundaries as well as the middle; is there RED→GREEN evidence in the history | the tests, run |
+| correctness | Does it do what it claims, at the boundaries as well as the middle; is there RED→GREEN evidence in the history | the changed test files, run by the reviewer |
 | naming | Names say what the thing is; functions stay short — 20 lines soft, 50 hard, 100 is a finding on its own | Clean Code Ch.2–3 (Martin) |
-| tests | Every shipped behaviour has focused RED→GREEN evidence; the package suite and committed adversarial artifacts must exercise the changed behavior rather than merely exit successfully | Beck, *Test-Driven Development* (2002) |
+| tests | Every shipped behaviour has focused RED→GREEN evidence; the reviewer runs the test files the change added or changed, and a test there that is skipped or never actually executes is a finding; committed tests and adversarial artifacts must exercise the changed behavior rather than merely exit successfully | Beck, *Test-Driven Development* (2002) |
 | refactoring | Duplication and smells; Rule of Three — three sites doing the same thing is an extraction | Fowler, *Refactoring*; the Pragmatic Programmer's DRY |
 | cross-task-coherence | Only a whole-delta reviewer can see this: abstractions that disagree between tasks, logic duplicated because each task saw one slice, a task that quietly did more than its title | — |
 | external-surface-grounding | Every call into a surface the author does not own — HTTP API, SDK package, MCP tool, CLI flag, a sibling team's contract — carries a grounding citation. Missing on the first four is fatal; missing on a sibling contract is important; two tasks calling the same surface with conflicting shapes is important | — |
