@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v1",
   "change_id": "2026-09-14-typed-branch-names",
-  "content_digest": "d75ae16f4643ca7124fe6d923737df642f036028",
+  "content_digest": "767bd6859ddbf18f9d2de9fcb7fa5864fec3e72e",
   "executions": [
     {
       "kind": "package-tests",
@@ -34,7 +34,7 @@
   ],
   "verdicts": [
     {
-      "reviewer": "loom-code:reviewer#code-afb16cf",
+      "reviewer": "loom-code:reviewer#code-a19f61f",
       "vendor": "anthropic",
       "model": "claude-opus-5",
       "lens": "code",
@@ -42,29 +42,31 @@
       "findings": [
         {
           "severity": "nit",
-          "dimension": "tests",
-          "anchor": "loom-code/scripts/test_write_plan_station_text.py :: test_repo_grep_no_bare_branch",
-          "text": "Sweep skips plugin docs/ folders and misses checkout -B, switch --create, worktree add -b spellings.",
-          "fix": "Drop the docs exclusion and widen the regex prefix."
+          "dimension": "cross-task-coherence",
+          "anchor": "loom-code/skills/ship/SKILL.md:105",
+          "text": "Title-type rule has no fallback for a legacy branch without an allowed <type>/ prefix.",
+          "fix": "Add a clause: pick the type from what the change does, as in write-plan Step 6."
         }
       ]
     },
     {
-      "reviewer": "loom-code:reviewer#skill-a6b7cd4",
+      "reviewer": "loom-code:reviewer#skill-a38ace5",
       "vendor": "anthropic",
       "model": "claude-opus-5",
       "lens": "skill",
       "verdict": "PASS",
-      "findings": []
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "anchor": "loom-code/skills/ship/SKILL.md:105",
+          "text": "On an untyped legacy branch the '<type>/ prefix' points at nothing; harm is cosmetic, nothing checks title type.",
+          "fix": "Append: when the branch has no such prefix, pick the type that matches the change and do not rename the branch."
+        }
+      ]
     }
   ],
   "findings": [
-    {
-      "severity": "nit",
-      "anchor": "loom-code/skills/ship/SKILL.md:96",
-      "text": "Ship's --title has no reminder that the title type matches the branch prefix; rule lives only in write-plan Step 6 (dismissed by skill reviewer: single home avoids drift).",
-      "fix": "none — dismissed"
-    },
     {
       "severity": "nit",
       "anchor": "loom-code/scripts/loom_checker/helpers.py:222",
