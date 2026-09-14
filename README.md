@@ -1,15 +1,152 @@
 # Loom
 
-Three independently installable plugins share this repository:
+Loom carries one change from a rough idea to a merged pull request, with
+machines verifying machines along the way. Agents write the intent, spec,
+plan and code; fresh-context agents that did not write them review, blind-run
+and attack the result; a deterministic checker recomputes the evidence before
+anything is published. You are asked only three times: to confirm what the
+change is, to confirm visible product behaviour when there is any, and to
+accept the blind-run report.
 
-| Plugin | Version | Skills | Agents | Purpose |
-| --- | --- | --- | --- | --- |
-| [`loom-code`](loom-code/) | 3.1.4 | 6 | 0 | Planning, implementation, review and publication. |
-| [`loom-design`](loom-design/) | 2.1.5 | 5 | 0 | Intent, specification, product principles and visual design. |
-| [`loom-workflow`](loom-workflow/) | 4.3.4 | 12 | 4 | Supporting workflow and repository memory tools, including `independent-advisor`. |
+Loom ships as three independently installable plugins for Claude Code and
+Codex:
 
-Each plugin retains its own manifest, version, tests and changelog. Read the
-README inside each plugin for its capabilities and usage.
+| Plugin | Version | Skills | Role in the flow |
+| --- | --- | --- | --- |
+| [`loom-design`](loom-design/) | 2.1.5 | 5 | Front of the flow: intent, specification, product principles, visual design. |
+| [`loom-code`](loom-code/) | 3.1.4 | 6 | Engineering stations: plan, build, review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/) | 4.3.4 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions. |
+
+Each plugin keeps its own manifest, version, tests and changelog; its README
+covers usage in depth.
+
+## The Loom flow
+
+```mermaid
+flowchart TD
+    idea(["Idea, bug report or incident"])
+
+    subgraph design["loom-design"]
+        intent["capture-intent<br/>① you confirm the intent"]
+        spec["write-spec<br/>only when needs-design: yes<br/>② you confirm visible behaviour (product changes)"]
+    end
+
+    subgraph code["loom-code"]
+        plan["write-plan<br/>task DAG"]
+        build["build<br/>test-first, one commit per task"]
+        review["review<br/>fresh-context reviewers + blind run + adversary<br/>→ attestation"]
+        ship["ship<br/>push + PR<br/>③ you accept the blind-run report"]
+        maintain["maintain<br/>bugs, alerts, regressions"]
+    end
+
+    merged(["Merged PR"])
+
+    idea --> intent
+    intent -->|"needs-design: yes"| spec
+    intent -->|"needs-design: no"| plan
+    spec --> plan
+    plan --> build
+    build --> review
+    review -->|"NEEDS_REVISION"| build
+    review -->|"PASS"| ship
+    ship --> merged
+    merged -.-> maintain
+    maintain -.->|"new intent"| intent
+```
+
+- **① Intent** — `capture-intent` restates the change in your words, with
+  testable acceptance lines, and waits for your yes. Without `loom-design`
+  installed, `loom-code:write-plan` captures the intent itself.
+- **② Specification** — `write-spec` runs only for changes that need design;
+  for product changes you confirm the visible behaviour before planning.
+- **Build and review** — `build` implements each planned task test-first.
+  `review` then dispatches at least two fresh-context reviewers, a blind runner
+  that walks every acceptance line in a clean environment, and an adversary
+  that tries to make the change fail. Passing evidence becomes an attestation
+  bound to the reviewed content.
+- **③ Acceptance** — `ship` pushes the branch, opens the PR and verifies
+  checks; the blind-run report is what you read to accept the change.
+- **Maintain** — incidents after merge come back as a new intent, so every
+  change enters the same way.
+
+## loom-design
+
+Version 2.1.5. Turns a rough idea into a confirmed intent and a risk-declared
+spec, and provides product-definition tools. Requires `loom-code`, whose
+contract package it reads.
+
+| Skill | Role |
+| --- | --- |
+| `capture-intent` | Interview, write and confirm a change intent (decision point ①). |
+| `write-spec` | Write a design spec from a confirmed `needs-design: yes` intent (decision point ②). |
+| `product-principles` | Ratify `PRINCIPLES.md`, the rules that govern product and engineering trade-offs. |
+| `design-system` | Ratify a visual `DESIGN.md`: colour, type, layout and component tokens. |
+| `using-loom-design` | Optional router to the right product-definition skill. |
+
+## loom-code
+
+Version 3.1.4. Five stations carry one change from plan to PR with
+content-bound verification, one closing review and a fast publication gate.
+
+| Skill | Role |
+| --- | --- |
+| `write-plan` | Turn a confirmed intent into a task DAG with tests and risks per task. |
+| `build` | Implement the plan test-first, one task at a time. |
+| `review` | Run the closing review (read, blind run, adversary) and generate an attestation. |
+| `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
+| `maintain` | Route bug reports, alerts, regressions or incidents into a new intent. |
+| `using-loom-code` | Optional router to the right station. |
+
+It also ships the `implementer`, `reviewer`, `blind-runner` and `adversary`
+agents that the stations dispatch.
+
+## loom-workflow
+
+Version 4.3.4. Workflow tools used around the stations; each works on its own.
+
+| Skill | Role |
+| --- | --- |
+| `loom-memory` | Recall, record, reconcile or retire durable repository lessons. |
+| `git-memory` | Classify commit and PR memory before committing; recall why a past decision was made. |
+| `critique` | Judge a proposal or look for a simpler version of a change. |
+| `decision-map` | Chart or advance a persistent Outcome Map across sessions. |
+| `independent-advisor` | Get a second opinion from another model, effort level or vendor. |
+| `recap-state` | In-session recap of where the work stands. |
+| `handoff` | Save or resume state across sessions. |
+| `distill-sessions` | Mine past Claude Code or Codex sessions for skill improvement proposals. |
+| `cot-explain` | Explain documented reasoning as a page with a chain-of-thought diagram. |
+| `goal-create` | Create a session goal or draft a repository purpose (invoked by name only). |
+| `dbt-model-style` | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
+| `using-loom-workflow` | Optional router to the right workflow tool. |
+
+## Install
+
+This repository is a plugin marketplace named `loom`.
+
+### Claude Code
+
+```sh
+claude plugin marketplace add https://github.com/kouko/loom-plugins.git
+claude plugin install loom-code@loom
+claude plugin install loom-design@loom
+claude plugin install loom-workflow@loom
+```
+
+The plugins are independently installable: install only the ones you need.
+`loom-code` needs neither sibling; `loom-design` requires `loom-code`. Plugins
+compose only through plugin-qualified skill names such as
+`loom-design:write-spec`, the contract package and the project's own
+`docs/loom/` artifacts.
+
+### Codex
+
+Add this repository as a Codex plugin marketplace, then install plugins from
+it:
+
+```sh
+codex plugin add loom-code@loom
+codex plugin list
+```
 
 ## Development
 
@@ -30,13 +167,13 @@ python3 scripts/check_plugin_boundaries.py loom-design
 python3 loom-code/scripts/check-skill-crossrefs.py
 ```
 
-The local marketplace at `.claude-plugin/marketplace.json` contains only these
-three plugin roots. Existing upstream URLs inside plugin manifests remain
-provenance links until publication and installation cutover are authorized.
+The marketplace at `.claude-plugin/marketplace.json` contains only these three
+plugin roots. Homepage and repository URLs inside plugin manifests still point
+to the historical origin repository.
 
 ## Migration provenance
 
-This is a local candidate extracted from a fixed `monkey-skills` commit.
+This repository was extracted from a fixed `monkey-skills` commit.
 `docs/migration/extraction.json` records that commit, the reviewed path boundary
 and verification counts. `docs/migration/commit-map.tsv` maps every original
 commit reachable from that source to its rewritten commit, or a zero SHA when
@@ -46,7 +183,7 @@ preserved as `docs/migration/filter-repo-commit-map.tsv`.
 Currently committed tests also cite four development commits outside main's
 ancestry, and the measurement gate cites one otherwise empty snapshot boundary
 within main's ancestry. `docs/migration/auxiliary-history.json` enumerates those exact tips and
-their retained citation paths. Their required ancestry is filtered under local
+their retained citation paths. Their required ancestry is filtered under
 `refs/tags/loom-evidence/<original-sha>` tags and included in the complete
 map. Default clones transport these tags without a custom fetch refspec.
 This preserves main history plus currently referenced Loom development
@@ -57,5 +194,6 @@ development uses only the three plugin directories above. Rewriting changes
 commit IDs and invalidates historical signatures; author and committer identity,
 dates, messages and retained file trees are verified against the original.
 
-The extraction does not configure a publishing remote. Repository publication,
-marketplace cutover and removal of the original files are separate decisions.
+## License
+
+MIT. See [LICENSE](LICENSE).
