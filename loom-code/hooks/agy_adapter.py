@@ -289,7 +289,10 @@ def _arg_value(value):
 
 
 def _reads_loom_skill(step: dict) -> bool:
-    for call in step.get("tool_calls") or []:
+    calls = step.get("tool_calls")
+    if not isinstance(calls, list):
+        return False
+    for call in calls:
         if not isinstance(call, dict) or call.get("name") != "view_file":
             continue
         args = call.get("args")
@@ -320,7 +323,9 @@ def _language_anchor(payload: dict) -> str:
     if skill_read is None:
         return ""
     line_no, step = skill_read
-    step_key = str(step.get("step_index", f"line{line_no}"))
+    idx = step.get("step_index")
+    is_int = isinstance(idx, int) and not isinstance(idx, bool)
+    step_key = str(idx) if is_int else f"line{line_no}"
 
     anchor = _load_module("loom_language_anchor", LANGUAGE_ANCHOR)
     lang_detect = anchor._load_lang_detect()
