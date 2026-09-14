@@ -52,6 +52,11 @@ charter: 1.0
 - Test: A1 positive: readme-agy-install-steps-from-clone; negative: readme-claims-agy-marketplace. A9 positive: principles-name-antigravity-cli; boundary: principles-non-negotiables-count-unchanged.
 - Risk: agent-decided — clone plus `agy plugin install <dir>` per plugin, loom-code first; Japanese and Traditional Chinese READMEs get the same section; PRINCIPLES amendment line records the user-confirmed host addition.
 
+**W3-02 Antigravity host lines in loom-design and drift hook**  after: W2-01, W2-04  acceptance: 3, 8
+- Files: loom-design/skills/capture-intent/references/second-vendor.md, loom-design/scripts/spec/test_capture_intent_contract.py, .claude/hooks/check-codex-manifest-drift.sh, .claude/hooks/test_check_codex_manifest_drift.py
+- Test: A3 positive: capture-intent-names-agy-probe-order; negative: capture-intent-offers-host-vendor. A8 positive: drift-hook-message-names-both-manifests; boundary: codex-drift-block-unchanged.
+- Risk: agent-decided — added after W2-04 found loom-design's second-vendor copy lists only Codex and Claude hosts and W2-01 found the drift hook message Codex-only; wording mirrors the loom-code reference.
+
 ## Questions asked
 ① — what — 在 Antigravity 裡你希望做到多「能用」？（答：整條流程能走完）
 ① — what — 三個 plugin 都要支援 Antigravity 嗎？（答：三個都要）
