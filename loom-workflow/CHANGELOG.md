@@ -4,6 +4,20 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.2.0] — 2026-09-14 — Codex visualization-card hook
+
+- The Codex SessionStart hook in `hooks/hooks-codex.json` is now part of the
+  counted mechanism population as
+  `SessionStart:startup|clear|compact:visualization-card@codex`; the net
+  count rises from 126 to 127.
+- budget-exception: SessionStart:startup|clear|compact:visualization-card@codex — delivers the existing loom-visualization trigger card to Codex, where the manifest `hooks` key replaces default hook discovery; eval scripts/test_loom_plugin_install_layout.py::test_codex_manifest_points_at_sessionstart_card_hook.
+- The Codex manifest's long description no longer claims a PostToolUse
+  skill-folder hook: Codex runs only `hooks/hooks-codex.json`, so it names
+  the SessionStart visualization-card hook instead.
+- Sync `--check` now tells the user to remove a hand-written leftover
+  `rules/AGENTS.md` by hand when its source card is gone, because sync never
+  deletes a file without the generated header.
+
 ## [5.1.0] — 2026-09-14 — loom-visualization triggers on Loom station reports
 
 - `loom-visualization`'s description now names Loom station reports to the
