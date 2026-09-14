@@ -85,6 +85,53 @@ def test_hook_blocks_every_merge_form_with_push_merge(
     assert called == []
 
 
+# hook-merge-text-rule-fails-closed (A11): hand-typed merges hidden behind
+# wrapper options, combined shell flags, shell grammar or a backslash-newline
+# split are refused by the textual rule, which also refuses mere mentions.
+@pytest.mark.parametrize("command", [
+    "(gh pr merge 7)",
+    "bash -lc 'gh pr merge 7'",
+    "sh -ec 'gh pr merge 7'",
+    "sudo -u me gh pr merge 7",
+    "nice -n 5 gh pr merge 7",
+    "time -p gh pr merge 7",
+    "command -p gh pr merge 7",
+    "echo 7 | xargs -n1 gh pr merge",
+    "exec -a x gh pr merge 7",
+    "{ gh pr merge 7; }",
+    "if true; then gh pr merge 7; fi",
+    "for n in 7; do gh pr merge $n; done",
+    "! gh pr merge 7",
+    "gh pr \\\nmerge 7",
+    "gh \\\npr merge 7",
+    "'gh' 'pr' 'merge' 7",
+    "/opt/homebrew/bin/GH -R o/r PR Merge 7",
+    "echo gh pr merge",
+])
+def test_hook_text_rule_blocks_hand_typed_merge_forms(
+    tmp_path: Path, monkeypatch, command: str,
+) -> None:
+    rc, err, called = _merge_hook(tmp_path, monkeypatch, command)
+
+    assert rc == 2
+    assert err.splitlines() == [PUSH_MERGE_BLOCK]
+    assert called == []
+
+
+@pytest.mark.parametrize("command", [
+    "gh pr view 7",
+    "gh pr list --search merge",
+    "git merge main",
+    "ghx pr merge 7",
+])
+def test_hook_text_rule_leaves_other_commands_alone(
+    tmp_path: Path, monkeypatch, command: str,
+) -> None:
+    _rc, err, _called = _merge_hook(tmp_path, monkeypatch, command)
+
+    assert "BLOCK push.merge" not in err
+
+
 def test_cmd_push_non_publication_command_still_passes(monkeypatch) -> None:
     payload = {
         "cwd": "/does/not/matter",

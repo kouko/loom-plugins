@@ -142,10 +142,43 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     return 2 if rc == 1 else rc
 
 
+# Word separators for the merge text rule: whitespace, quotes and shell
+# punctuation, so `(gh`, `'gh'`, `{ gh` and `then gh` all yield the word `gh`.
+MERGE_TEXT_WORD = re.compile(r"[^\s'\"`;|&(){}<>!]+")
+
+
+def mentions_pr_merge(command: str) -> bool:
+    """Fail-closed text rule: after joining backslash-newlines, a word `gh`
+    (or a path ending in `/gh`) followed later by the consecutive words `pr`
+    `merge`, case-insensitively, anywhere in the command text.
+
+    It ignores wrappers, options and shell grammar, so `sudo -u x`, `bash -lc`,
+    `( … )`, `if … then` and `xargs -n1` cannot hide a merge. Ceiling: it also
+    refuses commands that merely mention the words (`echo gh pr merge`, a
+    search pattern, a commit message) — accepted, because `land` is the only
+    merge path and a false refusal costs a rewording. It does not see a merge
+    assembled at run time (`printf`, variables, `gh api …/merge`)."""
+    words = [
+        word.lower()
+        for word in MERGE_TEXT_WORD.findall(command.replace("\\\n", ""))
+    ]
+    for index, word in enumerate(words):
+        if word != "gh" and not word.endswith("/gh"):
+            continue
+        tail = words[index + 1:]
+        if any(
+            tail[i] == "pr" and tail[i + 1] == "merge"
+            for i in range(len(tail) - 1)
+        ):
+            return True
+    return False
+
+
 def contains_pr_merge(command: str) -> bool:
-    """True when a segment merges a PR, directly or inside the `eval` and
-    `<shell> -c` forms `is_push_command` unwraps."""
-    if is_pr_merge_command(command):
+    """True when the fail-closed text rule matches, or a segment merges a PR
+    directly or inside the `eval` and `<shell> -c` forms `is_push_command`
+    unwraps."""
+    if mentions_pr_merge(command) or is_pr_merge_command(command):
         return True
     for segment in _shell_segments(command):
         tokens = _strip_prefix(_tokenise(segment))

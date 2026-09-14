@@ -1178,7 +1178,10 @@ def test_canonical_attested_push_allowed(tmp_path: Path, monkeypatch) -> None:
 BLOCKED_PUSH_MATRIX = [
     ("git status", 0, 0),
     ("ls -la", 0, 0),
-    ("rg -n \"SEGMENT_SPLIT|publisher&&gh pr create|gh pr merge\" loom-code -g '*.py'", 0, 0),
+    # The hand-typed merge text rule fails closed: a command that merely
+    # mentions the merge words is refused too (changed deliberately, W1-01).
+    ("rg -n \"SEGMENT_SPLIT|publisher&&gh pr create|gh pr merge\" loom-code -g '*.py'", 2, 2),
+    ("rg -n \"SEGMENT_SPLIT|publisher&&gh pr create\" loom-code -g '*.py'", 0, 0),
     ("printf '%s\\n' '$(git push origin HEAD)'", 0, 0),
     ("git push origin HEAD", 2, 2),
     ("git push origin feature", 2, 2),
