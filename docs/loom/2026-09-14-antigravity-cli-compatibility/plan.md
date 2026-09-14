@@ -79,6 +79,18 @@ charter: 1.0
 - Test: A3 positive: station-commits-report-before-finalize; negative: finalize-before-report-commit-not-instructed.
 - Risk: agent-decided — finalize-review already requires a clean tree; state explicitly that the blind-run report is committed before finalize so agy runs do not leave it untracked.
 
+### Wave 5 — closing-review findings after re-confirmation (intent re-confirmed again 2026-09-14)
+
+**W5-01 Skill and docs findings**  after: W4-04  acceptance: 1, 3
+- Files: loom-workflow/README.ja.md, loom-workflow/README.zh-TW.md, loom-code/skills/closing-review/SKILL.md, loom-code/references/antigravity-tools.md, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md, loom-design/skills/capture-intent/references/second-vendor.md, scripts/test_agy_install_docs.py, loom-code/scripts/test_review_convergence_contract.py
+- Test: A1 positive: loom-workflow-ja-zh-readmes-have-agy-section; negative: agy-section-missing-in-any-translation-fails. A3 positive: report-committed-before-reviewers-read-final-digest; negative: report-commit-after-verdicts-not-instructed.
+- Risk: agent-decided — commit the blind-run report before reviewers read the final digest; agy offers no second-vendor runner yet, so both second-vendor references say so instead of probing; trim orientation-only hook section and duplicate wording.
+
+**W5-02 Code findings**  after: W4-03  acceptance: 4, 8
+- Files: loom-code/hooks/agy_adapter.py, loom-code/scripts/loom_checker/command_handlers/push.py, loom-code/scripts/test_loom_publish.py, loom-code/scripts/test_agy_adapter.py
+- Test: A4 positive: attestation-reason-docstring-names-checked-head; boundary: case-folded-publishers-blocked-on-every-host. A8 positive: allow-set-parity-still-passes-after-split; negative: blocked-matrix-baseline-named.
+- Risk: user-decided — keep case-insensitive publisher detection on every host; agent-decided — split `_closed_read_only` under 50 lines, name the matrix baseline commit, document that the reason reflects checked-out HEAD.
+
 ## Questions asked
 ① — what — 在 Antigravity 裡你希望做到多「能用」？（答：整條流程能走完）
 ① — what — 三個 plugin 都要支援 Antigravity 嗎？（答：三個都要）
@@ -88,6 +100,7 @@ charter: 1.0
 ① — consequence — 覆述 intent，含：舊名不留轉接、agy 上審查由 Gemini 執行、clone 後逐一安裝、原則加入 Antigravity、審查通過後自動 push 並開 PR（答：對）
 ① — what — 第 3 條驗收寫著「loom 的檢查程式接受盲跑報告」，但 loom 目前沒有任何規則在檢查盲跑報告，所以這半句永遠證明不了。你要怎麼處理？（答：改驗收說法）
 ① — consequence — 被 push 閘門擋下時，一般人打的 `git push` 看到的第一個理由是「指令必須用標準全引號寫法」，看不出真正缺的是審查紀錄。要改嗎？（這個訊息三個平台共用，擋不擋的判斷不會變，只改看到的文字）（答：改，三平台都先說缺審查）
+① — consequence — 審查發現：第一輪對抗測試後，我們讓 push 閘門「不分大小寫」辨認 `git`／`gh`，所以現在 `GIT push`、`Gh pr create` 這類寫法在 Claude Code 和 Codex 上也會被擋（以前會放行）。這違反了你先前定的「哪些 push 會被擋不變」。在 macOS 上檔名不分大小寫，`GIT push` 其實真的會推送成功，所以舊行為是個漏洞。要怎麼處理？（答：保留，三平台都擋）
 
 ## Risks
 1. user-decided — review station renamed closing-review on all hosts with no alias, because agy de-duplicates skills by short name and an alias would collide again.
