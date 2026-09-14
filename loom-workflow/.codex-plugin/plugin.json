@@ -24,6 +24,7 @@
     "dbt-model-style",
     "dbt"
   ],
+  "hooks": "./hooks/hooks-codex.json",
   "interface": {
     "displayName": "loom-workflow",
     "shortDescription": "Process skills for the work around the code",

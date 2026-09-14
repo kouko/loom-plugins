@@ -182,6 +182,10 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
+On Codex, the loom-visualization trigger card arrives through a plugin
+SessionStart hook, which Codex runs only after you review and trust the
+plugin's hooks.
+
 ### Antigravity CLI
 
 Install from a clone of the repository. Install `loom-code` first. `critique`,

@@ -177,6 +177,8 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
+Codex では loom-visualization のトリガーカードを plugin の SessionStart hook で届ける。Codex がこの hook を走らせるのは、plugin の hook を確認して信頼した後だけ。
+
 ### Antigravity CLI
 
 repo を clone し、`loom-code` を先にインストールする。`critique`・`decision-map`・

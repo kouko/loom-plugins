@@ -171,6 +171,8 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
+在 Codex 上，loom-visualization 的觸發卡透過 plugin 的 SessionStart hook 送達；Codex 只在你審閱並信任該 plugin 的 hook 之後才會執行它。
+
 ### Antigravity CLI
 
 從 repo 的 clone 安裝，先裝 `loom-code`：`critique`、`decision-map`、
