@@ -1,5 +1,15 @@
 {
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f \"${PLUGIN_ROOT}/scripts/loom_checker.py\" ]; then python3 \"${PLUGIN_ROOT}/scripts/loom_checker.py\" selection capture --hook || true; else cat >/dev/null; fi; exit 0"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",

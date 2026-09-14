@@ -59,11 +59,26 @@ def _commands(entries) -> list[str]:
 
 
 def test_event_set_is_exact(hooks):
-    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse"}
+    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit"}
 
 
-def test_codex_event_set_is_only_publication_interception(codex_hooks):
-    assert set(codex_hooks) == {"PreToolUse"}
+def test_codex_event_set_is_publication_interception_and_prompt_capture(codex_hooks):
+    assert set(codex_hooks) == {"PreToolUse", "UserPromptSubmit"}
+
+
+def test_user_prompt_submit_runs_selection_capture_hook(hooks):
+    """W2-01: the prompt capture runs the installed checker in hook mode and
+    must never block the prompt, so a non-zero checker exit is swallowed."""
+    (command,) = _commands(hooks["UserPromptSubmit"])
+    assert command.startswith("python3 ")
+    assert '"${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py" selection capture --hook' in command
+    assert command.rstrip().endswith("|| true")
+
+
+def test_codex_user_prompt_submit_uses_native_root_and_capture_hook(codex_hooks):
+    (command,) = _commands(codex_hooks["UserPromptSubmit"])
+    assert '"${PLUGIN_ROOT}/scripts/loom_checker.py" selection capture --hook' in command
+    assert "${CLAUDE_PLUGIN_ROOT}" not in command
 
 
 def test_session_start_runs_the_rewritten_script(hooks):
