@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v1",
   "change_id": "2026-09-14-antigravity-cli-compatibility",
-  "content_digest": "6b93647a89269f8c7c30146be0dfe5eb4cd4e86d",
+  "content_digest": "f39555a9cc6d60143c070688490ebb629260def4",
   "executions": [
     {
       "kind": "package-tests",
@@ -141,6 +141,14 @@
           "anchor": "docs/loom/2026-09-14-antigravity-cli-compatibility/blind-run-report.md:202",
           "text": "nitpick: Evidence bullets now quote the deciding output inline.",
           "fix": "none needed"
+        },
+        {
+          "severity": "nit",
+          "dimension": "omission",
+          "status": "open",
+          "anchor": "loom-workflow/README.md:204",
+          "text": "nitpick (non-blocking): after merging main, the README tree lists the SessionStart visualization card while agy only runs the skill-folder rule; an agy reader may expect the card.",
+          "fix": "Note that on agy only the skill-folder rule runs and the loom-visualization session-start card is Claude Code only (en/ja/zh-TW)."
         }
       ]
     }
@@ -175,6 +183,16 @@
       "fix": "Record 2e4da589 outcomes per row or point the comment at the intent's user-decided case-folding exception.",
       "reviewer": "loom-code:reviewer#code-aa15607c",
       "lens": "code"
+    },
+    {
+      "severity": "nit",
+      "dimension": "omission",
+      "status": "open",
+      "anchor": "loom-workflow/README.md:204",
+      "text": "nitpick (non-blocking): after merging main, the README tree lists the SessionStart visualization card while agy only runs the skill-folder rule; an agy reader may expect the card.",
+      "fix": "Note that on agy only the skill-folder rule runs and the loom-visualization session-start card is Claude Code only (en/ja/zh-TW).",
+      "reviewer": "loom-code:reviewer#skill-a485c678",
+      "lens": "skill"
     }
   ]
 }
