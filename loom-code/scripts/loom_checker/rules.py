@@ -133,7 +133,7 @@ RULES.append((
     "land merges nothing unless every precondition holds: an --accepted-by name equal to "
     "the intent's originator or publication authorizer, a valid attestation at HEAD, one "
     "open PR whose head is HEAD, every check passed (not only required ones), and a "
-    "MERGEABLE state other than BLOCKED, DIRTY, BEHIND, or UNSTABLE.",
+    "MERGEABLE state other than BLOCKED, DIRTY, BEHIND, UNSTABLE, or DRAFT.",
 ))
 
 
