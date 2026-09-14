@@ -10,9 +10,13 @@ touch any committed manifest. Stdlib only (json + subprocess to exercise the CLI
 """
 
 import json
+import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 SCRIPT = Path(__file__).resolve().parent / "sync_codex_manifests.py"
 
@@ -386,3 +390,134 @@ def test_all_eligible_codex_manifests_in_sync():
         "committed Codex manifests drifted or missing vs their Claude SSOT: "
         f"{offenders}. Run: python3 scripts/sync_codex_manifests.py --scaffold --all"
     )
+
+
+# --- Antigravity CLI (agy) root manifest: <plugin>/plugin.json ----------------
+# agy reads only a root plugin.json (Claude Code and Codex ignore it). It is
+# fully derived from the Claude SSOT — no hand-authored keys — so any byte of
+# difference from the derived form is drift.
+
+AGY_FIELDS = ("name", "version", "description")
+
+
+def _agy_path(plugin_dir: Path) -> Path:
+    return plugin_dir / "plugin.json"
+
+
+def test_root_manifest_generated_and_validates(tmp_path):
+    """A1 positive: sync writes a minimal, deterministic root manifest."""
+    import sync_codex_manifests as m
+
+    plugin = _build_plugin(tmp_path / "demo-plugin", _claude_ssot(), _stale_codex())
+    assert not _agy_path(plugin).exists()
+
+    m.sync_agy_manifest(plugin)
+
+    expected = {field: _claude_ssot()[field] for field in AGY_FIELDS}
+    text = _agy_path(plugin).read_text(encoding="utf-8")
+    assert json.loads(text) == expected
+    assert list(json.loads(text)) == list(AGY_FIELDS)  # stable key order
+    assert text == json.dumps(expected, indent=2, ensure_ascii=False) + "\n"
+    assert m.sync_agy_manifest(plugin, check=True) is True
+
+
+def test_cli_sync_writes_root_manifest(tmp_path):
+    plugin = _build_plugin(tmp_path / "demo-plugin", _claude_ssot(), _stale_codex())
+
+    assert _run([], plugin).returncode == 0
+    assert json.loads(_agy_path(plugin).read_text(encoding="utf-8"))["name"] == "demo-plugin"
+
+
+def test_drifted_root_manifest_fails_check(tmp_path):
+    """A1 negative: a hand-edited root manifest fails --check, read-only."""
+    plugin = _build_plugin(tmp_path / "demo-plugin", _claude_ssot(), _stale_codex())
+    assert _run([], plugin).returncode == 0
+
+    drifted = json.loads(_agy_path(plugin).read_text(encoding="utf-8"))
+    drifted["description"] = "hand-edited"
+    _agy_path(plugin).write_text(json.dumps(drifted, indent=2) + "\n", encoding="utf-8")
+    before = _agy_path(plugin).read_text(encoding="utf-8")
+
+    proc = _run(["--check"], plugin)
+    assert proc.returncode != 0
+    assert "DRIFT" in proc.stderr and "plugin.json" in proc.stderr, proc.stderr
+    assert _agy_path(plugin).read_text(encoding="utf-8") == before
+
+
+def test_root_manifest_extra_key_is_drift(tmp_path):
+    import sync_codex_manifests as m
+
+    plugin = _build_plugin(tmp_path / "demo-plugin", _claude_ssot(), _stale_codex())
+    m.sync_agy_manifest(plugin)
+    extra = json.loads(_agy_path(plugin).read_text(encoding="utf-8"))
+    extra["skills"] = "./skills/"
+    _agy_path(plugin).write_text(json.dumps(extra, indent=2) + "\n", encoding="utf-8")
+
+    assert m.sync_agy_manifest(plugin, check=True) is False
+
+
+def test_all_check_fails_on_drifted_or_missing_root_manifest(tmp_path):
+    dirs = _build_all_eligible(tmp_path)
+    assert _run_all([], tmp_path).returncode == 0
+    assert _run_all(["--check"], tmp_path).returncode == 0
+
+    _agy_path(dirs["loom-design"]).write_text('{"name": "loom-design"}\n', encoding="utf-8")
+    drift = _run_all(["--check"], tmp_path)
+    assert drift.returncode != 0 and "DRIFT" in drift.stderr, drift.stderr
+
+    _agy_path(dirs["loom-design"]).unlink()
+    missing = _run_all(["--check"], tmp_path)
+    assert missing.returncode != 0 and "MISSING" in missing.stderr, missing.stderr
+    assert "Traceback" not in missing.stderr
+
+
+def test_codex_manifests_unchanged_by_root_manifest_sync(tmp_path):
+    """A8 positive: generating the agy manifest never touches host manifests."""
+    import sync_codex_manifests as m
+
+    for name in m.CODEX_ELIGIBLE:
+        copy = tmp_path / name
+        for host in (".claude-plugin", ".codex-plugin"):
+            (copy / host).mkdir(parents=True)
+            (copy / host / "plugin.json").write_bytes(
+                (REPO_ROOT / name / host / "plugin.json").read_bytes()
+            )
+        before = {h: (copy / h / "plugin.json").read_bytes()
+                  for h in (".claude-plugin", ".codex-plugin")}
+
+        m.sync_agy_manifest(copy)
+
+        after = {h: (copy / h / "plugin.json").read_bytes()
+                 for h in (".claude-plugin", ".codex-plugin")}
+        assert after == before, f"{name}: host manifests mutated"
+        assert m.sync_plugin(copy, check=True), f"{name}: codex drift"
+
+
+def test_all_eligible_agy_root_manifests_in_sync():
+    import sync_codex_manifests as m
+
+    offenders = []
+    for name in m.CODEX_ELIGIBLE:
+        plugin_dir = REPO_ROOT / name
+        if not m.agy_manifest_path(plugin_dir).exists():
+            offenders.append(f"{name} (MISSING plugin.json)")
+        elif not m.sync_agy_manifest(plugin_dir, check=True):
+            offenders.append(name)
+    assert not offenders, (
+        f"committed agy root manifests drifted or missing: {offenders}. "
+        "Run: python3 scripts/sync_codex_manifests.py --all"
+    )
+
+
+@pytest.mark.skipif(shutil.which("agy") is None, reason="agy CLI not on PATH")
+@pytest.mark.parametrize("name", ("loom-code", "loom-design", "loom-workflow"))
+def test_agy_plugin_validate_accepts_committed_plugin(name):
+    """A1 live: `agy plugin validate` passes and processes every skill folder."""
+    proc = subprocess.run(
+        ["agy", "plugin", "validate", str(REPO_ROOT / name)],
+        capture_output=True, text=True, timeout=120,
+    )
+    out = re.sub(r"\x1b\[[0-9;]*m", "", proc.stdout + proc.stderr)
+    assert proc.returncode == 0, out
+    skills = len(list((REPO_ROOT / name / "skills").glob("*/SKILL.md")))
+    assert re.search(rf"skills\s*:\s*{skills} processed", out), out

@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-REVIEW = (ROOT / "loom-code/skills/review/SKILL.md").read_text(encoding="utf-8")
+REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
 SHIP = (ROOT / "loom-code/skills/ship/SKILL.md").read_text(encoding="utf-8")
 MAINTAIN = (ROOT / "loom-code/skills/maintain/SKILL.md").read_text(encoding="utf-8")
 BUILD = (ROOT / "loom-code/skills/build/SKILL.md").read_text(encoding="utf-8")
@@ -222,13 +222,18 @@ def test_host_specific_skill_guidance_uses_each_native_contract() -> None:
     assert "`${CLAUDE_PLUGIN_ROOT}` is substituted by Claude Code" in PLAN
     assert "`PLUGIN_ROOT` is provided to Codex plugin hook commands" in PLAN
     assert "not a general skill-shell variable" in " ".join(PLAN.split())
+    assert (
+        "on any other host it is the directory two levels above this SKILL.md"
+        in " ".join(PLAN.split())
+    )
+    assert "injected loom-code plugin root" not in PLAN
     assert "hooks/hooks-codex.json" in CODEX_FIRST_CONTACT
     assert "`${PLUGIN_ROOT}`" in CODEX_FIRST_CONTACT
     assert "does not also load `hooks/hooks.json`" in CODEX_FIRST_CONTACT
 
 
 def test_principles_name_installed_hooks_for_both_hosts() -> None:
-    assert "Host-installed plugin hooks (Claude Code and Codex)" in PRINCIPLES
+    assert "Host-installed plugin hooks (Claude Code, Codex and Antigravity CLI)" in PRINCIPLES
     assert "Codex `.codex/hooks.json`" not in PRINCIPLES
 
 

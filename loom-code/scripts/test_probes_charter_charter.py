@@ -64,7 +64,7 @@ def _valid_row(name: str, goes_to: str) -> dict:
         "readers": ["reviewer"],
         "must": ["decision"],
         "must_not": [{"kind": "code", "goes_to": goes_to}],
-        "signoff": "review",
+        "signoff": "closing-review",
         "edits_after": [{"id": f"{name}-fix-round-lands", "text": "a fix round lands"}],
     }
 
@@ -252,11 +252,11 @@ def test_manifest_duplicate_artifact_key_collapses_silently():
         "  spec:\n"
         "    path: docs/loom/<change-id>/spec.md\n"
         "    charter: {answers: first, readers: [r], must: [a], "
-        "must_not: [{kind: c, goes_to: plan}], signoff: review, edits_after: [x]}\n"
+        "must_not: [{kind: c, goes_to: plan}], signoff: closing-review, edits_after: [x]}\n"
         "  spec:\n"
         "    path: docs/loom/<change-id>/spec.md\n"
         "    charter: {answers: second, readers: [r], must: [a], "
-        "must_not: [{kind: c, goes_to: plan}], signoff: review, edits_after: [x]}\n"
+        "must_not: [{kind: c, goes_to: plan}], signoff: closing-review, edits_after: [x]}\n"
     )
     data = yaml.safe_load(raw)
     assert list(data["artifacts"].keys()).count("spec") == 1

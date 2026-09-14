@@ -2,6 +2,9 @@
 
 This file expands the four operations named in `SKILL.md`. Read it when
 the compact steps there are not enough, not on every invocation.
+`${CLAUDE_PLUGIN_ROOT}` below is this plugin's root, substituted on Claude
+Code; on any other host it is the directory three levels above this file
+(two above `SKILL.md`) — use that path in its place.
 
 ## Recall
 

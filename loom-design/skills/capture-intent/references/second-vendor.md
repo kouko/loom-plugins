@@ -4,7 +4,9 @@ An independent cross-model review only counts if it uses a non-interactive
 command-line tool from a **different model family than the current host**.
 Host identity comes from the environment running this skill, never from which
 executables happen to be installed. On Codex, probe `claude` then `gemini`.
-On Claude Code, probe `codex` then `gemini`. Never offer the current host
+On Claude Code, probe `codex` then `gemini`. On Antigravity CLI, probe nothing:
+Antigravity CLI has no verified second-vendor runner yet, so state that no
+such review tool is available. Never offer the current host
 family. Detect a candidate with
 `command -v <cli>` **and** a probe that it runs — `<cli> --version` must
 exit 0. In zsh `command -v` may print an alias or a function body rather
@@ -50,4 +52,6 @@ is computed later and independently from the complete branch delta.
 
 A **fixed CLI** is the standing reviewer choice and adds no intent question.
 Probe it with the same availability rule before downstream use; never replace
-it silently with another vendor.
+it silently with another vendor. A fixed CLI or an accepted `ask` answer cannot
+run on Antigravity CLI, so Closing Review follows the existing review failure
+behavior: it reports the blocker and never silently drops the second vendor.

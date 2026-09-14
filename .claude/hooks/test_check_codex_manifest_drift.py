@@ -81,6 +81,32 @@ def test_fires_for_arbitrary_plugin_on_drift(tmp_path):
     assert "drift" in result.stderr.lower()
 
 
+def test_drift_message_names_both_manifests_on_agy_root_drift(tmp_path):
+    """Codex mirror in sync, agy root plugin.json drifted -> blocks, and the
+    message names both derived manifests the sync command regenerates."""
+    codex_path = _make_repo(tmp_path, drift=False)
+    plugin = codex_path.parent.parent
+    (plugin / "plugin.json").write_text(
+        json.dumps({"name": "myplugin", "version": "0.0.0", "description": "d"}),
+        encoding="utf-8",
+    )
+    result = run_hook(str(plugin / ".claude-plugin" / "plugin.json"))
+    assert result.returncode == 2
+    assert "myplugin/.codex-plugin/plugin.json" in result.stderr
+    assert "myplugin/plugin.json" in result.stderr
+    assert "Antigravity" in result.stderr
+    assert "python3 scripts/sync_codex_manifests.py myplugin" in result.stderr
+
+
+def test_codex_drift_block_unchanged(tmp_path):
+    """The existing Codex drift block still fires with the same repair command."""
+    codex_path = _make_repo(tmp_path, drift=True)
+    result = run_hook(str(codex_path))
+    assert result.returncode == 2
+    assert "Codex" in result.stderr
+    assert "python3 scripts/sync_codex_manifests.py myplugin" in result.stderr
+
+
 def test_fires_on_claude_side_edit(tmp_path):
     """Editing the Claude SSOT side (not just Codex) also triggers the check."""
     codex_path = _make_repo(tmp_path, drift=True)

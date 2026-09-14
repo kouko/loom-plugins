@@ -8,13 +8,13 @@ anything is published. You are asked only three times: to confirm what the
 change is, to confirm visible product behaviour when there is any, and to
 accept the result, through the blind-run report when one is required.
 
-Loom ships as three independently installable plugins for Claude Code and
-Codex:
+Loom ships as three independently installable plugins for Claude Code,
+Codex and Antigravity CLI:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.1.5 | 5 | Front of the flow: intent, specification, product principles, visual design. |
-| [`loom-code`](loom-code/) | 3.2.0 | 6 | Engineering stations: plan, build, review, ship, maintain. |
+| [`loom-code`](loom-code/) | 3.2.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
 | [`loom-workflow`](loom-workflow/) | 5.0.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
@@ -43,7 +43,7 @@ flowchart TD
     subgraph code["loom-code"]
         plan["loom-code:write-plan<br/>task DAG"]
         build["loom-code:build<br/>test-first, one commit per task"]
-        review["loom-code:review<br/>fresh-context review<br/>→ attestation"]
+        review["loom-code:closing-review<br/>fresh-context review<br/>→ attestation"]
         ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (blind-run report when required)"]
         maintain["loom-code:maintain<br/>bugs, alerts, regressions"]
     end
@@ -75,7 +75,7 @@ flowchart TD
 - **② Specification** — `write-spec` runs only for changes that need design;
   for product changes you confirm the visible behaviour before planning.
 - **Build and review** — `build` implements each planned task test-first.
-  `review` then dispatches the checker-computed number of fresh-context
+  `closing-review` then dispatches the checker-computed number of fresh-context
   reviewers (two unless the change is narrow and low-risk), a blind runner
   when an acceptance line cannot be checked mechanically, and adversarial
   programs for code, skill, spec or gate changes. Passing evidence becomes an
@@ -134,7 +134,7 @@ content-bound verification, one closing review and a fast publication gate.
 | --- | --- |
 | `write-plan` | Turn a confirmed intent into a task DAG with tests and risks per task. |
 | `build` | Implement the plan test-first, one task at a time. |
-| `review` | Run the closing review (read, blind run, adversary) and generate an attestation. |
+| `closing-review` | Run the closing review (read, blind run, adversary) and generate an attestation. |
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
 | `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |
@@ -167,7 +167,8 @@ attach to the flow.
 
 ## Install
 
-This repository is a plugin marketplace named `loom`.
+For Claude Code and Codex, this repository is a plugin marketplace named
+`loom`.
 
 ### Claude Code
 
@@ -193,6 +194,44 @@ codex plugin add loom-design@loom
 codex plugin add loom-workflow@loom
 codex plugin list
 ```
+
+### Antigravity CLI
+
+Antigravity CLI (`agy`) installs plugins from a local directory, so clone the
+repository and install each plugin from the clone. Install `loom-code` first:
+the other two use its contract package and checker.
+
+```sh
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-design
+agy plugin install ./loom-workflow
+agy plugin list
+```
+
+`agy plugin validate ./loom-code` (or any other plugin directory) checks a
+plugin before you install it. To update, run `git pull` in the clone and run
+the install commands again; each install replaces the installed copy. To
+remove a plugin, run `agy plugin uninstall <name>`, for example
+`agy plugin uninstall loom-workflow`.
+
+To use loom, start `agy` from your project with the project added as a
+workspace by absolute path: `agy --add-dir "$PWD"` (interactive) or
+`agy --add-dir "$PWD" -p "..."` (print mode); agy 1.2.2 does not honour a
+relative path such as `.`. Without `--add-dir`, print mode (`agy -p`)
+attaches no workspace, so loom's kickoff defaults are not loaded and the
+agent may act outside the project; pass it in interactive mode too.
+
+Limits on Antigravity:
+
+- The plugin hooks (the push gate, the session context, the language reminder
+  and the skill-folder rule) run only in the `agy` CLI, not in the Antigravity
+  desktop app or IDE, so those gates are not enforced there.
+- loom's roles (implementer, reviewer, adversary, blind-runner) run as agy
+  `self` subagents that follow loom's agent contracts, on Gemini models.
+- The review station is `closing-review` on every host; the old `review` name
+  was removed and has no alias.
 
 ## Development
 

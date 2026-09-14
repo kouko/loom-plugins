@@ -163,7 +163,7 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
 
     for protected in (
         "src.py",
-        "loom-code/skills/review/SKILL.md",
+        "loom-code/skills/closing-review/SKILL.md",
         "loom-code/agents/reviewer.md",
         "loom-code/contract/manifest.yaml",
         "loom-code/hooks/hooks.json",

@@ -65,8 +65,10 @@ work creates a successor Map that cites its predecessor.
 
 Use `python3 "${CLAUDE_PLUGIN_ROOT}/skills/decision-map/scripts/map_init.py" "<map-id>" --repo-root "<path>"`
 to create the schema-v3 `MAP.md` template and empty `tickets/` directory.
-`${CLAUDE_PLUGIN_ROOT}` is replaced when the skill is loaded; it is not a
-run-time shell variable. Fill the Destination,
+`${CLAUDE_PLUGIN_ROOT}` is this plugin's root, substituted on Claude Code when
+the skill is loaded; it is not a run-time shell variable. On any other host it
+is the directory two levels above this SKILL.md — put that path in its place
+in every command in this file. Fill the Destination,
 author at least one stable Destination acceptance criterion, add the first
 closure-typed tickets, and record genuine fog.
 

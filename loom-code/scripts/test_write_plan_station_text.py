@@ -183,6 +183,7 @@ def test_ask_still_asks_once_per_full_lane_change() -> None:
     assert "every full-lane change" in flat
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
+    assert "ask_question" not in text  # agy offers no candidate, so it never asks
     assert "render both choices in the user's current conversation language" in flat
     assert "decline this change" in flat
     assert "https://code.claude.com/docs/en/tools-reference" in text
@@ -196,6 +197,12 @@ def test_ask_is_host_aware_and_has_complete_fallbacks() -> None:
     flat = " ".join(text.split())
     assert "On Codex, probe `claude` then `gemini`" in flat
     assert "On Claude Code, probe `codex` then `gemini`" in flat
+    agy = flat.split("On Antigravity CLI,", 1)[1].split(".", 1)[0]
+    assert "probe nothing" in agy
+    assert "no verified second-vendor runner yet" in agy
+    assert "no such review tool is available" in agy
+    for vendor in ("claude", "codex", "gemini"):
+        assert f"`{vendor}`" not in agy
     assert "blocking plain-language Markdown question" in flat
     assert "no runnable different-model-family CLI" in flat
     assert "continue without asking" in flat
@@ -251,3 +258,12 @@ def test_current_release_metadata_is_synchronized() -> None:
     assert claude_manifest["version"] == "3.2.0"
     assert codex_manifest["version"] == "3.2.0"
     assert "## [3.2.0]" in changelog
+
+
+def test_agy_host_passes_empty_usable_vendors() -> None:
+    text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
+    probe = " ".join(_section(text, "## Availability probe").split())
+    order = next(s for s in re.split(r"(?<=[.:])\s+(?=[A-Z])", probe) if "canonical order" in s)
+    assert "On Claude Code and Codex" in order
+    assert 'On Antigravity CLI, pass `host_vendor: "gemini"`' in probe
+    assert "an empty `usable_vendors` list to `second_vendor_policy.py`" in probe
