@@ -463,7 +463,9 @@ def test_unknown_failure_kind_fails_closed() -> None:
 def test_contract_defines_the_executable_json_boundary() -> None:
     text = (PLUGIN / "references" / "dispatch-profile.md").read_text(encoding="utf-8")
     assert "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py" in text
-    assert "python3 <injected loom-code plugin root>/scripts/dispatch_profile.py" in text
+    assert "python3 <loom-code>/scripts/dispatch_profile.py" in text
+    assert "on any other host" in " ".join(text.split())
+    assert "injected loom-code plugin root" not in text
     assert '"event": "initial"' in text
     assert '"event": "after-execution"' in text
     assert '"event": "host-rejection"' in text
@@ -476,7 +478,9 @@ def test_stations_invoke_the_executable_resolver_before_spawn(station: str) -> N
     text = (PLUGIN / "skills" / station / "SKILL.md").read_text(encoding="utf-8")
     flat = " ".join(text.split())
     assert "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py" in text
-    assert "python3 <injected loom-code plugin root>/scripts/dispatch_profile.py" in text
+    assert "python3 <loom-code>/scripts/dispatch_profile.py" in text
+    assert "on any other host it is the directory two levels above this SKILL.md" in flat
+    assert "injected loom-code plugin root" not in text
     assert "Pass its deterministic JSON result to the host-native spawn" in flat
     assert "post-execution capability-quality failure" in flat
     assert "pre-execution host rejection" in flat

@@ -40,7 +40,7 @@ checkout on this host:
 | Host | Where `loom-code` lives |
 |---|---|
 | Claude Code | the plugin cache — `~/.claude/plugins/cache/<marketplace>/loom-code/<version>/`, one directory per installed version; take the newest |
-| Codex CLI | the installed `loom-code` plugin directory; use its checker script |
+| Codex CLI, Antigravity CLI | on any other host: the `loom-code` directory next to this plugin's root (this plugin's root is two levels above this SKILL.md); it may contain one version subdirectory holding the plugin files — use the newest |
 
 Then run, with that directory in place of `<loom-code>`:
 

@@ -222,6 +222,11 @@ def test_host_specific_skill_guidance_uses_each_native_contract() -> None:
     assert "`${CLAUDE_PLUGIN_ROOT}` is substituted by Claude Code" in PLAN
     assert "`PLUGIN_ROOT` is provided to Codex plugin hook commands" in PLAN
     assert "not a general skill-shell variable" in " ".join(PLAN.split())
+    assert (
+        "on any other host it is the directory two levels above this SKILL.md"
+        in " ".join(PLAN.split())
+    )
+    assert "injected loom-code plugin root" not in PLAN
     assert "hooks/hooks-codex.json" in CODEX_FIRST_CONTACT
     assert "`${PLUGIN_ROOT}`" in CODEX_FIRST_CONTACT
     assert "does not also load `hooks/hooks.json`" in CODEX_FIRST_CONTACT

@@ -31,9 +31,12 @@ Use the installed checker's host-specific prefix:
 | Host | Command prefix |
 |---|---|
 | Claude Code | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py` |
-| Codex CLI | `python3 <injected loom-code plugin root>/scripts/loom_checker.py` |
+| Codex CLI, Antigravity CLI | `python3 <loom-code>/scripts/loom_checker.py` |
 
-Commands below show Claude Code; on Codex substitute the injected prefix.
+`<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude Code;
+on any other host it is the directory two levels above this SKILL.md.
+Commands below show Claude Code; on any other host substitute `<loom-code>`
+for `${CLAUDE_PLUGIN_ROOT}`.
 `${CLAUDE_PLUGIN_ROOT}` is substituted by Claude Code. `PLUGIN_ROOT` is provided to Codex plugin hook commands; it is not a general skill-shell variable.
 
 ## Artifact vocabulary
@@ -412,7 +415,7 @@ Review has started as JSON on stdin to:
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/second_vendor_policy.py
 ```
 
-On Codex, use the injected loom-code plugin root as in step 0. Treat the
+On any other host, use the `<loom-code>` root defined in step 0. Treat the
 JSON result as the decision: render its `notice_kind`, `notice_vendor`, and
 `recommendation_reasons`; do not reproduce the risk mapping in prose. A
 notice is commentary, not a decision point, and work continues without

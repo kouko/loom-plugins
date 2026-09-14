@@ -275,6 +275,35 @@ DEBT_LIST: frozenset[str] = frozenset(
 )
 
 
+# Only Claude Code substitutes this token in skill text; Codex CLI and
+# Antigravity CLI pass it through literally. A scoped contract that names it
+# must also carry OTHER_HOST_MARKER, the canonical start of the sentence that
+# tells every other host where the plugin root is (e.g. "on any other host it
+# is the directory two levels above this SKILL.md"). No debt list: every
+# live file was fixed when the rule landed.
+PLUGIN_ROOT_TOKEN = "${CLAUDE_PLUGIN_ROOT}"
+OTHER_HOST_MARKER = "on any other host"
+
+
+def lacks_other_host_fallback(text: str) -> bool:
+    """True when `text` names the Claude-only plugin-root token without the
+    other-host marker. Whitespace is collapsed so wrapped prose still matches,
+    and case is ignored so the marker may open a sentence."""
+    if PLUGIN_ROOT_TOKEN not in text:
+        return False
+    flat = " ".join(text.split()).lower()
+    return OTHER_HOST_MARKER not in flat
+
+
+def scan_plugin_root_fallbacks(repo_root: Path) -> list[str]:
+    """Repo-root-relative posix paths of scoped files that lack the fallback."""
+    return [
+        path.relative_to(repo_root).as_posix()
+        for path in iter_scope_files(repo_root)
+        if lacks_other_host_fallback(path.read_text(encoding="utf-8"))
+    ]
+
+
 def find_repo_root(start: Path) -> Path:
     """Walk up from `start` to the nearest `.git` dir; else cwd."""
     current = start.resolve()
@@ -311,6 +340,16 @@ def main(argv: list[str] | None = None) -> int:
         for rel_path in sorted(set(actual) - DEBT_LIST):
             for cand in actual[rel_path]:
                 print(f"    {rel_path}: {cand}", file=sys.stderr)
+        return 1
+
+    no_fallback = scan_plugin_root_fallbacks(repo_root)
+    if no_fallback:
+        for rel_path in no_fallback:
+            print(
+                f"PLUGIN ROOT WITHOUT OTHER-HOST FALLBACK: {rel_path} names "
+                f"{PLUGIN_ROOT_TOKEN} but never says '{OTHER_HOST_MARKER}'",
+                file=sys.stderr,
+            )
         return 1
 
     print(

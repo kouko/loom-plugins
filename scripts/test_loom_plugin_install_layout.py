@@ -494,6 +494,33 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
             )
 
 
+def test_sibling_lookup_allows_version_subdirectory() -> None:
+    """Every design station that locates `loom-code` by host covers the
+    non-Claude hosts too. Claude and Codex caches hold `<name>/<version>/`;
+    Antigravity CLI installs `<name>/` with no version directory, so the
+    other-host row must allow, not require, one version subdirectory."""
+    design_skills = REPO_ROOT / "loom-design" / "skills"
+    lookups = 0
+    for skill_md in sorted(design_skills.glob("*/SKILL.md")):
+        text = skill_md.read_text(encoding="utf-8")
+        if "| Where `loom-code` lives |" not in text:
+            continue
+        lookups += 1
+        rows = [line for line in text.splitlines() if line.startswith("| ")]
+        other = [
+            row
+            for row in rows
+            if "Codex CLI" in row and "Antigravity CLI" in row
+        ]
+        assert len(other) == 1, f"{skill_md} lacks one Codex/Antigravity row"
+        row = " ".join(other[0].split())
+        assert "on any other host" in row, skill_md
+        assert "two levels above this SKILL.md" in row, skill_md
+        assert "may contain one version subdirectory" in row, skill_md
+        assert "use the newest" in row, skill_md
+    assert lookups == 4
+
+
 def test_isolated_loom_workflow_bundle_contains_required_skills_and_executes(
     tmp_path: Path,
 ) -> None:

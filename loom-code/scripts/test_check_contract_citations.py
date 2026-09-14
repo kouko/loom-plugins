@@ -211,3 +211,50 @@ def test_store_directories_and_placeholder_shapes_stay_exempt() -> None:
         "docs/loom/discovery/<date>-<slug>",
     ):
         assert classify_citation(path) == "exempt", path
+
+
+# --- plugin-root other-host fallback -------------------------------------
+# Only Claude Code substitutes `${CLAUDE_PLUGIN_ROOT}`; Codex CLI and
+# Antigravity CLI pass it through literally, so a contract that names it must
+# also say where the plugin root is on any other host.
+
+
+def test_skill_root_phrase_has_other_host_fallback(tmp_path: Path) -> None:
+    from check_contract_citations import (
+        lacks_other_host_fallback,
+        scan_plugin_root_fallbacks,
+    )
+
+    text = (
+        "`<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude\n"
+        "Code; on any other\nhost it is the directory two levels above this SKILL.md.\n"
+    )
+    assert not lacks_other_host_fallback(text)
+    assert not lacks_other_host_fallback("no plugin-root token here\n")
+    _write_scoped_file(tmp_path, "loom-workflow/skills/s/SKILL.md", text)
+    assert scan_plugin_root_fallbacks(tmp_path) == []
+
+
+def test_bare_claude_plugin_root_without_fallback_rejected(
+    tmp_path: Path, capsys, monkeypatch
+) -> None:
+    import check_contract_citations as checker
+
+    text = "Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/x.py` from Claude or Codex.\n"
+    assert checker.lacks_other_host_fallback(text)
+    rel = "loom-design/skills/s/references/r.md"
+    _write_scoped_file(tmp_path, rel, text)
+    assert checker.scan_plugin_root_fallbacks(tmp_path) == [rel]
+    # Empty the debt list so the citation half passes on this fixture; the
+    # exit code must then come from the fallback rule alone.
+    monkeypatch.setattr(checker, "DEBT_LIST", frozenset())
+    assert checker.main(["--repo-root", str(tmp_path)]) == 1
+    err = capsys.readouterr().err
+    assert rel in err and checker.OTHER_HOST_MARKER in err
+
+
+def test_live_contracts_name_other_host_plugin_root() -> None:
+    from check_contract_citations import scan_plugin_root_fallbacks
+
+    repo_root = Path(__file__).resolve().parents[2]
+    assert scan_plugin_root_fallbacks(repo_root) == []

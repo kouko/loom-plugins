@@ -283,8 +283,10 @@ These exact runnable templates match the shipped CLI parsers:
 - `python3 "${CLAUDE_PLUGIN_ROOT}/skills/decision-map/scripts/map_progress.py" "<target>" --repo-root "<path>"`
 - `python3 "${CLAUDE_PLUGIN_ROOT}/skills/decision-map/scripts/start_delivery.py" "<map-dir>" "<DA-id>" "<change-id>" --repo-root "<path>"`
 
-`${CLAUDE_PLUGIN_ROOT}` is a load-time substitution performed when Claude or
-Codex renders the skill, not a run-time shell variable. Quoting the installed
+`${CLAUDE_PLUGIN_ROOT}` is this plugin's root, substituted on Claude Code when
+the skill is rendered; it is not a run-time shell variable. On any other host
+it is the directory three levels above this file (two above this skill's
+SKILL.md) — put that path in its place. Quoting the installed
 script and path placeholders keeps the rendered argv safe when paths contain
 spaces.
 
