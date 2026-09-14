@@ -1,5 +1,6 @@
 # Let the user choose which Loom steps a single change runs — spec
 intent: 2026-09-14-expert-mode-step-selection@17aaaa83
+confirmed-behavior: 2026-09-15 @0bfd5a8
 pre-build-review: required — changes who may waive verification at the publication gate (a security boundary) and extends the public attestation and contract format
 
 ## Requirements
