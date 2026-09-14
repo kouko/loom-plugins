@@ -23,8 +23,11 @@ At entry, run `loom_checker.py selection show <change-id>` and omit only the
 prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
 blind-run). The agent may suggest skipping steps at most once per change: it
 runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
-table, and keeps working on the full process at once; a plain "yes" binds
-nothing.
+table and the confirmation line (type `/loom-code:expert-mode` (Codex:
+`$expert-mode`) with the code shown), and keeps working on the full process at
+once; a plain "yes" binds nothing. When the user asks in their own words to run
+or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
+`--origin user`.
 
 ## 2. Compute review depth
 
@@ -61,6 +64,8 @@ fresh-context reviewers with distinct agent identities. The checker derives the
 floor from the cumulative branch delta and fails closed to two when it cannot
 classify the whole change. `finalize-review` and publication validation
 recompute the same policy; the orchestrator never declares or overrides it.
+When `selection show` lists `reviewers` as skipped, dispatch no reviewer and pass
+no `verdicts`.
 - A selected second vendor remains required. Resolve it from the standing
   fixed CLI, the per-change `ask` answer, or a `selection-confirmed` line
   naming the second vendor in the plan's `## Risks` section; the
@@ -137,6 +142,9 @@ Use a blind run when an Acceptance line cannot be settled mechanically. For
 code, skill, spec, or gate changes, create committed adversarial programs that
 exercise the relevant boundary and pass their paths and commands to
 `finalize-review`. Do not record a claimed result; finalization executes them.
+When `selection show` lists `adversarial` as skipped, create no adversarial
+program and omit the `adversarial` input. When it lists `blind-run` as skipped,
+run no blind run.
 
 ## 4. Converge within one bounded episode
 

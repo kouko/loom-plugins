@@ -19,8 +19,11 @@ At entry, run `loom_checker.py selection show <change-id>` and omit only the
 prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
 blind-run). The agent may suggest skipping steps at most once per change: it
 runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
-table, and keeps working on the full process at once; a plain "yes" binds
-nothing.
+table and the confirmation line (type `/loom-code:expert-mode` (Codex:
+`$expert-mode`) with the code shown), and keeps working on the full process at
+once; a plain "yes" binds nothing. When the user asks in their own words to run
+or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
+`--origin user`.
 
 ## 2. Implement test first
 
@@ -44,13 +47,15 @@ the contract's checkable definition; describe rejected routing parameters as
 a pre-execution host rejection, which selects the one atomic fallback instead
 of model escalation.
 
-For every behavior change:
+Unless `selection show` lists `tdd` as skipped, for every behavior change:
 
 1. Write the smallest failing test and run it to observe RED.
 2. Implement the minimum change and run it to GREEN.
 3. Refactor only while the focused suite stays green.
 
-Implementer dispatch is mandatory for every implementation task. Scheduling
+Unless `selection show` lists `implementer` as skipped, implementer dispatch is
+mandatory for every implementation task; when it is skipped, the main agent
+implements the task itself. Scheduling
 multiple implementers concurrently is optional and used only for genuinely
 independent file sets; no dispatch ledger is created. If implementer dispatch
 is unavailable, stop and report the blocker. The main agent must not substitute

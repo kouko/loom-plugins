@@ -77,8 +77,9 @@ def test_frontmatter_disables_model_invocation_and_openai_yaml_blocks_implicit()
 def test_skill_text_evaluates_no_gate() -> None:
     text = _skill()
     assert "<!-- gate:" not in text
-    invoked = set(re.findall(r"loom_checker\.py (selection \w+|[\w-]+)", text))
-    assert invoked == {"selection propose", "selection show", "selection cancel"}
+    invoked = set(re.findall(r"loom_checker\.py (selection [\w-]+|[\w-]+)", text))
+    assert invoked == {"selection propose", "selection show", "selection cancel",
+                       "selection skipped-review"}
     flat = _flat(text)
     assert "Never evaluate a gate" in flat
     assert "only from `loom_checker.py selection show <change-id>`" in flat
@@ -97,6 +98,47 @@ def test_skill_procedure_maps_proposes_reports_withdraws_and_relapses() -> None:
     assert "any language" in flat
     assert "stops shortcuts, not deliberately disguised commands" in flat
     assert "recorded only when Review hands it to the checker" in flat
+
+
+def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:
+    text = _skill()
+    flat = _flat(text)
+    affirmative(text, "pass `--skip intent,spec,plan,blind-run`", ("skipping",))
+    boundary = _flat(text.split("## Boundary", 1)[1])
+    assert ("`loom_checker.py selection skipped-review` lists merged changes on the default "
+            "branch whose attestation skipped reviewers.") in boundary
+    assert ("A change with a bound selection publishes only from a checkout sharing the git "
+            "common dir that holds its records; a fresh clone refuses it.") in boundary
+    affirmative(text, "only confirm the full process resumed", ("withdraws",))
+    affirmative(text, "the hook's lists differed from the table shown", ("show",))
+    cancel = next(s for s in re.split(r"(?<=\.)\s+", flat) if "selection cancel <change-id>" in s)
+    assert "other withdrawal wording" in cancel
+    assert "show the table again" not in cancel
+
+
+def test_readme_lists_expert_mode() -> None:
+    row = ("User-invoked only: choose which Loom steps one change runs or skips; "
+           "binds on a typed confirmation")
+    plugin_readme = (PLUGIN_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "[`expert-mode`](skills/expert-mode/SKILL.md) | " + row in plugin_readme
+    assert "**Skills**: 5 stations + 1 router + 1 user-invoked" in plugin_readme
+    root_readme = (PLUGIN_ROOT.parent / "README.md").read_text(encoding="utf-8")
+    assert "| `expert-mode` | " + row in root_readme
+
+
+def test_changelog_names_failure_sources_and_limits() -> None:
+    changelog = (PLUGIN_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    entry = _flat(changelog.split("## [3.3.0]", 1)[1].split("\n## [", 1)[0])
+    assert "skipped-review ledger" not in entry
+    for phrase in (
+        "failure events recorded by `finalize-review` and `selection record-failure`",
+        "`loom_checker.py selection skipped-review` lists merged changes that skipped reviewers",
+        "a fresh clone refuses it",
+        "Codex older than PR #18391",
+        "nested `claude` or `codex` session",
+        "separate from the net mechanism count",
+    ):
+        assert phrase in entry, phrase
 
 
 def test_ordinary_conversation_reaches_the_same_procedure() -> None:
@@ -168,5 +210,7 @@ def test_station_text_suggests_once_without_waiting(station: str) -> None:
     sentence = affirmative(text, "at most once per change", ("may suggest",))
     assert "`loom_checker.py selection propose <change-id> --origin agent`" in sentence
     assert "keeps working on the full process at once" in sentence
+    assert ("shows the table and the confirmation line (type `/loom-code:expert-mode` "
+            "(Codex: `$expert-mode`) with the code shown)") in sentence
     assert 'a plain "yes" binds nothing' in sentence
     assert _flat(text).count("at most once per change") == 1

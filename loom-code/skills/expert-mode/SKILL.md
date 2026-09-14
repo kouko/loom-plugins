@@ -27,9 +27,10 @@ and the attestation are not steps.
 - Nothing after the entry point: list the steps with one example sentence and
   stop; nothing is recorded.
 - Map the user's words, in any language, onto step names. Skipping the intent
-  also skips spec, plan and blind-run.
-- A word that is no step, or a skip another selected step needs: name the
-  item, ask the user to rephrase, and show no confirmation line.
+  also skips spec, plan and blind-run: pass `--skip intent,spec,plan,blind-run`.
+- A word that is no step, or a skip another selected step needs (other than
+  the intent's own spec, plan and blind-run): name the item, ask the user to
+  rephrase, and show no confirmation line.
 
 ## 2. Propose, show, wait
 
@@ -56,9 +57,13 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
 
 ## 4. Withdraw and lapse
 
-- On withdrawal wording in any language (`取消`, `cancel`, `キャンセル`,
-  `不對，剛剛那個不算`), run `loom_checker.py selection cancel <change-id>`, say
-  the full process resumed, and show the table again.
+- After a Loom hook message that withdraws the selection, only confirm the
+  full process resumed.
+- On other withdrawal wording in any language (`取消`, `cancel`, `キャンセル`,
+  `不對，剛剛那個不算`), run `loom_checker.py selection cancel <change-id>` and
+  say the full process resumed.
+- Show the table again only when the hook's lists differed from the table
+  shown.
 - After a rebase, or a merge of the default branch into the change, tell the
   user the bound selection lapsed and the full process resumed, then re-run
   `loom_checker.py selection propose` with the same steps and show the table
@@ -72,3 +77,7 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
   independent CI stays the trust boundary.
 - A reviewer rejection is recorded only when Review hands it to the checker
   (`selection record-failure`).
+- `loom_checker.py selection skipped-review` lists merged changes on the
+  default branch whose attestation skipped reviewers.
+- A change with a bound selection publishes only from a checkout sharing the
+  git common dir that holds its records; a fresh clone refuses it.

@@ -138,6 +138,7 @@ content-bound verification, one closing review and a fast publication gate.
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
 | `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |
+| `expert-mode` | User-invoked only: choose which Loom steps one change runs or skips; binds on a typed confirmation. |
 
 It also ships the `implementer`, `reviewer`, `blind-runner` and `adversary`
 agents that the stations dispatch.

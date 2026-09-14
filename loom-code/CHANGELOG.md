@@ -12,12 +12,21 @@
 - Attestation v2 carries a recomputed `selection` field; only confirmed skips
   waive their checks, and v1 attestations stay valid.
 - Publication discloses every skipped step in the pull request and lists prior
-  reviewer failures from the skipped-review ledger.
+  failures from the failure events recorded by `finalize-review` and
+  `selection record-failure`; `loom_checker.py selection skipped-review` lists
+  merged changes that skipped reviewers.
+- Limits: publication of a change with a bound selection must run from a
+  checkout sharing the git common dir that holds its records, and a fresh
+  clone refuses it; Codex older than PR #18391 does not guard file edits
+  against selection record writes; a nested `claude` or `codex` session whose
+  command names the entry point is denied.
 - Remove the unused lane settings from `KICKOFF-DEFAULTS.md`, the contract
   manifest and the templates.
 - Raise the counted-skill measurement ceiling from 21 to 22 for `expert-mode`;
-  the skill budget is a constant in `check_mechanisms.py --measure`, not an R3
-  budget exception, so a twenty-third counted skill still fails.
+  that ceiling is a constant in `check_mechanisms.py --measure`, not an R3
+  budget exception and separate from the net mechanism count, so a
+  twenty-third counted skill still fails. The `expert-mode` budget-exception
+  line below covers the skill's entry in that net count, not this ceiling.
 - Net mechanism count rises from 126 to 130: the five additions below, less
   the removed `artifact:intent.lane`; the widened Claude PreToolUse matcher
   renames its existing hook row rather than adding one.

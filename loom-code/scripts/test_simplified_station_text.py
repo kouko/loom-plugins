@@ -253,9 +253,10 @@ def test_build_has_no_evidence_accounting() -> None:
 def test_build_and_plan_require_implementer_dispatch_without_requiring_parallelism() -> None:
     for station in (BUILD, PLAN):
         prose = " ".join(station.split())
-        assert "Implementer dispatch is mandatory" in prose
         assert "Scheduling multiple implementers concurrently is optional" in prose
         assert "Parallel work is optional" not in station
+    assert "Implementer dispatch is mandatory" in " ".join(PLAN.split())
+    assert "implementer dispatch is mandatory" in " ".join(BUILD.split())
 
     build_prose = " ".join(BUILD.split())
     assert "If implementer dispatch is unavailable, stop and report the blocker" in build_prose
@@ -315,6 +316,37 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
         assert prose.count(read) == 1
         sentence = next(s for s in prose.split(". ") if read in s)
         assert not has_negation(sentence), sentence
+        own_words = (
+            "When the user asks in their own words to run or skip Loom steps, read "
+            "../expert-mode/SKILL.md and follow it with `--origin user`."
+        )
+        assert prose.count(own_words) == 1
+
+
+def test_build_obligations_yield_to_a_bound_selection() -> None:
+    build_prose = " ".join(BUILD.split())
+    assert "Unless `selection show` lists `tdd` as skipped, for every behavior change:" in build_prose
+    assert (
+        "Unless `selection show` lists `implementer` as skipped, implementer dispatch is "
+        "mandatory for every implementation task; when it is skipped, the main agent "
+        "implements the task itself."
+    ) in build_prose
+    assert "For every behavior change:" not in BUILD
+
+
+def test_review_dispatches_nothing_for_skipped_steps() -> None:
+    depth = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
+    checks = REVIEW.split("## 3. Run blind and adversarial checks", 1)[1].split("## 4.", 1)[0]
+    assert (
+        "When `selection show` lists `reviewers` as skipped, dispatch no reviewer and pass "
+        "no `verdicts`."
+    ) in " ".join(depth.split())
+    checks_prose = " ".join(checks.split())
+    assert (
+        "When `selection show` lists `adversarial` as skipped, create no adversarial program "
+        "and omit the `adversarial` input."
+    ) in checks_prose
+    assert "When it lists `blind-run` as skipped, run no blind run." in checks_prose
 
 
 def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
@@ -330,10 +362,14 @@ def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
 
 
 def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None:
+    assert "render_selection_disclosure" not in SHIP
     assert (
-        "open the Verification section with exactly the lines `render_selection_disclosure` renders "
-        "for the attestation (`Skipped steps:` lines, then `Prior failure:` lines)"
+        "open the Verification section with exactly these lines, filled from the attestation's "
+        "`selection` field: one `Skipped steps: <steps> — authority: <source> (<code>, "
+        "<YYYY-MM-DD>)` line per confirmation, then one `Prior failure: <step> <rule> "
+        "<YYYY-MM-DD>` line per prior failure"
     ) in SHIP_PROSE
+    assert "On a mismatch, `publish` prints the expected lines." in SHIP_PROSE
     assert (
         "When `selection show` lists the intent as skipped, obtain the one publication "
         "decision and publish with `--confirm-authorized`"

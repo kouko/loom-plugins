@@ -29,8 +29,11 @@ blind-run). When `selection show` lists the intent as skipped, obtain the one
 publication decision and publish with `--confirm-authorized`. The agent may
 suggest skipping steps at most once per change: it runs
 `loom_checker.py selection propose <change-id> --origin agent`, shows the
-table, and keeps working on the full process at once; a plain "yes" binds
-nothing.
+table and the confirmation line (type `/loom-code:expert-mode` (Codex:
+`$expert-mode`) with the code shown), and keeps working on the full process at
+once; a plain "yes" binds nothing. When the user asks in their own words to run
+or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
+`--origin user`.
 
 ## 2. Prepare publication text
 
@@ -68,8 +71,10 @@ do not depend on conversation recall. Use these headings exactly once:
 ```
 
 When the attestation carries a selection, open the Verification section with
-exactly the lines `render_selection_disclosure` renders for the attestation
-(`Skipped steps:` lines, then `Prior failure:` lines), and state that a
+exactly these lines, filled from the attestation's `selection` field: one
+`Skipped steps: <steps> — authority: <source> (<code>, <YYYY-MM-DD>)` line per
+confirmation, then one `Prior failure: <step> <rule> <YYYY-MM-DD>` line per
+prior failure. On a mismatch, `publish` prints the expected lines. State that a
 reviewer rejection Review never handed to the checker is unrecorded.
 
 Every decision summary states the chosen option, material alternatives,
