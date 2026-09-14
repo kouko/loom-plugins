@@ -30,6 +30,7 @@ EXPECTED_RULE_IDS = [
     "plan.field-caps",
     "push.attestation",
     "push.contextual-body",
+    "push.merge",
     "spec.req-grammar",
     "spec.ui-flows-recompute",
     "standing.product-principles-reject",
@@ -287,8 +288,8 @@ def test_hooks_probe_is_gone() -> None:
     assert "hooks-probe" not in CHECKER.read_text(encoding="utf-8").split('"""')[1]
 
 
-def test_the_rule_population_is_twenty() -> None:
-    assert len(run_checker("--list-rules").stdout.splitlines()) == 20
+def test_the_rule_population_is_twenty_one() -> None:
+    assert len(run_checker("--list-rules").stdout.splitlines()) == 21
 
 
 # --- contract --require (spec G) -------------------------------------------
