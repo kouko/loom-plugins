@@ -218,7 +218,9 @@ def test_session_mistyped_initial_steps_injects_at_most_once(tmp_path, initial_s
 
 def test_session_unwritable_marker_dir_does_not_crash(tmp_path):
     """A marker location that cannot be created still returns valid JSON with the context."""
-    (tmp_path / "loom-code-agy-session").write_text("a file where the dir should be")
+    if not hasattr(os, "getuid"):
+        pytest.skip("per-user marker directory is keyed by os.getuid, unavailable here")
+    (tmp_path / f"loom-code-agy-session-{os.getuid()}").write_text("a file where the dir should be")
     out = _run("pre-invocation", _invocation(), tmp_path)
     assert any("Station order:" in m for m in _messages(out))
 
