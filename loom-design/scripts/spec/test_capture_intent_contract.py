@@ -368,6 +368,23 @@ def test_reviewer_policy_summary_has_patch_release_metadata() -> None:
     assert "## [2.1.5]" in changelog
 
 
+def _branch_note() -> str:
+    section = _section(_text(), "## Step 5 — Hand off")
+    m = re.search(r"^Branch:.*$", section, re.M)
+    assert m, "Step 5 has no Branch: note"
+    return m.group(0)
+
+
+def test_capture_intent_names_typed_branch() -> None:
+    note = _branch_note()
+    assert "`loom-code:write-plan` creates `<type>/<change-id>`" in note
+
+
+def test_capture_intent_bare_branch_absent() -> None:
+    bare = "creates " + "`<change-id>`"  # split so the repo sweep grep skips this pin
+    assert bare not in _text()
+
+
 def test_plugin_declares_requires_contract() -> None:
     data = json.loads(PLUGIN_JSON.read_text(encoding="utf-8"))
     assert data["requires-contract"] == ">=2.1"

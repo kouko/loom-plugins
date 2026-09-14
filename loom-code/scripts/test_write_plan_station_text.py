@@ -240,6 +240,33 @@ def test_confirmed_selection_is_recorded_for_closing_review() -> None:
     assert "before committing the plan" not in flat
 
 
+# --- typed-branch-names W1-02 -- the branch is `<type>/<change-id>` -------
+
+
+def test_write_plan_names_typed_branch_and_types() -> None:
+    section = _section(
+        SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off"
+    )
+    flat = " ".join(section.split())
+    assert "git switch -c <type>/<change-id>" in flat
+    for kind in ("feat", "fix", "docs", "refactor", "test", "chore"):
+        assert f"`{kind}`" in flat, kind
+    hits = [
+        s for s in _flat_sentences(section)
+        if "pick" in s and "same type" in s and "commit" in s
+        and "PR title" in s and not _has_negation(s)
+    ]
+    assert hits, (
+        "Step 6 has no affirmative sentence saying the agent picks the type "
+        "and reuses it in the change's commit and PR title"
+    )
+
+
+def test_write_plan_bare_switch_absent() -> None:
+    bare = "switch -c " + "<change-id>"  # split so the repo sweep grep skips this pin
+    assert bare not in SKILL.read_text(encoding="utf-8")
+
+
 def test_current_release_metadata_is_synchronized() -> None:
     claude_manifest = json.loads(
         (REPO / "loom-code/.claude-plugin/plugin.json").read_text(encoding="utf-8")
