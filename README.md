@@ -236,6 +236,8 @@ Limits on Antigravity:
   `self` subagents that follow loom's agent contracts, on Gemini models.
 - The review station is `closing-review` on every host; the old `review` name
   was removed and has no alias.
+- `expert-mode` selections do not take effect: agy captures no prompt, so the
+  full process applies.
 
 ## Development
 

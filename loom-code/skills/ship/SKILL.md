@@ -25,8 +25,7 @@ The user may still explicitly stop publication before the outward action.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
 prose steps it lists as skipped (intent, spec, plan, implementer, tdd,
-blind-run). When `selection show` lists the intent as skipped, obtain the one
-publication decision and publish with `--confirm-authorized`. The agent may
+blind-run). The agent may
 suggest skipping steps at most once per change: it runs
 `loom_checker.py selection propose <change-id> --origin agent`, shows the
 table and the confirmation line (type `/loom-code:expert-mode` (Codex:

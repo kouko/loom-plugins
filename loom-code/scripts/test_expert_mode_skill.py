@@ -102,7 +102,6 @@ def test_skill_text_evaluates_no_gate() -> None:
 def test_skill_procedure_maps_proposes_reports_withdraws_and_relapses() -> None:
     text = _skill()
     flat = _flat(text)
-    affirmative(text, "also skips spec, plan and blind-run", ("skipping",))
     affirmative(text, "selection propose <change-id> --origin user --skip", ("run",))
     affirmative(text, "the code shown", ("type",))
     affirmative(text, "hook trust", ("name",))
@@ -117,8 +116,16 @@ def test_skill_procedure_maps_proposes_reports_withdraws_and_relapses() -> None:
 def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:
     text = _skill()
     flat = _flat(text)
-    affirmative(text, "pass `--skip intent,spec,plan,blind-run`", ("skipping",))
+    assert "--skip intent" not in flat
+    assert "`intent`, `spec`" not in flat
+    affirmative(text, "the intent is always kept", ("say",))
+    affirmative(text, "show the table of the remaining steps", ("say",))
     boundary = _flat(text.split("## Boundary", 1)[1])
+    affirmative(boundary, "a typed confirmation stays unrecorded", ("on antigravity cli",))
+    sentence = affirmative(boundary, "leave out the confirmation line", ("say",))
+    assert "selections take effect only where prompts are captured" in sentence
+    assert "keep the full process" in sentence
+    assert "hook trust" not in _flat(boundary)
     assert ("`loom_checker.py selection skipped-review` lists merged changes on the default "
             "branch whose attestation skipped reviewers.") in boundary
     assert ("A change with a bound selection publishes only from a checkout sharing the git "
@@ -172,8 +179,15 @@ def test_changelog_names_failure_sources_and_limits() -> None:
         "is a further layer and the only one on Codex",
         "confirmation and finalization must share the same Claude Code session",
         "separate from the net mechanism count",
+        "The intent is never skippable",
+        "expert-mode selections do not take effect on Antigravity CLI, where the full "
+        "process applies",
     ):
         assert phrase in entry, phrase
+    root_readme = (PLUGIN_ROOT.parent / "README.md").read_text(encoding="utf-8")
+    limits = _flat(root_readme.split("Limits on Antigravity:", 1)[1].split("\n## ", 1)[0])
+    assert ("- `expert-mode` selections do not take effect: agy captures no prompt, so "
+            "the full process applies.") in limits
 
 
 def test_ordinary_conversation_reaches_the_same_procedure() -> None:

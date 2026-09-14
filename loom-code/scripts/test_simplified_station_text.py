@@ -390,10 +390,9 @@ def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None
         "<YYYY-MM-DD>` line per prior failure"
     ) in SHIP_PROSE
     assert "On a mismatch, `publish` prints the expected lines." in SHIP_PROSE
-    assert (
-        "When `selection show` lists the intent as skipped, obtain the one publication "
-        "decision and publish with `--confirm-authorized`"
-    ) in SHIP_PROSE
+    assert "lists the intent as skipped" not in SHIP_PROSE
+    assert "## 1. Confirm publication authorization" in SHIP
+    assert "loom_checker.py publish --confirm-authorized --title" in SHIP_PROSE
 
 
 def test_code_only_surface_routing_matches_capture_intent() -> None:

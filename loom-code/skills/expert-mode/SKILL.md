@@ -21,17 +21,17 @@ change will use.
 
 ## 1. Map the words onto steps
 
-Steps: `intent`, `spec`, `plan`, `implementer`, `tdd`, `reviewers`,
-`adversarial`, `blind-run`, `package-tests`. Publication, the merge decision
-and the attestation are not steps.
+Steps: `spec`, `plan`, `implementer`, `tdd`, `reviewers`, `adversarial`,
+`blind-run`, `package-tests`. The intent, publication, the merge decision and
+the attestation are not steps.
 
 - Nothing after the entry point: list the steps with one example sentence and
   stop; nothing is recorded.
-- Map the user's words, in any language, onto step names. Skipping the intent
-  also skips spec, plan and blind-run: pass `--skip intent,spec,plan,blind-run`.
-- A word that is no step, or a skip another selected step needs (other than
-  the intent's own spec, plan and blind-run): name the item, ask the user to
-  rephrase, and show no confirmation line.
+- Map the user's words, in any language, onto step names.
+- When the user asks to skip the intent, say the intent is always kept and
+  show the table of the remaining steps.
+- A word that is no step, or a skip another selected step needs: name the
+  item, ask the user to rephrase, and show no confirmation line.
 
 ## 2. Propose, show, wait
 
@@ -51,7 +51,7 @@ same lists; when they differ from your table, say so and withdraw (§4).
 
 If `bound` is false, tell the user the confirmation was not captured. Name
 hook trust as the usual cause on Codex (its hooks run once the user trusts the
-plugin), and a stale or mistyped code otherwise; show the current table and
+plugin), and a stale or mistyped code on Claude Code; show the current table and
 code again and keep the full process.
 
 Claim a skip is in effect only from `loom_checker.py selection show <change-id>`.
@@ -87,3 +87,7 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
   again in that session. A nested unattended session (such as `claude -p`,
   even wrapped in `timeout`) never binds. Codex exports no session variable,
   so on Codex only the command-text guard applies.
+- On Antigravity CLI, or any other host that lacks prompt capture, a typed
+  confirmation stays unrecorded: say that selections take effect only where
+  prompts are captured, leave out the confirmation line, and keep the full
+  process.

@@ -130,8 +130,12 @@ def validate_selection(skip: list[str], run: list[str], manifest=None) -> list[s
     """Refusal reasons for a proposed skip list; empty when it is valid."""
     steps = step_vocabulary(manifest)
     names = [s["name"] for s in steps]
-    reasons = [f"unknown step {name!r} (steps: {', '.join(names)})"
-               for name in [*skip, *run] if name not in names]
+    reasons = []
+    if "intent" in [*skip, *run]:
+        reasons.append("the intent is always kept: landing a change requires its committed "
+                       "intent, so no selection runs or skips it")
+    reasons += [f"unknown step {name!r} (steps: {', '.join(names)})"
+                for name in [*skip, *run] if name not in names and name != "intent"]
     reasons += [f"step {name!r} is named in both --run and --skip" for name in run if name in skip]
     if reasons:
         return reasons

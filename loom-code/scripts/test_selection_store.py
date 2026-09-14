@@ -26,7 +26,7 @@ def no_host_session(monkeypatch):
 
 CHECKER = Path(__file__).with_name("loom_checker.py")
 CHANGE = "2026-09-14-example"
-FULL = ["intent", "spec", "plan", "implementer", "tdd", "reviewers",
+FULL = ["spec", "plan", "implementer", "tdd", "reviewers",
         "adversarial", "blind-run", "package-tests"]
 
 
@@ -117,9 +117,26 @@ def test_unknown_step_or_unmet_dependency_refused(tmp_path: Path) -> None:
     unknown = checker(repo, "propose", CHANGE, "--origin", "agent", "--skip", "publication")
     assert unknown.returncode != 0
     assert "publication" in unknown.stderr
-    unmet = checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "intent")
-    assert unmet.returncode != 0
-    assert "intent" in unmet.stderr and "spec" in unmet.stderr
+    assert selection.read_events(repo, CHANGE) == []
+    manifest = {"step_selection": {"steps": [
+        {"name": "spec", "requires": []}, {"name": "plan", "requires": ["spec"]}]}}
+    unmet = selection.validate_selection(["spec"], [], manifest)
+    assert unmet and "plan" in unmet[0] and "spec" in unmet[0]
+
+
+def test_intent_is_no_step_and_every_step_stands_alone() -> None:
+    steps = selection.step_vocabulary()
+    assert [s["name"] for s in steps] == FULL
+    assert all(s["requires"] == [] for s in steps)
+
+
+@pytest.mark.parametrize("flag", ["--skip", "--run"])
+def test_propose_refuses_intent_saying_it_is_always_kept(tmp_path: Path, flag: str) -> None:
+    repo = make_repo(tmp_path)
+    refused = checker(repo, "propose", CHANGE, "--origin", "user", flag, "intent")
+    assert refused.returncode != 0
+    assert "the intent is always kept" in refused.stderr
+    assert "unknown step" not in refused.stderr
     assert selection.read_events(repo, CHANGE) == []
 
 

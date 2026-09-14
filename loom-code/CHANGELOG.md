@@ -15,6 +15,8 @@
   failures from the failure events recorded by `finalize-review` and
   `selection record-failure`; `loom_checker.py selection skipped-review` lists
   merged changes that skipped reviewers.
+- The intent is never skippable: `selection propose` refuses `intent`, because
+  landing a change requires its committed intent.
 - Limits: publication of a change with a bound selection must run from a
   checkout sharing the git common dir that holds its records, and a fresh
   clone refuses it; Codex older than PR #18391 does not guard file edits
@@ -23,7 +25,8 @@
   unattended hook process refuses to bind; a command-text guard that denies
   nested `claude` or `codex` sessions naming the entry point is a further
   layer and the only one on Codex; confirmation and finalization must share
-  the same Claude Code session.
+  the same Claude Code session; expert-mode selections do not take effect on
+  Antigravity CLI, where the full process applies.
 - Remove the unused lane settings from `KICKOFF-DEFAULTS.md`, the contract
   manifest and the templates.
 - Raise the counted-skill measurement ceiling from 21 to 22 for `expert-mode`;
