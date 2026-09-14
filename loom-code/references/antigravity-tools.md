@@ -13,7 +13,7 @@ instead of assuming it.
 
 | Concept | Claude Code | Antigravity CLI |
 |---|---|---|
-| Dispatch a named loom agent | `Agent` with `subagent_type: "loom-code:<role>"` | `invoke_subagent` with `TypeName: "<role>"` |
+| Dispatch a named loom agent | `Agent` with `subagent_type: "loom-code:<role>"` | `invoke_subagent` with `TypeName: "self"`, as described under Dispatching loom roles |
 | Ask the user a question | `AskUserQuestion` | `ask_question` |
 | Run a shell command | `Bash` | `run_command` with `CommandLine` and `Cwd` |
 | Open a file | `Read` | `view_file` with `AbsolutePath` |
@@ -27,28 +27,44 @@ second-vendor reference owns when each host's question tool is used.
 Argument names for `ask_question`, `grep_search`, `find_by_name` and
 `list_dir` are unverified on agy 1.2.2; read them from the live tool schema.
 
-## Dispatching loom agents
+## Dispatching loom roles
 
-loom-code ships four agents: `implementer`, `reviewer`, `adversary` and
-`blind-runner`. agy loads each from `agents/<name>.md` and addresses it by
-that bare name, without the `loom-code:` prefix.
+loom-code ships four agent contracts: `implementer`, `reviewer`, `adversary`
+and `blind-runner`, each in `<loom-code>/agents/<role>.md`. agy also lists
+the plugin-provided agents of the same names, but gives a Markdown-defined
+agent no tools by default and loom's agent files declare none, so those
+agents have no tools on agy. Never use one of them as a `TypeName` on agy.
+
+Dispatch every loom role to agy's built-in `self` subagent instead. It starts
+from a fresh context (it does not see the parent conversation) and has
+working tools, including `view_file`, `write_to_file` and `run_command`.
+
+| loom role | `TypeName` | Contract the `Prompt` tells it to read first |
+|---|---|---|
+| `implementer` | `self` | `<loom-code>/agents/implementer.md` |
+| `reviewer` | `self` | `<loom-code>/agents/reviewer.md` |
+| `adversary` | `self` | `<loom-code>/agents/adversary.md` |
+| `blind-runner` | `self` | `<loom-code>/agents/blind-runner.md` |
 
 Call `invoke_subagent` with a `Subagents` array. Each item carries:
 
-- `TypeName` (required) — the bare agent name, for example `reviewer`.
-- `Role` (required) — a short label for this dispatch.
-- `Prompt` (required) — the station's input packet: resource paths, task,
-  acceptance criteria, as the agent contract's input section defines.
+- `TypeName` (required) — always `"self"`: `TypeName: "self"`.
+- `Role` (required) — the loom role this dispatch fills, as in the table.
+- `Prompt` (required) — first, an instruction to read
+  `<loom-code>/agents/<role>.md` (with `<loom-code>` resolved to an absolute
+  path as Plugin root below defines) and follow it as the subagent's
+  contract; then the station's normal dispatch packet: resource paths, task,
+  acceptance criteria, as that contract's input section defines.
 - `Model` (optional) — one of `inherit`, `flash_lite`, `flash`, `pro`.
 - `Workspace` (optional) — one of `inherit`, `branch`, `share`; the meaning
   of each value is unverified on agy 1.2.2.
 
-The subagent runs as a background task and the root agent waits for its
-reply. Whether each invocation starts from a fresh context is unverified on
-agy 1.2.2; every station requirement for fresh-context or distinct reviewers
-still applies, so give each dispatch a complete prompt and never reuse one
-agent's reply as another reviewer's verdict. Whether several items in one
-`Subagents` array run concurrently is unverified on agy 1.2.2.
+Use one `self` invocation per role. The subagent runs as a background task
+and the root agent waits for its reply. Every station requirement for
+fresh-context or distinct reviewers still applies: give each reviewer
+identity its own separate `self` invocation with a complete prompt, and never
+reuse one subagent's reply as another reviewer's verdict. Whether several
+items in one `Subagents` array run concurrently is unverified on agy 1.2.2.
 
 ## Model and effort overrides
 

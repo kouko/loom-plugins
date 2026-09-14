@@ -118,8 +118,9 @@ defaults が読み込まれず、agent がプロジェクトの外で作業す�
 更新は clone で `git pull` してから install を再実行します（install は
 インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
 です。hook（publication gate・session context・言語リマインダー）が走るのは `agy` CLI だけで、
-Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では reviewer・
-blind-runner・adversary の subagent は Gemini モデルで動きます。review station は
+Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では loom の役割
+（implementer・reviewer・adversary・blind-runner）は、loom の agent 契約に従う
+agy の `self` subagent として Gemini モデルで動きます。review station は
 どの host でも `closing-review` で、旧名 `review` は別名なしで削除されました。
 
 ## ライセンス

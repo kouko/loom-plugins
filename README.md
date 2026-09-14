@@ -226,7 +226,8 @@ Limits on Antigravity:
 - The plugin hooks (the push gate, the session context, the language reminder
   and the skill-folder rule) run only in the `agy` CLI, not in the Antigravity
   desktop app or IDE, so those gates are not enforced there.
-- The review, blind-run and adversary subagents run on Gemini models.
+- loom's roles (implementer, reviewer, adversary, blind-runner) run as agy
+  `self` subagents that follow loom's agent contracts, on Gemini models.
 - The review station is `closing-review` on every host; the old `review` name
   was removed and has no alias.
 

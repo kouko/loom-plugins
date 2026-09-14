@@ -96,6 +96,53 @@ def test_reference_names_no_claude_only_tool_for_agy() -> None:
     assert _claude_only_violations(REFERENCE.read_text(encoding="utf-8")) == []
 
 
+SELF_TYPENAME = 'TypeName: "self"'
+
+
+def _role_dispatch_ok(text: str, role: str) -> bool:
+    """A line routes ``role`` to the ``self`` subagent reading its contract."""
+    contract = f"<loom-code>/agents/{role}.md"
+    return any(
+        f"`{role}`" in line and "`self`" in line and contract in line
+        for line in text.splitlines()
+    )
+
+
+def _plugin_agent_typenames(text: str) -> list[str]:
+    """Places that hand a loom plugin agent name to agy as a TypeName.
+
+    A unit is a table row or a prose sentence; one that names ``TypeName``
+    and a loom agent (quoted or in backticks) is a violation.
+    """
+    units: list[str] = []
+    prose: list[str] = []
+    for line in text.splitlines():
+        if line.lstrip().startswith("|"):
+            units.append(line)
+        else:
+            prose.append(line)
+    units += _sentences("\n".join(prose))
+    found: list[str] = []
+    for unit in units:
+        if "TypeName" not in unit:
+            continue
+        for agent in AGENTS:
+            if re.search(rf"[`\"']{re.escape(agent)}[`\"']", unit):
+                found.append(agent)
+    return found
+
+
+def test_reference_dispatches_every_role_as_self_reading_its_contract() -> None:
+    text = REFERENCE.read_text(encoding="utf-8")
+    assert SELF_TYPENAME in text
+    for role in AGENTS:
+        assert _role_dispatch_ok(text, role), role
+
+
+def test_reference_never_invokes_a_plugin_agent_as_typename() -> None:
+    assert _plugin_agent_typenames(REFERENCE.read_text(encoding="utf-8")) == []
+
+
 # Synthetic self-tests: the checks accept a good example and reject a bad one.
 
 
@@ -121,3 +168,13 @@ def test_violation_check_rejects_claude_tool_in_agy_column_and_prose() -> None:
         "Claude Code: `AskUserQuestion`; agy: `ask_question`.\n"
     )
     assert _claude_only_violations(good) == []
+
+
+def test_role_dispatch_checks_accept_self_and_reject_plugin_typename() -> None:
+    good = "| `reviewer` | `self` | `<loom-code>/agents/reviewer.md` |"
+    assert _role_dispatch_ok(good, "reviewer")
+    assert not _role_dispatch_ok("| `reviewer` | `self` |", "reviewer")
+    assert _plugin_agent_typenames('Use `TypeName: "reviewer"`.') == ["reviewer"]
+    assert _plugin_agent_typenames("`TypeName` `blind-runner`") == ["blind-runner"]
+    assert _plugin_agent_typenames("`TypeName` (required), for example `reviewer`.") == ["reviewer"]
+    assert _plugin_agent_typenames(f"Use `{SELF_TYPENAME}`. The `reviewer` reads.") == []
