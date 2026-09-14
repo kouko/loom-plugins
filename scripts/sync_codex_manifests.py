@@ -207,14 +207,18 @@ def _agy_rule_source(plugin_dir: Path):
     return AGY_RULE_SOURCES.get(Path(plugin_dir).resolve().name)
 
 
-def derive_agy_rule(plugin_dir) -> str:
-    """A one-line generated-file header, then the source file verbatim."""
-    source = _agy_rule_source(plugin_dir)
+def _agy_rule_header(source) -> str:
     rel = "/".join(source)
-    header = (
+    return (
         f"<!-- Generated from {rel} by scripts/{Path(__file__).name}; "
         f"edit {rel}, not this file. -->\n"
     )
+
+
+def derive_agy_rule(plugin_dir) -> str:
+    """A one-line generated-file header, then the source file verbatim."""
+    source = _agy_rule_source(plugin_dir)
+    header = _agy_rule_header(source)
     return header + Path(plugin_dir).joinpath(*source).read_text(encoding="utf-8")
 
 
@@ -223,15 +227,31 @@ def sync_agy_rule(plugin_dir, check: bool = False) -> bool:
 
     A plugin without an ``AGY_RULE_SOURCES`` entry has no rule: always True,
     nothing written. A mapped plugin whose source file is absent gets no rule
-    either, so a leftover rule there is drift. ``check=True`` is a pure read.
+    either, so a leftover rule there is drift; sync deletes it when it carries
+    the generated header (a hand-written file is left for the user).
+    ``check=True`` is a pure read. Sync onto a directory at the rule path
+    prints a one-line error and returns False.
     """
     plugin_dir = Path(plugin_dir)
     source = _agy_rule_source(plugin_dir)
     if source is None:
         return True
     target_path = agy_rule_path(plugin_dir)
+    if not check and target_path.is_dir():
+        print(f"ERROR: {target_path} is a directory, not the generated rule; "
+              f"remove it and rerun: python3 {Path(__file__).name} {plugin_dir}",
+              file=sys.stderr)
+        return False
     if not plugin_dir.joinpath(*source).is_file():
-        return not (check and target_path.exists())
+        if check:
+            return not target_path.exists()
+        try:
+            orphan = target_path.read_text(encoding="utf-8")
+        except (OSError, ValueError):
+            orphan = ""
+        if orphan.startswith(_agy_rule_header(source)):
+            target_path.unlink()
+        return True
     derived = derive_agy_rule(plugin_dir)
     try:
         current = target_path.read_text(encoding="utf-8")
@@ -393,7 +413,8 @@ def main(argv: list[str] | None = None) -> int:
                 exit_code |= _check_agy_rule(plugin_dir)
             else:
                 sync_agy_manifest(plugin_dir)
-                sync_agy_rule(plugin_dir)
+                if not sync_agy_rule(plugin_dir):
+                    exit_code = 1
         return exit_code
 
     if args.plugin is None:
@@ -402,8 +423,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.scaffold:
         scaffold_plugin(args.plugin)
         sync_agy_manifest(args.plugin)
-        sync_agy_rule(args.plugin)
-        return 0
+        return 0 if sync_agy_rule(args.plugin) else 1
 
     if args.check:
         if not codex_manifest_path(args.plugin).exists():
@@ -424,8 +444,7 @@ def main(argv: list[str] | None = None) -> int:
 
     sync_plugin(args.plugin)
     sync_agy_manifest(args.plugin)
-    sync_agy_rule(args.plugin)
-    return 0
+    return 0 if sync_agy_rule(args.plugin) else 1
 
 
 if __name__ == "__main__":

@@ -276,13 +276,13 @@ def test_bare_python3_scripts_command_flagged(tmp_path: Path, capsys, monkeypatc
         "```\n"  # 4
         "Then python ./scripts/z.py.\n"  # 5 ./scripts/
         "Or bash scripts/x.sh, or sh scripts/x.sh.\n"  # 6 bash + sh
-        "PYTHON3 scripts/x.py\n"  # 7 uppercase
+        "PYTHON3 scripts/x.py\n"  # 7 uppercase: case-sensitive, not a command
     )
-    assert checker.find_bare_script_paths(text) == [1, 3, 5, 6, 7]
+    assert checker.find_bare_script_paths(text) == [1, 3, 5, 6]
     rel = "loom-workflow/skills/s/SKILL.md"
     _write_scoped_file(tmp_path, rel, text)
     assert checker.scan_bare_script_paths(tmp_path) == [
-        f"{rel}:{n}" for n in (1, 3, 5, 6, 7)
+        f"{rel}:{n}" for n in (1, 3, 5, 6)
     ]
     monkeypatch.setattr(checker, "DEBT_LIST", frozenset())
     assert checker.main(["--repo-root", str(tmp_path)]) == 1

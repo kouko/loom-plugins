@@ -348,18 +348,33 @@ def scan_plugin_root_fallbacks(repo_root: Path) -> list[str]:
 # forms (`<skill-dir>/scripts/...`, `${CLAUDE_SKILL_DIR}/scripts/...`) never
 # match: the path must start at `scripts/` or `./scripts/`. Fenced code is
 # scanned too — agents copy commands out of fences. No debt list.
+# Interpreter names match case-sensitively (`python`, `python3`, `python3.12`,
+# `bash`, `sh`) so prose like "Python scripts/ folder" is not a command.
+# Interpreter flags (`-u`, `-X utf8`, `-W error`) and a quoted path still run
+# the bare path. A backslash-continued command is joined before matching.
 _BARE_SCRIPT_RE = re.compile(
-    r"(?<![\w-])(?:python3?|bash|sh)[ \t]+(?:\./)?scripts/", re.IGNORECASE
+    r"(?<![\w-])(?:python(?:3(?:\.\d+)?)?|bash|sh)"
+    r"(?:[ \t]+(?:-[XW][ \t]*[^\s\"'-]\S*|-[A-Za-z]+))*"
+    r"[ \t]+[\"']?(?:\./)?scripts/"
 )
 
 
 def find_bare_script_paths(text: str) -> list[int]:
-    """1-based line numbers in `text` running a bare `scripts/` path."""
-    return [
-        number
-        for number, line in enumerate(text.splitlines(), start=1)
-        if _BARE_SCRIPT_RE.search(line)
-    ]
+    """1-based line numbers in `text` running a bare `scripts/` path. A
+    backslash-continued command reports its first line."""
+    hits: list[int] = []
+    lines = text.splitlines()
+    index = 0
+    while index < len(lines):
+        start = index
+        command = lines[index]
+        while command.endswith("\\") and index + 1 < len(lines):
+            index += 1
+            command = command[:-1] + " " + lines[index]
+        if _BARE_SCRIPT_RE.search(command):
+            hits.append(start + 1)
+        index += 1
+    return hits
 
 
 def scan_bare_script_paths(repo_root: Path) -> list[str]:
