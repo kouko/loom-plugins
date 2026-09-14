@@ -49,6 +49,8 @@ instruction removes, and discloses what was skipped and on what authority.
 - PRINCIPLES.md non-negotiable 2 is amended to state that steps the user explicitly skips fall outside its guarantee and must be disclosed; the amendment is re-ratified by kouko.
 - Protection stops an agent that takes a shortcut, such as running a documented command or writing a record file; an agent that deliberately disguises its commands to evade the local guard is outside the local guarantee, the same boundary Loom's other local gates keep (user-decided 2026-09-14).
 - A reviewer rejection is recorded only when the review station hands it to the checker; the pull request states that limit (user-decided 2026-09-14).
+- The intent itself cannot be skipped: every change keeps a confirmed intent, because it carries the acceptance lines and the publication and landing authority the merge path requires (user-decided 2026-09-15).
+- On hosts outside scope (such as Antigravity CLI) no confirmation is captured; the entry point says so and the full process applies (user-decided 2026-09-15).
 - New mechanisms arrive with regression evals (PRINCIPLES.md non-negotiable 4), including the case where the agent suggests a skip and the user replies with a plain "yes" instead of typing the confirmation.
 
 ## Value case
