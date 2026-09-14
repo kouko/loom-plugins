@@ -1,0 +1,149 @@
+"""Step-selection record store and effective-selection resolution.
+
+The store is append-only JSON lines at
+`<git common dir>/loom/selections/<change-id>.jsonl`: untracked, shared by
+every worktree of the repository, and never part of the functional digest.
+Events: `proposal`, `confirmation`, `cancel`, `failure`.
+
+Lifetimes: proposals, confirmations and cancels apply only while the current
+branch AND merge base equal the ones they recorded, so a reused change-id on
+another branch inherits nothing and a rebase makes a bound selection lapse.
+Failures are scoped by change-id (the file) and branch only, so a rebase
+cannot drop them.
+"""
+from __future__ import annotations
+
+from loom_checker.helpers import UsageError
+from loom_checker.helpers import branch_base
+from loom_checker.helpers import git_text
+from loom_checker.helpers import load_manifest
+
+from datetime import datetime, timezone
+from pathlib import Path
+import base64
+import hashlib
+import json
+
+
+ENTRY_TOKENS = frozenset(
+    {"/loom-code:expert-mode", "/expert-mode", "$expert-mode", "$loom-code:expert-mode"}
+)
+
+
+def step_vocabulary(manifest=None) -> list[dict]:
+    """The checker-owned steps, in manifest order, each with `requires`."""
+    manifest = manifest if manifest is not None else load_manifest()
+    steps = (manifest.get("step_selection") or {}).get("steps") or []
+    if not steps:
+        raise UsageError("the contract manifest declares no step_selection.steps.")
+    return [{"name": s["name"], "requires": list(s.get("requires") or [])} for s in steps]
+
+
+def selection_code(change_id: str, run: list[str], skip: list[str]) -> str:
+    """Four characters of sha256 over change-id + sorted run + sorted skip.
+
+    Uppercase RFC 4648 base32 rather than hex: 32^4 (about one million)
+    codes instead of 16^4 (65 536) for the same four keystrokes, and the
+    alphabet omits 0/1/8/9, so no digit is mistaken for O, I or B."""
+    payload = "\n".join([change_id, ",".join(sorted(run)), ",".join(sorted(skip))])
+    digest = hashlib.sha256(payload.encode("utf-8")).digest()
+    return base64.b32encode(digest).decode("ascii")[:4]
+
+
+def confirmation_prompt_matches(text: str, code: str) -> bool:
+    """First token is an entry-point token and the code is a standalone token."""
+    tokens = (text or "").split()
+    if not tokens or tokens[0] not in ENTRY_TOKENS:
+        return False
+    return code.upper() in (token.upper() for token in tokens[1:])
+
+
+def confirmation_is_valid(event: dict, proposal: dict) -> bool:
+    """The recorded prompt still hashes to its sha and still confirms the code."""
+    text = event.get("prompt_text")
+    if not isinstance(text, str) or event.get("code") != proposal.get("code"):
+        return False
+    if hashlib.sha256(text.encode("utf-8")).hexdigest() != event.get("prompt_sha256"):
+        return False
+    return confirmation_prompt_matches(text, proposal["code"])
+
+
+def store_path(repo: Path, change_id: str) -> Path:
+    common = Path(git_text(repo, "rev-parse", "--git-common-dir"))
+    if not common.is_absolute():
+        common = (repo / common).resolve()
+    return common / "loom" / "selections" / f"{change_id}.jsonl"
+
+
+def read_events(repo: Path, change_id: str) -> list[dict]:
+    path = store_path(repo, change_id)
+    if not path.is_file():
+        return []
+    events = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            events.append(json.loads(line))
+    return events
+
+
+def append_event(repo: Path, change_id: str, event: dict) -> None:
+    path = store_path(repo, change_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
+
+
+def now() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def current_scope(repo: Path) -> tuple[str, str]:
+    """(branch, merge base) a selection event must match to apply."""
+    return git_text(repo, "rev-parse", "--abbrev-ref", "HEAD"), branch_base(repo)
+
+
+def validate_selection(skip: list[str], run: list[str], manifest=None) -> list[str]:
+    """Refusal reasons for a proposed skip list; empty when it is valid."""
+    steps = step_vocabulary(manifest)
+    names = [s["name"] for s in steps]
+    reasons = [f"unknown step {name!r} (steps: {', '.join(names)})"
+               for name in [*skip, *run] if name not in names]
+    reasons += [f"step {name!r} is named in both --run and --skip" for name in run if name in skip]
+    if reasons:
+        return reasons
+    for step in steps:
+        if step["name"] in skip:
+            continue
+        for needed in step["requires"]:
+            if needed in skip:
+                reasons.append(f"step {step['name']!r} requires {needed!r}, which is skipped")
+    return reasons
+
+
+def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
+    """The step set stations and gates read: full set unless a valid,
+    uncancelled confirmation recorded on this branch and merge base exists."""
+    names = [s["name"] for s in step_vocabulary(manifest)]
+    branch, merge_base = current_scope(repo)
+    events = read_events(repo, change_id)
+    in_scope = [e for e in events
+                if e.get("branch") == branch and e.get("merge_base") == merge_base]
+    proposals = {e["id"]: e for e in in_scope if e.get("event") == "proposal"}
+    bound = None
+    for event in in_scope:
+        if event.get("event") == "cancel":
+            bound = None
+        elif event.get("event") == "confirmation":
+            proposal = proposals.get(event.get("proposal_id"))
+            if proposal is not None and confirmation_is_valid(event, proposal):
+                bound = (event, proposal)
+    failures = [e for e in events if e.get("event") == "failure" and e.get("branch") == branch]
+    if bound is None:
+        return {"change_id": change_id, "bound": False, "run": names, "skip": [],
+                "code": None, "failures": failures}
+    confirmation, proposal = bound
+    skip = [name for name in names if name in proposal["skip"]]
+    return {"change_id": change_id, "bound": True,
+            "run": [name for name in names if name not in skip], "skip": skip,
+            "code": proposal["code"], "source": confirmation.get("source"),
+            "confirmed_at": confirmation.get("at"), "failures": failures}

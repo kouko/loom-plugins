@@ -242,7 +242,19 @@ standing_docs:       # not per-change (§2a, §8)
     # lives at artifacts.kickoff-defaults.charter, not duplicated here --
     # one shape for the checker to read (wave-end:0-05).
 
-kickoff_defaults:    # grammar: `- <key>: <value> — <reason> (<date>)`
+step_selection:      # the only step names a user selection may run or skip; publication, the merge decision and the attestation are deliberately absent
+  steps:
+    - {name: intent,        requires: []}
+    - {name: spec,          requires: [intent]}
+    - {name: plan,          requires: [intent]}
+    - {name: implementer,   requires: []}
+    - {name: tdd,           requires: []}
+    - {name: reviewers,     requires: []}
+    - {name: adversarial,   requires: []}
+    - {name: blind-run,     requires: [intent]}
+    - {name: package-tests, requires: []}
+
+kickoff_defaults:   # grammar: `- <key>: <value> — <reason> (<date>)`
   - {name: second-vendor,          grammar: "<cli> | ask | suggest", note: "`ask` blocks once per full-lane change; `suggest` reports availability without waiting and permits opt-in only before full-lane Review"}
   - {name: docs-lint,              grammar: "<command> | none", note: "declared, not a blocker (W0-02): a declared command runs in CI for its report only; reviewer contract reads it to decide whether style findings are allowed at all"}
   - {name: package-tests,          grammar: "<command> | none", note: "the command finalize-review executes once and push.attestation validates by identity; absent = recomputed from build markers"}
