@@ -35,7 +35,7 @@ enforced, while Claude Code and Codex installs keep working exactly as before.
 
 ## Constraints
 - Claude Code and Codex install layout, skill names and behaviour must not change, except that the review station is renamed `closing-review` on every host (user-decided 2026-09-14; the old `review` name stops working and no alias is kept, because an alias named `review` would collide again on agy).
-- When the push gate blocks a push that lacks a review attestation, the missing attestation is named first on every host; which pushes are blocked does not change (user-decided 2026-09-14 after the first blind run).
+- When the push gate blocks a push that lacks a review attestation, the missing attestation is named first on every host; which pushes are blocked does not change (user-decided 2026-09-14 after the first blind run), except that publication commands are now recognised regardless of letter case (e.g. `GIT push`, `Gh pr create`), so those case variants are blocked on every host as well (user-decided 2026-09-14: closes a bypass on case-insensitive filesystems).
 - Target is the Antigravity CLI (`agy`, verified on 1.2.2); hooks stay host-installed plugin hooks, never repository-local or git hooks.
 - Skill folders stay flat (no nested subfolders), per the repository's skill structure rule.
 
