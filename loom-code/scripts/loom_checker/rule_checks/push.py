@@ -401,8 +401,6 @@ def git_dash_c_push_cwd(command: str, fallback: str) -> str | None:
                 for token in tokens[1:]
             ):
                 return None
-            if is_pr_merge_command(segment) and shell_root is None:
-                return None
             root = shell_root if shell_root is not None else Path(fallback)
             selected_roots.add(str(root.resolve()))
             continue

@@ -120,6 +120,38 @@ RULES.append((
 ))
 
 
+RULES.append((
+    "push.merge",
+    "The publication hook refuses every Bash command whose text contains the words "
+    "gh, pr, merge in order (wrappers, options and shell grammar included), before "
+    "repository selection; loom_checker.py land is the only merge path.",
+))
+
+
+RULES.append((
+    "land.merge",
+    "land merges nothing unless every precondition holds: an --accepted-by name equal to "
+    "the intent's originator or publication authorizer, a valid attestation at HEAD, one "
+    "open PR whose head is HEAD, every check passed (not only required ones), and a "
+    "MERGEABLE state other than BLOCKED, DIRTY, BEHIND, UNSTABLE, or DRAFT.",
+))
+
+
+RULES.append((
+    "land.verify",
+    "After land merges, the squash commit read back from the trunk carries the PR title "
+    "and the PR body; otherwise land stops before trunk sync and cleanup.",
+))
+
+
+RULES.append((
+    "land.cleanup",
+    "land removes a change's worktree and branches only when its PR is merged, the "
+    "worktree is clean apart from regenerable caches, and each branch tip equals the "
+    "merged PR head, selected by exact branch name; a changed sweep list removes nothing.",
+))
+
+
 def list_rules(out=sys.stdout) -> int:
     for rule_id, description in sorted(RULES):
         out.write(f"{rule_id}\t{description}\n")

@@ -9,12 +9,18 @@ from loom_checker.helpers import glob_to_regex
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
+from loom_checker.rule_checks.push import SHELL_PROGRAMS
+from loom_checker.rule_checks.push import _program
+from loom_checker.rule_checks.push import _shell_segments
+from loom_checker.rule_checks.push import _strip_prefix
+from loom_checker.rule_checks.push import _tokenise
 from loom_checker.rule_checks.push import canonical_git_push
 from loom_checker.rule_checks.push import canonical_pr_create_repo
 from loom_checker.rule_checks.push import check_pr_create_remote_head
 from loom_checker.rule_checks.push import git_dash_c_push_cwd
 from loom_checker.rule_checks.push import is_git_push_command
 from loom_checker.rule_checks.push import is_pr_create_command
+from loom_checker.rule_checks.push import is_pr_merge_command
 from loom_checker.rule_checks.push import is_push_command
 from loom_checker.rule_checks.push import quote_all_shell_token
 from pathlib import Path
@@ -59,6 +65,14 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     # The matcher is the tool name, so every Bash command arrives here; only
     # push-shaped commands are judged.
     command = str((payload.get("tool_input") or {}).get("command", ""))
+    if contains_pr_merge(command):
+        # `land` runs its own merge as a subprocess, never as a Bash tool
+        # call, so refusing here leaves exactly one merge path.
+        print(
+            "BLOCK push.merge: merge through loom_checker.py land --accepted-by <name>",
+            file=err,
+        )
+        return 2
     canonical_pr_repo = canonical_pr_create_repo(command)
     push_shaped = canonical_pr_repo is not None or is_push_command(command)
     git_push = is_git_push_command(command)
@@ -126,6 +140,59 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
             print(f"BLOCK push.attestation: {remote_error}", file=err)
             return 2
     return 2 if rc == 1 else rc
+
+
+# Word separators for the merge text rule: whitespace, quotes and shell
+# punctuation, so `(gh`, `'gh'`, `{ gh` and `then gh` all yield the word `gh`;
+# `$` separates too, so ANSI-C `$'merge'` and locale `$"merge"` yield `merge`.
+MERGE_TEXT_WORD = re.compile(r"[^\s'\"`;|&(){}<>!$]+")
+
+
+def mentions_pr_merge(command: str) -> bool:
+    """Fail-closed text rule: after joining backslash-newlines, a word `gh`
+    (or a path ending in `/gh`) followed later by the consecutive words `pr`
+    `merge`, case-insensitively, anywhere in the command text.
+
+    It ignores wrappers, options and shell grammar, so `sudo -u x`, `bash -lc`,
+    `( … )`, `if … then` and `xargs -n1` cannot hide a merge. Ceiling: it also
+    refuses commands that merely mention the words (`echo gh pr merge`, a
+    search pattern, a commit message) — accepted, because `land` is the only
+    merge path and a false refusal costs a rewording. It does not see a merge
+    assembled at run time (`printf`, variables, `gh api …/merge`)."""
+    words = [
+        word.lower()
+        for word in MERGE_TEXT_WORD.findall(command.replace("\\\n", ""))
+    ]
+    for index, word in enumerate(words):
+        if word != "gh" and not word.endswith("/gh"):
+            continue
+        tail = words[index + 1:]
+        if any(
+            tail[i] == "pr" and tail[i + 1] == "merge"
+            for i in range(len(tail) - 1)
+        ):
+            return True
+    return False
+
+
+def contains_pr_merge(command: str) -> bool:
+    """True when the fail-closed text rule matches, or a segment merges a PR
+    directly or inside the `eval` and `<shell> -c` forms `is_push_command`
+    unwraps."""
+    if mentions_pr_merge(command) or is_pr_merge_command(command):
+        return True
+    for segment in _shell_segments(command):
+        tokens = _strip_prefix(_tokenise(segment))
+        if not tokens:
+            continue
+        program = _program(tokens[0])
+        if program == "eval" and contains_pr_merge(" ".join(tokens[1:])):
+            return True
+        if program in SHELL_PROGRAMS and "-c" in tokens[1:]:
+            index = tokens.index("-c")
+            if index + 1 < len(tokens) and contains_pr_merge(tokens[index + 1]):
+                return True
+    return False
 
 
 def attestation_reason(command: str, cwd: str, rest: list[str]) -> str:
