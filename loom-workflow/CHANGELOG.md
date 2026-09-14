@@ -4,6 +4,15 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.1.0] — 2026-09-14 — loom-visualization triggers on Loom station reports
+
+- `loom-visualization`'s description now names Loom station reports to the
+  user (intent restatement, choices, blind-run results). An A/B on 18
+  station-reporting sessions per variant raised invocations from 12/18 to
+  18/18; the shipped text is the tested text, pinned by SHA-256 (evidence:
+  the change's A/B results in
+  `docs/loom/2026-09-14-loom-visualization-description-trigger/ab/results.md`).
+
 ## [5.0.0] — 2026-09-14 — loom-visualization replaces cot-explain
 
 - **BREAKING**: `cot-explain` is removed with no alias. Invocations of

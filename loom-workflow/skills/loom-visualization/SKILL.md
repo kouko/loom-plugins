@@ -1,7 +1,7 @@
 ---
 name: loom-visualization
 description: |
-  Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat; not Obsidian notes.
+  Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, including when a Loom station reports to the user (intent restatement, choices, blind-run results); not Obsidian notes.
 ---
 
 # Loom Visualization
