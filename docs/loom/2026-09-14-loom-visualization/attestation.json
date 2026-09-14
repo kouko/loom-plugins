@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v1",
   "change_id": "2026-09-14-loom-visualization",
-  "content_digest": "d705d335011207a87e54a8808034c5f4a326b9fa",
+  "content_digest": "44b87233d4c14d131add0ca1e3f20b9b25a22ffa",
   "executions": [
     {
       "kind": "package-tests",
@@ -90,6 +90,14 @@
       "anchor": "loom-code/agents/adversary.md",
       "text": "chore: the adversary contract cites references/attack-catalogue.md, which the installed loom-code 3.1.4 does not ship.",
       "reason": "Outside this change's scope; the adversary used references/adversarial.md recipes instead."
+    },
+    {
+      "severity": "nit",
+      "status": "fixed",
+      "source": "reviewer-skill-a6a8671f",
+      "anchor": "loom-workflow/README.md :: hooks/ tree, skills/ tree order, tagline",
+      "text": "nitpick: after the main merge the READMEs omitted the visualization-card hook, placed loom-visualization out of alphabetical order, and named only reasoning explainers in the tagline.",
+      "reason": "Fixed in the README nit commit before finalization; the reviewer confirms each fix in one line."
     }
   ]
 }
