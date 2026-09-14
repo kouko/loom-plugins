@@ -2,8 +2,8 @@
 originator: kouko
 kind: engineering
 needs-design: yes — multi-state selection flow (proposed step table, user-confirmed binding, mid-change reissue) with no spec
-status: confirmed 2026-09-14
-publication: automatic — authorized 2026-09-14 by kouko
+status: confirmed 2026-09-15
+publication: automatic — authorized 2026-09-15 by kouko
 
 ## Problem
 Every Loom change pays the full process regardless of size. A one-line
