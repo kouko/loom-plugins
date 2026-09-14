@@ -678,14 +678,15 @@ def run_measure(repo: Path) -> int:
 
     print(f"skill count (counted): {skill_count}")
     print(f"artifact-type count (manifest): {artifact_types}")
-    # Three optional discovery routers are explicitly admitted in release 3.1.3.
-    if skill_count > 21:
-        print(f"RED: skill count {skill_count} exceeds the loom budget of 21")
+    # Three optional discovery routers are explicitly admitted in release 3.1.3;
+    # the user-invoked expert-mode skill is explicitly admitted in release 3.4.0.
+    if skill_count > 22:
+        print(f"RED: skill count {skill_count} exceeds the loom budget of 22")
     if artifact_types > 8:
         print(f"RED: artifact-type count {artifact_types} exceeds the per-change budget of 8")
     print(f"session-start word count: {words}")
 
-    exit_code = 1 if (skill_count > 21 or artifact_types > 8) else 0
+    exit_code = 1 if (skill_count > 22 or artifact_types > 8) else 0
     if words < 0:
         print("RED: no loom-code/hooks/session-start to measure; the injection "
               "budget cannot be recomputed")

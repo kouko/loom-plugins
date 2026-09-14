@@ -23,6 +23,17 @@ never implies authorization. A legacy intent without that machine-readable field
 requires one publication decision before anything leaves the machine.
 The user may still explicitly stop publication before the outward action.
 
+At entry, run `loom_checker.py selection show <change-id>` and omit only the
+prose steps it lists as skipped (spec, plan, implementer, tdd,
+blind-run). The agent may
+suggest skipping steps at most once per change: it runs
+`loom_checker.py selection propose <change-id> --origin agent`, shows the
+table and the confirmation line (type `/loom-code:expert-mode` (Codex:
+`$expert-mode`) with the code shown), and keeps working on the full process at
+once; a plain "yes" binds nothing. When the user asks in their own words to run
+or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
+`--origin user`.
+
 ## 2. Prepare publication text
 
 Ship owns one top-level PR body schema. Reconstruct it from the current intent,
@@ -57,6 +68,13 @@ do not depend on conversation recall. Use these headings exactly once:
 ## Follow-ups
 <deferred work, or "None">
 ```
+
+When the attestation carries a selection, open the Verification section with
+exactly these lines, filled from the attestation's `selection` field: one
+`Skipped steps: <steps> — authority: <source> (<code>, <YYYY-MM-DD>)` line per
+confirmation, then one `Prior failure: <step> <rule> <YYYY-MM-DD>` line per
+prior failure. On a mismatch, `publish` prints the expected lines. State that a
+reviewer rejection Review never handed to the checker is unrecorded.
 
 Every decision summary states the chosen option, material alternatives,
 trade-offs, supporting evidence, and observed or expected outcome. This is an

@@ -14,7 +14,7 @@ Codex and Antigravity CLI:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.1.5 | 5 | Front of the flow: intent, specification, product principles, visual design. |
-| [`loom-code`](loom-code/) | 3.3.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-code`](loom-code/) | 3.4.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
 | [`loom-workflow`](loom-workflow/) | 5.2.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
@@ -138,6 +138,7 @@ content-bound verification, one closing review and a fast publication gate.
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
 | `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |
+| `expert-mode` | User-invoked only: choose which Loom steps one change runs or skips; binds on a typed confirmation. |
 
 It also ships the `implementer`, `reviewer`, `blind-runner` and `adversary`
 agents that the stations dispatch.
@@ -235,6 +236,8 @@ Limits on Antigravity:
   `self` subagents that follow loom's agent contracts, on Gemini models.
 - The review station is `closing-review` on every host; the old `review` name
   was removed and has no alias.
+- `expert-mode` selections do not take effect: agy captures no prompt, so the
+  full process applies.
 
 ## Development
 

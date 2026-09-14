@@ -308,6 +308,21 @@ def test_finalize_review_runs_and_writes_matching_attestation(tmp_path: Path) ->
     assert [run["kind"] for run in attestation["executions"]] == [
         "package-tests", "adversarial"
     ]
+    assert attestation["schema"] == "loom-attestation/v2"
+    assert attestation["selection"] is None
+
+
+def test_v1_attestation_still_validates_unchanged(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    assert attestation["schema"] == "loom-attestation/v1"
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    ) == []
+    attestation["selection"] = None
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    ) != []
 
 
 def test_finalize_review_accepts_one_reviewer_for_low_risk_change(tmp_path: Path) -> None:

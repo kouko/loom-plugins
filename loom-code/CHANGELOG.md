@@ -1,5 +1,51 @@
 # Changelog
 
+## [3.4.0] — 2026-09-15 — user-chosen Loom steps per change
+
+- Add the user-invoked `expert-mode` skill: it proposes which Loom steps a
+  change runs or skips, reports what bound, and withdraws a selection.
+- Add a prompt capture hook on Claude Code and Codex (`UserPromptSubmit`) that
+  binds a selection only from the user's own typed confirmation code.
+- Widen the PreToolUse guard over file tools so an agent cannot write the
+  selection record store; records live untracked under the git common dir
+  with branch-and-base scoped selections and persistent failure events.
+- Attestation v2 carries a recomputed `selection` field; only confirmed skips
+  waive their checks, and v1 attestations stay valid.
+- Publication discloses every skipped step in the pull request and lists prior
+  failures from the failure events recorded by `finalize-review` and
+  `selection record-failure`; `loom_checker.py selection skipped-review` lists
+  merged changes that skipped reviewers.
+- The intent is never skippable: `selection propose` refuses `intent`, because
+  landing a change requires its committed intent.
+- Limits: publication of a change with a bound selection must run from a
+  checkout sharing the git common dir that holds its records, and a fresh
+  clone refuses it; Codex older than PR #18391 does not guard file edits
+  against selection record writes; on Claude Code a confirmation binds only
+  when its prompt comes from the attended session that proposed it, and an
+  unattended hook process refuses to bind; a command-text guard that denies
+  nested `claude` or `codex` sessions naming the entry point is a further
+  layer and the only one on Codex; confirmation and finalization must share
+  the same Claude Code session; expert-mode selections do not take effect on
+  Antigravity CLI, where the full process applies.
+- Remove the unused lane settings from `KICKOFF-DEFAULTS.md`, the contract
+  manifest and the templates.
+- Raise the counted-skill measurement ceiling from 21 to 22 for `expert-mode`;
+  that ceiling is a constant in `check_mechanisms.py --measure`, not an R3
+  budget exception and separate from the net mechanism count, so a
+  twenty-third counted skill still fails. The `expert-mode` budget-exception
+  line below covers the skill's entry in that net count, not this ceiling.
+- Net mechanism count rises from 131 to 135: the five additions below, less
+  the removed `artifact:intent.lane`; the widened Claude PreToolUse matcher
+  renames its existing hook row rather than adding one.
+- budget-exception: expert-mode — user-invoked entry point for choosing Loom steps per change; eval loom-code/scripts/test_expert_mode_skill.py.
+- budget-exception: UserPromptSubmit::loom_checker.py — binds a selection only from the user's typed confirmation on Claude Code; eval loom-code/scripts/test_selection_capture.py.
+- budget-exception: UserPromptSubmit::loom_checker.py@codex — the same capture on Codex, never blocking when the checker is missing; eval loom-code/scripts/test_selection_capture.py.
+- budget-exception: PreToolUse:apply_patch|Edit|Write:loom_checker.py@codex — guards Codex file tools against selection record writes; eval loom-code/scripts/test_selection_guard.py.
+- budget-exception: artifact:attestation.selection — the attestation field that binds confirmed skips to the reviewed content; eval loom-code/scripts/test_selection_finalize.py.
+
+Contract 2.3 adds the attestation `selection` field and the step selection
+vocabulary; a leftover undeclared `lane:` line is tolerated.
+
 ## [3.3.0] — 2026-09-14 — land merges, syncs, and cleans up a reviewed change
 
 - Add `loom_checker.py land`. `land --accepted-by <name>` checks acceptance,

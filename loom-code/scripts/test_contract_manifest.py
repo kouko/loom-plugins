@@ -64,6 +64,8 @@ def test_loom_code_station_names_match_skill_dirs(manifest):
     router = "using-loom-code"
     assert router not in declared
     assert router in on_disk
+    # expert-mode is a user-only step-selection surface, not a lifecycle station.
+    on_disk -= {"expert-mode"}
     assert declared == on_disk - {router}
 
 
@@ -129,6 +131,54 @@ def test_kickoff_defaults_keys_declared(manifest):
             "interface-surfaces", "artifact-types"} <= keys
 
 
+MECHANISMS = REPO / "docs" / "loom" / "evidence" / "mechanisms.yaml"
+REPO_KICKOFF = REPO / "docs" / "loom" / "KICKOFF-DEFAULTS.md"
+
+
+def lane_residue(manifest: dict, intent_tmpl: str, kickoff_tmpl: str,
+                 mechanisms: str, repo_kickoff: str) -> list[str]:
+    """Every place the retired lane settings (intent `lane:`, kickoff
+    `default-lane`) still appear in the contract surfaces REQ-10 names."""
+    found = []
+    if any(f["name"] == "lane" for f in manifest["artifacts"]["intent"]["fields"]):
+        found.append("manifest intent.lane field")
+    if any(k["name"] == "default-lane" for k in manifest["kickoff_defaults"]):
+        found.append("manifest kickoff default-lane key")
+    if re.search(r"(?m)^lane:", intent_tmpl):
+        found.append("intent template lane: line")
+    if re.search(r"(?m)^- default-lane:", kickoff_tmpl):
+        found.append("KICKOFF template default-lane line")
+    if "artifact:intent.lane" in mechanisms:
+        found.append("mechanisms artifact:intent.lane row")
+    if re.search(r"(?m)^- default-lane:", repo_kickoff):
+        found.append("repo KICKOFF default-lane line")
+    return found
+
+
+def test_manifest_templates_and_mechanisms_agree_without_lane(manifest):
+    """A10 positive: no lane settings remain, and the repo KICKOFF records
+    the key's removal with a dated reason line (kickoff charter)."""
+    repo_kickoff = REPO_KICKOFF.read_text(encoding="utf-8")
+    assert lane_residue(
+        manifest,
+        (TEMPLATES / "intent.md").read_text(encoding="utf-8"),
+        (TEMPLATES / "KICKOFF-DEFAULTS.md").read_text(encoding="utf-8"),
+        MECHANISMS.read_text(encoding="utf-8"),
+        repo_kickoff,
+    ) == []
+    assert re.search(r"(?m)^Removed `default-lane` — .+ \(\d{4}-\d{2}-\d{2}\)$", repo_kickoff)
+
+
+def test_reintroduced_default_lane_key_fails_manifest_test(manifest):
+    """A10 negative: putting a `default-lane` key back is caught."""
+    import copy
+    mutated = copy.deepcopy(manifest)
+    mutated["kickoff_defaults"].append({"name": "default-lane", "grammar": "full"})
+    assert lane_residue(mutated, "", "", "", "") == ["manifest kickoff default-lane key"]
+    assert lane_residue(manifest, "", "- default-lane: full — x (2026-09-14)\n", "", "") == [
+        "KICKOFF template default-lane line"]
+
+
 def test_second_vendor_modes_remove_none_and_default_to_suggest(manifest):
     entry = next(k for k in manifest["kickoff_defaults"] if k["name"] == "second-vendor")
     template = (TEMPLATES / "KICKOFF-DEFAULTS.md").read_text(encoding="utf-8")
@@ -156,7 +206,7 @@ def test_manifest_declares_generated_attestation(manifest):
     assert schema["path"] == "docs/loom/<change-id>/attestation.json"
     assert schema["template"] == "attestation.json"
     names = [field["name"] for field in schema["fields"]]
-    assert names == ["schema", "change_id", "content_digest", "executions", "verdicts", "findings"]
+    assert names == ["schema", "change_id", "content_digest", "executions", "verdicts", "findings", "selection"]
     assert "review" not in manifest["artifacts"]
 
 

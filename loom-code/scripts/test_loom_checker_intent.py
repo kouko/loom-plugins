@@ -1036,3 +1036,29 @@ def test_kickoff_added_docs_glob_still_counts_regardless_of_type(tmp_path: Path)
     result = run_checker("intent", str(intent), cwd=repo)
     assert "intent.needs-design-recompute" in blocked_rules(result)
     assert "docs/guide.md" in result.stderr
+
+
+# --- lane grammar removed (expert-mode A10) --------------------------------
+
+
+def test_intent_with_leftover_lane_line_passes_schema(tmp_path: Path) -> None:
+    """The lane mechanism is gone: a `lane:` line left behind in an older
+    intent is an undeclared field, ignored like any other -- a bare value
+    with no dated attribution and no commit-message line no longer blocks."""
+    repo = make_repo(tmp_path)
+    intent = write_intent(repo / "docs/loom/intent/a.md", status="status: open\nlane: express")
+    seal(repo, intent)
+    result = run_checker("intent", str(intent), cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
+def test_no_lane_grammar_symbol_left_in_checker() -> None:
+    checker_dir = CHECKER.with_name("loom_checker")
+    symbols = ("LANE_LINE_PREFIX", "LANE_GRAMMAR", "check_lane_schema", "check_lane_reason", "lane:")
+    leftovers = [
+        f"{source.relative_to(checker_dir)}: {symbol}"
+        for source in sorted(checker_dir.rglob("*.py"))
+        for symbol in symbols
+        if symbol in source.read_text(encoding="utf-8")
+    ]
+    assert leftovers == []

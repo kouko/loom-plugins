@@ -1,8 +1,9 @@
 {
-  "schema": "loom-attestation/v1",
+  "schema": "loom-attestation/v2",
   "change_id": "<change-id>",
   "content_digest": "<functional-content-digest>",
   "executions": [],
   "verdicts": [],
-  "findings": []
+  "findings": [],
+  "selection": null
 }

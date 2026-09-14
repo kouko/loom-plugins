@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from git_exec import run_git
-from loom_checker.attestation import ATTESTATION_KEYS
-from loom_checker.attestation import ATTESTATION_SCHEMA
+from loom_checker.attestation import KEYS_BY_SCHEMA
 from loom_checker.helpers import GIT_TIMEOUT
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import git_maybe
@@ -121,17 +120,23 @@ def _committed_text(repo: Path, commit: str, relative: Path) -> tuple[str, str]:
 
 def _delivery_witness_valid(attestation: object, change_id: str) -> bool:
     """Validate stable witness shape without comparing it to a later tree."""
-    if not isinstance(attestation, dict) or set(attestation) != ATTESTATION_KEYS:
+    if not isinstance(attestation, dict) or attestation.get("schema") not in KEYS_BY_SCHEMA:
         return False
-    if attestation.get("schema") != ATTESTATION_SCHEMA or attestation.get("change_id") != change_id:
+    if set(attestation) != KEYS_BY_SCHEMA[attestation["schema"]] or attestation.get("change_id") != change_id:
         return False
     if not isinstance(attestation.get("content_digest"), str) or not attestation["content_digest"].strip():
         return False
+    skip: set = set()
+    recorded = attestation.get("selection")
+    if recorded is not None:
+        if not isinstance(recorded, dict) or not isinstance(recorded.get("skip"), list):
+            return False
+        skip = set(recorded["skip"])
     executions = attestation.get("executions")
     verdicts = attestation.get("verdicts")
-    if not isinstance(executions, list) or not executions:
+    if not isinstance(executions, list) or (not executions and not {"package-tests", "adversarial"} <= skip):
         return False
-    if not isinstance(verdicts, list) or not verdicts:
+    if not isinstance(verdicts, list) or (not verdicts and "reviewers" not in skip):
         return False
     if not isinstance(attestation.get("findings"), list):
         return False

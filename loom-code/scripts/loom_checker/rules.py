@@ -47,7 +47,7 @@ RULES: list[tuple[str, str]] = [
     (
         "intent.needs-design-reason",
         "The needs-design line carries a reason and appears verbatim in the message of the "
-        "commit that last changed the intent's status, needs-design or lane line.",
+        "commit that last changed the intent's status or needs-design line.",
     ),
     (
         "intent.needs-design-recompute",

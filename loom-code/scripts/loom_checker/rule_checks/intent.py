@@ -128,8 +128,8 @@ def deciding_commit(
     """The newest commit that CHANGED the intent's `status:` or
     `needs-design:` line -- the one that decided something. `prefixes`
     generalizes this to another frontmatter line with the same discipline
-    (the `lane:` switch line reuses it below) without touching the
-    needs-design/status callers, which keep the default.
+    without touching the needs-design/status callers, which keep the
+    default.
 
     Reading the newest touching commit instead made every later edit to the
     intent body (a new open question, an evidence path) owe the needs-design
@@ -325,85 +325,6 @@ def check_needs_design_reason(
             verdict,
         )
     return [], verdict
-
-
-LANE_LINE_PREFIX = ("lane:",)
-
-
-LANE_GRAMMAR = re.compile(
-    r"^(?P<name>express|gate-only|full)\s*(?:—|–|--)\s*"
-    r"(?:"
-    r"declared\s+(?P<declared_date>\d{4}-\d{2}-\d{2})\s+by\s+(?P<declared_by>[^,]+?)"
-    r"|"
-    r"switched\s+(?P<date>\d{4}-\d{2}-\d{2})\s+by\s+(?P<by>[^,]+?)\s*,\s*from\s+"
-    r"(?P<unit>wave|round)\s+(?P<n>\d+)"
-    r")"
-    r"\s*$"
-)
-
-
-def check_lane_schema(front) -> list[tuple[str, str]]:
-    """`lane:` is optional, but when present it must carry dated user
-    attribution -- the declared suffix `— declared <YYYY-MM-DD> by <name>`
-    or the switch suffix `— switched <YYYY-MM-DD> by <name>, from <wave
-    <n>|round <n>>`, both WITH `by <name>` -- a bare `lane: express` (no
-    suffix at all), or a suffix that omits who wrote it, is unrecoverable
-    and blocks here rather than being silently accepted as a plain
-    declaration."""
-    raw = front.get("lane", "").strip()
-    if not raw or LANE_GRAMMAR.match(raw):
-        return []
-    return [
-        (
-            "intent.schema",
-            f"`lane: {raw}` does not match the declared grammar `express | "
-            "gate-only | full — declared <YYYY-MM-DD> by <name>` or the switch "
-            "grammar `<name> — switched <YYYY-MM-DD> by <name>, from <wave "
-            "<n>|round <n>>` -- a bare lane name with no dated attribution is "
-            "not a legal value.",
-        )
-    ]
-
-
-def check_lane_reason(
-    front, commit_msg: Path | None, repo: Path, path: Path, out=sys.stdout
-) -> list[tuple[str, str]]:
-    """The `lane:` line, declared or switched, must appear verbatim in the
-    message of the commit that last changed it -- the same discipline
-    `check_needs_design_reason` applies to `status:`/`needs-design:`,
-    reused here (`deciding_commit`/`_decides_in_frontmatter` take a
-    `prefixes` argument for exactly this) since only the user may write
-    this line and its provenance matters the same way."""
-    raw = front.get("lane", "").strip()
-    if not raw:
-        return []
-    sha = relative = None
-    if commit_msg is not None:
-        if not commit_msg.is_file():
-            raise UsageError(f"no commit message file at {commit_msg}")
-        message, source = read_text(commit_msg), str(commit_msg)
-    else:
-        relative = path.resolve().relative_to(repo.resolve()).as_posix()
-        sha = deciding_commit(repo, relative, prefixes=LANE_LINE_PREFIX)
-        if sha is None:
-            message, source = "", f"{relative} (no commit has decided it yet)"
-        else:
-            message = git_text(repo, "show", "-s", "--format=%B", sha)
-            source = f"commit {sha[:7]}, which last changed lane"
-    line = f"lane: {raw}"
-    if _squeeze(line) not in _squeeze(message):
-        if sha is not None and relative is not None:
-            note = _squash_note(repo, relative, sha)
-            if note is not None:
-                out.write(note + "\n")
-                return []
-        return [
-            (
-                "intent.needs-design-reason",
-                f"the commit message ({source}) does not carry the line `{line}`.",
-            )
-        ]
-    return []
 
 
 TEMPLATES_GLOB = "**/templates/**"

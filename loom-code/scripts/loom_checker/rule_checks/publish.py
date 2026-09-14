@@ -9,8 +9,11 @@ CONTEXTUAL_PR_HEADINGS = (
 )
 
 
-def validate_contextual_pr_body(body: str) -> str | None:
-    """Recompute the structural PR-body floor; semantic truth stays review-owned."""
+DISCLOSURE_PREFIXES = ("Skipped steps:", "Prior failure:")
+
+
+def _body_sections(body: str) -> tuple[list[tuple[str, list[str]]], list[str]]:
+    """Top-level `## ` sections and every line outside fenced code."""
     sections: list[tuple[str, list[str]]] = []
     outside_fences: list[str] = []
     fence: tuple[str, int] | None = None
@@ -33,7 +36,12 @@ def validate_contextual_pr_body(body: str) -> str | None:
             sections.append((heading.group(1), []))
         elif sections:
             sections[-1][1].append(line)
+    return sections, outside_fences
 
+
+def validate_contextual_pr_body(body: str) -> str | None:
+    """Recompute the structural PR-body floor; semantic truth stays review-owned."""
+    sections, outside_fences = _body_sections(body)
     if [heading for heading, _content in sections] != list(CONTEXTUAL_PR_HEADINGS):
         return (
             "PR body must contain Ship's nine top-level contextual headings "
@@ -64,3 +72,45 @@ def validate_contextual_pr_body(body: str) -> str | None:
     ):
         return "PR body must not claim to expose private or hidden chain-of-thought"
     return None
+
+
+def render_selection_disclosure(attestation: object) -> list[str]:
+    """The lines `## Verification` must open with for this attestation.
+
+    One `Skipped steps:` line per confirmation in recorded order (newest
+    last), then one `Prior failure:` line per recorded prior failure. Ship's
+    prose and the publish validator both use this one renderer."""
+    selected = attestation.get("selection") if isinstance(attestation, dict) else None
+    if not isinstance(selected, dict):
+        return []
+    lines = []
+    for confirmation in selected.get("confirmations") or []:
+        steps = ", ".join(confirmation.get("skip") or []) or "none"
+        lines.append(
+            f"Skipped steps: {steps} — authority: {confirmation.get('source')} "
+            f"({confirmation.get('code')}, {str(confirmation.get('at'))[:10]})"
+        )
+    for failure in selected.get("prior_failures") or []:
+        lines.append(
+            f"Prior failure: {failure.get('step')} {failure.get('rule')} "
+            f"{str(failure.get('at'))[:10]}"
+        )
+    return lines
+
+
+def validate_selection_disclosure(body: str, attestation: object) -> str | None:
+    """`## Verification` opens with exactly the rendered disclosure and carries
+    no other disclosure line; with a null selection no such line may appear."""
+    expected = render_selection_disclosure(attestation)
+    sections, _ = _body_sections(body)
+    verification = next((lines for heading, lines in sections if heading == "Verification"), [])
+    present = [line.rstrip() for line in verification if line.strip()]
+    opening, rest = present[:len(expected)], present[len(expected):]
+    if opening == expected and not any(line.startswith(DISCLOSURE_PREFIXES) for line in rest):
+        return None
+    if not expected:
+        return ("PR body discloses skipped steps or prior failures, but the "
+                "attestation records no step selection")
+    return ("PR body section 'Verification' must start with exactly the "
+            "attestation's selection disclosure and no other disclosure line:\n"
+            + "\n".join(expected))
