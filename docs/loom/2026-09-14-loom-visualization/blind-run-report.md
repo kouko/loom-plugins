@@ -1,16 +1,17 @@
 # 聊天圖表技能（loom-visualization）— 我試了什麼、結果如何
 
 第一次試用：2026-09-14，在乾淨的專案副本 55c80731 上。
-修正後重試：2026-09-14，在乾淨的專案副本 b3678bfb 上。
+修正後重試：2026-09-14，在乾淨的專案副本 b3678bfb 上（第 1–6、9 條）。
+最終版本：2026-09-14，在乾淨的專案副本 76a1b005 上（第 7、10 條，另外快速重跑第 3 條）。
 
-一句話結論：修正之後，十條驗收裡九條照你要的方式運作，整套測試也通過了。還剩第 9 條只算部分可用：兩個工具都裝時，新的共存卡片改了寫法，現在兩張卡片對「中日文方框圖」會各自叫代理人用自己的工具（見第 9 條）。
+一句話結論：在最終版本上，十條驗收裡九條照你要的方式運作，整套測試也通過了。第 9 條只算部分可用：兩個工具都裝時，兩張卡片對「中日文方框圖」會各自叫代理人用自己的工具。這一點已經被駁回，留到之後的改動處理（見「我替你決定了的事」）。
 
 第 1、3、6、8 條是在 55c80731 上試的。後來的修正其實有動到其中三條會用到的東西，所以不能說「完全沒碰到」：
 - 第 3 條：客戶端判斷程式和客戶端對照表都有改。
 - 第 6 條：推理頁面的轉換程式和頁面模式說明都有改。
 - 第 8 條：技能主說明有改，比較選項改成「一律用 markdown 表格」。
 
-第 1、3、6 條很快，我在 b3678bfb 上重跑了一次，結果和之前一樣。第 8 條依指示沒有重跑，所以它的結果仍然代表修正前的行為。第 7 條（Obsidian 筆記庫的邊界）還會再修一次，所以保留 55c80731 的結果，標為「等最終版本出來後重跑」。
+第 1、3、6 條很快，我在 b3678bfb 上重跑了一次，結果和之前一樣。第 8 條依指示沒有重跑，所以它的結果仍然代表修正前的行為。最後一次修正（76a1b005）只動了 Obsidian 筆記庫的判斷、它的說明和測試，所以第 7 條和整套測試在 76a1b005 上重跑。這次修正也改了客戶端判斷程式，所以第 3 條也快速重跑：三種環境仍然都是「不用 Mermaid」。
 
 ## 你要的東西，一條一條看
 
@@ -29,7 +30,7 @@
 ### 3. Given the environment of a Claude Code terminal session, a Codex CLI session, and an unrecognised environment, the skill's client check chooses the documented form for each, and never chooses Mermaid for a client not confirmed to render it.
 - **我怎麼試**：分別模擬三種環境，執行客戶端判斷：Claude Code 終端機、Codex 命令列，以及一個什麼環境變數都沒有的空環境。另外加試遠端檢視。然後對照技能說明和客戶端對照表。55c80731 和 b3678bfb 各跑一次。
 - **結果**：兩次都一樣：三種環境分別被認成 Claude Code 命令列、Codex、無法辨識，全部回報「不用 Mermaid」，和說明寫的「表格加 ASCII」一致。修正後多了一項「目前資料夾是不是筆記庫」的回報（這裡都是「不是」），對照表也把 Claude Code 各介面能不能顯示表格改標為「未驗證」。這些都不影響選哪種形式。
-- **證據**：`evidence/a3-client-check.txt`、`evidence/b3678bfb/a3-client-check-b3678bfb.txt`
+- **證據**：`evidence/a3-client-check.txt`、`evidence/b3678bfb/a3-client-check-b3678bfb.txt`、`evidence/76a1b005/a3-client-check-76a1b005.txt`（最終版本上三種環境仍然都是「不用 Mermaid」；沒指定目標時，筆記庫欄位回到空值）
 - **判定**：可用。
 
 ### 4. ASCII diagrams with Chinese or Japanese labels produced through the skill pass its alignment check on a machine with no third-party Python packages installed.
@@ -51,12 +52,10 @@
 - **判定**：可用 — 頁面做得出來，驗證有效；忠實度檢查沒有跑。
 
 ### 7. When the requested output is a note inside an Obsidian vault, the skill declines and points to the Obsidian visualizer, and no template contains Obsidian-only syntax.
-> **等最終版本出來後重跑。** 這段是 55c80731 上的結果。之後的修正改了「沒指定目標時要不要檢查目前資料夾」，兩位審查者都認為範圍太寬，會再修回來。所以這條先不在 b3678bfb 上重試，等最終版本再重跑。
-
-- **我怎麼試**：（55c80731）做一個假的 Obsidian 筆記庫（裡面有 `.obsidian` 資料夾），分別問三個目標：庫裡子資料夾的筆記、庫根目錄的檔案、庫外面的檔案。再讀技能說明的邊界段落，並搜尋所有範本、參考文件、素材裡的 Obsidian 專屬寫法（雙中括號連結、提示框、`%%` 註解）。
-- **結果**：兩個庫內目標都回報「是筆記庫」，庫外回報「不是」。說明寫明遇到這種情況要拒絕，並指向 Obsidian 的 Mermaid 視覺化技能。三種專屬寫法都搜不到。這條我只驗證了判斷和說明文字，沒有真的叫代理人去寫筆記看它會不會拒絕。
-- **證據**：`evidence/a7-obsidian-boundary.txt`
-- **判定**：可用（55c80731）— 等最終版本出來後重跑。
+- **我怎麼試**：（76a1b005）做一個假的 Obsidian 筆記庫（裡面有 `.obsidian` 資料夾）。先指定目標檔案：庫裡子資料夾的筆記、庫根目錄的檔案、庫外面的檔案。再不指定目標，分別站在庫裡和庫外的資料夾執行，模擬「只是在聊天裡回答」。然後讀技能說明的邊界段落，並搜尋所有範本、參考文件、素材裡的 Obsidian 專屬寫法（雙中括號連結、提示框、`%%` 註解）。
+- **結果**：兩個庫內目標都回報「是筆記庫」，庫外回報「不是」。不指定目標時，不論站在庫裡還是庫外，都回報「沒有檢查」（空值），不會因為你剛好在筆記庫裡工作就拒絕。說明寫明：只有要寫進筆記庫的檔案、或你明說要一篇筆記庫筆記時才拒絕，並指向 Obsidian 的 Mermaid 視覺化技能；在筆記庫資料夾裡的聊天回答照常進行。三種專屬寫法都搜不到。中間那一版曾改成「沒指定目標就檢查目前資料夾」，兩位審查者認為範圍太寬，已經改回來。這條我只驗證了判斷和說明文字，沒有真的叫代理人去寫筆記看它會不會拒絕。
+- **證據**：`evidence/76a1b005/a7-obsidian-boundary-76a1b005.txt`；第一次的結果在 `evidence/a7-obsidian-boundary.txt`
+- **判定**：可用。
 
 ### 8. In a fresh session with only the loom plugins installed, asking the agent to compare several options or to explain a multi-step flow produces a table or diagram following the skill, without the user naming the skill.
 - **我怎麼試**：（55c80731，修正後沒有重跑）在一個跟本專案無關的暫存資料夾裡，開 7 個全新的非互動 Claude Code 對話，只載入這份副本的三個 loom 外掛，其他外掛全部關掉。三題要比較選項（記帳 app 的資料庫、前端框架、訊息佇列），三題要解說多步驟流程（git rebase、OAuth 授權碼流程、CI/CD），一題是一句話的事實題當對照組。題目都沒提到技能名稱。整組跑了兩次：第一次用命令列參數關掉其他外掛；第二次照規格的做法，在專案設定檔裡關掉。
@@ -72,9 +71,9 @@
 - **判定**：部分可用 — 大部分形狀只有一個工具負責，但中日文方框圖兩張卡片都搶。
 
 ### 10. The repository's package test suite passes.
-- **我怎麼試**：（b3678bfb）在乾淨副本裡照專案的指令跑整套 loom 測試。
-- **結果**：全部通過，退出碼 0。第一組是 1054 個通過、2 個略過，沒有失敗。其餘各組全部通過，Mermaid 那組的 11 張圖也包含在內，反例檢查也有跑。最後幾行是「11/11 mermaid blocks parsed」、兩行反例檢查的 PASS、「exit=0」。修正前那個寫死舊版本號的測試已經改好。
-- **證據**：`evidence/b3678bfb/package-tests-b3678bfb.txt`；修正前的失敗紀錄留在 `evidence/package-tests.txt`
+- **我怎麼試**：（76a1b005，最終版本）在乾淨副本裡照專案的指令跑整套 loom 測試。
+- **結果**：全部通過，退出碼 0。第一組 1054 個通過、2 個略過，沒有失敗。其餘各組全部通過，包括 Mermaid 那組 11 張圖和反例檢查。最後幾行是「11/11 mermaid blocks parsed」、「PASS — validator exits 1 on the A -> B block」、「PASS — FAIL line names <temp>/bad.md:3」、「exit=0」。第一次試用時那個寫死舊版本號的失敗，已經修好。
+- **證據**：`evidence/76a1b005/package-tests-76a1b005.txt`；b3678bfb 的結果在 `evidence/b3678bfb/package-tests-b3678bfb.txt`，第一次的失敗紀錄在 `evidence/package-tests.txt`
 - **判定**：可用。
 
 ## 對你既有的資料做了什麼
@@ -95,6 +94,7 @@
 - **自動測試的觸發範圍維持寬鬆** — 改到相關資料夾就會跑，會多跑一些，但不容易漏。
 - **Mermaid 那組測試需要 node 和網路** — 沒有 node 或連不上網，那組就算失敗，沒有略過選項。
 - **駁回的重要意見：只用命令列參數關掉 ascii-graph 時，開場提示程式看不到** — 我在第一次試用時提出。統籌者駁回的理由是：開場提示程式拿不到命令列設定的內容，這方面沒有公開文件可依據；一般安裝都是用設定檔開關外掛，而程式會讀設定檔。如果這個理由不成立，代價是：只用命令列關掉 ascii-graph 時，代理人仍可能看到共存卡片，被叫去用一個根本沒載入的工具。
+- **駁回的重要意見：兩個工具都裝時，中日文方框圖會收到兩個指示** — 我在修正後重試時提出。loom 的共存卡片說「由 loom-visualization 決定的方框圖，用它自己的對齊檢查來畫」，ascii-graph 的卡片卻說「只要有中日文標籤或三個以上方框，就先叫 ascii-graph」。統籌者在這次改動裡駁回，理由有兩個：審查這一輪已經用完三次內容修改的額度，要修得另開一個新改動；而且不管代理人照哪一個做，畫出來的都是寬度檢查過、對齊的圖，所以後果是重複的指示，不是壞掉的圖。要改的代價是：再開一個後續改動，刪掉那句話，或寫明這種圖歸誰。
 - **駁回的審查意見：保留開發依賴裡的 markdown-it-py 版本鎖定** — 理由是有一個專案啟動時的測試，在測試用的版本鎖定檔裡釘住了它。代價是開發環境還會裝這個執行時用不到的套件。
 - **駁回的審查意見：推理頁面轉換器裡兩個很長的函式不拆** — 理由是拆開有改變行為的風險。代價是這兩段之後比較難讀、難改。
 
