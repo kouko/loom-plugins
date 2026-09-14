@@ -1,6 +1,6 @@
 # Let the user choose which Loom steps a single change runs — spec
 intent: 2026-09-14-expert-mode-step-selection@17aaaa83
-confirmed-behavior: 2026-09-15 @0bfd5a8
+confirmed-behavior: 2026-09-15 @8951835
 pre-build-review: required — changes who may waive verification at the publication gate (a security boundary) and extends the public attestation and contract format
 
 ## Requirements
@@ -46,11 +46,12 @@ ship                ─► publish validates attestation + disclosure ─► PR
 ```
 
 1. **Step vocabulary is checker-owned** — agent-decided. The manifest gains
-   `step_selection.steps`: `intent`, `spec`, `plan`, `implementer`, `tdd`,
-   `reviewers`, `adversarial`, `blind-run`, `package-tests`, each with
-   `requires:` dependencies (`spec`, `plan` and `blind-run` require
-   `intent`). Publication, the merge decision and the attestation are not in
-   the vocabulary, so no instruction can name them. `propose` refuses
+   `step_selection.steps`: `spec`, `plan`, `implementer`, `tdd`,
+   `reviewers`, `adversarial`, `blind-run`, `package-tests`. The intent,
+   publication, the merge decision and the attestation are not in the
+   vocabulary, so no instruction can name them; `propose` refuses `intent`
+   with a message that the intent is always kept (user-decided 2026-09-15:
+   landing a change requires its committed intent). `propose` refuses
    unknown names and unmet dependencies.
 2. **Record store and threat model** — agent-decided. Append-only JSON lines
    at `<git common dir>/loom/selections/<change-id>.jsonl` with events
@@ -156,10 +157,10 @@ ship                ─► publish validates attestation + disclosure ─► PR
     `Prior failure: <step> <rule> <date>` line per recorded failure;
     `validate_contextual_pr_body` compares them with the attestation. No
     line is required when `selection` is null.
-11. **Skipping the intent** — agent-decided. The change-id is given at
-    `propose`. Automatic publication authority lives only in a confirmed
-    intent, so a change without one publishes through the existing
-    `--confirm-authorized` path: one publication decision at ship.
+11. **The intent is never skipped** — user-decided 2026-09-15. The landing
+    command requires the change's committed intent, and automatic
+    publication authority lives there, so a skippable intent would let a
+    change publish but never land.
 12. **Agent-recorded authority is reserved** — agent-decided. The
     attestation and disclosure grammar keep `agent-recorded` as a source
     value, satisfying the intent's fallback constraint, but no command
@@ -272,7 +273,8 @@ ship                ─► publish validates attestation + disclosure ─► PR
 **Pull request**
 - Success: a change with a bound selection → `## Verification` starts with `Skipped steps: reviewers, adversarial — authority: user-typed (K7Q2, 2026-09-14)` and any `Prior failure:` lines.
 - Success: a change with no selection → no skipped-steps line; the full process ran.
-- Success: the intent was skipped → ship asks one publication decision before pushing.
+- Error: asks to skip the intent → the agent says the intent is always kept and shows the table without it.
+- Error: uses the entry point on a host without prompt capture (Antigravity CLI) → the agent says selections cannot take effect there, shows no confirmation line, and keeps the full process.
 - Error: the disclosure disagrees with the attestation → publication is refused with the mismatch named; the agent rewrites the lines.
 
 **Skipped-review ledger**
