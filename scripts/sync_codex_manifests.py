@@ -278,6 +278,18 @@ def _check_agy_rule(plugin_dir: Path) -> int:
     if source.is_file() and not path.is_file():
         print(f"MISSING: {path} — {fix}", file=sys.stderr)
         return 1
+    if not source.is_file() and path.is_file():
+        try:
+            leftover = path.read_text(encoding="utf-8")
+        except (OSError, ValueError):
+            leftover = ""
+        if not leftover.startswith(_agy_rule_header(rel)):
+            # Sync only deletes a rule carrying the generated header, so
+            # rerunning it would never clear this file.
+            print(f"DRIFT: {path} has no generated header and its source "
+                  f"{source} is gone; sync will not delete a hand-written "
+                  f"file — remove it by hand.", file=sys.stderr)
+            return 1
     if not sync_agy_rule(plugin_dir, check=True):
         print(f"DRIFT: {path} differs from its source {source} "
               f"(or the source is gone). {fix}", file=sys.stderr)

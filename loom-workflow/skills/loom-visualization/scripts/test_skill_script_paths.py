@@ -6,12 +6,17 @@ defines a `<skill-dir>` token once in SKILL.md and every command uses it.
 """
 
 import re
+import sys
 from pathlib import Path
 
 SKILLS = Path(__file__).resolve().parent.parent.parent
 SKILL_DIRS = [SKILLS / "loom-visualization", SKILLS / "goal-create"]
 
-BARE_COMMAND = re.compile(r"\b(?:python3|bash|sh) (?:\./)?scripts/")
+# One matcher for the whole repo: the contract-citation lint's own, so this
+# test cannot drift weaker than the gate.
+sys.path.insert(0, str(SKILLS.parent.parent / "loom-code" / "scripts"))
+from check_contract_citations import find_bare_script_paths  # noqa: E402
+
 SKILL_DIR_SCRIPT = re.compile(r"<skill-dir>/scripts/([\w.-]+)")
 
 
@@ -29,12 +34,16 @@ def test_skill_dir_phrase_defined_and_used_for_every_script_call():
 
 
 def test_bare_scripts_path_left_in_skill_doc():
+    # The matcher must still see the bare forms, or an empty result is vacuous.
+    assert find_bare_script_paths("python3 scripts/render.py") == [1]
+    assert find_bare_script_paths('python3.12 -X utf8 "./scripts/x.py"') == [1]
+    assert find_bare_script_paths("python3 <skill-dir>/scripts/render.py") == []
+
     offenders = [
         f"{path.relative_to(SKILLS)}:{n}"
         for skill_dir in SKILL_DIRS
         for path in _markdown(skill_dir)
-        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1)
-        if BARE_COMMAND.search(line)
+        for n in find_bare_script_paths(path.read_text(encoding="utf-8"))
     ]
     assert not offenders, offenders
 

@@ -624,6 +624,22 @@ def test_agy_rule_absent_source_writes_nothing_and_orphan_fails_check(tmp_path):
     assert orphan.returncode != 0 and "DRIFT" in orphan.stderr, orphan.stderr
 
 
+def test_hand_written_orphan_rule_tells_user_to_remove_it_by_hand(tmp_path):
+    """No card and a rule without the generated header: sync would leave it,
+    so --check must say to delete it by hand, not to rerun the sync."""
+    plugin = _loom_workflow_fixture(tmp_path)
+    plugin.joinpath(*CARD_REL).unlink()
+    assert _run([], plugin).returncode == 0  # manifests in sync; only the rule is left
+    _rule_path(plugin).parent.mkdir()
+    _rule_path(plugin).write_text("hand-written\n", encoding="utf-8")
+
+    proc = _run(["--check"], plugin)
+    assert proc.returncode != 0, proc.stderr
+    assert "remove" in proc.stderr.lower() and "by hand" in proc.stderr, proc.stderr
+    assert "rules/AGENTS.md" in proc.stderr, proc.stderr
+    assert "Run: python3" not in proc.stderr, proc.stderr
+
+
 def test_claude_hook_still_injects_card_once(tmp_path):
     """A4 positive: one SessionStart card command; it injects the full card once."""
     plugin = REPO_ROOT / "loom-workflow"
