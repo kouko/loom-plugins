@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v1",
   "change_id": "2026-09-14-antigravity-cli-compatibility",
-  "content_digest": "f39555a9cc6d60143c070688490ebb629260def4",
+  "content_digest": "d96fdfa127ec902d245015103d05cfc50043dc33",
   "executions": [
     {
       "kind": "package-tests",
