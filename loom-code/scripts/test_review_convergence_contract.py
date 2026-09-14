@@ -1,9 +1,17 @@
 import re
+import subprocess
 from pathlib import Path
+
+import pytest
+
+from prose_pin import has_negation
 
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
+ADVERSARIAL_REF = (
+    ROOT / "loom-code/skills/closing-review/references/adversarial.md"
+).read_text(encoding="utf-8")
 REVIEWER = (ROOT / "loom-code/agents/reviewer.md").read_text(encoding="utf-8")
 REVIEW_WORDS = " ".join(REVIEW.split())
 CONTRACT = " ".join((REVIEW + "\n" + REVIEWER).split())
@@ -254,3 +262,87 @@ def test_blind_run_before_first_reviewer_dispatch() -> None:
     )
     assert sentence in words
     assert words.index(sentence) < words.index("loom_checker.py reviewer-count")
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-15-mechanical-checks-before-review — acceptance 3, 6, 7
+# ---------------------------------------------------------------------------
+
+BASE = "aa0cffff"
+
+
+def _flat_section(heading: str) -> str:
+    return " ".join(REVIEW.split(heading, 1)[1].split("\n## ", 1)[0].split())
+
+
+def test_reviewers_dispatched_after_build_checks() -> None:
+    depth = _flat_section("## 2. Compute review depth")
+    confirm = next(s for s in _sentences(depth) if s.startswith("Before dispatching reviewers in any round"))
+    for element in ("Build's hand-off", "complete package suite", "every adversarial program", "`selection show`"):
+        assert element in confirm, confirm
+    assert not has_negation(confirm), confirm
+    assert "Otherwise return the change to Build and dispatch no reviewer." in depth
+    assert depth.index(confirm) < depth.index("loom_checker.py reviewer-count")
+    round_two = next(s for s in REVIEW_WORDS.split("- **") if s.startswith("Round 2"))
+    assert "repeats its end-of-Build mechanical checks" in round_two
+
+
+def test_no_adversary_dispatch_in_closing_review() -> None:
+    assert "loom-code:adversary" not in REVIEW
+    assert "adversary dispatch" not in REVIEW_WORDS
+    assert "create committed adversarial programs" not in REVIEW_WORDS
+    assert "Run blind and adversarial checks" not in REVIEW
+    for sentence in _sentences(REVIEW_WORDS):
+        if re.search(r"\badversary\b", sentence):
+            assert has_negation(sentence), sentence
+    opening = " ".join(ADVERSARIAL_REF.split("\n## ", 1)[0].split())
+    assert "at the end of Build" in opening
+    assert "a later round can re-run it" not in opening
+    recording = " ".join(ADVERSARIAL_REF.split("## Recording", 1)[1].split())
+    assert "Build re-runs" in recording
+    assert "`finalize-review`" in recording
+
+
+def test_finalize_failure_fix_needs_next_round() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    sentence = next(s for s in _sentences(finalize) if s.startswith("When `finalize-review` fails"))
+    for element in ("return the fix to Build", "next review round", "before `finalize-review` runs again"):
+        assert element in sentence, sentence
+    assert not has_negation(sentence), sentence
+    assert "The checker runs the declared package suite and each adversarial program once." in finalize
+
+
+def test_earlier_verdicts_not_reused() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    assert "Earlier verdicts are never reused for the fixed content." in finalize
+    for sentence in _sentences(REVIEW_WORDS):
+        if re.search(r"\breus(?:e|ed|es|ing)\b", sentence, re.IGNORECASE):
+            assert has_negation(sentence), sentence
+    rerun_with_old = re.compile(
+        r"\b(?:re-?run|run)\b[^.]*`finalize-review`[^.]*\b(?:same|earlier|previous|existing|prior) verdicts",
+        re.IGNORECASE,
+    )
+    assert not [s for s in _sentences(REVIEW_WORDS) if rerun_with_old.search(s)]
+
+
+def test_no_diff_to_finalize_attestation_push_code() -> None:
+    probe = subprocess.run(
+        ["git", "-C", str(ROOT), "cat-file", "-e", f"{BASE}^{{commit}}"],
+        capture_output=True,
+    )
+    if probe.returncode != 0:
+        pytest.skip(f"not a git checkout containing {BASE}")
+    guarded = [
+        "loom-code/scripts/loom_checker/command_handlers/finalize.py",
+        "loom-code/scripts/loom_checker/attestation.py",
+        "loom-code/scripts/loom_checker/command_handlers/push.py",
+        "loom-code/scripts/test_selection_finalize.py",
+        "loom-code/scripts/test_loom_attestation.py",
+    ]
+    for path in guarded:
+        assert (ROOT / path).is_file(), path
+    diff = subprocess.run(
+        ["git", "-C", str(ROOT), "diff", "--name-only", BASE, "--", *guarded],
+        capture_output=True, text=True, check=True,
+    )
+    assert diff.stdout.strip() == ""

@@ -362,17 +362,18 @@ def test_build_obligations_yield_to_a_bound_selection() -> None:
 
 def test_review_dispatches_nothing_for_skipped_steps() -> None:
     depth = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
-    checks = REVIEW.split("## 3. Run blind and adversarial checks", 1)[1].split("## 4.", 1)[0]
+    assert "## 3. Run blind and adversarial checks" not in REVIEW
+    checks = REVIEW.split("## 3. Run the blind run", 1)[1].split("## 4.", 1)[0]
     assert (
         "When `selection show` lists `reviewers` as skipped, dispatch no reviewer and pass "
         "no `verdicts`."
     ) in " ".join(depth.split())
     checks_prose = " ".join(checks.split())
     assert (
-        "When `selection show` lists `adversarial` as skipped, create no adversarial program "
-        "and omit the `adversarial` input."
+        "When `selection show` lists `adversarial` as skipped, Build hands off no adversarial "
+        "program and §5 omits the `adversarial` input."
     ) in checks_prose
-    assert "When it lists `blind-run` as skipped, run no blind run." in checks_prose
+    assert "When `selection show` lists `blind-run` as skipped, run no blind run." in checks_prose
 
 
 def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
