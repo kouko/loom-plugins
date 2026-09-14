@@ -66,3 +66,4 @@ Wave 4 — release
 2. The suite runs twice per change, at Build end and in finalize-review; removing the second run needs checker changes the intent excludes.
 3. Branch renamed from speedup-reviewer-subagent to feat/2026-09-15-mechanical-checks-before-review so the PR title type matches; herdr workspace metadata may still show the old name.
 4. The missing attack-catalogue reference stays broken for adversary skill and gate attacks; it is out of scope and should become its own intent.
+5. Ordinary dispatches load the installed reviewer contract, so closing reviewers run from a --plugin-dir headless session on the branch plugin (probe evidence plugin-dir-reviewer-probe.md); the edited contract then reviews its own change; agent-decided.
