@@ -92,6 +92,12 @@ def _tokenise(segment: str) -> list[str]:
         return segment.split()
 
 
+def _program(token: str) -> str:
+    """Executable basename, case-folded: a case-insensitive filesystem (default
+    macOS) runs ``GIT push`` as git."""
+    return Path(token).name.lower()
+
+
 def _strip_prefix(tokens: list[str]) -> list[str]:
     """Drop `VAR=…` assignments and wrapper words that precede the program."""
     index = 0
@@ -99,7 +105,7 @@ def _strip_prefix(tokens: list[str]) -> list[str]:
         if ASSIGNMENT.match(tokens[index]):
             index += 1
             continue
-        wrapper = Path(tokens[index]).name
+        wrapper = _program(tokens[index])
         if wrapper not in PREFIX_WORDS:
             break
         index += 1
@@ -141,7 +147,7 @@ def is_push_command(command: str) -> bool:
         tokens = _strip_prefix(_tokenise(segment))
         if not tokens:
             continue
-        program = Path(tokens[0]).name
+        program = _program(tokens[0])
         if program == "eval":
             if is_push_command(" ".join(tokens[1:])):
                 return True
@@ -163,7 +169,7 @@ def is_pr_create_command(command: str) -> bool:
     """True when a shell segment creates a PR."""
     for segment in _shell_segments(command):
         tokens = _strip_prefix(_tokenise(segment))
-        if not tokens or Path(tokens[0]).name != "gh":
+        if not tokens or _program(tokens[0]) != "gh":
             continue
         rest = tokens[1:]
         found = _subcommand_at(rest, GH_VALUE_OPTIONS)
@@ -178,7 +184,7 @@ def is_pr_merge_command(command: str) -> bool:
     """True when a shell segment merges a PR."""
     for segment in _shell_segments(command):
         tokens = _strip_prefix(_tokenise(segment))
-        if not tokens or Path(tokens[0]).name != "gh":
+        if not tokens or _program(tokens[0]) != "gh":
             continue
         rest = tokens[1:]
         found = _subcommand_at(rest, GH_VALUE_OPTIONS)
@@ -309,7 +315,7 @@ def is_git_push_command(command: str) -> bool:
         tokens = _strip_prefix(_tokenise(segment))
         if not tokens:
             continue
-        program = Path(tokens[0]).name
+        program = _program(tokens[0])
         if program == "eval":
             if is_git_push_command(" ".join(tokens[1:])):
                 return True
@@ -339,7 +345,7 @@ def git_dash_c_push_cwd(command: str, fallback: str) -> str | None:
         tokens = _strip_prefix(raw_tokens)
         if not tokens:
             continue
-        if any(Path(token).name == "env" for token in raw_tokens) and any(
+        if any(_program(token) == "env" for token in raw_tokens) and any(
             token.startswith("-C")
             or token == "--chdir"
             or token.startswith("--chdir=")
@@ -351,7 +357,7 @@ def git_dash_c_push_cwd(command: str, fallback: str) -> str | None:
             and token.split("=", 1)[0] in GIT_REPOSITORY_ENV
             for token in raw_tokens
         )
-        program = Path(tokens[0]).name.lstrip("(")
+        program = _program(tokens[0]).lstrip("(")
         if program == "export" and any(
             token.split("=", 1)[0] in GIT_REPOSITORY_ENV
             for token in tokens[1:]
@@ -385,7 +391,7 @@ def git_dash_c_push_cwd(command: str, fallback: str) -> str | None:
             index = tokens.index("-c")
             if index + 1 < len(tokens) and is_push_command(tokens[index + 1]):
                 return None
-        if any(Path(token).name == "xargs" for token in raw_tokens) and is_push_command(segment):
+        if any(_program(token) == "xargs" for token in raw_tokens) and is_push_command(segment):
             return None
         if program == "gh" and is_push_command(segment):
             if repository_env_changed or any(

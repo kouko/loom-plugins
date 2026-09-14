@@ -16,6 +16,7 @@ read-only commands is allowed (the same set as the Codex stale-root fallback).
 """
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -30,7 +31,9 @@ PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 CHECKER = PLUGIN_ROOT / "scripts" / "loom_checker.py"
 SESSION_START = PLUGIN_ROOT / "hooks" / "session-start"
 LANGUAGE_ANCHOR = PLUGIN_ROOT / "hooks" / "language-anchor.py"
-LOOM_PLUGIN_SEGMENTS = ("/loom-code/", "/loom-design/", "/loom-workflow/")
+# <loom-plugin>/[<version>/]skills/<name>/SKILL.md, as agy, Claude Code and a checkout lay it out.
+LOOM_SKILL_PATH_RE = re.compile(
+    r"/loom-(?:code|design|workflow)/(?:[^/]+/)?skills/[^/]+/SKILL\.md$")
 USER_REQUEST_RE = re.compile(r"<USER_REQUEST>(.*?)</USER_REQUEST>", re.DOTALL)
 
 
@@ -174,27 +177,34 @@ def _session_context(payload: dict) -> str:
 def _state_file(kind: str, payload: dict) -> Path:
     conversation = str(payload.get("conversationId") or os.environ.get("ANTIGRAVITY_CONVERSATION_ID")
                        or payload.get("transcriptPath") or "unknown")
-    return Path(tempfile.gettempdir()) / kind / re.sub(r"[^A-Za-z0-9_.-]", "_", conversation)
+    name = re.sub(r"[^A-Za-z0-9_.-]", "_", conversation)
+    if not name.strip("."):  # "." and ".." name the directory itself, not a file in it
+        name = "_" + hashlib.sha256(conversation.encode("utf-8")).hexdigest()[:16]
+    return Path(tempfile.gettempdir()) / kind / name
 
 
-def _first_turn_session_context(payload: dict) -> str:
+def _first_turn_session_context(payload: dict) -> tuple[str, Path | None]:
     """agy resets invocationNum to 0 on every user turn, so the first turn is
     invocationNum 0 with at most one prior step; a per-conversation marker
-    keeps a resumed or compacted conversation from being re-injected."""
+    keeps a resumed or compacted conversation from being re-injected.
+
+    Returns the context and the marker to write once the output is built."""
     initial_steps = payload.get("initialNumSteps", 0)
     if payload.get("invocationNum") != 0 or not isinstance(initial_steps, int) or initial_steps > 1:
-        return ""
+        return "", None
     marker = _state_file("loom-code-agy-session", payload)
     if marker.is_file():
-        return ""
+        return "", None
     text = _session_context(payload)
-    if text:
-        try:
-            marker.parent.mkdir(parents=True, exist_ok=True)
-            marker.write_text("injected", encoding="utf-8")
-        except OSError:
-            pass
-    return text
+    return (text, marker) if text else ("", None)
+
+
+def _write_marker(marker: Path) -> None:
+    try:
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.write_text("injected", encoding="utf-8")
+    except OSError:
+        pass
 
 
 def _load_module(name: str, path: Path):
@@ -207,7 +217,8 @@ def _load_module(name: str, path: Path):
 
 def _read_steps(path: str) -> list[dict]:
     steps = []
-    with open(path, "r", encoding="utf-8") as fh:
+    # agy appends while hooks run: a read may end mid multibyte character.
+    with open(path, "r", encoding="utf-8", errors="replace") as fh:
         for line in fh:
             try:
                 step = json.loads(line)
@@ -222,8 +233,9 @@ def _reads_loom_skill(step: dict) -> bool:
     for call in step.get("tool_calls") or []:
         if not isinstance(call, dict) or call.get("name") != "view_file":
             continue
-        path = str((call.get("args") or {}).get("AbsolutePath", ""))
-        if path.endswith("/SKILL.md") and any(seg in path for seg in LOOM_PLUGIN_SEGMENTS):
+        args = call.get("args")
+        path = args.get("AbsolutePath") if isinstance(args, dict) else None
+        if isinstance(path, str) and LOOM_SKILL_PATH_RE.search(path.replace("\\", "/")):
             return True
     return False
 
@@ -234,7 +246,7 @@ def _language_anchor(payload: dict) -> str:
         return ""
     try:
         steps = _read_steps(transcript)
-    except OSError:
+    except (OSError, ValueError):
         return ""
     model_steps = [(i, s) for i, s in enumerate(steps) if s.get("source") == "MODEL"]
     if not model_steps or not _reads_loom_skill(model_steps[-1][1]):
@@ -269,9 +281,17 @@ def _language_anchor(payload: dict) -> str:
 
 
 def pre_invocation(payload: dict) -> int:
-    messages = [_first_turn_session_context(payload), _language_anchor(payload)]
-    steps = [{"ephemeralMessage": m} for m in messages if m]
-    return _emit({"injectSteps": steps} if steps else {})
+    session, marker = _first_turn_session_context(payload)
+    try:
+        anchor = _language_anchor(payload)
+    except Exception:  # a transcript problem must not cost the session context
+        anchor = ""
+    steps = [{"ephemeralMessage": m} for m in (session, anchor) if m]
+    output = json.dumps({"injectSteps": steps} if steps else {}, ensure_ascii=False)
+    if marker is not None:
+        _write_marker(marker)
+    print(output)
+    return 0
 
 
 def main(argv: list[str]) -> int:
