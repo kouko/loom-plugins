@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v1",
   "change_id": "2026-09-14-land-merged-changes",
-  "content_digest": "bad60d2f498e830a61ad6834964a91502be0cc25",
+  "content_digest": "e959c13c46df0a108c834f442e761afda26eb37d",
   "executions": [
     {
       "kind": "package-tests",
@@ -77,6 +77,22 @@
       "lens": "skill+spec-conformance+docs",
       "verdict": "PASS",
       "findings": []
+    },
+    {
+      "reviewer": "loom-code:reviewer#integration-a8676c43",
+      "vendor": "anthropic",
+      "model": "claude-opus-5[1m]",
+      "lens": "integration (code+spec-conformance)",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "correctness",
+          "anchor": "docs/loom/2026-09-14-land-merged-changes/attestation.json :: content_digest",
+          "text": "The trunk integration made the committed attestation stale (whole-tree digest bad60d2f at ef0d6a9e vs e959c13c at 57fd6c9c); resolved by this finalization, which regenerates the attestation on the merged tree.",
+          "fix": "Regenerate the attestation with finalize-review on the merged tree and confirm push --head HEAD exits 0."
+        }
+      ]
     }
   ],
   "findings": [
@@ -89,6 +105,11 @@
       "severity": "nit",
       "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:334",
       "text": "Three functions exceed the 50-line hard limit."
+    },
+    {
+      "severity": "important",
+      "anchor": "docs/loom/2026-09-14-land-merged-changes/attestation.json :: content_digest",
+      "text": "Stale attestation after trunk integration; resolved by regenerating it in this finalization."
     }
   ]
 }
