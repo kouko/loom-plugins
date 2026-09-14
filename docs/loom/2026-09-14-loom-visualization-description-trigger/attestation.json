@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v1",
   "change_id": "2026-09-14-loom-visualization-description-trigger",
-  "content_digest": "d1417fae7ffac34bea4202d3bf727b38123f8a10",
+  "content_digest": "9c29197f84e1af5d4b240a2a47e6178809d6c944",
   "executions": [
     {
       "kind": "package-tests",
