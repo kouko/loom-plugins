@@ -6,7 +6,7 @@ charter: 1.0
 - Forward: `loom-code/skills/write-plan/SKILL.md` Step 6 — "Branch first" block runs `git switch -c <change-id>`.
 - Reverse: `loom-design/skills/capture-intent/SKILL.md` Step 5 — Branch note says write-plan creates `<change-id>` from the trunk.
 - Error: `loom-code/scripts/loom_checker/helpers.py` `ON_A_BRANCH` — trunk refusal hint prints `git switch -c <change-id>`.
-- Data: `loom-code/scripts/command_handlers/publish.py` `_publication_change_id` — change-id comes from the attestation path, never the branch name.
+- Data: `loom-code/scripts/loom_checker/command_handlers/publish.py` `_publication_change_id` — change-id comes from the attestation path, never the branch name.
 - Boundary: `loom-code/scripts/test_loom_checker_intent.py` `test_working_on_the_trunk_fails_closed` — asserts only `git switch -c` in stderr.
 
 ## Task DAG
@@ -19,7 +19,7 @@ charter: 1.0
 - Risk: agent-decided — change only the hint string; branch_base logic untouched so no name parsing is introduced (intent Constraint 1).
 
 **W1-02 Typed branch in station prose**  after: W1-01  acceptance: 1, 3, 4, 6
-- Files: loom-code/skills/write-plan/SKILL.md, loom-design/skills/capture-intent/SKILL.md
+- Files: loom-code/skills/write-plan/SKILL.md, loom-design/skills/capture-intent/SKILL.md, loom-code/skills/ship/SKILL.md, loom-code/scripts/test_ship_station_text.py
 - Test: A1 positive: write-plan-names-typed-branch-and-types; negative: write-plan-bare-switch-absent. A3 positive: capture-intent-names-typed-branch; negative: capture-intent-bare-branch-absent. A4 positive: repo-grep-no-bare-branch; negative: changelog-history-excluded. A6 positive: package-suite-pass; negative: station-text-test-regression.
 - Risk: agent-decided — allowed types are feat, fix, docs, refactor, test, chore, ci, matching implementer.md; the agent picks one and applies it to the branch prefix and PR title.
 

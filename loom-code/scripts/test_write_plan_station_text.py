@@ -13,6 +13,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 from prose_pin import NEGATION_RE
 
 REPO = Path(__file__).resolve().parents[2]
@@ -288,8 +290,46 @@ def test_write_plan_names_typed_branch_and_types() -> None:
 
 # Split literals so a repo grep for the bare form never matches this file.
 _BARE_BRANCH_RE = re.compile(
-    r"(?:switch -c|checkout -b|git branch)\s+" + "<change" + r"-id>"
+    r"(?:switch (?:-c|--create)|checkout -[bB]|git branch|worktree add -b"
+    r"|branch named)\s+[`'\"]?" + "<change" + r"-id>"
 )
+
+_CID = "<change" + "-id>"
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        f"git switch -c {_CID}",
+        f"git switch --create {_CID}",
+        f"git switch -c `{_CID}`",
+        f"git switch -c '{_CID}'",
+        f'git switch -c "{_CID}"',
+        f"git checkout -b {_CID}",
+        f"git checkout -B {_CID}",
+        f"git branch {_CID}",
+        f"git worktree add -b {_CID} ../wt",
+        f"create a branch named `{_CID}`",
+    ],
+)
+def test_bare_branch_re_catches_spelling(line: str) -> None:
+    assert _BARE_BRANCH_RE.search(line), line
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        f"git switch -c <type>/{_CID}",
+        f"git switch --create `<type>/{_CID}`",
+        f"git checkout -B <type>/{_CID}",
+        f"git worktree add -b <type>/{_CID} ../wt",
+        f"create a branch named `<type>/{_CID}`",
+        f"write docs/loom/{_CID}/plan.md",
+        f"see `docs/loom/{_CID}/spec.md`",
+    ],
+)
+def test_bare_branch_re_ignores_typed_and_path(line: str) -> None:
+    assert not _BARE_BRANCH_RE.search(line), line
 
 
 def test_write_plan_bare_switch_absent() -> None:
@@ -306,7 +346,9 @@ def test_repo_grep_no_bare_branch() -> None:
             if path.suffix not in {".md", ".py", ".sh"} or not path.is_file():
                 continue
             rel = path.relative_to(REPO)
-            if path.name.startswith("CHANGELOG") or "docs" in rel.parts:
+            if path.name.startswith("CHANGELOG") or {
+                "node_modules", "__pycache__"
+            } & set(rel.parts):
                 continue
             for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
                 if _BARE_BRANCH_RE.search(line):
