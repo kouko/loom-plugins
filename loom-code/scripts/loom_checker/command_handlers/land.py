@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from loom_checker.command_handlers.publish import PUBLISH_CI_PENDING_WAITS
 from loom_checker.command_handlers.publish import PUBLISH_CI_POLL_SECONDS
 from loom_checker.command_handlers.publish import PUBLISH_CI_REGISTRATION_WAITS
@@ -27,6 +28,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
 
 
@@ -152,9 +154,140 @@ def _land_accepted(
     target = _merge_preconditions(accepted_by, trusted_git, trusted_gh, out, err)
     if isinstance(target, int):
         return target
-    # --- W2-02 extension point: every precondition holds for `target`; the
-    # squash merge and its verification start here. -------------------------
-    out.write(f"Preconditions passed for PR #{target.number}\n")
+    merged = _squash_merge(target, accepted_by, err)
+    if merged is None:
+        return 1
+    merge_commit, title, body = merged
+    out.write(f"Merged PR #{target.number} as {merge_commit[:7]}\n")
+    if _verify_merge(target, merge_commit, title, body, err) != 0:
+        return 1
+    # --- W3-01 extension point: the merge is verified; trunk fast-forward and
+    # change cleanup start here. ---------------------------------------------
+    return 0
+
+
+def _normalized(text: str) -> str:
+    return " ".join(text.split())
+
+
+def _acceptance_line(repo: Path, accepted_by: str) -> str:
+    """`Accepted-by: <name> <date>`, citing the blind-run report blob when one
+    is committed at HEAD."""
+    line = f"Accepted-by: {accepted_by} {date.today().isoformat()}"
+    change_id, _error = _publication_change_id(repo)
+    if change_id:
+        report_rel = artifact_path(
+            load_manifest(), "blind-run-report", change_id, repo
+        ).relative_to(repo)
+        blob = git_maybe(repo, "rev-parse", "--verify", "--quiet", f"HEAD:{report_rel}")
+        if blob:
+            line += f" (blind-run-report {blob[:7]})"
+    return line
+
+
+def _merged_state(target: LandTarget, err) -> tuple[str, str] | None:
+    """(state, mergeCommit oid) from GitHub, or None after a reported block."""
+    result = _read(
+        [target.trusted_gh, "pr", "view", str(target.number), "--json", "state,mergeCommit"],
+        "PR state lookup", repo=target.repo, env=target.env, err=err,
+    )
+    if result is None:
+        return None
+    try:
+        payload = json.loads(result.stdout)
+        commit = payload.get("mergeCommit") or {}
+        return str(payload.get("state", "")).upper(), str(commit.get("oid", ""))
+    except (json.JSONDecodeError, AttributeError) as exc:
+        _block(f"cannot decode PR state response: {exc}", err)
+        return None
+
+
+def _squash_merge(
+    target: LandTarget, accepted_by: str, err
+) -> tuple[str, str, str] | None:
+    """Spec 'Merge command': squash with the PR title and body; returns
+    (merge commit oid, title, body) once GitHub reports the PR merged."""
+    view = _read(
+        [target.trusted_gh, "pr", "view", str(target.number), "--json", "title,body"],
+        "PR title and body lookup", repo=target.repo, env=target.env, err=err,
+    )
+    if view is None:
+        return None
+    try:
+        payload = json.loads(view.stdout)
+        title = str(payload["title"])
+        body = str(payload.get("body") or "")
+    except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as exc:
+        _block(f"cannot decode PR title and body: {exc}", err)
+        return None
+    message = f"{body.rstrip()}\n\n{_acceptance_line(target.repo, accepted_by)}\n"
+
+    with tempfile.TemporaryDirectory(prefix="loom-land-") as message_dir:
+        body_file = Path(message_dir) / "squash-body.md"
+        body_file.write_text(message, encoding="utf-8")
+        body_file.chmod(0o600)
+        try:
+            result = run_land_external(
+                [target.trusted_gh, "pr", "merge", str(target.number), "--squash",
+                 "--match-head-commit", target.head,
+                 "--subject", f"{title} (#{target.number})",
+                 "--body-file", str(body_file)],
+                LAND_WRITE_TIMEOUT, cwd=target.repo, env=target.env,
+            )
+            detail = "" if result.returncode == 0 else (
+                result.stderr or result.stdout or f"exit {result.returncode}"
+            ).strip()
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            detail = f"{type(exc).__name__}: {exc}"
+
+    # A failed or timed-out command may still have merged: re-read up to 60s.
+    state = ""
+    for attempt in range(LAND_MERGE_STATE_WAITS + 1):
+        observed = _merged_state(target, err)
+        if observed is None:
+            return None
+        state, oid = observed
+        if state == "MERGED" and oid:
+            return oid, title, body
+        if attempt < LAND_MERGE_STATE_WAITS:
+            wait_land_interval(PUBLISH_CI_POLL_SECONDS)
+    if not detail:
+        detail = f"PR #{target.number} is {state or 'UNKNOWN'}"
+    _block(f"merge not performed: {detail}", err)
+    return None
+
+
+def _verify_merge(
+    target: LandTarget, merge_commit: str, title: str, body: str, err
+) -> int:
+    """Spec 'Verification': the squash commit carries the PR title and body."""
+    def verify_block(reason: str) -> int:
+        return report([("land.verify", reason)], err)
+
+    try:
+        fetched = run_land_external(
+            [target.trusted_git, "fetch", "origin", target.base],
+            LAND_WRITE_TIMEOUT, cwd=target.repo, env=target.env,
+        )
+        if fetched.returncode != 0:
+            detail = (fetched.stderr or fetched.stdout or f"exit {fetched.returncode}").strip()
+            return verify_block(f"cannot fetch origin {target.base}: {detail}")
+        commit = run_land_external(
+            [target.trusted_git, "cat-file", "commit", merge_commit],
+            LAND_READ_TIMEOUT, cwd=target.repo, env=target.env,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return verify_block(f"cannot read the squash commit: {type(exc).__name__}: {exc}")
+    if commit.returncode != 0:
+        detail = (commit.stderr or commit.stdout or f"exit {commit.returncode}").strip()
+        return verify_block(f"cannot read the squash commit: {detail}")
+
+    _header, _sep, message = commit.stdout.partition("\n\n")
+    normalized = _normalized(message)
+    if _normalized(title) not in normalized:
+        return verify_block("squash commit lacks the PR title")
+    if _normalized(body) not in normalized:
+        return verify_block("squash commit lacks the PR body")
     return 0
 
 
