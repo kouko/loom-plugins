@@ -122,6 +122,15 @@ def test_readme_lists_expert_mode() -> None:
     plugin_readme = (PLUGIN_ROOT / "README.md").read_text(encoding="utf-8")
     assert "[`expert-mode`](skills/expert-mode/SKILL.md) | " + row in plugin_readme
     assert "**Skills**: 5 stations + 1 router + 1 user-invoked" in plugin_readme
+    for name, count, role in (
+        ("README.ja.md", "5 ステーション + 1 ルーター + 1 ユーザー起動",
+         "ユーザーが明示的に呼び出す場合のみ"),
+        ("README.zh-TW.md", "5 個站 + 1 個入口路由 + 1 個使用者呼叫",
+         "僅限使用者主動呼叫"),
+    ):
+        translated = (PLUGIN_ROOT / name).read_text(encoding="utf-8")
+        assert count in translated, name
+        assert "| [`expert-mode`](skills/expert-mode/SKILL.md) | " + role in translated, name
     root_readme = (PLUGIN_ROOT.parent / "README.md").read_text(encoding="utf-8")
     assert "| `expert-mode` | " + row in root_readme
 

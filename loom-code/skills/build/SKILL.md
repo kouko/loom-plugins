@@ -58,8 +58,9 @@ mandatory for every implementation task; when it is skipped, the main agent
 implements the task itself. Scheduling
 multiple implementers concurrently is optional and used only for genuinely
 independent file sets; no dispatch ledger is created. If implementer dispatch
-is unavailable, stop and report the blocker. The main agent must not substitute
-itself as implementer. An implementation agent never acts as its own closing
+is unavailable, stop and report the blocker. Unless `selection show` lists
+`implementer` as skipped, the main agent must not substitute itself as
+implementer. An implementation agent never acts as its own closing
 reviewer.
 
 Internal plans, commits, and verification evidence are written in English.

@@ -260,7 +260,12 @@ def test_build_and_plan_require_implementer_dispatch_without_requiring_paralleli
 
     build_prose = " ".join(BUILD.split())
     assert "If implementer dispatch is unavailable, stop and report the blocker" in build_prose
-    assert "The main agent must not substitute itself as implementer" in build_prose
+    assert "The main agent must not substitute itself as implementer" not in build_prose
+    assert (
+        "Unless `selection show` lists `implementer` as skipped, the main agent must not "
+        "substitute itself as implementer."
+    ) in build_prose
+    assert "An implementation agent never acts as its own closing reviewer." in build_prose
 
     manifest_prose = " ".join(CONTRACT_MANIFEST.split())
     assert "every implementation task is dispatched to an implementer" in manifest_prose
