@@ -680,6 +680,13 @@ def _land_sweep(context: LandTarget, confirm: str | None, out, err) -> int:
     refused = False
     anchor: Path | None = None
     for target, plan in removable:
+        # Earlier removals take time: re-check read-only right before this one.
+        current = plan_cleanup(target, fetch=False)
+        if current != plan:
+            reason = current if isinstance(current, str) else "state changed since confirmation"
+            _cleanup_block(f"{plan.branch}: {reason}", err)
+            refused = True
+            continue
         code = execute_cleanup(
             target, plan, out, err, label=f"{plan.branch}: ", announce_next=False
         )

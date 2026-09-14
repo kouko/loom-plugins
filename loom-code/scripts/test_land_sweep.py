@@ -98,6 +98,7 @@ class Calls:
         self.calls: list[list[str]] = []
         self.merged_override: list[dict] | None = None
         self.refuse_push_for: set[str] = set()
+        self.after_remove = None  # called with the removed worktree path
 
     def argvs(self, *words: str) -> list[list[str]]:
         return [argv for argv in self.calls if all(word in argv for word in words)]
@@ -131,7 +132,10 @@ class Calls:
         assert cwd == self.layout.root or self.layout.root in cwd.parents, argv
         if "push" in argv and any(argv[-1] == f":refs/heads/{b}" for b in self.refuse_push_for):
             return subprocess.CompletedProcess(argv, 1, "", "! [remote rejected] refused")
-        return subprocess.run(argv, capture_output=True, text=True, timeout=timeout, **kwargs)
+        result = subprocess.run(argv, capture_output=True, text=True, timeout=timeout, **kwargs)
+        if self.after_remove and argv[3:5] == ["worktree", "remove"] and result.returncode == 0:
+            self.after_remove(Path(argv[-1]))
+        return result
 
 
 def run(monkeypatch, layout: Repo, *args: str, cwd: Path | None = None, configure=None):
@@ -305,6 +309,38 @@ def test_sweep_confirm_continues_past_refusal(tmp_path: Path, monkeypatch) -> No
     assert "BLOCK land.cleanup: feat/b: remote branch feat/b not deleted: " in err
     assert layout.gone("feat/a", s["a"][1]) and layout.gone("feat/r")
     assert ref_exists(layout.origin, "refs/heads/feat/b")
+
+
+def test_sweep_confirm_replans_before_each_removal(tmp_path: Path, monkeypatch) -> None:
+    layout = Repo(tmp_path)
+    (layout.repo / ".gitignore").write_text(".env\n", encoding="utf-8")
+    git(layout.repo, "add", ".gitignore")
+    git(layout.repo, "commit", "-q", "-m", "ignore .env")
+    git(layout.repo, "push", "-q", "origin", "main")
+    _, wt_a = layout.branch("feat/a", worktree="wt-a")
+    _, wt_c = layout.branch("feat/c", worktree="wt-c")
+    _rc, out, _err, _calls = run(monkeypatch, layout, "--sweep")
+    token = token_of(out)
+    assert len([line for line in out.splitlines() if line.startswith("remove ")]) == 2
+
+    def configure(calls: Calls) -> None:
+        def drop_env(removed: Path) -> None:
+            if removed == wt_a:
+                (wt_c / ".env").write_text("SECRET=1\n", encoding="utf-8")
+        calls.after_remove = drop_env
+
+    rc, out, err, calls = run(monkeypatch, layout, "--sweep", "--confirm", token,
+                              configure=configure)
+
+    assert rc == 1
+    assert (
+        f"BLOCK land.cleanup: feat/c: worktree {wt_c} has ignored files outside "
+        "the regenerable set: .env\n"
+    ) in err, err
+    assert layout.gone("feat/a", wt_a)
+    assert layout.intact("feat/c", wt_c)
+    assert (wt_c / ".env").read_text(encoding="utf-8") == "SECRET=1\n"
+    assert all(str(wt_c) not in argv for argv in calls.argvs("worktree", "remove"))
 
 
 def test_sweep_no_candidates(tmp_path: Path, monkeypatch) -> None:
