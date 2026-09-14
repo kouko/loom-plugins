@@ -6,8 +6,8 @@
     "name": "kouko",
     "url": "https://github.com/kouko"
   },
-  "homepage": "https://github.com/kouko/monkey-skills/tree/main/loom-workflow",
-  "repository": "https://github.com/kouko/monkey-skills",
+  "homepage": "https://github.com/kouko/loom-plugins/tree/main/loom-workflow",
+  "repository": "https://github.com/kouko/loom-plugins",
   "license": "MIT",
   "keywords": [
     "decision-map",
@@ -41,7 +41,7 @@
       "Is this change worth the lines it adds?",
       "Record why we chose this design into git memory so we can recall it later."
     ],
-    "websiteURL": "https://github.com/kouko/monkey-skills/tree/main/loom-workflow",
+    "websiteURL": "https://github.com/kouko/loom-plugins/tree/main/loom-workflow",
     "brandColor": "#475569"
   }
 }
