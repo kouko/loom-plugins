@@ -27,6 +27,9 @@ EXPECTED_RULE_IDS = [
     "intent.needs-design-recompute",
     "intent.product-no-identifiers",
     "intent.schema",
+    "land.cleanup",
+    "land.merge",
+    "land.verify",
     "plan.field-caps",
     "push.attestation",
     "push.contextual-body",
@@ -193,7 +196,7 @@ def test_every_rule_id_is_area_dot_name() -> None:
     for line in run_checker("--list-rules").stdout.splitlines():
         rule_id = line.split("\t")[0]
         area, _, name = rule_id.partition(".")
-        assert area in {"contract", "intent", "intake", "plan", "push", "review", "spec", "standing"}, rule_id
+        assert area in {"contract", "intent", "intake", "land", "plan", "push", "review", "spec", "standing"}, rule_id
         assert name and "." not in name, rule_id
 
 
@@ -214,6 +217,15 @@ def test_publish_is_a_declared_cli_command() -> None:
 
     assert entry["COMMANDS"]["publish"] is entry["cmd_publish"]
     assert "loom_checker.py publish --confirm-authorized" in entry["__doc__"]
+
+
+def test_land_is_a_declared_cli_command() -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+
+    assert entry["COMMANDS"]["land"] is entry["cmd_land"]
+    assert "loom_checker.py land --accepted-by <name>" in entry["__doc__"]
+    assert "loom_checker.py land --cleanup <branch>" in entry["__doc__"]
+    assert "loom_checker.py land --sweep [--confirm <token>]" in entry["__doc__"]
 
 
 def test_intents_is_a_declared_cli_command() -> None:
@@ -288,8 +300,8 @@ def test_hooks_probe_is_gone() -> None:
     assert "hooks-probe" not in CHECKER.read_text(encoding="utf-8").split('"""')[1]
 
 
-def test_the_rule_population_is_twenty_one() -> None:
-    assert len(run_checker("--list-rules").stdout.splitlines()) == 21
+def test_the_rule_population_is_twenty_four() -> None:
+    assert len(run_checker("--list-rules").stdout.splitlines()) == 24
 
 
 # --- contract --require (spec G) -------------------------------------------
