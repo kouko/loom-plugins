@@ -21,6 +21,9 @@ development commands and migration provenance that remain true.
 2. The root README contains a Mermaid flowchart of the main Loom flow (capture-intent → write-spec → write-plan → build → review → ship, maintain feeding back) including the three user decision points, and it renders on GitHub.
 3. The root README gives install instructions that work against this repository's own marketplace.
 4. Development commands and migration provenance remain present, and no statement in the README contradicts the repository being published.
+5. The flowchart names the owning skill on every node, and shows the `decision-map` loop (destination, unknowns, tickets, decisions) as a second entry into intent capture.
+6. The root README explains when each supporting `loom-workflow` tool (`git-memory`, `loom-memory`, `independent-advisor`, `handoff`, `recap-state`) is used relative to the flow, without drawing them as flow steps.
+7. The repository's existing package test suite passes with the rewritten README.
 
 ## Constraints
 - Plugin manifests, plugin READMEs, and plugin versions stay unchanged.
