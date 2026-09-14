@@ -4,7 +4,8 @@ An independent cross-model review only counts if it uses a non-interactive
 command-line tool from a **different model family than the current host**.
 Host identity comes from the environment running this skill, never from which
 executables happen to be installed. On Codex, probe `claude` then `gemini`.
-On Claude Code, probe `codex` then `gemini`. Never offer the current host
+On Claude Code, probe `codex` then `gemini`. On Antigravity CLI, probe
+`claude` then `codex`. Never offer the current host
 family. Detect a candidate with
 `command -v <cli>` **and** a probe that it runs — `<cli> --version` must
 exit 0. In zsh `command -v` may print an alias or a function body rather

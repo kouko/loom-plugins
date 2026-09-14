@@ -329,6 +329,7 @@ def test_ask_excludes_host_and_defines_unavailable_paths() -> None:
     flat = " ".join(text.split())
     assert "On Codex, probe `claude` then `gemini`" in flat
     assert "On Claude Code, probe `codex` then `gemini`" in flat
+    assert "On Antigravity CLI, probe `claude` then `codex`" in flat
     assert "blocking plain-language Markdown question" in flat
     assert "no runnable different-model-family CLI" in flat
     assert "continue without asking" in flat
@@ -341,6 +342,14 @@ def test_ask_and_fixed_never_silently_substitute_the_host() -> None:
     flat = " ".join(text.split())
     assert "Never offer the current host family" in flat
     assert "never replace it silently" in flat
+
+
+def test_antigravity_host_is_never_told_to_probe_gemini() -> None:
+    text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+    sentence = flat.split("On Antigravity CLI,", 1)[1].split(".", 1)[0]
+    assert "`claude` then `codex`" in sentence
+    assert "gemini" not in sentence.lower()
 
 
 def test_second_vendor_modes_match_loom_code_contract() -> None:

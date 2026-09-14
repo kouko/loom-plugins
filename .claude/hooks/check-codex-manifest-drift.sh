@@ -50,16 +50,17 @@ SYNC="$REPO_ROOT/scripts/sync_codex_manifests.py"
 
 if ! PYTHONDONTWRITEBYTECODE=1 python3 "$SYNC" --check "$PLUGIN_DIR" >/dev/null 2>&1; then
   cat >&2 <<EOF
-❌ Codex manifest drift detected
+❌ Codex or Antigravity manifest drift detected
 
-$PLUGIN/.codex-plugin/plugin.json no longer matches the shared fields of
+$PLUGIN/.codex-plugin/plugin.json (Codex) or $PLUGIN/plugin.json (Antigravity
+root) no longer matches the shared fields of
 $PLUGIN/.claude-plugin/plugin.json (a version bump or shared-field edit was
 not mirrored). The CI "codex-manifest-drift" gate will fail on push.
 
-Fix (run from repo root):
+Fix (run from repo root) — regenerates both:
     python3 scripts/sync_codex_manifests.py $PLUGIN
 
-Then re-stage the regenerated .codex-plugin/plugin.json.
+Then re-stage the regenerated .codex-plugin/plugin.json and plugin.json.
 EOF
   exit 2
 fi
