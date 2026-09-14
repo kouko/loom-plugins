@@ -1,0 +1,40 @@
+{
+  "schema": "loom-attestation/v1",
+  "change_id": "agents-claude-compatibility",
+  "content_digest": "9cd791dd3024a13bb607aaec0f0bd2d76e0c4bbb",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 loom-code/scripts/check_contract_citations.py",
+      "artifact": "loom-code/scripts/check_contract_citations.py",
+      "result": "pass",
+      "command_digest": "19fbf1bb07be26ebd7e06cc17c1eb9a4a6d0880031c5f1707bd18f97608e11c6"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-internal",
+      "vendor": "openai",
+      "model": "gpt-5.6-sol",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-second",
+      "vendor": "openai",
+      "model": "gpt-5.6-sol",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": []
+}

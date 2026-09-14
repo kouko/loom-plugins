@@ -172,12 +172,14 @@ def test_an_external_url_containing_docs_is_not_a_candidate() -> None:
 
 def test_the_rule_is_documented_in_claude_md() -> None:
     repo_root = Path(__file__).resolve().parents[2]
+    agents_md = repo_root / "AGENTS.md"
     claude_md = repo_root / "CLAUDE.md"
+    assert claude_md.read_text(encoding="utf-8").strip() == "@AGENTS.md"
     # Normalise backticks as well as whitespace. Asserting on raw text made an
     # earlier implementer strip code-span formatting OUT of the document to
     # satisfy the test — the document degraded to fit the assertion, which is
     # the wrong direction. The prose owns its formatting; the test adapts.
-    raw = claude_md.read_text(encoding="utf-8").replace("`", "")
+    raw = agents_md.read_text(encoding="utf-8").replace("`", "")
     flattened = " ".join(raw.split())
     assert (
         "a runtime prose contract under the loom skill and agent trees "
