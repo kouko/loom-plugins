@@ -1,4 +1,4 @@
-"""test_cot_explain_scripts.py — tests for render_cot_html.py and verify_cot_html.py.
+"""test_loom_visualization_page_scripts.py — tests for render_cot_html.py and verify_cot_html.py.
 
 Every case here is a defect that a reviewer reproduced against the first
 shipped version of these scripts, or a property the scripts' own docstrings
@@ -52,11 +52,11 @@ from pathlib import Path
 import pytest
 
 # The suite lives OUTSIDE the skill it tests, deliberately. Running
-# pytest inside `skills/cot-explain/scripts/` creates `__pycache__/` and
+# pytest inside `skills/loom-visualization/scripts/` creates `__pycache__/` and
 # `.pytest_cache/` there — nested subfolders under a skill root, which
 # this repo's PostToolUse hook forbids — so the skill's own tests locked
 # the skill against further editing until swept by hand.
-SKILL = Path(__file__).resolve().parents[1] / "skills" / "cot-explain"
+SKILL = Path(__file__).resolve().parents[1] / "skills" / "loom-visualization"
 SCRIPTS = SKILL / "scripts"
 RENDER = SCRIPTS / "render_cot_html.py"
 VERIFY = SCRIPTS / "verify_cot_html.py"
@@ -68,16 +68,16 @@ import verify_cot_html as V  # noqa: E402
 
 FRONTMATTER = """---
 title: "t"
-type: cot-explain
+type: loom-visualization
 date: 2026-08-19
 tags:
-  - cot-explain
+  - loom-visualization
 source: "{source}"
 source_mode: "file"
 language: zh-TW
 status: completed
 processed_at: "2026-08-19T00:00:00+08:00"
-generator: "loom-workflow:cot-explain"
+generator: "loom-workflow:loom-visualization"
 arcs: 1
 nodes: 5
 layout: "rows"

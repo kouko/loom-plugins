@@ -34,7 +34,7 @@ def loom_family_commands(
         commands.append([sys.executable, "-m", "pytest", "loom-design/scripts/", verbosity])
     if only in {None, "workflow-python"}:
         commands.extend([
-            [sys.executable, "-m", "pytest", "loom-workflow/tests/test_cot_explain_scripts.py", verbosity],
+            [sys.executable, "-m", "pytest", "loom-workflow/tests/test_loom_visualization_page_scripts.py", verbosity],
             [sys.executable, "-m", "pytest", "loom-workflow/scripts", verbosity],
         ])
         for scripts_dir in sorted((repo / "loom-workflow/skills").glob("*/scripts")):

@@ -51,7 +51,7 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
 
     assert any("loom-code/scripts/ scripts/ .claude/hooks/" in command for command in rendered)
     assert any("loom-design/scripts/" in command for command in rendered)
-    assert any("loom-workflow/tests/test_cot_explain_scripts.py" in command for command in rendered)
+    assert any("loom-workflow/tests/test_loom_visualization_page_scripts.py" in command for command in rendered)
     assert any("loom-workflow/tests/test-privacy-gate-compose-commit.sh" in command for command in rendered)
 
     expected_skill_dirs = sorted(

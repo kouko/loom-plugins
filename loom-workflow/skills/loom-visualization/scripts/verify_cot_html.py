@@ -230,10 +230,10 @@ def check(path, do_render=False):
     # ships. It once read "report template" while the template said
     # "markdown template", so the check could never fire — a check that
     # cannot fail is worse than none, because it reads as coverage.
-    if "cot-explain markdown template" in raw:
+    if "loom-visualization markdown template" in raw:
         r.fails.append(
             "the template's own authoring comment is still in the file — "
-            "delete the leading <!-- cot-explain markdown template ... --> block"
+            "delete the leading <!-- loom-visualization markdown template ... --> block"
         )
 
     check_spec_quotes(raw, r)

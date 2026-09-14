@@ -377,7 +377,7 @@ def build(md_text, artifact=False, out_dir=None):
     ver = version()
 
     title = meta.get("title") or meta.get("source") or "CoT Explain"
-    stamp = f"loom-workflow:cot-explain/{ver}"
+    stamp = f"loom-workflow:loom-visualization/{ver}"
 
     # Every frontmatter key reaches the full page's <head> (the Artifact
     # build has no <head> of its own, so it carries none). The markdown carried

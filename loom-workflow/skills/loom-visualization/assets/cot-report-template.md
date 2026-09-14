@@ -1,9 +1,9 @@
 ---
 title: "{{TITLE}}"
-type: cot-explain
+type: loom-visualization
 date: {{DATE}}
 tags:
-  - cot-explain
+  - loom-visualization
 {{TOPIC_TAGS}}
 aliases: []
 source: "{{SOURCE_ABSOLUTE_PATH}}"
@@ -14,7 +14,7 @@ processed_at: "{{PROCESSED_AT}}"
 timezone: Asia/Taipei
 llm_provider: anthropic
 llm_model: "{{LLM_MODEL}}"
-generator: "loom-workflow:cot-explain"
+generator: "loom-workflow:loom-visualization"
 arcs: {{ARCS}}
 nodes: {{NODES}}
 layout: "{{LAYOUT}}"
@@ -22,7 +22,7 @@ verified: ""
 fidelity_checked: ""
 ---
 
-<!-- cot-explain markdown template. DELETE THIS COMMENT BLOCK before writing.
+<!-- loom-visualization markdown template. DELETE THIS COMMENT BLOCK before writing.
 
      This .md is the artifact. The HTML is derived from it mechanically by
      scripts/render_cot_html.py — never hand-edit the HTML, and never let
