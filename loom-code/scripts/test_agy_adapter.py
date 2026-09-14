@@ -313,6 +313,52 @@ def test_anchor_only_reads_most_recent_model_step(tmp_path):
     assert out == {}
 
 
+# agy 1.2.2 live shape: ``transcript.jsonl`` stores each tool arg as a JSON
+# string literal (the value carries its own quotes); ``transcript_full.jsonl``
+# stores it plain. USER_INPUT content is the same plain string in both.
+QUOTED_VIEW_LINE = (
+    '{"step_index":2,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE",'
+    '"tool_calls":[{"name":"view_file","args":{"AbsolutePath":'
+    '"\\"/Users/u/.gemini/config/plugins/loom-workflow/skills/recap-state/SKILL.md\\"",'
+    '"toolAction":"\\"Viewing skill file\\""}}]}'
+)
+
+
+def _quoted_transcript(tmp_path: Path, user_text: str) -> Path:
+    user = {"step_index": 0, "source": "USER_EXPLICIT", "type": "USER_INPUT", "status": "DONE",
+            "content": f"<USER_REQUEST>\n{user_text}\n</USER_REQUEST>\n<ADDITIONAL_METADATA>\n"
+                       "The current local time is: 2026-09-14T10:47:28+08:00.\n</ADDITIONAL_METADATA>"}
+    path = tmp_path / "transcript.jsonl"
+    path.write_text(json.dumps(user, ensure_ascii=False) + "\n" + QUOTED_VIEW_LINE + "\n", encoding="utf-8")
+    return path
+
+
+def test_quoted_transcript_args_ja_injects_anchor(tmp_path):
+    transcript = _quoted_transcript(tmp_path, JA_TURN)
+    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
+    (message,) = _messages(out)
+    assert JA_FRAGMENT in message
+
+
+def test_quoted_transcript_args_english_silent(tmp_path):
+    transcript = _quoted_transcript(tmp_path, EN_TURN)
+    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
+    assert out == {}
+
+
+def test_empty_workspace_session_context_asks_for_add_dir(tmp_path):
+    out = _run("pre-invocation", _invocation(0, []), tmp_path)
+    (message,) = _messages(out)
+    assert "Station order:" in message
+    assert "--add-dir" in message
+
+
+def test_attached_workspace_session_context_has_no_add_dir_note(tmp_path):
+    out = _run("pre-invocation", _invocation(0, [str(tmp_path)]), tmp_path)
+    (message,) = _messages(out)
+    assert "--add-dir" not in message
+
+
 def test_unreadable_transcript_is_silent(tmp_path):
     out = _run("pre-invocation", _invocation(2, [str(tmp_path)], tmp_path / "missing.jsonl"), tmp_path)
     assert out == {}

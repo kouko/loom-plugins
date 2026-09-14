@@ -173,7 +173,13 @@ def _session_context(payload: dict) -> str:
     except (OSError, subprocess.SubprocessError, ValueError):
         return ""
     text = (data.get("hookSpecificOutput") or {}).get("additionalContext") or data.get("additionalContext")
-    return text if isinstance(text, str) else ""
+    if not isinstance(text, str) or not text:
+        return ""
+    if not workspaces:
+        text += ("\n\nNo workspace is attached to this agy session, so the project's kickoff defaults "
+                 "were not loaded. Ask the user to restart agy from the project with "
+                 "`agy --add-dir <project>` before working on it.")
+    return text
 
 
 def _state_file(kind: str, payload: dict) -> Path:
@@ -269,12 +275,25 @@ def _read_steps(path: str) -> list[dict]:
     return steps
 
 
+def _arg_value(value):
+    """agy's transcript.jsonl stores each tool arg as a JSON string literal
+    (``"\\"/path\\""``); transcript_full.jsonl stores it plain. Unwrap one layer."""
+    if isinstance(value, str) and len(value) >= 2 and value[0] == value[-1] == '"':
+        try:
+            decoded = json.loads(value)
+        except ValueError:
+            return value
+        if isinstance(decoded, str):
+            return decoded
+    return value
+
+
 def _reads_loom_skill(step: dict) -> bool:
     for call in step.get("tool_calls") or []:
         if not isinstance(call, dict) or call.get("name") != "view_file":
             continue
         args = call.get("args")
-        path = args.get("AbsolutePath") if isinstance(args, dict) else None
+        path = _arg_value(args.get("AbsolutePath")) if isinstance(args, dict) else None
         if isinstance(path, str) and LOOM_SKILL_PATH_RE.search(path.replace("\\", "/")):
             return True
     return False
