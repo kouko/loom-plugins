@@ -171,6 +171,26 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
+### Antigravity CLI
+
+從 repo 的 clone 安裝，先裝 `loom-code`：`critique`、`decision-map`、
+`distill-sessions` 會參照它。
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-workflow
+```
+
+使用時，在專案目錄啟動 `agy` 並以絕對路徑把專案加為 workspace：
+`agy --add-dir "$PWD"`（互動）或 `agy --add-dir "$PWD" -p "..."`（print 模式）；
+agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模式（`agy -p`）
+不會掛上 workspace，loom 的 kickoff defaults 不會載入，agent 也可能在專案外動作；
+互動模式也請一併指定。
+
+hook 只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。
+
 ## 使用
 
 `loom-workflow` 沒有內附 slash command。用自然語言提出，或直接指名 skill；

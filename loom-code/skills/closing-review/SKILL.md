@@ -1,11 +1,11 @@
 ---
-name: review
+name: closing-review
 description: |
   Run closing review and generate an attestation. Use after Build completes or functional changes invalidate prior review evidence.
 version: 1.5.0
 ---
 
-# Review
+# Closing review
 
 Reviewer findings and generated evidence are written in English.
 
@@ -32,8 +32,10 @@ second-vendor reviewer, blind runner, and adversary dispatch; role and round
 labels supply no routing evidence.
 
 Invoke `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py` from Claude
-Code or `python3 <injected loom-code plugin root>/scripts/dispatch_profile.py`
-from Codex, with the explicit observed JSON defined by the shared contract
+Code or `python3 <loom-code>/scripts/dispatch_profile.py` from any other host,
+where `<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude
+Code; on any other host it is the directory two levels above this SKILL.md.
+Supply the explicit observed JSON defined by the shared contract
 before each spawn. Pass its deterministic JSON result to the host-native spawn:
 apply both fields from `overrides`, or apply neither when it is `null`. Feed
 every completed result back as an `after-execution` event before any
@@ -43,7 +45,12 @@ meets the contract's checkable definition; describe rejected routing
 parameters as a pre-execution host rejection, which selects the one atomic
 fallback instead of model escalation.
 
-After Build commits completed functional content, run:
+On Antigravity CLI, map tool and agent names with
+[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
+
+When a blind run is needed, finish it and commit its report (§3) before
+dispatching the first reviewers. After Build commits completed functional
+content, run:
 
 ```text
 python3 <loom-code>/scripts/loom_checker.py reviewer-count <change-id>
@@ -126,7 +133,13 @@ alone; a plain-text exit 2 is caller misuse rather than a routing signal.
 
 ## 3. Run blind and adversarial checks
 
-Use a blind run when an Acceptance line cannot be settled mechanically. For
+Use a blind run when an Acceptance line cannot be settled mechanically. Its
+`docs/loom/<change-id>/blind-run-report.md` is functional content; only
+`attestation.json` is publication metadata. Finish the blind run and commit
+that report on the change branch before the reviewers read the final
+functional-content digest, and so before running `finalize-review`. A report
+committed after their verdicts is new functional content and needs the next
+round. For
 code, skill, spec, or gate changes, create committed adversarial programs that
 exercise the relevant boundary and pass their paths and commands to
 `finalize-review`. Do not record a claimed result; finalization executes them.

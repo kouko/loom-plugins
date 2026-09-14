@@ -20,8 +20,8 @@ flowchart TD
     spec["只在 needs-design: yes 時<br/>loom-design:write-spec<br/>② product 變更：你確認可見的行為"]
     plan["loom-code:write-plan<br/>plan.md 裡的任務 DAG"]
     build["loom-code:build<br/>測試先行，每個任務一個 implementer"]
-    review["loom-code:review<br/>fresh-context 審查者<br/>需要時加盲跑與 adversary"]
-    attest[["產生 attestation<br/>由 loom-code:review"]]
+    review["loom-code:closing-review<br/>fresh-context 審查者<br/>需要時加盲跑與 adversary"]
+    attest[["產生 attestation<br/>由 loom-code:closing-review"]]
     ship["loom-code:ship<br/>push + PR + checks<br/>③ 你驗收結果<br/>需要時透過盲跑報告"]
     merged(["合併是另一步<br/>在 loom-code:ship 之後，由你另外授權"])
     maintain["loom-code:maintain<br/>bug、告警、回歸或事故"]
@@ -43,7 +43,7 @@ flowchart TD
   沒裝時，`write-plan` 自己覆述這次變更並問 ①。
 - **規格** —— 只有 product 變更會問 ②，由寫 spec 的那一方問：
   `loom-design:write-spec`，或只裝 code 時 `write-plan` 寫的最小 spec。
-- **建置與審查** —— `build` 為每個任務派一個 implementer，測試先行。`review`
+- **建置與審查** —— `build` 為每個任務派一個 implementer，測試先行。`closing-review`
   跑一次收尾審查；`NEEDS_REVISION` 把發現退回 `build`，通過的證據會產生為一份
   綁定受審功能內容的 attestation。
 - **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
@@ -57,7 +57,7 @@ flowchart TD
 |---|---|
 | [`write-plan`](skills/write-plan/SKILL.md) | 把確認過的 intent 變成 `docs/loom/<change-id>/plan.md`：分 wave 的任務，各帶檔案、負責的 Acceptance 行、測試案例與風險。沒裝 `loom-design` 時自己跑 ①。 |
 | [`build`](skills/build/SKILL.md) | 每個任務派一個 implementer，以測試先行實作 plan。 |
-| [`review`](skills/review/SKILL.md) | 跑收尾審查——審查者，視需要加盲跑與對抗程式——並產生 `docs/loom/<change-id>/attestation.json`。 |
+| [`closing-review`](skills/closing-review/SKILL.md) | 跑收尾審查——審查者，視需要加盲跑與對抗程式——並產生 `docs/loom/<change-id>/attestation.json`。 |
 | [`ship`](skills/ship/SKILL.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
 | [`maintain`](skills/maintain/SKILL.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
@@ -69,9 +69,9 @@ flowchart TD
 | Agent | 派出者 | 角色 |
 |---|---|---|
 | [`implementer`](agents/implementer.md) | `build` | 一個任務：先寫會失敗的測試、一個 commit、一份狀態回報 —— 不下 verdict。 |
-| [`reviewer`](agents/reviewer.md) | `review` | fresh-context 的 verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）與帶位置的發現；從不修改受審對象。 |
-| [`blind-runner`](agents/blind-runner.md) | `review` | 在乾淨環境跑這次變更、逐條走過每一行 Acceptance，寫出 `docs/loom/<change-id>/blind-run-report.md`。 |
-| [`adversary`](agents/adversary.md) | `review` | 設法讓變更失敗 —— mutation 或 fuzz 工具，或至少三個可執行的濫用與邊界案例 —— 並把每次嘗試記成 probe。 |
+| [`reviewer`](agents/reviewer.md) | `closing-review` | fresh-context 的 verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）與帶位置的發現；從不修改受審對象。 |
+| [`blind-runner`](agents/blind-runner.md) | `closing-review` | 在乾淨環境跑這次變更、逐條走過每一行 Acceptance，寫出 `docs/loom/<change-id>/blind-run-report.md`。 |
+| [`adversary`](agents/adversary.md) | `closing-review` | 設法讓變更失敗 —— mutation 或 fuzz 工具，或至少三個可執行的濫用與邊界案例 —— 並把每次嘗試記成 probe。 |
 
 審查者人數不是 agent 自己選的：`loom_checker.py reviewer-count` 依整條分支的
 差異計算 —— 範圍窄且低風險的變更一位，其他情況或無法判斷時兩位。只有當某行
@@ -159,6 +159,32 @@ codex plugin list
 `plugin add` 會替換已安裝版本的快取，因此可能刪除執行中 task 仍持有的版本化
 hook 路徑。安裝成功後，請立刻重新啟動 Codex，再執行任何其他工具或命令。不要
 先移除 plugin；那只會讓同一段路徑失效期間更早開始。
+
+### Antigravity CLI
+
+Antigravity CLI（`agy`）從本機目錄安裝 plugin。先 clone repo，並在另外兩個
+plugin 之前安裝 `loom-code`：
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin validate ./loom-code
+agy plugin install ./loom-code
+agy plugin list
+```
+
+使用時，在專案目錄啟動 `agy` 並以絕對路徑把專案加為 workspace：
+`agy --add-dir "$PWD"`（互動）或 `agy --add-dir "$PWD" -p "..."`（print 模式）；
+agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模式（`agy -p`）
+不會掛上 workspace，loom 的 kickoff defaults 不會載入，agent 也可能在專案外動作；
+互動模式也請一併指定。
+
+更新時在 clone 裡執行 `git pull`，再重跑 install（install 會取代已安裝的副本）；
+移除用 `agy plugin uninstall loom-code`。hook（publication gate、session
+context 與語言提醒）只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。在 `agy`
+上，loom 的角色（implementer、reviewer、adversary、blind-runner）以 agy 的
+`self` subagent 執行，遵循 loom 的 agent 契約，使用 Gemini 模型。審查站在所有
+host 上都叫 `closing-review`，舊名 `review` 已移除，沒有別名。
 
 ## 授權
 

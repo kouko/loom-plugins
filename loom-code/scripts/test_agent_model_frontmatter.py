@@ -36,7 +36,7 @@ def test_no_agent_pins_model_or_effort():
 
 
 def test_module_contract_rejects_retired_dispatch_ledger_wording():
-    review_station = (AGENTS_DIR.parent / "skills" / "review" / "SKILL.md").read_text(
+    review_station = (AGENTS_DIR.parent / "skills" / "closing-review" / "SKILL.md").read_text(
         encoding="utf-8"
     ).lower()
 

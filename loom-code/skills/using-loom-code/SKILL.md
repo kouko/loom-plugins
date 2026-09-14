@@ -13,7 +13,7 @@ follow its linked SKILL.md. A directly named station goes straight to that skill
 |---|---|
 | Plan or start a change; no implementation plan yet, including an absent or unconfirmed intent | [write-plan](../write-plan/SKILL.md) |
 | Implement a committed plan with a confirmed intent | [build](../build/SKILL.md) |
-| Build completed, or functional changes invalidated review evidence | [review](../review/SKILL.md) |
+| Build completed, or functional changes invalidated review evidence | [closing-review](../closing-review/SKILL.md) |
 | Publish a branch with a matching review attestation | [ship](../ship/SKILL.md) |
 | Bug report, alert, regression, or dogfood incident outside an active unmerged change | [maintain](../maintain/SKILL.md) |
 

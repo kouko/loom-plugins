@@ -32,7 +32,7 @@ flight.
 | write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no blind run; `not-required`: none |
 | write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | no formal plan review; invokes the required spec review only when it authored the spec |
 | build | diff — commits on the change branch | agent-decided | task and integration tests | no formal review during Build; one closing review follows completed functional work |
-| review | generated `docs/loom/<change-id>/attestation.json`, plus a blind-run report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | package suite and adversarial programs execute once during `finalize-review` | branch end, or again only after functional content changes |
+| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus a blind-run report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | package suite and adversarial programs execute once during `finalize-review` | branch end, or again only after functional content changes |
 | ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.attestation` plus fast publication safety; no functional replay | before push; publication-only fixes reuse matching evidence |
 | maintain | intent — a fresh `docs/loom/intent/<change-id>.md` | agent (dedupe is mechanical) | `intent.schema`, `intent.needs-design-reason`, `intent.needs-design-recompute`, `intent.product-no-identifiers` on a new intent | before hand-off to write-plan |
 
@@ -48,7 +48,7 @@ checkout on this host:
 | Host | Where `loom-code` lives |
 |---|---|
 | Claude Code | the plugin cache — `~/.claude/plugins/cache/<marketplace>/loom-code/<version>/`, one directory per installed version; take the newest |
-| Codex CLI | the installed `loom-code` plugin directory; use its checker script |
+| Codex CLI, Antigravity CLI | on any other host: this plugin's root is the directory two levels above this SKILL.md, and if its parent directory is named `loom-design` (a versioned install) the root is that parent instead; the `loom-code` directory sits next to this plugin's root and it may contain one version subdirectory holding the plugin files — use the newest |
 
 Then run, with that directory in place of `<loom-code>`:
 
@@ -132,7 +132,7 @@ git commit -m "docs(loom): PRINCIPLES.md ratified"
 reads: `write-spec` loads it before drafting `Requirements`; a product
 change with no ratified copy is refused there
 (`standing.product-principles-reject`), never silently allowed through.
-At `review`, the `principles-conformance` dimension scores the diff
+At `closing-review`, the `principles-conformance` dimension scores the diff
 against these Non-negotiables; when nothing in the file speaks to a given
 finding, the dimension is scored **N/A with a one-line reason**, never
 forced to a number it cannot support. Engineering-only changes are never

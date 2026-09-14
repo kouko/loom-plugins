@@ -22,8 +22,8 @@ flowchart TD
     spec["Only when needs-design: yes<br/>loom-design:write-spec<br/>② product changes: you confirm the visible behaviour"]
     plan["loom-code:write-plan<br/>Task DAG in plan.md"]
     build["loom-code:build<br/>Test-first, one implementer per task"]
-    review["loom-code:review<br/>Fresh-context reviewers<br/>blind run and adversary when needed"]
-    attest[["Attestation generated<br/>by loom-code:review"]]
+    review["loom-code:closing-review<br/>Fresh-context reviewers<br/>blind run and adversary when needed"]
+    attest[["Attestation generated<br/>by loom-code:closing-review"]]
     ship["loom-code:ship<br/>Push + PR + checks<br/>③ You accept the result<br/>through the blind-run report when required"]
     merged(["Merged separately<br/>after loom-code:ship, on your own authorization"])
     maintain["loom-code:maintain<br/>Bug, alert, regression or incident"]
@@ -47,7 +47,7 @@ flowchart TD
   spec: `loom-design:write-spec`, or `write-plan`'s minimal spec on a
   code-only install.
 - **Build and review** — `build` dispatches an implementer for every task,
-  test first. `review` runs one closing review; `NEEDS_REVISION` returns the
+  test first. `closing-review` runs one closing review; `NEEDS_REVISION` returns the
   findings to `build`, and passing evidence becomes a generated attestation
   bound to the reviewed functional content.
 - **Ship** — pushes the branch, opens the PR and verifies required checks
@@ -63,7 +63,7 @@ flowchart TD
 |---|---|
 | [`write-plan`](skills/write-plan/SKILL.md) | Turn a confirmed intent into `docs/loom/<change-id>/plan.md`: waved tasks with files, owned Acceptance lines, test cases and risk. Runs ① itself when `loom-design` is absent. |
 | [`build`](skills/build/SKILL.md) | Implement the plan test-first, dispatching one implementer per task. |
-| [`review`](skills/review/SKILL.md) | Run the closing review — reviewers, a blind run and adversarial programs as needed — and generate `docs/loom/<change-id>/attestation.json`. |
+| [`closing-review`](skills/closing-review/SKILL.md) | Run the closing review — reviewers, a blind run and adversarial programs as needed — and generate `docs/loom/<change-id>/attestation.json`. |
 | [`ship`](skills/ship/SKILL.md) | Validate the attestation, push, open the PR and verify required checks (decision point ③). Never merges. |
 | [`maintain`](skills/maintain/SKILL.md) | Reproduce an incident outside an active unmerged change, attach it to a matching open intent or create one, and hand it to `write-plan`. |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | Optional router that picks the station for a general Loom request; every station stays directly callable. |
@@ -75,9 +75,9 @@ The stations dispatch these agents; none reviews its own work.
 | Agent | Dispatched by | Role |
 |---|---|---|
 | [`implementer`](agents/implementer.md) | `build` | One task: failing test first, one commit, a status report — never a verdict. |
-| [`reviewer`](agents/reviewer.md) | `review` | Fresh-context verdict (`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`) with anchored findings; never edits what it reviews. |
-| [`blind-runner`](agents/blind-runner.md) | `review` | Runs the change in a clean environment against every Acceptance line and writes `docs/loom/<change-id>/blind-run-report.md`. |
-| [`adversary`](agents/adversary.md) | `review` | Tries to make the change fail — mutation or fuzz tooling, or at least three executable abuse and boundary cases — and records every attempt as a probe. |
+| [`reviewer`](agents/reviewer.md) | `closing-review` | Fresh-context verdict (`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`) with anchored findings; never edits what it reviews. |
+| [`blind-runner`](agents/blind-runner.md) | `closing-review` | Runs the change in a clean environment against every Acceptance line and writes `docs/loom/<change-id>/blind-run-report.md`. |
+| [`adversary`](agents/adversary.md) | `closing-review` | Tries to make the change fail — mutation or fuzz tooling, or at least three executable abuse and boundary cases — and records every attempt as a probe. |
 
 The number of reviewers is not chosen by the agent: `loom_checker.py
 reviewer-count` computes it from the whole branch delta — one for a narrow,
@@ -176,6 +176,35 @@ codex plugin list
 hook path held by an active task. After it succeeds, restart Codex immediately
 before running another tool or command. Do not remove the plugin first; that
 only creates the same broken-path window earlier.
+
+### Antigravity CLI
+
+Antigravity CLI (`agy`) installs a plugin from a local directory. Clone the
+repository and install `loom-code` before its siblings:
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin validate ./loom-code
+agy plugin install ./loom-code
+agy plugin list
+```
+
+To use loom, start `agy` from your project with the project added as a
+workspace by absolute path: `agy --add-dir "$PWD"` (interactive) or
+`agy --add-dir "$PWD" -p "..."` (print mode); agy 1.2.2 does not honour a
+relative path such as `.`. Without `--add-dir`, print mode (`agy -p`)
+attaches no workspace, so loom's kickoff defaults are not loaded and the
+agent may act outside the project; pass it in interactive mode too.
+
+To update, run `git pull` in the clone and install again; the install replaces
+the installed copy. `agy plugin uninstall loom-code` removes it. The hooks (the
+publication gate, the session context and the language reminder) run only in
+the `agy` CLI, not in the Antigravity desktop app or IDE. On `agy` the loom roles (implementer,
+reviewer, adversary, blind-runner) run as agy `self` subagents that follow
+loom's agent contracts, on Gemini models. The review station is
+`closing-review` on every host; the old `review` name was removed and has no
+alias.
 
 ## Licence
 

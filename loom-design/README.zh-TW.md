@@ -2,7 +2,7 @@
 
 > **Loom 流程的入口：兩個站把粗略的想法變成確認過的 intent，變更需要設計時
 > 再變成一份 spec；兩個工具決定產品的原則與視覺系統。** loom-design 只寫
-> 草稿，不打分數。這裡產出的東西一律由 `loom-code:review` 下 verdict，而且
+> 草稿，不打分數。這裡產出的東西一律由 `loom-code:closing-review` 下 verdict，而且
 > 下判斷的 agent 不是寫草稿的那一個。
 
 **Version**: 2.1.5 — 4 個 skill + 1 個可選入口路由。版本資訊見
@@ -21,7 +21,7 @@ flowchart TD
         spec["loom-design:write-spec<br/>只在 needs-design: yes 時<br/>② product 變更：使用者確認<br/>看得見的行為"]
     end
 
-    specreview["loom-code:review<br/>一次 fresh-context spec review<br/>只在 pre-build-review: required 時"]
+    specreview["loom-code:closing-review<br/>一次 fresh-context spec review<br/>只在 pre-build-review: required 時"]
     plan(["交棒給<br/>loom-code:write-plan"])
 
     subgraph tools["隨叫隨用的工具（不是流程步驟）"]
@@ -43,7 +43,7 @@ flowchart TD
 - **② Specification** — `write-spec` 把確認過的 intent 寫成
   `docs/loom/<change-id>/spec.md`。`kind: product` 的變更會用白話把看得見的
   行為讀回去並記下 yes；engineering 變更不在這裡停。spec 宣告
-  `pre-build-review: required` 時，規劃前先交給 `loom-code:review`，由一位
+  `pre-build-review: required` 時，規劃前先交給 `loom-code:closing-review`，由一位
   fresh-context 的 `spec+adversarial` reviewer 審一次；否則直接交給
   `loom-code:write-plan`。
 - **工具** — `product-principles` 與 `design-system` 是你叫它才跑，各自在
@@ -90,7 +90,7 @@ loom-design 需要 `loom-code`：
   版本對不上就停下，而不是對著看不懂的 contract 硬寫。在 Codex 上
   `<loom-code>` 是已安裝的 plugin 目錄；絕不在 repo 裡建 checker 副本。
 - **它的 verdict 由 loom-code 下。** 規劃前的 spec review 與最後的 closing
-  review 都在 `loom-code:review` 由 fresh-context reviewer 進行；
+  review 都在 `loom-code:closing-review` 由 fresh-context reviewer 進行；
   loom-design 只點名 checker 規則，從不執行它們。
 - **它交棒給 loom-code。** 流程離開 loom-design 都在 `loom-code:write-plan`：
   `needs-design: no` 時從 `capture-intent` 離開，否則從 `write-spec` 離開。
@@ -119,6 +119,26 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-code@loom
 codex plugin add loom-design@loom
 ```
+
+### Antigravity CLI
+
+從 repo 的 clone 安裝，先裝 `loom-code`：
+
+```bash
+git clone https://github.com/kouko/loom-plugins.git
+cd loom-plugins
+agy plugin install ./loom-code
+agy plugin install ./loom-design
+```
+
+使用時，在專案目錄啟動 `agy` 並以絕對路徑把專案加為 workspace：
+`agy --add-dir "$PWD"`（互動）或 `agy --add-dir "$PWD" -p "..."`（print 模式）；
+agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模式（`agy -p`）
+不會掛上 workspace，loom 的 kickoff defaults 不會載入，agent 也可能在專案外動作；
+互動模式也請一併指定。
+
+loom-design 本身沒有 hook；loom-code 的 hook 只在 `agy` CLI 執行，Antigravity
+桌面 app 與 IDE 裡不會執行。
 
 ## 跑測試
 
