@@ -14,7 +14,7 @@ establish it from the confirmed intent or active conversation. Repository
 conventions still govern committed artifacts. Internal publication reports
 remain English.
 
-## 1. Confirm acceptance
+## 1. Confirm publication authorization
 
 Read the intent and blind-run report when one was required. A confirmed intent
 with `publication: automatic — authorized <YYYY-MM-DD> by <name>` carries that
@@ -173,22 +173,43 @@ without resetting the episode or adding another retry budget, then returns to
 Ship. A PR title, body, or other publication data not committed to the
 repository may be fixed in place and reuse the matching attestation.
 
-Publication never authorizes or invokes merge. Do not merge without the user's
-separate explicit authorization.
-Once that authorization exists, take the root of the worktree whose branch
-carries the attestation — `git rev-parse --show-toplevel` run from that
-worktree, never the task or main checkout — and issue the direct merge as one
-Bash command:
+## 5. Land after acceptance
+
+After all checks pass, present the result and the blind-run report when one
+exists (decision point ③). Publication never authorizes or invokes merge; only
+the maintainer's explicit acceptance does. Never type `gh pr merge` yourself:
+the installed publication hook refuses it.
+Publication authorization, including `publication: automatic`, is not
+acceptance; always present the result and ask at decision point ③ before
+running land. Before running land, invoke `loom-workflow:git-memory` for the
+merge checkpoint.
+
+On that acceptance, take the root of the worktree whose branch carries the
+attestation — `git rev-parse --show-toplevel` run from that worktree, never the
+task or main checkout — and land the change as one Bash command:
 
 ```text
-cd '<absolute-repository-root>' && gh pr merge <number> --squash
+cd '<absolute worktree root>' && python3 <loom-code>/scripts/loom_checker.py land --accepted-by <name>
 ```
 
-Always render that absolute `cd`; never rely on the Bash tool's workdir,
-because Codex may report the task root rather than the executor worktree to the
-installed publication hook.
+`<name>` is the maintainer who accepted; it must match the intent originator or
+the publication authorizer. Always render that absolute `cd`;
+never rely on the Bash tool's workdir, because Codex may report the task root
+rather than the executor worktree, and `land` acts on the worktree it runs in.
+`land` removes that worktree, so the agent's next Bash command starts with the
+`cd` printed on land's `next:` line. When no `next:` line is printed, keep the
+current directory.
+
+If land prints `Merged PR` and then a BLOCK, do not rerun `--accepted-by`;
+resolve the named state and run `land --cleanup <branch>`. If it names a
+failing non-required check, repair it as in §4.
+
+For one merged change left from earlier work, run `land --cleanup <branch>`
+through the same command. `land --sweep` lists merged changes, removes nothing,
+and prints a token; pass `--sweep --confirm <token>` only after the maintainer
+answers yes to the printed list.
 
 ## Handoff
 
-Report the attestation digest, publication checks, PR URL, and CI state. Keep
-the worktree until integration is verified.
+Report the attestation digest, publication checks, PR URL, CI state, and land's
+output.

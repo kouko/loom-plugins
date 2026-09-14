@@ -5,82 +5,133 @@ from __future__ import annotations
 import io
 from pathlib import Path
 
+import pytest
+
 from loom_checker.command_handlers import push as loom_checker
 
 
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
 
 
-def test_ship_authorized_merge_renders_absolute_repository_in_command() -> None:
+def test_ship_accepted_land_renders_absolute_worktree_in_command() -> None:
     text = SHIP.read_text(encoding="utf-8")
 
-    assert "cd '<absolute-repository-root>' && gh pr merge" in text
+    assert "cd '<absolute worktree root>' && python3 <loom-code>/scripts/loom_checker.py land" in text
     assert "never rely on the Bash tool's workdir" in text
 
 
-def test_cmd_push_observed_codex_payload_explicit_cd_selects_worktree(
-    tmp_path: Path, monkeypatch,
-) -> None:
+PUSH_MERGE_BLOCK = (
+    "BLOCK push.merge: merge through loom_checker.py land --accepted-by <name>"
+)
+
+
+def _merge_hook(tmp_path: Path, monkeypatch, command: str) -> tuple[int, str, list]:
     main = tmp_path / "main"
-    feature = tmp_path / "feature"
-    main.mkdir()
-    feature.mkdir()
-    observed: list[Path] = []
+    main.mkdir(exist_ok=True)
     payload = {
         "cwd": str(main),
         "hook_event_name": "PreToolUse",
         "tool_name": "Bash",
-        "tool_input": {
-            "command": f"cd '{feature}' && gh pr merge 808 --squash",
-        },
+        "tool_input": {"command": command},
     }
-
+    called: list = []
     monkeypatch.setattr(loom_checker, "read_hook_payload", lambda: payload)
     monkeypatch.setattr(
         loom_checker,
         "_cmd_push",
-        lambda _args, _out, _err: observed.append(Path.cwd()) or 0,
+        lambda *_args: called.append(Path.cwd()) or 0,
     )
     monkeypatch.chdir(tmp_path)
-
-    assert loom_checker.cmd_push(["--hook"], io.StringIO(), io.StringIO()) == 0
-    assert observed == [feature.resolve()]
-
-
-def test_cmd_push_relative_cd_remains_fail_closed(tmp_path: Path, monkeypatch) -> None:
-    main = tmp_path / "main"
-    main.mkdir()
-    payload = {
-        "cwd": str(main),
-        "hook_event_name": "PreToolUse",
-        "tool_name": "Bash",
-        "tool_input": {"command": "cd feature && gh pr merge 808 --squash"},
-    }
     err = io.StringIO()
-
-    monkeypatch.setattr(loom_checker, "read_hook_payload", lambda: payload)
-
-    assert loom_checker.cmd_push(["--hook"], io.StringIO(), err) == 2
-    assert "ambiguous repository selection" in err.getvalue()
+    rc = loom_checker.cmd_push(["--hook"], io.StringIO(), err)
+    return rc, err.getvalue(), called
 
 
-def test_cmd_push_bare_merge_does_not_trust_top_level_cwd(
+# hook-blocks-absolute-cd-merge-with-push-merge (A11 positive): the absolute
+# `cd` form allowed before, plus bare, relative and nested forms, are refused
+# before any repository selection; `land` is the only merge path.
+def test_hook_blocks_absolute_cd_merge_with_push_merge(
     tmp_path: Path, monkeypatch,
 ) -> None:
-    main = tmp_path / "main"
-    main.mkdir()
-    payload = {
-        "cwd": str(main),
-        "hook_event_name": "PreToolUse",
-        "tool_name": "Bash",
-        "tool_input": {"command": "gh pr merge 808 --squash"},
-    }
-    err = io.StringIO()
+    feature = tmp_path / "feature"
+    feature.mkdir()
 
-    monkeypatch.setattr(loom_checker, "read_hook_payload", lambda: payload)
+    rc, err, called = _merge_hook(
+        tmp_path, monkeypatch, f"cd '{feature}' && gh pr merge 808 --squash"
+    )
 
-    assert loom_checker.cmd_push(["--hook"], io.StringIO(), err) == 2
-    assert "absolute" in err.getvalue()
+    assert rc == 2
+    assert err.splitlines() == [PUSH_MERGE_BLOCK]
+    assert called == []
+
+
+@pytest.mark.parametrize("command", [
+    "gh pr merge 1",
+    "gh pr merge 808 --squash",
+    "cd feature && gh pr merge 808 --squash",
+    "bash -c 'gh pr merge 1'",
+    "zsh -c 'cd /tmp && gh pr merge 1'",
+    "eval 'gh pr merge 1'",
+    "env GH_TOKEN=x gh pr merge 1",
+    "Gh pr merge 1",
+])
+def test_hook_blocks_every_merge_form_with_push_merge(
+    tmp_path: Path, monkeypatch, command: str,
+) -> None:
+    rc, err, called = _merge_hook(tmp_path, monkeypatch, command)
+
+    assert rc == 2
+    assert err.splitlines() == [PUSH_MERGE_BLOCK]
+    assert called == []
+
+
+# hook-merge-text-rule-fails-closed (A11): hand-typed merges hidden behind
+# wrapper options, combined shell flags, shell grammar or a backslash-newline
+# split are refused by the textual rule, which also refuses mere mentions.
+@pytest.mark.parametrize("command", [
+    "(gh pr merge 7)",
+    "bash -lc 'gh pr merge 7'",
+    "sh -ec 'gh pr merge 7'",
+    "sudo -u me gh pr merge 7",
+    "nice -n 5 gh pr merge 7",
+    "time -p gh pr merge 7",
+    "command -p gh pr merge 7",
+    "echo 7 | xargs -n1 gh pr merge",
+    "exec -a x gh pr merge 7",
+    "{ gh pr merge 7; }",
+    "if true; then gh pr merge 7; fi",
+    "for n in 7; do gh pr merge $n; done",
+    "! gh pr merge 7",
+    "gh pr \\\nmerge 7",
+    "gh \\\npr merge 7",
+    "'gh' 'pr' 'merge' 7",
+    "/opt/homebrew/bin/GH -R o/r PR Merge 7",
+    "echo gh pr merge",
+    "gh pr $'merge' 5",
+    'gh pr $"merge" 5',
+])
+def test_hook_text_rule_blocks_hand_typed_merge_forms(
+    tmp_path: Path, monkeypatch, command: str,
+) -> None:
+    rc, err, called = _merge_hook(tmp_path, monkeypatch, command)
+
+    assert rc == 2
+    assert err.splitlines() == [PUSH_MERGE_BLOCK]
+    assert called == []
+
+
+@pytest.mark.parametrize("command", [
+    "gh pr view 7",
+    "gh pr list --search merge",
+    "git merge main",
+    "ghx pr merge 7",
+])
+def test_hook_text_rule_leaves_other_commands_alone(
+    tmp_path: Path, monkeypatch, command: str,
+) -> None:
+    _rc, err, _called = _merge_hook(tmp_path, monkeypatch, command)
+
+    assert "BLOCK push.merge" not in err
 
 
 def test_cmd_push_non_publication_command_still_passes(monkeypatch) -> None:

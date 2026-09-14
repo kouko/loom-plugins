@@ -160,7 +160,7 @@ def test_readme_lists_expert_mode() -> None:
 
 def test_changelog_names_failure_sources_and_limits() -> None:
     changelog = (PLUGIN_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-    entry = _flat(changelog.split("## [3.3.0]", 1)[1].split("\n## [", 1)[0])
+    entry = _flat(changelog.split("## [3.4.0]", 1)[1].split("\n## [", 1)[0])
     assert "skipped-review ledger" not in entry
     for phrase in (
         "failure events recorded by `finalize-review` and `selection record-failure`",

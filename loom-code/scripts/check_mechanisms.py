@@ -679,7 +679,7 @@ def run_measure(repo: Path) -> int:
     print(f"skill count (counted): {skill_count}")
     print(f"artifact-type count (manifest): {artifact_types}")
     # Three optional discovery routers are explicitly admitted in release 3.1.3;
-    # the user-invoked expert-mode skill is explicitly admitted in release 3.3.0.
+    # the user-invoked expert-mode skill is explicitly admitted in release 3.4.0.
     if skill_count > 22:
         print(f"RED: skill count {skill_count} exceeds the loom budget of 22")
     if artifact_types > 8:

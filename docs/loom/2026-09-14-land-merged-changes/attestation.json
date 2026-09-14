@@ -1,0 +1,115 @@
+{
+  "schema": "loom-attestation/v1",
+  "change_id": "2026-09-14-land-merged-changes",
+  "content_digest": "e959c13c46df0a108c834f442e761afda26eb37d",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_hook_merge_forms.py -q",
+      "artifact": "docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_hook_merge_forms.py",
+      "result": "pass",
+      "command_digest": "329b571d58577dec7e63e577aa738826728a7d240080ad6cd99ca352e6167cef"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_cleanup_hidden_work.py -q",
+      "artifact": "docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_cleanup_hidden_work.py",
+      "result": "pass",
+      "command_digest": "2b756ceadcb06cbf3f497fdb6aacea2f027fa13b97062be5eb625665af305053"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_sweep_replay.py -q",
+      "artifact": "docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_sweep_replay.py",
+      "result": "pass",
+      "command_digest": "4daef42883b84e2e3f0ad9c2133ed01fa9066d468830501a839e1b65ee364507"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_dependency_failures.py -q",
+      "artifact": "docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_dependency_failures.py",
+      "result": "pass",
+      "command_digest": "a874a378b0e72bd9f693e663796bb717c0ce94be46d450290cb748dea3422e85"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_acceptance_forgery.py -q",
+      "artifact": "docs/loom/2026-09-14-land-merged-changes/evidence/probes/test_probe_acceptance_forgery.py",
+      "result": "pass",
+      "command_digest": "b9152dcf3a5106abea5e729eec27b1f5c79f2fd2966ffae6f476514bc19532e5"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "loom-code:reviewer#code-a81367d0",
+      "vendor": "anthropic",
+      "model": "claude-opus-5[1m]",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "refactoring",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:1003",
+          "text": "_observe_all_checks, the redirect-env check and the default-branch lookup duplicate publish.py logic; accepted because sharing them changes publish, which is out of scope.",
+          "fix": "Extract shared helpers into publish.py in a follow-up change."
+        },
+        {
+          "severity": "nit",
+          "dimension": "naming",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:334",
+          "text": "plan_cleanup, _merge_preconditions and _observe_all_checks exceed the 50-line hard limit.",
+          "fix": "Split them at their numbered steps in a follow-up."
+        }
+      ]
+    },
+    {
+      "reviewer": "loom-code:reviewer#skill-spec-docs-a931b0aa",
+      "vendor": "anthropic",
+      "model": "claude-opus-5[1m]",
+      "lens": "skill+spec-conformance+docs",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "loom-code:reviewer#integration-a8676c43",
+      "vendor": "anthropic",
+      "model": "claude-opus-5[1m]",
+      "lens": "integration (code+spec-conformance)",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "correctness",
+          "anchor": "docs/loom/2026-09-14-land-merged-changes/attestation.json :: content_digest",
+          "text": "The trunk integration made the committed attestation stale (whole-tree digest bad60d2f at ef0d6a9e vs e959c13c at 57fd6c9c); resolved by this finalization, which regenerates the attestation on the merged tree.",
+          "fix": "Regenerate the attestation with finalize-review on the merged tree and confirm push --head HEAD exits 0."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:1003",
+      "text": "Duplication with publish.py accepted as out of scope."
+    },
+    {
+      "severity": "nit",
+      "anchor": "loom-code/scripts/loom_checker/command_handlers/land.py:334",
+      "text": "Three functions exceed the 50-line hard limit."
+    },
+    {
+      "severity": "important",
+      "anchor": "docs/loom/2026-09-14-land-merged-changes/attestation.json :: content_digest",
+      "text": "Stale attestation after trunk integration; resolved by regenerating it in this finalization."
+    }
+  ]
+}

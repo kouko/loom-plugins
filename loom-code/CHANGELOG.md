@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.3.0] — 2026-09-14 — user-chosen Loom steps per change
+## [3.4.0] — 2026-09-15 — user-chosen Loom steps per change
 
 - Add the user-invoked `expert-mode` skill: it proposes which Loom steps a
   change runs or skips, reports what bound, and withdraws a selection.
@@ -31,7 +31,7 @@
   budget exception and separate from the net mechanism count, so a
   twenty-third counted skill still fails. The `expert-mode` budget-exception
   line below covers the skill's entry in that net count, not this ceiling.
-- Net mechanism count rises from 127 to 131: the five additions below, less
+- Net mechanism count rises from 131 to 135: the five additions below, less
   the removed `artifact:intent.lane`; the widened Claude PreToolUse matcher
   renames its existing hook row rather than adding one.
 - budget-exception: expert-mode — user-invoked entry point for choosing Loom steps per change; eval loom-code/scripts/test_expert_mode_skill.py.
@@ -42,6 +42,31 @@
 
 Contract 2.3 adds the attestation `selection` field and the step selection
 vocabulary; a leftover undeclared `lane:` line is tolerated.
+
+## [3.3.0] — 2026-09-14 — land merges, syncs, and cleans up a reviewed change
+
+- Add `loom_checker.py land`. `land --accepted-by <name>` checks acceptance,
+  the attestation, the PR head, and every check; squash-merges with the PR
+  title and body; verifies the merged commit; fast-forwards a clean trunk; and
+  removes the change's worktree, local branch, and remote branch.
+  `land --cleanup <branch>` cleans up one merged change left from earlier
+  work. `land --sweep` lists merged changes and prints a token;
+  `land --sweep --confirm <token>` removes that list only when it is unchanged.
+- Ship presents the result for acceptance, then runs `land` instead of keeping
+  the worktree until integration is verified.
+- Breaking: the publication hook now refuses every hand-typed `gh pr merge`,
+  including the absolute-`cd` form Ship previously prescribed. Callers that
+  merged by hand merge through `land --accepted-by <name>`.
+- The hook fails closed: any Bash command whose text mentions the words gh,
+  pr, merge in that order is refused, including commit messages given with
+  `-m`, searches, `echo`, and `publish --title`. Pass commit messages and PR
+  bodies through files instead.
+- Known limits: the `gh api …/pulls/<n>/merge` REST form is not blocked; herdr
+  workspace metadata may keep a stale entry for a removed worktree.
+- budget-exception: land.merge — one id for every refusal before and during land's merge (acceptance, attestation, PR identity, checks, merge state); eval loom-code/scripts/test_land_merge.py::test_missing_or_foreign_name_blocks.
+- budget-exception: land.verify — the merged commit must carry the PR title and body, which the squash dialog once dropped; eval loom-code/scripts/test_land_merge.py::test_title_only_commit_verify_blocks.
+- budget-exception: land.cleanup — one id for every worktree and branch cleanup refusal, including a changed sweep list; eval loom-code/scripts/test_land_sweep.py::test_changed_list_token_removes_nothing.
+- budget-exception: push.merge — the hook refuses hand-typed merges so `land` is the one merge path; eval loom-code/scripts/test_ship_worktree_merge.py::test_hook_blocks_absolute_cd_merge_with_push_merge.
 
 ## [3.2.0] — 2026-09-14 — count loom-workflow hooks in the mechanism population
 

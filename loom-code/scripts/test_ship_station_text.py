@@ -35,3 +35,57 @@ def test_ship_publish_title_type_equals_branch_type() -> None:
         "Commits subject whose type equals the branch `<type>/` prefix, because "
         "it becomes the squash-merge commit"
     )
+
+
+LAND_COMMAND = (
+    "cd '<absolute worktree root>' && python3 <loom-code>/scripts/loom_checker.py "
+    "land --accepted-by <name>"
+)
+
+
+# ship-text-runs-land-after-acceptance (A1 positive)
+def test_ship_text_runs_land_after_acceptance() -> None:
+    text = SHIP.read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+    assert LAND_COMMAND in text
+    assert "decision point ③" in flat
+    assert "blind-run report" in flat
+    assert "`next:`" in flat and "starts with the `cd`" in flat
+    assert "`land --cleanup <branch>`" in flat
+    assert "`land --sweep`" in flat
+    assert "`--sweep --confirm <token>`" in flat
+    confirm = [
+        s for s in re.split(r"(?<=[.!?])\s+", flat)
+        if "`--sweep --confirm <token>`" in s and "answers yes" in s
+    ]
+    assert len(confirm) == 1, "the sweep token is passed only after the maintainer answers yes"
+    handoff = " ".join(_section(text, "## Handoff").split())
+    assert "land" in handoff and "output" in handoff
+
+
+# ship-text-separates-authorization-from-acceptance
+def test_ship_text_separates_authorization_from_acceptance() -> None:
+    text = SHIP.read_text(encoding="utf-8")
+    assert not re.search(r"^## 1\. Confirm acceptance$", text, re.M)
+    assert re.search(r"^## 1\. Confirm publication authorization$", text, re.M)
+    land = " ".join(_section(text, "## 5. Land after acceptance").split())
+    assert (
+        "Publication authorization, including `publication: automatic`, is not "
+        "acceptance; always present the result and ask at decision point ③ "
+        "before running land."
+    ) in land
+
+
+# ship-text-has-no-direct-gh-pr-merge (A1 negative)
+def test_ship_text_has_no_direct_gh_pr_merge() -> None:
+    flat = " ".join(SHIP.read_text(encoding="utf-8").split())
+    assert not re.search(r"gh pr merge\s+[<0-9-]", flat), "no gh pr merge command form"
+    for sentence in re.split(r"(?<=[.!?])\s+", flat):
+        if "gh pr merge" in sentence:
+            assert has_negation(sentence), f"affirmative merge instruction: {sentence}"
+
+
+# ship-text-keeps-no-worktree-instruction (A11 negative)
+def test_ship_text_keeps_no_worktree_instruction() -> None:
+    text = SHIP.read_text(encoding="utf-8").lower()
+    assert "keep the worktree" not in " ".join(text.split())
