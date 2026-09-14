@@ -196,13 +196,15 @@ full list):
 
 ## License
 
-This skill is part of the [monkey-skills](https://github.com/kouko/monkey-skills)
+This skill was originally developed in monkey-skills and is now part of
+loom-workflow in the [loom-plugins](https://github.com/kouko/loom-plugins)
 repository, MIT-licensed — see the repository root `LICENSE` file.
 
 ### Third-party attributions
 
 The two prompt-analyst templates under `agents/` are direct adaptations of
 Trace2Skill (arxiv 2603.25158 / github.com/Qwen-Applications/Trace2Skill,
-Apache 2.0 License). The MIT license of monkey-skills is compatible with the
-Apache 2.0 license of the upstream — both permit commercial + derivative use
-with attribution preserved.
+Apache 2.0 License). The MIT license of this repository
+([loom-plugins](https://github.com/kouko/loom-plugins)) is compatible with
+the Apache 2.0 license of the upstream — both permit commercial + derivative
+use with attribution preserved.
