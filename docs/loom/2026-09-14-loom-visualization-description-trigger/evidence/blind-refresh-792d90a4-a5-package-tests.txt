@@ -1,0 +1,51 @@
+# command: uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q
+# clean worktree at 792d90a4, run 2026-09-14
+1055 passed, 2 skipped in 20.55s
+204 passed, 1 skipped in 3.51s
+52 passed in 2.61s
+94 passed in 1.07s
+261 passed in 8.83s
+115 passed in 0.58s
+64 passed in 10.82s
+43 passed in 0.10s
+13 passed in 0.03s
+1 passed in 0.01s
+78 passed, 3 skipped in 1.54s
+164 passed, 5 skipped in 0.36s
+12 passed in 0.03s
+Summary: 5 PASS / 0 FAIL
+Summary: 2 PASS / 0 FAIL
+Summary: 5 PASS / 0 FAIL
+Summary: 2 PASS / 0 FAIL
+Summary: 15 PASS / 0 FAIL
+Summary: 21 PASS / 0 FAIL
+Summary: 12 PASS / 0 FAIL
+Summary: 12 PASS / 0 FAIL
+Summary: 11 PASS / 0 FAIL
+Summary: 6 PASS / 0 FAIL
+Summary: 5 PASS / 0 FAIL
+Summary: 5 PASS / 0 FAIL
+Summary: 5 PASS / 0 FAIL
+Summary: 6 PASS / 0 FAIL
+Summary: 11 PASS / 0 FAIL
+--- tail ---
+
+11 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+OK templates/01-option-comparison.md:52
+OK templates/02-linear-steps.md:53
+OK templates/03-branching-decision.md:46
+OK templates/04-reasoning-chain.md:52
+OK templates/05-state-lifecycle.md:39
+OK templates/06-actor-sequence.md:49
+OK templates/07-hierarchy.md:42
+OK templates/08-system-architecture.md:55
+OK templates/09-data-model.md:31
+OK templates/10-timeline.md:37
+OK templates/11-quantity.md:41
+11/11 mermaid blocks parsed
+PASS — validator exits 1 on the A -> B block
+PASS — FAIL line names /var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/tmp.zI1nMvuczI/bad.md:3
+EXIT=0

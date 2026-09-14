@@ -1,0 +1,17 @@
+# Blind-run refresh, clean worktree at 792d90a4, 2026-09-14
+## A1 rendered description (SKILL.md lines 1-5)
+---
+name: loom-visualization
+description: |
+  Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, including when a Loom station reports to the user (intent restatement, choices, blind-run results); not Obsidian notes.
+---
+## A1 python3 -m pytest scripts/test_loom_skill_description_catalog.py -q
+7 passed in 0.10s
+## A4 rendered SHA-256 via catalog _description
+e98a3ed165415900bf405fe07209dde634cd465ff035fbea4ac2c73f57f6fd45
+## A4 pinned literal in guard test
+21:TESTED_SHA256 = "e98a3ed165415900bf405fe07209dde634cd465ff035fbea4ac2c73f57f6fd45"
+## A4 python3 -m pytest loom-workflow/scripts/test_loom_visualization_description_ab.py -q
+3 passed in 0.09s
+## A2/A3 evidence unchanged: git diff --stat b8fbcc1f 792d90a4 -- evidence/ab-A evidence/ab-B
+       0
