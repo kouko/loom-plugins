@@ -1,6 +1,6 @@
 # 讓使用者為單一變更選擇要跑哪些 Loom 步驟 — 我試了什麼、發生了什麼
 
-2026-09-14 在專案的乾淨副本上試跑兩次：第一次在 f595bc18，審查第一輪修正後在 3fce72c8 重跑受影響的第 1、2、7、8 條（其他各條的修正沒碰到，結果沿用第一次）。做法：把分支重新 clone 到暫存目錄，另外建一個拋棄式小專案（有本機假遠端、宣告了一條會通過的測試指令），用副本裡的檢查器，並把 Claude Code 與 Codex 兩份 hook 設定裡的指令原封不動拿出來，餵進兩種主機實際會送的 JSON。沒有開真的 Claude Code／Codex 對話，也沒有推到任何 GitHub。對抗測試那組 16 個案例在新版上也跑過，全部通過。
+2026-09-14 在專案的乾淨副本上試跑兩次：第一次在 f595bc18，審查第一輪修正後在 3fce72c8 重跑受影響的第 1、2、7、8 條（其他各條的修正沒碰到，結果沿用第一次）；第三輪設計改動（確認只在提出表格的那個「有人在場」的 Claude Code 對話裡生效）後，又在 c7eac3f8 重跑第 1、2、3、9 條，每個子程序都明確指定對話身分與是否有人在場。做法：把分支重新 clone 到暫存目錄，另外建一個拋棄式小專案（有本機假遠端、宣告了一條會通過的測試指令），用副本裡的檢查器，並把 Claude Code 與 Codex 兩份 hook 設定裡的指令原封不動拿出來，餵進兩種主機實際會送的 JSON。沒有開真的 Claude Code／Codex 對話，也沒有推到任何 GitHub。對抗測試那組案例在最新版上是 21 個，全部通過。
 
 ## 你要求的，一條一條看
 
@@ -9,18 +9,21 @@
 - **發生了什麼**：表格列出九個步驟各自 run／skip，附四碼確認碼。打確認後 hook 回一則訊息，列出實際綁定的執行與跳過清單，之後查到的就只剩標為執行的步驟。四種撤回說法都回「已撤回、恢復完整流程」；agent 代為撤回也一樣。「取消 review」不算撤回（依設計會當成新的選擇）。不存在的步驟、依賴沒滿足、「發布」都被拒絕，也不給確認碼。**新版**：撤回後或 rebase 後重打舊碼，hook 會回「這個碼已失效、什麼都沒記錄、請 agent 重新出表」，不再是沒反應；打一個從沒出現過的碼則依設計沒有 hook 訊息。各站的說明文字現在都寫了「使用者用自己的話說要跳過步驟時，走同一套流程、要等打確認」。
 - **證據**：`selection propose` 輸出 `code: J5GV` 與九列表格；`systemMessage: "Loom: selection J5GV bound … Skip: reviewers, adversarial."`；撤回輸出 `withdrawn; the full process resumes.`；拒絕輸出 `unknown step 'publication'`、`step 'spec' requires 'intent'`；失效碼 `Loom: code J5GV is no longer valid (its selection was withdrawn or lapsed); nothing was recorded.`；各站說明 `When the user asks in their own words to run …`。
 - **判定**：部分 — 表格、確認、撤回、失效碼提示在檢查器與 hook 層都照做；「在一般對話裡說出來 agent 真的會走同一套」與「使用者在真實對話畫面上真的看得到那則 hook 訊息」只寫在說明文字、必須開真的對話才能證明，這裡沒辦法驗。
+- **第三次（c7eac3f8）**：在對話 A（有人在場）出表並由對話 A 打確認 → 綁定，hook 訊息照常出現；換成對話 B 查詢則看到完整流程。從別的對話 B 打同一個確認（不論有沒有人在場）、或同一個對話 A 但標為無人在場，都不綁定、也沒有訊息。從無人在場的程序打「/expert-mode 取消」仍然會撤回。證據：`bound= True`（以 A 查）／`bound= False`（以 B 查）；`[SESSION_ID=B ATTENDED=0] /expert-mode J5GV` → `bound= False`；`[SESSION_ID=A ATTENDED=0]` → `bound= False`；`[SESSION_ID=B ATTENDED=0] /expert-mode 取消` → `withdrawn; the full process resumes.`。判定不變（部分）。
 
 ### 2. Until that typed confirmation exists, the change follows the full process; a plain reply such as "yes" is not a confirmation.
 - **怎麼試**：出表後分別回「yes」「對」「確認 碼」（前面沒有入口指令）；再送缺少 prompt 編號的、事件類型錯的 hook 資料；直接執行記錄指令；模擬 agent 用指令列或寫檔工具去改記錄。重跑時再試：agent 叫出一個巢狀的 Claude Code 或 Codex 對話、把入口指令和碼當成「使用者輸入」送進去（包括包在 bash -c 裡、以及用 Codex 的 hook 設定）；agent 先切到記錄資料夾裡面再寫；以及一般專案裡剛好叫 selections 的資料夾寫設定檔。這些都只餵給守門 hook 看，沒有真的開巢狀對話。
 - **發生了什麼**：每一種之後查到的都是完整流程、沒有跳過。偽造與缺欄位的資料都被拒絕並註明「什麼都沒記錄」。agent 想直接跑記錄指令、用 >> 寫、先 cd 再寫、透過 git 目錄寫、用寫檔工具寫，全部被擋；一般的列出目錄與代為撤回則放行。**新版**：四種巢狀對話都被擋，理由是「巢狀對話的入口指令會被當成使用者親手打的」；在記錄資料夾裡面寫檔，Claude 與 Codex 兩邊都被擋；寫一般專案的 selections 設定檔、或只是搜尋含「expert-mode」字樣的檔案，都放行。
 - **證據**：`bound= False skip= []`（三次）；`not a UserPromptSubmit payload with a prompt reference; nothing recorded.`；`BLOCK selection.guard: the selection capture command runs only from the prompt hook`、`names the selection record store`、`writes through the git directory`、`resolves under the loom record directory`；`ls models/selections/` exit 0；`claude -p "/loom-code:expert-mode J5GV"`、`codex exec "$expert-mode J5GV"` → `BLOCK selection.guard: a nested host session's expert-mode prompt would pass as user-typed`；在記錄資料夾內 `echo x >> …jsonl` → `writes from a working directory inside the loom record directory`；`echo cfg > app/selections/config.json` exit 0。
 - **判定**：可用 — 沒有打確認就一律是完整流程。（刻意偽裝的指令本來就不在保護範圍，這是你已接受的邊界。）
+- **第三次（c7eac3f8）**：模擬 agent 叫出巢狀的 Claude Code 對話（例如 `timeout 60 claude -p "/expert-mode 碼"`）：送進去的確認帶著另一個對話身分、且標為無人在場，結果什麼都沒綁定。這次除了指令文字守門之外，就算指令被偽裝到守門沒認出來，確認本身也不會生效。只餵 hook 資料，沒有真的開巢狀對話。證據：`[claude env SESSION_ID=B ATTENDED=0, payload session_id=B] /expert-mode J5GV` → `[show as A] bound= False`。判定不變（可用）。
 
 ### 3. Whatever the instruction, the change is still published through a pull request and merged, and cannot be pushed if its content differs from the content its record describes; the package tests may be skipped like any other step, and when they run they must pass.
 - **怎麼試**：綁定「跳過審查與對抗測試」後結束審查（測試照跑）；把測試改成會失敗再結束一次；對內容檢查放行後再改一行程式看能不能推；模擬 agent 直接下 git push；用發布指令送一份格式不對的 PR 內容。（第一次試跑，f595bc18。）
 - **發生了什麼**：測試有跑且通過，產生的紀錄寫明跳過了哪些步驟；測試失敗時被擋下並指出指令與結束碼。內容改動後推送被擋（內容與紀錄不符）。直接 git push 被擋。發布指令在碰網路之前就因 PR 標題結構不符而拒絕。
 - **證據**：`wrote docs/loom/2026-09-14-tiny-param-change/attestation.json`，內含 `"kind": "package-tests" … "result": "pass"`、`"skip": ["reviewers","adversarial"]`；`BLOCK finalize.package-tests: \`python3 test_ok.py\` exited 3`；`BLOCK push.attestation: attestation functional content digest does not match the selected tree`；`BLOCK push.attestation: the entire Git push command must use canonical quote-all rendering`；`BLOCK push.contextual-body: … nine top-level contextual headings`。
 - **判定**：部分 — 本機的閘全部照做；真的在 GitHub 開 PR 並合併這一段需要真的遠端與帳號，這裡沒試。
+- **第三次（c7eac3f8）**：在對話 A 綁定「跳過審查與對抗測試」後，從對話 B 結束審查 → 照完整流程要求審查結果而被擋；從對話 A 結束審查 → 接受跳過，測試照跑通過並產生紀錄。證據：`[finalize as B] BLOCK finalize.verdicts: review input has no verdicts`（exit 1）；`[finalize as A] wrote docs/loom/2026-09-14-tiny-param-change/attestation.json`，`skip= ['reviewers', 'adversarial'] executions= ['package-tests']`。判定不變（部分）。
 
 ### 4. When the agent suggests skipping steps without the user having asked, the suggestion is shown at most once per change, the work continues on the full process without waiting for an answer, and no step is skipped unless the user later types the confirmation.
 - **怎麼試**：以「agent 建議」的來源出表，回「yes」，再打正式確認。（第一次試跑。）
@@ -57,6 +60,7 @@
 - **發生了什麼**：結果與 Claude Code 完全一樣（yes 不綁定、確認後綁定、撤回恢復完整流程、兩種寫記錄都被擋）。這台機器上的 Codex 載入的是舊版外掛，而且開 Codex 會用到你真正的設定，所以沒有開真的 Codex 對話；Codex 實際把外掛 skill 呼叫寫成什麼字、以及還沒信任 hook 時的情況都沒驗到。
 - **證據**：Codex 格式 `$expert-mode J5GV` → 與 Claude 相同的綁定訊息；`$loom-code:expert-mode go J5GV` → `"bound": true`；`BLOCK selection.guard: .git/loom/selections/a.jsonl resolves under the loom record directory`（apply_patch）。
 - **判定**：部分 — 兩種資料格式結果一致；真實 Codex 對話這裡沒辦法驗。
+- **第三次（c7eac3f8）**：拿掉所有 Claude Code 對話變數、用 Codex 的資料格式出表並打「$expert-mode 碼」→ 跟之前一樣綁定。Codex 不提供對話身分，所以在 Codex 上沒有「只在同一個對話生效」這層保護，擋巢狀對話只靠比對指令文字的守門（見第 2 條）。證據：`$expert-mode J5GV`（無 `CLAUDE_CODE_*`、有 `turn_id`）→ 綁定訊息、`bound= True`。判定不變（部分）。
 
 ### 10. `KICKOFF-DEFAULTS.md`, the contract manifest and the templates no longer carry the unused lane settings, and the repository's existing Loom checks still pass.
 - **怎麼試**：在副本搜尋 lane 相關設定；跑機制登記檢查；拿一份還留著 `lane:` 行的舊 intent 讓檢查器檢查。（第一次試跑。）
@@ -77,6 +81,7 @@
 - **rebase 或把主線合進來，會讓已綁定的選擇失效；失敗紀錄則跟著變更名稱保留，改分支名或 rebase 都不會消失** — 你得重新確認一次；沿用同一個變更名稱的新分支也會帶著舊的失敗。
 - **被撤回的確認不寫進 PR** — PR 只揭露最後仍生效的選擇與它之前的失敗。
 - **擋下 agent 自己開巢狀的 Claude Code／Codex 對話並送入口指令** — 靠比對指令文字；刻意偽裝的寫法不在保護範圍。
+- **在 Claude Code 上，確認只在提出表格、有人在場的那個對話裡生效** — 代價是：確認和結束審查必須在同一個 Claude Code 對話裡做；換一個對話結束審查會回到完整流程，要在那個對話重新確認。另外，選擇紀錄存在本機 git 的內部資料夾，所以在全新 clone 的副本裡，已綁定的選擇不存在，一律是完整流程。沒有對話身分的環境（Codex、CI、手動在終端機跑）不做這層比對。
 - **「代理記錄的授權」只保留了寫法，目前沒有任何指令會產生它** — 因為兩種主機都抓得到你打的字。
 - **「建議跳過最多一次、不停下來等」只寫在說明文字** — 沒有程式能驗，靠回歸測試裡的文字檢查。
 - **跳過審查的清單只看遠端主線上已合併的紀錄** — 還沒合併、或遠端主線沒抓下來時，查不到。
@@ -94,7 +99,7 @@
 | 計畫 | 守住 | 不適用 | `plan.md` 全英文 |
 | 規格 | 守住 | 守住（每條需求都是 EARS 句型並對回驗收編號） | `spec.md` `REQ-1`…`REQ-11` |
 | 審查紀錄的發現 | 尚無可檢查的內容 | 尚無可檢查的內容 | 變更資料夾內沒有審查紀錄檔 |
-| 證據 | 守住 | 不適用 | 擷取輸出皆為英文；`evidence/probes/test_selection_adversarial_probes.py` 16 passed |
+| 證據 | 守住 | 不適用 | 擷取輸出皆為英文；`evidence/probes/test_selection_adversarial_probes.py` 21 passed |
 | 測試說明文字 | 守住（中文只出現在模擬使用者輸入的測試資料） | 不適用 | `test_selection_capture.py:163` 等 |
 | 測試名稱 | 守住 | 守住（單元_狀態_預期） | `test_plain_yes_binds_nothing`、`test_failure_survives_rebase` 等 |
 | 提交訊息 | 守住 | 不適用 | `feat(loom-code): …`、`fix(loom-code): …` |
