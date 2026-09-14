@@ -2,7 +2,8 @@
 
 第一次試用：2026-09-14，在乾淨的專案副本 55c80731 上。
 修正後重試：2026-09-14，在乾淨的專案副本 b3678bfb 上（第 1–6、9 條）。
-最終版本：2026-09-14，在乾淨的專案副本 76a1b005 上（第 7、10 條，另外快速重跑第 3 條）。
+最終功能版本：2026-09-14，在乾淨的專案副本 76a1b005 上（第 7 條，另外快速重跑第 3 條）。
+合併主線之後：2026-09-14，在乾淨的專案副本 2c514285 上（第 1、10 條）。
 
 一句話結論：在最終版本上，十條驗收裡九條照你要的方式運作，整套測試也通過了。第 9 條只算部分可用：兩個工具都裝時，兩張卡片對「中日文方框圖」會各自叫代理人用自己的工具。這一點已經被駁回，留到之後的改動處理（見「我替你決定了的事」）。
 
@@ -16,9 +17,9 @@
 ## 你要的東西，一條一條看
 
 ### 1. `loom-workflow` provides a `loom-visualization` skill and no longer provides `cot-explain`; the plugin installs on Claude Code and Codex, and references to `cot-explain` elsewhere in the repository point to the new skill.
-- **我怎麼試**：（55c80731）用 Claude Code 自己的外掛檢查指令檢查三個外掛。再開一個全新的暫時設定目錄，照 README 的步驟把這份副本加成外掛來源，安裝 loom-workflow。Codex 也一樣：用 Codex 0.154.0 和暫時的設定目錄，加入來源後安裝 loom-workflow。最後在整個專案裡搜尋舊名字。（b3678bfb）確認兩邊的外掛設定檔都沒改，再跑一次檢查、Codex 同步檢查和舊名字搜尋。
-- **結果**：三個外掛都通過檢查。loom-design 有一個「不認得的欄位」警告，跟這次改動無關。兩邊都裝得起來，版本是 5.0.0，裝好的 12 個技能裡有新技能，舊技能不見了。Codex 的外掛描述和 Claude 的一致。舊名字只剩在歷史紀錄、改名對照表，以及「確保沒有人再指向舊名字」的測試裡。修正後再查，結果相同。
-- **證據**：`evidence/a1-install-and-references.txt`、`evidence/a1-claude-install.txt`、`evidence/a1-codex-install.txt`、`evidence/b3678bfb/a1-recheck-b3678bfb.txt`
+- **我怎麼試**：（55c80731）用 Claude Code 自己的外掛檢查指令檢查三個外掛。再開一個全新的暫時設定目錄，照 README 的步驟把這份副本加成外掛來源，安裝 loom-workflow。Codex 也一樣：用 Codex 0.154.0 和暫時的設定目錄，加入來源後安裝 loom-workflow。最後在整個專案裡搜尋舊名字。（b3678bfb）確認兩邊的外掛設定檔都沒改，再跑一次檢查、Codex 同步檢查和舊名字搜尋。（2c514285，合併主線之後）主線帶來了外掛設定檔裡的網址變更和新版 README，所以再跑一次三個外掛的檢查、Codex 同步檢查、舊名字搜尋，並確認版本號。
+- **結果**：三個外掛都通過檢查。loom-design 有一個「不認得的欄位」警告，跟這次改動無關。兩邊都裝得起來，版本是 5.0.0，裝好的 12 個技能裡有新技能，舊技能不見了。Codex 的外掛描述和 Claude 的一致。舊名字只剩在歷史紀錄、改名對照表，以及「確保沒有人再指向舊名字」的測試裡。修正後再查，結果相同。合併主線之後：三個外掛仍然通過檢查（loom-design 同一個無關警告），Codex 同步檢查結果是 0，loom-workflow 是 5.0.0、loom-code 是 3.2.0，技能資料夾仍是 12 個且包含新技能。新版的 4 份 README 都改用新名字，完全沒有舊名字。舊名字只剩在變更紀錄的歷史段落和上述測試裡。
+- **證據**：`evidence/a1-install-and-references.txt`、`evidence/a1-claude-install.txt`、`evidence/a1-codex-install.txt`、`evidence/b3678bfb/a1-recheck-b3678bfb.txt`、`evidence/2c514285/a1-recheck-2c514285.txt`
 - **判定**：可用 — 兩個工具都真的裝得起來，舊名字沒有殘留在使用中的地方。
 
 ### 2. The skill provides templates for 11 information shapes — option comparison, linear steps, branching decision, reasoning/causal chain, state/lifecycle, actor interaction sequence, hierarchy, system architecture, data model, timeline, quantity — each with a markdown-table form, an ASCII form (or a stated table substitute), and a Mermaid form.
@@ -71,9 +72,9 @@
 - **判定**：部分可用 — 大部分形狀只有一個工具負責，但中日文方框圖兩張卡片都搶。
 
 ### 10. The repository's package test suite passes.
-- **我怎麼試**：（76a1b005，最終版本）在乾淨副本裡照專案的指令跑整套 loom 測試。
-- **結果**：全部通過，退出碼 0。第一組 1054 個通過、2 個略過，沒有失敗。其餘各組全部通過，包括 Mermaid 那組 11 張圖和反例檢查。最後幾行是「11/11 mermaid blocks parsed」、「PASS — validator exits 1 on the A -> B block」、「PASS — FAIL line names <temp>/bad.md:3」、「exit=0」。第一次試用時那個寫死舊版本號的失敗，已經修好。
-- **證據**：`evidence/76a1b005/package-tests-76a1b005.txt`；b3678bfb 的結果在 `evidence/b3678bfb/package-tests-b3678bfb.txt`，第一次的失敗紀錄在 `evidence/package-tests.txt`
+- **我怎麼試**：（2c514285，合併主線之後）在乾淨副本裡照專案的指令跑整套 loom 測試。
+- **結果**：全部通過，退出碼 0。第一組 1054 個通過、2 個略過，沒有失敗。其餘各組全部通過，包括 Mermaid 那組 11 張圖和反例檢查。最後幾行是「11/11 mermaid blocks parsed」、「PASS — validator exits 1 on the A -> B block」、「PASS — FAIL line names <temp>/bad.md:3」、「exit=0」。第一次試用時那個寫死舊版本號的失敗，已經修好。合併主線沒有讓任何測試變紅。
+- **證據**：`evidence/2c514285/package-tests-2c514285.txt`；76a1b005 的結果在 `evidence/76a1b005/package-tests-76a1b005.txt`，b3678bfb 的在 `evidence/b3678bfb/package-tests-b3678bfb.txt`，第一次的失敗紀錄在 `evidence/package-tests.txt`
 - **判定**：可用。
 
 ## 對你既有的資料做了什麼
@@ -91,6 +92,7 @@
 - **兩個工具都裝時，流程、狀態和架構交給 ascii-graph** — loom 的卡片管其他形狀，修正後也包括訊息往來。第 9 條發現中日文方框圖仍有重疊。
 - **loom-code 升到 3.2.0，並記下四條預算例外** — 因為這次動到它的機制計數程式。
 - **loom-workflow 版本定為 5.0.0** — 移除公開技能名稱算不相容的變更。
+- **合併主線時，README 用主線的新架構，只套上改名** — 主線同時重寫了 README，和這個分支衝突。這個分支把主線合併進來，保留主線的新 README 結構，只把舊技能名稱換成新名稱，沒有保留分支上原本的 README 寫法。
 - **自動測試的觸發範圍維持寬鬆** — 改到相關資料夾就會跑，會多跑一些，但不容易漏。
 - **Mermaid 那組測試需要 node 和網路** — 沒有 node 或連不上網，那組就算失敗，沒有略過選項。
 - **駁回的重要意見：只用命令列參數關掉 ascii-graph 時，開場提示程式看不到** — 我在第一次試用時提出。統籌者駁回的理由是：開場提示程式拿不到命令列設定的內容，這方面沒有公開文件可依據；一般安裝都是用設定檔開關外掛，而程式會讀設定檔。如果這個理由不成立，代價是：只用命令列關掉 ascii-graph 時，代理人仍可能看到共存卡片，被叫去用一個根本沒載入的工具。

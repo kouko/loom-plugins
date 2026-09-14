@@ -1,0 +1,64 @@
+== claude plugin validate loom-code
+Validating plugin manifest: <scratch>/br4/loom-code/.claude-plugin/plugin.json
+
+✔ Validation passed
+== claude plugin validate loom-design
+  ❯ requires-contract: Unknown field 'requires-contract'. Claude Code ignores it at load time.
+
+✔ Validation passed with warnings
+== claude plugin validate loom-workflow
+Validating plugin manifest: <scratch>/br4/loom-workflow/.claude-plugin/plugin.json
+
+✔ Validation passed
+== sync_codex_manifests --check --all
+exit=0
+== versions
+loom-workflow/.claude-plugin/plugin.json:  "version": "5.0.0",
+loom-workflow/.codex-plugin/plugin.json:  "version": "5.0.0",
+loom-code/.claude-plugin/plugin.json:  "version": "3.2.0",
+loom-code/.codex-plugin/plugin.json:  "version": "3.2.0",
+17:| [`loom-code`](loom-code/) | 3.2.0 | 6 | Engineering stations: plan, build, review, ship, maintain. |
+18:| [`loom-workflow`](loom-workflow/) | 5.0.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
+== skills folder
+critique
+dbt-model-style
+decision-map
+distill-sessions
+git-memory
+goal-create
+handoff
+independent-advisor
+loom-memory
+loom-visualization
+recap-state
+using-loom-workflow
+== git grep -l cot-explain (live paths: excluding docs/loom history)
+loom-workflow/CHANGELOG.md
+loom-workflow/scripts/test_loom_visualization_compaction.py
+loom-workflow/scripts/test_no_live_cot_explain_references.py
+loom-workflow/tests/test_loom_visualization_page_scripts.py
+scripts/test_loom_skill_description_catalog.py
+== cot-explain lines in any README or CHANGELOG
+loom-workflow/CHANGELOG.md:7:## [5.0.0] — 2026-09-14 — loom-visualization replaces cot-explain
+loom-workflow/CHANGELOG.md:9:- **BREAKING**: `cot-explain` is removed with no alias. Invocations of
+loom-workflow/CHANGELOG.md:10:  `loom-workflow:cot-explain` must change to
+loom-workflow/CHANGELOG.md:18:- Page output identifiers changed from `cot-explain` to `loom-visualization`.
+loom-workflow/CHANGELOG.md:185:the contract check (`loom_checker.py contract --require 1.0`) lives in decision-map only — the one skill that needs loom-code; th
+loom-workflow/CHANGELOG.md:490:- `cot-explain`: restored all three routing destinations 1.0.1 dropped —
+loom-workflow/CHANGELOG.md:514:## [2.27.1] — 2026-08-19 — `cot-explain` stops pinning the anomalous mermaid
+loom-workflow/CHANGELOG.md:542:## [2.27.0] — 2026-08-19 — `cot-explain` diagrams render the same everywhere
+loom-workflow/CHANGELOG.md:593:Both outputs now live side by side in `${TMPDIR:-/tmp}/cot-explain/`, and
+loom-workflow/CHANGELOG.md:605:## [2.26.1] — 2026-08-19 — `cot-explain` reads as domain-neutral
+loom-workflow/CHANGELOG.md:649:## [2.26.0] — 2026-08-19 — new skill `cot-explain`
+loom-workflow/CHANGELOG.md:651:### Added — `cot-explain` v0.1.0: reasoning → one shareable HTML page
+loom-workflow/CHANGELOG.md:684:Output landed in the repo at `.claude/cot-explain/` in this first pass;
+loom-workflow/CHANGELOG.md:694:state across sessions; `cot-explain` is for *explaining* thinking that
+loom-workflow/CHANGELOG.md:718:`.claude/cot-explain/` was not in `.gitignore`, so generated explainers
+loom-workflow/CHANGELOG.md:976:Output moved to `${TMPDIR:-/tmp}/cot-explain/`. These pages are read once
+loom-workflow/CHANGELOG.md:1381:Run inside `skills/cot-explain/scripts/`, pytest creates `__pycache__/`
+loom-workflow/CHANGELOG.md:1389:Files: `skills/cot-explain/{SKILL.md,README.md,README.ja.md,README.zh-TW.md}`,
+== loom-visualization in READMEs
+README.md:1
+loom-workflow/README.ja.md:5
+loom-workflow/README.md:5
+loom-workflow/README.zh-TW.md:5
