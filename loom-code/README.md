@@ -22,7 +22,7 @@ implementation requests to a station below. Each station remains directly callab
 |---|---|---|
 | `write-plan` | `docs/loom/<change-id>/plan.md` — a task DAG | [SKILL.md](skills/write-plan/SKILL.md) |
 | `build` | tested functional commits | [SKILL.md](skills/build/SKILL.md) |
-| `review` | generated `docs/loom/<change-id>/attestation.json` | [SKILL.md](skills/review/SKILL.md) |
+| `closing-review` | generated `docs/loom/<change-id>/attestation.json` | [SKILL.md](skills/closing-review/SKILL.md) |
 | `ship` | the pull request, the memory trailers, the merge | [SKILL.md](skills/ship/SKILL.md) |
 | `maintain` | an intent, out of an alert or an incident | [SKILL.md](skills/maintain/SKILL.md) |
 

@@ -64,7 +64,7 @@ mechanisms:
   - id: build
     class: skill
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w1-checkpoint-reviews.md"
-  - id: review
+  - id: closing-review
     class: skill
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w1-checkpoint-reviews.md"
   - id: ship
@@ -191,7 +191,7 @@ mechanisms:
   - {id: "station:write-spec",     class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "station:write-plan",     class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "station:build",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
-  - {id: "station:review",         class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
+  - {id: "station:closing-review", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "station:ship",           class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "station:maintain",       class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "tool:product-principles",  class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}

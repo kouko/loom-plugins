@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-REVIEW = (ROOT / "loom-code/skills/review/SKILL.md").read_text(encoding="utf-8")
+REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
 REVIEWER = (ROOT / "loom-code/agents/reviewer.md").read_text(encoding="utf-8")
 REVIEW_WORDS = " ".join(REVIEW.split())
 CONTRACT = " ".join((REVIEW + "\n" + REVIEWER).split())

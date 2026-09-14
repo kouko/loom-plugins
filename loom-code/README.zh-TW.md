@@ -20,7 +20,7 @@
 |---|---|---|
 | `write-plan` | `docs/loom/<change-id>/plan.md` — 任務 DAG | [SKILL.md](skills/write-plan/SKILL.md) |
 | `build` | 功能 commit 與聚焦測試；不建立 dispatch ledger | [SKILL.md](skills/build/SKILL.md) |
-| `review` | 產生綁定功能內容的 `docs/loom/<change-id>/attestation.json` | [SKILL.md](skills/review/SKILL.md) |
+| `closing-review` | 產生綁定功能內容的 `docs/loom/<change-id>/attestation.json` | [SKILL.md](skills/closing-review/SKILL.md) |
 | `ship` | PR、memory trailer、合併 | [SKILL.md](skills/ship/SKILL.md) |
 | `maintain` | 把告警或事故變成一份 intent | [SKILL.md](skills/maintain/SKILL.md) |
 

@@ -471,7 +471,7 @@ def test_contract_defines_the_executable_json_boundary() -> None:
     assert "completed_redispatches" in text
 
 
-@pytest.mark.parametrize("station", ["build", "review"])
+@pytest.mark.parametrize("station", ["build", "closing-review"])
 def test_stations_invoke_the_executable_resolver_before_spawn(station: str) -> None:
     text = (PLUGIN / "skills" / station / "SKILL.md").read_text(encoding="utf-8")
     flat = " ".join(text.split())

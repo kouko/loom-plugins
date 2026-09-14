@@ -1,5 +1,5 @@
 ---
-name: review
+name: closing-review
 description: |
   Run closing review and generate an attestation. Use after Build completes or functional changes invalidate prior review evidence.
 version: 1.5.0

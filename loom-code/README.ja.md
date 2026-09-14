@@ -22,7 +22,7 @@
 |---|---|---|
 | `write-plan` | `docs/loom/<change-id>/plan.md` — タスク DAG | [SKILL.md](skills/write-plan/SKILL.md) |
 | `build` | 機能コミットと focused test。dispatch ledger は作らない | [SKILL.md](skills/build/SKILL.md) |
-| `review` | 機能内容に結び付く `docs/loom/<change-id>/attestation.json` を生成 | [SKILL.md](skills/review/SKILL.md) |
+| `closing-review` | 機能内容に結び付く `docs/loom/<change-id>/attestation.json` を生成 | [SKILL.md](skills/closing-review/SKILL.md) |
 | `ship` | PR、memory trailer、マージ | [SKILL.md](skills/ship/SKILL.md) |
 | `maintain` | アラートや障害から intent を起こす | [SKILL.md](skills/maintain/SKILL.md) |
 

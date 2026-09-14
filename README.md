@@ -14,7 +14,7 @@ Codex:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.1.5 | 5 | Front of the flow: intent, specification, product principles, visual design. |
-| [`loom-code`](loom-code/) | 3.1.4 | 6 | Engineering stations: plan, build, review, ship, maintain. |
+| [`loom-code`](loom-code/) | 3.1.4 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
 | [`loom-workflow`](loom-workflow/) | 4.3.4 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
@@ -43,7 +43,7 @@ flowchart TD
     subgraph code["loom-code"]
         plan["loom-code:write-plan<br/>task DAG"]
         build["loom-code:build<br/>test-first, one commit per task"]
-        review["loom-code:review<br/>fresh-context review<br/>→ attestation"]
+        review["loom-code:closing-review<br/>fresh-context review<br/>→ attestation"]
         ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (blind-run report when required)"]
         maintain["loom-code:maintain<br/>bugs, alerts, regressions"]
     end
@@ -75,7 +75,7 @@ flowchart TD
 - **② Specification** — `write-spec` runs only for changes that need design;
   for product changes you confirm the visible behaviour before planning.
 - **Build and review** — `build` implements each planned task test-first.
-  `review` then dispatches the checker-computed number of fresh-context
+  `closing-review` then dispatches the checker-computed number of fresh-context
   reviewers (two unless the change is narrow and low-risk), a blind runner
   when an acceptance line cannot be checked mechanically, and adversarial
   programs for code, skill, spec or gate changes. Passing evidence becomes an
@@ -134,7 +134,7 @@ content-bound verification, one closing review and a fast publication gate.
 | --- | --- |
 | `write-plan` | Turn a confirmed intent into a task DAG with tests and risks per task. |
 | `build` | Implement the plan test-first, one task at a time. |
-| `review` | Run the closing review (read, blind run, adversary) and generate an attestation. |
+| `closing-review` | Run the closing review (read, blind run, adversary) and generate an attestation. |
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
 | `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |

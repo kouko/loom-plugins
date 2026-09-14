@@ -134,7 +134,7 @@ def test_no_fixed_station_mandatory_invocation() -> None:
     forbidden_station_names = {
         "loom-code:write-plan",
         "loom-code:build",
-        "loom-code:review",
+        "loom-code:closing-review",
         "loom-code:ship",
         "loom-code:maintain",
         "loom-design:capture-intent",

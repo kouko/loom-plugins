@@ -34,7 +34,7 @@ TEMPLATES_DIR = REPO / "loom-code/contract/templates"
 STATION_FILES = {
     "write-plan": (REPO / "loom-code/skills/write-plan/SKILL.md", {"plan"}),
     "build": (REPO / "loom-code/skills/build/SKILL.md", {"plan", "probe", "commit", "spec"}),
-    "review": (REPO / "loom-code/skills/review/SKILL.md", {"review.json", "findings", "evidence", "probe"}),
+    "review": (REPO / "loom-code/skills/closing-review/SKILL.md", {"review.json", "findings", "evidence", "probe"}),
     "ship": (REPO / "loom-code/skills/ship/SKILL.md", {"pr body", "commit", "report"}),
     "capture-intent": (REPO / "loom-design/skills/capture-intent/SKILL.md", {"intent"}),
     "write-spec": (REPO / "loom-design/skills/write-spec/SKILL.md", {"spec"}),

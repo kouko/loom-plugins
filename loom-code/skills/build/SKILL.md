@@ -62,6 +62,6 @@ content-bound execution.
 ## 4. Hand off to Review
 
 Commit functional changes normally. Report the branch base, HEAD, changed
-paths, focused test results, and any unresolved risk. Call `loom-code:review`
+paths, focused test results, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after Review generates it.
