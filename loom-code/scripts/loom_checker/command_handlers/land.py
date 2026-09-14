@@ -230,6 +230,17 @@ def _git_run(
     return result.returncode, result.stdout, detail
 
 
+def _git_reason(detail: str, fallback: str) -> str:
+    """git's last `fatal:`/`error:` line, never a hint line or one that
+    suggests forcing or overriding; `fallback` when no such line remains."""
+    lines = [
+        line.strip() for line in detail.splitlines()
+        if line.strip().startswith(("fatal:", "error:"))
+        and not re.search(r"(^|\s|')-f\b|force|override|rebase|--no-ff", line, re.IGNORECASE)
+    ]
+    return lines[-1] if lines else fallback
+
+
 def _worktrees(target: LandTarget, where: Path) -> tuple[list[Worktree], Path] | str:
     """(porcelain worktree entries, main worktree) or a failure reason."""
     code, stdout, detail = _git_run(target, where, "worktree", "list", "--porcelain", "-z")
@@ -301,7 +312,8 @@ def sync_trunk(target: LandTarget, out) -> None:
             target, main, "fetch", "origin", f"{trunk}:{trunk}", timeout=LAND_WRITE_TIMEOUT
         )
     if code != 0:
-        out.write(f"trunk not updated: {detail}\n")
+        reason = detail if code is None else _git_reason(detail, "not a fast-forward")
+        out.write(f"trunk not updated: {reason}\n")
         return
     tip = _tip(target, where, f"refs/heads/{trunk}")
     shown = tip[:7] if isinstance(tip, str) else "an unreadable tip"
@@ -444,8 +456,14 @@ def execute_cleanup(
         code, _stdout, detail = _git_run(
             target, anchor, "worktree", "remove", str(plan.worktree), timeout=LAND_WRITE_TIMEOUT
         )
+        if code is not None and code != 0 and _status_entries(target, plan.worktree) == []:
+            # git refused before deleting anything (for example a locked
+            # worktree): name its error line, never its force/override hint.
+            reason = _git_reason(detail, f"exit {code}")
+            return _cleanup_block(
+                f"git refused to remove worktree {plan.worktree}: {reason}", err
+            )
         if code != 0:
-            err.write(f"{detail}\n")
             return _cleanup_block(
                 f"worktree removal interrupted at {plan.worktree}; "
                 "run git worktree prune after checking the directory", err,

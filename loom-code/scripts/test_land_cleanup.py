@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 from io import StringIO
@@ -420,3 +421,45 @@ def test_interrupted_worktree_removal_keeps_branches(tmp_path: Path, monkeypatch
     assert layout.remote_has("feat/x")
     assert not calls.git_calls("update-ref")
     assert "Removed worktree" not in out
+
+
+# locked-worktree-refusal-names-git-reason-without-force-hint
+def test_locked_worktree_refusal_names_git_reason_without_force_hint(
+    tmp_path: Path, monkeypatch
+) -> None:
+    layout = Layout(tmp_path)
+    git(layout.repo, "worktree", "lock", str(layout.wt))
+
+    rc, out, err, calls = run_land(monkeypatch, layout)
+
+    assert rc == 1
+    assert f"BLOCK land.cleanup: git refused to remove worktree {layout.wt}: " in err, err
+    shown = (out + err).replace(str(layout.root), "<root>")
+    # "fast-forwarded" contains "-f"; look for -f as a flag token instead.
+    assert not re.search(r"(^|[\s'\"])-f\b", shown), shown
+    assert "force" not in shown and "override" not in shown, shown
+    assert "interrupted" not in err
+    assert layout.wt.is_dir() and (layout.wt / "feature.txt").is_file()
+    assert ref_exists(layout.repo, "refs/heads/feat/x")
+    assert layout.remote_has("feat/x")
+    assert not calls.git_calls("update-ref")
+    assert not calls.git_calls("push")
+
+
+# trunk-not-fast-forward-message-has-no-rebase-advice
+def test_trunk_not_fast_forward_message_has_no_rebase_advice(
+    tmp_path: Path, monkeypatch
+) -> None:
+    layout = Layout(tmp_path)
+    git(layout.repo, "commit", "-q", "--allow-empty", "-m", "local only")
+    diverged = git(layout.repo, "rev-parse", "refs/heads/main")
+
+    rc, out, err, _ = run_land(monkeypatch, layout)
+
+    assert rc == 0, err
+    [line] = [l for l in out.splitlines() if "trunk not updated" in l]
+    assert line.startswith("trunk not updated:"), out
+    assert "rebase" not in out + err and "--no-ff" not in out + err, out + err
+    assert git(layout.repo, "rev-parse", "refs/heads/main") == diverged
+    assert f"Removed worktree {layout.wt}\n" in out
+    assert not ref_exists(layout.repo, "refs/heads/feat/x")
