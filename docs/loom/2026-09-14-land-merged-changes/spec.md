@@ -79,6 +79,7 @@ Land after acceptance:
 - merged but body missing → `Merged PR #<n> as <sha7>` then `BLOCK land.verify: squash commit lacks the PR body`, exit 1, no sync or cleanup; the PR stays merged.
 - merged but a cleanup precondition fails → `Merged PR #<n> as <sha7>`, trunk line, then `BLOCK land.cleanup: <reason>`, exit 1, nothing removed; the way out is to resolve the named state and run `land --cleanup <branch>`.
 - worktree removal interrupted → `BLOCK land.cleanup: worktree removal interrupted at <path>; run git worktree prune after checking the directory`, exit 1, branches kept.
+- git refuses the removal and the directory is intact (for example a locked worktree) → `BLOCK land.cleanup: git refused to remove worktree <path>: <git's error line>`, exit 1, branches kept; git's own override or force hints are not repeated.
 
 Named cleanup:
 - `land --cleanup <branch>` with no merged PR → `BLOCK land.cleanup: no merged PR for <branch>`, exit 1.
