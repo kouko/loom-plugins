@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from prose_pin import has_negation
+import re
+
+from prose_pin import has_negation, split_sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -260,7 +262,11 @@ def test_build_and_plan_require_implementer_dispatch_without_requiring_paralleli
         prose = " ".join(station.split())
         assert "Scheduling multiple implementers concurrently is optional" in prose
         assert "Parallel work is optional" not in station
-    assert "Implementer dispatch is mandatory" in " ".join(PLAN.split())
+    assert (
+        "Unless `selection show` lists `implementer` as skipped, implementer dispatch is "
+        "mandatory for every implementation task."
+    ) in " ".join(PLAN.split())
+    assert "Implementer dispatch is mandatory for every implementation task" not in PLAN
     assert "implementer dispatch is mandatory" in " ".join(BUILD.split())
 
     build_prose = " ".join(BUILD.split())
@@ -436,3 +442,49 @@ def test_station_summary_rows_name_builds_mechanical_checks() -> None:
         for row in (*build, *review):
             assert "closing review dispatches" not in row.lower()
             assert "closing-review dispatches" not in row.lower()
+
+
+WRITE_SPEC = (ROOT / "loom-design/skills/write-spec/SKILL.md").read_text(encoding="utf-8")
+BLIND_RUNNER = (ROOT / "loom-code/agents/blind-runner.md").read_text(encoding="utf-8")
+
+
+def _affirmed_sentences(text: str, *literals: str) -> list[str]:
+    return [
+        s
+        for s in split_sentences(" ".join(text.split()), ".;")
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_spec_review_dispatches_reviewer_directly() -> None:
+    """A1 positive: the spec author dispatches loom-code:reviewer itself."""
+    for station in (PLAN, WRITE_SPEC):
+        assert _affirmed_sentences(
+            station, "`pre-build-review: required`", "`loom-code:reviewer`", "lens `spec+adversarial`"
+        )
+        assert _affirmed_sentences(station, "commit", "send", "back to that reviewer")
+
+
+def test_closing_review_scope_spec_rejected() -> None:
+    """A1 negative: no station hands a pre-build spec to closing-review."""
+    for station in (PLAN, WRITE_SPEC):
+        flat = " ".join(station.split())
+        assert "scope `spec`" not in flat
+        assert "hand the spec to the **closing-review** station" not in flat
+        assert "hand it to **`loom-code:closing-review`**" not in flat
+
+
+def test_plan_questions_asked_claims_no_reader_or_design_record() -> None:
+    flat = " ".join(PLAN.split())
+    assert "questions[]" not in PLAN
+    assert "§11" not in PLAN
+    assert "review record" not in flat
+    assert _affirmed_sentences(flat, "The list shows how often loom interrupts the user")
+
+
+def test_blind_runner_names_current_artifacts_and_package_suite_owners() -> None:
+    flat = " ".join(BLIND_RUNNER.split())
+    assert "review record" not in flat
+    assert "package-tests probe" not in flat
+    assert _affirmed_sentences(flat, "Build", "`finalize-review`", "package suite")

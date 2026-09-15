@@ -218,9 +218,9 @@ turns a behaviour confirmation into a quality review the user cannot do.
 
 2. **The one-way doors of this change**, in consequence form, in this same
    message. A one-way door is a choice that is expensive or impossible to
-   undo. The reference that defines them lives in `loom-code`'s
-   `write-plan` station — the file `one-way-door.md` in that skill's own
-   references directory, which you cannot read from here; the classes are:
+   undo. The classes are a deliberate copy of `one-way-door.md` in
+   `loom-code`'s `write-plan` references, kept until cross-plugin copies are
+   merged:
    **(a)** hard to swap later — framework, language, database,
    authentication, hosting, package manager; **(b)** creates money or a
    standing obligation — paid services, third-party APIs needing an
@@ -318,12 +318,14 @@ that section.
 ## Step 4 — Commit, conditionally review, hand off
 
 1. Commit the spec with the message `docs(loom): spec <change-id>`.
-2. If `pre-build-review: required`, hand it to **`loom-code:closing-review`** with
-   scope `spec`, pasting the question list verbatim. Dispatch one
-   fresh-context reviewer whose lens is `spec+adversarial`; do not dispatch
-   a blind runner or a separate adversary. You are not the reviewer. If it
-   returns NEEDS_REVISION, close each finding, commit, and send only those
-   fixes back to that reviewer. If it passes, continue.
+2. If `pre-build-review: required`, dispatch one fresh-context
+   **`loom-code:reviewer`** yourself with lens `spec+adversarial`, the
+   commit before the spec as `reviewed_sha`, and the intent and spec as
+   ground truth. You are not the reviewer; do not dispatch a blind runner, a
+   separate adversary, or `finalize-review`. If it returns NEEDS_REVISION,
+   close each finding, commit, and send only those fixes back to that
+   reviewer.
+   If it passes, continue.
 3. If `pre-build-review: not-required`, do not create a formal spec review;
    continue directly. This declaration never changes branch-end reviewer
    requirements.

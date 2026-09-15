@@ -671,6 +671,12 @@ def test_later_stops_name_both_spec_writing_stations() -> None:
     assert "happens at `write-spec`, for product changes only" not in step5
 
 
+def test_asked_list_admits_exception_stops() -> None:
+    asked = " ".join(_section(_text(), "## What you will be asked, in plain words").split())
+    assert "nothing else in the change stops for them" not in asked
+    assert _affirmed(asked, "These are the decision points", "legacy intent", "changed requirements", "expert-mode")
+
+
 def test_nothing_agreed_shows_no_table() -> None:
     """A5 boundary: an empty list shows no table."""
     assert "With an empty list, no table appears" in _flat_section(_STEP4)

@@ -259,8 +259,8 @@ quality, task splitting, or review verdicts.
 point — every question put to the user at ①, and at ② if you run it here —
 as `{decision_point, text, type}` with `type` one of `what` / `behaviour` /
 `done` / `consequence`. It goes into the plan's `## Questions asked`
-section at step 5. The §11 measurement of how often
-loom interrupts the user reads exactly this list; a question asked and not
+section at step 5. The list shows how often loom interrupts the user; a
+question asked and not
 recorded makes the flow look quieter than it is.
 
 **Keep a carried-details list** too: only details the user stated or
@@ -353,11 +353,13 @@ spec yourself, from `contract/templates/spec-minimal.md`:
   recorded.
 
 Print one line for the user: installing `loom-design` gets them a fuller
-spec than this one. For `pre-build-review: required`, hand the spec to the
-**closing-review** station for one fresh-context `spec+adversarial` reviewer
-and no blind run; it must pass before planning. For `not-required`, proceed without
-a formal spec review. A missing declaration on a legacy spec is the safe
-`required` default and uses its existing passing review record.
+spec than this one. For `pre-build-review: required`, dispatch one
+fresh-context `loom-code:reviewer` with lens `spec+adversarial`, the commit
+before the spec as `reviewed_sha`, and the intent and spec as ground truth;
+it must pass before planning, with no blind run, adversary, or
+`finalize-review`. On NEEDS_REVISION, close each finding, commit, and send
+only those fixes back to that reviewer. For `not-required`, proceed without a
+formal spec review; `intake.spec-ready` blocks a spec with no declaration.
 
 Running ② on a product spec you wrote: when a flow has parallel cases or
 branches, lead with a table or a text (ASCII) diagram, then the per-case
@@ -406,8 +408,9 @@ unrelated behaviour; keep scenario detail in the spec and never size by time.
 - Group tasks into **waves** as dependency and integration boundaries. Waves
   do not schedule formal review; after all tasks and package tests pass,
   Build transitions once to the closing `branch-end` review.
-- Implementer dispatch is mandatory for every implementation task. Scheduling
-  multiple implementers concurrently is optional.
+- Unless `selection show` lists `implementer` as skipped, implementer dispatch
+  is mandatory for every implementation task. Scheduling multiple implementers
+  concurrently is optional.
 - Task ids are `W<n>-<nn>` and remain stable once written so hand-offs can
   refer to dependencies without ambiguity.
 - Dependencies go on the task line as `after: <ids>`. Independent tasks in one
@@ -440,9 +443,7 @@ spoken to the user rather than read as a machine artifact.
   and each task's Risk line points at the spec's Design decision by REQ id
   rather than restating the reasoning.
 - A **Questions asked** section carrying the list you kept from step 3 —
-  one line per question, `<decision point> — <type> — <text>`. The
-  closing-review station reads this section at the first applicable
-  checkpoint and copies it into `questions[]`. The intent's `## Open questions` must be exactly
+  one line per question, `<decision point> — <type> — <text>`. The intent's `## Open questions` must be exactly
   `- none` before Build; unresolved choices go back to intent work.
 - A closing **Risks** section for risks that span the whole plan. When
   there is no spec, this section is also where the answers to one-way-door
