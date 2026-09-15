@@ -138,7 +138,7 @@ def test_nonconforming_output_retry_keeps_validation_and_retry_ownership_separat
     assert "missing kind or another known kind returns `execution-failed`" in profile
     assert "an unknown kind is malformed input" in profile
     assert "consumes the shared completed-redispatch budget" in profile
-    assert "Review orchestrator enforces its stricter one-retry limit" in review
+    assert "`closing-review` orchestrator enforces its stricter one-retry limit" in review
     assert "never parse or validate reviewer YAML" in review
     assert "never retry or interpret reviewer content" in runner
 

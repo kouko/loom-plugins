@@ -250,7 +250,7 @@ twice, and this is the only stop this station makes.
    only one of the two vendors. When the defaults carry `second-vendor: ask`,
    use the reference's host-aware native question or fallback in this same
    message; the answer governs this change only. In the small lane omit this
-   opt-in question; Review computes the reviewer floor later from the complete
+   opt-in question; `closing-review` computes the reviewer floor later from the complete
    branch delta. A fixed CLI also adds no question.
 
 4. **The principles confirmation**, if step 3 ran the interview — restated

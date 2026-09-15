@@ -327,10 +327,12 @@ def test_invalid_attestation_blocks_before_github(tmp_path: Path, monkeypatch) -
         lambda name: "/usr/bin/git" if name == "git" else "/usr/local/bin/gh",
     )
 
-    rc = land.cmd_land(["--accepted-by", "kouko"], StringIO(), StringIO())
+    err = StringIO()
+    rc = land.cmd_land(["--accepted-by", "kouko"], StringIO(), err)
 
     assert rc == 1
     assert calls.calls == []
+    assert "return to closing-review" in err.getvalue()
 
 
 # A1 positive: accepted-green-pr-merges-with-match-head

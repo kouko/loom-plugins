@@ -26,9 +26,14 @@ charter: 1.0
 ### Wave 2
 
 **W2-01 Close adversary findings on remaining station names**  after: W1-02  acceptance: 1, 2, 3
-- Files: loom-code/skills/ship/SKILL.md, loom-code/skills/build/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-code/skills/expert-mode/SKILL.md, loom-code/skills/write-plan/SKILL.md, loom-design/skills/capture-intent/SKILL.md, loom-code/scripts/loom_checker/rule_checks/standing.py, scripts/test_loom_plugin_install_layout.py
+- Files: loom-code/skills/ship/SKILL.md, loom-code/skills/build/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-code/skills/expert-mode/SKILL.md, loom-code/skills/write-plan/SKILL.md, loom-design/skills/capture-intent/SKILL.md, loom-design/.codex-plugin/plugin.json, loom-code/scripts/test_dispatch_profile_contract.py
 - Test: A1 positive: adversary-probes-all-pass; negative: capitalized-review-station-noun. A2 positive: reword-reverts-to-base; boundary: generic-review-words-kept. A3 positive: suite-green; negative: install-layout-pin-weak.
 - Risk: agent-decided — capitalised "Review" naming the station is the old name under Proposed outcome; also loom-design/.codex-plugin/plugin.json longDescription; generic "Review policy" wording stays.
+
+**W2-02 Pin station name in runtime messages, tests and probes**  after: W2-01  acceptance: 1, 2, 3
+- Files: loom-code/scripts/loom_checker/rule_checks/standing.py, loom-code/scripts/loom_checker/command_handlers/land.py, scripts/test_loom_plugin_install_layout.py, loom-code/scripts/test_build_mechanical_checks.py, loom-code/scripts/test_expert_mode_skill.py, loom-code/scripts/test_sync_before_review_text.py, loom-code/scripts/test_land_merge.py, docs/loom/2026-09-15-closing-review-station-name/evidence/probes/test_abuse_station_name.py
+- Test: A1 positive: land-block-names-closing-review; negative: land-block-says-return-to-review. A2 positive: exact-phrase-reversal-restores-base; boundary: unrelated-word-change-fails-oracle. A3 positive: suite-green; negative: install-layout-pin-weak.
+- Risk: agent-decided — pins follow the renamed prose; the probe oracle reverses only exact W2-01 phrases and compares case exactly.
 
 ## Questions asked
 ① — what — 你要把 loom-code 和 loom-design 裡還寫著「review station」的地方全部改成 closing-review（12 處、只換站名、測試全過），並授權自動 push 開 PR、合併走 land 並在檢查綠了後請你回「接受」；這樣對嗎？

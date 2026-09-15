@@ -62,7 +62,7 @@ _OPTIONAL = re.compile(
 
 
 def _extra_handoff_sentences(section: str) -> list[str]:
-    """Sentences about handing off to Review other than the pinned gate pair."""
+    """Sentences about handing off to closing-review other than the pinned gate pair."""
     return [
         s for s in _sentences(section)
         if _HANDOFF.search(s) and s not in (GATE, ADVERSARY_FINDINGS)
@@ -75,7 +75,7 @@ def _optional_sentences(section: str) -> list[str]:
 
 def test_handoff_helpers_synthetic() -> None:
     assert _extra_handoff_sentences(f"{GATE} {ADVERSARY_FINDINGS}") == []
-    escape = "When the diff is small, hand off to Review while the suite is still running."
+    escape = "When the diff is small, hand off to `closing-review` while the suite is still running."
     assert _extra_handoff_sentences(f"{GATE} {escape}") == [escape]
     assert _optional_sentences("Run the complete package suite.") == []
     assert _optional_sentences("Optionally run the complete package suite.")
