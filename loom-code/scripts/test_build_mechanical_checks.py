@@ -514,7 +514,66 @@ PROBE_MAINTENANCE_PINS = {
         "Reused and modified cases count toward the floor.",
         ("Reused and modified cases do not count toward the floor.",),
     ),
+    "mutation-in-throwaway-copy-or-edit-tool": (
+        "adversary", "Apply each mutation in", "a throwaway copy of the working tree",
+        ("run the committed probe program there unchanged",
+         "apply and undo the mutation with the host's edit tool"),
+        "Apply each mutation in a throwaway copy of the working tree, such as a temporary `git "
+        "worktree add` or a `git archive` extract, and run the committed probe program there "
+        "unchanged, or apply and undo the mutation with the host's edit tool.",
+        ("Apply each mutation in a throwaway copy of the working tree and run the committed probe "
+         "program there unchanged, or do not apply and undo the mutation with the host's edit tool.",
+         "Apply each mutation in the working tree and run the committed probe program there unchanged."),
+    ),
+    "copy-still-runs-own-assertion": (
+        "adversary", "Running the unchanged probe inside a copy of the tree",
+        "still exercises its own assertion", ("unlike a copy of its logic",),
+        "Running the unchanged probe inside a copy of the tree still exercises its own assertion, "
+        "unlike a copy of its logic.",
+        ("Running the unchanged probe inside a copy of the tree no longer exercises its own "
+         "assertion, unlike a copy of its logic.",),
+    ),
+    "ref-mutation-in-throwaway-copy-or-edit-tool": (
+        "ref", "The adversary applies each mutation in", "a throwaway copy of the working tree",
+        ("runs the committed probe program there unchanged",
+         "applies and undoes the mutation with the host's edit tool"),
+        "The adversary applies each mutation in a throwaway copy of the working tree, such as a "
+        "temporary `git worktree add` or a `git archive` extract, and runs the committed probe "
+        "program there unchanged, or applies and undoes the mutation with the host's edit tool.",
+        ("The adversary applies each mutation in a throwaway copy of the working tree and runs the "
+         "committed probe program there unchanged, or never applies and undoes the mutation with "
+         "the host's edit tool.",
+         "The adversary applies each mutation in the working tree and runs the committed probe "
+         "program there unchanged."),
+    ),
+    "ref-copy-still-runs-own-assertion": (
+        "ref", "Running the unchanged probe inside a copy of the tree",
+        "still exercises its own assertion", ("unlike a copy of its logic",),
+        "Running the unchanged probe inside a copy of the tree still exercises its own assertion, "
+        "unlike a copy of its logic.",
+        ("Running the unchanged probe inside a copy of the tree does not exercise its own "
+         "assertion, unlike a copy of its logic.",),
+    ),
+    "rewritten-case-counts-modified": (
+        "adversary", "A stale case that is rewritten or flipped to its positive form",
+        "counts as `modified`", (),
+        "A stale case that is rewritten or flipped to its positive form counts as `modified`.",
+        ("A stale case that is rewritten or flipped to its positive form never counts as `modified`.",
+         "A stale case that is rewritten or flipped to its positive form counts as `new`."),
+    ),
+    "ref-rewritten-case-counts-modified": (
+        "ref", "A stale case that is rewritten or flipped to its positive form",
+        "counts as `modified`", (),
+        "A stale case that is rewritten or flipped to its positive form counts as `modified`.",
+        ("A stale case that is rewritten or flipped to its positive form does not count as `modified`.",
+         "A stale case that is rewritten or flipped to its positive form counts as `new`."),
+    ),
 }
+NO_DISCARD_UNDO = (
+    "Discard commands (`git checkout --`, `git restore`, `git reset --hard`, `git clean`) are "
+    "never used to undo a mutation, because host guards refuse them and they can destroy "
+    "uncommitted work."
+)
 _PIN_DOCS = {"adversary": ADVERSARY_PROSE, "ref": ADVERSARIAL_REF, "build": VERIFY}
 
 
@@ -546,6 +605,26 @@ def test_adversary_update_never_weakens_a_case() -> None:
     assert _pins_exact_sentence(ADVERSARIAL_REF, UPDATE_NO_WEAKENING), ADVERSARIAL_REF
     assert "**at least three**" in ADVERSARIAL_REF
     assert "**at least three**" in ADVERSARY_PROSE
+
+
+def test_no_discard_undo_helpers_synthetic() -> None:
+    assert _pins_exact_sentence(f"Undo in a copy. {NO_DISCARD_UNDO}", NO_DISCARD_UNDO)
+    assert not _pins_exact_sentence(
+        "Undo in a copy. Discard commands (`git checkout --`, `git restore`, `git reset --hard`, "
+        "`git clean`) may be used to undo a mutation, because host guards refuse them and they "
+        "can destroy uncommitted work.",
+        NO_DISCARD_UNDO,
+    )
+    assert not _pins_exact_sentence(
+        "Undo in a copy. Discard commands (`git checkout --`, `git restore`) are never used to "
+        "undo a mutation.",
+        NO_DISCARD_UNDO,
+    )
+
+
+def test_adversary_mutation_undo_uses_no_discard_command() -> None:
+    assert _pins_exact_sentence(ADVERSARY_PROSE, NO_DISCARD_UNDO), ADVERSARY_PROSE
+    assert _pins_exact_sentence(ADVERSARIAL_REF, NO_DISCARD_UNDO), ADVERSARIAL_REF
 
 
 def test_probes_field_helper_synthetic() -> None:

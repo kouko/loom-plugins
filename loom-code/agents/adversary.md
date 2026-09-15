@@ -69,7 +69,16 @@ generic-word substitution that a global replace with a case-insensitive
 comparison lets through. Include one mutation that restores the original
 behaviour the stale program rejected, and the updated probe must turn RED on
 it. Each mutation must turn the probe RED and is then
-reverted; report each one with its command and observed result.
+reverted; report each one with its command and observed result. Apply each
+mutation in a throwaway copy of the working tree, such as a temporary
+`git worktree add` or a `git archive` extract, and run the committed probe
+program there unchanged, or apply and undo the mutation with the host's edit
+tool. Running the unchanged probe inside a copy of the tree still exercises its
+own assertion, unlike a copy of its logic. Remove a worktree copy with
+`git worktree remove`, or leave the copy in a temp directory. Discard commands
+(`git checkout --`, `git restore`, `git reset --hard`, `git clean`) are never
+used to undo a mutation, because host guards refuse them and they can destroy
+uncommitted work.
 
 ## What you return
 
@@ -80,7 +89,8 @@ findings: [{severity: fatal | important | nit, anchor: "<where>", text: "<label>
 ```
 
 `probes` marks each probe as `reused`, `modified` or `new`, and every `new`
-one carries a one-line `reason`.
+one carries a one-line `reason`. A stale case that is rewritten or flipped to
+its positive form counts as `modified`.
 
 Every probe function is named `test_<unit>_<state>_<expected>` — three
 underscore-separated parts (unit of work, state under test, expected

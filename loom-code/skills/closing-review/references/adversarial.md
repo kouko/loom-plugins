@@ -14,7 +14,8 @@ modifies one when a small change covers it, and writes a new probe only when
 nothing covers the case. A permanent repository test that covers a case
 counts as reuse, and the adversary leaves that test as it is. Its report marks
 each probe `reused`, `modified` or `new`, with a one-line reason for every new
-one.
+one. A stale case that is rewritten or flipped to its positive form counts as
+`modified`.
 
 When Build re-dispatches it for a widened scope or for trunk content brought
 in by `sync-trunk`, the adversary updates only its own programs and fixes
@@ -25,8 +26,17 @@ committed probe program itself: at least one mutation per kind of change the
 update touches, plus one that an over-broad update would wrongly accept. One
 mutation restores the original behaviour the stale program rejected, and the
 updated probe must turn RED on it. Each mutation turns the probe RED and is
-reverted, and the report gives its command and observed result. An update
-never deletes, skips or xfails a case to make it pass.
+reverted, and the report gives its command and observed result. The adversary
+applies each mutation in a throwaway copy of the working tree, such as a
+temporary `git worktree add` or a `git archive` extract, and runs the committed
+probe program there unchanged, or applies and undoes the mutation with the
+host's edit tool. Running the unchanged probe inside a copy of the tree still
+exercises its own assertion, unlike a copy of its logic. A worktree copy is
+removed with `git worktree remove`, or the copy is left in a temp directory.
+Discard commands (`git checkout --`, `git restore`, `git reset --hard`,
+`git clean`) are never used to undo a mutation, because host guards refuse them
+and they can destroy uncommitted work. An update never deletes, skips or xfails
+a case to make it pass.
 
 ## Code
 
