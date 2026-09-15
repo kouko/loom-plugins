@@ -273,7 +273,8 @@ attestation directly.
 When `finalize-review` fails, return the fix to Build, which repeats its
 end-of-Build mechanical checks, and the fixed content, a new functional-content
 digest, must pass the next review round (§4) before `finalize-review` runs
-again. No technical design re-look precedes that round unless the episode is stuck. Earlier verdicts are never reused for the fixed content. When no round
+again. No technical design re-look precedes that round unless the episode is
+stuck. Earlier verdicts are never reused for the fixed content. When no round
 remains, the fix would need a fourth distinct digest, which §4 forbids, so it
 ends the episode as `NON_CONVERGENT`.
 

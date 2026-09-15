@@ -402,10 +402,27 @@ def test_round2_blockers_still_require_relook_before_round3() -> None:
     assert not has_negation(action), action
 
 
+def _round_three_relook_sentences(text: str) -> list[str]:
+    """Sentences that name Round 3 and also the technical design re-look."""
+    return [s for s in _sentences(text) if "Round 3" in s and "technical design re-look" in s]
+
+
+def test_round_three_relook_helper_synthetic() -> None:
+    assert _round_three_relook_sentences(
+        "Round 1 reviews. Before Round 3, always perform a technical design re-look."
+    ) == ["Before Round 3, always perform a technical design re-look."]
+    assert _round_three_relook_sentences(
+        "Treat the episode as stuck when Round 2 still has blockers; use the next "
+        "available round only after the technical design re-look."
+    ) == []
+
+
 def test_finalize_failure_round_requires_no_relook() -> None:
     bullet = _round_three_bullet()
     assert "technical design re-look" not in bullet, bullet
     assert "stop local patching" not in bullet, bullet
+    converge = _flat_section("## 4. Converge within one bounded episode")
+    assert _round_three_relook_sentences(converge) == []
     finalize = _flat_section("## 5. Finalize")
     for sentence in _sentences(finalize):
         if "technical design re-look" in sentence:

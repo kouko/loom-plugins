@@ -49,10 +49,6 @@ GATE = (
     "program has passed or it lists `adversarial` as skipped, each skip waiving only "
     "its own check."
 )
-GATE_CONSEQUENCE = (
-    "A hand-off with neither step skipped therefore means the complete package suite "
-    "and every adversarial program pass."
-)
 ADVERSARY_FINDINGS = (
     "Every fatal or important finding the adversary returns is fixed inside Build like "
     "a failing check before hand-off, and any finding left unresolved is listed in the "
@@ -69,7 +65,7 @@ def _extra_handoff_sentences(section: str) -> list[str]:
     """Sentences about handing off to Review other than the pinned gate pair."""
     return [
         s for s in _sentences(section)
-        if _HANDOFF.search(s) and s not in (GATE, GATE_CONSEQUENCE, ADVERSARY_FINDINGS)
+        if _HANDOFF.search(s) and s not in (GATE, ADVERSARY_FINDINGS)
     ]
 
 
@@ -78,7 +74,7 @@ def _optional_sentences(section: str) -> list[str]:
 
 
 def test_handoff_helpers_synthetic() -> None:
-    assert _extra_handoff_sentences(f"{GATE} {GATE_CONSEQUENCE}") == []
+    assert _extra_handoff_sentences(f"{GATE} {ADVERSARY_FINDINGS}") == []
     escape = "When the diff is small, hand off to Review while the suite is still running."
     assert _extra_handoff_sentences(f"{GATE} {escape}") == [escape]
     assert _optional_sentences("Run the complete package suite.") == []
@@ -87,7 +83,6 @@ def test_handoff_helpers_synthetic() -> None:
 
 def test_build_allows_complete_suite_at_end() -> None:
     assert VERIFY.count(GATE) == 1
-    assert GATE_CONSEQUENCE in VERIFY
     assert _extra_handoff_sentences(VERIFY) == []
     assert _optional_sentences(VERIFY) == []
     assert "`finalize-review` still executes both once more on committed content." in VERIFY
@@ -111,6 +106,7 @@ def test_no_speculative_preflight_ban_remains() -> None:
 
 
 def test_rerun_trigger_covers_every_fix() -> None:
+    assert VERIFY.count("Repeat these end-of-Build checks after every fix:") == 1
     sentence = _sentence(VERIFY, "Repeat these end-of-Build checks after every fix")
     assert "run the complete package suite and re-run the existing adversarial programs" in sentence
     assert not has_negation(sentence), sentence
@@ -130,23 +126,44 @@ STEP_2 = VERIFY.split("2. Run the repository's complete package suite", 1)[1].sp
 )[0]
 
 
+SUITE_NONE = "when it is `none`, `selection show` must list `package-tests` as skipped."
+
+
 def _names_suite_command(step: str) -> bool:
-    return "`package-tests:`" in step and "`docs/loom/KICKOFF-DEFAULTS.md`" in step
+    """The suite-command sentence names the declared value and the absent fallback, affirmatively."""
+    sentence = next(
+        (s for s in _sentences(step)
+         if "`package-tests:`" in s and "`docs/loom/KICKOFF-DEFAULTS.md`" in s),
+        None,
+    )
+    return (
+        sentence is not None
+        and sentence.startswith("The suite command is")
+        and "`package-tests:` value in" in sentence
+        and "when absent, the command detected from build markers" in sentence
+        and not has_negation(sentence)
+    )
 
 
 def test_suite_command_names_package_tests_declaration() -> None:
     assert _names_suite_command(STEP_2), STEP_2
+    assert STEP_2.count(SUITE_NONE) == 1, STEP_2
+    assert not has_negation(SUITE_NONE)
+    assert not _OPTIONAL.search(SUITE_NONE)
 
 
 def test_suite_step_without_command_source_fails() -> None:
     accepted = (
         "Run the repository's complete package suite, then each committed adversarial "
-        "program. The suite command is the `package-tests:` line in "
-        "`docs/loom/KICKOFF-DEFAULTS.md`."
+        "program. The suite command is the `package-tests:` value in "
+        "`docs/loom/KICKOFF-DEFAULTS.md`, or, when absent, the command detected from "
+        "build markers; " + SUITE_NONE
     )
     rejected = "Run the repository's complete package suite, then each committed adversarial program."
+    negated = accepted.replace("The suite command is the", "The suite command is not the")
     assert _names_suite_command(accepted)
     assert not _names_suite_command(rejected)
+    assert not _names_suite_command(negated)
 
 
 def test_skipped_selection_step_omits_that_check() -> None:
