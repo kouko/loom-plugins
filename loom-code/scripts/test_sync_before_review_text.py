@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from loom_checker.digest import functional_content_digest
-from prose_pin import split_sentences
+from prose_pin import has_negation, split_sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -126,27 +126,50 @@ def test_sync_after_finalize_invalidates_attestation(tmp_path: Path) -> None:
 # --- Acceptance 5 --------------------------------------------------------
 
 
+REVIEW_SYNC_SENTENCES = (
+    f"Before dispatching reviewers in Round 1, run {COMMAND} from the change worktree.",
+    "When it reports `up to date`, continue.",
+    "When it reports `content changed`, dispatch no reviewer and return to Build §3 to "
+    "re-run the complete package suite and the existing adversarial programs, then start "
+    "Round 1 again.",
+    "When it prints `WARN review.sync`, state the warning in the round report and continue.",
+    "When it prints `BLOCK review.sync`, dispatch no reviewer and return the change to Build.",
+)
+BUILD_SYNC_SENTENCES = (
+    f"From the change worktree, run {COMMAND}, so the adversary, the suite and the "
+    "programs all see the fetched trunk tip.",
+    "On `BLOCK review.sync`, fix the cause inside Build, where a conflict is resolved as "
+    "implementation work in a new build round, never by the command.",
+    "On `WARN review.sync`, continue unsynced.",
+)
+
+
+def _pinned_run(text: str, first: str, count: int) -> tuple[str, ...]:
+    """The `count` consecutive sentences starting at the one containing `first`."""
+    sentences = split_sentences(text)
+    start = next(i for i, s in enumerate(sentences) if first in s)
+    return tuple(sentences[start:start + count])
+
+
 def test_merged_sync_returns_to_build_checks_before_dispatch() -> None:
-    run = _sentence(DEPTH, COMMAND)
-    assert "Round 1" in run, run
-    changed = _sentence(DEPTH, "reports `content changed`")
-    for element in (
-        "dispatch no reviewer", "Build §3", "complete package suite",
-        "existing adversarial programs", "Round 1 again",
-    ):
-        assert element in changed, changed
-    blocked = _sentence(DEPTH, "`BLOCK review.sync`")
-    assert "dispatch no reviewer" in blocked and "Build" in blocked, blocked
-    warned = _sentence(DEPTH, "`WARN review.sync`")
-    assert "round report" in warned and "continue" in warned, warned
-    assert DEPTH.index(changed) < DEPTH.index("loom_checker.py reviewer-count")
-    # Build syncs before its suite, so merged content is checked there.
-    step = _sentence(VERIFY, COMMAND)
-    assert "change worktree" in step, step
-    conflict = _sentence(VERIFY, "`BLOCK review.sync`")
-    assert "inside Build" in conflict and "new build round" in conflict, conflict
-    assert "never by the command" in conflict, conflict
-    assert "`WARN review.sync`" in VERIFY
+    # Whole governing sentences, byte for byte: an added condition ("or on a
+    # small merge"), a dropped round-report duty or an in-place conflict
+    # resolution each changes a pinned sentence.
+    assert _pinned_run(DEPTH, COMMAND, 5) == REVIEW_SYNC_SENTENCES
+    run, current, changed, warned, blocked = REVIEW_SYNC_SENTENCES
+    for affirmative in (run, current, warned):
+        assert not has_negation(affirmative), affirmative
+    assert DEPTH.count("`up to date`") == 1 and DEPTH.count("`content changed`") == 1
+    assert DEPTH.count("`WARN review.sync`") == 1 and DEPTH.count("`BLOCK review.sync`") == 1
+    assert DEPTH.index(blocked) < DEPTH.index("loom_checker.py reviewer-count")
+    # Build syncs first among its mechanical checks: before the adversary is
+    # dispatched and before the suite, so merged content is checked there.
+    assert _pinned_run(VERIFY, COMMAND, 3) == BUILD_SYNC_SENTENCES
+    step = BUILD_SYNC_SENTENCES[0]
+    assert not has_negation(step), step
+    adversary = VERIFY.index("Dispatch the `loom-code:adversary` agent fresh-context")
+    assert VERIFY.index(step) < adversary < VERIFY.index("Run the repository's complete package suite")
+    assert VERIFY.count("sync-trunk") == 1
     assert "`sync-trunk` result" in HANDOFF
     assert "warning" in _sentence(HANDOFF, "`sync-trunk` result")
 
