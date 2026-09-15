@@ -39,9 +39,14 @@ Current state evidence lives in the spec (`## Current state evidence`); each tas
 - Test: A6 positive: three-zh-complaints-rewritten-plain-and-literal; negative: metaphor-in-rewrite-flagged. A7 positive: how-question-gets-alternatives-and-recommendation; boundary: publish-confirmation-stays-yes-no. A9 positive: progress-reply-reads-general-only; negative: incident-report-reads-software-only.
 - Risk: fresh agents vary run to run; Chinese inputs also show whether the English card pulls replies into English. REQ-6, REQ-7, REQ-9. agent-decided.
 
+**W2-04 Guide fixes from cold-read failures and re-recorded runs**  after: W2-03  acceptance: 6, 7
+- Files: `loom-workflow/skills/loom-visualization/references/plain-language.md`, `loom-workflow/skills/loom-visualization/scripts/test_references.py`, `docs/loom/2026-09-16-plain-language-replies/evidence/coldread/rewrite.txt`, `docs/loom/2026-09-16-plain-language-replies/evidence/coldread/decision.txt`
+- Test: A6 positive: rewrite-opens-with-conclusion-and-keeps-facts; negative: announcing-or-heading-opener-flagged. A7 positive: each-missed-alternative-included-or-ruled-out; boundary: reply-keeps-user-script.
+- Risk: W2-03 runs opened with a rewrite announcement or heading, dropped the lead news and skipped the do-nothing check; the guide, not the card, is changed. REQ-6, REQ-7. agent-decided.
+
 ### Wave 3 — release
 
-**W3-01 Install limits, card timing in READMEs, changelog and versions**  after: W2-03  acceptance: 10, 11
+**W3-01 Install limits, card timing in READMEs, changelog and versions**  after: W2-04  acceptance: 10, 11
 - Files: `loom-workflow/README.md`, `loom-workflow/README.ja.md`, `loom-workflow/README.zh-TW.md`, `loom-workflow/CHANGELOG.md`, `loom-workflow/plugin.json`, `loom-workflow/.claude-plugin/plugin.json`, `loom-workflow/.codex-plugin/plugin.json`
 - Test: A10 positive: readmes-state-unreached-hosts-and-loom-code-only; negative: sessionstart-wording-removed. A11 positive: package-suite-and-check-mechanisms-green; negative: version-mismatch-fails.
 - Risk: minor release 5.3.0 because the card's delivery timing changes; no budget-exception line is needed while the count is unchanged. REQ-10, REQ-11. agent-decided.
