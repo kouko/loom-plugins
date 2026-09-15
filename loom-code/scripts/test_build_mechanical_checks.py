@@ -110,16 +110,43 @@ def test_no_speculative_preflight_ban_remains() -> None:
             assert "does not hand off" in sentence or "skipped" in sentence, sentence
 
 
-def test_fix_return_reruns_existing_programs() -> None:
-    sentence = _sentence(
-        VERIFY, "When closing review or a failed `finalize-review` returns the change to Build"
-    )
-    assert "repeat these end-of-Build checks" in sentence
-    assert "after the fix: run the complete package suite" in sentence
-    assert "re-run the existing adversarial programs" in sentence
+def test_rerun_trigger_covers_every_fix() -> None:
+    sentence = _sentence(VERIFY, "Repeat these end-of-Build checks after every fix")
+    assert "run the complete package suite and re-run the existing adversarial programs" in sentence
     assert not has_negation(sentence), sentence
     assert not _OPTIONAL.search(sentence), sentence
     assert "Do not dispatch the adversary again." in VERIFY
+
+
+def test_returned_change_only_trigger_absent() -> None:
+    assert (
+        "When closing review or a failed `finalize-review` returns the change to Build"
+        not in VERIFY
+    )
+
+
+STEP_2 = VERIFY.split("2. Run the repository's complete package suite", 1)[1].split(
+    "When a check fails", 1
+)[0]
+
+
+def _names_suite_command(step: str) -> bool:
+    return "`package-tests:`" in step and "`docs/loom/KICKOFF-DEFAULTS.md`" in step
+
+
+def test_suite_command_names_package_tests_declaration() -> None:
+    assert _names_suite_command(STEP_2), STEP_2
+
+
+def test_suite_step_without_command_source_fails() -> None:
+    accepted = (
+        "Run the repository's complete package suite, then each committed adversarial "
+        "program. The suite command is the `package-tests:` line in "
+        "`docs/loom/KICKOFF-DEFAULTS.md`."
+    )
+    rejected = "Run the repository's complete package suite, then each committed adversarial program."
+    assert _names_suite_command(accepted)
+    assert not _names_suite_command(rejected)
 
 
 def test_skipped_selection_step_omits_that_check() -> None:

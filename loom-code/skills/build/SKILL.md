@@ -83,7 +83,8 @@ mechanical checks, in this order:
    artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
    adversarial programs.
 2. Run the repository's complete package suite, then each committed
-   adversarial program.
+   adversarial program. The suite command is the `package-tests:` line in
+   `docs/loom/KICKOFF-DEFAULTS.md`.
 
 When a check fails, the fix is made inside Build as §2 assigns implementation
 work; the adversary never fixes what it breaks. Every fatal or important
@@ -100,10 +101,9 @@ When `selection show` lists `adversarial` as skipped, dispatch no adversary and
 run no adversarial program. When it lists `package-tests` as skipped, run no
 complete package suite.
 
-When closing review or a failed `finalize-review` returns the change to Build,
-repeat these end-of-Build checks after the fix: run the complete package suite
-and re-run the existing adversarial programs. Do not dispatch the adversary
-again.
+Repeat these end-of-Build checks after every fix: run the complete package
+suite and re-run the existing adversarial programs. Do not dispatch the
+adversary again.
 
 ## 4. Hand off to Review
 
