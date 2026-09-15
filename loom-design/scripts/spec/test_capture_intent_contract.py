@@ -489,6 +489,72 @@ def test_material_choice_rules_live_inside_existing_confirmation_gates() -> None
         assert "unknown surface" in gate
 
 
+def _flat_section(heading: str) -> str:
+    return " ".join(_section(_text(), heading).split())
+
+
+_STEP1 = "## Step 1 — Interview"
+_STEP4 = "## Step 4 — Decision point ①: restate and confirm"
+_STEP5 = "## Step 5 — Hand off"
+
+
+def test_hand_off_lists_agreed_details_and_requires_spec() -> None:
+    """A1 positive: agreed details travel to the spec, even with no design."""
+    step4 = _flat_section(_STEP4)
+    assert "**Keep a carried-details list**" in step4
+    assert "the user stated or explicitly agreed to" in step4
+    assert "Never carry an agent proposal the user did not agree to" in step4
+    assert "detail you inferred" in step4
+    step5 = _flat_section(_STEP5)
+    assert "carried-details list verbatim" in step5
+    assert "must record each item in the spec" in step5
+    assert re.search(
+        r"non-empty and `needs-design: no`, `loom-code:write-plan` must still write a spec",
+        step5,
+    )
+
+
+def test_no_details_no_forced_spec() -> None:
+    """A1 negative: an empty list forces no spec and adds nothing."""
+    step5 = _flat_section(_STEP5)
+    assert "An empty list forces no spec" in step5
+    forcing = [s for s in re.split(r"(?<=[.])\s+", step5) if "must still write a spec" in s]
+    assert forcing and all("non-empty" in s for s in forcing)
+
+
+def test_engineering_restatement_shows_carried_details_table() -> None:
+    """A5 positive: engineering confirmation shows the table in the same message."""
+    step4 = _flat_section(_STEP4)
+    assert "**The carried details, `kind: engineering` only**" in step4
+    assert "as a table, one row per detail in the user's language" in step4
+    assert "confirmed by the same yes; no extra stop" in step4
+    assert "product change shows them at `write-spec`'s decision point ② instead" in step4
+
+
+def test_nothing_agreed_shows_no_table() -> None:
+    """A5 boundary: an empty list shows no table."""
+    assert "With an empty list, no table appears" in _flat_section(_STEP4)
+
+
+def test_intent_sections_may_use_tables_and_diagrams() -> None:
+    """A6 positive: sections may use tables or diagrams when easier to read."""
+    step1 = _flat_section(_STEP1)
+    assert "Any section may use a Markdown table or diagram" in step1
+    assert "current versus wanted" in step1
+
+
+def test_acceptance_stays_numbered_list_and_flows_stay_out() -> None:
+    """A6 negative: forms never loosen Acceptance, altitude, or identifiers."""
+    step1 = _flat_section(_STEP1)
+    assert "Acceptance stays a numbered list" in step1
+    assert "no UI reactions or state transitions" in step1
+    assert "Mermaid node ids included" in step1
+    assert "text tables or text diagrams, not Mermaid" in step1
+    step4 = _flat_section(_STEP4)
+    assert "The list never enters the intent file" in step4
+    assert "detailed flows stay out" in step4
+
+
 def test_altitude_pass_runs_after_the_fill_in_list_exists() -> None:
     drafting = _section(_text(), "## Step 2 — Write the intent")
     assert drafting.index("- `## Open questions`") < drafting.index(

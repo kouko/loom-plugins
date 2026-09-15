@@ -115,6 +115,13 @@ Keep every field at intent altitude:
   content; both block confirmation. Carry downstream spec/engineering questions
   in the hand-off, not this section.
 
+Any section may use a Markdown table or diagram when it reads more easily —
+for example current versus wanted, or who is affected. Acceptance stays a
+numbered list, a diagram stays at intent altitude (no UI reactions or state
+transitions), and a product Problem still holds no identifiers, Mermaid node
+ids included. When restating in chat, show text tables or text diagrams, not
+Mermaid: a terminal shows it as raw code.
+
 ## Step 2 — Write the intent
 
 Write the intent and decision-point dialogue in the user's language; plans,
@@ -247,6 +254,12 @@ twice, and this is the only stop this station makes.
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
 
+5. **The carried details, `kind: engineering` only** — it has no decision
+   point ②. Show them as a table, one row per detail in the user's language,
+   confirmed by the same yes; no extra stop. With an empty list, no table
+   appears. A product change shows them at `write-spec`'s decision point ②
+   instead.
+
 Questions may only ask what the user wants, what they will see (reserved for
 decision point ② at `write-spec`), whether acceptance worked (decision point ③
 at `ship`), or state one-way-door consequences. Decide implementation choices
@@ -261,6 +274,12 @@ second schema next to the contract's. The canonical carrier is the plan's
 message in step 5, verbatim**, and say that the receiving station must write
 it into that section. A question asked and not recorded makes the flow look
 quieter than it is.
+
+**Keep a carried-details list** beside the question list: flow or reaction
+details the user stated or explicitly agreed to, before or during intake.
+Never carry an agent proposal the user did not agree to, or detail you
+inferred. The list never enters the intent file; its sections stay unchanged
+and detailed flows stay out.
 
 <!-- gate: capture-intent.no-confirmed-without-restatement -->
 **No intent becomes `confirmed` without the restatement being answered.**
@@ -319,6 +338,12 @@ In the hand-off message, name the change-id and paste the list of
 questions you asked, one per line as
 `<decision point> — <type> — <text>`, saying it belongs in the plan's
 `## Questions asked` section.
+
+Next to it, paste the carried-details list verbatim, one per line, and say the
+next station must record each item in the spec. When the list is non-empty and
+`needs-design: no`, `loom-code:write-plan` must still write a spec
+(`spec-minimal`) to hold them. An empty list forces no spec and adds nothing
+to the hand-off.
 
 Say two things so the next station is not re-run by accident: `write-plan`
 will **not** run decision point ① again, because `status:` is already
