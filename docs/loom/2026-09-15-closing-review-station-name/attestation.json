@@ -1,0 +1,41 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-15-closing-review-station-name",
+  "content_digest": "c9c0a0d7793a9e1dce54d5914144c666582de51d",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-closing-review-station-name/evidence/probes/test_abuse_station_name.py -q -p no:cacheprovider -rA",
+      "artifact": "docs/loom/2026-09-15-closing-review-station-name/evidence/probes/test_abuse_station_name.py",
+      "result": "pass",
+      "command_digest": "1dae3b1689d8bf81f1a1fb996a939a9f1c390914002a1e82efe0b589275da6c3"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-skill-rename",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-code-rename",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
