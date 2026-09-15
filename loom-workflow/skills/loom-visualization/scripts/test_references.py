@@ -72,8 +72,12 @@ def guide_errors(text):
     steps = numbered(sections(text).get("Rewrite steps", ""))
     if len(steps) != 5:
         errors.append(f"{len(steps)} rewrite steps, expected 5")
-    elif "metaphor" not in steps[-1].lower():
-        errors.append("last rewrite step is not a metaphor check")
+    else:
+        if "metaphor" not in steps[-1].lower():
+            errors.append("last rewrite step is not a metaphor check")
+        first = steps[0].lower()
+        if not all(w in first for w in ("conclusion", "announcement", "heading", "background")):
+            errors.append("first rewrite step is not conclusion-first")
     return errors
 
 
@@ -129,6 +133,48 @@ def test_yes_no_confirmation_asked_directly():
     assert "asked directly" in sentence and "no invented alternatives" in sentence
     for action in ("publish", "delete", "confirm"):
         assert action in sentence, action
+
+
+KEEP_FACTS_PHRASES = (
+    "keep every fact",
+    "lead news",
+    "a review stays a review",
+    "an agent is not a person",
+    "never refer to something the original did not say",
+)
+
+
+def test_rewrite_opens_with_conclusion_and_keeps_facts():
+    text = _text()
+    steps = [" ".join(s.split()) for s in numbered(sections(text)["Rewrite steps"])]
+    assert "first rewrite step is not conclusion-first" not in guide_errors(text)
+    facts = next((s for s in steps if "never what happened" in s), "")
+    missing = [p for p in KEEP_FACTS_PHRASES if p not in facts]
+    assert facts and not missing, missing
+    rule2 = " ".join(rule_titles(text)[2].split())
+    assert "never what happened" in rule2
+
+
+def test_announcing_or_heading_opener_flagged():
+    text = _text()
+    steps = numbered(sections(text)["Rewrite steps"])
+    announcing = text.replace(steps[0], "Say that you are explaining it again, then give a heading.")
+    assert "first rewrite step is not conclusion-first" in guide_errors(announcing)
+    no_heading_clause = text.replace(steps[0], steps[0].replace("heading", "title"))
+    assert "first rewrite step is not conclusion-first" in guide_errors(no_heading_clause)
+
+
+def test_each_missed_alternative_included_or_ruled_out():
+    rule5 = " ".join(rule_titles(_text())[5].split())
+    sentence = next((s for s in re.split(r"(?<=[.!?;])\s+", rule5) if "ruled out" in s), "")
+    assert "For each of the three" in sentence and "one short clause" in sentence
+    assert not sentence.startswith("If only two"), sentence
+
+
+def test_reply_keeps_user_script():
+    scope = " ".join(sections(_text())["Scope"].split())
+    assert ("Reply in the user's language and script: Traditional Chinese stays "
+            "Traditional, Simplified stays Simplified.") in scope
 
 
 def test_eight_conversation_situations_present():
