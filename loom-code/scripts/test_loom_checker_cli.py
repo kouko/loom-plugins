@@ -34,6 +34,7 @@ EXPECTED_RULE_IDS = [
     "push.attestation",
     "push.contextual-body",
     "push.merge",
+    "review.sync",
     "spec.req-grammar",
     "spec.ui-flows-recompute",
     "standing.product-principles-reject",
@@ -228,6 +229,13 @@ def test_land_is_a_declared_cli_command() -> None:
     assert "loom_checker.py land --sweep [--confirm <token>]" in entry["__doc__"]
 
 
+def test_sync_trunk_is_a_declared_cli_command() -> None:
+    entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
+
+    assert entry["COMMANDS"]["sync-trunk"] is entry["cmd_sync_trunk"]
+    assert "loom_checker.py sync-trunk" in entry["__doc__"]
+
+
 def test_intents_is_a_declared_cli_command() -> None:
     entry = runpy.run_path(str(CHECKER), run_name="_loom_checker_entry")
 
@@ -300,8 +308,8 @@ def test_hooks_probe_is_gone() -> None:
     assert "hooks-probe" not in CHECKER.read_text(encoding="utf-8").split('"""')[1]
 
 
-def test_the_rule_population_is_twenty_four() -> None:
-    assert len(run_checker("--list-rules").stdout.splitlines()) == 24
+def test_the_rule_population_is_twenty_five() -> None:
+    assert len(run_checker("--list-rules").stdout.splitlines()) == 25
 
 
 # --- contract --require (spec G) -------------------------------------------
