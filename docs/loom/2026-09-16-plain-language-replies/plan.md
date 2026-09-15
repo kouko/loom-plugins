@@ -68,3 +68,4 @@ Current state evidence lives in the spec (`## Current state evidence`); each tas
 3. Acceptance 6, 7 and 9 rest on fresh-agent behaviour, which is not deterministic; recorded runs are evidence, not a guarantee.
 4. An English-only card may pull replies in Chinese conversations toward English; W2-03 uses Chinese inputs to observe it. user-decided shape.
 5. user-decided — the domain collections ship now although the complexity critique judged them deferrable.
+6. Cold-read rewrites still change or drop facts after two guide rounds; the fresh reader lacks the original context, so no third prose round. Reported, not hidden. agent-decided.
