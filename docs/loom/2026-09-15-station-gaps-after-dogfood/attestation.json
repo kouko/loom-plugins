@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-15-station-gaps-after-dogfood",
-  "content_digest": "4d1881a9d496c6f1ecc09748f40125642f7dd3f4",
+  "content_digest": "317d99fcb331301bac304d4a7b2b462126c442bc",
   "executions": [
     {
       "kind": "package-tests",
@@ -53,6 +53,20 @@
           "status": "dismissed",
           "anchor": "loom-code/skills/build/SKILL.md:87-88",
           "text": "'the command detected from build markers' is narrower than the checker's fallback (also test files); widening exceeds the 2952-word budget; follow-up."
+        },
+        {
+          "severity": "nit",
+          "dimension": "naming",
+          "status": "open",
+          "anchor": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_suite_command_source.py:30",
+          "text": "Probe variable still named STEP_2 while slicing Build step 3; adversary artifact; follow-up."
+        },
+        {
+          "severity": "nit",
+          "dimension": "deliberate-simplification",
+          "status": "open",
+          "anchor": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_relook_and_budget.py:25",
+          "text": "BASE is fixed at 040e5010; a later trunk merge must update it; follow-up."
         }
       ]
     },
@@ -62,7 +76,22 @@
       "model": "claude-opus-5",
       "lens": "skill",
       "verdict": "PASS",
-      "findings": []
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "status": "open",
+          "anchor": "loom-code/skills/build/SKILL.md:111-113",
+          "text": "After a BLOCK review.sync at step 1 the adversary has not run, but the every-fix re-run says not to dispatch it again; finalize-review refuses a change with no adversarial artifact, so the slip is caught mechanically; follow-up."
+        },
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "status": "open",
+          "anchor": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/dogfood-rerun.md :: | File | 9906c79c | HEAD |",
+          "text": "The pre-merge word-budget table still labels its column HEAD; the post-merge table below is correct; follow-up."
+        }
+      ]
     }
   ],
   "findings": [
