@@ -1,7 +1,12 @@
 """The live plan contract has one ordinary task-id form."""
 
 import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from prose_pin import has_negation, split_sentences  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -41,7 +46,23 @@ def _section(heading: str) -> str:
 
 
 def _sentences(flat: str) -> list[str]:
-    return [s for s in re.split(r"(?<=[.])\s+", flat) if s.strip()]
+    return split_sentences(flat, ".;")
+
+
+def _affirmed(text: str, *literals: str) -> list[str]:
+    """Sentences holding every literal and no negation token outside code spans.
+
+    Engineering baseline prose-pin rule: a pinned sentence rejects negation,
+    so "Never assume that a non-empty carried-details list ... forces that
+    spec" cannot pass a pin on "forces that spec". Backticked spans such as
+    `needs-design: no` are field values, not negations.
+    """
+    return [
+        s
+        for s in _sentences(_flat(text))
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
 
 
 def _readback_paragraph() -> str:
@@ -50,22 +71,51 @@ def _readback_paragraph() -> str:
     return _flat(before.rstrip().rsplit("\n\n", 1)[-1])
 
 
+def _carried_item() -> str:
+    step3 = _flat(_section(_STEP3))
+    return step3.split("5. **The carried details", 1)[1].split("**Every question in this message", 1)[0]
+
+
+def _record_bullet() -> str:
+    step4 = _section(_STEP4)
+    return "Record each carried detail" + step4.split("- Record each carried detail", 1)[1].split("\n\n", 1)[0]
+
+
+def test_affirmedPin_syntheticAffirmativeSentence_accepted() -> None:
+    """Self-test: an affirmative sentence satisfies the pin."""
+    assert _affirmed("A non-empty carried-details list forces that spec.", "forces that spec")
+
+
+def test_affirmedPin_syntheticNegatedSentence_rejected() -> None:
+    """Self-test: the same sentence carrying a negation token fails the pin."""
+    for negated in (
+        "Never assume that a non-empty carried-details list forces that spec.",
+        "It is not the case that a non-empty list forces that spec.",
+        "Do not record it on its Requirement line.",
+    ):
+        literal = "Requirement line" if "Requirement" in negated else "forces that spec"
+        assert not _affirmed(negated, literal), negated
+
+
+def test_affirmedPin_syntheticCodeSpanNo_notNegation() -> None:
+    """Self-test: a field value in backticks is not read as a negation token."""
+    assert _affirmed("For a product change with `needs-design: no`, show them.", "show them")
+
+
 def test_carried_details_force_minimal_spec() -> None:
     """A1 positive: a non-empty carried-details list forces a minimal spec."""
     step3 = _flat(_section(_STEP3))
-    assert "**Keep a carried-details list**" in step3
-    assert "the user stated or explicitly agreed to" in step3
-    assert "never an agent proposal or detail you inferred" in step3
+    assert _affirmed(step3, "**Keep a carried-details list**", "the user stated or explicitly agreed to")
+    assert "Never carry an agent proposal the user did not agree to, or detail you inferred" in step3
     assert "never enters the intent file" in step3
     step4 = _flat(_section(_STEP4))
-    assert re.search(
-        r"non-empty carried-details list — from `capture-intent`'s hand-off or "
-        r"your own intake — forces that spec",
+    assert _affirmed(
         step4,
+        "non-empty carried-details list — from `capture-intent`'s hand-off or "
+        "your own intake — forces that spec",
     )
-    assert "record each carried detail" in step4.lower()
-    assert "as a UI flows line when visible" in step4
-    assert "an agent proposal the user did not agree to is not recorded" in step4
+    assert _affirmed(_record_bullet(), "Record each carried detail as a UI flows line when visible")
+    assert "An agent proposal the user did not agree to is not recorded" in _flat(_record_bullet())
 
 
 def test_no_details_keeps_evidence_only_plan() -> None:
@@ -74,7 +124,8 @@ def test_no_details_keeps_evidence_only_plan() -> None:
     assert "An empty list forces no spec" in step4
     forcing = [s for s in _sentences(step4) if "forces that spec" in s]
     assert forcing and all("non-empty" in s for s in forcing)
-    assert "The plan carries the Current State Evidence section instead of a spec." in step4
+    assert all(_affirmed(s, "forces that spec") for s in forcing)
+    assert _affirmed(step4, "The plan carries the Current State Evidence section instead of a spec.")
     gate = _text().split("<!-- gate: write-plan.no-plan-without-confirmed-intent -->", 1)[1]
     assert "carried-details" not in gate.split("<!-- /gate -->", 1)[0]
 
@@ -82,12 +133,12 @@ def test_no_details_keeps_evidence_only_plan() -> None:
 def test_write_plan_readback_leads_with_table_or_text_diagram() -> None:
     """A3 positive: ② for a spec write-plan wrote leads with a table or text diagram."""
     para = _readback_paragraph()
-    assert "② on a product spec you wrote" in para
-    assert re.search(
-        r"parallel cases or branches, lead with a table or a text \(ASCII\) diagram",
+    assert _affirmed(para, "② on a product spec you wrote")
+    assert _affirmed(
         para,
+        "parallel cases or branches, lead with a table or a text (ASCII) diagram",
+        "then the per-case sentences",
     )
-    assert "then the per-case sentences" in para
 
 
 def test_write_plan_readback_has_no_mermaid() -> None:
@@ -106,16 +157,16 @@ def test_both_stations_share_form_rules() -> None:
     plan = _flat(_section(_STEP4))
     flows = _flat((WRITE_SPEC_REFS / "ui-flows.md").read_text(encoding="utf-8"))
     forms = _flat((WRITE_SPEC_REFS / "spec-forms.md").read_text(encoding="utf-8"))
-    for text in (plan, flows):
-        assert "several parallel cases on one surface" in text.lower()
-        assert "`case | what the user does | what they see`" in text
-        assert re.search(
-            r"branch or go back and forth.*`stateDiagram-v2` or `flowchart`", text
-        )
-    assert "`<action> → <reaction>` lines" in plan
+    assert _affirmed(
+        plan, "several parallel cases on one surface, a table `case | what the user does | what they see`"
+    )
+    assert _affirmed(plan, "branch or go back and forth", "`stateDiagram-v2` or `flowchart`")
+    assert _affirmed(plan, "a short flow is `<action> → <reaction>` lines")
+    assert "several parallel cases on one surface" in flows.lower()
+    assert "`case | what the user does | what they see`" in flows
+    assert re.search(r"branch or go back and forth.*`stateDiagram-v2` or `flowchart`", flows)
     assert "`stateDiagram-v2` or `flowchart`" in forms
-    back = _flat((WRITE_SPEC_REFS / "ui-flows.md").read_text(encoding="utf-8"))
-    for text in (_readback_paragraph(), back):
+    for text in (_readback_paragraph(), flows):
         assert "lead with a table or a text (ASCII) diagram" in text
         assert "a terminal shows it as raw code" in text
 
@@ -131,13 +182,15 @@ def test_template_placeholder_names_table_and_diagram() -> None:
 
 
 def test_write_plan_intake_shows_carried_details_table() -> None:
-    """A5 positive: write-plan's own ① shows carried details as a table."""
+    """A5 positive: write-plan's own ① shows carried details as a table where it is their only stop."""
     step3 = _flat(_section(_STEP3))
-    assert "**The carried details, `kind: engineering` only**" in step3
-    assert "as a table, one row per detail in the user's language" in step3
-    assert "confirmed by the same yes; no extra stop" in step3
+    assert "**The carried details, where this is their only stop**" in step3
+    item = _carried_item()
+    assert _affirmed(item, "for `kind: engineering` and for a product change with `needs-design: no`")
+    assert _affirmed(item, "Show them as a table, one row per detail in the user's language")
+    assert "confirmed by the same yes; no extra stop" in item
     step1 = _flat(_section(_STEP1))
-    assert "Any intent section may use a Markdown table or diagram" in step1
+    assert _affirmed(step1, "Any intent section may use a Markdown table or a Mermaid `flowchart`")
     assert "Acceptance stays a numbered list" in step1
     assert "no UI reactions or state transitions" in step1
     assert "Mermaid node ids included" in step1
@@ -145,8 +198,38 @@ def test_write_plan_intake_shows_carried_details_table() -> None:
 
 
 def test_write_plan_no_details_no_table() -> None:
-    """A5 boundary: an empty list shows no table."""
+    """A5 boundary: an empty list shows no table; a needs-design: yes product defers to ②."""
     step3 = _flat(_section(_STEP3))
-    assert "With an empty list, no table appears" in step3
-    tables = [s for s in _sentences(step3) if "as a table" in s]
-    assert tables and all("engineering" in s for s in tables)
+    item = _carried_item()
+    assert "With an empty list, no table appears" in item
+    assert step3.count("as a table") == item.count("as a table") >= 1
+    assert _affirmed(item, "A product change with `needs-design: yes` shows them at decision point ② instead")
+
+
+# --- W3-02: adversary findings (explicit yes, where a product detail lands) ---
+
+
+def test_write_plan_only_explicit_yes_is_carried() -> None:
+    """A1 positive: only the user's explicit yes makes a proposal a carried detail."""
+    assert _affirmed(_section(_STEP3), "Only an explicit yes from the user counts as agreement")
+
+
+def test_write_plan_unanswered_proposal_dropped() -> None:
+    """A1 negative: silence, "later", or an answer about something else drops it."""
+    assert _affirmed(
+        _section(_STEP3),
+        "a proposal left unanswered, deferred",
+        "answered about something else is dropped",
+    )
+
+
+def test_product_non_visible_detail_on_requirement_line() -> None:
+    """A3 positive: a non-visible carried detail lands on its Requirement line."""
+    assert _affirmed(_record_bullet(), "as a UI flows line when visible, else on its Requirement line")
+
+
+def test_product_detail_not_on_design_decision() -> None:
+    """A3 negative: only an engineering change may record one on a Design decision line."""
+    routing = [s for s in _sentences(_flat(_record_bullet())) if "Design decision line" in s]
+    assert routing
+    assert all(_affirmed(s, "only an engineering change may put one on a Design decision line") for s in routing)

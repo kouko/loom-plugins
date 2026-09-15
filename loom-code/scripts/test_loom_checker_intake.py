@@ -547,6 +547,44 @@ def test_engineering_spec_needs_no_confirmed_behavior(tmp_path: Path) -> None:
     assert "intake.confirmed-behavior" not in blocked_rules(result)
 
 
+def test_product_spec_under_needs_design_no_requires_confirmed_behavior(tmp_path: Path) -> None:
+    """A5 positive: a product spec write-plan wrote under `needs-design: no`
+    (forced by carried details) still owes decision point ②; the gate
+    "A product spec needs confirmed-behavior before it becomes a plan" does
+    not depend on needs-design."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="no — same command gains a question")
+    write_spec(repo)
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.confirmed-behavior" in blocked_rules(result)
+
+
+def test_confirmed_product_spec_under_needs_design_no_is_accepted(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="no — same command gains a question")
+    write_spec(repo, confirmed_behavior="confirmed-behavior: 2026-09-02")
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
+def test_product_under_needs_design_no_without_a_spec_passes(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="no — same command gains a question")
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
+def test_engineering_spec_under_no_skips_confirmed_behavior(tmp_path: Path) -> None:
+    """A5 boundary: an engineering spec under `no` never owes decision point ②."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="engineering", needs_design="no — internal only")
+    write_spec(repo)
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.confirmed-behavior" not in blocked_rules(result)
+    assert result.returncode == 0, result.stderr
+
+
 def test_write_spec_never_asks_for_confirmed_behavior(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     write_intent(repo, kind="product", needs_design="yes — new visible surface")
@@ -1370,5 +1408,69 @@ STRUCTURAL_BLOCKS = {
 @pytest.mark.parametrize("label", sorted(STRUCTURAL_BLOCKS))
 def test_these_do_not_clear_the_structural_floor(tmp_path: Path, label: str) -> None:
     result = ui_flows_verdict(tmp_path, STRUCTURAL_BLOCKS[label])
+    assert result.returncode == 1, result.stdout
+    assert "spec.ui-flows-recompute" in blocked_rules(result)
+
+
+# --- spec.ui-flows-recompute: the table and diagram forms (W3-02) ----------
+# write-spec and write-plan tell authors to write parallel cases as a
+# `case | what the user does | what they see` table and branching paths as a
+# Mermaid `stateDiagram-v2` or `flowchart`. Each table data row and each
+# diagram transition clears the same per-side floor as an arrow line.
+
+FLOW_TABLE = (
+    "| case | what the user does | what they see |\n"
+    "|---|---|---|\n"
+    "| empty list | runs todo export | the line nothing to export |\n"
+    "| file exists | runs todo export | the question overwrite todo-export? |\n"
+)
+
+FLOW_FORMS = {
+    "a parallel-cases table": FLOW_TABLE,
+    "a mermaid stateDiagram-v2":
+        "```mermaid\nstateDiagram-v2\n"
+        "  [*] --> Asking : todo export with an existing file\n"
+        "  Asking --> Written : answers yes\n```",
+    "a mermaid flowchart":
+        "```mermaid\nflowchart LR\n"
+        "  export[runs todo export] --> asking[sees the overwrite question]\n```",
+}
+
+
+@pytest.mark.parametrize("label", sorted(FLOW_FORMS))
+def test_table_or_mermaid_ui_flows_count_as_flows(tmp_path: Path, label: str) -> None:
+    """A2 positive."""
+    result = ui_flows_verdict(tmp_path, FLOW_FORMS[label])
+    assert result.returncode == 0, result.stderr
+
+
+def test_each_table_data_row_counts_but_not_header_or_separator() -> None:
+    from loom_checker.rule_checks.intake import flow_lines
+
+    rows = flow_lines(FLOW_TABLE)
+    assert len(rows) == 2, rows
+    assert not any("what the user does" in row or "---" in row for row in rows)
+
+
+EMPTY_FLOW_FORMS = {
+    "an empty section": "",
+    "N/A": "N/A",
+    "a table with a header and separator only":
+        "| case | what the user does | what they see |\n|---|---|---|\n",
+    "a table without a separator row":
+        "| case | what the user does | what they see |\n| empty list | runs todo export | nothing |\n",
+    "a stateDiagram-v2 with no transition":
+        "```mermaid\nstateDiagram-v2\n  Asking : the overwrite question\n```",
+    "a sequenceDiagram, which is not a flow form":
+        "```mermaid\nsequenceDiagram\n  kouko->>todo export: runs it with a file\n```",
+    "a python fence with a --> inside":
+        "```python\nprint('runs export --> sees question')\n```",
+}
+
+
+@pytest.mark.parametrize("label", sorted(EMPTY_FLOW_FORMS))
+def test_empty_ui_flows_still_blocked(tmp_path: Path, label: str) -> None:
+    """A2 negative."""
+    result = ui_flows_verdict(tmp_path, EMPTY_FLOW_FORMS[label])
     assert result.returncode == 1, result.stdout
     assert "spec.ui-flows-recompute" in blocked_rules(result)

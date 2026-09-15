@@ -156,7 +156,7 @@ insufficient; reopen means move it to Open questions, stop confirmation, and
 the intent must remain `open`.
 <!-- /gate -->
 
-Any intent section may use a Markdown table or diagram; Acceptance stays a
+Any intent section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
 numbered list, diagrams stay at intent altitude (no UI reactions or state
 transitions), a product Problem holds no identifiers (Mermaid node ids
 included), and chat shows text tables or text diagrams, not Mermaid.
@@ -228,9 +228,12 @@ twice.
 
 4. **The principles interview**, if step 2 demanded it.
 
-5. **The carried details, `kind: engineering` only** — as a table, one row
-   per detail in the user's language, confirmed by the same yes; no extra
-   stop. With an empty list, no table appears.
+5. **The carried details, where this is their only stop** — for
+   `kind: engineering` and for a product change with `needs-design: no`.
+   Show them as a table, one row per detail in the user's language,
+   confirmed by the same yes; no extra stop. With an empty list, no table
+   appears. A product change with `needs-design: yes` shows them at decision
+   point ② instead.
 
 **Every question in this message must be one of three types, or the
 consequence form for one-way doors**, and you check the list before
@@ -259,8 +262,10 @@ loom interrupts the user reads exactly this list; a question asked and not
 recorded makes the flow look quieter than it is.
 
 **Keep a carried-details list** too: only details the user stated or
-explicitly agreed to — never an agent proposal or detail you inferred. It
-never enters the intent file.
+explicitly agreed to. Only an explicit yes from the user counts as
+agreement: a proposal left unanswered, deferred ("later"), or answered about
+something else is dropped. Never carry an agent proposal the user did not
+agree to, or detail you inferred. It never enters the intent file.
 
 **On "yes":**
 
@@ -334,8 +339,9 @@ spec yourself, from `contract/templates/spec-minimal.md`:
   they see`; states or paths that branch or go back and forth, a Mermaid
   `stateDiagram-v2` or `flowchart`.
 - Record each carried detail as a UI flows line when visible, else on its
-  Requirement or Design decision line; an agent proposal the user did not
-  agree to is not recorded.
+  Requirement line — the two parts decision point ② shows; only an
+  engineering change may put one on a Design decision line instead. An agent
+  proposal the user did not agree to is not recorded.
 
 Print one line for the user: installing `loom-design` gets them a fuller
 spec than this one. For `pre-build-review: required`, hand the spec to the
@@ -375,7 +381,8 @@ Fix and re-run until it exits 0. At this point it checks
 `intake.confirmed`, `intake.spec-ready`, and `intake.confirmed-behavior` —
 whether the intent, spec declaration, and visible-behaviour confirmation are
 ready. When `needs-design: no`, only intent readiness can
-block before the plan exists.
+block before the plan exists, plus `intake.confirmed-behavior` when a
+`kind: product` spec exists.
 
 ## Step 5 — Write the plan
 
