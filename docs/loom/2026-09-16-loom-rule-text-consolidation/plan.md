@@ -92,6 +92,18 @@ charter: 1.0
 - Test: A5 positive: same-steps-questions-checker-results-per-station; negative: branch-reader-skips-a-step. A6 positive: package-suite-mechanisms-citations-green; negative: prose-gate-count-not-17.
 - Risk: agent-decided — fresh-context readers get the installed-path-free branch and main copies and one real task each for capture-intent, write-spec, write-plan, build, closing-review and ship.
 
+### Wave 4
+
+**W4-01 Close round-1 review findings in rules, checker and evidence**  after: W3-02  acceptance: 1, 4
+- Files: loom-code/skills/write-plan/SKILL.md, docs/loom/README.md, loom-code/agents/reviewer.md, loom-code/scripts/check-skill-crossrefs.py, loom-code/scripts/test_write_plan_shape_text.py, loom-code/scripts/test_readme_review_order.py, loom-code/scripts/test_reviewer_mechanical_evidence.py, docs/loom/2026-09-16-loom-rule-text-consolidation/evidence/frozen-probes.md
+- Test: A1 positive: step-5-question-list-covers-decision-point-two; negative: readme-written-by-names-retired-review-station. A4 positive: bare-name-docstring-names-upgrade-path; negative: lenses-path-spelled-two-ways.
+- Risk: agent-decided — the important finding is a rule reachable only through the on-demand reference; step 5 restates it so a confirmed intent still records decision point ② questions.
+
+**W4-02 Restate the blind-run report's margin question as a disclosure**  after: W3-02  acceptance: 5
+- Files: docs/loom/2026-09-16-loom-rule-text-consolidation/blind-run-report.md
+- Test: A5 positive: report-open-questions-free-of-verification-quality-ask; negative: margin-line-dropped-entirely.
+- Risk: agent-decided — the blind runner owns its report; the margin stays visible under what was decided for the user, since asking it is a user-judgment leak.
+
 ## Questions asked
 ① — what — 這次整理要做到哪裡？（A 修矛盾＋同外掛內去重 / B 加跨外掛 / C 加 loom-workflow 語氣）答：A 修矛盾＋同外掛內去重
 ① — what — 需求覆述（範圍 A）…不加新規則、不加問題；硬性禁令維持強度但附理由；被刪掉的攻擊清單不復原；跨外掛去重留到下次。對嗎？（含審查與發布檢查通過後自動 push 開 PR 的授權）答：對，授權自動發布
