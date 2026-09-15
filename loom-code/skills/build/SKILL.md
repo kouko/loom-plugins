@@ -109,14 +109,27 @@ run no adversarial program. When it lists `package-tests` as skipped, run no
 complete package suite.
 
 Repeat these end-of-Build checks after every fix: run the complete package
-suite and re-run the existing adversarial programs. Do not dispatch the
-adversary again.
+suite and re-run the existing adversarial programs. After a fix where every
+adversarial program still passes, or fails only for a product defect, do not
+dispatch the adversary again.
+
+Build dispatches the `loom-code:adversary` agent fresh-context again to update
+its own programs when a fix widens or changes what the change covers, or trunk
+content brought in by a trunk sync changes it, and a committed adversarial
+program fails, or is unable to run, for that reason, rather than for a product
+defect it correctly caught. A program that still passes keeps its content.
+Build decides which case
+applies from the program's failure and the widened scope, and fixes a product
+defect in the product as above. Give the adversary the step 2 inputs plus the
+widened changed paths, or the trunk paths the sync brought in, and the
+failing program's output. The adversary updates only its own programs. Implementers and the orchestrator never edit an
+adversarial program. After the update, Build repeats these end-of-Build checks.
 
 ## 4. Hand off to closing-review
 
 Commit functional changes normally. Report the branch base, HEAD, the
 `sync-trunk` result with any warning it printed, changed paths, focused test
 results, the complete package suite command and its result,
-each adversarial program's path and command, every unresolved adversary finding, and any unresolved risk. Call `loom-code:closing-review`
+each adversarial program's path and command, each adversary re-dispatch with its reason, every unresolved adversary finding, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after `closing-review` generates it.

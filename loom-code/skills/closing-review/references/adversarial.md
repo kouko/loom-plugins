@@ -5,6 +5,44 @@ is to make the change fail. It runs at the end of Build, and everything it
 runs is committed as a program: Build re-runs those programs on every fix
 loop, and `finalize-review` executes them on committed content.
 
+## Reuse first, update with evidence
+
+Before writing any probe, the adversary checks what already covers the
+target: this change's programs under `docs/loom/<change-id>/evidence/probes/`
+and the repository's related tests. It reuses a program that covers a case,
+modifies one when a small change covers it, and writes a new probe only when
+nothing covers the case. A permanent repository test that covers a case
+counts as reuse, and the adversary leaves that test as it is. Its report marks
+each probe `reused`, `modified` or `new`, with a one-line reason for every new
+one. A stale case that is rewritten or flipped to its positive form counts as
+`modified`.
+
+When Build re-dispatches it for a widened scope or for trunk content brought
+in by `sync-trunk`, the adversary updates only its own programs and fixes
+nothing in the product. When a failing program caught a product defect, the
+adversary keeps that program unchanged and returns a finding, and Build then
+fixes the product. Every update carries mutation evidence run against the
+committed probe program itself: at least one mutation per kind of change the
+update touches, plus one that an over-broad update would wrongly accept. One
+mutation restores the original behaviour the stale program rejected, and the
+updated probe must turn RED on it. Each mutation turns the probe RED and is
+reverted, and the report gives its command and observed result. The adversary
+commits the updated probe before it makes a copy, because `git worktree add` and
+`git archive` hold only committed content, and an uncommitted update takes the
+edit-tool route in the working tree. The adversary
+applies each mutation in a throwaway copy of the working tree, such as a
+temporary `git worktree add` or a `git archive` extract, and runs the committed
+probe program there unchanged, or applies and undoes the mutation with the
+host's edit tool. Running the unchanged probe inside a copy of the tree still
+exercises its own assertion, unlike a copy of its logic. The adversary undoes
+each mutation in a worktree copy with the host's edit tool before
+`git worktree remove` removes that copy, and prefers a `git archive` extract
+when the copy will be left behind in a temp directory. Discard commands
+(`git checkout --`, `git restore`, `git reset --hard`, `git clean`,
+`git worktree remove --force`) are never used to undo a mutation, because host
+guards refuse them and they can destroy uncommitted work. An update never deletes, skips or xfails
+a case to make it pass.
+
 ## Code
 
 **If the repo declares mutation or fuzz tooling** — a `mutmut`,
@@ -14,7 +52,12 @@ asserts nothing.
 
 **If it declares none** (the common case), write **at least three**
 executable abuse or boundary cases against the changed behaviour, run them,
-and record each one. Three is the floor, not the target. Draw them from:
+and record each one. Three is the floor, not the target. Reused and modified
+cases count toward the floor. Reuse toward the floor counts only (a) the
+programs the adversary committed for this change and (b) tests that exist
+unchanged outside this change's branch. Any other test added or changed on the
+branch, such as an implementer's pin, is named as related coverage only. Draw
+them from:
 
 | Class | The question |
 |---|---|
