@@ -147,6 +147,8 @@ def test_hooks_json_registers_user_prompt_submit_and_keeps_post_tool_use():
     assert h["type"] == "command"
     assert h["command"] == '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"'
     assert h["async"] is False
+    # A5: a hung read must not stall every prompt past a short host timeout (seconds).
+    assert h["timeout"] == 5
 
 
 def test_hook_is_executable_python3_script():
@@ -271,12 +273,59 @@ PLAIN_RULES = {
 }
 
 
+NEGATION = re.compile(r"\b(?:never|not|no|avoid|don't)\b", re.I)
+# Rule 3's ban list is the one negation a rule sentence must keep.
+METAPHOR_BAN = 'no metaphors, analogies, "like" or "imagine"'
+
+
+def rule_polarity_errors(text):
+    """Missing or negated rule sentences in a card; empty = every rule stated affirmatively."""
+    errors = []
+    sentences = _sentences(text)
+    for rule, pattern in PLAIN_RULES.items():
+        hits = [s for s in sentences if re.search(pattern, s, re.I)]
+        if not hits:
+            errors.append(f"{rule}: missing")
+        for s in hits:
+            if rule.startswith("3") and METAPHOR_BAN not in s:
+                errors.append(f"{rule}: metaphor ban list missing")
+            if NEGATION.search(s.replace(METAPHOR_BAN, "")):
+                errors.append(f"{rule}: negated: {s}")
+    return errors
+
+
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
 @pytest.mark.parametrize("rule", sorted(PLAIN_RULES))
 def test_cards_carry_plain_language_rules(card, rule):
-    """A1 positive: each card carries the four plain-language rules."""
-    body = " ".join(_sentences(card.read_text(encoding="utf-8")))
+    """A1 positive: each card carries the four plain-language rules, stated affirmatively."""
+    text = card.read_text(encoding="utf-8")
+    body = " ".join(_sentences(text))
     assert re.search(PLAIN_RULES[rule], body, re.I), rule
+    assert [e for e in rule_polarity_errors(text) if e.startswith(rule + ":")] == []
+
+
+def test_affirmative_card_rule_accepted():
+    """A1 positive affirmative-card-rule-accepted: a synthetic affirmative card passes."""
+    card = ("Reply to the user in their language. 1) First sentence: the conclusion and what it "
+            "means for the user. 2) Use plain words, with the term in brackets. 3) Be literal: "
+            'who does what; no metaphors, analogies, "like" or "imagine". 4) Use tables or '
+            "diagrams for comparisons. For a plainer explanation, read "
+            "`references/plain-language.md` first.")
+    assert rule_polarity_errors(card) == []
+
+
+@pytest.mark.parametrize("old, new", [
+    ("in their language.", "never in their language."),
+    ("3) Be literal:", "3) Never literal:"),
+    ("4) Use tables or", "4) Avoid tables or"),
+    ('; no metaphors, analogies, "like" or "imagine".', "."),
+], ids=["language", "literal", "tables", "metaphor-ban-removed"])
+def test_negated_card_rule_rejected(old, new):
+    """A1 negative negated-card-rule-rejected: a rule flipped to its opposite is caught."""
+    text = FULL_CARD.read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+    assert old in flat
+    assert rule_polarity_errors(flat.replace(old, new, 1)) != []
 
 
 def _rules_one_to_three(card):

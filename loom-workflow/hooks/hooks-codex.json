@@ -5,7 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${PLUGIN_ROOT}/hooks/visualization-card\" --host=codex"
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/visualization-card\" --host=codex",
+            "timeout": 5
           }
         ]
       }

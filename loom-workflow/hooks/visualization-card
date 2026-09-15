@@ -26,6 +26,9 @@ def _load_json(path, missing_ok):
     """Parsed JSON object, {} when missing and allowed; raises when unreadable."""
     if missing_ok and not os.path.exists(path):
         return {}
+    # A FIFO or device would block open() on every prompt; only read regular files.
+    if not os.path.isfile(path):
+        raise ValueError("not a regular file: " + path)
     with open(path, encoding="utf-8") as fh:
         data = json.load(fh)
     if not isinstance(data, dict):
@@ -91,7 +94,7 @@ def _read_card(name):
         try:
             with open(os.path.join(d, name), encoding="utf-8") as fh:
                 return fh.read()
-        except OSError:
+        except (OSError, ValueError):  # ValueError covers an undecodable card
             continue
     raise OSError("card not found: " + name)
 

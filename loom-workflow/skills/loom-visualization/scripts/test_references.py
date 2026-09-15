@@ -103,9 +103,62 @@ def _text():
     return PLAIN.read_text(encoding="utf-8")
 
 
+NEGATION = re.compile(r"\b(?:never|not|no|avoid|don't)\b", re.I)
+
+
+def _sentence_with(body, phrase):
+    flat = " ".join(body.split())
+    return next((s for s in re.split(r"(?<=[.!?])\s+", flat) if phrase in s), "")
+
+
+def polarity_errors(text):
+    """Rule 3, rule 5 and yes-or-no sentences that are missing or say the opposite; empty = valid."""
+    errors = []
+    rules = rule_titles(text)
+    ban = _sentence_with(rules.get(3, ""), "metaphors or analogies")
+    if not ban.startswith("Do not use metaphors or analogies, and do not reach for"):
+        errors.append("rule 3 does not ban metaphors and analogies")
+    rule5 = rules.get(5, "")
+    yes_no = _sentence_with(rule5, "yes-or-no confirmation")
+    if "is asked directly" not in yes_no \
+            or NEGATION.search(yes_no.replace("yes-or-no", "").replace("no invented alternatives", "")):
+        errors.append("yes-or-no confirmation is not asked directly")
+    option = _sentence_with(rule5, "you recommend")
+    if "lists at least two workable alternatives and marks the one you recommend" not in option \
+            or NEGATION.search(option):
+        errors.append("option question does not list alternatives and mark a recommendation")
+    return errors
+
+
+def test_affirmative_option_and_yes_no_rules_accepted():
+    """A6/A7 positive: the committed rule 3, rule 5 and yes-or-no sentences pass the polarity check."""
+    assert polarity_errors(_text()) == []
+
+
+def test_negated_option_rule_rejected():
+    """A7 negative negated-option-rule-rejected: a flipped rule 5 sentence is caught."""
+    text = _text()
+    for pattern, new in ((r"marks\s+the\s+one\s+you\s+recommend", "never marks the one you recommend"),
+                         (r"is\s+asked\s+directly", "is not asked directly")):
+        broken, n = re.subn(pattern, new, text, count=1)
+        assert n == 1, pattern
+        assert polarity_errors(broken) != [], new
+
+
+def test_metaphor_ban_removed_rejected():
+    """A6 negative metaphor-ban-removed-rejected: rule 3 turned into permission is caught."""
+    flat = _text()
+    old = "Do not use metaphors or analogies, and do not reach for"
+    assert old in " ".join(flat.split())
+    broken = re.sub(r"Do\s+not\s+use\s+metaphors\s+or\s+analogies,\s+and\s+do\s+not\s+reach\s+for",
+                    "Use metaphors or analogies, and reach for", flat, count=1)
+    assert "rule 3 does not ban metaphors and analogies" in polarity_errors(broken)
+
+
 def test_guide_has_seven_rules_and_rewrite_steps():
     text = _text()
     assert guide_errors(text) == []
+    assert "rule 3 does not ban metaphors and analogies" not in polarity_errors(text)
     assert "Scope" in sections(text)
     assert "Internal terms" in sections(text)
     rule3 = rule_titles(text)[3]

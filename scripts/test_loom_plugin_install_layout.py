@@ -1098,6 +1098,8 @@ def test_codex_manifest_points_at_prompt_submit_card_hook(tmp_path: Path) -> Non
     assert "matcher" not in group
     (command,) = _card_commands(hooks)
     assert command == 'python3 "${PLUGIN_ROOT}/hooks/visualization-card" --host=codex'
+    # A5: a hung settings read must not stall every Codex prompt (seconds).
+    assert group["hooks"][0]["timeout"] == 5
     assert _codex_card_command_problems(command) == []
 
     consumer = tmp_path / "consumer project"

@@ -36,7 +36,11 @@ LIMIT_PHRASES = {
     ),
 }
 
-STALE_TIMING = re.compile(r"SessionStart|session start|startup, clear, and compact", re.I)
+STALE_TIMING = re.compile(
+    r"SessionStart|session[ -]start|startup, clear, and compact"
+    r"|セッション開始時|工作階段開始時|session 開始時",
+    re.I,
+)
 
 
 def _read(name: str) -> str:
@@ -68,6 +72,12 @@ def test_sessionstart_wording_removed() -> None:
 def test_checks_catch_stale_and_missing_wording() -> None:
     stale = "intro\n│   └── visualization-card SessionStart trigger card\n"
     assert _stale_lines(stale) == ["│   └── visualization-card SessionStart trigger card"]
+    for line in ("The card also arrives at session-start.",
+                 "カードはセッション開始時に一度だけ届く。",
+                 "卡片只在工作階段開始時送達一次。",
+                 "卡片在 session 開始時送達。"):
+        assert _stale_lines("intro\n" + line + "\n") == [line], line
+    assert _stale_lines("The card arrives with every message you send.\n") == []
     assert _missing_limits("Codex app only", LIMIT_PHRASES["README.md"]) == [
         "Codex IDE extension",
         "Antigravity desktop app or IDE",
