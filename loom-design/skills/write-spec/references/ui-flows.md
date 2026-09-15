@@ -52,7 +52,7 @@ what is revalidated. One pass over each edge is enough; edge pairs are
 not this section's job.
 
 A surface no line arrives at is orphaned, and a state no line leaves is a
-dead end. Both are findings before the review station raises them.
+dead end. Both are findings before the closing-review station raises them.
 
 ## Irreversible steps get a sentence of their own
 
