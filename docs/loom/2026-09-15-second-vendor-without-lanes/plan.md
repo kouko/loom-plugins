@@ -35,6 +35,11 @@ charter: 1.0
 - Test: A4 positive: memory-store-integrity-hook-passes; negative: contradicting-entry-left-unreconciled.
 - Risk: agent-decided — the charter's harness-friction home `environment-gotchas.md` no longer exists, so the lesson lands in this store; one fact, no new intent.
 
+**W2-02 Close adversary findings on lane guards**  after: W2-01  acceptance: 2, 3, 4
+- Files: loom-code/scripts/test_contract_manifest.py, loom-code/scripts/test_write_plan_station_text.py, loom-design/scripts/spec/test_capture_intent_contract.py, docs/loom/KICKOFF-DEFAULTS.md
+- Test: A2 positive: runtime-tree-lane-scan; negative: manifest-note-lane-mutant-survives. A3 positive: affirmative-every-change-pin; negative: negated-every-change-mutant-survives. A4 positive: adversary-mutation-program-green; negative: kickoff-line-says-full-lane.
+- Risk: agent-decided — strengthen product tests until the adversary's mutation program passes; KICKOFF second-vendor reason replaced by a new dated line, value unchanged; policy stdin decoding nit left open.
+
 ## Questions asked
 ① — what — 修掉「要不要建議找其他公司的 AI 再審查」這一步對已刪除的「大／小改動」設定的依賴，同一個改動每次結果一樣，所有改動都會問，並授權自動 push 開 PR、合併前回「接受」；這樣對嗎？
 ① — what — 只改文件或測試的小改動，要不要也問你要不要找其他公司的 AI 再審查？（答：B 我覺得還是問 因為當前不卡流程繼續進行 而且問的時候我記得也會給建議是要用還是不要用）
