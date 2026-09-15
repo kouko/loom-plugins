@@ -22,6 +22,17 @@ SCANNED = (
     "loom-workflow/skills/distill-sessions/agents/prompt-success-analysis.md",
 )
 
+# Host maps and READMEs name skills in plain prose and sample output, so a
+# retired name is rejected there even without backticks. Scoped to these
+# files: elsewhere "brainstorming" is an ordinary English word.
+SCANNED_UNQUOTED = (
+    "loom-workflow/skills/distill-sessions/references/claude-code-tools.md",
+    "loom-workflow/skills/distill-sessions/references/codex-tools.md",
+    "loom-workflow/skills/distill-sessions/README.md",
+    "loom-workflow/skills/distill-sessions/README.ja.md",
+    "loom-workflow/skills/distill-sessions/README.zh-TW.md",
+)
+
 RETIRED = (
     "brainstorming",
     "writing-plans",
@@ -31,11 +42,16 @@ RETIRED = (
 
 _QUALIFIED = re.compile(r"loom-code:([a-z][a-z0-9-]*)")
 _BARE = re.compile(r"`(" + "|".join(map(re.escape, RETIRED)) + r")`")
+_UNQUOTED = re.compile(
+    r"(?<![\w:`-])(" + "|".join(map(re.escape, RETIRED)) + r")(?![\w`-])"
+)
 
 
-def find_retired_names(text: str, live: set[str]) -> list[str]:
+def find_retired_names(text: str, live: set[str], unquoted: bool = False) -> list[str]:
     hits = [m.group(0) for m in _QUALIFIED.finditer(text) if m.group(1) not in live]
     hits += [m.group(1) for m in _BARE.finditer(text)]
+    if unquoted:
+        hits += [m.group(1) for m in _UNQUOTED.finditer(text)]
     return hits
 
 
@@ -52,6 +68,31 @@ def test_no_retired_loom_code_skill_names() -> None:
         if (found := find_retired_names((REPO_ROOT / rel).read_text(encoding="utf-8"), live))
     }
     assert not hits, f"retired loom-code skill names still named: {hits}"
+
+
+def test_distill_sessions_docs_free_of_retired_names() -> None:
+    live = _live_skills()
+    hits = {
+        rel: found
+        for rel in SCANNED_UNQUOTED
+        if (
+            found := find_retired_names(
+                (REPO_ROOT / rel).read_text(encoding="utf-8"), live, unquoted=True
+            )
+        )
+    }
+    assert not hits, f"retired loom-code skill names still named: {hits}"
+
+
+def test_retired_name_in_reference_flagged() -> None:
+    live = {"write-plan", "build"}
+    assert find_retired_names(
+        "sessions invoking brainstorming + writing-plans; via "
+        "loom-code:dispatching-parallel-agents",
+        live,
+        unquoted=True,
+    ) == ["loom-code:dispatching-parallel-agents", "brainstorming", "writing-plans"]
+    assert find_retired_names("e.g. write-plan + build", live, unquoted=True) == []
 
 
 def test_scanner_rejects_retired_names_and_keeps_live_ones() -> None:

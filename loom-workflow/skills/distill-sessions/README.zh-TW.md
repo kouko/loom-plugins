@@ -62,8 +62,8 @@ skill 跑 multi-stage pipeline：
               ▼
        JSON payload (stdout) + Markdown summary (stderr)
               │
-              ▼  Stage 3: orchestrator 透過 loom-code:dispatching-parallel-agents
-              │   dispatch subagent
+              ▼  Stage 3: orchestrator 以 subagent
+              │   平行 dispatch
               │   - 每個 (skill, session) 一個 Haiku-4.5 subagent
               │   - 依 friction 選 failure / success prompt
               ▼
@@ -85,7 +85,7 @@ skill 跑 multi-stage pipeline：
 ### v0.3 主要功能
 
 - **跨技能 friction-density routing** — 當 session 呼叫多個
-  目標 skill 時（例如 brainstorming + writing-plans），Memory Items
+  目標 skill 時（例如 write-plan + build），Memory Items
   會 route 到該 session 中 severity score 最高的 skill，而不是
   字典序最前的 skill。這確保 feedback 歸到 friction 真正來源的 skill。
 
@@ -142,10 +142,10 @@ python3 main.py
 
 ## Top skills
 
-- **loom-code:writing-plans**
+- **loom-code:write-plan**
   - session `2026-05-20-...`: friction=high, events=12
   - session `2026-05-18-...`: friction=mid,  events=7
-- **loom-code:brainstorming**
+- **loom-code:build**
   - session `2026-05-19-...`: friction=mid,  events=5
 ...
 ```
