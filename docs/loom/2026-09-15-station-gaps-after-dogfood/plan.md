@@ -48,6 +48,13 @@ Wave 2 — release
 - Test: A6 positive: package-suite-and-mechanism-check-green; negative: checker-code-diff-is-empty.
 - Risk: patch bump via sync_codex_manifests.py; version pins move with it; loom-design unchanged; agent-decided.
 
+Wave 3 — trunk moved during publication
+
+**W1-06 Merge trunk #16 and re-release on 3.6.0**  after: W2-01  acceptance: 1, 3, 5, 6
+- Files: loom-code/skills/build/SKILL.md, loom-code/CHANGELOG.md, loom-code/**/plugin.json, README.md, loom-code/README*.md, loom-code/scripts/test_build_mechanical_checks.py, loom-code/scripts/test_write_plan_station_text.py, docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/*.py
+- Test: A1 positive: sync-adversary-suite-order-kept; negative: every-fix-rerun-survives-merge. A3 positive: suite-source-in-step-3; negative: suite-source-dropped-fails. A5 positive: words-not-above-merged-trunk; negative: stale-base-count-rejected. A6 positive: checker-unchanged-since-merge-base; negative: stale-base-diff-rejected.
+- Risk: merge, not rebase, because the branch is pushed; probes re-based to the merged trunk tip, documented; release 3.6.1; third digest makes Round 3 terminal; agent-decided.
+
 ## Questions asked
 ① — what — Restated the two station-text gaps (no re-run after an in-Build fix; design re-look after a finalize failure) plus the suite-command source and the 6 Acceptance lines in plain words; asked "以上內容對嗎？" — answered 「對」.
 ① — consequence — Answering yes authorizes a later non-forced push and Ready PR after Review and publication checks pass; merge stays separate; the user may opt out before publication — answered 「對」.
@@ -59,3 +66,4 @@ Wave 2 — release
 4. "every fix" may be over-applied to per-task fixes during implementation; the worst case is extra suite runs, not a wrong hand-off.
 5. Both re-run auditors note Build does not say what to do when an end-of-Build failure predates the change; out of scope, recorded as a follow-up.
 6. W2-01 ran before W1-03: release files and the evidence file are disjoint and the evidence is docs-only; agent-decided.
+7. PR #16 merged to main after publication and conflicts with this branch; once merged, Acceptance 5 and 6 are measured against the merged trunk tip 040e5010, not 9906c79c, because #16 itself adds 182 station words and sync.py; agent-decided.
