@@ -278,6 +278,18 @@ def test_cards_carry_plain_language_rules(card, rule):
     body = " ".join(_sentences(card.read_text(encoding="utf-8")))
     assert re.search(PLAIN_RULES[rule], body, re.I), rule
 
+
+def _rules_one_to_three(card):
+    body = " ".join(_sentences(card.read_text(encoding="utf-8")))
+    match = re.search(r"Reply to the user.*?(?= 4\))", body)
+    assert match, card.name
+    return match.group(0)
+
+
+def test_coexist_card_rules_one_to_three_match_full_card_word_for_word():
+    """The coexist card is what toolkit users receive; rules 1-3 must not be compressed."""
+    assert _rules_one_to_three(COEXIST_CARD) == _rules_one_to_three(FULL_CARD)
+
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
 def test_cards_at_most_150_words(card):
     assert len(card.read_text(encoding="utf-8").split()) <= 150
