@@ -180,6 +180,106 @@ def test_option_rule_two_alternatives_and_recommendation():
     assert "Nutt" in rule5 and "Chernev" in rule5
 
 
+DECISION_HEADERS = SITUATIONS["Decision consequences"]
+LETTERED_OPTION = re.compile(r"\((?:[A-C])(?:,[^)]*)?\)")
+
+
+def all_header_rows(body):
+    """Return the cells of every markdown table header in body."""
+    return [tuple(c.strip() for c in m.group(1).split("|"))
+            for m in re.finditer(r"^\|(.+)\|\s*$\n^\|[\s:|-]+\|\s*$", body, flags=re.MULTILINE)]
+
+
+def rule5_example_errors(text):
+    """Errors when rule 5's how-question example is not a question plus a consequences table."""
+    errors = []
+    rule5 = rule_titles(text).get(5, "")
+    if DECISION_HEADERS not in all_header_rows(rule5):
+        errors.append("rule 5 example has no Decision consequences table")
+    elif not re.search(r"^\| [^|\n]*\(recommended\) \|", rule5, flags=re.MULTILINE):
+        errors.append("rule 5 example table marks no recommended option")
+    if any(len(LETTERED_OPTION.findall(line)) >= 2 for line in rule5.splitlines()):
+        errors.append("rule 5 example sets out options as prose")
+    return errors
+
+
+def test_rule_five_example_is_a_table():
+    """A7 positive rule-five-example-is-a-table."""
+    assert rule5_example_errors(_text()) == []
+
+
+def test_prose_option_example_rejected():
+    """A7 negative prose-option-example-rejected: the options-in-one-sentence example is caught."""
+    prose = ('| "Should I refactor the parser?" | "How should the parser change? (A, recommended) '
+             "Fix only the failing case: one file changes today. (B) Rewrite the parser: every "
+             'input format gets retested. (C) Leave it for now." |')
+    text = _text()
+    rule5 = rule_titles(text)[5]
+    broken = text.replace(rule5, rule5 + "\n| Hard to read | Plain |\n|---|---|\n" + prose + "\n")
+    assert "rule 5 example sets out options as prose" in rule5_example_errors(broken)
+    no_table = re.sub(r"\| Option \| What you gain \| What you give up \| Best if \|",
+                      "| Choice | Gain | Cost | When |", rule5)
+    assert "rule 5 example has no Decision consequences table" in \
+        rule5_example_errors(text.replace(rule5, no_table))
+
+
+# Spec REQ-7: the guide's rule 5 names the same scope as the card's inline rule.
+DECISION_SCOPE = "asking or answering how to do something"
+
+
+def test_rule_five_scope_matches_card():
+    """A7 positive: rule 5 covers the agent asking and the user asking, in the card's words."""
+    option = _sentence_with(rule_titles(_text())[5], "you recommend")
+    assert DECISION_SCOPE in option, option
+    card = (SKILL_DIR / "assets" / "trigger-card.md").read_text(encoding="utf-8")
+    assert DECISION_SCOPE in " ".join(card.split())
+
+
+def table_rule_one_errors(text):
+    """Errors when table rule 1 lacks the key-value summary exception."""
+    rules = numbered(sections(text).get("Table-writing rules and common mistakes", ""))
+    first = rules[0] if rules else ""
+    if not ("three or more attributes" in first and "key-value" in first
+            and "label plus one value" in first):
+        return ["table rule 1 has no key-value exception"]
+    return []
+
+
+def test_rule_one_key_value_exception_stated():
+    """A8 positive rule-one-key-value-exception-stated."""
+    assert table_rule_one_errors(_text()) == []
+
+
+def test_rule_one_without_exception_fails():
+    """A8 negative: rule 1 reduced to the three-attribute rule alone is caught."""
+    text = _text()
+    first = numbered(sections(text)["Table-writing rules and common mistakes"])[0]
+    broken = text.replace(first, "Use a table only when each item has three or more attributes; "
+                                 "otherwise use a list (Google, Microsoft).")
+    assert table_rule_one_errors(broken) != []
+
+
+OSU_URL = "https://news.osu.edu/half-of-business-decisions-fail-because-of-managements-blunders-new-study-finds/"
+
+
+def nutt_citation_errors(text):
+    """Errors when the 52%/32% figures are attributed to the Ohio State News article."""
+    flat = " ".join(text.split())
+    errors = []
+    for s in re.split(r"(?<=[.!?])\s+(?=[A-Z(\[])", flat):
+        if ("52%" in s or "32%" in s) and OSU_URL in s:
+            errors.append(f"figures attributed to OSU: {s[:80]}")
+    return errors
+
+
+def test_unsupported_nutt_figures_absent():
+    """A8 negative unsupported-nutt-figures-absent: no 52%/32% sentence cites the OSU article."""
+    assert nutt_citation_errors(_text()) == []
+    old = ('Nutt\'s study found "whether or not" decisions failed 52% of the time, against 32% '
+           f"with two or more alternatives ([Ohio State News]({OSU_URL})).")
+    assert nutt_citation_errors(old) != []
+
+
 def test_yes_no_confirmation_asked_directly():
     rule5 = " ".join(rule_titles(_text())[5].split())
     sentence = next(s for s in re.split(r"(?<=[.!?])\s+", rule5) if "yes-or-no" in s)
@@ -440,13 +540,81 @@ def routing_errors(skill_text):
         for word in CONVERSATION_WORDS:
             if word in need.lower():
                 errors.append(f"{stem} row names conversation situation: {word}")
+    if "progress" not in routes.get("references/plain-language.md", "").lower():
+        errors.append("plain-language row does not name progress")
     prose = " ".join(skill_text.split())
-    if not re.search(r"conversation-situation reply \([^)]*progress[^)]*\) reads only "
-                     r"`references/plain-language.md`", prose):
+    if "a conversation-situation reply never opens a domain file" not in prose:
         errors.append("no sentence routing conversation replies to the general set only")
-    if "read only when the user asks for one of its named document types" not in prose:
+    if "Read only the one file whose row matches" not in prose:
         errors.append("no sentence limiting domain files to named document types")
     return errors
+
+
+# Document type each held (non-pointer) entry is routed by; every one must appear in its row.
+HELD_TYPES = {
+    "tables-software": {
+        1: ("ADR",), 2: ("RFC",), 3: ("technology selection",), 6: ("test plan",),
+        8: ("feature-flag rollout",), 9: ("incident postmortem",), 10: ("incident postmortem",),
+        11: ("risk register",), 12: ("RACI",), 15: ("migration guide",), 16: ("API parameters",),
+        17: ("release notes",), 18: ("runbook",), 19: ("incident report",),
+        21: ("decision table",), 22: ("state-transition table",), 23: ("truth table",),
+        24: ("traceability",), 25: ("morphological box",), 26: ("risk matrix",),
+        27: ("RAID log",), 28: ("threat model (STRIDE)",), 29: ("feature table",),
+        30: ("confusion matrix",), 31: ("correlation matrix",),
+    },
+    "tables-design": {
+        1: ("heuristic evaluation",), 2: ("usability test report",), 4: ("content audit",),
+        5: ("design critique",), 6: ("design tokens",), 7: ("component states",),
+        8: ("accessibility audit",), 9: ("journey map",), 10: ("personas or JTBD",),
+        11: ("design decision log",),
+    },
+    "tables-business": {
+        1: ("weighted",), 2: ("Pugh",), 3: ("RICE",), 4: ("ICE",), 5: ("MoSCoW",),
+        6: ("SWOT", "TOWS"), 7: ("competitive analysis",), 8: ("Five Forces",),
+        9: ("stakeholder analysis",), 11: ("scenario planning",), 12: ("business case",),
+        14: ("OKR",), 15: ("assumption log",), 18: ("pricing tiers",), 19: ("WSJF",),
+        20: ("decisional balance sheet",), 21: ("Kano",), 22: ("roadmap",), 23: ("2×2",),
+    },
+}
+
+
+def _has_term(term, text):
+    return re.search(rf"(?<!\w){re.escape(term)}(?!\w)", text, re.I) is not None
+
+
+def held_type_routing_errors(skill_text, texts):
+    """Errors when a held entry's document type is missing from its routing row, or RACI
+    is routed anywhere but software; empty = valid."""
+    rows = re.findall(r"^\| (.+?) \| `(references/[\w.-]+)` \|$", skill_text, flags=re.MULTILINE)
+    routes = {path: need for need, path in rows}
+    errors = []
+    for stem, types in HELD_TYPES.items():
+        need = routes.get(f"references/{stem}.md", "")
+        held = {int(m.group(2)) for m in ENTRY.finditer(texts[stem])
+                if not POINTER.search(entries(texts[stem])[m.group(3).strip()])}
+        errors += [f"{stem}: entry {n} has no routed document type" for n in sorted(held - set(types))]
+        for n, terms in types.items():
+            errors += [f"{stem} row misses {t}" for t in terms if not _has_term(t, need)]
+    for stem in ("tables-design", "tables-business"):
+        load = re.search(r"^Load this when: (.+)$", texts[stem], flags=re.MULTILINE)
+        if _has_term("RACI", routes.get(f"references/{stem}.md", "")) \
+                or (load and _has_term("RACI", load.group(1))):
+            errors.append(f"RACI routed to {stem}")
+    return errors
+
+
+def test_routing_rows_name_all_held_document_types():
+    """A9 positive routing-rows-name-all-held-document-types."""
+    assert held_type_routing_errors(SKILL.read_text(encoding="utf-8"), _domain_texts()) == []
+
+
+def test_raci_routed_to_software_only():
+    """A9 negative raci-routed-to-software-only: RACI in the business load line is caught."""
+    texts = _domain_texts()
+    texts["tables-business"] = re.sub(r"^(Load this when: .+?)\.$", r"\1, RACI.",
+                                      texts["tables-business"], count=1, flags=re.MULTILINE)
+    assert "RACI routed to tables-business" in \
+        held_type_routing_errors(SKILL.read_text(encoding="utf-8"), texts)
 
 
 def _domain_texts():

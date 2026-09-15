@@ -148,6 +148,7 @@ def test_hooks_json_registers_user_prompt_submit_and_keeps_post_tool_use():
     assert h["command"] == '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"'
     assert h["async"] is False
     # A5: a hung read must not stall every prompt past a short host timeout (seconds).
+    # Source: Claude Code hooks reference, `timeout` in seconds: https://code.claude.com/docs/en/hooks
     assert h["timeout"] == 5
 
 
@@ -361,26 +362,40 @@ def test_card_over_150_words_fails():
 
 
 GUIDE = "references/plain-language.md"
+# Scope shared word-for-word with rule 5 of the guide (spec REQ-7).
+DECISION_SCOPE = "asking or answering how to do something"
+INLINE_RULE_PHRASES = (DECISION_SCOPE, "2+ workable options", "in a table", "recommend", GUIDE)
 
 
-def decision_routing_errors(text):
-    """Error when no card sentence routes decision questions to the guide; empty = routed."""
-    ok = any(re.search(r"\bdeci(?:de|sions?)\b", s, re.I) and GUIDE in s
-             and not NEGATION.search(s) for s in _sentences(text))
-    return [] if ok else ["decision questions not routed to the guide"]
+def inline_decision_rule_errors(text):
+    """Error when no card sentence states the decision rule inline; empty = stated."""
+    ok = any(all(p in s for p in INLINE_RULE_PHRASES) and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["decision rule not stated inline"]
 
 
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
-def test_both_cards_name_decision_questions_for_guide(card):
-    """A1/A7 positive both-cards-name-decision-questions-for-guide."""
-    assert decision_routing_errors(card.read_text(encoding="utf-8")) == []
+def test_both_cards_state_inline_decision_rule(card):
+    """A1/A7 positive both-cards-state-inline-decision-rule."""
+    assert inline_decision_rule_errors(card.read_text(encoding="utf-8")) == []
 
 
-def test_card_without_decision_routing_fails():
-    """A7 negative: a card whose guide sentence covers only plainer explanations is caught."""
-    card = ("Reply to the user in their language. For a plainer explanation, read "
-            "loom-visualization's `references/plain-language.md` first. Decide later.")
-    assert decision_routing_errors(card) != []
+@pytest.mark.parametrize("card", [
+    "Reply to the user in their language. Before plainer explanations or decisions between "
+    "approaches, read loom-visualization's `references/plain-language.md`.",
+    "When asking or answering how to do something, never offer 2+ workable options in a table "
+    "or recommend one; read loom-visualization's `references/plain-language.md` first.",
+], ids=["routing-only", "negated"])
+def test_card_without_inline_decision_rule_fails(card):
+    """A7 negative: a card that only routes decisions to the guide, or negates the rule, is caught."""
+    assert inline_decision_rule_errors(card) != []
+
+
+def test_coexist_card_skip_sentence_names_the_skill():
+    """'Skip it' was ambiguous next to the ascii-graph card; the skip sentence names the skill."""
+    body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
+    assert "Skip loom-visualization for one-paragraph answers" in body
+    assert "Skip it" not in body
 
 
 def test_full_card_names_skill_and_comparison_and_flow_triggers():

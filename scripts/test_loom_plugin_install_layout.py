@@ -1099,6 +1099,8 @@ def test_codex_manifest_points_at_prompt_submit_card_hook(tmp_path: Path) -> Non
     (command,) = _card_commands(hooks)
     assert command == 'python3 "${PLUGIN_ROOT}/hooks/visualization-card" --host=codex'
     # A5: a hung settings read must not stall every Codex prompt (seconds).
+    # Source: Codex hook_config.rs, `rename = "timeout"`, u64 seconds:
+    # https://github.com/openai/codex/blob/main/codex-rs/config/src/hook_config.rs
     assert group["hooks"][0]["timeout"] == 5
     assert _codex_card_command_problems(command) == []
 
