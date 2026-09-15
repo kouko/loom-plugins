@@ -43,6 +43,23 @@ charter: 1.0
 - Test: A7 positive: package-groups-and-check-mechanisms-green; negative: stale-3-5-0-pin-fails.
 - Risk: minor release 3.6.0 after main shipped 3.5.0; contract version changes only if a manifest test pins the template text. agent-decided.
 
+### Wave 3 — adversary findings (end-of-Build probes at 97017250)
+
+**W3-01 capture-intent and write-spec close carried-detail gaps**  after: W2-02  acceptance: 1, 5, 6
+- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-design/skills/write-spec/SKILL.md`, `loom-design/scripts/spec/test_capture_intent_contract.py`, `loom-design/scripts/spec/test_write_spec_contract.py`, `loom-design/CHANGELOG.md`
+- Test: A1 positive: only-explicit-yes-is-carried; negative: unanswered-or-deferred-proposal-dropped. A5 positive: product-needs-design-no-shows-table-at-intent-confirmation; boundary: product-needs-design-yes-defers-to-write-spec. A6 positive: intent-diagram-form-is-flowchart-or-table; negative: negated-pin-mutant-killed.
+- Risk: silence read as agreement failed all three cold reads; a product change without a spec had no stop showing its details. agent-decided.
+
+**W3-02 write-plan and intake checker accept flow forms and confirm product specs**  after: W3-01  acceptance: 1, 2, 3, 5
+- Files: `loom-code/skills/write-plan/SKILL.md`, `loom-code/scripts/loom_checker/command_handlers/intake.py`, `loom-code/scripts/loom_checker/rule_checks/intake.py`, `loom-code/scripts/test_write_plan_shape_text.py`, `loom-code/scripts/test_loom_checker_intake.py`, `loom-code/CHANGELOG.md`
+- Test: A1 positive: write-plan-only-explicit-yes-is-carried; negative: write-plan-unanswered-proposal-dropped. A2 positive: table-or-mermaid-ui-flows-count-as-flows; negative: empty-ui-flows-still-blocked. A3 positive: product-non-visible-detail-on-requirement-line; negative: product-detail-not-on-design-decision. A5 positive: product-spec-under-needs-design-no-requires-confirmed-behavior; boundary: engineering-spec-under-no-skips-confirmed-behavior.
+- Risk: intake now checks an existing product spec regardless of needs-design, enforcing the existing write-plan gate. agent-decided.
+
+**W3-03 Re-record cold reads and re-run checks**  after: W3-02  acceptance: 1, 7
+- Files: `docs/loom/2026-09-15-readable-flow-details/evidence/probes/coldread/run-1.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/probes/coldread/run-2.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/probes/coldread/run-3.txt`
+- Test: A1 positive: three-fresh-readers-carry-only-agreed-details; negative: stale-recording-fails. A7 positive: package-suite-and-all-probes-green; negative: any-probe-failure-blocks-hand-off.
+- Risk: recorded runs load the global CLAUDE.md; recording uses the existing probe command unchanged. agent-decided.
+
 ## Questions asked
 ① — what — 你在聊天確認當下難讀，還是事後讀文件難讀？ kouko: "兩者都有點難讀"
 ① — what — 想在哪個時間點確認談好的細節有被保留？ kouko: "Ｃ 但是照理說細節應該在 spec 的時候會被記錄下來 所以應該不用額外的機制？"
