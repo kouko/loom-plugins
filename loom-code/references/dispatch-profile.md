@@ -157,7 +157,7 @@ Entering `high` requires a completed `frontier/medium` attempt and one of:
 - the same blocker survived a substantive fix;
 - mutually exclusive conclusions were reached over identical evidence;
 - medium failed to settle a high-risk decision;
-- a round-3 technical redesign requires adjudication; or
+- a technical design re-look requires adjudication; or
 - a multi-step security chain remains unresolved.
 
 Entering `xhigh` requires a completed `frontier/high` attempt plus either a

@@ -45,8 +45,10 @@ Both runs grade all three scenarios CONFORMS (Acceptance 4 met). Residual ambigu
 
 W1-05 (d8e3988b), landed after both re-runs, closed the end-of-Build adversary findings: it rewrote Build step 2's
 suite-command sentence to cover an absent declaration and `none`, deleted Build §3's restated hand-off consequence, and
-rewrapped one closing-review §5 line without word changes. It did not touch the re-run sentence the S2/S3 trajectories
-cite or any §4/§5 wording the S7-a trajectory cites, so the verdicts above still describe the station text at HEAD.
+rewrapped one closing-review §5 line without word changes. It extended the step-2 suite-command sentence the S2/S3
+executors cited (adding the absent and `none` cases); the declared-value reading they used is unchanged at HEAD. It did
+not touch the re-run sentence the S2/S3 trajectories cite or any §4/§5 wording the S7-a trajectory cites, so the verdicts
+above still describe the station text at HEAD.
 
 ## Word budget (Acceptance 5)
 

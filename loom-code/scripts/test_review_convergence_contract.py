@@ -23,7 +23,7 @@ def test_review_episode_has_three_distinct_content_rounds_and_no_identity_reset(
         assert identity in REVIEW_WORDS
 
 
-def test_round_roles_require_relook_before_terminal_round() -> None:
+def test_round_roles_name_three_rounds_and_relook_term() -> None:
     assert "Round 1" in REVIEW_WORDS
     assert "Round 2" in REVIEW_WORDS
     assert "Round 3" in REVIEW_WORDS
@@ -440,10 +440,23 @@ def test_finalize_failure_round_states_no_relook_unless_stuck() -> None:
     assert not _OPTIONAL_ROUND.search(_NO_RELOOK)
 
 
-def test_reviewer_contract_ties_no_relook_to_round3() -> None:
+def test_reviewer_contract_does_not_tie_relook_to_round3() -> None:
     reviewer = " ".join(REVIEWER.split())
     tied = [
         s for s in _sentences(reviewer)
         if "Round 3" in s and "technical design re-look" in s
+    ]
+    assert tied == [], tied
+
+
+def test_dispatch_profile_does_not_tie_relook_to_round3() -> None:
+    profile = (ROOT / "loom-code/references/dispatch-profile.md").read_text(
+        encoding="utf-8"
+    )
+    prose = " ".join(re.sub(r"`[^`]*`", "", profile).split())
+    tied = [
+        s for s in _sentences(prose)
+        if re.search(r"round[- ]3", s, re.IGNORECASE)
+        and re.search(r"re-look|redesign", s, re.IGNORECASE)
     ]
     assert tied == [], tied
