@@ -40,7 +40,7 @@ dimensions: loom-code/skills/closing-review/references/lenses.md
 
 If any of these is missing, say so and stop; do not guess a lens or invent
 a base. Read `skills/closing-review/references/lenses.md` before scoring — it defines every
-dimension named below and the severity thresholds.
+dimension named below and every severity and verdict rule.
 
 ## What each lens scores
 
@@ -53,60 +53,26 @@ dimension named below and the severity thresholds.
 | `principles` | principles-conformance |
 | `skill` | the five `docs` dimensions, plus user-judgment-leak, deletion-first |
 
-On the `spec` and `spec+adversarial` lenses, `user-judgment-leak` also fires the other way — a
-`Design decision` introducing a paid service, an account, or data leaving
-the user's machine, with no `user-decided` mark, is `NEEDS_REVISION` (per
-`skills/closing-review/references/lenses.md`); an `agent-decided` mark settles it only when the
-option carries zero obligation and is reversible.
-
-The `tests` dimension reads the committed tests and adversarial artifacts,
-and you run the test files the change added or changed, except the
-adversarial programs under `docs/loom/<change-id>/evidence/probes/` — a test
-in a changed test file you ran that is skipped, or that never actually executes, is a `tests`
-finding, since a green exit code does not show that it ran. An adversarial
-artifact whose command is a shell builtin (`true`, `:`), or whose command
-never names it, exits 0 for unrelated reasons — score `tests`
-`NEEDS_REVISION` and raise a finding naming that artifact.
-
-Score every dimension of your lens. A dimension with nothing to conform to
-— no `PRINCIPLES.md`, no `DESIGN.md` — scores `N/A` with the reason, which
-is not a pass. In every round, you never run the complete package suite or
-the adversarial programs: both run mechanically at the end of Build, and
-`finalize-review` executes them again and records the result. Not having
-run them is not grounds for `PASS_WITH_NOTES`. A dimension whose pass rests
-on a claim you could check — by reading a source or by running a changed
-test file — and did not, scores `PASS_WITH_NOTES` naming what you did not
-verify.
+Score every dimension of your lens, as `skills/closing-review/references/lenses.md`
+defines it — including which test files you run for `tests`, and what you
+never run.
 
 ## How to read
 
-1. **Read the artifact whole**, not only the delta — the entire file for
-   prose, the changed functions plus their callers for code. The delta
-   shows where to look hardest, not the bound of your responsibility.
-2. **Read the ground truth before the change.** The intent's Acceptance
+1. **Read the ground truth before the change.** The intent's Acceptance
    lines define correctness; never trust the change's own description of
    its purpose.
-3. **Open every source you cite.** A citation you did not read is an
+2. **Open every source you cite.** A citation you did not read is an
    `incorrect-fact` finding waiting to be made against you.
-4. **Confirm rather than assume.** Check anything checkable — a changed
+3. **Confirm rather than assume.** Check anything checkable — a changed
    test file's run, a path, a number; say so when it is not.
 
 ## Severity
 
-Severity is decided by consequence, not by where the finding lands or how
-literally wrong the text reads:
-
-- `fatal` — a defect that ships: a wrong result, an exploitable hole, a
-  lost guarantee, an instruction that makes an executor do the wrong thing.
-- `important` — a reader following the text would act wrongly, or a fact
-  the checker or CI relies on (a path, a command, a number a rule reads
-  back) is wrong.
-- `nit` — everything else: wording, terminology, units, the same fact
-  stated two ways, readability. A sentence can be literally incorrect and
-  still a `nit` if a reader following it still does the right thing and no
-  checker or CI step reads the wrong part. `nit`s never open a round:
-  record them in the verdict, and Ship may batch safe publication-only
-  wording fixes.
+Severity levels, how they map to a verdict, and the rules for unrun
+checks, `N/A` and opaque findings live in the "Severity and verdict"
+section of `skills/closing-review/references/lenses.md`. Two caps apply
+on top of them.
 
 **Style, when the repo declares `docs-lint`.** Read
 `docs/loom/KICKOFF-DEFAULTS.md`. When it carries a `docs-lint: <command>`
@@ -127,9 +93,6 @@ issue, todo, question, thought, chore, note; optional decoration such as
 blocking / non-blocking / if-minor); or a probe function name not in the
 `test_<unit>_<state>_<expected>` shape — is a `nit` regardless of
 `docs-lint`, and never more than a `nit`.
-
-Any `fatal` → `NEEDS_REVISION`. Two or more `important` → `NEEDS_REVISION`.
-One `important` → `PASS_WITH_NOTES`. Only nits, or none → `PASS`.
 
 ## Fix rounds — when you are the resumed reader
 
@@ -170,9 +133,9 @@ notes: []                        # optional, at most three bullets
 ```
 
 **Every finding carries an anchor and a fix.** A finding without an anchor
-cannot be located and a finding without a fix cannot be closed; either one
-makes the finding opaque, and an opaque finding flips your whole verdict to
-`NEEDS_REVISION` regardless of severity. `fix` names a concrete change —
+cannot be located and a finding without a fix cannot be closed; what an
+opaque finding does to your verdict is in
+`skills/closing-review/references/lenses.md`. `fix` names a concrete change —
 "add a case asserting the empty list returns `[]`" — not a direction to
 think harder.
 

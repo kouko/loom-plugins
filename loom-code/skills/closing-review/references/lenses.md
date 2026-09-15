@@ -6,13 +6,17 @@ for what each one is asking. General knowledge of Clean Code, SOLID, DRY,
 TDD, F.I.R.S.T and OWASP is assumed — the citations below say which source
 settles a disagreement, not what to read first.
 
+Under every lens, read the whole artifact, not only the delta — the entire
+file for prose, the changed functions plus their callers for code. The
+delta says where to look hardest; it never bounds the review.
+
 ## Severity and verdict
 
 Severity is decided by consequence, never by where a finding lands or how
 literally wrong the text is:
 
 - **fatal** — ships a defect: a wrong result, an exploitable hole, a lost
-  guarantee.
+  guarantee, an instruction that makes an executor do the wrong thing.
 - **important** — a reader following the text would act wrongly, or a
   fact the checker or CI relies on is wrong (a path, a command, a number a
   rule reads back).
@@ -22,21 +26,22 @@ literally wrong the text is:
   literally incorrect and still a nit, if no reader or machine acts on the
   wrong part of it.
 - Any fatal → `NEEDS_REVISION`. Two or more important → `NEEDS_REVISION`.
-  One important → `PASS_WITH_NOTES`. Only nits, or nothing →`PASS`.
-- **Nits do not trigger another formal review.** Record them in the closing
-  verdict; Ship may batch safe publication-only wording fixes.
-- A finding with no anchor is opaque and flips the whole verdict to
-  `NEEDS_REVISION` however small it is: "naming is off somewhere" cannot be
-  fixed by anyone.
-- Reviewers never run the complete package suite or the adversarial programs:
-  both run mechanically at the end of Build and again in `finalize-review`,
-  and not having run them is not grounds for `PASS_WITH_NOTES`. A dimension
-  whose pass rests on a claim you could check — by reading a source or by
-  running a changed test file — and did not, scores `PASS_WITH_NOTES`,
-  naming what was not independently checked. Never "could not see it, so it
-  is fine".
-- A conformance dimension with no document to conform to scores `N/A` with
-  the reason. `N/A` is not a pass and is never given for convenience.
+  One important → `PASS_WITH_NOTES`. Only nits, or nothing → `PASS`.
+- **Nits do not trigger another formal review:** record nits in the closing
+  verdict, and Ship may batch safe publication-only wording fixes.
+- A finding with no anchor, or with no concrete fix, is opaque and flips
+  the whole verdict to `NEEDS_REVISION` however small it is: "naming is off
+  somewhere" cannot be located or fixed by anyone.
+- In every round, reviewers never run the complete package suite or the
+  adversarial programs: both run mechanically at the end of Build, and
+  `finalize-review` executes them again and records the result. Not having
+  run them is not grounds for `PASS_WITH_NOTES`. A dimension whose pass
+  rests on a claim you could check — by reading a source or by running a
+  changed test file — and did not, scores `PASS_WITH_NOTES`, naming what was
+  not independently checked. Never "could not see it, so it is fine".
+- A dimension with nothing to conform to — no `PRINCIPLES.md`, no
+  `DESIGN.md` — scores `N/A` with the reason. `N/A` is not a pass and is
+  never given for convenience.
 
 ## Code — eleven dimensions
 
@@ -46,7 +51,7 @@ literally wrong the text is:
 | architecture | Does the shape the change produces hold — responsibilities, dependency direction, boundaries | SOLID (Martin) |
 | correctness | Does it do what it claims, at the boundaries as well as the middle; is there RED→GREEN evidence in the history | the changed test files, run by the reviewer |
 | naming | Names say what the thing is; functions stay short — 20 lines soft, 50 hard, 100 is a finding on its own | Clean Code Ch.2–3 (Martin) |
-| tests | Every shipped behaviour has focused RED→GREEN evidence; the reviewer runs the test files the change added or changed, except the adversarial programs under `docs/loom/<change-id>/evidence/probes/`, and a test in a changed test file the reviewer ran that is skipped or never actually executes is a finding; committed tests and adversarial artifacts must exercise the changed behavior rather than merely exit successfully | Beck, *Test-Driven Development* (2002) |
+| tests | Every shipped behaviour has focused RED→GREEN evidence; the reviewer runs the test files the change added or changed, except the adversarial programs under `docs/loom/<change-id>/evidence/probes/`, and a test in a changed test file the reviewer ran that is skipped or never actually executes is a finding, since a green exit code does not show that it ran; committed tests and adversarial artifacts must exercise the changed behavior rather than merely exit successfully; an adversarial artifact whose command is a shell builtin (`true`, `:`), or whose command never names it, exits 0 for unrelated reasons — score `tests` `NEEDS_REVISION` and raise a finding naming that artifact | Beck, *Test-Driven Development* (2002) |
 | refactoring | Duplication and smells; Rule of Three — three sites doing the same thing is an extraction | Fowler, *Refactoring*; the Pragmatic Programmer's DRY |
 | cross-task-coherence | Only a whole-delta reviewer can see this: abstractions that disagree between tasks, logic duplicated because each task saw one slice, a task that quietly did more than its title | — |
 | external-surface-grounding | Every call into a surface the author does not own — HTTP API, SDK package, MCP tool, CLI flag, a sibling team's contract — carries a grounding citation. Missing on the first four is fatal; missing on a sibling contract is important; two tasks calling the same surface with conflicting shapes is important | — |
@@ -88,9 +93,6 @@ job, the same rule and severity-by-consequence as the code lens's
 two consecutive changes is a design smell: the `deletion-first` dimension
 always names at least one deletion candidate for that file, standing
 until it is rebutted with evidence.
-
-Read the whole artifact, not the delta. The delta says where to look
-hardest; it never bounds the review.
 
 ## Conformance and question lenses
 
