@@ -320,3 +320,41 @@ def test_product_detail_not_on_design_decision() -> None:
     routing = [s for s in _sentences(_flat(_record_bullet())) if "Design decision line" in s]
     assert routing
     assert all(_affirmed(s, "only an engineering change may put one on a Design decision line") for s in routing)
+
+
+# --- Build fix (2026-09-16-loom-rule-text-consolidation): the no-plan gate's
+# prohibition on confirming for the user is pinned exactly once. prose_pin
+# rejects negation inside `_affirmed`, so a prohibition is pinned as a whole
+# sentence counted exactly once (the build mechanical-checks mechanism). ---
+
+_GATE_NO_PLAN = "<!-- gate: write-plan.no-plan-without-confirmed-intent -->"
+NO_CONFIRM_ON_USERS_BEHALF = (
+    "you do not draft a plan \"provisionally\" and you do not confirm on the user's behalf."
+)
+
+
+def _pins_exact_sentence(section: str, sentence: str) -> bool:
+    return _sentences(_flat(section)).count(sentence) == 1
+
+
+def _no_plan_gate() -> str:
+    return _text().split(_GATE_NO_PLAN, 1)[1].split("<!-- /gate -->", 1)[0]
+
+
+def test_noConfirmOnUsersBehalf_pinHelper_synthetic() -> None:
+    """Self-check: deleting the clause, or doubling the sentence, fails the pin."""
+    prose = f"If unconfirmed, you stop; {NO_CONFIRM_ON_USERS_BEHALF}"
+    assert _pins_exact_sentence(prose, NO_CONFIRM_ON_USERS_BEHALF)
+    deleted = prose.replace(" and you do not confirm on the user's behalf", "")
+    assert not _pins_exact_sentence(deleted, NO_CONFIRM_ON_USERS_BEHALF)
+    assert not _pins_exact_sentence(f"{prose} {prose}", NO_CONFIRM_ON_USERS_BEHALF)
+
+
+def test_noPlanGate_forbidsConfirmingOnUsersBehalf() -> None:
+    """The gate text keeps the prohibition, exactly once."""
+    assert _pins_exact_sentence(_no_plan_gate(), NO_CONFIRM_ON_USERS_BEHALF), _no_plan_gate()
+    live = _text()
+    deleted = live.replace(" and you do not confirm on the user's behalf", "", 1)
+    assert deleted != live
+    gate = deleted.split(_GATE_NO_PLAN, 1)[1].split("<!-- /gate -->", 1)[0]
+    assert not _pins_exact_sentence(gate, NO_CONFIRM_ON_USERS_BEHALF)

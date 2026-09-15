@@ -3,7 +3,7 @@
 
 Walks every ``loom-code/skills/*/SKILL.md``, every single-level skill
 subfolder file ``skills/*/*/*.md`` (references/, agents/, ...) and the
-plugin-level ``agents/*.md``. For each RELATIVE markdown link
+plugin-level ``agents/*.md`` and ``references/*.md``. For each RELATIVE markdown link
 ``](path)``, resolves the target against the reading file's directory and
 asserts the target exists on disk. For each backtick span naming a
 ``.md`` path with a ``/``, asserts it exists relative to the file's
@@ -85,11 +85,50 @@ def _scanned_documents(skills_dir: Path) -> list[Path]:
     # and a path copied one level down dangles in any of them alike.
     found += skills_dir.glob("*/*/*.md")
     found += skills_dir.parent.glob("agents/*.md")
+    # Plugin-level shared rule files (dispatch-profile.md, ...) that
+    # stations link; their paths resolve from their own directory, the
+    # plugin root or the repository root.
+    found += skills_dir.parent.glob("references/*.md")
     return sorted(set(found))
 
 
 # A backtick span naming a `.md` path: at least one `/`, no whitespace.
 _BACKTICK_MD_RE = re.compile(r"`([^`\s]+/[^`\s]*\.md)(?:#[^`\s]*)?`")
+
+# A slash-free backtick `.md` name (`one-way-door.md`).
+_BARE_MD_RE = re.compile(r"`([^`\s/]+\.md)(?:#[^`\s]*)?`")
+
+# A backtick span used as link text: the link itself is checked above.
+_LINK_TEXT_RE = re.compile(r"\[`[^`]*`\]\([^)]*\)")
+
+# Bare names that are repository-root protocol files, not skill-relative.
+_ROOT_PROTOCOL_NAMES = frozenset({
+    "DESIGN.md", "PRINCIPLES.md", "README.md", "CHANGELOG.md", "AGENTS.md",
+    "CLAUDE.md", "SKILL.md", "KICKOFF-DEFAULTS.md",
+})
+
+# A sentence that tells the reader to read or load a file.
+_LOAD_VERB_RE = re.compile(r"\b(?:read|reads|load|loads|loaded)\b", re.I)
+
+
+def _loaded_bare_names(text: str) -> list[str]:
+    """Bare `.md` names inside a sentence that says to read or load a file.
+
+    A bare name is only checked where the prose loads it: elsewhere it
+    usually names a user-repo artifact (`plan.md`) or tool trivia
+    (`report.md`) that is not a file beside the scanning document.
+    Root protocol names and placeholders are skipped.
+    """
+    flat = " ".join(_LINK_TEXT_RE.sub(" ", text).split())
+    names: list[str] = []
+    for sentence in re.split(r"(?<=[.;!?])\s+", flat):
+        if not _LOAD_VERB_RE.search(sentence):
+            continue
+        for name in _BARE_MD_RE.findall(sentence):
+            if name in _ROOT_PROTOCOL_NAMES or _PLACEHOLDER_CHARS & set(name):
+                continue
+            names.append(name)
+    return names
 
 # Placeholder or glob characters: the span names a pattern, not a file.
 _PLACEHOLDER_CHARS = set("<>*{}$")
@@ -135,11 +174,13 @@ def find_broken_crossrefs(skills_dir) -> list[str]:
     """Return one ``<skill-md-path>: <link>`` string per broken cross-ref.
 
     Scans ``<skills_dir>/*/SKILL.md``, ``<skills_dir>/*/*/*.md`` and
-    the plugin-level ``agents/*.md`` beside ``skills/``. A link is broken
-    when its target (relative, anchor stripped) does not exist on disk
-    relative to the reading file's own directory; a checkable backtick
-    ``.md`` path is broken when it resolves against none of
-    ``_backtick_bases``. Empty list == all references resolve.
+    the plugin-level ``agents/*.md`` and ``references/*.md`` beside
+    ``skills/``. A link is broken when its target (relative, anchor
+    stripped) does not exist on disk relative to the reading file's own
+    directory; a checkable backtick ``.md`` path is broken when it resolves
+    against none of ``_backtick_bases``; a bare backtick name in a
+    read/load sentence (``_loaded_bare_names``) is broken when it is not
+    beside the reading file. Empty list == all references resolve.
     """
     skills_dir = Path(skills_dir)
     broken: list[str] = []
@@ -163,6 +204,9 @@ def find_broken_crossrefs(skills_dir) -> list[str]:
             bases = _backtick_bases(skill_md, skills_dir)
             if not any((b / path).exists() for b in bases):
                 broken.append(f"{skill_md}: `{path}`")
+        for name in _loaded_bare_names(text):
+            if not (base / name).exists():
+                broken.append(f"{skill_md}: `{name}`")
     return broken
 
 

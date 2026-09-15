@@ -286,3 +286,102 @@ def test_placeholder_and_docs_backtick_paths_are_skipped(tmp_path):
     broken = checker.find_broken_crossrefs(skills)
     assert broken == [], \
         f"placeholders and docs/ protocol paths must be skipped, got: {broken!r}"
+
+
+# --- Plugin-level references and bare backtick names -------------------------
+
+def test_plugin_level_references_dead_link_is_reported(tmp_path):
+    """`loom-code/references/*.md` (dispatch-profile.md, ...) is linked by
+    stations; a dead link or backtick path inside it must be reported."""
+    plugin = tmp_path / "loom-code"
+    skills = plugin / "skills"
+    _make_skill(skills, "omicron", "No links here.\n")
+    _write(
+        plugin / "references" / "shared.md",
+        "See [gone](missing.md) and `skills/nope/SKILL.md`.\n",
+    )
+
+    checker = _load_checker()
+    broken = checker.find_broken_crossrefs(skills)
+    assert any("shared.md" in e and "missing.md" in e for e in broken), broken
+    assert any("skills/nope/SKILL.md" in e for e in broken), broken
+
+
+def test_plugin_level_references_resolving_paths_pass(tmp_path):
+    plugin = tmp_path / "loom-code"
+    skills = plugin / "skills"
+    _make_skill(skills, "pi", "No links here.\n")
+    _write(plugin / "references" / "baseline.md", "# baseline\n")
+    _write(
+        plugin / "references" / "shared.md",
+        "See [sibling](baseline.md), `skills/pi/SKILL.md` and "
+        "`loom-code/references/baseline.md`.\n",
+    )
+
+    checker = _load_checker()
+    assert checker.find_broken_crossrefs(skills) == []
+
+
+def test_bare_backtick_missing_name_is_reported(tmp_path):
+    """A slash-free `.md` name the prose tells the agent to load is checked
+    against the scanning file's own directory."""
+    skills = tmp_path / "skills"
+    _make_skill(skills, "rho", "No links here.\n")
+    _write(skills / "rho" / "references" / "one-way-door.md", "# classes\n")
+    _write(
+        skills / "rho" / "references" / "confirm.md",
+        "Load `one-way-dor.md` before deciding.\n",
+    )
+
+    checker = _load_checker()
+    broken = checker.find_broken_crossrefs(skills)
+    assert len(broken) == 1, f"expected one broken name, got: {broken!r}"
+    assert "one-way-dor.md" in broken[0]
+    assert "confirm.md" in broken[0]
+
+
+def test_existing_bare_backtick_name_passes(tmp_path):
+    skills = tmp_path / "skills"
+    _make_skill(skills, "sigma", "No links here.\n")
+    _write(skills / "sigma" / "references" / "one-way-door.md", "# classes\n")
+    _write(
+        skills / "sigma" / "references" / "confirm.md",
+        "Per `one-way-door.md` — load that file before deciding.\n",
+    )
+
+    checker = _load_checker()
+    assert checker.find_broken_crossrefs(skills) == []
+
+
+def test_root_protocol_bare_names_are_skipped(tmp_path):
+    skills = tmp_path / "skills"
+    names = ("DESIGN.md", "PRINCIPLES.md", "README.md", "CHANGELOG.md",
+             "AGENTS.md", "CLAUDE.md", "SKILL.md", "KICKOFF-DEFAULTS.md",
+             "<change-id>.md")
+    body = " ".join(f"Read `{n}` first." for n in names) + "\n"
+    _make_skill(skills, "tau", body)
+    _write(skills / "tau" / "references" / "notes.md", body)
+
+    checker = _load_checker()
+    broken = checker.find_broken_crossrefs(skills)
+    assert broken == [], f"root protocol names must be skipped, got: {broken!r}"
+
+
+def test_bare_name_outside_a_read_or_load_sentence_is_skipped(tmp_path):
+    """Names of user-repo artifacts (`plan.md`) or tool trivia (`report.md`)
+    are mentioned, not loaded; a link text naming a resolving link is the
+    link's business."""
+    plugin = tmp_path / "loom-code"
+    skills = plugin / "skills"
+    _make_skill(
+        skills,
+        "upsilon",
+        "The plan itself — `plan.md` — is written in English. "
+        "It works from the recipes in [`adv.md`](references/adv.md).\n",
+    )
+    _write(skills / "upsilon" / "references" / "adv.md", "# adv\n")
+    _write(plugin / "agents" / "worker.md",
+           "The Write tool refuses the filename `report.md`.\n")
+
+    checker = _load_checker()
+    assert checker.find_broken_crossrefs(skills) == []
