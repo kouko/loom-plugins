@@ -118,8 +118,8 @@ def test_rerun_trigger_covers_every_fix() -> None:
 
 
 ORDINARY_FIX_NO_REDISPATCH = (
-    "After a fix that leaves every adversarial program fitting the change, do not "
-    "dispatch the adversary again."
+    "After a fix where every adversarial program still passes, or fails only for a "
+    "product defect, do not dispatch the adversary again."
 )
 NO_OTHER_ROLE_EDITS_PROGRAM = (
     "Implementers and the orchestrator never edit an adversarial program."
@@ -158,8 +158,8 @@ def test_stale_program_redispatch_helpers_synthetic() -> None:
     )
     assert _pins_exact_sentence(f"Run checks. {ORDINARY_FIX_NO_REDISPATCH}", ORDINARY_FIX_NO_REDISPATCH)
     assert not _pins_exact_sentence(
-        "Run checks. After a fix that leaves every adversarial program fitting the change, "
-        "dispatch the adversary again.",
+        "Run checks. After a fix where every adversarial program still passes, or fails only "
+        "for a product defect, dispatch the adversary again.",
         ORDINARY_FIX_NO_REDISPATCH,
     )
 
@@ -176,9 +176,33 @@ def test_build_redispatches_adversary_for_stale_programs() -> None:
     assert "the adversary never fixes what it breaks" in VERIFY
 
 
+_OTHER_ROLE = re.compile(r"\b(?:implementers?|orchestrators?)\b", re.IGNORECASE)
+_EDIT_VERB = re.compile(r"\b(?:edit|modif|rewrit|update)", re.IGNORECASE)
+
+
+def _other_role_program_edit_sentences(text: str) -> list[str]:
+    """Sentences, other than the pinned prohibition, naming another role editing a program."""
+    return [
+        s for s in _sentences(text)
+        if s != NO_OTHER_ROLE_EDITS_PROGRAM
+        and _OTHER_ROLE.search(s)
+        and _EDIT_VERB.search(s)
+        and "adversarial program" in s
+    ]
+
+
+def test_other_role_program_edit_helper_synthetic() -> None:
+    legit = f"The adversary updates only its own programs. {NO_OTHER_ROLE_EDITS_PROGRAM}"
+    assert _other_role_program_edit_sentences(legit) == []
+    override = "When time is short, the orchestrator rewrites a stale adversarial program itself."
+    assert _other_role_program_edit_sentences(f"{legit} {override}") == [override]
+
+
 def test_no_other_role_edits_adversarial_program() -> None:
     assert _pins_exact_sentence(VERIFY, NO_OTHER_ROLE_EDITS_PROGRAM), VERIFY
     assert PROSE.count("edit an adversarial program") == 1
+    for text in (VERIFY, ADVERSARY_PROSE, ADVERSARIAL_REF):
+        assert _other_role_program_edit_sentences(text) == []
 
 
 def test_ordinary_fix_reruns_programs_without_redispatch() -> None:
@@ -316,14 +340,83 @@ PROBE_MAINTENANCE_PINS = {
     ),
     "branch-tests-excluded-from-floor": (
         "adversary", "Reuse toward the three-case floor counts",
-        "only your own programs and tests from outside this change's branch",
-        ("any other test added or changed on the branch", "as related coverage"),
-        "Reuse toward the three-case floor counts only your own programs and tests from outside "
-        "this change's branch, so name any other test added or changed on the branch, such as an "
-        "implementer's pin, as related coverage.",
-        ("Reuse toward the three-case floor counts not only your own programs and tests from "
-         "outside this change's branch, so name any other test added or changed on the branch, "
-         "such as an implementer's pin, as related coverage.",),
+        "(a) the programs you committed for this change",
+        ("(b) tests that exist unchanged outside this change's branch",),
+        "Reuse toward the three-case floor counts only (a) the programs you committed for this "
+        "change and (b) tests that exist unchanged outside this change's branch.",
+        ("Reuse toward the three-case floor counts not only (a) the programs you committed for "
+         "this change and (b) tests that exist unchanged outside this change's branch.",
+         "Reuse toward the three-case floor counts (a) the programs you committed for this change "
+         "and (b) any test on this change's branch."),
+    ),
+    "branch-tests-named-related-coverage": (
+        "adversary", "Name any other test added or changed on the branch",
+        "as related coverage only", ("such as an implementer's pin",),
+        "Name any other test added or changed on the branch, such as an implementer's pin, as "
+        "related coverage only.",
+        ("Name any other test added or changed on the branch, such as an implementer's pin, not "
+         "as related coverage only.",
+         "Name any other test added or changed on the branch, such as an implementer's pin, as "
+         "floor coverage."),
+    ),
+    "commit-before-copy": (
+        "adversary", "Commit the updated probe", "before you make a copy",
+        ("because `git worktree add` and `git archive` hold only committed content",
+         "an uncommitted update takes the edit-tool route in the working tree"),
+        "Commit the updated probe before you make a copy, because `git worktree add` and "
+        "`git archive` hold only committed content, and an uncommitted update takes the "
+        "edit-tool route in the working tree.",
+        ("Commit the updated probe not before you make a copy, because `git worktree add` and "
+         "`git archive` hold only committed content, and an uncommitted update takes the "
+         "edit-tool route in the working tree.",
+         "Commit the updated probe before you make a copy."),
+    ),
+    "undo-before-worktree-remove": (
+        "adversary", "Undo each mutation in a worktree copy with the host's edit tool",
+        "before `git worktree remove` removes that copy",
+        ("prefer a `git archive` extract when the copy will be left behind",),
+        "Undo each mutation in a worktree copy with the host's edit tool before `git worktree "
+        "remove` removes that copy, and prefer a `git archive` extract when the copy will be left "
+        "behind in a temp directory.",
+        ("Undo each mutation in a worktree copy with the host's edit tool before `git worktree "
+         "remove` removes that copy, and never prefer a `git archive` extract when the copy will "
+         "be left behind in a temp directory.",
+         "Undo each mutation in a worktree copy with the host's edit tool before `git worktree "
+         "remove` removes that copy."),
+    ),
+    "redispatch-inputs": (
+        "adversary", "On a re-dispatch, you also receive", "the widened changed paths",
+        ("or the trunk paths a sync brought in", "and the failing program's output"),
+        "On a re-dispatch, you also receive the widened changed paths, or the trunk paths a sync "
+        "brought in, and the failing program's output.",
+        ("On a re-dispatch, you also receive no widened changed paths, or the trunk paths a sync "
+         "brought in, and the failing program's output.",
+         "On a re-dispatch, you also receive the widened changed paths."),
+    ),
+    "ref-commit-before-copy": (
+        "ref", "The adversary commits the updated probe", "before it makes a copy",
+        ("because `git worktree add` and `git archive` hold only committed content",
+         "an uncommitted update takes the edit-tool route in the working tree"),
+        "The adversary commits the updated probe before it makes a copy, because `git worktree "
+        "add` and `git archive` hold only committed content, and an uncommitted update takes the "
+        "edit-tool route in the working tree.",
+        ("The adversary commits the updated probe not before it makes a copy, because `git "
+         "worktree add` and `git archive` hold only committed content, and an uncommitted update "
+         "takes the edit-tool route in the working tree.",
+         "The adversary commits the updated probe before it makes a copy."),
+    ),
+    "ref-undo-before-worktree-remove": (
+        "ref", "The adversary undoes each mutation in a worktree copy with the host's edit tool",
+        "before `git worktree remove` removes that copy",
+        ("prefers a `git archive` extract when the copy will be left behind",),
+        "The adversary undoes each mutation in a worktree copy with the host's edit tool before "
+        "`git worktree remove` removes that copy, and prefers a `git archive` extract when the "
+        "copy will be left behind in a temp directory.",
+        ("The adversary undoes each mutation in a worktree copy with the host's edit tool before "
+         "`git worktree remove` removes that copy, and never prefers a `git archive` extract when "
+         "the copy will be left behind in a temp directory.",
+         "The adversary undoes each mutation in a worktree copy with the host's edit tool before "
+         "`git worktree remove` removes that copy."),
     ),
     "mutation-on-committed-probe": (
         "adversary", "Back every update with mutation evidence",
@@ -432,14 +525,24 @@ PROBE_MAINTENANCE_PINS = {
     ),
     "ref-branch-tests-excluded-from-floor": (
         "ref", "Reuse toward the floor counts",
-        "only the adversary's own programs and tests from outside this change's branch",
-        ("any other test added or changed on the branch", "is named as related coverage"),
-        "Reuse toward the floor counts only the adversary's own programs and tests from outside "
-        "this change's branch, so any other test added or changed on the branch, such as an "
-        "implementer's pin, is named as related coverage.",
-        ("Reuse toward the floor counts not only the adversary's own programs and tests from outside "
-         "this change's branch, so any other test added or changed on the branch, such as an "
-         "implementer's pin, is named as related coverage.",),
+        "(a) the programs the adversary committed for this change",
+        ("(b) tests that exist unchanged outside this change's branch",),
+        "Reuse toward the floor counts only (a) the programs the adversary committed for this "
+        "change and (b) tests that exist unchanged outside this change's branch.",
+        ("Reuse toward the floor counts not only (a) the programs the adversary committed for "
+         "this change and (b) tests that exist unchanged outside this change's branch.",
+         "Reuse toward the floor counts (a) the programs the adversary committed for this change "
+         "and (b) any test on this change's branch."),
+    ),
+    "ref-branch-tests-named-related-coverage": (
+        "ref", "Any other test added or changed on the branch",
+        "is named as related coverage only", ("such as an implementer's pin",),
+        "Any other test added or changed on the branch, such as an implementer's pin, is named "
+        "as related coverage only.",
+        ("Any other test added or changed on the branch, such as an implementer's pin, is not "
+         "named as related coverage only.",
+         "Any other test added or changed on the branch, such as an implementer's pin, counts "
+         "toward the floor."),
     ),
     "ref-reuse-modify-then-new": (
         "ref", "It reuses a program that covers a case",
@@ -453,40 +556,36 @@ PROBE_MAINTENANCE_PINS = {
          "new probe only when nothing covers the case."),
     ),
     "build-trigger-excludes-caught-defect": (
-        "build", "fails or needs changing for that reason,",
+        "build", "Build dispatches",
         "rather than for a product defect it correctly caught",
-        ("or trunk content brought in by a trunk sync changes it",
-         "Build dispatches the `loom-code:adversary` agent fresh-context again to update its own programs"),
-        "When a fix widens or changes what the change covers, or trunk content brought in by "
-        "a trunk sync changes it, and a committed adversarial program fails or needs changing for "
-        "that reason, rather than for a product defect it correctly caught, Build dispatches the "
-        "`loom-code:adversary` agent fresh-context again to update its own programs.",
-        ("When a fix widens or changes what the change covers, or trunk content brought in by "
-         "a trunk sync changes it, and a committed adversarial program fails or needs changing for "
-         "that reason, not only for a product defect it correctly caught, Build dispatches the "
-         "`loom-code:adversary` agent fresh-context again to update its own programs.",
-         "When a fix widens or changes what the change covers and a committed adversarial program "
-         "fails for any reason, Build dispatches the `loom-code:adversary` agent fresh-context "
-         "again to update its own programs."),
+        ("`loom-code:adversary` agent fresh-context again to update its own programs",
+         "or trunk content brought in by a trunk sync changes it",
+         "fails, or is unable to run, for that reason"),
+        "Build dispatches the `loom-code:adversary` agent fresh-context again to update its own "
+        "programs when a fix widens or changes what the change covers, or trunk content brought in "
+        "by a trunk sync changes it, and a committed adversarial program fails, or is unable to "
+        "run, for that reason, rather than for a product defect it correctly caught.",
+        ("Build dispatches the `loom-code:adversary` agent fresh-context again to update its own "
+         "programs when a fix widens or changes what the change covers, or trunk content brought "
+         "in by a trunk sync changes it, and a committed adversarial program fails, or is unable "
+         "to run, for that reason, not rather than for a product defect it correctly caught.",
+         "Build dispatches the `loom-code:adversary` agent fresh-context again to update its own "
+         "programs when a fix widens or changes what the change covers and a committed adversarial "
+         "program fails for any reason."),
     ),
-    "build-redispatch-only-for-failing-program": (
-        "build", "Build re-dispatches the adversary",
-        "only for a program that fails, or is unable to run, because the covered scope changed",
-        ("a program that still passes keeps its content",),
-        "Build re-dispatches the adversary only for a program that fails, or is unable to run, "
-        "because the covered scope changed, and a program that still passes keeps its content.",
-        ("Build re-dispatches the adversary not only for a program that fails, or is unable to run, "
-         "because the covered scope changed, and a program that still passes keeps its content.",
-         "Build re-dispatches the adversary for any program, and a program that still passes keeps its content."),
+    "build-passing-program-keeps-content": (
+        "build", "A program that still passes", "keeps its content", (),
+        "A program that still passes keeps its content.",
+        ("A program that still passes does not keep its content.",
+         "A program that still passes is rewritten."),
     ),
     "build-decides-and-fixes-defect": (
         "build", "Build decides which case applies",
-        "and fixes a product defect in the product as above",
-        ("from the program's failure and the widened scope",),
-        "Build decides which case applies from the program's failure and the widened scope, and "
-        "fixes a product defect in the product as above.",
-        ("Build decides which case applies from the program's failure and the widened scope, and "
-         "never fixes a product defect in the product as above.",
+        "fixes a product defect in the product", (),
+        "Build decides which case applies from the program's failure, and fixes a product defect "
+        "in the product as above.",
+        ("Build decides which case applies from the program's failure, and never fixes a product "
+         "defect in the product as above.",
          "Give the adversary the failing program's output."),
     ),
     "build-reruns-after-update": (
@@ -570,9 +669,13 @@ PROBE_MAINTENANCE_PINS = {
     ),
 }
 NO_DISCARD_UNDO = (
-    "Discard commands (`git checkout --`, `git restore`, `git reset --hard`, `git clean`) are "
-    "never used to undo a mutation, because host guards refuse them and they can destroy "
-    "uncommitted work."
+    "Discard commands (`git checkout --`, `git restore`, `git reset --hard`, `git clean`, "
+    "`git worktree remove --force`) are never used to undo a mutation, because host guards "
+    "refuse them and they can destroy uncommitted work."
+)
+REDISPATCH_UPDATE_NEW_COMMIT = "An update made on a Build re-dispatch is a new commit, never an amend."
+DISCARD_LITERALS = (
+    "git checkout --", "git restore", "git reset --hard", "git clean", "git worktree remove --force",
 )
 _PIN_DOCS = {"adversary": ADVERSARY_PROSE, "ref": ADVERSARIAL_REF, "build": VERIFY}
 
@@ -625,6 +728,90 @@ def test_no_discard_undo_helpers_synthetic() -> None:
 def test_adversary_mutation_undo_uses_no_discard_command() -> None:
     assert _pins_exact_sentence(ADVERSARY_PROSE, NO_DISCARD_UNDO), ADVERSARY_PROSE
     assert _pins_exact_sentence(ADVERSARIAL_REF, NO_DISCARD_UNDO), ADVERSARIAL_REF
+
+
+def test_redispatch_update_new_commit_helpers_synthetic() -> None:
+    assert _pins_exact_sentence(f"Commit it. {REDISPATCH_UPDATE_NEW_COMMIT}", REDISPATCH_UPDATE_NEW_COMMIT)
+    assert not _pins_exact_sentence(
+        "Commit it. An update made on a Build re-dispatch may be amended into the original commit.",
+        REDISPATCH_UPDATE_NEW_COMMIT,
+    )
+
+
+def test_adversary_redispatch_update_is_new_commit() -> None:
+    assert _pins_exact_sentence(ADVERSARY_PROSE, REDISPATCH_UPDATE_NEW_COMMIT), ADVERSARY_PROSE
+
+
+# --- Added-sentence scans: an extra sentence cannot override a pinned rule ---
+
+def _discard_literals_outside_rule(text: str) -> list[str]:
+    return [
+        s for s in _sentences(text)
+        if s != NO_DISCARD_UNDO and any(lit in s for lit in DISCARD_LITERALS)
+    ]
+
+
+_FLOOR_PINS = ("branch-tests-excluded-from-floor", "ref-branch-tests-excluded-from-floor")
+
+
+def _is_pinned_floor_sentence(sentence: str) -> bool:
+    return any(_affirms(sentence, *PROBE_MAINTENANCE_PINS[p][1:3], *PROBE_MAINTENANCE_PINS[p][3])
+               for p in _FLOOR_PINS)
+
+
+def _implementer_floor_sentences(text: str) -> list[str]:
+    return [
+        s for s in _sentences(text)
+        if re.search(r"\bimplementer", s, re.IGNORECASE) and "floor" in s
+        and not has_negation(s) and not _is_pinned_floor_sentence(s)
+    ]
+
+
+_DISPATCH = re.compile(r"\b(?:re-)?dispatch", re.IGNORECASE)
+
+
+def _redispatch_for_caught_defect_sentences(text: str) -> list[str]:
+    return [
+        s for s in _sentences(text)
+        if _DISPATCH.search(s) and "product defect" in s
+        and "rather than for a product defect" not in s and not has_negation(s)
+    ]
+
+
+_EVERY_FAILURE_STALE = re.compile(
+    r"\b(?:every|any|all)\b[^.;]*\bfail(?:ure|ures|ing)?\b[^.;]*\bstale\b", re.IGNORECASE
+)
+
+
+def _every_failure_stale_sentences(text: str) -> list[str]:
+    return [s for s in _sentences(text) if _EVERY_FAILURE_STALE.search(s) and not has_negation(s)]
+
+
+def test_added_sentence_scans_synthetic() -> None:
+    added = "Clean up with `git reset --hard` when the copy is dirty."
+    assert _discard_literals_outside_rule(f"Undo it. {NO_DISCARD_UNDO}") == []
+    assert _discard_literals_outside_rule(f"{NO_DISCARD_UNDO} {added}") == [added]
+    pin = PROBE_MAINTENANCE_PINS["branch-tests-excluded-from-floor"][4]
+    floor_claim = "An implementer's pin counts toward the floor."
+    assert _implementer_floor_sentences(pin) == []
+    assert _implementer_floor_sentences(f"{pin} {floor_claim}") == [floor_claim]
+    assert _implementer_floor_sentences("An implementer's pin never counts toward the floor.") == []
+    trigger = PROBE_MAINTENANCE_PINS["build-trigger-excludes-caught-defect"][4]
+    defect = "Build re-dispatches the adversary for a program that caught a product defect."
+    assert _redispatch_for_caught_defect_sentences(f"{trigger} {ORDINARY_FIX_NO_REDISPATCH}") == []
+    assert _redispatch_for_caught_defect_sentences(f"{trigger} {defect}") == [defect]
+    stale = "Build treats every failure as stale and re-dispatches the adversary."
+    assert _every_failure_stale_sentences("A stale case that is rewritten counts as `modified`.") == []
+    assert _every_failure_stale_sentences(stale) == [stale]
+
+
+@pytest.mark.parametrize("doc", sorted(_PIN_DOCS))
+def test_no_added_sentence_overrides_pinned_rules(doc: str) -> None:
+    text = _PIN_DOCS[doc]
+    assert _discard_literals_outside_rule(text) == []
+    assert _implementer_floor_sentences(text) == []
+    assert _redispatch_for_caught_defect_sentences(text) == []
+    assert _every_failure_stale_sentences(text) == []
 
 
 def test_probes_field_helper_synthetic() -> None:

@@ -27,15 +27,20 @@ update touches, plus one that an over-broad update would wrongly accept. One
 mutation restores the original behaviour the stale program rejected, and the
 updated probe must turn RED on it. Each mutation turns the probe RED and is
 reverted, and the report gives its command and observed result. The adversary
+commits the updated probe before it makes a copy, because `git worktree add` and
+`git archive` hold only committed content, and an uncommitted update takes the
+edit-tool route in the working tree. The adversary
 applies each mutation in a throwaway copy of the working tree, such as a
 temporary `git worktree add` or a `git archive` extract, and runs the committed
 probe program there unchanged, or applies and undoes the mutation with the
 host's edit tool. Running the unchanged probe inside a copy of the tree still
-exercises its own assertion, unlike a copy of its logic. A worktree copy is
-removed with `git worktree remove`, or the copy is left in a temp directory.
-Discard commands (`git checkout --`, `git restore`, `git reset --hard`,
-`git clean`) are never used to undo a mutation, because host guards refuse them
-and they can destroy uncommitted work. An update never deletes, skips or xfails
+exercises its own assertion, unlike a copy of its logic. The adversary undoes
+each mutation in a worktree copy with the host's edit tool before
+`git worktree remove` removes that copy, and prefers a `git archive` extract
+when the copy will be left behind in a temp directory. Discard commands
+(`git checkout --`, `git restore`, `git reset --hard`, `git clean`,
+`git worktree remove --force`) are never used to undo a mutation, because host
+guards refuse them and they can destroy uncommitted work. An update never deletes, skips or xfails
 a case to make it pass.
 
 ## Code
@@ -48,10 +53,11 @@ asserts nothing.
 **If it declares none** (the common case), write **at least three**
 executable abuse or boundary cases against the changed behaviour, run them,
 and record each one. Three is the floor, not the target. Reused and modified
-cases count toward the floor. Reuse toward the floor counts only the
-adversary's own programs and tests from outside this change's branch, so any
-other test added or changed on the branch, such as an implementer's pin, is
-named as related coverage. Draw them from:
+cases count toward the floor. Reuse toward the floor counts only (a) the
+programs the adversary committed for this change and (b) tests that exist
+unchanged outside this change's branch. Any other test added or changed on the
+branch, such as an implementer's pin, is named as related coverage only. Draw
+them from:
 
 | Class | The question |
 |---|---|

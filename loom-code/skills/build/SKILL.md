@@ -109,17 +109,16 @@ run no adversarial program. When it lists `package-tests` as skipped, run no
 complete package suite.
 
 Repeat these end-of-Build checks after every fix: run the complete package
-suite and re-run the existing adversarial programs. After a fix that leaves
-every adversarial program fitting the change, do not dispatch the adversary
-again.
+suite and re-run the existing adversarial programs. After a fix where every
+adversarial program still passes, or fails only for a product defect, do not
+dispatch the adversary again.
 
-When a fix widens or changes what the change covers, or trunk content brought
-in by a trunk sync changes it, and a committed adversarial program fails or
-needs changing for that reason, rather than for a product defect it correctly
-caught, Build dispatches the `loom-code:adversary` agent fresh-context again to
-update its own programs. Build re-dispatches the adversary only for a program
-that fails, or is unable to run, because the covered scope changed, and a
-program that still passes keeps its content. Build decides which case
+Build dispatches the `loom-code:adversary` agent fresh-context again to update
+its own programs when a fix widens or changes what the change covers, or trunk
+content brought in by a trunk sync changes it, and a committed adversarial
+program fails, or is unable to run, for that reason, rather than for a product
+defect it correctly caught. A program that still passes keeps its content.
+Build decides which case
 applies from the program's failure and the widened scope, and fixes a product
 defect in the product as above. Give the adversary the step 2 inputs plus the
 widened changed paths, or the trunk paths the sync brought in, and the
