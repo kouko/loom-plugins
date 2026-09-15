@@ -121,6 +121,31 @@ _DOWNGRADE_FOR_NOT_RUNNING = re.compile(
 )
 
 
+_SHIP_FOLDS_NITS = re.compile(
+    r"\bship\b[^.]*\bfolds?\b[^.]*\bcommit\b|\bconfirm each fix\b", re.IGNORECASE
+)
+
+
+def _nit_sentences(text: str) -> list[str]:
+    return [s for s in _sentences(text) if re.search(r"\bnits?\b", s)]
+
+
+def test_ship_folds_nits_sentence_rejected() -> None:
+    """Ship has no nit-folding step and publication-only edits never return to
+    review, so the reviewer contract must not promise a folded nit commit that
+    the reviewer confirms; it says what lenses.md says — Ship may batch."""
+    old = (
+        "`nit`s never open a round — `ship` folds them into one commit before "
+        "push and you confirm each fix in one line, not a new round."
+    )
+    assert _SHIP_FOLDS_NITS.search(old)
+    for path in (REVIEWER_PATH, LENSES_PATH):
+        for sentence in _nit_sentences(_flat(path)):
+            assert not _SHIP_FOLDS_NITS.search(sentence), f"{path.name}: {sentence!r}"
+    reviewer_nits = " ".join(_nit_sentences(_flat(REVIEWER_PATH)))
+    assert "Ship may batch safe publication-only wording fixes" in reviewer_nits
+
+
 def test_no_reviewer_or_lens_text_requires_suite_run_or_downgrade() -> None:
     for path in (REVIEWER_PATH, LENSES_PATH):
         text = _flat(path)

@@ -242,7 +242,7 @@ which is still not a branch opened only to record something.
 Almost nothing qualifies. Most of what a review surfaces is not a durable
 lesson: a one-off implementation slip belongs in its commit message, a
 verification result in this change's evidence, an unfinished item in an
-intent or a backlog entry. Zero to one durable lesson per change is the
+intent. Zero to one durable lesson per change is the
 normal outcome. This passage states the moment and the bar; it invokes
 nothing, requires no plugin to be installed, and asks for no decision from
 the user.

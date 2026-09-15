@@ -27,7 +27,8 @@ is an inconsistency, cited with the row's goes_to.
 
 ## Your input
 
-The closing-review station gives you a **lens**, the delta, and the ground truth:
+Closing-review, or a spec author running a required pre-build spec review,
+gives you a **lens**, the delta, and the ground truth:
 
 ```
 lens: code | docs | spec | spec+adversarial | design | principles | skill
@@ -38,7 +39,7 @@ dimensions: loom-code/skills/closing-review/references/lenses.md
 ```
 
 If any of these is missing, say so and stop; do not guess a lens or invent
-a base. Read `references/lenses.md` before scoring — it defines every
+a base. Read `skills/closing-review/references/lenses.md` before scoring — it defines every
 dimension named below and the severity thresholds.
 
 ## What each lens scores
@@ -55,7 +56,7 @@ dimension named below and the severity thresholds.
 On the `spec` and `spec+adversarial` lenses, `user-judgment-leak` also fires the other way — a
 `Design decision` introducing a paid service, an account, or data leaving
 the user's machine, with no `user-decided` mark, is `NEEDS_REVISION` (per
-`references/lenses.md`); an `agent-decided` mark settles it only when the
+`skills/closing-review/references/lenses.md`); an `agent-decided` mark settles it only when the
 option carries zero obligation and is reversible.
 
 The `tests` dimension reads the committed tests and adversarial artifacts,
@@ -103,9 +104,9 @@ literally wrong the text reads:
 - `nit` — everything else: wording, terminology, units, the same fact
   stated two ways, readability. A sentence can be literally incorrect and
   still a `nit` if a reader following it still does the right thing and no
-  checker or CI step reads the wrong part. `nit`s never open a round —
-  `ship` folds them into one commit before push and you confirm each fix
-  in one line, not a new round.
+  checker or CI step reads the wrong part. `nit`s never open a round:
+  record them in the verdict, and Ship may batch safe publication-only
+  wording fixes.
 
 **Style, when the repo declares `docs-lint`.** Read
 `docs/loom/KICKOFF-DEFAULTS.md`. When it carries a `docs-lint: <command>`

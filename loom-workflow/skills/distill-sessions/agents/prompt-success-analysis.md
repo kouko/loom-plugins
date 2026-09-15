@@ -175,8 +175,7 @@ Per the architecture decision in
   trajectory sizes; v0.4 model lock per distill-sessions v0.4 brief).
 - **Parallel dispatch**: orchestrator fans out N parallel subagent
   dispatches in one round — one per (target skill, low-friction session)
-  pair — via the contract documented in
-  `loom-code:dispatching-parallel-agents`.
+  pair — using the per-host call shape linked above.
 - **Input passing**: `session_events / target_skill_path /
   target_skill_md_content` are serialized into the dispatched subagent's
   prompt as JSON. The subagent parses it and runs the workflow above.

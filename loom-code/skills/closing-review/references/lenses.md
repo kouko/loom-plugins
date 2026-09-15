@@ -1,6 +1,6 @@
 # Lenses — what each dimension means, and what it is scored against
 
-One reviewer contract, six lenses. This file is the dimension definition
+One reviewer contract, seven lenses. This file is the dimension definition
 for all of them; `agents/reviewer.md` names the dimensions and points here
 for what each one is asking. General knowledge of Clean Code, SOLID, DRY,
 TDD, F.I.R.S.T and OWASP is assumed — the citations below say which source
