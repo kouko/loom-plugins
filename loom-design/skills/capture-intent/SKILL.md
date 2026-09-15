@@ -115,7 +115,7 @@ Keep every field at intent altitude:
   content; both block confirmation. Carry downstream spec/engineering questions
   in the hand-off, not this section.
 
-Any section may use a Markdown table or diagram when it reads more easily —
+Any section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —
 for example current versus wanted, or who is affected. Acceptance stays a
 numbered list, a diagram stays at intent altitude (no UI reactions or state
 transitions), and a product Problem still holds no identifiers, Mermaid node
@@ -254,11 +254,14 @@ twice, and this is the only stop this station makes.
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
 
-5. **The carried details, `kind: engineering` only** — it has no decision
-   point ②. Show them as a table, one row per detail in the user's language,
+5. **The carried details, where this is their only stop** — for
+   `kind: engineering` and for a product change with `needs-design: no`.
+   Show them as a table, one row per detail in the user's language,
    confirmed by the same yes; no extra stop. With an empty list, no table
-   appears. A product change shows them at `write-spec`'s decision point ②
-   instead.
+   appears. For that product change, this message is the one stop that
+   shows them before `loom-code:write-plan` records them in a spec. A
+   product change with `needs-design: yes` shows them at `write-spec`'s
+   decision point ② instead.
 
 Questions may only ask what the user wants, what they will see (reserved for
 decision point ② at `write-spec`), whether acceptance worked (decision point ③
@@ -277,6 +280,8 @@ quieter than it is.
 
 **Keep a carried-details list** beside the question list: flow or reaction
 details the user stated or explicitly agreed to, before or during intake.
+Only an explicit yes from the user counts as agreement: a proposal left
+unanswered, deferred ("later"), or answered about something else is dropped.
 Never carry an agent proposal the user did not agree to, or detail you
 inferred. The list never enters the intent file; its sections stay unchanged
 and detailed flows stay out.

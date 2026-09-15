@@ -29,6 +29,10 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "loom-code/scripts"))
+
+from prose_pin import has_negation, split_sentences  # noqa: E402
+
 SKILL = REPO / "loom-design/skills/write-spec/SKILL.md"
 CAPTURE_INTENT = REPO / "loom-design/skills/capture-intent/SKILL.md"
 WRITE_PLAN = REPO / "loom-code/skills/write-plan/SKILL.md"
@@ -381,16 +385,54 @@ def _forms() -> str:
     return (SKILL.parent / "references/spec-forms.md").read_text(encoding="utf-8")
 
 
+def _affirmed(text: str, *literals: str) -> list[str]:
+    """Sentences holding every literal and no negation token outside code spans.
+
+    Engineering baseline prose-pin rule: "do not record each item in the
+    spec" must not pass a pin on "record each item in the spec".
+    """
+    return [
+        s
+        for s in split_sentences(_flat(text), ".;")
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_affirmedPin_syntheticAffirmativeSentence_accepted() -> None:
+    """Self-test: an affirmative sentence satisfies the pin."""
+    assert _affirmed("Read the list and record each item in the spec.", "record each item in the spec")
+
+
+def test_affirmedPin_syntheticNegatedSentence_rejected() -> None:
+    """Self-test (negated-pin-mutant-killed): a negated sentence fails the pin."""
+    assert not _affirmed("Read the list and do not record each item in the spec.", "record each item in the spec")
+    assert not _affirmed("When a flow branches, never lead with a table.", "lead with a table")
+
+
 def test_spec_records_each_carried_detail() -> None:
     """A1 positive: each carried detail lands in the spec and in ② read-back."""
     step2 = _flat(_section(_text(), _STEP2))
-    assert "Read the carried-details list from `capture-intent`'s hand-off" in step2
-    assert "record each item in the spec" in step2
-    assert "a visible flow or reaction as a UI flows line" in step2
-    assert "the matching Requirement or Design decision line" in step2
-    assert "decision point ② shows each of them as part of the read-back" in step2
+    assert _affirmed(
+        step2,
+        "Read the carried-details list from `capture-intent`'s hand-off",
+        "record each item in the spec",
+        "a visible flow or reaction as a UI flows line",
+    )
+    assert _affirmed(step2, "decision point ② shows each of them as part of the read-back")
     for gate_id in GATE_IDS:
         assert "carried-details" not in _gate(_text(), gate_id)
+
+
+def test_product_carried_detail_recorded_where_decision_point_two_shows() -> None:
+    """A1 positive (product routing): a product change's non-visible detail goes
+    on a Requirement line; only an engineering change may use Design decision,
+    which ② never shows."""
+    carried = _flat(_section(_text(), _STEP2)).split("**Carried details.**", 1)[1].split("Forms:", 1)[0]
+    assert _affirmed(carried, "anything else on the matching Requirement line")
+    design = [s for s in split_sentences(carried, ".;") if "Design decision line" in s]
+    assert design and all("engineering" in s for s in design)
+    assert _affirmed(carried, "engineering change", "Design decision line")
 
 
 def test_agent_proposal_not_agreed_not_recorded() -> None:
@@ -431,11 +473,12 @@ def test_readback_leads_with_table_or_text_diagram() -> None:
     step3 = _flat(_section(_text(), _STEP3))
     back = _flat(_section(_flows(), "## Reading it back"))
     for text in (step3, back):
-        assert re.search(
-            r"parallel cases or branches, .*lead\w* with a table or a text \(ASCII\) diagram",
-            text,
-        ), text[:200]
-        assert "then the per-case sentences" in text
+        leading = [
+            s
+            for s in _affirmed(text, "parallel cases or branches, ", "then the per-case sentences")
+            if re.search(r"lead\w* with a table or a text \(ASCII\) diagram", s)
+        ]
+        assert leading, text[:200]
 
 
 def test_chat_readback_has_no_mermaid() -> None:

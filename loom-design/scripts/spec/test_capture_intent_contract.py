@@ -18,9 +18,14 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "loom-code/scripts"))
+
+from prose_pin import has_negation, split_sentences  # noqa: E402
+
 SKILL = REPO / "loom-design/skills/capture-intent/SKILL.md"
 WRITE_PLAN = REPO / "loom-code/skills/write-plan/SKILL.md"
 PLUGIN_JSON = REPO / "loom-design/.claude-plugin/plugin.json"
@@ -502,19 +507,53 @@ _STEP4 = "## Step 4 — Decision point ①: restate and confirm"
 _STEP5 = "## Step 5 — Hand off"
 
 
+def _affirmed(text: str, *literals: str) -> list[str]:
+    """Sentences holding every literal and no negation token outside code spans.
+
+    Engineering baseline prose-pin rule: a pinned sentence rejects negation,
+    so "Never show them as a table" cannot pass a pin on "show them as a
+    table". Backticked spans such as `needs-design: no` are field values,
+    not negations, and are ignored by the negation check.
+    """
+    return [
+        s
+        for s in split_sentences(" ".join(text.split()), ".;")
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_affirmedPin_syntheticAffirmativeSentence_accepted() -> None:
+    """A6 negative self-test: an affirmative sentence satisfies the pin."""
+    assert _affirmed("Show them as a table, one row per detail.", "as a table")
+
+
+def test_affirmedPin_syntheticNegatedSentence_rejected() -> None:
+    """A6 negative (negated-pin-mutant-killed): a negated sentence fails the pin."""
+    for negated in (
+        "Never show them as a table, one row per detail.",
+        "It is not the case that, when the list is non-empty, it must still write a spec.",
+        "Do not show them as a table.",
+    ):
+        literal = "must still write a spec" if "spec" in negated else "as a table"
+        assert not _affirmed(negated, literal), negated
+
+
+def test_affirmedPin_syntheticCodeSpanNo_notNegation() -> None:
+    """A field value in backticks is not read as a negation token."""
+    assert _affirmed("When `needs-design: no`, write-plan must still write a spec.", "must still write a spec")
+
+
 def test_hand_off_lists_agreed_details_and_requires_spec() -> None:
     """A1 positive: agreed details travel to the spec, even with no design."""
     step4 = _flat_section(_STEP4)
-    assert "**Keep a carried-details list**" in step4
-    assert "the user stated or explicitly agreed to" in step4
+    assert _affirmed(step4, "**Keep a carried-details list**", "the user stated or explicitly agreed to")
     assert "Never carry an agent proposal the user did not agree to" in step4
     assert "detail you inferred" in step4
     step5 = _flat_section(_STEP5)
-    assert "carried-details list verbatim" in step5
-    assert "must record each item in the spec" in step5
-    assert re.search(
-        r"non-empty and `needs-design: no`, `loom-code:write-plan` must still write a spec",
-        step5,
+    assert _affirmed(step5, "carried-details list verbatim", "must record each item in the spec")
+    assert _affirmed(
+        step5, "non-empty and `needs-design: no`, `loom-code:write-plan` must still write a spec"
     )
 
 
@@ -524,15 +563,50 @@ def test_no_details_no_forced_spec() -> None:
     assert "An empty list forces no spec" in step5
     forcing = [s for s in re.split(r"(?<=[.])\s+", step5) if "must still write a spec" in s]
     assert forcing and all("non-empty" in s for s in forcing)
+    assert all(_affirmed(s, "must still write a spec") for s in forcing)
+
+
+def test_only_explicit_yes_is_carried() -> None:
+    """A1 positive: only the user's explicit yes makes a proposal a carried detail."""
+    assert _affirmed(_flat_section(_STEP4), "Only an explicit yes from the user counts as agreement")
+
+
+def test_unanswered_or_deferred_proposal_dropped() -> None:
+    """A1 negative: silence, "later", or an answer about something else drops it."""
+    assert _affirmed(
+        _flat_section(_STEP4),
+        "a proposal left unanswered, deferred",
+        "answered about something else is dropped",
+    )
+
+
+def _carried_item() -> str:
+    step4 = _flat_section(_STEP4)
+    return step4.split("5. **The carried details", 1)[1].split("Questions may only ask", 1)[0]
 
 
 def test_engineering_restatement_shows_carried_details_table() -> None:
     """A5 positive: engineering confirmation shows the table in the same message."""
-    step4 = _flat_section(_STEP4)
-    assert "**The carried details, `kind: engineering` only**" in step4
-    assert "as a table, one row per detail in the user's language" in step4
-    assert "confirmed by the same yes; no extra stop" in step4
-    assert "product change shows them at `write-spec`'s decision point ② instead" in step4
+    item = _carried_item()
+    assert _affirmed(item, "`kind: engineering`")
+    assert _affirmed(item, "Show them as a table, one row per detail in the user's language")
+    assert "confirmed by the same yes; no extra stop" in item
+
+
+def test_product_needs_design_no_shows_table_at_intent_confirmation() -> None:
+    """A5 positive: a product change with needs-design: no, which never reaches
+    write-spec, shows its carried details here, before write-plan."""
+    item = _carried_item()
+    assert _affirmed(item, "`kind: engineering` and for a product change with `needs-design: no`")
+    assert _affirmed(item, "shows them before `loom-code:write-plan`")
+
+
+def test_product_needs_design_yes_defers_to_write_spec() -> None:
+    """A5 boundary: only needs-design: yes defers the table to write-spec's ②."""
+    item = _carried_item()
+    deferring = [s for s in split_sentences(item, ".;") if "`write-spec`'s decision point ②" in s]
+    assert deferring and all("`needs-design: yes`" in s for s in deferring)
+    assert _affirmed(item, "A product change with `needs-design: yes` shows them at `write-spec`'s decision point ② instead")
 
 
 def test_nothing_agreed_shows_no_table() -> None:
@@ -543,8 +617,12 @@ def test_nothing_agreed_shows_no_table() -> None:
 def test_intent_sections_may_use_tables_and_diagrams() -> None:
     """A6 positive: sections may use tables or diagrams when easier to read."""
     step1 = _flat_section(_STEP1)
-    assert "Any section may use a Markdown table or diagram" in step1
-    assert "current versus wanted" in step1
+    assert _affirmed(step1, "Any section may use", "current versus wanted")
+
+
+def test_intent_diagram_form_is_flowchart_or_table() -> None:
+    """A6 positive: the intent forms are a Markdown table or a Mermaid flowchart."""
+    assert _affirmed(_flat_section(_STEP1), "Any section may use a Markdown table or a Mermaid `flowchart`")
 
 
 def test_acceptance_stays_numbered_list_and_flows_stay_out() -> None:

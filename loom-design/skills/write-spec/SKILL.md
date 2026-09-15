@@ -175,8 +175,9 @@ language, since it is spoken to them rather than read by a checker.
 
 **Carried details.** Read the carried-details list from `capture-intent`'s
 hand-off and record each item in the spec: a visible flow or reaction as a UI
-flows line, anything else on the matching Requirement or Design decision line.
-Record only what the list or the intent holds; an agent proposal the user did
+flows line, anything else on the matching Requirement line — the two parts
+decision point ② shows. Only an engineering change may put one on a Design
+decision line instead. Record only what the list or the intent holds; an agent proposal the user did
 not agree to is not recorded. For a product change, decision point ② shows each
 of them as part of the read-back, in behaviour words.
 

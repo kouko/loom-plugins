@@ -19,15 +19,20 @@ field, identifier, checker rule, or station.
 
 - `capture-intent` keeps a carried-details list: flow or reaction details the
   user stated or explicitly agreed to, never an agent proposal or an inferred
-  detail. The list stays out of the intent file, is pasted verbatim in the
-  hand-off, and, when non-empty with `needs-design: no`, requires
-  `loom-code:write-plan` to write a minimal spec to hold it. An engineering
-  confirmation shows the list as a table in the same message.
-- Intent sections may use Markdown tables or diagrams; Acceptance stays a
-  numbered list, and chat restatements use text tables or diagrams, not
-  Mermaid.
+  detail. Only an explicit yes counts as agreement; a proposal left
+  unanswered, deferred, or answered about something else is dropped. The
+  list stays out of the intent file, is pasted verbatim in the hand-off, and,
+  when non-empty with `needs-design: no`, requires `loom-code:write-plan` to
+  write a minimal spec to hold it. The confirmation shows the list as a table
+  in the same message for an engineering change and for a product change
+  with `needs-design: no`; a product change with `needs-design: yes` shows it
+  at `write-spec`'s decision point ②.
+- Intent sections may use Markdown tables or a Mermaid `flowchart`;
+  Acceptance stays a numbered list, and chat restatements use text tables or
+  diagrams, not Mermaid.
 - `write-spec` records each carried detail in the spec — a visible flow as a
-  UI flows line, anything else on the matching Requirement or Design decision
+  UI flows line, anything else on the matching Requirement line, both shown
+  at decision point ②; only an engineering change may use a Design decision
   line — and never records an agent proposal the user did not agree to.
 - UI flows keep one line per operation for a short flow, use a
   `case | what the user does | what they see` table for parallel cases, and a
