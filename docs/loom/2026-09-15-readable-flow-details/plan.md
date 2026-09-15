@@ -35,13 +35,13 @@ charter: 1.0
 
 **W2-01 loom-design release notes and versions**  after: W1-03  acceptance: 7
 - Files: `loom-design/CHANGELOG.md`, `loom-design/README.md`, `loom-design/README.ja.md`, `loom-design/README.zh-TW.md`, `loom-design/plugin.json`, `loom-design/.claude-plugin/plugin.json`, `loom-design/.codex-plugin/plugin.json`, `README.md`
-- Test: A7 positive: loom-design-version-2-2-0-consistent; negative: stale-2-1-5-pin-fails.
+- Test: A7 positive: loom-design-version-2-2-0-consistent; negative: stale-2-1-6-pin-fails.
 - Risk: minor release 2.2.0 because station guidance changes; the root README carries both plugin rows. agent-decided.
 
 **W2-02 loom-code release notes, versions and checks**  after: W2-01  acceptance: 7
 - Files: `loom-code/CHANGELOG.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/scripts/test_write_plan_station_text.py`
-- Test: A7 positive: package-groups-and-check-mechanisms-green; negative: stale-3-4-1-pin-fails.
-- Risk: minor release 3.5.0; contract version changes only if a manifest test pins the template text. agent-decided.
+- Test: A7 positive: package-groups-and-check-mechanisms-green; negative: stale-3-5-0-pin-fails.
+- Risk: minor release 3.6.0 after main shipped 3.5.0; contract version changes only if a manifest test pins the template text. agent-decided.
 
 ## Questions asked
 ① — what — 你在聊天確認當下難讀，還是事後讀文件難讀？ kouko: "兩者都有點難讀"
@@ -52,5 +52,5 @@ charter: 1.0
 
 ## Risks
 1. user-decided — carried details get no new final-acceptance check; product blind runs already walk UI flows, engineering details rely on spec reviewers.
-2. Prose rules cannot be checked against the conversation; Closing Review runs a fresh-context cold-read adversary over a sample conversation to confirm no invented detail is carried.
+2. Prose rules cannot be checked against the conversation; the end-of-Build adversary runs a fresh-context cold read over a sample conversation to confirm no invented detail is carried.
 3. Details live only in the conversation between intent confirmation and spec writing; compaction in that window can still drop them. Accepted for this change.
