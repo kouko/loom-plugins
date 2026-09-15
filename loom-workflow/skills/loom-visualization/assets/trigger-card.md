@@ -9,6 +9,6 @@ diagrams: before you explain an option comparison of 2+ options, a flow of
 architecture, or a reasoning chain, invoke the `loom-visualization` skill
 FIRST and lead with the table or diagram it prescribes. Before typing any
 box-drawing diagram (┌─┐, +--+), invoke `loom-visualization` FIRST. Skip it
-when one short paragraph covers the answer; never draw for decoration. For a
-plainer explanation, read loom-visualization's `references/plain-language.md`
-first.
+when one short paragraph covers the answer; never draw for decoration. Before
+plainer explanations or decisions between approaches, read
+loom-visualization's `references/plain-language.md`.

@@ -288,6 +288,50 @@ def test_removed_in_cell_section_fails():
     assert "missing subsection: In-cell visuals" in in_cell_errors(broken)
 
 
+# Earlier table research: (subsection, phrases in that subsection, source URL in Sources).
+TABLE_CRITERIA = {
+    "Datawrapper two-direction comparison": (
+        "Table or chart", ("two directions", "Datawrapper"),
+        "https://www.datawrapper.de/blog/guide-what-to-consider-when-creating-tables"),
+    "W3C WAI table as text alternative": (
+        "Table or chart", ("text alternative", "flowchart", "org chart", "W3C WAI"),
+        "https://www.w3.org/WAI/tutorials/images/complex/"),
+    "Google no table inside numbered steps": (
+        "When not to use a table", ("numbered steps", "Google"),
+        "https://developers.google.com/style/tables"),
+}
+
+
+def table_criteria_errors(text):
+    """Return missing or duplicated earlier table criteria; empty = valid."""
+    errors = []
+    subs = sections(sections(text).get("Table-writing rules and common mistakes", ""), level=3)
+    sources = sections(text).get("Sources", "")
+    flat_all = " ".join(text.split())
+    for name, (sub, phrases, url) in TABLE_CRITERIA.items():
+        body = " ".join(subs.get(sub, "").split())
+        bullet = next((b for b in re.split(r"(?:^| )- ", body) if all(p in b for p in phrases)), None)
+        if bullet is None:
+            errors.append(f"missing criterion: {name}")
+        elif flat_all.count(phrases[0]) != 1:
+            errors.append(f"duplicated criterion: {name}")
+        if url not in sources:
+            errors.append(f"missing source URL: {name}")
+    return errors
+
+
+def test_three_earlier_criteria_present():
+    """A8 positive three-earlier-criteria-present."""
+    assert table_criteria_errors(_text()) == []
+
+
+def test_removed_criterion_fails():
+    """A8 negative removed-criterion-fails: dropping one criterion's bullet is caught."""
+    text = _text()
+    broken = re.sub(r"^- [^\n]*numbered steps[^\n]*\n", "", text, count=1, flags=re.MULTILINE)
+    assert "missing criterion: Google no table inside numbered steps" in table_criteria_errors(broken)
+
+
 def test_reference_cites_no_repository_records():
     assert "docs/loom" not in _text()
 

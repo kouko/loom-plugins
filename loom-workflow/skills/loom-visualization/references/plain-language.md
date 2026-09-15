@@ -313,6 +313,11 @@ convention).
 - A 2×2 with categorical axes (important or not × urgent or not) can be a
   table. A 2×2 with continuous axes (market share × growth rate) cannot: the
   meaning is in each item's position, so use a chart.
+- When the reader compares the data in two directions, across rows and down
+  columns, a table beats a chart (Datawrapper).
+- A table is the formal text alternative for a complex diagram such as a
+  flowchart or an org chart: W3C's own long-description example is a table
+  (W3C WAI, complex images).
 
 ### Time in tables
 
@@ -336,6 +341,7 @@ For events placed on dates, use `templates/10-timeline.md`.
   next outer cell (WCAG F49).
 - For an incomplete comparison: if an attribute is unknown for some items,
   leave that attribute out of the table (NN/g).
+- In the middle of numbered steps (Google).
 
 ### Options as columns or rows
 
@@ -355,6 +361,8 @@ it departs from NN/g when there are more than three options.
 - GOV.UK Design System, table: https://design-system.service.gov.uk/components/table/
 - Red Hat supplementary style guide, accessibility of tables: https://redhat-documentation.github.io/supplementary-style-guide/#accessibility-tables
 - W3C WAI, multi-level tables: https://www.w3.org/WAI/tutorials/tables/multi-level/
+- W3C WAI, complex images: https://www.w3.org/WAI/tutorials/images/complex/
+- Datawrapper, what to consider when creating tables: https://www.datawrapper.de/blog/guide-what-to-consider-when-creating-tables
 - WCAG F49: https://www.w3.org/WAI/WCAG22/Techniques/failures/F49
 - WCAG 1.4.1 Use of Color: https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html
 - Stephen Few, Effectively Communicating Numbers: https://www.perceptualedge.com/articles/Whitepapers/Communicating_Numbers.pdf

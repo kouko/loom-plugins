@@ -339,9 +339,48 @@ def test_coexist_card_rules_one_to_three_match_full_card_word_for_word():
     """The coexist card is what toolkit users receive; rules 1-3 must not be compressed."""
     assert _rules_one_to_three(COEXIST_CARD) == _rules_one_to_three(FULL_CARD)
 
+MAX_CARD_WORDS = 150
+
+
+def card_word_errors(text):
+    """Word-cap error for a card; empty = within the cap."""
+    count = len(text.split())
+    return [f"{count} words, cap {MAX_CARD_WORDS}"] if count > MAX_CARD_WORDS else []
+
+
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
 def test_cards_at_most_150_words(card):
-    assert len(card.read_text(encoding="utf-8").split()) <= 150
+    assert card_word_errors(card.read_text(encoding="utf-8")) == []
+
+
+def test_card_over_150_words_fails():
+    """A1 negative card-over-150-words-fails: a card padded past the cap is caught."""
+    text = COEXIST_CARD.read_text(encoding="utf-8")
+    padding = " word" * (MAX_CARD_WORDS + 1 - len(text.split()))
+    assert card_word_errors(text + padding) != []
+
+
+GUIDE = "references/plain-language.md"
+
+
+def decision_routing_errors(text):
+    """Error when no card sentence routes decision questions to the guide; empty = routed."""
+    ok = any(re.search(r"\bdeci(?:de|sions?)\b", s, re.I) and GUIDE in s
+             and not NEGATION.search(s) for s in _sentences(text))
+    return [] if ok else ["decision questions not routed to the guide"]
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_both_cards_name_decision_questions_for_guide(card):
+    """A1/A7 positive both-cards-name-decision-questions-for-guide."""
+    assert decision_routing_errors(card.read_text(encoding="utf-8")) == []
+
+
+def test_card_without_decision_routing_fails():
+    """A7 negative: a card whose guide sentence covers only plainer explanations is caught."""
+    card = ("Reply to the user in their language. For a plainer explanation, read "
+            "loom-visualization's `references/plain-language.md` first. Decide later.")
+    assert decision_routing_errors(card) != []
 
 
 def test_full_card_names_skill_and_comparison_and_flow_triggers():
