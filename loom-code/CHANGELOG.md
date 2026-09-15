@@ -1,5 +1,32 @@
 # Changelog
 
+## [3.6.0] — 2026-09-15 — carried details and readable flows in write-plan
+
+Minor. Station guidance changes in `write-plan` and the `spec-minimal.md`
+UI flows placeholder; no new field, identifier, checker rule, or station, and
+the contract manifest version stays 2.3.1.
+
+- When `write-plan` runs decision point ① itself, it keeps a carried-details
+  list as `loom-design:capture-intent` does: only details the user stated or
+  explicitly agreed to, never an agent proposal or an inferred detail. The
+  list never enters the intent file. A `kind: engineering` confirmation shows
+  it as a table, confirmed by the same yes.
+- A non-empty carried-details list, from the `capture-intent` hand-off or
+  `write-plan`'s own intake, forces a minimal spec even with
+  `needs-design: no`; an empty list forces no spec. Each carried detail is
+  recorded as a UI flows line when visible, else on its Requirement or Design
+  decision line.
+- Intent sections may use Markdown tables or diagrams; Acceptance stays a
+  numbered list, and chat shows text tables or text diagrams, not Mermaid.
+- Minimal-spec UI flows keep one `<action> → <reaction>` line per operation
+  for a short flow, use a `case | what the user does | what they see` table
+  for parallel cases, and a Mermaid `stateDiagram-v2` or `flowchart` for
+  branching paths; the `spec-minimal.md` UI flows placeholder names the three
+  forms.
+- Decision point ② on a product spec `write-plan` wrote leads with a table or
+  text (ASCII) diagram for flows with parallel cases or branches, then the
+  per-case sentences, and never puts Mermaid in the chat message.
+
 ## [3.5.0] — 2026-09-15 — mechanical checks before closing review
 
 - Build now ends with an independent adversary plus the complete package suite
