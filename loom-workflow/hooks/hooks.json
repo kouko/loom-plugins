@@ -1,13 +1,13 @@
 {
   "hooks": {
-    "SessionStart": [
+    "UserPromptSubmit": [
       {
-        "matcher": "startup|clear|compact",
         "hooks": [
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card\"",
-            "async": false
+            "async": false,
+            "timeout": 5
           }
         ]
       }

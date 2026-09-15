@@ -1,0 +1,180 @@
+# Live Claude Code sessions (claude -p, sonnet) with loom-workflow loaded from the clean worktree via --plugin-dir;
+# CLAUDE.md disabled, --setting-sources project, --strict-mcp-config, --disable-slash-commands, --tools "".
+# Extracted from each session's transcript: user messages and the hook_additional_context attachments that follow them.
+
+=== session dir: scratchpad-live (transcript a3c4be63-ff7e-4a5a-b531-45364d3d9fe7.jsonl)
+[2] USER MESSAGE: Diagnostic question, answer in English: besides this sentence, is there any other text in your context that arrived with this user message (for example a hook-i
+[6] ATTACHMENT hook_additional_context (hookEvent=UserPromptSubmit):
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+for option comparisons, branching decisions, reasoning chains, timelines,
+sequences, quantities, data models or reasoning pages, invoke
+`loom-visualization` FIRST, leading with its form. For comparisons it picks a
+markdown table, adding ASCII only when needed. Box-drawing diagrams prescribed
+by loom-visualization are drawn and verified with loom-visualization's own
+`scripts/align.py` and checks; the ascii-graph card covers flows, state
+machines and architecture; follow it. Skip it for a one-paragraph answer;
+never decorate. For a plainer explanation, read loom-visualization's
+`references/plain-language.md` first.
+
+[15] ASSISTANT: Yes — several `system-reminder` blocks arrived alongside your message. Here they are verbatim:
+
+**1. Environment reminder:**
+```
+# Environment
+You have been invoked in the following environment: 
+ - Primary working directory: /private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/live
+ - Is a git repository: false
+ - Platform: darwin
+ - Shell: zsh
+ - OS Version: Darwin 25.6.0
+```
+
+**2. Model identity reminder:**
+```
+You are powered by the model named Sonnet 5. The exact model ID is claude-sonnet-5. Assistant knowledge cutoff is January 2026.
+```
+
+**3. Token count reminder:**
+```
+<total_tokens>15000000 tokens left</total_tokens>
+```
+
+**4. UserPromptSubmit hook additional context** (this is the hook-injected reminder you asked about):
+```
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+for option comparisons, branching decisions, reasoning chains, timelines,
+sequences, quantities, data models or reasoning pages, invoke
+`loom-visualization` FIRST, leading with its form. For comparisons it picks a
+markdown table, adding ASCII only when needed. Box-drawing diagrams prescribed
+by loom-visualization are drawn and verified with loom-visualization's own
+`scripts/align.py` and checks; the ascii-graph card covers flows, state
+machines and architecture; follow it. Skip it for a one-paragraph answer;
+never decorate. For a plainer explanation, read loom-visualization's
+`references/plain-language.md` first.
+```
+
+**5. Date reminder:**
+```
+Today's date is 2026-09-16.
+```
+
+**CLAUDE.md content:** none is present in this context — I see no CLAUDE.md text at all.
+
+**Skill/plugin names visible:** `loom-workflow`, `ascii-graph-toolkit`, and `loom-visualization` (referenced by the hook text above, including its `scripts/align.py` and `references/plain-language.md` files). I also have your account email ([redacted by blind runner]) in a separate system-reminder from earlier in the conversation, provided for attribution purposes only — not part of this message's payload, but included for completeness since you asked about "this context" broadly.
+
+=== session dir: scratchpad-live2 (transcript ca45db5e-0de4-45c0-85ad-18c99d269163.jsonl)
+[2] USER MESSAGE: Reply with just the word OK.
+[6] ATTACHMENT hook_additional_context (hookEvent=UserPromptSubmit):
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+for option comparisons, branching decisions, reasoning chains, timelines,
+sequences, quantities, data models or reasoning pages, invoke
+`loom-visualization` FIRST, leading with its form. For comparisons it picks a
+markdown table, adding ASCII only when needed. Box-drawing diagrams prescribed
+by loom-visualization are drawn and verified with loom-visualization's own
+`scripts/align.py` and checks; the ascii-graph card covers flows, state
+machines and architecture; follow it. Skip it for a one-paragraph answer;
+never decorate. For a plainer explanation, read loom-visualization's
+`references/plain-language.md` first.
+
+[14] ASSISTANT: OK
+[19] USER MESSAGE: Diagnostic, answer in English. Look at the whole conversation so far. (1) Did any text arrive at session start, before my first message, that tells you to use t
+[21] ATTACHMENT hook_additional_context (hookEvent=UserPromptSubmit):
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+for option comparisons, branching decisions, reasoning chains, timelines,
+sequences, quantities, data models or reasoning pages, invoke
+`loom-visualization` FIRST, leading with its form. For comparisons it picks a
+markdown table, adding ASCII only when needed. Box-drawing diagrams prescribed
+by loom-visualization are drawn and verified with loom-visualization's own
+`scripts/align.py` and checks; the ascii-graph card covers flows, state
+machines and architecture; follow it. Skip it for a one-paragraph answer;
+never decorate. For a plainer explanation, read loom-visualization's
+`references/plain-language.md` first.
+
+[23] ASSISTANT: 1) No. Before your first message, the system-reminders present were about my email-handling context, the working-directory/environment, and the model ID — no visualization/loom-visualization instruction appeared at session start.
+
+2) Per message:
+- Message 1 ("Reply with just the word OK"): No visualization trigger card arrived with it.
+- Message 2 (this diagnostic question): Yes, a visualization trigger card arrived with it (as a UserPromptSubmit hook system-reminder).
+
+Total distinct copies of the card visible so far: 1.
+
+=== session dir: scratchpad-live6 — same flags, plugin copy with BOTH card files moved out of skills/loom-visualization/assets/ (Acceptance 5, live)
+(transcript cf9fd150-7538-4045-8acc-4faa25b061ed.jsonl)
+[2] USER MESSAGE: 請把這句話原封不動回給我：藍色的鯨魚在第七號碼頭。然後另起一行，用英文說明：這則訊息旁邊有沒有出現任何 'Visualization trigger card' 或 hook 錯誤訊息？
+[13] ASSISTANT: 藍色的鯨魚在第七號碼頭。
+No 'Visualization trigger card' or hook error message appeared alongside this message.
+attachment types present in transcript: ['date', 'environment', 'model', 'prompt_snapshot', 'session_context', 'total_tokens_reminder']
+claude -p exit code: 0
+
+=== session dir: scratchpad-live7 — same flags, loom-workflow from a clean worktree at eacf718f (re-check of Acceptance 1 after the card change)
+(transcript 72095472-3708-4abc-aae0-c386938e21b5.jsonl)
+[2] USER MESSAGE: Diagnostic, answer in English. Did a 'Visualization trigger card' arrive together with this message? If yes, quote only its last sentence verbatim, and say how many copies of such a card you see.
+[6] ATTACHMENT hook_additional_context (hookEvent=UserPromptSubmit):
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+for comparisons, branching decisions, reasoning chains, timelines,
+sequences, quantities, data models or reasoning pages, invoke
+`loom-visualization` FIRST, leading with its form. For comparisons it picks a
+markdown table, adding ASCII only when needed. Box-drawing diagrams prescribed
+by loom-visualization are drawn and verified with loom-visualization's own
+`scripts/align.py` and checks; the ascii-graph card covers flows, state
+machines and architecture; follow it. Skip it for one-paragraph answers;
+never decorate. Before plainer explanations or decisions between approaches,
+read loom-visualization's `references/plain-language.md`.
+
+[15] ASSISTANT: Yes, one such card arrived (in the "UserPromptSubmit hook additional context" system-reminder). I see exactly one copy.
+
+Its last sentence, verbatim:
+
+"Before plainer explanations or decisions between approaches, read loom-visualization's `references/plain-language.md`."
+
+=== session dir: scratchpad-live8 — same flags, loom-workflow from a clean worktree at 75024929 (re-check of Acceptance 1 and 2 after the inline decision rule)
+(transcript baeeb12e-7d54-4691-99af-b42f79941119.jsonl)
+[2] USER MESSAGE: Diagnostic, answer in English. Did a 'Visualization card' arrive together with this message? If yes, quote its first line (the header) and its last sentence verbatim, and say how many copies of such a card you can see.
+[6] ATTACHMENT hook_additional_context (hookEvent=UserPromptSubmit):
+# Visualization card (ascii-graph-toolkit)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+for comparisons, branching decisions, reasoning chains, timelines,
+sequences, quantities, data models or reasoning pages, invoke
+`loom-visualization` FIRST, leading with its form. Comparisons get a markdown
+table, ASCII only when needed. Verify prescribed box diagrams with
+loom-visualization's `scripts/align.py`; the ascii-graph card covers flows,
+state machines and architecture; follow it. Skip loom-visualization for
+one-paragraph answers; never decorate. When asking or answering how to do
+something, offer 2+ workable options in a table, recommending one; for
+plainer explanations, read loom-visualization's `references/plain-language.md`
+first.
+
+[15] ASSISTANT: Yes, one such card arrived, injected via a `UserPromptSubmit` hook (not part of your visible message).
+
+- **First line (header):** `# Visualization card (ascii-graph-toolkit)`
+- **Last sentence:** "for plainer explanations, read loom-visualization's `references/plain-language.md` first."
+- **Copies visible:** 1

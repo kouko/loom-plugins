@@ -1,0 +1,53 @@
+# blind-run live trial: a7-how-question (re-run after W4-04)
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/w404-scratch/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at 4af823eb via --plugin-dir; real hook and real skill files
+# prompt-sha256: c8dbb8a5116fae553ec6751f16999619f44d574b5b83d44178487efe9340bc3c (same prompt as a7-how-question.txt)
+# exit: 0 (result subtype success, is_error false); single run, no reruns
+# card delivery (saved transcript a751ea83-0ab9-4346-bf28-3d44a70ed9a3.jsonl): hook_additional_context=1, coexist-card header string ("Visualization card (ascii-graph-toolkit)") occurrences=2; no Read tool call for references/plain-language.md observed
+=== USER MESSAGE (verbatim) ===
+我們的網站要把使用者上傳的圖片，從伺服器本機硬碟搬到雲端物件儲存。要怎麼搬比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+Read <scratchpad>/w404-scratch/loom-workflow/skills/loom-visualization/templates/01-option-comparison.md
+Read <scratchpad>/w404-scratch/loom-workflow/skills/loom-visualization/templates/02-linear-steps.md
+Glob scripts/detect_client.py (in loom-visualization skill dir)
+=== FINAL REPLY (verbatim) ===
+搬遷的核心風險是「切換過程中服務不能中斷、檔案不能遺失」，所以我建議採用**雙寫 + 背景搬移 + 讀取容錯**的漸進式做法，而不是一次性搬完再切換。
+
+## 常見遷移方式比較
+
+| 方案 | 停機風險 | 遺失風險 | 實作複雜度 | 適合情境 |
+|---|---|---|---|---|
+| 一次性搬移（停機切換） | 高（需暫停上傳服務） | 低 | 低 | 流量小、可接受維護時段 |
+| 雙寫 + 背景搬移 + 讀取容錯 | 無 | 低 | 中 | 正式營運中、不能停機 |
+| 讀取時才搬移（lazy migration） | 無 | 中（冷資料可能一直留在本機） | 中 | 檔案量極大、多數是舊資料很少被讀 |
+| CDN/物件儲存當快取前端，本機仍是主要來源 | 無 | 低 | 低 | 只想加速讀取，不是真正遷移 |
+
+**推薦：雙寫 + 背景搬移 + 讀取容錯**，因為正式站台通常不能為了搬檔案而停機，這個做法讓新舊資料同時可用，出問題也能隨時退回本機讀取。
+
+## 建議執行步驟
+
+| # | 步驟 | 做什麼 | 完成標準 |
+|---|---|---|---|
+| 1 | 建置雲端環境 | 建立物件儲存 bucket（S3/GCS/Azure Blob 皆可），設定權限、加上 CDN | bucket 可透過 SDK 存取，CDN 網域可解析 |
+| 2 | 改上傳邏輯 | 新上傳一律寫入雲端（建議用 presigned URL 讓瀏覽器直傳，減輕伺服器負擔），資料庫記錄檔案的儲存位置 | 新上傳的檔案只存在雲端且可正常讀取 |
+| 3 | 加讀取容錯層 | 讀取時先查雲端，查不到才 fallback 讀本機，並記錄「本機命中」次數方便追蹤 | 舊檔案在搬移前仍可正常顯示 |
+| 4 | 背景批次搬移 | 寫 script 或用 `rsync`/`aws s3 sync` 之類工具，把本機既有檔案逐批上傳到雲端，並做 checksum 驗證 | 所有本機檔案在雲端都有對應且 checksum 一致 |
+| 5 | 驗證與觀察 | 抽樣測試舊圖片可正常存取，觀察 fallback 命中率是否趨近於零 | 連續一段時間（例如兩週）無本機 fallback 觸發 |
+| 6 | 收尾清理 | 移除讀取容錯的 fallback 邏輯，刪除本機檔案（先備份或延遲刪除一段時間再真的刪除） | 程式碼不再依賴本機路徑，磁碟空間釋放 |
+
+幾個要注意的細節：
+
+- **不要用檔案系統路徑當永久識別碼**，改用資料庫欄位記錄「儲存位置」（本機或雲端 key），方便之後隨時再搬。
+- **上傳走 presigned URL**，讓使用者瀏覽器直接傳到物件儲存，伺服器只負責簽發網址，可省頻寬與記憶體。
+- **搬移要做 checksum 比對**（例如 MD5/SHA256），避免搬壞或搬一半沒發現。
+- **保留回退能力**：第 5 步觀察期內若雲端出問題，容錯層讓你能隨時退回本機讀取，不影響使用者。
+=== CHECK ===
+read references/plain-language.md: no (no Read tool call for it in the transcript; only the two skill templates were read)
+workable alternatives: 4 (一次性搬移, 雙寫+背景搬移+讀取容錯, lazy migration, CDN前端快取)
+recommended one marked: yes (bold "推薦：雙寫 + 背景搬移 + 讀取容錯" line, matching the first-sentence recommendation)
+do nothing or later: not listed and not ruled out (no row or sentence addresses "don't migrate yet")
+smaller version: partially present — the lazy-migration row is a smaller-scope variant, but it is offered as a peer option, not named/ruled-out as "a smaller version of the recommendation"
+combining two: not listed and not ruled out as such (the recommended option itself already combines dual-write + background-move + read fallback, but no sentence names or rules out combining two of the table's alternatives)
+yes/no asked directly: not applicable (open how-question, not a confirmation)

@@ -1,0 +1,53 @@
+# blind-run live trial: a7-how-auth-eacf718f (re-run after W4-04)
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/w404-scratch/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at 4af823eb via --plugin-dir; real hook and real skill files
+# prompt-sha256: 070ff3cb57ac7a6f25c7b89d43d06e61a3a71675b3d0c15fadb1812a199378a7 (same prompt as a7-how-auth-eacf718f.txt)
+# exit: 0 (result subtype success, is_error false); single run, no reruns
+# card delivery (saved transcript 1658661d-9943-41dd-a83b-a75f7b0dbb56.jsonl): hook_additional_context=1, coexist-card header string ("Visualization card (ascii-graph-toolkit)") occurrences=2; no Read tool call for references/plain-language.md observed
+=== USER MESSAGE (verbatim) ===
+我們的 Python 網頁服務要加上「只有管理員能刪除文章」這種權限檢查。要怎麼做比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+Glob **/*
+Read <scratchpad>/w404-scratch/loom-workflow/skills/loom-visualization/templates/01-option-comparison.md
+=== FINAL REPLY (verbatim) ===
+直接建議:把權限檢查做成一個**集中、可重複使用的檢查函式(或框架內建的權限機制)**,在會刪除文章的路由/處理函式最前面呼叫,並且一律用「登入時建立的使用者身份(session 或 JWT)」來判斷角色,絕不信任前端傳來的角色欄位。
+
+三種常見做法比較如下:
+
+| 做法 | 說明 | 優點 | 缺點/適用情境 |
+|---|---|---|---|
+| 路由層 decorator / dependency | 寫一個 `@require_role("admin")` 或 FastAPI 的 `Depends(require_admin)`,掛在刪除文章的路由上 | 簡單、每個路由一眼看出權限要求、容易測試 | 規則變複雜(多角色、擁有者也能刪)時要另外處理 |
+| 框架內建權限系統 | Django 的 `permission_required` / DRF `permission_classes`;Flask 搭配 Flask-Login + 自訂 `login_required`/角色檢查 | 跟框架其他機制(admin site、序列化器)整合好,團隊熟悉度高 | 綁定特定框架,換框架要重寫 |
+| 集中式 Policy 函式(service 層) | 在 service/domain 層寫 `can_delete_post(user, post) -> bool`,路由和背景任務都呼叫同一個函式 | 邏輯只有一處、之後要加「作者本人也能刪」很好擴充、路由和其他呼叫路徑(如 CLI、排程)都受保護 | 需要多一層抽象,對非常小的專案可能是過度設計 |
+
+**推薦:先用「路由層 decorator/dependency + 一個集中的權限判斷函式」**,也就是把上面第一種和第三種合起來——判斷邏輯寫成一個小函式(`is_admin(user)` 或未來的 `can_delete_post(user, post)`),再用 decorator/dependency 在路由上套用。這樣路由簽章一看就知道有做權限檢查,邏輯又只維護一份,之後規則變複雜(例如允許作者刪自己的文章)也只需要改那一個函式,不用一個個路由去改。若專案已經用 Django,直接用 DRF 的 `permission_classes` 就好,不必自己重造輪子。
+
+以 FastAPI 為例的最小示範:
+
+```python
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin only")
+    return current_user
+
+@router.delete("/posts/{post_id}")
+def delete_post(post_id: int, admin: User = Depends(require_admin)):
+    ...
+```
+
+幾個容易漏掉但重要的地方:
+- 權限判斷一定要在**伺服器端**做,且依據的是伺服器驗證過的使用者身份(session/JWT 解出來的),不是前端送來的欄位。
+- 沒權限回 `403`,不要回 `404`(除非你刻意想隱藏文章是否存在)。
+- 幫這個檢查寫測試:一般使用者呼叫應該被擋、admin 呼叫應該成功、未登入應該被擋。
+
+你們現在是用哪個框架(Django / FastAPI / Flask)?我可以針對實際程式碼給更具體的寫法。
+=== CHECK ===
+read references/plain-language.md: no (no Read tool call for it in the transcript; only the one skill template was read)
+workable alternatives: 3 (route-layer decorator/dependency, framework built-in permission system, centralized service-layer policy function)
+recommended one marked: yes (bold "推薦:先用「路由層 decorator/dependency + 一個集中的權限判斷函式」" line combining rows 1 and 3)
+do nothing or later: not listed and not ruled out (no row or sentence addresses skipping the permission check)
+smaller version: not listed and not ruled out as a named smaller option (row 1 alone would be the smaller subset of the recommendation, but it is not called out that way)
+combining two: listed and taken — the recommendation explicitly names combining option 1 and option 3, with a stated reason (single source of truth, easy to extend to owner-can-delete later)
+yes/no asked directly: not applicable (open how-question, not a confirmation)

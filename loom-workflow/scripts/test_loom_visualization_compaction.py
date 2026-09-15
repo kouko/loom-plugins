@@ -46,6 +46,7 @@ def test_entrypoint_has_required_sections_and_routes():
         "client check": ["scripts/detect_client.py", "references/client-matrix.md"],
         "ascii generation": ["scripts/generate.py", "scripts/align.py"],
         "page mode": ["references/page-mode.md"],
+        "plain language": ["references/plain-language.md"],
     }
     for contract, needles in essence.items():
         missing = [needle for needle in needles if needle not in text]

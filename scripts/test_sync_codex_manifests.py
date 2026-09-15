@@ -641,10 +641,11 @@ def test_hand_written_orphan_rule_tells_user_to_remove_it_by_hand(tmp_path):
 
 
 def test_claude_hook_still_injects_card_once(tmp_path):
-    """A4 positive: one SessionStart card command; it injects the full card once."""
+    """A4 positive: one UserPromptSubmit card command; it injects the full card once."""
     plugin = REPO_ROOT / "loom-workflow"
     hooks = json.loads((plugin / "hooks" / "hooks.json").read_text(encoding="utf-8"))
-    commands = [h["command"] for group in hooks["hooks"]["SessionStart"]
+    assert "SessionStart" not in hooks["hooks"]
+    commands = [h["command"] for group in hooks["hooks"]["UserPromptSubmit"]
                 for h in group["hooks"] if h.get("type") == "command"]
     card_commands = [c for c in commands if "visualization-card" in c]
     assert len(card_commands) == 1, commands

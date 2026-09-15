@@ -40,6 +40,20 @@ artifact (`loom-workflow:git-memory`, `loom-code:ship`,
 
 Documented reasoning turned into a standalone page is page mode, below.
 
+## Plain language and conversation tables
+
+These references sit beside the data-shape templates; the templates in
+Step 1 stay as they are.
+
+| Need | Read |
+|---|---|
+| A plainer explanation, a decision question, or a table for a conversation situation (decision, before and after, progress, checklist, confirmed and unconfirmed, findings, risks, support matrix) | `references/plain-language.md` |
+| A software document: incident postmortem or incident report, test plan, traceability or compatibility matrix, migration guide, API parameters, runbook, RACI, ADR or RFC options, technology selection, feature-flag rollout, release notes, risk register, RAID log, threat model (STRIDE), decision table, state-transition table, truth table, morphological box, risk matrix, feature table, confusion matrix, correlation matrix | `references/tables-software.md` |
+| A design document: heuristic evaluation, usability test report, content audit, design critique, design tokens, component states, accessibility audit, journey map, personas or JTBD, design decision log | `references/tables-design.md` |
+| A business document: weighted or Pugh matrix, RICE, ICE, MoSCoW or WSJF, SWOT or TOWS, competitive analysis, Five Forces, stakeholder analysis, scenario planning, business case, OKR, assumption log, go/no-go, pricing tiers, Kano, decisional balance sheet, roadmap, 2×2 quadrants | `references/tables-business.md` |
+
+Read only the one file whose row matches; a conversation-situation reply never opens a domain file.
+
 ## Step 1 — Classify the information shape
 
 Name the one shape the information has. If it has two, draw the one the

@@ -1,0 +1,98 @@
+# blind-run live trial: a6-rewrite-3
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --disable-slash-commands --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at dda0014f via --plugin-dir; real hook and real skill files
+# prompt-sha256: 71f8915382a23d6fab0d0d6144c151fe8cc8361b33d31fd3aa9a728423ce3f4a
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+=== USER MESSAGE (verbatim) ===
+（下面是你上一則傳給我的回覆，我貼回來給你看）
+
+Branch-end PASS（PASS_WITH_NOTES）、push 閘 exit 0。**決策點 ③：請看盲跑報告，說 OK 或不 OK。** 原文在 `docs/loom/2026-09-04-codex-hook-trust-covers-every-definition-and-worktree/blind-run-report.md`。
+
+**你要的東西，一條一條核對**
+
+1. **`--trusted` 逐條回報；乾淨暫存 repo 沒按 `/hooks` 時全 never、exit 非 0、輸出含 `/hooks` 與資料夾路徑** — works。三條定義各一行、全 never、exit 2、BLOCK 行帶暫存資料夾絕對路徑。
+2. **`codex exec` 各跑一次 shell 與 apply_patch（不按 `/hooks`）hook 不該跑；手動餵一條只翻那一條** — works。`echo probe` 與建 `hello.txt` 都真的執行了，但 ledger 不存在、`--trusted` 仍三條 never（Codex 靜靜跳過未信任的 hook，連警告都沒有）；手動餵 `validate-skill-folder-structure.sh` 後只有它翻 fired。
+3. **三處站文字有「逐條／never／`/hooks`／停」的句子、文字測試通過** — works（write-plan step 0b、build §0、first-contact §3；6 測全過）。
+4. **`hooks.json` 命令字串與 main 逐位元相同、規則數不變（27）、整包綠、版本 1.2.4** — works。
+
+**你親手驗的那一腿（intent Constraints 明講）**：按過 `/hooks` 之後守衛真的跑。報告寫了五步：到暫存資料夾開 `codex` → `/hooks` 同意 → 再跑那兩個 `codex exec` → `--trusted` 預期三條全 fired、exit 0；同時 ledger 會第一次出現 Codex 對 apply_patch 真正填的 `tool_name`（到今天沒人看過）。暫存資料夾留著：
+`…/scratchpad/scratch-repo-JWQz`（裡面已有一條手動翻 fired 的紀錄；要乾淨起點再跟我說）。
+
+**對你既有的資料做了什麼**：git 追蹤的東西沒動、`hooks.json` 沒動所以既有信任照舊。**但要老實說**：build 期間兩個探針測試對本 repo 真正的薄殼開火，把紀錄寫進本 repo 自己的 ledger（gitignore 的本機檔）；每個實作者與對抗者都在提交前發現並刪掉，沒進任何 commit。這個漏洞在修正輪已修（探針改打 tmp 副本＋守衛）。
+
+**我幫你決定的事**
+- 火痕檔改成一行一行的 ledger（同一路徑）；舊的零位元組 marker 只算 loom 那條「legacy 跑過」，其他定義仍 never——寧可多問一次 `/hooks`。
+- 歸屬用「事件＋指令路徑」，不看 Codex 回報的工具名（那個字串沒人驗過）。
+- 兩支手抄副本改薄殼、指令字串不動（既有信任不失效）；順便消滅了副本漂移（remind 那支從 8 月就陳舊）。
+
+**你可能還沒想到的事**
+- apply_patch 的 `tool_name` 字串仍未知，等你那一腿。
+- 第二位讀者抓到「先記 fired 再 exec、exec 目標看 cwd」的順序漏洞，修正輪已修（目標改相對薄殼自身、目標存在才記；有子目錄 cwd 的回歸測試）。
+- 這台機器的 Codex 設定是 approval never；你的設定若不同，畫面會多幾個確認步驟，不影響閘本身。
+
+ship 時會併一個 nit commit：記錄器 docstring 補「追加不加鎖、丟一行只會變 never 不會偽造 fired」；報告裡兩處「正在修正」改成已修的 commit。
+
+**OK 嗎？**
+
+---
+可以用更白話的方式說明嗎？
+=== SKILLS INVOKED ===
+none
+=== FILE TOOLS USED ===
+Glob **/loom-visualization/references/plain-language.md
+Read <scratchpad>/trial-a6-rewrite-3/docs/loom/2026-09-04-codex-hook-trust-covers-every-definition-and-worktree/blind-run-report.md
+=== FINAL REPLY (verbatim) ===
+**結論：這輪测试都通過，但有一個步驟只有你能驗，需要你去跑一次。**
+
+先講四個已經測過、都通過的部分：
+
+**1. 沒按過 `/hooks` 的情況**
+拿一個全新、乾淨的暫存資料夾，不去按 Codex 的 `/hooks` 同意畫面，直接查三條 hook 定義的信任狀態。結果：三條全部顯示「never」（未信任），指令結束碼不是 0（代表失敗/擋下），畫面上有提示要去按 `/hooks`，也有列出資料夾路徑。這是預期行為，測試通過。
+
+**2. 沒按 `/hooks` 時，hook 真的不會跑**
+用 `codex exec` 分別跑一次 shell 指令（`echo probe`）跟一次建檔案的指令（apply_patch），事先都沒按 `/hooks`。結果：指令本身照常執行了（echo 有印、檔案有建出來），但沒有任何 hook 紀錄被寫入——代表 hook 真的沒有被觸發，而且 Codex 沒有跳出任何警告，就直接安靜跳過。接著手動單獨呼叫其中一條 hook 腳本，結果只有那一條被記錄成「fired」（觸發過），其他兩條還是 never。這是預期行為，測試通過。
+
+**3. 三處文件/介面的文字檢查**
+檢查三個地方（write-plan 的步驟 0b、build 文件的第 0 節、first-contact 文件的第 3 節）有沒有正確提到「逐條檢查」、「never」、「`/hooks`」、「停下來」這些字眼。六個文字測試全部通過。
+
+**4. 設定檔沒被改壞**
+確認 `hooks.json`（設定 27 條規則的檔案）裡的指令字串跟 main 分支逐字一樣，規則數量還是 27 條，整套測試全綠，版本號是 1.2.4。
+
+---
+
+**你需要親自驗的那一步**
+
+前面四項都是「沒按 `/hooks`」的情況。但真正按過 `/hooks` 同意之後，hook 會不會真的開始運作，這一步我沒辦法自己測完——需要你到 Codex 裡實際按一次同意鍵。
+
+報告裡寫了五個步驟：進到暫存資料夾開 Codex → 按 `/hooks` 同意 → 再跑一次前面那兩個指令（shell 跟 apply_patch）→ 這次應該看到三條 hook 全部觸發、指令結束碼是 0。順便你會第一次看到 Codex 對 apply_patch 這個動作回報的「工具名稱」實際長什麼樣子（目前沒人驗證過這個字串）。
+
+暫存資料夾留在：`…/scratchpad/scratch-repo-JWQz`。裡面已經有一筆手動觸發的紀錄；如果你要從乾淨狀態開始，跟我說一聲我重建。
+
+---
+
+**對你原本的資料做了什麼**
+
+Git 有追蹤的檔案完全沒動，`hooks.json` 也沒改，所以你原本已經信任過的東西維持原狀。
+
+但要老實講一件事：測試過程中，有兩個探測用的測試不小心真的打到這個 repo 自己的 hook 腳本上，把紀錄寫進了這個 repo 本機的紀錄檔（這個檔案有被 git 忽略，不會進版本控制）。每個負責寫程式跟負責檢查的人都在送出前自己發現並刪掉了，沒有任何一筆進到 commit 裡。這個問題已經在修正輪處理掉了（探測測試改成只打暫存的副本，並加了防呆）。
+
+---
+
+**我自己做的三個決定**
+
+- 記錄觸發紀錄的檔案，從「有沒有這個檔案存在」改成「一行一行累加紀錄」。舊的那種空檔案標記，只當作其中一條（loom）「以前跑過」，其他兩條照樣算 never——寧可讓你多按一次 `/hooks`，也不要誤判成已信任。
+- 判斷是哪個 hook 觸發的，看「發生了什麼事＋指令路徑」，不看 Codex 自己回報的工具名稱字串（因為那個字串目前沒人驗證過準不準）。
+- 兩支手動複製出來的腳本，改成很薄的轉呼叫殼、指令字串本身沒動（這樣你原本的信任狀態不會失效），順便解決了兩份複製版本內容不一致的問題（其中一份從八月就沒更新過）。
+
+---
+
+**還沒解決/你可能不知道的事**
+
+- apply_patch 動作時 Codex 回報的工具名稱字串，目前還是未知，要等你親自跑那一步才會知道。
+- 有第二個檢查的人抓到一個順序上的漏洞：程式會先寫「已觸發」的紀錄，才去執行指令，而且執行目標是看當下所在的資料夾決定——這樣可能誤判。已經修好了，目標改成用腳本自己的相對位置決定，而且要先確認目標真的存在才會寫紀錄；也加了一個在子資料夾底下執行的回歸測試。
+- 我這台機器上 Codex 的設定是「永不詢問」；如果你的設定不同，畫面上會多跳出幾個確認步驟，但不影響這個信任機制本身對不對。
+
+送出前還會多包一個小修正的 commit：在記錄器的程式註解裡補一句「用附加寫入、沒有上鎖，所以就算漏寫一行，頂多讓狀態變回 never，不會憑空冒出一個假的 fired」；報告裡兩處寫「正在修正中」的地方也會改成指向已經修好的 commit。
+
+**這樣可以嗎？**

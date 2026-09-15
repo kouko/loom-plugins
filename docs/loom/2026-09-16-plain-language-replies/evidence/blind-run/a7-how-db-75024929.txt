@@ -1,0 +1,55 @@
+# blind-run live trial: a7-how-db-75024929
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at 75024929 via --plugin-dir; real hook and real skill files
+# prompt-sha256: 9a8961c3a7b5d18ddfaac7a9114666382e70f2df9c124e4ad655dd10496ab1e8
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+# session init: {"tools": ["Glob", "Grep", "Read", "Skill"], "skills": ["deep-research", "loom-workflow:critique", "loom-workflow:dbt-model-style", "loom-workflow:decision-map", "loom-workflow:distill-sessions", "loom-workflow:git-memory", "loom-workflow:goal-create", "loom-workflow:handoff", "loom-workflow:independent-advisor", "loom-workflow:loom-memory", "loom-workflow:loom-visualization", "loom-workflow:recap-state", "loom-workflow:using-loom-workflow", "design", "design-sync", "dataviz", "update-config", "verify", "debug", "code-review", "simplify", "batch", "fewer-permission-prompts", "doctor", "loop", "schedule", "claude-api", "workflow-authoring", "run", "run-skill-generator"], "plugins": ["loom-workflow@inline"]}
+=== USER MESSAGE (verbatim) ===
+我們的使用者資料現在存在一台機器的 PostgreSQL 裡，資料量成長很快，查詢越來越慢。要怎麼處理比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/templates/01-option-comparison.md
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/templates/03-branching-decision.md
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/scripts/align.py
+=== FINAL REPLY (verbatim) ===
+## 結論
+
+資料庫變慢通常不是「一定要分片」,而是要先诊断瓶頸在哪,再對症下藥。多數情況下,加索引、連線池、分區三招做完就能撐很久,分片(sharding)是最後才考慮的選項,因為它的維運複雜度最高。
+
+## 先診斷
+
+用 `EXPLAIN ANALYZE` 檢查慢查詢,再依瓶頸選方案:
+
+```
+EXPLAIN ANALYZE 有 Seq Scan（全表掃描）嗎？
+├─ 有 → 先補索引／改寫查詢（成本最低，一定要先做）
+└─ 沒有 → 瓶頸在哪？
+      ├─ 讀取重複、讀多寫少        → 加快取層（Redis）
+      ├─ 讀取流量大，寫入正常     → 讀寫分離（Read Replica）
+      ├─ 單表資料量大，有時間/範圍鍵可切 → 資料表分區（Partitioning）
+      └─ 單機 CPU／IO／連線數全面吃緊    → 先垂直擴充，長期才考慮分片
+```
+
+## 方案比較
+
+| 方案 | 解決什麼問題 | 導入難度 | 何時該用 |
+|---|---|---|---|
+| 索引 + 查詢優化 | 全表掃描、缺索引 | 低 | 任何情況都先做，通常投報率最高 |
+| 連線池（PgBouncer） | 短連線太多拖垮 DB | 低 | 應用端連線數常常爆掉 |
+| 資料表分區（Partitioning） | 單表過大、歷史資料拖慢查詢 | 中 | 有明顯的時間或範圍鍵可切（如按月分區） |
+| 快取層（Redis） | 重複查詢、讀多寫少 | 中 | 熱門資料被重複查詢 |
+| 讀寫分離（Read Replica） | 讀取流量大、單機 I/O 到頂 | 中 | 讀遠多於寫 |
+| 垂直擴充（換更大機器/受管服務） | 單機資源全面吃緊 | 低，但成本隨規格上升 | 短期止血，資料量還沒大到需要分片 |
+| 水平分片（Sharding，如 Citus） | 單機容量或寫入量真的到極限 | 高 | 前面全做了還不夠，且資料量持續高速成長 |
+
+## 建議順序
+
+1. 用 `EXPLAIN ANALYZE` 找出真正慢在哪，先補索引、跑 `VACUUM ANALYZE`。
+2. 加連線池,通常對「查詢單獨測試很快、但應用整體變慢」很有效。
+3. 依瓶頸選一個:資料量大就分區,讀取量大就讀寫分離或加快取。
+4. 這些都做了、且資料量還在快速成長,才評估垂直擴充或水平分片。
+
+你目前的瓶頸是讀取流量大,還是單表資料量本身就很大(例如歷史紀錄)?這會決定該先做分區還是讀寫分離。

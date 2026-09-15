@@ -1,0 +1,157 @@
+# card-blob: f3cf31688399439d34f1e88118c96a7198a2a9c2  (loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md)
+# skill-blob: ea667cd596aa385bd33ae826215e17c5d728982f  (loom-workflow/skills/loom-visualization/SKILL.md)
+# reference-blob: 0dfcc32470352f5b65e8d5de07a681e4d4e38892  (loom-workflow/skills/loom-visualization/references/plain-language.md)
+# model: sonnet
+# command: cd <empty temp dir outside repo> && CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --disable-slash-commands --strict-mcp-config --tools "" --model sonnet --output-format text  (prompt on stdin; one fresh invocation per run; sha256 of each assembled prompt under its run)
+# isolation: run from an empty temp directory outside the repo; CLAUDE_CODE_DISABLE_CLAUDE_MDS=1, --setting-sources project, --disable-slash-commands, --strict-mcp-config and --tools "" keep the user's CLAUDE.md, installed plugins/skills, hooks and file tools out; a pre-run probe with the same command answered 'no CLAUDE.md, no skills, no hook text'. (--bare was tried first and refused: 'Not logged in'.)
+# prompt template placeholders: {CARD} = full text of the card blob above; {ROUTING} = SKILL.md section from '## Plain language and conversation tables' up to (not including) '## Step 1'; {REF} = full text of references/plain-language.md at the reference blob
+# note: harness framing is English; the user turns are Chinese, as kouko would send them.
+
+=== PROMPT TEMPLATE run a (verbatim) ===
+You are an AI coding assistant working with a user in a chat session.
+
+The following text is injected into your context with every user message:
+<injected-card>
+{CARD}</injected-card>
+
+The loom-visualization skill's SKILL.md contains this section:
+<skill-md-section>
+{ROUTING}</skill-md-section>
+
+Following the instructions above, you have read loom-visualization's references/plain-language.md. Its full text:
+<file path="references/plain-language.md">
+{REF}</file>
+
+Conversation so far:
+
+[User]
+我在寫一個命令列工具，使用者需要一個自己的設定檔。
+
+[Assistant]
+好，我們來處理設定檔。
+
+[User]
+這個設定檔要放在哪裡比較好？選一個你推薦的做法
+
+Write your next reply to the user, exactly as you would send it. Output only the reply.
+
+# run: a
+# prompt-sha256: 033b8968f785e1f6e2c8b6c31288a9e23cfb43dfb0a917e67cab78a20dbe9a76
+=== USER TURN (verbatim) ===
+這個設定檔要放在哪裡比較好？選一個你推薦的做法
+=== OUTPUT (verbatim) ===
+设定档放在哪里，会影響使用者能不能找到它、能不能把它放進版本控制、以及多台機器要不要共用它。
+
+**推薦做法：放在使用者主目錄下的 XDG 設定目錄** ——Linux／macOS 是 `~/.config/<工具名>/config.toml`，程式啟動時先讀環境變數 `XDG_CONFIG_HOME`（沒設定就用預設的 `~/.config`）；Windows 對應 `%APPDATA%\<工具名>\config.toml`。這樣設定檔和程式的執行檔位置分開，之後解除安裝工具時使用者的設定不會被一起刪掉。
+
+| 做法 | 使用者得到什麼 | 使用者放棄什麼 | 適合情境 |
+|---|---|---|---|
+| XDG 設定目錄（推薦） | 設定和程式碼位置分開，多個工具的設定不會混在一起 | 程式要多寫幾行判斷作業系統路徑、讀環境變數 | 大多數命令列工具，使用者只有一份全域設定 |
+| 主目錄單一檔案，如 `~/.toolnamerc` | 程式碼最簡單，一個固定路徑就好 | 這個檔案會跟主目錄裡其他工具的點檔案混在一起，比較難整理 | 工具設定項目很少，不太會成長 |
+| 目前所在目錄下的設定檔，如 `.toolnamerc` | 同一個專案的人可以共用同一份設定，能放進版本控制 | 換到別的目錄執行同一個指令，設定就讀不到，除非另外寫往上層目錄找的邏輯 | 工具主要在專案資料夾內執行，設定跟著專案走 |
+
+如果使用者同時需要「全域預設」和「單一專案可以覆寫」，可以把 XDG 設定目錄當預設值，再讓程式在目前目錄找到同名檔案時優先讀那一份——兩種情境都照顾到，但程式要多處理一次「先找哪個檔案」的順序。
+=== CHECK ===
+number of alternatives: 3 in the table (XDG config directory; single file in the home directory `~/.toolnamerc`; file in the current directory `.toolnamerc`) plus 1 combined option in the closing paragraph (XDG default + current-directory override) = 4.
+recommendation marked: yes -- 「**推薦做法：放在使用者主目錄下的 XDG 設定目錄**」 and 「XDG 設定目錄（推薦）」 in the table.
+commonly missed alternatives:
+  - do nothing or later (e.g. no config file, flags or environment variables only): not listed, and no sentence saying why it is not workable. FAIL.
+  - smaller or simpler version: covered -- the home-directory single file is described as 「程式碼最簡單」. PASS.
+  - combining two options: covered -- closing paragraph combines XDG default with a per-project override. PASS.
+one consequence sentence per option: table columns 「使用者得到什麼」/「使用者放棄什麼」 give each of the 3 options its consequence; the combined option gets 「兩種情境都照顾到，但程式要多處理一次「先找哪個檔案」的順序」. PASS.
+first sentence: "设定档放在哪里，会影響使用者能不能找到它、能不能把它放進版本控制、以及多台機器要不要共用它。" -- states the stakes, not the conclusion; the recommendation is the second sentence. (Not part of the A7 check; noted.)
+metaphor scan: no hits.
+reply language: Chinese, but mixed Simplified and Traditional characters (「设定档放在哪里，会」, 「照顾到」 are Simplified; the rest Traditional).
+table: 4 columns, matches the plain-language.md "Decision consequences" table headers.
+A7 run (a) verdict: FAIL (do-nothing-or-later neither listed nor ruled out in one sentence); alternatives, recommendation and consequences PASS.
+
+=== PROMPT TEMPLATE run b (verbatim) ===
+You are an AI coding assistant working with a user in a chat session.
+
+The following text is injected into your context with every user message:
+<injected-card>
+{CARD}</injected-card>
+
+The loom-visualization skill's SKILL.md contains this section:
+<skill-md-section>
+{ROUTING}</skill-md-section>
+
+Following the instructions above, you have read loom-visualization's references/plain-language.md. Its full text:
+<file path="references/plain-language.md">
+{REF}</file>
+
+Situation: the conversation is in Traditional Chinese. You finished the change on a local branch and the tests pass. Before pushing the branch and opening a pull request you need the user's confirmation; the question you need answered is: 確認要把這個分支推上去並開 PR 嗎？
+
+Conversation so far:
+
+[User]
+改好了就跟我說。
+
+Write the message you would send to the user to ask this question, exactly as you would send it. Output only the message.
+
+# run: b
+# prompt-sha256: 1c1c296aa83c499df9242294282918ca8a50b80118087d28639e563372ccb728
+=== QUESTION THE AGENT MUST ASK (verbatim) ===
+確認要把這個分支推上去並開 PR 嗎？
+=== OUTPUT (verbatim) ===
+修改完成，測試也通過了。要把這個分支推上去並開 PR 嗎？
+=== CHECK ===
+question asked: "要把這個分支推上去並開 PR 嗎？" preceded by the status sentence "修改完成，測試也通過了。"
+asked directly as yes-or-no: yes.
+invented alternatives: none.
+first sentence: "修改完成，測試也通過了。" -- the conclusion.
+metaphor scan: no hits.
+reply language: Chinese (Traditional).
+A7 run (b) verdict: PASS.
+
+=== ROUND 2 (guide 8eedffc034e438a38b2867dad8631c96e9626ce2) ===
+# reference-blob: 8eedffc034e438a38b2867dad8631c96e9626ce2  (loom-workflow/skills/loom-visualization/references/plain-language.md, after W2-04)
+# card-blob and skill-blob: unchanged from the header above (f3cf31688399439d34f1e88118c96a7198a2a9c2, ea667cd596aa385bd33ae826215e17c5d728982f)
+# method: identical to round 1 -- same command, flags, model, empty temp dir and prompt template (template files byte-identical to round 1's); only {REF} differs. One fresh invocation per run; no tool errors, no reruns.
+# metaphor scan regex (same as round 1): 就像|好比|想像|比喻|像是一個|like a|imagine|think of it as
+
+# run: a
+# prompt-sha256: bb17da78ec3fdfdc0fb0193dcf70401e18fa9945f78e7cf861f73be57e063e25
+=== PROMPT TEMPLATE === same as round 1 run a above
+=== USER TURN (verbatim) ===
+這個設定檔要放在哪裡比較好？選一個你推薦的做法
+=== OUTPUT (verbatim) ===
+設定檔建議放在作業系統的標準設定目錄:macOS 和 Linux 用 `~/.config/<工具名稱>/config.toml`,Windows 用 `%APPDATA%\<工具名稱>\config.toml`。這是目前多數命令列工具採用的位置,使用者的設定檔會跟其他工具放在同一類目錄,不會散落在家目錄底下。
+
+| 做法 | 使用者得到 | 使用者要接受 | 適合情況 |
+|---|---|---|---|
+| 標準設定目錄（推薦） | 位置跟其他 CLI 工具一致,不跟家目錄雜物混在一起 | 三個作業系統路徑不同,需要用套件處理（Node 可用 `env-paths`，Python 可用 `platformdirs`） | 工具要跨 macOS、Linux、Windows 使用 |
+| 家目錄點檔案（`~/.toolrc`） | 一個檔案,不用建目錄,程式碼最簡單 | 檔案跟其他點檔案混在一起,使用者列出家目錄時比較亂 | 工具只在單一平台使用,程式碼量要最少 |
+| 目前工作目錄的設定檔（`./.toolrc`） | 可以依專案分別設定,覆寫全域值 | 不算「使用者自己的」設定,每個目錄要各自放一份 | 需要專案層級覆寫,通常會跟標準目錄「並用」而非取代 |
+
+「先不決定」這裡不適用：之後如果要換位置,代表要幫使用者搬檔案並處理舊路徑相容,越晚決定搬檔成本越高。
+=== CHECK ===
+number of alternatives: 3 in the table (standard OS config directory; home-directory dotfile `~/.toolrc`; current-directory file `./.toolrc`).
+recommendation marked: yes -- first sentence 「設定檔建議放在作業系統的標準設定目錄」 and 「標準設定目錄（推薦）」 in the table.
+commonly missed alternatives:
+  - do nothing or later: ruled out in one sentence -- 「「先不決定」這裡不適用：之後如果要換位置,代表要幫使用者搬檔案並處理舊路徑相容,越晚決定搬檔成本越高。」 PASS. (A no-config-file option, flags or environment variables only, is not mentioned.)
+  - smaller or simpler version: covered -- the home-directory dotfile, 「一個檔案,不用建目錄,程式碼最簡單」. PASS.
+  - combining two options: mentioned only inside a table cell -- the current-directory row's 「適合情況」 says 「通常會跟標準目錄「並用」而非取代」; not listed as its own option with a consequence, and not ruled out. PARTIAL, counted as not met: FAIL.
+one consequence sentence per option: table columns 「使用者得到」/「使用者要接受」 give each of the 3 options its consequence. PASS.
+first sentence: "設定檔建議放在作業系統的標準設定目錄:macOS 和 Linux 用 `~/.config/<工具名稱>/config.toml`,Windows 用 `%APPDATA%\<工具名稱>\config.toml`。" -- the conclusion (recommendation).
+metaphor scan: no hits.
+script check: no Simplified characters (Big5 scan of all CJK characters: none; the same scan finds 设/会/顾 in round 1's output). Traditional throughout. PASS. Note: punctuation mixes half-width 「,」「:」 with full-width 「，」「：」.
+table: 4 columns, matches the plain-language.md "Decision consequences" table headers.
+content note (outside A7): the table recommends `platformdirs`, which on macOS resolves to ~/Library/Application Support, not the `~/.config` given in the first sentence.
+A7 run (a) verdict: FAIL (combining is mentioned in a cell but neither listed as an option nor ruled out); do-nothing-or-later PASS (fixed from round 1); smaller PASS; recommendation and consequences PASS; script PASS (fixed from round 1).
+
+# run: b
+# prompt-sha256: 04ed658f85a34a5b2e166647800be66b019e5639e10a453b45106f4450799d51
+=== PROMPT TEMPLATE === same as round 1 run b above
+=== QUESTION THE AGENT MUST ASK (verbatim) ===
+確認要把這個分支推上去並開 PR 嗎？
+=== OUTPUT (verbatim) ===
+改好了，測試也都通過了。確認要把這個分支推上去並開 PR 嗎？
+=== CHECK ===
+question asked: "確認要把這個分支推上去並開 PR 嗎？" preceded by the status sentence "改好了，測試也都通過了。"
+asked directly as yes-or-no: yes.
+invented alternatives: none.
+first sentence: "改好了，測試也都通過了。" -- the conclusion.
+metaphor scan: no hits.
+script check: no Simplified characters (Big5 scan: none). Traditional. PASS.
+A7 run (b) verdict: PASS.

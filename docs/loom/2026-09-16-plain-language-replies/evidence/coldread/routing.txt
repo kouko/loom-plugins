@@ -1,0 +1,91 @@
+# card-blob: f3cf31688399439d34f1e88118c96a7198a2a9c2  (loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md)
+# skill-blob: ea667cd596aa385bd33ae826215e17c5d728982f  (loom-workflow/skills/loom-visualization/SKILL.md)
+# model: sonnet
+# command: cd <empty temp dir outside repo> && CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --disable-slash-commands --strict-mcp-config --tools "" --model sonnet --output-format text  (prompt on stdin; one fresh invocation per run; sha256 of each assembled prompt under its run)
+# isolation: run from an empty temp directory outside the repo; CLAUDE_CODE_DISABLE_CLAUDE_MDS=1, --setting-sources project, --disable-slash-commands, --strict-mcp-config and --tools "" keep the user's CLAUDE.md, installed plugins/skills, hooks and file tools out; a pre-run probe with the same command answered 'no CLAUDE.md, no skills, no hook text'. (--bare was tried first and refused: 'Not logged in'.)
+# prompt template placeholders: {CARD} = full text of the card blob above; {ROUTING} = SKILL.md section from '## Plain language and conversation tables' up to (not including) '## Step 1'; {REF} = full text of references/plain-language.md at the reference blob
+# note: no reference contents supplied; only the file names under references/.
+# note: harness framing is English; the user turns are Chinese, as kouko would send them.
+
+=== PROMPT TEMPLATE run a (verbatim) ===
+You are an AI coding assistant working with a user in a chat session.
+
+The following text is injected into your context with every user message:
+<injected-card>
+{CARD}</injected-card>
+
+The loom-visualization skill's SKILL.md contains this section:
+<skill-md-section>
+{ROUTING}</skill-md-section>
+
+The loom-visualization skill's references/ folder contains these files (contents not shown):
+- references/client-matrix.md
+- references/fidelity-check.md
+- references/mermaid-cot-spec.md
+- references/page-mode.md
+- references/plain-language.md
+- references/tables-business.md
+- references/tables-design.md
+- references/tables-software.md
+
+The user now sends:
+
+[User]
+幫我回報一下目前的進度：三個任務完成兩個，一個卡在等審查
+
+Before replying, decide which of the reference files above, if any, you would read. Answer with the list of files you would read and one sentence each on why; say "none" if you would read none. Do not write the reply itself.
+
+# run: a
+# prompt-sha256: 69e52edba3dbf0f05b4ff99bada8e939ba3916d48a64839ce8cf9f5e5138cd3e
+=== USER TURN (verbatim) ===
+幫我回報一下目前的進度：三個任務完成兩個，一個卡在等審查
+=== OUTPUT (verbatim) ===
+references/plain-language.md — this is a progress-report situation (3 tasks, 2 done, 1 blocked on review), which is a conversation-situation reply covered by this file.
+=== CHECK ===
+files named: references/plain-language.md only.
+tables-software.md / tables-design.md / tables-business.md named: none.
+reason given: progress-report situation is a conversation-situation reply covered by plain-language.md.
+answer language: English (the meta question in the harness was English; this run does not show reply language).
+A9 run (a) verdict: PASS.
+
+=== PROMPT TEMPLATE run b (verbatim) ===
+You are an AI coding assistant working with a user in a chat session.
+
+The following text is injected into your context with every user message:
+<injected-card>
+{CARD}</injected-card>
+
+The loom-visualization skill's SKILL.md contains this section:
+<skill-md-section>
+{ROUTING}</skill-md-section>
+
+The loom-visualization skill's references/ folder contains these files (contents not shown):
+- references/client-matrix.md
+- references/fidelity-check.md
+- references/mermaid-cot-spec.md
+- references/page-mode.md
+- references/plain-language.md
+- references/tables-business.md
+- references/tables-design.md
+- references/tables-software.md
+
+The user now sends:
+
+[User]
+幫我寫一份上週資料庫當機的事故報告
+
+Before replying, decide which of the reference files above, if any, you would read. Answer with the list of files you would read and one sentence each on why; say "none" if you would read none. Do not write the reply itself.
+
+# run: b
+# prompt-sha256: d8bdd478fe208d7fa92af67997249b6db2650120038bc8de06b0c271501a215a
+=== USER TURN (verbatim) ===
+幫我寫一份上週資料庫當機的事故報告
+=== OUTPUT (verbatim) ===
+references/tables-software.md — the user is asking for an incident postmortem (事故報告), which is one of the named software document types this file covers.
+=== CHECK ===
+files named: references/tables-software.md only.
+plain-language.md named: no (allowed either way).
+tables-design.md / tables-business.md named: none.
+reason given: 事故報告 is an incident postmortem, a named software document type.
+answer language: English (the meta question in the harness was English; this run does not show reply language).
+A9 run (b) verdict: PASS.
