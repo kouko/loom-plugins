@@ -40,8 +40,8 @@ charter: 1.0
 
 **W2-02 loom-code release notes, versions and checks**  after: W2-01  acceptance: 7
 - Files: `loom-code/CHANGELOG.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/scripts/test_write_plan_station_text.py`
-- Test: A7 positive: package-groups-and-check-mechanisms-green; negative: stale-3-5-0-pin-fails.
-- Risk: minor release 3.6.0 after main shipped 3.5.0; contract version changes only if a manifest test pins the template text. agent-decided.
+- Test: A7 positive: package-groups-and-check-mechanisms-green; negative: stale-3-6-1-pin-fails.
+- Risk: minor release 3.7.0 after main shipped 3.6.1 (trunk synced at 8a30883a); contract version changes only if a manifest test pins the template text. agent-decided.
 
 ### Wave 3 — adversary findings (end-of-Build probes at 97017250)
 
