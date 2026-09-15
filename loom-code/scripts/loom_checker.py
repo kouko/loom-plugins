@@ -18,6 +18,7 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py land --accepted-by <name>
     loom_checker.py land --cleanup <branch>
     loom_checker.py land --sweep [--confirm <token>]
+    loom_checker.py sync-trunk
     loom_checker.py reviewer-count <change-id>
     loom_checker.py finalize-review <change-id> --input <review-input.json>
     loom_checker.py standing <path-to-intent>
@@ -55,6 +56,7 @@ from loom_checker.command_handlers.push import cmd_push
 from loom_checker.command_handlers.reviewer_count import cmd_reviewer_count
 from loom_checker.command_handlers.selection import cmd_selection
 from loom_checker.command_handlers.standing import cmd_standing
+from loom_checker.command_handlers.sync import cmd_sync_trunk
 from loom_checker.helpers import UsageError
 from loom_checker.rules import list_rules
 
@@ -69,6 +71,7 @@ COMMANDS = {
     "push": cmd_push,
     "publish": cmd_publish,
     "land": cmd_land,
+    "sync-trunk": cmd_sync_trunk,
     "standing": cmd_standing,
     "contract": cmd_contract,
     "charter": cmd_charter,

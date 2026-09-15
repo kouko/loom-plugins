@@ -58,6 +58,17 @@ fallback instead of model escalation.
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
+Before dispatching reviewers in Round 1, run
+`python3 <loom-code>/scripts/loom_checker.py sync-trunk` from the change
+worktree. When it reports `up to date`, continue. When it reports
+`content changed`, dispatch no reviewer and return to Build §3 to re-run the
+complete package suite and the existing adversarial programs, then start
+Round 1 again. When it prints `WARN review.sync`, state the warning in the
+round report and continue. When it prints `BLOCK review.sync`, dispatch no
+reviewer and return the change to Build. Any other result, including exit 2,
+dispatches no reviewer and reports the printed message. Run it before the
+blind run (§3), so the blind run exercises the synced content.
+
 Before dispatching reviewers in any round, confirm on the current functional
 content (a committed blind-run report aside) that Build's hand-off reports the
 complete package suite passing or `selection show` lists `package-tests` as
@@ -185,16 +196,15 @@ content the reviewers last read; publication-only edits do not change it.
 - **Round 2 — fix verification.** Batch fatal and important findings, return to
   Build, which repeats its end-of-Build mechanical checks, and resume the same
   reviewers over the functional fix delta.
-- **Round 3 — terminal verification.** If Round 2 still has blockers, first
-  stop local patching and perform a technical design re-look. The agent owns
-  that re-plan when it preserves requirements, visible behavior, and
-  guarantees. Review the resulting final digest once. `NEEDS_REVISION` ends
-  the episode as `NON_CONVERGENT`; never dispatch Round 4.
+- **Round 3 — terminal verification.** Review the final digest once.
+  `NEEDS_REVISION` ends the episode as `NON_CONVERGENT`; never dispatch Round 4.
 
-Treat the episode as stuck when the same blocker survives two consecutive
-rounds, the blocker count does not decrease after a functional fix, or the fix
-repeats the same mechanism shape. Stop local patching at that point and use the
-next available round only after the technical design re-look.
+Treat the episode as stuck when Round 2 still has blockers, the same blocker
+survives two consecutive rounds, the blocker count does not decrease after a
+functional fix, or the fix repeats the same mechanism shape; stop local
+patching then, and use the next available round only after the technical
+design re-look. The agent owns that re-plan when it preserves requirements,
+visible behavior, and guarantees.
 
 Do not ask the user whether to continue or which technical repair to choose.
 Ask only when resolving the blocker would change requirements, visible
@@ -274,7 +284,8 @@ attestation directly.
 When `finalize-review` fails, return the fix to Build, which repeats its
 end-of-Build mechanical checks, and the fixed content, a new functional-content
 digest, must pass the next review round (§4) before `finalize-review` runs
-again. Earlier verdicts are never reused for the fixed content. When no round
+again. No technical design re-look precedes that round unless the episode is
+stuck. Earlier verdicts are never reused for the fixed content. When no round
 remains, the fix would need a fourth distinct digest, which §4 forbids, so it
 ends the episode as `NON_CONVERGENT`.
 

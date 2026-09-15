@@ -23,7 +23,7 @@ def test_review_episode_has_three_distinct_content_rounds_and_no_identity_reset(
         assert identity in REVIEW_WORDS
 
 
-def test_round_roles_require_relook_before_terminal_round() -> None:
+def test_round_roles_name_three_rounds_and_relook_term() -> None:
     assert "Round 1" in REVIEW_WORDS
     assert "Round 2" in REVIEW_WORDS
     assert "Round 3" in REVIEW_WORDS
@@ -378,3 +378,85 @@ def test_unresolved_adversarial_findings_reach_finalize_input() -> None:
     destination = next(s for s in _sentences(recording) if "`findings` input of `finalize-review`" in s)
     assert "closing review passes" in destination, destination
     assert not has_negation(destination), destination
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-15-station-gaps-after-dogfood — acceptance 2
+# ---------------------------------------------------------------------------
+
+def _round_three_bullet() -> str:
+    start = REVIEW.index("- **Round 3")
+    return " ".join(REVIEW[start:].split("\n\n", 1)[0].split())
+
+
+def test_round2_blockers_still_require_relook_before_round3() -> None:
+    stuck = next(
+        s for s in split_sentences(REVIEW_WORDS, ends=".")
+        if s.startswith("Treat the episode as stuck")
+    )
+    trigger, _, action = stuck.partition(";")
+    condition = next(c for c in trigger.split(", ") if "Round 2 still has blockers" in c)
+    assert not has_negation(condition), condition
+    assert "stop local patching" in action, stuck
+    assert "technical design re-look" in action, stuck
+    assert not has_negation(action), action
+
+
+def _round_three_relook_sentences(text: str) -> list[str]:
+    """Sentences that name Round 3 and also the technical design re-look."""
+    return [s for s in _sentences(text) if "Round 3" in s and "technical design re-look" in s]
+
+
+def test_round_three_relook_helper_synthetic() -> None:
+    assert _round_three_relook_sentences(
+        "Round 1 reviews. Before Round 3, always perform a technical design re-look."
+    ) == ["Before Round 3, always perform a technical design re-look."]
+    assert _round_three_relook_sentences(
+        "Treat the episode as stuck when Round 2 still has blockers; use the next "
+        "available round only after the technical design re-look."
+    ) == []
+
+
+def test_finalize_failure_round_requires_no_relook() -> None:
+    bullet = _round_three_bullet()
+    assert "technical design re-look" not in bullet, bullet
+    assert "stop local patching" not in bullet, bullet
+    converge = _flat_section("## 4. Converge within one bounded episode")
+    assert _round_three_relook_sentences(converge) == []
+    finalize = _flat_section("## 5. Finalize")
+    for sentence in _sentences(finalize):
+        if "technical design re-look" in sentence:
+            assert has_negation(sentence), sentence
+            assert "unless the episode is stuck" in sentence, sentence
+
+
+_NO_RELOOK = "No technical design re-look precedes that round unless the episode is stuck."
+
+
+def test_finalize_failure_round_states_no_relook_unless_stuck() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    assert _NO_RELOOK in finalize
+    assert "fix verification, as in Round 2" not in finalize
+    assert not _OPTIONAL_ROUND.search(_NO_RELOOK)
+
+
+def test_reviewer_contract_does_not_tie_relook_to_round3() -> None:
+    reviewer = " ".join(REVIEWER.split())
+    tied = [
+        s for s in _sentences(reviewer)
+        if "Round 3" in s and "technical design re-look" in s
+    ]
+    assert tied == [], tied
+
+
+def test_dispatch_profile_does_not_tie_relook_to_round3() -> None:
+    profile = (ROOT / "loom-code/references/dispatch-profile.md").read_text(
+        encoding="utf-8"
+    )
+    prose = " ".join(re.sub(r"`[^`]*`", "", profile).split())
+    tied = [
+        s for s in _sentences(prose)
+        if re.search(r"round[- ]3", s, re.IGNORECASE)
+        and re.search(r"re-look|redesign", s, re.IGNORECASE)
+    ]
+    assert tied == [], tied

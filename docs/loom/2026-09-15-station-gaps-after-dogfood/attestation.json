@@ -1,0 +1,115 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-15-station-gaps-after-dogfood",
+  "content_digest": "317d99fcb331301bac304d4a7b2b462126c442bc",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_pin_mutants.py -q",
+      "artifact": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_pin_mutants.py",
+      "result": "pass",
+      "command_digest": "c5a836086a2b23fbe72b97f9056e2fef5d21e1cf7270832ad6aabec05f3d631a"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_suite_command_source.py -q",
+      "artifact": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_suite_command_source.py",
+      "result": "pass",
+      "command_digest": "8ce16e908e35a0ca4e63cbfc9b3781183291e206a62745a99d32a562c482cda0"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_relook_and_budget.py -q",
+      "artifact": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_relook_and_budget.py",
+      "result": "pass",
+      "command_digest": "e7282e5506a5faf7f7f8997c3f49c3877fed293c841022fc060dfa1b4373bc1b"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "sg-code-r1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "status": "dismissed",
+          "anchor": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_pin_mutants.py :: DEFECT_PROBES",
+          "text": "Probe docstrings and DEFECT_PROBES tuples still describe the probes as expected to fail; adversary artifact, not re-dispatched on a fix loop; follow-up."
+        },
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "status": "dismissed",
+          "anchor": "loom-code/skills/build/SKILL.md:87-88",
+          "text": "'the command detected from build markers' is narrower than the checker's fallback (also test files); widening exceeds the 2952-word budget; follow-up."
+        },
+        {
+          "severity": "nit",
+          "dimension": "naming",
+          "status": "open",
+          "anchor": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_suite_command_source.py:30",
+          "text": "Probe variable still named STEP_2 while slicing Build step 3; adversary artifact; follow-up."
+        },
+        {
+          "severity": "nit",
+          "dimension": "deliberate-simplification",
+          "status": "open",
+          "anchor": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_relook_and_budget.py:25",
+          "text": "BASE is fixed at 040e5010; a later trunk merge must update it; follow-up."
+        }
+      ]
+    },
+    {
+      "reviewer": "sg-skill-r1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "status": "open",
+          "anchor": "loom-code/skills/build/SKILL.md:111-113",
+          "text": "After a BLOCK review.sync at step 1 the adversary has not run, but the every-fix re-run says not to dispatch it again; finalize-review refuses a change with no adversarial artifact, so the slip is caught mechanically; follow-up."
+        },
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "status": "open",
+          "anchor": "docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/dogfood-rerun.md :: | File | 9906c79c | HEAD |",
+          "text": "The pre-merge word-budget table still labels its column HEAD; the post-merge table below is correct; follow-up."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "source": "end-of-Build adversary",
+      "severity": "important",
+      "status": "open",
+      "anchor": "loom-code/skills/closing-review/references/adversarial.md :: Skill and gate",
+      "text": "The adversary contract cites attack-catalogue.md, which does not exist in this repository; the six-class skill/gate attack could not be run.",
+      "fix": "Out of scope per the intent; restore the catalogue or remove the citation in a separate change."
+    },
+    {
+      "source": "sg-skill-r1",
+      "severity": "note",
+      "status": "open",
+      "anchor": "loom-code/scripts/dispatch_profile.py:30",
+      "text": "Trigger id round-3-redesign-adjudication kept (caller input contract); its name no longer matches the prose; follow-up."
+    }
+  ],
+  "selection": null
+}
