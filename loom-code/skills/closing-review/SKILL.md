@@ -9,7 +9,7 @@ version: 1.5.0
 
 Reviewer findings and generated evidence are written in English.
 
-Review decides whether the completed functional content is ready. It produces
+`closing-review` decides whether the completed functional content is ready. It produces
 `docs/loom/<change-id>/attestation.json`; agents never edit that file by hand.
 
 ## 1. Establish the content

@@ -203,7 +203,7 @@ twice.
 
    For the current contract, automatic publication is the default. This same
    restatement explicitly says that answering yes authorizes a later non-forced
-   push and Ready PR after Review and publication checks pass, while merge
+   push and Ready PR after `closing-review` and publication checks pass, while merge
    remains a separate decision. Say that the user may explicitly opt out before
    publication. Write
    `publication: automatic — authorized <date> by <name>` only after that

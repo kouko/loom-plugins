@@ -116,9 +116,22 @@ def test_changeddiff_stationnameonly_meaningunchanged(path: str) -> None:
     reverted = head.replace("**closing-review** station", "**review** station")
     reverted = reverted.replace("closing-review station", "review station")
     reverted = reverted.replace("The closing-review station", "The review station")
+    # W2-01: a capitalised "Review" that named the station became closing-review
+    reverted = reverted.replace("`closing-review`", "Review")
+    reverted = reverted.replace("return to closing-review", "return to Review")
+    reverted = _undo_description_station(reverted)
     # sentence-initial capital in the base
     assert reverted.lower() == base.lower(), f"{path}: reworded text differs beyond the station name"
     assert reverted == base or _case_only_initial(reverted, base), f"{path}: casing drift beyond sentence start"
+
+
+def _undo_description_station(text: str) -> str:
+    """Map a plain closing-review station noun in a skill description back to Review."""
+    m = re.search(r"description: (.*?) (?:version:|---)", text)
+    if not m:
+        return text
+    desc = re.sub(r"(?<![\w:-])closing-review(?![\w-])", "Review", m.group(1))
+    return text[:m.start(1)] + desc + text[m.end(1):]
 
 
 def _case_only_initial(a: str, b: str) -> bool:
