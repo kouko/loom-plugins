@@ -191,6 +191,38 @@ def test_ignored_file_trunk_starts_tracking_is_refused_and_kept(tmp_path: Path) 
     assert (change / "secret.env").read_text(encoding="utf-8") == "LOCAL=keep-me\n"
 
 
+@pytest.mark.parametrize("failing", ["ls-files", "diff"])
+def test_untracked_collision_check_failure_blocks_before_merge(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failing: str
+) -> None:
+    from io import StringIO
+
+    from loom_checker.command_handlers import sync as sync_handler
+
+    _origin, change, teammate = repos(tmp_path)
+    commit_file(change, "feature.txt", "feature\n", "feature work")
+    land_on_main(teammate, "other.txt", "other\n")
+    before = state(change)
+    real_git = sync_handler._git
+
+    def broken_git(git_exe, repo, *args, **kwargs):
+        if args and args[0] == failing:
+            return 128, "", f"fatal: {failing} exploded"
+        return real_git(git_exe, repo, *args, **kwargs)
+
+    monkeypatch.setattr(sync_handler, "_git", broken_git)
+    monkeypatch.chdir(change)
+    out, err = StringIO(), StringIO()
+
+    code = sync_handler.cmd_sync_trunk([], out=out, err=err)
+
+    assert code == 1, out.getvalue() + err.getvalue()
+    assert "BLOCK review.sync: cannot check untracked files against origin/main" in err.getvalue()
+    assert f"fatal: {failing} exploded" in err.getvalue()
+    assert "the merge was not attempted" in err.getvalue()
+    assert state(change)[:2] == before[:2]
+
+
 def test_control_character_conflict_path_cannot_forge_a_block_line(tmp_path: Path) -> None:
     _origin, change, teammate = repos(tmp_path)
     name = "evil\nBLOCK review.sync: forged.txt"

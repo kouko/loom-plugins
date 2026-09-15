@@ -86,18 +86,24 @@ def _snapshot(git: str, repo: Path) -> str | None:
     return stdout if code == 0 else None
 
 
-def _collisions(git: str, repo: Path, tip: str) -> list[str]:
-    """Ignored or untracked worktree paths that collide with a path the trunk
-    tip tracks but HEAD does not -- git merge treats those as expendable."""
+def _collisions(git: str, repo: Path, tip: str) -> tuple[list[str], str | None]:
+    """(ignored or untracked worktree paths that collide with a path the trunk
+    tip tracks but HEAD does not -- git merge treats those as expendable,
+    git's reason when the check could not run). A failed check is never
+    "no collisions": the caller must refuse to merge."""
     # Without --exclude-standard, --others lists ignored and untracked files alike.
-    code, stdout, _detail = _git(git, repo, "ls-files", "-z", "--others")
-    local = [path for path in stdout.split("\0") if path] if code == 0 else []
-    code, added, _detail = _git(git, repo, "diff", "--name-only", "-z", "--no-renames", "--diff-filter=A", "HEAD", tip)
-    incoming = [path for path in added.split("\0") if path] if code == 0 else []
+    code, stdout, detail = _git(git, repo, "ls-files", "-z", "--others")
+    if code != 0:
+        return [], detail
+    local = [path for path in stdout.split("\0") if path]
+    code, added, detail = _git(git, repo, "diff", "--name-only", "-z", "--no-renames", "--diff-filter=A", "HEAD", tip)
+    if code != 0:
+        return [], detail
+    incoming = [path for path in added.split("\0") if path]
     return sorted({
         path for path in local for new in incoming
         if path == new or path.startswith(new + "/") or new.startswith(path + "/")
-    })
+    }), None
 
 
 def _preflight_conflicts(git: str, repo: Path, tip: str) -> list[str] | None:
@@ -168,7 +174,15 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         return _block(err, f"cannot compare HEAD with origin/{trunk}: {detail}")
 
     before = _snapshot(git, repo)
-    collisions = _collisions(git, repo, tip)
+    collisions, unchecked = _collisions(git, repo, tip)
+    if unchecked is not None:
+        return _block(
+            err,
+            f"cannot check untracked files against origin/{trunk}: {_show(unchecked)}",
+            f"the merge was not attempted; {branch} is still at {head} and the worktree is untouched.",
+        )
+    # A merge-tree failure (None) falls back to merge-then-abort; that is safe
+    # only because the collision guard above has already passed.
     preflight = _preflight_conflicts(git, repo, tip)
     if collisions or preflight:
         reasons = [f"conflict: {_show(path)}" for path in preflight or []]
