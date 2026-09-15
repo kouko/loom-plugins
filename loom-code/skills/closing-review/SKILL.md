@@ -58,6 +58,15 @@ fallback instead of model escalation.
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
+Before dispatching reviewers in Round 1, run
+`python3 <loom-code>/scripts/loom_checker.py sync-trunk` from the change
+worktree. When it reports `up to date`, continue. When it reports
+`content changed`, dispatch no reviewer and return to Build §3 to re-run the
+complete package suite and the existing adversarial programs, then start
+Round 1 again. When it prints `WARN review.sync`, state the warning in the
+round report and continue. When it prints `BLOCK review.sync`, dispatch no
+reviewer and return the change to Build.
+
 Before dispatching reviewers in any round, confirm on the current functional
 content (a committed blind-run report aside) that Build's hand-off reports the
 complete package suite passing or `selection show` lists `package-tests` as

@@ -76,13 +76,19 @@ Run focused tests after each task. After all tasks land, run the relevant
 integration checks once to expose cross-task defects. Then end Build with its
 mechanical checks, in this order:
 
-1. Dispatch the `loom-code:adversary` agent fresh-context, resolving its
+1. From the change worktree, run
+   `python3 <loom-code>/scripts/loom_checker.py sync-trunk`, so the adversary,
+   the suite and the programs all see the fetched trunk tip. On
+   `BLOCK review.sync`, fix the cause inside Build, where a conflict is resolved as
+   implementation work in a new build round, never by the command. On
+   `WARN review.sync`, continue unsynced.
+2. Dispatch the `loom-code:adversary` agent fresh-context, resolving its
    profile as §2 requires before every host-native dispatch. Never dispatch an
    agent that implemented any part of the change. Give it only the change id,
    `HEAD`, and paths: the intent, the plan, and the changed paths with their
    artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
    adversarial programs.
-2. Run the repository's complete package suite, then each committed
+3. Run the repository's complete package suite, then each committed
    adversarial program.
 
 When a check fails, the fix is made inside Build as §2 assigns implementation
@@ -107,8 +113,9 @@ again.
 
 ## 4. Hand off to Review
 
-Commit functional changes normally. Report the branch base, HEAD, changed
-paths, focused test results, the complete package suite command and its result,
+Commit functional changes normally. Report the branch base, HEAD, the
+`sync-trunk` result with any warning it printed, changed paths, focused test
+results, the complete package suite command and its result,
 each adversarial program's path and command, every unresolved adversary finding, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after Review generates it.
