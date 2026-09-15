@@ -108,30 +108,67 @@ def test_stationprose_capitalizedreview_noproperstationnoun() -> None:
     )
 
 
-@pytest.mark.parametrize("path", CHANGED)
+# W2-01: exact phrase reversals, HEAD phrase -> base phrase, whitespace-normalised.
+# Each phrase must occur exactly once in its file; files listed here compare exactly.
+W2_REVERSALS: dict[str, list[tuple[str, str]]] = {
+    "loom-code/skills/write-plan/SKILL.md": [
+        ("after `closing-review` and publication checks pass", "after Review and publication checks pass"),
+    ],
+    "loom-design/skills/capture-intent/SKILL.md": [
+        ("after `closing-review` and publication checks pass", "after Review and publication checks pass"),
+        ("opt-in question; `closing-review` computes the reviewer floor later",
+         "opt-in question; Review computes the reviewer floor later"),
+    ],
+    "loom-code/skills/build/SKILL.md": [
+        ("hand off to `closing-review` until the complete package suite",
+         "hand off to Review until the complete package suite"),
+        ("## 4. Hand off to closing-review Commit", "## 4. Hand off to Review Commit"),
+        ("never edits it after `closing-review` generates it.", "never edits it after Review generates it."),
+    ],
+    "loom-code/skills/closing-review/SKILL.md": [
+        ("`closing-review` decides whether the completed functional content",
+         "Review decides whether the completed functional content"),
+        ("The `closing-review` orchestrator enforces", "The Review orchestrator enforces"),
+        ("do not reopen `closing-review`. <!-- /gate -->", "do not reopen Review. <!-- /gate -->"),
+    ],
+    "loom-code/skills/expert-mode/SKILL.md": [
+        ("recorded only when `closing-review` hands it to the checker",
+         "recorded only when Review hands it to the checker"),
+    ],
+    "loom-code/skills/ship/SKILL.md": [
+        ("Use after closing-review generates a matching content attestation.",
+         "Use after Review generates a matching content attestation."),
+        ("reviewer rejection `closing-review` never handed to the checker",
+         "reviewer rejection Review never handed to the checker"),
+        ("do not return to `closing-review`. Functional edits", "do not return to Review. Functional edits"),
+    ],
+    "loom-design/.codex-plugin/plugin.json": [
+        ("the spec goes to loom-code's closing-review station under its spec",
+         "the spec goes to loom-code's review station under its spec"),
+    ],
+}
+W2_ONLY = [p for p in W2_REVERSALS if p not in CHANGED]
+
+
+@pytest.mark.parametrize("path", CHANGED + W2_ONLY)
 def test_changeddiff_stationnameonly_meaningunchanged(path: str) -> None:
     """Undoing only the station-name substitution restores the base text exactly, modulo whitespace."""
     head = _norm((REPO / path).read_text(encoding="utf-8"))
     base = _norm(_git_show(BASE, path))
-    reverted = head.replace("**closing-review** station", "**review** station")
-    reverted = reverted.replace("closing-review station", "review station")
-    reverted = reverted.replace("The closing-review station", "The review station")
-    # W2-01: a capitalised "Review" that named the station became closing-review
-    reverted = reverted.replace("`closing-review`", "Review")
-    reverted = reverted.replace("return to closing-review", "return to Review")
-    reverted = _undo_description_station(reverted)
+    reverted = head
+    if path in CHANGED:
+        reverted = reverted.replace("**closing-review** station", "**review** station")
+        reverted = reverted.replace("closing-review station", "review station")
+        reverted = reverted.replace("The closing-review station", "The review station")
+    for new, old in W2_REVERSALS.get(path, []):
+        assert reverted.count(new) == 1, f"{path}: W2-01 phrase not found exactly once: {new!r}"
+        reverted = reverted.replace(new, old)
+    if path in W2_REVERSALS:
+        assert reverted == base, f"{path}: reworded text differs beyond the W2-01 station-name phrases"
+        return
     # sentence-initial capital in the base
     assert reverted.lower() == base.lower(), f"{path}: reworded text differs beyond the station name"
     assert reverted == base or _case_only_initial(reverted, base), f"{path}: casing drift beyond sentence start"
-
-
-def _undo_description_station(text: str) -> str:
-    """Map a plain closing-review station noun in a skill description back to Review."""
-    m = re.search(r"description: (.*?) (?:version:|---)", text)
-    if not m:
-        return text
-    desc = re.sub(r"(?<![\w:-])closing-review(?![\w-])", "Review", m.group(1))
-    return text[:m.start(1)] + desc + text[m.end(1):]
 
 
 def _case_only_initial(a: str, b: str) -> bool:
@@ -139,7 +176,7 @@ def _case_only_initial(a: str, b: str) -> bool:
     return all(a[i].lower() == b[i].lower() and (i == 0 or a[i - 1] in " *`(") for i in diffs)
 
 
-@pytest.mark.parametrize("path", CHANGED)
+@pytest.mark.parametrize("path", CHANGED + W2_ONLY)
 def test_gatemarkers_afterrename_unchanged(path: str) -> None:
     """Gate markers and backticked review-bearing ids are identical before and after the rename."""
     marker = re.compile(r"<!--\s*gate:[^>]*-->")
@@ -172,6 +209,15 @@ def test_checkerwarn_standingmessage_nolegacyname() -> None:
     assert m is None, (
         "FINDING: loom_checker standing WARN still prints 'the review station' to agents: ..."
         + text[max(0, m.start() - 40):m.end() + 40]
+    )
+
+
+def test_landmessage_attestationblock_closingreviewname() -> None:
+    """land's missing-attestation BLOCK, which agents read at runtime, sends them back to closing-review."""
+    text = _norm((REPO / "loom-code/scripts/loom_checker/command_handlers/land.py").read_text(encoding="utf-8"))
+    assert "return to closing-review" in text, "land BLOCK message no longer names closing-review"
+    assert "return to Review" not in text, (
+        "FINDING: loom_checker land still prints 'return to Review' to agents"
     )
 
 
