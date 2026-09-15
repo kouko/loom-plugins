@@ -7,12 +7,18 @@ the mutated file, records whether any test turns RED, and restores the file.
 The same mutation is applied to the base tree at the sentence's base location,
 so a mutant killed on base but surviving on the branch is a weakened pin.
 
-Usage: python3 moved_pin_mutation.py <head-tree> <base-tree>
-Exit 1 when any mutant survives on head that base killed.
+Usage (from the repository root):
+  python3 docs/loom/2026-09-16-loom-rule-text-consolidation/evidence/probes/moved_pin_mutation.py
+It adds detached worktrees for HEAD and the base commit under a fresh
+temporary directory and removes them with plain `git worktree remove`.
+Exit 1 when a control run is red or any mutant survives on head that base
+killed.
 """
 from __future__ import annotations
 
+import os
 import subprocess
+import tempfile
 import sys
 from pathlib import Path
 
@@ -104,8 +110,30 @@ def _run(tree: Path, edits) -> tuple[str, list[str]]:
     return verdict, tests
 
 
+BASE_COMMIT = "dec4e927"
+REPO = Path(__file__).resolve().parents[5]
+
+
 def main() -> int:
-    head, base = Path(sys.argv[1]), Path(sys.argv[2])
+    if len(sys.argv) == 3:
+        return _compare(Path(sys.argv[1]), Path(sys.argv[2]))
+    tmp = Path(tempfile.mkdtemp(prefix="moved-pin-mutation-"))
+    head, base = tmp / "head", tmp / "base"
+    added = []
+    try:
+        for tree, rev in ((head, "HEAD"), (base, BASE_COMMIT)):
+            subprocess.run(["git", "-C", str(REPO), "worktree", "add", "--detach", str(tree), rev],
+                           check=True, capture_output=True, text=True)
+            added.append(tree)
+        return _compare(head, base)
+    finally:
+        # Every mutation is restored inside _run, so a plain remove succeeds.
+        for tree in added:
+            subprocess.run(["git", "-C", str(REPO), "worktree", "remove", str(tree)], check=True)
+        os.rmdir(tmp)
+
+
+def _compare(head: Path, base: Path) -> int:
     weakened = 0
     for name, (head_edits, base_edits) in MUTANTS.items():
         # Control: the same test set on the unmutated tree must pass, or a
