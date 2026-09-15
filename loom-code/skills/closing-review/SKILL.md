@@ -58,10 +58,12 @@ fallback instead of model escalation.
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
-Before dispatching reviewers in any round, confirm that Build's hand-off
-reports the complete package suite and every adversarial program passing on
-the current functional content (a committed blind-run report aside), or that
-`selection show` lists that step as skipped. Otherwise return the change to
+Before dispatching reviewers in any round, confirm on the current functional
+content (a committed blind-run report aside) that Build's hand-off reports the
+complete package suite passing or `selection show` lists `package-tests` as
+skipped, and that it reports every adversarial program passing or
+`selection show` lists `adversarial` as skipped, each skip waiving only its own
+check. Otherwise return the change to
 Build and dispatch no reviewer. Reviewers read only content whose Build
 mechanical checks passed.
 

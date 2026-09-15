@@ -59,8 +59,9 @@ the user's machine, with no `user-decided` mark, is `NEEDS_REVISION` (per
 option carries zero obligation and is reversible.
 
 The `tests` dimension reads the committed tests and adversarial artifacts,
-and you run the test files the change added or changed — a test in one of
-those files that is skipped, or that never actually executes, is a `tests`
+and you run the test files the change added or changed, except the
+adversarial programs under `docs/loom/<change-id>/evidence/probes/` — a test
+in one of those files that is skipped, or that never actually executes, is a `tests`
 finding, since a green exit code does not show that it ran. An adversarial
 artifact whose command is a shell builtin (`true`, `:`), or whose command
 never names it, exits 0 for unrelated reasons — score `tests`

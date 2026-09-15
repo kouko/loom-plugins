@@ -87,7 +87,11 @@ mechanical checks, in this order:
 
 When a check fails, the fix is made inside Build as §2 assigns implementation
 work; the adversary never fixes what it breaks. Build does not hand off to
-Review until the complete package suite and every adversarial program pass.
+Review until the complete package suite has passed or `selection show` lists
+`package-tests` as skipped, and until every adversarial program has passed or
+it lists `adversarial` as skipped, each skip waiving only its own check. A
+hand-off with neither step skipped therefore means the complete package suite
+and every adversarial program pass.
 `finalize-review` still executes both once more on committed content.
 
 When `selection show` lists `adversarial` as skipped, dispatch no adversary and

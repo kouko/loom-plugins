@@ -1,5 +1,6 @@
 """Build ends with a fresh adversary, the package suite and adversarial programs."""
 
+import re
 from pathlib import Path
 
 from prose_pin import has_negation
@@ -39,11 +40,52 @@ def test_adversary_prompt_carries_no_implementer_explanation() -> None:
         assert leak not in VERIFY
 
 
+GATE = (
+    "Build does not hand off to Review until the complete package suite has passed or "
+    "`selection show` lists `package-tests` as skipped, and until every adversarial "
+    "program has passed or it lists `adversarial` as skipped, each skip waiving only "
+    "its own check."
+)
+GATE_CONSEQUENCE = (
+    "A hand-off with neither step skipped therefore means the complete package suite "
+    "and every adversarial program pass."
+)
+_HANDOFF = re.compile(r"\bhand(?:s|ed|ing)?[ -]off\b", re.IGNORECASE)
+_OPTIONAL = re.compile(
+    r"\b(?:optional(?:ly)?|may|might|if (?:needed|time permits)|at (?:your|its) discretion)\b",
+    re.IGNORECASE,
+)
+
+
+def _sentences(text: str) -> list[str]:
+    return [s for s in re.split(r"(?<=[.;])\s+", text) if s]
+
+
+def _extra_handoff_sentences(section: str) -> list[str]:
+    """Sentences about handing off to Review other than the pinned gate pair."""
+    return [
+        s for s in _sentences(section)
+        if _HANDOFF.search(s) and s not in (GATE, GATE_CONSEQUENCE)
+    ]
+
+
+def _optional_sentences(section: str) -> list[str]:
+    return [s for s in _sentences(section) if _OPTIONAL.search(s)]
+
+
+def test_handoff_helpers_synthetic() -> None:
+    assert _extra_handoff_sentences(f"{GATE} {GATE_CONSEQUENCE}") == []
+    escape = "When the diff is small, hand off to Review while the suite is still running."
+    assert _extra_handoff_sentences(f"{GATE} {escape}") == [escape]
+    assert _optional_sentences("Run the complete package suite.") == []
+    assert _optional_sentences("Optionally run the complete package suite.")
+
+
 def test_build_allows_complete_suite_at_end() -> None:
-    assert (
-        "Build does not hand off to Review until the complete package suite and every "
-        "adversarial program pass."
-    ) in VERIFY
+    assert VERIFY.count(GATE) == 1
+    assert GATE_CONSEQUENCE in VERIFY
+    assert _extra_handoff_sentences(VERIFY) == []
+    assert _optional_sentences(VERIFY) == []
     assert "`finalize-review` still executes both once more on committed content." in VERIFY
     assert "complete package suite command and its result" in HANDOFF
     assert "each adversarial program's path and command" in HANDOFF
@@ -62,7 +104,10 @@ def test_fix_return_reruns_existing_programs() -> None:
         VERIFY, "When closing review or a failed `finalize-review` returns the change to Build"
     )
     assert "repeat these end-of-Build checks" in sentence
+    assert "after the fix: run the complete package suite" in sentence
     assert "re-run the existing adversarial programs" in sentence
+    assert not has_negation(sentence), sentence
+    assert not _OPTIONAL.search(sentence), sentence
     assert "Do not dispatch the adversary again." in VERIFY
 
 

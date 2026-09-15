@@ -12,6 +12,8 @@ in those files is a finding.
 import re
 from pathlib import Path
 
+from prose_pin import has_negation
+
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEWER_PATH = ROOT / "loom-code/agents/reviewer.md"
@@ -45,6 +47,67 @@ def test_reviewer_text_runs_changed_test_files_and_flags_skips() -> None:
     assert "Open every source you cite." in reviewer
     assert "you write no probes" in reviewer
     assert "**Do not modify**" in reviewer
+
+
+RUN_RULE = "test files the change added or changed"
+PROBE_CARVE_OUT = (
+    "except the adversarial programs under `docs/loom/<change-id>/evidence/probes/`"
+)
+# Negations the skipped-test sentence legitimately carries; any other negation
+# inverts the finding ("is not a `tests` finding").
+_ALLOWED_NEGATIONS = ("never actually executes", "does not show that it ran")
+_FINDING = re.compile(r"\bis a (?:`tests` )?finding\b")
+_ROUND_SCOPED = re.compile(
+    r"\bRound \d\b|\b(?:first|final|last|later|early|some) rounds?\b", re.IGNORECASE
+)
+
+
+def _run_rule_sentences(text: str) -> list[str]:
+    return [s for s in _sentences(text) if RUN_RULE in s]
+
+
+def _skipped_test_is_finding(sentence: str) -> bool:
+    rest = sentence
+    for phrase in _ALLOWED_NEGATIONS:
+        rest = rest.replace(phrase, "")
+    return bool(_FINDING.search(sentence)) and not has_negation(rest)
+
+
+def test_prose_pin_helpers_synthetic() -> None:
+    assert _skipped_test_is_finding(
+        "a test that is skipped, or that never actually executes, is a `tests` finding."
+    )
+    assert not _skipped_test_is_finding(
+        "a test that is skipped, or that never actually executes, is not a `tests` finding."
+    )
+    assert not _ROUND_SCOPED.search("In every round, you never run the complete package suite.")
+    assert _ROUND_SCOPED.search("In Round 1, you never run the complete package suite.")
+
+
+def test_run_rule_excludes_adversarial_programs() -> None:
+    for path in (REVIEWER_PATH, LENSES_PATH):
+        rules = _run_rule_sentences(_flat(path))
+        assert len(rules) == 1, f"{path.name}: {rules}"
+        assert f"{RUN_RULE}, {PROBE_CARVE_OUT}" in rules[0], rules[0]
+    assert not [s for s in _sentences("You run the test files the change added or changed.")
+                if PROBE_CARVE_OUT in s]
+
+
+def test_skipped_changed_test_stays_a_finding() -> None:
+    for path in (REVIEWER_PATH, LENSES_PATH):
+        (rule,) = _run_rule_sentences(_flat(path))
+        assert _skipped_test_is_finding(rule), f"{path.name}: {rule}"
+
+
+def test_suite_ban_holds_in_every_round() -> None:
+    reviewer = _flat(REVIEWER_PATH)
+    assert (
+        "In every round, you never run the complete package suite or the adversarial programs"
+    ) in reviewer
+    for path in (REVIEWER_PATH, LENSES_PATH):
+        for sentence in _sentences(_flat(path)):
+            if _SUITE.search(sentence):
+                assert not _ROUND_SCOPED.search(sentence), f"{path.name}: {sentence!r}"
 
 
 _SUITE = re.compile(r"package suite|adversarial programs?\b", re.IGNORECASE)
