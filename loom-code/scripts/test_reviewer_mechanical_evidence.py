@@ -39,11 +39,23 @@ def test_reviewer_text_runs_changed_test_files_and_flags_skips() -> None:
     assert "not grounds for `PASS_WITH_NOTES`" in text
 
     reviewer = _flat(REVIEWER_PATH)
-    assert "`skills/closing-review/references/lenses.md`" in reviewer
+    assert "`loom-code/skills/closing-review/references/lenses.md`" in reviewer
     # What still holds: citation reading, no probes, no edits.
     assert "Open every source you cite." in reviewer
     assert "you write no probes" in reviewer
     assert "**Do not modify**" in reviewer
+
+
+LENSES_REF = "`loom-code/skills/closing-review/references/lenses.md`"
+
+
+def test_reviewer_spells_the_lenses_path_one_way() -> None:
+    """A4 negative (lenses-path-spelled-two-ways): reviewer.md sits at plugin
+    level, so every citation resolves from the repository root."""
+    reviewer = _flat(REVIEWER_PATH)
+    assert "`skills/closing-review/references/lenses.md`" not in reviewer
+    assert reviewer.count(LENSES_REF) == 4, reviewer.count(LENSES_REF)
+    assert LENSES_PATH.is_file()
 
 
 RUN_RULE = "test files the change added or changed"
@@ -208,7 +220,7 @@ def test_severity_verdict_rules_once_in_lenses() -> None:
         if re.search(r"→ `PASS", sentence):
             assert not has_negation(sentence), sentence
     reviewer = _flat(REVIEWER_PATH)
-    assert "`skills/closing-review/references/lenses.md`" in reviewer
+    assert "`loom-code/skills/closing-review/references/lenses.md`" in reviewer
     assert "<!-- gate: charter.plan-omission-narrow -->" in LENSES_PATH.read_text(encoding="utf-8")
 
 

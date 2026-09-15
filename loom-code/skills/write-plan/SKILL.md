@@ -343,7 +343,8 @@ spoken to the user rather than read as a machine artifact.
   With a spec, that section lives there instead, the plan cites the spec,
   and each task's Risk line points at the spec's Design decision by REQ id
   rather than restating the reasoning.
-- A **Questions asked** section carrying the list you kept from step 3 —
+- A **Questions asked** section carrying the list you kept from step 3 and
+  every question you asked at decision point ② in step 4 —
   one line per question, `<decision point> — <type> — <text>`. The intent's `## Open questions` must be exactly
   `- none` before Build; unresolved choices go back to intent work.
 - A closing **Risks** section for risks that span the whole plan. When

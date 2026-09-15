@@ -142,6 +142,22 @@ def test_no_loom_doc_says_review_runs_groups_once(doc: Path) -> None:
     assert not offending, f"{doc}: review still owns the adversary or a run-once suite: {offending}"
 
 
+def _written_by_cell(row_key: str) -> str:
+    row = next(
+        line for line in LOOM_README.read_text(encoding="utf-8").splitlines()
+        if line.startswith("|") and row_key in line
+    )
+    return row.split("|")[-2].strip()
+
+
+def test_loom_readme_written_by_names_no_retired_review_station() -> None:
+    """A1 negative (readme-written-by-names-retired-review-station): the
+    change-folder row credits `closing-review`, the live station name."""
+    cell = _written_by_cell("`<change-id>/`")
+    assert "closing-review" in cell, cell
+    assert not re.search(r"(?<!-)\breview\b", cell), f"retired station name in {cell!r}"
+
+
 REVIEW_TO_ADVERSARY = re.compile(r"\breview\s*→\s*adv\b", re.IGNORECASE)
 # Retired flow vocabulary: attack catalogue, review.json, lanes, the Build
 # memory step, reviewed_sha→HEAD^.

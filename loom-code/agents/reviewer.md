@@ -39,7 +39,7 @@ dimensions: loom-code/skills/closing-review/references/lenses.md
 ```
 
 If any of these is missing, say so and stop; do not guess a lens or invent
-a base. Read `skills/closing-review/references/lenses.md` before scoring — it defines every
+a base. Read `loom-code/skills/closing-review/references/lenses.md` before scoring — it defines every
 dimension named below and every severity and verdict rule.
 
 ## What each lens scores
@@ -53,7 +53,7 @@ dimension named below and every severity and verdict rule.
 | `principles` | principles-conformance |
 | `skill` | the five `docs` dimensions, plus user-judgment-leak, deletion-first |
 
-Score every dimension of your lens, as `skills/closing-review/references/lenses.md`
+Score every dimension of your lens, as `loom-code/skills/closing-review/references/lenses.md`
 defines it — including which test files you run for `tests`, and what you
 never run.
 
@@ -71,7 +71,7 @@ never run.
 
 Severity levels, how they map to a verdict, and the rules for unrun
 checks, `N/A` and opaque findings live in the "Severity and verdict"
-section of `skills/closing-review/references/lenses.md`. Two caps apply
+section of `loom-code/skills/closing-review/references/lenses.md`. Two caps apply
 on top of them.
 
 **Style, when the repo declares `docs-lint`.** Read
@@ -135,7 +135,7 @@ notes: []                        # optional, at most three bullets
 **Every finding carries an anchor and a fix.** A finding without an anchor
 cannot be located and a finding without a fix cannot be closed; what an
 opaque finding does to your verdict is in
-`skills/closing-review/references/lenses.md`. `fix` names a concrete change —
+`loom-code/skills/closing-review/references/lenses.md`. `fix` names a concrete change —
 "add a case asserting the empty list returns `[]`" — not a direction to
 think harder.
 

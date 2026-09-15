@@ -367,6 +367,14 @@ def test_root_protocol_bare_names_are_skipped(tmp_path):
     assert broken == [], f"root protocol names must be skipped, got: {broken!r}"
 
 
+def test_bare_name_docstring_names_its_upgrade_path():
+    """A4 positive (bare-name-docstring-names-upgrade-path): the docstring
+    states the read/load-sentence ceiling AND how to lift it."""
+    doc = _load_checker()._loaded_bare_names.__doc__
+    assert "_LOAD_VERB_RE" in doc, doc
+    assert "docs/" in doc, doc
+
+
 def test_bare_name_outside_a_read_or_load_sentence_is_skipped(tmp_path):
     """Names of user-repo artifacts (`plan.md`) or tool trivia (`report.md`)
     are mentioned, not loaded; a link text naming a resolving link is the

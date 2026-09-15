@@ -118,6 +118,10 @@ def _loaded_bare_names(text: str) -> list[str]:
     usually names a user-repo artifact (`plan.md`) or tool trivia
     (`report.md`) that is not a file beside the scanning document.
     Root protocol names and placeholders are skipped.
+
+    To lift that ceiling, either widen `_LOAD_VERB_RE` to the other verbs
+    that load a file, or drop the sentence filter entirely once every
+    user-repo artifact name in the prose is written `docs/`-prefixed.
     """
     flat = " ".join(_LINK_TEXT_RE.sub(" ", text).split())
     names: list[str] = []

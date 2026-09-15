@@ -116,6 +116,20 @@ def _record_bullet() -> str:
     return "Record each carried detail" + step4.split("- Record each carried detail", 1)[1].split("\n\n", 1)[0]
 
 
+def test_questionsAsked_coversDecisionPointTwo() -> None:
+    """A1 positive (step-5-question-list-covers-decision-point-two).
+
+    Step 3 loads `references/confirm-intent.md` only for an unconfirmed
+    intent, so the Questions asked bullet in the always-read body must itself
+    carry the decision point ② questions asked at step 4.
+    """
+    bullet = "A **Questions asked** section"
+    pinned = _affirmed(_text(), bullet, "decision point ② in step 4")
+    assert pinned, "Step 5's Questions asked bullet omits decision point ② at step 4"
+    (sentence,) = pinned
+    assert "`<decision point> — <type> — <text>`" in sentence, sentence
+
+
 def test_affirmedPin_syntheticAffirmativeSentence_accepted() -> None:
     """Self-test: an affirmative sentence satisfies the pin."""
     assert _affirmed("A non-empty carried-details list forces that spec.", "forces that spec")
