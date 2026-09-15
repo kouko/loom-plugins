@@ -43,6 +43,9 @@ point.
   otherwise the enumeration manufactures volume.
 - **Requirement → Acceptance coverage** — when there are more than about
   six requirements and the mapping is no longer readable inline.
+- **UI flow cases** — one surface with several parallel cases (empty, in
+  progress, each error, success), columns `case | what the user does |
+  what they see`. Each error row still names the way out.
 
 Never pad a table to look substantial. When a section's table would be
 empty, write one line — `N/A — <one-line reason>` — and the reason has to
@@ -69,6 +72,9 @@ navigation between three or more surfaces, or a data flow that forks.
 - **ASCII** for spatial layout — screen wireframes, pane splits, the
   column layout of command output. Mermaid has no native wireframe form
   (mermaid issue #1184), which is why layout stays ASCII.
+- **UI flows** that branch or go back and forth — `stateDiagram-v2` or
+  `flowchart` in the spec file. In the decision point ② chat message, draw
+  it in ASCII instead: a terminal shows Mermaid as raw code.
 
 Keep it narrow enough to survive a side pane, and when labels are CJK,
 generate the box widths rather than eyeballing them.

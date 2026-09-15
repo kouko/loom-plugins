@@ -173,6 +173,13 @@ language, since it is spoken to them rather than read by a checker.
   `N/A` form are in `references/ui-flows.md`. Apply the gate below before
   presenting them.
 
+**Carried details.** Read the carried-details list from `capture-intent`'s
+hand-off and record each item in the spec: a visible flow or reaction as a UI
+flows line, anything else on the matching Requirement or Design decision line.
+Record only what the list or the intent holds; an agent proposal the user did
+not agree to is not recorded. For a product change, decision point ② shows each
+of them as part of the read-back, in behaviour words.
+
 Forms: reference `references/spec-forms.md` before reaching for a table, a
 state list or a diagram — it says which shape carries which content, and
 carries the ten completeness questions the review station's
@@ -197,6 +204,11 @@ turns a behaviour confirmation into a quality review the user cannot do.
    >
    > (You type ___ and you see ___; when ___ happens it will ___. Is that
    > right?)
+
+   When a flow has parallel cases or branches, lead with a table or a text
+   (ASCII) diagram of it, then the per-case sentences. Never put Mermaid in
+   this message: a terminal shows it as raw code. A short flow gets the
+   sentences only.
 
    Then the Requirements in the same plain register — what they will be
    able to do, not what the code will contain.

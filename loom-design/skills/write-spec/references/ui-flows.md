@@ -6,7 +6,7 @@ Mechanism names, module names and file paths do not appear here.
 
 ## The line
 
-One line per operation:
+One line per operation is the default, for a short flow:
 
 ```
 <what the user does> → <what they see or what changes>
@@ -22,6 +22,12 @@ One line per operation:
 For a command, the reaction is its output text and its exit code; for a
 screen, the region that changed. "It works" and "the item is saved" are
 not reactions — the user cannot check either one by looking.
+
+Several parallel cases on one surface: a table, `case | what the user does |
+what they see`. States or paths that branch or go back and forth: a Mermaid
+`stateDiagram-v2` or `flowchart`; ASCII still for layout. Every variant,
+error line naming the way out, irreversible-step sentence and paths walk
+still hold inside either. Rules: `spec-forms.md`.
 
 ## What every surface owes
 
@@ -76,3 +82,7 @@ At decision point ② these lines become one plain sentence per operation:
 see ___; when ___ happens it will ___. Is that right?" If a line cannot
 be said that way without naming a mechanism, the line is written from the
 inside out and needs rewriting before it is shown.
+
+With parallel cases or branches, lead with a table or a text (ASCII)
+diagram, then the per-case sentences. Never put Mermaid in the message: a
+terminal shows it as raw code.

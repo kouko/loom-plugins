@@ -365,6 +365,91 @@ def test_reference_files_exist_within_caps() -> None:
     assert len(flows.read_text(encoding="utf-8").split()) <= UI_FLOWS_CAP
 
 
+_STEP2 = "## Step 2 — Write the spec"
+_STEP3 = "## Step 3 — Decision point ②, product changes only"
+
+
+def _flat(text: str) -> str:
+    return " ".join(text.split())
+
+
+def _flows() -> str:
+    return (SKILL.parent / "references/ui-flows.md").read_text(encoding="utf-8")
+
+
+def _forms() -> str:
+    return (SKILL.parent / "references/spec-forms.md").read_text(encoding="utf-8")
+
+
+def test_spec_records_each_carried_detail() -> None:
+    """A1 positive: each carried detail lands in the spec and in ② read-back."""
+    step2 = _flat(_section(_text(), _STEP2))
+    assert "Read the carried-details list from `capture-intent`'s hand-off" in step2
+    assert "record each item in the spec" in step2
+    assert "a visible flow or reaction as a UI flows line" in step2
+    assert "the matching Requirement or Design decision line" in step2
+    assert "decision point ② shows each of them as part of the read-back" in step2
+    for gate_id in GATE_IDS:
+        assert "carried-details" not in _gate(_text(), gate_id)
+
+
+def test_agent_proposal_not_agreed_not_recorded() -> None:
+    """A1 negative: nothing beyond what the user agreed is recorded."""
+    step2 = _flat(_section(_text(), _STEP2))
+    assert "an agent proposal the user did not agree to is not recorded" in step2
+    recording = [
+        s for s in re.split(r"(?<=[.])\s+", step2) if "proposal" in s.lower()
+    ]
+    assert recording and all("not recorded" in s for s in recording)
+
+
+def test_parallel_cases_table_branching_diagram() -> None:
+    """A2 positive: parallel cases are a table, branching paths a diagram."""
+    flows = _flat(_flows())
+    assert "several parallel cases on one surface: a table" in flows.lower()
+    assert "`case | what the user does | what they see`" in flows
+    assert re.search(r"branch or go back and forth.*`stateDiagram-v2` or `flowchart`", flows)
+    assert "ASCII still for layout" in flows
+    assert "`spec-forms.md`" in flows
+    for kept in ("every variant", "naming the way out", "irreversible-step sentence", "paths walk"):
+        assert kept in flows.lower(), kept
+    forms = _flat(_section(_forms(), "## Table"))
+    assert "**UI flow cases**" in forms
+    diagram = _flat(_section(_forms(), "## Diagram"))
+    assert "**UI flows** that branch or go back and forth" in diagram
+
+
+def test_short_flow_stays_lines() -> None:
+    """A2 boundary: the one-line form stays the default for a short flow."""
+    flows = _flat(_flows())
+    assert "One line per operation is the default, for a short flow" in flows
+    assert "A short flow gets the sentences only" in _flat(_section(_text(), _STEP3))
+
+
+def test_readback_leads_with_table_or_text_diagram() -> None:
+    """A3 positive: ② leads with a table or text diagram, then the sentences."""
+    step3 = _flat(_section(_text(), _STEP3))
+    back = _flat(_section(_flows(), "## Reading it back"))
+    for text in (step3, back):
+        assert re.search(
+            r"parallel cases or branches, .*lead\w* with a table or a text \(ASCII\) diagram",
+            text,
+        ), text[:200]
+        assert "then the per-case sentences" in text
+
+
+def test_chat_readback_has_no_mermaid() -> None:
+    """A3 negative: Mermaid never appears in the chat read-back."""
+    step3 = _section(_text(), _STEP3)
+    back = _section(_flows(), "## Reading it back")
+    for text in (step3, back):
+        flat = _flat(text)
+        assert "Never put Mermaid in" in flat
+        assert "a terminal shows it as raw code" in flat
+        assert "```mermaid" not in text
+    assert "Nothing from `## Design decision` down is ever shown to the user." in _flat(step3)
+
+
 def test_plugin_declares_requires_contract() -> None:
     data = json.loads(
         (REPO / "loom-design/.claude-plugin/plugin.json").read_text(encoding="utf-8")
