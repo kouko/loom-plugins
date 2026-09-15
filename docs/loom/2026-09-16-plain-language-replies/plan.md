@@ -51,6 +51,13 @@ Current state evidence lives in the spec (`## Current state evidence`); each tas
 - Test: A10 positive: readmes-state-unreached-hosts-and-loom-code-only; negative: sessionstart-wording-removed. A11 positive: package-suite-and-check-mechanisms-green; negative: version-mismatch-fails.
 - Risk: minor release 5.3.0 because the card's delivery timing changes; no budget-exception line is needed while the count is unchanged. REQ-10, REQ-11. agent-decided.
 
+### Wave 4 — adversary findings (probes at 4f1980ef)
+
+**W4-01 Polarity-checked rule tests and fail-safe hook dependencies**  after: W3-01  acceptance: 1, 5, 6, 7, 10
+- Files: `loom-workflow/scripts/test_visualization_card_hook.py`, `loom-workflow/skills/loom-visualization/scripts/test_references.py`, `loom-workflow/scripts/test_readme_card_timing.py`, `loom-workflow/hooks/visualization-card`, `loom-workflow/hooks/hooks.json`, `loom-workflow/hooks/hooks-codex.json`, `scripts/test_loom_plugin_install_layout.py`
+- Test: A1 positive: affirmative-card-rule-accepted; negative: negated-card-rule-rejected. A5 positive: hung-settings-file-finishes-within-timeout; boundary: undecodable-plugin-root-card-falls-back. A6 positive: affirmative-metaphor-ban-accepted; negative: metaphor-ban-removed-rejected. A7 positive: affirmative-option-and-yes-no-rules-accepted; negative: negated-option-rule-rejected. A10 positive: per-turn-readme-wording-accepted; negative: localized-session-start-wording-rejected.
+- Risk: phrase-presence tests let a rule flipped to its opposite pass; every committed probe must pass before hand-off. agent-decided.
+
 ## Questions asked
 ① — what — 提醒要在什麼時機送：叫用 skill 後、每次你送出訊息時、或寫進各階段格式說明？
 ① — what — 「怎麼跟使用者說話」只在 loom 流程裡生效，還是 loom 所有工具都要生效？

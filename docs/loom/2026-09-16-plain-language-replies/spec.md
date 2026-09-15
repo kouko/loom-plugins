@@ -4,7 +4,7 @@ pre-build-review: not-required — guidance text plus moving one existing hook t
 
 ## Requirements
 REQ-1 — Per-turn reminder on Claude Code
-  WHEN a user submits a message in a Claude Code session with loom-workflow installed, the loom-workflow hook shall add one English reminder to the agent's context that tells it to reply in the user's language, lead with the conclusion and its impact, replace internal terms with plain words, speak literally without metaphors ("用白話說明，但不要用比喻"), and show structured content as tables or diagrams through loom-visualization, choosing Mermaid only where the client can display it ("基於當前 client 是否能 preview mermaid 來決定呈現用的技術") → Acceptance #1
+  WHEN a user submits a message in a Claude Code session with loom-workflow installed, the loom-workflow hook shall add one English reminder to the agent's context that tells it to reply in the user's language, lead with the conclusion and its impact, replace internal terms with plain words, speak literally without metaphors ("用白話說明，但不要用比喻"), and show structured content as tables or diagrams through loom-visualization, whose existing client check chooses Mermaid only where the client can display it ("基於當前 client 是否能 preview mermaid 來決定呈現用的技術"); the card itself names no rendering technology → Acceptance #1
 
 REQ-2 — Table-and-diagram trigger moves into the reminder
   WHEN a Claude Code or Codex session starts, the loom-workflow hooks shall not deliver the visualization trigger card separately, and WHEN ascii-graph-toolkit is active the per-turn reminder shall carry the coexist diagram wording so exactly one diagram trigger instruction is present → Acceptance #2
