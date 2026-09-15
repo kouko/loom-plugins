@@ -20,7 +20,6 @@ def packet(**overrides: object) -> dict[str, object]:
         "contract_version": 1,
         "configured_mode": "suggest",
         "host_vendor": "codex",
-        "lane": "full",
         "usable_vendors": ["claude"],
         "risk_evidence": [],
         "review_started": False,
@@ -34,7 +33,7 @@ def risk(signal: str, *anchors: str) -> dict[str, object]:
     return {"signal": signal, "anchors": list(anchors)}
 
 
-def test_resolve_full_lane_available_returns_nonblocking_notice() -> None:
+def test_resolve_available_returns_nonblocking_notice() -> None:
     result = second_vendor_policy.resolve(packet())
 
     assert result == {
@@ -44,7 +43,7 @@ def test_resolve_full_lane_available_returns_nonblocking_notice() -> None:
         "recommendation_reasons": [],
         "opt_in_eligible": True,
         "wait_for_user": False,
-        "reason_code": "full-lane-availability",
+        "reason_code": "availability",
     }
 
 
@@ -56,7 +55,7 @@ def test_resolve_risks_returns_grounded_canonical_recommendation() -> None:
     result = second_vendor_policy.resolve(packet(risk_evidence=evidence))
 
     assert result["notice_kind"] == "recommendation"
-    assert result["reason_code"] == "full-lane-risk-recommendation"
+    assert result["reason_code"] == "risk-recommendation"
     assert result["recommendation_reasons"] == [evidence[1], evidence[0]]
 
 
@@ -76,37 +75,68 @@ def test_resolve_without_usable_vendor_emits_no_notice() -> None:
     assert result["reason_code"] == "no-usable-vendor"
 
 
+def test_resolve_packet_without_lane_resolves() -> None:
+    value = packet()
+
+    assert "lane" not in value
+    assert second_vendor_policy.resolve(value)["reason_code"] == "availability"
+
+
+def test_resolve_same_packet_twice_gives_identical_result() -> None:
+    evidence = [risk("security-or-privacy-boundary", "intent.md :: privacy")]
+
+    first = second_vendor_policy.resolve(packet(risk_evidence=evidence))
+    second = second_vendor_policy.resolve(packet(risk_evidence=evidence))
+
+    assert first == second
+
+
+@pytest.mark.parametrize("lane", ["small", "full"])
+def test_resolve_rejects_lane_as_unknown_field(lane: str) -> None:
+    with pytest.raises(second_vendor_policy.InputError, match="unknown fields"):
+        second_vendor_policy.resolve(packet(lane=lane))
+
+
+def test_resolve_formerly_small_lane_packet_is_opt_in_eligible() -> None:
+    # A narrow, low-risk change: no risk evidence, pending, review not started.
+    result = second_vendor_policy.resolve(packet(risk_evidence=[]))
+
+    assert result["notice_kind"] == "availability"
+    assert result["opt_in_eligible"] is True
+    assert result["wait_for_user"] is False
+
+
 @pytest.mark.parametrize(
     ("response", "review_started", "notice_kind", "reason_code", "effective"),
     [
-        ("pending", False, "availability", "small-lane-availability-only", None),
+        ("pending", False, "availability", "availability", None),
         ("pending", True, "no-notice", "no-response", None),
-        ("decline", False, "no-notice", "small-lane-declined", None),
-        ("decline", True, "no-notice", "small-lane-declined", None),
-        ("accept", False, "next-change-only", "small-lane-no-opt-in", None),
-        ("accept", True, "next-change-only", "small-lane-no-opt-in", None),
+        ("decline", False, "no-notice", "selection-declined", None),
+        ("decline", True, "no-notice", "selection-declined", None),
+        ("accept", False, "selection-confirmed", "selection-accepted", "claude"),
+        ("accept", True, "next-change-only", "response-too-late", None),
     ],
 )
-def test_resolve_small_lane_never_selects_vendor(
+def test_resolve_every_change_follows_one_branch(
     response: str,
     review_started: bool,
     notice_kind: str,
     reason_code: str,
-    effective: None,
+    effective: str | None,
 ) -> None:
     extra = {"response_vendor": "claude"} if response == "accept" else {}
     result = second_vendor_policy.resolve(
-        packet(lane="small", response=response, review_started=review_started, **extra)
+        packet(response=response, review_started=review_started, **extra)
     )
 
     assert result["notice_kind"] == notice_kind
     assert result["reason_code"] == reason_code
-    assert result["effective_vendor"] is effective
-    assert result["opt_in_eligible"] is False
+    assert result["effective_vendor"] == effective
+    assert result["opt_in_eligible"] is (reason_code == "availability")
     assert result["wait_for_user"] is False
 
 
-def test_resolve_full_lane_acceptance_obeys_review_cutoff() -> None:
+def test_resolve_acceptance_obeys_review_cutoff() -> None:
     accepted = second_vendor_policy.resolve(
         packet(response="accept", response_vendor="claude")
     )
@@ -172,3 +202,18 @@ def test_cli_emits_sorted_json_and_rejects_invalid_input() -> None:
     assert invalid.returncode == 2
     assert invalid.stdout == ""
     assert invalid.stderr.startswith("second-vendor-policy: ")
+
+
+def test_cli_rejects_lane_with_exit_two() -> None:
+    script = SCRIPTS / "second_vendor_policy.py"
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        input=json.dumps(packet(lane="full")),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert result.stdout == ""
+    assert "unknown fields" in result.stderr
