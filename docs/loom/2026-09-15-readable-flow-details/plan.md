@@ -56,9 +56,14 @@ charter: 1.0
 - Risk: intake now checks an existing product spec regardless of needs-design, enforcing the existing write-plan gate. agent-decided.
 
 **W3-03 Re-record cold reads and re-run checks**  after: W3-02  acceptance: 1, 7
-- Files: `docs/loom/2026-09-15-readable-flow-details/evidence/probes/coldread/run-1.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/probes/coldread/run-2.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/probes/coldread/run-3.txt`
+- Files: `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-1.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-2.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-3.txt`
 - Test: A1 positive: three-fresh-readers-carry-only-agreed-details; negative: stale-recording-fails. A7 positive: package-suite-and-all-probes-green; negative: any-probe-failure-blocks-hand-off.
 - Risk: recorded runs load the global CLAUDE.md; recording uses the existing probe command unchanged. agent-decided.
+
+**W3-04 Carry flow details in the user's words, not background or inference**  after: W3-03  acceptance: 1, 7
+- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-code/skills/write-plan/SKILL.md`, `loom-design/scripts/spec/test_capture_intent_contract.py`, `loom-code/scripts/test_write_plan_shape_text.py`, `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-1.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-2.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-3.txt`
+- Test: A1 positive: carried-detail-kept-in-user-words; negative: background-context-and-inference-not-carried. A7 positive: re-recorded-cold-reads-and-package-suite-green; negative: added-interpretation-flagged.
+- Risk: the W3-03 recording showed a reader carrying background (cron use) and appending its own inference (non-interactive). agent-decided.
 
 ## Questions asked
 ① — what — 你在聊天確認當下難讀，還是事後讀文件難讀？ kouko: "兩者都有點難讀"
