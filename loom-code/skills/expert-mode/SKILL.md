@@ -43,6 +43,12 @@ with the code shown, in any surrounding words. Then wait.
 Only that typed confirmation applies. A reply such as "yes" or "對" binds
 nothing: say so and repeat the confirmation line.
 
+The agent may suggest skipping steps at most once per change: it runs
+`loom_checker.py selection propose <change-id> --origin agent`, shows the
+table and the confirmation line (type `/loom-code:expert-mode` (Codex:
+`$expert-mode`) with the code shown), and keeps working on the full process at
+once; a plain "yes" binds nothing.
+
 ## 3. Report what bound
 
 After a confirmation prompt, run `loom_checker.py selection show <change-id>`

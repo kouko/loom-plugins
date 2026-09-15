@@ -17,13 +17,8 @@ base. Preserve unrelated and untracked work. Work only on planned paths.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
 steps it lists as skipped (spec, plan, implementer, tdd, adversarial,
-package-tests, blind-run). The agent may suggest skipping steps at most once per change: it
-runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
-table and the confirmation line (type `/loom-code:expert-mode` (Codex:
-`$expert-mode`) with the code shown), and keeps working on the full process at
-once; a plain "yes" binds nothing. When the user asks in their own words to run
-or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
-`--origin user`.
+package-tests, blind-run); skip suggestions and user requests follow
+[expert-mode](../expert-mode/SKILL.md).
 
 ## 2. Implement test first
 

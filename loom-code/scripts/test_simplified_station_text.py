@@ -356,11 +356,11 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
         sentence = next(s for s in prose.split(". ") if read in s)
         assert not has_negation(sentence), sentence
         assert "intent" not in sentence.replace("(", " ").replace(",", " ").split(), sentence
-        own_words = (
-            "When the user asks in their own words to run or skip Loom steps, read "
-            "../expert-mode/SKILL.md and follow it with `--origin user`."
+        pointer = (
+            "skip suggestions and user requests follow [expert-mode](../expert-mode/SKILL.md)."
         )
-        assert prose.count(own_words) == 1
+        assert prose.count(pointer) == 1
+        assert pointer in sentence + ". "
 
 
 def test_build_obligations_yield_to_a_bound_selection() -> None:

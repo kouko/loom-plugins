@@ -21,13 +21,8 @@ the remaining work.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 it lists as skipped; §2 and §3 say how skipped reviewers, adversarial and
-blind-run are handled. The agent may suggest skipping steps at most once per change: it
-runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
-table and the confirmation line (type `/loom-code:expert-mode` (Codex:
-`$expert-mode`) with the code shown), and keeps working on the full process at
-once; a plain "yes" binds nothing. When the user asks in their own words to run
-or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
-`--origin user`.
+blind-run are handled; skip suggestions and user requests follow
+[expert-mode](../expert-mode/SKILL.md).
 
 ## 2. Compute review depth
 
