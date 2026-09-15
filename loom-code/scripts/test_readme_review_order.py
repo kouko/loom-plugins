@@ -105,6 +105,43 @@ def test_codex_long_description_follows_new_order() -> None:
     assert build_sentences, "longDescription does not say Build runs the adversary and suite"
 
 
+LOOM_README = REPO_ROOT / "docs" / "loom" / "README.md"
+KICKOFF_DEFAULTS = REPO_ROOT / "docs" / "loom" / "KICKOFF-DEFAULTS.md"
+REVIEW_OWNER = re.compile(r"closing[- ]review|review station", re.IGNORECASE)
+END_OF_BUILD = re.compile(r"end of build|end-of-build", re.IGNORECASE)
+
+
+def _package_tests_reason() -> str:
+    line = next(
+        line for line in KICKOFF_DEFAULTS.read_text(encoding="utf-8").splitlines()
+        if line.startswith("- package-tests:")
+    )
+    return line.split(" — ", 1)[1]
+
+
+def test_kickoff_and_loom_readme_name_build_end_checks() -> None:
+    reason = _package_tests_reason()
+    assert END_OF_BUILD.search(reason), f"package-tests reason omits the end of Build: {reason}"
+    assert "finalize-review" in reason, f"package-tests reason omits finalize-review: {reason}"
+    units = _units(LOOM_README.read_text(encoding="utf-8"))
+    hits = [u for u in units if ADVERSARY.search(u) and END_OF_BUILD.search(u)]
+    assert hits, f"{LOOM_README}: no unit places the adversary at the end of Build"
+
+
+@pytest.mark.parametrize(
+    "doc", [LOOM_README, KICKOFF_DEFAULTS], ids=lambda p: str(p.relative_to(REPO_ROOT))
+)
+def test_no_loom_doc_says_review_runs_groups_once(doc: Path) -> None:
+    text = doc.read_text(encoding="utf-8")
+    units = [*text.splitlines(), *_units(text)]
+    offending = sorted({
+        u for u in units
+        if REVIEW_OWNER.search(u)
+        and ((ADVERSARY.search(u) and not END_OF_BUILD.search(u)) or (re.search(r"\bonce\b", u) and re.search(r"group|suite", u)))
+    })
+    assert not offending, f"{doc}: review still owns the adversary or a run-once suite: {offending}"
+
+
 def test_units_catch_seeded_closing_review_adversary_sentence() -> None:
     seeded = (
         "- **Build and review** — `build` implements each task.\n"
