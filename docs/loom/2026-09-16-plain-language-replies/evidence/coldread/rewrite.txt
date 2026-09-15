@@ -1,0 +1,265 @@
+# card-blob: f3cf31688399439d34f1e88118c96a7198a2a9c2  (loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md)
+# skill-blob: ea667cd596aa385bd33ae826215e17c5d728982f  (loom-workflow/skills/loom-visualization/SKILL.md)
+# reference-blob: 0dfcc32470352f5b65e8d5de07a681e4d4e38892  (loom-workflow/skills/loom-visualization/references/plain-language.md)
+# model: sonnet
+# command: cd <empty temp dir outside repo> && CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --disable-slash-commands --strict-mcp-config --tools "" --model sonnet --output-format text  (prompt on stdin; one fresh invocation per run; sha256 of each assembled prompt under its run)
+# isolation: run from an empty temp directory outside the repo; CLAUDE_CODE_DISABLE_CLAUDE_MDS=1, --setting-sources project, --disable-slash-commands, --strict-mcp-config and --tools "" keep the user's CLAUDE.md, installed plugins/skills, hooks and file tools out; a pre-run probe with the same command answered 'no CLAUDE.md, no skills, no hook text'. (--bare was tried first and refused: 'Not logged in'.)
+# prompt template placeholders: {CARD} = full text of the card blob above; {ROUTING} = SKILL.md section from '## Plain language and conversation tables' up to (not including) '## Step 1'; {REF} = full text of references/plain-language.md at the reference blob
+# note: harness framing is English; the user turn is Chinese, as kouko would send it.
+
+=== PROMPT TEMPLATE (verbatim; <<<INPUT-N>>> is replaced by the run's input) ===
+You are an AI coding assistant working with a user in a chat session.
+
+The following text is injected into your context with every user message:
+<injected-card>
+{CARD}</injected-card>
+
+The loom-visualization skill's SKILL.md contains this section:
+<skill-md-section>
+{ROUTING}</skill-md-section>
+
+Following the instructions above, you have read loom-visualization's references/plain-language.md. Its full text:
+<file path="references/plain-language.md">
+{REF}</file>
+
+Conversation so far:
+
+[Assistant — your previous reply]
+<<<INPUT-N>>>
+
+[User]
+可以用更白話的方式說明嗎？
+
+Write your next reply to the user, exactly as you would send it. Output only the reply.
+
+# run: 1
+# prompt-sha256: 174c04ac89b95fdd092582819e12ec5b63521b0f85d448ffde7d777f555379bf
+=== INPUT 1 (verbatim; the previous assistant reply) ===
+Reviewer B 在第 3 次審查判定**通過（附註）**：合併 main 之後發現的兩個問題都已修好。
+
+但它指出一件事，我確實做得不對：
+- spec 裡記錄「你確認過的畫面行為」的那一行，我在畫面流程改動之後，直接重新算了雜湊，沒有把改動的內容拿給你看。
+- 這樣一來，紀錄上看起來像是你確認了自己沒看過的文字。雖然內容就是你選 A 時接受的後果，還是應該補問你一次。
+
+## 請確認這 3 句行為變化
+
+1. **刪除一句：** 「跳過 intent 時，發布前會另外問你一次」。因為 intent 不能再跳過，這個情境不存在了。
+2. **新增一句：** 你要求跳過 intent → agent 會說明 intent 一定保留，並只列出其他步驟的做／跳表。
+3. **新增一句：** 你在 Antigravity CLI 上使用 `/loom-code:expert-mode` → agent 會說明選擇在這裡不會生效，不顯示確認指令，照完整流程走。
+
+這樣對嗎？
+
+回「對」之後，我會做這幾件事：
+- 保留重新計算的行為紀錄，並在 commit 裡註明這次有重新請你確認。
+- 順手修掉兩個小問題：spec 決策 7 還寫著 intent；skill 裡「不是步驟的詞」和「intent」兩條規則可能重疊。
+- 請 Reviewer B 快速確認這些修改。
+- 重跑最終檢查，更新 PR #13。
+=== USER TURN (verbatim) ===
+可以用更白話的方式說明嗎？
+=== OUTPUT (verbatim) ===
+我把上一則訊息重新用白話說一次。
+
+**結論**:第三次審查結果是通過,但附帶一個提醒——我少做了一步,想請你重新確認三句話。
+
+**發生了什麼事**:
+- 這個專案有一份記錄檔,寫著「你確認過畫面會怎麼運作」。
+- 我在改了畫面的流程之後,直接把這份記錄標記成「已確認」——做法是重新產生一段用來檢查文字有沒有被改過的代碼(業內叫雜湊),但沒有先把改過的文字拿給你看過。
+- 結果是:記錄上看起來像你確認了一段自己沒看過的文字。內容跟你之前選的做法是一致的,但這一步理當先給你看過才算數。
+
+**想請你確認的三句話**,說的是「什麼情況下,agent 會怎麼回應」:
+
+1. 刪掉一句舊規則:「如果你選擇跳過最開始的說明步驟〔intent〕,發布前會再另外問你一次」。因為這個步驟現在不能跳過了,這句話講的情況不會再發生。
+2. 加一句新規則:如果你要求跳過最開始的說明步驟〔intent〕,agent 會回覆「這一步一定會做,不能跳」,然後只列出其他步驟裡哪些可以跳、哪些不行。
+3. 加一句新規則:如果你在 Antigravity 這個工具裡打開「專家模式」的設定〔`/loom-code:expert-mode`〕,agent 會回覆「這個設定在這裡不會生效」,不會跳出確認畫面,直接照完整流程繼續做。
+
+這三句話這樣寫,你確認可以嗎?
+
+你回「可以」之後,我會做這幾件事:
+- 把「這次重新算過雜湊、又回頭請你確認」這件事寫進 commit 說明裡。
+- 順手修兩個小問題:記錄檔裡有一條決策還寫著舊的「intent」字樣;還有兩條規則內容可能重複,我會清掉重複的部分。
+- 把改完的內容給 Reviewer B 看過一次。
+- 再跑一次最終檢查,更新 PR #13。
+=== CHECK ===
+first sentence: "我把上一則訊息重新用白話說一次。" -- announces the rewrite; the conclusion ("第三次審查結果是通過,但...想請你重新確認三句話") only comes in the second line. Conclusion-first: FAIL.
+metaphor scan (就像|好比|想像|比喻|像是一個|like a|imagine|think of it as): no hits. Manual read: no metaphor or analogy. PASS.
+internal terms from the list (lane, REQ-, F-4, attestation, probe, PASS_WITH_NOTES, gate, ledger, 盲跑, file paths): none present. PASS.
+other internal terms left in the reply:
+  - intent (loom station name): 3 times; twice written as 「最開始的說明步驟〔intent〕」 (plain words first, name in brackets); once in 「還寫著舊的「intent」字樣」 with no explanation there, but it was explained earlier. accompanied.
+  - `/loom-code:expert-mode`: in brackets after 「專家模式」的設定. accompanied.
+  - 雜湊: explained ("用來檢查文字有沒有被改過的代碼(業內叫雜湊)"). accompanied.
+  - Reviewer B: not explained (who or what reviewer B is). unexplained.
+  - commit, PR #13: not explained. unexplained (not on the listed term set).
+reply language: Chinese (Traditional), with English product/tool names. Card in English did not pull the reply into English.
+fidelity note: all three behaviour sentences and all four follow-up actions carried over; "spec 決策 7" became "記錄檔裡有一條決策", losing the decision number.
+A6 run 1 verdict: FAIL (first sentence is not the conclusion); literal wording PASS.
+
+# run: 2
+# prompt-sha256: a43257b65cdc7902a99319360c3b4b36c20bba1e8cb8a188afa27b614f5c817d
+=== INPUT 2 (verbatim; the previous assistant reply) ===
+改名那個變更（PR #19）已經合併進 main。合併後 loom-code 和 loom-design 的 CI 都通過，分支也清掉了。main 上還有幾個其他 session 開的分支，例如 `auto-git-part2`、`antigravity-compatible`，我沒動。
+
+接著是「lane 缺口」。需求已經寫好，有一個問題要你決定，再確認一次整體內容。
+
+**1. 你要的是這個嗎？**
+你要修掉「要不要建議找其他廠商模型審查」這一步對 lane 的依賴。lane 設定已經被拿掉，但這一步仍然要 agent 自己填，所以結果全憑 agent 猜。改完後：
+- 同一個變更，不管跑幾次，是否讓你選擇「用其他廠商模型審查」的結果都一樣，不用 agent 猜任何值。
+- loom-code 和 loom-design 的說明、合約和腳本裡，不再出現 small lane／full lane。
+- 一般變更照舊，會讓你選擇要不要用其他模型審查。
+- 完整套件測試通過。
+- 不動的部分：「second-vendor」的 repo 預設值、審查人數、expert-mode。
+
+**2. 要你決定：小改動要不要也讓你選？**
+
+當初「small lane」指的是「範圍很窄、風險很低的改動」，也就是現在系統只派 1 位審查者的那種，例如只改文件或測試。
+
+| 選項 | 小改動時會發生什麼 |
+|---|---|
+| A. 維持原本的區分（建議） | 只告訴你「有其他模型可用」，不讓你選；一般改動照舊讓你選 |
+| B. 一律讓你選 | 小改動也會讓你選擇要不要用其他模型審查 |
+
+建議選 A，原因有兩個：一是保留 small lane 原本的用意，小改動不值得多花一次審查的時間和額度；二是判斷條件直接沿用系統現有的「1 位審查者」規則，不必另外發明標準。
+
+**3. 發布方式**
+這次先講清楚：回「對」就代表你授權審查通過後，我自動 push 並開 PR，不強制推送；合併時仍然會請你回「接受」。不想自動發布的話，現在說一聲。
+
+**另外兩件事**
+- **這次改名學到的經驗**：「對抗 agent 寫的測試跟不上擴大後的範圍，又被安全防線擋住，只能由你手動處理」，我打算順便記進 repo 的經驗記錄（`docs/loom/memory/`），跟這個變更一起送審。
+- **A（讓對抗 agent 自己更新檢查）**：排在這個變更之後。
+
+請回我「A 或 B」，再加上「對」。
+=== USER TURN (verbatim) ===
+可以用更白話的方式說明嗎？
+=== OUTPUT (verbatim) ===
+**這次修改要達成的效果**
+
+現在遇到的狀況：改東西的時候，系統原本靠一個設定決定「要不要讓你選擇用其他家公司的模型再審查一次」。這個設定已經被拿掉了，但程式碼裡還在問這件事，所以現在每次執行都是 agent 自己亂猜答案——同一個改動連續跑兩次，可能一次讓你選、一次不讓你選。
+
+我要修的就是這個。改完以後：
+- 同一個改動不管跑幾次，「要不要讓你選用其他家模型審查」這件事的答案都一樣，不再是猜的。
+- 說明文件、程式合約、腳本裡都不會再出現剛才提到的那個設定名稱。
+- 一般大小的改動，還是照常讓你自己選要不要用其他模型審查。
+- 全部測試都要跑過。
+- 不會動到：預設用哪個 repo 當第二家審查廠商、要派幾位審查者、以及「專家模式」這幾項設定。
+
+這是你要的效果嗎？
+
+**第二件事，要你決定：影響很小的改動（比如只改文件或測試），要不要也讓你選？**
+
+系統裡，影響範圍很窄、風險很低的改動（像只改文件或只改測試）現在只會派 1 位審查者。這種改動以前不讓你選「要不要找其他家模型審查」，只會告訴你「有這個選項可以用」而已。
+
+| 選項 | 這種小改動會發生什麼事 |
+|---|---|
+| A（建議） | 只告訴你有其他模型可以選，不主動問你要不要用；一般大小的改動照舊讓你選 |
+| B | 小改動也會問你要不要用其他模型審查 |
+
+我建議 A：第一，小改動本來就不值得多花一次審查的時間；第二，系統已經有「派幾位審查者」這個規則可以直接拿來判斷什麼算小改動，不用再另外定一套標準。
+
+**第三件事，做完之後怎麼發布**
+如果你回「對」，代表你同意：審查通過後，我會自動把程式碼送到共用的版本庫並開一個 PR（不會用強制推送）；真的要合併進主線時，還是會再問你一次「接受」。不想要我自動做這一步的話，現在跟我說一聲。
+
+**另外兩件小事**
+- 這次改名字的過程中，我發現一個問題：負責找漏洞的 agent 寫的測試跟不上改動範圍擴大，結果被安全防線擋下來，最後要你自己手動處理。我打算把這個經驗寫進 repo 的紀錄檔案，跟這次改動一起送審。
+- 「讓負責找漏洞的 agent 自己更新檢查項目」這件事，我打算排在這次修改之後再做。
+
+麻煩回我「A 或 B」，再加一個「對」。
+=== CHECK ===
+first sentence: the reply opens with the bold heading "**這次修改要達成的效果**"; first prose sentence: "現在遇到的狀況：改東西的時候，系統原本靠一個設定決定「要不要讓你選擇用其他家公司的模型再審查一次」。" -- a background statement, not the conclusion or what it means for the user. The original's opening news (PR #19 merged, CI passed, branches cleaned up) was dropped entirely. Conclusion-first: FAIL.
+metaphor scan (就像|好比|想像|比喻|像是一個|like a|imagine|think of it as): no hits. Manual read: 「像只改文件或只改測試」 and 「比如只改文件或測試」 are "for example", not metaphors. PASS.
+internal terms from the list:
+  - lane (original: 「lane 缺口」, small lane／full lane): removed and replaced by "一個設定"; plain. But the sentence 「不會再出現剛才提到的那個設定名稱」 refers to a name the rewrite never mentioned. accompanied, with a dangling reference.
+  - file path `docs/loom/memory/`: removed and replaced by "repo 的紀錄檔案". plain.
+  - REQ-, F-4, attestation, probe, PASS_WITH_NOTES, gate, ledger, 盲跑: not present.
+other internal terms left: PR (unexplained); repo (unexplained); expert-mode rendered as 「專家模式」 (plain).
+fidelity note: 「second-vendor 的 repo 預設值」 became 「預設用哪個 repo 當第二家審查廠商」, which changes the meaning (repo-level default of the second-vendor setting, not which repo is the vendor). The added claim 「同一個改動連續跑兩次，可能一次讓你選、一次不讓你選」 is an inference not stated in the original.
+reply language: Chinese (Traditional). Card in English did not pull the reply into English.
+A6 run 2 verdict: FAIL (first sentence is not the conclusion; opening news dropped); literal wording PASS; one meaning change noted.
+
+# run: 3
+# prompt-sha256: a05a1b9e22942b4477855c2339e75eb5768912cc7ad57fdf47bdbc4ca48f0753
+=== INPUT 3 (verbatim; the previous assistant reply) ===
+Branch-end PASS（PASS_WITH_NOTES）、push 閘 exit 0。**決策點 ③：請看盲跑報告，說 OK 或不 OK。** 原文在 `docs/loom/2026-09-04-codex-hook-trust-covers-every-definition-and-worktree/blind-run-report.md`。
+
+**你要的東西，一條一條核對**
+
+1. **`--trusted` 逐條回報；乾淨暫存 repo 沒按 `/hooks` 時全 never、exit 非 0、輸出含 `/hooks` 與資料夾路徑** — works。三條定義各一行、全 never、exit 2、BLOCK 行帶暫存資料夾絕對路徑。
+2. **`codex exec` 各跑一次 shell 與 apply_patch（不按 `/hooks`）hook 不該跑；手動餵一條只翻那一條** — works。`echo probe` 與建 `hello.txt` 都真的執行了，但 ledger 不存在、`--trusted` 仍三條 never（Codex 靜靜跳過未信任的 hook，連警告都沒有）；手動餵 `validate-skill-folder-structure.sh` 後只有它翻 fired。
+3. **三處站文字有「逐條／never／`/hooks`／停」的句子、文字測試通過** — works（write-plan step 0b、build §0、first-contact §3；6 測全過）。
+4. **`hooks.json` 命令字串與 main 逐位元相同、規則數不變（27）、整包綠、版本 1.2.4** — works。
+
+**你親手驗的那一腿（intent Constraints 明講）**：按過 `/hooks` 之後守衛真的跑。報告寫了五步：到暫存資料夾開 `codex` → `/hooks` 同意 → 再跑那兩個 `codex exec` → `--trusted` 預期三條全 fired、exit 0；同時 ledger 會第一次出現 Codex 對 apply_patch 真正填的 `tool_name`（到今天沒人看過）。暫存資料夾留著：
+`…/scratchpad/scratch-repo-JWQz`（裡面已有一條手動翻 fired 的紀錄；要乾淨起點再跟我說）。
+
+**對你既有的資料做了什麼**：git 追蹤的東西沒動、`hooks.json` 沒動所以既有信任照舊。**但要老實說**：build 期間兩個探針測試對本 repo 真正的薄殼開火，把紀錄寫進本 repo 自己的 ledger（gitignore 的本機檔）；每個實作者與對抗者都在提交前發現並刪掉，沒進任何 commit。這個漏洞在修正輪已修（探針改打 tmp 副本＋守衛）。
+
+**我幫你決定的事**
+- 火痕檔改成一行一行的 ledger（同一路徑）；舊的零位元組 marker 只算 loom 那條「legacy 跑過」，其他定義仍 never——寧可多問一次 `/hooks`。
+- 歸屬用「事件＋指令路徑」，不看 Codex 回報的工具名（那個字串沒人驗過）。
+- 兩支手抄副本改薄殼、指令字串不動（既有信任不失效）；順便消滅了副本漂移（remind 那支從 8 月就陳舊）。
+
+**你可能還沒想到的事**
+- apply_patch 的 `tool_name` 字串仍未知，等你那一腿。
+- 第二位讀者抓到「先記 fired 再 exec、exec 目標看 cwd」的順序漏洞，修正輪已修（目標改相對薄殼自身、目標存在才記；有子目錄 cwd 的回歸測試）。
+- 這台機器的 Codex 設定是 approval never；你的設定若不同，畫面會多幾個確認步驟，不影響閘本身。
+
+ship 時會併一個 nit commit：記錄器 docstring 補「追加不加鎖、丟一行只會變 never 不會偽造 fired」；報告裡兩處「正在修正」改成已修的 commit。
+
+**OK 嗎？**
+=== USER TURN (verbatim) ===
+可以用更白話的方式說明嗎？
+=== OUTPUT (verbatim) ===
+這次的測試已經跑完，結果是「通過，但有幾點備註」；送出合併前的自動檢查也顯示通過。不過報告裡有一件事還沒測到，需要你自己動手確認一次，看完後跟我說「可以」或「不可以」就行。
+
+報告原文在：`docs/loom/2026-09-04-codex-hook-trust-covers-every-definition-and-worktree/blind-run-report.md`
+
+**已經測過、都通過的部分**
+
+| 檢查項目 | 結果 | 你會看到什麼 |
+|---|---|---|
+| 沒同意過 `/hooks` 時的檢查 | 通過 | 三條規則全部顯示「沒執行過」，指令失敗，畫面提示要去執行 `/hooks`，並列出資料夾路徑 |
+| 沒同意過時，指令本身有沒有照樣執行 | 通過 | 終端機指令、修改檔案這兩個動作都確實執行了（真的印出文字、真的新增了檔案）；只有負責檢查的「守衛」規則沒被觸發，連警告都沒顯示。之後手動只跑其中一條規則的程式，畫面上就只有那一條顯示「執行過」 |
+| 說明文件的文字檢查 | 通過 | 三處文件的文字都提到「逐條列出、沒執行過、要去 `/hooks`、然後停下」；6 項文字測試全部通過 |
+| 設定檔與版本檢查 | 通過 | 設定檔裡每條規則的指令文字，跟主線版本一字不差；規則總數沒變，是 27 條；全部測試通過；版本號 1.2.4 |
+
+**還差你自己動手測的一步**
+
+要確認的是：同意過 `/hooks` 之後，這些規則是不是真的會執行。報告寫了五個步驟：打開暫存資料夾 → 開啟程式並同意 `/hooks` → 再跑一次那兩個動作（終端機指令、修改檔案）→ 這時檢查應該會看到三條規則全部顯示「執行過」、指令成功。同時，紀錄檔會第一次記下「修改檔案」這個動作的真實名稱——目前還沒人看過這個名稱長什麼樣子。
+
+暫存資料夾留著：`…/scratchpad/scratch-repo-JWQz`（裡面已經有一條手動測試留下的紀錄；要乾淨的起點就跟我說，我會重建）。
+
+**對你原本的資料做了什麼**
+
+你原本用 Git 追蹤的東西都沒被更動，設定檔也沒改，所以你原本已經同意過的信任狀態不受影響。
+
+但要老實說一件事：測試過程中，有兩個檢查不小心對這個專案自己的紀錄檔寫入了資料（這個檔案不會被 Git 追蹤，是本機檔案）。寫程式和挑錯的人都在送出提交前發現並刪掉了，所以沒有進到任何一次提交紀錄裡。這個問題已經在後續修正處理：改成先寫到暫存的副本，並加了守衛擋住。
+
+**我幫你決定的事**
+
+- 紀錄檔改成一行記一次事件；舊的、內容是空的標記檔，只算「這條舊規則以前執行過」，其他規則仍算「沒執行過」——寧可多問你一次要不要同意 `/hooks`，也不要誤判成已經同意過。
+- 判斷「是哪條規則執行的」，改成看「發生了什麼事件、跑了哪個指令的路徑」，不採用 Codex 自己回報的規則名稱（那個名稱目前沒人驗證過）。
+- 兩份手動複製出來的程式改成呼叫同一份原始程式，指令文字本身沒改，所以你原本的信任狀態仍然有效；順便解決了複本內容跟原始版本不同步的問題（其中一份從八月就沒更新過）。
+
+**你可能還沒想到的事**
+
+- 「修改檔案」這個動作，Codex 實際回報的名稱是什麼字，目前還不知道，要等你做完上面那個手動測試才會知道。
+- 有一位挑錯的人發現一個順序漏洞：程式原本「先記錄成執行過，再真的去執行」，而「去哪裡執行」又是看目前所在的資料夾決定，可能會記錯。這個已經修好：改成用程式自己所在的位置去找目標，且目標要真的存在才記錄，也加了「在子資料夾底下執行」的測試。
+- 這台機器上 Codex 的設定是「自動全部同意」；如果你自己機器的設定不同，畫面上會多跳出幾個確認框，但不影響檢查結果本身。
+
+送出合併時會多加一個小修改：紀錄程式的說明文字補一句「多次寫入不會互相鎖住，寫壞一行只會讓那條規則變成沒執行過，不會假造成執行過」；報告裡兩處寫「正在修正」的文字，會改成已修好的提交編號。
+
+這樣可以嗎？
+=== CHECK ===
+first sentence: "這次的測試已經跑完，結果是「通過，但有幾點備註」；送出合併前的自動檢查也顯示通過。" -- a conclusion; what it means for the user (a manual check is still needed, answer 可以/不可以) is the second sentence. Conclusion-first: PASS.
+metaphor scan (就像|好比|想像|比喻|像是一個|like a|imagine|think of it as): no hits. Manual read: no metaphor or analogy; 「守衛」 is kept in quotes from the original term and described as "負責檢查的「守衛」規則". PASS.
+internal terms from the list:
+  - PASS_WITH_NOTES / Branch-end PASS: rendered as 「通過，但有幾點備註」. plain (but called 「測試」 although it was a review -- wording inaccuracy).
+  - gate (push 閘 exit 0; 「不影響閘本身」): rendered as 「送出合併前的自動檢查也顯示通過」 and 「不影響檢查結果本身」. plain.
+  - ledger: rendered as 「紀錄檔」. plain.
+  - probe (探針): rendered as 「兩個檢查」. plain.
+  - 盲跑 (盲跑報告): rendered as 「報告」; the word 盲跑 is gone, but the path still contains blind-run-report.md.
+  - file path `docs/loom/2026-09-04-codex-hook-trust-covers-every-definition-and-worktree/blind-run-report.md`: kept, introduced as 「報告原文在」. accompanied.
+  - path `…/scratchpad/scratch-repo-JWQz`: kept, introduced as 「暫存資料夾」. accompanied.
+  - REQ-, F-4, attestation, lane: not present.
+other internal terms left: `/hooks` (5 times; described only as something you 「同意」, never what it is) -- partly explained; Codex (product name, unexplained); 薄殼 rendered as 「改成呼叫同一份原始程式」 (plain).
+fidelity notes: 「每個實作者與對抗者」 (agents) became 「寫程式和挑錯的人」 (people); 「Codex 回報的工具名」 became 「Codex 自己回報的規則名稱」 (tool name -> rule name). Both change meaning.
+reply language: Chinese (Traditional). Card in English did not pull the reply into English.
+A6 run 3 verdict: PASS on conclusion-first, literal wording and term replacement; two meaning changes noted for a reviewer.
