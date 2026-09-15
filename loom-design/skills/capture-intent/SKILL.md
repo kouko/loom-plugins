@@ -283,7 +283,11 @@ details the user stated or explicitly agreed to, before or during intake.
 Only an explicit yes from the user counts as agreement: a proposal left
 unanswered, deferred ("later"), or answered about something else is dropped.
 Never carry an agent proposal the user did not agree to, or detail you
-inferred. The list never enters the intent file; its sections stay unchanged
+inferred. Carry only details about what the command or screen does or how it
+reacts. A remark about background or usage context, such as when or where the
+user runs it, is not a carried detail. Write each carried detail in the user's
+own words. Add no explanation, implication, or inference of your own. The list
+never enters the intent file; its sections stay unchanged
 and detailed flows stay out.
 
 <!-- gate: capture-intent.no-confirmed-without-restatement -->

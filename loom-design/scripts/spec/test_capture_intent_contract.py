@@ -580,6 +580,23 @@ def test_unanswered_or_deferred_proposal_dropped() -> None:
     )
 
 
+def test_carried_detail_kept_in_user_words() -> None:
+    """A1 positive (carried-detail-kept-in-user-words): only flow or reaction
+    details are carried, each in the user's own words."""
+    step4 = _flat_section(_STEP4)
+    assert _affirmed(step4, "Carry only details about what the command or screen does or how it reacts")
+    assert _affirmed(step4, "Write each carried detail in the user's own words")
+
+
+def test_background_context_and_inference_not_carried() -> None:
+    """A1 negative (background-context-and-inference-not-carried): a usage or
+    background remark is not a detail, and the agent adds no interpretation."""
+    step4 = _flat_section(_STEP4)
+    background = [s for s in split_sentences(step4, ".;") if "background or usage context" in s]
+    assert background and all("is not a carried detail" in s for s in background)
+    assert "Add no explanation, implication, or inference of your own" in step4
+
+
 def _carried_item() -> str:
     step4 = _flat_section(_STEP4)
     return step4.split("5. **The carried details", 1)[1].split("Questions may only ask", 1)[0]

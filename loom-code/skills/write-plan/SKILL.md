@@ -265,7 +265,11 @@ recorded makes the flow look quieter than it is.
 explicitly agreed to. Only an explicit yes from the user counts as
 agreement: a proposal left unanswered, deferred ("later"), or answered about
 something else is dropped. Never carry an agent proposal the user did not
-agree to, or detail you inferred. It never enters the intent file.
+agree to, or detail you inferred. Carry only details about what the command
+or screen does or how it reacts. A remark about background or usage context,
+such as when or where the user runs it, is not a carried detail. Write each
+carried detail in the user's own words. Add no explanation, implication, or
+inference of your own. It never enters the intent file.
 
 **On "yes":**
 

@@ -223,6 +223,23 @@ def test_write_plan_unanswered_proposal_dropped() -> None:
     )
 
 
+def test_write_plan_carried_detail_kept_in_user_words() -> None:
+    """A1 positive (carried-detail-kept-in-user-words): only flow or reaction
+    details are carried, each in the user's own words."""
+    step3 = _section(_STEP3)
+    assert _affirmed(step3, "Carry only details about what the command or screen does or how it reacts")
+    assert _affirmed(step3, "Write each carried detail in the user's own words")
+
+
+def test_write_plan_background_context_and_inference_not_carried() -> None:
+    """A1 negative (background-context-and-inference-not-carried): a usage or
+    background remark is not a detail, and the agent adds no interpretation."""
+    step3 = _flat(_section(_STEP3))
+    background = [s for s in _sentences(step3) if "background or usage context" in s]
+    assert background and all("is not a carried detail" in s for s in background)
+    assert "Add no explanation, implication, or inference of your own" in step3
+
+
 def test_product_non_visible_detail_on_requirement_line() -> None:
     """A3 positive: a non-visible carried detail lands on its Requirement line."""
     assert _affirmed(_record_bullet(), "as a UI flows line when visible, else on its Requirement line")
