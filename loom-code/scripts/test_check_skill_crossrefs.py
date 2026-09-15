@@ -6,6 +6,9 @@ resolves it against that SKILL.md's directory, and reports any link
 whose target is missing on disk. Relative-only: http(s) URLs,
 anchor-only `#...` links, and absolute paths are skipped. A trailing
 `#anchor` on an otherwise-relative link is stripped before the check.
+Skill subfolder files (`references/*.md`, ...) are scanned too, and
+backtick `.md` paths are checked unless they are placeholders or `docs/`
+protocol paths.
 
 These tests drive `find_broken_crossrefs(skills_dir) -> list[str]`
 directly against HERMETIC temp fixtures (no dependency on the real
@@ -170,3 +173,116 @@ def test_the_plugin_level_agents_directory_is_scanned(tmp_path):
     broken = checker.find_broken_crossrefs(skills)
     assert any("engineering-baseline.md" in entry for entry in broken), \
         f"the plugin-level agents/ tree must be scanned, got: {broken!r}"
+
+
+# --- References files and backtick paths ------------------------------------
+
+def _write(path: Path, body: str) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+def test_missing_link_in_references_is_reported(tmp_path):
+    """A dead link inside `references/*.md` used to pass unseen — the
+    attack-catalogue links lived in exactly such a file."""
+    skills = tmp_path / "skills"
+    _make_skill(skills, "theta", "No links here.\n")
+    _write(
+        skills / "theta" / "references" / "guide.md",
+        "See [the catalogue](gone-catalogue.md).\n",
+    )
+
+    checker = _load_checker()
+    broken = checker.find_broken_crossrefs(skills)
+
+    assert len(broken) == 1, f"expected one broken link, got: {broken!r}"
+    assert "gone-catalogue.md" in broken[0]
+    assert "guide.md" in broken[0], \
+        "the report must name the references file the link came from"
+
+
+def test_link_in_references_resolves_against_its_own_directory(tmp_path):
+    skills = tmp_path / "skills"
+    _make_skill(skills, "iota", "No links here.\n")
+    _write(skills / "iota" / "references" / "sibling.md", "# sibling\n")
+    _write(
+        skills / "iota" / "references" / "guide.md",
+        "See [the sibling](sibling.md).\n",
+    )
+
+    checker = _load_checker()
+    assert checker.find_broken_crossrefs(skills) == []
+
+
+def test_existing_backtick_path_passes(tmp_path):
+    skills = tmp_path / "skills"
+    _make_skill(skills, "kappa", "Read `references/lenses.md` first.\n")
+    _write(skills / "kappa" / "references" / "lenses.md", "# lenses\n")
+    _write(
+        skills / "kappa" / "references" / "adversarial.md",
+        "The lens table is in `references/lenses.md`.\n",
+    )
+
+    checker = _load_checker()
+    broken = checker.find_broken_crossrefs(skills)
+    assert broken == [], f"expected no broken paths, got: {broken!r}"
+
+
+def test_missing_backtick_path_is_reported(tmp_path):
+    skills = tmp_path / "skills"
+    _make_skill(skills, "lambda", "No links here.\n")
+    _write(
+        skills / "lambda" / "references" / "adversarial.md",
+        "Run each attack in `references/attack-catalogue.md`.\n",
+    )
+
+    checker = _load_checker()
+    broken = checker.find_broken_crossrefs(skills)
+    assert len(broken) == 1, f"expected one broken path, got: {broken!r}"
+    assert "references/attack-catalogue.md" in broken[0]
+    assert "adversarial.md" in broken[0]
+
+
+def test_plugin_root_relative_backtick_path_resolves(tmp_path):
+    plugin = tmp_path / "loom-code"
+    skills = plugin / "skills"
+    _make_skill(skills, "mu", "No links here.\n")
+    _write(skills / "nu" / "SKILL.md", "No links here.\n")
+    _write(skills / "nu" / "references" / "target.md", "# target\n")
+    _write(plugin / "agents" / "reviewer.md", "# reviewer\n")
+    _write(
+        skills / "mu" / "references" / "notes.md",
+        "Repo-rooted `loom-code/skills/nu/references/target.md`, "
+        "plugin-rooted `skills/nu/references/target.md`, "
+        "plugin-rooted `agents/reviewer.md`, "
+        "sibling-skill `../nu/references/target.md`.\n",
+    )
+
+    checker = _load_checker()
+    assert checker.find_broken_crossrefs(skills) == []
+
+    _write(
+        skills / "mu" / "references" / "dead.md",
+        "Gone: `loom-code/skills/nu/references/missing.md`.\n",
+    )
+    broken = checker.find_broken_crossrefs(skills)
+    assert len(broken) == 1, f"expected one broken path, got: {broken!r}"
+    assert "loom-code/skills/nu/references/missing.md" in broken[0]
+
+
+def test_placeholder_and_docs_backtick_paths_are_skipped(tmp_path):
+    skills = tmp_path / "skills"
+    _make_skill(
+        skills,
+        "xi",
+        "Protocol paths `docs/loom/intent/<change-id>.md`, "
+        "`docs/loom/KICKOFF-DEFAULTS.md`, `skills/*/SKILL.md`, "
+        "`references/{name}.md`, `$ROOT/references/x.md`, "
+        "bare `SKILL.md`, and a URL `https://example.com/a/b.md`.\n",
+    )
+
+    checker = _load_checker()
+    broken = checker.find_broken_crossrefs(skills)
+    assert broken == [], \
+        f"placeholders and docs/ protocol paths must be skipped, got: {broken!r}"

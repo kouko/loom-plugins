@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """CI gate: dead-link validator for loom-code skill cross-references.
 
-Walks every ``loom-code/skills/*/SKILL.md``, every ``agents/*.md``
-(per-skill and plugin-level) and, for each RELATIVE
-markdown link ``](path)``, resolves the target against that SKILL.md's
-directory and asserts the target exists on disk.
+Walks every ``loom-code/skills/*/SKILL.md``, every single-level skill
+subfolder file ``skills/*/*/*.md`` (references/, agents/, ...) and the
+plugin-level ``agents/*.md``. For each RELATIVE markdown link
+``](path)``, resolves the target against the reading file's directory and
+asserts the target exists on disk. For each backtick span naming a
+``.md`` path with a ``/``, asserts it exists relative to the file's
+directory, its skill directory, the plugin root or the repository root;
+placeholders (``< > * { } $``), URLs, absolute paths and ``docs/``
+protocol paths are skipped.
 
 Skipped (not a relative on-disk target):
 - ``http://`` / ``https://`` URLs
@@ -15,8 +20,8 @@ A trailing ``#anchor`` on an otherwise-relative link is stripped before
 the existence check (e.g. ``references/guide.md#step-2`` checks
 ``references/guide.md``).
 
-Caveat: only INLINE links ``](target)`` are checked. Reference-style
-link definitions (``[id]: path``) and inline links carrying a title
+Caveat: of markdown links, only INLINE links ``](target)`` are checked.
+Reference-style link definitions (``[id]: path``) and inline links carrying a title
 attribute (``](path "title")``) are NOT covered — the loom-code SKILL.md
 convention is title-less inline links, so this matches today's corpus; a
 future author adding a reference-style link should not assume coverage.
@@ -75,19 +80,66 @@ def _scanned_documents(skills_dir: Path) -> list[Path]:
     and the plugin-level one beside `skills/` are read.
     """
     found = list(skills_dir.glob("*/SKILL.md"))
-    found += skills_dir.glob("*/agents/*.md")
+    # Every single-level skill subfolder (references/, agents/, protocols/
+    # ...): the flat-folder convention makes `*/*/*.md` exactly that set,
+    # and a path copied one level down dangles in any of them alike.
+    found += skills_dir.glob("*/*/*.md")
     found += skills_dir.parent.glob("agents/*.md")
     return sorted(set(found))
+
+
+# A backtick span naming a `.md` path: at least one `/`, no whitespace.
+_BACKTICK_MD_RE = re.compile(r"`([^`\s]+/[^`\s]*\.md)(?:#[^`\s]*)?`")
+
+# Placeholder or glob characters: the span names a pattern, not a file.
+_PLACEHOLDER_CHARS = set("<>*{}$")
+
+
+def _is_checkable_backtick_path(path: str) -> bool:
+    """True for a backtick path that should name a real file in this tree.
+
+    Skips placeholders and globs, URLs, absolute or home paths, and
+    `docs/` paths — those are runtime-repo protocol paths an adopting
+    repo creates, not files this plugin ships.
+    """
+    if _PLACEHOLDER_CHARS & set(path):
+        return False
+    if "://" in path or path.startswith(("/", "~")):
+        return False
+    if path.startswith("docs/"):
+        return False
+    return True
+
+
+def _backtick_bases(document: Path, skills_dir: Path) -> list[Path]:
+    """Directories a backtick path may be written relative to.
+
+    Prose names paths from the file's own directory, from its skill
+    directory (a references file saying `references/lenses.md`), from the
+    plugin root (`agents/reviewer.md`, `skills/x/SKILL.md`) or from the
+    repository root (`loom-code/skills/...`). Resolving against any of
+    them counts, so only a path that exists nowhere is reported.
+    """
+    plugin_root = skills_dir.parent
+    bases = [document.parent]
+    try:
+        skill_name = document.relative_to(skills_dir).parts[0]
+        bases.append(skills_dir / skill_name)
+    except ValueError:
+        pass
+    bases += [plugin_root, plugin_root.parent]
+    return bases
 
 
 def find_broken_crossrefs(skills_dir) -> list[str]:
     """Return one ``<skill-md-path>: <link>`` string per broken cross-ref.
 
-    Scans ``<skills_dir>/*/SKILL.md``, ``<skills_dir>/*/agents/*.md`` and
+    Scans ``<skills_dir>/*/SKILL.md``, ``<skills_dir>/*/*/*.md`` and
     the plugin-level ``agents/*.md`` beside ``skills/``. A link is broken
     when its target (relative, anchor stripped) does not exist on disk
-    relative to the reading file's own directory. Empty list == all links
-    resolve.
+    relative to the reading file's own directory; a checkable backtick
+    ``.md`` path is broken when it resolves against none of
+    ``_backtick_bases``. Empty list == all references resolve.
     """
     skills_dir = Path(skills_dir)
     broken: list[str] = []
@@ -105,6 +157,12 @@ def find_broken_crossrefs(skills_dir) -> list[str]:
             resolved = (base / path_part)
             if not resolved.exists():
                 broken.append(f"{skill_md}: {target}")
+        for path in _BACKTICK_MD_RE.findall(text):
+            if not _is_checkable_backtick_path(path):
+                continue
+            bases = _backtick_bases(skill_md, skills_dir)
+            if not any((b / path).exists() for b in bases):
+                broken.append(f"{skill_md}: `{path}`")
     return broken
 
 
