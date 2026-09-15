@@ -1,5 +1,5 @@
 # Run every mechanical check before closing reviewers read the change — plan
-intent: 2026-09-15-mechanical-checks-before-review@ef450389
+intent: 2026-09-15-mechanical-checks-before-review@b03b4a13
 charter: 1.0
 
 ## Current State Evidence
@@ -57,12 +57,24 @@ Wave 4 — release
 - Test: A10 positive: loom-design-manifests-in-sync-at-patch-version; negative: manifest-drift-check-fails-on-mismatch.
 - Risk: patch bump for station-table text only; agent-decided.
 
+Wave 5 — end-of-Build fixes from the adversary
+
+**W5-01 Close adversary findings in station and reviewer text**  after: W4-02  acceptance: 1, 3, 4, 5
+- Files: loom-code/skills/build/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-code/agents/reviewer.md, loom-code/skills/closing-review/references/lenses.md, loom-code/scripts/test_build_mechanical_checks.py, loom-code/scripts/test_reviewer_mechanical_evidence.py, loom-code/scripts/test_review_convergence_contract.py
+- Test: A1 positive: handoff-gate-honours-skipped-checks; negative: weakened-build-sentence-fails-pin. A3 positive: dispatch-gate-names-both-steps; negative: one-skip-does-not-waive-other. A4 positive: changed-tests-exclude-probes; negative: weakened-reviewer-rule-fails-pin. A5 positive: fix-loop-reruns-suite; negative: optional-rerun-fails-pin.
+- Risk: pins require the modal verb and reject permissive sentences; committed adversarial probes are the RED oracle; Round-3 re-plan keeps existing programs per Acceptance 5; agent-decided.
+
+**W5-02 Loom docs name Build's end-of-Build checks**  after: W5-01  acceptance: 3
+- Files: docs/loom/KICKOFF-DEFAULTS.md, docs/loom/README.md, loom-code/scripts/test_readme_review_order.py
+- Test: A3 positive: kickoff-and-loom-readme-name-build-end-checks; negative: no-loom-doc-says-review-runs-groups-once.
+- Risk: the package-tests line keeps its value, rewords only its reason and redates it; agent-decided.
+
 ## Questions asked
 ① — what — Restated the problem (closing review slow because reviewers re-run the full suite) and the 10 Acceptance lines in plain words; asked "is this what you want?" — answered 「對，確認」.
 ① — consequence — Answering yes authorizes a later non-forced push and Ready PR after Review and publication checks pass; merge stays a separate decision; the user may opt out before publication — answered 「同意自動發布」.
 
 ## Risks
-1. Main merged expert-mode (aa0cffff) the same day over the same files; the branch was rebased before planning, and any further main change needs another rebase before closing review.
+1. Main merged expert-mode (aa0cffff) the same day over the same files; the branch was rebased before planning and again onto 6b38ae05 (#14) before closing review, resolving only release-metadata conflicts.
 2. The suite runs twice per change, at Build end and in finalize-review; removing the second run needs checker changes the intent excludes.
 3. Branch renamed from speedup-reviewer-subagent to feat/2026-09-15-mechanical-checks-before-review so the PR title type matches; herdr workspace metadata may still show the old name.
 4. The missing attack-catalogue reference stays broken for adversary skill and gate attacks; it is out of scope and should become its own intent.
