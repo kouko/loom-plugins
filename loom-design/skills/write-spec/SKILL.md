@@ -325,8 +325,8 @@ that section.
    returns NEEDS_REVISION, close each finding, commit, and send only those
    fixes back to that reviewer. If it passes, continue.
 3. If `pre-build-review: not-required`, do not create a formal spec review;
-   continue directly. This declaration never changes branch-end lane or
-   reviewer requirements.
+   continue directly. This declaration never changes branch-end reviewer
+   requirements.
 4. Confirm the next station's intake is satisfied:
 
    ```

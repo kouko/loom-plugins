@@ -515,6 +515,12 @@ def test_chat_readback_has_no_mermaid() -> None:
     assert "Nothing from `## Design decision` down is ever shown to the user." in _flat(step3)
 
 
+def test_no_lane_wording() -> None:
+    """A2 positive: write-spec station text names no lane (intent Acceptance 2)."""
+    flat = _flat(_text())
+    assert not re.search(r"(?i)\b(small|full)[- ]lanes?\b|\blanes?\b", flat)
+
+
 def test_plugin_declares_requires_contract() -> None:
     data = json.loads(
         (REPO / "loom-design/.claude-plugin/plugin.json").read_text(encoding="utf-8")
