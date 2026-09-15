@@ -58,6 +58,11 @@ Current state evidence lives in the spec (`## Current state evidence`); each tas
 - Test: A1 positive: affirmative-card-rule-accepted; negative: negated-card-rule-rejected. A5 positive: hung-settings-file-finishes-within-timeout; boundary: undecodable-plugin-root-card-falls-back. A6 positive: affirmative-metaphor-ban-accepted; negative: metaphor-ban-removed-rejected. A7 positive: affirmative-option-and-yes-no-rules-accepted; negative: negated-option-rule-rejected. A10 positive: per-turn-readme-wording-accepted; negative: localized-session-start-wording-rejected.
 - Risk: phrase-presence tests let a rule flipped to its opposite pass; every committed probe must pass before hand-off. agent-decided.
 
+**W4-02 In-cell visuals and time-as-column guidance from the earlier table research**  after: W4-01  acceptance: 8
+- Files: `loom-workflow/skills/loom-visualization/references/plain-language.md`, `loom-workflow/skills/loom-visualization/scripts/test_references.py`
+- Test: A8 positive: in-cell-visuals-and-time-axis-guidance-present; negative: removed-in-cell-section-fails.
+- Risk: the blind run found the earlier research's in-cell micro-visualisation rules and time-as-column forms missing; only the table-rules section grows, so rewrite trials stay valid. agent-decided.
+
 ## Questions asked
 ① — what — 提醒要在什麼時機送：叫用 skill 後、每次你送出訊息時、或寫進各階段格式說明？
 ① — what — 「怎麼跟使用者說話」只在 loom 流程裡生效，還是 loom 所有工具都要生效？
