@@ -255,7 +255,10 @@ def _assert_local_contract_graph(design_root: Path, code_root: Path) -> None:
         code_root,
     )
     write_plan = code_root / "skills/write-plan/SKILL.md"
-    _resolve_local_contract(write_plan, "references/one-way-door.md", code_root)
+    confirm_intent = _resolve_local_contract(
+        write_plan, "references/confirm-intent.md", code_root
+    )
+    _resolve_local_contract(confirm_intent, "one-way-door.md", code_root)
 
 
 def _assert_local_behavior_dependencies(design_root: Path, code_root: Path) -> None:

@@ -22,6 +22,11 @@ MEMORY_PR = (
 SHIP_PROSE = " ".join(SHIP.split())
 CAPTURE_PROSE = " ".join(CAPTURE.split())
 PLAN_PROSE = " ".join(PLAN.split())
+# write-plan's own intent confirmation (step 3) lives in this reference.
+PLAN_CONFIRM = (
+    ROOT / "loom-code/skills/write-plan/references/confirm-intent.md"
+).read_text(encoding="utf-8")
+PLAN_CONFIRM_PROSE = " ".join(PLAN_CONFIRM.split())
 INTENT_TEMPLATE = (ROOT / "loom-code/contract/templates/intent.md").read_text(encoding="utf-8")
 CONTRACT_MANIFEST = (ROOT / "loom-code/contract/manifest.yaml").read_text(encoding="utf-8")
 
@@ -220,7 +225,7 @@ def test_git_memory_defers_loom_consent_and_schema_to_ship() -> None:
 
 
 def test_intent_confirmation_discloses_publication_and_separate_merge() -> None:
-    for station, prose in ((CAPTURE, CAPTURE_PROSE), (PLAN, PLAN_PROSE)):
+    for station, prose in ((CAPTURE, CAPTURE_PROSE), (PLAN_CONFIRM, PLAN_CONFIRM_PROSE)):
         assert "automatic publication is the default" in prose
         assert "non-forced push" in prose
         assert "Ready PR" in prose
@@ -481,11 +486,12 @@ def test_closing_review_scope_spec_rejected() -> None:
 
 
 def test_plan_questions_asked_claims_no_reader_or_design_record() -> None:
-    flat = " ".join(PLAN.split())
-    assert "questions[]" not in PLAN
-    assert "§11" not in PLAN
-    assert "review record" not in flat
-    assert _affirmed_sentences(flat, "The list shows how often loom interrupts the user")
+    for text in (PLAN, PLAN_CONFIRM):
+        flat = " ".join(text.split())
+        assert "questions[]" not in text
+        assert "§11" not in text
+        assert "review record" not in flat
+    assert _affirmed_sentences(PLAN_CONFIRM_PROSE, "The list shows how often loom interrupts the user")
 
 
 def test_blind_runner_names_current_artifacts_and_package_suite_owners() -> None:

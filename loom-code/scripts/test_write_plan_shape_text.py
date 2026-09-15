@@ -22,11 +22,41 @@ def test_task_ids_use_one_numeric_form_without_reserved_process_tasks() -> None:
     assert "W<n>-memory" not in shape
 
 
+# --- W2-06 (2026-09-16-loom-rule-text-consolidation): write-plan loads its
+# own intent confirmation from a reference only when the intent is unconfirmed ---
+
+CONFIRM_INTENT = ROOT / "loom-code/skills/write-plan/references/confirm-intent.md"
+
+
+def _body_words(text: str) -> int:
+    """Words after the YAML frontmatter, counted with `str.split`."""
+    m = re.match(r"---\n.*?\n---\n", text, re.S)
+    assert m, "frontmatter missing"
+    return len(text[m.end():].split())
+
+
+def test_writePlanBody_under3750Words() -> None:
+    """A3 positive (write-plan-body-under-3750-words)."""
+    assert _body_words(WRITE_PLAN.read_text(encoding="utf-8")) < 3750
+
+
+def test_confirmedIntent_skipsReferenceLoad() -> None:
+    """A3 boundary (confirmed-intent-skips-reference-load): Step 3 in SKILL.md
+    skips a confirmed intent and otherwise loads the reference before Step 4."""
+    heading = "## Step 3 — Decision point ①: restate and confirm"
+    m = re.search(rf"^{re.escape(heading)}$.*?(?=^## |\Z)", WRITE_PLAN.read_text(encoding="utf-8"), re.M | re.S)
+    assert m, "Step 3 heading missing"
+    step3 = " ".join(m.group(0).split())
+    assert "When the intent's `status:` is already `confirmed`, skip this step" in step3
+    assert "read `references/confirm-intent.md` and follow it fully before step 4" in step3
+    assert CONFIRM_INTENT.is_file()
+    assert "Compose **one message**" in CONFIRM_INTENT.read_text(encoding="utf-8")
+
+
 # --- W1-03 (2026-09-15-readable-flow-details): write-plan mirrors the
 # carried-details and flow-form guidance of capture-intent and write-spec ---
 
 _STEP1 = "## Step 1 — Find the intent"
-_STEP3 = "## Step 3 — Decision point ①: restate and confirm"
 _STEP4 = "## Step 4 — Does this need a spec?"
 _PRODUCT_GATE = "<!-- gate: write-plan.product-spec-needs-confirmed-behavior -->"
 
@@ -37,6 +67,11 @@ def _flat(text: str) -> str:
 
 def _text() -> str:
     return WRITE_PLAN.read_text(encoding="utf-8")
+
+
+def _confirm_text() -> str:
+    """Step 3's body: write-plan's own intent confirmation, loaded on demand."""
+    return CONFIRM_INTENT.read_text(encoding="utf-8")
 
 
 def _section(heading: str) -> str:
@@ -72,7 +107,7 @@ def _readback_paragraph() -> str:
 
 
 def _carried_item() -> str:
-    step3 = _flat(_section(_STEP3))
+    step3 = _flat(_confirm_text())
     return step3.split("5. **The carried details", 1)[1].split("**Every question in this message", 1)[0]
 
 
@@ -104,7 +139,7 @@ def test_affirmedPin_syntheticCodeSpanNo_notNegation() -> None:
 
 def test_carried_details_force_minimal_spec() -> None:
     """A1 positive: a non-empty carried-details list forces a minimal spec."""
-    step3 = _flat(_section(_STEP3))
+    step3 = _flat(_confirm_text())
     assert _affirmed(step3, "**Keep a carried-details list**", "the user stated or explicitly agreed to")
     assert "Never carry an agent proposal the user did not agree to, or detail you inferred" in step3
     assert "never enters the intent file" in step3
@@ -206,7 +241,7 @@ def test_write_plan_confirmation_table_engineering_only() -> None:
 
 def test_write_plan_no_details_no_table() -> None:
     """A5 boundary: an empty list shows no table; a needs-design: yes product defers to ②."""
-    step3 = _flat(_section(_STEP3))
+    step3 = _flat(_confirm_text())
     item = _carried_item()
     assert "With an empty list, no table appears" in item
     assert step3.count("as a table") == item.count("as a table") >= 1
@@ -217,7 +252,7 @@ def test_write_plan_product_details_not_at_intent_confirmation() -> None:
     sentence of ① shows a product change's details, so none is asked twice."""
     item = _carried_item()
     assert "for a product change with `needs-design: no`" not in item
-    assert "where this is their only stop" not in _flat(_section(_STEP3))
+    assert "where this is their only stop" not in _flat(_confirm_text())
     here = [s for s in _sentences(item) if "product change" in s and "this message" in s]
     assert here and all("never" in s for s in here)
 
@@ -227,13 +262,13 @@ def test_write_plan_product_details_not_at_intent_confirmation() -> None:
 
 def test_write_plan_only_explicit_yes_is_carried() -> None:
     """A1 positive: only the user's explicit yes makes a proposal a carried detail."""
-    assert _affirmed(_section(_STEP3), "Only an explicit yes from the user counts as agreement")
+    assert _affirmed(_confirm_text(), "Only an explicit yes from the user counts as agreement")
 
 
 def test_write_plan_unanswered_proposal_dropped() -> None:
     """A1 negative: silence, "later", or an answer about something else drops it."""
     assert _affirmed(
-        _section(_STEP3),
+        _confirm_text(),
         "a proposal left unanswered, deferred",
         "answered about something else is dropped",
     )
@@ -242,7 +277,7 @@ def test_write_plan_unanswered_proposal_dropped() -> None:
 def test_write_plan_quotes_user_words() -> None:
     """A1 positive (write-plan-quotes-user-words): only flow or reaction details
     are carried, each quoting the user or the proposal the user said yes to."""
-    step3 = _section(_STEP3)
+    step3 = _confirm_text()
     assert _affirmed(step3, "Carry only details about what the command or screen does or how it reacts")
     assert _affirmed(
         step3,
@@ -255,7 +290,7 @@ def test_write_plan_quotes_user_words() -> None:
 def test_write_plan_background_context_and_inference_not_carried() -> None:
     """A1 negative (background-context-and-inference-not-carried): a usage or
     background remark is not a detail, and the agent adds no interpretation."""
-    step3 = _flat(_section(_STEP3))
+    step3 = _flat(_confirm_text())
     background = [s for s in _sentences(step3) if "background or usage context" in s]
     assert background and all("is not a carried detail" in s for s in background)
     assert "Add no explanation, implication, or inference of your own" in step3
