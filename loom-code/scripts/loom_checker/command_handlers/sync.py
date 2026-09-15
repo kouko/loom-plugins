@@ -3,8 +3,8 @@ before closing review dispatches reviewers (rule `review.sync`).
 
 The attestation digest covers the whole tree, so a merge after review
 invalidates it; this runs first. Merge only -- never rebase, never force --
-so pushed history is never rewritten, and a conflict is aborted and named,
-never resolved.
+so pushed history is never rewritten, and a conflict is named, never
+resolved: detected in memory before the merge when git can, else aborted.
 """
 from __future__ import annotations
 
@@ -73,6 +73,42 @@ def _status(git: str, repo: Path) -> str | None:
     return stdout if code == 0 else None
 
 
+def _show(text: str) -> str:
+    """A path or git message as one unambiguous line: quoted when it holds a
+    newline or other control character, so it cannot forge a BLOCK line."""
+    return text if text.isprintable() else repr(text)
+
+
+def _snapshot(git: str, repo: Path) -> str | None:
+    """Status including ignored files: the before/after restore check must
+    notice an ignored file a merge deleted."""
+    code, stdout, _detail = _git(git, repo, "status", "--porcelain", "-z", "--untracked-files=all", "--ignored")
+    return stdout if code == 0 else None
+
+
+def _collisions(git: str, repo: Path, tip: str) -> list[str]:
+    """Ignored or untracked worktree paths that collide with a path the trunk
+    tip tracks but HEAD does not -- git merge treats those as expendable."""
+    # Without --exclude-standard, --others lists ignored and untracked files alike.
+    code, stdout, _detail = _git(git, repo, "ls-files", "-z", "--others")
+    local = [path for path in stdout.split("\0") if path] if code == 0 else []
+    code, added, _detail = _git(git, repo, "diff", "--name-only", "-z", "--no-renames", "--diff-filter=A", "HEAD", tip)
+    incoming = [path for path in added.split("\0") if path] if code == 0 else []
+    return sorted({
+        path for path in local for new in incoming
+        if path == new or path.startswith(new + "/") or new.startswith(path + "/")
+    })
+
+
+def _preflight_conflicts(git: str, repo: Path, tip: str) -> list[str] | None:
+    """Conflicting paths from an in-memory merge (git >= 2.38), so a conflict
+    never touches the worktree; None when merge-tree cannot tell."""
+    code, stdout, _detail = _git(git, repo, "merge-tree", "--write-tree", "--name-only", "--no-messages", "-z", "HEAD", tip)
+    if code != 1:
+        return None
+    return list(dict.fromkeys(path for path in stdout.split("\0")[1:] if path))
+
+
 def _block(err, *reasons: str) -> int:
     for reason in reasons:
         err.write(f"BLOCK {RULE}: {reason}\n")
@@ -131,8 +167,27 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     if code != 1 or head is None:
         return _block(err, f"cannot compare HEAD with origin/{trunk}: {detail}")
 
+    before = _snapshot(git, repo)
+    collisions = _collisions(git, repo, tip)
+    preflight = _preflight_conflicts(git, repo, tip)
+    if collisions or preflight:
+        reasons = [f"conflict: {_show(path)}" for path in preflight or []]
+        reasons += [
+            f"ignored or untracked path {_show(path)} collides with a path origin/{trunk} tracks; "
+            "move it out of the worktree first, or the merge would overwrite it."
+            for path in collisions
+        ]
+        reasons.append(f"the merge was not attempted; {branch} is still at {head} and the worktree is untouched.")
+        if preflight:
+            reasons.append("Conflicts are never resolved automatically -- resolve them in a new build round.")
+        return _block(err, *reasons)
+
+    # The fetched commit id, never the name `origin/<trunk>`: a local branch or
+    # tag of that name would shadow the remote-tracking ref. `--ff` overrides a
+    # user `merge.ff=only`; a merge commit or fast-forward never rewrites history.
     code, _stdout, detail = _git(
-        git, repo, "merge", "--no-edit", f"origin/{trunk}", timeout=SYNC_WRITE_TIMEOUT
+        git, repo, "merge", "--ff", "--no-edit", "-m", f"Merge origin/{trunk} into {branch}", tip,
+        timeout=SYNC_WRITE_TIMEOUT,
     )
     if code == 0:
         new_head = _oid(git, repo, "HEAD")
@@ -147,15 +202,16 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     conflicts = [path for path in unmerged.split("\0") if path]
     if _oid(git, repo, "MERGE_HEAD"):
         _git(git, repo, "merge", "--abort", timeout=SYNC_WRITE_TIMEOUT)
-    reasons = [f"conflict: {path}" for path in conflicts]
+    reasons = [f"conflict: {_show(path)}" for path in conflicts]
     if not conflicts:
         reason = detail if code is None else _git_reason(detail, "merge failed")
-        reasons.append(f"merging origin/{trunk} failed without a conflict: {reason}")
-    if _oid(git, repo, "HEAD") == head and _status(git, repo) == "":
-        reasons.append(
-            f"the merge was aborted; {branch} is back at {head} with a clean worktree. "
-            "Conflicts are never resolved automatically -- resolve them in a new build round."
-        )
+        reasons.append(f"merging origin/{trunk} failed without a conflict: {_show(reason)}")
+    after = _snapshot(git, repo)
+    if _oid(git, repo, "HEAD") == head and before is not None and after == before:
+        restored = f"the merge was aborted; {branch} is back at {head} with a clean worktree."
+        if conflicts:
+            restored += " Conflicts are never resolved automatically -- resolve them in a new build round."
+        reasons.append(restored)
     else:
         reasons.append(
             f"the aborted merge did not restore {branch} to {head} with a clean worktree; "

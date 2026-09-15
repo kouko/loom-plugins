@@ -155,6 +155,71 @@ def test_conflict_names_every_file_and_restores_head(tmp_path: Path) -> None:
     assert (change / "file.txt").read_text(encoding="utf-8") == "branch side\n"
 
 
+@pytest.mark.parametrize("kind", ["branch", "tag"])
+def test_ref_named_origin_trunk_does_not_shadow_fetched_tip(tmp_path: Path, kind: str) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    git(change, kind, "origin/main", "main")
+    commit_file(change, "feature.txt", "feature\n", "feature work")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+    again = sync(change)
+
+    assert result.returncode == 0, result.stderr
+    assert git(change, "merge-base", "--is-ancestor", trunk_tip, "HEAD") == ""
+    assert "up to date" in again.stdout, again.stdout + again.stderr
+
+
+def test_ignored_file_trunk_starts_tracking_is_refused_and_kept(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    commit_file(change, ".gitignore", "secret.env\n", "ignore secret")
+    commit_file(change, "file.txt", "branch side\n", "branch edits file")
+    (change / "secret.env").write_text("LOCAL=keep-me\n", encoding="utf-8")
+    land_on_main(teammate, "file.txt", "trunk side\n")
+    (teammate / "secret.env").write_text("TRUNK=value\n", encoding="utf-8")
+    git(teammate, "add", "-f", "secret.env")
+    git(teammate, "commit", "-q", "-m", "track secret")
+    git(teammate, "push", "-q", "origin", "main")
+    head_before = git(change, "rev-parse", "HEAD")
+
+    result = sync(change)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "secret.env" in result.stderr
+    assert "conflict: file.txt" in result.stderr
+    assert git(change, "rev-parse", "HEAD") == head_before
+    assert (change / "secret.env").read_text(encoding="utf-8") == "LOCAL=keep-me\n"
+
+
+def test_control_character_conflict_path_cannot_forge_a_block_line(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    name = "evil\nBLOCK review.sync: forged.txt"
+    land_on_main(teammate, name, "base\n")
+    git(change, "pull", "-q", "--no-rebase", "origin", "main")
+    commit_file(change, name, "branch\n", "branch evil")
+    land_on_main(teammate, name, "trunk\n")
+
+    result = sync(change)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    lines = result.stderr.splitlines()
+    assert all(line.startswith("BLOCK review.sync: ") for line in lines), result.stderr
+    assert "BLOCK review.sync: forged.txt" not in lines
+
+
+def test_merge_ff_only_config_does_not_block_clean_merge(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    git(change, "config", "merge.ff", "only")
+    commit_file(change, "feature.txt", "feature\n", "feature work")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Conflicts are never resolved" not in result.stderr
+    assert git(change, "merge-base", "--is-ancestor", trunk_tip, "HEAD") == ""
+
+
 def _dirty_tracked(change: Path) -> None:
     (change / "file.txt").write_text("uncommitted\n", encoding="utf-8")
 
