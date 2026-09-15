@@ -471,16 +471,17 @@ def test_contract_defines_the_executable_json_boundary() -> None:
     assert '"event": "host-rejection"' in text
     assert "capabilities" in text
     assert "completed_redispatches" in text
+    flat = " ".join(text.split())
+    assert "pass the resolver's deterministic JSON result to the host-native spawn" in flat
+    assert "post-execution capability-quality failure" in flat
+    assert "pre-execution host rejection" in flat
 
 
 @pytest.mark.parametrize("station", ["build", "closing-review"])
-def test_stations_invoke_the_executable_resolver_before_spawn(station: str) -> None:
+def test_stations_point_to_the_executable_resolver_contract(station: str) -> None:
     text = (PLUGIN / "skills" / station / "SKILL.md").read_text(encoding="utf-8")
     flat = " ".join(text.split())
-    assert "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py" in text
-    assert "python3 <loom-code>/scripts/dispatch_profile.py" in text
+    assert "](../../references/dispatch-profile.md)" in text
     assert "on any other host it is the directory two levels above this SKILL.md" in flat
     assert "injected loom-code plugin root" not in text
-    assert "Pass its deterministic JSON result to the host-native spawn" in flat
-    assert "post-execution capability-quality failure" in flat
-    assert "pre-execution host rejection" in flat
+    assert "scripts/dispatch_profile.py" not in text

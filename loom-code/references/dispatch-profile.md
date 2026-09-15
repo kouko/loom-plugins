@@ -2,7 +2,9 @@
 
 This is the normative, host-neutral contract for choosing a Loom subagent's
 model and reasoning effort. Product model names stay in host adapters; role
-names and agent frontmatter stay outside the routing decision.
+names and agent frontmatter stay outside the routing decision. Routing must come
+from this contract alone; a static model or effort pin in an agent contract is
+invalid.
 
 ## Inputs and record
 
@@ -17,9 +19,11 @@ atomic fallback in this contract instead of inferring a portable baseline.
 
 ## Executable resolver
 
-Before a host-native spawn, a station invokes the packaged standard-library
-oracle by its absolute plugin root and supplies exactly one
-observed-state JSON object on standard input:
+Before every host-native dispatch, a station must classify the task from its
+evidence and resolve the atomic model-and-effort profile against the selected
+model's verified host capabilities. To resolve it, the station invokes the
+packaged standard-library oracle by its absolute plugin root and supplies
+exactly one observed-state JSON object on standard input:
 
 ```text
 # Claude Code
@@ -57,7 +61,9 @@ universal product-model table. A verified host-native effort may appear in the
 selected model's array only so an observed main value can be inherited. The
 resolver never generates such a value.
 
-After an execution, use `"event": "after-execution"` and add `last_attempt`
+The station must feed every completed result back as an `after-execution` event
+before any redispatch. After an execution, use `"event": "after-execution"` and
+add `last_attempt`
 with typed `completed`, `success`, and `conforming` observations plus the
 effective `profile`. `success` reports whether the completed work satisfied
 its acceptance conditions. `conforming` reports whether the output is
@@ -74,7 +80,11 @@ is malformed input and exits non-zero.
 
 A capability-quality failure means the completed task omitted a checkable
 obligation, produced an oracle-verifiable wrong result, or failed to connect
-required system relationships; it is not a provider error. `failure_trigger`
+required system relationships; it is not a provider error. Describe an omitted
+obligation or wrong result as a post-execution capability-quality failure only
+when it meets this checkable definition; describe rejected routing parameters
+as a pre-execution host rejection, which selects the one atomic fallback instead
+of model escalation. `failure_trigger`
 is required only for a transition into `high` or `xhigh`; low-to-medium and
 non-routing failures omit it.
 
@@ -87,7 +97,10 @@ resolver returns `execution-failed`.
 
 The resolver emits one deterministic JSON object. `overrides` is either the
 complete portable pair or `null`; a station must never reconstruct a partial
-pair. `outcome` is `dispatch`, `routed`, or `execution-failed`. Unknown fields,
+pair. The station must pass the resolver's deterministic JSON result to the
+host-native spawn and apply the resolved overrides at invocation time. At that
+spawn, apply both fields from `overrides`, or apply neither when it is `null`.
+`outcome` is `dispatch`, `routed`, or `execution-failed`. Unknown fields,
 unknown events, malformed types, and malformed JSON exit non-zero without a
 decision. The caller retains the returned record in active task context. A
 redispatch decision includes `next_redispatch`; only after that task execution
