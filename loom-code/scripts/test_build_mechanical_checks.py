@@ -111,7 +111,78 @@ def test_rerun_trigger_covers_every_fix() -> None:
     assert "run the complete package suite and re-run the existing adversarial programs" in sentence
     assert not has_negation(sentence), sentence
     assert not _OPTIONAL.search(sentence), sentence
-    assert "Do not dispatch the adversary again." in VERIFY
+    assert "Do not dispatch the adversary again." not in VERIFY
+    assert VERIFY.count(ORDINARY_FIX_NO_REDISPATCH) == 1, VERIFY
+
+
+ORDINARY_FIX_NO_REDISPATCH = (
+    "After a fix that leaves every adversarial program fitting the change, do not "
+    "dispatch the adversary again."
+)
+NO_OTHER_ROLE_EDITS_PROGRAM = (
+    "Implementers and the orchestrator never edit an adversarial program."
+)
+
+
+def _names_stale_program_redispatch(section: str) -> bool:
+    """One affirmative sentence re-dispatches the adversary to update its own
+    programs when a widened scope makes one stale."""
+    return any(
+        "widens or changes what the change covers" in s
+        and "Build dispatches the `loom-code:adversary` agent fresh-context again "
+        "to update its own programs" in s
+        and not has_negation(s)
+        for s in _sentences(section)
+    )
+
+
+def _pins_exact_sentence(section: str, sentence: str) -> bool:
+    return _sentences(section).count(sentence) == 1
+
+
+def test_stale_program_redispatch_helpers_synthetic() -> None:
+    affirmative = (
+        "When a fix widens or changes what the change covers and a committed adversarial "
+        "program fails for that reason, Build dispatches the `loom-code:adversary` agent "
+        "fresh-context again to update its own programs."
+    )
+    negated = affirmative.replace("When a fix", "Never, when a fix")
+    assert _names_stale_program_redispatch(affirmative)
+    assert not _names_stale_program_redispatch(negated)
+    assert _pins_exact_sentence(f"Run checks. {NO_OTHER_ROLE_EDITS_PROGRAM}", NO_OTHER_ROLE_EDITS_PROGRAM)
+    assert not _pins_exact_sentence(
+        "Run checks. Implementers and the orchestrator may edit an adversarial program.",
+        NO_OTHER_ROLE_EDITS_PROGRAM,
+    )
+    assert _pins_exact_sentence(f"Run checks. {ORDINARY_FIX_NO_REDISPATCH}", ORDINARY_FIX_NO_REDISPATCH)
+    assert not _pins_exact_sentence(
+        "Run checks. After a fix that leaves every adversarial program fitting the change, "
+        "dispatch the adversary again.",
+        ORDINARY_FIX_NO_REDISPATCH,
+    )
+
+
+def test_build_redispatches_adversary_for_stale_programs() -> None:
+    assert _names_stale_program_redispatch(VERIFY), VERIFY
+    inputs = _sentence(VERIFY, "the widened changed paths")
+    assert "the failing program's output" in inputs
+    assert not has_negation(inputs), inputs
+    assert _sentence(VERIFY, "The adversary updates only its own programs") == (
+        "The adversary updates only its own programs."
+    )
+    assert "each adversary re-dispatch with its reason" in HANDOFF
+    assert "the adversary never fixes what it breaks" in VERIFY
+
+
+def test_no_other_role_edits_adversarial_program() -> None:
+    assert _pins_exact_sentence(VERIFY, NO_OTHER_ROLE_EDITS_PROGRAM), VERIFY
+    assert PROSE.count("edit an adversarial program") == 1
+
+
+def test_ordinary_fix_reruns_programs_without_redispatch() -> None:
+    assert _pins_exact_sentence(VERIFY, ORDINARY_FIX_NO_REDISPATCH), VERIFY
+    rerun = VERIFY.index("Repeat these end-of-Build checks after every fix:")
+    assert rerun < VERIFY.index(ORDINARY_FIX_NO_REDISPATCH)
 
 
 def test_returned_change_only_trigger_absent() -> None:
