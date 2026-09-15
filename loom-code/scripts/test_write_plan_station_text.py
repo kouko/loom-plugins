@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from prose_pin import NEGATION_RE
+from prose_pin import NEGATION_RE, has_negation, split_sentences
 
 REPO = Path(__file__).resolve().parents[2]
 SKILL = REPO / "loom-code" / "skills" / "write-plan" / "SKILL.md"
@@ -181,11 +181,41 @@ def test_suggest_is_non_blocking_and_has_no_background_listener() -> None:
 LANE_WORDING_RE = re.compile(r"(?i)\b(small|full)[- ]lanes?\b|\blanes?\b")
 
 
+ASK_SENTENCE = (
+    "`ask` is a standing choice that puts one cross-model review question to "
+    "the user on every change."
+)
+
+
+def affirmed_sentences(text: str, *literals: str) -> list[str]:
+    """Sentences holding every literal and no negation token outside code spans."""
+    return [
+        s
+        for s in split_sentences(" ".join(re.sub(r"(?m)^#+ .*$", "", text).split()), ".;")
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_affirmedSentences_syntheticAffirmative_accepted() -> None:
+    assert affirmed_sentences("Next. `ask` puts one question on every change. Done.", "puts one", "on every change")
+
+
+def test_affirmedSentences_syntheticNegated_rejected() -> None:
+    for negated in (
+        "`ask` never puts one question on every change.",
+        "`ask` does not put one question, so puts one on every change.",
+        "`ask` puts one question without asking on every change.",
+        "`ask` puts one question on no change, won't ask on every change.",
+    ):
+        assert not affirmed_sentences(negated, "puts one", "on every change"), negated
+
+
 def test_ask_still_asks_once_per_change() -> None:
     text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
     flat = " ".join(text.split())
     assert "second-vendor: ask" in flat
-    assert "on every change" in flat
+    assert affirmed_sentences(text, "puts one", "on every change") == [ASK_SENTENCE]
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
     assert "ask_question" not in text  # agy offers no candidate, so it never asks
@@ -224,11 +254,56 @@ def test_suggest_uses_one_cell_markdown_table_with_spacing() -> None:
     assert "raw Markdown" in text
 
 
+RUNTIME_DIRS = ("skills", "agents", "contract", "hooks", "commands", "scripts")
+RUNTIME_SUFFIXES = {".md", ".py", ".sh", ".yaml", ".yml", ".json", ".toml", ".ini", ""}
+DATED_NAME_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def runtime_files() -> list[Path]:
+    """Every runtime file of loom-code and loom-design, walked from disk so the
+    scan also runs in a `git archive` copy. Excluded: tests (they assert the
+    absence), CHANGELOGs and dated records."""
+    files = []
+    for plugin in ("loom-code", "loom-design"):
+        for sub in RUNTIME_DIRS:
+            for path in sorted((REPO / plugin / sub).rglob("*")):
+                if (
+                    path.is_file()
+                    and path.suffix in RUNTIME_SUFFIXES
+                    and not {"__pycache__", ".pytest_cache"} & set(path.parts)
+                    and not re.fullmatch(r"test_.*\.py", path.name)
+                    and not path.name.upper().startswith("CHANGELOG")
+                    and not DATED_NAME_RE.search(path.name)
+                ):
+                    files.append(path)
+    return files
+
+
+def lane_hits(text: str) -> list[str]:
+    return [m.group(0) for m in LANE_WORDING_RE.finditer(" ".join(text.split()))]
+
+
+def test_laneHits_syntheticText_matchesOnlyLaneWords() -> None:
+    assert lane_hits("ask blocks once per full-lane change")
+    assert lane_hits("In the small\n lane it is omitted")
+    assert not lane_hits("planes and a planet on the plane explained")
+
+
+def test_runtime_tree_names_no_lane() -> None:
+    """A2 positive (runtime-tree-lane-scan): no runtime file in either plugin
+    names a lane; the only lane guard, so it is not repeated per file."""
+    files = runtime_files()
+    assert len(files) > 50, "scan scope collapsed"
+    assert REPO / "loom-code" / "hooks" / "session-start" in files
+    offenders = {
+        str(path.relative_to(REPO)): hits
+        for path in files
+        if (hits := lane_hits(path.read_text(encoding="utf-8", errors="replace")))
+    }
+    assert offenders == {}
+
+
 def test_second_vendor_text_names_no_lane() -> None:
-    for path in (SKILL, SECOND_VENDOR_REFERENCE):
-        flat = " ".join(path.read_text(encoding="utf-8").split())
-        hits = [m.group(0) for m in LANE_WORDING_RE.finditer(flat)]
-        assert not hits, f"{path.name} still mentions lanes: {hits}"
     reference = " ".join(SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8").split())
     assert "next-change-only" in reference
     assert "there is only one reader" not in reference

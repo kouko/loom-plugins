@@ -188,6 +188,15 @@ def test_second_vendor_modes_remove_none_and_default_to_suggest(manifest):
     assert "second-vendor: none" not in template
 
 
+def test_second_vendor_note_names_no_lane_and_asks_once_per_change(manifest):
+    """A2/A3: the contract note says `ask` blocks once per change, with no lane."""
+    entry = next(k for k in manifest["kickoff_defaults"] if k["name"] == "second-vendor")
+    note = " ".join(entry["note"].split())
+    lane = re.compile(r"(?i)\b(small|full)[- ]lanes?\b|\blanes?\b")
+    assert [m.group(0) for m in lane.finditer(note)] == []
+    assert "`ask` blocks once per change;" in note
+
+
 def test_restate_action_routes_only_ask_at_decision_point_one(manifest):
     action = next(a for a in manifest["actions"] if a["name"] == "restate-and-confirm")
     assert "second-vendor: ask" in action["summary"]

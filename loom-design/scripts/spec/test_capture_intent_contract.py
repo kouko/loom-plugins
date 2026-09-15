@@ -315,7 +315,7 @@ def test_suggest_skips_the_intent_decision_point() -> None:
 def test_ask_keeps_the_question_on_every_change() -> None:
     text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
     flat = " ".join(text.split())
-    assert "on every change" in flat
+    assert _affirmed(text, "puts one", "on every change") == [ASK_SENTENCE]
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
     assert "ask_question" not in text  # agy offers no candidate, so it never asks
@@ -326,11 +326,27 @@ def test_ask_keeps_the_question_on_every_change() -> None:
     assert "這次不使用" not in text
     assert "recommended" in flat
     assert "there is only one reader" not in flat
-    lane = re.compile(r"(?i)\b(small|full)[- ]lanes?\b|\blanes?\b")
-    for path in (SKILL, SECOND_VENDOR_REFERENCE):
-        body = " ".join(path.read_text(encoding="utf-8").split())
-        hits = [m.group(0) for m in lane.finditer(body)]
-        assert not hits, f"{path.name} still mentions lanes: {hits}"
+    # Lane wording is guarded once, across both plugins' runtime trees, by
+    # loom-code/scripts/test_write_plan_station_text.py::test_runtime_tree_names_no_lane.
+
+
+ASK_SENTENCE = (
+    "**`ask`** puts one cross-model review question into decision point ① on every change."
+)
+
+
+def test_askPin_syntheticAffirmative_accepted() -> None:
+    assert _affirmed("Next. **`ask`** puts one question on every change. Done.", "puts one", "on every change")
+
+
+def test_askPin_syntheticNegated_rejected() -> None:
+    for negated in (
+        "**`ask`** never puts one question on every change.",
+        "**`ask`** does not put one question, yet puts one on every change.",
+        "**`ask`** puts one question without a reply on every change.",
+        "**`ask`** puts one question on no change and won't on every change.",
+    ):
+        assert not _affirmed(negated, "puts one", "on every change"), negated
 
 
 def test_ask_excludes_host_and_defines_unavailable_paths() -> None:
