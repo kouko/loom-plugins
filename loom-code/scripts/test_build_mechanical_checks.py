@@ -3,6 +3,8 @@
 import re
 from pathlib import Path
 
+import pytest
+
 from prose_pin import has_negation, split_sentences as _sentences
 
 
@@ -250,3 +252,194 @@ def test_skipped_selection_step_omits_that_check() -> None:
     assert (
         "When it lists `package-tests` as skipped, run no complete package suite."
     ) in VERIFY
+
+
+# --- The adversary updates its own programs with evidence and reuses first ---
+
+def _flat(path: Path) -> str:
+    return " ".join(re.sub(r"^> ?", "", path.read_text(encoding="utf-8"), flags=re.M).split())
+
+
+ADVERSARY_PROSE = _flat(ADVERSARY)
+ADVERSARIAL_REF = _flat(ROOT / "loom-code/skills/closing-review/references/adversarial.md")
+UPDATE_NO_WEAKENING = "An update never deletes, skips or xfails a case to make it pass."
+PROBES_FIELD = re.compile(
+    r"^probes: \[\{artifact: .+, status: reused \| modified \| new, reason: .+\}\]$", re.M
+)
+
+
+def _affirms(text: str, verb: str, literal: str, *extras: str) -> bool:
+    """Some sentence carries `verb` before `literal`, every extra, and no negation."""
+    for s in _sentences(text):
+        v, lit = s.find(verb), s.find(literal)
+        if 0 <= v < lit and all(e in s for e in extras) and not has_negation(s):
+            return True
+    return False
+
+
+# (doc, verb, literal, extras, affirmative example, rejected examples)
+PROBE_MAINTENANCE_PINS = {
+    "role-updates-own-programs": (
+        "adversary", "You fix nothing you attack, and you",
+        "update only your own programs when Build re-dispatches you", (),
+        "You fix nothing you attack, and you update only your own programs when Build re-dispatches you.",
+        ("You fix nothing you attack, and you never update only your own programs when Build re-dispatches you.",),
+    ),
+    "update-scope": (
+        "adversary", "When Build re-dispatches you for a widened scope,",
+        "update only the programs you committed for this change", ("fix nothing in the product",),
+        "When Build re-dispatches you for a widened scope, update only the programs you committed "
+        "for this change, and still fix nothing in the product.",
+        ("When Build re-dispatches you for a widened scope, do not update only the programs you "
+         "committed for this change, and still fix nothing in the product.",),
+    ),
+    "mutation-on-committed-probe": (
+        "adversary", "Back every update with mutation evidence",
+        "against the committed probe program itself", (),
+        "Back every update with mutation evidence run against the committed probe program itself;",
+        ("Back every update with mutation evidence run against a copy of its logic, not against "
+         "the committed probe program itself;",
+         "Back every update with mutation evidence run against a copy of its logic;"),
+    ),
+    "mutation-per-kind-and-over-broad": (
+        "adversary", "Use", "at least one mutation per kind of change the update touches",
+        ("an over-broad update would wrongly accept",),
+        "Use at least one mutation per kind of change the update touches, and include one that "
+        "an over-broad update would wrongly accept.",
+        ("Use at least one mutation per kind of change the update touches, and never include one "
+         "that an over-broad update would wrongly accept.",
+         "Use one mutation for the update, and include one that an over-broad update would wrongly accept."),
+    ),
+    "mutation-red-then-reverted": (
+        "adversary", "Each mutation must", "turn the probe RED and is then reverted", (),
+        "Each mutation must turn the probe RED and is then reverted;",
+        ("Each mutation must not turn the probe RED and is then reverted;",),
+    ),
+    "mutation-reported": (
+        "adversary", "report each one with", "its command and observed result", (),
+        "report each one with its command and observed result.",
+        ("never report each one with its command and observed result.",),
+    ),
+    "reuse-checks-existing-first": (
+        "adversary", "check what already covers the target",
+        "this change's programs under `docs/loom/<change-id>/evidence/probes/`",
+        ("the repository's related tests",),
+        "Before you write any probe, check what already covers the target: this change's programs "
+        "under `docs/loom/<change-id>/evidence/probes/` and the repository's related tests.",
+        ("Before you write any probe, you need not check what already covers the target: this "
+         "change's programs under `docs/loom/<change-id>/evidence/probes/` and the repository's related tests.",),
+    ),
+    "reuse-modify-then-new": (
+        "adversary", "Reuse a program that already covers a case",
+        "write a new probe only when nothing covers the case",
+        ("modify a program when a small change makes it cover the case",),
+        "Reuse a program that already covers a case and write nothing new for it, modify a program "
+        "when a small change makes it cover the case, and write a new probe only when nothing covers the case.",
+        ("Reuse a program that already covers a case or do not, modify a program when a small change "
+         "makes it cover the case, and write a new probe only when nothing covers the case.",),
+    ),
+    "permanent-test-is-reuse": (
+        "adversary", "counts as reuse", "name it in `reason`",
+        ("A permanent repository test that already covers a case", "leave the test as it is"),
+        "A permanent repository test that already covers a case counts as reuse: name it in "
+        "`reason` and leave the test as it is.",
+        ("A permanent repository test that already covers a case never counts as reuse: name it in "
+         "`reason` and leave the test as it is.",),
+    ),
+    "status-with-reason-for-new": (
+        "adversary", "marks each probe", "as `reused`, `modified` or `new`",
+        ("every `new` one carries a one-line `reason`",),
+        "`probes` marks each probe as `reused`, `modified` or `new`, and every `new` one carries a one-line `reason`.",
+        ("`probes` never marks each probe as `reused`, `modified` or `new`, and every `new` one "
+         "carries a one-line `reason`.",
+         "`probes` marks each probe as `reused`, `modified` or `new`."),
+    ),
+    "ref-reuse-checks-existing-first": (
+        "ref", "the adversary checks what already covers the target",
+        "this change's programs under `docs/loom/<change-id>/evidence/probes/`",
+        ("the repository's related tests",),
+        "Before writing any probe, the adversary checks what already covers the target: this "
+        "change's programs under `docs/loom/<change-id>/evidence/probes/` and the repository's related tests.",
+        ("Before writing any probe, the adversary checks what already covers the target, not "
+         "this change's programs under `docs/loom/<change-id>/evidence/probes/` and the repository's related tests.",),
+    ),
+    "ref-status-with-reason-for-new": (
+        "ref", "marks each probe", "`reused`, `modified` or `new`",
+        ("a one-line reason for every new one",),
+        "Its report marks each probe `reused`, `modified` or `new`, with a one-line reason for every new one.",
+        ("Its report marks each probe `reused`, `modified` or `new`, with no one-line reason for every new one.",
+         "Its report marks each probe `reused`, `modified` or `new`."),
+    ),
+    "ref-update-own-programs": (
+        "ref", "When Build re-dispatches it for a widened scope,",
+        "the adversary updates only its own programs", ("fixes nothing in the product",),
+        "When Build re-dispatches it for a widened scope, the adversary updates only its own "
+        "programs and fixes nothing in the product.",
+        ("When Build re-dispatches it for a widened scope, the adversary never updates only its own "
+         "programs and fixes nothing in the product.",),
+    ),
+    "ref-mutation-evidence": (
+        "ref", "Every update carries mutation evidence run",
+        "against the committed probe program itself",
+        ("at least one mutation per kind of change the update touches",
+         "an over-broad update would wrongly accept"),
+        "Every update carries mutation evidence run against the committed probe program itself: "
+        "at least one mutation per kind of change the update touches, plus one that an over-broad "
+        "update would wrongly accept.",
+        ("Every update carries mutation evidence run against the committed probe program itself: "
+         "at least one mutation per kind of change the update touches, plus no one that an "
+         "over-broad update would wrongly accept.",
+         "Every update carries mutation evidence run against the committed probe program itself: "
+         "one mutation overall."),
+    ),
+    "ref-floor-counts-reuse": (
+        "ref", "Reused and modified cases count", "toward the floor", (),
+        "Reused and modified cases count toward the floor.",
+        ("Reused and modified cases do not count toward the floor.",),
+    ),
+}
+_PIN_DOCS = {"adversary": ADVERSARY_PROSE, "ref": ADVERSARIAL_REF}
+
+
+@pytest.mark.parametrize("pin", sorted(PROBE_MAINTENANCE_PINS))
+def test_probe_maintenance_pin_helpers_synthetic(pin: str) -> None:
+    _doc, verb, literal, extras, affirmative, rejected = PROBE_MAINTENANCE_PINS[pin]
+    assert _affirms(affirmative, verb, literal, *extras)
+    assert any(has_negation(r) for r in rejected), pin
+    for example in rejected:
+        assert not _affirms(example, verb, literal, *extras), example
+
+
+@pytest.mark.parametrize("pin", sorted(PROBE_MAINTENANCE_PINS))
+def test_adversary_probe_maintenance_rule_stated(pin: str) -> None:
+    doc, verb, literal, extras, _affirmative, _rejected = PROBE_MAINTENANCE_PINS[pin]
+    assert _affirms(_PIN_DOCS[doc], verb, literal, *extras), (pin, verb, literal)
+
+
+def test_update_no_weakening_helpers_synthetic() -> None:
+    assert _pins_exact_sentence(f"Keep every case. {UPDATE_NO_WEAKENING}", UPDATE_NO_WEAKENING)
+    assert not _pins_exact_sentence(
+        "Keep every case. An update may delete, skip or xfail a case to make it pass.",
+        UPDATE_NO_WEAKENING,
+    )
+
+
+def test_adversary_update_never_weakens_a_case() -> None:
+    assert _pins_exact_sentence(ADVERSARY_PROSE, UPDATE_NO_WEAKENING), ADVERSARY_PROSE
+    assert _pins_exact_sentence(ADVERSARIAL_REF, UPDATE_NO_WEAKENING), ADVERSARIAL_REF
+    assert "**at least three**" in ADVERSARIAL_REF
+    assert "**at least three**" in ADVERSARY_PROSE
+
+
+def test_probes_field_helper_synthetic() -> None:
+    good = 'probes: [{artifact: "<path>", status: reused | modified | new, reason: "<one line>"}]'
+    assert PROBES_FIELD.search(good)
+    assert not PROBES_FIELD.search('probes: [{artifact: "<path>", status: reused | modified | new}]')
+
+
+def test_adversary_return_format_marks_probe_status() -> None:
+    text = ADVERSARY.read_text(encoding="utf-8")
+    block = text.split("## What you return", 1)[1].split("```", 2)[1]
+    assert PROBES_FIELD.search(block), block
+    assert re.search(r"^adversarial: \[\{command: ", block, re.M), block
+    assert re.search(r"^findings: \[\{severity: ", block, re.M), block

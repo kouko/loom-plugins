@@ -5,6 +5,25 @@ is to make the change fail. It runs at the end of Build, and everything it
 runs is committed as a program: Build re-runs those programs on every fix
 loop, and `finalize-review` executes them on committed content.
 
+## Reuse first, update with evidence
+
+Before writing any probe, the adversary checks what already covers the
+target: this change's programs under `docs/loom/<change-id>/evidence/probes/`
+and the repository's related tests. It reuses a program that covers a case,
+modifies one when a small change covers it, and writes a new probe only when
+nothing covers the case. A permanent repository test that covers a case
+counts as reuse, and the adversary leaves that test as it is. Its report marks
+each probe `reused`, `modified` or `new`, with a one-line reason for every new
+one.
+
+When Build re-dispatches it for a widened scope, the adversary updates only
+its own programs and fixes nothing in the product. Every update carries
+mutation evidence run against the committed probe program itself: at least
+one mutation per kind of change the update touches, plus one that an
+over-broad update would wrongly accept. Each mutation turns the probe RED and
+is reverted, and the report gives its command and observed result. An update
+never deletes, skips or xfails a case to make it pass.
+
 ## Code
 
 **If the repo declares mutation or fuzz tooling** — a `mutmut`,
@@ -14,7 +33,8 @@ asserts nothing.
 
 **If it declares none** (the common case), write **at least three**
 executable abuse or boundary cases against the changed behaviour, run them,
-and record each one. Three is the floor, not the target. Draw them from:
+and record each one. Three is the floor, not the target. Reused and modified
+cases count toward the floor. Draw them from:
 
 | Class | The question |
 |---|---|
