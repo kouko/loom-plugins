@@ -30,6 +30,11 @@ charter: 1.0
 - Test: A1 positive: sync-trunk-staleness-covered; negative: defect-guard-mutant-survives-pins. A2 positive: restore-original-rejection-mutation-required; negative: loosening-by-modify-accepted. A4 positive: branch-tests-excluded-from-reuse-floor; negative: implementer-pins-count-as-reuse. A5 positive: adversary-abuse-program-green; negative: rerun-sentence-deletion-survives.
 - Risk: agent-decided — defect stays failing and returns a finding; exception extends to sync-trunk staleness; adversary program is read-only for the implementer.
 
+**W2-02 Make mutation evidence runnable without discard commands**  after: W2-01  acceptance: 2, 3, 4
+- Files: loom-code/agents/adversary.md, loom-code/skills/closing-review/references/adversarial.md, loom-code/scripts/test_build_mechanical_checks.py
+- Test: A2 positive: mutation-applied-in-throwaway-copy-or-edit-tool; negative: git-checkout-discard-named-as-revert. A3 positive: rerun-trial-adversary-runs-own-mutations; negative: trial-blocked-by-discard-guard. A4 positive: flipped-case-marked-modified; negative: rewritten-case-marked-new.
+- Risk: agent-decided — blind run found `git checkout --` refused by the host guard; mutations run on a throwaway copy of the committed probe; blind run re-runs Acceptance 3 afterwards.
+
 ## Questions asked
 ① — what — 對抗 agent 的兩個問題：範圍擴大後由對抗 agent 自己更新檢查並附正式突變證據；寫之前先查既有檢查與測試、逐項標沿用／修改／新增；本機暫存 repo 實跑驗證；授權自動 push 開 PR、合併前回「接受」；這樣對嗎？
 ① — what — 所以 A+ 實際上的修改有哪些？另外當前業界似乎有一派認為當前最新的模型其實少寫 prompt 指示效果更好，對此你的看法是？（使用者追問）
