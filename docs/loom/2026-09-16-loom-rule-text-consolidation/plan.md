@@ -38,6 +38,16 @@ charter: 1.0
 - Test: A4 positive: missing-link-in-references-reported; negative: existing-backtick-path-passes. A4 boundary: plugin-root-relative-path-resolves.
 - Risk: agent-decided — scan widened only; backtick paths are checked when they name a skill-relative or loom-code-rooted `.md` file, to avoid flagging placeholders like `<change-id>`.
 
+**W1-06 Align loom-memory's lesson routing with the frozen backlog**  after: W1-04  acceptance: 1
+- Files: loom-workflow/skills/loom-memory/SKILL.md, loom-workflow/skills/loom-memory/evals/record-timing.md, loom-workflow/skills/loom-memory/evals/record-timing-cases.json, loom-workflow/skills/loom-memory/scripts/test_skill_contract.py
+- Test: A1 positive: record-section-routes-unfinished-item-to-intent; negative: backlog-entry-routing-sentence-rejected.
+- Risk: agent-decided — C17's loom-memory half sits in a digest-guarded Record section; a baseline and a changed-text cold-reader run gate the digest update, else the item is reported unresolved.
+
+**W1-07 Remove remaining retired skill names from distill-sessions docs**  after: W1-04  acceptance: 1
+- Files: loom-workflow/skills/distill-sessions/references/claude-code-tools.md, loom-workflow/skills/distill-sessions/references/codex-tools.md, loom-workflow/skills/distill-sessions/README.md, loom-workflow/skills/distill-sessions/README.ja.md, loom-workflow/skills/distill-sessions/README.zh-TW.md, loom-workflow/scripts/test_no_retired_loom_code_skill_names.py
+- Test: A1 positive: distill-sessions-docs-free-of-retired-names; negative: retired-name-in-reference-flagged.
+- Risk: agent-decided — found by W1-04 beyond the audit's C19 list; scripts that match skill names as data stay unchanged.
+
 ### Wave 2
 
 **W2-01 Keep severity rules only in lenses.md**  after: W1-04  acceptance: 2
@@ -72,7 +82,7 @@ charter: 1.0
 
 ### Wave 3
 
-**W3-01 Measure the word reduction against the baseline**  after: W1-01, W1-02, W1-03, W1-04, W1-05, W2-01, W2-04, W2-05, W2-06  acceptance: 3
+**W3-01 Measure the word reduction against the baseline**  after: W1-01, W1-02, W1-03, W1-04, W1-05, W1-06, W1-07, W2-01, W2-02, W2-03, W2-04, W2-05, W2-06  acceptance: 3
 - Files: docs/loom/2026-09-16-loom-rule-text-consolidation/evidence/word-count.md
 - Test: A3 positive: total-at-most-35665-words; boundary: write-plan-body-below-3750.
 - Risk: agent-decided — same file set and `str.split` method as the baseline; if under 2,000 words, Build tightens restated prose inside already-touched files rather than widening scope.
