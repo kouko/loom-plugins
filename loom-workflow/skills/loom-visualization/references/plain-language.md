@@ -62,8 +62,9 @@ Replace an abstract noun with "you do X, you see Y".
 ### 5. Ask decision questions with real alternatives
 
 A yes-or-no confirmation (publish, delete, confirm a restatement) is asked
-directly, with no invented alternatives. A question about how to do
-something lists at least two workable alternatives and marks the one you
+directly, with no invented alternatives. When asking or answering how to do
+something (you ask the user to decide how, or the user asks you how), the
+reply lists at least two workable alternatives and marks the one you
 recommend. Before sending, check three commonly missed alternatives: do
 nothing or later, a smaller or simpler version, and combining two of the
 listed options. For each of the three, the reply either lists it or says in
@@ -71,18 +72,36 @@ one short clause why it is ruled out, however many other options are listed;
 when only two alternatives remain, those clauses say why there is no third.
 Give each option one sentence on what choosing it changes for the user.
 
-Why: in Paul Nutt's study of 400 business decisions, "whether or not"
-decisions that weighed a single option failed 52% of the time, against 32%
-when two or more alternatives were considered
+Why: in Paul Nutt's study of 400 business decisions, about half failed, and
+failure was more likely when the first idea was adopted
 ([Ohio State News](https://news.osu.edu/half-of-business-decisions-fail-because-of-managements-blunders-new-study-finds/)).
+In Nutt's 1999 study, managers developed multiple options in fewer than 20
+percent of their decisions; when they did, success rates rose from 56 percent
+to 70 percent
+([Academy of Management Executive 13(4)](https://journals.aom.org/doi/10.5465/AME.1999.2570556)).
 Chernev et al. (2015) found that choice overload depends on the context
 rather than on the number of options alone
 ([Journal of Consumer Psychology](https://www.sciencedirect.com/science/article/abs/pii/S1057740814000916)),
 so list the workable options and leave out filler.
 
+Hard to read: "Should I refactor the parser?"
+
+Plain: one line of question, then a Decision consequences table
+(situation 1 below) with the recommended option marked.
+
+"How should the parser change?"
+
+| Option | What you gain | What you give up | Best if |
+|---|---|---|---|
+| Fix only the failing case (recommended) | One file changes today | Other cases stay as they are | The bug blocks a release |
+| Rewrite the parser | Every input format gets retested | Two days of work | More formats are coming |
+| Leave it for now | No work now | The error stays until next week | Nobody hits it yet |
+
+Combining the fix and the rewrite is ruled out: the rewrite already covers the
+failing case.
+
 | Hard to read | Plain |
 |---|---|
-| "Should I refactor the parser?" | "How should the parser change? (A, recommended) Fix only the failing case: one file changes today. (B) Rewrite the parser: every input format gets retested. (C) Leave it for now: the error stays until next week." |
 | "Do you want option A, B or C for publishing?" (for a publish confirmation) | "Publish the page now?" |
 
 ### 6. Show shaped content as tables or diagrams
@@ -252,7 +271,7 @@ In a real reply, replace "Environment A / B / C" with the environment names.
 
 ### Rules
 
-1. Use a table only when each item has three or more attributes; otherwise use a list (Google, Microsoft).
+1. Use a table only when each item has three or more attributes; otherwise use a list (Google, Microsoft). Exception: a key-value summary table, one label plus one value per row (such as the incident report summary S19 or the component state matrix D7), may have two columns.
 2. Put the value that identifies the row in the leftmost column (Microsoft).
 3. Keep columns few and cells to one line; in chat, use at most 4 to 5 columns. The one-line cell is Microsoft's rule; the column cap is derived from fitting chat width, not a published rule.
 4. Write specific headers, and do not let a header and its cell form a sentence (Microsoft).
@@ -377,4 +396,5 @@ it departs from NN/g when there are more than three options.
 - GitHub skips inline SVG: https://alexwlchan.net/notes/2024/how-to-render-svgs-on-github/
 - ProdPad, Now-Next-Later roadmap: https://www.prodpad.com/blog/invented-now-next-later-roadmap/
 - Paul Nutt, 400 decisions: https://news.osu.edu/half-of-business-decisions-fail-because-of-managements-blunders-new-study-finds/
+- Nutt, P. C. (1999), "Surprising but true: Half the decisions in organizations fail", Academy of Management Executive 13(4): https://journals.aom.org/doi/10.5465/AME.1999.2570556
 - Chernev et al. (2015), choice overload: https://www.sciencedirect.com/science/article/abs/pii/S1057740814000916

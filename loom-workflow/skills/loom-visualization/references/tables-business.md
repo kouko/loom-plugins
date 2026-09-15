@@ -1,6 +1,6 @@
 # Tables in business strategy, consulting and product management documents
 
-Load this when: the user asks for one of these documents: weighted or Pugh matrix, RICE, ICE, MoSCoW or WSJF prioritisation, SWOT or TOWS, competitive analysis, Five Forces, stakeholder analysis or RACI, scenario planning, business case or cost-benefit, OKR or KPI tracker, assumption log, go/no-go review, pricing tiers, Kano evaluation, decisional balance sheet, Now-Next-Later roadmap.
+Load this when: the user asks for one of these documents: weighted or Pugh matrix, RICE, ICE, MoSCoW or WSJF prioritisation, SWOT or TOWS, competitive analysis, Five Forces, stakeholder analysis, scenario planning, business case or cost-benefit, OKR or KPI tracker, assumption log, go/no-go review, pricing tiers, Kano evaluation, decisional balance sheet, Now-Next-Later roadmap.
 
 A chat reply about a conversation situation (decision, before and after,
 progress, checklist, confirmed and unconfirmed, findings, risks, support
