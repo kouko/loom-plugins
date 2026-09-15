@@ -23,16 +23,20 @@ field, identifier, checker rule, or station.
   unanswered, deferred, or answered about something else is dropped. The
   list stays out of the intent file, is pasted verbatim in the hand-off, and,
   when non-empty with `needs-design: no`, requires `loom-code:write-plan` to
-  write a minimal spec to hold it. The confirmation shows the list as a table
-  in the same message for an engineering change and for a product change
-  with `needs-design: no`; a product change with `needs-design: yes` shows it
-  at `write-spec`'s decision point ②.
+  write a minimal spec to hold it. Each carried detail quotes the user's
+  words, or the proposal the user said yes to. The confirmation shows the list
+  as a table in the same message for an engineering change only; every product
+  change shows it at decision point ② of the station that writes its spec —
+  `write-spec`, or `loom-code:write-plan` when `needs-design: no` and the list
+  forces a spec — so it is never shown twice.
 - Intent sections may use Markdown tables or a Mermaid `flowchart`;
   Acceptance stays a numbered list, and chat restatements use text tables or
   diagrams, not Mermaid.
 - `write-spec` records each carried detail in the spec — a visible flow as a
-  UI flows line, anything else on the matching Requirement line, both shown
-  at decision point ②; only an engineering change may use a Design decision
+  UI flows line, anything else as a clause on the Requirement line of the
+  Acceptance line it serves (never a new REQ), both shown at decision point ②,
+  whose read-back leads a branching flow with a table or text diagram; only
+  an engineering change may use a Design decision
   line — and never records an agent proposal the user did not agree to.
 - UI flows keep one line per operation for a short flow, use a
   `case | what the user does | what they see` table for parallel cases, and a

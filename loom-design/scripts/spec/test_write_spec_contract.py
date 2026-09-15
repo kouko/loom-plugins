@@ -429,10 +429,32 @@ def test_product_carried_detail_recorded_where_decision_point_two_shows() -> Non
     on a Requirement line; only an engineering change may use Design decision,
     which ② never shows."""
     carried = _flat(_section(_text(), _STEP2)).split("**Carried details.**", 1)[1].split("Forms:", 1)[0]
-    assert _affirmed(carried, "anything else on the matching Requirement line")
+    assert _affirmed(carried, "anything else as a clause on a Requirement line")
     design = [s for s in split_sentences(carried, ".;") if "Design decision line" in s]
     assert design and all("engineering" in s for s in design)
     assert _affirmed(carried, "engineering change", "Design decision line")
+
+
+def test_non_visible_detail_never_new_req() -> None:
+    """A1 negative (non-visible-detail-never-new-req): a non-visible carried
+    detail is a clause on the Requirement line of the Acceptance line it
+    serves, never a new REQ."""
+    carried = _flat(_section(_text(), _STEP2)).split("**Carried details.**", 1)[1].split("Forms:", 1)[0]
+    assert "on the matching Requirement line" not in carried
+    new_req = [s for s in split_sentences(carried, ".;") if "new REQ" in s]
+    assert new_req and all(
+        "never a new REQ" in s and "Requirement line of the Acceptance line the detail serves" in s
+        for s in new_req
+    )
+
+
+def test_asked_list_leads_branching_flow_with_table_or_diagram() -> None:
+    """A2 positive: the station's ② summary promises the table or text diagram lead."""
+    asked = _flat(_section(_text(), "## What you will be asked, in plain words"))
+    assert _affirmed(
+        asked,
+        "one sentence per operation, led by a table or text diagram when a flow has parallel cases or branches",
+    )
 
 
 def test_agent_proposal_not_agreed_not_recorded() -> None:

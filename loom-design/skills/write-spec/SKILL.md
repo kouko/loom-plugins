@@ -47,7 +47,8 @@ This station makes **one** stop, and only for a product change:
 
 1. **"You type ___ and you see ___"** — decision point ②. I read back the
    Requirements and the UI flows in your own words, one sentence per
-   operation, and you say yes or correct me. There is no limit on how many
+   operation, led by a table or text diagram when a flow has parallel cases or
+   branches, and you say yes or correct me. There is no limit on how many
    sentences; there is a limit on what they may be about.
 2. **Any choice that is expensive to undo**, folded into that same message
    as a consequence — never as jargon, never as an extra stop.
@@ -175,8 +176,9 @@ language, since it is spoken to them rather than read by a checker.
 
 **Carried details.** Read the carried-details list from `capture-intent`'s
 hand-off and record each item in the spec: a visible flow or reaction as a UI
-flows line, anything else on the matching Requirement line — the two parts
-decision point ② shows. Only an engineering change may put one on a Design
+flows line, anything else as a clause on a Requirement line — the two parts
+decision point ② shows. That clause goes on the Requirement line of the
+Acceptance line the detail serves, never a new REQ. Only an engineering change may put one on a Design
 decision line instead. Record only what the list or the intent holds; an agent proposal the user did
 not agree to is not recorded. For a product change, decision point ② shows each
 of them as part of the read-back, in behaviour words.

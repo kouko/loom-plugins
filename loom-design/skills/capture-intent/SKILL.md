@@ -44,8 +44,10 @@ nothing else in the change stops for them.
    only for full-lane `second-vendor: ask` — whether to use another vendor.
    `suggest` adds no question at capture-intent; write-plan owns its post-plan
    notice.
-2. **At `write-spec`, product only:** confirm visible behaviour ("you type
-   ___ and see ___"). Engineering changes skip this.
+2. **Where the product spec is written:** confirm visible behaviour and any
+   carried details ("you type ___ and see ___") — at `write-spec`, or at
+   `loom-code:write-plan` when `needs-design: no` and carried details force a
+   spec. Engineering changes skip this.
 3. **At the end:** accept or reject the report showing how each Acceptance
    line was tried and what happened.
 
@@ -254,17 +256,16 @@ twice, and this is the only stop this station makes.
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
 
-5. **The carried details, where this is their only stop** — for
-   `kind: engineering` and for a product change with `needs-design: no`.
+5. **The carried details, `kind: engineering` only.**
    Show them as a table, one row per detail in the user's language,
-   confirmed by the same yes; no extra stop. With an empty list, no table
-   appears. For that product change, this message is the one stop that
-   shows them before `loom-code:write-plan` records them in a spec. A
-   product change with `needs-design: yes` shows them at `write-spec`'s
-   decision point ② instead.
+   confirmed by the same yes; no extra stop. With an empty list, no table appears. Every product change
+   shows them at decision point ② of the station that writes its spec —
+   `write-spec`, or `loom-code:write-plan` when the list forces a spec for a
+   change that skips design. A product change's carried details never appear
+   in this message.
 
 Questions may only ask what the user wants, what they will see (reserved for
-decision point ② at `write-spec`), whether acceptance worked (decision point ③
+decision point ②, where the product spec is written), whether acceptance worked (decision point ③
 at `ship`), or state one-way-door consequences. Decide implementation choices
 from repo evidence and record the reason; asking the user is a
 `user-judgment-leak` review failure.
@@ -285,8 +286,8 @@ unanswered, deferred ("later"), or answered about something else is dropped.
 Never carry an agent proposal the user did not agree to, or detail you
 inferred. Carry only details about what the command or screen does or how it
 reacts. A remark about background or usage context, such as when or where the
-user runs it, is not a carried detail. Write each carried detail in the user's
-own words. Add no explanation, implication, or inference of your own. The list
+user runs it, is not a carried detail. Quote the user's words for each carried detail —
+for an agreed proposal, quote the proposal the user said yes to. Add no explanation, implication, or inference of your own. The list
 never enters the intent file; its sections stay unchanged
 and detailed flows stay out.
 
@@ -357,9 +358,10 @@ to the hand-off.
 Say two things so the next station is not re-run by accident: `write-plan`
 will **not** run decision point ① again, because `status:` is already
 `confirmed` — it reads the intent and starts planning. And decision point
-② — "you type ___ and you see ___" — happens at `write-spec`, for product
-changes only; engineering changes go from here to a plan with no further
-stop until acceptance.
+② — "you type ___ and you see ___" — happens where the product spec is
+written: at `write-spec`, or at `write-plan` when `needs-design: no` and
+carried details force a spec. Engineering changes go from here to a plan with
+no further stop until acceptance.
 
 ## On Codex CLI
 

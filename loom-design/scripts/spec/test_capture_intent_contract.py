@@ -580,12 +580,17 @@ def test_unanswered_or_deferred_proposal_dropped() -> None:
     )
 
 
-def test_carried_detail_kept_in_user_words() -> None:
-    """A1 positive (carried-detail-kept-in-user-words): only flow or reaction
-    details are carried, each in the user's own words."""
+def test_carried_detail_quotes_user_or_agreed_proposal() -> None:
+    """A1 positive (carried-detail-quotes-user-or-agreed-proposal): only flow or
+    reaction details are carried, each quoting the user or the agreed proposal."""
     step4 = _flat_section(_STEP4)
     assert _affirmed(step4, "Carry only details about what the command or screen does or how it reacts")
-    assert _affirmed(step4, "Write each carried detail in the user's own words")
+    assert _affirmed(
+        step4,
+        "Quote the user's words for each carried detail",
+        "for an agreed proposal, quote the proposal the user said yes to",
+    )
+    assert "in the user's own words" not in step4.split("**Keep a carried-details list**", 1)[1]
 
 
 def test_background_context_and_inference_not_carried() -> None:
@@ -605,25 +610,46 @@ def _carried_item() -> str:
 def test_engineering_restatement_shows_carried_details_table() -> None:
     """A5 positive: engineering confirmation shows the table in the same message."""
     item = _carried_item()
-    assert _affirmed(item, "`kind: engineering`")
+    assert _affirmed(item, "`kind: engineering` only")
     assert _affirmed(item, "Show them as a table, one row per detail in the user's language")
     assert "confirmed by the same yes; no extra stop" in item
 
 
-def test_product_needs_design_no_shows_table_at_intent_confirmation() -> None:
-    """A5 positive: a product change with needs-design: no, which never reaches
-    write-spec, shows its carried details here, before write-plan."""
+def test_intent_confirmation_table_engineering_only() -> None:
+    """A5 positive (intent-confirmation-table-engineering-only): the table at ①
+    is for engineering changes; every product change shows its details at ② of
+    whichever station writes its spec."""
     item = _carried_item()
-    assert _affirmed(item, "`kind: engineering` and for a product change with `needs-design: no`")
-    assert _affirmed(item, "shows them before `loom-code:write-plan`")
+    assert item.startswith(", `kind: engineering` only.**")
+    assert _affirmed(
+        item,
+        "Every product change shows them at decision point ② of the station that writes its spec",
+        "`write-spec`, or `loom-code:write-plan`",
+    )
 
 
-def test_product_needs_design_yes_defers_to_write_spec() -> None:
-    """A5 boundary: only needs-design: yes defers the table to write-spec's ②."""
+def test_product_needs_design_no_not_shown_at_intent_confirmation() -> None:
+    """A5 negative (product-needs-design-no-not-shown-at-intent-confirmation):
+    no sentence of ① shows a product change's details here, so a product change
+    with needs-design: no is not asked twice."""
     item = _carried_item()
-    deferring = [s for s in split_sentences(item, ".;") if "`write-spec`'s decision point ②" in s]
-    assert deferring and all("`needs-design: yes`" in s for s in deferring)
-    assert _affirmed(item, "A product change with `needs-design: yes` shows them at `write-spec`'s decision point ② instead")
+    assert "for a product change with `needs-design: no`" not in item
+    assert "shows them before `loom-code:write-plan`" not in item
+    here = [s for s in split_sentences(item, ".;") if "product change" in s and "this message" in s]
+    assert here and all("never" in s for s in here)
+    step4 = _flat_section(_STEP4)
+    assert "where this is their only stop" not in step4
+    assert "reserved for decision point ② at `write-spec`" not in step4
+
+
+def test_later_stops_name_both_spec_writing_stations() -> None:
+    """A5 positive: the asked-list and the hand-off put ② where the product spec is written."""
+    asked = " ".join(_section(_text(), "## What you will be asked, in plain words").split())
+    assert _affirmed(asked, "Where the product spec is written", "`loom-code:write-plan` when `needs-design: no`")
+    assert "At `write-spec`, product only" not in asked
+    step5 = _flat_section(_STEP5)
+    assert _affirmed(step5, "happens where the product spec is written", "`write-plan` when `needs-design: no`")
+    assert "happens at `write-spec`, for product changes only" not in step5
 
 
 def test_nothing_agreed_shows_no_table() -> None:
