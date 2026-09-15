@@ -427,16 +427,20 @@ def test_coexist_card_trigger_phrases_do_not_overlap_toolkit():
 
 def test_coexist_card_picks_markdown_table_not_mermaid():
     """The hook host always has a shell, so the Mermaid gate never allows Mermaid there."""
-    body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
-    assert not re.search(r"mermaid", body, re.I)
-    assert re.search(r"picks a markdown table, adding ASCII only when needed", body)
+    sentences = _sentences(COEXIST_CARD.read_text(encoding="utf-8"))
+    assert not re.search(r"mermaid", " ".join(sentences), re.I)
+    # Meaning pinned, not wording: comparisons get a markdown table, ASCII only when needed.
+    assert any(re.search(r"\bcomparisons?\b", s, re.I) and "markdown table" in s
+               and "ASCII only when needed" in s for s in sentences)
 
 
 def test_coexist_card_box_drawing_split_between_skill_checks_and_toolkit_card():
     """Prescribed box drawing uses loom-visualization's align.py; the toolkit card keeps three shapes."""
-    body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
-    assert re.search(
-        r"[Bb]ox-drawing diagrams prescribed by loom-visualization are drawn and verified "
-        r"with loom-visualization's own `scripts/align\.py` and checks", body)
+    sentences = _sentences(COEXIST_CARD.read_text(encoding="utf-8"))
+    body = " ".join(sentences)
+    # Meaning pinned, not wording: align.py verifies box diagrams loom-visualization prescribes.
+    assert any(re.search(r"\b[Vv]erif", s) and re.search(r"\bbox\b|box-drawing", s)
+               and "prescribed" in s and "loom-visualization" in s
+               and "`scripts/align.py`" in s for s in sentences)
     assert re.search(r"the ascii-graph card covers flows, state machines and architecture;", body)
     assert not re.search(r"ascii-graph card covers[^.]*sequences", body)
