@@ -151,6 +151,64 @@ a7-yes-no-delete-eacf718f.txt (blind runner, eacf718f, new: delete merged remote
   asked directly: yes ("要我把遠端的這個分支刪掉嗎?"), no invented
   alternatives; it notes the branch name is unknown. verdict: pass.
 
+== Acceptance 7 and 9 re-check after the inline decision rule (W4-04) ==
+# Cards at 75024929 end with "When asking or answering how to do something,
+# offer 2+ workable options in a table, recommending one; for plainer
+# explanations, read loom-visualization's references/plain-language.md first."
+# The implementer's four trials ran at 4af823eb; 4af823eb..75024929 adds
+# evidence files only, so they saw the same cards, guide and SKILL.md.
+
+Acceptance 7, how-questions (5 runs: 3 implementer, 2 blind runner):
+
+  a7-how-question-after-w4-04.txt (implementer, image migration)
+    skill invoked yes; guide read no. 4 alternatives in a table.
+    recommended marked: yes (bold 推薦 line naming one row).
+    do-nothing: absent. smaller: the lazy-migration row is a smaller variant
+    offered as a peer, not named as such. combined: not named.
+    Acceptance words: met (2+ options, one recommended, a smaller option
+    present among them). verdict: pass.
+
+  a7-how-auth-after-w4-04.txt (implementer, admin-only delete)
+    skill invoked yes; guide read no. 3 alternatives in a table.
+    recommended marked: yes, and the recommendation explicitly combines two
+    rows with a reason. verdict: pass.
+
+  a7-how-logs-after-w4-04.txt (implementer, logs filling the disk)
+    skill invoked NO; guide read no. 4 alternatives in a table.
+    recommended marked: NO single option marked; the reply sequences three of
+    the four as immediate / mid-term / long-term steps. verdict: fail.
+
+  a7-how-db-75024929.txt (blind runner, slow PostgreSQL)
+    skill invoked yes; guide read no (read the option-comparison and
+    branching templates and align.py). 7 alternatives in a table.
+    recommended marked: NO row marked; the reply gives an ordered plan
+    ("建議順序") instead of marking one option. verdict: fail.
+
+  a7-how-logs-75024929.txt (blind runner, same logs question)
+    skill invoked yes; guide read no. 4 alternatives in a table.
+    recommended marked: NO row marked; again an ordered plan
+    ("建議做法（依優先順序）"). verdict: fail.
+
+Acceptance 7, yes/no confirmations:
+  a7-yes-no-delete-after-w4-04.txt (implementer): asked directly
+  ("確認要刪除嗎？"), no invented alternatives, no options table. verdict: pass.
+  (Earlier direct-ask passes: a7-yes-no.txt, a7-yes-no-after-w4-03.txt,
+  a7-yes-no-delete-eacf718f.txt.)
+
+Line 7 at 75024929 overall: partly. Two or more workable options now appear in
+every how-question run (5 of 5, all as tables), which the earlier rounds did
+not achieve. The recommendation is marked in only 2 of 5; the other 3 replace
+a marked pick with an ordered plan. The guide was read in 0 of 6 runs at
+4af823eb/75024929, so the card's rule, not the guide, is doing the work.
+
+Acceptance 9 re-check at 75024929 (SKILL.md routing rows changed):
+  a9-progress-skill-75024929.txt: skill invoked; read references/plain-language.md
+  only; no domain collection. Reply used the Progress report columns. pass.
+  a9-incident-skill-75024929.txt: skill invoked; read references/tables-software.md
+  (the collection holding incident reports) plus templates/10-timeline.md;
+  no other domain collection. pass.
+  Line 9 at 75024929: works.
+
 Line 7 at eacf718f overall: partly. Yes/no: 3 of 3 direct. How-questions:
 2 of 3 meet the line's words, 1 of 3 fails; the guide was read in 1 of 3
 runs, and in neither of the blind runner's two new questions, so the added
