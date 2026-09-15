@@ -4,6 +4,32 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.3.0] — 2026-09-16 — Plain-language trigger card on every message
+
+- The loom-visualization trigger card now reaches the agent on every user
+  message through a UserPromptSubmit hook, instead of once at session start,
+  on Claude Code and Codex. On Antigravity CLI the same card is still
+  delivered as the always-on plugin rule.
+- The card now also carries four plain-language rules: reply in the user's
+  language and lead with the conclusion and what it means for the user; say
+  in plain words what a thing does, naming internal terms only when needed;
+  say it literally, without metaphors; and show comparisons, flows, branches
+  and state changes as tables or diagrams through loom-visualization.
+- The card adds about 150 words to every turn.
+- Codex users must review and trust the moved hook again, because its event
+  changed.
+- `loom-visualization` gained `references/plain-language.md` (writing guide,
+  decision-option rule, eight conversation-situation tables, table rules) and
+  three domain table collections, `references/tables-software.md`,
+  `references/tables-design.md` and `references/tables-business.md`, routed
+  from its SKILL.md; no new skill.
+- The READMEs now state where the per-turn reminder does not arrive: the
+  Codex IDE extension and app, the Antigravity desktop app and IDE, and an
+  install of `loom-code` without `loom-workflow`.
+- The net mechanism count is unchanged: the two visualization-card hook ids
+  moved from SessionStart to UserPromptSubmit, so no budget-exception line is
+  needed.
+
 ## [5.2.0] — 2026-09-14 — Codex visualization-card hook
 
 - `loom-visualization`, `goal-create`, `distill-sessions` and
