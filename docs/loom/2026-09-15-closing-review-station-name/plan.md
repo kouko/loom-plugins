@@ -23,6 +23,13 @@ charter: 1.0
 - Test: A1 positive: no-review-station-in-loom-design; negative: review-station-remains. A2 positive: diff-only-station-name; boundary: lens-names-unchanged. A3 positive: suite-green; negative: skill-token-budget-exceeded.
 - Risk: agent-decided — sequential after W1-01 to avoid concurrent commits in one tree; same wording rule.
 
+### Wave 2
+
+**W2-01 Close adversary findings on remaining station names**  after: W1-02  acceptance: 1, 2, 3
+- Files: loom-code/skills/ship/SKILL.md, loom-code/skills/build/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-code/skills/expert-mode/SKILL.md, loom-code/skills/write-plan/SKILL.md, loom-design/skills/capture-intent/SKILL.md, loom-code/scripts/loom_checker/rule_checks/standing.py, scripts/test_loom_plugin_install_layout.py
+- Test: A1 positive: adversary-probes-all-pass; negative: capitalized-review-station-noun. A2 positive: reword-reverts-to-base; boundary: generic-review-words-kept. A3 positive: suite-green; negative: install-layout-pin-weak.
+- Risk: agent-decided — capitalised "Review" naming the station is the old name under Proposed outcome; also loom-design/.codex-plugin/plugin.json longDescription; generic "Review policy" wording stays.
+
 ## Questions asked
 ① — what — 你要把 loom-code 和 loom-design 裡還寫著「review station」的地方全部改成 closing-review（12 處、只換站名、測試全過），並授權自動 push 開 PR、合併走 land 並在檢查綠了後請你回「接受」；這樣對嗎？
 ① — what — 我們已經非常確定那些的確是寫錯的嗎？（使用者追問；答：先改站名，然後再做補上 lane 缺口）
