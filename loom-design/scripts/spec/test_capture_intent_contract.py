@@ -312,10 +312,10 @@ def test_suggest_skips_the_intent_decision_point() -> None:
     assert "write-plan owns its post-plan notice" in flat
 
 
-def test_ask_keeps_the_full_lane_question() -> None:
+def test_ask_keeps_the_question_on_every_change() -> None:
     text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
     flat = " ".join(text.split())
-    assert "every full-lane change" in flat
+    assert "on every change" in flat
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
     assert "ask_question" not in text  # agy offers no candidate, so it never asks
@@ -325,9 +325,12 @@ def test_ask_keeps_the_full_lane_question() -> None:
     assert "https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/request_user_input.rs" in text
     assert "這次不使用" not in text
     assert "recommended" in flat
-    assert "small lane" in flat
-    assert "reviewer floor is computed later and independently" in flat
     assert "there is only one reader" not in flat
+    lane = re.compile(r"(?i)\b(small|full)[- ]lanes?\b|\blanes?\b")
+    for path in (SKILL, SECOND_VENDOR_REFERENCE):
+        body = " ".join(path.read_text(encoding="utf-8").split())
+        hits = [m.group(0) for m in lane.finditer(body)]
+        assert not hits, f"{path.name} still mentions lanes: {hits}"
 
 
 def test_ask_excludes_host_and_defines_unavailable_paths() -> None:

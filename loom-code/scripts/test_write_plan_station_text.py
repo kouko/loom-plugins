@@ -178,11 +178,14 @@ def test_suggest_is_non_blocking_and_has_no_background_listener() -> None:
     assert "do not reclassify risk" in flat
 
 
-def test_ask_still_asks_once_per_full_lane_change() -> None:
+LANE_WORDING_RE = re.compile(r"(?i)\b(small|full)[- ]lanes?\b|\blanes?\b")
+
+
+def test_ask_still_asks_once_per_change() -> None:
     text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
     flat = " ".join(text.split())
     assert "second-vendor: ask" in flat
-    assert "every full-lane change" in flat
+    assert "on every change" in flat
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
     assert "ask_question" not in text  # agy offers no candidate, so it never asks
@@ -221,14 +224,14 @@ def test_suggest_uses_one_cell_markdown_table_with_spacing() -> None:
     assert "raw Markdown" in text
 
 
-def test_small_lane_suggest_is_information_only() -> None:
-    text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
-    flat = " ".join(text.split())
-    assert "small lane" in flat
-    assert "informational only" in flat
-    assert "next-change-only" in flat
-    assert "reviewer floor is computed later and independently" in flat
-    assert "there is only one reader" not in flat
+def test_second_vendor_text_names_no_lane() -> None:
+    for path in (SKILL, SECOND_VENDOR_REFERENCE):
+        flat = " ".join(path.read_text(encoding="utf-8").split())
+        hits = [m.group(0) for m in LANE_WORDING_RE.finditer(flat)]
+        assert not hits, f"{path.name} still mentions lanes: {hits}"
+    reference = " ".join(SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8").split())
+    assert "next-change-only" in reference
+    assert "there is only one reader" not in reference
 
 
 def test_reference_has_no_none_mode_or_per_change_none_answer() -> None:

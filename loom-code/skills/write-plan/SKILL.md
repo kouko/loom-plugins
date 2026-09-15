@@ -77,7 +77,7 @@ non-decision authorisation stop, the first time this repo is used (step
 0b) — it asks for permission to run, not for a decision about the work.
 
 1. At ①, restate the wanted outcome; merge any expensive-to-undo choice,
-   full-lane `second-vendor: ask` question, and required principles interview.
+   `second-vendor: ask` question, and required principles interview.
 2. At ②, only for a product spec you write: confirm visible behaviour and
    carried details. Ask nothing about plan structure; record each agent
    decision and reason.
@@ -223,10 +223,10 @@ twice.
 3. **The cross-model review question, only for `second-vendor: ask`.** Load
    `references/second-vendor-ask-and-docs-lint.md` before composing this
    message. A missing line is initialized as `second-vendor: suggest`; it
-   does not add a question. In a full lane, `ask` puts its per-change
+   does not add a question. `ask` puts its per-change
    host-aware question here using the native interface or documented fallback,
-   and records the answer in the intent decision record. In a
-   small lane it is omitted. A fixed CLI and `suggest` add no question here.
+   and records the answer in the intent decision record. A fixed CLI and
+   `suggest` add no question here.
 
 4. **The principles interview**, if step 2 demanded it.
 
@@ -464,7 +464,7 @@ questions. A pre-plan intake pass cannot substitute for this readiness run.
 
 Run this after the plan's Risk lines exist and both checks pass. Load
 `references/second-vendor-ask-and-docs-lint.md`. Probe only the eligible
-other-vendor CLIs described there, then pass the observed mode, lane, host,
+other-vendor CLIs described there, then pass the observed mode, host,
 usable vendors, anchored risk evidence, response state, and whether Closing
 Review has started as JSON on stdin to:
 
@@ -476,7 +476,7 @@ On any other host, use the `<loom-code>` root defined in step 0. Treat the
 JSON result as the decision: render its `notice_kind`, `notice_vendor`, and
 `recommendation_reasons`; do not reproduce the risk mapping in prose. A
 notice is commentary, not a decision point, and work continues without
-waiting. The reference owns response timing, small-lane behavior, and the
+waiting. The reference owns response timing and the
 no-listener boundary.
 
 **Forks you decided yourself.** Every one gets a one-line reason on its

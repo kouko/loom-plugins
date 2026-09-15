@@ -41,7 +41,7 @@ nothing else in the change stops for them.
 
 1. **Here:** one message confirms the restated intent, every expensive-to-undo
    choice in consequence form, a product's new principles when needed, and —
-   only for full-lane `second-vendor: ask` — whether to use another vendor.
+   only for `second-vendor: ask` — whether to use another vendor.
    `suggest` adds no question at capture-intent; write-plan owns its post-plan
    notice.
 2. **Where the product spec is written:** confirm visible behaviour and any
@@ -249,9 +249,8 @@ twice, and this is the only stop this station makes.
    serious problems in this system's own spec review were found by
    only one of the two vendors. When the defaults carry `second-vendor: ask`,
    use the reference's host-aware native question or fallback in this same
-   message; the answer governs this change only. In the small lane omit this
-   opt-in question; `closing-review` computes the reviewer floor later from the complete
-   branch delta. A fixed CLI also adds no question.
+   message; the answer governs this change only. A fixed CLI also adds no
+   question.
 
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
