@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-15-readable-flow-details",
-  "content_digest": "14c1ae6716a4d29cf9fd07c90ab1143d54e1ecb5",
+  "content_digest": "7af869886dc0c76a061b2144c6cd6c7bc84a80da",
   "executions": [
     {
       "kind": "package-tests",
@@ -66,6 +66,13 @@
           "dimension": "deletion-first",
           "anchor": "loom-code/scripts/loom_checker/rule_checks/intent.py:99",
           "text": "MERMAID_KEYWORDS masks diagram types an intent may not use.",
+          "status": "open"
+        },
+        {
+          "severity": "nit",
+          "dimension": "cross-task-coherence",
+          "anchor": "loom-code/scripts/loom_checker/rules.py:81",
+          "text": "spec.ui-flows-recompute description still names only prose arrow lines; intake also counts table rows and Mermaid transitions.",
           "status": "open"
         }
       ]
