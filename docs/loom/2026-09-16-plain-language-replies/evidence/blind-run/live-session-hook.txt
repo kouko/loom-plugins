@@ -125,3 +125,29 @@ Total distinct copies of the card visible so far: 1.
 No 'Visualization trigger card' or hook error message appeared alongside this message.
 attachment types present in transcript: ['date', 'environment', 'model', 'prompt_snapshot', 'session_context', 'total_tokens_reminder']
 claude -p exit code: 0
+
+=== session dir: scratchpad-live7 — same flags, loom-workflow from a clean worktree at eacf718f (re-check of Acceptance 1 after the card change)
+(transcript 72095472-3708-4abc-aae0-c386938e21b5.jsonl)
+[2] USER MESSAGE: Diagnostic, answer in English. Did a 'Visualization trigger card' arrive together with this message? If yes, quote only its last sentence verbatim, and say how many copies of such a card you see.
+[6] ATTACHMENT hook_additional_context (hookEvent=UserPromptSubmit):
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+for comparisons, branching decisions, reasoning chains, timelines,
+sequences, quantities, data models or reasoning pages, invoke
+`loom-visualization` FIRST, leading with its form. For comparisons it picks a
+markdown table, adding ASCII only when needed. Box-drawing diagrams prescribed
+by loom-visualization are drawn and verified with loom-visualization's own
+`scripts/align.py` and checks; the ascii-graph card covers flows, state
+machines and architecture; follow it. Skip it for one-paragraph answers;
+never decorate. Before plainer explanations or decisions between approaches,
+read loom-visualization's `references/plain-language.md`.
+
+[15] ASSISTANT: Yes, one such card arrived (in the "UserPromptSubmit hook additional context" system-reminder). I see exactly one copy.
+
+Its last sentence, verbatim:
+
+"Before plainer explanations or decisions between approaches, read loom-visualization's `references/plain-language.md`."

@@ -1,32 +1,39 @@
 # 讓 loom 的回覆講白話、照字面講、用表格或圖 — 我試了什麼、結果如何
 
-試跑日期：2026-09-16。第 1–7、9–11 條在一份乾淨的專案複本上試（版本 dda0014f）。第 8 條在之後補上的修正版本上重新檢查（版本 40014ea3）。
+試跑日期：2026-09-16。每一條都在乾淨的專案複本上試，但依修正時間分成三個版本：
 
-第 6、7、9 條的試跑用的是 dda0014f 的內容。到 40014ea3 為止，這些試跑讀到的檔案只多了一段東西：寫作指南的「表格寫作規則」底下，新增「格子裡能放什麼」和「表格裡的時間」兩小節。試跑用到的其他文字都沒有改。
+| 版本 | 檢查了哪幾條 | 說明 |
+|---|---|---|
+| dda0014f | 3、5、6、9、10、11 | 第一次完整試跑 |
+| 40014ea3 | 8（部分） | 補上「格子裡能放什麼」「表格裡的時間」之後 |
+| eacf718f | 1、2、4、7、8 | 提醒最後加了一句「講解更白話或要在做法之間做決定前，先讀寫作指南」，指南補上三小項之後 |
 
-**一句話結論**：每則訊息附帶提醒這件事，在 Claude Code 上確實做到了，出錯時也不會擋住你的訊息。可是 agent 真正照著寫出白話回覆的效果只做到一部分：
+第 6、9 條的試跑是在 dda0014f 做的。之後這兩條用到的內容只改了兩處：指南多了幾段表格寫作規則，提醒最後多了一句（讀指南的時機從「只在你要求更白話時」擴大到「也包含要在做法之間做決定時」）。改寫試跑本來就屬於「要求更白話」的情況，進度和事故報告的試跑也不涉及這一句，所以我沒有重跑。
+
+**一句話結論**：每則訊息附帶提醒這件事，在 Claude Code 上確實做到了，出錯時也不會擋住你的訊息，表格集現在也收齊了。可是 agent 真正照著寫出白話回覆的效果只做到一部分：
 - 改寫時仍會掉事實或改事實，有一次還用了比喻。
-- 問「要怎麼做」時，只給一個做法。
+- 問「要怎麼做」時，三次有一次只給一個做法。
+- 提醒新加的那一句，並沒有讓 agent 穩定地先去讀指南。
 
-| 條目 | 結果 |
-|---|---|
-| 1 每則訊息附帶提醒（Claude Code） | 做到 |
-| 2 開場不再另外送；裝了 ascii-graph-toolkit 也只有一份圖表指示 | 做到 |
-| 3 Codex CLI | 部分（沒有實際開 Codex 對話） |
-| 4 Antigravity CLI | 部分（沒有實際開 agy 對話） |
-| 5 提醒出錯時訊息照常送出 | 做到 |
-| 6 白話改寫 | 部分 |
-| 7 決策問題的問法 | 部分 |
-| 8 表格集收錄完整 | 部分（剩三小項沒收） |
-| 9 只讀需要的表格集 | 做到 |
-| 10 安裝說明寫清楚收不到的地方 | 做到 |
-| 11 測試與機制檢查 | 做到 |
+| 條目 | 結果 | 檢查版本 |
+|---|---|---|
+| 1 每則訊息附帶提醒（Claude Code） | 做到 | eacf718f |
+| 2 開場不再另外送；裝了 ascii-graph-toolkit 也只有一份圖表指示 | 做到 | eacf718f |
+| 3 Codex CLI | 部分（沒有實際開 Codex 對話） | dda0014f |
+| 4 Antigravity CLI | 部分（沒有實際開 agy 對話） | eacf718f |
+| 5 提醒出錯時訊息照常送出 | 做到 | dda0014f |
+| 6 白話改寫 | 部分 | dda0014f |
+| 7 決策問題的問法 | 部分 | eacf718f |
+| 8 表格集收錄完整 | 做到 | eacf718f |
+| 9 只讀需要的表格集 | 做到 | dda0014f |
+| 10 安裝說明寫清楚收不到的地方 | 做到 | dda0014f |
+| 11 測試與機制檢查 | 做到 | dda0014f（機制數量在 eacf718f 再確認一次） |
 
 ## 審查摘要
 
 - 還沒有審查者看過這個版本，所以沒有被駁回的審查意見。
-- 在我的乾淨複本上，整套測試都通過：3,097 項通過、11 項略過、0 項失敗，另外幾組檢查腳本也全部通過。
-- 檢查規則的數量和改動前一樣，沒有變多。
+- 在 dda0014f 的乾淨複本上，整套測試都通過：3,097 項通過、11 項略過、0 項失敗，另外幾組檢查腳本也全部通過。eacf718f 的整套測試由建置那邊重跑，我沒有再跑一次。
+- 檢查規則的數量在 dda0014f 和 eacf718f 都是 136，和改動前一樣。
 - 建置階段有另一個 agent 專門試著弄壞這個改動，寫了攻擊測試。在我這次的整套測試裡，那些攻擊測試也都通過。
 
 ## 我問過你的問題
@@ -48,26 +55,28 @@
 ### 1. In a Claude Code session with loom-workflow installed, each user message reaches the agent together with one short reminder, written once in English, to reply in the user's language, lead with the conclusion and its impact, replace internal terms with plain words, speak literally without metaphors, and show structured content as tables or diagrams through loom-visualization.
 - **我怎麼試**：
   - 先直接執行提醒程式，送進一則模擬「你送出訊息」的事件，看它吐出什麼。
-  - 再開真正的 Claude Code 對話：只載入這份乾淨複本的外掛，關掉你自己的全域設定和說明檔，連續送兩則訊息。
-  - 最後問 agent 每則訊息旁邊出現了什麼，並對照對話紀錄檔確認。
+  - 再開真正的 Claude Code 對話：只載入乾淨複本的外掛，關掉你自己的全域設定和說明檔。
+  - 在 dda0014f 連續送兩則訊息；在 eacf718f 另開一個對話，請 agent 引用提醒的最後一句。
+  - 最後對照對話紀錄檔確認。
 - **結果**：
-  - 每則訊息都附上一份英文提醒，約 150 個英文字。
+  - 每則訊息都附上一份英文提醒，剛好 150 個英文字。
   - 內容五項都有：用使用者的語言回覆、第一句講結論和影響、內部用語換成白話、照字面講不用比喻、結構化內容交給圖表 skill 用表格或圖呈現。
-  - 兩則訊息各收到一次，沒有重複。
-  - 另外 9 次改寫和問答的試跑，每一次也都收到剛好一份。
-- **證據**：`evidence/blind-run/hook-runs.txt`（案例 A1）、`evidence/blind-run/live-session-hook.txt`（兩則訊息，各附一份 `hook_additional_context`，事件為 `UserPromptSubmit`）、`evidence/blind-run/trial-card-delivery.txt`
+  - 最後一句是新版的「講解更白話或要在做法之間做決定前，先讀寫作指南」，agent 也一字不差引用出來。
+  - 每則訊息都只收到一份；另外 12 次改寫和問答的試跑，每一次也都收到剛好一份。
+- **證據**：`evidence/blind-run/hook-runs-eacf718f.txt`（案例 A1，150 字，結尾 "decisions between approaches"）、`evidence/blind-run/live-session-hook.txt`（dda0014f 兩則訊息各一份；最後一段 eacf718f 對話一份 `hook_additional_context`）、`evidence/blind-run/trial-card-delivery.txt`
 - **判定**：做到 — 每則訊息都帶著同一份提醒。
 
 ### 2. The table-and-diagram trigger reaches the agent through that per-turn reminder; a session start no longer delivers it separately, and with ascii-graph-toolkit also installed the reminder still carries one diagram trigger instruction, not two conflicting ones.
 - **我怎麼試**：
   - 查看外掛登記的觸發時機，確認「對話開始時」已經沒有這份提醒。
-  - 在真正的對話裡問 agent：第一則訊息之前，有沒有收到任何圖表提醒？
-  - 準備一份「也裝了 ascii-graph-toolkit 並啟用」的設定，執行提醒程式。
+  - 在真正的對話裡問 agent：第一則訊息之前，有沒有收到任何圖表提醒？（dda0014f）
+  - 在 eacf718f 準備一份「也裝了 ascii-graph-toolkit 並啟用」的設定，執行提醒程式，並讀這一版的提醒全文。
 - **結果**：
   - 外掛只在「你送出訊息時」送提醒，對話開始時不送。agent 也回答開場前沒收到。
   - 裝了 ascii-graph-toolkit 時，程式改送另一版提醒：流程圖、狀態圖、架構圖交給 ascii-graph-toolkit 自己的提醒處理，本身只保留一套圖表指示。
+  - 這次為了塞進新句子，這一版把「選項比較」縮成「比較」。比較的內容仍然是先用表格，所以沒有多出第二套指示。
   - 限制：我沒有在同一個對話裡同時載入兩個外掛，所以沒親眼看到兩份提醒並排的樣子。兩份不衝突，是讀文字判斷的。
-- **證據**：`evidence/blind-run/checks.txt`（兩份 hooks 設定只有 `UserPromptSubmit`）、`evidence/blind-run/hook-runs.txt`（案例 A2，標題 "ascii-graph-toolkit active"，150 字）、`evidence/blind-run/live-session-hook.txt`（第二則訊息的回答第 1 點）
+- **證據**：`evidence/blind-run/checks-eacf718f.txt`（兩份 hooks 設定只有 `UserPromptSubmit`；coexist 卡片全文）、`evidence/blind-run/hook-runs-eacf718f.txt`（案例 A2，標題 "ascii-graph-toolkit active"，150 字）、`evidence/blind-run/live-session-hook.txt`（第二則訊息的回答第 1 點）
 - **判定**：做到 — 開場不再另外送；裝了 ascii-graph-toolkit 時換成單一圖表指示的版本。
 
 ### 3. In a Codex CLI session with loom-workflow installed and its hooks trusted, each user message reaches the agent with the same reminder.
@@ -76,18 +85,18 @@
   - 查看 Codex 版的觸發設定。
   - 沒有開真正的 Codex 對話：這台機器裝了 Codex 0.154.0，但要讓外掛的觸發程式生效，得在互動畫面裡按一次信任，我無法代你按。
 - **結果**：
-  - 程式送出和 Claude Code 相同的提醒全文，只用 Codex 接受的那一種輸出格式，沒有多餘欄位。
+  - 程式送出和 Claude Code 相同的提醒全文，只用 Codex 接受的那一種輸出格式，沒有多餘欄位。在 eacf718f 重跑時也一樣。
   - 觸發時機是「每次送出訊息」，最多等 5 秒。
-- **證據**：`evidence/blind-run/hook-runs.txt`（案例 A3：只有 `hookSpecificOutput` 一個鍵）、`evidence/blind-run/checks.txt`（`hooks-codex.json` 登記 `UserPromptSubmit`）
+- **證據**：`evidence/blind-run/hook-runs.txt` 與 `hook-runs-eacf718f.txt`（案例 A3：只有 `hookSpecificOutput` 一個鍵）、`evidence/blind-run/checks.txt`（`hooks-codex.json` 登記 `UserPromptSubmit`）
 - **判定**：部分 — 程式輸出正確，但沒有在真正的 Codex 對話裡確認提醒真的送到。
 
 ### 4. In an Antigravity CLI session with loom-workflow installed, the same reminder is active in every session.
 - **我怎麼試**：
-  - 逐位元比對 Antigravity 用的規則檔和提醒原文。
+  - 在 eacf718f 逐位元比對 Antigravity 用的規則檔和新版提醒原文。
   - 執行專案自己的「產生檔是否過期」檢查。
   - 沒有開真正的 agy 對話：在 agy 安裝這份外掛，會蓋掉你機器上已裝的那一份。
-- **結果**：規則檔除了第一行「此檔由程式產生」的註記，其餘和提醒原文完全相同，過期檢查也通過。
-- **證據**：`evidence/blind-run/checks.txt`（`cmp` 結果 0、`sync_codex_manifests.py --check --all` 結束碼 0）
+- **結果**：規則檔已經重新產生。除了第一行「此檔由程式產生」的註記，其餘和新版提醒完全相同，過期檢查也通過。
+- **證據**：`evidence/blind-run/checks-eacf718f.txt`（`cmp` 結果 0、`sync_codex_manifests.py --check --all` 結束碼 0）
 - **判定**：部分 — 檔案內容正確，但沒有在 agy 裡實際確認。
 
 ### 5. When the reminder cannot be produced, the user's message still goes through unchanged.
@@ -101,9 +110,9 @@
   - 另外開一個真正的對話，外掛裡兩份提醒檔都移走，請 agent 把一句話原封不動回給我。
 - **結果**：
   - 五種狀況都正常結束、沒有錯誤訊息。
-  - 能讀到提醒檔時，照樣送出完整提醒；讀不到時，送出空白內容。
+  - 能讀到提醒檔時，照樣送出完整提醒；讀不到時，送出空白內容。在 eacf718f 重跑，結果相同。
   - 真正的對話裡，agent 一字不差回了那句話，沒有看到任何錯誤訊息。
-- **證據**：`evidence/blind-run/hook-runs.txt`（案例 A5a–A5e，全部 exit 0）、`evidence/blind-run/live-session-hook.txt`（最後一段，提醒檔移走的對話）
+- **證據**：`evidence/blind-run/hook-runs.txt` 與 `hook-runs-eacf718f.txt`（案例 A5a–A5e，全部 exit 0）、`evidence/blind-run/live-session-hook.txt`（提醒檔移走的對話）
 - **判定**：做到 — 提醒做不出來時，你的訊息照常送到。
 
 ### 6. Given three past hard-to-read loom replies, a fresh agent following the reminder and loom-visualization's writing guide rewrites each so that its first sentence states the conclusion, it contains no metaphor or analogy, and it names no internal term, file path or rule id without saying in plain words what it does; the guide's before-and-after examples come from real complaints.
@@ -126,30 +135,39 @@
 - **判定**：部分 — 三則都先講結論；但一則用了比喻，兩則掉了或改了事實，一則根本沒去讀指南。
 
 ### 7. Given a decision question about how to do something, a fresh agent following the guide offers at least two workable alternatives, marks the one it recommends, and either includes a do-nothing-or-later, smaller, or combined alternative or says in one sentence why none is workable; a yes-or-no confirmation is asked directly without invented alternatives.
-- **我怎麼試**：同樣的全新對話，問兩件事：
-  - 「網站圖片要從本機硬碟搬到雲端，要怎麼搬比較好？給我你推薦的做法。」
-  - 「改好了、測試過了，推送並開 PR 前一定要先問我，請寫出你要傳給我的訊息。」
+- **我怎麼試**：
+  - 提醒加上新句子之後，一共看了三個「要怎麼做」和兩個是非題：
+    - 建置那邊重跑了原本的圖片搬遷題和原本的推送題；我照 Acceptance 的原文自己判定。
+    - 我另外出兩道新的「要怎麼做」題：只讓管理員刪文章的權限檢查、日誌塞滿硬碟怎麼處理。
+    - 再加一道新的是非題：刪除已合併的遠端分支前先問你。
+  - 我的三個試跑都在 eacf718f；建置那邊的兩個在 a2b500a3，提醒和指南與 eacf718f 相同。
+  - 修正前（dda0014f）的兩個試跑也保留作對照。
 - **結果**：
-  - 問「怎麼搬」：agent 叫用了圖表 skill，卻去讀了「步驟」範本，沒讀寫作指南。它只給一套六步驟做法，沒有第二個做法，也沒有檢查「先不做／做小一點／兩者合併」。
-  - 問「可以推送嗎」：直接請你同意，沒有編出假選項。它另外列了分支名稱、遠端、目標分支三個「請確認」的空格，算多問，不算選項。
-- **證據**：`evidence/blind-run/a7-how-question.txt`（讀了 `templates/02-linear-steps.md`，沒讀 `references/plain-language.md`）、`evidence/blind-run/a7-yes-no.txt`、`evidence/blind-run/trial-judgments.txt`
-- **判定**：部分 — 是非題問法做到；「要怎麼做」的問題沒做到。
+  | 問題 | 有沒有讀指南 | 可行做法數 | 標出推薦 | 先不做／做小一點／合併，或說明為何都不行 | 合乎這一條 |
+  |---|---|---|---|---|---|
+  | 圖片搬遷（修正前） | 沒有 | 1 | 不適用 | 沒有 | 否 |
+  | 圖片搬遷（修正後，建置那邊跑） | 有 | 3 | 有 | 有「做小一點」的停機一次搬；「先不搬」有說明為何排除 | 是 |
+  | 權限檢查（新題） | 沒有 | 2（用文字寫，沒有表格） | 有 | 有「做小一點」的逐一寫判斷 | 是，但很勉強 |
+  | 日誌塞滿（新題） | 沒有 | 1（直接給一套組合方案） | 不適用 | 手動清、加硬碟只用半句話帶過，沒當選項 | 否 |
+  - 是非題三次都直接問你，沒有編出假選項：推送題修正前、修正後各一次，刪分支題一次。
+  - 提醒新加的那一句，只讓圖片搬遷那一題去讀了指南；我出的兩道新題，agent 都沒叫用圖表 skill，也沒讀指南。
+- **證據**：`evidence/blind-run/a7-how-question-after-w4-03.txt`、`a7-how-auth-eacf718f.txt`、`a7-how-logs-eacf718f.txt`、`a7-yes-no-after-w4-03.txt`、`a7-yes-no-delete-eacf718f.txt`、修正前的 `a7-how-question.txt` 與 `a7-yes-no.txt`、逐則判定在 `evidence/blind-run/trial-judgments.txt` 最後一段
+- **判定**：部分 — 是非題做到；「要怎麼做」三次有兩次合乎，一次只給一個做法，而且指南三次只被讀了一次。
 
 ### 8. The loom-visualization skill carries every table usage found in the research — software development, design, and business analysis, plus the table patterns and table-writing rules from the earlier table research — together with a general set for common conversation situations (at least before versus after, per-item status, decision consequences, and hard-to-read versus plain wording) and the common mistakes to avoid; loom-workflow gains no new skill.
-- **我怎麼試**：在修正後的版本上，把 9 月 16 日和 9 月 4 日兩份研究筆記的每個標題與規則，逐項對照 skill 裡的表格集和寫作指南。
+- **我怎麼試**：把 9 月 16 日和 9 月 4 日兩份研究筆記的每個標題與規則，逐項對照 skill 裡的表格集和寫作指南。先在 40014ea3 對照一次，再在 eacf718f 確認上次缺的三小項。
 - **結果**：
   - 9 月 16 日研究的三個領域全部收錄：軟體 20 種、設計 12 種、商業 18 種。
   - 9 月 4 日研究的 18 種有名稱的表格模式也都在：攤平的圖、評分、治理、相容性、2×2 象限、時間。
   - 一般對話情境有 8 種，包含前後對照、逐項狀態、決策後果；「難讀 vs. 白話」的對照範例也有。
-  - 表格寫作規則、狀態符號、表格或圖怎麼選、什麼時候不該用表格，都有。
-  - 修正後新增的「格子裡能放什麼」（方塊長條、迷你走勢、徽章、底色、進度條、內嵌圖）和「表格裡的時間」（時間當欄、時間當格子內容）也都在。
+  - 表格寫作規則、狀態符號、表格或圖怎麼選、什麼時候不該用表格、格子裡能放什麼、表格裡的時間，都有。
+  - 上次缺的三小項，eacf718f 都補上了，並附來源：
+    - 讀者要在兩個方向上比較時，表格勝過圖（Datawrapper）；
+    - 流程圖、組織圖的正式文字版本就是表格（W3C）；
+    - 不要把表格放在編號步驟的中間（Google）。
   - skill 數量改動前後都是 12 個，沒有新增。
-  - 仍然沒收錄的三小項（都來自 9 月 4 日研究）：
-    - 讀者要在兩個方向上比較時，表格勝過圖（Datawrapper 的判準）；
-    - 流程圖、組織圖的正式文字版本就是表格（W3C 的做法）；
-    - 不要把表格放在編號步驟的中間。
-- **證據**：`evidence/blind-run/line8-coverage.txt`（40014ea3 的逐項對照、`S1–S31`、`D1–D12`、`B1–B23`、skill 目錄數 12/12、三項 `MISSING`）
-- **判定**：部分 — 幾乎全部收錄，還差上面三小項。
+- **證據**：`evidence/blind-run/line8-coverage.txt`（40014ea3 的逐項對照，`S1–S31`、`D1–D12`、`B1–B23`）、`evidence/blind-run/checks-eacf718f.txt`（`Datawrapper` 第 317 行、`text alternative` 第 318 行、`numbered steps` 第 344 行；skill 目錄數 12）
+- **判定**：做到 — 研究裡找到的表格用法和規則都收進來了，也沒有新增 skill。
 
 ### 9. Given a reply that reports progress, a fresh agent using the skill reads the general conversation set and none of the domain-specific table collections; given a request to write an incident report, it reads only the collection that holds that document type.
 - **我怎麼試**：每種請求各開兩個全新對話，一個不特別指名，一個說「用 loom-visualization」：
@@ -175,9 +193,10 @@
 ### 11. The repository's package tests and mechanism checks pass, and the number of registered mechanisms does not grow.
 - **我怎麼試**：在乾淨複本上跑整套測試和機制數量檢查。
 - **結果**：
-  - 整套測試通過：3,097 項通過、11 項略過、0 項失敗；各組檢查腳本全部通過。
-  - 機制數量 136，和改動前一樣，檢查結果「全部正常」。
-- **證據**：`evidence/blind-run/package-tests.txt`（`run_package_tests.py --loom-family -q`，exit=0）、`evidence/blind-run/checks.txt`（`check_mechanisms.py --baseline 4dcd03a6`：net 136 / baseline 136，all clear）
+  - dda0014f 整套測試通過：3,097 項通過、11 項略過、0 項失敗；各組檢查腳本全部通過。
+  - 機制數量在 dda0014f 和 eacf718f 都是 136，和改動前一樣，檢查結果「全部正常」。
+  - eacf718f 的整套測試我沒有重跑，由建置那邊負責。
+- **證據**：`evidence/blind-run/package-tests.txt`（`run_package_tests.py --loom-family -q`，exit=0）、`evidence/blind-run/checks.txt` 與 `checks-eacf718f.txt`（`check_mechanisms.py --baseline 4dcd03a6`：baseline 136，all clear）
 - **判定**：做到。
 
 ## 對你既有的資料做了什麼
@@ -192,18 +211,22 @@
 ## 我幫你決定的事
 
 - **提醒壓縮到原本的 150 字上限內，沒有放寬上限**：
-  - 完整版 148 字，搭配 ascii-graph-toolkit 的版本剛好 150 字。
-  - 以後想在提醒裡多加一句（例如下面「不確定」的第一點），就得刪掉別的字，或放寬上限。
+  - 兩個版本現在都剛好 150 字。為了塞進「做決定前先讀指南」，搭配 ascii-graph-toolkit 的版本把「選項比較」縮成「比較」。
+  - 以後想在提醒裡再加任何一句，就得刪掉別的字，或放寬上限。
+- **新句子寫成「要在做法之間做決定時」，沒有寫成「要請使用者做決定時」**：
+  - 用意是只把「要怎麼做」這類問題導去讀指南，是非題不必讀。
+  - 代價是：像「要不要推送」這種請你決定的問題，不會被提醒去讀指南。這次三個是非題都問得正確，所以目前看不出壞處。
 - **沿用原本的提醒程式，只改觸發時機，沒有另外新增一支**：這是你接受縮小方案時同意的方向，理由是不增加檢查規則的數量。要改回「開場一次加每輪一次」，就得多一支程式。
 - **Codex 最多等 5 秒**：這個值是對照 Codex 文件訂的，沒有在真正的 Codex 對話裡測過。
-- **改寫指南修了兩輪以後，沒有做第三輪**：
-  - 建置時的試跑就發現改寫會掉事實，我這次也看到一樣的情況。
-  - 當時的判斷是，全新的 agent 手上沒有原本的來龍去脈，再修文字效果有限。
-  - 如果你要求改寫不能掉事實，這裡還得再做一次。
-- **建置途中加了三批原本計畫外的工作**：
+- **改寫會掉事實、「要怎麼做」會漏選項，這兩件事都不再多修一輪指南**：
+  - 建置時的試跑就發現改寫會掉事實，我這次也看到一樣的情況。當時的判斷是，全新的 agent 手上沒有原本的來龍去脈，再修文字效果有限。
+  - 「要怎麼做」的部分只補了提醒那一句，指南本身沒有再改；我的試跑裡，指南三次只被讀了一次。
+  - 如果你要求這兩件事做到，這裡還得再做一次。
+- **建置途中加了四批原本計畫外的工作**：
   - 依試跑失敗修改寫指南；
   - 依攻擊測試的發現，修正檢查規則被反向改寫卻照樣通過的漏洞，並讓提醒程式在設定檔卡住時也能準時結束；
-  - 補上第 8 條缺的表格內容。
+  - 補上第 8 條缺的「格子裡能放什麼」和「表格裡的時間」；
+  - 依我這份報告，在審查前補上提醒的新句子，以及指南缺的三小項。
 - **你電腦上裝的舊版流程檢查程式，還要求填「改動大小分類」這個欄位**：這個分類已經拿掉了，建置時一律填「完整」，也就是分類拿掉後的預設值。
 - **加權決策矩陣的處理**：
   - 完整版放在商業表格集，軟體表格集用一行指過去。
@@ -215,11 +238,10 @@
 
 ## 我不確定你要不要的事
 
-- **問「要怎麼做」時，要不要讓提醒直接要求 agent 先讀寫作指南？** 現在提醒只在「你要求更白話」時才叫 agent 讀指南。這次試跑裡，agent 叫用了圖表 skill，卻沒讀指南，所以只給一個做法。加這句大約要多 15 個字，但會超過目前的字數上限。
+- **「要怎麼做」的問題，agent 常常不叫用 skill、也不讀指南**：我出的兩道新題都是這樣，其中一題只給了一套方案。你能接受目前這樣嗎？還是要找別的方式讓它讀指南？在 150 字上限內，提醒已經沒有空間再加字。
 - **改寫仍會掉事實或把 agent 說成「人」，你能接受嗎？** 還是要再修一輪指南？
 - **不指名 skill 時，進度回報沒有用表格**，只是一串清單。這樣可以嗎？
 - **Codex 和 Antigravity 我都沒有實際開對話試。** 要不要你在 Codex 按一次重新信任，並在 agy 各試一則訊息？
-- **第 8 條剩下的三小項**（兩個方向比較用表格、表格當圖的文字版、別把表格塞進編號步驟中間），要補，還是算了？
 - **有一件事和這次改動無關，但你可能想知道**：在 Codex 上，即使裝了 ascii-graph-toolkit，也一律送完整版提醒，這在改動之前就是如此。如果 ascii-graph-toolkit 在 Codex 上也送自己的提醒，Codex 可能會同時收到兩份圖表指示。
 
 ## 英文規則與格式規則有沒有守住

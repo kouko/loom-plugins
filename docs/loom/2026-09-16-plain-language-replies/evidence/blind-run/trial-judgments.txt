@@ -108,3 +108,50 @@ a9-incident-skill (same, naming the skill)
   collections read: tables-software.md only. verdict: pass.
 
 Line 9 overall: works.
+
+== Acceptance 7 re-check after the card change (W4-03) ==
+# Card at eacf718f ends "Before plainer explanations or decisions between
+# approaches, read loom-visualization's references/plain-language.md."
+# a2b500a3..eacf718f changes docs only, so the implementer's runs at a2b500a3
+# saw the same card and guide.
+
+a7-how-question-after-w4-03.txt (implementer run, a2b500a3, same prompt as a7-how-question.txt)
+  guide read: yes. alternatives: 3 (one-shot with downtime, dual-write +
+  backfill, migrate on read). recommended marked: yes (B).
+  do-nothing-or-later: listed and ruled out with a reason. smaller: option A
+  is the simpler version ("邏輯最簡單"). combined: not named.
+  Against Acceptance 7's words ("either includes a do-nothing-or-later,
+  smaller, or combined alternative or says in one sentence why none is
+  workable"): met. Against the guide's stricter rule (each of the three
+  listed or ruled out): not met (combining).
+  verdict: pass.
+
+a7-how-auth-eacf718f.txt (blind runner, eacf718f, new question: admin-only delete)
+  skill invoked: no. guide read: no (Glob in the empty directory only).
+  alternatives: 2, in prose (shared decorator / dependency vs an if-check in
+  each route). recommended marked: yes (decorator). smaller alternative: the
+  per-route if-check is the smaller version, with its trade-off stated.
+  do-nothing / combined: not mentioned. Ends with a clarifying question.
+  Against Acceptance 7's words: met at the letter, weakly (no table, no
+  consequence per option beyond one trade-off sentence).
+  verdict: pass (borderline).
+
+a7-how-logs-eacf718f.txt (blind runner, eacf718f, new question: logs filling the disk)
+  skill invoked: no. guide read: no.
+  alternatives: 1 - a single combined plan (rotation + tiered retention +
+  ship off the host), not offered as a choice. Manual cleanup and adding
+  disk are dismissed in half a clause ("而不是單靠手動清或擴容") without being
+  presented as alternatives.
+  verdict: fail (fewer than two alternatives offered).
+
+a7-yes-no-after-w4-03.txt (implementer run, a2b500a3)
+  asked directly: yes ("請問可以進行嗎？"), no invented alternatives. verdict: pass.
+
+a7-yes-no-delete-eacf718f.txt (blind runner, eacf718f, new: delete merged remote branch)
+  asked directly: yes ("要我把遠端的這個分支刪掉嗎?"), no invented
+  alternatives; it notes the branch name is unknown. verdict: pass.
+
+Line 7 at eacf718f overall: partly. Yes/no: 3 of 3 direct. How-questions:
+2 of 3 meet the line's words, 1 of 3 fails; the guide was read in 1 of 3
+runs, and in neither of the blind runner's two new questions, so the added
+card sentence does not reliably route decision questions to the guide.
