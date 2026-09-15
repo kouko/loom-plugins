@@ -1,7 +1,7 @@
 """Adversarial probes for `hooks/visualization-card --host=codex` and the Codex
 hook wiring (`hooks/hooks-codex.json`, `.codex-plugin/plugin.json`).
 
-Codex marks a SessionStart hook failed when its JSON carries keys beside
+Codex marks a hook failed when its JSON carries keys beside
 `hookSpecificOutput`, so on Codex the output must be exactly that one key.
 The Claude path must stay byte-identical to the base commit.
 """
@@ -139,7 +139,8 @@ def test_visualization_card_codex_hooks_json_command_uses_plugin_root(tmp_path):
     from an unrelated cwd with a space in the plugin path it delivers the
     single-key full card."""
     hooks = json.loads((PLUGIN_ROOT / "hooks" / "hooks-codex.json").read_text(encoding="utf-8"))
-    groups = hooks["hooks"]["SessionStart"]
+    assert set(hooks["hooks"]) == {"UserPromptSubmit"}
+    groups = hooks["hooks"]["UserPromptSubmit"]
     commands = [h["command"] for g in groups for h in g["hooks"]]
     assert len(commands) == 1
     command = commands[0]
