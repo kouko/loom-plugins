@@ -1,0 +1,93 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-15-sync-main-before-review",
+  "content_digest": "ba4fe966cd0afca9c29762e23d30a784c36ac1bd",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-sync-main-before-review/evidence/probes/test_sync_trunk_abuse.py -q",
+      "artifact": "docs/loom/2026-09-15-sync-main-before-review/evidence/probes/test_sync_trunk_abuse.py",
+      "result": "pass",
+      "command_digest": "d5301ab9253773d04e0966c7828c5a9c233c13a416285ae4cd17e333e97a08c7"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-sync-main-before-review/evidence/probes/test_sync_text_pins_mutation.py -q",
+      "artifact": "docs/loom/2026-09-15-sync-main-before-review/evidence/probes/test_sync_text_pins_mutation.py",
+      "result": "pass",
+      "command_digest": "a5e64e8ac66d35b0c36e8a52b98c504ff84659dee7b6062fbb965cbdc97f8b46"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a4fcf1f60cfd848e2",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "security",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/sync.py:155",
+          "text": "nitpick (non-blocking): operator written `+(` with no space.",
+          "fix": "Write `) + (\", ...\"` at sync.py:155."
+        },
+        {
+          "severity": "nit",
+          "dimension": "naming",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/sync.py:124",
+          "text": "nitpick (non-blocking): cmd_sync_trunk is about 111 lines; deferred on purpose.",
+          "fix": "Extract `_refusal(...)` and `_merge_or_abort(...)` in a later change."
+        },
+        {
+          "severity": "nit",
+          "dimension": "refactoring",
+          "anchor": "loom-code/scripts/loom_checker/command_handlers/sync.py:11",
+          "text": "suggestion (non-blocking): sync imports land's private `_git_reason`; deferred on purpose.",
+          "fix": "Move `_git_reason` into loom_checker/helpers.py as `git_reason` in a later change."
+        }
+      ]
+    },
+    {
+      "reviewer": "a2462846c5b8f793b",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-09-15-sync-main-before-review/plan.md:30",
+          "text": "note (non-blocking): W2-01 Files line omits README version lines and rule-count/version pin tests.",
+          "fix": "List README.md, loom-code/README*.md, test_loom_checker_modules.py, test_probes_language_policy.py and test_write_plan_station_text.py as release pins in the PR body."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "important",
+      "dimension": "omission",
+      "anchor": "loom-code/agents/adversary.md:44",
+      "text": "Adversary contract names loom-code/skills/closing-review/references/attack-catalogue.md, which does not exist in the repository; pre-existing, outside this change's scope. The adversary used the adversarial.md Skill-and-gate mutation recipe instead.",
+      "fix": "Open a separate intent to restore or re-point the attack catalogue reference."
+    },
+    {
+      "severity": "nit",
+      "dimension": "correctness",
+      "anchor": "loom-code/scripts/loom_checker/command_handlers/sync.py:145",
+      "text": "sync-trunk exits 0 for both up-to-date and content-changed; stations read the stdout line and finalize-review re-runs checks. Accepted by the code reviewer.",
+      "fix": "None for this change."
+    }
+  ],
+  "selection": null
+}
