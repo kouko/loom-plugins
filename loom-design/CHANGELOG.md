@@ -12,6 +12,31 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.2.0] — 2026-09-15 — carried details and readable flows
+
+Minor. Station guidance changes in `capture-intent` and `write-spec`; no new
+field, identifier, checker rule, or station.
+
+- `capture-intent` keeps a carried-details list: flow or reaction details the
+  user stated or explicitly agreed to, never an agent proposal or an inferred
+  detail. The list stays out of the intent file, is pasted verbatim in the
+  hand-off, and, when non-empty with `needs-design: no`, requires
+  `loom-code:write-plan` to write a minimal spec to hold it. An engineering
+  confirmation shows the list as a table in the same message.
+- Intent sections may use Markdown tables or diagrams; Acceptance stays a
+  numbered list, and chat restatements use text tables or diagrams, not
+  Mermaid.
+- `write-spec` records each carried detail in the spec — a visible flow as a
+  UI flows line, anything else on the matching Requirement or Design decision
+  line — and never records an agent proposal the user did not agree to.
+- UI flows keep one line per operation for a short flow, use a
+  `case | what the user does | what they see` table for parallel cases, and a
+  Mermaid `stateDiagram-v2` or `flowchart` for branching paths; `spec-forms`
+  covers both forms.
+- Decision point ② leads with a table or text (ASCII) diagram for flows with
+  parallel cases or branches, then the per-case sentences, and never puts
+  Mermaid in the chat message.
+
 ## [2.1.6] — 2026-09-15 — station summaries name Build's mechanical checks
 
 Patch. Text-only update to the station summary tables of `capture-intent`,

@@ -371,15 +371,19 @@ def test_capture_intent_does_not_call_loom_code_policy() -> None:
     assert "does not call `second_vendor_policy.py`" in text
 
 
-def test_reviewer_policy_summary_has_patch_release_metadata() -> None:
+def test_loom_design_version_2_2_0_consistent() -> None:
     claude_manifest = json.loads(PLUGIN_JSON.read_text(encoding="utf-8"))
     codex_manifest = json.loads(
         (REPO / "loom-design/.codex-plugin/plugin.json").read_text(encoding="utf-8")
     )
+    agy_manifest = json.loads(
+        (REPO / "loom-design/plugin.json").read_text(encoding="utf-8")
+    )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.1.6"
-    assert codex_manifest["version"] == "2.1.6"
-    assert "## [2.1.6]" in changelog
+    assert claude_manifest["version"] == "2.2.0"
+    assert codex_manifest["version"] == "2.2.0"
+    assert agy_manifest["version"] == "2.2.0"
+    assert "## [2.2.0]" in changelog
 
 
 def _branch_note() -> str:
