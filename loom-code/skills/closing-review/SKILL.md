@@ -185,16 +185,15 @@ content the reviewers last read; publication-only edits do not change it.
 - **Round 2 — fix verification.** Batch fatal and important findings, return to
   Build, which repeats its end-of-Build mechanical checks, and resume the same
   reviewers over the functional fix delta.
-- **Round 3 — terminal verification.** If Round 2 still has blockers, first
-  stop local patching and perform a technical design re-look. The agent owns
-  that re-plan when it preserves requirements, visible behavior, and
-  guarantees. Review the resulting final digest once. `NEEDS_REVISION` ends
-  the episode as `NON_CONVERGENT`; never dispatch Round 4.
+- **Round 3 — terminal verification.** Review the final digest once.
+  `NEEDS_REVISION` ends the episode as `NON_CONVERGENT`; never dispatch Round 4.
 
-Treat the episode as stuck when the same blocker survives two consecutive
-rounds, the blocker count does not decrease after a functional fix, or the fix
-repeats the same mechanism shape. Stop local patching at that point and use the
-next available round only after the technical design re-look.
+Treat the episode as stuck when Round 2 still has blockers, the same blocker
+survives two consecutive rounds, the blocker count does not decrease after a
+functional fix, or the fix repeats the same mechanism shape; stop local
+patching then, and use the next available round only after the technical
+design re-look. The agent owns that re-plan when it preserves requirements,
+visible behavior, and guarantees.
 
 Do not ask the user whether to continue or which technical repair to choose.
 Ask only when resolving the blocker would change requirements, visible
@@ -274,7 +273,7 @@ attestation directly.
 When `finalize-review` fails, return the fix to Build, which repeats its
 end-of-Build mechanical checks, and the fixed content, a new functional-content
 digest, must pass the next review round (§4) before `finalize-review` runs
-again. Earlier verdicts are never reused for the fixed content. When no round
+again. That round is fix verification, as in Round 2. Earlier verdicts are never reused for the fixed content. When no round
 remains, the fix would need a fourth distinct digest, which §4 forbids, so it
 ends the episode as `NON_CONVERGENT`.
 

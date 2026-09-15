@@ -378,3 +378,34 @@ def test_unresolved_adversarial_findings_reach_finalize_input() -> None:
     destination = next(s for s in _sentences(recording) if "`findings` input of `finalize-review`" in s)
     assert "closing review passes" in destination, destination
     assert not has_negation(destination), destination
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-15-station-gaps-after-dogfood — acceptance 2
+# ---------------------------------------------------------------------------
+
+def _round_three_bullet() -> str:
+    start = REVIEW.index("- **Round 3")
+    return " ".join(REVIEW[start:].split("\n\n", 1)[0].split())
+
+
+def test_round2_blockers_still_require_relook_before_round3() -> None:
+    stuck = next(
+        s for s in split_sentences(REVIEW_WORDS, ends=".")
+        if s.startswith("Treat the episode as stuck")
+    )
+    trigger, _, action = stuck.partition(";")
+    condition = next(c for c in trigger.split(", ") if "Round 2 still has blockers" in c)
+    assert not has_negation(condition), condition
+    assert "stop local patching" in action, stuck
+    assert "technical design re-look" in action, stuck
+    assert not has_negation(action), action
+
+
+def test_finalize_failure_round_requires_no_relook() -> None:
+    bullet = _round_three_bullet()
+    assert "technical design re-look" not in bullet, bullet
+    assert "stop local patching" not in bullet, bullet
+    finalize = _flat_section("## 5. Finalize")
+    assert "That round is fix verification, as in Round 2." in finalize
+    assert "technical design re-look" not in finalize
