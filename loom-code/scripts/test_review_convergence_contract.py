@@ -407,5 +407,26 @@ def test_finalize_failure_round_requires_no_relook() -> None:
     assert "technical design re-look" not in bullet, bullet
     assert "stop local patching" not in bullet, bullet
     finalize = _flat_section("## 5. Finalize")
-    assert "That round is fix verification, as in Round 2." in finalize
-    assert "technical design re-look" not in finalize
+    for sentence in _sentences(finalize):
+        if "technical design re-look" in sentence:
+            assert has_negation(sentence), sentence
+            assert "unless the episode is stuck" in sentence, sentence
+
+
+_NO_RELOOK = "No technical design re-look precedes that round unless the episode is stuck."
+
+
+def test_finalize_failure_round_states_no_relook_unless_stuck() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    assert _NO_RELOOK in finalize
+    assert "fix verification, as in Round 2" not in finalize
+    assert not _OPTIONAL_ROUND.search(_NO_RELOOK)
+
+
+def test_reviewer_contract_ties_no_relook_to_round3() -> None:
+    reviewer = " ".join(REVIEWER.split())
+    tied = [
+        s for s in _sentences(reviewer)
+        if "Round 3" in s and "technical design re-look" in s
+    ]
+    assert tied == [], tied
