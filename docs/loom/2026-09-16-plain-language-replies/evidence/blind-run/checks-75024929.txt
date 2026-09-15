@@ -1,0 +1,32 @@
+# clean worktree at 75024929
+$ sync_codex_manifests.py --check --all
+exit=0
+$ rule vs card cmp
+exit=0 (0 = identical)
+$ wc -w cards
+     150 loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md
+     148 loom-workflow/skills/loom-visualization/assets/trigger-card.md
+     298 total
+$ rules 1-3 identical across the two cards?
+5c5
+< changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
+---
+> changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+$ hook events
+loom-workflow/hooks/hooks.json:3:    "UserPromptSubmit": [
+loom-workflow/hooks/hooks-codex.json:3:    "UserPromptSubmit": [
+$ check_mechanisms --baseline 4dcd03a6
+net mechanism count (excl. host-hygiene): 136
+baseline net count: 136
+exempt from net count: PostToolUse:Skill:language-anchor.py
+all clear
+$ skill folders
+      12
+
+# Acceptance 8 spot checks at 75024929
+Datawrapper            plain-language.md:336:  columns, a table beats a chart (Datawrapper). plain-language.md:384:- Datawrapper, what to consider when creating tables: https://www.datawrapper.de/blog/guide-what-to-consider-when-creating-tables 
+text alternative       plain-language.md:337:- A table is the formal text alternative for a complex diagram such as a 
+numbered steps         plain-language.md:363:- In the middle of numbered steps (Google). 
+Nutt                   plain-language.md:75:Why: in Paul Nutt's study of 400 business decisions, about half failed, and plain-language.md:78:In Nutt's 1999 study, managers developed multiple options in fewer than 20 plain-language.md:398:- Paul Nutt, 400 decisions: https://news.osu.edu/half-of-business-decisions-fail-because-of-managements-blunders-new-study-finds/ 
+key-value\|key and value plain-language.md:274:1. Use a table only when each item has three or more attributes; otherwise use a list (Google, Microsoft). Exception: a key-value summary table, one 
+RACI                   tables-business.md:133:- When: planning whom to manage closely and whom to keep informed. For assigning responsibility, the RACI matrix is S12 in `references/tables-softw tables-business.md:135:- In chat: fits (4 short columns); a RACI with many roles gets wide, so name at most 4 to 5 roles per message. tables-business.md:143:Sources: https://www.rock.so/blog/power-interest-grid, https://sinnaps.com/en/project-management-blog/raci-matrix-template, https://www.nomura-syst 

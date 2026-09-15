@@ -1,0 +1,62 @@
+# blind-run live trial: a9-incident-natural
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --disable-slash-commands --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at dda0014f via --plugin-dir; real hook and real skill files
+# prompt-sha256: 07fe38b945e28c1e94dc8047e27afb303878f109edf00df9e770302207dd2501
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+=== USER MESSAGE (verbatim) ===
+昨天晚上 21:10 到 21:50 付款服務停了 40 分鐘，原因是資料庫連線數用完。幫我寫一份事故報告。
+=== SKILLS INVOKED ===
+none
+=== FILE TOOLS USED ===
+none
+=== FINAL REPLY (verbatim) ===
+以下是初版事故報告草稿，其中資料庫連線數用完是已知原因，但還有幾個關鍵欄位需要你補充才能完整（例如受影響交易量、偵測方式、修復步驟），我先用【待補充】標示，你可以直接回填。
+
+---
+
+## 事故報告
+
+**事故編號：** 【待補充，例如 INC-2026-0916-01】
+**日期：** 2026-09-15
+**狀態：** 已解決
+
+### 摘要
+付款服務中斷 40 分鐘（21:10–21:50），原因為資料庫連線數用盡，導致新的付款請求無法建立資料庫連線而失敗。
+
+### 影響範圍
+- 受影響服務：付款服務
+- 影響時間：2026-09-15 21:10 – 21:50（共 40 分鐘）
+- 受影響交易數／使用者數：【待補充】
+- 是否造成金流損失或重複扣款：【待補充】
+
+### 時間軸
+
+| 時間 | 事件 |
+|---|---|
+| 21:10 | 付款服務開始出現錯誤，資料庫連線數達到上限 |
+| 21:?? | 【待補充：誰／如何發現問題，例如告警觸發、客訴、on-call 發現】 |
+| 21:?? | 【待補充：排查與處置過程，例如重啟服務、擴大連線池、關閉異常連線】 |
+| 21:50 | 服務恢復正常 |
+
+### 根本原因
+資料庫連線數用盡（connection pool exhausted），導致付款服務無法取得新的資料庫連線。
+
+- 是何種原因造成連線數暴增或未釋放：【待補充，例如慢查詢未關閉連線、流量突增、連線池設定過小、某次部署引入的連線洩漏】
+
+### 處置與復原
+【待補充：實際採取的修復動作，例如重啟服務、調高 max_connections、修正程式碼釋放連線】
+
+### 後續改善行動
+
+| 項目 | 負責人 | 期限 |
+|---|---|---|
+| 【待補充】 | 【待補充】 | 【待補充】 |
+
+---
+
+請提供以下資訊，我再幫你補完：
+1. 是怎麼發現／告警的？
+2. 具體怎麼修復讓服務在 21:50 恢復的？
+3. 大約影響多少筆交易或使用者？
+4. 連線數用完的根本原因是什麼（例如慢查詢、流量突增、連線洩漏）？

@@ -1,0 +1,47 @@
+# blind-run live trial: a9-incident-skill-75024929
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at 75024929 via --plugin-dir; real hook and real skill files
+# prompt-sha256: 9cec3de97fc56c99b9e11cdd3a487d726507642b8879841b5a9cedeb08f43208
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+# session init: {"tools": ["Glob", "Grep", "Read", "Skill"], "skills": ["deep-research", "loom-workflow:critique", "loom-workflow:dbt-model-style", "loom-workflow:decision-map", "loom-workflow:distill-sessions", "loom-workflow:git-memory", "loom-workflow:goal-create", "loom-workflow:handoff", "loom-workflow:independent-advisor", "loom-workflow:loom-memory", "loom-workflow:loom-visualization", "loom-workflow:recap-state", "loom-workflow:using-loom-workflow", "design", "design-sync", "dataviz", "update-config", "verify", "debug", "code-review", "simplify", "batch", "fewer-permission-prompts", "doctor", "loop", "schedule", "claude-api", "workflow-authoring", "run", "run-skill-generator"], "plugins": ["loom-workflow@inline"]}
+=== USER MESSAGE (verbatim) ===
+用 loom-visualization 幫我寫一份事故報告：昨天晚上 21:10 到 21:50 付款服務停了 40 分鐘，原因是資料庫連線數用完。
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/references/tables-software.md
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/templates/10-timeline.md
+=== FINAL REPLY (verbatim) ===
+我幫你整理了昨晚付款服務停機的事故報告，用摘要表 + 時間軸表呈現重點資訊。目前只有起訖時間兩個時間點，若你有偵測、通報、修復等中間步驟的時間，可以補充讓時間軸更完整。
+
+## 事故報告：付款服務停機
+
+### 事故摘要
+
+| 項目 | 內容 |
+|---|---|
+| 事故名稱 | 付款服務中斷 |
+| 發生日期 | 2026-09-15（昨日） |
+| 開始時間 | 21:10 |
+| 結束時間 | 21:50 |
+| 停機時長 | 40 分鐘 |
+| 影響範圍 | 付款服務 |
+| 根本原因 | 資料庫連線數用完（connection pool exhausted） |
+| 嚴重程度 | 待評估 |
+
+### 事件時間軸
+
+| 時間 | 事件 |
+|---|---|
+| 21:10 | 付款服務開始異常，資料庫連線數耗盡，新請求無法取得連線 |
+| 21:50 | 服務恢復正常 |
+
+還有幾個常見欄位目前沒有資訊，要不要一併補上？
+
+1. **影響範圍細節**：受影響的使用者數 / 訂單數，或是否有交易失敗、重複扣款等情況
+2. **偵測與應變**：是誰／什麼機制發現的（告警、使用者回報）、何時介入處理、如何解除（重啟服務、擴大連線池上限等）
+3. **後續行動項目**：例如加上連線數監控告警、調整連線池大小、加入連線洩漏檢測——這類通常會列成「行動項目 / 負責人 / 期限」表
+
+告訴我要補哪些，我再更新報告。

@@ -4,7 +4,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.2.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.3.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 這是什麼
 
@@ -113,7 +113,7 @@ flowchart TD
 | [`handoff`](skills/handoff/) | 把 session 狀態存成 `.claude/handoffs/` 下的 HANDOFF 檔，或在新 session 中從它接續。 |
 | [`distill-sessions`](skills/distill-sessions/) | 挖掘過去的 Claude Code 與 Codex session（可用時加上 `/insights` facets），產出依 skill 排序的 friction 與可審閱的 SKILL.md 提案。 |
 | [`independent-advisor`](skills/independent-advisor/) | 對 plan 或決策，向另一個 executor——另一個 model tier、更高的 effort，或另一家廠商——取得 second opinion。花錢或把資料送出本機需經同意。 |
-| [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。不用於 Obsidian 筆記。 |
+| [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。plain-language reference 收錄寫法指引、選項判斷規則、八種對話情境表格與表格規則，另有軟體、設計、商業三份表格集。不用於 Obsidian 筆記。 |
 | [`goal-create`](skills/goal-create/) | 只在指名呼叫時執行。SESSION 起草四欄 goal condition，在 host 接受時啟用，否則誠實提供復原操作；ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
 Loom 的契約計入其中八個工具。`goal-create` 與 `dbt-model-style` 是 Loom
@@ -129,8 +129,8 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  治理、稽核、遙測與設計筆記
 ├── hooks/
-│   ├── hooks.json         SessionStart 卡片，以及 Write/Edit 後檢查 skill 資料夾結構
-│   └── visualization-card loom-visualization 的 SessionStart 觸發卡片
+│   ├── hooks.json         UserPromptSubmit 卡片，以及 Write/Edit 後檢查 skill 資料夾結構
+│   └── visualization-card loom-visualization 的 UserPromptSubmit 觸發卡片
 ├── scripts/               plugin 層級測試與結構檢查
 ├── skills/
 │   ├── critique/
@@ -171,7 +171,7 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
-在 Codex 上，loom-visualization 的觸發卡透過 plugin 的 SessionStart hook 送達；Codex 只在你審閱並信任該 plugin 的 hook 之後才會執行它。
+在 Codex 上，loom-visualization 的觸發卡透過 plugin 的 UserPromptSubmit hook，在你每次送出訊息時送達；Codex 只在你審閱並信任該 plugin 的 hook 之後才會執行它。如果你在舊版本已信任過，因為 hook 的事件改了，需要重新審閱並信任一次。
 
 ### Antigravity CLI
 
@@ -195,6 +195,16 @@ agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模�
 
 hook 只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。
 在 agy 上，loom-visualization 的觸發卡以 plugin rule 送達，因此永遠生效。
+
+### 每輪提醒送不到的地方
+
+在 Claude Code 與 Codex 上，`loom-workflow` 透過 UserPromptSubmit hook，在你每次送出訊息時
+把 loom-visualization 的觸發卡（用使用者的語言回覆、結論先講、白話說明、照字面講不用比喻、
+用表格或圖）送給 agent，每輪約多 150 個英文字。以下情況收不到：
+
+- Codex IDE 擴充功能與 Codex app
+- Antigravity 桌面 app 與 IDE（plugin 的 hook 與 rule 只在 `agy` CLI 執行）
+- 只裝 `loom-code`、沒裝 `loom-workflow`：卡片只放在 `loom-workflow` 裡
 
 ## 使用
 

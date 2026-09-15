@@ -1,0 +1,31 @@
+# blind-run live trial: a7-how-logs-75024929
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at 75024929 via --plugin-dir; real hook and real skill files
+# prompt-sha256: f9ad42c04962908581f5e8252d51ecf69ae913f9f1c76543009f0743ef72f512
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+# session init: {"tools": ["Glob", "Grep", "Read", "Skill"], "skills": ["deep-research", "loom-workflow:critique", "loom-workflow:dbt-model-style", "loom-workflow:decision-map", "loom-workflow:distill-sessions", "loom-workflow:git-memory", "loom-workflow:goal-create", "loom-workflow:handoff", "loom-workflow:independent-advisor", "loom-workflow:loom-memory", "loom-workflow:loom-visualization", "loom-workflow:recap-state", "loom-workflow:using-loom-workflow", "design", "design-sync", "dataviz", "update-config", "verify", "debug", "code-review", "simplify", "batch", "fewer-permission-prompts", "doctor", "loop", "schedule", "claude-api", "workflow-authoring", "run", "run-skill-generator"], "plugins": ["loom-workflow@inline"]}
+=== USER MESSAGE (verbatim) ===
+我們的服務每天產生很多日誌檔，硬碟快滿了。日誌要怎麼處理比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+none
+=== FINAL REPLY (verbatim) ===
+日誌塞爆硬碟最務實的做法是**分層處理**：先用輪替壓縮止血,同時依日誌重要性訂出不同保留期限,長期再視規模導入集中式日誌系統。以下是幾種常見做法的比較：
+
+| 做法 | 適合情境 | 優點 | 缺點 |
+|---|---|---|---|
+| 日誌輪替(logrotate) | 單機或機器數量少,想立刻解決硬碟問題 | 設定簡單、系統原生支援、免額外部署 | 日誌仍留在本機,跨機器查詢不方便 |
+| 集中式日誌系統(如 Loki、ELK、CloudWatch Logs) | 多台機器,需要跨服務搜尋、告警、儀表板 | 本機幾乎不留日誌、方便除錯與監控 | 需額外基礎設施與維運成本 |
+| 歸檔到物件儲存(如 S3)+生命週期規則 | 因合規或稽核需要長期保存 | 成本低、可設定自動過期刪除 | 查詢不便,需另外工具讀取 |
+| 降低日誌量(調整 log level、去除冗餘輸出) | 日誌內容本身太囉嗦、成長速度太快 | 從源頭解決,減輕後續所有處理的負擔 | 需要改程式碼,不是立即見效 |
+
+**建議做法（依優先順序）：**
+
+1. **立即止血**：先用 `du -sh /var/log/*`（或對應日誌目錄）確認是哪些服務在灌爆硬碟，設定 logrotate 依大小或天數輪替、壓縮舊檔、只保留固定份數。這一步幾小時內就能解決硬碟滿的問題。
+2. **分級保留**：不是所有日誌都同等重要。錯誤/稽核類日誌可以留久一點（例如 30 天），debug/verbose 類日誌留短一點（例如 3–7 天），甚至考慮預設不落地。
+3. **檢視輸出量**：如果日誌是因為某些服務打印太多 debug 訊息造成的，調整 log level 或去除重複輸出，比一直加大保留機制更治本。
+4. **長期方案**：如果服務規模持續成長、有多台機器或需要跨服務查詢/告警，再評估導入集中式日誌系統（例如 Loki + Grafana 成本較低，ELK 功能較完整但較重），把本機日誌保留期限縮到很短（如 1–2 天）當作緩衝，真正的查詢與長期保存交給集中系統或物件儲存歸檔。
+
+如果你想更具體，可以告訴我你們現在用什麼作業系統/服務數量規模，我可以給更貼近你們環境的 logrotate 設定或工具選擇建議。

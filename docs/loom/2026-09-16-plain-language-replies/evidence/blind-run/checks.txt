@@ -1,0 +1,48 @@
+# clean worktree at dda0014f
+$ python3 scripts/sync_codex_manifests.py --check --all
+exit=0
+
+$ python3 loom-code/scripts/check_mechanisms.py --baseline 4dcd03a6
+class          recomputed registered
+skill                  22         22
+checker-rule           25         25
+hook                   10          9
+contract               63         63
+prose-gate             17         17
+net mechanism count (excl. host-hygiene): 136
+baseline net count: 136
+exempt from net count: PostToolUse:Skill:language-anchor.py
+all clear
+exit=0
+
+$ tail -n +2 loom-workflow/rules/AGENTS.md | cmp - loom-workflow/skills/loom-visualization/assets/trigger-card.md
+exit=0 (0 = identical)
+line 1 of the rule: <!-- Generated from skills/loom-visualization/assets/trigger-card.md by scripts/sync_codex_manifests.py; edit skills/loom-visualization/assets/trigger-card.md, not this file. -->
+
+$ grep hook events in loom-workflow manifests
+loom-workflow/hooks/hooks.json:3:    "UserPromptSubmit": [
+loom-workflow/hooks/hooks.json:8:            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card\"",
+loom-workflow/hooks/hooks-codex.json:3:    "UserPromptSubmit": [
+loom-workflow/hooks/hooks-codex.json:8:            "command": "python3 \"${PLUGIN_ROOT}/hooks/visualization-card\" --host=codex",
+
+$ git diff --stat 4dcd03a6 HEAD -- loom-workflow/hooks
+ loom-workflow/hooks/hooks-codex.json   |  6 +++---
+ loom-workflow/hooks/hooks.json         |  6 +++---
+ loom-workflow/hooks/visualization-card | 11 +++++++----
+ 3 files changed, 13 insertions(+), 10 deletions(-)
+$ ls loom-workflow/skills (skill count)
+      12
+      12
+$ word counts
+    1460 loom-workflow/skills/loom-visualization/SKILL.md
+     383 loom-workflow/skills/loom-visualization/references/client-matrix.md
+     980 loom-workflow/skills/loom-visualization/references/fidelity-check.md
+    3116 loom-workflow/skills/loom-visualization/references/mermaid-cot-spec.md
+    3130 loom-workflow/skills/loom-visualization/references/page-mode.md
+    2433 loom-workflow/skills/loom-visualization/references/plain-language.md
+    2589 loom-workflow/skills/loom-visualization/references/tables-business.md
+    1561 loom-workflow/skills/loom-visualization/references/tables-design.md
+    3485 loom-workflow/skills/loom-visualization/references/tables-software.md
+     150 loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md
+     148 loom-workflow/skills/loom-visualization/assets/trigger-card.md
+   19435 total

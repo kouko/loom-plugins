@@ -1,4 +1,4 @@
-"""Adversarial probes for the SessionStart hook `hooks/visualization-card`.
+"""Adversarial probes for the UserPromptSubmit hook `hooks/visualization-card`.
 
 Each probe feeds hostile config or stdin and requires: exit 0, exactly one
 stdout line, valid JSON with the three context keys equal, and the expected

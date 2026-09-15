@@ -1,0 +1,67 @@
+# blind-run live trial: a9-incident-skill
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --disable-slash-commands --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at dda0014f via --plugin-dir; real hook and real skill files
+# prompt-sha256: 9cec3de97fc56c99b9e11cdd3a487d726507642b8879841b5a9cedeb08f43208
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+=== USER MESSAGE (verbatim) ===
+用 loom-visualization 幫我寫一份事故報告：昨天晚上 21:10 到 21:50 付款服務停了 40 分鐘，原因是資料庫連線數用完。
+=== SKILLS INVOKED ===
+none
+=== FILE TOOLS USED ===
+Glob **/loom-visualization/**
+Glob **/plugins/**/loom*/**
+Glob **/*.md
+Grep name: loom-visualization|loom-visualization
+Glob **/ascii-graph-toolkit/**
+Read /Users/kouko/.claude/plugins/cache/loom/loom-workflow/5.2.0/skills/loom-visualization/SKILL.md
+Read /Users/kouko/.claude/plugins/cache/loom/loom-workflow/5.2.0/skills/loom-visualization/templates/10-timeline.md
+Grep --target
+Glob scripts/detect_client.py
+=== FINAL REPLY (verbatim) ===
+我幫你整理了一份付款服務中斷的事故報告草稿，時間軸和目前已知的原因都放進去了；但報告裡有幾個欄位（發現方式、止血過程、後續行動）你目前訊息裡沒提到，這些是完整事故報告必須有的部分，草稿裡先標成「待補充」，麻煩你補上。
+
+---
+
+# 事故報告：付款服務中斷
+
+## 摘要
+
+| 項目 | 內容 |
+|---|---|
+| 日期 | 2026-09-15 |
+| 受影響服務 | 付款服務 |
+| 中斷時間 | 21:10–21:50（共 40 分鐘）|
+| 直接原因 | 資料庫連線數用完（連線池耗盡）|
+| 嚴重程度 | 待補充 |
+| 通報 / 發現方式 | 待補充 |
+
+## 時間軸
+
+```
+21:10 ──┬── 付款服務開始無法處理請求
+        │
+21:50 ──┴── 服務恢復正常
+```
+
+（目前只有起訖兩個時間點；若中間有「發現/告警」「開始處置」「確認修復」等時間點，補給我後可以加進時間軸。）
+
+## 根本原因
+
+資料庫連線池的可用連線數被用盡，付款服務因此拿不到新的資料庫連線，導致付款請求無法處理。
+
+## 影響範圍
+
+待補充：受影響的訂單數／使用者數、是否有交易失敗但金流已扣款等需要對帳的情況。
+
+## 處理過程
+
+待補充：如何發現此問題、採取了什麼止血動作（例如重啟服務、調高連線池上限、砍掉閒置連線）、何時確認恢復正常。
+
+## 後續行動
+
+待補充：例如連線池大小調整、逾時與重試設定、連線數監控告警、是否需要事後對帳。
+
+---
+
+麻煩補充上面標「待補充」的部分，我再把報告補完整。

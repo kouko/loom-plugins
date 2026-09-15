@@ -4,7 +4,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat の図表と推論ページ、second opinion。
 
-**Version**：5.2.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.3.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 概要
 
@@ -118,7 +118,7 @@ flowchart TD
 | [`handoff`](skills/handoff/) | session 状態を `.claude/handoffs/` の HANDOFF ファイルに保存し、あるいは新しい session でそこから再開する。 |
 | [`distill-sessions`](skills/distill-sessions/) | 過去の Claude Code と Codex の session（利用可能なら `/insights` facets も）を掘り、skill ごとに順位付けした friction とレビュー可能な SKILL.md 提案を出す。 |
 | [`independent-advisor`](skills/independent-advisor/) | plan や決定について、別の executor——別の model tier、より高い effort、あるいは別ベンダー——から second opinion を取る。費用の発生やマシン外への送信には承認が必要。 |
-| [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。Obsidian ノートには使わない。 |
+| [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |
 | [`goal-create`](skills/goal-create/) | 名前で呼んだ時のみ動く。SESSION は 4 項目の goal condition を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
 Loom の契約で数えるツールはこのうち 8 個です。`goal-create` と `dbt-model-style`
@@ -134,8 +134,8 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  ガバナンス、監査、テレメトリ、設計メモ
 ├── hooks/
-│   ├── hooks.json         SessionStart のカードと Write/Edit 後の skill フォルダ構成チェック
-│   └── visualization-card loom-visualization の SessionStart トリガーカード
+│   ├── hooks.json         UserPromptSubmit のカードと Write/Edit 後の skill フォルダ構成チェック
+│   └── visualization-card loom-visualization の UserPromptSubmit トリガーカード
 ├── scripts/               plugin レベルのテストと構成チェック
 ├── skills/
 │   ├── critique/
@@ -177,7 +177,7 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
-Codex では loom-visualization のトリガーカードを plugin の SessionStart hook で届ける。Codex がこの hook を走らせるのは、plugin の hook を確認して信頼した後だけ。
+Codex では loom-visualization のトリガーカードを plugin の UserPromptSubmit hook で、メッセージを送るたびに届ける。Codex がこの hook を走らせるのは、plugin の hook を確認して信頼した後だけ。以前のバージョンで信頼済みでも、hook のイベントが変わったため、もう一度確認して信頼する。
 
 ### Antigravity CLI
 
@@ -202,6 +202,17 @@ agy plugin install ./loom-workflow
 
 hook が走るのは `agy` CLI だけで、Antigravity のデスクトップアプリや IDE では走らない。
 agy では loom-visualization のトリガーカードを plugin rule として届けるため、常に有効になる。
+
+### 毎ターンのリマインダーが届かない環境
+
+Claude Code と Codex では、`loom-workflow` が loom-visualization のトリガーカード
+（ユーザーの言語で返答、結論を先に、平易な言葉、比喩を使わない文字どおりの表現、表や図）を
+UserPromptSubmit hook で、メッセージを送るたびに agent に届ける。1 ターンあたり約 150 語
+（英語）増える。次の環境には届かない：
+
+- Codex の IDE 拡張と Codex アプリ
+- Antigravity のデスクトップアプリや IDE（plugin の hook と rule は `agy` CLI でしか動かない）
+- `loom-workflow` なしで `loom-code` だけをインストールした場合：カードは `loom-workflow` にしか入っていない
 
 ## 使い方
 

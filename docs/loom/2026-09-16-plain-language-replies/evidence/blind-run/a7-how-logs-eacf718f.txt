@@ -1,0 +1,36 @@
+# blind-run live trial: a7-how-logs-eacf718f
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at eacf718f via --plugin-dir; real hook and real skill files
+# prompt-sha256: f9ad42c04962908581f5e8252d51ecf69ae913f9f1c76543009f0743ef72f512
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+# session init: {"tools": ["Glob", "Grep", "Read", "Skill"], "skills": ["deep-research", "loom-workflow:critique", "loom-workflow:dbt-model-style", "loom-workflow:decision-map", "loom-workflow:distill-sessions", "loom-workflow:git-memory", "loom-workflow:goal-create", "loom-workflow:handoff", "loom-workflow:independent-advisor", "loom-workflow:loom-memory", "loom-workflow:loom-visualization", "loom-workflow:recap-state", "loom-workflow:using-loom-workflow", "design", "design-sync", "dataviz", "update-config", "verify", "debug", "code-review", "simplify", "batch", "fewer-permission-prompts", "doctor", "loop", "schedule", "claude-api", "workflow-authoring", "run", "run-skill-generator"], "plugins": ["loom-workflow@inline"]}
+=== USER MESSAGE (verbatim) ===
+我們的服務每天產生很多日誌檔，硬碟快滿了。日誌要怎麼處理比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+none
+=== FILE TOOLS USED ===
+Glob **/*
+=== FINAL REPLY (verbatim) ===
+disk 快滿的根本原因通常是「日誌只寫入、沒有輪替和清理機制」，建議做法是組合式的：**限制單檔大小＋自動輪替＋分級保留＋搬離本機**，而不是單靠手動清或擴容。
+
+**立即可做（治標，優先做）**
+- 用 `logrotate`（Linux 內建）設定：單檔超過一定大小（如 100MB）或每天就切檔，保留最近 N 份，舊檔自動壓縮（gzip 可省 80~90% 空間）、超過保留期限自動刪除。
+- 檢查應用程式本身有沒有日誌套件（如 log4j、winston、logback 等）內建 rotation 設定，通常比外部工具更可靠，優先用套件自帶的。
+
+**中期（治本）**
+- 依重要性分級保留期限，不要所有日誌一視同仁：
+
+| 日誌類型 | 建議保留 | 存放位置 |
+|---|---|---|
+| debug / 一般存取日誌 | 7~14 天 | 本機或短期物件儲存 |
+| 錯誤 / 例外日誌 | 30~90 天 | 集中式日誌系統 |
+| 稽核 / 合規日誌 | 依法規要求（常見 1 年以上） | 冷儲存（如 S3 Glacier）+ 唯讀 |
+
+- 把日誌集中送到外部系統（如 ELK/OpenSearch、Loki+Grafana、CloudWatch Logs、或雲端 Object Storage），本機只留短期快取，這樣單機硬碟不再是瓶頸，也方便多台機器統一查詢。
+- 對於必須長期保存但很少查的日誌，壓縮後丟到便宜的冷儲存（S3 Glacier / 低頻存取層），而不是留在正式機的硬碟上。
+
+**監控**
+- 幫硬碟使用率設告警閾值（如 80%），避免下次又滿了才發現。
+
+如果你告訴我服務跑在什麼環境（單機 Linux、Docker、Kubernetes、雲端平台等），我可以給更具體的設定方式。

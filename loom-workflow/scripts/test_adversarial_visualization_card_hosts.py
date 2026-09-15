@@ -1,7 +1,7 @@
 """Adversarial probes for `hooks/visualization-card --host=codex` and the Codex
 hook wiring (`hooks/hooks-codex.json`, `.codex-plugin/plugin.json`).
 
-Codex marks a SessionStart hook failed when its JSON carries keys beside
+Codex marks a hook failed when its JSON carries keys beside
 `hookSpecificOutput`, so on Codex the output must be exactly that one key.
 The Claude path must stay byte-identical to the base commit.
 """
@@ -53,7 +53,7 @@ def _codex_payload(proc):
     data = json.loads(lines[0])
     assert list(data) == ["hookSpecificOutput"], data.keys()
     assert set(data["hookSpecificOutput"]) == {"hookEventName", "additionalContext"}
-    assert data["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert data["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
     return data["hookSpecificOutput"]["additionalContext"]
 
 
@@ -129,7 +129,9 @@ def test_visualization_card_claude_default_matches_base_bytes(tmp_path, active, 
     old = _run([], env, stdin=stdin, hook=base)
     new = _run([], env, stdin=stdin)
     assert old.returncode == new.returncode == 0
-    assert new.stdout == old.stdout
+    # Only the event name moved (SessionStart -> UserPromptSubmit).
+    assert new.stdout == old.stdout.replace(b'"SessionStart"', b'"UserPromptSubmit"')
+    assert b'"SessionStart"' not in new.stdout
 
 
 def test_visualization_card_codex_hooks_json_command_uses_plugin_root(tmp_path):
@@ -137,7 +139,8 @@ def test_visualization_card_codex_hooks_json_command_uses_plugin_root(tmp_path):
     from an unrelated cwd with a space in the plugin path it delivers the
     single-key full card."""
     hooks = json.loads((PLUGIN_ROOT / "hooks" / "hooks-codex.json").read_text(encoding="utf-8"))
-    groups = hooks["hooks"]["SessionStart"]
+    assert set(hooks["hooks"]) == {"UserPromptSubmit"}
+    groups = hooks["hooks"]["UserPromptSubmit"]
     commands = [h["command"] for g in groups for h in g["hooks"]]
     assert len(commands) == 1
     command = commands[0]

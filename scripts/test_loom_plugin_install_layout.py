@@ -1029,7 +1029,7 @@ TOOLKIT_KEY = "ascii-graph-toolkit@monkey-skills"
 
 
 def _codex_card_command_problems(command: object) -> list[str]:
-    """Why a Codex SessionStart command cannot deliver the card; [] when it can."""
+    """Why a Codex UserPromptSubmit command cannot deliver the card; [] when it can."""
     if not isinstance(command, str):
         return ["command is not a string"]
     problems = []
@@ -1043,7 +1043,7 @@ def _codex_card_command_problems(command: object) -> list[str]:
 def _card_commands(hooks: dict) -> list[str]:
     return [
         h["command"]
-        for group in hooks.get("SessionStart", [])
+        for group in hooks.get("UserPromptSubmit", [])
         for h in group["hooks"]
         if h.get("type") == "command" and CARD_SCRIPT in h.get("command", "")
     ]
@@ -1060,7 +1060,7 @@ def _run_hook_command(command: str, env_root: str, root: Path, home: Path, cwd: 
         env["CLAUDE_PLUGIN_ROOT"] = str(root)  # Codex exports both names.
     return subprocess.run(
         ["bash", "-c", command],
-        input=json.dumps({"hook_event_name": "SessionStart", "cwd": str(cwd)}),
+        input=json.dumps({"hook_event_name": "UserPromptSubmit", "cwd": str(cwd)}),
         capture_output=True,
         text=True,
         env=env,
@@ -1079,9 +1079,30 @@ def _card_text(root: Path, name: str) -> str:
     return (root / "skills/loom-visualization/assets" / name).read_text(encoding="utf-8").strip()
 
 
-def test_codex_manifest_points_at_sessionstart_card_hook(tmp_path: Path) -> None:
+def _codex_output_problems(stdout: str) -> list[str]:
+    """Why a Codex card hook's stdout is not the canonical single-key shape."""
+    try:
+        data = json.loads(stdout)
+    except ValueError:
+        return ["stdout is not JSON"]
+    if not isinstance(data, dict):
+        return ["stdout is not a JSON object"]
+    problems = []
+    extra = set(data) - {"hookSpecificOutput"}
+    if extra:
+        problems.append(f"keys beside hookSpecificOutput: {sorted(extra)}")
+    specific = data.get("hookSpecificOutput")
+    if not isinstance(specific, dict):
+        return problems + ["hookSpecificOutput is not an object"]
+    if specific.get("hookEventName") != "UserPromptSubmit":
+        problems.append("hookEventName is not UserPromptSubmit")
+    return problems
+
+
+def test_codex_manifest_points_at_prompt_submit_card_hook(tmp_path: Path) -> None:
     """A3 positive: a Codex install selects hooks-codex.json, whose one
-    SessionStart command runs the card script through PLUGIN_ROOT."""
+    UserPromptSubmit command (no matcher) runs the card script through
+    PLUGIN_ROOT and emits only the canonical hookSpecificOutput key."""
     from scripts.sync_codex_manifests import sync_shared_fields
 
     root = _install_plugin("loom-workflow", tmp_path / "renamed codex cache")
@@ -1091,10 +1112,15 @@ def test_codex_manifest_points_at_sessionstart_card_hook(tmp_path: Path) -> None
     assert sync_shared_fields(_manifest(root), codex)["hooks"] == codex["hooks"]
 
     hooks = json.loads((root / codex["hooks"]).read_text(encoding="utf-8"))["hooks"]
-    assert set(hooks) == {"SessionStart"}
-    (group,) = hooks["SessionStart"]
-    assert group["matcher"] == "startup|clear|compact"
+    assert set(hooks) == {"UserPromptSubmit"}
+    (group,) = hooks["UserPromptSubmit"]
+    assert "matcher" not in group
     (command,) = _card_commands(hooks)
+    assert command == 'python3 "${PLUGIN_ROOT}/hooks/visualization-card" --host=codex'
+    # A5: a hung settings read must not stall every Codex prompt (seconds).
+    # Source: Codex hook_config.rs, `rename = "timeout"`, u64 seconds:
+    # https://github.com/openai/codex/blob/main/codex-rs/config/src/hook_config.rs
+    assert group["hooks"][0]["timeout"] == 5
     assert _codex_card_command_problems(command) == []
 
     consumer = tmp_path / "consumer project"
@@ -1103,9 +1129,32 @@ def test_codex_manifest_points_at_sessionstart_card_hook(tmp_path: Path) -> None
     home.mkdir()
     proc = _run_hook_command(command, "PLUGIN_ROOT", root, home, consumer)
     assert _card_context(proc) == _card_text(root, "trigger-card.md")
-    # Codex 0.154.0 marks a SessionStart hook Failed when its JSON carries
-    # keys beyond hookSpecificOutput (live probe), dropping the card.
-    assert set(json.loads(proc.stdout)) == {"hookSpecificOutput"}
+    # Codex 0.154.0 marks a hook Failed when its JSON carries keys beyond
+    # hookSpecificOutput (live probe), dropping the card.
+    assert _codex_output_problems(proc.stdout) == []
+
+
+@pytest.mark.parametrize(
+    "stdout",
+    [
+        json.dumps({
+            "hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "c"},
+            "additionalContext": "c",
+            "additional_context": "c",
+        }),
+        json.dumps({
+            "hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "c"},
+            "systemMessage": "c",
+        }),
+        json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "c"}}),
+        "not json",
+    ],
+    ids=["claude-three-keys", "system-message", "sessionstart-event", "not-json"],
+)
+def test_codex_extra_keys_rejected(stdout: str) -> None:
+    """A3 negative: output with keys beside hookSpecificOutput, or naming the
+    old SessionStart event, is not the canonical Codex shape."""
+    assert _codex_output_problems(stdout) != []
 
 
 @pytest.mark.parametrize(

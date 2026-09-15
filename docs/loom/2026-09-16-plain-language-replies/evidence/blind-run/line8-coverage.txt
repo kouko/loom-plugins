@@ -1,0 +1,130 @@
+# Acceptance 8 re-check at 40014ea3 (files read with git show 40014ea3:<path>; nothing else changed for line 8 since dda0014f)
+# git diff --stat dda0014f 40014ea3:
+ .../loom/2026-09-16-plain-language-replies/plan.md |  5 +++
+ .../references/plain-language.md                   | 48 ++++++++++++++++++++++
+ .../loom-visualization/scripts/test_references.py  | 45 ++++++++++++++++++++
+ 3 files changed, 98 insertions(+)
+
+# skill folders in loom-workflow at 4dcd03a6 / 40014ea3:
+      12
+      12
+
+# domain usages of the 2026-09-16 research, by heading -> reference entry heading
+software 1-20 -> S1-S20:
+### S1. ADR options and trade-offs
+### S2. RFC alternatives considered
+### S3. 技術選定比較表 (technology selection comparison table)
+### S4. Weighted decision matrix
+### S5. PR before and after summary
+### S6. Test plan or test matrix
+### S7. Compatibility table
+### S8. Feature flag rollout plan
+### S9. Incident postmortem timeline
+### S10. Incident postmortem action items
+### S11. Risk register
+### S12. RACI matrix
+### S13. Weekly status report
+### S14. Known and unknown issues
+### S15. Migration or deprecation mapping, old to new
+### S16. API reference parameter table
+### S17. Deprecation schedule or release-notes table
+### S18. Runbook or troubleshooting table
+### S19. 障害報告書サマリ表 (incident report summary table)
+### S20. Migration plan, team-level before and after
+design 1-12 -> D1-D12:
+### D1. Heuristic evaluation
+### D2. Usability test findings
+### D3. Competitive or feature comparison matrix
+### D4. Content audit spreadsheet
+### D5. Design critique or review feedback
+### D6. Design tokens table
+### D7. Component state matrix
+### D8. Accessibility audit (WCAG)
+### D9. User journey map or service blueprint as a table
+### D10. Personas or JTBD comparison table
+### D11. Design decision log (ADR style)
+### D12. Microcopy before and after
+business 1-18 -> B1-B18:
+### B1. Weighted decision matrix
+### B2. Pugh matrix
+### B3. RICE prioritization
+### B4. ICE score or value vs effort
+### B5. MoSCoW prioritization
+### B6. SWOT and TOWS (cross-SWOT)
+### B7. Competitive analysis matrix
+### B8. Porter's Five Forces as a table
+### B9. Stakeholder analysis (power and interest)
+### B10. Risk register
+### B11. Scenario planning
+### B12. Business case or cost-benefit
+### B13. RAG status report
+### B14. OKR or KPI table
+### B15. Assumption log
+### B16. Trade-off consequence table
+### B17. Go/No-Go decision checklist
+### B18. Pricing or packaging tiers
+
+# earlier (2026-09-04) research patterns A-F -> entries
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-business.md:### B19. WSJF (weighted shortest job first)
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-business.md:### B20. Decisional balance sheet
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-business.md:### B21. Kano evaluation table
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-business.md:### B22. Now-Next-Later roadmap
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-business.md:### B23. 2×2 quadrants as tables
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S21. Decision table
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S22. State-transition table
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S23. Truth table
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S24. Traceability matrix (RTM)
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S25. Morphological box (Zwicky)
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S26. Risk matrix
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S27. RAID log
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S28. STRIDE-per-element
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S29. Feature table
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S30. Confusion matrix
+/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/l8/tables-software.md:### S31. Correlation matrix
+
+# conversation set (plain-language.md) situation headings
+### 1. Put the conclusion and its impact first
+### 2. Say what a thing does in plain words
+### 3. Say it literally
+### 4. Turn abstract nouns into what the user does and sees
+### 5. Ask decision questions with real alternatives
+### 6. Show shaped content as tables or diagrams
+### 7. Give only what the user needs
+### 1. Decision consequences
+### 2. Before and after
+### 3. Progress report
+### 4. Acceptance checklist
+### 5. Confirmed, unconfirmed, to decide
+### 6. Findings and recommendations
+### 7. Risks
+### 8. Support matrix
+
+# table-writing and common-mistake subsections
+### Rules
+### Status symbols
+### In-cell visuals
+### Table or chart
+### Time in tables
+### When not to use a table
+### Options as columns or rows
+
+# earlier-research items, grep per item (file:line or MISSING)
+████                                     plain-language.md:282:- Block bars (`████░░░░`): usable only with the number in the same cell. Google 
+sparkline                                tables-software.md:404:- text sparklines specifically inside Markdown table cells plain-language.md:285:- Text sparklines (`▁▂▃▄▅▆▇█`): usable. Tufte says a sparkline can go wherever 
+shields                                  plain-language.md:293:- shields.io badges: usable but risky. Badges are cached by design, and a dead 
+<meter>                                  plain-language.md:295:- `<progress>` and `<meter>`: depend on the renderer (Obsidian shows them, 
+<svg>                                    plain-language.md:298:- Inline `<svg>`: do not use; GitHub's Markdown renderer skips `<svg>` 
+heatmap                                  plain-language.md:291:- Cell background colour or a heatmap: not possible in plain Markdown. GFM 
+across a row                             plain-language.md:301:Layout: when cells hold text, compare items across a row; when cells hold 
+Time as the column axis                  plain-language.md:321:- Time as the column axis (Q1 to Q4, measurement dates, lifecycle stages): 
+Time as a cell value                     plain-language.md:323:- Time as a cell value (What | Who | When): replaces a checklist. 
+Now-Next-Later                           tables-software.md:403:- a generic "roadmap table" (use Now-Next-Later roadmap, B22 in `references/tables-business.md`) plain-language.md:325:A Now-Next-Later roadmap orders its columns by confidence, not by dates 
+Datawrapper                              MISSING
+two directions                           MISSING
+W3C WAI.*text\|text equivalent\|text alternative MISSING
+numbered step\|numbered list             MISSING
+comparison table                         plain-language.md:342:NN/g puts options in columns and attributes in rows for comparison tables. plain-language.md:354:- NN/g, comparison tables: https://www.nngroup.com/articles/comparison-tables/ 
+swimlane                                 tables-software.md:156:- When: at project start, making clear who does the work, who signs off, who is consulted and who is informed. Also called a re 
+prioritization matrix                    tables-business.md:64:- Columns (value/effort 2×2 as a table): `Idea | Value (H/L) | Effort (H/L) | Quadrant (Quick Win/Big Bet/Fill-in/Money Pit)`. N 
+compatibility table                      tables-software.md:92:### S7. Compatibility table tables-software.md:94:Pointer: `references/plain-language.md` situation "Support matrix"; in a document put features in rows, browsers or platforms in 
+progress bar                             tables-design.md:25:| Visibility of system status | No loading indicator when saving | 3 | Add spinner/progress bar | 

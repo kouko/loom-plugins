@@ -1,0 +1,38 @@
+# blind-run live trial: a7-how-logs-eacf718f (re-run after W4-04)
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/w404-scratch/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at 4af823eb via --plugin-dir; real hook and real skill files
+# prompt-sha256: f9ad42c04962908581f5e8252d51ecf69ae913f9f1c76543009f0743ef72f512 (same prompt as a7-how-logs-eacf718f.txt)
+# exit: 0 (result subtype success, is_error false); single run, no reruns
+# card delivery (saved transcript be424d76-f4b7-46ab-b25c-328349ffb9b9.jsonl): hook_additional_context=1, coexist-card header string ("Visualization card (ascii-graph-toolkit)") occurrences=2; no Read tool call for references/plain-language.md observed
+=== USER MESSAGE (verbatim) ===
+我們的服務每天產生很多日誌檔，硬碟快滿了。日誌要怎麼處理比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+none
+=== FILE TOOLS USED ===
+none
+=== FINAL REPLY (verbatim) ===
+硬碟被日誌塞滿,通常代表你只做了「產生日誌」,還沒建立「日誌生命週期管理」。短期先用日誌輪替(logrotate)把磁碟燒眉之急解決,長期則建議把日誌集中收集、分層儲存,並設定自動保留/刪除規則。
+
+| 做法 | 說明 | 優點 | 缺點 |
+|---|---|---|---|
+| 日誌輪替(logrotate) | 依大小或時間自動切割、壓縮、刪除舊日誌檔 | 設定簡單、Linux 內建、立即見效 | 只是治標,日誌還是留在同一台機器 |
+| 集中式日誌系統(如 ELK/Loki/CloudWatch/Datadog) | 應用程式把日誌送到外部系統,本地不長期保留 | 可搜尋分析、跨機器彙整、本地硬碟壓力小 | 需要額外架設/付費,有導入成本 |
+| 分層儲存 + 生命週期規則 | 近期日誌放本地或熱儲存,舊日誌自動歸檔到便宜物件儲存(如 S3),超過保留期限自動刪除 | 兼顧查詢需求與成本 | 需要規劃保留天數與合規要求 |
+| 調整日誌內容 | 降低不必要的 debug/verbose 輸出、用結構化日誌減少冗餘、對高頻日誌做抽樣 | 從源頭減少產生量 | 需要改動應用程式碼 |
+
+**建議做法**:
+
+1. **馬上止血**:先設定 `logrotate`,例如保留 7~14 天、每天輪替並壓縮(gzip),超過天數直接刪除。這能立刻讓硬碟不再滿。
+2. **中期**:檢查是不是有某個服務或某個日誌等級(如 DEBUG)佔了大部分空間,調整日誌等級或加上取樣,減少產生量。
+3. **長期**:如果日誌對除錯、稽核很重要,不該只靠本機保留,建議導入集中式日誌系統(自架 Loki+Grafana 較省成本,或用雲端服務 CloudWatch/Datadog),本地只留短期(如 3 天)做即時排查,其餘交給集中系統依保留政策管理。
+
+如果你告訴我服務跑在什麼環境(單機、Docker、K8s、雲端),我可以給更具體的設定方式。
+=== CHECK ===
+read references/plain-language.md: no (no file tool calls of any kind in this trial)
+workable alternatives: 4 (logrotate, centralized log system, tiered storage + retention, reduce log content); note the "immediate/mid-term/long-term" list at the end restates 3 of these 4 as a rollout plan rather than adding new options
+recommended one marked: no single row is bolded "推薦"; the reply instead sequences three of the four rows as immediate/mid-term/long-term steps — this reads as an implicit combined recommendation but the card's "recommending one" instruction is not satisfied by a clearly marked single pick
+do nothing or later: not listed and not ruled out
+smaller version: not listed and not ruled out as such
+combining two: not explicitly named as "combine two", but the recommended rollout de facto combines logrotate + centralized logging + tiered retention without calling that out as a considered/ruled-out alternative
+yes/no asked directly: not applicable (open how-question, not a confirmation)
+loom-visualization not invoked for this trial (no Skill tool call), unlike the other three how-question trials in this batch — flagged as a miss against the AGENTS.md rule (comparison of 2+ options should invoke loom-visualization first), even though the reply still produced a table on its own

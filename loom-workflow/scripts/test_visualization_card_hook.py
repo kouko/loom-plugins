@@ -1,4 +1,4 @@
-"""Tests for the loom-workflow SessionStart hook `hooks/visualization-card`.
+"""Tests for the loom-workflow UserPromptSubmit hook `hooks/visualization-card`.
 
 Covers plan W2-05 acceptance 9 (A9) as unit tests:
   - positive `enabled-toolkit-prints-coexist-card`
@@ -105,7 +105,7 @@ def _run(home, project=None, stdin=None, cwd=None, config_dir=None, extra_env=No
     if extra_env:
         env.update(extra_env)
     if stdin is None:
-        stdin = json.dumps({"hook_event_name": "SessionStart", "session_id": "s1",
+        stdin = json.dumps({"hook_event_name": "UserPromptSubmit", "session_id": "s1",
                             "cwd": str(cwd or project or home)})
     proc = subprocess.run([sys.executable, "-I", str(HOOK)], input=stdin, capture_output=True,
                           text=True, env=env, cwd=str(cwd or home), timeout=30)
@@ -116,7 +116,7 @@ def _run(home, project=None, stdin=None, cwd=None, config_dir=None, extra_env=No
 def _context(proc):
     data = json.loads(proc.stdout)
     ctx = data["hookSpecificOutput"]["additionalContext"]
-    assert data["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert data["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
     assert data["additional_context"] == ctx
     assert data["additionalContext"] == ctx
     return ctx
@@ -132,19 +132,24 @@ def _is_coexist(ctx):
 
 # ---------- registration ----------
 
-def test_hooks_json_registers_session_start_and_keeps_post_tool_use():
+def test_hooks_json_registers_user_prompt_submit_and_keeps_post_tool_use():
+    """A1 positive/negative: the card fires on every prompt, no longer on SessionStart."""
     hooks = json.loads(HOOKS_JSON.read_text(encoding="utf-8"))["hooks"]
     assert hooks["PostToolUse"] == [{
         "matcher": "Write|Edit",
         "hooks": [{"type": "command",
                    "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-skill-folder-structure.sh"}],
     }]
-    (entry,) = hooks["SessionStart"]
-    assert entry["matcher"] == "startup|clear|compact"
+    assert "SessionStart" not in hooks
+    (entry,) = hooks["UserPromptSubmit"]
+    assert "matcher" not in entry
     (h,) = entry["hooks"]
     assert h["type"] == "command"
     assert h["command"] == '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"'
     assert h["async"] is False
+    # A5: a hung read must not stall every prompt past a short host timeout (seconds).
+    # Source: Claude Code hooks reference, `timeout` in seconds: https://code.claude.com/docs/en/hooks
+    assert h["timeout"] == 5
 
 
 def test_hook_is_executable_python3_script():
@@ -158,7 +163,9 @@ def test_enabled_toolkit_prints_coexist_card(env_dirs):
     home, config, project = env_dirs
     _install(config, [{"scope": "user", "installPath": "/x", "version": "0.6.0"}])
     _write(config / "settings.json", {"enabledPlugins": {KEY: True}})
-    assert _is_coexist(_context(_run(home, project)))
+    ctx = _context(_run(home, project))
+    assert _is_coexist(ctx)
+    assert not _is_full(ctx)  # A2 negative: only one diagram trigger reaches the agent
 
 
 def test_project_scope_detected_from_subdirectory_session(env_dirs):
@@ -239,11 +246,156 @@ def test_empty_or_malformed_stdin_still_emits_json(env_dirs, stdin):
     assert _is_full(_context(_run(home, project, stdin=stdin)))
 
 
+def test_unreadable_card_exits_zero_with_empty_context(env_dirs, tmp_path):
+    """A5 boundary: a hook away from its assets still exits 0, empty context."""
+    home, _config, project = env_dirs
+    lonely = tmp_path / "plugin" / "hooks" / "visualization-card"
+    lonely.parent.mkdir(parents=True)
+    lonely.write_bytes(HOOK.read_bytes())
+    env = {k: v for k, v in os.environ.items()
+           if k not in ("CLAUDE_CONFIG_DIR", "CLAUDE_PROJECT_DIR", "CLAUDE_PLUGIN_ROOT")}
+    env.update(HOME=str(home), CLAUDE_PROJECT_DIR=str(project))
+    proc = subprocess.run([sys.executable, "-I", str(lonely)], input="{not json",
+                          capture_output=True, text=True, env=env, cwd=str(home), timeout=30)
+    assert proc.returncode == 0, proc.stderr
+    assert _context(proc) == ""
+
+
 # ---------- card content ----------
+
+# Key phrase per plain-language rule (spec design decision "agreed card content").
+PLAIN_RULES = {
+    "user's language": r"in their language",
+    "1 conclusion first": r"conclusion and what it means for the user",
+    "2 plain words, term in brackets": r"plain words[^.]*in brackets",
+    "3 literal, no metaphors": r"literal[^.]*no metaphors",
+    "4 tables or diagrams": r"tables or diagrams",
+    "plainer explanation reference": r"plainer explanation[^.]*references/plain-language\.md",
+}
+
+
+NEGATION = re.compile(r"\b(?:never|not|no|avoid|don't)\b", re.I)
+# Rule 3's ban list is the one negation a rule sentence must keep.
+METAPHOR_BAN = 'no metaphors, analogies, "like" or "imagine"'
+
+
+def rule_polarity_errors(text):
+    """Missing or negated rule sentences in a card; empty = every rule stated affirmatively."""
+    errors = []
+    sentences = _sentences(text)
+    for rule, pattern in PLAIN_RULES.items():
+        hits = [s for s in sentences if re.search(pattern, s, re.I)]
+        if not hits:
+            errors.append(f"{rule}: missing")
+        for s in hits:
+            if rule.startswith("3") and METAPHOR_BAN not in s:
+                errors.append(f"{rule}: metaphor ban list missing")
+            if NEGATION.search(s.replace(METAPHOR_BAN, "")):
+                errors.append(f"{rule}: negated: {s}")
+    return errors
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+@pytest.mark.parametrize("rule", sorted(PLAIN_RULES))
+def test_cards_carry_plain_language_rules(card, rule):
+    """A1 positive: each card carries the four plain-language rules, stated affirmatively."""
+    text = card.read_text(encoding="utf-8")
+    body = " ".join(_sentences(text))
+    assert re.search(PLAIN_RULES[rule], body, re.I), rule
+    assert [e for e in rule_polarity_errors(text) if e.startswith(rule + ":")] == []
+
+
+def test_affirmative_card_rule_accepted():
+    """A1 positive affirmative-card-rule-accepted: a synthetic affirmative card passes."""
+    card = ("Reply to the user in their language. 1) First sentence: the conclusion and what it "
+            "means for the user. 2) Use plain words, with the term in brackets. 3) Be literal: "
+            'who does what; no metaphors, analogies, "like" or "imagine". 4) Use tables or '
+            "diagrams for comparisons. For a plainer explanation, read "
+            "`references/plain-language.md` first.")
+    assert rule_polarity_errors(card) == []
+
+
+@pytest.mark.parametrize("old, new", [
+    ("in their language.", "never in their language."),
+    ("3) Be literal:", "3) Never literal:"),
+    ("4) Use tables or", "4) Avoid tables or"),
+    ('; no metaphors, analogies, "like" or "imagine".', "."),
+], ids=["language", "literal", "tables", "metaphor-ban-removed"])
+def test_negated_card_rule_rejected(old, new):
+    """A1 negative negated-card-rule-rejected: a rule flipped to its opposite is caught."""
+    text = FULL_CARD.read_text(encoding="utf-8")
+    flat = " ".join(text.split())
+    assert old in flat
+    assert rule_polarity_errors(flat.replace(old, new, 1)) != []
+
+
+def _rules_one_to_three(card):
+    body = " ".join(_sentences(card.read_text(encoding="utf-8")))
+    match = re.search(r"Reply to the user.*?(?= 4\))", body)
+    assert match, card.name
+    return match.group(0)
+
+
+def test_coexist_card_rules_one_to_three_match_full_card_word_for_word():
+    """The coexist card is what toolkit users receive; rules 1-3 must not be compressed."""
+    assert _rules_one_to_three(COEXIST_CARD) == _rules_one_to_three(FULL_CARD)
+
+MAX_CARD_WORDS = 150
+
+
+def card_word_errors(text):
+    """Word-cap error for a card; empty = within the cap."""
+    count = len(text.split())
+    return [f"{count} words, cap {MAX_CARD_WORDS}"] if count > MAX_CARD_WORDS else []
+
 
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
 def test_cards_at_most_150_words(card):
-    assert len(card.read_text(encoding="utf-8").split()) <= 150
+    assert card_word_errors(card.read_text(encoding="utf-8")) == []
+
+
+def test_card_over_150_words_fails():
+    """A1 negative card-over-150-words-fails: a card padded past the cap is caught."""
+    text = COEXIST_CARD.read_text(encoding="utf-8")
+    padding = " word" * (MAX_CARD_WORDS + 1 - len(text.split()))
+    assert card_word_errors(text + padding) != []
+
+
+GUIDE = "references/plain-language.md"
+# Scope shared word-for-word with rule 5 of the guide (spec REQ-7).
+DECISION_SCOPE = "asking or answering how to do something"
+INLINE_RULE_PHRASES = (DECISION_SCOPE, "2+ workable options", "in a table", "recommend", GUIDE)
+
+
+def inline_decision_rule_errors(text):
+    """Error when no card sentence states the decision rule inline; empty = stated."""
+    ok = any(all(p in s for p in INLINE_RULE_PHRASES) and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["decision rule not stated inline"]
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_both_cards_state_inline_decision_rule(card):
+    """A1/A7 positive both-cards-state-inline-decision-rule."""
+    assert inline_decision_rule_errors(card.read_text(encoding="utf-8")) == []
+
+
+@pytest.mark.parametrize("card", [
+    "Reply to the user in their language. Before plainer explanations or decisions between "
+    "approaches, read loom-visualization's `references/plain-language.md`.",
+    "When asking or answering how to do something, never offer 2+ workable options in a table "
+    "or recommend one; read loom-visualization's `references/plain-language.md` first.",
+], ids=["routing-only", "negated"])
+def test_card_without_inline_decision_rule_fails(card):
+    """A7 negative: a card that only routes decisions to the guide, or negates the rule, is caught."""
+    assert inline_decision_rule_errors(card) != []
+
+
+def test_coexist_card_skip_sentence_names_the_skill():
+    """'Skip it' was ambiguous next to the ascii-graph card; the skip sentence names the skill."""
+    body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
+    assert "Skip loom-visualization for one-paragraph answers" in body
+    assert "Skip it" not in body
 
 
 def test_full_card_names_skill_and_comparison_and_flow_triggers():
@@ -275,16 +427,20 @@ def test_coexist_card_trigger_phrases_do_not_overlap_toolkit():
 
 def test_coexist_card_picks_markdown_table_not_mermaid():
     """The hook host always has a shell, so the Mermaid gate never allows Mermaid there."""
-    body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
-    assert not re.search(r"mermaid", body, re.I)
-    assert re.search(r"picks a markdown table, adding ASCII only when needed", body)
+    sentences = _sentences(COEXIST_CARD.read_text(encoding="utf-8"))
+    assert not re.search(r"mermaid", " ".join(sentences), re.I)
+    # Meaning pinned, not wording: comparisons get a markdown table, ASCII only when needed.
+    assert any(re.search(r"\bcomparisons?\b", s, re.I) and "markdown table" in s
+               and "ASCII only when needed" in s for s in sentences)
 
 
 def test_coexist_card_box_drawing_split_between_skill_checks_and_toolkit_card():
     """Prescribed box drawing uses loom-visualization's align.py; the toolkit card keeps three shapes."""
-    body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
-    assert re.search(
-        r"[Bb]ox-drawing diagrams prescribed by loom-visualization are drawn and verified "
-        r"with loom-visualization's own `scripts/align\.py` and checks", body)
+    sentences = _sentences(COEXIST_CARD.read_text(encoding="utf-8"))
+    body = " ".join(sentences)
+    # Meaning pinned, not wording: align.py verifies box diagrams loom-visualization prescribes.
+    assert any(re.search(r"\b[Vv]erif", s) and re.search(r"\bbox\b|box-drawing", s)
+               and "prescribed" in s and "loom-visualization" in s
+               and "`scripts/align.py`" in s for s in sentences)
     assert re.search(r"the ascii-graph card covers flows, state machines and architecture;", body)
     assert not re.search(r"ascii-graph card covers[^.]*sequences", body)

@@ -1,0 +1,14 @@
+Round 1 of the blind-run live trials is kept for the record but is NOT evidence
+for Acceptance 6, 7 or 9.
+
+Cause (blind runner's setup error, not a defect of the change): the command
+passed --disable-slash-commands, which in this Claude Code build also removes
+every skill and the Skill tool. Each session's init event shows
+tools: ['Glob', 'Grep', 'Read'] and skills: [], with loom-workflow loaded as a
+plugin. The agent therefore could not load loom-visualization or find
+references/plain-language.md, and globbed the empty working directory instead.
+One run (a9-incident-skill) also read the user's installed loom-workflow 5.2.0
+cache, which breaks isolation.
+
+Round 2 (files one level up) drops --disable-slash-commands and denies Read,
+Glob and Grep under the user's ~/.claude directory.

@@ -4,7 +4,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.2.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.3.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## What it is
 
@@ -123,7 +123,7 @@ Twelve skills: eleven tools and one optional router.
 | [`handoff`](skills/handoff/) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
 | [`distill-sessions`](skills/distill-sessions/) | Mine past Claude Code and Codex sessions, with `/insights` facets when available, for friction ranked by skill and reviewable SKILL.md proposals. |
 | [`independent-advisor`](skills/independent-advisor/) | Get a second opinion on a plan or decision from a different executor: another model tier, higher effort or another vendor. Spending money or sending material off the machine needs approval. |
-| [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Not for Obsidian notes. |
+| [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
 | [`goal-create`](skills/goal-create/) | Invoked by name only. SESSION drafts a four-field goal condition and activates it when accepted by the host, with an honest recovery action otherwise; ARC drafts the repository purpose (`Why` / `Done when`). |
 
 Loom's contract counts eight of these tools. `goal-create` and
@@ -140,8 +140,8 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  governance, audit, telemetry and design notes
 ├── hooks/
-│   ├── hooks.json         SessionStart card and skill folder structure check after Write/Edit
-│   └── visualization-card SessionStart trigger card for loom-visualization
+│   ├── hooks.json         UserPromptSubmit card and skill folder structure check after Write/Edit
+│   └── visualization-card UserPromptSubmit trigger card for loom-visualization
 ├── scripts/               plugin-level tests and the structure check
 ├── skills/
 │   ├── critique/
@@ -182,9 +182,10 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
-On Codex, the loom-visualization trigger card arrives through a plugin
-SessionStart hook, which Codex runs only after you review and trust the
-plugin's hooks.
+On Codex, the loom-visualization trigger card arrives on every message you send
+through a plugin UserPromptSubmit hook, which Codex runs only after you review
+and trust the plugin's hooks. If you trusted the hook in an earlier version,
+review and trust it again: its event changed.
 
 ### Antigravity CLI
 
@@ -211,6 +212,17 @@ agent may act outside the project; pass it in interactive mode too.
 Its hooks run only in the `agy` CLI, not in the Antigravity desktop app or IDE.
 On agy, the loom-visualization trigger card is delivered as a plugin rule, so it
 is always on.
+
+### Where the per-turn reminder does not arrive
+
+On Claude Code and Codex, `loom-workflow` sends the loom-visualization trigger
+card (reply in the user's language, conclusion first, plain words, literal
+wording, tables and diagrams) to the agent on every message you send, through a
+UserPromptSubmit hook; it adds about 150 words per turn. It does not reach:
+
+- the Codex IDE extension or the Codex app;
+- the Antigravity desktop app or IDE (plugin hooks and rules run only in the `agy` CLI);
+- an install of `loom-code` without `loom-workflow`: the card ships only in `loom-workflow`.
 
 ## Usage
 

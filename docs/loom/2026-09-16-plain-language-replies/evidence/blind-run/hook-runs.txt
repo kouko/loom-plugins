@@ -1,0 +1,181 @@
+=== CASE: A1 Claude Code, loom-workflow only
+--- stdin: {"session_id":"blind","hook_event_name":"UserPromptSubmit","cwd":"/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/hk/proj","prompt":"可以用更白話的方式說明嗎？"}
+--- exit: 0
+--- stderr: 
+--- stdout (raw):
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}, "additional_context": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}
+--- decoded additionalContext (canonical key):
+top-level keys: ['additionalContext', 'additional_context', 'hookSpecificOutput']
+hookEventName: UserPromptSubmit
+# Visualization trigger card (loom-workflow)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
+diagrams: before you explain an option comparison of 2+ options, a flow of
+3+ steps, a branching decision, a state or lifecycle, an actor sequence, an
+architecture, or a reasoning chain, invoke the `loom-visualization` skill
+FIRST and lead with the table or diagram it prescribes. Before typing any
+box-drawing diagram (┌─┐, +--+), invoke `loom-visualization` FIRST. Skip it
+when one short paragraph covers the answer; never draw for decoration. For a
+plainer explanation, read loom-visualization's `references/plain-language.md`
+first.
+
+words: 148
+
+=== CASE: A2 Claude Code, ascii-graph-toolkit also installed and enabled
+--- stdin: {"session_id":"blind","hook_event_name":"UserPromptSubmit","cwd":"/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/hk/proj","prompt":"可以用更白話的方式說明嗎？"}
+--- exit: 0
+--- stderr: 
+--- stdout (raw):
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Tables or diagrams:\nfor option comparisons, branching decisions, reasoning chains, timelines,\nsequences, quantities, data models or reasoning pages, invoke\n`loom-visualization` FIRST, leading with its form. For comparisons it picks a\nmarkdown table, adding ASCII only when needed. Box-drawing diagrams prescribed\nby loom-visualization are drawn and verified with loom-visualization's own\n`scripts/align.py` and checks; the ascii-graph card covers flows, state\nmachines and architecture; follow it. Skip it for a one-paragraph answer;\nnever decorate. For a plainer explanation, read loom-visualization's\n`references/plain-language.md` first.\n"}, "additional_context": "# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Tables or diagrams:\nfor option comparisons, branching decisions, reasoning chains, timelines,\nsequences, quantities, data models or reasoning pages, invoke\n`loom-visualization` FIRST, leading with its form. For comparisons it picks a\nmarkdown table, adding ASCII only when needed. Box-drawing diagrams prescribed\nby loom-visualization are drawn and verified with loom-visualization's own\n`scripts/align.py` and checks; the ascii-graph card covers flows, state\nmachines and architecture; follow it. Skip it for a one-paragraph answer;\nnever decorate. For a plainer explanation, read loom-visualization's\n`references/plain-language.md` first.\n", "additionalContext": "# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Tables or diagrams:\nfor option comparisons, branching decisions, reasoning chains, timelines,\nsequences, quantities, data models or reasoning pages, invoke\n`loom-visualization` FIRST, leading with its form. For comparisons it picks a\nmarkdown table, adding ASCII only when needed. Box-drawing diagrams prescribed\nby loom-visualization are drawn and verified with loom-visualization's own\n`scripts/align.py` and checks; the ascii-graph card covers flows, state\nmachines and architecture; follow it. Skip it for a one-paragraph answer;\nnever decorate. For a plainer explanation, read loom-visualization's\n`references/plain-language.md` first.\n"}
+--- decoded additionalContext (canonical key):
+top-level keys: ['additionalContext', 'additional_context', 'hookSpecificOutput']
+hookEventName: UserPromptSubmit
+# Visualization trigger card (loom-workflow, ascii-graph-toolkit active)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Tables or diagrams:
+for option comparisons, branching decisions, reasoning chains, timelines,
+sequences, quantities, data models or reasoning pages, invoke
+`loom-visualization` FIRST, leading with its form. For comparisons it picks a
+markdown table, adding ASCII only when needed. Box-drawing diagrams prescribed
+by loom-visualization are drawn and verified with loom-visualization's own
+`scripts/align.py` and checks; the ascii-graph card covers flows, state
+machines and architecture; follow it. Skip it for a one-paragraph answer;
+never decorate. For a plainer explanation, read loom-visualization's
+`references/plain-language.md` first.
+
+words: 150
+
+=== CASE: A3 Codex host flag (as hooks-codex.json invokes it)
+--- stdin: {"session_id":"blind","hook_event_name":"UserPromptSubmit","cwd":"/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/hk/proj","prompt":"可以用更白話的方式說明嗎？"}
+--- exit: 0
+--- stderr: 
+--- stdout (raw):
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}}
+--- decoded additionalContext (canonical key):
+top-level keys: ['hookSpecificOutput']
+hookEventName: UserPromptSubmit
+# Visualization trigger card (loom-workflow)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
+diagrams: before you explain an option comparison of 2+ options, a flow of
+3+ steps, a branching decision, a state or lifecycle, an actor sequence, an
+architecture, or a reasoning chain, invoke the `loom-visualization` skill
+FIRST and lead with the table or diagram it prescribes. Before typing any
+box-drawing diagram (┌─┐, +--+), invoke `loom-visualization` FIRST. Skip it
+when one short paragraph covers the answer; never draw for decoration. For a
+plainer explanation, read loom-visualization's `references/plain-language.md`
+first.
+
+words: 148
+
+=== CASE: A5a malformed stdin
+--- stdin: {not json
+--- exit: 0
+--- stderr: 
+--- stdout (raw):
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}, "additional_context": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}
+--- decoded additionalContext (canonical key):
+top-level keys: ['additionalContext', 'additional_context', 'hookSpecificOutput']
+hookEventName: UserPromptSubmit
+# Visualization trigger card (loom-workflow)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
+diagrams: before you explain an option comparison of 2+ options, a flow of
+3+ steps, a branching decision, a state or lifecycle, an actor sequence, an
+architecture, or a reasoning chain, invoke the `loom-visualization` skill
+FIRST and lead with the table or diagram it prescribes. Before typing any
+box-drawing diagram (┌─┐, +--+), invoke `loom-visualization` FIRST. Skip it
+when one short paragraph covers the answer; never draw for decoration. For a
+plainer explanation, read loom-visualization's `references/plain-language.md`
+first.
+
+words: 148
+
+=== CASE: A5b empty stdin
+--- stdin: 
+--- exit: 0
+--- stderr: 
+--- stdout (raw):
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}, "additional_context": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}
+--- decoded additionalContext (canonical key):
+top-level keys: ['additionalContext', 'additional_context', 'hookSpecificOutput']
+hookEventName: UserPromptSubmit
+# Visualization trigger card (loom-workflow)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
+diagrams: before you explain an option comparison of 2+ options, a flow of
+3+ steps, a branching decision, a state or lifecycle, an actor sequence, an
+architecture, or a reasoning chain, invoke the `loom-visualization` skill
+FIRST and lead with the table or diagram it prescribes. Before typing any
+box-drawing diagram (┌─┐, +--+), invoke `loom-visualization` FIRST. Skip it
+when one short paragraph covers the answer; never draw for decoration. For a
+plainer explanation, read loom-visualization's `references/plain-language.md`
+first.
+
+words: 148
+
+=== CASE: A5c corrupt settings.json with toolkit installed
+--- stdin: {"session_id":"blind","hook_event_name":"UserPromptSubmit","cwd":"/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/hk/proj","prompt":"可以用更白話的方式說明嗎？"}
+--- exit: 0
+--- stderr: 
+--- stdout (raw):
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}, "additional_context": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n", "additionalContext": "# Visualization trigger card (loom-workflow)\nReply to the user in their language. 1) First sentence: the conclusion and\nwhat it means for the user; details after. 2) Say what a thing does in plain\nwords; name an internal term, file path or rule id only when needed, in\nbrackets after. 3) Be literal: who does what, what the user sees, what\nchanges; no metaphors, analogies, \"like\" or \"imagine\". 4) Use tables or\ndiagrams: before you explain an option comparison of 2+ options, a flow of\n3+ steps, a branching decision, a state or lifecycle, an actor sequence, an\narchitecture, or a reasoning chain, invoke the `loom-visualization` skill\nFIRST and lead with the table or diagram it prescribes. Before typing any\nbox-drawing diagram (\u250c\u2500\u2510, +--+), invoke `loom-visualization` FIRST. Skip it\nwhen one short paragraph covers the answer; never draw for decoration. For a\nplainer explanation, read loom-visualization's `references/plain-language.md`\nfirst.\n"}
+--- decoded additionalContext (canonical key):
+top-level keys: ['additionalContext', 'additional_context', 'hookSpecificOutput']
+hookEventName: UserPromptSubmit
+# Visualization trigger card (loom-workflow)
+Reply to the user in their language. 1) First sentence: the conclusion and
+what it means for the user; details after. 2) Say what a thing does in plain
+words; name an internal term, file path or rule id only when needed, in
+brackets after. 3) Be literal: who does what, what the user sees, what
+changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
+diagrams: before you explain an option comparison of 2+ options, a flow of
+3+ steps, a branching decision, a state or lifecycle, an actor sequence, an
+architecture, or a reasoning chain, invoke the `loom-visualization` skill
+FIRST and lead with the table or diagram it prescribes. Before typing any
+box-drawing diagram (┌─┐, +--+), invoke `loom-visualization` FIRST. Skip it
+when one short paragraph covers the answer; never draw for decoration. For a
+plainer explanation, read loom-visualization's `references/plain-language.md`
+first.
+
+words: 148
+
+=== CASE: A5d both card files unreadable (chmod 000)
+--- stdin: {"session_id":"blind","hook_event_name":"UserPromptSubmit","cwd":"/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/hk/proj","prompt":"可以用更白話的方式說明嗎？"}
+--- exit: 0
+--- stderr: 
+--- stdout (raw):
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": ""}, "additional_context": "", "additionalContext": ""}
+--- decoded additionalContext (canonical key):
+top-level keys: ['additionalContext', 'additional_context', 'hookSpecificOutput']
+hookEventName: UserPromptSubmit
+
+words: 0
+
+=== CASE: A5e both card files deleted
+--- stdin: {"session_id":"blind","hook_event_name":"UserPromptSubmit","cwd":"/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-speak-plainly/6bd7f849-f471-43ae-b528-f7a27e13c6fe/scratchpad/hk/proj","prompt":"可以用更白話的方式說明嗎？"}
+--- exit: 0
+--- stderr: 
+--- stdout (raw):
+{"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": ""}, "additional_context": "", "additionalContext": ""}
+--- decoded additionalContext (canonical key):
+top-level keys: ['additionalContext', 'additional_context', 'hookSpecificOutput']
+hookEventName: UserPromptSubmit
+
+words: 0
+
