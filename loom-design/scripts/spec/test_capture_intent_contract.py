@@ -377,9 +377,9 @@ def test_reviewer_policy_summary_has_patch_release_metadata() -> None:
         (REPO / "loom-design/.codex-plugin/plugin.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.1.5"
-    assert codex_manifest["version"] == "2.1.5"
-    assert "## [2.1.5]" in changelog
+    assert claude_manifest["version"] == "2.1.6"
+    assert codex_manifest["version"] == "2.1.6"
+    assert "## [2.1.6]" in changelog
 
 
 def _branch_note() -> str:

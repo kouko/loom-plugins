@@ -1,8 +1,9 @@
 # Adversarial — recipes by artifact type, and how to record what ran
 
 The adversary's job is not to find bugs the reviewers might also find. It
-is to make the change fail. Everything it runs is recorded, so a later
-round can re-run it as a regression.
+is to make the change fail. It runs at the end of Build, and everything it
+runs is committed as a program: Build re-runs those programs on every fix
+loop, and `finalize-review` executes them on committed content.
 
 ## Code
 
@@ -52,9 +53,10 @@ catalogue an eval rather than an anecdote.
 
 ## Recording
 
-Every run is supplied to `finalize-review`, which records the command,
-artifact, functional-content digest and observed result in the generated
-attestation:
+Build's hand-off names every committed program, and Build re-runs each one on
+every fix loop. Closing review supplies them to `finalize-review`, which
+executes each one and records the command, artifact, functional-content digest
+and observed result in the generated attestation:
 
 ```json
 {"command": "python3 -m pytest tests/test_abuse_empty_input.py -q",
@@ -67,4 +69,6 @@ attestation:
   artifact type and needs no separate task-accounting trailer. Promote a
   probe into the repo's real test suite only through a plan task.
 - Anything the adversary found that matters
-  becomes a `finding` with an anchor and a fix, like any other.
+  becomes a `finding` with an anchor and a fix. Build fixes every fatal or
+  important finding before hand-off and lists any left unresolved in its
+  hand-off, and closing review passes those into the `findings` input of `finalize-review`.

@@ -28,3 +28,12 @@ NEGATION_RE = re.compile(
 
 def has_negation(sentence: str) -> bool:
     return bool(NEGATION_RE.search(sentence))
+
+
+def split_sentences(text: str, ends: str = ".;") -> list[str]:
+    """Split prose after each character of `ends` that whitespace follows.
+
+    Callers that also treat a colon as a boundary pass ``ends=".:;"``.
+    """
+    pattern = rf"(?<=[{re.escape(ends)}])\s+"
+    return [s for s in re.split(pattern, text) if s]
