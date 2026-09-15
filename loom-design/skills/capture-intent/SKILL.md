@@ -212,7 +212,7 @@ twice, and this is the only stop this station makes.
 
    For the current contract, automatic publication is the default. This same
    restatement explicitly says that answering yes authorizes a later non-forced
-   push and Ready PR after Review and publication checks pass, while merge
+   push and Ready PR after `closing-review` and publication checks pass, while merge
    remains a separate decision. Say that the user may explicitly opt out before
    publication. Do not hide that consequence in mechanism language or add it
    after the user has answered. Write
@@ -250,7 +250,7 @@ twice, and this is the only stop this station makes.
    only one of the two vendors. When the defaults carry `second-vendor: ask`,
    use the reference's host-aware native question or fallback in this same
    message; the answer governs this change only. In the small lane omit this
-   opt-in question; Review computes the reviewer floor later from the complete
+   opt-in question; `closing-review` computes the reviewer floor later from the complete
    branch delta. A fixed CLI also adds no question.
 
 4. **The principles confirmation**, if step 3 ran the interview — restated

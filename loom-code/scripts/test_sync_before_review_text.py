@@ -33,7 +33,7 @@ def _section(text: str, heading: str) -> str:
 
 
 VERIFY = _section(BUILD, "## 3. Verify integration")
-HANDOFF = _section(BUILD, "## 4. Hand off to Review")
+HANDOFF = _section(BUILD, "## 4. Hand off to closing-review")
 DEPTH = _section(REVIEW, "## 2. Compute review depth")
 REVIEW_WORDS = _flat(REVIEW)
 

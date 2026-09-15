@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 BUILD = (ROOT / "loom-code/skills/build/SKILL.md").read_text(encoding="utf-8")
 PROSE = " ".join(BUILD.split())
 VERIFY = " ".join(BUILD.split("## 3. Verify integration", 1)[1].split("## 4.", 1)[0].split())
-HANDOFF = " ".join(BUILD.split("## 4. Hand off to Review", 1)[1].split())
+HANDOFF = " ".join(BUILD.split("## 4. Hand off to closing-review", 1)[1].split())
 ADVERSARY = ROOT / "loom-code/agents/adversary.md"
 
 
@@ -44,7 +44,7 @@ def test_adversary_prompt_carries_no_implementer_explanation() -> None:
 
 
 GATE = (
-    "Build does not hand off to Review until the complete package suite has passed or "
+    "Build does not hand off to `closing-review` until the complete package suite has passed or "
     "`selection show` lists `package-tests` as skipped, and until every adversarial "
     "program has passed or it lists `adversarial` as skipped, each skip waiving only "
     "its own check."
@@ -62,7 +62,7 @@ _OPTIONAL = re.compile(
 
 
 def _extra_handoff_sentences(section: str) -> list[str]:
-    """Sentences about handing off to Review other than the pinned gate pair."""
+    """Sentences about handing off to closing-review other than the pinned gate pair."""
     return [
         s for s in _sentences(section)
         if _HANDOFF.search(s) and s not in (GATE, ADVERSARY_FINDINGS)
@@ -75,7 +75,7 @@ def _optional_sentences(section: str) -> list[str]:
 
 def test_handoff_helpers_synthetic() -> None:
     assert _extra_handoff_sentences(f"{GATE} {ADVERSARY_FINDINGS}") == []
-    escape = "When the diff is small, hand off to Review while the suite is still running."
+    escape = "When the diff is small, hand off to `closing-review` while the suite is still running."
     assert _extra_handoff_sentences(f"{GATE} {escape}") == [escape]
     assert _optional_sentences("Run the complete package suite.") == []
     assert _optional_sentences("Optionally run the complete package suite.")

@@ -27,7 +27,7 @@ is an inconsistency, cited with the row's goes_to.
 
 ## Your input
 
-The review station gives you a **lens**, the delta, and the ground truth:
+The closing-review station gives you a **lens**, the delta, and the ground truth:
 
 ```
 lens: code | docs | spec | spec+adversarial | design | principles | skill

@@ -937,7 +937,7 @@ def _merge_preconditions(
 
     # (2) attestation at live HEAD
     if _cmd_push(["--head", head, "--require-live-head"], out, err) != 0:
-        return _block("attestation does not validate at HEAD; return to Review", err)
+        return _block("attestation does not validate at HEAD; return to closing-review", err)
 
     # (3) exactly one open PR for this branch against the default base
     base_result = _read(

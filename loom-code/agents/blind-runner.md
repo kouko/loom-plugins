@@ -1,6 +1,6 @@
 ---
 name: blind-runner
-description: 'Plugin-level blind-runner agent for loom-code. Dispatched fresh-context by the review station to build and run the change in a clean environment and walk every Acceptance line of the intent, producing docs/loom/<change-id>/blind-run-report.md — the document the user reads to accept the change. Never an agent that implemented it. Reusable cross-plugin via subagent_type "loom-code:blind-runner".'
+description: 'Plugin-level blind-runner agent for loom-code. Dispatched fresh-context by the closing-review station to build and run the change in a clean environment and walk every Acceptance line of the intent, producing docs/loom/<change-id>/blind-run-report.md — the document the user reads to accept the change. Never an agent that implemented it. Reusable cross-plugin via subagent_type "loom-code:blind-runner".'
 ---
 
 # blind-runner subagent
@@ -43,7 +43,7 @@ user's language that the template specifies: one block per Acceptance line
 (how you tried it, what happened, evidence, verdict), the fixed paragraph
 about what the change did to data the user already had, the section listing
 what was decided on the user's behalf (including every dismissal of
-severity `important` or worse, which the review station hands you), and the
+severity `important` or worse, which the closing-review station hands you), and the
 open questions. Evidence files you capture and the probe docstrings you
 read are in English; the report itself stays in the user's language. The report
 also lists, in labels the user can read — the plan, spec, review record's
@@ -54,7 +54,7 @@ Comments label binds the findings text, and each test is named
 `test_<unit>_<state>_<expected>`. Identifiers appear only in each row's
 evidence cell.
 
-Then return, to the review station:
+Then return, to the closing-review station:
 
 ```yaml
 report: docs/loom/<change-id>/blind-run-report.md

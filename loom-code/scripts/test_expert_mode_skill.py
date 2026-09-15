@@ -110,7 +110,7 @@ def test_skill_procedure_maps_proposes_reports_withdraws_and_relapses() -> None:
     assert "keep the full process" in flat
     assert "any language" in flat
     assert "stops shortcuts, not deliberately disguised commands" in flat
-    assert "recorded only when Review hands it to the checker" in flat
+    assert "recorded only when `closing-review` hands it to the checker" in flat
 
 
 def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:

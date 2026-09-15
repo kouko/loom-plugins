@@ -76,7 +76,7 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
   and waive only a bound skip.
 - Local protection stops shortcuts, not deliberately disguised commands;
   independent CI stays the trust boundary.
-- A reviewer rejection is recorded only when Review hands it to the checker
+- A reviewer rejection is recorded only when `closing-review` hands it to the checker
   (`selection record-failure`).
 - `loom_checker.py selection skipped-review` lists merged changes on the
   default branch whose attestation skipped reviewers.

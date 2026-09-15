@@ -81,9 +81,10 @@ generate the box widths rather than eyeballing them.
 
 ## Completeness pass before hand-off
 
-Ten questions, grounded in Nielsen's usability heuristics, that the review
-station's design-conformance lens will ask. Answer them yourself first;
-each unanswered one is a finding you could have closed for free.
+Ten questions, grounded in Nielsen's usability heuristics, that the
+closing-review station's design-conformance lens will ask. Answer them
+yourself first; each unanswered one is a finding you could have closed
+for free.
 
 1. Does every surface name its empty, loading, error and success variants?
 2. Does every state have a path forward, back, or out?

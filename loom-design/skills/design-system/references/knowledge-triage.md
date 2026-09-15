@@ -47,7 +47,7 @@ token/convention.
 
 ## Two-tier triage — HIGH bar for SHAPING
 
-Design has a downstream net — `write-spec`'s gate, and the review station
+Design has a downstream net — `write-spec`'s gate, and the closing-review station
 after it, still catch whatever design defers — so this tool's SHAPING bar is
 deliberately **narrower** (higher) than spec's: only tag SHAPING when the
 answer would genuinely reshape the artifact, not merely decorate it.
@@ -70,7 +70,7 @@ losing recall.
   via `PRINCIPLES.md` / this product's own `DESIGN.md` notes, or ask the
   user) — token derivation continues normally, no tag needed.
 - **domain-convention, SHAPING-class** → do **NOT** invent a token value.
-  Resolution is **routed research BEFORE the review station's
+  Resolution is **routed research BEFORE the closing-review station's
   design-conformance verdict** — the orchestrator or the user routes the
   tagged question to research; `design-system` never routes it itself. **`design-system` itself never runs WebSearch** — it is a
   closed-world drafting skill (per its Executor model) and this reference
@@ -84,7 +84,7 @@ losing recall.
 
 ## Cross-severing guard — review verdict vocabulary unchanged
 
-This reference does not add or change any verdict value. The review station's
+This reference does not add or change any verdict value. The closing-review station's
 verdict (`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`) under the
 design-conformance lens is **unchanged** — the `evidence_needed` tag is
 informational metadata on a finding or open question, never a verdict state

@@ -9,7 +9,7 @@ version: 1.5.0
 
 Reviewer findings and generated evidence are written in English.
 
-Review decides whether the completed functional content is ready. It produces
+`closing-review` decides whether the completed functional content is ready. It produces
 `docs/loom/<change-id>/attestation.json`; agents never edit that file by hand.
 
 ## 1. Establish the content
@@ -133,7 +133,7 @@ produces the Claude login diagnosis; stop without treating it as transient.
 
 The runner executes one Claude attempt and does not retry. Exit 0 carries the
 raw non-empty reviewer output, which must still satisfy `agents/reviewer.md`.
-The runner must never parse or validate reviewer YAML. The Review orchestrator
+The runner must never parse or validate reviewer YAML. The `closing-review` orchestrator
 enforces its stricter one-retry limit and owns that validation even when the
 shared resolver still has more completed-redispatch budget available.
 Its JSON stderr names `empty-output` for blank stdout and `timeout` when the
@@ -219,7 +219,7 @@ the current round.
 
 Keep this episode in the active task context. Do not create a review-round
 ledger or committed state schema. Wording-only publication edits do not reopen
-Review.
+`closing-review`.
 <!-- /gate -->
 
 Before any fix round, pass each non-passing reviewer verdict to

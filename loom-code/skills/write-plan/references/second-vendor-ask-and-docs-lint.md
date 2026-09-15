@@ -125,8 +125,8 @@ drops the second vendor.
 ## `docs-lint: <command> | none — <why>`
 
 `docs/loom/KICKOFF-DEFAULTS.md` may also carry this line — a repo declaring
-its own prose linter, so the review station's reviewer contract can trust
-it instead of raising style findings itself (declared → no style findings;
+its own prose linter, so the closing-review station's reviewer contract can
+trust it instead of raising style findings itself (declared → no style findings;
 `none` → style findings capped at `nit`).
 
 This station never installs a docs linter and never asks about one on first

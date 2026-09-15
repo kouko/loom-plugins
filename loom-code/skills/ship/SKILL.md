@@ -1,7 +1,7 @@
 ---
 name: ship
 description: |
-  Publish a reviewed branch and verify PR checks. Use after Review generates a matching content attestation.
+  Publish a reviewed branch and verify PR checks. Use after closing-review generates a matching content attestation.
 version: 1.1.0
 ---
 
@@ -74,7 +74,7 @@ exactly these lines, filled from the attestation's `selection` field: one
 `Skipped steps: <steps> — authority: <source> (<code>, <YYYY-MM-DD>)` line per
 confirmation, then one `Prior failure: <step> <rule> <YYYY-MM-DD>` line per
 prior failure. On a mismatch, `publish` prints the expected lines. State that a
-reviewer rejection Review never handed to the checker is unrecorded.
+reviewer rejection `closing-review` never handed to the checker is unrecorded.
 
 Every decision summary states the chosen option, material alternatives,
 trade-offs, supporting evidence, and observed or expected outcome. This is an
@@ -103,7 +103,7 @@ diagram that is required by the relationships above but absent. Retired review
 and probe accounting ledgers and their fields are not valid inputs.
 
 Publication-only edits do not change the functional digest and do not return to
-Review. Functional edits invalidate the attestation and do.
+`closing-review`. Functional edits invalidate the attestation and do.
 
 ## 3. Publish once
 

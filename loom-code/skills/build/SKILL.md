@@ -99,7 +99,7 @@ When a check fails, the fix is made inside Build as §2 assigns implementation
 work; the adversary never fixes what it breaks. Every fatal or important
 finding the adversary returns is fixed inside Build like a failing check before
 hand-off, and any finding left unresolved is listed in the §4 hand-off. Build does not hand off to
-Review until the complete package suite has passed or `selection show` lists
+`closing-review` until the complete package suite has passed or `selection show` lists
 `package-tests` as skipped, and until every adversarial program has passed or
 it lists `adversarial` as skipped, each skip waiving only its own check.
 `finalize-review` still executes both once more on committed content.
@@ -112,11 +112,11 @@ Repeat these end-of-Build checks after every fix: run the complete package
 suite and re-run the existing adversarial programs. Do not dispatch the
 adversary again.
 
-## 4. Hand off to Review
+## 4. Hand off to closing-review
 
 Commit functional changes normally. Report the branch base, HEAD, the
 `sync-trunk` result with any warning it printed, changed paths, focused test
 results, the complete package suite command and its result,
 each adversarial program's path and command, every unresolved adversary finding, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
-never edits it after Review generates it.
+never edits it after `closing-review` generates it.

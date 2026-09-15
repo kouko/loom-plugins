@@ -203,7 +203,7 @@ twice.
 
    For the current contract, automatic publication is the default. This same
    restatement explicitly says that answering yes authorizes a later non-forced
-   push and Ready PR after Review and publication checks pass, while merge
+   push and Ready PR after `closing-review` and publication checks pass, while merge
    remains a separate decision. Say that the user may explicitly opt out before
    publication. Write
    `publication: automatic — authorized <date> by <name>` only after that
@@ -251,7 +251,7 @@ A question that fits none is not the user's decision. If answering requires
 reading code, follow repository precedent, decide it yourself, and record the
 reason as `agent-decided`.
 
-The review station has a dimension for exactly this, `user-judgment-leak`,
+The closing-review station has a dimension for exactly this, `user-judgment-leak`,
 and it returns NEEDS_REVISION when it finds one. Ask nothing about spec
 quality, task splitting, or review verdicts.
 
@@ -354,8 +354,8 @@ spec yourself, from `contract/templates/spec-minimal.md`:
 
 Print one line for the user: installing `loom-design` gets them a fuller
 spec than this one. For `pre-build-review: required`, hand the spec to the
-**review** station for one fresh-context `spec+adversarial` reviewer and no
-blind run; it must pass before planning. For `not-required`, proceed without
+**closing-review** station for one fresh-context `spec+adversarial` reviewer
+and no blind run; it must pass before planning. For `not-required`, proceed without
 a formal spec review. A missing declaration on a legacy spec is the safe
 `required` default and uses its existing passing review record.
 
@@ -440,9 +440,9 @@ spoken to the user rather than read as a machine artifact.
   and each task's Risk line points at the spec's Design decision by REQ id
   rather than restating the reasoning.
 - A **Questions asked** section carrying the list you kept from step 3 —
-  one line per question, `<decision point> — <type> — <text>`. The review
-  station reads this section at the first applicable checkpoint and copies
-  it into `questions[]`. The intent's `## Open questions` must be exactly
+  one line per question, `<decision point> — <type> — <text>`. The
+  closing-review station reads this section at the first applicable
+  checkpoint and copies it into `questions[]`. The intent's `## Open questions` must be exactly
   `- none` before Build; unresolved choices go back to intent work.
 - A closing **Risks** section for risks that span the whole plan. When
   there is no spec, this section is also where the answers to one-way-door
@@ -519,5 +519,5 @@ branch.
 
 Commit the plan with the message `docs(loom): plan <change-id>`. Then hand
 the change to the build station — `loom-code:build` — which dispatches one
-implementer per task, runs task and integration tests, and calls the review
-station once at branch end.
+implementer per task, runs task and integration tests, and calls the
+closing-review station once at branch end.

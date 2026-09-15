@@ -185,7 +185,7 @@ of them as part of the read-back, in behaviour words.
 
 Forms: reference `references/spec-forms.md` before reaching for a table, a
 state list or a diagram — it says which shape carries which content, and
-carries the ten completeness questions the review station's
+carries the ten completeness questions the closing-review station's
 design-conformance lens will ask you anyway.
 
 ## Step 3 — Decision point ②, product changes only
@@ -263,7 +263,7 @@ consequence form for one-way doors**: what do you want, what will you see (this
 station's own type), did it work. A question fitting none of them is a
 question the user cannot answer — "should the state live in the store or
 the component?" is not a behaviour question however it is phrased. The
-review station has a dimension for exactly this, `user-judgment-leak`, and
+closing-review station has a dimension for exactly this, `user-judgment-leak`, and
 returns NEEDS_REVISION when it finds one.
 
 A one-way door that surfaces **after** this message is not a new stop: pick
