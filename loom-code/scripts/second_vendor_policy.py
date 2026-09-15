@@ -9,7 +9,6 @@ from typing import Any
 
 VENDORS = ("claude", "codex", "gemini")
 MODES = {"ask", "suggest", "fixed"}
-LANES = {"small", "full"}
 RESPONSES = {"pending", "decline", "accept"}
 RISK_SIGNALS = (
     "security-or-privacy-boundary",
@@ -98,7 +97,7 @@ def resolve(packet: dict[str, Any]) -> dict[str, object]:
         raise InputError("input must be an object")
     allowed = {
         "contract_version", "configured_mode", "fixed_vendor", "host_vendor",
-        "lane", "usable_vendors", "risk_evidence", "review_started",
+        "usable_vendors", "risk_evidence", "review_started",
         "response", "response_vendor",
     }
     if set(packet) - allowed:
@@ -107,7 +106,6 @@ def resolve(packet: dict[str, Any]) -> dict[str, object]:
         raise InputError("contract_version must be integer 1")
     mode = _require_string(packet.get("configured_mode"), "configured_mode", MODES)
     host_vendor = _require_string(packet.get("host_vendor"), "host_vendor", set(VENDORS))
-    lane = _require_string(packet.get("lane"), "lane", LANES)
     response = _require_string(packet.get("response"), "response", RESPONSES)
     review_started = packet.get("review_started")
     if type(review_started) is not bool:
@@ -135,23 +133,6 @@ def resolve(packet: dict[str, Any]) -> dict[str, object]:
         return _result(reason_code="no-usable-vendor")
 
     candidate = vendors[0]
-    if lane == "small":
-        if response == "accept":
-            return _result(
-                notice_kind="next-change-only",
-                notice_vendor=response_vendor,
-                reason_code="small-lane-no-opt-in",
-            )
-        if response == "decline":
-            return _result(reason_code="small-lane-declined")
-        if review_started:
-            return _result(reason_code="no-response")
-        return _result(
-            notice_kind="availability",
-            notice_vendor=candidate,
-            reason_code="small-lane-availability-only",
-        )
-
     if response == "accept":
         if review_started:
             return _result(
@@ -175,13 +156,13 @@ def resolve(packet: dict[str, Any]) -> dict[str, object]:
             notice_vendor=candidate,
             reasons=risks,
             eligible=True,
-            reason_code="full-lane-risk-recommendation",
+            reason_code="risk-recommendation",
         )
     return _result(
         notice_kind="availability",
         notice_vendor=candidate,
         eligible=True,
-        reason_code="full-lane-availability",
+        reason_code="availability",
     )
 
 

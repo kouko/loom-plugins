@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from prose_pin import NEGATION_RE
+from prose_pin import NEGATION_RE, has_negation, split_sentences
 
 REPO = Path(__file__).resolve().parents[2]
 SKILL = REPO / "loom-code" / "skills" / "write-plan" / "SKILL.md"
@@ -178,11 +178,44 @@ def test_suggest_is_non_blocking_and_has_no_background_listener() -> None:
     assert "do not reclassify risk" in flat
 
 
-def test_ask_still_asks_once_per_full_lane_change() -> None:
+LANE_WORDING_RE = re.compile(r"(?i)\b(small|full)[- ]lanes?\b|\blanes?\b")
+
+
+ASK_SENTENCE = (
+    "`ask` is a standing choice that puts one cross-model review question to "
+    "the user on every change."
+)
+
+
+def affirmed_sentences(text: str, *literals: str) -> list[str]:
+    """Sentences holding every literal and no negation token outside code spans."""
+    return [
+        s
+        for s in split_sentences(" ".join(re.sub(r"(?m)^#+ .*$", "", text).split()), ".;")
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_affirmedSentences_syntheticAffirmative_accepted() -> None:
+    assert affirmed_sentences("Next. `ask` puts one question on every change. Done.", "puts one", "on every change")
+
+
+def test_affirmedSentences_syntheticNegated_rejected() -> None:
+    for negated in (
+        "`ask` never puts one question on every change.",
+        "`ask` does not put one question, so puts one on every change.",
+        "`ask` puts one question without asking on every change.",
+        "`ask` puts one question on no change, won't ask on every change.",
+    ):
+        assert not affirmed_sentences(negated, "puts one", "on every change"), negated
+
+
+def test_ask_still_asks_once_per_change() -> None:
     text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
     flat = " ".join(text.split())
     assert "second-vendor: ask" in flat
-    assert "every full-lane change" in flat
+    assert affirmed_sentences(text, "puts one", "on every change") == [ASK_SENTENCE]
     assert "AskUserQuestion" in text
     assert "request_user_input" in text
     assert "ask_question" not in text  # agy offers no candidate, so it never asks
@@ -221,14 +254,89 @@ def test_suggest_uses_one_cell_markdown_table_with_spacing() -> None:
     assert "raw Markdown" in text
 
 
-def test_small_lane_suggest_is_information_only() -> None:
-    text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
-    flat = " ".join(text.split())
-    assert "small lane" in flat
-    assert "informational only" in flat
-    assert "next-change-only" in flat
-    assert "reviewer floor is computed later and independently" in flat
-    assert "there is only one reader" not in flat
+RUNTIME_DIRS = ("skills", "agents", "contract", "hooks", "commands", "scripts", "references")
+RUNTIME_SUFFIXES = {".md", ".py", ".sh", ".yaml", ".yml", ".json", ".toml", ".ini", ""}
+DATED_NAME_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def runtime_files() -> list[Path]:
+    """Every runtime file of loom-code and loom-design, walked from disk so the
+    scan also runs in a `git archive` copy. Excluded: tests (they assert the
+    absence), CHANGELOGs and dated records."""
+    files = []
+    for plugin in ("loom-code", "loom-design"):
+        for sub in RUNTIME_DIRS:
+            for path in sorted((REPO / plugin / sub).rglob("*")):
+                if (
+                    path.is_file()
+                    and path.suffix in RUNTIME_SUFFIXES
+                    and not {"__pycache__", ".pytest_cache"} & set(path.parts)
+                    and not re.fullmatch(r"test_.*\.py", path.name)
+                    and not path.name.upper().startswith("CHANGELOG")
+                    and not DATED_NAME_RE.search(path.name)
+                ):
+                    files.append(path)
+    return files
+
+
+def lane_hits(text: str) -> list[str]:
+    return [m.group(0) for m in LANE_WORDING_RE.finditer(" ".join(text.split()))]
+
+
+def test_laneHits_syntheticText_matchesOnlyLaneWords() -> None:
+    assert lane_hits("ask blocks once per full-lane change")
+    assert lane_hits("In the small\n lane it is omitted")
+    assert not lane_hits("planes and a planet on the plane explained")
+
+
+def test_runtime_tree_names_no_lane() -> None:
+    """A2 positive (runtime-tree-lane-scan): no runtime file in either plugin
+    names a lane; the only lane guard, so it is not repeated per file."""
+    files = runtime_files()
+    assert len(files) > 50, "scan scope collapsed"
+    assert REPO / "loom-code" / "hooks" / "session-start" in files
+    assert REPO / "loom-code" / "references" / "dispatch-profile.md" in files
+    offenders = {
+        str(path.relative_to(REPO)): hits
+        for path in files
+        if (hits := lane_hits(path.read_text(encoding="utf-8", errors="replace")))
+    }
+    assert offenders == {}
+
+
+def test_second_vendor_reference_keeps_next_change_only_notice() -> None:
+    reference = " ".join(SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8").split())
+    assert "next-change-only" in reference
+    assert "there is only one reader" not in reference
+
+
+def _policy_accepted_fields() -> set[str]:
+    """The `allowed` set literal inside second_vendor_policy.resolve, read by
+    AST so the pin follows the script rather than a copied list."""
+    import ast
+
+    tree = ast.parse(
+        (REPO / "loom-code" / "scripts" / "second_vendor_policy.py").read_text(encoding="utf-8")
+    )
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Assign)
+            and any(isinstance(t, ast.Name) and t.id == "allowed" for t in node.targets)
+            and isinstance(node.value, ast.Set)
+        ):
+            return {elt.value for elt in node.value.elts}
+    raise AssertionError("allowed set not found in second_vendor_policy.py")
+
+
+def test_suggest_station_names_every_policy_input_key() -> None:
+    section = _section(
+        SKILL.read_text(encoding="utf-8"), "### Resolve `second-vendor: suggest`"
+    )
+    flat = " ".join(section.split())
+    match = re.search(r"with exactly these keys:(.*?)\bto:", flat)
+    assert match, "key list sentence missing"
+    named = set(re.findall(r"`([a-z_]+)`", re.sub(r"\([^)]*\)", "", match.group(1))))
+    assert named == _policy_accepted_fields()
 
 
 def test_reference_has_no_none_mode_or_per_change_none_answer() -> None:

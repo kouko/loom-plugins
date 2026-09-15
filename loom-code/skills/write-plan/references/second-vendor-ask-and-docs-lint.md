@@ -72,18 +72,14 @@ even when the initial plan commit already exists. Closing Review consumes
 that line as the selected reviewer; it is a result record, not a fabricated
 entry in `## Questions asked`.
 
-In the small lane the notice is informational only and the policy does not
-accept an active-change vendor selection. If the user accepts anyway, report
-the policy's `next-change-only` result; it does not mutate the current reviewer
-identity or the standing default. The reviewer floor is computed later and
-independently from the complete branch delta. A reply after Closing Review
-starts is likewise next-change-only. No reply means no second vendor for this
-change.
+A reply after Closing Review starts gets the policy's `next-change-only`
+result; it does not mutate the current reviewer identity or the standing
+default. No reply means no second vendor for this change.
 
 ## `second-vendor: ask`
 
 `ask` is a standing choice that puts one cross-model review question to the
-user on every full-lane change. The answer governs only that change and never
+user on every change. The answer governs only that change and never
 rewrites the KICKOFF line. Probe the host-specific candidates above first.
 
 With a runnable candidate, prefer the current host's native question tool.
@@ -109,9 +105,6 @@ state that no such review tool is currently available and continue without askin
 Add the question to the running list kept in step 3, so it lands in the
 plan's `## Questions asked` section and the intent's decision record. That
 answer names a CLI or declines cross-model review for this change.
-
-**In the small lane**, this opt-in question is not asked. The reviewer floor
-is computed later and independently from the complete branch delta.
 
 ## Fixed CLI
 

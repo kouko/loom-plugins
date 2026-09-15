@@ -26,7 +26,7 @@ This standalone plugin does not call `second_vendor_policy.py` and does not
 reimplement its risk mapping. That executable belongs to loom-code.
 
 **`ask`** puts one cross-model review question into decision point ① on every
-full-lane change. Probe the host-specific candidates above first. With a
+change. Probe the host-specific candidates above first. With a
 runnable candidate, prefer the current host's native question tool. Claude Code
 uses `AskUserQuestion` when available in the current agent; the authoritative
 tool reference names that tool and owns its live schema
@@ -47,8 +47,7 @@ no such review tool is available and continue without asking.
 The answer governs this change only and never rewrites the KICKOFF line. Add
 the question to the running list kept in SKILL.md, so it lands in the plan's
 `## Questions asked`; pass the accepted CLI or decline directly to Closing
-Review. In the small lane this opt-in question is not asked. The reviewer floor
-is computed later and independently from the complete branch delta.
+Review.
 
 A **fixed CLI** is the standing reviewer choice and adds no intent question.
 Probe it with the same availability rule before downstream use; never replace
