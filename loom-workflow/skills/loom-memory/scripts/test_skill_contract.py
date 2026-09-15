@@ -399,7 +399,7 @@ SCARCITY_ELEMENTS = (
 # sha256 of the whitespace-flattened Record section of SKILL.md. Its only job
 # is to go red when that section changes at all, so the dilution guard cannot
 # fall silently out of date behind a literal pin that still passes.
-RECORD_SECTION_DIGEST = "33a407721f339b9d2c0967766e50341d8ccb4716fecea7cf49372d221d25631e"
+RECORD_SECTION_DIGEST = "945a9cb29dfb5a9090e4ad036e5f980accf19fe94b22ff3014c1c066635ddcc9"
 
 
 def test_record_contract_states_when_to_record() -> None:
@@ -426,6 +426,27 @@ def test_record_contract_states_how_much_to_record() -> None:
         assert element in flat, (
             f"the Record contract no longer states {element!r}. {_A4_WHY}"
         )
+
+
+def test_record_section_routes_unfinished_item_to_intent() -> None:
+    """The backlog is frozen (docs/loom/README.md): a recurring open item
+    comes back as an intent. The Record section routes an unfinished item
+    to an intent and names no other destination."""
+    flat = _flat(_section(_skill_md_text(), "Record"))
+    assert "an unfinished item belongs in an intent." in flat, (
+        "the Record section no longer routes an unfinished item to an intent "
+        "alone. " + _A4_WHY
+    )
+
+
+def test_backlog_entry_routing_sentence_rejected() -> None:
+    """Negative: the retired backlog alternative must not come back into the
+    Record section's routing sentence."""
+    flat = _flat(_section(_skill_md_text(), "Record"))
+    assert "backlog" not in flat, (
+        "the Record section routes a lesson to a backlog entry, but the "
+        "backlog is frozen; route unfinished items to an intent."
+    )
 
 
 def test_the_reference_copy_still_carries_both_halves() -> None:
