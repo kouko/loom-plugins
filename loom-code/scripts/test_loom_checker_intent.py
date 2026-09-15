@@ -590,6 +590,48 @@ def test_a_real_camel_case_identifier_is_still_blocked(tmp_path: Path) -> None:
     assert "intent.product-no-identifiers" in blocked_rules(result)
 
 
+# --- intent.product-no-identifiers: Mermaid keywords inside a fence (W3-02) --
+
+MERMAID_KEYWORD_DIAGRAMS = {
+    "sequenceDiagram": "sequenceDiagram\n  kouko->>Team: shares the task list",
+    "quadrantChart": "quadrantChart\n  x-axis Rare --> Frequent\n  Manual backup: [0.8, 0.7]",
+    "classDef": "flowchart LR\n  A[kouko] --> B[loses tasks]\n  classDef pain fill:#f96\n  class B pain",
+    "stateDiagram-v2": "stateDiagram-v2\n  Working --> Lost : forgets the backup",
+    "linkStyle": "flowchart LR\n  A[kouko] --> B[loses tasks]\n  linkStyle 0 stroke:#f00",
+}
+
+
+def _problem_with_diagram(diagram: str) -> str:
+    return f"People lose tasks because backing up is manual.\n\n```mermaid\n{diagram}\n```"
+
+
+def test_mermaid_keywords_in_fence_not_identifiers(tmp_path: Path) -> None:
+    """A6 positive: a Mermaid diagram-type keyword or directive is not code."""
+    repo = make_repo(tmp_path)
+    for name, diagram in MERMAID_KEYWORD_DIAGRAMS.items():
+        intent = write_intent(
+            repo / "docs/loom/intent/a.md", kind="product", problem=_problem_with_diagram(diagram)
+        )
+        result = run_checker("intent", str(intent), cwd=repo)
+        assert "intent.product-no-identifiers" not in blocked_rules(result), (name, result.stderr)
+
+
+def test_snake_case_node_label_still_blocked(tmp_path: Path) -> None:
+    """A6 negative: a code identifier as a node label or id inside the fence still blocks,
+    and a Mermaid keyword outside a mermaid fence is still read as an identifier."""
+    repo = make_repo(tmp_path)
+    for problem in (
+        _problem_with_diagram("flowchart LR\n  A[run_batch] --> B[loses tasks]"),
+        _problem_with_diagram("flowchart LR\n  saveDraft --> B[loses tasks]"),
+        _problem_with_diagram("sequenceDiagram\n  kouko->>save_draft: types a note"),
+        "People lose tasks because sequenceDiagram is slow.",
+        "People lose tasks.\n\n```text\nsequenceDiagram\n```",
+    ):
+        intent = write_intent(repo / "docs/loom/intent/a.md", kind="product", problem=problem)
+        result = run_checker("intent", str(intent), cwd=repo)
+        assert "intent.product-no-identifiers" in blocked_rules(result), problem
+
+
 def test_a_real_path_is_still_blocked_next_to_an_allowlisted_name(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     intent = write_intent(

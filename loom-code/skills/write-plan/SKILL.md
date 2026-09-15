@@ -78,7 +78,9 @@ non-decision authorisation stop, the first time this repo is used (step
 
 1. At ①, restate the wanted outcome; merge any expensive-to-undo choice,
    full-lane `second-vendor: ask` question, and required principles interview.
-2. Ask nothing about plan structure; record each agent decision and reason.
+2. At ②, only for a product spec you write: confirm visible behaviour and
+   carried details. Ask nothing about plan structure; record each agent
+   decision and reason.
 3. At ③, the user accepts or rejects the report against every Acceptance line.
 
 `second-vendor: suggest` only emits a non-blocking notice after the plan exists.
@@ -156,6 +158,11 @@ insufficient; reopen means move it to Open questions, stop confirmation, and
 the intent must remain `open`.
 <!-- /gate -->
 
+Any intent section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
+numbered list, diagrams stay at intent altitude (no UI reactions or state
+transitions), a product Problem holds no identifiers (Mermaid node ids
+included), and chat shows text tables or text diagrams, not Mermaid.
+
 ## Step 2 — Standing documents
 
 ```
@@ -223,6 +230,13 @@ twice.
 
 4. **The principles interview**, if step 2 demanded it.
 
+5. **The carried details, `kind: engineering` only.** Show them as a table,
+   one row per detail in the user's language, confirmed by the same yes; no
+   extra stop. With an empty list, no table appears. A product change shows
+   them at decision point ② of the station writing its spec — `write-spec`,
+   or this station (step 4). A product change's carried details never appear
+   in this message.
+
 **Every question in this message must be one of three types, or the
 consequence form for one-way doors**, and you check the list before
 sending:
@@ -248,6 +262,17 @@ as `{decision_point, text, type}` with `type` one of `what` / `behaviour` /
 section at step 5. The §11 measurement of how often
 loom interrupts the user reads exactly this list; a question asked and not
 recorded makes the flow look quieter than it is.
+
+**Keep a carried-details list** too: only details the user stated or
+explicitly agreed to. Only an explicit yes from the user counts as
+agreement: a proposal left unanswered, deferred ("later"), or answered about
+something else is dropped. Never carry an agent proposal the user did not
+agree to, or detail you inferred. Carry only details about what the command
+or screen does or how it reacts. A remark about background or usage context,
+such as when or where the user runs it, is not a carried detail. Quote the
+user's words for each carried detail — for an agreed proposal, quote the
+proposal the user said yes to. Add no explanation, implication, or inference
+of your own. It never enters the intent file.
 
 **On "yes":**
 
@@ -290,10 +315,14 @@ When a task's rationale outgrows its Risk line, write
 `docs/loom/<change-id>/spec.md` from `contract/templates/spec-minimal.md` —
 Requirements one per Acceptance line, Design decision one line per
 agent-decided fork, Alternatives considered, Current state evidence, UI
-flows N/A — carrying the template's five sections and leaving the
-`confirmed-behavior:` line to product changes. Decision point ② stays
-product-only. Declare `pre-build-review: required|not-required — <reason>`
+flows (N/A unless a carried detail is visible) — carrying the template's five
+sections and leaving the `confirmed-behavior:` line to product changes.
+Decision point ② stays product-only. Declare `pre-build-review: required|not-required — <reason>`
 using the risk classes below; only a required spec gets a pre-build review.
+
+A non-empty carried-details list — from `capture-intent`'s hand-off or your
+own intake — forces that spec even when every Risk line fits; record each
+item per the `Record each carried detail` bullet below. An empty list forces no spec.
 
 **`yes`, and `docs/loom/<change-id>/spec.md` already exists** — go to the
 intake check below.
@@ -312,6 +341,16 @@ spec yourself, from `contract/templates/spec-minimal.md`:
 - Fill UI flows (action and response, or `N/A`), Design decision,
   Alternatives considered, and path-anchored Forward/Reverse/Error/Data/Boundary
   evidence. Do not show those internal sections to the user.
+- UI flows form: a short flow is `<action> → <reaction>` lines; several
+  parallel cases on one surface, a table `case | what the user does | what
+  they see`; states or paths that branch or go back and forth, a Mermaid
+  `stateDiagram-v2` or `flowchart`.
+- Record each carried detail as a UI flows line when visible, else as a clause
+  on a Requirement line — the two parts decision point ② shows; only an
+  engineering change may put one on a Design decision line instead. That
+  clause goes on the Requirement line of the Acceptance line the detail
+  serves, never a new REQ. An agent proposal the user did not agree to is not
+  recorded.
 
 Print one line for the user: installing `loom-design` gets them a fuller
 spec than this one. For `pre-build-review: required`, hand the spec to the
@@ -319,6 +358,11 @@ spec than this one. For `pre-build-review: required`, hand the spec to the
 blind run; it must pass before planning. For `not-required`, proceed without
 a formal spec review. A missing declaration on a legacy spec is the safe
 `required` default and uses its existing passing review record.
+
+Running ② on a product spec you wrote: when a flow has parallel cases or
+branches, lead with a table or a text (ASCII) diagram, then the per-case
+sentences; never put Mermaid in this message — a terminal shows it as raw
+code.
 
 <!-- gate: write-plan.product-spec-needs-confirmed-behavior -->
 **A product spec needs `confirmed-behavior:` before it becomes a plan.**
@@ -346,7 +390,8 @@ Fix and re-run until it exits 0. At this point it checks
 `intake.confirmed`, `intake.spec-ready`, and `intake.confirmed-behavior` —
 whether the intent, spec declaration, and visible-behaviour confirmation are
 ready. When `needs-design: no`, only intent readiness can
-block before the plan exists.
+block before the plan exists, plus `intake.confirmed-behavior` when a
+`kind: product` spec exists.
 
 ## Step 5 — Write the plan
 

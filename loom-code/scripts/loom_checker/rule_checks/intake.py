@@ -172,18 +172,85 @@ def prose_lines(body: str) -> list[str]:
     return kept
 
 
+TABLE_SEPARATOR = re.compile(r"^[\s|:-]*-{3,}[\s|:-]*$")
+
+
+MERMAID_OPEN = re.compile(r"^\s*(?:```|~~~)\s*mermaid\b", re.IGNORECASE)
+
+
+MERMAID_FLOW_TYPE = re.compile(r"^\s*(?:stateDiagram(?:-v2)?|flowchart|graph)\b")
+
+
+MERMAID_TRANSITION = "-->"
+
+
+def clears_floor(left: str, right: str) -> bool:
+    return (visible_count(left) >= MIN_VISIBLE_PER_SIDE
+            and visible_count(right) >= MIN_VISIBLE_PER_SIDE)
+
+
+def table_rows(lines: list[str]) -> list[str]:
+    """Data rows of a Markdown table -- the rows below its header and its
+    `|---|` separator. A row counts when its last cell (what the user sees)
+    and the cells before it each clear the per-side floor."""
+    rows, inside = [], False
+    for index, line in enumerate(lines):
+        if "|" not in line:
+            inside = False
+            continue
+        if not inside:
+            inside = (bool(TABLE_SEPARATOR.match(line))
+                      and index > 0 and "|" in lines[index - 1])
+            continue
+        cells = [cell for cell in (strip_markup(part) for part in
+                                   line.strip().strip("|").split("|")) if cell]
+        if len(cells) >= 2 and clears_floor(" ".join(cells[:-1]), cells[-1]):
+            rows.append(" | ".join(cells))
+    return rows
+
+
+def mermaid_transitions(body: str) -> list[str]:
+    """`-->` transitions inside a ```mermaid fence whose diagram type is
+    `stateDiagram-v2` or `flowchart` (or the aliases `stateDiagram` and
+    `graph`), each side clearing the floor. Any other fence, and any other
+    Mermaid diagram type, carries no flow."""
+    found: list[str] = []
+    fence, flow_type = None, None
+    for line in HTML_COMMENT.sub(" ", body).splitlines():
+        if FENCE.match(line):
+            if fence is None:
+                fence = "mermaid" if MERMAID_OPEN.match(line) else "other"
+                flow_type = None
+            else:
+                fence = None
+            continue
+        text = line.strip()
+        if fence != "mermaid" or not text or text.startswith("%%"):
+            continue
+        if flow_type is None:
+            flow_type = bool(MERMAID_FLOW_TYPE.match(text))
+            continue
+        if flow_type and MERMAID_TRANSITION in text:
+            left, _, right = text.partition(MERMAID_TRANSITION)
+            if clears_floor(left, right):
+                found.append(text)
+    return found
+
+
 def flow_lines(body: str) -> list[str]:
-    """`<operation> -> <reaction>` lines: what decision point 2 reads back."""
+    """What decision point 2 reads back: prose `<operation> -> <reaction>`
+    lines, data rows of a parallel-cases table, and transitions of a Mermaid
+    `stateDiagram-v2` or `flowchart` (aliases `stateDiagram`, `graph`)."""
+    lines = prose_lines(body)
     found = []
-    for line in prose_lines(body):
+    for line in lines:
         text = strip_markup(line)
         arrow = ARROW.search(text)
-        if not arrow:
-            continue
-        left, right = text[:arrow.start()], text[arrow.end():]
-        if (visible_count(left) >= MIN_VISIBLE_PER_SIDE
-                and visible_count(right) >= MIN_VISIBLE_PER_SIDE):
+        if arrow and clears_floor(text[:arrow.start()], text[arrow.end():]):
             found.append(text)
+    for flow in table_rows(lines) + mermaid_transitions(body):
+        if flow not in found:
+            found.append(flow)
     return found
 
 
@@ -207,17 +274,22 @@ def check_ui_flows_recompute(manifest, repo: Path, change_id: str, touched: list
     return [
         (
             "spec.ui-flows-recompute",
-            f"{spec_path.relative_to(repo)} carries no `<operation> -> "
-            f"<reaction>` line under `## UI flows` (it says {shown!r}) while "
-            f"the diff touches a declared interface surface: "
-            f"{', '.join(touched[:5])}. A flow line is prose -- not inside a "
-            "``` fence or an HTML comment -- carrying an arrow with at least "
+            f"{spec_path.relative_to(repo)} carries no flow under `## UI "
+            f"flows` (it says {shown!r}) while the diff touches a declared "
+            f"interface surface: {', '.join(touched[:5])}. A flow is a prose "
+            "line carrying an arrow with at least "
             f"{MIN_VISIBLE_PER_SIDE} visible characters on each side, e.g. "
             "`todo add --due 2026-09-10 'buy milk' -> the todo is stored with "
-            "its due date`. That is a shape check only: whether the flow is "
-            "true, complete or worth reading is the reviewer's judgement, not "
-            "this rule's. Write one per operation; that section IS decision "
-            "point 2.",
+            "its due date`; a data row of a `case | what the user does | what "
+            "they see` table, below its header and `|---|` separator, with "
+            "that floor before and in its last cell; or a `-->` transition "
+            "with that floor on each side inside a ```mermaid "
+            "`stateDiagram-v2` or `flowchart` fence (the aliases "
+            "`stateDiagram` and `graph` count too). An HTML comment or any "
+            "other fence carries none. That is a shape check only: whether the "
+            "flow is true, complete or worth reading is the reviewer's "
+            "judgement, not this rule's. Write one per operation or case; that "
+            "section IS decision point 2.",
         )
     ]
 

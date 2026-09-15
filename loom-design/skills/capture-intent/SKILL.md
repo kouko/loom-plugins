@@ -44,8 +44,10 @@ nothing else in the change stops for them.
    only for full-lane `second-vendor: ask` — whether to use another vendor.
    `suggest` adds no question at capture-intent; write-plan owns its post-plan
    notice.
-2. **At `write-spec`, product only:** confirm visible behaviour ("you type
-   ___ and see ___"). Engineering changes skip this.
+2. **Where the product spec is written:** confirm visible behaviour and any
+   carried details ("you type ___ and see ___") — at `write-spec`, or at
+   `loom-code:write-plan` when `needs-design: no` and carried details force a
+   spec. Engineering changes skip this.
 3. **At the end:** accept or reject the report showing how each Acceptance
    line was tried and what happened.
 
@@ -114,6 +116,13 @@ Keep every field at intent altitude:
 - **Open questions** — only unresolved outcome/scope choices or missing required
   content; both block confirmation. Carry downstream spec/engineering questions
   in the hand-off, not this section.
+
+Any section may use a Markdown table or a Mermaid `flowchart` when it reads more easily —
+for example current versus wanted, or who is affected. Acceptance stays a
+numbered list, a diagram stays at intent altitude (no UI reactions or state
+transitions), and a product Problem still holds no identifiers, Mermaid node
+ids included. When restating in chat, show text tables or text diagrams, not
+Mermaid: a terminal shows it as raw code.
 
 ## Step 2 — Write the intent
 
@@ -247,8 +256,16 @@ twice, and this is the only stop this station makes.
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
 
+5. **The carried details, `kind: engineering` only.**
+   Show them as a table, one row per detail in the user's language,
+   confirmed by the same yes; no extra stop. With an empty list, no table appears. Every product change
+   shows them at decision point ② of the station that writes its spec —
+   `write-spec`, or `loom-code:write-plan` when the list forces a spec for a
+   change that skips design. A product change's carried details never appear
+   in this message.
+
 Questions may only ask what the user wants, what they will see (reserved for
-decision point ② at `write-spec`), whether acceptance worked (decision point ③
+decision point ②, where the product spec is written), whether acceptance worked (decision point ③
 at `ship`), or state one-way-door consequences. Decide implementation choices
 from repo evidence and record the reason; asking the user is a
 `user-judgment-leak` review failure.
@@ -261,6 +278,18 @@ second schema next to the contract's. The canonical carrier is the plan's
 message in step 5, verbatim**, and say that the receiving station must write
 it into that section. A question asked and not recorded makes the flow look
 quieter than it is.
+
+**Keep a carried-details list** beside the question list: flow or reaction
+details the user stated or explicitly agreed to, before or during intake.
+Only an explicit yes from the user counts as agreement: a proposal left
+unanswered, deferred ("later"), or answered about something else is dropped.
+Never carry an agent proposal the user did not agree to, or detail you
+inferred. Carry only details about what the command or screen does or how it
+reacts. A remark about background or usage context, such as when or where the
+user runs it, is not a carried detail. Quote the user's words for each carried detail —
+for an agreed proposal, quote the proposal the user said yes to. Add no explanation, implication, or inference of your own. The list
+never enters the intent file; its sections stay unchanged
+and detailed flows stay out.
 
 <!-- gate: capture-intent.no-confirmed-without-restatement -->
 **No intent becomes `confirmed` without the restatement being answered.**
@@ -320,12 +349,19 @@ questions you asked, one per line as
 `<decision point> — <type> — <text>`, saying it belongs in the plan's
 `## Questions asked` section.
 
+Next to it, paste the carried-details list verbatim, one per line, and say the
+next station must record each item in the spec. When the list is non-empty and
+`needs-design: no`, `loom-code:write-plan` must still write a spec
+(`spec-minimal`) to hold them. An empty list forces no spec and adds nothing
+to the hand-off.
+
 Say two things so the next station is not re-run by accident: `write-plan`
 will **not** run decision point ① again, because `status:` is already
 `confirmed` — it reads the intent and starts planning. And decision point
-② — "you type ___ and you see ___" — happens at `write-spec`, for product
-changes only; engineering changes go from here to a plan with no further
-stop until acceptance.
+② — "you type ___ and you see ___" — happens where the product spec is
+written: at `write-spec`, or at `write-plan` when `needs-design: no` and
+carried details force a spec. Engineering changes go from here to a plan with
+no further stop until acceptance.
 
 ## On Codex CLI
 

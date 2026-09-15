@@ -66,6 +66,10 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     if yes_at_write_plan:
         failures += check_spec_ready(manifest, repo, change_id)
         failures += check_ui_flows_recompute(manifest, repo, change_id, touched)
-        if kind == "product":
-            failures += check_confirmed_behavior(manifest, repo, change_id, err)
+    if station == "write-plan" and kind == "product":
+        # "A product spec needs confirmed-behavior before it becomes a plan"
+        # does not depend on needs-design: under `no`, a carried-details list
+        # forces a spec and write-plan runs decision point 2 on it. With no
+        # spec there is nothing to confirm and the rule returns nothing.
+        failures += check_confirmed_behavior(manifest, repo, change_id, err)
     return report(failures, err)

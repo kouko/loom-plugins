@@ -1,5 +1,53 @@
 # Changelog
 
+## [3.7.0] — 2026-09-15 — carried details and readable flows in write-plan
+
+Minor. Station guidance changes in `write-plan` and the `spec-minimal.md`
+UI flows placeholder, and three existing checker rules change behaviour (below);
+no new field, rule id, or station, and the contract manifest version stays
+2.3.1.
+
+- When `write-plan` runs decision point ① itself, it keeps a carried-details
+  list as `loom-design:capture-intent` does: only details the user stated or
+  explicitly agreed to, never an agent proposal or an inferred detail. Only an
+  explicit yes counts as agreement; a proposal left unanswered, deferred, or
+  answered about something else is dropped. The list never enters the intent
+  file. Each carried detail quotes the user's words, or the proposal the user
+  said yes to. A `kind: engineering` confirmation shows the list as a table,
+  confirmed by the same yes; a product change shows it at decision point ② of
+  the station writing its spec, and `write-plan` runs ② itself on a product
+  spec it writes, so the list is never shown twice.
+- A non-empty carried-details list, from the `capture-intent` hand-off or
+  `write-plan`'s own intake, forces a minimal spec even with
+  `needs-design: no`; an empty list forces no spec, and that spec's UI flows
+  are `N/A` only when no carried detail is visible. Each carried detail is
+  recorded as a UI flows line when visible, else as a clause on the
+  Requirement line of the Acceptance line it serves, never a new REQ; only an
+  engineering change may use a Design decision line.
+- Intent sections may use Markdown tables or Mermaid flowcharts; Acceptance
+  stays a numbered list, and chat shows text tables or text diagrams, not
+  Mermaid.
+- Checker: `intake write-plan` runs `intake.confirmed-behavior` on an existing
+  `kind: product` spec under `needs-design: no` too; an engineering spec under
+  `no` still skips it.
+- Checker: `spec.ui-flows-recompute` counts each data row of a UI flows table
+  and each `-->` transition in a Mermaid `stateDiagram-v2` or `flowchart`
+  (aliases `stateDiagram` and `graph`) as a flow, with the same per-side floor
+  as an arrow line; an empty or `N/A`
+  section over a touched interface surface still blocks.
+- Checker: `intent.product-no-identifiers` ignores Mermaid diagram-type
+  keywords and directives such as `sequenceDiagram` or `classDef` inside a
+  Mermaid fence; a code identifier used as a node id or label there still
+  blocks.
+- Minimal-spec UI flows keep one `<action> → <reaction>` line per operation
+  for a short flow, use a `case | what the user does | what they see` table
+  for parallel cases, and a Mermaid `stateDiagram-v2` or `flowchart` for
+  branching paths; the `spec-minimal.md` UI flows placeholder names the three
+  forms.
+- Decision point ② on a product spec `write-plan` wrote leads with a table or
+  text (ASCII) diagram for flows with parallel cases or branches, then the
+  per-case sentences, and never puts Mermaid in the chat message.
+
 ## [3.6.1] — 2026-09-15 — checks after every fix and fix-verification rounds
 
 - Build now repeats its end-of-Build checks, the complete package suite and

@@ -96,12 +96,41 @@ def mask_allowed_tokens(problem: str) -> str:
     return problem
 
 
+MERMAID_KEYWORDS = re.compile(
+    r"\b(?:sequenceDiagram|stateDiagram|classDiagram|erDiagram|quadrantChart"
+    r"|gitGraph|requirementDiagram|classDef|linkStyle|accTitle|accDescr)\b"
+)
+
+
+FENCE_LINE = re.compile(r"^\s*(?:```|~~~)")
+
+
+MERMAID_FENCE_OPEN = re.compile(r"^\s*(?:```|~~~)\s*mermaid\b", re.IGNORECASE)
+
+
+def mask_mermaid_keywords(problem: str) -> str:
+    """Blank Mermaid diagram-type keywords and directives inside a ```mermaid
+    fence only. They are Mermaid syntax, not the code that will change; node
+    ids and labels in the same fence are still scanned."""
+    kept, fence = [], None
+    for line in problem.splitlines(keepends=True):
+        if FENCE_LINE.match(line):
+            if fence is None:
+                fence = "mermaid" if MERMAID_FENCE_OPEN.match(line) else "other"
+            else:
+                fence = None
+        elif fence == "mermaid":
+            line = MERMAID_KEYWORDS.sub(lambda match: " " * len(match.group(0)), line)
+        kept.append(line)
+    return "".join(kept)
+
+
 def check_product_no_identifiers(front, sections) -> list[tuple[str, str]]:
     """A product Problem is written for the person with the problem: it may
     not name the code that will change (concept-model §2b)."""
     if front.get("kind", "").strip() != "product":
         return []
-    problem = mask_allowed_tokens(sections.get("Problem", ""))
+    problem = mask_allowed_tokens(mask_mermaid_keywords(sections.get("Problem", "")))
     failures = []
     for pattern, what in IDENTIFIER_PATTERNS:
         match = pattern.search(problem)

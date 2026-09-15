@@ -29,6 +29,10 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "loom-code/scripts"))
+
+from prose_pin import has_negation, split_sentences  # noqa: E402
+
 SKILL = REPO / "loom-design/skills/write-spec/SKILL.md"
 CAPTURE_INTENT = REPO / "loom-design/skills/capture-intent/SKILL.md"
 WRITE_PLAN = REPO / "loom-code/skills/write-plan/SKILL.md"
@@ -363,6 +367,152 @@ def test_reference_files_exist_within_caps() -> None:
     assert forms.is_file() and flows.is_file()
     assert len(forms.read_text(encoding="utf-8").split()) <= SPEC_FORMS_CAP
     assert len(flows.read_text(encoding="utf-8").split()) <= UI_FLOWS_CAP
+
+
+_STEP2 = "## Step 2 — Write the spec"
+_STEP3 = "## Step 3 — Decision point ②, product changes only"
+
+
+def _flat(text: str) -> str:
+    return " ".join(text.split())
+
+
+def _flows() -> str:
+    return (SKILL.parent / "references/ui-flows.md").read_text(encoding="utf-8")
+
+
+def _forms() -> str:
+    return (SKILL.parent / "references/spec-forms.md").read_text(encoding="utf-8")
+
+
+def _affirmed(text: str, *literals: str) -> list[str]:
+    """Sentences holding every literal and no negation token outside code spans.
+
+    Engineering baseline prose-pin rule: "do not record each item in the
+    spec" must not pass a pin on "record each item in the spec".
+    """
+    return [
+        s
+        for s in split_sentences(_flat(text), ".;")
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_affirmedPin_syntheticAffirmativeSentence_accepted() -> None:
+    """Self-test: an affirmative sentence satisfies the pin."""
+    assert _affirmed("Read the list and record each item in the spec.", "record each item in the spec")
+
+
+def test_affirmedPin_syntheticNegatedSentence_rejected() -> None:
+    """Self-test (negated-pin-mutant-killed): a negated sentence fails the pin."""
+    assert not _affirmed("Read the list and do not record each item in the spec.", "record each item in the spec")
+    assert not _affirmed("When a flow branches, never lead with a table.", "lead with a table")
+
+
+def test_spec_records_each_carried_detail() -> None:
+    """A1 positive: each carried detail lands in the spec and in ② read-back."""
+    step2 = _flat(_section(_text(), _STEP2))
+    assert _affirmed(
+        step2,
+        "Read the carried-details list from `capture-intent`'s hand-off",
+        "record each item in the spec",
+        "a visible flow or reaction as a UI flows line",
+    )
+    assert _affirmed(step2, "decision point ② shows each of them as part of the read-back")
+    for gate_id in GATE_IDS:
+        assert "carried-details" not in _gate(_text(), gate_id)
+
+
+def test_product_carried_detail_recorded_where_decision_point_two_shows() -> None:
+    """A1 positive (product routing): a product change's non-visible detail goes
+    on a Requirement line; only an engineering change may use Design decision,
+    which ② never shows."""
+    carried = _flat(_section(_text(), _STEP2)).split("**Carried details.**", 1)[1].split("Forms:", 1)[0]
+    assert _affirmed(carried, "anything else as a clause on a Requirement line")
+    design = [s for s in split_sentences(carried, ".;") if "Design decision line" in s]
+    assert design and all("engineering" in s for s in design)
+    assert _affirmed(carried, "engineering change", "Design decision line")
+
+
+def test_non_visible_detail_never_new_req() -> None:
+    """A1 negative (non-visible-detail-never-new-req): a non-visible carried
+    detail is a clause on the Requirement line of the Acceptance line it
+    serves, never a new REQ."""
+    carried = _flat(_section(_text(), _STEP2)).split("**Carried details.**", 1)[1].split("Forms:", 1)[0]
+    assert "on the matching Requirement line" not in carried
+    new_req = [s for s in split_sentences(carried, ".;") if "new REQ" in s]
+    assert new_req and all(
+        "never a new REQ" in s and "Requirement line of the Acceptance line the detail serves" in s
+        for s in new_req
+    )
+
+
+def test_asked_list_leads_branching_flow_with_table_or_diagram() -> None:
+    """A2 positive: the station's ② summary promises the table or text diagram lead."""
+    asked = _flat(_section(_text(), "## What you will be asked, in plain words"))
+    assert _affirmed(
+        asked,
+        "one sentence per operation, led by a table or text diagram when a flow has parallel cases or branches",
+    )
+
+
+def test_agent_proposal_not_agreed_not_recorded() -> None:
+    """A1 negative: nothing beyond what the user agreed is recorded."""
+    step2 = _flat(_section(_text(), _STEP2))
+    assert "an agent proposal the user did not agree to is not recorded" in step2
+    recording = [
+        s for s in re.split(r"(?<=[.])\s+", step2) if "proposal" in s.lower()
+    ]
+    assert recording and all("not recorded" in s for s in recording)
+
+
+def test_parallel_cases_table_branching_diagram() -> None:
+    """A2 positive: parallel cases are a table, branching paths a diagram."""
+    flows = _flat(_flows())
+    assert "several parallel cases on one surface: a table" in flows.lower()
+    assert "`case | what the user does | what they see`" in flows
+    assert re.search(r"branch or go back and forth.*`stateDiagram-v2` or `flowchart`", flows)
+    assert "ASCII still for layout" in flows
+    assert "`spec-forms.md`" in flows
+    for kept in ("every variant", "naming the way out", "irreversible-step sentence", "paths walk"):
+        assert kept in flows.lower(), kept
+    forms = _flat(_section(_forms(), "## Table"))
+    assert "**UI flow cases**" in forms
+    diagram = _flat(_section(_forms(), "## Diagram"))
+    assert "**UI flows** that branch or go back and forth" in diagram
+
+
+def test_short_flow_stays_lines() -> None:
+    """A2 boundary: the one-line form stays the default for a short flow."""
+    flows = _flat(_flows())
+    assert "One line per operation is the default, for a short flow" in flows
+    assert "A short flow gets the sentences only" in _flat(_section(_text(), _STEP3))
+
+
+def test_readback_leads_with_table_or_text_diagram() -> None:
+    """A3 positive: ② leads with a table or text diagram, then the sentences."""
+    step3 = _flat(_section(_text(), _STEP3))
+    back = _flat(_section(_flows(), "## Reading it back"))
+    for text in (step3, back):
+        leading = [
+            s
+            for s in _affirmed(text, "parallel cases or branches, ", "then the per-case sentences")
+            if re.search(r"lead\w* with a table or a text \(ASCII\) diagram", s)
+        ]
+        assert leading, text[:200]
+
+
+def test_chat_readback_has_no_mermaid() -> None:
+    """A3 negative: Mermaid never appears in the chat read-back."""
+    step3 = _section(_text(), _STEP3)
+    back = _section(_flows(), "## Reading it back")
+    for text in (step3, back):
+        flat = _flat(text)
+        assert "Never put Mermaid in" in flat
+        assert "a terminal shows it as raw code" in flat
+        assert "```mermaid" not in text
+    assert "Nothing from `## Design decision` down is ever shown to the user." in _flat(step3)
 
 
 def test_plugin_declares_requires_contract() -> None:

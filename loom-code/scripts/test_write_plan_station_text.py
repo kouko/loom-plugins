@@ -135,7 +135,7 @@ def test_skill_names_the_engineering_spec_path() -> None:
         "`docs/loom/<change-id>/spec.md` from "
         "`contract/templates/spec-minimal.md` — Requirements one per "
         "Acceptance line, Design decision one line per agent-decided fork, "
-        "Alternatives considered, Current state evidence, UI flows N/A — carrying the template's five sections and leaving the `confirmed-behavior:` line to product changes."
+        "Alternatives considered, Current state evidence, UI flows (N/A unless a carried detail is visible) — carrying the template's five sections and leaving the `confirmed-behavior:` line to product changes."
     )
     flat = " ".join(text.split())
     assert sentence in flat, (
@@ -367,10 +367,10 @@ def test_current_release_metadata_is_synchronized() -> None:
     agy_manifest = json.loads(
         (REPO / "loom-code/plugin.json").read_text(encoding="utf-8")
     )
-    assert claude_manifest["version"] == "3.6.1"
-    assert codex_manifest["version"] == "3.6.1"
-    assert agy_manifest["version"] == "3.6.1"
-    assert "## [3.6.1]" in changelog
+    assert claude_manifest["version"] == "3.7.0"
+    assert codex_manifest["version"] == "3.7.0"
+    assert agy_manifest["version"] == "3.7.0"
+    assert "## [3.7.0]" in changelog
 
 
 @pytest.mark.parametrize(

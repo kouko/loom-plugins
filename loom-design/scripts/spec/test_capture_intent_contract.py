@@ -18,9 +18,14 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "loom-code/scripts"))
+
+from prose_pin import has_negation, split_sentences  # noqa: E402
+
 SKILL = REPO / "loom-design/skills/capture-intent/SKILL.md"
 WRITE_PLAN = REPO / "loom-code/skills/write-plan/SKILL.md"
 PLUGIN_JSON = REPO / "loom-design/.claude-plugin/plugin.json"
@@ -371,15 +376,19 @@ def test_capture_intent_does_not_call_loom_code_policy() -> None:
     assert "does not call `second_vendor_policy.py`" in text
 
 
-def test_reviewer_policy_summary_has_patch_release_metadata() -> None:
+def test_loom_design_version_2_2_0_consistent() -> None:
     claude_manifest = json.loads(PLUGIN_JSON.read_text(encoding="utf-8"))
     codex_manifest = json.loads(
         (REPO / "loom-design/.codex-plugin/plugin.json").read_text(encoding="utf-8")
     )
+    agy_manifest = json.loads(
+        (REPO / "loom-design/plugin.json").read_text(encoding="utf-8")
+    )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.1.6"
-    assert codex_manifest["version"] == "2.1.6"
-    assert "## [2.1.6]" in changelog
+    assert claude_manifest["version"] == "2.2.0"
+    assert codex_manifest["version"] == "2.2.0"
+    assert agy_manifest["version"] == "2.2.0"
+    assert "## [2.2.0]" in changelog
 
 
 def _branch_note() -> str:
@@ -487,6 +496,188 @@ def test_material_choice_rules_live_inside_existing_confirmation_gates() -> None
         assert "must remain `open`" in gate
         assert "Publication and second-reviewer authorisation" in gate
         assert "unknown surface" in gate
+
+
+def _flat_section(heading: str) -> str:
+    return " ".join(_section(_text(), heading).split())
+
+
+_STEP1 = "## Step 1 — Interview"
+_STEP4 = "## Step 4 — Decision point ①: restate and confirm"
+_STEP5 = "## Step 5 — Hand off"
+
+
+def _affirmed(text: str, *literals: str) -> list[str]:
+    """Sentences holding every literal and no negation token outside code spans.
+
+    Engineering baseline prose-pin rule: a pinned sentence rejects negation,
+    so "Never show them as a table" cannot pass a pin on "show them as a
+    table". Backticked spans such as `needs-design: no` are field values,
+    not negations, and are ignored by the negation check.
+    """
+    return [
+        s
+        for s in split_sentences(" ".join(text.split()), ".;")
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_affirmedPin_syntheticAffirmativeSentence_accepted() -> None:
+    """A6 negative self-test: an affirmative sentence satisfies the pin."""
+    assert _affirmed("Show them as a table, one row per detail.", "as a table")
+
+
+def test_affirmedPin_syntheticNegatedSentence_rejected() -> None:
+    """A6 negative (negated-pin-mutant-killed): a negated sentence fails the pin."""
+    for negated in (
+        "Never show them as a table, one row per detail.",
+        "It is not the case that, when the list is non-empty, it must still write a spec.",
+        "Do not show them as a table.",
+    ):
+        literal = "must still write a spec" if "spec" in negated else "as a table"
+        assert not _affirmed(negated, literal), negated
+
+
+def test_affirmedPin_syntheticCodeSpanNo_notNegation() -> None:
+    """A field value in backticks is not read as a negation token."""
+    assert _affirmed("When `needs-design: no`, write-plan must still write a spec.", "must still write a spec")
+
+
+def test_hand_off_lists_agreed_details_and_requires_spec() -> None:
+    """A1 positive: agreed details travel to the spec, even with no design."""
+    step4 = _flat_section(_STEP4)
+    assert _affirmed(step4, "**Keep a carried-details list**", "the user stated or explicitly agreed to")
+    assert "Never carry an agent proposal the user did not agree to" in step4
+    assert "detail you inferred" in step4
+    step5 = _flat_section(_STEP5)
+    assert _affirmed(step5, "carried-details list verbatim", "must record each item in the spec")
+    assert _affirmed(
+        step5, "non-empty and `needs-design: no`, `loom-code:write-plan` must still write a spec"
+    )
+
+
+def test_no_details_no_forced_spec() -> None:
+    """A1 negative: an empty list forces no spec and adds nothing."""
+    step5 = _flat_section(_STEP5)
+    assert "An empty list forces no spec" in step5
+    forcing = [s for s in re.split(r"(?<=[.])\s+", step5) if "must still write a spec" in s]
+    assert forcing and all("non-empty" in s for s in forcing)
+    assert all(_affirmed(s, "must still write a spec") for s in forcing)
+
+
+def test_only_explicit_yes_is_carried() -> None:
+    """A1 positive: only the user's explicit yes makes a proposal a carried detail."""
+    assert _affirmed(_flat_section(_STEP4), "Only an explicit yes from the user counts as agreement")
+
+
+def test_unanswered_or_deferred_proposal_dropped() -> None:
+    """A1 negative: silence, "later", or an answer about something else drops it."""
+    assert _affirmed(
+        _flat_section(_STEP4),
+        "a proposal left unanswered, deferred",
+        "answered about something else is dropped",
+    )
+
+
+def test_carried_detail_quotes_user_or_agreed_proposal() -> None:
+    """A1 positive (carried-detail-quotes-user-or-agreed-proposal): only flow or
+    reaction details are carried, each quoting the user or the agreed proposal."""
+    step4 = _flat_section(_STEP4)
+    assert _affirmed(step4, "Carry only details about what the command or screen does or how it reacts")
+    assert _affirmed(
+        step4,
+        "Quote the user's words for each carried detail",
+        "for an agreed proposal, quote the proposal the user said yes to",
+    )
+    assert "in the user's own words" not in step4.split("**Keep a carried-details list**", 1)[1]
+
+
+def test_background_context_and_inference_not_carried() -> None:
+    """A1 negative (background-context-and-inference-not-carried): a usage or
+    background remark is not a detail, and the agent adds no interpretation."""
+    step4 = _flat_section(_STEP4)
+    background = [s for s in split_sentences(step4, ".;") if "background or usage context" in s]
+    assert background and all("is not a carried detail" in s for s in background)
+    assert "Add no explanation, implication, or inference of your own" in step4
+
+
+def _carried_item() -> str:
+    step4 = _flat_section(_STEP4)
+    return step4.split("5. **The carried details", 1)[1].split("Questions may only ask", 1)[0]
+
+
+def test_engineering_restatement_shows_carried_details_table() -> None:
+    """A5 positive: engineering confirmation shows the table in the same message."""
+    item = _carried_item()
+    assert _affirmed(item, "`kind: engineering` only")
+    assert _affirmed(item, "Show them as a table, one row per detail in the user's language")
+    assert "confirmed by the same yes; no extra stop" in item
+
+
+def test_intent_confirmation_table_engineering_only() -> None:
+    """A5 positive (intent-confirmation-table-engineering-only): the table at ①
+    is for engineering changes; every product change shows its details at ② of
+    whichever station writes its spec."""
+    item = _carried_item()
+    assert item.startswith(", `kind: engineering` only.**")
+    assert _affirmed(
+        item,
+        "Every product change shows them at decision point ② of the station that writes its spec",
+        "`write-spec`, or `loom-code:write-plan`",
+    )
+
+
+def test_product_needs_design_no_not_shown_at_intent_confirmation() -> None:
+    """A5 negative (product-needs-design-no-not-shown-at-intent-confirmation):
+    no sentence of ① shows a product change's details here, so a product change
+    with needs-design: no is not asked twice."""
+    item = _carried_item()
+    assert "for a product change with `needs-design: no`" not in item
+    assert "shows them before `loom-code:write-plan`" not in item
+    here = [s for s in split_sentences(item, ".;") if "product change" in s and "this message" in s]
+    assert here and all("never" in s for s in here)
+    step4 = _flat_section(_STEP4)
+    assert "where this is their only stop" not in step4
+    assert "reserved for decision point ② at `write-spec`" not in step4
+
+
+def test_later_stops_name_both_spec_writing_stations() -> None:
+    """A5 positive: the asked-list and the hand-off put ② where the product spec is written."""
+    asked = " ".join(_section(_text(), "## What you will be asked, in plain words").split())
+    assert _affirmed(asked, "Where the product spec is written", "`loom-code:write-plan` when `needs-design: no`")
+    assert "At `write-spec`, product only" not in asked
+    step5 = _flat_section(_STEP5)
+    assert _affirmed(step5, "happens where the product spec is written", "`write-plan` when `needs-design: no`")
+    assert "happens at `write-spec`, for product changes only" not in step5
+
+
+def test_nothing_agreed_shows_no_table() -> None:
+    """A5 boundary: an empty list shows no table."""
+    assert "With an empty list, no table appears" in _flat_section(_STEP4)
+
+
+def test_intent_sections_may_use_tables_and_diagrams() -> None:
+    """A6 positive: sections may use tables or diagrams when easier to read."""
+    step1 = _flat_section(_STEP1)
+    assert _affirmed(step1, "Any section may use", "current versus wanted")
+
+
+def test_intent_diagram_form_is_flowchart_or_table() -> None:
+    """A6 positive: the intent forms are a Markdown table or a Mermaid flowchart."""
+    assert _affirmed(_flat_section(_STEP1), "Any section may use a Markdown table or a Mermaid `flowchart`")
+
+
+def test_acceptance_stays_numbered_list_and_flows_stay_out() -> None:
+    """A6 negative: forms never loosen Acceptance, altitude, or identifiers."""
+    step1 = _flat_section(_STEP1)
+    assert "Acceptance stays a numbered list" in step1
+    assert "no UI reactions or state transitions" in step1
+    assert "Mermaid node ids included" in step1
+    assert "text tables or text diagrams, not Mermaid" in step1
+    step4 = _flat_section(_STEP4)
+    assert "The list never enters the intent file" in step4
+    assert "detailed flows stay out" in step4
 
 
 def test_altitude_pass_runs_after_the_fill_in_list_exists() -> None:

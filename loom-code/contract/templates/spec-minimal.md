@@ -27,4 +27,4 @@ REQ-1 — <name>
 - Boundary: <…>
 
 ## UI flows                                        [user-readable; shown for product]
-<each action and the system's response (command/screen → output/state); write N/A if there is no interface>
+<short flow: one `<action> → <reaction>` line per operation (command/screen → output/state); several parallel cases: a table `case | what the user does | what they see`; branching states or paths: a Mermaid stateDiagram-v2 or flowchart; write N/A if there is no interface>
