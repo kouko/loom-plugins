@@ -1,0 +1,57 @@
+# blind-run live trial: a7-how-question (re-run after W4-03)
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at a2b500a3 via --plugin-dir; real hook and real skill files
+# prompt-sha256: c8dbb8a5116fae553ec6751f16999619f44d574b5b83d44178487efe9340bc3c (same prompt as a7-how-question.txt)
+# exit: 0 (result subtype success, is_error false); single run, no reruns
+# card delivery (saved transcript e19e6616-a40b-41c2-833d-e0f98e54da0c.jsonl): hook_additional_context=1, coexist-card header string occurrences=2
+=== USER MESSAGE (verbatim) ===
+我們的網站要把使用者上傳的圖片，從伺服器本機硬碟搬到雲端物件儲存。要怎麼搬比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/templates/02-linear-steps.md
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/references/plain-language.md
+=== FINAL REPLY (verbatim) ===
+搬遷圖片建議採用「雙寫 + 背景回填 + 逐步切換讀取」的漸進式做法，理由是可以在不停機、不遺失既有圖片的前提下完成搬遷；如果服務可以接受短暫停機，一次性搬遷會更簡單。
+
+## 三種做法比較
+
+| 做法 | 你會得到什麼 | 你要付出什麼 | 適合情境 |
+|---|---|---|---|
+| A. 一次性搬遷（停機搬） | 邏輯最簡單、一次做完 | 搬遷期間網站要停止上傳/瀏覽圖片 | 圖片量小、可接受短暫停機 |
+| B. 雙寫 + 背景回填（推薦） | 全程不停機、可隨時中止或回退 | 需要多寫一段過渡期程式碼，遷移期較長 | 正式服務、圖片量大、不能停機 |
+| C. 讀取時才搬（lazy migration） | 不用寫批次搬遷程式 | 冷門、很少被讀取的舊圖可能長期留在本機、進度不可控 | 圖片量極大且大多數是熱門常讀的圖 |
+
+「先不搬，之後再搬」被排除：本機硬碟隨時間會塞滿、也是單點故障風險，拖越久搬遷成本越高。「圖片量小可以停機」已經涵蓋在選項 A 裡，不算獨立的第四個選項。
+
+## 推薦做法（B）的執行步驟
+
+| # | 步驟 | 做什麼 | 完成標準 |
+|---|---|---|---|
+| 1 | 建立雲端儲存 | 開一個物件儲存 bucket（如 S3/GCS/R2），設好權限與網域 | 可以手動上傳、下載測試檔 |
+| 2 | 改上傳邏輯為雙寫 | 新上傳的圖片同時寫入本機硬碟和雲端 | 新圖片兩邊都存在 |
+| 3 | 背景回填舊圖 | 寫一支批次程式，把本機硬碟既有的圖片逐一複製到雲端，並比對檔案雜湊值確認一致 | 回填程式跑完、雜湊值全部相符 |
+| 4 | 切換讀取來源 | 把網站顯示圖片的網址改成指向雲端（可搭配 CDN） | 使用者看到的圖片改由雲端提供 |
+| 5 | 觀察一段時間 | 保留本機檔案與雙寫邏輯，觀察是否有讀取失敗或找不到檔案的情況 | 一至兩週內無異常 |
+| 6 | 收尾 | 確認無誤後，移除雙寫程式碼、停止寫入本機，並清除本機舊檔 | 系統只依賴雲端儲存 |
+
+## 需要留意的風險
+
+| 風險 | 可能性 | 影響 | 因應方式 |
+|---|---|---|---|
+| 回填遺漏檔案 | 中 | 部分圖片顯示失效 | 用雜湊值比對數量與內容，而非只比對檔名 |
+| 圖片網址格式改變，舊連結失效 | 中 | 外部分享的舊連結失效 | 在雲端保留與原本相同的路徑結構，或設定轉址 |
+| 雲端流量費（egress）增加 | 低 | 成本上升 | 圖片前面加一層 CDN 快取 |
+| 步驟 3 回填耗時過長 | 中 | 遷移期拉長 | 分批、多執行緒回填，且不影響線上服務效能 |
+
+如果你想要，我可以幫你針對特定雲端服務商（AWS S3、GCP、Cloudflare R2 等）寫出步驟 2、3 的實作程式碼。
+=== CHECK ===
+read references/plain-language.md: yes (Read event above)
+workable alternatives: 3 (A one-shot with downtime, B dual-write + backfill, C migrate on read)
+recommended one marked: yes (B labelled 推薦, and named in the first sentence)
+do nothing or later: listed and ruled out (「先不搬，之後再搬」被排除, with a reason)
+smaller version: not listed and not ruled out as such (the "small image count" remark folds a case into A; no smaller-scope option is named)
+combining two: not listed and not ruled out as such (B itself joins dual-write and backfill, but no sentence names or rules out combining two of the alternatives)
+yes/no asked directly: not applicable (option question, not a confirmation)
+before (a7-how-question.txt, dda0014f): guide not read, one approach, no recommendation marking, no missed-alternative check
