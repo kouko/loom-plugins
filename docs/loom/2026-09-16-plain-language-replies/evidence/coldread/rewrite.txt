@@ -263,3 +263,167 @@ other internal terms left: `/hooks` (5 times; described only as something you �
 fidelity notes: 「每個實作者與對抗者」 (agents) became 「寫程式和挑錯的人」 (people); 「Codex 回報的工具名」 became 「Codex 自己回報的規則名稱」 (tool name -> rule name). Both change meaning.
 reply language: Chinese (Traditional). Card in English did not pull the reply into English.
 A6 run 3 verdict: PASS on conclusion-first, literal wording and term replacement; two meaning changes noted for a reviewer.
+
+=== ROUND 2 (guide 8eedffc034e438a38b2867dad8631c96e9626ce2) ===
+# reference-blob: 8eedffc034e438a38b2867dad8631c96e9626ce2  (loom-workflow/skills/loom-visualization/references/plain-language.md, after W2-04)
+# card-blob and skill-blob: unchanged from the header above (f3cf31688399439d34f1e88118c96a7198a2a9c2, ea667cd596aa385bd33ae826215e17c5d728982f)
+# method: identical to round 1 -- same command, flags, model, empty temp dir and prompt template (template files byte-identical to round 1's); only {REF} differs. One fresh invocation per run; no tool errors, no reruns.
+# metaphor scan regex (same as round 1): 就像|好比|想像|比喻|像是一個|like a|imagine|think of it as
+
+# run: 1
+# prompt-sha256: 0109b617eb380d69a0015dcf7d05debd6dc83612dc674376bf3b047e384f6233
+=== INPUT 1 === same as round 1 run 1 above (verbatim there)
+=== USER TURN (verbatim) ===
+可以用更白話的方式說明嗎？
+=== OUTPUT (verbatim) ===
+第三次審查通過了，但我做記錄的方式有一個錯誤，需要你重新確認三句話。
+
+**發生了什麼事：** spec 裡有一行寫著「你看過並同意這段畫面行為的文字」。畫面流程改了之後，我直接照新文字重新算了一次代表這段文字的驗證碼，標記成「你已確認」，但沒有先把新文字給你看過。結果現在的記錄看起來像你確認了你沒讀過的文字。內容跟你之前選 A 時已經接受的結果一樣，但這一步還是要重新讓你看過、你說可以才算數。
+
+## 請確認這 3 句話對不對
+
+1. **刪掉一句：** 「你跳過起始確認步驟時，發布前會另外再問你一次」。因為起始確認步驟現在不能跳過了，這句話講的情況不會再發生。
+2. **加一句：** 你要求跳過起始確認步驟時，agent 會告訴你這一步一定會做、跳不過，然後只列出其他步驟裡哪些能跳、哪些不能跳給你看。
+3. **加一句：** 你在 Antigravity CLI 上輸入 `/loom-code:expert-mode` 時，agent 會告訴你這個指令在這裡沒有作用，不會顯示原本該顯示的確認指令，直接照完整流程繼續走。
+
+你看這三句話對嗎？
+
+你說「對」之後，我會做這些事：
+- 保留剛剛重算驗證碼的記錄，並在 commit 訊息裡寫清楚「這次有重新請你確認過」。
+- 順手修兩個小問題：spec 的第 7 個決策還寫著舊的「intent」用詞；skill 文件裡「不是步驟的詞」和「intent」兩條規則內容可能重複了。
+- 請 Reviewer B 很快看一次這些修改。
+- 跑一次最終檢查，更新 PR #13。
+=== CHECK ===
+first sentence: "第三次審查通過了，但我做記錄的方式有一個錯誤，需要你重新確認三句話。" -- the conclusion and what the user must do. No announcement, no heading and no background before it. Conclusion-first: PASS.
+heading: one heading "## 請確認這 3 句話對不對" appears after the conclusion and the background paragraph, not before the conclusion. Not an opener.
+metaphor scan: no hits. Manual read: 「看起來像你確認了」 is literal ("appears as"), not a metaphor. PASS.
+internal terms from the list (lane, REQ-, F-4, attestation, probe, PASS_WITH_NOTES, gate, ledger, 盲跑, file paths): none present. PASS.
+other internal terms left in the reply:
+  - intent (loom station name): replaced by 「起始確認步驟」 in behaviour sentences 1 and 2; the name itself appears once, in 「還寫著舊的「intent」用詞」, not bracketed after the plain words. partly explained.
+  - `/loom-code:expert-mode`: kept raw, with no plain words (round 1 had 「專家模式」的設定). unexplained.
+  - 雜湊: rendered as 「驗證碼」. plain.
+  - spec, Reviewer B, commit, PR #13, Antigravity CLI: not explained. unexplained (not on the listed term set).
+facts check (original facts missing or changed in the output):
+  - missing: 「合併 main 之後發現的兩個問題都已修好」 -- the two post-merge problems being fixed is not mentioned.
+  - changed: 「通過（附註）」 became 「通過了」; the "with notes" qualifier is gone.
+  - changed: the judge 「Reviewer B」 is no longer named in the conclusion (Reviewer B still appears in the follow-up list).
+  - kept: all three behaviour sentences, the 「選 A 時接受的後果」 point, all four follow-up actions, 「spec 決策 7」 (as 「spec 的第 7 個決策」) and PR #13.
+  - nothing added that the original did not say.
+reply language and script: Chinese (Traditional); no Simplified characters (Big5 scan: none).
+A6 run 1 verdict: conclusion-first PASS; literal wording PASS; facts check FAIL (one fact dropped, one qualifier dropped).
+
+# run: 2
+# prompt-sha256: ac67c49ca46368bc4a0bb39f8d002b15eb231b6c0bb116bd541ad9d7693685b6
+=== INPUT 2 === same as round 1 run 2 above (verbatim there)
+=== USER TURN (verbatim) ===
+可以用更白話的方式說明嗎？
+=== OUTPUT (verbatim) ===
+改名的改動已經合併進主線，兩邊的自動測試（loom-code、loom-design）都通過了，這部分你不用做什麼。
+
+接下來這個新改動要動的地方是：系統以前有一個設定，把改動分成「範圍小、風險低」和「一般」兩種；範圍小的只派 1 位審查者，一般的會讓你選擇要不要另外找其他公司的模型做一次審查。這個分類設定本身已經被拿掉了，但判斷「要不要讓你選」這一小段程式碼還留著，現在只能靠 AI 自己猜，結果是同一個改動每次執行可能不一樣。
+
+改完之後會變成這樣：
+- 同一個改動不管跑幾次，你會不會被問「要不要用其他公司的模型審查」，結果都一樣，不再靠 AI 猜。
+- 文件、規格和腳本裡，不再出現「small lane」「full lane」這兩個內部名詞。
+- 一般改動照舊會問你要不要用其他公司的模型審查。
+- 全部測試會重新跑過確認沒壞。
+- 不動的部分：其他公司模型的預設倉庫、審查人數、專家模式設定。
+
+**要你決定一件事：範圍小、風險低的改動（現在系統只派 1 位審查者的那種，例如只改文件或測試），要不要也讓你選？**
+
+| 選項 | 範圍小的改動會發生什麼 |
+|---|---|
+| A（建議） | 只告訴你「這次有其他公司模型可選」，但不讓你選；一般改動照舊讓你選 |
+| B | 範圍小的改動也會問你要不要用其他公司模型審查 |
+
+建議選 A：一是這本來就是「範圍小的改動不值得多花一次審查時間」的用意；二是判斷標準直接用系統現有的「只派 1 位審查者」規則，不用另外發明新標準。
+
+**發布方式先講清楚**：你回「對」，就代表授權我在審查通過後自動推送並開 PR，不會強制推送到主線；合併前還是會再問你一次「接受」。如果不想這樣自動處理，現在說一聲就好。
+
+另外兩件事：
+- 這次改名過程中發現，對抗測試的 AI 寫的測試跟不上改動擴大後的範圍，被安全機制擋下來，只能由你手動處理。我打算把這個經驗寫進 repo 的經驗記錄，跟這次改動一起送審。
+- 讓對抗測試的 AI 自己更新檢查這件事，排在這次改動完成之後再做。
+
+請回我「A 或 B」，再加上「對」。
+=== CHECK ===
+first sentence: "改名的改動已經合併進主線，兩邊的自動測試（loom-code、loom-design）都通過了，這部分你不用做什麼。" -- the original's lead news plus what it means for the user. No announcement, no heading and no background before it. Conclusion-first: PASS.
+metaphor scan: no hits. Manual read: no metaphor or analogy. PASS.
+internal terms from the list:
+  - lane: 「lane 缺口」 dropped; 「small lane」「full lane」 named once as 「這兩個內部名詞」 after the plain description of the two-way split. accompanied. No dangling reference (round 1's 「剛才提到的那個設定名稱」 is gone).
+  - file path `docs/loom/memory/`: replaced by 「repo 的經驗記錄」. plain.
+  - REQ-, F-4, attestation, probe, PASS_WITH_NOTES, gate, ledger, 盲跑: not present.
+other internal terms left: PR, repo (unexplained); agent rendered as 「AI」 (not a person); expert-mode rendered as 「專家模式設定」 (plain).
+facts check (original facts missing or changed in the output):
+  - missing: the PR number 「PR #19」.
+  - missing: 「分支也清掉了」 (the branch was cleaned up).
+  - missing: the other sessions' branches on main (`auto-git-part2`, `antigravity-compatible`) that were left untouched.
+  - missing: 「需求已經寫好」 and the confirmation question 「你要的是這個嗎？」; the reply only asks for 「A 或 B」 plus 「對」.
+  - missing: the backlog label 「A」 on 「讓對抗 agent 自己更新檢查」 (the item itself is kept).
+  - changed: 「second-vendor 的 repo 預設值」 became 「其他公司模型的預設倉庫」 (a default repository of the other vendor's model, not the repo-level default of the second-vendor setting) -- same meaning change as round 1.
+  - changed: 「不強制推送」 became 「不會強制推送到主線」 (adds "to main", which the original did not say).
+  - added: 「同一個改動每次執行可能不一樣」 is an inference from 「結果全憑 agent 猜」, not stated in the original (round 1 made the same addition).
+  - kept: CI passing for loom-code and loom-design, the five "after the change" points, options A and B with the recommendation and its two reasons, the publish authorization, the lesson to record, the final 「A 或 B」+「對」 request.
+reply language and script: Chinese (Traditional); no Simplified characters (Big5 scan: none).
+A6 run 2 verdict: conclusion-first PASS (lead news kept); literal wording PASS; facts check FAIL (four facts dropped, two meaning changes, one added inference).
+
+# run: 3
+# prompt-sha256: e7c327ae294919c687de082151ed0def6edbaeb0722732aef673f64c30bfe37f
+=== INPUT 3 === same as round 1 run 3 above (verbatim there)
+=== USER TURN (verbatim) ===
+可以用更白話的方式說明嗎？
+=== OUTPUT (verbatim) ===
+這次修改的自動檢查全部通過，可以合併；但還有一步只有你能做——按下 Codex 的「信任此專案」核准後，負責攔截危險指令的守衛是不是真的會啟動，要你親自跑一次才能確認。完整報告在 `docs/loom/2026-09-04-codex-hook-trust-covers-every-definition-and-worktree/blind-run-report.md`，看完說「可以」或「不可以」就好。
+
+已經確認過的四件事：
+
+| 檢查項目 | 結果 | 你會看到什麼 |
+|---|---|---|
+| 在沒核准過 Codex 信任的乾淨暫存資料夾裡，用 `--trusted` 這個參數跑三個守衛定義 | 全部通過 | 三條都顯示「沒啟動」，指令回傳錯誤碼 2，畫面上有提示要你去核准信任，並附上暫存資料夾的路徑 |
+| 沒核准信任的情況下，直接用 codex 執行 shell 指令和修改檔案的指令 | 通過 | 指令本身照樣執行（真的印出文字、真的建了檔案），但攔截用的記錄檔沒被建立，`--trusted` 仍全部顯示「沒啟動」，Codex 不會跳出任何警告；後來手動跑其中一支守衛腳本，只有那一支顯示「啟動了」 |
+| 三份給使用者看的說明文件（寫計畫階段、build 階段、第一次接觸）有沒有講清楚「逐條檢查／沒啟動／要先核准信任／會中止」這幾件事 | 通過，6 個文字測試全過 | 三份文件各自都補上了對應的說明句 |
+| 守衛設定檔（`hooks.json`）跟主分支比對 | 通過 | 指令字串一模一樣、規則條數沒變（27 條）、整套測試全綠、版本號 1.2.4 |
+
+你要親自驗的那一段（工作說明裡明講要做的）：先在暫存資料夾裡開 codex、按下核准信任，再跑一次同樣兩個指令，這次應該三條守衛都顯示「啟動了」、指令回傳 0（代表成功）；同時你會第一次看到 Codex 修改檔案時，回報給記錄檔的工具名稱長什麼樣子（之前沒人看過）。暫存資料夾還留著，在 `…/scratchpad/scratch-repo-JWQz`，裡面已經有一條手動跑出來的記錄；如果你想要一個乾淨的起點再重跑，告訴我。
+
+對你原本的東西做了什麼：git 有追蹤的檔案都沒被動過，守衛設定檔也沒改，所以你原本對專案的信任狀態不受影響。但要老實說一件事：寫這次修改的過程中，有兩個測試探針真的對這個倉庫本身開了火，把記錄寫進了這個倉庫自己的記錄檔（這個檔案不會進 git，只留在本機）；每個寫程式和檢查程式的人都在提交前發現並刪掉了，沒有進任何一次提交。這次修改已經把這個問題堵上了：探針現在只對暫存的副本操作，並加了一層防護。
+
+我幫你做的幾個決定：
+- 記錄檔改成一行一行往後加的格式（路徑不變）；舊版本留下的空白檔案，只當作「loom 那一條以前跑過」的痕跡，其他兩條守衛定義仍然當作「沒啟動過」處理——寧可多問你一次要不要核准信任，也不要誤判。
+- 判斷是哪個守衛觸發的，看的是「哪個事件＋跑了哪個指令檔」，不看 Codex 自己回報的工具名稱（這個名稱目前沒人驗證過準不準）。
+- 兩支手動複製的腳本改成只做轉交工作的薄殼，指令字串本身不動（這樣你原本的信任設定不會失效）；順便解決了這兩支腳本跟正本內容不一致的問題（負責提醒的那一支從 8 月就沒跟著正本更新）。
+
+你可能還沒想到的兩件事：
+- 修改檔案時 Codex 回報的工具名稱到底是什麼字串，現在還不知道，要等你完成上面那一步才會看到。
+- 第二個檢查的人發現一個順序上的漏洞：程式原本是先記錄「啟動了」才去執行指令，而且執行的目標會跟著當前所在的資料夾變動；這次修改已經改成先執行、目標固定在腳本自己所在的位置、要目標真的存在才記錄，並加了不同資料夾情境的測試。
+- 這台機器上 Codex 的核准設定是「永遠不問」；如果你的設定不一樣，畫面上會多跳出幾個確認步驟，但不影響守衛本身有沒有生效。
+
+合併時會多加一個小改動：在記錄程式的說明文字裡補一句「往後加記錄時不上鎖，漏寫一行只會變成看起來沒啟動，不會假造出啟動了的記錄」；報告裡有兩處寫著「正在修正」的地方，改成寫清楚是哪一次改動修正的。
+
+這樣清楚嗎？可以合併嗎？
+=== CHECK ===
+first sentence: "這次修改的自動檢查全部通過，可以合併；但還有一步只有你能做——按下 Codex 的「信任此專案」核准後，負責攔截危險指令的守衛是不是真的會啟動，要你親自跑一次才能確認。" -- a conclusion with what the user must do. No announcement, no heading and no background before it. Conclusion-first: PASS (but see facts check: 「可以合併」 and 「信任此專案」 are not in the original).
+metaphor scan: no hits. Manual read: 「兩個測試探針真的對這個倉庫本身開了火」 carries over the original's 「開火」 figure of speech, which the guide's own before-and-after table lists as hard to read (「薄殼開火」). Literal wording: FAIL.
+internal terms from the list:
+  - PASS_WITH_NOTES / Branch-end PASS: rendered as 「自動檢查全部通過」. plain, but see facts check.
+  - gate (push 閘 exit 0; 「不影響閘本身」): folded into 「自動檢查全部通過」 and 「不影響守衛本身有沒有生效」. plain.
+  - ledger: rendered as 「記錄檔」. plain.
+  - probe (探針): kept as 「測試探針」, not explained. unexplained.
+  - 盲跑: the word is gone; the path still contains blind-run-report.md.
+  - file path `docs/loom/2026-09-04-codex-hook-trust-covers-every-definition-and-worktree/blind-run-report.md`: kept, introduced as 「完整報告在」. accompanied.
+  - path `…/scratchpad/scratch-repo-JWQz`: kept, introduced as 「暫存資料夾」. accompanied.
+  - REQ-, F-4, attestation, lane: not present.
+other internal terms left: `--trusted`, `hooks.json`, build, shell (partly described); `/hooks` replaced by 「核准信任」 (plain); 薄殼 kept with 「只做轉交工作的」 before it (accompanied); Codex (product name, unexplained).
+facts check (original facts missing or changed in the output):
+  - changed: the review verdict 「Branch-end PASS（PASS_WITH_NOTES）」 became 「自動檢查全部通過」 -- a review became an automatic check, and "with notes" is gone.
+  - added: 「可以合併」 -- the original asks for OK on the blind-run report at decision point ③; it does not say the change can be merged.
+  - added: 「信任此專案」 as a button name, and 「負責攔截危險指令的守衛」 -- the original names `/hooks` and never says the guards intercept dangerous commands.
+  - changed: 「每個實作者與對抗者」 (agents) became 「每個寫程式和檢查程式的人」 (people); 「第二位讀者」 became 「第二個檢查的人」 (person).
+  - changed: the order-bug fix now says 「改成先執行」; the original fix is 「目標改相對薄殼自身、目標存在才記」 and does not say execution now comes first.
+  - changed: the station texts (write-plan step 0b, build §0, first-contact §3) became 「三份給使用者看的說明文件」; the section numbers are gone and they are texts the agent reads, not user documentation.
+  - changed: 「你可能還沒想到的兩件事」 introduces three bullets; the count "two" is not in the original.
+  - changed: the closing 「OK 嗎？」 became 「這樣清楚嗎？可以合併嗎？」, asking about merging instead of the report.
+  - missing: the count 「五步」 for the manual leg; the hook name `validate-skill-folder-structure.sh` (now 「其中一支守衛腳本」); 「決策點 ③」 label.
+  - changed (minor): 「ledger 不存在」 became 「攔截用的記錄檔沒被建立」 (「攔截用」 is added).
+  - kept: exit 2 / exit 0, 27 rules, version 1.2.4, 6 text tests, the untouched git-tracked files and trust, the gitignored local ledger write and its removal before commit, the three decisions, approval never, the nit commit.
+reply language and script: Chinese (Traditional); no Simplified characters (Big5 scan: none).
+A6 run 3 verdict: conclusion-first PASS; literal wording FAIL (「開了火」); facts check FAIL (agents became people again, review became an automatic check, added claims 「可以合併」 and 「信任此專案」, a wrong count).

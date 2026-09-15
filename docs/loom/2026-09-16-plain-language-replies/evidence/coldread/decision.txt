@@ -103,3 +103,55 @@ first sentence: "修改完成，測試也通過了。" -- the conclusion.
 metaphor scan: no hits.
 reply language: Chinese (Traditional).
 A7 run (b) verdict: PASS.
+
+=== ROUND 2 (guide 8eedffc034e438a38b2867dad8631c96e9626ce2) ===
+# reference-blob: 8eedffc034e438a38b2867dad8631c96e9626ce2  (loom-workflow/skills/loom-visualization/references/plain-language.md, after W2-04)
+# card-blob and skill-blob: unchanged from the header above (f3cf31688399439d34f1e88118c96a7198a2a9c2, ea667cd596aa385bd33ae826215e17c5d728982f)
+# method: identical to round 1 -- same command, flags, model, empty temp dir and prompt template (template files byte-identical to round 1's); only {REF} differs. One fresh invocation per run; no tool errors, no reruns.
+# metaphor scan regex (same as round 1): 就像|好比|想像|比喻|像是一個|like a|imagine|think of it as
+
+# run: a
+# prompt-sha256: bb17da78ec3fdfdc0fb0193dcf70401e18fa9945f78e7cf861f73be57e063e25
+=== PROMPT TEMPLATE === same as round 1 run a above
+=== USER TURN (verbatim) ===
+這個設定檔要放在哪裡比較好？選一個你推薦的做法
+=== OUTPUT (verbatim) ===
+設定檔建議放在作業系統的標準設定目錄:macOS 和 Linux 用 `~/.config/<工具名稱>/config.toml`,Windows 用 `%APPDATA%\<工具名稱>\config.toml`。這是目前多數命令列工具採用的位置,使用者的設定檔會跟其他工具放在同一類目錄,不會散落在家目錄底下。
+
+| 做法 | 使用者得到 | 使用者要接受 | 適合情況 |
+|---|---|---|---|
+| 標準設定目錄（推薦） | 位置跟其他 CLI 工具一致,不跟家目錄雜物混在一起 | 三個作業系統路徑不同,需要用套件處理（Node 可用 `env-paths`，Python 可用 `platformdirs`） | 工具要跨 macOS、Linux、Windows 使用 |
+| 家目錄點檔案（`~/.toolrc`） | 一個檔案,不用建目錄,程式碼最簡單 | 檔案跟其他點檔案混在一起,使用者列出家目錄時比較亂 | 工具只在單一平台使用,程式碼量要最少 |
+| 目前工作目錄的設定檔（`./.toolrc`） | 可以依專案分別設定,覆寫全域值 | 不算「使用者自己的」設定,每個目錄要各自放一份 | 需要專案層級覆寫,通常會跟標準目錄「並用」而非取代 |
+
+「先不決定」這裡不適用：之後如果要換位置,代表要幫使用者搬檔案並處理舊路徑相容,越晚決定搬檔成本越高。
+=== CHECK ===
+number of alternatives: 3 in the table (standard OS config directory; home-directory dotfile `~/.toolrc`; current-directory file `./.toolrc`).
+recommendation marked: yes -- first sentence 「設定檔建議放在作業系統的標準設定目錄」 and 「標準設定目錄（推薦）」 in the table.
+commonly missed alternatives:
+  - do nothing or later: ruled out in one sentence -- 「「先不決定」這裡不適用：之後如果要換位置,代表要幫使用者搬檔案並處理舊路徑相容,越晚決定搬檔成本越高。」 PASS. (A no-config-file option, flags or environment variables only, is not mentioned.)
+  - smaller or simpler version: covered -- the home-directory dotfile, 「一個檔案,不用建目錄,程式碼最簡單」. PASS.
+  - combining two options: mentioned only inside a table cell -- the current-directory row's 「適合情況」 says 「通常會跟標準目錄「並用」而非取代」; not listed as its own option with a consequence, and not ruled out. PARTIAL, counted as not met: FAIL.
+one consequence sentence per option: table columns 「使用者得到」/「使用者要接受」 give each of the 3 options its consequence. PASS.
+first sentence: "設定檔建議放在作業系統的標準設定目錄:macOS 和 Linux 用 `~/.config/<工具名稱>/config.toml`,Windows 用 `%APPDATA%\<工具名稱>\config.toml`。" -- the conclusion (recommendation).
+metaphor scan: no hits.
+script check: no Simplified characters (Big5 scan of all CJK characters: none; the same scan finds 设/会/顾 in round 1's output). Traditional throughout. PASS. Note: punctuation mixes half-width 「,」「:」 with full-width 「，」「：」.
+table: 4 columns, matches the plain-language.md "Decision consequences" table headers.
+content note (outside A7): the table recommends `platformdirs`, which on macOS resolves to ~/Library/Application Support, not the `~/.config` given in the first sentence.
+A7 run (a) verdict: FAIL (combining is mentioned in a cell but neither listed as an option nor ruled out); do-nothing-or-later PASS (fixed from round 1); smaller PASS; recommendation and consequences PASS; script PASS (fixed from round 1).
+
+# run: b
+# prompt-sha256: 04ed658f85a34a5b2e166647800be66b019e5639e10a453b45106f4450799d51
+=== PROMPT TEMPLATE === same as round 1 run b above
+=== QUESTION THE AGENT MUST ASK (verbatim) ===
+確認要把這個分支推上去並開 PR 嗎？
+=== OUTPUT (verbatim) ===
+改好了，測試也都通過了。確認要把這個分支推上去並開 PR 嗎？
+=== CHECK ===
+question asked: "確認要把這個分支推上去並開 PR 嗎？" preceded by the status sentence "改好了，測試也都通過了。"
+asked directly as yes-or-no: yes.
+invented alternatives: none.
+first sentence: "改好了，測試也都通過了。" -- the conclusion.
+metaphor scan: no hits.
+script check: no Simplified characters (Big5 scan: none). Traditional. PASS.
+A7 run (b) verdict: PASS.
