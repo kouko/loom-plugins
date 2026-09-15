@@ -147,8 +147,7 @@ checkpoint again):
 - Functional fixes require a renewed finalization.
 - The orchestrator may rebut a finding with evidence; accept it and mark
   the finding `dismissed`, or hold your ground and say why.
-- Round 3 is terminal and occurs only after the orchestrator's technical
-  design re-look. If blockers remain, return `NEEDS_REVISION`; the orchestrator
+- Round 3 is terminal. If blockers remain, return `NEEDS_REVISION`; the orchestrator
   records `NON_CONVERGENT` and must not dispatch Round 4, swap identities to
   reset the episode, or ask the user whether to continue.
 

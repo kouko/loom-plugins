@@ -90,7 +90,10 @@ mechanical checks, in this order:
    artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
    adversarial programs.
 3. Run the repository's complete package suite, then each committed
-   adversarial program.
+   adversarial program. The suite command is the `package-tests:` value in
+   `docs/loom/KICKOFF-DEFAULTS.md`, or, when absent, the command detected from
+   build markers; when it is `none`, `selection show` must list `package-tests`
+   as skipped.
 
 When a check fails, the fix is made inside Build as §2 assigns implementation
 work; the adversary never fixes what it breaks. Every fatal or important
@@ -98,19 +101,16 @@ finding the adversary returns is fixed inside Build like a failing check before
 hand-off, and any finding left unresolved is listed in the §4 hand-off. Build does not hand off to
 Review until the complete package suite has passed or `selection show` lists
 `package-tests` as skipped, and until every adversarial program has passed or
-it lists `adversarial` as skipped, each skip waiving only its own check. A
-hand-off with neither step skipped therefore means the complete package suite
-and every adversarial program pass.
+it lists `adversarial` as skipped, each skip waiving only its own check.
 `finalize-review` still executes both once more on committed content.
 
 When `selection show` lists `adversarial` as skipped, dispatch no adversary and
 run no adversarial program. When it lists `package-tests` as skipped, run no
 complete package suite.
 
-When closing review or a failed `finalize-review` returns the change to Build,
-repeat these end-of-Build checks after the fix: run the complete package suite
-and re-run the existing adversarial programs. Do not dispatch the adversary
-again.
+Repeat these end-of-Build checks after every fix: run the complete package
+suite and re-run the existing adversarial programs. Do not dispatch the
+adversary again.
 
 ## 4. Hand off to Review
 

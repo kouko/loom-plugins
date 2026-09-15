@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.6.1] — 2026-09-15 — checks after every fix and fix-verification rounds
+
+- Build now repeats its end-of-Build checks, the complete package suite and
+  the existing adversarial programs, after every fix, not only when a change
+  is returned, and names the `package-tests:` declaration as the suite
+  command.
+- After a failed `finalize-review`, the next review round is fix
+  verification. The technical design re-look now comes from the stuck rule,
+  which includes Round 2 ending with blockers, not from Round 3 itself.
+
 ## [3.6.0] — 2026-09-15 — sync with main before closing review
 
 - Add `loom_checker.py sync-trunk` (rule `review.sync`): it fetches the remote
