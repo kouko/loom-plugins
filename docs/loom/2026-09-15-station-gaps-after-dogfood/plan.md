@@ -26,7 +26,12 @@ Wave 1 — station text and its behavioural check
 - Test: A2 positive: round2-blockers-still-require-relook-before-round3; negative: finalize-failure-round-requires-no-relook.
 - Risk: edits gate review.bounded-episode text; move the re-look into the stuck rule, keep lowercase pinned phrases; agent-decided.
 
-**W1-03 Dogfood re-run and word budget evidence**  after: W1-02  acceptance: 4, 5
+**W1-04 Remove the remaining Round-3 re-look coupling**  after: W1-02  acceptance: 2
+- Files: loom-code/agents/reviewer.md, loom-code/skills/closing-review/SKILL.md, loom-code/scripts/test_review_convergence_contract.py
+- Test: A2 positive: finalize-failure-round-states-no-relook-unless-stuck; negative: reviewer-contract-ties-no-relook-to-round3.
+- Risk: dogfood re-run S7-a still re-looked, citing reviewer.md:150-151 and the §5 "fix verification" name clashing with Round 3; delete-first; agent-decided.
+
+**W1-03 Dogfood re-run and word budget evidence**  after: W1-04  acceptance: 4, 5
 - Files: docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/dogfood-rerun.md
 - Test: A4 positive: s2-s3-s7a-conform-in-blind-audit; negative: executor-listing-rerun-as-guess-fails. A5 positive: combined-words-not-above-2952; negative: added-sentence-over-budget-fails.
 - Risk: fresh executors read the worktree text; two blind auditor runs absorb judge variance; baseline 848+2104 words at 9906c79; agent-decided.
