@@ -53,7 +53,7 @@ def _codex_payload(proc):
     data = json.loads(lines[0])
     assert list(data) == ["hookSpecificOutput"], data.keys()
     assert set(data["hookSpecificOutput"]) == {"hookEventName", "additionalContext"}
-    assert data["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert data["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
     return data["hookSpecificOutput"]["additionalContext"]
 
 
@@ -129,7 +129,9 @@ def test_visualization_card_claude_default_matches_base_bytes(tmp_path, active, 
     old = _run([], env, stdin=stdin, hook=base)
     new = _run([], env, stdin=stdin)
     assert old.returncode == new.returncode == 0
-    assert new.stdout == old.stdout
+    # Only the event name moved (SessionStart -> UserPromptSubmit).
+    assert new.stdout == old.stdout.replace(b'"SessionStart"', b'"UserPromptSubmit"')
+    assert b'"SessionStart"' not in new.stdout
 
 
 def test_visualization_card_codex_hooks_json_command_uses_plugin_root(tmp_path):

@@ -105,7 +105,7 @@ def _run(home, project=None, stdin=None, cwd=None, config_dir=None, extra_env=No
     if extra_env:
         env.update(extra_env)
     if stdin is None:
-        stdin = json.dumps({"hook_event_name": "SessionStart", "session_id": "s1",
+        stdin = json.dumps({"hook_event_name": "UserPromptSubmit", "session_id": "s1",
                             "cwd": str(cwd or project or home)})
     proc = subprocess.run([sys.executable, "-I", str(HOOK)], input=stdin, capture_output=True,
                           text=True, env=env, cwd=str(cwd or home), timeout=30)
@@ -116,7 +116,7 @@ def _run(home, project=None, stdin=None, cwd=None, config_dir=None, extra_env=No
 def _context(proc):
     data = json.loads(proc.stdout)
     ctx = data["hookSpecificOutput"]["additionalContext"]
-    assert data["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert data["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
     assert data["additional_context"] == ctx
     assert data["additionalContext"] == ctx
     return ctx
@@ -132,15 +132,17 @@ def _is_coexist(ctx):
 
 # ---------- registration ----------
 
-def test_hooks_json_registers_session_start_and_keeps_post_tool_use():
+def test_hooks_json_registers_user_prompt_submit_and_keeps_post_tool_use():
+    """A1 positive/negative: the card fires on every prompt, no longer on SessionStart."""
     hooks = json.loads(HOOKS_JSON.read_text(encoding="utf-8"))["hooks"]
     assert hooks["PostToolUse"] == [{
         "matcher": "Write|Edit",
         "hooks": [{"type": "command",
                    "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-skill-folder-structure.sh"}],
     }]
-    (entry,) = hooks["SessionStart"]
-    assert entry["matcher"] == "startup|clear|compact"
+    assert "SessionStart" not in hooks
+    (entry,) = hooks["UserPromptSubmit"]
+    assert "matcher" not in entry
     (h,) = entry["hooks"]
     assert h["type"] == "command"
     assert h["command"] == '"${CLAUDE_PLUGIN_ROOT}/hooks/visualization-card"'
@@ -158,7 +160,9 @@ def test_enabled_toolkit_prints_coexist_card(env_dirs):
     home, config, project = env_dirs
     _install(config, [{"scope": "user", "installPath": "/x", "version": "0.6.0"}])
     _write(config / "settings.json", {"enabledPlugins": {KEY: True}})
-    assert _is_coexist(_context(_run(home, project)))
+    ctx = _context(_run(home, project))
+    assert _is_coexist(ctx)
+    assert not _is_full(ctx)  # A2 negative: only one diagram trigger reaches the agent
 
 
 def test_project_scope_detected_from_subdirectory_session(env_dirs):
@@ -239,7 +243,40 @@ def test_empty_or_malformed_stdin_still_emits_json(env_dirs, stdin):
     assert _is_full(_context(_run(home, project, stdin=stdin)))
 
 
+def test_unreadable_card_exits_zero_with_empty_context(env_dirs, tmp_path):
+    """A5 boundary: a hook away from its assets still exits 0, empty context."""
+    home, _config, project = env_dirs
+    lonely = tmp_path / "plugin" / "hooks" / "visualization-card"
+    lonely.parent.mkdir(parents=True)
+    lonely.write_bytes(HOOK.read_bytes())
+    env = {k: v for k, v in os.environ.items()
+           if k not in ("CLAUDE_CONFIG_DIR", "CLAUDE_PROJECT_DIR", "CLAUDE_PLUGIN_ROOT")}
+    env.update(HOME=str(home), CLAUDE_PROJECT_DIR=str(project))
+    proc = subprocess.run([sys.executable, "-I", str(lonely)], input="{not json",
+                          capture_output=True, text=True, env=env, cwd=str(home), timeout=30)
+    assert proc.returncode == 0, proc.stderr
+    assert _context(proc) == ""
+
+
 # ---------- card content ----------
+
+# Key phrase per plain-language rule (spec design decision "agreed card content").
+PLAIN_RULES = {
+    "user's language": r"in their language",
+    "1 conclusion first": r"conclusion and what it means for the user",
+    "2 plain words, term in brackets": r"plain words[^.]*in brackets",
+    "3 literal, no metaphors": r"literal[^.]*no metaphors",
+    "4 tables or diagrams": r"tables or diagrams",
+    "plainer explanation reference": r"plainer explanation[^.]*references/plain-language\.md",
+}
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+@pytest.mark.parametrize("rule", sorted(PLAIN_RULES))
+def test_cards_carry_plain_language_rules(card, rule):
+    """A1 positive: each card carries the four plain-language rules."""
+    body = " ".join(_sentences(card.read_text(encoding="utf-8")))
+    assert re.search(PLAIN_RULES[rule], body, re.I), rule
 
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
 def test_cards_at_most_150_words(card):
