@@ -48,6 +48,14 @@ Step 1 stay as they are.
 | Need | Read |
 |---|---|
 | A plainer explanation, a decision question, or a table for a conversation situation (decision, before and after, progress, checklist, confirmed and unconfirmed, findings, risks, support matrix) | `references/plain-language.md` |
+| A software document: incident postmortem, test plan, traceability or compatibility matrix, migration guide, API parameters, runbook, RACI, ADR or RFC options, feature-flag rollout, release notes, risk register | `references/tables-software.md` |
+| A design document: heuristic evaluation, usability test report, content audit, design critique, design tokens, component states, accessibility audit, journey map, personas or JTBD, design decision log | `references/tables-design.md` |
+| A business document: weighted or Pugh matrix, RICE, ICE, MoSCoW or WSJF, SWOT, competitive analysis, Five Forces, stakeholder analysis, scenario planning, business case, OKR, assumption log, go/no-go, pricing tiers, Kano, roadmap | `references/tables-business.md` |
+
+A conversation-situation reply (decision, progress, before and after,
+checklist, confirmed and unconfirmed, findings, risks, support matrix) reads
+only `references/plain-language.md`; a domain file is read only when the
+user asks for one of its named document types.
 
 ## Step 1 — Classify the information shape
 
