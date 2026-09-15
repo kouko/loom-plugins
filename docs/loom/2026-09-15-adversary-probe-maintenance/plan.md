@@ -23,6 +23,13 @@ charter: 1.0
 - Test: A2 positive: update-requires-per-kind-mutation-on-committed-probe; negative: single-mutation-or-copy-accepted. A4 positive: report-marks-reused-modified-new; negative: new-probe-without-reason. A5 positive: suite-green; negative: prose-pin-negation-accepted.
 - Risk: agent-decided — sequential after W1-01 because both files restate the same hand-off; pins follow the prose-pin rule (affirmative verb, negation rejected, self-tests).
 
+### Wave 2
+
+**W2-01 Close adversary findings on the probe-update exception**  after: W1-02  acceptance: 1, 2, 4, 5
+- Files: loom-code/skills/build/SKILL.md, loom-code/agents/adversary.md, loom-code/skills/closing-review/references/adversarial.md, loom-code/scripts/test_build_mechanical_checks.py
+- Test: A1 positive: sync-trunk-staleness-covered; negative: defect-guard-mutant-survives-pins. A2 positive: restore-original-rejection-mutation-required; negative: loosening-by-modify-accepted. A4 positive: branch-tests-excluded-from-reuse-floor; negative: implementer-pins-count-as-reuse. A5 positive: adversary-abuse-program-green; negative: rerun-sentence-deletion-survives.
+- Risk: agent-decided — defect stays failing and returns a finding; exception extends to sync-trunk staleness; adversary program is read-only for the implementer.
+
 ## Questions asked
 ① — what — 對抗 agent 的兩個問題：範圍擴大後由對抗 agent 自己更新檢查並附正式突變證據；寫之前先查既有檢查與測試、逐項標沿用／修改／新增；本機暫存 repo 實跑驗證；授權自動 push 開 PR、合併前回「接受」；這樣對嗎？
 ① — what — 所以 A+ 實際上的修改有哪些？另外當前業界似乎有一派認為當前最新的模型其實少寫 prompt 指示效果更好，對此你的看法是？（使用者追問）
