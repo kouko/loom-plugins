@@ -65,6 +65,18 @@ charter: 1.0
 - Test: A1 positive: carried-detail-kept-in-user-words; negative: background-context-and-inference-not-carried. A7 positive: re-recorded-cold-reads-and-package-suite-green; negative: added-interpretation-flagged.
 - Risk: the W3-03 recording showed a reader carrying background (cron use) and appending its own inference (non-interactive). agent-decided.
 
+### Wave 4 — closing review round 1 findings (reviewed a99757de)
+
+**W4-01 Product details confirmed at decision point 2 only; quote the user**  after: W3-04  acceptance: 1, 5
+- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-design/skills/write-spec/SKILL.md`, `loom-design/scripts/spec/test_capture_intent_contract.py`, `loom-design/scripts/spec/test_write_spec_contract.py`, `loom-design/CHANGELOG.md`, `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-1.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-2.txt`, `docs/loom/2026-09-15-readable-flow-details/evidence/coldread/run-3.txt`
+- Test: A1 positive: carried-detail-quotes-user-or-agreed-proposal; negative: non-visible-detail-never-new-req. A5 positive: intent-confirmation-table-engineering-only; negative: product-needs-design-no-not-shown-at-intent-confirmation.
+- Risk: the product needs-design no path showed details twice once write-plan's forced spec ran decision point 2; cold reads re-recorded because capture-intent changes. agent-decided.
+
+**W4-02 write-plan mirrors round 1 fixes; checker notes**  after: W4-01  acceptance: 1, 2, 5, 7
+- Files: `loom-code/skills/write-plan/SKILL.md`, `loom-code/scripts/test_write_plan_shape_text.py`, `loom-code/scripts/loom_checker/rule_checks/intake.py`, `loom-code/scripts/test_loom_checker_intake.py`, `loom-code/CHANGELOG.md`
+- Test: A1 positive: write-plan-quotes-user-words; negative: write-plan-no-branch-ui-flows-not-forced-na. A2 positive: graph-and-statediagram-aliases-documented; negative: below-floor-table-row-and-single-letter-nodes-blocked. A5 positive: write-plan-confirmation-table-engineering-only; negative: write-plan-product-details-not-at-intent-confirmation. A7 positive: package-suite-and-probes-green; negative: stale-cold-read-fails.
+- Risk: write-plan crosses the soft word target; the PR body carries the one-line reason. agent-decided.
+
 ## Questions asked
 ① — what — 你在聊天確認當下難讀，還是事後讀文件難讀？ kouko: "兩者都有點難讀"
 ① — what — 想在哪個時間點確認談好的細節有被保留？ kouko: "Ｃ 但是照理說細節應該在 spec 的時候會被記錄下來 所以應該不用額外的機制？"
@@ -76,3 +88,4 @@ charter: 1.0
 1. user-decided — carried details get no new final-acceptance check; product blind runs already walk UI flows, engineering details rely on spec reviewers.
 2. Prose rules cannot be checked against the conversation; the end-of-Build adversary runs a fresh-context cold read over a sample conversation to confirm no invented detail is carried.
 3. Details live only in the conversation between intent confirmation and spec writing; compaction in that window can still drop them. Accepted for this change.
+4. The carried-details paragraphs are deliberately not gate-marked: the intent's constraint allows no new mechanism beyond carrying details into the spec.
