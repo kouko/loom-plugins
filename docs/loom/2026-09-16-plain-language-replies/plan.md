@@ -63,6 +63,11 @@ Current state evidence lives in the spec (`## Current state evidence`); each tas
 - Test: A8 positive: in-cell-visuals-and-time-axis-guidance-present; negative: removed-in-cell-section-fails.
 - Risk: the blind run found the earlier research's in-cell micro-visualisation rules and time-as-column forms missing; only the table-rules section grows, so rewrite trials stay valid. agent-decided.
 
+**W4-03 Card routes decision questions to the guide; three missing table criteria**  after: W4-02  acceptance: 1, 7, 8
+- Files: `loom-workflow/skills/loom-visualization/assets/trigger-card.md`, `loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md`, `loom-workflow/rules/AGENTS.md`, `loom-workflow/scripts/test_visualization_card_hook.py`, `loom-workflow/skills/loom-visualization/references/plain-language.md`, `loom-workflow/skills/loom-visualization/scripts/test_references.py`
+- Test: A1 positive: both-cards-name-decision-questions-for-guide; negative: card-over-150-words-fails. A7 positive: how-question-trial-reads-guide; boundary: yes-no-trial-stays-direct. A8 positive: three-earlier-criteria-present; negative: removed-criterion-fails.
+- Risk: the blind run saw a how-question skip the guide because the card only routed plainer explanations; the wording is compressed within the existing cap. agent-decided.
+
 ## Questions asked
 ① — what — 提醒要在什麼時機送：叫用 skill 後、每次你送出訊息時、或寫進各階段格式說明？
 ① — what — 「怎麼跟使用者說話」只在 loom 流程裡生效，還是 loom 所有工具都要生效？
