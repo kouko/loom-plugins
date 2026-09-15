@@ -156,6 +156,11 @@ insufficient; reopen means move it to Open questions, stop confirmation, and
 the intent must remain `open`.
 <!-- /gate -->
 
+Any intent section may use a Markdown table or diagram; Acceptance stays a
+numbered list, diagrams stay at intent altitude (no UI reactions or state
+transitions), a product Problem holds no identifiers (Mermaid node ids
+included), and chat shows text tables or text diagrams, not Mermaid.
+
 ## Step 2 — Standing documents
 
 ```
@@ -223,6 +228,10 @@ twice.
 
 4. **The principles interview**, if step 2 demanded it.
 
+5. **The carried details, `kind: engineering` only** — as a table, one row
+   per detail in the user's language, confirmed by the same yes; no extra
+   stop. With an empty list, no table appears.
+
 **Every question in this message must be one of three types, or the
 consequence form for one-way doors**, and you check the list before
 sending:
@@ -248,6 +257,10 @@ as `{decision_point, text, type}` with `type` one of `what` / `behaviour` /
 section at step 5. The §11 measurement of how often
 loom interrupts the user reads exactly this list; a question asked and not
 recorded makes the flow look quieter than it is.
+
+**Keep a carried-details list** too: only details the user stated or
+explicitly agreed to — never an agent proposal or detail you inferred. It
+never enters the intent file.
 
 **On "yes":**
 
@@ -295,6 +308,10 @@ flows N/A — carrying the template's five sections and leaving the
 product-only. Declare `pre-build-review: required|not-required — <reason>`
 using the risk classes below; only a required spec gets a pre-build review.
 
+A non-empty carried-details list — from `capture-intent`'s hand-off or your
+own intake — forces that spec even when every Risk line fits; record each
+item as the bullets below say. An empty list forces no spec.
+
 **`yes`, and `docs/loom/<change-id>/spec.md` already exists** — go to the
 intake check below.
 
@@ -312,6 +329,13 @@ spec yourself, from `contract/templates/spec-minimal.md`:
 - Fill UI flows (action and response, or `N/A`), Design decision,
   Alternatives considered, and path-anchored Forward/Reverse/Error/Data/Boundary
   evidence. Do not show those internal sections to the user.
+- UI flows form: a short flow is `<action> → <reaction>` lines; several
+  parallel cases on one surface, a table `case | what the user does | what
+  they see`; states or paths that branch or go back and forth, a Mermaid
+  `stateDiagram-v2` or `flowchart`.
+- Record each carried detail as a UI flows line when visible, else on its
+  Requirement or Design decision line; an agent proposal the user did not
+  agree to is not recorded.
 
 Print one line for the user: installing `loom-design` gets them a fuller
 spec than this one. For `pre-build-review: required`, hand the spec to the
@@ -319,6 +343,11 @@ spec than this one. For `pre-build-review: required`, hand the spec to the
 blind run; it must pass before planning. For `not-required`, proceed without
 a formal spec review. A missing declaration on a legacy spec is the safe
 `required` default and uses its existing passing review record.
+
+Running ② on a product spec you wrote: when a flow has parallel cases or
+branches, lead with a table or a text (ASCII) diagram, then the per-case
+sentences; never put Mermaid in this message — a terminal shows it as raw
+code.
 
 <!-- gate: write-plan.product-spec-needs-confirmed-behavior -->
 **A product spec needs `confirmed-behavior:` before it becomes a plan.**
