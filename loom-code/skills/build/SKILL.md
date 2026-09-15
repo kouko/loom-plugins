@@ -88,7 +88,8 @@ mechanical checks, in this order:
    agent that implemented any part of the change. Give it only the change id,
    `HEAD`, and paths: the intent, the plan, and the changed paths with their
    artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
-   adversarial programs.
+   adversarial programs. It works from the recipes in
+   [`adversarial.md`](../closing-review/references/adversarial.md).
 3. Run the repository's complete package suite, then each committed
    adversarial program. The suite command is the `package-tests:` value in
    `docs/loom/KICKOFF-DEFAULTS.md`, or, when absent, the command detected from

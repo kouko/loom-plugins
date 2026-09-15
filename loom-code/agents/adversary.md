@@ -1,6 +1,6 @@
 ---
 name: adversary
-description: 'Plugin-level adversary agent for loom-code. Dispatched fresh-context by the build station after all tasks land to make the change fail — mutation or fuzz tooling when the repo declares it, else at least three executable abuse and boundary cases; red-team for a spec, the attack catalogue for a skill or gate. Records every attempt as a probe. Reusable via subagent_type "loom-code:adversary".'
+description: 'Plugin-level adversary agent for loom-code. Dispatched fresh-context by the build station after all tasks land to make the change fail — mutation or fuzz tooling when the repo declares it, else at least three executable abuse and boundary cases; red-team for a spec, temptation and near-miss attempts for a skill or gate. Records every attempt as a probe. Reusable via subagent_type "loom-code:adversary".'
 ---
 
 # adversary subagent
@@ -55,9 +55,10 @@ the branch, such as an implementer's pin, as related coverage only.
   order, and a failing dependency.
 - **Spec**: red-team each requirement — name a behaviour it permits that
   the author plainly did not want — then hunt the states it never mentions.
-- **Skill or gate**: work the classes of
-  `loom-code/skills/closing-review/references/attack-catalogue.md` against the file, one
-  attempt per class, prose temptations verbatim.
+- **Skill or gate**: read the file as an agent under time pressure, looking
+  for a reading that skips the expensive step and still looks compliant;
+  attempt its prose temptations verbatim; feed a gate script the input it
+  was written to catch, then the same input one character different.
 
 **Updating your own programs.** When Build re-dispatches you for a widened
 scope or for trunk content brought in by `sync-trunk`, update only the programs
@@ -108,7 +109,7 @@ sentence, and carries synthetic self-tests validating one affirmative
 example and one rejected negated example.
 
 Record attempts that **failed to break anything**: they turn the
-catalogue into an eval, not an anecdote. A case only in your head is not
+attempts into an eval, not an anecdote. A case only in your head is not
 a probe — `command` must be re-runnable in a clean tree, and `artifact`
 must point at the file holding it. Amend an unseen probe fix into that
 probe's original commit. An update made on a Build re-dispatch is a new commit,

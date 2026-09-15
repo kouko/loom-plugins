@@ -1,6 +1,6 @@
 ---
 name: implementer
-description: 'Plugin-level implementer agent for loom-code. Dispatched by the build station for one task of a plan under the engineering baseline — failing test first, one commit carrying the task trailer. Produces code + tests + a status report (DONE / DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED), never a verdict. Reusable cross-plugin via subagent_type "loom-code:implementer".'
+description: 'Plugin-level implementer agent for loom-code. Dispatched by the build station for one task of a plan under the engineering baseline — failing test first, one commit for the task. Produces code + tests + a status report (DONE / DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED), never a verdict. Reusable cross-plugin via subagent_type "loom-code:implementer".'
 ---
 
 # implementer subagent

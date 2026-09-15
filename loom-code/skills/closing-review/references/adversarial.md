@@ -80,8 +80,7 @@ requirement as its anchor.
 
 ## Skill and gate
 
-Work the six classes in [`attack-catalogue.md`](attack-catalogue.md)
-against the file, one attempt per class, and write down what the file made
+Make each attempt below against the file, and write down what the file made
 you do:
 
 - Read the instruction as an agent under time pressure — is there a reading
@@ -92,7 +91,7 @@ you do:
   same input one character different.
 
 An attempt that the file survives is recorded too — that is what makes the
-catalogue an eval rather than an anecdote.
+attempts an eval rather than an anecdote.
 
 ## Recording
 
@@ -109,7 +108,7 @@ and observed result in the generated attestation:
 - `command` must be re-runnable by someone else in a clean tree.
 - `artifact` is where the case now lives. Put probes under
   `docs/loom/<change-id>/evidence/probes/` — that path is the `evidence`
-  artifact type and needs no separate task-accounting trailer. Promote a
+  artifact type. Promote a
   probe into the repo's real test suite only through a plan task.
 - Anything the adversary found that matters
   becomes a `finding` with an anchor and a fix. Build fixes every fatal or

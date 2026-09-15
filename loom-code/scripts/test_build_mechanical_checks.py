@@ -814,6 +814,44 @@ def test_no_added_sentence_overrides_pinned_rules(doc: str) -> None:
     assert _every_failure_stale_sentences(text) == []
 
 
+# --- Dead pointers: the attack catalogue and the task trailer are retired ---
+
+IMPLEMENTER = ROOT / "loom-code/agents/implementer.md"
+ADVERSARIAL_REF_PATH = ROOT / "loom-code/skills/closing-review/references/adversarial.md"
+_DEAD_POINTER = re.compile(r"attack[- ]catalogue|\bcatalogue\b|\btrailer\b", re.IGNORECASE)
+BUILD_ADVERSARIAL_LINK = "[`adversarial.md`](../closing-review/references/adversarial.md)"
+BUILD_LINK_VERB = "works from the recipes in"
+
+
+def _dead_pointer_hits(text: str) -> list[str]:
+    return _DEAD_POINTER.findall(text)
+
+
+def test_dead_pointer_helpers_catalogue_link_reintroduced_fails() -> None:
+    assert _dead_pointer_hits("Work the classes against the file, one attempt per class.") == []
+    assert _dead_pointer_hits("Work the six classes in [`attack-catalogue.md`](attack-catalogue.md).")
+    assert _dead_pointer_hits("they turn the catalogue into an eval")
+    assert _dead_pointer_hits("failing test first, one commit carrying the task trailer.")
+    assert _dead_pointer_hits("needs no separate task-accounting trailer.")
+    affirmative = f"It {BUILD_LINK_VERB} {BUILD_ADVERSARIAL_LINK}."
+    negated = f"It never {BUILD_LINK_VERB} {BUILD_ADVERSARIAL_LINK}."
+    assert _affirms(affirmative, BUILD_LINK_VERB, BUILD_ADVERSARIAL_LINK)
+    assert has_negation(negated)
+    assert not _affirms(negated, BUILD_LINK_VERB, BUILD_ADVERSARIAL_LINK)
+
+
+@pytest.mark.parametrize("path", [ADVERSARY, ADVERSARIAL_REF_PATH, IMPLEMENTER], ids=lambda p: p.name)
+def test_contract_no_attack_catalogue_or_task_trailer_reference(path: Path) -> None:
+    assert _dead_pointer_hits(path.read_text(encoding="utf-8")) == [], path
+
+
+def test_build_verify_step_links_adversarial_recipes_in_place() -> None:
+    step = VERIFY.split("2. Dispatch the `loom-code:adversary` agent", 1)[1].split("3. Run the", 1)[0]
+    assert _affirms(step, BUILD_LINK_VERB, BUILD_ADVERSARIAL_LINK), step
+    target = (ROOT / "loom-code/skills/build" / "../closing-review/references/adversarial.md").resolve()
+    assert target == ADVERSARIAL_REF_PATH and target.is_file()
+
+
 def test_probes_field_helper_synthetic() -> None:
     good = 'probes: [{artifact: "<path>", status: reused | modified | new, reason: "<one line>"}]'
     assert PROBES_FIELD.search(good)
