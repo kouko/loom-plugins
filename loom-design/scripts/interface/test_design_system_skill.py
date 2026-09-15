@@ -64,17 +64,15 @@ def test_description_within_codex_limit_and_carries_triggers():
         assert trigger in desc
 
 
-def test_station_summary_byte_identical_to_capture_intent():
+def test_tool_carries_no_station_summary():
+    """design-system is a tool, not a station: the whole-flow table stays in
+    the three stations (byte equality among them lives in
+    spec/test_capture_intent_contract.py)."""
     assert CAPTURE_INTENT.is_file(), f"missing sibling file: {CAPTURE_INTENT}"
     text = _text()
-    other = CAPTURE_INTENT.read_text(encoding="utf-8")
-    start = text.index("## Station summary")
-    end = text.index("\n## ", start + len("## Station summary"))
-    ours = text[start:end].strip()
-    ostart = other.index("## Station summary")
-    oend = other.index("\n## ", ostart + len("## Station summary"))
-    theirs = other[ostart:oend].strip()
-    assert ours == theirs
+    assert "## Station summary" in CAPTURE_INTENT.read_text(encoding="utf-8")
+    assert "## Station summary" not in text
+    assert "| station | artifact | who decides |" not in text
 
 
 def test_gate_marker_registered():

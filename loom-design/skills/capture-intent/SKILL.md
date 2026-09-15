@@ -58,24 +58,15 @@ Codex may also need one first-use repository authorisation stop.
 
 ## Step 0 — Check the contract version
 
-The artifacts belong to `loom-code`'s contract; reject versions that do not
-declare them. Plugins cannot cross-read roots, so locate `loom-code` by host:
-
-| Host | Where `loom-code` lives |
-|---|---|
-| Claude Code | the plugin cache — `~/.claude/plugins/cache/<marketplace>/loom-code/<version>/`, one directory per installed version; take the newest |
-| Codex CLI, Antigravity CLI | on any other host: this plugin's root is the directory two levels above this SKILL.md, and if its parent directory is named `loom-design` (a versioned install) the root is that parent instead; the `loom-code` directory sits next to this plugin's root and it may contain one version subdirectory holding the plugin files — use the newest |
-
-Run:
+Locate the `loom-code` directory as `references/locate-loom-code.md` says,
+then run, with that directory in place of `<loom-code>`:
 
 ```
 python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
 ```
 
-Exit 0 continues. Otherwise print the `contract.requires` output, request a
-`loom-code` update, and **stop**. Never guess, work around, or create a
-repo-local checker; if its install cannot be found, ask for its location or
-installation/update.
+Exit 0 continues. On any other result, or when the checkout cannot be found,
+follow that reference's failure rule and **stop**.
 
 ## Step 1 — Interview
 

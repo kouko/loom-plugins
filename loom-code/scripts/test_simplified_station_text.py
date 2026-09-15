@@ -35,16 +35,24 @@ def test_review_uses_one_computed_reviewer_floor_without_prose_allowlist() -> No
     assert "docs only" not in review_prose
 
 
+def _design_skill(name: str) -> str:
+    return (ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
+
+
+# The station summary table lives in the three stations only; the two
+# loom-design tools (product-principles, design-system) carry none.
+TOOL_SKILLS = ("product-principles", "design-system")
+
+
 def test_station_summaries_do_not_duplicate_reviewer_counts() -> None:
-    stations = [
-        CAPTURE,
-        PLAN,
-        *((ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
-          for name in ("write-spec", "product-principles", "design-system")),
-    ]
+    stations = [CAPTURE, PLAN, _design_skill("write-spec")]
     for station in stations:
         flat = " ".join(station.split())
         assert "reviewer count comes from the installed Review policy" in flat
+        assert "one in the small lane, two or more in the full lane" not in flat
+    for tool in TOOL_SKILLS:
+        flat = " ".join(_design_skill(tool).split())
+        assert "## Station summary" not in flat, tool
         assert "one in the small lane, two or more in the full lane" not in flat
 
 
@@ -424,12 +432,9 @@ def _station_summary_rows(station: str) -> tuple[list[str], list[str]]:
 
 
 def test_station_summary_rows_name_builds_mechanical_checks() -> None:
-    stations = [
-        CAPTURE,
-        PLAN,
-        *((ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
-          for name in ("write-spec", "product-principles", "design-system")),
-    ]
+    for tool in TOOL_SKILLS:
+        assert _station_summary_rows(_design_skill(tool)) == ([], []), tool
+    stations = [CAPTURE, PLAN, _design_skill("write-spec")]
     for station in stations:
         build, review = _station_summary_rows(station)
         assert len(build) == 1 and len(review) == 1
