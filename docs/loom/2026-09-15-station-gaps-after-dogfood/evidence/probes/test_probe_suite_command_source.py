@@ -27,7 +27,7 @@ from prose_pin import has_negation, split_sentences  # noqa: E402
 
 BUILD = (REPO_ROOT / "loom-code/skills/build/SKILL.md").read_text(encoding="utf-8")
 VERIFY = " ".join(BUILD.split("## 3. Verify integration", 1)[1].split("## 4.", 1)[0].split())
-STEP_2 = VERIFY.split("2. Run the repository's complete package suite", 1)[1].split("When a check fails", 1)[0]
+STEP_2 = VERIFY.split("3. Run the repository's complete package suite", 1)[1].split("When a check fails", 1)[0]
 
 DEFECT_PROBES = (
     "test_buildsuite_absentdeclaration_namesfallback",
@@ -78,7 +78,7 @@ def test_checkerparse_reasonsuffix_stripped() -> None:
 
 
 def test_buildsuite_absentdeclaration_namesfallback() -> None:
-    """Build step 2 states what the suite command is when the `package-tests:` line is absent."""
+    """Build step 3 states what the suite command is when the `package-tests:` line is absent."""
     found = _affirmative_sentence_with(
         STEP_2, ("absent", "build markers", "detected", "otherwise", "missing")
     )

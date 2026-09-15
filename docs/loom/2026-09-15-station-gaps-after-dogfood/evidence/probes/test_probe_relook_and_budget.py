@@ -1,12 +1,15 @@
 """Hostile-reading and constraint probes for closing-review re-look, word budget, checker code.
 
-Run from the repo root (needs the branch base 9906c79c in the clone):
+Run from the repo root (needs the trunk commit BASE, 040e5010, in the clone):
 
     python3 -m pytest docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/probes/test_probe_relook_and_budget.py -q
 
 Every probe here is an attempt the change is expected to survive; a failure
 is a real regression. A missing base commit fails loudly rather than skipping,
 because a skipped probe would read as a pass in finalize-review.
+
+The word budget and the checker-code diff are measured against the trunk tip
+this branch last merged, so trunk changes are not counted as this change's.
 """
 from __future__ import annotations
 
@@ -19,7 +22,7 @@ sys.path.insert(0, str(REPO_ROOT / "loom-code" / "scripts"))
 
 from prose_pin import has_negation, split_sentences  # noqa: E402
 
-BASE = "9906c79c"
+BASE = "040e5010"
 BUILD = "loom-code/skills/build/SKILL.md"
 REVIEW = "loom-code/skills/closing-review/SKILL.md"
 REVIEW_TEXT = (REPO_ROOT / REVIEW).read_text(encoding="utf-8")

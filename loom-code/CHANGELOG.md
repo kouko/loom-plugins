@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.5.1] — 2026-09-15 — checks after every fix and fix-verification rounds
+## [3.6.1] — 2026-09-15 — checks after every fix and fix-verification rounds
 
 - Build now repeats its end-of-Build checks, the complete package suite and
   the existing adversarial programs, after every fix, not only when a change

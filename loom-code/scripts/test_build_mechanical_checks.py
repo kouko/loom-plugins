@@ -121,7 +121,7 @@ def test_returned_change_only_trigger_absent() -> None:
     )
 
 
-STEP_2 = VERIFY.split("2. Run the repository's complete package suite", 1)[1].split(
+STEP_3 = VERIFY.split("3. Run the repository's complete package suite", 1)[1].split(
     "When a check fails", 1
 )[0]
 
@@ -146,8 +146,8 @@ def _names_suite_command(step: str) -> bool:
 
 
 def test_suite_command_names_package_tests_declaration() -> None:
-    assert _names_suite_command(STEP_2), STEP_2
-    assert STEP_2.count(SUITE_NONE) == 1, STEP_2
+    assert _names_suite_command(STEP_3), STEP_3
+    assert STEP_3.count(SUITE_NONE) == 1, STEP_3
     assert not has_negation(SUITE_NONE)
     assert not _OPTIONAL.search(SUITE_NONE)
 
