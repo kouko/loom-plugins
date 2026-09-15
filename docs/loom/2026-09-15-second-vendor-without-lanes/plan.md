@@ -23,9 +23,14 @@ charter: 1.0
 - Test: A2 positive: no-lane-word-in-loom-code-loom-design-station-text; negative: small-lane-branch-still-described. A4 positive: suite-green; negative: station-text-pin-still-expects-full-lane.
 - Risk: agent-decided — the `ask` question and suggest notice apply to every change; pins asserting "every full-lane change" move to "every change".
 
+**W1-03 Remove the last lane mention from write-spec**  after: W1-02  acceptance: 2
+- Files: loom-design/skills/write-spec/SKILL.md, loom-design/scripts/test_write_spec_contract.py
+- Test: A2 positive: write-spec-text-names-no-lane; negative: branch-end-lane-phrase-remains.
+- Risk: agent-decided — found by W1-02's scan outside its file list; reword to the reviewer requirements only.
+
 ### Wave 2
 
-**W2-01 Record the probe-maintenance gotcha**  after: W1-02  acceptance: 4
+**W2-01 Record the probe-maintenance gotcha**  after: W1-03  acceptance: 4
 - Files: docs/loom/memory/a-probe-outpaced-by-scope-growth-needs-a-maintainer.md, docs/loom/memory/index.md
 - Test: A4 positive: memory-store-integrity-hook-passes; negative: contradicting-entry-left-unreconciled.
 - Risk: agent-decided — the charter's harness-friction home `environment-gotchas.md` no longer exists, so the lesson lands in this store; one fact, no new intent.
