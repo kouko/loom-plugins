@@ -16,12 +16,16 @@ counts as reuse, and the adversary leaves that test as it is. Its report marks
 each probe `reused`, `modified` or `new`, with a one-line reason for every new
 one.
 
-When Build re-dispatches it for a widened scope, the adversary updates only
-its own programs and fixes nothing in the product. Every update carries
-mutation evidence run against the committed probe program itself: at least
-one mutation per kind of change the update touches, plus one that an
-over-broad update would wrongly accept. Each mutation turns the probe RED and
-is reverted, and the report gives its command and observed result. An update
+When Build re-dispatches it for a widened scope or for trunk content brought
+in by `sync-trunk`, the adversary updates only its own programs and fixes
+nothing in the product. When a failing program caught a product defect, the
+adversary keeps that program unchanged and returns a finding, and Build then
+fixes the product. Every update carries mutation evidence run against the
+committed probe program itself: at least one mutation per kind of change the
+update touches, plus one that an over-broad update would wrongly accept. One
+mutation restores the original behaviour the stale program rejected, and the
+updated probe must turn RED on it. Each mutation turns the probe RED and is
+reverted, and the report gives its command and observed result. An update
 never deletes, skips or xfails a case to make it pass.
 
 ## Code
@@ -34,7 +38,10 @@ asserts nothing.
 **If it declares none** (the common case), write **at least three**
 executable abuse or boundary cases against the changed behaviour, run them,
 and record each one. Three is the floor, not the target. Reused and modified
-cases count toward the floor. Draw them from:
+cases count toward the floor. Reuse toward the floor counts only the
+adversary's own programs and tests from outside this change's branch, so any
+other test added or changed on the branch, such as an implementer's pin, is
+named as related coverage. Draw them from:
 
 | Class | The question |
 |---|---|

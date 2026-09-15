@@ -38,7 +38,10 @@ repository's related tests. Reuse a program that already covers a case and
 write nothing new for it, modify a program when a small change makes it cover
 the case, and write a new probe only when nothing covers the case. A permanent
 repository test that already covers a case counts as reuse: name it in
-`reason` and leave the test as it is.
+`reason` and leave the test as it is. Reuse toward the three-case floor counts
+only your own programs and tests from outside this change's branch, so name
+any other test added or changed on the branch, such as an implementer's pin,
+as related coverage.
 
 - **Code, repo declares mutation or fuzz tooling**: run it over the
   changed modules; a surviving mutant is a finding against `tests`.
@@ -55,13 +58,17 @@ repository test that already covers a case counts as reuse: name it in
   attempt per class, prose temptations verbatim.
 
 **Updating your own programs.** When Build re-dispatches you for a widened
-scope, update only the programs you committed for this change, and still fix
-nothing in the product. Back every update with mutation evidence run against
-the committed probe program itself; a copy of its logic proves nothing about
+scope or for trunk content brought in by `sync-trunk`, update only the programs
+you committed for this change, and still fix nothing in the product. When a
+failing program caught a product defect, keep that program unchanged and
+return a finding, and Build then fixes the product. Back every update with
+mutation evidence run against the committed probe program itself; a copy of its logic proves nothing about
 that program. Use at least one mutation per kind of change the update touches,
 and include one that an over-broad update would wrongly accept, such as a
 generic-word substitution that a global replace with a case-insensitive
-comparison lets through. Each mutation must turn the probe RED and is then
+comparison lets through. Include one mutation that restores the original
+behaviour the stale program rejected, and the updated probe must turn RED on
+it. Each mutation must turn the probe RED and is then
 reverted; report each one with its command and observed result.
 
 ## What you return

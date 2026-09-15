@@ -286,12 +286,44 @@ PROBE_MAINTENANCE_PINS = {
         ("You fix nothing you attack, and you never update only your own programs when Build re-dispatches you.",),
     ),
     "update-scope": (
-        "adversary", "When Build re-dispatches you for a widened scope,",
+        "adversary",
+        "When Build re-dispatches you for a widened scope or for trunk content brought in by `sync-trunk`,",
         "update only the programs you committed for this change", ("fix nothing in the product",),
-        "When Build re-dispatches you for a widened scope, update only the programs you committed "
-        "for this change, and still fix nothing in the product.",
-        ("When Build re-dispatches you for a widened scope, do not update only the programs you "
-         "committed for this change, and still fix nothing in the product.",),
+        "When Build re-dispatches you for a widened scope or for trunk content brought in by "
+        "`sync-trunk`, update only the programs you committed for this change, and still fix "
+        "nothing in the product.",
+        ("When Build re-dispatches you for a widened scope or for trunk content brought in by "
+         "`sync-trunk`, do not update only the programs you committed for this change, and still "
+         "fix nothing in the product.",),
+    ),
+    "defect-kept-and-reported": (
+        "adversary", "When a failing program caught a product defect,",
+        "keep that program unchanged and return a finding", ("Build then fixes the product",),
+        "When a failing program caught a product defect, keep that program unchanged and return a "
+        "finding, and Build then fixes the product.",
+        ("When a failing program caught a product defect, do not keep that program unchanged and "
+         "return a finding, and Build then fixes the product.",),
+    ),
+    "mutation-restores-original-rejection": (
+        "adversary", "Include one mutation that restores",
+        "the original behaviour the stale program rejected",
+        ("the updated probe must turn RED on it",),
+        "Include one mutation that restores the original behaviour the stale program rejected, and "
+        "the updated probe must turn RED on it.",
+        ("Include one mutation that restores the original behaviour the stale program rejected, and "
+         "the updated probe need not turn RED on it.",
+         "Include one mutation that restores the original behaviour the stale program rejected."),
+    ),
+    "branch-tests-excluded-from-floor": (
+        "adversary", "Reuse toward the three-case floor counts",
+        "only your own programs and tests from outside this change's branch",
+        ("any other test added or changed on the branch", "as related coverage"),
+        "Reuse toward the three-case floor counts only your own programs and tests from outside "
+        "this change's branch, so name any other test added or changed on the branch, such as an "
+        "implementer's pin, as related coverage.",
+        ("Reuse toward the three-case floor counts not only your own programs and tests from "
+         "outside this change's branch, so name any other test added or changed on the branch, "
+         "such as an implementer's pin, as related coverage.",),
     ),
     "mutation-on-committed-probe": (
         "adversary", "Back every update with mutation evidence",
@@ -371,12 +403,97 @@ PROBE_MAINTENANCE_PINS = {
          "Its report marks each probe `reused`, `modified` or `new`."),
     ),
     "ref-update-own-programs": (
-        "ref", "When Build re-dispatches it for a widened scope,",
+        "ref",
+        "When Build re-dispatches it for a widened scope or for trunk content brought in by `sync-trunk`,",
         "the adversary updates only its own programs", ("fixes nothing in the product",),
-        "When Build re-dispatches it for a widened scope, the adversary updates only its own "
-        "programs and fixes nothing in the product.",
-        ("When Build re-dispatches it for a widened scope, the adversary never updates only its own "
-         "programs and fixes nothing in the product.",),
+        "When Build re-dispatches it for a widened scope or for trunk content brought in by "
+        "`sync-trunk`, the adversary updates only its own programs and fixes nothing in the product.",
+        ("When Build re-dispatches it for a widened scope or for trunk content brought in by "
+         "`sync-trunk`, the adversary never updates only its own programs and fixes nothing in the "
+         "product.",),
+    ),
+    "ref-defect-kept-and-reported": (
+        "ref", "When a failing program caught a product defect,",
+        "the adversary keeps that program unchanged and returns a finding",
+        ("Build then fixes the product",),
+        "When a failing program caught a product defect, the adversary keeps that program unchanged "
+        "and returns a finding, and Build then fixes the product.",
+        ("When a failing program caught a product defect, the adversary never keeps that program "
+         "unchanged and returns a finding, and Build then fixes the product.",),
+    ),
+    "ref-mutation-restores-original-rejection": (
+        "ref", "One mutation restores", "the original behaviour the stale program rejected",
+        ("the updated probe must turn RED on it",),
+        "One mutation restores the original behaviour the stale program rejected, and the updated "
+        "probe must turn RED on it.",
+        ("One mutation restores the original behaviour the stale program rejected, and the updated "
+         "probe need not turn RED on it.",
+         "One mutation restores the original behaviour the stale program rejected."),
+    ),
+    "ref-branch-tests-excluded-from-floor": (
+        "ref", "Reuse toward the floor counts",
+        "only the adversary's own programs and tests from outside this change's branch",
+        ("any other test added or changed on the branch", "is named as related coverage"),
+        "Reuse toward the floor counts only the adversary's own programs and tests from outside "
+        "this change's branch, so any other test added or changed on the branch, such as an "
+        "implementer's pin, is named as related coverage.",
+        ("Reuse toward the floor counts not only the adversary's own programs and tests from outside "
+         "this change's branch, so any other test added or changed on the branch, such as an "
+         "implementer's pin, is named as related coverage.",),
+    ),
+    "ref-reuse-modify-then-new": (
+        "ref", "It reuses a program that covers a case",
+        "writes a new probe only when nothing covers the case",
+        ("modifies one when a small change covers it",),
+        "It reuses a program that covers a case, modifies one when a small change covers it, and "
+        "writes a new probe only when nothing covers the case.",
+        ("It never reuses a program that covers a case, modifies one when a small change covers it, "
+         "and writes a new probe only when nothing covers the case.",
+         "It may write new probes freely, modifies one when a small change covers it, and writes a "
+         "new probe only when nothing covers the case."),
+    ),
+    "build-trigger-excludes-caught-defect": (
+        "build", "fails or needs changing for that reason,",
+        "rather than for a product defect it correctly caught",
+        ("or trunk content brought in by a trunk sync changes it",
+         "Build dispatches the `loom-code:adversary` agent fresh-context again to update its own programs"),
+        "When a fix widens or changes what the change covers, or trunk content brought in by "
+        "a trunk sync changes it, and a committed adversarial program fails or needs changing for "
+        "that reason, rather than for a product defect it correctly caught, Build dispatches the "
+        "`loom-code:adversary` agent fresh-context again to update its own programs.",
+        ("When a fix widens or changes what the change covers, or trunk content brought in by "
+         "a trunk sync changes it, and a committed adversarial program fails or needs changing for "
+         "that reason, not only for a product defect it correctly caught, Build dispatches the "
+         "`loom-code:adversary` agent fresh-context again to update its own programs.",
+         "When a fix widens or changes what the change covers and a committed adversarial program "
+         "fails for any reason, Build dispatches the `loom-code:adversary` agent fresh-context "
+         "again to update its own programs."),
+    ),
+    "build-redispatch-only-for-failing-program": (
+        "build", "Build re-dispatches the adversary",
+        "only for a program that fails, or is unable to run, because the covered scope changed",
+        ("a program that still passes keeps its content",),
+        "Build re-dispatches the adversary only for a program that fails, or is unable to run, "
+        "because the covered scope changed, and a program that still passes keeps its content.",
+        ("Build re-dispatches the adversary not only for a program that fails, or is unable to run, "
+         "because the covered scope changed, and a program that still passes keeps its content.",
+         "Build re-dispatches the adversary for any program, and a program that still passes keeps its content."),
+    ),
+    "build-decides-and-fixes-defect": (
+        "build", "Build decides which case applies",
+        "and fixes a product defect in the product as above",
+        ("from the program's failure and the widened scope",),
+        "Build decides which case applies from the program's failure and the widened scope, and "
+        "fixes a product defect in the product as above.",
+        ("Build decides which case applies from the program's failure and the widened scope, and "
+         "never fixes a product defect in the product as above.",
+         "Give the adversary the failing program's output."),
+    ),
+    "build-reruns-after-update": (
+        "build", "After the update, Build repeats", "these end-of-Build checks", (),
+        "After the update, Build repeats these end-of-Build checks.",
+        ("After the update, Build does not repeat these end-of-Build checks.",
+         "After the update, Build hands off."),
     ),
     "ref-mutation-evidence": (
         "ref", "Every update carries mutation evidence run",
@@ -398,7 +515,7 @@ PROBE_MAINTENANCE_PINS = {
         ("Reused and modified cases do not count toward the floor.",),
     ),
 }
-_PIN_DOCS = {"adversary": ADVERSARY_PROSE, "ref": ADVERSARIAL_REF}
+_PIN_DOCS = {"adversary": ADVERSARY_PROSE, "ref": ADVERSARIAL_REF, "build": VERIFY}
 
 
 @pytest.mark.parametrize("pin", sorted(PROBE_MAINTENANCE_PINS))
