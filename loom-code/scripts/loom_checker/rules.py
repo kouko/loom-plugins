@@ -152,6 +152,16 @@ RULES.append((
 ))
 
 
+RULES.append((
+    "review.sync",
+    "sync-trunk merges the freshly fetched origin trunk into the change branch before "
+    "closing review, never rebasing or forcing: it refuses a trunk checkout, a detached "
+    "HEAD or a dirty worktree untouched; adds no commit when HEAD already contains the "
+    "trunk tip; on conflict aborts, restores HEAD and names every conflicting file; an "
+    "unreachable remote only warns.",
+))
+
+
 def list_rules(out=sys.stdout) -> int:
     for rule_id, description in sorted(RULES):
         out.write(f"{rule_id}\t{description}\n")

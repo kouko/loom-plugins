@@ -167,6 +167,9 @@ mechanisms:
   - id: push.merge
     class: checker-rule
     eval: loom-code/scripts/test_ship_worktree_merge.py::test_hook_blocks_absolute_cd_merge_with_push_merge
+  - id: review.sync
+    class: checker-rule
+    eval: loom-code/scripts/test_sync_trunk.py::test_conflict_names_every_file_and_restores_head
   - id: spec.req-grammar
     class: checker-rule
     eval: loom-code/scripts/test_loom_checker_intake.py::test_a_skipped_req_number_is_blocked
