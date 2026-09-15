@@ -87,7 +87,7 @@ charter: 1.0
 - Test: A3 positive: total-at-most-35665-words; boundary: write-plan-body-below-3750.
 - Risk: agent-decided — same file set and `str.split` method as the baseline; if under 2,000 words, Build tightens restated prose inside already-touched files rather than widening scope.
 
-**W3-02 Compare cold-read behaviour on main and the branch**  after: W3-01  acceptance: 5, 6
+**W3-02 Compare cold-read behaviour on main and the branch**  after: W2-06, W1-06, W1-07  acceptance: 5, 6
 - Files: docs/loom/2026-09-16-loom-rule-text-consolidation/evidence/cold-read-parity.md
 - Test: A5 positive: same-steps-questions-checker-results-per-station; negative: branch-reader-skips-a-step. A6 positive: package-suite-mechanisms-citations-green; negative: prose-gate-count-not-17.
 - Risk: agent-decided — fresh-context readers get the installed-path-free branch and main copies and one real task each for capture-intent, write-spec, write-plan, build, closing-review and ship.
