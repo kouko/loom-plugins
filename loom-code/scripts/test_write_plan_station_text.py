@@ -254,7 +254,7 @@ def test_suggest_uses_one_cell_markdown_table_with_spacing() -> None:
     assert "raw Markdown" in text
 
 
-RUNTIME_DIRS = ("skills", "agents", "contract", "hooks", "commands", "scripts")
+RUNTIME_DIRS = ("skills", "agents", "contract", "hooks", "commands", "scripts", "references")
 RUNTIME_SUFFIXES = {".md", ".py", ".sh", ".yaml", ".yml", ".json", ".toml", ".ini", ""}
 DATED_NAME_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
@@ -295,6 +295,7 @@ def test_runtime_tree_names_no_lane() -> None:
     files = runtime_files()
     assert len(files) > 50, "scan scope collapsed"
     assert REPO / "loom-code" / "hooks" / "session-start" in files
+    assert REPO / "loom-code" / "references" / "dispatch-profile.md" in files
     offenders = {
         str(path.relative_to(REPO)): hits
         for path in files
@@ -303,10 +304,39 @@ def test_runtime_tree_names_no_lane() -> None:
     assert offenders == {}
 
 
-def test_second_vendor_text_names_no_lane() -> None:
+def test_second_vendor_reference_keeps_next_change_only_notice() -> None:
     reference = " ".join(SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8").split())
     assert "next-change-only" in reference
     assert "there is only one reader" not in reference
+
+
+def _policy_accepted_fields() -> set[str]:
+    """The `allowed` set literal inside second_vendor_policy.resolve, read by
+    AST so the pin follows the script rather than a copied list."""
+    import ast
+
+    tree = ast.parse(
+        (REPO / "loom-code" / "scripts" / "second_vendor_policy.py").read_text(encoding="utf-8")
+    )
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Assign)
+            and any(isinstance(t, ast.Name) and t.id == "allowed" for t in node.targets)
+            and isinstance(node.value, ast.Set)
+        ):
+            return {elt.value for elt in node.value.elts}
+    raise AssertionError("allowed set not found in second_vendor_policy.py")
+
+
+def test_suggest_station_names_every_policy_input_key() -> None:
+    section = _section(
+        SKILL.read_text(encoding="utf-8"), "### Resolve `second-vendor: suggest`"
+    )
+    flat = " ".join(section.split())
+    match = re.search(r"with exactly these keys:(.*?)\bto:", flat)
+    assert match, "key list sentence missing"
+    named = set(re.findall(r"`([a-z_]+)`", re.sub(r"\([^)]*\)", "", match.group(1))))
+    assert named == _policy_accepted_fields()
 
 
 def test_reference_has_no_none_mode_or_per_change_none_answer() -> None:

@@ -16,7 +16,7 @@ so no honest wording passed both. No role was authorised to update the probe.
 
 On Claude Code in auto mode, the host's safety classifier also refused to let an
 agent run or commit a probe file another agent had edited ("Security Test
-Removal", "CI Bypass"), so the maintainer had to run and commit it by hand.
+Removal", "CI Bypass" — labels as reported by the refused agents), so the maintainer had to run and commit it by hand.
 A single mutation that turned RED was then taken as proof the edit did not
 weaken the probe; review found a global substitution plus case-insensitive
 comparison that still let a lowercase `review` become `closing-review`

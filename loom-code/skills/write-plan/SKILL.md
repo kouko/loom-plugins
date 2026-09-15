@@ -464,9 +464,12 @@ questions. A pre-plan intake pass cannot substitute for this readiness run.
 
 Run this after the plan's Risk lines exist and both checks pass. Load
 `references/second-vendor-ask-and-docs-lint.md`. Probe only the eligible
-other-vendor CLIs described there, then pass the observed mode, host,
-usable vendors, anchored risk evidence, response state, and whether Closing
-Review has started as JSON on stdin to:
+other-vendor CLIs described there, then pass one JSON object on stdin with
+exactly these keys: `contract_version` (integer 1), `configured_mode`,
+`host_vendor`, `usable_vendors`, `risk_evidence` (anchored risk evidence),
+`response` (`pending` | `decline` | `accept`), `response_vendor` (only with
+`accept`), `review_started` (whether Closing Review has started), and
+`fixed_vendor` (only in fixed mode), to:
 
 ```
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/second_vendor_policy.py
