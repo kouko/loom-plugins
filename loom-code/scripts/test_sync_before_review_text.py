@@ -104,7 +104,12 @@ def test_behind_branch_synced_then_attestation_validates_at_head(tmp_path: Path)
     # The digest a reviewer-then-finalize run binds is computed at the synced
     # HEAD, so it is the one that validates there.
     assert _digest(change, after) != _digest(change, before)
-    assert _digest(change, after) == _digest(change, _git(change, "rev-parse", "HEAD"))
+    # Committing a publication-only path after the sync leaves the bound digest unchanged.
+    publication = {"publication_only_paths": ["report.txt"]}
+    report_head = _commit(change, "report.txt", "report\n")
+    assert functional_content_digest(change, report_head, "change", publication) == (
+        functional_content_digest(change, after, "change", publication)
+    )
     # Both stations sync before any reviewer is dispatched or finalize runs.
     assert COMMAND in VERIFY
     assert VERIFY.index(COMMAND) < VERIFY.index("Run the repository's complete package suite")
@@ -134,6 +139,8 @@ REVIEW_SYNC_SENTENCES = (
     "Round 1 again.",
     "When it prints `WARN review.sync`, state the warning in the round report and continue.",
     "When it prints `BLOCK review.sync`, dispatch no reviewer and return the change to Build.",
+    "Any other result, including exit 2, dispatches no reviewer and reports the printed message.",
+    "Run it before the blind run (§3), so the blind run exercises the synced content.",
 )
 BUILD_SYNC_SENTENCES = (
     f"From the change worktree, run {COMMAND}, so the adversary, the suite and the "
@@ -141,6 +148,7 @@ BUILD_SYNC_SENTENCES = (
     "On `BLOCK review.sync`, fix the cause inside Build, where a conflict is resolved as "
     "implementation work in a new build round, never by the command.",
     "On `WARN review.sync`, continue unsynced.",
+    "Any other result, including exit 2, does not continue and reports the printed message.",
 )
 
 
@@ -155,16 +163,17 @@ def test_merged_sync_returns_to_build_checks_before_dispatch() -> None:
     # Whole governing sentences, byte for byte: an added condition ("or on a
     # small merge"), a dropped round-report duty or an in-place conflict
     # resolution each changes a pinned sentence.
-    assert _pinned_run(DEPTH, COMMAND, 5) == REVIEW_SYNC_SENTENCES
-    run, current, changed, warned, blocked = REVIEW_SYNC_SENTENCES
-    for affirmative in (run, current, warned):
+    assert _pinned_run(DEPTH, COMMAND, 7) == REVIEW_SYNC_SENTENCES
+    run, current, changed, warned, blocked, other, order = REVIEW_SYNC_SENTENCES
+    for affirmative in (run, current, warned, order):
         assert not has_negation(affirmative), affirmative
     assert DEPTH.count("`up to date`") == 1 and DEPTH.count("`content changed`") == 1
     assert DEPTH.count("`WARN review.sync`") == 1 and DEPTH.count("`BLOCK review.sync`") == 1
-    assert DEPTH.index(blocked) < DEPTH.index("loom_checker.py reviewer-count")
+    assert DEPTH.index(other) < DEPTH.index("loom_checker.py reviewer-count")
+    assert DEPTH.index(order) < DEPTH.index("When a blind run is needed")
     # Build syncs first among its mechanical checks: before the adversary is
     # dispatched and before the suite, so merged content is checked there.
-    assert _pinned_run(VERIFY, COMMAND, 3) == BUILD_SYNC_SENTENCES
+    assert _pinned_run(VERIFY, COMMAND, 4) == BUILD_SYNC_SENTENCES
     step = BUILD_SYNC_SENTENCES[0]
     assert not has_negation(step), step
     adversary = VERIFY.index("Dispatch the `loom-code:adversary` agent fresh-context")

@@ -81,7 +81,8 @@ mechanical checks, in this order:
    the suite and the programs all see the fetched trunk tip. On
    `BLOCK review.sync`, fix the cause inside Build, where a conflict is resolved as
    implementation work in a new build round, never by the command. On
-   `WARN review.sync`, continue unsynced.
+   `WARN review.sync`, continue unsynced. Any other result, including exit 2,
+   does not continue and reports the printed message.
 2. Dispatch the `loom-code:adversary` agent fresh-context, resolving its
    profile as §2 requires before every host-native dispatch. Never dispatch an
    agent that implemented any part of the change. Give it only the change id,

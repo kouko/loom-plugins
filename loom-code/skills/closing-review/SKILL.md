@@ -65,7 +65,9 @@ worktree. When it reports `up to date`, continue. When it reports
 complete package suite and the existing adversarial programs, then start
 Round 1 again. When it prints `WARN review.sync`, state the warning in the
 round report and continue. When it prints `BLOCK review.sync`, dispatch no
-reviewer and return the change to Build.
+reviewer and return the change to Build. Any other result, including exit 2,
+dispatches no reviewer and reports the printed message. Run it before the
+blind run (§3), so the blind run exercises the synced content.
 
 Before dispatching reviewers in any round, confirm on the current functional
 content (a committed blind-run report aside) that Build's hand-off reports the
