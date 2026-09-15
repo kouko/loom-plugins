@@ -211,8 +211,9 @@ def table_rows(lines: list[str]) -> list[str]:
 
 def mermaid_transitions(body: str) -> list[str]:
     """`-->` transitions inside a ```mermaid fence whose diagram type is
-    `stateDiagram-v2` or `flowchart`, each side clearing the floor. Any other
-    fence, and any other Mermaid diagram type, carries no flow."""
+    `stateDiagram-v2` or `flowchart` (or the aliases `stateDiagram` and
+    `graph`), each side clearing the floor. Any other fence, and any other
+    Mermaid diagram type, carries no flow."""
     found: list[str] = []
     fence, flow_type = None, None
     for line in HTML_COMMENT.sub(" ", body).splitlines():
@@ -239,7 +240,7 @@ def mermaid_transitions(body: str) -> list[str]:
 def flow_lines(body: str) -> list[str]:
     """What decision point 2 reads back: prose `<operation> -> <reaction>`
     lines, data rows of a parallel-cases table, and transitions of a Mermaid
-    `stateDiagram-v2` or `flowchart`."""
+    `stateDiagram-v2` or `flowchart` (aliases `stateDiagram`, `graph`)."""
     lines = prose_lines(body)
     found = []
     for line in lines:
@@ -283,7 +284,8 @@ def check_ui_flows_recompute(manifest, repo: Path, change_id: str, touched: list
             "they see` table, below its header and `|---|` separator, with "
             "that floor before and in its last cell; or a `-->` transition "
             "with that floor on each side inside a ```mermaid "
-            "`stateDiagram-v2` or `flowchart` fence. An HTML comment or any "
+            "`stateDiagram-v2` or `flowchart` fence (the aliases "
+            "`stateDiagram` and `graph` count too). An HTML comment or any "
             "other fence carries none. That is a shape check only: whether the "
             "flow is true, complete or worth reading is the reviewer's "
             "judgement, not this rule's. Write one per operation or case; that "

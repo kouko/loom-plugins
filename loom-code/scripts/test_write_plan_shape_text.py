@@ -181,13 +181,20 @@ def test_template_placeholder_names_table_and_diagram() -> None:
         assert phrase in body, phrase
 
 
-def test_write_plan_intake_shows_carried_details_table() -> None:
-    """A5 positive: write-plan's own ① shows carried details as a table where it is their only stop."""
-    step3 = _flat(_section(_STEP3))
-    assert "**The carried details, where this is their only stop**" in step3
+def test_write_plan_confirmation_table_engineering_only() -> None:
+    """A5 positive (write-plan-confirmation-table-engineering-only): the table at
+    ① is for engineering; a product change's details are shown at ② of the
+    station writing its spec, and the asked-list names that ②."""
     item = _carried_item()
-    assert _affirmed(item, "for `kind: engineering` and for a product change with `needs-design: no`")
+    assert item.startswith(", `kind: engineering` only.**")
     assert _affirmed(item, "Show them as a table, one row per detail in the user's language")
+    assert _affirmed(
+        item,
+        "A product change shows them at decision point ② of the station writing its spec",
+        "`write-spec`, or this station (step 4)",
+    )
+    asked = _flat(_section("## What you will be asked, in plain words"))
+    assert _affirmed(asked, "At ②, only for a product spec you write", "confirm visible behaviour and carried details")
     assert "confirmed by the same yes; no extra stop" in item
     step1 = _flat(_section(_STEP1))
     assert _affirmed(step1, "Any intent section may use a Markdown table or a Mermaid `flowchart`")
@@ -203,7 +210,16 @@ def test_write_plan_no_details_no_table() -> None:
     item = _carried_item()
     assert "With an empty list, no table appears" in item
     assert step3.count("as a table") == item.count("as a table") >= 1
-    assert _affirmed(item, "A product change with `needs-design: yes` shows them at decision point ② instead")
+
+
+def test_write_plan_product_details_not_at_intent_confirmation() -> None:
+    """A5 negative (write-plan-product-details-not-at-intent-confirmation): no
+    sentence of ① shows a product change's details, so none is asked twice."""
+    item = _carried_item()
+    assert "for a product change with `needs-design: no`" not in item
+    assert "where this is their only stop" not in _flat(_section(_STEP3))
+    here = [s for s in _sentences(item) if "product change" in s and "this message" in s]
+    assert here and all("never" in s for s in here)
 
 
 # --- W3-02: adversary findings (explicit yes, where a product detail lands) ---
@@ -223,12 +239,17 @@ def test_write_plan_unanswered_proposal_dropped() -> None:
     )
 
 
-def test_write_plan_carried_detail_kept_in_user_words() -> None:
-    """A1 positive (carried-detail-kept-in-user-words): only flow or reaction
-    details are carried, each in the user's own words."""
+def test_write_plan_quotes_user_words() -> None:
+    """A1 positive (write-plan-quotes-user-words): only flow or reaction details
+    are carried, each quoting the user or the proposal the user said yes to."""
     step3 = _section(_STEP3)
     assert _affirmed(step3, "Carry only details about what the command or screen does or how it reacts")
-    assert _affirmed(step3, "Write each carried detail in the user's own words")
+    assert _affirmed(
+        step3,
+        "Quote the user's words for each carried detail",
+        "for an agreed proposal, quote the proposal the user said yes to",
+    )
+    assert "in the user's own words" not in _flat(step3).split("**Keep a carried-details list**", 1)[1]
 
 
 def test_write_plan_background_context_and_inference_not_carried() -> None:
@@ -241,8 +262,22 @@ def test_write_plan_background_context_and_inference_not_carried() -> None:
 
 
 def test_product_non_visible_detail_on_requirement_line() -> None:
-    """A3 positive: a non-visible carried detail lands on its Requirement line."""
-    assert _affirmed(_record_bullet(), "as a UI flows line when visible, else on its Requirement line")
+    """A3 positive: a non-visible carried detail is a clause on the Requirement
+    line of the Acceptance line it serves, never a new REQ."""
+    bullet = _flat(_record_bullet())
+    assert _affirmed(bullet, "as a UI flows line when visible, else as a clause on a Requirement line")
+    assert "That clause goes on the Requirement line of the Acceptance line the detail serves, never a new REQ" in bullet
+
+
+def test_write_plan_no_branch_ui_flows_not_forced_na() -> None:
+    """A1 negative (write-plan-no-branch-ui-flows-not-forced-na): the `no`
+    branch spec keeps UI flows open for a visible carried detail, and the record
+    rule is pointed at by name, not "the bullets below"."""
+    step4 = _flat(_section(_STEP4))
+    assert _affirmed(step4, "Current state evidence, UI flows (N/A unless a carried detail is visible)")
+    assert "UI flows N/A —" not in step4
+    assert "as the bullets below say" not in step4
+    assert _affirmed(step4, "record each item per the `Record each carried detail` bullet below")
 
 
 def test_product_detail_not_on_design_decision() -> None:

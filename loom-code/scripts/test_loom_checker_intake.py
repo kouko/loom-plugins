@@ -1465,7 +1465,26 @@ EMPTY_FLOW_FORMS = {
         "```mermaid\nsequenceDiagram\n  kouko->>todo export: runs it with a file\n```",
     "a python fence with a --> inside":
         "```python\nprint('runs export --> sees question')\n```",
+    "a table row whose last cell is under the floor":
+        "| case | what the user does | what they see |\n|---|---|---|\n| empty list | runs todo export | ok |\n",
+    "a flowchart with single-letter node ids only":
+        "```mermaid\nflowchart LR\n  A --> B\n  B --> C\n```",
 }
+
+
+def test_mermaid_flow_type_aliases_documented(tmp_path: Path) -> None:
+    """A2 positive (graph-and-statediagram-aliases-documented): the accepted
+    `graph` and v1 `stateDiagram` aliases are named in the docstrings and in
+    the spec.ui-flows-recompute failure message."""
+    from loom_checker.rule_checks import intake
+
+    for alias in ("graph", "stateDiagram"):
+        assert intake.MERMAID_FLOW_TYPE.match(alias + "\n")
+    for doc in (intake.mermaid_transitions.__doc__, intake.flow_lines.__doc__):
+        assert "`graph`" in doc and "`stateDiagram`" in doc, doc
+    result = ui_flows_verdict(tmp_path, "N/A")
+    message = " ".join((result.stdout + result.stderr).split())
+    assert "`graph`" in message and "`stateDiagram`" in message, message
 
 
 @pytest.mark.parametrize("label", sorted(EMPTY_FLOW_FORMS))

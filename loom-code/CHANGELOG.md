@@ -12,13 +12,18 @@ no new field, rule id, or station, and the contract manifest version stays
   explicitly agreed to, never an agent proposal or an inferred detail. Only an
   explicit yes counts as agreement; a proposal left unanswered, deferred, or
   answered about something else is dropped. The list never enters the intent
-  file. A `kind: engineering` confirmation, or a product change with
-  `needs-design: no`, shows it as a table, confirmed by the same yes.
+  file. Each carried detail quotes the user's words, or the proposal the user
+  said yes to. A `kind: engineering` confirmation shows the list as a table,
+  confirmed by the same yes; a product change shows it at decision point ② of
+  the station writing its spec, and `write-plan` runs ② itself on a product
+  spec it writes, so the list is never shown twice.
 - A non-empty carried-details list, from the `capture-intent` hand-off or
   `write-plan`'s own intake, forces a minimal spec even with
-  `needs-design: no`; an empty list forces no spec. Each carried detail is
-  recorded as a UI flows line when visible, else on its Requirement line; only
-  an engineering change may use a Design decision line.
+  `needs-design: no`; an empty list forces no spec, and that spec's UI flows
+  are `N/A` only when no carried detail is visible. Each carried detail is
+  recorded as a UI flows line when visible, else as a clause on the
+  Requirement line of the Acceptance line it serves, never a new REQ; only an
+  engineering change may use a Design decision line.
 - Intent sections may use Markdown tables or Mermaid flowcharts; Acceptance
   stays a numbered list, and chat shows text tables or text diagrams, not
   Mermaid.
@@ -26,8 +31,9 @@ no new field, rule id, or station, and the contract manifest version stays
   `kind: product` spec under `needs-design: no` too; an engineering spec under
   `no` still skips it.
 - Checker: `spec.ui-flows-recompute` counts each data row of a UI flows table
-  and each `-->` transition in a Mermaid `stateDiagram-v2` or `flowchart` as a
-  flow, with the same per-side floor as an arrow line; an empty or `N/A`
+  and each `-->` transition in a Mermaid `stateDiagram-v2` or `flowchart`
+  (aliases `stateDiagram` and `graph`) as a flow, with the same per-side floor
+  as an arrow line; an empty or `N/A`
   section over a touched interface surface still blocks.
 - Checker: `intent.product-no-identifiers` ignores Mermaid diagram-type
   keywords and directives such as `sequenceDiagram` or `classDef` inside a

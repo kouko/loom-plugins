@@ -78,7 +78,9 @@ non-decision authorisation stop, the first time this repo is used (step
 
 1. At ①, restate the wanted outcome; merge any expensive-to-undo choice,
    full-lane `second-vendor: ask` question, and required principles interview.
-2. Ask nothing about plan structure; record each agent decision and reason.
+2. At ②, only for a product spec you write: confirm visible behaviour and
+   carried details. Ask nothing about plan structure; record each agent
+   decision and reason.
 3. At ③, the user accepts or rejects the report against every Acceptance line.
 
 `second-vendor: suggest` only emits a non-blocking notice after the plan exists.
@@ -228,12 +230,12 @@ twice.
 
 4. **The principles interview**, if step 2 demanded it.
 
-5. **The carried details, where this is their only stop** — for
-   `kind: engineering` and for a product change with `needs-design: no`.
-   Show them as a table, one row per detail in the user's language,
-   confirmed by the same yes; no extra stop. With an empty list, no table
-   appears. A product change with `needs-design: yes` shows them at decision
-   point ② instead.
+5. **The carried details, `kind: engineering` only.** Show them as a table,
+   one row per detail in the user's language, confirmed by the same yes; no
+   extra stop. With an empty list, no table appears. A product change shows
+   them at decision point ② of the station writing its spec — `write-spec`,
+   or this station (step 4). A product change's carried details never appear
+   in this message.
 
 **Every question in this message must be one of three types, or the
 consequence form for one-way doors**, and you check the list before
@@ -267,9 +269,10 @@ agreement: a proposal left unanswered, deferred ("later"), or answered about
 something else is dropped. Never carry an agent proposal the user did not
 agree to, or detail you inferred. Carry only details about what the command
 or screen does or how it reacts. A remark about background or usage context,
-such as when or where the user runs it, is not a carried detail. Write each
-carried detail in the user's own words. Add no explanation, implication, or
-inference of your own. It never enters the intent file.
+such as when or where the user runs it, is not a carried detail. Quote the
+user's words for each carried detail — for an agreed proposal, quote the
+proposal the user said yes to. Add no explanation, implication, or inference
+of your own. It never enters the intent file.
 
 **On "yes":**
 
@@ -312,14 +315,14 @@ When a task's rationale outgrows its Risk line, write
 `docs/loom/<change-id>/spec.md` from `contract/templates/spec-minimal.md` —
 Requirements one per Acceptance line, Design decision one line per
 agent-decided fork, Alternatives considered, Current state evidence, UI
-flows N/A — carrying the template's five sections and leaving the
-`confirmed-behavior:` line to product changes. Decision point ② stays
-product-only. Declare `pre-build-review: required|not-required — <reason>`
+flows (N/A unless a carried detail is visible) — carrying the template's five
+sections and leaving the `confirmed-behavior:` line to product changes.
+Decision point ② stays product-only. Declare `pre-build-review: required|not-required — <reason>`
 using the risk classes below; only a required spec gets a pre-build review.
 
 A non-empty carried-details list — from `capture-intent`'s hand-off or your
 own intake — forces that spec even when every Risk line fits; record each
-item as the bullets below say. An empty list forces no spec.
+item per the `Record each carried detail` bullet below. An empty list forces no spec.
 
 **`yes`, and `docs/loom/<change-id>/spec.md` already exists** — go to the
 intake check below.
@@ -342,10 +345,12 @@ spec yourself, from `contract/templates/spec-minimal.md`:
   parallel cases on one surface, a table `case | what the user does | what
   they see`; states or paths that branch or go back and forth, a Mermaid
   `stateDiagram-v2` or `flowchart`.
-- Record each carried detail as a UI flows line when visible, else on its
-  Requirement line — the two parts decision point ② shows; only an
-  engineering change may put one on a Design decision line instead. An agent
-  proposal the user did not agree to is not recorded.
+- Record each carried detail as a UI flows line when visible, else as a clause
+  on a Requirement line — the two parts decision point ② shows; only an
+  engineering change may put one on a Design decision line instead. That
+  clause goes on the Requirement line of the Acceptance line the detail
+  serves, never a new REQ. An agent proposal the user did not agree to is not
+  recorded.
 
 Print one line for the user: installing `loom-design` gets them a fuller
 spec than this one. For `pre-build-review: required`, hand the spec to the
