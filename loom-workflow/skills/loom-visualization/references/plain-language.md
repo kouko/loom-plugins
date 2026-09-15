@@ -275,6 +275,33 @@ agent replies, not from a published source.
 - For graded comparisons, the Japanese four-level scale ◎ ○ △ × carries more
   than a yes/no pair and does not depend on colour.
 
+### In-cell visuals
+
+What can go inside a table cell, and what cannot:
+
+- Block bars (`████░░░░`): usable only with the number in the same cell. Google
+  Cloud SDK's accessibility mode replaces Unicode bars with plain percentages,
+  so the vendor treats a bar alone as inaccessible.
+- Text sparklines (`▁▂▃▄▅▆▇█`): usable. Tufte says a sparkline can go wherever
+  a word or number can, tables included. The ceiling is 8 levels.
+- Check and cross marks: shape over hue; see Status symbols above.
+- Coloured dots: only with a text legend (WCAG 1.4.1); see Status symbols
+  above. The ◎ ○ △ × scale is there too.
+- A blank cell for "no": not allowed; see table rule 6.
+- Cell background colour or a heatmap: not possible in plain Markdown. GFM
+  cells hold only inline content, and GitHub strips inline style and class.
+- shields.io badges: usable but risky. Badges are cached by design, and a dead
+  third-party badge host breaks every badge that uses it.
+- `<progress>` and `<meter>`: depend on the renderer (Obsidian shows them,
+  GitHub strips them). They are not interchangeable: the WHATWG specification
+  says a meter should not be used to show progress.
+- Inline `<svg>`: do not use; GitHub's Markdown renderer skips `<svg>`
+  elements.
+
+Layout: when cells hold text, compare items across a row; when cells hold
+numbers, compare down a column so the digits line up (a Japanese table
+convention).
+
 ### Table or chart
 
 - Per item: one data point → a list; two related data points → term and
@@ -286,6 +313,18 @@ agent replies, not from a published source.
 - A 2×2 with categorical axes (important or not × urgent or not) can be a
   table. A 2×2 with continuous axes (market share × growth rate) cannot: the
   meaning is in each item's position, so use a chart.
+
+### Time in tables
+
+Time goes into a table in two opposite ways:
+
+- Time as the column axis (Q1 to Q4, measurement dates, lifecycle stages):
+  replaces a drawn Gantt chart or roadmap.
+- Time as a cell value (What | Who | When): replaces a checklist.
+
+A Now-Next-Later roadmap orders its columns by confidence, not by dates
+(ProdPad, a vendor source); see entry B22 in `references/tables-business.md`.
+For events placed on dates, use `templates/10-timeline.md`.
 
 ### When not to use a table
 
@@ -320,5 +359,14 @@ it departs from NN/g when there are more than three options.
 - WCAG 1.4.1 Use of Color: https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html
 - Stephen Few, Effectively Communicating Numbers: https://www.perceptualedge.com/articles/Whitepapers/Communicating_Numbers.pdf
 - Japanese four-level scale ◎○△×: https://itoyusuke.net/1020/
+- Japanese table layout, text across and numbers down: https://maki-ichikawa.com/2019/08/01/table2019/
+- Google Cloud SDK accessibility mode (replaces Unicode bars): https://docs.cloud.google.com/sdk/gcloud/reference/alpha/topic/accessibility
+- Tufte, sparkline theory and practice: https://www.edwardtufte.com/notebook/sparkline-theory-and-practice-edward-tufte/
+- GFM specification: https://github.github.com/gfm/
+- github/markup (strips style and class): https://github.com/github/markup
+- README badge host risk: https://movermeyer.com/2018-06-22-readme-badges-are-vulns/
+- WHATWG, form elements (meter is not for progress): https://html.spec.whatwg.org/dev/form-elements.html
+- GitHub skips inline SVG: https://alexwlchan.net/notes/2024/how-to-render-svgs-on-github/
+- ProdPad, Now-Next-Later roadmap: https://www.prodpad.com/blog/invented-now-next-later-roadmap/
 - Paul Nutt, 400 decisions: https://news.osu.edu/half-of-business-decisions-fail-because-of-managements-blunders-new-study-finds/
 - Chernev et al. (2015), choice overload: https://www.sciencedirect.com/science/article/abs/pii/S1057740814000916

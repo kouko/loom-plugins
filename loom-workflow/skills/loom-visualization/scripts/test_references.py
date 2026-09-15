@@ -243,6 +243,51 @@ def test_missing_table_rules_section_fails():
     assert "missing section: Table-writing rules and common mistakes" in table_errors(broken)
 
 
+IN_CELL_ITEMS = {
+    "bar with number": ("████░░░░", "same cell"),
+    "sparkline": ("▁▂▃▄▅▆▇█", "Tufte", "8 levels"),
+    "shape over hue": ("shape", "Status symbols"),
+    "colour legend": ("legend", "WCAG 1.4.1"),
+    "blank cell": ("rule 6",),
+    "heatmap not possible": ("heatmap", "not possible"),
+    "badge": ("shields.io", "cache"),
+    "progress/meter": ("<progress>", "<meter>", "WHATWG"),
+    "svg": ("<svg>", "GitHub"),
+}
+TIME_PHRASES = ("column axis", "cell value", "confidence", "B22", "templates/10-timeline.md")
+
+
+def in_cell_errors(text):
+    """Return errors in the in-cell visuals and time subsections; empty = valid."""
+    errors = []
+    subs = sections(sections(text).get("Table-writing rules and common mistakes", ""), level=3)
+    in_cell = " ".join(subs.get("In-cell visuals", "").split())
+    if not in_cell:
+        errors.append("missing subsection: In-cell visuals")
+    else:
+        for item, phrases in IN_CELL_ITEMS.items():
+            if not all(p in in_cell for p in phrases):
+                errors.append(f"in-cell visuals misses {item}")
+    time = " ".join(subs.get("Time in tables", "").split())
+    if not time:
+        errors.append("missing subsection: Time in tables")
+    else:
+        errors += [f"time in tables misses {p}" for p in TIME_PHRASES if p not in time]
+    return errors
+
+
+def test_in_cell_visuals_and_time_axis_guidance_present():
+    """A8 positive in-cell-visuals-and-time-axis-guidance-present."""
+    assert in_cell_errors(_text()) == []
+
+
+def test_removed_in_cell_section_fails():
+    """A8 negative removed-in-cell-section-fails: a renamed in-cell heading is caught."""
+    text = _text()
+    broken = text.replace("### In-cell visuals", "### Other notes")
+    assert "missing subsection: In-cell visuals" in in_cell_errors(broken)
+
+
 def test_reference_cites_no_repository_records():
     assert "docs/loom" not in _text()
 
