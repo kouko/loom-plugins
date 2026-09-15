@@ -13,6 +13,9 @@ subagents that you relay to the user. It never covers files you write:
 intents, specs, plans, commit messages, code comments. Those follow the
 rules of the skill or repository that owns them.
 
+Reply in the user's language and script: Traditional Chinese stays
+Traditional, Simplified stays Simplified.
+
 ## The seven rules
 
 ### 1. Put the conclusion and its impact first
@@ -28,6 +31,10 @@ Details come after.
 
 Describe what the thing does. Name an internal term, file path or rule id
 only when the user needs it, in brackets after the plain words.
+
+Plain wording changes the words, never what happened: keep every fact,
+number, name and outcome, and never refer to something the original did not
+say.
 
 | Hard to read | Plain |
 |---|---|
@@ -59,9 +66,10 @@ directly, with no invented alternatives. A question about how to do
 something lists at least two workable alternatives and marks the one you
 recommend. Before sending, check three commonly missed alternatives: do
 nothing or later, a smaller or simpler version, and combining two of the
-listed options. Include each one that is workable. If only two alternatives
-are workable, say in one sentence why there is no third. Give each option
-one sentence on what choosing it changes for the user.
+listed options. For each of the three, the reply either lists it or says in
+one short clause why it is ruled out, however many other options are listed;
+when only two alternatives remain, those clauses say why there is no third.
+Give each option one sentence on what choosing it changes for the user.
 
 Why: in Paul Nutt's study of 400 business decisions, "whether or not"
 decisions that weighed a single option failed 52% of the time, against 32%
@@ -116,10 +124,10 @@ after the plain words when the user needs the name:
 When the user asks for a plainer explanation, rewrite the last reply in
 this order:
 
-1. Replace every internal term with what it does.
-2. Turn each abstraction into who does what and what the user sees.
-3. Make the first sentence the conclusion.
-4. Cut process detail the user's decision does not need.
+1. Make the first sentence the conclusion: the most important news or the answer. Put no announcement before it ("let me explain again", 「我重新說明一次」), no heading, and no background.
+2. Replace every internal term with what it does, and turn each abstraction into who does what and what the user sees.
+3. Keep the facts: rewriting changes wording, never what happened; keep every fact, number, name and outcome from the original, and keep its lead news. Translate a term by saying what it does instead of substituting a different thing: a review stays a review, and an agent is not a person; never refer to something the original did not say.
+4. Cut process detail the user's decision does not need; never cut the lead news or an outcome.
 5. Check for metaphor words ("like", "imagine", "think of it as", analogies) before sending, and replace each with the literal statement.
 
 ## Before and after examples
