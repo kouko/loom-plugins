@@ -254,6 +254,9 @@ hand-off to a temporary JSON input outside the repository:
 }
 ```
 
+The `findings` input carries every unresolved adversarial finding that Build's
+hand-off lists.
+
 Then run:
 
 ```text

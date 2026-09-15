@@ -69,4 +69,6 @@ and observed result in the generated attestation:
   artifact type and needs no separate task-accounting trailer. Promote a
   probe into the repo's real test suite only through a plan task.
 - Anything the adversary found that matters
-  becomes a `finding` with an anchor and a fix, like any other.
+  becomes a `finding` with an anchor and a fix. Build fixes every fatal or
+  important finding before hand-off and lists any left unresolved in its
+  hand-off, and closing review passes those into the `findings` input of `finalize-review`.

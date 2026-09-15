@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-from prose_pin import has_negation
+from prose_pin import has_negation, split_sentences as _sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,7 +15,7 @@ ADVERSARY = ROOT / "loom-code/agents/adversary.md"
 
 
 def _sentence(text: str, fragment: str) -> str:
-    return next(s for s in text.split(". ") if fragment in s)
+    return next(s for s in _sentences(text) if fragment in s)
 
 
 def test_build_dispatches_fresh_adversary_then_suite_after_tasks() -> None:
@@ -34,7 +34,10 @@ def test_build_dispatches_fresh_adversary_then_suite_after_tasks() -> None:
 
 
 def test_adversary_prompt_carries_no_implementer_explanation() -> None:
-    assert "Give it only paths: the intent, the plan, and the changed paths" in VERIFY
+    assert (
+        "Give it only the change id, `HEAD`, and paths: the intent, the plan, and the "
+        "changed paths with their artifact types"
+    ) in VERIFY
     assert "never pass an implementer's explanation of its own code" in VERIFY
     for leak in ("implementer's report", "implementer's summary", "self_review"):
         assert leak not in VERIFY
@@ -50,6 +53,11 @@ GATE_CONSEQUENCE = (
     "A hand-off with neither step skipped therefore means the complete package suite "
     "and every adversarial program pass."
 )
+ADVERSARY_FINDINGS = (
+    "Every fatal or important finding the adversary returns is fixed inside Build like "
+    "a failing check before hand-off, and any finding left unresolved is listed in the "
+    "§4 hand-off."
+)
 _HANDOFF = re.compile(r"\bhand(?:s|ed|ing)?[ -]off\b", re.IGNORECASE)
 _OPTIONAL = re.compile(
     r"\b(?:optional(?:ly)?|may|might|if (?:needed|time permits)|at (?:your|its) discretion)\b",
@@ -57,15 +65,11 @@ _OPTIONAL = re.compile(
 )
 
 
-def _sentences(text: str) -> list[str]:
-    return [s for s in re.split(r"(?<=[.;])\s+", text) if s]
-
-
 def _extra_handoff_sentences(section: str) -> list[str]:
     """Sentences about handing off to Review other than the pinned gate pair."""
     return [
         s for s in _sentences(section)
-        if _HANDOFF.search(s) and s not in (GATE, GATE_CONSEQUENCE)
+        if _HANDOFF.search(s) and s not in (GATE, GATE_CONSEQUENCE, ADVERSARY_FINDINGS)
     ]
 
 
@@ -91,10 +95,17 @@ def test_build_allows_complete_suite_at_end() -> None:
     assert "each adversarial program's path and command" in HANDOFF
 
 
+def test_adversary_findings_fixed_or_handed_off() -> None:
+    assert VERIFY.count(ADVERSARY_FINDINGS) == 1
+    assert not has_negation(ADVERSARY_FINDINGS), ADVERSARY_FINDINGS
+    assert not _OPTIONAL.search(ADVERSARY_FINDINGS), ADVERSARY_FINDINGS
+    assert "every unresolved adversary finding" in HANDOFF
+
+
 def test_no_speculative_preflight_ban_remains() -> None:
     assert "speculative push preflight" not in PROSE
     assert "owns its one content-bound execution" not in PROSE
-    for sentence in PROSE.split(". "):
+    for sentence in _sentences(PROSE):
         if "complete package suite" in sentence and has_negation(sentence):
             assert "does not hand off" in sentence or "skipped" in sentence, sentence
 

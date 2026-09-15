@@ -78,15 +78,17 @@ mechanical checks, in this order:
 
 1. Dispatch the `loom-code:adversary` agent fresh-context, resolving its
    profile as §2 requires before every host-native dispatch. Never dispatch an
-   agent that implemented any part of the change. Give it only paths: the
-   intent, the plan, and the changed paths; never pass an implementer's
-   explanation of its own code. The adversary writes and commits its
+   agent that implemented any part of the change. Give it only the change id,
+   `HEAD`, and paths: the intent, the plan, and the changed paths with their
+   artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
    adversarial programs.
 2. Run the repository's complete package suite, then each committed
    adversarial program.
 
 When a check fails, the fix is made inside Build as §2 assigns implementation
-work; the adversary never fixes what it breaks. Build does not hand off to
+work; the adversary never fixes what it breaks. Every fatal or important
+finding the adversary returns is fixed inside Build like a failing check before
+hand-off, and any finding left unresolved is listed in the §4 hand-off. Build does not hand off to
 Review until the complete package suite has passed or `selection show` lists
 `package-tests` as skipped, and until every adversarial program has passed or
 it lists `adversarial` as skipped, each skip waiving only its own check. A
@@ -107,6 +109,6 @@ again.
 
 Commit functional changes normally. Report the branch base, HEAD, changed
 paths, focused test results, the complete package suite command and its result,
-each adversarial program's path and command, and any unresolved risk. Call `loom-code:closing-review`
+each adversarial program's path and command, every unresolved adversary finding, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after Review generates it.

@@ -12,7 +12,7 @@ in those files is a finding.
 import re
 from pathlib import Path
 
-from prose_pin import has_negation
+from prose_pin import has_negation, split_sentences as _sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,10 +22,6 @@ LENSES_PATH = ROOT / "loom-code/skills/closing-review/references/lenses.md"
 
 def _flat(path: Path) -> str:
     return " ".join(path.read_text(encoding="utf-8").split())
-
-
-def _sentences(text: str) -> list[str]:
-    return [s for s in re.split(r"(?<=[.;])\s+", text) if s]
 
 
 def test_reviewer_text_runs_changed_test_files_and_flags_skips() -> None:
@@ -97,6 +93,13 @@ def test_skipped_changed_test_stays_a_finding() -> None:
     for path in (REVIEWER_PATH, LENSES_PATH):
         (rule,) = _run_rule_sentences(_flat(path))
         assert _skipped_test_is_finding(rule), f"{path.name}: {rule}"
+
+
+def test_skipped_test_names_the_file_the_reviewer_ran() -> None:
+    for path, subject in ((REVIEWER_PATH, "you ran"), (LENSES_PATH, "the reviewer ran")):
+        (rule,) = _run_rule_sentences(_flat(path))
+        assert f"a test in a changed test file {subject}" in rule, f"{path.name}: {rule}"
+        assert not has_negation(f"a test in a changed test file {subject}")
 
 
 def test_suite_ban_holds_in_every_round() -> None:

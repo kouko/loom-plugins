@@ -9,9 +9,9 @@ Run from the repo root:
 
     python3 -m pytest docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_text_pins_mutation.py -q
 
-RECORDED_KILLS are attacks the guards already catch; they pass. MUTANTS
-expose a gap: each test asserts its mutant is killed, so it FAILS until the
-guard is strengthened. test_harness_unmutated_green proves a kill comes from
+RECORDED_KILLS are attacks the guards already caught; they pass. MUTANTS
+survived the guards at the adversary's commit and are killed from 2dc9da37
+on: each test asserts its mutant is killed. test_harness_unmutated_green proves a kill comes from
 the mutation, not from a broken sandbox.
 """
 from __future__ import annotations
@@ -61,7 +61,7 @@ def _guards_green(root: Path, test_files: tuple[str, ...]) -> bool:
 
 
 MUTANTS = [
-    # --- weakenings the guards let through today -------------------------
+    # --- survived at the adversary's commit; killed from 2dc9da37 on -----
     pytest.param(
         BUILD,
         "every adversarial program pass.\n",

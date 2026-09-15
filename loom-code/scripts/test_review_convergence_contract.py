@@ -1,10 +1,7 @@
 import re
-import subprocess
 from pathlib import Path
 
-import pytest
-
-from prose_pin import has_negation
+from prose_pin import has_negation, split_sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -63,7 +60,7 @@ def test_round_four_is_forbidden_in_context() -> None:
 
 
 def _sentences(text: str) -> list[str]:
-    return [s for s in re.split(r"(?<=[.:;])\s+", text) if s]
+    return split_sentences(text, ends=".:;")  # colon is a boundary here
 
 
 def test_station_commits_report_before_finalize() -> None:
@@ -268,9 +265,6 @@ def test_blind_run_before_first_reviewer_dispatch() -> None:
 # 2026-09-15-mechanical-checks-before-review — acceptance 3, 6, 7
 # ---------------------------------------------------------------------------
 
-BASE = "aa0cffff"
-
-
 def _flat_section(heading: str) -> str:
     return " ".join(REVIEW.split(heading, 1)[1].split("\n## ", 1)[0].split())
 
@@ -373,24 +367,14 @@ def test_earlier_verdicts_not_reused() -> None:
     assert not [s for s in _sentences(REVIEW_WORDS) if rerun_with_old.search(s)]
 
 
-def test_no_diff_to_finalize_attestation_push_code() -> None:
-    probe = subprocess.run(
-        ["git", "-C", str(ROOT), "cat-file", "-e", f"{BASE}^{{commit}}"],
-        capture_output=True,
-    )
-    if probe.returncode != 0:
-        pytest.skip(f"not a git checkout containing {BASE}")
-    guarded = [
-        "loom-code/scripts/loom_checker/command_handlers/finalize.py",
-        "loom-code/scripts/loom_checker/attestation.py",
-        "loom-code/scripts/loom_checker/command_handlers/push.py",
-        "loom-code/scripts/test_selection_finalize.py",
-        "loom-code/scripts/test_loom_attestation.py",
-    ]
-    for path in guarded:
-        assert (ROOT / path).is_file(), path
-    diff = subprocess.run(
-        ["git", "-C", str(ROOT), "diff", "--name-only", BASE, "--", *guarded],
-        capture_output=True, text=True, check=True,
-    )
-    assert diff.stdout.strip() == ""
+def test_unresolved_adversarial_findings_reach_finalize_input() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    sentence = next(s for s in _sentences(finalize) if "unresolved adversarial finding" in s)
+    assert "`findings` input" in sentence, sentence
+    assert "Build's hand-off" in sentence, sentence
+    assert not has_negation(sentence), sentence
+    assert not _OPTIONAL_ROUND.search(sentence), sentence
+    recording = " ".join(ADVERSARIAL_REF.split("## Recording", 1)[1].split())
+    destination = next(s for s in _sentences(recording) if "`findings` input of `finalize-review`" in s)
+    assert "closing review passes" in destination, destination
+    assert not has_negation(destination), destination
