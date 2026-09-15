@@ -1,0 +1,65 @@
+# blind-run live trial: a9-incident-skill
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at dda0014f via --plugin-dir; real hook and real skill files
+# prompt-sha256: 9cec3de97fc56c99b9e11cdd3a487d726507642b8879841b5a9cedeb08f43208
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+# session init: {"tools": ["Glob", "Grep", "Read", "Skill"], "skills": ["deep-research", "loom-workflow:critique", "loom-workflow:dbt-model-style", "loom-workflow:decision-map", "loom-workflow:distill-sessions", "loom-workflow:git-memory", "loom-workflow:goal-create", "loom-workflow:handoff", "loom-workflow:independent-advisor", "loom-workflow:loom-memory", "loom-workflow:loom-visualization", "loom-workflow:recap-state", "loom-workflow:using-loom-workflow", "design", "design-sync", "dataviz", "update-config", "verify", "debug", "code-review", "simplify", "batch", "fewer-permission-prompts", "doctor", "loop", "schedule", "claude-api", "workflow-authoring", "run", "run-skill-generator"], "plugins": ["loom-workflow@inline"]}
+=== USER MESSAGE (verbatim) ===
+用 loom-visualization 幫我寫一份事故報告：昨天晚上 21:10 到 21:50 付款服務停了 40 分鐘，原因是資料庫連線數用完。
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/references/tables-software.md
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/templates/10-timeline.md
+Glob **/scripts/detect_client.py
+=== FINAL REPLY (verbatim) ===
+我幫你依「事故摘要 + 時間軸」的標準結構寫了報告草稿；已知的時間、時長、原因都放進表格，你沒提供的細節（如告警來源、處理人員、改善措施）先標成待補，方便你確認或補充。
+
+---
+
+# 事故報告：付款服務中斷
+
+## 摘要
+
+| 項目 | 內容 |
+|---|---|
+| 事故發生時間 | 2026-09-15 21:10 |
+| 復原時間 | 2026-09-15 21:50（歷時 40 分鐘） |
+| 影響範圍 | 付款服務停止運作（待補：影響用戶數 / 影響訂單數） |
+| 根本原因 | 資料庫連線數耗盡（connection pool exhausted） |
+| 嚴重程度 | 待補（如 SEV-1 / SEV-2） |
+
+## 時間軸
+
+| 時間 | 事件 |
+|---|---|
+| 21:10 | 付款服務開始無法回應 |
+| 21:xx | 待補：告警觸發時間 / 值班人員介入時間 |
+| 21:xx | 待補：確認根本原因為資料庫連線數耗盡 |
+| 21:xx | 待補：採取處置措施（如重啟服務、擴增連線池） |
+| 21:50 | 服務恢復正常 |
+
+## 根本原因
+
+資料庫連線數（connection pool）被耗盡，導致付款服務無法取得新的資料庫連線而停止回應。
+
+待補：
+- 連線數耗盡的觸發因素（流量突增／慢查詢佔用連線／連線未釋放／連線池上限設定過低等）
+- 是否有相關監控指標佐證（如連線池使用率圖表）
+
+## 後續行動項目
+
+| 行動項目 | 負責人 | 期限 | 狀態 |
+|---|---|---|---|
+| 待補 | 待補 | 待補 | TODO |
+
+---
+
+有幾個地方需要你補充才能完成報告：
+1. 告警何時觸發、誰負責處理
+2. 連線數耗盡的具體原因（是流量突增還是有慢查詢／連線洩漏）
+3. 當下採取了什麼處置動作讓服務在 21:50 恢復
+4. 預防再發生的後續行動項目與負責人
+
+你可以直接把這些資訊補給我，我會把報告填完整。

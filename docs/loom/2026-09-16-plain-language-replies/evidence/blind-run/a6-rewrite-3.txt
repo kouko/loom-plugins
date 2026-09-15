@@ -1,0 +1,81 @@
+# blind-run live trial: a6-rewrite-3
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at dda0014f via --plugin-dir; real hook and real skill files
+# prompt-sha256: 71f8915382a23d6fab0d0d6144c151fe8cc8361b33d31fd3aa9a728423ce3f4a
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+# session init: {"tools": ["Glob", "Grep", "Read", "Skill"], "skills": ["deep-research", "loom-workflow:critique", "loom-workflow:dbt-model-style", "loom-workflow:decision-map", "loom-workflow:distill-sessions", "loom-workflow:git-memory", "loom-workflow:goal-create", "loom-workflow:handoff", "loom-workflow:independent-advisor", "loom-workflow:loom-memory", "loom-workflow:loom-visualization", "loom-workflow:recap-state", "loom-workflow:using-loom-workflow", "design", "design-sync", "dataviz", "update-config", "verify", "debug", "code-review", "simplify", "batch", "fewer-permission-prompts", "doctor", "loop", "schedule", "claude-api", "workflow-authoring", "run", "run-skill-generator"], "plugins": ["loom-workflow@inline"]}
+=== USER MESSAGE (verbatim) ===
+（下面是你上一則傳給我的回覆，我貼回來給你看）
+
+Branch-end PASS（PASS_WITH_NOTES）、push 閘 exit 0。**決策點 ③：請看盲跑報告，說 OK 或不 OK。** 原文在 `docs/loom/2026-09-04-codex-hook-trust-covers-every-definition-and-worktree/blind-run-report.md`。
+
+**你要的東西，一條一條核對**
+
+1. **`--trusted` 逐條回報；乾淨暫存 repo 沒按 `/hooks` 時全 never、exit 非 0、輸出含 `/hooks` 與資料夾路徑** — works。三條定義各一行、全 never、exit 2、BLOCK 行帶暫存資料夾絕對路徑。
+2. **`codex exec` 各跑一次 shell 與 apply_patch（不按 `/hooks`）hook 不該跑；手動餵一條只翻那一條** — works。`echo probe` 與建 `hello.txt` 都真的執行了，但 ledger 不存在、`--trusted` 仍三條 never（Codex 靜靜跳過未信任的 hook，連警告都沒有）；手動餵 `validate-skill-folder-structure.sh` 後只有它翻 fired。
+3. **三處站文字有「逐條／never／`/hooks`／停」的句子、文字測試通過** — works（write-plan step 0b、build §0、first-contact §3；6 測全過）。
+4. **`hooks.json` 命令字串與 main 逐位元相同、規則數不變（27）、整包綠、版本 1.2.4** — works。
+
+**你親手驗的那一腿（intent Constraints 明講）**：按過 `/hooks` 之後守衛真的跑。報告寫了五步：到暫存資料夾開 `codex` → `/hooks` 同意 → 再跑那兩個 `codex exec` → `--trusted` 預期三條全 fired、exit 0；同時 ledger 會第一次出現 Codex 對 apply_patch 真正填的 `tool_name`（到今天沒人看過）。暫存資料夾留著：
+`…/scratchpad/scratch-repo-JWQz`（裡面已有一條手動翻 fired 的紀錄；要乾淨起點再跟我說）。
+
+**對你既有的資料做了什麼**：git 追蹤的東西沒動、`hooks.json` 沒動所以既有信任照舊。**但要老實說**：build 期間兩個探針測試對本 repo 真正的薄殼開火，把紀錄寫進本 repo 自己的 ledger（gitignore 的本機檔）；每個實作者與對抗者都在提交前發現並刪掉，沒進任何 commit。這個漏洞在修正輪已修（探針改打 tmp 副本＋守衛）。
+
+**我幫你決定的事**
+- 火痕檔改成一行一行的 ledger（同一路徑）；舊的零位元組 marker 只算 loom 那條「legacy 跑過」，其他定義仍 never——寧可多問一次 `/hooks`。
+- 歸屬用「事件＋指令路徑」，不看 Codex 回報的工具名（那個字串沒人驗過）。
+- 兩支手抄副本改薄殼、指令字串不動（既有信任不失效）；順便消滅了副本漂移（remind 那支從 8 月就陳舊）。
+
+**你可能還沒想到的事**
+- apply_patch 的 `tool_name` 字串仍未知，等你那一腿。
+- 第二位讀者抓到「先記 fired 再 exec、exec 目標看 cwd」的順序漏洞，修正輪已修（目標改相對薄殼自身、目標存在才記；有子目錄 cwd 的回歸測試）。
+- 這台機器的 Codex 設定是 approval never；你的設定若不同，畫面會多幾個確認步驟，不影響閘本身。
+
+ship 時會併一個 nit commit：記錄器 docstring 補「追加不加鎖、丟一行只會變 never 不會偽造 fired」；報告裡兩處「正在修正」改成已修的 commit。
+
+**OK 嗎？**
+
+---
+可以用更白話的方式說明嗎？
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/references/plain-language.md
+=== FINAL REPLY (verbatim) ===
+**結論：這次的四項自動測試全部通過；剩下一件事需要你親自操作才能確認，就是「你按過 /hooks 同意之後，防護是不是真的會啟動」，這一步目前只有你能做。**
+
+## 四項已測試項目
+
+| 項目 | 結果 | 說明 |
+|---|---|---|
+| 還沒按過 /hooks 同意時，防護會擋下 | 通過 | 在乾淨的暫存資料夾裡，三個防護行為的紀錄都顯示「沒有啟動」，程式結束時回報失敗，畫面上有提示要去按 /hooks，並附上資料夾路徑 |
+| 還沒同意時，範例操作照樣會執行，但防護不會跟著啟動 | 通過 | 執行了一個打字指令、一個改檔案的操作，兩個都成功執行了，防護卻沒有啟動，畫面上也沒有任何警告；之後手動叫用其中一個防護腳本，就只有那一個顯示啟動 |
+| 三處說明文字裡有講清楚「逐項檢查、未啟動、要去按 /hooks、會擋下」 | 通過 | 相關文字測試全過 |
+| 防護設定檔內容跟主線一模一樣，規則數量不變 | 通過 | 版本標記為 1.2.4 |
+
+## 需要你做的事
+
+到一個暫存資料夾裡開啟 codex → 按 /hooks 同意信任 → 再執行前面提到的那兩個操作，確認這次三個防護真的會啟動，程式結束時顯示成功。這同時也是目前唯一還沒人看過的資料：防護紀錄裡，codex 對其中一個操作（改檔案）回報的「工具名稱」欄位，內容到現在都還沒人驗證過。
+
+## 你原本的東西有沒有被動到
+
+沒有。git 有追蹤的檔案都沒被動、防護設定檔也沒改，所以你原本已經信任的東西照舊信任。
+
+但要老實說一件事：測試過程中，有兩次測試不小心真的觸發了正式資料夾自己的防護，把紀錄寫進了正式資料夾本機的紀錄檔（這個檔案不會進版本控制）。每個人在送出之前都發現並刪掉了，所以沒有進到任何一次提交。這個問題後續已經修好（改成測試只在暫存的複本上執行）。
+
+## 我幫你做的幾個決定
+
+- 啟動紀錄改成每行一筆。舊的一次性標記只算「最早那份腳本曾經跑過」，其他每個防護定義還是視為沒啟動——寧可多問你一次也不要漏掉。
+- 判斷「是哪個防護啟動的」看的是「發生了什麼事＋呼叫的指令路徑」，不看程式自己回報的工具名稱，因為那個字串到今天都還沒人驗證過。
+- 兩份手抄的副本改成很短的轉接殼，指令內容沒改（原本的信任不會失效），順便修掉了副本跟正本不同步的問題（其中一份從八月就沒更新過）。
+
+## 還不知道的事
+
+- 改檔案那個操作回報的「工具名稱」字串內容還不知道，要等你做完前面那個手動確認，才會第一次看到。
+- 有第二個人抓到一個順序問題：先記錄「啟動了」才真正去執行，而執行的目標會依當時所在的資料夾而定，這可能導致記錯。這個問題後續已經修好。
+- 這台機器的 codex 設定是「永遠不用再次確認」；如果你的設定不同，畫面上會多幾個確認步驟，但不影響這次測試的結論。
+
+出貨時還會多帶一個小修改：紀錄器的程式說明會補上一句「只會在檔案後面加一行，不會加鎖；如果漏寫一行，結果只會變成沒啟動，不會假造成啟動」，報告裡兩處寫「正在修正」的字也會改成已經修好的提交編號。
+
+**前面這份測試結果，你要說 OK 還是不 OK？**

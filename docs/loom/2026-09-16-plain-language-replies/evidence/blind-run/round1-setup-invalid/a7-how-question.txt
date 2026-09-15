@@ -1,0 +1,33 @@
+# blind-run live trial: a7-how-question
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --disable-slash-commands --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at dda0014f via --plugin-dir; real hook and real skill files
+# prompt-sha256: c8dbb8a5116fae553ec6751f16999619f44d574b5b83d44178487efe9340bc3c
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+=== USER MESSAGE (verbatim) ===
+我們的網站要把使用者上傳的圖片，從伺服器本機硬碟搬到雲端物件儲存。要怎麼搬比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+none
+=== FILE TOOLS USED ===
+Read /Users/kouko/.claude/projects/-private-tmp-claude-501--Users-kouko--herdr-worktrees-loom-plugins-speak-plainly-6bd7f849-f471-43ae-b528-f7a27e13c6fe-scratchpad-trial-a7-how-question/memory/MEMORY.md
+=== FINAL REPLY (verbatim) ===
+建議採用「雙寫 + 背景搬移 + 逐步切換」的分階段做法，這樣使用者在搬移過程中不會看到圖片壞掉，也保留隨時回退的空間。以下是具體步驟：
+
+| 階段 | 做的事 | 目的 |
+|---|---|---|
+| 1. 準備 | 建立雲端物件儲存的 bucket，規劃檔名規則（建議用內容雜湊或 UUID 當 key，不要用原始檔名），設定好權限、CDN | 之後的路徑穩定不會再變 |
+| 2. 雙寫 | 修改上傳程式碼：新上傳的圖片同時寫入本機硬碟和雲端（或直接改成只寫雲端），資料庫記一個欄位標示這張圖存在哪裡 | 從此刻起新資料不再增加，搬移範圍固定 |
+| 3. 背景搬移 | 寫一支獨立的搬移程式，把本機既有的舊圖片逐批上傳到雲端；每上傳一張就比對雜湊值確認內容一致，成功才更新資料庫記錄 | 存量資料慢慢清完，且可驗證正確性 |
+| 4. 讀取切換 | 上線一個開關（feature flag），讀取路徑改成優先讀雲端 URL，讀不到才 fallback 回本機 | 可以隨時切回本機，降低風險 |
+| 5. 驗證 | 監控錯誤率、404 數量，抽查圖片是否顯示正常 | 確認搬移沒有漏掉或損毀的檔案 |
+| 6. 收尾 | 全部確認無誤後，關掉本機讀取的 fallback，再過一段觀察期後才刪除本機檔案（先備份一份） | 避免資料遺失，留有恢復空間 |
+
+幾個實作上的重點：
+
+- **搬移程式要能重跑、可中斷續傳**：紀錄哪些檔案已搬完，中途失敗重新執行時跳過已完成的，不要每次全部重來。
+- **不要在使用者請求的當下做同步搬移**：搬移是背景批次工作，跟使用者的即時讀寫請求分開，避免拖慢網站回應。
+- **搬移期間限速**：分批處理、控制併發數，避免把伺服器硬碟 I/O 或雲端 API 額度用滿。
+- **保留本機備份一段時間**：不要搬完立刻刪本機檔案，留一到兩週觀察期，確認沒問題再清除。
+- **選用支援 CDN 的雲端儲存**（如 S3 + CloudFront、GCS + Cloud CDN）：圖片是高頻讀取的靜態內容，直接讓 CDN 快取，不要每次都打到物件儲存本身。
+
+如果你告訴我目前用的是哪家雲端服務（AWS/GCP/Azure/其他）、圖片數量規模大概多少、資料庫用什麼存路徑欄位，我可以幫你寫更具體的搬移腳本。

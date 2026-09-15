@@ -1,0 +1,11 @@
+# Card delivery in the round-2 live trial sessions (stream-json output omits attachments, so the saved session transcripts were checked).
+# For each trial: count of hook_additional_context attachments and of the coexist card header in the newest transcript.
+a6-rewrite-1 transcript=251e8df6-b908-4c08-9c48-792dc83d5489.jsonl hook_additional_context=1 coexist-card-header=1
+a6-rewrite-2 transcript=859f4a0d-c5eb-4c28-b5e6-3093b831ffe6.jsonl hook_additional_context=1 coexist-card-header=1
+a6-rewrite-3 transcript=576b114c-c9a9-4171-a8bd-b3cfb9cb6729.jsonl hook_additional_context=1 coexist-card-header=1
+a7-how-question transcript=8641c3eb-d3fa-4d61-8ccf-52d6394e998e.jsonl hook_additional_context=1 coexist-card-header=1
+a7-yes-no transcript=1f728467-1e76-4b80-bc1b-147eb0d75609.jsonl hook_additional_context=1 coexist-card-header=1
+a9-incident-natural transcript=8eb6bb3d-b6c3-4e81-8183-cfe0134ad396.jsonl hook_additional_context=1 coexist-card-header=1
+a9-incident-skill transcript=3e6415ea-2b51-4923-985f-7a428b3af6d8.jsonl hook_additional_context=1 coexist-card-header=1
+a9-progress-natural transcript=3df9cb66-3d9e-4ed6-822c-47f8e9d05358.jsonl hook_additional_context=1 coexist-card-header=1
+a9-progress-skill transcript=3ba8e357-4e5a-444d-9845-bed9898ebb79.jsonl hook_additional_context=1 coexist-card-header=1

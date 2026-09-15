@@ -1,0 +1,37 @@
+# blind-run live trial: a7-how-question
+# command (run from an empty temp dir, prompt on stdin): CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 /Users/kouko/.local/bin/claude -p --setting-sources project --strict-mcp-config --tools Read,Glob,Grep,Skill --allowedTools Read,Glob,Grep,Skill --disallowedTools Read(//Users/kouko/.claude/**),Glob(//Users/kouko/.claude/**),Grep(//Users/kouko/.claude/**) --model sonnet --plugin-dir <scratchpad>/br/loom-workflow --output-format stream-json --verbose
+# plugin: loom-workflow loaded from a clean worktree at dda0014f via --plugin-dir; real hook and real skill files
+# prompt-sha256: c8dbb8a5116fae553ec6751f16999619f44d574b5b83d44178487efe9340bc3c
+# exit: 0
+# events carrying the card text (non-assistant): none seen in stream
+# session init: {"tools": ["Glob", "Grep", "Read", "Skill"], "skills": ["deep-research", "loom-workflow:critique", "loom-workflow:dbt-model-style", "loom-workflow:decision-map", "loom-workflow:distill-sessions", "loom-workflow:git-memory", "loom-workflow:goal-create", "loom-workflow:handoff", "loom-workflow:independent-advisor", "loom-workflow:loom-memory", "loom-workflow:loom-visualization", "loom-workflow:recap-state", "loom-workflow:using-loom-workflow", "design", "design-sync", "dataviz", "update-config", "verify", "debug", "code-review", "simplify", "batch", "fewer-permission-prompts", "doctor", "loop", "schedule", "claude-api", "workflow-authoring", "run", "run-skill-generator"], "plugins": ["loom-workflow@inline"]}
+=== USER MESSAGE (verbatim) ===
+我們的網站要把使用者上傳的圖片，從伺服器本機硬碟搬到雲端物件儲存。要怎麼搬比較好？給我你推薦的做法。
+=== SKILLS INVOKED ===
+loom-workflow:loom-visualization
+=== FILE TOOLS USED ===
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/templates/02-linear-steps.md
+Read <scratchpad>/br/loom-workflow/skills/loom-visualization/scripts/generate.py
+=== FINAL REPLY (verbatim) ===
+直接說結論:比較安全的做法是「先讓新資料寫入雲端、再背景搬舊資料、驗證後才切讀取路徑、最後才刪本機檔案」，全程不要一次性搬移或直接砍掉本機檔案，這樣即使中途出錯也能隨時退回。
+
+## 建議搬遷步驟
+
+| # | 步驟 | 做什麼 | 完成標準 |
+|---|---|---|---|
+| 1 | 抽象化儲存層 | 在程式裡加一層「儲存介面」(storage adapter)，讓上傳/讀取的程式碼不直接寫死本機路徑，而是呼叫介面方法 | 本機硬碟版本也能透過這層介面運作，沒有邏輯改變 |
+| 2 | 新上傳雙寫或直接改寫雲端 | 新上傳的圖片直接寫進物件儲存 (S3/GCS 等)，資料庫記錄同時存 bucket+key 或完整 URL | 新上傳的檔案已經 100% 進雲端，不再落地本機 |
+| 3 | 背景批次搬移舊檔 | 寫一支背景任務，分批讀取資料庫裡「還在本機」的紀錄，把檔案上傳到雲端，成功後更新資料庫欄位 | 所有舊紀錄的雲端欄位都已填上 |
+| 4 | 校驗完整性 | 搬移後比對檔案大小或雜湊值 (checksum)，確認雲端檔案與本機原檔一致 | 抽樣或全量校驗通過，沒有遺漏或損毀 |
+| 5 | 切換讀取路徑 | 讓圖片讀取（含 CDN 設定）改成從雲端網址取得，本機路徑保留但不再被讀取 | 前台顯示的圖片都來自雲端網址 |
+| 6 | 保留觀察期後清除本機檔案 | 觀察一段時間（例如 1–2 週）確認沒有讀取失敗、沒有需要回退的狀況，才刪除本機檔案釋放空間 | 本機硬碟檔案已清除，且雲端服務穩定運行 |
+
+## 幾個重要細節
+
+- **不要邊搬邊改本機檔案**：搬移期間若使用者還能上傳/修改圖片，要確保背景任務跟即時寫入不會互相覆蓋，通常用「先寫雲端、資料庫標記為雲端來源」的方式最簡單。
+- **分批處理、控制速率**：批次搬移要限制併發數與速率，避免瞬間大量請求打爆物件儲存的 API 或佔滿頻寬。
+- **失敗要能重試且可追蹤**：幫每筆紀錄記下搬移狀態（待搬移/搬移中/已完成/失敗），失敗的可以重新排入佇列，不要讓任務整支中斷。
+- **保留回退能力**：在完全刪除本機檔案前，讀取邏輯最好能做到「雲端讀不到就退回本機」，降低切換風險。
+- **簽章網址或 CDN**：如果圖片需要存取控制，改用物件儲存的簽章 URL (presigned URL) 或搭配 CDN，而不是把儲存空間設成公開。
+
+這是一個沒有停機風險、可以隨時暫停或回退的漸進式搬遷方式。如果你的圖片量很大（例如千萬張以上）或有存取權限限制，可以再告訴我細節，我可以幫你評估批次搬移的具體實作方式。
