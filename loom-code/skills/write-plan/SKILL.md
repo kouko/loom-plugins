@@ -255,9 +255,9 @@ spec yourself, from `contract/templates/spec-minimal.md`:
 
 Print one line for the user: installing `loom-design` gets them a fuller
 spec than this one. For `pre-build-review: required`, dispatch one
-fresh-context `loom-code:reviewer` with lens `spec+adversarial`, the commit
-before the spec as `reviewed_sha`, and the intent and spec as ground truth;
-it must pass before planning, with no blind run, adversary, or
+fresh-context `loom-code:reviewer` with lens `spec+adversarial`, the spec
+commit's parent (`<spec-commit>^`) as `reviewed_sha`, and the intent and
+spec as ground truth; it must pass before planning, with no blind run, adversary, or
 `finalize-review`. On NEEDS_REVISION, close each finding, commit, and send
 only those fixes back to that reviewer. For `not-required`, proceed without a
 formal spec review; `intake.spec-ready` blocks a spec with no declaration.

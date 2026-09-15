@@ -305,8 +305,8 @@ that section.
 1. Commit the spec with the message `docs(loom): spec <change-id>`.
 2. If `pre-build-review: required`, dispatch one fresh-context
    **`loom-code:reviewer`** yourself with lens `spec+adversarial`, the
-   commit before the spec as `reviewed_sha`, and the intent and spec as
-   ground truth. You are not the reviewer; do not dispatch a blind runner, a
+   spec commit's parent (`<spec-commit>^`) as `reviewed_sha`, and the intent
+   and spec as ground truth. You are not the reviewer; do not dispatch a blind runner, a
    separate adversary, or `finalize-review`. If it returns NEEDS_REVISION,
    close each finding, commit, and send only those fixes back to that
    reviewer.

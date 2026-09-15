@@ -476,6 +476,22 @@ def test_spec_review_dispatches_reviewer_directly() -> None:
         assert _affirmed_sentences(station, "commit", "send", "back to that reviewer")
 
 
+def test_spec_review_names_the_spec_commits_parent_as_reviewed_sha() -> None:
+    """A1 follow-up: cold reader found "the commit before the spec" ambiguous;
+
+    name the spec commit's parent explicitly so the reviewer's delta is
+    exactly the spec commit."""
+    for station in (PLAN, WRITE_SPEC):
+        prose = " ".join(station.split())
+        assert (
+            prose.count(
+                "the spec commit's parent (`<spec-commit>^`) as `reviewed_sha`"
+            )
+            == 1
+        )
+        assert "the commit before the spec" not in prose
+
+
 def test_closing_review_scope_spec_rejected() -> None:
     """A1 negative: no station hands a pre-build spec to closing-review."""
     for station in (PLAN, WRITE_SPEC):
