@@ -40,6 +40,15 @@ artifact (`loom-workflow:git-memory`, `loom-code:ship`,
 
 Documented reasoning turned into a standalone page is page mode, below.
 
+## Plain language and conversation tables
+
+These references sit beside the data-shape templates; the templates in
+Step 1 stay as they are.
+
+| Need | Read |
+|---|---|
+| A plainer explanation, a decision question, or a table for a conversation situation (decision, before and after, progress, checklist, confirmed and unconfirmed, findings, risks, support matrix) | `references/plain-language.md` |
+
 ## Step 1 — Classify the information shape
 
 Name the one shape the information has. If it has two, draw the one the

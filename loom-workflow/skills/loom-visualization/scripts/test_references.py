@@ -53,7 +53,7 @@ def rule_titles(text):
     """Map rule number to its H3 body under the seven-rules section."""
     body = sections(text).get("The seven rules", "")
     return {int(m.group(1)): m.group(2)
-            for m in re.finditer(r"^### (\d+)\. .+$\n(.*?)(?=^### |\Z)", body,
+            for m in re.finditer(r"^### (\d+)\. [^\n]+\n(.*?)(?=^### |\Z)", body,
                                  flags=re.MULTILINE | re.DOTALL)}
 
 
