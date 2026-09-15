@@ -31,7 +31,12 @@ Wave 1 — station text and its behavioural check
 - Test: A2 positive: finalize-failure-round-states-no-relook-unless-stuck; negative: reviewer-contract-ties-no-relook-to-round3.
 - Risk: dogfood re-run S7-a still re-looked, citing reviewer.md:150-151 and the §5 "fix verification" name clashing with Round 3; delete-first; agent-decided.
 
-**W1-03 Dogfood re-run and word budget evidence**  after: W1-04  acceptance: 4, 5
+**W1-05 Close the end-of-Build adversary findings**  after: W1-04  acceptance: 1, 2, 3
+- Files: loom-code/skills/build/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-code/scripts/test_build_mechanical_checks.py, loom-code/scripts/test_review_convergence_contract.py
+- Test: A1 positive: rerun-sentence-ends-at-after-every-fix; negative: qualified-every-fix-trigger-rejected. A2 positive: section4-round3-sentences-carry-no-relook; negative: standalone-round3-relook-rejected. A3 positive: suite-command-covers-declared-absent-and-none; negative: negated-suite-command-rejected.
+- Risk: committed adversarial programs are the RED oracle and stay unedited; delete the restated hand-off consequence to stay within 2952 words; agent-decided.
+
+**W1-03 Dogfood re-run and word budget evidence**  after: W1-05  acceptance: 4, 5
 - Files: docs/loom/2026-09-15-station-gaps-after-dogfood/evidence/dogfood-rerun.md
 - Test: A4 positive: s2-s3-s7a-conform-in-blind-audit; negative: executor-listing-rerun-as-guess-fails. A5 positive: combined-words-not-above-2952; negative: added-sentence-over-budget-fails.
 - Risk: fresh executors read the worktree text; two blind auditor runs absorb judge variance; baseline 848+2104 words at 9906c79; agent-decided.
@@ -52,3 +57,5 @@ Wave 2 — release
 2. The previous change's committed mutation probe anchors on the old re-run sentence; it is historical evidence outside the package suite and stays untouched; agent-decided.
 3. "blocker" stays undefined, so a reader could still count a finalize failure toward the stuck rule; the new §5 sentence argues against it but cannot rule it out.
 4. "every fix" may be over-applied to per-task fixes during implementation; the worst case is extra suite runs, not a wrong hand-off.
+5. Both re-run auditors note Build does not say what to do when an end-of-Build failure predates the change; out of scope, recorded as a follow-up.
+6. W2-01 ran before W1-03: release files and the evidence file are disjoint and the evidence is docs-only; agent-decided.
