@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.6.0] — 2026-09-15 — sync with main before closing review
+
+- Add `loom_checker.py sync-trunk` (rule `review.sync`): it fetches the remote
+  trunk and merges it into the change branch, reports `up to date` when the
+  branch already contains the tip, detects a conflict before merging (or
+  aborts the merge on older git) and names every conflicting file, refuses
+  the trunk, a detached HEAD, a dirty worktree, or an untracked or ignored
+  path the trunk would overwrite, and warns and continues when the remote
+  cannot be reached.
+- Build runs `sync-trunk` first among its end-of-Build checks, so the
+  adversary, the complete package suite and the adversarial programs all run
+  on the synced content; the hand-off reports the sync result and any warning.
+- Closing review runs `sync-trunk` before dispatching Round 1 reviewers. When
+  the sync merged new content it dispatches no reviewer and returns to Build
+  to re-run the suite and programs; a warning is stated in the round report
+  and review continues; a block returns the change to Build.
+- The attestation therefore binds the content that will merge, instead of
+  being invalidated by a merge from main after review.
+- The sync-before-dispatch order is station prose only, backstopped by land's
+  refusal of a BEHIND pull request.
+- budget-exception: review.sync — the only step that brings the change branch up to date with the trunk before reviewers read it; eval loom-code/scripts/test_sync_trunk.py::test_conflict_names_every_file_and_restores_head.
+
 ## [3.5.0] — 2026-09-15 — mechanical checks before closing review
 
 - Build now ends with an independent adversary plus the complete package suite
