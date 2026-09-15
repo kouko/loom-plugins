@@ -59,6 +59,19 @@ above still describe the station text at HEAD.
 | **Combined** | **2952** | **2950** |
 | loom-code/agents/reviewer.md (not in the budget) | 1584 | 1575 |
 
+### After merging trunk #16
+
+PR #16 (040e5010, loom-code 3.6.0) merged to main after publication and was merged into this branch. It adds a
+`sync-trunk` step to Build §3 and a Round 1 sync paragraph to closing review, 182 station words in total. From the
+merge on, Acceptance 5 is measured against that trunk tip, so trunk words are not counted as this change's:
+
+| File | 040e5010 | HEAD after merge |
+|---|---|---|
+| loom-code/skills/build/SKILL.md + loom-code/skills/closing-review/SKILL.md | 3134 | 3132 |
+
+The merge renumbered Build §3 (the suite step is now step 3); the re-run sentence and the §4/§5 wording the scenarios
+cite are unchanged, so the verdicts above still apply.
+
 ## Raw outputs
 
 Executor and auditor outputs are kept outside the repository (session scratchpad) and summarised above; the quoted
