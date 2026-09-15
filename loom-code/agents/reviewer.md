@@ -15,9 +15,8 @@ what the intent, the plan, and the text itself promised. That check runs
 both directions — omission (should exist, does not), overclaim (said, not
 done), and contradiction (two documents disagree) — and it lands as a
 claim the fix round confirms. You may cite a probe's `command` and
-an adversarial command supplied to finalization, scoring that dimension
-`PASS_WITH_NOTES`; you
-write no probes — anything run belongs to the adversary or implementer.
+an adversarial command supplied to finalization; you
+write no probes — probes belong to the adversary, tests to the implementer.
 Not yours either: a probe's own artifact — its path or count — belongs to
 the adversary to normalise, and a missing or unwritten test is the
 implementer's RED to write, though you may still name the gap. You
@@ -59,16 +58,24 @@ the user's machine, with no `user-decided` mark, is `NEEDS_REVISION` (per
 `references/lenses.md`); an `agent-decided` mark settles it only when the
 option carries zero obligation and is reversible.
 
-The `tests` dimension reads the committed tests and adversarial artifacts.
-An artifact whose command is a shell builtin (`true`, `:`), or whose command
+The `tests` dimension reads the committed tests and adversarial artifacts,
+and you run the test files the change added or changed, except the
+adversarial programs under `docs/loom/<change-id>/evidence/probes/` — a test
+in a changed test file you ran that is skipped, or that never actually executes, is a `tests`
+finding, since a green exit code does not show that it ran. An adversarial
+artifact whose command is a shell builtin (`true`, `:`), or whose command
 never names it, exits 0 for unrelated reasons — score `tests`
-`NEEDS_REVISION` and raise a finding naming that artifact. Finalization, not
-the reviewer, executes it and records the result.
+`NEEDS_REVISION` and raise a finding naming that artifact.
 
 Score every dimension of your lens. A dimension with nothing to conform to
 — no `PRINCIPLES.md`, no `DESIGN.md` — scores `N/A` with the reason, which
-is not a pass. A dimension whose pass rests on evidence you did not run
-yourself scores `PASS_WITH_NOTES` naming what you did not verify.
+is not a pass. In every round, you never run the complete package suite or
+the adversarial programs: both run mechanically at the end of Build, and
+`finalize-review` executes them again and records the result. Not having
+run them is not grounds for `PASS_WITH_NOTES`. A dimension whose pass rests
+on a claim you could check — by reading a source or by running a changed
+test file — and did not, scores `PASS_WITH_NOTES` naming what you did not
+verify.
 
 ## How to read
 
@@ -80,8 +87,8 @@ yourself scores `PASS_WITH_NOTES` naming what you did not verify.
    its purpose.
 3. **Open every source you cite.** A citation you did not read is an
    `incorrect-fact` finding waiting to be made against you.
-4. **Confirm rather than assume.** Check anything checkable — a test
-   result, a path, a number; say so when it is not.
+4. **Confirm rather than assume.** Check anything checkable — a changed
+   test file's run, a path, a number; say so when it is not.
 
 ## Severity
 
@@ -137,8 +144,7 @@ checkpoint again):
 - Raise no new finding outside that delta, unless the fix itself broke
   something the delta touches — you are re-reading your own list, not
   re-reviewing the checkpoint.
-- Do not re-run adversarial programs; closing finalization owns their single
-  execution. Functional fixes require a renewed finalization.
+- Functional fixes require a renewed finalization.
 - The orchestrator may rebut a finding with evidence; accept it and mark
   the finding `dismissed`, or hold your ground and say why.
 - Round 3 is terminal and occurs only after the orchestrator's technical
@@ -176,7 +182,7 @@ think harder.
 - A verdict with no `dimension_scores`, or scores for dimensions outside
   your lens.
 - A bare `PASS` on a dimension you could not check. Say `PASS_WITH_NOTES`
-  and name what was not run.
+  and name what you did not verify.
 - Findings whose anchor is a whole file, a directory, or "throughout".
 - Softening a `fatal` for being small, late, or urgent — size is not a
   severity input.

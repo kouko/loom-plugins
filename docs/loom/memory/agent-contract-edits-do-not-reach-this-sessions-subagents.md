@@ -1,9 +1,10 @@
 ---
 name: agent-contract-edits-do-not-reach-this-sessions-subagents
-description: An ordinary subagent dispatch loads its role contract from the installed plugin, not from the repo working tree, so an agent-contract edit on a branch does not reach the reviewers that branch dispatches — and the subagent cannot reliably report which version it loaded, because it may have read the repo copy as a review artifact and mistake that for its own system prompt
+description: An ordinary subagent dispatch loads its role contract from the installed plugin, not from the repo working tree, so an agent-contract edit on a branch does not reach the reviewers that branch dispatches unless they are dispatched from a session started with --plugin-dir on the branch plugin — and the subagent cannot reliably report which version it loaded, because it may have read the repo copy as a review artifact and mistake that for its own system prompt
 type: gotcha
 sources:
   - resource: PR #645 (2026-08-04) — the delta-scope rule was edited into loom-code/agents/docs-reviewer.md and every reviewer dispatched that session still ran the cached 0.47.0 contract
+  - resource: docs/loom/2026-09-15-mechanical-checks-before-review/evidence/plugin-dir-reviewer-probe.md (2026-09-15) — from an empty cwd with no tools, a loom-code:reviewer dispatched in a --plugin-dir session quoted branch-only contract sentences while the control session quoted the installed 3.4.0 text
 ---
 
 Editing `loom-code/agents/<role>.md` on a branch changes the file the
@@ -16,11 +17,13 @@ moves when the plugin is published and updated.
 **Scope, because a sibling entry covers the exception**:
 [[headless-branch-plugin-testing-recipe]] loads an unpushed branch's plugin
 with `claude … --plugin-dir <repo>/<plugin>`, which is a deliberate override
-of the path this entry describes. Whether that override reaches subagent
-role contracts specifically is untested — the point here is only that an
-ordinary in-session dispatch does not, so "I dispatched a reviewer and it
+of the path this entry describes. That override does reach subagent role
+contracts: a reviewer dispatched from such a session, run from an empty
+directory with no tools, quoted sentences that exist only in the branch's
+contract, while a control session quoted the installed text. An ordinary
+in-session dispatch still does not, so "I dispatched a reviewer and it
 behaved correctly" is not evidence about a contract edit that has not
-shipped.
+shipped unless that reviewer came from a `--plugin-dir` session.
 
 The gap is invisible unless you look at the cache. On PR #645 the working
 tree carried a new `### Round scope` input section and an `out_of_scope:`
@@ -53,9 +56,9 @@ the change is unverified behaviourally and say why — do not cite a
 reviewer's self-description as evidence it landed. To check what is actually
 live, grep the installed cache path, not the repo. Ordinary review rounds
 cannot supply behavioural verification of such a change, so do not schedule
-it as one. Two instruments remain before publication: a deliberate
-`--plugin-dir` probe, whose reach into role contracts is untested and so
-worth establishing before relying on it
+it as one. Two instruments remain before publication: reviewers or probes
+dispatched from a `--plugin-dir` session on the branch plugin, which do run
+under the branch's role contracts
 ([[headless-branch-plugin-testing-recipe]]), and static checks that need no
 probe at all — a diff read by a reviewer, or a check pairing the skill
 against the agent contract

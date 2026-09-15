@@ -325,12 +325,17 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
         "run `loom_checker.py selection show <change-id>` and omit the steps it lists as "
         "skipped; §2 and §3 say how skipped reviewers, adversarial and blind-run are handled"
     )
+    build_read = (
+        "run `loom_checker.py selection show <change-id>` and omit only the steps it lists "
+        "as skipped (spec, plan, implementer, tdd, adversarial, package-tests, blind-run)"
+    )
     assert prose_read not in " ".join(REVIEW.split())
+    assert prose_read not in " ".join(BUILD.split())
     assert (
         "- Unless reviewers are skipped, a selected second vendor remains required. Resolve it "
         "from the standing fixed CLI"
     ) in " ".join(REVIEW.split())
-    for station, read in ((BUILD, prose_read), (REVIEW, review_read),
+    for station, read in ((BUILD, build_read), (REVIEW, review_read),
                           (SHIP, prose_read), (PLAN, prose_read)):
         prose = " ".join(station.split())
         assert prose.count(read) == 1
@@ -357,17 +362,18 @@ def test_build_obligations_yield_to_a_bound_selection() -> None:
 
 def test_review_dispatches_nothing_for_skipped_steps() -> None:
     depth = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
-    checks = REVIEW.split("## 3. Run blind and adversarial checks", 1)[1].split("## 4.", 1)[0]
+    assert "## 3. Run blind and adversarial checks" not in REVIEW
+    checks = REVIEW.split("## 3. Run the blind run", 1)[1].split("## 4.", 1)[0]
     assert (
         "When `selection show` lists `reviewers` as skipped, dispatch no reviewer and pass "
         "no `verdicts`."
     ) in " ".join(depth.split())
     checks_prose = " ".join(checks.split())
     assert (
-        "When `selection show` lists `adversarial` as skipped, create no adversarial program "
-        "and omit the `adversarial` input."
+        "When `selection show` lists `adversarial` as skipped, Build hands off no adversarial "
+        "program and §5 omits the `adversarial` input."
     ) in checks_prose
-    assert "When it lists `blind-run` as skipped, run no blind run." in checks_prose
+    assert "When `selection show` lists `blind-run` as skipped, run no blind run." in checks_prose
 
 
 def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
@@ -402,3 +408,31 @@ def test_code_only_surface_routing_matches_capture_intent() -> None:
     assert "Visible effects with an unknown surface and no spec require" in normalized
     assert "surface-neutral reason" in normalized
     assert "internal files alone do not" in normalized
+
+
+def _station_summary_rows(station: str) -> tuple[list[str], list[str]]:
+    rows = [line for line in station.splitlines() if line.startswith("| ")]
+    build = [row for row in rows if row.startswith("| build |")]
+    review = [row for row in rows if row.startswith("| closing-review |")]
+    return build, review
+
+
+def test_station_summary_rows_name_builds_mechanical_checks() -> None:
+    stations = [
+        CAPTURE,
+        PLAN,
+        *((ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
+          for name in ("write-spec", "product-principles", "design-system")),
+    ]
+    for station in stations:
+        build, review = _station_summary_rows(station)
+        assert len(build) == 1 and len(review) == 1
+        assert "independent adversary's committed adversarial programs" in build[0]
+        assert "complete package suite" in build[0]
+        assert "must pass before hand-off" in build[0]
+        assert "only content that passed Build's checks" in review[0]
+        assert "again on committed content" in review[0]
+        assert "execute once during" not in review[0]
+        for row in (*build, *review):
+            assert "closing review dispatches" not in row.lower()
+            assert "closing-review dispatches" not in row.lower()

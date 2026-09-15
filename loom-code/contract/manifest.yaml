@@ -48,7 +48,7 @@ actions:             # executable steps inside a station; not skills (§3)
     summary: "code-only install, kind product, no ratified PRINCIPLES.md — run templates/PRINCIPLES-interview.md inside decision point ①; user confirms, agent writes ratified-by."
   - name: package-tests
     owner: closing-review
-    summary: "run the package-level test command once during finalize-review; the generated attestation binds its result to functional content."
+    summary: "run the package-level test command at the end of Build and once more during finalize-review; the generated attestation binds the finalize result to functional content."
   - name: parallel-dispatch
     owner: build
     summary: "every implementation task is dispatched to an implementer; scheduling multiple implementers concurrently is optional and requires genuine independence because disjoint files alone do not establish independence; no dispatch ledger is required."
@@ -62,7 +62,7 @@ actions:             # executable steps inside a station; not skills (§3)
     owner: closing-review
     summary: "an agent that never touched the change builds/runs it in a clean environment and writes the blind-run report against every Acceptance line (plus UI flows for product)."
   - name: adversarial
-    owner: closing-review
+    owner: build
     summary: "mutation / fuzz / abuse cases for code, red-team for spec, and gate attacks for skills; execution results land in the generated attestation."
   - name: checkpoint
     owner: closing-review
@@ -257,7 +257,7 @@ step_selection:      # the only step names a user selection may run or skip; the
 kickoff_defaults:   # grammar: `- <key>: <value> — <reason> (<date>)`
   - {name: second-vendor,          grammar: "<cli> | ask | suggest", note: "`ask` blocks once per full-lane change; `suggest` reports availability without waiting and permits opt-in only before full-lane Review"}
   - {name: docs-lint,              grammar: "<command> | none", note: "declared, not a blocker (W0-02): a declared command runs in CI for its report only; reviewer contract reads it to decide whether style findings are allowed at all"}
-  - {name: package-tests,          grammar: "<command> | none", note: "the command finalize-review executes once and push.attestation validates by identity; absent = recomputed from build markers"}
+  - {name: package-tests,          grammar: "<command> | none", note: "the command Build runs at the end of Build and finalize-review executes once more, which push.attestation validates by identity; absent = recomputed from build markers"}
   - {name: standing-docs,          grammar: "waived"}
   - {name: session-start-baseline, grammar: "<sha> <words>"}
   - {name: interface-surfaces,     grammar: "<glob>[, <glob>…]", default: "**/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/**"}

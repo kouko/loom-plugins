@@ -4,6 +4,7 @@ description: Recipe for behaviorally testing an unpushed branch's Claude Code pl
 type: process
 sources:
   - resource: PR #488 (loom family connective tissue, firing tests 2026-07-04)
+  - resource: docs/loom/2026-09-15-mechanical-checks-before-review/evidence/plugin-dir-reviewer-probe.md (2026-09-15) — --plugin-dir reached a dispatched subagent's role contract; --allowedTools swallowed the trailing prompt
 ---
 
 To behaviorally test Claude Code plugins from an UNPUSHED branch
@@ -15,7 +16,13 @@ version directories are the tell. Recipe:
 1. **Wrapper script per plugin** overriding the installed copy:
    `exec claude "$@" --plugin-dir <repo>/<plugin>` — feed the
    wrapper into the harness's `claude_bin` seam (the harness
-   parameter that names the claude binary to invoke).
+   parameter that names the claude binary to invoke). The override
+   also reaches subagents that session dispatches: their role
+   contracts load from the branch, not the installed cache. Pass the
+   prompt on stdin (or write `--allowedTools=Agent`): `--allowedTools`
+   takes every following argument, so a trailing prompt is swallowed
+   and `-p` fails with "Input must be provided either through stdin or
+   as a prompt argument".
 2. **Run from a neutral EMPTY directory** — leftover artifacts in a
    working/scratchpad directory contaminated 3 test records by
    giving the model unintended context.

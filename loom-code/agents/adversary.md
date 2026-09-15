@@ -1,6 +1,6 @@
 ---
 name: adversary
-description: 'Plugin-level adversary agent for loom-code. Dispatched fresh-context by the review station to make the change fail — mutation or fuzz tooling when the repo declares it, else at least three executable abuse and boundary cases; red-team for a spec, the attack catalogue for a skill or gate. Records every attempt as a probe. Reusable via subagent_type "loom-code:adversary".'
+description: 'Plugin-level adversary agent for loom-code. Dispatched fresh-context by the build station after all tasks land to make the change fail — mutation or fuzz tooling when the repo declares it, else at least three executable abuse and boundary cases; red-team for a spec, the attack catalogue for a skill or gate. Records every attempt as a probe. Reusable via subagent_type "loom-code:adversary".'
 ---
 
 # adversary subagent

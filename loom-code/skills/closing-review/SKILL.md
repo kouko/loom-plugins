@@ -38,8 +38,8 @@ the selected model's verified host capabilities. Record the requested and
 effective profile with its evidence-grounded reason in active task context only.
 Apply the resolved overrides at invocation time; a static model or effort pin in
 an agent contract is invalid. Repeat this resolution for every reviewer,
-second-vendor reviewer, blind runner, and adversary dispatch; role and round
-labels supply no routing evidence.
+second-vendor reviewer, and blind runner dispatch; role and round labels supply
+no routing evidence.
 
 Invoke `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py` from Claude
 Code or `python3 <loom-code>/scripts/dispatch_profile.py` from any other host,
@@ -57,6 +57,15 @@ fallback instead of model escalation.
 
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
+
+Before dispatching reviewers in any round, confirm on the current functional
+content (a committed blind-run report aside) that Build's hand-off reports the
+complete package suite passing or `selection show` lists `package-tests` as
+skipped, and that it reports every adversarial program passing or
+`selection show` lists `adversarial` as skipped, each skip waiving only its own
+check. Otherwise return the change to
+Build and dispatch no reviewer. Reviewers read only content whose Build
+mechanical checks passed.
 
 When a blind run is needed, finish it and commit its report (§3) before
 dispatching the first reviewers. After Build commits completed functional
@@ -144,7 +153,7 @@ free-form provider text. Route on the stderr JSON `kind`, not exit status
 alone; a plain-text exit 2 is caller misuse rather than a routing signal.
 <!-- /gate -->
 
-## 3. Run blind and adversarial checks
+## 3. Run the blind run
 
 Use a blind run when an Acceptance line cannot be settled mechanically. Its
 `docs/loom/<change-id>/blind-run-report.md` is functional content; only
@@ -152,13 +161,14 @@ Use a blind run when an Acceptance line cannot be settled mechanically. Its
 that report on the change branch before the reviewers read the final
 functional-content digest, and so before running `finalize-review`. A report
 committed after their verdicts is new functional content and needs the next
-round. For
-code, skill, spec, or gate changes, create committed adversarial programs that
-exercise the relevant boundary and pass their paths and commands to
-`finalize-review`. Do not record a claimed result; finalization executes them.
-When `selection show` lists `adversarial` as skipped, create no adversarial
-program and omit the `adversarial` input. When it lists `blind-run` as skipped,
-run no blind run.
+round. When `selection show` lists `blind-run` as skipped, run no blind run.
+
+Closing review dispatches no adversary and creates no adversarial program.
+Build commits the adversarial programs, and its hand-off names each program's
+path and command; §5 passes them to `finalize-review`. Do not record a claimed
+result; finalization executes them. When `selection show` lists `adversarial`
+as skipped, Build hands off no adversarial program and §5 omits the
+`adversarial` input.
 
 ## 4. Converge within one bounded episode
 
@@ -173,7 +183,8 @@ content the reviewers last read; publication-only edits do not change it.
 
 - **Round 1 — full review.** Review the cumulative functional content.
 - **Round 2 — fix verification.** Batch fatal and important findings, return to
-  Build, and resume the same reviewers over the functional fix delta.
+  Build, which repeats its end-of-Build mechanical checks, and resume the same
+  reviewers over the functional fix delta.
 - **Round 3 — terminal verification.** If Round 2 still has blockers, first
   stop local patching and perform a technical design re-look. The agent owns
   that re-plan when it preserves requirements, visible behavior, and
@@ -228,8 +239,8 @@ the user.
 
 ## 5. Finalize
 
-Write reviewer output and adversarial command declarations to a temporary JSON
-input outside the repository:
+Write reviewer output and the adversarial command declarations from Build's
+hand-off to a temporary JSON input outside the repository:
 
 ```json
 {
@@ -242,6 +253,9 @@ input outside the repository:
   ]
 }
 ```
+
+The `findings` input carries every unresolved adversarial finding that Build's
+hand-off lists.
 
 Then run:
 
@@ -256,6 +270,13 @@ Only after all executions and verdicts pass does it atomically generate the
 attestation bound to the functional-content digest. Commit the generated file
 with any remaining publication metadata; publication validates that single
 attestation directly.
+
+When `finalize-review` fails, return the fix to Build, which repeats its
+end-of-Build mechanical checks, and the fixed content, a new functional-content
+digest, must pass the next review round (§4) before `finalize-review` runs
+again. Earlier verdicts are never reused for the fixed content. When no round
+remains, the fix would need a fourth distinct digest, which §4 forbids, so it
+ends the episode as `NON_CONVERGENT`.
 
 ## Handoff
 

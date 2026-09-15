@@ -1,9 +1,14 @@
 import re
 from pathlib import Path
 
+from prose_pin import has_negation, split_sentences
+
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
+ADVERSARIAL_REF = (
+    ROOT / "loom-code/skills/closing-review/references/adversarial.md"
+).read_text(encoding="utf-8")
 REVIEWER = (ROOT / "loom-code/agents/reviewer.md").read_text(encoding="utf-8")
 REVIEW_WORDS = " ".join(REVIEW.split())
 CONTRACT = " ".join((REVIEW + "\n" + REVIEWER).split())
@@ -55,7 +60,7 @@ def test_round_four_is_forbidden_in_context() -> None:
 
 
 def _sentences(text: str) -> list[str]:
-    return [s for s in re.split(r"(?<=[.:;])\s+", text) if s]
+    return split_sentences(text, ends=".:;")  # colon is a boundary here
 
 
 def test_station_commits_report_before_finalize() -> None:
@@ -254,3 +259,122 @@ def test_blind_run_before_first_reviewer_dispatch() -> None:
     )
     assert sentence in words
     assert words.index(sentence) < words.index("loom_checker.py reviewer-count")
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-15-mechanical-checks-before-review — acceptance 3, 6, 7
+# ---------------------------------------------------------------------------
+
+def _flat_section(heading: str) -> str:
+    return " ".join(REVIEW.split(heading, 1)[1].split("\n## ", 1)[0].split())
+
+
+_EARLY_DISPATCH = re.compile(
+    r"\b(?:while|during|in parallel|still run\w*|under time pressure)\b", re.IGNORECASE
+)
+_OPTIONAL_ROUND = re.compile(
+    r"\b(?:may|might|can|optional(?:ly)?|skip\w*|waive\w*)\b", re.IGNORECASE
+)
+
+
+def _early_dispatch_sentences(text: str) -> list[str]:
+    """Sentences that permit dispatching reviewers before Build's checks finish."""
+    return [
+        s for s in _sentences(text)
+        if re.search(r"\bdispatch\w*\b", s, re.IGNORECASE)
+        and re.search(r"\breviewers?\b", s)
+        and _EARLY_DISPATCH.search(s)
+    ]
+
+
+def test_gate_helpers_synthetic() -> None:
+    assert _early_dispatch_sentences(
+        "Under time pressure, dispatch reviewers while Build's checks still run."
+    )
+    assert not _early_dispatch_sentences("Otherwise return the change to Build and dispatch no reviewer.")
+    assert _OPTIONAL_ROUND.search("the fixed content may skip the next review round")
+    assert not _OPTIONAL_ROUND.search("the fixed content must pass the next review round")
+
+
+def test_reviewers_dispatched_after_build_checks() -> None:
+    depth = _flat_section("## 2. Compute review depth")
+    confirm = next(s for s in _sentences(depth) if s.startswith("Before dispatching reviewers in any round"))
+    for element in ("Build's hand-off", "complete package suite", "every adversarial program", "`selection show`"):
+        assert element in confirm, confirm
+    assert not has_negation(confirm), confirm
+    for step in (
+        "the complete package suite passing or `selection show` lists `package-tests` as skipped",
+        "every adversarial program passing or `selection show` lists `adversarial` as skipped",
+        "each skip waiving only its own check",
+    ):
+        assert step in confirm, confirm
+    assert "that step" not in confirm, confirm
+    assert "Otherwise return the change to Build and dispatch no reviewer." in depth
+    assert _early_dispatch_sentences(REVIEW_WORDS) == []
+    assert depth.index(confirm) < depth.index("loom_checker.py reviewer-count")
+    round_two = next(s for s in REVIEW_WORDS.split("- **") if s.startswith("Round 2"))
+    assert "repeats its end-of-Build mechanical checks" in round_two
+
+
+def test_no_adversary_dispatch_in_closing_review() -> None:
+    assert "loom-code:adversary" not in REVIEW
+    assert "adversary dispatch" not in REVIEW_WORDS
+    assert "create committed adversarial programs" not in REVIEW_WORDS
+    assert "Run blind and adversarial checks" not in REVIEW
+    for sentence in _sentences(REVIEW_WORDS):
+        if re.search(r"\badversary\b", sentence):
+            assert has_negation(sentence), sentence
+    opening = " ".join(ADVERSARIAL_REF.split("\n## ", 1)[0].split())
+    assert "at the end of Build" in opening
+    assert "a later round can re-run it" not in opening
+    recording = " ".join(ADVERSARIAL_REF.split("## Recording", 1)[1].split())
+    assert "Build re-runs" in recording
+    assert "`finalize-review`" in recording
+
+
+def test_finalize_failure_fix_needs_next_round() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    sentence = next(s for s in _sentences(finalize) if s.startswith("When `finalize-review` fails"))
+    for element in (
+        "return the fix to Build, which repeats its end-of-Build mechanical checks",
+        "must pass the next review round (§4) before `finalize-review` runs again",
+    ):
+        assert element in sentence, sentence
+    assert not has_negation(sentence), sentence
+    for other in _sentences(finalize):
+        if re.search(r"\bround\b|end-of-Build|mechanical checks", other):
+            assert not _OPTIONAL_ROUND.search(other), other
+    assert "The checker runs the declared package suite and each adversarial program once." in finalize
+
+
+def test_finalize_failure_without_round_is_non_convergent() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    sentence = next(s for s in _sentences(finalize) if s.startswith("When no round remains"))
+    assert "fourth distinct digest" in sentence, sentence
+    assert "ends the episode as `NON_CONVERGENT`" in sentence, sentence
+
+
+def test_earlier_verdicts_not_reused() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    assert "Earlier verdicts are never reused for the fixed content." in finalize
+    for sentence in _sentences(REVIEW_WORDS):
+        if re.search(r"\breus(?:e|ed|es|ing)\b", sentence, re.IGNORECASE):
+            assert has_negation(sentence), sentence
+    rerun_with_old = re.compile(
+        r"\b(?:re-?run|run)\b[^.]*`finalize-review`[^.]*\b(?:same|earlier|previous|existing|prior) verdicts",
+        re.IGNORECASE,
+    )
+    assert not [s for s in _sentences(REVIEW_WORDS) if rerun_with_old.search(s)]
+
+
+def test_unresolved_adversarial_findings_reach_finalize_input() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    sentence = next(s for s in _sentences(finalize) if "unresolved adversarial finding" in s)
+    assert "`findings` input" in sentence, sentence
+    assert "Build's hand-off" in sentence, sentence
+    assert not has_negation(sentence), sentence
+    assert not _OPTIONAL_ROUND.search(sentence), sentence
+    recording = " ".join(ADVERSARIAL_REF.split("## Recording", 1)[1].split())
+    destination = next(s for s in _sentences(recording) if "`findings` input of `finalize-review`" in s)
+    assert "closing review passes" in destination, destination
+    assert not has_negation(destination), destination

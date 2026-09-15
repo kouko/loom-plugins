@@ -1,0 +1,93 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-15-mechanical-checks-before-review",
+  "content_digest": "0ba74909721e79e09c896ce834613972e0dadf5a",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_text_pins_mutation.py -q",
+      "artifact": "docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_text_pins_mutation.py",
+      "result": "pass",
+      "command_digest": "dfdf7812bbb6fa575580c6d56f5fae2d2d5571d91c18fc621fa5705a0f38b65b"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_reviewer_runs_probes.py -q",
+      "artifact": "docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_reviewer_runs_probes.py",
+      "result": "pass",
+      "command_digest": "716207a3e1aac522f91df98285c4c39d9b602d845db5d49cbe21f7414bf47815"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_selection_skip_gates.py -q",
+      "artifact": "docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_selection_skip_gates.py",
+      "result": "pass",
+      "command_digest": "83a40726599b2102221870fbdf363e4578ed7f7d8b0222f5660e1fd60334cb32"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_checker_code_untouched.py -q",
+      "artifact": "docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_checker_code_untouched.py",
+      "result": "pass",
+      "command_digest": "556b2cf44f5ecd4cd652d8a929280cc23b66090e137c915ea84fed9ac7ece946"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "mcr-code-r1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_checker_code_untouched.py:21",
+          "text": "GUARDED covers finalize.py, attestation.py and push.py but not test_selection_finalize.py or test_loom_attestation.py; both have no diff against the merge-base today.",
+          "status": "open"
+        }
+      ]
+    },
+    {
+      "reviewer": "mcr-skill-r1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "deletion-first",
+          "anchor": "loom-code/skills/build/SKILL.md :: A hand-off with neither step skipped therefore means the complete package suite and every adversarial program pass.",
+          "text": "Restated consequence sentence repeats the gate; rebuttal accepted because the committed mutation probe anchors on it.",
+          "status": "dismissed"
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "source": "mcr-code-r1",
+      "severity": "nit",
+      "status": "open",
+      "anchor": "docs/loom/2026-09-15-mechanical-checks-before-review/evidence/probes/test_checker_code_untouched.py:21",
+      "text": "Extend GUARDED to test_selection_finalize.py and test_loom_attestation.py (follow-up)."
+    },
+    {
+      "source": "implementer W5-02",
+      "severity": "nit",
+      "status": "open",
+      "anchor": "loom-code/scripts/test_package_tests_command.py:46",
+      "text": "Docstring still says Closing Review runs all Loom groups (comment only; follow-up)."
+    }
+  ],
+  "selection": null
+}

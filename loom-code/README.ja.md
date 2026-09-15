@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.4.1 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.5.0 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -21,8 +21,8 @@ flowchart TD
     intent["① intent を確認する<br/>loom-design:capture-intent<br/>loom-design がなければ loom-code:write-plan"]
     spec["needs-design: yes のときだけ<br/>loom-design:write-spec<br/>② product の変更: 目に見える振る舞いを確認する"]
     plan["loom-code:write-plan<br/>plan.md のタスク DAG"]
-    build["loom-code:build<br/>テストファースト、タスクごとに implementer 1 つ"]
-    review["loom-code:closing-review<br/>fresh-context のレビュアー<br/>必要なら盲検と adversary"]
+    build["loom-code:build<br/>テストファースト、タスクごとに implementer 1 つ<br/>最後に adversary と package テスト一式"]
+    review["loom-code:closing-review<br/>fresh-context のレビュアー<br/>必要なら盲検"]
     attest[["attestation を生成<br/>loom-code:closing-review による"]]
     ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは盲検レポートで"]
     merged(["マージは別手順<br/>loom-code:ship の後、あなた自身の許可で"])
@@ -48,7 +48,9 @@ flowchart TD
   `loom-design:write-spec`、または code のみのインストールでは `write-plan` の
   最小 spec。
 - **ビルドとレビュー** — `build` は全タスクに implementer を割り当て、テストから
-  書きます。`closing-review` はクロージングレビューを 1 回行います。`NEEDS_REVISION` は
+  書き、最後に独立した adversary の敵対プログラムと package テスト一式を
+  走らせます。これらが通るまで引き渡しません。`closing-review` はその確認済みの
+  内容にクロージングレビューを 1 回行います。`NEEDS_REVISION` は
   指摘を `build` に戻し、合格した証拠は、レビューされた機能内容に結び付く
   attestation として生成されます。
 - **Ship** — ブランチを push し、PR を開き、必須チェックを確認します（③）。
@@ -62,8 +64,8 @@ flowchart TD
 | Skill | 役割 |
 |---|---|
 | [`write-plan`](skills/write-plan/SKILL.md) | 確認済みの intent を `docs/loom/<change-id>/plan.md` に変える：ファイル、担当する Acceptance 行、テストケース、リスクを持つ wave 分けされたタスク。`loom-design` がなければ ① を自分で行う。 |
-| [`build`](skills/build/SKILL.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装する。 |
-| [`closing-review`](skills/closing-review/SKILL.md) | クロージングレビュー（レビュアー、必要に応じて盲検と敵対プログラム）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
+| [`build`](skills/build/SKILL.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装し、最後に adversary と package テスト一式を走らせる。これらが通るまで引き渡さない。 |
+| [`closing-review`](skills/closing-review/SKILL.md) | Build の確認を通った内容にクロージングレビュー（レビュアー、必要に応じて盲検）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
 | [`ship`](skills/ship/SKILL.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
 | [`maintain`](skills/maintain/SKILL.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
@@ -79,7 +81,7 @@ flowchart TD
 | [`implementer`](agents/implementer.md) | `build` | 1 タスク：失敗するテストを先に書き、1 コミット、状態レポート — verdict は出さない。 |
 | [`reviewer`](agents/reviewer.md) | `closing-review` | fresh-context の verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）と位置付きの指摘。レビュー対象は編集しない。 |
 | [`blind-runner`](agents/blind-runner.md) | `closing-review` | クリーンな環境で変更を動かして全 Acceptance 行を確かめ、`docs/loom/<change-id>/blind-run-report.md` を書く。 |
-| [`adversary`](agents/adversary.md) | `closing-review` | 変更を壊しにいく — mutation や fuzz ツール、または実行可能な悪用・境界ケース 3 つ以上 — そしてすべての試行を probe として記録する。 |
+| [`adversary`](agents/adversary.md) | `build` | 変更を壊しにいく — mutation や fuzz ツール、または実行可能な悪用・境界ケース 3 つ以上 — そしてすべての試行を probe として記録する。 |
 
 レビュアーの人数は agent が選ぶのではありません。`loom_checker.py
 reviewer-count` がブランチ全体の差分から計算します — 狭く低リスクな変更なら
@@ -118,7 +120,7 @@ artifact — intent・spec・plan・attestation・盲検レポート・`KICKOFF-
 合格で 0、ルールによるブロックで 1、使い方や内部のエラーで 2 — 判定できない
 checker が「問題なし」と言うことはありません。ステーションは intake、
 `reviewer-count`、`finalize-review` でこれを呼びます。`finalize-review` は
-package テストと敵対プログラムを 1 回だけ走らせ、内容に結び付く attestation を
+コミット済みの内容で package テストと敵対プログラムを再度走らせ、内容に結び付く attestation を
 生成します。インストール済みの `PreToolUse` hook は `git push` と
 `gh pr create` の前にもう一度走り、内容の digest を再計算して、テストや probe を
 再実行せずにその証拠を検証します。
