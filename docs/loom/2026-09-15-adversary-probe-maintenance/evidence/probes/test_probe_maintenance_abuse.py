@@ -5,9 +5,10 @@ programs, and tells the adversary to reuse existing probes and tests first.
 These probes try to make that change fail:
 
 * mutation runs of the new pins in `test_build_mechanical_checks.py`: each
-  mutation removes or loosens one guard sentence in a scratch copy of the
-  changed files and runs the committed test module against it; a mutant the
-  module still passes is a vacuous pin;
+  mutation removes, loosens or overrides one guard sentence in a scratch copy
+  of the changed files and runs the committed test module against it; a
+  mutant the module still passes is a vacuous pin, and a mutant killed only by
+  a test other than the pin named for it is a pin that holds by accident;
 * readings of the new Build exception that an agent under time pressure
   could exploit (a real defect relabelled "stale", a probe rewritten to
   accept the defect, reuse of the implementer's own tests as the
@@ -67,7 +68,7 @@ def _scratch(tmp_path: Path) -> Path:
 
 def _run_pins(root: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", str(root / TEST_MODULE)],
+        [sys.executable, "-m", "pytest", "-q", "-rf", "-p", "no:cacheprovider", str(root / TEST_MODULE)],
         cwd=root / "loom-code/scripts",
         capture_output=True,
         text=True,
@@ -78,33 +79,75 @@ def _run_pins(root: Path) -> subprocess.CompletedProcess[str]:
 def _mutate(root: Path, rel: str, old: str, new: str) -> None:
     path = root / rel
     text = path.read_text(encoding="utf-8")
-    mutated, count = _ws(old).subn(new, text)
+    mutated, count = _ws(old).subn(lambda _m: new, text)
     assert count == 1, f"mutation anchor not found exactly once in {rel}: {old!r} ({count})"
     path.write_text(mutated, encoding="utf-8")
 
 
-# (id, file, old text, replacement, whether the pins should kill it)
+def _failed_tests(output: str) -> set[str]:
+    """Test names (with parameter id) from pytest's FAILED summary lines."""
+    return {m.group(1) for m in re.finditer(r"^FAILED \S*?::(\S+)", output, re.M)}
+
+
+def test_failed_tests_parser_synthetic() -> None:
+    """Self-test: a full parametrised name is parsed; a sibling test sharing the id is distinct."""
+    out = (
+        "FAILED /x/test_build_mechanical_checks.py::test_probe_maintenance_pin_helpers_synthetic"
+        "[build-trigger-excludes-caught-defect] - AssertionError\n"
+    )
+    names = _failed_tests(out)
+    assert "test_probe_maintenance_pin_helpers_synthetic[build-trigger-excludes-caught-defect]" in names
+    assert "test_adversary_probe_maintenance_rule_stated[build-trigger-excludes-caught-defect]" not in names
+
+
+_OVERRIDE_ANCHOR = "Implementers and the orchestrator never edit an adversarial program."
+
+# (id, file, old text, replacement, pin test expected to kill it)
 MUTATIONS = [
     # Controls: guards the pins do cover. A mutant surviving here is a vacuous pin.
-    ("drop-fresh-context", BUILD, "agent fresh-context again to update", "agent again to update", True),
-    ("drop-handoff-reason", BUILD, "each adversary re-dispatch with its reason, ", "", True),
+    ("drop-fresh-context", BUILD, "agent fresh-context again to update", "agent again to update",
+     "test_build_redispatches_adversary_for_stale_programs"),
+    ("drop-handoff-reason", BUILD, "each adversary re-dispatch with its reason, ", "",
+     "test_build_redispatches_adversary_for_stale_programs"),
     ("drop-red-then-reverted", ADVERSARY,
-     "Each mutation must turn the probe RED and is then reverted;", "", True),
+     "Each mutation must turn the probe RED and is then reverted;", "",
+     "test_adversary_probe_maintenance_rule_stated[mutation-red-then-reverted]"),
     ("loosen-ref-reuse-sentence", REF,
-     "It reuses a program that covers a case,", "It may write new probes freely,", True),
+     "It reuses a program that covers a case,", "It may write new probes freely,",
+     "test_adversary_probe_maintenance_rule_stated[ref-reuse-modify-then-new]"),
     # Guards the exception relies on to refuse a defect relabelled as stale.
     ("drop-product-defect-guard", BUILD,
-     "fails or needs changing for that reason, rather than for a product defect it correctly caught,",
-     "fails for any reason,", True),
+     "fails, or is unable to run, for that reason, rather than for a product defect it correctly caught.",
+     "fails for any reason.",
+     "test_adversary_probe_maintenance_rule_stated[build-trigger-excludes-caught-defect]"),
     ("drop-build-decides-defect-fix", BUILD,
      "Build decides which case applies from the program's failure and the widened scope, "
-     "and fixes a product defect in the product as above.", "", True),
+     "and fixes a product defect in the product as above.", "",
+     "test_adversary_probe_maintenance_rule_stated[build-decides-and-fixes-defect]"),
     ("drop-rerun-after-update", BUILD,
-     "After the update, Build repeats these end-of-Build checks.", "", True),
-    ("orchestrator-may-modify-program", BUILD,
-     "Implementers and the orchestrator never edit an adversarial program.",
-     "Implementers and the orchestrator never edit an adversarial program. "
-     "When time is short, the orchestrator may modify a stale adversarial program itself.", True),
+     "After the update, Build repeats these end-of-Build checks.", "",
+     "test_adversary_probe_maintenance_rule_stated[build-reruns-after-update]"),
+    # Added sentences that override a pinned rule without touching its text.
+    ("orchestrator-may-modify-program", BUILD, _OVERRIDE_ANCHOR,
+     _OVERRIDE_ANCHOR + " When time is short, the orchestrator may modify a stale adversarial program itself.",
+     "test_no_other_role_edits_adversarial_program"),
+    ("orchestrator-rewrites-program-modal-free", BUILD, _OVERRIDE_ANCHOR,
+     _OVERRIDE_ANCHOR + " When time is short, the orchestrator rewrites a stale adversarial program itself.",
+     "test_no_other_role_edits_adversarial_program"),
+    ("added-discard-literal", ADVERSARY, "they can destroy uncommitted work.",
+     "they can destroy uncommitted work. Clean up a dirty copy with `git reset --hard` afterwards.",
+     "test_no_added_sentence_overrides_pinned_rules[adversary]"),
+    ("implementer-pin-counts-floor", REF, "Reused and modified cases count toward the floor.",
+     "Reused and modified cases count toward the floor. An implementer's pin counts toward the floor.",
+     "test_no_added_sentence_overrides_pinned_rules[ref]"),
+    ("redispatch-for-caught-defect", BUILD, "After the update, Build repeats these end-of-Build checks.",
+     "After the update, Build repeats these end-of-Build checks. "
+     "Build re-dispatches the adversary for a program that caught a product defect.",
+     "test_no_added_sentence_overrides_pinned_rules[build]"),
+    ("every-failure-stale", BUILD, "After the update, Build repeats these end-of-Build checks.",
+     "After the update, Build repeats these end-of-Build checks. "
+     "Build treats every failure as stale and re-dispatches the adversary.",
+     "test_no_added_sentence_overrides_pinned_rules[build]"),
 ]
 
 
@@ -115,20 +158,24 @@ def test_pins_scratch_copy_unmutated_passes(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    "mutation_id,rel,old,new,should_kill", MUTATIONS, ids=[m[0] for m in MUTATIONS]
+    "mutation_id,rel,old,new,killer", MUTATIONS, ids=[m[0] for m in MUTATIONS]
 )
 def test_pins_guard_mutation_killed(
-    tmp_path: Path, mutation_id: str, rel: str, old: str, new: str, should_kill: bool
+    tmp_path: Path, mutation_id: str, rel: str, old: str, new: str, killer: str
 ) -> None:
-    """Each guard-removing mutation turns the committed pin module RED."""
+    """Each guard-removing mutation turns the committed pin module RED, through the pin named for it."""
     root = _scratch(tmp_path)
     _mutate(root, rel, old, new)
     result = _run_pins(root)
-    killed = result.returncode != 0
-    assert killed == should_kill, (
+    assert result.returncode != 0, (
         f"FINDING vacuous-pin ({mutation_id}): {rel} mutant survived "
         f"test_build_mechanical_checks.py; the guard is stated but no pin fails when it is "
-        f"removed or loosened.\n{result.stdout[-800:]}"
+        f"removed, loosened or overridden.\n{result.stdout[-800:]}"
+    )
+    failed = _failed_tests(result.stdout)
+    assert killer in failed, (
+        f"FINDING accidental-kill ({mutation_id}): the mutant was killed, but not by {killer}; "
+        f"the pin meant for this guard does not see it. Failed: {sorted(failed)}"
     )
 
 
@@ -197,20 +244,56 @@ def test_adversary_update_old_case_preserved_required() -> None:
     )
 
 
+_BRANCH_TEST = re.compile(
+    r"\b(implementer|added or changed on the branch|this change adds|written for this change)", re.I
+)
+_FLOOR_CREDIT = re.compile(r"\bcounts?\b[^.;]*\btoward the floor\b", re.I)
+
+
 def _affirms_exclusion(text: str) -> bool:
-    for s in split_sentences(text):
-        if re.search(r"\b(implementer|this change adds|the change adds|changed paths|written for this change)\b", s) \
-                and "reuse" in s.lower() and not has_negation(s) and re.search(r"\b(excludes?|only|outside)\b", s):
-            return True
-    return False
+    """The floor is limited to the adversary's programs and tests outside the branch,
+    and branch tests such as an implementer's pin are sent to related coverage only.
+
+    The limit and the related-coverage rule may sit in one sentence or in two; each
+    must be affirmative, and no sentence may credit a branch test toward the floor.
+    """
+    sentences = split_sentences(text)
+    limit = any(
+        "reuse" in s.lower() and "floor" in s and re.search(r"\bonly\b", s)
+        and re.search(r"\boutside (?:this|the) change's branch\b|\boutside the changed paths\b", s)
+        and not has_negation(s)
+        for s in sentences
+    )
+    related = any(
+        _BRANCH_TEST.search(s) and re.search(r"\b(related coverage|excludes?)\b", s)
+        and not has_negation(s) and not _FLOOR_CREDIT.search(s)
+        for s in sentences
+    )
+    credited = any(
+        _BRANCH_TEST.search(s) and _FLOOR_CREDIT.search(s) and not has_negation(s)
+        for s in sentences
+    )
+    return limit and related and not credited
 
 
 def test_reuse_exclusion_helper_synthetic() -> None:
-    """Self-test: one affirmative exclusion accepted, one negated example rejected."""
+    """Self-test: one affirmative exclusion accepted; negated and floor-crediting examples rejected."""
     assert _affirms_exclusion(
-        "Reuse counts only tests outside the changed paths, so it excludes tests the implementer wrote."
+        "Reuse toward the floor counts only your programs and tests unchanged outside this "
+        "change's branch. Name an implementer's pin as related coverage only."
     )
-    assert not _affirms_exclusion("Reuse does not exclude tests the implementer wrote.")
+    assert not _affirms_exclusion(
+        "Reuse toward the floor does not count only tests outside this change's branch. "
+        "An implementer's pin is never related coverage only."
+    )
+    assert not _affirms_exclusion(
+        "Reuse toward the floor counts only your programs and tests outside this change's branch. "
+        "Name an implementer's pin as related coverage only. An implementer's pin counts toward the floor."
+    )
+    assert not _affirms_exclusion(
+        "Reuse toward the floor counts only your programs and tests outside this change's branch. "
+        "Name an implementer's pin as floor coverage."
+    )
 
 
 def test_adversary_reuse_implementer_tests_excluded_from_floor() -> None:
@@ -220,12 +303,13 @@ def test_adversary_reuse_implementer_tests_excluded_from_floor() -> None:
     'Reused and modified cases count toward the floor' together let the adversary
     name three tests the implementer added in this change (for example the new pins
     in test_build_mechanical_checks.py) and write no adversarial case at all, which
-    turns the writer's own tests into the attack arm.
+    turns the writer's own tests into the attack arm. Both the adversary's own
+    contract and the reference it reads must carry the exclusion.
     """
-    held = [rel for rel in (ADVERSARY, REF) if _affirms_exclusion(_flat(rel))]
-    assert held, (
+    missing = [rel for rel in (ADVERSARY, REF) if not _affirms_exclusion(_flat(rel))]
+    assert not missing, (
         "FINDING self-reuse floor (writer-is-judge): the reuse-first rule lets tests "
-        "added by this change's implementer count toward the adversarial floor."
+        f"added by this change's implementer count toward the adversarial floor in {missing}."
     )
 
 
