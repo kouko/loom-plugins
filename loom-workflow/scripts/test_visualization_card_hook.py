@@ -1,4 +1,4 @@
-"""Tests for the loom-workflow SessionStart hook `hooks/visualization-card`.
+"""Tests for the loom-workflow UserPromptSubmit hook `hooks/visualization-card`.
 
 Covers plan W2-05 acceptance 9 (A9) as unit tests:
   - positive `enabled-toolkit-prints-coexist-card`

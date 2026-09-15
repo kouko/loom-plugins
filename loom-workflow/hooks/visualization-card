@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SessionStart hook: print the loom-visualization trigger card.
+"""UserPromptSubmit hook: print the loom-visualization trigger card.
 
 Prints the coexistence card when ascii-graph-toolkit is active for this
 project (so only one diagram trigger instruction reaches the session),
@@ -10,7 +10,7 @@ Claude plugin config it would read says nothing about a Codex session.
 Output shape follows loom-code/hooks/session-start: canonical
 hookSpecificOutput.additionalContext plus defensive `additional_context`
 and bare `additionalContext`. On Codex only the canonical key is printed:
-Codex marks a SessionStart hook failed on the extra keys. Stdlib only.
+Codex marks a hook failed on the extra keys. Stdlib only.
 """
 
 import json
@@ -120,7 +120,7 @@ def main():
             context = _read_card(FULL)
         except Exception:
             context = ""
-    output = {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": context}}
+    output = {"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": context}}
     if not codex:
         output["additional_context"] = context
         output["additionalContext"] = context
