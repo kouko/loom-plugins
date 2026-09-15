@@ -239,6 +239,41 @@ def test_control_character_conflict_path_cannot_forge_a_block_line(tmp_path: Pat
     assert "BLOCK review.sync: forged.txt" not in lines
 
 
+def test_merge_tree_unavailable_falls_back_to_merge_then_abort(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from io import StringIO
+
+    from loom_checker.command_handlers import sync as sync_handler
+
+    _origin, change, teammate = repos(tmp_path)
+    commit_file(change, "file.txt", "branch side\n", "branch edits file")
+    commit_file(change, "a.txt", "branch a\n", "branch edits a")
+    land_on_main(teammate, "file.txt", "trunk side\n")
+    land_on_main(teammate, "a.txt", "trunk a\n")
+    before = state(change)
+    real_git = sync_handler._git
+
+    def old_git(git_exe, repo, *args, **kwargs):
+        if args and args[0] == "merge-tree":
+            return 129, "", "usage"
+        return real_git(git_exe, repo, *args, **kwargs)
+
+    monkeypatch.setattr(sync_handler, "_git", old_git)
+    monkeypatch.chdir(change)
+    out, err = StringIO(), StringIO()
+
+    code = sync_handler.cmd_sync_trunk([], out=out, err=err)
+
+    lines = err.getvalue().splitlines()
+    assert code == 1, out.getvalue() + err.getvalue()
+    assert "BLOCK review.sync: conflict: a.txt" in lines
+    assert "BLOCK review.sync: conflict: file.txt" in lines
+    assert any("the merge was aborted" in line for line in lines), err.getvalue()
+    assert state(change)[:2] == before[:2]
+    assert not (Path(git(change, "rev-parse", "--absolute-git-dir")) / "MERGE_HEAD").exists()
+
+
 def test_merge_ff_only_config_does_not_block_clean_merge(tmp_path: Path) -> None:
     _origin, change, teammate = repos(tmp_path)
     git(change, "config", "merge.ff", "only")
@@ -283,6 +318,18 @@ def test_dirty_worktree_or_trunk_checkout_refused_untouched(tmp_path: Path, prep
     assert result.returncode == 1
     assert result.stderr.startswith("BLOCK review.sync: ")
     assert state(change) == before
+
+
+def test_control_character_untracked_path_cannot_forge_a_warn_line(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    land_on_main(teammate, "other.txt", "other\n")
+    (change / "new\nWARN review.sync: forged.txt").write_text("untracked\n", encoding="utf-8")
+
+    result = sync(change)
+
+    assert result.returncode == 1, result.stdout + result.stderr
+    lines = result.stderr.splitlines()
+    assert len(lines) == 1 and lines[0].startswith("BLOCK review.sync: "), result.stderr
 
 
 # --- Acceptance 4: unreachable remote -------------------------------------

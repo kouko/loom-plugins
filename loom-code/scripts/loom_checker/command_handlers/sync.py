@@ -21,9 +21,16 @@ import sys
 
 
 # Manual pages this module relies on:
-# git merge --no-edit / --abort: https://git-scm.com/docs/git-merge
-# git merge-base --is-ancestor exit codes: https://git-scm.com/docs/git-merge-base
-# git diff --diff-filter=U (unmerged paths): https://git-scm.com/docs/git-diff
+# git -C and GIT_TERMINAL_PROMPT=0 (never prompt for credentials): https://git-scm.com/docs/git
+# git merge --ff --no-edit -m / --abort: https://git-scm.com/docs/git-merge
+# git merge-base --is-ancestor exit 0 ancestor / 1 not: https://git-scm.com/docs/git-merge-base
+# git diff --diff-filter=U (unmerged) / --diff-filter=A --no-renames --name-only -z: https://git-scm.com/docs/git-diff
+# git merge-tree --write-tree --name-only --no-messages -z, exit 1 on conflict (git >= 2.38): https://git-scm.com/docs/git-merge-tree
+# git fetch --no-tags with a forced (+) refspec: https://git-scm.com/docs/git-fetch
+# git ls-files -z --others, ignored included without --exclude-standard: https://git-scm.com/docs/git-ls-files
+# git status --porcelain -z --untracked-files=all --ignored: https://git-scm.com/docs/git-status
+# git symbolic-ref --quiet [--short], nonzero when not a symbolic ref: https://git-scm.com/docs/git-symbolic-ref
+# git rev-parse --verify --quiet <ref>^{commit}: https://git-scm.com/docs/git-rev-parse
 
 
 RULE = "review.sync"
@@ -145,7 +152,7 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         return _block(err, f"cannot read the status of {repo}.")
     if status:
         paths = [entry[3:] for entry in status.split("\0") if len(entry) > 3]
-        shown = ", ".join(paths[:5]) + (", ..." if len(paths) > 5 else "")
+        shown = ", ".join(_show(path) for path in paths[:5]) +(", ..." if len(paths) > 5 else "")
         return _block(err, f"the worktree has uncommitted or untracked changes ({shown}); commit or remove them first.")
 
     remote_ref = f"refs/remotes/origin/{trunk}"
