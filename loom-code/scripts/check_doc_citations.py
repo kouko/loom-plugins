@@ -324,7 +324,9 @@ def _exists_outside_the_candidate_set(repo_root: Path, cited_path: str) -> bool:
     `repo_files.nested_repositories` name both shapes -- the same union
     `scripts/run_package_tests.py:73` excludes -- and the walk is pruned at
     them, so `IGNORED_DIRECTORY_NAMES` alone (which sees only a `.git`
-    DIRECTORY, never a worktree's `.git` FILE) is not relied on.
+    DIRECTORY, never a worktree's `.git` FILE) is not relied on. A nested
+    clone at a path git ignores is the one shape not named: git lists no
+    entry for it, so a file only there still downgrades the finding.
 
     The basename is compared literally, not matched: a cited path may contain
     `*` or `[`, which a glob would read as a pattern over other files.

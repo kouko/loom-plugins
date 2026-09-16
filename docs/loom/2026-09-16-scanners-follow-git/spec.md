@@ -5,9 +5,11 @@ pre-build-review: not-required — engineering change to file enumeration; no se
 ## Requirements
 REQ-1 — Checker ignores a nested worktree in an adopting repository
   WHEN the loom checker runs in a repository that contains a git linked
-  worktree inside its directory, the checker shall take no file inside that
-  worktree into account, using only files installed with the loom-code
-  plugin → Acceptance #1
+  worktree inside its directory at a path that repository's git ignores, the
+  checker shall take no file inside that worktree into account, using only
+  files installed with the loom-code plugin. Where the worktree's path is not
+  ignored, the pre-existing clean-tree check stops finalization; that is a
+  stated exception this change does not alter → Acceptance #1
 
 REQ-2 — This repository's scanners ignore a nested worktree
   WHEN a git linked worktree exists inside this repository's directory, each
@@ -76,7 +78,8 @@ REQ-6 — Ignored directories produce no findings
   of failing, so a `git archive` copy keeps working.
 - user-decided: on 2026-09-16 kouko narrowed the obligation to run in a
   `git archive` copy from six scanners to the five archive-capable ones, and
-  chose a clean skip for the sixth. `rehearse_probes.py` run with no `--repo`
+  chose a clean skip for the sixth.
+- agent-decided: `rehearse_probes.py` run with no `--repo`
   in a directory git does not recognise prints one line saying it is skipping
   because rehearsal needs a git repository and this directory is not one, and
   exits zero. Only that case skips: an explicit `--repo` pointing at a
@@ -121,8 +124,11 @@ REQ-6 — Ignored directories produce no findings
   is on disk but outside git's listing is not this document's repository to
   speak about, so the honest answer is loud skipping, not a clean verdict —
   resolving it would let the check read files the repository does not own. The
-  walk is pruned at `nested_worktrees` ∪ `nested_repositories`, so a second
-  checkout inside the tree cannot suppress a finding that CI will produce.
+  walk is pruned at `nested_worktrees` ∪ `nested_repositories`, so a worktree
+  anywhere, or a nested clone git does not ignore, cannot suppress a finding
+  that CI will produce. A nested clone at a path git ignores is not listed by
+  `nested_repositories` and can still downgrade such a finding, consistent
+  with the intent's Out of scope.
 - agent-decided: `repo_files.nested_worktrees` and `nested_repositories` live in
   the same module as `repository_files`, because they are the same git question
   seen from the other side — which subtrees inside this root are foreign — and

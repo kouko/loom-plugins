@@ -1,6 +1,6 @@
 # Loom asks git which files belong to the repository it is running in — plan
 intent: 2026-09-16-scanners-follow-git@8390868c
-spec: docs/loom/2026-09-16-scanners-follow-git/spec.md@1d0655dd
+spec: docs/loom/2026-09-16-scanners-follow-git/spec.md@032dde7b
 charter: 1.0
 
 ## Task DAG
@@ -35,6 +35,11 @@ decision point ① — consequence — git archive 的退路要不要保留？�
 decision point ① — what — 共用機制放 loom-code／loom-workflow／repo 根 scripts/？ → loom-code 出貨樹內一份，六支全用；理由是使用者要的是給 loom 機制用、在採用 loom 的 repo 裡也生效，不只是本 repo 的開發工具
 decision point ① — what — 要不要做成讓採用 repo 自己呼叫的公開介面？ → 不特意開放也不特意阻擋；不寫文件、不承諾穩定
 decision point ① — done — 這些驗收條件可以嗎？ → 可以
+closing review — consequence — 第 4 條驗收條件寫「六支掃描器在沒有 git 的副本裡都要跑出相同判定」，但其中一支（rehearse_probes）靠複製 repo 運作，沒有 git 就什麼都做不了——這條對它本質上不可能成立，是我當初寫太寬。怎麼處理？ → 兩個都做
+closing review — consequence — 你確認的「不在範圍內」寫著「不改變任何掃描器對違規的判定」，但引用檢查的判定實際上兩個方向都變了：以前因重複而跳過的引用現在會被檢查、以前能解析的被忽略檔案現在變成不檢查。本 repo 實測 15 條引用、前後都是 0 個發現，但這個模組會裝到別人的 repo。怎麼處理？ → 修正措辭（推薦）
+closing review — what — 確認修訂後的第 4 條驗收條件與「不在範圍內」措辭 → 可以
+decision point ③ — done — 第 1 條驗收條件只在「採用 loom 的專案有把工作副本位置加進 gitignore」時成立；沒加的話，一道既有的「請先提交」檢查會擋住。你要怎麼處理這次改動？ → 接受，寫回文件再合併（推薦）
+decision point ③ — what — 確認修訂後的第 1 條驗收條件與新增的限制 → 可以
 
 ## Risks
 1. Only three of the six scanners walk from the repository root and reach a nested worktree today; the other three gain ignore-awareness within their own scope. Acceptance 2 holds trivially for those three.
