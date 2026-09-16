@@ -1,0 +1,90 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-16-scanners-follow-git",
+  "content_digest": "e41e72d5084f81d05c74f1f87ade77b5090fa142",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_citation_candidate_shrink.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_citation_candidate_shrink.py",
+      "result": "pass",
+      "command_digest": "140961af3fad2970cd5f21182d6b1bd6f29a04a1b082dc811258c6f174a82e4d"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_nested_repository_collection.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_nested_repository_collection.py",
+      "result": "pass",
+      "command_digest": "097272ee7414209ab101d124bbbd082cae16b24a5b57dd460ffa84b4f2f0e3a0"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_repo_files_hostile_paths.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_repo_files_hostile_paths.py",
+      "result": "pass",
+      "command_digest": "97c36ca06e92ab535ca173578180df4f14a882a44c8d53fe8e1a18d952880aa2"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_walk_fallback_divergence.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_walk_fallback_divergence.py",
+      "result": "pass",
+      "command_digest": "e5c6be7a2428a92bd7e82b70945140bce5e4d84441399c1852013599f37ee877"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a7472c42a0b9c2c45",
+      "vendor": "claude",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "docs/loom/2026-09-16-scanners-follow-git/plan.md:39",
+          "text": "nitpick (non-blocking): the recorded decision point asks where to put the code in the source tree, which PRINCIPLES.md non-negotiable 1 does not allow; the user's answer was about the product."
+        }
+      ]
+    },
+    {
+      "reviewer": "a496f23a2f2922a4c",
+      "vendor": "claude",
+      "model": "claude-opus-5",
+      "lens": "spec",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "anchor": "docs/loom/2026-09-16-scanners-follow-git/spec.md:6",
+          "text": "issue (non-blocking): REQ-1 claims without condition that the checker takes no file inside a nested worktree into account; the blind run shows it holds only when the adopting repository gitignores the worktree folder, otherwise the pre-existing clean-tree check blocks. To be put to the user at decision point 3."
+        },
+        {
+          "severity": "nit",
+          "anchor": "docs/loom/2026-09-16-scanners-follow-git/spec.md:125",
+          "text": "nitpick: the claim that a second checkout cannot suppress a CI finding is absolute; a plain nested clone at a gitignored path still can, consistent with the amended Out of scope."
+        },
+        {
+          "severity": "nit",
+          "anchor": "docs/loom/2026-09-16-scanners-follow-git/spec.md:77",
+          "text": "nitpick: a user-decided line bundles the user's choice with agent mechanism; the round-2 decision point is not recorded in plan.md Questions asked."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "anchor": "loom-code/scripts/repo_files.py",
+      "text": "repository_files on a non-existent path or on a regular file returns [] silently, which every consumer reads as no violations; pre-existing in the filesystem walks this change replaced, left out of scope."
+    }
+  ],
+  "selection": null
+}
