@@ -34,8 +34,11 @@ walking the filesystem their own way.
 
 ## Acceptance
 1. In a repository that has adopted loom and contains a git linked worktree
-   inside its directory, loom's checker takes no file inside that worktree
-   into account, using only the loom-code plugin as installed.
+   inside its directory at a path that repository's git ignores, loom's checker
+   takes no file inside that worktree into account, using only the loom-code
+   plugin as installed. Where the worktree's path is not ignored, the checker's
+   pre-existing clean-tree check stops finalization because git reports the
+   worktree as uncommitted content; that is a stated exception.
 2. With a git linked worktree present inside this repository's directory, each
    of the six scanners listed in Constraints passes, and no reported finding
    points at a file inside that worktree.
@@ -70,6 +73,10 @@ walking the filesystem their own way.
   `loom-code/scripts/rehearse_probes.py`, which clones the repository to do its
   work and so depends on git by construction. That dependency predates this
   change.
+- The clean-tree check that stops finalization when git reports uncommitted
+  content guards publication and is not one of the six scanners; this change
+  does not alter it. Its behaviour toward a nested worktree at a path git does
+  not ignore predates this change.
 - The fixed ignore-directory list keeps the names already in use in this
   repository (`__pycache__`, `node_modules`, `.pytest_cache` and the like); no
   new ignore convention is introduced.
