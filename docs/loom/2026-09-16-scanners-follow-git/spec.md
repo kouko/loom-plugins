@@ -45,7 +45,21 @@ REQ-6 — Ignored directories produce no findings
   --exclude-standard -z` run with `-C <root>`, so a root that is a
   subdirectory scopes the listing naturally — `check_plugin_boundaries.py` and
   `test_state_anchor_carrier_inventory.py` both scan a subtree, not the
-  repository root.
+  repository root. `-z` is mandatory: without it a filename containing a
+  newline is emitted shell-quoted (https://git-scm.com/docs/git-config,
+  core.quotePath).
+- agent-decided: the module drops every listed entry that is not an existing
+  regular file. `--others` emits a nested repository or linked worktree as one
+  opaque directory entry such as `wt/` rather than its files, and `--cached`
+  still lists a staged-but-deleted path. Both would reach a caller that expects
+  a readable file. That directory entry is also the mechanism by which the
+  worktree's contents stay out of the listing, so it is dropped, not expanded.
+- agent-decided: submodule contents are not listed, because
+  `--recurse-submodules` is documented as incompatible with `--others`
+  (https://git-scm.com/docs/git-ls-files). This repository already recorded the
+  same limitation at
+  `loom-workflow/skills/loom-memory/scripts/test_skill_contract.py:253`. No
+  consumer in scope scans a submodule.
 - agent-decided: git absence is detected by `git rev-parse --show-toplevel`
   returning nothing through `git_exec.run_git`, which already yields `None` on
   a non-zero exit (`git_exec.py:83`); no separate `.git` existence probe.
@@ -80,6 +94,22 @@ REQ-6 — Ignored directories produce no findings
 - Pure `git ls-files` with no fallback: rejected because it breaks the
   `git archive` use documented at
   `loom-code/scripts/test_write_plan_station_text.py:269`.
+- Parsing `.gitignore` in-process instead of asking git, as ripgrep's `ignore`
+  crate (https://github.com/BurntSushi/ripgrep/blob/master/crates/ignore/src/gitignore.rs),
+  ruff (https://docs.astral.sh/ruff/settings/#respect-gitignore) and black via
+  `pathspec` (https://github.com/psf/black/blob/main/src/black/files.py) do:
+  rejected. Those tools must run in any directory; loom's gates only ever run
+  inside a repository, which is the case where pre-commit shells out to git
+  (https://github.com/pre-commit/pre-commit/blob/main/pre_commit/git.py). It
+  would also add a dependency to a plugin that runs in arbitrary user
+  repositories, and ripgrep's own tracker records where a hand-written parser
+  still diverges from git (https://github.com/BurntSushi/ripgrep/issues/1221,
+  https://github.com/BurntSushi/ripgrep/issues/1098).
+- Honouring a `.gitignore` that is present when there is no `.git`: rejected.
+  ripgrep, fd and ruff all ignore it in that case by default and require
+  `--no-require-git` to opt in (ripgrep 12.0.0,
+  https://github.com/BurntSushi/ripgrep/blob/master/CHANGELOG.md), so the
+  fallback matches prevailing behaviour rather than inventing one.
 - Bare `git ls-files` without `--others --exclude-standard`: rejected because
   it lists only tracked files, so a violating file not yet added would be
   missed — a silent pass, worse than a false report.

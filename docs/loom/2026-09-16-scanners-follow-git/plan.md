@@ -1,6 +1,6 @@
 # Loom asks git which files belong to the repository it is running in — plan
 intent: 2026-09-16-scanners-follow-git@8390868c
-spec: docs/loom/2026-09-16-scanners-follow-git/spec.md@2a7988c2
+spec: docs/loom/2026-09-16-scanners-follow-git/spec.md@1d0655dd
 charter: 1.0
 
 ## Task DAG
@@ -12,7 +12,7 @@ can only be proven once every one of them uses the module.
 **W1-01 Ship the repository file list module**  after: —  acceptance: 4, 5
 - Files: loom-code/scripts/repo_files.py, loom-code/scripts/test_repo_files.py
 - Test: A4 positive: test_repo_files.py::test_walks_when_git_is_absent; boundary: test_repo_files.py::test_archive_copy_listing_matches_git_checkout. A5 positive: test_repo_files.py::test_untracked_unignored_file_is_listed; negative: test_repo_files.py::test_gitignored_file_is_absent.
-- Risk: agent-decided — returns absolute paths; every caller derives its own relative form, per spec Design decision.
+- Risk: agent-decided — `-z` is mandatory, and entries that are not existing regular files are dropped: `--others` emits a nested worktree as one directory entry and `--cached` lists staged-but-deleted paths.
 
 **W2-01 loom-code scanners use the module**  after: W1-01  acceptance: 1
 - Files: loom-code/scripts/loom_checker/probes.py, loom-code/scripts/check_doc_citations.py, loom-code/scripts/rehearse_probes.py, loom-code/scripts/test_check_doc_citations.py, loom-code/scripts/test_rehearse_probes.py, loom-code/scripts/test_loom_checker_probes.py
@@ -42,3 +42,6 @@ decision point ① — done — 這些驗收條件可以嗎？ → 可以
 3. The module ships with loom-code, so its behaviour reaches every adopting repository. Reverting later is a plugin release, not a local edit.
 4. Three consumers import a loom-code module from another tree. The precedent is test-only; a future packaging change that isolates plugin trees would break them.
 5. A worktree nested inside a scanned subtree is excluded by git, but the fixed ignore list alone would not catch it if git is unavailable in the archive fallback path.
+6. `git ls-files --others` emits a nested repository or linked worktree as one opaque directory entry, not its files. That is how its contents stay out, and also a crash source if handed to a file reader unfiltered.
+7. Submodule contents are never listed: `--recurse-submodules` is documented as incompatible with `--others`. No consumer in scope scans a submodule, and the repository already recorded this limitation.
+8. The no-git fallback deliberately does not honour a `.gitignore` that is present. ripgrep, fd and ruff behave the same way by default; a reader expecting the file to be honoured would find this surprising.
