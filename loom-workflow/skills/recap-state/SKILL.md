@@ -105,7 +105,8 @@ Use tables or diagrams only when they compress information:
 - The opening and final sections stay concise prose.
 - Use a diagram only for real topology such as a pipeline, dependency graph,
   or state machine. When the client is known to render Mermaid, prefer
-  Mermaid; for an unknown or terminal client, use ASCII. An explicit user
+  Mermaid; otherwise use a markdown table by default, and ASCII only where
+  the destination cannot render markdown. An explicit user
   format request overrides this fallback. Support counts as known only when
   the user or current runtime instructions explicitly state Mermaid rendering
   support; never infer it from a product name.

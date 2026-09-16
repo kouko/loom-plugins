@@ -278,9 +278,6 @@ def _templates_module():
 RECAP_SKILL = PLUGIN / "skills" / "recap-state" / "SKILL.md"
 
 
-@pytest.mark.xfail(strict=True, reason="live contradiction: recap-state/SKILL.md still says "
-                                       "'for an unknown or terminal client, use ASCII', and "
-                                       "test_recap_state_compaction.py pins that phrase")
 def test_clientDrivenAsciiRule_acrossEveryLoomWorkflowSkill_isAbsent():
     """The change's own detector, pointed at the sibling skill the plan listed, still fires."""
     module = _templates_module()
