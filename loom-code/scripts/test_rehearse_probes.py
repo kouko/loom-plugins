@@ -463,6 +463,16 @@ def test_genuineRepositoryGitRefusesForDubiousOwnership_failsInsteadOfSkipping(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
 ) -> None:
     repo = make_repo(tmp_path, trunk="main")
+    # `safe.directory` (e.g. `*`, which CI runners commonly set) is read only
+    # from global, system and command-line config and would bypass the
+    # ownership check; isolate git from all three, for the precondition and
+    # for every git call rehearse_probes makes in this process.
+    empty_config = tmp_path / "empty.gitconfig"
+    empty_config.write_text("", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty_config))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    for key in ("GIT_CONFIG_SYSTEM", "GIT_CONFIG_COUNT", "GIT_CONFIG_PARAMETERS"):
+        monkeypatch.delenv(key, raising=False)
     monkeypatch.setenv("GIT_TEST_ASSUME_DIFFERENT_OWNER", "1")
     # precondition: git really does refuse this repository under the variable
     assert _git(repo, "rev-parse", "--show-toplevel").returncode != 0
