@@ -32,11 +32,6 @@ the tree because `git log --grep` and `grep -rn` against historical
 decision context is why they were kept in the first place — but no
 station reads them, and nothing new should be written into them.
 
-- [`plans/`](plans/) — writing-plans output, 2026-05-18 → 2026-09-01
-- [`specs/`](specs/) — brainstorming briefs and OpenSpec-era specs
-- [`backlog/`](backlog/) + [`BACKLOG.md`](BACKLOG.md) — the open-item queue store and its former generated index. Open items there are historical; a recurring one comes back as a new intent through the maintain station, not by editing the queue
-- [`design/`](design/) — design documents
-- [`archive/`](archive/) — closed change folders from the change-folder era
 - [`2026-07-12-us-sec-primary-source-layer/`](2026-07-12-us-sec-primary-source-layer/), [`2026-07-19-8k-prose-kpi-intake/`](2026-07-19-8k-prose-kpi-intake/) — two old change folders left where they were
 
 ## checkpoint 的三個驗證角色什麼時候被觸發

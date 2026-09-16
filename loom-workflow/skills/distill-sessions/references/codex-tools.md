@@ -5,7 +5,7 @@
 >
 > **Doc-sourced, not session-exercised** against this specific skill's
 > prompts — inherits the same evidence grain as loom-code's own
-> `codex-tools.md` §Subagent dispatch.
+> `loom-code's internal dispatch patterns` §Subagent dispatch.
 
 ## Stage 3 parallel fan-out (`agents/prompt-failure-analysis.md` / `agents/prompt-success-analysis.md`)
 
