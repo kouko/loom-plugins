@@ -277,6 +277,42 @@ def test_pytest_runner_directly_executes_named_artifact() -> None:
     )
 
 
+def bare_repo(tmp_path: Path) -> Path:
+    """A repository with no test-command marker and no KICKOFF-DEFAULTS, so
+    that `declared_test_command` falls through to the test-file scan."""
+    repo = tmp_path / "adopting"
+    repo.mkdir()
+    git(repo, "init", "-q")
+    git(repo, "config", "user.email", "test@example.com")
+    git(repo, "config", "user.name", "Test")
+    (repo / "src.py").write_text("VALUE = 1\n", encoding="utf-8")
+    commit(repo, "initial")
+    return repo
+
+
+def test_test_command_ignores_nested_worktree(tmp_path: Path) -> None:
+    """Files inside a linked worktree checked out under the repository are
+    another repository's; a test file there is not this repo's test suite."""
+    repo = bare_repo(tmp_path)
+    git(repo, "worktree", "add", "-q", "-b", "side", str(repo / "wt"))
+    (repo / "wt" / "test_someone_elses.py").write_text(
+        "def test_x():\n    assert True\n", encoding="utf-8"
+    )
+
+    assert probes.declared_test_command(repo) == (None, "")
+
+
+def test_test_command_still_detects_own_tests(tmp_path: Path) -> None:
+    repo = bare_repo(tmp_path)
+    (repo / "test_own.py").write_text(
+        "def test_x():\n    assert True\n", encoding="utf-8"
+    )
+
+    assert probes.declared_test_command(repo) == (
+        "python3 -m pytest -q", "detected test_*.py files"
+    )
+
+
 def test_finalize_review_runs_and_writes_matching_attestation(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
     kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"

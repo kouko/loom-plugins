@@ -61,6 +61,7 @@ NESTED_ENV = "REHEARSE_PROBES_NESTED"
 from pathlib import Path
 
 from git_exec import run_git  # sibling module (no __init__.py, no conftest)
+from repo_files import repository_files  # sibling module, same convention
 
 DEFAULT_GLOB = "loom-code/scripts/test_probes_*.py"
 GIT_TIMEOUT = 300
@@ -160,8 +161,17 @@ def _relativize_test_path(raw: str, repo_root: Path) -> str | None:
 
 
 def _default_paths(repo_root: Path) -> list[str]:
+    """Files matching DEFAULT_GLOB that belong to `repo_root` itself.
+
+    The glob alone would also match a copy of that directory sitting in a
+    linked worktree checked out inside the repository, or in ignored
+    output; `repo_files.repository_files` is what git says is ours.
+    """
+    own = set(repository_files(repo_root))
     return sorted(
-        p.relative_to(repo_root).as_posix() for p in repo_root.glob(DEFAULT_GLOB)
+        p.relative_to(repo_root).as_posix()
+        for p in repo_root.glob(DEFAULT_GLOB)
+        if p in own
     )
 
 

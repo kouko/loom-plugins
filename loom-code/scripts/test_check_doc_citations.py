@@ -934,3 +934,24 @@ def test_multiple_citations_each_use_their_adjacent_quote(tmp_path: Path) -> Non
     _write(doc, '`a.py:1` "alpha" and `b.py:1` "beta"\n')
 
     assert check_doc(doc, tmp_path) == []
+
+
+def test_repo_file_list_follows_git(tmp_path: Path) -> None:
+    """The candidate set is what git says belongs here: an ignored build
+    copy and a linked worktree's files are out, an untracked file is in.
+    The returned form stays repo-relative POSIX strings."""
+    _write(tmp_path / ".gitignore", "build/\n")
+    _write(tmp_path / "kept.py", "line1\n")
+    _commit_snapshot(tmp_path)
+    _write(tmp_path / "build" / "kept.py", "line1\n")
+    _write(tmp_path / "untracked.py", "line1\n")
+    _git(tmp_path, "worktree", "add", "-q", "-b", "side", "wt")
+    _write(tmp_path / "wt" / "stowaway.py", "line1\n")
+
+    listing = list_repo_files(tmp_path)
+
+    assert ".gitignore" in listing
+    assert "kept.py" in listing
+    assert "untracked.py" in listing
+    assert "build/kept.py" not in listing
+    assert not [path for path in listing if path.startswith("wt/")]

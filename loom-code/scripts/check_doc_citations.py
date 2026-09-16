@@ -112,22 +112,30 @@ silent skip. `_is_explicit_path_citation_with_no_match` implements this
 split; a citation with multiple (ambiguous) matches, explicit or not,
 keeps the original UNCHECKED treatment.
 
-The repo-wide file list (`list_repo_files`) walks the tree once via
-`os.walk`, excluding only `.git`. This over-includes untracked/ignored
-files relative to `git ls-files` (e.g. `__pycache__`), but that is the
-conservative direction for this design: an extra candidate can only
-ever turn a would-be-unique match into an ambiguous (unchecked) one —
-it never fabricates a false "resolves cleanly" result — and it avoids
-adding a `git` subprocess dependency to an otherwise stdlib-only script.
+The repo-wide file list (`list_repo_files`) is the set of files git says
+belong to this repository, via the shared `repo_files.repository_files`:
+tracked and untracked-but-not-ignored files, with ignored output and the
+contents of a linked worktree checked out inside the tree left out. A
+document cites its own repository, so a file that is not part of it is
+not a citation target — and a worktree's copy of the tree used to make
+every path in it ambiguous twice over.
+
+The rule this script enforces is unchanged; only the candidate set is.
+A smaller candidate set is not purely conservative: a suffix match that
+was ambiguous (and so UNCHECKED) because of an ignored or foreign copy
+can now be unique, so citations that were silently skipped are now
+checked and can produce a finding. That is the intended direction — the
+check was skipping them for a reason that was never about the document.
 """
 from __future__ import annotations
 
-import os
 import re
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+
+from repo_files import repository_files
 
 # Matches a backtick-quoted `path`, `path:line`, or `path:line-range` candidate.
 # The path segment excludes backticks/whitespace/colons; requiring a
@@ -217,19 +225,16 @@ def count_pathless_citations(text: str) -> int:
 
 
 def list_repo_files(repo_root: Path) -> list[str]:
-    """Return every file's path relative to `repo_root`, POSIX-style.
+    """Return every repository file's path relative to `repo_root`, POSIX-style.
 
-    Walks the tree once, skipping `.git`. See module docstring for why
-    `os.walk` (not `git ls-files`) and why over-inclusion is the safe
-    direction for the suffix-match fallback below.
+    The files are the repository's own, per `repo_files.repository_files`.
+    See module docstring for what that leaves out and what it means for
+    the suffix-match fallback below.
     """
-    files: list[str] = []
-    for dirpath, dirnames, filenames in os.walk(repo_root):
-        dirnames[:] = [d for d in dirnames if d != ".git"]
-        for filename in filenames:
-            rel = (Path(dirpath) / filename).relative_to(repo_root)
-            files.append(rel.as_posix())
-    return files
+    return sorted(
+        path.relative_to(repo_root).as_posix()
+        for path in repository_files(repo_root)
+    )
 
 
 def resolve_cited_path(
