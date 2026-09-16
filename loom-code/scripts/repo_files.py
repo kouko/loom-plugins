@@ -23,6 +23,11 @@ derives its own relative form.
 Submodule contents are never listed: `--recurse-submodules` is documented as
 incompatible with `--others` (git-ls-files(1)).
 
+`nested_worktrees` answers the neighbouring git question -- where the linked
+worktrees inside this root are -- for the callers that must exclude those paths
+rather than list files themselves, so that no second git invocation grows
+outside this module.
+
 Sibling-module import (no `__init__.py`), following `git_exec`'s own
 precedent in this directory.
 """
@@ -45,6 +50,28 @@ def repository_files(root: Path | str) -> list[Path]:
     if entries is None:
         entries = _walk_entries(root)
     return [path for path in entries if path.is_file()]
+
+
+def nested_worktrees(root: Path | str) -> list[Path]:
+    """Absolute paths of the git worktrees that live inside `root`.
+
+    `git worktree list --porcelain` lists every worktree of the repository,
+    including the one `root` itself is in; only the ones strictly below `root`
+    are returned, so the repository's own worktree is never one of them. The
+    paths git prints are already resolved, so `root` is resolved before the
+    comparison. No git, or a `root` outside any repository, is an empty list,
+    not an error -- the callers have nothing to exclude in that case.
+    """
+    root = Path(root).resolve()
+    listing = run_git(root, "worktree", "list", "--porcelain")
+    if listing is None:
+        return []
+    paths = [
+        Path(line[len("worktree "):])
+        for line in listing.splitlines()
+        if line.startswith("worktree ")
+    ]
+    return sorted(path for path in paths if path != root and root in path.parents)
 
 
 def _git_entries(root: Path) -> list[Path] | None:

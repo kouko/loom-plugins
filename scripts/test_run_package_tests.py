@@ -94,6 +94,44 @@ def test_relocated_memory_skill_tests_pass_through_the_workflow_python_command()
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def _git(repo: Path, *args: str) -> None:
+    subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True)
+
+
+def _seed_repo(repo: Path) -> None:
+    """A real git repository -- the behaviour under test is git's own."""
+    (repo / "loom-code" / "scripts").mkdir(parents=True)
+    (repo / "loom-code" / "scripts" / "test_seed.py").write_text("def test_s():\n    pass\n")
+    _git(repo, "init", "-q")
+    _git(repo, "config", "user.email", "t@example.com")
+    _git(repo, "config", "user.name", "T")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "c")
+
+
+def test_targets_unchanged_without_nested_worktree(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+
+    commands = loom_family_commands(repo, verbosity="-q")
+
+    assert not any(token.startswith("--ignore") for command in commands for token in command)
+
+
+def test_nested_worktree_is_ignored(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+    nested = repo / "loom-code" / "scripts" / "wt"
+    _git(repo, "worktree", "add", "-q", "-b", "wt-branch", str(nested))
+
+    commands = loom_family_commands(repo, verbosity="-q")
+
+    pytest_commands = [c for c in commands if c[:3] == [sys.executable, "-m", "pytest"]]
+    assert pytest_commands
+    expected = f"--ignore={nested.resolve()}"
+    assert all(expected in command for command in pytest_commands)
+
+
 def test_loom_family_preset_is_the_only_test_command_named_by_ci_and_kickoff() -> None:
     kickoff = (REPO / "docs/loom/KICKOFF-DEFAULTS.md").read_text(encoding="utf-8")
     assert "scripts/run_package_tests.py --loom-family" in kickoff

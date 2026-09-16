@@ -9,7 +9,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from repo_files import repository_files
+from repo_files import nested_worktrees, repository_files
 
 
 def _git(repo: Path, *args: str) -> None:
@@ -108,6 +108,36 @@ def test_nested_linked_worktree_contributes_nothing(tmp_path: Path) -> None:
     # The opaque `wt/` directory entry itself must not be returned either.
     assert not any(str(p).startswith(str(repo / "wt")) for p in
                    repository_files(repo))
+
+
+def test_nested_worktrees_lists_the_nested_one_and_not_the_repository(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    _init_repo(repo)
+    _write(repo, "kept.py")
+    _commit(repo)
+    _git(repo, "worktree", "add", "-q", "-b", "wt-branch", str(repo / "sub" / "wt"))
+
+    assert nested_worktrees(repo) == [(repo / "sub" / "wt").resolve()]
+
+
+def test_nested_worktrees_is_empty_without_a_nested_worktree(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    _init_repo(repo)
+    _write(repo, "kept.py")
+    _commit(repo)
+
+    assert nested_worktrees(repo) == []
+
+
+def test_nested_worktrees_is_empty_without_git(tmp_path: Path) -> None:
+    plain = tmp_path / "plain"
+    _write(plain, "a.py")
+
+    assert nested_worktrees(plain) == []
 
 
 def test_staged_but_deleted_path_is_not_returned(tmp_path: Path) -> None:
