@@ -4,6 +4,18 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.3.1] — 2026-09-16 — Visualization card follow-ups
+
+- The per-turn card is now named the "visualization card" everywhere, and
+  holds at most 181 words.
+- The card carries the missed-alternatives check inline and names the eight
+  conversation situations.
+- Markdown tables are the default; a drawn form (ASCII) is used only where
+  the destination cannot render markdown.
+- The card guards reject rules that are negated or softened by a modal
+  word, so a pinned rule must appear as an affirmative sentence.
+- `recap-state` picks its drawn form by the destination, not by the client.
+
 ## [5.3.0] — 2026-09-16 — Plain-language trigger card on every message
 
 - The loom-visualization trigger card now reaches the agent on every user

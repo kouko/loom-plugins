@@ -4,7 +4,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.3.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.3.1 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## What it is
 
