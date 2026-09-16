@@ -25,9 +25,9 @@ the end of Build, then read and blind run in review.
 
 ## Frozen stores — read-only history
 
-These are the pre-1.0 stores. loom 1.0 was a hard cutover: old plans,
-specs, briefs and backlog entries were archived where they stood and
-never converted. They stay in
+These are the pre-1.0 stores. loom 1.0 was a hard cutover: old plans
+were archived where they stood and never converted; the other pre-1.0
+stores have since been removed and survive only in git history. They stay in
 the tree because `git log --grep` and `grep -rn` against historical
 decision context is why they were kept in the first place — but no
 station reads them, and nothing new should be written into them.
