@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-16-scanners-follow-git",
-  "content_digest": "b8c59a85308ae2dc35e220e5eabf850781862793",
+  "content_digest": "cd9184c0c3b01e6ec4509b001dca6400eb90f1d4",
   "executions": [
     {
       "kind": "package-tests",
@@ -41,40 +41,34 @@
   ],
   "verdicts": [
     {
-      "reviewer": "a7472c42a0b9c2c45",
+      "reviewer": "a4a76567447d31d6e",
       "vendor": "claude",
       "model": "claude-opus-5",
       "lens": "code",
       "verdict": "PASS",
-      "findings": [
-        {
-          "severity": "nit",
-          "anchor": "docs/loom/2026-09-16-scanners-follow-git/plan.md:39",
-          "text": "nitpick (non-blocking): the recorded decision point asks where to put the code in the source tree instead of the product question the answer settled."
-        }
-      ]
+      "findings": []
     },
     {
-      "reviewer": "a496f23a2f2922a4c",
+      "reviewer": "ae564f15ec73f04c6",
       "vendor": "claude",
       "model": "claude-opus-5",
       "lens": "spec",
-      "verdict": "PASS_WITH_NOTES",
+      "verdict": "PASS",
       "findings": [
         {
-          "severity": "important",
-          "anchor": "docs/loom/2026-09-16-scanners-follow-git/spec.md:6",
-          "text": "issue (non-blocking): REQ-1 claims without condition that the checker takes no file inside a nested worktree into account; the blind run shows it holds only when the adopting repository gitignores the worktree folder, otherwise the pre-existing clean-tree check blocks. To be put to the user at decision point 3."
+          "severity": "nit",
+          "anchor": "loom-code/scripts/repo_files.py:86",
+          "text": "note (non-blocking): git worktree list --porcelain -z needs git >= 2.36; on older git nested_worktrees silently returns [] and the worktree exclusion is dropped. The floor is not recorded as a spec decision."
         },
         {
           "severity": "nit",
-          "anchor": "docs/loom/2026-09-16-scanners-follow-git/spec.md:125",
-          "text": "nitpick: the claim that a second checkout cannot suppress a CI finding is absolute; a plain nested clone at a gitignored path still can, consistent with the amended Out of scope."
+          "anchor": "docs/loom/2026-09-16-scanners-follow-git/blind-run-report.md:203",
+          "text": "nitpick: the Chinese plan.md line range is now 33-42, not 33-37."
         },
         {
           "severity": "nit",
-          "anchor": "docs/loom/2026-09-16-scanners-follow-git/spec.md:77",
-          "text": "nitpick: a user-decided line bundles the user's choice with agent mechanism; the round-2 decision point is not recorded in plan.md Questions asked."
+          "anchor": "docs/loom/2026-09-16-scanners-follow-git/blind-run-report.md:214",
+          "text": "note: two of the report's open questions have no recorded outcome."
         }
       ]
     }
