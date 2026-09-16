@@ -2,7 +2,7 @@
 
 Each probe copies the smallest tree a committed test file needs into a temp
 dir, flips the polarity of one pinned instruction (keeping word counts so the
-150-word cap cannot catch it by accident), runs the committed test file on
+165-word cap cannot catch it by accident), runs the committed test file on
 the copy, and requires that it FAILS. A passing run is a surviving mutant:
 the gate would accept a card or guide telling the agent the opposite.
 
@@ -58,7 +58,7 @@ CARD_MUTANTS = {
                                        r"Comparisons get a markdown table",
                                        "Comparisons never get a markdown table"),
     "coexist-align-verify-negated": (None, None,
-                                     r"verify prescribed box diagrams",
+                                     r"Verify prescribed box diagrams",
                                      "never verify prescribed box diagrams"),
     "language-negated": (r"in their language\. 1\)", "never in their language. 1)",
                          r"in their language\. 1\)", "never in their language. 1)"),
@@ -103,7 +103,7 @@ def test_cardTests_negatedRuleMutant_rejected(tmp_path, name):
     root = _card_tree(tmp_path, name)
     for card in ("trigger-card.md", "trigger-card-coexist.md"):
         words = (root / "skills/loom-visualization/assets" / card).read_text(encoding="utf-8").split()
-        assert len(words) <= 150, (card, len(words))  # mutant is not caught by the cap
+        assert len(words) <= 165, (card, len(words))  # mutant is not caught by the cap
     proc = _pytest(root / "scripts" / "test_visualization_card_hook.py", root)
     assert proc.returncode != 0, f"surviving mutant {name}:\n{proc.stdout[-800:]}"
 

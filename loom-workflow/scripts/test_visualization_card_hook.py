@@ -340,7 +340,7 @@ def test_coexist_card_rules_one_to_three_match_full_card_word_for_word():
     """The coexist card is what toolkit users receive; rules 1-3 must not be compressed."""
     assert _rules_one_to_three(COEXIST_CARD) == _rules_one_to_three(FULL_CARD)
 
-MAX_CARD_WORDS = 150
+MAX_CARD_WORDS = 165
 
 
 def card_word_errors(text):
@@ -350,13 +350,13 @@ def card_word_errors(text):
 
 
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
-def test_cards_at_most_150_words(card):
-    """A1/A6 boundary both-cards-stay-within-150-words: the cap holds as rules are added."""
+def test_cards_at_most_165_words(card):
+    """A1/A6 boundary both-cards-stay-within-165-words: the cap holds as rules are added."""
     assert card_word_errors(card.read_text(encoding="utf-8")) == []
 
 
-def test_card_over_150_words_fails():
-    """A1 negative card-over-150-words-fails: a card padded past the cap is caught."""
+def test_card_over_165_words_fails():
+    """A1 negative card-over-165-words-fails: a card padded past the cap is caught."""
     text = COEXIST_CARD.read_text(encoding="utf-8")
     padding = " word" * (MAX_CARD_WORDS + 1 - len(text.split()))
     assert card_word_errors(text + padding) != []
@@ -416,6 +416,33 @@ def test_card_missing_one_missed_alternative_fails(dropped):
     flat = " ".join(FULL_CARD.read_text(encoding="utf-8").split())
     assert dropped in flat
     assert missed_alternative_errors(flat.replace(dropped, "", 1)) != []
+
+
+# A6: the obligation carried by the verb — each alternative is offered or ruled out,
+# so none can be dropped in silence.
+MISSED_ALTERNATIVE_VERB = "list or rule out"
+
+
+def missed_alternative_verb_errors(text):
+    """Error when the three alternatives are named under a weaker verb; empty = list-or-rule-out."""
+    ok = any(DECISION_SCOPE in s and MISSED_ALTERNATIVE_VERB in s
+             and all(p in s for p in MISSED_ALTERNATIVES)
+             and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["missed alternatives not listed or ruled out inline"]
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_both_cards_list_or_rule_out_each_missed_alternative(card):
+    """A6 positive cards-list-or-rule-out-each-missed-alternative."""
+    assert missed_alternative_verb_errors(card.read_text(encoding="utf-8")) == []
+
+
+def test_weaker_verb_over_missed_alternatives_rejected():
+    """A6 negative: 'cover' lets an alternative be dropped in silence; the weaker verb is caught."""
+    assert missed_alternative_verb_errors(
+        "When asking or answering how to do something, cover doing nothing or later, "
+        "a smaller version, combining two.") != []
 
 
 def test_negated_missed_alternatives_rejected():

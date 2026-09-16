@@ -10,5 +10,6 @@ reasoning chains, or typing any box-drawing diagram (┌─┐, +--+), invoke
 `loom-visualization` FIRST and lead with its table or diagram. Skip
 loom-visualization for one-paragraph answers; never decorate. When asking or
 answering how to do something, offer 2+ workable options in a table,
-recommending one; cover doing nothing or later, a smaller version, combining
-two; for plainer explanations, read `references/plain-language.md` first.
+recommending one; list or rule out doing nothing or later, a smaller version,
+and combining two; for plainer explanations, read loom-visualization's
+`references/plain-language.md` first.
