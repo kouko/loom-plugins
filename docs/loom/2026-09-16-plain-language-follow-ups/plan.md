@@ -30,7 +30,7 @@ charter: 1.0
 **W1-03 Raise the card cap so the rule keeps its obligations**  after: W1-02  acceptance: 6
 - Files: `loom-workflow/skills/loom-visualization/assets/trigger-card.md`, `loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md`, `loom-workflow/rules/AGENTS.md`, `loom-workflow/scripts/test_visualization_card_hook.py`, `docs/loom/2026-09-16-plain-language-replies/evidence/probes/test_probe_prose_gate_mutants.py`
 - Test: A6 positive: cards-list-or-rule-out-each-missed-alternative; boundary: both-cards-stay-within-165-words.
-- Risk: W1-02 hit the 150-word cap and paid with three coexist obligations and a weaker verb; raising the cap to 165 restores them and costs about 15 words each turn. agent-decided.
+- Risk: W1-02 hit the 150-word cap and lost three coexist obligations; this raised it to 165, later superseded by the user-decided 181 (Risk 5). agent-decided.
 
 ### Wave 2 — shipped text and the memory store
 
@@ -40,7 +40,7 @@ charter: 1.0
 - Risk: changelog entries keep the name they shipped with, so only current descriptions change; the hook docstring is prose, not behaviour. agent-decided.
 
 **W2-02 Two lessons enter the repository memory store**  after: W2-01  acceptance: 3
-- Files: `docs/loom/memory/a-phrase-presence-guard-passes-a-negated-rule.md`, `docs/loom/memory/an-inline-rule-reaches-replies-that-a-routed-guide-never-does.md`, `docs/loom/memory/index.md`
+- Files: `docs/loom/memory/a-prose-pin-must-require-an-affirmative-un-negated-sentence.md` (negation lesson merged into this existing entry), `docs/loom/memory/an-inline-rule-reaches-replies-that-a-routed-guide-never-does.md`, `docs/loom/memory/index.md`
 - Test: A3 positive: both-entries-validate-against-the-memory-profile; negative: entry-missing-sources-is-rejected.
 - Risk: both entries are recorded by invoking `loom-workflow:loom-memory`, which owns the profile and regenerates `index.md`; hand-written files and a hand-merged index are what its validator rejects. agent-decided.
 
@@ -52,7 +52,7 @@ charter: 1.0
 - Risk: the eight situations reach replies only through the card, as the guide is not read; the coexist card has one word of headroom, so the cap moves again if the wording does not fit. user-decided.
 
 **W2-04 Markdown table is the default form; ASCII is for plain-text destinations**  after: W2-03  acceptance: 8
-- Files: `loom-workflow/skills/loom-visualization/SKILL.md`, `loom-workflow/skills/loom-visualization/references/client-matrix.md`, `loom-workflow/skills/loom-visualization/scripts/test_templates.py`, `loom-workflow/skills/loom-visualization/scripts/detect_client.py`, `loom-workflow/skills/loom-visualization/scripts/test_detect_client.py`, `loom-workflow/scripts/test_recap_state_compaction.py`, `loom-workflow/skills/recap-state/SKILL.md`
+- Files: `loom-workflow/skills/loom-visualization/SKILL.md`, `loom-workflow/skills/loom-visualization/references/client-matrix.md`, `loom-workflow/skills/loom-visualization/scripts/test_templates.py`, `loom-workflow/skills/loom-visualization/scripts/detect_client.py`, `loom-workflow/scripts/test_recap_state_compaction.py`, `loom-workflow/skills/recap-state/SKILL.md`
 - Test: A8 positive: shaped-content-defaults-to-a-markdown-table; negative: remote-viewer-no-longer-forces-ascii.
 - Risk: the registered prose gate pins the words "markdown table plus ASCII", and a sibling skill pins the terminal-means-ASCII story, so both move with the rule. user-decided.
 
@@ -63,6 +63,11 @@ charter: 1.0
 - Test: A4 positive: every-loom-code-version-pin-reads-3-7-1; negative: one-stale-3-7-0-pin-fails. A5 positive: package-suite-and-check-mechanisms-green; negative: mechanism-count-growth-blocked.
 - Risk: the changelog has no entry for PR #19, #20 and #21, so 3.7.1 records them as well as the bump; without it the version moves with nothing stating why. agent-decided.
 
+**W3-02 loom-workflow 5.3.1 reaches installed copies**  after: W3-01  acceptance: 2, 5
+- Files: `loom-workflow/plugin.json`, `loom-workflow/.claude-plugin/plugin.json`, `loom-workflow/.codex-plugin/plugin.json`, `loom-workflow/CHANGELOG.md`, `loom-workflow/README{,.ja,.zh-TW}.md`, `README.md`, `loom-workflow/scripts/test_release_metadata.py`
+- Test: A2 positive: changelog-5-3-1-uses-visualization-card-name; negative: one-stale-5-3-0-pin-fails. A5 positive: package-suite-green; negative: mechanism-count-growth-blocked.
+- Risk: the installer refetches only on a version change, so loom-workflow content changed under 5.3.0 would never reach installed copies. agent-decided.
+
 ## Questions asked
 ① — what — 上面那 6 條就是這次要做的，對嗎？
 ① — what — 指南的「先不做／更小版本／合併」檢查，要寫進提醒卡（A），還是記錄成只存在於指南（B）？
@@ -71,7 +76,7 @@ charter: 1.0
 ## Risks
 <!-- each numbered item ≤40 words (checker rule plan.field-caps) -->
 1. user-decided — kouko chose option A: the missed-alternatives check is stated in the reminder itself, because the guide was opened in none of six recorded trials while the inline rule reached every one.
-2. Both cards are at the 150-word cap, so W1-02 trims non-rule wording a second time; the previous change already trimmed once, and further trimming may cost diagram guidance.
+2. Before W1-03, both cards sat at the 150-word cap, so W1-02 trimmed non-rule wording a second time; further trimming could have cost diagram guidance.
 3. Whether an installed copy refreshes can only be seen after this change merges and the plugin is updated on kouko's machine; the blind run proves the declared version and the checks only.
 4. The installed loom-code checker predates the trunk, so this branch's own runs still use the older station contracts until the bump lands and is installed.
 5. user-decided — kouko chose option A (2026-09-16): keep the card cap at 181 words, raised from 150 for W1-03 and W2-03; intent Acceptance 6 now states that limit.
