@@ -27,6 +27,11 @@ charter: 1.0
 - Test: A6 positive: both-cards-name-the-three-missed-alternatives; boundary: both-cards-stay-within-150-words.
 - Risk: the cards sit at 148 and 150 words, so every added word is trimmed from non-rule wording; rules 1-3 stay identical and the agy rule is regenerated, never hand-edited. user-decided.
 
+**W1-03 Raise the card cap so the rule keeps its obligations**  after: W1-02  acceptance: 6
+- Files: `loom-workflow/skills/loom-visualization/assets/trigger-card.md`, `loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md`, `loom-workflow/rules/AGENTS.md`, `loom-workflow/scripts/test_visualization_card_hook.py`, `docs/loom/2026-09-16-plain-language-replies/evidence/probes/test_probe_prose_gate_mutants.py`
+- Test: A6 positive: cards-list-or-rule-out-each-missed-alternative; boundary: both-cards-stay-within-165-words.
+- Risk: W1-02 hit the 150-word cap and paid with three coexist obligations and a weaker verb; raising the cap to 165 restores them and costs about 15 words each turn. agent-decided.
+
 ### Wave 2 — shipped text and the memory store
 
 **W2-01 One name for the card in shipped text**  after: W1-02  acceptance: 2
