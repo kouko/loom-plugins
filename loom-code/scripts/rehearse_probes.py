@@ -64,8 +64,9 @@ from git_exec import run_git  # sibling module (no __init__.py, no conftest)
 from repo_files import repository_files  # sibling module, same convention
 
 DEFAULT_GLOB = "loom-code/scripts/test_probes_*.py"
-# Printed, alone, when the script is run with no `--repo` in a directory git
-# does not recognise -- a `git archive` extract being the case that matters.
+# Printed, alone, when the script is run with no `--repo` in a directory with
+# no `.git` entry in it or any ancestor -- a `git archive` extract being the
+# case that matters.
 # Rehearsal works by cloning the repository, so there is nothing to rehearse
 # without git; that is a stated exception, not a defect, so it is reported as
 # an explicit skip on stdout with exit 0 rather than as a failure.
@@ -127,20 +128,21 @@ def _resolve_repo(raw: str | None) -> Path | None:
     return Path(toplevel)
 
 
-def _is_a_git_repository(directory: Path) -> bool:
-    """Whether git recognises `directory` as being inside a repository at all.
+def _has_git_marker(directory: Path) -> bool:
+    """Whether `directory` or any ancestor holds a `.git` entry.
 
-    `--is-bare-repository` is the same first probe `repo_files._git_entries`
-    uses, asked the same way through `run_git`: it answers for a bare
-    repository as well as for a work tree, so it fails only when there is no
-    repository here (or no git to ask). That is what separates the two cases
-    this script has to treat differently -- "this directory is not a git
-    repository", which is a clean skip, from "git is here and something went
-    wrong", which is still an error.
+    The entry may be a directory (an ordinary checkout) or a file (a linked
+    worktree points at its gitdir with one). This deliberately does not ask
+    git: git answers nothing both when there is no repository and when it
+    refuses one (dubious ownership) or is not installed, and only the first
+    of those is a clean skip. The filesystem tells them apart -- no marker
+    anywhere upward is "this directory is not a repository"; a marker that
+    git could not resolve is a git failure, which still fails.
     """
-    return run_git(
-        directory, "rev-parse", "--is-bare-repository", timeout=GIT_TIMEOUT
-    ) is not None
+    return any(
+        (candidate / ".git").exists()
+        for candidate in (directory, *directory.parents)
+    )
 
 
 def _validate_repo(repo: Path):
@@ -296,17 +298,20 @@ def main(argv: list[str] | None = None) -> int:
     repo = _resolve_repo(args.repo)
     if repo is None:
         # No `--repo`, and `--show-toplevel` failed. Either there is no
-        # repository here at all -- the `git archive` extract -- or git is
-        # here and the call went wrong. Only the first is a skip; the second
-        # keeps failing exactly as it did. An explicit `--repo` never reaches
-        # this branch, so a caller who names a directory that is not a
-        # repository still gets the loud `_validate_repo` failure below.
-        if not _is_a_git_repository(Path.cwd()):
+        # repository here at all -- the `git archive` extract -- or there is
+        # one and git failed on it (refused it, or is not installed). Only
+        # the first is a skip; the second still fails. An explicit `--repo`
+        # never reaches this branch, so a caller who names a directory that
+        # is not a repository still gets the loud `_validate_repo` failure
+        # below.
+        if not _has_git_marker(Path.cwd()):
             print(NO_GIT_SKIP)
             return 0
         return _fail(
-            "could not determine the repository to rehearse "
-            "(`git rev-parse --show-toplevel` failed)"
+            "could not determine the repository to rehearse: a `.git` entry "
+            "exists here or above, but git failed to resolve it "
+            "(`git rev-parse --show-toplevel` failed -- is git installed, "
+            "and does it accept this repository?)"
         )
 
     repo_root, error = _validate_repo(repo)

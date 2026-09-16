@@ -440,3 +440,68 @@ def test_genuineRepositoryWithNoRepoFlag_stillRehearses_andNeverSkips(
     assert rehearse_probes.NO_GIT_SKIP not in out, out
     assert "Rehearsed " in out, out
     assert "FAILED (0)" in out, out
+
+
+# --------------------------------------------------------------------------
+# Inside a genuine repository, git itself can still fail -- it refuses the
+# repository, or it is not installed. Neither is "this directory is not a
+# repository", so neither may take the skip: both must still fail, and say
+# that git failed.
+# --------------------------------------------------------------------------
+
+def _assert_git_failure_not_skip(
+    code: int, captured: pytest.CaptureFixture[str],
+) -> None:
+    result = captured.readouterr()
+    assert code != 0, result.out
+    assert rehearse_probes.NO_GIT_SKIP not in result.out, result.out
+    assert rehearse_probes.NO_GIT_SKIP not in result.err, result.err
+    assert "git" in result.err and "not one" not in result.err, result.err
+
+
+def test_genuineRepositoryGitRefusesForDubiousOwnership_failsInsteadOfSkipping(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    monkeypatch.setenv("GIT_TEST_ASSUME_DIFFERENT_OWNER", "1")
+    # precondition: git really does refuse this repository under the variable
+    assert _git(repo, "rev-parse", "--show-toplevel").returncode != 0
+
+    monkeypatch.chdir(repo)
+    code = rehearse_probes.main([])
+
+    _assert_git_failure_not_skip(code, capsys)
+
+
+def test_genuineRepositoryGitNotOnPath_failsInsteadOfSkipping(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    empty_bin = tmp_path / "empty-bin"
+    empty_bin.mkdir()
+    monkeypatch.setenv("PATH", str(empty_bin))
+    assert shutil.which("git") is None
+
+    monkeypatch.chdir(repo)
+    code = rehearse_probes.main([])
+
+    _assert_git_failure_not_skip(code, capsys)
+
+
+def test_linkedWorktreeSubdirectoryGitRefuses_failsInsteadOfSkipping(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    # a linked worktree marks itself with a `.git` FILE, and the marker is
+    # found by walking upward from a subdirectory
+    repo = make_repo(tmp_path, trunk="main")
+    linked = tmp_path / "linked"
+    _git_ok(repo, "worktree", "add", "-q", "--detach", str(linked))
+    assert (linked / ".git").is_file()
+    sub = linked / "deep" / "er"
+    sub.mkdir(parents=True)
+    monkeypatch.setenv("PATH", str(tmp_path / "no-such-bin"))
+
+    monkeypatch.chdir(sub)
+    code = rehearse_probes.main([])
+
+    _assert_git_failure_not_skip(code, capsys)

@@ -81,9 +81,13 @@ REQ-6 — Ignored directories produce no findings
   because rehearsal needs a git repository and this directory is not one, and
   exits zero. Only that case skips: an explicit `--repo` pointing at a
   non-repository, a bare repository, and any git failure inside a genuine
-  repository all keep failing as before. The two cases are told apart by
-  asking `git rev-parse --is-bare-repository` through `git_exec.run_git` —
-  the same first probe, asked the same way, as the enumeration module above.
+  repository all keep failing as before. The two cases are told apart
+  without asking git, because git answers nothing both when there is no
+  repository and when it refuses one or is not installed: the script walks
+  upward from the working directory for a `.git` entry — a directory, or the
+  file a linked worktree uses. No entry anywhere upward means this directory
+  is not a repository, and it skips; an entry that git could not resolve is a
+  git failure, and it fails with a message saying git failed.
 - user-decided: both paths then drop any path with a component in a fixed
   ignore list holding the names already used in this repository — `.git`,
   `.pytest_cache`, `__pycache__`, `node_modules` (the intent's Constraints).
