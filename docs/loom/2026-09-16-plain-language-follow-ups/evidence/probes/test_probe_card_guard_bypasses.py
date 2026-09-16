@@ -195,8 +195,6 @@ def _vis_tree(tmp: Path) -> Path:
     return root
 
 
-@pytest.mark.xfail(strict=True, reason="surviving mutant: ASCII_BY_CLIENT scans only SKILL.md, "
-                                       "client-matrix.md and detect_client.py, never the templates")
 def test_templateTests_clientDrivenAsciiInATemplate_rejected(tmp_path):
     """`stay ASCII` reintroduced in a template must be caught; the guard scans three files only."""
     root = _vis_tree(tmp_path)
@@ -210,8 +208,6 @@ def test_templateTests_clientDrivenAsciiInATemplate_rejected(tmp_path):
     assert proc.returncode != 0, f"surviving mutant:\n{proc.stdout[-1200:]}"
 
 
-@pytest.mark.xfail(strict=True, reason="surviving mutant: no committed test forbids a "
-                                       "client-driven ASCII rule inside the per-turn cards")
 def test_cardTests_clientDrivenAsciiInTheTriggerCard_rejected(tmp_path):
     """`stay ASCII` reintroduced in the per-turn card must be caught by some committed test."""
     root = tmp_path / "lw"

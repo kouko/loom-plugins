@@ -385,6 +385,26 @@ def test_card_over_181_words_fails():
     assert card_word_errors(text + padding) != []
 
 
+def _ascii_by_client():
+    """The template gate's detector for a rule that picks ASCII because of the client."""
+    import importlib.util
+    gate = ASSETS.parent / "scripts" / "test_templates.py"
+    spec = importlib.util.spec_from_file_location("_loom_vis_template_gate", gate)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.ASCII_BY_CLIENT
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_cards_carry_no_client_driven_ascii_rule(card):
+    """A8 negative: neither per-turn card picks the drawn form because of the client."""
+    detector = _ascii_by_client()
+    assert detector.search("With a remote viewer attached, stay ASCII.")
+    flat = " ".join(card.read_text(encoding="utf-8").split())
+    hit = detector.search(flat)
+    assert not hit, f"{card.name}: {hit.group(0)!r}"
+
+
 GUIDE = "references/plain-language.md"
 # Scope shared word-for-word with rule 5 of the guide (spec REQ-7).
 DECISION_SCOPE = "asking or answering how to do something"

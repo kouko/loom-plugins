@@ -337,7 +337,9 @@ def test_remote_viewer_no_longer_forces_ascii():
         "The drawn ASCII form is for a destination that does not render markdown."
     ), "detector flags a destination-driven rule"
 
-    for path in (SKILL_MD, CLIENT_MATRIX, DETECT_CLIENT):
+    templates = sorted(TEMPLATES.glob("*.md"))
+    assert templates, "no templates found to scan"
+    for path in (SKILL_MD, CLIENT_MATRIX, DETECT_CLIENT, *templates):
         flat = " ".join(path.read_text(encoding="utf-8").split())
         hit = ASCII_BY_CLIENT.search(flat)
         assert not hit, f"{path.name}: {hit.group(0)!r}"
