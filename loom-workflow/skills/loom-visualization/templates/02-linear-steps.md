@@ -19,6 +19,9 @@ ways, use the branching decision template instead.
 
 ## ASCII
 
+A reply defaults to the table above; draw this when the shape itself is the
+information, or when the destination does not render markdown.
+
 Run `python3 <skill-dir>/scripts/generate.py flow` (`<skill-dir>` is defined
 in `SKILL.md`) with this input on stdin:
 

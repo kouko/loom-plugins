@@ -21,6 +21,9 @@ Draw one C4 level per diagram: context (systems and people), container
 
 ## ASCII
 
+A reply defaults to the table above; draw this when the shape itself is the
+information, or when the destination does not render markdown.
+
 Run `python3 <skill-dir>/scripts/generate.py arch` (`<skill-dir>` is defined
 in `SKILL.md`) with this input on stdin. The layer
 bands carry no arrows; state the dependencies in the table or below the diagram.

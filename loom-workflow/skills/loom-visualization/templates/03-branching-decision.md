@@ -18,6 +18,9 @@ rollback decision, which fix to apply. Every branch ends in an action.
 
 ## ASCII
 
+A reply defaults to the table above; draw this when the shape itself is the
+information, or when the destination does not render markdown.
+
 No generator covers branches. Hand-author the diagram, then verify it with
 `python3 <skill-dir>/scripts/align.py -` (`<skill-dir>` is defined in
 `SKILL.md`) until it prints no drift.
