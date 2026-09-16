@@ -219,7 +219,7 @@ def pinned_sentence_ok(sentence, verb, literals):
 
 MERMAID_GATE = "loom-visualization.mermaid-only-when-confirmed"
 MERMAID_PIN = ("Use", ("Mermaid only when you have no shell", "claude.ai", "Claude Desktop chat"))
-TABLE_ASCII_PIN = ("use", ("markdown table plus ASCII", "Everywhere else"))
+TABLE_ASCII_PIN = ("gets", ("markdown table", "Everywhere else"))
 
 
 def test_pinned_sentence_affirmative_example_accepted():
@@ -277,3 +277,76 @@ def test_obsidian_gate_paragraph_chat_in_vault_cwd_proceeds():
     assert any(pinned_sentence_ok(s, *CHAT_PROCEEDS_PIN) for s in gate_sentences(block)), (
         "no affirmative, un-negated sentence says a chat answer proceeds in a vault cwd"
     )
+
+
+# Acceptance 8: a markdown table is the default form for shaped content, and
+# the drawn form is chosen by the destination, never by the client.
+
+CLIENT_MATRIX = SKILL_DIR / "references" / "client-matrix.md"
+DETECT_CLIENT = SKILL_DIR / "scripts" / "detect_client.py"
+
+TABLE_DEFAULT_PIN = ("gets", ("markdown table by default",
+                              "a destination that does not render markdown"))
+
+# A rule that picks the drawn form because of the client the agent runs in.
+ASCII_BY_CLIENT = re.compile(
+    r"(?:remote[ _]viewer|terminal client|because of the client)[^.]*\bASCII\b"
+    r"|\bstay ASCII\b",
+    re.IGNORECASE,
+)
+
+
+def test_table_default_pin_affirmative_example_accepted():
+    sentence = ("Shaped content in a chat reply gets a markdown table by default; the "
+                "drawn form is for a destination that does not render markdown.")
+    assert pinned_sentence_ok(sentence, *TABLE_DEFAULT_PIN)
+
+
+def test_table_default_pin_negated_example_rejected():
+    sentence = ("Shaped content in a chat reply never gets a markdown table by default; the "
+                "drawn form is for a destination that does not render markdown.")
+    assert not pinned_sentence_ok(sentence, *TABLE_DEFAULT_PIN)
+
+
+def test_shaped_content_defaults_to_a_markdown_table():
+    """A8 positive: the skill and the matrix make the table the default form."""
+    text = SKILL_MD.read_text(encoding="utf-8")
+    assert any(pinned_sentence_ok(s, *TABLE_DEFAULT_PIN) for s in gate_sentences(text)), (
+        "SKILL.md pins no affirmative sentence making the markdown table the default form"
+    )
+
+    matrix = CLIENT_MATRIX.read_text(encoding="utf-8")
+    rows = [line for line in matrix.splitlines()
+            if line.startswith("|") and not re.match(r"^\|[\s:|-]+\|\s*$", line)]
+    header, body = rows[0], rows[1:]
+    cells = [c.strip() for c in header.strip("|").split("|")]
+    assert "Form in a chat reply" in cells, cells
+    column = cells.index("Form in a chat reply")
+    for row in body:
+        form = [c.strip() for c in row.strip("|").split("|")][column]
+        assert "markdown table" in form, row
+
+
+def test_remote_viewer_no_longer_forces_ascii():
+    """A8 negative: no rule picks the drawn form because of the client."""
+    assert ASCII_BY_CLIENT.search(
+        "When `remote_viewer` is `true`, send the ASCII form in a code block."
+    ), "detector misses the client-driven rule it exists to catch"
+    assert ASCII_BY_CLIENT.search("; remote viewer attached, stay ASCII")
+    assert not ASCII_BY_CLIENT.search(
+        "The drawn ASCII form is for a destination that does not render markdown."
+    ), "detector flags a destination-driven rule"
+
+    for path in (SKILL_MD, CLIENT_MATRIX, DETECT_CLIENT):
+        flat = " ".join(path.read_text(encoding="utf-8").split())
+        hit = ASCII_BY_CLIENT.search(flat)
+        assert not hit, f"{path.name}: {hit.group(0)!r}"
+
+
+def test_every_ascii_section_names_its_destination_condition():
+    """The drawn form is conditioned on the destination in every template."""
+    for name in EXPECTED:
+        if name == "09-data-model.md":
+            continue  # no ASCII form at all; it points at the table substitute
+        body = " ".join(sections(_read(name))["ASCII"].split())
+        assert "does not render markdown" in body, name
