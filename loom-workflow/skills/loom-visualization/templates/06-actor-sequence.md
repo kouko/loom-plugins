@@ -18,6 +18,9 @@ webhook round-trip, a request crossing services. Order in time is the point.
 
 ## ASCII
 
+A reply defaults to the table above; draw this when the shape itself is the
+information, or when the destination does not render markdown.
+
 Run `python3 <skill-dir>/scripts/generate.py seq` (`<skill-dir>` is defined
 in `SKILL.md`) with this input on stdin. The generator
 is correct by construction; lifelines outside a message's span are left blank

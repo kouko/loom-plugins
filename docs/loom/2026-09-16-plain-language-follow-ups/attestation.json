@@ -1,0 +1,47 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-16-plain-language-follow-ups",
+  "content_digest": "ea10cb75228d18a0be48fc16d614cb790dbffbba",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-plain-language-follow-ups/evidence/probes/test_probe_card_guard_bypasses.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-plain-language-follow-ups/evidence/probes/test_probe_card_guard_bypasses.py",
+      "result": "pass",
+      "command_digest": "26d47ca83814216722fd089862b408e6f53aa06ae43d1aafb41da273552cb845"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-code-1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "docs/loom/2026-09-16-plain-language-follow-ups/plan.md W3-02 Test",
+          "text": "Two W3-02 test labels describe checks test_release_metadata.py does not perform."
+        }
+      ]
+    },
+    {
+      "reviewer": "reviewer-docs-2",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""UserPromptSubmit hook: print the loom-visualization trigger card.
+"""UserPromptSubmit hook: print the visualization card for loom-visualization.
 
 Prints the coexistence card when ascii-graph-toolkit is active for this
 project (so only one diagram trigger instruction reaches the session),

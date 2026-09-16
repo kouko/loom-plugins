@@ -274,7 +274,12 @@ PLAIN_RULES = {
 }
 
 
-NEGATION = re.compile(r"\b(?:never|not|no|avoid|don't)\b", re.I)
+# Same negation words as the sibling gate's NEGATION_RE in
+# skills/loom-visualization/scripts/test_templates.py, plus modal softeners that
+# turn an obligation into a choice.
+NEGATION_WORDS = ("not", "never", "no", "none", "without", "unless", "except", "avoid")
+SOFTENERS = ("may", "optional", "optionally", "if you like", "if you want")
+NEGATION = re.compile(r"\b(?:%s)\b|n't" % "|".join(NEGATION_WORDS + SOFTENERS), re.I)
 # Rule 3's ban list is the one negation a rule sentence must keep.
 METAPHOR_BAN = 'no metaphors, analogies, "like" or "imagine"'
 
@@ -329,6 +334,24 @@ def test_negated_card_rule_rejected(old, new):
     assert rule_polarity_errors(flat.replace(old, new, 1)) != []
 
 
+def test_negation_vocabulary_matches_sibling_gate():
+    """The card guard knows every negation word the template gate rejects."""
+    gate = (Path(__file__).resolve().parent.parent / "skills" / "loom-visualization"
+            / "scripts" / "test_templates.py")
+    words = re.search(r"NEGATION_RE = re\.compile\(r\"\\b\(\?:([a-z|]+)\)", gate.read_text(encoding="utf-8"))
+    assert words, "NEGATION_RE not found in test_templates.py"
+    assert set(words.group(1).split("|")) == set(NEGATION_WORDS)
+
+
+@pytest.mark.parametrize("sentence", [
+    "answer without listing it", "it isn't required", "skip it unless asked",
+    "none of these apply", "all except this", "you may list it", "it is optional",
+    "list it if you like",
+])
+def test_negation_catches_softened_or_negated_sentence(sentence):
+    assert NEGATION.search(sentence)
+
+
 def _rules_one_to_three(card):
     body = " ".join(_sentences(card.read_text(encoding="utf-8")))
     match = re.search(r"Reply to the user.*?(?= 4\))", body)
@@ -340,7 +363,7 @@ def test_coexist_card_rules_one_to_three_match_full_card_word_for_word():
     """The coexist card is what toolkit users receive; rules 1-3 must not be compressed."""
     assert _rules_one_to_three(COEXIST_CARD) == _rules_one_to_three(FULL_CARD)
 
-MAX_CARD_WORDS = 150
+MAX_CARD_WORDS = 181
 
 
 def card_word_errors(text):
@@ -350,15 +373,36 @@ def card_word_errors(text):
 
 
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
-def test_cards_at_most_150_words(card):
+def test_cards_at_most_181_words(card):
+    """A1/A6/A7 boundary both-cards-stay-within-their-cap: the cap holds as rules are added."""
     assert card_word_errors(card.read_text(encoding="utf-8")) == []
 
 
-def test_card_over_150_words_fails():
-    """A1 negative card-over-150-words-fails: a card padded past the cap is caught."""
+def test_card_over_181_words_fails():
+    """A1 negative card-over-the-cap-fails: a card padded past the cap is caught."""
     text = COEXIST_CARD.read_text(encoding="utf-8")
     padding = " word" * (MAX_CARD_WORDS + 1 - len(text.split()))
     assert card_word_errors(text + padding) != []
+
+
+def _ascii_by_client():
+    """The template gate's detector for a rule that picks ASCII because of the client."""
+    import importlib.util
+    gate = ASSETS.parent / "scripts" / "test_templates.py"
+    spec = importlib.util.spec_from_file_location("_loom_vis_template_gate", gate)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.ASCII_BY_CLIENT
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_cards_carry_no_client_driven_ascii_rule(card):
+    """A8 negative: neither per-turn card picks the drawn form because of the client."""
+    detector = _ascii_by_client()
+    assert detector.search("With a remote viewer attached, stay ASCII.")
+    flat = " ".join(card.read_text(encoding="utf-8").split())
+    hit = detector.search(flat)
+    assert not hit, f"{card.name}: {hit.group(0)!r}"
 
 
 GUIDE = "references/plain-language.md"
@@ -389,6 +433,124 @@ def test_both_cards_state_inline_decision_rule(card):
 def test_card_without_inline_decision_rule_fails(card):
     """A7 negative: a card that only routes decisions to the guide, or negates the rule, is caught."""
     assert inline_decision_rule_errors(card) != []
+
+
+# A6: the three alternatives a "how do I" answer most often leaves out.
+MISSED_ALTERNATIVES = ("doing nothing or later", "a smaller version", "combining two")
+
+
+def missed_alternative_errors(text):
+    """Error when no card sentence names the three missed alternatives; empty = named."""
+    ok = any(DECISION_SCOPE in s and all(p in s for p in MISSED_ALTERNATIVES)
+             and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["missed alternatives not named inline"]
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_both_cards_name_the_three_missed_alternatives(card):
+    """A6 positive both-cards-name-the-three-missed-alternatives."""
+    assert missed_alternative_errors(card.read_text(encoding="utf-8")) == []
+
+
+@pytest.mark.parametrize("dropped", MISSED_ALTERNATIVES)
+def test_card_missing_one_missed_alternative_fails(dropped):
+    """A6 negative: a card that leaves out any one of the three is caught."""
+    flat = " ".join(FULL_CARD.read_text(encoding="utf-8").split())
+    assert dropped in flat
+    assert missed_alternative_errors(flat.replace(dropped, "", 1)) != []
+
+
+# A6: the obligation carried by the verb — each alternative is offered or ruled out,
+# so none can be dropped in silence.
+MISSED_ALTERNATIVE_VERB = "list or rule out"
+
+
+def missed_alternative_verb_errors(text):
+    """Error when the three alternatives are named under a weaker verb; empty = list-or-rule-out."""
+    ok = any(DECISION_SCOPE in s and MISSED_ALTERNATIVE_VERB in s
+             and all(p in s for p in MISSED_ALTERNATIVES)
+             and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["missed alternatives not listed or ruled out inline"]
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_both_cards_list_or_rule_out_each_missed_alternative(card):
+    """A6 positive cards-list-or-rule-out-each-missed-alternative."""
+    assert missed_alternative_verb_errors(card.read_text(encoding="utf-8")) == []
+
+
+def test_weaker_verb_over_missed_alternatives_rejected():
+    """A6 negative: 'cover' lets an alternative be dropped in silence; the weaker verb is caught."""
+    assert missed_alternative_verb_errors(
+        "When asking or answering how to do something, cover doing nothing or later, "
+        "a smaller version, combining two.") != []
+
+
+def test_negated_missed_alternatives_rejected():
+    """A6 negative: naming the three inside a negated clause does not count."""
+    assert missed_alternative_errors(
+        "When asking or answering how to do something, never cover doing nothing or later, "
+        "a smaller version, combining two.") != []
+
+
+# A7: the everyday conversation situations that carry a table. One per situation
+# table in the guide (`references/plain-language.md`), which recorded runs show is
+# not opened — so a situation named only there never reaches a reply.
+SITUATIONS = {
+    "progress report": r"\bprogress\b",
+    "before and after": r"\bbefore and after\b",
+    "what each choice means": r"what each choice means",
+    "readiness checklist": r"\breadiness\b",
+    "confirmed against unconfirmed": r"confirmed against unconfirmed",
+    "findings": r"\bfindings\b",
+    "risks": r"\brisks\b",
+    "supported environments": r"supported environments",
+}
+
+
+def _flat_body(card):
+    """The card's prose as one line, header dropped."""
+    return " ".join(" ".join(card.read_text(encoding="utf-8").splitlines()[1:]).split())
+
+
+def situation_errors(text):
+    """Situations no affirmative trigger sentence names; empty = every situation is named."""
+    body = " ".join(s for s in _trigger_phrases(text) if not NEGATION.search(s))
+    return [name for name, pat in SITUATIONS.items() if not re.search(pat, body, re.I)]
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_both_cards_name_the_conversation_situations(card):
+    """A7 positive both-cards-name-the-conversation-situations."""
+    assert situation_errors(_flat_body(card)) == []
+
+
+def test_card_naming_only_data_shapes_fails():
+    """A7 negative: a trigger list of data shapes alone leaves every situation out."""
+    assert situation_errors(
+        "4) Use tables or diagrams: before explaining comparisons of 2+ options, flows of 3+ "
+        "steps, states or reasoning chains, invoke `loom-visualization` FIRST."
+    ) == list(SITUATIONS)
+
+
+@pytest.mark.parametrize("dropped", list(SITUATIONS))
+def test_card_missing_one_situation_fails(dropped):
+    """A7 negative: dropping any one situation from the trigger list is caught."""
+    flat = _flat_body(FULL_CARD)
+    mutated = re.sub(SITUATIONS[dropped], "", flat, count=1, flags=re.I)
+    assert mutated != flat, dropped
+    assert situation_errors(mutated) == [dropped]
+
+
+def test_situations_named_in_a_negated_sentence_do_not_count():
+    """A7 negative: naming the situations inside a negated trigger sentence does not count."""
+    assert situation_errors(
+        "4) Use tables or diagrams: never invoke `loom-visualization` for progress, a before "
+        "and after, what each choice means, readiness, confirmed against unconfirmed, "
+        "findings, risks or supported environments."
+    ) == list(SITUATIONS)
 
 
 def test_coexist_card_skip_sentence_names_the_skill():
@@ -425,22 +587,60 @@ def test_coexist_card_trigger_phrases_do_not_overlap_toolkit():
     assert re.search(r"ascii-graph", text, re.I)
 
 
+def markdown_table_choice_errors(text):
+    """Error when no card sentence gives comparisons a markdown table; empty = stated."""
+    ok = any(re.search(r"\bcomparisons?\b", s, re.I) and "markdown table" in s
+             and "ASCII only when needed" in s and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["markdown-table choice not stated affirmatively"]
+
+
+def box_drawing_split_errors(text):
+    """Error when no card sentence sends prescribed box diagrams to align.py; empty = stated."""
+    ok = any(re.search(r"\b[Vv]erif", s) and re.search(r"\bbox\b|box-drawing", s)
+             and "prescribed" in s and "loom-visualization" in s
+             and "`scripts/align.py`" in s and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["box-drawing split not stated affirmatively"]
+
+
 def test_coexist_card_picks_markdown_table_not_mermaid():
     """The hook host always has a shell, so the Mermaid gate never allows Mermaid there."""
-    sentences = _sentences(COEXIST_CARD.read_text(encoding="utf-8"))
-    assert not re.search(r"mermaid", " ".join(sentences), re.I)
+    text = COEXIST_CARD.read_text(encoding="utf-8")
+    assert not re.search(r"mermaid", " ".join(_sentences(text)), re.I)
     # Meaning pinned, not wording: comparisons get a markdown table, ASCII only when needed.
-    assert any(re.search(r"\bcomparisons?\b", s, re.I) and "markdown table" in s
-               and "ASCII only when needed" in s for s in sentences)
+    assert markdown_table_choice_errors(text) == []
+
+
+def test_affirmative_coexist_table_sentence_accepted():
+    """A1 positive affirmative-coexist-sentence-still-passes (markdown-table sentence)."""
+    assert markdown_table_choice_errors(
+        "Comparisons get a markdown table, ASCII only when needed.") == []
+
+
+def test_negated_coexist_table_sentence_rejected():
+    """A1 negative negated-coexist-sentence-fails-card-tests (markdown-table sentence)."""
+    assert markdown_table_choice_errors(
+        "Comparisons never get a markdown table, ASCII only when needed.") != []
 
 
 def test_coexist_card_box_drawing_split_between_skill_checks_and_toolkit_card():
     """Prescribed box drawing uses loom-visualization's align.py; the toolkit card keeps three shapes."""
-    sentences = _sentences(COEXIST_CARD.read_text(encoding="utf-8"))
-    body = " ".join(sentences)
+    text = COEXIST_CARD.read_text(encoding="utf-8")
+    body = " ".join(_sentences(text))
     # Meaning pinned, not wording: align.py verifies box diagrams loom-visualization prescribes.
-    assert any(re.search(r"\b[Vv]erif", s) and re.search(r"\bbox\b|box-drawing", s)
-               and "prescribed" in s and "loom-visualization" in s
-               and "`scripts/align.py`" in s for s in sentences)
+    assert box_drawing_split_errors(text) == []
     assert re.search(r"the ascii-graph card covers flows, state machines and architecture;", body)
     assert not re.search(r"ascii-graph card covers[^.]*sequences", body)
+
+
+def test_affirmative_coexist_box_sentence_accepted():
+    """A1 positive affirmative-coexist-sentence-still-passes (align.py box sentence)."""
+    assert box_drawing_split_errors(
+        "Verify prescribed box diagrams with loom-visualization's `scripts/align.py`.") == []
+
+
+def test_negated_coexist_box_sentence_rejected():
+    """A1 negative negated-coexist-sentence-fails-card-tests (align.py box sentence)."""
+    assert box_drawing_split_errors(
+        "Never verify prescribed box diagrams with loom-visualization's `scripts/align.py`.") != []

@@ -19,6 +19,9 @@ the states.
 
 ## ASCII
 
+A reply defaults to the table above; draw this when the shape itself is the
+information, or when the destination does not render markdown.
+
 No generator covers states. Hand-author the diagram, then verify it with
 `python3 <skill-dir>/scripts/align.py -` (`<skill-dir>` is defined in
 `SKILL.md`).

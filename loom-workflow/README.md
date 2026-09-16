@@ -4,7 +4,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.3.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.3.1 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## What it is
 
@@ -141,7 +141,7 @@ loom-workflow/
 ├── docs/                  governance, audit, telemetry and design notes
 ├── hooks/
 │   ├── hooks.json         UserPromptSubmit card and skill folder structure check after Write/Edit
-│   └── visualization-card UserPromptSubmit trigger card for loom-visualization
+│   └── visualization-card UserPromptSubmit visualization card for loom-visualization
 ├── scripts/               plugin-level tests and the structure check
 ├── skills/
 │   ├── critique/
@@ -182,7 +182,7 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
-On Codex, the loom-visualization trigger card arrives on every message you send
+On Codex, the visualization card for loom-visualization arrives on every message you send
 through a plugin UserPromptSubmit hook, which Codex runs only after you review
 and trust the plugin's hooks. If you trusted the hook in an earlier version,
 review and trust it again: its event changed.
@@ -210,15 +210,16 @@ attaches no workspace, so loom's kickoff defaults are not loaded and the
 agent may act outside the project; pass it in interactive mode too.
 
 Its hooks run only in the `agy` CLI, not in the Antigravity desktop app or IDE.
-On agy, the loom-visualization trigger card is delivered as a plugin rule, so it
+On agy, the visualization card for loom-visualization is delivered as a plugin rule, so it
 is always on.
 
 ### Where the per-turn reminder does not arrive
 
-On Claude Code and Codex, `loom-workflow` sends the loom-visualization trigger
-card (reply in the user's language, conclusion first, plain words, literal
-wording, tables and diagrams) to the agent on every message you send, through a
-UserPromptSubmit hook; it adds about 150 words per turn. It does not reach:
+On Claude Code and Codex, `loom-workflow` sends the visualization card for
+loom-visualization (reply in the user's language, conclusion first, plain words,
+literal wording, tables and diagrams) to the agent on every message you send,
+through a UserPromptSubmit hook; it adds up to 181 words per turn. It does not
+reach:
 
 - the Codex IDE extension or the Codex app;
 - the Antigravity desktop app or IDE (plugin hooks and rules run only in the `agy` CLI);

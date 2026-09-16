@@ -102,7 +102,8 @@ Block 6 Pending) read meaningfully better with a small table:
 
 **Diagrams**: useful only when there is real topology — a pipeline, dependency
 graph, or state machine the human needs to see spatially. Use Mermaid only when
-the client is known to render it; use ASCII for an unknown or terminal client.
+the client is known to render it; otherwise use a markdown table by default, and
+ASCII only where the destination cannot render markdown.
 An explicit user format request wins. Support counts as known only when the
 user or current runtime instructions explicitly state Mermaid rendering
 support; never infer it from a product name. Most recaps are flat state

@@ -475,10 +475,10 @@ def test_current_release_metadata_is_synchronized() -> None:
     agy_manifest = json.loads(
         (REPO / "loom-code/plugin.json").read_text(encoding="utf-8")
     )
-    assert claude_manifest["version"] == "3.7.0"
-    assert codex_manifest["version"] == "3.7.0"
-    assert agy_manifest["version"] == "3.7.0"
-    assert "## [3.7.0]" in changelog
+    assert claude_manifest["version"] == "3.7.1"
+    assert codex_manifest["version"] == "3.7.1"
+    assert agy_manifest["version"] == "3.7.1"
+    assert "## [3.7.1]" in changelog
 
 
 @pytest.mark.parametrize(
@@ -497,6 +497,20 @@ def test_readme_version_matches_manifest(readme: str, label: str) -> None:
     match = re.search(rf"^{re.escape(label)}(\d+\.\d+\.\d+)", text, re.M)
     assert match, f"{readme}: version line missing"
     assert match.group(1) == manifest["version"]
+
+
+def test_root_readme_plugin_table_row_version_matches_manifest() -> None:
+    """The plugin table at the top of the repository README states the
+    loom-code version too. The section prose below it is already pinned; a
+    stale table row would still send a reader to a version the installer will
+    not hand them."""
+    manifest = json.loads(
+        (REPO / "loom-code/.claude-plugin/plugin.json").read_text(encoding="utf-8")
+    )
+    text = (REPO / "README.md").read_text(encoding="utf-8")
+    row = re.search(r"^\| \[`loom-code`\]\(loom-code/\) \| (\d+\.\d+\.\d+) \|", text, re.M)
+    assert row, "README.md: loom-code plugin table row missing"
+    assert row.group(1) == manifest["version"]
 
 
 def test_root_readme_loom_code_section_version_matches_manifest() -> None:

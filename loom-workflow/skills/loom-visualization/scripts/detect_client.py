@@ -8,6 +8,10 @@ Reads environment markers and prints one JSON object:
 documented or reported to show Mermaid source raw, or is unverified. See
 references/client-matrix.md for the sources.
 
+`remote_viewer` reports that a phone or web viewer is attached. It bears on
+Mermaid safety only; the form of a reply is decided by its destination, not by
+the client.
+
 `obsidian_vault` is true when the --target path or an ancestor of it holds a
 `.obsidian/` directory, false otherwise, and null when no --target is given.
 
@@ -52,10 +56,10 @@ def detect(env=None, target=None):
         reason = "GEMINI_CLI=1; Mermaid rendering is unverified"
     else:
         client = "unknown"
-        reason = "no known client marker; use markdown table plus ASCII"
+        reason = "no known client marker; Mermaid rendering is unverified"
 
     if remote_viewer:
-        reason += "; remote viewer attached, stay ASCII"
+        reason += "; remote viewer attached, Mermaid stays unsafe"
 
     return {
         "client": client,

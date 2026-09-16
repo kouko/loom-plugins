@@ -4,7 +4,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.3.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.3.1 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 這是什麼
 
@@ -130,7 +130,7 @@ loom-workflow/
 ├── docs/                  治理、稽核、遙測與設計筆記
 ├── hooks/
 │   ├── hooks.json         UserPromptSubmit 卡片，以及 Write/Edit 後檢查 skill 資料夾結構
-│   └── visualization-card loom-visualization 的 UserPromptSubmit 觸發卡片
+│   └── visualization-card loom-visualization 的 UserPromptSubmit visualization card
 ├── scripts/               plugin 層級測試與結構檢查
 ├── skills/
 │   ├── critique/
@@ -171,7 +171,7 @@ codex plugin marketplace add https://github.com/kouko/loom-plugins.git
 codex plugin add loom-workflow@loom
 ```
 
-在 Codex 上，loom-visualization 的觸發卡透過 plugin 的 UserPromptSubmit hook，在你每次送出訊息時送達；Codex 只在你審閱並信任該 plugin 的 hook 之後才會執行它。如果你在舊版本已信任過，因為 hook 的事件改了，需要重新審閱並信任一次。
+在 Codex 上，loom-visualization 的 visualization card 透過 plugin 的 UserPromptSubmit hook，在你每次送出訊息時送達；Codex 只在你審閱並信任該 plugin 的 hook 之後才會執行它。如果你在舊版本已信任過，因為 hook 的事件改了，需要重新審閱並信任一次。
 
 ### Antigravity CLI
 
@@ -194,13 +194,13 @@ agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模�
 互動模式也請一併指定。
 
 hook 只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。
-在 agy 上，loom-visualization 的觸發卡以 plugin rule 送達，因此永遠生效。
+在 agy 上，loom-visualization 的 visualization card 以 plugin rule 送達，因此永遠生效。
 
 ### 每輪提醒送不到的地方
 
 在 Claude Code 與 Codex 上，`loom-workflow` 透過 UserPromptSubmit hook，在你每次送出訊息時
-把 loom-visualization 的觸發卡（用使用者的語言回覆、結論先講、白話說明、照字面講不用比喻、
-用表格或圖）送給 agent，每輪約多 150 個英文字。以下情況收不到：
+把 loom-visualization 的 visualization card（用使用者的語言回覆、結論先講、白話說明、
+照字面講不用比喻、用表格或圖）送給 agent，每輪最多增加 181 個英文字。以下情況收不到：
 
 - Codex IDE 擴充功能與 Codex app
 - Antigravity 桌面 app 與 IDE（plugin 的 hook 與 rule 只在 `agy` CLI 執行）

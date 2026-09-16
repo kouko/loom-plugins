@@ -90,21 +90,29 @@ displays, with sources and a verified date, is in
 Use Mermaid only when you have no shell and your own host is claude.ai or the
 Claude Desktop chat, where Mermaid is reported to render. If you can run the
 client check at all, you have a shell, so do not use Mermaid. Everywhere else
-use a markdown table plus ASCII in a fenced code block. When
-`remote_viewer` is `true`, send the ASCII form in a code block and add the
-table only when exact values matter. A wrong Mermaid choice shows the user
-raw source; a table plus ASCII reads everywhere.
+the reply gets a markdown table, which every client in the matrix renders.
+A drawn ASCII diagram goes in a fenced code block when the shape itself is
+the information, or when the answer is bound for a plain-text destination.
+A wrong Mermaid choice shows the user raw source; a markdown table reads
+everywhere.
 <!-- /gate -->
 
-Within the table plus ASCII form:
+Which of the two forms to send:
 
+- Shaped content in a chat reply gets a markdown table by default; the drawn
+  form is for a destination that does not render markdown, such as a code
+  comment, a commit message or a plain-text file.
 - Option comparison always uses a GFM markdown table, in every client. Use the
   ASCII table generator only when the answer goes into a code block or a
   plain-text destination.
-- Data model and quantity usually need only the markdown table; add the ASCII
-  form when the channel may not render markdown.
-- Flows, decisions, chains, states, sequences, hierarchies, architecture and
-  timelines get the ASCII diagram, with the table when exact values matter.
+- Data model and quantity need only the markdown table.
+- A flow, a branch, a reasoning chain, a state machine, a sequence, a
+  hierarchy, an architecture or a timeline may still be drawn in the reply
+  when a table would lose what the reader needs: there the shape is the
+  information. Draw it, verify it, and keep a table beside it when exact
+  values matter.
+- The client never decides between the two. `remote_viewer` and the client
+  name tell you whether Mermaid is safe, and nothing more.
 
 ## Step 4 — Generate and verify the ASCII
 

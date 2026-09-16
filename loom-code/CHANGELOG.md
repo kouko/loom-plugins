@@ -1,5 +1,44 @@
 # Changelog
 
+## [3.7.1] — 2026-09-16 — the version that carries three merged fixes out
+
+Patch. No station guidance, field, rule id or contract change of its own; the
+contract manifest version stays 2.3.1 and the mechanism count is unchanged.
+Three changes merged into `main` after 3.7.0 was cut without the version
+moving, so `claude plugin update loom-code@loom` answered "already at the
+latest version (3.7.0)" and refreshed nothing. The bump is what makes those
+already-merged fixes reach an installed copy; the entries below record what
+they changed.
+
+- Station name (#19). The skills, skill references and agent contracts no
+  longer call the station "the review station" or `review`; every description
+  of it now reads `closing-review`, matching the station's actual name. Two
+  checker messages, in `loom_checker/rule_checks/standing.py` and
+  `loom_checker/command_handlers/land.py`, changed with them. Gate markers,
+  internal ids (`finalize-review`, `pre-build-review`, `review.*`), lens names
+  and the general word "review" were left alone, so each sentence means the
+  same apart from the name.
+- Second-vendor suggestions decided without lanes (#20). The `lane` field
+  (`small` / `full`) left the input of `scripts/second_vendor_policy.py`;
+  nothing defined how an agent should pick between the two values, and the
+  guess decided whether the user was offered the choice at all. Every change
+  now runs the same path and is offered the cross-vendor review choice. An
+  input that still carries `lane` is rejected
+  as an unknown field (exit 2) rather than silently ignored, and the reason
+  codes lose their lane prefix: `full-lane-risk-recommendation` becomes
+  `risk-recommendation`, `full-lane-availability` becomes `availability`.
+  `write-plan`, `capture-intent`, their references and the contract manifest
+  note no longer ask for or describe a lane.
+- The adversary maintains its own programs and reuses first (#21). When a fix
+  widens Build's scope and an already-committed adversarial program fails or
+  cannot run because of it, Build dispatches a fresh `loom-code:adversary` to
+  update that program; no other role may change it, and the update must carry
+  mutation evidence run against the committed program, including one mutation
+  that a too-broad update would wrongly let through. Before writing any
+  program the adversary first looks at what this change and the repository
+  already cover, reuses or modifies where it can, and reports every program as
+  `reused`, `modified` or `new`, with a reason for each `new` one.
+
 ## [3.7.0] — 2026-09-15 — carried details and readable flows in write-plan
 
 Minor. Station guidance changes in `write-plan` and the `spec-minimal.md`
