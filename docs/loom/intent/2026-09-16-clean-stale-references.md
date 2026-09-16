@@ -6,22 +6,22 @@ status: confirmed 2026-09-16
 publication: automatic — authorized 2026-09-16 by kouko
 
 ## Problem
-Documentation and skill references in the repository are stale, pointing to files or sections that no longer exist (e.g., `codex-tools.md`, obsolete frozen store paths in README). This misleads contributors and agents.
+Some repository documents point readers and agents at files or folders that no longer exist, so anyone following those pointers hits a dead end.
 
 ## Proposed outcome
-All identified stale references are updated to reflect the current codebase structure and patterns.
+Every pointer this change touches leads to something that exists, and nothing that still exists loses its pointer.
 
 ## Acceptance
-1. `loom-workflow/skills/distill-sessions/references/codex-tools.md` refers to internal dispatch patterns instead of `codex-tools.md`.
-2. `docs/loom/README.md` no longer lists `plans/`, `specs/`, `backlog/`, `design/`, `archive/`, or `BACKLOG.md` as active/relevant paths.
-3. `loom-design/skills/write-spec/SKILL.md` no longer refers to "ten completeness questions".
+1. `loom-workflow/skills/distill-sessions/references/codex-tools.md` no longer names a `codex-tools.md` or any other file that does not exist in `loom-code`.
+2. Every folder or file the frozen-store list in `docs/loom/README.md` links to exists, and `docs/loom/plans/` is still listed.
+3. `loom-code/docs/examples/README.md` no longer links to `skills/using-loom-code/references/codex-tools.md`.
 
 ## Constraints
-- None.
+- Documentation prose only; no skill behaviour changes.
 
 ## Out of scope
-- Fixing other unrelated documentation errors.
-- Refactoring the actual skill logic.
+- Other items from the 2026-09-16 follow-up scan.
+- `loom-design/skills/write-spec/SKILL.md`: its "ten completeness questions" sentence matches `references/spec-forms.md` and stays.
 
 ## Open questions
 - none
