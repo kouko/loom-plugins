@@ -14,7 +14,7 @@ Codex and Antigravity CLI:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.2.0 | 5 | Front of the flow: intent, specification, product principles, visual design. |
-| [`loom-code`](loom-code/) | 3.7.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-code`](loom-code/) | 3.7.1 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
 | [`loom-workflow`](loom-workflow/) | 5.3.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
@@ -128,7 +128,7 @@ contract package it reads.
 
 ## loom-code
 
-Version 3.7.0. Five stations carry one change from plan to PR with
+Version 3.7.1. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a fast publication gate.
 
 | Skill | Role |

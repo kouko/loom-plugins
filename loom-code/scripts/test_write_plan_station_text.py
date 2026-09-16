@@ -499,10 +499,11 @@ def test_readme_version_matches_manifest(readme: str, label: str) -> None:
     assert match.group(1) == manifest["version"]
 
 
-def test_root_readme_version_pins_match_manifest() -> None:
-    """The repository README states the loom-code version twice — the plugin
-    table row and the section heading line. A stale pin in either one sends a
-    reader to a version the installer will not hand them."""
+def test_root_readme_plugin_table_row_version_matches_manifest() -> None:
+    """The plugin table at the top of the repository README states the
+    loom-code version too. The section prose below it is already pinned; a
+    stale table row would still send a reader to a version the installer will
+    not hand them."""
     manifest = json.loads(
         (REPO / "loom-code/.claude-plugin/plugin.json").read_text(encoding="utf-8")
     )
@@ -510,9 +511,6 @@ def test_root_readme_version_pins_match_manifest() -> None:
     row = re.search(r"^\| \[`loom-code`\]\(loom-code/\) \| (\d+\.\d+\.\d+) \|", text, re.M)
     assert row, "README.md: loom-code plugin table row missing"
     assert row.group(1) == manifest["version"]
-    heading = re.search(r"^Version (\d+\.\d+\.\d+)\. Five stations", text, re.M)
-    assert heading, "README.md: loom-code section version line missing"
-    assert heading.group(1) == manifest["version"]
 
 
 def test_root_readme_loom_code_section_version_matches_manifest() -> None:
