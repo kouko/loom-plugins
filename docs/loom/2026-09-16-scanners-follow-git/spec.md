@@ -1,5 +1,5 @@
 # Loom asks git which files belong to the repository it is running in — spec
-intent: 2026-09-16-scanners-follow-git@8390868c
+intent: 2026-09-16-scanners-follow-git@87b51761
 pre-build-review: not-required — engineering change to file enumeration; no security, privacy, irreversible data, or promised public contract, and Out of scope records that the module is not documented or stabilised for callers outside loom's own gates
 
 ## Requirements

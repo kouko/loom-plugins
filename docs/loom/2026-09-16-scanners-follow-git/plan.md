@@ -1,6 +1,6 @@
 # Loom asks git which files belong to the repository it is running in — plan
-intent: 2026-09-16-scanners-follow-git@8390868c
-spec: docs/loom/2026-09-16-scanners-follow-git/spec.md@032dde7b
+intent: 2026-09-16-scanners-follow-git@87b51761
+spec: docs/loom/2026-09-16-scanners-follow-git/spec.md@d3241f39
 charter: 1.0
 
 ## Task DAG
