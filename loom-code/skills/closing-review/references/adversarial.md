@@ -3,7 +3,8 @@
 The adversary's job is not to find bugs the reviewers might also find. It
 is to make the change fail. It runs at the end of Build, and everything it
 runs is committed as a program: Build re-runs those programs on every fix
-loop, and `finalize-review` executes them on committed content.
+loop, and `finalize-review` executes them on committed content. If a case
+needs the code changed to fail, it is not a case.
 
 ## Reuse first, update with evidence
 
@@ -11,8 +12,9 @@ Before writing any probe, the adversary checks what already covers the
 target: this change's programs under `docs/loom/<change-id>/evidence/probes/`
 and the repository's related tests. It reuses a program that covers a case,
 modifies one when a small change covers it, and writes a new probe only when
-nothing covers the case. A permanent repository test that covers a case
-counts as reuse, and the adversary leaves that test as it is. Its report marks
+nothing covers the case. A permanent repository test that already covers a
+case counts as reuse: the adversary names it in `reason` and leaves the test as
+it is. Its report marks
 each probe `reused`, `modified` or `new`, with a one-line reason for every new
 one. A stale case that is rewritten or flipped to its positive form counts as
 `modified`.
@@ -23,10 +25,13 @@ nothing in the product. When a failing program caught a product defect, the
 adversary keeps that program unchanged and returns a finding, and Build then
 fixes the product. Every update carries mutation evidence run against the
 committed probe program itself: at least one mutation per kind of change the
-update touches, plus one that an over-broad update would wrongly accept. One
-mutation restores the original behaviour the stale program rejected, and the
-updated probe must turn RED on it. Each mutation turns the probe RED and is
-reverted, and the report gives its command and observed result. The adversary
+update touches, plus one that an over-broad update would wrongly accept, such
+as a generic-word substitution that a global replace with a case-insensitive
+comparison lets through. A copy of the probe's logic proves nothing about that
+program. One mutation restores the original behaviour the stale program
+rejected, and the updated probe must turn RED on it. Each mutation must turn
+the probe RED and is then reverted, and the report gives each one's command and
+observed result. The adversary
 commits the updated probe before it makes a copy, because `git worktree add` and
 `git archive` hold only committed content, and an uncommitted update takes the
 edit-tool route in the working tree. The adversary
@@ -48,7 +53,7 @@ a case to make it pass.
 **If the repo declares mutation or fuzz tooling** — a `mutmut`,
 `cosmic-ray`, `stryker` or fuzz target in its config — run it over the
 changed modules and report survivors: a surviving mutant is a test that
-asserts nothing.
+asserts nothing, and a finding against `tests`.
 
 **If it declares none** (the common case), write **at least three**
 executable abuse or boundary cases against the changed behaviour, run them,
@@ -80,8 +85,7 @@ requirement as its anchor.
 
 ## Skill and gate
 
-Work the six classes in [`attack-catalogue.md`](attack-catalogue.md)
-against the file, one attempt per class, and write down what the file made
+Make each attempt below against the file, and write down what the file made
 you do:
 
 - Read the instruction as an agent under time pressure — is there a reading
@@ -90,9 +94,6 @@ you do:
   and record whether the text refuses them.
 - For a gate script, feed it the input it was written to catch, then the
   same input one character different.
-
-An attempt that the file survives is recorded too — that is what makes the
-catalogue an eval rather than an anecdote.
 
 ## Recording
 
@@ -106,10 +107,12 @@ and observed result in the generated attestation:
  "artifact": "docs/loom/<change-id>/evidence/probes/abuse_empty_input.py"}
 ```
 
+- Record every attempt that failed to break anything, for every artifact
+  type — that is what makes the attempts an eval rather than an anecdote.
 - `command` must be re-runnable by someone else in a clean tree.
 - `artifact` is where the case now lives. Put probes under
   `docs/loom/<change-id>/evidence/probes/` — that path is the `evidence`
-  artifact type and needs no separate task-accounting trailer. Promote a
+  artifact type. Promote a
   probe into the repo's real test suite only through a plan task.
 - Anything the adversary found that matters
   becomes a `finding` with an anchor and a fix. Build fixes every fatal or

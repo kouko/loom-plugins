@@ -10,8 +10,8 @@ used to declare `argv:` contracts running validators and verdict-minters out
 of `${CLAUDE_PLUGIN_ROOT}/scripts/`, and most of this file drove each of
 those commands from an isolated install. Those skills and scripts are gone:
 loom-design 1.0 declares no in-plugin station command at all, and its four
-SKILL.md files say in prose that no `${CLAUDE_PLUGIN_ROOT}` path reaches
-loom-code. So the command-matrix tests are replaced by one that pins that
+SKILL.md files link one reference that says in prose that no
+`${CLAUDE_PLUGIN_ROOT}` path reaches loom-code. So the command-matrix tests are replaced by one that pins that
 state — an empty command surface, asserted rather than assumed — plus the
 one executable the plugin still ships, exercised from the isolated install.
 """
@@ -255,7 +255,10 @@ def _assert_local_contract_graph(design_root: Path, code_root: Path) -> None:
         code_root,
     )
     write_plan = code_root / "skills/write-plan/SKILL.md"
-    _resolve_local_contract(write_plan, "references/one-way-door.md", code_root)
+    confirm_intent = _resolve_local_contract(
+        write_plan, "references/confirm-intent.md", code_root
+    )
+    _resolve_local_contract(confirm_intent, "one-way-door.md", code_root)
 
 
 def _assert_local_behavior_dependencies(design_root: Path, code_root: Path) -> None:
@@ -603,13 +606,26 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
 
 
 def test_sibling_lookup_allows_version_subdirectory() -> None:
-    """Every design station that locates `loom-code` by host covers the
+    """Every design skill that locates `loom-code` by host covers the
     non-Claude hosts too. Claude and Codex caches hold `<name>/<version>/`;
     Antigravity CLI installs `<name>/` with no version directory, so the
-    other-host row must allow, not require, one version subdirectory."""
+    other-host row must allow, not require, one version subdirectory.
+    The four skills share one lookup table in capture-intent's references
+    and each links it from Step 0."""
     design_skills = REPO_ROOT / "loom-design" / "skills"
-    lookups = 0
+    linking = 0
     for skill_md in sorted(design_skills.glob("*/SKILL.md")):
+        text = skill_md.read_text(encoding="utf-8")
+        if "## Step 0 — Check the contract version" not in text:
+            continue
+        linking += 1
+        assert "locate-loom-code.md`" in text, skill_md
+        assert "| Where `loom-code` lives |" not in text, skill_md
+    assert linking == 4
+    lookups = 0
+    for skill_md in sorted(
+        [*design_skills.glob("*/SKILL.md"), *design_skills.glob("*/references/*.md")]
+    ):
         text = skill_md.read_text(encoding="utf-8")
         if "| Where `loom-code` lives |" not in text:
             continue
@@ -626,7 +642,7 @@ def test_sibling_lookup_allows_version_subdirectory() -> None:
         assert "two levels above this SKILL.md" in row, skill_md
         assert "may contain one version subdirectory" in row, skill_md
         assert "use the newest" in row, skill_md
-    assert lookups == 4
+    assert lookups == 1
 
 
 # The version step every other-host row must carry: Codex installs
@@ -671,12 +687,15 @@ def test_sibling_lookup_resolves_flat_and_versioned_installs(tmp_path: Path) -> 
         assert (resolved / "scripts" / "loom_checker.py").is_file()
 
     rows = 0
-    for skill_md in sorted((REPO_ROOT / "loom-design" / "skills").glob("*/SKILL.md")):
+    design_skills = REPO_ROOT / "loom-design" / "skills"
+    for skill_md in sorted(
+        [*design_skills.glob("*/SKILL.md"), *design_skills.glob("*/references/*.md")]
+    ):
         for line in skill_md.read_text(encoding="utf-8").splitlines():
             if line.startswith("| Codex CLI, Antigravity CLI |"):
                 rows += 1
                 assert VERSION_STEP in " ".join(line.split()), skill_md
-    assert rows == 4
+    assert rows == 1
 
 
 def test_isolated_loom_workflow_bundle_contains_required_skills_and_executes(

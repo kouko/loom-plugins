@@ -46,7 +46,7 @@ what was decided on the user's behalf (including every dismissal of
 severity `important` or worse, which the closing-review station hands you), and the
 open questions. Evidence files you capture and the probe docstrings you
 read are in English; the report itself stays in the user's language. The report
-also lists, in labels the user can read — the plan, spec, review record's
+also lists, in labels the user can read — the plan, spec, reviewer
 findings, evidence, test docstrings, test names, commit messages —
 whether the English rule held for each, and where a template rule also
 binds that artifact: EARS `REQ-<n>` lines bind the spec, the Conventional
@@ -69,8 +69,8 @@ An Acceptance line you could not try is `not-yet` with the reason — never
 
 - **Guessing the user's setup.** Say so when a step needs a credential,
   service, or file you lack; never invent a stub and report success.
-- **Reporting the test suite instead of the behaviour.** Green tests are
-  the package-tests probe's job. You are here for the thing itself.
+- **Reporting the test suite instead of the behaviour.** Build and
+  `finalize-review` run the package suite. You are here for the thing itself.
 - **Prose the user cannot read.** No file paths, function names, or loom
   vocabulary in the report — rewrite any sentence only the change's
   author would follow.

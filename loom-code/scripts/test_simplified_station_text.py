@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from prose_pin import has_negation
+import re
+
+from prose_pin import has_negation, split_sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,6 +22,11 @@ MEMORY_PR = (
 SHIP_PROSE = " ".join(SHIP.split())
 CAPTURE_PROSE = " ".join(CAPTURE.split())
 PLAN_PROSE = " ".join(PLAN.split())
+# write-plan's own intent confirmation (step 3) lives in this reference.
+PLAN_CONFIRM = (
+    ROOT / "loom-code/skills/write-plan/references/confirm-intent.md"
+).read_text(encoding="utf-8")
+PLAN_CONFIRM_PROSE = " ".join(PLAN_CONFIRM.split())
 INTENT_TEMPLATE = (ROOT / "loom-code/contract/templates/intent.md").read_text(encoding="utf-8")
 CONTRACT_MANIFEST = (ROOT / "loom-code/contract/manifest.yaml").read_text(encoding="utf-8")
 
@@ -33,16 +40,24 @@ def test_review_uses_one_computed_reviewer_floor_without_prose_allowlist() -> No
     assert "docs only" not in review_prose
 
 
+def _design_skill(name: str) -> str:
+    return (ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
+
+
+# The station summary table lives in the three stations only; the two
+# loom-design tools (product-principles, design-system) carry none.
+TOOL_SKILLS = ("product-principles", "design-system")
+
+
 def test_station_summaries_do_not_duplicate_reviewer_counts() -> None:
-    stations = [
-        CAPTURE,
-        PLAN,
-        *((ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
-          for name in ("write-spec", "product-principles", "design-system")),
-    ]
+    stations = [CAPTURE, PLAN, _design_skill("write-spec")]
     for station in stations:
         flat = " ".join(station.split())
         assert "reviewer count comes from the installed Review policy" in flat
+        assert "one in the small lane, two or more in the full lane" not in flat
+    for tool in TOOL_SKILLS:
+        flat = " ".join(_design_skill(tool).split())
+        assert "## Station summary" not in flat, tool
         assert "one in the small lane, two or more in the full lane" not in flat
 
 
@@ -210,7 +225,7 @@ def test_git_memory_defers_loom_consent_and_schema_to_ship() -> None:
 
 
 def test_intent_confirmation_discloses_publication_and_separate_merge() -> None:
-    for station, prose in ((CAPTURE, CAPTURE_PROSE), (PLAN, PLAN_PROSE)):
+    for station, prose in ((CAPTURE, CAPTURE_PROSE), (PLAN_CONFIRM, PLAN_CONFIRM_PROSE)):
         assert "automatic publication is the default" in prose
         assert "non-forced push" in prose
         assert "Ready PR" in prose
@@ -260,7 +275,11 @@ def test_build_and_plan_require_implementer_dispatch_without_requiring_paralleli
         prose = " ".join(station.split())
         assert "Scheduling multiple implementers concurrently is optional" in prose
         assert "Parallel work is optional" not in station
-    assert "Implementer dispatch is mandatory" in " ".join(PLAN.split())
+    assert (
+        "Unless `selection show` lists `implementer` as skipped, implementer dispatch is "
+        "mandatory for every implementation task."
+    ) in " ".join(PLAN.split())
+    assert "Implementer dispatch is mandatory for every implementation task" not in PLAN
     assert "implementer dispatch is mandatory" in " ".join(BUILD.split())
 
     build_prose = " ".join(BUILD.split())
@@ -342,11 +361,11 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
         sentence = next(s for s in prose.split(". ") if read in s)
         assert not has_negation(sentence), sentence
         assert "intent" not in sentence.replace("(", " ").replace(",", " ").split(), sentence
-        own_words = (
-            "When the user asks in their own words to run or skip Loom steps, read "
-            "../expert-mode/SKILL.md and follow it with `--origin user`."
+        pointer = (
+            "skip suggestions and user requests follow [expert-mode](../expert-mode/SKILL.md)."
         )
-        assert prose.count(own_words) == 1
+        assert prose.count(pointer) == 1
+        assert pointer in sentence + ". "
 
 
 def test_build_obligations_yield_to_a_bound_selection() -> None:
@@ -418,12 +437,9 @@ def _station_summary_rows(station: str) -> tuple[list[str], list[str]]:
 
 
 def test_station_summary_rows_name_builds_mechanical_checks() -> None:
-    stations = [
-        CAPTURE,
-        PLAN,
-        *((ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
-          for name in ("write-spec", "product-principles", "design-system")),
-    ]
+    for tool in TOOL_SKILLS:
+        assert _station_summary_rows(_design_skill(tool)) == ([], []), tool
+    stations = [CAPTURE, PLAN, _design_skill("write-spec")]
     for station in stations:
         build, review = _station_summary_rows(station)
         assert len(build) == 1 and len(review) == 1
@@ -436,3 +452,66 @@ def test_station_summary_rows_name_builds_mechanical_checks() -> None:
         for row in (*build, *review):
             assert "closing review dispatches" not in row.lower()
             assert "closing-review dispatches" not in row.lower()
+
+
+WRITE_SPEC = (ROOT / "loom-design/skills/write-spec/SKILL.md").read_text(encoding="utf-8")
+BLIND_RUNNER = (ROOT / "loom-code/agents/blind-runner.md").read_text(encoding="utf-8")
+
+
+def _affirmed_sentences(text: str, *literals: str) -> list[str]:
+    return [
+        s
+        for s in split_sentences(" ".join(text.split()), ".;")
+        if all(lit in s for lit in literals)
+        and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_spec_review_dispatches_reviewer_directly() -> None:
+    """A1 positive: the spec author dispatches loom-code:reviewer itself."""
+    for station in (PLAN, WRITE_SPEC):
+        assert _affirmed_sentences(
+            station, "`pre-build-review: required`", "`loom-code:reviewer`", "lens `spec+adversarial`"
+        )
+        assert _affirmed_sentences(station, "commit", "send", "back to that reviewer")
+
+
+def test_spec_review_names_the_spec_commits_parent_as_reviewed_sha() -> None:
+    """A1 follow-up: cold reader found "the commit before the spec" ambiguous;
+
+    name the spec commit's parent explicitly so the reviewer's delta is
+    exactly the spec commit."""
+    for station in (PLAN, WRITE_SPEC):
+        prose = " ".join(station.split())
+        assert (
+            prose.count(
+                "the spec commit's parent (`<spec-commit>^`) as `reviewed_sha`"
+            )
+            == 1
+        )
+        assert "the commit before the spec" not in prose
+
+
+def test_closing_review_scope_spec_rejected() -> None:
+    """A1 negative: no station hands a pre-build spec to closing-review."""
+    for station in (PLAN, WRITE_SPEC):
+        flat = " ".join(station.split())
+        assert "scope `spec`" not in flat
+        assert "hand the spec to the **closing-review** station" not in flat
+        assert "hand it to **`loom-code:closing-review`**" not in flat
+
+
+def test_plan_questions_asked_claims_no_reader_or_design_record() -> None:
+    for text in (PLAN, PLAN_CONFIRM):
+        flat = " ".join(text.split())
+        assert "questions[]" not in text
+        assert "§11" not in text
+        assert "review record" not in flat
+    assert _affirmed_sentences(PLAN_CONFIRM_PROSE, "The list shows how often loom interrupts the user")
+
+
+def test_blind_runner_names_current_artifacts_and_package_suite_owners() -> None:
+    flat = " ".join(BLIND_RUNNER.split())
+    assert "review record" not in flat
+    assert "package-tests probe" not in flat
+    assert _affirmed_sentences(flat, "Build", "`finalize-review`", "package suite")

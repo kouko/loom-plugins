@@ -65,8 +65,8 @@ The skill runs a multi-stage pipeline:
               ▼
        JSON payload (stdout) + Markdown summary (stderr)
               │
-              ▼  Stage 3: orchestrator dispatches subagents via
-              │   loom-code:dispatching-parallel-agents
+              ▼  Stage 3: orchestrator dispatches subagents
+              │   in parallel
               │   - one Haiku-4.5 subagent per (skill, session)
               │   - failure vs success prompt selected per friction
               ▼
@@ -88,7 +88,7 @@ See [`SKILL.md`](SKILL.md) §Pipeline for the full step-by-step.
 ### Key v0.3 features
 
 - **Cross-skill friction-density routing** — when a session invokes
-  multiple target skills (e.g. brainstorming + writing-plans), Memory
+  multiple target skills (e.g. write-plan + build), Memory
   Items route to the skill with the highest severity score in that
   session, not the lexically-first skill. This ensures feedback
   attributes to the friction-owning skill.
@@ -147,10 +147,10 @@ Expected output sketch:
 
 ## Top skills
 
-- **loom-code:writing-plans**
+- **loom-code:write-plan**
   - session `2026-05-20-...`: friction=high, events=12
   - session `2026-05-18-...`: friction=mid,  events=7
-- **loom-code:brainstorming**
+- **loom-code:build**
   - session `2026-05-19-...`: friction=mid,  events=5
 ...
 ```

@@ -1,14 +1,12 @@
 # Claude Code — tool name reference for `distill-sessions`
 
-> Scoped to this skill's own dispatch points. When `loom-code:dispatching-parallel-agents`
-> is available, use its public skill contract for the general parallel-fan-out
-> discipline. This file only maps `distill-sessions`' two dispatch points.
+> Scoped to this skill's own dispatch points: this file maps
+> `distill-sessions`' two dispatch points to the host's call shape.
 
 ## Stage 3 parallel fan-out (`agents/prompt-failure-analysis.md` / `agents/prompt-success-analysis.md`)
 
-Delegates to `loom-code:dispatching-parallel-agents` for the concrete
-per-host call shape — see `using-loom-code`'s
-`references/claude-code-tools.md`. On Claude Code this resolves to N
+The orchestrator dispatches these prompts in parallel as subagents. On
+Claude Code the per-host call shape is N
 `Agent()` calls issued in a single assistant message so the harness
 runs them concurrently:
 
@@ -32,8 +30,7 @@ harness alias reaches `Agent()` without failing enum validation; the
 literal id in `top.json`'s payload is not directly usable.
 
 One such call per `subagent_payload[]` entry, all issued in the same
-assistant message per `loom-code:dispatching-parallel-agents`' public
-concurrency rule. **Do not add `name:`**: it turns the one-shot blocking call
+assistant message so they run concurrently. **Do not add `name:`**: it turns the one-shot blocking call
 into a persistent mailbox-semantics teammate whose output is never delivered.
 
 ## Stage 5c single dispatch (`agents/prompt-advisory-analyst.md`)

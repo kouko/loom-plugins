@@ -28,6 +28,21 @@ from prose_pin import has_negation, split_sentences  # noqa: E402
 
 SKILL = REPO / "loom-design/skills/capture-intent/SKILL.md"
 WRITE_PLAN = REPO / "loom-code/skills/write-plan/SKILL.md"
+WRITE_SPEC = REPO / "loom-design/skills/write-spec/SKILL.md"
+TOOL_SKILLS = (
+    REPO / "loom-design/skills/design-system/SKILL.md",
+    REPO / "loom-design/skills/product-principles/SKILL.md",
+)
+STATION_TABLE_HEADER = "| station | artifact | who decides | checker | checkpoint |"
+LOCATE_REFERENCE = REPO / "loom-design/skills/capture-intent/references/locate-loom-code.md"
+LOCATE_LINKS = {
+    SKILL: "references/locate-loom-code.md",
+    WRITE_SPEC: "../capture-intent/references/locate-loom-code.md",
+    TOOL_SKILLS[0]: "../capture-intent/references/locate-loom-code.md",
+    TOOL_SKILLS[1]: "../capture-intent/references/locate-loom-code.md",
+}
+HOST_TABLE_HEADER = "| Where `loom-code` lives |"
+CONTRACT_COMMAND = "python3 <loom-code>/scripts/loom_checker.py contract --require 2.1"
 PLUGIN_JSON = REPO / "loom-design/.claude-plugin/plugin.json"
 MECHANISMS = REPO / "docs/loom/evidence/mechanisms.yaml"
 SECOND_VENDOR_REFERENCE = (
@@ -199,6 +214,61 @@ def test_station_summary_is_byte_identical_to_write_plan() -> None:
     ours = _section(_text(), "## Station summary")
     theirs = _section(WRITE_PLAN.read_text(encoding="utf-8"), "## Station summary")
     assert ours == theirs
+
+
+def test_station_summary_three_station_copies_byte_identical() -> None:
+    ours = _section(_text(), "## Station summary")
+    for station in (WRITE_SPEC, WRITE_PLAN):
+        theirs = _section(station.read_text(encoding="utf-8"), "## Station summary")
+        assert ours == theirs, station
+
+
+def _carries_station_table(text: str) -> bool:
+    return "## Station summary" in text or STATION_TABLE_HEADER in text
+
+
+def test_tool_skills_carry_no_station_table() -> None:
+    """The two tools are not stations; only the three stations carry the table."""
+    for tool in TOOL_SKILLS:
+        assert not _carries_station_table(tool.read_text(encoding="utf-8")), tool
+
+
+def test_tool_skill_carries_station_table_is_caught() -> None:
+    table = _section(_text(), "## Station summary")
+    rows_only = table.split("\n", 1)[1]
+    for tool in TOOL_SKILLS:
+        text = tool.read_text(encoding="utf-8")
+        assert _carries_station_table(text + "\n" + table), tool
+        assert _carries_station_table(text + "\n" + rows_only), tool
+
+
+def test_four_skills_link_one_locate_loom_code_reference() -> None:
+    assert LOCATE_REFERENCE.is_file(), LOCATE_REFERENCE
+    for skill_md, link in LOCATE_LINKS.items():
+        text = skill_md.read_text(encoding="utf-8")
+        step0 = _section(text, "## Step 0 — Check the contract version")
+        assert f"`{link}`" in step0, skill_md
+        assert CONTRACT_COMMAND in step0, skill_md
+        assert (skill_md.parent / link).resolve() == LOCATE_REFERENCE.resolve()
+        assert HOST_TABLE_HEADER not in text, skill_md
+    carriers = sorted(
+        path
+        for path in (REPO / "loom-design/skills").rglob("*.md")
+        if HOST_TABLE_HEADER in path.read_text(encoding="utf-8")
+    )
+    assert carriers == [LOCATE_REFERENCE]
+
+
+def test_locate_loom_code_reference_keeps_every_obligation() -> None:
+    flat = " ".join(LOCATE_REFERENCE.read_text(encoding="utf-8").split())
+    assert CONTRACT_COMMAND in flat
+    assert "the rule is `contract.requires`" in flat
+    assert "tell the user to update `loom-code`, and **stop**" in flat
+    assert "ask the user where `loom-code` is installed" in flat
+    assert "ask the user to install or update `loom-code`" in flat
+    # Prohibitions are pinned exact-once (prose-pin rule).
+    assert flat.count("Do not work around it and do not guess a path") == 1
+    assert flat.count("never create a repository-local copy of the checker") == 1
 
 
 def test_what_you_will_be_asked_list_present() -> None:
@@ -669,6 +739,12 @@ def test_later_stops_name_both_spec_writing_stations() -> None:
     step5 = _flat_section(_STEP5)
     assert _affirmed(step5, "happens where the product spec is written", "`write-plan` when `needs-design: no`")
     assert "happens at `write-spec`, for product changes only" not in step5
+
+
+def test_asked_list_admits_exception_stops() -> None:
+    asked = " ".join(_section(_text(), "## What you will be asked, in plain words").split())
+    assert "nothing else in the change stops for them" not in asked
+    assert _affirmed(asked, "These are the decision points", "legacy intent", "changed requirements", "expert-mode")
 
 
 def test_nothing_agreed_shows_no_table() -> None:

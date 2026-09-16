@@ -5,8 +5,8 @@
      `ratified-by:` line (the validator's own unit tests live in
      `test_validate_principles_output.py`; this file only checks the
      specific ratified-line grammar the checker gates on).
-  2. `product-principles/SKILL.md`'s shape: the `## Station summary`
-     table is byte-identical to `capture-intent`'s, the
+  2. `product-principles/SKILL.md`'s shape: it carries no
+     `## Station summary` table (a tool, not a station), the
      `<!-- gate: ... -->` marker is registered, no vocabulary from the
      deleted replay-matrix / improve-loop / seed-traceability apparatus
      survives, the body stays under the 2,500-word soft cap, and every
@@ -111,11 +111,15 @@ def test_rejects_malformed_ratified_by_line(tmp_path):
 # --- 2. SKILL.md shape ---------------------------------------------------
 
 
-def test_station_summary_byte_identical_to_capture_intent():
+def test_tool_carries_no_station_summary():
+    """product-principles is a tool, not a station: the whole-flow table
+    stays in the three stations (byte equality among them lives in
+    spec/test_capture_intent_contract.py)."""
     assert CAPTURE_INTENT.is_file(), f"missing sibling file: {CAPTURE_INTENT}"
-    ours = _station_summary_table(_text())
-    theirs = _station_summary_table(CAPTURE_INTENT.read_text(encoding="utf-8"))
-    assert ours == theirs
+    assert _station_summary_table(CAPTURE_INTENT.read_text(encoding="utf-8"))
+    text = _text()
+    assert "## Station summary" not in text
+    assert "| station | artifact | who decides |" not in text
 
 
 def test_gate_marker_registered():

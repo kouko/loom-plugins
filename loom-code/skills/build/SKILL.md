@@ -17,37 +17,16 @@ base. Preserve unrelated and untracked work. Work only on planned paths.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
 steps it lists as skipped (spec, plan, implementer, tdd, adversarial,
-package-tests, blind-run). The agent may suggest skipping steps at most once per change: it
-runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
-table and the confirmation line (type `/loom-code:expert-mode` (Codex:
-`$expert-mode`) with the code shown), and keeps working on the full process at
-once; a plain "yes" binds nothing. When the user asks in their own words to run
-or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
-`--origin user`.
+package-tests, blind-run); skip suggestions and user requests follow
+[expert-mode](../expert-mode/SKILL.md).
 
 ## 2. Implement test first
 
-Before every host-native dispatch, the station must read the
-[shared dispatch profile](../../references/dispatch-profile.md), classify the
-task from its evidence, and resolve the atomic model-and-effort profile against
-the selected model's verified host capabilities. Record the requested and
-effective profile with its evidence-grounded reason in active task context only.
-Apply the resolved overrides at invocation time; a static model or effort pin in
-an agent contract is invalid.
-
-Invoke `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py` from Claude
-Code or `python3 <loom-code>/scripts/dispatch_profile.py` from any other host,
-where `<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude
-Code; on any other host it is the directory two levels above this SKILL.md.
-Supply the explicit observed JSON defined by the shared contract
-before each spawn. Pass its deterministic JSON result to the host-native spawn:
-apply both fields from `overrides`, or apply neither when it is `null`. Feed
-every completed result back as an `after-execution` event before any
-redispatch. Describe an omitted or wrong
-task result as a post-execution capability-quality failure only when it meets
-the contract's checkable definition; describe rejected routing parameters as
-a pre-execution host rejection, which selects the one atomic fallback instead
-of model escalation.
+Before every host-native dispatch, the station must resolve the model-and-effort
+profile as the [shared dispatch profile](../../references/dispatch-profile.md)
+defines and apply its result. `<loom-code>` (this plugin's root) is
+`${CLAUDE_PLUGIN_ROOT}` on Claude Code; on any other host it is the directory
+two levels above this SKILL.md.
 
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
@@ -88,7 +67,8 @@ mechanical checks, in this order:
    agent that implemented any part of the change. Give it only the change id,
    `HEAD`, and paths: the intent, the plan, and the changed paths with their
    artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
-   adversarial programs.
+   adversarial programs. It works from the recipes in
+   [`adversarial.md`](../closing-review/references/adversarial.md).
 3. Run the repository's complete package suite, then each committed
    adversarial program. The suite command is the `package-tests:` value in
    `docs/loom/KICKOFF-DEFAULTS.md`, or, when absent, the command detected from

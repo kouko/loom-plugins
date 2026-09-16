@@ -72,9 +72,9 @@ scripts/memory-grep.sh --match='parser' --history
 - **Empty** → no recorded memory. Proceed. Note that if you now make a
   non-obvious decision here, this is the moment to **record** it.
 
-## Soft link to loom-code (guidance, no coupling)
+## Soft link to loom (guidance, no coupling)
 
-If `loom-code:brainstorming` or `writing-plans` is running, trigger ③ is
+If `loom-design:write-spec` or `loom-code:write-plan` is running, trigger ③ is
 the natural hook: recall each real alternative before proposing it. This
 is guidance only — git-memory does **not** modify those skills, and they
 do not depend on it.

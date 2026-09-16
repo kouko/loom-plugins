@@ -152,18 +152,49 @@ def test_final_allowed_redispatch_success_returns_routed() -> None:
     )
 
 
+RESOLVER_INVOCATION_PHRASES = (
+    "classify the task from its evidence",
+    "resolve the atomic model-and-effort profile",
+    "active task context only",
+    "static model or effort pin",
+    "python3 <loom-code>/scripts/dispatch_profile.py",
+    "pass the resolver's deterministic JSON result to the host-native spawn",
+    "apply both fields from `overrides`, or apply neither when it is `null`",
+    "apply the resolved overrides at invocation time",
+    "feed every completed result back as an `after-execution` event before any redispatch",
+    "post-execution capability-quality failure",
+    "as a pre-execution host rejection",
+    "selects the one atomic fallback instead of model escalation",
+)
+
+
 def test_build_and_review_resolve_the_shared_profile_before_every_dispatch() -> None:
     for station in STATIONS:
         text = station.read_text(encoding="utf-8")
-        flat = _flat(text)
         link = "../../references/dispatch-profile.md"
 
         assert f"]({link})" in text, f"{station.name} must link the packaged contract"
-        _affirmative_sentence(text, "Before every host-native dispatch")
-        assert "classify the task from its evidence" in flat
-        assert "resolve the atomic model-and-effort profile" in flat
-        assert "active task context only" in flat
-        assert "static model or effort pin" in flat
+        sentence = _affirmative_sentence(text, "Before every host-native dispatch")
+        assert "shared dispatch profile" in sentence
+        assert "apply its result" in _flat(text)
+
+
+def test_stations_do_not_restate_the_resolver_invocation() -> None:
+    profile = _flat(_contract()).lower()
+    for phrase in RESOLVER_INVOCATION_PHRASES:
+        assert profile.count(phrase.lower()) == 1, phrase
+        for station in STATIONS:
+            flat = _flat(station.read_text(encoding="utf-8")).lower()
+            assert phrase.lower() not in flat, f"{station.parent.name} restates: {phrase}"
+
+
+def test_moved_invocation_obligations_stay_affirmative_in_the_profile() -> None:
+    text = _contract()
+
+    _affirmative_sentence(text, "classify the task from its evidence")
+    _affirmative_sentence(text, "feed every completed result back as an `after-execution` event")
+    _affirmative_sentence(text, "apply the resolved overrides at invocation time")
+    _affirmative_sentence(text, "static model or effort pin")
 
 
 def test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack() -> None:

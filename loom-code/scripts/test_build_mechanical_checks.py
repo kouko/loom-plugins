@@ -309,80 +309,14 @@ PROBE_MAINTENANCE_PINS = {
         "You fix nothing you attack, and you update only your own programs when Build re-dispatches you.",
         ("You fix nothing you attack, and you never update only your own programs when Build re-dispatches you.",),
     ),
-    "update-scope": (
-        "adversary",
-        "When Build re-dispatches you for a widened scope or for trunk content brought in by `sync-trunk`,",
-        "update only the programs you committed for this change", ("fix nothing in the product",),
-        "When Build re-dispatches you for a widened scope or for trunk content brought in by "
-        "`sync-trunk`, update only the programs you committed for this change, and still fix "
-        "nothing in the product.",
-        ("When Build re-dispatches you for a widened scope or for trunk content brought in by "
-         "`sync-trunk`, do not update only the programs you committed for this change, and still "
-         "fix nothing in the product.",),
-    ),
-    "defect-kept-and-reported": (
-        "adversary", "When a failing program caught a product defect,",
-        "keep that program unchanged and return a finding", ("Build then fixes the product",),
-        "When a failing program caught a product defect, keep that program unchanged and return a "
-        "finding, and Build then fixes the product.",
-        ("When a failing program caught a product defect, do not keep that program unchanged and "
-         "return a finding, and Build then fixes the product.",),
-    ),
-    "mutation-restores-original-rejection": (
-        "adversary", "Include one mutation that restores",
-        "the original behaviour the stale program rejected",
-        ("the updated probe must turn RED on it",),
-        "Include one mutation that restores the original behaviour the stale program rejected, and "
-        "the updated probe must turn RED on it.",
-        ("Include one mutation that restores the original behaviour the stale program rejected, and "
-         "the updated probe need not turn RED on it.",
-         "Include one mutation that restores the original behaviour the stale program rejected."),
-    ),
-    "branch-tests-excluded-from-floor": (
-        "adversary", "Reuse toward the three-case floor counts",
-        "(a) the programs you committed for this change",
-        ("(b) tests that exist unchanged outside this change's branch",),
-        "Reuse toward the three-case floor counts only (a) the programs you committed for this "
-        "change and (b) tests that exist unchanged outside this change's branch.",
-        ("Reuse toward the three-case floor counts not only (a) the programs you committed for "
-         "this change and (b) tests that exist unchanged outside this change's branch.",
-         "Reuse toward the three-case floor counts (a) the programs you committed for this change "
-         "and (b) any test on this change's branch."),
-    ),
-    "branch-tests-named-related-coverage": (
-        "adversary", "Name any other test added or changed on the branch",
-        "as related coverage only", ("such as an implementer's pin",),
-        "Name any other test added or changed on the branch, such as an implementer's pin, as "
-        "related coverage only.",
-        ("Name any other test added or changed on the branch, such as an implementer's pin, not "
-         "as related coverage only.",
-         "Name any other test added or changed on the branch, such as an implementer's pin, as "
-         "floor coverage."),
-    ),
-    "commit-before-copy": (
-        "adversary", "Commit the updated probe", "before you make a copy",
-        ("because `git worktree add` and `git archive` hold only committed content",
-         "an uncommitted update takes the edit-tool route in the working tree"),
-        "Commit the updated probe before you make a copy, because `git worktree add` and "
-        "`git archive` hold only committed content, and an uncommitted update takes the "
-        "edit-tool route in the working tree.",
-        ("Commit the updated probe not before you make a copy, because `git worktree add` and "
-         "`git archive` hold only committed content, and an uncommitted update takes the "
-         "edit-tool route in the working tree.",
-         "Commit the updated probe before you make a copy."),
-    ),
-    "undo-before-worktree-remove": (
-        "adversary", "Undo each mutation in a worktree copy with the host's edit tool",
-        "before `git worktree remove` removes that copy",
-        ("prefer a `git archive` extract when the copy will be left behind",),
-        "Undo each mutation in a worktree copy with the host's edit tool before `git worktree "
-        "remove` removes that copy, and prefer a `git archive` extract when the copy will be left "
-        "behind in a temp directory.",
-        ("Undo each mutation in a worktree copy with the host's edit tool before `git worktree "
-         "remove` removes that copy, and never prefer a `git archive` extract when the copy will "
-         "be left behind in a temp directory.",
-         "Undo each mutation in a worktree copy with the host's edit tool before `git worktree "
-         "remove` removes that copy."),
+    "adversary-reads-procedure-first": (
+        "adversary", "read it first", "because it holds the whole attack procedure",
+        ("`loom-code/skills/closing-review/references/adversarial.md`",),
+        "Read `loom-code/skills/closing-review/references/adversarial.md` — read it first, because "
+        "it holds the whole attack procedure.",
+        ("Read `loom-code/skills/closing-review/references/adversarial.md` — never read it first, "
+         "because it holds the whole attack procedure.",
+         "Read `loom-code/skills/closing-review/references/adversarial.md` when convenient."),
     ),
     "redispatch-inputs": (
         "adversary", "On a re-dispatch, you also receive", "the widened changed paths",
@@ -418,66 +352,33 @@ PROBE_MAINTENANCE_PINS = {
          "The adversary undoes each mutation in a worktree copy with the host's edit tool before "
          "`git worktree remove` removes that copy."),
     ),
-    "mutation-on-committed-probe": (
-        "adversary", "Back every update with mutation evidence",
-        "against the committed probe program itself", (),
-        "Back every update with mutation evidence run against the committed probe program itself;",
-        ("Back every update with mutation evidence run against a copy of its logic, not against "
-         "the committed probe program itself;",
-         "Back every update with mutation evidence run against a copy of its logic;"),
+    "ref-mutation-red-then-reverted": (
+        "ref", "Each mutation must", "turn the probe RED and is then reverted", (),
+        "Each mutation must turn the probe RED and is then reverted, and the report gives each "
+        "one's command and observed result.",
+        ("Each mutation must not turn the probe RED and is then reverted, and the report gives "
+         "each one's command and observed result.",),
     ),
-    "mutation-per-kind-and-over-broad": (
-        "adversary", "Use", "at least one mutation per kind of change the update touches",
-        ("an over-broad update would wrongly accept",),
-        "Use at least one mutation per kind of change the update touches, and include one that "
-        "an over-broad update would wrongly accept.",
-        ("Use at least one mutation per kind of change the update touches, and never include one "
-         "that an over-broad update would wrongly accept.",
-         "Use one mutation for the update, and include one that an over-broad update would wrongly accept."),
+    "ref-mutation-reported": (
+        "ref", "the report gives", "each one's command and observed result", (),
+        "Each mutation must turn the probe RED and is then reverted, and the report gives each "
+        "one's command and observed result.",
+        ("Each mutation must turn the probe RED and is then reverted, and the report never gives "
+         "each one's command and observed result.",),
     ),
-    "mutation-red-then-reverted": (
-        "adversary", "Each mutation must", "turn the probe RED and is then reverted", (),
-        "Each mutation must turn the probe RED and is then reverted;",
-        ("Each mutation must not turn the probe RED and is then reverted;",),
+    "ref-mutation-copy-of-logic-proves-nothing": (
+        "ref", "A copy of the probe's logic proves", "nothing about that program", (),
+        "A copy of the probe's logic proves nothing about that program.",
+        ("A copy of the probe's logic proves nothing about that program, unless it is not a copy.",
+         "A copy of the probe's logic is enough evidence."),
     ),
-    "mutation-reported": (
-        "adversary", "report each one with", "its command and observed result", (),
-        "report each one with its command and observed result.",
-        ("never report each one with its command and observed result.",),
-    ),
-    "reuse-checks-existing-first": (
-        "adversary", "check what already covers the target",
-        "this change's programs under `docs/loom/<change-id>/evidence/probes/`",
-        ("the repository's related tests",),
-        "Before you write any probe, check what already covers the target: this change's programs "
-        "under `docs/loom/<change-id>/evidence/probes/` and the repository's related tests.",
-        ("Before you write any probe, you need not check what already covers the target: this "
-         "change's programs under `docs/loom/<change-id>/evidence/probes/` and the repository's related tests.",),
-    ),
-    "reuse-modify-then-new": (
-        "adversary", "Reuse a program that already covers a case",
-        "write a new probe only when nothing covers the case",
-        ("modify a program when a small change makes it cover the case",),
-        "Reuse a program that already covers a case and write nothing new for it, modify a program "
-        "when a small change makes it cover the case, and write a new probe only when nothing covers the case.",
-        ("Reuse a program that already covers a case or do not, modify a program when a small change "
-         "makes it cover the case, and write a new probe only when nothing covers the case.",),
-    ),
-    "permanent-test-is-reuse": (
-        "adversary", "counts as reuse", "name it in `reason`",
-        ("A permanent repository test that already covers a case", "leave the test as it is"),
-        "A permanent repository test that already covers a case counts as reuse: name it in "
-        "`reason` and leave the test as it is.",
-        ("A permanent repository test that already covers a case never counts as reuse: name it in "
-         "`reason` and leave the test as it is.",),
-    ),
-    "status-with-reason-for-new": (
-        "adversary", "marks each probe", "as `reused`, `modified` or `new`",
-        ("every `new` one carries a one-line `reason`",),
-        "`probes` marks each probe as `reused`, `modified` or `new`, and every `new` one carries a one-line `reason`.",
-        ("`probes` never marks each probe as `reused`, `modified` or `new`, and every `new` one "
-         "carries a one-line `reason`.",
-         "`probes` marks each probe as `reused`, `modified` or `new`."),
+    "ref-permanent-test-is-reuse": (
+        "ref", "counts as reuse", "the adversary names it in `reason`",
+        ("A permanent repository test that already covers a case", "leaves the test as it is"),
+        "A permanent repository test that already covers a case counts as reuse: the adversary "
+        "names it in `reason` and leaves the test as it is.",
+        ("A permanent repository test that already covers a case never counts as reuse: the "
+         "adversary names it in `reason` and leaves the test as it is.",),
     ),
     "ref-reuse-checks-existing-first": (
         "ref", "the adversary checks what already covers the target",
@@ -613,25 +514,6 @@ PROBE_MAINTENANCE_PINS = {
         "Reused and modified cases count toward the floor.",
         ("Reused and modified cases do not count toward the floor.",),
     ),
-    "mutation-in-throwaway-copy-or-edit-tool": (
-        "adversary", "Apply each mutation in", "a throwaway copy of the working tree",
-        ("run the committed probe program there unchanged",
-         "apply and undo the mutation with the host's edit tool"),
-        "Apply each mutation in a throwaway copy of the working tree, such as a temporary `git "
-        "worktree add` or a `git archive` extract, and run the committed probe program there "
-        "unchanged, or apply and undo the mutation with the host's edit tool.",
-        ("Apply each mutation in a throwaway copy of the working tree and run the committed probe "
-         "program there unchanged, or do not apply and undo the mutation with the host's edit tool.",
-         "Apply each mutation in the working tree and run the committed probe program there unchanged."),
-    ),
-    "copy-still-runs-own-assertion": (
-        "adversary", "Running the unchanged probe inside a copy of the tree",
-        "still exercises its own assertion", ("unlike a copy of its logic",),
-        "Running the unchanged probe inside a copy of the tree still exercises its own assertion, "
-        "unlike a copy of its logic.",
-        ("Running the unchanged probe inside a copy of the tree no longer exercises its own "
-         "assertion, unlike a copy of its logic.",),
-    ),
     "ref-mutation-in-throwaway-copy-or-edit-tool": (
         "ref", "The adversary applies each mutation in", "a throwaway copy of the working tree",
         ("runs the committed probe program there unchanged",
@@ -653,13 +535,6 @@ PROBE_MAINTENANCE_PINS = {
         ("Running the unchanged probe inside a copy of the tree does not exercise its own "
          "assertion, unlike a copy of its logic.",),
     ),
-    "rewritten-case-counts-modified": (
-        "adversary", "A stale case that is rewritten or flipped to its positive form",
-        "counts as `modified`", (),
-        "A stale case that is rewritten or flipped to its positive form counts as `modified`.",
-        ("A stale case that is rewritten or flipped to its positive form never counts as `modified`.",
-         "A stale case that is rewritten or flipped to its positive form counts as `new`."),
-    ),
     "ref-rewritten-case-counts-modified": (
         "ref", "A stale case that is rewritten or flipped to its positive form",
         "counts as `modified`", (),
@@ -668,6 +543,8 @@ PROBE_MAINTENANCE_PINS = {
          "A stale case that is rewritten or flipped to its positive form counts as `new`."),
     ),
 }
+CODE_CHANGE_NOT_A_CASE = "If a case needs the code changed to fail, it is not a case."
+FLOOR_NOT_TARGET = "Three is the floor, not the target."
 NO_DISCARD_UNDO = (
     "Discard commands (`git checkout --`, `git restore`, `git reset --hard`, `git clean`, "
     "`git worktree remove --force`) are never used to undo a mutation, because host guards "
@@ -704,10 +581,10 @@ def test_update_no_weakening_helpers_synthetic() -> None:
 
 
 def test_adversary_update_never_weakens_a_case() -> None:
-    assert _pins_exact_sentence(ADVERSARY_PROSE, UPDATE_NO_WEAKENING), ADVERSARY_PROSE
     assert _pins_exact_sentence(ADVERSARIAL_REF, UPDATE_NO_WEAKENING), ADVERSARIAL_REF
-    assert "**at least three**" in ADVERSARIAL_REF
-    assert "**at least three**" in ADVERSARY_PROSE
+    assert ADVERSARIAL_REF.count("**at least three**") == 1
+    assert _pins_exact_sentence(ADVERSARIAL_REF, CODE_CHANGE_NOT_A_CASE), ADVERSARIAL_REF
+    assert _pins_exact_sentence(ADVERSARIAL_REF, FLOOR_NOT_TARGET), ADVERSARIAL_REF
 
 
 def test_no_discard_undo_helpers_synthetic() -> None:
@@ -726,7 +603,6 @@ def test_no_discard_undo_helpers_synthetic() -> None:
 
 
 def test_adversary_mutation_undo_uses_no_discard_command() -> None:
-    assert _pins_exact_sentence(ADVERSARY_PROSE, NO_DISCARD_UNDO), ADVERSARY_PROSE
     assert _pins_exact_sentence(ADVERSARIAL_REF, NO_DISCARD_UNDO), ADVERSARIAL_REF
 
 
@@ -751,7 +627,7 @@ def _discard_literals_outside_rule(text: str) -> list[str]:
     ]
 
 
-_FLOOR_PINS = ("branch-tests-excluded-from-floor", "ref-branch-tests-excluded-from-floor")
+_FLOOR_PINS = ("ref-branch-tests-excluded-from-floor",)
 
 
 def _is_pinned_floor_sentence(sentence: str) -> bool:
@@ -791,7 +667,7 @@ def test_added_sentence_scans_synthetic() -> None:
     added = "Clean up with `git reset --hard` when the copy is dirty."
     assert _discard_literals_outside_rule(f"Undo it. {NO_DISCARD_UNDO}") == []
     assert _discard_literals_outside_rule(f"{NO_DISCARD_UNDO} {added}") == [added]
-    pin = PROBE_MAINTENANCE_PINS["branch-tests-excluded-from-floor"][4]
+    pin = PROBE_MAINTENANCE_PINS["ref-branch-tests-excluded-from-floor"][4]
     floor_claim = "An implementer's pin counts toward the floor."
     assert _implementer_floor_sentences(pin) == []
     assert _implementer_floor_sentences(f"{pin} {floor_claim}") == [floor_claim]
@@ -814,10 +690,89 @@ def test_no_added_sentence_overrides_pinned_rules(doc: str) -> None:
     assert _every_failure_stale_sentences(text) == []
 
 
+# --- Dead pointers: the attack catalogue and the task trailer are retired ---
+
+IMPLEMENTER = ROOT / "loom-code/agents/implementer.md"
+ADVERSARIAL_REF_PATH = ROOT / "loom-code/skills/closing-review/references/adversarial.md"
+_DEAD_POINTER = re.compile(r"attack[- ]catalogue|\bcatalogue\b|\btrailer\b", re.IGNORECASE)
+BUILD_ADVERSARIAL_LINK = "[`adversarial.md`](../closing-review/references/adversarial.md)"
+BUILD_LINK_VERB = "works from the recipes in"
+
+
+def _dead_pointer_hits(text: str) -> list[str]:
+    return _DEAD_POINTER.findall(text)
+
+
+def test_dead_pointer_helpers_catalogue_link_reintroduced_fails() -> None:
+    assert _dead_pointer_hits("Work the classes against the file, one attempt per class.") == []
+    assert _dead_pointer_hits("Work the six classes in [`attack-catalogue.md`](attack-catalogue.md).")
+    assert _dead_pointer_hits("they turn the catalogue into an eval")
+    assert _dead_pointer_hits("failing test first, one commit carrying the task trailer.")
+    assert _dead_pointer_hits("needs no separate task-accounting trailer.")
+    affirmative = f"It {BUILD_LINK_VERB} {BUILD_ADVERSARIAL_LINK}."
+    negated = f"It never {BUILD_LINK_VERB} {BUILD_ADVERSARIAL_LINK}."
+    assert _affirms(affirmative, BUILD_LINK_VERB, BUILD_ADVERSARIAL_LINK)
+    assert has_negation(negated)
+    assert not _affirms(negated, BUILD_LINK_VERB, BUILD_ADVERSARIAL_LINK)
+
+
+@pytest.mark.parametrize("path", [ADVERSARY, ADVERSARIAL_REF_PATH, IMPLEMENTER], ids=lambda p: p.name)
+def test_contract_no_attack_catalogue_or_task_trailer_reference(path: Path) -> None:
+    assert _dead_pointer_hits(path.read_text(encoding="utf-8")) == [], path
+
+
+def test_build_verify_step_links_adversarial_recipes_in_place() -> None:
+    step = VERIFY.split("2. Dispatch the `loom-code:adversary` agent", 1)[1].split("3. Run the", 1)[0]
+    assert _affirms(step, BUILD_LINK_VERB, BUILD_ADVERSARIAL_LINK), step
+    target = (ROOT / "loom-code/skills/build" / "../closing-review/references/adversarial.md").resolve()
+    assert target == ADVERSARIAL_REF_PATH and target.is_file()
+
+
 def test_probes_field_helper_synthetic() -> None:
     good = 'probes: [{artifact: "<path>", status: reused | modified | new, reason: "<one line>"}]'
     assert PROBES_FIELD.search(good)
     assert not PROBES_FIELD.search('probes: [{artifact: "<path>", status: reused | modified | new}]')
+
+
+# --- One home for the procedure: adversarial.md; adversary.md keeps role, inputs, return ---
+
+# Each fragment names one procedure rule; it lives in adversarial.md and nowhere in adversary.md.
+PROCEDURE_FRAGMENTS = (
+    "already covers the target", "counts as reuse", "floor counts only", "as related coverage only",
+    "marks each probe", "counts as `modified`", "nothing in the product", "that program unchanged",
+    "mutation evidence", "an over-broad update would wrongly accept",
+    "the original behaviour the stale program rejected", "hold only committed content",
+    "a throwaway copy of the working tree", "still exercises its own assertion", "removes that copy",
+    "Discard commands", UPDATE_NO_WEAKENING, "**at least three**", "surviving mutant", "wrong type",
+    "did not want", "under time pressure", "prose temptations", "one character different",
+    "an anecdote", "must be re-runnable", "needs the code changed to fail",
+)
+
+
+def _procedure_fragments_in_both(agent: str, ref: str) -> list[str]:
+    return [f for f in PROCEDURE_FRAGMENTS if f in agent and f in ref]
+
+
+def test_procedure_fragments_helper_synthetic() -> None:
+    ref = "Before writing any probe, the adversary checks what already covers the target."
+    assert _procedure_fragments_in_both("Read the reference first.", ref) == []
+    duplicated = "Before you write any probe, check what already covers the target."
+    assert _procedure_fragments_in_both(duplicated, ref) == ["already covers the target"]
+
+
+def test_procedure_sentence_in_both_files_rejected() -> None:
+    assert _procedure_fragments_in_both(ADVERSARY_PROSE, ADVERSARIAL_REF) == []
+    assert [f for f in PROCEDURE_FRAGMENTS if f not in ADVERSARIAL_REF] == []
+
+
+def test_adversary_md_keeps_role_inputs_return_format() -> None:
+    for pin in ("role-updates-own-programs", "redispatch-inputs", "adversary-reads-procedure-first"):
+        _doc, verb, literal, extras, _a, _r = PROBE_MAINTENANCE_PINS[pin]
+        assert _affirms(ADVERSARY_PROSE, verb, literal, *extras), pin
+    assert "You own the negative in this flow" in ADVERSARY_PROSE
+    assert _pins_exact_sentence(ADVERSARY_PROSE, REDISPATCH_UPDATE_NEW_COMMIT), ADVERSARY_PROSE
+    assert "Use the host's edit tool (Edit/Write, `apply_patch` on Codex) -- never `sed -i`" in ADVERSARY_PROSE
+    assert "## What you return" in ADVERSARY.read_text(encoding="utf-8")
 
 
 def test_adversary_return_format_marks_probe_status() -> None:

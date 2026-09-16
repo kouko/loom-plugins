@@ -1,9 +1,7 @@
 # Codex CLI — tool name mapping for `distill-sessions`
 
-> Scoped to this skill's own dispatch points. When
-> `loom-code:dispatching-parallel-agents` is available, use its public skill
-> contract for the general dispatch surface. This file only maps
-> `distill-sessions`' two dispatch points.
+> Scoped to this skill's own dispatch points: this file maps
+> `distill-sessions`' two dispatch points to the host's call shape.
 >
 > **Doc-sourced, not session-exercised** against this specific skill's
 > prompts — inherits the same evidence grain as loom-code's own
@@ -11,8 +9,8 @@
 
 ## Stage 3 parallel fan-out (`agents/prompt-failure-analysis.md` / `agents/prompt-success-analysis.md`)
 
-Delegates to `loom-code:dispatching-parallel-agents` for the concrete
-per-host call shape. On Codex this resolves to `spawn_agent` once per
+The orchestrator dispatches these prompts in parallel as subagents. On
+Codex the per-host call shape is `spawn_agent` once per
 `subagent_payload[]` entry (each carrying
 `agents/prompt-failure-analysis.md` or `agents/prompt-success-analysis.md`
 as the agent's instructions plus that entry's

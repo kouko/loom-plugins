@@ -56,7 +56,7 @@
       "id": 8,
       "text": "One plugin's test suite assumes a sibling plugin is present; making each independently testable is unscoped work.",
       "ground_truth": "REJECT",
-      "belongs": "intent or backlog",
+      "belongs": "intent",
       "rationale": "An open task, not a lesson."
     },
     {
@@ -70,7 +70,7 @@
       "id": 10,
       "text": "The store-integrity hook derives the repository root with a shortest-suffix expansion, picking the wrong directory when a path contains the marker segment twice.",
       "ground_truth": "REJECT",
-      "belongs": "intent or backlog",
+      "belongs": "intent",
       "rationale": "Borderline. The `%` vs `%%` trap is durable, but as stated it is an unfixed defect, and an unfixed defect is an item, not a lesson."
     },
     {

@@ -44,11 +44,12 @@ of 11. Kept as a line rather than deleted: a frozen run whose text version is
 not recorded cannot be compared against a later one, which is this file's
 whole job.
 
-## Reference run — 2026-09-11 (second, current)
+## Reference run — 2026-09-11 (second, superseded)
 
 Contract version: the `Record` section after Round 3 added the
 digest-exhausted case to the exception sentence; section digest
-`33a40772`, the value pinned in `scripts/test_skill_contract.py`.
+`33a40772`, the value pinned in `scripts/test_skill_contract.py` until the
+2026-09-16 run below.
 Twelve candidates. Reader: one fresh-context `sonnet` agent, no tools used.
 
 This run exists because the digest pin demanded it. Round 3 edited the
@@ -105,3 +106,40 @@ The reader was given the clause in isolation, so this measures the wording,
 not whether an agent mid-change will remember to consult it at all. That
 second question belongs to the moment the question gets asked, not to this
 text.
+
+## Reference run — 2026-09-16 (third, current)
+
+Contract version: the `Record` section after the scarcity clause dropped
+"or a backlog entry", so an unfinished item routes to an intent only;
+section digest `945a9cb2`, the value pinned in
+`scripts/test_skill_contract.py`. Twelve candidates, verdicts unchanged; the
+`belongs` label on candidates 8 and 10 now reads "intent". Readers: fresh-context
+`sonnet` agents, no tools used, two runs on the unchanged text and two on the
+changed text.
+
+**Reason for the edit:** the backlog is frozen and a recurring open item
+comes back as an intent (`docs/loom/README.md`); closing-review had already
+dropped the backlog alternative, so this section contradicted it.
+
+**Verdict: the changed text passes all three criteria on its latest run.**
+
+| Run | Text | Timing | Exception | Scarcity (RECORD of 12) |
+|---|---|---|---|---|
+| B1 | unchanged | PASS | PASS (11 only) | MISS: 5 (2, 3, 4, 10, 12); count checked, judged over |
+| B2 | unchanged | PASS | PASS (11 only) | MISS: 5 (2, 3, 4, 10, 12); count checked, judged over |
+| C1 | changed | PASS | PASS (11 only) | MISS: 5 (2, 3, 4, 10, 12); count checked, judged over |
+| C2 | changed | PASS | PASS (11 only) | PASS: 2 (2, 4); count checked, flagged 2 as above normal |
+
+Decision rule applied: the changed text passes at least as often as the
+unchanged text (1 of 2 against 0 of 2), and its latest run passes every band,
+so the edit and this digest land together.
+
+What these runs show is not what the second run showed. On the unchanged
+text both readers recorded 5, the same as one of the two changed-text
+runs — the scarcity miss predates this edit, and it was absent from the
+2026-09-11 runs. C2 landed in band by cancelling errors again: it rejected
+true RECORDs 1 and 12 and recorded true REJECT 2. Candidates 2, 3 and 10 are
+now the rows readers most often over-record; candidate 1 was rejected in all
+four runs, and candidate 12 was recorded in three. If the next run on this
+text also records 5, the scarcity clause is under-steering on this pool and
+should be looked at on its own, not as part of a routing fix.

@@ -42,4 +42,7 @@ def test_module_contract_rejects_retired_dispatch_ledger_wording():
 
     assert "review.json" not in review_station
     assert "dispatch[]" not in review_station
-    assert "active task context only" in review_station
+    profile = (AGENTS_DIR.parent / "references" / "dispatch-profile.md").read_text(
+        encoding="utf-8"
+    ).lower()
+    assert "active task context only" in profile

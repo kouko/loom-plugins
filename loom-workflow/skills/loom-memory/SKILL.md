@@ -94,7 +94,7 @@ next change's branch batched, which is still not a branch opened to record.
 **How much:** almost nothing qualifies. Most of what a change surfaces is
 not a durable lesson — a one-off implementation slip belongs in its commit
 message, a verification result belongs in the change's evidence, an
-unfinished item belongs in an intent or a backlog entry. Zero to one
+unfinished item belongs in an intent. Zero to one
 durable lesson per change is the normal outcome. The filter below judges
 one candidate at a time, so it cannot see the other signal: wanting to
 record eight things at once means the filter has not been applied yet.
