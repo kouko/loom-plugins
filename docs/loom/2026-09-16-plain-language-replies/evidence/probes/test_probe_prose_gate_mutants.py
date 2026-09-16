@@ -51,7 +51,15 @@ def _pytest(test_file: Path, rootdir: Path) -> subprocess.CompletedProcess:
 # ---------- card mutants (test_visualization_card_hook.py) ----------
 
 # (full-card pattern, full repl, coexist pattern, coexist repl); word counts preserved.
+# A full-card pattern of None marks a mutant whose sentence exists only in the
+# coexist card, so the full card is left untouched.
 CARD_MUTANTS = {
+    "coexist-markdown-table-negated": (None, None,
+                                       r"Comparisons get a markdown table",
+                                       "Comparisons never get a markdown table"),
+    "coexist-align-verify-negated": (None, None,
+                                     r"Verify prescribed box diagrams",
+                                     "Never verify prescribed box diagrams"),
     "language-negated": (r"in their language\. 1\)", "never in their language. 1)",
                          r"in their language\. 1\)", "never in their language. 1)"),
     "literal-negated": (r"3\) Be literal:", "3) Never literal:",
@@ -61,6 +69,10 @@ CARD_MUTANTS = {
 }
 # An added negation word costs one word; drop one elsewhere so the cap holds.
 TRIM = (r"details after\.", "details.")
+# A coexist-only mutant trims only the coexist card, so it must not trim inside
+# rules 1-3 (those stay word-for-word identical to the full card) nor inside any
+# phrase the committed tests pin: trim rule 4's unpinned tail instead.
+COEXIST_TRIM = (r" FIRST, leading with its form\.", " FIRST.")
 
 
 def _card_tree(tmp: Path, name: str) -> Path:
@@ -73,12 +85,14 @@ def _card_tree(tmp: Path, name: str) -> Path:
     fp, fr, cp, cr = CARD_MUTANTS[name]
     assets = root / "skills" / "loom-visualization" / "assets"
     for card, pat, repl in (("trigger-card.md", fp, fr), ("trigger-card-coexist.md", cp, cr)):
+        if pat is None:  # coexist-only mutant
+            continue
         path = assets / card
         text = " ".join(path.read_text(encoding="utf-8").split("\n")[1:])
         head = path.read_text(encoding="utf-8").split("\n")[0]
         text = _sub_once(" ".join(text.split()), pat, repl)
         if len(repl.split()) > len(pat.replace("\\", "").split()):
-            text = _sub_once(text, *TRIM)
+            text = _sub_once(text, *(TRIM if fp is not None else COEXIST_TRIM))
         path.write_text(head + "\n" + text + "\n", encoding="utf-8")
     return root
 
@@ -162,7 +176,8 @@ def test_readmeTimingTests_staleTimingMutant_rejected(tmp_path, name):
 def test_mutantBuilder_cardAndGuideMutants_flipNegation(tmp_path):
     """Synthetic check: every mutant sentence gains a negation, or loses the one it had."""
     for name, (fp, fr, cp, cr) in CARD_MUTANTS.items():
-        assert not NEGATION.search(fp.replace("\\", "")) and NEGATION.search(fr), name
+        if fp is not None:  # coexist-only mutants leave the full card alone
+            assert not NEGATION.search(fp.replace("\\", "")) and NEGATION.search(fr), name
         assert not NEGATION.search(cp.replace("\\", "")) and NEGATION.search(cr), name
     for name, (pat, repl) in GUIDE_MUTANTS.items():
         assert bool(NEGATION.search(pat.replace(r"\s+", " "))) != bool(NEGATION.search(repl)), name

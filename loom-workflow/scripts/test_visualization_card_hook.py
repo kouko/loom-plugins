@@ -425,22 +425,60 @@ def test_coexist_card_trigger_phrases_do_not_overlap_toolkit():
     assert re.search(r"ascii-graph", text, re.I)
 
 
+def markdown_table_choice_errors(text):
+    """Error when no card sentence gives comparisons a markdown table; empty = stated."""
+    ok = any(re.search(r"\bcomparisons?\b", s, re.I) and "markdown table" in s
+             and "ASCII only when needed" in s and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["markdown-table choice not stated affirmatively"]
+
+
+def box_drawing_split_errors(text):
+    """Error when no card sentence sends prescribed box diagrams to align.py; empty = stated."""
+    ok = any(re.search(r"\b[Vv]erif", s) and re.search(r"\bbox\b|box-drawing", s)
+             and "prescribed" in s and "loom-visualization" in s
+             and "`scripts/align.py`" in s and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["box-drawing split not stated affirmatively"]
+
+
 def test_coexist_card_picks_markdown_table_not_mermaid():
     """The hook host always has a shell, so the Mermaid gate never allows Mermaid there."""
-    sentences = _sentences(COEXIST_CARD.read_text(encoding="utf-8"))
-    assert not re.search(r"mermaid", " ".join(sentences), re.I)
+    text = COEXIST_CARD.read_text(encoding="utf-8")
+    assert not re.search(r"mermaid", " ".join(_sentences(text)), re.I)
     # Meaning pinned, not wording: comparisons get a markdown table, ASCII only when needed.
-    assert any(re.search(r"\bcomparisons?\b", s, re.I) and "markdown table" in s
-               and "ASCII only when needed" in s for s in sentences)
+    assert markdown_table_choice_errors(text) == []
+
+
+def test_affirmative_coexist_table_sentence_accepted():
+    """A1 positive affirmative-coexist-sentence-still-passes (markdown-table sentence)."""
+    assert markdown_table_choice_errors(
+        "Comparisons get a markdown table, ASCII only when needed.") == []
+
+
+def test_negated_coexist_table_sentence_rejected():
+    """A1 negative negated-coexist-sentence-fails-card-tests (markdown-table sentence)."""
+    assert markdown_table_choice_errors(
+        "Comparisons never get a markdown table, ASCII only when needed.") != []
 
 
 def test_coexist_card_box_drawing_split_between_skill_checks_and_toolkit_card():
     """Prescribed box drawing uses loom-visualization's align.py; the toolkit card keeps three shapes."""
-    sentences = _sentences(COEXIST_CARD.read_text(encoding="utf-8"))
-    body = " ".join(sentences)
+    text = COEXIST_CARD.read_text(encoding="utf-8")
+    body = " ".join(_sentences(text))
     # Meaning pinned, not wording: align.py verifies box diagrams loom-visualization prescribes.
-    assert any(re.search(r"\b[Vv]erif", s) and re.search(r"\bbox\b|box-drawing", s)
-               and "prescribed" in s and "loom-visualization" in s
-               and "`scripts/align.py`" in s for s in sentences)
+    assert box_drawing_split_errors(text) == []
     assert re.search(r"the ascii-graph card covers flows, state machines and architecture;", body)
     assert not re.search(r"ascii-graph card covers[^.]*sequences", body)
+
+
+def test_affirmative_coexist_box_sentence_accepted():
+    """A1 positive affirmative-coexist-sentence-still-passes (align.py box sentence)."""
+    assert box_drawing_split_errors(
+        "Verify prescribed box diagrams with loom-visualization's `scripts/align.py`.") == []
+
+
+def test_negated_coexist_box_sentence_rejected():
+    """A1 negative negated-coexist-sentence-fails-card-tests (align.py box sentence)."""
+    assert box_drawing_split_errors(
+        "Never verify prescribed box diagrams with loom-visualization's `scripts/align.py`.") != []
