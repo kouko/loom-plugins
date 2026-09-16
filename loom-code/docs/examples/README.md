@@ -28,7 +28,7 @@ For readers focused on a specific area:
 ## What's deliberately NOT in these examples
 
 - **Real coding output** — these are *worked examples* showing the toolkit's flow, not literal copy-paste-ready implementations. The Python `render_csv` function is real Python; the Swift Concurrency wrapper is real Swift. But the specific business logic is illustrative.
-- **Codex CLI commands** — examples show Claude Code's tool surface (`Skill(...)`, `Bash(...)`, etc.). The same flow works on Codex CLI via `/skill-name` slash commands per [`../../skills/using-loom-code/references/codex-tools.md`](../../skills/using-loom-code/references/codex-tools.md).
+- **Codex CLI commands** — examples show Claude Code's tool surface (`Skill(...)`, `Bash(...)`, etc.). The same flow works on Codex CLI by invoking skills as `$skill-name` (see the `using-loom-code` skill).
 - **Full transcripts** — each Stage shows the load-bearing artifacts (the brief, the plan, the test output) without 50-page interleaved chat. The actual session has more turns; the examples extract the durable outputs.
 
 ## See also
