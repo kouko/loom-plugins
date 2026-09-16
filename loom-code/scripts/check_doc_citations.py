@@ -129,13 +129,19 @@ check was skipping them for a reason that was never about the document.
 """
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from repo_files import IGNORED_DIRECTORY_NAMES, repository_files
+from repo_files import (
+    IGNORED_DIRECTORY_NAMES,
+    nested_repositories,
+    nested_worktrees,
+    repository_files,
+)
 
 # Matches a backtick-quoted `path`, `path:line`, or `path:line-range` candidate.
 # The path segment excludes backticks/whitespace/colons; requiring a
@@ -310,19 +316,41 @@ def _exists_outside_the_candidate_set(repo_root: Path, cited_path: str) -> bool:
     takes its candidate set from `git ls-tree`, which this change did not
     touch, and its citations are about a commit rather than the disk — so
     the disk is not evidence there and is not consulted.
+
+    A foreign subtree inside the root is NOT this disk. A linked worktree or
+    a nested clone holds a whole second checkout; a file that exists only
+    there would suppress the finding on the developer's machine and produce
+    it in CI, where no such subtree exists. `repo_files.nested_worktrees` and
+    `repo_files.nested_repositories` name both shapes -- the same union
+    `scripts/run_package_tests.py:73` excludes -- and the walk is pruned at
+    them, so `IGNORED_DIRECTORY_NAMES` alone (which sees only a `.git`
+    DIRECTORY, never a worktree's `.git` FILE) is not relied on.
+
+    The basename is compared literally, not matched: a cited path may contain
+    `*` or `[`, which a glob would read as a pattern over other files.
     """
-    basename = cited_path.rsplit("/", 1)[-1]
+    foreign = {
+        path.resolve()
+        for path in (*nested_worktrees(repo_root), *nested_repositories(repo_root))
+    }
     suffix = "/" + cited_path
-    for path in repo_root.rglob(basename):
-        if _is_ignored_path(path.relative_to(repo_root).parts):
+    direct = repo_root / cited_path
+    if direct.is_file() and not foreign.intersection(direct.resolve().parents):
+        return True
+    basename = cited_path.rsplit("/", 1)[-1]
+    for directory, subdirectories, filenames in os.walk(repo_root):
+        here = Path(directory)
+        subdirectories[:] = [
+            name for name in subdirectories
+            if name not in IGNORED_DIRECTORY_NAMES
+            and (here / name).resolve() not in foreign
+        ]
+        if basename not in filenames:
             continue
+        path = here / basename
         if path.is_file() and path.as_posix().endswith(suffix):
             return True
     return False
-
-
-def _is_ignored_path(parts: tuple[str, ...]) -> bool:
-    return any(part in IGNORED_DIRECTORY_NAMES for part in parts)
 
 
 def check_citation(

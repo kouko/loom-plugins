@@ -60,31 +60,56 @@ REQ-6 — Ignored directories produce no findings
   same limitation at
   `loom-workflow/skills/loom-memory/scripts/test_skill_contract.py:253`. No
   consumer in scope scans a submodule.
-- agent-decided: git absence is detected by `git rev-parse --show-toplevel`
-  returning nothing through `git_exec.run_git`, which already yields `None` on
-  a non-zero exit (`git_exec.py:83`); no separate `.git` existence probe.
+- agent-decided: git absence is detected in two questions, in order:
+  `git rev-parse --is-bare-repository` FIRST, because a bare repository is git
+  yet owns no work tree and so owns no files; only then
+  `git rev-parse --show-toplevel` returning nothing through `git_exec.run_git`,
+  which already yields `None` on a non-zero exit (`git_exec.py:83`). No separate
+  `.git` existence probe. Asking `--show-toplevel` alone sent a bare repository
+  down the walk, which then listed the object store itself
+  (`evidence/probes/test_abuse_walk_fallback_divergence.py`).
 - user-decided: when there is no git the module walks the filesystem instead
   of failing, so a `git archive` copy keeps working.
 - user-decided: both paths then drop any path with a component in a fixed
   ignore list holding the names already used in this repository — `.git`,
-  `.pytest_cache`, `__pycache__`, `node_modules`. Names a single scanner
-  excludes for its own rule, such as `docs` in
-  `test_no_live_cot_explain_references.py:16`, stay with that scanner.
+  `.pytest_cache`, `__pycache__`, `node_modules` (the intent's Constraints).
+- agent-decided: names a single scanner excludes for its own rule, such as
+  `docs` in `test_no_live_cot_explain_references.py:32`, stay with that
+  scanner rather than joining the shared list, because they are that rule's
+  scope and not a statement about what the repository owns.
 - agent-decided: the module returns absolute paths; every caller already
   derives its own repo-relative form, and `check_plugin_boundaries.py:159`
   reports absolute paths.
 - user-decided: nothing prevents callers outside loom's gates from importing
   the module; no documentation or stability promise is produced for them.
-- agent-decided: `scripts/run_package_tests.py` excludes nested worktrees by
-  asking `git worktree list` for worktree paths inside the repository and
+- agent-decided: `scripts/run_package_tests.py` excludes the UNION of
+  `repo_files.nested_worktrees` (what `git worktree list` reports) and
+  `repo_files.nested_repositories` (the opaque directory entries git collapsed),
   passing `--ignore` for each, rather than adding a repository-root
   `pytest.ini`; the repository has no root pytest config today and a bare
-  root pytest run is known to abort on dbt-wiki collection.
+  root pytest run is known to abort on dbt-wiki collection. The union, not
+  worktrees alone, because `evidence/probes/test_abuse_nested_repository_collection.py`
+  showed a plain nested clone and a submodule still being collected — their
+  failing tests failed this repository's suite — while `repository_files`
+  already treated them as foreign.
 - agent-decided: `check_doc_citations.py`'s module docstring argues that
   over-including untracked and ignored files is the conservative direction for
   its design (`check_doc_citations.py:114-121`). The rule it enforces does not
   change; only the candidate set does. That rationale is rewritten in the same
   task, because leaving it would document the opposite of the code.
+- agent-decided: `check_doc_citations._exists_outside_the_candidate_set`
+  consults the disk before an explicit-path finding is issued, and a hit
+  DOWNGRADES the citation to UNCHECKED rather than resolving it. A target that
+  is on disk but outside git's listing is not this document's repository to
+  speak about, so the honest answer is loud skipping, not a clean verdict —
+  resolving it would let the check read files the repository does not own. The
+  walk is pruned at `nested_worktrees` ∪ `nested_repositories`, so a second
+  checkout inside the tree cannot suppress a finding that CI will produce.
+- agent-decided: `repo_files.nested_worktrees` and `nested_repositories` live in
+  the same module as `repository_files`, because they are the same git question
+  seen from the other side — which subtrees inside this root are foreign — and
+  keeping them together is what stops a second git invocation growing outside
+  the module.
 
 ## Alternatives considered
 - One shared helper in this repository's root `scripts/`: rejected because the

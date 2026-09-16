@@ -5,9 +5,13 @@ worktree, a plain clone someone dropped in `vendor/`, a submodule -- because
 `git ls-files --others` collapses each of them to one opaque directory entry
 that the module then drops.
 
-`scripts/run_package_tests.py` excludes a narrower set: only the paths
-`git worktree list` reports, via `repo_files.nested_worktrees`. These probes
-run the real pytest command the runner builds and ask what it collects.
+These probes ran the real pytest command `scripts/run_package_tests.py` builds
+and asked what it collects. They found the runner excluding a NARROWER set than
+the scanners: only the paths `git worktree list` reports. Commit 338bef0c closed
+that gap -- `scripts/run_package_tests.py:73` now excludes the union of
+`repo_files.nested_repositories` and `repo_files.nested_worktrees`, so a nested
+clone and a submodule are excluded too. The assertions below pin the closed
+behaviour.
 """
 from __future__ import annotations
 
@@ -74,12 +78,13 @@ def test_package_tests_nested_worktree_collects_nothing_from_it(
 def test_package_tests_nested_clone_collects_nothing_from_it(
     tmp_path: Path,
 ) -> None:
-    """A plain git repository nested in the tree is still collected.
+    """A plain git repository nested in the tree was still collected.
 
-    The scanners already agree it is not ours: `repository_files` omits every
-    file under it. The package-test command disagrees, because
-    `git worktree list` never mentions it, so a foreign failing test fails this
-    repository's suite.
+    The scanners already agreed it is not ours: `repository_files` omits every
+    file under it. The package-test command disagreed, because
+    `git worktree list` never mentions it, so a foreign failing test failed this
+    repository's suite. The runner now excludes `nested_repositories` as well,
+    which is what names this clone.
     """
     repo = _seed(tmp_path / "repo")
     inner = repo / "loom-code" / "scripts" / "vendor"
@@ -100,10 +105,12 @@ def test_package_tests_nested_clone_collects_nothing_from_it(
 
 
 def test_package_tests_submodule_collects_nothing_from_it(tmp_path: Path) -> None:
-    """A submodule's tests are collected as this repository's.
+    """A submodule's tests were collected as this repository's.
 
     The module documents that submodule contents are never listed, so the two
-    definitions of "belongs to this repository" part company here too.
+    definitions of "belongs to this repository" parted company here too. The
+    same union fix closed it: git collapses a submodule to one directory entry,
+    so `nested_repositories` names it and the runner passes `--ignore` for it.
     """
     repo = _seed(tmp_path / "repo")
     sub = _seed(tmp_path / "sub")

@@ -33,13 +33,16 @@ def _init(repo: Path) -> Path:
 
 
 def test_check_citation_ignored_target_reports_no_finding(tmp_path: Path) -> None:
-    """A citation whose target exists but is gitignored is called missing.
+    """A citation whose target existed but was gitignored was called missing.
 
     `resolve_cited_path` tries the literal repo-root-relative path first, so a
     citation written from the root still resolves. One written as a suffix --
-    `build/generated.md` under `docs/` -- falls through to the repo-wide suffix
-    search, finds nothing now that the candidate set is git's, and is reported
-    as "file not found" for a file that is on disk and readable.
+    `build/generated.md` under `docs/` -- fell through to the repo-wide suffix
+    search, found nothing once the candidate set became git's, and was reported
+    as "file not found" for a file on disk and readable.
+    `check_doc_citations._exists_outside_the_candidate_set` closed it: before
+    the finding is issued the disk is consulted, and a hit sends the citation
+    back to UNCHECKED instead.
     """
     repo = _init(tmp_path / "repo")
     (repo / ".gitignore").write_text("build/\n", encoding="utf-8")

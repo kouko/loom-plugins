@@ -15,8 +15,8 @@ can only be proven once every one of them uses the module.
 - Risk: agent-decided — `-z` is mandatory, and entries that are not existing regular files are dropped: `--others` emits a nested worktree as one directory entry and `--cached` lists staged-but-deleted paths.
 
 **W2-01 loom-code scanners use the module**  after: W1-01  acceptance: 1
-- Files: loom-code/scripts/loom_checker/probes.py, loom-code/scripts/check_doc_citations.py, loom-code/scripts/rehearse_probes.py, loom-code/scripts/test_check_doc_citations.py, loom-code/scripts/test_rehearse_probes.py, loom-code/scripts/test_loom_checker_probes.py
-- Test: A1 positive: test_loom_checker_probes.py::test_test_command_ignores_nested_worktree; negative: test_loom_checker_probes.py::test_test_command_still_detects_own_tests.
+- Files: loom-code/scripts/loom_checker/probes.py, loom-code/scripts/check_doc_citations.py, loom-code/scripts/rehearse_probes.py, loom-code/scripts/test_check_doc_citations.py, loom-code/scripts/test_rehearse_probes.py, loom-code/scripts/test_loom_attestation.py
+- Test: A1 positive: test_loom_attestation.py::test_test_command_ignores_nested_worktree; negative: test_loom_attestation.py::test_test_command_still_detects_own_tests.
 - Risk: agent-decided — a smaller candidate set can change check_doc_citations verdicts; its rule is untouched and its docstring rationale is rewritten in this task.
 
 **W2-02 loom-workflow and root scanners use the module**  after: W2-01  acceptance: 2, 6

@@ -350,3 +350,32 @@ def test_cloneRun_carriesTheNestedMarker_soCloneAndRunProbesCanSkip(
     out = capsys.readouterr().out
     assert code == 0, out
     assert "FAILED (0)" in out, out
+
+
+# --------------------------------------------------------------------------
+# the default probe set is what git says belongs to this repository -- the
+# glob alone would also pick up an ignored copy, and the filter is what stops
+# it. A path-form mismatch between the glob and `repository_files` would
+# silently empty the default set instead of failing, so the exact list is
+# pinned here.
+# --------------------------------------------------------------------------
+
+def test_defaultPaths_ownProbeOnly_excludesAnIgnoredCopyAndAWorktreesFiles(
+    tmp_path: Path,
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    commit_file(repo, ".gitignore", "test_probes_ignored.py\n", "ignore rule")
+    commit_file(
+        repo, "loom-code/scripts/test_probes_own.py",
+        "def test_own():\n    assert True\n", "own probe",
+    )
+    (repo / "loom-code" / "scripts" / "test_probes_ignored.py").write_text(
+        "def test_ignored():\n    assert True\n", encoding="utf-8"
+    )
+    _git_ok(repo, "worktree", "add", "-q", "-b", "side", "wt")
+    stowaway = repo / "wt" / "loom-code" / "scripts" / "test_probes_stowaway.py"
+    stowaway.write_text("def test_stowaway():\n    assert True\n", encoding="utf-8")
+
+    assert rehearse_probes._default_paths(repo) == [
+        "loom-code/scripts/test_probes_own.py"
+    ]

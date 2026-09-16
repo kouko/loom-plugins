@@ -42,13 +42,14 @@ def _relative(root: Path) -> list[str]:
 def test_repository_files_gitfile_without_git_drops_the_dot_git_component(
     tmp_path: Path,
 ) -> None:
-    """A `.git` that is a FILE survives the no-git walk.
+    """A `.git` that is a FILE used to survive the no-git walk.
 
     A linked worktree and a submodule both mark their directory with a `.git`
-    *file*, not a directory. `_walk_entries` prunes directories by name and
-    never applies `_is_ignored`, so the file is returned as one of the
-    repository's own files -- while the git path drops any path carrying a
-    `.git` component. Same tree, two answers.
+    *file*, not a directory. `_walk_entries` pruned directories by name only, so
+    the file came back as one of the repository's own files -- while the git
+    path drops any path carrying a `.git` component. Same tree, two answers.
+    `repo_files.py:146-148` closed it by filtering filenames against
+    IGNORED_DIRECTORY_NAMES too.
     """
     root = tmp_path / "nogit"
     (root / "sub").mkdir(parents=True)
@@ -79,13 +80,15 @@ def test_repository_files_gitfile_with_git_drops_the_dot_git_component(
 def test_repository_files_bare_repository_lists_no_git_internals(
     tmp_path: Path,
 ) -> None:
-    """A bare repository is not "no git", but it is treated as such.
+    """A bare repository was not "no git", but was treated as such.
 
     `git rev-parse --show-toplevel` has no work tree to print in a bare
-    repository, so the module concludes there is no git here and walks. The
-    directory it then walks IS the object store: `HEAD`, `config`, every
-    `hooks/*.sample`, and every loose object. The module ships in a plugin
-    that runs in other people's repositories.
+    repository, so the module concluded there was no git here and walked. The
+    directory it then walked IS the object store: `HEAD`, `config`, every
+    `hooks/*.sample`, and every loose object -- in a module that ships in a
+    plugin run inside other people's repositories. `repo_files.py:114-115`
+    closed it by asking `--is-bare-repository` first and short-circuiting to an
+    empty listing.
     """
     bare = tmp_path / "bare.git"
     subprocess.run(["git", "init", "-q", "--bare", str(bare)], check=True)

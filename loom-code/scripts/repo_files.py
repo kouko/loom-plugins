@@ -13,6 +13,11 @@ by default, and it keeps a `git archive` copy working. A BARE repository is git
 even though `git rev-parse --show-toplevel` prints nothing there; it owns no
 work tree, so it owns no files, and the walk must not be reached.
 
+The two paths agree on a tree that holds no foreign subtree, not on every tree:
+without git, `_walk_entries` drops a nested repository's `.git` marker but still
+walks that subtree and returns every other file in it, whereas the git path
+drops the whole subtree as one opaque entry.
+
 Both paths then drop any path with a component in IGNORED_DIRECTORY_NAMES, and
 drop every entry that is not an existing regular file: `--others` emits a
 nested repository or linked worktree as one opaque directory entry such as

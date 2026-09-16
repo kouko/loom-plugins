@@ -990,3 +990,56 @@ def test_explicit_citation_with_no_target_anywhere_is_still_a_finding(
 
     assert check_citation(tmp_path, "docs/gone.md", 1, None, files) == (
         True, "file not found")
+
+
+def test_target_only_inside_a_nested_worktree_is_still_a_finding(
+    tmp_path: Path,
+) -> None:
+    """A linked worktree checked out inside the repository is not this
+    repository's disk. A file that exists ONLY there must not suppress the
+    finding: CI has no such worktree, so a citation green here would be red
+    there — the developer-machine content the change exists to stop reading.
+    """
+    _write(tmp_path / "kept.py", "line1\n")
+    _commit_snapshot(tmp_path)
+    _git(tmp_path, "worktree", "add", "-q", "-b", "side", "wt")
+    _write(tmp_path / "wt" / "docs" / "only-there.md", "hello\n")
+
+    files = list_repo_files(tmp_path)
+
+    assert check_citation(tmp_path, "docs/only-there.md", 1, None, files) == (
+        True, "file not found")
+
+
+def test_target_only_inside_a_nested_repository_is_still_a_finding(
+    tmp_path: Path,
+) -> None:
+    """Same for a plain clone dropped inside the repository: git collapses it
+    to one opaque directory entry, so its contents are nobody's here."""
+    _write(tmp_path / "kept.py", "line1\n")
+    _commit_snapshot(tmp_path)
+    vendor = tmp_path / "vendor"
+    vendor.mkdir()
+    _git(vendor, "init", "-q")
+    _write(vendor / "docs" / "only-there.md", "hello\n")
+
+    files = list_repo_files(tmp_path)
+
+    assert check_citation(tmp_path, "docs/only-there.md", 1, None, files) == (
+        True, "file not found")
+
+
+def test_cited_path_with_a_glob_character_is_matched_literally(
+    tmp_path: Path,
+) -> None:
+    """The basename reaches the walk as data, never as a pattern: a cited
+    `wild*.md` is not satisfied by an on-disk `wildcard.md`."""
+    _write(tmp_path / ".gitignore", "build/\n")
+    _write(tmp_path / "kept.py", "line1\n")
+    _commit_snapshot(tmp_path)
+    _write(tmp_path / "build" / "docs" / "wildcard.md", "hello\n")
+
+    files = list_repo_files(tmp_path)
+
+    assert check_citation(tmp_path, "docs/wild*.md", 1, None, files) == (
+        True, "file not found")
