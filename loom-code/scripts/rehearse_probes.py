@@ -64,6 +64,15 @@ from git_exec import run_git  # sibling module (no __init__.py, no conftest)
 from repo_files import repository_files  # sibling module, same convention
 
 DEFAULT_GLOB = "loom-code/scripts/test_probes_*.py"
+# Printed, alone, when the script is run with no `--repo` in a directory git
+# does not recognise -- a `git archive` extract being the case that matters.
+# Rehearsal works by cloning the repository, so there is nothing to rehearse
+# without git; that is a stated exception, not a defect, so it is reported as
+# an explicit skip on stdout with exit 0 rather than as a failure.
+NO_GIT_SKIP = (
+    "skipping the rehearsal: it works by cloning the repository, so it needs "
+    "a git repository, and this directory is not one"
+)
 GIT_TIMEOUT = 300
 PYTEST_TIMEOUT = 900
 
@@ -112,12 +121,26 @@ def _fail(message: str) -> int:
 def _resolve_repo(raw: str | None) -> Path | None:
     if raw is not None:
         return Path(raw)
-    proc = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True,
-    )
-    if proc.returncode != 0:
+    toplevel = run_git(Path.cwd(), "rev-parse", "--show-toplevel", timeout=GIT_TIMEOUT)
+    if toplevel is None:
         return None
-    return Path(proc.stdout.strip())
+    return Path(toplevel)
+
+
+def _is_a_git_repository(directory: Path) -> bool:
+    """Whether git recognises `directory` as being inside a repository at all.
+
+    `--is-bare-repository` is the same first probe `repo_files._git_entries`
+    uses, asked the same way through `run_git`: it answers for a bare
+    repository as well as for a work tree, so it fails only when there is no
+    repository here (or no git to ask). That is what separates the two cases
+    this script has to treat differently -- "this directory is not a git
+    repository", which is a clean skip, from "git is here and something went
+    wrong", which is still an error.
+    """
+    return run_git(
+        directory, "rev-parse", "--is-bare-repository", timeout=GIT_TIMEOUT
+    ) is not None
 
 
 def _validate_repo(repo: Path):
@@ -272,6 +295,15 @@ def main(argv: list[str] | None = None) -> int:
 
     repo = _resolve_repo(args.repo)
     if repo is None:
+        # No `--repo`, and `--show-toplevel` failed. Either there is no
+        # repository here at all -- the `git archive` extract -- or git is
+        # here and the call went wrong. Only the first is a skip; the second
+        # keeps failing exactly as it did. An explicit `--repo` never reaches
+        # this branch, so a caller who names a directory that is not a
+        # repository still gets the loud `_validate_repo` failure below.
+        if not _is_a_git_repository(Path.cwd()):
+            print(NO_GIT_SKIP)
+            return 0
         return _fail(
             "could not determine the repository to rehearse "
             "(`git rev-parse --show-toplevel` failed)"

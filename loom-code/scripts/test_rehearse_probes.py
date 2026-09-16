@@ -379,3 +379,64 @@ def test_defaultPaths_ownProbeOnly_excludesAnIgnoredCopyAndAWorktreesFiles(
     assert rehearse_probes._default_paths(repo) == [
         "loom-code/scripts/test_probes_own.py"
     ]
+
+
+# --------------------------------------------------------------------------
+# a `git archive` extract has no `.git`, and this script works by cloning the
+# repository -- it cannot do its job there, so it says so and skips rather
+# than failing the scan that runs it (intent Acceptance 4). The pair below
+# pins both directions: the no-git copy, and a genuine repository, which must
+# still rehearse exactly as before.
+# --------------------------------------------------------------------------
+
+def _archive_extract(repo: Path, dest: Path) -> Path:
+    """A real `git archive` extract of `repo`'s HEAD -- no `.git` anywhere."""
+    dest.mkdir(parents=True)
+    tarball = dest.parent / "HEAD.tar"
+    with tarball.open("wb") as handle:
+        subprocess.run(
+            ["git", "-C", str(repo), "archive", "HEAD"], check=True, stdout=handle,
+        )
+    subprocess.run(["tar", "-xf", str(tarball), "-C", str(dest)], check=True)
+    assert not (dest / ".git").exists()
+    return dest
+
+
+def test_archiveExtractWithoutGit_skipsExplicitlyNamingTheReason_andExitsZero(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    commit_file(
+        repo, "loom-code/scripts/test_probes_own.py",
+        "def test_own():\n    assert True\n", "own probe",
+    )
+    extract = _archive_extract(repo, tmp_path / "extract" / "copy")
+
+    monkeypatch.chdir(extract)
+    code = rehearse_probes.main([])
+    out = capsys.readouterr().out
+
+    assert code == 0, out
+    skip_lines = [line for line in out.splitlines() if line.strip()]
+    assert skip_lines == [rehearse_probes.NO_GIT_SKIP], out
+    assert "git repository" in rehearse_probes.NO_GIT_SKIP
+    assert "skip" in rehearse_probes.NO_GIT_SKIP.lower()
+
+
+def test_genuineRepositoryWithNoRepoFlag_stillRehearses_andNeverSkips(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    commit_file(
+        repo, "loom-code/scripts/test_probes_own.py",
+        "def test_own():\n    assert True\n", "own probe",
+    )
+
+    monkeypatch.chdir(repo)
+    code = rehearse_probes.main([])
+    out = capsys.readouterr().out
+
+    assert code == 0, out
+    assert rehearse_probes.NO_GIT_SKIP not in out, out
+    assert "Rehearsed " in out, out
+    assert "FAILED (0)" in out, out

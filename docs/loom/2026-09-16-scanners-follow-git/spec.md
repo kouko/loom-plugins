@@ -20,8 +20,12 @@ REQ-3 — Package tests ignore a nested worktree
 
 REQ-4 — Scanners still run without git
   WHEN the same commit is extracted with `git archive` into a copy that has no
-  `.git`, each of those six scanners shall run and reach the verdict it
-  reaches in the git checkout → Acceptance #4
+  `.git`, each of the five archive-capable scanners named in the intent's
+  Constraints shall run and reach the verdict it reaches in the git checkout.
+  `loom-code/scripts/rehearse_probes.py` is the stated exception: it works by
+  cloning the repository, so it cannot run without git, and in that copy it
+  shall report an explicit skip naming that reason and exit zero instead of
+  failing → Acceptance #4
 
 REQ-5 — Untracked but not ignored files are still seen
   WHEN a violating file is present that git does not track and `.gitignore`
@@ -70,6 +74,16 @@ REQ-6 — Ignored directories produce no findings
   (`evidence/probes/test_abuse_walk_fallback_divergence.py`).
 - user-decided: when there is no git the module walks the filesystem instead
   of failing, so a `git archive` copy keeps working.
+- user-decided: on 2026-09-16 kouko narrowed the obligation to run in a
+  `git archive` copy from six scanners to the five archive-capable ones, and
+  chose a clean skip for the sixth. `rehearse_probes.py` run with no `--repo`
+  in a directory git does not recognise prints one line saying it is skipping
+  because rehearsal needs a git repository and this directory is not one, and
+  exits zero. Only that case skips: an explicit `--repo` pointing at a
+  non-repository, a bare repository, and any git failure inside a genuine
+  repository all keep failing as before. The two cases are told apart by
+  asking `git rev-parse --is-bare-repository` through `git_exec.run_git` —
+  the same first probe, asked the same way, as the enumeration module above.
 - user-decided: both paths then drop any path with a component in a fixed
   ignore list holding the names already used in this repository — `.git`,
   `.pytest_cache`, `__pycache__`, `node_modules` (the intent's Constraints).
