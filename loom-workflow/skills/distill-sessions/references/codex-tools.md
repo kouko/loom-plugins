@@ -4,8 +4,7 @@
 > `distill-sessions`' two dispatch points to the host's call shape.
 >
 > **Doc-sourced, not session-exercised** against this specific skill's
-> prompts — inherits the same evidence grain as loom-code's own
-> `dispatch-profile.md` §Subagent dispatch.
+> prompts.
 
 ## Stage 3 parallel fan-out (`agents/prompt-failure-analysis.md` / `agents/prompt-success-analysis.md`)
 

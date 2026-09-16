@@ -170,7 +170,7 @@ of them as part of the read-back, in behaviour words.
 
 Forms: reference `references/spec-forms.md` before reaching for a table, a
 state list or a diagram — it says which shape carries which content, and
-carries the completeness questions the closing-review station's
+carries the ten completeness questions the closing-review station's
 design-conformance lens will ask you anyway.
 
 ## Step 3 — Decision point ②, product changes only

@@ -1,33 +1,28 @@
-# Plan: Clean stale references — plan
-intent: 2026-09-16-clean-stale-references@a388bc09
+# Clean stale references — plan
+intent: 2026-09-16-clean-stale-references@cb04eaea
 charter: 1.0
 
 ## Current State Evidence
-- Forward: `docs/loom/README.md:35-40` lists obsolete paths like `plans/` and `specs/`.
-- Reverse: `loom-design/skills/write-spec/SKILL.md:173` references "ten completeness questions".
-- Error: `loom-workflow/skills/distill-sessions/references/codex-tools.md:8` points to `codex-tools.md`, which does not exist.
-- Data: N/A.
-- Boundary: Changes are limited to documentation and skill-instruction prose; no logic changed.
+- Forward: `docs/loom/README.md` "Frozen stores" list links `specs/`, `backlog/`, `design/`, `archive/`, `BACKLOG.md` and two 2026-07 folders, none present.
+- Reverse: `loom-workflow/skills/distill-sessions/references/codex-tools.md:8` cites loom-code's `codex-tools.md`, deleted in eae874c4.
+- Error: `loom-code/docs/examples/README.md:31` links `skills/using-loom-code/references/codex-tools.md`, which does not exist.
+- Data: N/A — prose only.
+- Boundary: `docs/loom/plans/` exists and stays listed; write-spec's "ten completeness questions" matches `references/spec-forms.md:84`.
 
 ## Task DAG
 
-**W1-01 Update distill-sessions reference**  after: none  acceptance: 1
-- Files: `loom-workflow/skills/distill-sessions/references/codex-tools.md`
-- Test: A1 positive: internal-dispatch-found; negative: codex-tools-missing
-- Risk: None. agent-decided.
+**W1-01 Drop dead codex-tools pointers**  after: none  acceptance: 1, 3
+- Files: loom-workflow/skills/distill-sessions/references/codex-tools.md, loom-code/docs/examples/README.md
+- Test: A1 positive: no-missing-file-named; negative: grep-codex-tools-md-absent. A3 positive: examples-link-removed; negative: link-target-missing.
+- Risk: Removing rather than repointing — no live successor document exists. agent-decided.
 
-**W1-02 Update docs/loom/README.md frozen store list**  after: none  acceptance: 2
-- Files: `docs/loom/README.md`
-- Test: A2 positive: frozen-paths-removed; negative: obsolete-paths-missing
-- Risk: None. agent-decided.
-
-**W1-03 Update write-spec completeness questions reference**  after: none  acceptance: 3
-- Files: `loom-design/skills/write-spec/SKILL.md`
-- Test: A3 positive: ten-questions-removed; negative: completeness-rule-present
-- Risk: None. agent-decided.
+**W1-02 Frozen-store list matches the tree**  after: none  acceptance: 2
+- Files: docs/loom/README.md
+- Test: A2 positive: every-linked-path-exists; boundary: plans-still-listed.
+- Risk: `plans/` has no ARCHIVED.md, so the sentence claiming one is removed. agent-decided.
 
 ## Questions asked
-- none
+① — what — 你要的是把幾份文件裡指向不存在檔案的連結清掉，而且不能誤刪還存在的東西。這樣對嗎？
 
 ## Risks
-- None.
+1. First Acceptance set rested on unverified claims; re-confirmed after checking each path on disk.

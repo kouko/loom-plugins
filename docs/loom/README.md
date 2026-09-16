@@ -27,12 +27,12 @@ the end of Build, then read and blind run in review.
 
 These are the pre-1.0 stores. loom 1.0 was a hard cutover: old plans,
 specs, briefs and backlog entries were archived where they stood and
-never converted. Each carries an `ARCHIVED.md` saying so. They stay in
+never converted. They stay in
 the tree because `git log --grep` and `grep -rn` against historical
 decision context is why they were kept in the first place — but no
 station reads them, and nothing new should be written into them.
 
-- [`2026-07-12-us-sec-primary-source-layer/`](2026-07-12-us-sec-primary-source-layer/), [`2026-07-19-8k-prose-kpi-intake/`](2026-07-19-8k-prose-kpi-intake/) — two old change folders left where they were
+- [`plans/`](plans/) — writing-plans output, 2026-05-18 → 2026-09-01
 
 ## checkpoint 的三個驗證角色什麼時候被觸發
 
