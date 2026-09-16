@@ -9,7 +9,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from repo_files import nested_worktrees, repository_files
+from repo_files import nested_repositories, nested_worktrees, repository_files
 
 
 def _git(repo: Path, *args: str) -> None:
@@ -180,3 +180,62 @@ def test_archive_copy_listing_matches_git_checkout(tmp_path: Path) -> None:
 
     assert _rel(archive, repository_files(archive)) == _rel(
         repo, repository_files(repo))
+
+
+def test_walk_drops_a_dot_git_that_is_a_file(tmp_path: Path) -> None:
+    """A linked worktree and a submodule mark their directory with a `.git`
+    FILE, so the no-git walk has to drop ignored names on every path
+    component, not only on directories -- the git path already does."""
+    plain = tmp_path / "plain"
+    _write(plain, "sub/.git", "gitdir: /elsewhere\n")
+    _write(plain, "sub/f.txt")
+
+    assert _rel(plain, repository_files(plain)) == {"sub/f.txt"}
+
+
+def test_bare_repository_lists_nothing(tmp_path: Path) -> None:
+    """A bare repository has no work tree, so it owns no files. Walking it
+    would return its object store (`HEAD`, `config`, `hooks/*.sample`)."""
+    bare = tmp_path / "bare.git"
+    subprocess.run(["git", "init", "-q", "--bare", str(bare)], check=True)
+
+    assert repository_files(bare) == []
+
+
+def test_nested_repositories_reports_a_plain_clone(tmp_path: Path) -> None:
+    """The directories `repository_files` drops as "not ours" are nameable:
+    a nested clone git collapses to one opaque entry, not only a worktree."""
+    repo = tmp_path / "repo"
+    _init_repo(repo)
+    _write(repo, "kept.py")
+    _commit(repo)
+    inner = repo / "vendor"
+    _init_repo(inner)
+    _write(inner, "foreign.py")
+    _commit(inner)
+
+    assert _rel(repo, nested_repositories(repo)) == {"vendor"}
+    assert "vendor/foreign.py" not in _rel(repo, repository_files(repo))
+
+
+def test_nested_repositories_reports_a_submodule(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    _init_repo(repo)
+    _write(repo, "kept.py")
+    _commit(repo)
+    sub = tmp_path / "sub"
+    _init_repo(sub)
+    _write(sub, "foreign.py")
+    _commit(sub)
+    _git(repo, "-c", "protocol.file.allow=always", "submodule", "add", "-q",
+         str(sub), "subm")
+    _git(repo, "commit", "-q", "-m", "add sub")
+
+    assert "subm" in _rel(repo, nested_repositories(repo))
+
+
+def test_nested_repositories_is_empty_without_git(tmp_path: Path) -> None:
+    plain = tmp_path / "plain"
+    _write(plain, "a.py")
+
+    assert nested_repositories(plain) == []

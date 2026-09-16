@@ -132,6 +132,51 @@ def test_nested_worktree_is_ignored(tmp_path: Path) -> None:
     assert all(expected in command for command in pytest_commands)
 
 
+def _collect_with_runner_ignores(repo: Path) -> str:
+    """Collect `loom-code/scripts/` with exactly the runner's `--ignore` tokens.
+
+    The `--ignore=` string being present is not the property that matters;
+    what matters is that pytest then collects nothing from the nested
+    repository. This runs the real collection.
+    """
+    command = loom_family_commands(repo, verbosity="-q", only="code")[0]
+    ignores = [token for token in command if token.startswith("--ignore=")]
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "loom-code/scripts/", "-q",
+         "-p", "no:cacheprovider", "--collect-only", *ignores],
+        cwd=repo, capture_output=True, text=True,
+    )
+    return result.stdout
+
+
+def test_nested_worktree_collects_nothing_from_it(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+    nested = repo / "loom-code" / "scripts" / "wt"
+    _git(repo, "worktree", "add", "-q", "-b", "wt-branch", str(nested))
+    (nested / "loom-code" / "scripts" / "test_intruder.py").write_text(
+        "def test_i():\n    assert False\n")
+
+    assert "test_intruder" not in _collect_with_runner_ignores(repo)
+
+
+def test_nested_clone_collects_nothing_from_it(tmp_path: Path) -> None:
+    """A plain nested repository is not this repository's, exactly as
+    `repository_files` already says -- so its tests are not ours to run."""
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+    inner = repo / "loom-code" / "scripts" / "vendor"
+    inner.mkdir(parents=True)
+    (inner / "test_foreign.py").write_text("def test_foreign():\n    assert False\n")
+    _git(inner, "init", "-q")
+    _git(inner, "config", "user.email", "t@example.com")
+    _git(inner, "config", "user.name", "T")
+    _git(inner, "add", "-A")
+    _git(inner, "commit", "-q", "-m", "c")
+
+    assert "test_foreign" not in _collect_with_runner_ignores(repo)
+
+
 def test_loom_family_preset_is_the_only_test_command_named_by_ci_and_kickoff() -> None:
     kickoff = (REPO / "docs/loom/KICKOFF-DEFAULTS.md").read_text(encoding="utf-8")
     assert "scripts/run_package_tests.py --loom-family" in kickoff

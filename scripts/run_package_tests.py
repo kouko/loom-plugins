@@ -6,10 +6,14 @@ single session that also names loom-code paths adopts that ini, and the
 loom-code modules that rely on bare sibling imports (three files, ~90
 tests) fail to collect. Two sessions, one exit code.
 
-Whole directories are handed to pytest, and a git linked worktree placed inside
-one of them would have its test files collected as this repository's. Every
-pytest session therefore carries `--ignore=<path>` for each worktree nested in
-the repository. A repository-root `pytest.ini` would also apply to a bare
+Whole directories are handed to pytest, and a nested git repository placed
+inside one of them -- a linked worktree, a clone dropped in `vendor/`, a
+submodule -- would have its test files collected and run as this repository's.
+Every pytest session therefore carries `--ignore=<path>` for each such subtree.
+The exclusions are the union of `repo_files.nested_repositories` (the opaque
+directory entries git collapsed, which is the same answer the scanners use for
+"not ours") and `repo_files.nested_worktrees` (which still sees a worktree that
+a `.gitignore` hides from the first). A repository-root `pytest.ini` would also apply to a bare
 `pytest` run at the root, which is known to abort on dbt-wiki collection, so
 the exclusion is passed per command instead. Where the worktrees are is a git
 question, and git questions live in `loom-code/scripts/repo_files.py`, imported
@@ -24,7 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "loom-code" / "scripts"))
 
-from repo_files import nested_worktrees  # noqa: E402
+from repo_files import nested_repositories, nested_worktrees  # noqa: E402
 
 
 def split_groups(argv: list[str]) -> list[list[str]]:
@@ -66,7 +70,8 @@ def loom_family_commands(
             ["node", "loom-workflow/tests/mermaid/validate_mermaid.mjs"],
             ["bash", "loom-workflow/tests/mermaid-validator-negative.sh"],
         ])
-    ignores = [f"--ignore={worktree}" for worktree in nested_worktrees(repo)]
+    foreign = sorted({*nested_repositories(repo), *nested_worktrees(repo)})
+    ignores = [f"--ignore={path.resolve()}" for path in foreign]
     for command in commands:
         if command[:3] == [sys.executable, "-m", "pytest"]:
             command.extend(ignores)

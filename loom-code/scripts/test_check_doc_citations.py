@@ -23,6 +23,7 @@ from pathlib import Path
 
 import check_doc_citations
 from check_doc_citations import (
+    check_citation,
     check_doc,
     check_doc_report,
     find_repo_root,
@@ -955,3 +956,37 @@ def test_repo_file_list_follows_git(tmp_path: Path) -> None:
     assert "untracked.py" in listing
     assert "build/kept.py" not in listing
     assert not [path for path in listing if path.startswith("wt/")]
+
+
+def test_explicit_citation_to_an_existing_ignored_target_is_unchecked(
+    tmp_path: Path,
+) -> None:
+    """A target that is on disk but outside git's listing is not drift.
+
+    The explicit-path finding reads "zero repo-wide matches" as drift. That
+    reading only holds while the candidate set covers the disk; now that it
+    is git's, an existing-but-ignored target must fall back to UNCHECKED
+    rather than become a false "file not found".
+    """
+    _write(tmp_path / ".gitignore", "build/\n")
+    _write(tmp_path / "docs" / "build" / "generated.md", "hello\n")
+    _write(tmp_path / "docs" / "note.md", "see it\n")
+    _commit_snapshot(tmp_path)
+
+    files = list_repo_files(tmp_path)
+
+    assert check_citation(tmp_path, "build/generated.md", 1, None, files) == (
+        False, None)
+
+
+def test_explicit_citation_with_no_target_anywhere_is_still_a_finding(
+    tmp_path: Path,
+) -> None:
+    """The control: real drift keeps producing the finding."""
+    _write(tmp_path / "kept.py", "line1\n")
+    _commit_snapshot(tmp_path)
+
+    files = list_repo_files(tmp_path)
+
+    assert check_citation(tmp_path, "docs/gone.md", 1, None, files) == (
+        True, "file not found")

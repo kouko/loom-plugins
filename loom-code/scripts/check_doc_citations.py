@@ -135,7 +135,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from repo_files import repository_files
+from repo_files import IGNORED_DIRECTORY_NAMES, repository_files
 
 # Matches a backtick-quoted `path`, `path:line`, or `path:line-range` candidate.
 # The path segment excludes backticks/whitespace/colons; requiring a
@@ -289,6 +289,42 @@ def _is_explicit_path_citation_with_no_match(
     return len(matches) == 0
 
 
+def _exists_outside_the_candidate_set(repo_root: Path, cited_path: str) -> bool:
+    """True when a real file under `repo_root` ends with `cited_path`.
+
+    The explicit-path finding reads "zero repo-wide matches" as drift. That
+    reading was sound while the candidate set was every file on disk; it is
+    not sound now the set is git's, because a target that is merely ignored
+    (or inside a nested repository) is absent from the set while sitting on
+    disk, readable, exactly where the citation says. Reporting it missing
+    would be a FALSE finding — the failure class the smaller candidate set
+    exists to remove, in mirror image.
+
+    So before the finding is issued, and only then, the disk is consulted
+    directly. This walk is on the finding path only, never the clean path.
+    A hit sends the citation back to UNCHECKED rather than resolving it: the
+    file is outside what the document's repository owns, so it is not a
+    target this check can speak about — loud skipping, as everywhere else.
+
+    Working-tree only. The reviewed-SHA path (`check_doc_report_at_sha`)
+    takes its candidate set from `git ls-tree`, which this change did not
+    touch, and its citations are about a commit rather than the disk — so
+    the disk is not evidence there and is not consulted.
+    """
+    basename = cited_path.rsplit("/", 1)[-1]
+    suffix = "/" + cited_path
+    for path in repo_root.rglob(basename):
+        if _is_ignored_path(path.relative_to(repo_root).parts):
+            continue
+        if path.is_file() and path.as_posix().endswith(suffix):
+            return True
+    return False
+
+
+def _is_ignored_path(parts: tuple[str, ...]) -> bool:
+    return any(part in IGNORED_DIRECTORY_NAMES for part in parts)
+
+
 def check_citation(
     repo_root: Path,
     cited_path: str,
@@ -303,8 +339,10 @@ def check_citation(
     `resolve_cited_path`); `reason` is then always `None`. When
     `checked` is `True`, `reason` is a finding string for an
     out-of-range line, a missing anchor substring, or an unresolvable
-    EXPLICIT path citation (contains `/`, zero repo-wide matches — see
-    `_is_explicit_path_citation_with_no_match`), or `None` for a clean
+    EXPLICIT path citation (contains `/`, zero repo-wide matches, and no
+    such file on disk either — see
+    `_is_explicit_path_citation_with_no_match` and
+    `_exists_outside_the_candidate_set`), or `None` for a clean
     citation. A resolved target is by construction a real file, so
     "file not found" only fires via that explicit-path branch, never
     from a resolved `target` (round 2 — see module docstring).
@@ -321,7 +359,9 @@ def check_citation(
     """
     target = resolve_cited_path(repo_root, cited_path, repo_files)
     if target is None:
-        if _is_explicit_path_citation_with_no_match(cited_path, repo_files):
+        if _is_explicit_path_citation_with_no_match(
+            cited_path, repo_files
+        ) and not _exists_outside_the_candidate_set(repo_root, cited_path):
             return True, "file not found"
         return False, None
     file_text = target.read_text(encoding="utf-8", errors="replace")
