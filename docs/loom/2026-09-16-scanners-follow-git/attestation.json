@@ -1,0 +1,84 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-16-scanners-follow-git",
+  "content_digest": "cd9184c0c3b01e6ec4509b001dca6400eb90f1d4",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_citation_candidate_shrink.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_citation_candidate_shrink.py",
+      "result": "pass",
+      "command_digest": "140961af3fad2970cd5f21182d6b1bd6f29a04a1b082dc811258c6f174a82e4d"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_nested_repository_collection.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_nested_repository_collection.py",
+      "result": "pass",
+      "command_digest": "097272ee7414209ab101d124bbbd082cae16b24a5b57dd460ffa84b4f2f0e3a0"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_repo_files_hostile_paths.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_repo_files_hostile_paths.py",
+      "result": "pass",
+      "command_digest": "97c36ca06e92ab535ca173578180df4f14a882a44c8d53fe8e1a18d952880aa2"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_walk_fallback_divergence.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-16-scanners-follow-git/evidence/probes/test_abuse_walk_fallback_divergence.py",
+      "result": "pass",
+      "command_digest": "e5c6be7a2428a92bd7e82b70945140bce5e4d84441399c1852013599f37ee877"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a4a76567447d31d6e",
+      "vendor": "claude",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "ae564f15ec73f04c6",
+      "vendor": "claude",
+      "model": "claude-opus-5",
+      "lens": "spec",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "loom-code/scripts/repo_files.py:86",
+          "text": "note (non-blocking): git worktree list --porcelain -z needs git >= 2.36; on older git nested_worktrees silently returns [] and the worktree exclusion is dropped. The floor is not recorded as a spec decision."
+        },
+        {
+          "severity": "nit",
+          "anchor": "docs/loom/2026-09-16-scanners-follow-git/blind-run-report.md:203",
+          "text": "nitpick: the Chinese plan.md line range is now 33-42, not 33-37."
+        },
+        {
+          "severity": "nit",
+          "anchor": "docs/loom/2026-09-16-scanners-follow-git/blind-run-report.md:214",
+          "text": "note: two of the report's open questions have no recorded outcome."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "anchor": "loom-code/scripts/repo_files.py",
+      "text": "repository_files on a non-existent path or on a regular file returns [] silently, which every consumer reads as no violations; pre-existing in the filesystem walks this change replaced, left out of scope."
+    }
+  ],
+  "selection": null
+}

@@ -61,8 +61,19 @@ NESTED_ENV = "REHEARSE_PROBES_NESTED"
 from pathlib import Path
 
 from git_exec import run_git  # sibling module (no __init__.py, no conftest)
+from repo_files import repository_files  # sibling module, same convention
 
 DEFAULT_GLOB = "loom-code/scripts/test_probes_*.py"
+# Printed, alone, when the script is run with no `--repo` in a directory with
+# no `.git` entry in it or any ancestor -- a `git archive` extract being the
+# case that matters.
+# Rehearsal works by cloning the repository, so there is nothing to rehearse
+# without git; that is a stated exception, not a defect, so it is reported as
+# an explicit skip on stdout with exit 0 rather than as a failure.
+NO_GIT_SKIP = (
+    "skipping the rehearsal: it works by cloning the repository, so it needs "
+    "a git repository, and this directory is not one"
+)
 GIT_TIMEOUT = 300
 PYTEST_TIMEOUT = 900
 
@@ -111,12 +122,27 @@ def _fail(message: str) -> int:
 def _resolve_repo(raw: str | None) -> Path | None:
     if raw is not None:
         return Path(raw)
-    proc = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True,
-    )
-    if proc.returncode != 0:
+    toplevel = run_git(Path.cwd(), "rev-parse", "--show-toplevel", timeout=GIT_TIMEOUT)
+    if toplevel is None:
         return None
-    return Path(proc.stdout.strip())
+    return Path(toplevel)
+
+
+def _has_git_marker(directory: Path) -> bool:
+    """Whether `directory` or any ancestor holds a `.git` entry.
+
+    The entry may be a directory (an ordinary checkout) or a file (a linked
+    worktree points at its gitdir with one). This deliberately does not ask
+    git: git answers nothing both when there is no repository and when it
+    refuses one (dubious ownership) or is not installed, and only the first
+    of those is a clean skip. The filesystem tells them apart -- no marker
+    anywhere upward is "this directory is not a repository"; a marker that
+    git could not resolve is a git failure, which still fails.
+    """
+    return any(
+        (candidate / ".git").exists()
+        for candidate in (directory, *directory.parents)
+    )
 
 
 def _validate_repo(repo: Path):
@@ -160,8 +186,17 @@ def _relativize_test_path(raw: str, repo_root: Path) -> str | None:
 
 
 def _default_paths(repo_root: Path) -> list[str]:
+    """Files matching DEFAULT_GLOB that belong to `repo_root` itself.
+
+    The glob alone would also match a copy of that directory sitting in a
+    linked worktree checked out inside the repository, or in ignored
+    output; `repo_files.repository_files` is what git says is ours.
+    """
+    own = set(repository_files(repo_root))
     return sorted(
-        p.relative_to(repo_root).as_posix() for p in repo_root.glob(DEFAULT_GLOB)
+        p.relative_to(repo_root).as_posix()
+        for p in repo_root.glob(DEFAULT_GLOB)
+        if p in own
     )
 
 
@@ -262,9 +297,21 @@ def main(argv: list[str] | None = None) -> int:
 
     repo = _resolve_repo(args.repo)
     if repo is None:
+        # No `--repo`, and `--show-toplevel` failed. Either there is no
+        # repository here at all -- the `git archive` extract -- or there is
+        # one and git failed on it (refused it, or is not installed). Only
+        # the first is a skip; the second still fails. An explicit `--repo`
+        # never reaches this branch, so a caller who names a directory that
+        # is not a repository still gets the loud `_validate_repo` failure
+        # below.
+        if not _has_git_marker(Path.cwd()):
+            print(NO_GIT_SKIP)
+            return 0
         return _fail(
-            "could not determine the repository to rehearse "
-            "(`git rev-parse --show-toplevel` failed)"
+            "could not determine the repository to rehearse: a `.git` entry "
+            "exists here or above, but git failed to resolve it "
+            "(`git rev-parse --show-toplevel` failed -- is git installed, "
+            "and does it accept this repository?)"
         )
 
     repo_root, error = _validate_repo(repo)

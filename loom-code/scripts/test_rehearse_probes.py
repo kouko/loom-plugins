@@ -350,3 +350,168 @@ def test_cloneRun_carriesTheNestedMarker_soCloneAndRunProbesCanSkip(
     out = capsys.readouterr().out
     assert code == 0, out
     assert "FAILED (0)" in out, out
+
+
+# --------------------------------------------------------------------------
+# the default probe set is what git says belongs to this repository -- the
+# glob alone would also pick up an ignored copy, and the filter is what stops
+# it. A path-form mismatch between the glob and `repository_files` would
+# silently empty the default set instead of failing, so the exact list is
+# pinned here.
+# --------------------------------------------------------------------------
+
+def test_defaultPaths_ownProbeOnly_excludesAnIgnoredCopyAndAWorktreesFiles(
+    tmp_path: Path,
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    commit_file(repo, ".gitignore", "test_probes_ignored.py\n", "ignore rule")
+    commit_file(
+        repo, "loom-code/scripts/test_probes_own.py",
+        "def test_own():\n    assert True\n", "own probe",
+    )
+    (repo / "loom-code" / "scripts" / "test_probes_ignored.py").write_text(
+        "def test_ignored():\n    assert True\n", encoding="utf-8"
+    )
+    _git_ok(repo, "worktree", "add", "-q", "-b", "side", "wt")
+    stowaway = repo / "wt" / "loom-code" / "scripts" / "test_probes_stowaway.py"
+    stowaway.write_text("def test_stowaway():\n    assert True\n", encoding="utf-8")
+
+    assert rehearse_probes._default_paths(repo) == [
+        "loom-code/scripts/test_probes_own.py"
+    ]
+
+
+# --------------------------------------------------------------------------
+# a `git archive` extract has no `.git`, and this script works by cloning the
+# repository -- it cannot do its job there, so it says so and skips rather
+# than failing the scan that runs it (intent Acceptance 4). The pair below
+# pins both directions: the no-git copy, and a genuine repository, which must
+# still rehearse exactly as before.
+# --------------------------------------------------------------------------
+
+def _archive_extract(repo: Path, dest: Path) -> Path:
+    """A real `git archive` extract of `repo`'s HEAD -- no `.git` anywhere."""
+    dest.mkdir(parents=True)
+    tarball = dest.parent / "HEAD.tar"
+    with tarball.open("wb") as handle:
+        subprocess.run(
+            ["git", "-C", str(repo), "archive", "HEAD"], check=True, stdout=handle,
+        )
+    subprocess.run(["tar", "-xf", str(tarball), "-C", str(dest)], check=True)
+    assert not (dest / ".git").exists()
+    return dest
+
+
+def test_archiveExtractWithoutGit_skipsExplicitlyNamingTheReason_andExitsZero(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    commit_file(
+        repo, "loom-code/scripts/test_probes_own.py",
+        "def test_own():\n    assert True\n", "own probe",
+    )
+    extract = _archive_extract(repo, tmp_path / "extract" / "copy")
+
+    monkeypatch.chdir(extract)
+    code = rehearse_probes.main([])
+    out = capsys.readouterr().out
+
+    assert code == 0, out
+    skip_lines = [line for line in out.splitlines() if line.strip()]
+    assert skip_lines == [rehearse_probes.NO_GIT_SKIP], out
+    assert "git repository" in rehearse_probes.NO_GIT_SKIP
+    assert "skip" in rehearse_probes.NO_GIT_SKIP.lower()
+
+
+def test_genuineRepositoryWithNoRepoFlag_stillRehearses_andNeverSkips(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    commit_file(
+        repo, "loom-code/scripts/test_probes_own.py",
+        "def test_own():\n    assert True\n", "own probe",
+    )
+
+    monkeypatch.chdir(repo)
+    code = rehearse_probes.main([])
+    out = capsys.readouterr().out
+
+    assert code == 0, out
+    assert rehearse_probes.NO_GIT_SKIP not in out, out
+    assert "Rehearsed " in out, out
+    assert "FAILED (0)" in out, out
+
+
+# --------------------------------------------------------------------------
+# Inside a genuine repository, git itself can still fail -- it refuses the
+# repository, or it is not installed. Neither is "this directory is not a
+# repository", so neither may take the skip: both must still fail, and say
+# that git failed.
+# --------------------------------------------------------------------------
+
+def _assert_git_failure_not_skip(
+    code: int, captured: pytest.CaptureFixture[str],
+) -> None:
+    result = captured.readouterr()
+    assert code != 0, result.out
+    assert rehearse_probes.NO_GIT_SKIP not in result.out, result.out
+    assert rehearse_probes.NO_GIT_SKIP not in result.err, result.err
+    assert "git" in result.err and "not one" not in result.err, result.err
+
+
+def test_genuineRepositoryGitRefusesForDubiousOwnership_failsInsteadOfSkipping(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    # `safe.directory` (e.g. `*`, which CI runners commonly set) is read only
+    # from global, system and command-line config and would bypass the
+    # ownership check; isolate git from all three, for the precondition and
+    # for every git call rehearse_probes makes in this process.
+    empty_config = tmp_path / "empty.gitconfig"
+    empty_config.write_text("", encoding="utf-8")
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", str(empty_config))
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+    for key in ("GIT_CONFIG_SYSTEM", "GIT_CONFIG_COUNT", "GIT_CONFIG_PARAMETERS"):
+        monkeypatch.delenv(key, raising=False)
+    monkeypatch.setenv("GIT_TEST_ASSUME_DIFFERENT_OWNER", "1")
+    # precondition: git really does refuse this repository under the variable
+    assert _git(repo, "rev-parse", "--show-toplevel").returncode != 0
+
+    monkeypatch.chdir(repo)
+    code = rehearse_probes.main([])
+
+    _assert_git_failure_not_skip(code, capsys)
+
+
+def test_genuineRepositoryGitNotOnPath_failsInsteadOfSkipping(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    repo = make_repo(tmp_path, trunk="main")
+    empty_bin = tmp_path / "empty-bin"
+    empty_bin.mkdir()
+    monkeypatch.setenv("PATH", str(empty_bin))
+    assert shutil.which("git") is None
+
+    monkeypatch.chdir(repo)
+    code = rehearse_probes.main([])
+
+    _assert_git_failure_not_skip(code, capsys)
+
+
+def test_linkedWorktreeSubdirectoryGitRefuses_failsInsteadOfSkipping(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str],
+) -> None:
+    # a linked worktree marks itself with a `.git` FILE, and the marker is
+    # found by walking upward from a subdirectory
+    repo = make_repo(tmp_path, trunk="main")
+    linked = tmp_path / "linked"
+    _git_ok(repo, "worktree", "add", "-q", "--detach", str(linked))
+    assert (linked / ".git").is_file()
+    sub = linked / "deep" / "er"
+    sub.mkdir(parents=True)
+    monkeypatch.setenv("PATH", str(tmp_path / "no-such-bin"))
+
+    monkeypatch.chdir(sub)
+    code = rehearse_probes.main([])
+
+    _assert_git_failure_not_skip(code, capsys)

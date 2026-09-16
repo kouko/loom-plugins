@@ -112,13 +112,20 @@ silent skip. `_is_explicit_path_citation_with_no_match` implements this
 split; a citation with multiple (ambiguous) matches, explicit or not,
 keeps the original UNCHECKED treatment.
 
-The repo-wide file list (`list_repo_files`) walks the tree once via
-`os.walk`, excluding only `.git`. This over-includes untracked/ignored
-files relative to `git ls-files` (e.g. `__pycache__`), but that is the
-conservative direction for this design: an extra candidate can only
-ever turn a would-be-unique match into an ambiguous (unchecked) one —
-it never fabricates a false "resolves cleanly" result — and it avoids
-adding a `git` subprocess dependency to an otherwise stdlib-only script.
+The repo-wide file list (`list_repo_files`) is the set of files git says
+belong to this repository, via the shared `repo_files.repository_files`:
+tracked and untracked-but-not-ignored files, with ignored output and the
+contents of a linked worktree checked out inside the tree left out. A
+document cites its own repository, so a file that is not part of it is
+not a citation target — and a worktree's copy of the tree used to make
+every path in it ambiguous twice over.
+
+The rule this script enforces is unchanged; only the candidate set is.
+A smaller candidate set is not purely conservative: a suffix match that
+was ambiguous (and so UNCHECKED) because of an ignored or foreign copy
+can now be unique, so citations that were silently skipped are now
+checked and can produce a finding. That is the intended direction — the
+check was skipping them for a reason that was never about the document.
 """
 from __future__ import annotations
 
@@ -128,6 +135,13 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+
+from repo_files import (
+    IGNORED_DIRECTORY_NAMES,
+    nested_repositories,
+    nested_worktrees,
+    repository_files,
+)
 
 # Matches a backtick-quoted `path`, `path:line`, or `path:line-range` candidate.
 # The path segment excludes backticks/whitespace/colons; requiring a
@@ -217,19 +231,16 @@ def count_pathless_citations(text: str) -> int:
 
 
 def list_repo_files(repo_root: Path) -> list[str]:
-    """Return every file's path relative to `repo_root`, POSIX-style.
+    """Return every repository file's path relative to `repo_root`, POSIX-style.
 
-    Walks the tree once, skipping `.git`. See module docstring for why
-    `os.walk` (not `git ls-files`) and why over-inclusion is the safe
-    direction for the suffix-match fallback below.
+    The files are the repository's own, per `repo_files.repository_files`.
+    See module docstring for what that leaves out and what it means for
+    the suffix-match fallback below.
     """
-    files: list[str] = []
-    for dirpath, dirnames, filenames in os.walk(repo_root):
-        dirnames[:] = [d for d in dirnames if d != ".git"]
-        for filename in filenames:
-            rel = (Path(dirpath) / filename).relative_to(repo_root)
-            files.append(rel.as_posix())
-    return files
+    return sorted(
+        path.relative_to(repo_root).as_posix()
+        for path in repository_files(repo_root)
+    )
 
 
 def resolve_cited_path(
@@ -284,6 +295,66 @@ def _is_explicit_path_citation_with_no_match(
     return len(matches) == 0
 
 
+def _exists_outside_the_candidate_set(repo_root: Path, cited_path: str) -> bool:
+    """True when a real file under `repo_root` ends with `cited_path`.
+
+    The explicit-path finding reads "zero repo-wide matches" as drift. That
+    reading was sound while the candidate set was every file on disk; it is
+    not sound now the set is git's, because a target that is merely ignored
+    (or inside a nested repository) is absent from the set while sitting on
+    disk, readable, exactly where the citation says. Reporting it missing
+    would be a FALSE finding — the failure class the smaller candidate set
+    exists to remove, in mirror image.
+
+    So before the finding is issued, and only then, the disk is consulted
+    directly. This walk is on the finding path only, never the clean path.
+    A hit sends the citation back to UNCHECKED rather than resolving it: the
+    file is outside what the document's repository owns, so it is not a
+    target this check can speak about — loud skipping, as everywhere else.
+
+    Working-tree only. The reviewed-SHA path (`check_doc_report_at_sha`)
+    takes its candidate set from `git ls-tree`, which this change did not
+    touch, and its citations are about a commit rather than the disk — so
+    the disk is not evidence there and is not consulted.
+
+    A foreign subtree inside the root is NOT this disk. A linked worktree or
+    a nested clone holds a whole second checkout; a file that exists only
+    there would suppress the finding on the developer's machine and produce
+    it in CI, where no such subtree exists. `repo_files.nested_worktrees` and
+    `repo_files.nested_repositories` name both shapes -- the same union
+    `scripts/run_package_tests.py:73` excludes -- and the walk is pruned at
+    them, so `IGNORED_DIRECTORY_NAMES` alone (which sees only a `.git`
+    DIRECTORY, never a worktree's `.git` FILE) is not relied on. A nested
+    clone at a path git ignores is the one shape not named: git lists no
+    entry for it, so a file only there still downgrades the finding.
+
+    The basename is compared literally, not matched: a cited path may contain
+    `*` or `[`, which a glob would read as a pattern over other files.
+    """
+    foreign = {
+        path.resolve()
+        for path in (*nested_worktrees(repo_root), *nested_repositories(repo_root))
+    }
+    suffix = "/" + cited_path
+    direct = repo_root / cited_path
+    if direct.is_file() and not foreign.intersection(direct.resolve().parents):
+        return True
+    basename = cited_path.rsplit("/", 1)[-1]
+    for directory, subdirectories, filenames in os.walk(repo_root):
+        here = Path(directory)
+        subdirectories[:] = [
+            name for name in subdirectories
+            if name not in IGNORED_DIRECTORY_NAMES
+            and (here / name).resolve() not in foreign
+        ]
+        if basename not in filenames:
+            continue
+        path = here / basename
+        if path.is_file() and path.as_posix().endswith(suffix):
+            return True
+    return False
+
+
 def check_citation(
     repo_root: Path,
     cited_path: str,
@@ -298,8 +369,10 @@ def check_citation(
     `resolve_cited_path`); `reason` is then always `None`. When
     `checked` is `True`, `reason` is a finding string for an
     out-of-range line, a missing anchor substring, or an unresolvable
-    EXPLICIT path citation (contains `/`, zero repo-wide matches — see
-    `_is_explicit_path_citation_with_no_match`), or `None` for a clean
+    EXPLICIT path citation (contains `/`, zero repo-wide matches, and no
+    such file on disk either — see
+    `_is_explicit_path_citation_with_no_match` and
+    `_exists_outside_the_candidate_set`), or `None` for a clean
     citation. A resolved target is by construction a real file, so
     "file not found" only fires via that explicit-path branch, never
     from a resolved `target` (round 2 — see module docstring).
@@ -316,7 +389,9 @@ def check_citation(
     """
     target = resolve_cited_path(repo_root, cited_path, repo_files)
     if target is None:
-        if _is_explicit_path_citation_with_no_match(cited_path, repo_files):
+        if _is_explicit_path_citation_with_no_match(
+            cited_path, repo_files
+        ) and not _exists_outside_the_candidate_set(repo_root, cited_path):
             return True, "file not found"
         return False, None
     file_text = target.read_text(encoding="utf-8", errors="replace")

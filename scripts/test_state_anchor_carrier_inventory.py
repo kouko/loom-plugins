@@ -31,9 +31,15 @@ from __future__ import annotations
 
 import re
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+sys.path.insert(0, str(REPO_ROOT / "loom-code" / "scripts"))
+
+from repo_files import repository_files  # noqa: E402
 
 PATTERN = re.compile(r"state anchor|state-anchor")
 
@@ -63,24 +69,27 @@ def scan_state_anchor_carriers(root: Path) -> dict[str, int]:
     EXCLUDED_RELATIVE_PATHS removed. Returns {posix relative path: hit count}
     for every file with >=1 hit; files with zero hits are absent from the
     map (matching how the file->hit-count pin is authored).
+
+    The population is the repository's own files under those `loom-*`
+    directories, per `repo_files.repository_files` — an ignored directory and a
+    linked worktree checked out inside the tree carry no live carrier, exactly
+    as `grep` with a `.gitignore`-aware tool would report.
     """
     counts: dict[str, int] = {}
-    for loom_dir in sorted(root.glob("loom-*")):
-        if not loom_dir.is_dir():
+    for path in sorted(repository_files(root)):
+        relative = path.relative_to(root)
+        if len(relative.parts) < 2 or not relative.parts[0].startswith("loom-"):
             continue
-        for path in sorted(loom_dir.rglob("*")):
-            if not path.is_file():
-                continue
-            rel = path.relative_to(root).as_posix()
-            if rel in EXCLUDED_RELATIVE_PATHS:
-                continue
-            try:
-                text = path.read_text(encoding="utf-8")
-            except (UnicodeDecodeError, OSError):
-                continue
-            hits = len(PATTERN.findall(text))
-            if hits:
-                counts[rel] = hits
+        rel = relative.as_posix()
+        if rel in EXCLUDED_RELATIVE_PATHS:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        hits = len(PATTERN.findall(text))
+        if hits:
+            counts[rel] = hits
     return counts
 
 
@@ -134,3 +143,28 @@ def test_scan_state_anchor_carriers_catches_a_removed_carrier(tmp_path):
     actual = scan_state_anchor_carriers(tmp_path)
     assert actual != EXPECTED_INVENTORY
     assert mutated_rel not in actual  # the carrier's only hit was removed
+
+
+def _git(repo: Path, *args: str) -> None:
+    subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True)
+
+
+def test_gitignored_dir_not_counted(tmp_path):
+    """A directory `.gitignore` excludes holds no carrier: its copy of the
+    phrase is build output, not a live mention to sweep."""
+    repo = tmp_path / "repo"
+    (repo / "loom-workflow" / "build").mkdir(parents=True)
+    (repo / ".gitignore").write_text("loom-workflow/build/\n", encoding="utf-8")
+    (repo / "loom-workflow" / "live.md").write_text(
+        "the state anchor discipline\n", encoding="utf-8"
+    )
+    (repo / "loom-workflow" / "build" / "generated.md").write_text(
+        "the state anchor discipline\n", encoding="utf-8"
+    )
+    _git(repo, "init", "-q")
+    _git(repo, "config", "user.email", "t@example.com")
+    _git(repo, "config", "user.name", "T")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "c")
+
+    assert scan_state_anchor_carriers(repo) == {"loom-workflow/live.md": 1}

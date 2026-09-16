@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from fnmatch import fnmatch
 from loom_checker.helpers import kickoff_defaults
 from pathlib import Path
+from repo_files import repository_files
 import os
 import re
 import shlex
@@ -85,14 +87,20 @@ def declared_test_command(repo: Path) -> tuple[str | None, str]:
     A recorded probe is compared against THIS, so that a command which
     exits 0 without running the suite cannot stand in for the suite. The
     repo's own KICKOFF-DEFAULTS line wins, because only the repo knows;
-    otherwise the same markers the build station reads are read here."""
+    otherwise the same markers the build station reads are read here.
+
+    The test-file scan asks `repo_files.repository_files` which files are
+    the repo's own: a walk of the directory also sees a linked worktree
+    checked out inside it, or ignored build output, and would report a
+    test command for a suite that is not this repository's."""
     declared = kickoff_defaults(repo).get("package-tests", "").strip()
     if declared:
         return declared, "docs/loom/KICKOFF-DEFAULTS.md"
     for markers, command in TEST_COMMAND_MARKERS:
         if any((repo / marker).is_file() for marker in markers):
             return command, f"detected {markers[0]}"
+    names = [path.name for path in repository_files(repo)]
     for pattern in ("test_*.py", "*_test.py"):
-        if next(repo.rglob(pattern), None) is not None:
+        if any(fnmatch(name, pattern) for name in names):
             return "python3 -m pytest -q", f"detected {pattern} files"
     return None, ""
