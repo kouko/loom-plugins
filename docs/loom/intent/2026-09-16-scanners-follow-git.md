@@ -42,8 +42,11 @@ walking the filesystem their own way.
 3. With a git linked worktree present inside this repository's directory, the
    package-test command collects no test file from inside that worktree.
 4. Extracted from the same commit with `git archive` into a copy that has no
-   `.git`, each of those six scanners still runs and reaches the same verdict
-   it reaches in the git checkout.
+   `.git`, the five archive-capable scanners named in Constraints still run and
+   reach the verdict they reach in the git checkout.
+   `loom-code/scripts/rehearse_probes.py` is the stated exception: it works by
+   cloning the repository, so it cannot run without git. In that copy it
+   reports an explicit skip naming that reason instead of failing.
 5. A violating file that git does not track and that `.gitignore` does not
    exclude is reported by the scanner whose rule it violates.
 6. A directory excluded by `.gitignore` produces no finding from any of those
@@ -63,7 +66,10 @@ walking the filesystem their own way.
   the package-test runner hands to pytest.
 - The ability to run these scanners in a `git archive` copy is already relied
   on and must be kept; `loom-code/scripts/test_write_plan_station_text.py:269`
-  documents that purpose.
+  documents that purpose. Five of the six are archive-capable; the exception is
+  `loom-code/scripts/rehearse_probes.py`, which clones the repository to do its
+  work and so depends on git by construction. That dependency predates this
+  change.
 - The fixed ignore-directory list keeps the names already in use in this
   repository (`__pycache__`, `node_modules`, `.pytest_cache` and the like); no
   new ignore convention is introduced.
@@ -73,7 +79,12 @@ walking the filesystem their own way.
   exclusion lists are left as they are.
 - Scanners that walk user data directories, such as the decision-map maps root.
 - Scanners that walk an installed-plugin copy in a temporary directory.
-- Changing what any scanner considers a violation.
+- Changing the rules by which a scanner decides something is a violation. The
+  set of files a scanner is shown does change — that is the point of this
+  change — so a verdict can move in either direction: a match that was
+  ambiguous because of an ignored or foreign copy can become unique and get
+  checked, and a target that is present but excluded by `.gitignore` becomes
+  unchecked rather than resolved.
 - Documenting the mechanism as an interface for callers outside loom's own
   gates, or promising its shape will stay stable for them. Nothing is added to
   prevent such a call; none is designed for.
