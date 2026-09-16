@@ -5,15 +5,31 @@
 the old name: everything under `docs/` and every `CHANGELOG*.md`. Everything
 else — the plugin folders, the root README, `scripts/`, `.github/` and
 `loom-code/contract/` — is live and is scanned.
+
+Which files are the repository's own is git's answer, taken from
+`repo_files.repository_files`: an ignored file and a linked worktree checked
+out inside the tree are not live paths of this repository. `docs/` stays in
+this scanner's own `SKIPPED_DIRS` — it is this rule's history exemption, not a
+generic ignore name. The loom-code module is reached across trees by sys.path,
+as `loom-design/scripts/spec/test_write_spec_contract.py` already does.
 """
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+sys.path.insert(0, str(REPO_ROOT / "loom-code" / "scripts"))
+
+from repo_files import repository_files  # noqa: E402
 OLD_NAME = "cot-" + "explain"
 
-SKIPPED_DIRS = {".git", ".pytest_cache", "__pycache__", "node_modules", "docs"}
+# This rule's own history exemption. The machinery names (`.git`,
+# `__pycache__`, …) that used to sit here belong to the file list and are not
+# repeated: a second copy of an ignore list is a second thing to drift.
+SKIPPED_DIRS = {"docs"}
 
 # Files that name the old skill on purpose: negative assertions, the rename
 # map that keeps a frozen baseline readable, and this scanner.
@@ -35,9 +51,7 @@ def _is_live(relative: Path) -> bool:
 def find_live_hits(root: Path, allowed: set[str] = frozenset()) -> list[str]:
     """Return `path:line` for every live mention of the old skill name."""
     hits: list[str] = []
-    for path in sorted(root.rglob("*")):
-        if not path.is_file():
-            continue
+    for path in sorted(repository_files(root)):
         relative = path.relative_to(root)
         if not _is_live(relative) or relative.as_posix() in allowed:
             continue
@@ -67,3 +81,43 @@ def test_scanner_flags_a_synthetic_live_hit_and_skips_history(tmp_path):
     changelog.write_text(OLD_NAME, encoding="utf-8")
 
     assert find_live_hits(tmp_path) == ["loom-workflow/skills/x/SKILL.md:1"]
+
+
+def _git(repo: Path, *args: str) -> None:
+    subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True)
+
+
+def _seed_repo(repo: Path) -> Path:
+    """A real git repository -- the behaviour under test is git's own."""
+    (repo / "loom-workflow" / "skills" / "x").mkdir(parents=True)
+    (repo / "loom-workflow" / "skills" / "x" / "SKILL.md").write_text(
+        "clean\n", encoding="utf-8"
+    )
+    _git(repo, "init", "-q")
+    _git(repo, "config", "user.email", "t@example.com")
+    _git(repo, "config", "user.name", "T")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", "c")
+    return repo
+
+
+def test_nested_worktree_produces_no_hits(tmp_path):
+    """A linked worktree checked out inside the repository is another
+    checkout of it; its files are not this repository's live paths."""
+    repo = _seed_repo(tmp_path / "repo")
+    _git(repo, "worktree", "add", "-q", "-b", "side", str(repo / "wt"))
+    (repo / "wt" / "loom-workflow" / "skills" / "x" / "SKILL.md").write_text(
+        OLD_NAME, encoding="utf-8"
+    )
+
+    assert find_live_hits(repo) == []
+
+
+def test_own_violation_still_reported(tmp_path):
+    """An untracked, unignored file of this repository is still scanned."""
+    repo = _seed_repo(tmp_path / "repo")
+    (repo / "loom-workflow" / "skills" / "x" / "OTHER.md").write_text(
+        OLD_NAME, encoding="utf-8"
+    )
+
+    assert find_live_hits(repo) == ["loom-workflow/skills/x/OTHER.md:1"]

@@ -7,8 +7,16 @@ path references to another ``loom-*`` plugin's private ``hooks/``, ``skills/``,
 or ``scripts/`` tree.  Plugin-qualified skill names such as
 ``loom-code:using-loom-code`` are public names and are therefore allowed.
 
-Pure stdlib.  ``find_boundary_violations`` is the hermetic test surface; the
-CLI exits non-zero and prints each violation when passed a plugin root.
+The Markdown it scans is what git says belongs to the repository under that
+plugin root, via ``repo_files.repository_files``: passing a subdirectory scopes
+the listing to that subtree, so an ignored directory and a linked worktree
+checked out inside the plugin contribute no violation.  That module ships with
+loom-code and is reached across trees by sys.path, as
+``loom-design/scripts/spec/test_write_spec_contract.py`` already does.
+
+Stdlib only, that module included.  ``find_boundary_violations`` is the
+hermetic test surface; the CLI exits non-zero and prints each violation when
+passed a plugin root.
 """
 
 from __future__ import annotations
@@ -18,6 +26,10 @@ import json
 import re
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "loom-code" / "scripts"))
+
+from repo_files import repository_files  # noqa: E402
 
 
 _LINK_RE = re.compile(r"\]\((?P<target>[^)]+)\)")
@@ -143,7 +155,10 @@ def find_boundary_violations(plugin_root: str | Path) -> list[str]:
     plugin_name = _plugin_name(root)
     violations: list[str] = []
 
-    for markdown in sorted(root.rglob("*.md")):
+    markdown_files = sorted(
+        path for path in repository_files(root) if path.suffix == ".md"
+    )
+    for markdown in markdown_files:
         if _is_archival_markdown(root, markdown):
             continue
         for line_number, line in enumerate(
