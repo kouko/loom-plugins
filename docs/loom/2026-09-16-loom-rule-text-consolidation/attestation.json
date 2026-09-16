@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-16-loom-rule-text-consolidation",
-  "content_digest": "0b576cee9f8ee377d5aedd2f87f805d9aa68f6bd",
+  "content_digest": "aef7435a228e4b858eac3a497c42b21fa66463cd",
   "executions": [
     {
       "kind": "package-tests",
