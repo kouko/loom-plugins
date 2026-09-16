@@ -53,6 +53,8 @@ copy instead of stopping at an unchanged version number.
 4. `loom-code` declares one new version above 3.7.0 across every place it states its version, and the repository's own consistency checks accept it.
 5. The repository's package tests and mechanism checks pass, and the number of registered mechanisms does not grow.
 6. When the agent asks or answers how to do something, the reminder it receives every turn states that doing nothing or later, a smaller version, and combining two options are each offered or ruled out, and both reminder variants still fit the word limit they already have.
+7. The reminder names the everyday conversation situations that carry a table — a progress report, a before and after, what each choice means, a readiness checklist, what is confirmed and what is not, findings, risks, and which environments are supported — so an agent reaches them without opening a separate file.
+8. Shaped content in a reply is a markdown table by default, and the drawn form is reserved for a destination that cannot render markdown, such as a code comment; no rule still tells the agent to prefer the drawn form because of the client it is running in.
 
 ## Constraints
 - user-decided (kouko, 2026-09-16): the reminder ships only from `loom-workflow`; `loom-code` and `loom-design` carry no copy of it.

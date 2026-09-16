@@ -44,9 +44,21 @@ charter: 1.0
 - Test: A3 positive: both-entries-validate-against-the-memory-profile; negative: entry-missing-sources-is-rejected.
 - Risk: both entries are recorded by invoking `loom-workflow:loom-memory`, which owns the profile and regenerates `index.md`; hand-written files and a hand-merged index are what its validator rejects. agent-decided.
 
+### Wave 2b — what the card triggers on, and which form it asks for
+
+**W2-03 The card names the conversation situations that carry a table**  after: W2-02  acceptance: 7
+- Files: `loom-workflow/skills/loom-visualization/assets/trigger-card.md`, `loom-workflow/skills/loom-visualization/assets/trigger-card-coexist.md`, `loom-workflow/rules/AGENTS.md`, `loom-workflow/scripts/test_visualization_card_hook.py`, `docs/loom/2026-09-16-plain-language-replies/evidence/probes/test_probe_prose_gate_mutants.py`
+- Test: A7 positive: both-cards-name-the-conversation-situations; boundary: both-cards-stay-within-their-cap.
+- Risk: the eight situations reach replies only through the card, as the guide is not read; the coexist card has one word of headroom, so the cap moves again if the wording does not fit. user-decided.
+
+**W2-04 Markdown table is the default form; ASCII is for plain-text destinations**  after: W2-03  acceptance: 8
+- Files: `loom-workflow/skills/loom-visualization/SKILL.md`, `loom-workflow/skills/loom-visualization/references/client-matrix.md`, `loom-workflow/skills/loom-visualization/scripts/test_templates.py`, `loom-workflow/skills/loom-visualization/scripts/detect_client.py`, `loom-workflow/skills/loom-visualization/scripts/test_detect_client.py`, `loom-workflow/scripts/test_recap_state_compaction.py`, `loom-workflow/skills/recap-state/SKILL.md`
+- Test: A8 positive: shaped-content-defaults-to-a-markdown-table; negative: remote-viewer-no-longer-forces-ascii.
+- Risk: the registered prose gate pins the words "markdown table plus ASCII", and a sibling skill pins the terminal-means-ASCII story, so both move with the rule. user-decided.
+
 ### Wave 3 — release
 
-**W3-01 loom-code 3.7.1 reaches installed copies**  after: W2-02  acceptance: 4, 5
+**W3-01 loom-code 3.7.1 reaches installed copies**  after: W2-04  acceptance: 4, 5
 - Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `README.md`
 - Test: A4 positive: every-loom-code-version-pin-reads-3-7-1; negative: one-stale-3-7-0-pin-fails. A5 positive: package-suite-and-check-mechanisms-green; negative: mechanism-count-growth-blocked.
 - Risk: the changelog has no entry for PR #19, #20 and #21, so 3.7.1 records them as well as the bump; without it the version moves with nothing stating why. agent-decided.
