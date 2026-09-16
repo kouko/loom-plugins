@@ -301,19 +301,25 @@ def _cap_raises(values_newest_first):
     return [(new, old) for new, old in reversed(pairs) if new > old]
 
 
-@pytest.mark.xfail(strict=True, reason="the repository's own memory entry "
-                                       "a-cap-raised-at-every-touch-is-not-a-cap: the cap went "
-                                       "150 -> 165 -> 181, two raises inside one change")
-def test_cardWordCap_historyOfTheCapLine_showsAtMostOneRaise():
-    """A cap raised more than once has become a running total, not a ceiling."""
+INTENT = ROOT / "docs" / "loom" / "intent" / "2026-09-16-plain-language-follow-ups.md"
+
+
+def test_cardWordCap_finalCap_equalsTheLimitTheIntentStates(hook_tests):
+    """The cap went 150 -> 165 -> 181; kouko kept 181 (2026-09-16, option A), so the
+    intent must state that limit and the committed cap must equal it — a later
+    raise without amending the intent fails here. The history counter below stays
+    as the self-test that the two raises are real."""
     proc = subprocess.run(
         ["git", "log", "--no-merges", "-p", "--format=%h",
          "--", "loom-workflow/scripts/test_visualization_card_hook.py"],
         capture_output=True, text=True, timeout=120, cwd=str(ROOT), check=True)
     values = [int(v) for v in CAP_LINE.findall(proc.stdout)]  # newest first
     assert values, "no MAX_CARD_WORDS line found in the file's history"
-    raises = _cap_raises(values)
-    assert len(raises) <= 1, f"cap raised {len(raises)} times: {raises}"
+    acceptance_6 = next(line for line in INTENT.read_text(encoding="utf-8").splitlines()
+                        if line.startswith("6. "))
+    stated = [int(n) for n in re.findall(r"\b(\d+)-word limit", acceptance_6)]
+    assert stated == [181], acceptance_6
+    assert values[0] == hook_tests.MAX_CARD_WORDS == stated[0]
 
 
 def test_capRaiseCounter_syntheticHistory_countsOnlyIncreases():

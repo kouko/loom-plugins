@@ -52,14 +52,14 @@ copy instead of stopping at an unchanged version number.
 3. The repository's memory store holds the two lessons from the previous change — that a phrase-presence test accepts a rule flipped to its opposite, and that an inline rule fired where routing prose did not — each with the evidence it came from.
 4. `loom-code` declares one new version above 3.7.0 across every place it states its version, and the repository's own consistency checks accept it.
 5. The repository's package tests and mechanism checks pass, and the number of registered mechanisms does not grow.
-6. When the agent asks or answers how to do something, the reminder it receives every turn states that doing nothing or later, a smaller version, and combining two options are each offered or ruled out, and both reminder variants still fit the word limit they already have.
+6. When the agent asks or answers how to do something, the reminder it receives every turn states that doing nothing or later, a smaller version, and combining two options are each offered or ruled out, and both reminder variants fit a 181-word limit, raised from 150 so the missed-alternatives check (W1-03) and the eight situations (W2-03) fit.
 7. The reminder names the everyday conversation situations that carry a table — a progress report, a before and after, what each choice means, a readiness checklist, what is confirmed and what is not, findings, risks, and which environments are supported — so an agent reaches them without opening a separate file.
 8. Shaped content in a reply is a markdown table by default, and the drawn form is reserved for a destination that cannot render markdown, such as a code comment; no rule still tells the agent to prefer the drawn form because of the client it is running in.
 
 ## Constraints
 - user-decided (kouko, 2026-09-16): the reminder ships only from `loom-workflow`; `loom-code` and `loom-design` carry no copy of it.
 - user-decided (kouko, 2026-09-16): the missed-alternatives check is stated in the reminder itself rather than recorded as guide-only, because the guide was opened in none of the six recorded trials while the inline rule reached every one of them.
-- The 150-word cap on each card stays as it is; wording that needs room is trimmed from non-rule text rather than raising the cap.
+- user-decided (kouko, 2026-09-16, option A): the cap on each card is 181 words, raised from 150 so the missed-alternatives check and the eight situations fit; it is not raised again within this change.
 - Committed artifacts stay in English.
 - Repository skill conventions hold: flat skill folders, the SKILL.md size cap, and no runtime citation of this repository's development records.
 - Whether an installed copy actually refreshes can only be observed after this change merges, by updating the plugin on kouko's machine; the blind run can prove the declared version and the checks, not the post-merge install.

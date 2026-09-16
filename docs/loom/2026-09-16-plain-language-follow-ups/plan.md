@@ -74,3 +74,4 @@ charter: 1.0
 2. Both cards are at the 150-word cap, so W1-02 trims non-rule wording a second time; the previous change already trimmed once, and further trimming may cost diagram guidance.
 3. Whether an installed copy refreshes can only be seen after this change merges and the plugin is updated on kouko's machine; the blind run proves the declared version and the checks only.
 4. The installed loom-code checker predates the trunk, so this branch's own runs still use the older station contracts until the bump lands and is installed.
+5. user-decided — kouko chose option A (2026-09-16): keep the card cap at 181 words, raised from 150 for W1-03 and W2-03; intent Acceptance 6 now states that limit.
