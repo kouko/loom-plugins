@@ -1,6 +1,7 @@
 """Tests for the independently-installable plugin boundary checker."""
 
 import json
+import subprocess
 from pathlib import Path
 
 
@@ -300,3 +301,31 @@ def test_a_real_sibling_plugin_name_is_never_exempt(tmp_path):
     )
 
     assert any("x.py" in v for v in checker.find_boundary_violations(plugin))
+
+
+def _git(repo: Path, *args: str) -> None:
+    subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True)
+
+
+def test_ignored_markdown_not_scanned(tmp_path):
+    """Markdown a `.gitignore` excludes is not this repository's file, so no
+    violation may be anchored inside it -- while a tracked one still is."""
+    import check_plugin_boundaries as checker
+
+    plugin = tmp_path / "loom-design"
+    _write(tmp_path / ".gitignore", "loom-design/build/\n")
+    violating = "Read `loom-code/hooks/family-relay.md` before dispatch.\n"
+    _write(plugin / "build" / "generated.md", violating)
+    tracked = _write(plugin / "skills" / "router" / "SKILL.md", violating)
+    _git(tmp_path, "init", "-q")
+    _git(tmp_path, "config", "user.email", "t@example.com")
+    _git(tmp_path, "config", "user.name", "T")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-q", "-m", "c")
+
+    violations = checker.find_boundary_violations(plugin)
+
+    assert violations == [
+        f"{tracked.resolve()}:1: sibling internal path: "
+        "loom-code/hooks/family-relay.md"
+    ]
