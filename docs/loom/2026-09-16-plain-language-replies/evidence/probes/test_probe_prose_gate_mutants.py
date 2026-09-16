@@ -58,8 +58,8 @@ CARD_MUTANTS = {
                                        r"Comparisons get a markdown table",
                                        "Comparisons never get a markdown table"),
     "coexist-align-verify-negated": (None, None,
-                                     r"Verify prescribed box diagrams",
-                                     "Never verify prescribed box diagrams"),
+                                     r"verify prescribed box diagrams",
+                                     "never verify prescribed box diagrams"),
     "language-negated": (r"in their language\. 1\)", "never in their language. 1)",
                          r"in their language\. 1\)", "never in their language. 1)"),
     "literal-negated": (r"3\) Be literal:", "3) Never literal:",
@@ -71,8 +71,8 @@ CARD_MUTANTS = {
 TRIM = (r"details after\.", "details.")
 # A coexist-only mutant trims only the coexist card, so it must not trim inside
 # rules 1-3 (those stay word-for-word identical to the full card) nor inside any
-# phrase the committed tests pin: trim rule 4's unpinned tail instead.
-COEXIST_TRIM = (r" FIRST, leading with its form\.", " FIRST.")
+# phrase the committed tests pin: trim the guide pointer's unpinned last word.
+COEXIST_TRIM = (r" `references/plain-language\.md` first\.", " `references/plain-language.md`.")
 
 
 def _card_tree(tmp: Path, name: str) -> Path:

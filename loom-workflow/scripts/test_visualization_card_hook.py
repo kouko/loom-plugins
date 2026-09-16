@@ -351,6 +351,7 @@ def card_word_errors(text):
 
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
 def test_cards_at_most_150_words(card):
+    """A1/A6 boundary both-cards-stay-within-150-words: the cap holds as rules are added."""
     assert card_word_errors(card.read_text(encoding="utf-8")) == []
 
 
@@ -389,6 +390,39 @@ def test_both_cards_state_inline_decision_rule(card):
 def test_card_without_inline_decision_rule_fails(card):
     """A7 negative: a card that only routes decisions to the guide, or negates the rule, is caught."""
     assert inline_decision_rule_errors(card) != []
+
+
+# A6: the three alternatives a "how do I" answer most often leaves out.
+MISSED_ALTERNATIVES = ("doing nothing or later", "a smaller version", "combining two")
+
+
+def missed_alternative_errors(text):
+    """Error when no card sentence names the three missed alternatives; empty = named."""
+    ok = any(DECISION_SCOPE in s and all(p in s for p in MISSED_ALTERNATIVES)
+             and not NEGATION.search(s)
+             for s in _sentences(text))
+    return [] if ok else ["missed alternatives not named inline"]
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_both_cards_name_the_three_missed_alternatives(card):
+    """A6 positive both-cards-name-the-three-missed-alternatives."""
+    assert missed_alternative_errors(card.read_text(encoding="utf-8")) == []
+
+
+@pytest.mark.parametrize("dropped", MISSED_ALTERNATIVES)
+def test_card_missing_one_missed_alternative_fails(dropped):
+    """A6 negative: a card that leaves out any one of the three is caught."""
+    flat = " ".join(FULL_CARD.read_text(encoding="utf-8").split())
+    assert dropped in flat
+    assert missed_alternative_errors(flat.replace(dropped, "", 1)) != []
+
+
+def test_negated_missed_alternatives_rejected():
+    """A6 negative: naming the three inside a negated clause does not count."""
+    assert missed_alternative_errors(
+        "When asking or answering how to do something, never cover doing nothing or later, "
+        "a smaller version, combining two.") != []
 
 
 def test_coexist_card_skip_sentence_names_the_skill():
