@@ -200,7 +200,7 @@ hook 只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。
 
 在 Claude Code 與 Codex 上，`loom-workflow` 透過 UserPromptSubmit hook，在你每次送出訊息時
 把 loom-visualization 的 visualization card（用使用者的語言回覆、結論先講、白話說明、
-照字面講不用比喻、用表格或圖）送給 agent，每輪最多增加 165 個英文字。以下情況收不到：
+照字面講不用比喻、用表格或圖）送給 agent，每輪最多增加 181 個英文字。以下情況收不到：
 
 - Codex IDE 擴充功能與 Codex app
 - Antigravity 桌面 app 與 IDE（plugin 的 hook 與 rule 只在 `agy` CLI 執行）

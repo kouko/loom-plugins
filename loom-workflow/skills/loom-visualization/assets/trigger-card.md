@@ -5,8 +5,10 @@ words; name an internal term, file path or rule id only when needed, in
 brackets after. 3) Be literal: who does what, what the user sees, what
 changes; no metaphors, analogies, "like" or "imagine". 4) Use tables or
 diagrams: before explaining comparisons of 2+ options, flows of 3+ steps,
-branching decisions, states or lifecycles, actor sequences, architectures or
-reasoning chains, or typing any box-drawing diagram (┌─┐, +--+), invoke
+branching decisions, states or lifecycles, actor sequences, architectures,
+reasoning chains, progress, a before and after, what each choice means,
+readiness, confirmed against unconfirmed, findings, risks or supported
+environments, or typing any box-drawing diagram (┌─┐, +--+), invoke
 `loom-visualization` FIRST and lead with its table or diagram. Skip
 loom-visualization for one-paragraph answers; never decorate. When asking or
 answering how to do something, offer 2+ workable options in a table,

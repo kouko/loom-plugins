@@ -218,7 +218,7 @@ is always on.
 On Claude Code and Codex, `loom-workflow` sends the visualization card for
 loom-visualization (reply in the user's language, conclusion first, plain words,
 literal wording, tables and diagrams) to the agent on every message you send,
-through a UserPromptSubmit hook; it adds up to 165 words per turn. It does not
+through a UserPromptSubmit hook; it adds up to 181 words per turn. It does not
 reach:
 
 - the Codex IDE extension or the Codex app;

@@ -340,7 +340,7 @@ def test_coexist_card_rules_one_to_three_match_full_card_word_for_word():
     """The coexist card is what toolkit users receive; rules 1-3 must not be compressed."""
     assert _rules_one_to_three(COEXIST_CARD) == _rules_one_to_three(FULL_CARD)
 
-MAX_CARD_WORDS = 165
+MAX_CARD_WORDS = 181
 
 
 def card_word_errors(text):
@@ -350,13 +350,13 @@ def card_word_errors(text):
 
 
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
-def test_cards_at_most_165_words(card):
-    """A1/A6 boundary both-cards-stay-within-165-words: the cap holds as rules are added."""
+def test_cards_at_most_181_words(card):
+    """A1/A6/A7 boundary both-cards-stay-within-their-cap: the cap holds as rules are added."""
     assert card_word_errors(card.read_text(encoding="utf-8")) == []
 
 
-def test_card_over_165_words_fails():
-    """A1 negative card-over-165-words-fails: a card padded past the cap is caught."""
+def test_card_over_181_words_fails():
+    """A1 negative card-over-the-cap-fails: a card padded past the cap is caught."""
     text = COEXIST_CARD.read_text(encoding="utf-8")
     padding = " word" * (MAX_CARD_WORDS + 1 - len(text.split()))
     assert card_word_errors(text + padding) != []

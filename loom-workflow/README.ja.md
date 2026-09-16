@@ -207,7 +207,7 @@ agy では loom-visualization の visualization card を plugin rule として�
 
 Claude Code と Codex では、`loom-workflow` が loom-visualization の visualization card
 （ユーザーの言語で返答、結論を先に、平易な言葉、比喩を使わない文字どおりの表現、表や図）を
-UserPromptSubmit hook で、メッセージを送るたびに agent に届ける。1 ターンあたり最大 165 語
+UserPromptSubmit hook で、メッセージを送るたびに agent に届ける。1 ターンあたり最大 181 語
 （英語）増える。次の環境には届かない：
 
 - Codex の IDE 拡張と Codex アプリ
