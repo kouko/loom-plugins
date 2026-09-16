@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-16-scanners-follow-git",
-  "content_digest": "e41e72d5084f81d05c74f1f87ade77b5090fa142",
+  "content_digest": "b8c59a85308ae2dc35e220e5eabf850781862793",
   "executions": [
     {
       "kind": "package-tests",
@@ -50,7 +50,7 @@
         {
           "severity": "nit",
           "anchor": "docs/loom/2026-09-16-scanners-follow-git/plan.md:39",
-          "text": "nitpick (non-blocking): the recorded decision point asks where to put the code in the source tree, which PRINCIPLES.md non-negotiable 1 does not allow; the user's answer was about the product."
+          "text": "nitpick (non-blocking): the recorded decision point asks where to put the code in the source tree instead of the product question the answer settled."
         }
       ]
     },
