@@ -13,6 +13,13 @@ by default, and it keeps a `git archive` copy working. A BARE repository is git
 even though `git rev-parse --show-toplevel` prints nothing there; it owns no
 work tree, so it owns no files, and the walk must not be reached.
 
+"No git" is decided by `--show-toplevel` printing nothing, so a checkout whose
+git is NOT installed, or whose repository git refuses (for example
+`safe.directory` dubious ownership), is walked as well -- and that walk lists
+the files of any nested worktree again, which the git path would have
+dropped. This module does not tell those cases apart; `rehearse_probes.py`
+does, with an upward check for a `.git` marker.
+
 The two paths agree on a tree that holds no foreign subtree, not on every tree:
 without git, `_walk_entries` drops a nested repository's `.git` marker but still
 walks that subtree and returns every other file in it, whereas the git path
@@ -66,21 +73,23 @@ def repository_files(root: Path | str) -> list[Path]:
 def nested_worktrees(root: Path | str) -> list[Path]:
     """Absolute paths of the git worktrees that live inside `root`.
 
-    `git worktree list --porcelain` lists every worktree of the repository,
+    `git worktree list --porcelain -z` lists every worktree of the repository,
     including the one `root` itself is in; only the ones strictly below `root`
     are returned, so the repository's own worktree is never one of them. The
     paths git prints are already resolved, so `root` is resolved before the
     comparison. No git, or a `root` outside any repository, is an empty list,
-    not an error -- the callers have nothing to exclude in that case.
+    not an error -- the callers have nothing to exclude in that case. `-z`
+    NUL-terminates each field, so a path holding a newline stays one path
+    (https://git-scm.com/docs/git-worktree, git >= 2.36).
     """
     root = Path(root).resolve()
-    listing = run_git(root, "worktree", "list", "--porcelain")
+    listing = run_git(root, "worktree", "list", "--porcelain", "-z", strip=False)
     if listing is None:
         return []
     paths = [
-        Path(line[len("worktree "):])
-        for line in listing.splitlines()
-        if line.startswith("worktree ")
+        Path(field[len("worktree "):])
+        for field in listing.split("\0")
+        if field.startswith("worktree ")
     ]
     return sorted(path for path in paths if path != root and root in path.parents)
 
@@ -94,12 +103,21 @@ def nested_repositories(root: Path | str) -> list[Path]:
     entry instead of listing its contents. Naming them lets a caller that
     must EXCLUDE those subtrees (rather than list files) use the same answer
     the scanners use. No git here is an empty list, not an error.
+
+    A symlink is excluded even when it points at a directory: git records it
+    as a symlink blob (mode 120000), never as a collapsed subtree, and
+    `is_dir` alone follows it -- naming it would make a caller exclude the
+    real directory it points at. `not is_symlink()` is preferred over
+    requiring a `.git` marker inside because a gitlink whose submodule is
+    not checked out is still an empty real directory git collapsed.
     """
     root = Path(root)
     entries = _git_entries(root)
     if entries is None:
         return []
-    return sorted({path for path in entries if path.is_dir()})
+    return sorted(
+        {path for path in entries if path.is_dir() and not path.is_symlink()}
+    )
 
 
 def _git_entries(root: Path) -> list[Path] | None:

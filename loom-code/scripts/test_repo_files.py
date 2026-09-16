@@ -239,3 +239,31 @@ def test_nested_repositories_is_empty_without_git(tmp_path: Path) -> None:
     _write(plain, "a.py")
 
     assert nested_repositories(plain) == []
+
+
+def test_nested_repositories_ignores_a_tracked_symlink_to_a_directory(
+    tmp_path: Path,
+) -> None:
+    """A tracked symlink is one `--cached` entry that `is_dir` follows; it is
+    not a collapsed foreign subtree, and naming it would make callers
+    exclude the real directory it points at."""
+    repo = tmp_path / "repo"
+    _init_repo(repo)
+    _write(repo, "real/sub/test_a.py")
+    (repo / "link").symlink_to("real/sub", target_is_directory=True)
+    _commit(repo)
+
+    assert nested_repositories(repo) == []
+
+
+def test_nested_worktrees_finds_a_worktree_whose_path_holds_a_newline(
+    tmp_path: Path,
+) -> None:
+    repo = tmp_path / "repo"
+    _init_repo(repo)
+    _write(repo, "kept.py")
+    _commit(repo)
+    odd = repo / "odd\nname"
+    _git(repo, "worktree", "add", "-q", "-b", "wt-branch", str(odd))
+
+    assert nested_worktrees(repo) == [odd.resolve()]
