@@ -207,8 +207,9 @@ def test_ordinary_conversation_reaches_the_same_procedure() -> None:
     sentence = affirmative(
         router, "`loom_checker.py selection propose <change-id> --origin user`", ("follow",))
     assert "asks in their own words to run or skip Loom steps" in sentence
-    assert "wait for the typed confirmation" in sentence
-    assert 'a plain "yes" binds nothing' in sentence
+    assert 'a plain "yes" binds nothing' not in _flat(router)
+    assert "Only that typed confirmation applies." in _flat(_skill())
+    assert 'A reply such as "yes" or "對" binds nothing' in _flat(_skill())
 
     sentence = affirmative(_skill(), "from ordinary conversation", ("applies",))
     assert "the user still types the confirmation" in sentence
@@ -266,9 +267,54 @@ def test_suggestion_then_plain_yes_skips_nothing(repo: Path) -> None:
     assert json.loads(_selection(repo, "show", CHANGE).stdout)["skip"] == ["reviewers", "adversarial"]
 
 
+SELECTION_READ = "At entry, run `loom_checker.py selection show <change-id>` and omit"
+EXPERT_MODE_POINTER = ("skip suggestions and user requests follow "
+                       "[expert-mode](../expert-mode/SKILL.md).")
+MOVED_RULES = ("at most once per change", "--origin agent", 'a plain "yes" binds nothing',
+               "asks in their own words")
+
+
+def assert_station_points_to_expert_mode(text: str) -> None:
+    """One affirmative sentence reads the bound selection and points to
+    expert-mode; the suggestion rules live only in expert-mode."""
+    flat = _flat(text)
+    assert flat.count(SELECTION_READ) == 1, "selection show step missing or repeated"
+    assert flat.count(EXPERT_MODE_POINTER) == 1, "expert-mode pointer missing or repeated"
+    sentence = affirmative(text, "`loom_checker.py selection show <change-id>` and omit", ("run",))
+    assert sentence.endswith(EXPERT_MODE_POINTER), sentence
+    for rule in MOVED_RULES:
+        assert rule.lower() not in flat.lower(), rule
+
+
 @pytest.mark.parametrize("station", STATIONS)
-def test_station_text_suggests_once_without_waiting(station: str) -> None:
+def test_station_one_sentence_points_to_expert_mode(station: str) -> None:
     text = (PLUGIN_ROOT / "skills" / station / "SKILL.md").read_text(encoding="utf-8")
+    assert_station_points_to_expert_mode(text)
+
+
+GOOD_STATION = ("Intro. At entry, run `loom_checker.py selection show <change-id>` and omit "
+                "only the steps it lists as skipped; " + EXPERT_MODE_POINTER + " Next.")
+
+
+def test_station_pointer_helper_accepts_the_pointer_sentence() -> None:
+    assert_station_points_to_expert_mode(GOOD_STATION)
+
+
+@pytest.mark.parametrize("mutant", [
+    GOOD_STATION.replace(SELECTION_READ, "At entry, omit"),
+    GOOD_STATION.replace(" and omit only", " and do not omit"),
+    GOOD_STATION.replace(EXPERT_MODE_POINTER, "see expert-mode."),
+    GOOD_STATION + " " + GOOD_STATION,
+    GOOD_STATION + ' A plain "yes" binds nothing.',
+], ids=["station-missing-selection-show-step", "negated", "pointer-missing",
+        "repeated", "rule-restated"])
+def test_station_pointer_helper_rejects_mutants(mutant: str) -> None:
+    with pytest.raises(AssertionError):
+        assert_station_points_to_expert_mode(mutant)
+
+
+def test_expert_mode_holds_the_suggestion_rules_once() -> None:
+    text = _skill()
     sentence = affirmative(text, "at most once per change", ("may suggest",))
     assert "`loom_checker.py selection propose <change-id> --origin agent`" in sentence
     assert "keeps working on the full process at once" in sentence
@@ -276,3 +322,4 @@ def test_station_text_suggests_once_without_waiting(station: str) -> None:
             "(Codex: `$expert-mode`) with the code shown)") in sentence
     assert 'a plain "yes" binds nothing' in sentence
     assert _flat(text).count("at most once per change") == 1
+    assert _flat(text).count("--origin agent") == 1

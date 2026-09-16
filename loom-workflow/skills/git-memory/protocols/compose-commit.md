@@ -150,7 +150,7 @@ Skip the diagram for trivial changes.
 ### Delegated loom close-out exception
 
 Evaluate this condition before any confirmation action. When
-`loom-code:finishing-a-development-branch` delegates this protocol and the
+`loom-code:ship` delegates this protocol and the
 initiating request already authorizes the commit and any requested push or PR,
 the close-out orchestrator owns consent. Git-memory drafts the memory carrier
 and does not re-confirm that authorized publish action. It may proceed only

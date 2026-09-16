@@ -142,6 +142,66 @@ def test_no_loom_doc_says_review_runs_groups_once(doc: Path) -> None:
     assert not offending, f"{doc}: review still owns the adversary or a run-once suite: {offending}"
 
 
+def _written_by_cell(row_key: str) -> str:
+    row = next(
+        line for line in LOOM_README.read_text(encoding="utf-8").splitlines()
+        if line.startswith("|") and row_key in line
+    )
+    return row.split("|")[-2].strip()
+
+
+def test_loom_readme_written_by_names_no_retired_review_station() -> None:
+    """A1 negative (readme-written-by-names-retired-review-station): the
+    change-folder row credits `closing-review`, the live station name."""
+    cell = _written_by_cell("`<change-id>/`")
+    assert "closing-review" in cell, cell
+    assert not re.search(r"(?<!-)\breview\b", cell), f"retired station name in {cell!r}"
+
+
+REVIEW_TO_ADVERSARY = re.compile(r"\breview\s*→\s*adv\b", re.IGNORECASE)
+# Retired flow vocabulary: attack catalogue, review.json, lanes, the Build
+# memory step, reviewed_sha→HEAD^.
+STALE_LOOM_README = re.compile(
+    r"attack-catalogue|review\.json|車道|\blanes?\b|memory step|reviewed_sha",
+    re.IGNORECASE,
+)
+
+
+def _sequence_messages(text: str) -> list[dict]:
+    match = re.search(r"```json\n(.*?)\n```", text, re.DOTALL)
+    assert match, "no JSON sequence payload"
+    return json.loads(match.group(1))["messages"]
+
+
+def _review_dispatches_adversary(text: str) -> list[str]:
+    rows = [u for u in _units(text) if REVIEW_TO_ADVERSARY.search(u)]
+    rows += [
+        m["label"] for m in _sequence_messages(text)
+        if m["from"] == "review" and m["to"] == "adv"
+    ]
+    return rows
+
+
+def test_readme_adversary_at_build_end_no_lanes_no_review_json() -> None:
+    text = LOOM_README.read_text(encoding="utf-8")
+    messages = _sequence_messages(text)
+    adv = [i for i, m in enumerate(messages) if m["to"] == "adv"]
+    impl = [i for i, m in enumerate(messages) if m["to"] == "impl" and m["from"] == "build"]
+    assert adv and impl and min(adv) > max(impl), "Build dispatches the adversary only after implementation"
+    assert all(messages[i]["from"] == "build" for i in adv), "only Build dispatches the adversary"
+    assert not STALE_LOOM_README.findall(text), STALE_LOOM_README.findall(text)
+
+
+def test_readme_review_dispatches_adversary_rejected() -> None:
+    assert not _review_dispatches_adversary(LOOM_README.read_text(encoding="utf-8"))
+    seeded = (
+        "| 4a | review→adv | extra attacks |\n\n"
+        '```json\n{"participants": [], "messages": '
+        '[{"from": "review", "to": "adv", "label": "8"}]}\n```\n'
+    )
+    assert len(_review_dispatches_adversary(seeded)) == 2
+
+
 def test_units_catch_seeded_closing_review_adversary_sentence() -> None:
     seeded = (
         "- **Build and review** — `build` implements each task.\n"

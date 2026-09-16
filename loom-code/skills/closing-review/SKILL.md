@@ -21,39 +21,17 @@ the remaining work.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 it lists as skipped; §2 and §3 say how skipped reviewers, adversarial and
-blind-run are handled. The agent may suggest skipping steps at most once per change: it
-runs `loom_checker.py selection propose <change-id> --origin agent`, shows the
-table and the confirmation line (type `/loom-code:expert-mode` (Codex:
-`$expert-mode`) with the code shown), and keeps working on the full process at
-once; a plain "yes" binds nothing. When the user asks in their own words to run
-or skip Loom steps, read ../expert-mode/SKILL.md and follow it with
-`--origin user`.
+blind-run are handled; skip suggestions and user requests follow
+[expert-mode](../expert-mode/SKILL.md).
 
 ## 2. Compute review depth
 
-Before every host-native dispatch, the station must read the
-[shared dispatch profile](../../references/dispatch-profile.md), classify the
-task from its evidence, and resolve the atomic model-and-effort profile against
-the selected model's verified host capabilities. Record the requested and
-effective profile with its evidence-grounded reason in active task context only.
-Apply the resolved overrides at invocation time; a static model or effort pin in
-an agent contract is invalid. Repeat this resolution for every reviewer,
-second-vendor reviewer, and blind runner dispatch; role and round labels supply
-no routing evidence.
-
-Invoke `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py` from Claude
-Code or `python3 <loom-code>/scripts/dispatch_profile.py` from any other host,
-where `<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude
-Code; on any other host it is the directory two levels above this SKILL.md.
-Supply the explicit observed JSON defined by the shared contract
-before each spawn. Pass its deterministic JSON result to the host-native spawn:
-apply both fields from `overrides`, or apply neither when it is `null`. Feed
-every completed result back as an `after-execution` event before any
-redispatch. Describe an omitted or wrong
-review obligation as a post-execution capability-quality failure only when it
-meets the contract's checkable definition; describe rejected routing
-parameters as a pre-execution host rejection, which selects the one atomic
-fallback instead of model escalation.
+Before every host-native dispatch, the station must resolve the model-and-effort
+profile as the [shared dispatch profile](../../references/dispatch-profile.md)
+defines and apply its result. Repeat this resolution for every reviewer,
+second-vendor reviewer, and blind runner dispatch. `<loom-code>` (this plugin's
+root) is `${CLAUDE_PLUGIN_ROOT}` on Claude Code; on any other host it is the
+directory two levels above this SKILL.md.
 
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
@@ -242,7 +220,7 @@ which is still not a branch opened only to record something.
 Almost nothing qualifies. Most of what a review surfaces is not a durable
 lesson: a one-off implementation slip belongs in its commit message, a
 verification result in this change's evidence, an unfinished item in an
-intent or a backlog entry. Zero to one durable lesson per change is the
+intent. Zero to one durable lesson per change is the
 normal outcome. This passage states the moment and the bar; it invokes
 nothing, requires no plugin to be installed, and asks for no decision from
 the user.

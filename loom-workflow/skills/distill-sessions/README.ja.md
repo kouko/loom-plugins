@@ -67,8 +67,8 @@ skill は multi-stage pipeline で動く：
               ▼
        JSON payload (stdout) + Markdown summary (stderr)
               │
-              ▼  Stage 3: orchestrator が loom-code:dispatching-parallel-agents
-              │   経由で subagent を dispatch
+              ▼  Stage 3: orchestrator が subagent を
+              │   並列で dispatch
               │   - (skill, session) ごとに Haiku-4.5 subagent 1 つ
               │   - friction に応じて failure / success prompt を選択
               ▼
@@ -90,7 +90,7 @@ skill は multi-stage pipeline で動く：
 ### v0.3 の主要機能
 
 - **クロススキル friction-density routing** — session が複数の
-  対象 skill を invoke した場合（e.g. brainstorming + writing-plans）、
+  対象 skill を invoke した場合（e.g. write-plan + build）、
   Memory Items はそのセッション内で最も高い severity score を持つ
   skill にルートされる — 字句的に最初の skill ではない。これにより
   feedback は friction の original owner となる skill に帰属される。
@@ -150,10 +150,10 @@ python3 main.py
 
 ## Top skills
 
-- **loom-code:writing-plans**
+- **loom-code:write-plan**
   - session `2026-05-20-...`: friction=high, events=12
   - session `2026-05-18-...`: friction=mid,  events=7
-- **loom-code:brainstorming**
+- **loom-code:build**
   - session `2026-05-19-...`: friction=mid,  events=5
 ...
 ```

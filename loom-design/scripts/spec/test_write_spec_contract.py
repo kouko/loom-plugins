@@ -341,12 +341,19 @@ def test_intake_station_argument_is_this_station() -> None:
 
 def test_risk_triggered_spec_review_contract() -> None:
     text = _text()
-    assert "loom-code:closing-review" in text
+    assert "loom-code:closing-review" not in text
+    assert "`loom-code:reviewer`" in text
     assert "loom-code:write-plan" in text
     assert "pre-build-review: required|not-required — <reason>" in text
     assert "spec+adversarial" in text
-    assert "do not dispatch\n   a blind runner or a separate adversary" in text
+    assert "do not dispatch a blind runner, a separate adversary, or `finalize-review`" in _flat(text)
     assert "If `pre-build-review: not-required`" in text
+
+
+def test_one_way_door_copy_states_it_is_deliberate() -> None:
+    text = _text()
+    assert "cannot read from here" not in _flat(text)
+    assert _affirmed(text, "`one-way-door.md`", "copy")
 
 
 def test_spec_risk_classes_are_explicit() -> None:

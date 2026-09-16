@@ -16,44 +16,18 @@ write the `ratified-by:` line. `DESIGN.md` documents the product's
 **visual system only** — brand, color, type, spacing, elevation, shape,
 and component tokens — never flows, screens, or navigation.
 
-## Station summary
-
-| station | artifact | who decides | checker | checkpoint |
-|---|---|---|---|---|
-| capture-intent | intent — `docs/loom/intent/<change-id>.md`; `PRINCIPLES.md` and `DESIGN.md` at the repo root are side outputs of the tools it calls | user — decision point ① | `intent.schema`, `intent.product-no-identifiers`, `intent.needs-design-reason`, `intent.needs-design-recompute` | N/A |
-| write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no blind run; `not-required`: none |
-| write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | no formal plan review; invokes the required spec review only when it authored the spec |
-| build | diff — commits on the change branch | agent-decided | task and integration tests; at the end of Build, an independent adversary's committed adversarial programs and the complete package suite, which must pass before hand-off | no formal review during Build; one closing review follows completed functional work |
-| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus a blind-run report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |
-| ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.attestation` plus fast publication safety; no functional replay | before push; publication-only fixes reuse matching evidence |
-| maintain | intent — a fresh `docs/loom/intent/<change-id>.md` | agent (dedupe is mechanical) | `intent.schema`, `intent.needs-design-reason`, `intent.needs-design-recompute`, `intent.product-no-identifiers` on a new intent | before hand-off to write-plan |
-
 ## Step 0 — Check the contract version
 
-This tool's artifact is defined by `loom-code`'s contract package, so
-refuse to run against a version that does not declare it.
-
-Plugins cannot read each other's files, so there is no
-`${CLAUDE_PLUGIN_ROOT}` path that reaches `loom-code` from here. Find its
-checkout on this host:
-
-| Host | Where `loom-code` lives |
-|---|---|
-| Claude Code | the plugin cache — `~/.claude/plugins/cache/<marketplace>/loom-code/<version>/`, one directory per installed version; take the newest |
-| Codex CLI, Antigravity CLI | on any other host: this plugin's root is the directory two levels above this SKILL.md, and if its parent directory is named `loom-design` (a versioned install) the root is that parent instead; the `loom-code` directory sits next to this plugin's root and it may contain one version subdirectory holding the plugin files — use the newest |
-
-Then run, with that directory in place of `<loom-code>`:
+Locate the `loom-code` directory as
+`../capture-intent/references/locate-loom-code.md` says, then run, with that
+directory in place of `<loom-code>`:
 
 ```
 python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
 ```
 
-Exit 0: continue. Anything else, the rule is `contract.requires`: print
-what the checker printed, tell the user to update `loom-code`, and
-**stop**. Do not work around it and do not guess a path.
-
-If the installed checker cannot be found on Codex, stop and ask the user to
-install or update `loom-code`; do not create a repository-local copy.
+Exit 0: continue. On any other result, or when the checkout cannot be found,
+follow that reference's failure rule and **stop**.
 
 ## Step 1 — When to run
 

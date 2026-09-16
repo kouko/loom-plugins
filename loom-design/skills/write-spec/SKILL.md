@@ -60,31 +60,16 @@ verified is ever put to you, at this station or any other.
 
 ## Step 0 — Check the contract version
 
-This station's artifacts are defined by `loom-code`'s contract package, so
-refuse to run against a version that does not declare them.
-
-Plugins cannot read each other's files, so there is no
-`${CLAUDE_PLUGIN_ROOT}` path that reaches `loom-code` from here. Find its
-checkout on this host:
-
-| Host | Where `loom-code` lives |
-|---|---|
-| Claude Code | the plugin cache — `~/.claude/plugins/cache/<marketplace>/loom-code/<version>/`, one directory per installed version; take the newest |
-| Codex CLI, Antigravity CLI | on any other host: this plugin's root is the directory two levels above this SKILL.md, and if its parent directory is named `loom-design` (a versioned install) the root is that parent instead; the `loom-code` directory sits next to this plugin's root and it may contain one version subdirectory holding the plugin files — use the newest |
-
-Then run, with that directory in place of `<loom-code>`:
+Locate the `loom-code` directory as
+`../capture-intent/references/locate-loom-code.md` says, then run, with that
+directory in place of `<loom-code>`:
 
 ```
 python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
 ```
 
-Exit 0: continue. Anything else, the rule is `contract.requires`: print
-what the checker printed, tell the user to update `loom-code`, and
-**stop**. Do not work around it and do not guess a path — if you cannot
-find the checkout, say so and ask the user where `loom-code` is installed.
-
-If the installed checker cannot be found on Codex, stop and ask the user to
-install or update `loom-code`; do not create a repository-local copy.
+Exit 0: continue. On any other result, or when the checkout cannot be found,
+follow that reference's failure rule and **stop**.
 
 ## Step 1 — Intake
 
@@ -218,9 +203,9 @@ turns a behaviour confirmation into a quality review the user cannot do.
 
 2. **The one-way doors of this change**, in consequence form, in this same
    message. A one-way door is a choice that is expensive or impossible to
-   undo. The reference that defines them lives in `loom-code`'s
-   `write-plan` station — the file `one-way-door.md` in that skill's own
-   references directory, which you cannot read from here; the classes are:
+   undo. The classes are a deliberate copy of `one-way-door.md` in
+   `loom-code`'s `write-plan` references, kept until cross-plugin copies are
+   merged:
    **(a)** hard to swap later — framework, language, database,
    authentication, hosting, package manager; **(b)** creates money or a
    standing obligation — paid services, third-party APIs needing an
@@ -318,12 +303,14 @@ that section.
 ## Step 4 — Commit, conditionally review, hand off
 
 1. Commit the spec with the message `docs(loom): spec <change-id>`.
-2. If `pre-build-review: required`, hand it to **`loom-code:closing-review`** with
-   scope `spec`, pasting the question list verbatim. Dispatch one
-   fresh-context reviewer whose lens is `spec+adversarial`; do not dispatch
-   a blind runner or a separate adversary. You are not the reviewer. If it
-   returns NEEDS_REVISION, close each finding, commit, and send only those
-   fixes back to that reviewer. If it passes, continue.
+2. If `pre-build-review: required`, dispatch one fresh-context
+   **`loom-code:reviewer`** yourself with lens `spec+adversarial`, the
+   spec commit's parent (`<spec-commit>^`) as `reviewed_sha`, and the intent
+   and spec as ground truth. You are not the reviewer; do not dispatch a blind runner, a
+   separate adversary, or `finalize-review`. If it returns NEEDS_REVISION,
+   close each finding, commit, and send only those fixes back to that
+   reviewer.
+   If it passes, continue.
 3. If `pre-build-review: not-required`, do not create a formal spec review;
    continue directly. This declaration never changes branch-end reviewer
    requirements.
