@@ -66,7 +66,7 @@ def _sub_once(text: str, pattern: str, repl: str) -> str:
     return new
 
 
-# ---------- 1. the affirmative-verb guards accept a modal softener ----------
+# ---------- 1. the affirmative-verb guards reject a modal softener (flipped with the fix) ----------
 
 # Each entry: the guard helper's name, and a card sentence that keeps every
 # pinned literal, carries no token in the guard's NEGATION list, and still
@@ -86,9 +86,9 @@ SOFTENED = {
 
 
 @pytest.mark.parametrize("guard", sorted(SOFTENED))
-def test_cardGuard_modalSoftenedObligation_passesUncaught(hook_tests, guard):
-    """A `you may` / `it is optional to` card keeps every literal and clears the guard."""
-    assert getattr(hook_tests, guard)(SOFTENED[guard]) == [], guard
+def test_cardGuard_modalSoftenedObligation_isRejected(hook_tests, guard):
+    """A `you may` / `it is optional to` card keeps every literal but the guard now rejects it."""
+    assert getattr(hook_tests, guard)(SOFTENED[guard]) != [], guard
 
 
 def test_cardGuard_imperativeObligation_passesAsIntended(hook_tests):
@@ -109,8 +109,9 @@ def test_cardGuard_negatedObligation_isRejectedAsIntended(hook_tests):
 # ---------- 2. the guards' negation vocabulary is narrower than the sibling gate's ----------
 
 # `test_templates.py` rejects not|never|no|none|without|unless|except|avoid and any
-# `n't`; the card hook's NEGATION knows only never|not|no|avoid|don't. These
-# sentences negate the rule using a token only the wider list carries.
+# `n't`; the card hook's NEGATION knew only never|not|no|avoid|don't. These
+# sentences negate the rule using a token only the wider list carried; the hook
+# now shares the wider list, so each is rejected.
 NEGATED_PAST_THE_GUARD = {
     "without": f"{SCOPE}, answer without listing doing nothing or later, a smaller version, "
                "and combining two.",
@@ -122,11 +123,11 @@ NEGATED_PAST_THE_GUARD = {
 
 
 @pytest.mark.parametrize("token", sorted(NEGATED_PAST_THE_GUARD))
-def test_cardGuardNegation_tokenOutsideItsVocabulary_passesUncaught(hook_tests, token):
-    """A negation the sibling gate rejects clears the card guard untouched."""
+def test_cardGuardNegation_siblingGateToken_isRejected(hook_tests, token):
+    """A negation the sibling gate rejects is now rejected by the card guard too."""
     text = NEGATED_PAST_THE_GUARD[token]
-    assert hook_tests.missed_alternative_errors(text) == [], token
-    assert hook_tests.NEGATION.search(text) is None, token
+    assert hook_tests.missed_alternative_errors(text) != [], token
+    assert hook_tests.NEGATION.search(text) is not None, token
 
 
 def test_cardGuardNegation_widerVocabularyOfSiblingGate_catchesEveryToken():

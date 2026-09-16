@@ -274,7 +274,12 @@ PLAIN_RULES = {
 }
 
 
-NEGATION = re.compile(r"\b(?:never|not|no|avoid|don't)\b", re.I)
+# Same negation words as the sibling gate's NEGATION_RE in
+# skills/loom-visualization/scripts/test_templates.py, plus modal softeners that
+# turn an obligation into a choice.
+NEGATION_WORDS = ("not", "never", "no", "none", "without", "unless", "except", "avoid")
+SOFTENERS = ("may", "optional", "optionally", "if you like", "if you want")
+NEGATION = re.compile(r"\b(?:%s)\b|n't" % "|".join(NEGATION_WORDS + SOFTENERS), re.I)
 # Rule 3's ban list is the one negation a rule sentence must keep.
 METAPHOR_BAN = 'no metaphors, analogies, "like" or "imagine"'
 
@@ -327,6 +332,24 @@ def test_negated_card_rule_rejected(old, new):
     flat = " ".join(text.split())
     assert old in flat
     assert rule_polarity_errors(flat.replace(old, new, 1)) != []
+
+
+def test_negation_vocabulary_matches_sibling_gate():
+    """The card guard knows every negation word the template gate rejects."""
+    gate = (Path(__file__).resolve().parent.parent / "skills" / "loom-visualization"
+            / "scripts" / "test_templates.py")
+    words = re.search(r"NEGATION_RE = re\.compile\(r\"\\b\(\?:([a-z|]+)\)", gate.read_text(encoding="utf-8"))
+    assert words, "NEGATION_RE not found in test_templates.py"
+    assert set(words.group(1).split("|")) == set(NEGATION_WORDS)
+
+
+@pytest.mark.parametrize("sentence", [
+    "answer without listing it", "it isn't required", "skip it unless asked",
+    "none of these apply", "all except this", "you may list it", "it is optional",
+    "list it if you like",
+])
+def test_negation_catches_softened_or_negated_sentence(sentence):
+    assert NEGATION.search(sentence)
 
 
 def _rules_one_to_three(card):
