@@ -452,6 +452,64 @@ def test_negated_missed_alternatives_rejected():
         "a smaller version, combining two.") != []
 
 
+# A7: the everyday conversation situations that carry a table. One per situation
+# table in the guide (`references/plain-language.md`), which recorded runs show is
+# not opened — so a situation named only there never reaches a reply.
+SITUATIONS = {
+    "progress report": r"\bprogress\b",
+    "before and after": r"\bbefore and after\b",
+    "what each choice means": r"what each choice means",
+    "readiness checklist": r"\breadiness\b",
+    "confirmed against unconfirmed": r"confirmed against unconfirmed",
+    "findings": r"\bfindings\b",
+    "risks": r"\brisks\b",
+    "supported environments": r"supported environments",
+}
+
+
+def _flat_body(card):
+    """The card's prose as one line, header dropped."""
+    return " ".join(" ".join(card.read_text(encoding="utf-8").splitlines()[1:]).split())
+
+
+def situation_errors(text):
+    """Situations no affirmative trigger sentence names; empty = every situation is named."""
+    body = " ".join(s for s in _trigger_phrases(text) if not NEGATION.search(s))
+    return [name for name, pat in SITUATIONS.items() if not re.search(pat, body, re.I)]
+
+
+@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
+def test_both_cards_name_the_conversation_situations(card):
+    """A7 positive both-cards-name-the-conversation-situations."""
+    assert situation_errors(_flat_body(card)) == []
+
+
+def test_card_naming_only_data_shapes_fails():
+    """A7 negative: a trigger list of data shapes alone leaves every situation out."""
+    assert situation_errors(
+        "4) Use tables or diagrams: before explaining comparisons of 2+ options, flows of 3+ "
+        "steps, states or reasoning chains, invoke `loom-visualization` FIRST."
+    ) == list(SITUATIONS)
+
+
+@pytest.mark.parametrize("dropped", list(SITUATIONS))
+def test_card_missing_one_situation_fails(dropped):
+    """A7 negative: dropping any one situation from the trigger list is caught."""
+    flat = _flat_body(FULL_CARD)
+    mutated = re.sub(SITUATIONS[dropped], "", flat, count=1, flags=re.I)
+    assert mutated != flat, dropped
+    assert situation_errors(mutated) == [dropped]
+
+
+def test_situations_named_in_a_negated_sentence_do_not_count():
+    """A7 negative: naming the situations inside a negated trigger sentence does not count."""
+    assert situation_errors(
+        "4) Use tables or diagrams: never invoke `loom-visualization` for progress, a before "
+        "and after, what each choice means, readiness, confirmed against unconfirmed, "
+        "findings, risks or supported environments."
+    ) == list(SITUATIONS)
+
+
 def test_coexist_card_skip_sentence_names_the_skill():
     """'Skip it' was ambiguous next to the ascii-graph card; the skip sentence names the skill."""
     body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
