@@ -16,8 +16,8 @@ this directory is written by the stations.
 | `maps/` | Persistent decision maps — `MAP.md` plus tickets per run. A map that wants a slice delivered writes an intent carrying `map:`; it never owns a delivery ticket of its own | [`loom-workflow:decision-map`](../../loom-workflow/skills/decision-map/) |
 | [`KICKOFF-DEFAULTS.md`](KICKOFF-DEFAULTS.md) | This repo's standing answers to the questions the stations would otherwise ask every time — second vendor, package-test command, standing-docs waiver, interface surfaces, session-start baseline. One line per key, read by `loom_checker.py` | a human, once per repo |
 
-The artifact type of any path is decided by the mapping in the change's
-concept model §6 — `docs/loom/intent/**` is an intent, `**/evidence/**`
+The artifact type of any path is decided by the `artifact_types` mapping
+in `loom-code/contract/manifest.yaml` — `docs/loom/intent/**` is an intent, `**/evidence/**`
 is evidence, `docs/loom/memory/**` is memory, `docs/loom/maps/**` is a
 map. That mapping is what tells Build and the review station which of
 the three verification actions a file owes: the adversarial programs at
