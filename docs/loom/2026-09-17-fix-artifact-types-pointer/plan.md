@@ -5,12 +5,14 @@ charter: 1.0
 ## Current State Evidence
 - Forward: `docs/loom/README.md:19-20` says the mapping lives in the change's
   concept model §6, which is not tracked in this repository.
-- Reverse: `loom-code/contract/manifest.yaml:266` declares `artifact_types`
-  and is the mapping the checker reads.
-- Error: the pointer leads nowhere here.
-- Data: the mapping lists `docs/loom/intent/**` = intent, `**/evidence/**` =
-  evidence, `docs/loom/memory/**` = memory, `docs/loom/maps/**` = map.
-- Boundary: one line of prose in one internal document.
+- Reverse: `loom-code/contract/manifest.yaml` declares `artifact_types` and
+  is the mapping the checker reads (`loom_checker.artifact_types`).
+- Error: the pointer leads nowhere here; the adversary found the manifest
+  itself was missing the `memory` row the README describes.
+- Data: the mapping lists intent, spec, plan, standing, evidence, skill, gate,
+  map, docs, code and, after this change, memory.
+- Boundary: one line of prose in one internal document, plus one row in the
+  manifest's `artifact_types` table.
 
 ## Task DAG
 

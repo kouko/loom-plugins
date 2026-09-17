@@ -276,5 +276,6 @@ artifact_types:      # §6 type mapping; KICKOFF-DEFAULTS artifact-types is rese
   - {glob: "**/hooks/**",                type: gate}
   - {glob: "**/scripts/check_*",         type: gate}
   - {glob: "docs/loom/maps/**",          type: map}
+  - {glob: "docs/loom/memory/**",        type: memory}
   - {glob: "**/*.md",                    type: docs}
   - {glob: "**",                         type: code}
