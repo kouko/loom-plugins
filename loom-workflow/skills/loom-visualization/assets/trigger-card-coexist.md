@@ -1,4 +1,4 @@
-# Visualization card (ascii-graph-toolkit)
+# Visualization card (loom-workflow)
 Reply to the user in their language. 1) First sentence: the conclusion and
 what it means for the user; details after. 2) Say what a thing does in plain
 words; name an internal term, file path or rule id only when needed, in
