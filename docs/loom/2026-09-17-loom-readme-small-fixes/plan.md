@@ -1,5 +1,5 @@
 # Loom README small fixes — plan
-intent: 2026-09-17-loom-readme-small-fixes@1272fd29
+intent: 2026-09-17-loom-readme-small-fixes@f3e39231
 charter: 1.0
 
 ## Current State Evidence
