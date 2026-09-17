@@ -1,0 +1,41 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-17-loom-readme-small-fixes",
+  "content_digest": "4869a8772a53ad57cbf755a12ddaee6433918c1b",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-17-loom-readme-small-fixes/evidence/probes/test_readme_adversarial.py -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-09-17-loom-readme-small-fixes/evidence/probes/test_readme_adversarial.py",
+      "result": "pass",
+      "command_digest": "619aa1707a1d21f19e141140b49274a7f7a9afc60359527a124e83841808b547"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "closing-reviewer-docs",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "closing-reviewer-code",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
