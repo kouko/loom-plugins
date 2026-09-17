@@ -16,16 +16,41 @@ def test_a1_bare_they_absent():
     assert "They stay in" not in FLAT
 
 
-def test_a2_all_links_resolve():
-    for target in re.findall(r"\]\(([^)]+)\)", TEXT):
+def local_link_paths(text, base):
+    """Resolved filesystem paths of every local inline or reference link."""
+    raw = re.findall(r"\]\(\s*(<[^>]*>|[^)\s]+)", text)
+    raw += re.findall(r"^ {0,3}\[[^\]]+\]:\s*(<[^>]*>|\S+)", text, re.MULTILINE)
+    targets = [t[1:-1] if t.startswith("<") else t for t in raw]
+    paths = []
+    for target in targets:
         if "://" in target or target.startswith("#"):
             continue
-        path = (README.parent / target.split("#")[0]).resolve()
-        assert path.exists(), target
+        paths.append((target, (base / target.split("#")[0]).resolve()))
+    return paths
+
+
+def broken_links(text, base):
+    return [t for t, p in local_link_paths(text, base) if not p.exists()]
+
+
+def test_helper_catches_broken_reference_link(tmp_path):
+    text = "See [x][ref].\n\n[ref]: missing/\n"
+    assert broken_links(text, tmp_path) == ["missing/"]
+
+
+def test_helper_accepts_angle_bracket_link_with_title(tmp_path):
+    (tmp_path / "plans").mkdir()
+    text = '[plans/](<plans/> "title")\n'
+    assert broken_links(text, tmp_path) == []
+
+
+def test_a2_all_links_resolve():
+    assert broken_links(TEXT, README.parent) == []
 
 
 def test_a2_maps_link_absent():
-    assert "](maps/)" not in TEXT
+    maps = (README.parent / "maps").resolve()
+    assert all(p != maps for _, p in local_link_paths(TEXT, README.parent))
 
 
 def test_a3_maps_path_still_named_and_row_kept():
