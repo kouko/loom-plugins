@@ -89,3 +89,50 @@ def test_ship_text_has_no_direct_gh_pr_merge() -> None:
 def test_ship_text_keeps_no_worktree_instruction() -> None:
     text = SHIP.read_text(encoding="utf-8").lower()
     assert "keep the worktree" not in " ".join(text.split())
+
+
+GATE_OPEN_RE = re.compile(r"<!--\s*gate:\s*[A-Za-z0-9._-]+\s*-->")
+GATE_CLOSE = "<!-- /gate -->"
+NO_HANDOVER = "hand a refused publication command to the user to run"
+
+
+def _gate_regions(text: str) -> list[tuple[int, int]]:
+    """Offsets of every `<!-- gate: id -->` ... `<!-- /gate -->` span."""
+    regions = []
+    for match in GATE_OPEN_RE.finditer(text):
+        close = text.find(GATE_CLOSE, match.end())
+        end = len(text) if close == -1 else close + len(GATE_CLOSE)
+        regions.append((match.start(), end))
+    return regions
+
+
+# ship-prose-forbids-handing-the-command-over (A3 positive)
+def test_ship_prose_forbids_handing_the_command_over() -> None:
+    section = _section(SHIP.read_text(encoding="utf-8"), "## 3. Publish once")
+    flat = " ".join(section.split())
+    hits = [
+        s for s in re.split(r"(?<=[.!?])\s+", flat)
+        if NO_HANDOVER in s
+        and "closing-review station" in s
+        and "step selection" in s
+        and "typing the code" in s
+    ]
+    assert len(hits) == 1, (
+        "ship §3 needs one sentence forbidding a refused publication command "
+        "from being handed to the user, and naming both legal routes: run the "
+        "closing-review station, or propose a step selection the user confirms "
+        "by typing the code"
+    )
+
+
+# ship-prose-rule-is-not-marked-as-a-gate (A3 negative)
+def test_ship_prose_rule_is_not_marked_as_a_gate() -> None:
+    text = SHIP.read_text(encoding="utf-8")
+    index = text.find(NO_HANDOVER)
+    assert index != -1, "the no-handover rule is missing from the ship station"
+    for start, end in _gate_regions(text):
+        assert not start <= index < end, (
+            "PRINCIPLES.md forbids prose-only gates: the no-handover rule is "
+            "advisory prose, and the enforceable carrier is the checker's "
+            "missing-attestation refusal string"
+        )

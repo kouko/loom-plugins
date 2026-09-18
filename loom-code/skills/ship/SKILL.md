@@ -121,7 +121,11 @@ The command verifies exactly one branch attestation, its schema, content
 digest, execution identities/results, reviewer verdicts, and live HEAD. It
 then derives the origin repository, default base, current branch, and exact
 refspec; performs a non-forced push; and opens or reuses one PR. Do not run a
-separate attestation preflight or construct Git push or PR-create commands.
+separate attestation preflight, construct Git push or PR-create commands, or
+hand a refused publication command to the user to run; on a refusal take one of
+the two legal routes it names — run the closing-review station, which generates
+the attestation, or propose a step selection the user confirms by typing the
+code.
 
 The installed plugin's `PreToolUse` hook applies the same check automatically
 to direct raw publication commands and retains destination/refspec safety for
