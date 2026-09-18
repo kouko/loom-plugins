@@ -3,7 +3,7 @@ name: folding-a-pre-existing-hole-into-a-change-multiplies-its-probe-surface
 description: A pre-existing defect folded into a change because the change "makes it reachable" is not a small addition — the fix enters the adversarial pass as part of the change, every finding it produces earns a permanent probe, and the probe surface grows with the fix rather than with the requirement; decide the fold before Build, and when the budget is not there take the whole change without it rather than half of it
 type: decision
 sources:
-  - resource: branch 2026-09-18-blocked-publish-names-the-legal-routes — a 42-line requirement (a refusal naming routes that work) shipped alongside 4,700 changed lines; of thirteen adversarial findings, six came from the folded fix rather than from the requirement, and the adversarial module reached 1,961 lines against roughly 30 lines of message logic
+  - resource: branch 2026-09-18-blocked-publish-names-the-legal-routes — a 42-line requirement (a refusal naming routes that work) shipped as 4,815 insertions and 45 deletions across 15 files; of thirteen adversarial findings, six came from the folded fix rather than from the requirement, and the adversarial module reached 1,961 lines against roughly 30 lines of message logic
 ---
 
 The change's requirement was one sentence of checker output: when publication
@@ -42,6 +42,13 @@ keeps forever. When the budget for that is not available, file the defect as
 its own intent carrying the evidence that this change is what makes it worth
 fixing — and take the whole change without the fold rather than a partial one,
 because a half-closed hole earns trust it has not got.
+
+**Decided by the user on 2026-09-18**, against the alternative of splitting the
+branch so that only the requirement shipped here: ship with the follow-up
+recorded. The split was offered with its cost — by then the branch's commits
+tested both halves through shared fixtures, so splitting cost more than it
+saved and the code would ship either way — and declined on that basis. The debt
+below is therefore someone's call, not an oversight.
 
 **Follow-up this branch owes:** the probe count grew to roughly ten cases per
 finding, and nobody pruned it. A later change should measure which probes are
