@@ -258,9 +258,21 @@ def _cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     matcher = glob_to_regex(attestation_template.replace("<change-id>", "*"))
     candidates = sorted(path for path in changed_paths(repo) if matcher.fullmatch(path))
     if len(candidates) != 1:
+        # One line: report() writes one `BLOCK <rule>: <reason>` line per
+        # failure, and every caller parses that prefix, so a wrapped reason
+        # would emit continuation lines that no longer carry it. The existing
+        # reason stays at the front; what follows only names the two legal
+        # routes out, because the refusal alone left the agent nothing to do
+        # but hand the blocked command back to the user.
         return report([(
             "push.attestation",
-            f"branch must carry exactly one generated attestation; found {len(candidates)}",
+            f"branch must carry exactly one generated attestation; found {len(candidates)}"
+            "; two legal routes, both run by the agent: run the closing-review station,"
+            " which generates the attestation, or propose a step selection"
+            " (`loom_checker.py selection propose <change-id> --origin agent`) that the user"
+            " confirms by typing the code, after which finalize-review drops the reviewer"
+            " floor to zero and still emits an attestation recording the skip;"
+            " never hand this command to the user to run",
         )], err)
     attestation_rel = candidates[0]
     match = re.fullmatch(

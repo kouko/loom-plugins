@@ -1207,7 +1207,15 @@ def test_publish_accepts_matching_selection_disclosure(tmp_path: Path, monkeypat
 
 # --- push hook: the reason a blocked push names first -------------------------
 
-MISSING_ATTESTATION = "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
+MISSING_ATTESTATION = (
+    "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
+    "; two legal routes, both run by the agent: run the closing-review station,"
+    " which generates the attestation, or propose a step selection"
+    " (`loom_checker.py selection propose <change-id> --origin agent`) that the user"
+    " confirms by typing the code, after which finalize-review drops the reviewer"
+    " floor to zero and still emits an attestation recording the skip;"
+    " never hand this command to the user to run"
+)
 NONCANONICAL = "the entire Git push command must use canonical quote-all rendering"
 
 
@@ -1269,6 +1277,50 @@ def test_plain_push_without_attestation_reason_names_attestation(
     assert rc == 2
     assert lines[0] == MISSING_ATTESTATION
     assert any(NONCANONICAL in line for line in lines[1:])
+
+
+def test_missing_attestation_names_both_routes(tmp_path: Path, monkeypatch) -> None:
+    """The refusal keeps its existing reason and adds the two legal routes plus
+    the rule that the blocked command is never handed to the user."""
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    reason = err.splitlines()[0]
+    assert rc == 2
+    assert reason.startswith(
+        "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
+    )
+    assert "closing-review" in reason
+    assert "selection propose <change-id> --origin agent" in reason
+    assert "confirms by typing the code" in reason
+    assert "never hand this command to the user to run" in reason
+
+
+def test_missing_attestation_reason_stays_one_line(tmp_path: Path, monkeypatch) -> None:
+    """report() writes one line per failure, so the reason must not wrap: a
+    continuation line would not carry the BLOCK prefix every caller parses."""
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+    monkeypatch.chdir(repo)
+    err = StringIO()
+
+    rc = push_handler._cmd_push([], StringIO(), err)
+
+    assert rc == 1
+    assert len(err.getvalue().splitlines()) == 1, err.getvalue()
+
+
+def test_unattested_unconfirmed_push_still_refused(tmp_path: Path, monkeypatch) -> None:
+    """No attestation and no confirmed step selection: the canonical publication
+    command is refused exactly as before, same rule id, same exit code."""
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_push(repo))
+
+    lines = err.splitlines()
+    assert rc == 2
+    assert lines[0].startswith("BLOCK push.attestation: ")
+    assert all(line.startswith("BLOCK ") for line in lines), err
 
 
 def test_attested_noncanonical_push_still_blocked(tmp_path: Path, monkeypatch) -> None:

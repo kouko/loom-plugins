@@ -24,7 +24,15 @@ from loom_checker.command_handlers import push as push_handler
 
 SCRIPTS = Path(__file__).resolve().parent
 CHECKER = SCRIPTS / "loom_checker.py"
-FOUND_ZERO = "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
+FOUND_ZERO = (
+    "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
+    "; two legal routes, both run by the agent: run the closing-review station,"
+    " which generates the attestation, or propose a step selection"
+    " (`loom_checker.py selection propose <change-id> --origin agent`) that the user"
+    " confirms by typing the code, after which finalize-review drops the reviewer"
+    " floor to zero and still emits an attestation recording the skip;"
+    " never hand this command to the user to run"
+)
 
 
 def _git(repo: Path, *args: str) -> str:
