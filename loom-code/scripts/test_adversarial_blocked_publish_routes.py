@@ -16,13 +16,28 @@ marker turns the probe red the moment the promise becomes true so the marker is
 removed with the defect. No product code, existing test or record is touched by
 this module.
 
-The module carries no marker now -- every finding it recorded (F1 through F12)
+The module carries no marker now -- every finding it recorded (F1 through F13)
 was closed, and each probe stayed as the regression for its own finding. Two
 were re-aimed rather than converted, because the fix answered the finding in a
 way the probe had not demanded; each says so in its own docstring rather than
 here. A marker must fail at its own assertion and not in fixture setup: the F6
 probe once died in `git switch` and recorded that instead, so a new marker is
 read under `--runxfail` before it is trusted.
+
+Probes that neither pass on a promise nor carry a marker say "recorded, not
+scored" in their first line. They are measurements of a boundary the change
+chose and the reader should be able to see -- what a forged ref still costs,
+what half of a finding a fix did not reach -- and they assert the behaviour
+they describe, so a boundary that moves is caught rather than silently
+outgrowing its own docstring.
+
+Twice now a probe went wrong by modelling git's state one level less precisely
+than the checker reads it, both times in the landed-branch fixture, and the
+second time the first repair was the cause. `test_probe_landed_fixture_builds
+_the_refs_a_real_clone_builds` is the answer to that class: it clones a local
+repository offline and requires the fixture's refs to match, so what a landed
+branch looks like is read off git rather than off whichever product function
+last happened to open one.
 """
 from __future__ import annotations
 
@@ -44,6 +59,7 @@ from loom_checker.command_handlers.publish import MISSING_ATTESTATION
 from loom_checker.command_handlers.push import EXTRA_ATTESTED_CHANGES
 from loom_checker.command_handlers.push import NOTHING_TO_PUBLISH
 from loom_checker.command_handlers.push import PUBLICATION_ROUTES
+from loom_checker.intent_state import remote_default_snapshot
 from loom_checker.rule_checks.publish import render_selection_disclosure
 from loom_checker.rule_checks.push import canonical_pr_create_trailing
 from loom_checker.rule_checks.push import github_repo_from_origin
@@ -749,23 +765,46 @@ def test_probe_following_the_refusal_verbatim_reaches_a_publishable_state(tmp_pa
 
 
 def _already_landed_branch(tmp_path: Path, change_id: str, review: Path, *,
-                           trunk: str = "main", published: bool = True) -> Path:
+                           trunk: str = "main", published: bool = True,
+                           local_trunk: str = "main", name: str | None = None,
+                           arrange=None) -> Path:
     """A branch whose base already carries the attestation finalize-review
     generates for it -- so the branch delta holds none, and regenerating it
     changes no byte.
 
     `landed` is the state this fixture means, and landed means the base is on
-    the remote, not merely in a local branch. It did not say so until
-    `22dd7f92` made the difference matter: it fast-forwarded local `main` and
-    left no remote-tracking ref, which is the finished-but-unpublished state,
-    where keeping the routes is now right. The missing `update-ref` was the
-    fixture under-specifying its own name, so it is added rather than the probe
-    re-aimed -- the subject has not moved, only the precision with which the
-    fixture states it.
+    the remote, not merely in a local branch. Two rounds went wrong at exactly
+    this line by modelling that one level less precisely than the checker reads
+    it -- `22dd7f92` made the remote matter and this fixture had no
+    remote-tracking ref; `0072b5f8` made the checker read the remote's own
+    default-branch ref and this fixture had no such ref either -- so the refs
+    are no longer guessed from what the current reader happens to open. A real
+    `git clone` of a repository whose default branch is `<trunk>` was run
+    offline and its refs read back: it writes exactly two, a normal
+    `refs/remotes/origin/<trunk>` and a symbolic `refs/remotes/origin/HEAD`
+    selecting it, on top of the `remote.origin.fetch` refspec `_repo`'s `git
+    remote add` already wrote. Both are written here. A landed branch is now
+    the clone, not the half of the clone some reader needed.
 
-    `trunk` and `published` exist so the probes below can build the two states
-    that fall outside `PUBLISHED_TRUNK_CANDIDATES`."""
-    repo = _repo(tmp_path, f"landed-{trunk}-{int(published)}")
+    `published=False` keeps no remote-tracking ref at all, and that is a real
+    repository rather than a lazier one -- `git init` plus `git remote add`
+    with nothing ever fetched. It is also the only shape that reaches the state
+    its probe wants, which is why it is not "repaired" into a clone too: give
+    it a clone's stale `refs/remotes/origin/main` and `branch_base` prefers
+    that ref over the local trunk, the branch delta stops being empty, the
+    branch carries its own attestation and `push` exits 0 with no refusal to
+    read at all (measured).
+
+    `trunk`, `local_trunk`, `published`, `name` and `arrange` exist so the
+    probes below can build the states the resolver has to answer about;
+    `arrange(repo, landed_sha, initial_sha)` replaces the ref writing entirely.
+    """
+    repo = _repo(tmp_path, name or f"landed-{trunk}-{local_trunk}-{int(published)}")
+    initial = _git(repo, "rev-parse", "main")
+    if local_trunk != "main":
+        # A clone of a repository whose default branch is not `main` has no
+        # local `main` either, and `helpers.TRUNK_CANDIDATES` is a literal list.
+        _git(repo, "branch", "-m", "main", local_trunk)
     _git(repo, "switch", "-q", "-c", "prep")
     (repo / "docs" / "loom").mkdir(parents=True)
     (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
@@ -788,21 +827,62 @@ def _already_landed_branch(tmp_path: Path, change_id: str, review: Path, *,
     _git(repo, "add", ".")
     _git(repo, "commit", "-q", "-m", "attest")
 
-    _git(repo, "switch", "-q", "main")
+    _git(repo, "switch", "-q", local_trunk)
     _git(repo, "merge", "-q", "--ff-only", "prep")
     # `_repo` already created `feature`, so this moves it onto the base rather
     # than creating it. `switch -c` here died with exit 128 during fixture setup,
     # which the strict marker then recorded as the expected failure -- the probe
     # asserted nothing and could never have retired itself.
-    if published:
+    if arrange is not None:
+        arrange(repo, _git(repo, "rev-parse", local_trunk), initial)
+    elif published:
         # What makes it landed rather than finished: the base is reachable from
-        # a remote-tracking trunk, which is the only witness this checker has
-        # that the work is somewhere other than this working copy.
-        _git(repo, "update-ref", f"refs/remotes/origin/{trunk}", "main")
+        # the branch the remote itself names as its default, which is the only
+        # witness this checker has that the work is somewhere other than this
+        # working copy. Both refs, because a clone writes both and the checker
+        # reads both -- the tracking ref for the commit, `HEAD` for the name.
+        _git(repo, "update-ref", f"refs/remotes/origin/{trunk}", local_trunk)
+        _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD",
+             f"refs/remotes/origin/{trunk}")
     _git(repo, "switch", "-q", "feature")
-    _git(repo, "reset", "-q", "--hard", "main")
-    assert _git(repo, "rev-parse", "HEAD") == _git(repo, "rev-parse", "main")
+    _git(repo, "reset", "-q", "--hard", local_trunk)
+    assert _git(repo, "rev-parse", "HEAD") == _git(repo, "rev-parse", local_trunk)
     return repo
+
+
+def test_probe_landed_fixture_builds_the_refs_a_real_clone_builds(tmp_path) -> None:
+    """The fixture check the last two rounds did not have. Clone a local
+    repository offline -- no network, no GitHub -- read back every ref the clone
+    holds, and require the landed fixture to hold the same set.
+
+    This is the assertion that would have caught both regressions before the
+    checker did: a fixture that models a landed branch has to build what a real
+    clone builds, and the only way to know what that is, is to make one."""
+    source = tmp_path / "source"
+    source.mkdir()
+    _git(source, "init", "-q", "-b", "trunk")
+    _git(source, "config", "user.email", "t@example.com")
+    _git(source, "config", "user.name", "T")
+    (source / "file.txt").write_text("content\n", encoding="utf-8")
+    _git(source, "add", ".")
+    _git(source, "commit", "-q", "-m", "initial")
+    clone = tmp_path / "clone"
+    subprocess.run(["git", "clone", "-q", str(source), str(clone)], check=True,
+                   capture_output=True, text=True)
+
+    def remote_shape(repo: Path) -> set[str]:
+        listing = _git(repo, "for-each-ref", "--format=%(refname) %(symref)",
+                       "refs/remotes/")
+        return {line.replace("trunk", "<trunk>").replace("main", "<trunk>")
+                for line in listing.splitlines()}
+
+    review = tmp_path / "shape-review.json"
+    landed = _already_landed_branch(tmp_path, "2026-09-18-clone-shape", review)
+    assert remote_shape(landed) == remote_shape(clone), (
+        "the landed fixture does not carry the refs a real clone carries")
+    assert _git(clone, "symbolic-ref", "refs/remotes/origin/HEAD")
+    assert _git(landed, "config", "--get", "remote.origin.fetch") == \
+        _git(clone, "config", "--get", "remote.origin.fetch")
 
 
 def test_probe_closing_review_route_terminates_at_count_zero(tmp_path) -> None:
@@ -1499,46 +1579,92 @@ def test_probe_finished_but_unpublished_branch_keeps_its_routes(tmp_path) -> Non
     assert "this branch adds nothing" not in reason, reason
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F13: `PUBLISHED_TRUNK_CANDIDATES` is the literal pair "
-           "`origin/main`, `origin/master`, so a repository whose remote default "
-           "is named anything else -- `trunk`, `develop`, `release` -- can never "
-           "satisfy the third fact. A branch whose change genuinely landed keeps "
-           "both routes there and walks back into the non-terminating loop F6 "
-           "named. The repository already resolves this properly: "
-           "`intent_state.remote_default_snapshot` reads `refs/remotes/origin/"
-           "HEAD`, which git sets from the remote's own default, and "
-           "`selection skipped-review` uses it",
-)
 def test_probe_landed_branch_is_recognised_on_a_trunk_not_called_main(tmp_path) -> None:
     """Attack the fact in the direction that restores the old defect: land the
-    change on a remote default this checker does not know the name of."""
+    change on a remote default this checker does not know the name of.
+
+    F13's marker is gone. `0072b5f8` deleted `PUBLISHED_TRUNK_CANDIDATES` and
+    put `intent_state.remote_default_snapshot` in its place, which asks
+    `refs/remotes/origin/HEAD` -- the branch the remote itself named -- rather
+    than guessing from a list, and the probe passes on the assertion it always
+    carried rather than on a softened one. It stays as the regression for the
+    finding: a literal name reintroduced anywhere in `base_is_published` turns
+    it red again for every repository that does not use that name.
+
+    What it does not reach is one level up, where the base it asks about comes
+    from. `test_probe_landed_on_a_clone_with_no_local_main` measures that."""
     reason = _landed_refusal(tmp_path, "2026-09-18-landed-on-trunk", trunk="trunk")
     assert "this branch adds nothing" in reason, reason
 
 
+def test_probe_landed_on_a_clone_with_no_local_main(tmp_path) -> None:
+    """Recorded, not scored, and deliberately not a marker.
+
+    F13 was a trunk under another name, and the fix reaches half of it. The
+    probe above passes because `_repo` leaves a local `main` behind for
+    `helpers.TRUNK_CANDIDATES` -- the literal `origin/main, main, origin/master,
+    master, @{upstream}` -- to find, and `branch_base` reads that list to
+    produce the very base `base_is_published` is then asked about. A real clone
+    of a `trunk`-defaulting repository has no `main` at all. Then no base
+    resolves, `push` raises before any count is taken and before any tail is
+    chosen, and the refusal this change rewrote is never reached.
+
+    Not a marker, because nothing the refusal promises is broken here: the
+    command fails closed, exits 2 and names every candidate it tried. Not this
+    change's defect either -- `branch_base` predates it and every recomputing
+    rule in the checker shares the same list. It is recorded so that the half of
+    F13 the fix did not reach is visible rather than implied by a green probe,
+    and so that a later attempt to make the checker trunk-agnostic knows there
+    is a second literal pair to remove."""
+    review = tmp_path / "no-main-review.json"
+    repo = _already_landed_branch(tmp_path, "2026-09-18-landed-clone-trunk", review,
+                                  trunk="trunk", local_trunk="trunk")
+    assert _git(repo, "branch", "--list", "main") == ""
+    assert _git(repo, "branch", "--list", "master") == ""
+    # The remote default resolves perfectly well; it is the base that does not.
+    assert _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD") == \
+        "refs/remotes/origin/trunk"
+
+    result = _checker(repo, ["push"])
+    assert result.returncode == 2, result.stderr
+    assert "no branch base resolves" in result.stderr, result.stderr
+    assert "two legal routes" not in result.stderr, result.stderr
+    assert "this branch adds nothing" not in result.stderr, result.stderr
+
+
 def test_probe_landed_branch_on_master_is_recognised(tmp_path) -> None:
-    """Control for F13: the other name the literal pair knows does work, so the
-    probe above is measuring the pair's contents and not the fixture."""
+    """Control for F13. It was the other name the deleted literal pair knew, and
+    it survives the pair's deletion as the control for the resolver: `master`
+    goes through `refs/remotes/origin/HEAD` exactly as `trunk` does, so the
+    probe above is measuring what the remote says and not the fixture."""
     reason = _landed_refusal(tmp_path, "2026-09-18-landed-on-master", trunk="master")
     assert "this branch adds nothing" in reason, reason
 
 
 def test_probe_published_trunk_witness_is_agent_writable(tmp_path) -> None:
-    """The other direction, recorded and not scored.
+    """The other direction, recorded and not scored, and re-measured after
+    `0072b5f8` changed the witness's shape.
 
-    `base_is_published` answers yes about a base that was never pushed, because
-    its only witness is `refs/remotes/origin/main` -- a local ref one
-    `git update-ref` writes, which is exactly how this module's own fixture
-    builds a landed branch two functions above. A stale cache after a remote
-    rewind reaches the same state without anyone acting.
+    The witness that work was ever published is now two refs rather than one --
+    `refs/remotes/origin/HEAD` and the tracking ref it selects -- and the
+    question worth asking is whether writing two by hand is meaningfully harder
+    than writing one. It is not, and the honest answer is narrower than that:
+    in the repository shape this actually arises in, it is still one command.
+    `refs/remotes/origin/HEAD` is written by `git clone`, so every cloned
+    repository already carries it, and forging the landed state there is the
+    single `git update-ref` it always was. Only a repository that was never
+    cloned or fetched -- `git init` plus `git remote add`, which is what this
+    probe's first half builds -- costs the second command, and the second
+    command is `git symbolic-ref`, no harder to type than the first.
 
-    Not scored as a defect: the harm is an agent talking itself out of
-    publishing its own finished work, not a gate admitting anything, and no
-    offline checker can tell a fetched ref from a written one. It is the honest
-    boundary of the third fact, and the recompute in PRINCIPLES.md
-    non-negotiable 3 rests on a ref the agent can write."""
+    So the new resolver did not raise the cost of forging the third fact; it
+    changed which name gets forged. Still not scored as a defect: the harm is an
+    agent talking itself out of publishing its own finished work, not a gate
+    admitting anything, and no offline checker can tell a fetched ref from a
+    written one -- a stale cache after a remote rewind reaches the same state
+    with nobody acting at all. It is the honest boundary of the third fact, and
+    the recompute in PRINCIPLES.md non-negotiable 3 rests on refs the agent can
+    write."""
     review = tmp_path / "forged-review.json"
     repo = _already_landed_branch(tmp_path, "2026-09-18-forged-witness", review,
                                   published=False)
@@ -1546,8 +1672,290 @@ def test_probe_published_trunk_witness_is_agent_writable(tmp_path) -> None:
     assert rule == "push.attestation"
     assert before.endswith(PUBLICATION_ROUTES), before
 
+    # Never cloned, so both refs are missing and both have to be written. The
+    # first alone no longer moves the answer, which is the whole of what
+    # `0072b5f8` added to the cost.
     _git(repo, "update-ref", "refs/remotes/origin/main", "main")
+    (_rule, halfway), = _blocks(_refusal(repo))
+    assert halfway == before, (
+        "the tracking ref alone was still enough: " + halfway)
 
+    _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
     (_rule, after), = _blocks(_refusal(repo))
     assert "this branch adds nothing" in after, (
-        "one update-ref turned a finished branch into a landed one: " + after)
+        "two hand-written refs turned a finished branch into a landed one: " + after)
+
+
+def test_probe_a_cloned_repo_still_forges_the_witness_with_one_command(tmp_path) -> None:
+    """The measurement the probe above depends on, made rather than asserted:
+    in a clone -- the shape every repository an agent works in actually has --
+    `refs/remotes/origin/HEAD` is already present, so the two-ref witness costs
+    exactly one `git update-ref`, the same gesture as before `0072b5f8`.
+
+    It is worse than a tie here, and that is the point of running it in this
+    direction: the branch this starts from is not refused at all. Its
+    attestation sits in its own delta and `push` exits 0, so one command turns a
+    branch the checker was about to publish into a branch it says has nothing to
+    publish."""
+    review = tmp_path / "clone-forge-review.json"
+
+    def clone_shaped(repo: Path, landed: str, initial: str) -> None:
+        # A clone made before the work: the remote's default exists, is named,
+        # and sits at the commit the branch grew from.
+        _git(repo, "update-ref", "refs/remotes/origin/main", initial)
+        _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+
+    repo = _already_landed_branch(tmp_path, "2026-09-18-clone-forge", review,
+                                  arrange=clone_shaped)
+    publishable = _checker(repo, ["push"])
+    assert publishable.returncode == 0, publishable.stderr
+
+    _git(repo, "update-ref", "refs/remotes/origin/main", "main")
+
+    (rule, after), = _blocks(_refusal(repo))
+    assert rule == "push.attestation", after
+    assert "this branch adds nothing" in after, (
+        "one update-ref turned a publishable branch into a landed one: " + after)
+
+
+# --------------------------------------------------------------------------
+# Half ten: the resolver itself. `0072b5f8` put `remote_default_snapshot` where
+# a literal pair of names used to be, so the third fact now rests on whatever
+# `refs/remotes/origin/HEAD` happens to say. A ref is a file; files go wrong in
+# ways a hardcoded string cannot. Both directions are attacked -- a broken ref
+# that makes a landed branch look unpublished, and a ref that makes an
+# unpublished branch look landed.
+# --------------------------------------------------------------------------
+
+
+def _head_file(repo: Path) -> Path:
+    return repo / ".git" / "refs" / "remotes" / "origin" / "HEAD"
+
+
+def _landed_but(tmp_path: Path, change_id: str, name: str, break_it) -> Path:
+    """A branch whose change genuinely landed, with the default-branch ref
+    damaged afterwards. Every state here is one the resolver has to answer
+    about, and in every one of them the work really is on the remote."""
+
+    def arrange(repo: Path, landed: str, initial: str) -> None:
+        _git(repo, "update-ref", "refs/remotes/origin/main", landed)
+        _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+        break_it(repo, landed, initial)
+
+    review = tmp_path / f"{name}-review.json"
+    return _already_landed_branch(tmp_path, change_id, review, name=name,
+                                  arrange=arrange)
+
+
+def _prune_target(repo: Path, landed: str, initial: str) -> None:
+    """`git remote prune origin` after the default branch was deleted upstream:
+    the tracking ref goes, the symbolic ref is left pointing at nothing."""
+    _git(repo, "update-ref", "-d", "refs/remotes/origin/main")
+
+
+def _not_symbolic(repo: Path, landed: str, initial: str) -> None:
+    """`refs/remotes/origin/HEAD` replaced by an ordinary ref holding a commit.
+
+    `--no-deref` is what makes this the state it claims to be: plain
+    `git update-ref` follows a symbolic ref and writes through it, so without
+    the flag this rewrites `refs/remotes/origin/main` and leaves `HEAD` symbolic
+    and resolving. The first version of this probe did exactly that and passed
+    for the wrong reason, which is the same mistake in miniature the fixture
+    above was repaired for."""
+    _git(repo, "update-ref", "--no-deref", "refs/remotes/origin/HEAD", landed)
+
+
+def _outside_the_prefix(repo: Path, landed: str, initial: str) -> None:
+    """The symbolic ref selecting a local branch instead of a remote-tracking
+    one -- the state the resolver's prefix test exists for."""
+    _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/heads/main")
+
+
+def _self_referential(repo: Path, landed: str, initial: str) -> None:
+    _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/HEAD")
+
+
+def _two_ref_loop(repo: Path, landed: str, initial: str) -> None:
+    _git(repo, "symbolic-ref", "refs/remotes/origin/ring", "refs/remotes/origin/HEAD")
+    _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/ring")
+
+
+def _not_a_commit(repo: Path, landed: str, initial: str) -> None:
+    """The tracking ref pointing at a tree. `^{commit}` is the only reason this
+    is not read as a snapshot."""
+    tree = _git(repo, "rev-parse", "HEAD^{tree}")
+    (repo / ".git" / "refs" / "remotes" / "origin" / "main").write_text(
+        tree + "\n", encoding="utf-8")
+
+
+@pytest.mark.parametrize("name,break_it", [
+    ("pruned-target", _prune_target),
+    ("not-symbolic", _not_symbolic),
+    ("outside-prefix", _outside_the_prefix),
+    ("self-referential", _self_referential),
+    ("two-ref-loop", _two_ref_loop),
+    ("not-a-commit", _not_a_commit),
+])
+def test_probe_broken_default_ref_fails_towards_the_routes(tmp_path, name, break_it) -> None:
+    """Attack: damage `refs/remotes/origin/HEAD` on a branch that genuinely
+    landed, and see which way the resolver falls.
+
+    Every one of these six answers the same way -- no default branch resolves,
+    so the third fact is unproven and the two routes stay. That is the direction
+    `base_is_published`'s docstring commits to, and it is the right one: the
+    cost of falling this way is an agent re-running closing review on work that
+    is already merged, and the cost of falling the other way is a finished
+    change being told it is nothing and abandoned.
+
+    It is the direction, not a free pass. Three of these six are reachable
+    without anyone touching a ref by hand -- `git remote prune` after the
+    default branch is deleted upstream leaves exactly the first state -- and in
+    every one of them a landed branch walks back into the loop F6 named. The
+    loop is bounded now only by the agent noticing the count will not move.
+
+    Timed as well as asserted: a symbolic ref that points at itself and a pair
+    that point at each other are the two shapes that make a naive resolver spin,
+    and neither is allowed to take the refusal with it."""
+    started = time.monotonic()
+    reason = _landed_refusal_broken(tmp_path, f"2026-09-18-{name}", name, break_it)
+    assert time.monotonic() - started < 120, f"{name} did not come back promptly"
+    assert "two legal routes" in reason, reason
+    assert "this branch adds nothing" not in reason, reason
+
+
+def _landed_refusal_broken(tmp_path: Path, change_id: str, name: str, break_it) -> str:
+    repo = _landed_but(tmp_path, change_id, name, break_it)
+    (rule, reason), = _blocks(_refusal(repo))
+    assert rule == "push.attestation", reason
+    return reason
+
+
+@pytest.mark.parametrize("content", [
+    "ref: refs/remotes/origin/main@{1}\n",
+    "ref: refs/remotes/origin/../../heads/main\n",
+    "ref: refs/remotes/origin/main^{commit}\n",
+    "ref: not a ref\n",
+    "garbage\n",
+    "",
+])
+def test_probe_a_hand_written_head_file_is_never_read_as_a_revision(tmp_path, content) -> None:
+    """Attack: the resolver takes `symbolic-ref`'s output and hands it straight
+    to `rev-parse --verify <target>^{commit}`. If a hand-written ref file can
+    put a revision expression through that seam -- a reflog selector, a path
+    escape, a second peel -- then the ref no longer has to name a branch the
+    remote has, and the third fact can be satisfied by a string.
+
+    Repelled, and by git rather than by the checker's own parsing: every one of
+    these makes `symbolic-ref --quiet` fail, so the target never reaches
+    `rev-parse` at all. The prefix test and the `^{commit}` peel are the second
+    and third lines of that defence, not the first. Argv is the reason none of
+    this is worse: the target is one element of a list, never a shell word."""
+    def write_it(repo: Path, landed: str, initial: str) -> None:
+        _head_file(repo).write_text(content, encoding="utf-8")
+
+    started = time.monotonic()
+    reason = _landed_refusal_broken(tmp_path, "2026-09-18-handwritten",
+                                    f"handwritten-{abs(hash(content)) % 9973}", write_it)
+    assert time.monotonic() - started < 120, "the malformed ref did not come back promptly"
+    assert "two legal routes" in reason, reason
+
+
+def test_probe_a_chained_symbolic_default_ref_still_resolves(tmp_path) -> None:
+    """The control for the six above, and the one shape that must answer yes.
+
+    `refs/remotes/origin/HEAD` -> `refs/remotes/origin/alias` ->
+    `refs/remotes/origin/main` passes the prefix test at the first hop and is
+    chased the rest of the way by `rev-parse`, not by `symbolic-ref`. Worth
+    pinning: the resolver's own comment credits `symbolic-ref` with following
+    chains, and if that were the load-bearing claim a chain would be the way to
+    break it. It is not -- the peel resolves the chain either way -- so the
+    comment is imprecise rather than wrong, and this probe is what keeps the
+    imprecision from mattering."""
+    def chain(repo: Path, landed: str, initial: str) -> None:
+        _git(repo, "symbolic-ref", "refs/remotes/origin/alias", "refs/remotes/origin/main")
+        _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/alias")
+
+    reason = _landed_refusal_broken(tmp_path, "2026-09-18-chained", "chained", chain)
+    assert "this branch adds nothing" in reason, reason
+
+
+def test_probe_remote_default_moved_after_the_last_fetch(tmp_path) -> None:
+    """Recorded, not scored. The remote renamed its default from `main` to
+    `trunk` and the change landed on `trunk`; nobody has fetched since, so
+    `refs/remotes/origin/HEAD` still selects `refs/remotes/origin/main` and that
+    ref still sits at the commit the branch grew from.
+
+    The resolver answers about the stale name, confidently and wrongly, but the
+    error never reaches the tail: the stale ref is also the first entry of
+    `helpers.TRUNK_CANDIDATES`, so `branch_base` measures the delta against it,
+    the delta is not empty, the branch carries its own attestation and `push`
+    exits 0. A landed change is offered publication again rather than told it
+    has nothing to publish.
+
+    Which is the safe half of the two possible wrongs, and is here so the
+    reading is on the record: a stale default ref cannot make this refusal claim
+    a change landed. It can only fail to notice that one did."""
+    def moved(repo: Path, landed: str, initial: str) -> None:
+        _git(repo, "update-ref", "refs/remotes/origin/trunk", landed)
+        _git(repo, "update-ref", "refs/remotes/origin/main", initial)
+        _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+
+    review = tmp_path / "moved-review.json"
+    repo = _already_landed_branch(tmp_path, "2026-09-18-default-moved", review,
+                                  name="default-moved", arrange=moved)
+    result = _checker(repo, ["push"])
+    assert result.returncode == 0, result.stderr
+
+
+def test_probe_a_second_remote_holding_the_default_is_out_of_reach(tmp_path) -> None:
+    """Recorded, not scored. `remote_default_snapshot` is always called with its
+    default argument, so the third fact is a question about `origin` and about
+    no other remote -- and `origin` is the only remote a repository is obliged
+    to have a default-branch ref for.
+
+    The state built here is the one that makes that bite, and it needs no forked
+    workflow to reach: `origin` is up to date and contains the landed change,
+    `upstream` carries the only `HEAD` ref in the repository, and `origin/HEAD`
+    was never written because nothing here was cloned -- `git remote add` plus
+    `git fetch` does not write it. The resolver reads `origin/HEAD`, finds
+    nothing, and a landed branch keeps both routes and re-enters the loop while
+    a default-branch ref is sitting in the same repository under another name.
+
+    Not scored, because the checker is `origin`-bound one layer down and says
+    so: `rule_checks/push.py` refuses any publication whose git remote is not
+    the literal `origin`, so reading another remote's default would answer a
+    question about a publication this gate would never make. Recorded because
+    the resolver's hardcoded `origin` is now load-bearing and the reason it is
+    the right name lives in a different file from the call."""
+    def forked(repo: Path, landed: str, initial: str) -> None:
+        _git(repo, "remote", "add", "upstream", "git@github.com:other/project.git")
+        _git(repo, "update-ref", "refs/remotes/upstream/main", landed)
+        _git(repo, "symbolic-ref", "refs/remotes/upstream/HEAD", "refs/remotes/upstream/main")
+        _git(repo, "update-ref", "refs/remotes/origin/main", landed)
+
+    review = tmp_path / "fork-review.json"
+    repo = _already_landed_branch(tmp_path, "2026-09-18-fork-upstream", review,
+                                  name="fork-upstream", arrange=forked)
+    assert _git(repo, "symbolic-ref", "refs/remotes/upstream/HEAD")
+    (rule, reason), = _blocks(_refusal(repo))
+    assert rule == "push.attestation", reason
+    assert "two legal routes" in reason, reason
+
+
+@pytest.mark.parametrize("remote", [
+    "", "-", "--upload-pack=touch /tmp/pwned", "origin main", "origin/../../etc",
+    "ori gin", "..", "origin\n", "origin;id",
+])
+def test_probe_resolver_refuses_a_remote_name_that_is_not_a_literal(tmp_path, remote) -> None:
+    """Attack the one argument the resolver takes. No caller in this change
+    passes a non-default remote today, which is exactly why the guard is worth
+    a probe now rather than after someone wires a configurable one to it.
+
+    The guard answers before any git runs, so nothing reaches argv, and it
+    answers in the same three-tuple shape as every other failure -- no
+    exception, no ref, no snapshot, and a reason that says which name it was."""
+    repo = _repo(tmp_path, "remote-name")
+    ref, snapshot, error = remote_default_snapshot(repo, remote)
+    assert ref is None and snapshot is None, (ref, snapshot)
+    assert "is not a safe literal" in error, error
+    assert repr(remote) in error, error
