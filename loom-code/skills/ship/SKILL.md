@@ -124,8 +124,9 @@ refspec; performs a non-forced push; and opens or reuses one PR. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
 hand a refused publication command to the user to run; on a refusal take the
 remedy that refusal names — where the branch attests nothing, that is one of
-two routes: run the closing-review station, which generates the attestation, or
-propose a step selection the user confirms by typing the code.
+two routes: run the closing-review station, which generates the attestation,
+or propose a step selection the user confirms by typing
+`/loom-code:expert-mode <code>` with the code the proposal printed.
 
 The installed plugin's `PreToolUse` hook applies the same check automatically
 to direct raw publication commands and retains destination/refspec safety for

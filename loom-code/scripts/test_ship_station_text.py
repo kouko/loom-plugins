@@ -11,6 +11,8 @@ from pathlib import Path
 
 from loom_checker.command_handlers.push import PUBLICATION_ROUTES
 from loom_checker.command_handlers.push import publication_advice
+from loom_checker.selection import confirmation_prompt_matches
+from loom_checker.selection import selection_code
 from prose_pin import has_negation
 
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
@@ -133,14 +135,17 @@ def test_ship_prose_forbids_handing_the_command_over() -> None:
         if NO_HANDOVER in s
         and "closing-review station" in s
         and "step selection" in s
-        and "typing the code" in s
+        and "confirms by typing" in s
     ]
     assert len(hits) == 1, (
         "ship §3 needs one sentence forbidding a refused publication command "
         "from being handed to the user, and naming both legal routes: run the "
         "closing-review station, or propose a step selection the user confirms "
-        "by typing the code"
+        "by typing a confirmation prompt"
     )
+    # Which prompt is not pinned here: the form the station may name is the
+    # form `confirmation_prompt_matches` accepts, and
+    # `test_ship_prose_names_a_confirmation_the_checker_accepts` runs it.
 
 
 # ship-prose-rule-is-not-marked-as-a-gate (A3 negative)
@@ -207,6 +212,42 @@ def test_ship_prose_promises_only_what_every_refusal_names() -> None:
             "names the routes for one attestation count only; scope the "
             "promise to that state, after the dash"
         )
+
+
+# The confirmation prompt the station names, in backticks with `<code>` where
+# the proposal's code goes -- the one part of the sentence the user retypes.
+CONFIRMATION_FORM = re.compile(r"`([^`]*<code>[^`]*)`")
+
+
+# ship-prose-names-a-confirmation-the-checker-accepts (A3 positive)
+def test_ship_prose_names_a_confirmation_the_checker_accepts() -> None:
+    """The prompt the station tells the user to type is run through the
+    matcher that decides whether a typed prompt binds anything.
+
+    `confirmation_prompt_matches` binds a selection only when the prompt's
+    first token is one of `ENTRY_TOKENS` and the code is a standalone token
+    after it, so a station that asks for the bare code sends the user to a
+    prompt that binds nothing and leaves the reviewer floor where it was.
+    Asserting the literal `/loom-code:expert-mode <code>` would pin one of the
+    four entry tokens and would keep passing if the matcher later stopped
+    accepting it; executing the form catches both, and any reword that is
+    wrong in a new way fails the same assertion.
+    """
+    sentence = _no_handover_sentence()
+    forms = CONFIRMATION_FORM.findall(sentence)
+    assert len(forms) == 1, (
+        "ship §3 names exactly one confirmation prompt, in backticks, with "
+        "`<code>` standing for the code the proposal printed"
+    )
+    code = selection_code("2026-09-18-example-change", [], ["reviewers"])
+    assert confirmation_prompt_matches(forms[0].replace("<code>", code), code), (
+        f"the prompt ship §3 names, {forms[0]!r}, binds nothing: "
+        "confirmation_prompt_matches wants an entry token first, then the code"
+    )
+    # The placeholder is the code's seat, not decoration: naming the prompt
+    # without it, or the code without the prompt, binds nothing either.
+    assert not confirmation_prompt_matches(forms[0].replace("<code>", "").strip(), code)
+    assert not confirmation_prompt_matches(code, code)
 
 
 TWO_COPY_DOC = (
