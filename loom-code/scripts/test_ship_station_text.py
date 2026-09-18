@@ -9,6 +9,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from loom_checker.command_handlers.push import PUBLICATION_ROUTES
+from loom_checker.command_handlers.push import publication_advice
 from prose_pin import has_negation
 
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
@@ -152,6 +154,59 @@ def test_ship_prose_rule_is_not_marked_as_a_gate() -> None:
         "rule is advisory prose, and the enforceable carrier is the checker's "
         "missing-attestation refusal string"
     )
+
+
+# The counts a `...; found <n>` attestation refusal can report, plus the
+# unknown-count caller. `publication_advice` decides per count which tail it
+# appends, so how many routes a refusal names is a fact about the code.
+REFUSAL_COUNTS = (None, 0, 1, 2, 3)
+
+# The dash that scopes the sentence: everything before it speaks about any
+# refusal, everything after it about the one state it names.
+SCOPING_DASH = re.compile(r"\s+[—-]\s+")
+
+
+def _no_handover_sentence() -> str:
+    flat = " ".join(_section(SHIP.read_text(encoding="utf-8"), "## 3. Publish once").split())
+    hits = [s for s in re.split(r"(?<=[.!?])\s+", flat) if NO_HANDOVER in s]
+    assert len(hits) == 1, "ship §3 states the no-handover rule in one sentence"
+    return hits[0]
+
+
+# ship-prose-promises-only-what-every-refusal-names (A3 positive)
+def test_ship_prose_promises_only_what_every_refusal_names() -> None:
+    """What the station may promise is read from the checker, not remembered.
+
+    Two facts come out of `publication_advice`: every count gets a non-empty
+    tail, so "take what the refusal names" holds for all of them; and only one
+    count gets `PUBLICATION_ROUTES`, so naming routes in a clause that speaks
+    about any refusal promises a state the checker does not always produce.
+    The clause before the scoping dash is therefore held to the first fact and
+    the routes belong after it, where the sentence names the state they apply
+    to.
+
+    Chosen over `assert "the two legal routes it names" not in sentence`: the
+    literal passes the moment the same false promise is reworded, and says
+    nothing if `publication_advice` later changes which counts carry routes --
+    this reads both from the module. Its limit is the dash: a sentence that
+    hides an unconditional promise after one is not caught, and only the
+    refusal string itself is enforceable.
+    """
+    advice = {count: publication_advice(count) for count in REFUSAL_COUNTS}
+    assert all(tail.strip() for tail in advice.values()), (
+        "every refusal names something the agent can act on"
+    )
+    assert [count for count, tail in advice.items() if tail is not PUBLICATION_ROUTES], (
+        "premise: some refusal names no route -- were every refusal to carry "
+        "PUBLICATION_ROUTES again, the station could promise routes outright"
+    )
+    general = SCOPING_DASH.split(_no_handover_sentence(), maxsplit=1)[0]
+    for promise in ("route", "closing-review", "step selection"):
+        assert promise not in general.lower(), (
+            f"ship §3 promises {promise!r} for any refusal, but the checker "
+            "names the routes for one attestation count only; scope the "
+            "promise to that state, after the dash"
+        )
 
 
 TWO_COPY_DOC = (
