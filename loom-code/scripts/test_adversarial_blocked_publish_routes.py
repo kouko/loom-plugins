@@ -1084,3 +1084,88 @@ def test_probe_scoping_dash_hides_a_promise_placed_after_it() -> None:
         "…while promising, after the dash, exactly what the checker does not "
         "always name"
     )
+
+
+# --------------------------------------------------------------------------
+# Half seven: route two is named on every host and in every session. It is not
+# available in every host or every session.
+# --------------------------------------------------------------------------
+
+
+def _bind_in(repo: Path, change_id: str, *, propose_session: str,
+             confirm_session: str, attended: str) -> dict:
+    """Propose in one session, confirm in another, under a chosen attendedness."""
+    def run(argv, stdin="", **overrides):
+        env = _env()
+        env.update(overrides)
+        return subprocess.run([sys.executable, str(CHECKER), *argv], cwd=str(repo),
+                              capture_output=True, text=True, env=env, input=stdin)
+
+    proposal = run([*_propose_argv(change_id), "--skip", "reviewers"],
+                   CLAUDE_CODE_SESSION_ID=propose_session,
+                   CLAUDE_CODE_SESSION_ATTENDED="1")
+    assert proposal.returncode == 0, proposal.stderr
+    code = proposal.stdout.split("code:")[1].strip().split()[0]
+    run(["selection", "capture", "--hook"], json.dumps({
+        "hook_event_name": "UserPromptSubmit",
+        "prompt": f"/loom-code:expert-mode {code}",
+        "prompt_id": f"p-{code}", "session_id": confirm_session}),
+        CLAUDE_CODE_SESSION_ID=confirm_session,
+        CLAUDE_CODE_SESSION_ATTENDED=attended)
+    shown = run(["selection", "show", change_id],
+                CLAUDE_CODE_SESSION_ID=confirm_session,
+                CLAUDE_CODE_SESSION_ATTENDED="1")
+    assert shown.returncode == 0, shown.stderr
+    return json.loads(shown.stdout)
+
+
+UNBINDABLE = (
+    # label, propose session, confirm session, attended
+    ("a nested unattended session", "S1", "S1", "0"),
+    ("a confirmation typed in a later session", "S1", "S2", "1"),
+)
+
+
+@pytest.mark.parametrize("label,propose,confirm,attended", UNBINDABLE)
+def test_probe_route_two_really_is_unavailable_there(tmp_path, label, propose,
+                                                     confirm, attended) -> None:
+    """The mechanism behind F11, which is correct and must stay: a confirmation
+    that was not typed by an attended user in the proposing session binds
+    nothing. Nothing here argues for loosening it."""
+    repo = _repo(tmp_path, "unbindable" + str(abs(hash(label)) % 1000))
+    assert _bind_in(repo, CHANGE, propose_session=propose,
+                    confirm_session=confirm, attended=attended)["bound"] is False
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F11: the count-zero tail names the step-selection route in "
+           "every session and on every host, and the route is unavailable in a "
+           "nested unattended session, when the confirmation lands in a later "
+           "session, and -- per the expert-mode station's own Boundary -- on a "
+           "host without prompt capture. The agent asks the user to type a "
+           "confirmation that cannot be recorded, which is the mechanical work "
+           "this change exists to stop asking of them",
+)
+def test_probe_refusal_names_route_two_only_where_it_can_be_taken(tmp_path) -> None:
+    """Attack: reach a state where a named route cannot be completed at all, and
+    see whether the refusal still names it."""
+    repo = _repo(tmp_path, "unattended")
+    env = _env()
+    env["CLAUDE_CODE_SESSION_ATTENDED"] = "0"
+    refused = subprocess.run([sys.executable, str(CHECKER), "push"], cwd=str(repo),
+                             capture_output=True, text=True, env=env, input="")
+    assert refused.returncode == 1
+    assert "selection propose" not in refused.stderr, (
+        "the refusal offers a step selection to a session that cannot record "
+        "one: " + refused.stderr)
+
+
+def test_probe_route_one_survives_where_route_two_does_not(tmp_path) -> None:
+    """The bound on F11: route one needs no confirmation, so the agent is
+    slowed, not stranded. This is why F11 is not F6."""
+    repo = _repo(tmp_path, "routeone")
+    assert _bind_in(repo, CHANGE, propose_session="S1", confirm_session="S1",
+                    attended="0")["bound"] is False
+    # …and closing-review, which route one names, never consults the store.
+    assert "selection" not in _checker(repo, ["finalize-review", CHANGE]).stderr.lower()
