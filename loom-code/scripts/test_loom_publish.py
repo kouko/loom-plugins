@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -10,6 +11,7 @@ from pathlib import Path
 
 from loom_checker.command_handlers import publish as loom_checker
 from loom_checker.command_handlers import push as push_handler
+from loom_checker import selection as selection_store
 from loom_checker.rule_checks import push as push_rules
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
 from loom_checker.rule_checks.push import github_repo_from_origin
@@ -1255,7 +1257,8 @@ MISSING_ATTESTATION = (
     " types and only once per change, because expert-mode allows the agent one"
     " skip proposal per change, propose a step selection"
     " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
-    " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
+    " that the user confirms by typing `/loom-code:expert-mode <code>`"
+    " (Codex: `$expert-mode`) with the code"
     " the proposal printed, after which finalize-review drops the reviewer floor to"
     " zero and still emits an attestation recording the skip;"
     " never hand the blocked publication command to the user to run"
@@ -2035,3 +2038,22 @@ def test_the_pr_create_allowlist_carries_its_grounding_citations() -> None:
     assert "https://cli.github.com/manual/gh_pr_create" in above.rsplit("\n\n", 1)[-1]
     trailing = source.partition("def canonical_pr_create_trailing")[2].partition("\ndef ")[0]
     assert "pflag" in trailing and "https://" in trailing
+
+
+def test_the_refusal_names_both_confirmation_spellings_the_checker_accepts() -> None:
+    """The refusal is what an agent reads at the moment of failure, and an agent
+    on Codex reading it was shown one spelling while the ship station beside it
+    gives two. Both are named here, in the station's own parenthetical form.
+
+    Checked against `selection.ENTRY_TOKENS`, which is what decides whether a
+    typed prompt binds anything -- not against the station's prose, which would
+    only prove two documents agree. `ENTRY_TOKENS` accepts four spellings; the
+    two the station names are the two named here, because a refusal that listed
+    every accepted token would be teaching the token set rather than telling the
+    user what to type."""
+    forms = re.findall(r"`([^`]*expert-mode[^`]*)`", push_handler.PUBLICATION_ROUTES)
+    assert [form.split()[0] for form in forms] == [
+        "/loom-code:expert-mode", "$expert-mode"
+    ], forms
+    for form in forms:
+        assert form.split()[0] in selection_store.ENTRY_TOKENS, form

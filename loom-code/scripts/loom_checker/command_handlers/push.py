@@ -50,7 +50,12 @@ import sys
 # confirmation is written in the form the user actually types, because
 # `selection.confirmation_prompt_matches` counts a prompt only when its first
 # token is an entry-point token (`selection.ENTRY_TOKENS`); a prompt that is the
-# bare code binds nothing.
+# bare code binds nothing. Both host spellings are named, in the expert-mode
+# station's own parenthetical form, because this string is what an agent reads
+# at the moment of failure and a Codex agent shown only the Claude Code slash
+# form would tell its user to type something its host does not offer.
+# `ENTRY_TOKENS` accepts four; the two the station names are the two named here,
+# because the sentence tells a user what to type rather than teaching the set.
 #
 # Route two is named under its conditions rather than flatly, because it is open
 # in fewer states than route one, and an agent that follows a dead route asks the
@@ -82,7 +87,8 @@ PUBLICATION_ROUTES = (
     " types and only once per change, because expert-mode allows the agent one"
     " skip proposal per change, propose a step selection"
     " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
-    " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
+    " that the user confirms by typing `/loom-code:expert-mode <code>`"
+    " (Codex: `$expert-mode`) with the code"
     " the proposal printed, after which finalize-review drops the reviewer floor to"
     " zero and still emits an attestation recording the skip;"
     " never hand the blocked publication command to the user to run"

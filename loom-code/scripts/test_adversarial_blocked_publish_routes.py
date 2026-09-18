@@ -34,6 +34,7 @@ import test_ship_station_text as ship_text
 from loom_checker.command_handlers import push as push_handler
 from loom_checker.command_handlers.publish import MISSING_ATTESTATION
 from loom_checker.command_handlers.push import EXTRA_ATTESTED_CHANGES
+from loom_checker.command_handlers.push import NOTHING_TO_PUBLISH
 from loom_checker.command_handlers.push import PUBLICATION_ROUTES
 from loom_checker.rule_checks.publish import render_selection_disclosure
 from loom_checker.rule_checks.push import canonical_pr_create_trailing
@@ -778,35 +779,35 @@ def _already_landed_branch(tmp_path: Path, change_id: str, review: Path) -> Path
     return repo
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F6: the count-zero tail names the closing-review route "
-           "unconditionally, but a branch whose base already carries the "
-           "attestation finalize-review regenerates gets `found 0` and stays "
-           "there -- running the named station rewrites byte-identical content, "
-           "so the count never moves. This is the non-terminating loop the "
-           "count-above-one branch was split off to avoid, left in place on the "
-           "branch that kept the routes",
-)
 def test_probe_closing_review_route_terminates_at_count_zero(tmp_path) -> None:
     """Attack: take the first named route on every branch shape that is offered
-    it, not only the one it was written for."""
+    it, not only the one it was written for.
+
+    F6's marker is gone, and the fix is not the one the probe demanded. The
+    probe asserted that this branch becomes publishable; it never will, and it
+    should not -- there is genuinely nothing here to publish. `41cbcf1b`
+    answered the finding at the naming instead: `nothing_left_to_publish`
+    recomputes the state and `publication_advice` withholds both routes from it.
+    So the assertion moved from "the route works here" to "the route is not
+    named here", and the loop below stays as the reason it must not be."""
     change_id = "2026-09-18-already-landed"
     review = tmp_path / "landed-review.json"
     repo = _already_landed_branch(tmp_path, change_id, review)
 
-    refusal = _refusal(repo)
-    assert f"{PUSH_REASON}0" in refusal and "two legal routes" in refusal, refusal
+    (rule, reason), = _blocks(_refusal(repo))
+    assert rule == "push.attestation", reason
+    assert reason == f"{PUSH_REASON}0{NOTHING_TO_PUBLISH}", reason
+    assert "two legal routes" not in reason, reason
 
-    # "run the closing-review station, which generates the attestation" -- the
-    # real station, not a stand-in for it.
+    # Why neither route may be named here: run the real closing-review station,
+    # not a stand-in for it, and watch the count fail to move.
     regenerated = _checker(repo, ["finalize-review", change_id, "--input", str(review)])
     assert regenerated.returncode == 0, regenerated.stderr
     assert _git(repo, "status", "--porcelain") == "", (
         "the fixture is only interesting while the regenerated attestation is "
         "byte-identical to the one already in the base")
-
-    assert f"{PUSH_REASON}0" not in _checker(repo, ["push"]).stderr
+    (_rule, again), = _blocks(_checker(repo, ["push"]).stderr)
+    assert again == reason, "the station ran and changed nothing, as expected"
 
 
 def test_probe_land_always_reports_a_countable_attestation_count(tmp_path) -> None:
@@ -1378,21 +1379,14 @@ def test_probe_structural_floor_runs_before_the_disclosure_clause(tmp_path, monk
     assert "Skipped steps" not in err
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F12: the hook route emits a refusal whose reason contains a "
-           "newline, so stderr carries a line with no `BLOCK ` prefix -- the "
-           "one-line-per-failure contract this change was built on, and which "
-           "`PUBLICATION_ROUTES` was held to. `validate_selection_disclosure` "
-           "quotes the disclosure it wants on a second line and `report()` "
-           "writes it verbatim. No probe crossed the two until this one; the "
-           "module's own `_blocks()` reader is what the rest of the suite "
-           "trusts, and it rejects this stderr",
-)
 def test_probe_hook_refusal_is_one_block_line_per_failure(tmp_path, monkeypatch) -> None:
     """Attack the contract the whole change rests on, from the route that was
     added last. Every other probe reads refusals through `_blocks()`; this one
-    points `_blocks()` at the stderr no probe had read that way."""
+    points `_blocks()` at the stderr no probe had read that way.
+
+    F12's marker is gone: `41cbcf1b` flattens the reason at this emission only,
+    leaving publish's multi-line rendering for the terminal that reads it. The
+    probe stays as the regression for the contract."""
     repo, disclosure = _skipped_branch(tmp_path)
     _honest, hidden = _bodies(tmp_path, disclosure)
     code, err = _run_hook(repo, _command(repo, "--body-file", str(hidden)), monkeypatch)
