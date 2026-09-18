@@ -13,11 +13,29 @@ the left-hand column with:
 git show 5b8dfdce727792a338f4c7778d1d0c1b55295b23:loom-code/skills/closing-review/references/adversarial.md
 ```
 
-and diff it against the four files named in the right-hand column. The
-split moved whole `##` sections; no sentence was reworded, reordered,
+and diff it against the four files named in the right-hand column as the
+split wrote them, read at split commit `50cf9f8b603fa77cb5934b9a1dcc6b73cf275ad6`:
+
+```
+git show 50cf9f8b603fa77cb5934b9a1dcc6b73cf275ad6:loom-code/skills/closing-review/references/adversarial-code.md
+```
+
+The split moved whole `##` sections; no sentence was reworded, reordered,
 dropped or written. `loom-code/scripts/test_adversary_layout.py` recomputes
-this correspondence from that commit on every run, so the table below is a
-reader's index, not the check itself.
+this correspondence from those two commits on every run, so the table below
+is a reader's index, not the check itself.
+
+Both sides of that comparison are read from git rather than from the
+working tree, and that is deliberate. What it proves is a fact about one
+past event — the split moved every rule and invented none — and a fact
+about the past cannot change. Reading the current files instead would have
+turned this into a freeze on the recipes themselves: every later edit to
+one of them would have failed a check named after the migration, which
+Acceptance 3 of the intent forbids. A later edit to a recipe is the
+business of that recipe's own test file. What remains a live check against
+the working tree is this file's structural half: the recipe files sit
+beside the protocol in a flat folder, the protocol carries no recipe body,
+and a kind's rule appears in that kind's file and nowhere else.
 
 Every destination path is relative to
 `loom-code/skills/closing-review/references/`.
