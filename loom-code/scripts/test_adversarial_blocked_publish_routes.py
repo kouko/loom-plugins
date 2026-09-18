@@ -153,10 +153,17 @@ def test_probe_only_a_zero_count_is_ever_offered_the_routes(tmp_path, count) -> 
     Read off the emitted bytes, with no call into the product's own chooser."""
     ids = tuple(f"2026-09-18-change-{index}" for index in range(count))
     stderr = _checker(_repo(tmp_path, f"only{count}", ids), ["push"]).stderr
-    offered = "two legal routes" in stderr
+    (rule, reason), = _blocks(stderr)
+    assert rule == "push.attestation", stderr
+    offered = "two legal routes" in reason
     assert offered == (count == 0), stderr
-    if count == 1:  # one attestation passes the count and is refused later
-        assert PUSH_REASON not in stderr
+    if count == 1:
+        # one attestation passes the count and is refused on its contents, so
+        # the refusal must be a different one rather than merely not this one.
+        assert PUSH_REASON not in reason
+        assert reason == "attestation has an unknown or incomplete schema", stderr
+    else:
+        assert reason.startswith(f"{PUSH_REASON}{count}"), stderr
 
 
 def test_probe_routes_text_is_one_line_with_no_control_characters() -> None:
@@ -187,8 +194,8 @@ def test_probe_refspec_refusal_still_emits_two_separate_block_lines(tmp_path) ->
     result = _checker(repo, ["push", "--hook"], _hook("git push origin feature", repo))
     assert result.returncode == 2
     blocks = _blocks(result.stderr)
-    assert len(blocks) == 2
-    assert blocks[0][1].endswith(PUBLICATION_ROUTES)
+    assert [rule for rule, _reason in blocks] == ["push.attestation", "push.attestation"]
+    assert blocks[0][1] == f"{PUSH_REASON}0{PUBLICATION_ROUTES}"
     assert not blocks[1][1].endswith(PUBLICATION_ROUTES)
 
 
@@ -232,6 +239,9 @@ def test_probe_push_and_land_name_byte_identical_routes(tmp_path) -> None:
     """Attack: let the two sites drift into naming two different ways out."""
     push = _checker(_repo(tmp_path, "p"), ["push"]).stderr
     land = _checker(_repo(tmp_path, "l"), ["land", "--accepted-by", "kouko"]).stderr
+    assert _blocks(push)[0][0] == "push.attestation"
+    assert _blocks(land)[0][0] == "land.merge"
+    assert PUSH_REASON + "0" in push and LAND_REASON + "0" in land
     assert push.split(PUSH_REASON + "0", 1)[1] == land.split(LAND_REASON + "0", 1)[1]
 
 
@@ -239,7 +249,10 @@ def test_probe_routes_are_not_appended_twice(tmp_path) -> None:
     """Attack: `land` appends, then delegates to the push handler, which
     appends again."""
     result = _checker(_repo(tmp_path, "twice"), ["land", "--accepted-by", "kouko"])
-    assert result.stderr.count("two legal routes") == 1
+    (rule, reason), = _blocks(result.stderr)
+    assert rule == "land.merge", result.stderr
+    assert reason == f"{LAND_REASON}0{PUBLICATION_ROUTES}", result.stderr
+    assert reason.count("two legal routes") == 1
 
 
 # --------------------------------------------------------------------------
@@ -287,30 +300,73 @@ def _bind(repo: Path, change_id: str, extra: list[str], *, prompt=_named_prompt)
 CHANGE = "2026-09-18-blocked-publish-names-the-legal-routes"
 
 
+def _propose_argv_without_skip(change_id: str) -> list[str]:
+    """The refusal's own proposal command with `--skip <steps>` taken out --
+    the command it printed before F1 was fixed."""
+    argv = _propose_argv(change_id)
+    index = argv.index("--skip")
+    del argv[index:index + 2]
+    return argv
+
+
+def _confirm_then_finalize(repo: Path, change_id: str, argv: list[str],
+                           tmp_path: Path, name: str):
+    """Propose with `argv`, have the user confirm, and run finalize-review with
+    an empty verdict list -- the input that only passes when the floor is zero.
+
+    The adversarial artifact is supplied because without it `finalize.adversarial`
+    fires first and the run never reaches the reviewer floor at all, which is how
+    this probe and its control previously passed each other by."""
+    proposal = _checker(repo, argv)
+    assert proposal.returncode == 0, proposal.stderr
+    code = proposal.stdout.split("code:")[1].strip().split()[0]
+    _checker(repo, ["selection", "capture", "--hook"], json.dumps({
+        "hook_event_name": "UserPromptSubmit",
+        "prompt": f"/loom-code:expert-mode {code}",
+        "prompt_id": f"p-{name}", "session_id": SESSION}))
+    shown = _checker(repo, ["selection", "show", change_id])
+    assert shown.returncode == 0, shown.stderr
+    review = tmp_path / f"{name}-review.json"
+    review.write_text(json.dumps({
+        "verdicts": [], "findings": [],
+        "adversarial": [{"command": "python3 probe_ok.py", "artifact": "probe_ok.py"}],
+    }), encoding="utf-8")
+    return json.loads(shown.stdout), _checker(
+        repo, ["finalize-review", change_id, "--input", str(review)])
+
+
 def test_probe_named_proposal_drops_the_reviewer_floor(tmp_path) -> None:
     """Attack: follow the refusal literally and see whether the second route
-    reaches the state the refusal says it reaches."""
-    repo = _repo(tmp_path, "route2")
-    assert _bind(repo, CHANGE, [])["skip"] == ["reviewers"]
+    reaches the state the refusal says it reaches -- a finalize-review that
+    accepts no verdicts at all and still writes the attestation."""
+    change_id = "2026-09-18-floor-drops"
+    repo = _publishable_fixture(tmp_path, "floordrop", change_id)
+    shown, finalized = _confirm_then_finalize(
+        repo, change_id, _propose_argv(change_id), tmp_path, "drop")
+    assert shown["skip"] == ["reviewers"]
+    assert finalized.returncode == 0, finalized.stderr
+    assert (repo / "docs" / "loom" / change_id / "attestation.json").is_file()
 
-    review = tmp_path / "review-input.json"
-    review.write_text(json.dumps({"verdicts": [], "findings": [], "adversarial": []}),
-                      encoding="utf-8")
-    result = _checker(repo, ["finalize-review", CHANGE, "--input", str(review)])
-    assert "review input has no verdicts" not in result.stderr
 
+def test_probe_named_proposal_without_the_skip_does_not_drop_the_floor(tmp_path) -> None:
+    """The genuine negative. The same route with `--skip reviewers` removed --
+    the command the refusal printed before F1 was fixed -- binds a selection that
+    skips nothing, and finalize-review refuses at the floor.
 
-def test_probe_named_proposal_with_an_explicit_skip_does_drop_the_floor(tmp_path) -> None:
-    """Control for F1: the same command plus `--skip reviewers` -- the words the
-    refusal leaves out -- is what actually drops the floor."""
-    repo = _repo(tmp_path, "route2ok")
-    assert _bind(repo, CHANGE, ["--skip", "reviewers"])["skip"] == ["reviewers"]
-
-    review = tmp_path / "review-ok.json"
-    review.write_text(json.dumps({"verdicts": [], "findings": [], "adversarial": []}),
-                      encoding="utf-8")
-    result = _checker(repo, ["finalize-review", CHANGE, "--input", str(review)])
-    assert "review input has no verdicts" not in result.stderr
+    This is what the old "control" was meant to be. It was not: `_propose_argv`
+    reads the command out of `PUBLICATION_ROUTES`, which has carried
+    `--skip reviewers` since `bf3cfc81`, so the control's extra flag was a
+    duplicate and the two fixtures were identical."""
+    change_id = "2026-09-18-floor-holds"
+    repo = _publishable_fixture(tmp_path, "floorhold", change_id)
+    argv = _propose_argv_without_skip(change_id)
+    assert "--skip" not in argv
+    shown, finalized = _confirm_then_finalize(repo, change_id, argv, tmp_path, "hold")
+    assert shown["skip"] == []
+    assert finalized.returncode == 1
+    (rule, reason), = _blocks(finalized.stderr)
+    assert rule == "finalize.verdicts", finalized.stderr
+    assert reason == "review input has no verdicts", finalized.stderr
 
 
 def test_probe_typing_the_named_confirmation_confirms_the_selection(tmp_path) -> None:
@@ -585,6 +641,7 @@ def test_probe_hook_route_really_reaches_the_pull_request(tmp_path, monkeypatch)
     body.write_text(_pr_body(disclosure), encoding="utf-8")
     code, err = _run_hook(repo, _canonical_metadata_command(repo, body), monkeypatch)
     assert code == 0, err
+    assert err == "", err
 
 
 # --------------------------------------------------------------------------
@@ -711,7 +768,13 @@ def _already_landed_branch(tmp_path: Path, change_id: str, review: Path) -> Path
 
     _git(repo, "switch", "-q", "main")
     _git(repo, "merge", "-q", "--ff-only", "prep")
-    _git(repo, "switch", "-q", "-c", "feature")
+    # `_repo` already created `feature`, so this moves it onto the base rather
+    # than creating it. `switch -c` here died with exit 128 during fixture setup,
+    # which the strict marker then recorded as the expected failure -- the probe
+    # asserted nothing and could never have retired itself.
+    _git(repo, "switch", "-q", "feature")
+    _git(repo, "reset", "-q", "--hard", "main")
+    assert _git(repo, "rev-parse", "HEAD") == _git(repo, "rev-parse", "main")
     return repo
 
 
@@ -758,7 +821,9 @@ def test_probe_land_always_reports_a_countable_attestation_count(tmp_path) -> No
         ids = tuple(f"2026-09-18-change-{index}" for index in range(count))
         result = _checker(_repo(tmp_path, f"count{count}", ids),
                           ["land", "--accepted-by", "kouko"])
-        (_rule, reason), = _blocks(result.stderr)
+        (rule, reason), = _blocks(result.stderr)
+        assert rule == "land.merge", result.stderr
+        assert reason.startswith(MISSING_ATTESTATION), reason
         found = reason.removeprefix(MISSING_ATTESTATION).split(";", 1)[0]
         assert found.isdigit() and int(found) == count, reason
 
@@ -854,16 +919,32 @@ def test_probe_repeated_body_file_is_read_last_wins(tmp_path, monkeypatch) -> No
     honest, hidden = _bodies(tmp_path, disclosure)
     hidden_last = _command(repo, "--body-file", str(honest), "--body-file", str(hidden))
     honest_last = _command(repo, "--body-file", str(hidden), "--body-file", str(honest))
-    assert _run_hook(repo, hidden_last, monkeypatch)[0] == 2
-    assert _run_hook(repo, honest_last, monkeypatch)[0] == 0
+    hidden_code, hidden_err = _run_hook(repo, hidden_last, monkeypatch)
+    assert hidden_code == 2
+    assert hidden_err.startswith("BLOCK push.contextual-body: "), hidden_err
+    assert "Skipped steps: reviewers" in hidden_err, hidden_err
+    honest_code, honest_err = _run_hook(repo, honest_last, monkeypatch)
+    assert honest_code == 0 and honest_err == "", honest_err
 
 
-def test_probe_joined_body_file_form_is_read(tmp_path, monkeypatch) -> None:
+def test_probe_joined_body_file_form_is_refused_at_admission(tmp_path, monkeypatch) -> None:
     """Attack: spell the option `--body-file=<path>` so the parse misses it and
-    falls back to an empty body the disclosure rule has nothing to say about."""
+    falls back to an empty body the disclosure rule has nothing to say about.
+
+    Repelled, and not where the old name said. The joined spelling is not in
+    `CANONICAL_PR_CREATE_OPTIONS`, so the command is refused at admission and no
+    body is read on this route at all. The probe asserted only `== 2` and so
+    passed on a refusal it was not aimed at. Both halves are pinned now: the rule
+    the hook really prints, and the reader still understanding the spelling --
+    which is the tripwire if it is ever allowlisted."""
     repo, disclosure = _skipped_branch(tmp_path)
     _honest, hidden = _bodies(tmp_path, disclosure)
-    assert _run_hook(repo, _command(repo, f"--body-file={hidden}"), monkeypatch)[0] == 2
+    command = _command(repo, f"--body-file={hidden}")
+    code, err = _run_hook(repo, command, monkeypatch)
+    assert code == 2
+    assert "BLOCK push.attestation: PR creation must use the canonical" in err, err
+    assert "push.contextual-body" not in err, err
+    assert pr_create_body(command) == hidden.read_text(encoding="utf-8")
 
 
 def test_probe_unreadable_body_is_refused_while_a_skip_stands(tmp_path, monkeypatch) -> None:
@@ -907,11 +988,12 @@ def test_probe_short_body_file_option_cannot_diverge_from_the_shell(tmp_path, mo
     (sub / "rel.md").write_text(_pr_body(), encoding="utf-8")             # the shell's copy
 
     command = _command(repo, "-F", "rel.md")
-    code, _err = _run_hook(repo, command, monkeypatch, payload_cwd=sub)
+    code, err = _run_hook(repo, command, monkeypatch, payload_cwd=sub)
     assert code == 2, (
         "the hook admitted a command whose body it resolved against the "
         "repository root while the shell will resolve it against " + str(sub)
     )
+    assert "BLOCK push.attestation: PR creation must use the canonical" in err, err
 
 
 def test_probe_short_body_file_option_really_reads_two_different_files(tmp_path, monkeypatch) -> None:
@@ -966,8 +1048,10 @@ def test_probe_hook_enforces_the_whole_contextual_body_rule(tmp_path, monkeypatc
     repo = _attested_branch_without_a_skip(tmp_path)
     body = tmp_path / "naked.md"
     body.write_text(NAKED_BODY, encoding="utf-8")
-    code, _err = _run_hook(repo, _command(repo, "--body-file", str(body)), monkeypatch)
+    code, err = _run_hook(repo, _command(repo, "--body-file", str(body)), monkeypatch)
     assert code == 2
+    assert err.startswith("BLOCK push.contextual-body: "), err
+    assert "nine top-level contextual headings" in err, err
 
 
 def test_probe_publish_refuses_the_same_naked_body(tmp_path) -> None:
@@ -1001,6 +1085,9 @@ def test_probe_body_read_cannot_block_the_hook(tmp_path) -> None:
     except subprocess.TimeoutExpired:
         pytest.fail("pr_create_body blocked for more than ten seconds on a FIFO")
     assert done.returncode == 0, done.stderr
+    # The value, not only the exit: a reader that returned anything at all here
+    # would have had to open the FIFO to do it.
+    assert done.stdout.strip() == "''", done.stdout
 
 
 def test_probe_publish_refuses_a_body_that_is_not_a_regular_file(tmp_path) -> None:
@@ -1163,12 +1250,27 @@ def test_probe_route_two_condition_is_not_self_evaluable(tmp_path) -> None:
 
 def test_probe_route_one_survives_where_route_two_does_not(tmp_path) -> None:
     """The bound on F11: route one needs no confirmation, so the agent is
-    slowed, not stranded. This is why F11 is not F6."""
-    repo = _repo(tmp_path, "routeone")
-    assert _bind_in(repo, CHANGE, propose_session="S1", confirm_session="S1",
+    slowed, not stranded. This is why F11 is not F6.
+
+    The closing assertion used to run `finalize-review` with no `--input`, which
+    exits 2 on a usage error before consulting anything -- it recorded nothing.
+    The station is now actually run, in the session that could not bind, and has
+    to succeed."""
+    change_id = "2026-09-18-route-one-survives"
+    repo = _publishable_fixture(tmp_path, "routeone", change_id)
+    assert _bind_in(repo, change_id, propose_session="S1", confirm_session="S1",
                     attended="0")["bound"] is False
-    # …and closing-review, which route one names, never consults the store.
-    assert "selection" not in _checker(repo, ["finalize-review", CHANGE]).stderr.lower()
+
+    review = tmp_path / "route-one-review.json"
+    review.write_text(json.dumps({
+        "verdicts": [{"reviewer": "a", "verdict": "PASS"},
+                     {"reviewer": "b", "verdict": "PASS"}],
+        "findings": [],
+        "adversarial": [{"command": "python3 probe_ok.py", "artifact": "probe_ok.py"}],
+    }), encoding="utf-8")
+    finalized = _checker(repo, ["finalize-review", change_id, "--input", str(review)])
+    assert finalized.returncode == 0, finalized.stderr
+    assert (repo / "docs" / "loom" / change_id / "attestation.json").is_file()
 
 
 # --------------------------------------------------------------------------
@@ -1274,6 +1376,31 @@ def test_probe_structural_floor_runs_before_the_disclosure_clause(tmp_path, monk
     assert _blocks(err.splitlines()[0] + "\n")[0][0] == "push.contextual-body"
     assert "nine top-level contextual headings" in err
     assert "Skipped steps" not in err
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F12: the hook route emits a refusal whose reason contains a "
+           "newline, so stderr carries a line with no `BLOCK ` prefix -- the "
+           "one-line-per-failure contract this change was built on, and which "
+           "`PUBLICATION_ROUTES` was held to. `validate_selection_disclosure` "
+           "quotes the disclosure it wants on a second line and `report()` "
+           "writes it verbatim. No probe crossed the two until this one; the "
+           "module's own `_blocks()` reader is what the rest of the suite "
+           "trusts, and it rejects this stderr",
+)
+def test_probe_hook_refusal_is_one_block_line_per_failure(tmp_path, monkeypatch) -> None:
+    """Attack the contract the whole change rests on, from the route that was
+    added last. Every other probe reads refusals through `_blocks()`; this one
+    points `_blocks()` at the stderr no probe had read that way."""
+    repo, disclosure = _skipped_branch(tmp_path)
+    _honest, hidden = _bodies(tmp_path, disclosure)
+    code, err = _run_hook(repo, _command(repo, "--body-file", str(hidden)), monkeypatch)
+    assert code == 2
+    assert err.startswith("BLOCK push.contextual-body: "), err
+    # `_blocks` is the reader the rest of this module judges refusals with; it
+    # asserts every stderr line carries the prefix, which is the contract.
+    assert [rule for rule, _reason in _blocks(err)] == ["push.contextual-body"]
 
 
 BODY_PATHS_THAT_ARE_NOT_BODIES = ("fifo", "chardev", "stdin", "directory",
