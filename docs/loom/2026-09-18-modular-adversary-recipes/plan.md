@@ -31,6 +31,11 @@ charter: 1.0
 - Test: A5 positive: deleting-a-kind-leaves-no-reference; negative: stale-reference-detected.
 - Risk: A grep-shaped check can pass by skipping. agent-decided: the test performs a synthetic deletion in a temporary copy and asserts on the result, never on prose.
 
+**W1-04 Removing a routed kind is bounded for the kinds that exist**  after: W1-02  acceptance: 5
+- Files: loom-code/scripts/test_adversary_layout.py, loom-code/scripts/test_adversary_recipe_code.py, loom-code/scripts/test_build_mechanical_checks.py
+- Test: A5 positive: removing-a-real-kind-leaves-no-reference; negative: hand-listed-path-detected.
+- Risk: Three test files hard-code recipe paths, so removing a kind breaks collection. agent-decided: derive those lists from the routing table and read migration facts from the split commit.
+
 **W1-03 One shape every recipe keeps**  after: W0-02  acceptance: 10
 - Files: loom-code/scripts/test_adversary_recipe_shape.py
 - Test: A10 positive: every-recipe-keeps-the-shape; negative: recipe-missing-part-of-shape-rejected.
