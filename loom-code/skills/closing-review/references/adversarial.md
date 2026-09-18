@@ -6,7 +6,32 @@ runs is committed as a program: Build re-runs those programs on every fix
 loop, and `finalize-review` executes them on committed content. If a case
 needs the code changed to fail, it is not a case.
 
-<!-- Routing table goes here: which recipe file each kind of artifact is read from. -->
+## Which recipe to read
+
+Every changed path has an artifact type, from the `artifact_types` list in
+`contract/manifest.yaml`. Read this protocol, then the recipe file this table
+names for every artifact type among the changed paths: that protocol and those
+recipes are the whole procedure, and there is nothing else to find. A type
+whose row says `none` has no recipe today — attack it with this protocol
+alone, and say in the report that it has none.
+
+| Artifact type | Recipe file |
+|---|---|
+| `code` | [`adversarial-code.md`](adversarial-code.md) |
+| `spec` | [`adversarial-spec.md`](adversarial-spec.md) |
+| `skill` | [`adversarial-skill-gate.md`](adversarial-skill-gate.md) |
+| `gate` | [`adversarial-skill-gate.md`](adversarial-skill-gate.md) |
+| `intent` | none |
+| `plan` | none |
+| `standing` | none |
+| `evidence` | none |
+| `map` | none |
+| `memory` | none |
+| `docs` | none |
+
+Giving a type a recipe is one new file beside this one plus its own row here;
+no existing recipe file is edited. Taking one away deletes its file and puts
+its row back to `none`.
 
 ## Reuse first, update with evidence
 
