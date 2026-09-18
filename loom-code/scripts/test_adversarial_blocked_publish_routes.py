@@ -36,6 +36,7 @@ from loom_checker.command_handlers.push import EXTRA_ATTESTED_CHANGES
 from loom_checker.command_handlers.push import PUBLICATION_ROUTES
 from loom_checker.rule_checks.publish import render_selection_disclosure
 from loom_checker.rule_checks.push import github_repo_from_origin
+from loom_checker.rule_checks.push import pr_create_body
 from loom_checker.rule_checks.push import render_quote_all
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -536,12 +537,18 @@ def _canonical_metadata_command(repo: Path, body: Path) -> str:
     ])
 
 
-def _run_hook(repo: Path, command: str, monkeypatch) -> tuple[int, str]:
+def _run_hook(repo: Path, command: str, monkeypatch, *,
+              payload_cwd: Path | None = None) -> tuple[int, str]:
     """The publication hook on one Bash command, with the live remote-head
     lookup -- the external seam -- answered with the state that holds right
-    after a successful push."""
+    after a successful push.
+
+    `payload_cwd` is the directory the Bash tool would run the command in. The
+    hook chdirs to the repository root regardless, so the two differ whenever
+    the agent is working from a subdirectory."""
     payload = {"hook_event_name": "PreToolUse", "tool_name": "Bash",
-               "tool_input": {"command": command}, "cwd": str(repo)}
+               "tool_input": {"command": command},
+               "cwd": str(payload_cwd or repo)}
     monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", SESSION)
     monkeypatch.setenv("CLAUDE_CODE_SESSION_ATTENDED", "1")
     monkeypatch.setattr(push_handler, "read_hook_payload", lambda *a, **k: payload)
@@ -551,27 +558,24 @@ def _run_hook(repo: Path, command: str, monkeypatch) -> tuple[int, str]:
     return push_handler.cmd_push(["--hook"], out, err), err.getvalue()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F5: the publication hook validates the attestation and the "
-           "remote head for the trusted metadata-only PR-opening command, but "
-           "never the PR body, so the skip disclosure `publish` enforces is not "
-           "enforced on that route and a user-typed skip reaches a pull request "
-           "undisclosed",
-)
 def test_probe_hook_refuses_a_pr_body_that_hides_the_skip(tmp_path, monkeypatch) -> None:
-    """Attack: same repository, same undisclosed body, the other route."""
+    """Attack: same repository, same undisclosed body, the other route.
+
+    F5's marker is gone: `f8a5559a` made the hook ask publish's own
+    `selection_disclosure_failure`, and this now refuses. The probe stays as the
+    regression that would catch the route being opened again."""
     repo, _attestation = _attested_branch_with_a_skip(tmp_path)
     body = tmp_path / "hook-body-no-disclosure.md"
     body.write_text(_pr_body(), encoding="utf-8")
     code, err = _run_hook(repo, _canonical_metadata_command(repo, body), monkeypatch)
     assert code == 2, "the hook let an undisclosed skip through: " + (err or "no refusal")
+    assert "push.contextual-body" in err, err
 
 
 def test_probe_hook_route_really_reaches_the_pull_request(tmp_path, monkeypatch) -> None:
-    """Control for F5: the same command with a correctly disclosing body is
-    admitted too, which shows the hook is not reading the body at all rather
-    than reading it and happening to accept."""
+    """Control: the same command with a correctly disclosing body is admitted,
+    so the refusal above is the disclosure rule firing and not the route being
+    closed to every body."""
     repo, attestation = _attested_branch_with_a_skip(tmp_path)
     disclosure = tuple(render_selection_disclosure(attestation))
     assert disclosure, "the fixture must produce a disclosure line"
@@ -763,19 +767,25 @@ SHIP_RULE_SENTENCE = re.search(
 )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F7a: the ship station still tells the agent to `take one of "
-           "the two legal routes it names`, but a refusal above one attestation "
-           "now names no route at all; the instruction is unfollowable in "
-           "exactly the state the checker was corrected for",
-)
 def test_probe_ship_prose_does_not_promise_routes_the_refusal_may_not_name() -> None:
     """Attack: reach a state where the station's instruction cannot be carried
-    out. The checker learnt that a count above one has no route; the prose that
-    sends the agent to `the two legal routes it names` did not."""
+    out. The checker learnt that a count above one has no route; the prose had
+    to learn it too.
+
+    F7a's marker is gone: `eabbe2c0` scoped the routes to the branch that
+    attests nothing. The probe stays as the regression, and reads the property
+    rather than the old literal -- an unconditional promise reworded would
+    otherwise walk straight past it. The split is computed here rather than
+    imported from the station's own test, so the two cannot drift into agreeing
+    about a sentence the checker contradicts."""
     assert SHIP_RULE_SENTENCE, "the no-handover sentence is missing from the station"
-    assert "the two legal routes it names" not in SHIP_RULE_SENTENCE.group(0)
+    sentence = SHIP_RULE_SENTENCE.group(0)
+    unconditional = re.split(r"\s+[—-]\s+", sentence, maxsplit=1)[0].lower()
+    for promise in ("route", "closing-review", "step selection"):
+        assert promise not in unconditional, (
+            f"ship §3 promises {promise!r} for any refusal, while the checker "
+            f"names routes for one attestation count only: {sentence}"
+        )
 
 
 @pytest.mark.xfail(
@@ -798,3 +808,279 @@ def test_probe_ship_prose_names_a_confirmation_the_checker_accepts() -> None:
     sentence = SHIP_RULE_SENTENCE.group(0)
     assert "typing the code" not in sentence
     assert "/loom-code:expert-mode" in sentence
+
+
+# --------------------------------------------------------------------------
+# Half six: the body the hook now reads. The gate's guarantee is only as good
+# as its agreement with the bytes `gh` will actually send, so every probe here
+# asks whether the two can be made to differ.
+# --------------------------------------------------------------------------
+
+
+def _skipped_branch(tmp_path: Path) -> tuple[Path, tuple[str, ...]]:
+    repo, attestation = _attested_branch_with_a_skip(tmp_path)
+    disclosure = tuple(render_selection_disclosure(attestation))
+    assert disclosure, "the fixture must produce a disclosure line"
+    return repo, disclosure
+
+
+def _bodies(tmp_path: Path, disclosure: tuple[str, ...]) -> tuple[Path, Path]:
+    honest, hidden = tmp_path / "honest.md", tmp_path / "hidden.md"
+    honest.write_text(_pr_body(disclosure), encoding="utf-8")
+    hidden.write_text(_pr_body(), encoding="utf-8")
+    return honest, hidden
+
+
+def _command(repo: Path, *trailing: str) -> str:
+    return render_quote_all([
+        "command", str(Path(shutil.which("env")).resolve()),
+        f"LOOM_REPO_ROOT={repo.resolve()}",
+        f"GH_REPO={github_repo_from_origin(repo)}",
+        str(Path(shutil.which("gh")).resolve()), "pr", "create",
+        "--head", "feature", "--title", "feat(x): seam probe", *trailing,
+    ])
+
+
+def test_probe_repeated_body_file_is_read_last_wins(tmp_path, monkeypatch) -> None:
+    """Attack: repeat the option so the gate judges one body and the request
+    carries another.
+
+    Repelled. `gh pr create --help` declares `-b, --body string` and
+    `-F, --body-file file`: both scalar pflag flags, whose `Set` overwrites, so
+    a repeated flag keeps the last value. Had either been declared
+    `stringArray`, last-wins would be the wrong reading. I did not execute `gh`
+    to confirm it: this repository's own hook refuses the command, and the
+    invocations that would reach body handling risk a network call the pass
+    forbids. The claim rests on gh's declared flag types, and this probe pins
+    only the half that is mine -- that the gate reads the last one."""
+    repo, disclosure = _skipped_branch(tmp_path)
+    honest, hidden = _bodies(tmp_path, disclosure)
+    hidden_last = _command(repo, "--body-file", str(honest), "--body-file", str(hidden))
+    honest_last = _command(repo, "--body-file", str(hidden), "--body-file", str(honest))
+    assert _run_hook(repo, hidden_last, monkeypatch)[0] == 2
+    assert _run_hook(repo, honest_last, monkeypatch)[0] == 0
+
+
+def test_probe_joined_body_file_form_is_read(tmp_path, monkeypatch) -> None:
+    """Attack: spell the option `--body-file=<path>` so the parse misses it and
+    falls back to an empty body the disclosure rule has nothing to say about."""
+    repo, disclosure = _skipped_branch(tmp_path)
+    _honest, hidden = _bodies(tmp_path, disclosure)
+    assert _run_hook(repo, _command(repo, f"--body-file={hidden}"), monkeypatch)[0] == 2
+
+
+def test_probe_unreadable_body_is_refused_while_a_skip_stands(tmp_path, monkeypatch) -> None:
+    """Attack: the fix calls an unreadable body "discloses nothing". Name a file
+    that does not exist and see whether nothing is read as honest.
+
+    Repelled where it matters: an empty body carries no disclosure line, and a
+    branch with a recorded skip requires one, so the empty reading refuses."""
+    repo, _disclosure = _skipped_branch(tmp_path)
+    missing = _command(repo, "--body-file", str(tmp_path / "absent.md"))
+    code, err = _run_hook(repo, missing, monkeypatch)
+    assert code == 2 and "push.contextual-body" in err, err
+
+
+def test_probe_disclosure_check_is_not_reached_before_the_attestation(tmp_path, monkeypatch) -> None:
+    """Attack the ordering: reach the body check on a branch whose attestation
+    does not validate, so a body verdict stands in for an attestation verdict.
+
+    Repelled: the body is judged only after `_cmd_push` returns 0, so a broken
+    attestation refuses under its own rule id and the body is never consulted."""
+    repo = _repo(tmp_path, "unattested")
+    body = tmp_path / "ordering.md"
+    body.write_text(_pr_body(), encoding="utf-8")
+    code, err = _run_hook(repo, _command(repo, "--body-file", str(body)), monkeypatch)
+    assert code == 2
+    assert "push.attestation" in err and "push.contextual-body" not in err, err
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F8: `check_pr_create_remote_head` requires an absolute path "
+           "for `--body-file` and `--body-file=` but not for the `-F` spelling, "
+           "which `pr_create_body` reads. The hook resolves the relative path "
+           "against the repository root it chdirs to; the shell resolves it "
+           "against its own working directory. F5 survives verbatim under `-F`",
+)
+def test_probe_short_body_file_option_cannot_diverge_from_the_shell(tmp_path, monkeypatch) -> None:
+    """Attack: make the gate and the request read two different files under one
+    path, by spelling the option the absoluteness rule does not cover."""
+    repo, disclosure = _skipped_branch(tmp_path)
+    (repo / "rel.md").write_text(_pr_body(disclosure), encoding="utf-8")  # the gate's copy
+    sub = repo / "sub"
+    sub.mkdir()
+    (sub / "rel.md").write_text(_pr_body(), encoding="utf-8")             # the shell's copy
+
+    command = _command(repo, "-F", "rel.md")
+    code, _err = _run_hook(repo, command, monkeypatch, payload_cwd=sub)
+    assert code == 2, (
+        "the hook admitted a command whose body it resolved against the "
+        "repository root while the shell will resolve it against " + str(sub)
+    )
+
+
+def test_probe_short_body_file_option_really_reads_two_different_files(tmp_path, monkeypatch) -> None:
+    """Control for F8: the same relative path, read from the two directories,
+    yields a disclosing body and a hiding one."""
+    repo, disclosure = _skipped_branch(tmp_path)
+    (repo / "rel.md").write_text(_pr_body(disclosure), encoding="utf-8")
+    sub = repo / "sub"
+    sub.mkdir()
+    (sub / "rel.md").write_text(_pr_body(), encoding="utf-8")
+    command = _command(repo, "-F", "rel.md")
+
+    monkeypatch.chdir(repo)
+    assert "Skipped steps" in pr_create_body(command)
+    monkeypatch.chdir(sub)
+    assert "Skipped steps" not in pr_create_body(command)
+
+
+def _attested_branch_without_a_skip(tmp_path: Path) -> Path:
+    """The same fixture with real reviewer verdicts instead of a skip, so the
+    attestation records no selection and there is nothing to disclose."""
+    repo = _repo(tmp_path, "noskip")
+    (repo / "docs" / "loom").mkdir(parents=True)
+    (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
+        "# Kickoff Defaults\n\n"
+        "- package-tests: python3 probe_ok.py — fixture (2026-09-18)\n",
+        encoding="utf-8")
+    (repo / "probe_ok.py").write_text("print('ok')\n", encoding="utf-8")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "fixture")
+    review = tmp_path / "noskip-review.json"
+    review.write_text(json.dumps({
+        "verdicts": [{"reviewer": "a", "verdict": "PASS"},
+                     {"reviewer": "b", "verdict": "PASS"}],
+        "findings": [],
+        "adversarial": [{"command": "python3 probe_ok.py", "artifact": "probe_ok.py"}],
+    }), encoding="utf-8")
+    finalized = _checker(repo, ["finalize-review", SEAM_CHANGE, "--input", str(review)])
+    assert finalized.returncode == 0, finalized.stderr
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "attest")
+    return repo
+
+
+NAKED_BODY = ("no headings at all, and this body claims to expose private "
+              "chain-of-thought.\n")
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F9: the hook route now enforces the disclosure half of "
+           "`push.contextual-body` and still not the structural half. Both "
+           "routes refuse under the same rule id, so the rule looks enforced "
+           "everywhere while the nine-heading floor and the "
+           "chain-of-thought ban hold on the publish route alone",
+)
+def test_probe_hook_enforces_the_whole_contextual_body_rule(tmp_path, monkeypatch) -> None:
+    """Attack: a branch with nothing to disclose, and a body that fails every
+    other part of the rule the hook's own refusal is named after."""
+    repo = _attested_branch_without_a_skip(tmp_path)
+    body = tmp_path / "naked.md"
+    body.write_text(NAKED_BODY, encoding="utf-8")
+    code, _err = _run_hook(repo, _command(repo, "--body-file", str(body)), monkeypatch)
+    assert code == 2
+
+
+def test_probe_publish_refuses_the_same_naked_body(tmp_path) -> None:
+    """Control for F9: `publish` refuses that body under `push.contextual-body`,
+    which is the rule id the hook route also prints -- for less."""
+    repo = _attested_branch_without_a_skip(tmp_path)
+    body = tmp_path / "naked-publish.md"
+    body.write_text(NAKED_BODY, encoding="utf-8")
+    result = _checker(repo, ["publish", "--title", "feat(x): naked",
+                             "--body-file", str(body), "--confirm-authorized"])
+    assert result.returncode == 1
+    assert result.stderr.startswith("BLOCK push.contextual-body: ")
+    assert "nine top-level contextual headings" in result.stderr
+
+
+@pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="needs FIFOs")
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F10: `pr_create_body` opens the named path with no "
+           "regular-file guard and no timeout, so a FIFO body file blocks the "
+           "PreToolUse hook indefinitely -- `/dev/zero` is the unbounded-read "
+           "variant. `publish` refuses the same path outright, because "
+           "`_publish_args` requires `--body-file` to be a readable regular file",
+)
+def test_probe_body_read_cannot_block_the_hook(tmp_path) -> None:
+    """Attack: hand the gate a path that is not a file it can finish reading."""
+    fifo = tmp_path / "fifo.md"
+    os.mkfifo(fifo)
+    command = render_quote_all(["command", "env", "LOOM_REPO_ROOT=/", "GH_REPO=x",
+                                "gh", "pr", "create", "--body-file", str(fifo)])
+    script = (
+        "import sys; sys.path.insert(0, %r)\n"
+        "from loom_checker.rule_checks.push import pr_create_body\n"
+        "print(repr(pr_create_body(%r)))\n" % (str(SCRIPTS), command)
+    )
+    try:
+        done = subprocess.run([sys.executable, "-c", script], capture_output=True,
+                              text=True, timeout=10)
+    except subprocess.TimeoutExpired:
+        pytest.fail("pr_create_body blocked for more than ten seconds on a FIFO")
+    assert done.returncode == 0, done.stderr
+
+
+def test_probe_publish_refuses_a_body_that_is_not_a_regular_file(tmp_path) -> None:
+    """Control for F10: the route that has a guard. `publish` exits 2 on the
+    same path before reading a byte, which is the guard the hook route lacks."""
+    if not hasattr(os, "mkfifo"):
+        pytest.skip("needs FIFOs")
+    repo = _repo(tmp_path, "fiforepo")
+    fifo = tmp_path / "publish-fifo.md"
+    os.mkfifo(fifo)
+    result = _checker(repo, ["publish", "--title", "t",
+                             "--body-file", str(fifo), "--confirm-authorized"])
+    assert result.returncode == 2
+    assert "--body-file is not a readable file" in result.stderr
+
+
+def test_probe_body_can_change_between_the_check_and_the_request(tmp_path) -> None:
+    """Attack: the gate reads the body; `gh` reads it again afterwards. Nothing
+    holds the bytes still in between.
+
+    Recorded, not scored as a defect: a `PreToolUse` hook judges a command it
+    does not execute, so time-of-check is all any body rule on this route can
+    have. It bounds what the F5 fix can promise -- that the body was honest when
+    the hook looked, not that the pull request received it."""
+    disclosing = tmp_path / "disclosing.md"
+    disclosing.write_text(_pr_body(("Skipped steps: reviewers — authority: "
+                                    "user-typed (AAAA, 2026-09-18)",)), encoding="utf-8")
+    hiding = tmp_path / "hiding.md"
+    hiding.write_text(_pr_body(), encoding="utf-8")
+    pointer = tmp_path / "body.md"
+    pointer.symlink_to(disclosing)
+    command = render_quote_all(["command", "env", "LOOM_REPO_ROOT=/", "GH_REPO=x",
+                                "gh", "pr", "create", "--body-file", str(pointer)])
+
+    assert "Skipped steps" in pr_create_body(command)
+    pointer.unlink()
+    pointer.symlink_to(hiding)
+    assert "Skipped steps" not in pr_create_body(command)
+
+
+def test_probe_scoping_dash_hides_a_promise_placed_after_it() -> None:
+    """Attack the assertion that closed F7a: it holds only the clause before the
+    scoping dash to "promise no route", so an unconditional promise written
+    after the dash is invisible to it.
+
+    Recorded, not scored. The station test declares this limit in its own
+    docstring, the sentence is advisory prose whose enforceable carrier is the
+    refusal string, and F4's version of this shape was a defect only because it
+    was undeclared. It is here so that the limit stays measured rather than
+    remembered, and so a later sentence that uses it is caught by something."""
+    forged = (
+        "Do not " + ship_text.NO_HANDOVER + " — on a refusal take one of the "
+        "two legal routes it names: run the closing-review station, or propose "
+        "a step selection."
+    )
+    before_dash = re.split(r"\s+[—-]\s+", forged, maxsplit=1)[0].lower()
+    assert "route" not in before_dash, "the forged sentence must look clean"
+    assert "two legal routes it names" in forged, (
+        "…while promising, after the dash, exactly what the checker does not "
+        "always name"
+    )
