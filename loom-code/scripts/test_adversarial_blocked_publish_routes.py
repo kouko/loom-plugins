@@ -51,7 +51,12 @@ LAND_REASON = "branch must carry exactly one attested change; found "
 def _tail(count: int) -> str:
     """The advice the refusal carries for this attestation count. The two routes
     belong to the zero case alone; above one neither of them reduces the count,
-    so that state is told what does."""
+    so that state is told what does.
+
+    Deliberately not `push.publication_advice`: a probe that asks the product
+    which tail it should have emitted proves only that the product agrees with
+    itself. The rule is restated here, and `test_probe_only_a_zero_count_is_ever
+    _offered_the_routes` checks the emitted bytes against the count directly."""
     return PUBLICATION_ROUTES if count == 0 else EXTRA_ATTESTED_CHANGES
 
 
@@ -137,11 +142,27 @@ def test_probe_land_refusal_keeps_rule_exit_and_reason_prefix(tmp_path, count) -
     ]
 
 
+@pytest.mark.parametrize("count", [0, 1, 2, 3, 4])
+def test_probe_only_a_zero_count_is_ever_offered_the_routes(tmp_path, count) -> None:
+    """Attack: reach a state that is offered the two routes while the branch
+    already attests something, which is where neither route reduces the count.
+
+    Read off the emitted bytes, with no call into the product's own chooser."""
+    ids = tuple(f"2026-09-18-change-{index}" for index in range(count))
+    stderr = _checker(_repo(tmp_path, f"only{count}", ids), ["push"]).stderr
+    offered = "two legal routes" in stderr
+    assert offered == (count == 0), stderr
+    if count == 1:  # one attestation passes the count and is refused later
+        assert PUSH_REASON not in stderr
+
+
 def test_probe_routes_text_is_one_line_with_no_control_characters() -> None:
     """Attack: break `report()`'s one-`BLOCK`-line-per-failure contract by
-    smuggling a newline, a carriage return or an escape into the reason."""
-    assert not re.search(r"[\r\n\x00-\x08\x0b-\x1f\x7f]", PUBLICATION_ROUTES)
-    assert not PUBLICATION_ROUTES.startswith("\n")
+    smuggling a newline, a carriage return or an escape into either tail."""
+    for tail in (PUBLICATION_ROUTES, EXTRA_ATTESTED_CHANGES):
+        assert not re.search(r"[\r\n\x00-\x08\x0b-\x1f\x7f]", tail)
+        assert not tail.startswith("\n")
+        assert tail.startswith("; ")
 
 
 def test_probe_hook_mode_keeps_exit_two_and_only_block_lines(tmp_path) -> None:
@@ -314,12 +335,12 @@ def test_probe_entry_token_form_is_what_actually_confirms(tmp_path) -> None:
     assert bound["bound"] is True
 
 
-def test_probe_closing_review_route_unblocks_a_two_attestation_branch(tmp_path) -> None:
-    """Attack: take the first named route on the branch shape that produces the
-    same refusal, and see whether the publication becomes possible.
+def test_probe_two_attestation_branch_is_named_a_remedy_that_works(tmp_path) -> None:
+    """Attack: on the branch shape that carries two attestations, take the
+    closing-review route and see whether the publication becomes possible.
 
-    It does not, so the refusal must not name it here; and what it names instead
-    has to be a state this branch can actually reach."""
+    It does not, so the refusal must not name it here; and whatever it names
+    instead has to be something this branch can actually reach."""
     ids = ("2026-09-18-change-0", "2026-09-18-change-1")
     repo = _repo(tmp_path, "two", ids)
     blocked = _checker(repo, ["push"])
@@ -342,7 +363,12 @@ def test_probe_closing_review_route_unblocks_a_two_attestation_branch(tmp_path) 
     # What the refusal names instead: end the delta at one attested change.
     _git(repo, "rm", "-q", "-r", f"docs/loom/{ids[1]}")
     _git(repo, "commit", "-q", "-m", "publish one change per branch")
-    assert PUSH_REASON not in _checker(repo, ["push"]).stderr
+    after = _checker(repo, ["push"])
+    assert PUSH_REASON not in after.stderr
+    assert EXTRA_ATTESTED_CHANGES not in after.stderr
+    # The count is no longer what blocks: the refusal has moved on to the
+    # placeholder attestation's own contents, which is progress, not a loop.
+    assert "attestation has an unknown or incomplete schema" in after.stderr
 
 
 # --------------------------------------------------------------------------
@@ -369,33 +395,35 @@ def _document_with_the_rule_inside_a_gate() -> str:
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F4: the no-gate assertion locates the rule with "
-           "`text.find`, so it only ever inspects the FIRST occurrence; a "
-           "second, gate-marked copy of the same rule is invisible to it",
-)
 def test_probe_no_gate_assertion_sees_a_gate_marked_second_copy() -> None:
-    """Attack: satisfy `test_ship_prose_rule_is_not_marked_as_a_gate` while the
-    rule is in fact inside a gate-marked region."""
+    """Attack: satisfy the ship station's no-gate assertion while the rule is in
+    fact inside a gate-marked region.
+
+    Re-aimed. The probe committed with F4 replicated the assertion's locator
+    (`text.find`) inline, so it went on failing no matter what the station test
+    did -- it was attacking a copy of the defect, not the mechanism. It now
+    calls the shipped locator, so it attacks whatever the station test uses
+    today and fails the moment that goes back to inspecting one offset."""
+    text = _document_with_the_rule_inside_a_gate()
+    assert ship_text._gate_regions(text), "the document must contain a gate region"
+    assert ship_text._gate_marked_occurrences(text, ship_text.NO_HANDOVER), (
+        "a gate-marked copy of the no-handover rule escaped the locator the "
+        "ship station's no-gate assertion uses"
+    )
+
+
+def test_probe_first_copy_alone_would_still_have_missed_it() -> None:
+    """Control: the document is the one that defeated the old locator -- two
+    occurrences, the first outside every region -- so the probe above passes on
+    the mechanism's strength, not because the document got easier."""
     text = _document_with_the_rule_inside_a_gate()
     regions = ship_text._gate_regions(text)
-    assert regions, "the synthetic document must contain a gate region"
-
-    index = text.find(ship_text.NO_HANDOVER)
-    assert any(start <= index < end for start, end in regions)
-
-
-def test_probe_gate_marked_copy_is_really_there_and_really_missed() -> None:
-    """Control for F4: the rule does sit inside a detected gate region, and the
-    existing assertion's own locator still points outside every region."""
-    text = _document_with_the_rule_inside_a_gate()
-    regions = ship_text._gate_regions(text)
-    occurrences = [match.start() for match in
-                   re.finditer(re.escape(ship_text.NO_HANDOVER), text)]
+    occurrences = ship_text._occurrences(text, ship_text.NO_HANDOVER)
     assert len(occurrences) == 2
     assert not any(start <= occurrences[0] < end for start, end in regions)
-    assert any(start <= occurrences[1] < end for start, end in regions)
+    assert ship_text._gate_marked_occurrences(text, ship_text.NO_HANDOVER) == [
+        occurrences[1]
+    ]
 
 
 def test_probe_ship_station_carries_no_gate_marker_at_all() -> None:
@@ -551,3 +579,222 @@ def test_probe_hook_route_really_reaches_the_pull_request(tmp_path, monkeypatch)
     body.write_text(_pr_body(disclosure), encoding="utf-8")
     code, err = _run_hook(repo, _canonical_metadata_command(repo, body), monkeypatch)
     assert code == 0, err
+
+
+# --------------------------------------------------------------------------
+# Half five: the rewritten refusal, attacked as if the old one never existed.
+# Nothing below reads an imported constant to decide what to do; it reads the
+# bytes the agent reads, out of the refusal the checker just printed.
+# --------------------------------------------------------------------------
+
+
+def _refusal(repo: Path) -> str:
+    """The publication refusal this branch actually produces."""
+    result = _checker(repo, ["push"])
+    assert result.returncode == 1, result.stderr
+    return result.stderr
+
+
+def _quoted_propose(refusal: str, change_id: str) -> list[str]:
+    """The proposal command the refusal prints, as argv."""
+    match = re.search(r"`(loom_checker\.py selection propose[^`]*)`", refusal)
+    assert match, f"the refusal names no proposal command: {refusal}"
+    tokens = match.group(1).split()
+    assert tokens[0] == "loom_checker.py"
+    return [change_id if token == "<change-id>" else token for token in tokens[1:]]
+
+
+def _quoted_confirmation(refusal: str, code: str) -> str:
+    """The confirmation the refusal tells the user to type, with the code in."""
+    match = re.search(r"confirms by typing `([^`]+)`", refusal)
+    assert match, f"the refusal names no confirmation form: {refusal}"
+    return match.group(1).replace("<code>", code)
+
+
+def _publishable_fixture(tmp_path: Path, name: str, change_id: str) -> Path:
+    """A branch with functional content and a runnable package command, and no
+    attestation -- the state the count-zero refusal is written for."""
+    repo = _repo(tmp_path, name)
+    (repo / "docs" / "loom").mkdir(parents=True)
+    (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
+        "# Kickoff Defaults\n\n"
+        "- package-tests: python3 probe_ok.py — fixture (2026-09-18)\n",
+        encoding="utf-8")
+    (repo / "probe_ok.py").write_text("print('ok')\n", encoding="utf-8")
+    (repo / "feature.py").write_text("VALUE = 1\n", encoding="utf-8")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "feature")
+    return repo
+
+
+def test_probe_following_the_refusal_verbatim_reaches_a_publishable_state(tmp_path) -> None:
+    """Attack: the whole second route, end to end, driven only by the refusal's
+    own bytes. If any word of it is wrong the branch never becomes publishable.
+
+    This is the probe the route half was missing: F1 and F2 each checked one
+    link, and a chain can have two sound links and still not carry."""
+    change_id = "2026-09-18-verbatim-route"
+    repo = _publishable_fixture(tmp_path, "verbatim", change_id)
+
+    refusal = _refusal(repo)
+    assert "two legal routes" in refusal, refusal
+
+    proposal = _checker(repo, _quoted_propose(refusal, change_id))
+    assert proposal.returncode == 0, proposal.stderr
+    code = proposal.stdout.split("code:")[1].strip().split()[0]
+
+    payload = json.dumps({"hook_event_name": "UserPromptSubmit",
+                          "prompt": _quoted_confirmation(refusal, code),
+                          "prompt_id": "p-verbatim", "session_id": SESSION})
+    _checker(repo, ["selection", "capture", "--hook"], payload)
+
+    review = tmp_path / "verbatim-review.json"
+    review.write_text(json.dumps({
+        "verdicts": [], "findings": [],
+        "adversarial": [{"command": "python3 probe_ok.py", "artifact": "probe_ok.py"}],
+    }), encoding="utf-8")
+    finalized = _checker(repo, ["finalize-review", change_id, "--input", str(review)])
+    assert finalized.returncode == 0, (
+        "the refusal promised finalize-review would drop the reviewer floor to "
+        "zero and still emit an attestation: " + finalized.stderr)
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "attest")
+
+    published = _checker(repo, ["push"])
+    assert published.returncode == 0, published.stderr
+
+    # …and the skip the route created is disclosable, which is the condition
+    # `publish` puts on the same branch a moment later.
+    attestation = json.loads(
+        (repo / "docs" / "loom" / change_id / "attestation.json").read_text(encoding="utf-8"))
+    assert attestation["selection"]["skip"] == ["reviewers"]
+    body = tmp_path / "verbatim-body.md"
+    body.write_text(_pr_body(tuple(render_selection_disclosure(attestation))),
+                    encoding="utf-8")
+    accepted = _checker(repo, ["publish", "--title", "feat(x): verbatim route",
+                               "--body-file", str(body), "--confirm-authorized"])
+    assert "push.contextual-body" not in accepted.stderr, accepted.stderr
+
+
+def _already_landed_branch(tmp_path: Path, change_id: str, review: Path) -> Path:
+    """A branch whose base already carries the attestation finalize-review
+    generates for it -- so the branch delta holds none, and regenerating it
+    changes no byte."""
+    repo = _repo(tmp_path, "landed")
+    _git(repo, "switch", "-q", "-c", "prep")
+    (repo / "docs" / "loom").mkdir(parents=True)
+    (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
+        "# Kickoff Defaults\n\n"
+        "- package-tests: python3 probe_ok.py — fixture (2026-09-18)\n",
+        encoding="utf-8")
+    (repo / "probe_ok.py").write_text("print('ok')\n", encoding="utf-8")
+    (repo / "feature.py").write_text("VALUE = 1\n", encoding="utf-8")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "feature")
+
+    review.write_text(json.dumps({
+        "verdicts": [{"reviewer": "a", "verdict": "PASS"},
+                     {"reviewer": "b", "verdict": "PASS"}],
+        "findings": [],
+        "adversarial": [{"command": "python3 probe_ok.py", "artifact": "probe_ok.py"}],
+    }), encoding="utf-8")
+    finalized = _checker(repo, ["finalize-review", change_id, "--input", str(review)])
+    assert finalized.returncode == 0, finalized.stderr
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "attest")
+
+    _git(repo, "switch", "-q", "main")
+    _git(repo, "merge", "-q", "--ff-only", "prep")
+    _git(repo, "switch", "-q", "-c", "feature")
+    return repo
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F6: the count-zero tail names the closing-review route "
+           "unconditionally, but a branch whose base already carries the "
+           "attestation finalize-review regenerates gets `found 0` and stays "
+           "there -- running the named station rewrites byte-identical content, "
+           "so the count never moves. This is the non-terminating loop the "
+           "count-above-one branch was split off to avoid, left in place on the "
+           "branch that kept the routes",
+)
+def test_probe_closing_review_route_terminates_at_count_zero(tmp_path) -> None:
+    """Attack: take the first named route on every branch shape that is offered
+    it, not only the one it was written for."""
+    change_id = "2026-09-18-already-landed"
+    review = tmp_path / "landed-review.json"
+    repo = _already_landed_branch(tmp_path, change_id, review)
+
+    refusal = _refusal(repo)
+    assert f"{PUSH_REASON}0" in refusal and "two legal routes" in refusal, refusal
+
+    # "run the closing-review station, which generates the attestation" -- the
+    # real station, not a stand-in for it.
+    regenerated = _checker(repo, ["finalize-review", change_id, "--input", str(review)])
+    assert regenerated.returncode == 0, regenerated.stderr
+    assert _git(repo, "status", "--porcelain") == "", (
+        "the fixture is only interesting while the regenerated attestation is "
+        "byte-identical to the one already in the base")
+
+    assert f"{PUSH_REASON}0" not in _checker(repo, ["push"]).stderr
+
+
+def test_probe_land_always_reports_a_countable_attestation_count(tmp_path) -> None:
+    """Attack: reach `land`'s unknown-count fallback, which hands a branch the
+    extra-attestations remedy without knowing the count is above one.
+
+    Repelled: the reason `land` parses is built as `f'…found {len(candidates)}'`,
+    so the tail after the prefix is always digits and the fallback is dead. It is
+    still the wrong default for an unknown state, and only unreachability is
+    keeping that from mattering."""
+    for count in (0, 2, 3):
+        ids = tuple(f"2026-09-18-change-{index}" for index in range(count))
+        result = _checker(_repo(tmp_path, f"count{count}", ids),
+                          ["land", "--accepted-by", "kouko"])
+        (_rule, reason), = _blocks(result.stderr)
+        found = reason.removeprefix(MISSING_ATTESTATION).split(";", 1)[0]
+        assert found.isdigit() and int(found) == count, reason
+
+
+SHIP_RULE_SENTENCE = re.search(
+    r"[^.]*" + re.escape(ship_text.NO_HANDOVER) + r"[^.]*\.",
+    " ".join(ship_text.SHIP.read_text(encoding="utf-8").split()),
+)
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F7a: the ship station still tells the agent to `take one of "
+           "the two legal routes it names`, but a refusal above one attestation "
+           "now names no route at all; the instruction is unfollowable in "
+           "exactly the state the checker was corrected for",
+)
+def test_probe_ship_prose_does_not_promise_routes_the_refusal_may_not_name() -> None:
+    """Attack: reach a state where the station's instruction cannot be carried
+    out. The checker learnt that a count above one has no route; the prose that
+    sends the agent to `the two legal routes it names` did not."""
+    assert SHIP_RULE_SENTENCE, "the no-handover sentence is missing from the station"
+    assert "the two legal routes it names" not in SHIP_RULE_SENTENCE.group(0)
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F7b: the ship station still says the user confirms `by "
+           "typing the code`, the exact phrasing the checker was corrected away "
+           "from, and `test_ship_prose_forbids_handing_the_command_over` "
+           "requires that substring -- so the station cannot be corrected "
+           "without editing the test that pins it",
+)
+def test_probe_ship_prose_names_a_confirmation_the_checker_accepts() -> None:
+    """Attack: make the station and the refusal disagree about what the user
+    types, so that following the station binds nothing.
+
+    Why this is not cosmetic is already executable above: an agent relaying the
+    station's wording asks for the bare code, and
+    `test_probe_bare_code_still_binds_nothing` shows the bare code binds nothing.
+    """
+    assert SHIP_RULE_SENTENCE, "the no-handover sentence is missing from the station"
+    sentence = SHIP_RULE_SENTENCE.group(0)
+    assert "typing the code" not in sentence
+    assert "/loom-code:expert-mode" in sentence
