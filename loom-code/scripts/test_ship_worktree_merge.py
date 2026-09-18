@@ -270,6 +270,62 @@ def test_merge_refusal_with_two_attested_changes_names_no_dead_route(
     assert "never hand the blocked publication command to the user to run" in reason
 
 
+def _land_on_a_branch_that_adds_nothing(tmp_path: Path, monkeypatch) -> tuple[int, str, list]:
+    """`land --accepted-by` on a branch that adds nothing to a base which
+    already attests a change and which the published trunk contains -- the
+    landed shape. The merge route reads the same empty-delta state the push
+    route does, so it owes the same tail."""
+    repo = tmp_path / "landed-repo"
+    repo.mkdir(parents=True)
+    _git(repo, "init", "-q", "-b", "main")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test")
+    (repo / "file.txt").write_text("content\n", encoding="utf-8")
+    intent = repo / "docs" / "loom" / "intent" / "change.md"
+    intent.parent.mkdir(parents=True)
+    intent.write_text(
+        "# Change\noriginator: kouko\nstatus: confirmed 2026-09-14\n"
+        "\n## Proposed outcome\nLand it.\n",
+        encoding="utf-8",
+    )
+    target = repo / "docs" / "loom" / "change-0" / "attestation.json"
+    target.parent.mkdir(parents=True)
+    target.write_text('{"change_id": "change-0"}', encoding="utf-8")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "landed change")
+    # The change landed, so the published trunk carries the base. Without this
+    # ref the state cannot be told from a finished branch nobody published, and
+    # `nothing_left_to_publish` answers False on that doubt.
+    _git(repo, "update-ref", "refs/remotes/origin/main", "main")
+    _git(repo, "switch", "-q", "-c", "feature")
+    _git(repo, "remote", "add", "origin", "git@github.com:example/project.git")
+
+    calls: list = []
+    monkeypatch.chdir(repo)
+    monkeypatch.setattr(land, "run_land_external", lambda argv, _t, **_k: calls.append(list(argv)))
+    monkeypatch.setattr(
+        land, "resolve_publish_executable",
+        lambda name: "/usr/bin/git" if name == "git" else "/usr/local/bin/gh",
+    )
+    err = io.StringIO()
+    rc = land.cmd_land(["--accepted-by", "kouko"], io.StringIO(), err)
+    return rc, err.getvalue(), calls
+
+
+# A2, empty delta over an attesting base: `land` reaches the same tail the push
+# route does, and it is pinned at both sites rather than at one.
+def test_merge_refusal_on_a_branch_that_adds_nothing_names_no_route(
+    tmp_path: Path, monkeypatch
+) -> None:
+    rc, err, calls = _land_on_a_branch_that_adds_nothing(tmp_path, monkeypatch)
+
+    assert rc == 1
+    assert calls == []
+    lines = err.splitlines()
+    assert len(lines) == 1
+    assert lines[0] == f"{MERGE_UNATTESTED_REASON}{loom_checker.NOTHING_TO_PUBLISH}"
+
+
 # A2 negative: merge-without-attestation-still-refused. The refusal keeps the
 # rule id, the exit code and the reason it opened with, on one line.
 def test_merge_without_attestation_still_refused(tmp_path: Path, monkeypatch) -> None:

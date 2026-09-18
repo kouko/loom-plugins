@@ -104,20 +104,27 @@ REQ-13 — The refusal tail names only what is true of its own state
   WHEN the publication or merge refusal reports an attestation count, the tail
   it appends shall name the two legal routes only where both are live, and
   otherwise name what is true of that state instead: above one attestation,
-  what reduces the count; on an empty delta over a base that already attests,
-  that there is nothing here to publish; and where the count could not be
-  read, no count and no route → Acceptance #1
+  what reduces the count; on an empty delta over a base that already attests
+  and that a remote-tracking trunk already contains, that there is nothing here
+  to publish; and where the count could not be read, no count and no route
+  → Acceptance #1
   Authorised by Acceptance line 1, which asks the refusal to name the routes.
   A route named where it cannot reach the state it claims is worse than none:
   the agent runs it forever. The spec as first written described one tail;
-  four shipped.
+  four shipped. The published-trunk clause is the closing review's round-2
+  finding: an empty delta over an attesting base is also what a finished,
+  attested branch looks like once its local trunk is fast-forwarded onto it,
+  and telling that branch there is nothing here to publish sends a complete
+  change back to a new intent. The two states are identical in git, so only a
+  remote-tracking trunk separates them, and where none resolves the tail is
+  withheld and the two routes stand.
 
 ## Design decision
 
 - Naming the routes rather than downgrading the refusal is the user's choice,
   taken after the adversarial review of the downgrade exposed the four surfaces
   it would sever; the gate keeps every rule it has today. user-decided.
-- Extend the existing missing-attestation reason (`command_handlers/push.py:260-264`)
+- Extend the existing missing-attestation reason (`command_handlers/push.py:483-490`)
   rather than adding a second emission path. The hook, `publish` (`publish.py:415`)
   and `land` (`land.py:939`) all route that verdict through `_cmd_push`, so one
   string reaches three callers. agent-decided.
@@ -165,10 +172,16 @@ REQ-13 — The refusal tail names only what is true of its own state
   `_publish_args` already puts on `--body-file`, and treats `-` (gh's spelling
   for stdin, which the gate cannot see) as no path. agent-decided.
 - REQ-13 is four module constants selected by one pure function
-  (`publication_advice`, `command_handlers/push.py:133-147`), not four emission
+  (`publication_advice`, `command_handlers/push.py:142-156`), not four emission
   sites: `nothing_left_to_publish` is recomputed from the repository by the
   caller and passed in, so the function that picks the tail reads no state
   itself. agent-decided.
+- The published-trunk fact reads `origin/main` and `origin/master`
+  (`PUBLISHED_TRUNK_CANDIDATES`, `command_handlers/push.py:160-179`) rather than
+  the whole of `helpers.TRUNK_CANDIDATES`: a local `main` is moved onto a branch
+  by one `git branch -f`, and `@{upstream}` is the branch's own upstream, which
+  an unmerged pushed branch contains trivially. Neither witnesses a
+  publication. agent-decided.
 
 ## Alternatives considered
 
@@ -186,7 +199,7 @@ REQ-13 — The refusal tail names only what is true of its own state
 
 ## Current state evidence
 
-- Forward: `command_handlers/push.py:260-264` returns the missing-attestation
+- Forward: `command_handlers/push.py:483-490` returns the missing-attestation
   refusal through `report()`.
 - Reverse: `publish.py:415` and `land.py:939` both call `_cmd_push`;
   `land.py:920-924` refuses earlier when the attestation is absent.
@@ -196,13 +209,14 @@ REQ-13 — The refusal tail names only what is true of its own state
   a bound skip and records the selection in the attestation it emits.
 - Boundary: `test_adversarial_push_reason.py:113-116` asserts every stderr line
   on fourteen hostile unattested pushes begins with `BLOCK `.
-- Forward (hook route, REQ-9/REQ-10): `command_handlers/push.py:284-322` runs
+- Forward (hook route, REQ-9/REQ-10): `command_handlers/push.py:306-312` runs
   the body check after the shared push check returns 0 on a PR-create command.
 - Boundary (REQ-11/REQ-12): `rule_checks/push.py:238-253` walks the trailing
-  tokens against the allowlist; `rule_checks/push.py:292-333` reads the body
-  from the last body-bearing option and returns "" for anything it cannot read.
-- Data (REQ-13): `command_handlers/push.py:150-172` recomputes the empty-delta
-  and attesting-base state from the repository, and answers False on any doubt.
+  tokens against the allowlist; `rule_checks/push.py:292-336` reads the body
+  from the last `--body-file` and returns "" for anything it cannot read.
+- Data (REQ-13): `command_handlers/push.py:160-210` recomputes the empty-delta,
+  attesting-base and published-base state from the repository, and answers False
+  on any doubt.
 
 ## UI flows
 
@@ -217,5 +231,6 @@ REQ-13 — The refusal tail names only what is true of its own state
 | PR-create with an unlisted option | adds `--label`, `--assignee` or any other spelling outside the allowlist to the canonical form | `BLOCK push.attestation: PR creation must use the canonical trusted-gh command from loom-code:ship` |
 | PR-create whose body file cannot be read | names a FIFO, a device, a directory, an unreadable path, or `-` | the body reads as empty, so the create is refused on the nine headings, and the hook returns instead of blocking on the read |
 | more than one attested change | publishes or merges a delta carrying two attestations | the refusal naming what reduces the count, and no route |
-| empty delta over an attesting base | publishes a branch that adds nothing to a base that already attests | the refusal saying there is nothing here to publish, and that the change starts from a new intent on its own branch |
+| empty delta over an attesting base the trunk carries | publishes a branch that adds nothing to a base that already attests and that `origin/main` contains | the refusal saying there is nothing here to publish, and that the change starts from a new intent on its own branch |
+| the same delta, base not published | publishes a finished attested branch whose local trunk was moved onto it, or any branch where no remote-tracking trunk resolves | the two legal routes, because the branch may still hold work nobody has published |
 | count nobody could read | merges where the count after `found ` is not a plain integer | the refusal naming no count and no route, pointing at `push` in the repository |

@@ -292,11 +292,18 @@ def canonical_pr_create_repo(command: str) -> Path | None:
 def pr_create_body(command: str) -> str:
     """The PR body this `gh pr create` would send.
 
-    Read from the last body-bearing option, because that is the one gh keeps
-    when a command repeats them: a gate that read the first would judge a body
+    Read from the last `--body-file`, because that is the one gh keeps when a
+    command repeats the option: a gate that read the first would judge a body
     the pull request never receives. The ship station's form carries
     `--body-file` with an absolute path, which `check_pr_create_remote_head`
     requires of every command it admits.
+
+    The inline spellings (`--body`, `-b`, `--body=`) are not read, because no
+    command carrying one ever reaches this reader: `CANONICAL_PR_CREATE_OPTIONS`
+    admits only `--base`, `--head`, `--title`, `--body-file` and `--draft`, and
+    the sole caller (command_handlers/push.py) refuses anything else at
+    admission. Were one ever allowlisted it would read as "" here, which
+    discloses nothing and refuses.
 
     "" when the command names no body and when the named file cannot be read:
     an empty body discloses nothing, which is exactly what a body the gate
@@ -317,10 +324,6 @@ def pr_create_body(command: str) -> str:
         elif token.startswith("--body-file="):
             path = token.split("=", 1)[1]
         else:
-            if token in {"--body", "-b"} and following is not None:
-                body = following
-            elif token.startswith("--body="):
-                body = token.split("=", 1)[1]
             continue
         body = ""
         named = Path(path)

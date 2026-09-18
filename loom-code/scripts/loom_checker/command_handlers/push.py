@@ -5,6 +5,7 @@ from loom_checker.helpers import UsageError
 from loom_checker.helpers import branch_base
 from loom_checker.helpers import changed_paths
 from loom_checker.helpers import git_maybe
+from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
 from loom_checker.helpers import glob_to_regex
 from loom_checker.helpers import load_manifest
@@ -110,12 +111,14 @@ EXTRA_ATTESTED_CHANGES = (
 
 
 # The third state a count of zero can be in: the branch adds nothing to a base
-# that already attests a change. Route one is dead here -- closing review
-# regenerates the attestation the base already carries, byte for byte, so the
-# count never leaves zero and an agent taking the named route runs the station
-# forever -- and route two has no step to skip on an empty delta. Naming either
-# is the non-terminating loop the count-above-one branch was split off to avoid,
-# so this state is told what is true of it instead. Same one-line contract.
+# that already attests a change and that the published trunk already contains.
+# All three facts, because the first two also hold of a finished branch nobody
+# published. Route one is dead here -- closing review regenerates the
+# attestation the base already carries, byte for byte, so the count never leaves
+# zero and an agent taking the named route runs the station forever -- and route
+# two has no step to skip on an empty delta. Naming either is the
+# non-terminating loop the count-above-one branch was split off to avoid, so
+# this state is told what is true of it instead. Same one-line contract.
 NOTHING_TO_PUBLISH = (
     "; this branch adds nothing to its base and the base already attests a"
     " change, so there is no unattested work here to review and nothing to"
@@ -153,25 +156,54 @@ def publication_advice(found: int | None, nothing_to_publish: bool = False) -> s
     return NOTHING_TO_PUBLISH if nothing_to_publish else PUBLICATION_ROUTES
 
 
+# The trunk spellings that witness a publication. `helpers.TRUNK_CANDIDATES`
+# also names the local `main` / `master`, and neither can witness anything: a
+# local trunk is fast-forwarded onto a finished branch by one `git branch -f`,
+# and the result is the same bytes in git as a branch whose work has landed.
+# `@{upstream}` cannot either -- it is the current branch's own upstream, which
+# a pushed but unmerged branch contains trivially. Only a remote-tracking trunk
+# says the base is somewhere other than this working copy.
+PUBLISHED_TRUNK_CANDIDATES = ("origin/main", "origin/master")
+
+
+def base_is_published(repo: Path, base: str) -> bool:
+    """Whether a remote-tracking trunk contains `base`.
+
+    False when none resolves, and false when the ancestry check cannot run:
+    without a published trunk to read, a branch whose change has landed and a
+    finished branch nobody has published yet are the same state, and answering
+    True there tells a complete change it is nothing."""
+    return any(
+        git_ok(repo, "merge-base", "--is-ancestor", base, candidate)
+        for candidate in PUBLISHED_TRUNK_CANDIDATES
+    )
+
+
 def nothing_left_to_publish(repo: Path) -> bool:
     """Whether this branch adds nothing to a base that already attests a change.
 
-    Recomputed from the repository, never claimed: the branch delta is empty,
-    and the base carries at least one generated attestation. Closing review then
-    writes the bytes the base already holds and the attestation count stays at
-    zero, which is the state `publication_advice` must not send to it.
+    Recomputed from the repository, never claimed. Three facts, all three
+    required: the branch delta is empty, the base carries at least one generated
+    attestation, and a remote-tracking trunk contains the base. Closing review
+    then writes the bytes the base already holds and the attestation count stays
+    at zero, which is the state `publication_advice` must not send to it.
 
     A base that attests nothing is a branch that has simply not run closing
     review yet -- route one does move that count -- so the base lookup is what
-    separates the two, and an empty delta alone is not enough. Any doubt (no
-    trunk to diff against, a manifest without the artifact) answers False and
-    leaves today's two routes standing."""
+    separates the two, and an empty delta alone is not enough. The third fact is
+    what separates a landed change from a finished one nobody published: those
+    two are identical in content once the local trunk is moved onto the branch,
+    and only the published trunk tells them apart. Any doubt (no trunk to diff
+    against, a manifest without the artifact, no published trunk to read)
+    answers False and leaves today's two routes standing."""
     try:
         template = load_manifest().get("artifacts", {}).get("attestation", {}).get("path")
         if not template or changed_paths(repo):
             return False
         base = branch_base(repo)
     except UsageError:
+        return False
+    if not base_is_published(repo, base):
         return False
     matcher = glob_to_regex(template.replace("<change-id>", "*"))
     listing = git_maybe(repo, "ls-tree", "-r", "--name-only", base) or ""
@@ -229,25 +261,9 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     canonical_pr_repo = canonical_pr_create_repo(command)
     push_shaped = canonical_pr_repo is not None or is_push_command(command)
     git_push = is_git_push_command(command)
-    malformed_canonical_push = False
-    if not push_shaped:
-        # A malformed quote can defeat the permissive recogniser, but not a
-        # command that visibly starts with the canonical command trust root
-        # and trusted executable.
-        trusted = shutil.which("git")
-        trusted_prefix = (
-            f"{quote_all_shell_token('command')} "
-            f"{quote_all_shell_token(str(Path(trusted).resolve()))}"
-            if trusted
-            else ""
-        )
-        malformed_canonical_push = bool(
-            trusted_prefix
-            and command.startswith(trusted_prefix)
-            and quote_all_shell_token("push") in command
-        )
-        if not malformed_canonical_push:
-            return 0
+    malformed_canonical_push = not push_shaped and looks_canonically_pushed(command)
+    if not push_shaped and not malformed_canonical_push:
+        return 0
     cwd = str(payload.get("cwd") or os.getcwd())
     if git_push or malformed_canonical_push:
         repo, immutable_head, refspec_error = canonical_git_push(command, cwd)
@@ -292,41 +308,67 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         if remote_error:
             print(f"BLOCK push.attestation: {remote_error}", file=err)
             return 2
-        # This route opens a pull request, so it owes what the publication
-        # command owes: the whole of `push.contextual-body`, the rule id it
-        # prints. That is the structural floor -- the nine headings, their
-        # substance, and the ban on claiming to expose hidden reasoning --
-        # followed by the disclosure of every step the user's confirmed
-        # selection skipped, in the order `cmd_publish` runs them. Both are
-        # publish's own functions, never a second copy of either rule. The
-        # second import is deferred because publish imports `_cmd_push` from
-        # this module; at module level the two would cycle.
-        #
-        # Every gh input that would compose a body the hook cannot see
-        # (`--fill`, `--editor`, a template, a browser-composed body) is refused
-        # earlier, at admission: `CANONICAL_PR_CREATE_OPTIONS` admits no option
-        # that spells any of them. The "" this reader falls back to is for a body
-        # it was handed and could not read -- an unreadable `--body-file` -- and
-        # "" has none of the nine headings, so that refuses whether or not the
-        # branch records a skip.
-        from loom_checker.command_handlers.publish import selection_disclosure_failure
-
-        body = pr_create_body(command)
-        body_error = (
-            validate_contextual_pr_body(body)
-            or selection_disclosure_failure(Path.cwd(), body)
-        )
+        body_error = pr_create_body_failure(command)
         if body_error:
-            # `validate_selection_disclosure` renders the disclosure it expects
-            # over several lines, which reads well under `publish`'s own output
-            # and breaks the contract here: report() writes the reason verbatim,
-            # so a newline emits a stderr line carrying no `BLOCK ` prefix, and
-            # every caller of this hook parses that prefix. Flattened at this
-            # emission only -- publish's output is a terminal, not a parsed
-            # stream, and keeps the shape a reader can act on.
-            report([("push.contextual-body", " ".join(body_error.split("\n")))], err)
+            report([("push.contextual-body", body_error)], err)
             return 2
     return 2 if rc == 1 else rc
+
+
+def looks_canonically_pushed(command: str) -> bool:
+    """Whether a command the recognisers did not accept still visibly starts
+    with the canonical push.
+
+    A malformed quote can defeat the permissive recogniser, but not a command
+    that visibly starts with the canonical command trust root and trusted
+    executable."""
+    trusted = shutil.which("git")
+    if not trusted:
+        return False
+    trusted_prefix = (
+        f"{quote_all_shell_token('command')} "
+        f"{quote_all_shell_token(str(Path(trusted).resolve()))}"
+    )
+    return (
+        command.startswith(trusted_prefix)
+        and quote_all_shell_token("push") in command
+    )
+
+
+def pr_create_body_failure(command: str) -> str | None:
+    """The `push.contextual-body` reason this PR-create command earns, or None.
+
+    This route opens a pull request, so it owes what the publication command
+    owes: the whole of `push.contextual-body`, the rule id it prints. That is
+    the structural floor -- the nine headings, their substance, and the ban on
+    claiming to expose hidden reasoning -- followed by the disclosure of every
+    step the user's confirmed selection skipped, in the order `cmd_publish` runs
+    them. Both are publish's own functions, never a second copy of either rule.
+    The disclosure import is deferred because publish imports `_cmd_push` from
+    this module; at module level the two would cycle.
+
+    Every gh input that would compose a body the hook cannot see (`--fill`,
+    `--editor`, a template, a browser-composed body) is refused earlier, at
+    admission: `CANONICAL_PR_CREATE_OPTIONS` admits no option that spells any of
+    them. The "" the reader falls back to is for a body it was handed and could
+    not read -- an unreadable `--body-file` -- and "" has none of the nine
+    headings, so that refuses whether or not the branch records a skip.
+
+    The reason comes back on one line. `validate_selection_disclosure` renders
+    the disclosure it expects over several lines, which reads well under
+    `publish`'s own output and breaks the contract here: report() writes the
+    reason verbatim, so a newline emits a stderr line carrying no `BLOCK `
+    prefix, and every caller of this hook parses that prefix. Flattened for this
+    caller only -- publish's output is a terminal, not a parsed stream, and
+    keeps the shape a reader can act on."""
+    from loom_checker.command_handlers.publish import selection_disclosure_failure
+
+    body = pr_create_body(command)
+    failure = (
+        validate_contextual_pr_body(body)
+        or selection_disclosure_failure(Path.cwd(), body)
+    )
+    return " ".join(failure.split("\n")) if failure else None
 
 
 # Word separators for the merge text rule: whitespace, quotes and shell

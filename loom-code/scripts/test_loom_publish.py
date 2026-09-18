@@ -1929,6 +1929,10 @@ def branch_whose_base_already_attests(tmp_path: Path, monkeypatch) -> Path:
     attestation(repo, "2026-09-18-already-landed")
     git(repo, "add", ".")
     git(repo, "commit", "-q", "-m", "landed change")
+    # The change landed, so the published trunk carries it. Without this ref the
+    # repository cannot tell this branch from the finished-but-unpublished one
+    # below, and `nothing_left_to_publish` answers False on that doubt.
+    git(repo, "update-ref", "refs/remotes/origin/main", "main")
     git(repo, "switch", "-q", "-c", "feature")
     git(repo, "remote", "add", "origin", "git@github.com:example/project.git")
     monkeypatch.setattr(push_handler, "validate_attestation", lambda *_a, **_k: [])
@@ -1977,6 +1981,57 @@ def test_a_branch_that_adds_work_still_gets_the_two_routes(
     assert rc == 2
     assert "two legal routes" in reason
     assert "run the closing-review station" in reason
+
+
+def branch_finished_but_never_published(tmp_path: Path, monkeypatch) -> Path:
+    """A branch whose work is done, reviewed and attested, with the local trunk
+    fast-forwarded onto it and nothing published yet: `git branch -f main
+    feature`.
+
+    In git this is the same state as the landed branch above -- empty delta, the
+    attestation in the base -- because which branch moved onto which is history,
+    not content. The only witness that separates them is the published trunk,
+    which here does not contain the base."""
+    repo = tmp_path / "unpublished-repo"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    git(repo, "config", "user.email", "test@example.com")
+    git(repo, "config", "user.name", "Test")
+    (repo / "file.txt").write_text("content\n", encoding="utf-8")
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "initial")
+    git(repo, "switch", "-q", "-c", "feature")
+    git(repo, "remote", "add", "origin", "git@github.com:example/project.git")
+    (repo / "feature.py").write_text("VALUE = 1\n", encoding="utf-8")
+    attestation(repo, "2026-09-18-finished-change")
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "work and its attestation")
+    git(repo, "branch", "-f", "main", "feature")
+    monkeypatch.setattr(push_handler, "validate_attestation", lambda *_a, **_k: [])
+    return repo
+
+
+def test_a_finished_branch_nobody_published_keeps_its_routes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """R2, the state the empty-delta tail must not claim: the work is complete,
+    reviewed and attested and has never been published, and the local trunk has
+    been moved onto it. The two facts the third tail was built on -- an empty
+    delta over an attesting base -- are both true here, so a tail that reads
+    only those tells a finished change to start over from a new intent."""
+    repo = branch_finished_but_never_published(tmp_path, monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    reason = err.splitlines()[0]
+    assert rc == 2
+    assert reason.startswith(
+        "BLOCK push.attestation: branch must carry exactly one generated "
+        "attestation; found 0"
+    )
+    assert "two legal routes" in reason
+    assert "run the closing-review station" in reason
+    assert "new intent" not in reason
 
 
 def test_the_nothing_to_publish_tail_obeys_the_one_line_contract() -> None:
