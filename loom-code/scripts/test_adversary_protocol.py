@@ -35,9 +35,21 @@ def _flat(path: Path) -> str:
 
 # The raw protocol, for the assertions that cut it at a heading, and the
 # flattened protocol, for the sentence pins.
+def _rules(path: Path) -> str:
+    """The protocol's prose, flattened, with its heading lines dropped.
+
+    A heading is structure, not a rule, and `test_adversary_layout.py` owns
+    it. Left in, it would be swept into the first sentence after it and a
+    rename would break a pin that is not about names.
+    """
+    text = re.sub(r"^#{1,6} .*$", "", path.read_text(encoding="utf-8"), flags=re.M)
+    return " ".join(re.sub(r"^> ?", "", text, flags=re.M).split())
+
+
 PROTOCOL_TEXT = PROTOCOL.read_text(encoding="utf-8")
 ADVERSARIAL_REF = _flat(PROTOCOL)
 ADVERSARY_PROSE = _flat(ADVERSARY)
+RULES = _rules(PROTOCOL)
 
 
 def _sentences(text: str) -> list[str]:
@@ -303,6 +315,124 @@ def test_procedure_fragments_helper_synthetic() -> None:
 def test_procedure_sentence_in_both_files_rejected() -> None:
     assert _procedure_fragments_in_both(ADVERSARY_PROSE, ADVERSARIAL_REF) == []
     assert [f for f in PROCEDURE_FRAGMENTS if f not in ADVERSARIAL_REF] == []
+
+
+# --- What the protocol says outside the reuse-and-mutation passage ----------
+#
+# The pins above cover `Reuse first, update with evidence`, which is most of
+# the protocol. These cover the two halves that had none: what the adversary
+# is for, stated in the opening, and how a probe and a finding are recorded,
+# stated under `Recording`. Same two shapes -- an affirmative verb before the
+# pinned literal with a negation in the same sentence rejected, and an exact
+# sentence where the rule's own wording carries the negation.
+
+# name: (verb, literal, extras, affirmative example, rejected examples)
+RULE_PINS = {
+    "protocol-the-job-is-to-make-the-change-fail": (
+        "It is", "to make the change fail", (),
+        "It is to make the change fail.",
+        ("It is not to make the change fail.",
+         "It is to report what looks risky."),
+    ),
+    "protocol-everything-run-is-committed-as-a-program": (
+        "It runs at the end of Build", "everything it runs is committed as a program",
+        ("Build re-runs those programs on every fix loop",
+         "`finalize-review` executes them on committed content"),
+        "It runs at the end of Build, and everything it runs is committed as a program: "
+        "Build re-runs those programs on every fix loop, and `finalize-review` executes "
+        "them on committed content.",
+        ("It runs at the end of Build, and everything it runs is committed as a program, "
+         "but `finalize-review` does not execute them on committed content and Build "
+         "re-runs those programs on every fix loop.",
+         "It runs at the end of Build, and everything it runs is committed as a program."),
+    ),
+    "protocol-every-failed-attempt-is-recorded": (
+        "Record every attempt that failed to break anything", "for every artifact type",
+        ("an eval rather than an anecdote",),
+        "Record every attempt that failed to break anything, for every artifact type — "
+        "that is what makes the attempts an eval rather than an anecdote.",
+        ("Record no attempt that failed to break anything, for every artifact type — that "
+         "is what makes the attempts an eval rather than an anecdote.",
+         "Record every attempt that failed to break anything, for every artifact type."),
+    ),
+    "protocol-command-is-rerunnable-in-a-clean-tree": (
+        "`command` must be", "re-runnable by someone else in a clean tree", (),
+        "`command` must be re-runnable by someone else in a clean tree.",
+        ("`command` must be re-runnable by someone else, but not in a clean tree.",
+         "`command` must be recorded."),
+    ),
+    "protocol-probes-live-under-the-evidence-path": (
+        "Put probes under", "`docs/loom/<change-id>/evidence/probes/`",
+        ("that path is the `evidence` artifact type",),
+        "Put probes under `docs/loom/<change-id>/evidence/probes/` — that path is the "
+        "`evidence` artifact type.",
+        ("Put probes under `docs/loom/<change-id>/evidence/probes/` — that path is not the "
+         "`evidence` artifact type.",
+         "Put probes under `docs/loom/<change-id>/evidence/probes/`."),
+    ),
+    "protocol-promotion-only-through-a-plan-task": (
+        "Promote a probe into the repo's real test suite", "only through a plan task", (),
+        "Promote a probe into the repo's real test suite only through a plan task.",
+        ("Promote a probe into the repo's real test suite, not only through a plan task.",
+         "Promote a probe into the repo's real test suite whenever it is stable."),
+    ),
+    "protocol-a-finding-carries-an-anchor-and-a-fix": (
+        "Anything the adversary found that matters becomes",
+        "a `finding` with an anchor and a fix", (),
+        "Anything the adversary found that matters becomes a `finding` with an anchor and a fix.",
+        ("Anything the adversary found that matters becomes a `finding` with an anchor and "
+         "no fix.",
+         "Anything the adversary found that matters becomes a note in the report."),
+    ),
+    "protocol-build-fixes-findings-before-hand-off": (
+        "Build fixes every fatal or important finding", "before hand-off",
+        ("lists any left unresolved in its hand-off",),
+        "Build fixes every fatal or important finding before hand-off and lists any left "
+        "unresolved in its hand-off.",
+        ("Build fixes every fatal or important finding, though not before hand-off, and "
+         "lists any left unresolved in its hand-off.",
+         "Build fixes every fatal or important finding before hand-off."),
+    ),
+}
+
+# name: (sentence, rewrites that must fail)
+RULE_SENTENCE_PINS = {
+    "protocol-not-a-second-review": (
+        "The adversary's job is not to find bugs the reviewers might also find.",
+        ("The adversary's job is to find bugs the reviewers might also find.",
+         "The adversary's job is not only to find bugs the reviewers might also find.",
+         "The adversary's job is not to find bugs."),
+    ),
+}
+
+
+@pytest.mark.parametrize("pin", sorted(RULE_PINS))
+def test_rule_pin_helpers_synthetic(pin: str) -> None:
+    verb, literal, extras, affirmative, rejected = RULE_PINS[pin]
+    assert _affirms(affirmative, verb, literal, *extras), pin
+    assert any(has_negation(r) for r in rejected), pin
+    for example in rejected:
+        assert not _affirms(example, verb, literal, *extras), example
+
+
+@pytest.mark.parametrize("pin", sorted(RULE_PINS))
+def test_protocol_affirms_the_rule(pin: str) -> None:
+    verb, literal, extras, _affirmative, _rejected = RULE_PINS[pin]
+    assert _affirms(RULES, verb, literal, *extras), (pin, verb, literal)
+
+
+@pytest.mark.parametrize("pin", sorted(RULE_SENTENCE_PINS))
+def test_rule_sentence_pin_helpers_synthetic(pin: str) -> None:
+    sentence, rejected = RULE_SENTENCE_PINS[pin]
+    assert _pins_exact_sentence(f"Read this first. {sentence}", sentence), pin
+    for example in rejected:
+        assert not _pins_exact_sentence(f"Read this first. {example}", sentence), example
+
+
+@pytest.mark.parametrize("pin", sorted(RULE_SENTENCE_PINS))
+def test_protocol_states_the_rule(pin: str) -> None:
+    sentence, _rejected = RULE_SENTENCE_PINS[pin]
+    assert _pins_exact_sentence(RULES, sentence), (pin, sentence)
 
 
 # --- The protocol places the adversary at the end of Build ------------------
