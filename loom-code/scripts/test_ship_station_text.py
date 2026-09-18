@@ -250,6 +250,31 @@ def test_ship_prose_names_a_confirmation_the_checker_accepts() -> None:
     assert not confirmation_prompt_matches(code, code)
 
 
+# ship-prose-states-the-hook-body-check-limit (A3 positive)
+def test_ship_prose_states_the_limit_of_the_hook_body_check() -> None:
+    """The hook reads the body file when the command is proposed; `gh` reads it
+    again when the command runs. Nothing holds the bytes still in between, and
+    no `PreToolUse` hook can: it judges a command it does not execute.
+
+    `test_probe_body_can_change_between_the_check_and_the_request` runs that
+    swap. The station says it out loud so an agent does not read the check as a
+    promise about the pull request's contents. Advisory prose, no gate marker --
+    the enforceable carrier stays the checker's own refusal."""
+    section = " ".join(_section(SHIP.read_text(encoding="utf-8"), "## 3. Publish once").split())
+    hits = [
+        s for s in re.split(r"(?<=[.!?])\s+", section)
+        if "judges the body it can read when it looks" in s
+        and "not the body the pull request receives" in s
+        and "swapped" in s
+    ]
+    assert len(hits) == 1, (
+        "ship §3 needs one sentence stating that the hook judges the body it "
+        "can read when it looks, not the body the pull request receives, and "
+        "that a file swapped between the two reads is outside what any such "
+        "check can promise"
+    )
+
+
 TWO_COPY_DOC = (
     "## 3. Publish once\n\nDo not " + NO_HANDOVER + ".\n\n"
     "## 4. Refuse\n\n"

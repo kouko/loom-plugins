@@ -9,6 +9,7 @@ from loom_checker.helpers import glob_to_regex
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
+from loom_checker.rule_checks.publish import validate_contextual_pr_body
 from loom_checker.rule_checks.push import SHELL_PROGRAMS
 from loom_checker.rule_checks.push import _program
 from loom_checker.rule_checks.push import _shell_segments
@@ -50,12 +51,24 @@ import sys
 # token is an entry-point token (`selection.ENTRY_TOKENS`); a prompt that is the
 # bare code binds nothing.
 #
+# Route two is named under its condition rather than flatly, because a
+# confirmation binds only when the session that proposed it records an attended
+# user typing it: a nested unattended session, a confirmation that lands in a
+# later session, and a host without prompt capture (expert-mode's own Boundary)
+# each leave it dead, and an agent that follows a dead route asks the user for
+# mechanical work this refusal exists to stop asking of them. Route one needs no
+# confirmation, so it carries no condition. The sentence is qualified rather
+# than computed: reading session state here would add a mechanism to a message,
+# which PRINCIPLES.md non-negotiable 4 asks a declared budget exception for.
+#
 # One line, and no leading newline: report() writes one `BLOCK <rule>: <reason>`
 # line per failure and every caller parses that prefix, so a wrapped reason
 # would emit continuation lines that no longer carry it.
 PUBLICATION_ROUTES = (
     "; two legal routes, both run by the agent: run the closing-review station,"
-    " which generates the attestation, or propose a step selection"
+    " which generates the attestation and needs no confirmation, so it is open"
+    " in every session; or, in a session that can record a confirmation the user"
+    " types, propose a step selection"
     " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
     " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
     " the proposal printed, after which finalize-review drops the reviewer floor to"
@@ -203,17 +216,28 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
             print(f"BLOCK push.attestation: {remote_error}", file=err)
             return 2
         # This route opens a pull request, so it owes what the publication
-        # command owes: a body that discloses every step the user's confirmed
-        # selection skipped. It asks publish's own function, never a second
-        # copy of the rule. The import is deferred because publish imports
-        # `_cmd_push` from this module; at module level the two would cycle.
+        # command owes: the whole of `push.contextual-body`, the rule id it
+        # prints. That is the structural floor -- the nine headings, their
+        # substance, and the ban on claiming to expose hidden reasoning --
+        # followed by the disclosure of every step the user's confirmed
+        # selection skipped, in the order `cmd_publish` runs them. Both are
+        # publish's own functions, never a second copy of either rule. The
+        # second import is deferred because publish imports `_cmd_push` from
+        # this module; at module level the two would cycle.
+        #
+        # The structural half also decides every gh input the hook cannot see
+        # (`--fill`, `--editor`, a template, a browser-composed body): those
+        # read as "", and "" has none of the nine headings, so they refuse
+        # whether or not the branch records a skip.
         from loom_checker.command_handlers.publish import selection_disclosure_failure
 
-        disclosure_error = selection_disclosure_failure(
-            Path.cwd(), pr_create_body(command)
+        body = pr_create_body(command)
+        body_error = (
+            validate_contextual_pr_body(body)
+            or selection_disclosure_failure(Path.cwd(), body)
         )
-        if disclosure_error:
-            report([("push.contextual-body", disclosure_error)], err)
+        if body_error:
+            report([("push.contextual-body", body_error)], err)
             return 2
     return 2 if rc == 1 else rc
 

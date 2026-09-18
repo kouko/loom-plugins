@@ -131,7 +131,9 @@ or propose a step selection the user confirms by typing
 The installed plugin's `PreToolUse` hook applies the same check automatically
 to direct raw publication commands and retains destination/refspec safety for
 callers that bypass `publish`. No repository-local checker scaffold or
-hook-firing ledger is required.
+hook-firing ledger is required. That hook judges the body it can read when it
+looks, not the body the pull request receives; a file swapped between those two
+reads is outside what any such check can promise.
 
 ## 4. Observe CI
 

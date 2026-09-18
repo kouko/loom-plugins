@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from io import StringIO
 from pathlib import Path
 
@@ -1248,7 +1249,9 @@ def test_body_without_disclosure_refused_when_selection_bound(
 MISSING_ATTESTATION = (
     "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
     "; two legal routes, both run by the agent: run the closing-review station,"
-    " which generates the attestation, or propose a step selection"
+    " which generates the attestation and needs no confirmation, so it is open"
+    " in every session; or, in a session that can record a confirmation the user"
+    " types, propose a step selection"
     " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
     " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
     " the proposal printed, after which finalize-review drops the reviewer floor to"
@@ -1287,9 +1290,14 @@ def canonical_push(repo: Path) -> str:
     ])
 
 
-def run_push_hook(monkeypatch, repo: Path, command: str) -> tuple[int, str]:
+def run_push_hook(
+    monkeypatch, repo: Path, command: str, *, payload_cwd: Path | None = None
+) -> tuple[int, str]:
+    """`payload_cwd` is the directory the Bash tool would run the command in.
+    The hook chdirs to the repository root regardless, so the two differ
+    whenever the agent works from a subdirectory of the repository."""
     payload = {
-        "cwd": str(repo),
+        "cwd": str(payload_cwd or repo),
         "hook_event_name": "PreToolUse",
         "tool_name": "Bash",
         "tool_input": {"command": command},
@@ -1336,6 +1344,33 @@ def test_missing_attestation_names_both_routes(tmp_path: Path, monkeypatch) -> N
     )
     assert "confirms by typing `/loom-code:expert-mode <code>`" in reason
     assert "never hand the blocked publication command to the user to run" in reason
+
+
+def test_only_the_confirmation_route_is_named_conditionally(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Route two binds only where the session records a confirmation the user
+    types: a nested unattended session, a confirmation landing in a later
+    session, and a host without prompt capture each leave it dead, which
+    `test_probe_route_two_really_is_unavailable_there` runs. So the clause that
+    names it states that condition, and route one -- which needs no
+    confirmation at all -- keeps being named without one.
+
+    The refusal is not asked to read session state to decide: that would put a
+    mechanism inside a message, and PRINCIPLES.md non-negotiable 4 wants a
+    declared budget exception before the net mechanism count rises. A sentence
+    that is true in every session costs nothing."""
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    reason = err.splitlines()[0]
+    before, separator, _after = reason.partition("propose a step selection")
+    assert rc == 2
+    assert separator, reason
+    assert "run the closing-review station" in before
+    assert "needs no confirmation" in before
+    assert "record a confirmation the user types" in before
 
 
 # The tail for a count greater than one. The two routes are absent: closing
@@ -1558,6 +1593,222 @@ def test_hook_reads_the_body_file_gh_would_send(tmp_path: Path, monkeypatch) -> 
 
     assert rc == 2
     assert err.startswith("BLOCK push.contextual-body: ")
+
+
+# --- the trailing-option allowlist (finding F8) -------------------------------
+
+# The refusal every command outside the canonical form earns.
+NOT_CANONICAL = (
+    "BLOCK push.attestation: PR creation must use the canonical "
+    "trusted-gh command from loom-code:ship\n"
+)
+
+
+def test_hook_refuses_the_short_body_file_spelling(tmp_path: Path, monkeypatch) -> None:
+    """`-F` is not on the allowlist, so it is refused before the body is read.
+
+    It is the one option the hook could read and resolve differently from the
+    shell: `pr_create_body` resolves a relative path against the repository
+    root the hook chdirs to, and the absoluteness rule covers `--body-file`
+    and `--body-file=` only. Admission closes that, not a wider parser."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
+    body = tmp_path / "short-option.md"
+    body.write_text(disclosed_body(DISCLOSURE), encoding="utf-8")
+    command = render_quote_all([
+        "command", str(Path(shutil.which("env")).resolve()),
+        f"LOOM_REPO_ROOT={repo.resolve()}",
+        f"GH_REPO={github_repo_from_origin(repo)}",
+        str(Path(shutil.which("gh")).resolve()), "pr", "create",
+        "--head", "feature", "--title", "feat(loom): safe", "-F", str(body),
+    ])
+
+    rc, err = run_push_hook(monkeypatch, repo, command)
+
+    assert (rc, err) == (2, NOT_CANONICAL)
+
+
+def test_hook_refuses_a_relative_body_path_the_shell_resolves_elsewhere(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The divergence F8 names, end to end: one path, two files. The gate reads
+    the disclosing copy at the repository root; the shell would read the hiding
+    copy in the directory the Bash tool runs in."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
+    (repo / "rel.md").write_text(disclosed_body(DISCLOSURE), encoding="utf-8")
+    sub = repo / "sub"
+    sub.mkdir()
+    (sub / "rel.md").write_text(contextual_body(), encoding="utf-8")
+    command = render_quote_all([
+        "command", str(Path(shutil.which("env")).resolve()),
+        f"LOOM_REPO_ROOT={repo.resolve()}",
+        f"GH_REPO={github_repo_from_origin(repo)}",
+        str(Path(shutil.which("gh")).resolve()), "pr", "create",
+        "--head", "feature", "--title", "feat(loom): safe", "-F", "rel.md",
+    ])
+
+    rc, err = run_push_hook(monkeypatch, repo, command, payload_cwd=sub)
+
+    assert (rc, err) == (2, NOT_CANONICAL)
+
+
+@pytest.mark.parametrize("trailing", [
+    ["--fill"],                       # gh composes the body from the commits
+    ["--editor"],                     # the body is typed in an editor
+    ["--template", "PR.md"],          # gh seeds the body from a template
+    ["--recover", "state.json"],      # the body is restored from saved state
+    ["--web"],                        # the body is composed in a browser
+    ["--assignee", "someone"],        # not body-bearing, and still not canonical
+])
+def test_hook_refuses_every_option_outside_the_allowlist(
+    tmp_path: Path, monkeypatch, trailing: list[str]
+) -> None:
+    """An option the canonical form does not name is refused, whether or not it
+    determines the body. Coverage of gh's body-bearing flags would have to
+    track gh's release notes; admission does not."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
+    body = tmp_path / "allowlist-body.md"
+    body.write_text(disclosed_body(DISCLOSURE), encoding="utf-8")
+    command = canonical_pr_create(repo, body) + " " + render_quote_all(trailing)
+
+    rc, err = run_push_hook(monkeypatch, repo, command)
+
+    assert (rc, err) == (2, NOT_CANONICAL)
+
+
+def test_hook_still_admits_the_allowlisted_publication_options(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Control: the options the allowlist names are still admitted together, so
+    the refusals above are the allowlist working and not the route closing."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
+    body = tmp_path / "allowlisted.md"
+    body.write_text(disclosed_body(DISCLOSURE), encoding="utf-8")
+    command = render_quote_all([
+        "command", str(Path(shutil.which("env")).resolve()),
+        f"LOOM_REPO_ROOT={repo.resolve()}",
+        f"GH_REPO={github_repo_from_origin(repo)}",
+        str(Path(shutil.which("gh")).resolve()), "pr", "create",
+        "--base", "main", "--head", "feature", "--draft",
+        "--title", "feat(loom): safe", "--body-file", str(body),
+    ])
+
+    rc, err = run_push_hook(monkeypatch, repo, command)
+
+    assert (rc, err) == (0, "")
+
+
+# --- the hook route runs the whole body rule it names (finding F9) ------------
+
+
+def test_hook_enforces_the_structural_half_of_the_body_rule(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The hook prints `push.contextual-body`, so it owes the whole rule: the
+    nine-heading floor and the chain-of-thought ban, not the disclosure clause
+    alone. This body has nothing to disclose and fails everything else."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, None)
+    body = tmp_path / "naked.md"
+    body.write_text(
+        "no headings at all, and this body claims to expose private "
+        "chain-of-thought.\n",
+        encoding="utf-8",
+    )
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_pr_create(repo, body))
+
+    assert rc == 2
+    assert err == (
+        "BLOCK push.contextual-body: "
+        + publish_rules.validate_contextual_pr_body(body.read_text(encoding="utf-8"))
+        + "\n"
+    )
+
+
+def test_hook_refuses_a_body_it_could_not_read_even_with_nothing_to_disclose(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """A body the gate cannot read is "", and "" has none of the nine headings.
+    Every gh input the hook cannot see therefore refuses on its own, instead of
+    refusing only where a recorded skip gave the disclosure clause something to
+    say."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, None)
+    absent = tmp_path / "absent.md"
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_pr_create(repo, absent))
+
+    assert rc == 2
+    assert err.startswith("BLOCK push.contextual-body: ")
+    assert "nine top-level contextual headings" in err
+
+
+# --- the body read cannot hang or overrun the hook (finding F10) --------------
+
+
+def read_body_in_a_subprocess(path: str, timeout: int = 10) -> str:
+    """`pr_create_body` on one path, in a process this test can outlive: a hang
+    has to fail the test rather than hang the suite. A `PreToolUse` hook has no
+    timeout of its own, so a blocking read there blocks the agent."""
+    command = render_quote_all([
+        "command", "env", "LOOM_REPO_ROOT=/", "GH_REPO=x",
+        "gh", "pr", "create", "--body-file", path,
+    ])
+    script = (
+        "import sys; sys.path.insert(0, %r)\n"
+        "from loom_checker.rule_checks.push import pr_create_body\n"
+        "print(repr(pr_create_body(%r)))\n"
+        % (str(Path(__file__).resolve().parent), command)
+    )
+    done = subprocess.run(
+        [sys.executable, "-c", script], capture_output=True, text=True, timeout=timeout
+    )
+    assert done.returncode == 0, done.stderr
+    return done.stdout.strip()
+
+
+@pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="needs FIFOs")
+def test_body_read_does_not_block_on_a_fifo(tmp_path: Path) -> None:
+    """A FIFO with no writer blocks `open` forever. The guard refuses it before
+    a byte is read, so the hook answers instead of hanging."""
+    fifo = tmp_path / "fifo.md"
+    os.mkfifo(fifo)
+
+    try:
+        assert read_body_in_a_subprocess(str(fifo)) == "''"
+    except subprocess.TimeoutExpired:
+        pytest.fail("pr_create_body blocked on a FIFO")
+
+
+@pytest.mark.skipif(not Path("/dev/zero").exists(), reason="needs /dev/zero")
+def test_body_read_does_not_run_away_on_a_character_device(tmp_path: Path) -> None:
+    """The unbounded-read variant: `/dev/zero` never ends. The same guard
+    refuses it, because it is not a regular file either."""
+    try:
+        assert read_body_in_a_subprocess("/dev/zero") == "''"
+    except subprocess.TimeoutExpired:
+        pytest.fail("pr_create_body read an unbounded character device")
+
+
+@pytest.mark.parametrize("path", ["-", "/dev/stdin"])
+def test_body_read_refuses_the_paths_that_name_a_stream(
+    tmp_path: Path, path: str
+) -> None:
+    """`-` is gh's spelling for stdin, which the gate cannot see: it reads ""
+    rather than whatever file happens to be named `-` in the working
+    directory."""
+    assert read_body_in_a_subprocess(path) == "''"
+
+
+def test_body_read_refuses_a_directory(tmp_path: Path) -> None:
+    """A directory is not a regular file; the read fails rather than the gate."""
+    assert read_body_in_a_subprocess(str(tmp_path)) == "''"
+
+
+def test_body_read_still_returns_a_regular_file(tmp_path: Path) -> None:
+    """Control: the guard refuses what cannot be finished, not the body."""
+    body = tmp_path / "regular.md"
+    body.write_text("hello\n", encoding="utf-8")
+
+    assert read_body_in_a_subprocess(str(body)) == repr("hello\n")
 
 
 # Allow (0) / block (2) outcomes pinned against commit 4e87e264, which
