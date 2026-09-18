@@ -256,6 +256,39 @@ def canonical_pr_create_repo(command: str) -> Path | None:
     return repo if is_canonical_pr_create_command(repo, command) else None
 
 
+def pr_create_body(command: str) -> str:
+    """The PR body this `gh pr create` would send.
+
+    Read from the last body-bearing option, because that is the one gh keeps
+    when a command repeats them: a gate that read the first would judge a body
+    the pull request never receives. The ship station's form carries
+    `--body-file` with an absolute path, which `check_pr_create_remote_head`
+    requires of every command it admits.
+
+    "" when the command names no body and when the named file cannot be read:
+    an empty body discloses nothing, which is exactly what a body the gate
+    cannot read has proven about itself."""
+    tokens = _tokenise(command)
+    body = ""
+    for index, token in enumerate(tokens):
+        following = tokens[index + 1] if index + 1 < len(tokens) else None
+        if token in {"--body-file", "-F"} and following is not None:
+            path = following
+        elif token.startswith("--body-file="):
+            path = token.split("=", 1)[1]
+        else:
+            if token in {"--body", "-b"} and following is not None:
+                body = following
+            elif token.startswith("--body="):
+                body = token.split("=", 1)[1]
+            continue
+        try:
+            body = Path(path).read_text(encoding="utf-8")
+        except OSError:
+            body = ""
+    return body
+
+
 def check_pr_create_remote_head(repo: Path, command: str) -> str | None:
     """Require PR creation to reference the already-published current HEAD."""
     branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")

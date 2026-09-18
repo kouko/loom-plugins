@@ -22,6 +22,7 @@ from loom_checker.rule_checks.push import is_git_push_command
 from loom_checker.rule_checks.push import is_pr_create_command
 from loom_checker.rule_checks.push import is_pr_merge_command
 from loom_checker.rule_checks.push import is_push_command
+from loom_checker.rule_checks.push import pr_create_body
 from loom_checker.rule_checks.push import quote_all_shell_token
 from loom_checker.rule_checks.selection_guard import FILE_TOOLS as SELECTION_GUARD_FILE_TOOLS
 from loom_checker.rule_checks.selection_guard import RULE_ID as SELECTION_GUARD_RULE
@@ -200,6 +201,19 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         remote_error = check_pr_create_remote_head(Path.cwd(), command)
         if remote_error:
             print(f"BLOCK push.attestation: {remote_error}", file=err)
+            return 2
+        # This route opens a pull request, so it owes what the publication
+        # command owes: a body that discloses every step the user's confirmed
+        # selection skipped. It asks publish's own function, never a second
+        # copy of the rule. The import is deferred because publish imports
+        # `_cmd_push` from this module; at module level the two would cycle.
+        from loom_checker.command_handlers.publish import selection_disclosure_failure
+
+        disclosure_error = selection_disclosure_failure(
+            Path.cwd(), pr_create_body(command)
+        )
+        if disclosure_error:
+            report([("push.contextual-body", disclosure_error)], err)
             return 2
     return 2 if rc == 1 else rc
 

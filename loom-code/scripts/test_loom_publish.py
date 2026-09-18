@@ -10,6 +10,7 @@ from pathlib import Path
 from loom_checker.command_handlers import publish as loom_checker
 from loom_checker.command_handlers import push as push_handler
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
+from loom_checker.rule_checks.push import github_repo_from_origin
 from loom_checker.rule_checks.push import render_quote_all
 import pytest
 
@@ -1447,6 +1448,116 @@ def test_canonical_attested_push_allowed(tmp_path: Path, monkeypatch) -> None:
     rc, err = run_push_hook(monkeypatch, repo, canonical_push(repo))
 
     assert (rc, err) == (0, "")
+
+
+# --- the hook route reaches publish's disclosure verdict (finding F5) --------
+
+
+def canonical_pr_create(repo: Path, body: Path) -> str:
+    """The one trusted metadata-only PR-opening command the ship station runs."""
+    return render_quote_all([
+        "command", str(Path(shutil.which("env")).resolve()),
+        f"LOOM_REPO_ROOT={repo.resolve()}",
+        f"GH_REPO={github_repo_from_origin(repo)}",
+        str(Path(shutil.which("gh")).resolve()), "pr", "create",
+        "--head", "feature", "--title", "feat(loom): safe", "--body-file", str(body),
+    ])
+
+
+def hook_repository_with_a_selection(
+    tmp_path: Path, monkeypatch, selection: dict | None
+) -> Path:
+    """A branch whose sole attestation records this step selection, published
+    through the PR-opening hook rather than through the publication command."""
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+    attestation(repo).write_text(
+        json.dumps({"change_id": "change", "selection": selection}), encoding="utf-8"
+    )
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "attest")
+    # Attestation content is attestation.py's own contract; the live remote-head
+    # lookup is the external seam, answered with the state that holds right
+    # after a successful push. Neither is what this route is under test for.
+    monkeypatch.setattr(push_handler, "validate_attestation", lambda *_a, **_k: [])
+    monkeypatch.setattr(push_handler, "check_pr_create_remote_head", lambda *_a, **_k: None)
+    return repo
+
+
+def test_hook_refuses_a_pr_body_that_hides_the_skip(tmp_path: Path, monkeypatch) -> None:
+    """A skip the user typed reaches a pull request only disclosed, whichever
+    route opens it: the hook refuses the very body publish refuses, under the
+    same rule id and with the same reason."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
+    body = tmp_path / "hook-body-no-disclosure.md"
+    body.write_text(contextual_body(), encoding="utf-8")
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_pr_create(repo, body))
+
+    expected = publish_rules.validate_selection_disclosure(
+        contextual_body(), {"selection": SELECTION}
+    )
+    assert rc == 2
+    assert err == f"BLOCK push.contextual-body: {expected}\n"
+
+
+def test_hook_admits_a_pr_body_that_discloses_the_skip(tmp_path: Path, monkeypatch) -> None:
+    """Control: the same route with the attestation's own disclosure present is
+    admitted, so the refusal above is the body being read, not the route being
+    closed."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
+    body = tmp_path / "hook-body-disclosed.md"
+    body.write_text(disclosed_body(DISCLOSURE), encoding="utf-8")
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_pr_create(repo, body))
+
+    assert (rc, err) == (0, "")
+
+
+def test_hook_admits_an_undisclosing_body_when_nothing_was_skipped(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """An attestation recording no selection keeps behaving as it does today:
+    there is nothing to disclose, so a body carrying no disclosure line passes."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, None)
+    body = tmp_path / "hook-body-nothing-skipped.md"
+    body.write_text(contextual_body(), encoding="utf-8")
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_pr_create(repo, body))
+
+    assert (rc, err) == (0, "")
+
+
+def test_hook_refuses_a_false_disclosure_when_nothing_was_skipped(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The verdict is publish's whole verdict, not just its skipped-steps half:
+    a disclosure line with no selection behind it is false either way."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, None)
+    body = tmp_path / "hook-body-false-disclosure.md"
+    body.write_text(disclosed_body([DISCLOSURE[0]]), encoding="utf-8")
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_pr_create(repo, body))
+
+    assert rc == 2
+    assert err.startswith("BLOCK push.contextual-body: ")
+
+
+def test_hook_reads_the_body_file_gh_would_send(tmp_path: Path, monkeypatch) -> None:
+    """A second `--body-file` is the file gh sends, so it is the file the gate
+    reads: the disclosing one first cannot cover a hiding one after it."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
+    disclosed = tmp_path / "first-disclosed.md"
+    disclosed.write_text(disclosed_body(DISCLOSURE), encoding="utf-8")
+    hidden = tmp_path / "second-hidden.md"
+    hidden.write_text(contextual_body(), encoding="utf-8")
+    command = canonical_pr_create(repo, disclosed) + " " + render_quote_all(
+        ["--body-file", str(hidden)]
+    )
+
+    rc, err = run_push_hook(monkeypatch, repo, command)
+
+    assert rc == 2
+    assert err.startswith("BLOCK push.contextual-body: ")
 
 
 # Allow (0) / block (2) outcomes pinned against commit 4e87e264, which
