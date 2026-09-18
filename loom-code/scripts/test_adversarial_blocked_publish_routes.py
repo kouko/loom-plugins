@@ -25,6 +25,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -35,6 +36,7 @@ from loom_checker.command_handlers.publish import MISSING_ATTESTATION
 from loom_checker.command_handlers.push import EXTRA_ATTESTED_CHANGES
 from loom_checker.command_handlers.push import PUBLICATION_ROUTES
 from loom_checker.rule_checks.publish import render_selection_disclosure
+from loom_checker.rule_checks.push import canonical_pr_create_trailing
 from loom_checker.rule_checks.push import github_repo_from_origin
 from loom_checker.rule_checks.push import pr_create_body
 from loom_checker.rule_checks.push import render_quote_all
@@ -788,17 +790,12 @@ def test_probe_ship_prose_does_not_promise_routes_the_refusal_may_not_name() -> 
         )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F7b: the ship station still says the user confirms `by "
-           "typing the code`, the exact phrasing the checker was corrected away "
-           "from, and `test_ship_prose_forbids_handing_the_command_over` "
-           "requires that substring -- so the station cannot be corrected "
-           "without editing the test that pins it",
-)
 def test_probe_ship_prose_names_a_confirmation_the_checker_accepts() -> None:
     """Attack: make the station and the refusal disagree about what the user
     types, so that following the station binds nothing.
+
+    F7b's marker is gone: `cfaa2057` put the binding form in the station, and
+    the assertion that had pinned the false phrasing moved with it.
 
     Why this is not cosmetic is already executable above: an agent relaying the
     station's wording asks for the bare code, and
@@ -895,17 +892,14 @@ def test_probe_disclosure_check_is_not_reached_before_the_attestation(tmp_path, 
     assert "push.attestation" in err and "push.contextual-body" not in err, err
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F8: `check_pr_create_remote_head` requires an absolute path "
-           "for `--body-file` and `--body-file=` but not for the `-F` spelling, "
-           "which `pr_create_body` reads. The hook resolves the relative path "
-           "against the repository root it chdirs to; the shell resolves it "
-           "against its own working directory. F5 survives verbatim under `-F`",
-)
 def test_probe_short_body_file_option_cannot_diverge_from_the_shell(tmp_path, monkeypatch) -> None:
     """Attack: make the gate and the request read two different files under one
-    path, by spelling the option the absoluteness rule does not cover."""
+    path, by spelling the option the absoluteness rule does not cover.
+
+    F8's marker is gone. `775eba95` closed it on the admission side: `-F` is not
+    in `CANONICAL_PR_CREATE_OPTIONS`, so the command is no longer canonical and
+    is refused before any body is read. The probe stays pointed at the outcome,
+    not the mechanism, so it still fails if `-F` is ever allowlisted."""
     repo, disclosure = _skipped_branch(tmp_path)
     (repo / "rel.md").write_text(_pr_body(disclosure), encoding="utf-8")  # the gate's copy
     sub = repo / "sub"
@@ -966,14 +960,6 @@ NAKED_BODY = ("no headings at all, and this body claims to expose private "
               "chain-of-thought.\n")
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F9: the hook route now enforces the disclosure half of "
-           "`push.contextual-body` and still not the structural half. Both "
-           "routes refuse under the same rule id, so the rule looks enforced "
-           "everywhere while the nine-heading floor and the "
-           "chain-of-thought ban hold on the publish route alone",
-)
 def test_probe_hook_enforces_the_whole_contextual_body_rule(tmp_path, monkeypatch) -> None:
     """Attack: a branch with nothing to disclose, and a body that fails every
     other part of the rule the hook's own refusal is named after."""
@@ -998,14 +984,6 @@ def test_probe_publish_refuses_the_same_naked_body(tmp_path) -> None:
 
 
 @pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="needs FIFOs")
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F10: `pr_create_body` opens the named path with no "
-           "regular-file guard and no timeout, so a FIFO body file blocks the "
-           "PreToolUse hook indefinitely -- `/dev/zero` is the unbounded-read "
-           "variant. `publish` refuses the same path outright, because "
-           "`_publish_args` requires `--body-file` to be a readable regular file",
-)
 def test_probe_body_read_cannot_block_the_hook(tmp_path) -> None:
     """Attack: hand the gate a path that is not a file it can finish reading."""
     fifo = tmp_path / "fifo.md"
@@ -1137,28 +1115,50 @@ def test_probe_route_two_really_is_unavailable_there(tmp_path, label, propose,
                     confirm_session=confirm, attended=attended)["bound"] is False
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F11: the count-zero tail names the step-selection route in "
-           "every session and on every host, and the route is unavailable in a "
-           "nested unattended session, when the confirmation lands in a later "
-           "session, and -- per the expert-mode station's own Boundary -- on a "
-           "host without prompt capture. The agent asks the user to type a "
-           "confirmation that cannot be recorded, which is the mechanical work "
-           "this change exists to stop asking of them",
-)
 def test_probe_refusal_names_route_two_only_where_it_can_be_taken(tmp_path) -> None:
     """Attack: reach a state where a named route cannot be completed at all, and
-    see whether the refusal still names it."""
+    see whether the refusal still claims it outright.
+
+    F11's marker is gone, and the fix is not the one the probe originally
+    demanded. `775eba95` did not suppress route two in those sessions -- it
+    qualified it, and said in the same breath that route one needs none. That is
+    a defensible answer: the refusal is one line, it reads the same in every
+    session, and computing the condition would put session state into a message.
+    The probe is re-aimed at the property the fix claims, and
+    `test_probe_route_two_condition_is_not_self_evaluable` below records what
+    the qualification still costs."""
     repo = _repo(tmp_path, "unattended")
     env = _env()
     env["CLAUDE_CODE_SESSION_ATTENDED"] = "0"
     refused = subprocess.run([sys.executable, str(CHECKER), "push"], cwd=str(repo),
                              capture_output=True, text=True, env=env, input="")
     assert refused.returncode == 1
-    assert "selection propose" not in refused.stderr, (
-        "the refusal offers a step selection to a session that cannot record "
-        "one: " + refused.stderr)
+    reason = refused.stderr
+    assert "needs no confirmation" in reason and "in every session" in reason, (
+        "route one must be stated to be open in the sessions route two is not: "
+        + reason)
+    before_route_two = reason.split("propose a step selection", 1)[0]
+    assert "can record a confirmation" in before_route_two, (
+        "route two must carry its condition before it is named: " + reason)
+
+
+def test_probe_route_two_condition_is_not_self_evaluable(tmp_path) -> None:
+    """What the qualification costs, recorded so it is not lost.
+
+    The condition the refusal now attaches to route two is not one an agent can
+    evaluate before acting: nothing in the checker reports whether this session
+    records confirmations. The agent learns it by proposing, asking the user to
+    type the code, and reading `bound: false` afterwards -- one wasted keystroke
+    per blocked publication in an unattended or cross-session run. Route one is
+    unconditional, so nobody is stranded; this is a cost, not a block."""
+    repo = _repo(tmp_path, "notselfeval")
+    bound = _bind_in(repo, CHANGE, propose_session="S1", confirm_session="S1",
+                     attended="0")
+    assert bound["bound"] is False
+    assert bound.get("code") is None
+    # Nothing in the store distinguishes "not confirmed yet" from "this session
+    # cannot confirm", which is why the agent has to ask to find out.
+    assert bound["skip"] == []
 
 
 def test_probe_route_one_survives_where_route_two_does_not(tmp_path) -> None:
@@ -1169,3 +1169,159 @@ def test_probe_route_one_survives_where_route_two_does_not(tmp_path) -> None:
                     attended="0")["bound"] is False
     # …and closing-review, which route one names, never consults the store.
     assert "selection" not in _checker(repo, ["finalize-review", CHANGE]).stderr.lower()
+
+
+# --------------------------------------------------------------------------
+# Half eight: the trailing-option allowlist that replaced the parse. The
+# question is no longer what the gate reads, but what it admits.
+# --------------------------------------------------------------------------
+
+
+# (trailing tokens, admitted, what is being tried)
+ALLOWLIST_CASES = [
+    ([], True, "no trailing options"),
+    (["--head", "feature", "--title", "t", "--body-file", "/a/b.md"], True, "ship's form"),
+    (["--draft"], True, "the one flag that spends no value"),
+    (["--body-file", "/a.md", "--body-file", "/b.md"], True, "repeated, last wins"),
+    (["--title", "--draft"], True, "a value that looks like an option"),
+    (["--title"], False, "an option with no value left"),
+    (["--body-file", "--title", "x"], False, "the value eats the next option, x dangles"),
+    (["-F", "/a/b.md"], False, "the short spelling F8 travelled on"),
+    (["--body-file=/a/b.md"], False, "the joined spelling"),
+    (["-R", "o/r"], False, "repo override"),
+    (["--repo", "o/r"], False, "repo override"),
+    (["--hostname", "h"], False, "host override"),
+    (["--repo=o/r"], False, "joined repo override"),
+    (["-Ro/r"], False, "clustered repo override"),
+    (["--title", "x", "-R", "o/r"], False, "override after a complete option"),
+    (["--"], False, "end of options"),
+    (["--", "--repo", "o/r"], False, "end of options, then an override"),
+    ([""], False, "an empty token"),
+    (["--draft", "false"], False, "a bool given a separate value"),
+    (["--draft=true"], False, "a bool given a joined value"),
+    (["--fill"], False, "a body gh composes from commits"),
+    (["--fill-first"], False, "a body gh composes from one commit"),
+    (["--fill-verbose"], False, "a body gh composes from commit bodies"),
+    (["--editor"], False, "a body typed in an editor"),
+    (["--template", "/t.md"], False, "a body seeded from a template"),
+    (["--web"], False, "a body composed in a browser"),
+    (["--recover", "{}"], False, "a body restored from a failed run"),
+    (["--attach", "/i.png"], False, "content appended to the body"),
+]
+
+
+@pytest.mark.parametrize("trailing,admitted,label", ALLOWLIST_CASES)
+def test_probe_allowlist_admits_only_what_it_can_judge(trailing, admitted, label) -> None:
+    """Attack the allowlist walk itself: wrong value counts, values that look
+    like options, end-of-options, empty tokens, repeats, and every gh input that
+    determines a body the hook cannot see."""
+    assert canonical_pr_create_trailing(list(trailing)) is admitted, label
+
+
+REPO_OVERRIDE_SPELLINGS = (["-R", "o/r"], ["--repo", "o/r"], ["--hostname", "h"],
+                           ["--repo=o/r"], ["--hostname=h"], ["-Ro/r"])
+
+
+@pytest.mark.parametrize("trailing", REPO_OVERRIDE_SPELLINGS)
+def test_probe_deleted_repo_override_check_is_really_subsumed(trailing) -> None:
+    """The F4 lesson applied to a deletion: `775eba95` removed the explicit
+    repo-override enumeration on the grounds that the allowlist subsumes it. A
+    subsumption that is only claimed is exactly what F4 was. Every spelling the
+    deleted check named is measured here, including the joined and clustered
+    forms it handled specially."""
+    assert canonical_pr_create_trailing(list(trailing)) is False
+
+
+def test_probe_option_value_is_consumed_the_way_pflag_consumes_it() -> None:
+    """Attack: make the walk and gh disagree about where an option's value ends.
+
+    `--title --draft` is admitted, with `--draft` read as the title's value.
+    That matches gh: `pflag.parseLongArg` takes the following argument as the
+    value whenever the flag has no `NoOptDefVal`, without testing it for a
+    leading dash, so gh sees the title `--draft` and no draft flag. Reasoned
+    from pflag's documented behaviour and gh's declared flag types, not executed
+    -- this repository's own hook refuses the command text, and the invocations
+    that reach flag parsing risk a network call. Every allowlisted option is
+    either separate-value or valueless, so there is no third case to disagree
+    about."""
+    assert canonical_pr_create_trailing(["--title", "--draft"]) is True
+    assert canonical_pr_create_trailing(["--title", "--draft", "--draft"]) is True
+    assert canonical_pr_create_trailing(["--draft", "--title"]) is False
+
+
+def test_probe_unseen_body_flags_are_refused_before_the_body_is_read(tmp_path, monkeypatch) -> None:
+    """The fix's stated mechanism for the unseen-body inputs was that they read
+    as "" and "" fails the nine headings. The allowlist now refuses them first,
+    under a different rule id -- so the outcome holds and the reason in the
+    comment is superseded. Recorded because a future reader will otherwise trust
+    the comment's route."""
+    repo, _disclosure = _skipped_branch(tmp_path)
+    command = _command(repo, "--fill")
+    code, err = _run_hook(repo, command, monkeypatch)
+    assert code == 2
+    assert "push.attestation" in err and "push.contextual-body" not in err, err
+
+
+def test_probe_structural_floor_runs_before_the_disclosure_clause(tmp_path, monkeypatch) -> None:
+    """Attack the composition: a body that fails both halves must still produce
+    one refusal, one rule id, one line -- and the half `cmd_publish` runs first
+    must be the half that speaks."""
+    repo, _disclosure = _skipped_branch(tmp_path)
+    body = tmp_path / "fails-both.md"
+    body.write_text("neither headings nor a disclosure line.\n", encoding="utf-8")
+    code, err = _run_hook(repo, _command(repo, "--body-file", str(body)), monkeypatch)
+    assert code == 2
+    assert _blocks(err.splitlines()[0] + "\n")[0][0] == "push.contextual-body"
+    assert "nine top-level contextual headings" in err
+    assert "Skipped steps" not in err
+
+
+BODY_PATHS_THAT_ARE_NOT_BODIES = ("fifo", "chardev", "stdin", "directory",
+                                  "unreadable", "symlink-to-fifo")
+
+
+@pytest.mark.parametrize("kind", BODY_PATHS_THAT_ARE_NOT_BODIES)
+def test_probe_guarded_body_read_returns_promptly(tmp_path, kind) -> None:
+    """Attack the F10 guard the way any check-then-read deserves: every path
+    that is not a readable regular file must come back empty and come back at
+    once, including one reached through a symlink."""
+    if kind in {"fifo", "symlink-to-fifo"} and not hasattr(os, "mkfifo"):
+        pytest.skip("needs FIFOs")
+    if kind == "fifo":
+        path = tmp_path / "f.fifo"
+        os.mkfifo(path)
+    elif kind == "symlink-to-fifo":
+        target = tmp_path / "t.fifo"
+        os.mkfifo(target)
+        path = tmp_path / "link.md"
+        path.symlink_to(target)
+    elif kind == "chardev":
+        path = Path("/dev/zero")
+    elif kind == "stdin":
+        path = Path("-")
+    elif kind == "directory":
+        path = tmp_path
+    else:
+        path = tmp_path / "u.md"
+        path.write_text("x", encoding="utf-8")
+        os.chmod(path, 0o000)
+
+    command = render_quote_all(["command", "env", "LOOM_REPO_ROOT=/", "GH_REPO=x",
+                                "gh", "pr", "create", "--body-file", str(path)])
+    started = time.monotonic()
+    assert pr_create_body(command) == ""
+    assert time.monotonic() - started < 5, f"{kind} did not come back promptly"
+
+
+def test_probe_body_read_has_no_size_ceiling(tmp_path) -> None:
+    """Recorded, not scored. The guard admits any readable regular file, and
+    there is no cap on how much of it is read into the hook's memory. Twenty
+    megabytes here; nothing stops twenty gigabytes. It is agent-named and
+    self-inflicted -- the agent stalls its own tool call, nothing is published,
+    and `publish` reads its body file the same way -- so it is a limitation
+    rather than a hole. It is measured so that it stays a known one."""
+    big = tmp_path / "big.md"
+    big.write_text("x" * (20 * 1024 * 1024), encoding="utf-8")
+    command = render_quote_all(["command", "env", "LOOM_REPO_ROOT=/", "GH_REPO=x",
+                                "gh", "pr", "create", "--body-file", str(big)])
+    assert len(pr_create_body(command)) == 20 * 1024 * 1024
