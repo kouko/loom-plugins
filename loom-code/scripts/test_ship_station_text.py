@@ -6,11 +6,13 @@ prefix -- an agent at ship never reads write-plan Step 6.
 """
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
 from loom_checker.command_handlers.push import PUBLICATION_ROUTES
 from loom_checker.command_handlers.push import publication_advice
+from loom_checker.selection import ENTRY_TOKENS
 from loom_checker.selection import confirmation_prompt_matches
 from loom_checker.selection import selection_code
 from prose_pin import has_negation
@@ -214,6 +216,77 @@ def test_ship_prose_promises_only_what_every_refusal_names() -> None:
         )
 
 
+# The module that emits the publication refusals ship §3 speaks about, read as
+# source rather than imported: what the test needs is which reasons reach
+# `report()` as a bare literal, and that is a fact about the call sites.
+PUBLISH_HANDLER = (
+    Path(__file__).resolve().parents[1]
+    / "scripts" / "loom_checker" / "command_handlers" / "publish.py"
+)
+
+
+def _bare_attestation_refusals() -> list[str]:
+    """Every `push.attestation` reason `publish` emits as a plain string.
+
+    `_publish_block(reason, err)` is `report([("push.attestation", reason)])`,
+    so a call whose first argument is a string constant is a refusal whose
+    whole text is that constant: nothing appends a remedy to it. A call that
+    passes a name (`origin_error`) is not counted -- what that name holds is
+    not decidable here.
+    """
+    tree = ast.parse(PUBLISH_HANDLER.read_text(encoding="utf-8"))
+    return [
+        node.args[0].value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_publish_block"
+        and node.args
+        and isinstance(node.args[0], ast.Constant)
+        and isinstance(node.args[0].value, str)
+    ]
+
+
+# ship-prose-covers-the-refusals-that-name-no-remedy (A3 positive)
+def test_ship_prose_covers_the_refusals_that_name_no_remedy() -> None:
+    """The station may only promise a remedy where the checker names one.
+
+    The premise is recomputed, not remembered: `publish` emits
+    `push.attestation` refusals whose whole text is a string constant, with
+    none of `publication_advice`'s tails in it -- `literal origin is not a
+    supported GitHub repository URL` is the one the blind runner hit. An
+    agent that met one of those and read an unconditional "take the remedy
+    that refusal names" had nothing to take and nothing it was allowed to do,
+    which is the state this change exists to eliminate.
+
+    Were every refusal later given a remedy, the premise assertion fails here
+    rather than leaving the station quietly over-scoped in the other
+    direction.
+    """
+    tails = {publication_advice(count) for count in REFUSAL_COUNTS}
+    bare = _bare_attestation_refusals()
+    assert bare, (
+        "premise: `publish` emits no bare-literal attestation refusal, so "
+        "every refusal may name a remedy and ship 3 could promise one outright"
+    )
+    remediless = [
+        reason for reason in bare
+        if not any(tail in reason for tail in tails)
+    ]
+    assert remediless, (
+        "premise: every bare refusal carries a publication_advice tail after all"
+    )
+    general = SCOPING_DASH.split(_no_handover_sentence(), maxsplit=1)[0]
+    assert re.search(r"where a refusal names a remedy, take it", general), (
+        "ship 3 scopes the remedy clause to the refusals that carry one; "
+        f"{len(remediless)} of publish's own refusals name none"
+    )
+    assert re.search(r"where it names none, report the refusal and stop", general), (
+        "ship 3 says what the agent does where the refusal names no remedy, "
+        "because the same sentence forbids handing the command over"
+    )
+
+
 # The confirmation prompt the station names, in backticks with `<code>` where
 # the proposal's code goes -- the one part of the sentence the user retypes.
 CONFIRMATION_FORM = re.compile(r"`([^`]*<code>[^`]*)`")
@@ -248,6 +321,38 @@ def test_ship_prose_names_a_confirmation_the_checker_accepts() -> None:
     # without it, or the code without the prompt, binds nothing either.
     assert not confirmation_prompt_matches(forms[0].replace("<code>", "").strip(), code)
     assert not confirmation_prompt_matches(code, code)
+
+
+# Every backticked form in the sentence whose first word is an entry-point
+# token: the confirmation spellings the station offers the user.
+BACKTICKED = re.compile(r"`([^`]+)`")
+
+
+# ship-prose-names-every-confirmation-spelling-the-checker-accepts (A3 positive)
+def test_ship_prose_names_every_confirmation_spelling_the_checker_accepts() -> None:
+    """`expert-mode` always gives the Codex spelling beside the Claude Code
+    one, because a reader on either host retypes the form in front of them.
+
+    Which spellings count as entry points is read from `selection.ENTRY_TOKENS`
+    and each one the station names is run through the matcher, so a station
+    that named a fifth spelling the matcher does not accept fails here, and so
+    does one that drops to a single host again.
+    """
+    sentence = _no_handover_sentence()
+    named = [
+        form for form in BACKTICKED.findall(sentence)
+        if form.split()[0] in ENTRY_TOKENS
+    ]
+    assert len(named) >= 2, (
+        "ship 3 names the Claude Code and Codex spellings of the confirmation, "
+        f"as `expert-mode` does; it names {named}"
+    )
+    code = selection_code("2026-09-18-example-change", [], ["reviewers"])
+    for form in named:
+        prompt = form if "<code>" in form else f"{form} <code>"
+        assert confirmation_prompt_matches(prompt.replace("<code>", code), code), (
+            f"the spelling ship 3 names, {form!r}, binds nothing"
+        )
 
 
 # ship-prose-states-the-hook-body-check-limit (A3 positive)

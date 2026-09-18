@@ -16,7 +16,7 @@ charter: 1.0
 - Risk: land refuses before the shared check, so the earlier site carries the text; spec Design decision names the site. agent-decided.
 
 **W1-01 Record the no-handover rule in the ship station**  after: W0-01  acceptance: 3
-- Files: loom-code/skills/ship/SKILL.md, loom-code/scripts/test_ship_skill_prose.py
+- Files: loom-code/skills/ship/SKILL.md, loom-code/scripts/test_ship_station_text.py
 - Test: A3 positive: test_ship_prose_forbids_handing_the_command_over; negative: test_ship_prose_rule_is_not_marked_as_a_gate.
 - Risk: prose is advisory and never the primary carrier; spec Design decision pins the refusal string as the carrier. agent-decided.
 
