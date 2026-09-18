@@ -27,7 +27,8 @@ Inside the skill folder that holds it today, each kind of artifact has its attac
 7. Given the kinds of artifact a change touched, the adversary contract says which files to read, and reading the protocol plus the matching recipes yields a complete, executable procedure.
 8. Every rule present before the split is still present after it, and none was added: a line-by-line correspondence list shows where each rule now lives.
 9. The four properties this split is judged by — change, add, remove, locate — are written down in the repository's own conventions in a form the next skill can be held to, and the repository's roadmap records that the rest of loom is to be brought to the same shape one skill per change.
-10. In a clean environment, the complete package suite passes.
+10. One check covers all recipes at once and states the shape each must keep: it carries a pointer back to the shared protocol that resolves, it is named by the routing table and names one kind, it holds no rule the shared protocol owns, and the shared protocol holds no rule of its own. A recipe added or edited so that any part of that shape is missing fails the check.
+11. In a clean environment, the complete package suite passes.
 
 ## Constraints
 

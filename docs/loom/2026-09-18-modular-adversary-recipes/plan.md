@@ -31,14 +31,19 @@ charter: 1.0
 - Test: A5 positive: deleting-a-kind-leaves-no-reference; negative: stale-reference-detected.
 - Risk: A grep-shaped check can pass by skipping. agent-decided: the test performs a synthetic deletion in a temporary copy and asserts on the result, never on prose.
 
+**W1-03 One shape every recipe keeps**  after: W0-02  acceptance: 10
+- Files: loom-code/scripts/test_adversary_recipe_shape.py
+- Test: A10 positive: every-recipe-keeps-the-shape; negative: recipe-missing-part-of-shape-rejected.
+- Risk: A shape check drifting into pinned wording would re-couple the recipes. agent-decided: it asserts the parts are present and owned, never how a recipe words them.
+
 **W2-01 Write the four properties into the conventions and the roadmap**  after: W0-02  acceptance: 9
 - Files: AGENTS.md, loom-code/ROADMAP.md, loom-code/scripts/test_module_criteria_text.py
 - Test: A9 positive: four-properties-stated-once; negative: property-without-a-check.
 - Risk: Conventions can grow into a second rulebook. agent-decided: four lines naming change, add, remove and locate, plus one roadmap line; no new process and no cross-skill guidance.
 
-**W2-02 Clean-environment suite**  after: W1-02, W2-01  acceptance: 10
+**W2-02 Clean-environment suite**  after: W1-02, W1-03, W2-01  acceptance: 11
 - Files: docs/loom/2026-09-18-modular-adversary-recipes/evidence/suite-run.md
-- Test: A10 positive: full-suite-green; boundary: clean-clone-green.
+- Test: A11 positive: full-suite-green; boundary: clean-clone-green.
 - Risk: Host Python drift can mask a failure. agent-decided: run the repository's declared isolated runner, and rehearse the probes in a clone as the scanners change already requires.
 
 ## Questions asked
