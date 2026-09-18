@@ -35,6 +35,24 @@ import shutil
 import sys
 
 
+# The two legal routes out of a publication blocked for a missing attestation,
+# appended to the reason that blocks it. One copy, because `land` refuses the
+# merge at its own earlier site and appends this same text there: a caller must
+# read the same routes wherever the block lands.
+#
+# One line, and no leading newline: report() writes one `BLOCK <rule>: <reason>`
+# line per failure and every caller parses that prefix, so a wrapped reason
+# would emit continuation lines that no longer carry it.
+PUBLICATION_ROUTES = (
+    "; two legal routes, both run by the agent: run the closing-review station,"
+    " which generates the attestation, or propose a step selection"
+    " (`loom_checker.py selection propose <change-id> --origin agent`) that the user"
+    " confirms by typing the code, after which finalize-review drops the reviewer"
+    " floor to zero and still emits an attestation recording the skip;"
+    " never hand this command to the user to run"
+)
+
+
 def read_hook_payload(stdin=sys.stdin) -> dict | None:
     """PreToolUse payload (Claude Code and Codex share the shape) when the
     checker is invoked as a hook; None when run from a terminal or with an
@@ -258,21 +276,13 @@ def _cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     matcher = glob_to_regex(attestation_template.replace("<change-id>", "*"))
     candidates = sorted(path for path in changed_paths(repo) if matcher.fullmatch(path))
     if len(candidates) != 1:
-        # One line: report() writes one `BLOCK <rule>: <reason>` line per
-        # failure, and every caller parses that prefix, so a wrapped reason
-        # would emit continuation lines that no longer carry it. The existing
-        # reason stays at the front; what follows only names the two legal
-        # routes out, because the refusal alone left the agent nothing to do
+        # The existing reason stays at the front; PUBLICATION_ROUTES only names
+        # the way out, because the refusal alone left the agent nothing to do
         # but hand the blocked command back to the user.
         return report([(
             "push.attestation",
             f"branch must carry exactly one generated attestation; found {len(candidates)}"
-            "; two legal routes, both run by the agent: run the closing-review station,"
-            " which generates the attestation, or propose a step selection"
-            " (`loom_checker.py selection propose <change-id> --origin agent`) that the user"
-            " confirms by typing the code, after which finalize-review drops the reviewer"
-            " floor to zero and still emits an attestation recording the skip;"
-            " never hand this command to the user to run",
+            + PUBLICATION_ROUTES,
         )], err)
     attestation_rel = candidates[0]
     match = re.fullmatch(

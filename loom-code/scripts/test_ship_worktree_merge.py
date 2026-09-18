@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import io
+import subprocess
 from pathlib import Path
 
 import pytest
 
+from loom_checker.command_handlers import land
 from loom_checker.command_handlers import push as loom_checker
 
 
@@ -172,3 +174,82 @@ def test_cmd_push_noncanonical_git_push_remains_blocked(
 
     assert loom_checker.cmd_push(["--hook"], io.StringIO(), err) == 2
     assert "canonical quote-all rendering" in err.getvalue()
+
+
+MERGE_UNATTESTED_REASON = (
+    "BLOCK land.merge: branch must carry exactly one attested change; found 0"
+)
+
+
+def _git(repo: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], check=True, capture_output=True, text=True
+    ).stdout.strip()
+
+
+def _land_without_attestation(
+    tmp_path: Path, monkeypatch,
+) -> tuple[int, str, list]:
+    """`land --accepted-by` on a branch that carries a committed intent but no
+    attestation. Every gh and git call goes through `run_land_external`, which
+    records here instead of running, so nothing reaches GitHub."""
+    repo = tmp_path / "repo"
+    repo.mkdir(parents=True)
+    _git(repo, "init", "-q")
+    _git(repo, "config", "user.email", "test@example.com")
+    _git(repo, "config", "user.name", "Test")
+    (repo / "file.txt").write_text("content\n", encoding="utf-8")
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "initial")
+    _git(repo, "branch", "-M", "main")
+    _git(repo, "switch", "-q", "-c", "feature")
+    _git(repo, "remote", "add", "origin", "git@github.com:example/project.git")
+    intent = repo / "docs" / "loom" / "intent" / "change.md"
+    intent.parent.mkdir(parents=True)
+    intent.write_text(
+        "# Change\noriginator: kouko\nstatus: confirmed 2026-09-14\n"
+        "\n## Proposed outcome\nLand it.\n",
+        encoding="utf-8",
+    )
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-q", "-m", "change")
+
+    calls: list = []
+    monkeypatch.chdir(repo)
+    monkeypatch.setattr(land, "run_land_external", lambda argv, _t, **_k: calls.append(list(argv)))
+    monkeypatch.setattr(
+        land, "resolve_publish_executable",
+        lambda name: "/usr/bin/git" if name == "git" else "/usr/local/bin/gh",
+    )
+    err = io.StringIO()
+    rc = land.cmd_land(["--accepted-by", "kouko"], io.StringIO(), err)
+    return rc, err.getvalue(), calls
+
+
+# A2 positive: merge-refusal-names-both-routes. With no attestation `land`
+# refuses at the acceptance step, before the shared publication check, so this
+# is the site a caller actually sees; it names the same two routes the
+# publication refusal names, and forbids handing the command over.
+def test_merge_refusal_names_both_routes(tmp_path: Path, monkeypatch) -> None:
+    rc, err, calls = _land_without_attestation(tmp_path, monkeypatch)
+
+    assert rc == 1
+    assert calls == []
+    reason = err.splitlines()[0]
+    assert reason.startswith("BLOCK land.merge: ")
+    assert "run the closing-review station" in reason
+    assert "selection propose <change-id> --origin agent" in reason
+    assert "confirms by typing the code" in reason
+    assert "never hand this command to the user to run" in reason
+
+
+# A2 negative: merge-without-attestation-still-refused. The refusal keeps the
+# rule id, the exit code and the reason it opened with, on one line.
+def test_merge_without_attestation_still_refused(tmp_path: Path, monkeypatch) -> None:
+    rc, err, calls = _land_without_attestation(tmp_path, monkeypatch)
+
+    assert rc == 1
+    assert calls == []
+    lines = err.splitlines()
+    assert len(lines) == 1
+    assert lines[0].startswith(MERGE_UNATTESTED_REASON)

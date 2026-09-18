@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+from loom_checker.command_handlers.publish import MISSING_ATTESTATION
 from loom_checker.command_handlers.publish import PUBLISH_CI_PENDING_WAITS
 from loom_checker.command_handlers.publish import PUBLISH_CI_POLL_SECONDS
 from loom_checker.command_handlers.publish import PUBLISH_CI_REGISTRATION_WAITS
@@ -11,6 +12,7 @@ from loom_checker.command_handlers.publish import _publication_change_id
 from loom_checker.command_handlers.publish import _publish_env
 from loom_checker.command_handlers.publish import _publish_origin_state
 from loom_checker.command_handlers.publish import resolve_publish_executable
+from loom_checker.command_handlers.push import PUBLICATION_ROUTES
 from loom_checker.command_handlers.push import _cmd_push
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
@@ -919,6 +921,11 @@ def _merge_preconditions(
     # (1) acceptance
     names, intent_error = _accepted_names(repo)
     if intent_error:
+        # With no attestation the acceptor set cannot be derived, so the merge
+        # refuses here — before the shared publication check at (2) ever runs.
+        # This is the refusal a caller sees, so it carries the same routes out.
+        if intent_error.startswith(MISSING_ATTESTATION):
+            intent_error += PUBLICATION_ROUTES
         return _block(intent_error, err)
     if accepted_by not in names:
         return _block(ACCEPTANCE_NOT_RECORDED, err)

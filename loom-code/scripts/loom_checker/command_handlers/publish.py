@@ -28,6 +28,12 @@ import tempfile
 import time
 
 
+# Named so callers that derive the publication identity can tell "no
+# attestation on this branch" from the other derivation failures, and say what
+# to do about it. The text itself is unchanged.
+MISSING_ATTESTATION = "branch must carry exactly one attested change; found "
+
+
 PUBLISH_REDIRECT_ENV = {
     "GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_NAMESPACE", "GIT_OBJECT_DIRECTORY",
     "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_EXEC_PATH", "GIT_SSH",
@@ -156,7 +162,7 @@ def _publication_attestation(repo: Path) -> tuple[str | None, dict | None, str |
     matcher = glob_to_regex(template.replace("<change-id>", "*"))
     candidates = sorted(path for path in changed_paths(repo) if matcher.fullmatch(path))
     if len(candidates) != 1:
-        return None, None, f"branch must carry exactly one attested change; found {len(candidates)}"
+        return None, None, f"{MISSING_ATTESTATION}{len(candidates)}"
     match = re.fullmatch(
         re.escape(template).replace(re.escape("<change-id>"), r"(?P<change_id>[^/]+)"),
         candidates[0],
