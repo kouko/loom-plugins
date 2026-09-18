@@ -19,6 +19,7 @@ from pathlib import Path
 import pytest
 
 from prose_pin import has_negation, split_sentences as _sentences
+from test_adversary_routing import routed_recipe_files
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -46,14 +47,13 @@ ADVERSARIAL_CODE = _flat(RECIPE)
 RULES = _rules(RECIPE)
 ADVERSARY_PROSE = _flat(ADVERSARY)
 # The whole procedure — protocol plus every recipe — for the one pin that
-# asserts a code-recipe literal occurs once across all of it.
+# asserts a code-recipe literal occurs once across all of it. Which recipes
+# those are comes from the routing table, so a kind given a recipe is covered
+# without an edit here and a kind whose recipe is taken away leaves no path
+# behind. This file names its own recipe, which is deleted with it.
 ADVERSARIAL_PROCEDURE = " ".join(
-    (
-        _flat(REFERENCES / "adversarial.md"),
-        ADVERSARIAL_CODE,
-        _flat(REFERENCES / "adversarial-spec.md"),
-        _flat(REFERENCES / "adversarial-skill-gate.md"),
-    )
+    [_flat(REFERENCES / "adversarial.md")]
+    + [_flat(path) for path in routed_recipe_files()]
 )
 
 

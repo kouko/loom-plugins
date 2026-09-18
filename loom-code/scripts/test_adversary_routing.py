@@ -38,11 +38,18 @@ copied file for the deleted names, and run the adversary test files inside
 that copy. Nothing is asserted about wording; every assertion is made on the
 result of an edit that was really performed.
 
-The kind removed is one the routing table lists as having no recipe today,
-so the round trip ends where it started and the deleted names belong to no
-other file in the repository. Removing one of the three kinds routed today
-is not yet this bounded: `_BOUNDED_REMOVAL_DEBT` records the files that
-still hand-list a routed recipe by name, and the debt list may only shrink.
+The kind added and removed in the round trip is one the routing table lists
+as having no recipe today, so the round trip ends where it started and the
+deleted names belong to no other file in the repository. A kind routed today
+is removed the same way, without the round trip: its recipe is deleted where
+it stands, so what is asserted afterwards is that nothing outside the change
+records still names it and that the remaining checks run.
+
+Two debt lists run alongside, and both may only shrink:
+`_BOUNDED_REMOVAL_DEBT` the files that still hand-list a routed recipe by
+name, and `_UNBOUNDED_REMOVAL_DEBT_KINDS` the kinds whose removal a module
+elsewhere still breaks. An entry that stopped violating fails as loudly as
+a file that started.
 """
 from __future__ import annotations
 
@@ -51,6 +58,8 @@ import re
 import shutil
 import subprocess
 from pathlib import Path
+
+import pytest
 
 from prose_pin import has_negation, split_sentences
 
@@ -83,16 +92,13 @@ RECIPE_TEST_STEM = "test_adversary_recipe_"
 SUITE_GLOB = "test_adversary_*.py"
 SUITE_EXTRA = ("test_build_mechanical_checks.py", "test_review_convergence_contract.py")
 
-# Files that still hand-list a recipe file routed today, so removing one of
-# today's three kinds would leave their reference dangling. Every entry is a
-# debt recorded when this check went in, not a permission: the list may only
-# shrink, and `test_no_new_file_hand_lists_a_routed_recipe` fails on an entry
-# that stopped violating as loudly as on a file that started.
-_BOUNDED_REMOVAL_DEBT = (
-    f"{SCRIPTS}/test_adversary_layout.py",
-    f"{SCRIPTS}/test_adversary_recipe_code.py",
-    f"{SCRIPTS}/test_build_mechanical_checks.py",
-)
+# Files that still hand-list a recipe file routed today, so removing that
+# kind would leave their reference dangling. The three that were here when
+# this check went in now read the routing table instead, and the list is
+# empty. It stays: an entry is a debt, never a permission, so the list may
+# only shrink and `test_no_new_file_hand_lists_a_routed_recipe` fails on an
+# entry that stopped violating as loudly as on a file that started.
+_BOUNDED_REMOVAL_DEBT: tuple[str, ...] = ()
 # The one tree the debt scan passes over by path: the change records, which
 # state where a rule lived at a commit already made and cannot stop being
 # true. The other two exclusions the debt scan makes are named where it makes
@@ -104,6 +110,8 @@ _DEBT_SCAN_SKIP = ("docs/loom/",)
 # copy. The copy's own run must not start that again, so these are deselected
 # there by name; a name that no longer exists makes pytest exit non-zero.
 REMOVAL_TESTS = (
+    "test_removing_a_kind_routed_today_leaves_no_reference",
+    "test_recorded_unbounded_removal_is_still_unbounded",
     "test_removing_a_kind_restores_the_tree_and_leaves_no_reference",
     "test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected",
     "test_removal_that_leaves_the_routing_row_behind_is_detected",
@@ -143,6 +151,47 @@ def _routing_rows(text: str) -> dict[str, str]:
             continue
         rows[kind] = target
     return rows
+
+
+def routed_recipes() -> dict[str, tuple[str, ...]]:
+    """Map each recipe file the routing table names to the artifact types
+    routed to it, in file-name order.
+
+    Two types may share one recipe, so removing that recipe puts more than
+    one row back to `none`. This is the reader every module that needs to
+    know which recipe files exist goes through: the routing table is the one
+    place a kind is added or taken away, so a hand-written list of recipe
+    paths elsewhere would be a second place to maintain and a dangling
+    reference after a removal.
+    """
+    rows = _routing_rows(PROTOCOL.read_text(encoding="utf-8"))
+    grouped: dict[str, list[str]] = {}
+    for kind, target in sorted(rows.items()):
+        if target != NO_RECIPE:
+            grouped.setdefault(target, []).append(kind)
+    return {recipe: tuple(kinds) for recipe, kinds in sorted(grouped.items())}
+
+
+def routed_recipe_files() -> list[Path]:
+    """Every recipe file the routing table names, as paths in the tree.
+
+    A row whose file is not there is left out rather than raised on: that
+    dangling row is `test_every_artifact_type_is_routed_or_says_it_has_no_recipe`'s
+    to report, and raising here would turn one named failure into a
+    collection error in every module that reads a recipe.
+    """
+    return [REFERENCES / name for name in routed_recipes() if (REFERENCES / name).is_file()]
+
+
+def recipe_kind(recipe: str) -> str:
+    """The kind a recipe file is named after: `<stem><kind>.md` -> `<kind>`.
+
+    Spelled with placeholders rather than with a recipe routed today, so
+    that this reader is not itself a reference that a removal would leave
+    dangling.
+    """
+    assert recipe.startswith(RECIPE_STEM) and recipe.endswith(".md"), recipe
+    return recipe[len(RECIPE_STEM):-len(".md")]
 
 
 def _artifact_types() -> set[str]:
@@ -200,6 +249,22 @@ _SYNTHETIC = (
 def test_routing_row_helper_synthetic() -> None:
     assert _routing_rows(_SYNTHETIC) == {"code": _SYNTHETIC_RECIPE, "plan": NO_RECIPE}
     assert _routing_rows("# Title\n\n## Recording\n\n| `code` | x.md |\n") == {}
+
+
+def test_routed_recipe_reader_synthetic() -> None:
+    """The reader groups the rows by file, so a recipe two rows share is one
+    entry carrying both types, and every file it names is there."""
+    grouped = routed_recipes()
+    assert grouped, "the routing table names no recipe file"
+    rows = _routing_rows(PROTOCOL.read_text(encoding="utf-8"))
+    for recipe, kinds in grouped.items():
+        assert kinds, recipe
+        for kind in kinds:
+            assert rows[kind] == recipe, (kind, recipe)
+    assert sorted(grouped) == sorted(p.name for p in routed_recipe_files())
+    # A synthetic name, for the reason the fixtures above give: a kind whose
+    # name carries a hyphen is the case that a naive split would get wrong.
+    assert recipe_kind(_SYNTHETIC_RECIPE) == "synthetic-one"
 
 
 def test_cell_helper_synthetic() -> None:
@@ -639,17 +704,103 @@ def test_removal_that_leaves_the_name_in_a_live_file_is_detected(tmp_path: Path)
     assert _references_to(root, names, expected=len(copied)) == [stale]
 
 
-# --- A5 boundary: today's routed recipes are still hand-listed elsewhere ----
+# --- A5 positive, for a kind routed today -----------------------------------
+
+def _remove_routed_kind_from_copy(root: Path, recipe: str, kinds: tuple[str, ...]) -> str:
+    """Remove a kind that is routed today, in the copy: delete its recipe,
+    delete its own test file, and put every row that named the recipe back to
+    `none`. Returns the test file it deleted."""
+    references = root / str(REFERENCES.relative_to(ROOT))
+    (references / recipe).unlink()
+    own_test = _own_test_file(recipe_kind(recipe))
+    (root / own_test).unlink()
+    protocol = references / "adversarial.md"
+    text = protocol.read_text(encoding="utf-8")
+    for kind in kinds:
+        row = f"| `{kind}` | [`{recipe}`]({recipe}) |"
+        assert row in text, row
+        text = text.replace(row, f"| `{kind}` | {NO_RECIPE} |")
+    protocol.write_text(text, encoding="utf-8")
+    return own_test
+
+
+# Recipes whose removal is not bounded yet, because a module outside the
+# reference folder reaches for that kind's own test file by name rather than
+# through the routing table: `test_build_mechanical_checks.py` imports the
+# code recipe's pin table for a cross-document scan, and
+# `test_module_criteria_text.py` names that module as an example. Entries are
+# debt, not permission: the test below proves each one is still unbounded, so
+# clearing one fails here until it is struck off and the case above covers it.
+# Recorded by kind rather than by file name, so that the list is not itself a
+# reference the removal it describes would leave dangling.
+_UNBOUNDED_REMOVAL_DEBT_KINDS = ("code",)
+_UNBOUNDED_REMOVAL_DEBT = tuple(_recipe_file(k) for k in _UNBOUNDED_REMOVAL_DEBT_KINDS)
+
+
+@pytest.mark.parametrize(
+    "recipe", sorted(set(routed_recipes()) - set(_UNBOUNDED_REMOVAL_DEBT))
+)
+def test_removing_a_kind_routed_today_leaves_no_reference(recipe: str, tmp_path: Path) -> None:
+    """deleting-a-kind-leaves-no-reference, for the kinds that exist today.
+
+    The kind is not one this case invented: it is removed where it stands, in
+    a copy of the whole repository, once per recipe file the routing table
+    names -- which covers the recipe two rows share as well as the recipes one
+    row each names. Afterwards nothing outside the change records still writes
+    either deleted name, and the checks that read these documents still run.
+    """
+    kinds = routed_recipes()[recipe]
+    root = tmp_path / "repo"
+    copied = _copy_repository(root)
+    own_test = _remove_routed_kind_from_copy(root, recipe, kinds)
+
+    names = (recipe, Path(own_test).name)
+    hits = _references_to(root, names, expected=len(copied) - 2)
+    # `docs/loom/` records where a rule lived at a commit already made; they
+    # are the one tree a removal is not expected to rewrite.
+    assert [h for h in hits if not h.startswith(_DEBT_SCAN_SKIP)] == [], hits
+
+    run = _run_adversary_tests(root)
+    assert run.returncode == 0, run.stdout + run.stderr
+    assert _passed(run) > 0, run.stdout + run.stderr
+
+
+@pytest.mark.parametrize("recipe", sorted(_UNBOUNDED_REMOVAL_DEBT))
+def test_recorded_unbounded_removal_is_still_unbounded(recipe: str, tmp_path: Path) -> None:
+    """Every recorded debt is real, so the list may only shrink.
+
+    The same removal is performed, and this time what is asserted is that it
+    does not come out clean: either a live file still writes a deleted name,
+    or the checks that read these documents no longer run. The day that stops
+    being true this case fails, the entry comes off the list, and the case
+    above takes the recipe over.
+    """
+    assert recipe in routed_recipes(), recipe
+    kinds = routed_recipes()[recipe]
+    root = tmp_path / "repo"
+    copied = _copy_repository(root)
+    own_test = _remove_routed_kind_from_copy(root, recipe, kinds)
+
+    names = (recipe, Path(own_test).name)
+    hits = [
+        h for h in _references_to(root, names, expected=len(copied) - 2)
+        if not h.startswith(_DEBT_SCAN_SKIP)
+    ]
+    run = _run_adversary_tests(root)
+    assert hits or run.returncode != 0, (hits, run.stdout + run.stderr)
+
+
+# --- A5 boundary: no file hand-lists a routed recipe ------------------------
 
 def test_no_new_file_hand_lists_a_routed_recipe() -> None:
-    """Removing a kind routed today is not yet this bounded.
+    """Nothing outside the three allowed places writes a routed recipe's name.
 
-    A file that writes a routed recipe's name would be left dangling by that
-    kind's removal. The reference folder holds the routing table itself, a
-    recipe's own test file is deleted with the recipe, and `docs/loom/`
-    records where a rule lived at a commit already made. Everything else is
-    debt: the list may only shrink, so an entry that stopped hand-listing
-    fails here as loudly as a file that started.
+    A file that writes one would be left dangling by that kind's removal. The
+    reference folder holds the routing table itself, a recipe's own test file
+    is deleted with the recipe, and `docs/loom/` records where a rule lived at
+    a commit already made. Everything else is debt: the list may only shrink,
+    so an entry that stopped hand-listing fails here as loudly as a file that
+    started.
     """
     rows = _routing_rows(PROTOCOL.read_text(encoding="utf-8"))
     routed = {kind: target for kind, target in rows.items() if target != NO_RECIPE}

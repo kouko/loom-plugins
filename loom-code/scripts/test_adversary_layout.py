@@ -18,17 +18,20 @@ The three assertions this module makes, in the words of the plan:
    (A8 positive), and no recipe file grew one (A8 boundary).
 
 Assertions 1 and 2 are standing structural rules, checked against the
-working tree: they must hold for as long as the recipes exist.
+working tree: they must hold for as long as the recipes exist. Which recipe
+files that is, they read from the routing table in the protocol, which is
+the one place a kind is given a recipe or has it taken away.
 
-Assertion 3 is migration evidence, and both of its sides are read out of
+Assertion 3 is migration evidence, and every side of it is read out of
 git history at the commits the correspondence note names -- the pre-split
-document at its own commit, the split files at the split commit. It states
-a fact about one past event, that the split moved every rule and invented
-none, and a fact about the past does not change. Reading the current files
-instead would have frozen the recipes themselves: every later edit to one
-of them would have failed a check named after the migration, which
-Acceptance 3 forbids. A later edit to a recipe belongs to that recipe's own
-test file.
+document at its own commit, the split files and the list of them at the
+split commit, including where each section landed and which destination the
+correspondence note may name. It states a fact about one past event, that
+the split moved every rule and invented none, and a fact about the past does
+not change. Reading the current files instead would have frozen the recipes
+themselves: every later edit to one of them would have failed a check named
+after the migration, which Acceptance 3 forbids. A later edit to a recipe
+belongs to that recipe's own test file.
 """
 from __future__ import annotations
 
@@ -36,15 +39,17 @@ import re
 import subprocess
 from pathlib import Path
 
+from test_adversary_routing import recipe_kind, routed_recipe_files
+
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCES = ROOT / "loom-code/skills/closing-review/references"
 PROTOCOL = REFERENCES / "adversarial.md"
-RECIPES = {
-    "code": REFERENCES / "adversarial-code.md",
-    "spec": REFERENCES / "adversarial-spec.md",
-    "skill-gate": REFERENCES / "adversarial-skill-gate.md",
-}
+# Which recipe files exist is read from the routing table, never hand-listed:
+# the table is the one place a kind is given a recipe or has it taken away, so
+# a list here would be a second place to maintain and, after a removal, a path
+# that is no longer there.
+RECIPES = {recipe_kind(p.name): p for p in routed_recipe_files()}
 CORRESPONDENCE = (
     ROOT / "docs/loom/2026-09-18-modular-adversary-recipes/evidence/rule-correspondence.md"
 )
@@ -55,6 +60,9 @@ _BASE_COMMIT_RE = re.compile(r"at commit `([0-9a-f]{7,40})`")
 # The split commit is named with its own phrasing so that the base-commit
 # pattern above cannot match it, and vice versa.
 _SPLIT_COMMIT_RE = re.compile(r"at split commit `([0-9a-f]{7,40})`")
+# What a recipe file is called: the protocol's own name with the kind it
+# attacks appended. Used to tell recipe files from the protocol in a listing.
+RECIPE_PREFIX = "adversarial-"
 
 # The H2 the split moves into each recipe file, exactly as the pre-split
 # document spells it.
@@ -183,6 +191,36 @@ def _at_split(name: str) -> str:
     return _show(_split_commit(), f"{REFERENCES_PATH}/{name}", f"split {name}")
 
 
+def _split_names() -> list[str]:
+    """Every file the reference folder held at the split commit, read from
+    that commit. The migration assertions take their file list from here
+    rather than from the tree: which files the split wrote is part of the
+    fact they state, and a recipe removed since did not un-write it."""
+    listing = subprocess.run(
+        ["git", "ls-tree", "--name-only", f"{_split_commit()}:{REFERENCES_PATH}"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert listing.returncode == 0, (
+        f"cannot list the reference folder at {_split_commit()}: {listing.stderr.strip()}"
+    )
+    names = [n for n in listing.stdout.split("\n") if n]
+    assert names, "the split commit wrote no file in the reference folder"
+    return names
+
+
+def _split_recipes() -> dict[str, str]:
+    """The recipe files of the split commit, by the kind each is named after."""
+    recipes = {
+        name[len(RECIPE_PREFIX):-len(".md")]: name
+        for name in _split_names()
+        if name.startswith(RECIPE_PREFIX) and name.endswith(".md")
+    }
+    assert set(recipes) == set(KIND_HEADINGS), (sorted(recipes), sorted(KIND_HEADINGS))
+    return recipes
+
+
 # --- helper self-tests -----------------------------------------------------
 
 _SYNTHETIC = (
@@ -277,9 +315,17 @@ def test_protocol_keeps_no_recipe_body() -> None:
 # --- A2: a kind's rule lives in that kind's file and nowhere else -----------
 
 def test_each_kind_section_lives_in_its_own_file() -> None:
-    """Standing: the kind's section is in the kind's file, in the tree."""
-    for kind, path in RECIPES.items():
-        assert KIND_HEADINGS[kind] in _sections(path.read_text(encoding="utf-8")), kind
+    """Standing: the kind's section is in the kind's file, in the tree.
+
+    Only the kinds this module names a heading for: a recipe added later
+    states its own shape in its own test file, and one taken away is not in
+    the routing table any more, so it is not among the files read here.
+    """
+    kinds = [kind for kind in RECIPES if kind in KIND_HEADINGS]
+    assert kinds, sorted(RECIPES)
+    for kind in kinds:
+        text = RECIPES[kind].read_text(encoding="utf-8")
+        assert KIND_HEADINGS[kind] in _sections(text), kind
 
 
 def test_each_kind_rule_lives_in_its_own_file() -> None:
@@ -289,8 +335,8 @@ def test_each_kind_rule_lives_in_its_own_file() -> None:
     the coupling Acceptance 3 forbids. A rewording is that recipe's own test
     file's business; that the split filed the rule correctly is this one's,
     and it happened once."""
-    for kind, path in RECIPES.items():
-        found = _markers_found(_at_split(path.name), KIND_MARKERS[kind])
+    for kind, name in _split_recipes().items():
+        found = _markers_found(_at_split(name), KIND_MARKERS[kind])
         assert found == list(KIND_MARKERS[kind]), (kind, found)
 
 
@@ -307,11 +353,17 @@ def test_no_kind_rule_appears_outside_its_own_file() -> None:
 # --- A8: every rule survived the split, and no recipe file grew one ---------
 
 def test_every_original_section_lives_in_exactly_one_file() -> None:
+    """Frozen to the migration: the files come from the split commit.
+
+    Where a section landed is a fact about the split. Read against the tree,
+    a kind removed later would leave its section homeless and fail a check
+    named after an event that did happen.
+    """
     original = _sections(_original())
     assert set(original) == set(SHARED_HEADINGS) | set(KIND_HEADINGS.values()), original.keys()
-    homes = {"protocol": PROTOCOL, **RECIPES}
+    homes = {"protocol": PROTOCOL.name, **_split_recipes()}
     for heading in original:
-        holding = [n for n, p in homes.items() if heading in _sections(p.read_text(encoding="utf-8"))]
+        holding = [n for n, name in homes.items() if heading in _sections(_at_split(name))]
         assert len(holding) == 1, (heading, holding)
 
 
@@ -323,9 +375,9 @@ def test_every_original_rule_is_still_stated_verbatim() -> None:
     protocol = _sections(split_protocol)
     for heading in SHARED_HEADINGS:
         assert protocol[heading] == original[heading], heading
-    for kind, path in RECIPES.items():
+    for kind, name in _split_recipes().items():
         heading = KIND_HEADINGS[kind]
-        assert _sections(_at_split(path.name))[heading] == original[heading], kind
+        assert _sections(_at_split(name))[heading] == original[heading], kind
     dropped = _dropped_sentences(_preamble(original_text), _preamble(split_protocol))
     assert dropped == [], dropped
 
@@ -333,14 +385,22 @@ def test_every_original_rule_is_still_stated_verbatim() -> None:
 def test_no_recipe_file_carries_a_rule_the_original_did_not() -> None:
     """Frozen to the migration: both sides come from git, never the tree."""
     original = _sections(_original())
-    for kind, path in RECIPES.items():
-        headings = _sections(_at_split(path.name))
+    for kind, name in _split_recipes().items():
+        headings = _sections(_at_split(name))
         assert list(headings) == [KIND_HEADINGS[kind]], (kind, list(headings))
         assert headings[KIND_HEADINGS[kind]] == original[KIND_HEADINGS[kind]], kind
 
 
 def test_correspondence_note_maps_every_rule_to_a_file_that_exists() -> None:
+    """Frozen to the migration: a destination exists at the split commit.
+
+    The note says where each rule went when the split ran, so the file it
+    names is looked for in that commit's tree. Looked for in the working
+    tree, the note would have to be edited whenever a recipe was retired,
+    which would make it a record of the present rather than of the split.
+    """
     note = CORRESPONDENCE.read_text(encoding="utf-8")
+    written = _split_names()
     rows = [line for line in note.splitlines() if line.startswith("| ") and " | " in line]
     body = [r for r in rows if not set(r) <= set("|- ")][1:]  # drop the header row
     assert body, "the correspondence note lists no rule"
@@ -351,5 +411,5 @@ def test_correspondence_note_maps_every_rule_to_a_file_that_exists() -> None:
         heading, destination = cells[-2].strip("`"), cells[-1].strip("`")
         assert heading in original or heading == "(preamble)", row
         named_headings.add(heading)
-        assert (REFERENCES / destination).is_file(), row
+        assert destination in written, row
     assert set(original) <= named_headings, set(original) - named_headings

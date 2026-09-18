@@ -11,6 +11,7 @@ from prose_pin import has_negation, split_sentences as _sentences
 # from there rather than keeping a second copy that could drift.
 from test_adversary_protocol import NO_DISCARD_UNDO
 from test_adversary_recipe_code import RECIPE_PINS as CODE_RECIPE_PINS
+from test_adversary_routing import recipe_kind, routed_recipe_files
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -293,17 +294,18 @@ ADVERSARY_PROSE = _flat(ADVERSARY)
 # The attack procedure is one shared protocol file plus one recipe file per
 # kind of artifact, all in the same skill reference folder. Each of those
 # files has its own test module, which is where its rules are pinned:
-# `test_adversary_protocol.py` for the protocol, `test_adversary_recipe_code.py`,
-# `test_adversary_recipe_spec.py` and `test_adversary_recipe_skill_gate.py` for
-# the recipes. What stays here is the build station's own text, the adversary
-# contract, and the scans that run across every one of those documents at
-# once; a pin or scan below names the document it reads as `ref` the
-# protocol, `ref-code`, `ref-spec` and `ref-skill-gate` the recipes.
+# `test_adversary_protocol.py` for the protocol, and for each recipe a
+# `test_adversary_recipe_<kind>.py` named after the kind it attacks, which
+# the routing table lists. What stays here is the build station's own text,
+# the adversary contract, and the scans that run across every one of those
+# documents at once; a pin or scan below names the document it reads as `ref`
+# the protocol and `ref-<kind>` that kind's recipe.
 REFERENCES = ROOT / "loom-code/skills/closing-review/references"
 ADVERSARIAL_REF = _flat(REFERENCES / "adversarial.md")
-ADVERSARIAL_CODE = _flat(REFERENCES / "adversarial-code.md")
-ADVERSARIAL_SPEC = _flat(REFERENCES / "adversarial-spec.md")
-ADVERSARIAL_SKILL_GATE = _flat(REFERENCES / "adversarial-skill-gate.md")
+# Which recipe files there are is read from the routing table, not listed
+# here: a kind given a recipe is scanned without an edit to this file, and a
+# kind whose recipe is taken away leaves no path behind for the scans to open.
+ADVERSARIAL_RECIPE_PATHS = routed_recipe_files()
 PROBES_FIELD = re.compile(
     r"^probes: \[\{artifact: .+, status: reused \| modified \| new, reason: .+\}\]$", re.M
 )
@@ -391,9 +393,7 @@ DISCARD_LITERALS = (
 _PIN_DOCS = {
     "adversary": ADVERSARY_PROSE,
     "ref": ADVERSARIAL_REF,
-    "ref-code": ADVERSARIAL_CODE,
-    "ref-spec": ADVERSARIAL_SPEC,
-    "ref-skill-gate": ADVERSARIAL_SKILL_GATE,
+    **{f"ref-{recipe_kind(p.name)}": _flat(p) for p in ADVERSARIAL_RECIPE_PATHS},
     "build": VERIFY,
 }
 
@@ -501,11 +501,6 @@ def test_no_added_sentence_overrides_pinned_rules(doc: str) -> None:
 
 IMPLEMENTER = ROOT / "loom-code/agents/implementer.md"
 ADVERSARIAL_REF_PATH = REFERENCES / "adversarial.md"
-ADVERSARIAL_RECIPE_PATHS = [
-    REFERENCES / "adversarial-code.md",
-    REFERENCES / "adversarial-spec.md",
-    REFERENCES / "adversarial-skill-gate.md",
-]
 _DEAD_POINTER = re.compile(r"attack[- ]catalogue|\bcatalogue\b|\btrailer\b", re.IGNORECASE)
 BUILD_ADVERSARIAL_LINK = "[`adversarial.md`](../closing-review/references/adversarial.md)"
 BUILD_LINK_VERB = "works from the recipes in"
@@ -554,9 +549,9 @@ def test_probes_field_helper_synthetic() -> None:
 # --- keeps role, inputs, return ---
 #
 # Each procedure rule is pinned in the test module of the file that owns it,
-# where it is also checked against adversary.md: test_adversary_protocol.py,
-# test_adversary_recipe_code.py, test_adversary_recipe_spec.py and
-# test_adversary_recipe_skill_gate.py. What adversary.md must keep is here.
+# where it is also checked against adversary.md: test_adversary_protocol.py for
+# the protocol, and test_adversary_recipe_<kind>.py for each recipe the routing
+# table lists. What adversary.md must keep is here.
 
 def test_adversary_md_keeps_role_inputs_return_format() -> None:
     for pin in ("role-updates-own-programs", "redispatch-inputs", "adversary-reads-procedure-first"):
