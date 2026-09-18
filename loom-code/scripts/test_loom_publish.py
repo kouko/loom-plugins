@@ -1205,6 +1205,43 @@ def test_publish_accepts_matching_selection_disclosure(tmp_path: Path, monkeypat
     assert any("pr" in call and "create" in call for call in calls.calls)
 
 
+# --- Acceptance 4: the confirmed skip publishes end to end (plan W1-02) -------
+
+
+def verification_section(body: str) -> list[str]:
+    return body.split("## Verification\n", 1)[1].split("\n## ", 1)[0].splitlines()
+
+
+def test_confirmed_skip_publishes_with_disclosure(tmp_path: Path, monkeypatch) -> None:
+    """With the user-confirmed skip recorded in the attestation, publication
+    pushes the selected HEAD and opens a Ready pull request whose body opens
+    Verification with the attestation's own disclosure."""
+    rc, err, calls = selected_publication(tmp_path, monkeypatch, DISCLOSURE)
+
+    assert rc == 0, err
+    push = next(call for call in calls.calls if "push" in call)
+    assert push[-2:] == ["origin", f"{calls.head}:refs/heads/feature"]
+    create = next(call for call in calls.calls if "pr" in call and "create" in call)
+    # No --draft: the pull request opens Ready, so no `pr ready` call follows.
+    assert "--draft" not in create
+    assert not any("ready" in call for call in calls.calls)
+    published = calls.published_bodies[-1]
+    assert verification_section(published)[:len(DISCLOSURE)] == DISCLOSURE
+
+
+def test_body_without_disclosure_refused_when_selection_bound(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The same attestation with a body carrying no disclosure at all is refused
+    before any outward call: a bound skip is never published undisclosed."""
+    rc, err, calls = selected_publication(tmp_path, monkeypatch, [])
+
+    assert rc == 1
+    assert "push.contextual-body" in err
+    assert DISCLOSURE[0] in err
+    assert calls.calls == []
+
+
 # --- push hook: the reason a blocked push names first -------------------------
 
 MISSING_ATTESTATION = (
