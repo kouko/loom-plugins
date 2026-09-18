@@ -226,6 +226,10 @@ def github_repo_from_origin(repo: Path) -> str | None:
 # requires an absolute path of `--body-file` and `--body-file=` alone, while the
 # hook resolves a relative path against the repository root it chdirs to and the
 # shell resolves it against the payload's `cwd`.
+#
+# GitHub CLI documents every `gh pr create` flag, its short form and whether it
+# takes a value -- the arities below are read from that list:
+# https://cli.github.com/manual/gh_pr_create
 CANONICAL_PR_CREATE_OPTIONS = {
     "--base": 2, "--head": 2, "--title": 2, "--body-file": 2, "--draft": 1,
 }
@@ -236,6 +240,10 @@ def canonical_pr_create_trailing(trailing: list[str]) -> bool:
 
     An option consumes its own value, so a value that looks like an option is
     read as a value -- which is how gh's flag parser reads it too."""
+    # gh parses its flags with spf13/pflag, whose `parseLongArg` takes the next
+    # argument as the value of a flag that declares no `NoOptDefVal`, without
+    # testing it for a leading dash. That is the rule the walk below repeats:
+    # https://github.com/spf13/pflag/blob/master/flag.go
     index = 0
     while index < len(trailing):
         width = CANONICAL_PR_CREATE_OPTIONS.get(trailing[index])

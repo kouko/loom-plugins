@@ -10,6 +10,7 @@ from pathlib import Path
 
 from loom_checker.command_handlers import publish as loom_checker
 from loom_checker.command_handlers import push as push_handler
+from loom_checker.rule_checks import push as push_rules
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
 from loom_checker.rule_checks.push import github_repo_from_origin
 from loom_checker.rule_checks.push import render_quote_all
@@ -1251,7 +1252,8 @@ MISSING_ATTESTATION = (
     "; two legal routes, both run by the agent: run the closing-review station,"
     " which generates the attestation and needs no confirmation, so it is open"
     " in every session; or, in a session that can record a confirmation the user"
-    " types, propose a step selection"
+    " types and only once per change, because expert-mode allows the agent one"
+    " skip proposal per change, propose a step selection"
     " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
     " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
     " the proposal printed, after which finalize-review drops the reviewer floor to"
@@ -1521,7 +1523,13 @@ def hook_repository_with_a_selection(
 def test_hook_refuses_a_pr_body_that_hides_the_skip(tmp_path: Path, monkeypatch) -> None:
     """A skip the user typed reaches a pull request only disclosed, whichever
     route opens it: the hook refuses the very body publish refuses, under the
-    same rule id and with the same reason."""
+    same rule id and for the same reason.
+
+    Not byte for byte: the rule renders the disclosure it expects over several
+    lines, and this route writes one `BLOCK` line per failure, so the reason is
+    flattened here and nowhere else. Every word of it is still the rule's own --
+    the comparison is against `" ".join(expected.split("\\n"))`, not against a
+    second copy of the sentence."""
     repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
     body = tmp_path / "hook-body-no-disclosure.md"
     body.write_text(contextual_body(), encoding="utf-8")
@@ -1532,7 +1540,8 @@ def test_hook_refuses_a_pr_body_that_hides_the_skip(tmp_path: Path, monkeypatch)
         contextual_body(), {"selection": SELECTION}
     )
     assert rc == 2
-    assert err == f"BLOCK push.contextual-body: {expected}\n"
+    assert "\n" in expected, "premise: the rule's reason is the multi-line one"
+    assert err == f"BLOCK push.contextual-body: {' '.join(expected.split(chr(10)))}\n"
 
 
 def test_hook_admits_a_pr_body_that_discloses_the_skip(tmp_path: Path, monkeypatch) -> None:
@@ -1874,3 +1883,155 @@ def test_case_folded_publishers_blocked_on_every_host(
 
     assert rc == 2
     assert "BLOCK" in err
+
+
+# --- fix round: the repairs the closing review asked for ---------------------
+
+EXPERT_MODE = Path(__file__).resolve().parents[1] / "skills" / "expert-mode" / "SKILL.md"
+
+
+def test_hook_body_refusal_is_one_block_line_per_failure(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """R1: the hook route owes the same one-line-per-failure contract as every
+    other refusal in the checker.
+
+    `validate_selection_disclosure` renders the expected disclosure over several
+    lines for a human reading `publish`'s output; written through the hook that
+    becomes stderr lines with no `BLOCK ` prefix, which every caller that parses
+    this stream -- including the adversarial module's own `_blocks()` -- reads as
+    a line that is not a refusal at all."""
+    repo = hook_repository_with_a_selection(tmp_path, monkeypatch, SELECTION)
+    body = tmp_path / "hook-body-multiline-reason.md"
+    body.write_text(contextual_body(), encoding="utf-8")
+
+    rc, err = run_push_hook(monkeypatch, repo, canonical_pr_create(repo, body))
+
+    assert rc == 2
+    assert err.splitlines(), "the route refused and said nothing"
+    for line in err.splitlines():
+        assert line.startswith("BLOCK "), f"stderr line is not a BLOCK line: {line!r}"
+
+
+def branch_whose_base_already_attests(tmp_path: Path, monkeypatch) -> Path:
+    """A branch off a base that already carries a generated attestation, adding
+    nothing of its own -- the shape where closing review regenerates the bytes
+    the base already holds and the attestation count never leaves zero."""
+    repo = tmp_path / "landed-repo"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    git(repo, "config", "user.email", "test@example.com")
+    git(repo, "config", "user.name", "Test")
+    (repo / "file.txt").write_text("content\n", encoding="utf-8")
+    attestation(repo, "2026-09-18-already-landed")
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "landed change")
+    git(repo, "switch", "-q", "-c", "feature")
+    git(repo, "remote", "add", "origin", "git@github.com:example/project.git")
+    monkeypatch.setattr(push_handler, "validate_attestation", lambda *_a, **_k: [])
+    return repo
+
+
+def test_a_branch_that_adds_nothing_is_not_sent_to_closing_review(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """R2: where the base already attests a change and the branch adds nothing,
+    the closing-review route moves no count -- regenerating writes the same
+    bytes -- so naming it loops the agent through a station forever. That state
+    is told what is true of it instead."""
+    repo = branch_whose_base_already_attests(tmp_path, monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    reason = err.splitlines()[0]
+    assert rc == 2
+    assert reason.startswith(
+        "BLOCK push.attestation: branch must carry exactly one generated "
+        "attestation; found 0"
+    )
+    assert "two legal routes" not in reason
+    assert "closing-review" not in reason
+    assert "selection propose" not in reason
+    assert "nothing" in reason and "new intent" in reason
+    assert "never hand the blocked publication command to the user to run" in reason
+
+
+def test_a_branch_that_adds_work_still_gets_the_two_routes(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Control for the branch above: the same base, a branch that carries work
+    of its own. Closing review does move this count, so the routes stay -- the
+    third tail is about an empty delta, not about a base that ever attested
+    anything."""
+    repo = branch_whose_base_already_attests(tmp_path, monkeypatch)
+    (repo / "feature.py").write_text("VALUE = 1\n", encoding="utf-8")
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "work")
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    reason = err.splitlines()[0]
+    assert rc == 2
+    assert "two legal routes" in reason
+    assert "run the closing-review station" in reason
+
+
+def test_the_nothing_to_publish_tail_obeys_the_one_line_contract() -> None:
+    """The third tail is appended to the same `BLOCK` line as the other two."""
+    tail = push_handler.NOTHING_TO_PUBLISH
+    assert tail.startswith("; ")
+    assert not [character for character in tail if ord(character) < 0x20]
+
+
+def test_route_two_is_named_under_the_cap_expert_mode_puts_on_it(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """R3: the station caps agent-originated skip proposals at one per change.
+    A refusal that instructs `--origin agent` unconditionally tells an agent
+    that has already spent it to do what the station forbids, and the effect of
+    obeying is a second request that the user make a quality judgement.
+
+    The cap is read from the station rather than remembered here, so a station
+    that drops it takes this test with it."""
+    station = " ".join(EXPERT_MODE.read_text(encoding="utf-8").split())
+    assert "at most once per change" in station, (
+        "premise: expert-mode caps agent-originated skip proposals"
+    )
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    reason = err.splitlines()[0]
+    before, separator, _after = reason.partition("propose a step selection")
+    assert rc == 2
+    assert separator, reason
+    assert "once per change" in before, (
+        "route two instructs an agent-originated proposal, so it names the cap "
+        "the station puts on that proposal"
+    )
+
+
+def test_an_unknown_attestation_count_names_no_count_and_no_route() -> None:
+    """R5: `publication_advice(None)` served the above-one tail, which asserts a
+    count nobody read and prescribes removing attestations the caller may not
+    have. An unknown count gets a tail that claims neither."""
+    tail = push_handler.publication_advice(None)
+    assert tail.strip()
+    assert tail is not push_handler.PUBLICATION_ROUTES
+    assert tail is not push_handler.EXTRA_ATTESTED_CHANGES
+    assert "two legal routes" not in tail
+    assert "attested change first" not in tail
+    assert "never hand the blocked publication command to the user to run" in tail
+
+
+def test_the_pr_create_allowlist_carries_its_grounding_citations() -> None:
+    """R4: `CANONICAL_PR_CREATE_OPTIONS` encodes gh's flag arities and
+    `canonical_pr_create_trailing` encodes pflag's value-consumption rule. Both
+    are claims about an external surface, and `check_pr_create_remote_head` in
+    the same module cites its own inline -- so these carry the reference in the
+    same form, where the reader meets the claim."""
+    source = Path(push_rules.__file__).read_text(encoding="utf-8")
+    above, _sep, _rest = source.partition("CANONICAL_PR_CREATE_OPTIONS = {")
+    assert "https://cli.github.com/manual/gh_pr_create" in above.rsplit("\n\n", 1)[-1]
+    trailing = source.partition("def canonical_pr_create_trailing")[2].partition("\ndef ")[0]
+    assert "pflag" in trailing and "https://" in trailing

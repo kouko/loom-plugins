@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from loom_checker.attestation import validate_attestation
 from loom_checker.helpers import UsageError
+from loom_checker.helpers import branch_base
 from loom_checker.helpers import changed_paths
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_text
@@ -51,15 +52,25 @@ import sys
 # token is an entry-point token (`selection.ENTRY_TOKENS`); a prompt that is the
 # bare code binds nothing.
 #
-# Route two is named under its condition rather than flatly, because a
-# confirmation binds only when the session that proposed it records an attended
-# user typing it: a nested unattended session, a confirmation that lands in a
-# later session, and a host without prompt capture (expert-mode's own Boundary)
-# each leave it dead, and an agent that follows a dead route asks the user for
-# mechanical work this refusal exists to stop asking of them. Route one needs no
-# confirmation, so it carries no condition. The sentence is qualified rather
-# than computed: reading session state here would add a mechanism to a message,
-# which PRINCIPLES.md non-negotiable 4 asks a declared budget exception for.
+# Route two is named under its conditions rather than flatly, because it is open
+# in fewer states than route one, and an agent that follows a dead route asks the
+# user for mechanical work this refusal exists to stop asking of them. Two
+# conditions, both stated:
+#
+# * a confirmation binds only when the session that proposed it records an
+#   attended user typing it -- a nested unattended session, a confirmation that
+#   lands in a later session, and a host without prompt capture (expert-mode's
+#   own Boundary) each leave it dead; and
+# * the expert-mode station allows the agent one skip proposal per change ("The
+#   agent may suggest skipping steps at most once per change"), so an agent that
+#   has already spent it and then hits a second block would be instructed here to
+#   do what the station forbids -- and obeying costs the user a second quality
+#   judgement, which is the pressure the cap exists to bound.
+#
+# Route one needs neither, so it carries no condition. Both sentences are
+# qualified rather than computed: reading session state or the selection store
+# here would add a mechanism to a message, which PRINCIPLES.md non-negotiable 4
+# asks a declared budget exception for.
 #
 # One line, and no leading newline: report() writes one `BLOCK <rule>: <reason>`
 # line per failure and every caller parses that prefix, so a wrapped reason
@@ -68,7 +79,8 @@ PUBLICATION_ROUTES = (
     "; two legal routes, both run by the agent: run the closing-review station,"
     " which generates the attestation and needs no confirmation, so it is open"
     " in every session; or, in a session that can record a confirmation the user"
-    " types, propose a step selection"
+    " types and only once per change, because expert-mode allows the agent one"
+    " skip proposal per change, propose a step selection"
     " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
     " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
     " the proposal printed, after which finalize-review drops the reviewer floor to"
@@ -91,14 +103,73 @@ EXTRA_ATTESTED_CHANGES = (
 )
 
 
-def publication_advice(found: int | None) -> str:
+# The third state a count of zero can be in: the branch adds nothing to a base
+# that already attests a change. Route one is dead here -- closing review
+# regenerates the attestation the base already carries, byte for byte, so the
+# count never leaves zero and an agent taking the named route runs the station
+# forever -- and route two has no step to skip on an empty delta. Naming either
+# is the non-terminating loop the count-above-one branch was split off to avoid,
+# so this state is told what is true of it instead. Same one-line contract.
+NOTHING_TO_PUBLISH = (
+    "; this branch adds nothing to its base and the base already attests a"
+    " change, so there is no unattested work here to review and nothing to"
+    " publish: neither route out of a missing attestation applies, and the"
+    " change you mean to publish starts from a new intent on its own branch;"
+    " never hand the blocked publication command to the user to run"
+)
+
+
+# A count nobody read names no count and no route: every sentence above is true
+# only of the state it is chosen for, and an unknown state is not one of them.
+# The one thing that holds regardless is where the count can be read.
+UNKNOWN_ATTESTATION_COUNT = (
+    "; the attestation count could not be read here, so nothing is claimed about"
+    " it and no route out is named: read it with `loom_checker.py push` in the"
+    " repository, which always reports a count, and take what that refusal names;"
+    " never hand the blocked publication command to the user to run"
+)
+
+
+def publication_advice(found: int | None, nothing_to_publish: bool = False) -> str:
     """The tail appended to a `…; found <n>` attestation refusal.
 
     `found` is the number of attestations the refusal reports, or None when the
-    caller could not read it. Only a count of zero names the two routes: a route
-    is named where it demonstrably reaches the state the sentence claims, and
-    nowhere else."""
-    return PUBLICATION_ROUTES if found == 0 else EXTRA_ATTESTED_CHANGES
+    caller could not read it. `nothing_to_publish` is `nothing_left_to_publish`
+    recomputed by the caller, and only a count of zero consults it.
+
+    A route is named where it demonstrably reaches the state the sentence
+    claims, and nowhere else: the two routes belong to a count of zero on a
+    branch that carries work, and to nothing else."""
+    if found is None:
+        return UNKNOWN_ATTESTATION_COUNT
+    if found != 0:
+        return EXTRA_ATTESTED_CHANGES
+    return NOTHING_TO_PUBLISH if nothing_to_publish else PUBLICATION_ROUTES
+
+
+def nothing_left_to_publish(repo: Path) -> bool:
+    """Whether this branch adds nothing to a base that already attests a change.
+
+    Recomputed from the repository, never claimed: the branch delta is empty,
+    and the base carries at least one generated attestation. Closing review then
+    writes the bytes the base already holds and the attestation count stays at
+    zero, which is the state `publication_advice` must not send to it.
+
+    A base that attests nothing is a branch that has simply not run closing
+    review yet -- route one does move that count -- so the base lookup is what
+    separates the two, and an empty delta alone is not enough. Any doubt (no
+    trunk to diff against, a manifest without the artifact) answers False and
+    leaves today's two routes standing."""
+    try:
+        template = load_manifest().get("artifacts", {}).get("attestation", {}).get("path")
+        if not template or changed_paths(repo):
+            return False
+        base = branch_base(repo)
+    except UsageError:
+        return False
+    matcher = glob_to_regex(template.replace("<change-id>", "*"))
+    listing = git_maybe(repo, "ls-tree", "-r", "--name-only", base) or ""
+    return any(matcher.fullmatch(path) for path in listing.splitlines())
 
 
 def read_hook_payload(stdin=sys.stdin) -> dict | None:
@@ -225,10 +296,13 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         # second import is deferred because publish imports `_cmd_push` from
         # this module; at module level the two would cycle.
         #
-        # The structural half also decides every gh input the hook cannot see
-        # (`--fill`, `--editor`, a template, a browser-composed body): those
-        # read as "", and "" has none of the nine headings, so they refuse
-        # whether or not the branch records a skip.
+        # Every gh input that would compose a body the hook cannot see
+        # (`--fill`, `--editor`, a template, a browser-composed body) is refused
+        # earlier, at admission: `CANONICAL_PR_CREATE_OPTIONS` admits no option
+        # that spells any of them. The "" this reader falls back to is for a body
+        # it was handed and could not read -- an unreadable `--body-file` -- and
+        # "" has none of the nine headings, so that refuses whether or not the
+        # branch records a skip.
         from loom_checker.command_handlers.publish import selection_disclosure_failure
 
         body = pr_create_body(command)
@@ -237,7 +311,14 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
             or selection_disclosure_failure(Path.cwd(), body)
         )
         if body_error:
-            report([("push.contextual-body", body_error)], err)
+            # `validate_selection_disclosure` renders the disclosure it expects
+            # over several lines, which reads well under `publish`'s own output
+            # and breaks the contract here: report() writes the reason verbatim,
+            # so a newline emits a stderr line carrying no `BLOCK ` prefix, and
+            # every caller of this hook parses that prefix. Flattened at this
+            # emission only -- publish's output is a terminal, not a parsed
+            # stream, and keeps the shape a reader can act on.
+            report([("push.contextual-body", " ".join(body_error.split("\n")))], err)
             return 2
     return 2 if rc == 1 else rc
 
@@ -354,7 +435,10 @@ def _cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         return report([(
             "push.attestation",
             f"branch must carry exactly one generated attestation; found {len(candidates)}"
-            + publication_advice(len(candidates)),
+            + publication_advice(
+                len(candidates),
+                not candidates and nothing_left_to_publish(repo),
+            ),
         )], err)
     attestation_rel = candidates[0]
     match = re.fullmatch(
