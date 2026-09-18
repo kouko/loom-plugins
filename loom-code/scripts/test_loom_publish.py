@@ -1248,10 +1248,11 @@ MISSING_ATTESTATION = (
     "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
     "; two legal routes, both run by the agent: run the closing-review station,"
     " which generates the attestation, or propose a step selection"
-    " (`loom_checker.py selection propose <change-id> --origin agent`) that the user"
-    " confirms by typing the code, after which finalize-review drops the reviewer"
-    " floor to zero and still emits an attestation recording the skip;"
-    " never hand this command to the user to run"
+    " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
+    " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
+    " the proposal printed, after which finalize-review drops the reviewer floor to"
+    " zero and still emits an attestation recording the skip;"
+    " never hand the blocked publication command to the user to run"
 )
 NONCANONICAL = "the entire Git push command must use canonical quote-all rendering"
 
@@ -1329,9 +1330,80 @@ def test_missing_attestation_names_both_routes(tmp_path: Path, monkeypatch) -> N
         "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
     )
     assert "closing-review" in reason
-    assert "selection propose <change-id> --origin agent" in reason
-    assert "confirms by typing the code" in reason
-    assert "never hand this command to the user to run" in reason
+    assert (
+        "selection propose <change-id> --origin agent --skip reviewers" in reason
+    )
+    assert "confirms by typing `/loom-code:expert-mode <code>`" in reason
+    assert "never hand the blocked publication command to the user to run" in reason
+
+
+# The tail for a count greater than one. The two routes are absent: closing
+# review rewrites one attestation in place and a confirmed skip emits one, so
+# neither can take a branch from two attested changes down to one.
+EXTRA_ATTESTED_CHANGES = (
+    "BLOCK push.attestation: branch must carry exactly one generated attestation; found 2"
+    "; a publication covers exactly one change, so neither route out of a missing"
+    " attestation applies here: the branch delta has to end at one attested change"
+    " first, by landing the other changes from their own branches or by taking"
+    " their attestations out of this delta;"
+    " never hand the blocked publication command to the user to run"
+)
+
+
+def two_attested_changes(tmp_path: Path, monkeypatch) -> Path:
+    repo = hook_repository(tmp_path, attested=False, monkeypatch=monkeypatch)
+    attestation(repo, "change-a")
+    attestation(repo, "change-b")
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "attest two changes")
+    return repo
+
+
+def test_more_than_one_attestation_names_what_actually_helps(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """A branch attesting two changes is refused under the same rule with the
+    same reason opening, and is told what reduces the count -- not the two
+    routes, neither of which can."""
+    repo = two_attested_changes(tmp_path, monkeypatch)
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    assert rc == 2
+    assert err.splitlines()[0] == EXTRA_ATTESTED_CHANGES
+    assert "two legal routes" not in err
+    assert "selection propose" not in err
+
+
+def test_more_than_one_attestation_reason_stays_one_line(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The count-greater-than-one tail obeys the same one-line contract as the
+    routes: report() writes one BLOCK line per failure."""
+    repo = two_attested_changes(tmp_path, monkeypatch)
+    monkeypatch.chdir(repo)
+    err = StringIO()
+
+    rc = push_handler._cmd_push([], StringIO(), err)
+
+    assert rc == 1
+    assert len(err.getvalue().splitlines()) == 1, err.getvalue()
+
+
+def test_one_attested_change_per_branch_clears_the_count_refusal(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The action the reason names is one the branch can actually take: with the
+    second change's attestation out of the delta, the count refusal is gone."""
+    repo = two_attested_changes(tmp_path, monkeypatch)
+    git(repo, "rm", "-q", "-r", "docs/loom/change-b")
+    git(repo, "commit", "-q", "-m", "publish one change per branch")
+    monkeypatch.chdir(repo)
+    err = StringIO()
+
+    push_handler._cmd_push([], StringIO(), err)
+
+    assert "branch must carry exactly one generated attestation" not in err.getvalue()
 
 
 def test_missing_attestation_reason_stays_one_line(tmp_path: Path, monkeypatch) -> None:

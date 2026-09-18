@@ -28,10 +28,11 @@ FOUND_ZERO = (
     "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
     "; two legal routes, both run by the agent: run the closing-review station,"
     " which generates the attestation, or propose a step selection"
-    " (`loom_checker.py selection propose <change-id> --origin agent`) that the user"
-    " confirms by typing the code, after which finalize-review drops the reviewer"
-    " floor to zero and still emits an attestation recording the skip;"
-    " never hand this command to the user to run"
+    " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
+    " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
+    " the proposal printed, after which finalize-review drops the reviewer floor to"
+    " zero and still emits an attestation recording the skip;"
+    " never hand the blocked publication command to the user to run"
 )
 
 

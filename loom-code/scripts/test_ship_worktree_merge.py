@@ -188,11 +188,12 @@ def _git(repo: Path, *args: str) -> str:
 
 
 def _land_without_attestation(
-    tmp_path: Path, monkeypatch,
+    tmp_path: Path, monkeypatch, *, attestations: int = 0,
 ) -> tuple[int, str, list]:
-    """`land --accepted-by` on a branch that carries a committed intent but no
-    attestation. Every gh and git call goes through `run_land_external`, which
-    records here instead of running, so nothing reaches GitHub."""
+    """`land --accepted-by` on a branch that carries a committed intent and
+    `attestations` attested changes. Every gh and git call goes through
+    `run_land_external`, which records here instead of running, so nothing
+    reaches GitHub."""
     repo = tmp_path / "repo"
     repo.mkdir(parents=True)
     _git(repo, "init", "-q")
@@ -211,6 +212,10 @@ def _land_without_attestation(
         "\n## Proposed outcome\nLand it.\n",
         encoding="utf-8",
     )
+    for index in range(attestations):
+        target = repo / "docs" / "loom" / f"change-{index}" / "attestation.json"
+        target.parent.mkdir(parents=True)
+        target.write_text(f'{{"change_id": "change-{index}"}}', encoding="utf-8")
     _git(repo, "add", ".")
     _git(repo, "commit", "-q", "-m", "change")
 
@@ -238,9 +243,31 @@ def test_merge_refusal_names_both_routes(tmp_path: Path, monkeypatch) -> None:
     reason = err.splitlines()[0]
     assert reason.startswith("BLOCK land.merge: ")
     assert "run the closing-review station" in reason
-    assert "selection propose <change-id> --origin agent" in reason
-    assert "confirms by typing the code" in reason
-    assert "never hand this command to the user to run" in reason
+    assert "selection propose <change-id> --origin agent --skip reviewers" in reason
+    assert "confirms by typing `/loom-code:expert-mode <code>`" in reason
+    assert "never hand the blocked publication command to the user to run" in reason
+
+
+# A2, count greater than one: the merge refusal names the routes only where
+# they work. With two attested changes in the delta neither route reduces the
+# count, so the same site names the action that does.
+def test_merge_refusal_with_two_attested_changes_names_no_dead_route(
+    tmp_path: Path, monkeypatch
+) -> None:
+    rc, err, calls = _land_without_attestation(tmp_path, monkeypatch, attestations=2)
+
+    assert rc == 1
+    assert calls == []
+    lines = err.splitlines()
+    assert len(lines) == 1
+    reason = lines[0]
+    assert reason.startswith(
+        "BLOCK land.merge: branch must carry exactly one attested change; found 2"
+    )
+    assert "two legal routes" not in reason
+    assert "selection propose" not in reason
+    assert "the branch delta has to end at one attested change" in reason
+    assert "never hand the blocked publication command to the user to run" in reason
 
 
 # A2 negative: merge-without-attestation-still-refused. The refusal keeps the

@@ -35,10 +35,19 @@ import shutil
 import sys
 
 
-# The two legal routes out of a publication blocked for a missing attestation,
-# appended to the reason that blocks it. One copy, because `land` refuses the
-# merge at its own earlier site and appends this same text there: a caller must
-# read the same routes wherever the block lands.
+# The two legal routes out of a publication blocked because the branch attests
+# nothing, appended to the reason that blocks it. One copy, because `land`
+# refuses the merge at its own earlier site and appends this same text there: a
+# caller must read the same routes wherever the block lands.
+#
+# The proposal command carries `--skip reviewers` because that is what the
+# sentence promises: `selection propose` (command_handlers/selection.py:_propose)
+# binds whatever `--skip` names and nothing more, so without it the confirmed
+# selection skips no step and finalize-review's reviewer floor never drops. The
+# confirmation is written in the form the user actually types, because
+# `selection.confirmation_prompt_matches` counts a prompt only when its first
+# token is an entry-point token (`selection.ENTRY_TOKENS`); a prompt that is the
+# bare code binds nothing.
 #
 # One line, and no leading newline: report() writes one `BLOCK <rule>: <reason>`
 # line per failure and every caller parses that prefix, so a wrapped reason
@@ -46,11 +55,36 @@ import sys
 PUBLICATION_ROUTES = (
     "; two legal routes, both run by the agent: run the closing-review station,"
     " which generates the attestation, or propose a step selection"
-    " (`loom_checker.py selection propose <change-id> --origin agent`) that the user"
-    " confirms by typing the code, after which finalize-review drops the reviewer"
-    " floor to zero and still emits an attestation recording the skip;"
-    " never hand this command to the user to run"
+    " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
+    " that the user confirms by typing `/loom-code:expert-mode <code>` with the code"
+    " the proposal printed, after which finalize-review drops the reviewer floor to"
+    " zero and still emits an attestation recording the skip;"
+    " never hand the blocked publication command to the user to run"
 )
+
+
+# The same refusal fires for any count other than one, and above one neither
+# route helps: closing review rewrites one attestation file in place and a
+# confirmed skip emits one, so the count stays where it was. Naming a route
+# there would name a route that cannot work, so this state is told what reduces
+# the count instead. Same one-line contract as above.
+EXTRA_ATTESTED_CHANGES = (
+    "; a publication covers exactly one change, so neither route out of a missing"
+    " attestation applies here: the branch delta has to end at one attested change"
+    " first, by landing the other changes from their own branches or by taking"
+    " their attestations out of this delta;"
+    " never hand the blocked publication command to the user to run"
+)
+
+
+def publication_advice(found: int | None) -> str:
+    """The tail appended to a `…; found <n>` attestation refusal.
+
+    `found` is the number of attestations the refusal reports, or None when the
+    caller could not read it. Only a count of zero names the two routes: a route
+    is named where it demonstrably reaches the state the sentence claims, and
+    nowhere else."""
+    return PUBLICATION_ROUTES if found == 0 else EXTRA_ATTESTED_CHANGES
 
 
 def read_hook_payload(stdin=sys.stdin) -> dict | None:
@@ -276,13 +310,13 @@ def _cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     matcher = glob_to_regex(attestation_template.replace("<change-id>", "*"))
     candidates = sorted(path for path in changed_paths(repo) if matcher.fullmatch(path))
     if len(candidates) != 1:
-        # The existing reason stays at the front; PUBLICATION_ROUTES only names
-        # the way out, because the refusal alone left the agent nothing to do
-        # but hand the blocked command back to the user.
+        # The existing reason stays at the front; the tail only names what the
+        # agent can do next, because the refusal alone left it nothing to do but
+        # hand the blocked command back to the user.
         return report([(
             "push.attestation",
             f"branch must carry exactly one generated attestation; found {len(candidates)}"
-            + PUBLICATION_ROUTES,
+            + publication_advice(len(candidates)),
         )], err)
     attestation_rel = candidates[0]
     match = re.fullmatch(

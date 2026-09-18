@@ -12,8 +12,8 @@ from loom_checker.command_handlers.publish import _publication_change_id
 from loom_checker.command_handlers.publish import _publish_env
 from loom_checker.command_handlers.publish import _publish_origin_state
 from loom_checker.command_handlers.publish import resolve_publish_executable
-from loom_checker.command_handlers.push import PUBLICATION_ROUTES
 from loom_checker.command_handlers.push import _cmd_push
+from loom_checker.command_handlers.push import publication_advice
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import git_maybe
@@ -923,9 +923,13 @@ def _merge_preconditions(
     if intent_error:
         # With no attestation the acceptor set cannot be derived, so the merge
         # refuses here — before the shared publication check at (2) ever runs.
-        # This is the refusal a caller sees, so it carries the same routes out.
+        # This is the refusal a caller sees, so it carries the same tail out —
+        # chosen by the count publish.py printed after `found `, because above
+        # one the two routes name nothing that reduces it. A count that is not a
+        # plain integer is passed as None, which takes the tail naming no route.
         if intent_error.startswith(MISSING_ATTESTATION):
-            intent_error += PUBLICATION_ROUTES
+            found = intent_error.removeprefix(MISSING_ATTESTATION)
+            intent_error += publication_advice(int(found) if found.isdigit() else None)
         return _block(intent_error, err)
     if accepted_by not in names:
         return _block(ACCEPTANCE_NOT_RECORDED, err)

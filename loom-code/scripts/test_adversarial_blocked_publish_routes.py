@@ -32,6 +32,7 @@ import pytest
 import test_ship_station_text as ship_text
 from loom_checker.command_handlers import push as push_handler
 from loom_checker.command_handlers.publish import MISSING_ATTESTATION
+from loom_checker.command_handlers.push import EXTRA_ATTESTED_CHANGES
 from loom_checker.command_handlers.push import PUBLICATION_ROUTES
 from loom_checker.rule_checks.publish import render_selection_disclosure
 from loom_checker.rule_checks.push import github_repo_from_origin
@@ -45,6 +46,13 @@ SESSION = "adversarial-blocked-publish-routes"
 # them; it may not replace, reword or re-rule them.
 PUSH_REASON = "branch must carry exactly one generated attestation; found "
 LAND_REASON = "branch must carry exactly one attested change; found "
+
+
+def _tail(count: int) -> str:
+    """The advice the refusal carries for this attestation count. The two routes
+    belong to the zero case alone; above one neither of them reduces the count,
+    so that state is told what does."""
+    return PUBLICATION_ROUTES if count == 0 else EXTRA_ATTESTED_CHANGES
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -113,7 +121,7 @@ def test_probe_push_refusal_keeps_rule_exit_and_reason_prefix(tmp_path, count) -
     result = _checker(_repo(tmp_path, f"push{count}", ids), ["push"])
     assert result.returncode == 1
     assert _blocks(result.stderr) == [
-        ("push.attestation", f"{PUSH_REASON}{count}{PUBLICATION_ROUTES}")
+        ("push.attestation", f"{PUSH_REASON}{count}{_tail(count)}")
     ]
 
 
@@ -125,7 +133,7 @@ def test_probe_land_refusal_keeps_rule_exit_and_reason_prefix(tmp_path, count) -
                       ["land", "--accepted-by", "kouko"])
     assert result.returncode == 1
     assert _blocks(result.stderr) == [
-        ("land.merge", f"{LAND_REASON}{count}{PUBLICATION_ROUTES}")
+        ("land.merge", f"{LAND_REASON}{count}{_tail(count)}")
     ]
 
 
@@ -175,7 +183,9 @@ def test_probe_hostile_change_id_cannot_reach_the_reason(tmp_path) -> None:
     (rule, reason), = _blocks(result.stderr)
     assert rule == "push.attestation"
     assert re.fullmatch(
-        rf"{re.escape(PUSH_REASON)}\d+{re.escape(PUBLICATION_ROUTES)}", reason
+        rf"{re.escape(PUSH_REASON)}\d+"
+        rf"(?:{re.escape(PUBLICATION_ROUTES)}|{re.escape(EXTRA_ATTESTED_CHANGES)})",
+        reason,
     ), reason
     assert "pwned" not in result.stderr and "publication approved" not in result.stderr
 
@@ -224,14 +234,25 @@ def _propose_argv(change_id: str) -> list[str]:
     return [change_id if token == "<change-id>" else token for token in tokens[1:]]
 
 
-def _bind(repo: Path, change_id: str, extra: list[str], *, bare_code: bool = False) -> dict:
+NAMED_CONFIRMATION = re.search(r"confirms by typing `([^`]+)`", PUBLICATION_ROUTES)
+
+
+def _named_prompt(code: str) -> str:
+    """The confirmation exactly as the refusal writes it, with the code filled
+    in. The refusal tells the user what to type, so a probe that follows it
+    literally must type this and nothing else."""
+    assert NAMED_CONFIRMATION, "the refusal no longer names a confirmation form"
+    return NAMED_CONFIRMATION.group(1).replace("<code>", code)
+
+
+def _bind(repo: Path, change_id: str, extra: list[str], *, prompt=_named_prompt) -> dict:
     """Propose with the refusal's own command, let the user type a
     confirmation, and return what `selection show` reports."""
     proposal = _checker(repo, [*_propose_argv(change_id), *extra])
     assert proposal.returncode == 0, proposal.stderr
     code = proposal.stdout.split("code:")[1].strip().split()[0]
     payload = json.dumps({"hook_event_name": "UserPromptSubmit",
-                          "prompt": code if bare_code else f"/loom-code:expert-mode {code}",
+                          "prompt": prompt(code),
                           "prompt_id": f"p-{code}", "session_id": SESSION})
     _checker(repo, ["selection", "capture", "--hook"], payload)
     shown = _checker(repo, ["selection", "show", change_id])
@@ -242,12 +263,6 @@ def _bind(repo: Path, change_id: str, extra: list[str], *, bare_code: bool = Fal
 CHANGE = "2026-09-18-blocked-publish-names-the-legal-routes"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F1: the proposal command the refusal names carries no "
-           "`--skip`, so the confirmed selection skips nothing and the reviewer "
-           "floor the refusal promises to drop stays where it was",
-)
 def test_probe_named_proposal_drops_the_reviewer_floor(tmp_path) -> None:
     """Attack: follow the refusal literally and see whether the second route
     reaches the state the refusal says it reaches."""
@@ -274,37 +289,43 @@ def test_probe_named_proposal_with_an_explicit_skip_does_drop_the_floor(tmp_path
     assert "review input has no verdicts" not in result.stderr
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F2: the refusal says the user confirms `by typing the code`; "
-           "a prompt that is the code alone is captured as nothing, because a "
-           "confirmation counts only behind an entry-point token",
-)
-def test_probe_typing_the_code_confirms_the_selection(tmp_path) -> None:
-    """Attack: do exactly what the refusal tells the user to do."""
-    repo = _repo(tmp_path, "bare-code")
-    assert _bind(repo, CHANGE, ["--skip", "reviewers"], bare_code=True)["bound"] is True
-
-
-def test_probe_entry_token_form_is_what_actually_confirms(tmp_path) -> None:
-    """Control for F2: the same code behind `/loom-code:expert-mode` binds."""
-    repo = _repo(tmp_path, "entry-token")
+def test_probe_typing_the_named_confirmation_confirms_the_selection(tmp_path) -> None:
+    """Attack: do exactly what the refusal tells the user to do -- type the
+    confirmation in the form the refusal spells out, and nothing else."""
+    repo = _repo(tmp_path, "named-confirmation")
     assert _bind(repo, CHANGE, ["--skip", "reviewers"])["bound"] is True
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F3: with more than one attestation in the branch delta the "
-           "refusal still names the same two routes, and neither of them can "
-           "reduce the count, so the refusal names no route that works",
-)
+def test_probe_bare_code_still_binds_nothing(tmp_path) -> None:
+    """F2's other half: the form the refusal used to name binds nothing, so the
+    refusal may not go back to naming it. No rule moved to make F2 pass."""
+    repo = _repo(tmp_path, "bare-code")
+    bound = _bind(repo, CHANGE, ["--skip", "reviewers"], prompt=lambda code: code)
+    assert bound["bound"] is False
+
+
+def test_probe_entry_token_form_is_what_actually_confirms(tmp_path) -> None:
+    """Control for F2: the same code behind `/loom-code:expert-mode` binds,
+    written out here rather than read from the refusal, so the two cannot drift
+    into agreeing with each other about a form the checker rejects."""
+    repo = _repo(tmp_path, "entry-token")
+    bound = _bind(repo, CHANGE, ["--skip", "reviewers"],
+                  prompt=lambda code: f"/loom-code:expert-mode {code}")
+    assert bound["bound"] is True
+
+
 def test_probe_closing_review_route_unblocks_a_two_attestation_branch(tmp_path) -> None:
     """Attack: take the first named route on the branch shape that produces the
-    same refusal, and see whether the publication becomes possible."""
+    same refusal, and see whether the publication becomes possible.
+
+    It does not, so the refusal must not name it here; and what it names instead
+    has to be a state this branch can actually reach."""
     ids = ("2026-09-18-change-0", "2026-09-18-change-1")
     repo = _repo(tmp_path, "two", ids)
     blocked = _checker(repo, ["push"])
-    assert PUBLICATION_ROUTES in blocked.stderr
+    assert blocked.returncode == 1
+    assert PUBLICATION_ROUTES not in blocked.stderr
+    assert EXTRA_ATTESTED_CHANGES in blocked.stderr
 
     # "run the closing-review station, which generates the attestation": what it
     # generates is one attestation file for one change id, written in place.
@@ -314,7 +335,14 @@ def test_probe_closing_review_route_unblocks_a_two_attestation_branch(tmp_path) 
     _git(repo, "add", ".")
     _git(repo, "commit", "-q", "-m", "closing-review")
 
-    assert _checker(repo, ["push"]).returncode == 0
+    # The count is untouched, so the same refusal stands: naming that route here
+    # would have sent the agent round a loop that cannot terminate.
+    assert f"{PUSH_REASON}2" in _checker(repo, ["push"]).stderr
+
+    # What the refusal names instead: end the delta at one attested change.
+    _git(repo, "rm", "-q", "-r", f"docs/loom/{ids[1]}")
+    _git(repo, "commit", "-q", "-m", "publish one change per branch")
+    assert PUSH_REASON not in _checker(repo, ["push"]).stderr
 
 
 # --------------------------------------------------------------------------
