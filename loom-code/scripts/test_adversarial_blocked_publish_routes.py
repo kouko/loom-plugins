@@ -15,6 +15,14 @@ asserts what the refusal text promises, it does not hold today, and the strict
 marker turns the probe red the moment the promise becomes true so the marker is
 removed with the defect. No product code, existing test or record is touched by
 this module.
+
+The module carries no marker now -- every finding it recorded (F1 through F12)
+was closed, and each probe stayed as the regression for its own finding. Two
+were re-aimed rather than converted, because the fix answered the finding in a
+way the probe had not demanded; each says so in its own docstring rather than
+here. A marker must fail at its own assertion and not in fixture setup: the F6
+probe once died in `git switch` and recorded that instead, so a new marker is
+read under `--runxfail` before it is trusted.
 """
 from __future__ import annotations
 
