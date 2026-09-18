@@ -6,9 +6,9 @@ from prose_pin import has_negation, split_sentences
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
-ADVERSARIAL_REF = (
-    ROOT / "loom-code/skills/closing-review/references/adversarial.md"
-).read_text(encoding="utf-8")
+# The attack protocol's own text is pinned in test_adversary_protocol.py, so
+# that a change to it turns that file red and names it; this module keeps the
+# station's text.
 REVIEWER = (ROOT / "loom-code/agents/reviewer.md").read_text(encoding="utf-8")
 REVIEW_WORDS = " ".join(REVIEW.split())
 CONTRACT = " ".join((REVIEW + "\n" + REVIEWER).split())
@@ -324,12 +324,6 @@ def test_no_adversary_dispatch_in_closing_review() -> None:
     for sentence in _sentences(REVIEW_WORDS):
         if re.search(r"\badversary\b", sentence):
             assert has_negation(sentence), sentence
-    opening = " ".join(ADVERSARIAL_REF.split("\n## ", 1)[0].split())
-    assert "at the end of Build" in opening
-    assert "a later round can re-run it" not in opening
-    recording = " ".join(ADVERSARIAL_REF.split("## Recording", 1)[1].split())
-    assert "Build re-runs" in recording
-    assert "`finalize-review`" in recording
 
 
 def test_finalize_failure_fix_needs_next_round() -> None:
@@ -374,10 +368,6 @@ def test_unresolved_adversarial_findings_reach_finalize_input() -> None:
     assert "Build's hand-off" in sentence, sentence
     assert not has_negation(sentence), sentence
     assert not _OPTIONAL_ROUND.search(sentence), sentence
-    recording = " ".join(ADVERSARIAL_REF.split("## Recording", 1)[1].split())
-    destination = next(s for s in _sentences(recording) if "`findings` input of `finalize-review`" in s)
-    assert "closing review passes" in destination, destination
-    assert not has_negation(destination), destination
 
 
 # ---------------------------------------------------------------------------
