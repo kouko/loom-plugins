@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+from loom_checker.command_handlers.publish import MISSING_ATTESTATION
 from loom_checker.command_handlers.publish import PUBLISH_CI_PENDING_WAITS
 from loom_checker.command_handlers.publish import PUBLISH_CI_POLL_SECONDS
 from loom_checker.command_handlers.publish import PUBLISH_CI_REGISTRATION_WAITS
@@ -12,6 +13,8 @@ from loom_checker.command_handlers.publish import _publish_env
 from loom_checker.command_handlers.publish import _publish_origin_state
 from loom_checker.command_handlers.publish import resolve_publish_executable
 from loom_checker.command_handlers.push import _cmd_push
+from loom_checker.command_handlers.push import nothing_left_to_publish
+from loom_checker.command_handlers.push import publication_advice
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import git_maybe
@@ -919,6 +922,18 @@ def _merge_preconditions(
     # (1) acceptance
     names, intent_error = _accepted_names(repo)
     if intent_error:
+        # With no attestation the acceptor set cannot be derived, so the merge
+        # refuses here — before the shared publication check at (2) ever runs.
+        # This is the refusal a caller sees, so it carries the same tail out —
+        # chosen by the count publish.py printed after `found `, because above
+        # one the two routes name nothing that reduces it. A count that is not a
+        # plain integer is passed as None, which takes the tail naming no route.
+        if intent_error.startswith(MISSING_ATTESTATION):
+            found = intent_error.removeprefix(MISSING_ATTESTATION)
+            count = int(found) if found.isdigit() else None
+            intent_error += publication_advice(
+                count, count == 0 and nothing_left_to_publish(repo)
+            )
         return _block(intent_error, err)
     if accepted_by not in names:
         return _block(ACCEPTANCE_NOT_RECORDED, err)

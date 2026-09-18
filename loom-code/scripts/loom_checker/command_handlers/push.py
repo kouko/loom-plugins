@@ -2,13 +2,17 @@ from __future__ import annotations
 
 from loom_checker.attestation import validate_attestation
 from loom_checker.helpers import UsageError
+from loom_checker.helpers import branch_base
 from loom_checker.helpers import changed_paths
 from loom_checker.helpers import git_maybe
+from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
 from loom_checker.helpers import glob_to_regex
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
+from loom_checker.intent_state import remote_default_snapshot
+from loom_checker.rule_checks.publish import validate_contextual_pr_body
 from loom_checker.rule_checks.push import SHELL_PROGRAMS
 from loom_checker.rule_checks.push import _program
 from loom_checker.rule_checks.push import _shell_segments
@@ -22,6 +26,7 @@ from loom_checker.rule_checks.push import is_git_push_command
 from loom_checker.rule_checks.push import is_pr_create_command
 from loom_checker.rule_checks.push import is_pr_merge_command
 from loom_checker.rule_checks.push import is_push_command
+from loom_checker.rule_checks.push import pr_create_body
 from loom_checker.rule_checks.push import quote_all_shell_token
 from loom_checker.rule_checks.selection_guard import FILE_TOOLS as SELECTION_GUARD_FILE_TOOLS
 from loom_checker.rule_checks.selection_guard import RULE_ID as SELECTION_GUARD_RULE
@@ -33,6 +38,181 @@ import os
 import re
 import shutil
 import sys
+
+
+# The two legal routes out of a publication blocked because the branch attests
+# nothing, appended to the reason that blocks it. One copy, because `land`
+# refuses the merge at its own earlier site and appends this same text there: a
+# caller must read the same routes wherever the block lands.
+#
+# The proposal command carries `--skip reviewers` because that is what the
+# sentence promises: `selection propose` (command_handlers/selection.py:_propose)
+# binds whatever `--skip` names and nothing more, so without it the confirmed
+# selection skips no step and finalize-review's reviewer floor never drops. The
+# confirmation is written in the form the user actually types, because
+# `selection.confirmation_prompt_matches` counts a prompt only when its first
+# token is an entry-point token (`selection.ENTRY_TOKENS`); a prompt that is the
+# bare code binds nothing. Both host spellings are named, in the expert-mode
+# station's own parenthetical form, because this string is what an agent reads
+# at the moment of failure and a Codex agent shown only the Claude Code slash
+# form would tell its user to type something its host does not offer.
+# `ENTRY_TOKENS` accepts four; the two the station names are the two named here,
+# because the sentence tells a user what to type rather than teaching the set.
+#
+# Route two is named under its conditions rather than flatly, because it is open
+# in fewer states than route one, and an agent that follows a dead route asks the
+# user for mechanical work this refusal exists to stop asking of them. Two
+# conditions, both stated:
+#
+# * a confirmation binds only when the session that proposed it records an
+#   attended user typing it -- a nested unattended session, a confirmation that
+#   lands in a later session, and a host without prompt capture (expert-mode's
+#   own Boundary) each leave it dead; and
+# * the expert-mode station allows the agent one skip proposal per change ("The
+#   agent may suggest skipping steps at most once per change"), so an agent that
+#   has already spent it and then hits a second block would be instructed here to
+#   do what the station forbids -- and obeying costs the user a second quality
+#   judgement, which is the pressure the cap exists to bound.
+#
+# Route one needs neither, so it carries no condition. Both sentences are
+# qualified rather than computed: reading session state or the selection store
+# here would add a mechanism to a message, which PRINCIPLES.md non-negotiable 4
+# asks a declared budget exception for.
+#
+# One line, and no leading newline: report() writes one `BLOCK <rule>: <reason>`
+# line per failure and every caller parses that prefix, so a wrapped reason
+# would emit continuation lines that no longer carry it.
+PUBLICATION_ROUTES = (
+    "; two legal routes, both run by the agent: run the closing-review station,"
+    " which generates the attestation and needs no confirmation, so it is open"
+    " in every session; or, in a session that can record a confirmation the user"
+    " types and only once per change, because expert-mode allows the agent one"
+    " skip proposal per change, propose a step selection"
+    " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
+    " that the user confirms by typing `/loom-code:expert-mode <code>`"
+    " (Codex: `$expert-mode`) with the code"
+    " the proposal printed, after which finalize-review drops the reviewer floor to"
+    " zero and still emits an attestation recording the skip;"
+    " never hand the blocked publication command to the user to run"
+)
+
+
+# The same refusal fires for any count other than one, and above one neither
+# route helps: closing review rewrites one attestation file in place and a
+# confirmed skip emits one, so the count stays where it was. Naming a route
+# there would name a route that cannot work, so this state is told what reduces
+# the count instead. Same one-line contract as above.
+EXTRA_ATTESTED_CHANGES = (
+    "; a publication covers exactly one change, so neither route out of a missing"
+    " attestation applies here: the branch delta has to end at one attested change"
+    " first, by landing the other changes from their own branches or by taking"
+    " their attestations out of this delta;"
+    " never hand the blocked publication command to the user to run"
+)
+
+
+# The third state a count of zero can be in: the branch adds nothing to a base
+# that already attests a change and that the remote's default branch contains.
+# All three facts, because the first two also hold of a finished branch nobody
+# published. Route one is dead here -- closing review regenerates the
+# attestation the base already carries, byte for byte, so the count never leaves
+# zero and an agent taking the named route runs the station forever -- and route
+# two has no step to skip on an empty delta. Naming either is the
+# non-terminating loop the count-above-one branch was split off to avoid, so
+# this state is told what is true of it instead. Same one-line contract.
+NOTHING_TO_PUBLISH = (
+    "; this branch adds nothing to its base and the base already attests a"
+    " change, so there is no unattested work here to review and nothing to"
+    " publish: neither route out of a missing attestation applies, and the"
+    " change you mean to publish starts from a new intent on its own branch;"
+    " never hand the blocked publication command to the user to run"
+)
+
+
+# A count nobody read names no count and no route: every sentence above is true
+# only of the state it is chosen for, and an unknown state is not one of them.
+# The one thing that holds regardless is where the count can be read.
+UNKNOWN_ATTESTATION_COUNT = (
+    "; the attestation count could not be read here, so nothing is claimed about"
+    " it and no route out is named: read it with `loom_checker.py push` in the"
+    " repository, which always reports a count, and take what that refusal names;"
+    " never hand the blocked publication command to the user to run"
+)
+
+
+def publication_advice(found: int | None, nothing_to_publish: bool = False) -> str:
+    """The tail appended to a `…; found <n>` attestation refusal.
+
+    `found` is the number of attestations the refusal reports, or None when the
+    caller could not read it. `nothing_to_publish` is `nothing_left_to_publish`
+    recomputed by the caller, and only a count of zero consults it.
+
+    A route is named where it demonstrably reaches the state the sentence
+    claims, and nowhere else: the two routes belong to a count of zero on a
+    branch that carries work, and to nothing else."""
+    if found is None:
+        return UNKNOWN_ATTESTATION_COUNT
+    if found != 0:
+        return EXTRA_ATTESTED_CHANGES
+    return NOTHING_TO_PUBLISH if nothing_to_publish else PUBLICATION_ROUTES
+
+
+def base_is_published(repo: Path, base: str) -> bool:
+    """Whether the remote's own default branch contains `base`.
+
+    Which branch is the trunk is the remote's to say, not this checker's to
+    guess: `remote_default_snapshot` reads `refs/remotes/origin/HEAD`, the ref
+    git writes from the remote's default at clone time and the one
+    `selection skipped-review` already asks the same question of. A list of
+    names here would answer False for every repository whose trunk is called
+    something else -- `trunk`, `develop`, `release` -- and send a landed change
+    back into the loop this tail exists to end.
+
+    `helpers.TRUNK_CANDIDATES` cannot serve: its local `main` / `master` witness
+    nothing, because one `git branch -f` moves a local trunk onto a finished
+    branch and the result is the same bytes in git as a change that landed, and
+    its `@{upstream}` is the current branch's own upstream, which a pushed but
+    unmerged branch contains trivially.
+
+    False when no default-branch ref resolves, and false when the ancestry check
+    cannot run: without a published trunk to read, a branch whose change has
+    landed and a finished branch nobody has published yet are the same state,
+    and answering True there tells a complete change it is nothing."""
+    _ref, snapshot, error = remote_default_snapshot(repo)
+    if error or not snapshot:
+        return False
+    return git_ok(repo, "merge-base", "--is-ancestor", base, snapshot)
+
+
+def nothing_left_to_publish(repo: Path) -> bool:
+    """Whether this branch adds nothing to a base that already attests a change.
+
+    Recomputed from the repository, never claimed. Three facts, all three
+    required: the branch delta is empty, the base carries at least one generated
+    attestation, and the remote's default branch contains the base. Closing review
+    then writes the bytes the base already holds and the attestation count stays
+    at zero, which is the state `publication_advice` must not send to it.
+
+    A base that attests nothing is a branch that has simply not run closing
+    review yet -- route one does move that count -- so the base lookup is what
+    separates the two, and an empty delta alone is not enough. The third fact is
+    what separates a landed change from a finished one nobody published: those
+    two are identical in content once the local trunk is moved onto the branch,
+    and only the remote tells them apart. Any doubt (no trunk to diff against, a
+    manifest without the artifact, no remote default branch to read) answers
+    False and leaves today's two routes standing."""
+    try:
+        template = load_manifest().get("artifacts", {}).get("attestation", {}).get("path")
+        if not template or changed_paths(repo):
+            return False
+        base = branch_base(repo)
+    except UsageError:
+        return False
+    if not base_is_published(repo, base):
+        return False
+    matcher = glob_to_regex(template.replace("<change-id>", "*"))
+    listing = git_maybe(repo, "ls-tree", "-r", "--name-only", base) or ""
+    return any(matcher.fullmatch(path) for path in listing.splitlines())
 
 
 def read_hook_payload(stdin=sys.stdin) -> dict | None:
@@ -86,25 +266,9 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     canonical_pr_repo = canonical_pr_create_repo(command)
     push_shaped = canonical_pr_repo is not None or is_push_command(command)
     git_push = is_git_push_command(command)
-    malformed_canonical_push = False
-    if not push_shaped:
-        # A malformed quote can defeat the permissive recogniser, but not a
-        # command that visibly starts with the canonical command trust root
-        # and trusted executable.
-        trusted = shutil.which("git")
-        trusted_prefix = (
-            f"{quote_all_shell_token('command')} "
-            f"{quote_all_shell_token(str(Path(trusted).resolve()))}"
-            if trusted
-            else ""
-        )
-        malformed_canonical_push = bool(
-            trusted_prefix
-            and command.startswith(trusted_prefix)
-            and quote_all_shell_token("push") in command
-        )
-        if not malformed_canonical_push:
-            return 0
+    malformed_canonical_push = not push_shaped and looks_canonically_pushed(command)
+    if not push_shaped and not malformed_canonical_push:
+        return 0
     cwd = str(payload.get("cwd") or os.getcwd())
     if git_push or malformed_canonical_push:
         repo, immutable_head, refspec_error = canonical_git_push(command, cwd)
@@ -149,7 +313,67 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         if remote_error:
             print(f"BLOCK push.attestation: {remote_error}", file=err)
             return 2
+        body_error = pr_create_body_failure(command)
+        if body_error:
+            report([("push.contextual-body", body_error)], err)
+            return 2
     return 2 if rc == 1 else rc
+
+
+def looks_canonically_pushed(command: str) -> bool:
+    """Whether a command the recognisers did not accept still visibly starts
+    with the canonical push.
+
+    A malformed quote can defeat the permissive recogniser, but not a command
+    that visibly starts with the canonical command trust root and trusted
+    executable."""
+    trusted = shutil.which("git")
+    if not trusted:
+        return False
+    trusted_prefix = (
+        f"{quote_all_shell_token('command')} "
+        f"{quote_all_shell_token(str(Path(trusted).resolve()))}"
+    )
+    return (
+        command.startswith(trusted_prefix)
+        and quote_all_shell_token("push") in command
+    )
+
+
+def pr_create_body_failure(command: str) -> str | None:
+    """The `push.contextual-body` reason this PR-create command earns, or None.
+
+    This route opens a pull request, so it owes what the publication command
+    owes: the whole of `push.contextual-body`, the rule id it prints. That is
+    the structural floor -- the nine headings, their substance, and the ban on
+    claiming to expose hidden reasoning -- followed by the disclosure of every
+    step the user's confirmed selection skipped, in the order `cmd_publish` runs
+    them. Both are publish's own functions, never a second copy of either rule.
+    The disclosure import is deferred because publish imports `_cmd_push` from
+    this module; at module level the two would cycle.
+
+    Every gh input that would compose a body the hook cannot see (`--fill`,
+    `--editor`, a template, a browser-composed body) is refused earlier, at
+    admission: `CANONICAL_PR_CREATE_OPTIONS` admits no option that spells any of
+    them. The "" the reader falls back to is for a body it was handed and could
+    not read -- an unreadable `--body-file` -- and "" has none of the nine
+    headings, so that refuses whether or not the branch records a skip.
+
+    The reason comes back on one line. `validate_selection_disclosure` renders
+    the disclosure it expects over several lines, which reads well under
+    `publish`'s own output and breaks the contract here: report() writes the
+    reason verbatim, so a newline emits a stderr line carrying no `BLOCK `
+    prefix, and every caller of this hook parses that prefix. Flattened for this
+    caller only -- publish's output is a terminal, not a parsed stream, and
+    keeps the shape a reader can act on."""
+    from loom_checker.command_handlers.publish import selection_disclosure_failure
+
+    body = pr_create_body(command)
+    failure = (
+        validate_contextual_pr_body(body)
+        or selection_disclosure_failure(Path.cwd(), body)
+    )
+    return " ".join(failure.split("\n")) if failure else None
 
 
 # Word separators for the merge text rule: whitespace, quotes and shell
@@ -258,9 +482,16 @@ def _cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     matcher = glob_to_regex(attestation_template.replace("<change-id>", "*"))
     candidates = sorted(path for path in changed_paths(repo) if matcher.fullmatch(path))
     if len(candidates) != 1:
+        # The existing reason stays at the front; the tail only names what the
+        # agent can do next, because the refusal alone left it nothing to do but
+        # hand the blocked command back to the user.
         return report([(
             "push.attestation",
-            f"branch must carry exactly one generated attestation; found {len(candidates)}",
+            f"branch must carry exactly one generated attestation; found {len(candidates)}"
+            + publication_advice(
+                len(candidates),
+                not candidates and nothing_left_to_publish(repo),
+            ),
         )], err)
     attestation_rel = candidates[0]
     match = re.fullmatch(

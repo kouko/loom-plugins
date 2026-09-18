@@ -211,6 +211,48 @@ def github_repo_from_origin(repo: Path) -> str | None:
     return f"{host}/{owner}/{name}"
 
 
+# Every trailing option the canonical PR-create form may carry, with the number
+# of tokens it spends: 2 for an option and its value, 1 for a flag.
+#
+# An allowlist rather than a list of refused spellings, because the refused list
+# can only ever be as current as gh's release notes: a body-determining flag
+# added in a later gh release would be admitted by a refused-list check and then
+# read by `pr_create_body` as an empty body, which is the shape of F8. Here an
+# option this repository has never heard of is simply not canonical.
+#
+# Only the separate-value spelling is canonical. `--body-file=<path>` and the
+# short forms (`-F`, `-H`, `-b`, `-t`) are not: `-F` is the one option the hook
+# and the shell could resolve differently, because `check_pr_create_remote_head`
+# requires an absolute path of `--body-file` and `--body-file=` alone, while the
+# hook resolves a relative path against the repository root it chdirs to and the
+# shell resolves it against the payload's `cwd`.
+#
+# GitHub CLI documents every `gh pr create` flag, its short form and whether it
+# takes a value -- the arities below are read from that list:
+# https://cli.github.com/manual/gh_pr_create
+CANONICAL_PR_CREATE_OPTIONS = {
+    "--base": 2, "--head": 2, "--title": 2, "--body-file": 2, "--draft": 1,
+}
+
+
+def canonical_pr_create_trailing(trailing: list[str]) -> bool:
+    """True when every trailing token belongs to an allowlisted option.
+
+    An option consumes its own value, so a value that looks like an option is
+    read as a value -- which is how gh's flag parser reads it too."""
+    # gh parses its flags with spf13/pflag, whose `parseLongArg` takes the next
+    # argument as the value of a flag that declares no `NoOptDefVal`, without
+    # testing it for a leading dash. That is the rule the walk below repeats:
+    # https://github.com/spf13/pflag/blob/master/flag.go
+    index = 0
+    while index < len(trailing):
+        width = CANONICAL_PR_CREATE_OPTIONS.get(trailing[index])
+        if width is None or index + width > len(trailing):
+            return False
+        index += width
+    return True
+
+
 def is_canonical_pr_create_command(repo: Path, command: str) -> bool:
     """True only for one function-proof, origin-bound PR creation command."""
     trusted = shutil.which("gh")
@@ -223,18 +265,9 @@ def is_canonical_pr_create_command(repo: Path, command: str) -> bool:
         "command", str(Path(trusted_env).resolve()), f"LOOM_REPO_ROOT={repo.resolve()}",
         f"GH_REPO={gh_repo}", str(Path(trusted).resolve()), "pr", "create",
     ]
-    trailing = gh_tokens[7:]
-    repo_overrides = {"-R", "--repo", "--hostname"}
-    has_repo_override = any(
-        token in repo_overrides
-        or token.startswith("--repo=")
-        or token.startswith("--hostname=")
-        or (token.startswith("-R") and token != "-R")
-        for token in trailing
-    )
     return (
         gh_tokens[:7] == expected_prefix
-        and not has_repo_override
+        and canonical_pr_create_trailing(gh_tokens[7:])
         and command == render_quote_all(gh_tokens)
     )
 
@@ -254,6 +287,53 @@ def canonical_pr_create_repo(command: str) -> Path | None:
     if repo.resolve() != selected.resolve():
         return None
     return repo if is_canonical_pr_create_command(repo, command) else None
+
+
+def pr_create_body(command: str) -> str:
+    """The PR body this `gh pr create` would send.
+
+    Read from the last `--body-file`, because that is the one gh keeps when a
+    command repeats the option: a gate that read the first would judge a body
+    the pull request never receives. The ship station's form carries
+    `--body-file` with an absolute path, which `check_pr_create_remote_head`
+    requires of every command it admits.
+
+    The inline spellings (`--body`, `-b`, `--body=`) are not read, because no
+    command carrying one ever reaches this reader: `CANONICAL_PR_CREATE_OPTIONS`
+    admits only `--base`, `--head`, `--title`, `--body-file` and `--draft`, and
+    the sole caller (command_handlers/push.py) refuses anything else at
+    admission. Were one ever allowlisted it would read as "" here, which
+    discloses nothing and refuses.
+
+    "" when the command names no body and when the named file cannot be read:
+    an empty body discloses nothing, which is exactly what a body the gate
+    cannot read has proven about itself.
+
+    Only a readable regular file is read, which is the guard `_publish_args`
+    (command_handlers/publish.py) already puts on `--body-file`. This runs
+    inside a `PreToolUse` hook that has no timeout of its own, so an unguarded
+    `read_text` on a FIFO blocks the agent forever and one on a character
+    device reads without end. `-` is gh's spelling for stdin, which the gate
+    cannot see at all, so it is never treated as a path."""
+    tokens = _tokenise(command)
+    body = ""
+    for index, token in enumerate(tokens):
+        following = tokens[index + 1] if index + 1 < len(tokens) else None
+        if token in {"--body-file", "-F"} and following is not None:
+            path = following
+        elif token.startswith("--body-file="):
+            path = token.split("=", 1)[1]
+        else:
+            continue
+        body = ""
+        named = Path(path)
+        if path == "-" or not named.is_file() or not os.access(named, os.R_OK):
+            continue
+        try:
+            body = named.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            body = ""
+    return body
 
 
 def check_pr_create_remote_head(repo: Path, command: str) -> str | None:
