@@ -748,11 +748,24 @@ def test_probe_following_the_refusal_verbatim_reaches_a_publishable_state(tmp_pa
     assert "push.contextual-body" not in accepted.stderr, accepted.stderr
 
 
-def _already_landed_branch(tmp_path: Path, change_id: str, review: Path) -> Path:
+def _already_landed_branch(tmp_path: Path, change_id: str, review: Path, *,
+                           trunk: str = "main", published: bool = True) -> Path:
     """A branch whose base already carries the attestation finalize-review
     generates for it -- so the branch delta holds none, and regenerating it
-    changes no byte."""
-    repo = _repo(tmp_path, "landed")
+    changes no byte.
+
+    `landed` is the state this fixture means, and landed means the base is on
+    the remote, not merely in a local branch. It did not say so until
+    `22dd7f92` made the difference matter: it fast-forwarded local `main` and
+    left no remote-tracking ref, which is the finished-but-unpublished state,
+    where keeping the routes is now right. The missing `update-ref` was the
+    fixture under-specifying its own name, so it is added rather than the probe
+    re-aimed -- the subject has not moved, only the precision with which the
+    fixture states it.
+
+    `trunk` and `published` exist so the probes below can build the two states
+    that fall outside `PUBLISHED_TRUNK_CANDIDATES`."""
+    repo = _repo(tmp_path, f"landed-{trunk}-{int(published)}")
     _git(repo, "switch", "-q", "-c", "prep")
     (repo / "docs" / "loom").mkdir(parents=True)
     (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
@@ -781,6 +794,11 @@ def _already_landed_branch(tmp_path: Path, change_id: str, review: Path) -> Path
     # than creating it. `switch -c` here died with exit 128 during fixture setup,
     # which the strict marker then recorded as the expected failure -- the probe
     # asserted nothing and could never have retired itself.
+    if published:
+        # What makes it landed rather than finished: the base is reachable from
+        # a remote-tracking trunk, which is the only witness this checker has
+        # that the work is somewhere other than this working copy.
+        _git(repo, "update-ref", f"refs/remotes/origin/{trunk}", "main")
     _git(repo, "switch", "-q", "feature")
     _git(repo, "reset", "-q", "--hard", "main")
     assert _git(repo, "rev-parse", "HEAD") == _git(repo, "rev-parse", "main")
@@ -1454,3 +1472,82 @@ def test_probe_body_read_has_no_size_ceiling(tmp_path) -> None:
     command = render_quote_all(["command", "env", "LOOM_REPO_ROOT=/", "GH_REPO=x",
                                 "gh", "pr", "create", "--body-file", str(big)])
     assert len(pr_create_body(command)) == 20 * 1024 * 1024
+
+
+# --------------------------------------------------------------------------
+# Half nine: the published-trunk fact. It decides whether a branch is told its
+# work has landed or told to go and review it, so both directions are attacked.
+# --------------------------------------------------------------------------
+
+
+def _landed_refusal(tmp_path: Path, change_id: str, **kwargs) -> str:
+    review = tmp_path / f"{change_id}-review.json"
+    repo = _already_landed_branch(tmp_path, change_id, review, **kwargs)
+    (rule, reason), = _blocks(_refusal(repo))
+    assert rule == "push.attestation", reason
+    return reason
+
+
+def test_probe_finished_but_unpublished_branch_keeps_its_routes(tmp_path) -> None:
+    """The state `22dd7f92` was written for, attacked from my side: a reviewed,
+    attested branch nobody pushed, with local `main` moved onto it. It is
+    byte-identical to a landed one, and it must still be offered the routes --
+    telling it there is nothing to publish would abandon finished work."""
+    reason = _landed_refusal(tmp_path, "2026-09-18-finished-unpublished",
+                             published=False)
+    assert reason == f"{PUSH_REASON}0{PUBLICATION_ROUTES}", reason
+    assert "this branch adds nothing" not in reason, reason
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="FINDING F13: `PUBLISHED_TRUNK_CANDIDATES` is the literal pair "
+           "`origin/main`, `origin/master`, so a repository whose remote default "
+           "is named anything else -- `trunk`, `develop`, `release` -- can never "
+           "satisfy the third fact. A branch whose change genuinely landed keeps "
+           "both routes there and walks back into the non-terminating loop F6 "
+           "named. The repository already resolves this properly: "
+           "`intent_state.remote_default_snapshot` reads `refs/remotes/origin/"
+           "HEAD`, which git sets from the remote's own default, and "
+           "`selection skipped-review` uses it",
+)
+def test_probe_landed_branch_is_recognised_on_a_trunk_not_called_main(tmp_path) -> None:
+    """Attack the fact in the direction that restores the old defect: land the
+    change on a remote default this checker does not know the name of."""
+    reason = _landed_refusal(tmp_path, "2026-09-18-landed-on-trunk", trunk="trunk")
+    assert "this branch adds nothing" in reason, reason
+
+
+def test_probe_landed_branch_on_master_is_recognised(tmp_path) -> None:
+    """Control for F13: the other name the literal pair knows does work, so the
+    probe above is measuring the pair's contents and not the fixture."""
+    reason = _landed_refusal(tmp_path, "2026-09-18-landed-on-master", trunk="master")
+    assert "this branch adds nothing" in reason, reason
+
+
+def test_probe_published_trunk_witness_is_agent_writable(tmp_path) -> None:
+    """The other direction, recorded and not scored.
+
+    `base_is_published` answers yes about a base that was never pushed, because
+    its only witness is `refs/remotes/origin/main` -- a local ref one
+    `git update-ref` writes, which is exactly how this module's own fixture
+    builds a landed branch two functions above. A stale cache after a remote
+    rewind reaches the same state without anyone acting.
+
+    Not scored as a defect: the harm is an agent talking itself out of
+    publishing its own finished work, not a gate admitting anything, and no
+    offline checker can tell a fetched ref from a written one. It is the honest
+    boundary of the third fact, and the recompute in PRINCIPLES.md
+    non-negotiable 3 rests on a ref the agent can write."""
+    review = tmp_path / "forged-review.json"
+    repo = _already_landed_branch(tmp_path, "2026-09-18-forged-witness", review,
+                                  published=False)
+    (rule, before), = _blocks(_refusal(repo))
+    assert rule == "push.attestation"
+    assert before.endswith(PUBLICATION_ROUTES), before
+
+    _git(repo, "update-ref", "refs/remotes/origin/main", "main")
+
+    (_rule, after), = _blocks(_refusal(repo))
+    assert "this branch adds nothing" in after, (
+        "one update-ref turned a finished branch into a landed one: " + after)
