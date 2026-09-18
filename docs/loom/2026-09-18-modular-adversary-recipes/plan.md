@@ -12,7 +12,7 @@ charter: 1.0
 ## Task DAG
 
 **W0-01 Split the procedure into protocol plus one file per kind**  after: none  acceptance: 1, 2, 8
-- Files: loom-code/references/adversary-protocol.md, loom-code/references/adversary-code.md, loom-code/references/adversary-spec.md, loom-code/references/adversary-skill-gate.md, loom-code/skills/closing-review/references/adversarial.md, docs/loom/2026-09-18-modular-adversary-recipes/evidence/rule-correspondence.md
+- Files: loom-code/references/adversary-protocol.md, loom-code/references/adversary-code.md, loom-code/references/adversary-spec.md, loom-code/references/adversary-skill-gate.md, loom-code/skills/closing-review/references/adversarial.md, loom-code/scripts/test_adversary_layout.py, docs/loom/2026-09-18-modular-adversary-recipes/evidence/rule-correspondence.md
 - Test: A1 positive: recipes-at-plugin-references; negative: station-copy-absent. A2 positive: kind-rule-in-own-file; negative: kind-rule-outside-own-file. A8 positive: every-rule-mapped; boundary: no-rule-added.
 - Risk: Content moves verbatim; any rewording breaks pinned tests. agent-decided: split on the document's existing H2 boundaries, protocol keeps intro, Reuse and Recording.
 
