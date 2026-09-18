@@ -106,6 +106,22 @@ def _gate_regions(text: str) -> list[tuple[int, int]]:
     return regions
 
 
+def _occurrences(text: str, rule: str) -> list[int]:
+    """Offsets of every occurrence of `rule`, not just the first."""
+    return [match.start() for match in re.finditer(re.escape(rule), text)]
+
+
+def _gate_marked_occurrences(text: str, rule: str) -> list[int]:
+    """Offsets of the occurrences of `rule` that sit inside a gate region.
+
+    A document can carry the rule twice -- advisory in one section, gate-marked
+    in another -- so a single offset is not evidence about the document.
+    """
+    regions = _gate_regions(text)
+    return [index for index in _occurrences(text, rule)
+            if any(start <= index < end for start, end in regions)]
+
+
 # ship-prose-forbids-handing-the-command-over (A3 positive)
 def test_ship_prose_forbids_handing_the_command_over() -> None:
     section = _section(SHIP.read_text(encoding="utf-8"), "## 3. Publish once")
@@ -128,11 +144,31 @@ def test_ship_prose_forbids_handing_the_command_over() -> None:
 # ship-prose-rule-is-not-marked-as-a-gate (A3 negative)
 def test_ship_prose_rule_is_not_marked_as_a_gate() -> None:
     text = SHIP.read_text(encoding="utf-8")
-    index = text.find(NO_HANDOVER)
-    assert index != -1, "the no-handover rule is missing from the ship station"
-    for start, end in _gate_regions(text):
-        assert not start <= index < end, (
-            "PRINCIPLES.md forbids prose-only gates: the no-handover rule is "
-            "advisory prose, and the enforceable carrier is the checker's "
-            "missing-attestation refusal string"
-        )
+    assert _occurrences(text, NO_HANDOVER), (
+        "the no-handover rule is missing from the ship station"
+    )
+    assert _gate_marked_occurrences(text, NO_HANDOVER) == [], (
+        "PRINCIPLES.md forbids prose-only gates: every copy of the no-handover "
+        "rule is advisory prose, and the enforceable carrier is the checker's "
+        "missing-attestation refusal string"
+    )
+
+
+TWO_COPY_DOC = (
+    "## 3. Publish once\n\nDo not " + NO_HANDOVER + ".\n\n"
+    "## 4. Refuse\n\n"
+    "<!-- gate: ship.no-handover -->\n"
+    "Refuse the publication unless the agent did not " + NO_HANDOVER + ".\n"
+    "<!-- /gate -->\n"
+)
+
+
+def test_gate_marked_locator_sees_a_second_gate_marked_copy() -> None:
+    """The ship station carries no gate marker today, so the assertion above
+    holds under any locator -- including one that inspects a single offset.
+    Exercise the locator on the document that separates them: the advisory
+    sentence in one section, the same rule gate-marked in a later one."""
+    assert len(_occurrences(TWO_COPY_DOC, NO_HANDOVER)) == 2
+    assert _gate_marked_occurrences(TWO_COPY_DOC, NO_HANDOVER) == [
+        _occurrences(TWO_COPY_DOC, NO_HANDOVER)[1]
+    ]
