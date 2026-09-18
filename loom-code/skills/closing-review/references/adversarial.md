@@ -6,6 +6,8 @@ runs is committed as a program: Build re-runs those programs on every fix
 loop, and `finalize-review` executes them on committed content. If a case
 needs the code changed to fail, it is not a case.
 
+<!-- Routing table goes here: which recipe file each kind of artifact is read from. -->
+
 ## Reuse first, update with evidence
 
 Before writing any probe, the adversary checks what already covers the
@@ -47,53 +49,6 @@ when the copy will be left behind in a temp directory. Discard commands
 `git worktree remove --force`) are never used to undo a mutation, because host
 guards refuse them and they can destroy uncommitted work. An update never deletes, skips or xfails
 a case to make it pass.
-
-## Code
-
-**If the repo declares mutation or fuzz tooling** — a `mutmut`,
-`cosmic-ray`, `stryker` or fuzz target in its config — run it over the
-changed modules and report survivors: a surviving mutant is a test that
-asserts nothing, and a finding against `tests`.
-
-**If it declares none** (the common case), write **at least three**
-executable abuse or boundary cases against the changed behaviour, run them,
-and record each one. Three is the floor, not the target. Reused and modified
-cases count toward the floor. Reuse toward the floor counts only (a) the
-programs the adversary committed for this change and (b) tests that exist
-unchanged outside this change's branch. Any other test added or changed on the
-branch, such as an implementer's pin, is named as related coverage only. Draw
-them from:
-
-| Class | The question |
-|---|---|
-| Empty and absent | zero items, empty string, missing file, unset variable — does it behave, or explode? |
-| Boundary | one less, one more, exactly at the limit, the limit plus one |
-| Hostile input | wrong type, enormous value, path traversal, injection payload, mixed encodings and non-ASCII |
-| Wrong order | the second step called first; the operation run twice; two callers at once |
-| Failure of a dependency | the network call fails, the disk is full, the subprocess exits non-zero — is the failure loud, or swallowed? |
-
-Prefer cases that live as real tests afterwards. A case that only ran in
-the adversary's head is not evidence.
-
-## Spec
-
-Red-team it: for each `REQ-<n>`, name a behaviour the requirement permits
-that the author clearly did not want. Then look for the states the spec
-never mentions — the second user, the interrupted run, the empty account,
-the migration from what exists today. Each one is a finding with the
-requirement as its anchor.
-
-## Skill and gate
-
-Make each attempt below against the file, and write down what the file made
-you do:
-
-- Read the instruction as an agent under time pressure — is there a reading
-  that skips the expensive step and still looks compliant?
-- Attempt the prose temptations verbatim ("the diff is one line, proceed?")
-  and record whether the text refuses them.
-- For a gate script, feed it the input it was written to catch, then the
-  same input one character different.
 
 ## Recording
 

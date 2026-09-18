@@ -285,7 +285,18 @@ def _flat(path: Path) -> str:
 
 
 ADVERSARY_PROSE = _flat(ADVERSARY)
-ADVERSARIAL_REF = _flat(ROOT / "loom-code/skills/closing-review/references/adversarial.md")
+# The attack procedure is one shared protocol file plus one recipe file per
+# kind of artifact, all in the same skill reference folder. A pin below names
+# the file its rule lives in: `ref` the protocol, `ref-code`, `ref-spec` and
+# `ref-skill-gate` the recipes.
+REFERENCES = ROOT / "loom-code/skills/closing-review/references"
+ADVERSARIAL_REF = _flat(REFERENCES / "adversarial.md")
+ADVERSARIAL_CODE = _flat(REFERENCES / "adversarial-code.md")
+ADVERSARIAL_SPEC = _flat(REFERENCES / "adversarial-spec.md")
+ADVERSARIAL_SKILL_GATE = _flat(REFERENCES / "adversarial-skill-gate.md")
+ADVERSARIAL_PROCEDURE = " ".join(
+    (ADVERSARIAL_REF, ADVERSARIAL_CODE, ADVERSARIAL_SPEC, ADVERSARIAL_SKILL_GATE)
+)
 UPDATE_NO_WEAKENING = "An update never deletes, skips or xfails a case to make it pass."
 PROBES_FIELD = re.compile(
     r"^probes: \[\{artifact: .+, status: reused \| modified \| new, reason: .+\}\]$", re.M
@@ -425,7 +436,7 @@ PROBE_MAINTENANCE_PINS = {
          "One mutation restores the original behaviour the stale program rejected."),
     ),
     "ref-branch-tests-excluded-from-floor": (
-        "ref", "Reuse toward the floor counts",
+        "ref-code", "Reuse toward the floor counts",
         "(a) the programs the adversary committed for this change",
         ("(b) tests that exist unchanged outside this change's branch",),
         "Reuse toward the floor counts only (a) the programs the adversary committed for this "
@@ -436,7 +447,7 @@ PROBE_MAINTENANCE_PINS = {
          "and (b) any test on this change's branch."),
     ),
     "ref-branch-tests-named-related-coverage": (
-        "ref", "Any other test added or changed on the branch",
+        "ref-code", "Any other test added or changed on the branch",
         "is named as related coverage only", ("such as an implementer's pin",),
         "Any other test added or changed on the branch, such as an implementer's pin, is named "
         "as related coverage only.",
@@ -510,7 +521,7 @@ PROBE_MAINTENANCE_PINS = {
          "one mutation overall."),
     ),
     "ref-floor-counts-reuse": (
-        "ref", "Reused and modified cases count", "toward the floor", (),
+        "ref-code", "Reused and modified cases count", "toward the floor", (),
         "Reused and modified cases count toward the floor.",
         ("Reused and modified cases do not count toward the floor.",),
     ),
@@ -554,7 +565,14 @@ REDISPATCH_UPDATE_NEW_COMMIT = "An update made on a Build re-dispatch is a new c
 DISCARD_LITERALS = (
     "git checkout --", "git restore", "git reset --hard", "git clean", "git worktree remove --force",
 )
-_PIN_DOCS = {"adversary": ADVERSARY_PROSE, "ref": ADVERSARIAL_REF, "build": VERIFY}
+_PIN_DOCS = {
+    "adversary": ADVERSARY_PROSE,
+    "ref": ADVERSARIAL_REF,
+    "ref-code": ADVERSARIAL_CODE,
+    "ref-spec": ADVERSARIAL_SPEC,
+    "ref-skill-gate": ADVERSARIAL_SKILL_GATE,
+    "build": VERIFY,
+}
 
 
 @pytest.mark.parametrize("pin", sorted(PROBE_MAINTENANCE_PINS))
@@ -582,9 +600,9 @@ def test_update_no_weakening_helpers_synthetic() -> None:
 
 def test_adversary_update_never_weakens_a_case() -> None:
     assert _pins_exact_sentence(ADVERSARIAL_REF, UPDATE_NO_WEAKENING), ADVERSARIAL_REF
-    assert ADVERSARIAL_REF.count("**at least three**") == 1
+    assert ADVERSARIAL_PROCEDURE.count("**at least three**") == 1
     assert _pins_exact_sentence(ADVERSARIAL_REF, CODE_CHANGE_NOT_A_CASE), ADVERSARIAL_REF
-    assert _pins_exact_sentence(ADVERSARIAL_REF, FLOOR_NOT_TARGET), ADVERSARIAL_REF
+    assert _pins_exact_sentence(ADVERSARIAL_CODE, FLOOR_NOT_TARGET), ADVERSARIAL_CODE
 
 
 def test_no_discard_undo_helpers_synthetic() -> None:
@@ -693,7 +711,12 @@ def test_no_added_sentence_overrides_pinned_rules(doc: str) -> None:
 # --- Dead pointers: the attack catalogue and the task trailer are retired ---
 
 IMPLEMENTER = ROOT / "loom-code/agents/implementer.md"
-ADVERSARIAL_REF_PATH = ROOT / "loom-code/skills/closing-review/references/adversarial.md"
+ADVERSARIAL_REF_PATH = REFERENCES / "adversarial.md"
+ADVERSARIAL_RECIPE_PATHS = [
+    REFERENCES / "adversarial-code.md",
+    REFERENCES / "adversarial-spec.md",
+    REFERENCES / "adversarial-skill-gate.md",
+]
 _DEAD_POINTER = re.compile(r"attack[- ]catalogue|\bcatalogue\b|\btrailer\b", re.IGNORECASE)
 BUILD_ADVERSARIAL_LINK = "[`adversarial.md`](../closing-review/references/adversarial.md)"
 BUILD_LINK_VERB = "works from the recipes in"
@@ -716,7 +739,11 @@ def test_dead_pointer_helpers_catalogue_link_reintroduced_fails() -> None:
     assert not _affirms(negated, BUILD_LINK_VERB, BUILD_ADVERSARIAL_LINK)
 
 
-@pytest.mark.parametrize("path", [ADVERSARY, ADVERSARIAL_REF_PATH, IMPLEMENTER], ids=lambda p: p.name)
+@pytest.mark.parametrize(
+    "path",
+    [ADVERSARY, ADVERSARIAL_REF_PATH, *ADVERSARIAL_RECIPE_PATHS, IMPLEMENTER],
+    ids=lambda p: p.name,
+)
 def test_contract_no_attack_catalogue_or_task_trailer_reference(path: Path) -> None:
     assert _dead_pointer_hits(path.read_text(encoding="utf-8")) == [], path
 
@@ -734,9 +761,11 @@ def test_probes_field_helper_synthetic() -> None:
     assert not PROBES_FIELD.search('probes: [{artifact: "<path>", status: reused | modified | new}]')
 
 
-# --- One home for the procedure: adversarial.md; adversary.md keeps role, inputs, return ---
+# --- One home for the procedure: the adversarial reference files; adversary.md
+# --- keeps role, inputs, return ---
 
-# Each fragment names one procedure rule; it lives in adversarial.md and nowhere in adversary.md.
+# Each fragment names one procedure rule; it lives in the protocol file or in one
+# recipe file, and nowhere in adversary.md.
 PROCEDURE_FRAGMENTS = (
     "already covers the target", "counts as reuse", "floor counts only", "as related coverage only",
     "marks each probe", "counts as `modified`", "nothing in the product", "that program unchanged",
@@ -761,8 +790,8 @@ def test_procedure_fragments_helper_synthetic() -> None:
 
 
 def test_procedure_sentence_in_both_files_rejected() -> None:
-    assert _procedure_fragments_in_both(ADVERSARY_PROSE, ADVERSARIAL_REF) == []
-    assert [f for f in PROCEDURE_FRAGMENTS if f not in ADVERSARIAL_REF] == []
+    assert _procedure_fragments_in_both(ADVERSARY_PROSE, ADVERSARIAL_PROCEDURE) == []
+    assert [f for f in PROCEDURE_FRAGMENTS if f not in ADVERSARIAL_PROCEDURE] == []
 
 
 def test_adversary_md_keeps_role_inputs_return_format() -> None:
