@@ -105,8 +105,9 @@ REQ-13 — The refusal tail names only what is true of its own state
   it appends shall name the two legal routes only where both are live, and
   otherwise name what is true of that state instead: above one attestation,
   what reduces the count; on an empty delta over a base that already attests
-  and that a remote-tracking trunk already contains, that there is nothing here
-  to publish; and where the count could not be read, no count and no route
+  and that the remote's own default branch already contains, that there is
+  nothing here to publish; and where the count could not be read, no count and
+  no route
   → Acceptance #1
   Authorised by Acceptance line 1, which asks the refusal to name the routes.
   A route named where it cannot reach the state it claims is worse than none:
@@ -116,8 +117,8 @@ REQ-13 — The refusal tail names only what is true of its own state
   attested branch looks like once its local trunk is fast-forwarded onto it,
   and telling that branch there is nothing here to publish sends a complete
   change back to a new intent. The two states are identical in git, so only a
-  remote-tracking trunk separates them, and where none resolves the tail is
-  withheld and the two routes stand.
+  remote separates them, and where no remote default branch resolves the tail
+  is withheld and the two routes stand.
 
 ## Design decision
 
@@ -176,12 +177,26 @@ REQ-13 — The refusal tail names only what is true of its own state
   sites: `nothing_left_to_publish` is recomputed from the repository by the
   caller and passed in, so the function that picks the tail reads no state
   itself. agent-decided.
-- The published-trunk fact reads `origin/main` and `origin/master`
-  (`PUBLISHED_TRUNK_CANDIDATES`, `command_handlers/push.py:160-179`) rather than
-  the whole of `helpers.TRUNK_CANDIDATES`: a local `main` is moved onto a branch
-  by one `git branch -f`, and `@{upstream}` is the branch's own upstream, which
-  an unmerged pushed branch contains trivially. Neither witnesses a
-  publication. agent-decided.
+- The published-trunk fact asks the remote which branch is its default, through
+  `intent_state.remote_default_snapshot` (`base_is_published`,
+  `command_handlers/push.py:160-184`), the same resolver
+  `selection skipped-review` already uses. It reads `refs/remotes/origin/HEAD`,
+  which git writes from the remote's own default at clone time, so a repository
+  whose trunk is called `trunk`, `develop` or `release` is read correctly and no
+  branch name is carried in this checker. `helpers.TRUNK_CANDIDATES` cannot
+  serve: a local `main` is moved onto a branch by one `git branch -f`, and
+  `@{upstream}` is the branch's own upstream, which an unmerged pushed branch
+  contains trivially — neither witnesses a publication. agent-decided.
+- Boundary, recorded rather than closed: the witness is a local ref, and an
+  agent can write `refs/remotes/origin/HEAD` and a remote-tracking branch
+  itself; a stale cache after a remote rewind reaches the same state with
+  nobody acting. No offline check can tell a fetched ref from a written one —
+  git records no provenance for either — and confirming one would mean a
+  network call inside a `PreToolUse` hook that runs on every Bash tool call and
+  has no timeout of its own, which is a worse defect than the one it would
+  close. The failure direction is the safe one: a false witness makes an agent
+  withhold its own finished publication, and admits nothing, because the
+  attestation, origin and PR gates are untouched by it. agent-decided.
 
 ## Alternatives considered
 
@@ -214,9 +229,11 @@ REQ-13 — The refusal tail names only what is true of its own state
 - Boundary (REQ-11/REQ-12): `rule_checks/push.py:238-253` walks the trailing
   tokens against the allowlist; `rule_checks/push.py:292-336` reads the body
   from the last `--body-file` and returns "" for anything it cannot read.
-- Data (REQ-13): `command_handlers/push.py:160-210` recomputes the empty-delta,
-  attesting-base and published-base state from the repository, and answers False
-  on any doubt.
+- Data (REQ-13): `command_handlers/push.py:160-215` recomputes the empty-delta,
+  attesting-base and published-base state from the repository — the third
+  through `intent_state.remote_default_snapshot`, which `selection
+  skipped-review` (`command_handlers/selection.py:228`) already reads the same
+  way — and answers False on any doubt.
 
 ## UI flows
 
@@ -231,6 +248,6 @@ REQ-13 — The refusal tail names only what is true of its own state
 | PR-create with an unlisted option | adds `--label`, `--assignee` or any other spelling outside the allowlist to the canonical form | `BLOCK push.attestation: PR creation must use the canonical trusted-gh command from loom-code:ship` |
 | PR-create whose body file cannot be read | names a FIFO, a device, a directory, an unreadable path, or `-` | the body reads as empty, so the create is refused on the nine headings, and the hook returns instead of blocking on the read |
 | more than one attested change | publishes or merges a delta carrying two attestations | the refusal naming what reduces the count, and no route |
-| empty delta over an attesting base the trunk carries | publishes a branch that adds nothing to a base that already attests and that `origin/main` contains | the refusal saying there is nothing here to publish, and that the change starts from a new intent on its own branch |
-| the same delta, base not published | publishes a finished attested branch whose local trunk was moved onto it, or any branch where no remote-tracking trunk resolves | the two legal routes, because the branch may still hold work nobody has published |
+| empty delta over an attesting base the trunk carries | publishes a branch that adds nothing to a base that already attests and that the remote's default branch contains, whatever it is named | the refusal saying there is nothing here to publish, and that the change starts from a new intent on its own branch |
+| the same delta, base not published | publishes a finished attested branch whose local trunk was moved onto it, or any branch where `refs/remotes/origin/HEAD` does not resolve | the two legal routes, because the branch may still hold work nobody has published |
 | count nobody could read | merges where the count after `found ` is not a plain integer | the refusal naming no count and no route, pointing at `push` in the repository |

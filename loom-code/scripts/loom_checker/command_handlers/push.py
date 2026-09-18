@@ -11,6 +11,7 @@ from loom_checker.helpers import glob_to_regex
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
+from loom_checker.intent_state import remote_default_snapshot
 from loom_checker.rule_checks.publish import validate_contextual_pr_body
 from loom_checker.rule_checks.push import SHELL_PROGRAMS
 from loom_checker.rule_checks.push import _program
@@ -111,7 +112,7 @@ EXTRA_ATTESTED_CHANGES = (
 
 
 # The third state a count of zero can be in: the branch adds nothing to a base
-# that already attests a change and that the published trunk already contains.
+# that already attests a change and that the remote's default branch contains.
 # All three facts, because the first two also hold of a finished branch nobody
 # published. Route one is dead here -- closing review regenerates the
 # attestation the base already carries, byte for byte, so the count never leaves
@@ -156,27 +157,31 @@ def publication_advice(found: int | None, nothing_to_publish: bool = False) -> s
     return NOTHING_TO_PUBLISH if nothing_to_publish else PUBLICATION_ROUTES
 
 
-# The trunk spellings that witness a publication. `helpers.TRUNK_CANDIDATES`
-# also names the local `main` / `master`, and neither can witness anything: a
-# local trunk is fast-forwarded onto a finished branch by one `git branch -f`,
-# and the result is the same bytes in git as a branch whose work has landed.
-# `@{upstream}` cannot either -- it is the current branch's own upstream, which
-# a pushed but unmerged branch contains trivially. Only a remote-tracking trunk
-# says the base is somewhere other than this working copy.
-PUBLISHED_TRUNK_CANDIDATES = ("origin/main", "origin/master")
-
-
 def base_is_published(repo: Path, base: str) -> bool:
-    """Whether a remote-tracking trunk contains `base`.
+    """Whether the remote's own default branch contains `base`.
 
-    False when none resolves, and false when the ancestry check cannot run:
-    without a published trunk to read, a branch whose change has landed and a
-    finished branch nobody has published yet are the same state, and answering
-    True there tells a complete change it is nothing."""
-    return any(
-        git_ok(repo, "merge-base", "--is-ancestor", base, candidate)
-        for candidate in PUBLISHED_TRUNK_CANDIDATES
-    )
+    Which branch is the trunk is the remote's to say, not this checker's to
+    guess: `remote_default_snapshot` reads `refs/remotes/origin/HEAD`, the ref
+    git writes from the remote's default at clone time and the one
+    `selection skipped-review` already asks the same question of. A list of
+    names here would answer False for every repository whose trunk is called
+    something else -- `trunk`, `develop`, `release` -- and send a landed change
+    back into the loop this tail exists to end.
+
+    `helpers.TRUNK_CANDIDATES` cannot serve: its local `main` / `master` witness
+    nothing, because one `git branch -f` moves a local trunk onto a finished
+    branch and the result is the same bytes in git as a change that landed, and
+    its `@{upstream}` is the current branch's own upstream, which a pushed but
+    unmerged branch contains trivially.
+
+    False when no default-branch ref resolves, and false when the ancestry check
+    cannot run: without a published trunk to read, a branch whose change has
+    landed and a finished branch nobody has published yet are the same state,
+    and answering True there tells a complete change it is nothing."""
+    _ref, snapshot, error = remote_default_snapshot(repo)
+    if error or not snapshot:
+        return False
+    return git_ok(repo, "merge-base", "--is-ancestor", base, snapshot)
 
 
 def nothing_left_to_publish(repo: Path) -> bool:
@@ -184,7 +189,7 @@ def nothing_left_to_publish(repo: Path) -> bool:
 
     Recomputed from the repository, never claimed. Three facts, all three
     required: the branch delta is empty, the base carries at least one generated
-    attestation, and a remote-tracking trunk contains the base. Closing review
+    attestation, and the remote's default branch contains the base. Closing review
     then writes the bytes the base already holds and the attestation count stays
     at zero, which is the state `publication_advice` must not send to it.
 
@@ -193,9 +198,9 @@ def nothing_left_to_publish(repo: Path) -> bool:
     separates the two, and an empty delta alone is not enough. The third fact is
     what separates a landed change from a finished one nobody published: those
     two are identical in content once the local trunk is moved onto the branch,
-    and only the published trunk tells them apart. Any doubt (no trunk to diff
-    against, a manifest without the artifact, no published trunk to read)
-    answers False and leaves today's two routes standing."""
+    and only the remote tells them apart. Any doubt (no trunk to diff against, a
+    manifest without the artifact, no remote default branch to read) answers
+    False and leaves today's two routes standing."""
     try:
         template = load_manifest().get("artifacts", {}).get("attestation", {}).get("path")
         if not template or changed_paths(repo):

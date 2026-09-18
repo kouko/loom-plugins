@@ -293,10 +293,14 @@ def _land_on_a_branch_that_adds_nothing(tmp_path: Path, monkeypatch) -> tuple[in
     target.write_text('{"change_id": "change-0"}', encoding="utf-8")
     _git(repo, "add", ".")
     _git(repo, "commit", "-q", "-m", "landed change")
-    # The change landed, so the published trunk carries the base. Without this
-    # ref the state cannot be told from a finished branch nobody published, and
-    # `nothing_left_to_publish` answers False on that doubt.
+    # The change landed, so the remote's default branch carries the base. Both
+    # refs are what `git clone` writes: the branch is the snapshot, and
+    # `refs/remotes/origin/HEAD` is what says the remote calls that branch its
+    # default. Without them the state cannot be told from a finished branch
+    # nobody published, and `nothing_left_to_publish` answers False on that
+    # doubt.
     _git(repo, "update-ref", "refs/remotes/origin/main", "main")
+    _git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
     _git(repo, "switch", "-q", "-c", "feature")
     _git(repo, "remote", "add", "origin", "git@github.com:example/project.git")
 

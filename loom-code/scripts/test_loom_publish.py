@@ -1916,10 +1916,15 @@ def test_hook_body_refusal_is_one_block_line_per_failure(
         assert line.startswith("BLOCK "), f"stderr line is not a BLOCK line: {line!r}"
 
 
-def branch_whose_base_already_attests(tmp_path: Path, monkeypatch) -> Path:
+def branch_whose_base_already_attests(
+    tmp_path: Path, monkeypatch, *, trunk: str = "main"
+) -> Path:
     """A branch off a base that already carries a generated attestation, adding
     nothing of its own -- the shape where closing review regenerates the bytes
-    the base already holds and the attestation count never leaves zero."""
+    the base already holds and the attestation count never leaves zero.
+
+    `trunk` names the branch the remote calls its default, which is not always
+    `main` and is never this checker's to assume."""
     repo = tmp_path / "landed-repo"
     repo.mkdir()
     git(repo, "init", "-q", "-b", "main")
@@ -1929,10 +1934,14 @@ def branch_whose_base_already_attests(tmp_path: Path, monkeypatch) -> Path:
     attestation(repo, "2026-09-18-already-landed")
     git(repo, "add", ".")
     git(repo, "commit", "-q", "-m", "landed change")
-    # The change landed, so the published trunk carries it. Without this ref the
-    # repository cannot tell this branch from the finished-but-unpublished one
-    # below, and `nothing_left_to_publish` answers False on that doubt.
-    git(repo, "update-ref", "refs/remotes/origin/main", "main")
+    # The change landed, so the remote's default branch carries it. Both refs
+    # are what `git clone` writes, and both are needed: the branch is the
+    # snapshot, and `refs/remotes/origin/HEAD` is what says the remote calls
+    # that branch its default. Without them the repository cannot tell this
+    # branch from the finished-but-unpublished one below, and
+    # `nothing_left_to_publish` answers False on that doubt.
+    git(repo, "update-ref", f"refs/remotes/origin/{trunk}", "main")
+    git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", f"refs/remotes/origin/{trunk}")
     git(repo, "switch", "-q", "-c", "feature")
     git(repo, "remote", "add", "origin", "git@github.com:example/project.git")
     monkeypatch.setattr(push_handler, "validate_attestation", lambda *_a, **_k: [])
@@ -1981,6 +1990,26 @@ def test_a_branch_that_adds_work_still_gets_the_two_routes(
     assert rc == 2
     assert "two legal routes" in reason
     assert "run the closing-review station" in reason
+
+
+def test_a_landed_branch_is_recognised_on_a_trunk_not_called_main(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The same landed state on a remote whose default branch is `trunk`.
+
+    Which branch a remote calls its default is the remote's to say, and git
+    records the answer in `refs/remotes/origin/HEAD`. A checker that recognised
+    a landed change only under two names it carries in a list would send every
+    repository outside that list back into the loop the tail exists to end, and
+    a third name added to the list is the same defect one repository later."""
+    repo = branch_whose_base_already_attests(tmp_path, monkeypatch, trunk="trunk")
+
+    rc, err = run_push_hook(monkeypatch, repo, "git push origin feature")
+
+    reason = err.splitlines()[0]
+    assert rc == 2
+    assert "this branch adds nothing" in reason
+    assert "two legal routes" not in reason
 
 
 def branch_finished_but_never_published(tmp_path: Path, monkeypatch) -> Path:
