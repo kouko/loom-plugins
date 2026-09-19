@@ -8,18 +8,18 @@ denial — the split wrote a routing section, and that section states rules.
 
 The pre-split document is
 `loom-code/skills/closing-review/references/adversarial.md`, read
-at commit `5b8dfdce727792a338f4c7778d1d0c1b55295b23`. Anyone can reproduce
+at commit `a1891ed1101fa19f219f397b37019736180597a8`. Anyone can reproduce
 the left-hand column with:
 
 ```
-git show 5b8dfdce727792a338f4c7778d1d0c1b55295b23:loom-code/skills/closing-review/references/adversarial.md
+git show a1891ed1101fa19f219f397b37019736180597a8:loom-code/skills/closing-review/references/adversarial.md
 ```
 
 and diff it against the four files named in the right-hand column as the
-split wrote them, read at split commit `50cf9f8b603fa77cb5934b9a1dcc6b73cf275ad6`:
+split wrote them, read at split commit `9bf87029d531157a4ef9c5034ff8d8c3104c498d`:
 
 ```
-git show 50cf9f8b603fa77cb5934b9a1dcc6b73cf275ad6:loom-code/skills/closing-review/references/adversarial-code.md
+git show 9bf87029d531157a4ef9c5034ff8d8c3104c498d:loom-code/skills/closing-review/references/adversarial-code.md
 ```
 
 The split moved whole `##` sections; no sentence was reworded, reordered,
