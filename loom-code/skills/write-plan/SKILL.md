@@ -304,8 +304,8 @@ Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 declared dependencies, and positive plus negative/boundary cases. Split
 unrelated behaviour; keep scenario detail in the spec and never size by time.
 
-A task that removes or materially rewrites a function, recognizer, or rule
-that already has tests names the existing test file on its Risk line and
+A task that removes or materially rewrites a function, module, recognizer, or
+rule that already has tests names the existing test file on its Risk line and
 states whether the change preserves, widens, or narrows what those tests
 cover — not just that "tests pass" once the change is made. "Tests pass" is
 also true of a change that quietly drops the one case those tests existed to

@@ -99,16 +99,13 @@ the caller owns the body schema and publication consent. For Loom, contribute
 earned rationale inside Ship's contextual sections; never add `## Memory`, a
 second footer contract, or another confirmation.
 
-**For Loom, a durable `docs/loom/memory/` entry must land before
-`closing-review`'s `finalize-review` generates the attestation for that
-change, never after.** The attestation binds a `content_digest` computed over
-the committed tree; a memory file (and its index entry) committed afterward
-is itself functional content, so it changes that digest and invalidates the
-attestation the branch already has — a push then fails on the mismatch, or
-the addition has to be reverted to keep the digest the reviewers actually
-read. Fold the memory entry into whichever fix round is still open, before
-`finalize-review` runs; a lesson that surfaces only after it has run rides
-the next change's branch instead of reopening this one.
+**For Loom, land a durable `docs/loom/memory/` entry before
+`closing-review`'s `finalize-review` generates the attestation, never after**
+— `loom-code:closing-review`'s own SKILL.md states why (a recorded lesson is
+functional content, so it must ride the fix round already in flight). The
+symptom if this is missed: the attestation's `content_digest` no longer
+matches the committed tree, and the next push fails on that mismatch, or the
+entry has to be reverted to recover the digest the reviewers actually read.
 
 For a non-Loom caller without an owning schema, both generic carriers are
 used:

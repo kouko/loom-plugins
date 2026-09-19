@@ -261,6 +261,90 @@ def test_reviewer_floor_stays_two_for_malformed_json(tmp_path: Path) -> None:
     assert reviewers.required_reviewer_count(repo, CHANGE) == 2
 
 
+def test_reviewer_floor_stays_two_when_a_bool_or_int_field_flips(tmp_path: Path) -> None:
+    # Python's `==` treats 0/False and 1/True as equal, so a raw dict compare
+    # would let a real behaviour flag flip ride alongside a version bump.
+    repo = repo_with_content(tmp_path)
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "9.9.0", "strict": 0}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "manifest")
+    git(repo, "switch", "-q", "-c", "feature")
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "9.9.1", "strict": False}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "bump version and flip strict from 0 to false")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
+def test_reviewer_floor_stays_two_when_an_int_field_becomes_a_float(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "9.9.0", "retries": 3}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "manifest")
+    git(repo, "switch", "-q", "-c", "feature")
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "9.9.1", "retries": 3.0}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "bump version and retype retries as a float")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
+def test_reviewer_floor_stays_two_when_version_itself_changes_shape(tmp_path: Path) -> None:
+    # The version value is popped unread; if it stops being a scalar the
+    # exemption should not fire, since nothing checked what replaced it.
+    repo = repo_with_content(tmp_path)
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "9.9.0"}) + "\n", encoding="utf-8"
+    )
+    commit(repo, "manifest")
+    git(repo, "switch", "-q", "-c", "feature")
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": {"major": 9, "hooks": "x.sh"}}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "replace the version scalar with an object")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
+def test_reviewer_floor_stays_two_for_a_duplicate_key_hidden_by_a_version_bump(
+    tmp_path: Path,
+) -> None:
+    # json.loads keeps the LAST of a duplicate key; a diff a human reviewer
+    # would see (a repeated key) must not silently disappear once parsed.
+    repo = repo_with_content(tmp_path)
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "9.9.0", "entry": "safe.js"}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "manifest")
+    git(repo, "switch", "-q", "-c", "feature")
+    manifest_path.write_text(
+        '{"name": "loom-code", "version": "9.9.1", "entry": "evil.js", '
+        '"entry": "safe.js"}\n',
+        encoding="utf-8",
+    )
+    commit(repo, "bump version and hide a duplicate key behind it")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
 def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
 
