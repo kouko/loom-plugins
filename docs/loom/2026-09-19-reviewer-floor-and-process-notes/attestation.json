@@ -1,0 +1,41 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-19-reviewer-floor-and-process-notes",
+  "content_digest": "6a5d4bf3b9026dd48dd76d96dee8fd4f011a5f58",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_reviewer_floor_json.py -q -p no:cacheprovider",
+      "artifact": "loom-code/scripts/test_adversarial_reviewer_floor_json.py",
+      "result": "pass",
+      "command_digest": "61bf4ece9ff8244bb92251344b5b8022eeeb66b43db4b7c76f19cc8b01ee2fc6"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "rf-reviewer-a",
+      "vendor": "anthropic",
+      "model": "claude-sonnet-5",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": []
+    },
+    {
+      "reviewer": "rf-reviewer-b",
+      "vendor": "anthropic",
+      "model": "claude-sonnet-5",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
