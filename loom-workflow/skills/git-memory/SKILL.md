@@ -97,8 +97,21 @@ minimum useful trailers.
 Before `gh pr create`, read `protocols/compose-pr.md`. For a memory-worthy PR,
 the caller owns the body schema and publication consent. For Loom, contribute
 earned rationale inside Ship's contextual sections; never add `## Memory`, a
-second footer contract, or another confirmation. For a non-Loom caller without
-an owning schema, both generic carriers are used:
+second footer contract, or another confirmation.
+
+**For Loom, a durable `docs/loom/memory/` entry must land before
+`closing-review`'s `finalize-review` generates the attestation for that
+change, never after.** The attestation binds a `content_digest` computed over
+the committed tree; a memory file (and its index entry) committed afterward
+is itself functional content, so it changes that digest and invalidates the
+attestation the branch already has — a push then fails on the mismatch, or
+the addition has to be reverted to keep the digest the reviewers actually
+read. Fold the memory entry into whichever fix round is still open, before
+`finalize-review` runs; a lesson that surfaces only after it has run rides
+the next change's branch instead of reopening this one.
+
+For a non-Loom caller without an owning schema, both generic carriers are
+used:
 
 1. a rendered `## Memory` section after the standard test-plan content and
    before the generated-attribution footer; and
