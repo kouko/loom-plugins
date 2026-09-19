@@ -24,7 +24,8 @@ The five parts, from Acceptance 10:
   again in a recipe;
 - `kind-rule-in-protocol`: the protocol holds no rule belonging to a single
   kind -- neither by a kind's rules leaving the kind's own file, nor by the
-  protocol addressing one routed artifact type by name.
+  protocol addressing one routed artifact type by name, in the routing
+  table's backticks or in plain prose.
 
 What this module deliberately does not do is pin how any recipe words
 anything. Each recipe's own test file pins its sentences (Acceptance 6);
@@ -34,13 +35,27 @@ part being present and correctly owned, and the set of recipes is read from
 the routing table, never hand-listed, so a kind added or retired later is
 covered without editing this file.
 
-Two bounds worth stating, because a reader should know what this check does
+Three bounds worth stating, because a reader should know what this check does
 not see. Duplication is a symmetric observable: a sentence living in both
 the protocol and a recipe is reported as `protocol-rule-in-recipe`
 whichever file it was copied from, because nothing in the tree says which
-copy came first. And a rule that leaves its recipe is seen when the kind's
+copy came first. A rule that leaves its recipe is seen when the kind's
 section stops stating any rule, not when one sentence of several is moved
 out; the granularity of ownership the tree itself defines is the section.
+
+And a rule for one kind is seen in the protocol only where it names that
+kind as a type: the routed name in backticks, heading a generic noun phrase
+(`for a code artifact`, `of any spec`, `is a skill`), or standing as a bare
+complement (`when the artifact is code`). Three ways of naming a kind go
+through. A definite reference does -- `the code artifact gets two runs` --
+because the protocol legitimately writes `needs the code changed to fail`
+and a check that rejected the definite article could not be satisfied. A
+hyphenated compound does -- `a spec-shaped probe gets two runs` -- for the
+same reason, that a compound names a shape more often than the type. And a
+rule that never writes the routed name at all goes through however it is
+phrased, whether by synonym or by description (`anything under
+loom-code/scripts/`); no check on the prose can close that one, and the
+recipe-side parts of the shape are what stand behind it.
 """
 from __future__ import annotations
 
@@ -74,6 +89,15 @@ KIND_RULE_IN_PROTOCOL = "kind-rule-in-protocol"
 # a shared "Three is the floor." would be a coincidence, not a copied rule.
 MIN_RULE = 40
 
+# The determiners that make a noun phrase generic: "a code artifact" is a rule
+# about every artifact of that type, where "the code artifact" is one artifact
+# the sentence around it already picked out. That difference is what keeps the
+# protocol's own "needs the code changed to fail" readable prose rather than a
+# violation, and it is grammar, not wording: no phrase any recipe or the
+# protocol uses is pinned here.
+_GENERIC = "a|an|any|every|each"
+_COPULA = "is|are|was|were"
+
 _LINK = re.compile(r"\[[^\]]*\]\((?P<target>[^)#][^)]*)\)")
 _HEADING = re.compile(r"^#{1,6} .*$", re.M)
 _TABLE_ROW = re.compile(r"^\s*\|.*\|\s*$", re.M)
@@ -106,6 +130,34 @@ def _prose(text: str) -> str:
 def _rules(text: str) -> list[str]:
     """The sentences of `text` long enough to be a rule of their own."""
     return [s for s in split_sentences(_prose(text)) if len(s) >= MIN_RULE]
+
+
+def _addressed_as_a_type(kind: str) -> re.Pattern[str]:
+    """Where a sentence names `kind` as the artifact type a rule applies to.
+
+    Three positions, all of them structural: the type name in backticks, the
+    way the routing table writes it; the type name heading a generic noun
+    phrase (`for a code artifact`, `of any spec`, `is a skill`); and the type
+    name as a bare complement (`when the artifact is code`). A hyphen after
+    the name is excluded, because `a spec-shaped probe` names a shape and not
+    the type.
+    """
+    name = re.escape(kind)
+    return re.compile(
+        rf"`{name}`"
+        rf"|\b(?:{_GENERIC})\s+{name}\b(?!-)"
+        rf"|\b(?:{_COPULA})\s+{name}\b(?!-)",
+        re.IGNORECASE,
+    )
+
+
+def _addressing_sentence(text: str, kind: str) -> str | None:
+    """The first sentence of `text` that addresses `kind` as a type, if any."""
+    pattern = _addressed_as_a_type(kind)
+    for sentence in split_sentences(text):
+        if pattern.search(sentence):
+            return sentence
+    return None
 
 
 def _sections(text: str) -> dict[str, str]:
@@ -233,12 +285,14 @@ def shape_violations(folder: Path) -> list[Violation]:
                     )
 
     for kind in sorted({k for kinds in routed.values() for k in kinds}):
-        if f"`{kind}`" in protocol_text:
+        sentence = _addressing_sentence(protocol_text, kind)
+        if sentence is not None:
             found.append(
                 Violation(
                     KIND_RULE_IN_PROTOCOL,
                     PROTOCOL_NAME,
-                    f"it addresses the routed artifact type `{kind}` outside the routing table",
+                    f"it addresses the routed artifact type {kind} outside the "
+                    f"routing table: {sentence}",
                 )
             )
     return found
@@ -462,3 +516,57 @@ def test_protocol_addressing_one_routed_kind_is_rejected(tmp_path: Path) -> None
         encoding="utf-8",
     )
     assert _parts(folder) == {KIND_RULE_IN_PROTOCOL}
+
+
+# The same rule, written the way a writer writes prose rather than the way the
+# routing table writes a type. The first three are the wordings the adversary
+# of this change planted in the protocol and watched go through; the last two
+# are this module's own, one naming the kind mid-sentence and one naming it
+# with no article at all.
+_PLAIN_KIND_RULES = (
+    "For a {kind} artifact, run every attempt a second time before recording it.",
+    "When the changed path is a {kind}, run every attempt a second time.",
+    "A {kind} change gets every attempt run a second time before it is recorded.",
+    "The second run is asked of any {kind} artifact before its attempt is recorded.",
+    "When the changed artifact is {kind}, run every attempt a second time.",
+)
+
+# Sentences that name a routed type and state no rule about it: the type is
+# mentioned as the thing at hand, not as the class a rule applies to. The
+# protocol must stay writable in this register, so each of these is accepted.
+_PLAIN_MENTIONS = (
+    "Nothing the adversary writes replaces reading the {kind} the change touched.",
+    "The reviewer who read the {kind} is never the reviewer who wrote it.",
+    "A reader of the {kind} reads this shared protocol before any recipe of it.",
+)
+
+
+def _routed_kind(folder: Path) -> str:
+    """One routed artifact type, read from the table rather than named here."""
+    kinds = sorted({k for kinds in routed_kinds(folder).values() for k in kinds})
+    assert kinds, folder
+    return kinds[0]
+
+
+def test_kind_rule_in_plain_prose_in_the_protocol_is_rejected(tmp_path: Path) -> None:
+    """recipe-missing-part-of-shape-rejected: the same rule for one routed kind,
+    written in ordinary prose instead of the routing table's backticks."""
+    kind = _routed_kind(REFERENCES)
+    for index, wording in enumerate(_PLAIN_KIND_RULES):
+        folder = _copy(tmp_path / f"plain-{index}")
+        protocol = folder / PROTOCOL_NAME
+        sentence = wording.format(kind=kind)
+        protocol.write_text(_read(protocol) + f"\n{sentence}\n", encoding="utf-8")
+        assert _parts(folder) == {KIND_RULE_IN_PROTOCOL}, sentence
+
+
+def test_protocol_naming_a_kind_without_ruling_on_it_is_accepted(tmp_path: Path) -> None:
+    """The other side of the same part: naming a routed type is not by itself a
+    rule about it, and a check that rejected these could not be satisfied."""
+    kind = _routed_kind(REFERENCES)
+    for index, wording in enumerate(_PLAIN_MENTIONS):
+        folder = _copy(tmp_path / f"mention-{index}")
+        protocol = folder / PROTOCOL_NAME
+        sentence = wording.format(kind=kind)
+        protocol.write_text(_read(protocol) + f"\n{sentence}\n", encoding="utf-8")
+        assert shape_violations(folder) == [], sentence
