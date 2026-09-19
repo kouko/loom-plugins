@@ -304,6 +304,19 @@ Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 declared dependencies, and positive plus negative/boundary cases. Split
 unrelated behaviour; keep scenario detail in the spec and never size by time.
 
+A task that removes or materially rewrites a function, module, recognizer, or
+rule that already has tests names the existing test file on its Risk line and
+states whether the change preserves, widens, or narrows what those tests
+cover — not just that "tests pass" once the change is made. "Tests pass" is
+also true of a change that quietly drops the one case those tests existed to
+catch; read the current tests as the coverage spec before touching the code
+they protect, and treat any case they exercise today as a fact the new
+version must still hold, not a suggestion. The Risk line keeps its 40-word
+cap; when the coverage statement does not fit alongside the rest of the
+task's rationale, that is the existing "task's rationale exceeds its Risk
+line" case (`contract/manifest.yaml`'s spec charter), and the coverage claim
+moves to the minimal spec that case already writes, not past the cap.
+
 **Shape.**
 
 - Group tasks into **waves** as dependency and integration boundaries. Waves
