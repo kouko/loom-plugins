@@ -38,8 +38,20 @@ SHELL_PROGRAMS = {"bash", "sh", "zsh", "dash"}
 
 
 # Words a shell reads as grammar rather than as the command word, so that the
-# heredoc owned by `if …; then bash <<EOF` is still owned by `bash`.
+# heredoc owned by `if …; then bash <<EOF` is still owned by `bash`, and so that
+# merge recognition reads `if …; then gh pr merge` as the merge it runs.
 HEREDOC_GRAMMAR_WORDS = {"!", "then", "else", "elif", "do"}
+
+
+# Every option a `PREFIX_WORDS` wrapper spends a separate token on before the
+# program it runs, read from the wrappers' own manuals: sudo -u/-g/-C,
+# xargs -n/-L/-I/-P/-d/-s/-a, nice -n, exec -a, env's own set below. An option
+# carrying its value in one token (`-n1`) spends one and needs no entry.
+WRAPPER_VALUE_OPTIONS = ENV_VALUE_OPTIONS | {
+    "-g", "--group", "--user", "-n", "--max-args", "-L", "--max-lines",
+    "-I", "--replace", "-P", "--max-procs", "-d", "--delimiter",
+    "-s", "--max-chars", "-a", "--arg-file",
+}
 
 
 # Every character that ends a heredoc delimiter word, as a shell ends one.
@@ -275,6 +287,34 @@ def _strip_prefix(tokens: list[str]) -> list[str]:
     return tokens[index:]
 
 
+def _strip_merge_prefix(tokens: list[str]) -> list[str]:
+    """`_strip_prefix` widened by the shell grammar and the wrapper options a
+    merge can sit behind: `if …; then`, `( … )`, `{ …; }`, `sudo -u bob`,
+    `xargs -n1`.
+
+    Merge recognition alone gets this. The push recognisers keep the narrower
+    `_strip_prefix`, because a wrapped push they do not see today still runs
+    today: seeing it would send it to the canonical-form check that refuses it,
+    turning a command that runs into a blocked one."""
+    index = 0
+    while index < len(tokens):
+        token = tokens[index].lstrip("({")
+        if not token or ASSIGNMENT.match(token):
+            index += 1
+            continue
+        word = _program(token)
+        if word in HEREDOC_GRAMMAR_WORDS:
+            index += 1
+            continue
+        if word not in PREFIX_WORDS:
+            return [token, *tokens[index + 1:]]
+        index += 1
+        while index < len(tokens) and tokens[index].startswith("-"):
+            option = tokens[index]
+            index += 2 if option in WRAPPER_VALUE_OPTIONS else 1
+    return []
+
+
 def _subcommand_at(tokens: list[str], value_options: set[str]) -> tuple[int, str] | None:
     """The position and value of the first non-option, non-value word."""
     index = 0
@@ -339,17 +379,39 @@ def is_pr_create_command(command: str) -> bool:
     return False
 
 
+def _merge_word(token: str | None) -> str:
+    """A gh subcommand word as the shell hands it over, case-folded.
+
+    `shlex` knows nothing of ANSI-C (`$'merge'`) or locale (`$"merge"`)
+    quoting: it removes the quotes and leaves `$merge`, where the shell passes
+    `merge`. A leading `$` is therefore dropped. That also reads a genuine
+    expansion (`$merge`) as the word, which is the fail-closed direction: the
+    token stands in the subcommand position of `gh pr`, so what it expands to
+    cannot be resolved here and the refusal is the safe answer.
+
+    Case-folded because a case-insensitive filesystem runs `GH` as `gh`, and
+    gh matches its own subcommands case-insensitively."""
+    if token is None:
+        return ""
+    return token.lstrip("$").strip("'\"").lower()
+
+
 def is_pr_merge_command(command: str) -> bool:
-    """True when a shell segment merges a PR."""
-    for segment in _shell_segments(command):
-        tokens = _strip_prefix(_tokenise(segment))
+    """True when a shell segment merges a PR, whatever shell grammar or wrapper
+    options stand in front of it.
+
+    Backslash-continuations are joined first: the shell joins them before it
+    reads a command word, so `gh pr \\<newline>merge 7` is one command, while
+    `_shell_segments` splits on the raw newline and would read two."""
+    for segment in _shell_segments(command.replace("\\\n", "")):
+        tokens = _strip_merge_prefix(_tokenise(segment))
         if not tokens or _program(tokens[0]) != "gh":
             continue
         rest = tokens[1:]
         found = _subcommand_at(rest, GH_VALUE_OPTIONS)
-        if found and found[1] == "pr":
+        if found and _merge_word(found[1]) == "pr":
             after = rest[found[0] + 1:]
-            if _subcommand(after, GH_VALUE_OPTIONS) == "merge":
+            if _merge_word(_subcommand(after, GH_VALUE_OPTIONS)) == "merge":
                 return True
     return False
 

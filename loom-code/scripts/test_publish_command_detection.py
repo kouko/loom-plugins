@@ -132,3 +132,46 @@ def test_an_unlocatable_terminator_judges_the_unstripped_text() -> None:
     command = "cat <<'EOF' > notes.md\ngit push origin HEAD\n"
 
     assert loom_checker.is_push_command(command)
+
+
+# The text rule this replaced matched three words anywhere in the command text.
+# Built by concatenation so this file's own source carries no command such a
+# rule would have matched -- which is the defect these tests pin.
+MERGE = "gh" + " pr merge"
+
+
+WRAPPED_MERGES = [
+    "if true; then " + MERGE + " 1; fi",
+    "( " + MERGE + " 1 )",
+    "{ " + MERGE + " 1; }",
+    "sudo -u bob " + MERGE + " 1",
+    "echo 1 | xargs -n1 " + MERGE,
+]
+
+
+MERGE_MENTIONS = [
+    "echo 'run " + MERGE + " --squash when ready'",
+    "rg -n '" + MERGE + "' docs/",
+    "git commit -m 'docs: explain " + MERGE + " --squash'",
+    "man gh | grep -A2 'pr merge'",
+    "cat > notes.md <<'EOF'\nTo land it run " + MERGE + " --squash\nEOF\n",
+]
+
+
+def test_a_wrapped_merge_is_recognised_structurally() -> None:
+    # Only the removed text rule caught these shapes; the parse now does, so
+    # dropping it costs no coverage of a merge that actually runs.
+    for command in WRAPPED_MERGES:
+        assert loom_checker.is_pr_merge_command(command), command
+
+
+def test_text_naming_a_merge_is_not_a_merge_command() -> None:
+    # A search, a printed string, a commit message and a document written
+    # through a heredoc name the words without running one.
+    for command in MERGE_MENTIONS:
+        assert not loom_checker.is_pr_merge_command(command), command
+
+
+def test_a_plain_merge_is_still_recognised() -> None:
+    for command in (MERGE + " 12", MERGE + " 12 --squash", "time " + MERGE + " 1"):
+        assert loom_checker.is_pr_merge_command(command), command

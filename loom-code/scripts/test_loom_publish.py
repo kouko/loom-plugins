@@ -1829,9 +1829,9 @@ def test_body_read_still_returns_a_regular_file(tmp_path: Path) -> None:
 BLOCKED_PUSH_MATRIX = [
     ("git status", 0, 0),
     ("ls -la", 0, 0),
-    # The hand-typed merge text rule fails closed: a command that merely
-    # mentions the merge words is refused too (changed deliberately, W1-01).
-    ("rg -n \"SEGMENT_SPLIT|publisher&&gh pr create|gh pr merge\" loom-code -g '*.py'", 2, 2),
+    # Searching for the merge words is not merging. The rule was a text match
+    # over the whole command and refused this; recognition is structural now.
+    ("rg -n \"SEGMENT_SPLIT|publisher&&gh pr create|gh pr merge\" loom-code -g '*.py'", 0, 0),
     ("rg -n \"SEGMENT_SPLIT|publisher&&gh pr create\" loom-code -g '*.py'", 0, 0),
     ("printf '%s\\n' '$(git push origin HEAD)'", 0, 0),
     ("git push origin HEAD", 2, 2),

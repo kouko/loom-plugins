@@ -376,44 +376,23 @@ def pr_create_body_failure(command: str) -> str | None:
     return " ".join(failure.split("\n")) if failure else None
 
 
-# Word separators for the merge text rule: whitespace, quotes and shell
-# punctuation, so `(gh`, `'gh'`, `{ gh` and `then gh` all yield the word `gh`;
-# `$` separates too, so ANSI-C `$'merge'` and locale `$"merge"` yield `merge`.
-MERGE_TEXT_WORD = re.compile(r"[^\s'\"`;|&(){}<>!$]+")
-
-
-def mentions_pr_merge(command: str) -> bool:
-    """Fail-closed text rule: after joining backslash-newlines, a word `gh`
-    (or a path ending in `/gh`) followed later by the consecutive words `pr`
-    `merge`, case-insensitively, anywhere in the command text.
-
-    It ignores wrappers, options and shell grammar, so `sudo -u x`, `bash -lc`,
-    `( … )`, `if … then` and `xargs -n1` cannot hide a merge. Ceiling: it also
-    refuses commands that merely mention the words (`echo gh pr merge`, a
-    search pattern, a commit message) — accepted, because `land` is the only
-    merge path and a false refusal costs a rewording. It does not see a merge
-    assembled at run time (`printf`, variables, `gh api …/merge`)."""
-    words = [
-        word.lower()
-        for word in MERGE_TEXT_WORD.findall(command.replace("\\\n", ""))
-    ]
-    for index, word in enumerate(words):
-        if word != "gh" and not word.endswith("/gh"):
-            continue
-        tail = words[index + 1:]
-        if any(
-            tail[i] == "pr" and tail[i + 1] == "merge"
-            for i in range(len(tail) - 1)
-        ):
-            return True
-    return False
-
-
 def contains_pr_merge(command: str) -> bool:
-    """True when the fail-closed text rule matches, or a segment merges a PR
-    directly or inside the `eval` and `<shell> -c` forms `is_push_command`
-    unwraps."""
-    if mentions_pr_merge(command) or is_pr_merge_command(command):
+    """True when a segment merges a PR, directly or inside the `eval` and
+    `<shell> -c` forms `is_push_command` unwraps.
+
+    Recognition is structural: `is_pr_merge_command` reads the command word
+    through `_strip_merge_prefix`, so shell grammar (`if … then`, `( … )`,
+    `{ …; }`) and a wrapper spending its own option tokens (`sudo -u <user>`,
+    `xargs -n1`) cannot hide a merge behind it.
+
+    The fail-closed text rule this replaced matched the words `gh`, `pr` and
+    `merge` anywhere in the command text. It refused a search for them, a
+    string printed to stdout, a document written through a heredoc and a commit
+    message describing a merge -- while still missing the merge assembled at
+    run time (`gh api …/merge`), which it could never see. A text rule earns
+    its false positives only by catching what a parse cannot, and this one
+    caught nothing a parse does not."""
+    if is_pr_merge_command(command):
         return True
     for segment in _shell_segments(command):
         tokens = _strip_prefix(_tokenise(segment))
@@ -422,11 +401,30 @@ def contains_pr_merge(command: str) -> bool:
         program = _program(tokens[0])
         if program == "eval" and contains_pr_merge(" ".join(tokens[1:])):
             return True
-        if program in SHELL_PROGRAMS and "-c" in tokens[1:]:
-            index = tokens.index("-c")
-            if index + 1 < len(tokens) and contains_pr_merge(tokens[index + 1]):
+        if program in SHELL_PROGRAMS:
+            index = _shell_c_argument(tokens)
+            if index is not None and contains_pr_merge(tokens[index]):
                 return True
     return False
+
+
+def _shell_c_argument(tokens: list[str]) -> int | None:
+    """Index of the script a `<shell> … -c <script>` runs, or None.
+
+    A shell bundles its short options, so the flag is `-lc`, `-ec` or `-euxc`
+    as often as a bare `-c`; matching only `-c` reads `bash -lc '<merge>'` as
+    carrying no script at all. Every option before it is a flag rather than one
+    taking a value, so the script is simply the token after the first bundle
+    whose last letter is `c`."""
+    for index, token in enumerate(tokens[1:], start=1):
+        if (
+            token.startswith("-")
+            and not token.startswith("--")
+            and token.endswith("c")
+            and len(token) > 1
+        ):
+            return index + 1 if index + 1 < len(tokens) else None
+    return None
 
 
 def attestation_reason(command: str, cwd: str, rest: list[str]) -> str:

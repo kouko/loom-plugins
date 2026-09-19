@@ -108,11 +108,10 @@ def test_hook_blocks_every_merge_form_with_push_merge(
     "gh \\\npr merge 7",
     "'gh' 'pr' 'merge' 7",
     "/opt/homebrew/bin/GH -R o/r PR Merge 7",
-    "echo gh pr merge",
     "gh pr $'merge' 5",
     'gh pr $"merge" 5',
 ])
-def test_hook_text_rule_blocks_hand_typed_merge_forms(
+def test_hook_blocks_hand_typed_merge_forms(
     tmp_path: Path, monkeypatch, command: str,
 ) -> None:
     rc, err, called = _merge_hook(tmp_path, monkeypatch, command)
@@ -127,8 +126,17 @@ def test_hook_text_rule_blocks_hand_typed_merge_forms(
     "gh pr list --search merge",
     "git merge main",
     "ghx pr merge 7",
+    # Naming a merge is not running one. The rule used to be a text match over
+    # the whole command, so each of these was refused: a printed string, a
+    # search for the words, a commit message describing one, and a document
+    # written through a heredoc. Recognition is structural now, so they run.
+    "echo gh pr merge",
+    'rg -n "SEGMENT_SPLIT|publisher&&gh pr create|gh pr merge" loom-code -g \'*.py\'',
+    "git commit -m 'docs: explain gh pr merge --squash'",
+    "man gh | grep -A2 'pr merge'",
+    "cat > notes.md <<'EOF'\nTo land it run gh pr merge --squash\nEOF\n",
 ])
-def test_hook_text_rule_leaves_other_commands_alone(
+def test_hook_leaves_commands_that_only_name_a_merge_alone(
     tmp_path: Path, monkeypatch, command: str,
 ) -> None:
     _rc, err, _called = _merge_hook(tmp_path, monkeypatch, command)
