@@ -93,6 +93,16 @@ suite and re-run the existing adversarial programs. After a fix where every
 adversarial program still passes, or fails only for a product defect, do not
 dispatch the adversary again.
 
+Build enters these end-of-Build checks on absence as well as after a fix: when
+Build is entered with every planned task already committed and an item Build
+owes is absent, it runs this section from step 1 to produce that item. Absence
+is a distinct antecedent from a failing check; an item that exists and fails is
+a failure and is fixed as above. Read `loom-code/contract/manifest.yaml`
+(`stations[].produces` and `actions[].owner`) to decide whether an absent item
+is Build's to produce; this file keeps no second copy of that mapping. Absence
+dispatches the adversary only when no adversarial program is committed;
+committed programs are re-run, never re-dispatched, exactly as after a fix.
+
 Build dispatches the `loom-code:adversary` agent fresh-context again to update
 its own programs when a fix widens or changes what the change covers, or trunk
 content brought in by a trunk sync changes it, and a committed adversarial
