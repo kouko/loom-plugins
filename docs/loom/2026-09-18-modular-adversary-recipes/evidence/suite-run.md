@@ -63,15 +63,33 @@ The 44 supersede the 30 of the second run: the second program grew cases after
 that run, and the first was rewritten to attack the claim without deselecting
 a case or picking an easy kind.
 
-The ten modules that read the protocol, the recipes and the conventions ran
-`317 passed` in one invocation, where the second run recorded
-`260 passed, 1 skipped`. The skip is gone: it belonged to a parametrized case
-over an empty debt list, and the list and the case were deleted in this round.
+The ten modules that read the protocol, the recipes and the conventions are the
+ones this invocation names, and it is what their count is recomputed from:
+
+```
+python3 -m pytest -q \
+  loom-code/scripts/test_adversary_layout.py \
+  loom-code/scripts/test_adversary_protocol.py \
+  loom-code/scripts/test_adversary_recipe_code.py \
+  loom-code/scripts/test_adversary_recipe_shape.py \
+  loom-code/scripts/test_adversary_recipe_skill_gate.py \
+  loom-code/scripts/test_adversary_recipe_spec.py \
+  loom-code/scripts/test_adversary_routing.py \
+  loom-code/scripts/test_module_criteria_text.py \
+  loom-code/scripts/test_build_mechanical_checks.py \
+  loom-code/scripts/test_prose_pin_rule_text.py
+```
+
+It runs `292 passed`, where the second run recorded `260 passed, 1 skipped`.
+The skip is gone: it belonged to a parametrized case over an empty debt list,
+and the list and the case were deleted in this round. The `317 passed` this
+paragraph carried before named no module and no command; the figure above
+replaces it because this command is the one that produces it.
 
 ## Documents under check
 
 Each recipe and the shared protocol are read by their own test module, and the
 checks that recompute the four module criteria are named in
 `loom-code/scripts/test_module_criteria_text.py`. The ten modules that read
-these documents ran 260 passed, 1 skipped at the second run above, and
-317 passed at the third.
+these documents are the ones the invocation above names; they ran 260 passed,
+1 skipped at the second run above, and 292 passed at the third.

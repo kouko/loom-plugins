@@ -165,7 +165,6 @@ ENFORCED_BY = {
             "test_each_kind_section_lives_in_its_own_file",
             "test_no_kind_rule_appears_outside_its_own_file",
         ),
-        "test_adversary_protocol.py": ("test_procedure_sentence_in_both_files_rejected",),
     },
 }
 

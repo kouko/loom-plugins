@@ -265,7 +265,7 @@ def test_adversary_mutation_undo_uses_no_discard_command() -> None:
     assert _pins_exact_sentence(ADVERSARIAL_REF, NO_DISCARD_UNDO), ADVERSARIAL_REF
 
 
-# --- A2 one home: a rule is stated in one file, and adversary.md repeats none ---
+# --- One home for the protocol's rules: adversary.md repeats none of them ---
 
 # Each fragment names one rule the protocol owns; it lives in this file and
 # nowhere in adversary.md.
