@@ -20,6 +20,11 @@ charter: 1.0
 - Test: A2 positive: RL-09; boundary: RL-10.
 - Risk: A prose-presence probe passes on wording that no agent follows. The blind run, not these probes, decides Acceptance 1, 2 and 5 behaviourally. agent-decided.
 
+**W0-04 Build with no task to implement still reaches its verification section**  after: W0-01  acceptance: 1
+- Files: loom-code/skills/build/SKILL.md, loom-code/skills/build/probes/test_recovery_rules.py
+- Test: A1 positive: RL-11; negative: RL-12.
+- Risk: The 2026-09-19 run exited at §2 with no task to implement and never reached §3, where W0-01 put the rule. Stating the entry condition later than the exit leaves the gap open. agent-decided.
+
 ## Questions asked
 1 — what — 這次要修的「卡死」範圍到哪裡？
 1 — what — 如果 agent 回頭補跑、但補跑本身也失敗了，你希望它怎麼做？
