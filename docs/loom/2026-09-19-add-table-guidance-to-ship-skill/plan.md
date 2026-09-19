@@ -13,9 +13,11 @@ charter: 1.0
 
 ### Wave 1
 
-**W1-01 Add table usage guidance to ship skill**  after: none  acceptance: 1
+**W1-01 Add table usage guidance to ship skill**  after: none  acceptance: 1,2,3
 - Files: loom-code/skills/ship/SKILL.md
 - Test: A1 positive: verify SKILL.md contains the new table guidance line; negative: line missing or incorrect.
+- Test: A2 positive: verify the line is placed after the publication template block in the Prepare publication text section; negative: line not after the template block.
+- Test: A3 positive: verify the guidance is visible when running the ship skill or reading the SKILL.md; negative: guidance not visible or incorrect.
 - Risk: agent-decided — guidance is internal to ship skill, no external skill dependency introduced.
 
 ## Questions asked

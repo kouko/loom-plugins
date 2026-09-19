@@ -29,4 +29,4 @@ Improves self-containment of the ship skill and reduces external skill reference
 - Modifying other Loom skills or workflows.
 
 ## Open questions
-- None
+- none
