@@ -6,12 +6,15 @@ from pathlib import Path
 import pytest
 
 from prose_pin import has_negation, split_sentences as _sentences
-# Sentences owned by the protocol file and by the code recipe are pinned in
-# those files' own test modules; the cross-document scans below read them
-# from there rather than keeping a second copy that could drift.
+# Sentences owned by the protocol file and by the recipes are pinned in those
+# files' own test modules; the cross-document scans below read them from there
+# rather than keeping a second copy that could drift. The protocol is named,
+# because it is the one file of the set that every kind shares; the recipes
+# are reached through `recipe_pins()`, which the routing table drives, so no
+# one kind's test module is named here and retiring a kind takes its pins out
+# of the scans instead of breaking this import.
 from test_adversary_protocol import NO_DISCARD_UNDO
-from test_adversary_recipe_code import RECIPE_PINS as CODE_RECIPE_PINS
-from test_adversary_routing import recipe_kind, routed_recipe_files
+from test_adversary_routing import recipe_kind, recipe_pins, routed_recipe_files
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -306,6 +309,10 @@ ADVERSARIAL_REF = _flat(REFERENCES / "adversarial.md")
 # here: a kind given a recipe is scanned without an edit to this file, and a
 # kind whose recipe is taken away leaves no path behind for the scans to open.
 ADVERSARIAL_RECIPE_PATHS = routed_recipe_files()
+# The rules those recipes pin in their own test modules, merged and looked up
+# by pin name. A scan below exempts a recipe's own pinned sentence from what
+# it flags; the exemption lives exactly as long as the recipe does.
+RECIPE_PINS = recipe_pins()
 PROBES_FIELD = re.compile(
     r"^probes: \[\{artifact: .+, status: reused \| modified \| new, reason: .+\}\]$", re.M
 )
@@ -434,12 +441,16 @@ def _discard_literals_outside_rule(text: str) -> list[str]:
     ]
 
 
+# The pinned rules a sentence about an implementer and the floor is allowed
+# to be. A name no routed recipe pins is simply not exempt, which makes the
+# scan stricter rather than blinder, so a kind's retirement cannot let an
+# added claim through.
 _FLOOR_PINS = ("ref-branch-tests-excluded-from-floor",)
 
 
 def _is_pinned_floor_sentence(sentence: str) -> bool:
-    return any(_affirms(sentence, *CODE_RECIPE_PINS[p][1:3], *CODE_RECIPE_PINS[p][3])
-               for p in _FLOOR_PINS)
+    return any(_affirms(sentence, *RECIPE_PINS[p][1:3], *RECIPE_PINS[p][3])
+               for p in _FLOOR_PINS if p in RECIPE_PINS)
 
 
 def _implementer_floor_sentences(text: str) -> list[str]:
@@ -474,11 +485,15 @@ def test_added_sentence_scans_synthetic() -> None:
     added = "Clean up with `git reset --hard` when the copy is dirty."
     assert _discard_literals_outside_rule(f"Undo it. {NO_DISCARD_UNDO}") == []
     assert _discard_literals_outside_rule(f"{NO_DISCARD_UNDO} {added}") == [added]
-    pin = CODE_RECIPE_PINS["ref-branch-tests-excluded-from-floor"][4]
     floor_claim = "An implementer's pin counts toward the floor."
-    assert _implementer_floor_sentences(pin) == []
-    assert _implementer_floor_sentences(f"{pin} {floor_claim}") == [floor_claim]
+    assert _implementer_floor_sentences(floor_claim) == [floor_claim]
     assert _implementer_floor_sentences("An implementer's pin never counts toward the floor.") == []
+    for name in _FLOOR_PINS:
+        if name not in RECIPE_PINS:  # its recipe is retired; nothing to exempt
+            continue
+        pin = RECIPE_PINS[name][4]
+        assert _implementer_floor_sentences(pin) == []
+        assert _implementer_floor_sentences(f"{pin} {floor_claim}") == [floor_claim]
     trigger = PROBE_MAINTENANCE_PINS["build-trigger-excludes-caught-defect"][4]
     defect = "Build re-dispatches the adversary for a program that caught a product defect."
     assert _redispatch_for_caught_defect_sentences(f"{trigger} {ORDINARY_FIX_NO_REDISPATCH}") == []

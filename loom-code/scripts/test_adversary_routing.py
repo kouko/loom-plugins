@@ -53,6 +53,7 @@ a file that started.
 """
 from __future__ import annotations
 
+import importlib
 import os
 import re
 import shutil
@@ -90,7 +91,15 @@ RECIPE_TEST_STEM = "test_adversary_recipe_"
 # run these inside the copy; a recipe test that the removal deleted is gone
 # from the glob, and one the addition wrote is picked up by it.
 SUITE_GLOB = "test_adversary_*.py"
-SUITE_EXTRA = ("test_build_mechanical_checks.py", "test_review_convergence_contract.py")
+SUITE_EXTRA = (
+    "test_build_mechanical_checks.py",
+    "test_review_convergence_contract.py",
+    # The module criteria map names, for each routed recipe, the check that
+    # enforces a criterion. A removal that left it naming a module that is no
+    # longer there would pass a scan for the deleted names and still be
+    # broken, so the copy runs it.
+    "test_module_criteria_text.py",
+)
 
 # Files that still hand-list a recipe file routed today, so removing that
 # kind would leave their reference dangling. The three that were here when
@@ -194,6 +203,43 @@ def recipe_kind(recipe: str) -> str:
     return recipe[len(RECIPE_STEM):-len(".md")]
 
 
+def recipe_test_module(recipe: str) -> str:
+    """The file name of the test module that owns `recipe`'s rules.
+
+    Acceptance 6's convention, spelled in one place: one test file per recipe,
+    named after the kind the recipe attacks. A module that needs another
+    recipe's test module goes through here rather than writing the name, so
+    what it reaches for is what the routing table routes today and the kind's
+    removal takes the name away with the recipe.
+    """
+    return f"{RECIPE_TEST_STEM}{recipe_kind(recipe).replace('-', '_')}.py"
+
+
+def recipe_pins() -> dict[str, tuple]:
+    """Every `RECIPE_PINS` entry the routed recipes' own test modules define.
+
+    A cross-document scan that must not flag a recipe's own pinned sentence
+    reads the pin from here. Importing one recipe's test module by name would
+    make that scan a reference the kind's removal leaves dangling; going
+    through the routing table, the scan loses exactly the pins whose recipe
+    went away and keeps the rest.
+
+    A recipe whose module defines no pin table contributes nothing. A pin name
+    two modules define is refused, because the caller looks a pin up by name
+    alone and would otherwise silently get one of the two.
+    """
+    merged: dict[str, tuple] = {}
+    for recipe in routed_recipes():
+        module_name = recipe_test_module(recipe)
+        if not (ROOT / SCRIPTS / module_name).is_file():
+            continue
+        module = importlib.import_module(module_name[:-len(".py")])
+        for name, pin in getattr(module, "RECIPE_PINS", {}).items():
+            assert name not in merged, (name, module_name)
+            merged[name] = pin
+    return merged
+
+
 def _artifact_types() -> set[str]:
     """Every type name of the repository's own artifact-type vocabulary."""
     block = MANIFEST.read_text(encoding="utf-8").split("\nartifact_types:", 1)[1]
@@ -265,6 +311,27 @@ def test_routed_recipe_reader_synthetic() -> None:
     # A synthetic name, for the reason the fixtures above give: a kind whose
     # name carries a hyphen is the case that a naive split would get wrong.
     assert recipe_kind(_SYNTHETIC_RECIPE) == "synthetic-one"
+
+
+def test_recipe_test_module_and_pin_reader_synthetic() -> None:
+    """A recipe's test module is named from the recipe, and the pin reader
+    reaches every routed recipe's module through that name."""
+    assert recipe_test_module(_SYNTHETIC_RECIPE) == f"{RECIPE_TEST_STEM}synthetic_one.py"
+    pins = recipe_pins()
+    # Every pin the reader returns comes from a routed recipe's own module,
+    # and every pin such a module defines is in what it returns. Not asserted:
+    # that there is any pin at all -- a repository whose recipes pin nothing
+    # is a repository with nothing for the scans to exempt, which is the state
+    # a removal case reaches when the last recipe carrying a pin table goes.
+    from_modules: dict[str, tuple] = {}
+    for recipe in routed_recipes():
+        path = ROOT / SCRIPTS / recipe_test_module(recipe)
+        assert path.is_file(), recipe
+        module = importlib.import_module(recipe_test_module(recipe)[:-len(".py")])
+        from_modules.update(getattr(module, "RECIPE_PINS", {}))
+    assert pins == from_modules
+    for name, pin in pins.items():
+        assert len(pin) == 6, (name, pin)
 
 
 def test_cell_helper_synthetic() -> None:
@@ -465,29 +532,71 @@ def _references_to(root: Path, names: tuple[str, ...], *, expected: int) -> list
 
 
 def _own_test_file(kind: str) -> str:
-    """The test file Acceptance 6 gives that kind's recipe."""
-    return f"{SCRIPTS}/{RECIPE_TEST_STEM}{kind.replace('-', '_')}.py"
+    """The test file Acceptance 6 gives that kind's recipe, as a path."""
+    return f"{SCRIPTS}/{recipe_test_module(_recipe_file(kind))}"
 
 
 def _recipe_file(kind: str) -> str:
     return f"{RECIPE_STEM}{kind}.md"
 
 
+def _kinds_named_in(texts: list[str], candidates: dict[str, tuple[str, str]]) -> set[str]:
+    """Which `candidates` (kind -> (recipe name, own-test name)) are already
+    written somewhere in `texts`.
+
+    Pure and filesystem-free, so the collision rule `_removable_kind` applies
+    is provable on its own: a kind is tainted the moment either name it would
+    delete already appears in a text that is not going anywhere, such as a
+    migration note recording where a past removal's rule now lives.
+    """
+    tainted: set[str] = set()
+    for text in texts:
+        for kind, (recipe, own_test) in candidates.items():
+            if kind not in tainted and (recipe in text or own_test in text):
+                tainted.add(kind)
+    return tainted
+
+
 def _removable_kind() -> str:
-    """A kind the routing table says has no recipe, chosen deterministically.
+    """A kind the routing table says has no recipe, and whose recipe and own
+    test file names are not already written anywhere else in the repository,
+    chosen deterministically.
 
     The round trip adds a recipe for it and removes it again, so the tree it
     must return to is the tree as it stands, and the names it deletes belong
-    to no other file in the repository.
+    to no other file in the repository. An unrouted kind whose recipe name a
+    permanent record already writes -- true of a kind once its own removal
+    reaches the routing table, such as a migration note that keeps naming the
+    file that removal deleted -- would break that promise if it were chosen,
+    so it is passed over rather than picked.
     """
     rows = _routing_rows(PROTOCOL.read_text(encoding="utf-8"))
     unrouted = sorted(k for k, target in rows.items() if target == NO_RECIPE)
     assert unrouted, "every kind is routed; this check has no kind to add and remove"
-    return unrouted[0]
+    candidates = {k: (_recipe_file(k), Path(_own_test_file(k)).name) for k in unrouted}
+    texts: list[str] = []
+    for rel in _tracked_files():
+        path = ROOT / rel
+        if not path.is_file():
+            continue
+        try:
+            texts.append(path.read_text(encoding="utf-8"))
+        except (UnicodeDecodeError, OSError):
+            texts.append(path.read_bytes().decode("utf-8", "replace"))
+    tainted = _kinds_named_in(texts, candidates)
+    available = [k for k in unrouted if k not in tainted]
+    assert available, "every unrouted kind's name is already written elsewhere"
+    return available[0]
 
 
 def _add_kind_to_copy(root: Path, kind: str) -> tuple[str, str]:
-    """Give `kind` a recipe in the copy: the file, its own test file, its row."""
+    """Give `kind` a recipe in the copy: the file, its own test file, its row.
+
+    The test file written here carries the check every recipe's own test
+    module carries, the one `test_module_criteria_text.py` requires of each
+    routed recipe: the recipe's rule is in the recipe and not repeated in the
+    agent contract.
+    """
     recipe, own_test = _recipe_file(kind), _own_test_file(kind)
     body = (
         f"# Adversarial — {kind}\n\n"
@@ -500,11 +609,14 @@ def _add_kind_to_copy(root: Path, kind: str) -> tuple[str, str]:
     test_body = (
         f'"""The {kind} recipe\'s own rules."""\n'
         "from pathlib import Path\n\n\n"
-        'RECIPE = Path(__file__).resolve().parents[2] / (\n'
-        f'    "loom-code/skills/closing-review/references/{recipe}"\n'
-        ")\n\n\n"
+        "ROOT = Path(__file__).resolve().parents[2]\n"
+        f'RECIPE = ROOT / "loom-code/skills/closing-review/references/{recipe}"\n'
+        'ADVERSARY = ROOT / "loom-code/agents/adversary.md"\n'
+        f'RULE = "Attack the {kind} artifact"\n\n\n'
         "def test_recipe_states_its_own_rule() -> None:\n"
-        f'    assert "Attack the {kind} artifact" in RECIPE.read_text(encoding="utf-8")\n'
+        '    assert RULE in RECIPE.read_text(encoding="utf-8")\n\n\n'
+        "def test_procedure_sentence_in_both_files_rejected() -> None:\n"
+        '    assert RULE not in ADVERSARY.read_text(encoding="utf-8")\n'
     )
     (root / own_test).write_text(test_body, encoding="utf-8")
     return recipe, own_test
@@ -613,6 +725,50 @@ def test_removable_kind_and_name_helpers_synthetic() -> None:
     assert _own_test_file("skill-gate") == f"{SCRIPTS}/{RECIPE_TEST_STEM}skill_gate.py"
     assert not (ROOT / _own_test_file(kind)).exists(), kind
     assert not (REFERENCES / _recipe_file(kind)).exists(), kind
+
+
+def test_kinds_named_in_helper_synthetic() -> None:
+    """The pure name-collision check `_removable_kind` relies on: a kind is
+    tainted when a text anywhere carries its recipe or its own test file's
+    name, such as a migration note that still names the file a past removal
+    deleted."""
+    candidates = {
+        "alpha": ("adversarial-alpha.md", "test_adversary_recipe_alpha.py"),
+        "beta": ("adversarial-beta.md", "test_adversary_recipe_beta.py"),
+    }
+    texts = ["A migration note names `adversarial-alpha.md` as the file a removal deleted."]
+    assert _kinds_named_in(texts, candidates) == {"alpha"}
+    assert _kinds_named_in([], candidates) == set()
+    assert _kinds_named_in(["nothing relevant here"], candidates) == set()
+
+
+def test_removable_kind_skips_a_routed_kind_whose_removal_would_collide(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """`code` is routed today, but its recipe and own-test names are already
+    written in this repository's own migration record (the plan and the
+    rule-correspondence note for this change). If `code`'s row ever goes back
+    to `none`, the round trip must not pick `code` to add and remove again --
+    doing so would break the promise it is built on: that the names it
+    deletes belong to no other file in the repository. Proven against the
+    real tree, with only `code`'s own row flipped to `none`.
+    """
+    tainted_kind = "code"
+    recipe = _recipe_file(tainted_kind)
+    real_text = PROTOCOL.read_text(encoding="utf-8")
+    row = f"| `{tainted_kind}` | [`{recipe}`]({recipe}) |"
+    if row not in real_text:
+        # This copy already carries a removal of `code`, performed by the
+        # very case this helper exists for; the collision it would prove is
+        # then in the past tense, recorded rather than reproducible here.
+        pytest.skip("`code` is not routed in this tree")
+    synthetic_protocol = tmp_path / "adversarial.md"
+    synthetic_protocol.write_text(
+        real_text.replace(row, f"| `{tainted_kind}` | {NO_RECIPE} |"), encoding="utf-8"
+    )
+    monkeypatch.setattr("test_adversary_routing.PROTOCOL", synthetic_protocol)
+
+    assert _removable_kind() != "code"
 
 
 def test_passed_helper_synthetic() -> None:
@@ -726,14 +882,16 @@ def _remove_routed_kind_from_copy(root: Path, recipe: str, kinds: tuple[str, ...
 
 # Recipes whose removal is not bounded yet, because a module outside the
 # reference folder reaches for that kind's own test file by name rather than
-# through the routing table: `test_build_mechanical_checks.py` imports the
-# code recipe's pin table for a cross-document scan, and
-# `test_module_criteria_text.py` names that module as an example. Entries are
-# debt, not permission: the test below proves each one is still unbounded, so
-# clearing one fails here until it is struck off and the case above covers it.
-# Recorded by kind rather than by file name, so that the list is not itself a
-# reference the removal it describes would leave dangling.
-_UNBOUNDED_REMOVAL_DEBT_KINDS = ("code",)
+# through the routing table. The one kind that was here when this check went
+# in is gone: `test_build_mechanical_checks.py` now reads the recipes' pin
+# tables through `recipe_pins()`, and `test_module_criteria_text.py` derives
+# each recipe's own test module from the routing table, so the list is empty.
+# It stays: entries are debt, not permission, and the test below proves each
+# one is still unbounded, so clearing one fails here until it is struck off
+# and the case above takes the recipe over. Recorded by kind rather than by
+# file name, so that the list is not itself a reference the removal it
+# describes would leave dangling.
+_UNBOUNDED_REMOVAL_DEBT_KINDS: tuple[str, ...] = ()
 _UNBOUNDED_REMOVAL_DEBT = tuple(_recipe_file(k) for k in _UNBOUNDED_REMOVAL_DEBT_KINDS)
 
 

@@ -14,6 +14,12 @@ worth stating if something in this repository recomputes it, so every
 property the conventions state is mapped here to the executable checks that
 enforce it, and a property stated with no entry -- or an entry naming a check
 that is not there -- turns this file red.
+
+The map names no adversary recipe's own test module. Those modules exist only
+while the routing table routes their kind, so the checks they carry are
+expanded from that table instead of written here: retiring a kind takes its
+entry out of the map with it, and every property keeps a check that no kind's
+existence depends on.
 """
 from __future__ import annotations
 
@@ -23,6 +29,7 @@ from pathlib import Path
 import pytest
 
 from prose_pin import has_negation, split_sentences
+from test_adversary_routing import RECIPE_TEST_STEM, recipe_test_module, routed_recipes
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -118,10 +125,16 @@ PROPERTY_PINS = {
 
 # name: the checks in this repository that recompute the property.
 # path -> the test functions in it that do the recomputing.
+#
+# No recipe's own test module is named here. A recipe exists only while the
+# routing table routes its kind, so a name written here would be left
+# dangling by that kind's retirement and would take a stated property's only
+# check with it. What every routed recipe's own test module must carry is
+# `RECIPE_ENFORCED_BY` below, which the routing table expands; every property
+# keeps at least one check here, which no kind's existence depends on.
 ENFORCED_BY = {
     "change": {
         "test_adversary_routing.py": ("test_no_new_file_hand_lists_a_routed_recipe",),
-        "test_adversary_recipe_code.py": ("test_procedure_sentence_in_both_files_rejected",),
     },
     "add": {
         "test_adversary_routing.py": (
@@ -143,6 +156,27 @@ ENFORCED_BY = {
         "test_adversary_protocol.py": ("test_procedure_sentence_in_both_files_rejected",),
     },
 }
+
+# name: the test functions every routed recipe's own test module carries for
+# the property. Expanded against the routing table, so the check that keeps a
+# rule in one file is required of each recipe that exists and of no recipe
+# that does not.
+RECIPE_ENFORCED_BY = {
+    "change": ("test_procedure_sentence_in_both_files_rejected",),
+}
+
+
+def enforced_by(prop: str) -> dict[str, tuple[str, ...]]:
+    """Every check that recomputes `prop`: those named above, plus the
+    per-recipe check in each routed recipe's own test module."""
+    checks = dict(ENFORCED_BY[prop])
+    functions = RECIPE_ENFORCED_BY.get(prop, ())
+    if functions:
+        for recipe in routed_recipes():
+            module = recipe_test_module(recipe)
+            assert module not in checks, module
+            checks[module] = functions
+    return checks
 
 ROADMAP_PIN = (
     "The rest of loom is brought to this shape",
@@ -238,12 +272,41 @@ def test_every_property_the_conventions_state_has_an_entry() -> None:
 
 @pytest.mark.parametrize("prop", sorted(ENFORCED_BY))
 def test_each_property_is_enforced_by_a_check_that_exists(prop: str) -> None:
-    for filename, functions in ENFORCED_BY[prop].items():
+    checks = enforced_by(prop)
+    assert checks, prop
+    for filename, functions in checks.items():
         path = SCRIPTS / filename
         assert path.exists(), (prop, filename)
         text = path.read_text(encoding="utf-8")
         for function in functions:
             assert f"def {function}(" in text, (prop, filename, function)
+
+
+@pytest.mark.parametrize("prop", sorted(ENFORCED_BY))
+def test_no_property_depends_on_one_kind_existing(prop: str) -> None:
+    """A property keeps a check that no recipe's existence carries.
+
+    The per-recipe checks go away with their kind, so a property whose only
+    entry were one of those would be left stated with nothing recomputing it
+    the day that kind retired.
+    """
+    assert ENFORCED_BY[prop], prop
+    named = [f for f in ENFORCED_BY[prop] if f.startswith(RECIPE_TEST_STEM)]
+    assert named == [], (prop, named)
+
+
+def test_per_recipe_checks_cover_every_routed_recipe() -> None:
+    """Each routed recipe's own test module is required to carry the check,
+    and no module that is not one of them is added by the expansion."""
+    recipes = routed_recipes()
+    assert recipes, "the routing table names no recipe file"
+    for prop, functions in RECIPE_ENFORCED_BY.items():
+        expanded = enforced_by(prop)
+        for recipe in recipes:
+            assert expanded.get(recipe_test_module(recipe)) == functions, (prop, recipe)
+        assert set(expanded) - set(ENFORCED_BY[prop]) == {
+            recipe_test_module(r) for r in recipes
+        }, prop
 
 
 def test_enforcement_lookup_catches_a_check_that_is_not_there() -> None:
