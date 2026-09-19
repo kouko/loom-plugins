@@ -50,11 +50,12 @@ def main():
     h.expect(
         "ADV-09",
         (cr_code == 0, build_code == 0),
-        (True, True),
+        (False, False),
         "a complete artifact-to-station mapping, written in backticks inside "
-        "the lookup paragraph itself, passes RL-02 and RL-04. The code-span "
-        "exemption that lets the rule cite `stations[].produces` also hides "
-        "the copy the rule exists to prevent.",
+        "the lookup paragraph itself, now fails RL-02 and RL-04. Both "
+        "neutralize only the named manifest citations before scanning and "
+        "unwrap any other code span into plain prose, so a mapping hidden in "
+        "backticks is read as the restatement it is.",
     )
 
 

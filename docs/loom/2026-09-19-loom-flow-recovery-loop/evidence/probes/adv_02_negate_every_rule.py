@@ -84,10 +84,12 @@ def main():
     h.expect(
         "ADV-02",
         both_passed,
-        True,
+        False,
         "all five recovery paragraphs rewritten to say the opposite of "
-        "Acceptance 1, 2, 4 and 5 still pass every committed probe. The probes "
-        "assert phrase containment, which has no polarity.",
+        "Acceptance 1, 2, 4 and 5 now fail the committed probes: each pinned "
+        "paragraph's exact closing sentence is checked, and the shared "
+        "negation guard rejects the appended reversal, so containment alone "
+        "no longer suffices to pass.",
     )
 
 

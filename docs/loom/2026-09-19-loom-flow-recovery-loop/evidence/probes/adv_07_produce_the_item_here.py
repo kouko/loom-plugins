@@ -79,13 +79,14 @@ def main():
     h.expect(
         "ADV-07",
         (permits, present, in_manifest),
-        (True, [], True),
-        "the new entry point tells the agent to produce the blind-run report "
-        "'here' and closing-review/SKILL.md never names the blind-runner agent "
-        "nor states the never-touched-the-change constraint. The rule cites "
-        "manifest.yaml only to resolve ownership, and the one sentence that "
-        "would stop self-production sits in a field the rule does not send the "
-        "agent to read.",
+        (True, ["fresh-context", "loom-code:blind-runner"], True),
+        "the entry point still tells the agent to produce the blind-run "
+        "report 'here', but closing-review/SKILL.md's own §3 now names the "
+        "loom-code:blind-runner agent and its fresh-context, "
+        "never-touched-the-change constraint directly, and the lookup "
+        "paragraph routes the blind-run-report case there by reference. The "
+        "guardrail no longer lives only in a manifest field the rule never "
+        "sends the agent to read.",
     )
 
 

@@ -57,11 +57,12 @@ def main():
     h.expect(
         "ADV-01",
         both_passed,
-        True,
+        False,
         "a verbatim second copy of the artifact-to-station mapping, placed in "
-        "the paragraph next to the cited lookup, passes RL-02 and RL-04 "
-        "unchanged. The gates bound their scan to one paragraph, so REQ-3 is "
-        "satisfiable by a line break.",
+        "the paragraph next to the cited lookup, is now caught by both RL-02 "
+        "and RL-04: both scan the whole recovery passage rather than the one "
+        "paragraph the opener matches, so the near-door placement no longer "
+        "satisfies REQ-3 by a line break.",
     )
 
 

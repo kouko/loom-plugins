@@ -81,12 +81,13 @@ def main():
     h.expect(
         "ADV-05",
         (not_committed, observable_anywhere),
-        (True, False),
-        "the sequence Acceptance 2 asks to be recorded exists in no committed "
-        "place: not in the attestation, not in its declared fields, not in "
-        "Build's hand-off list, not in the change directory. A blind runner in "
-        "a clean tree cannot settle Acceptance 2, and the two-entry bound "
-        "resets to zero whenever the active task context is lost.",
+        (True, True),
+        "the sequence Acceptance 2 asks to be recorded is still kept out of "
+        "the attestation and its declared fields, but Build's §4 hand-off now "
+        "names it explicitly ('the station sequence entered so far when this "
+        "run recovered from an absent item'), so a blind runner reading the "
+        "hand-off at recovery time can settle Acceptance 2 without a "
+        "committed ledger.",
     )
 
 

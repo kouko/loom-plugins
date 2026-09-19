@@ -61,11 +61,14 @@ def main():
     h.expect(
         "ADV-06",
         results,
-        ["RED", "RED", "RED"],
-        "three edits that name no station turn the Build probes RED, because "
-        "RL-02 and RL-12 test station names by substring where RL-04 tests "
-        "them by word boundary. The two probe files disagree about the same "
-        "rule.",
+        ["RED", "RED", "GREEN"],
+        "RL-02 and RL-12 now match station names by the same word-boundary "
+        "pattern as RL-04, so the 'ships' edit in §1 — away from the pinned "
+        "closing sentence — no longer trips a false positive. The "
+        "'relationship' and 'maintains' edits still turn Build RED, but now "
+        "because they touch RL-01's pinned exact closing sentence (the guard "
+        "against ADV-02's trailing-append attack), not because of a "
+        "station-name substring match.",
     )
 
 
