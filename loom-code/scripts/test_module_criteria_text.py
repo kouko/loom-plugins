@@ -15,6 +15,12 @@ property the conventions state is mapped here to the executable checks that
 enforce it, and a property stated with no entry -- or an entry naming a check
 that is not there -- turns this file red.
 
+A map can also be wrong while every name in it resolves, which is the harder
+negative: a property pointed at a check written for a different property is
+as unenforced as a property pointed at nothing. So each entry is read back
+against the section header the named check sits under in its own module,
+which carries the Acceptance number that check was written for.
+
 The map names no adversary recipe's own test module, and requires none. Such
 a module exists only while the routing table routes its kind, so a name
 written here would be left dangling by that kind's retirement; and requiring
@@ -89,7 +95,7 @@ PROPERTY_PINS = {
         "Editing one capability touches",
         "that capability's file and its own test",
         "- **change** — Editing one capability touches that capability's file and its own "
-        "test, and nothing else.",
+        "test, where it has one, and nothing else.",
         ("- **change** — Editing one capability touches that capability's file and its own "
          "test, but not only those.",
          "- **change** — Editing one capability touches whatever the edit reaches."),
@@ -105,11 +111,13 @@ PROPERTY_PINS = {
     ),
     "remove": (
         "Removing a capability deletes",
-        "its file and its routing entry",
-        "- **remove** — Removing a capability deletes its file and its routing entry, and "
-        "leaves nothing behind that still names it.",
-        ("- **remove** — Removing a capability deletes its file and its routing entry, but "
-         "not what still names it.",
+        "its file, its routing entry and its own test where it has one",
+        "- **remove** — Removing a capability deletes its file, its routing entry and its "
+        "own test where it has one, and leaves nothing behind that still names it.",
+        ("- **remove** — Removing a capability deletes its file, its routing entry and its "
+         "own test where it has one, but not what still names it.",
+         "- **remove** — Removing a capability deletes its file and its routing entry, and "
+         "leaves nothing behind that still names it.",
          "- **remove** — Removing a capability deletes the passages that belong to it."),
     ),
     "locate": (
@@ -137,7 +145,7 @@ PROPERTY_PINS = {
 # existence depends on.
 ENFORCED_BY = {
     "change": {
-        "test_adversary_routing.py": ("test_no_new_file_hand_lists_a_routed_recipe",),
+        "test_adversary_routing.py": ("test_a_reworded_recipe_is_not_blamed_on_the_addition",),
     },
     "add": {
         "test_adversary_routing.py": (
@@ -149,6 +157,7 @@ ENFORCED_BY = {
         "test_adversary_routing.py": (
             "test_removing_a_kind_routed_today_leaves_no_reference",
             "test_removal_that_leaves_the_name_in_a_live_file_is_detected",
+            "test_no_new_file_hand_lists_a_routed_recipe",
         ),
     },
     "locate": {
@@ -159,6 +168,51 @@ ENFORCED_BY = {
         "test_adversary_protocol.py": ("test_procedure_sentence_in_both_files_rejected",),
     },
 }
+
+# The trade `add` and `change` make together, which used to be recorded only
+# in two test modules' docstrings: `add` is one file plus one routing entry,
+# so a capability may exist with no test module of its own, and `change` has
+# to be read that way too. A reader of the conventions opens neither module,
+# so the conventions state it themselves.
+OPTIONAL_TEST_PIN = ("A capability's own test module is", "optional")
+OPTIONAL_TEST_AFFIRMATIVE = (
+    "- A capability's own test module is optional: `add` stays one file plus one routing "
+    "entry, and `change` reads as its own test where it has one."
+)
+OPTIONAL_TEST_REJECTED = (
+    "- A capability's own test module is never optional: `add` stays one file plus one "
+    "routing entry, and `change` reads as its own test where it has one.",
+    "- A capability's own test module is written by whoever gave it a routing entry.",
+)
+
+# Which Acceptance line of the intent each criterion is the repository's
+# wording of. The checks are grouped in their own modules under section
+# headers that name that line, so a criterion registered to a check written
+# for a different one is caught by reading the check's own section rather
+# than by trusting this map.
+CRITERION_ACCEPTANCE = {"change": 3, "add": 4, "remove": 5, "locate": 2}
+
+_SECTION_HEADER = re.compile(r"^# --- (?P<label>.*?)\s*-*$", re.M)
+_ACCEPTANCE_LABEL = re.compile(r"^A(?P<n>\d+)\b")
+
+
+def _acceptance_of(text: str, function: str) -> int | None:
+    """The Acceptance number of the section `function` is defined under.
+
+    The nearest section header above the definition, and only that one: a
+    header carrying no Acceptance number -- the helper self-test blocks --
+    answers `None` rather than letting the numbered section above it stand
+    in for a section that does not claim a number.
+    """
+    definition = re.search(rf"^def {re.escape(function)}\(", text, re.M)
+    assert definition is not None, function
+    at = definition.start()
+    labels = [m.group("label") for m in _SECTION_HEADER.finditer(text) if m.start() < at]
+    if not labels:
+        return None
+    match = _ACCEPTANCE_LABEL.match(labels[-1])
+    return int(match.group("n")) if match else None
+
 
 ROADMAP_PIN = (
     "The rest of loom is brought to this shape",
@@ -210,6 +264,21 @@ def test_conventions_state_the_property_once(prop: str) -> None:
     verb, literal, _affirmative, _rejected = PROPERTY_PINS[prop]
     section = _section(CONVENTIONS.read_text(encoding="utf-8"), CRITERIA_HEADING)
     assert _stated_once(section, verb, literal), (prop, verb, literal)
+
+
+def test_optional_test_module_pin_helpers_synthetic() -> None:
+    verb, literal = OPTIONAL_TEST_PIN
+    assert _stated_once(OPTIONAL_TEST_AFFIRMATIVE, verb, literal)
+    assert any(has_negation(r) for r in OPTIONAL_TEST_REJECTED)
+    for example in OPTIONAL_TEST_REJECTED:
+        assert not _stated_once(example, verb, literal), example
+
+
+def test_conventions_say_a_capabilitys_own_test_module_is_optional() -> None:
+    """What `add` costs `change`, said where a reader of the criteria sees it."""
+    verb, literal = OPTIONAL_TEST_PIN
+    section = _section(CONVENTIONS.read_text(encoding="utf-8"), CRITERIA_HEADING)
+    assert _stated_once(section, verb, literal), section
 
 
 def test_conventions_name_the_four_properties_and_no_others() -> None:
@@ -277,6 +346,45 @@ def test_no_property_depends_on_one_kind_existing(prop: str) -> None:
     assert ENFORCED_BY[prop], prop
     named = [f for f in ENFORCED_BY[prop] if f.startswith(RECIPE_TEST_STEM)]
     assert named == [], (prop, named)
+
+
+def test_acceptance_reader_synthetic() -> None:
+    """The reader takes the nearest header, and refuses to guess past one."""
+    text = (
+        "# --- A4: adding ------\n\n"
+        "def test_added() -> None:\n    pass\n\n\n"
+        "# --- helper self-tests ------\n\n"
+        "def test_helper() -> None:\n    pass\n\n\n"
+        "# --- A5 boundary: removing ------\n\n"
+        "def test_removed() -> None:\n    pass\n"
+    )
+    assert _acceptance_of(text, "test_added") == 4
+    assert _acceptance_of(text, "test_helper") is None
+    assert _acceptance_of(text, "test_removed") == 5
+    assert _acceptance_of("def test_alone() -> None:\n    pass\n", "test_alone") is None
+
+
+def test_every_criterion_has_an_acceptance_line() -> None:
+    assert set(CRITERION_ACCEPTANCE) == set(ENFORCED_BY)
+    assert len(set(CRITERION_ACCEPTANCE.values())) == len(CRITERION_ACCEPTANCE)
+
+
+@pytest.mark.parametrize("prop", sorted(ENFORCED_BY))
+def test_each_check_sits_under_the_criterion_it_enforces(prop: str) -> None:
+    """A criterion's checks are the ones written for its own Acceptance line.
+
+    The negative Acceptance 9 is really watching for: not a criterion with no
+    entry at all, but a criterion whose entry names a check that recomputes
+    something else. Read from the check's own module, so the map cannot say
+    one thing while the check does another.
+    """
+    expected = CRITERION_ACCEPTANCE[prop]
+    for filename, functions in ENFORCED_BY[prop].items():
+        text = (SCRIPTS / filename).read_text(encoding="utf-8")
+        for function in functions:
+            assert _acceptance_of(text, function) == expected, (
+                prop, filename, function, _acceptance_of(text, function), expected
+            )
 
 
 def test_enforcement_lookup_catches_a_check_that_is_not_there() -> None:

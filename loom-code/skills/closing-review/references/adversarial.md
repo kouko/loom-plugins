@@ -30,8 +30,9 @@ alone, and say in the report that it has none.
 | `docs` | none |
 
 Giving a type a recipe is one new file beside this one plus its own row here;
-no existing recipe file is edited. Taking one away deletes its file and puts
-its row back to `none`.
+no existing recipe file is edited. Taking one away deletes its file, deletes
+the test module named after that kind where it has one, and puts its row back
+to `none`.
 
 ## Reuse first, update with evidence
 

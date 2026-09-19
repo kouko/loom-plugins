@@ -2,7 +2,9 @@
 
 Acceptance 8 of `docs/loom/intent/2026-09-18-modular-adversary-recipes.md`:
 every rule present before the split is still present after it, and none was
-added.
+added. The correspondence below answers the first half; `What the split
+added` answers the second, and answers it with a list rather than with a
+denial — the split wrote a routing section, and that section states rules.
 
 The pre-split document is
 `loom-code/skills/closing-review/references/adversarial.md`, read
@@ -81,7 +83,54 @@ Every destination path is relative to
 | 37 | `artifact` is where the case now lives; probes go under the change's evidence path, and promotion into the real suite happens only through a plan task | `Recording` | `adversarial.md` |
 | 38 | Anything found that matters becomes a `finding` with an anchor and a fix, reaching the `findings` input of `finalize-review` | `Recording` | `adversarial.md` |
 
-Count: 38 rules before the split, 38 after. Nothing added: the only text
-that did not come from the pre-split document is each new file's title, its
-one-line pointer back to the shared protocol, and the routing marker in
-`adversarial.md`, none of which states a rule.
+## What the split added
+
+The table above is the whole of the movement. It is not the whole of the
+split: to route a reader to the right recipe, the split wrote a
+`## Which recipe to read` section that the pre-split document had no
+counterpart for, and that section states rules. They are listed here so that
+the note does not read as a claim that nothing was written.
+
+Unlike the table above, this list is read against the protocol as it stands
+today rather than against the split commit, because these rules are live text
+that later work may extend — and one of them since has been.
+
+Each is pinned in `loom-code/scripts/test_adversary_protocol.py`, under the
+pin name given:
+
+- Serving Acceptance 7 (the contract plus the protocol plus the matching
+  recipes is a complete procedure):
+  - "Every changed path has an artifact type, from the `artifact_types` list
+    in `contract/manifest.yaml`." —
+    `protocol-artifact-type-comes-from-the-manifest`
+  - "Read this protocol, then the recipe file this table names for every
+    artifact type among the changed paths: that protocol and those recipes
+    are the whole procedure, and there is nothing else to find." —
+    `protocol-protocol-plus-matching-recipes-is-the-whole-procedure`
+  - "A type whose row says `none` has no recipe today — attack it with this
+    protocol alone, and say in the report that it has none." —
+    `protocol-a-type-with-no-recipe-is-attacked-with-the-protocol-alone`.
+    This is an obligation the pre-split document placed on no one, because
+    before the split there were no rows and no recipe files to be without.
+- Serving Acceptance 4 (adding a kind is one file and one routing entry):
+  - "Giving a type a recipe is one new file beside this one plus its own row
+    here" — `protocol-giving-a-type-a-recipe-is-one-file-and-one-row`
+  - "no existing recipe file is edited." —
+    `protocol-no-existing-recipe-is-edited`
+- Serving Acceptance 5 (removing a kind leaves nothing dangling):
+  - "Taking one away deletes its file, deletes the test module named after
+    that kind where it has one, and puts its row back to `none`." —
+    `protocol-taking-a-recipe-away-resets-the-row`. The split wrote this
+    sentence without its middle clause; closing review found that a
+    maintainer who followed it would leave the kind's test module reading a
+    file that was gone, and the clause was added in the fix round. The same
+    correction was made to the `remove` criterion in `AGENTS.md`.
+
+The routing table's rows are structure rather than rules, and so are each new
+file's title and its one-line pointer back to the shared protocol.
+
+## Count
+
+38 rules before the split, all 38 after: no pre-split rule was dropped or
+reworded, and each is in exactly one file. What the split wrote on top of
+them is the section listed above.

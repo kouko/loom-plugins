@@ -69,11 +69,11 @@ then removes it with one step left undone. Each copy of the repository costs
 seconds, so a case is made here only where it catches something no other
 case does.
 
-Two debt lists run alongside, and both may only shrink:
-`_BOUNDED_REMOVAL_DEBT` the files that still hand-list a routed recipe by
-name, and `_UNBOUNDED_REMOVAL_DEBT_KINDS` the kinds whose removal a module
-elsewhere still breaks. An entry that stopped violating fails as loudly as
-a file that started.
+Neither of those last two is held to a recorded list of exceptions. The
+boundary scan is held to nothing at all: no file outside the three allowed
+places hand-lists a routed recipe. And the positive removal runs for every
+recipe the routing table names, with none held back as unbounded, so a module
+that started reaching for a kind's test file by name would fail there.
 """
 from __future__ import annotations
 
@@ -125,28 +125,27 @@ SUITE_EXTRA = (
     "test_module_criteria_text.py",
 )
 
-# Files that still hand-list a recipe file routed today, so removing that
-# kind would leave their reference dangling. The three that were here when
-# this check went in now read the routing table instead, and the list is
-# empty. It stays: an entry is a debt, never a permission, so the list may
-# only shrink and `test_no_new_file_hand_lists_a_routed_recipe` fails on an
-# entry that stopped violating as loudly as on a file that started.
-_BOUNDED_REMOVAL_DEBT: tuple[str, ...] = ()
-# The one tree the debt scan passes over by path: the change records, which
-# state where a rule lived at a commit already made and cannot stop being
-# true. The other two exclusions the debt scan makes are named where it makes
+# The one tree the reference scan passes over by path: the change records,
+# which state where a rule lived at a commit already made and cannot stop
+# being true. The other two exclusions the scan makes are named where it makes
 # them -- the reference folder, whose routing row the removal rewrites, and
 # the kind's own test file, which the removal deletes with the recipe.
-_DEBT_SCAN_SKIP = ("docs/loom/",)
+_CHANGE_RECORDS = ("docs/loom/",)
 
 # The cases below that each copy the repository and run pytest inside the
 # copy. The copy's own run must not start that again, so these are deselected
-# there by name; a name that no longer exists makes pytest exit non-zero.
+# there by name. `--deselect` takes a node id prefix and silently matches
+# nothing when no test carries it -- pytest still exits 0 -- so what catches a
+# renamed case is the `assert name in globals()` below, which is the guard to
+# keep: without it a renamed entry would stop being deselected and the nested
+# run would copy the copy.
+# https://docs.pytest.org/en/stable/example/pythoncollection.html
+# ("Tests can individually be deselected during collection by passing the
+# `--deselect=item` option"); `pytest --help` spells the value `nodeid_prefix`.
 NESTED_TESTS = (
     "test_adding_a_kind_that_has_no_recipe_today_introduces_no_failure",
     "test_a_reworded_recipe_is_not_blamed_on_the_addition",
     "test_removing_a_kind_routed_today_leaves_no_reference",
-    "test_recorded_unbounded_removal_is_still_unbounded",
     "test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected",
     "test_removal_that_leaves_the_routing_row_behind_is_detected",
     "test_removal_that_leaves_the_name_in_a_live_file_is_detected",
@@ -720,9 +719,10 @@ def _run_adversary_tests(root: Path) -> subprocess.CompletedProcess[str]:
 
     The file list is a glob, so a recipe test the removal deleted is absent
     from the run and one the addition wrote is in it. The cases that copy the
-    repository are deselected by name: they would copy the copy. pytest exits
-    non-zero on a name that no longer matches a test, so a renamed case is
-    caught rather than quietly stopping to run.
+    repository are deselected by name: they would copy the copy. A renamed one
+    is caught by the `assert name in globals()` below and not by pytest, which
+    accepts a `--deselect` id that matches nothing; `NESTED_TESTS` carries the
+    grounding for that.
     """
     scripts = root / SCRIPTS
     targets = sorted(str(p.relative_to(root)) for p in scripts.glob(SUITE_GLOB))
@@ -1220,24 +1220,7 @@ def _remove_routed_kind_from_copy(root: Path, recipe: str, kinds: tuple[str, ...
     return own_test
 
 
-# Recipes whose removal is not bounded yet, because a module outside the
-# reference folder reaches for that kind's own test file by name rather than
-# through the routing table. The one kind that was here when this check went
-# in is gone: `test_build_mechanical_checks.py` now reads the recipes' pin
-# tables through `recipe_pins()`, and `test_module_criteria_text.py` derives
-# each recipe's own test module from the routing table, so the list is empty.
-# It stays: entries are debt, not permission, and the test below proves each
-# one is still unbounded, so clearing one fails here until it is struck off
-# and the case above takes the recipe over. Recorded by kind rather than by
-# file name, so that the list is not itself a reference the removal it
-# describes would leave dangling.
-_UNBOUNDED_REMOVAL_DEBT_KINDS: tuple[str, ...] = ()
-_UNBOUNDED_REMOVAL_DEBT = tuple(_recipe_file(k) for k in _UNBOUNDED_REMOVAL_DEBT_KINDS)
-
-
-@pytest.mark.parametrize(
-    "recipe", sorted(set(routed_recipes()) - set(_UNBOUNDED_REMOVAL_DEBT))
-)
+@pytest.mark.parametrize("recipe", sorted(routed_recipes()))
 def test_removing_a_kind_routed_today_leaves_no_reference(
     recipe: str, tmp_path: Path, inherited_failures: frozenset[str]
 ) -> None:
@@ -1261,7 +1244,7 @@ def test_removing_a_kind_routed_today_leaves_no_reference(
     hits = _references_to(root, names, expected=len(copied) - len(names))
     # `docs/loom/` records where a rule lived at a commit already made; they
     # are the one tree a removal is not expected to rewrite.
-    assert [h for h in hits if not h.startswith(_DEBT_SCAN_SKIP)] == [], hits
+    assert [h for h in hits if not h.startswith(_CHANGE_RECORDS)] == [], hits
 
     run = _run_adversary_tests(root)
     broke = caused_by_the_edit(run, inherited_failures)
@@ -1310,7 +1293,7 @@ def test_adding_a_kind_that_has_no_recipe_today_introduces_no_failure(
     assert own_test is None, own_test
     names = _deleted_names(recipe, own_test)
     hits = _references_to(root, names, expected=len(copied))
-    assert [h for h in hits if not h.startswith(_DEBT_SCAN_SKIP)] == [], hits
+    assert [h for h in hits if not h.startswith(_CHANGE_RECORDS)] == [], hits
 
     removed = _run_adversary_tests(root)
     broke_again = caused_by_the_edit(removed, inherited_failures)
@@ -1318,6 +1301,8 @@ def test_adding_a_kind_that_has_no_recipe_today_introduces_no_failure(
         sorted(broke_again), sorted(inherited_failures), removed.stdout + removed.stderr
     )
 
+
+# --- A3: a reworded recipe is its own test file's business and no one else's --
 
 def test_a_reworded_recipe_is_not_blamed_on_the_addition(
     tmp_path: Path, inherited_failures: frozenset[str]
@@ -1389,37 +1374,6 @@ def test_a_reworded_recipe_is_not_blamed_on_the_addition(
     assert _passed(after) > 0, after.stdout + after.stderr
 
 
-@pytest.mark.parametrize("recipe", sorted(_UNBOUNDED_REMOVAL_DEBT))
-def test_recorded_unbounded_removal_is_still_unbounded(
-    recipe: str, tmp_path: Path, inherited_failures: frozenset[str]
-) -> None:
-    """Every recorded debt is real, so the list may only shrink.
-
-    The same removal is performed, and this time what is asserted is that it
-    does not come out clean: either a live file still writes a deleted name,
-    or the removal itself broke a check that was passing before it. Measured
-    as the difference against `inherited_failures` for the same reason the
-    case above is: a failure the copy already carried would otherwise stand in
-    for the debt and keep an entry alive that is no longer real. The day the
-    removal comes out clean this case fails, the entry comes off the list, and
-    the case above takes the recipe over.
-    """
-    assert recipe in routed_recipes(), recipe
-    kinds = routed_recipes()[recipe]
-    root = tmp_path / "repo"
-    copied = _copy_repository(root)
-    own_test = _remove_routed_kind_from_copy(root, recipe, kinds)
-
-    names = _deleted_names(recipe, own_test)
-    hits = [
-        h for h in _references_to(root, names, expected=len(copied) - len(names))
-        if not h.startswith(_DEBT_SCAN_SKIP)
-    ]
-    run = _run_adversary_tests(root)
-    broke = caused_by_the_edit(run, inherited_failures)
-    assert hits or broke, (hits, sorted(inherited_failures), run.stdout + run.stderr)
-
-
 # --- A5 boundary: no file hand-lists a routed recipe ------------------------
 
 def test_no_new_file_hand_lists_a_routed_recipe() -> None:
@@ -1428,9 +1382,8 @@ def test_no_new_file_hand_lists_a_routed_recipe() -> None:
     A file that writes one would be left dangling by that kind's removal. The
     reference folder holds the routing table itself, a recipe's own test file
     is deleted with the recipe, and `docs/loom/` records where a rule lived at
-    a commit already made. Everything else is debt: the list may only shrink,
-    so an entry that stopped hand-listing fails here as loudly as a file that
-    started.
+    a commit already made. Everywhere else the count is zero, so a file that
+    starts hand-listing one fails here.
     """
     rows = _routing_rows(PROTOCOL.read_text(encoding="utf-8"))
     routed = {kind: target for kind, target in rows.items() if target != NO_RECIPE}
@@ -1443,7 +1396,7 @@ def test_no_new_file_hand_lists_a_routed_recipe() -> None:
         for rel in tracked:
             if rel.startswith(f"{REFERENCES.relative_to(ROOT)}/") or rel == own:
                 continue
-            if any(rel.startswith(prefix) for prefix in _DEBT_SCAN_SKIP):
+            if any(rel.startswith(prefix) for prefix in _CHANGE_RECORDS):
                 continue
             path = ROOT / rel
             if not path.is_file():
@@ -1453,7 +1406,7 @@ def test_no_new_file_hand_lists_a_routed_recipe() -> None:
                     hand_listing.add(rel)
             except (UnicodeDecodeError, OSError):
                 continue
-    assert hand_listing == set(_BOUNDED_REMOVAL_DEBT), {
-        "new": sorted(hand_listing - set(_BOUNDED_REMOVAL_DEBT)),
-        "cleared": sorted(set(_BOUNDED_REMOVAL_DEBT) - hand_listing),
-    }
+    # Nothing, and a literal rather than a list of recorded exceptions: the
+    # three files that hand-listed a recipe when this check went in read the
+    # routing table now, so there is no exception left to record.
+    assert hand_listing == set(), sorted(hand_listing)

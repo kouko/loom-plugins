@@ -5,7 +5,16 @@ from pathlib import Path
 
 import pytest
 
-from prose_pin import has_negation, split_sentences as _sentences
+# `_flat`, `_affirms` and `_pins_exact_sentence` come from `prose_pin` under
+# this module's own names: the protocol's test module and every recipe's
+# carried byte-identical copies of them.
+from prose_pin import (
+    affirms as _affirms,
+    flat_prose as _flat,
+    has_negation,
+    pins_exact_sentence as _pins_exact_sentence,
+    split_sentences as _sentences,
+)
 # Sentences owned by the protocol file and by the recipes are pinned in those
 # files' own test modules; the cross-document scans below read them from there
 # rather than keeping a second copy that could drift. The protocol is named,
@@ -147,10 +156,6 @@ def _names_stale_program_redispatch(section: str) -> bool:
     )
 
 
-def _pins_exact_sentence(section: str, sentence: str) -> bool:
-    return _sentences(section).count(sentence) == 1
-
-
 def test_stale_program_redispatch_helpers_synthetic() -> None:
     affirmative = (
         "When a fix widens or changes what the change covers and a committed adversarial "
@@ -289,10 +294,6 @@ def test_skipped_selection_step_omits_that_check() -> None:
 
 # --- The adversary updates its own programs with evidence and reuses first ---
 
-def _flat(path: Path) -> str:
-    return " ".join(re.sub(r"^> ?", "", path.read_text(encoding="utf-8"), flags=re.M).split())
-
-
 ADVERSARY_PROSE = _flat(ADVERSARY)
 # The attack procedure is one shared protocol file plus one recipe file per
 # kind of artifact, all in the same skill reference folder. Each of those
@@ -316,15 +317,6 @@ RECIPE_PINS = recipe_pins()
 PROBES_FIELD = re.compile(
     r"^probes: \[\{artifact: .+, status: reused \| modified \| new, reason: .+\}\]$", re.M
 )
-
-
-def _affirms(text: str, verb: str, literal: str, *extras: str) -> bool:
-    """Some sentence carries `verb` before `literal`, every extra, and no negation."""
-    for s in _sentences(text):
-        v, lit = s.find(verb), s.find(literal)
-        if 0 <= v < lit and all(e in s for e in extras) and not has_negation(s):
-            return True
-    return False
 
 
 # (doc, verb, literal, extras, affirmative example, rejected examples)

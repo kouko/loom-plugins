@@ -17,12 +17,22 @@ and is read from git there, not from these files.
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import pytest
 
-from prose_pin import has_negation, split_sentences as _sentences
+# The readers and the two matchers are `prose_pin`'s, under this module's own
+# names: the protocol's test module, every other recipe's and
+# `test_build_mechanical_checks.py` carried byte-identical copies of them.
+# `_rules` drops the heading lines: a heading is structure, not a rule, and
+# `test_adversary_layout.py` owns it.
+from prose_pin import (
+    affirms as _affirms,
+    flat_prose as _flat,
+    has_negation,
+    pins_exact_sentence as _pins_exact_sentence,
+    rule_prose as _rules,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,37 +41,9 @@ RECIPE = REFERENCES / "adversarial-spec.md"
 ADVERSARY = ROOT / "loom-code/agents/adversary.md"
 
 
-def _flat(path: Path) -> str:
-    return " ".join(re.sub(r"^> ?", "", path.read_text(encoding="utf-8"), flags=re.M).split())
-
-
-def _rules(path: Path) -> str:
-    """The recipe's prose, flattened, with its heading lines dropped.
-
-    A heading is structure, not a rule, and `test_adversary_layout.py` owns
-    it. Left in, it would be swept into the first sentence after it and a
-    rename would break a pin that is not about names.
-    """
-    text = re.sub(r"^#{1,6} .*$", "", path.read_text(encoding="utf-8"), flags=re.M)
-    return " ".join(re.sub(r"^> ?", "", text, flags=re.M).split())
-
-
 ADVERSARIAL_SPEC = _flat(RECIPE)
 ADVERSARY_PROSE = _flat(ADVERSARY)
 RULES = _rules(RECIPE)
-
-
-def _affirms(text: str, verb: str, literal: str, *extras: str) -> bool:
-    """Some sentence carries `verb` before `literal`, every extra, and no negation."""
-    for s in _sentences(text):
-        v, lit = s.find(verb), s.find(literal)
-        if 0 <= v < lit and all(e in s for e in extras) and not has_negation(s):
-            return True
-    return False
-
-
-def _pins_exact_sentence(section: str, sentence: str) -> bool:
-    return _sentences(section).count(sentence) == 1
 
 
 # --- The rules this recipe states -------------------------------------------

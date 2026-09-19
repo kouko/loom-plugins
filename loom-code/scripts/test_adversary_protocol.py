@@ -15,12 +15,21 @@ and it holds no rule a recipe owns.
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import pytest
 
-from prose_pin import has_negation, split_sentences
+# The readers and the two matchers are `prose_pin`'s, under this module's own
+# names: every recipe's test module and `test_build_mechanical_checks.py`
+# carried byte-identical copies of them.
+from prose_pin import (
+    affirms as _affirms,
+    flat_prose as _flat,
+    has_negation,
+    pins_exact_sentence as _pins_exact_sentence,
+    rule_prose as _rules,
+    split_sentences,
+)
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -29,48 +38,18 @@ PROTOCOL = REFERENCES / "adversarial.md"
 ADVERSARY = ROOT / "loom-code/agents/adversary.md"
 
 
-def _flat(path: Path) -> str:
-    return " ".join(re.sub(r"^> ?", "", path.read_text(encoding="utf-8"), flags=re.M).split())
-
-
-# The raw protocol, for the assertions that cut it at a heading, and the
-# flattened protocol, for the sentence pins.
-def _rules(path: Path) -> str:
-    """The protocol's prose, flattened, with its heading lines dropped.
-
-    A heading is structure, not a rule, and `test_adversary_layout.py` owns
-    it. Left in, it would be swept into the first sentence after it and a
-    rename would break a pin that is not about names.
-    """
-    text = re.sub(r"^#{1,6} .*$", "", path.read_text(encoding="utf-8"), flags=re.M)
-    return " ".join(re.sub(r"^> ?", "", text, flags=re.M).split())
-
-
+# The raw protocol, for the assertions that cut it at a heading; the flattened
+# protocol, for the sentence pins; and `_rules`, the same with its heading
+# lines dropped -- a heading is structure, and `test_adversary_layout.py` owns
+# it.
 PROTOCOL_TEXT = PROTOCOL.read_text(encoding="utf-8")
 ADVERSARIAL_REF = _flat(PROTOCOL)
 ADVERSARY_PROSE = _flat(ADVERSARY)
 RULES = _rules(PROTOCOL)
 
 
-def _sentences(text: str) -> list[str]:
-    return split_sentences(text)
-
-
 def _colon_sentences(text: str) -> list[str]:
     return split_sentences(text, ends=".:;")  # colon is a boundary here
-
-
-def _affirms(text: str, verb: str, literal: str, *extras: str) -> bool:
-    """Some sentence carries `verb` before `literal`, every extra, and no negation."""
-    for s in _sentences(text):
-        v, lit = s.find(verb), s.find(literal)
-        if 0 <= v < lit and all(e in s for e in extras) and not has_negation(s):
-            return True
-    return False
-
-
-def _pins_exact_sentence(section: str, sentence: str) -> bool:
-    return _sentences(section).count(sentence) == 1
 
 
 # --- The probe-maintenance rules the protocol owns --------------------------
@@ -286,7 +265,7 @@ def test_adversary_mutation_undo_uses_no_discard_command() -> None:
     assert _pins_exact_sentence(ADVERSARIAL_REF, NO_DISCARD_UNDO), ADVERSARIAL_REF
 
 
-# --- One home for the protocol's rules: adversary.md repeats none of them ---
+# --- A2 one home: a rule is stated in one file, and adversary.md repeats none ---
 
 # Each fragment names one rule the protocol owns; it lives in this file and
 # nowhere in adversary.md.
@@ -389,10 +368,16 @@ RULE_PINS = {
          "Giving a type a recipe is a new section in this file."),
     ),
     "protocol-taking-a-recipe-away-resets-the-row": (
-        "Taking one away", "deletes its file and puts its row back to `none`", (),
-        "Taking one away deletes its file and puts its row back to `none`.",
-        ("Taking one away never deletes its file and puts its row back to `none`.",
-         "Taking away one deletes its file and puts its row back to `none`.",
+        "Taking one away", "deletes its file",
+        ("deletes the test module named after that kind where it has one",
+         "puts its row back to `none`"),
+        "Taking one away deletes its file, deletes the test module named after that kind "
+        "where it has one, and puts its row back to `none`.",
+        ("Taking one away never deletes its file, deletes the test module named after that "
+         "kind where it has one, and puts its row back to `none`.",
+         "Taking away one deletes its file, deletes the test module named after that kind "
+         "where it has one, and puts its row back to `none`.",
+         "Taking one away deletes its file and puts its row back to `none`.",
          "Taking one away deletes its file."),
     ),
     "protocol-reuse-is-checked-before-any-probe-is-written": (
