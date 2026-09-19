@@ -20,6 +20,10 @@ steps it lists as skipped (spec, plan, implementer, tdd, adversarial,
 package-tests, blind-run); skip suggestions and user requests follow
 [expert-mode](../expert-mode/SKILL.md).
 
+Finding no task left to implement is not a reason to end Build. It means §2 has
+nothing to implement, not that the run is over: continue to §3, which states
+what such a re-entry runs.
+
 ## 2. Implement test first
 
 Before every host-native dispatch, the station must resolve the model-and-effort
