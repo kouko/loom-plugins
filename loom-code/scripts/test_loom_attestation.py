@@ -195,6 +195,72 @@ def test_matching_low_risk_attestation_accepts_one_reviewer(tmp_path: Path) -> N
     ) == []
 
 
+def test_reviewer_floor_is_one_for_a_version_only_json_bump(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "3.7.1", "description": "x"}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "manifest")
+    git(repo, "switch", "-q", "-c", "feature")
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "3.7.2", "description": "x"}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "bump version")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 1
+
+
+def test_reviewer_floor_stays_two_when_a_json_bump_touches_another_field(
+    tmp_path: Path,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "3.7.1", "description": "x"}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "manifest")
+    git(repo, "switch", "-q", "-c", "feature")
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "3.7.2", "description": "y"}) + "\n",
+        encoding="utf-8",
+    )
+    commit(repo, "bump version and sneak in a description change")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
+def test_reviewer_floor_stays_two_for_a_newly_added_json_file(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(
+        json.dumps({"name": "loom-code", "version": "1.0.0"}) + "\n", encoding="utf-8"
+    )
+    commit(repo, "add a new manifest")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
+def test_reviewer_floor_stays_two_for_malformed_json(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text('{"version": "3.7.1"}\n', encoding="utf-8")
+    commit(repo, "manifest")
+    git(repo, "switch", "-q", "-c", "feature")
+    manifest_path.write_text("{not valid json", encoding="utf-8")
+    commit(repo, "corrupt the manifest")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
 def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
 
