@@ -20,6 +20,7 @@ committed content; mutations touch only a copy under `tmp_path`.
 """
 from __future__ import annotations
 
+import os
 import re
 import shutil
 import subprocess
@@ -91,9 +92,25 @@ UNRUNNABLE_IN_SCRATCH = (
 
 IMPLEMENTER = "loom-code/agents/implementer.md"
 
+
+def _migration_note() -> list[str]:
+    """The note a pin module reads to learn which commit the split was.
+
+    Asked of that module rather than written here: the note's path is its
+    business, and a copy of the path here would be one more thing to keep
+    right. A module that stops needing one simply names none.
+    """
+    sys.path.insert(0, str(REPO / SCRIPTS))
+    try:
+        from test_adversary_layout import CORRESPONDENCE
+    except ImportError:  # the module, or the constant, is gone
+        return []
+    return [str(Path(CORRESPONDENCE).relative_to(REPO))]
+
+
 COPIED = [
     BUILD, ADVERSARY, IMPLEMENTER, TEST_MODULE, MANIFEST, f"{SCRIPTS}/prose_pin.py",
-    *_reference_docs(), *_pin_modules(),
+    *_reference_docs(), *_pin_modules(), *_migration_note(),
 ]
 
 
@@ -140,10 +157,30 @@ def _pin_targets(root: Path) -> list[str]:
     return [str(root / rel) for rel in targets]
 
 
+def _scratch_env() -> dict[str, str]:
+    """The environment the scratch run needs: this repository's object store.
+
+    The scratch tree is a handful of copied files with no `.git`, and a pin
+    module may read a fact out of git history -- the shared protocol as the
+    split commit wrote it is one. Pointing `GIT_DIR` at the real repository
+    lets `git show <commit>:<path>` resolve there, the same way the
+    repository's own runner points its copies at it. Nothing is written
+    through it: every mutation is a file in the scratch tree.
+    """
+    env = dict(os.environ)
+    gitdir = subprocess.run(
+        ["git", "rev-parse", "--absolute-git-dir"], cwd=REPO, capture_output=True, text=True
+    )
+    assert gitdir.returncode == 0, gitdir.stderr
+    env["GIT_DIR"] = gitdir.stdout.strip()
+    return env
+
+
 def _run_pins(root: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, "-m", "pytest", "-q", "-rf", "-p", "no:cacheprovider", *_pin_targets(root)],
         cwd=root / SCRIPTS,
+        env=_scratch_env(),
         capture_output=True,
         text=True,
         timeout=300,
