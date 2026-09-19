@@ -107,6 +107,11 @@ is Build's to produce; this file keeps no second copy of that mapping. Absence
 dispatches the adversary only when no adversarial program is committed;
 committed programs are re-run, never re-dispatched, exactly as after a fix.
 
+A recovery run is bounded across stations, not only within Build: an entry here
+counts toward that bound, and [closing-review](../closing-review/SKILL.md) §2
+states the bound and the record of entered stations it is counted from. Read it
+there; this file keeps no count of its own.
+
 Build dispatches the `loom-code:adversary` agent fresh-context again to update
 its own programs when a fix widens or changes what the change covers, or trunk
 content brought in by a trunk sync changes it, and a committed adversarial

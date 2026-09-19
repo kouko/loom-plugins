@@ -67,8 +67,12 @@ keeps no second copy of that mapping. Take the owner, never
 who produces it. When that owner is this station, produce the item here and
 route it nowhere. When it is another station, return the change there and
 dispatch no reviewer. Recovery adds a path and waives nothing: every check
-above runs on the recovered content, and the run enters no station more than
-twice.
+above runs on the recovered content. Keep the stations this run has entered as
+a list in entry order, in the active task context and not in a committed
+ledger, and name that list in the handoff and in either stop below. A second
+entry to a station is the last one allowed; a third entry to any station is a
+recovery that has failed, and it stops and reports under the rule below rather
+than routing on. The run enters no station more than twice.
 
 Stop and ask when producing an absent item needs a decision point the user
 has not answered for this change. When the user has answered it, including a

@@ -9,8 +9,11 @@ A4 boundary: RL-06 — an answered decision, including a general delegation,
              proceeds as user-decided, and the skip confirmation is untouched.
 A5 positive: RL-07 — a failed recovery stops and says what happened.
 A5 negative: RL-08 — a failed recovery neither retries nor hands on.
+A2 boundary: RL-10 — the station sequence is recorded, a second entry is the
+             last one allowed, and a third is a failed recovery.
 """
 
+import re
 import sys
 
 SKILL = "loom-code/skills/closing-review/SKILL.md"
@@ -20,20 +23,47 @@ LOOKUP_OPENER = "Absence is a distinct antecedent from a failing check."
 DECISION_OPENER = "Stop and ask when producing an absent item needs"
 FAILURE_OPENER = "Stop when the attempt to produce an absent item fails."
 
+# A station reference, not any occurrence of a station name as a substring.
+# `build` and `ship` are ordinary English words here ("the build", "rebuild",
+# "we ship"); this prose names those stations capitalized, so only the
+# capitalized word is a reference to them.
+STATION_REFERENCE = re.compile(
+    r"(?<![\w-])(?:capture-intent|write-spec|write-plan|closing-review)(?![\w-])"
+    r"|(?<![\w-])(?:Build|Ship|Maintain)(?![\w-])"
+)
+
+# Artifact nouns a restatement of the mapping would have to name. A second copy
+# phrased purely in artifact nouns — "the blind-run report is produced
+# downstream" — names no station and so slips past the check above.
+ARTIFACT_NOUNS = re.compile(
+    r"(?<![\w-])(?:intents?|specs?|plans?|diffs?|attestations?"
+    r"|blind[- ]run reports?|adversarial programs?)(?![\w-])",
+    re.IGNORECASE,
+)
+
+# Words that turn an artifact noun into a claim about who produces or owns it.
+PRODUCER_PHRASES = re.compile(
+    r"(?<![\w-])(?:produce[ds]?|produces|producing|producer"
+    r"|owns|owned|owner|owes|upstream|downstream"
+    r"|comes from|belongs to|responsible for)(?![\w-])",
+    re.IGNORECASE,
+)
+
 
 def _read():
     with open(SKILL, "r", encoding="utf-8") as f:
         return f.read()
 
 
-def _paragraph(opener):
-    """Return the paragraph carrying these words, or None when absent.
+def _normalize(text):
+    """Collapse whitespace so these probes test wording, not line wrapping."""
+    return " ".join(text.split())
 
-    Whitespace is normalized so that these probes test the wording, not where
-    the file happens to wrap a line.
-    """
+
+def _paragraph(opener):
+    """Return the normalized paragraph carrying these words, or None."""
     for para in _read().split("\n\n"):
-        normalized = " ".join(para.split())
+        normalized = _normalize(para)
         if opener in normalized:
             return normalized
     return None
@@ -49,6 +79,21 @@ def _require(probe, opener, phrases):
         print(f"{probe} FAIL: paragraph {opener!r} is missing {missing}")
         sys.exit(1)
     return para
+
+
+def _strip_code_spans(text):
+    """Drop inline code, so citing `stations[].produces` is not read as prose."""
+    return re.sub(r"`[^`]*`", " ", text)
+
+
+def _mapping_restatements(para):
+    """Sentences that pair an artifact noun with a claim about its producer."""
+    prose = _strip_code_spans(para)
+    offenders = []
+    for sentence in re.split(r"(?<=[.;])\s+", prose):
+        if ARTIFACT_NOUNS.search(sentence) and PRODUCER_PHRASES.search(sentence):
+            offenders.append(sentence.strip())
+    return offenders
 
 
 def test_RL_03_absence_is_distinct_and_the_producer_is_looked_up():
@@ -83,20 +128,16 @@ def test_RL_04_no_second_copy_of_the_artifact_station_mapping():
         print(f"RL-04 FAIL: no paragraph containing {LOOKUP_OPENER!r} in {SKILL}")
         sys.exit(1)
 
-    # A second copy of the mapping would have to name the producing stations.
-    other_stations = [
-        "capture-intent",
-        "write-spec",
-        "write-plan",
-        "Build",
-        "build",
-        "ship",
-        "Ship",
-        "maintain",
-    ]
-    restated = [name for name in other_stations if name in para]
+    # A second copy of the mapping may name the producing station...
+    restated = sorted(set(STATION_REFERENCE.findall(_strip_code_spans(para))))
     if restated:
         print(f"RL-04 FAIL: the lookup paragraph restates the mapping for {restated}")
+        sys.exit(1)
+
+    # ...or name none and say it in artifact nouns alone.
+    offenders = _mapping_restatements(para)
+    if offenders:
+        print(f"RL-04 FAIL: the lookup paragraph states who produces an artifact: {offenders}")
         sys.exit(1)
     print("RL-04 PASS: the lookup carries no second copy of the mapping")
 
@@ -151,6 +192,28 @@ def test_RL_08_failed_recovery_neither_retries_nor_hands_on():
     print("RL-08 PASS: a failed recovery neither retries nor hands on")
 
 
+def test_RL_10_the_sequence_is_recorded_and_the_second_entry_is_the_last():
+    """Acceptance 2 has two halves, and the boundary sits between them: the run
+    keeps a record of the stations it entered, a second entry to a station is
+    still allowed, and a third is not."""
+    _require(
+        "RL-10",
+        LOOKUP_OPENER,
+        [
+            # the sequence is recorded, in order, and where
+            "list in entry order",
+            "active task context",
+            # the boundary: the last allowed entry...
+            "second entry to a station is the last one allowed",
+            # ...and the first disallowed one, with its consequence
+            "third entry to any station",
+            # the bound itself, stated once
+            "no station more than twice",
+        ],
+    )
+    print("RL-10 PASS: the sequence is recorded and the second entry is the last allowed")
+
+
 if __name__ == "__main__":
     test_RL_03_absence_is_distinct_and_the_producer_is_looked_up()
     test_RL_04_no_second_copy_of_the_artifact_station_mapping()
@@ -158,4 +221,5 @@ if __name__ == "__main__":
     test_RL_06_answered_decision_proceeds_and_the_skip_rule_is_untouched()
     test_RL_07_failed_recovery_stops_and_reports()
     test_RL_08_failed_recovery_neither_retries_nor_hands_on()
+    test_RL_10_the_sequence_is_recorded_and_the_second_entry_is_the_last()
     print("All probes passed.")
