@@ -183,16 +183,32 @@ def _last_fragment(text):
 
 
 def _clause_containing(text, phrase):
-    """The smallest comma/semicolon/period-delimited clause of `text` that
-    contains `phrase`, for a negation guard on one clause of a multi-clause
-    sentence. Whole-sentence granularity is too coarse here: the sentence
-    carrying "return the change there" also carries "dispatch no reviewer"
-    later in the same sentence, so a whole-sentence has_negation call is
-    tripped by that unrelated "no" and would flag the committed, correct
-    text. Splitting on commas too isolates each clause from its neighbors."""
-    for clause in split_sentences(text, ends=".;,"):
-        if phrase in clause:
-            return clause
+    """The clause of `text` carrying `phrase`: its enclosing sentence
+    (bounded at the nearest `.;:` — a bare comma is too weak a sentence
+    boundary to trust on its own, the same reason build's RL-09 in
+    build/probes/test_recovery_rules.py never treats a comma as one),
+    narrowed back down to the comma-delimited pieces from that sentence's
+    start through the piece carrying `phrase`.
+
+    Both edges matter. Narrowing is required: the sentence carrying "return
+    the change there" also carries "dispatch no reviewer" later in the same
+    sentence, so reading the whole sentence trips has_negation on that
+    unrelated "no" and would flag the committed, correct text — a trailing
+    piece AFTER `phrase` is never absorbed. But narrowing by comma alone,
+    with no sentence-level backstop, is exactly the polarity gap a Round 2
+    reviewer found: "do not, under any circumstance, proceed" fences the
+    negation off from "proceed" with a comma on each side, so a clause that
+    stops at the nearest comma never sees it. Accumulating every piece back
+    to the sentence start closes that gap while still excluding the
+    unrelated trailing piece."""
+    for sentence in split_sentences(text, ends=".;:"):
+        if phrase not in sentence:
+            continue
+        pieces = []
+        for piece in split_sentences(sentence, ends=".;,"):
+            pieces.append(piece)
+            if phrase in piece:
+                return " ".join(pieces)
     return None
 
 
