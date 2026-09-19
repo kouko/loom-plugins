@@ -26,6 +26,20 @@ entries below record what they changed.
   directly to use Markdown tables for list-type or comparison-type
   information in a PR body, so it no longer depends on an external
   visualization card to remind the agent of that.
+- Build and closing-review recover from a missing verification item instead
+  of cycling between stations (recovery-loop change). The mechanism count
+  rises by two, not zero, for this addition; the two exceptions below are
+  this entry's own, not carried from the bump this section otherwise
+  describes.
+
+- budget-exception: build.absence-recovery — Build re-enters its
+  end-of-Build checks when an item it owes is absent, reading the producing
+  station from the contract manifest rather than a second copy; eval
+  loom-code/skills/build/probes/test_recovery_rules.py.
+- budget-exception: review.absence-recovery — closing-review tells absence
+  from a failing check, routes to the producing station or produces the item
+  in place, and bounds the run to two entries per station; eval
+  loom-code/skills/closing-review/probes/test_recovery_rules.py.
 
 ## [3.7.1] — 2026-09-16 — the version that carries three merged fixes out
 
