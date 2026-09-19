@@ -29,6 +29,18 @@ adds. It stood at 7 of 22 cases failing at the branch base, 18 of 22 after the
 split, and 24 of 24 passing here — the update also added two cases the list had
 never covered.
 
+## Second run, after the closing-review trunk sync
+
+`sync-trunk` at the start of closing review merged `origin/main` (`5a309716`)
+at `44ee3284`, bringing in ship-station content, and reported `content
+changed`. Under the station's own rule that dispatches no reviewer until
+Build's checks are repeated on the merged tree, both were re-run there:
+
+| Check | Result |
+|---|---|
+| The same complete package suite command | exit 0 |
+| Both adversarial programs in one invocation | 30 passed |
+
 ## Documents under check
 
 Each recipe and the shared protocol are read by their own test module, and the
