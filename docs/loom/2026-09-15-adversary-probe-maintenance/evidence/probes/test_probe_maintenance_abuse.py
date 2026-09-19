@@ -508,7 +508,11 @@ def test_build_exception_trunk_sync_staleness_covered() -> None:
 
 def test_cross_docs_roles_consistent_holds() -> None:
     """Held attempt: the four documents agree on who dispatches and who edits."""
-    build, adv, ref = _flat(BUILD), _flat(ADVERSARY), _procedure()
+    # The protocol, not the union with its recipes: these are rules about the
+    # adversary's role, which the shared protocol owns and a recipe may not
+    # restate. Reading the union here would accept a role rule that had left
+    # the protocol for one kind's file.
+    build, adv, ref = _flat(BUILD), _flat(ADVERSARY), _flat(REF)
     closing = _flat("loom-code/skills/closing-review/SKILL.md")
     assert "the adversary never fixes what it breaks" in build
     assert "You fix nothing you attack" in adv
