@@ -46,6 +46,11 @@ charter: 1.0
 - Test: A9 positive: four-properties-stated-once; negative: property-without-a-check.
 - Risk: Conventions can grow into a second rulebook. agent-decided: four lines naming change, add, remove and locate, plus one roadmap line; no new process and no cross-skill guidance.
 
+**W1-05 Cut the checks back to one owner each**  after: W1-03, W1-04  acceptance: 4
+- Files: loom-code/scripts/test_module_criteria_text.py, loom-code/scripts/test_adversary_layout.py, loom-code/scripts/test_adversary_protocol.py, loom-code/scripts/test_adversary_recipe_code.py, loom-code/scripts/test_adversary_routing.py
+- Test: A4 positive: add-is-one-file-and-one-row; negative: dropped-check-still-caught.
+- Risk: Removing a check can remove real coverage. agent-decided: every removal ships with a mutation showing a surviving check still catches what the removed one caught.
+
 **W2-02 Clean-environment suite**  after: W1-02, W1-03, W2-01  acceptance: 11
 - Files: docs/loom/2026-09-18-modular-adversary-recipes/evidence/suite-run.md
 - Test: A11 positive: full-suite-green; boundary: clean-clone-green.
