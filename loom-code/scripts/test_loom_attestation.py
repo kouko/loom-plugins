@@ -200,13 +200,13 @@ def test_reviewer_floor_is_one_for_a_version_only_json_bump(tmp_path: Path) -> N
     manifest_path = repo / "loom-code/plugin.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
-        json.dumps({"name": "loom-code", "version": "3.7.1", "description": "x"}) + "\n",
+        json.dumps({"name": "loom-code", "version": "9.9.0", "description": "x"}) + "\n",
         encoding="utf-8",
     )
     commit(repo, "manifest")
     git(repo, "switch", "-q", "-c", "feature")
     manifest_path.write_text(
-        json.dumps({"name": "loom-code", "version": "3.7.2", "description": "x"}) + "\n",
+        json.dumps({"name": "loom-code", "version": "9.9.1", "description": "x"}) + "\n",
         encoding="utf-8",
     )
     commit(repo, "bump version")
@@ -221,13 +221,13 @@ def test_reviewer_floor_stays_two_when_a_json_bump_touches_another_field(
     manifest_path = repo / "loom-code/plugin.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
-        json.dumps({"name": "loom-code", "version": "3.7.1", "description": "x"}) + "\n",
+        json.dumps({"name": "loom-code", "version": "9.9.0", "description": "x"}) + "\n",
         encoding="utf-8",
     )
     commit(repo, "manifest")
     git(repo, "switch", "-q", "-c", "feature")
     manifest_path.write_text(
-        json.dumps({"name": "loom-code", "version": "3.7.2", "description": "y"}) + "\n",
+        json.dumps({"name": "loom-code", "version": "9.9.1", "description": "y"}) + "\n",
         encoding="utf-8",
     )
     commit(repo, "bump version and sneak in a description change")
@@ -252,7 +252,7 @@ def test_reviewer_floor_stays_two_for_malformed_json(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
     manifest_path = repo / "loom-code/plugin.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text('{"version": "3.7.1"}\n', encoding="utf-8")
+    manifest_path.write_text('{"version": "9.9.0"}\n', encoding="utf-8")
     commit(repo, "manifest")
     git(repo, "switch", "-q", "-c", "feature")
     manifest_path.write_text("{not valid json", encoding="utf-8")
