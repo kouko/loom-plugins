@@ -52,9 +52,50 @@ content (a committed blind-run report aside) that Build's hand-off reports the
 complete package suite passing or `selection show` lists `package-tests` as
 skipped, and that it reports every adversarial program passing or
 `selection show` lists `adversarial` as skipped, each skip waiving only its own
-check. Otherwise return the change to
+check. When that hand-off reports a check failing, return the change to
 Build and dispatch no reviewer. Reviewers read only content whose Build
 mechanical checks passed.
+
+<!-- gate: review.absence-recovery -->
+Absence is a distinct antecedent from a failing check. On a re-entry with
+every planned task already committed, that hand-off is not in context, and the
+item this station needs may itself be missing. Neither state is a check
+reporting a failure, and neither routes like one. When an item is absent, read
+`loom-code/contract/manifest.yaml` (`stations[].produces` and
+`actions[].owner`) for the station that produces the absent item; this file
+keeps no second copy of that mapping. This lookup covers only an item this
+rule names: the adversarial programs, the blind-run report or the
+attestation. Take the owner, never
+`charter.signoff`, which names where an artifact is signed off rather than
+who produces it. When that owner is this station, produce the item here and
+route it nowhere; for a blind-run report specifically, that means following
+§3. When it is
+another station, return the change there, naming the station sequence
+entered so far, and dispatch no reviewer. Recovery adds a path and waives
+nothing: every check
+above runs on the recovered content. Keep the stations this run has entered as
+a list in entry order, in the active task context and not in a committed
+ledger, and name that list in the handoff and in either stop below. A second
+entry to a station is the last one allowed; a third entry to any station is a
+recovery that has failed, and it stops and reports under the rule below rather
+than routing on. The run enters no station more than twice, a count that
+tracks only entries made to resolve an absent item under this rule and is
+never incremented by §4's ordinary round-and-digest progression.
+
+Stop and ask when producing an absent item needs a decision point the user
+has not answered for this change, naming the station sequence entered so
+far. When the user has answered it, including a
+general delegation such as "you decide", proceed and record the choice as
+user-decided. This governs only whether the run asks again; a user-requested
+skip is still confirmed exactly as [expert-mode](../expert-mode/SKILL.md)
+requires.
+
+Stop when the attempt to produce an absent item fails. Report which item is
+absent, what was attempted, and where it failed. Also report the station
+sequence entered so far. Do not attempt that item a
+second time and do not hand the change on to another station.
+
+<!-- /gate -->
 
 When a blind run is needed, finish it and commit its report (§3) before
 dispatching the first reviewers. After Build commits completed functional
@@ -144,7 +185,9 @@ alone; a plain-text exit 2 is caller misuse rather than a routing signal.
 
 ## 3. Run the blind run
 
-Use a blind run when an Acceptance line cannot be settled mechanically. Its
+Use a blind run when an Acceptance line cannot be settled mechanically.
+Producing a blind run means dispatching the `loom-code:blind-runner` agent
+fresh-context, never an agent that touched any part of the change. Its
 `docs/loom/<change-id>/blind-run-report.md` is functional content; only
 `attestation.json` is publication metadata. Finish the blind run and commit
 that report on the change branch before the reviewers read the final
