@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-19-loom-flow-recovery-loop",
-  "content_digest": "b752cacc81def0578e85cf2eb07243e3702c4436",
+  "content_digest": "5fc939dcbd9f696ac31d994ce04b6b58582a4177",
   "executions": [
     {
       "kind": "package-tests",
