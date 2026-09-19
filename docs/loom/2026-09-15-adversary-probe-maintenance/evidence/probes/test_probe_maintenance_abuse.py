@@ -42,14 +42,79 @@ from prose_pin import has_negation, split_sentences  # noqa: E402
 
 BUILD = "loom-code/skills/build/SKILL.md"
 ADVERSARY = "loom-code/agents/adversary.md"
-REF = "loom-code/skills/closing-review/references/adversarial.md"
-TEST_MODULE = "loom-code/scripts/test_build_mechanical_checks.py"
-COPIED = [BUILD, ADVERSARY, REF, TEST_MODULE, "loom-code/scripts/prose_pin.py"]
+SCRIPTS = "loom-code/scripts"
+REFERENCES = "loom-code/skills/closing-review/references"
+REF = f"{REFERENCES}/adversarial.md"
+TEST_MODULE = f"{SCRIPTS}/test_build_mechanical_checks.py"
+MANIFEST = "loom-code/contract/manifest.yaml"
+
+
+def _reference_docs() -> list[str]:
+    """Every document of the reference folder, read from the folder itself.
+
+    The procedure the adversary follows is the shared protocol plus one file
+    per artifact kind, and which kinds exist is decided by the routing table
+    in the protocol, not by this probe. A hand-written list here went stale
+    the day a kind was given its own file: the copy below lost the recipes,
+    the pin module could not import, and every mutation case reported a dead
+    scratch tree instead of a surviving mutant. Reading the folder keeps the
+    copy right for a kind added or retired later.
+    """
+    folder = REPO / REFERENCES
+    return sorted(f"{REFERENCES}/{p.name}" for p in folder.glob("*.md") if p.is_file())
+
+
+def _recipes() -> list[str]:
+    """The reference documents other than the shared protocol."""
+    return [rel for rel in _reference_docs() if rel != REF]
+
+
+def _pin_modules() -> list[str]:
+    """The test modules that pin these documents' sentences, same reasoning.
+
+    The pins of the protocol and of each recipe live in that file's own test
+    module, and `test_build_mechanical_checks.py` imports them, so a copy
+    holding only the named module cannot run at all.
+    """
+    folder = REPO / SCRIPTS
+    return sorted(f"{SCRIPTS}/{p.name}" for p in folder.glob("test_adversary*.py") if p.is_file())
+
+
+# Modules the scratch copy cannot run, whatever they hold: one reads the
+# migration out of git history and the copy has no `.git`, and the other
+# copies the whole repository and runs pytest inside that copy. Both are
+# still copied, because the modules that do run import them.
+UNRUNNABLE_IN_SCRATCH = (
+    f"{SCRIPTS}/test_adversary_layout.py",
+    f"{SCRIPTS}/test_adversary_routing.py",
+)
+
+IMPLEMENTER = "loom-code/agents/implementer.md"
+
+COPIED = [
+    BUILD, ADVERSARY, IMPLEMENTER, TEST_MODULE, MANIFEST, f"{SCRIPTS}/prose_pin.py",
+    *_reference_docs(), *_pin_modules(),
+]
+
+
+def _raw(rel: str) -> str:
+    return (REPO / rel).read_text(encoding="utf-8")
 
 
 def _flat(rel: str) -> str:
-    text = (REPO / rel).read_text(encoding="utf-8")
-    return " ".join(re.sub(r"^> ?", "", text, flags=re.M).split())
+    return " ".join(re.sub(r"^> ?", "", _raw(rel), flags=re.M).split())
+
+
+def _procedure() -> str:
+    """The whole procedure the adversary contract routes it to, flattened.
+
+    The contract names the shared protocol and tells the adversary to read
+    the recipe of every kind the change touched, so a rule of the procedure
+    is a rule stated in the protocol or in one of its recipes. Before the
+    split every one of these sentences was in the protocol alone, which is
+    why the cases below used to read that one file.
+    """
+    return " ".join(_flat(rel) for rel in _reference_docs())
 
 
 def _ws(literal: str) -> re.Pattern[str]:
@@ -66,10 +131,19 @@ def _scratch(tmp_path: Path) -> Path:
     return root
 
 
+def _pin_targets(root: Path) -> list[str]:
+    """The pin modules the scratch copy runs: the named one and every module
+    that pins one of these documents, bar the two that need a repository."""
+    targets = [TEST_MODULE, *(m for m in _pin_modules() if m not in UNRUNNABLE_IN_SCRATCH)]
+    for rel in targets:
+        assert (root / rel).is_file(), rel
+    return [str(root / rel) for rel in targets]
+
+
 def _run_pins(root: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "-rf", "-p", "no:cacheprovider", str(root / TEST_MODULE)],
-        cwd=root / "loom-code/scripts",
+        [sys.executable, "-m", "pytest", "-q", "-rf", "-p", "no:cacheprovider", *_pin_targets(root)],
+        cwd=root / SCRIPTS,
         capture_output=True,
         text=True,
         timeout=300,
@@ -85,70 +159,142 @@ def _mutate(root: Path, rel: str, old: str, new: str) -> None:
 
 
 def _failed_tests(output: str) -> set[str]:
-    """Test names (with parameter id) from pytest's FAILED summary lines."""
-    return {m.group(1) for m in re.finditer(r"^FAILED \S*?::(\S+)", output, re.M)}
+    """Failed cases from pytest's FAILED summary lines, as `module::name[id]`.
+
+    The module is kept because the same test name now lives in several
+    modules at once: the protocol's module and each recipe's module both
+    carry `test_adversary_probe_maintenance_rule_stated`, so a bare name
+    would let a pin in one file be credited with killing a mutation in
+    another file's rule.
+    """
+    found = set()
+    for match in re.finditer(r"^FAILED (?P<path>\S+?)::(?P<name>\S+)", output, re.M):
+        found.add(f"{Path(match.group('path')).name}::{match.group('name')}")
+    return found
 
 
 def test_failed_tests_parser_synthetic() -> None:
-    """Self-test: a full parametrised name is parsed; a sibling test sharing the id is distinct."""
+    """Self-test: a full parametrised name is parsed with its module; the same
+    name in another module is a different case, and a bare name is neither."""
     out = (
         "FAILED /x/test_build_mechanical_checks.py::test_probe_maintenance_pin_helpers_synthetic"
         "[build-trigger-excludes-caught-defect] - AssertionError\n"
     )
     names = _failed_tests(out)
-    assert "test_probe_maintenance_pin_helpers_synthetic[build-trigger-excludes-caught-defect]" in names
-    assert "test_adversary_probe_maintenance_rule_stated[build-trigger-excludes-caught-defect]" not in names
+    assert (
+        "test_build_mechanical_checks.py::test_probe_maintenance_pin_helpers_synthetic"
+        "[build-trigger-excludes-caught-defect]"
+    ) in names
+    assert (
+        "test_adversary_protocol.py::test_probe_maintenance_pin_helpers_synthetic"
+        "[build-trigger-excludes-caught-defect]"
+    ) not in names
+    assert "test_probe_maintenance_pin_helpers_synthetic[build-trigger-excludes-caught-defect]" not in names
 
 
 _OVERRIDE_ANCHOR = "Implementers and the orchestrator never edit an adversarial program."
+
+BUILD_MODULE = Path(TEST_MODULE).name
+
+
+def _holder(anchor: str) -> str:
+    """The reference document that states `anchor`: found, never named here.
+
+    A rule of the procedure now sits in the shared protocol or in one kind's
+    recipe, and which of them is a fact of the tree. Writing the file name
+    into this list instead would make every mutation case go stale the next
+    time a rule moves between those files, and would leave a dangling name
+    behind the day that kind is retired.
+    """
+    hits = [rel for rel in _reference_docs() if _ws(anchor).search(_raw(rel))]
+    assert len(hits) == 1, f"{anchor!r} is stated in {hits}, not in exactly one document"
+    return hits[0]
+
+
+def _kind_of(rel: str) -> str:
+    """The artifact kind a recipe file attacks, from its name."""
+    return Path(rel).stem[len("adversarial-"):]
+
+
+def _pin_doc_key(rel: str) -> str:
+    """The key the pin module files that document under."""
+    return "ref" if rel == REF else f"ref-{_kind_of(rel)}"
+
+
+def _pin_module(rel: str) -> str:
+    """The module that carries that document's own pins."""
+    if rel == REF:
+        return "test_adversary_protocol.py"
+    return f"test_adversary_recipe_{_kind_of(rel).replace('-', '_')}.py"
+
+
+_RED_THEN_REVERTED = "Each mutation must turn the probe RED and is then reverted"
+_DISCARD_TAIL = "they can destroy uncommitted work."
+_FLOOR_SENTENCE = "Reused and modified cases count toward the floor."
 
 # (id, file, old text, replacement, pin test expected to kill it)
 MUTATIONS = [
     # Controls: guards the pins do cover. A mutant surviving here is a vacuous pin.
     ("drop-fresh-context", BUILD, "agent fresh-context again to update", "agent again to update",
-     "test_build_redispatches_adversary_for_stale_programs"),
+     f"{BUILD_MODULE}::test_build_redispatches_adversary_for_stale_programs"),
     ("drop-handoff-reason", BUILD, "each adversary re-dispatch with its reason, ", "",
-     "test_build_redispatches_adversary_for_stale_programs"),
-    ("drop-red-then-reverted", ADVERSARY,
-     "Each mutation must turn the probe RED and is then reverted;", "",
-     "test_adversary_probe_maintenance_rule_stated[mutation-red-then-reverted]"),
+     f"{BUILD_MODULE}::test_build_redispatches_adversary_for_stale_programs"),
+    ("drop-red-then-reverted", _holder(_RED_THEN_REVERTED), _RED_THEN_REVERTED, "The report says so;",
+     f"{_pin_module(_holder(_RED_THEN_REVERTED))}::test_adversary_probe_maintenance_rule_stated"
+     f"[{_pin_doc_key(_holder(_RED_THEN_REVERTED))}-mutation-red-then-reverted]"),
     ("loosen-ref-reuse-sentence", REF,
      "It reuses a program that covers a case,", "It may write new probes freely,",
-     "test_adversary_probe_maintenance_rule_stated[ref-reuse-modify-then-new]"),
+     f"{_pin_module(REF)}::test_adversary_probe_maintenance_rule_stated[ref-reuse-modify-then-new]"),
     # Guards the exception relies on to refuse a defect relabelled as stale.
     ("drop-product-defect-guard", BUILD,
      "fails, or is unable to run, for that reason, rather than for a product defect it correctly caught.",
      "fails for any reason.",
-     "test_adversary_probe_maintenance_rule_stated[build-trigger-excludes-caught-defect]"),
+     f"{BUILD_MODULE}::test_adversary_probe_maintenance_rule_stated"
+     "[build-trigger-excludes-caught-defect]"),
     ("drop-build-decides-defect-fix", BUILD,
      "Build decides which case applies from the program's failure and the widened scope, "
      "and fixes a product defect in the product as above.", "",
-     "test_adversary_probe_maintenance_rule_stated[build-decides-and-fixes-defect]"),
+     f"{BUILD_MODULE}::test_adversary_probe_maintenance_rule_stated[build-decides-and-fixes-defect]"),
     ("drop-rerun-after-update", BUILD,
      "After the update, Build repeats these end-of-Build checks.", "",
-     "test_adversary_probe_maintenance_rule_stated[build-reruns-after-update]"),
+     f"{BUILD_MODULE}::test_adversary_probe_maintenance_rule_stated[build-reruns-after-update]"),
     # Added sentences that override a pinned rule without touching its text.
     ("orchestrator-may-modify-program", BUILD, _OVERRIDE_ANCHOR,
      _OVERRIDE_ANCHOR + " When time is short, the orchestrator may modify a stale adversarial program itself.",
-     "test_no_other_role_edits_adversarial_program"),
+     f"{BUILD_MODULE}::test_no_other_role_edits_adversarial_program"),
     ("orchestrator-rewrites-program-modal-free", BUILD, _OVERRIDE_ANCHOR,
      _OVERRIDE_ANCHOR + " When time is short, the orchestrator rewrites a stale adversarial program itself.",
-     "test_no_other_role_edits_adversarial_program"),
-    ("added-discard-literal", ADVERSARY, "they can destroy uncommitted work.",
-     "they can destroy uncommitted work. Clean up a dirty copy with `git reset --hard` afterwards.",
-     "test_no_added_sentence_overrides_pinned_rules[adversary]"),
-    ("implementer-pin-counts-floor", REF, "Reused and modified cases count toward the floor.",
-     "Reused and modified cases count toward the floor. An implementer's pin counts toward the floor.",
-     "test_no_added_sentence_overrides_pinned_rules[ref]"),
+     f"{BUILD_MODULE}::test_no_other_role_edits_adversarial_program"),
+    ("added-discard-literal", _holder(_DISCARD_TAIL), _DISCARD_TAIL,
+     _DISCARD_TAIL + " Clean up a dirty copy with `git reset --hard` afterwards.",
+     f"{BUILD_MODULE}::test_no_added_sentence_overrides_pinned_rules"
+     f"[{_pin_doc_key(_holder(_DISCARD_TAIL))}]"),
+    ("implementer-pin-counts-floor", _holder(_FLOOR_SENTENCE), _FLOOR_SENTENCE,
+     _FLOOR_SENTENCE + " An implementer's pin counts toward the floor.",
+     f"{BUILD_MODULE}::test_no_added_sentence_overrides_pinned_rules"
+     f"[{_pin_doc_key(_holder(_FLOOR_SENTENCE))}]"),
     ("redispatch-for-caught-defect", BUILD, "After the update, Build repeats these end-of-Build checks.",
      "After the update, Build repeats these end-of-Build checks. "
      "Build re-dispatches the adversary for a program that caught a product defect.",
-     "test_no_added_sentence_overrides_pinned_rules[build]"),
+     f"{BUILD_MODULE}::test_no_added_sentence_overrides_pinned_rules[build]"),
     ("every-failure-stale", BUILD, "After the update, Build repeats these end-of-Build checks.",
      "After the update, Build repeats these end-of-Build checks. "
      "Build treats every failure as stale and re-dispatches the adversary.",
-     "test_no_added_sentence_overrides_pinned_rules[build]"),
+     f"{BUILD_MODULE}::test_no_added_sentence_overrides_pinned_rules[build]"),
 ]
+
+
+def test_holder_and_pin_key_helpers_synthetic() -> None:
+    """Self-test: a rule is found in exactly one reference document, and that
+    document's pin key and pin module follow from its name, not from a list."""
+    assert _holder(_FLOOR_SENTENCE) in _reference_docs()
+    assert _pin_doc_key(REF) == "ref"
+    assert _pin_module(REF) == "test_adversary_protocol.py"
+    synthetic = f"{REFERENCES}/adversarial-synthetic-kind.md"
+    assert _pin_doc_key(synthetic) == "ref-synthetic-kind"
+    assert _pin_module(synthetic) == "test_adversary_recipe_synthetic_kind.py"
+    with pytest.raises(AssertionError):
+        _holder("a sentence no document of the reference folder states")
 
 
 def test_pins_scratch_copy_unmutated_passes(tmp_path: Path) -> None:
@@ -204,11 +350,37 @@ def test_defect_handling_helper_synthetic() -> None:
     )
 
 
+_REDISPATCH = re.compile(r"re-dispatch", re.I)
+
+
 def _update_section(rel: str) -> str:
-    text = _flat(rel)
+    """What the document says about updating a stale adversarial program.
+
+    The contract used to carry a heading this split on; the consolidation of
+    the rule text retired that heading and left the rules in the contract's
+    role and input paragraphs, so the region is now taken from the sentences
+    that speak of a re-dispatch. The procedure's region is the section that
+    owns the update rules, cut at the next heading of its own file rather
+    than at the name of a section that moved to a recipe.
+    """
     if rel == ADVERSARY:
-        return text.split("**Updating your own programs.**", 1)[1].split("## What you return", 1)[0]
-    return text.split("## Reuse first, update with evidence", 1)[1].split("## Code", 1)[0]
+        return " ".join(s for s in split_sentences(_flat(rel)) if _REDISPATCH.search(s))
+    after = _raw(rel).split("## Reuse first, update with evidence", 1)
+    assert len(after) == 2, rel
+    return " ".join(re.split(r"^## ", after[1], maxsplit=1, flags=re.M)[0].split())
+
+
+def test_update_section_helpers_synthetic() -> None:
+    """Self-test: the contract's region is the re-dispatch sentences, and the
+    procedure's region stops at the next heading of its own file."""
+    assert _REDISPATCH.search("When Build re-dispatches it for a widened scope")
+    assert not _REDISPATCH.search("Build hands off to closing review.")
+    section = _update_section(REF)
+    assert "Reuse a program" in section or "It reuses a program" in section
+    assert "## Recording" not in section
+    contract = _update_section(ADVERSARY)
+    assert contract, "the contract says nothing about a re-dispatch"
+    assert all(_REDISPATCH.search(s) for s in split_sentences(contract))
 
 
 def test_adversary_update_defect_relabelled_stale_kept_red() -> None:
@@ -306,10 +478,14 @@ def test_adversary_reuse_implementer_tests_excluded_from_floor() -> None:
     turns the writer's own tests into the attack arm. Both the adversary's own
     contract and the reference it reads must carry the exclusion.
     """
-    missing = [rel for rel in (ADVERSARY, REF) if not _affirms_exclusion(_flat(rel))]
-    assert not missing, (
+    assert _affirms_exclusion(_procedure()), (
         "FINDING self-reuse floor (writer-is-judge): the reuse-first rule lets tests "
-        f"added by this change's implementer count toward the adversarial floor in {missing}."
+        "added by this change's implementer count toward the adversarial floor; neither "
+        "the shared protocol nor any recipe it routes to states the exclusion."
+    )
+    assert REF in _flat(ADVERSARY), (
+        "FINDING unreachable exclusion: the contract does not name the procedure that "
+        "states the exclusion, so nothing routes the adversary to it."
     )
 
 
@@ -332,11 +508,13 @@ def test_build_exception_trunk_sync_staleness_covered() -> None:
 
 def test_cross_docs_roles_consistent_holds() -> None:
     """Held attempt: the four documents agree on who dispatches and who edits."""
-    build, adv, ref = _flat(BUILD), _flat(ADVERSARY), _flat(REF)
+    build, adv, ref = _flat(BUILD), _flat(ADVERSARY), _procedure()
     closing = _flat("loom-code/skills/closing-review/SKILL.md")
     assert "the adversary never fixes what it breaks" in build
     assert "You fix nothing you attack" in adv
     assert "fixes nothing in the product" in ref
     assert "Closing review dispatches no adversary and creates no adversarial program." in closing
-    assert "When Build re-dispatches" in adv and "When Build re-dispatches" in ref
+    # Case-insensitively: the contract now carries the re-dispatch inside a
+    # sentence rather than opening one with it.
+    assert _REDISPATCH.search(adv) and _REDISPATCH.search(ref)
     assert "closing-review" not in _update_section(ADVERSARY)
