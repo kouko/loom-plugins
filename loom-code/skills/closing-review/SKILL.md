@@ -52,9 +52,34 @@ content (a committed blind-run report aside) that Build's hand-off reports the
 complete package suite passing or `selection show` lists `package-tests` as
 skipped, and that it reports every adversarial program passing or
 `selection show` lists `adversarial` as skipped, each skip waiving only its own
-check. Otherwise return the change to
+check. When that hand-off reports a check failing, return the change to
 Build and dispatch no reviewer. Reviewers read only content whose Build
 mechanical checks passed.
+
+Absence is a distinct antecedent from a failing check. On a re-entry with
+every planned task already committed, that hand-off is not in context, and the
+item this station needs may itself be missing. Neither state is a check
+reporting a failure, and neither routes like one. When an item is absent, read
+`loom-code/contract/manifest.yaml` (`stations[].produces` and
+`actions[].owner`) for the station that produces the absent item; this file
+keeps no second copy of that mapping. Take the owner, never
+`charter.signoff`, which names where an artifact is signed off rather than
+who produces it. When that owner is this station, produce the item here and
+route it nowhere. When it is another station, return the change there and
+dispatch no reviewer. Recovery adds a path and waives nothing: every check
+above runs on the recovered content, and the run enters no station more than
+twice.
+
+Stop and ask when producing an absent item needs a decision point the user
+has not answered for this change. When the user has answered it, including a
+general delegation such as "you decide", proceed and record the choice as
+user-decided. This governs only whether the run asks again; a user-requested
+skip is still confirmed exactly as [expert-mode](../expert-mode/SKILL.md)
+requires.
+
+Stop when the attempt to produce an absent item fails. Report which item is
+absent, what was attempted, and where it failed. Do not attempt that item a
+second time and do not hand the change on to another station.
 
 When a blind run is needed, finish it and commit its report (§3) before
 dispatching the first reviewers. After Build commits completed functional
