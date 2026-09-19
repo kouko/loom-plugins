@@ -7,22 +7,20 @@ contract manifest version stays 2.3.1 and the mechanism count is unchanged.
 Two changes merged into `main` after 3.7.1 was cut without the version
 moving, so `claude plugin update loom-code@loom` answered "already at the
 latest version (3.7.1)" and refreshed nothing — the exact failure 3.7.1's own
-entry below describes, repeated. Confirmed independently: a session running
-the installed 3.7.1 copy on 2026-09-19, seven hours after #30 merged, hit the
-pre-#30 refusal text verbatim (`found 0` plus the canonical-form line, with
-none of #30's added routes) and spent the next three hours trying undocumented
-workarounds instead of the routes #30 exists to name. The bump is what makes
-those already-merged fixes reach an installed copy; the entries below record
-what they changed.
+entry below describes, repeated. Reported by the originator: an installed
+3.7.1 copy still emitted the pre-#30 refusal text (`found 0` plus the
+canonical-form line, with none of #30's added routes) after #30 merged. The
+bump is what makes those already-merged fixes reach an installed copy; the
+entries below record what they changed.
 
 - The publication gate names the legal routes when it blocks (#30). A refusal
   citing a missing attestation, whether from `push`, `land`, or a merge, now
   appends which of two routes is actually open — running `closing-review`, or
   proposing a step selection the user confirms by typing the printed
   code — and states plainly that the agent must never hand the blocked
-  command to the user to run. The three states a zero-or-multiple attestation
-  count can be in (missing, over-attested, or nothing left to publish) each
-  get the route wording that actually applies to that state; a route named
+  command to the user to run. Each state a non-exactly-one attestation count
+  can be in (missing, over-attested, unreadable, or nothing left to publish)
+  gets the route wording that actually applies to that state; a route named
   where it cannot work is the same failure this fix exists to close.
 - Table usage guidance added to the ship skill (#31). The skill now says
   directly to use Markdown tables for list-type or comparison-type

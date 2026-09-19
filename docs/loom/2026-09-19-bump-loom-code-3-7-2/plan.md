@@ -38,7 +38,7 @@ records it for the closing-review gate rather than redoing the work.
 
 ## Questions asked
 
-① — consequence — 這個版本升級要推送並合併嗎? — 使用者稍早已看過完整內容並回答「好」,隨後再次確認「推吧 合併吧」;capture-intent 站沿用這兩次回答作為決策點①的確認,未重複提問。
+① — consequence — Should this version bump be pushed and merged? — The user had already seen the full content and answered 「好」, then confirmed again with 「推吧 合併吧」; capture-intent treated those two answers as decision point ①'s confirmation and did not ask again.
 
 ## Risks
 

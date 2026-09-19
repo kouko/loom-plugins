@@ -109,8 +109,10 @@ def test_marketplace_entry_pins_no_version() -> None:
 
 
 def test_no_operative_file_still_carries_the_previous_version() -> None:
-    """Changelog prose and the docs/loom record legitimately name 3.7.1. Any
-    other tracked file still stating it is a copy the bump missed."""
+    """Changelog prose and the docs/loom record legitimately name 3.7.1. This
+    probe's own source legitimately names it too, to describe and parse the
+    boundary it tests. Any other tracked file still stating it is a copy the
+    bump missed."""
     tracked = subprocess.run(
         ["git", "ls-files", "-z"],
         cwd=REPO,
@@ -118,9 +120,10 @@ def test_no_operative_file_still_carries_the_previous_version() -> None:
         text=True,
         check=True,
     ).stdout.split("\0")
+    self_path = Path(__file__).resolve().relative_to(REPO).as_posix()
     stale: list[str] = []
     for rel in tracked:
-        if not rel or rel.startswith("docs/") or rel.endswith("CHANGELOG.md"):
+        if not rel or rel.startswith("docs/") or rel.endswith("CHANGELOG.md") or rel == self_path:
             continue
         path = REPO / rel
         if not path.is_file() or "node_modules" in Path(rel).parts:
