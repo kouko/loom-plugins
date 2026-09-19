@@ -10,6 +10,9 @@ checker reads.
   a new mechanism needs a regression eval and a net count that does not
   rise without a `budget-exception:` line in that version's CHANGELOG entry
 - Where an incident becomes work: `skills/maintain/SKILL.md`
+- How the modular shape spreads: The rest of loom is brought to this shape
+  one skill per change, with the adversary recipe split under
+  `loom-code/skills/closing-review/references/` as the worked example.
 
 The pre-1.0 phase plan (P1-E, P3-D, the Superpowers-parity goals) shipped
 or was deleted with the skills it planned.
