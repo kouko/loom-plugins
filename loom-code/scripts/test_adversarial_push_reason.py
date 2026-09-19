@@ -24,7 +24,20 @@ from loom_checker.command_handlers import push as push_handler
 
 SCRIPTS = Path(__file__).resolve().parent
 CHECKER = SCRIPTS / "loom_checker.py"
-FOUND_ZERO = "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
+FOUND_ZERO = (
+    "BLOCK push.attestation: branch must carry exactly one generated attestation; found 0"
+    "; two legal routes, both run by the agent: run the closing-review station,"
+    " which generates the attestation and needs no confirmation, so it is open"
+    " in every session; or, in a session that can record a confirmation the user"
+    " types and only once per change, because expert-mode allows the agent one"
+    " skip proposal per change, propose a step selection"
+    " (`loom_checker.py selection propose <change-id> --origin agent --skip reviewers`)"
+    " that the user confirms by typing `/loom-code:expert-mode <code>`"
+    " (Codex: `$expert-mode`) with the code"
+    " the proposal printed, after which finalize-review drops the reviewer floor to"
+    " zero and still emits an attestation recording the skip;"
+    " never hand the blocked publication command to the user to run"
+)
 
 
 def _git(repo: Path, *args: str) -> str:
@@ -130,7 +143,10 @@ def test_push_hook_hostile_variant_attested_blocks(tmp_path, monkeypatch, comman
     err = StringIO()
     rc = push_handler.cmd_push(["--hook"], StringIO(), err)
     assert rc == 2, err.getvalue()
-    assert not err.getvalue().startswith(FOUND_ZERO)
+    # `FOUND_ZERO` is the whole refusal, so `startswith` would let a stderr that
+    # opens with the count and carries a different tail through. The count is
+    # what this probe is about, so the count is what it asserts.
+    assert "found 0" not in err.getvalue()
 
 
 def test_push_hook_reason_path_repository_unchanged(tmp_path):

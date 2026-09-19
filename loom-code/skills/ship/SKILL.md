@@ -121,12 +121,20 @@ The command verifies exactly one branch attestation, its schema, content
 digest, execution identities/results, reviewer verdicts, and live HEAD. It
 then derives the origin repository, default base, current branch, and exact
 refspec; performs a non-forced push; and opens or reuses one PR. Do not run a
-separate attestation preflight or construct Git push or PR-create commands.
+separate attestation preflight, construct Git push or PR-create commands, or
+hand a refused publication command to the user to run; where a refusal names a
+remedy, take it, and where it names none, report the refusal and stop — where
+the branch attests nothing, the remedy is one of two routes: run the
+closing-review station, which generates the attestation, or propose a step
+selection the user confirms by typing `/loom-code:expert-mode <code>`
+(Codex: `$expert-mode`) with the code the proposal printed.
 
 The installed plugin's `PreToolUse` hook applies the same check automatically
 to direct raw publication commands and retains destination/refspec safety for
 callers that bypass `publish`. No repository-local checker scaffold or
-hook-firing ledger is required.
+hook-firing ledger is required. That hook judges the body it can read when it
+looks, not the body the pull request receives; a file swapped between those two
+reads is outside what any such check can promise.
 
 ## 4. Observe CI
 

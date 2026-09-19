@@ -28,6 +28,12 @@ import tempfile
 import time
 
 
+# Named so callers that derive the publication identity can tell "no
+# attestation on this branch" from the other derivation failures, and say what
+# to do about it. The text itself is unchanged.
+MISSING_ATTESTATION = "branch must carry exactly one attested change; found "
+
+
 PUBLISH_REDIRECT_ENV = {
     "GIT_DIR", "GIT_COMMON_DIR", "GIT_WORK_TREE", "GIT_NAMESPACE", "GIT_OBJECT_DIRECTORY",
     "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_EXEC_PATH", "GIT_SSH",
@@ -156,7 +162,7 @@ def _publication_attestation(repo: Path) -> tuple[str | None, dict | None, str |
     matcher = glob_to_regex(template.replace("<change-id>", "*"))
     candidates = sorted(path for path in changed_paths(repo) if matcher.fullmatch(path))
     if len(candidates) != 1:
-        return None, None, f"branch must carry exactly one attested change; found {len(candidates)}"
+        return None, None, f"{MISSING_ATTESTATION}{len(candidates)}"
     match = re.fullmatch(
         re.escape(template).replace(re.escape("<change-id>"), r"(?P<change_id>[^/]+)"),
         candidates[0],
@@ -171,6 +177,23 @@ def _publication_attestation(repo: Path) -> tuple[str | None, dict | None, str |
     if not isinstance(payload, dict) or payload.get("change_id") != change_id:
         return None, None, "attestation change_id does not match its path"
     return change_id, payload, None
+
+
+def selection_disclosure_failure(repo: Path, body: str) -> str | None:
+    """The refusal this PR body earns for the branch's recorded step selection,
+    or None when it discloses exactly what was skipped.
+
+    Every route that opens a pull request asks this one function: the
+    publication command, and the `PreToolUse` hook's trusted PR-create form
+    (command_handlers/push.py). A skip the user typed is disclosed whichever
+    route opens the request, and the two routes cannot drift apart because
+    neither owns a copy of the rule."""
+    # No derivable attestation means no selection: a disclosure line is then false.
+    try:
+        _change_id, attested, _error = _publication_attestation(repo)
+    except UsageError:  # no branch base: the attestation gate above already owns that
+        attested = None
+    return validate_selection_disclosure(body, attested or {"selection": None})
 
 
 def _publication_change_id(repo: Path) -> tuple[str | None, str | None]:
@@ -415,13 +438,8 @@ def _cmd_publish_trusted(
     if _cmd_push(["--head", head, "--require-live-head"], out, err) != 0:
         return 1
     out.write(f"Attestation validated for {head}\n")
-    # No derivable attestation means no selection: a disclosure line is then false.
-    try:
-        _change_id, attested, _error = _publication_attestation(repo)
-    except UsageError:  # no branch base: the attestation gate above already owns that
-        attested = None
-    disclosure_error = validate_selection_disclosure(
-        body_file.read_text(encoding="utf-8"), attested or {"selection": None}
+    disclosure_error = selection_disclosure_failure(
+        repo, body_file.read_text(encoding="utf-8")
     )
     if disclosure_error:
         return report([("push.contextual-body", disclosure_error)], err)

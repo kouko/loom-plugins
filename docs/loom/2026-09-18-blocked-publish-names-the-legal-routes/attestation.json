@@ -1,0 +1,41 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-18-blocked-publish-names-the-legal-routes",
+  "content_digest": "751b7b6b3f36e03b1637e6be9eec045663e96e8a",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversarial_blocked_publish_routes.py -q",
+      "artifact": "loom-code/scripts/test_adversarial_blocked_publish_routes.py",
+      "result": "pass",
+      "command_digest": "a746ee87589b05ce6d69c144ec21c1228f096ee6bc079f82b1271b9f541eb3c1"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "rev-code",
+      "vendor": "claude",
+      "model": "opus",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "rev-conformance",
+      "vendor": "claude",
+      "model": "opus",
+      "lens": "spec",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
