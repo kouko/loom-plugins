@@ -103,7 +103,9 @@ owes is absent, it runs this section from step 1 to produce that item. Absence
 is a distinct antecedent from a failing check; an item that exists and fails is
 a failure and is fixed as above. Read `loom-code/contract/manifest.yaml`
 (`stations[].produces` and `actions[].owner`) to decide whether an absent item
-is Build's to produce; this file keeps no second copy of that mapping. Absence
+is Build's to produce; this file keeps no second copy of that mapping. This
+lookup covers only an item this rule names: the adversarial programs, the
+blind-run report or the attestation. Absence
 dispatches the adversary only when no adversarial program is committed;
 committed programs are re-run, never re-dispatched, exactly as after a fix.
 
@@ -129,6 +131,6 @@ adversarial program. After the update, Build repeats these end-of-Build checks.
 Commit functional changes normally. Report the branch base, HEAD, the
 `sync-trunk` result with any warning it printed, changed paths, focused test
 results, the complete package suite command and its result,
-each adversarial program's path and command, each adversary re-dispatch with its reason, every unresolved adversary finding, and any unresolved risk. Call `loom-code:closing-review`
+each adversarial program's path and command, each adversary re-dispatch with its reason, every unresolved adversary finding, the station sequence entered so far when this run recovered from an absent item, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after `closing-review` generates it.
