@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-18-modular-adversary-recipes",
-  "content_digest": "4e20a64c5c10ac395f235e8f88faf7f4a33f06c9",
+  "content_digest": "6b8d1f2911a775d66768ab15f40856ad32b47bad",
   "executions": [
     {
       "kind": "package-tests",
@@ -75,6 +75,12 @@
       "anchor": "loom-code/skills/closing-review/references/adversarial.md",
       "text": "Unresolved at episode end: the removal sentence says to delete the test module named after the kind, while skill and gate share one recipe and one test module, so retiring only gate and following the sentence literally deletes files skill still routes to.",
       "fix": "Say that a recipe shared by several kinds is retired only when its last kind is."
+    },
+    {
+      "severity": "nit",
+      "anchor": "docs/loom/2026-09-18-modular-adversary-recipes/evidence/suite-run.md",
+      "text": "Disclosed at publication: this attestation's digest names the tree after the pre-merge trunk sync at 1499dea6, one commit newer than the content the two reviewers read. That commit is a1891ed1, a loom-code version bump merged through the same stations with its own attestation. kouko chose on 2026-09-19 to carry the verdicts forward rather than open a fourth review round; Build's mechanical checks were repeated on the merged tree first.",
+      "fix": "None sought. Recorded so the difference between the reviewed tree and the attested tree is visible to anyone reading the attestation."
     }
   ],
   "selection": null
