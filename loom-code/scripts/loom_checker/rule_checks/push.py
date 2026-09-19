@@ -37,7 +37,166 @@ PREFIX_WORDS = {"sudo", "command", "env", "nohup", "time", "nice", "builtin", "e
 SHELL_PROGRAMS = {"bash", "sh", "zsh", "dash"}
 
 
+# Words a shell reads as grammar rather than as the command word, so that the
+# heredoc owned by `if …; then bash <<EOF` is still owned by `bash`.
+HEREDOC_GRAMMAR_WORDS = {"!", "then", "else", "elif", "do"}
+
+
+# Every character that ends a heredoc delimiter word, as a shell ends one.
+HEREDOC_WORD_END = frozenset(" \t\n;&|<>()")
+
+
+def _heredoc_executes_body(prefix: str) -> bool:
+    """True when the command word owning a heredoc runs its body as commands.
+
+    The bare `<<` form names no command word, and the shell itself reads that
+    body, so an absent command word reads as executing."""
+    tokens = _strip_prefix(_tokenise(prefix.lstrip("({ \t")))
+    while tokens and tokens[0] in HEREDOC_GRAMMAR_WORDS:
+        tokens = _strip_prefix(tokens[1:])
+    if not tokens:
+        return True
+    return _program(tokens[0]) in SHELL_PROGRAMS
+
+
+def _heredoc_delimiter(command: str, index: int) -> tuple[str, int] | None:
+    """Read the delimiter word at ``index`` as the literal a shell matches.
+
+    A delimiter may be written bare, quoted (`'EOF'`, `"EOF"`) or
+    backslash-escaped (`\\EOF`); the quoting selects expansion inside the body,
+    which no recogniser reads, so only the literal survives here. None when no
+    word is there. Returns the literal and the position just past the word."""
+    while index < len(command) and command[index] in " \t":
+        index += 1
+    delimiter: list[str] = []
+    quote: str | None = None
+    while index < len(command):
+        character = command[index]
+        if quote:
+            if character == quote:
+                quote = None
+            else:
+                delimiter.append(character)
+        elif character in {"'", '"'}:
+            quote = character
+        elif character == "\\" and index + 1 < len(command):
+            index += 1
+            delimiter.append(command[index])
+        elif character in HEREDOC_WORD_END:
+            break
+        else:
+            delimiter.append(character)
+        index += 1
+    if quote or not delimiter:
+        return None
+    return "".join(delimiter), index
+
+
+def _consume_heredoc_bodies(
+    command: str,
+    start: int,
+    pending: list[tuple[str, bool, bool]],
+    executed: list[str],
+) -> int | None:
+    """Carve the bodies that follow a logical line, left to right.
+
+    Each executed body is appended to ``executed`` for the caller to judge as
+    commands in its own right. None when a terminator is not where a shell
+    would find it, which makes the whole pass fail toward judging."""
+    index = start
+    for delimiter, strip_tabs, executes in pending:
+        body: list[str] = []
+        while True:
+            end = command.find("\n", index)
+            line = command[index:] if end < 0 else command[index:end]
+            if (line.lstrip("\t") if strip_tabs else line) == delimiter:
+                index = len(command) if end < 0 else end + 1
+                break
+            if end < 0:  # the terminator line never arrives
+                return None
+            body.append(line)
+            index = end + 1
+        if executes:
+            executed.append("\n".join(body))
+    return index
+
+
+def _without_unexecuted_heredocs(command: str) -> tuple[str, list[str]]:
+    """Carve every heredoc body out of ``command``.
+
+    Returns the remaining text plus the bodies a shell interpreter executes.
+    A body its command word does not execute -- `cat`, `tee`, a redirect to a
+    file -- is file content, and judging it as commands is what makes the same
+    bytes refused through Bash and allowed through a file-writing tool.
+
+    A body begins after the end of the *logical* line, so a backslash
+    continuation is joined before the body is located, and `<<<` is a
+    herestring rather than a heredoc. Anything this cannot locate exactly as a
+    shell would returns the original text and no bodies: the fail direction is
+    toward judging, never toward silence."""
+    kept: list[str] = []
+    executed: list[str] = []
+    pending: list[tuple[str, bool, bool]] = []
+    copied = 0
+    segment_start = 0
+    index = 0
+    quote: str | None = None
+    escaped = False
+    while index < len(command):
+        character = command[index]
+        if escaped:
+            escaped = False
+        elif character == "\\" and quote != "'":
+            escaped = True
+        elif quote:
+            if character == quote:
+                quote = None
+        elif character in {"'", '"'}:
+            quote = character
+        elif character == "<" and command[index + 1:index + 2] == "<":
+            if command[index + 2:index + 3] == "<":
+                index += 3
+                continue
+            after = index + 2
+            strip_tabs = command[after:after + 1] == "-"
+            found = _heredoc_delimiter(command, after + 1 if strip_tabs else after)
+            if found is None:
+                return command, []
+            delimiter, after = found
+            pending.append(
+                (delimiter, strip_tabs, _heredoc_executes_body(command[segment_start:index]))
+            )
+            index = after
+            continue
+        elif character == "\n" and pending:
+            kept.append(command[copied:index + 1])
+            consumed = _consume_heredoc_bodies(command, index + 1, pending, executed)
+            if consumed is None:
+                return command, []
+            copied = index = segment_start = consumed
+            pending = []
+            continue
+        elif character in ";\n|&":
+            segment_start = index + 1
+        index += 1
+    if quote or escaped or pending:
+        return command, []
+    kept.append(command[copied:])
+    return "".join(kept), executed
+
+
 def _shell_segments(command: str) -> list[str]:
+    """Split on shell operators outside quotes, reading each heredoc body as
+    its command word reads it: an executed body is re-fed as commands, and a
+    body that is file content is dropped before the split."""
+    stripped, executed = _without_unexecuted_heredocs(command)
+    segments = _operator_segments(stripped)
+    for body in executed:
+        segments.extend(_shell_segments(body))
+    return segments
+
+
+def _operator_segments(command: str) -> list[str]:
     """Split on shell operators outside quotes; malformed input stays strict."""
     segments: list[str] = []
     conservative_command = list(command)
