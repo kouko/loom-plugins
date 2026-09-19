@@ -9,11 +9,12 @@ The three assertions this module makes, in the words of the plan:
    the protocol keeps no recipe body (A1 negative);
 2. a rule that belongs to one kind of artifact lives in that kind's file
    (A2 positive) and in neither the protocol nor another kind's file
-   (A2 negative). The negative is a scan of the current files; the positive
-   names sentences quoted from the pre-split document, so it reads the
-   split's own files for the reason assertion 3 does, and the tree is read
-   for the structural half of it -- the kind's section is in the kind's
-   file;
+   (A2 negative). Both halves are read from the current files: the positive
+   structurally, the kind's section is in the kind's file; the negative as a
+   scan for sentences quoted from the pre-split document, which finds them
+   nowhere but that kind's file. That the split itself filed each rule
+   correctly is assertion 3's, which compares whole section bodies and so
+   states the same fact more strictly;
 3. every rule of the pre-split document is still there, section for section
    (A8 positive), and no recipe file grew one (A8 boundary).
 
@@ -303,11 +304,15 @@ def test_recipe_files_sit_beside_the_protocol() -> None:
 
 
 def test_protocol_keeps_no_recipe_body() -> None:
-    text = PROTOCOL.read_text(encoding="utf-8")
-    headings = _sections(text)
+    """The protocol carries the shared sections and no kind's section.
+
+    That no kind's *rules* are in it either is one assertion below, made for
+    the protocol and for every sibling recipe at once; repeating the protocol
+    half here would be a second place to keep right.
+    """
+    headings = _sections(PROTOCOL.read_text(encoding="utf-8"))
     for kind, heading in KIND_HEADINGS.items():
         assert heading not in headings, (kind, heading)
-        assert _markers_found(text, KIND_MARKERS[kind]) == [], kind
     for shared in SHARED_HEADINGS:
         assert shared in headings, shared
 
@@ -326,18 +331,6 @@ def test_each_kind_section_lives_in_its_own_file() -> None:
     for kind in kinds:
         text = RECIPES[kind].read_text(encoding="utf-8")
         assert KIND_HEADINGS[kind] in _sections(text), kind
-
-
-def test_each_kind_rule_lives_in_its_own_file() -> None:
-    """Frozen to the migration: the split put each marked rule in its kind's
-    file. The markers are sentences quoted from the pre-split document, so
-    read against the tree this would fire whenever a recipe was reworded --
-    the coupling Acceptance 3 forbids. A rewording is that recipe's own test
-    file's business; that the split filed the rule correctly is this one's,
-    and it happened once."""
-    for kind, name in _split_recipes().items():
-        found = _markers_found(_at_split(name), KIND_MARKERS[kind])
-        assert found == list(KIND_MARKERS[kind]), (kind, found)
 
 
 def test_no_kind_rule_appears_outside_its_own_file() -> None:

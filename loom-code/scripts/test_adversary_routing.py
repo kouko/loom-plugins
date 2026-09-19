@@ -18,10 +18,11 @@ The six cases this module makes, in the words of the plan:
   its own row rather than being absent, and a row naming a file that is not
   there is caught;
 - deleting-a-kind-leaves-no-reference (A5 positive): removing a kind is
-  deleting its recipe file and its own test file and putting its routing row
-  back to `none`; afterwards no file in the repository names either deleted
-  file, the tree is byte-for-byte what it was before the kind existed, and
-  the adversary test files still pass;
+  deleting its recipe file and its own test file, if it has one, and putting
+  its routing row back to `none`; afterwards no file in the repository names
+  either deleted file and the adversary test files still pass. Made once per
+  recipe the routing table names, so the kinds it is proven on are the kinds
+  that exist;
 - stale-reference-detected (A5 negative): a removal that leaves the recipe's
   own test file behind, one that leaves the routing row pointing at the
   deleted file, and one that leaves the deleted name in a live file are each
@@ -33,17 +34,20 @@ folder in a temporary directory, so the assertion is made on the result of
 a real edit rather than on a sentence promising the edit would be small.
 
 The removal cases go wider: they copy every tracked file of the repository
-into a temporary directory, add a kind there, remove it again, scan every
-copied file for the deleted names, and run the adversary test files inside
-that copy. Nothing is asserted about wording; every assertion is made on the
-result of an edit that was really performed.
+into a temporary directory, remove a kind there, scan every copied file for
+the deleted names, and run the adversary test files inside that copy.
+Nothing is asserted about wording; every assertion is made on the result of
+an edit that was really performed.
 
-The kind added and removed in the round trip is one the routing table lists
-as having no recipe today, so the round trip ends where it started and the
-deleted names belong to no other file in the repository. A kind routed today
-is removed the same way, without the round trip: its recipe is deleted where
-it stands, so what is asserted afterwards is that nothing outside the change
-records still names it and that the remaining checks run.
+The positive removes a kind routed today, where it stands, once per recipe
+file the routing table names: what is asserted afterwards is that nothing
+outside the change records still names it and that the remaining checks run.
+The negatives need a removal they can do wrong without deleting a kind the
+repository still uses, so each first gives a kind the routing table lists as
+having no recipe one -- a kind whose names belong to no other file -- and
+then removes it with one step left undone. Each copy of the repository costs
+seconds, so a case is made here only where it catches something no other
+case does.
 
 Two debt lists run alongside, and both may only shrink:
 `_BOUNDED_REMOVAL_DEBT` the files that still hand-list a routed recipe by
@@ -94,10 +98,9 @@ SUITE_GLOB = "test_adversary_*.py"
 SUITE_EXTRA = (
     "test_build_mechanical_checks.py",
     "test_review_convergence_contract.py",
-    # The module criteria map names, for each routed recipe, the check that
-    # enforces a criterion. A removal that left it naming a module that is no
-    # longer there would pass a scan for the deleted names and still be
-    # broken, so the copy runs it.
+    # The module criteria map names the check that enforces each criterion. A
+    # removal that left it naming a module that is no longer there would pass
+    # a scan for the deleted names and still be broken, so the copy runs it.
     "test_module_criteria_text.py",
 )
 
@@ -121,7 +124,6 @@ _DEBT_SCAN_SKIP = ("docs/loom/",)
 REMOVAL_TESTS = (
     "test_removing_a_kind_routed_today_leaves_no_reference",
     "test_recorded_unbounded_removal_is_still_unbounded",
-    "test_removing_a_kind_restores_the_tree_and_leaves_no_reference",
     "test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected",
     "test_removal_that_leaves_the_routing_row_behind_is_detected",
     "test_removal_that_leaves_the_name_in_a_live_file_is_detected",
@@ -315,7 +317,7 @@ def test_routed_recipe_reader_synthetic() -> None:
 
 def test_recipe_test_module_and_pin_reader_synthetic() -> None:
     """A recipe's test module is named from the recipe, and the pin reader
-    reaches every routed recipe's module through that name."""
+    reaches the module of every routed recipe that has one."""
     assert recipe_test_module(_SYNTHETIC_RECIPE) == f"{RECIPE_TEST_STEM}synthetic_one.py"
     pins = recipe_pins()
     # Every pin the reader returns comes from a routed recipe's own module,
@@ -323,10 +325,15 @@ def test_recipe_test_module_and_pin_reader_synthetic() -> None:
     # that there is any pin at all -- a repository whose recipes pin nothing
     # is a repository with nothing for the scans to exempt, which is the state
     # a removal case reaches when the last recipe carrying a pin table goes.
+    # Nor that a routed recipe has a module at all: requiring one would make
+    # giving a kind a recipe two files rather than the one file and one row
+    # the routing table describes, so a recipe without one contributes
+    # nothing here, exactly as `recipe_pins` reads it.
     from_modules: dict[str, tuple] = {}
     for recipe in routed_recipes():
         path = ROOT / SCRIPTS / recipe_test_module(recipe)
-        assert path.is_file(), recipe
+        if not path.is_file():
+            continue
         module = importlib.import_module(recipe_test_module(recipe)[:-len(".py")])
         from_modules.update(getattr(module, "RECIPE_PINS", {}))
     assert pins == from_modules
@@ -562,13 +569,13 @@ def _removable_kind() -> str:
     test file names are not already written anywhere else in the repository,
     chosen deterministically.
 
-    The round trip adds a recipe for it and removes it again, so the tree it
-    must return to is the tree as it stands, and the names it deletes belong
-    to no other file in the repository. An unrouted kind whose recipe name a
-    permanent record already writes -- true of a kind once its own removal
-    reaches the routing table, such as a migration note that keeps naming the
-    file that removal deleted -- would break that promise if it were chosen,
-    so it is passed over rather than picked.
+    The negative cases give it a recipe and then remove it wrongly, so the
+    names they delete must belong to no other file in the repository -- else
+    the reference they find would be one they did not plant. An unrouted kind
+    whose recipe name a permanent record already writes -- true of a kind once
+    its own removal reaches the routing table, such as a migration note that
+    keeps naming the file that removal deleted -- would break that promise if
+    it were chosen, so it is passed over rather than picked.
     """
     rows = _routing_rows(PROTOCOL.read_text(encoding="utf-8"))
     unrouted = sorted(k for k, target in rows.items() if target == NO_RECIPE)
@@ -592,10 +599,10 @@ def _removable_kind() -> str:
 def _add_kind_to_copy(root: Path, kind: str) -> tuple[str, str]:
     """Give `kind` a recipe in the copy: the file, its own test file, its row.
 
-    The test file written here carries the check every recipe's own test
-    module carries, the one `test_module_criteria_text.py` requires of each
-    routed recipe: the recipe's rule is in the recipe and not repeated in the
-    agent contract.
+    Nothing requires a routed recipe to have a test module of its own --
+    giving a kind a recipe is one file and one row. One is written here
+    anyway, because the removal these cases do wrong is the removal of a kind
+    that has one: it is the second file a removal must not leave behind.
     """
     recipe, own_test = _recipe_file(kind), _own_test_file(kind)
     body = (
@@ -778,38 +785,13 @@ def test_passed_helper_synthetic() -> None:
     assert _passed(subprocess.CompletedProcess([], 2, "Interrupted: 2 errors", "")) == 0
 
 
-# --- A5 positive: the removal leaves nothing behind ------------------------
-
-def test_removing_a_kind_restores_the_tree_and_leaves_no_reference(tmp_path: Path) -> None:
-    """deleting-a-kind-leaves-no-reference.
-
-    The kind is added and removed again in a copy of the whole repository, so
-    what the removal must restore is known byte for byte.
-    """
-    root = tmp_path / "repo"
-    copied = _copy_repository(root)
-    before = {rel: (root / rel).read_bytes() for rel in copied}
-
-    kind = _removable_kind()
-    recipe, own_test = _add_kind_to_copy(root, kind)
-    added = _run_adversary_tests(root)
-    assert added.returncode == 0, added.stdout + added.stderr
-    assert _passed(added) > 0, added.stdout + added.stderr
-
-    _remove_kind_from_copy(root, kind)
-
-    names = (recipe, Path(own_test).name)
-    assert _references_to(root, names, expected=len(copied)) == []
-    assert _files_in(root) == sorted(copied)
-    after = {rel: (root / rel).read_bytes() for rel in copied}
-    assert [rel for rel in copied if before[rel] != after[rel]] == []
-
-    removed = _run_adversary_tests(root)
-    assert removed.returncode == 0, removed.stdout + removed.stderr
-    assert _passed(removed) > 0, removed.stdout + removed.stderr
-
-
 # --- A5 negative: a removal done wrong is caught ---------------------------
+#
+# The positive these are the negatives of is
+# `test_removing_a_kind_routed_today_leaves_no_reference` below, which removes
+# each kind that exists. What is added and removed here is an invented kind,
+# because a removal done wrong has to be done on a kind the repository can
+# spare.
 
 def test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected(tmp_path: Path) -> None:
     """stale-reference-detected: the recipe is gone, its test still names it."""
