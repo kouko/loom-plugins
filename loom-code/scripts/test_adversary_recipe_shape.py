@@ -56,20 +56,44 @@ rule that never writes the routed name at all goes through however it is
 phrased, whether by synonym or by description (`anything under
 loom-code/scripts/`); no check on the prose can close that one, and the
 recipe-side parts of the shape are what stand behind it.
+
+And such a rule is read only where the protocol drifted: the sentences it
+has carried unchanged since the split commit are passed over, and every
+sentence added or reworded after it is read. `inherited_rules` says why --
+in short, two of those inherited sentences name an artifact type, so reading
+them would make routing `plan` or `evidence` to a recipe an addition no edit
+could ever make green, and a check whose satisfiability turns on whether a
+kind's name is a common English word is not one anyone can rely on.
 """
 from __future__ import annotations
 
 import re
 import shutil
+from functools import lru_cache
 from pathlib import Path
 from typing import NamedTuple
+
+import pytest
 
 from prose_pin import split_sentences
 # The routing table reader, imported rather than copied: the table is the one
 # place a kind is given a recipe or has it taken away, so a second reader here
 # would be a second thing to keep right. It takes the protocol's text, which
 # is what lets the negative cases run it against a copy of the folder.
-from test_adversary_routing import NO_RECIPE, RECIPE_STEM, _routing_rows
+from test_adversary_routing import (
+    NO_RECIPE,
+    RECIPE_STEM,
+    _add_kind,
+    _artifact_types,
+    _routing_rows,
+    added_recipe,
+    unrouted_types,
+)
+# The protocol as the split commit wrote it, read through the module that
+# already owns that commit: the layout module names it once, from the
+# correspondence note, and a second reader of the same fact here would be a
+# second thing to keep right.
+from test_adversary_layout import _at_split
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -151,13 +175,59 @@ def _addressed_as_a_type(kind: str) -> re.Pattern[str]:
     )
 
 
-def _addressing_sentence(text: str, kind: str) -> str | None:
-    """The first sentence of `text` that addresses `kind` as a type, if any."""
+def _addressing_sentence(
+    text: str, kind: str, inherited: frozenset[str] = frozenset()
+) -> str | None:
+    """The first sentence of `text` that addresses `kind` as a type, if any.
+
+    A sentence in `inherited` is passed over: it is text the protocol was
+    already carrying, not a rule anyone put there for this kind. See
+    `inherited_rules` for why the check is on drift and not on every sentence.
+    """
     pattern = _addressed_as_a_type(kind)
     for sentence in split_sentences(text):
+        if sentence in inherited:
+            continue
         if pattern.search(sentence):
             return sentence
     return None
+
+
+@lru_cache(maxsize=1)
+def inherited_rules() -> frozenset[str]:
+    """The shared protocol's sentences as the split commit wrote them.
+
+    This part of the shape reads prose, and prose the protocol was already
+    carrying when the recipes were split out of it is not a rule the split
+    filed in the wrong place. So what is checked is drift: a sentence the
+    protocol has carried unchanged since the split goes through, and every
+    sentence added or reworded after it is read. The baseline is read from git
+    at the commit the correspondence note names, the same commit and the same
+    reader the layout module's migration assertions use, and a fact about that
+    commit does not change -- so this exempts a fixed, finite text and cannot
+    grow to cover whatever the protocol says next.
+
+    Without it the check is not satisfiable for every artifact type the
+    manifest holds. The protocol has carried, since before the split, one
+    sentence that writes `a plan task` and one that names the `evidence`
+    artifact type in backticks -- described rather than quoted here, because
+    quoting them would pin the wording this module exists not to pin. Routing
+    either of those two kinds to a recipe -- an addition Acceptance 4 says is
+    one file and one row -- would make the protocol read as though it stated a
+    rule about the kind, and no edit to the recipe could clear it. Which kinds
+    are affected depends only on whether their names are common English words,
+    which is not a property anyone can plan around.
+
+    The alternative was to keep reading every sentence and narrow what counts
+    as addressing a kind. That is worse: the two inherited sentences name their
+    kind in the two strongest positions the match has -- one in backticks, the
+    way the routing table writes a type, and one behind a generic determiner.
+    Narrowing past both would leave the match with nothing it still sees, so it
+    would stop catching the wordings it was built for; narrowing past one would
+    leave the other kind's addition still impossible. Drift, by contrast,
+    exempts named sentences and no wording at all.
+    """
+    return frozenset(split_sentences(_prose(_without_routing(_at_split(PROTOCOL_NAME)))))
 
 
 def _sections(text: str) -> dict[str, str]:
@@ -284,8 +354,9 @@ def shape_violations(folder: Path) -> list[Violation]:
                         )
                     )
 
+    inherited = inherited_rules()
     for kind in sorted({k for kinds in routed.values() for k in kinds}):
-        sentence = _addressing_sentence(protocol_text, kind)
+        sentence = _addressing_sentence(protocol_text, kind, inherited)
         if sentence is not None:
             found.append(
                 Violation(
@@ -554,6 +625,91 @@ def test_kind_rule_in_plain_prose_in_the_protocol_is_rejected(tmp_path: Path) ->
     kind = _routed_kind(REFERENCES)
     for index, wording in enumerate(_PLAIN_KIND_RULES):
         folder = _copy(tmp_path / f"plain-{index}")
+        protocol = folder / PROTOCOL_NAME
+        sentence = wording.format(kind=kind)
+        protocol.write_text(_read(protocol) + f"\n{sentence}\n", encoding="utf-8")
+        assert _parts(folder) == {KIND_RULE_IN_PROTOCOL}, sentence
+
+
+def test_inherited_sentence_is_passed_over_and_a_reworded_one_is_not_synthetic() -> None:
+    """The drift rule, on sentences of this module's own making.
+
+    A sentence in the baseline goes through however it names a kind; the same
+    sentence with one word changed is drift and is read. So the exemption is
+    of named sentences, not of a wording: it cannot be widened by rephrasing.
+    """
+    inherited = frozenset({"For a `one` artifact, record the attempt twice."})
+    text = "For a `one` artifact, record the attempt twice."
+    assert _addressing_sentence(text, "one", inherited) is None
+    assert _addressing_sentence(text, "one") == text
+    reworded = "For a `one` artifact, record the attempt three times."
+    assert _addressing_sentence(reworded, "one", inherited) == reworded
+
+
+def test_inherited_baseline_is_the_protocol_the_split_wrote() -> None:
+    """The baseline is a text read from git, and it is the protocol's own.
+
+    Not asserted: which sentences are in it. That is a fact about one past
+    commit, and pinning any of them here would pin the protocol's wording,
+    which this module exists not to do.
+    """
+    inherited = inherited_rules()
+    assert inherited, "the split commit's protocol yields no sentence"
+    current = set(_rules(_without_routing(_read(REFERENCES / PROTOCOL_NAME))))
+    assert current & inherited, "the protocol shares no sentence with its own baseline"
+
+
+# --- A4 ∩ A10: giving any unrouted kind a recipe keeps the shape ------------
+
+def _with_kind_added(tmp_path: Path, kind: str) -> Path:
+    """A copy of the reference folder with `kind` routed to a new recipe.
+
+    A kind already routed is left as it is, so a case may be parametrized over
+    every artifact type without asking which of them have a recipe today. The
+    file written is the one the routing module's template defines, so the
+    addition proven here is the addition proven there.
+    """
+    folder = _copy(tmp_path)
+    rows = _routing_rows(_read(folder / PROTOCOL_NAME))
+    if rows.get(kind) == NO_RECIPE:
+        _add_kind(folder, kind, f"{RECIPE_STEM}{kind}.md", added_recipe(kind))
+    return folder
+
+
+@pytest.mark.parametrize("kind", unrouted_types())
+def test_adding_any_unrouted_kind_keeps_the_shape(kind: str, tmp_path: Path) -> None:
+    """The addition Acceptance 4 describes, made for every type the table
+    leaves unrouted rather than for one that happens not to collide.
+
+    A kind whose name is a common English word is the case that matters: the
+    protocol's inherited prose writes `a plan task` and names the `evidence`
+    artifact type, so before the check read drift rather than every sentence,
+    routing either of those was an addition no edit could make green.
+    """
+    folder = _with_kind_added(tmp_path, kind)
+    violations = shape_violations(folder)
+    assert violations == [], violations
+
+
+@pytest.mark.parametrize("kind", sorted(_artifact_types()))
+def test_a_rule_added_to_the_protocol_for_any_kind_is_still_caught(
+    kind: str, tmp_path: Path
+) -> None:
+    """The other side of the drift rule, for every type the manifest holds.
+
+    Reading only what the protocol grew after the split must not blind the
+    check to what it grows next. Each wording is a sentence nobody inherited:
+    one in the routing table's backticks, two in the prose a writer reaches
+    for first. Every one of them is a rule about the kind and every one is
+    caught, for a kind routed today and for a kind this case routes.
+    """
+    wordings = (
+        "For a `{kind}` artifact, run every attempt a second time before recording it.",
+        "For a {kind} artifact, run every attempt a second time before recording it.",
+        "When the changed path is a {kind}, run every attempt a second time.",
+    )
+    for index, wording in enumerate(wordings):
+        folder = _with_kind_added(tmp_path / f"{kind}-{index}", kind)
         protocol = folder / PROTOCOL_NAME
         sentence = wording.format(kind=kind)
         protocol.write_text(_read(protocol) + f"\n{sentence}\n", encoding="utf-8")

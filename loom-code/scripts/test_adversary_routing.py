@@ -9,7 +9,13 @@ The six cases this module makes, in the words of the plan:
   today is one new file beside the protocol plus one row of the routing
   table, and nothing else in the folder changes;
 - existing-recipe-file-untouched (A4 negative): that same addition leaves
-  every recipe file that already existed byte-identical;
+  every recipe file that already existed byte-identical. Counting what the
+  addition touches is not the whole of A4, so the addition is also performed
+  for real, in a copy of the whole repository and once per artifact type the
+  table leaves unrouted, with the checks run on the result and the kind then
+  taken away again -- a kind added exactly as the routing table describes has
+  no test module of its own, and its removal must come out as clean as the
+  removal of one that has;
 - protocol-plus-kind-is-complete (A7 positive): the adversary contract names
   the protocol, the protocol's row names the recipe, the recipe points back
   at the protocol, and that pair needs no third file;
@@ -118,10 +124,11 @@ _BOUNDED_REMOVAL_DEBT: tuple[str, ...] = ()
 # the kind's own test file, which the removal deletes with the recipe.
 _DEBT_SCAN_SKIP = ("docs/loom/",)
 
-# The removal cases below each copy the repository and run pytest inside the
+# The cases below that each copy the repository and run pytest inside the
 # copy. The copy's own run must not start that again, so these are deselected
 # there by name; a name that no longer exists makes pytest exit non-zero.
-REMOVAL_TESTS = (
+NESTED_TESTS = (
+    "test_adding_a_kind_that_has_no_recipe_today_leaves_the_checks_green",
     "test_removing_a_kind_routed_today_leaves_no_reference",
     "test_recorded_unbounded_removal_is_still_unbounded",
     "test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected",
@@ -547,6 +554,48 @@ def _recipe_file(kind: str) -> str:
     return f"{RECIPE_STEM}{kind}.md"
 
 
+def _deleted_names(recipe: str, own_test: str | None) -> tuple[str, ...]:
+    """The names a removal took away, for the scan to look for.
+
+    One name when the recipe had no test module of its own, two when it did.
+    The scan's `expected` count is derived from the length rather than written
+    as a literal, so a removal of one file is not held to the file count of a
+    removal of two.
+    """
+    return (recipe,) if own_test is None else (recipe, Path(own_test).name)
+
+
+def unrouted_types() -> list[str]:
+    """Every artifact type of the repository's vocabulary with no recipe today.
+
+    Read from the manifest and from the table together, so that a type the
+    manifest grows is covered by whatever is parametrized over this the day it
+    is added, without anyone editing a list. Every module that performs the
+    addition goes through here, so the kinds it is proven on are the kinds
+    that can be added.
+    """
+    rows = _routing_rows(PROTOCOL.read_text(encoding="utf-8"))
+    return sorted(t for t in _artifact_types() if rows.get(t, NO_RECIPE) == NO_RECIPE)
+
+
+# The recipe a kind gets when the addition is performed: the one file the
+# routing table asks for and nothing else. One template, read by every module
+# that performs the addition, so the file the checks are proven on is the same
+# file everywhere. Written from the kind's name rather than taken from a recipe
+# routed today, so it is not a reference a removal would leave dangling.
+ADDED_RECIPE = (
+    "# Adversarial — {kind}\n\n"
+    "Read it together with the shared protocol in [`adversarial.md`](adversarial.md).\n\n"
+    "## {heading}\n\n"
+    "Attack the {kind} artifact until something it promises stops being true.\n"
+)
+
+
+def added_recipe(kind: str) -> str:
+    """`ADDED_RECIPE` filled in for `kind`."""
+    return ADDED_RECIPE.format(kind=kind, heading=kind.capitalize())
+
+
 def _kinds_named_in(texts: list[str], candidates: dict[str, tuple[str, str]]) -> set[str]:
     """Which `candidates` (kind -> (recipe name, own-test name)) are already
     written somewhere in `texts`.
@@ -654,8 +703,8 @@ def _run_adversary_tests(root: Path) -> subprocess.CompletedProcess[str]:
     """Run the adversary test files inside the copy.
 
     The file list is a glob, so a recipe test the removal deleted is absent
-    from the run and one the addition wrote is in it. The removal cases
-    themselves are deselected by name: they would copy the copy. pytest exits
+    from the run and one the addition wrote is in it. The cases that copy the
+    repository are deselected by name: they would copy the copy. pytest exits
     non-zero on a name that no longer matches a test, so a renamed case is
     caught rather than quietly stopping to run.
     """
@@ -665,7 +714,7 @@ def _run_adversary_tests(root: Path) -> subprocess.CompletedProcess[str]:
     for target in targets:
         assert (root / target).is_file(), target
     deselect: list[str] = []
-    for name in REMOVAL_TESTS:
+    for name in NESTED_TESTS:
         assert name in globals(), name
         deselect += ["--deselect", f"{SCRIPTS}/test_adversary_routing.py::{name}"]
     env = dict(os.environ)
@@ -844,14 +893,25 @@ def test_removal_that_leaves_the_name_in_a_live_file_is_detected(tmp_path: Path)
 
 # --- A5 positive, for a kind routed today -----------------------------------
 
-def _remove_routed_kind_from_copy(root: Path, recipe: str, kinds: tuple[str, ...]) -> str:
+def _remove_routed_kind_from_copy(root: Path, recipe: str, kinds: tuple[str, ...]) -> str | None:
     """Remove a kind that is routed today, in the copy: delete its recipe,
-    delete its own test file, and put every row that named the recipe back to
-    `none`. Returns the test file it deleted."""
+    delete its own test file if it has one, and put every row that named the
+    recipe back to `none`. Returns the test file it deleted, or `None`.
+
+    Nothing requires a routed recipe to have a test module of its own: giving
+    a kind a recipe is one new file plus one row, and Acceptance 4 is that
+    addition and nothing else. So the removal must be the mirror of it --
+    demanding a second file back would make the check the one thing that
+    knows about a file no document asks a reader to write, and a kind added
+    exactly as the routing table describes would fail its own removal.
+    """
     references = root / str(REFERENCES.relative_to(ROOT))
     (references / recipe).unlink()
-    own_test = _own_test_file(recipe_kind(recipe))
-    (root / own_test).unlink()
+    own_test: str | None = _own_test_file(recipe_kind(recipe))
+    if (root / own_test).is_file():
+        (root / own_test).unlink()
+    else:
+        own_test = None
     protocol = references / "adversarial.md"
     text = protocol.read_text(encoding="utf-8")
     for kind in kinds:
@@ -894,8 +954,8 @@ def test_removing_a_kind_routed_today_leaves_no_reference(recipe: str, tmp_path:
     copied = _copy_repository(root)
     own_test = _remove_routed_kind_from_copy(root, recipe, kinds)
 
-    names = (recipe, Path(own_test).name)
-    hits = _references_to(root, names, expected=len(copied) - 2)
+    names = _deleted_names(recipe, own_test)
+    hits = _references_to(root, names, expected=len(copied) - len(names))
     # `docs/loom/` records where a rule lived at a commit already made; they
     # are the one tree a removal is not expected to rewrite.
     assert [h for h in hits if not h.startswith(_DEBT_SCAN_SKIP)] == [], hits
@@ -903,6 +963,41 @@ def test_removing_a_kind_routed_today_leaves_no_reference(recipe: str, tmp_path:
     run = _run_adversary_tests(root)
     assert run.returncode == 0, run.stdout + run.stderr
     assert _passed(run) > 0, run.stdout + run.stderr
+
+
+@pytest.mark.parametrize("kind", unrouted_types())
+def test_adding_a_kind_that_has_no_recipe_today_leaves_the_checks_green(
+    kind: str, tmp_path: Path
+) -> None:
+    """add-kind-one-file-one-row and existing-recipe-file-untouched, performed
+    for real and then undone.
+
+    `test_adding_a_kind_is_one_file_and_one_row` counts what the addition
+    touches; this one asks whether the repository still holds together
+    afterwards. The addition is made in a copy of the whole repository, for
+    every artifact type the table leaves unrouted rather than for one that
+    happens not to collide with anything, and the checks that read these
+    documents are run on the result. Then the kind is taken away again by the
+    removal the protocol describes, which must come out as clean for a kind
+    that never had a test module of its own as for one that did.
+    """
+    root = tmp_path / "repo"
+    copied = _copy_repository(root)
+    recipe = _recipe_file(kind)
+    _add_kind(root / str(REFERENCES.relative_to(ROOT)), kind, recipe, added_recipe(kind))
+
+    added = _run_adversary_tests(root)
+    assert added.returncode == 0, added.stdout + added.stderr
+    assert _passed(added) > 0, added.stdout + added.stderr
+
+    own_test = _remove_routed_kind_from_copy(root, recipe, (kind,))
+    assert own_test is None, own_test
+    names = _deleted_names(recipe, own_test)
+    hits = _references_to(root, names, expected=len(copied))
+    assert [h for h in hits if not h.startswith(_DEBT_SCAN_SKIP)] == [], hits
+
+    removed = _run_adversary_tests(root)
+    assert removed.returncode == 0, removed.stdout + removed.stderr
 
 
 @pytest.mark.parametrize("recipe", sorted(_UNBOUNDED_REMOVAL_DEBT))
@@ -921,9 +1016,9 @@ def test_recorded_unbounded_removal_is_still_unbounded(recipe: str, tmp_path: Pa
     copied = _copy_repository(root)
     own_test = _remove_routed_kind_from_copy(root, recipe, kinds)
 
-    names = (recipe, Path(own_test).name)
+    names = _deleted_names(recipe, own_test)
     hits = [
-        h for h in _references_to(root, names, expected=len(copied) - 2)
+        h for h in _references_to(root, names, expected=len(copied) - len(names))
         if not h.startswith(_DEBT_SCAN_SKIP)
     ]
     run = _run_adversary_tests(root)
