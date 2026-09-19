@@ -86,6 +86,32 @@ and the list and the case were deleted in this round. The `317 passed` this
 paragraph carried before named no module and no command; the figure above
 replaces it because this command is the one that produces it.
 
+## Fourth run, after the pre-merge trunk sync
+
+`land` refused the pull request as `BEHIND`: the trunk had gained
+`a1891ed1` (loom-code 3.7.1 to 3.7.2) after the attestation was generated, and
+this repository requires a branch to be current before it merges. `sync-trunk`
+merged that commit at `1499dea6`, which changes the functional-content digest,
+because the digest covers the whole tree rather than this change's own paths.
+
+kouko chose, on 2026-09-19, to regenerate the attestation for the merged
+content while carrying the two reviewer verdicts forward, rather than open a
+fourth review round over content the reviewers had not read. The reasoning,
+recorded here because a decision that lives only in a conversation is not
+evidence: the verdicts judge this change's own delta, and the trunk commit
+arrived through the same stations with its own attestation at
+`docs/loom/2026-09-19-bump-loom-code-3-7-2/attestation.json`. The cost is that
+this attestation's digest names content one commit newer than the tree the
+reviewers read, and that difference is exactly `a1891ed1`.
+
+Build's mechanical checks were repeated on the merged tree before the
+attestation was regenerated:
+
+| Check | Result |
+|---|---|
+| Complete package suite, the `package-tests:` command above | exit 0 |
+| Both adversarial programs, one invocation | 44 passed in 982 s |
+
 ## Documents under check
 
 Each recipe and the shared protocol are read by their own test module, and the
