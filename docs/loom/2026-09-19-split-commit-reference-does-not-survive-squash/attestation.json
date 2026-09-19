@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-19-split-commit-reference-does-not-survive-squash",
-  "content_digest": "41f4313d5e623087f0a3468889207719d8e1869b",
+  "content_digest": "ec9a118f6a2f227c91bfc6a1cc21cb6d0a9ce858",
   "executions": [
     {
       "kind": "package-tests",
