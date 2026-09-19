@@ -3,7 +3,8 @@
 Acceptance 4, 5 and 7 of
 `docs/loom/intent/2026-09-18-modular-adversary-recipes.md`.
 
-The six cases this module makes, in the words of the plan:
+The cases this module makes, the six of the plan plus the one the plan's
+wording turned out to need:
 
 - add-kind-one-file-one-row (A4 positive): giving a kind a recipe it lacks
   today is one new file beside the protocol plus one row of the routing
@@ -16,6 +17,15 @@ The six cases this module makes, in the words of the plan:
   taken away again -- a kind added exactly as the routing table describes has
   no test module of its own, and its removal must come out as clean as the
   removal of one that has;
+- reworded-recipe-not-blamed (none of the plan's six; the one the measurement
+  of them called for): the addition and the removal are each held to
+  the difference between the copy's failures before and after the edit, never
+  to the copy being green. The claim is that giving a kind a recipe introduces
+  no new failure, and a copy carries whatever the working tree carries: one
+  reworded sentence in one recipe is that recipe's own test file's business,
+  and demanding a green copy would make it fail the addition once per unrouted
+  kind. Proven by rewording a recipe in a copy on purpose and performing the
+  addition there anyway;
 - protocol-plus-kind-is-complete (A7 positive): the adversary contract names
   the protocol, the protocol's row names the recipe, the recipe points back
   at the protocol, and that pair needs no third file;
@@ -26,9 +36,9 @@ The six cases this module makes, in the words of the plan:
 - deleting-a-kind-leaves-no-reference (A5 positive): removing a kind is
   deleting its recipe file and its own test file, if it has one, and putting
   its routing row back to `none`; afterwards no file in the repository names
-  either deleted file and the adversary test files still pass. Made once per
-  recipe the routing table names, so the kinds it is proven on are the kinds
-  that exist;
+  either deleted file and the removal breaks no check that was passing before
+  it. Made once per recipe the routing table names, so the kinds it is proven
+  on are the kinds that exist;
 - stale-reference-detected (A5 negative): a removal that leaves the recipe's
   own test file behind, one that leaves the routing row pointing at the
   deleted file, and one that leaves the deleted name in a live file are each
@@ -68,6 +78,7 @@ import os
 import re
 import shutil
 import subprocess
+import warnings
 from pathlib import Path
 
 import pytest
@@ -128,7 +139,8 @@ _DEBT_SCAN_SKIP = ("docs/loom/",)
 # copy. The copy's own run must not start that again, so these are deselected
 # there by name; a name that no longer exists makes pytest exit non-zero.
 NESTED_TESTS = (
-    "test_adding_a_kind_that_has_no_recipe_today_leaves_the_checks_green",
+    "test_adding_a_kind_that_has_no_recipe_today_introduces_no_failure",
+    "test_a_reworded_recipe_is_not_blamed_on_the_addition",
     "test_removing_a_kind_routed_today_leaves_no_reference",
     "test_recorded_unbounded_removal_is_still_unbounded",
     "test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected",
@@ -727,9 +739,37 @@ def _run_adversary_tests(root: Path) -> subprocess.CompletedProcess[str]:
     assert gitdir.returncode == 0, gitdir.stderr
     env["GIT_DIR"] = gitdir.stdout.strip()
     return subprocess.run(
-        ["python3", "-m", "pytest", "-q", "-p", "no:cacheprovider", *targets, *deselect],
+        # `-rfE` so the run always names what failed: the comparison below is
+        # made on those names, and a pytest whose summary characters were
+        # configured away would otherwise leave it comparing empty sets.
+        ["python3", "-m", "pytest", "-q", "-rfE", "-p", "no:cacheprovider", *targets, *deselect],
         cwd=root, capture_output=True, text=True, env=env,
     )
+
+
+_FAILED = re.compile(r"^(?:FAILED|ERROR) (?P<node>\S+)", re.M)
+
+
+def failures(run: subprocess.CompletedProcess[str]) -> frozenset[str]:
+    """Which tests the run reported failing, by name.
+
+    This is what the cases that copy the repository assert on, rather than the
+    exit status: a copy inherits every failure the working tree already has, so
+    an exit status is a statement about the whole suite while the difference
+    between two of these sets is a statement about the edit made between them.
+
+    A run that exited non-zero without naming a single failing test -- a
+    collection error, an internal error, a crash -- is raised on rather than
+    read as an empty set, so a comparison that has nothing to compare cannot
+    come out clean.
+    """
+    named = frozenset(m.group("node") for m in _FAILED.finditer(run.stdout + run.stderr))
+    if run.returncode != 0 and not named:
+        raise AssertionError(
+            "the run exited non-zero without naming a failing test, so its "
+            f"failures cannot be compared:\n{run.stdout}{run.stderr}"
+        )
+    return named
 
 
 def _passed(run: subprocess.CompletedProcess[str]) -> int:
@@ -741,6 +781,99 @@ def _passed(run: subprocess.CompletedProcess[str]) -> int:
     """
     match = re.search(r"(\d+) passed", run.stdout + run.stderr)
     return int(match.group(1)) if match else 0
+
+
+@pytest.fixture(scope="session")
+def inherited_failures(tmp_path_factory: pytest.TempPathFactory) -> frozenset[str]:
+    """What is already failing in an untouched copy of the repository.
+
+    The cases below edit a copy and ask what the edit broke. A copy carries
+    whatever the working tree carries, so the answer is the difference against
+    this set and not the copy's exit status: one reworded sentence in one
+    recipe reddens that recipe's own test file inside every copy, and holding
+    a copy to green would make that one edit fail every case here.
+
+    Measured once for the whole session -- one copy and one run, whatever the
+    number of cases -- and warned about when it is not empty, so a copy that
+    was already failing is stated rather than passed over in silence.
+    """
+    root = tmp_path_factory.mktemp("inherited") / "repo"
+    _copy_repository(root)
+    run = _run_adversary_tests(root)
+    named = failures(run)
+    assert _passed(run) > 0, run.stdout + run.stderr
+    if named:
+        warnings.warn(
+            "this copy of the repository was already failing before any kind "
+            "was added or removed; these failures are not the subject of the "
+            "cases in this module and are subtracted from them: "
+            + ", ".join(sorted(named)),
+            stacklevel=1,
+        )
+    return named
+
+
+def caused_by_the_edit(
+    run: subprocess.CompletedProcess[str], inherited: frozenset[str]
+) -> frozenset[str]:
+    """Which failures of `run` the edit made in the copy is answerable for.
+
+    Every failure the untouched copy already had is subtracted. A test that
+    only exists once the edit was made -- a case parametrized over the routing
+    table gains a parameter when a kind gains a recipe -- is not in the
+    inherited set, so a failure of it counts here, which is right: the edit
+    brought it into being.
+    """
+    return failures(run) - inherited
+
+
+def _longest_sentence(text: str) -> str:
+    """The longest sentence of `text` with its heading lines dropped.
+
+    Used to reword a recipe without writing any recipe's name or any of its
+    sentences here: both would be a reference that the kind's removal leaves
+    dangling.
+    """
+    stripped = re.sub(r"^#{1,6} .*$", "", text, flags=re.M)
+    sentences = [s.strip() for s in split_sentences(" ".join(stripped.split()))]
+    assert sentences, text
+    return max(sentences, key=len)
+
+
+def _reword(sentence: str) -> str:
+    """The same sentence with its first two words exchanged.
+
+    Every word the sentence had is still in it, so the edit is a wording
+    change and nothing else -- no file added, deleted or emptied, no rule
+    taken out of the folder -- and it is enough to stop any pin that quotes
+    the sentence or opens a literal at its first word. Deliberately
+    mechanical: an invented synonym would be a sentence of a recipe written
+    into this file, which the removal of that kind would leave dangling.
+    """
+    words = sentence.split(" ")
+    assert len(words) > 2, sentence
+    return " ".join([words[1], words[0], *words[2:]])
+
+
+def _reword_a_recipe_in(root: Path) -> str:
+    """Reword one sentence of one recipe in the copy, and say which sentence.
+
+    The recipe is the first one the routing table names, so nothing here
+    depends on which kinds exist. The sentence is matched across the line
+    breaks it is wrapped over, so only its wording changes -- no file is
+    added, deleted, renamed or emptied.
+    """
+    recipe = sorted(routed_recipes())[0]
+    path = root / str(REFERENCES.relative_to(ROOT)) / recipe
+    text = path.read_text(encoding="utf-8")
+    sentence = _longest_sentence(text)
+    pattern = re.compile(r"\s+".join(re.escape(w) for w in sentence.split(" ")))
+    assert len(pattern.findall(text)) == 1, sentence
+    reworded = _reword(sentence)
+    # A function as the replacement, so nothing in the sentence is read as a
+    # backreference.
+    path.write_text(pattern.sub(lambda _m: reworded, text), encoding="utf-8")
+    return sentence
 
 
 # --- helper self-tests -----------------------------------------------------
@@ -834,6 +967,59 @@ def test_passed_helper_synthetic() -> None:
     assert _passed(subprocess.CompletedProcess([], 2, "Interrupted: 2 errors", "")) == 0
 
 
+def test_failure_reader_synthetic() -> None:
+    """The names a run gives, read off its summary; a green run names none."""
+    green = subprocess.CompletedProcess([], 0, "30 passed in 1.0s", "")
+    assert failures(green) == frozenset()
+    red = subprocess.CompletedProcess(
+        [], 1,
+        "FAILED a/b.py::test_one[x]\nERROR a/c.py\n1 failed, 2 passed in 1.0s\n", "",
+    )
+    assert failures(red) == {"a/b.py::test_one[x]", "a/c.py"}
+
+
+def test_failure_reader_fails_loudly_on_a_run_it_cannot_read() -> None:
+    """A non-zero run that named nothing is raised on, not read as green.
+
+    Otherwise a copy whose suite crashed before collecting would hand every
+    case below an empty set and every comparison would come out clean.
+    """
+    crashed = subprocess.CompletedProcess([], 3, "INTERNALERROR> boom\n", "")
+    try:
+        failures(crashed)
+    except AssertionError as exc:
+        assert "cannot be compared" in str(exc), exc
+    else:
+        raise AssertionError("a crashed run was read as having no failure")
+
+
+def test_edit_blame_helper_synthetic() -> None:
+    """Only what the untouched copy was not already failing is blamed on the
+    edit, and a test the edit brought into being is."""
+    inherited = frozenset({"a/recipe_spec.py::test_rule[anchor]"})
+    unchanged = subprocess.CompletedProcess(
+        [], 1, "FAILED a/recipe_spec.py::test_rule[anchor]\n1 failed, 9 passed\n", "",
+    )
+    assert caused_by_the_edit(unchanged, inherited) == frozenset()
+    worse = subprocess.CompletedProcess(
+        [], 1,
+        "FAILED a/recipe_spec.py::test_rule[anchor]\n"
+        "FAILED a/shape.py::test_shape[adversarial-new.md]\n2 failed, 8 passed\n", "",
+    )
+    assert caused_by_the_edit(worse, inherited) == {"a/shape.py::test_shape[adversarial-new.md]"}
+
+
+def test_reword_helpers_synthetic() -> None:
+    """The reword is one sentence, wording only, and the longest sentence is
+    picked from prose rather than from a heading."""
+    text = "# Adversarial — thing\n\nShort one.\n\nThe longer sentence here\nwraps a line.\n"
+    assert _longest_sentence(text) == "The longer sentence here wraps a line."
+    assert _reword("The longer sentence here wraps a line.") == (
+        "longer The sentence here wraps a line."
+    )
+    assert sorted(_reword("a b c").split(" ")) == ["a", "b", "c"]
+
+
 # --- A5 negative: a removal done wrong is caught ---------------------------
 #
 # The positive these are the negatives of is
@@ -842,8 +1028,15 @@ def test_passed_helper_synthetic() -> None:
 # because a removal done wrong has to be done on a kind the repository can
 # spare.
 
-def test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected(tmp_path: Path) -> None:
-    """stale-reference-detected: the recipe is gone, its test still names it."""
+def test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected(
+    tmp_path: Path, inherited_failures: frozenset[str]
+) -> None:
+    """stale-reference-detected: the recipe is gone, its test still names it.
+
+    What is asserted is that the botched removal broke something the untouched
+    copy was passing, not merely that the copy is red: a failure the copy
+    already carried would otherwise stand in for the detection.
+    """
     root = tmp_path / "repo"
     copied = _copy_repository(root)
     kind = _removable_kind()
@@ -853,11 +1046,16 @@ def test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected(tmp_path
     names = (recipe, Path(own_test).name)
     assert _references_to(root, names, expected=len(copied)) == [own_test]
     run = _run_adversary_tests(root)
-    assert run.returncode != 0, run.stdout + run.stderr
+    assert caused_by_the_edit(run, inherited_failures), run.stdout + run.stderr
 
 
-def test_removal_that_leaves_the_routing_row_behind_is_detected(tmp_path: Path) -> None:
-    """stale-reference-detected: both files are gone, the row still names one."""
+def test_removal_that_leaves_the_routing_row_behind_is_detected(
+    tmp_path: Path, inherited_failures: frozenset[str]
+) -> None:
+    """stale-reference-detected: both files are gone, the row still names one.
+
+    Held to the same difference as the case above, and for the same reason.
+    """
     root = tmp_path / "repo"
     copied = _copy_repository(root)
     kind = _removable_kind()
@@ -868,7 +1066,7 @@ def test_removal_that_leaves_the_routing_row_behind_is_detected(tmp_path: Path) 
     protocol = f"{REFERENCES.relative_to(ROOT)}/adversarial.md"
     assert _references_to(root, names, expected=len(copied)) == [protocol]
     run = _run_adversary_tests(root)
-    assert run.returncode != 0, run.stdout + run.stderr
+    assert caused_by_the_edit(run, inherited_failures), run.stdout + run.stderr
 
 
 def test_removal_that_leaves_the_name_in_a_live_file_is_detected(tmp_path: Path) -> None:
@@ -940,14 +1138,19 @@ _UNBOUNDED_REMOVAL_DEBT = tuple(_recipe_file(k) for k in _UNBOUNDED_REMOVAL_DEBT
 @pytest.mark.parametrize(
     "recipe", sorted(set(routed_recipes()) - set(_UNBOUNDED_REMOVAL_DEBT))
 )
-def test_removing_a_kind_routed_today_leaves_no_reference(recipe: str, tmp_path: Path) -> None:
+def test_removing_a_kind_routed_today_leaves_no_reference(
+    recipe: str, tmp_path: Path, inherited_failures: frozenset[str]
+) -> None:
     """deleting-a-kind-leaves-no-reference, for the kinds that exist today.
 
     The kind is not one this case invented: it is removed where it stands, in
     a copy of the whole repository, once per recipe file the routing table
     names -- which covers the recipe two rows share as well as the recipes one
     row each names. Afterwards nothing outside the change records still writes
-    either deleted name, and the checks that read these documents still run.
+    either deleted name, and the removal breaks no check that was passing
+    before it -- which is not the same as the copy being green: a copy carries
+    every failure the working tree has, and one of them is another recipe's
+    business, not this removal's.
     """
     kinds = routed_recipes()[recipe]
     root = tmp_path / "repo"
@@ -961,25 +1164,37 @@ def test_removing_a_kind_routed_today_leaves_no_reference(recipe: str, tmp_path:
     assert [h for h in hits if not h.startswith(_DEBT_SCAN_SKIP)] == [], hits
 
     run = _run_adversary_tests(root)
-    assert run.returncode == 0, run.stdout + run.stderr
+    broke = caused_by_the_edit(run, inherited_failures)
+    assert not broke, (sorted(broke), sorted(inherited_failures), run.stdout + run.stderr)
     assert _passed(run) > 0, run.stdout + run.stderr
 
 
 @pytest.mark.parametrize("kind", unrouted_types())
-def test_adding_a_kind_that_has_no_recipe_today_leaves_the_checks_green(
-    kind: str, tmp_path: Path
+def test_adding_a_kind_that_has_no_recipe_today_introduces_no_failure(
+    kind: str, tmp_path: Path, inherited_failures: frozenset[str]
 ) -> None:
     """add-kind-one-file-one-row and existing-recipe-file-untouched, performed
     for real and then undone.
 
     `test_adding_a_kind_is_one_file_and_one_row` counts what the addition
-    touches; this one asks whether the repository still holds together
-    afterwards. The addition is made in a copy of the whole repository, for
-    every artifact type the table leaves unrouted rather than for one that
-    happens not to collide with anything, and the checks that read these
-    documents are run on the result. Then the kind is taken away again by the
-    removal the protocol describes, which must come out as clean for a kind
-    that never had a test module of its own as for one that did.
+    touches; this one asks what the addition broke. The addition is made in a
+    copy of the whole repository, for every artifact type the table leaves
+    unrouted rather than for one that happens not to collide with anything,
+    and the checks that read these documents are run on the result. Then the
+    kind is taken away again by the removal the protocol describes, which must
+    come out as clean for a kind that never had a test module of its own as
+    for one that did.
+
+    What is asserted after each run is the difference against
+    `inherited_failures`, not that the copy is green. The claim is that giving
+    an artifact type a recipe introduces no new failure, which is a statement
+    about before and after; a copy is a copy of the working tree, so a green
+    copy is a statement about the whole suite instead, and one reworded
+    sentence in one recipe -- another recipe's business entirely -- would fail
+    this case once per unrouted kind. An addition whose recipe file is
+    missing, whose row points elsewhere, or that edits a recipe already there
+    still fails: each of those turns a check red that the untouched copy was
+    passing, so the difference is not empty.
     """
     root = tmp_path / "repo"
     copied = _copy_repository(root)
@@ -987,7 +1202,8 @@ def test_adding_a_kind_that_has_no_recipe_today_leaves_the_checks_green(
     _add_kind(root / str(REFERENCES.relative_to(ROOT)), kind, recipe, added_recipe(kind))
 
     added = _run_adversary_tests(root)
-    assert added.returncode == 0, added.stdout + added.stderr
+    broke = caused_by_the_edit(added, inherited_failures)
+    assert not broke, (sorted(broke), sorted(inherited_failures), added.stdout + added.stderr)
     assert _passed(added) > 0, added.stdout + added.stderr
 
     own_test = _remove_routed_kind_from_copy(root, recipe, (kind,))
@@ -997,18 +1213,66 @@ def test_adding_a_kind_that_has_no_recipe_today_leaves_the_checks_green(
     assert [h for h in hits if not h.startswith(_DEBT_SCAN_SKIP)] == [], hits
 
     removed = _run_adversary_tests(root)
-    assert removed.returncode == 0, removed.stdout + removed.stderr
+    broke_again = caused_by_the_edit(removed, inherited_failures)
+    assert not broke_again, (
+        sorted(broke_again), sorted(inherited_failures), removed.stdout + removed.stderr
+    )
+
+
+def test_a_reworded_recipe_is_not_blamed_on_the_addition(
+    tmp_path: Path, inherited_failures: frozenset[str]
+) -> None:
+    """The contamination this module used to have, kept out.
+
+    One sentence of one recipe is reworded in a copy -- the edit that belongs
+    to that recipe's own test file and to no other -- and the addition is then
+    performed in the same copy. What is asserted is that the reword really did
+    redden something, that what it reddened is the reworded recipe's own test
+    file, and that the run after the addition names no failure the run before
+    it did not. Held against a copy the reword has already contaminated, which
+    is what an addition case reading only the exit status could not survive:
+    it would fail here, and once per unrouted kind, for an edit that was not
+    its subject.
+    """
+    root = tmp_path / "repo"
+    _copy_repository(root)
+    sentence = _reword_a_recipe_in(root)
+    recipe = sorted(routed_recipes())[0]
+
+    run_before = _run_adversary_tests(root)
+    before = failures(run_before)
+    # What the reword did, and not what the working tree was already failing:
+    # this case is itself one of the cases that must survive a contaminated
+    # copy, so it subtracts the same inherited set the others do.
+    planted = caused_by_the_edit(run_before, inherited_failures)
+    assert planted, f"rewording {sentence!r} reddened nothing"
+    own_test = recipe_test_module(recipe)
+    assert {f.split("::")[0].rsplit("/", 1)[-1] for f in planted} == {own_test}, sorted(planted)
+
+    kind = unrouted_types()[0]
+    added_file = _recipe_file(kind)
+    _add_kind(root / str(REFERENCES.relative_to(ROOT)), kind, added_file, added_recipe(kind))
+
+    after = _run_adversary_tests(root)
+    broke = caused_by_the_edit(after, before)
+    assert not broke, (sorted(broke), after.stdout + after.stderr)
+    assert _passed(after) > 0, after.stdout + after.stderr
 
 
 @pytest.mark.parametrize("recipe", sorted(_UNBOUNDED_REMOVAL_DEBT))
-def test_recorded_unbounded_removal_is_still_unbounded(recipe: str, tmp_path: Path) -> None:
+def test_recorded_unbounded_removal_is_still_unbounded(
+    recipe: str, tmp_path: Path, inherited_failures: frozenset[str]
+) -> None:
     """Every recorded debt is real, so the list may only shrink.
 
     The same removal is performed, and this time what is asserted is that it
     does not come out clean: either a live file still writes a deleted name,
-    or the checks that read these documents no longer run. The day that stops
-    being true this case fails, the entry comes off the list, and the case
-    above takes the recipe over.
+    or the removal itself broke a check that was passing before it. Measured
+    as the difference against `inherited_failures` for the same reason the
+    case above is: a failure the copy already carried would otherwise stand in
+    for the debt and keep an entry alive that is no longer real. The day the
+    removal comes out clean this case fails, the entry comes off the list, and
+    the case above takes the recipe over.
     """
     assert recipe in routed_recipes(), recipe
     kinds = routed_recipes()[recipe]
@@ -1022,7 +1286,8 @@ def test_recorded_unbounded_removal_is_still_unbounded(recipe: str, tmp_path: Pa
         if not h.startswith(_DEBT_SCAN_SKIP)
     ]
     run = _run_adversary_tests(root)
-    assert hits or run.returncode != 0, (hits, run.stdout + run.stderr)
+    broke = caused_by_the_edit(run, inherited_failures)
+    assert hits or broke, (hits, sorted(inherited_failures), run.stdout + run.stderr)
 
 
 # --- A5 boundary: no file hand-lists a routed recipe ------------------------
