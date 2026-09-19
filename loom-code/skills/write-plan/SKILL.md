@@ -311,7 +311,11 @@ cover — not just that "tests pass" once the change is made. "Tests pass" is
 also true of a change that quietly drops the one case those tests existed to
 catch; read the current tests as the coverage spec before touching the code
 they protect, and treat any case they exercise today as a fact the new
-version must still hold, not a suggestion.
+version must still hold, not a suggestion. The Risk line keeps its 40-word
+cap; when the coverage statement does not fit alongside the rest of the
+task's rationale, that is the existing "task's rationale exceeds its Risk
+line" case (`contract/manifest.yaml`'s spec charter), and the coverage claim
+moves to the minimal spec that case already writes, not past the cap.
 
 **Shape.**
 

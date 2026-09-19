@@ -3,7 +3,7 @@
 originator: kouko
 kind: engineering
 needs-design: no — 全部改動落在 checker 程式碼、skill 說明文字與死程式碼清理,不是宣告的介面表面(`**/cli/**`、`**/api/**`、`**/commands/**`、`**/*.tsx`、`**/templates/**`)
-evidence: [loom-code/scripts/loom_checker/reviewers.py, loom-code/scripts/test_loom_attestation.py, loom-code/skills/write-plan/SKILL.md, loom-workflow/skills/git-memory/SKILL.md]
+evidence: [loom-code/scripts/loom_checker/reviewers.py, loom-code/scripts/test_loom_attestation.py, loom-code/scripts/test_adversarial_reviewer_floor_json.py, loom-code/skills/write-plan/SKILL.md, loom-workflow/skills/git-memory/SKILL.md]
 status: confirmed 2026-09-19
 publication: automatic — authorized 2026-09-19 by kouko
 

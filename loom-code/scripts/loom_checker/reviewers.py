@@ -67,16 +67,20 @@ def _json_scalar_equal(a: object, b: object) -> bool:
 
 
 def _is_version_only_json_bump(repo: Path, base: str, selected: str, path: str) -> bool:
-    """Whether a `.json` file's only change, on both sides, is its `version` value.
+    """Whether a `.json` file's change is a `version` bump plus, at most, a
+    reorder of the other keys -- never any other content change.
 
     Recomputed from the two blobs, never inferred from the filename: a newly
     added file (no `base` blob), a file either side fails to parse, a
     duplicate key, or a change to any key other than `version` all answer
-    False. `version` itself must be a plain string or number on both sides --
-    it is popped unread, so a shape change there (an object, a list) is not
-    trusted just because the rest of the file matches. This is what lets a
-    manifest version bump join the low-risk paths without trusting that the
-    rest of the file, or the value itself, was left alone.
+    False. Key order and absent-vs-`null` `version` are not "any other
+    change": `json.loads` erases both, and neither affects what the file
+    means, so this deliberately answers True for them too. `version` itself
+    must be a plain string or number on both sides -- it is popped unread, so
+    a shape change there (an object, a list) is not trusted just because the
+    rest of the file matches. This is what lets a manifest version bump join
+    the low-risk paths without trusting that the rest of the file, or the
+    value itself, was left alone.
 
     Known blind spot, found adversarially and left open: any key literally
     named `version` is popped, whatever it means in that file. A schema or
@@ -179,4 +183,10 @@ def required_reviewer_count(
         }
     except (OSError, UsageError):
         return 2
-    return reviewer_floor_for_paths(paths, change_id, repo=repo, base=base, selected=selected)
+    try:
+        return reviewer_floor_for_paths(paths, change_id, repo=repo, base=base, selected=selected)
+    except RecursionError:
+        # `_json_scalar_equal` recurses once per nesting level of a `.json`
+        # file under review; a pathologically deep one must not escape this
+        # function's own "failing closed" contract.
+        return 2

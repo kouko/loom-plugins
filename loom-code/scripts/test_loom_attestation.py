@@ -345,6 +345,30 @@ def test_reviewer_floor_stays_two_for_a_duplicate_key_hidden_by_a_version_bump(
     assert reviewers.required_reviewer_count(repo, CHANGE) == 2
 
 
+def test_reviewer_floor_fails_closed_on_a_pathologically_deep_json_file(
+    tmp_path: Path,
+) -> None:
+    # _json_scalar_equal recurses once per nesting level; required_reviewer_count
+    # must not let that RecursionError escape its own failing-closed contract.
+    repo = repo_with_content(tmp_path)
+    manifest_path = repo / "loom-code/plugin.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    node: dict = {}
+    top = node
+    for _ in range(3000):
+        node["n"] = {}
+        node = node["n"]
+    top["version"] = "9.9.0"
+    manifest_path.write_text(json.dumps(top), encoding="utf-8")
+    commit(repo, "manifest")
+    git(repo, "switch", "-q", "-c", "feature")
+    top["version"] = "9.9.1"
+    manifest_path.write_text(json.dumps(top), encoding="utf-8")
+    commit(repo, "bump version in a pathologically deep manifest")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
 def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
 
