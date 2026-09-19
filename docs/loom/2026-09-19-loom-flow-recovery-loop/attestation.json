@@ -1,0 +1,137 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-19-loom-flow-recovery-loop",
+  "content_digest": "3165ed1fdf448f5ef651f8cfdca43a8474f235c4",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 loom-code/skills/build/probes/test_recovery_rules.py",
+      "artifact": "loom-code/skills/build/probes/test_recovery_rules.py",
+      "result": "pass",
+      "command_digest": "86f1a890d8533979cd4fb6c6e44fb5e0a9ec95187252a21801358b0bc21af674"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 loom-code/skills/closing-review/probes/test_recovery_rules.py",
+      "artifact": "loom-code/skills/closing-review/probes/test_recovery_rules.py",
+      "result": "pass",
+      "command_digest": "2c24414078cfcbd89ee03ed738959af22f8bcbb38d21d3beee30d3456c812bb0"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_01_mapping_copy_next_door.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_01_mapping_copy_next_door.py",
+      "result": "pass",
+      "command_digest": "31f49ba5451b9faee4756f9bc407cd3fa378c5f81f259943e1b64bb031457c91"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_02_negate_every_rule.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_02_negate_every_rule.py",
+      "result": "pass",
+      "command_digest": "61568f6f61cfdcb4c179096daa9c32b4626b9db4dfc09363e162720e8d0b77c8"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_03_one_character_different.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_03_one_character_different.py",
+      "result": "pass",
+      "command_digest": "2fce14e5a2a8e88e065111c58904c33d458bf3689c7bdd1bd4907ef36cc5a180"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_04_lookup_does_not_resolve.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_04_lookup_does_not_resolve.py",
+      "result": "pass",
+      "command_digest": "20ef92e14198596599fc1a62c4f78401c64d281c5e6d13ef67c066569ba5644f"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_05_bound_record_is_unobservable.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_05_bound_record_is_unobservable.py",
+      "result": "pass",
+      "command_digest": "0958f4ada8e1a4ef17d0a9128305a27bfaa9aead1c3fb413b355a73c517076c8"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_06_station_names_as_substrings.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_06_station_names_as_substrings.py",
+      "result": "pass",
+      "command_digest": "5763a9525912b62d3b7e3a50fbcbb12744f70475348e42552e748c22ebeec712"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_07_produce_the_item_here.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_07_produce_the_item_here.py",
+      "result": "pass",
+      "command_digest": "ed57a7d9907af12b534101738d084fb7d453b54189132d55f53f88600f321666"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_08_stale_adversarial_set_is_absence_proof.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_08_stale_adversarial_set_is_absence_proof.py",
+      "result": "pass",
+      "command_digest": "d7ae3932ec65591ba63c5b7b1cf51f536f7113bb7ea3a0414148bd1364286806"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_09_mapping_inside_code_spans.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_09_mapping_inside_code_spans.py",
+      "result": "pass",
+      "command_digest": "fc089806eeb6c0d2111c0b50e9d4020e2063908b618fb1770dcf14a77c938742"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_10_attempts_that_held.py",
+      "artifact": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_10_attempts_that_held.py",
+      "result": "pass",
+      "command_digest": "8dacb8d4d29c06283514bcb2c95178c5e5f4a6ba8f882c7f02b8edd988a1a5be"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-skill",
+      "vendor": "Anthropic",
+      "model": "claude-sonnet-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-code",
+      "vendor": "Anthropic",
+      "model": "claude-sonnet-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [
+    {
+      "severity": "important",
+      "anchor": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_08_stale_adversarial_set_is_absence_proof.py",
+      "text": "Build's re-dispatch antecedents for the adversary (fix, and scope-widening) are decided by committed-program-count, not by coverage: a stale, non-representative committed adversarial program is treated as 'not absent'. Fixing this requires coverage-validation logic, which the intent's Out of scope explicitly excludes ('Changing the rule logic in loom_checker.py'). This change deliberately inherited the pre-existing trust-committed-programs model rather than introducing one. Left unresolved by design.",
+      "fix": "Open a separate intent to add coverage validation to the adversary re-dispatch mechanism, most likely as a loom_checker.py rule change."
+    },
+    {
+      "severity": "nit",
+      "anchor": "docs/loom/2026-09-19-loom-flow-recovery-loop/evidence/probes/adv_04_lookup_does_not_resolve.py",
+      "text": "The manifest lookup, read over all eight declared artifact keys, resolves 'intent' and 'diff' to two producing stations each with no tie-break. Resolved in substance: the SKILL.md prose now explicitly bounds the recovery lookup's domain to the three items this change's Acceptance actually covers (the adversarial programs, the blind-run report, and the attestation), all three of which resolve unambiguously. The adversarial program itself queries the full, unbounded manifest structure rather than the bounded prose, so it continues to report the two out-of-domain keys' raw ambiguity as a structural fact about manifest.yaml, which is outside what a SKILL.md prose change can or should fix.",
+      "fix": "None for this change; if the recovery rule's domain is ever widened to cover 'intent' or 'diff', the manifest's own producer declaration for those keys needs a tie-break first."
+    },
+    {
+      "severity": "nit",
+      "anchor": "loom-code/skills/build/probes/test_recovery_rules.py and loom-code/skills/closing-review/probes/test_recovery_rules.py",
+      "text": "Exact-string phrase pins turn RED on a meaning-preserving rewording (comma-for-'and', 'twice'-for-'two times', 'absent'-for-'missing') per adversarial finding ADV-03. Accepted as a wording-pin limitation consistent with the plan's own Risk 1 (probes pin wording an agent must follow; the blind run is what shows an agent actually recovering), not a behavioural gap.",
+      "fix": "None for this change; consider semantic-tolerant matching in a follow-up if this proves costly to maintain."
+    }
+  ],
+  "selection": null
+}
