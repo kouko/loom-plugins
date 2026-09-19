@@ -1,0 +1,48 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-19-split-commit-reference-does-not-survive-squash",
+  "content_digest": "41f4313d5e623087f0a3468889207719d8e1869b",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversary_layout.py -q",
+      "artifact": "loom-code/scripts/test_adversary_layout.py",
+      "result": "pass",
+      "command_digest": "37c91cb1499ae093ece7a8269e89c11431c61f8a8d30ea76cdd8676711496228"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/scripts/test_adversary_recipe_shape.py -q",
+      "artifact": "loom-code/scripts/test_adversary_recipe_shape.py",
+      "result": "pass",
+      "command_digest": "47eb3f915f24a3df16c313a1b4cbffb6d4a9eab7bf9bb9adf088e8de1af5816a"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-fixmain-a",
+      "vendor": "Anthropic",
+      "model": "claude-sonnet-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-fixmain-b",
+      "vendor": "Anthropic",
+      "model": "claude-sonnet-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
