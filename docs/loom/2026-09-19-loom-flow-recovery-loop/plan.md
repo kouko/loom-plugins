@@ -6,16 +6,16 @@ charter: 1.0
 ## Task DAG
 
 **W0-01 Build re-enters its end-of-Build checks when an item is absent**  after: —  acceptance: 1
-- Files: loom-code/skills/build/SKILL.md
+- Files: loom-code/skills/build/SKILL.md, loom-code/skills/build/probes/test_recovery_rules.py
 - Test: A1 positive: RL-01; negative: RL-02.
 - Risk: Widening the antecedent could make Build re-dispatch the adversary on every entry. Bound it to absence, per spec REQ-1 and the Design decision on adding an antecedent. agent-decided.
 
 **W0-02 Closing review tells absence from failure and names the producer**  after: W0-01  acceptance: 3, 4, 5
-- Files: loom-code/skills/closing-review/SKILL.md
+- Files: loom-code/skills/closing-review/SKILL.md, loom-code/skills/closing-review/probes/test_recovery_rules.py
 - Test: A3 positive: RL-03; negative: RL-04. A4 positive: RL-05; boundary: RL-06. A5 positive: RL-07; negative: RL-08.
 - Risk: Prose could restate the artifact-to-station mapping instead of citing it. Spec REQ-3 forbids a second copy; RL-04 fails the build if one appears. agent-decided.
 
-**W0-03 Probes pin the recovery rules and the no-repeat bound**  after: W0-02  acceptance: 2
+**W0-03 Probes pin the two-entry bound across both stations**  after: W0-02  acceptance: 2
 - Files: loom-code/skills/build/probes/test_recovery_rules.py, loom-code/skills/closing-review/probes/test_recovery_rules.py
 - Test: A2 positive: RL-09; boundary: RL-10.
 - Risk: A prose-presence probe passes on wording that no agent follows. The blind run, not these probes, decides Acceptance 1, 2 and 5 behaviourally. agent-decided.
