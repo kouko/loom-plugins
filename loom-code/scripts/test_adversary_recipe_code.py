@@ -135,11 +135,21 @@ def test_code_recipe_states_the_floor_once() -> None:
 # negation in the same sentence rejected, and, where the rule's own wording
 # carries the negation ("is not evidence"), an exact sentence, which the
 # matcher could not otherwise accept.
+#
+# Each verb starts where the rule's own sentence starts. Both two-branch
+# rules below open with the condition that selects the branch -- "**If the
+# repo declares ...**", "**If it declares none**" -- and a pin whose verb
+# opened at the consequence instead left that condition unpinned: the
+# change's own adversary reworded the whole opening clause of the tooling
+# rule and nothing went red (FINDING unpinned-recipe). So the verb names the
+# condition, the literal names the consequence, and each pin's rejected list
+# carries the reworded opening that used to pass.
 
 # name: (verb, literal, extras, affirmative example, rejected examples)
 AFFIRMATIVE_PINS = {
     "code-declared-tooling-is-run-and-survivors-reported": (
-        "run it over the", "changed modules and report survivors",
+        "the repo declares mutation or fuzz tooling**",
+        "run it over the changed modules and report survivors",
         ("a surviving mutant is a test that asserts nothing", "a finding against `tests`"),
         "**If the repo declares mutation or fuzz tooling** — a `mutmut`, `cosmic-ray`, "
         "`stryker` or fuzz target in its config — run it over the changed modules and "
@@ -151,10 +161,19 @@ AFFIRMATIVE_PINS = {
          "**If the repo declares mutation or fuzz tooling** — run it over the changed "
          "modules and report survivors.",
          "**If the repo declares mutation or fuzz tooling** — run it over the changed "
-         "modules and report survivors: a surviving mutant is a test that asserts nothing."),
+         "modules and report survivors: a surviving mutant is a test that asserts nothing.",
+         # The rewording the adversary landed: the consequence is untouched and
+         # only the condition reads differently.
+         "**If repo the declares mutation or fuzz tooling** — a `mutmut`, `cosmic-ray`, "
+         "`stryker` or fuzz target in its config — run it over the changed modules and "
+         "report survivors: a surviving mutant is a test that asserts nothing, and a "
+         "finding against `tests`.",
+         # The condition dropped outright: the rule would apply to every repo.
+         "Run it over the changed modules and report survivors: a surviving mutant is a "
+         "test that asserts nothing, and a finding against `tests`."),
     ),
     "code-three-cases-written-run-and-recorded": (
-        "write", "**at least three**",
+        "it declares none**", "write **at least three**",
         ("executable abuse or boundary cases against the changed behaviour",
          "run them", "record each one"),
         "**If it declares none** (the common case), write **at least three** executable "
@@ -165,7 +184,13 @@ AFFIRMATIVE_PINS = {
          "**If it declares none** (the common case), write **at least three** executable "
          "abuse or boundary cases against the changed behaviour.",
          "**If it declares none** (the common case), write a case or two against the "
-         "changed behaviour, run them, and record each one."),
+         "changed behaviour, run them, and record each one.",
+         # The same rewording, on the other branch's condition.
+         "**If declares it none** (the common case), write **at least three** executable "
+         "abuse or boundary cases against the changed behaviour, run them, and record each one.",
+         # The condition dropped: nothing says which branch the floor belongs to.
+         "Write **at least three** executable abuse or boundary cases against the changed "
+         "behaviour, run them, and record each one."),
     ),
     "code-cases-prefer-to-live-as-real-tests": (
         "Prefer", "cases that live as real tests afterwards", (),

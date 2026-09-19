@@ -320,11 +320,20 @@ def test_procedure_sentence_in_both_files_rejected() -> None:
 # --- What the protocol says outside the reuse-and-mutation passage ----------
 #
 # The pins above cover `Reuse first, update with evidence`, which is most of
-# the protocol. These cover the two halves that had none: what the adversary
-# is for, stated in the opening, and how a probe and a finding are recorded,
-# stated under `Recording`. Same two shapes -- an affirmative verb before the
-# pinned literal with a negation in the same sentence rejected, and an exact
-# sentence where the rule's own wording carries the negation.
+# the protocol. These cover the rest: what the adversary is for, stated in the
+# opening; which recipe to read and what giving or taking away a recipe costs,
+# stated under `Which recipe to read`; and how a probe and a finding are
+# recorded, stated under `Recording`. Same two shapes -- an affirmative verb
+# before the pinned literal with a negation in the same sentence rejected, and
+# an exact sentence where the rule's own wording carries the negation.
+#
+# Each verb starts where the rule's own sentence starts, and each pin's
+# rejected list carries that sentence with its opening words exchanged. A pin
+# whose verb opens mid-sentence leaves the words before it unwatched, and the
+# change's own adversary reworded exactly those words in a recipe and saw
+# nothing go red (FINDING unpinned-recipe); the rules of `Which recipe to
+# read` and the two `Recording` rules below were unwatched the same way when
+# that measurement was extended to every rule sentence of all four files.
 
 # name: (verb, literal, extras, affirmative example, rejected examples)
 RULE_PINS = {
@@ -345,6 +354,94 @@ RULE_PINS = {
          "but `finalize-review` does not execute them on committed content and Build "
          "re-runs those programs on every fix loop.",
          "It runs at the end of Build, and everything it runs is committed as a program."),
+    ),
+    "protocol-artifact-type-comes-from-the-manifest": (
+        "Every changed path has", "an artifact type",
+        ("from the `artifact_types` list in `contract/manifest.yaml`",),
+        "Every changed path has an artifact type, from the `artifact_types` list in "
+        "`contract/manifest.yaml`.",
+        ("Every changed path has an artifact type, but not from the `artifact_types` list "
+         "in `contract/manifest.yaml`.",
+         "Every path changed has an artifact type, from the `artifact_types` list in "
+         "`contract/manifest.yaml`.",
+         "Every changed path has an artifact type."),
+    ),
+    "protocol-protocol-plus-matching-recipes-is-the-whole-procedure": (
+        "Read this protocol",
+        "then the recipe file this table names for every artifact type among the changed paths",
+        ("that protocol and those recipes are the whole procedure",),
+        "Read this protocol, then the recipe file this table names for every artifact type "
+        "among the changed paths: that protocol and those recipes are the whole procedure, "
+        "and there is nothing else to find.",
+        ("Read this protocol, then the recipe file this table names for every artifact type "
+         "among the changed paths: that protocol and those recipes are not the whole "
+         "procedure.",
+         "Read protocol this, then the recipe file this table names for every artifact type "
+         "among the changed paths: that protocol and those recipes are the whole procedure.",
+         "Read this protocol, then the recipe file this table names for every artifact type "
+         "among the changed paths."),
+    ),
+    "protocol-giving-a-type-a-recipe-is-one-file-and-one-row": (
+        "Giving a type a recipe is", "one new file beside this one plus its own row here", (),
+        "Giving a type a recipe is one new file beside this one plus its own row here.",
+        ("Giving a type a recipe is not one new file beside this one plus its own row here.",
+         "Giving type a a recipe is one new file beside this one plus its own row here.",
+         "Giving a type a recipe is a new section in this file."),
+    ),
+    "protocol-taking-a-recipe-away-resets-the-row": (
+        "Taking one away", "deletes its file and puts its row back to `none`", (),
+        "Taking one away deletes its file and puts its row back to `none`.",
+        ("Taking one away never deletes its file and puts its row back to `none`.",
+         "Taking away one deletes its file and puts its row back to `none`.",
+         "Taking one away deletes its file."),
+    ),
+    "protocol-reuse-is-checked-before-any-probe-is-written": (
+        "Before writing any probe", "the adversary checks what already covers the target",
+        ("this change's programs under `docs/loom/<change-id>/evidence/probes/`",
+         "the repository's related tests"),
+        "Before writing any probe, the adversary checks what already covers the target: "
+        "this change's programs under `docs/loom/<change-id>/evidence/probes/` and the "
+        "repository's related tests.",
+        ("Before writing any probe, the adversary checks what already covers the target: "
+         "this change's programs under `docs/loom/<change-id>/evidence/probes/` and not the "
+         "repository's related tests.",
+         "Before any writing probe, the adversary checks what already covers the target: "
+         "this change's programs under `docs/loom/<change-id>/evidence/probes/` and the "
+         "repository's related tests.",
+         "Before writing any probe, the adversary checks what already covers the target."),
+    ),
+    "protocol-build-names-and-re-runs-every-committed-program": (
+        "Build's hand-off names", "every committed program",
+        ("Build re-runs each one on every fix loop",),
+        "Build's hand-off names every committed program, and Build re-runs each one on "
+        "every fix loop.",
+        ("Build's hand-off names every committed program, and Build re-runs each one on "
+         "every fix loop, though not on the last one.",
+         "Build's names hand-off every committed program, and Build re-runs each one on "
+         "every fix loop.",
+         "Build's hand-off names every committed program."),
+    ),
+    "protocol-closing-review-supplies-the-programs-to-finalize-review": (
+        "Closing review supplies", "them to `finalize-review`",
+        ("executes each one and records the command, artifact, functional-content digest "
+         "and observed result in the generated attestation",),
+        "Closing review supplies them to `finalize-review`, which executes each one and "
+        "records the command, artifact, functional-content digest and observed result in "
+        "the generated attestation.",
+        ("Closing review supplies them to `finalize-review`, which executes each one and "
+         "records the command, artifact, functional-content digest and observed result in "
+         "the generated attestation, and never runs them again.",
+         "Closing supplies review them to `finalize-review`, which executes each one and "
+         "records the command, artifact, functional-content digest and observed result in "
+         "the generated attestation.",
+         "Closing review supplies them to `finalize-review`."),
+    ),
+    "protocol-artifact-is-where-the-case-now-lives": (
+        "`artifact` is", "where the case now lives", (),
+        "- `artifact` is where the case now lives.",
+        ("- `artifact` is not where the case now lives.",
+         "- is `artifact` where the case now lives.",
+         "- `artifact` is a label."),
     ),
     "protocol-every-failed-attempt-is-recorded": (
         "Record every attempt that failed to break anything", "for every artifact type",
@@ -397,6 +494,26 @@ RULE_PINS = {
 
 # name: (sentence, rewrites that must fail)
 RULE_SENTENCE_PINS = {
+    "protocol-a-type-with-no-recipe-is-attacked-with-the-protocol-alone": (
+        "A type whose row says `none` has no recipe today — attack it with this protocol "
+        "alone, and say in the report that it has none.",
+        ("A type whose row says `none` has a recipe today — attack it with this protocol "
+         "alone, and say in the report that it has none.",
+         "A type whose row says `none` has no recipe today — attack it with this protocol "
+         "alone.",
+         "A whose type row says `none` has no recipe today — attack it with this protocol "
+         "alone, and say in the report that it has none."),
+    ),
+    # The clause after the semicolon in `Giving a type a recipe is one new
+    # file beside this one plus its own row here; no existing recipe file is
+    # edited.` -- the semicolon makes it its own unit, and its own wording
+    # carries the negation, so the affirmative matcher cannot hold it.
+    "protocol-no-existing-recipe-is-edited": (
+        "no existing recipe file is edited.",
+        ("an existing recipe file is edited.",
+         "no existing recipe file is edited unless the new kind needs it.",
+         "no recipe file is edited."),
+    ),
     "protocol-not-a-second-review": (
         "The adversary's job is not to find bugs the reviewers might also find.",
         ("The adversary's job is to find bugs the reviewers might also find.",
