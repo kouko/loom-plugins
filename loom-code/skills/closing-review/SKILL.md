@@ -56,6 +56,7 @@ check. When that hand-off reports a check failing, return the change to
 Build and dispatch no reviewer. Reviewers read only content whose Build
 mechanical checks passed.
 
+<!-- gate: review.absence-recovery -->
 Absence is a distinct antecedent from a failing check. On a re-entry with
 every planned task already committed, that hand-off is not in context, and the
 item this station needs may itself be missing. Neither state is a check
@@ -77,7 +78,9 @@ a list in entry order, in the active task context and not in a committed
 ledger, and name that list in the handoff and in either stop below. A second
 entry to a station is the last one allowed; a third entry to any station is a
 recovery that has failed, and it stops and reports under the rule below rather
-than routing on. The run enters no station more than twice.
+than routing on. The run enters no station more than twice, a count that
+tracks only entries made to resolve an absent item under this rule and is
+never incremented by §4's ordinary round-and-digest progression.
 
 Stop and ask when producing an absent item needs a decision point the user
 has not answered for this change, naming the station sequence entered so
@@ -91,6 +94,8 @@ Stop when the attempt to produce an absent item fails. Report which item is
 absent, what was attempted, and where it failed. Also report the station
 sequence entered so far. Do not attempt that item a
 second time and do not hand the change on to another station.
+
+<!-- /gate -->
 
 When a blind run is needed, finish it and commit its report (§3) before
 dispatching the first reviewers. After Build commits completed functional

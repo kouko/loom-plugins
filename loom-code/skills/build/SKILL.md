@@ -97,6 +97,7 @@ suite and re-run the existing adversarial programs. After a fix where every
 adversarial program still passes, or fails only for a product defect, do not
 dispatch the adversary again.
 
+<!-- gate: build.absence-recovery -->
 Build enters these end-of-Build checks on absence as well as after a fix: when
 Build is entered with every planned task already committed and an item Build
 owes is absent, it runs this section from step 1 to produce that item. Absence
@@ -110,7 +111,8 @@ dispatches the adversary only when no adversarial program is committed;
 committed programs are re-run, never re-dispatched, exactly as after a fix.
 
 A recovery run is bounded across stations, not only within Build: an entry here
-counts toward that bound, and [closing-review](../closing-review/SKILL.md) §2
+made to resolve an absent item counts toward that bound; an entry made for an
+ordinary review-round fix never does. [closing-review](../closing-review/SKILL.md) §2
 states the bound and the record of entered stations it is counted from. Read it
 there; this file keeps no count of its own.
 
@@ -125,6 +127,8 @@ defect in the product as above. Give the adversary the step 2 inputs plus the
 widened changed paths, or the trunk paths the sync brought in, and the
 failing program's output. The adversary updates only its own programs. Implementers and the orchestrator never edit an
 adversarial program. After the update, Build repeats these end-of-Build checks.
+
+<!-- /gate -->
 
 ## 4. Hand off to closing-review
 

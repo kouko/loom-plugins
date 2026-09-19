@@ -25,6 +25,11 @@ A1 positive: RL-11 — a blind run is always dispatched fresh-context to an
 A3 positive: RL-13 — the manifest lookup is bounded to the three items this
              change's Acceptance #1 names, not left open over the whole
              manifest.
+A2 boundary: RL-15 — the station-entry bound counts only entries made to
+             resolve an absent item under this rule; it is independent of,
+             and never incremented by, §4's ordinary round-and-digest
+             progression, so an unrelated healthy Round 2/3 review bounce
+             never trips it.
 
 RL-03, RL-05, RL-06, RL-07, RL-08 and RL-10 also pin the paragraph's exact
 closing sentence and, where the pinned sentence is itself affirmative, its
@@ -60,7 +65,22 @@ NEXT_UNRELATED = "When a blind run is needed, finish it and commit its report"
 # appended trailing sentence — ADV-02's attack — changes what the paragraph
 # ends with even though it removes nothing, so the ending is pinned exactly
 # rather than merely required to be present somewhere in the paragraph.
-RL_03_10_ENDING = "The run enters no station more than twice."
+RL_03_10_ENDING = (
+    "The run enters no station more than twice, a count that tracks only "
+    "entries made to resolve an absent item under this rule and is never "
+    "incremented by §4's ordinary round-and-digest progression."
+)
+
+# The exact clause distinguishing this count from §4's Round 1/2/3
+# progression (reviewer-skill Round 2 finding): read literally without it,
+# an ordinary Round 2 fix-and-reverify bounce — re-entering Build, then
+# closing-review — could be misread as two of the three station entries this
+# rule bounds, with no absent item ever involved.
+RL_15_INDEPENDENCE_CLAUSE = (
+    "a count that tracks only entries made to resolve an absent item under "
+    "this rule and is never incremented by §4's ordinary "
+    "round-and-digest progression"
+)
 RL_06_ENDING = (
     "a user-requested skip is still confirmed exactly as "
     "[expert-mode](../expert-mode/SKILL.md) requires."
@@ -162,6 +182,20 @@ def _last_fragment(text):
     return fragments[-1].strip() if fragments else ""
 
 
+def _clause_containing(text, phrase):
+    """The smallest comma/semicolon/period-delimited clause of `text` that
+    contains `phrase`, for a negation guard on one clause of a multi-clause
+    sentence. Whole-sentence granularity is too coarse here: the sentence
+    carrying "return the change there" also carries "dispatch no reviewer"
+    later in the same sentence, so a whole-sentence has_negation call is
+    tripped by that unrelated "no" and would flag the committed, correct
+    text. Splitting on commas too isolates each clause from its neighbors."""
+    for clause in split_sentences(text, ends=".;,"):
+        if phrase in clause:
+            return clause
+    return None
+
+
 def _recovery_passage():
     """The full run of paragraphs stating the absence-recovery rule — the
     lookup paragraph through the decision and failure paragraphs — stopping
@@ -172,11 +206,6 @@ def _recovery_passage():
     start = content.index(LOOKUP_OPENER)
     end = content.index(NEXT_UNRELATED, start)
     return _normalize(content[start:end])
-
-
-def _strip_code_spans(text):
-    """Drop inline code, so citing `stations[].produces` is not read as prose."""
-    return re.sub(r"`[^`]*`", " ", text)
 
 
 def _despan_for_scan(text):
@@ -232,6 +261,22 @@ def test_RL_03_absence_is_distinct_and_the_producer_is_looked_up():
         print(f"RL-03 FAIL: the sentence stating the item is absent is negated: {absent_sentence!r}")
         sys.exit(1)
 
+    # Polarity of each outcome clause: "produce the item here" is a literal
+    # substring of "do not produce the item here", and likewise for "return
+    # the change there", so containment alone is satisfied by the negated
+    # rewrite. Each clause is guarded on its own, at clause granularity, so
+    # neither trips on an unrelated negation word in a neighboring clause
+    # of the same sentence (e.g. "dispatch no reviewer" further along the
+    # "return the change there" sentence).
+    for outcome_phrase in ("produce the item here", "return the change there"):
+        clause = _clause_containing(para, outcome_phrase)
+        if clause is None:
+            print(f"RL-03 FAIL: no clause found containing {outcome_phrase!r}")
+            sys.exit(1)
+        if has_negation(clause):
+            print(f"RL-03 FAIL: the clause containing {outcome_phrase!r} is negated: {clause!r}")
+            sys.exit(1)
+
     # Scope: the paragraph must end exactly where the committed rule ends.
     ending = _last_fragment(para)
     if ending != RL_03_10_ENDING:
@@ -282,8 +327,15 @@ def test_RL_06_answered_decision_proceeds_and_the_skip_rule_is_untouched():
             "expert-mode",
         ],
     )
-    if "proceed" not in para:
+    # "proceed" is a literal substring of "do not proceed", so containment
+    # alone is satisfied by the negated rewrite. Isolate the clause carrying
+    # it and guard its polarity directly.
+    proceed_clause = _clause_containing(para, "proceed")
+    if proceed_clause is None:
         print("RL-06 FAIL: the answered branch does not proceed")
+        sys.exit(1)
+    if has_negation(proceed_clause):
+        print(f"RL-06 FAIL: the proceed clause is negated: {proceed_clause!r}")
         sys.exit(1)
 
     ending = _last_fragment(para)
@@ -369,6 +421,22 @@ def test_RL_12_the_recorded_sequence_surfaces_at_both_stops_and_the_hand_off():
     print("RL-12 PASS: the recorded sequence is named at the return, both stops")
 
 
+def test_RL_15_recovery_count_is_independent_of_ordinary_review_rounds():
+    """The station-entry bound counts only entries made to resolve an absent
+    item under this rule. Read literally without this clause, an ordinary,
+    healthy Round 2 fix-and-reverify bounce (re-entering Build, then
+    closing-review — §4) has nothing to do with an absent item, yet could be
+    misread as counting toward 'a third entry to any station is a recovery
+    that has failed', incorrectly aborting a healthy review episode."""
+    para = _require("RL-15", LOOKUP_OPENER, [RL_15_INDEPENDENCE_CLAUSE])
+
+    ending = _last_fragment(para)
+    if ending != RL_03_10_ENDING:
+        print(f"RL-15 FAIL: the paragraph's closing sentence changed; ends with {ending!r}")
+        sys.exit(1)
+    print("RL-15 PASS: the recovery-entry bound is independent of §4's ordinary round progression")
+
+
 def test_RL_11_blind_run_independence_is_stated_in_its_own_section():
     """The blind run's writer-never-judge constraint lives in this station's
     own §3, not only in the blind-runner agent definition and the manifest's
@@ -441,6 +509,7 @@ if __name__ == "__main__":
     test_RL_07_failed_recovery_stops_and_reports()
     test_RL_08_failed_recovery_neither_retries_nor_hands_on()
     test_RL_10_the_sequence_is_recorded_and_the_second_entry_is_the_last()
+    test_RL_15_recovery_count_is_independent_of_ordinary_review_rounds()
     test_RL_12_the_recorded_sequence_surfaces_at_both_stops_and_the_hand_off()
     test_RL_11_blind_run_independence_is_stated_in_its_own_section()
     test_RL_13_lookup_is_bounded_to_the_three_recovery_items()

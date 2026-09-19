@@ -10,7 +10,9 @@ A1 negative: RL-02 — the recovery paragraph carries no second copy of the
              a second copy placed in the next paragraph, or hidden in
              backticks, is still a second copy.
 A2 positive: RL-09 — Build carries the cross-station bound, as a pointer to the
-             station that states it rather than a count of its own.
+             station that states it rather than a count of its own, and only
+             an entry made to resolve an absent item counts toward it, never
+             an ordinary review-round fix entry.
 A1 positive: RL-11 — a Build entry with no task to implement is directed to §3,
              stated before the point where such a run would exit.
 A1 negative: RL-12 — that early pointer is a pointer, not a second copy of the
@@ -173,11 +175,6 @@ def _recovery_passage():
     return _normalize(content[start:end])
 
 
-def _strip_code_spans(text):
-    """Drop inline code, so citing `stations[].produces` is not read as prose."""
-    return re.sub(r"`[^`]*`", " ", text)
-
-
 def _despan_for_scan(text):
     """Neutralize the known manifest citations, then unwrap any remaining
     code span into plain prose. A citation like `stations[].produces` is not
@@ -268,6 +265,11 @@ def test_RL_09_build_carries_the_cross_station_bound():
         [
             # an entry here is part of the bounded sequence
             "counts toward",
+            # only an absence-triggered entry counts (reviewer-skill Round 2
+            # finding: an ordinary review-round fix entry must not conflate
+            # with the recovery bound)
+            "made to resolve an absent item counts toward that bound",
+            "an entry made for an ordinary review-round fix never does",
             # where the single statement of the bound lives
             "closing-review",
             # and the record the bound is counted from
@@ -277,6 +279,24 @@ def test_RL_09_build_carries_the_cross_station_bound():
     # A pointer, not a second copy: the count itself is stated in one place.
     if "more than twice" in para:
         print("RL-09 FAIL: the bound paragraph restates the count instead of pointing at it")
+        sys.exit(1)
+
+    # Polarity: "counts toward" is a literal substring of "does not count
+    # toward", so containment alone is satisfied by the negated rewrite.
+    # The enclosing sentence legitimately contains "not only" (from "not
+    # only within Build") before the colon, so a naive whole-sentence
+    # has_negation call would false-positive on the committed, correct
+    # text; splitting on the colon too isolates the clause after it — the
+    # one that actually states "counts toward" — as its own unit.
+    counts_clause = next(
+        (c for c in split_sentences(para, ends=".:;") if "counts toward" in c),
+        None,
+    )
+    if counts_clause is None:
+        print("RL-09 FAIL: no clause found containing 'counts toward'")
+        sys.exit(1)
+    if has_negation(counts_clause):
+        print(f"RL-09 FAIL: the 'counts toward' clause is negated: {counts_clause!r}")
         sys.exit(1)
 
     ending = _last_fragment(para)
