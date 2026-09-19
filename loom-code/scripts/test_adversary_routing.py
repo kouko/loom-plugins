@@ -25,7 +25,11 @@ wording turned out to need:
   reworded sentence in one recipe is that recipe's own test file's business,
   and demanding a green copy would make it fail the addition once per unrouted
   kind. Proven by rewording a recipe in a copy on purpose and performing the
-  addition there anyway;
+  addition there anyway. Which recipe is reworded is selected rather than
+  assumed: the premise is that the reword can still plant a failure, which is
+  only true of a recipe whose own test module is green in the tree the copy
+  came from, so a recipe already edited on this branch is passed over and a
+  tree where every recipe's module is red says so instead of measuring;
 - protocol-plus-kind-is-complete (A7 positive): the adversary contract names
   the protocol, the protocol's row names the recipe, the recipe points back
   at the protocol, and that pair needs no third file;
@@ -855,15 +859,58 @@ def _reword(sentence: str) -> str:
     return " ".join([words[1], words[0], *words[2:]])
 
 
-def _reword_a_recipe_in(root: Path) -> str:
-    """Reword one sentence of one recipe in the copy, and say which sentence.
+def _failing_modules(named: frozenset[str]) -> set[str]:
+    """The test file names a set of failure node ids belongs to."""
+    return {node.split("::")[0].rsplit("/", 1)[-1] for node in named}
 
-    The recipe is the first one the routing table names, so nothing here
-    depends on which kinds exist. The sentence is matched across the line
-    breaks it is wrapped over, so only its wording changes -- no file is
-    added, deleted, renamed or emptied.
+
+def _reword_candidates(inherited: frozenset[str]) -> list[str]:
+    """The routed recipes whose reword can still plant a failure, in order.
+
+    A recipe qualifies when it has a test module of its own -- nothing else
+    goes red for a wording change -- and that module is not already among
+    `inherited`'s failures. The ordinary state of a working branch is the
+    reason: between editing a recipe and updating its test file, that
+    recipe's module is red before anything here touches a copy, so rewording
+    that recipe plants nothing new and proves nothing, while rewording any
+    other one still does. Sorted, so which recipe is picked is fixed by the
+    routing table and not by the order a dict happens to carry.
     """
-    recipe = sorted(routed_recipes())[0]
+    failing = _failing_modules(inherited)
+    return [
+        recipe
+        for recipe in sorted(routed_recipes())
+        if (module := recipe_test_module(recipe)) not in failing
+        and (ROOT / SCRIPTS / module).is_file()
+    ]
+
+
+def _first_planting(attempts: dict[str, frozenset[str]]) -> tuple[str, frozenset[str]]:
+    """The first reword of `attempts` that really did redden something.
+
+    Raised on when no attempt did: a round of rewords that planted nothing
+    leaves the contamination measurement unexercised, which is a failure and
+    never a quiet pass. Pure, so the sabotaged measurement -- one that reports
+    every reword as harmless -- is provable without copying the repository.
+    """
+    for recipe, planted in attempts.items():
+        if planted:
+            return recipe, planted
+    raise AssertionError(
+        "no reword of a recipe whose own test module was green planted a "
+        "failure, so the contamination measurement was not exercised: "
+        + ", ".join(sorted(attempts))
+    )
+
+
+def _reword_a_recipe_in(root: Path, recipe: str) -> str:
+    """Reword one sentence of `recipe` in the copy, and say which sentence.
+
+    The recipe is the caller's, chosen through `_reword_candidates`, so
+    nothing here depends on which kinds exist. The sentence is matched across
+    the line breaks it is wrapped over, so only its wording changes -- no file
+    is added, deleted, renamed or emptied.
+    """
     path = root / str(REFERENCES.relative_to(ROOT)) / recipe
     text = path.read_text(encoding="utf-8")
     sentence = _longest_sentence(text)
@@ -1018,6 +1065,59 @@ def test_reword_helpers_synthetic() -> None:
         "longer The sentence here wraps a line."
     )
     assert sorted(_reword("a b c").split(" ")) == ["a", "b", "c"]
+
+
+def test_failing_module_reader_synthetic() -> None:
+    assert _failing_modules(frozenset()) == set()
+    assert _failing_modules(frozenset({
+        "loom-code/scripts/test_one.py::test_rule[anchor]",
+        "loom-code/scripts/test_one.py::test_other",
+        "loom-code/scripts/test_two.py",
+    })) == {"test_one.py", "test_two.py"}
+
+
+def test_reword_candidates_pass_over_a_recipe_already_red_synthetic() -> None:
+    """A reword is measured on a recipe whose own test module is green.
+
+    The three states the guard meets: an untouched tree, where every routed
+    recipe that has a module of its own is a candidate; a branch where one
+    recipe was edited and its test file not yet updated, where that recipe is
+    passed over and the others still serve; and a tree where every one of them
+    is red, where there is nothing left to measure and the guard says so
+    rather than failing for an edit that was not its subject.
+    """
+    green = _reword_candidates(frozenset())
+    assert green, "no routed recipe has a test module of its own"
+    for recipe in green:
+        assert (ROOT / SCRIPTS / recipe_test_module(recipe)).is_file(), recipe
+
+    one_red = frozenset({f"{SCRIPTS}/{recipe_test_module(green[0])}::test_rule[anchor]"})
+    assert _reword_candidates(one_red) == green[1:]
+
+    all_red = frozenset(f"{SCRIPTS}/{recipe_test_module(r)}::test_rule" for r in green)
+    assert _reword_candidates(all_red) == []
+
+
+def test_first_planting_fails_when_nothing_was_planted_synthetic() -> None:
+    """The sabotaged measurement: every reword comes back harmless.
+
+    A guard that answered that with a skip, or with a pass, would prove
+    nothing at all -- so this is the one outcome that is raised on. The
+    synthetic recipe names are the ones this module already uses for its
+    fixtures, for the reason given there.
+    """
+    try:
+        _first_planting({_SYNTHETIC_RECIPE: frozenset(), _SYNTHETIC_OTHER: frozenset()})
+    except AssertionError as exc:
+        assert "was not exercised" in str(exc), exc
+    else:
+        raise AssertionError("a round of rewords that planted nothing came out clean")
+
+    planted = frozenset({"a/b.py::test_rule[anchor]"})
+    assert _first_planting({_SYNTHETIC_RECIPE: frozenset(), _SYNTHETIC_OTHER: planted}) == (
+        _SYNTHETIC_OTHER, planted
+    )
+    assert _first_planting({_SYNTHETIC_RECIPE: planted}) == (_SYNTHETIC_RECIPE, planted)
 
 
 # --- A5 negative: a removal done wrong is caught ---------------------------
@@ -1233,21 +1333,51 @@ def test_a_reworded_recipe_is_not_blamed_on_the_addition(
     is what an addition case reading only the exit status could not survive:
     it would fail here, and once per unrouted kind, for an edit that was not
     its subject.
-    """
-    root = tmp_path / "repo"
-    _copy_repository(root)
-    sentence = _reword_a_recipe_in(root)
-    recipe = sorted(routed_recipes())[0]
 
-    run_before = _run_adversary_tests(root)
+    The recipe reworded is selected, not assumed. This case's premise is that
+    a fresh edit can still plant a failure, and that is false of a recipe
+    whose own test module the working tree is already failing -- the state a
+    branch is in between editing a recipe and updating its test file. So the
+    reword goes to a recipe whose module is green, trying them in routing-table
+    order until one plants something; a tree where every recipe's module is
+    already red is stated as the reason this case is not measuring, rather
+    than passing silently or failing for an edit that was not its subject.
+    """
+    candidates = _reword_candidates(inherited_failures)
+    if not candidates:
+        pytest.skip(
+            "no routed recipe has a test module of its own that is green in "
+            "this tree, so no reword here can plant a failure to measure; "
+            "already failing: "
+            + ", ".join(sorted(_failing_modules(inherited_failures)))
+        )
+
+    # One copy per candidate, and no more: the loop stops at the first reword
+    # that planted something, so the ordinary tree costs exactly one.
+    attempts: dict[str, frozenset[str]] = {}
+    runs: dict[str, subprocess.CompletedProcess[str]] = {}
+    sentences: dict[str, str] = {}
+    for candidate in candidates:
+        root = tmp_path / f"repo-{recipe_kind(candidate)}"
+        _copy_repository(root)
+        sentences[candidate] = _reword_a_recipe_in(root, candidate)
+        runs[candidate] = _run_adversary_tests(root)
+        # What the reword did, and not what the working tree was already
+        # failing: this case is itself one of the cases that must survive a
+        # contaminated copy, so it subtracts the same inherited set the others
+        # do.
+        attempts[candidate] = caused_by_the_edit(runs[candidate], inherited_failures)
+        if attempts[candidate]:
+            break
+
+    # The addition is performed in the copy the planting reword was made in,
+    # named rather than inherited from the loop variable.
+    recipe, planted = _first_planting(attempts)
+    root = tmp_path / f"repo-{recipe_kind(recipe)}"
+    run_before = runs[recipe]
     before = failures(run_before)
-    # What the reword did, and not what the working tree was already failing:
-    # this case is itself one of the cases that must survive a contaminated
-    # copy, so it subtracts the same inherited set the others do.
-    planted = caused_by_the_edit(run_before, inherited_failures)
-    assert planted, f"rewording {sentence!r} reddened nothing"
     own_test = recipe_test_module(recipe)
-    assert {f.split("::")[0].rsplit("/", 1)[-1] for f in planted} == {own_test}, sorted(planted)
+    assert _failing_modules(planted) == {own_test}, (sentences[recipe], sorted(planted))
 
     kind = unrouted_types()[0]
     added_file = _recipe_file(kind)
