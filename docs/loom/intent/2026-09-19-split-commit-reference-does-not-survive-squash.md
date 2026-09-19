@@ -3,7 +3,7 @@ originator: maintenance-loop
 kind: engineering
 needs-design: no — internal test fixture reference, not an interface surface under the manifest globs
 status: confirmed 2026-09-19
-publication: automatic — authorized 2026-09-19 by kouko
+publication: automatic — authorized 2026-09-20 by kouko
 ---
 
 ## Problem
