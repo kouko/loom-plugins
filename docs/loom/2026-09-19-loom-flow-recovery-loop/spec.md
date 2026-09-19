@@ -65,10 +65,17 @@ REQ-5 — A failed recovery stops and says what happened
   it raises — what proves a human rather than the agent or a document asked —
   is unanswered, and leaving it here would block this change. user-decided:
   the user chose to do this change first and that one after.
-- `artifacts.blind-run-report.charter.signoff: ship` is not in conflict with
-  `actions.blind-run.owner: closing-review`. `signoff` names who closes the
-  item out with the user at decision point ③; `owner` names who produces it.
-  The recovery lookup uses `owner`, never `signoff`. agent-decided.
+- The recovery lookup uses `actions[].owner`, never `charter.signoff`.
+  `signoff` names the station where the artifact is signed off, not who
+  produces it: intent carries `signoff: capture-intent` matching decision
+  point ①, and blind-run-report carries `signoff: ship` matching its
+  `readers: ["user at decision point 3"]`. agent-decided.
+- The declared mapping is uneven, and REQ-3 names both declarations because
+  of it. Only the attestation is fully declared. The blind-run report has an
+  `artifacts:` path but no producer field and no `stations[].produces` entry.
+  The adversarial programs have no `artifacts:` entry at all. `actions[].owner`
+  resolves all three, which is why it is named alongside `stations[].produces`
+  rather than as a fallback. agent-decided.
 
 ## Alternatives considered
 - Special-case the three verification items in the recovery prose. Rejected:

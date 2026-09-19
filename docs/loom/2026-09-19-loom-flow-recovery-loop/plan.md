@@ -1,6 +1,6 @@
 # Loom flow recovery loop — plan
 intent: 2026-09-19-loom-flow-recovery-loop@e4a57bc8
-spec: docs/loom/2026-09-19-loom-flow-recovery-loop/spec.md@ce91283
+spec: docs/loom/2026-09-19-loom-flow-recovery-loop/spec.md@78b2314
 charter: 1.0
 
 ## Task DAG
@@ -32,3 +32,5 @@ charter: 1.0
 2. Build and closing-review prose are mirrored on the same rule, so W0-01 and W0-02 stay sequential; disjoint files do not make them independent.
 3. Absence as an antecedent sits next to four existing return edges conditioned on failure. Wording that blurs the two could make a passing check look like a missing item.
 4. Bounding a station to two entries is a rule an agent counts, not a runtime guard. A run that ignores it fails the blind run rather than being stopped mechanically.
+5. The declared mapping is uneven: only the attestation carries a producer field. `actions[].owner` resolves the rest, but a future artifact added without an `actions:` entry would not resolve.
+6. Follow-up, not this change: `loom-code/skills/using-loom-code/SKILL.md` routes forward states only and has no row for a run that is stuck.
