@@ -20,8 +20,12 @@ import adv_harness as h
 REWORDINGS = [
     (
         h.CR_SKILL,
-        "The run enters no station more than twice.",
-        "The run enters no station more than two times.",
+        "The run enters no station more than twice, a count that\n"
+        "tracks only entries made to resolve an absent item under this rule and is\n"
+        "never incremented by §4's ordinary round-and-digest progression.",
+        "The run enters no station more than two times, a count that\n"
+        "tracks only entries made to resolve an absent item under this rule and is\n"
+        "never incremented by §4's ordinary round-and-digest progression.",
         "twice -> two times",
     ),
     (

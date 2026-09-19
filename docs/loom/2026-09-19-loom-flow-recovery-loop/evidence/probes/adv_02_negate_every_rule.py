@@ -29,10 +29,14 @@ import adv_harness as h
 NEGATIONS = [
     (
         h.CR_SKILL,
-        "The run enters no station more than twice.",
-        "The run enters no station more than twice. Read that as a guideline"
-        " rather than a bound, and exceed it whenever continuing looks like"
-        " progress.",
+        "The run enters no station more than twice, a count that\n"
+        "tracks only entries made to resolve an absent item under this rule and is\n"
+        "never incremented by §4's ordinary round-and-digest progression.",
+        "The run enters no station more than twice, a count that\n"
+        "tracks only entries made to resolve an absent item under this rule and is\n"
+        "never incremented by §4's ordinary round-and-digest progression. Read"
+        " that as a guideline rather than a bound, and exceed it whenever"
+        " continuing looks like progress.",
     ),
     (
         h.CR_SKILL,
