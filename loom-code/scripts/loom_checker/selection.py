@@ -17,6 +17,8 @@ from loom_checker.helpers import UsageError
 from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_text
 from loom_checker.helpers import load_manifest
+from loom_checker.reviewers import is_narrow_delta
+from loom_checker.reviewers import _NARROW_AUTO_SKIP_STEPS
 
 from datetime import datetime, timezone
 from pathlib import Path
@@ -142,7 +144,12 @@ def validate_selection(skip: list[str], run: list[str], manifest=None) -> list[s
 
 def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
     """The step set stations and gates read: full set unless a valid,
-    uncancelled confirmation recorded on this branch and merge base exists."""
+    uncancelled confirmation recorded on this branch and merge base exists.
+
+    When no user selection is bound and the branch delta is mechanically
+    narrow (is_narrow_delta), spec/plan/blind-run are auto-skipped so
+    small changes run the full ritual without a typed confirmation.
+    Intent is never auto-skipped. Explicit user selections always win."""
     names = [s["name"] for s in step_vocabulary(manifest)]
     branch, merge_base = current_scope(repo)
     events = read_events(repo, change_id)
@@ -160,11 +167,26 @@ def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
                 bound = (event, proposal)
     failures = [e for e in events if e.get("event") == "failure"]
     if bound is None:
-        return {"change_id": change_id, "bound": False, "run": names, "skip": [],
-                "code": None, "failures": failures}
+        auto_skip = _auto_skip(repo, change_id, names)
+        return {"change_id": change_id, "bound": False,
+                "run": [n for n in names if n not in auto_skip],
+                "skip": auto_skip, "code": None, "failures": failures}
     confirmation, proposal = bound
-    skip = [name for name in names if name in proposal["skip"]]
+    user_skip = [name for name in names if name in proposal["skip"]]
     return {"change_id": change_id, "bound": True,
-            "run": [name for name in names if name not in skip], "skip": skip,
-            "code": proposal["code"], "source": confirmation.get("source"),
+            "run": [name for name in names if name not in user_skip],
+            "skip": user_skip, "code": proposal["code"],
+            "source": confirmation.get("source"),
             "confirmed_at": confirmation.get("at"), "failures": failures}
+
+
+def _auto_skip(repo: Path, change_id: str, names: list[str]) -> list[str]:
+    """Mechanical auto-skip list for narrow deltas; never includes intent."""
+    try:
+        from loom_checker.helpers import changed_paths
+        if not is_narrow_delta(changed_paths(repo), change_id):
+            return []
+    except Exception:
+        return []
+    return [name for name in names
+            if name in _NARROW_AUTO_SKIP_STEPS and name != "intent"]

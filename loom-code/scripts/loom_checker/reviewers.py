@@ -21,11 +21,20 @@ _REVIEW_PROTECTED_NAMES = frozenset(
 )
 
 
+# Steps that a narrow delta auto-skips. Intent always stays (cannot be skipped).
+_NARROW_AUTO_SKIP_STEPS = frozenset(
+    {"spec", "plan", "blind-run"}
+)
+
+
 def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
     """Return one only for a complete, narrow, mechanically low-risk delta.
 
     This is a positive allowlist. Anything not recognized here, including a
     mixed delta with one protected path, keeps the default floor of two.
+    The `is_narrow_delta` docstring previously mentioned ``adversarial``,
+    but adversarial is not auto-skipped for narrow deltas — only ``spec``,
+    ``plan``, and ``blind-run`` are.
     """
     if not paths:
         return 2
@@ -53,6 +62,26 @@ def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
             continue
         return 2
     return 1
+
+
+def is_narrow_delta(paths: set[str], change_id: str) -> bool:
+    """Return True when the diff is narrow enough to auto-skip spec/plan/blind-run.
+
+    A narrow delta contains only the intent, plan, evidence, low-risk docs
+    (`.md`/`.rst`/`.txt` outside `docs/loom/`), and test files — no production
+    code, no protected surface, no interface-surface glob.
+
+    The check reuses the same allowlist as `reviewer_floor_for_paths` so the
+    two predicates never disagree: a delta that gets floor 1 is narrow, and a
+    narrow delta gets floor 1.
+
+    ``adversarial`` is NOT auto-skipped here — it is a mechanical check that
+    must run before closing review regardless of delta width.
+    """
+    # A narrow delta is exactly one whose reviewer floor is 1. The floor
+    # computation is the authoritative allowlist; we delegate to it rather
+    # than maintaining a second allowlist that could drift.
+    return reviewer_floor_for_paths(paths, change_id) == 1
 
 
 def required_reviewer_count(
