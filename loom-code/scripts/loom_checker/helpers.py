@@ -199,11 +199,12 @@ HOST_PLUMBING_DIR_PREFIX = ".codex/hooks/contract/"
 # must not drive ritual-scale computation. Distinct from the Codex scaffold
 # plumbing above: these are the host tooling, dependency tree, bytecode,
 # vendored lockfiles and the selection store, not surfaces a user reads.
-HOST_PLUMBING_DIR_PREFIXES = (
-    ".codex/hooks/contract/",
-    ".herdr/",
-    "node_modules/",
-    "__pycache__/",
+HOST_PLUMBING_DIR_NAMES = frozenset(
+    {
+        ".herdr",
+        "node_modules",
+        "__pycache__",
+    }
 )
 HOST_PLUMBING_NAME_SUFFIXES = (".lock", ".jsonl")
 
@@ -212,8 +213,8 @@ def _is_host_plumbing(path: str) -> bool:
     if path in HOST_PLUMBING_FILES or path.startswith(HOST_PLUMBING_DIR_PREFIX):
         return True
     pure = Path(path)
-    return pure.name.endswith(HOST_PLUMBING_NAME_SUFFIXES) or any(
-        part in HOST_PLUMBING_DIR_PREFIXES for part in pure.parts
+    return pure.name.endswith(HOST_PLUMBING_NAME_SUFFIXES) or bool(
+        HOST_PLUMBING_DIR_NAMES.intersection(pure.parts)
     )
 
 
