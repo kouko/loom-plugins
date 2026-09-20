@@ -69,12 +69,33 @@ def command_executes_artifact(command: str, artifact: str) -> bool:
     wanted = os.path.normpath(artifact)
     suffix = Path(artifact).suffix.lower()
     if suffix == ".py":
+        # Handle direct python command or python -m pytest
         python = Path(tokens[0]).name.startswith("python")
         direct = len(tokens) >= 2 and os.path.normpath(tokens[1]) == wanted
         pytest_direct = (
             len(tokens) >= 4 and tokens[1:3] == ["-m", "pytest"]
             and os.path.normpath(tokens[3]) == wanted
         )
+        # Handle uv run ... python ... or uv run ... python -m pytest ...
+        uv_run_python = (
+            len(tokens) >= 3
+            and tokens[0] == "uv"
+            and tokens[1] == "run"
+        )
+        if uv_run_python:
+            # Find the python token after uv run options
+            for i in range(2, len(tokens)):
+                if Path(tokens[i]).name.startswith("python"):
+                    python_tokens = tokens[i:]
+                    python = True
+                    direct = len(python_tokens) >= 2 and os.path.normpath(python_tokens[1]) == wanted
+                    pytest_direct = (
+                        len(python_tokens) >= 4 and python_tokens[1:3] == ["-m", "pytest"]
+                        and os.path.normpath(python_tokens[3]) == wanted
+                    )
+                    if python and (direct or pytest_direct):
+                        return True
+                    break
         return python and (direct or pytest_direct)
     if suffix == ".sh":
         return len(tokens) >= 2 and Path(tokens[0]).name in {"bash", "sh"} and os.path.normpath(tokens[1]) == wanted

@@ -55,9 +55,9 @@ def make_repo(tmp_path: Path) -> Path:
     git(repo, "init", "-q", "-b", "main")
     git(repo, "config", "user.email", "t@example.com")
     git(repo, "config", "user.name", "T")
-    commit(repo, "base.txt")
+    commit(repo, "base.py")
     git(repo, "checkout", "-q", "-b", "feature")
-    commit(repo, "work.txt")
+    commit(repo, "work.py")
     return repo
 
 
@@ -189,7 +189,12 @@ def test_reused_change_id_on_new_branch_inherits_nothing(tmp_path: Path) -> None
     commit(repo, "two.txt")
     state = show(repo)
     assert state["bound"] is False
-    assert state["run"] == FULL and state["skip"] == []
+    # Auto-skip activates for narrow deltas: .txt file outside docs/loom/ makes floor=1
+    # so spec/plan/blind-run are auto-skipped
+    assert state["skip"] == ["spec", "plan", "blind-run"]
+    assert "spec" not in state["run"]
+    assert "plan" not in state["run"]
+    assert "blind-run" not in state["run"]
 
 
 def test_store_lives_under_git_common_dir(tmp_path: Path) -> None:
