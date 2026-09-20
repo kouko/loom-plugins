@@ -84,10 +84,17 @@ def is_narrow_delta(paths: set[str], change_id: str) -> bool:
     return reviewer_floor_for_paths(paths, change_id) == 1
 
 
-def required_reviewer_count(
+def committed_branch_paths(
     repo: Path, change_id: str, head_sha: str | None = None
-) -> int:
-    """Compute the reviewer floor from the selected branch delta, failing closed."""
+) -> set[str]:
+    """Committed branch-delta paths, excluding host plumbing.
+
+    This is the single path source for every rule that reasons about the
+    branch's committed content: the reviewer floor, the auto-skip list, and
+    anything else that must agree on the same delta. Working-tree and staged
+    edits are deliberately excluded — they are not yet part of the change
+    that reviewers and finalize-review will see.
+    """
     try:
         selected = head_sha or git_text(repo, "rev-parse", "HEAD")
         base = branch_base(repo)
@@ -99,5 +106,12 @@ def required_reviewer_count(
             if line.strip() and not _is_host_plumbing(line.strip())
         }
     except (OSError, UsageError):
-        return 2
-    return reviewer_floor_for_paths(paths, change_id)
+        return set()
+    return paths
+
+
+def required_reviewer_count(
+    repo: Path, change_id: str, head_sha: str | None = None
+) -> int:
+    """Compute the reviewer floor from the selected branch delta, failing closed."""
+    return reviewer_floor_for_paths(committed_branch_paths(repo, change_id, head_sha), change_id)

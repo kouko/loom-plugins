@@ -13,14 +13,15 @@ informational, so neither a rebase nor a branch rename can drop them.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_text
 from loom_checker.helpers import load_manifest
+from loom_checker.reviewers import committed_branch_paths
 from loom_checker.reviewers import is_narrow_delta
 from loom_checker.reviewers import _NARROW_AUTO_SKIP_STEPS
-
-from datetime import datetime, timezone
 from pathlib import Path
 import base64
 import hashlib
@@ -183,8 +184,8 @@ def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
 def _auto_skip(repo: Path, change_id: str, names: list[str]) -> list[str]:
     """Mechanical auto-skip list for narrow deltas; never includes intent."""
     try:
-        from loom_checker.helpers import changed_paths
-        if not is_narrow_delta(changed_paths(repo), change_id):
+        paths = committed_branch_paths(repo, change_id)
+        if not is_narrow_delta(paths, change_id):
             return []
     except Exception:
         return []
