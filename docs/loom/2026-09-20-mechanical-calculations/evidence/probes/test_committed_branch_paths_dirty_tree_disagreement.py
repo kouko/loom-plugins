@@ -4,13 +4,27 @@ The function must return only committed paths between the branch and its base.
 Working-tree edits (staged, unstaged, and untracked) must not appear in the
 result, or the auto-skip and reviewer floor will disagree with what reviewers
 and finalize-review actually see.
+
+Run from the repo root inside the package-tests uv environment:
+
+    uv run --isolated --with-requirements requirements-package-tests.lock \
+        python -m pytest \
+        docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_committed_branch_paths_dirty_tree_disagreement.py -q
+
+Every probe is an attempt to make the change fail. Attempts the change
+survives PASS; attempts that expose a defect FAIL on purpose and must not be
+weakened.
 """
 from __future__ import annotations
 
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
+
+SCRIPTS = Path(__file__).resolve().parents[5] / "loom-code" / "scripts"
+sys.path.insert(0, str(SCRIPTS))
 
 from loom_checker.reviewers import committed_branch_paths
 

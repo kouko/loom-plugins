@@ -5,14 +5,28 @@ Tests that _auto_skip correctly:
 2. Never includes intent in auto-skip list
 3. Respects explicit user selections (they always win)
 4. Returns empty list for broad/unknown deltas
+
+Run from the repo root inside the package-tests uv environment:
+
+    uv run --isolated --with-requirements requirements-package-tests.lock \
+        python -m pytest \
+        docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_auto_skip_boundaries.py -q
+
+Every probe is an attempt to make the change fail. Attempts the change
+survives PASS; attempts that expose a defect FAIL on purpose and must not be
+weakened.
 """
 from __future__ import annotations
 
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 import pytest
+
+SCRIPTS = Path(__file__).resolve().parents[5] / "loom-code" / "scripts"
+sys.path.insert(0, str(SCRIPTS))
 
 from loom_checker.selection import _auto_skip
 from loom_checker.reviewers import _NARROW_AUTO_SKIP_STEPS
@@ -44,7 +58,7 @@ def make_repo_with_files(tmp_path: Path, files: list[str]) -> Path:
     return repo
 
 
-def test_auto_skip_returns_spec_plan_blind_run_for_narrow_delta() -> None:
+def test_autoskip_narrow_skipspecplanblindrun() -> None:
     """For a narrow delta (intent, plan, evidence, low-risk doc, test),
     _auto_skip should return ['spec', 'plan', 'blind-run'] (never intent)."""
     with tempfile.TemporaryDirectory() as tmp:
@@ -68,7 +82,7 @@ def test_auto_skip_returns_spec_plan_blind_run_for_narrow_delta() -> None:
         assert "intent" not in skip, "Intent must never be auto-skipped"
 
 
-def test_auto_skip_returns_empty_for_broad_delta() -> None:
+def test_autoskip_broad_skipempty() -> None:
     """For a broad delta (includes source code), _auto_skip should return empty list."""
     with tempfile.TemporaryDirectory() as tmp:
         repo = make_repo_with_files(
@@ -86,7 +100,7 @@ def test_auto_skip_returns_empty_for_broad_delta() -> None:
         assert skip == [], f"Expected empty list for broad delta, got {skip}"
 
 
-def test_auto_skip_respects_protected_paths() -> None:
+def test_autoskip_protected_skipempty() -> None:
     """If delta includes a protected path (e.g., manifest.yaml), auto-skip should be empty."""
     with tempfile.TemporaryDirectory() as tmp:
         repo = make_repo_with_files(
@@ -104,7 +118,7 @@ def test_auto_skip_respects_protected_paths() -> None:
         assert skip == [], f"Expected empty list for protected path delta, got {skip}"
 
 
-def test_auto_skip_never_includes_intent() -> None:
+def test_autoskip_narrow_intentnever() -> None:
     """Even in a narrow delta, intent must never appear in the auto-skip list."""
     with tempfile.TemporaryDirectory() as tmp:
         repo = make_repo_with_files(

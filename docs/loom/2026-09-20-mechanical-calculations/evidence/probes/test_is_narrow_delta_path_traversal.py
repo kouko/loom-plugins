@@ -4,15 +4,31 @@ The function must reject paths that escape via '..' components or absolute paths
 as such paths indicate either hostile input or confusion about the repository
 boundary, and must keep the reviewer floor at 2 (default) to prevent unsafe
 auto-skip of spec/plan/blind-run.
+
+Run from the repo root inside the package-tests uv environment:
+
+    uv run --isolated --with-requirements requirements-package-tests.lock \
+        python -m pytest \
+        docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_is_narrow_delta_path_traversal.py -q
+
+Every probe is an attempt to make the change fail. Attempts the change
+survives PASS; attempts that expose a defect FAIL on purpose and must not be
+weakened.
 """
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
 import pytest
+
+SCRIPTS = Path(__file__).resolve().parents[5] / "loom-code" / "scripts"
+sys.path.insert(0, str(SCRIPTS))
 
 from loom_checker.reviewers import is_narrow_delta
 
 
-def test_is_narrow_delta_rejects_double_dot_escape() -> None:
+def test_isnarrowdelta_doubledot_reject() -> None:
     """A path containing '..' must NOT be considered narrow, even if it
     appears to point inside docs/loom/ after normalization.
 
@@ -30,7 +46,7 @@ def test_is_narrow_delta_rejects_double_dot_escape() -> None:
     )
 
 
-def test_is_narrow_delta_rejects_absolute_path() -> None:
+def test_isnarrowdelta_absolute_reject() -> None:
     """An absolute path must NOT be considered narrow."""
     paths = {
         "docs/loom/intent/2026-09-20-mechanical-calculations.md",
@@ -42,7 +58,7 @@ def test_is_narrow_delta_rejects_absolute_path() -> None:
     )
 
 
-def test_is_narrow_delta_allows_legitimate_low_risk_doc_outside_docs_loom() -> None:
+def test_isnarrowdelta_legitdoc_allow() -> None:
     """A low-risk doc file OUTSIDE docs/loom/ (e.g., project README) should be allowed."""
     paths = {
         "docs/loom/intent/2026-09-20-mechanical-calculations.md",
@@ -54,7 +70,7 @@ def test_is_narrow_delta_allows_legitimate_low_risk_doc_outside_docs_loom() -> N
     )
 
 
-def test_is_narrow_delta_rejects_paths_with_dot_in_parts() -> None:
+def test_isnarrowdelta_dotparts_reject() -> None:
     """A path with '.' in its parts must NOT be considered narrow."""
     paths = {
         "docs/loom/intent/2026-09-20-mechanical-calculations.md",
