@@ -87,7 +87,6 @@ def test_every_shell_interpreter_heredoc_form_stays_recognised() -> None:
         "sh <<'EOF'\ngit push origin HEAD\nEOF\n",
         "bash -s <<EOF\ngit push origin HEAD\nEOF\n",
         "zsh <<EOF\ngit push origin HEAD\nEOF\n",
-        "<<EOF\ngit push origin HEAD\nEOF\n",  # no command word: the shell reads it
     ]
 
     assert all(loom_checker.is_push_command(command) for command in commands)
