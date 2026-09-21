@@ -160,6 +160,7 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
         "docs/guide.md",
     }
     assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 1
+    assert reviewers.is_narrow_delta(change_paths, CHANGE) is True
 
     for protected in (
         "src.py",
@@ -178,6 +179,18 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
         assert reviewers.reviewer_floor_for_paths(
             change_paths | {protected}, CHANGE
         ) == 2
+        assert reviewers.is_narrow_delta(change_paths | {protected}, CHANGE) is False
+
+
+def test_is_narrow_delta_returns_false_for_mixed_delta() -> None:
+    """A delta with code changes is not narrow."""
+    change_paths = {
+        f"docs/loom/intent/{CHANGE}.md",
+        f"docs/loom/{CHANGE}/plan.md",
+        "loom-code/scripts/some_code.py",
+    }
+    assert reviewers.is_narrow_delta(change_paths, CHANGE) is False
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 2
 
 
 def test_matching_low_risk_attestation_accepts_one_reviewer(tmp_path: Path) -> None:

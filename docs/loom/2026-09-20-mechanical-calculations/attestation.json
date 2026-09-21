@@ -1,0 +1,77 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-20-mechanical-calculations",
+  "content_digest": "64894754eb00924b43fe33f10be7db68f47a56d3",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_auto_skip_boundaries.py -q",
+      "artifact": "docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_auto_skip_boundaries.py",
+      "result": "pass",
+      "command_digest": "5505f455ad30992e28bf8e02ca27e470b8fa7c96438aec034526dfbc76feae73"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_committed_branch_paths_dirty_tree_disagreement.py -q",
+      "artifact": "docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_committed_branch_paths_dirty_tree_disagreement.py",
+      "result": "pass",
+      "command_digest": "49f7fcd4b6f3af5dce929346c8ac5a93b0c01be866835ef381d68407d9c7f3e2"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_is_narrow_delta_path_traversal.py -q",
+      "artifact": "docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_is_narrow_delta_path_traversal.py",
+      "result": "pass",
+      "command_digest": "7ba0c3420ae6f0e01273e3f972ca9c861973155b00c49ec07070a2a0bd58a0e0"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_effective_selection_user_precedence.py -q",
+      "artifact": "docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_effective_selection_user_precedence.py",
+      "result": "pass",
+      "command_digest": "06e04af04c9fcb50089826e2526bd5b961262ed29a828873ec98494e429627f4"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_trunk_sync_interaction.py -q",
+      "artifact": "docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_trunk_sync_interaction.py",
+      "result": "pass",
+      "command_digest": "5bf9f5077fd53e74c05d2b68a0fc5da1b4f257951151460e75a12f749b447e96"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a8bfc6e02e97108af",
+      "vendor": "anthropic",
+      "model": "openrouter",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "a1d3957768b513816",
+      "vendor": "anthropic",
+      "model": "openrouter",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/scripts/loom_checker/selection.py:184",
+          "text": "nitpick: Broad exception handler in _auto_skip catches all Exceptions; consider narrowing to specific expected exceptions (e.g., OSError, UsageError) to avoid hiding potential bugs.",
+          "fix": "Replace `except Exception:` with `except (OSError, UsageError):` to match the exception types that committed_branch_paths and is_narrow_delta might raise."
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

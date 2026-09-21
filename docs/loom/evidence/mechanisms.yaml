@@ -345,3 +345,9 @@ mechanisms:
   - id: "loom-visualization.mermaid-only-when-confirmed"
     class: prose-gate
     eval: loom-workflow/skills/loom-visualization/scripts/test_templates.py::test_mermaid_gate_paragraph_present_requires_confirmed_host
+  - id: "build.absence-recovery"
+    class: prose-gate
+    eval: loom-code/skills/build/probes/test_recovery_rules.py
+  - id: "review.absence-recovery"
+    class: prose-gate
+    eval: loom-code/skills/closing-review/probes/test_recovery_rules.py

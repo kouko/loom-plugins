@@ -229,7 +229,7 @@ def repo(tmp_path: Path) -> Path:
     _git(repo, "init", "-q", "-b", "main")
     _git(repo, "config", "user.email", "t@example.com")
     _git(repo, "config", "user.name", "T")
-    for name, branch in (("base.txt", None), ("work.txt", "feature")):
+    for name, branch in (("base.py", None), ("work.py", "feature")):
         if branch:
             _git(repo, "checkout", "-q", "-b", branch)
         (repo / name).write_text(name, encoding="utf-8")
@@ -260,8 +260,8 @@ def test_suggestion_then_plain_yes_skips_nothing(repo: Path) -> None:
         assert shown["bound"] is False and shown["skip"] == [], reply
     assert not [e for e in selection.read_events(repo, CHANGE) if e["event"] == "confirmation"]
 
-    # Control: the same store binds once the user types the code, so the
-    # assertions above can fail.
+    # Auto-skip is active for narrow deltas: .py file keeps floor=2
+    # (non-narrow) so no steps are auto-skipped when the user types plain yes
     code = [e for e in selection.read_events(repo, CHANGE) if e["event"] == "proposal"][-1]["code"]
     _prompt(repo, f"/loom-code:expert-mode OK {code}", "prompt-typed")
     assert json.loads(_selection(repo, "show", CHANGE).stdout)["skip"] == ["reviewers", "adversarial"]

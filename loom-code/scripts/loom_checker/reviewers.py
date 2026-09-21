@@ -21,11 +21,20 @@ _REVIEW_PROTECTED_NAMES = frozenset(
 )
 
 
+# Steps that a narrow delta auto-skips. Intent always stays (cannot be skipped).
+_NARROW_AUTO_SKIP_STEPS = frozenset(
+    {"spec", "plan", "blind-run"}
+)
+
+
 def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
     """Return one only for a complete, narrow, mechanically low-risk delta.
 
     This is a positive allowlist. Anything not recognized here, including a
     mixed delta with one protected path, keeps the default floor of two.
+    The `is_narrow_delta` docstring previously mentioned ``adversarial``,
+    but adversarial is not auto-skipped for narrow deltas — only ``spec``,
+    ``plan``, and ``blind-run`` are.
     """
     if not paths:
         return 2
@@ -55,10 +64,37 @@ def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
     return 1
 
 
-def required_reviewer_count(
+def is_narrow_delta(paths: set[str], change_id: str) -> bool:
+    """Return True when the diff is narrow enough to auto-skip spec/plan/blind-run.
+
+    A narrow delta contains only the intent, plan, evidence, low-risk docs
+    (`.md`/`.rst`/`.txt` outside `docs/loom/`), and test files — no production
+    code, no protected surface, no interface-surface glob.
+
+    The check reuses the same allowlist as `reviewer_floor_for_paths` so the
+    two predicates never disagree: a delta that gets floor 1 is narrow, and a
+    narrow delta gets floor 1.
+
+    ``adversarial`` is NOT auto-skipped here — it is a mechanical check that
+    must run before closing review regardless of delta width.
+    """
+    # A narrow delta is exactly one whose reviewer floor is 1. The floor
+    # computation is the authoritative allowlist; we delegate to it rather
+    # than maintaining a second allowlist that could drift.
+    return reviewer_floor_for_paths(paths, change_id) == 1
+
+
+def committed_branch_paths(
     repo: Path, change_id: str, head_sha: str | None = None
-) -> int:
-    """Compute the reviewer floor from the selected branch delta, failing closed."""
+) -> set[str]:
+    """Committed branch-delta paths, excluding host plumbing.
+
+    This is the single path source for every rule that reasons about the
+    branch's committed content: the reviewer floor, the auto-skip list, and
+    anything else that must agree on the same delta. Working-tree and staged
+    edits are deliberately excluded — they are not yet part of the change
+    that reviewers and finalize-review will see.
+    """
     try:
         selected = head_sha or git_text(repo, "rev-parse", "HEAD")
         base = branch_base(repo)
@@ -70,5 +106,12 @@ def required_reviewer_count(
             if line.strip() and not _is_host_plumbing(line.strip())
         }
     except (OSError, UsageError):
-        return 2
-    return reviewer_floor_for_paths(paths, change_id)
+        return set()
+    return paths
+
+
+def required_reviewer_count(
+    repo: Path, change_id: str, head_sha: str | None = None
+) -> int:
+    """Compute the reviewer floor from the selected branch delta, failing closed."""
+    return reviewer_floor_for_paths(committed_branch_paths(repo, change_id, head_sha), change_id)

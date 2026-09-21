@@ -1,0 +1,87 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-18-modular-adversary-recipes",
+  "content_digest": "6b8d1f2911a775d66768ab15f40856ad32b47bad",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-18-modular-adversary-recipes/evidence/probes/test_modular_recipes_abuse.py -q",
+      "artifact": "docs/loom/2026-09-18-modular-adversary-recipes/evidence/probes/test_modular_recipes_abuse.py",
+      "result": "pass",
+      "command_digest": "5927f1f06be3ed3da6e7236b647fc0c76703d5c35a7936352d97b632dde71d34"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-09-15-adversary-probe-maintenance/evidence/probes/test_probe_maintenance_abuse.py -q",
+      "artifact": "docs/loom/2026-09-15-adversary-probe-maintenance/evidence/probes/test_probe_maintenance_abuse.py",
+      "result": "pass",
+      "command_digest": "1d964fa90dabe562929ddecf8dc6f4ca7d2610d8d9949b8c516dd0e394584839"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "closing-review-code-lens",
+      "vendor": "claude",
+      "model": "opus-5",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "anchor": "docs/loom/2026-09-18-modular-adversary-recipes/evidence/suite-run.md",
+          "text": "The second-run figure 260 passed, 1 skipped is attributed to the ten modules the third run's invocation names; that list collects about 230 tests at 44ee3284, so it cannot have produced it.",
+          "fix": "Name the population that produced 260, or re-run the named ten at that commit and record what they yield."
+        }
+      ]
+    },
+    {
+      "reviewer": "closing-review-skill-lens",
+      "vendor": "claude",
+      "model": "opus-5",
+      "lens": "skill",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "anchor": "docs/loom/2026-09-18-modular-adversary-recipes/evidence/suite-run.md",
+          "text": "Same attribution, reconstructed independently: 260 is reached only by counting test_review_convergence_contract.py, which the named ten exclude.",
+          "fix": "State the second run's own population, or recompute it for the named ten."
+        },
+        {
+          "severity": "nit",
+          "anchor": "docs/loom/2026-09-18-modular-adversary-recipes/evidence/suite-run.md",
+          "text": "The sentence replacing 317 is true of the old text but leaves a reader unable to reconcile it: 317 was a real measurement over a different ten, and the note does not say so.",
+          "fix": "Add a clause naming the module that differed between the two sets."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "important",
+      "anchor": "docs/loom/2026-09-18-modular-adversary-recipes/evidence/suite-run.md",
+      "text": "Unresolved at episode end: the second-run comparison figure is attributed to a module population that cannot produce it. Both reviewers raised it in round three; correcting it would have required a fourth functional-content digest, which the episode does not admit.",
+      "fix": "Carry it into a follow-up change: either name the population that produced 260 passed, 1 skipped, or re-run the named ten modules at 44ee3284 and record the result."
+    },
+    {
+      "severity": "nit",
+      "anchor": "loom-code/skills/closing-review/references/adversarial.md",
+      "text": "Unresolved at episode end: the removal sentence says to delete the test module named after the kind, while skill and gate share one recipe and one test module, so retiring only gate and following the sentence literally deletes files skill still routes to.",
+      "fix": "Say that a recipe shared by several kinds is retired only when its last kind is."
+    },
+    {
+      "severity": "nit",
+      "anchor": "docs/loom/2026-09-18-modular-adversary-recipes/evidence/suite-run.md",
+      "text": "Disclosed at publication: this attestation's digest names the tree after the pre-merge trunk sync at 1499dea6, one commit newer than the content the two reviewers read. That commit is a1891ed1, a loom-code version bump merged through the same stations with its own attestation. kouko chose on 2026-09-19 to carry the verdicts forward rather than open a fourth review round; Build's mechanical checks were repeated on the merged tree first.",
+      "fix": "None sought. Recorded so the difference between the reviewed tree and the attested tree is visible to anyone reading the attestation."
+    }
+  ],
+  "selection": null
+}

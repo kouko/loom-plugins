@@ -41,6 +41,19 @@ skills/init/references/v1/spec.md     ← references/ 下開 v1/
 - Reference files 從 SKILL.md 直接引用，路徑都是 `<subfolder>/<file>` 一層 deep
 - **違規會被 `.claude/hooks/validate-skill-folder-structure.sh` 擋下**（PostToolUse on Write|Edit）
 
+### Module Criteria
+
+**MUST：一個 skill 拆成 per-capability 檔案後，用四條判準衡量 —— change、add、remove、locate。**
+
+- **change** — Editing one capability touches that capability's file and its own test, where it has one, and nothing else.
+- **add** — Adding a capability is a new file plus one routing entry, and every existing capability file stays untouched.
+- **remove** — Removing a capability deletes its file, its routing entry and its own test where it has one, and leaves nothing behind that still names it.
+- **locate** — A rule that belongs to one capability lives in that capability's file, while the shared part carries only what every capability shares and a sibling file carries only its own.
+- A capability's own test module is optional: `add` stays one file plus one routing entry, and `change` reads as its own test where it has one. Written without one, a capability gives up the guarantee that a failure names the capability that broke, and its removal is one deletion fewer.
+- 四條各自要有一支可執行的 check 擋著，散文不算：只寫在這裡而沒有 check 重算的判準就是缺陷。
+  `loom-code/scripts/test_module_criteria_text.py` 記著每一條由哪支 check 執行
+- 範例是 `loom-code/skills/closing-review/references/` 底下的 adversary recipe 拆分
+
 ### Contract Citations
 
 **MUST：執行期散文契約不得引用本 repo 的開發紀錄** — a runtime prose
@@ -78,6 +91,17 @@ repository's development records under `docs/`.
   沒標記的散文不得當閘用
 - 其他 plugin（domain-teams、投資／研究 toolkit 等）仍用四級系統 SELF / MUST / SHOULD / MAY；
   gate 定義明確指定檔案路徑（相對路徑），verdict 約束內嵌於 PASS_WITH_NOTES 定義
+
+### Versioning & Release
+
+**MUST：每個合併至 main 的 PR 必須包含 plugin.json 版號 bump**（預設 patch；有 station guidance、field、rule id 或 contract manifest 變更時為 minor）。
+
+- 三份 manifest（`loom-code/plugin.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`）必須同步
+- `CHANGELOG.md` 必須在同一 commit 加入新區段 `## [X.Y.Z] — <date> — <summary>`
+- README 版號字串同步更新
+- 理由：`claude plugin update` 只比對版本字串；未 bump 的變更永遠不會發到已安裝副本
+- 機制化：`test_write_plan_station_text.py::test_current_release_metadata_is_synchronized` 斷言版號一致；bump packet 必須列出 CHANGELOG entry、pin test rewrite 為交付項
+- 參考記憶：`docs/loom/memory/version-bump-packets-must-name-changelog-entry.md`、`docs/loom/memory/version-bump-on-every-pr.md`
 
 ### loom 1.0 flow
 - 七站：capture-intent → write-spec →（write-plan → build → review → ship），maintain 回頭開 intent

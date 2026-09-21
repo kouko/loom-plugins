@@ -29,7 +29,9 @@ which belong to the spec. The change id, `HEAD`, the changed paths and
 their artifact types, and
 `loom-code/skills/closing-review/references/adversarial.md` — read it first,
 because it holds the whole attack procedure: reuse first, updates to your own
-programs, the per-type recipes and the recorded probe shape. On a re-dispatch,
+programs, the routing table and the recorded probe shape. Then read the recipe
+file its routing table names for every artifact type among the changed paths;
+that protocol and those recipes are the whole procedure. On a re-dispatch,
 you also receive the widened changed paths, or the trunk paths a sync brought
 in, and the failing program's output.
 

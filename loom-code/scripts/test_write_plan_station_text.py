@@ -475,10 +475,10 @@ def test_current_release_metadata_is_synchronized() -> None:
     agy_manifest = json.loads(
         (REPO / "loom-code/plugin.json").read_text(encoding="utf-8")
     )
-    assert claude_manifest["version"] == "3.7.1"
-    assert codex_manifest["version"] == "3.7.1"
-    assert agy_manifest["version"] == "3.7.1"
-    assert "## [3.7.1]" in changelog
+    assert claude_manifest["version"] == "3.7.3"
+    assert codex_manifest["version"] == "3.7.3"
+    assert agy_manifest["version"] == "3.7.3"
+    assert "## [3.7.3]" in changelog
 
 
 @pytest.mark.parametrize(

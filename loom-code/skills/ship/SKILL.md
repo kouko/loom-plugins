@@ -62,6 +62,7 @@ do not depend on conversation recall. Use these headings exactly once:
 ## Follow-ups
 <deferred work, or "None">
 ```
+Use a Markdown table for any list‑type or comparison‑type information (options, trade‑offs, decision summaries, etc.). Do not use inline ①②③ lists or plain‑text enumerations.
 
 When the attestation carries a selection, open the Verification section with
 exactly these lines, filled from the attestation's `selection` field: one

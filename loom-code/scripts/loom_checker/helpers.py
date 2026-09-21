@@ -195,9 +195,27 @@ HOST_PLUMBING_FILES = frozenset(
 
 HOST_PLUMBING_DIR_PREFIX = ".codex/hooks/contract/"
 
+# Generic host / runtime artifacts that are never user-authored content and
+# must not drive ritual-scale computation. Distinct from the Codex scaffold
+# plumbing above: these are the host tooling, dependency tree, bytecode,
+# vendored lockfiles and the selection store, not surfaces a user reads.
+HOST_PLUMBING_DIR_NAMES = frozenset(
+    {
+        ".herdr",
+        "node_modules",
+        "__pycache__",
+    }
+)
+HOST_PLUMBING_NAME_SUFFIXES = (".lock", ".jsonl")
+
 
 def _is_host_plumbing(path: str) -> bool:
-    return path in HOST_PLUMBING_FILES or path.startswith(HOST_PLUMBING_DIR_PREFIX)
+    if path in HOST_PLUMBING_FILES or path.startswith(HOST_PLUMBING_DIR_PREFIX):
+        return True
+    pure = Path(path)
+    return pure.name.endswith(HOST_PLUMBING_NAME_SUFFIXES) or bool(
+        HOST_PLUMBING_DIR_NAMES.intersection(pure.parts)
+    )
 
 
 ON_A_BRANCH = (
@@ -253,7 +271,14 @@ def changed_paths(repo: Path) -> set[str]:
     The exception is exactly what the Codex scaffold writes (HOST_PLUMBING_FILES /
     HOST_PLUMBING_DIR_PREFIX above), never a surface a user reads -- an adopting
     repo's own hooks under `.codex/hooks/` stay visible. Left directory-wide, the
-    scaffold's `contract/templates/**` matched the interface glob (W4-02 F3)."""
+    scaffold's `contract/templates/**` matched the interface glob (W4-02 F3).
+
+    Generic host and runtime artifacts are excluded too: host tooling under
+    `.herdr/`, dependency trees under `node_modules/`, bytecode under
+    `__pycache__/`, vendored lockfiles (`*.lock`) and the selection store
+    (`*.jsonl`). None of these is user-authored content, and leaving them in
+    the diff would make ritual-scale computation disagree with what reviewers
+    and finalize-review actually see."""
     merge_base = branch_base(repo)
     paths: set[str] = set()
     for command in (

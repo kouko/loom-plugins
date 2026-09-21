@@ -1,5 +1,60 @@
 # Changelog
 
+## [3.7.3] — 2026-09-21 — the version that carries the versioning-rule change
+
+Patch. No station guidance, field, rule id or contract change of its own; the
+contract manifest version stays 2.3.1 and the mechanism count is unchanged.
+Adds a release-process rule to AGENTS.md: every merged PR that touches a
+plugin must bump that plugin's version (patch by default; minor when the
+change includes station guidance, field, rule id, or contract manifest
+changes), so `claude plugin update` reliably delivers merged changes to
+installed copies.
+
+- AGENTS.md gains a "Versioning & Release" section stating the rule, its
+  rationale, and the three-manifest + CHANGELOG + README synchronization
+  requirements.
+
+## [3.7.2] — 2026-09-19 — the version that carries #30 and #31 out
+
+Patch. No station guidance, field, rule id or contract change of its own; the
+contract manifest version stays 2.3.1 and the mechanism count is unchanged.
+Two changes merged into `main` after 3.7.1 was cut without the version
+moving, so `claude plugin update loom-code@loom` answered "already at the
+latest version (3.7.1)" and refreshed nothing — the exact failure 3.7.1's own
+entry below describes, repeated. Reported by the originator: an installed
+3.7.1 copy still emitted the pre-#30 refusal text (`found 0` plus the
+canonical-form line, with none of #30's added routes) after #30 merged. The
+bump is what makes those already-merged fixes reach an installed copy; the
+entries below record what they changed.
+
+- The publication gate names the legal routes when it blocks (#30). A refusal
+  citing a missing attestation, whether from `push`, `land`, or a merge, now
+  appends which of two routes is actually open — running `closing-review`, or
+  proposing a step selection the user confirms by typing the printed
+  code — and states plainly that the agent must never hand the blocked
+  command to the user to run. Each state a non-exactly-one attestation count
+  can be in (missing, over-attested, unreadable, or nothing left to publish)
+  gets the route wording that actually applies to that state; a route named
+  where it cannot work is the same failure this fix exists to close.
+- Table usage guidance added to the ship skill (#31). The skill now says
+  directly to use Markdown tables for list-type or comparison-type
+  information in a PR body, so it no longer depends on an external
+  visualization card to remind the agent of that.
+- Build and closing-review recover from a missing verification item instead
+  of cycling between stations (recovery-loop change). The mechanism count
+  rises by two, not zero, for this addition; the two exceptions below are
+  this entry's own, not carried from the bump this section otherwise
+  describes.
+
+- budget-exception: build.absence-recovery — Build re-enters its
+  end-of-Build checks when an item it owes is absent, reading the producing
+  station from the contract manifest rather than a second copy; eval
+  loom-code/skills/build/probes/test_recovery_rules.py.
+- budget-exception: review.absence-recovery — closing-review tells absence
+  from a failing check, routes to the producing station or produces the item
+  in place, and bounds the run to two entries per station; eval
+  loom-code/skills/closing-review/probes/test_recovery_rules.py.
+
 ## [3.7.1] — 2026-09-16 — the version that carries three merged fixes out
 
 Patch. No station guidance, field, rule id or contract change of its own; the

@@ -6,9 +6,9 @@ from prose_pin import has_negation, split_sentences
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
-ADVERSARIAL_REF = (
-    ROOT / "loom-code/skills/closing-review/references/adversarial.md"
-).read_text(encoding="utf-8")
+# The attack protocol's own text is pinned in test_adversary_protocol.py, so
+# that a change to it turns that file red and names it; this module keeps the
+# station's text.
 REVIEWER = (ROOT / "loom-code/agents/reviewer.md").read_text(encoding="utf-8")
 REVIEW_WORDS = " ".join(REVIEW.split())
 CONTRACT = " ".join((REVIEW + "\n" + REVIEWER).split())
@@ -287,13 +287,35 @@ def _early_dispatch_sentences(text: str) -> list[str]:
     ]
 
 
+# The §2 precondition has two antecedents, not one. Until 2026-09-19 a single
+# `Otherwise` clause carried both, which is the defect W0-02 repaired: a check
+# that reported a failure and an item that was simply absent collapsed into the
+# same branch, and a re-entered run cycled build -> closing-review -> ship. The
+# obligation these helpers and assertions defend is unchanged — no reviewer is
+# dispatched until Build's checks are confirmed — but it is now pinned per
+# branch, so losing either one goes red on its own.
+_BRANCH_ANTECEDENT = re.compile(
+    r"reports a check failing|an item is absent|it is another station",
+    re.IGNORECASE,
+)
+_AFFIRMATIVE_DISPATCH = re.compile(r"\bdispatch\w*\b(?!\s+no\b)", re.IGNORECASE)
+
+
 def test_gate_helpers_synthetic() -> None:
     assert _early_dispatch_sentences(
         "Under time pressure, dispatch reviewers while Build's checks still run."
     )
     assert not _early_dispatch_sentences("Otherwise return the change to Build and dispatch no reviewer.")
+    assert not _early_dispatch_sentences(
+        "When that hand-off reports a check failing, return the change to Build "
+        "and dispatch no reviewer."
+    )
     assert _OPTIONAL_ROUND.search("the fixed content may skip the next review round")
     assert not _OPTIONAL_ROUND.search("the fixed content must pass the next review round")
+    assert _AFFIRMATIVE_DISPATCH.search("When an item is absent, dispatch the reviewers anyway.")
+    assert not _AFFIRMATIVE_DISPATCH.search(
+        "When it is another station, return the change there and dispatch no reviewer."
+    )
 
 
 def test_reviewers_dispatched_after_build_checks() -> None:
@@ -309,7 +331,41 @@ def test_reviewers_dispatched_after_build_checks() -> None:
     ):
         assert step in confirm, confirm
     assert "that step" not in confirm, confirm
-    assert "Otherwise return the change to Build and dispatch no reviewer." in depth
+
+    # Branch 1 — a check reported a failure: back to Build, no reviewer.
+    failing = next(
+        s for s in _sentences(depth)
+        if s.startswith("When that hand-off reports a check failing")
+    )
+    assert "return the change to Build" in failing, failing
+    assert "dispatch no reviewer" in failing, failing
+
+    # Branch 2 — the item is absent: a distinct antecedent, routed by owner
+    # lookup, and still no reviewer. Absence must not read as a failing check.
+    assert "Absence is a distinct antecedent from a failing check." in depth
+    neither = next(
+        s for s in _sentences(depth)
+        if s.startswith("Neither state is a check reporting a failure")
+    )
+    assert "neither routes like one" in neither, neither
+    produced_here = next(
+        s for s in _sentences(depth) if s.startswith("When that owner is this station")
+    )
+    assert "produce the item here" in produced_here, produced_here
+    assert "route it nowhere" in produced_here, produced_here
+    elsewhere = next(
+        s for s in _sentences(depth) if s.startswith("When it is another station")
+    )
+    assert "return the change there" in elsewhere, elsewhere
+    assert "dispatch no reviewer" in elsewhere, elsewhere
+    assert "Recovery adds a path and waives nothing" in depth
+    assert "every check above runs on the recovered content" in depth
+
+    # Neither branch may dispatch a reviewer.
+    for sentence in _sentences(depth):
+        if _BRANCH_ANTECEDENT.search(sentence):
+            assert not _AFFIRMATIVE_DISPATCH.search(sentence), sentence
+
     assert _early_dispatch_sentences(REVIEW_WORDS) == []
     assert depth.index(confirm) < depth.index("loom_checker.py reviewer-count")
     round_two = next(s for s in REVIEW_WORDS.split("- **") if s.startswith("Round 2"))
@@ -324,12 +380,6 @@ def test_no_adversary_dispatch_in_closing_review() -> None:
     for sentence in _sentences(REVIEW_WORDS):
         if re.search(r"\badversary\b", sentence):
             assert has_negation(sentence), sentence
-    opening = " ".join(ADVERSARIAL_REF.split("\n## ", 1)[0].split())
-    assert "at the end of Build" in opening
-    assert "a later round can re-run it" not in opening
-    recording = " ".join(ADVERSARIAL_REF.split("## Recording", 1)[1].split())
-    assert "Build re-runs" in recording
-    assert "`finalize-review`" in recording
 
 
 def test_finalize_failure_fix_needs_next_round() -> None:
@@ -374,10 +424,6 @@ def test_unresolved_adversarial_findings_reach_finalize_input() -> None:
     assert "Build's hand-off" in sentence, sentence
     assert not has_negation(sentence), sentence
     assert not _OPTIONAL_ROUND.search(sentence), sentence
-    recording = " ".join(ADVERSARIAL_REF.split("## Recording", 1)[1].split())
-    destination = next(s for s in _sentences(recording) if "`findings` input of `finalize-review`" in s)
-    assert "closing review passes" in destination, destination
-    assert not has_negation(destination), destination
 
 
 # ---------------------------------------------------------------------------

@@ -20,6 +20,10 @@ steps it lists as skipped (spec, plan, implementer, tdd, adversarial,
 package-tests, blind-run); skip suggestions and user requests follow
 [expert-mode](../expert-mode/SKILL.md).
 
+Finding no task left to implement is not a reason to end Build. It means §2 has
+nothing to implement, not that the run is over: continue to §3, which states
+what such a re-entry runs.
+
 ## 2. Implement test first
 
 Before every host-native dispatch, the station must resolve the model-and-effort
@@ -93,6 +97,25 @@ suite and re-run the existing adversarial programs. After a fix where every
 adversarial program still passes, or fails only for a product defect, do not
 dispatch the adversary again.
 
+<!-- gate: build.absence-recovery -->
+Build enters these end-of-Build checks on absence as well as after a fix: when
+Build is entered with every planned task already committed and an item Build
+owes is absent, it runs this section from step 1 to produce that item. Absence
+is a distinct antecedent from a failing check; an item that exists and fails is
+a failure and is fixed as above. Read `loom-code/contract/manifest.yaml`
+(`stations[].produces` and `actions[].owner`) to decide whether an absent item
+is Build's to produce; this file keeps no second copy of that mapping. This
+lookup covers only an item this rule names: the adversarial programs, the
+blind-run report or the attestation. Absence
+dispatches the adversary only when no adversarial program is committed;
+committed programs are re-run, never re-dispatched, exactly as after a fix.
+
+A recovery run is bounded across stations, not only within Build: an entry here
+made to resolve an absent item counts toward that bound; an entry made for an
+ordinary review-round fix never does. [closing-review](../closing-review/SKILL.md) §2
+states the bound and the record of entered stations it is counted from. Read it
+there; this file keeps no count of its own.
+
 Build dispatches the `loom-code:adversary` agent fresh-context again to update
 its own programs when a fix widens or changes what the change covers, or trunk
 content brought in by a trunk sync changes it, and a committed adversarial
@@ -105,11 +128,13 @@ widened changed paths, or the trunk paths the sync brought in, and the
 failing program's output. The adversary updates only its own programs. Implementers and the orchestrator never edit an
 adversarial program. After the update, Build repeats these end-of-Build checks.
 
+<!-- /gate -->
+
 ## 4. Hand off to closing-review
 
 Commit functional changes normally. Report the branch base, HEAD, the
 `sync-trunk` result with any warning it printed, changed paths, focused test
 results, the complete package suite command and its result,
-each adversarial program's path and command, each adversary re-dispatch with its reason, every unresolved adversary finding, and any unresolved risk. Call `loom-code:closing-review`
+each adversarial program's path and command, each adversary re-dispatch with its reason, every unresolved adversary finding, the station sequence entered so far when this run recovered from an absent item, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after `closing-review` generates it.
