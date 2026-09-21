@@ -58,17 +58,41 @@ WRAPPER_VALUE_OPTIONS = ENV_VALUE_OPTIONS | {
 HEREDOC_WORD_END = frozenset(" \t\n;&|<>()")
 
 
-def _heredoc_executes_body(prefix: str) -> bool:
-    """True when the command word owning a heredoc runs its body as commands.
+def _command_word_is_a_shell(text: str) -> bool:
+    """Whether one pipeline member runs what it is handed as commands.
 
-    The bare `<<` form names no command word, and the shell itself reads that
-    body, so an absent command word reads as executing."""
-    tokens = _strip_prefix(_tokenise(prefix.lstrip("({ \t")))
+    `_strip_merge_prefix`, not `_strip_prefix`: the narrow one stops at the
+    first `-` token, so `sudo -u bob bash <<EOF` would read its command word as
+    `-u` and carve an executed body out as content. The narrow helper is right
+    for push recognition, where over-reading refuses a command that runs today;
+    here over-reading judges a body that would otherwise reach no rule, so the
+    wide one is the one that fails in the safe direction.
+
+    The bare `<<` form names no command word and the shell reads that body
+    itself, so an absent command word reads as executing."""
+    tokens = _strip_merge_prefix(_tokenise(text.lstrip("({ \t")))
     while tokens and tokens[0] in HEREDOC_GRAMMAR_WORDS:
-        tokens = _strip_prefix(tokens[1:])
+        tokens = _strip_merge_prefix(tokens[1:])
     if not tokens:
         return True
     return _program(tokens[0]) in SHELL_PROGRAMS
+
+
+def _heredoc_executes_body(pipeline: str) -> bool:
+    """True when a heredoc's body reaches something that runs it as commands.
+
+    The question is the whole pipeline, not the command word owning the
+    redirect: in `cat <<EOF | bash` the body is `cat`'s stdin and `bash`'s
+    stdin in turn, so a shell does execute it. Judging only the owner carves
+    the body out of the very pipeline that runs it, and a carved body reaches
+    no rule at all.
+
+    Over-reading a member here only sends a body to the recognisers that would
+    otherwise be treated as file content, so any doubt answers True."""
+    return any(
+        _command_word_is_a_shell(member)
+        for member in _operator_segments(pipeline)
+    )
 
 
 def _heredoc_delimiter(command: str, index: int) -> tuple[str, int] | None:
@@ -175,14 +199,20 @@ def _without_unexecuted_heredocs(command: str) -> tuple[str, list[str]]:
             if found is None:
                 return command, []
             delimiter, after = found
-            pending.append(
-                (delimiter, strip_tabs, _heredoc_executes_body(command[segment_start:index]))
-            )
+            # Whether the body is executed cannot be decided here: the pipeline
+            # member that runs it may still be to the right (`cat <<EOF | bash`).
+            # Keep where this command began and decide at the end of the line.
+            pending.append((delimiter, strip_tabs, segment_start))
             index = after
             continue
         elif character == "\n" and pending:
             kept.append(command[copied:index + 1])
-            consumed = _consume_heredoc_bodies(command, index + 1, pending, executed)
+            line = command[:index]
+            resolved = [
+                (delimiter, strip_tabs, _heredoc_executes_body(line[start:]))
+                for delimiter, strip_tabs, start in pending
+            ]
+            consumed = _consume_heredoc_bodies(command, index + 1, resolved, executed)
             if consumed is None:
                 return command, []
             copied = index = segment_start = consumed

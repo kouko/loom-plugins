@@ -411,17 +411,20 @@ def contains_pr_merge(command: str) -> bool:
 def _shell_c_argument(tokens: list[str]) -> int | None:
     """Index of the script a `<shell> … -c <script>` runs, or None.
 
-    A shell bundles its short options, so the flag is `-lc`, `-ec` or `-euxc`
-    as often as a bare `-c`; matching only `-c` reads `bash -lc '<merge>'` as
-    carrying no script at all. Every option before it is a flag rather than one
-    taking a value, so the script is simply the token after the first bundle
-    whose last letter is `c`."""
+    A shell bundles its short options, so the flag is `-lc`, `-ec`, `-euxc` or
+    `-cl` as often as a bare `-c`; matching only `-c` reads `bash -lc
+    '<merge>'` as carrying no script at all. The bundle is read for `c`
+    anywhere in it, not only at its end: `bash -cl`, `sh -cl` and `zsh -cl` all
+    run their script, and anchoring on the last letter let `-cl` through.
+
+    The script is the token after that bundle. An option taking a value cannot
+    displace it, because the value never begins with `-` and so is not read as
+    a bundle."""
     for index, token in enumerate(tokens[1:], start=1):
         if (
             token.startswith("-")
             and not token.startswith("--")
-            and token.endswith("c")
-            and len(token) > 1
+            and "c" in token[1:]
         ):
             return index + 1 if index + 1 < len(tokens) else None
     return None
