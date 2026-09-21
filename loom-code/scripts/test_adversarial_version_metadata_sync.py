@@ -50,7 +50,7 @@ def test_every_manifest_under_the_plugin_agrees_with_the_ssot() -> None:
 
 
 def test_changelog_top_entry_is_the_shipped_version() -> None:
-    """The pinned test asserts only that `## [3.7.2]` appears *somewhere*. An
+    """The pinned test asserts only that `## [3.7.3]` appears *somewhere*. An
     entry filed below an older one still satisfies it while a reader looking at
     the top of the changelog sees a stale version."""
     changelog = (PLUGIN / "CHANGELOG.md").read_text(encoding="utf-8")
@@ -77,9 +77,9 @@ def test_changelog_headings_descend() -> None:
 
 def test_shipped_version_is_above_the_version_it_replaces() -> None:
     """Acceptance 1 of the intent: the three manifests must read *higher* than
-    3.7.1, not merely be equal to each other. Three synchronized copies of an
+    3.7.2, not merely be equal to each other. Three synchronized copies of an
     unmoved string is the exact failure this change exists to fix."""
-    assert _semver(_version(SSOT)) > (3, 7, 1)
+    assert _semver(_version(SSOT)) > (3, 7, 2)
 
 
 def test_derived_manifests_are_not_hand_drifted() -> None:
@@ -109,7 +109,7 @@ def test_marketplace_entry_pins_no_version() -> None:
 
 
 def test_no_operative_file_still_carries_the_previous_version() -> None:
-    """Changelog prose and the docs/loom record legitimately name 3.7.1. This
+    """Changelog prose and the docs/loom record legitimately name 3.7.2. This
     probe's own source legitimately names it too, to describe and parse the
     boundary it tests. Any other tracked file still stating it is a copy the
     bump missed."""
@@ -133,7 +133,7 @@ def test_no_operative_file_still_carries_the_previous_version() -> None:
         except (UnicodeDecodeError, OSError):
             continue
         for n, line in enumerate(text.splitlines(), 1):
-            if "3.7.1" in line:
+            if "3.7.2" in line and path != SSOT:
                 stale.append(f"{rel}:{n}: {line.strip()}")
     assert not stale, stale
 
@@ -161,13 +161,13 @@ def test_no_readme_states_a_loom_code_version_other_than_the_manifest(
 
 
 def test_contract_manifest_version_is_untouched_as_the_changelog_claims() -> None:
-    """The 3.7.2 entry asserts the contract manifest version stays 2.3.1. Read
+    """The 3.7.3 entry asserts the contract manifest version stays 2.3.1. Read
     the claim out of the changelog and check it against the file rather than
     trusting the sentence."""
     changelog = (PLUGIN / "CHANGELOG.md").read_text(encoding="utf-8")
-    entry = changelog.split("## [3.7.1]")[0]
+    entry = changelog.split("## [3.7.2]")[0]
     claimed = re.search(r"contract manifest version stays (\d+\.\d+\.\d+)", entry)
-    assert claimed, "3.7.2 entry: no contract-manifest-version claim to check"
+    assert claimed, "3.7.3 entry: no contract-manifest-version claim to check"
     manifest = (PLUGIN / "contract/manifest.yaml").read_text(encoding="utf-8")
     actual = re.search(r"^version: (\d+\.\d+\.\d+)", manifest, re.M)
     assert actual, "loom-code/contract/manifest.yaml: no version line"

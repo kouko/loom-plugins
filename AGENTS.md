@@ -92,6 +92,17 @@ repository's development records under `docs/`.
 - 其他 plugin（domain-teams、投資／研究 toolkit 等）仍用四級系統 SELF / MUST / SHOULD / MAY；
   gate 定義明確指定檔案路徑（相對路徑），verdict 約束內嵌於 PASS_WITH_NOTES 定義
 
+### Versioning & Release
+
+**MUST：每個合併至 main 的 PR 必須包含 plugin.json 版號 bump**（預設 patch；有 station guidance、field、rule id 或 contract manifest 變更時為 minor）。
+
+- 三份 manifest（`loom-code/plugin.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`）必須同步
+- `CHANGELOG.md` 必須在同一 commit 加入新區段 `## [X.Y.Z] — <date> — <summary>`
+- README 版號字串同步更新
+- 理由：`claude plugin update` 只比對版本字串；未 bump 的變更永遠不會發到已安裝副本
+- 機制化：`test_write_plan_station_text.py::test_current_release_metadata_is_synchronized` 斷言版號一致；bump packet 必須列出 CHANGELOG entry、pin test rewrite 為交付項
+- 參考記憶：`docs/loom/memory/version-bump-packets-must-name-changelog-entry.md`、`docs/loom/memory/version-bump-on-every-pr.md`
+
 ### loom 1.0 flow
 - 七站：capture-intent → write-spec →（write-plan → build → review → ship），maintain 回頭開 intent
 - 三個人類決策點：①覆述並確認 intent（含單向門問法）②product 的可見行為確認（spec）③盲跑報告驗收
