@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.7.3] — 2026-09-21 — the version that carries the versioning-rule change
+
+Patch. No station guidance, field, rule id or contract change of its own; the
+contract manifest version stays 2.3.1 and the mechanism count is unchanged.
+Adds a release-process rule to AGENTS.md: every merged PR that touches a
+plugin must bump that plugin's version (patch by default; minor when the
+change includes station guidance, field, rule id, or contract manifest
+changes), so `claude plugin update` reliably delivers merged changes to
+installed copies.
+
+- AGENTS.md gains a "Versioning & Release" section stating the rule, its
+  rationale, and the three-manifest + CHANGELOG + README synchronization
+  requirements.
+
 ## [3.7.2] — 2026-09-19 — the version that carries #30 and #31 out
 
 Patch. No station guidance, field, rule id or contract change of its own; the
