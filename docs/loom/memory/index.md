@@ -328,6 +328,10 @@ okf_version: "0.2"
 - [retire-numbered-checks-dont-renumber](retire-numbered-checks-dont-renumber.md) — When a numbered check/criterion is dropped but other files cross-reference it by number, retire it in place (mark permanently N/A) rather than renumber — renumbering cascades edits into every file citing a specific number
 - [verify-agent-mechanisms-on-disk-not-self-report](verify-agent-mechanisms-on-disk-not-self-report.md) — Behavioral verification of agent-facing mechanisms on cheap model tiers — real-session drive with unique markers, disk-verified effects, transcript grep for output fingerprints, per-verb cold-reader agents, two consecutive clean rounds; never accept the model's self-report as the oracle
 
+## project
+
+- [version-bump-on-every-pr](version-bump-on-every-pr.md) — Adopted rule — every merged PR that touches a plugin must bump that plugin's version (patch by default; minor when station guidance, field, rule id, or contract manifest changes) so `claude plugin update` delivers merged changes to installed copies
+
 ## reference
 
 - [two-skill-structure-checkers-disagree-name-which-one](two-skill-structure-checkers-disagree-name-which-one.md) — This repo enforces skill folder structure with TWO tools that do not agree — `.claude/hooks/validate-skill-folder-structure.sh` rejects only nested subdirectories (`find -mindepth 2 -type d`) while `scripts/check-skill-structure.py` additionally rejects unexpected top-level files as CHK-SKL-012 — so "the skill-structure checker forbids X" is an ambiguous claim that a reviewer will probe against whichever one they reach first and disprove; always name the tool and the rule id
