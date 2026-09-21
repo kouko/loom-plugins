@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-21-reviewer-floor-clean",
-  "content_digest": "1db7ff3c85cd40c4655c8e3527e25da9c102c65a",
+  "content_digest": "1fa36114d4672740148a71c082e9737a90c3cd29",
   "executions": [
     {
       "kind": "package-tests",
