@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-19-publication-hook-false-positives",
-  "content_digest": "f3a5e7ec64cb9bfbcc1dfd0aed5b464f6c8821e4",
+  "content_digest": "4efbab469900a8c38fb26269bdf05872b8f1274d",
   "executions": [
     {
       "kind": "package-tests",
@@ -15,7 +15,7 @@
       "command": "python3 loom-code/scripts/test_adversarial_heredoc_carve_out.py",
       "artifact": "loom-code/scripts/test_adversarial_heredoc_carve_out.py",
       "result": "pass",
-      "command_digest": "c2ce9f920dc911e56bf63d2ccba2e0be48712055a38c613465179fe828a0e703"
+      "command_digest": "40d4a2d5fd50b9580c210d169bda57fb71df444cf51027476c50a63c73d6202b"
     }
   ],
   "verdicts": [
