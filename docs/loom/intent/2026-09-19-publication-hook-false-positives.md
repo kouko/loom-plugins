@@ -1,7 +1,7 @@
 change_id: 2026-09-19-publication-hook-false-positives
 kind: engineering
 needs-design: no
-publication: automatic
+publication: automatic — authorized 2026-09-19 by kouko
 status: confirmed 2026-09-19
 
 ## Problem
