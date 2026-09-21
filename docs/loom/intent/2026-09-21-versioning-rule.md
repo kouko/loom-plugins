@@ -22,7 +22,7 @@ Change the versioning rule to require a version bump on every merged PR that tou
 8. Package tests continue to pass and mechanism count remains stable
 
 ## Constraints
-- The change affects only AGENTS.md and the release process documentation
+- The change affects only the release process, release metadata, and their existing mechanized checks
 - No modifications to station guidance, field definitions, rule IDs, or contract manifest (`loom-code/contract/manifest.yaml`)
 - The version bump process follows semantic versioning: patch for documentation/process changes, minor for station/field/rule/contract changes
 - The Loom workflow stations (capture-intent → write-plan → build → closing-review → ship) remain unchanged
