@@ -1,0 +1,66 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-19-publication-hook-false-positives",
+  "content_digest": "4efbab469900a8c38fb26269bdf05872b8f1274d",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 loom-code/scripts/test_adversarial_heredoc_carve_out.py",
+      "artifact": "loom-code/scripts/test_adversarial_heredoc_carve_out.py",
+      "result": "pass",
+      "command_digest": "40d4a2d5fd50b9580c210d169bda57fb71df444cf51027476c50a63c73d6202b"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-docs",
+      "vendor": "claude",
+      "model": "sonnet",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-spec",
+      "vendor": "claude",
+      "model": "sonnet",
+      "lens": "spec",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-principles",
+      "vendor": "claude",
+      "model": "opus",
+      "lens": "principles",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": {
+    "change_id": "2026-09-19-publication-hook-false-positives",
+    "bound": true,
+    "run": [
+      "spec",
+      "plan",
+      "implementer",
+      "tdd",
+      "reviewers",
+      "blind-run",
+      "package-tests"
+    ],
+    "skip": [
+      "adversarial"
+    ],
+    "code": "LGD3",
+    "failures": []
+  }
+}

@@ -37,7 +37,208 @@ PREFIX_WORDS = {"sudo", "command", "env", "nohup", "time", "nice", "builtin", "e
 SHELL_PROGRAMS = {"bash", "sh", "zsh", "dash"}
 
 
+# Words a shell reads as grammar rather than as the command word, so that the
+# heredoc owned by `if …; then bash <<EOF` is still owned by `bash`, and so that
+# merge recognition reads `if …; then gh pr merge` as the merge it runs.
+HEREDOC_GRAMMAR_WORDS = {"!", "then", "else", "elif", "do"}
+
+
+# Every option a `PREFIX_WORDS` wrapper spends a separate token on before the
+# program it runs, read from the wrappers' own manuals: sudo -u/-g/-C,
+# xargs -n/-L/-I/-P/-d/-s/-a, nice -n, exec -a, env's own set below. An option
+# carrying its value in one token (`-n1`) spends one and needs no entry.
+WRAPPER_VALUE_OPTIONS = ENV_VALUE_OPTIONS | {
+    "-g", "--group", "--user", "-n", "--max-args", "-L", "--max-lines",
+    "-I", "--replace", "-P", "--max-procs", "-d", "--delimiter",
+    "-s", "--max-chars", "-a", "--arg-file",
+}
+
+
+# Every character that ends a heredoc delimiter word, as a shell ends one.
+HEREDOC_WORD_END = frozenset(" \t\n;&|<>()")
+
+
+def _command_word_is_a_shell(text: str) -> bool:
+    """Whether one pipeline member runs what it is handed as commands.
+
+    `_strip_merge_prefix`, not `_strip_prefix`: the narrow one stops at the
+    first `-` token, so `sudo -u bob bash <<EOF` would read its command word as
+    `-u` and carve an executed body out as content. The narrow helper is right
+    for push recognition, where over-reading refuses a command that runs today;
+    here over-reading judges a body that would otherwise reach no rule, so the
+    wide one is the one that fails in the safe direction.
+
+    The bare `<<` form names no command word and the shell reads that body
+    itself, so an absent command word reads as executing."""
+    tokens = _strip_merge_prefix(_tokenise(text.lstrip("({ \t")))
+    while tokens and tokens[0] in HEREDOC_GRAMMAR_WORDS:
+        tokens = _strip_merge_prefix(tokens[1:])
+    if not tokens:
+        return True
+    return _program(tokens[0]) in SHELL_PROGRAMS
+
+
+def _heredoc_executes_body(pipeline: str) -> bool:
+    """True when a heredoc's body reaches something that runs it as commands.
+
+    The question is the whole pipeline, not the command word owning the
+    redirect: in `cat <<EOF | bash` the body is `cat`'s stdin and `bash`'s
+    stdin in turn, so a shell does execute it. Judging only the owner carves
+    the body out of the very pipeline that runs it, and a carved body reaches
+    no rule at all.
+
+    Over-reading a member here only sends a body to the recognisers that would
+    otherwise be treated as file content, so any doubt answers True."""
+    return any(
+        _command_word_is_a_shell(member)
+        for member in _operator_segments(pipeline)
+    )
+
+
+def _heredoc_delimiter(command: str, index: int) -> tuple[str, int] | None:
+    """Read the delimiter word at ``index`` as the literal a shell matches.
+
+    A delimiter may be written bare, quoted (`'EOF'`, `"EOF"`) or
+    backslash-escaped (`\\EOF`); the quoting selects expansion inside the body,
+    which no recogniser reads, so only the literal survives here. None when no
+    word is there. Returns the literal and the position just past the word."""
+    while index < len(command) and command[index] in " \t":
+        index += 1
+    delimiter: list[str] = []
+    quote: str | None = None
+    while index < len(command):
+        character = command[index]
+        if quote:
+            if character == quote:
+                quote = None
+            else:
+                delimiter.append(character)
+        elif character in {"'", '"'}:
+            quote = character
+        elif character == "\\" and index + 1 < len(command):
+            index += 1
+            delimiter.append(command[index])
+        elif character in HEREDOC_WORD_END:
+            break
+        else:
+            delimiter.append(character)
+        index += 1
+    if quote or not delimiter:
+        return None
+    return "".join(delimiter), index
+
+
+def _consume_heredoc_bodies(
+    command: str,
+    start: int,
+    pending: list[tuple[str, bool, bool]],
+    executed: list[str],
+) -> int | None:
+    """Carve the bodies that follow a logical line, left to right.
+
+    Each executed body is appended to ``executed`` for the caller to judge as
+    commands in its own right. None when a terminator is not where a shell
+    would find it, which makes the whole pass fail toward judging."""
+    index = start
+    for delimiter, strip_tabs, executes in pending:
+        body: list[str] = []
+        while True:
+            end = command.find("\n", index)
+            line = command[index:] if end < 0 else command[index:end]
+            if (line.lstrip("\t") if strip_tabs else line) == delimiter:
+                index = len(command) if end < 0 else end + 1
+                break
+            if end < 0:  # the terminator line never arrives
+                return None
+            body.append(line)
+            index = end + 1
+        if executes:
+            executed.append("\n".join(body))
+    return index
+
+
+def _without_unexecuted_heredocs(command: str) -> tuple[str, list[str]]:
+    """Carve every heredoc body out of ``command``.
+
+    Returns the remaining text plus the bodies a shell interpreter executes.
+    A body its command word does not execute -- `cat`, `tee`, a redirect to a
+    file -- is file content, and judging it as commands is what makes the same
+    bytes refused through Bash and allowed through a file-writing tool.
+
+    A body begins after the end of the *logical* line, so a backslash
+    continuation is joined before the body is located, and `<<<` is a
+    herestring rather than a heredoc. Anything this cannot locate exactly as a
+    shell would returns the original text and no bodies: the fail direction is
+    toward judging, never toward silence."""
+    kept: list[str] = []
+    executed: list[str] = []
+    pending: list[tuple[str, bool, bool]] = []
+    copied = 0
+    segment_start = 0
+    index = 0
+    quote: str | None = None
+    escaped = False
+    while index < len(command):
+        character = command[index]
+        if escaped:
+            escaped = False
+        elif character == "\\" and quote != "'":
+            escaped = True
+        elif quote:
+            if character == quote:
+                quote = None
+        elif character in {"'", '"'}:
+            quote = character
+        elif character == "<" and command[index + 1:index + 2] == "<":
+            if command[index + 2:index + 3] == "<":
+                index += 3
+                continue
+            after = index + 2
+            strip_tabs = command[after:after + 1] == "-"
+            found = _heredoc_delimiter(command, after + 1 if strip_tabs else after)
+            if found is None:
+                return command, []
+            delimiter, after = found
+            # Whether the body is executed cannot be decided here: the pipeline
+            # member that runs it may still be to the right (`cat <<EOF | bash`).
+            # Keep where this command began and decide at the end of the line.
+            pending.append((delimiter, strip_tabs, segment_start))
+            index = after
+            continue
+        elif character == "\n" and pending:
+            kept.append(command[copied:index + 1])
+            line = command[:index]
+            resolved = [
+                (delimiter, strip_tabs, _heredoc_executes_body(line[start:]))
+                for delimiter, strip_tabs, start in pending
+            ]
+            consumed = _consume_heredoc_bodies(command, index + 1, resolved, executed)
+            if consumed is None:
+                return command, []
+            copied = index = segment_start = consumed
+            pending = []
+            continue
+        elif character in ";\n|&":
+            segment_start = index + 1
+        index += 1
+    if quote or escaped or pending:
+        return command, []
+    kept.append(command[copied:])
+    return "".join(kept), executed
+
+
 def _shell_segments(command: str) -> list[str]:
+    """Split on shell operators outside quotes, reading each heredoc body as
+    its command word reads it: an executed body is re-fed as commands, and a
+    body that is file content is dropped before the split."""
+    stripped, executed = _without_unexecuted_heredocs(command)
+    segments = _operator_segments(stripped)
+    for body in executed:
+        segments.extend(_shell_segments(body))
+    return segments
+
+
+def _operator_segments(command: str) -> list[str]:
     """Split on shell operators outside quotes; malformed input stays strict."""
     segments: list[str] = []
     conservative_command = list(command)
@@ -116,6 +317,34 @@ def _strip_prefix(tokens: list[str]) -> list[str]:
     return tokens[index:]
 
 
+def _strip_merge_prefix(tokens: list[str]) -> list[str]:
+    """`_strip_prefix` widened by the shell grammar and the wrapper options a
+    merge can sit behind: `if …; then`, `( … )`, `{ …; }`, `sudo -u bob`,
+    `xargs -n1`.
+
+    Merge recognition alone gets this. The push recognisers keep the narrower
+    `_strip_prefix`, because a wrapped push they do not see today still runs
+    today: seeing it would send it to the canonical-form check that refuses it,
+    turning a command that runs into a blocked one."""
+    index = 0
+    while index < len(tokens):
+        token = tokens[index].lstrip("({")
+        if not token or ASSIGNMENT.match(token):
+            index += 1
+            continue
+        word = _program(token)
+        if word in HEREDOC_GRAMMAR_WORDS:
+            index += 1
+            continue
+        if word not in PREFIX_WORDS:
+            return [token, *tokens[index + 1:]]
+        index += 1
+        while index < len(tokens) and tokens[index].startswith("-"):
+            option = tokens[index]
+            index += 2 if option in WRAPPER_VALUE_OPTIONS else 1
+    return []
+
+
 def _subcommand_at(tokens: list[str], value_options: set[str]) -> tuple[int, str] | None:
     """The position and value of the first non-option, non-value word."""
     index = 0
@@ -180,17 +409,39 @@ def is_pr_create_command(command: str) -> bool:
     return False
 
 
+def _merge_word(token: str | None) -> str:
+    """A gh subcommand word as the shell hands it over, case-folded.
+
+    `shlex` knows nothing of ANSI-C (`$'merge'`) or locale (`$"merge"`)
+    quoting: it removes the quotes and leaves `$merge`, where the shell passes
+    `merge`. A leading `$` is therefore dropped. That also reads a genuine
+    expansion (`$merge`) as the word, which is the fail-closed direction: the
+    token stands in the subcommand position of `gh pr`, so what it expands to
+    cannot be resolved here and the refusal is the safe answer.
+
+    Case-folded because a case-insensitive filesystem runs `GH` as `gh`, and
+    gh matches its own subcommands case-insensitively."""
+    if token is None:
+        return ""
+    return token.lstrip("$").strip("'\"").lower()
+
+
 def is_pr_merge_command(command: str) -> bool:
-    """True when a shell segment merges a PR."""
-    for segment in _shell_segments(command):
-        tokens = _strip_prefix(_tokenise(segment))
+    """True when a shell segment merges a PR, whatever shell grammar or wrapper
+    options stand in front of it.
+
+    Backslash-continuations are joined first: the shell joins them before it
+    reads a command word, so `gh pr \\<newline>merge 7` is one command, while
+    `_shell_segments` splits on the raw newline and would read two."""
+    for segment in _shell_segments(command.replace("\\\n", "")):
+        tokens = _strip_merge_prefix(_tokenise(segment))
         if not tokens or _program(tokens[0]) != "gh":
             continue
         rest = tokens[1:]
         found = _subcommand_at(rest, GH_VALUE_OPTIONS)
-        if found and found[1] == "pr":
+        if found and _merge_word(found[1]) == "pr":
             after = rest[found[0] + 1:]
-            if _subcommand(after, GH_VALUE_OPTIONS) == "merge":
+            if _merge_word(_subcommand(after, GH_VALUE_OPTIONS)) == "merge":
                 return True
     return False
 
