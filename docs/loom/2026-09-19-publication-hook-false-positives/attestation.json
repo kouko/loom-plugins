@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-19-publication-hook-false-positives",
-  "content_digest": "1db7ff3c85cd40c4655c8e3527e25da9c102c65a",
+  "content_digest": "f3a5e7ec64cb9bfbcc1dfd0aed5b464f6c8821e4",
   "executions": [
     {
       "kind": "package-tests",
