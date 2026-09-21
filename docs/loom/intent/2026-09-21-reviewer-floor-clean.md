@@ -2,7 +2,7 @@ change_id: 2026-09-21-reviewer-floor-clean
 kind: engineering
 status: confirmed 2026-09-21
 needs-design: no
-publication: authorized 2026-09-21 by kouko
+publication: automatic — authorized 2026-09-21 by kouko
 
 ## Problem
 The reviewer-floor branch from PR #35 has merge conflicts with main (reviewers.py). This clean branch separates the non-conflicting documentation and cleanup commits for independent delivery.
