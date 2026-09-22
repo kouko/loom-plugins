@@ -142,7 +142,12 @@ def _classic_state(gh: str, host: str, slug: str, trunk: str) -> tuple[bool, boo
     if not isinstance(protection, dict):
         return None
     try:
-        pr = bool(protection.get("required_pull_request_reviews")) and bool(
+        reviews = protection.get("required_pull_request_reviews")
+        allowances = (reviews or {}).get("bypass_pull_request_allowances") or {}
+        bypass = [allowances.get(kind) or [] for kind in ("users", "teams", "apps")]
+        if not all(isinstance(actors, list) for actors in bypass):
+            return None
+        pr = bool(reviews) and not any(bypass) and bool(
             (protection.get("enforce_admins") or {}).get("enabled") is True
         )
         checks = protection.get("required_status_checks") or {}

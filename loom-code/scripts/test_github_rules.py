@@ -172,6 +172,27 @@ def test_classic_with_enforce_admins_and_check_is_satisfied(tmp_path):
     assert "could not confirm" not in result.stdout
 
 
+def test_classic_with_pr_bypass_allowance_reported_missing(tmp_path):
+    for kind in ("users", "teams", "apps"):
+        classic = {
+            "required_pull_request_reviews": {
+                "required_approving_review_count": 0,
+                "bypass_pull_request_allowances": {kind: [{"id": 1}]},
+            },
+            "enforce_admins": {"enabled": True},
+            "required_status_checks": {"contexts": [CONTEXT]},
+        }
+        sub = tmp_path / kind
+        sub.mkdir()
+        result, _calls = probe(sub, base_responses(**{
+            f"{REPO}/branches/main/protection": ok(classic),
+        }))
+        assert result.returncode == 0, result.stderr
+        assert "loom: main does not require a pull request (administrators included)" \
+            in result.stdout, kind
+        assert "does not require the check" not in result.stdout, kind
+
+
 # --- Acceptance 7 ------------------------------------------------------------
 
 def test_missing_rules_listed_with_command(tmp_path):
@@ -306,6 +327,10 @@ def test_malformed_shapes_could_not_confirm(tmp_path):
              "parameters": {"required_status_checks": "x"}}])},
         "classic": {f"{REPO}/branches/main/protection": ok({
             "enforce_admins": "x", "required_status_checks": ["x"]})},
+        "allowances": {f"{REPO}/branches/main/protection": ok({
+            "required_pull_request_reviews": {"bypass_pull_request_allowances": {"users": "x"}},
+            "enforce_admins": {"enabled": True},
+            "required_status_checks": {"contexts": [CONTEXT]}})},
     }
     for name, overrides in cases.items():
         sub = tmp_path / name
