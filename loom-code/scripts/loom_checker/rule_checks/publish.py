@@ -17,12 +17,36 @@ DISCLOSURE_PREFIXES = ("Skipped steps:", "Prior failure:")
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
 
 
-def _body_sections(body: str) -> tuple[list[tuple[str, list[str]]], list[str]]:
-    """Top-level `## ` sections and every line outside fenced code."""
+def _visible_part(line: str, in_comment: bool) -> tuple[str, bool]:
+    """The line with HTML comment text removed, and whether a comment is
+    still open at its end."""
+    visible = ""
+    while line:
+        if in_comment:
+            end = line.find("-->")
+            if end < 0:
+                return visible, True
+            line, in_comment = line[end + 3:], False
+        else:
+            start = line.find("<!--")
+            if start < 0:
+                return visible + line, False
+            visible, line, in_comment = visible + line[:start], line[start + 4:], True
+    return visible, in_comment
+
+
+def _body_sections(
+    body: str, strip_comments: bool = False
+) -> tuple[list[tuple[str, list[str]]], list[str]]:
+    """Top-level `## ` sections and every line outside fenced code; with
+    `strip_comments`, HTML comments outside fenced code are removed first."""
     sections: list[tuple[str, list[str]]] = []
     outside_fences: list[str] = []
     fence: tuple[str, int] | None = None
+    in_comment = False
     for line in body.splitlines():
+        if strip_comments and fence is None:
+            line, in_comment = _visible_part(line, in_comment)
         marker = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
         if marker and fence is None:
             token = marker.group(1)
@@ -62,27 +86,42 @@ def _heading_fault(headings: list[str]) -> str | None:
     return None
 
 
-def validate_contextual_pr_body(body: str) -> str | None:
-    """Recompute the structural PR-body floor; semantic truth stays review-owned."""
-    sections, outside_fences = _body_sections(body)
+def _empty(heading: str, visible: str) -> bool:
+    alphanumeric_count = sum(character.isalnum() for character in visible)
+    one_ascii_token = re.fullmatch(r"\s*[A-Za-z]+[.!?:;,-]*\s*", visible) is not None
+    template_placeholder = re.fullmatch(r"\s*<[^>\n]+>\s*", visible) is not None
+    sentinel = (
+        heading == "Follow-ups"
+        and re.sub(r"[\W_]+", "", visible).casefold() == "none"
+    )
+    return (alphanumeric_count < 8 or one_ascii_token or template_placeholder) and not sentinel
+
+
+def _structure_fault(sections: list[tuple[str, list[str]]]) -> str | None:
     fault = _heading_fault([heading for heading, _content in sections])
     if fault:
         return fault
     for heading, lines in sections:
-        content = "\n".join(lines)
-        visible = re.sub(r"<!--.*?-->", " ", content, flags=re.DOTALL)
-        alphanumeric_count = sum(character.isalnum() for character in visible)
-        one_ascii_token = re.fullmatch(r"\s*[A-Za-z]+[.!?:;,-]*\s*", visible) is not None
-        template_placeholder = re.fullmatch(r"\s*<[^>\n]+>\s*", visible) is not None
-        sentinel = (
-            heading == "Follow-ups"
-            and re.sub(r"[\W_]+", "", visible).casefold() == "none"
-        )
-        if (
-            (alphanumeric_count < 8 or one_ascii_token or template_placeholder)
-            and not sentinel
-        ):
+        visible = re.sub(r"<!--.*?-->", " ", "\n".join(lines), flags=re.DOTALL)
+        # A link or image renders its text, never its target.
+        link_text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", visible)
+        if _empty(heading, visible) or _empty(heading, link_text):
             return f'heading "{heading}" is empty'
+    return None
+
+
+def validate_contextual_pr_body(body: str) -> str | None:
+    """Recompute the structural PR-body floor; semantic truth stays review-owned.
+
+    The body is judged as written and again as rendered (HTML comments
+    removed, links read as their text); either view's fault refuses, so
+    the rendered view only ever tightens the floor."""
+    sections, outside_fences = _body_sections(body)
+    fault = _structure_fault(sections) or _structure_fault(
+        _body_sections(body, strip_comments=True)[0]
+    )
+    if fault:
+        return fault
     visible_body = re.sub(
         r"<!--.*?-->", " ", "\n".join(outside_fences), flags=re.DOTALL
     )

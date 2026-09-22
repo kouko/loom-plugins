@@ -509,6 +509,47 @@ def test_contextual_body_gate_respects_commonmark_fence_length() -> None:
     assert loom_checker.validate_contextual_pr_body(body) is None
 
 
+def test_contextual_body_gate_ignores_headings_inside_html_comments() -> None:
+    hidden_all = "<!--\n" + contextual_body() + "-->\n"
+    assert loom_checker.validate_contextual_pr_body(hidden_all) == 'heading "Context" is missing'
+    hidden_scope = contextual_body().replace(
+        f"## Scope\n{CONTEXT_CONTENT['Scope']}",
+        f"<!-- ## Scope\n{CONTEXT_CONTENT['Scope']} -->",
+    )
+    assert loom_checker.validate_contextual_pr_body(hidden_scope) == 'heading "Scope" is missing'
+
+
+def test_contextual_body_gate_comment_inside_fence_hides_nothing() -> None:
+    body = contextual_body(overrides={
+        "Implementation": "The page template keeps one marker.\n\n```html\n<!--\n```",
+        "Follow-ups": "None. <!-- closes nothing -->",
+    })
+
+    assert loom_checker.validate_contextual_pr_body(body) is None
+
+
+def test_contextual_body_gate_link_targets_are_not_visible_text() -> None:
+    for content in ("[](https://example.com/aaaaaaaa)", "![](https://example.com/aaaaaaaa.png)",
+                    "[x](https://example.com/aaaaaaaa)"):
+        body = contextual_body(overrides={"Risks and rollback": content})
+        assert loom_checker.validate_contextual_pr_body(body) == (
+            'heading "Risks and rollback" is empty'), content
+    body = contextual_body(overrides={
+        "Risks and rollback": "[Rollback runbook for this change](https://example.com/r)",
+    })
+    assert loom_checker.validate_contextual_pr_body(body) is None
+
+
+def test_contextual_body_gate_only_tightens() -> None:
+    """Bodies refused before comment stripping and link-text reading stay refused."""
+    cases = (
+        contextual_body() + "\n<!--\n## Memory\n-->\n",
+        contextual_body(overrides={"Follow-ups": "[none](x)"}),
+    )
+    for body in cases:
+        assert loom_checker.validate_contextual_pr_body(body) is not None, body
+
+
 def test_publish_rejects_invalid_contextual_body_before_network(
     tmp_path: Path, monkeypatch
 ) -> None:
