@@ -47,6 +47,13 @@ def trusted_executable(name: str) -> str:
     return "/usr/bin/git" if name == "git" else "/usr/local/bin/gh"
 
 
+def identified(monkeypatch, status: str = "valid") -> None:
+    """Stub the change identity and its verification status: these tests are
+    about the outward publication steps, not about what the branch carries."""
+    monkeypatch.setattr(loom_checker, "identify_change", lambda *args, **kwargs: ("change", None))
+    monkeypatch.setattr(loom_checker, "verification_status", lambda *args, **kwargs: status)
+
+
 def git(repo: Path, *args: str) -> str:
     return subprocess.run(
         ["git", "-C", str(repo), *args], check=True, capture_output=True, text=True
@@ -205,7 +212,7 @@ def invoke(tmp_path: Path, monkeypatch, calls: ExternalCalls, *extra: str):
     calls.head = git(repo, "rev-parse", "HEAD")
     monkeypatch.chdir(repo)
     monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-    monkeypatch.setattr(loom_checker, "_cmd_push", lambda *args, **kwargs: 0)
+    identified(monkeypatch)
     monkeypatch.setattr(
         loom_checker, "resolve_publish_executable",
         trusted_executable,
@@ -256,7 +263,7 @@ def test_confirmed_current_intent_publishes_without_ship_reask(
     calls.head = git(repo, "rev-parse", "HEAD")
     monkeypatch.chdir(repo)
     monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-    monkeypatch.setattr(loom_checker, "_cmd_push", lambda *args, **kwargs: 0)
+    identified(monkeypatch)
     monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
 
     err = StringIO()
@@ -286,7 +293,7 @@ def test_legacy_intent_requires_one_publication_decision(
     calls.head = git(repo, "rev-parse", "HEAD")
     monkeypatch.chdir(repo)
     monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-    monkeypatch.setattr(loom_checker, "_cmd_push", lambda *args, **kwargs: 0)
+    identified(monkeypatch)
     monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
 
     err = StringIO()
@@ -311,6 +318,8 @@ def test_unrelated_intent_cannot_authorize_attested_change(
     attestation(repo)
     git(repo, "add", ".")
     git(repo, "commit", "-q", "-m", "attest change")
+    # Two intents in the delta: the branch name is what identifies the change.
+    git(repo, "branch", "-M", "feat/change")
     body = tmp_path / "body.md"
     body.write_text(contextual_body(), encoding="utf-8")
     monkeypatch.chdir(repo)
@@ -324,7 +333,7 @@ def test_unrelated_intent_cannot_authorize_attested_change(
     ], StringIO(), err)
 
     assert rc == 2
-    assert "attested change" in err.getvalue()
+    assert "identified change" in err.getvalue()
     assert calls.calls == []
 
 
@@ -355,8 +364,12 @@ def test_untracked_or_mutated_intent_cannot_authorize(
             "--body-file", str(body),
         ], StringIO(), err)
 
-        assert rc == 2, state
-        assert "committed intent" in err.getvalue(), state
+        # An untracked intent identifies no change; a mutated one identifies
+        # the change but its committed text grants no authorization.
+        expected = {"untracked": (1, "cannot identify the change"),
+                    "mutated": (2, "committed intent")}[state]
+        assert rc == expected[0], state
+        assert expected[1] in err.getvalue(), state
         assert calls.calls == [], state
 
 
@@ -372,7 +385,7 @@ def test_publish_pushes_exact_head_and_creates_one_pr(tmp_path: Path, monkeypatc
     assert create[create.index("--base") + 1] == "main"
     assert create[create.index("--head") + 1] == "feature"
     assert "https://github.com/example/project/pull/1" in out
-    assert f"Attestation validated for {head}" in out
+    assert f"Verification valid for {head}" in out
     assert "Publication target: github.com/example/project base main" in out
 
 
@@ -541,7 +554,7 @@ def test_publish_reuses_existing_pr_and_replaces_title_and_body(tmp_path: Path, 
     body.write_text(contextual_body(), encoding="utf-8")
     monkeypatch.chdir(repo)
     monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-    monkeypatch.setattr(loom_checker, "_cmd_push", lambda *args, **kwargs: 0)
+    identified(monkeypatch)
     monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
     out, err = StringIO(), StringIO()
     rc = loom_checker.cmd_publish([
@@ -703,9 +716,9 @@ def test_publish_does_not_replay_functional_executables(tmp_path: Path, monkeypa
     calls = ExternalCalls("")
     checked: list[list[str]] = []
 
-    def attestation_only(args, *unused, **kwargs):
-        checked.append(args)
-        return 0
+    def attestation_only(repo, change_id, **kwargs):
+        checked.append([change_id, kwargs])
+        return "valid"
 
     repo = repository(tmp_path)
     body = tmp_path / "body.md"
@@ -713,13 +726,14 @@ def test_publish_does_not_replay_functional_executables(tmp_path: Path, monkeypa
     calls.head = git(repo, "rev-parse", "HEAD")
     monkeypatch.chdir(repo)
     monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-    monkeypatch.setattr(loom_checker, "_cmd_push", attestation_only)
+    identified(monkeypatch)
+    monkeypatch.setattr(loom_checker, "verification_status", attestation_only)
     monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
     assert loom_checker.cmd_publish([
         "--confirm-authorized", "--title", "feat(loom): safe",
         "--body-file", str(body),
     ]) == 0
-    assert checked == [["--head", calls.head, "--require-live-head"]]
+    assert checked == [["change", {"depth": "local", "head": calls.head}]]
 
 
 def test_publish_rejects_diverged_remote_before_push(tmp_path: Path, monkeypatch) -> None:
@@ -731,7 +745,7 @@ def test_publish_rejects_diverged_remote_before_push(tmp_path: Path, monkeypatch
     body.write_text(contextual_body(), encoding="utf-8")
     monkeypatch.chdir(repo)
     monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-    monkeypatch.setattr(loom_checker, "_cmd_push", lambda *args, **kwargs: 0)
+    identified(monkeypatch)
     monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
     err = StringIO()
     rc = loom_checker.cmd_publish([
@@ -781,7 +795,7 @@ def test_publish_rejects_git_redirect_config_before_push(tmp_path: Path, monkeyp
         calls.calls.clear()
         monkeypatch.chdir(repo)
         monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-        monkeypatch.setattr(loom_checker, "_cmd_push", lambda *args, **kwargs: 0)
+        identified(monkeypatch)
         monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
         err = StringIO()
         rc = loom_checker.cmd_publish([
@@ -1209,7 +1223,7 @@ def selected_publication(tmp_path: Path, monkeypatch, lines: list[str]):
     calls.head = git(repo, "rev-parse", "HEAD")
     monkeypatch.chdir(repo)
     monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-    monkeypatch.setattr(loom_checker, "_cmd_push", lambda *args, **kwargs: 0)
+    identified(monkeypatch)
     monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
     err = StringIO()
     rc = loom_checker.cmd_publish([
@@ -1271,6 +1285,103 @@ def test_body_without_disclosure_refused_when_selection_bound(
     assert "push.contextual-body" in err
     assert DISCLOSURE[0] in err
     assert calls.calls == []
+
+
+# --- publish discloses instead of refusing (REQ-5, REQ-10) --------------------
+
+
+def unattested_publication(tmp_path: Path, monkeypatch, body_text: str, *,
+                           with_intent: bool = True):
+    """A branch off main carrying (or not) its committed intent and no
+    attestation, published for real: identification and status are computed."""
+    calls = ExternalCalls("")
+    repo = repository(tmp_path)
+    git(repo, "branch", "main")
+    (repo / "feature.py").write_text("VALUE = 1\n", encoding="utf-8")
+    if with_intent:
+        publication_intent(repo, automatic=False)
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "work without an attestation")
+    body = tmp_path / "body.md"
+    body.write_text(body_text, encoding="utf-8")
+    calls.head = git(repo, "rev-parse", "HEAD")
+    monkeypatch.chdir(repo)
+    monkeypatch.setattr(loom_checker, "run_publish_external", calls)
+    monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
+    out, err = StringIO(), StringIO()
+    rc = loom_checker.cmd_publish([
+        "--confirm-authorized", "--title", "feat(loom): safe", "--body-file", str(body),
+    ], out, err)
+    return rc, out.getvalue(), err.getvalue(), calls
+
+
+def test_good_body_without_attestation_publishes_with_reminder(
+    tmp_path: Path, monkeypatch
+) -> None:
+    rc, out, err, calls = unattested_publication(tmp_path, monkeypatch, contextual_body())
+
+    assert rc == 0, err
+    assert any("push" in call for call in calls.calls)
+    assert any("pr" in call and "create" in call for call in calls.calls)
+    assert (
+        "loom: verification absent (missing: plan, attestation); publishing anyway.\n"
+        in err
+    )
+    assert "BLOCK" not in err
+
+
+def test_bad_body_without_attestation_refused_before_push_naming_heading(
+    tmp_path: Path, monkeypatch
+) -> None:
+    bad = contextual_body().replace(f"## Scope\n{CONTEXT_CONTENT['Scope']}\n\n", "")
+    rc, _out, err, calls = unattested_publication(tmp_path, monkeypatch, bad)
+
+    assert rc == 1
+    assert err == 'BLOCK push.contextual-body: heading "Scope" is missing\n'
+    assert calls.calls == []
+
+
+def test_unidentified_change_refused_before_network(tmp_path: Path, monkeypatch) -> None:
+    rc, _out, err, calls = unattested_publication(
+        tmp_path, monkeypatch, contextual_body(), with_intent=False
+    )
+
+    assert rc == 1
+    assert err == (
+        "BLOCK publish: cannot identify the change — name the branch "
+        "<type>/<change-id> or commit its intent\n"
+    )
+    assert calls.calls == []
+
+
+def test_status_and_skip_lines_in_body_publish(tmp_path: Path, monkeypatch) -> None:
+    lines = ["Verification status: absent", "Skipped by instruction: closing review"]
+    rc, _out, err, calls = unattested_publication(
+        tmp_path, monkeypatch, disclosed_body(lines)
+    )
+
+    assert rc == 0, err
+    assert verification_section(calls.published_bodies[-1])[:2] == lines
+
+
+def test_skipped_steps_line_not_enforced_without_a_bound_selection(
+    tmp_path: Path, monkeypatch
+) -> None:
+    rc, _out, err, _calls = unattested_publication(
+        tmp_path, monkeypatch, disclosed_body([DISCLOSURE[1]])
+    )
+
+    assert rc == 0, err
+
+
+def test_status_and_skip_lines_accepted_beside_a_bound_disclosure() -> None:
+    extra = ["Verification status: valid (skipped: reviewers, adversarial)",
+             "Skipped by instruction: reviewers"]
+    for lines in ([*extra, *DISCLOSURE], [*DISCLOSURE, *extra]):
+        body = disclosed_body(lines)
+        assert publish_rules.validate_selection_disclosure(
+            body, {"selection": SELECTION}
+        ) is None, lines
 
 
 # --- push hook: the reason a blocked push names first -------------------------

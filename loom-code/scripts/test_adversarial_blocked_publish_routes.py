@@ -73,7 +73,14 @@ SESSION = "adversarial-blocked-publish-routes"
 # The reasons origin/main emitted for these inputs. The change may append to
 # them; it may not replace, reword or re-rule them.
 PUSH_REASON = "branch must carry exactly one generated attestation; found "
-LAND_REASON = "branch must carry exactly one attested change; found "
+# `land` no longer counts attestations: on these fixtures (branch `feature`, no
+# intent in the delta) it refuses because the change is unidentified, whatever
+# the attestation count. The text is identify_change's, restated here.
+LAND_UNIDENTIFIED = (
+    "cannot identify the change: branch 'feature' names no committed intent and "
+    "the branch delta carries 0 intent files; rename the branch to "
+    "<type>/<change-id> or commit the intent docs/loom/intent/<change-id>.md"
+)
 
 
 def _tail(count: int) -> str:
@@ -160,14 +167,14 @@ def test_probe_push_refusal_keeps_rule_exit_and_reason_prefix(tmp_path, count) -
 
 @pytest.mark.parametrize("count", [0, 2])
 def test_probe_land_refusal_keeps_rule_exit_and_reason_prefix(tmp_path, count) -> None:
-    """Attack: the same, through `land`'s own earlier refusal site."""
+    """Attack: the same, through `land`'s own earlier refusal site. `land` no
+    longer refuses on the attestation count; what remains is its unidentified-
+    change refusal, under the same rule id and exit code."""
     ids = tuple(f"2026-09-18-change-{index}" for index in range(count))
     result = _checker(_repo(tmp_path, f"land{count}", ids),
                       ["land", "--accepted-by", "kouko"])
     assert result.returncode == 1
-    assert _blocks(result.stderr) == [
-        ("land.merge", f"{LAND_REASON}{count}{_tail(count)}")
-    ]
+    assert _blocks(result.stderr) == [("land.merge", LAND_UNIDENTIFIED)]
 
 
 @pytest.mark.parametrize("count", [0, 1, 2, 3, 4])
@@ -260,24 +267,23 @@ def test_probe_other_derivation_failures_do_not_gain_the_routes(tmp_path) -> Non
     assert PUBLICATION_ROUTES not in reason
 
 
-def test_probe_push_and_land_name_byte_identical_routes(tmp_path) -> None:
-    """Attack: let the two sites drift into naming two different ways out."""
-    push = _checker(_repo(tmp_path, "p"), ["push"]).stderr
+def test_probe_land_names_no_attestation_route(tmp_path) -> None:
+    """Attack: let `land` keep offering the attestation routes after it stopped
+    refusing a missing attestation. Its only refusal here is the unidentified
+    change, which names the fix and no route."""
     land = _checker(_repo(tmp_path, "l"), ["land", "--accepted-by", "kouko"]).stderr
-    assert _blocks(push)[0][0] == "push.attestation"
-    assert _blocks(land)[0][0] == "land.merge"
-    assert PUSH_REASON + "0" in push and LAND_REASON + "0" in land
-    assert push.split(PUSH_REASON + "0", 1)[1] == land.split(LAND_REASON + "0", 1)[1]
+    assert _blocks(land) == [("land.merge", LAND_UNIDENTIFIED)]
+    assert PUBLICATION_ROUTES not in land
 
 
 def test_probe_routes_are_not_appended_twice(tmp_path) -> None:
     """Attack: `land` appends, then delegates to the push handler, which
-    appends again."""
+    appends again. Neither appends now: the refusal carries no route at all."""
     result = _checker(_repo(tmp_path, "twice"), ["land", "--accepted-by", "kouko"])
     (rule, reason), = _blocks(result.stderr)
     assert rule == "land.merge", result.stderr
-    assert reason == f"{LAND_REASON}0{PUBLICATION_ROUTES}", result.stderr
-    assert reason.count("two legal routes") == 1
+    assert reason == LAND_UNIDENTIFIED, result.stderr
+    assert reason.count("two legal routes") == 0
 
 
 # --------------------------------------------------------------------------
@@ -582,6 +588,17 @@ def _attested_branch_with_a_skip(tmp_path: Path) -> tuple[Path, dict]:
     return repo, attestation
 
 
+def _commit_intent(repo: Path, change_id: str) -> None:
+    """`publish` refuses a change it cannot identify; on branch `feature` the
+    one intent in the delta is what identifies it."""
+    intent = repo / "docs" / "loom" / "intent" / f"{change_id}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text("# Change\nstatus: confirmed 2026-09-18\n\n"
+                      "## Proposed outcome\nThe probe's change.\n", encoding="utf-8")
+    _git(repo, "add", str(intent))
+    _git(repo, "commit", "-q", "-m", "intent")
+
+
 def test_probe_finalize_and_push_agree_across_the_seam(tmp_path) -> None:
     """Attack: each half of the seam is proven separately against a
     hand-written payload, so cross it for real -- emit the attestation with
@@ -596,6 +613,7 @@ def test_probe_publish_refuses_a_body_that_hides_the_skip(tmp_path) -> None:
     """Attack: publish a real skipped-reviewer change with a body that says
     nothing about the skip. Repelled by `push.contextual-body`."""
     repo, _attestation = _attested_branch_with_a_skip(tmp_path)
+    _commit_intent(repo, SEAM_CHANGE)
     body = tmp_path / "body-no-disclosure.md"
     body.write_text(_pr_body(), encoding="utf-8")
     result = _checker(repo, ["publish", "--title", "feat(x): seam probe",
@@ -759,9 +777,11 @@ def test_probe_following_the_refusal_verbatim_reaches_a_publishable_state(tmp_pa
     body = tmp_path / "verbatim-body.md"
     body.write_text(_pr_body(tuple(render_selection_disclosure(attestation))),
                     encoding="utf-8")
+    _commit_intent(repo, change_id)
     accepted = _checker(repo, ["publish", "--title", "feat(x): verbatim route",
                                "--body-file", str(body), "--confirm-authorized"])
     assert "push.contextual-body" not in accepted.stderr, accepted.stderr
+    assert "BLOCK publish:" not in accepted.stderr, accepted.stderr
 
 
 def _already_landed_branch(tmp_path: Path, change_id: str, review: Path, *,
@@ -920,19 +940,17 @@ def test_probe_land_always_reports_a_countable_attestation_count(tmp_path) -> No
     """Attack: reach `land`'s unknown-count fallback, which hands a branch the
     extra-attestations remedy without knowing the count is above one.
 
-    Repelled: the reason `land` parses is built as `f'…found {len(candidates)}'`,
-    so the tail after the prefix is always digits and the fallback is dead. It is
-    still the wrong default for an unknown state, and only unreachability is
-    keeping that from mattering."""
+    Repelled differently now: `land` no longer counts attestations at all, so
+    no count reaches its reason. Whatever the count, the refusal on these
+    fixtures is the unidentified change, never the attestation-count reason."""
     for count in (0, 2, 3):
         ids = tuple(f"2026-09-18-change-{index}" for index in range(count))
         result = _checker(_repo(tmp_path, f"count{count}", ids),
                           ["land", "--accepted-by", "kouko"])
         (rule, reason), = _blocks(result.stderr)
         assert rule == "land.merge", result.stderr
-        assert reason.startswith(MISSING_ATTESTATION), reason
-        found = reason.removeprefix(MISSING_ATTESTATION).split(";", 1)[0]
-        assert found.isdigit() and int(found) == count, reason
+        assert not reason.startswith(MISSING_ATTESTATION), reason
+        assert reason == LAND_UNIDENTIFIED, reason
 
 
 SHIP_RULE_SENTENCE = re.search(
@@ -1158,7 +1176,7 @@ def test_probe_hook_enforces_the_whole_contextual_body_rule(tmp_path, monkeypatc
     code, err = _run_hook(repo, _command(repo, "--body-file", str(body)), monkeypatch)
     assert code == 2
     assert err.startswith("BLOCK push.contextual-body: "), err
-    assert "nine top-level contextual headings" in err, err
+    assert 'heading "Context" is missing' in err, err
 
 
 def test_probe_publish_refuses_the_same_naked_body(tmp_path) -> None:
@@ -1171,7 +1189,7 @@ def test_probe_publish_refuses_the_same_naked_body(tmp_path) -> None:
                              "--body-file", str(body), "--confirm-authorized"])
     assert result.returncode == 1
     assert result.stderr.startswith("BLOCK push.contextual-body: ")
-    assert "nine top-level contextual headings" in result.stderr
+    assert 'heading "Context" is missing' in result.stderr
 
 
 @pytest.mark.skipif(not hasattr(os, "mkfifo"), reason="needs FIFOs")
@@ -1481,7 +1499,7 @@ def test_probe_structural_floor_runs_before_the_disclosure_clause(tmp_path, monk
     code, err = _run_hook(repo, _command(repo, "--body-file", str(body)), monkeypatch)
     assert code == 2
     assert _blocks(err.splitlines()[0] + "\n")[0][0] == "push.contextual-body"
-    assert "nine top-level contextual headings" in err
+    assert 'heading "Context" is missing' in err
     assert "Skipped steps" not in err
 
 

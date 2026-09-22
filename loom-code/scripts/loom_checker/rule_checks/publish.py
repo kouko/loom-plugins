@@ -12,6 +12,11 @@ CONTEXTUAL_PR_HEADINGS = (
 DISCLOSURE_PREFIXES = ("Skipped steps:", "Prior failure:")
 
 
+# Ship's own lines: always accepted, never validated -- the CI check recomputes
+# the status, so the body's copy is a courtesy, not a claim anything trusts.
+STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
+
+
 def _body_sections(body: str) -> tuple[list[tuple[str, list[str]]], list[str]]:
     """Top-level `## ` sections and every line outside fenced code."""
     sections: list[tuple[str, list[str]]] = []
@@ -120,7 +125,8 @@ def validate_selection_disclosure(body: str, attestation: object) -> str | None:
     expected = render_selection_disclosure(attestation)
     sections, _ = _body_sections(body)
     verification = next((lines for heading, lines in sections if heading == "Verification"), [])
-    present = [line.rstrip() for line in verification if line.strip()]
+    present = [line.rstrip() for line in verification
+               if line.strip() and not line.startswith(STATUS_PREFIXES)]
     opening, rest = present[:len(expected)], present[len(expected):]
     if opening == expected and not any(line.startswith(DISCLOSURE_PREFIXES) for line in rest):
         return None
