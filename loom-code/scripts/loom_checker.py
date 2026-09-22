@@ -20,6 +20,7 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py land --sweep [--confirm <token>]
     loom_checker.py sync-trunk
     loom_checker.py github-rules [--print-setup]
+    loom_checker.py pr-floor --body-file <f> --base <sha> --head <sha> [--branch <name>]
     loom_checker.py reviewer-count <change-id>
     loom_checker.py finalize-review <change-id> --input <review-input.json>
     loom_checker.py standing <path-to-intent>
@@ -54,6 +55,7 @@ from loom_checker.command_handlers.intents import cmd_intents
 from loom_checker.command_handlers.land import cmd_land
 from loom_checker.command_handlers.plan import cmd_plan
 from loom_checker.command_handlers.publish import cmd_publish
+from loom_checker.command_handlers.pr_floor import cmd_pr_floor
 from loom_checker.command_handlers.push import cmd_push
 from loom_checker.command_handlers.reviewer_count import cmd_reviewer_count
 from loom_checker.command_handlers.selection import cmd_selection
@@ -75,6 +77,7 @@ COMMANDS = {
     "land": cmd_land,
     "sync-trunk": cmd_sync_trunk,
     "github-rules": cmd_github_rules,
+    "pr-floor": cmd_pr_floor,
     "standing": cmd_standing,
     "contract": cmd_contract,
     "charter": cmd_charter,
