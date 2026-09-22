@@ -77,6 +77,16 @@ def test_every_checkout_drops_credentials():
     assert "inputs.loom-ref" in loom["with"]["ref"]
 
 
+def test_every_action_is_pinned_to_a_commit_sha():
+    """A tag can be moved; a privileged pull_request_target job runs only
+    commits it named, with the tag kept as a trailing comment."""
+    lines = [line for line in REUSABLE.read_text(encoding="utf-8").splitlines()
+             if re.match(r"\s*uses:", line)]
+    assert len(lines) == 3
+    for line in lines:
+        assert re.fullmatch(r"\s*uses: actions/[\w-]+@[0-9a-f]{40} # v\d+", line), line
+
+
 def test_no_pr_controlled_text_interpolated_into_a_script():
     tainted = re.compile(
         r"\$\{\{[^}]*github\.event\.pull_request\.(body|title|head\.ref|head\.label)"
