@@ -80,6 +80,7 @@ class LandCalls:
         self.timeouts: list[int] = []
         self.pr_title = PR_TITLE
         self.pr_body = PR_BODY
+        self.pr_bodies: list[str] = []  # successive live bodies, when they change
         self.merge_outcome: subprocess.TimeoutExpired | tuple[int, str] = (0, "")
         self.pr_states: list[dict] = [{"state": "MERGED", "mergeCommit": {"oid": MERGE_OID}}]
         self.body_file_text: str | None = None
@@ -111,7 +112,8 @@ class LandCalls:
             header = "tree " + "0" * 40 + "\nauthor A <a@example.com> 1 +0000\n\n"
             return subprocess.CompletedProcess(argv, 0, header + message, "")
         if "pr" in argv and "view" in argv and "title,body" in argv:
-            payload = {"title": self.pr_title, "body": self.pr_body}
+            body = self.pr_bodies.pop(0) if self.pr_bodies else self.pr_body
+            payload = {"title": self.pr_title, "body": body}
             return subprocess.CompletedProcess(argv, 0, json.dumps(payload), "")
         if "pr" in argv and "view" in argv and "state,mergeCommit" in argv:
             state = self.pr_states.pop(0) if len(self.pr_states) > 1 else self.pr_states[0]
@@ -410,6 +412,45 @@ def test_missing_heading_refuses_names_it(tmp_path: Path, monkeypatch) -> None:
 
     assert rc == 1
     assert err == 'BLOCK land.merge: PR body heading "Risks and rollback" is missing\n'
+    assert "Merged PR" not in out
+    assert no_merge(calls)
+
+
+def test_missing_heading_is_named_before_failing_checks_and_blocked_state(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """With the CI template, a missing heading fails the floor check and
+    GitHub reports BLOCKED; land still names the heading itself."""
+    def configure(calls: LandCalls) -> None:
+        calls.pr_body = PR_BODY.replace(
+            "## Risks and rollback\nThis section covers risks and rollback for the landed change.\n",
+            "",
+        )
+        calls.checks = [[{"name": "pr-floor", "state": "FAILURE", "bucket": "fail"}]]
+        calls.check_returncodes = [1]
+        calls.merge_states = [{"mergeable": "MERGEABLE", "mergeStateStatus": "BLOCKED"}]
+
+    rc, out, err, calls, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", configure=configure
+    )
+
+    assert rc == 1
+    assert err == 'BLOCK land.merge: PR body heading "Risks and rollback" is missing\n'
+    assert "Merged PR" not in out
+    assert not any("checks" in call for call in calls.calls)
+    assert no_merge(calls)
+
+
+def test_body_changed_after_it_was_checked_refuses(tmp_path: Path, monkeypatch) -> None:
+    def configure(calls: LandCalls) -> None:
+        calls.pr_bodies = [PR_BODY, PR_BODY + "\nEdited while the checks ran.\n"]
+
+    rc, out, err, calls, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", configure=configure
+    )
+
+    assert rc == 1
+    assert err == "BLOCK land.merge: PR body changed after it was checked; run land again\n"
     assert "Merged PR" not in out
     assert no_merge(calls)
 

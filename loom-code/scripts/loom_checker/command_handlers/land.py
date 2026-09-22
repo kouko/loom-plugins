@@ -89,6 +89,7 @@ class LandTarget:
     env: dict[str, str]
     change_id: str = ""
     status: str = ""  # verification status at local depth, computed before merging
+    body: str = ""  # the live PR body checked before the checks and merge state
 
 
 def _usage(reason: str, err) -> int:
@@ -768,6 +769,24 @@ def _acceptance_line(repo: Path, change_id: str, accepted_by: str) -> str:
     return line
 
 
+def _live_title_body(
+    number: int, *, trusted_gh: str, repo: Path, env: dict[str, str], err
+) -> tuple[str, str] | None:
+    """(title, body) of the live PR, or None after a reported block."""
+    view = _read(
+        [trusted_gh, "pr", "view", str(number), "--json", "title,body"],
+        "PR title and body lookup", repo=repo, env=env, err=err,
+    )
+    if view is None:
+        return None
+    try:
+        payload = json.loads(view.stdout)
+        return str(payload["title"]), str(payload.get("body") or "")
+    except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as exc:
+        _block(f"cannot decode PR title and body: {exc}", err)
+        return None
+
+
 def _merged_state(target: LandTarget, err) -> tuple[str, str] | None:
     """(state, mergeCommit oid) from GitHub, or None after a reported block."""
     result = _read(
@@ -790,23 +809,14 @@ def _squash_merge(
 ) -> tuple[str, str, str] | None:
     """Spec 'Merge command': squash with the PR title and body; returns
     (merge commit oid, title, body) once GitHub reports the PR merged."""
-    view = _read(
-        [target.trusted_gh, "pr", "view", str(target.number), "--json", "title,body"],
-        "PR title and body lookup", repo=target.repo, env=target.env, err=err,
-    )
-    if view is None:
+    live = _live_title_body(target.number, trusted_gh=target.trusted_gh,
+                            repo=target.repo, env=target.env, err=err)
+    if live is None:
         return None
-    try:
-        payload = json.loads(view.stdout)
-        title = str(payload["title"])
-        body = str(payload.get("body") or "")
-    except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as exc:
-        _block(f"cannot decode PR title and body: {exc}", err)
-        return None
-    # The live body is the one squashed, so it is the one checked.
-    fault = validate_contextual_pr_body(body)
-    if fault:
-        _block(fault if fault.startswith("PR body") else f"PR body {fault}", err)
+    title, body = live
+    # The body squashed is the body checked before the checks were read.
+    if body != target.body:
+        _block("PR body changed after it was checked; run land again", err)
         return None
     acceptance = _acceptance_line(target.repo, target.change_id, accepted_by)
     message = f"{body.rstrip()}\n\n{acceptance}\n"
@@ -1004,6 +1014,17 @@ def _merge_preconditions(
             f"PR #{number} head {pr_head[:7]} is not HEAD {head[:7]}; publish again", err
         )
 
+    # The live body is the one squashed, so it is checked first: a missing
+    # heading also fails the floor check and blocks the merge state, and
+    # only this names the heading.
+    live = _live_title_body(number, trusted_gh=trusted_gh, repo=repo, env=env, err=err)
+    if live is None:
+        return 1
+    body = live[1]
+    fault = validate_contextual_pr_body(body)
+    if fault:
+        return _block(fault if fault.startswith("PR body") else f"PR body {fault}", err)
+
     # (4) every check, not only required ones
     if _observe_all_checks(number, trusted_gh=trusted_gh, repo=repo, env=env,
                            out=out, err=err) != 0:
@@ -1014,7 +1035,7 @@ def _merge_preconditions(
         return 1
 
     return LandTarget(repo, head, branch, base, identity, number, trusted_git, trusted_gh, env,
-                      change_id, status)
+                      change_id, status, body)
 
 
 def _observe_all_checks(
