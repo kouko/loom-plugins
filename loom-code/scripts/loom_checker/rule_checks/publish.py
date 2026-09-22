@@ -39,14 +39,30 @@ def _body_sections(body: str) -> tuple[list[tuple[str, list[str]]], list[str]]:
     return sections, outside_fences
 
 
+def _heading_fault(headings: list[str]) -> str | None:
+    """The first heading that breaks "the nine, exactly once, in order"."""
+    for index, found in enumerate(headings):
+        if found not in CONTEXTUAL_PR_HEADINGS:
+            return f'heading "{found}" is not one of the nine contextual headings'
+        if found in headings[:index]:
+            return f'heading "{found}" is duplicated'
+        expected = CONTEXTUAL_PR_HEADINGS[index] if index < len(CONTEXTUAL_PR_HEADINGS) else None
+        if found == expected:
+            continue
+        if expected is not None and expected not in headings:
+            return f'heading "{expected}" is missing'
+        return f'heading "{found}" is out of order'
+    if len(headings) < len(CONTEXTUAL_PR_HEADINGS):
+        return f'heading "{CONTEXTUAL_PR_HEADINGS[len(headings)]}" is missing'
+    return None
+
+
 def validate_contextual_pr_body(body: str) -> str | None:
     """Recompute the structural PR-body floor; semantic truth stays review-owned."""
     sections, outside_fences = _body_sections(body)
-    if [heading for heading, _content in sections] != list(CONTEXTUAL_PR_HEADINGS):
-        return (
-            "PR body must contain Ship's nine top-level contextual headings "
-            "exactly once and in order, with no competing top-level heading"
-        )
+    fault = _heading_fault([heading for heading, _content in sections])
+    if fault:
+        return fault
     for heading, lines in sections:
         content = "\n".join(lines)
         visible = re.sub(r"<!--.*?-->", " ", content, flags=re.DOTALL)
@@ -61,7 +77,7 @@ def validate_contextual_pr_body(body: str) -> str | None:
             (alphanumeric_count < 8 or one_ascii_token or template_placeholder)
             and not sentinel
         ):
-            return f"PR body section {heading!r} has no substantive content"
+            return f'heading "{heading}" is empty'
     visible_body = re.sub(
         r"<!--.*?-->", " ", "\n".join(outside_fences), flags=re.DOTALL
     )

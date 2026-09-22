@@ -432,6 +432,32 @@ def test_contextual_body_gate_rejects_malformed_or_unsafe_schema() -> None:
         assert loom_checker.validate_contextual_pr_body(body) is not None, name
 
 
+def test_contextual_body_gate_names_the_missing_heading() -> None:
+    body = contextual_body().replace(f"## Scope\n{CONTEXT_CONTENT['Scope']}\n\n", "")
+
+    assert loom_checker.validate_contextual_pr_body(body) == 'heading "Scope" is missing'
+
+
+def test_contextual_body_gate_names_duplicated_out_of_order_and_empty_headings() -> None:
+    valid = contextual_body()
+    cases = {
+        valid + "\n## Context\nAgain, the context repeats here.\n":
+            'heading "Context" is duplicated',
+        valid.replace(
+            f"## Context\n{CONTEXT_CONTENT['Context']}\n\n"
+            f"## Intended outcome\n{CONTEXT_CONTENT['Intended outcome']}",
+            f"## Intended outcome\n{CONTEXT_CONTENT['Intended outcome']}\n\n"
+            f"## Context\n{CONTEXT_CONTENT['Context']}",
+        ): 'heading "Intended outcome" is out of order',
+        contextual_body(overrides={"Decisions": "..."}): 'heading "Decisions" is empty',
+        valid + "\n## Memory\nLegacy section kept for history.\n":
+            'heading "Memory" is not one of the nine contextual headings',
+        "": 'heading "Context" is missing',
+    }
+    for body, expected in cases.items():
+        assert loom_checker.validate_contextual_pr_body(body) == expected, expected
+
+
 def test_contextual_body_gate_accepts_simple_and_mermaid_bodies() -> None:
     assert loom_checker.validate_contextual_pr_body(contextual_body()) is None
     assert loom_checker.validate_contextual_pr_body(contextual_body(mermaid=True)) is None
@@ -1750,7 +1776,7 @@ def test_hook_refuses_a_body_it_could_not_read_even_with_nothing_to_disclose(
 
     assert rc == 2
     assert err.startswith("BLOCK push.contextual-body: ")
-    assert "nine top-level contextual headings" in err
+    assert 'heading "Context" is missing' in err
 
 
 # --- the body read cannot hang or overrun the hook (finding F10) --------------
