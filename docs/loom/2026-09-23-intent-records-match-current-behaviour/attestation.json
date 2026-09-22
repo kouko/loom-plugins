@@ -1,0 +1,69 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-23-intent-records-match-current-behaviour",
+  "content_digest": "f529b550064e921cae438ca8c6710e07f8280cd3",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-23-intent-records-match-current-behaviour/evidence/probes/test_intent_wording_preserved.py -q",
+      "artifact": "docs/loom/2026-09-23-intent-records-match-current-behaviour/evidence/probes/test_intent_wording_preserved.py",
+      "result": "pass",
+      "command_digest": "30dcbd9c3c854bfc2ffa4fa31247a2e173b322a7f0681395bca271074c6897f9"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-23-intent-records-match-current-behaviour/evidence/probes/test_acceptance_numbers_and_status.py -q",
+      "artifact": "docs/loom/2026-09-23-intent-records-match-current-behaviour/evidence/probes/test_acceptance_numbers_and_status.py",
+      "result": "pass",
+      "command_digest": "133a2efdc831f02d571d07b1e964252f1c6dbc17e86377939460e2f039273fae"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-23-intent-records-match-current-behaviour/evidence/probes/test_later_changes_claims_match_code.py -q",
+      "artifact": "docs/loom/2026-09-23-intent-records-match-current-behaviour/evidence/probes/test_later_changes_claims_match_code.py",
+      "result": "pass",
+      "command_digest": "003e9fa40939956cecef539e171ae2766b5cb33522fc39fb0eb3d2747bd1a8b9"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-23-intent-records-match-current-behaviour/evidence/probes/test_expert_mode_skipped_review_listing.py -q",
+      "artifact": "docs/loom/2026-09-23-intent-records-match-current-behaviour/evidence/probes/test_expert_mode_skipped_review_listing.py",
+      "result": "pass",
+      "command_digest": "a7ab8def6dcd4adcb9807f2662d109e845353fad108c8bc2ab7eb70d16873613"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_committed_branch_paths_dirty_tree_disagreement.py -q",
+      "artifact": "docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_committed_branch_paths_dirty_tree_disagreement.py",
+      "result": "pass",
+      "command_digest": "49f7fcd4b6f3af5dce929346c8ac5a93b0c01be866835ef381d68407d9c7f3e2"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-2",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

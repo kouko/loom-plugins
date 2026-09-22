@@ -58,5 +58,10 @@ tried. It never cycles between stations in silence.
 - Changing how a user-requested skip is confirmed. See intent
   2026-09-19-expert-mode-skip-friction.
 
+## Later changes
+- PR #43 made two lines historical. The Problem's "Ship refuses because the attestation is absent": Ship now publishes an unattested change with the verification status disclosed. The Constraint "Leave the expert-mode skip confirmation exactly as it is": plain-words skips now exist beside the typed route. Ship's current behaviour is in `loom-code/skills/ship/SKILL.md` §3.
+- No Acceptance line was replaced: the absence-recovery rules still hold in `loom-code/skills/build/SKILL.md` §3 and `loom-code/skills/closing-review/SKILL.md`.
+- Decision recorded in #43's PR body Decisions table and intent 2026-09-22-publication-floor-moves-to-github.
+
 ## Open questions
 - none

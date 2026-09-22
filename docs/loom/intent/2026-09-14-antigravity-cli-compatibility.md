@@ -45,5 +45,9 @@ enforced, while Claude Code and Codex installs keep working exactly as before.
 - distill-sessions and handoff reading Antigravity conversation transcripts.
 - Using Antigravity as the second-vendor reviewer from Claude Code or Codex.
 
+## Later changes
+- PR #43 replaced Acceptance 4 and the Constraints bullet on which pushes the push gate blocks: in agy an unattested push is no longer blocked. `loom-code/hooks/agy_adapter.py` allows publication commands, with a reminder. It denies a command only when the checker exits 2 (the `selection.guard` refusal), when the payload has no CommandLine or cannot be read, or, when the checker is missing or fails, when the command names or runs inside the selection record store.
+- Decision recorded in #43's PR body Decisions table and intent 2026-09-22-publication-floor-moves-to-github.
+
 ## Open questions
 - none

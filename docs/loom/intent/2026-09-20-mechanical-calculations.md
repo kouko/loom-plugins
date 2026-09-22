@@ -39,6 +39,12 @@ The checker computes the ritual scale from the complete branch delta. A narrow, 
 - P1's consolidation of PR #30 adversarial tests.
 - The pending branch-fate decisions and the dotfiles permission-list change.
 
+## Later changes
+
+- No Acceptance line was replaced. The Constraints bullet saying the branch delta includes staged, unstaged and untracked paths does not match the shipped mechanism: `committed_branch_paths` in `loom-code/scripts/loom_checker/reviewers.py` counts committed paths only, on purpose.
+- Why: working-tree and staged edits are not yet part of the change that reviewers and finalize-review see, so counting them would make the auto-skip and the reviewer floor disagree with what is reviewed (the function's docstring).
+- Decided by the agent during this change's own build (plan task W1-01 in `docs/loom/2026-09-20-mechanical-calculations/plan.md`) and pinned by `docs/loom/2026-09-20-mechanical-calculations/evidence/probes/test_committed_branch_paths_dirty_tree_disagreement.py`; not a PR #43 change.
+
 ## Open questions
 
 - none
