@@ -1,5 +1,8 @@
 """`land --accepted-by` merge preconditions, squash merge and verification
-(plan W2-01, W2-02; spec REQ-1..REQ-4).
+(plan W2-01, W2-02; spec REQ-1..REQ-4), and since plan W1-02 of
+2026-09-22-publication-floor-moves-to-github: the change is identified
+without an attestation, the live PR body is checked, and a missing or stale
+attestation is disclosed rather than refused (spec REQ-6).
 
 Every git and gh network call goes through `land.run_land_external`, which a
 fake replaces here; waits go through `land.wait_land_interval`, recorded
@@ -15,6 +18,7 @@ from io import StringIO
 from pathlib import Path
 
 from loom_checker.command_handlers import land
+from loom_checker.rule_checks.publish import CONTEXTUAL_PR_HEADINGS
 
 ACCEPTANCE_BLOCK = (
     "BLOCK land.merge: blind-run acceptance not recorded; "
@@ -23,7 +27,11 @@ ACCEPTANCE_BLOCK = (
 PASS = {"name": "gate", "state": "SUCCESS", "bucket": "pass"}
 MERGE_OID = "a1b2c3d" + "0" * 33
 PR_TITLE = "Land merged changes"
-PR_BODY = "## Summary\nLands the change.\n\n- item one\n"
+PR_BODY = "\n".join(
+    f"## {heading}\nThis section covers {heading.lower()} for the landed change.\n"
+    for heading in CONTEXTUAL_PR_HEADINGS
+)
+REMINDER = "loom: verification absent (missing: attestation); merged anyway.\n"
 
 
 def git(repo: Path, *args: str) -> str:
@@ -51,9 +59,9 @@ def change_repository(tmp_path: Path, *, publication: str = "", prepare=None) ->
         f"{publication}\n## Proposed outcome\nLand it.\n",
         encoding="utf-8",
     )
-    attestation = repo / "docs" / "loom" / "change" / "attestation.json"
-    attestation.parent.mkdir(parents=True)
-    attestation.write_text(json.dumps({"change_id": "change"}), encoding="utf-8")
+    plan = repo / "docs" / "loom" / "change" / "plan.md"
+    plan.parent.mkdir(parents=True)
+    plan.write_text("# Plan\n", encoding="utf-8")
     if prepare:
         prepare(repo)
     git(repo, "add", ".")
@@ -139,7 +147,6 @@ def invoke(tmp_path: Path, monkeypatch, *args: str, publication: str = "",
     monkeypatch.chdir(repo)
     monkeypatch.setattr(land, "run_land_external", calls)
     monkeypatch.setattr(land, "wait_land_interval", waits.append)
-    monkeypatch.setattr(land, "_cmd_push", lambda *a, **k: 0)
     # Trunk sync and cleanup after the merge are covered by test_land_cleanup.py.
     monkeypatch.setattr(land, "_sync_and_clean", lambda *a, **k: 0)
     monkeypatch.setattr(
@@ -316,23 +323,67 @@ def test_pr_head_other_than_head_blocks(tmp_path: Path, monkeypatch) -> None:
     assert not any("checks" in call for call in calls.calls)
 
 
-def test_invalid_attestation_blocks_before_github(tmp_path: Path, monkeypatch) -> None:
-    repo = change_repository(tmp_path)
-    calls = LandCalls(git(repo, "rev-parse", "HEAD"))
-    monkeypatch.chdir(repo)
-    monkeypatch.setattr(land, "run_land_external", calls)
-    monkeypatch.setattr(land, "_cmd_push", lambda *a, **k: 1)
-    monkeypatch.setattr(
-        land, "resolve_publish_executable",
-        lambda name: "/usr/bin/git" if name == "git" else "/usr/local/bin/gh",
+# unidentified-change-blocks-before-github
+def test_unidentified_change_blocks_before_github(tmp_path: Path, monkeypatch) -> None:
+    def second_intent(repo: Path) -> None:
+        other = repo / "docs" / "loom" / "intent" / "other.md"
+        other.write_text("# Other\noriginator: kouko\n", encoding="utf-8")
+
+    rc, out, err, calls, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", prepare=second_intent
     )
 
-    err = StringIO()
-    rc = land.cmd_land(["--accepted-by", "kouko"], StringIO(), err)
+    assert rc == 1
+    assert err.startswith("BLOCK land.merge: cannot identify the change"), err
+    assert err.count("\n") == 1, err
+    assert calls.calls == []
+    assert out == ""
+
+
+# A6 positive: no-attestation-good-body-merges-with-reminder
+def test_no_attestation_good_body_merges_with_reminder(tmp_path: Path, monkeypatch) -> None:
+    rc, out, err, calls, _ = invoke(tmp_path, monkeypatch, "--accepted-by", "kouko")
+
+    assert rc == 0, err
+    assert err == ""
+    assert out.endswith("\nMerged PR #7 as a1b2c3d\n" + REMINDER), out
+    assert len(calls.merge_calls()) == 1
+
+
+# stale-attestation-merges-with-reminder
+def test_stale_attestation_merges_with_reminder(tmp_path: Path, monkeypatch) -> None:
+    def stale_attestation(repo: Path) -> None:
+        attestation = repo / "docs" / "loom" / "change" / "attestation.json"
+        attestation.write_text(json.dumps({"change_id": "change"}), encoding="utf-8")
+
+    rc, out, err, calls, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", prepare=stale_attestation
+    )
+
+    assert rc == 0, err
+    assert re.fullmatch(
+        r".*\nMerged PR #7 as a1b2c3d\nloom: verification stale \(.+\); merged anyway\.\n",
+        out, re.DOTALL,
+    ), out
+    assert len(calls.merge_calls()) == 1
+
+
+# A6 negative: missing-heading-refuses-names-it
+def test_missing_heading_refuses_names_it(tmp_path: Path, monkeypatch) -> None:
+    def configure(calls: LandCalls) -> None:
+        calls.pr_body = PR_BODY.replace(
+            "## Risks and rollback\nThis section covers risks and rollback for the landed change.\n",
+            "",
+        )
+
+    rc, out, err, calls, _ = invoke(
+        tmp_path, monkeypatch, "--accepted-by", "kouko", configure=configure
+    )
 
     assert rc == 1
-    assert calls.calls == []
-    assert "return to closing-review" in err.getvalue()
+    assert err == 'BLOCK land.merge: PR body heading "Risks and rollback" is missing\n'
+    assert "Merged PR" not in out
+    assert no_merge(calls)
 
 
 # A1 positive: accepted-green-pr-merges-with-match-head
@@ -441,7 +492,7 @@ def test_body_whitespace_runs_are_normalized_in_verification(
 ) -> None:
     def configure(calls: LandCalls) -> None:
         calls.commit_message = (
-            f"{PR_TITLE} (#7)\n\n## Summary\n\nLands   the change.\n- item one\n"
+            f"{PR_TITLE} (#7)\n\n" + PR_BODY.replace(" ", "   ").replace("\n## ", "\n\n## ")
         )
 
     rc, out, err, _, _ = invoke(
@@ -462,7 +513,7 @@ def test_title_only_commit_verify_blocks(tmp_path: Path, monkeypatch) -> None:
     )
 
     assert rc == 1
-    assert out.endswith("Merged PR #7 as a1b2c3d\n"), out
+    assert out.endswith("Merged PR #7 as a1b2c3d\n" + REMINDER), out
     assert err == "BLOCK land.verify: squash commit lacks the PR body\n"
 
 

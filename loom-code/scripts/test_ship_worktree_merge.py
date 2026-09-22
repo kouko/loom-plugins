@@ -184,11 +184,6 @@ def test_cmd_push_noncanonical_git_push_remains_blocked(
     assert "canonical quote-all rendering" in err.getvalue()
 
 
-MERGE_UNATTESTED_REASON = (
-    "BLOCK land.merge: branch must carry exactly one attested change; found 0"
-)
-
-
 def _git(repo: Path, *args: str) -> str:
     return subprocess.run(
         ["git", "-C", str(repo), *args], check=True, capture_output=True, text=True
@@ -200,8 +195,8 @@ def _land_without_attestation(
 ) -> tuple[int, str, list]:
     """`land --accepted-by` on a branch that carries a committed intent and
     `attestations` attested changes. Every gh and git call goes through
-    `run_land_external`, which records here instead of running, so nothing
-    reaches GitHub."""
+    `run_land_external`, which records here and fails as if offline, so
+    nothing reaches GitHub."""
     repo = tmp_path / "repo"
     repo.mkdir(parents=True)
     _git(repo, "init", "-q")
@@ -228,8 +223,13 @@ def _land_without_attestation(
     _git(repo, "commit", "-q", "-m", "change")
 
     calls: list = []
+
+    def offline(argv, _timeout, **_kwargs):
+        calls.append(list(argv))
+        return subprocess.CompletedProcess(argv, 1, "", "offline")
+
     monkeypatch.chdir(repo)
-    monkeypatch.setattr(land, "run_land_external", lambda argv, _t, **_k: calls.append(list(argv)))
+    monkeypatch.setattr(land, "run_land_external", offline)
     monkeypatch.setattr(
         land, "resolve_publish_executable",
         lambda name: "/usr/bin/git" if name == "git" else "/usr/local/bin/gh",
@@ -239,27 +239,21 @@ def _land_without_attestation(
     return rc, err.getvalue(), calls
 
 
-# A2 positive: merge-refusal-names-both-routes. With no attestation `land`
-# refuses at the acceptance step, before the shared publication check, so this
-# is the site a caller actually sees; it names the same two routes the
-# publication refusal names, and forbids handing the command over.
-def test_merge_refusal_names_both_routes(tmp_path: Path, monkeypatch) -> None:
+# With no attestation `land` identifies the change from its one intent and
+# goes on to GitHub (spec REQ-6): the refusal it used to give here, with its
+# two routes, is gone, and nothing tells the caller to hand a command over.
+def test_merge_without_attestation_reaches_github(tmp_path: Path, monkeypatch) -> None:
     rc, err, calls = _land_without_attestation(tmp_path, monkeypatch)
 
     assert rc == 1
-    assert calls == []
-    reason = err.splitlines()[0]
-    assert reason.startswith("BLOCK land.merge: ")
-    assert "run the closing-review station" in reason
-    assert "selection propose <change-id> --origin agent --skip reviewers" in reason
-    assert "confirms by typing `/loom-code:expert-mode <code>`" in reason
-    assert "never hand the blocked publication command to the user to run" in reason
+    assert calls and calls[0][1:3] == ["repo", "view"]
+    assert err == "BLOCK land.merge: default branch lookup failed: offline\n"
 
 
-# A2, count greater than one: the merge refusal names the routes only where
-# they work. With two attested changes in the delta neither route reduces the
-# count, so the same site names the action that does.
-def test_merge_refusal_with_two_attested_changes_names_no_dead_route(
+# Two attested changes disagree with the change the branch carries: `land`
+# cannot identify the change, refuses on one line naming the fix, and reaches
+# nothing on GitHub.
+def test_merge_with_two_attested_changes_is_unidentified(
     tmp_path: Path, monkeypatch
 ) -> None:
     rc, err, calls = _land_without_attestation(tmp_path, monkeypatch, attestations=2)
@@ -268,14 +262,8 @@ def test_merge_refusal_with_two_attested_changes_names_no_dead_route(
     assert calls == []
     lines = err.splitlines()
     assert len(lines) == 1
-    reason = lines[0]
-    assert reason.startswith(
-        "BLOCK land.merge: branch must carry exactly one attested change; found 2"
-    )
-    assert "two legal routes" not in reason
-    assert "selection propose" not in reason
-    assert "the branch delta has to end at one attested change" in reason
-    assert "never hand the blocked publication command to the user to run" in reason
+    assert lines[0].startswith("BLOCK land.merge: the branch identifies change 'change'")
+    assert "rename the branch to <type>/<change-id>" in lines[0]
 
 
 def _land_on_a_branch_that_adds_nothing(tmp_path: Path, monkeypatch) -> tuple[int, str, list]:
@@ -324,9 +312,10 @@ def _land_on_a_branch_that_adds_nothing(tmp_path: Path, monkeypatch) -> tuple[in
     return rc, err.getvalue(), calls
 
 
-# A2, empty delta over an attesting base: `land` reaches the same tail the push
-# route does, and it is pinned at both sites rather than at one.
-def test_merge_refusal_on_a_branch_that_adds_nothing_names_no_route(
+# Empty delta over an attesting base, on a branch that does not name the
+# change: nothing identifies it, so `land` refuses on one line naming the fix
+# and reaches nothing on GitHub.
+def test_merge_on_a_branch_that_adds_nothing_is_unidentified(
     tmp_path: Path, monkeypatch
 ) -> None:
     rc, err, calls = _land_on_a_branch_that_adds_nothing(tmp_path, monkeypatch)
@@ -335,16 +324,5 @@ def test_merge_refusal_on_a_branch_that_adds_nothing_names_no_route(
     assert calls == []
     lines = err.splitlines()
     assert len(lines) == 1
-    assert lines[0] == f"{MERGE_UNATTESTED_REASON}{loom_checker.NOTHING_TO_PUBLISH}"
-
-
-# A2 negative: merge-without-attestation-still-refused. The refusal keeps the
-# rule id, the exit code and the reason it opened with, on one line.
-def test_merge_without_attestation_still_refused(tmp_path: Path, monkeypatch) -> None:
-    rc, err, calls = _land_without_attestation(tmp_path, monkeypatch)
-
-    assert rc == 1
-    assert calls == []
-    lines = err.splitlines()
-    assert len(lines) == 1
-    assert lines[0].startswith(MERGE_UNATTESTED_REASON)
+    assert lines[0].startswith("BLOCK land.merge: cannot identify the change")
+    assert "rename the branch to <type>/<change-id>" in lines[0]

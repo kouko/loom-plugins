@@ -2,19 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
-from loom_checker.command_handlers.publish import MISSING_ATTESTATION
 from loom_checker.command_handlers.publish import PUBLISH_CI_PENDING_WAITS
 from loom_checker.command_handlers.publish import PUBLISH_CI_POLL_SECONDS
 from loom_checker.command_handlers.publish import PUBLISH_CI_REGISTRATION_WAITS
 from loom_checker.command_handlers.publish import PUBLISH_REDIRECT_CONFIG
 from loom_checker.command_handlers.publish import PUBLISH_REDIRECT_ENV
-from loom_checker.command_handlers.publish import _publication_change_id
 from loom_checker.command_handlers.publish import _publish_env
 from loom_checker.command_handlers.publish import _publish_origin_state
 from loom_checker.command_handlers.publish import resolve_publish_executable
-from loom_checker.command_handlers.push import _cmd_push
-from loom_checker.command_handlers.push import nothing_left_to_publish
-from loom_checker.command_handlers.push import publication_advice
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import git_maybe
@@ -24,7 +19,12 @@ from loom_checker.helpers import load_manifest
 from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
 from loom_checker.parsing import parse_document
+from loom_checker.rule_checks.publish import validate_contextual_pr_body
 from loom_checker.rule_checks.push import github_repo_from_origin
+from loom_checker.verification import identify_change
+from loom_checker.verification import missing_clause
+from loom_checker.verification import missing_records
+from loom_checker.verification import verification_status
 from pathlib import Path
 from urllib.parse import quote
 import hashlib
@@ -87,6 +87,8 @@ class LandTarget:
     trusted_git: str
     trusted_gh: str
     env: dict[str, str]
+    change_id: str = ""
+    status: str = ""  # verification status at local depth, computed before merging
 
 
 def _usage(reason: str, err) -> int:
@@ -180,6 +182,10 @@ def _land_accepted(
         return 1
     merge_commit, title, body = merged
     out.write(f"Merged PR #{target.number} as {merge_commit[:7]}\n")
+    if target.status == "absent" or target.status.startswith("stale"):
+        clause = missing_clause(missing_records(target.repo, target.change_id, target.status))
+        out.write(f"loom: verification {target.status}{' ' + clause if clause else ''}; "
+                  "merged anyway.\n")
     if _verify_merge(target, merge_commit, title, body, err) != 0:
         return 1
     return _sync_and_clean(target, out, err)
@@ -748,11 +754,10 @@ def _normalized(text: str) -> str:
     return " ".join(text.split())
 
 
-def _acceptance_line(repo: Path, accepted_by: str) -> str:
+def _acceptance_line(repo: Path, change_id: str, accepted_by: str) -> str:
     """`Accepted-by: <name> <date>`, citing the blind-run report blob when one
     is committed at HEAD."""
     line = f"Accepted-by: {accepted_by} {date.today().isoformat()}"
-    change_id, _error = _publication_change_id(repo)
     if change_id:
         report_rel = artifact_path(
             load_manifest(), "blind-run-report", change_id, repo
@@ -798,7 +803,13 @@ def _squash_merge(
     except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as exc:
         _block(f"cannot decode PR title and body: {exc}", err)
         return None
-    message = f"{body.rstrip()}\n\n{_acceptance_line(target.repo, accepted_by)}\n"
+    # The live body is the one squashed, so it is the one checked.
+    fault = validate_contextual_pr_body(body)
+    if fault:
+        _block(fault if fault.startswith("PR body") else f"PR body {fault}", err)
+        return None
+    acceptance = _acceptance_line(target.repo, target.change_id, accepted_by)
+    message = f"{body.rstrip()}\n\n{acceptance}\n"
 
     with tempfile.TemporaryDirectory(prefix="loom-land-") as message_dir:
         body_file = Path(message_dir) / "squash-body.md"
@@ -870,17 +881,14 @@ def _verify_merge(
     return 0
 
 
-def _accepted_names(repo: Path) -> tuple[set[str], str | None]:
+def _accepted_names(repo: Path, change_id: str) -> tuple[set[str], str | None]:
     """Names that may accept: the committed intent's originator and the
     authorizer in its `publication:` line."""
-    change_id, error = _publication_change_id(repo)
-    if error:
-        return set(), error
     intent_rel = artifact_path(load_manifest(), "intent", change_id, repo).relative_to(repo)
     try:
         committed = git_text(repo, "show", f"HEAD:{intent_rel}")
     except UsageError:
-        return set(), "the attested change's intent is not committed at HEAD"
+        return set(), "the change's intent is not committed at HEAD"
     front, _sections = parse_document(committed)
     names = set()
     if front.get("originator", "").strip():
@@ -919,21 +927,14 @@ def _merge_preconditions(
     except UsageError as exc:
         return _block(str(exc), err)
 
-    # (1) acceptance
-    names, intent_error = _accepted_names(repo)
+    # (1) the change, from the branch name or its one intent; no attestation needed
+    change_id, identify_error = identify_change(repo)
+    if identify_error:
+        return _block(identify_error, err)
+
+    # (2) acceptance
+    names, intent_error = _accepted_names(repo, change_id)
     if intent_error:
-        # With no attestation the acceptor set cannot be derived, so the merge
-        # refuses here — before the shared publication check at (2) ever runs.
-        # This is the refusal a caller sees, so it carries the same tail out —
-        # chosen by the count publish.py printed after `found `, because above
-        # one the two routes name nothing that reduces it. A count that is not a
-        # plain integer is passed as None, which takes the tail naming no route.
-        if intent_error.startswith(MISSING_ATTESTATION):
-            found = intent_error.removeprefix(MISSING_ATTESTATION)
-            count = int(found) if found.isdigit() else None
-            intent_error += publication_advice(
-                count, count == 0 and nothing_left_to_publish(repo)
-            )
         return _block(intent_error, err)
     if accepted_by not in names:
         return _block(ACCEPTANCE_NOT_RECORDED, err)
@@ -950,9 +951,8 @@ def _merge_preconditions(
         return _block("literal origin is not a supported GitHub repository URL", err)
     env = _publish_env(identity, repo, (trusted_git, trusted_gh))
 
-    # (2) attestation at live HEAD
-    if _cmd_push(["--head", head, "--require-live-head"], out, err) != 0:
-        return _block("attestation does not validate at HEAD; return to closing-review", err)
+    # Disclosed after the merge, never refused (spec 'Skipping').
+    status = verification_status(repo, change_id, depth="local")
 
     # (3) exactly one open PR for this branch against the default base
     base_result = _read(
@@ -1013,7 +1013,8 @@ def _merge_preconditions(
     if _await_mergeable(number, trusted_gh=trusted_gh, repo=repo, env=env, err=err) != 0:
         return 1
 
-    return LandTarget(repo, head, branch, base, identity, number, trusted_git, trusted_gh, env)
+    return LandTarget(repo, head, branch, base, identity, number, trusted_git, trusted_gh, env,
+                      change_id, status)
 
 
 def _observe_all_checks(

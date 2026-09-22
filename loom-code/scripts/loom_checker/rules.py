@@ -130,10 +130,12 @@ RULES.append((
 
 RULES.append((
     "land.merge",
-    "land merges nothing unless every precondition holds: an --accepted-by name equal to "
-    "the intent's originator or publication authorizer, a valid attestation at HEAD, one "
-    "open PR whose head is HEAD, every check passed (not only required ones), and a "
-    "MERGEABLE state other than BLOCKED, DIRTY, BEHIND, UNSTABLE, or DRAFT.",
+    "land merges nothing unless every precondition holds: the change identified from the "
+    "branch name or its one intent file, an --accepted-by name equal to the intent's "
+    "originator or publication authorizer, a live PR body with the nine contextual "
+    "headings, one open PR whose head is HEAD, every check passed (not only required "
+    "ones), and a MERGEABLE state other than BLOCKED, DIRTY, BEHIND, UNSTABLE, or DRAFT. "
+    "No attestation is required; an absent or stale one is printed after the merge.",
 ))
 
 
