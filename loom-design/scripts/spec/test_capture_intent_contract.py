@@ -474,10 +474,10 @@ def test_loom_design_version_2_2_0_consistent() -> None:
         (REPO / "loom-design/plugin.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.2.0"
-    assert codex_manifest["version"] == "2.2.0"
-    assert agy_manifest["version"] == "2.2.0"
-    assert "## [2.2.0]" in changelog
+    assert claude_manifest["version"] == "2.2.1"
+    assert codex_manifest["version"] == "2.2.1"
+    assert agy_manifest["version"] == "2.2.1"
+    assert "## [2.2.1]" in changelog
 
 
 def _branch_note() -> str:

@@ -5,7 +5,7 @@
 > 草稿，不打分數。這裡產出的東西一律由 `loom-code:closing-review` 下 verdict，而且
 > 下判斷的 agent 不是寫草稿的那一個。
 
-**Version**: 2.2.0 — 4 個 skill + 1 個可選入口路由。版本資訊見
+**Version**: 2.2.1 — 4 個 skill + 1 個可選入口路由。版本資訊見
 [CHANGELOG.md](CHANGELOG.md)。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)

@@ -1,5 +1,36 @@
 # Changelog
 
+## [3.8.0] — 2026-09-22 — publication floor moves to GitHub
+
+Minor: station guidance and checker rule ids change. The contract manifest
+version stays 2.3.1 (no field added or removed; one field note reworded). The
+net mechanism count is unchanged (138): two checker rules retired, two added.
+
+- The floor "no merge into the trunk without a PR carrying Ship's nine
+  contextual headings" moves to GitHub. A caller workflow template
+  (`templates/loom-pr-floor.yml`, context `loom-pr-floor / PR floor`) calls
+  the reusable workflow `.github/workflows/loom-pr-floor-reusable.yml`, which
+  runs the new read-only `loom_checker.py pr-floor`: it fails only on the PR
+  body's headings and publishes the recomputed verification status as a
+  notice. This repository adopts the template.
+- The publication hook no longer refuses: a recognised push, PR-create or
+  merge command is allowed with a one-line reminder naming any missing
+  records; the refusal-only shell parsing is deleted. Host fallbacks allow,
+  except for writes to the selection store.
+- `publish` and `land` disclose the verification status (valid, absent or
+  stale, recomputed from git) instead of refusing on a missing or stale
+  attestation; `land` checks the live PR body.
+- New `loom_checker.py github-rules [--print-setup]`, run by Ship, reports
+  whether the trunk's GitHub rules require a PR and the floor check, and
+  prints a setup command the agent runs only after the user agrees.
+- Stations skip a step on the user's plain-words instruction and say which
+  step was skipped; expert-mode stays an optional typed route.
+  PRINCIPLES.md non-negotiable 2 is amended to match.
+- Rule ids: retired `push.attestation` and `push.merge`; added `ci.pr-floor`
+  and `publish.preconditions` (publish's own identity, safety and network
+  refusals, formerly reported under `push.attestation`).
+- The reusable workflow pins its checker dependency to `pyyaml==6.0.3`.
+
 ## [3.7.3] — 2026-09-21 — the version that carries the versioning-rule change
 
 Patch. No station guidance, field, rule id or contract change of its own; the
