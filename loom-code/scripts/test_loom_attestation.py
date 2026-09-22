@@ -10,7 +10,7 @@ from pathlib import Path
 
 from loom_checker import attestation as attestation_module
 from loom_checker import digest, probes, reviewers
-from loom_checker.command_handlers import finalize, push, reviewer_count
+from loom_checker.command_handlers import finalize, reviewer_count
 
 
 CHANGE = "2026-09-08-example"
@@ -401,30 +401,6 @@ def test_finalize_review_accepts_one_reviewer_for_low_risk_change(tmp_path: Path
     )
 
     assert result.returncode == 0, result.stderr
-
-
-def test_push_reuses_matching_attestation_without_subprocesses(
-    tmp_path: Path, monkeypatch
-) -> None:
-    repo = repo_with_content(tmp_path)
-    git(repo, "branch", "-M", "main")
-    git(repo, "switch", "-q", "-c", "feature")
-    (repo / "feature.py").write_text("ENABLED = True\n", encoding="utf-8")
-    functional_head = commit(repo, "feature")
-    attestation = matching_attestation(repo)
-    target = repo / f"docs/loom/{CHANGE}/attestation.json"
-    target.parent.mkdir(parents=True)
-    target.write_text(json.dumps(attestation), encoding="utf-8")
-    commit(repo, "generated evidence")
-
-    import inspect
-
-    source = inspect.getsource(push._cmd_push)
-    assert "subprocess.run" not in source
-    assert "check_probes" not in source
-    monkeypatch.chdir(repo)
-    assert push._cmd_push([]) == 0
-    assert functional_head
 
 
 def test_finalize_surfaces_failed_command_output(tmp_path: Path, monkeypatch) -> None:

@@ -12,7 +12,7 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py intent <path> [--commit-msg <file>]
     loom_checker.py intents [<change-id>] [--remote <name>] [--metadata]
     loom_checker.py intake <station> <change-id>
-    loom_checker.py push [--head <ref>] [--hook]
+    loom_checker.py push --hook
     loom_checker.py publish --intent <absolute-path> --title <text> --body-file <absolute-path>
     loom_checker.py publish --confirm-authorized --title <text> --body-file <absolute-path>
     loom_checker.py land --accepted-by <name>

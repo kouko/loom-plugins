@@ -41,7 +41,7 @@ def test_removed_package_replay_flag_is_rejected() -> None:
         capture_output=True,
     )
     assert result.returncode == 2
-    assert "unexpected argument '--skip-package-tests'" in result.stderr
+    assert "push runs only as a hook" in result.stderr
 
 
 def test_live_consumers_require_contract_two() -> None:

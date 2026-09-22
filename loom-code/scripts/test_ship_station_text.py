@@ -10,8 +10,6 @@ import ast
 import re
 from pathlib import Path
 
-from loom_checker.command_handlers.push import PUBLICATION_ROUTES
-from loom_checker.command_handlers.push import publication_advice
 from loom_checker.selection import ENTRY_TOKENS
 from loom_checker.selection import confirmation_prompt_matches
 from loom_checker.selection import selection_code
@@ -163,11 +161,6 @@ def test_ship_prose_rule_is_not_marked_as_a_gate() -> None:
     )
 
 
-# The counts a `...; found <n>` attestation refusal can report, plus the
-# unknown-count caller. `publication_advice` decides per count which tail it
-# appends, so how many routes a refusal names is a fact about the code.
-REFUSAL_COUNTS = (None, 0, 1, 2, 3)
-
 # The dash that scopes the sentence: everything before it speaks about any
 # refusal, everything after it about the one state it names.
 SCOPING_DASH = re.compile(r"\s+[—-]\s+")
@@ -178,42 +171,6 @@ def _no_handover_sentence() -> str:
     hits = [s for s in re.split(r"(?<=[.!?])\s+", flat) if NO_HANDOVER in s]
     assert len(hits) == 1, "ship §3 states the no-handover rule in one sentence"
     return hits[0]
-
-
-# ship-prose-promises-only-what-every-refusal-names (A3 positive)
-def test_ship_prose_promises_only_what_every_refusal_names() -> None:
-    """What the station may promise is read from the checker, not remembered.
-
-    Two facts come out of `publication_advice`: every count gets a non-empty
-    tail, so "take what the refusal names" holds for all of them; and only one
-    count gets `PUBLICATION_ROUTES`, so naming routes in a clause that speaks
-    about any refusal promises a state the checker does not always produce.
-    The clause before the scoping dash is therefore held to the first fact and
-    the routes belong after it, where the sentence names the state they apply
-    to.
-
-    Chosen over `assert "the two legal routes it names" not in sentence`: the
-    literal passes the moment the same false promise is reworded, and says
-    nothing if `publication_advice` later changes which counts carry routes --
-    this reads both from the module. Its limit is the dash: a sentence that
-    hides an unconditional promise after one is not caught, and only the
-    refusal string itself is enforceable.
-    """
-    advice = {count: publication_advice(count) for count in REFUSAL_COUNTS}
-    assert all(tail.strip() for tail in advice.values()), (
-        "every refusal names something the agent can act on"
-    )
-    assert [count for count, tail in advice.items() if tail is not PUBLICATION_ROUTES], (
-        "premise: some refusal names no route -- were every refusal to carry "
-        "PUBLICATION_ROUTES again, the station could promise routes outright"
-    )
-    general = SCOPING_DASH.split(_no_handover_sentence(), maxsplit=1)[0]
-    for promise in ("route", "closing-review", "step selection"):
-        assert promise not in general.lower(), (
-            f"ship §3 promises {promise!r} for any refusal, but the checker "
-            "names the routes for one attestation count only; scope the "
-            "promise to that state, after the dash"
-        )
 
 
 # The module that emits the publication refusals ship §3 speaks about, read as
@@ -253,7 +210,7 @@ def test_ship_prose_covers_the_refusals_that_name_no_remedy() -> None:
 
     The premise is recomputed, not remembered: `publish` emits
     `push.attestation` refusals whose whole text is a string constant, with
-    none of `publication_advice`'s tails in it -- `literal origin is not a
+    no remedy appended -- `literal origin is not a
     supported GitHub repository URL` is the one the blind runner hit. An
     agent that met one of those and read an unconditional "take the remedy
     that refusal names" had nothing to take and nothing it was allowed to do,
@@ -263,19 +220,14 @@ def test_ship_prose_covers_the_refusals_that_name_no_remedy() -> None:
     rather than leaving the station quietly over-scoped in the other
     direction.
     """
-    tails = {publication_advice(count) for count in REFUSAL_COUNTS}
     bare = _bare_attestation_refusals()
     assert bare, (
         "premise: `publish` emits no bare-literal attestation refusal, so "
         "every refusal may name a remedy and ship 3 could promise one outright"
     )
-    remediless = [
-        reason for reason in bare
-        if not any(tail in reason for tail in tails)
-    ]
-    assert remediless, (
-        "premise: every bare refusal carries a publication_advice tail after all"
-    )
+    # The hook's route tails (`publication_advice`) are gone with its
+    # refusals (plan W1-03), so every bare refusal names no remedy.
+    remediless = bare
     general = SCOPING_DASH.split(_no_handover_sentence(), maxsplit=1)[0]
     assert re.search(r"where a refusal names a remedy, take it", general), (
         "ship 3 scopes the remedy clause to the refusals that carry one; "

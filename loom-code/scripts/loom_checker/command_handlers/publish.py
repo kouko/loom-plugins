@@ -182,23 +182,6 @@ def _publication_attestation(repo: Path) -> tuple[str | None, dict | None, str |
     return change_id, payload, None
 
 
-def selection_disclosure_failure(repo: Path, body: str) -> str | None:
-    """The refusal this PR body earns for the branch's recorded step selection,
-    or None when it discloses exactly what was skipped.
-
-    Every route that opens a pull request asks this one function: the
-    publication command, and the `PreToolUse` hook's trusted PR-create form
-    (command_handlers/push.py). A skip the user typed is disclosed whichever
-    route opens the request, and the two routes cannot drift apart because
-    neither owns a copy of the rule."""
-    # No derivable attestation means no selection: a disclosure line is then false.
-    try:
-        _change_id, attested, _error = _publication_attestation(repo)
-    except UsageError:  # no branch base: the attestation gate above already owns that
-        attested = None
-    return validate_selection_disclosure(body, attested or {"selection": None})
-
-
 def _publication_change_id(repo: Path) -> tuple[str | None, str | None]:
     """Derive the publication identity from the sole attestation in the branch."""
     change_id, _payload, error = _publication_attestation(repo)
