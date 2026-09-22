@@ -109,6 +109,21 @@ def test_status_in_summary_and_notice(tmp_path: Path, monkeypatch) -> None:
     assert "::notice title=verification::valid (skipped: adversarial)" in out
 
 
+def test_unparseable_recorded_command_passes_as_stale(tmp_path: Path, monkeypatch) -> None:
+    import hashlib
+
+    repo = identified_repo(tmp_path)
+    payload = attestation(repo)
+    command = "python3 src.py ;"
+    payload["executions"][1].update(
+        command=command, command_digest=hashlib.sha256(command.encode()).hexdigest()
+    )
+    commit_attestation(repo, payload)
+    code, out, err, _summary = run(repo, body(), monkeypatch, tmp_path)
+    assert code == 0, err
+    assert "::notice title=verification::stale (" in out
+
+
 def test_body_status_text_ignored(tmp_path: Path, monkeypatch) -> None:
     repo = identified_repo(tmp_path)
     claim = "\n\nVerification status: valid\n"

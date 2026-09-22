@@ -188,6 +188,21 @@ def test_two_attestations_and_bad_json_are_stale(tmp_path: Path, depth: str) -> 
     assert status == "stale (branch carries 2 attestations)"
 
 
+@pytest.mark.parametrize("depth", ["local", "ci"])
+def test_unparseable_recorded_command_is_stale(tmp_path: Path, depth: str) -> None:
+    repo = branch_repo(tmp_path)
+    confirmed_intent(repo)
+    commit(repo, "intent")
+    payload = attestation(repo)
+    command = "python3 src.py ;"
+    payload["executions"][1].update(
+        command=command, command_digest=hashlib.sha256(command.encode()).hexdigest()
+    )
+    commit_attestation(repo, payload)
+    status = verification.verification_status(repo, CHANGE, depth=depth)
+    assert status.startswith("stale (")
+
+
 def test_content_failure_is_stale_with_reason(tmp_path: Path) -> None:
     repo = branch_repo(tmp_path)
     confirmed_intent(repo)

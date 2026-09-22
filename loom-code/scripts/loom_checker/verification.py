@@ -125,9 +125,12 @@ def verification_status(
         return "stale (attestation is not committed at HEAD)"
     except json.JSONDecodeError:
         return "stale (attestation is not readable JSON)"
-    failures = validate_attestation(
-        repo, head_sha, change_id, payload, manifest, claimed_selection=(depth == "ci")
-    )
+    try:
+        failures = validate_attestation(
+            repo, head_sha, change_id, payload, manifest, claimed_selection=(depth == "ci")
+        )
+    except (UsageError, ValueError) as exc:
+        return f"stale ({exc})"
     if failures:
         return f"stale ({failures[0][1]})"
     selection = payload.get("selection")
