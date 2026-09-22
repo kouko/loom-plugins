@@ -1,7 +1,7 @@
 ---
 name: ship
 description: |
-  Publish a reviewed branch and verify PR checks. Use after closing-review generates a matching content attestation.
+  Publish a reviewed branch and verify PR checks. Use after closing-review, normally with a matching attestation.
 version: 1.1.0
 ---
 

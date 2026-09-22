@@ -362,8 +362,6 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
         assert not has_negation(sentence), sentence
         assert "intent" not in sentence.replace("(", " ").replace(",", " ").split(), sentence
         pointer = (
-            "skip suggestions and user requests follow [expert-mode](../expert-mode/SKILL.md)."
-            if station is PLAN else
             "[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may invoke."
         )
         assert prose.count(pointer) == 1

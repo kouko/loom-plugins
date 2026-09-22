@@ -22,7 +22,7 @@ At the start of a change:
 1. Resolve the injected plugin root and run
    `python3 <plugin-root>/scripts/loom_checker.py contract --require 2.1`.
 2. Confirm `python3 <plugin-root>/scripts/loom_checker.py --list-rules`
-   includes `push.attestation`.
+   includes `push.contextual-body`.
 3. If Codex presents a trust prompt for a new or modified installed definition,
    ask the user to review that single installed definition. Never edit Codex
    trust state, use `--dangerously-bypass-hook-trust`, or write hook files into

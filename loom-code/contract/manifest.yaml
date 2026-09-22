@@ -257,7 +257,7 @@ step_selection:      # the only step names a user selection may run or skip; the
 kickoff_defaults:   # grammar: `- <key>: <value> — <reason> (<date>)`
   - {name: second-vendor,          grammar: "<cli> | ask | suggest", note: "`ask` blocks once per change; `suggest` reports availability without waiting and permits opt-in only before Closing Review"}
   - {name: docs-lint,              grammar: "<command> | none", note: "declared, not a blocker (W0-02): a declared command runs in CI for its report only; reviewer contract reads it to decide whether style findings are allowed at all"}
-  - {name: package-tests,          grammar: "<command> | none", note: "the command Build runs at the end of Build and finalize-review executes once more, which push.attestation validates by identity; absent = recomputed from build markers"}
+  - {name: package-tests,          grammar: "<command> | none", note: "the command Build runs at the end of Build and finalize-review executes once more, which the attestation records by identity; absent = recomputed from build markers"}
   - {name: standing-docs,          grammar: "waived"}
   - {name: session-start-baseline, grammar: "<sha> <words>"}
   - {name: interface-surfaces,     grammar: "<glob>[, <glob>…]", default: "**/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/**"}

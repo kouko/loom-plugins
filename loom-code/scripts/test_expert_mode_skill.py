@@ -208,8 +208,10 @@ def test_expert_mode_keeps_its_typed_confirmation() -> None:
     assert "Only that typed confirmation applies." in _flat(_skill())
     assert 'A reply such as "yes" or "對" binds nothing' in _flat(_skill())
 
-    sentence = affirmative(_skill(), "from ordinary conversation", ("applies",))
+    sentence = affirmative(_skill(), "the optional typed route", ("is",))
+    assert "handled by the station itself" in sentence
     assert "the user still types the confirmation" in sentence
+    assert "from ordinary conversation" not in _flat(_skill())
 
 
 # --- Acceptance 4 -----------------------------------------------------------
@@ -267,9 +269,6 @@ def test_suggestion_then_plain_yes_skips_nothing(repo: Path) -> None:
 SELECTION_READ = "At entry, run `loom_checker.py selection show <change-id>` and omit"
 EXPERT_MODE_POINTER = ("[expert-mode](../expert-mode/SKILL.md) stays an optional route "
                        "the user may invoke.")
-# write-plan keeps the older pointer until its own station text is revised.
-PLAN_POINTER = ("skip suggestions and user requests follow "
-                "[expert-mode](../expert-mode/SKILL.md).")
 MOVED_RULES = ("at most once per change", "--origin agent", 'a plain "yes" binds nothing',
                "asks in their own words")
 
@@ -289,8 +288,7 @@ def assert_station_points_to_expert_mode(text: str, pointer: str = EXPERT_MODE_P
 @pytest.mark.parametrize("station", STATIONS)
 def test_station_one_sentence_points_to_expert_mode(station: str) -> None:
     text = (PLUGIN_ROOT / "skills" / station / "SKILL.md").read_text(encoding="utf-8")
-    assert_station_points_to_expert_mode(
-        text, PLAN_POINTER if station == "write-plan" else EXPERT_MODE_POINTER)
+    assert_station_points_to_expert_mode(text)
 
 
 GOOD_STATION = ("Intro. At entry, run `loom_checker.py selection show <change-id>` and omit "
