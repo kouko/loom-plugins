@@ -41,12 +41,15 @@ for `${CLAUDE_PLUGIN_ROOT}`.
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
-At entry, run `loom_checker.py selection show <change-id>` and omit only the
-prose steps it lists as skipped (spec, plan, implementer, tdd,
-blind-run); [expert-mode](../expert-mode/SKILL.md) stays an optional route
-the user may invoke. The default is the full flow: skip a step only when the
-user tells you to in plain words, then tell the user in one line which step is
-skipped and continue. Never ask the user for a generated code to skip a step.
+At entry, run `loom_checker.py selection show <change-id>` and omit the prose
+steps `selection show` lists as skipped (spec, plan, implementer, tdd,
+blind-run), plus any step the user told you to skip in plain words;
+[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
+invoke. The default is the full flow: skip a step only when the user tells you
+to in plain words, then tell the user in one line which step is skipped and
+continue. When you honour such a skip, append one line
+`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
+and commit it. Never ask the user for a generated code to skip a step.
 
 ## Artifact vocabulary
 
@@ -320,8 +323,9 @@ version must still hold, not a suggestion.
 - Group tasks into **waves** as dependency and integration boundaries. Waves
   do not schedule formal review; after all tasks and package tests pass,
   Build transitions once to the closing `branch-end` review.
-- Unless `selection show` lists `implementer` as skipped, implementer dispatch
-  is mandatory for every implementation task. Scheduling multiple implementers
+- Unless `implementer` is skipped (listed by `selection show` or skipped by the
+  user's plain-words instruction), implementer dispatch is mandatory for every
+  implementation task. Scheduling multiple implementers
   concurrently is optional.
 - Task ids are `W<n>-<nn>` and remain stable once written so hand-offs can
   refer to dependencies without ambiguity.

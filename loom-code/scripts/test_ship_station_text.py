@@ -282,3 +282,53 @@ def test_gate_marked_locator_sees_a_second_gate_marked_copy() -> None:
     assert _gate_marked_occurrences(TWO_COPY_DOC, NO_HANDOVER) == [
         _occurrences(TWO_COPY_DOC, NO_HANDOVER)[1]
     ]
+
+
+# ship-template-lands-as-its-own-change (round-1 review)
+def test_ship_template_missing_waits_for_consent_and_its_own_change() -> None:
+    flat = " ".join(_sentences())
+    assert (
+        "When it reports `template not on <trunk>`, relay the printed step to the user; "
+        "add the template only after the user explicitly agrees, as its own change and "
+        "never inside the current change's PR, then run `github-rules` again for the rules."
+    ) in flat
+    assert "lands the template on the trunk first" not in flat
+
+
+# ship-setup-consent-in-consequence-form (round-1 review)
+def test_ship_asks_setup_consent_in_consequence_form() -> None:
+    sentences = _sentences()
+    hits = [s for s in sentences if "missing rule" in s and "--print-setup" in s]
+    assert len(hits) == 1
+    assert (
+        "ask the user in consequence form — from then on <trunk> accepts changes only "
+        "through a PR whose body check passes, for you too — then show the user the setup "
+        "command"
+    ) in hits[0]
+    text = SHIP.read_text(encoding="utf-8")
+    assert _gate_marked_occurrences(text, "consequence form") == [], (
+        "a new prose gate would raise the net mechanism count; the consent rule is guidance"
+    )
+
+
+# ship-names-every-publish-refusal (round-1 review)
+def test_ship_names_every_publish_refusal() -> None:
+    flat = " ".join(_section(SHIP.read_text(encoding="utf-8"), "## 3. Publish once").split())
+    assert (
+        "Before pushing, beyond authorization and repository safety, it refuses only a "
+        "malformed body (naming the heading), a `Skipped steps:` mismatch against a bound "
+        "selection, and an unidentified change."
+    ) in flat
+
+
+# ship-lands-from-the-change-worktree (round-1 review)
+def test_ship_lands_from_the_change_branch_worktree_and_reports_status() -> None:
+    text = SHIP.read_text(encoding="utf-8")
+    land = " ".join(_section(text, "## 5. Land after acceptance").split())
+    assert "take the root of the change branch's worktree" in land
+    assert "whose branch carries the attestation" not in land
+    handoff = " ".join(_section(text, "## Handoff").split())
+    assert handoff.startswith(
+        "## Handoff Report the attestation digest when one exists, else the verification "
+        "status publish printed,"
+    ), handoff

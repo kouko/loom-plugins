@@ -12,9 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
-## [2.2.1] — 2026-09-22 — ship row names the rules that still refuse
+## [2.3.0] — 2026-09-22 — ship row names the rules that still refuse
 
-Patch. No new field, identifier, checker rule, or station.
+Minor. Station guidance changes in `capture-intent` and `write-spec`; no new
+field, identifier, checker rule, or station.
 
 - The `ship` row of the artifact vocabulary table in `capture-intent` and
   `write-spec` names `push.contextual-body` and `publish.preconditions` in

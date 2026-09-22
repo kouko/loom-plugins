@@ -43,7 +43,8 @@ with the code shown, in any surrounding words. Then wait.
 Only that typed confirmation applies. A reply such as "yes" or "對" binds
 nothing: say so and repeat the confirmation line.
 
-The agent may suggest skipping steps at most once per change: it runs
+Inside a user-invoked expert-mode session only, the agent may suggest skipping
+steps at most once per change: it runs
 `loom_checker.py selection propose <change-id> --origin agent`, shows the
 table and the confirmation line (type `/loom-code:expert-mode` (Codex:
 `$expert-mode`) with the code shown), and keeps working on the full process at
@@ -78,16 +79,16 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
 
 ## Boundary
 
-- Never evaluate a gate. `finalize-review` and `publish` re-read the records
-  and waive only a bound skip.
-- Local protection stops shortcuts, not deliberately disguised commands;
-  independent CI stays the trust boundary.
+- Never evaluate a gate. `finalize-review` re-reads the records and waives only
+  a bound skip; `publish` discloses the status.
+- Local hooks only remind; GitHub rules and the PR-floor check are the trust
+  boundary.
 - A reviewer rejection is recorded only when `closing-review` hands it to the checker
   (`selection record-failure`).
 - `loom_checker.py selection skipped-review` lists merged changes on the
   default branch whose attestation skipped reviewers.
-- A change with a bound selection publishes only from a checkout sharing the
-  git common dir that holds its records; a fresh clone refuses it.
+- In a checkout without its records, the selection shows as `stale` on the PR;
+  publishing still proceeds.
 - Confirmation, finalization and publication must all run in the same attended
   Claude Code session. In a new session, re-run
   `loom_checker.py selection propose` and have the user type the confirmation

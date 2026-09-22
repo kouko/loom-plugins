@@ -13,7 +13,7 @@ Codex and Antigravity CLI:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/) | 2.2.1 | 5 | Front of the flow: intent, specification, product principles, visual design. |
+| [`loom-design`](loom-design/) | 2.3.0 | 5 | Front of the flow: intent, specification, product principles, visual design. |
 | [`loom-code`](loom-code/) | 3.8.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
 | [`loom-workflow`](loom-workflow/) | 5.3.1 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
@@ -114,7 +114,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.2.1. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.3.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools. Requires `loom-code`, whose
 contract package it reads.
 
@@ -129,7 +129,7 @@ contract package it reads.
 ## loom-code
 
 Version 3.8.0. Five stations carry one change from plan to PR with
-content-bound verification, one closing review and a fast publication gate.
+content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
 | --- | --- |
@@ -230,7 +230,7 @@ agent may act outside the project; pass it in interactive mode too.
 
 Limits on Antigravity:
 
-- The plugin hooks (the push gate, the session context, the language reminder
+- The plugin hooks (the publication reminder, the session context, the language reminder
   and the skill-folder rule) run only in the `agy` CLI, not in the Antigravity
   desktop app or IDE, so those gates are not enforced there.
 - loom's roles (implementer, reviewer, adversary, blind-runner) run as agy

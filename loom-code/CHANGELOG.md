@@ -26,6 +26,13 @@ net mechanism count is unchanged (138): two checker rules retired, two added.
 - Stations skip a step on the user's plain-words instruction and say which
   step was skipped; expert-mode stays an optional typed route.
   PRINCIPLES.md non-negotiable 2 is amended to match.
+- A station that honours a plain-words skip appends
+  `skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks`
+  section and commits it; Ship builds the PR body's `Skipped by instruction:`
+  line from those lines only. Ship asks consent for the GitHub rules setup in
+  consequence form (from then on the trunk accepts changes only through a PR
+  whose body check passes, for the user too) and adds a missing workflow
+  template only on the user's agreement, as its own change.
 - Rule ids: retired `push.attestation` and `push.merge`; added `ci.pr-floor`
   and `publish.preconditions` (publish's own identity, safety and network
   refusals, formerly reported under `push.attestation`).

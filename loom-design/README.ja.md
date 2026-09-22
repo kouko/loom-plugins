@@ -6,7 +6,7 @@
 > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
 > `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
 
-**Version**: 2.2.1 — 4 skills + 任意のルーター 1 個。リリースは
+**Version**: 2.3.0 — 4 skills + 任意のルーター 1 個。リリースは
 [CHANGELOG.md](CHANGELOG.md) を参照。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)

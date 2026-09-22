@@ -20,12 +20,14 @@ attestation already exists, stop: the evidence is still valid and Ship owns
 the remaining work.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
-it lists as skipped; §2 and §3 say how skipped reviewers, adversarial and
-blind-run are handled; [expert-mode](../expert-mode/SKILL.md) stays an
-optional route the user may invoke. The default is the full flow: skip a step
-only when the user tells you to in plain words, then tell the user in one line
-which step is skipped and continue. Never ask the user for a generated code to
-skip a step.
+`selection show` lists as skipped, plus any step the user told you to skip in
+plain words; §2 and §3 say how skipped reviewers, adversarial and blind-run are
+handled; [expert-mode](../expert-mode/SKILL.md) stays an optional route the
+user may invoke. The default is the full flow: skip a step only when the user
+tells you to in plain words, then tell the user in one line which step is
+skipped and continue. When you honour such a skip, append one line
+`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
+and commit it. Never ask the user for a generated code to skip a step.
 
 ## 2. Compute review depth
 
@@ -52,10 +54,11 @@ blind run (§3), so the blind run exercises the synced content.
 
 Before dispatching reviewers in any round, confirm on the current functional
 content (a committed blind-run report aside) that Build's hand-off reports the
-complete package suite passing or `selection show` lists `package-tests` as
-skipped, and that it reports every adversarial program passing or
-`selection show` lists `adversarial` as skipped, each skip waiving only its own
-check. When that hand-off reports a check failing, return the change to
+complete package suite passing or `package-tests` is skipped (listed by
+`selection show` or skipped by the user's plain-words instruction), and that it
+reports every adversarial program passing or `adversarial` is skipped (listed
+by `selection show` or skipped by the user's plain-words instruction), each
+skip waiving only its own check. When that hand-off reports a check failing, return the change to
 Build and dispatch no reviewer. Reviewers read only content whose Build
 mechanical checks passed.
 
@@ -110,10 +113,11 @@ python3 <loom-code>/scripts/loom_checker.py reviewer-count <change-id>
 The output is the computed reviewer floor: dispatch exactly that many
 fresh-context reviewers with distinct agent identities. The checker derives the
 floor from the cumulative branch delta and fails closed to two when it cannot
-classify the whole change. `finalize-review` and publication validation
-recompute the same policy; the orchestrator never declares or overrides it.
-When `selection show` lists `reviewers` as skipped, dispatch no reviewer and pass
-no `verdicts`.
+classify the whole change. `finalize-review` recomputes the same policy, and
+the PR's verification status reports a mismatch as `stale`; the orchestrator
+never declares or overrides it. When `reviewers` is skipped (listed by
+`selection show` or skipped by the user's plain-words instruction), dispatch no
+reviewer and pass no `verdicts`.
 - Unless reviewers are skipped, a selected second vendor remains required.
   Resolve it from the standing
   fixed CLI, the per-change `ask` answer, or a `selection-confirmed` line
@@ -195,14 +199,15 @@ fresh-context, never an agent that touched any part of the change. Its
 that report on the change branch before the reviewers read the final
 functional-content digest, and so before running `finalize-review`. A report
 committed after their verdicts is new functional content and needs the next
-round. When `selection show` lists `blind-run` as skipped, run no blind run.
+round. When `blind-run` is skipped (listed by `selection show` or skipped by
+the user's plain-words instruction), run no blind run.
 
 Closing review dispatches no adversary and creates no adversarial program.
 Build commits the adversarial programs, and its hand-off names each program's
 path and command; §5 passes them to `finalize-review`. Do not record a claimed
-result; finalization executes them. When `selection show` lists `adversarial`
-as skipped, Build hands off no adversarial program and §5 omits the
-`adversarial` input.
+result; finalization executes them. When `adversarial` is skipped (listed by
+`selection show` or skipped by the user's plain-words instruction), Build hands
+off no adversarial program and §5 omits the `adversarial` input.
 
 ## 4. Converge within one bounded episode
 

@@ -63,11 +63,12 @@ def test_adversary_prompt_carries_no_implementer_explanation() -> None:
         assert leak not in VERIFY
 
 
+SKIPPED_BY = "(listed by `selection show` or skipped by the user's plain-words instruction)"
 GATE = (
     "Build does not hand off to `closing-review` until the complete package suite has passed or "
-    "`selection show` lists `package-tests` as skipped, and until every adversarial "
-    "program has passed or it lists `adversarial` as skipped, each skip waiving only "
-    "its own check."
+    "`package-tests` is skipped " + SKIPPED_BY + ", and until every adversarial "
+    "program has passed or `adversarial` is skipped " + SKIPPED_BY + ", each skip waiving "
+    "only its own check."
 )
 ADVERSARY_FINDINGS = (
     "Every fatal or important finding the adversary returns is fixed inside Build like "
@@ -279,16 +280,17 @@ def test_suite_step_without_command_source_fails() -> None:
 
 def test_skipped_selection_step_omits_that_check() -> None:
     read = (
-        "run `loom_checker.py selection show <change-id>` and omit only the steps it lists "
-        "as skipped (spec, plan, implementer, tdd, adversarial, package-tests, blind-run)"
+        "run `loom_checker.py selection show <change-id>` and omit the steps `selection show` "
+        "lists as skipped (spec, plan, implementer, tdd, adversarial, package-tests, "
+        "blind-run), plus any step the user told you to skip in plain words"
     )
     assert PROSE.count(read) == 1
     assert (
-        "When `selection show` lists `adversarial` as skipped, dispatch no adversary and "
+        "When `adversarial` is skipped " + SKIPPED_BY + ", dispatch no adversary and "
         "run no adversarial program."
     ) in VERIFY
     assert (
-        "When it lists `package-tests` as skipped, run no complete package suite."
+        "When `package-tests` is skipped " + SKIPPED_BY + ", run no complete package suite."
     ) in VERIFY
 
 

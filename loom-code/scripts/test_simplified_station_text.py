@@ -29,6 +29,7 @@ PLAN_CONFIRM = (
 PLAN_CONFIRM_PROSE = " ".join(PLAN_CONFIRM.split())
 INTENT_TEMPLATE = (ROOT / "loom-code/contract/templates/intent.md").read_text(encoding="utf-8")
 CONTRACT_MANIFEST = (ROOT / "loom-code/contract/manifest.yaml").read_text(encoding="utf-8")
+SKIPPED_BY = "(listed by `selection show` or skipped by the user's plain-words instruction)"
 
 
 def test_review_uses_one_computed_reviewer_floor_without_prose_allowlist() -> None:
@@ -276,7 +277,7 @@ def test_build_and_plan_require_implementer_dispatch_without_requiring_paralleli
         assert "Scheduling multiple implementers concurrently is optional" in prose
         assert "Parallel work is optional" not in station
     assert (
-        "Unless `selection show` lists `implementer` as skipped, implementer dispatch is "
+        "Unless `implementer` is skipped " + SKIPPED_BY + ", implementer dispatch is "
         "mandatory for every implementation task."
     ) in " ".join(PLAN.split())
     assert "Implementer dispatch is mandatory for every implementation task" not in PLAN
@@ -286,7 +287,7 @@ def test_build_and_plan_require_implementer_dispatch_without_requiring_paralleli
     assert "If implementer dispatch is unavailable, stop and report the blocker" in build_prose
     assert "The main agent must not substitute itself as implementer" not in build_prose
     assert (
-        "Unless `selection show` lists `implementer` as skipped, the main agent must not "
+        "Unless `implementer` is skipped " + SKIPPED_BY + ", the main agent must not "
         "substitute itself as implementer."
     ) in build_prose
     assert "An implementation agent never acts as its own closing reviewer." in build_prose
@@ -337,16 +338,19 @@ def test_code_only_field_boundaries_keep_problem_and_value_semantics() -> None:
 
 def test_stations_read_the_bound_selection_at_entry() -> None:
     prose_read = (
-        "run `loom_checker.py selection show <change-id>` and omit only the prose steps "
-        "it lists as skipped (spec, plan, implementer, tdd, blind-run)"
+        "run `loom_checker.py selection show <change-id>` and omit the prose steps "
+        "`selection show` lists as skipped (spec, plan, implementer, tdd, blind-run), plus "
+        "any step the user told you to skip in plain words"
     )
     review_read = (
-        "run `loom_checker.py selection show <change-id>` and omit the steps it lists as "
-        "skipped; §2 and §3 say how skipped reviewers, adversarial and blind-run are handled"
+        "run `loom_checker.py selection show <change-id>` and omit the steps `selection show` "
+        "lists as skipped, plus any step the user told you to skip in plain words; §2 and §3 "
+        "say how skipped reviewers, adversarial and blind-run are handled"
     )
     build_read = (
-        "run `loom_checker.py selection show <change-id>` and omit only the steps it lists "
-        "as skipped (spec, plan, implementer, tdd, adversarial, package-tests, blind-run)"
+        "run `loom_checker.py selection show <change-id>` and omit the steps `selection show` "
+        "lists as skipped (spec, plan, implementer, tdd, adversarial, package-tests, "
+        "blind-run), plus any step the user told you to skip in plain words"
     )
     assert prose_read not in " ".join(REVIEW.split())
     assert prose_read not in " ".join(BUILD.split())
@@ -370,9 +374,9 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
 
 def test_build_obligations_yield_to_a_bound_selection() -> None:
     build_prose = " ".join(BUILD.split())
-    assert "Unless `selection show` lists `tdd` as skipped, for every behavior change:" in build_prose
+    assert "Unless `tdd` is skipped " + SKIPPED_BY + ", for every behavior change:" in build_prose
     assert (
-        "Unless `selection show` lists `implementer` as skipped, implementer dispatch is "
+        "Unless `implementer` is skipped " + SKIPPED_BY + ", implementer dispatch is "
         "mandatory for every implementation task; when it is skipped, the main agent "
         "implements the task itself."
     ) in build_prose
@@ -384,15 +388,15 @@ def test_review_dispatches_nothing_for_skipped_steps() -> None:
     assert "## 3. Run blind and adversarial checks" not in REVIEW
     checks = REVIEW.split("## 3. Run the blind run", 1)[1].split("## 4.", 1)[0]
     assert (
-        "When `selection show` lists `reviewers` as skipped, dispatch no reviewer and pass "
+        "When `reviewers` is skipped " + SKIPPED_BY + ", dispatch no reviewer and pass "
         "no `verdicts`."
     ) in " ".join(depth.split())
     checks_prose = " ".join(checks.split())
     assert (
-        "When `selection show` lists `adversarial` as skipped, Build hands off no adversarial "
+        "When `adversarial` is skipped " + SKIPPED_BY + ", Build hands off no adversarial "
         "program and §5 omits the `adversarial` input."
     ) in checks_prose
-    assert "When `selection show` lists `blind-run` as skipped, run no blind run." in checks_prose
+    assert "When `blind-run` is skipped " + SKIPPED_BY + ", run no blind run." in checks_prose
 
 
 def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
@@ -545,3 +549,98 @@ def test_no_generated_code_requested() -> None:
         for sentence in split_sentences(prose):
             if CODE_REQUEST.search(sentence):
                 assert has_negation(sentence), (name, sentence)
+
+
+# Every skip condition in a station honours both skip sources: the bound
+# selection and the user's plain-words instruction. A sentence that names a
+# skip read only from `selection show` contradicts the plain-words rule.
+SKIP_CONDITION_STATIONS = {"build": BUILD, "closing-review": REVIEW, "ship": SHIP,
+                           "write-plan": PLAN}
+SELECTION_ONLY = re.compile(r"`selection show` lists `|\bit lists `|omit only the")
+
+
+def _selection_only_skip_conditions(prose: str) -> list[str]:
+    return [s for s in split_sentences(prose)
+            if SELECTION_ONLY.search(s)
+            or (re.search(r"\blists\b.*\bas skipped\b", s) and "plain words" not in s)]
+
+
+def test_no_skip_condition_reads_selection_show_alone() -> None:
+    for name, text in SKIP_CONDITION_STATIONS.items():
+        assert _selection_only_skip_conditions(" ".join(text.split())) == [], name
+
+
+def test_selection_only_detector_rejects_the_old_forms() -> None:
+    for old in (
+        "Unless `selection show` lists `tdd` as skipped, for every behavior change:",
+        "until every adversarial program has passed or it lists `adversarial` as skipped.",
+        "At entry, run it and omit only the steps it lists as skipped (spec, plan).",
+    ):
+        assert _selection_only_skip_conditions(old), old
+    assert not _selection_only_skip_conditions(
+        "Unless `tdd` is skipped " + SKIPPED_BY + ", for every behavior change:")
+
+
+SKIP_RECORD = (
+    "When you honour such a skip, append one line `skipped-by-instruction: <step> "
+    "<YYYY-MM-DD>` to the plan's `## Risks` section and commit it."
+)
+
+
+def test_each_station_records_a_plain_words_skip_in_the_plan() -> None:
+    assert not has_negation(SKIP_RECORD)
+    for name, text in SKIP_CONDITION_STATIONS.items():
+        prose = " ".join(text.split())
+        assert prose.count(SKIP_RECORD) == 1, name
+        assert prose.index(SKIP_RULE) < prose.index(SKIP_RECORD) < prose.index(NO_CODE), name
+
+
+def test_ship_builds_skipped_by_instruction_from_recorded_lines() -> None:
+    verification = " ".join(
+        SHIP.split("Under the Verification heading", 1)[1].split("When the attestation", 1)[0].split()
+    )
+    assert (
+        "Build the line `Skipped by instruction: <steps>` from the plan's "
+        "`skipped-by-instruction:` lines, not from conversation recall; with none recorded, "
+        "write no such line, and the recomputed `(missing: …)` clause still discloses the "
+        "absent records."
+    ) in verification
+    assert "When the user skipped steps in plain words" not in SHIP_PROSE
+
+
+def test_review_floor_mismatch_surfaces_as_stale() -> None:
+    review_prose = " ".join(REVIEW.split())
+    assert (
+        "`finalize-review` recomputes the same policy, and the PR's verification status "
+        "reports a mismatch as `stale`; the orchestrator never declares or overrides it."
+    ) in review_prose
+    assert "publication validation recompute" not in review_prose
+
+
+def test_attestation_readers_name_the_pr_floor_check() -> None:
+    assert 'readers: ["ship", "land", "the PR-floor check"]' in CONTRACT_MANIFEST
+    assert '"the publication gate"' not in CONTRACT_MANIFEST
+
+
+def test_readmes_name_the_hook_a_publication_reminder() -> None:
+    root = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "- The plugin hooks (the publication reminder, the session context" in root
+    assert ("content-bound verification, one closing review and a GitHub-enforced PR floor."
+            in " ".join(root.split()))
+    for name, phrase in (
+        ("loom-code/README.md", "The hooks (the publication reminder, the session context"),
+        ("loom-code/README.ja.md", "hook（公開リマインダー・session context・言語リマインダー）"),
+        ("loom-code/README.zh-TW.md", "hook（發布提醒、session context 與語言提醒）"),
+    ):
+        text = (ROOT / name).read_text(encoding="utf-8")
+        assert phrase in " ".join(text.split()).replace("、 ", "、"), name
+        assert "publication gate" not in text, name
+    assert "push gate" not in root and "fast publication gate" not in root
+
+
+def test_changelog_3_8_0_names_skip_record_and_setup_consent() -> None:
+    changelog = (ROOT / "loom-code/CHANGELOG.md").read_text(encoding="utf-8")
+    entry = " ".join(changelog.split("## [3.8.0]", 1)[1].split("\n## [", 1)[0].split())
+    assert "`skipped-by-instruction: <step> <YYYY-MM-DD>`" in entry
+    assert "`Skipped by instruction:`" in entry
+    assert "consequence form" in entry

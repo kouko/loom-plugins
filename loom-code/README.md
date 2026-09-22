@@ -204,7 +204,7 @@ agent may act outside the project; pass it in interactive mode too.
 
 To update, run `git pull` in the clone and install again; the install replaces
 the installed copy. `agy plugin uninstall loom-code` removes it. The hooks (the
-publication gate, the session context and the language reminder) run only in
+publication reminder, the session context and the language reminder) run only in
 the `agy` CLI, not in the Antigravity desktop app or IDE. On `agy` the loom roles (implementer,
 reviewer, adversary, blind-runner) run as agy `self` subagents that follow
 loom's agent contracts, on Gemini models. The review station is

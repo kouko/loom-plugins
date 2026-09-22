@@ -178,7 +178,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
     template: attestation.json
     charter:
       answers: "which functional content was checked, by whom, and with what result"
-      readers: ["ship", "the publication gate"]
+      readers: ["ship", "land", "the PR-floor check"]
       must:
         - "schema"
         - "change_id"

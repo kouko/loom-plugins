@@ -184,7 +184,7 @@ agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模�
 互動模式也請一併指定。
 
 更新時在 clone 裡執行 `git pull`，再重跑 install（install 會取代已安裝的副本）；
-移除用 `agy plugin uninstall loom-code`。hook（publication gate、session
+移除用 `agy plugin uninstall loom-code`。hook（發布提醒、session
 context 與語言提醒）只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。在 `agy`
 上，loom 的角色（implementer、reviewer、adversary、blind-runner）以 agy 的
 `self` subagent 執行，遵循 loom 的 agent 契約，使用 Gemini 模型。審查站在所有
