@@ -233,7 +233,12 @@ def _probe(print_setup: bool) -> str:
         classic = _classic_state(gh, host, slug, trunk)
     except (Unconfirmed, UsageError) as exc:
         return f"loom: could not confirm GitHub rules for {trunk} ({exc})\n"
+    return _report(host, slug, trunk, pr_state, check, classic)
 
+
+def _report(host: str, slug: str, trunk: str, pr_state: str, check: bool,
+            classic: tuple[bool, bool] | None) -> str:
+    """The probe's lines from the ruleset and classic protection states."""
     if classic is not None:
         if classic[0]:
             pr_state = "present"
