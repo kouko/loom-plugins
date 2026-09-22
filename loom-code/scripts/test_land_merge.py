@@ -263,6 +263,7 @@ def test_pending_checks_are_polled_until_they_pass(tmp_path: Path, monkeypatch) 
 
     assert rc == 0, err
     assert out.count("Waiting for checks on PR #7\n") == 1
+    assert "All checks registered on PR #7 passed\n" in out
     assert waits == [10, 10]
     assert sum("checks" in call for call in calls.calls) == 3
 

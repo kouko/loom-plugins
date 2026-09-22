@@ -1123,7 +1123,7 @@ def _observe_all_checks(
             return report(
                 [("land.merge", f"check {name}: {state}") for name, state in unknown], err
             )
-        out.write(f"All checks passed on PR #{number}\n")
+        out.write(f"All checks registered on PR #{number} passed\n")
         return 0
 
 
