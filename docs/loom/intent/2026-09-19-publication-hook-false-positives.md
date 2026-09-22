@@ -1,6 +1,7 @@
 change_id: 2026-09-19-publication-hook-false-positives
+originator: kouko
 kind: engineering
-needs-design: no
+needs-design: no — shell command recognition inside the publication hook only; no interface surface
 publication: automatic — authorized 2026-09-19 by kouko
 status: confirmed 2026-09-19
 
@@ -25,6 +26,9 @@ Fix the publication hook's shell command recognition to correctly identify merge
 - Do not change the fundamental push/merge recognition rules
 - Preserve all existing true positive detections
 - Focus on fixing false negatives in heredoc and shell flag parsing
+
+## Out of scope
+- Not recorded when this intent was confirmed; section added 2026-09-23 so the record passes the intent schema.
 
 ## Later changes
 - PR #43 replaced Acceptance 1, 2, 3 and 5: the publication hook no longer blocks, and it no longer reads heredoc bodies or `bash -c` scripts. `publication_kind` in `loom-code/scripts/loom_checker/rule_checks/push.py` recognises only a leading `git push`, `gh pr create` or `gh pr merge`, and only to print a reminder line. The heredoc carve-out tests (`loom-code/scripts/test_adversarial_heredoc_carve_out.py`) were deleted in #43.
