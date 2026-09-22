@@ -38,6 +38,8 @@ with open(os.environ["FAKE_GH_LOG"], "a", encoding="utf-8") as log:
     log.write(json.dumps(sys.argv[1:]) + "\\n")
 responses = json.load(open(os.environ["FAKE_GH_RESPONSES"], encoding="utf-8"))
 args = sys.argv[1:]
+if args[:2] == ["auth", "status"]:
+    sys.exit(0 if args[-1] == os.environ.get("FAKE_GH_AUTH_HOST") else 1)
 endpoint = next((a for a in args[1:] if a.startswith("repos/")), None)
 answer = responses.get(endpoint)
 if args[:1] != ["api"] or answer is None:
@@ -241,6 +243,22 @@ def test_no_github_remote_could_not_confirm(tmp_path):
     assert "loom: could not confirm GitHub rules" in result.stdout
     assert "no GitHub remote" in result.stdout
     assert calls == []
+
+
+def test_non_github_host_is_not_queried(tmp_path):
+    result, calls = probe(tmp_path, base_responses(), origin="https://gitlab.com/o/r.git")
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == "loom: could not confirm GitHub rules for the trunk (no GitHub remote)\n"
+    assert [argv for argv in calls if argv[:1] == ["api"]] == []
+
+
+def test_host_gh_is_logged_into_is_queried(tmp_path, monkeypatch):
+    monkeypatch.setenv("FAKE_GH_AUTH_HOST", "ghe.example.com")
+    result, calls = probe(tmp_path, base_responses(), origin="https://ghe.example.com/o/r.git")
+    assert result.returncode == 0, result.stderr
+    assert ["auth", "status", "--hostname", "ghe.example.com"] in calls
+    assert ["api", REPO, "--hostname", "ghe.example.com"] in calls
+    assert "no GitHub remote" not in result.stdout
 
 
 def test_rulesets_empty_classic_unreadable_unconfirmed(tmp_path):

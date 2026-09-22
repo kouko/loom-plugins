@@ -22,6 +22,7 @@ import yaml
 
 # Manual pages this module relies on:
 # gh api --hostname / -H: https://cli.github.com/manual/gh_api
+# gh auth status --hostname: https://cli.github.com/manual/gh_auth_status
 # rules for a branch (read access): https://docs.github.com/rest/repos/rules#get-rules-for-a-branch
 # a ruleset's bypass_actors: https://docs.github.com/rest/repos/rules#get-a-repository-ruleset
 # classic protection (admin only): https://docs.github.com/rest/branches/branch-protection#get-branch-protection
@@ -190,6 +191,14 @@ def template_step(trunk: str) -> str:
     )
 
 
+def _gh_knows_host(gh: str, host: str) -> bool:
+    """True when gh is logged into `host` (a GitHub Enterprise host)."""
+    try:
+        return run_gh([gh, "auth", "status", "--hostname", host]).returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+
+
 def _probe(print_setup: bool) -> str:
     trunk = "the trunk"
     try:
@@ -201,6 +210,8 @@ def _probe(print_setup: bool) -> str:
         gh = shutil.which("gh")
         if gh is None:
             raise Unconfirmed("gh not installed")
+        if host != "github.com" and not _gh_knows_host(gh, host):
+            raise Unconfirmed("no GitHub remote")
         repository = _json(gh, host, slug)
         trunk = repository.get("default_branch") if isinstance(repository, dict) else None
         if not isinstance(trunk, str) or not trunk:
