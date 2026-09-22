@@ -10,9 +10,10 @@ adapter maps agy events onto the handlers Claude Code and Codex already use:
     pre-invocation  PreInvocation           -> hooks/session-start (first turn only)
                                                + language-anchor on a loom SKILL.md read
 
-Exit status is always 0; decisions travel in the JSON. The push gate fails
-closed: when the checker is missing or cannot answer, only a closed set of
-read-only commands is allowed (the same set as the Codex stale-root fallback).
+Exit status is always 0; decisions travel in the JSON. The push gate never
+refuses publication: when the checker is missing or cannot answer it allows
+and says so, denying only a command that names the selection record store
+(the same rule as the Codex stale-root fallback).
 """
 from __future__ import annotations
 
@@ -22,7 +23,6 @@ import importlib.util
 import json
 import os
 import re
-import shlex
 import stat
 import subprocess
 import sys
@@ -46,86 +46,6 @@ def _emit(obj: dict) -> int:
 
 # --- push gate ---------------------------------------------------------------
 
-def _options_ok(args, exact, prefixes=()):
-    return all(
-        not t.startswith("-") or t == "--" or t in exact or any(t.startswith(p) for p in prefixes)
-        for t in args
-    )
-
-
-def _closed_read_only(command: str) -> bool:
-    """The Codex stale-root fallback's read-only set, ported verbatim in logic."""
-    try:
-        tokens = shlex.split(command)
-    except ValueError:
-        return False
-    if not tokens or any(ch in command for ch in "\n;&|<>$`()") or "/" in tokens[0]:
-        return False
-    if tokens[0] == "git":
-        return _git_read_only(tokens)
-    return _file_tool_read_only(tokens[0], tokens[1:])
-
-
-def _git_read_only(tokens: list[str]) -> bool:
-    """git status / log / show / diff / branch with read-only options only."""
-    index = 3 if len(tokens) > 2 and tokens[1] == "-C" and not tokens[2].startswith("-") else 1
-    if len(tokens) <= index:
-        return False
-    sub, args = tokens[index], tokens[index + 1:]
-    common = {"--stat", "--shortstat", "--name-only", "--name-status", "--oneline", "--no-patch",
-              "--patch", "-p", "--decorate", "--no-decorate", "--all", "--first-parent",
-              "--reverse", "--check", "--cached", "--staged", "--quiet", "--exit-code", "--"}
-    prefixes = ("--max-count=", "--format=", "--pretty=", "--since=", "--until=", "--author=",
-                "--grep=", "--date=", "--diff-filter=")
-    if sub == "status":
-        return _options_ok(
-            args,
-            {"-s", "--short", "-b", "--branch", "--porcelain", "--show-stash", "--ahead-behind",
-             "--no-ahead-behind", "-z", "--ignored", "--no-renames", "--"},
-            ("--porcelain=", "--untracked-files=", "--ignored=", "--find-renames="),
-        )
-    if sub in {"log", "show", "diff"}:
-        return all(
-            not a.startswith("-") or a in common or re.fullmatch(r"-[0-9]+", a)
-            or any(a.startswith(p) for p in prefixes)
-            for a in args
-        )
-    if sub == "branch":
-        return all(not a.startswith("-") or a in {"--list", "--"} for a in args)
-    return False
-
-
-def _file_tool_read_only(name: str, args: list[str]) -> bool:
-    """cat / ls / rg / find with read-only options only; any other program is refused."""
-    if name == "cat":
-        return all(a == "--" or not a.startswith("-") or re.fullmatch(r"-[benstuv]+", a) for a in args)
-    if name == "ls":
-        return all(a == "--" or not a.startswith("-") or re.fullmatch(r"-[AabdFfGghiklmnopqrstuwx1@%]+", a)
-                   for a in args)
-    if name == "rg":
-        return _options_ok(
-            args,
-            {"-n", "--line-number", "-l", "--files-with-matches", "--files", "--hidden", "-S",
-             "--smart-case", "-i", "--ignore-case", "-F", "--fixed-strings", "--no-heading", "--"},
-            ("--glob=", "--type=", "--color="),
-        )
-    if name == "find":
-        values = {"-maxdepth", "-mindepth", "-type", "-name", "-iname", "-path", "-ipath"}
-        flags = {"-print", "-xdev", "-depth", "-L", "-H", "-P", "!"}
-        i = 0
-        while i < len(args):
-            token = args[i]
-            if token in values:
-                i += 1
-                if i >= len(args):
-                    return False
-            elif token.startswith("-") and token not in flags:
-                return False
-            i += 1
-        return True
-    return False
-
-
 def _command_cwd(args: dict, payload: dict) -> str:
     workspaces = payload.get("workspacePaths") or []
     base = workspaces[0] if workspaces and isinstance(workspaces[0], str) else os.getcwd()
@@ -140,14 +60,14 @@ def push_gate(payload: dict) -> int:
     command = args.get("CommandLine")
     if not isinstance(command, str) or not command.strip():
         return _emit({"decision": "deny",
-                      "reason": "BLOCK push.attestation: run_command payload carries no CommandLine"})
+                      "reason": "BLOCK agy_adapter: run_command payload carries no CommandLine"})
     claude_payload = {
         "hook_event_name": "PreToolUse",
         "tool_name": "Bash",
         "tool_input": {"command": command},
         "cwd": _command_cwd(args, payload),
     }
-    rc, reason = None, ""
+    error = f"checker not found at {CHECKER}; reinstall the loom-code plugin (agy plugin install)"
     if CHECKER.is_file():
         try:
             result = subprocess.run(
@@ -155,19 +75,18 @@ def push_gate(payload: dict) -> int:
                 input=json.dumps(claude_payload), capture_output=True, text=True,
                 cwd=str(PLUGIN_ROOT), timeout=25,
             )
-            rc, reason = result.returncode, result.stderr.strip()
-        except (OSError, subprocess.SubprocessError):
-            rc = None
-    if rc == 0:
-        return _emit({"decision": "allow"})
-    if rc == 2:
-        return _emit({"decision": "deny", "reason": reason or "BLOCK push.attestation: checker refused"})
-    if _closed_read_only(command):
-        return _emit({"decision": "allow"})
-    return _emit({"decision": "deny", "reason": (
-        f"BLOCK push.attestation: loom checker unavailable at {CHECKER}; "
-        "reinstall the loom-code plugin (agy plugin install) before running this command"
-    )})
+            reason = result.stderr.strip()
+            if result.returncode == 0:  # the checker's reminder line, when it printed one
+                return _emit({"decision": "allow", "reason": reason} if reason else {"decision": "allow"})
+            if result.returncode == 2:
+                return _emit({"decision": "deny", "reason": reason or "BLOCK selection.guard: checker refused"})
+            error = f"checker exited {result.returncode}" + (f": {reason}" if reason else "")
+        except (OSError, subprocess.SubprocessError) as exc:
+            error = str(exc)
+    if "loom/selections" in command:  # a failed checker never loosens selection.guard
+        return _emit({"decision": "deny", "reason": (
+            f"BLOCK selection.guard: names the selection record store and the checker failed ({error})")})
+    return _emit({"decision": "allow", "reason": f"loom: publication hook failed ({error}); allowing."})
 
 
 # --- pre-invocation ------------------------------------------------------------
@@ -382,9 +301,9 @@ def main(argv: list[str]) -> int:
             return push_gate(payload)
         if mode == "pre-invocation":
             return pre_invocation(payload)
-    except Exception as exc:  # never crash the agent loop; the gate still fails closed
+    except Exception as exc:  # never crash the agent loop; an unreadable payload is denied
         if mode == "push-gate":
-            return _emit({"decision": "deny", "reason": f"BLOCK push.attestation: agy adapter error: {exc}"})
+            return _emit({"decision": "deny", "reason": f"BLOCK agy_adapter: agy adapter error: {exc}"})
         return _emit({})
     return _emit({"decision": "deny", "reason": f"agy_adapter: unknown mode {mode!r}"} if mode == "push-gate" else {})
 

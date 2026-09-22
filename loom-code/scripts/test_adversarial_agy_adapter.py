@@ -65,76 +65,6 @@ def _push(command: str, cwd, workspace: list[str]) -> dict:
             "toolCall": {"name": "run_command", "args": args}, "stepIdx": 3}
 
 
-@pytest.fixture
-def installed_copy(tmp_path: Path) -> Path:
-    """loom-code copied outside any git checkout, as agy installs it."""
-    dest = tmp_path / "gemini" / "plugins" / "loom-code"
-    shutil.copytree(PLUGIN_ROOT, dest, ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache"))
-    return dest / "hooks" / "agy_adapter.py"
-
-
-# --- push gate: shell-shape bypass -------------------------------------------
-
-@pytest.mark.parametrize("template", [
-    "bash -c 'git push origin feat'",
-    "cd {repo} && git push origin feat",
-    "true; git push origin feat",
-    "GIT_TRACE=0 git push origin feat",
-    "env git push origin feat",
-    "git -c core.pager=cat push origin feat",
-    "/usr/bin/git push origin feat",
-])
-def test_pushgate_wrapped_push_denies(change_repo, tmp_path, template):
-    """A push hidden behind a shell wrapper, chain, env prefix, or option is still denied."""
-    command = template.format(repo=change_repo)
-    out = _run("push-gate", _push(command, ".", [str(change_repo)]), tmp_path)
-    assert out["decision"] == "deny", (command, out)
-
-
-def test_pushgate_git_dash_c_from_foreign_cwd_denies(change_repo, tmp_path):
-    """``git -C <repo> push`` issued from an unrelated directory is still denied."""
-    elsewhere = tmp_path / "elsewhere"
-    elsewhere.mkdir()
-    out = _run("push-gate", _push(f"git -C {change_repo} push origin feat", str(elsewhere), []), tmp_path)
-    assert out["decision"] == "deny", out
-
-
-def test_pushgate_uppercase_git_on_case_insensitive_fs_denies(change_repo, tmp_path):
-    """On a case-insensitive filesystem ``GIT push`` runs git; the gate must still deny."""
-    probe = tmp_path / "CaseProbe"
-    probe.write_text("")
-    if not (tmp_path / "caseprobe").exists():
-        pytest.skip("filesystem is case-sensitive; GIT would not resolve to git")
-    if shutil.which("GIT") is None:
-        pytest.skip("GIT does not resolve on PATH")
-    out = _run("push-gate", _push("GIT push origin feat", ".", [str(change_repo)]), tmp_path)
-    assert out["decision"] == "deny", out
-
-
-# --- push gate: cwd resolution -----------------------------------------------
-
-def test_pushgate_relative_cwd_empty_workspace_installed_copy_denies(installed_copy, tmp_path):
-    """agy may send Cwd "." with workspacePaths []: the adapter then resolves cwd to
-    the installed plugin root (not a git checkout). It cannot know which repo the
-    push targets, so it must fail closed rather than allow."""
-    out = _run("push-gate", _push("git push origin feat", ".", []), tmp_path, adapter=installed_copy)
-    assert out["decision"] == "deny", out
-
-
-def test_pushgate_absent_cwd_empty_workspace_installed_copy_denies(installed_copy, tmp_path):
-    """No Cwd and no workspace: the push target is unknowable, so the gate denies."""
-    out = _run("push-gate", _push("git push origin feat", None, []), tmp_path, adapter=installed_copy)
-    assert out["decision"] == "deny", out
-
-
-def test_pushgate_nonstring_workspace_entry_denies(change_repo, tmp_path):
-    """A workspacePaths string (not a list) must not turn into a relative cwd that allows."""
-    payload = _push("git push origin feat", ".", [])
-    payload["workspacePaths"] = str(change_repo)
-    out = _run("push-gate", payload, tmp_path)
-    assert out["decision"] == "deny", out
-
-
 # --- push gate: dependency failure and hostile stdin -------------------------
 
 @pytest.fixture
@@ -147,25 +77,69 @@ def crashing_checker_adapter(tmp_path: Path) -> Path:
     return root / "hooks" / "agy_adapter.py"
 
 
-def test_pushgate_crashing_checker_push_denies(crashing_checker_adapter, change_repo, tmp_path):
-    """A checker that exits neither 0 nor 2 leaves the push denied (fail closed)."""
+def test_pushgate_crashing_checker_push_allows_and_says_so(crashing_checker_adapter, change_repo, tmp_path):
+    """A checker that exits neither 0 nor 2 allows the push and names the failure."""
     out = _run("push-gate", _push("git push origin feat", ".", [str(change_repo)]), tmp_path,
                adapter=crashing_checker_adapter)
-    assert out["decision"] == "deny", out
+    assert out["decision"] == "allow", out
+    assert out["reason"].startswith("loom: publication hook failed (checker exited 3"), out
+    assert out["reason"].endswith("; allowing."), out
 
 
-def test_pushgate_crashing_checker_newline_smuggled_push_denies(crashing_checker_adapter, change_repo, tmp_path):
-    """The read-only fallback rejects a read-only command with a push smuggled after a newline."""
-    out = _run("push-gate", _push("git status\ngit push origin feat", ".", [str(change_repo)]), tmp_path,
+@pytest.mark.parametrize("command", [
+    "echo x >> .git/loom/selections/c.jsonl",
+    "git status\ncp forged .git/loom/selections/c.jsonl",
+    "bash -c 'tee -a /r/.git/loom/selections/c.jsonl < ev'",
+])
+def test_pushgate_crashing_checker_selection_store_denies(crashing_checker_adapter, change_repo, tmp_path,
+                                                          command):
+    """A crashed checker never loosens the selection-store guard."""
+    out = _run("push-gate", _push(command, ".", [str(change_repo)]), tmp_path,
                adapter=crashing_checker_adapter)
     assert out["decision"] == "deny", out
+    assert "BLOCK selection.guard" in out["reason"]
 
 
 def test_pushgate_crashing_checker_git_dash_c_status_allows(crashing_checker_adapter, change_repo, tmp_path):
-    """The fallback still allows the closed read-only set (``git -C dir status``)."""
+    """The fallback still allows a read-only command (``git -C dir status``)."""
     out = _run("push-gate", _push(f"git -C {change_repo} status --short", ".", [str(change_repo)]),
                tmp_path, adapter=crashing_checker_adapter)
+    assert out["decision"] == "allow"
+
+
+@pytest.fixture
+def stub_checker_adapter(tmp_path: Path):
+    """An adapter whose checker is a stub with a chosen exit code and output."""
+    def make(code: int, stdout: str = "", stderr: str = "") -> Path:
+        root = tmp_path / f"stub-{code}"
+        (root / "hooks").mkdir(parents=True)
+        (root / "scripts").mkdir()
+        shutil.copy2(ADAPTER, root / "hooks" / "agy_adapter.py")
+        (root / "scripts" / "loom_checker.py").write_text(
+            f"import sys\nsys.stdin.read()\nprint({stdout!r})\n"
+            f"print({stderr!r}, file=sys.stderr)\nsys.exit({code})\n")
+        return root / "hooks" / "agy_adapter.py"
+    return make
+
+
+def test_pushgate_checker_exit_zero_forwards_reminder(stub_checker_adapter, change_repo, tmp_path):
+    line = "loom: verification absent (missing: attestation); publishing anyway."
+    adapter = stub_checker_adapter(0, json.dumps({"systemMessage": line}), line)
+    out = _run("push-gate", _push("git push origin feat", ".", [str(change_repo)]), tmp_path, adapter=adapter)
+    assert out == {"decision": "allow", "reason": line}
+
+
+def test_pushgate_checker_exit_zero_silent_allows_bare(stub_checker_adapter, change_repo, tmp_path):
+    out = _run("push-gate", _push("git status", ".", [str(change_repo)]), tmp_path,
+               adapter=stub_checker_adapter(0))
     assert out == {"decision": "allow"}
+
+
+def test_pushgate_checker_exit_two_passes_its_reason(stub_checker_adapter, change_repo, tmp_path):
+    reason = "BLOCK selection.guard: names the selection record store"
+    out = _run("push-gate", _push("ls .git/loom", ".", [str(change_repo)]), tmp_path,
+               adapter=stub_checker_adapter(2, stderr=reason))
+    assert out == {"decision": "deny", "reason": reason}
 
 
 @pytest.mark.parametrize("stdin", ["not json", "", "[]", "null", '{"toolCall": "x"}',

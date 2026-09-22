@@ -531,10 +531,9 @@ def test_isolated_host_hook_lifecycle_matrix(tmp_path: Path) -> None:
             env=dict(os.environ, **{root_var: str(root)}),
         )
 
-    for body, expected in (("git status --short", 0), ("git push origin HEAD", 2)):
-        codex = invoke(codex_command, "PLUGIN_ROOT", code_root, body)
-        claude = invoke(claude_command, "CLAUDE_PLUGIN_ROOT", code_root, body)
-        assert codex.returncode == claude.returncode == expected
+    codex = invoke(codex_command, "PLUGIN_ROOT", code_root, "git status --short")
+    claude = invoke(claude_command, "CLAUDE_PLUGIN_ROOT", code_root, "git status --short")
+    assert codex.returncode == claude.returncode == 0
 
     for command, root_var in (
         (codex_command, "PLUGIN_ROOT"),
@@ -548,7 +547,6 @@ def test_isolated_host_hook_lifecycle_matrix(tmp_path: Path) -> None:
 
     shutil.rmtree(code_root)
     assert invoke(codex_command, "PLUGIN_ROOT", code_root, "git status").returncode == 0
-    assert invoke(codex_command, "PLUGIN_ROOT", code_root, "git push origin HEAD").returncode == 2
 
     reloaded_root = _install_plugin("loom-code", tmp_path / "installed-v2")
     reloaded_manifest = json.loads(
