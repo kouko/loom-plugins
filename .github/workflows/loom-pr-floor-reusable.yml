@@ -49,7 +49,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install checker dependency
-        run: python3 -m pip install --quiet pyyaml
+        run: python3 -m pip install --quiet pyyaml==6.0.3
 
       - name: Write the PR body to a file
         env:

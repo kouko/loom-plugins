@@ -93,3 +93,11 @@ def test_no_pr_controlled_text_interpolated_into_a_script():
 
 def test_this_repository_adopts_the_template_unchanged():
     assert ADOPTION.read_bytes() == TEMPLATE.read_bytes()
+
+
+def test_checker_dependency_is_pinned_to_the_lock() -> None:
+    lock = (REPO / "requirements-package-tests.lock").read_text(encoding="utf-8")
+    pinned = re.search(r"^pyyaml==(\S+)", lock, re.MULTILINE).group(1)
+    installs = [step["run"] for step in _steps(_load(REUSABLE))
+                if "pip install" in step.get("run", "")]
+    assert installs == [f"python3 -m pip install --quiet pyyaml=={pinned}"]
