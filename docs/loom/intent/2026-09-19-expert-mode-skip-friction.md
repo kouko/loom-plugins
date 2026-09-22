@@ -48,6 +48,7 @@ brought about by anything other than the user.
 - PR #43 (intent 2026-09-22-publication-floor-moves-to-github) shipped this change. A skip asked for in plain words is handled by the station itself (e.g. `loom-code/skills/build/SKILL.md` §1); `/loom-code:expert-mode` remains an optional typed route.
 - Acceptance 2 holds only partly: a plain-words skip is recorded in the plan's `skipped-by-instruction:` line (`loom-code/skills/build/SKILL.md` §1) and the PR's `Skipped by instruction:` line (`loom-code/skills/ship/SKILL.md` §1–2), not in the selection store that typed skips use.
 - Acceptance 3 and 4 rest on an agent behaviour rule (a skip needs the user's own request), disclosed on the PR, not on a machine check. The user chose this as option A in #43's PR body Decisions table.
+- Option A also settled both Open questions: no machine evidence stands in for the typed code, and the same plain-words rule applies to every skippable step, whether or not it removes verification.
 
 ## Open questions
 - What evidence should stand in for the typed code as proof that a human, and

@@ -55,6 +55,7 @@ publication: automatic — authorized 2026-09-18 by kouko
 - PR #43 replaced Acceptance 1, 2 and 6: `publish` and `land` no longer refuse a branch without a verification record, so there is no refusal message left to name routes in. They print the recomputed verification status and continue ("publishing anyway" in `loom-code/scripts/loom_checker/command_handlers/publish.py`, "merged anyway" in `land.py`; `loom-code/skills/ship/SKILL.md` §3).
 - Acceptance 3 still holds: `loom-code/skills/ship/SKILL.md` §3 still forbids handing a refused publication command to the user. A skip is now asked for in plain words; the typed route of Acceptance 4 remains optional through `/loom-code:expert-mode`.
 - #43 also replaced two Constraints bullets: "不放寬閘門的任何一條規則，也不改變共用回報函式的語意。" (publish now prints "publishing anyway" instead of refusing) and "不產生任何不實的驗證紀錄；跳站必須來自使用者親手輸入的確認，符合原則第 2 條。" (the user's plain words now suffice for a skip).
+- #43 overturned the first Out of scope bullet, which rejected downgrading "no verification record" from a block to a warning: #43 made that downgrade, moved the merge floor to GitHub, and amended PRINCIPLES.md non-negotiable 2.
 - Decision recorded in #43's PR body Decisions table and intent 2026-09-22-publication-floor-moves-to-github.
 
 ## Open questions
