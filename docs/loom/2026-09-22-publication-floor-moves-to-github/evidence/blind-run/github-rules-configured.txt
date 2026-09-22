@@ -1,0 +1,1 @@
+loom: main requires a pull request (administrators included) and the check "loom-pr-floor / PR floor"

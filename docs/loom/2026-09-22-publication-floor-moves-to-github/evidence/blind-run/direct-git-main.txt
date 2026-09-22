@@ -1,0 +1,10 @@
+remote: error: GH013: Repository rule violations found for refs/heads/main.        
+remote: Review all repository rules at https://github.com/kouko/loom-floor-test/rules?ref=refs%2Fheads%2Fmain        
+remote: 
+remote: - Changes must be made through a pull request.        
+remote: 
+remote: - Required status check "loom-pr-floor / PR floor" is expected.        
+remote: 
+To https://github.com/kouko/loom-floor-test.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/kouko/loom-floor-test.git'

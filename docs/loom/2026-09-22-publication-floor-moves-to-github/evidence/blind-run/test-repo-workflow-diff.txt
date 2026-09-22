@@ -1,0 +1,21 @@
+--- /private/tmp/claude-501/-Users-kouko-GitHub-loom-plugins/5a71058c-c0a8-4447-8484-17e780c1448e/scratchpad/wt/loom-code/templates/loom-pr-floor.yml	2026-09-22 20:57:29
++++ .github/workflows/loom-pr-floor.yml	2026-09-22 20:58:23
+@@ -21,6 +21,6 @@
+ 
+ jobs:
+   loom-pr-floor:
+-    uses: kouko/loom-plugins/.github/workflows/loom-pr-floor-reusable.yml@main
++    uses: kouko/loom-floor-test/.github/workflows/loom-pr-floor-reusable.yml@main
+     with:
+       loom-ref: main
+--- /private/tmp/claude-501/-Users-kouko-GitHub-loom-plugins/5a71058c-c0a8-4447-8484-17e780c1448e/scratchpad/wt/.github/workflows/loom-pr-floor-reusable.yml	2026-09-22 20:57:29
++++ .github/workflows/loom-pr-floor-reusable.yml	2026-09-22 20:58:24
+@@ -29,7 +29,7 @@
+       - name: Check out loom
+         uses: actions/checkout@v4
+         with:
+-          repository: kouko/loom-plugins
++          repository: kouko/loom-floor-test
+           ref: ${{ inputs.loom-ref }}
+           path: loom
+           sparse-checkout: loom-code

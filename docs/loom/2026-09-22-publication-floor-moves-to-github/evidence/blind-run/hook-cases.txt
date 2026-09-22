@@ -1,0 +1,67 @@
+[#4 direct push] exit=0
+  command: 'git push -u origin feat/local-probe'
+  stderr: loom: verification absent (missing: plan, attestation); publishing anyway.
+
+[#4 direct PR create] exit=0
+  command: 'gh pr create --title T --body-file b.md'
+  stderr: loom: verification absent (missing: plan, attestation); publishing anyway.
+
+[#4 env-prefixed push] exit=0
+  command: 'GIT_TRACE=0 git push origin HEAD'
+  stderr: loom: verification absent (missing: plan, attestation); publishing anyway.
+
+[#4 wrapped: true;] exit=0
+  command: 'true; git push origin HEAD'
+  stderr: (none)
+
+[#4 wrapped: if/then] exit=0
+  command: 'if true; then git push origin HEAD; fi'
+  stderr: (none)
+
+[#4 wrapped: subshell] exit=0
+  command: '( git push origin HEAD )'
+  stderr: (none)
+
+[#4 wrapped: xargs] exit=0
+  command: 'echo origin | xargs git push'
+  stderr: (none)
+
+[#4 wrapped: heredoc to bash] exit=0
+  command: 'cat <<EOF | bash\ngit push origin HEAD\nEOF'
+  stderr: (none)
+
+[#4 wrapped: bash -c] exit=0
+  command: "bash -c 'git push origin HEAD'"
+  stderr: (none)
+
+[#4 && chain] exit=0
+  command: 'git status && git push origin HEAD'
+  stderr: (none)
+
+[#10 merge outside land] exit=0
+  command: 'gh pr merge 5 --squash'
+  stderr: loom: this merges outside loom_checker.py land (missing: plan, attestation); merging anyway.
+
+[#12 grep for merge words] exit=0
+  command: 'grep -rn "gh pr merge" .'
+  stderr: (none)
+
+[#12 echo merge words] exit=0
+  command: 'echo "run gh pr merge later"'
+  stderr: (none)
+
+[#12 commit message] exit=0
+  command: 'git commit -m "document gh pr merge usage"'
+  stderr: (none)
+
+[#12 printf merge words] exit=0
+  command: "printf '%s\\n' 'gh pr merge --auto'"
+  stderr: (none)
+
+[guard: selection store] exit=2
+  command: 'echo x > .git/loom/selections/foo.json'
+  stderr: BLOCK selection.guard: names the selection record store
+
+[hook failure: cwd is not a repository] exit=0
+  stderr: loom: publication hook failed (/ is not inside a git work tree.); allowing.
+

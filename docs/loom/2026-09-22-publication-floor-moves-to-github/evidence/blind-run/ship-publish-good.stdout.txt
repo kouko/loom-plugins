@@ -1,0 +1,4 @@
+Verification absent for 2d51790fd6135d2ca50869fe038ac515ede7f0eb
+Publication target: github.com/kouko/loom-floor-test base main
+Published PR: https://github.com/kouko/loom-floor-test/pull/5
+Required CI passed

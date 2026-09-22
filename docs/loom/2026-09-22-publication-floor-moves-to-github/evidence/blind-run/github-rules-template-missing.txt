@@ -1,0 +1,6 @@
+[template not on trunk] github-rules
+loom: template not on main — land it first, then add the rules
+  copy /private/tmp/claude-501/-Users-kouko-GitHub-loom-plugins/5a71058c-c0a8-4447-8484-17e780c1448e/scratchpad/wt/loom-code/templates/loom-pr-floor.yml to .github/workflows/loom-pr-floor.yml, land it on main, then run: loom_checker.py github-rules --print-setup
+[template not on trunk] github-rules --print-setup
+loom: template not on main — land it first, then add the rules
+  copy /private/tmp/claude-501/-Users-kouko-GitHub-loom-plugins/5a71058c-c0a8-4447-8484-17e780c1448e/scratchpad/wt/loom-code/templates/loom-pr-floor.yml to .github/workflows/loom-pr-floor.yml, land it on main, then run: loom_checker.py github-rules --print-setup
