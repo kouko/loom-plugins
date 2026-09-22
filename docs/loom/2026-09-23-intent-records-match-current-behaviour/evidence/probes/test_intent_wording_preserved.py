@@ -2,7 +2,11 @@
 
 The change intent's first Constraint says the existing wording of each intent
 stays as it was confirmed; the only allowed edits are added notes plus the one
-status line in Acceptance 1 (2026-09-19-expert-mode-skip-friction). This probe
+status line in Acceptance 1 (2026-09-19-expert-mode-skip-friction). A second
+Constraint (user-decided 2026-09-23) lets
+2026-09-19-publication-hook-false-positives append a reason to its
+`needs-design: no` line and nothing more; its added `originator:` line and
+`## Out of scope` section are insertions, which always pass. This probe
 diffs every edited intent against the trunk commit the branch started from
 (b568ba1a, PR #43) and fails on any existing line that was rewritten or
 removed. Added lines anywhere pass.
@@ -19,6 +23,7 @@ purpose and must not be weakened.
 from __future__ import annotations
 
 import difflib
+import re
 import subprocess
 from pathlib import Path
 
@@ -35,9 +40,15 @@ INTENTS = [
     "2026-09-19-publication-hook-false-positives",
     "2026-09-20-mechanical-calculations",
 ]
-# (intent, old line, required prefix of the new line): the one allowed rewrite.
+# (intent, exact old line) -> pattern the whole new line must match. The status
+# line is Acceptance 1's; the needs-design line is the Constraints exception
+# user-decided 2026-09-23 (cf97c369): the line keeps `needs-design: no` and only
+# gains a non-empty reason after the checker's ` — ` separator.
 ALLOWED_REWRITES = {
-    ("2026-09-19-expert-mode-skip-friction", "status: open"): "status: closed",
+    ("2026-09-19-expert-mode-skip-friction", "status: open"):
+        re.compile(r"status: closed\b.*"),
+    ("2026-09-19-publication-hook-false-positives", "needs-design: no"):
+        re.compile(r"needs-design: no — \S.*"),
 }
 
 
@@ -58,8 +69,8 @@ def rewritten_lines(change_id: str, old: list[str], new: list[str]) -> list[str]
             continue
         replaced = new[j1:j2]
         for line in old[i1:i2]:
-            prefix = ALLOWED_REWRITES.get((change_id, line.strip()))
-            if prefix and any(r.strip().startswith(prefix) for r in replaced):
+            allowed = ALLOWED_REWRITES.get((change_id, line))
+            if allowed and any(allowed.fullmatch(r) for r in replaced):
                 continue
             faults.append(f"{tag}: {line!r} -> {replaced!r}")
     return faults
@@ -81,6 +92,25 @@ def test_wordingcheck_allowedstatus_accepted() -> None:
     bad = ["status: withdrawn", "## Problem"]
     assert rewritten_lines("2026-09-19-expert-mode-skip-friction", old, good) == []
     assert rewritten_lines("2026-09-19-expert-mode-skip-friction", old, bad) != []
+
+
+def test_wordingcheck_needsdesignreason_appendonly() -> None:
+    """The needs-design exception accepts only an appended reason, only in its own intent."""
+    hook = "2026-09-19-publication-hook-false-positives"
+    old = ["kind: engineering", "needs-design: no", "## Problem"]
+
+    def with_line(line: str) -> list[str]:
+        return ["kind: engineering", line, "## Problem"]
+
+    assert rewritten_lines(hook, old, with_line("needs-design: no — hook recognition only")) == []
+    for bad in ("needs-design: yes — a reason", "needs-design: no —", "needs-design: no — ",
+                "needs-design: No — a reason", "needs-design: no - a reason",
+                "needs-design: no, a reason", "needs-design: none — a reason"):
+        assert rewritten_lines(hook, old, with_line(bad)) != [], bad
+    assert rewritten_lines("2026-09-14-land-merged-changes", old,
+                           with_line("needs-design: no — a reason")) != []
+    assert rewritten_lines(hook, old, ["kind: Engineering", "needs-design: no — a reason",
+                                       "## Problem"]) != []
 
 
 @pytest.mark.parametrize("change_id", INTENTS)
