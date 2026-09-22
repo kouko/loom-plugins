@@ -85,6 +85,8 @@ def test_list_rules_still_reports_the_complete_public_set() -> None:
     )
     rule_ids = {line.split("\t", 1)[0] for line in result.stdout.splitlines()}
     assert len(rule_ids) == 25
-    assert "push.attestation" in rule_ids
+    assert "push.attestation" not in rule_ids
+    assert "push.merge" not in rule_ids
+    assert {"ci.pr-floor", "publish.preconditions"} <= rule_ids
     assert "push.contextual-body" in rule_ids
     assert "standing.second-vendor-valid" in rule_ids

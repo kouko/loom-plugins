@@ -113,6 +113,9 @@ mechanisms:
     eval: "loom-code/scripts/test_expert_mode_skill.py::test_skill_procedure_maps_proposes_reports_withdraws_and_relapses"
 
   # --- checker-rule (19; loom_checker.py --list-rules) ---
+  - id: ci.pr-floor
+    class: checker-rule
+    eval: loom-code/scripts/test_pr_floor.py::test_bad_body_exit_1_names_heading
   - id: contract.charter-complete
     class: checker-rule
     eval: loom-code/scripts/test_contract_charter.py::test_charter_command_every_column_of_every_row_is_non_empty
@@ -158,15 +161,12 @@ mechanisms:
   - id: land.cleanup
     class: checker-rule
     eval: loom-code/scripts/test_land_sweep.py::test_changed_list_token_removes_nothing
-  - id: push.attestation
+  - id: publish.preconditions
     class: checker-rule
-    eval: loom-code/scripts/test_loom_attestation.py::test_push_reuses_matching_attestation_without_subprocesses
+    eval: loom-code/scripts/test_loom_publish.py::test_publish_rejects_diverged_remote_before_push
   - id: push.contextual-body
     class: checker-rule
     eval: loom-code/scripts/test_loom_publish.py::test_contextual_body_gate_rejects_malformed_or_unsafe_schema
-  - id: push.merge
-    class: checker-rule
-    eval: loom-code/scripts/test_ship_worktree_merge.py::test_hook_blocks_absolute_cd_merge_with_push_merge
   - id: review.sync
     class: checker-rule
     eval: loom-code/scripts/test_sync_trunk.py::test_conflict_names_every_file_and_restores_head

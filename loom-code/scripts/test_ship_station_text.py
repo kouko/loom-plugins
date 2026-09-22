@@ -173,9 +173,9 @@ PUBLISH_HANDLER = (
 
 
 def _bare_attestation_refusals() -> list[str]:
-    """Every `push.attestation` reason `publish` emits as a plain string.
+    """Every `publish.preconditions` reason `publish` emits as a plain string.
 
-    `_publish_block(reason, err)` is `report([("push.attestation", reason)])`,
+    `_publish_block(reason, err)` is `report([("publish.preconditions", reason)])`,
     so a call whose first argument is a string constant is a refusal whose
     whole text is that constant: nothing appends a remedy to it. A call that
     passes a name (`origin_error`) is not counted -- what that name holds is
@@ -199,7 +199,7 @@ def test_ship_prose_covers_the_refusals_that_name_no_remedy() -> None:
     """The station may only promise a remedy where the checker names one.
 
     The premise is recomputed, not remembered: `publish` emits
-    `push.attestation` refusals whose whole text is a string constant, with
+    `publish.preconditions` refusals whose whole text is a string constant, with
     no remedy appended -- `literal origin is not a
     supported GitHub repository URL` is the one the blind runner hit. An
     agent that met one of those and read an unconditional "take the remedy

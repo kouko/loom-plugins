@@ -68,6 +68,7 @@ def test_bad_body_exit_1_names_heading(tmp_path: Path, monkeypatch) -> None:
     repo = identified_repo(tmp_path)
     code, _out, err, _summary = run(repo, body("Scope"), monkeypatch, tmp_path)
     assert code == 1
+    assert err.startswith("BLOCK ci.pr-floor: ")
     assert 'heading "Scope" is missing' in err
 
 

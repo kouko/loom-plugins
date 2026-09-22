@@ -30,7 +30,7 @@ def test_public_rule_inventory_has_only_current_publication_contracts() -> None:
         for line in result.stdout.splitlines()
         if line.startswith("push.")
     }
-    assert push_rules == {"push.attestation", "push.contextual-body", "push.merge"}
+    assert push_rules == {"push.contextual-body"}
 
 
 def test_removed_package_replay_flag_is_rejected() -> None:

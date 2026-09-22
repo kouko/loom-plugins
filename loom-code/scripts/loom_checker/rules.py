@@ -105,10 +105,12 @@ RULES: list[tuple[str, str]] = [
 
 
 RULES.append((
-    "push.attestation",
-    "The branch carries one generated attestation whose functional-content digest, "
-    "successful executions, command identities, and passing reviewer verdicts validate "
-    "without replaying package tests or adversarial probes.",
+    "publish.preconditions",
+    "publish pushes HEAD and opens or updates its one pull request only when the change "
+    "is identified, publication is authorized, git and gh resolve to trusted executables, "
+    "origin is a literal GitHub URL, and HEAD, the remote branch and the PR identity stay "
+    "unchanged across every network step; the verification status is disclosed, never "
+    "a refusal.",
 ))
 
 
@@ -121,10 +123,10 @@ RULES.append((
 
 
 RULES.append((
-    "push.merge",
-    "The publication hook refuses every Bash command whose text contains the words "
-    "gh, pr, merge in order (wrappers, options and shell grammar included), before "
-    "repository selection; loom_checker.py land is the only merge path.",
+    "ci.pr-floor",
+    "The pr-floor CI check fails only when the pull-request body lacks Ship's nine "
+    "contextual headings in order, naming the heading; the verification status is "
+    "recomputed from git and published as a notice, and every status passes.",
 ))
 
 

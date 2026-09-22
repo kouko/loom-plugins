@@ -90,7 +90,7 @@ def _publish_usage(reason: str, err) -> int:
 
 
 def _publish_block(reason: str, err) -> int:
-    return report([("push.attestation", reason)], err)
+    return report([("publish.preconditions", reason)], err)
 
 
 def _publish_origin_state(repo: Path, expected_branch: str) -> tuple[str | None, str | None]:
@@ -397,7 +397,7 @@ def _cmd_publish_trusted(
 
     change_id, _unidentified = identify_change(repo)
     if change_id is None:
-        return report([("publish", "cannot identify the change — name the branch "
+        return report([("publish.preconditions", "cannot identify the change — name the branch "
                                    "<type>/<change-id> or commit its intent")], err)
 
     intent_error: str | None = None

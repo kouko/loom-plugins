@@ -743,6 +743,7 @@ def test_publish_rejects_diverged_remote_before_push(tmp_path: Path, monkeypatch
         "--body-file", str(body),
     ], StringIO(), err)
     assert rc == 1
+    assert err.getvalue().startswith("BLOCK publish.preconditions: ")
     assert "remote branch" in err.getvalue()
     assert not any("push" in call for call in calls.calls)
 
@@ -1338,7 +1339,7 @@ def test_unidentified_change_refused_before_network(tmp_path: Path, monkeypatch)
 
     assert rc == 1
     assert err == (
-        "BLOCK publish: cannot identify the change — name the branch "
+        "BLOCK publish.preconditions: cannot identify the change — name the branch "
         "<type>/<change-id> or commit its intent\n"
     )
     assert calls.calls == []
