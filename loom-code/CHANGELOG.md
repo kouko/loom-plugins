@@ -6,7 +6,7 @@ Patch: docs only. No station guidance, field, rule id or contract change.
 
 - Intent records under `docs/loom/intent/` now say which Acceptance lines a
   later change replaced: the skip-friction intent is closed as shipped by
-  PR #43, and seven intents carry a `## Later changes` note.
+  PR #43, and eight intents carry a `## Later changes` note.
 
 ## [3.8.0] — 2026-09-22 — publication floor moves to GitHub
 
