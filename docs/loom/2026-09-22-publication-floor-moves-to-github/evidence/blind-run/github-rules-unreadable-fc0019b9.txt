@@ -1,0 +1,16 @@
+[non-GitHub remote: https://gitlab.com/someone/project.git]
+loom: could not confirm GitHub rules for the trunk (no GitHub remote)
+exit=0
+[no remote]
+loom: could not confirm GitHub rules for the trunk (no GitHub remote)
+exit=0
+[API error]
+loom: could not confirm GitHub rules for the trunk (repos/kouko/loom-floor-test: gh: Server Error (HTTP 502))
+exit=0
+[gh not installed]
+loom: could not confirm GitHub rules for the trunk (gh not installed)
+exit=0
+[anonymous viewer]
+loom: could not confirm GitHub rules for main (bypass actors unreadable; classic protection unreadable)
+[owner, configured]
+loom: main requires a pull request (administrators included) and the check "loom-pr-floor / PR floor"

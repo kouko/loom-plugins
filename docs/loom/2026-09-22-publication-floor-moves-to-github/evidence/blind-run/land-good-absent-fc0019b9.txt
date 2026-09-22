@@ -1,0 +1,7 @@
+All checks passed on PR #7
+Merged PR #7 as 42ee292
+loom: verification absent (missing: plan, attestation); merged anyway.
+Trunk main fast-forwarded to 42ee292
+Deleted local branch feat/land-probe
+Deleted remote branch feat/land-probe
+exit=0

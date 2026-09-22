@@ -1,0 +1,3 @@
+BLOCK land.merge: PR body heading "Scope" is missing
+exit=1
+merged=false state=open
