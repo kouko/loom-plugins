@@ -27,7 +27,10 @@ user may invoke. The default is the full flow: skip a step only when the user
 tells you to in plain words, then tell the user in one line which step is
 skipped and continue. When you honour such a skip, append one line
 `skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
-and commit it. Never ask the user for a generated code to skip a step.
+and commit it. Commit that line before reviewers read the final digest,
+because it changes the digest; a later commit is harmless only when the skip
+sends the change to Ship unattested (§5). Never ask the user for a generated
+code to skip a step.
 
 ## 2. Compute review depth
 
@@ -309,7 +312,14 @@ attestation bound to the functional-content digest. Commit the generated file
 with any remaining publication metadata; publication validates that single
 attestation directly.
 
-When `finalize-review` fails, return the fix to Build, which repeats its
+When a step that `finalize-review` needs (reviewers, adversarial, package-tests)
+was skipped by the user's plain-words instruction rather than a bound
+selection, skip `finalize-review` and leave the change unattested: tell the
+user in one line that the PR will show `verification absent`, and hand the
+change to Ship.
+
+When `finalize-review` fails for any cause other than the plain-words case above,
+return the fix to Build, which repeats its
 end-of-Build mechanical checks, and the fixed content, a new functional-content
 digest, must pass the next review round (§4) before `finalize-review` runs
 again. No technical design re-look precedes that round unless the episode is

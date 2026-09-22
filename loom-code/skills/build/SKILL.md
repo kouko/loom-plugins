@@ -83,8 +83,9 @@ mechanical checks, in this order:
 3. Run the repository's complete package suite, then each committed
    adversarial program. The suite command is the `package-tests:` value in
    `docs/loom/KICKOFF-DEFAULTS.md`, or, when absent, the command detected from
-   build markers; when it is `none`, `selection show` must list `package-tests`
-   as skipped.
+   build markers; when it is `none`, the complete package suite is skipped:
+   either `package-tests` is listed by `selection show`, or the change reaches
+   Ship unattested and the PR discloses `absent`.
 
 When a check fails, the fix is made inside Build as §2 assigns implementation
 work; the adversary never fixes what it breaks. Every fatal or important
@@ -96,6 +97,8 @@ instruction), and until every adversarial program has passed or `adversarial`
 is skipped (listed by `selection show` or skipped by the user's plain-words
 instruction), each skip waiving only its own check.
 `finalize-review` still executes both once more on committed content.
+When the user skipped the suite or the adversary in plain words, closing-review
+hands the change to Ship unattested (closing-review §5).
 
 When `adversarial` is skipped (listed by `selection show` or skipped by the
 user's plain-words instruction), dispatch no adversary and run no adversarial

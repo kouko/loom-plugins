@@ -238,7 +238,15 @@ STEP_3 = VERIFY.split("3. Run the repository's complete package suite", 1)[1].sp
 )[0]
 
 
-SUITE_NONE = "when it is `none`, `selection show` must list `package-tests` as skipped."
+SUITE_NONE = (
+    "when it is `none`, the complete package suite is skipped: either `package-tests` is "
+    "listed by `selection show`, or the change reaches Ship unattested and the PR discloses "
+    "`absent`."
+)
+PLAIN_WORDS_UNATTESTED = (
+    "When the user skipped the suite or the adversary in plain words, closing-review "
+    "hands the change to Ship unattested (closing-review §5)."
+)
 
 
 def _names_suite_command(step: str) -> bool:
@@ -262,6 +270,14 @@ def test_suite_command_names_package_tests_declaration() -> None:
     assert STEP_3.count(SUITE_NONE) == 1, STEP_3
     assert not has_negation(SUITE_NONE)
     assert not _OPTIONAL.search(SUITE_NONE)
+
+
+def test_plain_words_skip_reaches_ship_unattested() -> None:
+    assert "`selection show` must list `package-tests` as skipped" not in VERIFY
+    assert VERIFY.count(PLAIN_WORDS_UNATTESTED) == 1, VERIFY
+    assert VERIFY.index("`finalize-review` still executes both") < VERIFY.index(PLAIN_WORDS_UNATTESTED)
+    assert not has_negation(PLAIN_WORDS_UNATTESTED)
+    assert has_negation(PLAIN_WORDS_UNATTESTED.replace("hands", "never hands"))
 
 
 def test_suite_step_without_command_source_fails() -> None:

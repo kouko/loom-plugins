@@ -590,9 +590,65 @@ SKIP_RECORD = (
 def test_each_station_records_a_plain_words_skip_in_the_plan() -> None:
     assert not has_negation(SKIP_RECORD)
     for name, text in SKIP_CONDITION_STATIONS.items():
+        if name == "ship":
+            continue
         prose = " ".join(text.split())
         assert prose.count(SKIP_RECORD) == 1, name
         assert prose.index(SKIP_RULE) < prose.index(SKIP_RECORD) < prose.index(NO_CODE), name
+
+
+SHIP_SKIP_TO_BODY = (
+    "When you honour such a skip, write it straight into the PR body's "
+    "`Skipped by instruction:` line (§2); Ship only reads the plan's "
+    "`skipped-by-instruction:` lines and leaves the plan unchanged, because plan.md is "
+    "functional content and an appended line would make the attestation stale."
+)
+REVIEW_SKIP_BEFORE_DIGEST = (
+    "Commit that line before reviewers read the final digest, because it changes the "
+    "digest; a later commit is harmless only when the skip sends the change to Ship "
+    "unattested (§5)."
+)
+
+
+def test_ship_writes_a_plain_words_skip_into_the_body_not_the_plan() -> None:
+    assert SHIP_PROSE.count(SKIP_RECORD) == 0
+    assert SHIP_PROSE.count(SHIP_SKIP_TO_BODY) == 1
+    assert (SHIP_PROSE.index(SKIP_RULE) < SHIP_PROSE.index(SHIP_SKIP_TO_BODY)
+            < SHIP_PROSE.index(NO_CODE))
+    assert not has_negation(SHIP_SKIP_TO_BODY)
+    assert has_negation(SHIP_SKIP_TO_BODY.replace("leaves", "never leaves"))
+
+
+def test_review_commits_the_skip_record_before_the_final_digest() -> None:
+    review_prose = " ".join(REVIEW.split())
+    assert review_prose.count(REVIEW_SKIP_BEFORE_DIGEST) == 1
+    assert (review_prose.index(SKIP_RECORD) < review_prose.index(REVIEW_SKIP_BEFORE_DIGEST)
+            < review_prose.index(NO_CODE))
+    assert not has_negation(REVIEW_SKIP_BEFORE_DIGEST)
+
+
+REVIEW_NO_FINALIZE = (
+    "When a step that `finalize-review` needs (reviewers, adversarial, package-tests) was "
+    "skipped by the user's plain-words instruction rather than a bound selection, skip "
+    "`finalize-review` and leave the change unattested: tell the user in one line that the "
+    "PR will show `verification absent`, and hand the change to Ship."
+)
+REVIEW_FAIL_EXCLUDES_SKIP = (
+    "When `finalize-review` fails for any cause other than the plain-words case above, "
+    "return the fix to Build"
+)
+
+
+def test_review_plain_words_skip_reaches_ship_without_finalize() -> None:
+    finalize = " ".join(REVIEW.split("## 5. Finalize", 1)[1].split("\n## ", 1)[0].split())
+    assert finalize.count(REVIEW_NO_FINALIZE) == 1, finalize
+    assert finalize.count(REVIEW_FAIL_EXCLUDES_SKIP) == 1, finalize
+    assert finalize.index(REVIEW_NO_FINALIZE) < finalize.index(REVIEW_FAIL_EXCLUDES_SKIP)
+    assert "When `finalize-review` fails, return the fix to Build" not in finalize
+    for sentence in (REVIEW_NO_FINALIZE, REVIEW_FAIL_EXCLUDES_SKIP):
+        assert not has_negation(sentence), sentence
+    assert has_negation(REVIEW_NO_FINALIZE.replace("skip `finalize-review`",
+                                                   "do not run `finalize-review`"))
 
 
 def test_ship_builds_skipped_by_instruction_from_recorded_lines() -> None:
@@ -601,7 +657,8 @@ def test_ship_builds_skipped_by_instruction_from_recorded_lines() -> None:
     )
     assert (
         "Build the line `Skipped by instruction: <steps>` from the plan's "
-        "`skipped-by-instruction:` lines, not from conversation recall; with none recorded, "
+        "`skipped-by-instruction:` lines plus any skip decided at Ship (§1), not from "
+        "conversation recall; with none recorded or decided, "
         "write no such line, and the recomputed `(missing: …)` clause still discloses the "
         "absent records."
     ) in verification

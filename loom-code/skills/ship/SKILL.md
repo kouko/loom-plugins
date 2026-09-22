@@ -29,9 +29,11 @@ blind-run), plus any step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
 invoke. The default is the full flow: skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
-continue. When you honour such a skip, append one line
-`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
-and commit it. Never ask the user for a generated code to skip a step.
+continue. When you honour such a skip, write it straight into the PR body's
+`Skipped by instruction:` line (§2); Ship only reads the plan's
+`skipped-by-instruction:` lines and leaves the plan unchanged, because plan.md
+is functional content and an appended line would make the attestation stale.
+Never ask the user for a generated code to skip a step.
 
 ## 2. Prepare publication text
 
@@ -75,7 +77,8 @@ where `<status>` is the status `publish` computes locally and prints on its
 `absent`, or `stale (<reason>)`. When the printed status differs from the
 body, correct the body in place. Build the line
 `Skipped by instruction: <steps>` from the plan's `skipped-by-instruction:`
-lines, not from conversation recall; with none recorded, write no such line,
+lines plus any skip decided at Ship (§1), not from conversation recall; with
+none recorded or decided, write no such line,
 and the recomputed `(missing: …)` clause still discloses the absent records.
 
 When the attestation carries a selection, open the Verification section with
