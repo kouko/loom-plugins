@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.7.3 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.8.0 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -204,7 +204,7 @@ agy plugin list
 
 更新は clone で `git pull` してから install を再実行します（install は
 インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
-です。hook（publication gate・session context・言語リマインダー）が走るのは `agy` CLI だけで、
+です。hook（公開リマインダー・session context・言語リマインダー）が走るのは `agy` CLI だけで、
 Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では loom の役割
 （implementer・reviewer・adversary・blind-runner）は、loom の agent 契約に従う
 agy の `self` subagent として Gemini モデルで動きます。review station は

@@ -1,0 +1,342 @@
+﻿2026-09-22T13:01:50.9298464Z Current runner version: '2.337.0'
+2026-09-22T13:01:50.9323464Z ##[group]Runner Image Provisioner
+2026-09-22T13:01:50.9324415Z Hosted Compute Agent
+2026-09-22T13:01:50.9325020Z Version: 20260828.587
+2026-09-22T13:01:50.9325721Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-09-22T13:01:50.9326514Z Build Date: 2026-08-28T16:44:25Z
+2026-09-22T13:01:50.9327214Z Worker ID: {b9981f7d-364c-4934-a3b6-e6202abe8114}
+2026-09-22T13:01:50.9327976Z Azure Region: westus3
+2026-09-22T13:01:50.9328660Z ##[endgroup]
+2026-09-22T13:01:50.9330441Z ##[group]Operating System
+2026-09-22T13:01:50.9331295Z Ubuntu
+2026-09-22T13:01:50.9331830Z 24.04.5
+2026-09-22T13:01:50.9332429Z LTS
+2026-09-22T13:01:50.9332952Z ##[endgroup]
+2026-09-22T13:01:50.9333494Z ##[group]Runner Image
+2026-09-22T13:01:50.9334263Z Image: ubuntu-24.04
+2026-09-22T13:01:50.9334841Z Version: 20260907.300.1
+2026-09-22T13:01:50.9336155Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260907.300/images/ubuntu/Ubuntu2404-Readme.md
+2026-09-22T13:01:50.9337706Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260907.300
+2026-09-22T13:01:50.9338783Z ##[endgroup]
+2026-09-22T13:01:50.9340330Z ##[group]GITHUB_TOKEN Permissions
+2026-09-22T13:01:50.9342318Z Contents: read
+2026-09-22T13:01:50.9342971Z Metadata: read
+2026-09-22T13:01:50.9343638Z ##[endgroup]
+2026-09-22T13:01:50.9345764Z Secret source: Actions
+2026-09-22T13:01:50.9346766Z Cache mode: read
+2026-09-22T13:01:50.9347484Z Prepare workflow directory
+2026-09-22T13:01:50.9688819Z Prepare all required actions
+2026-09-22T13:01:50.9736438Z Getting action download info
+2026-09-22T13:01:51.3092842Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-09-22T13:01:51.4292192Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-09-22T13:01:51.6165911Z Uses: kouko/loom-floor-test/.github/workflows/loom-pr-floor-reusable.yml@refs/heads/main (45940186122180244ecd7896acf9c42a5c277cd0)
+2026-09-22T13:01:51.6171040Z ##[group] Inputs
+2026-09-22T13:01:51.6171569Z   loom-ref: main
+2026-09-22T13:01:51.6172027Z ##[endgroup]
+2026-09-22T13:01:51.6172502Z Complete job name: loom-pr-floor / PR floor
+2026-09-22T13:01:51.6948954Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-22T13:01:51.6957761Z ##[group]Run actions/checkout@v4
+2026-09-22T13:01:51.6958495Z with:
+2026-09-22T13:01:51.6958957Z   repository: kouko/loom-floor-test
+2026-09-22T13:01:51.6959492Z   ref: main
+2026-09-22T13:01:51.6960120Z   path: loom
+2026-09-22T13:01:51.6960562Z   sparse-checkout: loom-code
+2026-09-22T13:01:51.6961077Z   persist-credentials: false
+2026-09-22T13:01:51.6964869Z   token: ***
+2026-09-22T13:01:51.6965304Z   ssh-strict: true
+2026-09-22T13:01:51.6965773Z   ssh-user: git
+2026-09-22T13:01:51.6966212Z   clean: true
+2026-09-22T13:01:51.6966674Z   sparse-checkout-cone-mode: true
+2026-09-22T13:01:51.6967200Z   fetch-depth: 1
+2026-09-22T13:01:51.6967711Z   fetch-tags: false
+2026-09-22T13:01:51.6968157Z   show-progress: true
+2026-09-22T13:01:51.6968606Z   lfs: false
+2026-09-22T13:01:51.6969021Z   submodules: false
+2026-09-22T13:01:51.6969471Z   set-safe-directory: true
+2026-09-22T13:01:51.6970111Z   allow-unsafe-pr-checkout: false
+2026-09-22T13:01:51.6971044Z ##[endgroup]
+2026-09-22T13:01:51.7980332Z Syncing repository: kouko/loom-floor-test
+2026-09-22T13:01:51.7982134Z ##[group]Getting Git version info
+2026-09-22T13:01:51.7982947Z Working directory is '/home/runner/work/loom-floor-test/loom-floor-test/loom'
+2026-09-22T13:01:51.7984155Z [command]/usr/bin/git version
+2026-09-22T13:01:51.8072036Z git version 2.55.0
+2026-09-22T13:01:51.8092779Z ##[endgroup]
+2026-09-22T13:01:51.8106675Z Temporarily overriding HOME='/home/runner/work/_temp/80fc2f52-61a3-4556-919f-9692ea962b02' before making global git config changes
+2026-09-22T13:01:51.8108446Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-22T13:01:51.8112211Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/loom-floor-test/loom-floor-test/loom
+2026-09-22T13:01:51.8161798Z ##[group]Initializing the repository
+2026-09-22T13:01:51.8165927Z [command]/usr/bin/git init /home/runner/work/loom-floor-test/loom-floor-test/loom
+2026-09-22T13:01:51.8268750Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-09-22T13:01:51.8270623Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-09-22T13:01:51.8272258Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-09-22T13:01:51.8273405Z hint: call:
+2026-09-22T13:01:51.8274232Z hint:
+2026-09-22T13:01:51.8275272Z hint: 	git config --global init.defaultBranch <name>
+2026-09-22T13:01:51.8276521Z hint:
+2026-09-22T13:01:51.8277739Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-09-22T13:01:51.8279854Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-09-22T13:01:51.8281197Z hint:
+2026-09-22T13:01:51.8281900Z hint: 	git branch -m <name>
+2026-09-22T13:01:51.8282777Z hint:
+2026-09-22T13:01:51.8283982Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-09-22T13:01:51.8286053Z Initialized empty Git repository in /home/runner/work/loom-floor-test/loom-floor-test/loom/.git/
+2026-09-22T13:01:51.8289004Z [command]/usr/bin/git remote add origin https://github.com/kouko/loom-floor-test
+2026-09-22T13:01:51.8331500Z ##[endgroup]
+2026-09-22T13:01:51.8332815Z ##[group]Disabling automatic garbage collection
+2026-09-22T13:01:51.8335995Z [command]/usr/bin/git config --local gc.auto 0
+2026-09-22T13:01:51.8365336Z ##[endgroup]
+2026-09-22T13:01:51.8366682Z ##[group]Setting up auth
+2026-09-22T13:01:51.8372581Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-22T13:01:51.8405373Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-22T13:01:51.8764990Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-22T13:01:51.8796793Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-22T13:01:51.9018102Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-22T13:01:51.9052854Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-22T13:01:51.9279301Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-09-22T13:01:51.9313113Z ##[endgroup]
+2026-09-22T13:01:51.9313971Z ##[group]Fetching the repository
+2026-09-22T13:01:51.9322555Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+2026-09-22T13:01:52.4853082Z From https://github.com/kouko/loom-floor-test
+2026-09-22T13:01:52.4854710Z  * [new branch]      main       -> origin/main
+2026-09-22T13:01:52.4891882Z ##[endgroup]
+2026-09-22T13:01:52.4893702Z ##[group]Determining the checkout info
+2026-09-22T13:01:52.4895339Z [command]/usr/bin/git branch --list --remote origin/main
+2026-09-22T13:01:52.4896738Z   origin/main
+2026-09-22T13:01:52.4900171Z ##[endgroup]
+2026-09-22T13:01:52.4901198Z ##[group]Setting up sparse checkout
+2026-09-22T13:01:52.4901889Z [command]/usr/bin/git sparse-checkout set loom-code
+2026-09-22T13:01:52.4956805Z ##[endgroup]
+2026-09-22T13:01:52.4958493Z ##[group]Checking out the ref
+2026-09-22T13:01:52.4961767Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-09-22T13:01:53.2489296Z Switched to a new branch 'main'
+2026-09-22T13:01:53.2493625Z branch 'main' set up to track 'origin/main'.
+2026-09-22T13:01:53.2500736Z ##[endgroup]
+2026-09-22T13:01:53.2544208Z [command]/usr/bin/git log -1 --format=%H
+2026-09-22T13:01:53.2568399Z 45940186122180244ecd7896acf9c42a5c277cd0
+2026-09-22T13:01:53.2578442Z ##[group]Removing auth
+2026-09-22T13:01:53.2582594Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-22T13:01:53.2612894Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-22T13:01:53.2843867Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-22T13:01:53.2869363Z http.https://github.com/.extraheader
+2026-09-22T13:01:53.2878036Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-09-22T13:01:53.2910227Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-22T13:01:53.3130209Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-22T13:01:53.3160838Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-22T13:01:53.3378996Z ##[endgroup]
+2026-09-22T13:01:53.3732729Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-22T13:01:53.3734887Z ##[group]Run actions/checkout@v4
+2026-09-22T13:01:53.3735254Z with:
+2026-09-22T13:01:53.3735629Z   ref: bedc10aee2cff37a087f0bf2e2e1afdf23a58d7a
+2026-09-22T13:01:53.3736034Z   path: pr
+2026-09-22T13:01:53.3736311Z   fetch-depth: 0
+2026-09-22T13:01:53.3736633Z   persist-credentials: false
+2026-09-22T13:01:53.3736999Z   repository: kouko/loom-floor-test
+2026-09-22T13:01:53.3740255Z   token: ***
+2026-09-22T13:01:53.3740568Z   ssh-strict: true
+2026-09-22T13:01:53.3740864Z   ssh-user: git
+2026-09-22T13:01:53.3741143Z   clean: true
+2026-09-22T13:01:53.3741457Z   sparse-checkout-cone-mode: true
+2026-09-22T13:01:53.3741820Z   fetch-tags: false
+2026-09-22T13:01:53.3742175Z   show-progress: true
+2026-09-22T13:01:53.3742482Z   lfs: false
+2026-09-22T13:01:53.3742760Z   submodules: false
+2026-09-22T13:01:53.3743063Z   set-safe-directory: true
+2026-09-22T13:01:53.3743414Z   allow-unsafe-pr-checkout: false
+2026-09-22T13:01:53.3743763Z ##[endgroup]
+2026-09-22T13:01:53.4572494Z Syncing repository: kouko/loom-floor-test
+2026-09-22T13:01:53.4579259Z ##[group]Getting Git version info
+2026-09-22T13:01:53.4580707Z Working directory is '/home/runner/work/loom-floor-test/loom-floor-test/pr'
+2026-09-22T13:01:53.4617929Z [command]/usr/bin/git version
+2026-09-22T13:01:53.4653983Z git version 2.55.0
+2026-09-22T13:01:53.4675484Z ##[endgroup]
+2026-09-22T13:01:53.4689769Z Temporarily overriding HOME='/home/runner/work/_temp/26f0afdf-3504-4944-b5bb-605e5e8588fe' before making global git config changes
+2026-09-22T13:01:53.4690920Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-22T13:01:53.4696736Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/loom-floor-test/loom-floor-test/pr
+2026-09-22T13:01:53.4729819Z ##[group]Initializing the repository
+2026-09-22T13:01:53.4735202Z [command]/usr/bin/git init /home/runner/work/loom-floor-test/loom-floor-test/pr
+2026-09-22T13:01:53.4771432Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-09-22T13:01:53.4773156Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-09-22T13:01:53.4774406Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-09-22T13:01:53.4775548Z hint: call:
+2026-09-22T13:01:53.4776143Z hint:
+2026-09-22T13:01:53.4776923Z hint: 	git config --global init.defaultBranch <name>
+2026-09-22T13:01:53.4777792Z hint:
+2026-09-22T13:01:53.4778685Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-09-22T13:01:53.4780295Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-09-22T13:01:53.4781263Z hint:
+2026-09-22T13:01:53.4781851Z hint: 	git branch -m <name>
+2026-09-22T13:01:53.4782485Z hint:
+2026-09-22T13:01:53.4783431Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-09-22T13:01:53.4785060Z Initialized empty Git repository in /home/runner/work/loom-floor-test/loom-floor-test/pr/.git/
+2026-09-22T13:01:53.4787576Z [command]/usr/bin/git remote add origin https://github.com/kouko/loom-floor-test
+2026-09-22T13:01:53.4816212Z ##[endgroup]
+2026-09-22T13:01:53.4817278Z ##[group]Disabling automatic garbage collection
+2026-09-22T13:01:53.4821190Z [command]/usr/bin/git config --local gc.auto 0
+2026-09-22T13:01:53.4850252Z ##[endgroup]
+2026-09-22T13:01:53.4850884Z ##[group]Setting up auth
+2026-09-22T13:01:53.4857233Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-22T13:01:53.4889351Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-22T13:01:53.5106261Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-22T13:01:53.5136162Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-22T13:01:53.5355161Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-22T13:01:53.5384559Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-22T13:01:53.5600662Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-09-22T13:01:53.5635798Z ##[endgroup]
+2026-09-22T13:01:53.5637197Z ##[group]Fetching the repository
+2026-09-22T13:01:53.5647295Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-09-22T13:01:54.4187539Z From https://github.com/kouko/loom-floor-test
+2026-09-22T13:01:54.4188546Z  * [new branch]      feat/floor-probe -> origin/feat/floor-probe
+2026-09-22T13:01:54.4199338Z  * [new branch]      main             -> origin/main
+2026-09-22T13:01:54.4207417Z [command]/usr/bin/git rev-parse --verify --quiet bedc10aee2cff37a087f0bf2e2e1afdf23a58d7a^{object}
+2026-09-22T13:01:54.4223764Z bedc10aee2cff37a087f0bf2e2e1afdf23a58d7a
+2026-09-22T13:01:54.4228600Z ##[endgroup]
+2026-09-22T13:01:54.4229329Z ##[group]Determining the checkout info
+2026-09-22T13:01:54.4230507Z ##[endgroup]
+2026-09-22T13:01:54.4235484Z [command]/usr/bin/git sparse-checkout disable
+2026-09-22T13:01:54.4272418Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-09-22T13:01:54.4333335Z ##[group]Checking out the ref
+2026-09-22T13:01:54.4337833Z [command]/usr/bin/git checkout --progress --force bedc10aee2cff37a087f0bf2e2e1afdf23a58d7a
+2026-09-22T13:01:54.4502172Z Note: switching to 'bedc10aee2cff37a087f0bf2e2e1afdf23a58d7a'.
+2026-09-22T13:01:54.4502825Z 
+2026-09-22T13:01:54.4503259Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-09-22T13:01:54.4504160Z changes and commit them, and you can discard any commits you make in this
+2026-09-22T13:01:54.4505003Z state without impacting any branches by switching back to a branch.
+2026-09-22T13:01:54.4505932Z 
+2026-09-22T13:01:54.4506275Z If you want to create a new branch to retain commits you create, you may
+2026-09-22T13:01:54.4506934Z do so (now or later) by using -c with the switch command. Example:
+2026-09-22T13:01:54.4507213Z 
+2026-09-22T13:01:54.4507355Z   git switch -c <new-branch-name>
+2026-09-22T13:01:54.4507535Z 
+2026-09-22T13:01:54.4507648Z Or undo this operation with:
+2026-09-22T13:01:54.4507832Z 
+2026-09-22T13:01:54.4507927Z   git switch -
+2026-09-22T13:01:54.4508053Z 
+2026-09-22T13:01:54.4508409Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-09-22T13:01:54.4508966Z 
+2026-09-22T13:01:54.4509209Z HEAD is now at bedc10a Add floor probe change
+2026-09-22T13:01:54.4511186Z ##[endgroup]
+2026-09-22T13:01:54.4547025Z [command]/usr/bin/git log -1 --format=%H
+2026-09-22T13:01:54.4570201Z bedc10aee2cff37a087f0bf2e2e1afdf23a58d7a
+2026-09-22T13:01:54.4580527Z ##[group]Removing auth
+2026-09-22T13:01:54.4584735Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-22T13:01:54.4614149Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-22T13:01:54.4830561Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-22T13:01:54.4851022Z http.https://github.com/.extraheader
+2026-09-22T13:01:54.4859159Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-09-22T13:01:54.4890833Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-22T13:01:54.5101529Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-22T13:01:54.5129494Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-22T13:01:54.5344032Z ##[endgroup]
+2026-09-22T13:01:54.5537145Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-22T13:01:54.5538437Z ##[group]Run actions/setup-python@v5
+2026-09-22T13:01:54.5538699Z with:
+2026-09-22T13:01:54.5538899Z   python-version: 3.11
+2026-09-22T13:01:54.5539121Z   check-latest: false
+2026-09-22T13:01:54.5542093Z   token: ***
+2026-09-22T13:01:54.5542329Z   update-environment: true
+2026-09-22T13:01:54.5542593Z   allow-prereleases: false
+2026-09-22T13:01:54.5542822Z   freethreaded: false
+2026-09-22T13:01:54.5543053Z ##[endgroup]
+2026-09-22T13:01:54.6878177Z ##[group]Installed versions
+2026-09-22T13:01:54.6988278Z (node:2531) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-22T13:01:54.6990011Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-22T13:01:54.6990903Z Successfully set up CPython (3.11.16)
+2026-09-22T13:01:54.6991724Z ##[endgroup]
+2026-09-22T13:01:54.7129265Z ##[group]Run python3 -m pip install --quiet pyyaml==6.0.3
+2026-09-22T13:01:54.7130071Z [36;1mpython3 -m pip install --quiet pyyaml==6.0.3[0m
+2026-09-22T13:01:54.7183627Z shell: /usr/bin/bash -e {0}
+2026-09-22T13:01:54.7183921Z env:
+2026-09-22T13:01:54.7184203Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:54.7184660Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+2026-09-22T13:01:54.7185101Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:54.7185487Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:54.7186112Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:54.7186525Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+2026-09-22T13:01:54.7186854Z ##[endgroup]
+2026-09-22T13:01:56.9704656Z ##[group]Run printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
+2026-09-22T13:01:56.9705157Z [36;1mprintf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"[0m
+2026-09-22T13:01:56.9743562Z shell: /usr/bin/bash -e {0}
+2026-09-22T13:01:56.9743806Z env:
+2026-09-22T13:01:56.9744075Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:56.9744515Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+2026-09-22T13:01:56.9744940Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:56.9745326Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:56.9745712Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:56.9746096Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+2026-09-22T13:01:56.9748686Z   PR_BODY: ## Context
+Test text for the Context section of the blind-run probe.
+
+## Intended outcome
+Test text for the Intended outcome section of the blind-run probe.
+
+## Scope
+Test text for the Scope section of the blind-run probe.
+
+## Decisions
+Test text for the Decisions section of the blind-run probe.
+
+## Implementation
+Test text for the Implementation section of the blind-run probe.
+
+## Behaviour change
+Test text for the Behaviour change section of the blind-run probe.
+
+## Verification
+Verification status: valid
+Test text for the Verification section of the blind-run probe.
+
+## Risks and rollback
+Test text for the Risks and rollback section of the blind-run probe.
+
+## Follow-ups
+Test text for the Follow-ups section of the blind-run probe.
+
+
+2026-09-22T13:01:56.9751363Z ##[endgroup]
+2026-09-22T13:01:56.9858365Z ##[group]Run python3 "$GITHUB_WORKSPACE/loom/loom-code/scripts/loom_checker.py" pr-floor --body-file "$RUNNER_TEMP/pr-body.md" --base "$BASE_SHA" --head "$HEAD_SHA" --branch "$HEAD_REF"
+2026-09-22T13:01:56.9859967Z [36;1mpython3 "$GITHUB_WORKSPACE/loom/loom-code/scripts/loom_checker.py" pr-floor --body-file "$RUNNER_TEMP/pr-body.md" --base "$BASE_SHA" --head "$HEAD_SHA" --branch "$HEAD_REF"[0m
+2026-09-22T13:01:56.9893723Z shell: /usr/bin/bash -e {0}
+2026-09-22T13:01:56.9893961Z env:
+2026-09-22T13:01:56.9894223Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:56.9894660Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+2026-09-22T13:01:56.9895091Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:56.9895465Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:56.9895847Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+2026-09-22T13:01:56.9896242Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+2026-09-22T13:01:56.9896596Z   BASE_SHA: 45940186122180244ecd7896acf9c42a5c277cd0
+2026-09-22T13:01:56.9896923Z   HEAD_SHA: bedc10aee2cff37a087f0bf2e2e1afdf23a58d7a
+2026-09-22T13:01:56.9897230Z   HEAD_REF: feat/floor-probe
+2026-09-22T13:01:56.9897460Z ##[endgroup]
+2026-09-22T13:01:57.2061732Z ##[notice]absent
+2026-09-22T13:01:57.2256239Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-22T13:01:57.2257501Z Post job cleanup.
+2026-09-22T13:01:57.3468310Z (node:2573) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-09-22T13:01:57.3469179Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-09-22T13:01:57.3609140Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-22T13:01:57.3610969Z Post job cleanup.
+2026-09-22T13:01:57.4479330Z [command]/usr/bin/git version
+2026-09-22T13:01:57.4516854Z git version 2.55.0
+2026-09-22T13:01:57.4554560Z Temporarily overriding HOME='/home/runner/work/_temp/3223b9d6-ef08-4286-803f-2bf417877565' before making global git config changes
+2026-09-22T13:01:57.4555968Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-22T13:01:57.4559954Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/loom-floor-test/loom-floor-test/pr
+2026-09-22T13:01:57.4596303Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-22T13:01:57.4629087Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-22T13:01:57.4852286Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-22T13:01:57.4884098Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-22T13:01:57.5106488Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-22T13:01:57.5137321Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-22T13:01:57.5496802Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-09-22T13:01:57.5498034Z Post job cleanup.
+2026-09-22T13:01:57.6328502Z [command]/usr/bin/git version
+2026-09-22T13:01:57.6370520Z git version 2.55.0
+2026-09-22T13:01:57.6412180Z Temporarily overriding HOME='/home/runner/work/_temp/b8c911f3-3562-4558-b8d7-1bfd6401e7cc' before making global git config changes
+2026-09-22T13:01:57.6413623Z Adding repository directory to the temporary git global config as a safe directory
+2026-09-22T13:01:57.6418663Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/loom-floor-test/loom-floor-test/loom
+2026-09-22T13:01:57.6458116Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-09-22T13:01:57.6493222Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-09-22T13:01:57.6744493Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-09-22T13:01:57.6783383Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-09-22T13:01:57.7034781Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-09-22T13:01:57.7061344Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-09-22T13:01:57.7460156Z Cleaning up orphan processes
+2026-09-22T13:01:57.7726048Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

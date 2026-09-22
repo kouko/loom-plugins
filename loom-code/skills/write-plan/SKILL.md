@@ -41,10 +41,15 @@ for `${CLAUDE_PLUGIN_ROOT}`.
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
-At entry, run `loom_checker.py selection show <change-id>` and omit only the
-prose steps it lists as skipped (spec, plan, implementer, tdd,
-blind-run); skip suggestions and user requests follow
-[expert-mode](../expert-mode/SKILL.md).
+At entry, run `loom_checker.py selection show <change-id>` and omit the prose
+steps `selection show` lists as skipped (spec, plan, implementer, tdd,
+blind-run), plus any step the user told you to skip in plain words;
+[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
+invoke. The default is the full flow: skip a step only when the user tells you
+to in plain words, then tell the user in one line which step is skipped and
+continue. When you honour such a skip, append one line
+`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
+and commit it. Never ask the user for a generated code to skip a step.
 
 ## Artifact vocabulary
 
@@ -61,7 +66,7 @@ blind-run); skip suggestions and user requests follow
 | write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | no formal plan review; invokes the required spec review only when it authored the spec |
 | build | diff — commits on the change branch | agent-decided | task and integration tests; at the end of Build, an independent adversary's committed adversarial programs and the complete package suite, which must pass before hand-off | no formal review during Build; one closing review follows completed functional work |
 | closing-review | generated `docs/loom/<change-id>/attestation.json`, plus a blind-run report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |
-| ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.attestation` plus fast publication safety; no functional replay | before push; publication-only fixes reuse matching evidence |
+| ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.contextual-body` and `publish.preconditions`; the verification status is disclosed, not a refusal; no functional replay | before push; publication-only fixes reuse matching evidence |
 | maintain | intent — a fresh `docs/loom/intent/<change-id>.md` | agent (dedupe is mechanical) | `intent.schema`, `intent.needs-design-reason`, `intent.needs-design-recompute`, `intent.product-no-identifiers` on a new intent | before hand-off to write-plan |
 
 ## What you will be asked, in plain words
@@ -95,7 +100,7 @@ what the checker printed, tell the user to update `loom-code`, and
 ## Step 0b — Codex only: installed hook check
 
 Read `references/codex-first-contact.md`. Confirm the injected checker lists
-`push.attestation`. No repository-local scaffold, copied checker, probe remote,
+`push.contextual-body`. No repository-local scaffold, copied checker, probe remote,
 or firing ledger is created.
 
 ## Step 1 — Find the intent
@@ -318,8 +323,9 @@ version must still hold, not a suggestion.
 - Group tasks into **waves** as dependency and integration boundaries. Waves
   do not schedule formal review; after all tasks and package tests pass,
   Build transitions once to the closing `branch-end` review.
-- Unless `selection show` lists `implementer` as skipped, implementer dispatch
-  is mandatory for every implementation task. Scheduling multiple implementers
+- Unless `implementer` is skipped (listed by `selection show` or skipped by the
+  user's plain-words instruction), implementer dispatch is mandatory for every
+  implementation task. Scheduling multiple implementers
   concurrently is optional.
 - Task ids are `W<n>-<nn>` and remain stable once written so hand-offs can
   refer to dependencies without ambiguity.

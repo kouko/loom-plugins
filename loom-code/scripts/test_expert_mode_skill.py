@@ -109,7 +109,7 @@ def test_skill_procedure_maps_proposes_reports_withdraws_and_relapses() -> None:
     affirmative(text, "re-run `loom_checker.py selection propose`", ("tell", "lapsed"))
     assert "keep the full process" in flat
     assert "any language" in flat
-    assert "stops shortcuts, not deliberately disguised commands" in flat
+    assert "Local hooks only remind" in flat
     assert "recorded only when `closing-review` hands it to the checker" in flat
 
 
@@ -133,8 +133,14 @@ def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:
     assert "hook trust" not in _flat(boundary)
     assert ("`loom_checker.py selection skipped-review` lists merged changes on the default "
             "branch whose attestation skipped reviewers.") in boundary
-    assert ("A change with a bound selection publishes only from a checkout sharing the git "
-            "common dir that holds its records; a fresh clone refuses it.") in boundary
+    assert ("In a checkout without its records, the selection shows as `stale` on the PR; "
+            "publishing still proceeds.") in boundary
+    assert "a fresh clone refuses it" not in boundary
+    assert ("Never evaluate a gate. `finalize-review` re-reads the records and waives only a "
+            "bound skip; `publish` discloses the status.") in boundary
+    assert ("Local hooks only remind; GitHub rules and the PR-floor check are the trust "
+            "boundary.") in boundary
+    assert "independent CI stays the trust boundary" not in boundary
     # Acceptance 2: confirmation, finalization and publication share one session,
     # and a new session re-proposes before the user confirms again.
     same = affirmative(boundary, "the same attended Claude Code session", ("must",))
@@ -202,17 +208,16 @@ def test_changelog_names_failure_sources_and_limits() -> None:
             "the full process applies.") in limits
 
 
-def test_ordinary_conversation_reaches_the_same_procedure() -> None:
+def test_expert_mode_keeps_its_typed_confirmation() -> None:
     router = (PLUGIN_ROOT / "skills" / "using-loom-code" / "SKILL.md").read_text(encoding="utf-8")
-    sentence = affirmative(
-        router, "`loom_checker.py selection propose <change-id> --origin user`", ("follow",))
-    assert "asks in their own words to run or skip Loom steps" in sentence
     assert 'a plain "yes" binds nothing' not in _flat(router)
     assert "Only that typed confirmation applies." in _flat(_skill())
     assert 'A reply such as "yes" or "對" binds nothing' in _flat(_skill())
 
-    sentence = affirmative(_skill(), "from ordinary conversation", ("applies",))
+    sentence = affirmative(_skill(), "the optional typed route", ("is",))
+    assert "handled by the station itself" in sentence
     assert "the user still types the confirmation" in sentence
+    assert "from ordinary conversation" not in _flat(_skill())
 
 
 # --- Acceptance 4 -----------------------------------------------------------
@@ -268,20 +273,20 @@ def test_suggestion_then_plain_yes_skips_nothing(repo: Path) -> None:
 
 
 SELECTION_READ = "At entry, run `loom_checker.py selection show <change-id>` and omit"
-EXPERT_MODE_POINTER = ("skip suggestions and user requests follow "
-                       "[expert-mode](../expert-mode/SKILL.md).")
+EXPERT_MODE_POINTER = ("[expert-mode](../expert-mode/SKILL.md) stays an optional route "
+                       "the user may invoke.")
 MOVED_RULES = ("at most once per change", "--origin agent", 'a plain "yes" binds nothing',
                "asks in their own words")
 
 
-def assert_station_points_to_expert_mode(text: str) -> None:
+def assert_station_points_to_expert_mode(text: str, pointer: str = EXPERT_MODE_POINTER) -> None:
     """One affirmative sentence reads the bound selection and points to
     expert-mode; the suggestion rules live only in expert-mode."""
     flat = _flat(text)
     assert flat.count(SELECTION_READ) == 1, "selection show step missing or repeated"
-    assert flat.count(EXPERT_MODE_POINTER) == 1, "expert-mode pointer missing or repeated"
+    assert flat.count(pointer) == 1, "expert-mode pointer missing or repeated"
     sentence = affirmative(text, "`loom_checker.py selection show <change-id>` and omit", ("run",))
-    assert sentence.endswith(EXPERT_MODE_POINTER), sentence
+    assert sentence.endswith(pointer), sentence
     for rule in MOVED_RULES:
         assert rule.lower() not in flat.lower(), rule
 
@@ -316,6 +321,8 @@ def test_station_pointer_helper_rejects_mutants(mutant: str) -> None:
 def test_expert_mode_holds_the_suggestion_rules_once() -> None:
     text = _skill()
     sentence = affirmative(text, "at most once per change", ("may suggest",))
+    assert sentence.startswith(
+        "Inside a user-invoked expert-mode session only, the agent may suggest"), sentence
     assert "`loom_checker.py selection propose <change-id> --origin agent`" in sentence
     assert "keeps working on the full process at once" in sentence
     assert ("shows the table and the confirmation line (type `/loom-code:expert-mode` "

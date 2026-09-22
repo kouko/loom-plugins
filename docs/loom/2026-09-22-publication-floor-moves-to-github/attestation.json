@@ -1,0 +1,76 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-22-publication-floor-moves-to-github",
+  "content_digest": "7467725ea6b65fc9b4054555dca24590d5908603",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_pr_body_floor.py -q",
+      "artifact": "docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_pr_body_floor.py",
+      "result": "pass",
+      "command_digest": "218390361039f4bae7bf13fed3fd88735a09e0edf62d541c841ea0c36947a50b"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_selection_guard_fallback.py -q",
+      "artifact": "docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_selection_guard_fallback.py",
+      "result": "pass",
+      "command_digest": "e3764a119664b60601d1a8da2e8d92542215466895726cc8d7d6d78a7d8731a5"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_hook_never_refuses.py -q",
+      "artifact": "docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_hook_never_refuses.py",
+      "result": "pass",
+      "command_digest": "153195bf6496199ba8f08133e437726aee67fb83f99fc542ffd84a7611c30596"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_ci_status.py -q",
+      "artifact": "docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_ci_status.py",
+      "result": "pass",
+      "command_digest": "e9f734e6eb5923a066e46781ece702e0bcbe906abbb973f44b5614875001ed77"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_workflow_injection.py -q",
+      "artifact": "docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_workflow_injection.py",
+      "result": "pass",
+      "command_digest": "954eaba85fbf8fa1e43ce2d7a33c68788e65014f8d84ab2ec06b5042a5d715ff"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_github_rules.py -q",
+      "artifact": "docs/loom/2026-09-22-publication-floor-moves-to-github/evidence/probes/test_abuse_github_rules.py",
+      "result": "pass",
+      "command_digest": "681a5afb0ef5ea8654b42731988614dc956d372a6904a136e676926f246ae7ba"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "afd9bde176a5b4496",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "a05c49370a9a592b9",
+      "vendor": "anthropic",
+      "model": "claude-opus-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

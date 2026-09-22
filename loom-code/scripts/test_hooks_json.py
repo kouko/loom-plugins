@@ -19,6 +19,8 @@ External surfaces grounded:
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -103,9 +105,89 @@ def test_pre_tool_use_runs_the_single_checker_push_rule(hooks):
     checker reads no stdin at all, so the flag is not decoration: a hook
     entry that omits it would judge nothing."""
     (command,) = _commands(hooks["PreToolUse"])
-    assert command.startswith("python3 ")
-    assert "/scripts/loom_checker.py" in command
-    assert command.rstrip().endswith(" push --hook")
+    assert 'python3 "${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py" push --hook' in command
+
+
+def _claude_pre_tool_use(hooks, payload: dict, plugin_root: Path):
+    """Run the Claude Code PreToolUse command as Claude Code does (``sh -c``)."""
+    (command,) = _commands(hooks["PreToolUse"])
+    return subprocess.run(["sh", "-c", command], input=json.dumps(payload),
+                          capture_output=True, text=True, timeout=30,
+                          env={**os.environ, "CLAUDE_PLUGIN_ROOT": str(plugin_root)})
+
+
+PUSH = "git" + " push"  # concatenated so this file's own text is no push
+
+
+def test_pre_tool_use_checker_missing_allows_and_says_so(hooks, tmp_path):
+    """REQ-4 on Claude Code: a stale plugin root (checker absent) never
+    refuses a publication command; it allows with the failure line."""
+    missing = tmp_path / "removed-version"
+    result = _claude_pre_tool_use(
+        hooks, {"tool_name": "Bash", "tool_input": {"command": f"{PUSH} -u origin feat"}}, missing)
+    assert result.returncode == 0, result.stderr
+    assert "loom: publication hook failed (" in result.stderr
+    assert "; allowing." in result.stderr
+    assert str(missing / "scripts" / "loom_checker.py") in result.stderr
+
+
+@pytest.mark.parametrize("tool_name,tool_input", [
+    ("Bash", {"command": "echo x >> .git/loom/selections/c.jsonl"}),
+    ("Bash", {"command": "cd .git/loom && printf x > selections/c.jsonl"}),
+    ("Bash", {"command": "printf x > .git/loom/./selections/c.jsonl"}),
+    ("Write", {"file_path": "/r/.git/loom//selections/c.jsonl", "content": "{}"}),
+    ("Edit", {"file_path": "/r/.git/loom/./selections/c.jsonl", "old_string": "a", "new_string": "b"}),
+])
+def test_pre_tool_use_checker_missing_still_denies_store(hooks, tmp_path, tool_name, tool_input):
+    """A missing checker never loosens selection.guard."""
+    result = _claude_pre_tool_use(hooks, {"tool_name": tool_name, "tool_input": tool_input},
+                                  tmp_path / "removed-version")
+    assert result.returncode == 2, result.stderr
+    assert "BLOCK selection.guard" in result.stderr
+
+
+# Store writes the running guard refuses although their text never spells the
+# store path: a git-directory lookup, a bare selections/ path, or a cwd inside
+# the store that a relative target or command runs from.
+CWD_STORE_WRITES = [
+    ("Bash", {"command": "cd $(git rev-parse --git-dir)/loom; printf x > selections/c.jsonl"}, ""),
+    ("Bash", {"command": "printf x > selections/c.jsonl"}, ".git/loom"),
+    ("Write", {"file_path": "selections/c.jsonl", "content": "{}"}, ".git/loom"),
+    ("apply_patch", {"command": "*** Begin Patch\n*** Add File: selections/c.jsonl\n+{}\n"
+                                "*** End Patch\n"}, ".git/loom"),
+]
+
+
+@pytest.mark.parametrize("tool_name,tool_input,cwd", CWD_STORE_WRITES)
+def test_pre_tool_use_checker_missing_denies_store_write_from_cwd(
+        hooks, tmp_path, tool_name, tool_input, cwd):
+    payload = {"tool_name": tool_name, "tool_input": tool_input,
+               "cwd": str(tmp_path / "repo" / cwd)}
+    result = _claude_pre_tool_use(hooks, payload, tmp_path / "removed-version")
+    assert result.returncode == 2, result.stderr
+    assert "BLOCK selection.guard" in result.stderr
+
+
+def _fallback_program(command: str) -> str:
+    """The `python3 -c '…'` body of a hook command, host name normalised."""
+    import re
+
+    (program,) = re.findall(r"python3 -c '([^']*)'", command)
+    return program.replace("restart Claude Code", "restart <host>").replace(
+        "restart Codex", "restart <host>")
+
+
+def test_checker_missing_fallback_programs_are_identical(hooks, codex_hooks):
+    """The Claude Code fallback and both Codex fallbacks run one program."""
+    programs = [_fallback_program(c) for c in _commands(hooks["PreToolUse"])]
+    programs += [_fallback_program(c) for c in _commands(codex_hooks["PreToolUse"])]
+    assert len(programs) == 3
+    assert len(set(programs)) == 1
+    from loom_checker.rule_checks import selection_guard as guard
+
+    for pattern in [p for p, _ in guard.ALWAYS_DENIED] + [guard.BARE_SELECTIONS,
+                                                           guard.GIT_DIR_NAMES]:
+        assert f're.compile(r"{pattern.pattern}")' in programs[0], pattern.pattern
 
 
 def test_post_tool_use_keeps_language_anchor(hooks):

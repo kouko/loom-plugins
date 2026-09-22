@@ -16,6 +16,7 @@ from pathlib import Path
 CHECKER = Path(__file__).with_name("loom_checker.py")
 
 EXPECTED_RULE_IDS = [
+    "ci.pr-floor",
     "contract.charter-complete",
     "contract.requires",
     "intake.confirmed",
@@ -31,9 +32,8 @@ EXPECTED_RULE_IDS = [
     "land.merge",
     "land.verify",
     "plan.field-caps",
-    "push.attestation",
+    "publish.preconditions",
     "push.contextual-body",
-    "push.merge",
     "review.sync",
     "spec.req-grammar",
     "spec.ui-flows-recompute",
@@ -197,7 +197,7 @@ def test_every_rule_id_is_area_dot_name() -> None:
     for line in run_checker("--list-rules").stdout.splitlines():
         rule_id = line.split("\t")[0]
         area, _, name = rule_id.partition(".")
-        assert area in {"contract", "intent", "intake", "land", "plan", "push", "review", "spec", "standing"}, rule_id
+        assert area in {"ci", "contract", "intent", "intake", "land", "plan", "publish", "push", "review", "spec", "standing"}, rule_id
         assert name and "." not in name, rule_id
 
 
@@ -380,7 +380,6 @@ def test_internal_failure_fails_closed_with_exit_2(tmp_path: Path) -> None:
 # to the words that name its own mechanism.
 
 LOAD_BEARING_WORDS = {
-    "push.attestation": ["content digest", "without replaying"],
     "intake.spec-ready": ["pre-build-review", "not persisted", "ledger"],
     "intake.test-case-pair": ["Acceptance", "positive", "negative or boundary"],
     "contract.requires": ["same major", "minor"],

@@ -12,12 +12,41 @@ CONTEXTUAL_PR_HEADINGS = (
 DISCLOSURE_PREFIXES = ("Skipped steps:", "Prior failure:")
 
 
-def _body_sections(body: str) -> tuple[list[tuple[str, list[str]]], list[str]]:
-    """Top-level `## ` sections and every line outside fenced code."""
+# Ship's own lines: always accepted, never validated -- the CI check recomputes
+# the status, so the body's copy is a courtesy, not a claim anything trusts.
+STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
+
+
+def _visible_part(line: str, in_comment: bool) -> tuple[str, bool]:
+    """The line with HTML comment text removed, and whether a comment is
+    still open at its end."""
+    visible = ""
+    while line:
+        if in_comment:
+            end = line.find("-->")
+            if end < 0:
+                return visible, True
+            line, in_comment = line[end + 3:], False
+        else:
+            start = line.find("<!--")
+            if start < 0:
+                return visible + line, False
+            visible, line, in_comment = visible + line[:start], line[start + 4:], True
+    return visible, in_comment
+
+
+def _body_sections(
+    body: str, strip_comments: bool = False
+) -> tuple[list[tuple[str, list[str]]], list[str]]:
+    """Top-level `## ` sections and every line outside fenced code; with
+    `strip_comments`, HTML comments outside fenced code are removed first."""
     sections: list[tuple[str, list[str]]] = []
     outside_fences: list[str] = []
     fence: tuple[str, int] | None = None
+    in_comment = False
     for line in body.splitlines():
+        if strip_comments and fence is None:
+            line, in_comment = _visible_part(line, in_comment)
         marker = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
         if marker and fence is None:
             token = marker.group(1)
@@ -39,29 +68,60 @@ def _body_sections(body: str) -> tuple[list[tuple[str, list[str]]], list[str]]:
     return sections, outside_fences
 
 
-def validate_contextual_pr_body(body: str) -> str | None:
-    """Recompute the structural PR-body floor; semantic truth stays review-owned."""
-    sections, outside_fences = _body_sections(body)
-    if [heading for heading, _content in sections] != list(CONTEXTUAL_PR_HEADINGS):
-        return (
-            "PR body must contain Ship's nine top-level contextual headings "
-            "exactly once and in order, with no competing top-level heading"
-        )
+def _heading_fault(headings: list[str]) -> str | None:
+    """The first heading that breaks "the nine, exactly once, in order"."""
+    for index, found in enumerate(headings):
+        if found not in CONTEXTUAL_PR_HEADINGS:
+            return f'heading "{found}" is not one of the nine contextual headings'
+        if found in headings[:index]:
+            return f'heading "{found}" is duplicated'
+        expected = CONTEXTUAL_PR_HEADINGS[index] if index < len(CONTEXTUAL_PR_HEADINGS) else None
+        if found == expected:
+            continue
+        if expected is not None and expected not in headings:
+            return f'heading "{expected}" is missing'
+        return f'heading "{found}" is out of order'
+    if len(headings) < len(CONTEXTUAL_PR_HEADINGS):
+        return f'heading "{CONTEXTUAL_PR_HEADINGS[len(headings)]}" is missing'
+    return None
+
+
+def _empty(heading: str, visible: str) -> bool:
+    alphanumeric_count = sum(character.isalnum() for character in visible)
+    one_ascii_token = re.fullmatch(r"\s*[A-Za-z]+[.!?:;,-]*\s*", visible) is not None
+    template_placeholder = re.fullmatch(r"\s*<[^>\n]+>\s*", visible) is not None
+    sentinel = (
+        heading == "Follow-ups"
+        and re.sub(r"[\W_]+", "", visible).casefold() == "none"
+    )
+    return (alphanumeric_count < 8 or one_ascii_token or template_placeholder) and not sentinel
+
+
+def _structure_fault(sections: list[tuple[str, list[str]]]) -> str | None:
+    fault = _heading_fault([heading for heading, _content in sections])
+    if fault:
+        return fault
     for heading, lines in sections:
-        content = "\n".join(lines)
-        visible = re.sub(r"<!--.*?-->", " ", content, flags=re.DOTALL)
-        alphanumeric_count = sum(character.isalnum() for character in visible)
-        one_ascii_token = re.fullmatch(r"\s*[A-Za-z]+[.!?:;,-]*\s*", visible) is not None
-        template_placeholder = re.fullmatch(r"\s*<[^>\n]+>\s*", visible) is not None
-        sentinel = (
-            heading == "Follow-ups"
-            and re.sub(r"[\W_]+", "", visible).casefold() == "none"
-        )
-        if (
-            (alphanumeric_count < 8 or one_ascii_token or template_placeholder)
-            and not sentinel
-        ):
-            return f"PR body section {heading!r} has no substantive content"
+        visible = re.sub(r"<!--.*?-->", " ", "\n".join(lines), flags=re.DOTALL)
+        # A link or image renders its text, never its target.
+        link_text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", visible)
+        if _empty(heading, visible) or _empty(heading, link_text):
+            return f'heading "{heading}" is empty'
+    return None
+
+
+def validate_contextual_pr_body(body: str) -> str | None:
+    """Recompute the structural PR-body floor; semantic truth stays review-owned.
+
+    The body is judged as written and again as rendered (HTML comments
+    removed, links read as their text); either view's fault refuses, so
+    the rendered view only ever tightens the floor."""
+    sections, outside_fences = _body_sections(body)
+    fault = _structure_fault(sections) or _structure_fault(
+        _body_sections(body, strip_comments=True)[0]
+    )
+    if fault:
+        return fault
     visible_body = re.sub(
         r"<!--.*?-->", " ", "\n".join(outside_fences), flags=re.DOTALL
     )
@@ -104,7 +164,8 @@ def validate_selection_disclosure(body: str, attestation: object) -> str | None:
     expected = render_selection_disclosure(attestation)
     sections, _ = _body_sections(body)
     verification = next((lines for heading, lines in sections if heading == "Verification"), [])
-    present = [line.rstrip() for line in verification if line.strip()]
+    present = [line.rstrip() for line in verification
+               if line.strip() and not line.startswith(STATUS_PREFIXES)]
     opening, rest = present[:len(expected)], present[len(expected):]
     if opening == expected and not any(line.startswith(DISCLOSURE_PREFIXES) for line in rest):
         return None

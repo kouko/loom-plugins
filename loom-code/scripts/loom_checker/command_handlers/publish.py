@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from loom_checker.command_handlers.push import _cmd_push
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import changed_paths
@@ -17,6 +16,10 @@ from loom_checker.rule_checks.publish import validate_contextual_pr_body
 from loom_checker.rule_checks.publish import validate_selection_disclosure
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
 from loom_checker.rule_checks.push import github_repo_from_origin
+from loom_checker.verification import identify_change
+from loom_checker.verification import missing_clause
+from loom_checker.verification import missing_records
+from loom_checker.verification import verification_status
 from pathlib import Path
 from urllib.parse import quote
 import json
@@ -87,7 +90,7 @@ def _publish_usage(reason: str, err) -> int:
 
 
 def _publish_block(reason: str, err) -> int:
-    return report([("push.attestation", reason)], err)
+    return report([("publish.preconditions", reason)], err)
 
 
 def _publish_origin_state(repo: Path, expected_branch: str) -> tuple[str | None, str | None]:
@@ -179,40 +182,14 @@ def _publication_attestation(repo: Path) -> tuple[str | None, dict | None, str |
     return change_id, payload, None
 
 
-def selection_disclosure_failure(repo: Path, body: str) -> str | None:
-    """The refusal this PR body earns for the branch's recorded step selection,
-    or None when it discloses exactly what was skipped.
-
-    Every route that opens a pull request asks this one function: the
-    publication command, and the `PreToolUse` hook's trusted PR-create form
-    (command_handlers/push.py). A skip the user typed is disclosed whichever
-    route opens the request, and the two routes cannot drift apart because
-    neither owns a copy of the rule."""
-    # No derivable attestation means no selection: a disclosure line is then false.
-    try:
-        _change_id, attested, _error = _publication_attestation(repo)
-    except UsageError:  # no branch base: the attestation gate above already owns that
-        attested = None
-    return validate_selection_disclosure(body, attested or {"selection": None})
-
-
-def _publication_change_id(repo: Path) -> tuple[str | None, str | None]:
-    """Derive the publication identity from the sole attestation in the branch."""
-    change_id, _payload, error = _publication_attestation(repo)
-    return change_id, error
-
-
 def _intent_authorizes_publication(
-    repo: Path, intent_file: Path
+    repo: Path, intent_file: Path, change_id: str
 ) -> tuple[bool, str | None]:
-    """Trust only the attested change's canonical intent as committed at HEAD."""
-    change_id, error = _publication_change_id(repo)
-    if error:
-        return False, error
+    """Trust only the identified change's canonical intent as committed at HEAD."""
     manifest = load_manifest()
     canonical = artifact_path(manifest, "intent", change_id, repo).resolve()
     if intent_file.resolve() != canonical:
-        return False, "intent path does not match the attested change"
+        return False, "intent path does not match the identified change"
     intent_rel = canonical.relative_to(repo)
     try:
         committed = git_text(repo, "show", f"HEAD:{intent_rel}")
@@ -412,9 +389,16 @@ def _cmd_publish_trusted(
     except UsageError as exc:
         return _publish_block(str(exc), err)
 
+    change_id, _unidentified = identify_change(repo)
+    if change_id is None:
+        return report([("publish.preconditions", "cannot identify the change — name the branch "
+                                   "<type>/<change-id> or commit its intent")], err)
+
     intent_error: str | None = None
     if not authorized and intent_file is not None:
-        intent_authorized, intent_error = _intent_authorizes_publication(repo, intent_file)
+        intent_authorized, intent_error = _intent_authorizes_publication(
+            repo, intent_file, change_id
+        )
         authorized = intent_authorized
     if not authorized:
         return _publish_usage(
@@ -435,14 +419,24 @@ def _cmd_publish_trusted(
         return _publish_block("literal origin is not a supported GitHub repository URL", err)
     env = _publish_env(identity, repo, (trusted_git, trusted_gh))
 
-    if _cmd_push(["--head", head, "--require-live-head"], out, err) != 0:
-        return 1
-    out.write(f"Attestation validated for {head}\n")
-    disclosure_error = selection_disclosure_failure(
-        repo, body_file.read_text(encoding="utf-8")
-    )
-    if disclosure_error:
-        return report([("push.contextual-body", disclosure_error)], err)
+    # The `Skipped steps:` disclosure is owed only for a selection the
+    # attestation binds; without one the body's skip lines are Ship's own.
+    try:
+        _attested_id, attested, _error = _publication_attestation(repo)
+    except UsageError:
+        attested = None
+    if attested and isinstance(attested.get("selection"), dict):
+        disclosure_error = validate_selection_disclosure(
+            body_file.read_text(encoding="utf-8"), attested
+        )
+        if disclosure_error:
+            return report([("push.contextual-body", disclosure_error)], err)
+    status = verification_status(repo, change_id, depth="local", head=head)
+    out.write(f"Verification {status} for {head}\n")
+    if status != "valid":
+        clause = missing_clause(missing_records(repo, change_id, status, head))
+        err.write(f"loom: verification {status}{' ' + clause if clause else ''}; "
+                  "publishing anyway.\n")
 
     base_result = _external_or_block(
         # gh repo view accepts [HOST/]OWNER/REPO and exposes defaultBranchRef:

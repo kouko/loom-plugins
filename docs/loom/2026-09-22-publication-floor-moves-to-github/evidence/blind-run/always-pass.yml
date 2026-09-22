@@ -1,0 +1,17 @@
+name: loom PR floor
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  loom-pr-floor:
+    name: loom-pr-floor / PR floor
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "always pass"

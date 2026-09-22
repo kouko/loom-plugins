@@ -15,6 +15,7 @@ and ``{"injectSteps": [{"ephemeralMessage": ...}]}``; transcript JSONL steps
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import shutil
@@ -82,16 +83,19 @@ def _tool_payload(command: str, cwd: str, workspace: list[str]) -> dict:
 
 # --- acceptance 4: push gate ------------------------------------------------
 
-def test_unattested_push_returns_deny_with_reason(change_repo, tmp_path):
+def test_push_with_running_checker_allows_and_forwards_reminder(change_repo, tmp_path):
+    """The checker allows a push of an unidentified change and prints one
+    reminder line; the adapter allows and carries that line as the reason."""
     out = _run("push-gate", _tool_payload("git push origin feat", ".", [str(change_repo)]), tmp_path)
-    assert out["decision"] == "deny"
-    assert "BLOCK push.attestation" in out["reason"]
+    assert out["decision"] == "allow", out
+    assert out["reason"].startswith("loom: "), out
 
 
-def test_unattested_push_with_absolute_cwd_and_no_workspace_denies(change_repo, tmp_path):
-    out = _run("push-gate", _tool_payload("git push origin feat", str(change_repo), []), tmp_path)
+def test_selection_store_write_with_running_checker_denies(change_repo, tmp_path):
+    out = _run("push-gate", _tool_payload("echo x >> .git/loom/selections/c.jsonl", ".",
+                                          [str(change_repo)]), tmp_path)
     assert out["decision"] == "deny"
-    assert "BLOCK push.attestation" in out["reason"]
+    assert "BLOCK selection.guard" in out["reason"]
 
 
 def test_non_push_command_returns_allow(change_repo, tmp_path):
@@ -107,19 +111,128 @@ def checkerless_adapter(tmp_path: Path) -> Path:
     return root / "hooks" / "agy_adapter.py"
 
 
-@pytest.mark.parametrize("command", ["git push origin feat", "gh pr create --fill", "pytest -q"])
-def test_missing_checker_fails_closed(checkerless_adapter, change_repo, tmp_path, command):
+def _codex_fallback(payload: dict, tmp_path: Path, matcher: int = 0) -> subprocess.CompletedProcess:
+    """Run a Codex PreToolUse command with its plugin root removed."""
+    hooks = json.loads((PLUGIN_ROOT / "hooks" / "hooks-codex.json").read_text(encoding="utf-8"))
+    command = hooks["hooks"]["PreToolUse"][matcher]["hooks"][0]["command"]
+    return subprocess.run(
+        ["sh", "-c", command], input=json.dumps(payload), capture_output=True, text=True,
+        timeout=30, env={**os.environ, "PLUGIN_ROOT": str(tmp_path / "removed-version")},
+    )
+
+
+FAILED_ALLOWING = "loom: publication hook failed ("
+
+
+@pytest.mark.parametrize("command", ["git push origin feat", "gh pr create --fill"])
+def test_missing_checker_allows_push_on_both_hosts(checkerless_adapter, change_repo, tmp_path, command):
     out = _run("push-gate", _tool_payload(command, ".", [str(change_repo)]), tmp_path,
                adapter=checkerless_adapter)
-    assert out["decision"] == "deny"
-    assert "BLOCK push.attestation" in out["reason"]
+    assert out["decision"] == "allow", out
+    assert out["reason"].startswith(FAILED_ALLOWING) and out["reason"].endswith("; allowing."), out
+    codex = _codex_fallback({"tool_name": "Bash", "tool_input": {"command": command}}, tmp_path)
+    assert codex.returncode == 0, codex.stderr
+    assert FAILED_ALLOWING in codex.stderr and "; allowing." in codex.stderr
+
+
+SELECTION_WRITE = "echo x >> .git/loom/selections/c.jsonl"
+
+
+def test_missing_checker_denies_selection_store_write(checkerless_adapter, change_repo, tmp_path):
+    out = _run("push-gate", _tool_payload(SELECTION_WRITE, ".", [str(change_repo)]), tmp_path,
+               adapter=checkerless_adapter)
+    assert out["decision"] == "deny", out
+    assert "BLOCK selection.guard" in out["reason"]
+    bash = _codex_fallback({"tool_name": "Bash", "tool_input": {"command": SELECTION_WRITE}}, tmp_path)
+    assert bash.returncode == 2 and "BLOCK selection.guard" in bash.stderr
+    for tool_name, tool_input in [
+        ("Write", {"file_path": ".git/loom/selections/c.jsonl", "content": "{}"}),
+        ("Edit", {"file_path": "/r/.git/loom/selections/c.jsonl", "old_string": "a", "new_string": "b"}),
+        ("apply_patch", {"command": "*** Begin Patch\n*** Add File: .git/loom/selections/c.jsonl\n+{}\n"
+                                    "*** End Patch\n"}),
+    ]:
+        result = _codex_fallback({"tool_name": tool_name, "tool_input": tool_input}, tmp_path, matcher=1)
+        assert result.returncode == 2, (tool_name, result.stderr)
+        assert "BLOCK selection.guard" in result.stderr
+
+
+def test_missing_checker_allows_ordinary_file_write_on_codex(tmp_path):
+    """Only a selection-store target is denied: content naming the store is not a target."""
+    result = _codex_fallback({"tool_name": "Write", "tool_input": {
+        "file_path": "notes.md", "content": "see .git/loom/selections/"}}, tmp_path, matcher=1)
+    assert result.returncode == 0, result.stderr
+
+
+# Store writes whose text never spells the literal store path; the running
+# guard's ALWAYS_DENIED patterns (`loom/selections/`, `\.git/loom`) refuse them.
+UNSPELLED_STORE_WRITES = [
+    "cd .git/loom && printf x > selections/c.jsonl",
+    "printf x > .git/loom//selections/c.jsonl",
+    "printf x > .git/loom/./selections/c.jsonl",
+]
+
+
+@pytest.mark.parametrize("command", UNSPELLED_STORE_WRITES)
+def test_missing_checker_denies_unspelled_store_write(checkerless_adapter, change_repo, tmp_path, command):
+    out = _run("push-gate", _tool_payload(command, ".", [str(change_repo)]), tmp_path,
+               adapter=checkerless_adapter)
+    assert out["decision"] == "deny", out
+    codex = _codex_fallback({"tool_name": "Bash", "tool_input": {"command": command}}, tmp_path)
+    assert codex.returncode == 2 and "BLOCK selection.guard" in codex.stderr, codex.stderr
+
+
+# Store writes the running guard refuses although their text never spells the
+# store path: a git-directory lookup, a bare selections/ path, or a cwd inside
+# the store that a relative target or command runs from.
+CWD_STORE_WRITES = [
+    ("Bash", {"command": "cd $(git rev-parse --git-dir)/loom; printf x > selections/c.jsonl"}, "."),
+    ("Bash", {"command": "printf x > selections/c.jsonl"}, ".git/loom"),
+    ("Write", {"file_path": "selections/c.jsonl", "content": "{}"}, ".git/loom"),
+    ("apply_patch", {"command": "*** Begin Patch\n*** Add File: selections/c.jsonl\n+{}\n"
+                                "*** End Patch\n"}, ".git/loom"),
+]
+
+
+@pytest.mark.parametrize("tool_name,tool_input,cwd", CWD_STORE_WRITES)
+def test_missing_checker_denies_store_write_from_cwd(checkerless_adapter, change_repo, tmp_path,
+                                                     tool_name, tool_input, cwd):
+    payload = {"tool_name": tool_name, "tool_input": tool_input,
+               "cwd": os.path.normpath(change_repo / cwd)}
+    codex = _codex_fallback(payload, tmp_path, matcher=0 if tool_name == "Bash" else 1)
+    assert codex.returncode == 2 and "BLOCK selection.guard" in codex.stderr, codex.stderr
+    if tool_name == "Bash":  # agy's push gate sees run_command only
+        out = _run("push-gate", _tool_payload(tool_input["command"], cwd, [str(change_repo)]),
+                   tmp_path, adapter=checkerless_adapter)
+        assert out["decision"] == "deny", out
+        assert "BLOCK selection.guard" in out["reason"]
+
+
+def test_fallback_patterns_mirror_selection_guard():
+    """The agy fallback refuses on exactly the running guard's patterns."""
+    sys.path.insert(0, str(PLUGIN_ROOT / "scripts"))
+    from loom_checker.rule_checks import selection_guard as guard
+
+    spec = importlib.util.spec_from_file_location("agy_adapter", ADAPTER)
+    adapter = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(adapter)
+    assert [p.pattern for p in adapter.SELECTION_STORE] == [p.pattern for p, _ in guard.ALWAYS_DENIED]
+    assert [p.pattern for p in adapter.STORE_COMMAND_TEXT] == [
+        p.pattern for p in adapter.SELECTION_STORE] + [guard.BARE_SELECTIONS.pattern,
+                                                      guard.GIT_DIR_NAMES.pattern]
+
+
+@pytest.mark.parametrize("target", ["/r/.git/loom//selections/c.jsonl", "/r/.git/loom/./selections/c.jsonl"])
+def test_missing_checker_denies_unnormalised_store_file_target_on_codex(tmp_path, target):
+    result = _codex_fallback({"tool_name": "Write", "tool_input": {"file_path": target, "content": "{}"}},
+                             tmp_path, matcher=1)
+    assert result.returncode == 2 and "BLOCK selection.guard" in result.stderr, result.stderr
 
 
 @pytest.mark.parametrize("command", ["git status --short", "git log -3 --oneline", "ls -la"])
 def test_missing_checker_allows_closed_read_only_set(checkerless_adapter, change_repo, tmp_path, command):
     out = _run("push-gate", _tool_payload(command, ".", [str(change_repo)]), tmp_path,
                adapter=checkerless_adapter)
-    assert out == {"decision": "allow"}
+    assert out["decision"] == "allow"
 
 
 PARITY_COMMANDS = [
@@ -128,6 +241,7 @@ PARITY_COMMANDS = [
     "git push origin feat", "gh pr create --fill", "pytest -q", "git status; rm -rf x",
     "git branch -D feat", "git log --output=x", "find . -delete", "/bin/ls", "cat $(id)",
     "rg --pre=sh foo", "ls -la | sh", "git", "git -C", "echo hi", "cat 'unterminated",
+    SELECTION_WRITE, "cat .git/loom/selections/c.jsonl", "ls loom/selections",
 ]
 
 

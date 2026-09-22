@@ -1,0 +1,14 @@
+[no remote]
+loom: could not confirm GitHub rules for the trunk (no GitHub remote)
+exit=0
+[non-GitHub remote]
+loom: could not confirm GitHub rules for the trunk (repos/someone/project: gh: HTTP 410)
+exit=0
+[API error, test repo]
+loom: could not confirm GitHub rules for the trunk (repos/kouko/loom-floor-test: gh: Server Error (HTTP 502))
+exit=0
+[gh not installed]
+loom: could not confirm GitHub rules for the trunk (gh not installed)
+exit=0
+[read-only viewer, test repo with rules]
+loom: could not confirm GitHub rules for main (bypass actors unreadable; classic protection unreadable)

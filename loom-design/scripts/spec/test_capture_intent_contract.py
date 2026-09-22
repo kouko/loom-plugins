@@ -474,10 +474,20 @@ def test_loom_design_version_2_2_0_consistent() -> None:
         (REPO / "loom-design/plugin.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.2.0"
-    assert codex_manifest["version"] == "2.2.0"
-    assert agy_manifest["version"] == "2.2.0"
-    assert "## [2.2.0]" in changelog
+    assert claude_manifest["version"] == "2.3.0"
+    assert codex_manifest["version"] == "2.3.0"
+    assert agy_manifest["version"] == "2.3.0"
+    assert "## [2.3.0]" in changelog
+    assert "## [2.2.1]" not in changelog
+    readme_pins = {
+        "README.md": "| [`loom-design`](loom-design/) | 2.3.0 |",
+        "loom-design/README.md": "**Version**: 2.3.0",
+        "loom-design/README.ja.md": "**Version**: 2.3.0",
+        "loom-design/README.zh-TW.md": "**Version**: 2.3.0",
+    }
+    for name, pin in readme_pins.items():
+        assert pin in (REPO / name).read_text(encoding="utf-8"), name
+    assert "Version 2.3.0. Turns a rough idea" in (REPO / "README.md").read_text(encoding="utf-8")
 
 
 def _branch_note() -> str:

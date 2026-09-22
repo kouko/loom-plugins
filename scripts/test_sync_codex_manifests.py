@@ -673,3 +673,29 @@ def test_claude_ignores_plugin_rules_dir():
                 "hooks/visualization-card"):
         text = (plugin / rel).read_text(encoding="utf-8")
         assert "rules/" not in text and "AGENTS.md" not in text, rel
+
+
+def _descriptions(node):
+    """Every string held under a *description key, at any depth."""
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if "escription" in key and isinstance(value, str):
+                yield value
+            else:
+                yield from _descriptions(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from _descriptions(item)
+
+
+def test_no_manifest_description_names_the_removed_refusing_gate():
+    """The publication floor moved to GitHub; no description may name a gate."""
+    manifests = [REPO_ROOT / ".claude-plugin" / "marketplace.json"]
+    manifests += sorted(REPO_ROOT.glob("*/plugin.json"))
+    manifests += sorted(REPO_ROOT.glob("*/.claude-plugin/plugin.json"))
+    manifests += sorted(REPO_ROOT.glob("*/.codex-plugin/plugin.json"))
+    assert len(manifests) > 3
+    for path in manifests:
+        for text in _descriptions(json.loads(path.read_text(encoding="utf-8"))):
+            for phrase in ("publication gate", "push gate"):
+                assert phrase not in text, (path, phrase)

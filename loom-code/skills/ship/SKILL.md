@@ -1,7 +1,7 @@
 ---
 name: ship
 description: |
-  Publish a reviewed branch and verify PR checks. Use after closing-review generates a matching content attestation.
+  Publish a reviewed branch and verify PR checks. Use after closing-review, normally with a matching attestation.
 version: 1.1.0
 ---
 
@@ -23,10 +23,17 @@ never implies authorization. A legacy intent without that machine-readable field
 requires one publication decision before anything leaves the machine.
 The user may still explicitly stop publication before the outward action.
 
-At entry, run `loom_checker.py selection show <change-id>` and omit only the
-prose steps it lists as skipped (spec, plan, implementer, tdd,
-blind-run); skip suggestions and user requests follow
-[expert-mode](../expert-mode/SKILL.md).
+At entry, run `loom_checker.py selection show <change-id>` and omit the prose
+steps `selection show` lists as skipped (spec, plan, implementer, tdd,
+blind-run), plus any step the user told you to skip in plain words;
+[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
+invoke. The default is the full flow: skip a step only when the user tells you
+to in plain words, then tell the user in one line which step is skipped and
+continue. When you honour such a skip, write it straight into the PR body's
+`Skipped by instruction:` line (§2); Ship only reads the plan's
+`skipped-by-instruction:` lines and leaves the plan unchanged, because plan.md
+is functional content and an appended line would make the attestation stale.
+Never ask the user for a generated code to skip a step.
 
 ## 2. Prepare publication text
 
@@ -63,6 +70,16 @@ do not depend on conversation recall. Use these headings exactly once:
 <deferred work, or "None">
 ```
 Use a Markdown table for any list‑type or comparison‑type information (options, trade‑offs, decision summaries, etc.). Do not use inline ①②③ lists or plain‑text enumerations.
+
+Under the Verification heading, write the line `Verification status: <status>`,
+where `<status>` is the status `publish` computes locally and prints on its
+`Verification <status> for <head>` line: `valid`, `valid (skipped: <steps>)`,
+`absent`, or `stale (<reason>)`. When the printed status differs from the
+body, correct the body in place. Build the line
+`Skipped by instruction: <steps>` from the plan's `skipped-by-instruction:`
+lines plus any skip decided at Ship (§1), not from conversation recall; with
+none recorded or decided, write no such line,
+and the recomputed `(missing: …)` clause still discloses the absent records.
 
 When the attestation carries a selection, open the Verification section with
 exactly these lines, filled from the attestation's `selection` field: one
@@ -102,6 +119,18 @@ Publication-only edits do not change the functional digest and do not return to
 
 ## 3. Publish once
 
+Before publishing, run `python3 <loom-code>/scripts/loom_checker.py github-rules`
+and relay its lines to the user. When it reports a missing rule, ask the user
+in consequence form — from then on <trunk> accepts changes only through a PR
+whose body check passes, for you too — then show the user the setup command
+that `loom_checker.py github-rules --print-setup` prints, and run that setup
+command only after the user explicitly agrees in conversation. Never run the
+setup command unasked. When it reports `template not on <trunk>`, relay the
+printed step to the user; add the template only after the user explicitly
+agrees, as its own change and never inside the current change's PR, then run
+`github-rules` again for the rules. When it reports that the rules could not be
+confirmed, tell the user and continue publishing.
+
 For an intent carrying automatic-publication authorization, pass its absolute
 path to the installed plugin's one publication command:
 
@@ -118,24 +147,22 @@ python3 <loom-code>/scripts/loom_checker.py publish --confirm-authorized --title
 The `<title>` is a Conventional Commits subject whose type equals the current
 branch's `<type>/` prefix, because it becomes the squash-merge commit.
 
-The command verifies exactly one branch attestation, its schema, content
-digest, execution identities/results, reviewer verdicts, and live HEAD. It
-then derives the origin repository, default base, current branch, and exact
-refspec; performs a non-forced push; and opens or reuses one PR. Do not run a
+The command validates the body, identifies the change from the branch
+`<type>/<change-id>` or its one committed intent, and computes the
+verification status locally and prints it. It then derives the origin repository, default
+base, current branch, and exact refspec (destination/refspec safety); performs
+a non-forced push; and opens or reuses one PR. Publishing proceeds without an
+attestation: an absent or stale one is disclosed, not refused. Before pushing,
+beyond authorization and repository safety, it refuses only a malformed body
+(naming the heading), a `Skipped steps:` mismatch against a bound selection,
+and an unidentified change. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
 hand a refused publication command to the user to run; where a refusal names a
-remedy, take it, and where it names none, report the refusal and stop — where
-the branch attests nothing, the remedy is one of two routes: run the
-closing-review station, which generates the attestation, or propose a step
-selection the user confirms by typing `/loom-code:expert-mode <code>`
-(Codex: `$expert-mode`) with the code the proposal printed.
+remedy, take it, and where it names none, report the refusal and stop.
 
-The installed plugin's `PreToolUse` hook applies the same check automatically
-to direct raw publication commands and retains destination/refspec safety for
-callers that bypass `publish`. No repository-local checker scaffold or
-hook-firing ledger is required. That hook judges the body it can read when it
-looks, not the body the pull request receives; a file swapped between those two
-reads is outside what any such check can promise.
+The installed plugin's `PreToolUse` hook only reminds: a direct push or PR
+create prints one line naming the branch's verification status. No
+repository-local checker scaffold or hook-firing ledger is required.
 
 ## 4. Observe CI
 
@@ -180,14 +207,14 @@ repository may be fixed in place and reuse the matching attestation.
 After all checks pass, present the result and the blind-run report when one
 exists (decision point ③). Publication never authorizes or invokes merge; only
 the maintainer's explicit acceptance does. Never type `gh pr merge` yourself:
-the installed publication hook refuses it.
+merge through land, which checks the live PR body and discloses verification.
 Publication authorization, including `publication: automatic`, is not
 acceptance; always present the result and ask at decision point ③ before
 running land. Before running land, invoke `loom-workflow:git-memory` for the
 merge checkpoint.
 
-On that acceptance, take the root of the worktree whose branch carries the
-attestation — `git rev-parse --show-toplevel` run from that worktree, never the
+On that acceptance, take the root of the change branch's worktree —
+`git rev-parse --show-toplevel` run from that worktree, never the
 task or main checkout — and land the change as one Bash command:
 
 ```text
@@ -213,5 +240,5 @@ answers yes to the printed list.
 
 ## Handoff
 
-Report the attestation digest, publication checks, PR URL, CI state, and land's
-output.
+Report the attestation digest when one exists, else the verification status
+publish printed, publication checks, PR URL, CI state, and land's output.

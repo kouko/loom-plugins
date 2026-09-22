@@ -84,9 +84,13 @@ def selection_evidence(repo: Path, change_id: str, manifest: dict | None = None)
 
 def validate_attestation(
     repo: Path, head_sha: str, change_id: str, attestation: object,
-    manifest: dict | None = None,
+    manifest: dict | None = None, claimed_selection: bool = False,
 ) -> list[tuple[str, str]]:
-    """Validate generated evidence without executing the recorded programs."""
+    """Validate generated evidence without executing the recorded programs.
+
+    `claimed_selection` runs the content-level checks only: the attestation's
+    own `selection` is taken as a claim and never compared with the local
+    selection records, which a fresh checkout (CI) does not have."""
     rule = "push.attestation"
     if not isinstance(attestation, dict) or set(attestation) not in KEYS_BY_SCHEMA.values():
         return [(rule, "attestation has an unknown or incomplete schema")]
@@ -102,7 +106,14 @@ def validate_attestation(
         return [(rule, "attestation functional content digest does not match the selected tree")]
 
     skip: set[str] = set()
-    if schema == ATTESTATION_SCHEMA:
+    if schema == ATTESTATION_SCHEMA and claimed_selection:
+        claim = attestation.get("selection")
+        if claim is not None:
+            claimed = claim.get("skip") if isinstance(claim, dict) else None
+            if not isinstance(claimed, list) or not all(isinstance(s, str) for s in claimed):
+                return [(rule, "attestation selection claim is malformed")]
+            skip = set(claimed)
+    elif schema == ATTESTATION_SCHEMA:
         recorded = selection_evidence(repo, change_id, manifest)
         if attestation.get("selection") != recorded:
             return [(rule, "attestation selection does not match the local selection records")]

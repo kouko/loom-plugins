@@ -207,7 +207,7 @@ def test_capture_refuses_to_run_without_hook_flag(repo):
     assert events(repo, "confirmation") == []
 
 
-@pytest.mark.parametrize("prompt", ["yes", "yes {code}", "ok /expert-mode {code}",
+@pytest.mark.parametrize("prompt", ["yes", "{code}", "yes {code}", "ok /expert-mode {code}",
                                     "/expert-mode yes", "/expert-mode {code}X"])
 def test_plain_yes_binds_nothing(repo, prompt):
     code = propose(repo)

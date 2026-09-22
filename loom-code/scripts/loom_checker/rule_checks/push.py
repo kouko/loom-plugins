@@ -1,31 +1,22 @@
+"""Shell reading shared by the PreToolUse hook and the selection-store guard.
+
+The hook recognises a publication command only in its most common shape
+(`publication_kind`); the segment splitter, tokeniser and prefix stripper
+serve `selection_guard.py`; `github_repo_from_origin` and
+`CANONICAL_PUSH_FLAGS` serve `publish`, `land` and `github-rules`.
+"""
 from __future__ import annotations
 
-from loom_checker.helpers import UsageError
 from loom_checker.helpers import git_maybe
-from loom_checker.helpers import git_text
-from loom_checker.helpers import repo_root
 from pathlib import Path
-from urllib.parse import quote
-import os
 import re
 import shlex
-import shutil
-import subprocess
 
 
 SEGMENT_SPLIT = re.compile(r"\|\||&&|[;\n|&]")
 
 
 ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
-
-
-GIT_VALUE_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
-
-
-GH_VALUE_OPTIONS = {"-R", "--repo", "--hostname"}
-
-
-GIT_REPOSITORY_ENV = {"GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR", "GH_REPO"}
 
 
 ENV_VALUE_OPTIONS = {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"}
@@ -38,8 +29,7 @@ SHELL_PROGRAMS = {"bash", "sh", "zsh", "dash"}
 
 
 # Words a shell reads as grammar rather than as the command word, so that the
-# heredoc owned by `if …; then bash <<EOF` is still owned by `bash`, and so that
-# merge recognition reads `if …; then gh pr merge` as the merge it runs.
+# heredoc owned by `if …; then bash <<EOF` is still owned by `bash`.
 HEREDOC_GRAMMAR_WORDS = {"!", "then", "else", "elif", "do"}
 
 
@@ -61,18 +51,17 @@ HEREDOC_WORD_END = frozenset(" \t\n;&|<>()")
 def _command_word_is_a_shell(text: str) -> bool:
     """Whether one pipeline member runs what it is handed as commands.
 
-    `_strip_merge_prefix`, not `_strip_prefix`: the narrow one stops at the
+    `_strip_command_word_prefix`, not `_strip_prefix`: the narrow one stops at the
     first `-` token, so `sudo -u bob bash <<EOF` would read its command word as
-    `-u` and carve an executed body out as content. The narrow helper is right
-    for push recognition, where over-reading refuses a command that runs today;
-    here over-reading judges a body that would otherwise reach no rule, so the
-    wide one is the one that fails in the safe direction.
+    `-u` and carve an executed body out as content. Over-reading here judges a
+    body that would otherwise reach no rule, so the wide one is the one that
+    fails in the safe direction.
 
     The bare `<<` form names no command word and the shell reads that body
     itself, so an absent command word reads as executing."""
-    tokens = _strip_merge_prefix(_tokenise(text.lstrip("({ \t")))
+    tokens = _strip_command_word_prefix(_tokenise(text.lstrip("({ \t")))
     while tokens and tokens[0] in HEREDOC_GRAMMAR_WORDS:
-        tokens = _strip_merge_prefix(tokens[1:])
+        tokens = _strip_command_word_prefix(tokens[1:])
     if not tokens:
         return True
     return _program(tokens[0]) in SHELL_PROGRAMS
@@ -317,15 +306,11 @@ def _strip_prefix(tokens: list[str]) -> list[str]:
     return tokens[index:]
 
 
-def _strip_merge_prefix(tokens: list[str]) -> list[str]:
+def _strip_command_word_prefix(tokens: list[str]) -> list[str]:
     """`_strip_prefix` widened by the shell grammar and the wrapper options a
-    merge can sit behind: `if …; then`, `( … )`, `{ …; }`, `sudo -u bob`,
-    `xargs -n1`.
-
-    Merge recognition alone gets this. The push recognisers keep the narrower
-    `_strip_prefix`, because a wrapped push they do not see today still runs
-    today: seeing it would send it to the canonical-form check that refuses it,
-    turning a command that runs into a blocked one."""
+    command word can sit behind: `if …; then`, `( … )`, `{ …; }`,
+    `sudo -u bob`, `xargs -n1`. Heredoc carving alone uses it, to find the
+    command word that owns a body."""
     index = 0
     while index < len(tokens):
         token = tokens[index].lstrip("({")
@@ -345,105 +330,24 @@ def _strip_merge_prefix(tokens: list[str]) -> list[str]:
     return []
 
 
-def _subcommand_at(tokens: list[str], value_options: set[str]) -> tuple[int, str] | None:
-    """The position and value of the first non-option, non-value word."""
-    index = 0
-    while index < len(tokens):
-        token = tokens[index]
-        if token == "--":
-            return None
-        if token in value_options:
-            index += 2
-            continue
-        if token.startswith("-"):
-            index += 1
-            continue
-        return index, token
+def publication_kind(command: str) -> str | None:
+    """`push`, `create` or `merge` when the first simple command of the text,
+    after leading `VAR=value` assignments, is literally `git push`,
+    `gh pr create` or `gh pr merge`; None for every other shape.
+
+    Shallow on purpose: the hook only reminds, so a shape read here costs a
+    reminder line and a shape missed costs nothing. A wrapper, a prefix
+    command, a `bash -c` script, a heredoc body and a mere mention of the
+    words are all None."""
+    first = next((segment for segment in _operator_segments(command) if segment.strip()), "")
+    tokens = _tokenise(first)
+    while tokens and ASSIGNMENT.match(tokens[0]):
+        tokens = tokens[1:]
+    if tokens[:2] == ["git", "push"]:
+        return "push"
+    if tokens[:2] == ["gh", "pr"] and tokens[2:3] in (["create"], ["merge"]):
+        return tokens[2]
     return None
-
-
-def _subcommand(tokens: list[str], value_options: set[str]) -> str | None:
-    """The first word that is neither an option nor an option's value."""
-    found = _subcommand_at(tokens, value_options)
-    return found[1] if found else None
-
-
-def is_push_command(command: str) -> bool:
-    """True when any segment of this shell line pushes or opens/merges a PR."""
-    if is_git_push_command(command):
-        return True
-    for segment in _shell_segments(command):
-        tokens = _strip_prefix(_tokenise(segment))
-        if not tokens:
-            continue
-        program = _program(tokens[0])
-        if program == "eval":
-            if is_push_command(" ".join(tokens[1:])):
-                return True
-        elif program in SHELL_PROGRAMS and "-c" in tokens[1:]:
-            index = tokens.index("-c")
-            if index + 1 < len(tokens) and is_push_command(tokens[index + 1]):
-                return True
-        elif program == "gh":
-            rest = tokens[1:]
-            found = _subcommand_at(rest, GH_VALUE_OPTIONS)
-            if found and found[1] == "pr":
-                after = rest[found[0] + 1:]
-                if _subcommand(after, GH_VALUE_OPTIONS) in {"create", "merge"}:
-                    return True
-    return False
-
-
-def is_pr_create_command(command: str) -> bool:
-    """True when a shell segment creates a PR."""
-    for segment in _shell_segments(command):
-        tokens = _strip_prefix(_tokenise(segment))
-        if not tokens or _program(tokens[0]) != "gh":
-            continue
-        rest = tokens[1:]
-        found = _subcommand_at(rest, GH_VALUE_OPTIONS)
-        if found and found[1] == "pr":
-            after = rest[found[0] + 1:]
-            if _subcommand(after, GH_VALUE_OPTIONS) == "create":
-                return True
-    return False
-
-
-def _merge_word(token: str | None) -> str:
-    """A gh subcommand word as the shell hands it over, case-folded.
-
-    `shlex` knows nothing of ANSI-C (`$'merge'`) or locale (`$"merge"`)
-    quoting: it removes the quotes and leaves `$merge`, where the shell passes
-    `merge`. A leading `$` is therefore dropped. That also reads a genuine
-    expansion (`$merge`) as the word, which is the fail-closed direction: the
-    token stands in the subcommand position of `gh pr`, so what it expands to
-    cannot be resolved here and the refusal is the safe answer.
-
-    Case-folded because a case-insensitive filesystem runs `GH` as `gh`, and
-    gh matches its own subcommands case-insensitively."""
-    if token is None:
-        return ""
-    return token.lstrip("$").strip("'\"").lower()
-
-
-def is_pr_merge_command(command: str) -> bool:
-    """True when a shell segment merges a PR, whatever shell grammar or wrapper
-    options stand in front of it.
-
-    Backslash-continuations are joined first: the shell joins them before it
-    reads a command word, so `gh pr \\<newline>merge 7` is one command, while
-    `_shell_segments` splits on the raw newline and would read two."""
-    for segment in _shell_segments(command.replace("\\\n", "")):
-        tokens = _strip_merge_prefix(_tokenise(segment))
-        if not tokens or _program(tokens[0]) != "gh":
-            continue
-        rest = tokens[1:]
-        found = _subcommand_at(rest, GH_VALUE_OPTIONS)
-        if found and _merge_word(found[1]) == "pr":
-            after = rest[found[0] + 1:]
-            if _merge_word(_subcommand(after, GH_VALUE_OPTIONS)) == "merge":
-                return True
-    return False
 
 
 def github_repo_from_origin(repo: Path) -> str | None:
@@ -462,386 +366,4 @@ def github_repo_from_origin(repo: Path) -> str | None:
     return f"{host}/{owner}/{name}"
 
 
-# Every trailing option the canonical PR-create form may carry, with the number
-# of tokens it spends: 2 for an option and its value, 1 for a flag.
-#
-# An allowlist rather than a list of refused spellings, because the refused list
-# can only ever be as current as gh's release notes: a body-determining flag
-# added in a later gh release would be admitted by a refused-list check and then
-# read by `pr_create_body` as an empty body, which is the shape of F8. Here an
-# option this repository has never heard of is simply not canonical.
-#
-# Only the separate-value spelling is canonical. `--body-file=<path>` and the
-# short forms (`-F`, `-H`, `-b`, `-t`) are not: `-F` is the one option the hook
-# and the shell could resolve differently, because `check_pr_create_remote_head`
-# requires an absolute path of `--body-file` and `--body-file=` alone, while the
-# hook resolves a relative path against the repository root it chdirs to and the
-# shell resolves it against the payload's `cwd`.
-#
-# GitHub CLI documents every `gh pr create` flag, its short form and whether it
-# takes a value -- the arities below are read from that list:
-# https://cli.github.com/manual/gh_pr_create
-CANONICAL_PR_CREATE_OPTIONS = {
-    "--base": 2, "--head": 2, "--title": 2, "--body-file": 2, "--draft": 1,
-}
-
-
-def canonical_pr_create_trailing(trailing: list[str]) -> bool:
-    """True when every trailing token belongs to an allowlisted option.
-
-    An option consumes its own value, so a value that looks like an option is
-    read as a value -- which is how gh's flag parser reads it too."""
-    # gh parses its flags with spf13/pflag, whose `parseLongArg` takes the next
-    # argument as the value of a flag that declares no `NoOptDefVal`, without
-    # testing it for a leading dash. That is the rule the walk below repeats:
-    # https://github.com/spf13/pflag/blob/master/flag.go
-    index = 0
-    while index < len(trailing):
-        width = CANONICAL_PR_CREATE_OPTIONS.get(trailing[index])
-        if width is None or index + width > len(trailing):
-            return False
-        index += width
-    return True
-
-
-def is_canonical_pr_create_command(repo: Path, command: str) -> bool:
-    """True only for one function-proof, origin-bound PR creation command."""
-    trusted = shutil.which("gh")
-    trusted_env = shutil.which("env")
-    gh_repo = github_repo_from_origin(repo)
-    if not trusted or not trusted_env or not gh_repo:
-        return False
-    gh_tokens = _tokenise(command)
-    expected_prefix = [
-        "command", str(Path(trusted_env).resolve()), f"LOOM_REPO_ROOT={repo.resolve()}",
-        f"GH_REPO={gh_repo}", str(Path(trusted).resolve()), "pr", "create",
-    ]
-    return (
-        gh_tokens[:7] == expected_prefix
-        and canonical_pr_create_trailing(gh_tokens[7:])
-        and command == render_quote_all(gh_tokens)
-    )
-
-
-def canonical_pr_create_repo(command: str) -> Path | None:
-    """Return the selected repo only when the whole PR-create form is trusted."""
-    tokens = _tokenise(command)
-    if len(tokens) < 7 or not tokens[2].startswith("LOOM_REPO_ROOT="):
-        return None
-    selected = Path(tokens[2].split("=", 1)[1])
-    if not selected.is_absolute() or not selected.is_dir():
-        return None
-    try:
-        repo = repo_root(selected.resolve())
-    except UsageError:
-        return None
-    if repo.resolve() != selected.resolve():
-        return None
-    return repo if is_canonical_pr_create_command(repo, command) else None
-
-
-def pr_create_body(command: str) -> str:
-    """The PR body this `gh pr create` would send.
-
-    Read from the last `--body-file`, because that is the one gh keeps when a
-    command repeats the option: a gate that read the first would judge a body
-    the pull request never receives. The ship station's form carries
-    `--body-file` with an absolute path, which `check_pr_create_remote_head`
-    requires of every command it admits.
-
-    The inline spellings (`--body`, `-b`, `--body=`) are not read, because no
-    command carrying one ever reaches this reader: `CANONICAL_PR_CREATE_OPTIONS`
-    admits only `--base`, `--head`, `--title`, `--body-file` and `--draft`, and
-    the sole caller (command_handlers/push.py) refuses anything else at
-    admission. Were one ever allowlisted it would read as "" here, which
-    discloses nothing and refuses.
-
-    "" when the command names no body and when the named file cannot be read:
-    an empty body discloses nothing, which is exactly what a body the gate
-    cannot read has proven about itself.
-
-    Only a readable regular file is read, which is the guard `_publish_args`
-    (command_handlers/publish.py) already puts on `--body-file`. This runs
-    inside a `PreToolUse` hook that has no timeout of its own, so an unguarded
-    `read_text` on a FIFO blocks the agent forever and one on a character
-    device reads without end. `-` is gh's spelling for stdin, which the gate
-    cannot see at all, so it is never treated as a path."""
-    tokens = _tokenise(command)
-    body = ""
-    for index, token in enumerate(tokens):
-        following = tokens[index + 1] if index + 1 < len(tokens) else None
-        if token in {"--body-file", "-F"} and following is not None:
-            path = following
-        elif token.startswith("--body-file="):
-            path = token.split("=", 1)[1]
-        else:
-            continue
-        body = ""
-        named = Path(path)
-        if path == "-" or not named.is_file() or not os.access(named, os.R_OK):
-            continue
-        try:
-            body = named.read_text(encoding="utf-8")
-        except (OSError, UnicodeError):
-            body = ""
-    return body
-
-
-def check_pr_create_remote_head(repo: Path, command: str) -> str | None:
-    """Require PR creation to reference the already-published current HEAD."""
-    branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
-    head = git_maybe(repo, "rev-parse", "HEAD")
-    if not branch or not head:
-        return "PR creation requires a current symbolic branch and commit"
-
-    tokens = _tokenise(command)
-    head_values: list[str] = []
-    for index, token in enumerate(tokens):
-        if token in {"--head", "-H"} and index + 1 < len(tokens):
-            head_values.append(tokens[index + 1])
-        elif token.startswith("--head="):
-            head_values.append(token.split("=", 1)[1])
-        elif token.startswith("-H") and token != "-H":
-            head_values.append(token[2:])
-        if token == "--body-file" and (
-            index + 1 >= len(tokens) or not Path(tokens[index + 1]).is_absolute()
-        ):
-            return "PR body file must be an absolute path"
-        if token.startswith("--body-file=") and not Path(token.split("=", 1)[1]).is_absolute():
-            return "PR body file must be an absolute path"
-    if head_values != [branch]:
-        if not head_values:
-            return f"PR creation requires explicit current branch head {branch!r}"
-        else:
-            return f"PR head must be the current branch {branch!r}"
-
-    gh_repo = github_repo_from_origin(repo)
-    trusted_gh = shutil.which("gh")
-    if not gh_repo or not trusted_gh:
-        return "PR creation requires a trusted GitHub origin and gh executable"
-    repo_parts = gh_repo.split("/")
-    host, owner, name = repo_parts[0], repo_parts[-2], repo_parts[-1]
-    try:
-        # GitHub CLI documents the endpoint form plus --hostname and --jq:
-        # https://cli.github.com/manual/gh_api
-        # GitHub documents this reference endpoint and its object.sha response:
-        # https://docs.github.com/en/rest/git/refs#get-a-reference
-        observed = subprocess.run(
-            [str(Path(trusted_gh).resolve()), "api", "--hostname", host,
-             f"repos/{owner}/{name}/git/ref/heads/{quote(branch, safe='')}",
-             "--jq", ".object.sha"],
-            cwd=repo, capture_output=True, text=True, timeout=30,
-            env={**os.environ, "GH_REPO": gh_repo, "LOOM_REPO_ROOT": str(repo)},
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        observed = None
-    if observed is not None and observed.returncode == 0 and observed.stdout.strip() == head:
-        return None
-    return f"remote branch {branch!r} must already equal reviewed HEAD {head}"
-
-
-def is_git_push_command(command: str) -> bool:
-    """True when any shell segment can reach a Git push."""
-    for segment in _shell_segments(command):
-        tokens = _strip_prefix(_tokenise(segment))
-        if not tokens:
-            continue
-        program = _program(tokens[0])
-        if program == "eval":
-            if is_git_push_command(" ".join(tokens[1:])):
-                return True
-        elif program in SHELL_PROGRAMS and "-c" in tokens[1:]:
-            index = tokens.index("-c")
-            if index + 1 < len(tokens) and is_git_push_command(tokens[index + 1]):
-                return True
-        elif program == "git" and _subcommand(tokens[1:], GIT_VALUE_OPTIONS) == "push":
-            return True
-    return False
-
-
-def git_dash_c_push_cwd(command: str, fallback: str) -> str | None:
-    """Return the one unambiguous repository selected by every Git push.
-
-    The host-reported cwd is authoritative only when a push has no directory
-    override. An absolute ``-C`` anchors later relative ``-C`` options. A
-    relative first ``-C``, another directory-changing option, a missing or
-    invalid directory, or pushes selecting distinct repositories is unsafe
-    because the hook cannot prove which repository the shell will push.
-    """
-    selected_roots: set[str] = set()
-    shell_root: Path | None = None
-    repository_env_changed = False
-    for segment in _shell_segments(command):
-        raw_tokens = _tokenise(segment)
-        tokens = _strip_prefix(raw_tokens)
-        if not tokens:
-            continue
-        if any(_program(token) == "env" for token in raw_tokens) and any(
-            token.startswith("-C")
-            or token == "--chdir"
-            or token.startswith("--chdir=")
-            for token in raw_tokens
-        ):
-            return None
-        segment_changes_repository_env = any(
-            ASSIGNMENT.match(token)
-            and token.split("=", 1)[0] in GIT_REPOSITORY_ENV
-            for token in raw_tokens
-        )
-        program = _program(tokens[0]).lstrip("(")
-        if program == "export" and any(
-            token.split("=", 1)[0] in GIT_REPOSITORY_ENV
-            for token in tokens[1:]
-        ):
-            segment_changes_repository_env = True
-        repository_env_changed = (
-            repository_env_changed or segment_changes_repository_env
-        )
-        if program in {"cd", "pushd"}:
-            directory_args = [
-                token for token in tokens[1:]
-                if token != "--" and not token.startswith("-")
-            ]
-            if len(directory_args) != 1:
-                return None
-            candidate = Path(directory_args[0])
-            if candidate.is_absolute():
-                shell_root = candidate
-            elif shell_root is not None:
-                shell_root = shell_root / candidate
-            else:
-                return None
-            if not shell_root.is_dir():
-                return None
-            continue
-        if program == "popd":
-            return None
-        if program == "eval" and is_push_command(" ".join(tokens[1:])):
-            return None
-        if program in SHELL_PROGRAMS and "-c" in tokens[1:]:
-            index = tokens.index("-c")
-            if index + 1 < len(tokens) and is_push_command(tokens[index + 1]):
-                return None
-        if any(_program(token) == "xargs" for token in raw_tokens) and is_push_command(segment):
-            return None
-        if program == "gh" and is_push_command(segment):
-            if repository_env_changed or any(
-                token.startswith("-R")
-                or token == "--repo"
-                or token.startswith("--repo=")
-                for token in tokens[1:]
-            ):
-                return None
-            root = shell_root if shell_root is not None else Path(fallback)
-            selected_roots.add(str(root.resolve()))
-            continue
-        if program != "git" or _subcommand(tokens[1:], GIT_VALUE_OPTIONS) != "push":
-            continue
-        if repository_env_changed:
-            return None
-        selected = shell_root
-        index = 1
-        while index < len(tokens):
-            token = tokens[index]
-            if token == "-C":
-                if index + 1 >= len(tokens):
-                    return None
-                candidate = Path(tokens[index + 1])
-                if candidate.is_absolute():
-                    selected = candidate
-                elif selected is not None:
-                    selected = selected / candidate
-                else:
-                    return None
-                index += 2
-                continue
-            if token.startswith("-C") or token in {"--git-dir", "--work-tree"}:
-                return None
-            if token.startswith("--git-dir=") or token.startswith("--work-tree="):
-                return None
-            if token in GIT_VALUE_OPTIONS:
-                index += 2
-                continue
-            if token.startswith("-"):
-                index += 1
-                continue
-            break
-        root = selected if selected is not None else Path(fallback)
-        if not root.is_dir():
-            return None
-        selected_roots.add(str(root.resolve()))
-    if len(selected_roots) > 1:
-        return None
-    return next(iter(selected_roots)) if selected_roots else None
-
-
 CANONICAL_PUSH_FLAGS = ["--no-follow-tags", "--recurse-submodules=no", "-u", "--no-verify"]
-
-
-SAFE_REMOTE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
-
-
-def quote_all_shell_token(token: str) -> str:
-    """Render one argv token without leaving any shell expansion position."""
-    return "'" + token.replace("'", "'\"'\"'") + "'"
-
-
-def render_quote_all(tokens: list[str]) -> str:
-    return " ".join(quote_all_shell_token(token) for token in tokens)
-
-
-def canonical_git_push(
-    command: str, fallback: str
-) -> tuple[Path | None, str | None, str | None]:
-    """Validate the complete shell bytes for the one supported Git push."""
-    trusted = shutil.which("git")
-    if not trusted:
-        return None, None, "the hook environment has no trusted Git executable"
-    trusted_git = str(Path(trusted).resolve())
-    try:
-        tokens = shlex.split(command, posix=True)
-    except ValueError as exc:
-        return None, None, f"the Git push command has malformed quoting: {exc}"
-    if command != render_quote_all(tokens):
-        return None, None, "the entire Git push command must use canonical quote-all rendering"
-    if len(tokens) < 2 or tokens[0] != "command":
-        return None, None, "the Git push must begin with the standard command builtin"
-    if tokens[1] != trusted_git or not Path(tokens[1]).is_absolute():
-        return None, None, f"the Git executable must be the trusted absolute path {trusted_git!r}"
-
-    index = 2
-    selected = Path(fallback)
-    if index < len(tokens) and tokens[index] == "-C":
-        if index + 1 >= len(tokens) or not Path(tokens[index + 1]).is_absolute():
-            return None, None, "Git -C must name the selected repository by absolute path"
-        selected = Path(tokens[index + 1])
-        index += 2
-    try:
-        repo = repo_root(selected.resolve())
-    except UsageError as exc:
-        return None, None, str(exc)
-    if "-C" in tokens[1:index] and selected.resolve() != repo.resolve():
-        return None, None, "Git -C must name the selected repository root exactly"
-
-    required = ["push", *CANONICAL_PUSH_FLAGS]
-    if tokens[index:index + len(required)] != required:
-        return None, None, (
-            "Git push must use exactly --no-follow-tags --recurse-submodules=no -u --no-verify"
-        )
-    tail = tokens[index + len(required):]
-    if len(tail) != 2:
-        return None, None, "Git push must name one literal remote and one explicit refspec"
-    remote, refspec = tail
-    if not SAFE_REMOTE.fullmatch(remote):
-        return None, None, f"Git push remote {remote!r} is not a safe literal name"
-    if remote != "origin":
-        return None, None, "the Git push remote must be literal 'origin'"
-
-    head = git_text(repo, "rev-parse", "HEAD")
-    branch = git_maybe(repo, "symbolic-ref", "--quiet", "--short", "HEAD")
-    if not branch:
-        return None, None, "the selected repository has no current symbolic branch"
-    expected = f"{head}:refs/heads/{branch}"
-    if refspec != expected:
-        return None, None, f"Git push refspec must be exactly {expected!r}, got {refspec!r}"
-    return repo, head, None

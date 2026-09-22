@@ -23,3 +23,12 @@ def test_first_contact_keeps_new_or_modified_hook_review_host_owned() -> None:
     assert "new or modified installed definition" in text
     assert "Never edit Codex trust state" in text
     assert "--dangerously-bypass-hook-trust" in text
+
+
+def test_first_contact_checks_a_still_registered_rule_id() -> None:
+    write_plan = " ".join((PLUGIN / "skills" / "write-plan" / "SKILL.md").read_text(encoding="utf-8").split())
+    text = " ".join(FIRST_CONTACT.read_text(encoding="utf-8").split())
+
+    assert "includes `push.contextual-body`" in text
+    assert "Confirm the injected checker lists `push.contextual-body`" in write_plan
+    assert "push.attestation" not in text + write_plan

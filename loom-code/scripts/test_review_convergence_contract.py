@@ -325,8 +325,10 @@ def test_reviewers_dispatched_after_build_checks() -> None:
         assert element in confirm, confirm
     assert not has_negation(confirm), confirm
     for step in (
-        "the complete package suite passing or `selection show` lists `package-tests` as skipped",
-        "every adversarial program passing or `selection show` lists `adversarial` as skipped",
+        "the complete package suite passing or `package-tests` is skipped (listed by "
+        "`selection show` or skipped by the user's plain-words instruction)",
+        "every adversarial program passing or `adversarial` is skipped (listed by "
+        "`selection show` or skipped by the user's plain-words instruction)",
         "each skip waiving only its own check",
     ):
         assert step in confirm, confirm

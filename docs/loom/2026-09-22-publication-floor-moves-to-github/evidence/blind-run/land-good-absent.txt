@@ -1,0 +1,7 @@
+All checks passed on PR #5
+Merged PR #5 as c01bf15
+loom: verification absent (missing: plan, attestation); merged anyway.
+Trunk main fast-forwarded to c01bf15
+Deleted local branch feat/ship-probe
+Deleted remote branch feat/ship-probe
+exit=0

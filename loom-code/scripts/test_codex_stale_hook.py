@@ -1,8 +1,8 @@
 """Codex publication hook lifecycle regression tests.
 
 The retained hook command must remain useful after its versioned plugin root
-has disappeared: a small set of read-only commands stays available, while
-everything else fails closed until Codex is restarted.
+has disappeared: commands stay available and each one says the hook failed,
+while a malformed payload or the selection record store is still denied.
 """
 from __future__ import annotations
 
@@ -68,33 +68,10 @@ def test_codex_hook_missing_root_allows_closed_read_only_set(
     assert result.returncode == 0, result.stderr
 
 
-@pytest.mark.parametrize(
-    "command",
-    [
-        "git push origin HEAD",
-        "gh pr create --fill",
-        "pytest -q",
-        "python3 -c 'print(1)'",
-        "git fetch origin",
-        "git status && git push origin HEAD",
-        "find . -exec git push origin HEAD ;",
-        "find . -delete",
-        "find . -fls /tmp/loom-stale-hook-output",
-        "rg --pre 'git push origin HEAD' needle .",
-        "rg --pre=bash needle .",
-        "rg --pre-glob=* --pre=sh needle .",
-        "git log --output=/tmp/log",
-        "git branch --list --delete main",
-        "./git status",
-        "/tmp/cat file",
-    ],
-)
-def test_codex_hook_missing_root_denies_publication_unknown_and_unsafe_reads(
-    tmp_path: Path, command: str
-) -> None:
+def test_codex_hook_missing_root_names_missing_checker_and_restart(tmp_path: Path) -> None:
     missing = tmp_path / "removed-version"
-    result = _run(command, missing)
-    assert result.returncode == 2
+    result = _run("pytest -q", missing)
+    assert result.returncode == 0, result.stderr
     assert str(missing / "scripts/loom_checker.py") in result.stderr
     assert "restart Codex" in result.stderr
 
@@ -108,28 +85,6 @@ def test_codex_hook_missing_root_denies_malformed_or_empty_input(tmp_path: Path)
             capture_output=True, env=env,
         )
         assert result.returncode == 2
-
-
-@pytest.mark.parametrize(
-    "command",
-    [
-        "git push origin HEAD",
-        "gh pr create --fill",
-        "gh pr merge 123 --squash",
-        "zsh -c 'git push origin HEAD'",
-        "eval 'gh pr create --fill'",
-        'echo "$(git push origin HEAD)"',
-        'echo "$(gh pr create --fill)"',
-        'echo "`git push origin HEAD`"',
-        'echo "`gh pr create --fill`"',
-        "rg -n 'needle|gh pr create",
-    ],
-)
-def test_codex_hook_missing_root_denies_every_checker_publication_corpus_case(
-    tmp_path: Path, command: str
-) -> None:
-    result = _run(command, tmp_path / "removed-version")
-    assert result.returncode == 2
 
 
 def test_codex_hook_present_root_delegates_every_bash_payload(tmp_path: Path) -> None:
@@ -164,5 +119,5 @@ def test_codex_hook_missing_root_ignores_sibling_checker(
         _command(), shell=True, input=_payload("./git status"), text=True,
         capture_output=True, env=env,
     )
-    assert result.returncode == 2
+    assert result.returncode == 0, result.stderr
     assert not marker.exists()

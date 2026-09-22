@@ -1,0 +1,535 @@
+bringing up nodes...
+bringing up nodes...
+
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [ 10%]
+........................................................................ [ 13%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+........................................................................ [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 47%]
+........................................................................ [ 50%]
+..........................................................s............. [ 54%]
+..............................................s......................... [ 57%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 91%]
+........................................................................ [ 94%]
+........................................................................ [ 98%]
+......................................                                   [100%]
+2124 passed, 2 skipped in 66.56s (0:01:06)
+........................................................................ [ 29%]
+........................................................................ [ 58%]
+........................................................................ [ 87%]
+.............................s                                           [100%]
+245 passed, 1 skipped in 8.39s
+....................................................                     [100%]
+52 passed in 2.72s
+........................................................................ [ 36%]
+........................................................................ [ 73%]
+...................................................                      [100%]
+195 passed in 2.05s
+........................................................................ [ 27%]
+........................................................................ [ 55%]
+........................................................................ [ 82%]
+.............................................                            [100%]
+261 passed in 8.88s
+........................................................................ [ 59%]
+.................................................                        [100%]
+121 passed in 0.28s
+................................................................         [100%]
+64 passed in 11.87s
+...........................................                              [100%]
+43 passed in 0.10s
+.............                                                            [100%]
+13 passed in 0.03s
+.                                                                        [100%]
+1 passed in 0.01s
+...........................................sss.......................... [ 86%]
+...........                                                              [100%]
+80 passed, 3 skipped in 1.82s
+..................................sssss................................. [ 34%]
+........................................................................ [ 68%]
+.................................................................        [100%]
+204 passed, 5 skipped in 0.47s
+............                                                             [100%]
+12 passed in 0.03s
+PASS — test_skillfolder_dotdot_into_sibling_nested_denies
+PASS — test_skillfolder_double_slash_nested_denies
+PASS — test_skillfolder_trailing_slash_after_skills_nested_denies
+PASS — test_skillfolder_dot_segment_nested_denies
+PASS — test_skillfolder_traversal_target_creates_nothing_outside_scratch
+PASS — test_skillfolder_relative_target_with_workspace_nested_denies
+PASS — test_skillfolder_multi_replace_nested_denies
+PASS — test_skillfolder_space_and_nonascii_skill_name_nested_denies
+PASS — test_skillfolder_hostile_stdin_exits_zero_with_json
+
+================================================================
+Summary: 9 PASS / 0 FAIL
+================================================================
+PASS — hooks.json registers the adapter on agy file-write tools (PreToolUse)
+PASS — nested-skill-subfolder-write-denied (deny, reason names assets/sub)
+PASS — adapter does not create the nested directory it checks
+PASS — nested write denied via args.AbsolutePath
+PASS — nested write denied via args.FilePath
+PASS — nested write denied via args.file_path
+PASS — nested write denied via args.path
+PASS — flat-skill-file-write-allowed
+PASS — new single-level subfolder write allowed
+PASS — non-skill path allowed
+PASS — unrecognised stdin allowed: 'not json at all'
+PASS — unrecognised stdin allowed: ''
+PASS — unrecognised stdin allowed: '{"toolCall":{"name":"write_to_'
+
+================================================================
+Summary: 13 PASS / 0 FAIL
+================================================================
+PASS — pinned carrier-hierarchy sentence present near top of SKILL.md
+PASS — 'durable substrate' absent from SKILL.md
+PASS — 'durable substrate' absent from the whole loom-workflow plugin (excl. this test)
+PASS — squash-caveat/verification neighborhood no longer frames grep/trailers as durable
+PASS — invocation-policy neighborhood no longer claims 'durable carriers'
+
+================================================================
+Summary: 5 PASS / 0 FAIL
+================================================================
+PASS — SKILL.md secrets bullet neighborhood references the operational privacy gate
+PASS — SKILL.md secrets bullet neighborhood points at the compose-protocol privacy gate carrier
+
+================================================================
+Summary: 2 PASS / 0 FAIL
+================================================================
+PASS — compose-pr.md Step 4 neighborhood pins the non-Loom raw-trailer-footer mandate
+PASS — compose-pr.md Step 4 neighborhood includes a worked before/after example
+PASS — SKILL.md keeps Loom PR context Ship-owned and non-Loom carriers generic
+PASS — 'is the supported path' absent from the whole of SKILL.md
+PASS — SKILL.md caveat + table neighborhood reframes the O2 mandate escape as best-effort (PR #576 live finding)
+
+================================================================
+Summary: 5 PASS / 0 FAIL
+================================================================
+PASS — pinned carrier-hierarchy sentence present near jurisdiction table
+PASS — pinned contradiction-check sentence present near When-to-record section
+
+================================================================
+Summary: 2 PASS / 0 FAIL
+================================================================
+PASS — fixture covers: trailer value with |, :, #, CJK + folded continuation (#7)
+PASS — fixture covers: Supersedes: by PR number (#8 -> #9)
+PASS — fixture covers: Supersedes: by SHA (#10 -> #11)
+PASS — fixture covers: a Related:-only commit (#6)
+PASS — fixture covers: a memory commit outside --since (#1, dated 2025-06-01)
+PASS — fixture covers: a lowercase decision: key, not picked up (#5)
+PASS — fixture covers: a merge commit carrying a trailer, excluded by --no-merges (#4)
+PASS — fixture covers: a commit subject ending (#N) (every commit in the fixture)
+PASS — fixture covers: trailer block followed by a non-trailer line, parses to nothing (#13)
+PASS — no-pr: stdout + exit code match golden
+PASS — format-json: stdout + exit code match golden
+PASS — history: stdout + exit code match golden
+PASS — match: stdout + exit code match golden
+PASS — path: stdout + exit code match golden
+PASS — top: stdout + exit code match golden
+
+================================================================
+Summary: 15 PASS / 0 FAIL
+================================================================
+PASS — match: shows live C3 (subject/trailer parser)
+PASS — match: matches trailer VALUE not just subject
+PASS — match: excludes non-matching C2
+PASS — match: hides superseded C1 by default
+PASS — match+history: shows superseded C1
+PASS — match: C2 hidden though its superseder doesn't match query
+PASS — match+history: superseded C2 reappears
+PASS — top=1 caps to one record
+PASS — top logs suppressed count (no silent truncation)
+PASS — path: shows live commit touching parser.txt (C3)
+PASS — path: excludes C2 (touches cache.txt)
+PASS — path: excludes C4 (touches README, not path)
+PASS — path: C2 hidden though out-of-path superseder retired it
+PASS — path+history: superseded C2 reappears, tagged
+PASS — path+history: tag present
+PASS — empty match exits 0
+PASS — empty match prints clear message
+PASS — empty match shows no records
+PASS — malformed regex exits 1 (not undocumented jq abort)
+PASS — malformed regex prints one clean message
+PASS — --top > result count reports nothing suppressed
+
+================================================================
+Summary: 21 PASS / 0 FAIL
+================================================================
+PASS — the 2,000-commit fixture yields exactly 300 commit records (--format=json --history)
+PASS — the 2,000-commit fixture marks exactly 20 records superseded
+PASS — the 2,000-commit fixture's default (live-only) run yields exactly 280 commit records (300 - 20 superseded)
+PASS — git-call count for --no-pr is <=4 on both a 20-commit repo (4) and a 2,000-commit repo (4)
+PASS — git-call count for --no-pr --path is <=6 on both a 20-commit repo (5) and a 2,000-commit repo (5)
+PASS — git-call count for --no-pr is the same constant regardless of repo size (4)
+PASS — jq-call count for plain format is <=6 on both a 20-commit repo (4) and a 2,000-commit repo (4)
+PASS — jq-call count for json format is <=6 on both a 20-commit repo (5) and a 2,000-commit repo (5)
+PASS — jq-call count for plain format is the same constant regardless of repo size (4)
+PASS — jq-call count for json format is the same constant regardless of repo size (5)
+PASS — --no-pr on the 2,000-commit repo exits 0
+PASS — --no-pr on the 2,000-commit repo finishes within the intent's 2.0s local bound (0.161s, monotonic sub-second clock)
+
+================================================================
+Summary: 12 PASS / 0 FAIL
+================================================================
+PASS — default hides A (superseded by PR #10)
+PASS — default shows B (live)
+PASS — default hides C (superseded by SHA)
+PASS — default shows D (live)
+PASS — --history shows superseded A
+PASS — --history tags superseded records
+PASS — json default returns 2 live commits
+PASS — json default excludes superseded A
+PASS — json --history flags 2 superseded (A, C)
+PASS — supersedes-only commit (no D/L/G) still retires its target
+PASS — reverse-prefix SHA (7-char abbrev < 12-char %h) matches
+PASS — malformed Supersedes leaves target live (safe direction)
+
+================================================================
+Summary: 12 PASS / 0 FAIL
+================================================================
+PASS — --verify-merged on heading-absent commit A exits 0
+PASS — --verify-merged on heading+key commit B exits 0
+## Memory heading present but no memory key found in c66cf324b5bbcd7ac5b17217ebe4a7d4dab9703c
+PASS — --verify-merged on heading-only commit C exits 4
+Unresolvable ref: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+PASS — --verify-merged on unresolvable ref exits 2
+--verify-merged requires a <ref>
+memory-grep.sh — retrieve git-memory entries from a repo
+
+Usage:
+  memory-grep.sh [--since=<period>] [--limit=<n>] [--repo=<path>]
+                 [--format=plain|json] [--no-pr] [--no-commit]
+  memory-grep.sh --verify <ref> [--repo=<path>]
+  memory-grep.sh --verify-merged <ref> [--repo=<path>]
+  memory-grep.sh --verify-strict <ref> [--repo=<path>]
+
+Options:
+  --since=<period>   date filter for COMMITS (default: "3 months ago")
+  --limit=<n>        cap on number of merged PRs fetched (default: 50)
+  --repo=<path>      working tree path (default: current dir)
+  --format=<f>       output format: plain | json (default: plain)
+  --no-pr            skip PR body extraction
+  --no-commit        skip commit trailer extraction
+  --match=<regex>    topic filter: keep only records whose text matches
+                     (case-insensitive regex). Searches commit subject +
+                     trailer values, and PR title + Memory section.
+  --path=<pathspec>  keep only COMMITS touching <pathspec>. Commit-only —
+                     PR sections cannot be path-scoped. Does NOT affect
+                     liveness (the supersession scan stays full-history).
+  --top=<n>          cap displayed commits to the newest <n>; the number
+                     suppressed is reported (never silently truncated).
+  --history          include superseded records (default: live only). A
+                     record is superseded when a LATER commit carries a
+                     `Supersedes:` trailer naming it (by PR #N or SHA).
+                     Liveness is computed by forward-scan, never stored.
+  --verify <ref>     check whether <ref>'s message body carries a memory
+                     trailer (^Decision:/^Learning:/^Gotcha:). Exits 0 if
+                     present, 4 if absent, 2 if <ref> does not resolve.
+                     Text match on the full body — survives squash mid-body
+                     under the COMMIT_MESSAGES setting; does not footer-parse.
+  --verify-merged <ref>
+                     post-merge predicate for a squash-shaped commit.
+                     First checks for a suspicious empty body: a
+                     title-only body (exactly one non-empty line) whose
+                     title matches the squash-of-PR signature `(#N)`
+                     exits 4 immediately (the #578 case — the merge
+                     dialog dropped the entire PR body, so nothing below
+                     can be checked). Otherwise, if the body has NO
+                     `## Memory` heading, exits 0 (not memory-worthy —
+                     nothing to check). If the heading IS present,
+                     requires a Decision:/Learning:/Gotcha: key anywhere
+                     in the body — exits 0 if found, 4 if not (the #574
+                     silent-drop case: heading survived, trailer carrier
+                     didn't). Exits 2 if <ref> does not resolve.
+  --verify-strict <ref>
+                     diagnostic, parser-strict variant of --verify: the
+                     memory key must survive `git interpret-trailers
+                     --parse --unfold` (a true trailing footer), not just
+                     a text match anywhere in the body. Exits 0 on a
+                     parse-level hit, 4 otherwise (the #575 case: a
+                     trailer block followed by any non-trailer line
+                     empties the parse even though --verify still passes
+                     on a text match). Exits 2 if <ref> does not resolve.
+
+Note: --since filters commits by date; --limit caps PR count.
+      PRs are not date-filtered (newest N are always taken).
+
+Examples:
+  memory-grep.sh --since='6 months ago' --limit=100
+  memory-grep.sh --no-pr              # commit trailers only
+  memory-grep.sh --match='parser|latency'      # topic recall
+  memory-grep.sh --path=src/parser --top=5     # decisions touching a path
+  memory-grep.sh --history           # include superseded decisions
+  memory-grep.sh --format=json | jq '.commits[]'
+  memory-grep.sh --verify HEAD        # did this commit capture memory?
+  memory-grep.sh --verify-merged HEAD # did a squash-merge drop its memory?
+  memory-grep.sh --verify-strict HEAD # does the memory key survive a strict parse?
+PASS — --verify-merged with no ref exits 1 (usage error)
+suspicious: squash-shaped commit (#N) with title-only body — the PR body did not reach the squash message
+PASS — --verify-merged on title-only squash-shaped commit D exits 4 (#578 case)
+PASS — --verify-merged on title-only non-squash commit E exits 0
+PASS — --verify-merged on multi-line heading-absent commit F exits 0
+suspicious: squash-shaped commit (#N) with title-only body — the PR body did not reach the squash message
+PASS — --verify-merged on title+(#N)+whitespace-only-line commit G exits 4
+PASS — --verify-merged on non-exact '## Memory management' heading commit H exits 0
+PASS — --verify-merged still detects exact '## Memory' heading + key on commit B
+
+================================================================
+Summary: 11 PASS / 0 FAIL
+================================================================
+PASS — plain --verify on commit A (mid-body Decision + trailing prose) exits 0
+No memory trailer survives strict parse in 0d9fec13e332fbe7fdf5b0d144fd96ec116e583c
+PASS — --verify-strict on commit A (trailing prose after trailer) exits 4
+PASS — --verify-strict on commit B (proper trailer footer) exits 0
+No memory trailer survives strict parse in 807e85f2ee76f7db5b4f251f7d1534ea032c2e54
+PASS — --verify-strict on no-key commit C exits 4
+Unresolvable ref: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+PASS — --verify-strict on unresolvable ref exits 2
+--verify-strict requires a <ref>
+memory-grep.sh — retrieve git-memory entries from a repo
+
+Usage:
+  memory-grep.sh [--since=<period>] [--limit=<n>] [--repo=<path>]
+                 [--format=plain|json] [--no-pr] [--no-commit]
+  memory-grep.sh --verify <ref> [--repo=<path>]
+  memory-grep.sh --verify-merged <ref> [--repo=<path>]
+  memory-grep.sh --verify-strict <ref> [--repo=<path>]
+
+Options:
+  --since=<period>   date filter for COMMITS (default: "3 months ago")
+  --limit=<n>        cap on number of merged PRs fetched (default: 50)
+  --repo=<path>      working tree path (default: current dir)
+  --format=<f>       output format: plain | json (default: plain)
+  --no-pr            skip PR body extraction
+  --no-commit        skip commit trailer extraction
+  --match=<regex>    topic filter: keep only records whose text matches
+                     (case-insensitive regex). Searches commit subject +
+                     trailer values, and PR title + Memory section.
+  --path=<pathspec>  keep only COMMITS touching <pathspec>. Commit-only —
+                     PR sections cannot be path-scoped. Does NOT affect
+                     liveness (the supersession scan stays full-history).
+  --top=<n>          cap displayed commits to the newest <n>; the number
+                     suppressed is reported (never silently truncated).
+  --history          include superseded records (default: live only). A
+                     record is superseded when a LATER commit carries a
+                     `Supersedes:` trailer naming it (by PR #N or SHA).
+                     Liveness is computed by forward-scan, never stored.
+  --verify <ref>     check whether <ref>'s message body carries a memory
+                     trailer (^Decision:/^Learning:/^Gotcha:). Exits 0 if
+                     present, 4 if absent, 2 if <ref> does not resolve.
+                     Text match on the full body — survives squash mid-body
+                     under the COMMIT_MESSAGES setting; does not footer-parse.
+  --verify-merged <ref>
+                     post-merge predicate for a squash-shaped commit.
+                     First checks for a suspicious empty body: a
+                     title-only body (exactly one non-empty line) whose
+                     title matches the squash-of-PR signature `(#N)`
+                     exits 4 immediately (the #578 case — the merge
+                     dialog dropped the entire PR body, so nothing below
+                     can be checked). Otherwise, if the body has NO
+                     `## Memory` heading, exits 0 (not memory-worthy —
+                     nothing to check). If the heading IS present,
+                     requires a Decision:/Learning:/Gotcha: key anywhere
+                     in the body — exits 0 if found, 4 if not (the #574
+                     silent-drop case: heading survived, trailer carrier
+                     didn't). Exits 2 if <ref> does not resolve.
+  --verify-strict <ref>
+                     diagnostic, parser-strict variant of --verify: the
+                     memory key must survive `git interpret-trailers
+                     --parse --unfold` (a true trailing footer), not just
+                     a text match anywhere in the body. Exits 0 on a
+                     parse-level hit, 4 otherwise (the #575 case: a
+                     trailer block followed by any non-trailer line
+                     empties the parse even though --verify still passes
+                     on a text match). Exits 2 if <ref> does not resolve.
+
+Note: --since filters commits by date; --limit caps PR count.
+      PRs are not date-filtered (newest N are always taken).
+
+Examples:
+  memory-grep.sh --since='6 months ago' --limit=100
+  memory-grep.sh --no-pr              # commit trailers only
+  memory-grep.sh --match='parser|latency'      # topic recall
+  memory-grep.sh --path=src/parser --top=5     # decisions touching a path
+  memory-grep.sh --history           # include superseded decisions
+  memory-grep.sh --format=json | jq '.commits[]'
+  memory-grep.sh --verify HEAD        # did this commit capture memory?
+  memory-grep.sh --verify-merged HEAD # did a squash-merge drop its memory?
+  memory-grep.sh --verify-strict HEAD # does the memory key survive a strict parse?
+PASS — --verify-strict with no ref exits 1 (usage error)
+
+================================================================
+Summary: 6 PASS / 0 FAIL
+================================================================
+PASS — --verify on memory-worthy commit A exits 0
+No memory trailer found in 8bc2cee74ac5d8f06ce4cd911ba28c898781a19e
+PASS — --verify on bare-subject commit B exits 4
+--verify requires a <ref>
+memory-grep.sh — retrieve git-memory entries from a repo
+
+Usage:
+  memory-grep.sh [--since=<period>] [--limit=<n>] [--repo=<path>]
+                 [--format=plain|json] [--no-pr] [--no-commit]
+  memory-grep.sh --verify <ref> [--repo=<path>]
+  memory-grep.sh --verify-merged <ref> [--repo=<path>]
+  memory-grep.sh --verify-strict <ref> [--repo=<path>]
+
+Options:
+  --since=<period>   date filter for COMMITS (default: "3 months ago")
+  --limit=<n>        cap on number of merged PRs fetched (default: 50)
+  --repo=<path>      working tree path (default: current dir)
+  --format=<f>       output format: plain | json (default: plain)
+  --no-pr            skip PR body extraction
+  --no-commit        skip commit trailer extraction
+  --match=<regex>    topic filter: keep only records whose text matches
+                     (case-insensitive regex). Searches commit subject +
+                     trailer values, and PR title + Memory section.
+  --path=<pathspec>  keep only COMMITS touching <pathspec>. Commit-only —
+                     PR sections cannot be path-scoped. Does NOT affect
+                     liveness (the supersession scan stays full-history).
+  --top=<n>          cap displayed commits to the newest <n>; the number
+                     suppressed is reported (never silently truncated).
+  --history          include superseded records (default: live only). A
+                     record is superseded when a LATER commit carries a
+                     `Supersedes:` trailer naming it (by PR #N or SHA).
+                     Liveness is computed by forward-scan, never stored.
+  --verify <ref>     check whether <ref>'s message body carries a memory
+                     trailer (^Decision:/^Learning:/^Gotcha:). Exits 0 if
+                     present, 4 if absent, 2 if <ref> does not resolve.
+                     Text match on the full body — survives squash mid-body
+                     under the COMMIT_MESSAGES setting; does not footer-parse.
+  --verify-merged <ref>
+                     post-merge predicate for a squash-shaped commit.
+                     First checks for a suspicious empty body: a
+                     title-only body (exactly one non-empty line) whose
+                     title matches the squash-of-PR signature `(#N)`
+                     exits 4 immediately (the #578 case — the merge
+                     dialog dropped the entire PR body, so nothing below
+                     can be checked). Otherwise, if the body has NO
+                     `## Memory` heading, exits 0 (not memory-worthy —
+                     nothing to check). If the heading IS present,
+                     requires a Decision:/Learning:/Gotcha: key anywhere
+                     in the body — exits 0 if found, 4 if not (the #574
+                     silent-drop case: heading survived, trailer carrier
+                     didn't). Exits 2 if <ref> does not resolve.
+  --verify-strict <ref>
+                     diagnostic, parser-strict variant of --verify: the
+                     memory key must survive `git interpret-trailers
+                     --parse --unfold` (a true trailing footer), not just
+                     a text match anywhere in the body. Exits 0 on a
+                     parse-level hit, 4 otherwise (the #575 case: a
+                     trailer block followed by any non-trailer line
+                     empties the parse even though --verify still passes
+                     on a text match). Exits 2 if <ref> does not resolve.
+
+Note: --since filters commits by date; --limit caps PR count.
+      PRs are not date-filtered (newest N are always taken).
+
+Examples:
+  memory-grep.sh --since='6 months ago' --limit=100
+  memory-grep.sh --no-pr              # commit trailers only
+  memory-grep.sh --match='parser|latency'      # topic recall
+  memory-grep.sh --path=src/parser --top=5     # decisions touching a path
+  memory-grep.sh --history           # include superseded decisions
+  memory-grep.sh --format=json | jq '.commits[]'
+  memory-grep.sh --verify HEAD        # did this commit capture memory?
+  memory-grep.sh --verify-merged HEAD # did a squash-merge drop its memory?
+  memory-grep.sh --verify-strict HEAD # does the memory key survive a strict parse?
+PASS — --verify with no ref exits 1 (usage error)
+Unresolvable ref: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+PASS — --verify on unresolvable ref exits 2
+No memory trailer found in 317d8dd9cb3ab6292aa3383630b58567a8b12b5b
+PASS — --verify on Related-only commit C exits 4
+
+================================================================
+Summary: 5 PASS / 0 FAIL
+================================================================
+PASS — compose-commit.md exists
+PASS — Privacy gate neighborhood present and runs layer-1 privacy-scan.py
+PASS — Privacy gate neighborhood conditionally dispatches the layer-2 judge via privacy-judge-spec.md
+PASS — Privacy gate neighborhood states an explicit fail-closed -> BLOCK branch
+PASS — Quality advisory neighborhood present (quality_note, non-blocking, points at privacy-judge-spec.md)
+
+================================================================
+Summary: 5 PASS / 0 FAIL
+================================================================
+PASS — Privacy gate neighborhood present (layer-1 script + layer-2 SSOT pointer)
+PASS — Privacy gate neighborhood specifies the BLOCKED + escalate-to-human verdict
+PASS — Privacy gate neighborhood pins the explicit fail-closed branch (script error / dispatch failure / non-conforming -> BLOCK)
+PASS — Privacy gate neighborhood correctly omits the commit-only quality_note block
+PASS — Privacy gate heading (line 261) precedes the 'gh pr create' hand-off (line 291)
+
+================================================================
+Summary: 5 PASS / 0 FAIL
+================================================================
+PASS — privacy-judge-spec.md exists
+PASS — Dispatch instruction neighborhood present (fresh-context + content-not-commands guard)
+PASS — Categories neighborhood lists all four categories + secrets carve-out
+PASS — Output schema neighborhood specifies PASS|BLOCK + findings (category/quoted span/why)
+PASS — quality_note neighborhood present (optional, commit-only, non-blocking, never escalates)
+PASS — Fail-closed neighborhood present (explicit dispatch-failure + non-conforming → BLOCK)
+
+================================================================
+Summary: 6 PASS / 0 FAIL
+================================================================
+PASS — privacy-scan.py exists
+denylist: not configured
+PASS — clean text → exit 0, empty JSON list
+denylist: not configured
+PASS — planted AWS key → exit 3, finding names aws_access_key
+denylist: not configured
+PASS — planted PEM private-key header → exit 3, finding names pem_private_key
+denylist: not configured
+PASS — planted Slack bot token → exit 3, finding names slack_token
+denylist: not configured
+PASS — planted generic secret assignment → exit 3, finding names generic_secret_assignment
+PASS — redaction: full AWS key literal absent from stdout
+denylist: not configured
+PASS — stdin path (no --text-file) → exit 0, empty JSON list
+PASS — planted deny-list term (via --denylist) → exit 3, finding names denylist
+PASS — deny-list term matches differently-cased text (case-insensitive) → exit 3
+PASS — short deny-list term ('Visa') never revealed in full in stdout
+
+================================================================
+Summary: 11 PASS / 0 FAIL
+================================================================
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+
+added 150 packages, and audited 151 packages in 1s
+
+11 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+OK templates/01-option-comparison.md:53
+OK templates/02-linear-steps.md:57
+OK templates/03-branching-decision.md:50
+OK templates/04-reasoning-chain.md:56
+OK templates/05-state-lifecycle.md:43
+OK templates/06-actor-sequence.md:53
+OK templates/07-hierarchy.md:46
+OK templates/08-system-architecture.md:59
+OK templates/09-data-model.md:31
+OK templates/10-timeline.md:41
+OK templates/11-quantity.md:45
+11/11 mermaid blocks parsed
+PASS — validator exits 1 on the A -> B block
+PASS — FAIL line names /var/folders/m5/4cb4p8h938qc4qcpdykwz2480000gn/T/tmp.Vji2omxJUk/bad.md:3
+EXIT=0

@@ -15,10 +15,15 @@ generate publication evidence.
 Read the confirmed intent, spec when present, plan, current branch, and branch
 base. Preserve unrelated and untracked work. Work only on planned paths.
 
-At entry, run `loom_checker.py selection show <change-id>` and omit only the
-steps it lists as skipped (spec, plan, implementer, tdd, adversarial,
-package-tests, blind-run); skip suggestions and user requests follow
-[expert-mode](../expert-mode/SKILL.md).
+At entry, run `loom_checker.py selection show <change-id>` and omit the steps
+`selection show` lists as skipped (spec, plan, implementer, tdd, adversarial,
+package-tests, blind-run), plus any step the user told you to skip in plain
+words; [expert-mode](../expert-mode/SKILL.md) stays an optional route the user
+may invoke. The default is the full flow: skip a step only when the user tells
+you to in plain words, then tell the user in one line which step is skipped and
+continue. When you honour such a skip, append one line
+`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
+and commit it. Never ask the user for a generated code to skip a step.
 
 Finding no task left to implement is not a reason to end Build. It means §2 has
 nothing to implement, not that the run is over: continue to §3, which states
@@ -35,20 +40,22 @@ two levels above this SKILL.md.
 On Antigravity CLI, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
 
-Unless `selection show` lists `tdd` as skipped, for every behavior change:
+Unless `tdd` is skipped (listed by `selection show` or skipped by the user's
+plain-words instruction), for every behavior change:
 
 1. Write the smallest failing test and run it to observe RED.
 2. Implement the minimum change and run it to GREEN.
 3. Refactor only while the focused suite stays green.
 
-Unless `selection show` lists `implementer` as skipped, implementer dispatch is
-mandatory for every implementation task; when it is skipped, the main agent
-implements the task itself. Scheduling
+Unless `implementer` is skipped (listed by `selection show` or skipped by the
+user's plain-words instruction), implementer dispatch is mandatory for every
+implementation task; when it is skipped, the main agent implements the task
+itself. Scheduling
 multiple implementers concurrently is optional and used only for genuinely
 independent file sets; no dispatch ledger is created. If implementer dispatch
-is unavailable, stop and report the blocker. Unless `selection show` lists
-`implementer` as skipped, the main agent must not substitute itself as
-implementer. An implementation agent never acts as its own closing
+is unavailable, stop and report the blocker. Unless `implementer` is skipped
+(listed by `selection show` or skipped by the user's plain-words instruction),
+the main agent must not substitute itself as implementer. An implementation agent never acts as its own closing
 reviewer.
 
 Internal plans, commits, and verification evidence are written in English.
@@ -76,21 +83,27 @@ mechanical checks, in this order:
 3. Run the repository's complete package suite, then each committed
    adversarial program. The suite command is the `package-tests:` value in
    `docs/loom/KICKOFF-DEFAULTS.md`, or, when absent, the command detected from
-   build markers; when it is `none`, `selection show` must list `package-tests`
-   as skipped.
+   build markers; when it is `none`, the complete package suite is skipped:
+   either `package-tests` is listed by `selection show`, or the change reaches
+   Ship unattested and the PR discloses `absent`.
 
 When a check fails, the fix is made inside Build as §2 assigns implementation
 work; the adversary never fixes what it breaks. Every fatal or important
 finding the adversary returns is fixed inside Build like a failing check before
 hand-off, and any finding left unresolved is listed in the §4 hand-off. Build does not hand off to
-`closing-review` until the complete package suite has passed or `selection show` lists
-`package-tests` as skipped, and until every adversarial program has passed or
-it lists `adversarial` as skipped, each skip waiving only its own check.
+`closing-review` until the complete package suite has passed or `package-tests`
+is skipped (listed by `selection show` or skipped by the user's plain-words
+instruction), and until every adversarial program has passed or `adversarial`
+is skipped (listed by `selection show` or skipped by the user's plain-words
+instruction), each skip waiving only its own check.
 `finalize-review` still executes both once more on committed content.
+When the user skipped the suite or the adversary in plain words, closing-review
+hands the change to Ship unattested (closing-review §5).
 
-When `selection show` lists `adversarial` as skipped, dispatch no adversary and
-run no adversarial program. When it lists `package-tests` as skipped, run no
-complete package suite.
+When `adversarial` is skipped (listed by `selection show` or skipped by the
+user's plain-words instruction), dispatch no adversary and run no adversarial
+program. When `package-tests` is skipped (listed by `selection show` or skipped
+by the user's plain-words instruction), run no complete package suite.
 
 Repeat these end-of-Build checks after every fix: run the complete package
 suite and re-run the existing adversarial programs. After a fix where every
