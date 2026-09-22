@@ -12,8 +12,8 @@ adapter maps agy events onto the handlers Claude Code and Codex already use:
 
 Exit status is always 0; decisions travel in the JSON. The push gate never
 refuses publication: when the checker is missing or cannot answer it allows
-and says so, denying only a command that names the selection record store
-(the same rule as the Codex stale-root fallback).
+and says so, denying only a command that names the selection record store or
+runs from inside it (the same rule as the Codex stale-root fallback).
 """
 from __future__ import annotations
 
@@ -39,6 +39,9 @@ LOOM_SKILL_PATH_RE = re.compile(
 USER_REQUEST_RE = re.compile(r"<USER_REQUEST>(.*?)</USER_REQUEST>", re.DOTALL)
 # selection.guard's ALWAYS_DENIED patterns, kept here for when the checker is gone.
 SELECTION_STORE = [re.compile(r"loom/selections/"), re.compile(r"\.git/loom")]
+# ...plus its BARE_SELECTIONS and GIT_DIR_NAMES patterns, applied to the command text.
+STORE_COMMAND_TEXT = SELECTION_STORE + [
+    re.compile(r"(?<![\w.-])selections/"), re.compile(r"git-common-dir|--git-dir|\bGIT_DIR\b")]
 
 
 def _emit(obj: dict) -> int:
@@ -85,7 +88,9 @@ def push_gate(payload: dict) -> int:
             error = f"checker exited {result.returncode}" + (f": {reason}" if reason else "")
         except (OSError, subprocess.SubprocessError) as exc:
             error = str(exc)
-    if any(p.search(command) for p in SELECTION_STORE):  # a failed checker never loosens selection.guard
+    cwd = os.path.normpath(claude_payload["cwd"]) + "/"
+    if (any(p.search(cwd) for p in SELECTION_STORE)  # a failed checker never loosens selection.guard
+            or any(p.search(command) for p in STORE_COMMAND_TEXT)):
         return _emit({"decision": "deny", "reason": (
             f"BLOCK selection.guard: names the selection record store and the checker failed ({error})")})
     return _emit({"decision": "allow", "reason": f"loom: publication hook failed ({error}); allowing."})

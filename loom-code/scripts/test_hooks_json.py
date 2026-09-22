@@ -146,6 +146,50 @@ def test_pre_tool_use_checker_missing_still_denies_store(hooks, tmp_path, tool_n
     assert "BLOCK selection.guard" in result.stderr
 
 
+# Store writes the running guard refuses although their text never spells the
+# store path: a git-directory lookup, a bare selections/ path, or a cwd inside
+# the store that a relative target or command runs from.
+CWD_STORE_WRITES = [
+    ("Bash", {"command": "cd $(git rev-parse --git-dir)/loom; printf x > selections/c.jsonl"}, ""),
+    ("Bash", {"command": "printf x > selections/c.jsonl"}, ".git/loom"),
+    ("Write", {"file_path": "selections/c.jsonl", "content": "{}"}, ".git/loom"),
+    ("apply_patch", {"command": "*** Begin Patch\n*** Add File: selections/c.jsonl\n+{}\n"
+                                "*** End Patch\n"}, ".git/loom"),
+]
+
+
+@pytest.mark.parametrize("tool_name,tool_input,cwd", CWD_STORE_WRITES)
+def test_pre_tool_use_checker_missing_denies_store_write_from_cwd(
+        hooks, tmp_path, tool_name, tool_input, cwd):
+    payload = {"tool_name": tool_name, "tool_input": tool_input,
+               "cwd": str(tmp_path / "repo" / cwd)}
+    result = _claude_pre_tool_use(hooks, payload, tmp_path / "removed-version")
+    assert result.returncode == 2, result.stderr
+    assert "BLOCK selection.guard" in result.stderr
+
+
+def _fallback_program(command: str) -> str:
+    """The `python3 -c '…'` body of a hook command, host name normalised."""
+    import re
+
+    (program,) = re.findall(r"python3 -c '([^']*)'", command)
+    return program.replace("restart Claude Code", "restart <host>").replace(
+        "restart Codex", "restart <host>")
+
+
+def test_checker_missing_fallback_programs_are_identical(hooks, codex_hooks):
+    """The Claude Code fallback and both Codex fallbacks run one program."""
+    programs = [_fallback_program(c) for c in _commands(hooks["PreToolUse"])]
+    programs += [_fallback_program(c) for c in _commands(codex_hooks["PreToolUse"])]
+    assert len(programs) == 3
+    assert len(set(programs)) == 1
+    from loom_checker.rule_checks import selection_guard as guard
+
+    for pattern in [p for p, _ in guard.ALWAYS_DENIED] + [guard.BARE_SELECTIONS,
+                                                           guard.GIT_DIR_NAMES]:
+        assert f're.compile(r"{pattern.pattern}")' in programs[0], pattern.pattern
+
+
 def test_post_tool_use_keeps_language_anchor(hooks):
     assert _matchers(hooks["PostToolUse"]) == {"Skill"}
     (command,) = _commands(hooks["PostToolUse"])

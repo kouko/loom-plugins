@@ -15,6 +15,7 @@ and ``{"injectSteps": [{"ephemeralMessage": ...}]}``; transcript JSONL steps
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import shutil
@@ -178,6 +179,46 @@ def test_missing_checker_denies_unspelled_store_write(checkerless_adapter, chang
     assert out["decision"] == "deny", out
     codex = _codex_fallback({"tool_name": "Bash", "tool_input": {"command": command}}, tmp_path)
     assert codex.returncode == 2 and "BLOCK selection.guard" in codex.stderr, codex.stderr
+
+
+# Store writes the running guard refuses although their text never spells the
+# store path: a git-directory lookup, a bare selections/ path, or a cwd inside
+# the store that a relative target or command runs from.
+CWD_STORE_WRITES = [
+    ("Bash", {"command": "cd $(git rev-parse --git-dir)/loom; printf x > selections/c.jsonl"}, "."),
+    ("Bash", {"command": "printf x > selections/c.jsonl"}, ".git/loom"),
+    ("Write", {"file_path": "selections/c.jsonl", "content": "{}"}, ".git/loom"),
+    ("apply_patch", {"command": "*** Begin Patch\n*** Add File: selections/c.jsonl\n+{}\n"
+                                "*** End Patch\n"}, ".git/loom"),
+]
+
+
+@pytest.mark.parametrize("tool_name,tool_input,cwd", CWD_STORE_WRITES)
+def test_missing_checker_denies_store_write_from_cwd(checkerless_adapter, change_repo, tmp_path,
+                                                     tool_name, tool_input, cwd):
+    payload = {"tool_name": tool_name, "tool_input": tool_input,
+               "cwd": os.path.normpath(change_repo / cwd)}
+    codex = _codex_fallback(payload, tmp_path, matcher=0 if tool_name == "Bash" else 1)
+    assert codex.returncode == 2 and "BLOCK selection.guard" in codex.stderr, codex.stderr
+    if tool_name == "Bash":  # agy's push gate sees run_command only
+        out = _run("push-gate", _tool_payload(tool_input["command"], cwd, [str(change_repo)]),
+                   tmp_path, adapter=checkerless_adapter)
+        assert out["decision"] == "deny", out
+        assert "BLOCK selection.guard" in out["reason"]
+
+
+def test_fallback_patterns_mirror_selection_guard():
+    """The agy fallback refuses on exactly the running guard's patterns."""
+    sys.path.insert(0, str(PLUGIN_ROOT / "scripts"))
+    from loom_checker.rule_checks import selection_guard as guard
+
+    spec = importlib.util.spec_from_file_location("agy_adapter", ADAPTER)
+    adapter = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(adapter)
+    assert [p.pattern for p in adapter.SELECTION_STORE] == [p.pattern for p, _ in guard.ALWAYS_DENIED]
+    assert [p.pattern for p in adapter.STORE_COMMAND_TEXT] == [
+        p.pattern for p in adapter.SELECTION_STORE] + [guard.BARE_SELECTIONS.pattern,
+                                                      guard.GIT_DIR_NAMES.pattern]
 
 
 @pytest.mark.parametrize("target", ["/r/.git/loom//selections/c.jsonl", "/r/.git/loom/./selections/c.jsonl"])
