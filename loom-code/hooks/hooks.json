@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py\" push --hook"
+            "command": "if [ -f \"${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py\" ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py\" push --hook; else exec python3 -c 'import json, os, re, sys\nchecker = sys.argv[1]\nfailed = f\"installed checker is unavailable at {checker}; restart Claude Code to load the installed plugin version\"\nstore = [re.compile(r\"loom/selections/\"), re.compile(r\"\\.git/loom\")]\ndef deny(why):\n print(f\"BLOCK selection.guard: {why} ({failed})\", file=sys.stderr)\n raise SystemExit(2)\ntry:\n payload = json.load(sys.stdin)\n fields = {k: v for k, v in (payload.get(\"tool_input\") or {}).items() if isinstance(v, str)}\nexcept (ValueError, TypeError, AttributeError):\n deny(\"hook payload is unreadable\")\nif payload.get(\"tool_name\") in {\"Write\", \"Edit\", \"MultiEdit\", \"NotebookEdit\", \"apply_patch\"}:\n targets = [v for k, v in fields.items() if k in {\"file_path\", \"notebook_path\"}]\n targets += [t for v in fields.values() for t in re.findall(r\"^\\*\\*\\* (?:Add File|Update File|Delete File|Move to): (.+?)\\s*$\", v, re.M)]\n if any(p.search(os.path.normpath(t) + \"/\") for t in targets for p in store): deny(\"targets the selection record store\")\n raise SystemExit(0)\nif any(p.search(fields.get(\"command\", \"\")) for p in store): deny(\"names the selection record store\")\nprint(f\"loom: publication hook failed ({failed}); allowing.\", file=sys.stderr)' \"${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py\"; fi"
           }
         ]
       }

@@ -37,6 +37,8 @@ LANGUAGE_ANCHOR = PLUGIN_ROOT / "hooks" / "language-anchor.py"
 LOOM_SKILL_PATH_RE = re.compile(
     r"/loom-(?:code|design|workflow)/(?:[^/]+/)?skills/[^/]+/SKILL\.md$")
 USER_REQUEST_RE = re.compile(r"<USER_REQUEST>(.*?)</USER_REQUEST>", re.DOTALL)
+# selection.guard's ALWAYS_DENIED patterns, kept here for when the checker is gone.
+SELECTION_STORE = [re.compile(r"loom/selections/"), re.compile(r"\.git/loom")]
 
 
 def _emit(obj: dict) -> int:
@@ -83,7 +85,7 @@ def push_gate(payload: dict) -> int:
             error = f"checker exited {result.returncode}" + (f": {reason}" if reason else "")
         except (OSError, subprocess.SubprocessError) as exc:
             error = str(exc)
-    if "loom/selections" in command:  # a failed checker never loosens selection.guard
+    if any(p.search(command) for p in SELECTION_STORE):  # a failed checker never loosens selection.guard
         return _emit({"decision": "deny", "reason": (
             f"BLOCK selection.guard: names the selection record store and the checker failed ({error})")})
     return _emit({"decision": "allow", "reason": f"loom: publication hook failed ({error}); allowing."})

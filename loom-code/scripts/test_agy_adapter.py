@@ -162,6 +162,31 @@ def test_missing_checker_allows_ordinary_file_write_on_codex(tmp_path):
     assert result.returncode == 0, result.stderr
 
 
+# Store writes whose text never spells the literal store path; the running
+# guard's ALWAYS_DENIED patterns (`loom/selections/`, `\.git/loom`) refuse them.
+UNSPELLED_STORE_WRITES = [
+    "cd .git/loom && printf x > selections/c.jsonl",
+    "printf x > .git/loom//selections/c.jsonl",
+    "printf x > .git/loom/./selections/c.jsonl",
+]
+
+
+@pytest.mark.parametrize("command", UNSPELLED_STORE_WRITES)
+def test_missing_checker_denies_unspelled_store_write(checkerless_adapter, change_repo, tmp_path, command):
+    out = _run("push-gate", _tool_payload(command, ".", [str(change_repo)]), tmp_path,
+               adapter=checkerless_adapter)
+    assert out["decision"] == "deny", out
+    codex = _codex_fallback({"tool_name": "Bash", "tool_input": {"command": command}}, tmp_path)
+    assert codex.returncode == 2 and "BLOCK selection.guard" in codex.stderr, codex.stderr
+
+
+@pytest.mark.parametrize("target", ["/r/.git/loom//selections/c.jsonl", "/r/.git/loom/./selections/c.jsonl"])
+def test_missing_checker_denies_unnormalised_store_file_target_on_codex(tmp_path, target):
+    result = _codex_fallback({"tool_name": "Write", "tool_input": {"file_path": target, "content": "{}"}},
+                             tmp_path, matcher=1)
+    assert result.returncode == 2 and "BLOCK selection.guard" in result.stderr, result.stderr
+
+
 @pytest.mark.parametrize("command", ["git status --short", "git log -3 --oneline", "ls -la"])
 def test_missing_checker_allows_closed_read_only_set(checkerless_adapter, change_repo, tmp_path, command):
     out = _run("push-gate", _tool_payload(command, ".", [str(change_repo)]), tmp_path,

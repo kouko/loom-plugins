@@ -122,3 +122,45 @@ def test_reminder_reaches_both_carriers_through_the_cli(tmp_path):
     assert result.returncode == 0, result.stderr
     assert result.stderr == ABSENT + "\n"
     assert json.loads(result.stdout) == {"systemMessage": ABSENT}
+
+
+def _checker_cli():
+    """`loom_checker.py` itself (the package of the same name shadows it on import)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("loom_checker_cli", CHECKER)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_cli_push_hook_crash_outside_guard_allows(tmp_path, monkeypatch):
+    """REQ-4: an unexpected failure in `push --hook` after the guard allows."""
+    repo = _repo(tmp_path)
+    monkeypatch.setattr(push_handler, "read_hook_payload",
+                        lambda: _payload(repo, PUSH + " origin HEAD"))
+    monkeypatch.setattr(push_handler, "publication_kind", _boom)
+    err = StringIO()
+
+    assert _checker_cli().main(["push", "--hook"], StringIO(), err) == 0
+    assert err.getvalue() == "loom: publication hook failed (RuntimeError: boom); allowing.\n"
+
+
+def test_cli_push_hook_guard_crash_still_refuses(tmp_path, monkeypatch):
+    """A guard that cannot judge never loosens selection.guard."""
+    repo = _repo(tmp_path)
+    monkeypatch.setattr(push_handler, "read_hook_payload",
+                        lambda: _payload(repo, PUSH + " origin HEAD"))
+    monkeypatch.setattr(push_handler, "selection_guard_reason", _boom)
+    err = StringIO()
+
+    assert _checker_cli().main(["push", "--hook"], StringIO(), err) == 2
+    assert err.getvalue().startswith("BLOCK selection.guard: ")
+
+
+def test_cli_other_subcommand_crash_keeps_exit_two(monkeypatch):
+    cli = _checker_cli()
+    monkeypatch.setitem(cli.COMMANDS, "intent", _boom)
+    err = StringIO()
+
+    assert cli.main(["intent"], StringIO(), err) == 2
+    assert err.getvalue() == "loom_checker internal error: RuntimeError: boom\n"

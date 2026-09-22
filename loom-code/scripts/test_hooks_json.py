@@ -19,6 +19,8 @@ External surfaces grounded:
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -103,9 +105,45 @@ def test_pre_tool_use_runs_the_single_checker_push_rule(hooks):
     checker reads no stdin at all, so the flag is not decoration: a hook
     entry that omits it would judge nothing."""
     (command,) = _commands(hooks["PreToolUse"])
-    assert command.startswith("python3 ")
-    assert "/scripts/loom_checker.py" in command
-    assert command.rstrip().endswith(" push --hook")
+    assert 'python3 "${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py" push --hook' in command
+
+
+def _claude_pre_tool_use(hooks, payload: dict, plugin_root: Path):
+    """Run the Claude Code PreToolUse command as Claude Code does (``sh -c``)."""
+    (command,) = _commands(hooks["PreToolUse"])
+    return subprocess.run(["sh", "-c", command], input=json.dumps(payload),
+                          capture_output=True, text=True, timeout=30,
+                          env={**os.environ, "CLAUDE_PLUGIN_ROOT": str(plugin_root)})
+
+
+PUSH = "git" + " push"  # concatenated so this file's own text is no push
+
+
+def test_pre_tool_use_checker_missing_allows_and_says_so(hooks, tmp_path):
+    """REQ-4 on Claude Code: a stale plugin root (checker absent) never
+    refuses a publication command; it allows with the failure line."""
+    missing = tmp_path / "removed-version"
+    result = _claude_pre_tool_use(
+        hooks, {"tool_name": "Bash", "tool_input": {"command": f"{PUSH} -u origin feat"}}, missing)
+    assert result.returncode == 0, result.stderr
+    assert "loom: publication hook failed (" in result.stderr
+    assert "; allowing." in result.stderr
+    assert str(missing / "scripts" / "loom_checker.py") in result.stderr
+
+
+@pytest.mark.parametrize("tool_name,tool_input", [
+    ("Bash", {"command": "echo x >> .git/loom/selections/c.jsonl"}),
+    ("Bash", {"command": "cd .git/loom && printf x > selections/c.jsonl"}),
+    ("Bash", {"command": "printf x > .git/loom/./selections/c.jsonl"}),
+    ("Write", {"file_path": "/r/.git/loom//selections/c.jsonl", "content": "{}"}),
+    ("Edit", {"file_path": "/r/.git/loom/./selections/c.jsonl", "old_string": "a", "new_string": "b"}),
+])
+def test_pre_tool_use_checker_missing_still_denies_store(hooks, tmp_path, tool_name, tool_input):
+    """A missing checker never loosens selection.guard."""
+    result = _claude_pre_tool_use(hooks, {"tool_name": tool_name, "tool_input": tool_input},
+                                  tmp_path / "removed-version")
+    assert result.returncode == 2, result.stderr
+    assert "BLOCK selection.guard" in result.stderr
 
 
 def test_post_tool_use_keeps_language_anchor(hooks):

@@ -53,7 +53,10 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     if payload is None:
         raise UsageError("push --hook expects a PreToolUse JSON payload on stdin.")
     # The record-store guard judges every matched tool call first.
-    guard_reason = selection_guard_reason(payload)
+    try:
+        guard_reason = selection_guard_reason(payload)
+    except Exception as exc:  # a guard that cannot judge refuses: never loosened
+        guard_reason = f"the guard failed ({type(exc).__name__}: {exc})"
     if guard_reason:
         print(f"BLOCK {SELECTION_GUARD_RULE}: {guard_reason}", file=err)
         return 2
