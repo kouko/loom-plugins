@@ -87,13 +87,16 @@ def test_hook_direct_push_allowed_with_reminder(repo: Path) -> None:
     f"{CREATE} --title t --body 'selection records live in .git/loom per the spec'",
     f"{PUSH} origin HEAD && {CREATE} --fill --body 'see .git/loom for records'",
 ])
-def test_hook_pr_open_mentioning_store_allowed(repo: Path, command: str) -> None:
-    """REQ-4 says any command that opens a pull request is allowed. A PR
-    body that merely mentions where loom keeps its records is not a write."""
+def test_hook_pr_open_mentioning_store_refused(repo: Path, command: str) -> None:
+    """Amended REQ-4 (spec commit 5ebaaf6d): the unchanged selection-store
+    guard still refuses a command naming the loom record directory, even a
+    PR-open command, so the refusal must come from that guard and no other
+    rule."""
     result = hook(repo, command)
-    assert result.returncode == 0, (
-        f"the hook refuses a PR-open command that only mentions the record "
+    assert result.returncode == 2, (
+        f"the selection guard no longer refuses a command naming the record "
         f"directory: exit {result.returncode}, {result.stderr.strip()!r}")
+    assert result.stderr.startswith("BLOCK selection.guard: "), result.stderr
 
 
 def test_claude_code_hook_checker_missing_allowed(repo: Path, tmp_path: Path) -> None:
