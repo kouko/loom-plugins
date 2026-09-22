@@ -29,10 +29,12 @@ import re
 
 def _delta(repo: Path, base: str | None, head: str) -> set[str]:
     """The branch delta: the local diff (working tree included) when no base
-    is given, else the committed diff base..head."""
+    is given, else the committed diff from the fork point of base and head
+    to head, so trunk commits after the fork are not this branch's delta."""
     if base is None:
         return changed_paths(repo)
-    return {line for line in git_text(repo, "diff", "--name-only", base, head).splitlines()
+    fork = git_text(repo, "merge-base", base, head)
+    return {line for line in git_text(repo, "diff", "--name-only", fork, head).splitlines()
             if line.strip()}
 
 

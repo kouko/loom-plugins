@@ -245,3 +245,25 @@ def test_status_never_raises_without_a_branch_base(tmp_path: Path) -> None:
     assert status.startswith("stale (")
     change_id, error = verification.identify_change(repo)
     assert change_id is None and error
+
+
+def test_explicit_base_diffs_from_the_fork_point_when_trunk_moved(tmp_path: Path) -> None:
+    """`base` is the trunk tip at event time; another change landing on the
+    trunk after the fork is not this branch's delta."""
+    repo = branch_repo(tmp_path)
+    confirmed_intent(repo)
+    commit(repo, "intent")
+    commit_attestation(repo, attestation(repo))
+    git(repo, "switch", "-q", "main")
+    confirmed_intent(repo, "2026-09-21-other")
+    write(repo, "docs/loom/2026-09-21-other/attestation.json",
+          json.dumps({"change_id": "2026-09-21-other"}))
+    commit(repo, "land the other change")
+    base = git(repo, "rev-parse", "main")
+    head = git(repo, "rev-parse", f"feat/{CHANGE}")
+    assert verification.verification_status(
+        repo, CHANGE, depth="ci", base=base, head=head
+    ) == "valid"
+    assert verification.identify_change(
+        repo, base=base, head=head, branch=f"feat/{CHANGE}"
+    ) == (CHANGE, None)
