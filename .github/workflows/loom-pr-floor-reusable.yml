@@ -1,0 +1,70 @@
+name: loom PR floor (reusable)
+
+# Called by the loom-pr-floor.yml caller workflow (template:
+# loom-code/templates/loom-pr-floor.yml). The job name below, prefixed by the
+# caller's job id, is the required check context "loom-pr-floor / PR floor".
+#
+# Security: runs under pull_request_target, so it must never execute code
+# from the PR. It checks out loom's own scripts at inputs.loom-ref and the PR
+# head only as data; neither checkout keeps credentials. PR-controlled text
+# (body, head ref) reaches the shell through env vars, never through ${{ }}
+# interpolation into a script.
+
+on:
+  workflow_call:
+    inputs:
+      loom-ref:
+        description: kouko/loom-plugins ref whose loom_checker.py runs the check
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  pr-floor:
+    name: PR floor
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out loom
+        uses: actions/checkout@v4
+        with:
+          repository: kouko/loom-plugins
+          ref: ${{ inputs.loom-ref }}
+          path: loom
+          sparse-checkout: loom-code
+          persist-credentials: false
+
+      - name: Check out the pull request head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install checker dependency
+        run: python3 -m pip install --quiet pyyaml
+
+      - name: Write the PR body to a file
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
+
+      - name: Check the PR floor
+        working-directory: pr
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: >-
+          python3 "$GITHUB_WORKSPACE/loom/loom-code/scripts/loom_checker.py" pr-floor
+          --body-file "$RUNNER_TEMP/pr-body.md"
+          --base "$BASE_SHA"
+          --head "$HEAD_SHA"
+          --branch "$HEAD_REF"
