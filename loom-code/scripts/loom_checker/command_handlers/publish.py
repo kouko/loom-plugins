@@ -182,12 +182,6 @@ def _publication_attestation(repo: Path) -> tuple[str | None, dict | None, str |
     return change_id, payload, None
 
 
-def _publication_change_id(repo: Path) -> tuple[str | None, str | None]:
-    """Derive the publication identity from the sole attestation in the branch."""
-    change_id, _payload, error = _publication_attestation(repo)
-    return change_id, error
-
-
 def _intent_authorizes_publication(
     repo: Path, intent_file: Path, change_id: str
 ) -> tuple[bool, str | None]:

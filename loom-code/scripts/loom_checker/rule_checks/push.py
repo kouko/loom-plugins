@@ -51,7 +51,7 @@ HEREDOC_WORD_END = frozenset(" \t\n;&|<>()")
 def _command_word_is_a_shell(text: str) -> bool:
     """Whether one pipeline member runs what it is handed as commands.
 
-    `_strip_merge_prefix`, not `_strip_prefix`: the narrow one stops at the
+    `_strip_command_word_prefix`, not `_strip_prefix`: the narrow one stops at the
     first `-` token, so `sudo -u bob bash <<EOF` would read its command word as
     `-u` and carve an executed body out as content. Over-reading here judges a
     body that would otherwise reach no rule, so the wide one is the one that
@@ -59,9 +59,9 @@ def _command_word_is_a_shell(text: str) -> bool:
 
     The bare `<<` form names no command word and the shell reads that body
     itself, so an absent command word reads as executing."""
-    tokens = _strip_merge_prefix(_tokenise(text.lstrip("({ \t")))
+    tokens = _strip_command_word_prefix(_tokenise(text.lstrip("({ \t")))
     while tokens and tokens[0] in HEREDOC_GRAMMAR_WORDS:
-        tokens = _strip_merge_prefix(tokens[1:])
+        tokens = _strip_command_word_prefix(tokens[1:])
     if not tokens:
         return True
     return _program(tokens[0]) in SHELL_PROGRAMS
@@ -306,7 +306,7 @@ def _strip_prefix(tokens: list[str]) -> list[str]:
     return tokens[index:]
 
 
-def _strip_merge_prefix(tokens: list[str]) -> list[str]:
+def _strip_command_word_prefix(tokens: list[str]) -> list[str]:
     """`_strip_prefix` widened by the shell grammar and the wrapper options a
     command word can sit behind: `if …; then`, `( … )`, `{ …; }`,
     `sudo -u bob`, `xargs -n1`. Heredoc carving alone uses it, to find the
