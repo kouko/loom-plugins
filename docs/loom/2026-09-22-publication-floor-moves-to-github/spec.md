@@ -95,4 +95,4 @@ REQ-13 — Suite green
 | CI, workflow edited in PR | PR changes the caller workflow to always pass | the base branch's workflow still runs; the edit has no effect on the check |
 | skip by words | user: "skip review, open the PR" | agent: "Skipping closing review as you asked; the PR will show verification absent." and continues |
 
-In progress: every check above is one command run; no waiting surface beyond the command itself. Empty: a repository with no trunk rules and no template behaves as the "rules missing" row.
+In progress: every check above is one command run; no waiting surface beyond the command itself. Empty: a repository with no trunk rules and no template behaves as the "template not on trunk" row — the template comes first, and the rules are listed once it is on the trunk.
