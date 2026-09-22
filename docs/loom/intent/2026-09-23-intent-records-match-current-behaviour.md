@@ -29,6 +29,7 @@ intent store can be read as an accurate list of open and done work.
 
 ## Constraints
 - Existing wording of each intent stays as it was confirmed; changes are added notes plus the one status line in Acceptance 1.
+- Exception, user-decided 2026-09-23: `2026-09-19-publication-hook-false-positives` never carried the required schema fields, so it also gains an `originator:` line and an `## Out of scope` section, and its `needs-design: no` line gains a reason, so that Acceptance 5 can hold.
 - This PR bumps the plugin version per the repository's versioning rule.
 
 ## Out of scope
