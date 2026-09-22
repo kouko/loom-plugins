@@ -66,5 +66,11 @@ instruction removes, and discloses what was skipped and on what authority.
 - Automatically re-running skipped reviews later.
 - Hosts other than Claude Code and Codex CLI.
 
+## Later changes
+- PR #43 replaced Acceptance 1 and 2, and the typed-confirmation clause of Acceptance 4: a skip no longer waits for a typed confirmation; the user's plain words take effect and the skip is disclosed on the PR (`loom-code/skills/build/SKILL.md` §1, `loom-code/skills/ship/SKILL.md` §1). `/loom-code:expert-mode` remains an optional typed route.
+- It also replaced the clause of Acceptance 3 that a change "cannot be pushed if its content differs from the content its record describes": `publish` now discloses an absent or stale verification status and publishes anyway (`loom-code/scripts/loom_checker/command_handlers/publish.py`).
+- The Constraints bullets requiring a typed confirmation are replaced the same way; PRINCIPLES.md non-negotiable 2 was amended for plain-words skips on 2026-09-22.
+- Decision recorded in #43's PR body Decisions table (option A) and intent 2026-09-22-publication-floor-moves-to-github.
+
 ## Open questions
 - none

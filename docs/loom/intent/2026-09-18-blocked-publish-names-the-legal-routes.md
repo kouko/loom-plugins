@@ -50,6 +50,12 @@ publication: automatic — authorized 2026-09-18 by kouko
 - Bash 指令文字只要出現 PR 合併那三個字就被擋的誤攔。
 - `!` 前綴指令是否經過同一個 hook 的查證。
 
+## Later changes
+
+- PR #43 replaced Acceptance 1, 2 and 6: `publish` and `land` no longer refuse a branch without a verification record, so there is no refusal message left to name routes in. They print the recomputed verification status and continue ("publishing anyway" in `loom-code/scripts/loom_checker/command_handlers/publish.py`, "merged anyway" in `land.py`; `loom-code/skills/ship/SKILL.md` §3).
+- Acceptance 3 still holds: `loom-code/skills/ship/SKILL.md` §3 still forbids handing a refused publication command to the user. A skip is now asked for in plain words; the typed route of Acceptance 4 remains optional through `/loom-code:expert-mode`.
+- Decision recorded in #43's PR body Decisions table and intent 2026-09-22-publication-floor-moves-to-github.
+
 ## Open questions
 
 - none

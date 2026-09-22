@@ -85,5 +85,10 @@ change or as a sweep over every change whose PR is merged.
 - Creating worktrees, stash handling, PR comments or approvals.
 - Changing push or PR-creation behavior.
 
+## Later changes
+- PR #43 replaced Acceptance 11: a hand-typed `gh pr merge` is no longer refused; the publication hook prints a reminder and allows it (`loom-code/scripts/loom_checker/command_handlers/push.py`). The merge floor is now GitHub's ruleset plus the `loom-pr-floor` CI check.
+- `land` still refuses a malformed PR body and a missing acceptance, and discloses a non-valid verification status as "merged anyway" (`loom-code/scripts/loom_checker/command_handlers/land.py`).
+- Decision recorded in #43's PR body Decisions table and intent 2026-09-22-publication-floor-moves-to-github.
+
 ## Open questions
 - none
