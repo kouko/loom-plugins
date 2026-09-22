@@ -368,6 +368,26 @@ def test_stale_attestation_merges_with_reminder(tmp_path: Path, monkeypatch) -> 
     assert len(calls.merge_calls()) == 1
 
 
+def test_skipped_status_merges_with_reminder(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(land, "verification_status",
+                        lambda *a, **k: "valid (skipped: adversarial)")
+    rc, out, err, calls, _ = invoke(tmp_path, monkeypatch, "--accepted-by", "kouko")
+
+    assert rc == 0, err
+    assert out.endswith(
+        "\nMerged PR #7 as a1b2c3d\n"
+        "loom: verification valid (skipped: adversarial); merged anyway.\n"
+    ), out
+
+
+def test_plain_valid_status_merges_without_reminder(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(land, "verification_status", lambda *a, **k: "valid")
+    rc, out, err, calls, _ = invoke(tmp_path, monkeypatch, "--accepted-by", "kouko")
+
+    assert rc == 0, err
+    assert out.endswith("\nMerged PR #7 as a1b2c3d\n"), out
+
+
 # A6 negative: missing-heading-refuses-names-it
 def test_missing_heading_refuses_names_it(tmp_path: Path, monkeypatch) -> None:
     def configure(calls: LandCalls) -> None:

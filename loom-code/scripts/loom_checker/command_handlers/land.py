@@ -182,7 +182,7 @@ def _land_accepted(
         return 1
     merge_commit, title, body = merged
     out.write(f"Merged PR #{target.number} as {merge_commit[:7]}\n")
-    if target.status == "absent" or target.status.startswith("stale"):
+    if target.status != "valid":
         clause = missing_clause(missing_records(target.repo, target.change_id, target.status))
         out.write(f"loom: verification {target.status}{' ' + clause if clause else ''}; "
                   "merged anyway.\n")
