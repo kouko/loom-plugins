@@ -103,7 +103,13 @@ def _ruleset_state(gh: str, host: str, slug: str, rules: list) -> tuple[str, boo
         if not isinstance(rule, dict):
             continue
         if rule.get("type") == "required_status_checks":
-            contexts = (rule.get("parameters") or {}).get("required_status_checks") or []
+            parameters = rule.get("parameters") or {}
+            contexts = (
+                parameters.get("required_status_checks") or []
+                if isinstance(parameters, dict) else None
+            )
+            if not isinstance(contexts, list):
+                raise Unconfirmed("unreadable required status checks rule")
             check = check or any(
                 isinstance(c, dict) and c.get("context") == REQUIRED_CONTEXT for c in contexts
             )
@@ -134,13 +140,16 @@ def _classic_state(gh: str, host: str, slug: str, trunk: str) -> tuple[bool, boo
         return None
     if not isinstance(protection, dict):
         return None
-    pr = bool(protection.get("required_pull_request_reviews")) and bool(
-        (protection.get("enforce_admins") or {}).get("enabled") is True
-    )
-    checks = protection.get("required_status_checks") or {}
-    contexts = list(checks.get("contexts") or []) + [
-        c.get("context") for c in checks.get("checks") or [] if isinstance(c, dict)
-    ]
+    try:
+        pr = bool(protection.get("required_pull_request_reviews")) and bool(
+            (protection.get("enforce_admins") or {}).get("enabled") is True
+        )
+        checks = protection.get("required_status_checks") or {}
+        contexts = list(checks.get("contexts") or []) + [
+            c.get("context") for c in checks.get("checks") or [] if isinstance(c, dict)
+        ]
+    except (AttributeError, TypeError):
+        return None  # a malformed response is as unreadable as a refused one
     return pr, REQUIRED_CONTEXT in contexts
 
 
@@ -217,15 +226,17 @@ def _probe(print_setup: bool) -> str:
     unconfirmed = []
     if pr_state == "unconfirmed":
         unconfirmed.append("bypass actors unreadable")
-    if classic is None and not rules and (pr_state != "present" or not check):
-        unconfirmed.append("no rulesets and classic protection unreadable")
+    # Classic protection may hold what the rulesets lack; unreadable, a
+    # requirement the rulesets do not satisfy is undecided, never missing.
+    if classic is None and (pr_state != "present" or not check):
+        unconfirmed.append("classic protection unreadable")
     if unconfirmed:
         lines.append(f"loom: could not confirm GitHub rules for {trunk} ({'; '.join(unconfirmed)})\n")
     missing = False
-    if pr_state == "absent" and (classic is not None or rules):
+    if pr_state == "absent" and classic is not None:
         lines.append(f"loom: {trunk} does not require a pull request (administrators included)\n")
         missing = True
-    if not check and (classic is not None or rules):
+    if not check and classic is not None:
         lines.append(f'loom: {trunk} does not require the check "{REQUIRED_CONTEXT}"\n')
         missing = True
     if missing:

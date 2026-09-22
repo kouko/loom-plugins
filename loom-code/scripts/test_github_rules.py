@@ -252,6 +252,52 @@ def test_rulesets_empty_classic_unreadable_unconfirmed(tmp_path):
     assert "does not require" not in result.stdout
 
 
+NON_ADMIN = fail("gh: Not Found (HTTP 404)\n")
+
+
+def test_check_ruleset_classic_unreadable_pr_unconfirmed(tmp_path):
+    """The PR requirement may live in classic protection nobody but an admin reads."""
+    result, calls = probe(tmp_path, base_responses(**{
+        f"{REPO}/rules/branches/main": ok([rule_check()]),
+        f"{REPO}/branches/main/protection": NON_ADMIN,
+    }))
+    assert result.returncode == 0, result.stderr
+    assert "loom: could not confirm GitHub rules for main (" in result.stdout
+    assert "does not require" not in result.stdout
+    assert "gh api -X POST" not in result.stdout
+    assert_read_only(calls)
+
+
+def test_pr_ruleset_classic_unreadable_check_unconfirmed(tmp_path):
+    result, _calls = probe(tmp_path, base_responses(**{
+        f"{REPO}/rules/branches/main": ok([rule_pr(3)]),
+        f"{REPO}/rulesets/3": ok({"id": 3, "bypass_actors": []}),
+        f"{REPO}/branches/main/protection": NON_ADMIN,
+    }))
+    assert result.returncode == 0, result.stderr
+    assert "loom: could not confirm GitHub rules for main (" in result.stdout
+    assert "does not require" not in result.stdout
+
+
+def test_malformed_shapes_could_not_confirm(tmp_path):
+    cases = {
+        "parameters": {f"{REPO}/rules/branches/main": ok([
+            {"type": "required_status_checks", "ruleset_id": 1, "parameters": "x"}])},
+        "contexts": {f"{REPO}/rules/branches/main": ok([
+            {"type": "required_status_checks", "ruleset_id": 1,
+             "parameters": {"required_status_checks": "x"}}])},
+        "classic": {f"{REPO}/branches/main/protection": ok({
+            "enforce_admins": "x", "required_status_checks": ["x"]})},
+    }
+    for name, overrides in cases.items():
+        sub = tmp_path / name
+        sub.mkdir()
+        result, _calls = probe(sub, base_responses(**overrides))
+        assert result.returncode == 0, (name, result.stderr)
+        assert "loom: could not confirm GitHub rules for main (" in result.stdout, name
+        assert "does not require" not in result.stdout, name
+
+
 def test_unreadable_bypass_actors_could_not_confirm(tmp_path):
     result, _calls = probe(tmp_path, base_responses(**{
         f"{REPO}/rules/branches/main": ok([rule_pr(7), rule_check(ruleset_id=7)]),
