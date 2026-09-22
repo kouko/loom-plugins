@@ -32,7 +32,7 @@ def test_each_subcommand_has_its_own_module() -> None:
     script = """
 import runpy
 commands = runpy.run_path('loom_checker.py')['COMMANDS']
-expected = {'intent': 'intent', 'intents': 'intents', 'intake': 'intake', 'push': 'push', 'publish': 'publish', 'land': 'land', 'sync-trunk': 'sync', 'standing': 'standing', 'contract': 'contract', 'charter': 'charter', 'plan': 'plan', 'reviewer-count': 'reviewer_count', 'finalize-review': 'finalize', 'selection': 'selection'}
+expected = {'intent': 'intent', 'intents': 'intents', 'intake': 'intake', 'push': 'push', 'publish': 'publish', 'land': 'land', 'sync-trunk': 'sync', 'github-rules': 'github_rules', 'standing': 'standing', 'contract': 'contract', 'charter': 'charter', 'plan': 'plan', 'reviewer-count': 'reviewer_count', 'finalize-review': 'finalize', 'selection': 'selection'}
 assert {name: fn.__module__ for name, fn in commands.items()} == {name: 'loom_checker.command_handlers.' + module for name, module in expected.items()}
 """
     subprocess.run([sys.executable, "-c", script], cwd=SCRIPTS, check=True, capture_output=True, text=True)
