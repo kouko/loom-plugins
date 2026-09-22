@@ -1,7 +1,7 @@
 {
   "name": "loom-code",
   "version": "3.8.0",
-  "description": "Optional using-loom-code discovery routing and five stations carry one change from plan to PR with non-blocking cross-vendor suggestions, content-bound verification, one closing review, and a fast publication gate. Claude Code, Codex + Antigravity CLI.",
+  "description": "Optional using-loom-code discovery routing and five stations carry one change from plan to PR with non-blocking cross-vendor suggestions, content-bound verification, one closing review, and a GitHub-enforced PR floor. Claude Code, Codex + Antigravity CLI.",
   "author": {
     "name": "kouko",
     "url": "https://github.com/kouko"
@@ -28,7 +28,7 @@
   "hooks": "./hooks/hooks-codex.json",
   "interface": {
     "displayName": "loom-code",
-    "shortDescription": "Five-station coding flow with a deterministic push gate, for Codex CLI",
+    "shortDescription": "Five-station coding flow with a deterministic publication reminder, for Codex CLI",
     "longDescription": "Carries one change from a confirmed intent to a pull request through five stations. Build ends with an independent adversary's programs and the complete package suite, which must pass before review; finalize-review runs them again on committed content, then generates an attestation bound to functional content. The installed plugin hook validates that attestation and publication safety without replaying functional work. Publication-only fixes reuse matching evidence; functional edits invalidate it. loom-design and loom-workflow are optional and read this plugin's versioned contract package.",
     "developerName": "kouko",
     "category": "Coding",
