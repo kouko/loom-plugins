@@ -44,7 +44,9 @@ On Antigravity CLI, map tool and agent names with
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
 prose steps it lists as skipped (spec, plan, implementer, tdd,
 blind-run); [expert-mode](../expert-mode/SKILL.md) stays an optional route
-the user may invoke.
+the user may invoke. The default is the full flow: skip a step only when the
+user tells you to in plain words, then tell the user in one line which step is
+skipped and continue. Never ask the user for a generated code to skip a step.
 
 ## Artifact vocabulary
 

@@ -518,7 +518,8 @@ def test_blind_runner_names_current_artifacts_and_package_suite_owners() -> None
 
 
 ROUTER = (ROOT / "loom-code/skills/using-loom-code/SKILL.md").read_text(encoding="utf-8")
-SKIP_STATIONS = {"build": BUILD, "closing-review": REVIEW, "ship": SHIP, "using-loom-code": ROUTER}
+SKIP_STATIONS = {"build": BUILD, "closing-review": REVIEW, "ship": SHIP, "using-loom-code": ROUTER,
+                 "write-plan": PLAN}
 SKIP_RULE = (
     "The default is the full flow: skip a step only when the user tells you to in "
     "plain words, then tell the user in one line which step is skipped and continue."
