@@ -363,6 +363,8 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
         assert "intent" not in sentence.replace("(", " ").replace(",", " ").split(), sentence
         pointer = (
             "skip suggestions and user requests follow [expert-mode](../expert-mode/SKILL.md)."
+            if station is PLAN else
+            "[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may invoke."
         )
         assert prose.count(pointer) == 1
         assert pointer in sentence + ". "
@@ -515,3 +517,32 @@ def test_blind_runner_names_current_artifacts_and_package_suite_owners() -> None
     assert "review record" not in flat
     assert "package-tests probe" not in flat
     assert _affirmed_sentences(flat, "Build", "`finalize-review`", "package suite")
+
+
+ROUTER = (ROOT / "loom-code/skills/using-loom-code/SKILL.md").read_text(encoding="utf-8")
+SKIP_STATIONS = {"build": BUILD, "closing-review": REVIEW, "ship": SHIP, "using-loom-code": ROUTER}
+SKIP_RULE = (
+    "The default is the full flow: skip a step only when the user tells you to in "
+    "plain words, then tell the user in one line which step is skipped and continue."
+)
+NO_CODE = "Never ask the user for a generated code to skip a step."
+CODE_REQUEST = re.compile(
+    r"expert-mode <code>|generated code|typed code|confirm\w* by typing|skip is still confirmed"
+)
+
+
+# skip-announced-in-one-line (A10 positive)
+def test_skip_announced_in_one_line() -> None:
+    assert not has_negation(SKIP_RULE)
+    for name, text in SKIP_STATIONS.items():
+        assert " ".join(text.split()).count(SKIP_RULE) == 1, name
+
+
+# no-generated-code-requested (A10 negative)
+def test_no_generated_code_requested() -> None:
+    for name, text in SKIP_STATIONS.items():
+        prose = " ".join(text.split())
+        assert prose.count(NO_CODE) == 1, name
+        for sentence in split_sentences(prose):
+            if CODE_REQUEST.search(sentence):
+                assert has_negation(sentence), (name, sentence)

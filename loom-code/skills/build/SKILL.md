@@ -17,8 +17,11 @@ base. Preserve unrelated and untracked work. Work only on planned paths.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit only the
 steps it lists as skipped (spec, plan, implementer, tdd, adversarial,
-package-tests, blind-run); skip suggestions and user requests follow
-[expert-mode](../expert-mode/SKILL.md).
+package-tests, blind-run); [expert-mode](../expert-mode/SKILL.md) stays an
+optional route the user may invoke. The default is the full flow: skip a step
+only when the user tells you to in plain words, then tell the user in one line
+which step is skipped and continue. Never ask the user for a generated code to
+skip a step.
 
 Finding no task left to implement is not a reason to end Build. It means §2 has
 nothing to implement, not that the run is over: continue to §3, which states

@@ -21,8 +21,11 @@ the remaining work.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 it lists as skipped; §2 and §3 say how skipped reviewers, adversarial and
-blind-run are handled; skip suggestions and user requests follow
-[expert-mode](../expert-mode/SKILL.md).
+blind-run are handled; [expert-mode](../expert-mode/SKILL.md) stays an
+optional route the user may invoke. The default is the full flow: skip a step
+only when the user tells you to in plain words, then tell the user in one line
+which step is skipped and continue. Never ask the user for a generated code to
+skip a step.
 
 ## 2. Compute review depth
 
@@ -87,8 +90,7 @@ has not answered for this change, naming the station sequence entered so
 far. When the user has answered it, including a
 general delegation such as "you decide", proceed and record the choice as
 user-decided. This governs only whether the run asks again; a user-requested
-skip is still confirmed exactly as [expert-mode](../expert-mode/SKILL.md)
-requires.
+skip follows the plain-words rule in §1.
 
 Stop when the attempt to produce an absent item fails. Report which item is
 absent, what was attempted, and where it failed. Also report the station

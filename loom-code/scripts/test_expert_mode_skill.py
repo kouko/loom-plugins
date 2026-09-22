@@ -202,11 +202,8 @@ def test_changelog_names_failure_sources_and_limits() -> None:
             "the full process applies.") in limits
 
 
-def test_ordinary_conversation_reaches_the_same_procedure() -> None:
+def test_expert_mode_keeps_its_typed_confirmation() -> None:
     router = (PLUGIN_ROOT / "skills" / "using-loom-code" / "SKILL.md").read_text(encoding="utf-8")
-    sentence = affirmative(
-        router, "`loom_checker.py selection propose <change-id> --origin user`", ("follow",))
-    assert "asks in their own words to run or skip Loom steps" in sentence
     assert 'a plain "yes" binds nothing' not in _flat(router)
     assert "Only that typed confirmation applies." in _flat(_skill())
     assert 'A reply such as "yes" or "對" binds nothing' in _flat(_skill())
@@ -268,20 +265,23 @@ def test_suggestion_then_plain_yes_skips_nothing(repo: Path) -> None:
 
 
 SELECTION_READ = "At entry, run `loom_checker.py selection show <change-id>` and omit"
-EXPERT_MODE_POINTER = ("skip suggestions and user requests follow "
-                       "[expert-mode](../expert-mode/SKILL.md).")
+EXPERT_MODE_POINTER = ("[expert-mode](../expert-mode/SKILL.md) stays an optional route "
+                       "the user may invoke.")
+# write-plan keeps the older pointer until its own station text is revised.
+PLAN_POINTER = ("skip suggestions and user requests follow "
+                "[expert-mode](../expert-mode/SKILL.md).")
 MOVED_RULES = ("at most once per change", "--origin agent", 'a plain "yes" binds nothing',
                "asks in their own words")
 
 
-def assert_station_points_to_expert_mode(text: str) -> None:
+def assert_station_points_to_expert_mode(text: str, pointer: str = EXPERT_MODE_POINTER) -> None:
     """One affirmative sentence reads the bound selection and points to
     expert-mode; the suggestion rules live only in expert-mode."""
     flat = _flat(text)
     assert flat.count(SELECTION_READ) == 1, "selection show step missing or repeated"
-    assert flat.count(EXPERT_MODE_POINTER) == 1, "expert-mode pointer missing or repeated"
+    assert flat.count(pointer) == 1, "expert-mode pointer missing or repeated"
     sentence = affirmative(text, "`loom_checker.py selection show <change-id>` and omit", ("run",))
-    assert sentence.endswith(EXPERT_MODE_POINTER), sentence
+    assert sentence.endswith(pointer), sentence
     for rule in MOVED_RULES:
         assert rule.lower() not in flat.lower(), rule
 
@@ -289,7 +289,8 @@ def assert_station_points_to_expert_mode(text: str) -> None:
 @pytest.mark.parametrize("station", STATIONS)
 def test_station_one_sentence_points_to_expert_mode(station: str) -> None:
     text = (PLUGIN_ROOT / "skills" / station / "SKILL.md").read_text(encoding="utf-8")
-    assert_station_points_to_expert_mode(text)
+    assert_station_points_to_expert_mode(
+        text, PLAN_POINTER if station == "write-plan" else EXPERT_MODE_POINTER)
 
 
 GOOD_STATION = ("Intro. At entry, run `loom_checker.py selection show <change-id>` and omit "

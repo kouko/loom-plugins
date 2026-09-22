@@ -10,9 +10,6 @@ import ast
 import re
 from pathlib import Path
 
-from loom_checker.selection import ENTRY_TOKENS
-from loom_checker.selection import confirmation_prompt_matches
-from loom_checker.selection import selection_code
 from prose_pin import has_negation
 
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
@@ -133,19 +130,12 @@ def test_ship_prose_forbids_handing_the_command_over() -> None:
     hits = [
         s for s in re.split(r"(?<=[.!?])\s+", flat)
         if NO_HANDOVER in s
-        and "closing-review station" in s
-        and "step selection" in s
-        and "confirms by typing" in s
+        and "report the refusal and stop" in s
     ]
     assert len(hits) == 1, (
         "ship §3 needs one sentence forbidding a refused publication command "
-        "from being handed to the user, and naming both legal routes: run the "
-        "closing-review station, or propose a step selection the user confirms "
-        "by typing a confirmation prompt"
+        "from being handed to the user, and saying what the agent does instead"
     )
-    # Which prompt is not pinned here: the form the station may name is the
-    # form `confirmation_prompt_matches` accepts, and
-    # `test_ship_prose_names_a_confirmation_the_checker_accepts` runs it.
 
 
 # ship-prose-rule-is-not-marked-as-a-gate (A3 negative)
@@ -239,97 +229,39 @@ def test_ship_prose_covers_the_refusals_that_name_no_remedy() -> None:
     )
 
 
-# The confirmation prompt the station names, in backticks with `<code>` where
-# the proposal's code goes -- the one part of the sentence the user retypes.
-CONFIRMATION_FORM = re.compile(r"`([^`]*<code>[^`]*)`")
+GITHUB_RULES = "`python3 <loom-code>/scripts/loom_checker.py github-rules`"
+AGREES = "only after the user explicitly agrees in conversation"
 
 
-# ship-prose-names-a-confirmation-the-checker-accepts (A3 positive)
-def test_ship_prose_names_a_confirmation_the_checker_accepts() -> None:
-    """The prompt the station tells the user to type is run through the
-    matcher that decides whether a typed prompt binds anything.
-
-    `confirmation_prompt_matches` binds a selection only when the prompt's
-    first token is one of `ENTRY_TOKENS` and the code is a standalone token
-    after it, so a station that asks for the bare code sends the user to a
-    prompt that binds nothing and leaves the reviewer floor where it was.
-    Asserting the literal `/loom-code:expert-mode <code>` would pin one of the
-    four entry tokens and would keep passing if the matcher later stopped
-    accepting it; executing the form catches both, and any reword that is
-    wrong in a new way fails the same assertion.
-    """
-    sentence = _no_handover_sentence()
-    forms = CONFIRMATION_FORM.findall(sentence)
-    assert len(forms) == 1, (
-        "ship §3 names exactly one confirmation prompt, in backticks, with "
-        "`<code>` standing for the code the proposal printed"
-    )
-    code = selection_code("2026-09-18-example-change", [], ["reviewers"])
-    assert confirmation_prompt_matches(forms[0].replace("<code>", code), code), (
-        f"the prompt ship §3 names, {forms[0]!r}, binds nothing: "
-        "confirmation_prompt_matches wants an entry token first, then the code"
-    )
-    # The placeholder is the code's seat, not decoration: naming the prompt
-    # without it, or the code without the prompt, binds nothing either.
-    assert not confirmation_prompt_matches(forms[0].replace("<code>", "").strip(), code)
-    assert not confirmation_prompt_matches(code, code)
+def _sentences() -> list[str]:
+    return re.split(r"(?<=[.!?])\s+", " ".join(SHIP.read_text(encoding="utf-8").split()))
 
 
-# Every backticked form in the sentence whose first word is an entry-point
-# token: the confirmation spellings the station offers the user.
-BACKTICKED = re.compile(r"`([^`]+)`")
-
-
-# ship-prose-names-every-confirmation-spelling-the-checker-accepts (A3 positive)
-def test_ship_prose_names_every_confirmation_spelling_the_checker_accepts() -> None:
-    """`expert-mode` always gives the Codex spelling beside the Claude Code
-    one, because a reader on either host retypes the form in front of them.
-
-    Which spellings count as entry points is read from `selection.ENTRY_TOKENS`
-    and each one the station names is run through the matcher, so a station
-    that named a fifth spelling the matcher does not accept fails here, and so
-    does one that drops to a single host again.
-    """
-    sentence = _no_handover_sentence()
-    named = [
-        form for form in BACKTICKED.findall(sentence)
-        if form.split()[0] in ENTRY_TOKENS
+# ship-runs-github-rules-before-publish (A7 positive)
+def test_ship_runs_github_rules_before_publish() -> None:
+    sentences = _sentences()
+    runs = [
+        s for s in sentences
+        if "Before publishing, run " + GITHUB_RULES in s
+        and "relay its lines to the user" in s and not has_negation(s)
     ]
-    assert len(named) >= 2, (
-        "ship 3 names the Claude Code and Codex spellings of the confirmation, "
-        f"as `expert-mode` does; it names {named}"
-    )
-    code = selection_code("2026-09-18-example-change", [], ["reviewers"])
-    for form in named:
-        prompt = form if "<code>" in form else f"{form} <code>"
-        assert confirmation_prompt_matches(prompt.replace("<code>", code), code), (
-            f"the spelling ship 3 names, {form!r}, binds nothing"
-        )
+    assert len(runs) == 1, "ship runs the github-rules probe before publishing"
+    flat = " ".join(sentences)
+    assert flat.index(runs[0]) < flat.index("loom_checker.py publish --intent")
+    assert [s for s in sentences if "missing rule" in s and "--print-setup" in s
+            and "show the user" in s], "a missing rule shows the setup command"
+    assert [s for s in sentences if "could not be confirmed" in s
+            and "continue publishing" in s], "unconfirmed rules do not stop Ship"
 
 
-# ship-prose-states-the-hook-body-check-limit (A3 positive)
-def test_ship_prose_states_the_limit_of_the_hook_body_check() -> None:
-    """The hook reads the body file when the command is proposed; `gh` reads it
-    again when the command runs. Nothing holds the bytes still in between, and
-    no `PreToolUse` hook can: it judges a command it does not execute.
-
-    `test_probe_body_can_change_between_the_check_and_the_request` runs that
-    swap. The station says it out loud so an agent does not read the check as a
-    promise about the pull request's contents. Advisory prose, no gate marker --
-    the enforceable carrier stays the checker's own refusal."""
-    section = " ".join(_section(SHIP.read_text(encoding="utf-8"), "## 3. Publish once").split())
-    hits = [
-        s for s in re.split(r"(?<=[.!?])\s+", section)
-        if "judges the body it can read when it looks" in s
-        and "not the body the pull request receives" in s
-        and "swapped" in s
-    ]
-    assert len(hits) == 1, (
-        "ship §3 needs one sentence stating that the hook judges the body it "
-        "can read when it looks, not the body the pull request receives, and "
-        "that a file swapped between the two reads is outside what any such "
-        "check can promise"
-    )
+# ship-never-runs-setup-unasked (A7 negative)
+def test_ship_never_runs_setup_unasked() -> None:
+    sentences = _sentences()
+    assert "Never run the setup command unasked." in sentences
+    for s in sentences:
+        if ("--print-setup" in s or "setup command" in s) and re.search(r"\brun\b", s):
+            assert AGREES in s or has_negation(s), f"setup run without consent: {s}"
+    assert sum(AGREES in s for s in sentences) == 1
 
 
 TWO_COPY_DOC = (
