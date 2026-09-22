@@ -20,7 +20,8 @@ def _lines() -> list[str]:
 def test_ratified_by_names_2026_09_15_non_negotiable_2_amendment() -> None:
     ratified = [line for line in _lines() if line.startswith("ratified-by:")]
     assert len(ratified) == 1
-    assert ratified[0].endswith("; " + AMENDMENT)
+    # An amendment log: later amendments append after this entry.
+    assert AMENDMENT in ratified[0].split("; ")
 
 
 PENDING_RE = re.compile(r"^\s*pending[\s_-]*ratification\s*:", re.I | re.M)

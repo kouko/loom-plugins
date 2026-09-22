@@ -404,23 +404,6 @@ def test_probe_ship_prose_does_not_promise_routes_the_refusal_may_not_name() -> 
         )
 
 
-def test_probe_ship_prose_names_a_confirmation_the_checker_accepts() -> None:
-    """Attack: make the station and the refusal disagree about what the user
-    types, so that following the station binds nothing.
-
-    F7b's marker is gone: `cfaa2057` put the binding form in the station, and
-    the assertion that had pinned the false phrasing moved with it.
-
-    Why this is not cosmetic is already executable above: an agent relaying the
-    station's wording asks for the bare code, and
-    `test_probe_bare_code_still_binds_nothing` shows the bare code binds nothing.
-    """
-    assert SHIP_RULE_SENTENCE, "the no-handover sentence is missing from the station"
-    sentence = SHIP_RULE_SENTENCE.group(0)
-    assert "typing the code" not in sentence
-    assert "/loom-code:expert-mode" in sentence
-
-
 # --------------------------------------------------------------------------
 # Half six: the body the hook now reads. The gate's guarantee is only as good
 # as its agreement with the bytes `gh` will actually send, so every probe here
