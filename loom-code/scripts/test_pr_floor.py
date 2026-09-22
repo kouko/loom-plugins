@@ -72,6 +72,25 @@ def test_bad_body_exit_1_names_heading(tmp_path: Path, monkeypatch) -> None:
     assert 'heading "Scope" is missing' in err
 
 
+def test_bad_body_annotates_the_heading(tmp_path: Path, monkeypatch) -> None:
+    repo = identified_repo(tmp_path)
+    code, out, _err, _summary = run(repo, body("Scope"), monkeypatch, tmp_path)
+    assert code == 1
+    assert out == '::error title=pr-floor::PR body heading "Scope" is missing\n'
+
+
+def test_error_annotation_escapes_workflow_command_text(tmp_path: Path, monkeypatch) -> None:
+    import loom_checker.command_handlers.pr_floor as pr_floor
+
+    repo = identified_repo(tmp_path)
+    monkeypatch.setattr(
+        pr_floor, "validate_contextual_pr_body", lambda _body: "x (a%b\r\n::notice::y)"
+    )
+    code, out, _err, _summary = run(repo, body(), monkeypatch, tmp_path)
+    assert code == 1
+    assert out == "::error title=pr-floor::PR body x (a%25b%0D%0A::notice::y)\n"
+
+
 def test_good_body_exit_0(tmp_path: Path, monkeypatch) -> None:
     repo = identified_repo(tmp_path)
     code, _out, err, _summary = run(repo, body(), monkeypatch, tmp_path)

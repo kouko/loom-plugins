@@ -36,10 +36,17 @@ def _options(args: list[str]) -> dict[str, str]:
     return options
 
 
+def _escaped(text: str) -> str:
+    """Workflow-command data escaping, so PR-controlled text stays one annotation:
+    https://github.com/actions/toolkit/blob/main/packages/core/src/command.ts"""
+    return text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
 def cmd_pr_floor(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     options = _options(args)
     fault = validate_contextual_pr_body(read_text(Path(options["--body-file"])))
     if fault:
+        out.write(f"::error title=pr-floor::{_escaped(f'PR body {fault}')}\n")
         return report([("ci.pr-floor", f"PR body {fault}")], err)
     repo = repo_root(Path.cwd())
     base, head = options["--base"], options["--head"]
@@ -54,8 +61,5 @@ def cmd_pr_floor(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     if summary:
         with open(summary, "a", encoding="utf-8") as handle:
             handle.write(f"verification: {status}\n")
-    # Workflow-command data escaping, so PR-controlled text stays one notice:
-    # https://github.com/actions/toolkit/blob/main/packages/core/src/command.ts
-    escaped = status.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-    out.write(f"::notice title=verification::{escaped}\n")
+    out.write(f"::notice title=verification::{_escaped(status)}\n")
     return 0
