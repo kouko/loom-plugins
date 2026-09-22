@@ -388,6 +388,14 @@ def test_plain_valid_status_merges_without_reminder(tmp_path: Path, monkeypatch)
     assert out.endswith("\nMerged PR #7 as a1b2c3d\n"), out
 
 
+def test_uncomputed_status_merges_without_reminder(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(land, "verification_status", lambda *a, **k: "")
+    rc, out, err, calls, _ = invoke(tmp_path, monkeypatch, "--accepted-by", "kouko")
+
+    assert rc == 0, err
+    assert out.endswith("\nMerged PR #7 as a1b2c3d\n"), out
+
+
 # A6 negative: missing-heading-refuses-names-it
 def test_missing_heading_refuses_names_it(tmp_path: Path, monkeypatch) -> None:
     def configure(calls: LandCalls) -> None:
