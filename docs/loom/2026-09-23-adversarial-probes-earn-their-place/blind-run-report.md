@@ -1,17 +1,31 @@
 # 讓每一個對抗測試程式都值得留下 — 我試了什麼、發生了什麼
 
-試跑日期 2026-09-23。第一輪在版本 `3b44e42b` 上，第二輪（複驗）在修正後的版本
-`6d622e70` 上，都是專案的乾淨副本，比對基準 `dbce4780`。我沒有參與這次修改的實作。
+試跑日期 2026-09-23，共三輪，都在專案的乾淨副本上，比對基準 `dbce4780`：
+第一輪 `3b44e42b`、第二輪 `6d622e70`、第三輪（本次，兩位收尾審查者提出的問題修完後）
+`c8223e91`。我沒有參與這次修改的實作。
 
-先講結論：**複驗後，十三條驗收條件全部成立。**
+先講結論：**十三條驗收條件全部成立，而且每一條都比前兩輪更嚴，沒有任何一條變弱。**
+整套專案測試在 `c8223e91` 上跑完是通過的（結束碼 0，loom-code 那一段 2223 項通過）。
 
-第一輪我找到三個問題，三個都已經修好，我也都親手重驗過：
+三輪下來，我自己找到的問題與後續處理：
 
-| 第一輪的問題 | 現況 |
+| 問題 | 現況 |
 |---|---|
-| 防止「最低數量」被寫回去的檢查，對英文有漏洞（影響第 8、9 條） | **已修好**，我把當初刪掉的那句英文原封不動貼回去，測試立刻紅了兩項 |
-| 這次自己留下的四個對抗程式沒有併進常跑測試（影響第 6 條） | **已完成**，四個都搬進常跑測試，共 10 項，實際跑過全通過 |
-| （第一輪沒發現）搬走之後反而卡死：驗證程序只肯接受還留在變更資料夾裡的程式 | **已修好**，現在兩個家都算數，我兩邊都試過 |
+| 防止「最低數量」被寫回去的檢查，對英文有漏洞（第 8、9 條） | 第二輪修好；第三輪又補了逗號與括號的情況，我重驗過 |
+| 這次留下的四個對抗程式沒併進常跑測試（第 6 條） | 第二輪完成，第三輪另外把「什麼時候以前要搬完」寫清楚了 |
+| 搬走之後驗證程序反而卡死 | 第二輪修好，兩個家都接受 |
+| 「最多五個」的上限，程式一搬家就不再被數 | **第三輪修好**：現在三個來源合起來算，搬過去的照樣佔名額 |
+
+第三輪另外修掉兩件我前兩輪沒試到的事：一個是「在看不到主幹的簡化簽出裡，
+一個動到程式碼的變更可以完全不跑對抗就產出驗收紀錄」，另一個是「沒有副檔名的
+可執行檔會被當成普通檔案」。兩件我都親手重現並確認已經擋住。
+
+**有一件事你要特別看**：這輪把產品原則第 2 條改了並重新簽署（`kouko 2026-09-23`）。
+改動的意思是：原本「品質由機器保證」只允許一個例外（你自己開口說跳過），
+現在正式允許第二個例外——機器自己判定變更夠小的時候，規格、計畫、盲跑、對抗
+四步一起跳過，而且**不會問你**。也就是說，被判定為小改動的變更，你不會收到盲跑報告，
+第三個人類確認點對那種變更就不存在了。文字與實際行為我都對過，一致；
+但這是「寫下來的保證變寬」，不是變嚴，值得你自己決定接不接受。
 
 剩下一個很小的殘留問題寫在最後的 findings 裡，不影響驗收。
 
@@ -33,6 +47,16 @@
 只要這次改動裡出現任何一個「會被執行的檔案」（程式、腳本、測試），或者刪掉了任何一個
 測試，就不算小改動。理由是：跳過對抗的正當性，來自「這次改動沒有任何會被執行的行為可以
 被打壞」。
+
+**第三輪再驗（`c8223e91`）：門檻又收緊了一次，沒有放寬。** 過去只看副檔名，所以一個
+沒有副檔名、但實際可以被執行的檔案（開頭寫了 `#!`，或者檔案權限標成可執行）會被當成
+普通文件，整個變更照樣算「小」。我做了一個只改一份說明文件、外加一支這種無副檔名
+可執行檔的變更：**舊版說「跳過規格、計畫、對抗、盲跑」，新版說「一步都不跳」**。
+我也試了三種變體確認判斷是對的——有 `#!` 的算程式、權限是可執行的算程式、
+兩者都沒有的純資料檔不算。
+
+- **第三輪證據**：同一個倉庫、同一個 commit，新舊兩版工具給出的跳步清單完全相反；
+  四個無副檔名檔案中有三個被認定為程式，第四個（純資料）沒有。
 
 ### 2. 這條界線有拿歷史紀錄重新檢查過，而且說明了結論
 
@@ -57,7 +81,23 @@
   減到五個就通過。我也翻過相關說明與程式碼，沒有任何「填一個理由就放行」的欄位或分支；
   說明文件明講「想多寫、或想整步跳過，用白話講一句就好」。
 - **證據**：兩次執行的輸出（一次被擋、一次通過並寫出驗證紀錄）。
-- **判定**：**成立**。
+- **前兩輪判定**：成立。
+
+**第三輪再驗（`c8223e91`）：上限真正咬得住了。** 第二輪結束時我寫過一個後果——
+程式一旦搬進常跑測試就不再被數，等於搬家可以繞過上限。這一輪把它補起來了：
+現在數的是三個來源的聯集——還留在變更資料夾裡的、驗證程序這次要執行的、
+以及這條分支直接放進常跑測試而且寫了「我防什麼」那一行的。我重做實驗：
+四個留在資料夾裡 ＋ 一個已搬家的 ＝ 五個，通過；再加一個變成六個，**被擋**，
+訊息明講是「（資料夾裡的、驗證要跑的、或已搬進常跑測試的）共 6 個，最多 5 個」。
+為了確認是那個「已搬家的」真的佔了名額，我把它那行「我防什麼」拿掉，
+它就不再被數，六個變回五個、又通過了。
+
+「最多五個」這個數字現在只有一個來源。我把那個數字改成 3 試跑，說明文件那一項檢查
+立刻紅了——代表文字和程式綁在一起，不會各說各話。
+
+- **第三輪證據**：五個通過／六個被擋的兩次輸出；拿掉那行後計數從 6 掉回 5；
+  把數字改成 3 之後 `test_protocol_states_the_ceiling_and_no_floor` 失敗。
+- **第三輪判定**：**成立**（比前兩輪嚴）。
 
 ### 4. 每個留下的程式都要寫一行「我防的是哪一類缺陷」，沒寫的會被機器擋掉
 
@@ -65,7 +105,14 @@
 - **發生了什麼**：立刻被擋，訊息點名是哪一個檔案、說它「前 20 行裡沒有那一行說明」。
   內容本身不限格式，只要不是空的就算。我也看了這次變更自己留下的四個程式，四個都寫了。
 - **證據**：被擋下的輸出；四個程式的開頭數行。
-- **判定**：**成立**。
+- **前兩輪判定**：成立。
+
+**第三輪再驗（`c8223e91`）：涵蓋範圍變大。** 這一行說明現在也綁得住無副檔名的
+可執行檔——我放了一支沒有副檔名、開頭是 `#!` 的程式進變更資料夾，沒寫那行說明，
+結果被擋，訊息點名就是它。過去這種檔案根本不會被看見。
+
+- **第三輪證據**：`…/evidence/probes/run carries no non-empty `concern:` line…` 的輸出。
+- **第三輪判定**：**成立**（比前兩輪嚴）。
 
 ### 5. 第 3、4 條由同一條新規則重算，規則清單剛好多一條，沒有舊規則被刪或改名
 
@@ -74,6 +121,9 @@
   沒有任何一條消失或換名字。倉庫裡也有一個測試在盯著「總數是 26」。
 - **證據**：兩份清單的比對結果（唯一差異：`> adversarial.proportionate`）。
 - **判定**：**成立**。
+
+**第三輪再驗（`c8223e91`）**：仍然是 26 條，編號沒變，只有那條規則的說明文字改寫得更準
+（現在說明白它是從三個來源的聯集重算）。清單比對結果與第一輪完全相同。
 
 ### 6. 抓到缺陷的程式要併進「以後每次都會跑」的測試裡，沒抓到的要說明並移除；這是審查站的規矩，不新增機器規則
 
@@ -92,6 +142,14 @@
 
 - **證據**：變更資料夾的檔案清單（已無程式）；`loom-code/scripts/test_adversarial_*.py`
   四個新檔；收集清單與 10 項全過的輸出；整套測試結束碼 0。
+
+**第三輪再驗（`c8223e91`）：規矩本身寫得更能照著做了。** 原本只說「在這一站結束前」搬完，
+現在明講截止點是「在跑出驗收紀錄那一步之前」，並且說清楚搬動要走回建置階段當成一項工作
+（審查站自己不搬檔案），搬完再回來。另外補上「什麼情況才會走到『刪掉』那一半」：
+因為現在只有打得動的攻擊才會留下程式，所以正常情況不會有沒抓到的程式，只有兩種例外
+會走到刪除。這些都讓照著做的人不必猜。
+
+- **第三輪證據**：審查站那段文字的新版本；仍然沒有為它新增任何機器規則（規則數仍是 26）。
 
 ### 7. 「更新程式要附突變證據」這個義務只針對已經併入常跑測試的程式，而且只寫在一個地方
 
@@ -131,7 +189,16 @@
 - **證據**：貼回英文原句後測試結果為「2 項失敗、110 項通過」，失敗的正是那兩項檢查；
   自編的四種下限寫法與五句控制句的掃描結果。
 - **複驗判定**：**成立**。
-  （殘留一個很小的情況：修飾語中間夾逗號或括號時仍讀不到，寫在最後的 findings 裡。）
+
+**第三輪再驗（`c8223e91`）：我上一輪留下的逗號／括號情況也補掉了。**
+「至少三個獨立、可執行的濫用案例」「至少三個簡短（可執行）的案例」
+「不少於兩個仔細撰寫、一寫就紅的測試程式」現在全部被讀成下限；
+五句不該被誤判的控制句仍然沒有被誤判，上限也還是被讀成上限。
+只剩一種把數量寫在句尾的寫法（「四個…測試程式，最少」這種倒裝，中間又夾逗號）
+還讀不到，我寫在最後的 findings 裡——比上一輪更窄，而且不是這次刪掉的那種寫法。
+
+- **第三輪證據**：十一句實測的掃描結果。
+- **第三輪判定**：**成立**（比第二輪嚴）。
 
 ### 9. 三份翻譯說明和倉庫慣例檔可以用自己的話重述，但有檢查會在它們跟唯一出處矛盾時擋下來
 
@@ -206,32 +273,75 @@
     「必須放在（這次變更的）`…/evidence/probes/` 底下，或者是一支常跑測試已經在跑的程式」。
 - **判定**：**兩半都成立**。
 
-有一個附帶結果你應該知道（這是這個決定本身帶來的，不是缺陷）：「最多五個」這個上限
-只數還留在變更資料夾裡的程式。程式一旦搬進常跑測試就不再被數——這正是規則文字給的理由：
-搬進去的東西已經受審查與每次執行的約束，不靠上限管。
+**第三輪更新**：我上面寫的那個附帶結果（搬過去就不再被數）在這一輪被補起來了，
+現在搬過去的照樣佔名額。詳見第 3 條。
+
+---
+
+## 第三輪多處理的三件事
+
+### 一、看不到主幹的簽出，不能再產出驗收紀錄
+
+- **問題**：有些自動化環境只抓一條分支下來，看不到主幹，因此算不出「這次改了哪些檔案」。
+  舊版在這種情況下會當作「所有可跳的步驟都跳了」，結果是：一個動到程式碼的變更，
+  在這種環境裡可以完全不跑對抗，照樣產出驗收紀錄。
+- **我怎麼試的**：做一個動到程式碼的變更，然後把它複製成一個看不到主幹的簽出，
+  提交一份「對抗結果：空的」的輸入，新舊兩版工具各跑一次。
+- **發生了什麼**：**舊版沒有擋**——它直接跳過對抗那一關，開始跑整套測試。
+  **新版擋下來**，訊息是「算不出這條分支改了哪些檔案，因此無法確定小改動會跳哪些步驟；
+  請在看得到主幹的環境裡做，或先把主幹抓下來」。同時，一般的（看得到主幹的）簽出
+  照樣能順利產出驗收紀錄——我也實跑確認過。
+- **判定**：**兩邊都成立**。
+
+### 二、產品原則第 2 條改了並重新簽署
+
+- **文字**：現在明講「只有兩種情況落在這個保證之外，而且只有這兩種」：
+  你用白話說要跳過，以及機器從這條分支實際改了哪些檔案證明變更夠小——後者會跳過
+  規格、計畫、盲跑、對抗四步，而且不問任何人。兩種跳過都必須寫在 PR 上。
+  簽署行末尾已加上 `kouko 2026-09-23`。
+- **行為對得上嗎**：對得上。自動跳過的就是那四步，不多不少；兩種跳過各自都有一行
+  規定要寫進 PR。
+- **判定**：**成立**。
+- **但這是把保證寫寬，不是寫嚴**。我在開頭已經提醒過：被判定為小改動的變更不會有
+  盲跑報告，你原本的第三個確認點對它不存在。文字裡有一處小出入：它說小改動的判定是
+  「決定審查人數的同一套計算」，實際上現在的小改動判定比那套計算再多兩道條件
+  （不能有會被執行的檔案、不能刪測試），是更嚴、不是相同。方向上不會讓你吃虧，
+  但字面不完全準確，我列在 findings。
+
+### 三、機制預算
+
+這個專案有一條自我約束：新增機制要有回歸測試，而且不能無故讓機制總數上升。
+這次新增兩個機制，總數從 138（上一版的紀錄數字）升到 140，變更紀錄裡寫了兩筆預算例外
+並各自指定了對應的測試。我實際跑了那支檢查：**輸出 140，結論 all clear**。
+
+- **判定**：**成立**。
 
 ---
 
 ## 審查摘要
 
-| 條件 | 第一輪 `3b44e42b` | 複驗 `6d622e70` |
-|---|---|---|
-| 1 小改動一併跳過對抗 | 成立 | 成立 |
-| 2 界線有拿歷史重新檢查 | 成立 | 成立（部分數字的原始資料不在倉庫，無法重算） |
-| 3 最多五個，沒有破例後門 | 成立 | 成立 |
-| 4 每個程式要寫防什麼 | 成立 | 成立 |
-| 5 只多一條機器規則 | 成立 | 成立（仍是 26 條，新增的只有那一條；規則說明文字有改，編號沒變） |
-| 6 有用的併入常跑測試，沒用的移除 | 成立（自己尚未照做） | **成立**（四支已搬入並確認會被跑到） |
-| 7 突變證據義務只寫一處、只管併入的程式 | 成立 | 成立 |
-| 8 不再有最低數量，且有檢查防止寫回 | 不成立 | **成立** |
-| 9 翻譯重述矛盾時會被擋 | 不成立 | **成立** |
-| 10 對抗執行的要求只有一段共用判斷 | 成立 | 成立 |
-| 11 跳步當場告知並列進 PR | 成立 | 成立（PR 尚未開，那一行本身仍看不到） |
-| 12 只留紅的程式，報告交代三個數字 | 成立 | 成立 |
-| 13 對抗分兩段跑 | 成立 | 成立 |
-| 附：搬家後的驗證死結 | 未發現 | **已解、兩半都驗過** |
+| 條件 | 一 `3b44e42b` | 二 `6d622e70` | 三 `c8223e91` |
+|---|---|---|---|
+| 1 小改動一併跳過對抗 | 成立 | 成立 | 成立（門檻再收緊，無副檔名可執行檔也算程式） |
+| 2 界線有拿歷史重新檢查 | 成立 | 成立 | 成立（部分數字的原始資料不在倉庫，無法重算） |
+| 3 最多五個，沒有破例後門 | 成立 | 成立 | 成立（改成三個來源聯集，搬家不再能繞過） |
+| 4 每個程式要寫防什麼 | 成立 | 成立 | 成立（也綁住無副檔名可執行檔） |
+| 5 只多一條機器規則 | 成立 | 成立 | 成立（仍 26 條，編號未變） |
+| 6 有用的併入常跑測試，沒用的移除 | 成立（自己尚未照做） | 成立 | 成立（截止點與走法都寫清楚了） |
+| 7 突變證據義務只寫一處、只管併入的程式 | 成立 | 成立 | 成立 |
+| 8 不再有最低數量，且有檢查防止寫回 | 不成立 | 成立 | 成立（逗號／括號也補掉） |
+| 9 翻譯重述矛盾時會被擋 | 不成立 | 成立 | 成立 |
+| 10 對抗執行的要求只有一段共用判斷 | 成立 | 成立 | 成立 |
+| 11 跳步當場告知並列進 PR | 成立 | 成立 | 成立（PR 尚未開，那一行本身仍看不到） |
+| 12 只留紅的程式，報告交代三個數字 | 成立 | 成立 | 成立 |
+| 13 對抗分兩段跑 | 成立 | 成立 | 成立 |
+| 附：搬家後的驗證死結 | 未發現 | 已解 | 成立 |
+| 附：看不到主幹的簽出可以免跑對抗 | 未試到 | 未試到 | **已解、兩邊都驗過** |
+| 附：產品原則第 2 條的兩個例外 | — | — | 成立（但保證是寫寬了，見上文） |
+| 附：機制預算 | — | — | 成立（140，all clear） |
 
-另外，整套專案測試在複驗用的乾淨副本上跑完是通過的（結束碼 0），第一輪時也是通過。
+**沒有任何一條比前一輪弱。** 整套專案測試在第三輪的乾淨副本上跑完是通過的
+（結束碼 0，loom-code 那一段 2223 項通過），前兩輪也都是通過。
 
 ## 英文撰寫規定的逐項檢查
 
@@ -257,7 +367,7 @@
 
 ## 對你既有的資料做了什麼
 
-沒有。兩輪盲跑全程都在專案的乾淨副本、以及幾個丟棄用的小倉庫裡進行，沒有碰到你機器上
+沒有。三輪盲跑全程都在專案的乾淨副本、以及幾個丟棄用的小倉庫裡進行，沒有碰到你機器上
 的任何既有資料。這次變更本身也不搬動、不改寫你已經有的東西：它只改了說明文字、檢查程式，
 新增一條規則，並把自己產生的四支對抗程式從變更資料夾搬進常跑測試。過去變更留下的對抗
 程式依規定原地不動——我確認過那四支搬動只發生在這次變更自己的資料夾裡。
@@ -268,17 +378,24 @@
   自己動手就量不到了。修正是別人做的，我複驗。
 - **界線檢討文件裡的統計我只查了能查的部分**。原始試算表不在倉庫裡，我選擇說「無法重算」
   而不是照抄它的數字。如果你要那些百分比有人獨立驗過，得另外把試算表放進來。
-- **複驗時我沒有只跑現成的測試**。防線修好了，現成測試當然會綠；所以我另外自己編了
-  四種下限寫法和五句不該被誤判的控制句去試，因為「測試通過」和「這道防線真的擋得住」
-  是兩件事。也正是這樣才找到最後那個逗號的殘留情況。
+- **每一輪我都沒有只跑現成的測試**。防線修好了，現成測試當然會綠；所以我每次都另外
+  自己編寫法去試，因為「測試通過」和「這道防線真的擋得住」是兩件事。三輪各自都靠
+  這個方式找到一個現成測試沒蓋到的情況。
+- **第三輪我用新舊兩版工具跑同一個倉庫做對照**。光看新版擋住了，證明不了舊版擋不住；
+  兩版跑同一份材料，差別才是證據。「看不到主幹的簽出」和「無副檔名可執行檔」兩件事
+  都是這樣確認的。
+- **產品原則那條我判成立，但把「保證變寬」單獨講出來**。從驗收角度看，文字與行為一致，
+  就是成立；但一條保證多了一個例外，對你的意義和多了一道檢查是相反的，所以我沒有
+  把它藏在「成立」兩個字裡。
 - **沒有審查者的發現被駁回**。我沒有收到任何需要在這裡揭露的「被判定為重要卻被駁回」的
   項目。
 
 ## 我不確定你要不要的事
 
-- 最後那個殘留情況（修飾語中間夾逗號或括號時，下限讀不到）要現在補，還是記下來？
-  這次修正已經把最現實的寫法都蓋住了，剩下的是「至少三個獨立、可執行的濫用案例」
-  這種帶逗號的句子。補法很小，但同樣會動到核心防線，由你決定。
+- 產品原則第 2 條現在允許「機器自己決定不問你就跳過四步」。你接受嗎？這是整份變更裡
+  唯一一件會直接改變你看得到什麼的事：小改動不再有盲跑報告。
+- 最後那個殘留寫法（把數量倒裝寫在句尾、中間又夾逗號）要現在補，還是記下來？
+  這次已經把正常語序的寫法都蓋住了，剩下的相當罕見。補法很小，但會動到核心防線。
 - 這次變更的資料夾裡找不到計畫文件。如果計畫是你當初用白話說可以跳過的，那沒問題；
   如果不是，那是一份應該存在卻不見的紀錄。
 - PR 還沒開，所以「小改動時被跳掉的步驟真的寫進 PR 了」這件事，要等 PR 開出來才看得到。
@@ -286,6 +403,13 @@
 ---
 
 ## findings
+
+### 已於 `c8223e91` 關閉
+
+- severity: nit — **closed by 937e39de's follow-up in c8223e91, re-verified**
+  anchor: `loom-code/scripts/test_adversary_protocol.py` — `_INNER_MARKUP`
+  text: "issue (non-blocking): the head scan stopped at a comma or a parenthesis inside the noun phrase."
+  fix: "done — `_INNER_MARKUP` now also skips `,`, `(`, `)`, `\"` and `'`. Re-verified: `at least three separate, independent, executable abuse cases`, `at least three short (executable) cases` and `a minimum of two carefully-written, red-first probe programs` all read as floors, while the five reviewer/mutation/digest controls stay unflagged and the ceiling still reads as a cap."
 
 ### 已於 `6d622e70` 關閉
 
@@ -302,9 +426,19 @@
 ### 仍然開著
 
 - severity: nit
-  anchor: `loom-code/scripts/test_adversary_protocol.py` — `_head_is_a_case`, `_INNER_MARKUP`
-  text: "issue (non-blocking): the widened head scan stops at a comma or a parenthesis inside the noun phrase, because `_INNER_MARKUP` strips only whitespace and emphasis. `at least three separate, independent, executable abuse cases` and `at least three short (executable) cases` are read as no count at all; `at least three executable and self-contained boundary cases` is read correctly. Much narrower than the closed finding — the wording this change actually removed is now refused — but a natural English floor can still hide behind a comma."
-  fix: "let the head scan skip over `,` and bracket characters as it already skips emphasis, counting only word tokens against `_HEAD_WORDS`; keep `_PHRASE_END` so the reviewer and mutation controls stay unflagged."
+  anchor: `loom-code/scripts/test_adversary_protocol.py` — `_COUNT_RE`, the `post_en` / `post` branches
+  text: "issue (non-blocking): the trailing-bound forms still miss when punctuation or more than three words separate the number from the bound word, because that alternative requires `\\b<num>\\b(?:\\s+<word>){0,3}\\s+(minimum|maximum)` with no punctuation allowed. `four well-scoped, clearly named probe programs minimum`, `three separate, independent abuse cases minimum` and `five short, focused probe programs maximum` are read as no count; `four well-scoped probe programs minimum` is read correctly. The CJK `以上`/`以下` branch is tighter still — it wants the bound word right after the number. Far narrower than the closed findings, and not the word order the removed wording used."
+  fix: "allow punctuation and a wider word budget between the number and the trailing bound word, reusing the same `_head_is_a_case` phrase walk the leading form now uses, so one notion of 'the number's own phrase' serves both branches."
+
+- severity: nit
+  anchor: `loom-code/scripts/loom_checker/probes.py` — `graduated_probe_programs`
+  text: "praise/question (non-blocking): counting a graduated program only when it carries a `concern:` line is deliberate and documented, but it is also the one remaining way past the ceiling: a change may graduate any number of probe programs without the line, and only the one finalize-review executes is counted. Verified in a fixture — removing the line took the count from 6 back to 5 and the change passed."
+  fix: "nothing, if the intent is that a line-less graduate is an ordinary test answerable to reviewers; otherwise count every branch-added program under a suite-collected path and let the `concern:` check, not the count, be what the line governs."
+
+- severity: nit
+  anchor: `PRINCIPLES.md` — non-negotiable 2
+  text: "issue (non-blocking): the amended clause glosses the narrow-delta skip as 'the same computation that sets the reviewer floor'. It is not the same computation: `is_narrow_delta` delegates to `reviewer_floor_for_paths` and then adds two further conditions (no executed file, no deleted test), which this change's own boundary evidence states as 'narrowness is strictly stronger than reviewer floor 1'. The gloss errs toward under-skipping, so no guarantee is overstated, but the sentence is not true as written."
+  fix: "say 'the computation that sets the reviewer floor, plus a test that the delta carries no executed file and deletes no test' — or drop the appositive."
 
 - severity: nit
   anchor: `docs/loom/2026-09-23-adversarial-probes-earn-their-place/`
