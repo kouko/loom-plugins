@@ -134,7 +134,6 @@ after the plain words when the user needs the name:
 - lane
 - attestation
 - probe
-- independent acceptance testing
 - temporary names the agent coined during the work
 - file names and function names
 
