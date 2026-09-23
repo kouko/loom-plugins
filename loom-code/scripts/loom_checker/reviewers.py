@@ -178,6 +178,14 @@ def auto_skipped_steps(
     a single-branch CI clone validating an attestation finalize already
     wrote — into a refusal of evidence that was correct when it was made.
     An empty but readable delta is a different fact and stays not narrow.
+
+    That permissive answer is only ever correct for a caller re-reading
+    evidence that already exists and is bound to the commit's content, which
+    is `attestation.validate_attestation` and nothing else. The caller that
+    MAKES the evidence, `finalize-review`, refuses an unreadable delta before
+    it ever reaches this function: there, "cannot tell" read as "everything
+    is skipped" let a change touching production code finalize with no
+    adversarial execution at all.
     """
     delta = committed_branch_delta(repo, change_id, head_sha)
     if delta is None:

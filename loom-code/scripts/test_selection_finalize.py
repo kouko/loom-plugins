@@ -193,6 +193,39 @@ def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> 
     ) == []
 
 
+def trunkless_clone(origin: Path, tmp_path: Path, branch: str = "feature") -> Path:
+    """The same commit, cloned the way CI fetches one branch: no trunk, so
+    the committed delta cannot be recomputed at all."""
+    clone = tmp_path / "clone"
+    subprocess.run(
+        ["git", "clone", "-q", "--single-branch", "--branch", branch, "--no-tags",
+         str(origin), str(clone)],
+        capture_output=True, text=True, check=True,
+    )
+    git(clone, "remote", "remove", "origin")
+    return clone
+
+
+def test_finalize_refuses_a_wide_delta_whose_delta_cannot_be_read(tmp_path: Path) -> None:
+    """Finalize MAKES the evidence, so it may not read "cannot tell" as "every
+    step is skipped". A checkout that resolves no trunk cannot know the delta
+    is wide, and the permissive reading let a change touching production code
+    finalize with no adversarial execution at all."""
+    origin = make_repo(tmp_path)
+    clone = trunkless_clone(origin, tmp_path)
+    # Precondition: the delta really is unreadable here, and really is wide there.
+    from loom_checker.reviewers import committed_branch_delta
+
+    assert committed_branch_delta(clone, CHANGE) is None
+    assert committed_branch_delta(origin, CHANGE)[0] == {"feature.py"}
+
+    refused = finalize(clone, review_input(tmp_path, PASSING, []))
+
+    assert refused.returncode == 1, refused.stdout
+    assert "finalize.delta" in refused.stderr
+    assert not (clone / f"docs/loom/{CHANGE}/attestation.json").exists()
+
+
 def test_finalize_and_attestation_refuse_alike_with_one_message(tmp_path: Path) -> None:
     """Acceptance 10: one predicate, one message, both call sites."""
     from loom_checker.probes import missing_adversarial_execution

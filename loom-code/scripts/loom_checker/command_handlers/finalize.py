@@ -5,6 +5,7 @@ from loom_checker.attestation import ATTESTATION_SCHEMA
 from loom_checker.attestation import _command_digest
 from loom_checker.attestation import selection_evidence
 from loom_checker.digest import functional_content_digest
+from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import git_maybe
@@ -25,6 +26,7 @@ from loom_checker.probes import missing_adversarial_execution
 from loom_checker.probes import probe_directory
 from loom_checker.probes import suite_collects
 from loom_checker.reviewers import auto_skipped_steps
+from loom_checker.reviewers import committed_branch_delta
 from loom_checker.reviewers import required_reviewer_count
 from pathlib import Path
 import json
@@ -87,6 +89,20 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     status_before = git_text(repo, "status", "--porcelain")
     if status_before:
         return [("finalize.clean-tree", "commit functional content before finalizing review")]
+    if committed_branch_delta(repo, change_id, head_sha) is None:
+        # `auto_skipped_steps` answers "every auto-skippable step is skipped"
+        # when the delta cannot be recomputed, and that permissive reading is
+        # correct exactly once: in `attestation.py`, re-validating evidence
+        # that already exists and is bound to the commit's content. Here the
+        # evidence does not exist yet — finalize is making it — so the same
+        # answer would let a change that touches production code waive the
+        # adversarial step by being finalized in a checkout that cannot see
+        # the trunk. Finalize therefore fails closed, and says why.
+        return [("finalize.delta",
+                 "cannot recompute this branch's committed delta, so which "
+                 "steps a narrow change would skip cannot be established; "
+                 "finalize review in a checkout that resolves the trunk "
+                 f"({', '.join(sorted(TRUNK_BRANCH_NAMES))}), or fetch it")]
     manifest = load_manifest()
     bound = selection_evidence(repo, change_id, manifest)
     skip = set(bound["skip"]) if bound else set()
