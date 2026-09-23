@@ -1,12 +1,19 @@
 # 讓每一個對抗測試程式都值得留下 — 我試了什麼、發生了什麼
 
-試跑日期 2026-09-23，在專案的一份乾淨副本上，版本 `3b44e42b`（比對基準 `dbce4780`）。
-我沒有參與這次修改的實作。
+試跑日期 2026-09-23。第一輪在版本 `3b44e42b` 上，第二輪（複驗）在修正後的版本
+`6d622e70` 上，都是專案的乾淨副本，比對基準 `dbce4780`。我沒有參與這次修改的實作。
 
-先講結論：**十三條驗收條件裡，十一條成立，兩條不成立**。不成立的兩條是同一個原因 ——
-用來「防止有人把已經刪掉的最低數量規定寫回去」的那道檢查，在英文句子裡只要數字和名詞
-之間夾了一個形容詞就看不見了，而這次變更自己刪掉的那句英文，正好就是這個形狀。我把它
-原封不動貼回說明文件，整套測試仍然全綠。
+先講結論：**複驗後，十三條驗收條件全部成立。**
+
+第一輪我找到三個問題，三個都已經修好，我也都親手重驗過：
+
+| 第一輪的問題 | 現況 |
+|---|---|
+| 防止「最低數量」被寫回去的檢查，對英文有漏洞（影響第 8、9 條） | **已修好**，我把當初刪掉的那句英文原封不動貼回去，測試立刻紅了兩項 |
+| 這次自己留下的四個對抗程式沒有併進常跑測試（影響第 6 條） | **已完成**，四個都搬進常跑測試，共 10 項，實際跑過全通過 |
+| （第一輪沒發現）搬走之後反而卡死：驗證程序只肯接受還留在變更資料夾裡的程式 | **已修好**，現在兩個家都算數，我兩邊都試過 |
+
+剩下一個很小的殘留問題寫在最後的 findings 裡，不影響驗收。
 
 ---
 
@@ -75,12 +82,16 @@
 - **發生了什麼**：文字兩半都在，而且說明了「從建置階段交接的紀錄讀每個程式的結果，
   沒給結果的一律當成沒抓到」。倉庫裡有一個測試在盯著這段文字。
 - **證據**：審查站的那段文字與盯著它的測試。
-- **判定**：**成立**（規矩本身已經就位）。
-  **但這次變更自己還沒照做**：它留下的四個程式仍然只躺在這次變更的資料夾裡，
-  不在「以後每次都會跑」的那套測試裡——我確認過那套測試不會收集那個資料夾。
-  依這四個程式自己寫的說明，它們描述的問題後來都有對應的修正，也就是說它們是「有抓到」
-  的那一類，照規矩應該要被併進去。這件事必須在這次審查結束前完成，否則這條規矩在它
-  自己身上第一次就沒有生效。
+- **判定**：**成立**。
+
+**複驗（`6d622e70`）**：第一輪我指出「規矩就位，但這次變更自己還沒照做」。現在做完了。
+四個程式都已經搬進常跑測試那個資料夾，改名為 `test_adversarial_*.py`；這次變更的資料夾
+底下已經沒有任何對抗程式，只剩那份界線檢討文件和這份報告。我用專案自己的測試指令確認
+它們**真的會被收集到**（四個檔案共 10 項測試都出現在收集清單裡），單獨跑 10 項全過，
+整套 loom 家族測試跑完也是通過（結束碼 0）。
+
+- **證據**：變更資料夾的檔案清單（已無程式）；`loom-code/scripts/test_adversarial_*.py`
+  四個新檔；收集清單與 10 項全過的輸出；整套測試結束碼 0。
 
 ### 7. 「更新程式要附突變證據」這個義務只針對已經併入常跑測試的程式，而且只寫在一個地方
 
@@ -104,7 +115,23 @@
 - **證據**：貼回英文原句後測試 112 項全綠；直接餵句子給那段掃描程式，
   「write at least three cases」會被抓到，「write at least three executable abuse or
   boundary cases」不會。
-- **判定**：**不成立**（前兩半成立，防止寫回來的那道檢查對英文有漏洞）。
+- **第一輪判定**：不成立。
+
+**複驗（`6d622e70`）**：修好了。現在那段掃描會沿著數字後面的修飾語一路往下讀，
+直到讀到「案例／程式」之類的名詞，或讀到一個表示「這個數字不是在數它」的字
+（冠詞、介系詞、助動詞）為止。我重做同一個試探：把當初刪掉的那句英文原封不動貼回
+英文說明，測試立刻紅了兩項（「沒有任何地方寫最低數量」和「重述不得與唯一出處矛盾」），
+訊息明確指出是哪一份檔案、讀到的是「下限 3」。我又自己另外編了四種寫法測試：
+「不少於兩個仔細撰寫的對抗測試程式」「最少四個簡短的可執行邊界案例」「三個或更多
+獨立的濫用案例」「三個可執行的濫用或邊界測試案例」——全部都被讀成下限。原本不該被
+誤判的控制句也都沒有被誤判（「至少兩位審查者閱讀那些程式」「每一種改動至少一個突變」
+「至少一位審查者重跑每一個程式」「至多三個不同的摘要」等），上限「最多五個」仍然被
+正確讀成上限。
+
+- **證據**：貼回英文原句後測試結果為「2 項失敗、110 項通過」，失敗的正是那兩項檢查；
+  自編的四種下限寫法與五句控制句的掃描結果。
+- **複驗判定**：**成立**。
+  （殘留一個很小的情況：修飾語中間夾逗號或括號時仍讀不到，寫在最後的 findings 裡。）
 
 ### 9. 三份翻譯說明和倉庫慣例檔可以用自己的話重述，但有檢查會在它們跟唯一出處矛盾時擋下來
 
@@ -113,7 +140,13 @@
   而且中文、日文的矛盾寫法都抓得到。但它跟第 8 條用的是**同一段掃描程式**，所以同一個
   英文漏洞照樣存在：英文說明可以被改回矛盾的內容而不被發現。
 - **證據**：同第 8 條。
-- **判定**：**不成立**（涵蓋範圍正確，但英文的矛盾攔不住）。
+- **第一輪判定**：不成立。
+
+**複驗（`6d622e70`）**：跟第 8 條一起修好了，因為它們共用同一段掃描。我把矛盾的英文
+內容貼回英文說明後，「重述不得與唯一出處矛盾」這一項確實紅了，訊息點名是英文說明、
+讀到的是「下限 3」。
+
+- **複驗判定**：**成立**。
 
 ### 10. 「至少要記錄一次對抗執行」由同一段共用判斷計算，不再是兩份說法不同的複本
 
@@ -155,25 +188,50 @@
 
 ---
 
+## 複驗時多處理的一件事：搬家之後差點卡死
+
+這件事第一輪我沒看到，是修第 6 條時冒出來的，值得你知道，因為它是一個「兩條規則各自
+合理、湊在一起就走不通」的情況。
+
+- **問題**：第 6 條要求把有用的對抗程式搬進常跑測試，搬走之後變更資料夾就空了；
+  但驗證程序當時規定「對抗程式必須放在變更資料夾裡」才肯執行它。兩邊一夾，
+  照規矩做完第 6 條的變更就再也產不出驗收紀錄——等於做對事反而被擋。
+- **你的決定**：讓驗證程序接受兩個家——還在變更資料夾裡的，或是已經被常跑測試收走的。
+  理由是後者根本不需要那個上限來管：它已經是一支每次都跑、審查者也會讀的正式測試。
+- **我怎麼驗的**：在丟棄用的倉庫裡兩邊都試。
+  - **已搬家的程式**：指定一支已經在常跑測試裡的程式當作對抗證據 → **接受**，
+    驗收紀錄順利寫出，裡面同時記了整套測試和那支程式，兩筆都是通過。
+  - **兩邊都不在的程式**：我另外放一支在專案原始碼資料夾裡（既不在變更資料夾，
+    常跑測試也不會收） → **被擋**，訊息同時點出兩個合法的家：
+    「必須放在（這次變更的）`…/evidence/probes/` 底下，或者是一支常跑測試已經在跑的程式」。
+- **判定**：**兩半都成立**。
+
+有一個附帶結果你應該知道（這是這個決定本身帶來的，不是缺陷）：「最多五個」這個上限
+只數還留在變更資料夾裡的程式。程式一旦搬進常跑測試就不再被數——這正是規則文字給的理由：
+搬進去的東西已經受審查與每次執行的約束，不靠上限管。
+
+---
+
 ## 審查摘要
 
-| 條件 | 判定 |
-|---|---|
-| 1 小改動一併跳過對抗 | 成立 |
-| 2 界線有拿歷史重新檢查 | 成立（部分數字的原始資料不在倉庫，無法重算） |
-| 3 最多五個，沒有破例後門 | 成立 |
-| 4 每個程式要寫防什麼 | 成立 |
-| 5 只多一條機器規則 | 成立 |
-| 6 有用的併入常跑測試，沒用的移除 | 成立（規矩就位；這次變更自己尚未照做） |
-| 7 突變證據義務只寫一處、只管併入的程式 | 成立 |
-| 8 不再有最低數量，且有檢查防止寫回 | **不成立** |
-| 9 翻譯重述矛盾時會被擋 | **不成立** |
-| 10 對抗執行的要求只有一段共用判斷 | 成立 |
-| 11 跳步當場告知並列進 PR | 成立 |
-| 12 只留紅的程式，報告交代三個數字 | 成立 |
-| 13 對抗分兩段跑 | 成立 |
+| 條件 | 第一輪 `3b44e42b` | 複驗 `6d622e70` |
+|---|---|---|
+| 1 小改動一併跳過對抗 | 成立 | 成立 |
+| 2 界線有拿歷史重新檢查 | 成立 | 成立（部分數字的原始資料不在倉庫，無法重算） |
+| 3 最多五個，沒有破例後門 | 成立 | 成立 |
+| 4 每個程式要寫防什麼 | 成立 | 成立 |
+| 5 只多一條機器規則 | 成立 | 成立（仍是 26 條，新增的只有那一條；規則說明文字有改，編號沒變） |
+| 6 有用的併入常跑測試，沒用的移除 | 成立（自己尚未照做） | **成立**（四支已搬入並確認會被跑到） |
+| 7 突變證據義務只寫一處、只管併入的程式 | 成立 | 成立 |
+| 8 不再有最低數量，且有檢查防止寫回 | 不成立 | **成立** |
+| 9 翻譯重述矛盾時會被擋 | 不成立 | **成立** |
+| 10 對抗執行的要求只有一段共用判斷 | 成立 | 成立 |
+| 11 跳步當場告知並列進 PR | 成立 | 成立（PR 尚未開，那一行本身仍看不到） |
+| 12 只留紅的程式，報告交代三個數字 | 成立 | 成立 |
+| 13 對抗分兩段跑 | 成立 | 成立 |
+| 附：搬家後的驗證死結 | 未發現 | **已解、兩半都驗過** |
 
-另外，整套專案測試在這份乾淨副本上跑完是通過的（由驗證指令自己執行並記錄）。
+另外，整套專案測試在複驗用的乾淨副本上跑完是通過的（結束碼 0），第一輪時也是通過。
 
 ## 英文撰寫規定的逐項檢查
 
@@ -183,12 +241,12 @@
 |---|---|---|---|
 | 意圖書 | 是（只在引述你的原話時保留中文） | 無 | `docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md` |
 | 規格 | 不適用（這次不需要規格） | EARS `REQ-<n>` 規定不適用 | 意圖書 `needs-design: no` |
-| 計畫 | **找不到** | — | `docs/loom/2026-09-23-adversarial-probes-earn-their-place/` 下只有 `evidence/` |
+| 計畫 | **找不到** | — | 這次變更的資料夾底下只有證據文件與本報告，沒有計畫 |
 | 審查發現 | 是（本報告下方的發現以英文標籤書寫） | Conventional Comments 標籤：符合 | 本報告「findings」 |
 | 證據文件 | 是 | 無 | `.../evidence/narrow-delta-boundary.md` |
-| 測試說明文字 | 是 | 無 | 四支程式的開頭說明與 docstring |
+| 測試說明文字 | 是 | 無 | 四支已搬入常跑測試的程式，開頭說明與 docstring 都是英文 |
 | 測試名稱 | 是 | **三段式 `test_<unit>_<state>_<expected>`：多數不符** | 例如 `test_five_probe_programs_pass_and_a_sixth_is_refused`——可讀，但不是三段式 |
-| 提交訊息 | 是 | 無 | 19 筆提交訊息全為英文 |
+| 提交訊息 | 是 | 無 | 22 筆提交訊息全為英文（含複驗前的三筆修正） |
 
 測試名稱那一列值得你知道：這次新增的測試名字是完整的句子（「五個程式通過而第六個被拒絕」），
 讀起來清楚，但不是規定的三段式寫法。整個倉庫本來就是這種風格，所以這不是這次變更帶進來的。
@@ -199,45 +257,54 @@
 
 ## 對你既有的資料做了什麼
 
-沒有。這次盲跑全程在專案的一份乾淨副本、以及兩個丟棄用的小倉庫裡進行，沒有碰到你機器上
+沒有。兩輪盲跑全程都在專案的乾淨副本、以及幾個丟棄用的小倉庫裡進行，沒有碰到你機器上
 的任何既有資料。這次變更本身也不搬動、不改寫你已經有的東西：它只改了說明文字、檢查程式，
-以及新增一條規則；過去變更留下的對抗程式依規定原地不動。唯一會被它「刪掉」的東西，是
-**這次變更自己**留下、而且沒抓到任何缺陷的對抗程式（見第 6 條）。
+新增一條規則，並把自己產生的四支對抗程式從變更資料夾搬進常跑測試。過去變更留下的對抗
+程式依規定原地不動——我確認過那四支搬動只發生在這次變更自己的資料夾裡。
 
 ## 我替你決定的事
 
-- **不成立的兩條我沒有去修**。盲跑的規矩是照交付的樣子量，修了就量不到了。
+- **第一輪不成立的兩條我沒有自己去修**，只寫成發現交回去。盲跑的規矩是照交付的樣子量，
+  自己動手就量不到了。修正是別人做的，我複驗。
 - **界線檢討文件裡的統計我只查了能查的部分**。原始試算表不在倉庫裡，我選擇說「無法重算」
   而不是照抄它的數字。如果你要那些百分比有人獨立驗過，得另外把試算表放進來。
-- **第 6 條我判成立，但把「這次變更自己還沒照做」獨立寫出來**。另一種寫法是直接判不成立。
-  我選擇分開講，因為「規矩有沒有寫好」和「這次有沒有照做」是兩件事，前者已經完成，
-  後者是這次審查結束前還要做的動作。
+- **複驗時我沒有只跑現成的測試**。防線修好了，現成測試當然會綠；所以我另外自己編了
+  四種下限寫法和五句不該被誤判的控制句去試，因為「測試通過」和「這道防線真的擋得住」
+  是兩件事。也正是這樣才找到最後那個逗號的殘留情況。
 - **沒有審查者的發現被駁回**。我沒有收到任何需要在這裡揭露的「被判定為重要卻被駁回」的
   項目。
 
 ## 我不確定你要不要的事
 
-- 第 8、9 條那個英文漏洞要現在補，還是記下來下次處理？補法很小：判斷「這個數字在數什麼」
-  時，不要只看緊接著的那一個字。但那是修改一支測試檔的邏輯，會動到這次變更的核心防線，
-  由你決定要不要在這次一起做。
-- 第 6 條要求把有用的對抗程式併進常跑測試。這次的四個要全部併進去，還是只併其中幾個？
-  依它們自己寫的說明，四個描述的問題後來都有對應修正，看起來四個都該併。
+- 最後那個殘留情況（修飾語中間夾逗號或括號時，下限讀不到）要現在補，還是記下來？
+  這次修正已經把最現實的寫法都蓋住了，剩下的是「至少三個獨立、可執行的濫用案例」
+  這種帶逗號的句子。補法很小，但同樣會動到核心防線，由你決定。
 - 這次變更的資料夾裡找不到計畫文件。如果計畫是你當初用白話說可以跳過的，那沒問題；
   如果不是，那是一份應該存在卻不見的紀錄。
+- PR 還沒開，所以「小改動時被跳掉的步驟真的寫進 PR 了」這件事，要等 PR 開出來才看得到。
 
 ---
 
 ## findings
 
-- severity: important
-  anchor: `loom-code/scripts/test_adversary_protocol.py` — `_head_is_a_case` / `case_counts`
-  text: "issue (blocking): the guard that Acceptance 8 and 9 rest on reads only the word immediately after the number as the counted noun, so any adjective between them hides the floor. Restoring this change's own deleted English wording to `loom-code/README.md` (`at least three executable abuse and boundary cases`) leaves all 112 tests green; the Chinese and Japanese equivalents are caught."
-  fix: "read the number's head across intervening modifiers up to the first noun, or match a case noun anywhere in the number's own clause; keep the existing controls so the fix is not a loosening."
+### 已於 `6d622e70` 關閉
 
-- severity: important
+- severity: important — **closed by 937e39de, re-verified**
+  anchor: `loom-code/scripts/test_adversary_protocol.py` — `_head_is_a_case` / `case_counts`
+  text: "issue (blocking): the guard that Acceptance 8 and 9 rest on read only the word immediately after the number as the counted noun, so any adjective between them hid the floor. Restoring this change's own deleted English wording to `loom-code/README.md` left all 112 tests green."
+  fix: "done — the head is now read across intervening modifiers until a case noun or a phrase-ending word. Re-verified: the same paste-back now fails `test_no_runtime_prose_states_a_minimum_case_count` and `test_no_restatement_contradicts_the_source` (2 failed, 110 passed), four invented floor wordings are read as floors, and the reviewer/mutation controls are still not flagged."
+
+- severity: important — **closed by 68c98635, re-verified**
   anchor: `docs/loom/2026-09-23-adversarial-probes-earn-their-place/evidence/probes/`
-  text: "issue (non-blocking for the rule, blocking for this change): Acceptance 6's station rule is in place and pinned by a test, but this change's own four probe programs are still only in the change store. `scripts/run_package_tests.py` collects `loom-code/scripts/`, `scripts/`, `.claude/hooks/` and the other plugin trees — not `docs/loom/<change-id>/evidence/probes/` — so none of them runs on a later change."
-  fix: "graduate the programs whose attack succeeded into the package suite through a plan task before this station finishes, and name and delete any that caught nothing."
+  text: "issue (blocking for this change): Acceptance 6's station rule was in place but this change's own four probe programs were still only in the change store, which the package suite never collects."
+  fix: "done — graduated to `loom-code/scripts/test_adversarial_{auto_skip_portability,case_count_scan,narrow_delta_waiver,probe_cap_coverage}.py`. Re-verified: 10 test functions collected by the suite's own command, 10 passed, `run_package_tests.py --loom-family` exits 0, and the change store holds no program."
+
+### 仍然開著
+
+- severity: nit
+  anchor: `loom-code/scripts/test_adversary_protocol.py` — `_head_is_a_case`, `_INNER_MARKUP`
+  text: "issue (non-blocking): the widened head scan stops at a comma or a parenthesis inside the noun phrase, because `_INNER_MARKUP` strips only whitespace and emphasis. `at least three separate, independent, executable abuse cases` and `at least three short (executable) cases` are read as no count at all; `at least three executable and self-contained boundary cases` is read correctly. Much narrower than the closed finding — the wording this change actually removed is now refused — but a natural English floor can still hide behind a comma."
+  fix: "let the head scan skip over `,` and bracket characters as it already skips emphasis, counting only word tokens against `_HEAD_WORDS`; keep `_PHRASE_END` so the reviewer and mutation controls stay unflagged."
 
 - severity: nit
   anchor: `docs/loom/2026-09-23-adversarial-probes-earn-their-place/`
