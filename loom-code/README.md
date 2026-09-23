@@ -8,7 +8,7 @@
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.10.0 · **Skills**: 5 stations + 1 router + 1 user-invoked · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.11.0 · **Skills**: 5 stations + 1 router + 1 user-invoked · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
