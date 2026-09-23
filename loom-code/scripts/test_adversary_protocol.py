@@ -608,26 +608,56 @@ _NUMBERS = {
 }
 _NUM = r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|[一二三四五六七八九十])"
 _BOUND_BEFORE = {
-    "at least": FLOOR_BOUND, "no fewer than": FLOOR_BOUND, "至少": FLOOR_BOUND,
-    "≥": FLOOR_BOUND, "at most": CAP_BOUND, "no more than": CAP_BOUND,
-    "up to": CAP_BOUND, "至多": CAP_BOUND, "最多": CAP_BOUND, "≤": CAP_BOUND,
+    "at least": FLOOR_BOUND, "no fewer than": FLOOR_BOUND,
+    "not fewer than": FLOOR_BOUND, "a minimum of": FLOOR_BOUND,
+    "至少": FLOOR_BOUND, "≥": FLOOR_BOUND,
+    "at most": CAP_BOUND, "no more than": CAP_BOUND, "not more than": CAP_BOUND,
+    "a maximum of": CAP_BOUND, "up to": CAP_BOUND,
+    "至多": CAP_BOUND, "最多": CAP_BOUND, "≤": CAP_BOUND,
 }
 _BOUND_AFTER = {"以上": FLOOR_BOUND, "以下": CAP_BOUND}
+# English states a bound after the number too, and puts it after the noun as
+# often as before it ("three or more cases", "three probe programs minimum").
+_BOUND_AFTER_EN = {
+    "or more": FLOOR_BOUND, "or greater": FLOOR_BOUND, "minimum": FLOOR_BOUND,
+    "or fewer": CAP_BOUND, "or less": CAP_BOUND, "maximum": CAP_BOUND,
+}
 _COUNT_RE = re.compile(
     rf"(?P<pre>{'|'.join(_BOUND_BEFORE)})\s*\**\s*(?P<n1>{_NUM})"
-    rf"|(?P<n2>{_NUM})\s*(?:つ|個|件|の)?\s*(?P<post>{'|'.join(_BOUND_AFTER)})",
+    rf"|(?P<n2>{_NUM})\s*(?:つ|個|件|の)?\s*(?P<post>{'|'.join(_BOUND_AFTER)})"
+    rf"|\b(?P<n3>{_NUM})\b(?:\s+[A-Za-z][\w-]*){{0,3}}"
+    rf"\s+(?P<post_en>{'|'.join(_BOUND_AFTER_EN)})\b",
     re.IGNORECASE,
 )
 # What the number has to be counting for the match to be this rule and not
-# another one: an adversarial case, probe or program. It is looked for beside
-# the number, not anywhere in the paragraph -- "at least one mutation per kind
-# of change" sits in a paragraph about probe programs and counts mutations,
-# and a table row's number belongs to its own row. The window reaches further
-# forward than back because English and Chinese put the noun after the number
-# ("at least three cases", "至少三個案例") and Japanese puts it before
-# ("境界ケース 3 つ以上").
+# another one: an adversarial case, probe or program. The noun has to be the
+# number's own head, not merely nearby -- "at least one mutation per kind of
+# change" sits in a paragraph about probe programs and counts mutations, and
+# "at least two reviewers read the probe programs" counts readers. English and
+# Chinese put the head after the number, Japanese before it.
 _CASE_NOUN = re.compile(r"\bcases?\b|\bprobes?\b|\bprograms?\b|ケース|案例", re.IGNORECASE)
+_CJK = re.compile(r"[぀-ヿ㐀-鿿]")
+_LEADING_MARKUP = " \t*_`\"'()[]:,"
 _BACK, _FORWARD = 12, 60
+
+
+def _head_is_a_case(text: str) -> bool:
+    """True when the noun the number counts, at the start of `text`, is a case.
+
+    In English the head noun follows the number immediately, once markdown
+    emphasis is stripped: "three cases", "five probe programs". So the first
+    word decides, and "two reviewers", "three distinct digests" or "one
+    mutation" decide against. Chinese and Japanese put a classifier and any
+    modifiers between the number and its head, with no word boundary to split
+    on ("三個可執行的邊界案例"), so a CJK run is read as a whole instead.
+    """
+    rest = text.lstrip(_LEADING_MARKUP)
+    if not rest:
+        return False
+    if _CJK.match(rest):
+        return bool(_CASE_NOUN.search(rest[:_FORWARD]))
+    word = re.match(r"[A-Za-z][\w-]*", rest)
+    return bool(word and _CASE_NOUN.fullmatch(word.group()))
 
 
 def _number(token: str) -> int:
@@ -651,13 +681,28 @@ def case_counts(text: str) -> set[tuple[str, int]]:
     found: set[tuple[str, int]] = set()
     for unit in _units(text):
         for match in _COUNT_RE.finditer(unit):
-            window = unit[max(0, match.start() - _BACK):match.end() + _FORWARD]
-            if not _CASE_NOUN.search(window):
-                continue
             if match.group("pre"):
+                if not _head_is_a_case(unit[match.end():]):
+                    continue
                 found.add((_BOUND_BEFORE[match.group("pre").lower()], _number(match.group("n1"))))
-            else:
+            elif match.group("post"):
+                behind = unit[max(0, match.start() - _BACK):match.start()]
+                if not (_CASE_NOUN.search(behind) or _head_is_a_case(unit[match.end():])):
+                    continue
                 found.add((_BOUND_AFTER[match.group("post")], _number(match.group("n2"))))
+            else:
+                # The head sits either between the number and the bound word
+                # ("three probe programs minimum") or after it ("three or
+                # more cases").
+                if not (
+                    _head_is_a_case(unit[match.end("n3"):])
+                    or _head_is_a_case(unit[match.end():])
+                ):
+                    continue
+                found.add((
+                    _BOUND_AFTER_EN[match.group("post_en").lower()],
+                    _number(match.group("n3")),
+                ))
     return found
 
 
@@ -690,6 +735,13 @@ def test_case_counts_reads_every_wording_synthetic() -> None:
     assert case_counts("≥3 個可執行的邊界案例") == {(FLOOR_BOUND, 3)}
     assert case_counts("a change commits at most five probe programs") == {(CAP_BOUND, 5)}
     assert case_counts("at most four cases") == {(CAP_BOUND, 4)}
+    # Plain English states the same floor without the phrase "at least".
+    assert case_counts("write three or more cases") == {(FLOOR_BOUND, 3)}
+    assert case_counts("a minimum of three cases") == {(FLOOR_BOUND, 3)}
+    assert case_counts("write not fewer than three cases") == {(FLOOR_BOUND, 3)}
+    assert case_counts("three probe programs minimum") == {(FLOOR_BOUND, 3)}
+    assert case_counts("a maximum of five probe programs") == {(CAP_BOUND, 5)}
+    assert case_counts("five probe programs maximum") == {(CAP_BOUND, 5)}
 
 
 def test_case_counts_ignores_a_count_of_something_else_synthetic() -> None:
@@ -703,6 +755,12 @@ def test_case_counts_ignores_a_count_of_something_else_synthetic() -> None:
     # A table row's number belongs to its own row, not to the row above it.
     table = "| **read** | ≥2 fresh-context reviewers | verdict |\n| **attack** | cases |\n"
     assert case_counts(table) == set()
+    # The number's head noun decides, not whatever noun follows within a
+    # window: these count readers, and say nothing about how many cases.
+    assert case_counts("at least two reviewers read the probe programs") == set()
+    assert case_counts(
+        "at least one reviewer re-runs every probe program of the change"
+    ) == set()
 
 
 def test_body_and_frontmatter_helpers_synthetic() -> None:
