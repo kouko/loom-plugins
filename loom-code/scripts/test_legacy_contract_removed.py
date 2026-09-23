@@ -18,7 +18,10 @@ MANIFEST = ROOT / "loom-code/contract/manifest.yaml"
 RETIRED_STEP_NAME = re.compile(
     r"blind[-_\s‐-―]*run(?:ner)?|" + "盲" + "跑", re.IGNORECASE
 )
-RUNTIME_TREES = ("loom-code/", "loom-design/", "loom-workflow/")
+RUNTIME_TREES = (
+    "loom-code/", "loom-design/", "loom-workflow/",
+    "scripts/", ".claude/", ".claude-plugin/", ".github/",
+)
 RUNTIME_FILES = (
     "README.md", "AGENTS.md", "PRINCIPLES.md", "docs/loom/README.md",
     "docs/loom/evidence/mechanisms.yaml",
@@ -81,6 +84,11 @@ def test_retired_step_name_helper_near_miss_spellings() -> None:
     ratified = f"{RATIFIED_BY_PREFIX} kouko; {word}_run"
     assert retired_step_names("PRINCIPLES.md", ratified) == []
     assert retired_step_names("x.md", f"{FORMER_NAME_PHRASE}\n{word}_run") == ["x.md:2"]
+
+
+def test_retired_name_scan_covers_the_root_tooling_trees() -> None:
+    for tree in ("scripts/", ".claude/", ".claude-plugin/", ".github/"):
+        assert tree in RUNTIME_TREES, tree
 
 
 def test_no_runtime_file_names_the_retired_step_name() -> None:
