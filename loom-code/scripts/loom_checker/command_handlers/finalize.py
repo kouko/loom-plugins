@@ -127,10 +127,6 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     missing = missing_adversarial_execution(len(adversarial), skip)
     if missing:
         return [("finalize.adversarial", missing)]
-    proportionate = check_adversarial_proportionate(repo, head_sha, change_id)
-    if proportionate:
-        return proportionate
-
     config_before = git_text(repo, "config", "--list", "--null")
     work: list[tuple[str, str, str]] = []
     if "package-tests" not in skip:
@@ -164,6 +160,16 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
                      f"{probe_directory(change_id)} or be a program the "
                      f"package suite already runs")]
         work.append(("adversarial", command, artifact))
+
+    # Every artifact is now in a legal home, so the cap can count them: what
+    # finalize-review is about to execute is this change's adversarial output
+    # wherever graduation has since moved it.
+    proportionate = check_adversarial_proportionate(
+        repo, head_sha, change_id,
+        [artifact for kind, _command, artifact in work if kind == "adversarial"],
+    )
+    if proportionate:
+        return proportionate
 
     executions: list[dict] = []
     for kind, command, artifact in work:

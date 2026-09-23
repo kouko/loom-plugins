@@ -2,20 +2,26 @@ from __future__ import annotations
 
 import sys
 
+from loom_checker.probes import MAX_PROBE_PROGRAMS
+
 
 RULES: list[tuple[str, str]] = [
     (
         "adversarial.proportionate",
-        "A change commits at most five adversarial probe programs, and every one "
-        "of them carries a non-empty `concern:` line in its first lines naming the "
-        "kind of defect it defends against. Both halves are recomputed at "
-        "finalize-review over every program the selected commit holds anywhere in "
-        "the change's store, whatever its extension; a program committed outside "
-        "the change's `evidence/probes/` directory is refused rather than left "
-        "uncounted. finalize-review runs an adversarial artifact only from that "
-        "directory or from the package suite the repository declares -- a "
-        "graduated program, which every later change runs and reviewers read, "
-        "so leaving the store escapes neither the cap nor review.",
+        f"A change produces at most {MAX_PROBE_PROGRAMS} adversarial probe "
+        "programs, and every one of them carries a non-empty `concern:` line in "
+        "its first lines naming the kind of defect it defends against. Both "
+        "halves are recomputed at finalize-review over the union of three sets, "
+        "because no one of them is the whole of what the step produced: the "
+        "programs the selected commit holds anywhere in the change's store, "
+        "whatever their extension; the programs finalize-review is about to "
+        "execute; and the programs this branch adds straight into the package "
+        "suite the repository declares, which the `concern:` line marks as the "
+        "adversary's output rather than ordinary new tests. A graduated program "
+        "therefore still spends against the ceiling, which reading the store "
+        "alone could not see, since the graduation gate empties that directory "
+        "first. A program committed elsewhere in the change's store, outside its "
+        "`evidence/probes/` directory, is refused rather than left uncounted.",
     ),
     (
         "contract.requires",

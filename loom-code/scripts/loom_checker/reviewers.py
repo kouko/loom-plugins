@@ -111,8 +111,8 @@ def is_narrow_delta(
 
 def committed_branch_delta(
     repo: Path, change_id: str, head_sha: str | None = None
-) -> tuple[set[str], set[str]] | None:
-    """The committed branch delta as (all paths, removed paths), or None.
+) -> tuple[set[str], set[str], set[str]] | None:
+    """The committed branch delta as (all paths, removed, added), or None.
 
     This is the single path source for every rule that reasons about the
     branch's committed content: the reviewer floor, the auto-skip list, and
@@ -139,19 +139,23 @@ def committed_branch_delta(
     except (OSError, UsageError):
         current = git_maybe(repo, "rev-parse", "--abbrev-ref", "HEAD") or ""
         if current in TRUNK_BRANCH_NAMES or current == "HEAD":
-            return set(), set()
+            return set(), set(), set()
         return None
     paths: set[str] = set()
     removed: set[str] = set()
+    added: set[str] = set()
     for line in status.splitlines():
         code, _, name = line.partition("\t")
         name = name.strip()
         if not name or _is_host_plumbing(name):
             continue
         paths.add(name)
-        if code.strip().upper().startswith("D"):
+        letter = code.strip().upper()[:1]
+        if letter == "D":
             removed.add(name)
-    return paths, removed
+        elif letter == "A":
+            added.add(name)
+    return paths, removed, added
 
 
 def committed_branch_paths(
@@ -190,7 +194,7 @@ def auto_skipped_steps(
     delta = committed_branch_delta(repo, change_id, head_sha)
     if delta is None:
         return set(_NARROW_AUTO_SKIP_STEPS)
-    paths, removed = delta
+    paths, removed, _added = delta
     return set(_NARROW_AUTO_SKIP_STEPS) if is_narrow_delta(paths, change_id, removed) else set()
 
 
@@ -206,5 +210,5 @@ def required_reviewer_count(
     delta = committed_branch_delta(repo, change_id, head_sha)
     if delta is None:
         return 2
-    paths, removed = delta
+    paths, removed, _added = delta
     return reviewer_floor_for_paths(paths, change_id, removed)

@@ -315,7 +315,7 @@ def test_a_shell_probe_program_counts_against_the_cap(tmp_path: Path) -> None:
 
     assert refused.returncode == 1
     assert "BLOCK adversarial.proportionate" in refused.stderr
-    assert "6 committed probe programs" in refused.stderr
+    assert "6 probe programs" in refused.stderr
 
 
 def test_a_program_in_the_store_outside_the_probe_directory_is_refused(
@@ -396,6 +396,97 @@ def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
     assert [run["artifact"] for run in executions if run["kind"] == "adversarial"] == [
         graduated
     ]
+
+
+def graduate_many(repo: Path, count: int, concern: bool = True) -> list[str]:
+    """Commit `count` graduated probe programs where the runner collects them."""
+    names = [f"test_graduated_{index}.py" for index in range(count)]
+    for name in names:
+        graduate(repo, name)
+    if not concern:
+        for name in names:
+            path = repo / "loom-code/scripts" / name
+            path.write_text(
+                "def test_graduated() -> None:\n    assert True\n", encoding="utf-8"
+            )
+        commit_all(repo, "ordinary tests, not the adversary's output")
+    return [f"loom-code/scripts/{name}" for name in names]
+
+
+def test_a_graduated_program_spends_against_the_cap(tmp_path: Path) -> None:
+    """Graduation empties the change's store, so counting only that store
+    counted zero however many programs the change actually committed. A
+    program that leaves the store for the suite still spends against the
+    ceiling."""
+    repo = make_repo(tmp_path)
+    graduated = graduate_many(repo, MAX_PROBE_PROGRAMS)
+    assert not (repo / f"docs/loom/{CHANGE}/evidence/probes").exists()
+
+    accepted = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated[0]}", "artifact": graduated[0]}],
+    ))
+    assert accepted.returncode == 0, accepted.stderr
+
+    graduate(repo, "test_graduated_one_too_many.py")
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated[0]}", "artifact": graduated[0]}],
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert f"{MAX_PROBE_PROGRAMS + 1} " in refused.stderr
+
+
+def test_an_executed_artifact_outside_the_store_spends_against_the_cap(
+    tmp_path: Path,
+) -> None:
+    """What finalize-review is about to run is the adversary's output whether
+    or not the tree still holds it under the store."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, MAX_PROBE_PROGRAMS)
+    graduated = graduate(repo, "test_graduated_extra.py")
+
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated}", "artifact": graduated}],
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert f"{MAX_PROBE_PROGRAMS + 1} " in refused.stderr
+
+
+def test_an_ordinary_new_test_does_not_spend_against_the_cap(tmp_path: Path) -> None:
+    """The `concern:` line is what makes a suite file the adversary's output.
+    A change that adds six ordinary tests adds no probe programs."""
+    repo = make_repo(tmp_path)
+    graduate_many(repo, MAX_PROBE_PROGRAMS + 1, concern=False)
+    write_probes(repo, 1)
+
+    accepted = run_with_probes(repo, tmp_path)
+
+    assert accepted.returncode == 0, accepted.stderr
+
+
+def test_a_graduated_program_without_a_concern_line_is_refused_when_executed(
+    tmp_path: Path,
+) -> None:
+    """Executing it is the claim that it is a probe, so it answers for the
+    `concern:` line wherever it now lives."""
+    repo = make_repo(tmp_path)
+    graduated = graduate_many(repo, 1, concern=False)[0]
+
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated}", "artifact": graduated}],
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert "concern:" in refused.stderr
+    assert graduated in refused.stderr
 
 
 def test_a_file_the_suite_never_collects_is_still_refused(tmp_path: Path) -> None:

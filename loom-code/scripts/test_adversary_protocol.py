@@ -23,6 +23,7 @@ import pytest
 # The readers and the two matchers are `prose_pin`'s, under this module's own
 # names: every recipe's test module and `test_build_mechanical_checks.py`
 # carried byte-identical copies of them.
+from loom_checker.probes import MAX_PROBE_PROGRAMS
 from prose_pin import (
     affirms as _affirms,
     flat_prose as _flat,
@@ -767,7 +768,10 @@ def test_protocol_opening_and_recording_name_build_and_finalize() -> None:
 # "3 つ以上", "至多五個") rather than a pinned sentence, because a restatement
 # is free to reword everything except the number it states.
 
-CAP = 5
+# The number itself has one source: the checker recomputes the ceiling from
+# `MAX_PROBE_PROGRAMS`, so the prose is held to that constant rather than to a
+# second copy of it written here.
+CAP = MAX_PROBE_PROGRAMS
 FLOOR_BOUND, CAP_BOUND = "floor", "cap"
 
 SKILLS = ROOT / "loom-code/skills"
