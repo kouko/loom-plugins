@@ -11,8 +11,13 @@ ROOT = Path(__file__).resolve().parents[2]
 CHECKER = ROOT / "loom-code/scripts/loom_checker.py"
 MANIFEST = ROOT / "loom-code/contract/manifest.yaml"
 
-# The acceptance-test step's retired name, in its id, agent and prose forms.
-RETIRED_STEP_NAME = re.compile(r"blind[- ]run(?:ner)?", re.IGNORECASE)
+# The acceptance-test step's retired name, in its id, agent and prose forms:
+# any run of `-`, `_`, whitespace (a line break and a non-breaking space
+# included) or a Unicode dash between the two words, none for the camel form,
+# and the Chinese term.
+RETIRED_STEP_NAME = re.compile(
+    r"blind[-_\s‐-―]*run(?:ner)?|" + "盲" + "跑", re.IGNORECASE
+)
 RUNTIME_TREES = ("loom-code/", "loom-design/", "loom-workflow/")
 RUNTIME_FILES = (
     "README.md", "AGENTS.md", "PRINCIPLES.md", "docs/loom/README.md",
@@ -26,13 +31,22 @@ RATIFIED_BY_PREFIX = "ratified-by:"
 
 
 def retired_step_names(path: str, text: str) -> list[str]:
-    """Each `path:line` that names the step by its retired name."""
+    """Each `path:line` that names the step by its retired name.
+
+    The exempt spans are blanked line by line, then the whole text is searched,
+    so a name split by a hard wrap is reported on the line where it starts.
+    """
+    masked = [
+        "" if path == "PRINCIPLES.md" and line.startswith(RATIFIED_BY_PREFIX)
+        else line.replace(FORMER_NAME_PHRASE, "")
+        for line in text.splitlines()
+    ]
+    joined = "\n".join(masked)
     hits = []
-    for number, line in enumerate(text.splitlines(), 1):
-        if path == "PRINCIPLES.md" and line.startswith(RATIFIED_BY_PREFIX):
-            continue
-        if RETIRED_STEP_NAME.search(line.replace(FORMER_NAME_PHRASE, "")):
-            hits.append(f"{path}:{number}")
+    for match in RETIRED_STEP_NAME.finditer(joined):
+        hit = f"{path}:{joined.count(chr(10), 0, match.start()) + 1}"
+        if hit not in hits:
+            hits.append(hit)
     return hits
 
 
@@ -45,6 +59,28 @@ def test_retired_step_name_helper_synthetic() -> None:
     ratified = f"{RATIFIED_BY_PREFIX} kouko; {old}"
     assert retired_step_names("PRINCIPLES.md", ratified) == []
     assert retired_step_names("README.md", ratified) == ["README.md:1"]
+
+
+def test_retired_step_name_helper_near_miss_spellings() -> None:
+    word = "blind"
+    for text in (
+        f"{word}_run_report: x",          # identifier / YAML key
+        f"a {word}–run",             # en dash
+        f"a {word} run",             # non-breaking space
+        f"a {word}\t run",                # several whitespace characters
+        f"{word.capitalize()}Runner()",   # camel form, no separator
+        f"{word.upper()}_RUNNER",
+        "③" + "盲" + "跑報告",             # the Chinese term
+    ):
+        assert retired_step_names("x.md", text) == ["x.md:1"], text
+    wrapped = f"intro\nwhen a {word}\nrun is needed"
+    assert retired_step_names("x.md", wrapped) == ["x.md:2"]
+    # Exemptions stay exact, and a split string literal is not a spelling.
+    assert retired_step_names("x.md", '"' + word + '" + "-run"') == []
+    assert retired_step_names("x.md", f"{word} judging, {word} test") == []
+    ratified = f"{RATIFIED_BY_PREFIX} kouko; {word}_run"
+    assert retired_step_names("PRINCIPLES.md", ratified) == []
+    assert retired_step_names("x.md", f"{FORMER_NAME_PHRASE}\n{word}_run") == ["x.md:2"]
 
 
 def test_no_runtime_file_names_the_retired_step_name() -> None:
