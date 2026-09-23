@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[5]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "loom-code" / "scripts"))
 
 from test_adversary_protocol import CAP_BOUND  # noqa: E402
@@ -30,6 +30,9 @@ FLOORS_IN_PLAIN_ENGLISH = (
     "a minimum of three cases",
     "write not fewer than three cases",
     "three probe programs minimum",
+    # The wording this change deleted from the READMEs, which a blind run
+    # pasted back with the whole suite green: one adjective hides the floor.
+    "at least three executable abuse and boundary cases",
 )
 
 # Sentences that state no bound on the number of cases at all.
