@@ -1,15 +1,13 @@
-"""Adversarial probe: the root README's loom-workflow section states a stale version.
+"""The root README's `## loom-workflow` version line equals loom-workflow/plugin.json's version.
 
 concern: a release bump that updates the plugin manifests and the README table
 but leaves a second version pin in the same README, so the published overview
 tells readers two different versions of one plugin.
 
-This change bumps loom-workflow to the version its three manifests carry. The
-root README states that version twice: once in the plugin table (pinned by
-`loom-workflow/scripts/test_release_metadata.py`) and once as the first line of
-its `## loom-workflow` section, which no test reads. The loom-code section's
-line has its own pin in `test_write_plan_station_text.py`; the loom-workflow
-one has none, and the bump left it behind.
+The root README states loom-workflow's version twice: in the plugin table,
+which `loom-workflow/scripts/test_release_metadata.py` pins, and as the first
+line of its `## loom-workflow` section, which this test pins to the version in
+`loom-workflow/plugin.json`.
 """
 
 from __future__ import annotations
