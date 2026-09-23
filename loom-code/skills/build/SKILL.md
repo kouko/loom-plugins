@@ -66,6 +66,16 @@ is unavailable, stop and report the blocker. Unless `implementer` is skipped
 the main agent must not substitute itself as implementer. An implementation agent never acts as its own closing
 reviewer.
 
+Before any fix is handed to an implementer, whatever found the defect (the
+adversary, acceptance testing, a reviewer or a failing check), the main agent
+names the defect's class and searches the change's own delta
+(`git diff <base>...HEAD`) for other instances of it, together with every
+surface named by the Acceptance line the finding maps to, when it maps to one.
+The search reaches no further than that delta and those surfaces. The fix
+hand-off lists every instance found, the flagged one included, and the
+hand-off and the fix's commit message each state the class and the places
+searched, even when the flagged instance is the only one found.
+
 Internal plans, commits, and verification evidence are written in English.
 
 ## 3. Verify integration
