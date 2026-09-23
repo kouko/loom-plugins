@@ -218,9 +218,11 @@ the user's plain-words instruction), run no acceptance testing.
 The acceptance tester leaves the full package suite to `finalize-review`: a
 criterion the suite settles cites the suite command, which `finalize-review`
 executes and refuses the attestation on failure. Its setup check from a
-clean copy runs every time. After a fix, re-dispatch it to re-test only the
-criteria the fix could affect, each in full over every surface its
-Acceptance line names, never only the part the fix touched; every other row
+clean copy runs every time. A re-dispatch after a fix passes the earlier
+report and evidence file paths and the fix's commit range, which the tester
+checks each carried-over reason against. After a fix, re-dispatch it to
+re-test only the criteria the fix could affect, each in full over every
+surface its Acceptance line names, never only the part the fix touched; every other row
 is carried over with a one-line reason in the template's Re-run column.
 
 Closing review dispatches no adversary and creates no adversarial program.

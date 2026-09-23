@@ -84,12 +84,27 @@ def test_evidence_file_shape_is_given_and_is_plain_markdown():
     assert re.search(r"never[^\n]*`#!`", text), "template does not forbid `#!` evidence"
 
 
+COLUMNS = ["#", "What you asked for", "Verdict", "What happened", "Re-run"]
+# A row cell that reads as evidence: a code span or a command, command
+# output, or a source location. Placeholders such as "<one plain sentence>"
+# match none of these.
+EVIDENCE_IN_CELL = re.compile(
+    r"`|evidence|command|file:line"
+    r"|\b(?:python3?|pytest|npm|pnpm|uv|git|bash)\b"
+    r"|\b\d+ (?:passed|failed|errors?)\b|\bexit(?:ed)? (?:code|status)\b"
+    r"|\btraceback\b|\bstdout\b|\bstderr\b"
+    r"|[\w./-]+\.\w+:\d+",
+    re.I,
+)
+
+
 def test_template_row_carries_no_how_or_evidence_cell():
     header, rows = _criterion_table()
     banned = re.compile(r"how|evidence|command|tried|output|proof", re.I)
     assert not [h for h in header if banned.search(h)], header
+    assert header == COLUMNS, f"criteria table columns are {header}, not {COLUMNS}"
     for row in rows:
-        assert not [c for c in row if re.search(r"evidence|command|file:line", c, re.I)], row
+        assert not [c for c in row if EVIDENCE_IN_CELL.search(c)], row
     report = _report_block()
     assert "**How I tried it**" not in report
     assert "**Evidence**" not in report
@@ -155,16 +170,42 @@ def test_suite_criterion_cites_finalize_review_command():
     assert "`finalize-review` executes" in section
 
 
+RUN_VERB = re.compile(r"\b(?:run|runs|running|execute|executes|executing|invoke|invokes)\b", re.I)
+WHOLE_TARGET = re.compile(
+    r"\b(?:package|whole|full|complete|entire)\s+(?:package\s+)?(?:suite|package)\b", re.I
+)
+NEGATED_VERB = re.compile(r"\b(?:not|never|no|cannot)\b|n't", re.I)
+OTHER_RUNNER = re.compile(r"finalize-review|\bBuild\b|\bchecker\b")
+
+
+def _full_suite_instructions(sentences: list[str]) -> list[str]:
+    """Sentences with a clause that runs the whole package's tests, not negated.
+
+    Only the words just before the run verb decide: "Never run the full
+    package suite" is exempt, while "Run the full package suite first,
+    unless it is not installed" is not -- its negation sits in another
+    clause. A clause whose runner is `finalize-review`, Build or the
+    checker is a statement about them, not an instruction to the tester.
+    """
+    offending = []
+    for sentence in sentences:
+        for clause in re.split(r"[,:;—]", sentence):
+            verb = RUN_VERB.search(clause)
+            if not verb or not WHOLE_TARGET.search(clause, verb.end()):
+                continue
+            before = " ".join(clause[: verb.start()].split()[-3:])
+            if NEGATED_VERB.search(before) or OTHER_RUNNER.search(before):
+                continue
+            offending.append(sentence)
+            break
+    return offending
+
+
 def test_no_full_suite_run_instruction():
     """A1 negative: nothing tells the tester to run the whole suite."""
     flat = flat_prose(TESTER)
     assert "the name of a test you ran" not in flat, "evidence wording still invites named tests"
-    run_suite = re.compile(r"\brun\w*\b[^.;]*\b(?:package|whole|full|complete) suite\b", re.I)
-    offending = [
-        s for s in _tester()
-        if run_suite.search(s) and not has_negation(s)
-        and "Build and `finalize-review` run the package suite" not in s
-    ]
+    offending = _full_suite_instructions(_tester())
     assert offending == [], offending
     assert [s for s in _tester() if "full package suite" in s and has_negation(s)], (
         "tester contract does not forbid running the full package suite"
@@ -187,7 +228,24 @@ def test_partial_surface_retest_forbidden():
     assert touched, "tester contract does not name the partial re-test trap"
     assert all(has_negation(s) for s in touched), touched
     section = [s for s in split_sentences(" ".join(_section3().split())) if "the part the fix touched" in s]
+    assert section, "§3 does not name the partial re-test trap"
     assert all(has_negation(s) for s in section), section
+
+
+def test_rerun_dispatch_passes_earlier_report_evidence_and_fix_range():
+    """A re-run gets what step 7 needs to check each carried-over reason."""
+    phrases = ("earlier report", "evidence file", "commit range")
+    assert _affirmed(_tester(), *phrases), "tester contract does not list the re-run inputs"
+    assert _affirmed(split_sentences(" ".join(_section3().split())), "re-dispatch", *phrases), (
+        "§3 does not pass the re-run inputs"
+    )
+
+
+def test_identifiers_confined_to_evidence_file_apart_from_pointer():
+    """The report's one path is the line pointing to the evidence file."""
+    assert _affirmed(
+        _tester(), "Identifiers appear only in the evidence file", "the one line that points to it"
+    )
 
 
 def test_rules_live_in_contract_and_template():

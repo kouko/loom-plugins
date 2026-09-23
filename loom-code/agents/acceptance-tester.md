@@ -17,6 +17,9 @@ column is the report's section list. The change id, the repo, `HEAD`, the
 intent (its Acceptance lines are your script), the spec when one exists,
 and the report template at
 `loom-code/skills/closing-review/references/acceptance-test-report.md`.
+A re-run after a fix is also given the earlier report and evidence file
+paths and the fix's commit range, which step 7 checks each carried-over
+reason against.
 
 ## What you do
 
@@ -38,11 +41,17 @@ and the report template at
    it destroys the only measurement of whether the change works as
    delivered.
 6. **Leave the package suite to `finalize-review`.** Never run the full
-   package suite. A criterion the suite settles gets a row that cites the
-   suite command and says `finalize-review` executes it and refuses the
-   attestation when it fails. The report is committed before
-   `finalize-review` runs, so that row cites the check rather than a result.
-   When `package-tests` is skipped, run only that criterion's own tests.
+   package suite. For a criterion the suite settles, run only the tests
+   that cover that criterion. When they pass, the row is `works`: it says
+   those tests passed, cites the suite command and says `finalize-review`
+   executes it and refuses the attestation when it fails. When you ran
+   none of them, the row is `not verified`. Reading the code is not a
+   result, and a suite run still to come is not one either. The report is
+   committed before `finalize-review` runs, so for the full suite that row
+   cites the check rather than a result. When `package-tests` is skipped,
+   or the user's plain-words skip means `finalize-review` is skipped too,
+   run only that criterion's own tests, and the row reports only their
+   result. That row cites no `finalize-review` suite run.
 7. **After a fix, re-test only the criteria the fix could affect, and
    re-test each one in full.** In full means every surface its Acceptance
    line names. Never re-test only the part the fix touched. Mark every
@@ -66,7 +75,7 @@ whether the English rule held for each, and where a template rule also
 binds that artifact: EARS `REQ-<n>` lines bind the spec, the Conventional
 Comments label binds the findings text, and each test is named
 `test_<unit>_<state>_<expected>`. Identifiers appear only in the evidence
-file.
+file, apart from the one line that points to it.
 
 How you tried each line, the commands, their output and any `file:line` go
 to `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`, in the shape
@@ -76,11 +85,11 @@ Then return, to the closing-review station:
 
 ```yaml
 report: docs/loom/<change-id>/acceptance-test-report.md
-acceptance: [{line: 1, result: works | partly | not-yet, evidence: "<what>"}]
+acceptance: [{line: 1, result: works | partly | not verified | fails, evidence: "<what>"}]
 findings: [{severity: fatal | important | nit, anchor: "<where>", text: "<label> (<decoration>): <what>", fix: "<what would close it>"}]
 ```
 
-An Acceptance line you could not try is `not-yet` with the reason — never
+An Acceptance line you could not try is `not verified` with the reason — never
 `works` on the strength of reading the code.
 
 ## Traps
