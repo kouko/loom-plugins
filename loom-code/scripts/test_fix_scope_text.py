@@ -1,6 +1,10 @@
 """Every fix is scoped to its defect's class before hand-off (plan W0-01;
 intent 2026-09-24-fix-the-whole-class Acceptance 1, 2 and 4).
 
+concern: false-green prose pin — a bare-substring pin passed a rule that was
+negated or handed to the wrong actor, so each rule sentence is pinned with
+`affirms` (actor before literal, no negation); graduated adversary probe.
+
 The rule lives in Build §2 only; closing-review and Ship carry one-sentence
 pointers, and the implementer contract accepts a multi-file fix hand-off.
 """
@@ -35,6 +39,11 @@ RECORD_PIN = (
     "the hand-off and the fix's commit message each state the class and the places searched",
     "even when the flagged instance is the only one found",
 )
+WEAKENED = (
+    ("lists every instance found", "never lists every instance found"),
+    ("even when the flagged", "but not even when the flagged"),
+    ("the main agent names", "the implementer names"),
+)
 
 
 def test_rule_names_class_search_and_acceptance_surfaces() -> None:
@@ -42,12 +51,15 @@ def test_rule_names_class_search_and_acceptance_surfaces() -> None:
     assert affirms(RULE, *BOUND_PIN)
 
 
-def test_record_states_class_and_places_searched() -> None:
-    assert affirms(RULE, *RECORD_PIN[:3])
-
-
-def test_none_found_still_recorded() -> None:
+def test_record_states_class_and_places_searched_even_when_none_found() -> None:
     assert affirms(RULE, *RECORD_PIN)
+
+
+def test_weakened_rule_fails_the_pins() -> None:
+    for old, new in WEAKENED:
+        weakened = RULE.replace(old, new, 1)
+        assert weakened != RULE, old
+        assert not (affirms(weakened, *SEARCH_PIN) and affirms(weakened, *RECORD_PIN)), new
 
 
 def test_pointers_reach_every_fix_path() -> None:
@@ -60,16 +72,12 @@ def test_pointers_reach_every_fix_path() -> None:
     assert "never silently widen the work" in IMPLEMENTER
 
 
-def test_no_gate_marker_and_rule_count_26() -> None:
+def test_no_gate_marker_rule_count_26_or_dispatch_wording() -> None:
     assert "<!-- gate" not in SECTION_2
     rules = subprocess.run(
         [sys.executable, str(CODE / "scripts/loom_checker.py"), "--list-rules"],
         capture_output=True, text=True, check=True,
     ).stdout.splitlines()
     assert len(rules) == 26
-
-
-def test_no_new_dispatch_wording() -> None:
-    assert RULE
     for word in ("dispatch", "subagent", "new step", "extra step"):
         assert word not in RULE, word
