@@ -82,7 +82,7 @@ repository's development records under `docs/`.
 |---|---|---|
 | **讀** | ≥2 個 fresh-context reviewer，按型別選鏡頭（code 11 維／docs 5 維／spec-conformance／design-conformance／principles-conformance） | verdict → generated attestation |
 | **盲跑** | 乾淨環境照 intent 的 Acceptance 逐條試，寫成使用者看得懂的盲跑報告 | 報告 ＋ `probes[]` |
-| **對抗** | mutation／fuzz，或對抗 agent 自寫 ≥3 個可執行的 abuse／邊界案例並逐筆自跑 | `probes[]`（`kind: adversarial`） |
+| **對抗** | mutation／fuzz，或對抗 agent 自寫可執行的 abuse／邊界案例並逐筆自跑 | `probes[]`（`kind: adversarial`） |
 
 - 對抗跑在 build 站結尾；讀與盲跑跑在 **checkpoint review**（review 站）上；三者都不是逐 task 三臂審查；寫的人不能自己驗
 - 決定性的閘只有一支 **checker**：`python3 loom-code/scripts/loom_checker.py --list-rules`

@@ -11,9 +11,9 @@ changed modules and report survivors: a surviving mutant is a test that
 asserts nothing, and a finding against `tests`.
 
 **If it declares none** (the common case), write executable abuse or boundary
-cases against the changed behaviour, run them, and record each one. How many
-of them a change needs, and what counts toward that, is in
-[`adversarial.md`](adversarial.md). Draw them from:
+cases against the changed behaviour, run them, and record each one. Write the
+ones the changed behaviour earns, and no others. How many a change may commit
+is in [`adversarial.md`](adversarial.md). Draw them from:
 
 | Class | The question |
 |---|---|

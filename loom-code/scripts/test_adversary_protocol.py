@@ -562,24 +562,30 @@ def test_protocol_opening_and_recording_name_build_and_finalize() -> None:
     assert "`finalize-review`" in recording
 
 
-# --- The case count is stated here and restated nowhere in conflict --------
+# --- The case count is a ceiling, stated here and nowhere else --------------
 #
 # Acceptance 8 and 9 of
-# `docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md`. How
-# many cases a change needs is a rule of this protocol, and of no other
-# runtime file: a recipe, a station or an agent body that states a number of
-# cases again is a second place to keep right, which is what this change
-# removed. Four documents may still restate it in their own words -- the
-# agent contract's frontmatter, which is trigger text a dispatcher reads, and
-# the two translated READMEs, the English README and the conventions file,
-# which are indexes -- and each is held only to agreeing with the source: a
-# floor that is not three, or a ceiling that is not five, contradicts it.
+# `docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md`, as the
+# intent reads after the floor was dropped. Two rules, and the scan below
+# answers both:
+#
+# 1. No runtime file states a minimum number of cases at all. The floor is
+#    what made the adversary produce volume: it set a number with no relevance
+#    test. What it guarded against is answered by the `concern:` line every
+#    program carries and by the reviewers who read the findings. So a floor is
+#    a defect wherever it is written, the allowed restatements included.
+# 2. How many cases a change may commit -- the ceiling -- is a rule of this
+#    protocol and of no other runtime file. Four documents may restate it in
+#    their own words: the agent contract's frontmatter, which is trigger text
+#    a dispatcher reads, and the two translated READMEs, the English README
+#    and the conventions file, which are indexes. Each is held to agreeing
+#    with the source, so a ceiling that is not five contradicts it.
 #
 # The scan reads a bound and its number together ("at least three", "≥3",
 # "3 つ以上", "至多五個") rather than a pinned sentence, because a restatement
 # is free to reword everything except the number it states.
 
-FLOOR, CAP = 3, 5
+CAP = 5
 FLOOR_BOUND, CAP_BOUND = "floor", "cap"
 
 SKILLS = ROOT / "loom-code/skills"
@@ -706,11 +712,32 @@ def test_body_and_frontmatter_helpers_synthetic() -> None:
     assert _body(path).lstrip().startswith("# adversary subagent")
 
 
-def test_protocol_states_both_bounds_of_the_case_count() -> None:
-    assert case_counts(PROTOCOL_TEXT) == {(FLOOR_BOUND, FLOOR), (CAP_BOUND, CAP)}
+def test_protocol_states_the_ceiling_and_no_floor() -> None:
+    assert case_counts(PROTOCOL_TEXT) == {(CAP_BOUND, CAP)}
+
+
+def test_no_runtime_prose_states_a_minimum_case_count() -> None:
+    """Rule 1: a floor is a defect wherever it is written.
+
+    Every runtime prose file, the protocol and the four allowed restatements
+    included, because a restatement may keep its own words but not reintroduce
+    the number the intent removed.
+    """
+    read = {PROTOCOL: PROTOCOL_TEXT, ADVERSARY: ADVERSARY.read_text(encoding="utf-8")}
+    read |= {path: path.read_text(encoding="utf-8") for path in RESTATEMENTS}
+    read |= {path: path.read_text(encoding="utf-8") for path in runtime_prose_files()}
+    floors = {
+        str(path.relative_to(ROOT)): sorted(n for bound, n in case_counts(text) if bound == FLOOR_BOUND)
+        for path, text in read.items()
+        if any(bound == FLOOR_BOUND for bound, _ in case_counts(text))
+    }
+    assert floors == {}, floors
 
 
 def test_no_second_statement_of_the_case_count_in_runtime_prose() -> None:
+    """Rule 2: the ceiling is stated in the protocol and in no other runtime
+    file. A recipe, a station or an agent body that states a number of cases
+    again is a second place to keep right."""
     second = {
         str(path.relative_to(ROOT)): sorted(case_counts(_body(path)))
         for path in runtime_prose_files()
@@ -720,7 +747,7 @@ def test_no_second_statement_of_the_case_count_in_runtime_prose() -> None:
 
 
 def test_no_restatement_contradicts_the_source() -> None:
-    allowed = {(FLOOR_BOUND, FLOOR), (CAP_BOUND, CAP)}
+    allowed = {(CAP_BOUND, CAP)}
     sources = {str(p.relative_to(ROOT)): p.read_text(encoding="utf-8") for p in RESTATEMENTS}
     sources["loom-code/agents/adversary.md frontmatter"] = _frontmatter(ADVERSARY)
     contradicting = {

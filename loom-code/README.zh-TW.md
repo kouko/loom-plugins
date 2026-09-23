@@ -73,7 +73,7 @@ flowchart TD
 | [`implementer`](agents/implementer.md) | `build` | 一個任務：先寫會失敗的測試、一個 commit、一份狀態回報 —— 不下 verdict。 |
 | [`reviewer`](agents/reviewer.md) | `closing-review` | fresh-context 的 verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）與帶位置的發現；從不修改受審對象。 |
 | [`blind-runner`](agents/blind-runner.md) | `closing-review` | 在乾淨環境跑這次變更、逐條走過每一行 Acceptance，寫出 `docs/loom/<change-id>/blind-run-report.md`。 |
-| [`adversary`](agents/adversary.md) | `build` | 設法讓變更失敗 —— mutation 或 fuzz 工具，或至少三個可執行的濫用與邊界案例 —— 並把每次嘗試記成 probe。 |
+| [`adversary`](agents/adversary.md) | `build` | 設法讓變更失敗 —— mutation 或 fuzz 工具，或可執行的濫用與邊界案例 —— 並把每次嘗試記成 probe。 |
 
 審查者人數不是 agent 自己選的：`loom_checker.py reviewer-count` 依整條分支的
 差異計算 —— 範圍窄且低風險的變更一位，其他情況或無法判斷時兩位。只有當某行

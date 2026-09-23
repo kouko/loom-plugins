@@ -36,22 +36,23 @@ to `none`.
 
 ## How many cases
 
-This section is the one place that says how many cases a change needs. A
+This section is the one place that says how many cases a change may commit. A
 recipe, a station, an agent contract or a README may point here; none of them
 states a number of its own.
 
-Where a recipe asks for executable cases and the repository declares no
-mutation or fuzz tooling, write **at least three** cases. Three is the
-floor, not the target. Reused and modified cases count toward the floor.
-Reuse toward the floor counts only (a) the programs the adversary committed
-for this change and (b) tests that exist unchanged outside this change's
-branch. Any other test added or changed on the branch, such as an
-implementer's pin, is named as related coverage only.
-
-A change commits **at most five** probe programs, whatever its artifact types
-are, and that ceiling has no written-reason escape: a user who wants more
-programs, or wants this step skipped, says so in plain words. The checker rule
+The count is a ceiling and there is no minimum. A change commits **at most
+five** probe programs, whatever its artifact types are, and that ceiling has
+no written-reason escape: a user who wants more programs, or wants this step
+skipped, says so in plain words. The checker rule
 `adversarial.proportionate` recomputes the ceiling from the committed tree.
+
+Nothing here asks for a number of cases to be reached. Each program earns its
+place by the `concern:` line it carries, which says what kind of defect it
+defends against; a program that cannot name one is a program not worth
+committing, and an attack that found nothing worth a program is reported as
+an attempt rather than padded into one. Reusing a program this change already
+committed, or a repository test that already covers a case, commits no new
+program and so spends nothing against the ceiling.
 
 ## Reuse first, update with evidence
 

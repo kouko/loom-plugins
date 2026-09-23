@@ -43,11 +43,13 @@ ADVERSARY_PROSE = _flat(ADVERSARY)
 
 # --- The rules this recipe states -------------------------------------------
 #
-# How many cases a change needs is not among them any more: the floor, the
-# ceiling and what counts toward the floor moved to the shared protocol, which
-# states them once for every artifact type, and `test_adversary_protocol.py`
-# pins them there. The three pins this module carried for them are deleted
-# rather than converted, because the rule they pinned left this file.
+# How many cases a change may commit is not among them any more. The ceiling
+# moved to the shared protocol, which states it once for every artifact type,
+# and `test_adversary_protocol.py` pins it there; the floor was dropped from
+# the intent altogether, so no file states one and the protocol's scan fails
+# the repository if one comes back. The four pins this module carried for the
+# floor are deleted rather than converted, because the rule they pinned is
+# gone.
 #
 # What is left: which procedure applies, what a case must be, where cases come
 # from, and what a case that never ran is worth. Two pin shapes, both the
@@ -110,15 +112,14 @@ AFFIRMATIVE_PINS = {
          "Write executable abuse or boundary cases against the changed behaviour, run "
          "them, and record each one."),
     ),
-    "code-how-many-cases-points-at-the-protocol": (
-        "How many of them a change needs", "is in [`adversarial.md`](adversarial.md)",
-        ("what counts toward that",),
-        "How many of them a change needs, and what counts toward that, is in "
-        "[`adversarial.md`](adversarial.md).",
-        ("How many of them a change needs, and what counts toward that, is not in "
-         "[`adversarial.md`](adversarial.md).",
-         "How many of them a change needs is in [`adversarial.md`](adversarial.md).",
-         "How many of them a change needs, and what counts toward that, is at least three."),
+    # The ceiling itself is not stated here: the recipe points at the one file
+    # that states it. A rewrite that answers the question locally, with a
+    # number of its own, fails this pin and the protocol's runtime-prose scan.
+    "code-how-many-points-at-the-protocol": (
+        "How many a change may commit", "is in [`adversarial.md`](adversarial.md)", (),
+        "How many a change may commit is in [`adversarial.md`](adversarial.md).",
+        ("How many a change may commit is not in [`adversarial.md`](adversarial.md).",
+         "How many a change may commit is at most five."),
     ),
     "code-cases-prefer-to-live-as-real-tests": (
         "Prefer", "cases that live as real tests afterwards", (),
@@ -130,6 +131,17 @@ AFFIRMATIVE_PINS = {
 
 # name: (sentence, rewrites that must fail)
 SENTENCE_PINS = {
+    # The recipe asks for the cases the change earns and points at the
+    # protocol for the ceiling. Its own wording carries the negation ("and no
+    # others"), so the affirmative matcher cannot hold it. A rejected rewrite
+    # states a floor here, the rule the intent removed and the one
+    # `test_adversary_protocol.py` refuses anywhere in the runtime prose.
+    "code-cases-are-the-ones-the-change-earns": (
+        "Write the ones the changed behaviour earns, and no others.",
+        ("Write the ones the changed behaviour earns, and others too.",
+         "Write the ones the changed behaviour earns.",
+         "Write at least three of them, and no others."),
+    ),
     "code-a-case-that-only-ran-in-the-head-is-not-evidence": (
         "A case that only ran in the adversary's head is not evidence.",
         ("A case that only ran in the adversary's head is evidence.",
