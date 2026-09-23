@@ -292,7 +292,8 @@ ledger or committed state schema. Wording-only publication edits do not reopen
 Before any fix round, pass each non-passing reviewer verdict to
 `loom_checker.py selection record-failure <change-id> --step reviewers --rule <verdict>`;
 a rejection never handed over stays unrecorded. Build scopes each fix to its
-defect's whole class before handing it to an implementer, as Build §2 states.
+defect's whole class before an implementer or the main agent makes it, as
+Build §2 states.
 
 Convergence is where a lesson this branch taught is still cheap to keep.
 Whatever it taught has surfaced by now — through a finding, a probe, or
