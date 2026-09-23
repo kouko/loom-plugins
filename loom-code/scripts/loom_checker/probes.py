@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fnmatch import fnmatch
 from loom_checker.helpers import git_maybe
+from loom_checker.helpers import is_program_path
 from loom_checker.helpers import kickoff_defaults
 from pathlib import Path
 from repo_files import repository_files
@@ -38,13 +39,25 @@ CONCERN_LINE = re.compile(
 CONCERN_HEAD_LINES = 20
 
 
+def probe_directory(change_id: str) -> str:
+    """The one directory a change's probe programs are committed under."""
+    return f"docs/loom/{change_id}/evidence/probes/"
+
+
 def committed_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[str]:
-    """Paths of the probe programs the selected commit holds for this change."""
-    prefix = f"docs/loom/{change_id}/evidence/probes/"
+    """Every program the selected commit holds under this change's store.
+
+    Counting only `*.py`, and only under `evidence/probes/`, counted a subset
+    of what the change commits and what `finalize-review` then executes: a
+    shell program, or a Python program one directory up, escaped both the cap
+    and the `concern:` line while still being run. What makes a file a program
+    is `is_program_path`, the same question the delta-width rule asks.
+    """
+    prefix = f"docs/loom/{change_id}/"
     listing = git_maybe(repo, "ls-tree", "-r", "--name-only", head_sha, "--", prefix) or ""
     return sorted(
         line.strip() for line in listing.splitlines()
-        if line.strip().endswith(".py")
+        if line.strip() and is_program_path(line.strip())
     )
 
 
@@ -55,10 +68,19 @@ def check_adversarial_proportionate(
 
     The cap keeps the adversary's output proportionate to one change; the
     `concern:` line makes each program say what kind of defect it defends
-    against, so a program that defends against nothing is visible.
+    against, so a program that defends against nothing is visible. Both are
+    recomputed over every program the change commits, and a program the
+    change commits somewhere else in its store is refused rather than left
+    uncounted.
     """
     rule = "adversarial.proportionate"
     programs = committed_probe_programs(repo, head_sha, change_id)
+    expected = probe_directory(change_id)
+    misplaced = [path for path in programs if not path.startswith(expected)]
+    if misplaced:
+        return [(rule, f"{misplaced[0]} is a program in this change's store outside "
+                       f"{expected}, where the cap and the `concern:` line cannot "
+                       f"see it; commit probe programs there")]
     if len(programs) > MAX_PROBE_PROGRAMS:
         return [(rule, f"{len(programs)} committed probe programs for this change; "
                        f"at most {MAX_PROBE_PROGRAMS} (five) are allowed")]

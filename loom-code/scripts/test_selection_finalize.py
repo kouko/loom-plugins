@@ -19,11 +19,16 @@ from pathlib import Path
 from loom_checker import attestation as attestation_module
 from loom_checker import intent_state
 from loom_checker import selection
+from loom_checker.probes import MAX_PROBE_PROGRAMS
 
 import pytest
 
 CHECKER = Path(__file__).with_name("loom_checker.py")
 CHANGE = "2026-09-14-example"
+# The one place finalize-review runs an adversarial artifact from, so that
+# every program it executes is one `adversarial.proportionate` counted.
+PROBE_0 = f"docs/loom/{CHANGE}/evidence/probes/probe_0.py"
+ADVERSARIAL = [{"command": f"python3 {PROBE_0}", "artifact": PROBE_0}]
 
 
 @pytest.fixture(autouse=True)
@@ -197,12 +202,13 @@ def test_finalize_and_attestation_refuse_alike_with_one_message(tmp_path: Path) 
     assert missing_adversarial_execution(0, {"adversarial"}) is None
 
     repo = make_repo(tmp_path)
+    write_probes(repo, 1)
     refused = finalize(repo, review_input(tmp_path, PASSING, []))
     assert refused.returncode == 1
     assert f"BLOCK finalize.adversarial: {reason}" in refused.stderr
 
     accepted = finalize(repo, review_input(
-        tmp_path, PASSING, [{"command": "python3 src.py", "artifact": "src.py"}]
+        tmp_path, PASSING, ADVERSARIAL
     ))
     assert accepted.returncode == 0, accepted.stderr
     attestation = written(repo)
@@ -229,7 +235,7 @@ def write_probes(repo: Path, count: int, concern: bool = True) -> None:
 
 def run_with_probes(repo: Path, tmp_path: Path) -> subprocess.CompletedProcess:
     return finalize(repo, review_input(
-        tmp_path, PASSING, [{"command": "python3 src.py", "artifact": "src.py"}]
+        tmp_path, PASSING, ADVERSARIAL
     ))
 
 
@@ -258,6 +264,60 @@ def test_probe_program_without_a_concern_line_is_refused(tmp_path: Path) -> None
     assert "BLOCK adversarial.proportionate" in refused.stderr
     assert "concern:" in refused.stderr
     assert "probe_0.py" in refused.stderr
+
+
+def test_a_shell_probe_program_counts_against_the_cap(tmp_path: Path) -> None:
+    """The protocol says "program", not "Python file": a `.sh` probe is run
+    like any other and is counted like any other."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+    directory = repo / f"docs/loom/{CHANGE}/evidence/probes"
+    for index in range(MAX_PROBE_PROGRAMS):
+        (directory / f"shell_{index}.sh").write_text(
+            "# concern: a boundary the code never rejects\nexit 0\n", encoding="utf-8"
+        )
+    commit_all(repo, "shell probes")
+
+    refused = run_with_probes(repo, tmp_path)
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert "6 committed probe programs" in refused.stderr
+
+
+def test_a_program_in_the_store_outside_the_probe_directory_is_refused(
+    tmp_path: Path,
+) -> None:
+    """A program one directory up is executed by finalize-review and counted
+    by nothing, so the rule refuses it where it sits."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+    stray = repo / f"docs/loom/{CHANGE}/helper.py"
+    stray.write_text("# concern: stated, and in the wrong place\nassert True\n", encoding="utf-8")
+    commit_all(repo, "stray program")
+
+    refused = run_with_probes(repo, tmp_path)
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert f"docs/loom/{CHANGE}/helper.py" in refused.stderr
+
+
+def test_finalize_refuses_an_adversarial_artifact_outside_the_probe_directory(
+    tmp_path: Path,
+) -> None:
+    """`src.py` exists in the commit and the command really runs it, which was
+    enough to have finalize-review execute it as a probe and count it nowhere."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING, [{"command": "python3 src.py", "artifact": "src.py"}]
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    assert f"docs/loom/{CHANGE}/evidence/probes/" in refused.stderr
 
 
 def test_skipping_every_executed_step_allows_empty_executions(tmp_path: Path) -> None:
@@ -323,8 +383,9 @@ def test_unbound_skip_refused_and_digest_mismatch_blocks(tmp_path: Path) -> None
 
 def test_v2_without_selection_keeps_every_floor(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
+    write_probes(repo, 1)
     assert finalize(repo, review_input(
-        tmp_path, PASSING, [{"command": "python3 src.py", "artifact": "src.py"}]
+        tmp_path, PASSING, ADVERSARIAL
     )).returncode == 0
     attestation = written(repo)
     assert attestation["schema"] == "loom-attestation/v2"
@@ -444,6 +505,7 @@ def test_non_verification_refusals_record_no_failure(tmp_path: Path) -> None:
 
 def test_failure_after_confirmation_not_listed_as_prior(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
+    write_probes(repo, 1)
     propose(repo, "reviewers")
     confirm(repo, "2026-01-01T00:00:00Z")
     refused = finalize(repo, review_input(tmp_path, [], []))
@@ -451,7 +513,7 @@ def test_failure_after_confirmation_not_listed_as_prior(tmp_path: Path) -> None:
     assert [e["rule"] for e in failures(repo)] == ["finalize.adversarial"]
 
     result = finalize(repo, review_input(
-        tmp_path, [], [{"command": "python3 src.py", "artifact": "src.py"}]
+        tmp_path, [], ADVERSARIAL
     ))
 
     assert result.returncode == 0, result.stderr

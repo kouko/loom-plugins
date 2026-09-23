@@ -22,6 +22,7 @@ from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
 from loom_checker.probes import missing_adversarial_execution
+from loom_checker.probes import probe_directory
 from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
 from pathlib import Path
@@ -133,6 +134,14 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             return [("finalize.adversarial", "command must execute the artifact directly")]
         if not git_ok(repo, "cat-file", "-e", f"{head_sha}:{artifact}"):
             return [("finalize.adversarial", "artifact must exist in the selected commit")]
+        if not artifact.startswith(probe_directory(change_id)):
+            # Anything finalize runs as an adversarial probe is counted by
+            # `adversarial.proportionate`, which reads one directory. An
+            # artifact outside it is a program that gets executed and never
+            # counted.
+            return [("finalize.adversarial",
+                     f"adversarial artifact must be committed under "
+                     f"{probe_directory(change_id)}")]
         work.append(("adversarial", command, artifact))
 
     executions: list[dict] = []

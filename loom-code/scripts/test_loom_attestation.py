@@ -46,6 +46,25 @@ def manifest() -> dict:
     return {"publication_only_paths": ["docs/loom/<change-id>/attestation.json"]}
 
 
+PROBE = f"docs/loom/{CHANGE}/evidence/probes/test_probe.py"
+
+
+def commit_probe(repo: Path) -> str:
+    """Commit a probe program where the protocol puts one.
+
+    `finalize-review` runs only an artifact committed there, so that every
+    program it executes is one `adversarial.proportionate` has counted.
+    """
+    path = repo / PROBE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "# concern: the fixture's own adversarial run\nprint('probe')\n",
+        encoding="utf-8",
+    )
+    commit(repo, "probe program")
+    return PROBE
+
+
 def test_functional_digest_ignores_declared_publication_paths(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
     before = git(repo, "rev-parse", "HEAD")
@@ -350,6 +369,7 @@ def test_finalize_review_runs_and_writes_matching_attestation(tmp_path: Path) ->
     kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
     kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-08)\n")
     commit(repo, "declare tests")
+    probe = commit_probe(repo)
     review_input = tmp_path / "review-input.json"
     review_input.write_text(json.dumps({
         "verdicts": [{
@@ -360,7 +380,7 @@ def test_finalize_review_runs_and_writes_matching_attestation(tmp_path: Path) ->
             "lens": "code", "verdict": "PASS", "findings": [],
         }],
         "findings": [],
-        "adversarial": [{"command": "python3 src.py", "artifact": "src.py"}],
+        "adversarial": [{"command": f"python3 {probe}", "artifact": probe}],
     }), encoding="utf-8")
     checker = Path(__file__).with_name("loom_checker.py")
     result = subprocess.run(
@@ -410,7 +430,9 @@ def test_finalize_review_accepts_one_reviewer_for_low_risk_change(tmp_path: Path
             "lens": "docs", "verdict": "PASS", "findings": [],
         }],
         "findings": [],
-        "adversarial": [{"command": "python3 src.py", "artifact": "src.py"}],
+        # The delta is one low-risk doc, so the adversarial step is auto-skipped
+        # and the change records no adversarial run at all.
+        "adversarial": [],
     }), encoding="utf-8")
 
     result = subprocess.run(
@@ -433,6 +455,7 @@ def test_finalize_surfaces_failed_command_output(tmp_path: Path, monkeypatch) ->
         encoding="utf-8",
     )
     commit(repo, "set failing package command")
+    probe = commit_probe(repo)
     review_input = tmp_path / "review-input.json"
     review_input.write_text(json.dumps({
         "verdicts": [
@@ -440,7 +463,7 @@ def test_finalize_surfaces_failed_command_output(tmp_path: Path, monkeypatch) ->
             {"reviewer": "r2", "vendor": "openai", "model": "test", "lens": "skill", "verdict": "PASS", "findings": []},
         ],
         "findings": [],
-        "adversarial": [{"command": "python3 src.py", "artifact": "src.py"}],
+        "adversarial": [{"command": f"python3 {probe}", "artifact": probe}],
     }), encoding="utf-8")
     monkeypatch.chdir(repo)
     error = StringIO()

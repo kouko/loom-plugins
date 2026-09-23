@@ -6,11 +6,14 @@ import sys
 RULES: list[tuple[str, str]] = [
     (
         "adversarial.proportionate",
-        "A change commits at most five adversarial probe programs under its "
-        "`evidence/probes/` directory, and every one of them carries a non-empty "
-        "`concern:` line in its first lines naming the kind of defect it defends "
-        "against. Both halves are recomputed from the committed tree at "
-        "finalize-review, over the programs the selected commit actually holds.",
+        "A change commits at most five adversarial probe programs, and every one "
+        "of them carries a non-empty `concern:` line in its first lines naming the "
+        "kind of defect it defends against. Both halves are recomputed at "
+        "finalize-review over every program the selected commit holds anywhere in "
+        "the change's store, whatever its extension; a program committed outside "
+        "the change's `evidence/probes/` directory is refused rather than left "
+        "uncounted, and finalize-review runs no adversarial artifact from "
+        "elsewhere.",
     ),
     (
         "contract.requires",
