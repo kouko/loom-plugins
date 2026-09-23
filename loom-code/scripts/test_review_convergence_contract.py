@@ -384,6 +384,33 @@ def test_no_adversary_dispatch_in_closing_review() -> None:
             assert has_negation(sentence), sentence
 
 
+def test_probe_graduation_gate_states_both_halves() -> None:
+    """The station rule behind `review.probe-graduation`.
+
+    Acceptance 6 of
+    `docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md`: a
+    probe that caught a defect graduates into the suite that runs on every
+    later change, and one that caught none is reported and deleted. It is a
+    station rule with no checker rule behind it, so this test is the whole
+    mechanism: both halves, and the source the station reads each program's
+    result from.
+    """
+    assert "<!-- gate: review.probe-graduation -->" in REVIEW
+    gate = " ".join(
+        REVIEW.split("<!-- gate: review.probe-graduation -->", 1)[1]
+        .split("<!-- /gate -->", 1)[0]
+        .split()
+    )
+    graduated = next(s for s in _sentences(gate) if s.startswith("A probe program that caught"))
+    assert "carried into the suite that runs on every later change" in graduated, graduated
+    assert "through a plan task" in graduated, graduated
+    assert not has_negation(graduated), graduated
+    deleted = next(s for s in _sentences(gate) if s.startswith("A program of this change"))
+    for element in ("caught none", "named as such in the review report", "deleted from the repository"):
+        assert element in deleted, (element, deleted)
+    assert "Build's hand-off" in gate and "observed result" in gate, gate
+
+
 def test_finalize_failure_fix_needs_next_round() -> None:
     finalize = _flat_section("## 5. Finalize")
     sentence = next(s for s in _sentences(finalize) if s.startswith("When `finalize-review` fails"))

@@ -212,6 +212,18 @@ result; finalization executes them. When `adversarial` is skipped (listed by
 `selection show` or skipped by the user's plain-words instruction), Build hands
 off no adversarial program and §5 omits the `adversarial` input.
 
+<!-- gate: review.probe-graduation -->
+A probe program that caught a defect on its own change is carried into the
+suite that runs on every later change, through a plan task, before this
+station finishes. A program of this change that caught none is named as such
+in the review report and deleted from the repository: a program that never
+went red is run twice and never again, so it defends nothing against a later
+regression. Read which is which from Build's hand-off, which records each
+program's observed result, and treat a program whose result the hand-off does
+not give as one that caught nothing. Probe programs committed for earlier
+changes stay where they are.
+<!-- /gate -->
+
 ## 4. Converge within one bounded episode
 
 <!-- gate: review.bounded-episode -->

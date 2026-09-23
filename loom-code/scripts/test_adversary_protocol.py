@@ -15,6 +15,7 @@ and it holds no rule a recipe owns.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -165,19 +166,32 @@ PROTOCOL_PINS = {
          "It may write new probes freely, modifies one when a small change covers it, and writes a "
          "new probe only when nothing covers the case."),
     ),
+    # The duty is narrowed to the programs that graduated into the re-run
+    # suite (Acceptance 7): a program that is run twice and never again buys
+    # no protection a mutation could measure. The verb therefore opens at the
+    # condition, so a rewrite that widens the duty back to every update turns
+    # this pin red.
     "ref-mutation-evidence": (
-        "ref", "Every update carries mutation evidence run",
+        "ref", "Every update to a program that was carried into the suite that runs on every "
+        "later change carries mutation evidence run",
         "against the committed probe program itself",
         ("at least one mutation per kind of change the update touches",
          "an over-broad update would wrongly accept"),
-        "Every update carries mutation evidence run against the committed probe program itself: "
+        "Every update to a program that was carried into the suite that runs on every later "
+        "change carries mutation evidence run against the committed probe program itself: "
         "at least one mutation per kind of change the update touches, plus one that an over-broad "
         "update would wrongly accept.",
-        ("Every update carries mutation evidence run against the committed probe program itself: "
+        ("Every update to a program that was carried into the suite that runs on every later "
+         "change carries mutation evidence run against the committed probe program itself: "
          "at least one mutation per kind of change the update touches, plus no one that an "
          "over-broad update would wrongly accept.",
+         "Every update to a program that was carried into the suite that runs on every later "
+         "change carries mutation evidence run against the committed probe program itself: "
+         "one mutation overall.",
+         # The duty widened back to every update, the rest untouched.
          "Every update carries mutation evidence run against the committed probe program itself: "
-         "one mutation overall."),
+         "at least one mutation per kind of change the update touches, plus one that an "
+         "over-broad update would wrongly accept."),
     ),
     "ref-mutation-in-throwaway-copy-or-edit-tool": (
         "ref", "The adversary applies each mutation in", "a throwaway copy of the working tree",
@@ -546,6 +560,175 @@ def test_protocol_opening_and_recording_name_build_and_finalize() -> None:
     recording = " ".join(PROTOCOL_TEXT.split("## Recording", 1)[1].split())
     assert "Build re-runs" in recording
     assert "`finalize-review`" in recording
+
+
+# --- The case count is stated here and restated nowhere in conflict --------
+#
+# Acceptance 8 and 9 of
+# `docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md`. How
+# many cases a change needs is a rule of this protocol, and of no other
+# runtime file: a recipe, a station or an agent body that states a number of
+# cases again is a second place to keep right, which is what this change
+# removed. Four documents may still restate it in their own words -- the
+# agent contract's frontmatter, which is trigger text a dispatcher reads, and
+# the two translated READMEs, the English README and the conventions file,
+# which are indexes -- and each is held only to agreeing with the source: a
+# floor that is not three, or a ceiling that is not five, contradicts it.
+#
+# The scan reads a bound and its number together ("at least three", "≥3",
+# "3 つ以上", "至多五個") rather than a pinned sentence, because a restatement
+# is free to reword everything except the number it states.
+
+FLOOR, CAP = 3, 5
+FLOOR_BOUND, CAP_BOUND = "floor", "cap"
+
+SKILLS = ROOT / "loom-code/skills"
+AGENTS = ROOT / "loom-code/agents"
+# Restatements the intent allows, each read whole except the agent contract,
+# whose body is runtime prose like any other and whose frontmatter is the
+# trigger text.
+RESTATEMENTS = (
+    ROOT / "loom-code/README.md",
+    ROOT / "loom-code/README.ja.md",
+    ROOT / "loom-code/README.zh-TW.md",
+    ROOT / "AGENTS.md",
+)
+
+_NUMBERS = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+    "一": 1, "二": 2, "三": 3, "四": 4, "五": 5,
+    "六": 6, "七": 7, "八": 8, "九": 9, "十": 10,
+}
+_NUM = r"(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|[一二三四五六七八九十])"
+_BOUND_BEFORE = {
+    "at least": FLOOR_BOUND, "no fewer than": FLOOR_BOUND, "至少": FLOOR_BOUND,
+    "≥": FLOOR_BOUND, "at most": CAP_BOUND, "no more than": CAP_BOUND,
+    "up to": CAP_BOUND, "至多": CAP_BOUND, "最多": CAP_BOUND, "≤": CAP_BOUND,
+}
+_BOUND_AFTER = {"以上": FLOOR_BOUND, "以下": CAP_BOUND}
+_COUNT_RE = re.compile(
+    rf"(?P<pre>{'|'.join(_BOUND_BEFORE)})\s*\**\s*(?P<n1>{_NUM})"
+    rf"|(?P<n2>{_NUM})\s*(?:つ|個|件|の)?\s*(?P<post>{'|'.join(_BOUND_AFTER)})",
+    re.IGNORECASE,
+)
+# What the number has to be counting for the match to be this rule and not
+# another one: an adversarial case, probe or program. It is looked for beside
+# the number, not anywhere in the paragraph -- "at least one mutation per kind
+# of change" sits in a paragraph about probe programs and counts mutations,
+# and a table row's number belongs to its own row. The window reaches further
+# forward than back because English and Chinese put the noun after the number
+# ("at least three cases", "至少三個案例") and Japanese puts it before
+# ("境界ケース 3 つ以上").
+_CASE_NOUN = re.compile(r"\bcases?\b|\bprobes?\b|\bprograms?\b|ケース|案例", re.IGNORECASE)
+_BACK, _FORWARD = 12, 60
+
+
+def _number(token: str) -> int:
+    return int(token) if token.isdigit() else _NUMBERS[token.lower()]
+
+
+def _units(text: str) -> list[str]:
+    """The text in the units a rule is stated in: paragraphs, and each table
+    row on its own, so that no window below reaches out of one row into the
+    next."""
+    units: list[str] = []
+    for paragraph in re.split(r"\n\s*\n", text):
+        lines = paragraph.splitlines()
+        units += [ln for ln in lines if ln.lstrip().startswith("|")]
+        units.append(" ".join(ln for ln in lines if not ln.lstrip().startswith("|")))
+    return [" ".join(unit.split()) for unit in units if unit.strip()]
+
+
+def case_counts(text: str) -> set[tuple[str, int]]:
+    """Every (bound, number) pair the text states about cases, `floor` or `cap`."""
+    found: set[tuple[str, int]] = set()
+    for unit in _units(text):
+        for match in _COUNT_RE.finditer(unit):
+            window = unit[max(0, match.start() - _BACK):match.end() + _FORWARD]
+            if not _CASE_NOUN.search(window):
+                continue
+            if match.group("pre"):
+                found.add((_BOUND_BEFORE[match.group("pre").lower()], _number(match.group("n1"))))
+            else:
+                found.add((_BOUND_AFTER[match.group("post")], _number(match.group("n2"))))
+    return found
+
+
+def _body(path: Path) -> str:
+    """The file without a YAML frontmatter block, which is trigger text."""
+    text = path.read_text(encoding="utf-8")
+    if text.startswith("---\n") and "\n---\n" in text[4:]:
+        return text[4:].split("\n---\n", 1)[1]
+    return text
+
+
+def _frontmatter(path: Path) -> str:
+    text = path.read_text(encoding="utf-8")
+    return text[4:].split("\n---\n", 1)[0] if text.startswith("---\n") else ""
+
+
+def runtime_prose_files() -> list[Path]:
+    """Every runtime prose file of loom-code that is not the source."""
+    return sorted(
+        p for p in list(SKILLS.rglob("*.md")) + list(AGENTS.glob("*.md"))
+        if p != PROTOCOL
+    )
+
+
+def test_case_counts_reads_every_wording_synthetic() -> None:
+    assert case_counts("write at least three cases") == {(FLOOR_BOUND, 3)}
+    assert case_counts("write **at least three** cases") == {(FLOOR_BOUND, 3)}
+    assert case_counts("実行可能な境界ケース 3 つ以上を書く") == {(FLOOR_BOUND, 3)}
+    assert case_counts("至少三個可執行的邊界案例") == {(FLOOR_BOUND, 3)}
+    assert case_counts("≥3 個可執行的邊界案例") == {(FLOOR_BOUND, 3)}
+    assert case_counts("a change commits at most five probe programs") == {(CAP_BOUND, 5)}
+    assert case_counts("at most four cases") == {(CAP_BOUND, 4)}
+
+
+def test_case_counts_ignores_a_count_of_something_else_synthetic() -> None:
+    """A number beside another noun is not a count of cases."""
+    assert case_counts("when it reports `up to date`, continue") == set()
+    assert case_counts("the episode admits at most three distinct digests") == set()
+    assert case_counts(
+        "mutation evidence run against the committed probe program itself: at least "
+        "one mutation per kind of change the update touches"
+    ) == set()
+    # A table row's number belongs to its own row, not to the row above it.
+    table = "| **read** | ≥2 fresh-context reviewers | verdict |\n| **attack** | cases |\n"
+    assert case_counts(table) == set()
+
+
+def test_body_and_frontmatter_helpers_synthetic() -> None:
+    path = ADVERSARY
+    assert _frontmatter(path).startswith("name: adversary"), _frontmatter(path)[:40]
+    assert "name: adversary" not in _body(path)
+    assert _body(path).lstrip().startswith("# adversary subagent")
+
+
+def test_protocol_states_both_bounds_of_the_case_count() -> None:
+    assert case_counts(PROTOCOL_TEXT) == {(FLOOR_BOUND, FLOOR), (CAP_BOUND, CAP)}
+
+
+def test_no_second_statement_of_the_case_count_in_runtime_prose() -> None:
+    second = {
+        str(path.relative_to(ROOT)): sorted(case_counts(_body(path)))
+        for path in runtime_prose_files()
+        if case_counts(_body(path))
+    }
+    assert second == {}, second
+
+
+def test_no_restatement_contradicts_the_source() -> None:
+    allowed = {(FLOOR_BOUND, FLOOR), (CAP_BOUND, CAP)}
+    sources = {str(p.relative_to(ROOT)): p.read_text(encoding="utf-8") for p in RESTATEMENTS}
+    sources["loom-code/agents/adversary.md frontmatter"] = _frontmatter(ADVERSARY)
+    contradicting = {
+        name: sorted(case_counts(text) - allowed)
+        for name, text in sources.items()
+        if case_counts(text) - allowed
+    }
+    assert contradicting == {}, contradicting
 
 
 def test_protocol_recording_sends_findings_to_the_finalize_input() -> None:

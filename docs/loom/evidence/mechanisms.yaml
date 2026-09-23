@@ -333,6 +333,9 @@ mechanisms:
   - id: "review.bounded-episode"
     class: prose-gate
     eval: loom-code/scripts/test_review_convergence_contract.py
+  - id: "review.probe-graduation"
+    class: prose-gate
+    eval: loom-code/scripts/test_review_convergence_contract.py::test_probe_graduation_gate_states_both_halves
   - id: "review.atomic-claude-dispatch"
     class: prose-gate
     eval: loom-code/scripts/test_dispatch_profile_contract.py::test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack

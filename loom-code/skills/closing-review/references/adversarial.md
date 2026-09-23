@@ -34,6 +34,25 @@ no existing recipe file is edited. Taking one away deletes its file, deletes
 the test module named after that kind where it has one, and puts its row back
 to `none`.
 
+## How many cases
+
+This section is the one place that says how many cases a change needs. A
+recipe, a station, an agent contract or a README may point here; none of them
+states a number of its own.
+
+Where a recipe asks for executable cases and the repository declares no
+mutation or fuzz tooling, write **at least three** cases. Three is the
+floor, not the target. Reused and modified cases count toward the floor.
+Reuse toward the floor counts only (a) the programs the adversary committed
+for this change and (b) tests that exist unchanged outside this change's
+branch. Any other test added or changed on the branch, such as an
+implementer's pin, is named as related coverage only.
+
+A change commits **at most five** probe programs, whatever its artifact types
+are, and that ceiling has no written-reason escape: a user who wants more
+programs, or wants this step skipped, says so in plain words. The checker rule
+`adversarial.proportionate` recomputes the ceiling from the committed tree.
+
 ## Reuse first, update with evidence
 
 Before writing any probe, the adversary checks what already covers the
@@ -51,7 +70,8 @@ When Build re-dispatches it for a widened scope or for trunk content brought
 in by `sync-trunk`, the adversary updates only its own programs and fixes
 nothing in the product. When a failing program caught a product defect, the
 adversary keeps that program unchanged and returns a finding, and Build then
-fixes the product. Every update carries mutation evidence run against the
+fixes the product. Every update to a program that was carried into the suite
+that runs on every later change carries mutation evidence run against the
 committed probe program itself: at least one mutation per kind of change the
 update touches, plus one that an over-broad update would wrongly accept, such
 as a generic-word substitution that a global replace with a case-insensitive
@@ -91,6 +111,9 @@ and observed result in the generated attestation:
 - Record every attempt that failed to break anything, for every artifact
   type — that is what makes the attempts an eval rather than an anecdote.
 - `command` must be re-runnable by someone else in a clean tree.
+- Every probe program carries a `concern:` line among its first lines, naming
+  in free text the kind of defect it defends against. The checker rule
+  `adversarial.proportionate` refuses a program without one.
 - `artifact` is where the case now lives. Put probes under
   `docs/loom/<change-id>/evidence/probes/` — that path is the `evidence`
   artifact type. Promote a

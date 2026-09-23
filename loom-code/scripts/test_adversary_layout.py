@@ -75,9 +75,11 @@ SHARED_HEADINGS = ("Reuse first, update with evidence", "Recording")
 # quoted from the pre-split document and occurs in one section of it only,
 # so finding it anywhere but that kind's file is a split that leaked.
 KIND_MARKERS = {
+    # How many cases a change needs left this list when it left the code
+    # recipe: the floor and the ceiling are stated once, in the protocol, for
+    # every artifact type, so finding them there is the rule rather than a
+    # leak. `test_adversary_protocol.py` is where they are pinned now.
     "code": (
-        "**at least three**",
-        "Three is the floor, not the target.",
         "a surviving mutant is a test that asserts nothing",
         "path traversal",
         "Prefer cases that live as real tests afterwards.",
@@ -241,8 +243,10 @@ def test_section_and_preamble_helpers_synthetic() -> None:
 
 def test_marker_helper_synthetic() -> None:
     """A recipe body left behind is detected; the shared protocol is not."""
-    leaked = "## Code\n\nWrite **at least three** cases; three is the floor.\n"
-    assert _markers_found(leaked, KIND_MARKERS["code"]) == ["**at least three**"]
+    leaked = "## Code\n\nFeed it a path traversal; a surviving mutant is a test that asserts nothing.\n"
+    assert _markers_found(leaked, KIND_MARKERS["code"]) == [
+        "a surviving mutant is a test that asserts nothing", "path traversal",
+    ]
     protocol_only = "## Reuse first, update with evidence\n\nReuse a program that covers a case.\n"
     assert _markers_found(protocol_only, KIND_MARKERS["code"]) == []
     assert _markers_found(protocol_only, KIND_MARKERS["spec"]) == []
