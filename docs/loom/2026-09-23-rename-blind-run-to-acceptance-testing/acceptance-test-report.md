@@ -91,7 +91,7 @@ PR 與對話裡列出被跳過步驟的共有四種行。我在新的乾淨副�
   - **證據**：`render_selection_disclosure` → 新代號複本 `Skipped steps: spec, plan, implementer, tdd, adversarial, acceptance-test (independent acceptance testing) — authority: user-typed (3NAV, 2026-09-17)`；舊證明檔 `2026-09-17-coexist-card-header` → `… adversarial, blind-run — authority: user-typed (3NAV, 2026-09-17)`，`2026-09-20-record-the-withdrawn-ordering-lesson` → `… reviewers, adversarial, blind-run — authority: user-typed (L352, 2026-09-20)`；`validate_selection_disclosure`：完整名稱 → `None`，只寫代號 → `PR body section 'Verification' must start with exactly the attestation's selection disclosure …`，含 `Skipped by instruction: acceptance-test` → `None`；`pytest test_loom_publish.py test_verification_status.py test_simplified_station_text.py test_build_mechanical_checks.py -k "plain or narrow or skipped or acceptance or disclosure or selection"` → `33 passed`。我沒有重做上一輪「自己做一個小改動分支」的實測，因為這要強制移動分支指標，被安全防護擋下；那部分程式這次沒有改動。
   - **判定**：partly — 程式產生的三種行沒變、仍正確；「Skipped by instruction:」行仍沒有機制保證。
 
-- **不用的縮寫**：四類文字與這次修正的差異裡都沒有；只剩 intent 本身解釋為什麼不用它。證據：`git grep -n -w UAT -- . ':!docs/loom/20*' ':!**/CHANGELOG.md'` → 只有 intent 第 13、14、29 行；`git diff 0b4b5978..d6ac4f8d | grep -w UAT` → 無輸出。
+- **不用的縮寫**：四類文字與這次修正的差異裡都沒有；只剩 intent 本身解釋為什麼不用它。證據：`git grep -n -w -E 'U[A]T' -- . ':!docs/loom/20*' ':!**/CHANGELOG.md'` → 只有 intent 第 13、14、29 行；`git diff 0b4b5978..d6ac4f8d | grep -w -E 'U[A]T'` → 無輸出（搜尋式刻意用方括號寫，這份報告就不必寫出那個縮寫）。
 
 - **判定（第三次重測）**：partly — 說明文件、原則文件、程式產生的 PR 行都做到了；「Skipped by instruction:」行仍只靠說明，另外四處站內說明第一次提到時只寫代號，完整名稱在同段稍後才出現。
 
