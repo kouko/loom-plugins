@@ -37,7 +37,7 @@ once, so the next change to them is one edit rather than six.
 5. Acceptance 3 and 4 are recomputed by exactly one new checker rule, and the checker's rule list grows by exactly one entry; no existing rule id is retired or renamed.
 6. A probe program that caught a defect on its own change is carried into the suite that runs on every later change, and one that caught none is reported and not left in the repository; this is a station rule the closing review checks, and it adds no checker rule.
 7. The mutation-evidence duty applies only to a program carried into that suite, and it is stated in one file.
-8. How many adversarial cases a change needs is stated in exactly one runtime file; every other runtime location that states it today either points at that file or drops the claim, and a check fails the repository if a second statement of it reappears.
+8. No runtime file states a minimum number of adversarial cases: the count a change needs is a ceiling, not a floor, because the `concern:` line and the reviewers already answer what the floor was there for. How many cases a change may commit is stated in exactly one runtime file; every other runtime location that states it today either points at that file or drops the claim, and a check fails the repository if a second statement of it reappears.
 9. The agent contract's own trigger text, the three translated READMEs and the repository conventions file may restate the rule in their own words, and a check fails the repository when such a restatement contradicts the single source.
 10. The requirement that a change record at least one adversarial execution unless the step was skipped is computed by one shared predicate, not by two copies with different messages.
 
