@@ -29,8 +29,6 @@ from prose_pin import (
     pins_exact_sentence as _pins_exact_sentence,
     rule_prose as _rules,
 )
-from test_adversary_routing import routed_recipe_files
-
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCES = ROOT / "loom-code/skills/closing-review/references"
@@ -41,77 +39,19 @@ ADVERSARY = ROOT / "loom-code/agents/adversary.md"
 ADVERSARIAL_CODE = _flat(RECIPE)
 RULES = _rules(RECIPE)
 ADVERSARY_PROSE = _flat(ADVERSARY)
-# The whole procedure — protocol plus every recipe — for the one pin that
-# asserts a code-recipe literal occurs once across all of it. Which recipes
-# those are comes from the routing table, so a kind given a recipe is covered
-# without an edit here and a kind whose recipe is taken away leaves no path
-# behind. This file names its own recipe, which is deleted with it.
-ADVERSARIAL_PROCEDURE = " ".join(
-    [_flat(REFERENCES / "adversarial.md")]
-    + [_flat(path) for path in routed_recipe_files()]
-)
 
 
-# --- The floor rules the code recipe owns -----------------------------------
+# --- The rules this recipe states -------------------------------------------
 #
-# (doc, verb, literal, extras, affirmative example, rejected examples)
-
-RECIPE_PINS = {
-    "ref-branch-tests-excluded-from-floor": (
-        "ref-code", "Reuse toward the floor counts",
-        "(a) the programs the adversary committed for this change",
-        ("(b) tests that exist unchanged outside this change's branch",),
-        "Reuse toward the floor counts only (a) the programs the adversary committed for this "
-        "change and (b) tests that exist unchanged outside this change's branch.",
-        ("Reuse toward the floor counts not only (a) the programs the adversary committed for "
-         "this change and (b) tests that exist unchanged outside this change's branch.",
-         "Reuse toward the floor counts (a) the programs the adversary committed for this change "
-         "and (b) any test on this change's branch."),
-    ),
-    "ref-branch-tests-named-related-coverage": (
-        "ref-code", "Any other test added or changed on the branch",
-        "is named as related coverage only", ("such as an implementer's pin",),
-        "Any other test added or changed on the branch, such as an implementer's pin, is named "
-        "as related coverage only.",
-        ("Any other test added or changed on the branch, such as an implementer's pin, is not "
-         "named as related coverage only.",
-         "Any other test added or changed on the branch, such as an implementer's pin, counts "
-         "toward the floor."),
-    ),
-    "ref-floor-counts-reuse": (
-        "ref-code", "Reused and modified cases count", "toward the floor", (),
-        "Reused and modified cases count toward the floor.",
-        ("Reused and modified cases do not count toward the floor.",),
-    ),
-}
-FLOOR_NOT_TARGET = "Three is the floor, not the target."
-_PIN_DOCS = {"ref-code": ADVERSARIAL_CODE}
-
-
-@pytest.mark.parametrize("pin", sorted(RECIPE_PINS))
-def test_probe_maintenance_pin_helpers_synthetic(pin: str) -> None:
-    _doc, verb, literal, extras, affirmative, rejected = RECIPE_PINS[pin]
-    assert _affirms(affirmative, verb, literal, *extras)
-    assert any(has_negation(r) for r in rejected), pin
-    for example in rejected:
-        assert not _affirms(example, verb, literal, *extras), example
-
-
-@pytest.mark.parametrize("pin", sorted(RECIPE_PINS))
-def test_adversary_probe_maintenance_rule_stated(pin: str) -> None:
-    doc, verb, literal, extras, _affirmative, _rejected = RECIPE_PINS[pin]
-    assert _affirms(_PIN_DOCS[doc], verb, literal, *extras), (pin, verb, literal)
-
-
-def test_code_recipe_states_the_floor_once() -> None:
-    assert ADVERSARIAL_PROCEDURE.count("**at least three**") == 1
-    assert _pins_exact_sentence(ADVERSARIAL_CODE, FLOOR_NOT_TARGET), ADVERSARIAL_CODE
-
-
-# --- The rest of the rules this recipe states -------------------------------
+# How many cases a change may commit is not among them any more. The ceiling
+# moved to the shared protocol, which states it once for every artifact type,
+# and `test_adversary_protocol.py` pins it there; the floor was dropped from
+# the intent altogether, so no file states one and the protocol's scan fails
+# the repository if one comes back. The four pins this module carried for the
+# floor are deleted rather than converted, because the rule they pinned is
+# gone.
 #
-# The three floor pins above cover what counts toward the floor. These cover
-# the rest: which procedure applies, what a case must be, where cases come
+# What is left: which procedure applies, what a case must be, where cases come
 # from, and what a case that never ran is worth. Two pin shapes, both the
 # repository's own -- an affirmative verb before the pinned literal with a
 # negation in the same sentence rejected, and, where the rule's own wording
@@ -154,25 +94,32 @@ AFFIRMATIVE_PINS = {
          "Run it over the changed modules and report survivors: a surviving mutant is a "
          "test that asserts nothing, and a finding against `tests`."),
     ),
-    "code-three-cases-written-run-and-recorded": (
-        "it declares none**", "write **at least three**",
-        ("executable abuse or boundary cases against the changed behaviour",
-         "run them", "record each one"),
-        "**If it declares none** (the common case), write **at least three** executable "
-        "abuse or boundary cases against the changed behaviour, run them, and record each one.",
-        ("**If it declares none** (the common case), write **at least three** executable "
-         "abuse or boundary cases against the changed behaviour, run them, and record no "
-         "one.",
-         "**If it declares none** (the common case), write **at least three** executable "
-         "abuse or boundary cases against the changed behaviour.",
-         "**If it declares none** (the common case), write a case or two against the "
-         "changed behaviour, run them, and record each one.",
+    "code-cases-written-run-and-recorded": (
+        "it declares none**", "write executable abuse or boundary cases",
+        ("against the changed behaviour", "run them", "record each one"),
+        "**If it declares none** (the common case), write executable abuse or boundary "
+        "cases against the changed behaviour, run them, and record each one.",
+        ("**If it declares none** (the common case), write executable abuse or boundary "
+         "cases against the changed behaviour, run them, and record no one.",
+         "**If it declares none** (the common case), write executable abuse or boundary "
+         "cases against the changed behaviour.",
+         "**If it declares none** (the common case), read the changed behaviour, run "
+         "them, and record each one.",
          # The same rewording, on the other branch's condition.
-         "**If declares it none** (the common case), write **at least three** executable "
-         "abuse or boundary cases against the changed behaviour, run them, and record each one.",
-         # The condition dropped: nothing says which branch the floor belongs to.
-         "Write **at least three** executable abuse or boundary cases against the changed "
-         "behaviour, run them, and record each one."),
+         "**If declares it none** (the common case), write executable abuse or boundary "
+         "cases against the changed behaviour, run them, and record each one.",
+         # The condition dropped: nothing says which branch these cases belong to.
+         "Write executable abuse or boundary cases against the changed behaviour, run "
+         "them, and record each one."),
+    ),
+    # The ceiling itself is not stated here: the recipe points at the one file
+    # that states it. A rewrite that answers the question locally, with a
+    # number of its own, fails this pin and the protocol's runtime-prose scan.
+    "code-how-many-points-at-the-protocol": (
+        "How many a change may commit", "is in [`adversarial.md`](adversarial.md)", (),
+        "How many a change may commit is in [`adversarial.md`](adversarial.md).",
+        ("How many a change may commit is not in [`adversarial.md`](adversarial.md).",
+         "How many a change may commit is at most five."),
     ),
     "code-cases-prefer-to-live-as-real-tests": (
         "Prefer", "cases that live as real tests afterwards", (),
@@ -184,6 +131,17 @@ AFFIRMATIVE_PINS = {
 
 # name: (sentence, rewrites that must fail)
 SENTENCE_PINS = {
+    # The recipe asks for the cases the change earns and points at the
+    # protocol for the ceiling. Its own wording carries the negation ("and no
+    # others"), so the affirmative matcher cannot hold it. A rejected rewrite
+    # states a floor here, the rule the intent removed and the one
+    # `test_adversary_protocol.py` refuses anywhere in the runtime prose.
+    "code-cases-are-the-ones-the-change-earns": (
+        "Write the ones the changed behaviour earns, and no others.",
+        ("Write the ones the changed behaviour earns, and others too.",
+         "Write the ones the changed behaviour earns.",
+         "Write at least three of them, and no others."),
+    ),
     "code-a-case-that-only-ran-in-the-head-is-not-evidence": (
         "A case that only ran in the adversary's head is not evidence.",
         ("A case that only ran in the adversary's head is evidence.",
@@ -249,8 +207,7 @@ def test_recipe_names_every_class_to_draw_cases_from() -> None:
 # Each fragment names one rule the code recipe owns; it lives in this file
 # and nowhere in adversary.md.
 PROCEDURE_FRAGMENTS = (
-    "floor counts only", "as related coverage only",
-    "**at least three**", "surviving mutant", "wrong type",
+    "abuse or boundary cases", "surviving mutant", "wrong type",
 )
 
 

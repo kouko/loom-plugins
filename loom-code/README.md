@@ -8,7 +8,7 @@
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.8.1 · **Skills**: 5 stations + 1 router + 1 user-invoked · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.9.0 · **Skills**: 5 stations + 1 router + 1 user-invoked · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -80,7 +80,7 @@ The stations dispatch these agents; none reviews its own work.
 | [`implementer`](agents/implementer.md) | `build` | One task: failing test first, one commit, a status report — never a verdict. |
 | [`reviewer`](agents/reviewer.md) | `closing-review` | Fresh-context verdict (`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`) with anchored findings; never edits what it reviews. |
 | [`blind-runner`](agents/blind-runner.md) | `closing-review` | Runs the change in a clean environment against every Acceptance line and writes `docs/loom/<change-id>/blind-run-report.md`. |
-| [`adversary`](agents/adversary.md) | `build` | Tries to make the change fail — mutation or fuzz tooling, or at least three executable abuse and boundary cases — and records every attempt as a probe. |
+| [`adversary`](agents/adversary.md) | `build` | Tries to make the change fail — mutation or fuzz tooling, or executable abuse and boundary cases — and records every attempt as a probe. |
 
 The number of reviewers is not chosen by the agent: `loom_checker.py
 reviewer-count` computes it from the whole branch delta — one for a narrow,

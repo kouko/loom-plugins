@@ -10,14 +10,10 @@ protocol in [`adversarial.md`](adversarial.md).
 changed modules and report survivors: a surviving mutant is a test that
 asserts nothing, and a finding against `tests`.
 
-**If it declares none** (the common case), write **at least three**
-executable abuse or boundary cases against the changed behaviour, run them,
-and record each one. Three is the floor, not the target. Reused and modified
-cases count toward the floor. Reuse toward the floor counts only (a) the
-programs the adversary committed for this change and (b) tests that exist
-unchanged outside this change's branch. Any other test added or changed on the
-branch, such as an implementer's pin, is named as related coverage only. Draw
-them from:
+**If it declares none** (the common case), write executable abuse or boundary
+cases against the changed behaviour, run them, and record each one. Write the
+ones the changed behaviour earns, and no others. How many a change may commit
+is in [`adversarial.md`](adversarial.md). Draw them from:
 
 | Class | The question |
 |---|---|

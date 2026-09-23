@@ -190,11 +190,10 @@ def test_reused_change_id_on_new_branch_inherits_nothing(tmp_path: Path) -> None
     state = show(repo)
     assert state["bound"] is False
     # Auto-skip activates for narrow deltas: .txt file outside docs/loom/ makes floor=1
-    # so spec/plan/blind-run are auto-skipped
-    assert state["skip"] == ["spec", "plan", "blind-run"]
-    assert "spec" not in state["run"]
-    assert "plan" not in state["run"]
-    assert "blind-run" not in state["run"]
+    # so spec/plan/adversarial/blind-run are auto-skipped
+    assert state["skip"] == ["spec", "plan", "adversarial", "blind-run"]
+    for step in ("spec", "plan", "adversarial", "blind-run"):
+        assert step not in state["run"]
 
 
 def test_store_lives_under_git_common_dir(tmp_path: Path) -> None:

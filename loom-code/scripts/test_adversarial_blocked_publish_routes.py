@@ -232,6 +232,18 @@ def test_probe_gate_open_marker_grammar_is_narrow() -> None:
 SEAM_CHANGE = "2026-09-18-seam-probe"
 
 
+def _write_probe(repo: Path, change_id: str) -> str:
+    """A probe program where finalize-review will run one from, uncommitted.
+
+    The caller commits it with the rest of its fixture.
+    """
+    relative = f"docs/loom/{change_id}/evidence/probes/probe_ok.py"
+    path = repo / relative
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("# concern: the fixture's own probe\nprint('ok')\n", encoding="utf-8")
+    return relative
+
+
 # --------------------------------------------------------------------------
 # Half five: the rewritten refusal, attacked as if the old one never existed.
 # Nothing below reads an imported constant to decide what to do; it reads the
@@ -287,6 +299,7 @@ def _already_landed_branch(tmp_path: Path, change_id: str, review: Path, *,
         "- package-tests: python3 probe_ok.py — fixture (2026-09-18)\n",
         encoding="utf-8")
     (repo / "probe_ok.py").write_text("print('ok')\n", encoding="utf-8")
+    probe = _write_probe(repo, change_id)
     (repo / "feature.py").write_text("VALUE = 1\n", encoding="utf-8")
     _git(repo, "add", ".")
     _git(repo, "commit", "-q", "-m", "feature")
@@ -295,7 +308,7 @@ def _already_landed_branch(tmp_path: Path, change_id: str, review: Path, *,
         "verdicts": [{"reviewer": "a", "verdict": "PASS"},
                      {"reviewer": "b", "verdict": "PASS"}],
         "findings": [],
-        "adversarial": [{"command": "python3 probe_ok.py", "artifact": "probe_ok.py"}],
+        "adversarial": [{"command": f"python3 {probe}", "artifact": probe}],
     }), encoding="utf-8")
     finalized = _checker(repo, ["finalize-review", change_id, "--input", str(review)])
     assert finalized.returncode == 0, finalized.stderr
@@ -421,6 +434,7 @@ def _attested_branch_without_a_skip(tmp_path: Path) -> Path:
         "- package-tests: python3 probe_ok.py — fixture (2026-09-18)\n",
         encoding="utf-8")
     (repo / "probe_ok.py").write_text("print('ok')\n", encoding="utf-8")
+    probe = _write_probe(repo, SEAM_CHANGE)
     _git(repo, "add", ".")
     _git(repo, "commit", "-q", "-m", "fixture")
     review = tmp_path / "noskip-review.json"
@@ -428,7 +442,7 @@ def _attested_branch_without_a_skip(tmp_path: Path) -> Path:
         "verdicts": [{"reviewer": "a", "verdict": "PASS"},
                      {"reviewer": "b", "verdict": "PASS"}],
         "findings": [],
-        "adversarial": [{"command": "python3 probe_ok.py", "artifact": "probe_ok.py"}],
+        "adversarial": [{"command": f"python3 {probe}", "artifact": probe}],
     }), encoding="utf-8")
     finalized = _checker(repo, ["finalize-review", SEAM_CHANGE, "--input", str(review)])
     assert finalized.returncode == 0, finalized.stderr

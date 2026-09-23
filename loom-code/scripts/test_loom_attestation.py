@@ -46,6 +46,25 @@ def manifest() -> dict:
     return {"publication_only_paths": ["docs/loom/<change-id>/attestation.json"]}
 
 
+PROBE = f"docs/loom/{CHANGE}/evidence/probes/test_probe.py"
+
+
+def commit_probe(repo: Path) -> str:
+    """Commit a probe program where the protocol puts one.
+
+    `finalize-review` runs only an artifact committed there, so that every
+    program it executes is one `adversarial.proportionate` has counted.
+    """
+    path = repo / PROBE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "# concern: the fixture's own adversarial run\nprint('probe')\n",
+        encoding="utf-8",
+    )
+    commit(repo, "probe program")
+    return PROBE
+
+
 def test_functional_digest_ignores_declared_publication_paths(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
     before = git(repo, "rev-parse", "HEAD")
@@ -160,7 +179,12 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
         "docs/guide.md",
     }
     assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 1
-    assert reviewers.is_narrow_delta(change_paths, CHANGE) is True
+    # Adding a test is low risk, so the floor is one; it is still a file the
+    # suite executes, so the delta is not narrow and skips no step.
+    assert reviewers.is_narrow_delta(change_paths, CHANGE) is False
+    assert reviewers.is_narrow_delta(
+        change_paths - {"loom-code/scripts/test_example.py"}, CHANGE
+    ) is True
 
     for protected in (
         "src.py",
@@ -180,6 +204,20 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
             change_paths | {protected}, CHANGE
         ) == 2
         assert reviewers.is_narrow_delta(change_paths | {protected}, CHANGE) is False
+
+
+def test_reviewer_floor_is_two_when_the_delta_removes_a_test() -> None:
+    """Adding a check is low risk; removing one changes what the repository
+    can still catch, so it keeps the default two reviewers."""
+    change_paths = {
+        f"docs/loom/intent/{CHANGE}.md",
+        "loom-code/scripts/test_example.py",
+        "docs/guide.md",
+    }
+    removed = {"loom-code/scripts/test_example.py"}
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE, removed) == 2
+    assert reviewers.is_narrow_delta(change_paths, CHANGE, removed) is False
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 1
 
 
 def test_is_narrow_delta_returns_false_for_mixed_delta() -> None:
@@ -331,6 +369,7 @@ def test_finalize_review_runs_and_writes_matching_attestation(tmp_path: Path) ->
     kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
     kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-08)\n")
     commit(repo, "declare tests")
+    probe = commit_probe(repo)
     review_input = tmp_path / "review-input.json"
     review_input.write_text(json.dumps({
         "verdicts": [{
@@ -341,7 +380,7 @@ def test_finalize_review_runs_and_writes_matching_attestation(tmp_path: Path) ->
             "lens": "code", "verdict": "PASS", "findings": [],
         }],
         "findings": [],
-        "adversarial": [{"command": "python3 src.py", "artifact": "src.py"}],
+        "adversarial": [{"command": f"python3 {probe}", "artifact": probe}],
     }), encoding="utf-8")
     checker = Path(__file__).with_name("loom_checker.py")
     result = subprocess.run(
@@ -391,7 +430,9 @@ def test_finalize_review_accepts_one_reviewer_for_low_risk_change(tmp_path: Path
             "lens": "docs", "verdict": "PASS", "findings": [],
         }],
         "findings": [],
-        "adversarial": [{"command": "python3 src.py", "artifact": "src.py"}],
+        # The delta is one low-risk doc, so the adversarial step is auto-skipped
+        # and the change records no adversarial run at all.
+        "adversarial": [],
     }), encoding="utf-8")
 
     result = subprocess.run(
@@ -414,6 +455,7 @@ def test_finalize_surfaces_failed_command_output(tmp_path: Path, monkeypatch) ->
         encoding="utf-8",
     )
     commit(repo, "set failing package command")
+    probe = commit_probe(repo)
     review_input = tmp_path / "review-input.json"
     review_input.write_text(json.dumps({
         "verdicts": [
@@ -421,7 +463,7 @@ def test_finalize_surfaces_failed_command_output(tmp_path: Path, monkeypatch) ->
             {"reviewer": "r2", "vendor": "openai", "model": "test", "lens": "skill", "verdict": "PASS", "findings": []},
         ],
         "findings": [],
-        "adversarial": [{"command": "python3 src.py", "artifact": "src.py"}],
+        "adversarial": [{"command": f"python3 {probe}", "artifact": probe}],
     }), encoding="utf-8")
     monkeypatch.chdir(repo)
     error = StringIO()

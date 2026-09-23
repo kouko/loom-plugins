@@ -19,11 +19,16 @@ from pathlib import Path
 from loom_checker import attestation as attestation_module
 from loom_checker import intent_state
 from loom_checker import selection
+from loom_checker.probes import MAX_PROBE_PROGRAMS
 
 import pytest
 
 CHECKER = Path(__file__).with_name("loom_checker.py")
 CHANGE = "2026-09-14-example"
+# The one place finalize-review runs an adversarial artifact from, so that
+# every program it executes is one `adversarial.proportionate` counted.
+PROBE_0 = f"docs/loom/{CHANGE}/evidence/probes/probe_0.py"
+ADVERSARIAL = [{"command": f"python3 {PROBE_0}", "artifact": PROBE_0}]
 
 
 @pytest.fixture(autouse=True)
@@ -59,6 +64,25 @@ def make_repo(tmp_path: Path, package: str = "python3 -c pass") -> Path:
     git(repo, "checkout", "-q", "-b", "feature")
     (repo / "feature.py").write_text("ENABLED = True\n", encoding="utf-8")
     commit_all(repo, "feature")
+    return repo
+
+
+def make_narrow_repo(tmp_path: Path) -> Path:
+    """A repo whose branch delta is mechanically narrow: one low-risk doc."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    git(repo, "config", "user.email", "t@example.com")
+    git(repo, "config", "user.name", "T")
+    (repo / "src.py").write_text("VALUE = 1\n", encoding="utf-8")
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.parent.mkdir(parents=True)
+    kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-23)\n", encoding="utf-8")
+    commit_all(repo, "base")
+    git(repo, "checkout", "-q", "-b", "feature")
+    guide = repo / "docs/guide.md"
+    guide.write_text("# guide\n", encoding="utf-8")
+    commit_all(repo, "doc")
     return repo
 
 
@@ -152,6 +176,368 @@ def test_bound_skip_of_reviewers_and_adversarial_validates(tmp_path: Path) -> No
     assert intent_state._delivery_witness_valid(attestation, CHANGE)
 
 
+def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> None:
+    """A narrow delta auto-skips the adversarial step, with no typed skip."""
+    repo = make_narrow_repo(tmp_path)
+
+    result = finalize(repo, review_input(tmp_path, PASSING[:1], []))
+
+    assert result.returncode == 0, result.stderr
+    attestation = written(repo)
+    assert [run["kind"] for run in attestation["executions"]] == ["package-tests"]
+    assert attestation["selection"] is None  # no typed confirmation was bound
+    assert validate(repo, attestation) == []
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, None,
+        claimed_selection=True,
+    ) == []
+
+
+def trunkless_clone(origin: Path, tmp_path: Path, branch: str = "feature") -> Path:
+    """The same commit, cloned the way CI fetches one branch: no trunk, so
+    the committed delta cannot be recomputed at all."""
+    clone = tmp_path / "clone"
+    subprocess.run(
+        ["git", "clone", "-q", "--single-branch", "--branch", branch, "--no-tags",
+         str(origin), str(clone)],
+        capture_output=True, text=True, check=True,
+    )
+    git(clone, "remote", "remove", "origin")
+    return clone
+
+
+def test_finalize_refuses_a_wide_delta_whose_delta_cannot_be_read(tmp_path: Path) -> None:
+    """Finalize MAKES the evidence, so it may not read "cannot tell" as "every
+    step is skipped". A checkout that resolves no trunk cannot know the delta
+    is wide, and the permissive reading let a change touching production code
+    finalize with no adversarial execution at all."""
+    origin = make_repo(tmp_path)
+    clone = trunkless_clone(origin, tmp_path)
+    # Precondition: the delta really is unreadable here, and really is wide there.
+    from loom_checker.reviewers import committed_branch_delta
+
+    assert committed_branch_delta(clone, CHANGE) is None
+    assert committed_branch_delta(origin, CHANGE)[0] == {"feature.py"}
+
+    refused = finalize(clone, review_input(tmp_path, PASSING, []))
+
+    assert refused.returncode == 1, refused.stdout
+    assert "finalize.delta" in refused.stderr
+    assert not (clone / f"docs/loom/{CHANGE}/attestation.json").exists()
+
+
+def test_finalize_and_attestation_refuse_alike_with_one_message(tmp_path: Path) -> None:
+    """Acceptance 10: one predicate, one message, both call sites."""
+    from loom_checker.probes import missing_adversarial_execution
+
+    reason = missing_adversarial_execution(0, set())
+    assert reason and missing_adversarial_execution(1, set()) is None
+    assert missing_adversarial_execution(0, {"adversarial"}) is None
+
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+    refused = finalize(repo, review_input(tmp_path, PASSING, []))
+    assert refused.returncode == 1
+    assert f"BLOCK finalize.adversarial: {reason}" in refused.stderr
+
+    accepted = finalize(repo, review_input(
+        tmp_path, PASSING, ADVERSARIAL
+    ))
+    assert accepted.returncode == 0, accepted.stderr
+    attestation = written(repo)
+    stripped = dict(attestation, executions=[
+        run for run in attestation["executions"] if run["kind"] != "adversarial"
+    ])
+    assert [msg for _, msg in validate(repo, stripped)] == [reason]
+
+
+def write_probes(repo: Path, count: int, concern: bool = True) -> None:
+    """Commit `count` probe programs for this change, replacing any earlier set."""
+    directory = repo / f"docs/loom/{CHANGE}/evidence/probes"
+    if directory.is_dir():
+        for stale in directory.iterdir():
+            stale.unlink()
+    directory.mkdir(parents=True, exist_ok=True)
+    head = "# concern: a boundary input the code never rejects\n" if concern else ""
+    for index in range(count):
+        (directory / f"probe_{index}.py").write_text(
+            f'"""Probe {index}."""\n{head}assert True\n', encoding="utf-8"
+        )
+    commit_all(repo, f"probes {count}")
+
+
+def run_with_probes(repo: Path, tmp_path: Path) -> subprocess.CompletedProcess:
+    return finalize(repo, review_input(
+        tmp_path, PASSING, ADVERSARIAL
+    ))
+
+
+def test_five_probe_programs_pass_and_a_sixth_is_refused(tmp_path: Path) -> None:
+    """Acceptance 3: at most five committed probe programs for a change."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 5)
+    accepted = run_with_probes(repo, tmp_path)
+    assert accepted.returncode == 0, accepted.stderr
+
+    write_probes(repo, 6)
+    refused = run_with_probes(repo, tmp_path)
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert "six" in refused.stderr or "6" in refused.stderr
+
+
+def test_probe_program_without_a_concern_line_is_refused(tmp_path: Path) -> None:
+    """Acceptance 4: every committed probe program names what it defends against."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 2, concern=False)
+
+    refused = run_with_probes(repo, tmp_path)
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert "concern:" in refused.stderr
+    assert "probe_0.py" in refused.stderr
+
+
+def test_a_shell_probe_program_counts_against_the_cap(tmp_path: Path) -> None:
+    """The protocol says "program", not "Python file": a `.sh` probe is run
+    like any other and is counted like any other."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+    directory = repo / f"docs/loom/{CHANGE}/evidence/probes"
+    for index in range(MAX_PROBE_PROGRAMS):
+        (directory / f"shell_{index}.sh").write_text(
+            "# concern: a boundary the code never rejects\nexit 0\n", encoding="utf-8"
+        )
+    commit_all(repo, "shell probes")
+
+    refused = run_with_probes(repo, tmp_path)
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert "6 probe programs" in refused.stderr
+
+
+def test_an_extension_less_program_is_counted_and_keeps_a_delta_wide(
+    tmp_path: Path,
+) -> None:
+    """A closed suffix list is a list of the names a program may be given. An
+    executable with no extension -- a shebang, or git's 100755 mode -- is run
+    like any other program, and used to escape the cap, the `concern:` line and
+    the delta-width rule at once."""
+    from loom_checker.reviewers import auto_skipped_steps
+
+    repo = make_narrow_repo(tmp_path)
+    runner = repo / f"docs/loom/{CHANGE}/evidence/probes/run"
+    runner.parent.mkdir(parents=True, exist_ok=True)
+    runner.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    runner.chmod(0o755)
+    head = commit_all(repo, "an extension-less probe program")
+
+    from loom_checker.probes import committed_probe_programs
+
+    assert committed_probe_programs(repo, head, CHANGE) == [
+        f"docs/loom/{CHANGE}/evidence/probes/run"
+    ]
+    assert "adversarial" not in auto_skipped_steps(repo, CHANGE, head)
+
+    refused = finalize(repo, review_input(tmp_path, PASSING, []))
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+
+
+def test_a_program_in_the_store_outside_the_probe_directory_is_refused(
+    tmp_path: Path,
+) -> None:
+    """A program one directory up is executed by finalize-review and counted
+    by nothing, so the rule refuses it where it sits."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+    stray = repo / f"docs/loom/{CHANGE}/helper.py"
+    stray.write_text("# concern: stated, and in the wrong place\nassert True\n", encoding="utf-8")
+    commit_all(repo, "stray program")
+
+    refused = run_with_probes(repo, tmp_path)
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert f"docs/loom/{CHANGE}/helper.py" in refused.stderr
+
+
+def test_finalize_refuses_an_adversarial_artifact_outside_the_probe_directory(
+    tmp_path: Path,
+) -> None:
+    """`src.py` exists in the commit and the command really runs it, which was
+    enough to have finalize-review execute it as a probe and count it nowhere."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING, [{"command": "python3 src.py", "artifact": "src.py"}]
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    # Both legal homes are named, so the refusal says where the program may go.
+    assert f"docs/loom/{CHANGE}/evidence/probes/" in refused.stderr
+    assert "package suite" in refused.stderr
+
+
+def graduate(repo: Path, name: str = "test_graduated_probe.py") -> str:
+    """Commit a probe program where the repository's own runner collects it,
+    together with the runner that declares that inventory."""
+    runner = repo / "scripts/run_package_tests.py"
+    runner.parent.mkdir(parents=True, exist_ok=True)
+    runner.write_text(
+        (Path(__file__).resolve().parents[2] / "scripts/run_package_tests.py")
+        .read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    graduated = repo / "loom-code/scripts" / name
+    graduated.parent.mkdir(parents=True, exist_ok=True)
+    graduated.write_text(
+        "# concern: the defect this probe caught, now pinned for every change\n"
+        "def test_graduated() -> None:\n    assert True\n",
+        encoding="utf-8",
+    )
+    commit_all(repo, "graduate the probe into the suite")
+    return f"loom-code/scripts/{name}"
+
+
+def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
+    tmp_path: Path,
+) -> None:
+    """A probe that earned its place leaves the change's store for the package
+    suite. It is still an adversarial execution, and the empty store is not a
+    missing one."""
+    repo = make_repo(tmp_path)
+    graduated = graduate(repo)
+    assert not (repo / f"docs/loom/{CHANGE}/evidence/probes").exists()
+
+    result = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated}", "artifact": graduated}],
+    ))
+
+    assert result.returncode == 0, result.stderr
+    executions = written(repo)["executions"]
+    assert [run["artifact"] for run in executions if run["kind"] == "adversarial"] == [
+        graduated
+    ]
+
+
+def graduate_many(repo: Path, count: int, concern: bool = True) -> list[str]:
+    """Commit `count` graduated probe programs where the runner collects them."""
+    names = [f"test_graduated_{index}.py" for index in range(count)]
+    for name in names:
+        graduate(repo, name)
+    if not concern:
+        for name in names:
+            path = repo / "loom-code/scripts" / name
+            path.write_text(
+                "def test_graduated() -> None:\n    assert True\n", encoding="utf-8"
+            )
+        commit_all(repo, "ordinary tests, not the adversary's output")
+    return [f"loom-code/scripts/{name}" for name in names]
+
+
+def test_a_graduated_program_spends_against_the_cap(tmp_path: Path) -> None:
+    """Graduation empties the change's store, so counting only that store
+    counted zero however many programs the change actually committed. A
+    program that leaves the store for the suite still spends against the
+    ceiling."""
+    repo = make_repo(tmp_path)
+    graduated = graduate_many(repo, MAX_PROBE_PROGRAMS)
+    assert not (repo / f"docs/loom/{CHANGE}/evidence/probes").exists()
+
+    accepted = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated[0]}", "artifact": graduated[0]}],
+    ))
+    assert accepted.returncode == 0, accepted.stderr
+
+    graduate(repo, "test_graduated_one_too_many.py")
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated[0]}", "artifact": graduated[0]}],
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert f"{MAX_PROBE_PROGRAMS + 1} " in refused.stderr
+
+
+def test_an_executed_artifact_outside_the_store_spends_against_the_cap(
+    tmp_path: Path,
+) -> None:
+    """What finalize-review is about to run is the adversary's output whether
+    or not the tree still holds it under the store."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, MAX_PROBE_PROGRAMS)
+    graduated = graduate(repo, "test_graduated_extra.py")
+
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated}", "artifact": graduated}],
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert f"{MAX_PROBE_PROGRAMS + 1} " in refused.stderr
+
+
+def test_an_ordinary_new_test_does_not_spend_against_the_cap(tmp_path: Path) -> None:
+    """The `concern:` line is what makes a suite file the adversary's output.
+    A change that adds six ordinary tests adds no probe programs."""
+    repo = make_repo(tmp_path)
+    graduate_many(repo, MAX_PROBE_PROGRAMS + 1, concern=False)
+    write_probes(repo, 1)
+
+    accepted = run_with_probes(repo, tmp_path)
+
+    assert accepted.returncode == 0, accepted.stderr
+
+
+def test_a_graduated_program_without_a_concern_line_is_refused_when_executed(
+    tmp_path: Path,
+) -> None:
+    """Executing it is the claim that it is a probe, so it answers for the
+    `concern:` line wherever it now lives."""
+    repo = make_repo(tmp_path)
+    graduated = graduate_many(repo, 1, concern=False)[0]
+
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated}", "artifact": graduated}],
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert "concern:" in refused.stderr
+    assert graduated in refused.stderr
+
+
+def test_a_file_the_suite_never_collects_is_still_refused(tmp_path: Path) -> None:
+    """The runner's inventory is read, not its directories trusted: a file that
+    pytest would not collect is in neither home."""
+    repo = make_repo(tmp_path)
+    graduate(repo)
+    stray = repo / "loom-code/scripts/helper_probe.py"
+    stray.write_text("# concern: none\nassert True\n", encoding="utf-8")
+    commit_all(repo, "uncollected neighbour")
+
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": "python3 loom-code/scripts/helper_probe.py",
+          "artifact": "loom-code/scripts/helper_probe.py"}],
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    assert f"docs/loom/{CHANGE}/evidence/probes/" in refused.stderr
+    assert "package suite" in refused.stderr
+
+
 def test_skipping_every_executed_step_allows_empty_executions(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, package="python3 -c 'raise SystemExit(3)'")
     propose(repo, "reviewers,adversarial,package-tests")
@@ -215,8 +601,9 @@ def test_unbound_skip_refused_and_digest_mismatch_blocks(tmp_path: Path) -> None
 
 def test_v2_without_selection_keeps_every_floor(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
+    write_probes(repo, 1)
     assert finalize(repo, review_input(
-        tmp_path, PASSING, [{"command": "python3 src.py", "artifact": "src.py"}]
+        tmp_path, PASSING, ADVERSARIAL
     )).returncode == 0
     attestation = written(repo)
     assert attestation["schema"] == "loom-attestation/v2"
@@ -336,6 +723,7 @@ def test_non_verification_refusals_record_no_failure(tmp_path: Path) -> None:
 
 def test_failure_after_confirmation_not_listed_as_prior(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
+    write_probes(repo, 1)
     propose(repo, "reviewers")
     confirm(repo, "2026-01-01T00:00:00Z")
     refused = finalize(repo, review_input(tmp_path, [], []))
@@ -343,7 +731,7 @@ def test_failure_after_confirmation_not_listed_as_prior(tmp_path: Path) -> None:
     assert [e["rule"] for e in failures(repo)] == ["finalize.adversarial"]
 
     result = finalize(repo, review_input(
-        tmp_path, [], [{"command": "python3 src.py", "artifact": "src.py"}]
+        tmp_path, [], ADVERSARIAL
     ))
 
     assert result.returncode == 0, result.stderr

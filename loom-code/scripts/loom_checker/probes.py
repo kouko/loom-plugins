@@ -1,9 +1,15 @@
 from __future__ import annotations
 
 from fnmatch import fnmatch
+from loom_checker.helpers import git_maybe
+from loom_checker.helpers import is_program_path
 from loom_checker.helpers import kickoff_defaults
+from loom_checker.helpers import tree_programs
+from loom_checker.reviewers import committed_branch_delta
 from pathlib import Path
+from typing import Iterable
 from repo_files import repository_files
+import importlib.util
 import os
 import re
 import shlex
@@ -24,6 +30,195 @@ _REGULAR_FILE_MODE = "100644"
 
 
 NO_PACKAGE_TESTS = "none"
+
+
+MAX_PROBE_PROGRAMS = 5
+
+
+CONCERN_LINE = re.compile(
+    r"^[^\S\n]*(?:#|//|--|\*)?[^\S\n]*concern:[^\S\n]*\S", re.IGNORECASE | re.MULTILINE
+)
+
+
+CONCERN_HEAD_LINES = 20
+
+
+def probe_directory(change_id: str) -> str:
+    """The one directory a change's probe programs are committed under."""
+    return f"docs/loom/{change_id}/evidence/probes/"
+
+
+SUITE_RUNNER = "scripts/run_package_tests.py"
+
+
+PYTEST_FILE_PATTERNS = ("test_*.py", "*_test.py")
+
+
+def _declared_suite_commands(repo: Path) -> list[list[str]]:
+    """The commands the repository's own test runner declares it runs.
+
+    Which programs the package suite covers is the repository's answer, not a
+    list kept here: `scripts/run_package_tests.py` is the single inventory the
+    declared package command drives, so it is read rather than mirrored. A
+    repository without that runner declares nothing, and nothing is collected.
+    """
+    runner = repo / SUITE_RUNNER
+    if not runner.is_file():
+        return []
+    spec = importlib.util.spec_from_file_location("_loom_suite_inventory", runner)
+    if spec is None or spec.loader is None:
+        return []
+    try:
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return list(module.loom_family_commands(repo))
+    except (OSError, AttributeError, ImportError, SyntaxError, TypeError, ValueError):
+        return []
+
+
+def suite_collects(repo: Path, artifact: str) -> bool:
+    """True when the declared package suite already runs `artifact`.
+
+    A graduated probe program -- one carried out of a change's store into the
+    permanent suite -- is named by a pytest path the runner declares, either
+    as that path itself or as a file pytest collects under a declared
+    directory. A neighbour the suite would never collect is not in the suite.
+    """
+    wanted = os.path.normpath(artifact)
+    for command in _declared_suite_commands(repo):
+        if not command:
+            continue
+        runs_pytest = "pytest" in command[:4]
+        runs_shell = Path(command[0]).name in {"bash", "sh"}
+        if not (runs_pytest or runs_shell):
+            continue
+        for token in command[1:]:
+            if token.startswith("-") or token == "pytest":
+                continue
+            target = os.path.normpath(token)
+            if not (repo / target).exists():
+                continue
+            if target == wanted:
+                return True
+            if not (runs_pytest and (repo / target).is_dir()):
+                continue
+            if wanted.startswith(target + os.sep) and any(
+                fnmatch(Path(wanted).name, pattern) for pattern in PYTEST_FILE_PATTERNS
+            ):
+                return True
+    return False
+
+
+def committed_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[str]:
+    """Every program the selected commit holds under this change's store.
+
+    Counting only `*.py`, and only under `evidence/probes/`, counted a subset
+    of what the change commits and what `finalize-review` then executes: a
+    shell program, or a Python program one directory up, escaped both the cap
+    and the `concern:` line while still being run. What makes a file a program
+    is `tree_programs`, the same question the delta-width rule asks, so an
+    extension-less executable is counted here too.
+    """
+    prefix = f"docs/loom/{change_id}/"
+    listing = git_maybe(repo, "ls-tree", "-r", "--name-only", head_sha, "--", prefix) or ""
+    held = [line.strip() for line in listing.splitlines() if line.strip()]
+    return sorted(tree_programs(repo, head_sha, held))
+
+
+def _carries_concern(repo: Path, head_sha: str, path: str) -> bool:
+    """True when the selected commit's copy of `path` states a concern."""
+    text = git_maybe(repo, "show", f"{head_sha}:{path}") or ""
+    head = "\n".join(text.splitlines()[:CONCERN_HEAD_LINES])
+    return CONCERN_LINE.search(head) is not None
+
+
+def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[str]:
+    """Probe programs this branch adds straight into the package suite.
+
+    A probe that earned its place graduates: it leaves the change's store for
+    a path the repository's own runner collects. Counting only the store
+    therefore counted zero for exactly the change that produced the most
+    programs, because the graduation gate empties that directory before
+    finalize-review runs. These are counted with the store.
+
+    What marks one of these files as the adversary's output rather than an
+    ordinary new test is the `concern:` line the protocol requires a
+    graduating probe to keep. A change that adds six ordinary test files adds
+    no probe programs; a graduated probe that drops the line to duck the cap
+    has stopped claiming to be a probe, and if finalize-review still executes
+    it as one it is counted and answers for the line anyway.
+    """
+    delta = committed_branch_delta(repo, change_id, head_sha)
+    if delta is None:
+        return []
+    _paths, _removed, added = delta
+    return sorted(
+        path for path in added
+        if is_program_path(path)
+        and suite_collects(repo, path)
+        and _carries_concern(repo, head_sha, path)
+    )
+
+
+def check_adversarial_proportionate(
+    repo: Path, head_sha: str, change_id: str, artifacts: Iterable[str] = ()
+) -> list[tuple[str, str]]:
+    """Recompute the probe-program cap and the `concern:` line from the tree.
+
+    The cap keeps the adversary's output proportionate to one change; the
+    `concern:` line makes each program say what kind of defect it defends
+    against, so a program that defends against nothing is visible.
+
+    Both are recomputed over the union of three sets, because no one of them
+    is the whole of what a change's adversarial step produced: the programs
+    the selected commit holds under this change's store, the programs
+    `finalize-review` is about to execute (``artifacts``), and the programs
+    this branch graduates straight into the package suite. Reading the store
+    alone made the cap unable to bind at all — graduation empties it first.
+
+    A program the change commits somewhere else in its store is still refused
+    rather than left uncounted; that check stays scoped to the store, since a
+    graduated program's whole point is to live outside it.
+    """
+    rule = "adversarial.proportionate"
+    stored = committed_probe_programs(repo, head_sha, change_id)
+    expected = probe_directory(change_id)
+    misplaced = [path for path in stored if not path.startswith(expected)]
+    if misplaced:
+        return [(rule, f"{misplaced[0]} is a program in this change's store outside "
+                       f"{expected}, where the cap and the `concern:` line cannot "
+                       f"see it; commit probe programs there")]
+    counted = dict.fromkeys(stored)
+    for path in graduated_probe_programs(repo, head_sha, change_id):
+        counted[path] = None
+    for artifact in artifacts:
+        artifact = artifact.strip()
+        if artifact:
+            counted[artifact] = None
+    programs = sorted(counted)
+    if len(programs) > MAX_PROBE_PROGRAMS:
+        return [(rule, f"{len(programs)} probe programs for this change "
+                       f"(committed under its store, executed by finalize-review, "
+                       f"or graduated into the package suite); at most "
+                       f"{MAX_PROBE_PROGRAMS} are allowed")]
+    for path in programs:
+        if not _carries_concern(repo, head_sha, path):
+            return [(rule, f"{path} carries no non-empty `concern:` line in its "
+                           f"first {CONCERN_HEAD_LINES} lines")]
+    return []
+
+
+def missing_adversarial_execution(count: int, skip: set[str]) -> str | None:
+    """The refusal reason when a change records no adversarial execution
+    and the adversarial step was not skipped, else None.
+
+    One predicate for both places that ask it -- finalize-review over its
+    review input, and the attestation validator over the recorded
+    executions -- so the two can never answer with different words.
+    """
+    if count < 1 and "adversarial" not in skip:
+        return "at least one adversarial execution is required"
+    return None
 
 
 def command_names_artifact(command: str, artifact: str) -> bool:

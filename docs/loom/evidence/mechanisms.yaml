@@ -112,7 +112,10 @@ mechanisms:
     class: skill
     eval: "loom-code/scripts/test_expert_mode_skill.py::test_skill_procedure_maps_proposes_reports_withdraws_and_relapses"
 
-  # --- checker-rule (19; loom_checker.py --list-rules) ---
+  # --- checker-rule (loom_checker.py --list-rules is the count) ---
+  - id: adversarial.proportionate
+    class: checker-rule
+    eval: loom-code/scripts/test_selection_finalize.py::test_five_probe_programs_pass_and_a_sixth_is_refused
   - id: ci.pr-floor
     class: checker-rule
     eval: loom-code/scripts/test_pr_floor.py::test_bad_body_exit_1_names_heading
@@ -330,6 +333,9 @@ mechanisms:
   - id: "review.bounded-episode"
     class: prose-gate
     eval: loom-code/scripts/test_review_convergence_contract.py
+  - id: "review.probe-graduation"
+    class: prose-gate
+    eval: loom-code/scripts/test_review_convergence_contract.py::test_probe_graduation_gate_states_both_halves
   - id: "review.atomic-claude-dispatch"
     class: prose-gate
     eval: loom-code/scripts/test_dispatch_profile_contract.py::test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack

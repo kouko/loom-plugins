@@ -5,6 +5,7 @@ from loom_checker.attestation import ATTESTATION_SCHEMA
 from loom_checker.attestation import _command_digest
 from loom_checker.attestation import selection_evidence
 from loom_checker.digest import functional_content_digest
+from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import git_maybe
@@ -17,9 +18,15 @@ from loom_checker.helpers import report
 from loom_checker.probes import NO_PACKAGE_TESTS
 from loom_checker.probes import PROBE_RUN_TIMEOUT
 from loom_checker.probes import argv_for
+from loom_checker.probes import check_adversarial_proportionate
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
+from loom_checker.probes import missing_adversarial_execution
+from loom_checker.probes import probe_directory
+from loom_checker.probes import suite_collects
+from loom_checker.reviewers import auto_skipped_steps
+from loom_checker.reviewers import committed_branch_delta
 from loom_checker.reviewers import required_reviewer_count
 from pathlib import Path
 import json
@@ -34,6 +41,7 @@ import tempfile
 STEP_BY_RULE = {
     "finalize.verdicts": "reviewers",
     "finalize.adversarial": "adversarial",
+    "adversarial.proportionate": "adversarial",
     "finalize.package-tests": "package-tests",
 }
 
@@ -81,9 +89,24 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     status_before = git_text(repo, "status", "--porcelain")
     if status_before:
         return [("finalize.clean-tree", "commit functional content before finalizing review")]
+    if committed_branch_delta(repo, change_id, head_sha) is None:
+        # `auto_skipped_steps` answers "every auto-skippable step is skipped"
+        # when the delta cannot be recomputed, and that permissive reading is
+        # correct exactly once: in `attestation.py`, re-validating evidence
+        # that already exists and is bound to the commit's content. Here the
+        # evidence does not exist yet — finalize is making it — so the same
+        # answer would let a change that touches production code waive the
+        # adversarial step by being finalized in a checkout that cannot see
+        # the trunk. Finalize therefore fails closed, and says why.
+        return [("finalize.delta",
+                 "cannot recompute this branch's committed delta, so which "
+                 "steps a narrow change would skip cannot be established; "
+                 "finalize review in a checkout that resolves the trunk "
+                 f"({', '.join(sorted(TRUNK_BRANCH_NAMES))}), or fetch it")]
     manifest = load_manifest()
     bound = selection_evidence(repo, change_id, manifest)
     skip = set(bound["skip"]) if bound else set()
+    skip |= auto_skipped_steps(repo, change_id, head_sha)
     verdicts = review_input.get("verdicts", [] if "reviewers" in skip else None)
     findings = review_input.get("findings", [])
     adversarial = review_input.get("adversarial", [])
@@ -101,9 +124,9 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         return [("finalize.verdicts", f"{needed} distinct reviewers are required")]
     if not isinstance(findings, list) or not isinstance(adversarial, list):
         return [("finalize.schema", "findings and adversarial must be lists")]
-    if not adversarial and "adversarial" not in skip:
-        return [("finalize.adversarial", "at least one adversarial artifact is required")]
-
+    missing = missing_adversarial_execution(len(adversarial), skip)
+    if missing:
+        return [("finalize.adversarial", missing)]
     config_before = git_text(repo, "config", "--list", "--null")
     work: list[tuple[str, str, str]] = []
     if "package-tests" not in skip:
@@ -124,7 +147,29 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             return [("finalize.adversarial", "command must execute the artifact directly")]
         if not git_ok(repo, "cat-file", "-e", f"{head_sha}:{artifact}"):
             return [("finalize.adversarial", "artifact must exist in the selected commit")]
+        if not artifact.startswith(probe_directory(change_id)) and not suite_collects(repo, artifact):
+            # A probe program has two legal homes. In this change's probe
+            # directory it is counted by `adversarial.proportionate`, which
+            # reads that directory only. Graduated into the package suite it
+            # is an ordinary permanent test: the suite runs it on every later
+            # change and reviewers read it, so it escapes neither the cap nor
+            # review by leaving the store. An artifact in neither home is a
+            # program that gets executed and is answerable to nothing.
+            return [("finalize.adversarial",
+                     f"adversarial artifact must be committed under "
+                     f"{probe_directory(change_id)} or be a program the "
+                     f"package suite already runs")]
         work.append(("adversarial", command, artifact))
+
+    # Every artifact is now in a legal home, so the cap can count them: what
+    # finalize-review is about to execute is this change's adversarial output
+    # wherever graduation has since moved it.
+    proportionate = check_adversarial_proportionate(
+        repo, head_sha, change_id,
+        [artifact for kind, _command, artifact in work if kind == "adversarial"],
+    )
+    if proportionate:
+        return proportionate
 
     executions: list[dict] = []
     for kind, command, artifact in work:

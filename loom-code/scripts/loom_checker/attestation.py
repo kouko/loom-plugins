@@ -7,6 +7,8 @@ from loom_checker.helpers import git_ok
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
+from loom_checker.probes import missing_adversarial_execution
+from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
 from pathlib import Path
 import hashlib
@@ -119,6 +121,7 @@ def validate_attestation(
             return [(rule, "attestation selection does not match the local selection records")]
         if recorded is not None:
             skip = set(recorded["skip"])
+    skip |= auto_skipped_steps(repo, change_id, head_sha)
 
     executions = attestation.get("executions")
     if not isinstance(executions, list) or (
@@ -157,8 +160,9 @@ def validate_attestation(
             return [(rule, "attestation contains an unknown execution kind")]
     if package_runs > 1 or (package_runs == 0 and "package-tests" not in skip):
         return [(rule, "attestation must record exactly one package-tests execution")]
-    if adversarial_runs < 1 and "adversarial" not in skip:
-        return [(rule, "attestation records no adversarial execution")]
+    missing = missing_adversarial_execution(adversarial_runs, skip)
+    if missing:
+        return [(rule, missing)]
 
     verdicts = attestation.get("verdicts")
     if not isinstance(verdicts, list) or (not verdicts and "reviewers" not in skip):

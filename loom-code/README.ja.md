@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.8.1 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.9.0 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -81,7 +81,7 @@ flowchart TD
 | [`implementer`](agents/implementer.md) | `build` | 1 タスク：失敗するテストを先に書き、1 コミット、状態レポート — verdict は出さない。 |
 | [`reviewer`](agents/reviewer.md) | `closing-review` | fresh-context の verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）と位置付きの指摘。レビュー対象は編集しない。 |
 | [`blind-runner`](agents/blind-runner.md) | `closing-review` | クリーンな環境で変更を動かして全 Acceptance 行を確かめ、`docs/loom/<change-id>/blind-run-report.md` を書く。 |
-| [`adversary`](agents/adversary.md) | `build` | 変更を壊しにいく — mutation や fuzz ツール、または実行可能な悪用・境界ケース 3 つ以上 — そしてすべての試行を probe として記録する。 |
+| [`adversary`](agents/adversary.md) | `build` | 変更を壊しにいく — mutation や fuzz ツール、または実行可能な悪用・境界ケース — そしてすべての試行を probe として記録する。 |
 
 レビュアーの人数は agent が選ぶのではありません。`loom_checker.py
 reviewer-count` がブランチ全体の差分から計算します — 狭く低リスクな変更なら
