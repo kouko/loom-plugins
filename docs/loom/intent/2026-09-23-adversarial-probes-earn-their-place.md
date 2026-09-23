@@ -43,6 +43,8 @@ once, so the next change to them is one edit rather than six.
 
 11. When the checker judges a change narrow, the steps that judgement skips are named to the user in one line as they are skipped, and listed in the pull request, so the cost of the judgement is visible every time and never only in the code.
 
+12. A probe program is committed only when it is red against the change as it stands, so that it demonstrates a defect rather than restating a behaviour; an attack that the change survives is reported and no program is written for it. The adversarial step's own report states how many attack points were found, how many earned a program, and how many were committed.
+
 ## Constraints
 - The user's plain-words skip stays exactly as it is; nothing here asks for a typed code or narrows what a user may skip.
 - The adversary still never fixes the product and never judges its own output.
