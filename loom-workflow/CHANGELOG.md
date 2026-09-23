@@ -4,6 +4,18 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.3.2] — 2026-09-23 — the blind run is renamed to independent acceptance testing
+
+Patch. Wording only, following loom-code 3.10.0; no behaviour changes.
+
+- The `loom-visualization` description says "acceptance test results" in
+  place of "blind-run results". An A/B of the two descriptions on the nine
+  station-reporting prompts triggered the skill in 18 of 18 valid runs for
+  each; the description's pinned hash now points at that result.
+- `decision-map`'s delivery-intent scaffold, the plain-language reference
+  and the visualization card tests use the new step name.
+- The version bump lets installed copies pick up the new wording.
+
 ## [5.3.1] — 2026-09-16 — Visualization card follow-ups
 
 - The per-turn card is now named the "visualization card" everywhere, and
