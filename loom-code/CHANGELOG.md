@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.11.0] — 2026-09-23 — lighter independent acceptance testing
+
+Minor: the acceptance tester's contract and the closing-review station's
+guidance change. The checker's rule list is unchanged.
+
+- The acceptance tester no longer runs the full package suite. A criterion
+  the suite settles gets a row that cites the suite command and says
+  `finalize-review` executes it and refuses the attestation when it fails.
+  When `package-tests` is skipped, the tester runs only that criterion's own
+  tests.
+- The setup check still runs on every run, re-runs included: the change
+  installs or loads in a clean copy and is usable.
+- The report `docs/loom/<change-id>/acceptance-test-report.md` is now one
+  table row per Acceptance line (verdict and one plain sentence), plus the
+  data paragraph, the decisions made on the user's behalf and the open
+  questions. Verdicts are works / partly / not verified / fails.
+- How each line was tried, the commands, their output and any `file:line`
+  now live in `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`,
+  which is functional content committed with the report under the same
+  deadline.
+- A re-run after a fix re-tests only the criteria the fix could affect, each
+  in full over every surface its Acceptance line names. Every other row is
+  marked `carried over — <one-line reason>` in the report's new Re-run
+  column, and each reason is checked against the fix diff.
+
 ## [3.10.0] — 2026-09-23 — the blind run is renamed to independent acceptance testing
 
 Minor: identifiers change. The step runs when and as it ran before, and the
