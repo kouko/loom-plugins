@@ -146,7 +146,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 4.3.4. Workflow tools used around the stations; all work without
+Version 5.3.2. Workflow tools used around the stations; all work without
 `loom-code`; only `decision-map`'s delivery step, which writes an intent,
 needs it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
