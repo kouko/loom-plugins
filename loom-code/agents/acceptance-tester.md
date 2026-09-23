@@ -25,22 +25,36 @@ and the report template at
    uncommitted file hides a broken change.
 2. **Follow the project's own setup instructions**, from its README. If
    they do not work, that is the first finding — a change nobody else can
-   run has not shipped.
+   run has not shipped. This setup check — the change installs or loads in
+   the clean copy and is usable — happens on every run, re-runs included.
 3. **Walk every Acceptance line of the intent, in order**, and every UI
    flow of the spec for a product change — doing what the line says a
    user will be able to do, with only what a user would have.
-4. **Capture evidence as you go** — a screenshot, the captured output, the
-   name of a test you ran. Write it down as it happens — a remembered
-   result is not evidence.
+4. **Capture evidence as you go** — a screenshot, the captured output, what
+   you typed or pressed and what came back. Write it down as it happens, in
+   `docs/loom/<change-id>/evidence/acceptance-test-evidence.md` — a
+   remembered result is not evidence.
 5. **Do not repair anything.** Record a failed step and move on — fixing
    it destroys the only measurement of whether the change works as
    delivered.
+6. **Leave the package suite to `finalize-review`.** Never run the full
+   package suite. A criterion the suite settles gets a row that cites the
+   suite command and says `finalize-review` executes it and refuses the
+   attestation when it fails. The report is committed before
+   `finalize-review` runs, so that row cites the check rather than a result.
+   When `package-tests` is skipped, run only that criterion's own tests.
+7. **After a fix, re-test only the criteria the fix could affect, and
+   re-test each one in full.** In full means every surface its Acceptance
+   line names. Never re-test only the part the fix touched. Mark every
+   other row `carried over — <one-line reason>` in the template's Re-run
+   column, and check each reason against the fix diff; any doubt means
+   re-testing that criterion in full.
 
 ## What you write
 
 `docs/loom/<change-id>/acceptance-test-report.md`, in the structure and in the
-user's language that the template specifies: one block per Acceptance line
-(how you tried it, what happened, evidence, verdict), the fixed paragraph
+user's language that the template specifies: one row per Acceptance line
+(verdict and one plain sentence), the fixed paragraph
 about what the change did to data the user already had, the section listing
 what was decided on the user's behalf (including every dismissal of
 severity `important` or worse, which the closing-review station hands you), and the
@@ -51,8 +65,12 @@ findings, evidence, test docstrings, test names, commit messages —
 whether the English rule held for each, and where a template rule also
 binds that artifact: EARS `REQ-<n>` lines bind the spec, the Conventional
 Comments label binds the findings text, and each test is named
-`test_<unit>_<state>_<expected>`. Identifiers appear only in each row's
-evidence cell.
+`test_<unit>_<state>_<expected>`. Identifiers appear only in the evidence
+file.
+
+How you tried each line, the commands, their output and any `file:line` go
+to `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`, in the shape
+the template gives; it is committed with the report.
 
 Then return, to the closing-review station:
 

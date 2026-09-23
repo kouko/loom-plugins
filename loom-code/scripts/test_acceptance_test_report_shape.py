@@ -7,11 +7,21 @@ the change's evidence directory. A re-run marks each verdict it did not
 re-test as carried over, with a one-line reason; a re-tested row carries
 no such reason. These tests pin that structure in the committed
 template, not whole paragraphs.
+
+Plan W1-01 adds the tester's side: it leaves the package suite to
+finalize-review, re-tests a criterion in full over every surface its
+Acceptance line names, and these rules live in the tester's contract and
+the template, under no new gate marker.
 """
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from prose_pin import flat_prose, has_negation, split_sentences  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = (
@@ -100,3 +110,105 @@ def test_retested_row_has_no_carry_reason():
     retested = [r[rerun] for r in rows if r[rerun].startswith("re-tested")]
     assert retested, "no row shows a re-tested verdict"
     assert all(c == "re-tested" for c in retested), retested
+
+
+# --- plan W1-01: the tester's contract and the station's §3 ------------------
+
+TESTER = REPO_ROOT / "loom-code" / "agents" / "acceptance-tester.md"
+STATION = REPO_ROOT / "loom-code" / "skills" / "closing-review" / "SKILL.md"
+STATION_GATES = {
+    "review.absence-recovery",
+    "review.atomic-claude-dispatch",
+    "review.probe-graduation",
+    "review.bounded-episode",
+}
+
+
+def _tester() -> list[str]:
+    return split_sentences(flat_prose(TESTER))
+
+
+def _section3() -> str:
+    text = STATION.read_text(encoding="utf-8")
+    return text.split("## 3. Run acceptance testing", 1)[1].split("\n## 4.", 1)[0]
+
+
+def _affirmed(sentences: list[str], *phrases: str) -> list[str]:
+    return [
+        s for s in sentences
+        if all(p in s for p in phrases) and not has_negation(re.sub(r"`[^`]*`", "", s))
+    ]
+
+
+def test_suite_criterion_cites_finalize_review_command():
+    """A1 positive: a suite-settled row cites the check, not a result."""
+    sentences = _tester()
+    assert _affirmed(
+        sentences, "cites the suite command", "`finalize-review` executes it",
+        "refuses the attestation",
+    ), "tester does not cite finalize-review's suite check"
+    assert _affirmed(sentences, "committed before `finalize-review` runs")
+    assert _affirmed(sentences, "`package-tests` is skipped", "only that criterion's own tests")
+    assert _affirmed(sentences, "setup check", "every run")
+    section = " ".join(_section3().split())
+    assert "cites the suite command" in section
+    assert "`finalize-review` executes" in section
+
+
+def test_no_full_suite_run_instruction():
+    """A1 negative: nothing tells the tester to run the whole suite."""
+    flat = flat_prose(TESTER)
+    assert "the name of a test you ran" not in flat, "evidence wording still invites named tests"
+    run_suite = re.compile(r"\brun\w*\b[^.;]*\b(?:package|whole|full|complete) suite\b", re.I)
+    offending = [
+        s for s in _tester()
+        if run_suite.search(s) and not has_negation(s)
+        and "Build and `finalize-review` run the package suite" not in s
+    ]
+    assert offending == [], offending
+    assert [s for s in _tester() if "full package suite" in s and has_negation(s)], (
+        "tester contract does not forbid running the full package suite"
+    )
+
+
+def test_rerun_retests_every_named_surface():
+    """A3 positive: a re-tested criterion is re-tested over every surface."""
+    sentences = _tester()
+    assert _affirmed(sentences, "re-test only the criteria the fix could affect", "in full")
+    assert _affirmed(sentences, "every surface its Acceptance line names")
+    assert _affirmed(sentences, "`carried over — <one-line reason>`", "Re-run column")
+    assert _affirmed(sentences, "against the fix diff")
+    assert _affirmed(sentences, "any doubt", "in full")
+
+
+def test_partial_surface_retest_forbidden():
+    """A3 negative: re-testing only the part a fix touched is never allowed."""
+    touched = [s for s in _tester() if "the part the fix touched" in s]
+    assert touched, "tester contract does not name the partial re-test trap"
+    assert all(has_negation(s) for s in touched), touched
+    section = [s for s in split_sentences(" ".join(_section3().split())) if "the part the fix touched" in s]
+    assert all(has_negation(s) for s in section), section
+
+
+def test_rules_live_in_contract_and_template():
+    """A4 positive: the tester's contract, the template and §3 carry the rules."""
+    flat = flat_prose(TESTER)
+    assert "loom-code/skills/closing-review/references/acceptance-test-report.md" in flat
+    assert EVIDENCE_PATH in flat
+    header, _ = _criterion_table()
+    _column(header, "Re-run")
+    section = " ".join(_section3().split())
+    assert EVIDENCE_PATH in section
+    assert _affirmed(split_sentences(section), "committed with the report")
+
+
+def test_no_new_gate_marker():
+    """A4 negative: no gate marker carries these rules."""
+    for path in (TESTER, TEMPLATE):
+        assert "<!-- gate:" not in path.read_text(encoding="utf-8"), path.name
+    text = STATION.read_text(encoding="utf-8")
+    assert set(re.findall(r"<!-- gate: ([\w.-]+) -->", text)) == STATION_GATES
+    ungated = re.sub(r"<!-- gate: [\w.-]+ -->.*?<!-- /gate -->", "", text, flags=re.S)
+    flat = " ".join(ungated.split())
+    for phrase in ("cites the suite command", "the part the fix touched", EVIDENCE_PATH):
+        assert phrase in flat, f"{phrase!r} sits inside a gate block"
