@@ -121,10 +121,10 @@ executes each one and records the command, artifact, functional-content digest
 and observed result in the generated attestation:
 
 ```json
-{"command": "python3 -m pytest tests/test_abuse_empty_input.py -q",
- "artifact": "docs/loom/<change-id>/evidence/probes/abuse_empty_input.py"}
-{"command": "python3 -m pytest loom-code/scripts/test_adversarial_empty_input.py -q",
- "artifact": "loom-code/scripts/test_adversarial_empty_input.py"}
+{"command": "python3 -m pytest docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py -q",
+ "artifact": "docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py"}
+{"command": "python3 -m pytest tests/test_adversarial_empty_input.py -q",
+ "artifact": "tests/test_adversarial_empty_input.py"}
 ```
 
 The first entry is a probe still in this change's store; the second is the

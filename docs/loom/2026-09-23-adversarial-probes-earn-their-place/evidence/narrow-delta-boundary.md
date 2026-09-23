@@ -10,7 +10,7 @@ either kept with the evidence stated or adjusted.
 built.** No delta that was narrow before is narrow now — every tightening
 only ever removes deltas from the exempt set — so the survey below still
 bounds what the boundary exempts. What changed is written out in "How the
-boundary moved" before the survey, because two of the three also change the
+boundary moved" before the survey, because one of the three also changes the
 reviewer floor, which is consumer-visible behaviour and is listed in the
 CHANGELOG as such.
 
@@ -29,7 +29,7 @@ intent puts out of scope.
 |---|---|---|---|
 | a delta that **deletes a test** | narrow, floor 1 | wide, floor **2** | yes — 1 → 2 |
 | a delta carrying an **executed file**, wherever it sits | narrow when the file was under the change's own store | wide | no — floor was already decided by the allowlist |
-| a **program with no suffix** (`#!` first line, or git mode 100755) | read as a document | read as a program, so wide | yes, through the same deletion rule when such a file is deleted |
+| a **program with no suffix** (`#!` first line, or git mode 100755) | read as a document | read as a program, so wide | no — narrowness only |
 
 The first is the one a consumer feels: a change whose whole delta is the
 intent, its store and a deleted test used to need one reviewer and now needs
