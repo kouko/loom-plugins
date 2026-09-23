@@ -19,7 +19,11 @@ At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 `selection show` lists as skipped (spec, plan, implementer, tdd, adversarial,
 package-tests, blind-run), plus any step the user told you to skip in plain
 words; [expert-mode](../expert-mode/SKILL.md) stays an optional route the user
-may invoke. The default is the full flow: skip a step only when the user tells
+may invoke. When `selection show` reports `bound: false` with a non-empty
+`skip` field, the checker judged this change narrow: name those steps to the
+user in one line as you omit them, `Skipped as a narrow change: <steps>`, read
+from that field rather than from conversation recall. The default is the full
+flow: skip a step only when the user tells
 you to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, append one line
 `skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section

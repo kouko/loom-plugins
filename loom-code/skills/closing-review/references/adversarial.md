@@ -34,6 +34,22 @@ no existing recipe file is edited. Taking one away deletes its file, deletes
 the test module named after that kind where it has one, and puts its row back
 to `none`.
 
+## Two parts: attack, then pin
+
+The adversarial step runs in two parts. The first part reads the change and
+attacks it, and it writes nothing but its report: it names every attack point
+it found and what each one did. Only an attack that succeeded opens the second
+part, where a program is written to pin what that attack exposed. A change the
+first part leaves standing ends there, with its report alone.
+
+A probe program is committed only when it is red against the change as it
+stands, because a program that is green the moment it is written restates a
+behaviour instead of demonstrating a defect. An attack the change survives is
+reported as an attempt, and the second part writes nothing for it.
+
+The report states three numbers: how many attack points the first part found,
+how many of them earned a program, and how many programs were committed.
+
 ## How many cases
 
 This section is the one place that says how many cases a change may commit. A

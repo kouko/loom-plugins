@@ -27,7 +27,11 @@ At entry, run `loom_checker.py selection show <change-id>` and omit the prose
 steps `selection show` lists as skipped (spec, plan, implementer, tdd,
 blind-run), plus any step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
-invoke. The default is the full flow: skip a step only when the user tells you
+invoke. When `selection show` reports `bound: false` with a non-empty `skip`
+field, the checker judged this change narrow: name those steps to the user in
+one line as you omit them, `Skipped as a narrow change: <steps>`, read from
+that field rather than from conversation recall. The default is the full flow:
+skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, write it straight into the PR body's
 `Skipped by instruction:` line (§2); Ship only reads the plan's
@@ -80,6 +84,9 @@ body, correct the body in place. Build the line
 lines plus any skip decided at Ship (§1), not from conversation recall; with
 none recorded or decided, write no such line,
 and the recomputed `(missing: …)` clause still discloses the absent records.
+Build the line `Skipped as a narrow change: <steps>` from `selection show`'s
+`skip` field when it reports `bound: false`, not from conversation recall; with
+a bound selection or an empty field, write no such line.
 
 When the attestation carries a selection, open the Verification section with
 exactly these lines, filled from the attestation's `selection` field: one

@@ -581,6 +581,41 @@ def test_selection_only_detector_rejects_the_old_forms() -> None:
         "Unless `tdd` is skipped " + SKIPPED_BY + ", for every behavior change:")
 
 
+# Acceptance 11 of
+# `docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md`: the
+# checker's own narrow-delta judgement costs the change its spec, plan,
+# blind-run and adversarial steps, so every station that honours it says so in
+# one line, in the same plain words a user-instructed skip already gets.
+NARROW_SKIP_ANNOUNCED = (
+    "When `selection show` reports `bound: false` with a non-empty `skip` field, the "
+    "checker judged this change narrow: name those steps to the user in one line as you "
+    "omit them, `Skipped as a narrow change: <steps>`, read from that field rather than "
+    "from conversation recall."
+)
+
+
+def test_each_station_names_the_narrow_auto_skip_to_the_user() -> None:
+    assert not has_negation(NARROW_SKIP_ANNOUNCED)
+    for name, text in SKIP_CONDITION_STATIONS.items():
+        prose = " ".join(text.split())
+        assert prose.count(NARROW_SKIP_ANNOUNCED) == 1, name
+        assert prose.index(NARROW_SKIP_ANNOUNCED) < prose.index(SKIP_RULE), name
+
+
+NARROW_SKIP_IN_PR = (
+    "Build the line `Skipped as a narrow change: <steps>` from `selection show`'s `skip` "
+    "field when it reports `bound: false`, not from conversation recall; with a bound "
+    "selection or an empty field, write no such line."
+)
+
+
+def test_ship_lists_the_narrow_auto_skip_in_the_pr_body() -> None:
+    verification = " ".join(
+        SHIP.split("Under the Verification heading", 1)[1].split("When the attestation", 1)[0].split()
+    )
+    assert verification.count(NARROW_SKIP_IN_PR) == 1, verification
+
+
 SKIP_RECORD = (
     "When you honour such a skip, append one line `skipped-by-instruction: <step> "
     "<YYYY-MM-DD>` to the plan's `## Risks` section and commit it."

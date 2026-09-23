@@ -16,6 +16,13 @@ changes, and a new prose gate.
   predicate instead of separate copies drifting apart.
 - New prose gate `review.probe-graduation` governs when a probe graduates
   out of the adversarial step into a standing test.
+- Every station names a narrow-delta auto-skip to the user in one line as it
+  omits those steps, and Ship lists them in the PR body on a
+  `Skipped as a narrow change: <steps>` line built from `selection show`.
+- The adversarial step is now read-then-pin: its first part writes no program
+  and reports the attack points it found, a program is committed only when it
+  is red against the change as it stands, and the report states how many
+  attack points were found, earned a program and were committed.
 
 ## [3.8.1] — 2026-09-23 — intent records match current behaviour
 

@@ -472,6 +472,87 @@ RULE_PINS = {
         ("Promote a probe into the repo's real test suite, not only through a plan task.",
          "Promote a probe into the repo's real test suite whenever it is stable."),
     ),
+    # Acceptance 12 and 13 of
+    # `docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md`:
+    # the step is read-then-pin, and only a red program is committed. These
+    # are kind-independent, so the protocol owns them and no recipe repeats
+    # them; the agent contract states the order it executes in its own words,
+    # pinned by AGENT_PINS below.
+    "protocol-the-step-runs-in-two-parts": (
+        "The adversarial step runs", "in two parts", (),
+        "The adversarial step runs in two parts.",
+        ("The adversarial step runs in one pass.",
+         "The adversarial step never runs in two parts."),
+    ),
+    "protocol-the-first-part-writes-no-program": (
+        "The first part reads the change and attacks it", "writes nothing but its report",
+        ("it names every attack point it found and what each one did",),
+        "The first part reads the change and attacks it, and it writes nothing but its "
+        "report: it names every attack point it found and what each one did.",
+        ("The first part reads the change and attacks it, and it writes its first programs: "
+         "it names every attack point it found and what each one did.",
+         "The first part reads the change and attacks it, and it does not write its "
+         "report: it names every attack point it found and what each one did.",
+         "The first part reads the change and attacks it, and it writes nothing but its "
+         "report."),
+    ),
+    "protocol-only-a-successful-attack-opens-part-two": (
+        "Only an attack that succeeded opens", "the second part",
+        ("where a program is written to pin what that attack exposed",),
+        "Only an attack that succeeded opens the second part, where a program is written "
+        "to pin what that attack exposed.",
+        ("Every attack opens the second part, where a program is written to pin what that "
+         "attack exposed.",
+         "An attack that succeeded does not open the second part, where a program is "
+         "written to pin what that attack exposed.",
+         "Only an attack that succeeded opens the second part."),
+    ),
+    "protocol-a-surviving-change-ends-at-the-report": (
+        "A change the first part leaves standing", "ends there",
+        ("with its report alone",),
+        "A change the first part leaves standing ends there, with its report alone.",
+        ("A change the first part leaves standing does not end there, with its report "
+         "alone.",
+         "A change the first part leaves standing ends there."),
+    ),
+    "protocol-a-program-is-committed-only-when-red": (
+        "A probe program is committed", "only when it is red against the change as it stands",
+        ("a program that is green the moment it is written restates a behaviour",),
+        "A probe program is committed only when it is red against the change as it stands, "
+        "because a program that is green the moment it is written restates a behaviour "
+        "instead of demonstrating a defect.",
+        ("A probe program is committed whenever its case is worth keeping, because a "
+         "program that is green the moment it is written restates a behaviour instead of "
+         "demonstrating a defect.",
+         "A probe program is not committed only when it is red against the change as it "
+         "stands, because a program that is green the moment it is written restates a "
+         "behaviour instead of demonstrating a defect.",
+         "A probe program is committed only when it is red against the change as it "
+         "stands."),
+    ),
+    "protocol-a-survived-attack-is-reported-not-pinned": (
+        "An attack the change survives is reported", "as an attempt",
+        ("the second part writes nothing for it",),
+        "An attack the change survives is reported as an attempt, and the second part "
+        "writes nothing for it.",
+        ("An attack the change survives is reported as an attempt, and the second part "
+         "writes a program for it anyway.",
+         "An attack the change survives is never reported as an attempt, and the second "
+         "part writes nothing for it.",
+         "An attack the change survives is reported as an attempt."),
+    ),
+    "protocol-the-report-states-the-three-numbers": (
+        "The report states", "three numbers",
+        ("how many attack points the first part found",
+         "how many of them earned a program",
+         "how many programs were committed"),
+        "The report states three numbers: how many attack points the first part found, how "
+        "many of them earned a program, and how many programs were committed.",
+        ("The report states three numbers: how many attack points the first part found and "
+         "how many of them earned a program.",
+         "The report gives no numbers: how many attack points the first part found, how "
+         "many of them earned a program, and how many programs were committed."),
+    ),
     "protocol-a-finding-carries-an-anchor-and-a-fix": (
         "Anything the adversary found that matters becomes",
         "a `finding` with an anchor and a fix", (),
@@ -549,6 +630,98 @@ def test_rule_sentence_pin_helpers_synthetic(pin: str) -> None:
 def test_protocol_states_the_rule(pin: str) -> None:
     sentence, _rejected = RULE_SENTENCE_PINS[pin]
     assert _pins_exact_sentence(RULES, sentence), (pin, sentence)
+
+
+# --- The order the agent executes, in the agent's own contract --------------
+#
+# Acceptance 13: the two-part order is what the adversary *does*, so a cold
+# reader of `adversary.md` must be able to run it without opening another
+# file. The protocol above owns the rule; these pins own the order, in the
+# agent's own words — no fragment of either is quoted in the other, which
+# `test_procedure_sentence_in_both_files_rejected` keeps true.
+
+# name: (verb, literal, extras, affirmative example, rejected examples)
+AGENT_PINS = {
+    "agent-attacks-in-two-parts": (
+        "You attack", "in two parts", ("the first part commits nothing",),
+        "You attack in two parts, and the first part commits nothing.",
+        ("You attack in two parts, and the first part commits its programs.",
+         "You do not attack in two parts, and the first part commits nothing.",
+         "You attack in two parts."),
+    ),
+    "agent-first-part-reports-every-attack-point": (
+        "Report each attack point", "what you attacked",
+        ("what you did to it", "whether the change held"),
+        "Report each attack point: what you attacked, what you did to it, and whether the "
+        "change held.",
+        ("Report each attack point: what you attacked and what you did to it.",
+         "Report no attack point: what you attacked, what you did to it, and whether the "
+         "change held."),
+    ),
+    "agent-a-standing-change-ends-the-run": (
+        "When the change held against everything you tried", "your run ends here",
+        ("with that report",),
+        "When the change held against everything you tried, your run ends here with that "
+        "report.",
+        ("When the change held against everything you tried, your run does not end here "
+         "with that report.",
+         "When the change held against everything you tried, write a program for each "
+         "attempt."),
+    ),
+    "agent-part-two-writes-one-red-program-per-successful-attack": (
+        "For each attack that succeeded",
+        "write one program that turns RED against the change as it stands",
+        ("and only those",),
+        "For each attack that succeeded, and only those, write one program that turns RED "
+        "against the change as it stands.",
+        ("For each attack you tried, and only those, write one program that turns RED "
+         "against the change as it stands.",
+         "For each attack that succeeded, and only those, write one program that does not "
+         "turn RED against the change as it stands."),
+    ),
+    "agent-a-green-program-is-thrown-away": (
+        "a program that is GREEN the first time you run it is",
+        "thrown away rather than committed", (),
+        "a program that is GREEN the first time you run it is thrown away rather than "
+        "committed.",
+        ("a program that is GREEN the first time you run it is committed anyway.",
+         "a program that is GREEN the first time you run it is not thrown away rather "
+         "than committed."),
+    ),
+    "agent-report-opens-with-the-three-counts": (
+        "Your report opens with", "three counts",
+        ("attack points tried", "attacks that succeeded", "programs committed"),
+        "Your report opens with three counts: attack points tried, attacks that "
+        "succeeded, and programs committed.",
+        ("Your report opens with three counts: attack points tried and programs "
+         "committed.",
+         "Your report opens with no counts: attack points tried, attacks that succeeded, "
+         "and programs committed."),
+    ),
+}
+
+
+@pytest.mark.parametrize("pin", sorted(AGENT_PINS))
+def test_agent_order_pin_helpers_synthetic(pin: str) -> None:
+    verb, literal, extras, affirmative, rejected = AGENT_PINS[pin]
+    assert _affirms(affirmative, verb, literal, *extras), pin
+    assert any(has_negation(r) for r in rejected), pin
+    for example in rejected:
+        assert not _affirms(example, verb, literal, *extras), example
+
+
+@pytest.mark.parametrize("pin", sorted(AGENT_PINS))
+def test_agent_contract_states_the_order(pin: str) -> None:
+    verb, literal, extras, _affirmative, _rejected = AGENT_PINS[pin]
+    assert _affirms(ADVERSARY_PROSE, verb, literal, *extras), (pin, verb, literal)
+
+
+def test_agent_return_block_carries_the_three_counts() -> None:
+    """The counts are a field of what the adversary returns, not loose prose."""
+    block = ADVERSARY.read_text(encoding="utf-8").split("```yaml", 1)[1].split("```", 1)[0]
+    assert "attack_points:" in block, block
+    for key in ("found", "earned_a_program", "committed"):
+        assert key in block, (key, block)
 
 
 # --- The protocol places the adversary at the end of Build ------------------
