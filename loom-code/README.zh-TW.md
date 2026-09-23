@@ -6,7 +6,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.9.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個使用者呼叫 · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.10.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個使用者呼叫 · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 

@@ -4,9 +4,9 @@ Loom carries one change from a rough idea to a merged pull request, with
 machines verifying machines along the way. Agents write the intent, spec,
 plan and code; fresh-context agents that did not write them review it, put it
 through independent acceptance testing and attack the result; a
-deterministic checker recomputes the evidence before anything is published. You are asked only three times: to confirm what the
-change is, to confirm visible product behaviour when there is any, and to
-accept the result, through the acceptance test report when one is required.
+deterministic checker recomputes the evidence before anything is published.
+You are asked only three times: to confirm what the change is, to confirm
+visible product behaviour when there is any, and to accept the result, through the acceptance test report when one is required.
 
 Loom ships as three independently installable plugins for Claude Code,
 Codex and Antigravity CLI:
@@ -14,7 +14,7 @@ Codex and Antigravity CLI:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.3.0 | 5 | Front of the flow: intent, specification, product principles, visual design. |
-| [`loom-code`](loom-code/) | 3.9.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-code`](loom-code/) | 3.10.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
 | [`loom-workflow`](loom-workflow/) | 5.3.1 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
@@ -128,7 +128,7 @@ contract package it reads.
 
 ## loom-code
 
-Version 3.9.0. Five stations carry one change from plan to PR with
+Version 3.10.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
