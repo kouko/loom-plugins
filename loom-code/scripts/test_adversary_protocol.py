@@ -820,26 +820,52 @@ _COUNT_RE = re.compile(
 _CASE_NOUN = re.compile(r"\bcases?\b|\bprobes?\b|\bprograms?\b|ケース|案例", re.IGNORECASE)
 _CJK = re.compile(r"[぀-ヿ㐀-鿿]")
 _LEADING_MARKUP = " \t*_`\"'()[]:,"
-_BACK, _FORWARD = 12, 60
+_INNER_MARKUP = " \t*_`"
+# A word that closes the number's own noun phrase: a determiner, a preposition
+# or an auxiliary starts something the number is no longer counting. "at least
+# two reviewers read the probe programs" stops at "the", so the programs after
+# it are not what the two counts.
+_PHRASE_END = {
+    "a", "an", "the", "this", "that", "these", "those", "its", "their", "his",
+    "her", "our", "your", "every", "each", "all", "any", "both", "some", "no",
+    "per", "of", "in", "on", "for", "from", "against", "with", "by", "to",
+    "at", "into", "than", "over", "under", "before", "after", "as", "if",
+    "when", "where", "which", "who", "whose", "whom", "it", "they", "them",
+    "is", "are", "was", "were", "be", "been", "has", "have", "had", "must",
+    "should", "may", "can", "will", "shall", "does", "do", "did",
+}
+_BACK, _FORWARD, _HEAD_WORDS = 12, 60, 6
 
 
 def _head_is_a_case(text: str) -> bool:
     """True when the noun the number counts, at the start of `text`, is a case.
 
-    In English the head noun follows the number immediately, once markdown
-    emphasis is stripped: "three cases", "five probe programs". So the first
-    word decides, and "two reviewers", "three distinct digests" or "one
-    mutation" decide against. Chinese and Japanese put a classifier and any
-    modifiers between the number and its head, with no word boundary to split
-    on ("三個可執行的邊界案例"), so a CJK run is read as a whole instead.
+    English puts modifiers between the number and its head noun -- "three
+    executable abuse and boundary cases" -- so the first word does not decide;
+    the words are read in order until one of them is a case noun, or until the
+    noun phrase ends. It ends at punctuation, at a determiner, preposition or
+    auxiliary (`_PHRASE_END`), or after `_HEAD_WORDS` words, which is what
+    keeps "two reviewers read the probe programs" a count of readers and "one
+    mutation per kind of change" a count of mutations. Chinese and Japanese
+    put a classifier and any modifiers between the number and its head with no
+    word boundary to split on ("三個可執行的邊界案例"), so a CJK run is read as
+    a whole instead.
     """
     rest = text.lstrip(_LEADING_MARKUP)
     if not rest:
         return False
     if _CJK.match(rest):
         return bool(_CASE_NOUN.search(rest[:_FORWARD]))
-    word = re.match(r"[A-Za-z][\w-]*", rest)
-    return bool(word and _CASE_NOUN.fullmatch(word.group()))
+    for _ in range(_HEAD_WORDS):
+        word = re.match(r"[A-Za-z][\w-]*", rest)
+        if not word:
+            return False
+        if _CASE_NOUN.fullmatch(word.group()):
+            return True
+        if word.group().lower() in _PHRASE_END:
+            return False
+        rest = rest[word.end():].lstrip(_INNER_MARKUP)
+    return False
 
 
 def _number(token: str) -> int:
@@ -924,6 +950,13 @@ def test_case_counts_reads_every_wording_synthetic() -> None:
     assert case_counts("three probe programs minimum") == {(FLOOR_BOUND, 3)}
     assert case_counts("a maximum of five probe programs") == {(CAP_BOUND, 5)}
     assert case_counts("five probe programs maximum") == {(CAP_BOUND, 5)}
+    # Modifiers stand between the number and its head noun. This is the
+    # wording this change deleted from the READMEs, and a blind run pasted it
+    # back into `loom-code/README.md` with the whole suite still green.
+    assert case_counts(
+        "at least three executable abuse and boundary cases"
+    ) == {(FLOOR_BOUND, 3)}
+    assert case_counts("at most five executable probe programs") == {(CAP_BOUND, 5)}
 
 
 def test_case_counts_ignores_a_count_of_something_else_synthetic() -> None:
