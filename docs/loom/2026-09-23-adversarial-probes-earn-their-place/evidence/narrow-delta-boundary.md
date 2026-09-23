@@ -17,10 +17,19 @@ the reviewer count, which this change's intent puts out of scope.
 
 ## What the boundary is today
 
-`is_narrow_delta` in `loom-code/scripts/loom_checker/reviewers.py` delegates
-to `reviewer_floor_for_paths`, so "narrow" and "reviewer floor 1" are one
-predicate and cannot drift apart. A delta is narrow when *every* committed
-path is one of:
+`is_narrow_delta` in `loom-code/scripts/loom_checker/reviewers.py` asks two
+things, and a delta has to pass both.
+
+**One — no executed file, wherever it sits.** If any committed path's suffix
+is one `is_program_path` in `loom_checker/helpers.py` knows — `.py`, `.sh`,
+`.js`, `.rb` and the rest — the delta is wide, whatever else the allowlist
+below would say about it. This is the test that makes skipping the
+adversarial step safe: the justification for skipping it is that the delta
+carries no executed behaviour a probe program could make fail, and a test
+file, a script, or a probe program committed under the change's own store
+(which `finalize-review` runs as a subprocess) is executed behaviour.
+
+**Two — the reviewer-floor allowlist.** *Every* committed path must be one of:
 
 | Allowed | Example |
 |---|---|
@@ -30,12 +39,28 @@ path is one of:
 | a test file, or any path with a `tests` component | `loom-code/scripts/test_x.py` |
 | a `.md`, `.mdx`, `.rst` or `.txt` file **outside** `docs/loom/` | `README.md` |
 
-and *no* path is protected. Protected means a path component named `agents`,
-`api`, `cli`, `commands`, `contract`, `hooks`, `skills` or `templates`, or a
-file named `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `kickoff-defaults.md`,
-`PRINCIPLES.md` or `SKILL.md`. Anything unrecognised — a `.py`, a `.json`, a
-`.yaml`, a `.sh` — makes the delta wide. The list is an allowlist: one
-unrecognised path is enough to lose narrowness.
+and *no* path is protected, and *no* removed path is a test. Protected means
+a path component named `agents`, `api`, `cli`, `commands`, `contract`,
+`hooks`, `skills` or `templates`, or a file named `AGENTS.md`, `CLAUDE.md`,
+`DESIGN.md`, `kickoff-defaults.md`, `PRINCIPLES.md` or `SKILL.md`. Anything
+unrecognised — a `.json`, a `.yaml`, a binary — makes the delta wide. The
+list is an allowlist: one unrecognised path is enough to lose narrowness.
+Deleting a test is treated as wide even though adding one is not, because
+what a deletion changes is what the repository can still catch.
+
+The two questions are not the same predicate. Narrowness is strictly
+stronger than reviewer floor 1: a delta that only adds a test file gets
+floor 1 and is **not** narrow, so it skips no step. Every narrow delta still
+gets floor 1.
+
+A delta that cannot be computed at all — a single-branch CI clone with no
+trunk to diff against — is a third answer, neither narrow nor wide.
+`auto_skipped_steps` returns the whole auto-skip set there, so a checkout
+that cannot read the delta does not refuse an attestation finalize wrote
+where it could; `required_reviewer_count` still fails closed at two, which
+costs an honest change nothing because the verdicts are in the attestation.
+Sitting on the trunk is not that case: there the delta is computable and
+empty, and every recomputed rule keeps failing closed on it.
 
 ## What it would have exempted
 
@@ -43,7 +68,9 @@ Source: the five survey CSVs behind this change (134 changes; columns
 `change_kind`, `probe_files`, `test_functions`, `probe_lines`,
 `did_a_probe_catch_a_real_defect`). Every number below was recomputed from
 those files, and the path-level classification was recomputed by importing
-`is_narrow_delta` itself and running it over each change's committed delta —
+`is_narrow_delta` itself — in the form described above, after the program and
+deletion tests were added, which only ever narrows the answer — and running it
+over each change's committed delta —
 the commit that added `docs/loom/intent/<change-id>.md` on the repository's
 first-parent `main` history, in local clones of all five repositories.
 
@@ -157,8 +184,21 @@ sha = subprocess.run(
     ["git", "-C", repo, "log", "--first-parent", "main", "--diff-filter=A",
      "--format=%H", "--", f"docs/loom/intent/{change_id}.md"],
     capture_output=True, text=True).stdout.split()[-1]
-paths = {p for p in subprocess.run(
-    ["git", "-C", repo, "show", "--name-only", "--format=", "--no-renames", sha],
-    capture_output=True, text=True).stdout.split("\n") if p.strip()}
-is_narrow_delta(paths, change_id)
+status = subprocess.run(
+    ["git", "-C", repo, "show", "--name-status", "--format=", "--no-renames", sha],
+    capture_output=True, text=True).stdout
+paths, removed = set(), set()
+for line in status.splitlines():
+    code, _, name = line.partition("\t")
+    if not name.strip():
+        continue
+    paths.add(name.strip())
+    if code.strip().upper().startswith("D"):
+        removed.add(name.strip())
+is_narrow_delta(paths, change_id, removed)
 ```
+
+Re-run after the program and deletion tests were added, both exempted changes
+are still narrow: neither delta contains an executed file or a deletion. The
+other four repositories had no narrow change to lose, and the predicate only
+ever got stricter, so the table above stands unchanged.

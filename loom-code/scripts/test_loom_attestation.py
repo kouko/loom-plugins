@@ -160,7 +160,12 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
         "docs/guide.md",
     }
     assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 1
-    assert reviewers.is_narrow_delta(change_paths, CHANGE) is True
+    # Adding a test is low risk, so the floor is one; it is still a file the
+    # suite executes, so the delta is not narrow and skips no step.
+    assert reviewers.is_narrow_delta(change_paths, CHANGE) is False
+    assert reviewers.is_narrow_delta(
+        change_paths - {"loom-code/scripts/test_example.py"}, CHANGE
+    ) is True
 
     for protected in (
         "src.py",
@@ -180,6 +185,20 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
             change_paths | {protected}, CHANGE
         ) == 2
         assert reviewers.is_narrow_delta(change_paths | {protected}, CHANGE) is False
+
+
+def test_reviewer_floor_is_two_when_the_delta_removes_a_test() -> None:
+    """Adding a check is low risk; removing one changes what the repository
+    can still catch, so it keeps the default two reviewers."""
+    change_paths = {
+        f"docs/loom/intent/{CHANGE}.md",
+        "loom-code/scripts/test_example.py",
+        "docs/guide.md",
+    }
+    removed = {"loom-code/scripts/test_example.py"}
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE, removed) == 2
+    assert reviewers.is_narrow_delta(change_paths, CHANGE, removed) is False
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 1
 
 
 def test_is_narrow_delta_returns_false_for_mixed_delta() -> None:

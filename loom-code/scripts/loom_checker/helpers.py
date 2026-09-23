@@ -218,6 +218,29 @@ def _is_host_plumbing(path: str) -> bool:
     )
 
 
+# Suffixes of files a host, a suite or the checker itself executes. One
+# predicate for every rule that has to ask "is this an executed file", so a
+# rule about programs and a rule about delta width cannot disagree about what
+# a program is.
+PROGRAM_SUFFIXES = frozenset(
+    {
+        ".py", ".pyw", ".sh", ".bash", ".zsh", ".fish", ".ps1",
+        ".rb", ".pl", ".lua", ".js", ".mjs", ".cjs", ".ts", ".tsx",
+        ".go", ".rs", ".java", ".kt", ".exe",
+    }
+)
+
+
+def is_program_path(path: str) -> bool:
+    """True when the path names a file something executes.
+
+    Read from the name alone: git records a mode, but a probe program added
+    without the executable bit is still run as `python3 <path>`, so the mode
+    is the wrong question.
+    """
+    return Path(path).suffix.casefold() in PROGRAM_SUFFIXES
+
+
 ON_A_BRANCH = (
     "work on a branch: `git switch -c <type>/<change-id>`, then re-run -- "
     "loom recomputes every claim from the branch's diff."

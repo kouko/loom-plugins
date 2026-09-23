@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from loom_checker.artifact_types import _TEST_NAME_RE
+from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import _is_host_plumbing
 from loom_checker.helpers import branch_base
+from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_text
+from loom_checker.helpers import is_program_path
 from pathlib import Path
 
 
@@ -27,14 +30,31 @@ _NARROW_AUTO_SKIP_STEPS = frozenset(
 )
 
 
-def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
+def _is_test_path(path: Path) -> bool:
+    """True for a file the suite collects, or anything under a `tests` tree."""
+    return bool(_TEST_NAME_RE.fullmatch(path.name)) or "tests" in {
+        part.casefold() for part in path.parts
+    }
+
+
+def reviewer_floor_for_paths(
+    paths: set[str], change_id: str, deleted: frozenset[str] | set[str] = frozenset()
+) -> int:
     """Return one only for a complete, narrow, mechanically low-risk delta.
 
     This is a positive allowlist. Anything not recognized here, including a
     mixed delta with one protected path, keeps the default floor of two.
+
+    ``deleted`` is the subset of ``paths`` the delta removes. Adding a test is
+    low risk; removing one is the delta that deletes the evidence a later
+    reviewer would read, so it keeps the default floor whatever else the
+    delta touches.
     """
     if not paths:
         return 2
+    for path in deleted:
+        if _is_test_path(Path(path)):
+            return 2
     intent_path = f"docs/loom/intent/{change_id}.md"
     change_store = f"docs/loom/{change_id}/"
     evidence_store = "docs/loom/evidence/"
@@ -50,7 +70,7 @@ def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
             continue
         if path.startswith(evidence_store):
             continue
-        if _TEST_NAME_RE.fullmatch(pure.name) or "tests" in parts:
+        if _is_test_path(pure):
             continue
         if (
             pure.suffix.casefold() in _LOW_RISK_DOC_EXTENSIONS
@@ -61,52 +81,85 @@ def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
     return 1
 
 
-def is_narrow_delta(paths: set[str], change_id: str) -> bool:
+def is_narrow_delta(
+    paths: set[str], change_id: str, deleted: frozenset[str] | set[str] = frozenset()
+) -> bool:
     """Return True when the diff is narrow enough to auto-skip the steps in
     ``_NARROW_AUTO_SKIP_STEPS``.
 
-    A narrow delta contains only the intent, plan, evidence, low-risk docs
-    (`.md`/`.rst`/`.txt` outside `docs/loom/`), and test files — no production
-    code, no protected surface, no interface-surface glob.
+    A narrow delta contains only the intent, plan, evidence and low-risk docs
+    (`.md`/`.rst`/`.txt` outside `docs/loom/`) — no production code, no
+    protected surface, no interface-surface glob, and **no file anything
+    executes**, wherever it sits.
 
-    The check reuses the same allowlist as `reviewer_floor_for_paths` so the
-    two predicates never disagree: a delta that gets floor 1 is narrow, and a
-    narrow delta gets floor 1.
+    ``adversarial`` is auto-skipped here as well, and the program test is what
+    makes that safe: the justification for skipping it is that the delta
+    carries no executed behaviour a probe program could make fail, so a delta
+    that carries an executed file — a test, a script, a probe program under
+    this change's own store, which `finalize-review` runs as a subprocess —
+    is not one the justification covers. A delta that removes a test is not
+    narrow either: what it changes is what the repository can still check.
 
-    ``adversarial`` is auto-skipped here as well: a narrow delta carries no
-    executed behaviour a probe program could make fail in a way reading the
-    diff cannot foresee, so the step buys nothing on this delta width.
+    Narrowness is therefore strictly stronger than reviewer floor 1: every
+    narrow delta gets floor 1, but a delta that only adds a test file gets
+    floor 1 without being narrow.
     """
-    # A narrow delta is exactly one whose reviewer floor is 1. The floor
-    # computation is the authoritative allowlist; we delegate to it rather
-    # than maintaining a second allowlist that could drift.
-    return reviewer_floor_for_paths(paths, change_id) == 1
+    if any(is_program_path(path) for path in paths):
+        return False
+    return reviewer_floor_for_paths(paths, change_id, deleted) == 1
 
 
-def committed_branch_paths(
+def committed_branch_delta(
     repo: Path, change_id: str, head_sha: str | None = None
-) -> set[str]:
-    """Committed branch-delta paths, excluding host plumbing.
+) -> tuple[set[str], set[str]] | None:
+    """The committed branch delta as (all paths, removed paths), or None.
 
     This is the single path source for every rule that reasons about the
     branch's committed content: the reviewer floor, the auto-skip list, and
     anything else that must agree on the same delta. Working-tree and staged
     edits are deliberately excluded — they are not yet part of the change
     that reviewers and finalize-review will see.
+
+    ``None`` means the delta could not be computed at all, which is not the
+    same fact as an empty delta and must not be read as one. A checkout that
+    holds only the branch — the ordinary CI fetch — resolves no trunk, so
+    every caller has to decide for itself what "cannot tell" means for it.
+
+    Working on the trunk is not that case. There the delta is computable and
+    empty by construction, which `branch_base` refuses precisely because it
+    would pass every recomputed rule; that stays an empty delta here, so the
+    rules keep failing closed on it.
     """
     try:
         selected = head_sha or git_text(repo, "rev-parse", "HEAD")
         base = branch_base(repo)
-        paths = {
-            line.strip()
-            for line in git_text(
-                repo, "diff", "--name-only", "--no-renames", base, selected
-            ).splitlines()
-            if line.strip() and not _is_host_plumbing(line.strip())
-        }
+        status = git_text(
+            repo, "diff", "--name-status", "--no-renames", base, selected
+        )
     except (OSError, UsageError):
-        return set()
-    return paths
+        current = git_maybe(repo, "rev-parse", "--abbrev-ref", "HEAD") or ""
+        if current in TRUNK_BRANCH_NAMES or current == "HEAD":
+            return set(), set()
+        return None
+    paths: set[str] = set()
+    removed: set[str] = set()
+    for line in status.splitlines():
+        code, _, name = line.partition("\t")
+        name = name.strip()
+        if not name or _is_host_plumbing(name):
+            continue
+        paths.add(name)
+        if code.strip().upper().startswith("D"):
+            removed.add(name)
+    return paths, removed
+
+
+def committed_branch_paths(
+    repo: Path, change_id: str, head_sha: str | None = None
+) -> set[str]:
+    """The committed branch-delta paths; empty when the delta cannot be read."""
+    delta = committed_branch_delta(repo, change_id, head_sha)
+    return delta[0] if delta else set()
 
 
 def auto_skipped_steps(
@@ -116,15 +169,34 @@ def auto_skipped_steps(
 
     Recomputed from the delta itself, so finalize-review, the attestation
     validator and `selection show` all read the same answer without a
-    recorded event to consult. Fails closed: an unreadable or empty delta
-    is not narrow, so it skips nothing.
+    recorded event to consult.
+
+    That recomputation is the reason an unreadable delta returns the whole
+    auto-skip set rather than nothing. The set is not a demand, it is the
+    list of steps nobody has to account for; answering "nothing was skipped"
+    where the delta cannot be read turns a checkout that lacks the trunk —
+    a single-branch CI clone validating an attestation finalize already
+    wrote — into a refusal of evidence that was correct when it was made.
+    An empty but readable delta is a different fact and stays not narrow.
     """
-    paths = committed_branch_paths(repo, change_id, head_sha)
-    return set(_NARROW_AUTO_SKIP_STEPS) if is_narrow_delta(paths, change_id) else set()
+    delta = committed_branch_delta(repo, change_id, head_sha)
+    if delta is None:
+        return set(_NARROW_AUTO_SKIP_STEPS)
+    paths, removed = delta
+    return set(_NARROW_AUTO_SKIP_STEPS) if is_narrow_delta(paths, change_id, removed) else set()
 
 
 def required_reviewer_count(
     repo: Path, change_id: str, head_sha: str | None = None
 ) -> int:
-    """Compute the reviewer floor from the selected branch delta, failing closed."""
-    return reviewer_floor_for_paths(committed_branch_paths(repo, change_id, head_sha), change_id)
+    """Compute the reviewer floor from the selected branch delta, failing closed.
+
+    Unlike the auto-skip list this one fails closed on an unreadable delta:
+    the reviewer count is checked against verdicts the attestation itself
+    records, so demanding two costs an honest change nothing.
+    """
+    delta = committed_branch_delta(repo, change_id, head_sha)
+    if delta is None:
+        return 2
+    paths, removed = delta
+    return reviewer_floor_for_paths(paths, change_id, removed)
