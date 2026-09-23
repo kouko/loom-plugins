@@ -1,0 +1,164 @@
+# The narrow-delta boundary, re-examined against 134 recorded changes
+
+Acceptance 2 of
+`docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md`: the
+boundary that decides which deltas skip the adversarial step now decides more
+than it used to, so it is re-examined here against the recorded history and
+either kept with the evidence stated or adjusted.
+
+**Verdict: kept, unchanged.** Across the 128 changes whose delta could be
+read back out of git, the boundary would have exempted two, both
+documentation-only, both of which committed no probe program at all and
+neither of which had a probe catch anything. The step it now skips was
+already buying nothing on exactly those deltas. One observation that argues
+for a *wider* boundary later is recorded at the end; it is not made here,
+because the same predicate also sets the reviewer floor and moving it moves
+the reviewer count, which this change's intent puts out of scope.
+
+## What the boundary is today
+
+`is_narrow_delta` in `loom-code/scripts/loom_checker/reviewers.py` delegates
+to `reviewer_floor_for_paths`, so "narrow" and "reviewer floor 1" are one
+predicate and cannot drift apart. A delta is narrow when *every* committed
+path is one of:
+
+| Allowed | Example |
+|---|---|
+| this change's intent | `docs/loom/intent/<change-id>.md` |
+| this change's own store | `docs/loom/<change-id>/…` |
+| the repo-level evidence store | `docs/loom/evidence/…` |
+| a test file, or any path with a `tests` component | `loom-code/scripts/test_x.py` |
+| a `.md`, `.mdx`, `.rst` or `.txt` file **outside** `docs/loom/` | `README.md` |
+
+and *no* path is protected. Protected means a path component named `agents`,
+`api`, `cli`, `commands`, `contract`, `hooks`, `skills` or `templates`, or a
+file named `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, `kickoff-defaults.md`,
+`PRINCIPLES.md` or `SKILL.md`. Anything unrecognised — a `.py`, a `.json`, a
+`.yaml`, a `.sh` — makes the delta wide. The list is an allowlist: one
+unrecognised path is enough to lose narrowness.
+
+## What it would have exempted
+
+Source: the five survey CSVs behind this change (134 changes; columns
+`change_kind`, `probe_files`, `test_functions`, `probe_lines`,
+`did_a_probe_catch_a_real_defect`). Every number below was recomputed from
+those files, and the path-level classification was recomputed by importing
+`is_narrow_delta` itself and running it over each change's committed delta —
+the commit that added `docs/loom/intent/<change-id>.md` on the repository's
+first-parent `main` history, in local clones of all five repositories.
+
+| Repository | Changes | Delta readable | Narrow |
+|---|---:|---:|---:|
+| monkey-skills | 64 | 64 | 0 |
+| loom-plugins | 45 | 42 | 2 |
+| dotfiles | 20 | 18 | 0 |
+| redshift-comment-mcp | 4 | 3 | 0 |
+| kumiko-zaiku-app-icons | 1 | 1 | 0 |
+| **total** | **134** | **128** | **2** |
+
+Six changes have no intent file added on their repository's first-parent
+`main` history under that change id (three in loom-plugins, two in dotfiles,
+one in redshift-comment-mcp) and could not be classified; none of the six is
+documentation-only.
+
+The two the boundary exempts:
+
+| Change | Kind | Probe programs | Did a probe catch a defect |
+|---|---|---:|---|
+| `loom-plugins 2026-09-14-plugin-readme-rewrite` | docs-only | 0 | no (a pre-existing checker caught one) |
+| `loom-plugins 2026-09-14-root-readme-overview` | docs-only | 0 | no |
+
+So the mechanism that this change extends would, over the whole recorded
+history, have skipped a step that in both cases produced no program and found
+nothing. It would have skipped no change on which a probe ever caught a
+defect.
+
+## Is that acceptable given what probes catch
+
+Recomputed from the same CSVs, by the first word of `change_kind`:
+
+| Kind | Changes | Probe files | Test functions | A probe caught a defect |
+|---|---:|---:|---:|---|
+| code | 54 | 95 | 536 | 20 yes, 17 no, 12 unknown, 5 step skipped |
+| mixed | 39 | 108 | 866 | 18 yes, 9 no, 1 partial, 11 unknown |
+| skill-or-gate | 27 | 36 | 174 | 6 yes, 15 no, 1 partial, 5 unknown |
+| docs-only | 13 | 14 | 67 | 2 qualified yes, 11 no |
+| unknown | 1 | 2 | 1 | 1 yes |
+| **total** | **134** | **255** | **1,644** | 47 yes, 52 no, 28 unknown, 5 skipped, 2 partial |
+
+For code changes that is 20 of 54, **37.0 %**; 20 of 49 (**40.8 %**) leaving
+out the five where the adversarial step was skipped; 20 of 37 (**54.1 %**)
+leaving out the twelve whose outcome the record does not state. The intent's
+"37 to 46 per cent" is the low end of that range; 37.0 % reproduces exactly,
+46 % does not reproduce from these columns under any denominator tried, and
+nothing here depends on which end is right.
+
+Both documentation-only "yes" rows are qualified in the record itself:
+
+- `2026-09-17-loom-readme-small-fixes` — "defect in implementer's test, not
+  README"; `how_found` is `unknown`. Not a product defect.
+- `2026-09-23-intent-records-match-current-behaviour` — `how_found` is
+  "reading (per baseline); PR says adversarial test proved it — possibly
+  program-red, not verifiable".
+
+Neither is an executed program catching, on a documentation-only delta, a
+product defect that reading did not. That is the claim the intent makes, and
+it survives recomputation. Both changes are also **wide** by the predicate
+above, so the boundary exempts neither of them either way.
+
+## The observation the boundary leaves on the table
+
+Eleven of the thirteen documentation-only changes are *not* narrow, and the
+paths that make them wide are mostly documentation:
+
+| Change | What makes it wide |
+|---|---|
+| `2026-09-16-clean-stale-references` | `docs/loom/README.md`, a `references/` file under a `skills/` tree |
+| `2026-09-17-fix-artifact-types-pointer` | `docs/loom/README.md`, `loom-code/contract/manifest.yaml` |
+| `2026-09-17-loom-readme-small-fixes` | `docs/loom/README.md` |
+| `2026-09-20-adversarial-probe-self-referential-blind-spot` | `docs/loom/memory/…` |
+| `2026-09-20-record-the-withdrawn-ordering-lesson` | another change's intent file, `docs/loom/memory/…` |
+| `2026-09-23-intent-records-match-current-behaviour` | other changes' intent files |
+| `2026-09-14-manifest-repo-urls` | five `plugin.json` files |
+
+A `.md` file under `docs/loom/` is deliberately excluded from the low-risk
+documentation rule unless it is this change's own store or the shared
+evidence store, which makes the loom's own README, its memory store and any
+other change's intent a wide delta. On the evidence above those deltas are
+exactly the ones where an adversarial program has never caught anything.
+Widening the allowlist to cover `docs/loom/memory/`, `docs/loom/README.md`
+and other changes' intent files would make exactly four more of the 128
+narrow — `2026-09-17-loom-readme-small-fixes`,
+`2026-09-20-adversarial-probe-self-referential-blind-spot`,
+`2026-09-20-record-the-withdrawn-ordering-lesson` and monkey-skills'
+`2026-09-09-fog-history-skips-non-ascii-ticket-names`, all documentation-only.
+On one of the four the adversarial step was already skipped by hand; on none
+of them did a probe catch a product defect (the first is the
+implementer's-test row above).
+
+It is not done here. The predicate is deliberately one predicate: widening it
+for the adversarial step also drops those changes from two reviewers to one,
+and this change's intent puts the reviewer-count policy out of scope. A later
+change that wants it should decide both effects together, with this table as
+its starting evidence.
+
+## Reproducing these numbers
+
+The CSVs live outside the repository (the survey's scratch directory). The
+path classification is reproduced by importing the predicate and running it
+over each change's delta:
+
+```python
+import sys, subprocess
+sys.path.insert(0, "loom-code/scripts")
+from loom_checker.reviewers import is_narrow_delta
+
+sha = subprocess.run(
+    ["git", "-C", repo, "log", "--first-parent", "main", "--diff-filter=A",
+     "--format=%H", "--", f"docs/loom/intent/{change_id}.md"],
+    capture_output=True, text=True).stdout.split()[-1]
+paths = {p for p in subprocess.run(
+    ["git", "-C", repo, "show", "--name-only", "--format=", "--no-renames", sha],
+    capture_output=True, text=True).stdout.split("\n") if p.strip()}
+is_narrow_delta(paths, change_id)
+```
