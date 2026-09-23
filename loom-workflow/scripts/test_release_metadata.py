@@ -14,7 +14,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[2]
 PLUGIN = REPO / "loom-workflow"
-CURRENT = "5.3.1"
+CURRENT = "5.3.2"
 
 
 @pytest.mark.parametrize(
@@ -46,3 +46,11 @@ def test_root_readme_table_row_is_current() -> None:
     )
     assert row, "README.md: loom-workflow plugin table row missing"
     assert row.group(1) == CURRENT
+
+
+def test_root_readme_section_line_is_current() -> None:
+    text = (REPO / "README.md").read_text(encoding="utf-8")
+    section = text.split("\n## loom-workflow\n", 1)[1].split("\n## ", 1)[0]
+    line = re.search(r"^Version (\d+\.\d+\.\d+)\.", section, re.M)
+    assert line, "README.md ## loom-workflow: version line missing"
+    assert line.group(1) == CURRENT

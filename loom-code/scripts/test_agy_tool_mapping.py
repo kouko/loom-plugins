@@ -21,7 +21,7 @@ PLUGIN = Path(__file__).resolve().parents[1]
 REFERENCE = PLUGIN / "references" / "antigravity-tools.md"
 LINK = "../../references/antigravity-tools.md"
 STATIONS = ("build", "closing-review", "write-plan")
-AGENTS = ("implementer", "reviewer", "adversary", "blind-runner")
+AGENTS = ("implementer", "reviewer", "adversary", "acceptance-tester")
 AGY_TOOLS = ("invoke_subagent", "ask_question", "run_command")
 CLAUDE_ONLY = ("Agent", "Task", "AskUserQuestion", "Bash", "Read", "Edit", "Write", "Skill")
 AGY_HEADER = "Antigravity CLI"
@@ -175,7 +175,7 @@ def test_role_dispatch_checks_accept_self_and_reject_plugin_typename() -> None:
     assert _role_dispatch_ok(good, "reviewer")
     assert not _role_dispatch_ok("| `reviewer` | `self` |", "reviewer")
     assert _plugin_agent_typenames('Use `TypeName: "reviewer"`.') == ["reviewer"]
-    assert _plugin_agent_typenames("`TypeName` `blind-runner`") == ["blind-runner"]
+    assert _plugin_agent_typenames("`TypeName` `acceptance-tester`") == ["acceptance-tester"]
     assert _plugin_agent_typenames("`TypeName` (required), for example `reviewer`.") == ["reviewer"]
     assert _plugin_agent_typenames(f"Use `{SELF_TYPENAME}`. The `reviewer` reads.") == []
 

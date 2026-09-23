@@ -6,7 +6,7 @@ green (plan.md, section "Wave 1"/"Wave 2").
 Policy under test (plan.md / intent.md): machine-read artifacts (spec,
 plan, review records, evidence, probe comments, commits, station prose,
 template comments) become English from this change forward; user-facing
-artifacts (intent, the three decision-point conversations, the blind-run
+artifacts (intent, the three decision-point conversations, the acceptance-test
 report, the PR body) stay in the user's language. A violation is a `nit`,
 never a blocker.
 
@@ -42,7 +42,7 @@ STATION_FILES = {
 
 REVIEWER_MD = REPO / "loom-code/agents/reviewer.md"
 ADVERSARY_MD = REPO / "loom-code/agents/adversary.md"
-BLIND_RUNNER_MD = REPO / "loom-code/agents/blind-runner.md"
+ACCEPTANCE_TESTER_MD = REPO / "loom-code/agents/acceptance-tester.md"
 SPEC_MINIMAL_MD = TEMPLATES_DIR / "spec-minimal.md"
 LOOM_CHECKER = REPO / "loom-code/scripts/loom_checker.py"
 
@@ -203,7 +203,7 @@ def test_specminimal_ears_absent():
     )
 
 
-# --- (e) adversary.md / blind-runner.md name the probe-name shape ----------
+# --- (e) adversary.md / acceptance-tester.md name the probe-name shape ----------
 
 _SHAPE_LITERAL = "test_<unit>_<state>_<expected>"
 
@@ -259,9 +259,9 @@ def _paragraph_names_shape_and_requires_english(paragraph: str) -> bool:
     return any(_sentence_affirmatively_requires_english(s) for s in sentences)
 
 
-@pytest.mark.parametrize("agent_path", [ADVERSARY_MD, BLIND_RUNNER_MD], ids=lambda p: p.name)
+@pytest.mark.parametrize("agent_path", [ADVERSARY_MD, ACCEPTANCE_TESTER_MD], ids=lambda p: p.name)
 def test_agents_probename_absent(agent_path: Path):
-    """Attack: both adversary.md and blind-runner.md must carry a paragraph
+    """Attack: both adversary.md and acceptance-tester.md must carry a paragraph
     in which one sentence affirmatively NAMES the probe shape (a naming
     verb — named/is named/must be named/name is — before the literal
     `test_<unit>_<state>_<expected>`, with no negation anywhere in that

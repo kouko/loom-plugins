@@ -50,7 +50,7 @@ def test_ship_text_runs_land_after_acceptance() -> None:
     flat = " ".join(text.split())
     assert LAND_COMMAND in text
     assert "decision point ③" in flat
-    assert "blind-run report" in flat
+    assert "acceptance test report" in flat
     assert "`next:`" in flat and "starts with the `cd`" in flat
     assert "`land --cleanup <branch>`" in flat
     assert "`land --sweep`" in flat
@@ -201,7 +201,7 @@ def test_ship_prose_covers_the_refusals_that_name_no_remedy() -> None:
     The premise is recomputed, not remembered: `publish` emits
     `publish.preconditions` refusals whose whole text is a string constant, with
     no remedy appended -- `literal origin is not a
-    supported GitHub repository URL` is the one the blind runner hit. An
+    supported GitHub repository URL` is the one the acceptance tester hit. An
     agent that met one of those and read an unconditional "take the remedy
     that refusal names" had nothing to take and nothing it was allowed to do,
     which is the state this change exists to eliminate.

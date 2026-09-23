@@ -33,8 +33,8 @@ def acceptance_count(intent_sections: dict[str, str]) -> int:
 def check_req_grammar(manifest, repo: Path, change_id: str, intent_sections):
     """The Requirements grammar the contract manifest declares, recomputed.
 
-    `REQ-<n> — <name>` ids are what a plan task, a finding and a blind-run
-    line all point at, so a skipped number, a reused one, or a requirement
+    `REQ-<n> — <name>` ids are what a plan task, a finding and an acceptance test
+    report line all point at, so a skipped number, a reused one, or a requirement
     that answers to no Acceptance line breaks addressability everywhere
     downstream (W2 adversary P03). The manifest declared the grammar from
     the start; until now nothing read it."""
@@ -65,7 +65,7 @@ def check_req_grammar(manifest, repo: Path, change_id: str, intent_sections):
                 "spec.req-grammar",
                 f"{spec_path.relative_to(repo)} has a `## Requirements` section "
                 "with no `REQ-<n> — <name>` line in it; the ids are what plan "
-                "tasks, findings and the blind-run report point at.",
+                "tasks, findings and the acceptance test report point at.",
             )
         ]
 

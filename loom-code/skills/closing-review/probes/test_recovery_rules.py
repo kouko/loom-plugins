@@ -19,7 +19,7 @@ A2 boundary: RL-10 — the station sequence is recorded, a second entry is the
              last one allowed, and a third is a failed recovery.
 A2 positive: RL-12 — the recorded sequence is named at both stops and at the
              hand-off to another station, not only promised in the abstract.
-A1 positive: RL-11 — a blind run is always dispatched fresh-context to an
+A1 positive: RL-11 — acceptance testing is always dispatched fresh-context to an
              agent that never touched the change, including when the absence
              route produces it here.
 A3 positive: RL-13 — the manifest lookup is bounded to the three items this
@@ -57,9 +57,9 @@ DECISION_OPENER = "Stop and ask when producing an absent item needs"
 FAILURE_OPENER = "Stop when the attempt to produce an absent item fails."
 
 # The paragraph immediately after the recovery passage: a different topic
-# (announcing the blind run to reviewers), the natural stopping point for a
+# (announcing acceptance testing to reviewers), the natural stopping point for a
 # scan of "the paragraphs that state the same rule" (ADV-01's near miss).
-NEXT_UNRELATED = "When a blind run is needed, finish it and commit its report"
+NEXT_UNRELATED = "When acceptance testing is needed, finish it and commit its report"
 
 # The exact closing sentence of each rule's paragraph, as committed. An
 # appended trailing sentence — ADV-02's attack — changes what the paragraph
@@ -92,7 +92,7 @@ RL_08_ENDING = "Do not attempt that item a second time and do not hand the chang
 # over the three items Acceptance #1 names.
 BOUNDED_LOOKUP_SENTENCE = (
     "This lookup covers only an item this rule names: the adversarial "
-    "programs, the blind-run report or the attestation."
+    "programs, the acceptance test report or the attestation."
 )
 
 # The exact phrases naming the recorded sequence at the points this rule
@@ -101,11 +101,11 @@ DECISION_SEQUENCE_PHRASE = "naming the station sequence entered so far"
 FAILURE_SEQUENCE_PHRASE = "Also report the station sequence entered so far."
 RETURN_SEQUENCE_PHRASE = "return the change there, naming the station sequence entered so far"
 
-# The guardrails a blind run must carry in its own home section (finding
+# The guardrails acceptance testing must carry in its own home section (finding
 # ADV-07): the agent, and that it never touched the change.
-BLIND_RUNNER_AGENT = "loom-code:blind-runner"
-BLIND_RUNNER_INDEPENDENCE = "never an agent that touched any part of the change"
-BLIND_RUNNER_ROUTE_PHRASE = "for a blind-run report specifically, that means following §3"
+ACCEPTANCE_TESTER_AGENT = "loom-code:acceptance-tester"
+ACCEPTANCE_TESTER_INDEPENDENCE = "never an agent that touched any part of the change"
+ACCEPTANCE_TESTER_ROUTE_PHRASE = "for an acceptance test report specifically, that means following §3"
 
 # A station reference, not any occurrence of a station name as a substring.
 # `build` and `ship` are ordinary English words here ("the build", "rebuild",
@@ -117,11 +117,11 @@ STATION_REFERENCE = re.compile(
 )
 
 # Artifact nouns a restatement of the mapping would have to name. A second copy
-# phrased purely in artifact nouns — "the blind-run report is produced
+# phrased purely in artifact nouns — "the acceptance test report is produced
 # downstream" — names no station and so slips past the check above.
 ARTIFACT_NOUNS = re.compile(
     r"(?<![\w-])(?:intents?|specs?|plans?|diffs?|attestations?"
-    r"|blind[- ]run reports?|adversarial programs?)(?![\w-])",
+    r"|acceptance[- ]test reports?|adversarial programs?)(?![\w-])",
     re.IGNORECASE,
 )
 
@@ -260,7 +260,7 @@ def test_RL_03_absence_is_distinct_and_the_producer_is_looked_up():
             "loom-code/contract/manifest.yaml",
             "stations[].produces",
             "actions[].owner",
-            # the field that would route a missing blind-run report wrongly
+            # the field that would route a missing acceptance test report wrongly
             "charter.signoff",
             # both outcomes of the lookup
             "produce the item here",
@@ -415,7 +415,7 @@ def test_RL_10_the_sequence_is_recorded_and_the_second_entry_is_the_last():
 
 def test_RL_12_the_recorded_sequence_surfaces_at_both_stops_and_the_hand_off():
     """RL-10's pointer promises the recorded list is named 'in the handoff and
-    in either stop below'; a blind runner can only settle that promise by
+    in either stop below'; an acceptance tester can only settle that promise by
     reading it named at the three concrete sites, not by reading the
     promise itself (ADV-05: the sequence Acceptance #2 asks to be recorded
     was nowhere a clean-tree reader could actually find it)."""
@@ -453,35 +453,35 @@ def test_RL_15_recovery_count_is_independent_of_ordinary_review_rounds():
     print("RL-15 PASS: the recovery-entry bound is independent of §4's ordinary round progression")
 
 
-def test_RL_11_blind_run_independence_is_stated_in_its_own_section():
-    """The blind run's writer-never-judge constraint lives in this station's
-    own §3, not only in the blind-runner agent definition and the manifest's
+def test_RL_11_acceptance_test_independence_is_stated_in_its_own_section():
+    """Acceptance testing's writer-never-judge constraint lives in this station's
+    own §3, not only in the acceptance-tester agent definition and the manifest's
     action summary (ADV-07: the absence route's 'produce the item here' is
     newly reachable by an agent that has just been implementing, and nothing
     in this file told it to dispatch fresh-context instead of writing the
     report itself)."""
     content = _read()
-    section3 = _normalize(content.split("## 3. Run the blind run", 1)[-1].split("## 4.", 1)[0])
+    section3 = _normalize(content.split("## 3. Run acceptance testing", 1)[-1].split("## 4.", 1)[0])
 
-    blind_sentences = [
-        s for s in re.split(r"(?<=[.;])\s+", section3) if re.search(r"blind[- ]run", s, re.I)
+    acceptance_sentences = [
+        s for s in re.split(r"(?<=[.;])\s+", section3) if re.search(r"acceptance[- ]test", s, re.I)
     ]
     guarded = any(
-        BLIND_RUNNER_AGENT in s and BLIND_RUNNER_INDEPENDENCE in s for s in blind_sentences
+        ACCEPTANCE_TESTER_AGENT in s and ACCEPTANCE_TESTER_INDEPENDENCE in s for s in acceptance_sentences
     )
     if not guarded:
-        print(f"RL-11 FAIL: §3 does not state, in a sentence about the blind run, both {BLIND_RUNNER_AGENT!r} and {BLIND_RUNNER_INDEPENDENCE!r}")
+        print(f"RL-11 FAIL: §3 does not state, in a sentence about acceptance testing, both {ACCEPTANCE_TESTER_AGENT!r} and {ACCEPTANCE_TESTER_INDEPENDENCE!r}")
         sys.exit(1)
 
     # The absence route's "produce the item here" is routed through §3 by
-    # reference for the blind-run-report case, not left as a freestanding,
+    # reference for the acceptance-test-report case, not left as a freestanding,
     # unconstrained instruction (mirrors how the §1 pointer routes a no-task
     # Build entry through §3 rather than restating its rule).
     lookup_para = _paragraph(LOOKUP_OPENER)
-    if BLIND_RUNNER_ROUTE_PHRASE not in lookup_para:
-        print(f"RL-11 FAIL: the absence route does not send the blind-run-report case to §3: missing {BLIND_RUNNER_ROUTE_PHRASE!r}")
+    if ACCEPTANCE_TESTER_ROUTE_PHRASE not in lookup_para:
+        print(f"RL-11 FAIL: the absence route does not send the acceptance-test-report case to §3: missing {ACCEPTANCE_TESTER_ROUTE_PHRASE!r}")
         sys.exit(1)
-    print("RL-11 PASS: blind-run independence is stated in §3 and the absence route defers to it")
+    print("RL-11 PASS: acceptance-test independence is stated in §3 and the absence route defers to it")
 
 
 def test_RL_13_lookup_is_bounded_to_the_three_recovery_items():
@@ -527,6 +527,6 @@ if __name__ == "__main__":
     test_RL_10_the_sequence_is_recorded_and_the_second_entry_is_the_last()
     test_RL_15_recovery_count_is_independent_of_ordinary_review_rounds()
     test_RL_12_the_recorded_sequence_surfaces_at_both_stops_and_the_hand_off()
-    test_RL_11_blind_run_independence_is_stated_in_its_own_section()
+    test_RL_11_acceptance_test_independence_is_stated_in_its_own_section()
     test_RL_13_lookup_is_bounded_to_the_three_recovery_items()
     print("All probes passed.")

@@ -122,7 +122,7 @@ def test_readme_uses_absolute_add_dir() -> None:
 
 
 def test_readme_relative_add_dir_dot_rejected() -> None:
-    # A relative `.` is not honoured by agy 1.2.2 (live blind run).
+    # A relative `.` is not honoured by agy 1.2.2 (live acceptance testing).
     for rel in AGY_READMES:
         body = _agy_section(_read(rel))
         assert not re.search(r"--add-dir \.(?=[\s`])", body), rel

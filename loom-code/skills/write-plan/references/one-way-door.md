@@ -27,8 +27,8 @@ Any one of these makes it a one-way door:
 - **(e) An irreversible action on the user's existing state** — rewriting
   or deleting the user's data in place, changing an existing file format
   with no backup, sending the user's data off their machine. This one is
-  asked **even when there is no fork at all** and only one way to do it: a
-  blind run happens in a clean environment, so it structurally never
+  asked **even when there is no fork at all** and only one way to do it:
+  independent acceptance testing happens in a clean environment, so it structurally never
   touches existing data, and asking is the only thing that stops the harm.
 
 ## The four gates, in order
@@ -67,7 +67,7 @@ The answer goes into the spec's `## Design decision`, marked
 
 A door that only surfaces later does **not** reopen the conversation. Pick
 a default, mark it `agent-decided — <one-line reason>`, and list it in the
-blind-run report's "I decided for you" section, which is what decision
+acceptance test report's "I decided for you" section, which is what decision
 point ③ reads.
 
 For classes **(b), (c) and (e)** that default is not free. Take the

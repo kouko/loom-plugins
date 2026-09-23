@@ -298,7 +298,8 @@ def test_skipped_selection_step_omits_that_check() -> None:
     read = (
         "run `loom_checker.py selection show <change-id>` and omit the steps `selection show` "
         "lists as skipped (spec, plan, implementer, tdd, adversarial, package-tests, "
-        "blind-run), plus any step the user told you to skip in plain words"
+        "`acceptance-test` (independent acceptance testing)), plus any step the user "
+        "told you to skip in plain words"
     )
     assert PROSE.count(read) == 1
     assert (

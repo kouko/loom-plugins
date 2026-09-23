@@ -12,6 +12,17 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.3.1] — 2026-09-23 — the blind run is renamed to independent acceptance testing
+
+Patch. Wording only, following loom-code 3.10.0; no behaviour, field, or
+checker rule changes.
+
+- `capture-intent` and `write-spec` (with their `interview.md` and
+  `spec-forms.md` references) name the step "independent acceptance testing"
+  and its report the "acceptance test report"; `write-spec`'s pre-build
+  review step says not to dispatch an acceptance tester.
+- The version bump lets installed copies pick up the new wording.
+
 ## [2.3.0] — 2026-09-22 — ship row names the rules that still refuse
 
 Minor. Station guidance changes in `capture-intent` and `write-spec`; no new

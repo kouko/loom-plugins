@@ -346,7 +346,7 @@ def test_risk_triggered_spec_review_contract() -> None:
     assert "loom-code:write-plan" in text
     assert "pre-build-review: required|not-required — <reason>" in text
     assert "spec+adversarial" in text
-    assert "do not dispatch a blind runner, a separate adversary, or `finalize-review`" in _flat(text)
+    assert "do not dispatch an acceptance tester, a separate adversary, or `finalize-review`" in _flat(text)
     assert "If `pre-build-review: not-required`" in text
 
 

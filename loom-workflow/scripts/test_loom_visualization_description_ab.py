@@ -16,10 +16,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILL_PATH = REPO_ROOT / "loom-workflow/skills/loom-visualization/SKILL.md"
 CATALOG = REPO_ROOT / "scripts/test_loom_skill_description_catalog.py"
 
-# Provenance: docs/loom/2026-09-14-loom-visualization-description-trigger/ab/results.md
-# (variant B, SHIP) and ab/protocol.md (variant A, the pre-change description).
-TESTED_SHA256 = "e98a3ed165415900bf405fe07209dde634cd465ff035fbea4ac2c73f57f6fd45"
-VARIANT_A_SHA256 = "6c65729a01ccc3b9cc81d7387b163d4b61dd1d0a26386ea69a10cad8d370f64c"
+# Provenance: the ab/results.md (variant B, KEEP B) and ab/protocol.md (variant A,
+# the description it renamed) of the 2026-09-23 change that renamed the step to
+# acceptance testing.
+TESTED_SHA256 = "b901f3528a8b1adbaaa412c1eb75034c973a0dac9e88def516f9ea147650c556"
+VARIANT_A_SHA256 = "e98a3ed165415900bf405fe07209dde634cd465ff035fbea4ac2c73f57f6fd45"
 
 _spec = importlib.util.spec_from_file_location("loom_skill_description_catalog", CATALOG)
 _catalog = importlib.util.module_from_spec(_spec)

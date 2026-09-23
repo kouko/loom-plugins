@@ -2,20 +2,20 @@
 
 Loom carries one change from a rough idea to a merged pull request, with
 machines verifying machines along the way. Agents write the intent, spec,
-plan and code; fresh-context agents that did not write them review, blind-run
-and attack the result; a deterministic checker recomputes the evidence before
-anything is published. You are asked only three times: to confirm what the
-change is, to confirm visible product behaviour when there is any, and to
-accept the result, through the blind-run report when one is required.
+plan and code; fresh-context agents that did not write them review it, put it
+through independent acceptance testing and attack the result; a
+deterministic checker recomputes the evidence before anything is published.
+You are asked only three times: to confirm what the change is, to confirm
+visible product behaviour when there is any, and to accept the result, through the acceptance test report when one is required.
 
 Loom ships as three independently installable plugins for Claude Code,
 Codex and Antigravity CLI:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/) | 2.3.0 | 5 | Front of the flow: intent, specification, product principles, visual design. |
-| [`loom-code`](loom-code/) | 3.9.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.3.1 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
+| [`loom-design`](loom-design/) | 2.3.1 | 5 | Front of the flow: intent, specification, product principles, visual design. |
+| [`loom-code`](loom-code/) | 3.10.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/) | 5.3.2 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -44,7 +44,7 @@ flowchart TD
         plan["loom-code:write-plan<br/>task DAG"]
         build["loom-code:build<br/>test-first, one commit per task"]
         review["loom-code:closing-review<br/>fresh-context review<br/>→ attestation"]
-        ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (blind-run report when required)"]
+        ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (acceptance test report when required)"]
         maintain["loom-code:maintain<br/>bugs, alerts, regressions"]
     end
 
@@ -78,11 +78,11 @@ flowchart TD
   ends with an independent adversary's adversarial programs and the complete
   package suite, which must pass before hand-off.
   `closing-review` then dispatches the checker-computed number of fresh-context
-  reviewers (two unless the change is narrow and low-risk) and a blind runner
-  when an acceptance line cannot be checked mechanically. Passing evidence
-  becomes an attestation bound to the reviewed content.
+  reviewers (two unless the change is narrow and low-risk) and an acceptance
+  tester when an acceptance line cannot be checked mechanically. Passing
+  evidence becomes an attestation bound to the reviewed content.
 - **③ Acceptance** — `ship` pushes the branch, opens the PR and verifies
-  checks; you accept the change, through the blind-run report when one was
+  checks; you accept the change, through the acceptance test report when one was
   required.
 - **Maintain** — `maintain` attaches an incident to a matching open intent, or
   creates one, and hands it to `write-plan`.
@@ -114,7 +114,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.3.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.3.1. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools. Requires `loom-code`, whose
 contract package it reads.
 
@@ -128,25 +128,25 @@ contract package it reads.
 
 ## loom-code
 
-Version 3.9.0. Five stations carry one change from plan to PR with
+Version 3.10.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
 | --- | --- |
 | `write-plan` | Turn a confirmed intent into a task DAG with tests and risks per task. |
 | `build` | Implement the plan test-first, one task at a time, ending with the adversary and the package suite. |
-| `closing-review` | Run the closing review (read, blind run) on Build-checked content and generate an attestation. |
+| `closing-review` | Run the closing review (read, acceptance testing) on Build-checked content and generate an attestation. |
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
 | `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |
 | `expert-mode` | User-invoked only: choose which Loom steps one change runs or skips; binds on a typed confirmation. |
 
-It also ships the `implementer`, `reviewer`, `blind-runner` and `adversary`
+It also ships the `implementer`, `reviewer`, `acceptance-tester` and `adversary`
 agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 4.3.4. Workflow tools used around the stations; all work without
+Version 5.3.2. Workflow tools used around the stations; all work without
 `loom-code`; only `decision-map`'s delivery step, which writes an intent,
 needs it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
@@ -233,7 +233,7 @@ Limits on Antigravity:
 - The plugin hooks (the publication reminder, the session context, the language reminder
   and the skill-folder rule) run only in the `agy` CLI, not in the Antigravity
   desktop app or IDE, so those gates are not enforced there.
-- loom's roles (implementer, reviewer, adversary, blind-runner) run as agy
+- loom's roles (implementer, reviewer, adversary, acceptance-tester) run as agy
   `self` subagents that follow loom's agent contracts, on Gemini models.
 - The review station is `closing-review` on every host; the old `review` name
   was removed and has no alias.

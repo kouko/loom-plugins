@@ -17,12 +17,16 @@ base. Preserve unrelated and untracked work. Work only on planned paths.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 `selection show` lists as skipped (spec, plan, implementer, tdd, adversarial,
-package-tests, blind-run), plus any step the user told you to skip in plain
-words; [expert-mode](../expert-mode/SKILL.md) stays an optional route the user
-may invoke. When `selection show` reports `bound: false` with a non-empty
-`skip` field, the checker judged this change narrow: name those steps to the
-user in one line as you omit them, `Skipped as a narrow change: <steps>`, read
-from that field rather than from conversation recall. The default is the full
+package-tests, `acceptance-test` (independent acceptance testing)), plus any
+step the user told you to skip in plain words;
+[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
+invoke. Words that ask to skip independent acceptance testing —
+"acceptance testing", or the step formerly called "blind run" — mean the
+`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty
+`skip` field, the checker judged this change narrow: as you omit those steps,
+tell the user its `narrow_change_line` field (`Skipped as a narrow change:
+<steps>`) exactly as printed, rather than rebuilding it from conversation recall
+or the raw `skip` ids. The default is the full
 flow: skip a step only when the user tells
 you to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, append one line
@@ -123,7 +127,7 @@ a failure and is fixed as above. Read `loom-code/contract/manifest.yaml`
 (`stations[].produces` and `actions[].owner`) to decide whether an absent item
 is Build's to produce; this file keeps no second copy of that mapping. This
 lookup covers only an item this rule names: the adversarial programs, the
-blind-run report or the attestation. Absence
+acceptance test report or the attestation. Absence
 dispatches the adversary only when no adversarial program is committed;
 committed programs are re-run, never re-dispatched, exactly as after a fix.
 

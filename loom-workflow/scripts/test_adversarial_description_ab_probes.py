@@ -3,7 +3,9 @@
 Targets: the A/B runner's stream parser and decision rule (ab/run_ab.py), the
 committed tested-hash guard (test_loom_visualization_description_ab.py), and the
 description renderer shared with the budget guard
-(scripts/test_loom_skill_description_catalog.py).
+(scripts/test_loom_skill_description_catalog.py). The renderer probes take the
+renderer, the shipped text and the tested hash from the guard itself, so they
+follow whatever text the guard pins.
 
 The probes are ordinary tests: each asserts the behaviour that should hold, and
 a passing probe records an attack the change survived. The probes that load
@@ -163,29 +165,29 @@ def test_guard_edited_skill_description_fails_closed(guard, tmp_path: Path, monk
 # --- renderer shared by the hash guard and the budget guard ---------------
 
 
-def test_render_description_trailing_whitespace_renders_identically(run_ab) -> None:
+def test_render_description_trailing_whitespace_renders_identically(guard) -> None:
     """Trailing spaces on the scalar line render to the same text, so the hash is unchanged."""
     text = SKILL.read_text(encoding="utf-8")
     head, rest = text.split("\n---\n", 1)
-    padded = head.replace(run_ab.DESCRIPTION_B, run_ab.DESCRIPTION_B + "   \t") + "\n---\n" + rest
-    assert run_ab._render_description(padded) == run_ab.DESCRIPTION_B
+    padded = head.replace(guard._shipped(), guard._shipped() + "   \t") + "\n---\n" + rest
+    assert guard._render_description(padded) == guard._shipped()
 
 
-def test_render_description_folded_scalar_fails_closed(run_ab) -> None:
+def test_render_description_folded_scalar_fails_closed(guard) -> None:
     """A folded (>) or plain scalar is not silently rendered as an empty description."""
     for header in ("description: >\n", "description: "):
-        text = f"---\nname: x\n{header}  {run_ab.DESCRIPTION_B}\n---\nbody\n"
+        text = f"---\nname: x\n{header}  {guard._shipped()}\n---\nbody\n"
         with pytest.raises(AssertionError):
-            run_ab._render_description(text)
+            guard._render_description(text)
 
 
-def test_render_description_blank_line_paragraph_changes_hash(run_ab) -> None:
+def test_render_description_blank_line_paragraph_changes_hash(guard) -> None:
     """Text appended after a blank line inside the block scalar must change the rendered description."""
     text = SKILL.read_text(encoding="utf-8")
-    edited = text.replace(run_ab.DESCRIPTION_B + "\n",
-                          run_ab.DESCRIPTION_B + "\n\n  " + "untested extra words " * 200 + "\n", 1)
+    edited = text.replace(guard._shipped() + "\n",
+                          guard._shipped() + "\n\n  " + "untested extra words " * 200 + "\n", 1)
     assert edited != text
-    assert run_ab.sha256_text(run_ab._render_description(edited)) != run_ab.DESCRIPTION_B_SHA256
+    assert guard._sha256(guard._render_description(edited)) != guard.TESTED_SHA256
 
 
 # --- guard dependency on the A/B runner -----------------------------------

@@ -12,6 +12,17 @@ CONTEXTUAL_PR_HEADINGS = (
 DISCLOSURE_PREFIXES = ("Skipped steps:", "Prior failure:")
 
 
+# The user reads the `Skipped steps:` line, so a step id whose meaning is not
+# plain gets its user-facing name in brackets; any other id renders as is.
+STEP_PLAIN_NAMES = {"acceptance-test": "acceptance-test (independent acceptance testing)"}
+
+
+def plain_step_names(steps) -> str:
+    """A step list as every PR line that lists steps writes it; a step id
+    outside the mapping, a retired one included, reads as recorded."""
+    return ", ".join(STEP_PLAIN_NAMES.get(step, step) for step in steps)
+
+
 # Ship's own lines: always accepted, never validated -- the CI check recomputes
 # the status, so the body's copy is a courtesy, not a claim anything trusts.
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
@@ -145,7 +156,7 @@ def render_selection_disclosure(attestation: object) -> list[str]:
         return []
     lines = []
     for confirmation in selected.get("confirmations") or []:
-        steps = ", ".join(confirmation.get("skip") or []) or "none"
+        steps = plain_step_names(confirmation.get("skip") or []) or "none"
         lines.append(
             f"Skipped steps: {steps} — authority: {confirmation.get('source')} "
             f"({confirmation.get('code')}, {str(confirmation.get('at'))[:10]})"

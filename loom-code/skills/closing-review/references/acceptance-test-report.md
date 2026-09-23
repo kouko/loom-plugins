@@ -1,6 +1,6 @@
-# Blind-run report — the template
+# Acceptance test report — the template
 
-The blind run produces `docs/loom/<change-id>/blind-run-report.md`. This is
+Independent acceptance testing produces `docs/loom/<change-id>/acceptance-test-report.md`. This is
 the document the user reads at decision point ③ to say "yes, that is what I
 wanted". They never read the diff, so anything not in here is invisible to
 them.
@@ -61,8 +61,8 @@ none: "Nothing.">
 ## Gate-only's replacement material
 
 Gate-only presents the one-page probe-and-package-test result at decision
-point ③ instead of a blind-run report, shaped by this same
-`references/blind-run-report.md` structure — every adversarial probe
+point ③ instead of an acceptance test report, shaped by this same
+`references/acceptance-test-report.md` structure — every adversarial probe
 named, what ran and what it proved, plus the package-test command's own
 recorded result.
 
@@ -71,7 +71,7 @@ recorded result.
 - An Acceptance line reported as "works" with no evidence anyone can look
   at. Evidence is a screenshot, a captured output, or a named test — not
   the runner's word.
-- The data paragraph missing. It is fixed because the blind run happens in
+- The data paragraph missing. It is fixed because acceptance testing happens in
   a clean environment and structurally cannot hit the user's real data:
   that harm is only ever caught by saying out loud what would happen.
 - Decisions folded into prose instead of listed. If the user has to hunt

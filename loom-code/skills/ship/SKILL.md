@@ -16,7 +16,7 @@ remain English.
 
 ## 1. Confirm publication authorization
 
-Read the intent and blind-run report when one was required. A confirmed intent
+Read the intent and acceptance test report when one was required. A confirmed intent
 with `publication: automatic — authorized <YYYY-MM-DD> by <name>` carries that
 decision into Ship; do not ask again. Intent prose, status, or contract version
 never implies authorization. A legacy intent without that machine-readable field
@@ -25,12 +25,15 @@ The user may still explicitly stop publication before the outward action.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the prose
 steps `selection show` lists as skipped (spec, plan, implementer, tdd,
-blind-run), plus any step the user told you to skip in plain words;
+acceptance-test), plus any step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
-invoke. When `selection show` reports `bound: false` with a non-empty `skip`
-field, the checker judged this change narrow: name those steps to the user in
-one line as you omit them, `Skipped as a narrow change: <steps>`, read from
-that field rather than from conversation recall. The default is the full flow:
+invoke. Words that ask to skip independent acceptance testing —
+"acceptance testing", or the step formerly called "blind run" — mean the
+`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty `skip`
+field, the checker judged this change narrow: as you omit those steps, tell the
+user its `narrow_change_line` field (`Skipped as a narrow change: <steps>`)
+exactly as printed, rather than rebuilding it from conversation recall or the
+raw `skip` ids. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, write it straight into the PR body's
@@ -84,16 +87,22 @@ body, correct the body in place. Build the line
 lines plus any skip decided at Ship (§1), not from conversation recall; with
 none recorded or decided, write no such line,
 and the recomputed `(missing: …)` clause still discloses the absent records.
-Build the line `Skipped as a narrow change: <steps>` from `selection show`'s
-`skip` field when it reports `bound: false`, not from conversation recall; with
-a bound selection or an empty field, write no such line.
+Copy the line `Skipped as a narrow change: <steps>` exactly as `selection show`
+prints it in its `narrow_change_line` field, not from conversation recall or
+the raw `skip` ids; when that field is null, write no such line.
 
 When the attestation carries a selection, open the Verification section with
 exactly these lines, filled from the attestation's `selection` field: one
 `Skipped steps: <steps> — authority: <source> (<code>, <YYYY-MM-DD>)` line per
 confirmation, then one `Prior failure: <step> <rule> <YYYY-MM-DD>` line per
-prior failure. On a mismatch, `publish` prints the expected lines. State that a
+prior failure. On a
+mismatch, `publish` prints the expected lines. State that a
 reviewer rejection `closing-review` never handed to the checker is unrecorded.
+
+In the `<steps>` of the `Skipped by instruction:` and `Skipped steps:` lines,
+write `acceptance-test` as `acceptance-test (independent acceptance testing)`;
+every other step reads as recorded. The `Verification status:` and
+`Skipped as a narrow change:` lines already arrive in that form from the checker.
 
 Every decision summary states the chosen option, material alternatives,
 trade-offs, supporting evidence, and observed or expected outcome. This is an
@@ -211,7 +220,7 @@ repository may be fixed in place and reuse the matching attestation.
 
 ## 5. Land after acceptance
 
-After all checks pass, present the result and the blind-run report when one
+After all checks pass, present the result and the acceptance test report when one
 exists (decision point ③). Publication never authorizes or invokes merge; only
 the maintainer's explicit acceptance does. Never type `gh pr merge` yourself:
 merge through land, which checks the live PR body and discloses verification.

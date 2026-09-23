@@ -21,7 +21,7 @@ MANIFEST = REPO_ROOT / "loom-code" / "contract" / "manifest.yaml"
 
 EXPECTED_ARTIFACTS = [
     "intent", "spec", "plan", "attestation",
-    "blind-run-report", "kickoff-defaults",
+    "acceptance-test-report", "kickoff-defaults",
 ]
 
 

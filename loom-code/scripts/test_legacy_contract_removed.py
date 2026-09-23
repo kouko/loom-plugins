@@ -1,6 +1,7 @@
 """The 2.0 runtime has no legacy publication ledgers or replay gates."""
 
 from pathlib import Path
+import re
 import subprocess
 
 import yaml
@@ -9,6 +10,117 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 CHECKER = ROOT / "loom-code/scripts/loom_checker.py"
 MANIFEST = ROOT / "loom-code/contract/manifest.yaml"
+
+# The acceptance-test step's retired name, in its id, agent and prose forms:
+# any run of `-`, `_`, whitespace (a line break and a non-breaking space
+# included) or a Unicode dash between the two words, none for the camel form,
+# and the Chinese term.
+RETIRED_STEP_NAME = re.compile(
+    r"blind[-_\s‐-―]*run(?:ner)?|" + "盲" + "跑", re.IGNORECASE
+)
+RUNTIME_TREES = (
+    "loom-code/", "loom-design/", "loom-workflow/",
+    "scripts/", ".claude/", ".claude-plugin/", ".github/",
+)
+RUNTIME_FILES = (
+    "README.md", "AGENTS.md", "PRINCIPLES.md", "docs/loom/README.md",
+    "docs/loom/evidence/mechanisms.yaml", "docs/loom/KICKOFF-DEFAULTS.md",
+    "CLAUDE.md",
+)
+# The two places the retired name is still meant to be read: the phrase that
+# maps a user's old words onto the renamed step, and PRINCIPLES.md's
+# ratification history. CHANGELOG.md files are release history and are skipped.
+FORMER_NAME_PHRASE = 'formerly called "' + "blind" + ' run"'
+RATIFIED_BY_PREFIX = "ratified-by:"
+
+
+def retired_step_names(path: str, text: str) -> list[str]:
+    """Each `path:line` that names the step by its retired name.
+
+    The exempt spans are blanked line by line, then the whole text is searched,
+    so a name split by a hard wrap is reported on the line where it starts.
+    """
+    masked = [
+        "" if path == "PRINCIPLES.md" and line.startswith(RATIFIED_BY_PREFIX)
+        else line.replace(FORMER_NAME_PHRASE, "")
+        for line in text.splitlines()
+    ]
+    joined = "\n".join(masked)
+    hits = []
+    for match in RETIRED_STEP_NAME.finditer(joined):
+        hit = f"{path}:{joined.count(chr(10), 0, match.start()) + 1}"
+        if hit not in hits:
+            hits.append(hit)
+    return hits
+
+
+def test_retired_step_name_helper_synthetic() -> None:
+    old = "blind" + "-run"
+    assert retired_step_names("x.md", f"skip {old}\nok") == ["x.md:1"]
+    assert retired_step_names("x.md", "Blind" + " Runner here") == ["x.md:1"]
+    assert retired_step_names("x.md", f"the step {FORMER_NAME_PHRASE}") == []
+    assert retired_step_names("x.md", f"{FORMER_NAME_PHRASE} and {old}") == ["x.md:1"]
+    ratified = f"{RATIFIED_BY_PREFIX} kouko; {old}"
+    assert retired_step_names("PRINCIPLES.md", ratified) == []
+    assert retired_step_names("README.md", ratified) == ["README.md:1"]
+
+
+def test_retired_step_name_helper_near_miss_spellings() -> None:
+    word = "blind"
+    for text in (
+        f"{word}_run_report: x",          # identifier / YAML key
+        f"a {word}–run",             # en dash
+        f"a {word} run",             # non-breaking space
+        f"a {word}\t run",                # several whitespace characters
+        f"{word.capitalize()}Runner()",   # camel form, no separator
+        f"{word.upper()}_RUNNER",
+        "③" + "盲" + "跑報告",             # the Chinese term
+    ):
+        assert retired_step_names("x.md", text) == ["x.md:1"], text
+    wrapped = f"intro\nwhen a {word}\nrun is needed"
+    assert retired_step_names("x.md", wrapped) == ["x.md:2"]
+    # Exemptions stay exact, and a split string literal is not a spelling.
+    assert retired_step_names("x.md", '"' + word + '" + "-run"') == []
+    assert retired_step_names("x.md", f"{word} judging, {word} test") == []
+    ratified = f"{RATIFIED_BY_PREFIX} kouko; {word}_run"
+    assert retired_step_names("PRINCIPLES.md", ratified) == []
+    assert retired_step_names("x.md", f"{FORMER_NAME_PHRASE}\n{word}_run") == ["x.md:2"]
+
+
+def test_retired_name_scan_covers_the_root_tooling_trees() -> None:
+    for tree in ("scripts/", ".claude/", ".claude-plugin/", ".github/"):
+        assert tree in RUNTIME_TREES, tree
+
+
+def test_no_runtime_file_names_the_retired_step_name() -> None:
+    listed = subprocess.run(
+        ["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=True,
+    ).stdout.decode("utf-8").split("\0")
+    paths = [
+        p for p in listed
+        if (p in RUNTIME_FILES or p.startswith(RUNTIME_TREES))
+        and Path(p).name != "CHANGELOG.md" and (ROOT / p).is_file()
+    ]
+    hits = []
+    for path in paths:
+        try:
+            text = (ROOT / path).read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        hits.extend(retired_step_names(path, text))
+    assert hits == []
+
+
+def test_every_station_honouring_plain_words_skips_maps_the_old_name() -> None:
+    sentence = (
+        "Words that ask to skip independent acceptance testing — "
+        f'"acceptance testing", or the step {FORMER_NAME_PHRASE} — mean the '
+        "`acceptance-test` step."
+    )
+    for station in ("closing-review", "write-plan", "build", "ship"):
+        path = ROOT / f"loom-code/skills/{station}/SKILL.md"
+        text = " ".join(path.read_text(encoding="utf-8").split())
+        assert sentence in text, station
 
 
 def test_manifest_declares_no_review_ledger() -> None:

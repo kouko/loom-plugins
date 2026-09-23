@@ -320,7 +320,7 @@ def test_capture_intent_boundaries_are_shared_with_code_only_intake() -> None:
 
 def test_shared_intent_contract_names_altitude_without_new_schema() -> None:
     assert "observable delivery outcomes, not scenarios or implementation" in INTENT_TEMPLATE
-    assert "each line provable by a blind run" in INTENT_TEMPLATE
+    assert "each line provable by independent acceptance testing" in INTENT_TEMPLATE
     assert (
         "Material user-outcome or scope choices remain open; only non-material "
         "unsupported detail is deleted"
@@ -339,18 +339,19 @@ def test_code_only_field_boundaries_keep_problem_and_value_semantics() -> None:
 def test_stations_read_the_bound_selection_at_entry() -> None:
     prose_read = (
         "run `loom_checker.py selection show <change-id>` and omit the prose steps "
-        "`selection show` lists as skipped (spec, plan, implementer, tdd, blind-run), plus "
+        "`selection show` lists as skipped (spec, plan, implementer, tdd, acceptance-test), plus "
         "any step the user told you to skip in plain words"
     )
     review_read = (
         "run `loom_checker.py selection show <change-id>` and omit the steps `selection show` "
         "lists as skipped, plus any step the user told you to skip in plain words; §2 and §3 "
-        "say how skipped reviewers, adversarial and blind-run are handled"
+        "say how skipped reviewers, adversarial and acceptance-test are handled"
     )
     build_read = (
         "run `loom_checker.py selection show <change-id>` and omit the steps `selection show` "
         "lists as skipped (spec, plan, implementer, tdd, adversarial, package-tests, "
-        "blind-run), plus any step the user told you to skip in plain words"
+        "`acceptance-test` (independent acceptance testing)), plus any step the user "
+        "told you to skip in plain words"
     )
     assert prose_read not in " ".join(REVIEW.split())
     assert prose_read not in " ".join(BUILD.split())
@@ -386,7 +387,7 @@ def test_build_obligations_yield_to_a_bound_selection() -> None:
 def test_review_dispatches_nothing_for_skipped_steps() -> None:
     depth = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
     assert "## 3. Run blind and adversarial checks" not in REVIEW
-    checks = REVIEW.split("## 3. Run the blind run", 1)[1].split("## 4.", 1)[0]
+    checks = REVIEW.split("## 3. Run acceptance testing", 1)[1].split("## 4.", 1)[0]
     assert (
         "When `reviewers` is skipped " + SKIPPED_BY + ", dispatch no reviewer and pass "
         "no `verdicts`."
@@ -396,7 +397,7 @@ def test_review_dispatches_nothing_for_skipped_steps() -> None:
         "When `adversarial` is skipped " + SKIPPED_BY + ", Build hands off no adversarial "
         "program and §5 omits the `adversarial` input."
     ) in checks_prose
-    assert "When `blind-run` is skipped " + SKIPPED_BY + ", run no blind run." in checks_prose
+    assert "When `acceptance-test` is skipped " + SKIPPED_BY + ", run no acceptance testing." in checks_prose
 
 
 def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
@@ -411,6 +412,23 @@ def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
     ) in review_prose
 
 
+# One shared sentence for the step-list lines Ship builds itself; its example
+# is the checker's own mapping, so prose and code cannot drift apart.
+STEP_NAMES_SENTENCE = (
+    "In the `<steps>` of the `Skipped by instruction:` and `Skipped steps:` lines, write "
+    "`acceptance-test` as `acceptance-test (independent acceptance testing)`; every other "
+    "step reads as recorded."
+)
+
+
+def test_ship_step_names_example_matches_the_checker_mapping() -> None:
+    from loom_checker.rule_checks.publish import STEP_PLAIN_NAMES
+
+    examples = re.findall(r"write `([^`]+)` as `([^`]+)`", STEP_NAMES_SENTENCE)
+    assert dict(examples) == STEP_PLAIN_NAMES
+    assert SHIP_PROSE.count(STEP_NAMES_SENTENCE) == 1
+
+
 def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None:
     assert "render_selection_disclosure" not in SHIP
     assert (
@@ -419,6 +437,8 @@ def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None
         "<YYYY-MM-DD>)` line per confirmation, then one `Prior failure: <step> <rule> "
         "<YYYY-MM-DD>` line per prior failure"
     ) in SHIP_PROSE
+    assert SHIP_PROSE.count(STEP_NAMES_SENTENCE) == 1
+    assert "In `<steps>`, write" not in SHIP_PROSE
     assert "On a mismatch, `publish` prints the expected lines." in SHIP_PROSE
     assert "lists the intent as skipped" not in SHIP_PROSE
     assert "## 1. Confirm publication authorization" in SHIP
@@ -459,7 +479,7 @@ def test_station_summary_rows_name_builds_mechanical_checks() -> None:
 
 
 WRITE_SPEC = (ROOT / "loom-design/skills/write-spec/SKILL.md").read_text(encoding="utf-8")
-BLIND_RUNNER = (ROOT / "loom-code/agents/blind-runner.md").read_text(encoding="utf-8")
+ACCEPTANCE_TESTER = (ROOT / "loom-code/agents/acceptance-tester.md").read_text(encoding="utf-8")
 
 
 def _affirmed_sentences(text: str, *literals: str) -> list[str]:
@@ -514,8 +534,8 @@ def test_plan_questions_asked_claims_no_reader_or_design_record() -> None:
     assert _affirmed_sentences(PLAN_CONFIRM_PROSE, "The list shows how often loom interrupts the user")
 
 
-def test_blind_runner_names_current_artifacts_and_package_suite_owners() -> None:
-    flat = " ".join(BLIND_RUNNER.split())
+def test_acceptance_tester_names_current_artifacts_and_package_suite_owners() -> None:
+    flat = " ".join(ACCEPTANCE_TESTER.split())
     assert "review record" not in flat
     assert "package-tests probe" not in flat
     assert _affirmed_sentences(flat, "Build", "`finalize-review`", "package suite")
@@ -584,13 +604,13 @@ def test_selection_only_detector_rejects_the_old_forms() -> None:
 # Acceptance 11 of
 # `docs/loom/intent/2026-09-23-adversarial-probes-earn-their-place.md`: the
 # checker's own narrow-delta judgement costs the change its spec, plan,
-# blind-run and adversarial steps, so every station that honours it says so in
+# acceptance-test and adversarial steps, so every station that honours it says so in
 # one line, in the same plain words a user-instructed skip already gets.
 NARROW_SKIP_ANNOUNCED = (
     "When `selection show` reports `bound: false` with a non-empty `skip` field, the "
-    "checker judged this change narrow: name those steps to the user in one line as you "
-    "omit them, `Skipped as a narrow change: <steps>`, read from that field rather than "
-    "from conversation recall."
+    "checker judged this change narrow: as you omit those steps, tell the user its "
+    "`narrow_change_line` field (`Skipped as a narrow change: <steps>`) exactly as "
+    "printed, rather than rebuilding it from conversation recall or the raw `skip` ids."
 )
 
 
@@ -603,9 +623,9 @@ def test_each_station_names_the_narrow_auto_skip_to_the_user() -> None:
 
 
 NARROW_SKIP_IN_PR = (
-    "Build the line `Skipped as a narrow change: <steps>` from `selection show`'s `skip` "
-    "field when it reports `bound: false`, not from conversation recall; with a bound "
-    "selection or an empty field, write no such line."
+    "Copy the line `Skipped as a narrow change: <steps>` exactly as `selection show` "
+    "prints it in its `narrow_change_line` field, not from conversation recall or the "
+    "raw `skip` ids; when that field is null, write no such line."
 )
 
 

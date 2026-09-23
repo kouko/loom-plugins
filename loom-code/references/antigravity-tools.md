@@ -30,7 +30,7 @@ Argument names for `ask_question`, `grep_search`, `find_by_name` and
 ## Dispatching loom roles
 
 loom-code ships four agent contracts: `implementer`, `reviewer`, `adversary`
-and `blind-runner`, each in `<loom-code>/agents/<role>.md`. agy also lists
+and `acceptance-tester`, each in `<loom-code>/agents/<role>.md`. agy also lists
 the plugin-provided agents of the same names, but gives a Markdown-defined
 agent no tools by default and loom's agent files declare none, so those
 agents have no tools on agy. Never use one of them as a `TypeName` on agy.
@@ -44,7 +44,7 @@ working tools, including `view_file`, `write_to_file` and `run_command`.
 | `implementer` | `self` | `<loom-code>/agents/implementer.md` |
 | `reviewer` | `self` | `<loom-code>/agents/reviewer.md` |
 | `adversary` | `self` | `<loom-code>/agents/adversary.md` |
-| `blind-runner` | `self` | `<loom-code>/agents/blind-runner.md` |
+| `acceptance-tester` | `self` | `<loom-code>/agents/acceptance-tester.md` |
 
 Call `invoke_subagent` with a `Subagents` array. Each item carries:
 
@@ -60,7 +60,7 @@ Call `invoke_subagent` with a `Subagents` array. Each item carries:
   of each value is unverified on agy 1.2.2.
 
 Use one `self` invocation per dispatch: one per reviewer identity, and one
-each for the implementer task, the adversary and the blind runner. The
+each for the implementer task, the adversary and the acceptance tester. The
 subagent runs as a background task and the root agent waits for its reply. Every station requirement for
 fresh-context or distinct reviewers still applies: give each reviewer
 identity its own separate `self` invocation with a complete prompt, and never

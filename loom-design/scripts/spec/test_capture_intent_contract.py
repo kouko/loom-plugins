@@ -474,20 +474,20 @@ def test_loom_design_version_2_2_0_consistent() -> None:
         (REPO / "loom-design/plugin.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.3.0"
-    assert codex_manifest["version"] == "2.3.0"
-    assert agy_manifest["version"] == "2.3.0"
-    assert "## [2.3.0]" in changelog
+    assert claude_manifest["version"] == "2.3.1"
+    assert codex_manifest["version"] == "2.3.1"
+    assert agy_manifest["version"] == "2.3.1"
+    assert "## [2.3.1]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/) | 2.3.0 |",
-        "loom-design/README.md": "**Version**: 2.3.0",
-        "loom-design/README.ja.md": "**Version**: 2.3.0",
-        "loom-design/README.zh-TW.md": "**Version**: 2.3.0",
+        "README.md": "| [`loom-design`](loom-design/) | 2.3.1 |",
+        "loom-design/README.md": "**Version**: 2.3.1",
+        "loom-design/README.ja.md": "**Version**: 2.3.1",
+        "loom-design/README.zh-TW.md": "**Version**: 2.3.1",
     }
     for name, pin in readme_pins.items():
         assert pin in (REPO / name).read_text(encoding="utf-8"), name
-    assert "Version 2.3.0. Turns a rough idea" in (REPO / "README.md").read_text(encoding="utf-8")
+    assert "Version 2.3.1. Turns a rough idea" in (REPO / "README.md").read_text(encoding="utf-8")
 
 
 def _branch_note() -> str:
@@ -555,8 +555,8 @@ def test_existing_intent_fields_have_explicit_altitude_boundaries() -> None:
     assert "complete scenarios" in text
     assert "product intent" in text and "engineering intent" in text
     assert "field boundaries" in interview
-    assert "blind run" in text
-    assert "blind run" in interview
+    assert "acceptance testing" in text
+    assert "acceptance testing" in interview
     assert '"A task can carry a due date' in " ".join(interview.split())
 
 

@@ -17,7 +17,7 @@ TWO_CASES_SENTENCE = (
     "branch's committed delta that the change is narrow, which is stricter "
     "than the computation that sets the reviewer floor: the delta must "
     "also carry no file anything executes and remove no test, in which "
-    "case the spec, plan, blind-run and adversarial steps are skipped "
+    "case the spec, plan, acceptance-test and adversarial steps are skipped "
     "with no one asked."
 )
 DISCLOSURE_SENTENCE = (
@@ -35,6 +35,14 @@ ORIGINAL_RATIFIED = (
 )
 APPENDED_PLAIN_WORDS = "; non-negotiable 2 plain-words-skip amendment by kouko 2026-09-22"
 APPENDED_NARROW_DELTA = "; non-negotiable 2 narrow-delta-skip amendment by kouko 2026-09-23"
+APPENDED_RENAME = (
+    "; " + "blind" + " run renamed to independent acceptance testing by kouko 2026-09-23"
+)
+ACCEPTANCE_TESTING_CLAUSE = (
+    "plus independent acceptance testing by someone who did not write it "
+    "(omitted only when every Acceptance line is mechanical), and an "
+    "adversarial pass"
+)
 
 
 def _text():
@@ -49,8 +57,12 @@ def test_nn2_states_pr_disclosure_and_ratified_line_appended():
     nn2 = _nn2()
     assert TWO_CASES_SENTENCE in nn2
     assert DISCLOSURE_SENTENCE in nn2
+    assert ACCEPTANCE_TESTING_CLAUSE in nn2
+    assert "blind" not in nn2.lower()
     ratified = next(line for line in _text().splitlines() if line.startswith("ratified-by:"))
-    assert ratified == ORIGINAL_RATIFIED + APPENDED_PLAIN_WORDS + APPENDED_NARROW_DELTA
+    assert ratified == (
+        ORIGINAL_RATIFIED + APPENDED_PLAIN_WORDS + APPENDED_NARROW_DELTA + APPENDED_RENAME
+    )
 
 
 def test_typed_confirmation_clause_gone():

@@ -43,12 +43,15 @@ On Antigravity CLI, map tool and agent names with
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the prose
 steps `selection show` lists as skipped (spec, plan, implementer, tdd,
-blind-run), plus any step the user told you to skip in plain words;
+acceptance-test), plus any step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
-invoke. When `selection show` reports `bound: false` with a non-empty `skip`
-field, the checker judged this change narrow: name those steps to the user in
-one line as you omit them, `Skipped as a narrow change: <steps>`, read from
-that field rather than from conversation recall. The default is the full flow:
+invoke. Words that ask to skip independent acceptance testing —
+"acceptance testing", or the step formerly called "blind run" — mean the
+`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty `skip`
+field, the checker judged this change narrow: as you omit those steps, tell the
+user its `narrow_change_line` field (`Skipped as a narrow change: <steps>`)
+exactly as printed, rather than rebuilding it from conversation recall or the
+raw `skip` ids. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, append one line
@@ -66,10 +69,10 @@ and commit it. Never ask the user for a generated code to skip a step.
 | station | artifact | who decides | checker | checkpoint |
 |---|---|---|---|---|
 | capture-intent | intent — `docs/loom/intent/<change-id>.md`; `PRINCIPLES.md` and `DESIGN.md` at the repo root are side outputs of the tools it calls | user — decision point ① | `intent.schema`, `intent.product-no-identifiers`, `intent.needs-design-reason`, `intent.needs-design-recompute` | N/A |
-| write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no blind run; `not-required`: none |
+| write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no independent acceptance testing; `not-required`: none |
 | write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | no formal plan review; invokes the required spec review only when it authored the spec |
 | build | diff — commits on the change branch | agent-decided | task and integration tests; at the end of Build, an independent adversary's committed adversarial programs and the complete package suite, which must pass before hand-off | no formal review during Build; one closing review follows completed functional work |
-| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus a blind-run report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |
+| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus an acceptance test report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |
 | ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.contextual-body` and `publish.preconditions`; the verification status is disclosed, not a refusal; no functional replay | before push; publication-only fixes reuse matching evidence |
 | maintain | intent — a fresh `docs/loom/intent/<change-id>.md` | agent (dedupe is mechanical) | `intent.schema`, `intent.needs-design-reason`, `intent.needs-design-recompute`, `intent.product-no-identifiers` on a new intent | before hand-off to write-plan |
 
@@ -266,7 +269,7 @@ Print one line for the user: installing `loom-design` gets them a fuller
 spec than this one. For `pre-build-review: required`, dispatch one
 fresh-context `loom-code:reviewer` with lens `spec+adversarial`, the spec
 commit's parent (`<spec-commit>^`) as `reviewed_sha`, and the intent and
-spec as ground truth; it must pass before planning, with no blind run, adversary, or
+spec as ground truth; it must pass before planning, with no acceptance testing, adversary, or
 `finalize-review`. On NEEDS_REVISION, close each finding, commit, and send
 only those fixes back to that reviewer. For `not-required`, proceed without a
 formal spec review; `intake.spec-ready` blocks a spec with no declaration.
@@ -407,7 +410,7 @@ no-listener boundary.
 **Forks you decided yourself.** Every one gets a one-line reason on its
 task: what you chose and why. Any one-way door that surfaces now — after
 decision point ① closed — is not a reason to go back to the user: take the
-default, mark it `agent-decided`, and list it so the blind-run report can
+default, mark it `agent-decided`, and list it so the acceptance test report can
 show it at decision point ③.
 
 <!-- gate: write-plan.post-decision-conservative-default -->

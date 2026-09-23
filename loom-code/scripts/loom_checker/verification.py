@@ -22,6 +22,7 @@ from loom_checker.helpers import git_text
 from loom_checker.helpers import glob_to_regex
 from loom_checker.helpers import load_manifest
 from loom_checker.parsing import parse_document
+from loom_checker.rule_checks.publish import plain_step_names
 from pathlib import Path
 import json
 import re
@@ -135,7 +136,7 @@ def verification_status(
         return f"stale ({failures[0][1]})"
     selection = payload.get("selection")
     skip = selection.get("skip") if isinstance(selection, dict) else None
-    return f"valid (skipped: {', '.join(skip)})" if skip else "valid"
+    return f"valid (skipped: {plain_step_names(skip)})" if skip else "valid"
 
 
 def missing_records(repo: Path, change_id: str, status: str, head: str = "HEAD",

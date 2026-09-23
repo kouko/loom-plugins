@@ -7,6 +7,7 @@ from loom_checker.helpers import git_text
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import repo_root
 from loom_checker.intent_state import remote_default_snapshot
+from loom_checker.rule_checks.publish import plain_step_names
 
 from pathlib import Path
 import argparse
@@ -67,7 +68,13 @@ def _one_change_id(sub: str, args: list[str]) -> str:
 
 def _show(repo: Path, args: list[str], out, err) -> int:
     _one_change_id("show", args)
-    out.write(json.dumps(store.effective_selection(repo, args[0]), ensure_ascii=False, indent=2) + "\n")
+    shown = store.effective_selection(repo, args[0])
+    # The narrow-change line stations say and Ship writes, rendered here so
+    # they copy it rather than rebuild it from the raw `skip` ids.
+    narrow = not shown["bound"] and shown["skip"]
+    shown["narrow_change_line"] = (
+        f"Skipped as a narrow change: {plain_step_names(shown['skip'])}" if narrow else None)
+    out.write(json.dumps(shown, ensure_ascii=False, indent=2) + "\n")
     return 0
 
 

@@ -25,7 +25,7 @@ does not say, and what holds anyway:
 
 Each requirement ends by naming the intent Acceptance line it serves.
 One-to-one is the default: do not fold two Acceptance lines into one
-requirement, because the blind run walks the Acceptance list and has to
+requirement, because independent acceptance testing walks the Acceptance list and has to
 find each line answered somewhere.
 
 ## Table

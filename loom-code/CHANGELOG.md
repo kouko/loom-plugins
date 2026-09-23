@@ -1,5 +1,46 @@
 # Changelog
 
+## [3.10.0] — 2026-09-23 — the blind run is renamed to independent acceptance testing
+
+Minor: identifiers change. The step runs when and as it ran before, and the
+checker's rule list is unchanged; the one visible change is how the PR lines
+that list skipped steps write this step.
+
+- Step id `blind-run` is now `acceptance-test`, in the manifest's steps and
+  step selection, the narrow-delta auto-skip set, and `selection propose
+  --skip`.
+- Agent `blind-runner` is now `acceptance-tester`; dispatch it as
+  `loom-code:acceptance-tester`.
+- The report is now written at
+  `docs/loom/<change-id>/acceptance-test-report.md` (artifact key
+  `acceptance-test-report`), from the template
+  `skills/closing-review/references/acceptance-test-report.md`. `land`
+  cites it on the `Accepted-by` line as `acceptance-test-report <blob>`.
+- Mechanism id `action:blind-run` is now `action:acceptance-test`.
+- Stations, agents, the session-start hook, the three READMEs and
+  PRINCIPLES.md name the step "independent acceptance testing"; the zh-TW
+  and ja text use the English term. A request to skip "acceptance testing",
+  or the old "blind run", maps onto `acceptance-test`.
+- Records of merged changes keep the old names: their attestations and
+  `blind-run-report.md` files are left as they are, and the commands that
+  read them afterwards (`selection skipped-review`, `selection show`, the PR
+  disclosure lines) still handle them, printing the old id as recorded. An
+  in-flight change in another repository whose confirmed step selection
+  skipped `blind-run` now runs acceptance testing, because the old name
+  matches no step; to keep the skip, propose and confirm it again with
+  `acceptance-test`. An in-flight change that already committed
+  `blind-run-report.md` runs acceptance testing again, since the report is
+  looked up only at `acceptance-test-report.md`; renaming the file with
+  `git mv` before closing review keeps it.
+- A test now fails the repository when the old name reappears in a runtime
+  file.
+- The PR lines that list skipped steps (`Verification status: valid
+  (skipped: …)`, `Skipped as a narrow change:`, `Skipped by instruction:` and
+  `Skipped steps:`) now write the step as `acceptance-test (independent
+  acceptance testing)`; `selection show` prints the narrow-change line ready
+  to copy, and `publish` prints the expected `Skipped steps:` lines on a
+  mismatch.
+
 ## [3.9.0] — 2026-09-23 — adversarial probes earn their place
 
 Minor: a new checker rule id (`adversarial.proportionate`), station guidance

@@ -27,7 +27,7 @@ def no_host_session(monkeypatch):
 CHECKER = Path(__file__).with_name("loom_checker.py")
 CHANGE = "2026-09-14-example"
 FULL = ["spec", "plan", "implementer", "tdd", "reviewers",
-        "adversarial", "blind-run", "package-tests"]
+        "adversarial", "acceptance-test", "package-tests"]
 
 
 def git(repo: Path, *args: str) -> str:
@@ -171,18 +171,18 @@ def test_confirmation_with_tampered_prompt_text_does_not_bind(tmp_path: Path) ->
 
 def test_same_branch_and_base_applies(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
-    assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "blind-run").returncode == 0
+    assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "acceptance-test").returncode == 0
     confirm(repo)
     commit(repo, "more.txt")  # new commits on the branch keep the merge base
     state = show(repo)
     assert state["bound"] is True
-    assert state["skip"] == ["blind-run"]
-    assert "blind-run" not in state["run"]
+    assert state["skip"] == ["acceptance-test"]
+    assert "acceptance-test" not in state["run"]
 
 
 def test_reused_change_id_on_new_branch_inherits_nothing(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
-    assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "blind-run").returncode == 0
+    assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "acceptance-test").returncode == 0
     confirm(repo)
     git(repo, "checkout", "-q", "main")
     git(repo, "checkout", "-q", "-b", "feature-two")
@@ -190,10 +190,24 @@ def test_reused_change_id_on_new_branch_inherits_nothing(tmp_path: Path) -> None
     state = show(repo)
     assert state["bound"] is False
     # Auto-skip activates for narrow deltas: .txt file outside docs/loom/ makes floor=1
-    # so spec/plan/adversarial/blind-run are auto-skipped
-    assert state["skip"] == ["spec", "plan", "adversarial", "blind-run"]
-    for step in ("spec", "plan", "adversarial", "blind-run"):
+    # so spec/plan/adversarial/acceptance-test are auto-skipped
+    assert state["skip"] == ["spec", "plan", "adversarial", "acceptance-test"]
+    for step in ("spec", "plan", "adversarial", "acceptance-test"):
         assert step not in state["run"]
+
+
+def test_show_renders_the_narrow_change_line(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    git(repo, "checkout", "-q", "main")
+    git(repo, "checkout", "-q", "-b", "feature-two")
+    commit(repo, "two.txt")  # narrow delta: the checker auto-skips four steps
+    assert show(repo)["narrow_change_line"] == (
+        "Skipped as a narrow change: spec, plan, adversarial, "
+        "acceptance-test (independent acceptance testing)"
+    )
+    assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "acceptance-test").returncode == 0
+    confirm(repo)
+    assert show(repo)["narrow_change_line"] is None  # a bound selection is not narrow
 
 
 def test_store_lives_under_git_common_dir(tmp_path: Path) -> None:

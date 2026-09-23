@@ -12,7 +12,7 @@ from pathlib import Path
 
 AGENTS_DIR = Path(__file__).resolve().parent.parent / "agents"
 
-ROLES = ["implementer", "reviewer", "blind-runner", "adversary"]
+ROLES = ["implementer", "reviewer", "acceptance-tester", "adversary"]
 
 
 def _frontmatter(agent_name):

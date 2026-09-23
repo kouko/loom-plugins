@@ -5,7 +5,7 @@ exists per the adversary-first dispatch order.
 Targets (not yet implemented at commit time -- W0-01 is the RED->GREEN task):
 * `artifacts.<name>.charter` keys (`answers`, `readers`, `must`, `must_not`,
   `signoff`, `edits_after`) in `loom-code/contract/manifest.yaml`.
-* the four new artifact entries `blind-run-report`, `memory`,
+* the four new artifact entries `acceptance-test-report`, `memory`,
   `kickoff-defaults`, `dispatch`.
 * a `charter` sub-command on `loom_checker.py` that renders the markdown
   table and exits non-zero with one `BLOCK contract.charter-complete: ...`
@@ -41,7 +41,7 @@ REAL_MANIFEST = REPO_ROOT / "loom-code" / "contract" / "manifest.yaml"
 CODEX_MIRROR_MANIFEST = REPO_ROOT / ".codex" / "hooks" / "contract" / "manifest.yaml"
 
 NEW_ARTIFACTS = {
-    "blind-run-report": {"path": "docs/loom/<change-id>/blind-run-report.md"},
+    "acceptance-test-report": {"path": "docs/loom/<change-id>/acceptance-test-report.md"},
     # `memory` was retired from this contract by REQ-24 of
     # 2026-09-10-okf-compatible-loom-memory (the repository memory store
     # is now owned solely by the independent `loom-memory` plugin); this
@@ -54,7 +54,7 @@ NEW_ARTIFACTS = {
 
 ALL_ROWS = [
     "intent", "spec", "plan", "attestation",
-    "blind-run-report", "sample-row", "kickoff-defaults",
+    "acceptance-test-report", "sample-row", "kickoff-defaults",
 ]
 
 

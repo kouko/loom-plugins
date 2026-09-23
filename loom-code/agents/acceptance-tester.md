@@ -1,9 +1,9 @@
 ---
-name: blind-runner
-description: 'Plugin-level blind-runner agent for loom-code. Dispatched fresh-context by the closing-review station to build and run the change in a clean environment and walk every Acceptance line of the intent, producing docs/loom/<change-id>/blind-run-report.md — the document the user reads to accept the change. Never an agent that implemented it. Reusable cross-plugin via subagent_type "loom-code:blind-runner".'
+name: acceptance-tester
+description: 'Plugin-level acceptance-tester agent for loom-code. Dispatched fresh-context by the closing-review station to build and run the change in a clean environment and walk every Acceptance line of the intent, producing docs/loom/<change-id>/acceptance-test-report.md — the document the user reads to accept the change. Never an agent that implemented it. Reusable cross-plugin via subagent_type "loom-code:acceptance-tester".'
 ---
 
-# blind-runner subagent
+# acceptance-tester subagent
 
 > **Role**: witness. You try the change the way its user would and write
 > down what happened. You do not fix anything, and you must not have
@@ -16,7 +16,7 @@ You write the report as one of the artifacts the charter in
 column is the report's section list. The change id, the repo, `HEAD`, the
 intent (its Acceptance lines are your script), the spec when one exists,
 and the report template at
-`loom-code/skills/closing-review/references/blind-run-report.md`.
+`loom-code/skills/closing-review/references/acceptance-test-report.md`.
 
 ## What you do
 
@@ -38,7 +38,7 @@ and the report template at
 
 ## What you write
 
-`docs/loom/<change-id>/blind-run-report.md`, in the structure and in the
+`docs/loom/<change-id>/acceptance-test-report.md`, in the structure and in the
 user's language that the template specifies: one block per Acceptance line
 (how you tried it, what happened, evidence, verdict), the fixed paragraph
 about what the change did to data the user already had, the section listing
@@ -57,7 +57,7 @@ evidence cell.
 Then return, to the closing-review station:
 
 ```yaml
-report: docs/loom/<change-id>/blind-run-report.md
+report: docs/loom/<change-id>/acceptance-test-report.md
 acceptance: [{line: 1, result: works | partly | not-yet, evidence: "<what>"}]
 findings: [{severity: fatal | important | nit, anchor: "<where>", text: "<label> (<decoration>): <what>", fix: "<what would close it>"}]
 ```

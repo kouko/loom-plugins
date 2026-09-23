@@ -156,6 +156,17 @@ def test_skip_set_reports_valid_skipped(tmp_path: Path, monkeypatch) -> None:
     assert status == "valid (skipped: adversarial)"
 
 
+def test_skipped_status_names_the_acceptance_step_in_plain_words(tmp_path: Path) -> None:
+    repo = branch_repo(tmp_path)
+    confirmed_intent(repo)
+    commit(repo, "intent")
+    commit_attestation(repo, attestation(repo, skip=["adversarial", "acceptance-test"]))
+    status = verification.verification_status(repo, CHANGE, depth="ci")
+    assert status == (
+        "valid (skipped: adversarial, acceptance-test (independent acceptance testing))"
+    )
+
+
 def test_local_depth_compares_selection_records(tmp_path: Path) -> None:
     repo = branch_repo(tmp_path)
     confirmed_intent(repo)

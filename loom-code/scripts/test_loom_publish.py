@@ -1204,6 +1204,28 @@ def test_disclosure_renderer_matches_attestation_order() -> None:
     assert publish_rules.render_selection_disclosure({"selection": None}) == []
 
 
+def test_disclosure_names_acceptance_step_in_plain_words() -> None:
+    # The retired id, as merged attestations still record it, renders as is;
+    # split so the retired-name guard does not flag this file.
+    retired = "blind" + "-run"
+    selection = {"confirmations": [
+        {"code": "WXYZ", "skip": ["spec", "acceptance-test", retired],
+         "source": "user-typed", "at": "2026-09-23T00:00:00Z"},
+    ]}
+    assert publish_rules.render_selection_disclosure({"selection": selection}) == [
+        "Skipped steps: spec, acceptance-test (independent acceptance testing), "
+        f"{retired} — authority: user-typed (WXYZ, 2026-09-23)",
+    ]
+
+
+def test_plain_step_names_renders_every_pr_step_list() -> None:
+    retired = "blind" + "-run"  # split so the retired-name guard skips this file
+    assert publish_rules.plain_step_names(["spec", "acceptance-test", retired]) == (
+        f"spec, acceptance-test (independent acceptance testing), {retired}"
+    )
+    assert publish_rules.plain_step_names([]) == ""
+
+
 def test_matching_skipped_and_prior_failure_lines_publish() -> None:
     body = disclosed_body(DISCLOSURE)
     assert loom_checker.validate_contextual_pr_body(body) is None
