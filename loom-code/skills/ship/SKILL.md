@@ -92,7 +92,9 @@ When the attestation carries a selection, open the Verification section with
 exactly these lines, filled from the attestation's `selection` field: one
 `Skipped steps: <steps> — authority: <source> (<code>, <YYYY-MM-DD>)` line per
 confirmation, then one `Prior failure: <step> <rule> <YYYY-MM-DD>` line per
-prior failure. On a mismatch, `publish` prints the expected lines. State that a
+prior failure. In `<steps>`, write `acceptance-test` as `acceptance-test
+(independent acceptance testing)`; every other step reads as recorded. On a
+mismatch, `publish` prints the expected lines. State that a
 reviewer rejection `closing-review` never handed to the checker is unrecorded.
 
 Every decision summary states the chosen option, material alternatives,

@@ -419,6 +419,10 @@ def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None
         "<YYYY-MM-DD>)` line per confirmation, then one `Prior failure: <step> <rule> "
         "<YYYY-MM-DD>` line per prior failure"
     ) in SHIP_PROSE
+    assert (
+        "In `<steps>`, write `acceptance-test` as `acceptance-test (independent acceptance "
+        "testing)`; every other step reads as recorded."
+    ) in SHIP_PROSE
     assert "On a mismatch, `publish` prints the expected lines." in SHIP_PROSE
     assert "lists the intent as skipped" not in SHIP_PROSE
     assert "## 1. Confirm publication authorization" in SHIP
