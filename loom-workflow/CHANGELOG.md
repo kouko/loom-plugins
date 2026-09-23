@@ -12,8 +12,10 @@ Patch. Wording only, following loom-code 3.10.0; no behaviour changes.
   place of "blind-run results". An A/B of the two descriptions on the nine
   station-reporting prompts triggered the skill in 18 of 18 valid runs for
   each; the description's pinned hash now points at that result.
-- `decision-map`'s delivery-intent scaffold, the plain-language reference
-  and the visualization card tests use the new step name.
+- `decision-map`'s delivery-intent scaffold and the visualization card tests
+  use the new step name. The plain-language reference no longer lists the
+  step as an internal term, since "independent acceptance testing" is the
+  user-facing name.
 - The version bump lets installed copies pick up the new wording.
 
 ## [5.3.1] — 2026-09-16 — Visualization card follow-ups

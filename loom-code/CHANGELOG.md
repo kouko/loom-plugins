@@ -2,8 +2,9 @@
 
 ## [3.10.0] — 2026-09-23 — the blind run is renamed to independent acceptance testing
 
-Minor: identifiers change. No behaviour changes; the step runs when and as it
-ran before, and the checker's rule list is unchanged.
+Minor: identifiers change. The step runs when and as it ran before, and the
+checker's rule list is unchanged; the one visible change is how the PR lines
+that list skipped steps write this step.
 
 - Step id `blind-run` is now `acceptance-test`, in the manifest's steps and
   step selection, the narrow-delta auto-skip set, and `selection propose
@@ -28,6 +29,12 @@ ran before, and the checker's rule list is unchanged.
   skip, propose and confirm it again with `acceptance-test`.
 - A test now fails the repository when the old name reappears in a runtime
   file.
+- The PR lines that list skipped steps (`Verification status: valid
+  (skipped: …)`, `Skipped as a narrow change:`, `Skipped by instruction:` and
+  `Skipped steps:`) now write the step as `acceptance-test (independent
+  acceptance testing)`; `selection show` prints the narrow-change line ready
+  to copy, and `publish` prints the expected `Skipped steps:` lines on a
+  mismatch.
 
 ## [3.9.0] — 2026-09-23 — adversarial probes earn their place
 
