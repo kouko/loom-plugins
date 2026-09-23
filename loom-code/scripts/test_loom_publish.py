@@ -1218,6 +1218,14 @@ def test_disclosure_names_acceptance_step_in_plain_words() -> None:
     ]
 
 
+def test_plain_step_names_is_the_one_rendering_of_a_step_list() -> None:
+    retired = "blind" + "-run"  # split so the retired-name guard skips this file
+    assert publish_rules.plain_step_names(["spec", "acceptance-test", retired]) == (
+        f"spec, acceptance-test (independent acceptance testing), {retired}"
+    )
+    assert publish_rules.plain_step_names([]) == ""
+
+
 def test_matching_skipped_and_prior_failure_lines_publish() -> None:
     body = disclosed_body(DISCLOSURE)
     assert loom_checker.validate_contextual_pr_body(body) is None

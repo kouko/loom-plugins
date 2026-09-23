@@ -196,6 +196,20 @@ def test_reused_change_id_on_new_branch_inherits_nothing(tmp_path: Path) -> None
         assert step not in state["run"]
 
 
+def test_show_renders_the_narrow_change_line(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    git(repo, "checkout", "-q", "main")
+    git(repo, "checkout", "-q", "-b", "feature-two")
+    commit(repo, "two.txt")  # narrow delta: the checker auto-skips four steps
+    assert show(repo)["narrow_change_line"] == (
+        "Skipped as a narrow change: spec, plan, adversarial, "
+        "acceptance-test (independent acceptance testing)"
+    )
+    assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "acceptance-test").returncode == 0
+    confirm(repo)
+    assert show(repo)["narrow_change_line"] is None  # a bound selection is not narrow
+
+
 def test_store_lives_under_git_common_dir(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "tdd").returncode == 0

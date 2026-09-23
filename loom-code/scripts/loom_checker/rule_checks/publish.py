@@ -17,6 +17,12 @@ DISCLOSURE_PREFIXES = ("Skipped steps:", "Prior failure:")
 STEP_PLAIN_NAMES = {"acceptance-test": "acceptance-test (independent acceptance testing)"}
 
 
+def plain_step_names(steps) -> str:
+    """A step list as every PR line that lists steps writes it; a step id
+    outside the mapping, a retired one included, reads as recorded."""
+    return ", ".join(STEP_PLAIN_NAMES.get(step, step) for step in steps)
+
+
 # Ship's own lines: always accepted, never validated -- the CI check recomputes
 # the status, so the body's copy is a courtesy, not a claim anything trusts.
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
@@ -150,8 +156,7 @@ def render_selection_disclosure(attestation: object) -> list[str]:
         return []
     lines = []
     for confirmation in selected.get("confirmations") or []:
-        steps = ", ".join(STEP_PLAIN_NAMES.get(step, step)
-                          for step in confirmation.get("skip") or []) or "none"
+        steps = plain_step_names(confirmation.get("skip") or []) or "none"
         lines.append(
             f"Skipped steps: {steps} — authority: {confirmation.get('source')} "
             f"({confirmation.get('code')}, {str(confirmation.get('at'))[:10]})"

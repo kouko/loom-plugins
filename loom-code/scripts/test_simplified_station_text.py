@@ -411,6 +411,23 @@ def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
     ) in review_prose
 
 
+# One shared sentence for the step-list lines Ship builds itself; its example
+# is the checker's own mapping, so prose and code cannot drift apart.
+STEP_NAMES_SENTENCE = (
+    "In the `<steps>` of the `Skipped by instruction:` and `Skipped steps:` lines, write "
+    "`acceptance-test` as `acceptance-test (independent acceptance testing)`; every other "
+    "step reads as recorded."
+)
+
+
+def test_ship_step_names_example_matches_the_checker_mapping() -> None:
+    from loom_checker.rule_checks.publish import STEP_PLAIN_NAMES
+
+    examples = re.findall(r"write `([^`]+)` as `([^`]+)`", STEP_NAMES_SENTENCE)
+    assert dict(examples) == STEP_PLAIN_NAMES
+    assert SHIP_PROSE.count(STEP_NAMES_SENTENCE) == 1
+
+
 def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None:
     assert "render_selection_disclosure" not in SHIP
     assert (
@@ -419,10 +436,8 @@ def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None
         "<YYYY-MM-DD>)` line per confirmation, then one `Prior failure: <step> <rule> "
         "<YYYY-MM-DD>` line per prior failure"
     ) in SHIP_PROSE
-    assert (
-        "In `<steps>`, write `acceptance-test` as `acceptance-test (independent acceptance "
-        "testing)`; every other step reads as recorded."
-    ) in SHIP_PROSE
+    assert SHIP_PROSE.count(STEP_NAMES_SENTENCE) == 1
+    assert "In `<steps>`, write" not in SHIP_PROSE
     assert "On a mismatch, `publish` prints the expected lines." in SHIP_PROSE
     assert "lists the intent as skipped" not in SHIP_PROSE
     assert "## 1. Confirm publication authorization" in SHIP
@@ -592,9 +607,9 @@ def test_selection_only_detector_rejects_the_old_forms() -> None:
 # one line, in the same plain words a user-instructed skip already gets.
 NARROW_SKIP_ANNOUNCED = (
     "When `selection show` reports `bound: false` with a non-empty `skip` field, the "
-    "checker judged this change narrow: name those steps to the user in one line as you "
-    "omit them, `Skipped as a narrow change: <steps>`, read from that field rather than "
-    "from conversation recall."
+    "checker judged this change narrow: as you omit those steps, tell the user its "
+    "`narrow_change_line` field (`Skipped as a narrow change: <steps>`) exactly as "
+    "printed, rather than rebuilding it from conversation recall or the raw `skip` ids."
 )
 
 
@@ -607,9 +622,9 @@ def test_each_station_names_the_narrow_auto_skip_to_the_user() -> None:
 
 
 NARROW_SKIP_IN_PR = (
-    "Build the line `Skipped as a narrow change: <steps>` from `selection show`'s `skip` "
-    "field when it reports `bound: false`, not from conversation recall; with a bound "
-    "selection or an empty field, write no such line."
+    "Copy the line `Skipped as a narrow change: <steps>` exactly as `selection show` "
+    "prints it in its `narrow_change_line` field, not from conversation recall or the "
+    "raw `skip` ids; when that field is null, write no such line."
 )
 
 
