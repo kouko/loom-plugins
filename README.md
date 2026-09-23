@@ -78,9 +78,9 @@ flowchart TD
   ends with an independent adversary's adversarial programs and the complete
   package suite, which must pass before hand-off.
   `closing-review` then dispatches the checker-computed number of fresh-context
-  reviewers (two unless the change is narrow and low-risk) and an acceptance tester
-  when an acceptance line cannot be checked mechanically. Passing evidence
-  becomes an attestation bound to the reviewed content.
+  reviewers (two unless the change is narrow and low-risk) and an acceptance
+  tester when an acceptance line cannot be checked mechanically. Passing
+  evidence becomes an attestation bound to the reviewed content.
 - **③ Acceptance** — `ship` pushes the branch, opens the PR and verifies
   checks; you accept the change, through the acceptance test report when one was
   required.

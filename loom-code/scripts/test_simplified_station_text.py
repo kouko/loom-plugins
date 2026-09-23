@@ -350,7 +350,8 @@ def test_stations_read_the_bound_selection_at_entry() -> None:
     build_read = (
         "run `loom_checker.py selection show <change-id>` and omit the steps `selection show` "
         "lists as skipped (spec, plan, implementer, tdd, adversarial, package-tests, "
-        "acceptance-test), plus any step the user told you to skip in plain words"
+        "`acceptance-test` (independent acceptance testing)), plus any step the user "
+        "told you to skip in plain words"
     )
     assert prose_read not in " ".join(REVIEW.split())
     assert prose_read not in " ".join(BUILD.split())

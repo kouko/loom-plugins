@@ -22,11 +22,16 @@ that list skipped steps write this step.
   and ja text use the English term. A request to skip "acceptance testing",
   or the old "blind run", maps onto `acceptance-test`.
 - Records of merged changes keep the old names: their attestations and
-  `blind-run-report.md` files are left as they are, and nothing that runs
-  afterwards reads them by the new names. An in-flight change in another
-  repository whose confirmed step selection skipped `blind-run` now runs
-  acceptance testing, because the old name matches no step; to keep the
-  skip, propose and confirm it again with `acceptance-test`.
+  `blind-run-report.md` files are left as they are, and the commands that
+  read them afterwards (`selection skipped-review`, `selection show`, the PR
+  disclosure lines) still handle them, printing the old id as recorded. An
+  in-flight change in another repository whose confirmed step selection
+  skipped `blind-run` now runs acceptance testing, because the old name
+  matches no step; to keep the skip, propose and confirm it again with
+  `acceptance-test`. An in-flight change that already committed
+  `blind-run-report.md` runs acceptance testing again, since the report is
+  looked up only at `acceptance-test-report.md`; renaming the file with
+  `git mv` before closing review keeps it.
 - A test now fails the repository when the old name reappears in a runtime
   file.
 - The PR lines that list skipped steps (`Verification status: valid

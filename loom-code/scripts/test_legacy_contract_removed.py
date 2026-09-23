@@ -24,7 +24,8 @@ RUNTIME_TREES = (
 )
 RUNTIME_FILES = (
     "README.md", "AGENTS.md", "PRINCIPLES.md", "docs/loom/README.md",
-    "docs/loom/evidence/mechanisms.yaml",
+    "docs/loom/evidence/mechanisms.yaml", "docs/loom/KICKOFF-DEFAULTS.md",
+    "CLAUDE.md",
 )
 # The two places the retired name is still meant to be read: the phrase that
 # maps a user's old words onto the renamed step, and PRINCIPLES.md's
@@ -108,6 +109,18 @@ def test_no_runtime_file_names_the_retired_step_name() -> None:
             continue
         hits.extend(retired_step_names(path, text))
     assert hits == []
+
+
+def test_every_station_honouring_plain_words_skips_maps_the_old_name() -> None:
+    sentence = (
+        "Words that ask to skip independent acceptance testing — "
+        f'"acceptance testing", or the step {FORMER_NAME_PHRASE} — mean the '
+        "`acceptance-test` step."
+    )
+    for station in ("closing-review", "write-plan", "build", "ship"):
+        path = ROOT / f"loom-code/skills/{station}/SKILL.md"
+        text = " ".join(path.read_text(encoding="utf-8").split())
+        assert sentence in text, station
 
 
 def test_manifest_declares_no_review_ledger() -> None:

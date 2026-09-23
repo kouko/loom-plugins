@@ -17,9 +17,12 @@ base. Preserve unrelated and untracked work. Work only on planned paths.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 `selection show` lists as skipped (spec, plan, implementer, tdd, adversarial,
-package-tests, acceptance-test), plus any step the user told you to skip in plain
-words; [expert-mode](../expert-mode/SKILL.md) stays an optional route the user
-may invoke. When `selection show` reports `bound: false` with a non-empty
+package-tests, `acceptance-test` (independent acceptance testing)), plus any
+step the user told you to skip in plain words;
+[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
+invoke. Words that ask to skip independent acceptance testing —
+"acceptance testing", or the step formerly called "blind run" — mean the
+`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty
 `skip` field, the checker judged this change narrow: as you omit those steps,
 tell the user its `narrow_change_line` field (`Skipped as a narrow change:
 <steps>`) exactly as printed, rather than rebuilding it from conversation recall
