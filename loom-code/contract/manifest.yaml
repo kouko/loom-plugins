@@ -210,10 +210,9 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       readers: ["user at decision point 3"]
       must:
         - "one line per Acceptance"
-        - "Review summary"
-        - "Questions I asked you"
         - "What this did to existing data"
         - "I decided for you"
+        - "open questions"
       must_not:
         - {kind: "design rationale", goes_to: spec}
         - {kind: "internal ids",     goes_to: attestation}

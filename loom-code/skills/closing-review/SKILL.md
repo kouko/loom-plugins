@@ -209,8 +209,16 @@ fresh-context, never an agent that touched any part of the change. Its
 that report on the change branch before the reviewers read the final
 functional-content digest, and so before running `finalize-review`. A report
 committed after their verdicts is new functional content and needs the next
-round. When `acceptance-test` is skipped (listed by `selection show` or skipped by
+round. Its evidence file,
+`docs/loom/<change-id>/evidence/acceptance-test-evidence.md`, is functional
+content too and is committed with the report under the same deadline.
+When `acceptance-test` is skipped (listed by `selection show` or skipped by
 the user's plain-words instruction), run no acceptance testing.
+
+On every dispatch, tell the acceptance tester whether `package-tests` or
+`finalize-review` is skipped. On a re-dispatch after a fix, also pass the
+earlier report and evidence file paths and the fix's commit range. The
+tester's steps 6-7 govern the suite row and what is re-tested.
 
 Closing review dispatches no adversary and creates no adversarial program.
 Build commits the adversarial programs, and its hand-off names each program's
