@@ -5,11 +5,15 @@
 Minor: the acceptance tester's contract and the closing-review station's
 guidance change. The checker's rule list is unchanged.
 
-- The acceptance tester no longer runs the full package suite. A criterion
-  the suite settles gets a row that cites the suite command and says
-  `finalize-review` executes it and refuses the attestation when it fails.
-  When `package-tests` is skipped, the tester runs only that criterion's own
-  tests.
+- The acceptance tester no longer runs the full package suite. For a
+  criterion the suite settles it runs only the tests covering that
+  criterion: `works` when they pass, `not verified` when it ran none. The
+  row names the suite check in plain words and says `finalize-review` runs
+  it and refuses the attestation when it fails; the command goes in the
+  evidence file. When `package-tests` is skipped or `finalize-review` will
+  not run, the row cites only that criterion's own tests.
+- A re-run dispatch passes the earlier report and evidence paths and the
+  fix's commit range.
 - The setup check still runs on every run, re-runs included: the change
   installs or loads in a clean copy and is usable.
 - The report `docs/loom/<change-id>/acceptance-test-report.md` is now one
@@ -24,6 +28,10 @@ guidance change. The checker's rule list is unchanged.
   in full over every surface its Acceptance line names. Every other row is
   marked `carried over — <one-line reason>` in the report's new Re-run
   column, and each reason is checked against the fix diff.
+- The report template is the report's section list. The manifest charter's
+  `must` list for `acceptance-test-report` now matches it: one line per
+  Acceptance, what this did to existing data, I decided for you, and open
+  questions ("Review summary" and "Questions I asked you" are gone).
 
 ## [3.10.0] — 2026-09-23 — the blind run is renamed to independent acceptance testing
 
