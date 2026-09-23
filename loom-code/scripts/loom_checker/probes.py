@@ -4,6 +4,7 @@ from fnmatch import fnmatch
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import kickoff_defaults
+from loom_checker.helpers import tree_programs
 from loom_checker.reviewers import committed_branch_delta
 from pathlib import Path
 from typing import Iterable
@@ -115,14 +116,13 @@ def committed_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
     of what the change commits and what `finalize-review` then executes: a
     shell program, or a Python program one directory up, escaped both the cap
     and the `concern:` line while still being run. What makes a file a program
-    is `is_program_path`, the same question the delta-width rule asks.
+    is `tree_programs`, the same question the delta-width rule asks, so an
+    extension-less executable is counted here too.
     """
     prefix = f"docs/loom/{change_id}/"
     listing = git_maybe(repo, "ls-tree", "-r", "--name-only", head_sha, "--", prefix) or ""
-    return sorted(
-        line.strip() for line in listing.splitlines()
-        if line.strip() and is_program_path(line.strip())
-    )
+    held = [line.strip() for line in listing.splitlines() if line.strip()]
+    return sorted(tree_programs(repo, head_sha, held))
 
 
 def _carries_concern(repo: Path, head_sha: str, path: str) -> bool:

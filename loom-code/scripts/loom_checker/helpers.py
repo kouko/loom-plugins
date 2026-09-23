@@ -232,13 +232,42 @@ PROGRAM_SUFFIXES = frozenset(
 
 
 def is_program_path(path: str) -> bool:
-    """True when the path names a file something executes.
+    """True when the path NAMES a file something executes.
 
-    Read from the name alone: git records a mode, but a probe program added
-    without the executable bit is still run as `python3 <path>`, so the mode
-    is the wrong question.
+    A probe program added without the executable bit is still run as
+    `python3 <path>`, so the mode alone is the wrong question and the name is
+    asked first. It is not the whole question either: see `tree_programs`,
+    which asks the two the name cannot answer.
     """
     return Path(path).suffix.casefold() in PROGRAM_SUFFIXES
+
+
+def tree_programs(repo: Path, head_sha: str, paths) -> set[str]:
+    """The subset of `paths` the selected commit holds as executable files.
+
+    A closed suffix list is a list of the names a program may be given, and a
+    program is free not to take one. `evidence/probes/run` with a `#!` first
+    line is executed exactly like `run.sh`, and git's 100755 mode says outright
+    that someone runs this file by name. Either one answers "is this a
+    program" when the name does not, so both are read here and the suffix test
+    stays the cheap first answer.
+    """
+    found = {path for path in paths if is_program_path(path)}
+    rest = [path for path in paths if path not in found]
+    if not rest:
+        return found
+    listing = git_maybe(repo, "ls-tree", head_sha, "--", *rest) or ""
+    for line in listing.splitlines():
+        meta, _, name = line.partition("\t")
+        fields = meta.split()
+        if not name or not fields:
+            continue
+        if fields[0].endswith("755"):
+            found.add(name)
+            continue
+        if (git_maybe(repo, "show", f"{head_sha}:{name}") or "").startswith("#!"):
+            found.add(name)
+    return found
 
 
 ON_A_BRANCH = (

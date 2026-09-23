@@ -318,6 +318,34 @@ def test_a_shell_probe_program_counts_against_the_cap(tmp_path: Path) -> None:
     assert "6 probe programs" in refused.stderr
 
 
+def test_an_extension_less_program_is_counted_and_keeps_a_delta_wide(
+    tmp_path: Path,
+) -> None:
+    """A closed suffix list is a list of the names a program may be given. An
+    executable with no extension -- a shebang, or git's 100755 mode -- is run
+    like any other program, and used to escape the cap, the `concern:` line and
+    the delta-width rule at once."""
+    from loom_checker.reviewers import auto_skipped_steps
+
+    repo = make_narrow_repo(tmp_path)
+    runner = repo / f"docs/loom/{CHANGE}/evidence/probes/run"
+    runner.parent.mkdir(parents=True, exist_ok=True)
+    runner.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    runner.chmod(0o755)
+    head = commit_all(repo, "an extension-less probe program")
+
+    from loom_checker.probes import committed_probe_programs
+
+    assert committed_probe_programs(repo, head, CHANGE) == [
+        f"docs/loom/{CHANGE}/evidence/probes/run"
+    ]
+    assert "adversarial" not in auto_skipped_steps(repo, CHANGE, head)
+
+    refused = finalize(repo, review_input(tmp_path, PASSING, []))
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+
+
 def test_a_program_in_the_store_outside_the_probe_directory_is_refused(
     tmp_path: Path,
 ) -> None:

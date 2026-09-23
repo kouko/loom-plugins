@@ -8,6 +8,7 @@ from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_text
 from loom_checker.helpers import is_program_path
+from loom_checker.helpers import tree_programs
 from pathlib import Path
 
 
@@ -82,7 +83,8 @@ def reviewer_floor_for_paths(
 
 
 def is_narrow_delta(
-    paths: set[str], change_id: str, deleted: frozenset[str] | set[str] = frozenset()
+    paths: set[str], change_id: str, deleted: frozenset[str] | set[str] = frozenset(),
+    executable: frozenset[str] | set[str] = frozenset(),
 ) -> bool:
     """Return True when the diff is narrow enough to auto-skip the steps in
     ``_NARROW_AUTO_SKIP_STEPS``.
@@ -103,8 +105,15 @@ def is_narrow_delta(
     Narrowness is therefore strictly stronger than reviewer floor 1: every
     narrow delta gets floor 1, but a delta that only adds a test file gets
     floor 1 without being narrow.
+
+    ``executable`` carries the paths a caller has already resolved against the
+    tree — `helpers.tree_programs` reads git's 100755 mode and a `#!` first
+    line, which is how `evidence/probes/run` says it is a program without
+    taking a suffix. The name test here is the cheap half of that same
+    question, and a caller with a commit in hand passes the other half in;
+    `auto_skipped_steps` always does.
     """
-    if any(is_program_path(path) for path in paths):
+    if any(is_program_path(path) or path in executable for path in paths):
         return False
     return reviewer_floor_for_paths(paths, change_id, deleted) == 1
 
@@ -195,7 +204,10 @@ def auto_skipped_steps(
     if delta is None:
         return set(_NARROW_AUTO_SKIP_STEPS)
     paths, removed, _added = delta
-    return set(_NARROW_AUTO_SKIP_STEPS) if is_narrow_delta(paths, change_id, removed) else set()
+    selected = head_sha or git_maybe(repo, "rev-parse", "HEAD") or ""
+    executable = tree_programs(repo, selected, paths) if selected else set()
+    narrow = is_narrow_delta(paths, change_id, removed, executable)
+    return set(_NARROW_AUTO_SKIP_STEPS) if narrow else set()
 
 
 def required_reviewer_count(
