@@ -5,7 +5,7 @@ Covers plan W2-05 acceptance 9 (A9) as unit tests:
   - boundary `disabled-or-other-project-prints-full-card`
 
 Acceptance 8 (A8) cases `comparison-prompt-stream-shows-skill-call-and-table`
-and `trivial-control-no-skill-call-no-diagram` are blind-run protocol (spec
+and `trivial-control-no-skill-call-no-diagram` are acceptance test protocol (spec
 design decision "Unprompted-use protocol"), not unit tests: they need a live
 agent session and its event stream. Here only the card content they rely on
 is checked (the full card names `loom-visualization` and its comparison and

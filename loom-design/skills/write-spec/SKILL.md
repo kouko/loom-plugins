@@ -34,10 +34,10 @@ good way to produce them. The shapes below are not negotiable.
 | station | artifact | who decides | checker | checkpoint |
 |---|---|---|---|---|
 | capture-intent | intent — `docs/loom/intent/<change-id>.md`; `PRINCIPLES.md` and `DESIGN.md` at the repo root are side outputs of the tools it calls | user — decision point ① | `intent.schema`, `intent.product-no-identifiers`, `intent.needs-design-reason`, `intent.needs-design-recompute` | N/A |
-| write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no blind run; `not-required`: none |
+| write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no independent acceptance testing; `not-required`: none |
 | write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | no formal plan review; invokes the required spec review only when it authored the spec |
 | build | diff — commits on the change branch | agent-decided | task and integration tests; at the end of Build, an independent adversary's committed adversarial programs and the complete package suite, which must pass before hand-off | no formal review during Build; one closing review follows completed functional work |
-| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus a blind-run report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |
+| closing-review | generated `docs/loom/<change-id>/attestation.json`, plus an acceptance test report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |
 | ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.contextual-body` and `publish.preconditions`; the verification status is disclosed, not a refusal; no functional replay | before push; publication-only fixes reuse matching evidence |
 | maintain | intent — a fresh `docs/loom/intent/<change-id>.md` | agent (dedupe is mechanical) | `intent.schema`, `intent.needs-design-reason`, `intent.needs-design-recompute`, `intent.product-no-identifiers` on a new intent | before hand-off to write-plan |
 
@@ -252,7 +252,7 @@ closing-review station has a dimension for exactly this, `user-judgment-leak`, a
 returns NEEDS_REVISION when it finds one.
 
 A one-way door that surfaces **after** this message is not a new stop: pick
-a default, tag it `agent-decided`, and let the blind-run report disclose
+a default, tag it `agent-decided`, and let the acceptance test report disclose
 it at decision point ③. For classes (b), (c) and (e) the default is not
 free — take the option with zero obligation, that is reversible, and that
 does not touch the user's existing data, and record
@@ -306,7 +306,7 @@ that section.
 2. If `pre-build-review: required`, dispatch one fresh-context
    **`loom-code:reviewer`** yourself with lens `spec+adversarial`, the
    spec commit's parent (`<spec-commit>^`) as `reviewed_sha`, and the intent
-   and spec as ground truth. You are not the reviewer; do not dispatch a blind runner, a
+   and spec as ground truth. You are not the reviewer; do not dispatch an acceptance tester, a
    separate adversary, or `finalize-review`. If it returns NEEDS_REVISION,
    close each finding, commit, and send only those fixes back to that
    reviewer.

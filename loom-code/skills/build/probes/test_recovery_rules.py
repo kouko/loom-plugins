@@ -64,7 +64,7 @@ RL_09_ENDING = "this file keeps no count of its own."
 # over the three items Acceptance #1 names.
 BOUNDED_LOOKUP_SENTENCE = (
     "This lookup covers only an item this rule names: the adversarial "
-    "programs, the blind-run report or the attestation."
+    "programs, the acceptance test report or the attestation."
 )
 
 # The exact phrase Build's §4 hand-off must carry (finding ADV-05): the
@@ -76,11 +76,11 @@ HANDOFF_SEQUENCE_PHRASE = (
 )
 
 # Artifact nouns a restatement of the mapping would have to name. A second copy
-# phrased purely in artifact nouns — "the blind-run report is produced
+# phrased purely in artifact nouns — "the acceptance test report is produced
 # downstream" — names no station and so slips past a station-name check.
 ARTIFACT_NOUNS = re.compile(
     r"(?<![\w-])(?:intents?|specs?|plans?|diffs?|attestations?"
-    r"|blind[- ]run reports?|adversarial programs?)(?![\w-])",
+    r"|acceptance[- ]test reports?|adversarial programs?)(?![\w-])",
     re.IGNORECASE,
 )
 

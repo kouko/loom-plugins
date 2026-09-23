@@ -555,8 +555,8 @@ def test_existing_intent_fields_have_explicit_altitude_boundaries() -> None:
     assert "complete scenarios" in text
     assert "product intent" in text and "engineering intent" in text
     assert "field boundaries" in interview
-    assert "blind run" in text
-    assert "blind run" in interview
+    assert "acceptance testing" in text
+    assert "acceptance testing" in interview
     assert '"A task can carry a due date' in " ".join(interview.split())
 
 

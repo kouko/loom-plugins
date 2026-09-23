@@ -15,7 +15,7 @@ stations:            # produce one per-change artifact each (§3)
   - {name: write-plan,     owner: loom-code,   produces: plan,    decision_point: 1}   # code-only path runs ① itself
   - {name: build,          owner: loom-code,   produces: diff}
   - {name: closing-review, owner: loom-code,   produces: attestation}
-  - {name: ship,           owner: loom-code,   produces: diff,    decision_point: 3}   # acceptance = blind-run report
+  - {name: ship,           owner: loom-code,   produces: diff,    decision_point: 3}   # acceptance = acceptance test report
   - {name: maintain,       owner: loom-code,   produces: intent}
 
 tools:               # user-invoked, or raised by a station on a mechanical condition; standalone ones are not counted
@@ -58,9 +58,9 @@ actions:             # executable steps inside a station; not skills (§3)
   - name: read
     owner: closing-review
     summary: "fresh-context reviewers apply the artifact lens; reviewer-count mechanically computes a floor of one only for a narrow low-risk whole delta and two for every other or undecidable delta."
-  - name: blind-run
+  - name: acceptance-test
     owner: closing-review
-    summary: "an agent that never touched the change builds/runs it in a clean environment and writes the blind-run report against every Acceptance line (plus UI flows for product)."
+    summary: "an agent that never touched the change builds/runs it in a clean environment and writes the acceptance test report against every Acceptance line (plus UI flows for product)."
   - name: adversarial
     owner: build
     summary: "mutation / fuzz / abuse cases for code, red-team for spec, and gate attacks for skills; execution results land in the generated attestation."
@@ -85,7 +85,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       must:
         - "Problem in the user's words"
         - "Proposed outcome"
-        - "Acceptance lines each provable by a blind run"
+        - "Acceptance lines each provable by acceptance testing"
         - "Constraints"
         - "Out of scope"
         - "Open questions"
@@ -201,8 +201,8 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       - {name: findings,       kind: json, required: true, grammar: "[{id, anchor, raised_by, resolution} | {severity, dimension, anchor, text}]"}
       - {name: selection,      kind: json, required: true, grammar: "{confirmations: [{code, skip, source, at}], skip, source, prior_failures: [{step, rule, head_sha, branch, at}]} | null", note: "schema loom-attestation/v2; recomputed from the local selection records, and only steps in skip waive their checks; v1 attestations carry no selection and stay valid"}
 
-  blind-run-report:
-    path: docs/loom/<change-id>/blind-run-report.md
+  acceptance-test-report:
+    path: docs/loom/<change-id>/acceptance-test-report.md
     template: null
     fields: []
     charter:
@@ -251,7 +251,7 @@ step_selection:      # the only step names a user selection may run or skip; the
     - {name: tdd}
     - {name: reviewers}
     - {name: adversarial}
-    - {name: blind-run}
+    - {name: acceptance-test}
     - {name: package-tests}
 
 kickoff_defaults:   # grammar: `- <key>: <value> — <reason> (<date>)`

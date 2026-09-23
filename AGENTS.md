@@ -9,7 +9,7 @@
 - 原因：Claude Code 提供 Base Path，bundled files 從 skill 目錄相對解析
 
 ### 兩份文件：intent.md 與 spec.md（loom 1.0）
-- `docs/loom/intent/<change-id>.md`（capture-intent／write-plan 擁有）— 使用者語言：Problem、Proposed outcome、Acceptance（每條可被盲跑證明）、Constraints、Out of scope、Open questions
+- `docs/loom/intent/<change-id>.md`（capture-intent／write-plan 擁有）— 使用者語言：Problem、Proposed outcome、Acceptance（每條可被 independent acceptance testing 證明）、Constraints、Out of scope、Open questions
 - `docs/loom/<change-id>/spec.md`（write-spec 擁有）— 工程語言：`REQ-<n> — <name>` 每條對回 intent 的 Acceptance 編號、Design decision（標 agent-decided／user-decided）、Current state evidence、UI flows
 - spec.md 只在 `needs-design: yes` 時存在；spec 一律 reference 它的 intent，不重述
 
@@ -81,10 +81,10 @@ repository's development records under `docs/`.
 | 動作 | 誰做 | 產出 |
 |---|---|---|
 | **讀** | ≥2 個 fresh-context reviewer，按型別選鏡頭（code 11 維／docs 5 維／spec-conformance／design-conformance／principles-conformance） | verdict → generated attestation |
-| **盲跑** | 乾淨環境照 intent 的 Acceptance 逐條試，寫成使用者看得懂的盲跑報告 | 報告 ＋ `probes[]` |
+| **acceptance testing** | 乾淨環境照 intent 的 Acceptance 逐條試，寫成使用者看得懂的 acceptance test report | 報告 ＋ `probes[]` |
 | **對抗** | mutation／fuzz，或對抗 agent 自寫可執行的 abuse／邊界案例並逐筆自跑 | `probes[]`（`kind: adversarial`） |
 
-- 對抗跑在 build 站結尾；讀與盲跑跑在 **checkpoint review**（review 站）上；三者都不是逐 task 三臂審查；寫的人不能自己驗
+- 對抗跑在 build 站結尾；讀與 acceptance testing 跑在 **checkpoint review**（review 站）上；三者都不是逐 task 三臂審查；寫的人不能自己驗
 - 決定性的閘只有一支 **checker**：`python3 loom-code/scripts/loom_checker.py --list-rules`
   是規則清單的 SSOT（規則全部是「重算」，不是宣稱）；這裡不重列規則 id，重列＝第二個漂移面
 - 散文不當閘：只有 SKILL.md／reference 內以 `<!-- gate: <id> -->` 標記的段落算閘，
@@ -105,7 +105,7 @@ repository's development records under `docs/`.
 
 ### loom 1.0 flow
 - 七站：capture-intent → write-spec →（write-plan → build → review → ship），maintain 回頭開 intent
-- 三個人類決策點：①覆述並確認 intent（含單向門問法）②product 的可見行為確認（spec）③盲跑報告驗收
+- 三個人類決策點：①覆述並確認 intent（含單向門問法）②product 的可見行為確認（spec）③acceptance test report 驗收
 - 入口與完整站序：`docs/loom/README.md`；概念模型：`docs/loom/2026-09-02-simple-loom-flow/concept-model.md`
 
 ### Agent Behavioral Rules

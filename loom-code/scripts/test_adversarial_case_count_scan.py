@@ -30,7 +30,7 @@ FLOORS_IN_PLAIN_ENGLISH = (
     "a minimum of three cases",
     "write not fewer than three cases",
     "three probe programs minimum",
-    # The wording this change deleted from the READMEs, which a blind run
+    # The wording this change deleted from the READMEs, which acceptance testing
     # pasted back with the whole suite green: one adjective hides the floor.
     "at least three executable abuse and boundary cases",
 )

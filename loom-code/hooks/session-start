@@ -83,7 +83,7 @@ Station order: ${flow}; ${tail_station} on alerts.
 You ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:
 ① after the intent is written (${dp1}) — restate the problem and the acceptance conditions in plain words and get \"yes, this is what I want\"; fold a missing-principles interview, any \`second-vendor: ask\` question, and (engineering changes) any one-way-door choice into this same conversation.
 ② only for a product change, after the spec is written (${dp2}) — read back the visible behaviour (\"you type X, you see Y\") and get \"yes\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①; never show design rationale.
-③ at the end (${dp3}) — the user reads the blind-run report, one line per acceptance condition, and accepts. They never review a diff.
+③ at the end (${dp3}) — the user reads the acceptance test report, one line per acceptance condition, and accepts. They never review a diff.
 
 Never ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.
 

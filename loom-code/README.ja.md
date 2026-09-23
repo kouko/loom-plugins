@@ -22,9 +22,9 @@ flowchart TD
     spec["needs-design: yes のときだけ<br/>loom-design:write-spec<br/>② product の変更: 目に見える振る舞いを確認する"]
     plan["loom-code:write-plan<br/>plan.md のタスク DAG"]
     build["loom-code:build<br/>テストファースト、タスクごとに implementer 1 つ<br/>最後に adversary と package テスト一式"]
-    review["loom-code:closing-review<br/>fresh-context のレビュアー<br/>必要なら盲検"]
+    review["loom-code:closing-review<br/>fresh-context のレビュアー<br/>必要なら independent acceptance testing"]
     attest[["attestation を生成<br/>loom-code:closing-review による"]]
-    ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは盲検レポートで"]
+    ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは acceptance test report で"]
     merged(["マージは別手順<br/>loom-code:ship の後、あなた自身の許可で"])
     maintain["loom-code:maintain<br/>バグ・アラート・リグレッション・障害"]
 
@@ -65,7 +65,7 @@ flowchart TD
 |---|---|
 | [`write-plan`](skills/write-plan/SKILL.md) | 確認済みの intent を `docs/loom/<change-id>/plan.md` に変える：ファイル、担当する Acceptance 行、テストケース、リスクを持つ wave 分けされたタスク。`loom-design` がなければ ① を自分で行う。 |
 | [`build`](skills/build/SKILL.md) | タスクごとに implementer を 1 つ割り当て、テストファーストで plan を実装し、最後に adversary と package テスト一式を走らせる。これらが通るまで引き渡さない。 |
-| [`closing-review`](skills/closing-review/SKILL.md) | Build の確認を通った内容にクロージングレビュー（レビュアー、必要に応じて盲検）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
+| [`closing-review`](skills/closing-review/SKILL.md) | Build の確認を通った内容にクロージングレビュー（レビュアー、必要に応じて acceptance testing）を行い、`docs/loom/<change-id>/attestation.json` を生成する。 |
 | [`ship`](skills/ship/SKILL.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
 | [`maintain`](skills/maintain/SKILL.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
@@ -80,12 +80,12 @@ flowchart TD
 |---|---|---|
 | [`implementer`](agents/implementer.md) | `build` | 1 タスク：失敗するテストを先に書き、1 コミット、状態レポート — verdict は出さない。 |
 | [`reviewer`](agents/reviewer.md) | `closing-review` | fresh-context の verdict（`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`）と位置付きの指摘。レビュー対象は編集しない。 |
-| [`blind-runner`](agents/blind-runner.md) | `closing-review` | クリーンな環境で変更を動かして全 Acceptance 行を確かめ、`docs/loom/<change-id>/blind-run-report.md` を書く。 |
+| [`acceptance-tester`](agents/acceptance-tester.md) | `closing-review` | クリーンな環境で変更を動かして全 Acceptance 行を確かめ、`docs/loom/<change-id>/acceptance-test-report.md` を書く。 |
 | [`adversary`](agents/adversary.md) | `build` | 変更を壊しにいく — mutation や fuzz ツール、または実行可能な悪用・境界ケース — そしてすべての試行を probe として記録する。 |
 
 レビュアーの人数は agent が選ぶのではありません。`loom_checker.py
 reviewer-count` がブランチ全体の差分から計算します — 狭く低リスクな変更なら
-1 人、それ以外や判定できないときは 2 人です。盲検が行われるのは、Acceptance
+1 人、それ以外や判定できないときは 2 人です。acceptance testing が行われるのは、Acceptance
 行を機械的に判定できないときだけです。
 
 ## 訊かれる 3 つの質問
@@ -96,7 +96,7 @@ reviewer-count` がブランチ全体の差分から計算します — 狭く�
    言葉で言い直したもの。
 2. **X と打つと Y が見える。合っていますか？** — 目に見える振る舞い。
    product の変更でのみ訊かれ、engineering では訊かれません。
-3. **できましたか？** — 結果を受け入れます。盲検レポートが必要だった場合は、
+3. **できましたか？** — 結果を受け入れます。acceptance test report が必要だった場合は、
    その変更に一切触れていない agent が書いたレポートを読みます。
 
 不可逆な分岐（データの削除、公開インターフェース、片道のマイグレーション）は、
@@ -106,7 +106,7 @@ engineering の変更なら ①、product の変更なら ② に、結果の形
 ## contract package
 
 `contract/manifest.yaml` がステーション、ツール、アクション、そしてすべての
-artifact — intent・spec・plan・attestation・盲検レポート・`KICKOFF-DEFAULTS.md` —
+artifact — intent・spec・plan・attestation・acceptance test report・`KICKOFF-DEFAULTS.md` —
 の charter とフィールド、さらに standing document を宣言します。空のひな型は
 `contract/templates/` にあります。書き込むのは loom-code のみ。`loom-design` は
 これを読み `requires-contract` を宣言します。`loom-workflow` はそうではなく
@@ -206,7 +206,7 @@ agy plugin list
 インストール済みのコピーを置き換えます）。削除は `agy plugin uninstall loom-code`
 です。hook（公開リマインダー・session context・言語リマインダー）が走るのは `agy` CLI だけで、
 Antigravity のデスクトップアプリや IDE では走りません。`agy` 上では loom の役割
-（implementer・reviewer・adversary・blind-runner）は、loom の agent 契約に従う
+（implementer・reviewer・adversary・acceptance-tester）は、loom の agent 契約に従う
 agy の `self` subagent として Gemini モデルで動きます。review station は
 どの host でも `closing-review` で、旧名 `review` は別名なしで削除されました。
 

@@ -67,28 +67,28 @@ def test_station_commits_report_before_finalize() -> None:
     instruction = "commit that report on the change branch before"
     assert instruction in REVIEW_WORDS
     assert "before running `finalize-review`" in REVIEW_WORDS
-    assert "docs/loom/<change-id>/blind-run-report.md" in REVIEW_WORDS
+    assert "docs/loom/<change-id>/acceptance-test-report.md" in REVIEW_WORDS
     command = "loom_checker.py finalize-review <change-id>"
     assert REVIEW_WORDS.index(instruction) < REVIEW_WORDS.index(command)
 
 
 def test_report_committed_before_reviewers_read_final_digest() -> None:
     order = next(s for s in _sentences(REVIEW_WORDS) if "commit that report" in s)
-    assert "Finish the blind run" in order
+    assert "Finish acceptance testing" in order
     assert "before the reviewers read the final functional-content digest" in order
     reason = next(s for s in _sentences(REVIEW_WORDS) if "committed after their verdicts" in s)
     assert "next round" in reason
 
 
 _COMMIT_AFTER_VERDICTS = re.compile(
-    r"\bcommit (?:that|the|its) (?:blind-run )?report\b[^.]*\bafter\b"
-    r"|\bafter\b[^.]*\b(?:verdicts?|reviewers? (?:read|return))\b[^.]*\bcommit (?:that|the|its) (?:blind-run )?report\b",
+    r"\bcommit (?:that|the|its) (?:acceptance[- ]test )?report\b[^.]*\bafter\b"
+    r"|\bafter\b[^.]*\b(?:verdicts?|reviewers? (?:read|return))\b[^.]*\bcommit (?:that|the|its) (?:acceptance[- ]test )?report\b",
     re.IGNORECASE,
 )
 
 
 def test_report_commit_after_verdicts_not_instructed() -> None:
-    assert _COMMIT_AFTER_VERDICTS.search("After the verdicts arrive, commit the blind-run report.")
+    assert _COMMIT_AFTER_VERDICTS.search("After the verdicts arrive, commit the acceptance test report.")
     assert _COMMIT_AFTER_VERDICTS.search("Commit that report after reviewers return.")
     assert not _COMMIT_AFTER_VERDICTS.search("A report committed after their verdicts needs the next round.")
     offending = [s for s in _sentences(REVIEW_WORDS) if _COMMIT_AFTER_VERDICTS.search(s)]
@@ -97,8 +97,8 @@ def test_report_commit_after_verdicts_not_instructed() -> None:
 
 def test_finalize_before_report_commit_not_instructed() -> None:
     finalize_then_commit = re.compile(
-        r"finaliz\w*.*\b(then|afterwards?|later)\b.*commit\w*.*blind-run report"
-        r"|commit\w*.*blind-run report.*\b(after|once)\b.*finaliz",
+        r"finaliz\w*.*\b(then|afterwards?|later)\b.*commit\w*.*acceptance test report"
+        r"|commit\w*.*acceptance test report.*\b(after|once)\b.*finaliz",
         re.IGNORECASE,
     )
     offending = [s for s in _sentences(REVIEW_WORDS) if finalize_then_commit.search(s)]
@@ -250,11 +250,11 @@ def test_recording_passage_invokes_nothing_and_registers_no_mechanism() -> None:
         )
 
 
-def test_blind_run_before_first_reviewer_dispatch() -> None:
+def test_acceptance_test_before_first_reviewer_dispatch() -> None:
     section = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
     words = " ".join(section.split())
     sentence = (
-        "When a blind run is needed, finish it and commit its report (§3) "
+        "When acceptance testing is needed, finish it and commit its report (§3) "
         "before dispatching the first reviewers."
     )
     assert sentence in words

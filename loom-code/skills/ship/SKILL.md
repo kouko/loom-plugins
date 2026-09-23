@@ -16,7 +16,7 @@ remain English.
 
 ## 1. Confirm publication authorization
 
-Read the intent and blind-run report when one was required. A confirmed intent
+Read the intent and acceptance test report when one was required. A confirmed intent
 with `publication: automatic — authorized <YYYY-MM-DD> by <name>` carries that
 decision into Ship; do not ask again. Intent prose, status, or contract version
 never implies authorization. A legacy intent without that machine-readable field
@@ -25,7 +25,7 @@ The user may still explicitly stop publication before the outward action.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the prose
 steps `selection show` lists as skipped (spec, plan, implementer, tdd,
-blind-run), plus any step the user told you to skip in plain words;
+acceptance-test), plus any step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
 invoke. When `selection show` reports `bound: false` with a non-empty `skip`
 field, the checker judged this change narrow: name those steps to the user in
@@ -211,7 +211,7 @@ repository may be fixed in place and reuse the matching attestation.
 
 ## 5. Land after acceptance
 
-After all checks pass, present the result and the blind-run report when one
+After all checks pass, present the result and the acceptance test report when one
 exists (decision point ③). Publication never authorizes or invokes merge; only
 the maintainer's explicit acceptance does. Never type `gh pr merge` yourself:
 merge through land, which checks the live PR body and discloses verification.

@@ -27,7 +27,7 @@ _REVIEW_PROTECTED_NAMES = frozenset(
 
 # Steps that a narrow delta auto-skips. Intent always stays (cannot be skipped).
 _NARROW_AUTO_SKIP_STEPS = frozenset(
-    {"spec", "plan", "blind-run", "adversarial"}
+    {"spec", "plan", "acceptance-test", "adversarial"}
 )
 
 

@@ -135,14 +135,14 @@ cat <<'EOF'
 Offline checks PASSED. Live verification (manual, in fresh Claude session):
 
   1. cd to a repo with a non-trivial branch whose branch-end checkpoint
-     has returned PASS and whose blind-run report exists — it should
+     has returned PASS and whose acceptance test report exists — it should
      have enough commits to warrant memory trailers
   2. claude
   3. Prompt: "finish this branch"
   4. Expected agent behavior:
      - Skill(loom-code:ship) auto-loads
      - Step 1 recomputes the preconditions and step 2 presents the
-       blind-run report for acceptance
+       acceptance test report for acceptance
      - Step 3 EXPLICITLY invokes loom-workflow:git-memory (transcript
        should show "Skill(loom-workflow:git-memory) → Successfully
        loaded skill" before the trailers are drafted)

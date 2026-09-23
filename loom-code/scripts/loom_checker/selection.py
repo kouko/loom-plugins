@@ -146,7 +146,7 @@ def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
     uncancelled confirmation recorded on this branch and merge base exists.
 
     When no user selection is bound and the branch delta is mechanically
-    narrow (is_narrow_delta), spec/plan/blind-run/adversarial are auto-skipped so
+    narrow (is_narrow_delta), spec/plan/acceptance-test/adversarial are auto-skipped so
     small changes run the full ritual without a typed confirmation.
     Intent is never auto-skipped. Explicit user selections always win."""
     names = [s["name"] for s in step_vocabulary(manifest)]

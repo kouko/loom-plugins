@@ -26,16 +26,16 @@ STATIONS = {
 }
 ARTIFACTS = {
     "intent", "spec", "plan", "attestation",
-    "blind-run-report", "kickoff-defaults",
+    "acceptance-test-report", "kickoff-defaults",
 }
 # The W0-01 additions declare no `fields:` schema of their own (their
 # content is free-form prose rather than a frontmatter/section/json-key
-# schema) -- blind-run-report has no template file -- it is a per-change
+# schema) -- acceptance-test-report has no template file -- it is a per-change
 # artifact charter row, not a new template-backed schema. (`memory` was
 # retired from this contract by REQ-24 of
 # 2026-09-10-okf-compatible-loom-memory -- the repository memory store is
 # now owned solely by the independent `loom-memory` plugin.)
-ARTIFACTS_WITHOUT_FIELDS_SCHEMA = {"blind-run-report", "kickoff-defaults", "dispatch"}
+ARTIFACTS_WITHOUT_FIELDS_SCHEMA = {"acceptance-test-report", "kickoff-defaults", "dispatch"}
 ID_RE = re.compile(r"^[a-z][a-z0-9-]*$")
 
 
@@ -97,7 +97,7 @@ def test_markdown_templates_carry_declared_fields(manifest):
     """Every frontmatter field / section the schema declares appears in the
     template, so the template and the schema cannot drift apart. Skips an
     artifact with no template file at all (`template: null` -- W0-01's
-    blind-run-report and dispatch, which are prose rather than
+    acceptance-test-report and dispatch, which are prose rather than
     not a template-backed schema)."""
     for name, schema in manifest["artifacts"].items():
         if schema.get("template") is None:

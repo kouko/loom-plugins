@@ -14,7 +14,7 @@ publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only af
 <wanted capability or state; no scenario, UI reaction, state transition, or implementation>
 
 ## Acceptance
-1. <observable delivery outcomes, not scenarios or implementation; each line provable by a blind run>
+1. <observable delivery outcomes, not scenarios or implementation; each line provable by independent acceptance testing>
 
 ## Constraints
 - <already-fixed boundaries, not agent preferences>

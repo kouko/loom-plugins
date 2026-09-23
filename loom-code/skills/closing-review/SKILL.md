@@ -21,9 +21,11 @@ the remaining work.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 `selection show` lists as skipped, plus any step the user told you to skip in
-plain words; §2 and §3 say how skipped reviewers, adversarial and blind-run are
+plain words; §2 and §3 say how skipped reviewers, adversarial and acceptance-test are
 handled; [expert-mode](../expert-mode/SKILL.md) stays an optional route the
-user may invoke. When `selection show` reports `bound: false` with a non-empty
+user may invoke. Words that ask to skip independent acceptance testing —
+"acceptance testing", or the step formerly called "blind run" — mean the
+`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty
 `skip` field, the checker judged this change narrow: name those steps to the
 user in one line as you omit them, `Skipped as a narrow change: <steps>`, read
 from that field rather than from conversation recall. The default is the full
@@ -41,7 +43,7 @@ code to skip a step.
 Before every host-native dispatch, the station must resolve the model-and-effort
 profile as the [shared dispatch profile](../../references/dispatch-profile.md)
 defines and apply its result. Repeat this resolution for every reviewer,
-second-vendor reviewer, and blind runner dispatch. `<loom-code>` (this plugin's
+second-vendor reviewer, and acceptance tester dispatch. `<loom-code>` (this plugin's
 root) is `${CLAUDE_PLUGIN_ROOT}` on Claude Code; on any other host it is the
 directory two levels above this SKILL.md.
 
@@ -56,11 +58,11 @@ complete package suite and the existing adversarial programs, then start
 Round 1 again. When it prints `WARN review.sync`, state the warning in the
 round report and continue. When it prints `BLOCK review.sync`, dispatch no
 reviewer and return the change to Build. Any other result, including exit 2,
-dispatches no reviewer and reports the printed message. Run it before the
-blind run (§3), so the blind run exercises the synced content.
+dispatches no reviewer and reports the printed message. Run it before
+acceptance testing (§3), so acceptance testing exercises the synced content.
 
 Before dispatching reviewers in any round, confirm on the current functional
-content (a committed blind-run report aside) that Build's hand-off reports the
+content (a committed acceptance test report aside) that Build's hand-off reports the
 complete package suite passing or `package-tests` is skipped (listed by
 `selection show` or skipped by the user's plain-words instruction), and that it
 reports every adversarial program passing or `adversarial` is skipped (listed
@@ -77,11 +79,11 @@ reporting a failure, and neither routes like one. When an item is absent, read
 `loom-code/contract/manifest.yaml` (`stations[].produces` and
 `actions[].owner`) for the station that produces the absent item; this file
 keeps no second copy of that mapping. This lookup covers only an item this
-rule names: the adversarial programs, the blind-run report or the
+rule names: the adversarial programs, the acceptance test report or the
 attestation. Take the owner, never
 `charter.signoff`, which names where an artifact is signed off rather than
 who produces it. When that owner is this station, produce the item here and
-route it nowhere; for a blind-run report specifically, that means following
+route it nowhere; for an acceptance test report specifically, that means following
 §3. When it is
 another station, return the change there, naming the station sequence
 entered so far, and dispatch no reviewer. Recovery adds a path and waives
@@ -109,7 +111,7 @@ second time and do not hand the change on to another station.
 
 <!-- /gate -->
 
-When a blind run is needed, finish it and commit its report (§3) before
+When acceptance testing is needed, finish it and commit its report (§3) before
 dispatching the first reviewers. After Build commits completed functional
 content, run:
 
@@ -196,18 +198,18 @@ free-form provider text. Route on the stderr JSON `kind`, not exit status
 alone; a plain-text exit 2 is caller misuse rather than a routing signal.
 <!-- /gate -->
 
-## 3. Run the blind run
+## 3. Run acceptance testing
 
-Use a blind run when an Acceptance line cannot be settled mechanically.
-Producing a blind run means dispatching the `loom-code:blind-runner` agent
+Use acceptance testing when an Acceptance line cannot be settled mechanically.
+Acceptance testing means dispatching the `loom-code:acceptance-tester` agent
 fresh-context, never an agent that touched any part of the change. Its
-`docs/loom/<change-id>/blind-run-report.md` is functional content; only
-`attestation.json` is publication metadata. Finish the blind run and commit
+`docs/loom/<change-id>/acceptance-test-report.md` is functional content; only
+`attestation.json` is publication metadata. Finish acceptance testing and commit
 that report on the change branch before the reviewers read the final
 functional-content digest, and so before running `finalize-review`. A report
 committed after their verdicts is new functional content and needs the next
-round. When `blind-run` is skipped (listed by `selection show` or skipped by
-the user's plain-words instruction), run no blind run.
+round. When `acceptance-test` is skipped (listed by `selection show` or skipped by
+the user's plain-words instruction), run no acceptance testing.
 
 Closing review dispatches no adversary and creates no adversarial program.
 Build commits the adversarial programs, and its hand-off names each program's
@@ -283,8 +285,8 @@ Before any fix round, pass each non-passing reviewer verdict to
 a rejection never handed over stays unrecorded.
 
 Convergence is where a lesson this branch taught is still cheap to keep.
-Whatever it taught has surfaced by now — through a finding, a probe, or the
-blind run — and writing it down after the merge costs a branch and a pull
+Whatever it taught has surfaced by now — through a finding, a probe, or
+acceptance testing — and writing it down after the merge costs a branch and a pull
 request for something already known. When this repository has a
 `docs/loom/memory/` directory, that is where such a lesson belongs.
 

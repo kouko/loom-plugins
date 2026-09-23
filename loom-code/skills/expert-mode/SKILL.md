@@ -22,12 +22,14 @@ change will use.
 ## 1. Map the words onto steps
 
 Steps: `spec`, `plan`, `implementer`, `tdd`, `reviewers`, `adversarial`,
-`blind-run`, `package-tests`. The intent, publication, the merge decision and
+`acceptance-test`, `package-tests`. The intent, publication, the merge decision and
 the attestation are not steps.
 
 - Nothing after the entry point: list the steps with one example sentence and
   stop; nothing is recorded.
-- Map the user's words, in any language, onto step names.
+- Map the user's words, in any language, onto step names. "Acceptance
+  testing", and the step formerly called "blind run", both mean
+  `acceptance-test` (independent acceptance testing).
 - When the user asks to skip the intent, say the intent is always kept and
   show the table of the remaining steps.
 - A word that is no step (other than the intent, handled above): name the

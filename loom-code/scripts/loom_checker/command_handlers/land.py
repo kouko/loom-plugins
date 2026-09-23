@@ -62,7 +62,7 @@ BLOCKING_MERGE_STATES = {"BLOCKED", "DIRTY", "BEHIND", "UNSTABLE", "DRAFT"}
 
 
 ACCEPTANCE_NOT_RECORDED = (
-    "blind-run acceptance not recorded; pass --accepted-by <name> after the maintainer accepts"
+    "acceptance not recorded; pass --accepted-by <name> after the maintainer accepts"
 )
 
 
@@ -756,16 +756,16 @@ def _normalized(text: str) -> str:
 
 
 def _acceptance_line(repo: Path, change_id: str, accepted_by: str) -> str:
-    """`Accepted-by: <name> <date>`, citing the blind-run report blob when one
+    """`Accepted-by: <name> <date>`, citing the acceptance test report blob when one
     is committed at HEAD."""
     line = f"Accepted-by: {accepted_by} {date.today().isoformat()}"
     if change_id:
         report_rel = artifact_path(
-            load_manifest(), "blind-run-report", change_id, repo
+            load_manifest(), "acceptance-test-report", change_id, repo
         ).relative_to(repo)
         blob = git_maybe(repo, "rev-parse", "--verify", "--quiet", f"HEAD:{report_rel}")
         if blob:
-            line += f" (blind-run-report {blob[:7]})"
+            line += f" (acceptance-test-report {blob[:7]})"
     return line
 
 

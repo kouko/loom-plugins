@@ -17,7 +17,7 @@ base. Preserve unrelated and untracked work. Work only on planned paths.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 `selection show` lists as skipped (spec, plan, implementer, tdd, adversarial,
-package-tests, blind-run), plus any step the user told you to skip in plain
+package-tests, acceptance-test), plus any step the user told you to skip in plain
 words; [expert-mode](../expert-mode/SKILL.md) stays an optional route the user
 may invoke. When `selection show` reports `bound: false` with a non-empty
 `skip` field, the checker judged this change narrow: name those steps to the
@@ -123,7 +123,7 @@ a failure and is fixed as above. Read `loom-code/contract/manifest.yaml`
 (`stations[].produces` and `actions[].owner`) to decide whether an absent item
 is Build's to produce; this file keeps no second copy of that mapping. This
 lookup covers only an item this rule names: the adversarial programs, the
-blind-run report or the attestation. Absence
+acceptance test report or the attestation. Absence
 dispatches the adversary only when no adversarial program is committed;
 committed programs are re-run, never re-dispatched, exactly as after a fix.
 

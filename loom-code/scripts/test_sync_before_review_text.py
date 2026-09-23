@@ -140,7 +140,7 @@ REVIEW_SYNC_SENTENCES = (
     "When it prints `WARN review.sync`, state the warning in the round report and continue.",
     "When it prints `BLOCK review.sync`, dispatch no reviewer and return the change to Build.",
     "Any other result, including exit 2, dispatches no reviewer and reports the printed message.",
-    "Run it before the blind run (§3), so the blind run exercises the synced content.",
+    "Run it before acceptance testing (§3), so acceptance testing exercises the synced content.",
 )
 BUILD_SYNC_SENTENCES = (
     f"From the change worktree, run {COMMAND}, so the adversary, the suite and the "
@@ -170,7 +170,7 @@ def test_merged_sync_returns_to_build_checks_before_dispatch() -> None:
     assert DEPTH.count("`up to date`") == 1 and DEPTH.count("`content changed`") == 1
     assert DEPTH.count("`WARN review.sync`") == 1 and DEPTH.count("`BLOCK review.sync`") == 1
     assert DEPTH.index(other) < DEPTH.index("loom_checker.py reviewer-count")
-    assert DEPTH.index(order) < DEPTH.index("When a blind run is needed")
+    assert DEPTH.index(order) < DEPTH.index("When acceptance testing is needed")
     # Build syncs first among its mechanical checks: before the adversary is
     # dispatched and before the suite, so merged content is checked there.
     assert _pinned_run(VERIFY, COMMAND, 4) == BUILD_SYNC_SENTENCES

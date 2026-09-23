@@ -84,7 +84,7 @@ real competing commitment, or reveals there is none.
 ## Writing the answers down
 
 Acceptance lines are the load-bearing output: each one states an observable
-delivery outcome that a blind run in a clean environment can decide pass or
+delivery outcome that independent acceptance testing in a clean environment can decide pass or
 fail. Rewrite anything that is not. "The code is cleaner" fails. "A task can
 carry a due date, and the due date is visible where tasks are listed" passes.
 Do not expand the outcome

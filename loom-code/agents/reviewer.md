@@ -84,7 +84,7 @@ findings are capped at `nit` — never `important` or `fatal` on style alone.
 **Language and template shape are not style.** An internal artifact of
 the delta — spec, plan, review notes, evidence, probe docstrings, commit
 messages, station text, template comments — not written in English
-(quoted source text, the intent, the blind-run report, and the
+(quoted source text, the intent, the acceptance test report, and the
 pull-request body excepted — those stay in the user's language); a
 `REQ-<n>` line not in one of the five EARS forms (WHEN / WHILE / WHERE /
 IF…THEN / the ubiquitous "The <system> shall"); a finding `text` not

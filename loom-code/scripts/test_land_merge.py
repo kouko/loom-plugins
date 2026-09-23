@@ -21,7 +21,7 @@ from loom_checker.command_handlers import land
 from loom_checker.rule_checks.publish import CONTEXTUAL_PR_HEADINGS
 
 ACCEPTANCE_BLOCK = (
-    "BLOCK land.merge: blind-run acceptance not recorded; "
+    "BLOCK land.merge: acceptance not recorded; "
     "pass --accepted-by <name> after the maintainer accepts\n"
 )
 PASS = {"name": "gate", "state": "SUCCESS", "bucket": "pass"}
@@ -538,8 +538,8 @@ def test_body_file_carries_body_and_accepted_by(tmp_path: Path, monkeypatch) -> 
     assert match, calls.body_file_text
 
     def commit_report(repo: Path) -> None:
-        report = repo / "docs" / "loom" / "change" / "blind-run-report.md"
-        report.write_text("# Blind run\nAll accepted.\n", encoding="utf-8")
+        report = repo / "docs" / "loom" / "change" / "acceptance-test-report.md"
+        report.write_text("# Acceptance test report\nAll accepted.\n", encoding="utf-8")
 
     rc, _, err, calls, _ = invoke(
         tmp_path / "report", monkeypatch, "--accepted-by", "kouko", prepare=commit_report
@@ -547,11 +547,11 @@ def test_body_file_carries_body_and_accepted_by(tmp_path: Path, monkeypatch) -> 
 
     assert rc == 0, err
     repo = tmp_path / "report" / "repo"
-    blob = git(repo, "rev-parse", "HEAD:docs/loom/change/blind-run-report.md")
+    blob = git(repo, "rev-parse", "HEAD:docs/loom/change/acceptance-test-report.md")
     assert calls.body_file_mode == 0o600
     assert re.fullmatch(
         re.escape(PR_BODY)
-        + r"\nAccepted-by: kouko \d{4}-\d{2}-\d{2} \(blind-run-report "
+        + r"\nAccepted-by: kouko \d{4}-\d{2}-\d{2} \(acceptance-test-report "
         + blob[:7] + r"\)\n?",
         calls.body_file_text,
     ), calls.body_file_text

@@ -958,7 +958,7 @@ def test_case_counts_reads_every_wording_synthetic() -> None:
     assert case_counts("a maximum of five probe programs") == {(CAP_BOUND, 5)}
     assert case_counts("five probe programs maximum") == {(CAP_BOUND, 5)}
     # Modifiers stand between the number and its head noun. This is the
-    # wording this change deleted from the READMEs, and a blind run pasted it
+    # wording this change deleted from the READMEs, and acceptance testing pasted it
     # back into `loom-code/README.md` with the whole suite still green.
     assert case_counts(
         "at least three executable abuse and boundary cases"

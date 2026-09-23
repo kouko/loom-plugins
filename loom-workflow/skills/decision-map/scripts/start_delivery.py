@@ -51,7 +51,7 @@ def _intent_stub(change_id: str, map_id: str, title: str) -> str:
         "<the slice this arc promises>\n"
         "\n"
         "## Acceptance\n"
-        "1. <after this lands I can …; provable by a blind run>\n"
+        "1. <after this lands I can …; provable by independent acceptance testing>\n"
         "\n"
         "## Constraints\n"
         "- <…>\n"

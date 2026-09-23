@@ -22,9 +22,9 @@ flowchart TD
     spec["Only when needs-design: yes<br/>loom-design:write-spec<br/>② product changes: you confirm the visible behaviour"]
     plan["loom-code:write-plan<br/>Task DAG in plan.md"]
     build["loom-code:build<br/>Test-first, one implementer per task<br/>ends with adversary and package suite"]
-    review["loom-code:closing-review<br/>Fresh-context reviewers<br/>blind run when needed"]
+    review["loom-code:closing-review<br/>Fresh-context reviewers<br/>independent acceptance testing when needed"]
     attest[["Attestation generated<br/>by loom-code:closing-review"]]
-    ship["loom-code:ship<br/>Push + PR + checks<br/>③ You accept the result<br/>through the blind-run report when required"]
+    ship["loom-code:ship<br/>Push + PR + checks<br/>③ You accept the result<br/>through the acceptance test report when required"]
     merged(["Merged separately<br/>after loom-code:ship, on your own authorization"])
     maintain["loom-code:maintain<br/>Bug, alert, regression or incident"]
 
@@ -65,7 +65,7 @@ flowchart TD
 |---|---|
 | [`write-plan`](skills/write-plan/SKILL.md) | Turn a confirmed intent into `docs/loom/<change-id>/plan.md`: waved tasks with files, owned Acceptance lines, test cases and risk. Runs ① itself when `loom-design` is absent. |
 | [`build`](skills/build/SKILL.md) | Implement the plan test-first, dispatching one implementer per task, then run the adversary and the complete package suite, which must pass before hand-off. |
-| [`closing-review`](skills/closing-review/SKILL.md) | Run the closing review — reviewers and a blind run as needed — on content that passed Build's checks, and generate `docs/loom/<change-id>/attestation.json`. |
+| [`closing-review`](skills/closing-review/SKILL.md) | Run the closing review — reviewers and acceptance testing as needed — on content that passed Build's checks, and generate `docs/loom/<change-id>/attestation.json`. |
 | [`ship`](skills/ship/SKILL.md) | Validate the attestation, push, open the PR and verify required checks (decision point ③). Never merges. |
 | [`maintain`](skills/maintain/SKILL.md) | Reproduce an incident outside an active unmerged change, attach it to a matching open intent or create one, and hand it to `write-plan`. |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | Optional router that picks the station for a general Loom request; every station stays directly callable. |
@@ -79,12 +79,12 @@ The stations dispatch these agents; none reviews its own work.
 |---|---|---|
 | [`implementer`](agents/implementer.md) | `build` | One task: failing test first, one commit, a status report — never a verdict. |
 | [`reviewer`](agents/reviewer.md) | `closing-review` | Fresh-context verdict (`PASS` / `PASS_WITH_NOTES` / `NEEDS_REVISION`) with anchored findings; never edits what it reviews. |
-| [`blind-runner`](agents/blind-runner.md) | `closing-review` | Runs the change in a clean environment against every Acceptance line and writes `docs/loom/<change-id>/blind-run-report.md`. |
+| [`acceptance-tester`](agents/acceptance-tester.md) | `closing-review` | Runs the change in a clean environment against every Acceptance line and writes `docs/loom/<change-id>/acceptance-test-report.md`. |
 | [`adversary`](agents/adversary.md) | `build` | Tries to make the change fail — mutation or fuzz tooling, or executable abuse and boundary cases — and records every attempt as a probe. |
 
 The number of reviewers is not chosen by the agent: `loom_checker.py
 reviewer-count` computes it from the whole branch delta — one for a narrow,
-low-risk change, two otherwise or when it cannot tell. A blind run happens
+low-risk change, two otherwise or when it cannot tell. Acceptance testing happens
 only when an Acceptance line cannot be settled mechanically.
 
 ## The three questions you are asked
@@ -95,7 +95,7 @@ Everything else is decided for you, with the reason recorded.
    any code exists.
 2. **You type X and you see Y — right?** — the visible behaviour, asked only
    for a product change, never for an engineering one.
-3. **Did it do it?** — you accept the result, reading the blind-run report
+3. **Did it do it?** — you accept the result, reading the acceptance test report
    written by an agent that never touched the change when one was required.
 
 An irreversible fork (deleting data, a public interface, a one-way migration)
@@ -106,7 +106,7 @@ its consequence — never as an extra stop.
 
 `contract/manifest.yaml` declares the stations, tools, actions and the
 charter and fields of every artifact — intent, spec, plan, attestation,
-blind-run report and `KICKOFF-DEFAULTS.md` — plus the standing documents.
+acceptance test report and `KICKOFF-DEFAULTS.md` — plus the standing documents.
 `contract/templates/` holds the blank of each. Only loom-code writes it.
 `loom-design` reads it and declares `requires-contract`; `loom-workflow` does
 not — only its `decision-map` skill runs `contract --require` before a
@@ -206,7 +206,7 @@ To update, run `git pull` in the clone and install again; the install replaces
 the installed copy. `agy plugin uninstall loom-code` removes it. The hooks (the
 publication reminder, the session context and the language reminder) run only in
 the `agy` CLI, not in the Antigravity desktop app or IDE. On `agy` the loom roles (implementer,
-reviewer, adversary, blind-runner) run as agy `self` subagents that follow
+reviewer, adversary, acceptance-tester) run as agy `self` subagents that follow
 loom's agent contracts, on Gemini models. The review station is
 `closing-review` on every host; the old `review` name was removed and has no
 alias.
