@@ -32,7 +32,7 @@ once, so the next change to them is one edit rather than six.
 ## Acceptance
 1. A change whose delta the checker already classifies as narrow also skips the adversarial step, through the same mechanism that skips spec, plan and blind-run today; no second definition of "small enough" is introduced anywhere.
 2. The boundary that mechanism uses is re-examined against the recorded history in this change's evidence, and either kept with the evidence stated or adjusted, because it now decides the adversarial step as well as the reviewer count.
-3. For a change that does run the adversarial step, the adversarial programs committed for it number at most five, and a run that commits more states its reason where the run is reported.
+3. For a change that does run the adversarial step, the adversarial programs committed for it number at most five; the cap has no written-reason escape, because the user can already ask for more, or for the step to be skipped, in plain words (user-decided 2026-09-23: nothing committed today carries such a reason, and adding a field for it was refused as unnecessary structure).
 4. Every committed probe program carries a line naming the kind of defect it defends against; its content is free text at this stage, and a program without that line is rejected mechanically.
 5. Acceptance 3 and 4 are recomputed by exactly one new checker rule, and the checker's rule list grows by exactly one entry; no existing rule id is retired or renamed.
 6. A probe program that caught a defect on its own change is carried into the suite that runs on every later change, and one that caught none is reported and not left in the repository; this is a station rule the closing review checks, and it adds no checker rule.
