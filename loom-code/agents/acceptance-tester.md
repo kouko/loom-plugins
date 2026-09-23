@@ -12,8 +12,8 @@ description: 'Plugin-level acceptance-tester agent for loom-code. Dispatched fre
 ## What you are given
 
 You write the report as one of the artifacts the charter in
-`contract/manifest.yaml` keeps in the user's language, and its `must`
-column is the report's section list. The change id, the repo, `HEAD`, the
+`contract/manifest.yaml` keeps in the user's language; the report
+template named below is the report's section list. The change id, the repo, `HEAD`, the
 intent (its Acceptance lines are your script), the spec when one exists,
 and the report template at
 `loom-code/skills/closing-review/references/acceptance-test-report.md`.
@@ -43,8 +43,11 @@ reason against.
 6. **Leave the package suite to `finalize-review`.** Never run the full
    package suite. For a criterion the suite settles, run only the tests
    that cover that criterion. When they pass, the row is `works`: it says
-   those tests passed, cites the suite command and says `finalize-review`
-   executes it and refuses the attestation when it fails. When you ran
+   those tests passed and names the suite check in plain words —
+   `finalize-review` executes it and refuses the attestation when it
+   fails, which the row puts as "the automated test suite, which runs
+   before the change is accepted and blocks it on failure". The suite
+   command itself goes in the evidence file. When you ran
    none of them, the row is `not verified`. Reading the code is not a
    result, and a suite run still to come is not one either. The report is
    committed before `finalize-review` runs, so for the full suite that row
@@ -68,13 +71,14 @@ about what the change did to data the user already had, the section listing
 what was decided on the user's behalf (including every dismissal of
 severity `important` or worse, which the closing-review station hands you), and the
 open questions. Evidence files you capture and the probe docstrings you
-read are in English; the report itself stays in the user's language. The report
-also lists, in labels the user can read — the plan, spec, reviewer
-findings, evidence, test docstrings, test names, commit messages —
-whether the English rule held for each, and where a template rule also
+read are in English; the report itself stays in the user's language. The
+evidence file also lists — for the plan, spec, reviewer findings,
+evidence, test docstrings, test names, commit messages — whether the
+English rule held for each, and where a template rule also
 binds that artifact: EARS `REQ-<n>` lines bind the spec, the Conventional
 Comments label binds the findings text, and each test is named
-`test_<unit>_<state>_<expected>`. Identifiers appear only in the evidence
+`test_<unit>_<state>_<expected>`. That list stays out of the report.
+Identifiers appear only in the evidence
 file, apart from the one line that points to it.
 
 How you tried each line, the commands, their output and any `file:line` go

@@ -161,14 +161,14 @@ def test_suite_criterion_cites_finalize_review_command():
     """A1 positive: a suite-settled row cites the check, not a result."""
     sentences = _tester()
     assert _affirmed(
-        sentences, "cites the suite command", "`finalize-review` executes it",
+        sentences, "names the suite check", "`finalize-review` executes it",
         "refuses the attestation",
     ), "tester does not cite finalize-review's suite check"
     assert _affirmed(sentences, "committed before `finalize-review` runs")
     assert _affirmed(sentences, "`package-tests` is skipped", "only that criterion's own tests")
     assert _affirmed(sentences, "setup check", "every run")
     section = " ".join(_section3().split())
-    assert "cites the suite command" in section
+    assert "names the suite check" in section
     assert "`finalize-review` executes" in section
 
 
@@ -270,7 +270,7 @@ def test_no_new_gate_marker():
     assert set(re.findall(r"<!-- gate: ([\w.-]+) -->", text)) == STATION_GATES
     ungated = re.sub(r"<!-- gate: [\w.-]+ -->.*?<!-- /gate -->", "", text, flags=re.S)
     flat = " ".join(ungated.split())
-    for phrase in ("cites the suite command", "the part the fix touched", EVIDENCE_PATH):
+    for phrase in ("names the suite check", "the part the fix touched", EVIDENCE_PATH):
         assert phrase in flat, f"{phrase!r} sits inside a gate block"
 
 

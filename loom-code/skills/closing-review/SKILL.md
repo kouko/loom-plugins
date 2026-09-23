@@ -216,8 +216,9 @@ When `acceptance-test` is skipped (listed by `selection show` or skipped by
 the user's plain-words instruction), run no acceptance testing.
 
 The acceptance tester leaves the full package suite to `finalize-review`: a
-criterion the suite settles cites the suite command, which `finalize-review`
-executes and refuses the attestation on failure. Its setup check from a
+criterion the suite settles names the suite check in plain words, which
+`finalize-review` executes and refuses the attestation on failure; the suite
+command goes in the evidence file. Its setup check from a
 clean copy runs every time. A re-dispatch after a fix passes the earlier
 report and evidence file paths and the fix's commit range, which the tester
 checks each carried-over reason against. After a fix, re-dispatch it to
