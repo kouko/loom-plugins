@@ -62,6 +62,25 @@ def make_repo(tmp_path: Path, package: str = "python3 -c pass") -> Path:
     return repo
 
 
+def make_narrow_repo(tmp_path: Path) -> Path:
+    """A repo whose branch delta is mechanically narrow: one low-risk doc."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    git(repo, "config", "user.email", "t@example.com")
+    git(repo, "config", "user.name", "T")
+    (repo / "src.py").write_text("VALUE = 1\n", encoding="utf-8")
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.parent.mkdir(parents=True)
+    kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-23)\n", encoding="utf-8")
+    commit_all(repo, "base")
+    git(repo, "checkout", "-q", "-b", "feature")
+    guide = repo / "docs/guide.md"
+    guide.write_text("# guide\n", encoding="utf-8")
+    commit_all(repo, "doc")
+    return repo
+
+
 def propose(repo: Path, skip: str) -> None:
     result = subprocess.run(
         [sys.executable, str(CHECKER), "selection", "propose", CHANGE,
@@ -150,6 +169,23 @@ def test_bound_skip_of_reviewers_and_adversarial_validates(tmp_path: Path) -> No
     assert validate(repo, attestation) == []
     # The merged witness shape accepts the v2 evidence too.
     assert intent_state._delivery_witness_valid(attestation, CHANGE)
+
+
+def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> None:
+    """A narrow delta auto-skips the adversarial step, with no typed skip."""
+    repo = make_narrow_repo(tmp_path)
+
+    result = finalize(repo, review_input(tmp_path, PASSING[:1], []))
+
+    assert result.returncode == 0, result.stderr
+    attestation = written(repo)
+    assert [run["kind"] for run in attestation["executions"]] == ["package-tests"]
+    assert attestation["selection"] is None  # no typed confirmation was bound
+    assert validate(repo, attestation) == []
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, None,
+        claimed_selection=True,
+    ) == []
 
 
 def test_skipping_every_executed_step_allows_empty_executions(tmp_path: Path) -> None:

@@ -19,9 +19,7 @@ from loom_checker.helpers import UsageError
 from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_text
 from loom_checker.helpers import load_manifest
-from loom_checker.reviewers import committed_branch_paths
-from loom_checker.reviewers import is_narrow_delta
-from loom_checker.reviewers import _NARROW_AUTO_SKIP_STEPS
+from loom_checker.reviewers import auto_skipped_steps
 from pathlib import Path
 import base64
 import hashlib
@@ -148,7 +146,7 @@ def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
     uncancelled confirmation recorded on this branch and merge base exists.
 
     When no user selection is bound and the branch delta is mechanically
-    narrow (is_narrow_delta), spec/plan/blind-run are auto-skipped so
+    narrow (is_narrow_delta), spec/plan/blind-run/adversarial are auto-skipped so
     small changes run the full ritual without a typed confirmation.
     Intent is never auto-skipped. Explicit user selections always win."""
     names = [s["name"] for s in step_vocabulary(manifest)]
@@ -184,10 +182,7 @@ def effective_selection(repo: Path, change_id: str, manifest=None) -> dict:
 def _auto_skip(repo: Path, change_id: str, names: list[str]) -> list[str]:
     """Mechanical auto-skip list for narrow deltas; never includes intent."""
     try:
-        paths = committed_branch_paths(repo, change_id)
-        if not is_narrow_delta(paths, change_id):
-            return []
+        skipped = auto_skipped_steps(repo, change_id)
     except Exception:
         return []
-    return [name for name in names
-            if name in _NARROW_AUTO_SKIP_STEPS and name != "intent"]
+    return [name for name in names if name in skipped and name != "intent"]

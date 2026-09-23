@@ -23,7 +23,7 @@ _REVIEW_PROTECTED_NAMES = frozenset(
 
 # Steps that a narrow delta auto-skips. Intent always stays (cannot be skipped).
 _NARROW_AUTO_SKIP_STEPS = frozenset(
-    {"spec", "plan", "blind-run"}
+    {"spec", "plan", "blind-run", "adversarial"}
 )
 
 
@@ -32,9 +32,6 @@ def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
 
     This is a positive allowlist. Anything not recognized here, including a
     mixed delta with one protected path, keeps the default floor of two.
-    The `is_narrow_delta` docstring previously mentioned ``adversarial``,
-    but adversarial is not auto-skipped for narrow deltas — only ``spec``,
-    ``plan``, and ``blind-run`` are.
     """
     if not paths:
         return 2
@@ -65,7 +62,8 @@ def reviewer_floor_for_paths(paths: set[str], change_id: str) -> int:
 
 
 def is_narrow_delta(paths: set[str], change_id: str) -> bool:
-    """Return True when the diff is narrow enough to auto-skip spec/plan/blind-run.
+    """Return True when the diff is narrow enough to auto-skip the steps in
+    ``_NARROW_AUTO_SKIP_STEPS``.
 
     A narrow delta contains only the intent, plan, evidence, low-risk docs
     (`.md`/`.rst`/`.txt` outside `docs/loom/`), and test files — no production
@@ -75,8 +73,9 @@ def is_narrow_delta(paths: set[str], change_id: str) -> bool:
     two predicates never disagree: a delta that gets floor 1 is narrow, and a
     narrow delta gets floor 1.
 
-    ``adversarial`` is NOT auto-skipped here — it is a mechanical check that
-    must run before closing review regardless of delta width.
+    ``adversarial`` is auto-skipped here as well: a narrow delta carries no
+    executed behaviour a probe program could make fail in a way reading the
+    diff cannot foresee, so the step buys nothing on this delta width.
     """
     # A narrow delta is exactly one whose reviewer floor is 1. The floor
     # computation is the authoritative allowlist; we delegate to it rather
@@ -108,6 +107,20 @@ def committed_branch_paths(
     except (OSError, UsageError):
         return set()
     return paths
+
+
+def auto_skipped_steps(
+    repo: Path, change_id: str, head_sha: str | None = None
+) -> set[str]:
+    """Steps the committed delta skips with no typed confirmation.
+
+    Recomputed from the delta itself, so finalize-review, the attestation
+    validator and `selection show` all read the same answer without a
+    recorded event to consult. Fails closed: an unreadable or empty delta
+    is not narrow, so it skips nothing.
+    """
+    paths = committed_branch_paths(repo, change_id, head_sha)
+    return set(_NARROW_AUTO_SKIP_STEPS) if is_narrow_delta(paths, change_id) else set()
 
 
 def required_reviewer_count(

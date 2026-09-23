@@ -20,6 +20,7 @@ from loom_checker.probes import argv_for
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
+from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
 from pathlib import Path
 import json
@@ -84,6 +85,7 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     manifest = load_manifest()
     bound = selection_evidence(repo, change_id, manifest)
     skip = set(bound["skip"]) if bound else set()
+    skip |= auto_skipped_steps(repo, change_id, head_sha)
     verdicts = review_input.get("verdicts", [] if "reviewers" in skip else None)
     findings = review_input.get("findings", [])
     adversarial = review_input.get("adversarial", [])

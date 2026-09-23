@@ -7,6 +7,7 @@ from loom_checker.helpers import git_ok
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
+from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
 from pathlib import Path
 import hashlib
@@ -119,6 +120,7 @@ def validate_attestation(
             return [(rule, "attestation selection does not match the local selection records")]
         if recorded is not None:
             skip = set(recorded["skip"])
+    skip |= auto_skipped_steps(repo, change_id, head_sha)
 
     executions = attestation.get("executions")
     if not isinstance(executions, list) or (
