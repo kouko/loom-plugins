@@ -336,17 +336,26 @@ RULE_PINS = {
         ("It is not to make the change fail.",
          "It is to report what looks risky."),
     ),
-    "protocol-everything-run-is-committed-as-a-program": (
-        "It runs at the end of Build", "everything it runs is committed as a program",
+    # What the adversary commits is no longer everything it ran: under
+    # Acceptance 12 an attack the change survives is reported and pins
+    # nothing, so the opening states what a commit is a commit *of*.
+    "protocol-a-program-is-committed-for-each-successful-attack": (
+        "It runs at the end of Build",
+        "what it commits is a program for each attack that succeeded",
         ("Build re-runs those programs on every fix loop",
          "`finalize-review` executes them on committed content"),
-        "It runs at the end of Build, and everything it runs is committed as a program: "
-        "Build re-runs those programs on every fix loop, and `finalize-review` executes "
-        "them on committed content.",
-        ("It runs at the end of Build, and everything it runs is committed as a program, "
-         "but `finalize-review` does not execute them on committed content and Build "
-         "re-runs those programs on every fix loop.",
-         "It runs at the end of Build, and everything it runs is committed as a program."),
+        "It runs at the end of Build, and what it commits is a program for each attack "
+        "that succeeded: Build re-runs those programs on every fix loop, and "
+        "`finalize-review` executes them on committed content.",
+        ("It runs at the end of Build, and what it commits is a program for each attack "
+         "that succeeded, but `finalize-review` does not execute them on committed content "
+         "and Build re-runs those programs on every fix loop.",
+         "It runs at the end of Build, and what it commits is a program for each attack "
+         "that succeeded.",
+         # The pre-Acceptance-12 wording, which committed every attempt.
+         "It runs at the end of Build, and everything it runs is committed as a program: "
+         "Build re-runs those programs on every fix loop, and `finalize-review` executes "
+         "them on committed content."),
     ),
     "protocol-artifact-type-comes-from-the-manifest": (
         "Every changed path has", "an artifact type",

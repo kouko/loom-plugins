@@ -1,10 +1,10 @@
 # Adversarial — recipes by artifact type, and how to record what ran
 
 The adversary's job is not to find bugs the reviewers might also find. It
-is to make the change fail. It runs at the end of Build, and everything it
-runs is committed as a program: Build re-runs those programs on every fix
-loop, and `finalize-review` executes them on committed content. If a case
-needs the code changed to fail, it is not a case.
+is to make the change fail. It runs at the end of Build, and what it commits
+is a program for each attack that succeeded: Build re-runs those programs on
+every fix loop, and `finalize-review` executes them on committed content. If a
+case needs the code changed to fail, it is not a case.
 
 ## Which recipe to read
 
