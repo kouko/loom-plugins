@@ -26,6 +26,19 @@ _REGULAR_FILE_MODE = "100644"
 NO_PACKAGE_TESTS = "none"
 
 
+def missing_adversarial_execution(count: int, skip: set[str]) -> str | None:
+    """The refusal reason when a change records no adversarial execution
+    and the adversarial step was not skipped, else None.
+
+    One predicate for both places that ask it -- finalize-review over its
+    review input, and the attestation validator over the recorded
+    executions -- so the two can never answer with different words.
+    """
+    if count < 1 and "adversarial" not in skip:
+        return "at least one adversarial execution is required"
+    return None
+
+
 def command_names_artifact(command: str, artifact: str) -> bool:
     """True when one argument of `command` IS `artifact`.
 

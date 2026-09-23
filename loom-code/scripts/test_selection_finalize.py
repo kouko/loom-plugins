@@ -188,6 +188,30 @@ def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> 
     ) == []
 
 
+def test_finalize_and_attestation_refuse_alike_with_one_message(tmp_path: Path) -> None:
+    """Acceptance 10: one predicate, one message, both call sites."""
+    from loom_checker.probes import missing_adversarial_execution
+
+    reason = missing_adversarial_execution(0, set())
+    assert reason and missing_adversarial_execution(1, set()) is None
+    assert missing_adversarial_execution(0, {"adversarial"}) is None
+
+    repo = make_repo(tmp_path)
+    refused = finalize(repo, review_input(tmp_path, PASSING, []))
+    assert refused.returncode == 1
+    assert f"BLOCK finalize.adversarial: {reason}" in refused.stderr
+
+    accepted = finalize(repo, review_input(
+        tmp_path, PASSING, [{"command": "python3 src.py", "artifact": "src.py"}]
+    ))
+    assert accepted.returncode == 0, accepted.stderr
+    attestation = written(repo)
+    stripped = dict(attestation, executions=[
+        run for run in attestation["executions"] if run["kind"] != "adversarial"
+    ])
+    assert [msg for _, msg in validate(repo, stripped)] == [reason]
+
+
 def test_skipping_every_executed_step_allows_empty_executions(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, package="python3 -c 'raise SystemExit(3)'")
     propose(repo, "reviewers,adversarial,package-tests")

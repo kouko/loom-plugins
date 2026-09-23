@@ -20,6 +20,7 @@ from loom_checker.probes import argv_for
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
+from loom_checker.probes import missing_adversarial_execution
 from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
 from pathlib import Path
@@ -103,8 +104,9 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         return [("finalize.verdicts", f"{needed} distinct reviewers are required")]
     if not isinstance(findings, list) or not isinstance(adversarial, list):
         return [("finalize.schema", "findings and adversarial must be lists")]
-    if not adversarial and "adversarial" not in skip:
-        return [("finalize.adversarial", "at least one adversarial artifact is required")]
+    missing = missing_adversarial_execution(len(adversarial), skip)
+    if missing:
+        return [("finalize.adversarial", missing)]
 
     config_before = git_text(repo, "config", "--list", "--null")
     work: list[tuple[str, str, str]] = []
