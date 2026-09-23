@@ -14,9 +14,11 @@ PRINCIPLES = Path(__file__).resolve().parents[2] / "PRINCIPLES.md"
 TWO_CASES_SENTENCE = (
     "A step falls outside this guarantee in two cases, and only these two: "
     "the user skips it by plain instruction, and the checker proves from the "
-    "branch's committed delta that the change is narrow — the same "
-    "computation that sets the reviewer floor — in which case the spec, "
-    "plan, blind-run and adversarial steps are skipped with no one asked."
+    "branch's committed delta that the change is narrow, which is stricter "
+    "than the computation that sets the reviewer floor: the delta must "
+    "also carry no file anything executes and remove no test, in which "
+    "case the spec, plan, blind-run and adversarial steps are skipped "
+    "with no one asked."
 )
 DISCLOSURE_SENTENCE = (
     "Every skip of either kind must be disclosed on the pull request, and "
