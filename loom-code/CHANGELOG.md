@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.9.0] — 2026-09-23 — adversarial probes earn their place
+
+Minor: a new checker rule id (`adversarial.proportionate`), station guidance
+changes, and a new prose gate.
+
+- A narrow delta already skips the adversarial step through the existing
+  mechanism; nothing new triggers the skip, and it stays keyed off the same
+  narrow-delta boundary.
+- New checker rule `adversarial.proportionate`: at most five probe programs,
+  and each one carries a `concern:` line naming what it targets.
+- The adversarial case-count floor is removed; the count is now stated once,
+  in the shared protocol, instead of being repeated per surface.
+- The adversarial-execution requirement now resolves through one shared
+  predicate instead of separate copies drifting apart.
+- New prose gate `review.probe-graduation` governs when a probe graduates
+  out of the adversarial step into a standing test.
+
 ## [3.8.1] — 2026-09-23 — intent records match current behaviour
 
 Patch: docs only. No station guidance, field, rule id or contract change.
