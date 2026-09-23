@@ -46,4 +46,4 @@ charter: 1.0
 1. The report is committed before finalize-review runs, so a suite-settled row cites the suite command and finalize-review's refusal on failure, not a result; a red suite still blocks the attestation.
 2. The evidence file is functional content like the report: it must be committed before reviewers read the digest, or it forces another round under the three-digest limit.
 3. A carried-over verdict is only as good as its reason; the contract makes the tester check each reason against the fix diff, and any doubt means re-testing that criterion in full.
-4. Pre-existing drift: the manifest charter lists "Review summary" and "Questions I asked you", which the template lacks; left unchanged here to keep the contract manifest version stable; agent-decided.
+4. Resolved in cf57f1a6 — charter `must` list aligned with the template; contract manifest version held at 2.3.1 because only `contract.charter-complete` reads `must` and it checks non-emptiness.

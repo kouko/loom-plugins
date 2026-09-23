@@ -24,14 +24,20 @@ guidance change. The checker's rule list is unchanged.
   now live in `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`,
   which is functional content committed with the report under the same
   deadline.
-- A re-run after a fix re-tests only the criteria the fix could affect, each
-  in full over every surface its Acceptance line names. Every other row is
+- A re-run after a fix re-tests only the rows the fix could affect —
+  Acceptance lines and, for a product change, UI flows — each in full over
+  every surface its Acceptance line or UI flow names. Every other row is
   marked `carried over — <one-line reason>` in the report's new Re-run
   column, and each reason is checked against the fix diff.
 - The report template is the report's section list. The manifest charter's
   `must` list for `acceptance-test-report` now matches it: one line per
   Acceptance, what this did to existing data, I decided for you, and open
-  questions ("Review summary" and "Questions I asked you" are gone).
+  questions ("Review summary" and "Questions I asked you" are gone). The
+  contract manifest version stays 2.3.1 (one charter's `must` list edited;
+  no field added or removed).
+- The station tells the tester whether `package-tests` or
+  `finalize-review` is skipped, a failing covering test makes the row
+  `fails`, and the tester's per-artifact English-rule audit is dropped.
 
 ## [3.10.0] — 2026-09-23 — the blind run is renamed to independent acceptance testing
 

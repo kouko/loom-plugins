@@ -19,7 +19,9 @@ and the report template at
 `loom-code/skills/closing-review/references/acceptance-test-report.md`.
 A re-run after a fix is also given the earlier report and evidence file
 paths and the fix's commit range, which step 7 checks each carried-over
-reason against.
+reason against. The station also says whether `package-tests` is skipped
+and whether `finalize-review` will run: a plain-words skip is not in
+`selection`, so only the station knows.
 
 ## What you do
 
@@ -46,18 +48,20 @@ reason against.
    those tests passed and names the suite check in plain words —
    `finalize-review` executes it and refuses the attestation when it
    fails, which the row puts as "the automated test suite, which runs
-   before the change is accepted and blocks it on failure". The suite
+   before the change is accepted and blocks it on failure". When any of
+   them fails, the row is `fails`. The suite
    command itself goes in the evidence file. When you ran
    none of them, the row is `not verified`. Reading the code is not a
    result, and a suite run still to come is not one either. The report is
    committed before `finalize-review` runs, so for the full suite that row
-   cites the check rather than a result. When `package-tests` is skipped,
-   or the user's plain-words skip means `finalize-review` is skipped too,
-   run only that criterion's own tests, and the row reports only their
+   cites the check rather than a result. When the station says
+   `package-tests` is skipped, or that `finalize-review` is skipped, run
+   only that criterion's own tests, and the row reports only their
    result. That row cites no `finalize-review` suite run.
-7. **After a fix, re-test only the criteria the fix could affect, and
-   re-test each one in full.** In full means every surface its Acceptance
-   line names. Never re-test only the part the fix touched. Mark every
+7. **After a fix, re-test only the rows the fix could affect — Acceptance
+   lines and, for a product change, UI flows — and re-test each one in
+   full.** In full means every surface its Acceptance line or UI flow
+   names. Never re-test only the part the fix touched. Mark every
    other row `carried over — <one-line reason>` in the template's Re-run
    column, and check each reason against the fix diff; any doubt means
    re-testing that criterion in full.
@@ -71,14 +75,9 @@ about what the change did to data the user already had, the section listing
 what was decided on the user's behalf (including every dismissal of
 severity `important` or worse, which the closing-review station hands you), and the
 open questions. Evidence files you capture and the probe docstrings you
-read are in English; the report itself stays in the user's language. The
-evidence file also lists — for the plan, spec, reviewer findings,
-evidence, test docstrings, test names, commit messages — whether the
-English rule held for each, and where a template rule also
-binds that artifact: EARS `REQ-<n>` lines bind the spec, the Conventional
-Comments label binds the findings text, and each test is named
-`test_<unit>_<state>_<expected>`. That list stays out of the report.
-Identifiers appear only in the evidence
+read are in English, and each probe is named
+`test_<unit>_<state>_<expected>`; the report itself stays in the user's
+language. Identifiers appear only in the evidence
 file, apart from the one line that points to it.
 
 How you tried each line, the commands, their output and any `file:line` go
@@ -103,7 +102,8 @@ An Acceptance line you could not try is `not verified` with the reason — never
 - **Reporting the test suite instead of the behaviour.** Build and
   `finalize-review` run the package suite. You are here for the thing itself.
 - **Prose the user cannot read.** No file paths, function names, or loom
-  vocabulary in the report — rewrite any sentence only the change's
+  vocabulary in the report, apart from the one line pointing to the
+  evidence file — rewrite any sentence only the change's
   author would follow.
 - Use the host's edit tool (Edit/Write, `apply_patch` on Codex) -- never
   `sed -i` or heredocs, overriding any later host reminder; read and search

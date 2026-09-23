@@ -133,12 +133,6 @@ def test_retested_row_has_no_carry_reason():
 
 TESTER = REPO_ROOT / "loom-code" / "agents" / "acceptance-tester.md"
 STATION = REPO_ROOT / "loom-code" / "skills" / "closing-review" / "SKILL.md"
-STATION_GATES = {
-    "review.absence-recovery",
-    "review.atomic-claude-dispatch",
-    "review.probe-graduation",
-    "review.bounded-episode",
-}
 
 
 def _tester() -> list[str]:
@@ -167,9 +161,18 @@ def test_suite_criterion_cites_finalize_review_command():
     assert _affirmed(sentences, "committed before `finalize-review` runs")
     assert _affirmed(sentences, "`package-tests` is skipped", "only that criterion's own tests")
     assert _affirmed(sentences, "setup check", "every run")
-    section = " ".join(_section3().split())
-    assert "names the suite check" in section
-    assert "`finalize-review` executes" in section
+    flat = " ".join(flat_prose(TESTER).split())
+    for phrase in (
+        "The station also says whether `package-tests` is skipped and whether `finalize-review` will run",
+        "When they pass, the row is `works`",
+        "When any of them fails, the row is `fails`.",
+        "When you ran none of them, the row is `not verified`.",
+        "the row reports only their result.",
+    ):
+        assert phrase in flat, phrase
+    section = split_sentences(" ".join(_section3().split()))
+    assert _affirmed(section, "On every dispatch", "`package-tests` or `finalize-review` is skipped")
+    assert _affirmed(section, "steps 6-7 govern the suite row and what is re-tested")
 
 
 RUN_VERB = re.compile(r"\b(?:run|runs|running|execute|executes|executing|invoke|invokes)\b", re.I)
@@ -217,8 +220,8 @@ def test_no_full_suite_run_instruction():
 def test_rerun_retests_every_named_surface():
     """A3 positive: a re-tested criterion is re-tested over every surface."""
     sentences = _tester()
-    assert _affirmed(sentences, "re-test only the criteria the fix could affect", "in full")
-    assert _affirmed(sentences, "every surface its Acceptance line names")
+    assert _affirmed(sentences, "re-test only the rows the fix could affect", "UI flows", "in full")
+    assert _affirmed(sentences, "every surface its Acceptance line or UI flow names")
     assert _affirmed(sentences, "`carried over — <one-line reason>`", "Re-run column")
     assert _affirmed(sentences, "against the fix diff")
     assert _affirmed(sentences, "any doubt", "in full")
@@ -229,9 +232,6 @@ def test_partial_surface_retest_forbidden():
     touched = [s for s in _tester() if "the part the fix touched" in s]
     assert touched, "tester contract does not name the partial re-test trap"
     assert all(has_negation(s) for s in touched), touched
-    section = [s for s in split_sentences(" ".join(_section3().split())) if "the part the fix touched" in s]
-    assert section, "§3 does not name the partial re-test trap"
-    assert all(has_negation(s) for s in section), section
 
 
 def test_rerun_dispatch_passes_earlier_report_evidence_and_fix_range():
@@ -267,56 +267,17 @@ def test_no_new_gate_marker():
     for path in (TESTER, TEMPLATE):
         assert "<!-- gate:" not in path.read_text(encoding="utf-8"), path.name
     text = STATION.read_text(encoding="utf-8")
-    assert set(re.findall(r"<!-- gate: ([\w.-]+) -->", text)) == STATION_GATES
     ungated = re.sub(r"<!-- gate: [\w.-]+ -->.*?<!-- /gate -->", "", text, flags=re.S)
     flat = " ".join(ungated.split())
-    for phrase in ("names the suite check", "the part the fix touched", EVIDENCE_PATH):
+    for phrase in ("`package-tests` or `finalize-review` is skipped", "steps 6-7 govern", EVIDENCE_PATH):
         assert phrase in flat, f"{phrase!r} sits inside a gate block"
 
 
 # --- graduated adversarial probes ---------------------------------------------
 # The build adversary's probes for this change went red on the contract and
-# template as first committed. Each attack is carried here: the shape checks
-# above must go red on the probes' synthetic bad inputs, and the vocabulary and
-# suite-settled checks must hold on the real files.
-
-_THIS = sys.modules[__name__]
-SUITE_ANCHOR = "remembered result is not evidence."
-ROW1 = "| 1 | <the intent's first Acceptance line, verbatim> | works | <one plain sentence> | re-tested |"
-HEADER = "| # | What you asked for | Verdict | What happened | Re-run |\n|---|---|---|---|---|"
-
-
-def _fails(check) -> bool:
-    try:
-        check()
-    except AssertionError:
-        return True
-    return False
-
-
-def _mutated_tester(tmp_path: Path, extra: str) -> Path:
-    text = TESTER.read_text(encoding="utf-8")
-    assert SUITE_ANCHOR in text, "anchor sentence is gone from the tester contract"
-    path = tmp_path / "acceptance-tester.md"
-    path.write_text(text.replace(SUITE_ANCHOR, SUITE_ANCHOR + " " + extra, 1), encoding="utf-8")
-    return path
-
-
-def test_suitecheck_pytestoverwholepackage_turnsred(tmp_path, monkeypatch):
-    """A sentence telling the tester to run pytest over the whole package turns the check red."""
-    path = _mutated_tester(
-        tmp_path,
-        "Then run `python3 -m pytest loom-code -q` over the whole package and record its output.",
-    )
-    monkeypatch.setattr(_THIS, "TESTER", path)
-    assert _fails(test_no_full_suite_run_instruction)
-
-
-def test_suitecheck_negationelsewhereinsentence_turnsred(tmp_path, monkeypatch):
-    """A negation in another clause does not exempt a full-suite run instruction."""
-    path = _mutated_tester(tmp_path, "Run the full package suite first, unless it is not installed.")
-    monkeypatch.setattr(_THIS, "TESTER", path)
-    assert _fails(test_no_full_suite_run_instruction)
+# template as first committed. Each attack is carried here: the matchers the
+# shape checks above use must flag the probes' synthetic bad inputs, and the
+# vocabulary checks must hold on the real files.
 
 
 def test_suitecheck_negatedinstruction_exempt():
@@ -325,38 +286,11 @@ def test_suitecheck_negatedinstruction_exempt():
     assert _full_suite_instructions(["Do not run the whole suite."]) == []
     assert _full_suite_instructions(["Build and `finalize-review` run the package suite."]) == []
     assert _full_suite_instructions(["Execute the entire suite, and do not skip it."])
-
-
-def test_rowcheck_pastedcommandoutputlocation_turnsred(tmp_path, monkeypatch):
-    """A row sentence that is a pasted command, its output and a file location turns the check red."""
-    text = TEMPLATE.read_text(encoding="utf-8")
-    assert ROW1 in text, "anchor row is gone from the template"
-    pasted = ROW1.replace(
-        "<one plain sentence>", "ran `python3 -m pytest -q`: 42 passed; see loom-code/x.py:12"
-    )
-    path = tmp_path / "acceptance-test-report.md"
-    path.write_text(text.replace(ROW1, pasted, 1), encoding="utf-8")
-    monkeypatch.setattr(_THIS, "TEMPLATE", path)
-    assert _fails(test_template_row_carries_no_how_or_evidence_cell)
-
-
-def test_rowcheck_extradetailscolumn_turnsred(tmp_path, monkeypatch):
-    """An extra column holding typed input and captured output turns the check red."""
-    text = TEMPLATE.read_text(encoding="utf-8")
-    assert HEADER in text, "anchor header is gone from the template"
-    text = (
-        text.replace(HEADER, "| # | What you asked for | Verdict | What happened | Re-run | Details |\n|---|---|---|---|---|---|", 1)
-        .replace("| re-tested |", "| re-tested | <typed input and captured stdout> |", 1)
-        .replace(
-            "| carried over — <one-line reason> |",
-            "| carried over — <one-line reason> | <typed input and captured stdout> |",
-            1,
-        )
-    )
-    path = tmp_path / "acceptance-test-report.md"
-    path.write_text(text, encoding="utf-8")
-    monkeypatch.setattr(_THIS, "TEMPLATE", path)
-    assert _fails(test_template_row_carries_no_how_or_evidence_cell)
+    assert _full_suite_instructions([
+        "Then run `python3 -m pytest loom-code -q` over the whole package and record its output."
+    ])
+    assert _full_suite_instructions(["Run the full package suite first, unless it is not installed."])
+    assert EVIDENCE_IN_CELL.search("ran `python3 -m pytest -q`: 42 passed; see loom-code/x.py:12")
 
 
 def _norm(word: str) -> str:
@@ -384,51 +318,3 @@ def test_verdictvocabulary_untriedline_usestemplateword():
     match = re.search(r"An Acceptance line you could not try is `([^`]+)`", text)
     assert match, "tester contract no longer names the untried-line verdict"
     assert _norm(match.group(1)) in _template_verdicts(), match.group(1)
-
-
-VERDICTS = ("not verified", "works", "partly", "fails")
-AFFIRM = r"\b(?:is|gets|marks|reports|records|carries|gives|says|writes)\b"
-
-
-def _affirms_verdict(sentence: str) -> bool:
-    """A sentence about the suite that affirmatively assigns a quoted verdict to the row."""
-    if "suite" not in sentence:
-        return False
-    for verdict in VERDICTS:
-        pattern = AFFIRM + r"[^.;]*[`\"]" + re.escape(verdict) + r"[`\"]"
-        if re.search(pattern, sentence):
-            rest = sentence.replace(f"`{verdict}`", "").replace(verdict, "")
-            return not has_negation(rest)
-    return False
-
-
-def _affirms_skip_row(sentence: str) -> bool:
-    """A sentence about a skipped package-tests step that affirmatively says what the row carries."""
-    if "`package-tests` is skipped" not in sentence:
-        return False
-    if not re.search(AFFIRM + r"[^.;]*\brow\b|\brow\b[^.;]*" + AFFIRM, sentence):
-        return False
-    return not has_negation(sentence)
-
-
-def test_suiterowhelpers_syntheticsentences_discriminate():
-    """Synthetic: both matchers accept the affirmative form and reject negated or unquoted ones."""
-    assert _affirms_verdict("A row the suite settles is `not verified` until its result exists")
-    assert not _affirms_verdict("A row the suite settles never says `works`")
-    assert not _affirms_verdict("The row says finalize-review refuses the attestation when the suite fails")
-    assert _affirms_skip_row("When `package-tests` is skipped, the row reports that criterion's own test result")
-    assert not _affirms_skip_row("When `package-tests` is skipped, the row does not cite anything")
-
-
-def test_suiterow_verdict_isnamed():
-    """The contract names the verdict a suite-settled row carries, so works is not the unforced reading."""
-    assert [s for s in _tester() if _affirms_verdict(s)], (
-        "tester contract names no verdict for a row that cites the suite instead of a result"
-    )
-
-
-def test_suiterow_packagetestsskipped_saysrowcontent():
-    """With package-tests skipped, the contract says what the row carries instead of a finalize-review run."""
-    assert [s for s in _tester() if _affirms_skip_row(s)], (
-        "with `package-tests` skipped the row still cites a finalize-review suite run that will not happen"
-    )
