@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fnmatch import fnmatch
+from loom_checker.helpers import git_maybe
 from loom_checker.helpers import kickoff_defaults
 from pathlib import Path
 from repo_files import repository_files
@@ -24,6 +25,50 @@ _REGULAR_FILE_MODE = "100644"
 
 
 NO_PACKAGE_TESTS = "none"
+
+
+MAX_PROBE_PROGRAMS = 5
+
+
+CONCERN_LINE = re.compile(
+    r"^[^\S\n]*(?:#|//|--|\*)?[^\S\n]*concern:[^\S\n]*\S", re.IGNORECASE | re.MULTILINE
+)
+
+
+CONCERN_HEAD_LINES = 20
+
+
+def committed_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[str]:
+    """Paths of the probe programs the selected commit holds for this change."""
+    prefix = f"docs/loom/{change_id}/evidence/probes/"
+    listing = git_maybe(repo, "ls-tree", "-r", "--name-only", head_sha, "--", prefix) or ""
+    return sorted(
+        line.strip() for line in listing.splitlines()
+        if line.strip().endswith(".py")
+    )
+
+
+def check_adversarial_proportionate(
+    repo: Path, head_sha: str, change_id: str
+) -> list[tuple[str, str]]:
+    """Recompute the probe-program cap and the `concern:` line from the tree.
+
+    The cap keeps the adversary's output proportionate to one change; the
+    `concern:` line makes each program say what kind of defect it defends
+    against, so a program that defends against nothing is visible.
+    """
+    rule = "adversarial.proportionate"
+    programs = committed_probe_programs(repo, head_sha, change_id)
+    if len(programs) > MAX_PROBE_PROGRAMS:
+        return [(rule, f"{len(programs)} committed probe programs for this change; "
+                       f"at most {MAX_PROBE_PROGRAMS} (five) are allowed")]
+    for path in programs:
+        text = git_maybe(repo, "show", f"{head_sha}:{path}") or ""
+        head = "\n".join(text.splitlines()[:CONCERN_HEAD_LINES])
+        if CONCERN_LINE.search(head) is None:
+            return [(rule, f"{path} carries no non-empty `concern:` line in its "
+                           f"first {CONCERN_HEAD_LINES} lines")]
+    return []
 
 
 def missing_adversarial_execution(count: int, skip: set[str]) -> str | None:

@@ -212,6 +212,54 @@ def test_finalize_and_attestation_refuse_alike_with_one_message(tmp_path: Path) 
     assert [msg for _, msg in validate(repo, stripped)] == [reason]
 
 
+def write_probes(repo: Path, count: int, concern: bool = True) -> None:
+    """Commit `count` probe programs for this change, replacing any earlier set."""
+    directory = repo / f"docs/loom/{CHANGE}/evidence/probes"
+    if directory.is_dir():
+        for stale in directory.iterdir():
+            stale.unlink()
+    directory.mkdir(parents=True, exist_ok=True)
+    head = "# concern: a boundary input the code never rejects\n" if concern else ""
+    for index in range(count):
+        (directory / f"probe_{index}.py").write_text(
+            f'"""Probe {index}."""\n{head}assert True\n', encoding="utf-8"
+        )
+    commit_all(repo, f"probes {count}")
+
+
+def run_with_probes(repo: Path, tmp_path: Path) -> subprocess.CompletedProcess:
+    return finalize(repo, review_input(
+        tmp_path, PASSING, [{"command": "python3 src.py", "artifact": "src.py"}]
+    ))
+
+
+def test_five_probe_programs_pass_and_a_sixth_is_refused(tmp_path: Path) -> None:
+    """Acceptance 3: at most five committed probe programs for a change."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 5)
+    accepted = run_with_probes(repo, tmp_path)
+    assert accepted.returncode == 0, accepted.stderr
+
+    write_probes(repo, 6)
+    refused = run_with_probes(repo, tmp_path)
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert "six" in refused.stderr or "6" in refused.stderr
+
+
+def test_probe_program_without_a_concern_line_is_refused(tmp_path: Path) -> None:
+    """Acceptance 4: every committed probe program names what it defends against."""
+    repo = make_repo(tmp_path)
+    write_probes(repo, 2, concern=False)
+
+    refused = run_with_probes(repo, tmp_path)
+
+    assert refused.returncode == 1
+    assert "BLOCK adversarial.proportionate" in refused.stderr
+    assert "concern:" in refused.stderr
+    assert "probe_0.py" in refused.stderr
+
+
 def test_skipping_every_executed_step_allows_empty_executions(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, package="python3 -c 'raise SystemExit(3)'")
     propose(repo, "reviewers,adversarial,package-tests")

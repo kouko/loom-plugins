@@ -17,6 +17,7 @@ from loom_checker.helpers import report
 from loom_checker.probes import NO_PACKAGE_TESTS
 from loom_checker.probes import PROBE_RUN_TIMEOUT
 from loom_checker.probes import argv_for
+from loom_checker.probes import check_adversarial_proportionate
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
@@ -36,6 +37,7 @@ import tempfile
 STEP_BY_RULE = {
     "finalize.verdicts": "reviewers",
     "finalize.adversarial": "adversarial",
+    "adversarial.proportionate": "adversarial",
     "finalize.package-tests": "package-tests",
 }
 
@@ -107,6 +109,9 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     missing = missing_adversarial_execution(len(adversarial), skip)
     if missing:
         return [("finalize.adversarial", missing)]
+    proportionate = check_adversarial_proportionate(repo, head_sha, change_id)
+    if proportionate:
+        return proportionate
 
     config_before = git_text(repo, "config", "--list", "--null")
     work: list[tuple[str, str, str]] = []

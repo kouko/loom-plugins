@@ -5,6 +5,14 @@ import sys
 
 RULES: list[tuple[str, str]] = [
     (
+        "adversarial.proportionate",
+        "A change commits at most five adversarial probe programs under its "
+        "`evidence/probes/` directory, and every one of them carries a non-empty "
+        "`concern:` line in its first lines naming the kind of defect it defends "
+        "against. Both halves are recomputed from the committed tree at "
+        "finalize-review, over the programs the selected commit actually holds.",
+    ),
+    (
         "contract.requires",
         "A consumer plugin's requires-contract floor is met by this contract manifest version: "
         "the same major, and a minor at or above the required one.",
