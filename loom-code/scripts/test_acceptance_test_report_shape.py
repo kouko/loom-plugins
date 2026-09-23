@@ -1,5 +1,7 @@
 """Shape of the acceptance test report template (plan W0-01).
 
+concern: prose-contract drift -- the acceptance tester's contract and report template letting a full-suite run, evidence in rows, or a mismatched verdict back in
+
 The report the user reads at decision point 3 is one table row per
 Acceptance criterion -- verdict plus one plain sentence -- while the
 evidence behind each row lives in a separate plain-markdown file under
@@ -270,3 +272,163 @@ def test_no_new_gate_marker():
     flat = " ".join(ungated.split())
     for phrase in ("cites the suite command", "the part the fix touched", EVIDENCE_PATH):
         assert phrase in flat, f"{phrase!r} sits inside a gate block"
+
+
+# --- graduated adversarial probes ---------------------------------------------
+# The build adversary's probes for this change went red on the contract and
+# template as first committed. Each attack is carried here: the shape checks
+# above must go red on the probes' synthetic bad inputs, and the vocabulary and
+# suite-settled checks must hold on the real files.
+
+_THIS = sys.modules[__name__]
+SUITE_ANCHOR = "remembered result is not evidence."
+ROW1 = "| 1 | <the intent's first Acceptance line, verbatim> | works | <one plain sentence> | re-tested |"
+HEADER = "| # | What you asked for | Verdict | What happened | Re-run |\n|---|---|---|---|---|"
+
+
+def _fails(check) -> bool:
+    try:
+        check()
+    except AssertionError:
+        return True
+    return False
+
+
+def _mutated_tester(tmp_path: Path, extra: str) -> Path:
+    text = TESTER.read_text(encoding="utf-8")
+    assert SUITE_ANCHOR in text, "anchor sentence is gone from the tester contract"
+    path = tmp_path / "acceptance-tester.md"
+    path.write_text(text.replace(SUITE_ANCHOR, SUITE_ANCHOR + " " + extra, 1), encoding="utf-8")
+    return path
+
+
+def test_suitecheck_pytestoverwholepackage_turnsred(tmp_path, monkeypatch):
+    """A sentence telling the tester to run pytest over the whole package turns the check red."""
+    path = _mutated_tester(
+        tmp_path,
+        "Then run `python3 -m pytest loom-code -q` over the whole package and record its output.",
+    )
+    monkeypatch.setattr(_THIS, "TESTER", path)
+    assert _fails(test_no_full_suite_run_instruction)
+
+
+def test_suitecheck_negationelsewhereinsentence_turnsred(tmp_path, monkeypatch):
+    """A negation in another clause does not exempt a full-suite run instruction."""
+    path = _mutated_tester(tmp_path, "Run the full package suite first, unless it is not installed.")
+    monkeypatch.setattr(_THIS, "TESTER", path)
+    assert _fails(test_no_full_suite_run_instruction)
+
+
+def test_suitecheck_negatedinstruction_exempt():
+    """Synthetic: only a negated instruction, or another runner's, is exempt."""
+    assert _full_suite_instructions(["Never run the full package suite."]) == []
+    assert _full_suite_instructions(["Do not run the whole suite."]) == []
+    assert _full_suite_instructions(["Build and `finalize-review` run the package suite."]) == []
+    assert _full_suite_instructions(["Execute the entire suite, and do not skip it."])
+
+
+def test_rowcheck_pastedcommandoutputlocation_turnsred(tmp_path, monkeypatch):
+    """A row sentence that is a pasted command, its output and a file location turns the check red."""
+    text = TEMPLATE.read_text(encoding="utf-8")
+    assert ROW1 in text, "anchor row is gone from the template"
+    pasted = ROW1.replace(
+        "<one plain sentence>", "ran `python3 -m pytest -q`: 42 passed; see loom-code/x.py:12"
+    )
+    path = tmp_path / "acceptance-test-report.md"
+    path.write_text(text.replace(ROW1, pasted, 1), encoding="utf-8")
+    monkeypatch.setattr(_THIS, "TEMPLATE", path)
+    assert _fails(test_template_row_carries_no_how_or_evidence_cell)
+
+
+def test_rowcheck_extradetailscolumn_turnsred(tmp_path, monkeypatch):
+    """An extra column holding typed input and captured output turns the check red."""
+    text = TEMPLATE.read_text(encoding="utf-8")
+    assert HEADER in text, "anchor header is gone from the template"
+    text = (
+        text.replace(HEADER, "| # | What you asked for | Verdict | What happened | Re-run | Details |\n|---|---|---|---|---|---|", 1)
+        .replace("| re-tested |", "| re-tested | <typed input and captured stdout> |", 1)
+        .replace(
+            "| carried over — <one-line reason> |",
+            "| carried over — <one-line reason> | <typed input and captured stdout> |",
+            1,
+        )
+    )
+    path = tmp_path / "acceptance-test-report.md"
+    path.write_text(text, encoding="utf-8")
+    monkeypatch.setattr(_THIS, "TEMPLATE", path)
+    assert _fails(test_template_row_carries_no_how_or_evidence_cell)
+
+
+def _norm(word: str) -> str:
+    return word.strip().replace("-", " ").lower()
+
+
+def _template_verdicts() -> set[str]:
+    text = " ".join(TEMPLATE.read_text(encoding="utf-8").split())
+    match = re.search(r"Verdict is one of ([a-z /-]+?)\.", text)
+    assert match, "template no longer lists its verdicts"
+    return {_norm(w) for w in match.group(1).split("/")}
+
+
+def test_verdictvocabulary_returnedset_equalstemplateset():
+    """Every verdict the report may carry has the same name in the tester's return, and no other."""
+    match = re.search(r"result: ([a-z |-]+?),", TESTER.read_text(encoding="utf-8"))
+    assert match, "tester contract no longer lists its returned results"
+    returned = {_norm(w) for w in match.group(1).split("|")}
+    assert returned == _template_verdicts(), f"{sorted(returned)} vs {sorted(_template_verdicts())}"
+
+
+def test_verdictvocabulary_untriedline_usestemplateword():
+    """The contract's word for a line it could not try is one of the template's verdicts."""
+    text = " ".join(TESTER.read_text(encoding="utf-8").split())
+    match = re.search(r"An Acceptance line you could not try is `([^`]+)`", text)
+    assert match, "tester contract no longer names the untried-line verdict"
+    assert _norm(match.group(1)) in _template_verdicts(), match.group(1)
+
+
+VERDICTS = ("not verified", "works", "partly", "fails")
+AFFIRM = r"\b(?:is|gets|marks|reports|records|carries|gives|says|writes)\b"
+
+
+def _affirms_verdict(sentence: str) -> bool:
+    """A sentence about the suite that affirmatively assigns a quoted verdict to the row."""
+    if "suite" not in sentence:
+        return False
+    for verdict in VERDICTS:
+        pattern = AFFIRM + r"[^.;]*[`\"]" + re.escape(verdict) + r"[`\"]"
+        if re.search(pattern, sentence):
+            rest = sentence.replace(f"`{verdict}`", "").replace(verdict, "")
+            return not has_negation(rest)
+    return False
+
+
+def _affirms_skip_row(sentence: str) -> bool:
+    """A sentence about a skipped package-tests step that affirmatively says what the row carries."""
+    if "`package-tests` is skipped" not in sentence:
+        return False
+    if not re.search(AFFIRM + r"[^.;]*\brow\b|\brow\b[^.;]*" + AFFIRM, sentence):
+        return False
+    return not has_negation(sentence)
+
+
+def test_suiterowhelpers_syntheticsentences_discriminate():
+    """Synthetic: both matchers accept the affirmative form and reject negated or unquoted ones."""
+    assert _affirms_verdict("A row the suite settles is `not verified` until its result exists")
+    assert not _affirms_verdict("A row the suite settles never says `works`")
+    assert not _affirms_verdict("The row says finalize-review refuses the attestation when the suite fails")
+    assert _affirms_skip_row("When `package-tests` is skipped, the row reports that criterion's own test result")
+    assert not _affirms_skip_row("When `package-tests` is skipped, the row does not cite anything")
+
+
+def test_suiterow_verdict_isnamed():
+    """The contract names the verdict a suite-settled row carries, so works is not the unforced reading."""
+    assert [s for s in _tester() if _affirms_verdict(s)], (
+        "tester contract names no verdict for a row that cites the suite instead of a result"
+    )
+
+
+def test_suiterow_packagetestsskipped_saysrowcontent():
+    """With package-tests skipped, the contract says what the row carries instead of a finalize-review run."""
+    assert [s for s in _tester() if _affirms_skip_row(s)], (
+        "with `package-tests` skipped the row still cites a finalize-review suite run that will not happen"
+    )
