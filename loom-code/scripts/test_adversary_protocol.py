@@ -824,7 +824,10 @@ _COUNT_RE = re.compile(
 _CASE_NOUN = re.compile(r"\bcases?\b|\bprobes?\b|\bprograms?\b|ケース|案例", re.IGNORECASE)
 _CJK = re.compile(r"[぀-ヿ㐀-鿿]")
 _LEADING_MARKUP = " \t*_`\"'()[]:,"
-_INNER_MARKUP = " \t*_`"
+# Inside a noun phrase, a comma or a bracket separates two modifiers of the
+# same head ("three executable, abuse and boundary cases"); only a word ends
+# the phrase, and `_PHRASE_END` says which ones.
+_INNER_MARKUP = " \t*_`\"'()[],"
 # A word that closes the number's own noun phrase: a determiner, a preposition
 # or an auxiliary starts something the number is no longer counting. "at least
 # two reviewers read the probe programs" stops at "the", so the programs after
@@ -961,6 +964,12 @@ def test_case_counts_reads_every_wording_synthetic() -> None:
         "at least three executable abuse and boundary cases"
     ) == {(FLOOR_BOUND, 3)}
     assert case_counts("at most five executable probe programs") == {(CAP_BOUND, 5)}
+    # A comma or a bracket inside the noun phrase is punctuation between two
+    # modifiers, not the end of the phrase; the head is still `cases`.
+    assert case_counts(
+        "at least three executable, abuse and boundary cases"
+    ) == {(FLOOR_BOUND, 3)}
+    assert case_counts("at most five (executable) probe programs") == {(CAP_BOUND, 5)}
 
 
 def test_case_counts_ignores_a_count_of_something_else_synthetic() -> None:
@@ -977,6 +986,11 @@ def test_case_counts_ignores_a_count_of_something_else_synthetic() -> None:
     # The number's head noun decides, not whatever noun follows within a
     # window: these count readers, and say nothing about how many cases.
     assert case_counts("at least two reviewers read the probe programs") == set()
+    # A comma does not end the phrase, so the word after it still has to be
+    # the head: here the phrase ends at a determiner as it always did.
+    assert case_counts(
+        "at least two reviewers, and the probe programs they read"
+    ) == set()
     assert case_counts(
         "at least one reviewer re-runs every probe program of the change"
     ) == set()

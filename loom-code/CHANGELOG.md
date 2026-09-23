@@ -23,6 +23,33 @@ changes, and a new prose gate.
   and reports the attack points it found, a program is committed only when it
   is red against the change as it stands, and the report states how many
   attack points were found, earned a program and were committed.
+- **Behaviour change, reviewer floor.** A delta that deletes a test file now
+  takes the default floor of two reviewers where it could previously take
+  one: removing a test removes the evidence a later reviewer reads, so it is
+  no longer a mechanically low-risk delta. The same predicate decides which
+  deltas auto-skip the adversarial step, so both move together. The evidence
+  is `docs/loom/2026-09-23-adversarial-probes-earn-their-place/evidence/narrow-delta-boundary.md`.
+- An extension-less executable — a `#!` first line, or git's 100755 mode — is
+  read as a program, so it can no longer keep a delta narrow or escape the
+  probe cap and the `concern:` line.
+- `finalize-review` refuses a checkout whose committed delta it cannot
+  recompute, instead of reading "cannot tell" as "every skippable step is
+  skipped" while it is writing the evidence. The permissive reading stays in
+  the attestation validator, where the evidence already exists.
+
+The net mechanism count rises by two, to 140, for the two mechanisms this
+entry adds; the two exceptions below are this entry's own.
+
+- budget-exception: adversarial.proportionate — the one recomputed ceiling on
+  what the adversarial step may commit, and the one place a probe program is
+  made to name the defect it defends against; without it the step's output is
+  bounded by nothing a machine can check; eval
+  loom-code/scripts/test_selection_finalize.py::test_five_probe_programs_pass_and_a_sixth_is_refused.
+- budget-exception: review.probe-graduation — decides which probe programs
+  leave a change's store for the suite that runs on every later change and
+  which are deleted, so that a probe earns its permanence instead of
+  accumulating; eval
+  loom-code/scripts/test_review_convergence_contract.py::test_probe_graduation_gate_states_both_halves.
 
 ## [3.8.1] — 2026-09-23 — intent records match current behaviour
 

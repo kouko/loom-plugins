@@ -6,14 +6,37 @@ boundary that decides which deltas skip the adversarial step now decides more
 than it used to, so it is re-examined here against the recorded history and
 either kept with the evidence stated or adjusted.
 
-**Verdict: kept, unchanged.** Across the 128 changes whose delta could be
-read back out of git, the boundary would have exempted two, both
-documentation-only, both of which committed no probe program at all and
-neither of which had a probe catch anything. The step it now skips was
-already buying nothing on exactly those deltas. One observation that argues
-for a *wider* boundary later is recorded at the end; it is not made here,
-because the same predicate also sets the reviewer floor and moving it moves
-the reviewer count, which this change's intent puts out of scope.
+**Verdict: kept in place, and tightened three times while this change was
+built.** No delta that was narrow before is narrow now — every tightening
+only ever removes deltas from the exempt set — so the survey below still
+bounds what the boundary exempts. What changed is written out in "How the
+boundary moved" before the survey, because two of the three also change the
+reviewer floor, which is consumer-visible behaviour and is listed in the
+CHANGELOG as such.
+
+Across the 128 changes whose delta could be read back out of git, the
+boundary would have exempted two, both documentation-only, both of which
+committed no probe program at all and neither of which had a probe catch
+anything. The step it now skips was already buying nothing on exactly those
+deltas. One observation that argues for a *wider* boundary later is recorded
+at the end; it is not made here, because the same predicate also sets the
+reviewer floor and moving it moves the reviewer count, which this change's
+intent puts out of scope.
+
+## How the boundary moved
+
+| Tightening | Was | Is | Also moves the reviewer floor |
+|---|---|---|---|
+| a delta that **deletes a test** | narrow, floor 1 | wide, floor **2** | yes — 1 → 2 |
+| a delta carrying an **executed file**, wherever it sits | narrow when the file was under the change's own store | wide | no — floor was already decided by the allowlist |
+| a **program with no suffix** (`#!` first line, or git mode 100755) | read as a document | read as a program, so wide | yes, through the same deletion rule when such a file is deleted |
+
+The first is the one a consumer feels: a change whose whole delta is the
+intent, its store and a deleted test used to need one reviewer and now needs
+two. The reasoning is in `reviewer_floor_for_paths` — adding a test is low
+risk, removing one deletes the evidence a later reviewer would read — and it
+is stated here because the reviewer floor is a published number, not an
+internal detail of the adversarial step.
 
 ## What the boundary is today
 
@@ -23,7 +46,11 @@ things, and a delta has to pass both.
 **One — no executed file, wherever it sits.** If any committed path's suffix
 is one `is_program_path` in `loom_checker/helpers.py` knows — `.py`, `.sh`,
 `.js`, `.rb` and the rest — the delta is wide, whatever else the allowlist
-below would say about it. This is the test that makes skipping the
+below would say about it. A suffix list is a list of the names a program may
+be given, so `helpers.tree_programs` asks the selected commit the two
+questions the name cannot answer: git's recorded mode (100755) and a `#!`
+first line. `evidence/probes/run` is a program by either. This is the test
+that makes skipping the
 adversarial step safe: the justification for skipping it is that the delta
 carries no executed behaviour a probe program could make fail, and a test
 file, a script, or a probe program committed under the change's own store
@@ -198,7 +225,10 @@ for line in status.splitlines():
 is_narrow_delta(paths, change_id, removed)
 ```
 
-Re-run after the program and deletion tests were added, both exempted changes
-are still narrow: neither delta contains an executed file or a deletion. The
-other four repositories had no narrow change to lose, and the predicate only
-ever got stricter, so the table above stands unchanged.
+Re-run after all three tightenings, both exempted changes are still narrow:
+neither delta contains an executed file, a deletion, or a suffix-less
+executable. The snippet passes no `executable` argument, which is the
+name-only half of the predicate; `auto_skipped_steps` passes the other half in
+from the commit, and adding it can only remove changes from the narrow set.
+The other four repositories had no narrow change to lose, and the predicate
+only ever got stricter, so the table above stands unchanged.

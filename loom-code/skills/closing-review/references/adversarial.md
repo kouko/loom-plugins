@@ -123,7 +123,12 @@ and observed result in the generated attestation:
 ```json
 {"command": "python3 -m pytest tests/test_abuse_empty_input.py -q",
  "artifact": "docs/loom/<change-id>/evidence/probes/abuse_empty_input.py"}
+{"command": "python3 -m pytest loom-code/scripts/test_adversarial_empty_input.py -q",
+ "artifact": "loom-code/scripts/test_adversarial_empty_input.py"}
 ```
+
+The first entry is a probe still in this change's store; the second is the
+same probe after graduation, named where the selected commit holds it.
 
 - Record every attempt that failed to break anything, for every artifact
   type — that is what makes the attempts an eval rather than an anecdote.
@@ -131,10 +136,16 @@ and observed result in the generated attestation:
 - Every probe program carries a `concern:` line among its first lines, naming
   in free text the kind of defect it defends against. The checker rule
   `adversarial.proportionate` refuses a program without one.
-- `artifact` is where the case now lives. Put probes under
+- `artifact` is where the case now lives. That is the path the program holds
+  in the commit `finalize-review` selects, which stays its store path until it
+  graduates. Put probes under
   `docs/loom/<change-id>/evidence/probes/` — that path is the `evidence`
   artifact type. Promote a
-  probe into the repo's real test suite only through a plan task.
+  probe into the repo's real test suite only through a plan task. A graduated
+  probe is named at its suite path, such as
+  `loom-code/scripts/test_adversarial_empty_input.py`; `finalize-review`
+  accepts exactly these two homes and counts either against the cap and the
+  `concern:` line.
 - Anything the adversary found that matters
   becomes a `finding` with an anchor and a fix. Build fixes every fatal or
   important finding before hand-off and lists any left unresolved in its

@@ -218,14 +218,23 @@ off no adversarial program and §5 omits the `adversarial` input.
 
 <!-- gate: review.probe-graduation -->
 A probe program that caught a defect on its own change is carried into the
-suite that runs on every later change, through a plan task, before this
-station finishes. A program of this change that caught none is named as such
-in the review report and deleted from the repository: a program that never
-went red is run twice and never again, so it defends nothing against a later
-regression. Read which is which from Build's hand-off, which records each
-program's observed result, and treat a program whose result the hand-off does
-not give as one that caught nothing. Probe programs committed for earlier
-changes stay where they are.
+suite that runs on every later change, through a plan task, before §5 runs
+`finalize-review`. That is the deadline, because §5 is what executes the
+programs and writes the attestation: a program still sitting in the change's
+store when the attestation is written was never graduated. Graduation is a
+plan task, so the route is back through Build — this station dispatches no
+implementer and moves no file itself. Re-enter §5 once Build reports the move.
+
+A program of this change that caught none is named as such in the review
+report and deleted from the repository: a program that never went red is run
+twice and never again, so it defends nothing against a later regression. The
+adversarial protocol commits a program only when it is red, so this branch
+never fires on a program that step produced as intended. It is reached in two
+cases and no others: a program carried over from an earlier dispatch whose
+case a later fix removed, and a program whose observed result Build's hand-off
+does not give, which is read as caught nothing. Read which is which from
+Build's hand-off, which records each program's observed result. Probe programs
+committed for earlier changes stay where they are.
 <!-- /gate -->
 
 ## 4. Converge within one bounded episode
