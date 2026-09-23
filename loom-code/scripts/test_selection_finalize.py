@@ -317,7 +317,73 @@ def test_finalize_refuses_an_adversarial_artifact_outside_the_probe_directory(
 
     assert refused.returncode == 1
     assert "BLOCK finalize.adversarial" in refused.stderr
+    # Both legal homes are named, so the refusal says where the program may go.
     assert f"docs/loom/{CHANGE}/evidence/probes/" in refused.stderr
+    assert "package suite" in refused.stderr
+
+
+def graduate(repo: Path, name: str = "test_graduated_probe.py") -> str:
+    """Commit a probe program where the repository's own runner collects it,
+    together with the runner that declares that inventory."""
+    runner = repo / "scripts/run_package_tests.py"
+    runner.parent.mkdir(parents=True, exist_ok=True)
+    runner.write_text(
+        (Path(__file__).resolve().parents[2] / "scripts/run_package_tests.py")
+        .read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    graduated = repo / "loom-code/scripts" / name
+    graduated.parent.mkdir(parents=True, exist_ok=True)
+    graduated.write_text(
+        "# concern: the defect this probe caught, now pinned for every change\n"
+        "def test_graduated() -> None:\n    assert True\n",
+        encoding="utf-8",
+    )
+    commit_all(repo, "graduate the probe into the suite")
+    return f"loom-code/scripts/{name}"
+
+
+def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
+    tmp_path: Path,
+) -> None:
+    """A probe that earned its place leaves the change's store for the package
+    suite. It is still an adversarial execution, and the empty store is not a
+    missing one."""
+    repo = make_repo(tmp_path)
+    graduated = graduate(repo)
+    assert not (repo / f"docs/loom/{CHANGE}/evidence/probes").exists()
+
+    result = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": f"python3 {graduated}", "artifact": graduated}],
+    ))
+
+    assert result.returncode == 0, result.stderr
+    executions = written(repo)["executions"]
+    assert [run["artifact"] for run in executions if run["kind"] == "adversarial"] == [
+        graduated
+    ]
+
+
+def test_a_file_the_suite_never_collects_is_still_refused(tmp_path: Path) -> None:
+    """The runner's inventory is read, not its directories trusted: a file that
+    pytest would not collect is in neither home."""
+    repo = make_repo(tmp_path)
+    graduate(repo)
+    stray = repo / "loom-code/scripts/helper_probe.py"
+    stray.write_text("# concern: none\nassert True\n", encoding="utf-8")
+    commit_all(repo, "uncollected neighbour")
+
+    refused = finalize(repo, review_input(
+        tmp_path, PASSING,
+        [{"command": "python3 loom-code/scripts/helper_probe.py",
+          "artifact": "loom-code/scripts/helper_probe.py"}],
+    ))
+
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    assert f"docs/loom/{CHANGE}/evidence/probes/" in refused.stderr
+    assert "package suite" in refused.stderr
 
 
 def test_skipping_every_executed_step_allows_empty_executions(tmp_path: Path) -> None:

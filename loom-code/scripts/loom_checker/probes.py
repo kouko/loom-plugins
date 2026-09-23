@@ -6,6 +6,7 @@ from loom_checker.helpers import is_program_path
 from loom_checker.helpers import kickoff_defaults
 from pathlib import Path
 from repo_files import repository_files
+import importlib.util
 import os
 import re
 import shlex
@@ -42,6 +43,67 @@ CONCERN_HEAD_LINES = 20
 def probe_directory(change_id: str) -> str:
     """The one directory a change's probe programs are committed under."""
     return f"docs/loom/{change_id}/evidence/probes/"
+
+
+SUITE_RUNNER = "scripts/run_package_tests.py"
+
+
+PYTEST_FILE_PATTERNS = ("test_*.py", "*_test.py")
+
+
+def _declared_suite_commands(repo: Path) -> list[list[str]]:
+    """The commands the repository's own test runner declares it runs.
+
+    Which programs the package suite covers is the repository's answer, not a
+    list kept here: `scripts/run_package_tests.py` is the single inventory the
+    declared package command drives, so it is read rather than mirrored. A
+    repository without that runner declares nothing, and nothing is collected.
+    """
+    runner = repo / SUITE_RUNNER
+    if not runner.is_file():
+        return []
+    spec = importlib.util.spec_from_file_location("_loom_suite_inventory", runner)
+    if spec is None or spec.loader is None:
+        return []
+    try:
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return list(module.loom_family_commands(repo))
+    except (OSError, AttributeError, ImportError, SyntaxError, TypeError, ValueError):
+        return []
+
+
+def suite_collects(repo: Path, artifact: str) -> bool:
+    """True when the declared package suite already runs `artifact`.
+
+    A graduated probe program -- one carried out of a change's store into the
+    permanent suite -- is named by a pytest path the runner declares, either
+    as that path itself or as a file pytest collects under a declared
+    directory. A neighbour the suite would never collect is not in the suite.
+    """
+    wanted = os.path.normpath(artifact)
+    for command in _declared_suite_commands(repo):
+        if not command:
+            continue
+        runs_pytest = "pytest" in command[:4]
+        runs_shell = Path(command[0]).name in {"bash", "sh"}
+        if not (runs_pytest or runs_shell):
+            continue
+        for token in command[1:]:
+            if token.startswith("-") or token == "pytest":
+                continue
+            target = os.path.normpath(token)
+            if not (repo / target).exists():
+                continue
+            if target == wanted:
+                return True
+            if not (runs_pytest and (repo / target).is_dir()):
+                continue
+            if wanted.startswith(target + os.sep) and any(
+                fnmatch(Path(wanted).name, pattern) for pattern in PYTEST_FILE_PATTERNS
+            ):
+                return True
+    return False
 
 
 def committed_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[str]:

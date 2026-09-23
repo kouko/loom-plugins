@@ -12,8 +12,10 @@ RULES: list[tuple[str, str]] = [
         "finalize-review over every program the selected commit holds anywhere in "
         "the change's store, whatever its extension; a program committed outside "
         "the change's `evidence/probes/` directory is refused rather than left "
-        "uncounted, and finalize-review runs no adversarial artifact from "
-        "elsewhere.",
+        "uncounted. finalize-review runs an adversarial artifact only from that "
+        "directory or from the package suite the repository declares -- a "
+        "graduated program, which every later change runs and reviewers read, "
+        "so leaving the store escapes neither the cap nor review.",
     ),
     (
         "contract.requires",
