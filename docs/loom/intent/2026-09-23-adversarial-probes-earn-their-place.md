@@ -41,6 +41,8 @@ once, so the next change to them is one edit rather than six.
 9. The agent contract's own trigger text, the three translated READMEs and the repository conventions file may restate the rule in their own words, and a check fails the repository when such a restatement contradicts the single source.
 10. The requirement that a change record at least one adversarial execution unless the step was skipped is computed by one shared predicate, not by two copies with different messages.
 
+11. When the checker judges a change narrow, the steps that judgement skips are named to the user in one line as they are skipped, and listed in the pull request, so the cost of the judgement is visible every time and never only in the code.
+
 ## Constraints
 - The user's plain-words skip stays exactly as it is; nothing here asks for a typed code or narrows what a user may skip.
 - The adversary still never fixes the product and never judges its own output.
