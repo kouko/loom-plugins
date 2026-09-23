@@ -25,7 +25,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[5]
+ROOT = Path(__file__).resolve().parents[2]
 GUARD = ROOT / "loom-code/scripts/test_legacy_contract_removed.py"
 
 _spec = importlib.util.spec_from_file_location("rename_guard_under_attack", GUARD)
