@@ -116,3 +116,26 @@ Covering tests (not the package suite), clean copy:
 
 ### Re-run cost
 Two `claude -p` runs: setup load 0.070, A2 HEAD 0.216 → USD 0.29.
+
+## Re-run after fix 3a63f074..1ee91bb0
+
+Clean copy: `git worktree add --detach <scratch>/rerun2/head 1ee91bb0`; trunk control `<scratch>/rerun2/trunk` at 710814a9.
+Fix delta: `ship/SKILL.md:93-94` adds "List each finding of severity `important` or worse that closing review dismissed after the acceptance tester's last dispatch, with its reason."; `test_acceptance_test_report_shape.py:231` `test_ship_lists_late_dismissals_in_verification`; one `CHANGELOG.md` bullet reworded.
+
+Row selection:
+- Re-tested: 5 (probe file `test_recovery_rules.py` mentions ship; cheap to re-run), 7 (a new Ship instruction could add a step or gate).
+- Carried over 1, 3: not in either fix delta.
+- Carried over 2: closing-review §3 hand-over text unchanged; the Ship sentence acts after the tester's last dispatch, so it cannot change what the tester is handed.
+- Carried over 4: no rule-count pin or guard change in the delta.
+- Carried over 6: memory store not in the delta.
+- Earlier open question "Ship does not mention late dismissals" resolved by this delta; removed from the report.
+
+Setup check: `claude -p --plugin-dir <scratch>/rerun2/head/loom-code --model haiku ...` asked to invoke `loom-code:ship` and quote the late-dismissal sentence → init `('3.14.0', 'loom-code@inline')`, skill base directory `<scratch>/rerun2/head/loom-code/skills/ship`, quoted the new sentence verbatim. USD 0.058.
+
+Covering tests (not the package suite): same five files as above → `104 passed in 0.68s`. Package suite executed later by `finalize-review` (not skipped), which refuses the attestation on failure.
+
+5: `python3 -m pytest -q loom-code/skills/closing-review/probes/` → `13 passed in 0.20s`.
+
+7: `--list-rules` → 26, `diff` against trunk identical; `check_mechanisms.py` full output identical to trunk (`net mechanism count (excl. host-hygiene): 140`); `grep -c "gate:" loom-code/skills/ship/SKILL.md` → 0 on HEAD and trunk. The sentence sits in Ship's existing Verification section: no new step, reviewer, gate or dispatch.
+
+Cost: one `claude -p` run, USD 0.058.
