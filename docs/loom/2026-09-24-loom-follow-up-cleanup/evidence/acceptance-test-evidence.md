@@ -66,3 +66,53 @@ Trials: `claude -p --plugin-dir <arm>/loom-code --model sonnet --no-session-pers
 
 ## Cost
 Nine `claude -p` runs: load check 0.061, A1 0.172 + 0.184, A2 0.186 + 0.185, A3 0.241 + 0.238, A3 load checks 0.125 + 0.125 → USD 1.52 total.
+
+## Re-run after fix a2ce6ad9..3bb4a226
+
+Clean copy: `git worktree add --detach <scratch>/rerun/head 3bb4a226`; trunk control `<scratch>/rerun/trunk` at 710814a9 (rows 7 only).
+Fix delta (`git diff --stat a2ce6ad9..3bb4a226`): memory entry (+1 sentence), `CHANGELOG.md`, `agents/acceptance-tester.md` ("What you are given" +1 sentence), `closing-review/SKILL.md:219-222` (+1 sentence after the dismissal hand-over), `references/acceptance-test-report.md:52,56` ("a reviewer" → "the main agent", "<reviewer>" → "<who>"), `test_acceptance_test_report_shape.py` (+2 tests), `test_fix_scope_text.py` (guard drops bare `RULES`, +1 negative).
+
+Row selection:
+- Re-tested: 2 (SKILL.md §3 dismissal paragraph changed), 4 (rule-count guard narrowed), 5 (probes read SKILL.md, which changed), 6 (memory entry changed), 7 (new SKILL.md sentence could add a step).
+- Carried over 1: fix-list paragraph (`SKILL.md` ~293-296) and its pins in `test_fix_scope_text.py`/`test_fix_handoff_text.py` untouched by the delta (the `test_fix_scope_text.py` hunks are the rule-count guard only).
+- Carried over 3: `agents/implementer.md` not in the delta.
+
+### Setup check (re-run)
+- `claude -p --plugin-dir <scratch>/rerun/head/loom-code --model haiku ...` asked to invoke `loom-code:closing-review` and quote the dismissal hand-over.
+- Init: `{"name": "loom-code", "path": "<scratch>/rerun/head/loom-code", "source": "loom-code@inline", "version": "3.14.0"}`; skill base directory `<scratch>/rerun/head/loom-code/skills/closing-review`.
+- Quoted: "Also hand it every finding of severity `important` or worse that the main agent dismissed. A finding of that severity dismissed after the tester's last dispatch, when Ship comes next, is listed in the pull request's Verification section instead." USD 0.070.
+
+Covering tests (not the package suite), clean copy:
+`python3 -m pytest -q loom-code/scripts/test_fix_scope_text.py loom-code/scripts/test_fix_handoff_text.py loom-code/scripts/test_acceptance_test_report_shape.py loom-code/scripts/test_probes_language_policy.py loom-code/scripts/test_write_plan_station_text.py` → `103 passed in 0.35s` (includes `test_late_dismissals_reach_the_pull_request`, `test_dismissal_source_agrees_across_tester_and_template`, `test_unrelated_rules_constant_is_not_flagged`). The package suite is executed later by `finalize-review` (not skipped), which refuses the attestation on failure.
+
+### 2 (re-run, HEAD arm, same seed as round 1)
+- `claude -p --plugin-dir <scratch>/rerun/head/loom-code --model sonnet --no-session-persistence --output-format stream-json --verbose --max-budget-usd 2 --permission-mode bypassPermissions` with the round-1 A2 seed (F1 fixed in b3..b4, F2 "retry loop has no backoff" dismissed by the main agent because Constraints forbid sleeps; write the re-dispatch prompt verbatim, no tools, no dispatch).
+- Init version 3.14.0 from `<scratch>/rerun/head/loom-code`; skill base directory `<scratch>/rerun/head/loom-code/skills/closing-review`. USD 0.216.
+- Prompt produced carries: skip status ("neither `package-tests` nor `finalize-review` is skipped"), earlier report and evidence paths, range `b3..b4`, F1 as fixed, and "F2 'retry loop has no backoff' (client.py:88) — Status: DISMISSED by the main agent. Reason: the intent's Constraints forbid adding sleeps to the client … Check whether the missing backoff makes any Acceptance line fail or become unprovable. If it does, record that line as a finding in the report".
+- Reading: the dismissed finding and its reason still reach the tester. The added sentence covers only dismissals after the tester's last dispatch (no further dispatch exists to carry them), so it does not narrow the line. Round-1 trunk control (no F2 anywhere) still stands; trunk text is unchanged.
+- Template agrees: `references/acceptance-test-report.md:52` "every finding of severity important or worse that the main agent dismissed"; tester contract "What you are given" now states the same.
+
+### 4 (re-run)
+- `grep -rnE "(==|!=|>=|<=)\s*26\b|\b26\s*==" --include='test_*.py' <head> | grep -v test_loom_checker_` → no output.
+- `grep -rnE "len\(\s*RULES\s*\)\s*==\s*[0-9]+" --include='test_*.py' <head> | grep -v test_loom_checker_` → no output (the case the narrowed guard no longer recognises).
+- Guard and its negatives passed in the 103-pass run.
+
+### 5 (re-run)
+- Repo root: `python3 -m pytest -q loom-code/skills/closing-review/probes/` → `13 passed in 0.14s`.
+- From `loom-code/`: `python3 -m pytest -q skills/closing-review/probes/` → `13 passed in 0.10s`.
+- Cause record (commit c3f70a86, `CHANGELOG.md`) unchanged by the delta.
+
+### 6 (re-run)
+- Entry now reads "Every paired figure below (wall-clock, tail, cost) is a mean over 3 runs per arm."; still carries "54 s against 116 s — the real effect, about one minute", "USD 3.05 against 2.35 (+30%)", "8 important errors inside acceptance test reports; 7 were invisible to a reader of the report alone".
+- `docs/loom/memory/index.md:277` index line present.
+- `loom_memory.py validate docs/loom/memory` → `OK — OKF v0.2-compatible Loom memory profile holds.`; `regenerate-index` on a scratch copy, `diff` against committed `index.md` → identical.
+
+### 7 (re-run)
+- `loom_checker.py --list-rules` → 26 lines; `diff` against trunk list → identical.
+- `check_mechanisms.py` → `net mechanism count (excl. host-hygiene): 140`, `all clear`; full output identical to trunk.
+- `grep -c "gate:" loom-code/skills/closing-review/SKILL.md` → 4.
+- The added sentence routes late dismissals to the PR's existing `## Verification` section (`loom-code/skills/ship/SKILL.md:70`, present at trunk too): no new step, reviewer or dispatch.
+- Observation (nit): `ship/SKILL.md` does not mention late dismissals; the rule lives only in closing-review.
+
+### Re-run cost
+Two `claude -p` runs: setup load 0.070, A2 HEAD 0.216 → USD 0.29.
