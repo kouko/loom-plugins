@@ -14,7 +14,7 @@ manifest version is unchanged.
   finding of severity `important` or worse that the main agent dismissed. A
   finding of that severity dismissed after the tester's last dispatch, when
   Ship comes next, is listed in the pull request's Verification section
-  instead. The report template and the tester's input list now agree that the
+  instead, and Ship lists each one there with its reason. The report template and the tester's input list now agree that the
   main agent is the one who dismisses.
 - The implementer treats a fix hand-off that lists several instances of one
   defect class as one task, a single assertion about that class.

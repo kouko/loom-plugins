@@ -215,6 +215,32 @@ def test_late_dismissals_reach_the_pull_request():
         assert not pins_exact_sentence(section.replace(old, new, 1), LATE_DISMISSALS), new
 
 
+SHIP = REPO_ROOT / "loom-code" / "skills" / "ship" / "SKILL.md"
+SHIP_LATE_DISMISSALS = (
+    "List each finding of severity `important` or worse that closing review "
+    "dismissed after the acceptance tester's last dispatch, with its reason."
+)
+
+
+def _ship_verification_rules() -> str:
+    text = SHIP.read_text(encoding="utf-8")
+    rules = text.split("Under the Verification heading", 1)[1].split("Every decision summary", 1)[0]
+    return " ".join(rules.split())
+
+
+def test_ship_lists_late_dismissals_in_verification():
+    """The station that writes the Verification section carries the late dismissals."""
+    rules = _ship_verification_rules()
+    assert pins_exact_sentence(rules, SHIP_LATE_DISMISSALS)
+    assert not has_negation(SHIP_LATE_DISMISSALS)
+    for old, new in (
+        (SHIP_LATE_DISMISSALS, ""),
+        ("`important` or worse", "`fatal`"),
+        (", with its reason.", "."),
+    ):
+        assert not pins_exact_sentence(rules.replace(old, new, 1), SHIP_LATE_DISMISSALS), new
+
+
 TESTER_DISMISSALS = (
     "The station also hands you every finding of severity `important` or worse "
     "that the main agent dismissed, with its reason."
