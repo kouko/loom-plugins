@@ -33,6 +33,11 @@ charter: 1.0
 - Test: A6 positive: entry-and-index-line-present; negative: index-regenerated-not-hand-merged.
 - Risk: the store's index format and any index check decide the write path; follow the store README; agent-decided.
 
+**W0-05 Remove the last literal rule-count pin; graduate the probe**  after: W0-02, W0-03  acceptance: 4, 5
+- Files: `loom-code/scripts/test_probes_language_policy.py`, `loom-code/scripts/test_fix_scope_text.py`, `loom-code/skills/closing-review/probes/test_recovery_rules.py`, `docs/loom/2026-09-24-loom-follow-up-cleanup/evidence/probes/test_rulecountpin_outsidecheckertests_absent.py`
+- Test: A4 positive: guard-sees-far-pin; negative: exempts-only-checker-tests. A5 positive: probe-runs-from-any-cwd; boundary: repo-root-run-unchanged.
+- Risk: adversary finding: the plan wrongly counted test_probes_language_policy.py as a checker test, and a six-line window missed its pin. Probe graduates; agent-decided.
+
 ### Wave 1 — release
 
 **W1-01 Minor release metadata 3.14.0**  after: W0-01, W0-02, W0-03, W0-04  acceptance: 7
