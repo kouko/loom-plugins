@@ -27,7 +27,7 @@ NEW_RULES = (
     "Its evidence file, `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`, is functional "
     "content too and is committed with the report under the same deadline.",
     "Once the report and its evidence file are committed, resume each of those reviewers, the same "
-    "agent rather than a new one, with the report commit as its new `reviewed_sha`.",
+    "agent rather than a new one, with the delta from the commit it started on to the report commit.",
     "Each reads the report and evidence against the change it already reviewed, and only then "
     "returns its Round 1 verdict.",
     "A reviewer's return before that resume is not a verdict.",
@@ -40,18 +40,20 @@ S3 = NEW_RULES  # the paragraph's kept head and skip sentence border it (test be
 REV = (
     "When closing review runs acceptance testing, it starts at the same time as your Round 1 review.",
     "First review the change as usual.",
-    "You are then resumed with the committed acceptance test report, its evidence file and a new "
-    "`reviewed_sha`.",
+    "You are then resumed with the delta from the commit you started on to the report commit, which "
+    "adds the acceptance test report and its evidence file.",
     "Read them against the change you reviewed: a verdict the evidence does not support is an "
     "overclaim, and an untried Acceptance line is an omission.",
     "Add your findings on them and return one verdict covering both the change and the report.",
     "What you returned before that resume is not your verdict.")
 WEAKENED = (
     (S3, NEW_RULES[0], "Start the reviewers after the report is committed."),
-    (S3, "the same agent rather than a new one", "a new reviewer"),
+    (S3, "the same agent rather than a new one", "a new reviewer"), (S3, "is not a", "is its"),
     (S3, "form Round 1's single functional-content digest", "form two separate digests"),
     (S3, "and only then returns its Round 1 verdict", "after returning its Round 1 verdict"),
-    (S3, "is not a verdict.", "is its verdict."),
+    (S3, "with the delta from the commit it started on to the report commit",
+     "with the report commit as its new `reviewed_sha`"),
+    (REV, "the delta from the commit you started on to the report commit", "a new `reviewed_sha`"),
     (S3, "needs the next round.", "needs the next round. The report commit is a separate digest."),
     (S2, "only after reading", "before reading"), (S2, "it starts together with", "it finishes before"),
     (REV, "is not your verdict.", "is your verdict."), (REV, "return one verdict", "return a second verdict"))

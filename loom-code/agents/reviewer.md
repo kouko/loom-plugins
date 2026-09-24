@@ -98,8 +98,8 @@ blocking / non-blocking / if-minor); or a probe function name not in the
 
 When closing review runs acceptance testing, it starts at the same time as
 your Round 1 review. First review the change as usual. You are then resumed
-with the committed acceptance test report, its evidence file and a new
-`reviewed_sha`. Read them against the change you reviewed: a verdict the
+with the delta from the commit you started on to the report commit, which adds
+the acceptance test report and its evidence file. Read them against the change you reviewed: a verdict the
 evidence does not support is an overclaim, and an untried Acceptance line is
 an omission. Add your findings on them and return one verdict covering both
 the change and the report. What you returned before that resume is not your

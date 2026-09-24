@@ -213,8 +213,8 @@ testing and commit that report on the change branch before running
 `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`, is functional
 content too and is committed with the report under the same deadline.
 Once the report and its evidence file are committed, resume each of those
-reviewers, the same agent rather than a new one, with the report commit as its
-new `reviewed_sha`. Each reads the report and evidence against the change it
+reviewers, the same agent rather than a new one, with the delta from the commit
+it started on to the report commit. Each reads the report and evidence against the change it
 already reviewed, and only then returns its Round 1 verdict. A reviewer's
 return before that resume is not a verdict. The commit the reviewers started
 from and the report commit form Round 1's single functional-content digest. A

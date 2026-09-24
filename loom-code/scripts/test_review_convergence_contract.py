@@ -77,6 +77,7 @@ def test_report_committed_before_reviewers_read_final_digest() -> None:
     assert "Finish acceptance testing" in order
     resume = next(s for s in _sentences(REVIEW_WORDS) if "resume each of those reviewers" in s)
     assert resume.startswith("Once the report and its evidence file are committed")
+    assert resume.endswith("with the delta from the commit it started on to the report commit.")
     verdict = next(s for s in _sentences(REVIEW_WORDS) if "returns its Round 1 verdict" in s)
     assert "only then" in verdict
     reason = next(s for s in _sentences(REVIEW_WORDS) if "committed after their verdicts" in s)
