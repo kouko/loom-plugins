@@ -139,3 +139,26 @@ Covering tests (not the package suite): same five files as above → `104 passed
 7: `--list-rules` → 26, `diff` against trunk identical; `check_mechanisms.py` full output identical to trunk (`net mechanism count (excl. host-hygiene): 140`); `grep -c "gate:" loom-code/skills/ship/SKILL.md` → 0 on HEAD and trunk. The sentence sits in Ship's existing Verification section: no new step, reviewer, gate or dispatch.
 
 Cost: one `claude -p` run, USD 0.058.
+
+## Re-run after fix 5ecde92f..a531620b
+
+Clean copy: `git worktree add --detach <scratch>/rerun3/head a531620b`; trunk control `<scratch>/rerun3/trunk` at 710814a9.
+Fix delta (5ecde92f itself adds only `attestation.json`): `closing-review/SKILL.md` `## Handoff` (:383-388) adds "Also report every finding of severity `important` or worse dismissed after the acceptance tester's last dispatch, with its reason."; `ship/SKILL.md:93-95` appends "as closing review's hand-off reports them."; `test_acceptance_test_report_shape.py` pins; `CHANGELOG.md` 3.14.0 bullets reworded (late-dismissal carrier; guard described as partial).
+
+Row selection:
+- Re-tested: 5 (probes read closing-review `SKILL.md`, which changed), 7 (new Handoff content could add a step).
+- Carried over 1: fix-list paragraph (~293-296) not in the delta.
+- Carried over 2: §3 tester dispatch paragraph (:217-222) unchanged; the Handoff sentence covers only dismissals after the tester's last dispatch.
+- Carried over 3: `agents/implementer.md` not in the delta.
+- Carried over 4: guard code and pins unchanged; only the CHANGELOG description of the guard changed.
+- Carried over 6: memory store not in the delta.
+
+Setup check: `claude -p --plugin-dir <scratch>/rerun3/head/loom-code --model haiku ...` asked to invoke `loom-code:closing-review` and quote its Handoff section → init `('3.14.0', 'loom-code@inline')`, skill base directory `<scratch>/rerun3/head/loom-code/skills/closing-review`, quoted the new Handoff text verbatim. USD 0.071.
+
+Covering tests (not the package suite): same five files → `106 passed in 0.57s`. Package suite executed later by `finalize-review` (not skipped), which refuses the attestation on failure.
+
+5: repo root `13 passed in 0.16s`; from `loom-code/` `13 passed in 0.13s`.
+
+7: `--list-rules` → 26, `diff` against trunk identical; `check_mechanisms.py` full output identical to trunk (`net mechanism count (excl. host-hygiene): 140`); `gate:` count closing-review 4/4, ship 0/0 (HEAD/trunk). `## Handoff` already existed at trunk (:379); the sentence adds content to it, not a new step, reviewer, gate or dispatch.
+
+Cost: one `claude -p` run, USD 0.071.
