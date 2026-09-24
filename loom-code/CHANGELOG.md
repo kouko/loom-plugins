@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.14.0] — 2026-09-24 — the fix list covers what the reviewers just read
+
+Minor: the closing-review station's guidance and the implementer contract
+change. The checker's rule list is unchanged (still 26 rules). The contract
+manifest version is unchanged.
+
+- The list every fix starts from now collects the fatal or important findings
+  that the reviewers and independent acceptance testing returned on the
+  content the reviewers just read, including the committed acceptance test
+  report.
+- On every dispatch, closing review also hands the acceptance tester every
+  finding of severity `important` or worse that the main agent dismissed.
+- The implementer treats a fix hand-off that lists several instances of one
+  defect class as one task, a single assertion about that class.
+- The literal checker rule-count pins are removed from
+  `test_fix_handoff_text.py` and `test_fix_scope_text.py`; a new guard in
+  `test_fix_scope_text.py` fails when a literal rule count is reintroduced in
+  any test outside the checker's own tests.
+- The closing-review RL-06 recovery probe now expects the plain-words skip
+  rule. It had been stale since #43 because the probes directory is not
+  collected by the package suite; a new negative probe rejects the restored
+  expert-mode ending.
+- Repository memory records why running independent acceptance testing and
+  review in parallel (#50) was rejected.
+
 ## [3.13.0] — 2026-09-24 — closing review hands Build every blocking finding grouped by class
 
 Minor: the closing-review station's guidance changes. The checker's rule list
