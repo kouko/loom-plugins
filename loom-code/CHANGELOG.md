@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.12.0] — 2026-09-24 — fixes cover the whole class of a finding
+
+Minor: Build's hand-off contract to an implementer and the implementer's
+contract change. The checker's rule list is unchanged. The contract manifest
+version is unchanged.
+
+- Before any fix is handed to an implementer or made by the main agent
+  itself, Build names the defect's class and searches the whole content of
+  every file the change touches, plus every surface named by the Acceptance
+  line the finding maps to, for other instances.
+- The hand-off lists every instance.
+- The hand-off and the commit message state the class and the places
+  searched.
+- The rule applies to adversary, acceptance-testing, reviewer and
+  check-failure findings.
+- Closing-review points to it, and Ship's CI repair points to it: the
+  minimum fix covers every instance the search finds.
+- The implementer contract accepts a fix hand-off that lists instances in
+  several files: those instances and their files are the task's scope.
+
 ## [3.11.0] — 2026-09-23 — lighter independent acceptance testing
 
 Minor: the acceptance tester's contract and the closing-review station's

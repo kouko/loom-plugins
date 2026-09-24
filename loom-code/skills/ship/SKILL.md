@@ -211,7 +211,9 @@ blocker. An unattributed failure must not be rerun automatically.
 Keep a functional or test repair in the original change. When an existing test
 already exposes the root cause, use it; otherwise add the smallest permanent
 regression case. Run it to observe RED, apply the minimum fix under Build's
-test-first discipline, and rerun it to observe GREEN. Every committed-file
+test-first discipline, and rerun it to observe GREEN. The minimum fix covers
+every instance of the defect's class that the search in Build §2 finds, the
+flagged one included, and is recorded as Build §2 states. Every committed-file
 change, including code, tests, and version files, invalidates the attestation
 and resumes the same bounded Review episode at its next functional digest
 without resetting the episode or adding another retry budget, then returns to
