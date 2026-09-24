@@ -21,7 +21,8 @@ Evidence:
 - **Reviewers catch report errors.** Across that history reviewers found
   8 important errors inside acceptance test reports; 7 were invisible to a
   reader of the report alone.
-- **Real-size paired trial, n=3.** Skill load to last verdict: 5m05 new
+- **Real-size paired trial, n=3.** Every paired figure below (wall-clock,
+  tail, cost) is a mean over 3 runs per arm. Skill load to last verdict: 5m05 new
   against 5m31 old, inside the run-to-run noise (the tester alone varied
   2m36-5m07). Tester return to last verdict: 54 s against 116 s — the
   real effect, about one minute. Cost: USD 3.05 against 2.35 (+30%);

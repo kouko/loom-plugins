@@ -95,9 +95,9 @@ def test_blocked_for_instances_rewrite_fails_the_pin() -> None:
 
 TREES = ("loom-code", "loom-design", "loom-workflow")
 WINDOW = 20
-LIST_RULES_RE = re.compile(r"--list-rules|list_rules|\bRULES\b|\bRULE_IDS\b|\brule_ids\b")
+LIST_RULES_RE = re.compile(r"--list-rules|list_rules|\bRULE_IDS\b|\brule_ids\b")
 LEN_EQ_RE = re.compile(r"len\(.*\)\s*==\s*\d+")
-RULE_LIST_EQ_RE = re.compile(r"len\(\s*(?:RULES|RULE_IDS|rule_ids)\s*\)\s*==\s*\d+")
+RULE_LIST_EQ_RE = re.compile(r"len\(\s*(?:RULE_IDS|rule_ids)\s*\)\s*==\s*\d+")
 
 
 def is_checker_own_test(path: Path) -> bool:
@@ -107,10 +107,11 @@ def is_checker_own_test(path: Path) -> bool:
 def literal_rule_counts(text: str) -> list[str]:
     """Lines that pin the checker's rule count as a literal integer.
 
-    Recognition-based and partial: it flags `len(RULES|RULE_IDS|rule_ids) == <int>`
+    Recognition-based and partial: it flags `len(RULE_IDS|rule_ids) == <int>`
     anywhere, and `len(...) == <int>` within twenty lines after a `--list-rules`,
-    `list_rules`, `RULES`, `RULE_IDS` or `rule_ids` mention. A count held in a
-    variable, computed, or compared further away passes unseen.
+    `list_rules`, `RULE_IDS` or `rule_ids` mention. A bare `RULES` name is left
+    out: recipe tests use it for their own lists. A count held in a variable,
+    computed, or compared further away passes unseen.
     """
     lines = text.splitlines()
     return [
@@ -134,7 +135,7 @@ def test_literal_rule_count_reintroduced_fails() -> None:
         'def test_count() -> None:\n'
         '    out = run([CHECKER, "--list-rules"]).stdout\n'
         f'    assert len(out.splitlines()) {eq} 26\n'
-        f'assert len(RULES) {eq} 26\n'
+        f'assert len(RULE_IDS) {eq} 26\n'
     )
     assert literal_rule_counts(sample) == [line.strip() for line in sample.splitlines()[2:]]
 
@@ -143,6 +144,12 @@ def test_far_literal_rule_count_fails() -> None:
     eq = "=="
     sample = 'run([CHECKER, "--list-rules"])\n' + "x = 1\n" * 15 + f"assert len(lines) {eq} 26\n"
     assert literal_rule_counts(sample) == [f"assert len(lines) {eq} 26"]
+
+
+def test_unrelated_rules_constant_is_not_flagged() -> None:
+    eq = "=="
+    sample = f"RULES = _rules(RECIPE)\nassert len(RULES) {eq} 5\n"
+    assert literal_rule_counts(sample) == []
 
 
 def test_rule_list_test_without_literal_count_passes() -> None:

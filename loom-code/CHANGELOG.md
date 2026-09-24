@@ -11,7 +11,11 @@ manifest version is unchanged.
   content the reviewers just read, including the committed acceptance test
   report.
 - On every dispatch, closing review also hands the acceptance tester every
-  finding of severity `important` or worse that the main agent dismissed.
+  finding of severity `important` or worse that the main agent dismissed. A
+  finding of that severity dismissed after the tester's last dispatch, when
+  Ship comes next, is listed in the pull request's Verification section
+  instead. The report template and the tester's input list now agree that the
+  main agent is the one who dismisses.
 - The implementer treats a fix hand-off that lists several instances of one
   defect class as one task, a single assertion about that class.
 - The literal checker rule-count pins are removed from three tests:

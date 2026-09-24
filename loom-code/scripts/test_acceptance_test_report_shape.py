@@ -194,6 +194,44 @@ def test_station_hands_tester_its_dismissals():
         assert not pins_exact_sentence(section.replace(old, new, 1), DISMISSALS), new
 
 
+LATE_DISMISSALS = (
+    "A finding of that severity dismissed after the tester's last dispatch, "
+    "when Ship comes next, is listed in the pull request's Verification section instead."
+)
+
+
+def test_late_dismissals_reach_the_pull_request():
+    """A dismissal decided after the tester's last dispatch still reaches the user."""
+    section = " ".join(_section3().split())
+    assert pins_exact_sentence(section, LATE_DISMISSALS)
+    assert not has_negation(LATE_DISMISSALS)
+    sentences = split_sentences(section)
+    assert sentences[sentences.index(LATE_DISMISSALS) - 1] == DISMISSALS
+    for old, new in (
+        (LATE_DISMISSALS, ""),
+        ("the pull request's Verification section", "the evidence file"),
+        ("after the tester's last dispatch", "before the tester's last dispatch"),
+    ):
+        assert not pins_exact_sentence(section.replace(old, new, 1), LATE_DISMISSALS), new
+
+
+TESTER_DISMISSALS = (
+    "The station also hands you every finding of severity `important` or worse "
+    "that the main agent dismissed, with its reason."
+)
+
+
+def test_dismissal_source_agrees_across_tester_and_template():
+    """Tester input list and template both say the main agent dismisses."""
+    given = flat_prose(TESTER).split("## What you are given", 1)[1].split("## What you do", 1)[0]
+    assert pins_exact_sentence(" ".join(given.split()), TESTER_DISMISSALS)
+    template = flat_prose(TEMPLATE)
+    assert "severity important or worse that the main agent dismissed" in template
+    assert "<who> raised <finding>" in template
+    for stale in ("a reviewer dismissed", "<reviewer> raised"):
+        assert stale not in template, stale
+
+
 RUN_VERB = re.compile(r"\b(?:run|runs|running|execute|executes|executing|invoke|invokes)\b", re.I)
 WHOLE_TARGET = re.compile(
     r"\b(?:package|whole|full|complete|entire)\s+(?:package\s+)?(?:suite|package)\b", re.I
