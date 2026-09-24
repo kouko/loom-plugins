@@ -17,10 +17,18 @@ manifest version is unchanged.
 - The commit the reviewers started from and the report commit form Round 1's
   single functional-content digest. A reviewer that cannot be resumed, such as
   a one-shot vendor CLI, starts after the report is committed.
+- Each first-round reviewer is told whether acceptance testing runs alongside
+  its round, through an optional `acceptance testing: alongside` input line.
+  Its first return carries `status: interim` and its findings, with no
+  `verdict:` key.
+- When the acceptance tester re-tests after a fix, that re-test and its
+  committed report and evidence file come before the reviewers are resumed
+  for that round.
 - `agents/reviewer.md` gains the section "Round 1 alongside acceptance
   testing": a verdict the evidence does not support is an overclaim, an
   untried Acceptance line is an omission, and the one verdict covers both the
-  change and the report.
+  change and the report. Its "Fix rounds" heading now names Round 2 and
+  Round 3, since Round 1 also resumes the reviewer.
 - New test `test_parallel_acceptance_review_text.py` pins the rule.
 
 ## [3.13.0] — 2026-09-24 — closing review hands Build every blocking finding grouped by class
