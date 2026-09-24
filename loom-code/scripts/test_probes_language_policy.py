@@ -22,7 +22,6 @@ Word counts, if ever needed, always use `len(str.split())` — never `wc`
 from __future__ import annotations
 
 import re
-import subprocess
 from pathlib import Path
 
 # evidence/probes/test_abuse_language_policy.py -> parents[2] is the repo
@@ -44,7 +43,6 @@ REVIEWER_MD = REPO / "loom-code/agents/reviewer.md"
 ADVERSARY_MD = REPO / "loom-code/agents/adversary.md"
 ACCEPTANCE_TESTER_MD = REPO / "loom-code/agents/acceptance-tester.md"
 SPEC_MINIMAL_MD = TEMPLATES_DIR / "spec-minimal.md"
-LOOM_CHECKER = REPO / "loom-code/scripts/loom_checker.py"
 
 CJK_RANGE = re.compile(r"[一-鿿]")
 
@@ -325,32 +323,6 @@ def test_ProbenameHelper_SyntheticParagraphs_Discriminates():
     )
     assert not _paragraph_names_shape_and_requires_english(literal_no_naming_verb), (
         "a paragraph with the literal but no naming verb before it must not pass"
-    )
-
-
-# --- (f) GREEN pin: --list-rules line count ---------------------------------
-
-
-def test_checker_rulecount_pinned():
-    """GREEN pin: `loom_checker.py --list-rules`, resolved inside REPO (not
-    the installed plugin cache), prints exactly 26 lines today. A
-    regression here means the checker's rule surface moved without this
-    change touching it, which is out of scope."""
-    assert LOOM_CHECKER.is_file(), f"loom_checker.py not found at {LOOM_CHECKER}"
-    result = subprocess.run(
-        ["python3", str(LOOM_CHECKER), "--list-rules"],
-        cwd=REPO,
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    lines = [l for l in result.stdout.splitlines() if l.strip() != ""]
-    assert result.returncode == 0, (
-        f"loom_checker.py --list-rules exited {result.returncode}: {result.stderr}"
-    )
-    assert len(lines) == 26, (
-        f"--list-rules printed {len(lines)} non-empty lines, expected 26:\n"
-        + "\n".join(lines)
     )
 
 

@@ -51,7 +51,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "scripts"))
 
 from prose_pin import has_negation, split_sentences  # noqa: E402
 
-SKILL = "loom-code/skills/closing-review/SKILL.md"
+SKILL = Path(__file__).resolve().parents[1] / "SKILL.md"
 
 # Each rule lives in one paragraph, identified by its opening words.
 LOOKUP_OPENER = "Absence is a distinct antecedent from a failing check."

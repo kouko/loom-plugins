@@ -5,6 +5,10 @@ concern: false-green prose pin — a bare-substring pin passed a rule that was
 negated or handed to the wrong actor, so each rule sentence is pinned with
 `affirms` (actor before literal, no negation); graduated adversary probe.
 
+concern: a test outside the checker's own tests still pins the checker's rule
+count as a literal integer; only `test_loom_checker_*.py` is exempt and the
+look-ahead spans twenty lines; graduated adversary probe.
+
 The rule lives in Build §2 only; closing-review and Ship carry one-sentence
 pointers, and the implementer contract accepts a multi-file fix hand-off.
 """
@@ -89,33 +93,39 @@ def test_blocked_for_instances_rewrite_fails_the_pin() -> None:
     assert not pins_exact_sentence(weakened, ONE_CLASS_ONE_TASK)
 
 
-CHECKER_TESTS = {"test_loom_checker_cli.py", "test_loom_checker_modules.py", "test_probes_language_policy.py"}
-LIST_RULES_RE = re.compile(r"--list-rules|list_rules")
+TREES = ("loom-code", "loom-design", "loom-workflow")
+WINDOW = 20
+LIST_RULES_RE = re.compile(r"--list-rules|list_rules|\bRULES\b|\bRULE_IDS\b|\brule_ids\b")
 LEN_EQ_RE = re.compile(r"len\(.*\)\s*==\s*\d+")
 RULE_LIST_EQ_RE = re.compile(r"len\(\s*(?:RULES|RULE_IDS|rule_ids)\s*\)\s*==\s*\d+")
+
+
+def is_checker_own_test(path: Path) -> bool:
+    return path.name.startswith("test_loom_checker_")
 
 
 def literal_rule_counts(text: str) -> list[str]:
     """Lines that pin the checker's rule count as a literal integer.
 
     Recognition-based and partial: it flags `len(RULES|RULE_IDS|rule_ids) == <int>`
-    anywhere, and `len(...) == <int>` within six lines after a `--list-rules`
-    or `list_rules` mention. A count held in a variable, computed, or compared
-    further away passes unseen.
+    anywhere, and `len(...) == <int>` within twenty lines after a `--list-rules`,
+    `list_rules`, `RULES`, `RULE_IDS` or `rule_ids` mention. A count held in a
+    variable, computed, or compared further away passes unseen.
     """
     lines = text.splitlines()
     return [
         line.strip() for i, line in enumerate(lines)
         if RULE_LIST_EQ_RE.search(line)
-        or (LEN_EQ_RE.search(line) and any(LIST_RULES_RE.search(x) for x in lines[max(0, i - 6):i + 1]))
+        or (LEN_EQ_RE.search(line) and any(LIST_RULES_RE.search(x) for x in lines[max(0, i - WINDOW):i + 1]))
     ]
 
 
 def test_no_literal_rule_count_outside_checker_tests() -> None:
-    files = sorted((CODE / "scripts").glob("test_*.py")) + sorted((CODE / "skills").rglob("test_*.py"))
-    hits = {p.name: found for p in files if p.name not in CHECKER_TESTS
+    files = [p for tree in TREES for p in sorted((ROOT / tree).rglob("test_*.py"))
+             if "__pycache__" not in p.parts and not is_checker_own_test(p)]
+    hits = {str(p.relative_to(ROOT)): found for p in files
             if (found := literal_rule_counts(p.read_text(encoding="utf-8")))}
-    assert hits == {}
+    assert hits == {}, hits
 
 
 def test_literal_rule_count_reintroduced_fails() -> None:
@@ -127,6 +137,22 @@ def test_literal_rule_count_reintroduced_fails() -> None:
         f'assert len(RULES) {eq} 26\n'
     )
     assert literal_rule_counts(sample) == [line.strip() for line in sample.splitlines()[2:]]
+
+
+def test_far_literal_rule_count_fails() -> None:
+    eq = "=="
+    sample = 'run([CHECKER, "--list-rules"])\n' + "x = 1\n" * 15 + f"assert len(lines) {eq} 26\n"
+    assert literal_rule_counts(sample) == [f"assert len(lines) {eq} 26"]
+
+
+def test_rule_list_test_without_literal_count_passes() -> None:
+    sample = 'ids = run([CHECKER, "--list-rules"]).stdout.splitlines()\nassert ids == sorted(ids)\n'
+    assert literal_rule_counts(sample) == []
+
+
+def test_only_the_checkers_own_tests_are_exempt() -> None:
+    assert is_checker_own_test(Path("test_loom_checker_cli.py"))
+    assert not is_checker_own_test(Path("test_probes_language_policy.py"))
 
 
 def test_no_gate_marker_or_dispatch_wording() -> None:
