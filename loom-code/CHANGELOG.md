@@ -1,5 +1,28 @@
 # Changelog
 
+## [3.14.0] — 2026-09-24 — acceptance testing starts with the first-round reviewers
+
+Minor: the closing-review station's guidance and the reviewer agent's contract
+change. The checker's rule list is unchanged (still 26 rules). The contract
+manifest version is unchanged.
+
+- When acceptance testing is needed, the acceptance tester and the first-round
+  reviewers start on the same commit at the same time, instead of the
+  reviewers waiting for the committed report.
+- Once the report and its evidence file are committed, each of those
+  reviewers is resumed, the same agent rather than a new one, with the delta
+  from the commit it started on to the report commit. It reads the report and
+  evidence against the change it already reviewed, and only then returns its
+  Round 1 verdict. A reviewer's return before that resume is not a verdict.
+- The commit the reviewers started from and the report commit form Round 1's
+  single functional-content digest. A reviewer that cannot be resumed, such as
+  a one-shot vendor CLI, starts after the report is committed.
+- `agents/reviewer.md` gains the section "Round 1 alongside acceptance
+  testing": a verdict the evidence does not support is an overclaim, an
+  untried Acceptance line is an omission, and the one verdict covers both the
+  change and the report.
+- New test `test_parallel_acceptance_review_text.py` pins the rule.
+
 ## [3.13.0] — 2026-09-24 — closing review hands Build every blocking finding grouped by class
 
 Minor: the closing-review station's guidance changes. The checker's rule list
