@@ -32,7 +32,7 @@ runs all of them.
 ## Acceptance
 1. Outside `docs/loom/`, every test file in the repository is under a plugin's `tests/` folder (that plugin's tests) or the root `tests/` folder (repository-level tests); none remains beside production code or inside a skill folder.
 2. The package suite collects and passes the same tests it collected before the move, plus the skill probe tests it did not collect before, with none lost; the before and after counts per plugin are recorded.
-3. A test added later anywhere under a `tests/` folder is run by the package suite without editing the suite command, and CI runs the same tests.
+3. A test added later anywhere under a `tests/` folder is run by the package suite without editing the suite command, and CI runs the same tests; the one exception is a `tests/local/` folder, which holds tests that need a locally installed CLI and is named as local-only.
 4. The repository's contributor guidance states where tests go, and every document an agent reads at run time names the new locations.
 5. The checker's rule list does not grow and no new step, reviewer or dispatch is added.
 
