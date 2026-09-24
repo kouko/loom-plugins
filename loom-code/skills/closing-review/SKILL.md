@@ -289,6 +289,17 @@ ledger or committed state schema. Wording-only publication edits do not reopen
 `closing-review`.
 <!-- /gate -->
 
+Before any fix begins, the main agent collects every fatal or important
+finding that the reviewers and independent acceptance testing returned on the
+current functional-content digest into one list. Every fix starts from that
+whole list. Findings that share a defect class, named in words taken from the
+findings themselves, go to Build as one hand-off that names every one of their
+instances; findings of different classes go as separate hand-offs. Every
+hand-off from the list goes to Build in the same fix round, before the
+reviewers resume. A verdict label such as `NEEDS_REVISION` names no class.
+The per-verdict failure record below is disclosure for the pull request only;
+each fix is scoped from this list.
+
 Before any fix round, pass each non-passing reviewer verdict to
 `loom_checker.py selection record-failure <change-id> --step reviewers --rule <verdict>`;
 a rejection never handed over stays unrecorded. Build scopes each fix to its

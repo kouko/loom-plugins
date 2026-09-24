@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.13.0] — 2026-09-24 — closing review hands Build every blocking finding grouped by class
+
+Minor: the closing-review station's guidance changes. The checker's rule list
+is unchanged (still 26 rules). The contract manifest version is unchanged.
+
+- Before any fix begins, closing review collects every fatal or important
+  finding that the reviewers and independent acceptance testing returned on
+  the current functional-content digest into one list. Every fix starts from
+  that whole list.
+- Findings that share a defect class go to Build as one hand-off that names
+  every one of their instances; findings of different classes go as separate
+  hand-offs, and every hand-off from the list goes to Build in the same fix
+  round, before the reviewers resume. The class is named in words taken from
+  the findings themselves; a verdict label such as `NEEDS_REVISION` names no
+  class.
+- The per-verdict failure record is disclosure for the pull request only; each
+  fix is scoped from the collected list.
+- New test `test_fix_handoff_text.py` pins the rule.
+
 ## [3.12.0] — 2026-09-24 — fixes cover the whole class of a finding
 
 Minor: Build's hand-off contract to an implementer and the implementer's

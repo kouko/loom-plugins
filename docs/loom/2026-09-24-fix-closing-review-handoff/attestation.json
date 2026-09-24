@@ -1,0 +1,61 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-24-fix-closing-review-handoff",
+  "content_digest": "e4efc0b063445b301336adde168d2d69bbe93663",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/scripts/test_fix_handoff_text.py -q",
+      "artifact": "loom-code/scripts/test_fix_handoff_text.py",
+      "result": "pass",
+      "command_digest": "8aee0ed1f70f57c78bdf33e50fd71f94e57b50bf196f30123145c9719e951fe1"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-code-r2",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-skill-r2",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "anchor": "loom-code/skills/closing-review/SKILL.md :: returned on the current functional-content digest",
+          "text": "A very literal orchestrator could read the digest scope as excluding acceptance-testing findings, whose report commit changes the digest; deferred as a follow-up."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "dimension": "tests",
+      "anchor": "loom-code/scripts/test_fix_handoff_text.py :: len(rules) == 26",
+      "text": "Adversary nit: the absolute rule-count pin breaks any later change that adds a checker rule; accepted, consistent with sibling tests."
+    },
+    {
+      "severity": "nit",
+      "dimension": "tests",
+      "anchor": "loom-code/scripts/test_fix_handoff_text.py:4 :: concern:",
+      "text": "Adversary nit: the concern: line counts this test against the probe cap; accepted because it carries the graduated probe."
+    }
+  ],
+  "selection": null
+}
