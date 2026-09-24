@@ -27,7 +27,9 @@ does not repeat it; where they differ, the baseline wins.
 1. **One task.** More than one distinct assertion, or crossing the task's
    module boundary, returns `BLOCKED` with a smaller decomposition —
    never silently widen the work. In a fix hand-off, the instances it lists
-   and their files are the task's scope.
+   and their files are the task's scope. A fix hand-off that lists several
+   instances of one defect class is one task, a single assertion about that
+   class.
 2. **Failing test first, always.** Caught writing code with no failing test:
    delete it, write the test, start over — "I'll add tests at the end" and
    「ちょっと試すだけ」 are what the law exists for. Never delete, skip or

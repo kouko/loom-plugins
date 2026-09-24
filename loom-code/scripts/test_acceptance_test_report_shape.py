@@ -23,7 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from prose_pin import flat_prose, has_negation, split_sentences  # noqa: E402
+from prose_pin import flat_prose, has_negation, pins_exact_sentence, split_sentences  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = (
@@ -173,6 +173,119 @@ def test_suite_criterion_cites_finalize_review_command():
     section = split_sentences(" ".join(_section3().split()))
     assert _affirmed(section, "On every dispatch", "`package-tests` or `finalize-review` is skipped")
     assert _affirmed(section, "steps 6-7 govern the suite row and what is re-tested")
+
+
+DISMISSALS = (
+    "Also hand it every finding of severity `important` or worse that the main agent dismissed."
+)
+
+
+def test_station_hands_tester_its_dismissals():
+    """The tester's dismissal section has a source: §3 hands it every dismissal."""
+    section = " ".join(_section3().split())
+    assert pins_exact_sentence(section, DISMISSALS)
+    sentences = split_sentences(section)
+    assert "On every dispatch" in sentences[sentences.index(DISMISSALS) - 1]
+    for old, new in (
+        (DISMISSALS, ""),
+        ("`important` or worse", "`fatal`"),
+        ("hand it every finding", "hand it one finding"),
+    ):
+        assert not pins_exact_sentence(section.replace(old, new, 1), DISMISSALS), new
+
+
+LATE_DISMISSALS = (
+    "A finding of that severity dismissed after the tester's last dispatch, "
+    "when Ship comes next, is listed in the pull request's Verification section instead."
+)
+
+
+def test_late_dismissals_reach_the_pull_request():
+    """A dismissal decided after the tester's last dispatch still reaches the user."""
+    section = " ".join(_section3().split())
+    assert pins_exact_sentence(section, LATE_DISMISSALS)
+    assert not has_negation(LATE_DISMISSALS)
+    sentences = split_sentences(section)
+    assert sentences[sentences.index(LATE_DISMISSALS) - 1] == DISMISSALS
+    for old, new in (
+        (LATE_DISMISSALS, ""),
+        ("the pull request's Verification section", "the evidence file"),
+        ("after the tester's last dispatch", "before the tester's last dispatch"),
+    ):
+        assert not pins_exact_sentence(section.replace(old, new, 1), LATE_DISMISSALS), new
+
+
+SHIP = REPO_ROOT / "loom-code" / "skills" / "ship" / "SKILL.md"
+SHIP_LATE_DISMISSALS = (
+    "List each finding of severity `important` or worse that closing review "
+    "dismissed after the acceptance tester's last dispatch, with its reason, "
+    "as closing review's hand-off reports them."
+)
+
+
+def _ship_verification_rules() -> str:
+    text = SHIP.read_text(encoding="utf-8")
+    rules = text.split("Under the Verification heading", 1)[1].split("Every decision summary", 1)[0]
+    return " ".join(rules.split())
+
+
+def test_ship_lists_late_dismissals_in_verification():
+    """The station that writes the Verification section carries the late dismissals."""
+    rules = _ship_verification_rules()
+    assert pins_exact_sentence(rules, SHIP_LATE_DISMISSALS)
+    assert not has_negation(SHIP_LATE_DISMISSALS)
+    for old, new in (
+        (SHIP_LATE_DISMISSALS, ""),
+        ("`important` or worse", "`fatal`"),
+        (", with its reason,", ","),
+    ):
+        assert not pins_exact_sentence(rules.replace(old, new, 1), SHIP_LATE_DISMISSALS), new
+
+
+def test_ship_names_handoff_as_late_dismissal_source():
+    """Ship reads the late dismissals from closing review's hand-off, not recall."""
+    rules = _ship_verification_rules()
+    assert pins_exact_sentence(rules, SHIP_LATE_DISMISSALS)
+    weakened = rules.replace(", as closing review's hand-off reports them.", ".", 1)
+    assert not pins_exact_sentence(weakened, SHIP_LATE_DISMISSALS)
+
+
+HANDOFF_LATE_DISMISSALS = (
+    "Also report every finding of severity `important` or worse dismissed after "
+    "the acceptance tester's last dispatch, with its reason."
+)
+
+
+def _closing_review_handoff() -> str:
+    text = STATION.read_text(encoding="utf-8")
+    return " ".join(text.split("\n## Handoff", 1)[1].split())
+
+
+def test_closing_review_handoff_reports_late_dismissals():
+    """The hand-off is the carrier for dismissals Ship lists in Verification."""
+    handoff = _closing_review_handoff()
+    assert pins_exact_sentence(handoff, HANDOFF_LATE_DISMISSALS)
+    assert not has_negation(HANDOFF_LATE_DISMISSALS)
+    assert not pins_exact_sentence(
+        handoff.replace(HANDOFF_LATE_DISMISSALS, "", 1), HANDOFF_LATE_DISMISSALS
+    )
+
+
+TESTER_DISMISSALS = (
+    "The station also hands you every finding of severity `important` or worse "
+    "that the main agent dismissed, with its reason."
+)
+
+
+def test_dismissal_source_agrees_across_tester_and_template():
+    """Tester input list and template both say the main agent dismisses."""
+    given = flat_prose(TESTER).split("## What you are given", 1)[1].split("## What you do", 1)[0]
+    assert pins_exact_sentence(" ".join(given.split()), TESTER_DISMISSALS)
+    template = flat_prose(TEMPLATE)
+    assert "severity important or worse that the main agent dismissed" in template
+    assert "<who> raised <finding>" in template
+    for stale in ("a reviewer dismissed", "<reviewer> raised"):
+        assert stale not in template, stale
 
 
 RUN_VERB = re.compile(r"\b(?:run|runs|running|execute|executes|executing|invoke|invokes)\b", re.I)

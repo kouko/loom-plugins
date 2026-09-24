@@ -1,5 +1,40 @@
 # Changelog
 
+## [3.14.0] — 2026-09-24 — the fix list covers what the reviewers just read
+
+Minor: the closing-review station's guidance and the implementer contract
+change. The checker's rule list is unchanged (still 26 rules). The contract
+manifest version is unchanged.
+
+- The list every fix starts from now collects the fatal or important findings
+  that the reviewers and independent acceptance testing returned on the
+  content the reviewers just read, including the committed acceptance test
+  report.
+- On every dispatch, closing review also hands the acceptance tester every
+  finding of severity `important` or worse that the main agent dismissed. A
+  finding of that severity dismissed after the tester's last dispatch, when
+  Ship comes next, is listed in the pull request's Verification section
+  instead; closing review's hand-off reports each one, and Ship lists each one
+  there with its reason. The report template and the tester's input list now agree that the
+  main agent is the one who dismisses.
+- The implementer treats a fix hand-off that lists several instances of one
+  defect class as one task, a single assertion about that class.
+- The literal checker rule-count pins are removed from three tests:
+  `test_fix_handoff_text.py`, `test_fix_scope_text.py` and
+  `test_probes_language_policy.py`. A new guard in `test_fix_scope_text.py`
+  catches a direct literal-count assertion on the rule list, or one within
+  twenty lines after a rule-list mention, in any test outside the checker's
+  own tests; it is partial by design, so a count held in a variable, computed,
+  or compared further away passes unseen. It exempts only
+  `test_loom_checker_*.py` and scans loom-code, loom-design and loom-workflow.
+- The closing-review RL-06 recovery probe now expects the plain-words skip
+  rule. It had been stale since #43 because the probes directory is not
+  collected by the package suite; a new negative probe rejects the restored
+  expert-mode ending. The recovery probe now resolves `SKILL.md` from its own
+  location, so it passes from any working directory.
+- Repository memory records why running independent acceptance testing and
+  review in parallel (#50) was rejected.
+
 ## [3.13.0] — 2026-09-24 — closing review hands Build every blocking finding grouped by class
 
 Minor: the closing-review station's guidance changes. The checker's rule list

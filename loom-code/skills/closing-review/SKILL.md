@@ -216,8 +216,11 @@ When `acceptance-test` is skipped (listed by `selection show` or skipped by
 the user's plain-words instruction), run no acceptance testing.
 
 On every dispatch, tell the acceptance tester whether `package-tests` or
-`finalize-review` is skipped. On a re-dispatch after a fix, also pass the
-earlier report and evidence file paths and the fix's commit range. The
+`finalize-review` is skipped. Also hand it every finding of severity
+`important` or worse that the main agent dismissed. A finding of that
+severity dismissed after the tester's last dispatch, when Ship comes next, is
+listed in the pull request's Verification section instead. On a re-dispatch after a
+fix, also pass the earlier report and evidence file paths and the fix's commit range. The
 tester's steps 6-7 govern the suite row and what is re-tested.
 
 Closing review dispatches no adversary and creates no adversarial program.
@@ -291,7 +294,8 @@ ledger or committed state schema. Wording-only publication edits do not reopen
 
 Before any fix begins, the main agent collects every fatal or important
 finding that the reviewers and independent acceptance testing returned on the
-current functional-content digest into one list. Every fix starts from that
+content the reviewers just read, including the committed acceptance test
+report, into one list. Every fix starts from that
 whole list. Findings that share a defect class, named in words taken from the
 findings themselves, go to Build as one hand-off that names every one of their
 instances; findings of different classes go as separate hand-offs. Every
@@ -379,4 +383,6 @@ ends the episode as `NON_CONVERGENT`.
 ## Handoff
 
 Report the reviewers, executed commands, functional digest, and unresolved
-findings. On PASS, hand the matching attestation to `loom-code:ship`.
+findings. Also report every finding of severity `important` or worse
+dismissed after the acceptance tester's last dispatch, with its reason. On
+PASS, hand the matching attestation to `loom-code:ship`.

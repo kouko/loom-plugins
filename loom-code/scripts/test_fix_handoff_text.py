@@ -10,8 +10,6 @@ every weakened or insertion rewrite must fail.
 """
 from __future__ import annotations
 
-import subprocess
-import sys
 from pathlib import Path
 
 from prose_pin import flat_prose, pins_exact_sentence
@@ -27,8 +25,8 @@ PARA = REVIEW.split(RECORD)[0].rsplit("<!-- /gate -->", 1)[-1].strip()
 
 SENTENCES = (
     "Before any fix begins, the main agent collects every fatal or important finding that the "
-    "reviewers and independent acceptance testing returned on the current functional-content "
-    "digest into one list.",
+    "reviewers and independent acceptance testing returned on the content the reviewers just "
+    "read, including the committed acceptance test report, into one list.",
     "Every fix starts from that whole list.",
     "Findings that share a defect class, named in words taken from the findings themselves, go "
     "to Build as one hand-off that names every one of their instances;",
@@ -65,6 +63,9 @@ WEAKENED = (
      "Once acceptance testing is late, a fix may start from the first verdict."),
     ("each fix is scoped from this list.",
      "each fix is scoped from this list. Build may still take one finding per round."),
+    ("on the content the reviewers just read, including the committed acceptance test report,",
+     "on the current functional-content digest"),
+    (", including the committed acceptance test report,", ""),
 )
 
 
@@ -84,13 +85,8 @@ def test_weakened_or_inserted_paragraph_fails_the_pins() -> None:
         assert not all_pinned(weakened), new
 
 
-def test_no_gate_marker_dispatch_words_or_rule_growth() -> None:
+def test_no_gate_marker_or_dispatch_words() -> None:
     assert PARA and "<!-- gate" not in PARA and "Build §2" not in PARA
     for word in ("dispatch", "subagent", "new step", "extra step", "names the defect's class",
                  "--name-only", "the places searched"):
         assert word not in PARA, word
-    rules = subprocess.run(
-        [sys.executable, str(CODE / "scripts/loom_checker.py"), "--list-rules"],
-        capture_output=True, text=True, check=True,
-    ).stdout.splitlines()
-    assert len(rules) == 26

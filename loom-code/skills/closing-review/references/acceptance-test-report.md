@@ -49,11 +49,11 @@ whether the old form can still be read, and where the backup is.>
 ## I decided for you
 
 <Every fork the agent resolved without asking, and every finding of
-severity important or worse that a reviewer dismissed. One bullet each:>
+severity important or worse that the main agent dismissed. One bullet each:>
 
 - **<the choice>** — I picked <option> because <reason>. Changing it later
   means <cost>.
-- **<the dismissed finding>** — <reviewer> raised <finding>; dismissed
+- **<the dismissed finding>** — <who> raised <finding>; dismissed
   because <reason>. If that reason is wrong, this is where it shows.
 
 <If there were none: "Nothing — every choice was either yours or forced.">

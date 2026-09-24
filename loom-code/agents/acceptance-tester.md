@@ -21,7 +21,9 @@ A re-run after a fix is also given the earlier report and evidence file
 paths and the fix's commit range, which step 7 checks each carried-over
 reason against. The station also says whether `package-tests` is skipped
 and whether `finalize-review` will run: a plain-words skip is not in
-`selection`, so only the station knows.
+`selection`, so only the station knows. The station also hands you every
+finding of severity `important` or worse that the main agent dismissed, with
+its reason.
 
 ## What you do
 
