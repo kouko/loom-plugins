@@ -4,8 +4,9 @@ and 5).
 
 concern: false-green prose pin — an ordered-words pin passes a rule that is
 negated, handed to the wrong actor, or inverted by a phrase inserted between
-or after its words, so each rule sentence is pinned exactly and every
-weakened or insertion rewrite must fail.
+or after its words, or by a standalone sentence added to the paragraph, so
+each rule sentence is pinned exactly, the paragraph is pinned whole, and
+every weakened or insertion rewrite must fail.
 """
 from __future__ import annotations
 
@@ -59,11 +60,16 @@ WEAKENED = (
     ("each fix is scoped from this list.", "each fix is scoped from the failure record and this list."),
     ("the reviewers and independent acceptance testing returned",
      "the reviewers and independent acceptance testing returned, once acceptance testing is skipped,"),
+    ("Every fix starts from that whole list.",
+     "Every fix starts from that whole list. "
+     "Once acceptance testing is late, a fix may start from the first verdict."),
+    ("each fix is scoped from this list.",
+     "each fix is scoped from this list. Build may still take one finding per round."),
 )
 
 
 def all_pinned(text: str) -> bool:
-    return all(pins_exact_sentence(text, s) for s in SENTENCES)
+    return text == " ".join(SENTENCES) and all(pins_exact_sentence(text, s) for s in SENTENCES)
 
 
 def test_every_rule_sentence_is_pinned_exactly_and_record_kept_verbatim() -> None:
