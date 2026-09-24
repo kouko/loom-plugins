@@ -91,7 +91,8 @@ Copy the line `Skipped as a narrow change: <steps>` exactly as `selection show`
 prints it in its `narrow_change_line` field, not from conversation recall or
 the raw `skip` ids; when that field is null, write no such line.
 List each finding of severity `important` or worse that closing review
-dismissed after the acceptance tester's last dispatch, with its reason.
+dismissed after the acceptance tester's last dispatch, with its reason, as
+closing review's hand-off reports them.
 
 When the attestation carries a selection, open the Verification section with
 exactly these lines, filled from the attestation's `selection` field: one

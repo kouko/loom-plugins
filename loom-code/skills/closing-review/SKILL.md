@@ -383,4 +383,6 @@ ends the episode as `NON_CONVERGENT`.
 ## Handoff
 
 Report the reviewers, executed commands, functional digest, and unresolved
-findings. On PASS, hand the matching attestation to `loom-code:ship`.
+findings. Also report every finding of severity `important` or worse
+dismissed after the acceptance tester's last dispatch, with its reason. On
+PASS, hand the matching attestation to `loom-code:ship`.

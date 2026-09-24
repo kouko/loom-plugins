@@ -218,7 +218,8 @@ def test_late_dismissals_reach_the_pull_request():
 SHIP = REPO_ROOT / "loom-code" / "skills" / "ship" / "SKILL.md"
 SHIP_LATE_DISMISSALS = (
     "List each finding of severity `important` or worse that closing review "
-    "dismissed after the acceptance tester's last dispatch, with its reason."
+    "dismissed after the acceptance tester's last dispatch, with its reason, "
+    "as closing review's hand-off reports them."
 )
 
 
@@ -236,9 +237,38 @@ def test_ship_lists_late_dismissals_in_verification():
     for old, new in (
         (SHIP_LATE_DISMISSALS, ""),
         ("`important` or worse", "`fatal`"),
-        (", with its reason.", "."),
+        (", with its reason,", ","),
     ):
         assert not pins_exact_sentence(rules.replace(old, new, 1), SHIP_LATE_DISMISSALS), new
+
+
+def test_ship_names_handoff_as_late_dismissal_source():
+    """Ship reads the late dismissals from closing review's hand-off, not recall."""
+    rules = _ship_verification_rules()
+    assert pins_exact_sentence(rules, SHIP_LATE_DISMISSALS)
+    weakened = rules.replace(", as closing review's hand-off reports them.", ".", 1)
+    assert not pins_exact_sentence(weakened, SHIP_LATE_DISMISSALS)
+
+
+HANDOFF_LATE_DISMISSALS = (
+    "Also report every finding of severity `important` or worse dismissed after "
+    "the acceptance tester's last dispatch, with its reason."
+)
+
+
+def _closing_review_handoff() -> str:
+    text = STATION.read_text(encoding="utf-8")
+    return " ".join(text.split("\n## Handoff", 1)[1].split())
+
+
+def test_closing_review_handoff_reports_late_dismissals():
+    """The hand-off is the carrier for dismissals Ship lists in Verification."""
+    handoff = _closing_review_handoff()
+    assert pins_exact_sentence(handoff, HANDOFF_LATE_DISMISSALS)
+    assert not has_negation(HANDOFF_LATE_DISMISSALS)
+    assert not pins_exact_sentence(
+        handoff.replace(HANDOFF_LATE_DISMISSALS, "", 1), HANDOFF_LATE_DISMISSALS
+    )
 
 
 TESTER_DISMISSALS = (

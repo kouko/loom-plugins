@@ -14,16 +14,19 @@ manifest version is unchanged.
   finding of severity `important` or worse that the main agent dismissed. A
   finding of that severity dismissed after the tester's last dispatch, when
   Ship comes next, is listed in the pull request's Verification section
-  instead, and Ship lists each one there with its reason. The report template and the tester's input list now agree that the
+  instead; closing review's hand-off reports each one, and Ship lists each one
+  there with its reason. The report template and the tester's input list now agree that the
   main agent is the one who dismisses.
 - The implementer treats a fix hand-off that lists several instances of one
   defect class as one task, a single assertion about that class.
 - The literal checker rule-count pins are removed from three tests:
   `test_fix_handoff_text.py`, `test_fix_scope_text.py` and
   `test_probes_language_policy.py`. A new guard in `test_fix_scope_text.py`
-  fails when a literal rule count is reintroduced in any test outside the
-  checker's own tests; it exempts only `test_loom_checker_*.py` and scans
-  loom-code, loom-design and loom-workflow.
+  catches a direct literal-count assertion on the rule list, or one within
+  twenty lines after a rule-list mention, in any test outside the checker's
+  own tests; it is partial by design, so a count held in a variable, computed,
+  or compared further away passes unseen. It exempts only
+  `test_loom_checker_*.py` and scans loom-code, loom-design and loom-workflow.
 - The closing-review RL-06 recovery probe now expects the plain-words skip
   rule. It had been stale since #43 because the probes directory is not
   collected by the package suite; a new negative probe rejects the restored
