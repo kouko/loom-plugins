@@ -112,8 +112,9 @@ second time and do not hand the change on to another station.
 
 <!-- /gate -->
 
-When acceptance testing is needed, finish it and commit its report (§3) before
-dispatching the first reviewers. After Build commits completed functional
+When acceptance testing is needed, it starts together with the first-round
+reviewers on the same functional content (§3), and the reviewers give their
+Round 1 verdict only after reading its committed report. After Build commits completed functional
 content, run:
 
 ```text
@@ -205,13 +206,21 @@ Use acceptance testing when an Acceptance line cannot be settled mechanically.
 Acceptance testing means dispatching the `loom-code:acceptance-tester` agent
 fresh-context, never an agent that touched any part of the change. Its
 `docs/loom/<change-id>/acceptance-test-report.md` is functional content; only
-`attestation.json` is publication metadata. Finish acceptance testing and commit
-that report on the change branch before the reviewers read the final
-functional-content digest, and so before running `finalize-review`. A report
-committed after their verdicts is new functional content and needs the next
-round. Its evidence file,
+`attestation.json` is publication metadata. Start the acceptance tester and the
+first-round reviewers on the same commit at the same time. Finish acceptance
+testing and commit that report on the change branch before running
+`finalize-review`. Its evidence file,
 `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`, is functional
 content too and is committed with the report under the same deadline.
+Once the report and its evidence file are committed, resume each of those
+reviewers, the same agent rather than a new one, with the report commit as its
+new `reviewed_sha`. Each reads the report and evidence against the change it
+already reviewed, and only then returns its Round 1 verdict. A reviewer's
+return before that resume is not a verdict. The commit the reviewers started
+from and the report commit form Round 1's single functional-content digest. A
+reviewer that cannot be resumed, such as a one-shot vendor CLI, starts after
+the report is committed. A report committed after their verdicts is new
+functional content and needs the next round.
 When `acceptance-test` is skipped (listed by `selection show` or skipped by
 the user's plain-words instruction), run no acceptance testing.
 

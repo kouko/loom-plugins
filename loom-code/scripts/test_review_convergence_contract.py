@@ -75,7 +75,10 @@ def test_station_commits_report_before_finalize() -> None:
 def test_report_committed_before_reviewers_read_final_digest() -> None:
     order = next(s for s in _sentences(REVIEW_WORDS) if "commit that report" in s)
     assert "Finish acceptance testing" in order
-    assert "before the reviewers read the final functional-content digest" in order
+    resume = next(s for s in _sentences(REVIEW_WORDS) if "resume each of those reviewers" in s)
+    assert resume.startswith("Once the report and its evidence file are committed")
+    verdict = next(s for s in _sentences(REVIEW_WORDS) if "returns its Round 1 verdict" in s)
+    assert "only then" in verdict
     reason = next(s for s in _sentences(REVIEW_WORDS) if "committed after their verdicts" in s)
     assert "next round" in reason
 
@@ -250,12 +253,13 @@ def test_recording_passage_invokes_nothing_and_registers_no_mechanism() -> None:
         )
 
 
-def test_acceptance_test_before_first_reviewer_dispatch() -> None:
+def test_acceptance_test_starts_with_first_reviewers_before_reviewer_count() -> None:
     section = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
     words = " ".join(section.split())
     sentence = (
-        "When acceptance testing is needed, finish it and commit its report (§3) "
-        "before dispatching the first reviewers."
+        "When acceptance testing is needed, it starts together with the first-round "
+        "reviewers on the same functional content (§3), and the reviewers give their "
+        "Round 1 verdict only after reading its committed report."
     )
     assert sentence in words
     assert words.index(sentence) < words.index("loom_checker.py reviewer-count")

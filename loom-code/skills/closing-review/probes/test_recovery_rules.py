@@ -59,7 +59,7 @@ FAILURE_OPENER = "Stop when the attempt to produce an absent item fails."
 # The paragraph immediately after the recovery passage: a different topic
 # (announcing acceptance testing to reviewers), the natural stopping point for a
 # scan of "the paragraphs that state the same rule" (ADV-01's near miss).
-NEXT_UNRELATED = "When acceptance testing is needed, finish it and commit its report"
+NEXT_UNRELATED = "When acceptance testing is needed, it starts together with the first-round"
 
 # The exact closing sentence of each rule's paragraph, as committed. An
 # appended trailing sentence — ADV-02's attack — changes what the paragraph
