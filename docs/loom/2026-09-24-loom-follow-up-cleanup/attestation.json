@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-24-loom-follow-up-cleanup",
-  "content_digest": "4d5b231fd998c29006cb41a95fdf7965b56e9f62",
+  "content_digest": "44e3a5ebc9b7f05bc6c494eea76b4d8a2e16553e",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,7 +20,7 @@
   ],
   "verdicts": [
     {
-      "reviewer": "reviewer-code-r2",
+      "reviewer": "reviewer-code-r3",
       "vendor": "anthropic",
       "model": "claude-opus-5-5",
       "lens": "code",
@@ -28,19 +28,12 @@
       "findings": []
     },
     {
-      "reviewer": "reviewer-skill-r2",
+      "reviewer": "reviewer-skill-r3",
       "vendor": "anthropic",
       "model": "claude-opus-5-5",
       "lens": "skill",
       "verdict": "PASS",
-      "findings": [
-        {
-          "severity": "nit",
-          "dimension": "omission",
-          "anchor": "loom-code/skills/ship/SKILL.md:93 :: List each finding of severity `important` or worse that closing review dismissed after the acceptance tester's last dispatch, with its reason.",
-          "text": "The sentence does not name where Ship reads the late dismissals from; deferred as a follow-up."
-        }
-      ]
+      "findings": []
     }
   ],
   "findings": [],
