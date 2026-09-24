@@ -14,14 +14,17 @@ manifest version is unchanged.
   finding of severity `important` or worse that the main agent dismissed.
 - The implementer treats a fix hand-off that lists several instances of one
   defect class as one task, a single assertion about that class.
-- The literal checker rule-count pins are removed from
-  `test_fix_handoff_text.py` and `test_fix_scope_text.py`; a new guard in
-  `test_fix_scope_text.py` fails when a literal rule count is reintroduced in
-  any test outside the checker's own tests.
+- The literal checker rule-count pins are removed from three tests:
+  `test_fix_handoff_text.py`, `test_fix_scope_text.py` and
+  `test_probes_language_policy.py`. A new guard in `test_fix_scope_text.py`
+  fails when a literal rule count is reintroduced in any test outside the
+  checker's own tests; it exempts only `test_loom_checker_*.py` and scans
+  loom-code, loom-design and loom-workflow.
 - The closing-review RL-06 recovery probe now expects the plain-words skip
   rule. It had been stale since #43 because the probes directory is not
   collected by the package suite; a new negative probe rejects the restored
-  expert-mode ending.
+  expert-mode ending. The recovery probe now resolves `SKILL.md` from its own
+  location, so it passes from any working directory.
 - Repository memory records why running independent acceptance testing and
   review in parallel (#50) was rejected.
 
