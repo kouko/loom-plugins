@@ -10,9 +10,10 @@ pointers, and the implementer contract accepts a multi-file fix hand-off.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
-from prose_pin import affirms, flat_prose, split_sentences
+from prose_pin import affirms, flat_prose, pins_exact_sentence, split_sentences
 
 ROOT = Path(__file__).resolve().parents[2]
 CODE = ROOT / "loom-code"
@@ -68,6 +69,64 @@ def test_pointers_reach_every_fix_path() -> None:
     assert affirms(SHIP, "The minimum fix covers", "every instance of the defect's class", "Build §2")
     assert affirms(IMPLEMENTER, "In a fix hand-off", "the task's scope", "the instances it lists and their files")
     assert "never silently widen the work" in IMPLEMENTER
+
+
+ONE_CLASS_ONE_TASK = (
+    "A fix hand-off that lists several instances of one defect class is one task, "
+    "a single assertion about that class."
+)
+
+
+def test_one_class_many_instances_is_one_task() -> None:
+    assert pins_exact_sentence(IMPLEMENTER, ONE_CLASS_ONE_TASK)
+
+
+def test_blocked_for_instances_rewrite_fails_the_pin() -> None:
+    weakened = IMPLEMENTER.replace(
+        ONE_CLASS_ONE_TASK,
+        "A fix hand-off that lists several instances of one defect class returns `BLOCKED`.",
+    )
+    assert not pins_exact_sentence(weakened, ONE_CLASS_ONE_TASK)
+
+
+CHECKER_TESTS = {"test_loom_checker_cli.py", "test_loom_checker_modules.py", "test_probes_language_policy.py"}
+LIST_RULES_RE = re.compile(r"--list-rules|list_rules")
+LEN_EQ_RE = re.compile(r"len\(.*\)\s*==\s*\d+")
+RULE_LIST_EQ_RE = re.compile(r"len\(\s*(?:RULES|RULE_IDS|rule_ids)\s*\)\s*==\s*\d+")
+
+
+def literal_rule_counts(text: str) -> list[str]:
+    """Lines that pin the checker's rule count as a literal integer.
+
+    Recognition-based and partial: it flags `len(RULES|RULE_IDS|rule_ids) == <int>`
+    anywhere, and `len(...) == <int>` within six lines after a `--list-rules`
+    or `list_rules` mention. A count held in a variable, computed, or compared
+    further away passes unseen.
+    """
+    lines = text.splitlines()
+    return [
+        line.strip() for i, line in enumerate(lines)
+        if RULE_LIST_EQ_RE.search(line)
+        or (LEN_EQ_RE.search(line) and any(LIST_RULES_RE.search(x) for x in lines[max(0, i - 6):i + 1]))
+    ]
+
+
+def test_no_literal_rule_count_outside_checker_tests() -> None:
+    files = sorted((CODE / "scripts").glob("test_*.py")) + sorted((CODE / "skills").rglob("test_*.py"))
+    hits = {p.name: found for p in files if p.name not in CHECKER_TESTS
+            if (found := literal_rule_counts(p.read_text(encoding="utf-8")))}
+    assert hits == {}
+
+
+def test_literal_rule_count_reintroduced_fails() -> None:
+    eq = "=="  # kept off the sample lines so this file does not flag itself
+    sample = (
+        'def test_count() -> None:\n'
+        '    out = run([CHECKER, "--list-rules"]).stdout\n'
+        f'    assert len(out.splitlines()) {eq} 26\n'
+        f'assert len(RULES) {eq} 26\n'
+    )
+    assert literal_rule_counts(sample) == [line.strip() for line in sample.splitlines()[2:]]
 
 
 def test_no_gate_marker_or_dispatch_wording() -> None:
