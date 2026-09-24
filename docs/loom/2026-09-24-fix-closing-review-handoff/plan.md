@@ -18,6 +18,11 @@ charter: 1.0
 - Test: A1 positive: list-covers-reviewers-and-acceptance-testing; negative: subset-fix-forbidden. A2 positive: shared-class-one-handoff; negative: verdict-label-not-class. A3 positive: record-is-disclosure-only; boundary: record-sentence-kept-verbatim. A4 positive: grouping-example-stated; negative: weakened-rule-fails-pins. A5 positive: rule-count-26; negative: no-dispatch-or-gate-wording.
 - Risk: `test_simplified_station_text.py:406` and `test_fix_scope_text.py` pin neighbouring sentences; both kept, coverage preserved. New prose avoids "Build §2" so one pointer remains; agent-decided.
 
+**W0-02 Bind hand-offs to one fix round; pin sentences exactly; graduate probe**  after: W0-01, W1-01  acceptance: 1, 2
+- Files: `loom-code/skills/closing-review/SKILL.md`, `loom-code/scripts/test_fix_handoff_text.py`, `loom-code/CHANGELOG.md`, `docs/loom/2026-09-24-fix-closing-review-handoff/evidence/probes/test_handoff_pins_reject_inverting_insertions.py`
+- Test: A1 positive: every-handoff-same-round-before-reviewers-resume; negative: class-per-round-rewrite-fails. A2 positive: exact-sentence-pins; negative: inverting-insertions-fail.
+- Risk: adversary findings: ordered-word pins accepted meaning-reversing insertions; separate hand-offs were not bound to one round. Probe graduates into the test file and leaves the store; agent-decided.
+
 ### Wave 1 — release
 
 **W1-01 Minor release metadata 3.13.0**  after: W0-01  acceptance: 5
