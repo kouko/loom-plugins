@@ -1,10 +1,12 @@
 """Acceptance testing starts with the first-round reviewers, who are resumed with its committed
 report before their Round 1 verdict (plan W0-01, W0-02; intent 2026-09-24-parallel-acceptance-
-testing-and-review Acceptance 1, 2, 3, 4, 6). concern: false-green prose pin — each rule sentence
-is pinned exactly and the §3 paragraph whole to its blank-line boundary, so a reversed,
-re-assigned, inserted or appended rule must fail (graduated probe: a reversal appended after the
-skip sentence). concern: moving-ref pin — the gate-marker count is a literal, never compared
-with `origin/main`, whose local position changes the answer for the same commit.
+testing-and-review Acceptance 1, 2, 3, 4, 6).
+
+concern: false-green prose pin — each rule sentence is pinned exactly and the §3 paragraph whole
+to its blank-line boundary, so a reversed, re-assigned, inserted or appended rule must fail
+(graduated probe: a reversal appended after the skip sentence).
+concern: moving-ref pin — the gate-marker count is a literal, never compared with `origin/main`,
+whose local position changes the answer for the same commit.
 """
 import subprocess
 import sys
