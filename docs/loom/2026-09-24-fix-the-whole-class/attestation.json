@@ -34,6 +34,14 @@
       "lens": "docs",
       "verdict": "PASS",
       "findings": []
+    },
+    {
+      "reviewer": "reviewer-codex-r1",
+      "vendor": "openai",
+      "model": "gpt-5.5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
     }
   ],
   "findings": [],
