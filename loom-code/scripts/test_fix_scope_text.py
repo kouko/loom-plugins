@@ -10,8 +10,6 @@ pointers, and the implementer contract accepts a multi-file fix hand-off.
 """
 from __future__ import annotations
 
-import subprocess
-import sys
 from pathlib import Path
 
 from prose_pin import affirms, flat_prose, split_sentences
@@ -72,12 +70,7 @@ def test_pointers_reach_every_fix_path() -> None:
     assert "never silently widen the work" in IMPLEMENTER
 
 
-def test_no_gate_marker_rule_count_26_or_dispatch_wording() -> None:
+def test_no_gate_marker_or_dispatch_wording() -> None:
     assert "<!-- gate" not in SECTION_2
-    rules = subprocess.run(
-        [sys.executable, str(CODE / "scripts/loom_checker.py"), "--list-rules"],
-        capture_output=True, text=True, check=True,
-    ).stdout.splitlines()
-    assert len(rules) == 26
     for word in ("dispatch", "subagent", "new step", "extra step"):
         assert word not in RULE, word

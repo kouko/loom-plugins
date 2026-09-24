@@ -23,7 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from prose_pin import flat_prose, has_negation, split_sentences  # noqa: E402
+from prose_pin import flat_prose, has_negation, pins_exact_sentence, split_sentences  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = (
@@ -173,6 +173,25 @@ def test_suite_criterion_cites_finalize_review_command():
     section = split_sentences(" ".join(_section3().split()))
     assert _affirmed(section, "On every dispatch", "`package-tests` or `finalize-review` is skipped")
     assert _affirmed(section, "steps 6-7 govern the suite row and what is re-tested")
+
+
+DISMISSALS = (
+    "Also hand it every finding of severity `important` or worse that the main agent dismissed."
+)
+
+
+def test_station_hands_tester_its_dismissals():
+    """The tester's dismissal section has a source: §3 hands it every dismissal."""
+    section = " ".join(_section3().split())
+    assert pins_exact_sentence(section, DISMISSALS)
+    sentences = split_sentences(section)
+    assert "On every dispatch" in sentences[sentences.index(DISMISSALS) - 1]
+    for old, new in (
+        (DISMISSALS, ""),
+        ("`important` or worse", "`fatal`"),
+        ("hand it every finding", "hand it one finding"),
+    ):
+        assert not pins_exact_sentence(section.replace(old, new, 1), DISMISSALS), new
 
 
 RUN_VERB = re.compile(r"\b(?:run|runs|running|execute|executes|executing|invoke|invokes)\b", re.I)
