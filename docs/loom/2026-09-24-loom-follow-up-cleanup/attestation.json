@@ -1,0 +1,48 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-24-loom-follow-up-cleanup",
+  "content_digest": "4d5b231fd998c29006cb41a95fdf7965b56e9f62",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/scripts/test_fix_scope_text.py -q",
+      "artifact": "loom-code/scripts/test_fix_scope_text.py",
+      "result": "pass",
+      "command_digest": "415c8cd3f822382967541e6285e26a5ccd8f144023b11007020606fae95c6bf9"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-code-r2",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-skill-r2",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "omission",
+          "anchor": "loom-code/skills/ship/SKILL.md:93 :: List each finding of severity `important` or worse that closing review dismissed after the acceptance tester's last dispatch, with its reason.",
+          "text": "The sentence does not name where Ship reads the late dismissals from; deferred as a follow-up."
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
