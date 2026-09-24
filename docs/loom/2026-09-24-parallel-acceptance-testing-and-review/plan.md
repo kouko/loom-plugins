@@ -18,6 +18,11 @@ charter: 1.0
 - Test: A1 positive: same-version-start; negative: wait-rewrite-fails. A2 positive: resume-reads-report; boundary: one-shot-waits. A3 positive: one-list; negative: split-rewrite-fails. A4 positive: report-shape-kept; negative: row-shape-dropped-fails. A6 positive: rules-26; negative: no-dispatch-words.
 - Risk: rewrites sentences pinned at `test_review_convergence_contract.py:74-80,250-259`; pins move to the new order, coverage preserved. Pre-report return is not a verdict; agent-decided.
 
+**W0-02 Align the digest gate; pin the paragraph whole; graduate probes**  after: W0-01, W1-01  acceptance: 2, 6
+- Files: `loom-code/skills/closing-review/SKILL.md`, `loom-code/scripts/test_parallel_acceptance_review_text.py`, `docs/loom/2026-09-24-parallel-acceptance-testing-and-review/evidence/probes/test_parallel_pin_appended_rule.py`, `docs/loom/2026-09-24-parallel-acceptance-testing-and-review/evidence/probes/test_gate_count_stale_trunk_ref.py`
+- Test: A2 positive: gate-names-report-commit-in-round-1; negative: appended-reversal-fails. A6 positive: literal-gate-count; negative: stale-trunk-ref-independent.
+- Risk: adversary findings: §3's single-digest sentence contradicted the gated §4 digest definition; pins missed an appended sentence and depended on origin/main. Probes graduate; agent-decided.
+
 ### Wave 1 — release
 
 **W1-01 Minor release metadata 3.14.0**  after: W0-01  acceptance: 5, 6
