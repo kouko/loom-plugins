@@ -1,0 +1,41 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-24-parallel-acceptance-testing-and-review",
+  "content_digest": "0b60830dcbcc9763cf30f4ff5f85ad097617f908",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/scripts/test_parallel_acceptance_review_text.py -q",
+      "artifact": "loom-code/scripts/test_parallel_acceptance_review_text.py",
+      "result": "pass",
+      "command_digest": "a0303cb8be2126450a6dc0d6a17c240dbca54d8d795a282dcbde83c94e3e6996"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-code-r3",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-skill-r3",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
