@@ -267,6 +267,7 @@ functional-content digests; changing the task, app, branch, reviewer, vendor,
 model, or technical design does not reset that limit.
 A digest is distinct whenever a functional-content file changed since the
 content the reviewers last read; publication-only edits do not change it.
+A report commit the reviewers read inside Round 1 (§3) belongs to Round 1's digest.
 
 - **Round 1 — full review.** Review the cumulative functional content.
 - **Round 2 — fix verification.** Batch fatal and important findings, return to

@@ -1,7 +1,10 @@
 """Acceptance testing starts with the first-round reviewers, who are resumed with its committed
-report before their Round 1 verdict (plan W0-01; intent 2026-09-24-parallel-acceptance-testing-
-and-review Acceptance 1, 2, 3, 4, 6). concern: false-green prose pin — each rule sentence is
-pinned exactly and the §3 rules whole, so a reversed, re-assigned or appended rule must fail.
+report before their Round 1 verdict (plan W0-01, W0-02; intent 2026-09-24-parallel-acceptance-
+testing-and-review Acceptance 1, 2, 3, 4, 6). concern: false-green prose pin — each rule sentence
+is pinned exactly and the §3 paragraph whole to its blank-line boundary, so a reversed,
+re-assigned, inserted or appended rule must fail (graduated probe: a reversal appended after the
+skip sentence). concern: moving-ref pin — the gate-marker count is a literal, never compared
+with `origin/main`, whose local position changes the answer for the same commit.
 """
 import subprocess
 import sys
@@ -13,8 +16,12 @@ CODE = ROOT / "loom-code"
 SKILL = CODE / "skills/closing-review/SKILL.md"
 REVIEW = flat_prose(SKILL)
 DEPTH = REVIEW.split("## 2. Compute review depth", 1)[1].split("## 3.", 1)[0]
-HEAD, TAIL = "is publication metadata. ", " When `acceptance-test` is skipped"
-PARA = REVIEW.partition("## 3. Run acceptance testing ")[2].partition(HEAD)[2].split(TAIL)[0]
+RAW_PARAS = [p for p in SKILL.read_text(encoding="utf-8").split("\n\n")
+             if p.startswith("Use acceptance testing when")]
+PARA = " ".join(RAW_PARAS[0].split())
+EPISODE = REVIEW.partition("<!-- gate: review.bounded-episode --> ")[2]
+DIGEST = "A digest is distinct" + EPISODE.partition("A digest is distinct")[2].split(
+    " - **Round 1")[0]
 SECTION = flat_prose(CODE / "agents/reviewer.md").partition(
     "## Round 1 alongside acceptance testing ")[2].split(" ## Fix rounds")[0]
 S2 = ("When acceptance testing is needed, it starts together with the first-round reviewers on the "
@@ -36,7 +43,18 @@ NEW_RULES = (
     "A reviewer that cannot be resumed, such as a one-shot vendor CLI, starts after the report is "
     "committed.",
     "A report committed after their verdicts is new functional content and needs the next round.")
-S3 = NEW_RULES  # the paragraph's kept head and skip sentence border it (test below)
+KEPT = (
+    "Use acceptance testing when an Acceptance line cannot be settled mechanically.",
+    "Acceptance testing means dispatching the `loom-code:acceptance-tester` agent fresh-context, "
+    "never an agent that touched any part of the change.",
+    "Its `docs/loom/<change-id>/acceptance-test-report.md` is functional content;",
+    "only `attestation.json` is publication metadata.")
+SKIP = ("When `acceptance-test` is skipped (listed by `selection show` or skipped by the user's "
+        "plain-words instruction), run no acceptance testing.")
+S3 = KEPT + NEW_RULES + (SKIP,)  # the whole §3 paragraph, blank line to blank line
+S4 = ("A digest is distinct whenever a functional-content file changed since the content the "
+      "reviewers last read;", "publication-only edits do not change it.",
+      "A report commit the reviewers read inside Round 1 (§3) belongs to Round 1's digest.")
 REV = (
     "When closing review runs acceptance testing, it starts at the same time as your Round 1 review.",
     "First review the change as usual.",
@@ -56,7 +74,11 @@ WEAKENED = (
     (REV, "the delta from the commit you started on to the report commit", "a new `reviewed_sha`"),
     (S3, "needs the next round.", "needs the next round. The report commit is a separate digest."),
     (S2, "only after reading", "before reading"), (S2, "it starts together with", "it finishes before"),
-    (REV, "is not your verdict.", "is your verdict."), (REV, "return one verdict", "return a second verdict"))
+    (REV, "is not your verdict.", "is your verdict."), (REV, "return one verdict", "return a second verdict"),
+    (S3, SKIP, SKIP + " Otherwise dispatch the reviewers only after the report is committed, and a "
+     "reviewer's return before the report is its verdict."),
+    (S3, NEW_RULES[5], NEW_RULES[5] + " Its return before that resume is its verdict."),
+    (S4, " " + S4[2], ""), (S4, "belongs to Round 1's digest", "is a separate digest"))
 
 
 def pinned(text: str, sentences: tuple[str, ...]) -> bool:
@@ -66,8 +88,9 @@ def pinned(text: str, sentences: tuple[str, ...]) -> bool:
 def test_new_rules_are_pinned_exactly() -> None:
     assert DEPTH.count(f"<!-- /gate --> {S2[0]} After Build commits completed functional content, "
                        "run: ```text python3 <loom-code>/scripts/loom_checker.py reviewer-count") == 1
-    assert REVIEW.count(HEAD + " ".join(S3) + TAIL) == 1
-    assert pinned(PARA, S3) and pinned(SECTION, REV)
+    assert len(RAW_PARAS) == 1 and REVIEW.count(" ".join(S3)) == 1
+    assert pinned(PARA, S3) and pinned(SECTION, REV) and pinned(DIGEST, S4)
+    assert EPISODE.split("<!-- /gate -->")[0].count(" ".join(S4)) == 1
 
 
 def test_weakened_or_appended_rewrites_fail() -> None:
@@ -83,9 +106,7 @@ def test_one_fix_list_report_shape_gates_and_rules_kept() -> None:
             "functional-content digest into one list.") in REVIEW
     report = (CODE / "skills/closing-review/references/acceptance-test-report.md").read_text()
     assert "| # | What you asked for | Verdict | What happened | Re-run |" in report
-    main = subprocess.run(["git", "show", "origin/main:loom-code/skills/closing-review/SKILL.md"],
-                          cwd=ROOT, capture_output=True, text=True, check=True).stdout
-    assert SKILL.read_text().count("<!-- gate") == main.count("<!-- gate")
+    assert SKILL.read_text().count("<!-- gate") == 4  # as at branch base 710814a9
     assert not any(w in " ".join(S2 + NEW_RULES + REV) for w in ("dispatch", "new step"))
     rules = subprocess.run([sys.executable, str(CODE / "scripts/loom_checker.py"), "--list-rules"],
                            capture_output=True, text=True, check=True).stdout.splitlines()
