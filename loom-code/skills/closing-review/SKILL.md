@@ -139,7 +139,8 @@ reviewer and pass no `verdicts`.
 
 Reviewer independence is a quality requirement, not a ledger field. Give each
 reviewer the branch base, changed paths, intent, spec when present, plan, and
-the applicable lens from `references/lenses.md`. Reviewers return the
+the applicable lens from `references/lenses.md`. Tell each first-round
+reviewer whether acceptance testing runs alongside this round. Reviewers return the
 structured YAML required by `agents/reviewer.md`; the orchestrator converts
 the accepted fields to the temporary JSON consumed by finalization.
 
@@ -220,7 +221,9 @@ return before that resume is not a verdict. The commit the reviewers started
 from and the report commit form Round 1's single functional-content digest. A
 reviewer that cannot be resumed, such as a one-shot vendor CLI, starts after
 the report is committed. A report committed after their verdicts is new
-functional content and needs the next round.
+functional content and needs the next round. When the acceptance tester
+re-tests after a fix, finish that re-test and commit its report and evidence
+file before resuming the reviewers for that round.
 When `acceptance-test` is skipped (listed by `selection show` or skipped by
 the user's plain-words instruction), run no acceptance testing.
 

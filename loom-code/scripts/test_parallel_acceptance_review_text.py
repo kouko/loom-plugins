@@ -22,8 +22,16 @@ PARA = " ".join(RAW_PARAS[0].split())
 EPISODE = REVIEW.partition("<!-- gate: review.bounded-episode --> ")[2]
 DIGEST = "A digest is distinct" + EPISODE.partition("A digest is distinct")[2].split(
     " - **Round 1")[0]
-SECTION = flat_prose(CODE / "agents/reviewer.md").partition(
+REVIEWER = CODE / "agents/reviewer.md"
+SECTION = flat_prose(REVIEWER).partition(
     "## Round 1 alongside acceptance testing ")[2].split(" ## Fix rounds")[0]
+OUTPUT = flat_prose(REVIEWER).partition("## Output ")[2].split(" ```yaml")[0]
+INPUT_LINE = ("acceptance testing: alongside  # optional: you are resumed with the report delta; "
+              "absent means return your verdict directly")
+FIX_HEADING = "## Fix rounds — Round 2 and Round 3, when you are the resumed reader"
+S2_INPUT = ("Tell each first-round reviewer whether acceptance testing runs alongside this round.",)
+OUT = ("An interim return, Round 1's first return alongside acceptance testing, carries "
+       "`status: interim` in place of `verdict:`.",)
 S2 = ("When acceptance testing is needed, it starts together with the first-round reviewers on the "
       "same functional content (§3), and the reviewers give their Round 1 verdict only after reading "
       "its committed report.",)
@@ -42,7 +50,9 @@ NEW_RULES = (
     "functional-content digest.",
     "A reviewer that cannot be resumed, such as a one-shot vendor CLI, starts after the report is "
     "committed.",
-    "A report committed after their verdicts is new functional content and needs the next round.")
+    "A report committed after their verdicts is new functional content and needs the next round.",
+    "When the acceptance tester re-tests after a fix, finish that re-test and commit its report and "
+    "evidence file before resuming the reviewers for that round.")
 KEPT = (
     "Use acceptance testing when an Acceptance line cannot be settled mechanically.",
     "Acceptance testing means dispatching the `loom-code:acceptance-tester` agent fresh-context, "
@@ -56,13 +66,17 @@ S4 = ("A digest is distinct whenever a functional-content file changed since the
       "reviewers last read;", "publication-only edits do not change it.",
       "A report commit the reviewers read inside Round 1 (§3) belongs to Round 1's digest.")
 REV = (
-    "When closing review runs acceptance testing, it starts at the same time as your Round 1 review.",
+    "When your input says `acceptance testing: alongside`, closing review runs acceptance testing at "
+    "the same time as your Round 1 review.",
     "First review the change as usual.",
+    "Your first return carries `status: interim` and your findings, and leaves out the `verdict:` key.",
     "You are then resumed with the delta from the commit you started on to the report commit, which "
     "adds the acceptance test report and its evidence file.",
     "Read them against the change you reviewed: a verdict the evidence does not support is an "
     "overclaim, and an untried Acceptance line is an omission.",
     "Add your findings on them and return one verdict covering both the change and the report.",
+    "File each finding on the report under your lens's closest dimension, such as `correctness` for "
+    "the `code` lens.",
     "What you returned before that resume is not your verdict.")
 WEAKENED = (
     (S3, NEW_RULES[0], "Start the reviewers after the report is committed."),
@@ -78,7 +92,16 @@ WEAKENED = (
     (S3, SKIP, SKIP + " Otherwise dispatch the reviewers only after the report is committed, and a "
      "reviewer's return before the report is its verdict."),
     (S3, NEW_RULES[5], NEW_RULES[5] + " Its return before that resume is its verdict."),
-    (S4, " " + S4[2], ""), (S4, "belongs to Round 1's digest", "is a separate digest"))
+    (S4, " " + S4[2], ""), (S4, "belongs to Round 1's digest", "is a separate digest"),
+    (S3, "before resuming the reviewers", "after resuming the reviewers"),
+    (S3, "commit its report and evidence file before", "commit its report and evidence file after"),
+    (S3, " " + NEW_RULES[9], ""),
+    (REV, "leaves out the `verdict:` key", "carries its `verdict:`"),
+    (REV, "`status: interim` and your findings", "`verdict: NEEDS_REVISION` and your findings"),
+    (REV, "your lens's closest dimension", "a new `acceptance` dimension"),
+    (REV, "When your input says `acceptance testing: alongside`, closing", "When"),
+    (S2_INPUT, "whether acceptance testing runs alongside this round", "its lens"),
+    (S2_INPUT, S2_INPUT[0], ""), (OUT, "in place of `verdict:`", "alongside its `verdict:`"))
 
 
 def pinned(text: str, sentences: tuple[str, ...]) -> bool:
@@ -91,6 +114,15 @@ def test_new_rules_are_pinned_exactly() -> None:
     assert len(RAW_PARAS) == 1 and REVIEW.count(" ".join(S3)) == 1
     assert pinned(PARA, S3) and pinned(SECTION, REV) and pinned(DIGEST, S4)
     assert EPISODE.split("<!-- /gate -->")[0].count(" ".join(S4)) == 1
+
+
+def test_reviewer_is_told_it_runs_alongside_and_returns_interim_first() -> None:
+    assert DEPTH.count("the applicable lens from `references/lenses.md`. " + S2_INPUT[0]) == 1
+    assert pins_exact_sentence(DEPTH, S2_INPUT[0])
+    block = REVIEWER.read_text(encoding="utf-8").partition("## Your input")[2].split("## What")[0]
+    assert block.splitlines().count(INPUT_LINE) == 1
+    assert pinned(OUTPUT, OUT)
+    assert REVIEWER.read_text(encoding="utf-8").splitlines().count(FIX_HEADING) == 1
 
 
 def test_weakened_or_appended_rewrites_fail() -> None:

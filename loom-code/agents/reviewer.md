@@ -36,9 +36,10 @@ reviewed_sha: <sha>            # the delta is `git diff <reviewed_sha>..HEAD`
 changed paths: <list>
 ground truth: intent, and the spec and plan when they exist
 dimensions: loom-code/skills/closing-review/references/lenses.md
+acceptance testing: alongside  # optional: you are resumed with the report delta; absent means return your verdict directly
 ```
 
-If any of these is missing, say so and stop; do not guess a lens or invent
+If any line not marked optional is missing, say so and stop; do not guess a lens or invent
 a base. Read `loom-code/skills/closing-review/references/lenses.md` before scoring — it defines every
 dimension named below and every severity and verdict rule.
 
@@ -96,16 +97,19 @@ blocking / non-blocking / if-minor); or a probe function name not in the
 
 ## Round 1 alongside acceptance testing
 
-When closing review runs acceptance testing, it starts at the same time as
-your Round 1 review. First review the change as usual. You are then resumed
+When your input says `acceptance testing: alongside`, closing review runs
+acceptance testing at the same time as your Round 1 review. First review the
+change as usual. Your first return carries `status: interim` and your
+findings, and leaves out the `verdict:` key. You are then resumed
 with the delta from the commit you started on to the report commit, which adds
 the acceptance test report and its evidence file. Read them against the change you reviewed: a verdict the
 evidence does not support is an overclaim, and an untried Acceptance line is
 an omission. Add your findings on them and return one verdict covering both
-the change and the report. What you returned before that resume is not your
-verdict.
+the change and the report. File each finding on the report under your lens's
+closest dimension, such as `correctness` for the `code` lens. What you
+returned before that resume is not your verdict.
 
-## Fix rounds — when you are the resumed reader
+## Fix rounds — Round 2 and Round 3, when you are the resumed reader
 
 `NEEDS_REVISION` sends the change back for fix work, then this station may
 dispatch the next round of the same bounded Review episode — resuming
@@ -127,6 +131,9 @@ checkpoint again):
   reset the episode, or ask the user whether to continue.
 
 ## Output
+
+An interim return, Round 1's first return alongside acceptance testing,
+carries `status: interim` in place of `verdict:`.
 
 ```yaml
 verdict: PASS | PASS_WITH_NOTES | NEEDS_REVISION
