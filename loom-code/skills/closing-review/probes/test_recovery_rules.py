@@ -12,7 +12,9 @@ A3 negative: RL-04 — the lookup paragraph carries no second copy of the
              a second copy.
 A4 positive: RL-05 — an unanswered decision point stops the run and asks.
 A4 boundary: RL-06 — an answered decision, including a general delegation,
-             proceeds as user-decided, and the skip confirmation is untouched.
+             proceeds as user-decided, and the skip confirmation is untouched
+             (a skip follows the plain-words rule in §1 since #43; the
+             restored expert-mode ending is rejected).
 A5 positive: RL-07 — a failed recovery stops and says what happened.
 A5 negative: RL-08 — a failed recovery neither retries nor hands on.
 A2 boundary: RL-10 — the station sequence is recorded, a second entry is the
@@ -81,10 +83,10 @@ RL_15_INDEPENDENCE_CLAUSE = (
     "this rule and is never incremented by §4's ordinary "
     "round-and-digest progression"
 )
-RL_06_ENDING = (
-    "a user-requested skip is still confirmed exactly as "
-    "[expert-mode](../expert-mode/SKILL.md) requires."
-)
+# Updated after #43 moved skip confirmation from expert-mode to the
+# plain-words rule in §1; this probe dir is not collected by the package
+# suite, so the old expert-mode expectation went stale unnoticed.
+RL_06_ENDING = "a user-requested skip follows the plain-words rule in §1."
 RL_08_ENDING = "Do not attempt that item a second time and do not hand the change on to another station."
 
 # The exact sentence REQ-1's bounded lookup adds (finding ADV-04): the
@@ -329,20 +331,46 @@ def test_RL_05_unanswered_decision_stops_and_asks():
     print("RL-05 PASS: an unanswered decision stops the run and asks")
 
 
+RL_06_PHRASES = [
+    "has answered it",
+    "you decide",
+    "user-decided",
+    # scope: this governs asking again, not how a skip is confirmed
+    "whether the run asks again",
+    "plain-words rule in §1",
+]
+
+
 def test_RL_06_answered_decision_proceeds_and_the_skip_rule_is_untouched():
     """An answered decision, delegation included, proceeds as user-decided."""
-    para = _require(
-        "RL-06",
-        DECISION_OPENER,
-        [
-            "has answered it",
-            "you decide",
-            "user-decided",
-            # scope: this governs asking again, not how a skip is confirmed
-            "whether the run asks again",
-            "expert-mode",
-        ],
+    para = _require("RL-06", DECISION_OPENER, RL_06_PHRASES)
+    _check_RL_06(para)
+    print("RL-06 PASS: an answered decision proceeds; the skip confirmation is untouched")
+
+
+def test_RL_06_rejects_the_restored_expert_mode_ending():
+    """Negative: a rewrite that restores the pre-#43 expert-mode ending fails
+    RL-06, so the pin tracks the plain-words skip rule rather than accepting
+    either wording."""
+    para = _paragraph(DECISION_OPENER)
+    rewritten = para.replace(
+        "a user-requested skip follows the plain-words rule in §1.",
+        "a user-requested skip is still confirmed exactly as "
+        "[expert-mode](../expert-mode/SKILL.md) requires.",
     )
+    assert rewritten != para, "the current RL-06 ending was not found to rewrite"
+    try:
+        _check_RL_06(rewritten)
+    except SystemExit:
+        return
+    raise AssertionError("RL-06 accepted a paragraph restoring the old expert-mode ending")
+
+
+def _check_RL_06(para):
+    missing = [phrase for phrase in RL_06_PHRASES if phrase not in para]
+    if missing:
+        print(f"RL-06 FAIL: paragraph {DECISION_OPENER!r} is missing {missing}")
+        sys.exit(1)
     # "proceed" is a literal substring of "do not proceed", so containment
     # alone is satisfied by the negated rewrite. Isolate the clause carrying
     # it and guard its polarity directly.
@@ -358,7 +386,6 @@ def test_RL_06_answered_decision_proceeds_and_the_skip_rule_is_untouched():
     if ending != RL_06_ENDING:
         print(f"RL-06 FAIL: the paragraph's closing sentence changed; ends with {ending!r}")
         sys.exit(1)
-    print("RL-06 PASS: an answered decision proceeds; the skip confirmation is untouched")
 
 
 def test_RL_07_failed_recovery_stops_and_reports():
@@ -522,6 +549,7 @@ if __name__ == "__main__":
     test_RL_04_no_second_copy_of_the_artifact_station_mapping()
     test_RL_05_unanswered_decision_stops_and_asks()
     test_RL_06_answered_decision_proceeds_and_the_skip_rule_is_untouched()
+    test_RL_06_rejects_the_restored_expert_mode_ending()
     test_RL_07_failed_recovery_stops_and_reports()
     test_RL_08_failed_recovery_neither_retries_nor_hands_on()
     test_RL_10_the_sequence_is_recorded_and_the_second_entry_is_the_last()
