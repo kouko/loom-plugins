@@ -26,21 +26,25 @@ Evidence from three local projects (2026-09-25 audit):
 Prose rules alone were not followed; rules with a check were.
 
 ## Proposed outcome
-A project can hold one standing ARCHITECTURE.md of structural rules, created
-and kept current through a loom-design tool, and loom holds each change to it
-at the same level it holds changes to DESIGN.md: planning reads it, closing
-review checks conformance, a missing file is a warning and never a block.
-Rules that can be checked mechanically also get a guard test that the
+A project can hold one standing ARCHITECTURE.md. When a project has none, a
+loom-design tool designs the engineering architecture and folder structure
+with the user: it reads the project's requirements and existing code, proposes
+options with trade-offs, and records what the user chooses as design decisions
+with reasons plus structural rules. loom then holds each change to that
+document at the same level it holds changes to DESIGN.md: planning reads it,
+closing review checks conformance, a missing file is a warning and never a
+block. Rules that can be checked mechanically also get a guard test that the
 package suite runs, so a violation fails the build.
 
 ## Acceptance
-1. In a repository without one, a user can invoke a loom-design tool that produces a user-ratified ARCHITECTURE.md holding only structural rules (module boundaries and allowed dependencies, where new files go, file size limits, required CI stages), with no project overview.
-2. Every rule in that file that can be checked mechanically comes with a guard test that the repository's package suite runs.
-3. When a change breaks a checkable rule, the package suite fails with a message that names the rule, the offending file, and the two ways out: conform to the rule, or change the rule and its guard together.
-4. When ARCHITECTURE.md exists, the plan for a change that adds or moves files places them by its rules and names the rule it followed.
-5. When ARCHITECTURE.md exists, closing review reports whether the change conforms to it, and a violation is a finding that sends the change back; this uses the existing reviewers, with no reviewer added.
-6. When ARCHITECTURE.md is absent, every change shows a warning line alongside the existing standing-document warnings, never blocks, and the existing waiver silences it; review scores that conformance check as not applicable.
-7. The same tool updates an existing ARCHITECTURE.md when a change alters the structure, changing a rule and its guard together.
+1. In a repository without ARCHITECTURE.md, a loom-design tool reads the project's requirements and existing code and proposes an architecture covering module split and dependency direction, main technology choices, folder structure and required CI stages, giving at least two options with their trade-offs for each open choice, and the user picks.
+2. The chosen design is written as a user-ratified ARCHITECTURE.md at the repository root holding the design decisions with their reasons and the structural rules, with no project overview and no data models or API interfaces.
+3. Every rule in that file that can be checked mechanically comes with a guard test that the repository's package suite runs.
+4. When a change breaks a checkable rule, the package suite fails with a message that names the rule, the offending file, and the two ways out: conform to the rule, or change the rule and its guard together.
+5. When ARCHITECTURE.md exists, the plan for a change that adds or moves files places them by its rules and names the rule it followed.
+6. When ARCHITECTURE.md exists, closing review reports whether the change conforms to it, and a violation is a finding that sends the change back; this uses the existing reviewers, with no reviewer added.
+7. When ARCHITECTURE.md is absent, every change shows a warning line alongside the existing standing-document warnings, never blocks, and the existing waiver silences it; review scores that conformance check as not applicable.
+8. When a change alters the structure, the same tool re-designs the affected part and updates its design decisions, rules and guards together.
 
 ## Constraints
 - A missing ARCHITECTURE.md never blocks a change, matching DESIGN.md.
@@ -54,6 +58,7 @@ package suite runs, so a violation fails the build.
 - Adding ARCHITECTURE.md to komado-Refs, komado-Viewfinder, kumiko-zaiku-app-icons or this repository.
 - Having write-spec read ARCHITECTURE.md.
 - Splitting visual design out of loom-design.
+- Data models and API interfaces; they stay in each change's spec.
 
 ## Open questions
 - none
