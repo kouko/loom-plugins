@@ -1,5 +1,33 @@
 # Changelog
 
+## [3.16.0] — 2026-09-25 — plan and review read ARCHITECTURE.md
+
+Minor: station guidance and the contract manifest change for the new
+loom-design `architecture` tool (loom-design 2.4.0). No new checker rule id;
+the contract manifest version stays 2.3.1.
+
+- `write-plan` reads the repository-root `ARCHITECTURE.md` when it exists:
+  Step 5 places files by its rules and names the rule id on the task's Risk
+  line.
+- The code lens gains `architecture-conformance`, so it scores twelve
+  dimensions; the dimension is N/A when the repository has no
+  `ARCHITECTURE.md`. `reviewer.md` lists it.
+- The standing WARN now names a missing `ARCHITECTURE.md` beside
+  `PRINCIPLES.md` and `DESIGN.md`. It never blocks, and `standing-docs:
+  waived` silences it too.
+- The contract manifest registers the `architecture` tool (owner
+  loom-design), the `ARCHITECTURE.md` standing doc and its `standing`
+  artifact type.
+- Raise the counted-skill measurement ceiling from 22 to 23 for the
+  loom-design `architecture` tool (user-decided 2026-09-25); that ceiling is
+  a constant in `check_mechanisms.py --measure`, not an R3 budget exception,
+  so a twenty-fourth counted skill still fails.
+- Net mechanism count rises from 140 to 142: the `architecture` skill and
+  its contract entry `tool:architecture`.
+- budget-exception: architecture — new loom-design architecture tool, user-decided 2026-09-25; eval loom-design/tests/architecture/test_architecture_skill.py.
+- budget-exception: tool:architecture — contract entry for the new loom-design architecture tool, user-decided 2026-09-25; eval loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner.
+- The version bump lets installed copies pick up the change.
+
 ## [3.15.0] — 2026-09-25 — moved tests no longer count as new probe programs
 
 Minor: the recomputation behind one checker rule, `adversarial.proportionate`,

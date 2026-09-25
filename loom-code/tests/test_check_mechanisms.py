@@ -905,18 +905,7 @@ class TestMeasureFailsClosed:
     def test_real_repo_measure_is_green(self):
         assert cm.run_measure(REPO) == 0
 
-    def test_twenty_two_counted_skills_fit_admitted_expert_mode_budget(self, tmp_path):
-        repo = _measure_repo(tmp_path, words=10,
-                             baseline_line="- session-start-baseline: <sha> 10 — measured")
-        # The fixture already contains two counted skills.
-        for number in range(20):
-            skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
-            skill.parent.mkdir(parents=True, exist_ok=True)
-            skill.write_text("# Skill\n")
-        assert cm.measure_skill_count(repo) == 22
-        assert cm.run_measure(repo) == 0
-
-    def test_twenty_third_counted_skill_exceeds_budget(self, tmp_path, capsys):
+    def test_twenty_three_counted_skills_fit_admitted_architecture_budget(self, tmp_path):
         repo = _measure_repo(tmp_path, words=10,
                              baseline_line="- session-start-baseline: <sha> 10 — measured")
         # The fixture already contains two counted skills.
@@ -925,5 +914,16 @@ class TestMeasureFailsClosed:
             skill.parent.mkdir(parents=True, exist_ok=True)
             skill.write_text("# Skill\n")
         assert cm.measure_skill_count(repo) == 23
+        assert cm.run_measure(repo) == 0
+
+    def test_twenty_fourth_counted_skill_exceeds_budget(self, tmp_path, capsys):
+        repo = _measure_repo(tmp_path, words=10,
+                             baseline_line="- session-start-baseline: <sha> 10 — measured")
+        # The fixture already contains two counted skills.
+        for number in range(22):
+            skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
+            skill.parent.mkdir(parents=True, exist_ok=True)
+            skill.write_text("# Skill\n")
+        assert cm.measure_skill_count(repo) == 24
         assert cm.run_measure(repo) == 1
-        assert "skill count 23 exceeds the loom budget of 22" in capsys.readouterr().out
+        assert "skill count 24 exceeds the loom budget of 23" in capsys.readouterr().out
