@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.18.0] — 2026-09-25 — plan simplicity check
+
+Minor: `plan.field-caps` now requires a `## Simplicity check` record on
+charter 1.1 plans (the plan template is bumped to charter 1.1; charter 1.0
+plans are unchanged). A `- skipped — narrow change` line is accepted only
+when the plan's Files entries are narrow, judged with the existing
+classifier. `write-plan` dispatches one fresh `plan` lens reviewer, scoring
+deletion-first, before the plan commit; adoption is agent-decided, with no
+user question. Build §1 now runs `loom_checker.py plan` at entry as well as
+`selection show`. The adversary marks a reused test with its `concern:` line
+in the same dispatch that names it as the reused program. Station summary
+tables are updated across `write-plan`, `build`, `capture-intent` and
+`write-spec`. No new checker rule id, gate or mechanism; the net mechanism
+count stays 142; the contract manifest version stays 2.3.1.
+
 ## [3.17.0] — 2026-09-25 — test budget
 
 Minor: implementer rule 2 now states a test budget (at most one positive and
