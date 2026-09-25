@@ -90,33 +90,6 @@ def _ignored(repo: Path, command: list[str], wanted: Path) -> bool:
     return False
 
 
-def _walked_through_symlink(repo: Path, command: list[str], target: str, wanted: Path) -> bool:
-    """True when a tracked symlink under `target` leads pytest back to `wanted`.
-
-    pytest applies `--ignore=` to the path it walks, not the file's real
-    location, so a link `tests/alias -> local` re-collects every file under an
-    ignored `tests/local/`. The link's own walked path (parents resolved, the
-    link itself not) must escape the ignores and resolve onto `wanted` or one
-    of its folders, and the name pytest sees must match a test-file pattern.
-    """
-    listing = git_maybe(repo, "ls-files", "-s", "--", target) or ""
-    for line in listing.splitlines():
-        meta, _tab, path = line.partition("\t")
-        if not meta.startswith("120000 "):
-            continue
-        link = repo / path
-        walked = link.parent.resolve() / link.name
-        if _ignored(repo, command, walked):
-            continue
-        real = link.resolve()
-        name = link.name if real == wanted else wanted.name
-        if (real == wanted or real in wanted.parents) and any(
-            fnmatch(name, pattern) for pattern in PYTEST_FILE_PATTERNS
-        ):
-            return True
-    return False
-
-
 def suite_collects(repo: Path, artifact: str) -> bool:
     """True when the declared package suite already runs `artifact`.
 
@@ -128,11 +101,8 @@ def suite_collects(repo: Path, artifact: str) -> bool:
     `--ignore=` -- that is how the runner skips every `tests/local/` folder,
     so the runner's own rule is honoured rather than restated here.
 
-    An ignored file is still collected when a tracked symlink under a declared
-    directory resolves into its ignored folder: pytest matches `--ignore=`
-    against the path it walks, so the link's path escapes the ignore. Only
-    tracked links are followed, the simplest set that is both what the branch
-    commits and what the suite then walks (see `_walked_through_symlink`).
+    Known limitation (user-decided 2026-09-25): a committed symlink into an
+    ignored folder makes pytest collect its files again, and they go uncounted.
     """
     wanted = os.path.normpath(artifact)
     wanted_path = (repo / wanted).resolve()
@@ -144,13 +114,6 @@ def suite_collects(repo: Path, artifact: str) -> bool:
         if not (runs_pytest or runs_shell):
             continue
         if runs_pytest and _ignored(repo, command, wanted_path):
-            if any(
-                _walked_through_symlink(repo, command, os.path.normpath(token), wanted_path)
-                for token in command[1:]
-                if not token.startswith("-") and token != "pytest"
-                and (repo / os.path.normpath(token)).is_dir()
-            ):
-                return True
             continue
         for token in command[1:]:
             if token.startswith("-") or token == "pytest":

@@ -23,8 +23,9 @@ still read with `--no-renames`. A probe copied under a new name while the
 original stays is still counted, and so is a move rewritten below the
 similarity threshold. Programs under `tests/local/`, which the package
 suite skips through pytest `--ignore=`, are no longer counted as graduated
-into the suite, unless a tracked symlink under a test root leads pytest back
-into that folder, in which case the suite runs them and they still count.
+into the suite. Known limitation (user-decided 2026-09-25): a committed
+symlink into an ignored folder makes pytest collect its files again, and
+they go uncounted.
 
 **Why:** a count of new programs is a claim about what a branch produced.
 Without rename pairing a refactor that only moves files spends the whole

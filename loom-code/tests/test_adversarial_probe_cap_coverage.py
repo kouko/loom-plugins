@@ -3,8 +3,8 @@
 # halves of `adversarial.proportionate` are escaped by where a program is put
 # or what it is named.
 # concern: the probe-program count undercounts a program the change really
-# produced -- a rename whose source never carried `concern:`, a probe under
-# tests/local/ reached through a symlink, or a local diff.renameLimit.
+# produced -- a rename whose source never carried `concern:`, or a local
+# diff.renameLimit.
 """Attack `check_adversarial_proportionate` in
 `loom-code/scripts/loom_checker/probes.py`.
 
@@ -16,7 +16,6 @@ commit and ask both.
 """
 from __future__ import annotations
 
-import os
 import subprocess
 import sys
 import tempfile
@@ -227,19 +226,6 @@ def test_a_rename_from_a_plain_test_is_counted() -> None:
                   + "\n\ndef test_new_case() -> None:\n    assert True\n"})
     head = _commit_branch(repo)
     assert graduated_probe_programs(repo, head, CHANGE_ID) == [new_probe]
-
-
-def test_a_probe_under_tests_local_reached_through_a_symlink_is_counted() -> None:
-    """The runner ignores tests/local/ by path, but pytest collects a file
-    there again through a committed symlink `tests/alias -> local`; the suite
-    runs it, so it is graduated and counted."""
-    repo = _branch({})
-    hidden = f"{SUITE}/local/test_hidden.py"
-    _write(repo, {hidden: "# concern: hidden probe\ndef test_hidden() -> None:\n"
-                          "    assert True\n"})
-    os.symlink("local", repo / SUITE / "alias")
-    head = _commit_branch(repo)
-    assert graduated_probe_programs(repo, head, CHANGE_ID) == [hidden]
 
 
 def test_the_move_pairing_ignores_the_local_rename_limit() -> None:

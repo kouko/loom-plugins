@@ -22,9 +22,9 @@ guidance, field or contract manifest changes.
   excluded.
 - A program under a folder the declared suite command passes to pytest as
   `--ignore=` is no longer counted as graduated into the suite, so programs
-  under `tests/local/`, which the package suite skips, are not counted,
-  unless a tracked symlink under a test root leads pytest back into that
-  folder, in which case the suite runs it and it is still counted.
+  under `tests/local/`, which the package suite skips, are not counted.
+  Known limitation (user-decided): a committed symlink into an ignored folder
+  makes pytest collect its files again, and they go uncounted.
 - New memory entry
   `docs/loom/memory/moving-graduated-probes-used-to-trip-the-probe-cap.md`
   records the lesson.
