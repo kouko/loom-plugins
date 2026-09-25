@@ -15,7 +15,7 @@
 # 'import sys;print(len(sys.stdin.read().split()))'` with cwd = an empty
 # git repo must stay <= 2639 words (half of the 923fb84a baseline of 5278).
 # Python str.split(): BSD and GNU wc disagree on this output in every
-# locale. Guarded by scripts/test_session_start_words.py.
+# locale. Guarded by tests/test_session_start_words.py.
 #
 # CANONICAL key (both hosts consume): hookSpecificOutput.additionalContext.
 # DEFENSIVE keys (`additional_context`, bare `additionalContext`) are emitted

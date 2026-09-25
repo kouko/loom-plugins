@@ -397,7 +397,7 @@ def test_ask_keeps_the_question_on_every_change() -> None:
     assert "recommended" in flat
     assert "there is only one reader" not in flat
     # Lane wording is guarded once, across both plugins' runtime trees, by
-    # loom-code/scripts/test_write_plan_station_text.py::test_runtime_tree_names_no_lane.
+    # loom-code/tests/test_write_plan_station_text.py::test_runtime_tree_names_no_lane.
 
 
 ASK_SENTENCE = (

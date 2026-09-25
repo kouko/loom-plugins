@@ -869,7 +869,7 @@ def test_isolated_loom_memory_rejects_a_corrupted_fixture_copy_using_only_instal
 
 def _write_intake_fixture_repo(repo: Path, change_id: str) -> None:
     """A minimal git repo carrying a confirmed intent, ready for `intake
-    write-plan`. Mirrors loom-code/scripts/test_loom_checker_intake.py's
+    write-plan`. Mirrors loom-code/tests/test_loom_checker_intake.py's
     `make_repo()`: the checker's delivery-state rule reads the local
     remote-default ref, so this fixture needs one even though nothing is
     delivered on it."""

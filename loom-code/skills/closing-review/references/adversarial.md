@@ -143,7 +143,7 @@ same probe after graduation, named where the selected commit holds it.
   artifact type. Promote a
   probe into the repo's real test suite only through a plan task. A graduated
   probe is named at its suite path, such as
-  `loom-code/scripts/test_adversarial_empty_input.py`; `finalize-review`
+  `loom-code/tests/test_adversarial_empty_input.py`; `finalize-review`
   accepts exactly these two homes and counts either against the cap and the
   `concern:` line.
 - Anything the adversary found that matters

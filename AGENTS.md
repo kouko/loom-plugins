@@ -51,7 +51,7 @@ skills/init/references/v1/spec.md     ← references/ 下開 v1/
 - **locate** — A rule that belongs to one capability lives in that capability's file, while the shared part carries only what every capability shares and a sibling file carries only its own.
 - A capability's own test module is optional: `add` stays one file plus one routing entry, and `change` reads as its own test where it has one. Written without one, a capability gives up the guarantee that a failure names the capability that broke, and its removal is one deletion fewer.
 - 四條各自要有一支可執行的 check 擋著，散文不算：只寫在這裡而沒有 check 重算的判準就是缺陷。
-  `loom-code/scripts/test_module_criteria_text.py` 記著每一條由哪支 check 執行
+  `loom-code/tests/test_module_criteria_text.py` 記著每一條由哪支 check 執行
 - 範例是 `loom-code/skills/closing-review/references/` 底下的 adversary recipe 拆分
 
 ### Contract Citations

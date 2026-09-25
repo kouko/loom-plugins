@@ -48,7 +48,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "loom-code" / "scri
 from repo_files import nested_repositories, nested_worktrees  # noqa: E402
 
 LOCAL = "local"
-LEGACY_CODE = ("loom-code/scripts",)
 LEGACY_DESIGN = ("loom-design/scripts",)
 LEGACY_WORKFLOW = ("loom-workflow/scripts", "loom-workflow/skills/*/scripts")
 GROUPS = {"code", "design", "workflow-python", "workflow-shell", "workflow-mermaid"}
@@ -116,9 +115,8 @@ def loom_family_commands(
     commands: list[list[str]] = []
     if only in {None, "code"}:
         code = _tests_session(repo, [repo / "tests", repo / "loom-code" / "tests"])
-        legacy = [f.relative_to(repo).as_posix() for f in _legacy(repo, LEGACY_CODE)]
-        if code or legacy:
-            commands.append([*pytest, *legacy, *code, verbosity, "-n", "auto"])
+        if code:
+            commands.append([*pytest, *code, verbosity, "-n", "auto"])
     if only in {None, "design"}:
         sessions += [s for s in [_tests_session(repo, [repo / "loom-design" / "tests"])] if s]
         sessions += [[f.relative_to(repo).as_posix()] for f in _legacy(repo, LEGACY_DESIGN)]

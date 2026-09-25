@@ -74,7 +74,7 @@ mechanisms:
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w1-checkpoint-reviews.md"
   - id: maintain
     class: skill
-    eval: loom-code/scripts/test_simplified_station_text.py
+    eval: loom-code/tests/test_simplified_station_text.py
   - id: product-principles
     class: skill
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
@@ -110,107 +110,107 @@ mechanisms:
     eval: "loom-workflow/skills/loom-memory/scripts/test_skill_contract.py"
   - id: expert-mode
     class: skill
-    eval: "loom-code/scripts/test_expert_mode_skill.py::test_skill_procedure_maps_proposes_reports_withdraws_and_relapses"
+    eval: "loom-code/tests/test_expert_mode_skill.py::test_skill_procedure_maps_proposes_reports_withdraws_and_relapses"
 
   # --- checker-rule (loom_checker.py --list-rules is the count) ---
   - id: adversarial.proportionate
     class: checker-rule
-    eval: loom-code/scripts/test_selection_finalize.py::test_five_probe_programs_pass_and_a_sixth_is_refused
+    eval: loom-code/tests/test_selection_finalize.py::test_five_probe_programs_pass_and_a_sixth_is_refused
   - id: ci.pr-floor
     class: checker-rule
-    eval: loom-code/scripts/test_pr_floor.py::test_bad_body_exit_1_names_heading
+    eval: loom-code/tests/test_pr_floor.py::test_bad_body_exit_1_names_heading
   - id: contract.charter-complete
     class: checker-rule
-    eval: loom-code/scripts/test_contract_charter.py::test_charter_command_every_column_of_every_row_is_non_empty
+    eval: loom-code/tests/test_contract_charter.py::test_charter_command_every_column_of_every_row_is_non_empty
   - id: contract.requires
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_cli.py::test_contract_require_blocks_a_higher_minor
+    eval: loom-code/tests/test_loom_checker_cli.py::test_contract_require_blocks_a_higher_minor
   - id: intake.confirmed
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intake.py::test_confirmed_intent_is_accepted
+    eval: loom-code/tests/test_loom_checker_intake.py::test_confirmed_intent_is_accepted
   - id: intake.confirmed-behavior
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intake.py::test_product_spec_without_confirmed_behavior_is_blocked
+    eval: loom-code/tests/test_loom_checker_intake.py::test_product_spec_without_confirmed_behavior_is_blocked
   - id: intake.test-case-pair
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intake.py
+    eval: loom-code/tests/test_loom_checker_intake.py
   - id: intake.spec-ready
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intake.py::test_invalid_pre_build_review_declaration_is_blocked
+    eval: loom-code/tests/test_loom_checker_intake.py::test_invalid_pre_build_review_declaration_is_blocked
   - id: intent.kind-recompute
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intent.py::test_engineering_kind_over_an_interface_diff_is_blocked
+    eval: loom-code/tests/test_loom_checker_intent.py::test_engineering_kind_over_an_interface_diff_is_blocked
   - id: intent.needs-design-reason
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intent.py::test_needs_design_without_reason_is_blocked
+    eval: loom-code/tests/test_loom_checker_intent.py::test_needs_design_without_reason_is_blocked
   - id: intent.needs-design-recompute
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intent.py::test_needs_design_no_while_diff_touches_interface_surface_is_blocked
+    eval: loom-code/tests/test_loom_checker_intent.py::test_needs_design_no_while_diff_touches_interface_surface_is_blocked
   - id: intent.product-no-identifiers
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intent.py::test_product_problem_with_file_path_is_blocked
+    eval: loom-code/tests/test_loom_checker_intent.py::test_product_problem_with_file_path_is_blocked
   - id: intent.schema
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intent.py::test_complete_intent_passes
+    eval: loom-code/tests/test_loom_checker_intent.py::test_complete_intent_passes
   - id: plan.field-caps
     class: checker-rule
-    eval: loom-code/scripts/test_plan_field_caps.py::test_check_plan_field_caps_test_field_over_cap_names_task_and_field
+    eval: loom-code/tests/test_plan_field_caps.py::test_check_plan_field_caps_test_field_over_cap_names_task_and_field
   - id: land.merge
     class: checker-rule
-    eval: loom-code/scripts/test_land_merge.py::test_missing_or_foreign_name_blocks
+    eval: loom-code/tests/test_land_merge.py::test_missing_or_foreign_name_blocks
   - id: land.verify
     class: checker-rule
-    eval: loom-code/scripts/test_land_merge.py::test_title_only_commit_verify_blocks
+    eval: loom-code/tests/test_land_merge.py::test_title_only_commit_verify_blocks
   - id: land.cleanup
     class: checker-rule
-    eval: loom-code/scripts/test_land_sweep.py::test_changed_list_token_removes_nothing
+    eval: loom-code/tests/test_land_sweep.py::test_changed_list_token_removes_nothing
   - id: publish.preconditions
     class: checker-rule
-    eval: loom-code/scripts/test_loom_publish.py::test_publish_rejects_diverged_remote_before_push
+    eval: loom-code/tests/test_loom_publish.py::test_publish_rejects_diverged_remote_before_push
   - id: push.contextual-body
     class: checker-rule
-    eval: loom-code/scripts/test_loom_publish.py::test_contextual_body_gate_rejects_malformed_or_unsafe_schema
+    eval: loom-code/tests/test_loom_publish.py::test_contextual_body_gate_rejects_malformed_or_unsafe_schema
   - id: review.sync
     class: checker-rule
-    eval: loom-code/scripts/test_sync_trunk.py::test_conflict_names_every_file_and_restores_head
+    eval: loom-code/tests/test_sync_trunk.py::test_conflict_names_every_file_and_restores_head
   - id: spec.req-grammar
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intake.py::test_a_skipped_req_number_is_blocked
+    eval: loom-code/tests/test_loom_checker_intake.py::test_a_skipped_req_number_is_blocked
   - id: spec.ui-flows-recompute
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_intake.py::test_ui_flows_na_while_the_diff_touches_a_surface_is_blocked
+    eval: loom-code/tests/test_loom_checker_intake.py::test_ui_flows_na_while_the_diff_touches_a_surface_is_blocked
   - id: standing.product-principles-reject
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_standing.py::test_product_without_principles_is_rejected
+    eval: loom-code/tests/test_loom_checker_standing.py::test_product_without_principles_is_rejected
   - id: standing.second-vendor-valid
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_standing.py::test_removed_second_vendor_none_is_rejected_with_migration
+    eval: loom-code/tests/test_loom_checker_standing.py::test_removed_second_vendor_none_is_rejected_with_migration
   - id: standing.silence
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_standing.py::test_waiver_silences_the_warn
+    eval: loom-code/tests/test_loom_checker_standing.py::test_waiver_silences_the_warn
   - id: standing.warn
     class: checker-rule
-    eval: loom-code/scripts/test_loom_checker_standing.py::test_missing_standing_docs_warn_in_exactly_three_lines
+    eval: loom-code/tests/test_loom_checker_standing.py::test_missing_standing_docs_warn_in_exactly_three_lines
 
   # --- hook (9 raw entries across host manifests; 8 counted, 1 host-hygiene) ---
   - id: "SessionStart:startup|clear|compact:session-start"
     class: hook
-    eval: loom-code/scripts/test_session_start_words.py
+    eval: loom-code/tests/test_session_start_words.py
   - id: "PreToolUse:Bash|Write|Edit|MultiEdit|NotebookEdit:loom_checker.py"
     class: hook
-    eval: loom-code/scripts/test_selection_guard.py::test_claude_matcher_covers_bash_and_file_tools
+    eval: loom-code/tests/test_selection_guard.py::test_claude_matcher_covers_bash_and_file_tools
   - id: "PreToolUse:Bash:loom_checker.py@codex"
     class: hook
-    eval: loom-code/scripts/test_codex_stale_hook.py
+    eval: loom-code/tests/test_codex_stale_hook.py
   - id: "PreToolUse:apply_patch|Edit|Write:loom_checker.py@codex"
     class: hook
-    eval: loom-code/scripts/test_selection_guard.py::test_codex_file_tool_hook_delegates_to_checker_and_passes_when_missing
+    eval: loom-code/tests/test_selection_guard.py::test_codex_file_tool_hook_delegates_to_checker_and_passes_when_missing
   - id: "UserPromptSubmit::loom_checker.py"
     class: hook
-    eval: loom-code/scripts/test_selection_capture.py::test_user_prompt_with_code_binds_and_returns_system_message
+    eval: loom-code/tests/test_selection_capture.py::test_user_prompt_with_code_binds_and_returns_system_message
   - id: "UserPromptSubmit::loom_checker.py@codex"
     class: hook
-    eval: loom-code/scripts/test_selection_capture.py::test_codex_hook_never_blocks_when_checker_is_missing
+    eval: loom-code/tests/test_selection_capture.py::test_codex_hook_never_blocks_when_checker_is_missing
   - id: "UserPromptSubmit::visualization-card"
     class: hook
     eval: loom-workflow/scripts/test_visualization_card_hook.py
@@ -224,76 +224,76 @@ mechanisms:
     class: host-hygiene   # excluded from the net count — language-anchor is
                           # host infrastructure outside the loom flow, but a
                           # real hook entry, so it must still be listed.
-    eval: loom-code/scripts/test_language_anchor_hook.py
+    eval: loom-code/tests/test_language_anchor_hook.py
 
   # --- contract (63; loom-code/contract/manifest.yaml — stations, the 10
   #     non-standalone tools, actions and per-field artifact schemas) ---
-  - {id: "station:capture-intent", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
-  - {id: "station:write-spec",     class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
-  - {id: "station:write-plan",     class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
-  - {id: "station:build",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
-  - {id: "station:closing-review", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
-  - {id: "station:ship",           class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
-  - {id: "station:maintain",       class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_seven_stations_with_owner"}
-  - {id: "tool:product-principles",  class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:design-system",       class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:decision-map",        class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:handoff",             class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:recap-state",         class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:loom-visualization",  class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:distill-sessions",    class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:git-memory",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:independent-advisor", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:critique",            class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "action:restate-and-confirm", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:one-way-door",        class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:minimal-spec",        class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:principles-interview", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:package-tests",       class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:parallel-dispatch",   class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:worktree",            class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:read",                class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:acceptance-test",           class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:adversarial",         class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:checkpoint",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
-  - {id: "action:alert-to-intent",     class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "station:capture-intent", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
+  - {id: "station:write-spec",     class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
+  - {id: "station:write-plan",     class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
+  - {id: "station:build",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
+  - {id: "station:closing-review", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
+  - {id: "station:ship",           class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
+  - {id: "station:maintain",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
+  - {id: "tool:product-principles",  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:design-system",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:decision-map",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:handoff",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:recap-state",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:loom-visualization",  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:distill-sessions",    class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:git-memory",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:independent-advisor", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:critique",            class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "action:restate-and-confirm", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:one-way-door",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:minimal-spec",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:principles-interview", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:package-tests",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:parallel-dispatch",   class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:worktree",            class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:read",                class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:acceptance-test",           class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:adversarial",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:checkpoint",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
+  - {id: "action:alert-to-intent",     class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_every_action_names_one_owner_station"}
   # artifact:<name>.<field> — one id per declared field (F10); eval is the
   # single test that walks every field of every artifact against its
   # template, so a dropped field cannot hide behind the artifact-level id.
-  - {id: "artifact:intent.originator",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.kind",                class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.needs-design",        class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.map",                 class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.evidence",            class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.status",              class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.publication",         class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_intent_contract_declares_machine_readable_publication_authorization"}
-  - {id: "artifact:intent.Problem",             class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.Proposed outcome",    class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.Acceptance",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.Constraints",         class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.Value case",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.Out of scope",        class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:intent.Open questions",      class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:spec.intent",                class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:spec.confirmed-behavior",    class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:spec.pre-build-review",      class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:spec.Requirements",          class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:spec.Design decision",       class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:spec.Alternatives considered", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:spec.Current state evidence", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:spec.UI flows",              class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:plan.intent",                class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:plan.spec",                  class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:plan.Task DAG",              class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:plan.Risks",                 class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:plan.Current State Evidence", class: contract, eval: "loom-code/scripts/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
-  - {id: "artifact:attestation.schema",         class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
-  - {id: "artifact:attestation.change_id",      class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
-  - {id: "artifact:attestation.content_digest", class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
-  - {id: "artifact:attestation.executions",     class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
-  - {id: "artifact:attestation.verdicts",       class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
-  - {id: "artifact:attestation.findings",       class: contract, eval: "loom-code/scripts/test_loom_attestation.py"}
-  - {id: "artifact:attestation.selection",      class: contract, eval: "loom-code/scripts/test_selection_finalize.py::test_bound_skip_of_reviewers_and_adversarial_validates"}
+  - {id: "artifact:intent.originator",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.kind",                class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.needs-design",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.map",                 class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.evidence",            class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.status",              class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.publication",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_intent_contract_declares_machine_readable_publication_authorization"}
+  - {id: "artifact:intent.Problem",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.Proposed outcome",    class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.Acceptance",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.Constraints",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.Value case",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.Out of scope",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.Open questions",      class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:spec.intent",                class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:spec.confirmed-behavior",    class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:spec.pre-build-review",      class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:spec.Requirements",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:spec.Design decision",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:spec.Alternatives considered", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:spec.Current state evidence", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:spec.UI flows",              class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:plan.intent",                class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:plan.spec",                  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:plan.Task DAG",              class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:plan.Risks",                 class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:plan.Current State Evidence", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:attestation.schema",         class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
+  - {id: "artifact:attestation.change_id",      class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
+  - {id: "artifact:attestation.content_digest", class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
+  - {id: "artifact:attestation.executions",     class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
+  - {id: "artifact:attestation.verdicts",       class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
+  - {id: "artifact:attestation.findings",       class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
+  - {id: "artifact:attestation.selection",      class: contract, eval: "loom-code/tests/test_selection_finalize.py::test_bound_skip_of_reviewers_and_adversarial_validates"}
 
   # --- prose-gate: landed stations mark their real `<!-- gate: … -->`
   #     paragraphs in W1/W2, W3-06 §11 recomputes ---
@@ -305,16 +305,16 @@ mechanisms:
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/cold-read-A.md"
   - id: "write-plan.post-decision-conservative-default"
     class: prose-gate
-    eval: loom-code/scripts/test_simplified_station_text.py
+    eval: loom-code/tests/test_simplified_station_text.py
   - id: "write-plan.codex-installed-hook-trust-boundary"
     class: prose-gate
-    eval: loom-code/scripts/test_codex_hook_trust_contract.py
+    eval: loom-code/tests/test_codex_hook_trust_contract.py
   - id: "capture-intent.no-confirmed-without-restatement"
     class: prose-gate
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
   - id: "capture-intent.product-problem-plain-words"
     class: prose-gate
-    eval: loom-code/scripts/test_loom_checker_intent.py::test_product_problem_with_code_identifier_is_blocked
+    eval: loom-code/tests/test_loom_checker_intent.py::test_product_problem_with_code_identifier_is_blocked
   - id: "write-spec.product-visible-behaviour-confirmed-before-review"
     class: prose-gate
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
@@ -326,25 +326,25 @@ mechanisms:
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
   - id: "design-system.never-blocks"
     class: prose-gate
-    eval: loom-code/scripts/test_loom_checker_standing.py::test_missing_design_never_rejects
+    eval: loom-code/tests/test_loom_checker_standing.py::test_missing_design_never_rejects
   - id: "charter.plan-omission-narrow"
     class: prose-gate
-    eval: loom-code/scripts/test_simplified_station_text.py
+    eval: loom-code/tests/test_simplified_station_text.py
   - id: "review.bounded-episode"
     class: prose-gate
-    eval: loom-code/scripts/test_review_convergence_contract.py
+    eval: loom-code/tests/test_review_convergence_contract.py
   - id: "review.probe-graduation"
     class: prose-gate
-    eval: loom-code/scripts/test_review_convergence_contract.py::test_probe_graduation_gate_states_both_halves
+    eval: loom-code/tests/test_review_convergence_contract.py::test_probe_graduation_gate_states_both_halves
   - id: "review.atomic-claude-dispatch"
     class: prose-gate
-    eval: loom-code/scripts/test_dispatch_profile_contract.py::test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack
+    eval: loom-code/tests/test_dispatch_profile_contract.py::test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack
   - id: "goal-create.session-activation"
     class: prose-gate
     eval: loom-workflow/skills/goal-create/scripts/test_skill_md.py::test_session_activation_rules_are_one_registered_gate
   - id: "dispatch-profile.relative-routing"
     class: prose-gate
-    eval: loom-code/scripts/test_dispatch_profile_contract.py::test_class_relative_route_and_insufficient_evidence_boundary
+    eval: loom-code/tests/test_dispatch_profile_contract.py::test_class_relative_route_and_insufficient_evidence_boundary
   - id: "loom-visualization.obsidian-boundary"
     class: prose-gate
     eval: loom-workflow/skills/loom-visualization/scripts/test_templates.py::test_skill_declines_vault_target
@@ -353,7 +353,7 @@ mechanisms:
     eval: loom-workflow/skills/loom-visualization/scripts/test_templates.py::test_mermaid_gate_paragraph_present_requires_confirmed_host
   - id: "build.absence-recovery"
     class: prose-gate
-    eval: loom-code/skills/build/probes/test_recovery_rules.py
+    eval: loom-code/tests/test_build_recovery_rules.py
   - id: "review.absence-recovery"
     class: prose-gate
-    eval: loom-code/skills/closing-review/probes/test_recovery_rules.py
+    eval: loom-code/tests/test_closing_review_recovery_rules.py

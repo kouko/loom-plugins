@@ -50,8 +50,9 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
     rendered = [" ".join(command) for command in commands]
 
     code = loom_family_commands(REPO, verbosity="-q", only="code")[0]
-    assert {"tests", "loom-code/scripts"} <= set(code)
+    assert {"tests", "loom-code/tests"} <= set(code)
     assert "scripts" not in code and ".claude/hooks" not in code
+    assert "loom-code/scripts" not in code
     assert any("loom-design/scripts" in command for command in rendered)
     assert any(command[3:4] == ["loom-workflow/tests"] for command in commands)
     assert any("loom-workflow/tests/test-privacy-gate-compose-commit.sh" in command for command in rendered)
@@ -103,8 +104,8 @@ def _git(repo: Path, *args: str) -> None:
 
 def _seed_repo(repo: Path) -> None:
     """A real git repository -- the behaviour under test is git's own."""
-    (repo / "loom-code" / "scripts").mkdir(parents=True)
-    (repo / "loom-code" / "scripts" / "test_seed.py").write_text("def test_s():\n    pass\n")
+    (repo / "loom-code" / "tests").mkdir(parents=True)
+    (repo / "loom-code" / "tests" / "test_seed.py").write_text("def test_s():\n    pass\n")
     _git(repo, "init", "-q")
     _git(repo, "config", "user.email", "t@example.com")
     _git(repo, "config", "user.name", "T")
@@ -124,7 +125,7 @@ def test_targets_unchanged_without_nested_worktree(tmp_path: Path) -> None:
 def test_nested_worktree_is_ignored(tmp_path: Path) -> None:
     repo = tmp_path / "repo"; repo.mkdir()
     _seed_repo(repo)
-    nested = repo / "loom-code" / "scripts" / "wt"
+    nested = repo / "loom-code" / "tests" / "wt"
     _git(repo, "worktree", "add", "-q", "-b", "wt-branch", str(nested))
 
     commands = loom_family_commands(repo, verbosity="-q")
@@ -136,7 +137,7 @@ def test_nested_worktree_is_ignored(tmp_path: Path) -> None:
 
 
 def _collect_with_runner_ignores(repo: Path) -> str:
-    """Collect `loom-code/scripts/` with exactly the runner's `--ignore` tokens.
+    """Collect `loom-code/tests/` with exactly the runner's `--ignore` tokens.
 
     The `--ignore=` string being present is not the property that matters;
     what matters is that pytest then collects nothing from the nested
@@ -145,7 +146,7 @@ def _collect_with_runner_ignores(repo: Path) -> str:
     command = loom_family_commands(repo, verbosity="-q", only="code")[0]
     ignores = [token for token in command if token.startswith("--ignore=")]
     result = subprocess.run(
-        [sys.executable, "-m", "pytest", "loom-code/scripts/", "-q",
+        [sys.executable, "-m", "pytest", "loom-code/tests/", "-q",
          "-p", "no:cacheprovider", "--collect-only", *ignores],
         cwd=repo, capture_output=True, text=True,
     )
@@ -155,9 +156,9 @@ def _collect_with_runner_ignores(repo: Path) -> str:
 def test_nested_worktree_collects_nothing_from_it(tmp_path: Path) -> None:
     repo = tmp_path / "repo"; repo.mkdir()
     _seed_repo(repo)
-    nested = repo / "loom-code" / "scripts" / "wt"
+    nested = repo / "loom-code" / "tests" / "wt"
     _git(repo, "worktree", "add", "-q", "-b", "wt-branch", str(nested))
-    (nested / "loom-code" / "scripts" / "test_intruder.py").write_text(
+    (nested / "loom-code" / "tests" / "test_intruder.py").write_text(
         "def test_i():\n    assert False\n")
 
     assert "test_intruder" not in _collect_with_runner_ignores(repo)
@@ -168,7 +169,7 @@ def test_nested_clone_collects_nothing_from_it(tmp_path: Path) -> None:
     `repository_files` already says -- so its tests are not ours to run."""
     repo = tmp_path / "repo"; repo.mkdir()
     _seed_repo(repo)
-    inner = repo / "loom-code" / "scripts" / "vendor"
+    inner = repo / "loom-code" / "tests" / "vendor"
     inner.mkdir(parents=True)
     (inner / "test_foreign.py").write_text("def test_foreign():\n    assert False\n")
     _git(inner, "init", "-q")
