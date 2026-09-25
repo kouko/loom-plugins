@@ -40,9 +40,9 @@ charter: 1.0
 - Risk: inventory pins widen by one tool, none narrowed; description added within the catalog budget; agent-decided.
 
 **W1-03 loom-code minor release 3.16.0 with budget exception**  after: W1-02  acceptance: 6, 7
-- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/tests/test_write_plan_station_text.py`, `README.md`
+- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/tests/test_write_plan_station_text.py`, `README.md`, `loom-code/scripts/check_mechanisms.py`, `loom-code/tests/test_check_mechanisms.py`
 - Test: A6 positive: versions-synchronized-3.16.0; negative: check-mechanisms-without-exception-fails. A7 positive: changelog-names-standing-warn-change; boundary: contract-version-bumped.
-- Risk: minor for lens, standing text and contract entries; `budget-exception:` lines for the new skill and tool ids; agent-decided.
+- Risk: minor release; `budget-exception:` line for net 140→142; skill cap 22→23 admits architecture (user-decided 2026-09-25); widens `test_check_mechanisms.py` cap cases.
 
 ## Questions asked
 ① — what — 我原本以為他就是要幫我 設計整個系統架構 的噎 → 我想要走方案 2 因為正常流程就是應該要設計好工程架構跟專案資料夾管理
@@ -57,3 +57,4 @@ charter: 1.0
 4. `selection show` judged the intent-only branch narrow; the full flow runs because the change adds a tool and edits three stations (agent-decided).
 5. The intent was amended and re-confirmed (448fad32) after W0-01 landed: the tool designs, not only records; W0-04 carries the delta (user-decided 2026-09-25).
 6. Keep complexity low (user, 2026-09-25): the validator checks structure only, the know-how reference stays under about 150 lines, at most one positive/negative pair per Acceptance line.
+7. user-decided — the counted skill cap rises from 22 to 23 to admit the architecture tool, as releases 3.1.3 and 3.4.0 did (2026-09-25).
