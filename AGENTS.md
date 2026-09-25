@@ -51,8 +51,21 @@ skills/init/references/v1/spec.md     ← references/ 下開 v1/
 - **locate** — A rule that belongs to one capability lives in that capability's file, while the shared part carries only what every capability shares and a sibling file carries only its own.
 - A capability's own test module is optional: `add` stays one file plus one routing entry, and `change` reads as its own test where it has one. Written without one, a capability gives up the guarantee that a failure names the capability that broke, and its removal is one deletion fewer.
 - 四條各自要有一支可執行的 check 擋著，散文不算：只寫在這裡而沒有 check 重算的判準就是缺陷。
-  `loom-code/scripts/test_module_criteria_text.py` 記著每一條由哪支 check 執行
+  `loom-code/tests/test_module_criteria_text.py` 記著每一條由哪支 check 執行
 - 範例是 `loom-code/skills/closing-review/references/` 底下的 adversary recipe 拆分
+
+### Test Location
+
+**MUST：測試住在 `tests/` 資料夾，和它測的 code 分開。**
+
+- 每個 plugin 的測試放在 `<plugin>/tests/`；loom-workflow 的 skill 測試放在 `loom-workflow/tests/<skill>/`
+- Repository-level 測試（root `scripts/`、`.claude/hooks/` 的測試）放在 root `tests/`
+- 不可把測試放在 production code 旁邊（`scripts/` 內）或 skill 資料夾內（含 `probes/`）
+- `tests/local/` 放需要本機安裝 CLI 的測試，package suite 和 CI 都會跳過它
+- Package suite（`scripts/run_package_tests.py --loom-family`）只跑四個 test root：root `tests/`、`loom-code/tests/`、`loom-design/tests/`、`loom-workflow/tests/`，含它們的子資料夾，pytest 檔（`test_*.py`、`*_test.py`）和 shell 測試（`test-*.sh`）都自動探索，新增測試不用改 suite command；CI 也跑同一份 inventory
+- 四個 root 定義在 `scripts/run_package_tests.py` 的 `TEST_ROOTS` 常數；新增 plugin 時要把它的 `<plugin>/tests/` 加進這個常數，否則它的測試不會跑，repo-wide guard 也會擋下
+- 例外：`docs/loom/` 底下的 evidence probe 程式留在原處
+- 移除一個 skill 時一併刪掉它的測試（Module Criteria 的 **remove**）：loom-workflow 刪 `tests/<skill>/` 資料夾；loom-code 刪 `loom-code/tests/` 裡以該 skill 命名的檔案
 
 ### Contract Citations
 

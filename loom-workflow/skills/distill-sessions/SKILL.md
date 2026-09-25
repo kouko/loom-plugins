@@ -222,7 +222,7 @@ valid:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python -m pytest \
-  loom-workflow/skills/distill-sessions/scripts/ -v
+  loom-workflow/tests/distill-sessions/ -v
 ```
 
 If `__pycache__` appears, use the non-destructive two-pass `find -delete`

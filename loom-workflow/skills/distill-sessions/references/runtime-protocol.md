@@ -122,7 +122,7 @@ Always disable bytecode for tests:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 python -m pytest \
-  loom-workflow/skills/distill-sessions/scripts/ -v
+  loom-workflow/tests/distill-sessions/ -v
 ```
 
 If bytecode directories already exist, remove files first and then empty

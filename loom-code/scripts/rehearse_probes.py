@@ -63,7 +63,7 @@ from pathlib import Path
 from git_exec import run_git  # sibling module (no __init__.py, no conftest)
 from repo_files import repository_files  # sibling module, same convention
 
-DEFAULT_GLOB = "loom-code/scripts/test_probes_*.py"
+DEFAULT_GLOB = "loom-code/tests/test_probes_*.py"
 # Printed, alone, when the script is run with no `--repo` in a directory with
 # no `.git` entry in it or any ancestor -- a `git archive` extract being the
 # case that matters.

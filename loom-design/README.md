@@ -6,7 +6,7 @@
 > never grades. Every verdict on what it produces is rendered by
 > `loom-code:closing-review`, by an agent that did not write the draft.
 
-**Version**: 2.3.1 — 4 skills + 1 optional router. See
+**Version**: 2.3.2 — 4 skills + 1 optional router. See
 [CHANGELOG.md](CHANGELOG.md) for releases.
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -153,11 +153,11 @@ in the Antigravity desktop app or IDE.
 ## Tests
 
 ```sh
-python3 -m pytest loom-design/scripts/
+python3 -m pytest loom-design/tests/
 ```
 
 One invocation collects the `interface/`, `principles/` and `spec/`
-directories; `scripts/pytest.ini` sets `--import-mode=importlib` so
+directories; `tests/pytest.ini` sets `--import-mode=importlib` so
 same-named test modules can sit side by side. The complete package suite
 for all three plugins runs from the repository root:
 

@@ -1,0 +1,471 @@
+from __future__ import annotations
+
+import subprocess
+import hashlib
+import json
+import os
+import sys
+from io import StringIO
+from pathlib import Path
+
+from loom_checker import attestation as attestation_module
+from loom_checker import digest, probes, reviewers
+from loom_checker.command_handlers import finalize, reviewer_count
+
+
+CHANGE = "2026-09-08-example"
+
+
+def git(repo: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], check=True, capture_output=True, text=True
+    ).stdout.strip()
+
+
+def commit(repo: Path, message: str) -> str:
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", message)
+    return git(repo, "rev-parse", "HEAD")
+
+
+def repo_with_content(tmp_path: Path) -> Path:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    git(repo, "init", "-q")
+    git(repo, "config", "user.email", "test@example.com")
+    git(repo, "config", "user.name", "Test")
+    (repo / "src.py").write_text("VALUE = 1\n", encoding="utf-8")
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.parent.mkdir(parents=True, exist_ok=True)
+    kickoff.write_text("- package-tests: python3 -m pytest -q — fixture (2026-09-08)\n")
+    commit(repo, "initial")
+    return repo
+
+
+def manifest() -> dict:
+    return {"publication_only_paths": ["docs/loom/<change-id>/attestation.json"]}
+
+
+PROBE = f"docs/loom/{CHANGE}/evidence/probes/test_probe.py"
+
+
+def commit_probe(repo: Path) -> str:
+    """Commit a probe program where the protocol puts one.
+
+    `finalize-review` runs only an artifact committed there, so that every
+    program it executes is one `adversarial.proportionate` has counted.
+    """
+    path = repo / PROBE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "# concern: the fixture's own adversarial run\nprint('probe')\n",
+        encoding="utf-8",
+    )
+    commit(repo, "probe program")
+    return PROBE
+
+
+def test_functional_digest_ignores_declared_publication_paths(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    before = git(repo, "rev-parse", "HEAD")
+    evidence = repo / f"docs/loom/{CHANGE}/attestation.json"
+    evidence.parent.mkdir(parents=True)
+    evidence.write_text('{"content_digest":"old"}\n', encoding="utf-8")
+    after = commit(repo, "publication evidence")
+
+    assert digest.functional_content_digest(repo, before, CHANGE, manifest()) == \
+        digest.functional_content_digest(repo, after, CHANGE, manifest())
+
+
+def test_functional_mutation_invalidates_digest(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    before = git(repo, "rev-parse", "HEAD")
+    (repo / "src.py").write_text("VALUE = 2\n", encoding="utf-8")
+    after = commit(repo, "functional change")
+
+    assert digest.functional_content_digest(repo, before, CHANGE, manifest()) != \
+        digest.functional_content_digest(repo, after, CHANGE, manifest())
+
+
+def test_another_changes_attestation_is_functional_content(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    before = git(repo, "rev-parse", "HEAD")
+    other = repo / "docs/loom/another-change/attestation.json"
+    other.parent.mkdir(parents=True)
+    other.write_text("{}\n", encoding="utf-8")
+    after = commit(repo, "other evidence")
+
+    assert digest.functional_content_digest(repo, before, CHANGE, manifest()) != \
+        digest.functional_content_digest(repo, after, CHANGE, manifest())
+
+
+def matching_attestation(repo: Path) -> dict:
+    command = "python3 -m pytest -q"
+    adversarial = "python3 src.py"
+    return {
+        "schema": "loom-attestation/v1",
+        "change_id": CHANGE,
+        "content_digest": digest.functional_content_digest(
+            repo, git(repo, "rev-parse", "HEAD"), CHANGE, manifest()
+        ),
+        "executions": [{
+            "kind": "package-tests", "command": command, "artifact": "",
+            "result": "pass", "command_digest": hashlib.sha256(command.encode()).hexdigest(),
+        }, {
+            "kind": "adversarial", "command": adversarial, "artifact": "src.py",
+            "result": "pass", "command_digest": hashlib.sha256(adversarial.encode()).hexdigest(),
+        }],
+        "verdicts": [{
+            "reviewer": "reviewer-1", "vendor": "openai", "model": "test",
+            "lens": "code", "verdict": "PASS", "findings": [],
+        }, {
+            "reviewer": "reviewer-2", "vendor": "other", "model": "test",
+            "lens": "code", "verdict": "PASS", "findings": [],
+        }],
+        "findings": [],
+    }
+
+
+def test_matching_attestation_validates_without_executing_commands(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    failures = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, matching_attestation(repo), manifest()
+    )
+    assert failures == []
+
+
+def test_well_formed_forged_attestation_fails_closed(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    attestation["executions"][0]["command_digest"] = "0" * 64
+    failures = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    )
+    assert any("command digest" in reason for _, reason in failures)
+
+
+def test_package_execution_must_match_declared_command(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    attestation["executions"][0]["command"] = "true"
+    attestation["executions"][0]["command_digest"] = hashlib.sha256(b"true").hexdigest()
+    failures = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    )
+    assert any("declared package command" in reason for _, reason in failures)
+
+
+def test_attestation_requires_two_reviewers_and_adversarial_execution(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    attestation["verdicts"] = attestation["verdicts"][:1]
+    failures = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    )
+    assert any("two distinct reviewers" in reason for _, reason in failures)
+    attestation = matching_attestation(repo)
+    attestation["executions"] = attestation["executions"][:1]
+    failures = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    )
+    assert any("adversarial execution" in reason for _, reason in failures)
+
+
+def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
+    change_paths = {
+        f"docs/loom/intent/{CHANGE}.md",
+        f"docs/loom/{CHANGE}/plan.md",
+        "loom-code/scripts/test_example.py",
+        "docs/guide.md",
+    }
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 1
+    # Adding a test is low risk, so the floor is one; it is still a file the
+    # suite executes, so the delta is not narrow and skips no step.
+    assert reviewers.is_narrow_delta(change_paths, CHANGE) is False
+    assert reviewers.is_narrow_delta(
+        change_paths - {"loom-code/scripts/test_example.py"}, CHANGE
+    ) is True
+
+    for protected in (
+        "src.py",
+        "loom-code/skills/closing-review/SKILL.md",
+        "loom-code/agents/reviewer.md",
+        "loom-code/contract/manifest.yaml",
+        "loom-code/hooks/hooks.json",
+        "docs/loom/KICKOFF-DEFAULTS.md",
+        "PRINCIPLES.md",
+        "unknown.bin",
+        f"docs/loom/{CHANGE}/../../src.py",
+        "tests/skills/SKILL.md",
+        "tests/hooks/hooks.json",
+        "tests/contract/manifest.yaml",
+    ):
+        assert reviewers.reviewer_floor_for_paths(
+            change_paths | {protected}, CHANGE
+        ) == 2
+        assert reviewers.is_narrow_delta(change_paths | {protected}, CHANGE) is False
+
+
+def test_reviewer_floor_is_two_when_the_delta_removes_a_test() -> None:
+    """Adding a check is low risk; removing one changes what the repository
+    can still catch, so it keeps the default two reviewers."""
+    change_paths = {
+        f"docs/loom/intent/{CHANGE}.md",
+        "loom-code/scripts/test_example.py",
+        "docs/guide.md",
+    }
+    removed = {"loom-code/scripts/test_example.py"}
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE, removed) == 2
+    assert reviewers.is_narrow_delta(change_paths, CHANGE, removed) is False
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 1
+
+
+def test_is_narrow_delta_returns_false_for_mixed_delta() -> None:
+    """A delta with code changes is not narrow."""
+    change_paths = {
+        f"docs/loom/intent/{CHANGE}.md",
+        f"docs/loom/{CHANGE}/plan.md",
+        "loom-code/scripts/some_code.py",
+    }
+    assert reviewers.is_narrow_delta(change_paths, CHANGE) is False
+    assert reviewers.reviewer_floor_for_paths(change_paths, CHANGE) == 2
+
+
+def test_matching_low_risk_attestation_accepts_one_reviewer(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    guide = repo / "docs/guide.md"
+    guide.parent.mkdir(parents=True, exist_ok=True)
+    guide.write_text("Clarified usage.\n", encoding="utf-8")
+    commit(repo, "docs")
+    attestation = matching_attestation(repo)
+    attestation["verdicts"] = attestation["verdicts"][:1]
+
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    ) == []
+
+
+def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
+def test_reviewer_floor_sees_both_sides_of_a_protected_file_rename(
+    tmp_path: Path,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    runtime = repo / "runtime.py"
+    runtime.write_text("VALUE = 1\n", encoding="utf-8")
+    commit(repo, "runtime")
+    git(repo, "switch", "-q", "-c", "feature")
+    guide = repo / "docs/guide.md"
+    guide.parent.mkdir(parents=True, exist_ok=True)
+    runtime.rename(guide)
+    commit(repo, "rename runtime as docs")
+
+    assert reviewers.required_reviewer_count(repo, CHANGE) == 2
+
+
+def test_reviewer_count_command_reports_the_computed_floor(
+    tmp_path: Path, monkeypatch
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    guide = repo / "docs/guide.md"
+    guide.parent.mkdir(parents=True, exist_ok=True)
+    guide.write_text("Clarified usage.\n", encoding="utf-8")
+    commit(repo, "docs")
+    monkeypatch.chdir(repo)
+    out, err = StringIO(), StringIO()
+
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, err) == 0
+    assert out.getvalue() == "1\n"
+    assert err.getvalue() == ""
+
+
+def test_stale_attestation_fails_closed(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    (repo / "src.py").write_text("VALUE = 3\n", encoding="utf-8")
+    head = commit(repo, "new behavior")
+    failures = attestation_module.validate_attestation(repo, head, CHANGE, attestation, manifest())
+    assert any("functional content digest" in reason for _, reason in failures)
+
+
+def test_adversarial_execution_must_name_a_committed_artifact(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    command = "python3 missing.py"
+    attestation["executions"].append({
+        "kind": "adversarial", "command": command, "artifact": "missing.py",
+        "result": "pass", "command_digest": hashlib.sha256(command.encode()).hexdigest(),
+    })
+    failures = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    )
+    assert any("committed artifact" in reason for _, reason in failures)
+
+
+def test_adversarial_wrapper_cannot_fake_execution(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    command = "true src.py"
+    attestation["executions"][1].update({
+        "command": command,
+        "command_digest": hashlib.sha256(command.encode()).hexdigest(),
+    })
+    failures = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    )
+    assert any("execute the artifact directly" in reason for _, reason in failures)
+
+
+def test_pytest_runner_directly_executes_named_artifact() -> None:
+    assert probes.command_executes_artifact(
+        "python3 -m pytest tests/probe.py -q", "tests/probe.py"
+    )
+
+
+def bare_repo(tmp_path: Path) -> Path:
+    """A repository with no test-command marker and no KICKOFF-DEFAULTS, so
+    that `declared_test_command` falls through to the test-file scan."""
+    repo = tmp_path / "adopting"
+    repo.mkdir()
+    git(repo, "init", "-q")
+    git(repo, "config", "user.email", "test@example.com")
+    git(repo, "config", "user.name", "Test")
+    (repo / "src.py").write_text("VALUE = 1\n", encoding="utf-8")
+    commit(repo, "initial")
+    return repo
+
+
+def test_test_command_ignores_nested_worktree(tmp_path: Path) -> None:
+    """Files inside a linked worktree checked out under the repository are
+    another repository's; a test file there is not this repo's test suite."""
+    repo = bare_repo(tmp_path)
+    git(repo, "worktree", "add", "-q", "-b", "side", str(repo / "wt"))
+    (repo / "wt" / "test_someone_elses.py").write_text(
+        "def test_x():\n    assert True\n", encoding="utf-8"
+    )
+
+    assert probes.declared_test_command(repo) == (None, "")
+
+
+def test_test_command_still_detects_own_tests(tmp_path: Path) -> None:
+    repo = bare_repo(tmp_path)
+    (repo / "test_own.py").write_text(
+        "def test_x():\n    assert True\n", encoding="utf-8"
+    )
+
+    assert probes.declared_test_command(repo) == (
+        "python3 -m pytest -q", "detected test_*.py files"
+    )
+
+
+def test_finalize_review_runs_and_writes_matching_attestation(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-08)\n")
+    commit(repo, "declare tests")
+    probe = commit_probe(repo)
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({
+        "verdicts": [{
+            "reviewer": "reviewer-1", "vendor": "openai", "model": "test",
+            "lens": "code", "verdict": "PASS", "findings": [],
+        }, {
+            "reviewer": "reviewer-2", "vendor": "other", "model": "test",
+            "lens": "code", "verdict": "PASS", "findings": [],
+        }],
+        "findings": [],
+        "adversarial": [{"command": f"python3 {probe}", "artifact": probe}],
+    }), encoding="utf-8")
+    checker = Path(__file__).resolve().parents[1] / "scripts" / "loom_checker.py"
+    result = subprocess.run(
+        [sys.executable, str(checker), "finalize-review", CHANGE, "--input", str(review_input)],
+        cwd=repo, capture_output=True, text=True, env=os.environ.copy(),
+    )
+    assert result.returncode == 0, result.stderr
+    output = repo / f"docs/loom/{CHANGE}/attestation.json"
+    attestation = json.loads(output.read_text(encoding="utf-8"))
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    ) == []
+    assert [run["kind"] for run in attestation["executions"]] == [
+        "package-tests", "adversarial"
+    ]
+    assert attestation["schema"] == "loom-attestation/v2"
+    assert attestation["selection"] is None
+
+
+def test_v1_attestation_still_validates_unchanged(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    assert attestation["schema"] == "loom-attestation/v1"
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    ) == []
+    attestation["selection"] = None
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    ) != []
+
+
+def test_finalize_review_accepts_one_reviewer_for_low_risk_change(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-08)\n")
+    commit(repo, "declare tests")
+    git(repo, "switch", "-q", "-c", "feature")
+    guide = repo / "docs/guide.md"
+    guide.parent.mkdir(parents=True, exist_ok=True)
+    guide.write_text("Clarified usage.\n", encoding="utf-8")
+    commit(repo, "docs")
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({
+        "verdicts": [{
+            "reviewer": "reviewer-1", "vendor": "openai", "model": "test",
+            "lens": "docs", "verdict": "PASS", "findings": [],
+        }],
+        "findings": [],
+        # The delta is one low-risk doc, so the adversarial step is auto-skipped
+        # and the change records no adversarial run at all.
+        "adversarial": [],
+    }), encoding="utf-8")
+
+    result = subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().parents[1] / "scripts" / "loom_checker.py"), "finalize-review", CHANGE,
+         "--input", str(review_input)],
+        cwd=repo, capture_output=True, text=True, env=os.environ.copy(),
+    )
+
+    assert result.returncode == 0, result.stderr
+
+
+def test_finalize_surfaces_failed_command_output(tmp_path: Path, monkeypatch) -> None:
+    repo = repo_with_content(tmp_path)
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    (repo / "fail.py").write_text(
+        'print("PACKAGE_SENTINEL")\nraise SystemExit(7)\n', encoding="utf-8"
+    )
+    kickoff.write_text(
+        "- package-tests: python3 fail.py — fixture (2026-09-08)\n",
+        encoding="utf-8",
+    )
+    commit(repo, "set failing package command")
+    probe = commit_probe(repo)
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({
+        "verdicts": [
+            {"reviewer": "r1", "vendor": "openai", "model": "test", "lens": "code", "verdict": "PASS", "findings": []},
+            {"reviewer": "r2", "vendor": "openai", "model": "test", "lens": "skill", "verdict": "PASS", "findings": []},
+        ],
+        "findings": [],
+        "adversarial": [{"command": f"python3 {probe}", "artifact": probe}],
+    }), encoding="utf-8")
+    monkeypatch.chdir(repo)
+    error = StringIO()
+    assert finalize.cmd_finalize_review([CHANGE, "--input", str(review_input)], err=error) == 1
+    assert "PACKAGE_SENTINEL" in error.getvalue()

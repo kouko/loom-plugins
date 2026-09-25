@@ -6,7 +6,7 @@
 > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
 > `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
 
-**Version**: 2.3.1 — 4 skills + 任意のルーター 1 個。リリースは
+**Version**: 2.3.2 — 4 skills + 任意のルーター 1 個。リリースは
 [CHANGELOG.md](CHANGELOG.md) を参照。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -152,11 +152,11 @@ Antigravity のデスクトップアプリや IDE では走らない。
 ## テスト
 
 ```sh
-python3 -m pytest loom-design/scripts/
+python3 -m pytest loom-design/tests/
 ```
 
 1 回の実行で `interface/`・`principles/`・`spec/` の各ディレクトリを
-収集する。`scripts/pytest.ini` が `--import-mode=importlib` を設定し、
+収集する。`tests/pytest.ini` が `--import-mode=importlib` を設定し、
 同名の test モジュールが並存できるようにしている。3 つの plugin すべての
 パッケージテストは、リポジトリのルートから実行する：
 

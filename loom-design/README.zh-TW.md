@@ -5,7 +5,7 @@
 > 草稿，不打分數。這裡產出的東西一律由 `loom-code:closing-review` 下 verdict，而且
 > 下判斷的 agent 不是寫草稿的那一個。
 
-**Version**: 2.3.1 — 4 個 skill + 1 個可選入口路由。版本資訊見
+**Version**: 2.3.2 — 4 個 skill + 1 個可選入口路由。版本資訊見
 [CHANGELOG.md](CHANGELOG.md)。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -143,11 +143,11 @@ loom-design 本身沒有 hook；loom-code 的 hook 只在 `agy` CLI 執行，Ant
 ## 跑測試
 
 ```sh
-python3 -m pytest loom-design/scripts/
+python3 -m pytest loom-design/tests/
 ```
 
 一次呼叫就收齊 `interface/`、`principles/`、`spec/` 三個目錄；
-`scripts/pytest.ini` 設 `--import-mode=importlib`，讓同名的 test 模組能並存。
+`tests/pytest.ini` 設 `--import-mode=importlib`，讓同名的 test 模組能並存。
 三個 plugin 的完整套件測試從 repo 根目錄執行：
 
 ```sh

@@ -8,7 +8,7 @@ sources:
 
 The clone-and-run probe was green all through wave 1 because its
 graduated copy did not exist yet. The moment it was copied into
-`loom-code/scripts/test_probes_rehearsal_*.py`, the rehearsal ran it,
+`loom-code/tests/test_probes_rehearsal_*.py`, the rehearsal ran it,
 it cloned the repository, ran the probe files in the clone, met its own
 copy, cloned again — the working tree's shell showed 40
 `rehearse_probes.py` processes and five clone directories before the

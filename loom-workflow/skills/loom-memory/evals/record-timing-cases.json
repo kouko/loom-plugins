@@ -2,7 +2,7 @@
   "eval": "record-timing",
   "contract_under_test": "SKILL.md § Record — the **When** and **How much** clauses",
   "method": "A fresh agent is given the Record section verbatim and nothing else: no repository access, no search, no prior context. It answers three questions — when and on which branch it would record, a verdict per candidate, and whether its own RECORD count matches what the contract calls the normal outcome.",
-  "why_not_a_ci_job": "The subject is whether prose still steers a reader, which needs a reader. An agent cannot run in CI, so this is a frozen reference run: re-run it when the Record clauses change. The regression test in scripts/test_skill_contract.py is what runs on every push, and it can only detect deletion, never dilution.",
+  "why_not_a_ci_job": "The subject is whether prose still steers a reader, which needs a reader. An agent cannot run in CI, so this is a frozen reference run: re-run it when the Record clauses change. The regression test in loom-workflow/tests/loom-memory/test_skill_contract.py is what runs on every push, and it can only detect deletion, never dilution.",
   "situation": "Finishing a change whose branch and pull request are open, CI green, not merged.",
   "candidates": [
     {

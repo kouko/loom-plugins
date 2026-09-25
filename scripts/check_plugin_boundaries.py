@@ -12,7 +12,7 @@ plugin root, via ``repo_files.repository_files``: passing a subdirectory scopes
 the listing to that subtree, so an ignored directory and a linked worktree
 checked out inside the plugin contribute no violation.  That module ships with
 loom-code and is reached across trees by sys.path, as
-``loom-design/scripts/spec/test_write_spec_contract.py`` already does.
+``loom-design/tests/spec/test_write_spec_contract.py`` already does.
 
 Stdlib only, that module included.  ``find_boundary_violations`` is the
 hermetic test surface; the CLI exits non-zero and prints each violation when

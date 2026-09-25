@@ -1,5 +1,38 @@
 # Changelog
 
+## [3.14.1] — 2026-09-25 — tests live in loom-code/tests
+
+Patch: file locations only. No station guidance, field, rule id or contract
+change, and no test assertion changes except the one skipped pair below.
+
+- The 104 `loom-code/scripts/test_*.py` files and the three skill probe
+  files move to `loom-code/tests/`; the two recovery-rule probes are now
+  `test_build_recovery_rules.py` and `test_closing_review_recovery_rules.py`,
+  and the emptied `skills/*/probes/` folders are gone. The 23 skill probe
+  tests are collected by the package suite for the first time.
+- `loom-code/tests/integration/` becomes `loom-code/tests/local/`; the
+  package suite skips it, so its four local-only integration scripts are run
+  by hand.
+- `scripts/run_package_tests.py` names the four test roots once, as
+  `TEST_ROOTS` (root `tests/`, `loom-code/tests/`, `loom-design/tests/`,
+  `loom-workflow/tests/`), and discovers pytest files and `test-*.sh`
+  inside them and their subfolders, skipping each root's `local/`; the code
+  group runs the root `tests/` and `loom-code/tests/`. A repository-wide
+  guard in `tests/test_tests_folder_convention.py` fails on any test file
+  (`test_*.py`, `*_test.py`, `test-*.sh`) outside those roots and outside
+  `docs/loom/`, so a test left in root `scripts/`, `.claude/hooks/`, a
+  plugin's own folders or a tests folder the suite does not run is refused;
+  a new plugin's tests are refused until its root is added to `TEST_ROOTS`.
+- Code group counts: 2271 passed, 2 skipped before; 2335 passed, 2 skipped
+  after. The 64 new tests are the 23 probes and 41 inventory and guard
+  tests in the root `tests/`; no earlier test is missing.
+- The coldread branch-end graduated probe,
+  `test_graduated_probe_copies_byte_identical_to_evidence_originals`, still
+  compares every other pair byte for byte, and skips the one pair where the
+  file compares itself with its own original, because the move had to edit
+  that file.
+- The version bump lets installed copies pick up the moved paths.
+
 ## [3.14.0] — 2026-09-24 — the fix list covers what the reviewers just read
 
 Minor: the closing-review station's guidance and the implementer contract

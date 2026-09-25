@@ -4,6 +4,25 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.3.3] — 2026-09-25 — tests live in loom-workflow/tests
+
+Patch. File locations only; no behaviour or test assertion changes.
+
+- The 58 test files under `skills/<skill>/scripts/` move to
+  `loom-workflow/tests/<skill>/`, the 21 under `scripts/` to
+  `loom-workflow/tests/scripts/`, and `.claude-plugin/test_plugin_manifest.py`
+  to `loom-workflow/tests/`. Runtime scripts stay in the skill folders.
+- The package suite discovers `loom-workflow/tests/`: the top level in one
+  session and each subfolder in its own, and runs every `test-*.sh` under
+  `loom-workflow/tests/`, subfolders included. The manifest test is
+  collected for the first time. The repository-wide guard fails when a test
+  file is left under `skills/`, `scripts/`, `.claude-plugin/` or anywhere
+  else outside `loom-workflow/tests/`.
+- Python counts: 1052 passed, 3 skipped before; 1053 passed, 3 skipped
+  after, in the same 11 sessions. The one new test is the manifest test.
+  Shell tests: 145 PASS before and after.
+- The version bump lets installed copies pick up the moved paths.
+
 ## [5.3.2] — 2026-09-23 — the blind run is renamed to independent acceptance testing
 
 Patch. Wording only, following loom-code 3.10.0; no behaviour changes.
