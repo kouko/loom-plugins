@@ -1,3 +1,4 @@
+# concern: the test-budget guidance being dropped, negated, or turned into a line cap
 """Pins the test budget (change 2026-09-25-keep-mechanical-tests-small).
 
 One assertion per plan case. A4's rule count is already pinned by
