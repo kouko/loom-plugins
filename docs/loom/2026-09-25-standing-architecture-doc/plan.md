@@ -14,7 +14,7 @@ charter: 1.0
 
 **W0-04 The tool designs with the user; Decisions section; re-design mode**  after: W0-01  acceptance: 1, 2, 8
 - Files: `loom-design/skills/architecture/SKILL.md`, `loom-design/skills/architecture/references/architecture-md-schema.md`, `loom-design/skills/architecture/references/design-know-how.md`, `loom-design/scripts/architecture/validate_architecture_output.py`, `loom-design/tests/architecture/test_architecture_skill.py`, `loom-design/tests/architecture/test_validate_architecture_output.py`, `docs/loom/2026-09-25-standing-architecture-doc/evidence/architecture-design-research.md`
-- Test: A1 positive: skill-reads-code-and-proposes-two-options-per-choice; negative: single-answer-proposal-not-allowed. A2 positive: decisions-section-valid; negative: decision-without-reason-rejected. A8 positive: skill-states-redesign-updates-decisions-rules-guards; negative: unratified-file-rejected.
+- Test: A1 positive: skill-reads-code-and-proposes-two-options-per-choice; negative: single-answer-proposal-not-allowed. A2 positive: decisions-section-valid; negative: decisions-section-missing-rejected. A8 positive: skill-states-redesign-updates-decisions-rules-guards; negative: unratified-file-rejected.
 - Risk: intent amended at decision point one after W0-01 landed; widens `test_validate_architecture_output.py` coverage, none narrowed; know-how cited from the research evidence; agent-decided.
 
 **W0-02 Standing WARN and contract entries name ARCHITECTURE.md**  after: W0-04  acceptance: 7
@@ -56,3 +56,4 @@ charter: 1.0
 3. The counted tool budget reaches its ceiling of eighteen; a later tool needs a budget decision first.
 4. `selection show` judged the intent-only branch narrow; the full flow runs because the change adds a tool and edits three stations (agent-decided).
 5. The intent was amended and re-confirmed (448fad32) after W0-01 landed: the tool designs, not only records; W0-04 carries the delta (user-decided 2026-09-25).
+6. Keep complexity low (user, 2026-09-25): the validator checks structure only, the know-how reference stays under about 150 lines, at most one positive/negative pair per Acceptance line.
