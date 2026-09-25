@@ -77,8 +77,10 @@ target: this change's programs under `docs/loom/<change-id>/evidence/probes/`
 and the repository's related tests. It reuses a program that covers a case,
 modifies one when a small change covers it, and writes a new probe only when
 nothing covers the case. A permanent repository test that already covers a
-case counts as reuse: the adversary names it in `reason` and leaves the test as
-it is. Its report marks
+case counts as reuse: when the adversary names it as this change's
+adversarial program, it adds that test's line-start `concern:` comment
+naming the defect kind it defends against in the same dispatch and commits
+it, and the test otherwise stays unchanged. Its report marks
 each probe `reused`, `modified` or `new`, with a one-line reason for every new
 one. A stale case that is rewritten or flipped to its positive form counts as
 `modified`. Each probe program stays small and reuses the repository's
