@@ -11,6 +11,9 @@ _VALID = """\
 # Architecture
 ratified-by: Alex Rivera 2026-09-25
 
+## Decisions
+- D-1 — layer-first folders — options: layer-first, feature-first — reason: one small app
+
 ## Module boundaries
 - MB-1 — ui/ never imports db/ — check: tests/arch/test_boundaries.py
 
@@ -34,9 +37,18 @@ def _write(tmp_path: Path, text: str, guard: bool = True) -> Path:
     return path
 
 
-def test_ratified_rules_only_file_valid(tmp_path):
+def test_decisions_section_valid(tmp_path):
     ok, problems = validate(_write(tmp_path, _VALID))
     assert ok, problems
+
+
+def test_decisions_section_missing_rejected(tmp_path):
+    text = _VALID.replace(
+        "## Decisions\n- D-1 — layer-first folders — options: layer-first, feature-first "
+        "— reason: one small app\n\n", "")
+    ok, problems = validate(_write(tmp_path, text))
+    assert not ok
+    assert any("Decisions" in p for p in problems)
 
 
 def test_overview_section_rejected(tmp_path):

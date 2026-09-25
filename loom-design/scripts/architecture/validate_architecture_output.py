@@ -5,9 +5,10 @@ Valid iff:
   1. A well-formed `ratified-by: <name> <YYYY-MM-DD>` line is present.
      `--draft` accepts a file without one (the pre-ratification check the
      tool runs before read-back); a malformed line is always invalid.
-  2. Exactly the four rule sections appear as `## ` headings — Module
-     boundaries, File placement, File size, CI stages — and no other
-     `## ` section (an Overview does not change agent behaviour).
+  2. A `## Decisions` section and the four rule sections appear as `## `
+     headings — Module boundaries, File placement, File size, CI stages —
+     and no other `## ` section (an Overview does not change agent
+     behaviour). Decision entries are prose and are not checked.
   3. Every non-blank line under those sections is a rule line
      `- <ID> — <rule> — check: <guard path>` or `... — check: review`.
   4. Rule ids are unique across the file.
@@ -31,6 +32,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
+DECISIONS = "Decisions"
 SECTIONS = ("Module boundaries", "File placement", "File size", "CI stages")
 
 _RULE = re.compile(r"^- ([A-Z][A-Z0-9]*-\d+) — (\S.*?) — check: (\S+)\s*$")
@@ -78,14 +80,18 @@ def _check_ratified_by(text: str, draft: bool) -> list[str]:
 def _check_rules(text: str, repo_root: Path) -> list[str]:
     problems = []
     sections = _sections(text)
+    if DECISIONS not in sections:
+        problems.append(f"missing section '## {DECISIONS}'; record each design choice "
+                        f"there (choice, options considered, reason)")
     for name in SECTIONS:
         if name not in sections:
             problems.append(f"missing section '## {name}'; the four rule sections are "
                             f"{', '.join(SECTIONS)}")
     for name in sections:
-        if name not in SECTIONS:
+        if name not in SECTIONS and name != DECISIONS:
             problems.append(f"section '## {name}' is not allowed; ARCHITECTURE.md holds "
-                            f"only the four rule sections ({', '.join(SECTIONS)})")
+                            f"only '## {DECISIONS}' and the four rule sections "
+                            f"({', '.join(SECTIONS)})")
     seen: set[str] = set()
     for name in SECTIONS:
         for line in sections.get(name, []):

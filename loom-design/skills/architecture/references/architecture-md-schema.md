@@ -1,20 +1,32 @@
 # ARCHITECTURE.md schema
 
 `ARCHITECTURE.md` lives at the repository root, one per repository. It holds
-rules an agent can follow and a guard can check — nothing else. Overview or
-background prose does not change what an agent does, so it has no place here.
+the design decisions the user picked, with their reasons, and rules an agent
+can follow and a guard can check — nothing else. Overview or background
+prose does not change what an agent does, so it has no place here. Data
+models and API interfaces have no place here either: they belong to each
+change's spec.
 
 ## Shape
 
 1. A title line: `# Architecture`.
 2. Directly under the title, once the user has said yes to the restatement:
    `ratified-by: <name> <YYYY-MM-DD>`.
-3. Exactly these four sections, in this order, and no other `## ` section:
+3. A required `## Decisions` section, before the rule sections: one entry
+   per design choice, naming the choice, the options considered and the
+   reason:
+
+   ```
+   - D-<n> — <choice> — options: <option>, <option> — reason: <why>
+   ```
+
+4. Exactly these four rule sections, in this order, and no `## ` section
+   other than these and `## Decisions`:
    - `## Module boundaries` — which module may depend on which.
    - `## File placement` — where each kind of file goes.
    - `## File size` — the size limits files stay under.
    - `## CI stages` — what CI runs, and in what order.
-4. Under each section, one line per rule:
+5. Under each rule section, one line per rule:
 
    ```
    - <ID> — <rule> — check: <guard path>
@@ -30,7 +42,9 @@ background prose does not change what an agent does, so it has no place here.
      closing review's `architecture-conformance` dimension reads it instead.
 
 `scripts/architecture/validate_architecture_output.py` checks all of the
-above (with `--draft` before the `ratified-by:` line is written).
+above (with `--draft` before the `ratified-by:` line is written), except
+the wording of decision entries: it checks that `## Decisions` exists, not
+what each entry says.
 
 ## Guard failure message
 
@@ -52,15 +66,20 @@ ARCHITECTURE.md and re-ratify.
 
 ## Updating
 
-A rule and its guard change in the same commit. Changing one without the
-other leaves the document and the suite disagreeing, so the tool changes
-both, runs the validator, and re-ratifies with a new `ratified-by:` line.
+When a change alters the structure, the tool re-designs the affected part
+with the user, and the affected decisions, rules and guards change in the
+same commit. Changing one without the others leaves the document and the
+suite disagreeing, so the tool changes them together, runs the validator,
+and re-ratifies with a new `ratified-by:` line.
 
 ## Example
 
 ```
 # Architecture
 ratified-by: Alex Rivera 2026-09-25
+
+## Decisions
+- D-1 — layer-first folders (ui/, core/, db/) — options: layer-first, feature-first — reason: one small app; split by feature when a layer grows too big
 
 ## Module boundaries
 - MB-1 — ui/ never imports db/ — check: tests/arch/test_boundaries.py

@@ -10,10 +10,12 @@ version: 1.0.0
 Relative paths in this document are relative to this skill's own
 directory.
 
-The user asks for architecture rules for a repository. You run one short
-interview, write `ARCHITECTURE.md` at the repository root holding **rules
-only**, write a guard test for every rule that can be checked mechanically,
-restate the rules, and — on "yes" — write the `ratified-by:` line.
+The user asks for an architecture for a repository. You design it with the
+user — read what exists, propose options with trade-offs, let the user pick
+— then write `ARCHITECTURE.md` at the repository root holding **the
+decisions and the rules only**, write a guard test for every rule that can
+be checked mechanically, restate them, and — on "yes" — write the
+`ratified-by:` line.
 
 ## Step 0 — Check the contract version
 
@@ -34,25 +36,46 @@ Run this **on request** only. `ARCHITECTURE.md` is **never required**: an
 absent or unratified `ARCHITECTURE.md` never blocks a change, at any
 station.
 
-When `ARCHITECTURE.md` already exists, run in **update mode**: when a change
-alters the structure a rule governs, change the rule and its guard in the
-**same commit**, run the validator, then re-ratify (Step 4) — a rule
-changed without its guard, or a guard without its rule, leaves the
-document and the suite disagreeing.
+When `ARCHITECTURE.md` already exists, run in **re-design mode**: when a
+change alters the structure, re-design only the affected part with the
+user (Step 2, for the affected choices alone), then update the affected
+decisions, rules and guards in the **same commit**, run the validator, and
+re-ratify (Step 4) — a decision, rule or guard changed without the others
+leaves the document and the suite disagreeing.
 
-## Step 2 — Interview → ARCHITECTURE.md
+## Step 2 — Design with the user → ARCHITECTURE.md
 
-Read the repository's current layout first, then ask, in the user's own
-words:
+**Read first.** Read the project's requirements — its intent files,
+README and `PRINCIPLES.md`, when present — and the existing code: its
+layout, languages, build files, test setup and CI, if any.
 
-1. **Module boundaries** — which parts may depend on which, and which never.
-2. **File placement** — where each kind of file goes (code, tests, scripts).
-3. **File size** — the limit files should stay under, if any.
-4. **CI stages** — what CI runs, and in what order.
+**Propose.** The open choices are:
 
-Write `ARCHITECTURE.md` at the repository root following
-`references/architecture-md-schema.md`: a title, then exactly the four rule
-sections, one line per rule, and no overview or background section.
+1. **Module split and dependency direction** — which modules exist, which
+   may depend on which, and which never.
+2. **Main technology choices** — language, framework, key libraries, where
+   the existing code has not already settled them.
+3. **Folder structure** — where each kind of file goes (code, tests,
+   scripts), and the size a file stays under.
+4. **Required CI stages** — what CI must run, and in what order.
+
+A choice the existing code already settles is stated, not re-opened —
+unless the user asks to revisit it. For each open choice, present **at
+least two options** in MADR style: the decision drivers first, then each
+option's trade-off against those drivers ("good, because … / bad,
+because …"), then your recommendation and what would make it wrong.
+**Never present a single answer**, even when one option looks obvious.
+Draw the options from `references/design-know-how.md`. The user picks;
+on a question, answer it and present the options again.
+
+Data models and API interfaces stay out of this design: they belong to
+each change's spec.
+
+**Write.** Write `ARCHITECTURE.md` at the repository root following
+`references/architecture-md-schema.md`: a title, a `## Decisions` section
+recording each pick (the choice, the options considered, the reason), then
+exactly the four rule sections, one line per rule, and no overview or
+background section.
 
 ## Step 3 — Write the guards and validate
 
@@ -81,9 +104,9 @@ read back a file that has not exited 0 here.
 
 ## Step 4 — Restate and ratify
 
-Read every rule back to the user in plain words, with which ones a guard
-checks and which a reviewer judges. On a correction, fix it and read back
-again. On "yes" — and only then — write one line directly under the title:
+Read every decision and rule back to the user in plain words, with which
+rules a guard checks and which a reviewer judges. On a correction, fix it
+and read back again. On "yes" — and only then — write one line directly under the title:
 
 ```
 ratified-by: <name> <date>

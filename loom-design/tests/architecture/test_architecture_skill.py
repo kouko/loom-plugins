@@ -62,8 +62,22 @@ def test_never_blocks_language_present():
     assert "never required" in low and "never blocks" in low
 
 
-def test_update_changes_rule_and_guard_together():
-    low = _text().lower()
+def test_skill_reads_code_and_proposes_two_options_per_choice():
+    low = " ".join(_text().lower().split())
+    for phrase in ("existing code", "at least two options", "trade-off", "recommendation",
+                   "module split", "technology", "folder structure", "ci stages",
+                   "references/design-know-how.md", "## decisions"):
+        assert phrase in low, f"design step lacks {phrase!r}"
+
+
+def test_single_answer_proposal_not_allowed():
+    assert "never present a single answer" in " ".join(_text().lower().split())
+
+
+def test_skill_states_redesign_updates_decisions_rules_guards():
+    low = " ".join(_text().lower().split())
+    assert "re-design" in low
+    assert "decisions, rules and guards" in low
     assert "same commit" in low
     assert "re-ratify" in low
 
