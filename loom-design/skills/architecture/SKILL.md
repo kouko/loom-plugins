@@ -1,7 +1,7 @@
 ---
 name: architecture
 description: |
-  Ratify a repository's ARCHITECTURE.md: module boundaries, file placement, file size, and CI stage rules, each backed by a guard test. Use when asked for architecture rules or to change one. 架構規則 / アーキテクチャ規約.
+  Design and ratify ARCHITECTURE.md with the user: module boundaries, tech choices, folder layout, CI stages, then guard tests. Use to design or change a project's architecture. 架構設計 / 架構規則 / アーキテクチャ設計.
 version: 1.0.0
 ---
 

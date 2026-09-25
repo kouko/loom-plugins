@@ -1,12 +1,12 @@
 # loom-design
 
 > **The front of the Loom flow: two stations turn a rough idea into a
-> confirmed intent and, when the change needs design, a spec; two tools give
-> a product its principles and its visual system.** loom-design drafts; it
+> confirmed intent and, when the change needs design, a spec; three tools give
+> a product its principles, its visual system and its architecture.** loom-design drafts; it
 > never grades. Every verdict on what it produces is rendered by
 > `loom-code:closing-review`, by an agent that did not write the draft.
 
-**Version**: 2.3.2 — 4 skills + 1 optional router. See
+**Version**: 2.4.0 — 5 skills + 1 optional router. See
 [CHANGELOG.md](CHANGELOG.md) for releases.
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -28,6 +28,7 @@ flowchart TD
     subgraph tools["On-demand tools, not flow steps"]
         principles["loom-design:product-principles<br/>ratifies PRINCIPLES.md"]
         designsys["loom-design:design-system<br/>ratifies DESIGN.md"]
+        arch["loom-design:architecture<br/>designs and ratifies ARCHITECTURE.md"]
     end
 
     intent -->|"needs-design: yes"| spec
@@ -49,8 +50,8 @@ flowchart TD
   `pre-build-review: required`, it goes to `loom-code:closing-review` for one
   fresh-context `spec+adversarial` reviewer before planning; otherwise it
   goes straight to `loom-code:write-plan`.
-- **Tools** — `product-principles` and `design-system` run when asked, each
-  writing one file at the project root. They are not steps in the flow.
+- **Tools** — `product-principles`, `design-system` and `architecture` run when asked, each
+  writing one standing document at the project root. They are not steps in the flow.
 
 ## Skills
 
@@ -60,7 +61,8 @@ flowchart TD
 | [`write-spec`](skills/write-spec/SKILL.md) | station | `docs/loom/<change-id>/spec.md` | Write requirements, design decisions, current-state evidence and UI flows from a confirmed intent (decision point ②, product only). |
 | [`product-principles`](skills/product-principles/SKILL.md) | tool | `PRINCIPLES.md` | Ratify the product's standing principles: at least three ordered Non-negotiables and a `ratified-by: <name> <date>` line. |
 | [`design-system`](skills/design-system/SKILL.md) | tool | `DESIGN.md` | Ratify the visual system for a product with a UI: colour, type, spacing, shape and component tokens. |
-| [`using-loom-design`](skills/using-loom-design/SKILL.md) | router | — | Optional: route a broad product-definition request to one of the four skills above. It is not a prerequisite; each skill can be called directly. |
+| [`architecture`](skills/architecture/SKILL.md) | tool | `ARCHITECTURE.md` | Design the project's architecture with the user — module boundaries, tech choices, folder layout, CI stages — then back each rule with a guard test. |
+| [`using-loom-design`](skills/using-loom-design/SKILL.md) | router | — | Optional: route a broad product-definition request to one of the five skills above. It is not a prerequisite; each skill can be called directly. |
 
 **Standing documents.** A `kind: product` change is refused by loom-code's
 checker (`standing.product-principles-reject`) while the repository has no
