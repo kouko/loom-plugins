@@ -41,10 +41,17 @@ change's spec.
      be checked mechanically says `check: review` and has no guard; the
      closing review's `architecture-conformance` dimension reads it instead.
 
-`scripts/architecture/validate_architecture_output.py` checks all of the
-above (with `--draft` before the `ratified-by:` line is written), except
-the wording of decision entries: it checks that `## Decisions` exists, not
-what each entry says.
+`scripts/architecture/validate_architecture_output.py` checks:
+
+- exactly one well-formed `ratified-by:` line (with `--draft`, zero or one);
+- nothing above the first `## ` section but the title and that line;
+- `## Decisions` and the four rule sections, each once, in this order, and
+  no other `## ` section;
+- `## Decisions` is not empty — it does not check what each entry says;
+- every line under a rule section follows the rule grammar, ids are unique,
+  and each guard path is inside the repository and exists.
+
+It does not check that a guard tests its rule or that the suite runs it.
 
 ## Guard failure message
 

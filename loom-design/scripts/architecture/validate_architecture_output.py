@@ -2,13 +2,15 @@
 authoring contract.
 
 Valid iff:
-  1. A well-formed `ratified-by: <name> <YYYY-MM-DD>` line is present.
-     `--draft` accepts a file without one (the pre-ratification check the
-     tool runs before read-back); a malformed line is always invalid.
+  1. Exactly one well-formed `ratified-by: <name> <YYYY-MM-DD>` line is
+     present. `--draft` also accepts a file without one (the
+     pre-ratification check the tool runs before read-back); a malformed
+     or second line is always invalid.
   2. A `## Decisions` section and the four rule sections appear as `## `
      headings — Module boundaries, File placement, File size, CI stages —
      and no other `## ` section (an Overview does not change agent
-     behaviour). Decision entries are prose and are not checked.
+     behaviour). Decisions holds at least one non-blank line; its entries
+     are prose and their wording is not checked. Rule sections may be empty.
   3. Every non-blank line under those sections is a rule line
      `- <ID> — <rule> — check: <guard path>` or `... — check: review`.
   4. Rule ids are unique across the file.
@@ -16,6 +18,8 @@ Valid iff:
      the repository root (the file's parent directory) and exists there.
   6. No `## ` heading appears twice, and the sections come in schema order:
      Decisions, then the four rule sections in the order above.
+  7. Above the first `## ` heading there is only the `# ` title, the
+     `ratified-by:` line and blank lines.
 
 Like design-system's validator, this blocks nothing downstream: it is the
 authoring-side check the tool runs on its own output.
@@ -57,7 +61,25 @@ def _sections(text: str) -> dict[str, list[str]]:
     return sections
 
 
+def _check_top_matter(text: str) -> list[str]:
+    """Above the first `## ` heading: one `# ` title, the ratified-by line, blanks."""
+    problems = []
+    title_seen = False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            break
+        if line.startswith("# ") and not title_seen:
+            title_seen = True
+        elif line.strip() and not line.startswith("ratified-by:"):
+            problems.append(f"line above the first '## ' section is not allowed; only the "
+                            f"'# ' title and the 'ratified-by:' line go there: {line.strip()!r}")
+    return problems
+
+
 def _check_ratified_by(text: str, draft: bool) -> list[str]:
+    if len(_RATIFIED_BY_ANY.findall(text)) > 1:
+        return ["more than one 'ratified-by:' line; keep exactly one, replacing the old "
+                "line when re-ratifying"]
     if _RATIFIED_BY_ANY.search(text) is None:
         if draft:
             return []
@@ -84,6 +106,9 @@ def _check_rules(text: str, repo_root: Path) -> list[str]:
     sections = _sections(text)
     if DECISIONS not in sections:
         problems.append(f"missing section '## {DECISIONS}'; record each design choice "
+                        f"there (choice, options considered, reason)")
+    elif not any(line.strip() for line in sections[DECISIONS]):
+        problems.append(f"section '## {DECISIONS}' is empty; record each design choice "
                         f"there (choice, options considered, reason)")
     for name in SECTIONS:
         if name not in sections:
@@ -138,7 +163,7 @@ def validate(path: Path, draft: bool = False) -> tuple[bool, list[str]]:
     if not path.is_file():
         return False, [f"ARCHITECTURE.md does not exist: {path}"]
     text = path.read_text(encoding="utf-8")
-    problems = _check_ratified_by(text, draft) + _check_rules(text, path.resolve().parent)
+    problems = _check_top_matter(text) + _check_ratified_by(text, draft) + _check_rules(text, path.resolve().parent)
     return (not problems), problems
 
 

@@ -113,7 +113,8 @@ ratified-by: <name> <date>
 ```
 
 `<name>` is the user's own name or handle; `<date>` is today, `YYYY-MM-DD`.
-Run the validator again without `--draft`.
+In re-design mode, replace the existing `ratified-by:` line; never add a
+second. Run the validator again without `--draft`.
 
 ## Step 5 — Commit
 

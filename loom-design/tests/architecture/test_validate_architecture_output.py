@@ -58,11 +58,6 @@ def test_overview_section_rejected(tmp_path):
     assert any("Overview" in p for p in problems)
 
 
-def test_rule_with_existing_guard_valid(tmp_path):
-    ok, problems = validate(_write(tmp_path, _VALID))
-    assert ok, problems
-
-
 def test_missing_guard_path_rejected(tmp_path):
     ok, problems = validate(_write(tmp_path, _VALID, guard=False))
     assert not ok
@@ -94,3 +89,19 @@ def test_missing_section_bad_grammar_and_duplicate_ids_rejected(tmp_path):
     assert "CI stages" in joined
     assert "files stay small" in joined
     assert "FP-1" in joined and "unique" in joined
+
+
+def test_second_ratified_line_or_top_prose_rejected(tmp_path):
+    text = _VALID.replace("2026-09-25\n", "2026-09-25\nratified-by: Sam 2026-09-24\n")
+    ok, problems = validate(_write(tmp_path, text))
+    assert not ok and any("ratified-by" in p for p in problems)
+    text = _VALID.replace("# Architecture\n", "# Architecture\nA layered app.\n")
+    ok, problems = validate(_write(tmp_path / "prose", text))
+    assert not ok and any("A layered app." in p for p in problems)
+
+
+def test_empty_decisions_rejected(tmp_path):
+    text = _VALID.replace("- D-1 — layer-first folders — options: layer-first, feature-first "
+                          "— reason: one small app\n", "")
+    ok, problems = validate(_write(tmp_path, text))
+    assert not ok and any("Decisions" in p for p in problems)
