@@ -59,13 +59,13 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
 
     expected_skill_dirs = sorted(
         path.relative_to(REPO).as_posix()
-        for path in (REPO / "loom-workflow/skills").glob("*/scripts")
-        if any(path.glob("test_*.py"))
+        for path in (REPO / "loom-workflow/tests").iterdir()
+        if path.is_dir() and any(path.glob("test_*.py"))
     )
     actual_skill_dirs = sorted(
         command[3] for command in commands
         if command[:3] == [sys.executable, "-m", "pytest"]
-        and command[3].startswith("loom-workflow/skills/")
+        and command[3].startswith("loom-workflow/tests/")
     )
     assert actual_skill_dirs == expected_skill_dirs
 
@@ -84,14 +84,14 @@ def test_workflow_mermaid_group_installs_then_validates_with_no_skip_path() -> N
 def test_loom_family_preset_discovers_relocated_memory_skill_tests() -> None:
     commands = loom_family_commands(REPO, verbosity="-q")
     rendered = [" ".join(command) for command in commands]
-    assert any("loom-workflow/skills/loom-memory/scripts" in command for command in rendered)
+    assert any("loom-workflow/tests/loom-memory" in command for command in rendered)
 
 
 def test_relocated_memory_skill_tests_pass_through_the_workflow_python_command() -> None:
     commands = loom_family_commands(REPO, verbosity="-q", only="workflow-python")
     memory_command = next(
         command for command in commands
-        if "loom-workflow/skills/loom-memory/scripts" in command[3]
+        if "loom-workflow/tests/loom-memory" in command[3]
     )
     env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
     result = subprocess.run(memory_command, capture_output=True, text=True, cwd=REPO, env=env)

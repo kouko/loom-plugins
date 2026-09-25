@@ -83,31 +83,31 @@ mechanisms:
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
   - id: decision-map
     class: skill
-    eval: "loom-workflow/skills/decision-map/scripts/test_decision_map_intent_binding.py"
+    eval: "loom-workflow/tests/decision-map/test_decision_map_intent_binding.py"
   - id: handoff
     class: skill
-    eval: "loom-workflow/scripts/test_handoff_compaction.py"
+    eval: "loom-workflow/tests/scripts/test_handoff_compaction.py"
   - id: recap-state
     class: skill
-    eval: "loom-workflow/scripts/test_recap_state_compaction.py"
+    eval: "loom-workflow/tests/scripts/test_recap_state_compaction.py"
   - id: loom-visualization
     class: skill
-    eval: "loom-workflow/scripts/test_loom_visualization_compaction.py"
+    eval: "loom-workflow/tests/scripts/test_loom_visualization_compaction.py"
   - id: distill-sessions
     class: skill
-    eval: "loom-workflow/scripts/test_distill_sessions_compaction.py"
+    eval: "loom-workflow/tests/scripts/test_distill_sessions_compaction.py"
   - id: git-memory
     class: skill
-    eval: "loom-workflow/scripts/test_git_memory_compaction.py"
+    eval: "loom-workflow/tests/scripts/test_git_memory_compaction.py"
   - id: independent-advisor
     class: skill
-    eval: "loom-workflow/scripts/test_independent_advisor_compaction.py"
+    eval: "loom-workflow/tests/scripts/test_independent_advisor_compaction.py"
   - id: critique
     class: skill
-    eval: "loom-workflow/scripts/test_critique_compaction.py"
+    eval: "loom-workflow/tests/scripts/test_critique_compaction.py"
   - id: loom-memory
     class: skill
-    eval: "loom-workflow/skills/loom-memory/scripts/test_skill_contract.py"
+    eval: "loom-workflow/tests/loom-memory/test_skill_contract.py"
   - id: expert-mode
     class: skill
     eval: "loom-code/tests/test_expert_mode_skill.py::test_skill_procedure_maps_proposes_reports_withdraws_and_relapses"
@@ -213,13 +213,13 @@ mechanisms:
     eval: loom-code/tests/test_selection_capture.py::test_codex_hook_never_blocks_when_checker_is_missing
   - id: "UserPromptSubmit::visualization-card"
     class: hook
-    eval: loom-workflow/scripts/test_visualization_card_hook.py
+    eval: loom-workflow/tests/scripts/test_visualization_card_hook.py
   - id: "UserPromptSubmit::visualization-card@codex"
     class: hook
     eval: tests/test_loom_plugin_install_layout.py::test_codex_manifest_points_at_prompt_submit_card_hook
   - id: "PostToolUse:Write|Edit:validate-skill-folder-structure.sh"
     class: hook
-    eval: loom-workflow/scripts/test_validate_skill_folder_structure_hook.py::test_nested_subfolder_is_blocked
+    eval: loom-workflow/tests/scripts/test_validate_skill_folder_structure_hook.py::test_nested_subfolder_is_blocked
   - id: "PostToolUse:Skill:language-anchor.py"
     class: host-hygiene   # excluded from the net count — language-anchor is
                           # host infrastructure outside the loom flow, but a
@@ -341,16 +341,16 @@ mechanisms:
     eval: loom-code/tests/test_dispatch_profile_contract.py::test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack
   - id: "goal-create.session-activation"
     class: prose-gate
-    eval: loom-workflow/skills/goal-create/scripts/test_skill_md.py::test_session_activation_rules_are_one_registered_gate
+    eval: loom-workflow/tests/goal-create/test_skill_md.py::test_session_activation_rules_are_one_registered_gate
   - id: "dispatch-profile.relative-routing"
     class: prose-gate
     eval: loom-code/tests/test_dispatch_profile_contract.py::test_class_relative_route_and_insufficient_evidence_boundary
   - id: "loom-visualization.obsidian-boundary"
     class: prose-gate
-    eval: loom-workflow/skills/loom-visualization/scripts/test_templates.py::test_skill_declines_vault_target
+    eval: loom-workflow/tests/loom-visualization/test_templates.py::test_skill_declines_vault_target
   - id: "loom-visualization.mermaid-only-when-confirmed"
     class: prose-gate
-    eval: loom-workflow/skills/loom-visualization/scripts/test_templates.py::test_mermaid_gate_paragraph_present_requires_confirmed_host
+    eval: loom-workflow/tests/loom-visualization/test_templates.py::test_mermaid_gate_paragraph_present_requires_confirmed_host
   - id: "build.absence-recovery"
     class: prose-gate
     eval: loom-code/tests/test_build_recovery_rules.py

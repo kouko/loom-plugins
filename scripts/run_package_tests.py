@@ -19,10 +19,6 @@ with `--only`, are:
 - `workflow-shell`: every `loom-workflow/tests/test-*.sh`.
 - `workflow-mermaid`: the Mermaid validator and its negative check.
 
-A plugin whose tests have not moved into its `tests/` folder yet is still run
-from where they are (`LEGACY_*` below); an entry goes when its tests move, and a
-folder that no longer holds tests is dropped on its own.
-
 Whole directories are handed to pytest, and a nested git repository placed
 inside one of them -- a linked worktree, a clone dropped in `vendor/`, a
 submodule -- would have its test files collected and run as this repository's.
@@ -48,7 +44,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "loom-code" / "scri
 from repo_files import nested_repositories, nested_worktrees  # noqa: E402
 
 LOCAL = "local"
-LEGACY_WORKFLOW = ("loom-workflow/scripts", "loom-workflow/skills/*/scripts")
 GROUPS = {"code", "design", "workflow-python", "workflow-shell", "workflow-mermaid"}
 
 
@@ -68,10 +63,6 @@ def _holds_tests(folder: Path, skip: tuple[Path, ...] = ()) -> bool:
         "node_modules" not in path.parts and not any(s in path.parents for s in skip)
         for path in folder.rglob("test_*.py")
     )
-
-
-def _legacy(repo: Path, patterns: tuple[str, ...]) -> list[Path]:
-    return [f for p in patterns for f in sorted(repo.glob(p)) if _holds_tests(f)]
 
 
 def _tests_session(repo: Path, folders: list[Path]) -> list[str]:
@@ -101,7 +92,6 @@ def _workflow_sessions(repo: Path) -> list[list[str]]:
             *(f"--ignore={p.resolve()}" for p in (local, *subfolders) if p.exists()),
         ])
     sessions += [[d.relative_to(repo).as_posix()] for d in subfolders]
-    sessions += [[d.relative_to(repo).as_posix()] for d in _legacy(repo, LEGACY_WORKFLOW)]
     return sessions
 
 

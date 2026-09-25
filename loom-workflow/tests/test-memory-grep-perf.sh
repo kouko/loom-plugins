@@ -72,7 +72,7 @@ trap cleanup EXIT
 # https://git-scm.com/docs/git-fast-import#_data
 # The Python mirror of this emitter cites the same section — see
 # `_commit_block` in
-# loom-workflow/skills/git-memory/scripts/conftest.py.
+# loom-workflow/tests/git-memory/conftest.py.
 #
 # `supersede_count` ($4) must stay BELOW `memory_count` ($3): the first
 # pass covers commits [0, memory_count - supersede_count), so an equal

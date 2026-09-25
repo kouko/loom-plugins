@@ -8,7 +8,7 @@ different guards:
 
 | Failure | Guard | Runs |
 |---|---|---|
-| A clause is deleted | `scripts/test_skill_contract.py` | every push |
+| A clause is deleted | `loom-workflow/tests/loom-memory/test_skill_contract.py` | every push |
 | A clause is kept but softened until it no longer steers anyone | this eval | when the clauses change |
 
 A string assertion cannot detect the second: a rewrite that keeps the
@@ -28,7 +28,7 @@ Re-run this whenever the **When** or **How much** clause changes, and
 update the run below with the new result and an explicit reason.
 
 Nothing about prose makes that re-run happen on its own, so it is wired
-to a digest. `scripts/test_skill_contract.py` pins the sha256 of the
+to a digest. `loom-workflow/tests/loom-memory/test_skill_contract.py` pins the sha256 of the
 whitespace-flattened `Record` section; any edit to it turns that test
 red with a message naming this file. Updating the digest without
 re-running the eval is the single move that defeats the guard, and it
@@ -112,7 +112,7 @@ text.
 Contract version: the `Record` section after the scarcity clause dropped
 "or a backlog entry", so an unfinished item routes to an intent only;
 section digest `945a9cb2`, the value pinned in
-`scripts/test_skill_contract.py`. Twelve candidates, verdicts unchanged; the
+`loom-workflow/tests/loom-memory/test_skill_contract.py`. Twelve candidates, verdicts unchanged; the
 `belongs` label on candidates 8 and 10 now reads "intent". Readers: fresh-context
 `sonnet` agents, no tools used, two runs on the unchanged text and two on the
 changed text.

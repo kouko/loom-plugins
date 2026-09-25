@@ -2,7 +2,7 @@
 # test-privacy-scan.sh
 #
 # CI is bash-only for loom-workflow (loom-workflow/tests/test-*.sh); there is
-# no pytest job that runs loom-workflow/skills/git-memory/scripts/test_privacy_scan.py
+# no pytest job that runs loom-workflow/tests/git-memory/test_privacy_scan.py
 # in CI, so that pytest suite has zero regression protection there. This
 # test exercises the REAL privacy-scan.py CLI (not the pytest internals) so
 # the layer-1 secrets scanner's observable contract is pinned in the bash
