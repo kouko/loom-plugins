@@ -318,10 +318,11 @@ unrelated behaviour; keep scenario detail in the spec and never size by time.
 
 **Architecture.** When the repository root has `ARCHITECTURE.md`, read it
 before writing the Task DAG. Place every added or moved file by its rules,
-and name the rule id you followed on that task's Risk line (`FP-2`). A task
-that must break a rule instead changes the rule and its guard in the same
-task, through the loom-design `architecture` tool's re-design mode. With no
-`ARCHITECTURE.md`, nothing changes.
+and name the rule id you followed on that task's Risk line (`FP-2`). When a
+task must break a rule, the planner runs the loom-design `architecture`
+tool's re-design mode with the user before Build starts, and lists
+`ARCHITECTURE.md` and the rule's guard in that task's Files; an implementer
+never changes a rule on its own. With no `ARCHITECTURE.md`, nothing changes.
 
 A task that removes or materially rewrites a function, recognizer, or rule
 that already has tests names the existing test file on its Risk line and

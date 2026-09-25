@@ -35,12 +35,13 @@ def test_write_plan_step5_reads_architecture_and_names_rule() -> None:
 def test_absent_architecture_doc_adds_no_step() -> None:
     para = _step5_architecture_paragraph()
     assert re.search(r"[Ww]ith no `?ARCHITECTURE\.md`?, nothing changes", para), para
+    assert "an implementer never changes a rule" in para, para
 
 
 def test_code_lens_has_architecture_conformance_na_without_doc() -> None:
     text = LENSES.read_text(encoding="utf-8")
     code = text[text.index("## Code — twelve dimensions"):text.index("## Docs")]
-    assert re.search(r"^\| architecture-conformance \|", code, re.M), code
+    assert re.search(r"^\| architecture-conformance \|.*at least `important`", code, re.M), code
     assert re.search(r"^\| architecture \| .*SOLID", code, re.M), "SOLID row changed"
     na_rule = " ".join(text[text.index("A dimension with nothing to conform to"):].split())[:200]
     assert "`ARCHITECTURE.md`" in na_rule, na_rule

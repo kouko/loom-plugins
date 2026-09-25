@@ -140,6 +140,7 @@ def test_the_warn_wording_is_fixed(tmp_path: Path) -> None:
     first = warn_lines(run_checker("standing", str(first_intent), cwd=first_repo))
     second = warn_lines(run_checker("standing", str(second_intent), cwd=second_repo))
     assert first == second
+    assert first[1] == "WARN: without it, the closing-review station cannot check any change against it."
 
 
 def test_a_warn_never_blocks(tmp_path: Path) -> None:

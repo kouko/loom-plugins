@@ -55,8 +55,7 @@ def check_product_principles(repo: Path, front, principles) -> list[tuple[str, s
 
 STANDING_WARN = (
     "WARN: this repo has no {missing} yet.",
-    "WARN: without it, the closing-review station cannot check any change for consistency "
-    "against what this product is supposed to be.",
+    "WARN: without it, the closing-review station cannot check any change against it.",
     "WARN: say the word and I will write one; to stop seeing this, record "
     "`standing-docs: waived — <reason> (<date>)` in docs/loom/KICKOFF-DEFAULTS.md.",
 )
