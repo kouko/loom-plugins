@@ -1,19 +1,19 @@
 # 每份 plan 在 Build 前都先檢查有沒有更簡單的做法 — 我試了什麼、結果如何
 
-2026-09-25 在專案的乾淨副本（611c2182）上試。每一條怎麼試、回來什麼：`docs/loom/2026-09-25-plan-simplicity-check/evidence/acceptance-test-evidence.md`。
+2026-09-25 先在專案的乾淨副本（611c2182）上試過一次；closing review 發現「簡化檢查」寫在兩個檢查通過之後、但那兩個檢查會擋下還沒做簡化檢查的 plan，所以照字面永遠跑不到。修正後在新的乾淨副本（fc4dbf30）上重試受影響的條目。每一條怎麼試、回來什麼：`docs/loom/2026-09-25-plan-simplicity-check/evidence/acceptance-test-evidence.md`。
 
 ## 你要的東西，一條一條
 
 | # | 你要的 | 結果 | 發生了什麼 | Re-run |
 |---|---|---|---|---|
-| 1 | Before Build starts on a change, a fresh-context reviewer that did not write the plan checks it for a simpler way to reach the same Acceptance lines, and returns either no simpler shape or a concrete smaller shape. | works | 規劃步驟的說明要求在 commit plan 前派一個沒寫過這份 plan 的 reviewer；我另外找一個全新的 reviewer 只看這份說明，拿一份刻意做太多的小 plan 給它，它回了具體的縮小方案（四個 task 縮成兩個、拿掉三個多餘機制），沒有問任何問題。 | — |
-| 2 | The plan records the outcome of that check — the simpler shapes considered and whether each was taken or why not — and a plan without that record cannot enter Build. | works | 有紀錄（taken／declined 附理由，或「none found」）的 plan 通過；缺這一段、只剩空白、或寫成不合格式的一句話都被擋下；Build 一開始就跑這個檢查，只要沒通過就停；舊版（charter 1.0）的 plan 照舊通過。 | — |
-| 3 | The check needs only loom-code installed. | works | 用到的 reviewer、說明和檢查全部都在 loom-code 裡，沒有任何地方要求 loom-workflow。 | — |
-| 4 | A change the checker judges narrow skips the check, and says so. | works | 只改文件的 plan 寫「skipped — narrow change」可以通過；同一句話寫在會改程式的 plan 上會被擋，並說明「不夠窄，必須做檢查」。 | — |
-| 5 | The check never asks the user a question; adopting or declining a simpler shape is recorded as agent-decided. | works | 說明明寫「採用或拒絕都由 agent 決定、這一步不問使用者、只跑一輪」；實際試跑的 reviewer 也沒問問題。 | — |
-| 6 | When the adversary names an existing test as this change's adversarial program, it marks that test with its `concern:` line in the same dispatch, so finalize-review does not refuse the change for a missing line. | works | 在一個丟棄用的小專案裡，沿用的既有 test 沒標 concern 時最後檢查會拒絕；照新說明補上一行 concern 後就不再拒絕。 | — |
+| 1 | Before Build starts on a change, a fresh-context reviewer that did not write the plan checks it for a simpler way to reach the same Acceptance lines, and returns either no simpler shape or a concrete smaller shape. | works | 我照規劃步驟的順序，從範本寫出一份刻意做太多的小 plan，再照說明派一個全新的 reviewer；它拿到的輸入就是說明規定的那幾行，沒有因為缺東西而停下，回了三個具體的縮小方案（三個 task 縮成一個、拿掉 registry 和 YAML 設定）。 | 重試 |
+| 2 | The plan records the outcome of that check — the simpler shapes considered and whether each was taken or why not — and a plan without that record cannot enter Build. | works | 還沒記錄的草稿，兩個檢查都擋下；把三個方案記成「taken」後，兩個檢查都通過。現在的順序（先做簡化檢查、再跑檢查）照著做就走得通。 | 重試 |
+| 3 | The check needs only loom-code installed. | works | 用到的 reviewer、說明和檢查全部都在 loom-code 裡，沒有任何地方要求 loom-workflow。 | carried over — 修正沒有加入任何對其他 plugin 的依賴，重查仍然沒有 |
+| 4 | A change the checker judges narrow skips the check, and says so. | works | 只改文件的 plan 寫「skipped — narrow change」可以通過；同一句話寫在會改程式的 plan 上會被擋，並說明「不夠窄，必須做檢查」。 | 重試 |
+| 5 | The check never asks the user a question; adopting or declining a simpler shape is recorded as agent-decided. | works | 說明仍寫「採用或拒絕都由 agent 決定、不問使用者、只跑一輪」，也新寫明 reviewer 這一輪之後沒有修正回合；實際試跑的 reviewer 沒有問任何問題。 | 重試 |
+| 6 | When the adversary names an existing test as this change's adversarial program, it marks that test with its `concern:` line in the same dispatch, so finalize-review does not refuse the change for a missing line. | works | 在一個丟棄用的小專案裡，沿用的既有 test 沒標 concern 時最後檢查會拒絕；照新說明補上一行 concern 後就不再拒絕。 | carried over — 修正沒有動到 adversary 的說明，也沒有動到檢查程式 |
 
-涵蓋這些條目的 targeted tests 在乾淨副本上全部通過（238 個）；完整的自動測試套件會在 change 被接受前再跑一次，失敗就擋下。
+涵蓋這些條目的 targeted tests 在新的乾淨副本上全部通過（69 個）；完整的自動測試套件會在 change 被接受前再跑一次，失敗就擋下。
 
 ## 對你既有的資料做了什麼
 

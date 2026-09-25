@@ -55,3 +55,39 @@ Tried on 2026-09-25, in a clean copy of the project at 611c2182
 - Command: `env -u FORCE_COLOR python3 -m pytest -q loom-code/tests/test_plan_field_caps.py loom-code/tests/test_plan_simplicity_text.py loom-code/tests/test_plan_skip_missing_files.py loom-code/tests/test_adversary_protocol.py loom-code/tests/test_write_plan_station_text.py loom-design/tests/spec/test_capture_intent_contract.py`
 - Result: `238 passed in 0.53s`.
 - Full package suite (not run here; finalize-review runs it): `python3 scripts/run_package_tests.py --loom-family`.
+
+# Re-run after fix 9b4306d5..fc4dbf30 (plan task W4-01)
+
+Tried on 2026-09-25 in a fresh clean copy at fc4dbf30 (`git worktree add /tmp/at-psc2 fc4dbf30`). Fix diff touches `write-plan/SKILL.md`, `references/plan-simplicity.md`, `closing-review/references/lenses.md`, `agents/reviewer.md`, `CHANGELOG.md`, the plan, one test file; no checker script and not `adversarial.md`.
+
+## Setup (re-run)
+- `python3 loom-code/scripts/loom_checker.py --list-rules` loads (plan.field-caps listed); `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json` all read `3.18.0`.
+
+## 1, 2, 5 — walk the write-plan steps in order on a charter 1.1 draft
+- How I tried it: throwaway repo `/tmp/at-psc2-toy` (bare origin `/tmp/at-psc2-toy-origin.git`, branch `feat/toy-greet`), intent `docs/loom/intent/toy-greet.md` (one Acceptance line: `greet Ann` prints `Hello, Ann`), draft `docs/loom/toy-greet/plan.md` from `loom-code/contract/templates/plan.md` with three tasks (plugin registry, YAML config, CLI) and the template's empty `## Simplicity check`.
+- Step order per `write-plan/SKILL.md:385-394`: Simplicity check first, then both commands.
+- Showing the old order was unfollowable, both commands on the unrecorded draft:
+  - `loom_checker.py plan docs/loom/toy-greet/plan.md` → `BLOCK plan.field-caps: Simplicity check section missing or empty (charter 1.1)`, exit 1
+  - `loom_checker.py intake write-plan toy-greet` → same BLOCK, exit 1
+- Simplicity step: dispatched one fresh `loom-code:reviewer` (model sonnet) with exactly the input block of `plan-simplicity.md:8-11` / `reviewer.md:34-40`: `lens: plan`, `reviewed_sha` and `changed paths` = the draft plan path, ground truth = intent + draft plan, `dimensions:` = `lenses.md`.
+- What came back: it did not stop for missing input; `verdict: NEEDS_REVISION`, three `important` `deletion-first` findings, each with a `fix` naming the shape and the removed tasks/files (drop W0-01 registry: removes `src/registry.py`, `src/base.py`, `tests/test_registry.py`; drop W0-02 YAML: removes `src/config.py`, `config/greet.yaml`, `tests/test_config.py`; collapse to one task, 2 files). It asked no question.
+- Planner step: adopted all three by rewriting the plan to one task and recorded `- <shape> — taken` ×3 under `## Simplicity check`. Then:
+  - `loom_checker.py plan docs/loom/toy-greet/plan.md` → exit 0
+  - `loom_checker.py intake write-plan toy-greet` → exit 0
+- A5 text: `plan-simplicity.md:13-15` "Each adoption or decline is agent-decided. This step never asks the user a question, and there is no second round."; `lenses.md:124` "The plan lens has no fix round."
+- Observation (nit, not a failure): the reviewer's third finding also says the Simplicity check section "was left blank instead of naming this" — expected at this step, since the record is written after the reviewer returns.
+
+## 4 — narrow skip
+- In `/tmp/at-psc2-plans`, variants of the toy draft:
+  - `skip_docs.md` (`- skipped — narrow change`, every Files line `docs/guide.md`) → exit 0
+  - `skip_code.md` (same line, code Files) → `BLOCK plan.field-caps: Simplicity check skipped but the plan's Files are not narrow; the check is required`, exit 1
+- `plan-simplicity.md:5-6`: skip only when the section holds only that line.
+
+## 3, 6 — carried over
+- 3: `grep -n loom-workflow` over `plan-simplicity.md`, `lenses.md`, `agents/reviewer.md` → exit 1 (no match).
+- 6: fix diff touches neither `adversarial.md` nor `loom-code/scripts/` (`git diff --stat 9b4306d5..fc4dbf30 -- <those>` empty).
+
+## Targeted tests (re-run)
+- Command: `env -u FORCE_COLOR python3 -m pytest -q loom-code/tests/test_plan_field_caps.py loom-code/tests/test_plan_simplicity_text.py loom-code/tests/test_plan_skip_missing_files.py loom-code/tests/test_write_plan_station_text.py` (in `/tmp/at-psc2`)
+- Result: `69 passed in 0.34s`.
+- Full package suite (not run here; finalize-review runs it): `python3 scripts/run_package_tests.py --loom-family`.
