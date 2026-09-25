@@ -87,7 +87,11 @@ RULES: list[tuple[str, str]] = [
         "(a comma inside backticks does not split), each numbered `## Risks` item at 40 words, "
         "and each `## Current State Evidence` bullet at 30 words -- CJK runs with no internal "
         "whitespace count as one word by len(text.split()); a task missing its Files, Test or "
-        "Risk line blocks too. A plan with no `charter:` line is skipped entirely.",
+        "Risk line blocks too. A plan whose `charter:` is 1.1 or later also needs a non-empty "
+        "`## Simplicity check` section: lines `- <simpler shape> — taken` or `- <simpler shape> "
+        "— declined: <reason>`, or the single line `- none found`; the single line `- skipped — "
+        "narrow change` passes only when every task's Files paths form a narrow delta. "
+        "A plan with no `charter:` line is skipped entirely.",
     ),
     (
         "spec.req-grammar",

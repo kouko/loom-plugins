@@ -12,6 +12,12 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.4.1] — 2026-09-25 — mirrored station table update
+
+Patch: the station table mirrored from `loom-code` picks up loom-code
+3.18.0's plan-simplicity-check station-summary wording. No loom-design
+skill, tool or contract behavior changes.
+
 ## [2.4.0] — 2026-09-25 — architecture tool
 
 Minor: a new skill.

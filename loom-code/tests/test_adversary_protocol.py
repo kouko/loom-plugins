@@ -105,12 +105,22 @@ PROTOCOL_PINS = {
          "A copy of the probe's logic is enough evidence."),
     ),
     "ref-permanent-test-is-reuse": (
-        "ref", "counts as reuse", "the adversary names it in `reason`",
-        ("A permanent repository test that already covers a case", "leaves the test as it is"),
-        "A permanent repository test that already covers a case counts as reuse: the adversary "
-        "names it in `reason` and leaves the test as it is.",
-        ("A permanent repository test that already covers a case never counts as reuse: the "
-         "adversary names it in `reason` and leaves the test as it is.",),
+        "ref", "when the adversary names it as this change's adversarial program",
+        "it adds that test's line-start `concern:` comment",
+        ("naming the defect kind it defends against", "in the same dispatch and commits it",
+         "the test otherwise stays unchanged"),
+        "A permanent repository test that already covers a case counts as reuse: when the "
+        "adversary names it as this change's adversarial program, it adds that test's line-start "
+        "`concern:` comment naming the defect kind it defends against in the same dispatch and "
+        "commits it, and the test otherwise stays unchanged.",
+        ("A permanent repository test that already covers a case counts as reuse: when the "
+         "adversary names it as this change's adversarial program, it never adds that test's "
+         "line-start `concern:` comment naming the defect kind it defends against in the same "
+         "dispatch and commits it, and the test otherwise stays unchanged.",
+         "A permanent repository test that already covers a case counts as reuse: when the "
+         "adversary names it as this change's adversarial program, it adds that test's line-start "
+         "`concern:` comment naming the defect kind it defends against in the same dispatch and "
+         "commits it, and the test otherwise stays changed."),
     ),
     "ref-reuse-checks-existing-first": (
         "ref", "the adversary checks what already covers the target",

@@ -157,6 +157,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       must:
         - "Current State Evidence as path plus anchor when no spec exists"
         - "Task DAG with acceptance ownership plus Files, paired Test and Risk one line each"
+        - "Simplicity check record (charter 1.1): each simpler shape taken or declined with a reason, none found, or skipped for a narrow change"
         - "Questions asked verbatim"
         - "plan-wide Risks"
       must_not:
