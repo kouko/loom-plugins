@@ -51,6 +51,18 @@ charter: 1.0
 - Test: A2 positive: in-order-single-sections-valid; negative: duplicated-or-misordered-section-rejected. A3 positive: repo-relative-guard-valid; negative: absolute-or-parent-guard-rejected. A7 positive: root-architecture-silences-warn; negative: docs-loom-architecture-still-warns.
 - Risk: class "validator accepts a malformed ARCHITECTURE.md" searched across the validator and schema; lookup class searched across standing handler, write-plan, skill, manifest; probe graduates unchanged; agent-decided.
 
+### Wave 3 — closing review round 1 fixes
+
+**W3-01 Violations always send the change back; only the user changes a rule; neutral WARN**  after: W2-01  acceptance: 5, 6, 7
+- Files: `loom-code/skills/closing-review/references/lenses.md`, `loom-code/skills/write-plan/SKILL.md`, `loom-code/scripts/loom_checker/rule_checks/standing.py`, `loom-code/tests/test_architecture_doc_consumers.py`, `loom-code/tests/test_loom_checker_standing.py`
+- Test: A6 positive: conformance-violation-at-least-important; negative: nit-severity-not-allowed-for-violation. A5 positive: rule-change-runs-redesign-with-user-at-plan-time; negative: implementer-never-edits-rule. A7 positive: warn-line-two-neutral; boundary: warn-still-three-lines.
+- Risk: class "a rule-breaking change may pass review or change a rule without the user" searched in lenses.md, reviewer.md, write-plan, the architecture skill; widens standing wording test; agent-decided.
+
+**W3-02 Guards the suite runs; validator rejects malformed top matter; sourced know-how**  after: W3-01  acceptance: 2, 3
+- Files: `loom-design/skills/architecture/SKILL.md`, `loom-design/skills/architecture/references/architecture-md-schema.md`, `loom-design/skills/architecture/references/design-know-how.md`, `loom-design/scripts/architecture/validate_architecture_output.py`, `loom-design/skills/using-loom-design/SKILL.md`, `loom-design/tests/architecture/test_validate_architecture_output.py`, `loom-design/tests/architecture/test_architecture_skill.py`
+- Test: A2 positive: single-ratified-line-and-nonempty-decisions-valid; negative: second-ratified-line-or-top-prose-rejected. A3 positive: skill-records-package-tests-when-absent; negative: step5-commits-edited-config.
+- Risk: classes "guards may not run", "validator accepts malformed top matter", "know-how beyond its sources" searched in the skill, schema, validator, know-how; dismissed: validator path check (skill writes root); agent-decided.
+
 ## Questions asked
 ① — what — 我原本以為他就是要幫我 設計整個系統架構 的噎 → 我想要走方案 2 因為正常流程就是應該要設計好工程架構跟專案資料夾管理
 ① — done — 對
@@ -66,3 +78,4 @@ charter: 1.0
 6. Keep complexity low (user, 2026-09-25): the validator checks structure only, the know-how reference stays under about 150 lines, at most one positive/negative pair per Acceptance line.
 7. user-decided — the counted skill cap rises from 22 to 23 to admit the architecture tool, as releases 3.1.3 and 3.4.0 did (2026-09-25).
 8. Known limitations (deliberate-only): all rules marked `check: review`, an empty guard, or a guard the suite never runs pass the validator; review's architecture-conformance dimension is the backstop. Non-UTF-8 ARCHITECTURE.md crashes the validator (not fixed).
+9. Round 1 dismissals: validator accepts a non-root file (the skill writes root; standing still warns); dead imports in the graduated probe (others never edit adversarial programs); empty rule sections (not every project needs each kind).
