@@ -1,7 +1,7 @@
 # <title> — plan
 intent: <change-id>@<sha>
 spec: docs/loom/<change-id>/spec.md@<sha>     # only when needs-design: yes
-charter: 1.0
+charter: 1.1
 
 ## Current State Evidence                  # only when needs-design: no (spec doesn't exist, the five lines go here)
 <!-- each bullet ≤30 words (checker rule plan.field-caps) -->
@@ -17,6 +17,9 @@ charter: 1.0
 - Files: <files this task touches>            <!-- ≤8 comma-separated entries -->
 - Test: A<n> positive: <case-id>; negative|boundary: <case-id>.  <!-- one pair per referenced Acceptance; ≤40 words -->
 - Risk: <risk and the default choice; mark agent-decided>  <!-- ≤40 words -->
+
+## Simplicity check
+<!-- one line each: `- <simpler shape> — taken` | `- <simpler shape> — declined: <reason>`; or only `- none found`; or only `- skipped — narrow change` when every task's Files are narrow -->
 
 ## Questions asked                        # every question asked at decision point ① (and at ② when it runs here)
 <decision point id> — <what|behaviour|done|consequence> — <verbatim quote>

@@ -12,6 +12,7 @@ from loom_checker.intent_state import intent_delivery_state
 from loom_checker.parsing import LIST_ITEM
 from loom_checker.parsing import _squeeze
 from loom_checker.parsing import parse_document
+from loom_checker.reviewers import is_narrow_delta
 from pathlib import Path
 import hashlib
 import re
@@ -604,7 +605,45 @@ def check_plan_field_caps(plan_text: str) -> list[tuple[str, str]]:
                 f"Current State Evidence#{index} {words} words, cap {PLAN_FIELD_CAP_CSE_BULLET}",
             ))
 
+    version = re.match(r"(\d+)\.(\d+)", front["charter"])
+    if version and (int(version.group(1)), int(version.group(2))) >= (1, 1):
+        failures += _simplicity_check_failures(sections, tasks, front.get("intent", ""))
+
     return failures
+
+
+SIMPLICITY_ENTRY = re.compile(r"^- \S.*? (?:—|–|--) (?:taken|declined: \S.*)$")
+SIMPLICITY_SKIP = re.compile(r"^- skipped (?:—|–|--) narrow change$")
+
+
+def _simplicity_check_failures(sections, tasks, intent: str) -> list[tuple[str, str]]:
+    """Charter 1.1+: the `## Simplicity check` record (entries, `- none
+    found`, or a skip line that only a narrow plan may use)."""
+    lines = [
+        line.strip()
+        for line in re.sub(r"<!--.*?-->", "", sections.get("Simplicity check", ""), flags=re.S).splitlines()
+        if line.strip()
+    ]
+    if not lines:
+        return [("plan.field-caps", "Simplicity check section missing or empty (charter 1.1)")]
+    if lines == ["- none found"]:
+        return []
+    if len(lines) == 1 and SIMPLICITY_SKIP.match(lines[0]):
+        paths = {
+            entry.strip().strip("`")
+            for fields in tasks.values()
+            for entry in _split_respecting_backticks(fields.get("Files", ""))
+            if entry.strip()
+        }
+        change_id = intent.split("@", 1)[0].strip()
+        if is_narrow_delta(paths, change_id):
+            return []
+        return [("plan.field-caps", "Simplicity check skipped but the plan's Files are not narrow; the check is required")]
+    return [
+        ("plan.field-caps", f"Simplicity check#{index} not '<shape> — taken' or '<shape> — declined: <reason>'")
+        for index, line in enumerate(lines, start=1)
+        if not SIMPLICITY_ENTRY.match(line)
+    ]
 
 
 def check_plan_field_caps_at(manifest, repo: Path, change_id: str) -> list[tuple[str, str]]:

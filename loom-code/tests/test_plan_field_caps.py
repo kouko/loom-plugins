@@ -26,6 +26,7 @@ def _plan(
     risk: str = "agent-decided -- low",
     risks_item: str = "A small residual risk, agent-decided and bounded.",
     cse_bullet: str = "Forward: some/path.py:1 names the current gap.",
+    simplicity: str | None = None,
 ) -> str:
     lines = ["# Sample -- plan", "intent: sample@deadbeef"]
     if charter is not None:
@@ -42,6 +43,10 @@ def _plan(
         f"- Test: {test}",
         f"- Risk: {risk}",
         "",
+    ]
+    if simplicity is not None:
+        lines += ["## Simplicity check", simplicity, ""]
+    lines += [
         "## Questions asked",
         "",
         "## Risks",
@@ -125,3 +130,23 @@ def test_check_plan_field_caps_cjk_run_with_no_spaces_counts_as_one_word() -> No
     40 characters."""
     failures = check_plan_field_caps(_plan(test="測" * 200))
     assert failures == []
+
+
+def test_check_plan_field_caps_charter_1_1_simplicity_record_required() -> None:
+    """A2: a charter 1.1 plan passes with a Simplicity check record and is
+    blocked without one; the charter 1.0 baseline above has no section and
+    still passes (grandfathered)."""
+    record = "- Reuse the existing rule instead of a new one — taken\n- Split it — declined: one assertion"
+    assert check_plan_field_caps(_plan(charter="charter: 1.1", simplicity=record)) == []
+    failures = check_plan_field_caps(_plan(charter="charter: 1.1"))
+    assert any(r == "plan.field-caps" and "Simplicity check" in m for r, m in failures)
+
+
+def test_check_plan_field_caps_skip_line_only_for_a_narrow_plan() -> None:
+    """A4: the skip line passes when every task's Files are narrow
+    (docs only) and is refused when a task touches production code."""
+    skip = "- skipped — narrow change"
+    narrow = _plan(charter="charter: 1.1", files="`docs/guide.md`", simplicity=skip)
+    assert check_plan_field_caps(narrow) == []
+    failures = check_plan_field_caps(_plan(charter="charter: 1.1", simplicity=skip))
+    assert any(r == "plan.field-caps" and "required" in m for r, m in failures)
