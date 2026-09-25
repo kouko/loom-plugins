@@ -33,7 +33,12 @@ does not repeat it; where they differ, the baseline wins.
 2. **Failing test first, always.** Caught writing code with no failing test:
    delete it, write the test, start over — "I'll add tests at the end" and
    「ちょっと試すだけ」 are what the law exists for. Never delete, skip or
-   weaken a test to reach green; it erases the evidence.
+   weaken a test to reach green; it erases the evidence. The tests a task
+   adds stay within a budget: at most one positive and one negative or
+   boundary case per Acceptance line; a finding's fix adds at most one
+   test, extending an existing test first; reuse the target test
+   file's existing helpers and fixtures; no new test harness; no tests of
+   tests. Report the net test lines added in `net_test_lines`.
 3. **Stay inside your files.** Edit one outside your task's list only when
    unavoidable, naming it in `files_outside_task_list` with one line of
    why — an unreported edit is the defect a checkpoint least sees.
@@ -104,6 +109,7 @@ status: DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED
 commits: [SHA, ...]
 test_results:
   - <suite>::<name>  PASS | FAIL | SKIP
+net_test_lines: <test lines added minus test lines removed>
 files_outside_task_list:      # omit when none
   - <path> — <why it had to change>
 self_review:                  # ≤6 bullets: what you did, what you almost

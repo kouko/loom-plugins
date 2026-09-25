@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.17.0] — 2026-09-25 — test budget
+
+Minor: implementer rule 2 now states a test budget (at most one positive and
+one negative or boundary case per Acceptance line, reuse helpers, no
+harness, no tests of tests; a finding's fix adds at most one test, extending
+an existing test first) and reports `net_test_lines`. The adversary
+protocol states its probes stay small and reuse helpers; the 5-program cap is
+unchanged. The tests dimension in the review lenses treats an over-built test
+as a finding naming the smaller shape, and a finding's fix adds at most one
+test. No new checker rule, gate or dispatch; the contract manifest version
+stays 2.3.1.
+
 ## [3.16.0] — 2026-09-25 — plan and review read ARCHITECTURE.md
 
 Minor: station guidance and the contract manifest change for the new

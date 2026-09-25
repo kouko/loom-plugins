@@ -81,7 +81,8 @@ case counts as reuse: the adversary names it in `reason` and leaves the test as
 it is. Its report marks
 each probe `reused`, `modified` or `new`, with a one-line reason for every new
 one. A stale case that is rewritten or flipped to its positive form counts as
-`modified`.
+`modified`. Each probe program stays small and reuses the repository's
+existing test helpers; no harness built for one case.
 
 When Build re-dispatches it for a widened scope or for trunk content brought
 in by `sync-trunk`, the adversary updates only its own programs and fixes
