@@ -40,6 +40,13 @@ charter: 1.0
 - Test: A1 positive: loom-design-versions-synchronized-2.4.1; negative: stale-2.4.0-pin-detected.
 - Risk: patch because only the mirrored station table changes in loom-design; agent-decided.
 
+### Wave 2 — suite fixes
+
+**W2-01 Station prose back within the station files' structural limits**  after: W1-02  acceptance: 1, 5
+- Files: `loom-code/skills/write-plan/SKILL.md`, `loom-code/skills/write-plan/references/plan-simplicity.md`, `loom-code/skills/build/SKILL.md`, `loom-design/skills/capture-intent/SKILL.md`, `loom-design/skills/write-spec/SKILL.md`, `loom-code/tests/test_plan_simplicity_text.py`
+- Test: A1 positive: pointer-and-reference-state-the-dispatch; negative: write-plan-body-under-word-cap. A5 positive: reference-records-agent-decided; negative: build-entry-names-no-other-station.
+- Risk: class "W0-02 prose breaks station structural limits" searched across the three station files W0-02 edited; detail moves to a write-plan reference; agent-decided.
+
 ## Simplicity check
 - Fold the record into plan.field-caps instead of a new rule id — taken
 - Run the existing plan command at Build entry instead of new handler wiring — taken
