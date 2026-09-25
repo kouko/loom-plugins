@@ -34,7 +34,7 @@ continue. When you honour such a skip, append one line
 and commit it. Never ask the user for a generated code to skip a step.
 
 Also at entry, run `loom_checker.py plan docs/loom/<change-id>/plan.md`; a
-BLOCK stops Build until the plan passes.
+BLOCK or any other non-zero exit stops Build until the plan passes.
 
 Finding no task left to implement is not a reason to end Build. It means §2 has
 nothing to implement, not that the run is over: continue to §3, which states

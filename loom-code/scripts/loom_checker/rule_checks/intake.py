@@ -632,7 +632,7 @@ def _simplicity_check_failures(sections, tasks, intent: str) -> list[tuple[str, 
         paths = {
             entry.strip().strip("`")
             for fields in tasks.values()
-            for entry in _split_respecting_backticks(fields.get("Files", ""))
+            for entry in _split_respecting_backticks(fields.get("Files") or "")
             if entry.strip()
         }
         change_id = intent.split("@", 1)[0].strip()
