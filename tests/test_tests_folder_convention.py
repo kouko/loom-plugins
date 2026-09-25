@@ -1,16 +1,29 @@
 """The tests-folder convention is stated, and CI follows it.
+concern: a test file placed outside every tests folder (root scripts/,
+.claude/hooks/, a plugin's hooks or contract folder, a new plugin) is neither
+collected by the package suite nor refused by any guard, so it goes dark.
 
-Tests live in `tests/` folders apart from the code they test. Three things keep
+Tests live in `tests/` folders apart from the code they test. Four things keep
 that true after the move: the contributor guidance (AGENTS.md) says so, every
 CI workflow is triggered by edits under the test folders it runs and runs them
 through the shared inventory (`scripts/run_package_tests.py --loom-family`),
-and neither the guidance nor the workflows still names an old test location.
+neither the guidance nor the workflows still names an old test location, and
+no test file in the working tree sits outside a tests folder.
+
+Bound of the repository-wide guard: it reads `git ls-files --cached --others
+--exclude-standard` (tracked plus untracked, non-ignored files), matches file names
+`test_*.py`, `*_test.py` and `test-*.sh`, and allows a match only when a
+folder named `tests` appears anywhere in its path or it sits under
+`docs/loom/` (change evidence and probes). A test named any other way, or a
+tests folder the inventory does not discover, is outside this guard.
 """
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
 
+import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
@@ -45,6 +58,24 @@ REQUIRED_TRIGGERS = {
         "scripts/run_package_tests.py",
     ],
 }
+
+
+# A test file by name: pytest's two default patterns and the shell-test prefix.
+TEST_FILE = re.compile(r"(^|/)(test_[^/]*\.py|[^/]*_test\.py|test-[^/]*\.sh)\Z")
+
+
+def _tracked_strays(root: Path) -> list[str]:
+    """Tracked or untracked, non-ignored test files outside every `tests/` folder and outside `docs/loom/`."""
+    tracked = subprocess.run(
+        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], cwd=root, capture_output=True, check=True
+    ).stdout.decode("utf-8").split("\0")
+    return sorted(
+        path
+        for path in filter(None, tracked)
+        if TEST_FILE.search(path)
+        and not path.startswith("docs/loom/")
+        and "tests" not in path.split("/")[:-1]
+    )
 
 
 def _glob_to_regex(pattern: str) -> re.Pattern[str]:
@@ -124,3 +155,46 @@ def test_old_test_path_in_a_document_is_detected() -> None:
     ):
         assert OLD_TEST_PATH.search(text), text
     assert not OLD_TEST_PATH.search("tests/test_state_anchor_carrier_inventory.py")
+
+
+def _planted_repo(root: Path, rel: str) -> Path:
+    planted = root / rel
+    planted.parent.mkdir(parents=True, exist_ok=True)
+    planted.write_text("def test_planted():\n    assert False\n", encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", rel], cwd=root, check=True)
+    return root
+
+
+def test_no_test_file_sits_outside_a_tests_folder() -> None:
+    assert _tracked_strays(REPO) == []
+
+
+@pytest.mark.parametrize(
+    "rel",
+    [
+        "scripts/test_zz_planted_stray.py",
+        ".claude/hooks/test_zz_planted_stray.py",
+        "loom-code/hooks/test_zz_planted_stray.py",
+        "loom-new/contract/zz_planted_test.py",
+        "loom-new/scripts/test-zz-planted.sh",
+    ],
+)
+def test_planted_stray_outside_tests_folders_is_refused(tmp_path: Path, rel: str) -> None:
+    assert _tracked_strays(_planted_repo(tmp_path, rel)) == [rel]
+
+
+@pytest.mark.parametrize(
+    "rel",
+    [
+        "tests/test_zz_planted_stray.py",
+        "tests/hooks/test_zz_planted_stray.py",
+        "loom-new/tests/test_zz_planted_stray.py",
+        "loom-workflow/tests/loom-memory/test-zz-planted.sh",
+        "docs/loom/some-change/evidence/probes/test_zz_planted_stray.py",
+    ],
+)
+def test_planted_test_in_a_tests_folder_or_docs_loom_is_allowed(
+    tmp_path: Path, rel: str
+) -> None:
+    assert _tracked_strays(_planted_repo(tmp_path, rel)) == []

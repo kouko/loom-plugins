@@ -19,10 +19,10 @@ All scripts gracefully skip when their prerequisites are missing — safe to run
 cd /path/to/loom-plugins/.worktrees/loom-code-design
 
 # Run individual test:
-bash loom-code/tests/integration/test-git-memory-delegation.sh
+bash loom-code/tests/local/test-git-memory-delegation.sh
 
 # Run all integration tests:
-for t in loom-code/tests/integration/test-*.sh; do
+for t in loom-code/tests/local/test-*.sh; do
   echo ""
   echo "=== ${t} ==="
   bash "${t}"

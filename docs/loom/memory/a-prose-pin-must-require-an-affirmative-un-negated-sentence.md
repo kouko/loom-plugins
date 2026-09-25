@@ -4,7 +4,7 @@ description: A test that pins a contract sentence by keyword co-occurrence is sa
 type: practice
 sources:
   - resource: 2026-09-05 artifact-language-policy (loom-code 1.3.0) — the same defect was raised on two different pin files in one change (the probe-name probe, then the six station-sentence pins), each time by the Codex reader
-  - resource: docs/loom/2026-09-16-plain-language-replies/attestation.json — the same defect recurred on a runtime prose card and its writing guide; adversarial probe docs/loom/2026-09-16-plain-language-replies/evidence/probes/test_probe_prose_gate_mutants.py, guard applied at loom-workflow/scripts/test_visualization_card_hook.py
+  - resource: docs/loom/2026-09-16-plain-language-replies/attestation.json — the same defect recurred on a runtime prose card and its writing guide; adversarial probe docs/loom/2026-09-16-plain-language-replies/evidence/probes/test_probe_prose_gate_mutants.py, guard applied at loom-workflow/tests/scripts/test_visualization_card_hook.py
 ---
 
 A pin on prose is tempting to write as "the file contains X and Y". That

@@ -16,10 +16,14 @@ below.
   by hand.
 - `scripts/run_package_tests.py` discovers `tests/` folders: the code group
   runs the root `tests/` and `loom-code/tests/`. A new guard fails when a
-  `test_*.py` is left under `loom-code/scripts/` or `loom-code/skills/`.
-- Code group counts: 2271 passed, 2 skipped before; 2308 passed, 2 skipped
-  after. The 37 new tests are the 23 probes, the new guards (2 in
-  `loom-code/tests/`, 11 in the root `tests/`) and one test pinning the
+  `test_*.py` is left under `loom-code/scripts/` or `loom-code/skills/`,
+  and a repository-wide guard in `tests/test_tests_folder_convention.py`
+  fails on any test file (`test_*.py`, `*_test.py`, `test-*.sh`) outside
+  every `tests/` folder and outside `docs/loom/`, so a test left in root
+  `scripts/`, `.claude/hooks/` or a new plugin cannot go uncollected.
+- Code group counts: 2271 passed, 2 skipped before; 2319 passed, 2 skipped
+  after. The 48 new tests are the 23 probes, the new guards (2 in
+  `loom-code/tests/`, 22 in the root `tests/`) and one test pinning the
   narrowed comparison; no earlier test is missing.
 - Narrowed comparison: in the coldread branch-end graduated probe,
   `test_graduated_probe_copies_byte_identical_to_evidence_originals` now
