@@ -12,6 +12,22 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.3.2] — 2026-09-25 — tests live in loom-design/tests
+
+Patch. File locations only; no behaviour, field, checker rule or test
+assertion changes.
+
+- The 14 `loom-design/scripts` test files move to `loom-design/tests/`,
+  in the same `interface/`, `principles/` and `spec/` station folders;
+  `pytest.ini` moves with them, and the validators stay in
+  `loom-design/scripts/`.
+- The package suite discovers `loom-design/tests/` as the design group. A
+  new guard fails when a `test_*.py` is left under `loom-design/scripts/`
+  or `loom-design/skills/`.
+- Design group counts: 245 passed, 1 skipped before; 247 passed, 1 skipped
+  after. The two new tests are that guard and its negative case.
+- The version bump lets installed copies pick up the moved paths.
+
 ## [2.3.1] — 2026-09-23 — the blind run is renamed to independent acceptance testing
 
 Patch. Wording only, following loom-code 3.10.0; no behaviour, field, or
