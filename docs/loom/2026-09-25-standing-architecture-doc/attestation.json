@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-25-standing-architecture-doc",
-  "content_digest": "c49be1f9f2c64fb02bd5d320ae0e74775541abdf",
+  "content_digest": "48e5e7054186fcca6f41eb988b31fef8adcb23fc",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,7 +20,7 @@
   ],
   "verdicts": [
     {
-      "reviewer": "reviewer-code-r1",
+      "reviewer": "reviewer-code-r3",
       "vendor": "anthropic",
       "model": "claude-opus-5-5",
       "lens": "code",
@@ -35,19 +35,12 @@
       ]
     },
     {
-      "reviewer": "reviewer-skill-r1",
+      "reviewer": "reviewer-skill-r3",
       "vendor": "anthropic",
       "model": "claude-opus-5-5",
       "lens": "skill",
       "verdict": "PASS",
-      "findings": [
-        {
-          "severity": "nit",
-          "dimension": "inconsistency",
-          "anchor": "loom-code/CHANGELOG.md :: 3.16.0",
-          "text": "The 3.16.0 entry omits the neutral WARN line two and the architecture-conformance severity floor added in the fix round."
-        }
-      ]
+      "findings": []
     }
   ],
   "findings": [],
