@@ -12,14 +12,19 @@ guidance, field or contract manifest changes.
   moved every test into `tests/` folders and finalize-review counted 9 probe
   programs, 8 of them renamed graduated probes and 1 new, against a cap of 5.
   The count now drops an added path that git pairs as a rename of a path the
-  branch removed, at git's default 50% similarity; the pairing is computed
+  branch removed, at git's default 50% similarity, and only when the removed
+  path carried a `concern:` line at the branch base; the pairing is computed
   inside the probe count only, so the shared branch delta and its other
   callers still read with `--no-renames`. A probe copied under a new name
   while the original stays, and a move rewritten below 50% similarity, are
-  still counted. When the pairing cannot be read, nothing is excluded.
+  still counted. The pairing passes `-l0` so a local `diff.renameLimit`
+  cannot change the count. When the pairing cannot be read, nothing is
+  excluded.
 - A program under a folder the declared suite command passes to pytest as
   `--ignore=` is no longer counted as graduated into the suite, so programs
-  under `tests/local/`, which the package suite skips, are not counted.
+  under `tests/local/`, which the package suite skips, are not counted,
+  unless a tracked symlink under a test root leads pytest back into that
+  folder, in which case the suite runs it and it is still counted.
 - New memory entry
   `docs/loom/memory/moving-graduated-probes-used-to-trip-the-probe-cap.md`
   records the lesson.

@@ -2,6 +2,9 @@
 # over a subset of the programs a change actually commits and runs, so both
 # halves of `adversarial.proportionate` are escaped by where a program is put
 # or what it is named.
+# concern: the probe-program count undercounts a program the change really
+# produced -- a rename whose source never carried `concern:`, a probe under
+# tests/local/ reached through a symlink, or a local diff.renameLimit.
 """Attack `check_adversarial_proportionate` in
 `loom-code/scripts/loom_checker/probes.py`.
 
@@ -13,6 +16,7 @@ commit and ask both.
 """
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -205,6 +209,50 @@ def test_a_program_under_tests_local_is_not_graduated() -> None:
     assert not suite_collects(repo, local)
     assert suite_collects(repo, kept)
     assert graduated_probe_programs(repo, head, CHANGE_ID) == [kept]
+
+
+PLAIN_TEST = "def test_plain() -> None:\n" + "".join(
+    f"    assert {n} + {n} == {2 * n}\n" for n in range(1, 30)
+)
+
+
+def test_a_rename_from_a_plain_test_is_counted() -> None:
+    """A deleted plain test (never a probe: no `concern:` line) replaced under
+    a new name by a concern-bearing probe that reuses its body is a new probe
+    program, although git pairs the two as a rename."""
+    repo = _branch({f"{SUITE}/test_plain.py": PLAIN_TEST})
+    _git(repo, "rm", "-q", f"{SUITE}/test_plain.py")
+    new_probe = f"{SUITE}/test_new_probe.py"
+    _write(repo, {new_probe: "# concern: a new defect class\n" + PLAIN_TEST
+                  + "\n\ndef test_new_case() -> None:\n    assert True\n"})
+    head = _commit_branch(repo)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == [new_probe]
+
+
+def test_a_probe_under_tests_local_reached_through_a_symlink_is_counted() -> None:
+    """The runner ignores tests/local/ by path, but pytest collects a file
+    there again through a committed symlink `tests/alias -> local`; the suite
+    runs it, so it is graduated and counted."""
+    repo = _branch({})
+    hidden = f"{SUITE}/local/test_hidden.py"
+    _write(repo, {hidden: "# concern: hidden probe\ndef test_hidden() -> None:\n"
+                          "    assert True\n"})
+    os.symlink("local", repo / SUITE / "alias")
+    head = _commit_branch(repo)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == [hidden]
+
+
+def test_the_move_pairing_ignores_the_local_rename_limit() -> None:
+    """Three edited moves stay moves under `diff.renameLimit=1`: the pairing
+    pins its own limit, so the count is the same on every machine."""
+    old = {f"loom-code/scripts/test_old_{i}.py": _probe(i) for i in range(3)}
+    repo = _branch(old)
+    _git(repo, "config", "diff.renameLimit", "1")
+    for i in range(3):
+        _git(repo, "mv", f"loom-code/scripts/test_old_{i}.py", f"{SUITE}/test_new_{i}.py")
+        _write(repo, {f"{SUITE}/test_new_{i}.py": _probe(i) + "    assert True\n"})
+    head = _commit_branch(repo)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == []
 
 
 def test_the_branch_delta_still_reads_a_move_as_removal_plus_addition() -> None:

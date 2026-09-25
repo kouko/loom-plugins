@@ -16,13 +16,15 @@ added program. The review episode had already used its three digests, so
 the PR shipped with "Verification status: absent".
 
 The fix counts only added paths that are not renames of paths the branch
-removed, paired at git's default 50% similarity. The pairing is computed
+removed, paired at git's default 50% similarity, and only when the removed
+path carried a `concern:` line at the branch base. The pairing is computed
 inside the probe count only; the shared branch delta and its other callers
 still read with `--no-renames`. A probe copied under a new name while the
 original stays is still counted, and so is a move rewritten below the
 similarity threshold. Programs under `tests/local/`, which the package
 suite skips through pytest `--ignore=`, are no longer counted as graduated
-into the suite.
+into the suite, unless a tracked symlink under a test root leads pytest back
+into that folder, in which case the suite runs them and they still count.
 
 **Why:** a count of new programs is a claim about what a branch produced.
 Without rename pairing a refactor that only moves files spends the whole
@@ -33,7 +35,7 @@ rule reads from the branch delta.
 **How to apply:** when a rule counts additions in a branch delta, decide
 explicitly whether a rename is an addition, and pair renames only where
 that rule needs it. Expect a large move to still pair its exact renames.
-Git's rename limit can leave edited moves unpaired in a very large diff;
-those are counted as new, which errs strict rather than letting a real new
-probe through. When the pairing cannot be read, exclude nothing, so the cap
+Pin git's rename limit (`-l0`, unlimited) rather than inheriting
+`diff.renameLimit`, which differs by machine and would leave edited moves
+unpaired on one and paired on another. When the pairing cannot be read, exclude nothing, so the cap
 fails closed.

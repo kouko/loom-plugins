@@ -90,6 +90,33 @@ def _ignored(repo: Path, command: list[str], wanted: Path) -> bool:
     return False
 
 
+def _walked_through_symlink(repo: Path, command: list[str], target: str, wanted: Path) -> bool:
+    """True when a tracked symlink under `target` leads pytest back to `wanted`.
+
+    pytest applies `--ignore=` to the path it walks, not the file's real
+    location, so a link `tests/alias -> local` re-collects every file under an
+    ignored `tests/local/`. The link's own walked path (parents resolved, the
+    link itself not) must escape the ignores and resolve onto `wanted` or one
+    of its folders, and the name pytest sees must match a test-file pattern.
+    """
+    listing = git_maybe(repo, "ls-files", "-s", "--", target) or ""
+    for line in listing.splitlines():
+        meta, _tab, path = line.partition("\t")
+        if not meta.startswith("120000 "):
+            continue
+        link = repo / path
+        walked = link.parent.resolve() / link.name
+        if _ignored(repo, command, walked):
+            continue
+        real = link.resolve()
+        name = link.name if real == wanted else wanted.name
+        if (real == wanted or real in wanted.parents) and any(
+            fnmatch(name, pattern) for pattern in PYTEST_FILE_PATTERNS
+        ):
+            return True
+    return False
+
+
 def suite_collects(repo: Path, artifact: str) -> bool:
     """True when the declared package suite already runs `artifact`.
 
@@ -100,6 +127,12 @@ def suite_collects(repo: Path, artifact: str) -> bool:
     and neither is a file under a folder the command passes to pytest as
     `--ignore=` -- that is how the runner skips every `tests/local/` folder,
     so the runner's own rule is honoured rather than restated here.
+
+    An ignored file is still collected when a tracked symlink under a declared
+    directory resolves into its ignored folder: pytest matches `--ignore=`
+    against the path it walks, so the link's path escapes the ignore. Only
+    tracked links are followed, the simplest set that is both what the branch
+    commits and what the suite then walks (see `_walked_through_symlink`).
     """
     wanted = os.path.normpath(artifact)
     wanted_path = (repo / wanted).resolve()
@@ -111,6 +144,13 @@ def suite_collects(repo: Path, artifact: str) -> bool:
         if not (runs_pytest or runs_shell):
             continue
         if runs_pytest and _ignored(repo, command, wanted_path):
+            if any(
+                _walked_through_symlink(repo, command, os.path.normpath(token), wanted_path)
+                for token in command[1:]
+                if not token.startswith("-") and token != "pytest"
+                and (repo / os.path.normpath(token)).is_dir()
+            ):
+                return True
             continue
         for token in command[1:]:
             if token.startswith("-") or token == "pytest":
@@ -162,18 +202,29 @@ def _moved_paths(repo: Path, head_sha: str, removed: set[str]) -> set[str]:
     A file rewritten below that threshold is a removal plus a new file and
     stays counted. `-M` alone never reports copies, and the old path must be
     one the branch removed, so a probe copied under a new name while the
-    original stays is counted too. When the pairing cannot be read, nothing
-    is excluded -- the cap fails closed.
+    original stays is counted too. The old path must also have carried a
+    `concern:` line at the branch base: a pair whose source was never a probe
+    is a new probe written over a plain test, and is counted. `-l0` pins the
+    exhaustive pairing to unlimited ("a value of 0 is treated as unlimited",
+    https://git-scm.com/docs/git-diff#Documentation/git-diff.txt--lltnumgt),
+    so a local `diff.renameLimit` cannot turn moves into new files and the
+    count is the same on every machine. When the pairing cannot be read,
+    nothing is excluded -- the cap fails closed.
     """
     try:
         base = branch_base(repo)
     except UsageError:
         return set()
-    status = git_maybe(repo, "diff", "--name-status", "-M", base, head_sha) or ""
+    status = git_maybe(repo, "diff", "--name-status", "-M", "-l0", base, head_sha) or ""
     moved: set[str] = set()
     for line in status.splitlines():
         fields = line.split("\t")
-        if len(fields) == 3 and fields[0].upper().startswith("R") and fields[1] in removed:
+        if (
+            len(fields) == 3
+            and fields[0].upper().startswith("R")
+            and fields[1] in removed
+            and _carries_concern(repo, base, fields[1])
+        ):
             moved.add(fields[2].strip())
     return moved
 
