@@ -71,14 +71,6 @@ Conform to the rule, or change the rule and its guard together in
 ARCHITECTURE.md and re-ratify.
 ```
 
-## Updating
-
-When a change alters the structure, the tool re-designs the affected part
-with the user, and the affected decisions, rules and guards change in the
-same commit. Changing one without the others leaves the document and the
-suite disagreeing, so the tool changes them together, runs the validator,
-and re-ratifies with a new `ratified-by:` line.
-
 ## Example
 
 ```
