@@ -13,7 +13,7 @@ Codex and Antigravity CLI:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/) | 2.4.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
+| [`loom-design`](loom-design/) | 2.4.1 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
 | [`loom-code`](loom-code/) | 3.18.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
 | [`loom-workflow`](loom-workflow/) | 5.3.3 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
@@ -114,7 +114,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.4.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.4.1. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools. Requires `loom-code`, whose
 contract package it reads.
 
