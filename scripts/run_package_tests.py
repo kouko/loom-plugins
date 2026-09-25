@@ -26,7 +26,8 @@ which CI selects with `--only`, are:
 Whole directories are handed to pytest, and a nested git repository placed
 inside one of them -- a linked worktree, a clone dropped in `vendor/`, a
 submodule -- would have its test files collected and run as this repository's.
-Every pytest session therefore carries `--ignore=<path>` for each such subtree.
+Every pytest session therefore carries `--ignore=<path>` for each such subtree,
+and no shell test inside one is run.
 The exclusions are the union of `repo_files.nested_repositories` (the opaque
 directory entries git collapsed, which is the same answer the scanners use for
 "not ours") and `repo_files.nested_worktrees` (which still sees a worktree that
@@ -119,6 +120,7 @@ def loom_family_commands(
     pytest = [sys.executable, "-m", "pytest"]
     sessions: list[list[str]] = []
     commands: list[list[str]] = []
+    foreign = sorted({p.resolve() for p in (*nested_repositories(repo), *nested_worktrees(repo))})
     if only in {None, "code"}:
         code_roots = [r for r in TEST_ROOTS if r not in {DESIGN_ROOT, WORKFLOW_ROOT}]
         code = _tests_session(repo, [repo / r for r in code_roots])
@@ -130,7 +132,10 @@ def loom_family_commands(
         sessions += _workflow_sessions(repo)
     commands += [[*pytest, *session, verbosity] for session in sessions]
     if only in {None, "workflow-shell"}:
-        commands.extend([["bash", test.as_posix()] for test in _shell_tests(repo)])
+        commands.extend([
+            ["bash", test.as_posix()] for test in _shell_tests(repo)
+            if not any(f in test.resolve().parents for f in foreign)
+        ])
     if only in {None, "workflow-mermaid"}:
         # No skip path: a missing node or npm fails the group.
         commands.extend([
@@ -138,8 +143,7 @@ def loom_family_commands(
             ["node", "loom-workflow/tests/mermaid/validate_mermaid.mjs"],
             ["bash", "loom-workflow/tests/mermaid-validator-negative.sh"],
         ])
-    foreign = sorted({*nested_repositories(repo), *nested_worktrees(repo)})
-    ignores = [f"--ignore={path.resolve()}" for path in foreign]
+    ignores = [f"--ignore={path}" for path in foreign]
     for command in commands:
         if command[:3] == pytest:
             command.extend(ignores)

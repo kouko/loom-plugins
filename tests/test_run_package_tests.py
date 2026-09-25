@@ -296,3 +296,23 @@ def test_test_roots_are_the_folders_the_pytest_groups_run() -> None:
     }
     assert set(TEST_ROOTS) <= targets
     assert all(any(t == r or t.startswith(r + "/") for r in TEST_ROOTS) for t in targets)
+
+
+def test_shell_group_skips_scripts_inside_nested_repositories(tmp_path: Path) -> None:
+    """A worktree or clone inside a test root is not ours; neither are its shell tests."""
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+    worktree = repo / "loom-workflow" / "tests" / "wt"
+    _git(repo, "worktree", "add", "-q", "-b", "wt-branch", str(worktree))
+    _plant_shell(worktree / "test-x.sh")
+    clone = repo / "loom-code" / "tests" / "vendor"
+    _plant_shell(clone / "test-x.sh")
+    _git(clone, "init", "-q")
+    _git(clone, "config", "user.email", "t@example.com")
+    _git(clone, "config", "user.name", "T")
+    _git(clone, "add", "-A")
+    _git(clone, "commit", "-q", "-m", "c")
+
+    commands = loom_family_commands(repo, verbosity="-q", only="workflow-shell")
+
+    assert commands == []
