@@ -94,7 +94,7 @@ Tool defaults, a starting ceiling the user may change:
 |---|---|---|
 | SwiftLint | `file_length` | warning 400, error 1000 lines — <https://realm.github.io/SwiftLint/file_length.html> |
 | ESLint | `max-lines` | 300 lines — <https://eslint.org/docs/latest/rules/max-lines> |
-| Pylint | `too-many-lines` | 1000 lines — <https://pylint.readthedocs.io/en/stable/user_guide/messages/convention/too-many-lines.html> |
+| Pylint | `too-many-lines` | 1000 lines (`max-module-lines`, from `pylint --generate-toml-config`, pylint 4.0.9; the page does not print it) — <https://pylint.readthedocs.io/en/stable/user_guide/messages/convention/too-many-lines.html> |
 
 ## Main technology choices
 
@@ -127,8 +127,10 @@ and per option "good, because … / bad, because …".
   <https://martinfowler.com/articles/continuousIntegration.html>,
   <https://docs.github.com/en/actions/tutorials/build-and-test-code/python>,
   <https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/about-dependabot-version-updates>
-- Security scanning is free on public repositories and paid on private
-  ones. <https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security>
+- Security scanning availability and cost vary by feature, repository
+  owner and GitHub product; verify them before making scanning a required
+  CI stage or a cost rule.
+  <https://docs.github.com/en/get-started/learning-about-github/about-github-advanced-security>
 - **macOS runners cost about ten times Linux** per minute on GitHub-hosted
   runners (<https://docs.github.com/en/billing/reference/actions-runner-pricing>);
   for a private Xcode project, test pure-logic packages on Linux where they
