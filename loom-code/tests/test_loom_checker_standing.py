@@ -82,6 +82,12 @@ def add_design(repo: Path) -> None:
     )
 
 
+def add_architecture(repo: Path) -> None:
+    (repo / "ARCHITECTURE.md").write_text(
+        "# Architecture\nratified-by: kouko 2026-09-25\n", encoding="utf-8"
+    )
+
+
 def waive(repo: Path) -> None:
     path = repo / "docs/loom/KICKOFF-DEFAULTS.md"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -141,10 +147,33 @@ def test_a_warn_never_blocks(tmp_path: Path) -> None:
     assert run_checker("standing", str(intent), cwd=repo).returncode == 0
 
 
-def test_no_warn_when_both_documents_exist(tmp_path: Path) -> None:
+def test_no_warn_when_all_documents_exist(tmp_path: Path) -> None:
     repo, intent = make_repo(tmp_path)
     add_principles(repo)
     add_design(repo)
+    add_architecture(repo)
+    result = run_checker("standing", str(intent), cwd=repo)
+    assert warn_lines(result) == []
+    assert result.returncode == 0
+
+
+def test_missing_architecture_is_named_in_the_warn(tmp_path: Path) -> None:
+    repo, intent = make_repo(tmp_path)
+    add_principles(repo)
+    add_design(repo)
+    result = run_checker("standing", str(intent), cwd=repo)
+    lines = warn_lines(result)
+    assert len(lines) == 3
+    assert "ARCHITECTURE.md" in lines[0]
+    assert "PRINCIPLES.md" not in lines[0] and "DESIGN.md" not in lines[0]
+    assert result.returncode == 0
+
+
+def test_waiver_silences_the_architecture_warn(tmp_path: Path) -> None:
+    repo, intent = make_repo(tmp_path)
+    add_principles(repo)
+    add_design(repo)
+    waive(repo)
     result = run_checker("standing", str(intent), cwd=repo)
     assert warn_lines(result) == []
     assert result.returncode == 0
@@ -153,6 +182,7 @@ def test_no_warn_when_both_documents_exist(tmp_path: Path) -> None:
 def test_principles_under_docs_loom_also_counts(tmp_path: Path) -> None:
     repo, intent = make_repo(tmp_path)
     add_design(repo)
+    add_architecture(repo)
     target = repo / "docs/loom/PRINCIPLES.md"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(
