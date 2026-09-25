@@ -33,7 +33,9 @@ charter: 1.0
 ## Questions asked
 ① — what — 好
 ① — done — 對
+① — consequence — A 我不想在這邊用 symlink 增加複雜度
 
 ## Risks
 1. A copy of an existing probe under a new name looks like a rename to git; the count must treat a pair as a move only when the old path left the branch.
 2. The behaviour is checker logic, so the acceptance test runs finalize-review in throwaway repositories with moved and new probes rather than reading prose.
+3. user-decided — no symlink handling in the probe count (2026-09-25): a probe reached through a committed symlink into `tests/local/` is a known, deliberate-only limitation, disclosed in the PR.
