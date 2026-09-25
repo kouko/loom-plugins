@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: 'Fresh-context reviewer for code, docs, spec, spec+adversarial, design, principles, and skill lenses at required spec or branch-end checkpoints. Produces PASS / PASS_WITH_NOTES / NEEDS_REVISION with scores and anchored findings; never edits what it reviews. Reusable via subagent_type "loom-code:reviewer".'
+description: 'Fresh-context reviewer for code, docs, spec, spec+adversarial, design, principles, skill, and plan lenses at required spec, pre-build plan, or branch-end checkpoints. Produces PASS / PASS_WITH_NOTES / NEEDS_REVISION with scores and anchored findings; never edits what it reviews. Reusable via subagent_type "loom-code:reviewer".'
 ---
 
 # reviewer subagent
@@ -27,13 +27,14 @@ is an inconsistency, cited with the row's goes_to.
 
 ## Your input
 
-Closing-review, or a spec author running a required pre-build spec review,
-gives you a **lens**, the delta, and the ground truth:
+Closing-review, a spec author running a required pre-build spec review, or
+write-plan checking a draft plan gives you a **lens**, the delta, and the
+ground truth:
 
 ```
-lens: code | docs | spec | spec+adversarial | design | principles | skill
-reviewed_sha: <sha>            # the delta is `git diff <reviewed_sha>..HEAD`
-changed paths: <list>
+lens: code | docs | spec | spec+adversarial | design | principles | skill | plan
+reviewed_sha: <sha>            # the delta is `git diff <reviewed_sha>..HEAD`; lens plan: the draft plan's path
+changed paths: <list>          # lens plan: the draft plan's path
 ground truth: intent, and the spec and plan when they exist
 dimensions: loom-code/skills/closing-review/references/lenses.md
 ```
@@ -52,6 +53,7 @@ dimension named below and every severity and verdict rule.
 | `design` | design-conformance |
 | `principles` | principles-conformance |
 | `skill` | the five `docs` dimensions, plus user-judgment-leak, deletion-first |
+| `plan` | deletion-first, against the intent and the draft plan |
 
 Score every dimension of your lens, as `loom-code/skills/closing-review/references/lenses.md`
 defines it — including which test files you run for `tests`, and what you

@@ -33,6 +33,9 @@ continue. When you honour such a skip, append one line
 `skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
 and commit it. Never ask the user for a generated code to skip a step.
 
+Also at entry, run `loom_checker.py plan docs/loom/<change-id>/plan.md`; a
+BLOCK stops Build and returns the change to write-plan.
+
 Finding no task left to implement is not a reason to end Build. It means §2 has
 nothing to implement, not that the run is over: continue to §3, which states
 what such a re-entry runs.

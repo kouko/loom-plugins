@@ -1,6 +1,6 @@
 # Lenses — what each dimension means, and what it is scored against
 
-One reviewer contract, seven lenses. This file is the dimension definition
+One reviewer contract, eight lenses. This file is the dimension definition
 for all of them; `agents/reviewer.md` names the dimensions and points here
 for what each one is asking. General knowledge of Clean Code, SOLID, DRY,
 TDD, F.I.R.S.T and OWASP is assumed — the citations below say which source
@@ -112,3 +112,11 @@ scored on the five docs dimensions plus `user-judgment-leak` and
 sharpenings: a step whose input the reader must guess is an omission, and a
 paragraph used as a rule without a `<!-- gate: <id> -->` comment is an
 omission too — an unregistered rule is a mechanism nobody recomputes.
+
+## Plan lens
+
+write-plan dispatches this lens on a draft plan before Build, with the
+intent and the draft plan as ground truth. It scores `deletion-first` only:
+can the same Acceptance lines be met with a simpler shape — fewer tasks,
+files or mechanisms, or less code? Return either "no simpler shape", or
+each concrete smaller shape with the tasks or files it removes.

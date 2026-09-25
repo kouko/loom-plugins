@@ -70,7 +70,7 @@ and commit it. Never ask the user for a generated code to skip a step.
 |---|---|---|---|---|
 | capture-intent | intent — `docs/loom/intent/<change-id>.md`; `PRINCIPLES.md` and `DESIGN.md` at the repo root are side outputs of the tools it calls | user — decision point ① | `intent.schema`, `intent.product-no-identifiers`, `intent.needs-design-reason`, `intent.needs-design-recompute` | N/A |
 | write-spec | spec — `docs/loom/<change-id>/spec.md` | user — decision point ②, product only; agent declares pre-build risk | `intake.confirmed`, `standing.product-principles-reject` | `required`: one independent `spec+adversarial` reviewer, no independent acceptance testing; `not-required`: none |
-| write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | no formal plan review; invokes the required spec review only when it authored the spec |
+| write-plan | plan — `docs/loom/<change-id>/plan.md` | agent-decided (runs ① itself when loom-design is absent) | `intake.confirmed`, `intake.confirmed-behavior`, `intake.spec-ready`, `intake.test-case-pair` | one fresh-context `plan` lens reviewer checks for a simpler shape before Build (narrow changes skip); invokes the required spec review only when it authored the spec |
 | build | diff — commits on the change branch | agent-decided | task and integration tests; at the end of Build, an independent adversary's committed adversarial programs and the complete package suite, which must pass before hand-off | no formal review during Build; one closing review follows completed functional work |
 | closing-review | generated `docs/loom/<change-id>/attestation.json`, plus an acceptance test report when needed | fresh-context reviewers; reviewer count comes from the installed Review policy | reviewers see only content that passed Build's checks; `finalize-review` executes the package suite and adversarial programs again on committed content | branch end, or again only after functional content changes |
 | ship | diff / PR — the pushed change branch and its pull request | automatic for canonical intent authorization; one user decision for a legacy intent; merge is separate | `push.contextual-body` and `publish.preconditions`; the verification status is disclosed, not a refusal; no functional replay | before push; publication-only fixes reuse matching evidence |
@@ -392,6 +392,18 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py intake write-plan <change-
 The second run is when `intake.test-case-pair` can inspect the completed
 Task DAG and block missing ownership, empty case pairs, or unresolved intent
 questions. A pre-plan intake pass cannot substitute for this readiness run.
+
+**Simplicity check.** After both checks pass and before the plan commit,
+unless the plan's `## Simplicity check` holds only `- skipped — narrow change`,
+resolve the profile as the [shared dispatch profile](../../references/dispatch-profile.md)
+defines, then dispatch one fresh-context `loom-code:reviewer` with lens
+`plan`, the draft plan's path as `reviewed_sha` and changed paths, and the
+intent and draft plan as ground truth; the plan's author never reviews its own plan. For each
+smaller shape it returns, adopt it by rewriting the plan and rerunning both
+checks, or decline it with a reason, and record each as one `## Simplicity
+check` line; a "no simpler shape" answer records `- none found`. Each adoption
+or decline is agent-decided. This step never asks the user a question, and
+there is no second round.
 
 ### Resolve `second-vendor: suggest`
 
