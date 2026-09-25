@@ -44,6 +44,13 @@ charter: 1.0
 - Test: A6 positive: versions-synchronized-3.16.0; negative: check-mechanisms-without-exception-fails. A7 positive: changelog-names-standing-warn-change; boundary: contract-version-bumped.
 - Risk: minor release; `budget-exception:` line for net 140→142; skill cap 22→23 admits architecture (user-decided 2026-09-25); widens `test_check_mechanisms.py` cap cases.
 
+### Wave 2 — adversary fixes
+
+**W2-01 Validator rejects outside, duplicated and misordered sections; root-only lookup; graduate the probe**  after: W1-03  acceptance: 2, 3, 7
+- Files: `loom-design/scripts/architecture/validate_architecture_output.py`, `loom-code/scripts/loom_checker/command_handlers/standing.py`, `loom-code/tests/test_loom_checker_standing.py`, `docs/loom/2026-09-25-standing-architecture-doc/evidence/probes/test_abuse_architecture_validator.py`, `loom-design/tests/architecture/test_abuse_architecture_validator.py`
+- Test: A2 positive: in-order-single-sections-valid; negative: duplicated-or-misordered-section-rejected. A3 positive: repo-relative-guard-valid; negative: absolute-or-parent-guard-rejected. A7 positive: root-architecture-silences-warn; negative: docs-loom-architecture-still-warns.
+- Risk: class "validator accepts a malformed ARCHITECTURE.md" searched across the validator and schema; lookup class searched across standing handler, write-plan, skill, manifest; probe graduates unchanged; agent-decided.
+
 ## Questions asked
 ① — what — 我原本以為他就是要幫我 設計整個系統架構 的噎 → 我想要走方案 2 因為正常流程就是應該要設計好工程架構跟專案資料夾管理
 ① — done — 對
@@ -58,3 +65,4 @@ charter: 1.0
 5. The intent was amended and re-confirmed (448fad32) after W0-01 landed: the tool designs, not only records; W0-04 carries the delta (user-decided 2026-09-25).
 6. Keep complexity low (user, 2026-09-25): the validator checks structure only, the know-how reference stays under about 150 lines, at most one positive/negative pair per Acceptance line.
 7. user-decided — the counted skill cap rises from 22 to 23 to admit the architecture tool, as releases 3.1.3 and 3.4.0 did (2026-09-25).
+8. Known limitations (deliberate-only): all rules marked `check: review`, an empty guard, or a guard the suite never runs pass the validator; review's architecture-conformance dimension is the backstop. Non-UTF-8 ARCHITECTURE.md crashes the validator (not fixed).
