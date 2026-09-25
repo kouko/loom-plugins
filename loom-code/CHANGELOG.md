@@ -1,5 +1,35 @@
 # Changelog
 
+## [3.15.0] — 2026-09-25 — moved tests no longer count as new probe programs
+
+Minor: the recomputation behind one checker rule, `adversarial.proportionate`,
+changes. The checker's rule list is unchanged (still 26 rules), and no station
+guidance, field or contract manifest changes.
+
+- The probe cap no longer counts a moved test as a new probe program. The
+  count read the branch delta built with `--no-renames`, so a graduated probe
+  carrying `concern:` that a branch only renamed was counted again. PR #52
+  moved every test into `tests/` folders and finalize-review counted 9 probe
+  programs, 8 of them renamed graduated probes and 1 new, against a cap of 5.
+  The count now drops an added path that git pairs as a rename of a path the
+  branch removed, at git's default 50% similarity, and only when the removed
+  path carried a `concern:` line at the branch base; the pairing is computed
+  inside the probe count only, so the shared branch delta and its other
+  callers still read with `--no-renames`. A probe copied under a new name
+  while the original stays, and a move rewritten below 50% similarity, are
+  still counted. The pairing passes `-l0` so a local `diff.renameLimit`
+  cannot change the count. When the pairing cannot be read, nothing is
+  excluded.
+- A program under a folder the declared suite command passes to pytest as
+  `--ignore=` is no longer counted as graduated into the suite, so programs
+  under `tests/local/`, which the package suite skips, are not counted.
+  Known limitation (user-decided): a committed symlink into an ignored folder
+  makes pytest collect its files again, and they go uncounted.
+- New memory entry
+  `docs/loom/memory/moving-graduated-probes-used-to-trip-the-probe-cap.md`
+  records the lesson.
+- The version bump lets installed copies pick up the new count.
+
 ## [3.14.1] — 2026-09-25 — tests live in loom-code/tests
 
 Patch: file locations only. No station guidance, field, rule id or contract
