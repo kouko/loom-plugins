@@ -243,3 +243,46 @@ affected, so all five were re-tested in full. Fresh clones of 277a1c0f (`head`,
 - 5: re-tested — `--list-rules`: 26, diff vs base empty; `check_mechanisms.py
   --baseline origin/main`: net 140 = baseline 140, all clear; fix diff over
   `loom-*/{skills,agents,contract,hooks}`: 0 changed lines.
+
+## Re-run on 2026-09-25, at fdddb2ca
+Fix range 628a600a..fdddb2ca (fdddb2ca): `scripts/run_package_tests.py` computes
+`foreign` (nested repositories + nested worktrees, resolved) before building
+commands and drops any `test-*.sh` whose resolved path lies inside one; new test
+`tests/test_run_package_tests.py::test_shell_group_skips_scripts_inside_nested_repositories`;
+`after-counts.md` and loom-code CHANGELOG numbers. Fresh clones of fdddb2ca
+(`head`, `plant`); base ids from the first run reused.
+
+- 1: carried over — the fix adds no test file and moves none (diff stat: runner,
+  one existing test module, after-counts.md, CHANGELOG).
+- 2: re-tested — ids with head's own inventory: 2337, 246, 53, 261, 121, 64, 43,
+  13, 1, 83, 209, 12, 196 = 3639. Against base 3574: lost 0; extra 65 =
+  build 8 + closing-review 13 + ship 2 + manifest 1 (the 24) +
+  test_run_package_tests.py 6 + test_tests_folder_convention.py 35. Versus
+  277a1c0f: +1 (`test_shell_group_skips_scripts_inside_nested_repositories`), −0.
+  Matches updated `after-counts.md` (3633 passed + 6 skipped, +65). Full suite
+  with the `package-tests:` command, exit 0: code 2335 passed 2 skipped; design
+  245/1; workflow-python 53, 261, 121, 64, 43, 13, 1, 80+3s, 204+5s, 12, 196;
+  workflow-shell 17 scripts, 145 PASS / 0 FAIL; mermaid 11/11 + negative PASS.
+  pytest 3628 passed + 11 skipped = 3639 (the same 5 fresh-clone mermaid skips
+  as every earlier run and base).
+- 3: re-tested — in `plant`, no runner edit:
+  `git worktree add --detach loom-code/tests/wt_nested HEAD` plus a planted
+  `wt_nested/loom-code/tests/test-planted-in-worktree.sh`; a worktree
+  `tests/wt_ignored` hidden via `.git/info/exclude` with
+  `test-planted-in-ignored-worktree.sh`; a `git init` clone
+  `loom-workflow/tests/vendor_clone` with `test-planted-in-clone.sh` and
+  `sub/test-planted-in-clone-sub.sh`; control
+  `loom-code/tests/planted_sub/test-planted-control.sh`.
+  `loom_family_commands(repo, "-q", "workflow-shell")`: 18 commands (17 existing +
+  control); inside a nested repo/worktree: `[]`; control run: yes. Code-group
+  pytest ignores: `loom-code/tests/local`, `loom-code/tests/wt_nested`,
+  `loom-workflow/tests/vendor_clone`, `tests/wt_ignored`. Same tree through the
+  pre-fix runner (`git show 628a600a:scripts/run_package_tests.py`): 64 shell
+  commands, 46 inside the nested copies (e.g.
+  `loom-code/tests/wt_nested/loom-code/tests/local/test-code-team-coexistence.sh`).
+  Python discovery, `tests/local/` skipping, guard refusal and CI triggers are
+  untouched by this diff; their first re-run results stand.
+- 4: carried over — AGENTS.md and every runtime document unchanged in the fix;
+  the Test Location claim (shell tests in the four roots run with no command edit)
+  still matches row 3.
+- 5: carried over — no checker, skill, agent, contract or hook change in the fix.
