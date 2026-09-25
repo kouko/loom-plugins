@@ -355,7 +355,7 @@ def test_existing_bare_backtick_name_passes(tmp_path):
 
 def test_root_protocol_bare_names_are_skipped(tmp_path):
     skills = tmp_path / "skills"
-    names = ("DESIGN.md", "PRINCIPLES.md", "README.md", "CHANGELOG.md",
+    names = ("DESIGN.md", "ARCHITECTURE.md", "PRINCIPLES.md", "README.md", "CHANGELOG.md",
              "AGENTS.md", "CLAUDE.md", "SKILL.md", "KICKOFF-DEFAULTS.md",
              "<change-id>.md")
     body = " ".join(f"Read `{n}` first." for n in names) + "\n"

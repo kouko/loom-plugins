@@ -118,7 +118,7 @@ RULES: list[tuple[str, str]] = [
     ),
     (
         "standing.warn",
-        "A missing PRINCIPLES.md or DESIGN.md prints the fixed three-line WARN and never blocks.",
+        "A missing PRINCIPLES.md, DESIGN.md or ARCHITECTURE.md prints the fixed three-line WARN and never blocks.",
     ),
 ]
 

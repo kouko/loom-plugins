@@ -1,12 +1,12 @@
 # loom-design
 
 > **Loom フローの入口：2 つのステーションが漠然としたアイデアを確認済みの
-> intent に変え、設計が要る変更ならさらに spec に変える。2 つのツールが
-> プロダクトの原則とビジュアルシステムを決める。** loom-design は下書きを
+> intent に変え、設計が要る変更ならさらに spec に変える。3 つのツールが
+> プロダクトの原則とビジュアルシステムとアーキテクチャを決める。** loom-design は下書きを
 > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
 > `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
 
-**Version**: 2.3.2 — 4 skills + 任意のルーター 1 個。リリースは
+**Version**: 2.4.0 — 5 skills + 任意のルーター 1 個。リリースは
 [CHANGELOG.md](CHANGELOG.md) を参照。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -28,6 +28,7 @@ flowchart TD
     subgraph tools["オンデマンドのツール（フローの段階ではない）"]
         principles["loom-design:product-principles<br/>PRINCIPLES.md を ratify"]
         designsys["loom-design:design-system<br/>DESIGN.md を ratify"]
+        arch["loom-design:architecture<br/>ARCHITECTURE.md を設計して ratify"]
     end
 
     intent -->|"needs-design: yes"| spec
@@ -48,8 +49,8 @@ flowchart TD
   ときは、計画の前に `loom-code:closing-review` で fresh-context の
   `spec+adversarial` reviewer 1 人の review を受ける。そうでなければ
   `loom-code:write-plan` へ直接進む。
-- **ツール** — `product-principles` と `design-system` は頼まれたときに
-  動き、それぞれプロジェクトのルートにファイルを 1 つ書く。フローの段階
+- **ツール** — `product-principles`・`design-system`・`architecture` は頼まれたときに
+  動き、それぞれプロジェクトのルートに常設ドキュメントを 1 つ書く。フローの段階
   ではない。
 
 ## Skills
@@ -60,7 +61,8 @@ flowchart TD
 | [`write-spec`](skills/write-spec/SKILL.md) | ステーション | `docs/loom/<change-id>/spec.md` | 確認済みの intent から要件、設計上の決定、現状の証拠、UI flows を書く（決定ポイント ②、product のみ）。 |
 | [`product-principles`](skills/product-principles/SKILL.md) | ツール | `PRINCIPLES.md` | プロダクトの常設の原則を ratify する：順序付きの Non-negotiables 3 件以上と `ratified-by: <name> <date>` の行。 |
 | [`design-system`](skills/design-system/SKILL.md) | ツール | `DESIGN.md` | UI を持つプロダクトのビジュアルシステムを ratify する：色・タイポグラフィ・余白・形状・コンポーネントの token。 |
-| [`using-loom-design`](skills/using-loom-design/SKILL.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 4 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
+| [`architecture`](skills/architecture/SKILL.md) | ツール | `ARCHITECTURE.md` | ユーザーと一緒にプロジェクトのアーキテクチャを設計する：モジュール境界・技術選定・フォルダ構成・CI ステージ。その後、各ルールをガードテストで裏付ける。 |
+| [`using-loom-design`](skills/using-loom-design/SKILL.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 5 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
 
 **常設ドキュメント。** リポジトリに ratify 済みの `PRINCIPLES.md` が無い
 間は、`kind: product` の変更を loom-code の checker

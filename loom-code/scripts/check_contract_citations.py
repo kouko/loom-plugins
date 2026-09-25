@@ -122,6 +122,7 @@ _PROTOCOL_BASENAMES = frozenset(
         "mechanisms.yaml",
         "INDEX.md",
         "DESIGN.md",
+        "ARCHITECTURE.md",
         "QUEUE.toml",
         "README.md",
         "ui-flows.md",

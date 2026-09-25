@@ -32,6 +32,7 @@ WRITE_SPEC = REPO / "loom-design/skills/write-spec/SKILL.md"
 TOOL_SKILLS = (
     REPO / "loom-design/skills/design-system/SKILL.md",
     REPO / "loom-design/skills/product-principles/SKILL.md",
+    REPO / "loom-design/skills/architecture/SKILL.md",
 )
 STATION_TABLE_HEADER = "| station | artifact | who decides | checker | checkpoint |"
 LOCATE_REFERENCE = REPO / "loom-design/skills/capture-intent/references/locate-loom-code.md"
@@ -40,6 +41,7 @@ LOCATE_LINKS = {
     WRITE_SPEC: "../capture-intent/references/locate-loom-code.md",
     TOOL_SKILLS[0]: "../capture-intent/references/locate-loom-code.md",
     TOOL_SKILLS[1]: "../capture-intent/references/locate-loom-code.md",
+    TOOL_SKILLS[2]: "../capture-intent/references/locate-loom-code.md",
 }
 HOST_TABLE_HEADER = "| Where `loom-code` lives |"
 CONTRACT_COMMAND = "python3 <loom-code>/scripts/loom_checker.py contract --require 2.1"
@@ -474,20 +476,20 @@ def test_loom_design_version_2_2_0_consistent() -> None:
         (REPO / "loom-design/plugin.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.3.2"
-    assert codex_manifest["version"] == "2.3.2"
-    assert agy_manifest["version"] == "2.3.2"
-    assert "## [2.3.2]" in changelog
+    assert claude_manifest["version"] == "2.4.0"
+    assert codex_manifest["version"] == "2.4.0"
+    assert agy_manifest["version"] == "2.4.0"
+    assert "## [2.4.0]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/) | 2.3.2 |",
-        "loom-design/README.md": "**Version**: 2.3.2",
-        "loom-design/README.ja.md": "**Version**: 2.3.2",
-        "loom-design/README.zh-TW.md": "**Version**: 2.3.2",
+        "README.md": "| [`loom-design`](loom-design/) | 2.4.0 |",
+        "loom-design/README.md": "**Version**: 2.4.0",
+        "loom-design/README.ja.md": "**Version**: 2.4.0",
+        "loom-design/README.zh-TW.md": "**Version**: 2.4.0",
     }
     for name, pin in readme_pins.items():
         assert pin in (REPO / name).read_text(encoding="utf-8"), name
-    assert "Version 2.3.2. Turns a rough idea" in (REPO / "README.md").read_text(encoding="utf-8")
+    assert "Version 2.4.0. Turns a rough idea" in (REPO / "README.md").read_text(encoding="utf-8")
 
 
 def _branch_note() -> str:

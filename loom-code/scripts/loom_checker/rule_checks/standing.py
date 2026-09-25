@@ -10,8 +10,16 @@ def check_standing_silence(repo: Path) -> bool:
     return kickoff_defaults(repo).get("standing-docs", "").strip() == "waived"
 
 
-def check_standing_warn(principles, design, waived: bool, err) -> None:
-    missing = [name for name, path in (("PRINCIPLES.md", principles), ("DESIGN.md", design)) if path is None]
+def check_standing_warn(principles, design, architecture, waived: bool, err) -> None:
+    missing = [
+        name
+        for name, path in (
+            ("PRINCIPLES.md", principles),
+            ("DESIGN.md", design),
+            ("ARCHITECTURE.md", architecture),
+        )
+        if path is None
+    ]
     if missing and not waived:
         for line in STANDING_WARN:
             err.write(line.format(missing=" or ".join(missing)) + "\n")
@@ -47,8 +55,7 @@ def check_product_principles(repo: Path, front, principles) -> list[tuple[str, s
 
 STANDING_WARN = (
     "WARN: this repo has no {missing} yet.",
-    "WARN: without it, the closing-review station cannot check any change for consistency "
-    "against what this product is supposed to be.",
+    "WARN: without it, the closing-review station cannot check any change against it.",
     "WARN: say the word and I will write one; to stop seeing this, record "
     "`standing-docs: waived — <reason> (<date>)` in docs/loom/KICKOFF-DEFAULTS.md.",
 )

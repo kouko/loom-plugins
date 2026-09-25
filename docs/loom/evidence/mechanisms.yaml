@@ -42,7 +42,7 @@ counting: >
   is not host-hygiene.
 
 mechanisms:
-  # --- skill (22; 7 stations + 11 non-standalone tools + 3 optional routers
+  # --- skill (23; 7 stations + 12 non-standalone tools + 3 optional routers
   #     + the user-invoked expert-mode skill;
   #     the 2 standalone tools are excluded from this population) ---
   - id: using-loom-code
@@ -81,6 +81,9 @@ mechanisms:
   - id: design-system
     class: skill
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
+  - id: architecture
+    class: skill
+    eval: "loom-design/tests/architecture/test_architecture_skill.py"
   - id: decision-map
     class: skill
     eval: "loom-workflow/tests/decision-map/test_decision_map_intent_binding.py"
@@ -226,7 +229,7 @@ mechanisms:
                           # real hook entry, so it must still be listed.
     eval: loom-code/tests/test_language_anchor_hook.py
 
-  # --- contract (63; loom-code/contract/manifest.yaml — stations, the 10
+  # --- contract (64; loom-code/contract/manifest.yaml — stations, the 11
   #     non-standalone tools, actions and per-field artifact schemas) ---
   - {id: "station:capture-intent", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "station:write-spec",     class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
@@ -237,6 +240,7 @@ mechanisms:
   - {id: "station:maintain",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "tool:product-principles",  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:design-system",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:architecture",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:decision-map",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:handoff",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:recap-state",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}

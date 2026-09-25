@@ -40,10 +40,10 @@ literally wrong the text is:
   changed test file — and did not, scores `PASS_WITH_NOTES`, naming what was
   not independently checked. Never "could not see it, so it is fine".
 - A dimension with nothing to conform to — no `PRINCIPLES.md`, no
-  `DESIGN.md` — scores `N/A` with the reason. `N/A` is not a pass and is
+  `DESIGN.md`, no `ARCHITECTURE.md` — scores `N/A` with the reason. `N/A` is not a pass and is
   never given for convenience.
 
-## Code — eleven dimensions
+## Code — twelve dimensions
 
 | Dimension | What it asks | Settled by |
 |---|---|---|
@@ -56,6 +56,7 @@ literally wrong the text is:
 | cross-task-coherence | Only a whole-delta reviewer can see this: abstractions that disagree between tasks, logic duplicated because each task saw one slice, a task that quietly did more than its title | — |
 | external-surface-grounding | Every call into a surface the author does not own — HTTP API, SDK package, MCP tool, CLI flag, a sibling team's contract — carries a grounding citation. Missing on the first four is fatal; missing on a sibling contract is important; two tasks calling the same surface with conflicting shapes is important | — |
 | principles-conformance | Does the change violate a falsifiable clause of the repo's `PRINCIPLES.md`? Scored only when that file exists, else `N/A` | the consumer's own `PRINCIPLES.md` |
+| architecture-conformance | Does the diff follow the repo's `ARCHITECTURE.md` rules and decisions — file placement, module boundaries and dependency direction, file size, CI stages? A violation is a finding whose fix is concrete: conform to the rule, or change the rule and its guard together. A violation of an `ARCHITECTURE.md` rule is at least `important`, so the round sends it back to Build. Scored only when that file exists, else `N/A` | the consumer's own `ARCHITECTURE.md` |
 | deliberate-simplification | A shortcut taken on purpose is annotated with its ceiling and its upgrade path; an annotation saying "later" or "someday" names no ceiling and is a finding | — |
 | deletion-first | Every new abstraction, flag, config or extension point justifies itself with two concrete users now, an explicit request, or a visible motivation. A finding must name the smaller shape that does the same job — no finding without a concrete alternative | — |
 

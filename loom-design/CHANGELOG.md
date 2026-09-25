@@ -12,6 +12,20 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.4.0] — 2026-09-25 — architecture tool
+
+Minor: a new skill.
+
+- New tool `architecture`: designs a project's `ARCHITECTURE.md` with the
+  user — module boundaries, tech choices, folder layout and CI stages —
+  records who ratified it, and backs each mechanically checkable rule
+  with a guard test.
+- The `using-loom-design` router gains one row that routes architecture
+  and folder-layout requests to it.
+- Manifests name the tool in their description and keywords; the READMEs
+  list it (5 skills + 1 optional router).
+- The version bump lets installed copies pick up the new skill.
+
 ## [2.3.2] — 2026-09-25 — tests live in loom-design/tests
 
 Patch. File locations only; no behaviour, field, checker rule or test

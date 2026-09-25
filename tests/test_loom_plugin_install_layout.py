@@ -51,12 +51,13 @@ REQUIRED_LOOM_WORKFLOW_SKILLS = {
     "using-loom-workflow",
 }
 
-# loom-design's whole skill surface: two stations, two tools, one optional router.
+# loom-design's whole skill surface: two stations, three tools, one optional router.
 DESIGN_SKILLS = {
     "capture-intent",
     "write-spec",
     "product-principles",
     "design-system",
+    "architecture",
     "using-loom-design",
 }
 
@@ -608,7 +609,7 @@ def test_sibling_lookup_allows_version_subdirectory() -> None:
     non-Claude hosts too. Claude and Codex caches hold `<name>/<version>/`;
     Antigravity CLI installs `<name>/` with no version directory, so the
     other-host row must allow, not require, one version subdirectory.
-    The four skills share one lookup table in capture-intent's references
+    The five skills share one lookup table in capture-intent's references
     and each links it from Step 0."""
     design_skills = REPO_ROOT / "loom-design" / "skills"
     linking = 0
@@ -619,7 +620,7 @@ def test_sibling_lookup_allows_version_subdirectory() -> None:
         linking += 1
         assert "locate-loom-code.md`" in text, skill_md
         assert "| Where `loom-code` lives |" not in text, skill_md
-    assert linking == 4
+    assert linking == 5
     lookups = 0
     for skill_md in sorted(
         [*design_skills.glob("*/SKILL.md"), *design_skills.glob("*/references/*.md")]

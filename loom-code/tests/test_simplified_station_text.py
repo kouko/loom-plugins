@@ -45,9 +45,9 @@ def _design_skill(name: str) -> str:
     return (ROOT / "loom-design/skills" / name / "SKILL.md").read_text(encoding="utf-8")
 
 
-# The station summary table lives in the three stations only; the two
-# loom-design tools (product-principles, design-system) carry none.
-TOOL_SKILLS = ("product-principles", "design-system")
+# The station summary table lives in the three stations only; the three
+# loom-design tools (product-principles, design-system, architecture) carry none.
+TOOL_SKILLS = ("product-principles", "design-system", "architecture")
 
 
 def test_station_summaries_do_not_duplicate_reviewer_counts() -> None:

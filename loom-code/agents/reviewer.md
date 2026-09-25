@@ -46,7 +46,7 @@ dimension named below and every severity and verdict rule.
 
 | Lens | Dimensions |
 |---|---|
-| `code` | security, architecture, correctness, naming, tests, refactoring, cross-task-coherence, external-surface-grounding, principles-conformance, deliberate-simplification, deletion-first |
+| `code` | security, architecture, correctness, naming, tests, refactoring, cross-task-coherence, external-surface-grounding, principles-conformance, architecture-conformance, deliberate-simplification, deletion-first |
 | `docs` | omission, ambiguity, inconsistency, incorrect-fact, missing-population, deletion-first |
 | `spec` / `spec+adversarial` | docs + spec-, design-, principles-conformance + user-judgment-leak; the combined lens checks missing negative/boundary behavior |
 | `design` | design-conformance |

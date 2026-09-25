@@ -103,7 +103,8 @@ _LINK_TEXT_RE = re.compile(r"\[`[^`]*`\]\([^)]*\)")
 
 # Bare names that are repository-root protocol files, not skill-relative.
 _ROOT_PROTOCOL_NAMES = frozenset({
-    "DESIGN.md", "PRINCIPLES.md", "README.md", "CHANGELOG.md", "AGENTS.md",
+    "DESIGN.md", "ARCHITECTURE.md", "PRINCIPLES.md", "README.md",
+    "CHANGELOG.md", "AGENTS.md",
     "CLAUDE.md", "SKILL.md", "KICKOFF-DEFAULTS.md",
 })
 

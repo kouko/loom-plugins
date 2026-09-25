@@ -24,8 +24,10 @@ def cmd_standing(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     front, _ = parse_document(read_text(intent_path))
     principles = find_standing_doc(repo, "PRINCIPLES.md")
     design = find_standing_doc(repo, "DESIGN.md")
+    architecture = repo / "ARCHITECTURE.md"  # root only: the only place its readers look
+    architecture = architecture if architecture.is_file() else None
     waived = check_standing_silence(repo)
-    check_standing_warn(principles, design, waived, err)
+    check_standing_warn(principles, design, architecture, waived, err)
     failures = check_second_vendor(repo)
     failures += check_product_principles(repo, front, principles)
     return report(failures, err)

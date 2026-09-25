@@ -120,7 +120,7 @@ def test_dispatch_is_not_part_of_generated_attestation(manifest):
 def test_tools_count_and_owner(manifest):
     tools = manifest["tools"]
     counted = [t for t in tools if not t.get("standalone")]
-    assert len(counted) == 10  # 8 loom-workflow + 2 loom-design; 7 stations + 10 = 17 ≤ 18
+    assert len(counted) == 11  # 8 loom-workflow + 3 loom-design; 7 stations + 11 = 18 ≤ 18
     assert {t["name"] for t in tools if t.get("standalone")} == {"goal-create", "dbt-model-style"}
     assert {t["owner"] for t in tools} <= {"loom-design", "loom-workflow"}
 
