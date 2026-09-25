@@ -180,3 +180,66 @@ no extra steps and exited 0 (section 2).
     that moved out of skill folders; no added step, reviewer, gate or dispatch
     wording.
 - Evidence: rule lists diffed; check_mechanisms output quoted above.
+
+## Re-run on 2026-09-25, at 277a1c0f
+Fix range 12d15b38..277a1c0f (78de9aec, 277a1c0f): `TEST_ROOTS` in
+`scripts/run_package_tests.py`, recursive `test-*.sh` discovery under every root
+minus `local/`, repo-wide guard limited to `TEST_ROOTS` + `docs/loom/` (three
+per-plugin guard modules and two root stray tests deleted), AGENTS.md Test
+Location rewritten, loom-workflow-ci.yml shell triggers extended, memory
+entries' suite commands updated, coldread tolerance helper deleted, CHANGELOGs,
+comment-only edit in `loom-workflow/tests/test-privacy-scan.sh`. Every row can be
+affected, so all five were re-tested in full. Fresh clones of 277a1c0f (`head`,
+`plant`); base ids and the base clone from the first run reused (base unchanged).
+
+- 1: re-tested — same `git ls-files` filter at 277a1c0f: 239 test files, 0 outside
+  the four roots `tests/`, `loom-code/tests/`, `loom-design/tests/`,
+  `loom-workflow/tests/`. Every one of the 238 base files maps to a head path via
+  `git diff -M --name-status 23dad634...277a1c0f` (renamed, or unchanged when
+  already in `loom-workflow/tests/`); the only head file with no base origin is
+  `tests/test_tests_folder_convention.py`.
+- 2: re-tested — ids collected with head's own inventory (same script as section
+  2): 13 sessions 2336, 246, 53, 261, 121, 64, 43, 13, 1, 83, 209, 12, 196 = 3638.
+  Against base 3574: lost 0; extra 64 = test_build_recovery_rules 8 +
+  test_closing_review_recovery_rules 13 + test_ship_guidance_presence 2 +
+  test_plugin_manifest 1 (the 24 never collected before) + tests/test_run_package_tests.py 5 +
+  tests/test_tests_folder_convention.py 35. Matches the updated `after-counts.md`
+  (code +63, design 0, workflow +1; 3632 passed + 6 skipped). Ids gone since the
+  first run (b560fb23): the 6 per-plugin guard tests, the 2 root stray tests in
+  test_run_package_tests.py, `test_byte_identity_tolerates_only_the_graduated_dir_line`,
+  and the `loom-new/tests/` allowed case — none exists at base, matching the
+  removal list in `after-counts.md`. Full suite with the `package-tests:` command,
+  exit 0: code 2334 passed 2 skipped; design 245/1; workflow-python 53, 261, 121,
+  64, 43, 13, 1, 80+3s, 204+5s, 12, 196; workflow-shell 17 scripts, 145 PASS / 0 FAIL;
+  mermaid 11/11 + negative PASS. pytest 3627 passed + 11 skipped = 3638; the 5
+  extra skips are the same fresh-clone mermaid-node_modules ordering as the first
+  run (base identical). Coldread test vs base: `graduated_dir` path line and the
+  self-skip only; strict byte equality for the other pairs.
+- 3: re-tested — `plant` clone, no runner edit. Planted and RUN: shell
+  `loom-code/tests/test-planted.sh`, `loom-workflow/tests/sub_sh/test-planted.sh`
+  (the two silently skipped in the first run), `tests/planted_sub/test-planted.sh`,
+  `loom-design/tests/planted_sub/test-planted.sh`; pytest
+  `loom-code/tests/planted_sub/test_planted_a.py`,
+  `loom-design/tests/planted_sub/test_planted_b.py`,
+  `loom-workflow/tests/planted_skill/test_planted_c.py`. Planted and NOT run:
+  `loom-code/tests/local/test-planted-local.sh`,
+  `loom-workflow/tests/local/test-planted-local.sh`, `tests/local/test_planted_local.py`,
+  and the nested non-root `loom-code/scripts/tests/test_planted_nested.py` and
+  `scripts/tests/test_planted_rootnested.py`. The guard
+  `tests/test_tests_folder_convention.py::test_no_test_file_sits_outside_a_tests_folder`
+  on that tree FAILED naming `loom-code/scripts/tests/test_planted_nested.py`
+  first and "2 more items" (the two nested strays; the local and in-root plants
+  were not reported). CI: `--only` groups unchanged (all five); loom-workflow-ci.yml
+  push and pull_request paths now add `tests/**`, `loom-code/tests/**`,
+  `loom-design/tests/**`.
+- 4: re-tested — AGENTS.md Test Location at 277a1c0f: suite runs only the four
+  roots incl. subfolders, discovers `test_*.py`, `*_test.py`, `test-*.sh`, no
+  command edit; `tests/local/` skipped by suite and CI; a new plugin's root must be
+  added to `TEST_ROOTS`; per-plugin remove rule. This matches row 3's observed
+  behaviour. Old-path grep (same 434 needles, 223 runtime files): 0 hits.
+  `docs/loom/memory/` diff in the fix: old suite commands
+  (`pytest loom-code/scripts/ scripts/`) replaced by `loom-code/tests/ tests/` or
+  the runner command.
+- 5: re-tested — `--list-rules`: 26, diff vs base empty; `check_mechanisms.py
+  --baseline origin/main`: net 140 = baseline 140, all clear; fix diff over
+  `loom-*/{skills,agents,contract,hooks}`: 0 changed lines.
