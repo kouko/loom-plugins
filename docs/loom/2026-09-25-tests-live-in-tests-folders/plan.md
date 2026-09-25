@@ -52,8 +52,9 @@ charter: 1.0
 ① — what — 根目錄裡的測試應該也要一起搬吧？ 都要統一了說
 ① — done — 對
 ① — consequence — 本機專用的整合測試：放 tests/local/ 並讓 package 測試跳過（A，推薦）／全部照跑／留在原處
+① — done — Ａ
 
 ## Risks
 1. Acceptance 2 is the oracle: before/after pytest and shell totals per plugin must match plus 24 newly collected tests; any gap means a lost test, not a flaky one.
-2. The Acceptance 3 `tests/local/` exception was added after confirmation and is pending the user's explicit answer; if they choose otherwise, W0-01 and W0-02 change.
+2. user-decided — local-only integration tests live in `tests/local/`, which the package suite skips (option A, 2026-09-25); the two failing scripts are a separate follow-up.
 3. Two local-only integration scripts fail on this machine before the move; fixing them is out of scope and is reported as a follow-up.
