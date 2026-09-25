@@ -68,7 +68,7 @@ walking the filesystem their own way.
   `scripts/test_state_anchor_carrier_inventory.py`; plus the collection roots
   the package-test runner hands to pytest.
 - The ability to run these scanners in a `git archive` copy is already relied
-  on and must be kept; `loom-code/scripts/test_write_plan_station_text.py:269`
+  on and must be kept; `loom-code/tests/test_write_plan_station_text.py:269`
   documents that purpose. Five of the six are archive-capable; the exception is
   `loom-code/scripts/rehearse_probes.py`, which clones the repository to do its
   work and so depends on git by construction. That dependency predates this
