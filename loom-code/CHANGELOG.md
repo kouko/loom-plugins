@@ -23,8 +23,8 @@ change, and no test assertion changes except the one skipped pair below.
   `docs/loom/`, so a test left in root `scripts/`, `.claude/hooks/`, a
   plugin's own folders or a tests folder the suite does not run is refused;
   a new plugin's tests are refused until its root is added to `TEST_ROOTS`.
-- Code group counts: 2271 passed, 2 skipped before; 2333 passed, 2 skipped
-  after. The 62 new tests are the 23 probes and 39 inventory and guard
+- Code group counts: 2271 passed, 2 skipped before; 2334 passed, 2 skipped
+  after. The 63 new tests are the 23 probes and 40 inventory and guard
   tests in the root `tests/`; no earlier test is missing.
 - The coldread branch-end graduated probe,
   `test_graduated_probe_copies_byte_identical_to_evidence_originals`, still

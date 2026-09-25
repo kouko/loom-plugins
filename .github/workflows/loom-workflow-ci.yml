@@ -7,13 +7,14 @@ name: loom-workflow CI
 # test-memory-grep-verify.sh) that pin memory-grep.sh's frozen exit-code
 # contract. A regression there had no CI gate to catch it.
 #
-# Three jobs: the shell suite (glob over loom-workflow/tests/test-*.sh),
+# Three jobs: the shell suite (every test-*.sh under the runner's
+# TEST_ROOTS, which live mostly in loom-workflow/tests/),
 # a mermaid job that parses every mermaid block loom-visualization ships
 # (see that job's comment), and a pytest job that runs every pytest file
 # under loom-workflow/tests/ (its top level plus each subfolder, such as
 # tests/scripts/ and tests/<skill>/, discovered by the runner — never a
 # named list, so a skill added after this file was written is covered
-# without another edit here). Each subfolder is its own pytest invocation
+# without another edit here). Each subfolder is its own pytest session
 # because two different skills can legitimately ship a same-named test
 # file (e.g. test_readmes.py, test_skill_md.py); running them all in one
 # pytest process would trip Python's module-identity check on the
@@ -34,12 +35,20 @@ on:
       - 'loom-workflow/**'
       - '.github/workflows/loom-workflow-ci.yml'
       - 'scripts/run_package_tests.py'
+      # The shell job runs every test-*.sh under every TEST_ROOTS folder in
+      # scripts/run_package_tests.py, so an edit under any of them must fire it.
+      - 'tests/**'
+      - 'loom-code/tests/**'
+      - 'loom-design/tests/**'
   push:
     branches: [main]
     paths:
       - 'loom-workflow/**'
       - '.github/workflows/loom-workflow-ci.yml'
       - 'scripts/run_package_tests.py'
+      - 'tests/**'
+      - 'loom-code/tests/**'
+      - 'loom-design/tests/**'
 
 permissions:
   contents: read

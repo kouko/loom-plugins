@@ -121,6 +121,18 @@ def test_ci_path_filters_cover_the_tests_folders() -> None:
             assert _missed(filters, paths) == [], f"{name} {event}"
 
 
+def test_workflow_shell_ci_is_triggered_by_every_test_root() -> None:
+    """A `test-*.sh` in any root runs in the shell group, so editing it must fire that job."""
+    shell = [
+        w for w in sorted(WORKFLOWS.glob("*.yml"))
+        if "--loom-family --only workflow-shell" in w.read_text(encoding="utf-8")
+    ]
+    assert len(shell) == 1, shell
+    paths = [f"{root}/sub/test-new.sh" for root in TEST_ROOTS]
+    for event, filters in _triggers(shell[0]).items():
+        assert _missed(filters, paths) == [], f"{shell[0].name} {event}"
+
+
 def test_ci_path_filter_missing_tests_is_detected() -> None:
     assert _missed(["loom-code/scripts/**", "scripts/**"], ["loom-code/tests/test_new.py"]) == [
         "loom-code/tests/test_new.py"
