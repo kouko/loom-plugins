@@ -12,8 +12,10 @@ Valid iff:
   3. Every non-blank line under those sections is a rule line
      `- <ID> — <rule> — check: <guard path>` or `... — check: review`.
   4. Rule ids are unique across the file.
-  5. Every `check:` guard path other than `review` exists relative to the
-     repository root, taken as the file's parent directory.
+  5. Every `check:` guard path other than `review` is relative, stays inside
+     the repository root (the file's parent directory) and exists there.
+  6. No `## ` heading appears twice, and the sections come in schema order:
+     Decisions, then the four rule sections in the order above.
 
 Like design-system's validator, this blocks nothing downstream: it is the
 authoring-side check the tool runs on its own output.
@@ -92,6 +94,13 @@ def _check_rules(text: str, repo_root: Path) -> list[str]:
             problems.append(f"section '## {name}' is not allowed; ARCHITECTURE.md holds "
                             f"only '## {DECISIONS}' and the four rule sections "
                             f"({', '.join(SECTIONS)})")
+    headings = [line[3:].strip() for line in text.splitlines() if line.startswith("## ")]
+    for name in dict.fromkeys(h for h in headings if headings.count(h) > 1):
+        problems.append(f"section '## {name}' appears more than once; merge the copies")
+    order = [h for h in dict.fromkeys(headings) if h == DECISIONS or h in SECTIONS]
+    if order != [h for h in (DECISIONS, *SECTIONS) if h in order]:
+        problems.append(f"sections are out of order; the order is '## {DECISIONS}', "
+                        f"then {', '.join(SECTIONS)}")
     seen: set[str] = set()
     for name in SECTIONS:
         for line in sections.get(name, []):
@@ -108,7 +117,11 @@ def _check_rules(text: str, repo_root: Path) -> list[str]:
             if rule_id in seen:
                 problems.append(f"rule id {rule_id} is used twice; ids must be unique")
             seen.add(rule_id)
-            if guard != "review" and not (repo_root / guard).is_file():
+            if guard != "review" and (Path(guard).is_absolute() or not
+                                      (repo_root / guard).resolve().is_relative_to(repo_root)):
+                problems.append(f"rule {rule_id} names guard '{guard}', which is not a path "
+                                f"inside the repository; write it relative to {repo_root}")
+            elif guard != "review" and not (repo_root / guard).is_file():
                 problems.append(
                     f"rule {rule_id} names guard '{guard}', which does not exist "
                     f"under {repo_root}; write the guard or mark the rule 'check: review'"

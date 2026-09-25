@@ -192,6 +192,16 @@ def test_principles_under_docs_loom_also_counts(tmp_path: Path) -> None:
     assert warn_lines(result) == []
 
 
+def test_architecture_under_docs_loom_does_not_count(tmp_path: Path) -> None:
+    repo, intent = make_repo(tmp_path)
+    add_principles(repo)
+    add_design(repo)
+    add_architecture(repo)
+    (repo / "ARCHITECTURE.md").rename(repo / "docs/loom/ARCHITECTURE.md")
+    lines = warn_lines(run_checker("standing", str(intent), cwd=repo))
+    assert lines and "ARCHITECTURE.md" in lines[0]
+
+
 # --- standing.product-principles-reject -----------------------------------
 
 
