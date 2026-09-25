@@ -2,7 +2,7 @@
 
 The shared engine ``scripts/sync_codex_manifests.py`` (repo-level SSOT) now owns
 all the pure sync/check logic; those functions are exercised by
-``scripts/test_sync_codex_manifests.py``. loom-code no longer ships its own copy
+``tests/test_sync_codex_manifests.py``. loom-code no longer ships its own copy
 of the engine — this test only asserts that loom-code's COMMITTED manifests
 (``.claude-plugin`` SSOT vs ``.codex-plugin`` derived) stay in lock-step when
 run through the shared engine.

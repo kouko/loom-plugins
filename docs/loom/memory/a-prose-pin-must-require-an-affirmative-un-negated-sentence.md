@@ -31,7 +31,7 @@ never in their language." or "3) Never literal:", and when the guide said
 a yes-or-no question "is never asked directly" with the metaphor ban
 deleted: every required token survived each flip. The guard that closed it
 is one shared negation matcher applied to the sentence carrying the pinned
-phrase (`NEGATION` in `loom-workflow/scripts/test_visualization_card_hook.py`,
+phrase (`NEGATION` in `loom-workflow/tests/scripts/test_visualization_card_hook.py`,
 used by `rule_polarity_errors` and `inline_decision_rule_errors`), with one
 accepted and one rejected example per rule.
 

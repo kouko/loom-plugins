@@ -39,17 +39,18 @@ on:
       # a drift in a non-loom-code plugin merges ungated (fail-open).
       - '**/.claude-plugin/plugin.json'
       - '**/.codex-plugin/plugin.json'
-      # Same rule for the pytest step: it runs the WHOLE `scripts/` dir, so the
-      # trigger must be the whole dir too. Enumerating filenames here is what
-      # already drifted once — scripts/check_version_bump.py was added with its
-      # 9 tests and never listed, so a PR editing only that gate ran none of
-      # them (fail-open on the gate's own maintenance).
+      # Same rule for the pytest step: it runs every repository-level test,
+      # and those test the WHOLE `scripts/` dir, so the trigger must be the
+      # whole dir too. Enumerating filenames here is what already drifted
+      # once — scripts/check_version_bump.py was added with its 9 tests and
+      # never listed, so a PR editing only that gate ran none of them
+      # (fail-open on the gate's own maintenance).
       - 'scripts/**'
       # The repository-level tests of those scripts live in the root tests/
       # folder and run in the same pytest step.
       - 'tests/**'
       # Repo-root drift guards scan the whole loom-*/ tree
-      # (scripts/test_state_anchor_carrier_inventory.py's population is
+      # (tests/test_state_anchor_carrier_inventory.py's population is
       # EVERYTHING under loom-*/), the mechanism recompute counts every
       # plugin's skills/ directories, and the doc-citation gate reads
       # loom-design's and loom-workflow's prose — but only loom-code/** is
@@ -59,9 +60,9 @@ on:
       # Same, for the third plugin: its skills count toward the mechanism
       # recompute and its prose is in the doc-citation scope.
       - 'loom-workflow/**'
-      # scripts/test_loom_design_ci_unified_root.py guards the single unified
+      # tests/test_loom_design_ci_unified_root.py guards the single unified
       # loom-design pytest step in loom-design-ci.yml, but it is collected
-      # only by THIS workflow's `scripts/` step -- so the whole workflow dir
+      # only by THIS workflow's pytest step -- so the whole workflow dir
       # must be a trigger. Naming just this file leaves the guard fail-open:
       # a PR editing only loom-design-ci.yml (or adding a brand-new
       # workflow with a per-station job) would never run it.

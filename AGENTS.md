@@ -54,6 +54,18 @@ skills/init/references/v1/spec.md     ← references/ 下開 v1/
   `loom-code/tests/test_module_criteria_text.py` 記著每一條由哪支 check 執行
 - 範例是 `loom-code/skills/closing-review/references/` 底下的 adversary recipe 拆分
 
+### Test Location
+
+**MUST：測試住在 `tests/` 資料夾，和它測的 code 分開。**
+
+- 每個 plugin 的測試放在 `<plugin>/tests/`；loom-workflow 的 skill 測試放在 `loom-workflow/tests/<skill>/`
+- Repository-level 測試（root `scripts/`、`.claude/hooks/` 的測試）放在 root `tests/`
+- 不可把測試放在 production code 旁邊（`scripts/` 內）或 skill 資料夾內（含 `probes/`）
+- `tests/local/` 放需要本機安裝 CLI 的測試，package suite 會跳過它
+- Package suite（`scripts/run_package_tests.py --loom-family`）自動探索 `tests/` 資料夾，新增測試不用改 suite command；CI 也跑同一份 inventory
+- 例外：`docs/loom/` 底下的 evidence probe 程式留在原處
+- 移除一個 skill 時一併刪掉它的 `tests/<skill>/` 資料夾（Module Criteria 的 **remove**）
+
 ### Contract Citations
 
 **MUST：執行期散文契約不得引用本 repo 的開發紀錄** — a runtime prose

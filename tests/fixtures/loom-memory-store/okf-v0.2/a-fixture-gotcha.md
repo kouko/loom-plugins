@@ -10,7 +10,7 @@ type_note: fixture-only field, not part of the Loom profile schema — exercises
 
 ## Trigger
 
-Whenever `scripts/test_loom_plugin_install_layout.py` copies `loom-memory`
+Whenever `tests/test_loom_plugin_install_layout.py` copies `loom-memory`
 into a clean install root and needs a real bundle to validate.
 
 ## Correct path

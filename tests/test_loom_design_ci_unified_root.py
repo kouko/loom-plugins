@@ -1,21 +1,23 @@
 """CI scan: the loom-design suite must be invoked from ONE workflow step.
 
-Task 1 of this arc gave `loom-design/scripts/` a pytest root that collects
-every station directory in a single invocation. This test pins the CI side
-of that: the per-directory pytest jobs collapse to one, and no workflow
-comment may keep asserting that the suites need separate invocations. (There
-were five station directories when this was written and three from loom 1.0
-on; the count is not what the guard pins — the single invocation is.)
+Task 1 of this arc gave the loom-design suite a pytest root that collects
+every station directory in a single invocation; the suite lived in
+`loom-design/scripts/` then and lives in `loom-design/tests/` now. This test
+pins the CI side of that: the per-directory pytest jobs collapse to one, and
+no workflow comment may keep asserting that the suites need separate
+invocations. (There were five station directories when this was written and
+three from loom 1.0 on; the count is not what the guard pins — the single
+invocation is.)
 
 SCOPE, stated plainly because a guard that overstates itself is worse than
 one that is honest: this is a TEXT scan of the workflow YAML, not a parse of
 each step into `run` + `working-directory`. It sees an invocation only when
-the literal path `loom-design/scripts...` appears in the step's own text. It
-therefore covers: the path anywhere after `pytest` (flags in between), and a
+the literal path `loom-design/scripts...` or `loom-design/tests...` appears
+in the step's own text. It therefore covers: the path anywhere after `pytest` (flags in between), and a
 `run: |` block splitting the command from its path across lines. The two
 shapes that would otherwise reach the suite WITHOUT that literal adjacency --
-`working-directory: loom-design/scripts` plus `run: pytest spec/`, and
-`run: cd loom-design/scripts && pytest spec/` -- are handled by refusing the
+`working-directory: loom-design/tests` plus `run: pytest spec/`, and
+`run: cd loom-design/tests && pytest spec/` -- are handled by refusing the
 relocation outright (`test_workflows_do_not_relocate_into_the_suite_root`)
 rather than by resolving it, so the scan keeps working on explicit paths.
 
@@ -23,7 +25,7 @@ What is still NOT caught, and would need a real per-step YAML parse to close:
 a path reaching pytest through a shell variable, a `matrix` expansion, a
 composite/reusable action defined outside `.github/workflows/`, or a
 positional argument sitting between `pytest` and the path
-(`pytest tests/ loom-design/scripts/spec/` -- INVOCATION allows only flags
+(`pytest tests/ loom-design/tests/spec/` -- INVOCATION allows only flags
 there, and that form was judged contrived enough not to widen it for).
 """
 
@@ -32,9 +34,9 @@ import re
 
 WORKFLOWS = pathlib.Path(__file__).resolve().parents[1] / ".github" / "workflows"
 
-# The invocation shape itself -- `pytest <path under loom-design/scripts>` --
+# The invocation shape itself -- `pytest <path under the suite root>` --
 # not merely a line that mentions loom-design. Flags are allowed between the
-# command and the path (`pytest -q loom-design/scripts/spec/`): pinning the
+# command and the path (`pytest -q loom-design/tests/spec/`): pinning the
 # path as the token immediately after `pytest` left every flag-first fan-out
 # invisible. `\s` spans newlines so a `run: |` block that wraps the command
 # is matched too -- see `_find_invocations`, which scans the file as one
@@ -42,15 +44,15 @@ WORKFLOWS = pathlib.Path(__file__).resolve().parents[1] / ".github" / "workflows
 INVOCATION = re.compile(
     r"\bpytest\b"                       # the command
     r"(?:\s+(?:\\|-\S+(?:\s+(?!-)\S+)?))*"  # ... flags (+ values) and `\` line-continuations
-    r"\s+(loom-design/scripts\S*)"       # ... then the suite path
+    r"\s+(loom-design/(?:scripts|tests)\S*)"  # ... then the suite path, old or new root
 )
 
 # A step that moves the shell INTO the suite root, after which a bare
-# `pytest spec/` would reach the suite with no literal `loom-design/scripts`
+# `pytest spec/` would reach the suite with no literal suite-root path
 # next to it. The text scan structurally cannot resolve those, so they are
 # refused rather than resolved -- keep the invocation path explicit.
 RELOCATION = re.compile(
-    r"(?:working-directory:\s*|\bcd\s+)(loom-design/scripts\S*)"
+    r"(?:working-directory:\s*|\bcd\s+)(loom-design/(?:scripts|tests)\S*)"
 )
 
 # A comment asserting the suites cannot share one invocation, e.g.
@@ -77,7 +79,7 @@ def _split_comment_and_code(text):
 
 
 def _find_invocations(code):
-    """Every `pytest ... loom-design/scripts/...` invocation in workflow code.
+    """Every `pytest ... loom-design/{scripts,tests}/...` invocation in workflow code.
 
     Scans the code as ONE string rather than line by line: a `run: |` block
     may split the command and its path across lines, and per-line matching
@@ -99,6 +101,7 @@ def test_workflows_invoke_loom_design_suite_once():
         prose, code = _split_comment_and_code(text)
         shared = "scripts/run_package_tests.py --loom-family --only design"
         invocations.extend(f"{path.name}: shared-runner" for _ in range(code.count(shared)))
+        invocations.extend(f"{path.name}: {found}" for found in _find_invocations(code))
         if SEPARATE_CLAIM.search(prose):
             offending_comments.append(path.name)
 
@@ -112,15 +115,21 @@ def test_workflows_invoke_loom_design_suite_once():
     )
 
 
-# The four shapes a restored per-station job could take, all of which the
-# guard must see. Only the first has the path as the token immediately
-# after `pytest`; the other three put a flag in between.
+# The shapes a restored per-station job could take, all of which the guard
+# must see, under the old suite root and the new one. The first of each four
+# has the path as the token immediately after `pytest`; the other three put a
+# flag in between.
 FAN_OUT_FORMS = (
     "        run: python3 -m pytest loom-design/scripts/ -q",
     "        run: python3 -m pytest -q loom-design/scripts/spec/",
     "        run: python3 -m pytest --import-mode=importlib "
     "loom-design/scripts/interface/",
     "        run: pytest -x loom-design/scripts/principles/",
+    "        run: python3 -m pytest loom-design/tests/ -q",
+    "        run: python3 -m pytest -q loom-design/tests/spec/",
+    "        run: python3 -m pytest --import-mode=importlib "
+    "loom-design/tests/interface/",
+    "        run: pytest -x loom-design/tests/principles/",
 )
 
 # A `run: |` block that splits the command from its path across lines.
@@ -128,7 +137,7 @@ MULTILINE_FAN_OUT = """    steps:
       - name: spec suite
         run: |
           python3 -m pytest \\
-            loom-design/scripts/spec/
+            loom-design/tests/spec/
 """
 
 
@@ -143,17 +152,17 @@ def test_guard_sees_a_flag_before_the_path():
 
 def test_guard_sees_a_run_block_split_across_lines():
     _prose, code = _split_comment_and_code(MULTILINE_FAN_OUT)
-    assert _find_invocations(code) == ["loom-design/scripts/spec/"], (
+    assert _find_invocations(code) == ["loom-design/tests/spec/"], (
         "a `run: |` block splitting `pytest` from its path across lines "
         "hid the invocation from the guard"
     )
 
 
 def test_workflows_do_not_relocate_into_the_suite_root():
-    """No workflow step may cd / working-directory into loom-design/scripts.
+    """No workflow step may cd / working-directory into the loom-design suite root.
 
     Both shapes let a restored per-station job (`pytest spec/`) run with no
-    literal `loom-design/scripts` beside `pytest`, which the text scan above
+    literal suite-root path beside `pytest`, which the text scan above
     cannot see. Refusing the relocation keeps the scan's premise true.
     """
     relocations = []
@@ -177,6 +186,9 @@ RELOCATION_FORMS = (
     "        working-directory: loom-design/scripts\n"
     "        run: python3 -m pytest spec/",
     "        run: cd loom-design/scripts && pytest spec/",
+    "        working-directory: loom-design/tests\n"
+    "        run: python3 -m pytest spec/",
+    "        run: cd loom-design/tests && pytest spec/",
 )
 
 

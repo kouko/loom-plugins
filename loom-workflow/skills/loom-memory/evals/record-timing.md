@@ -48,7 +48,7 @@ whole job.
 
 Contract version: the `Record` section after Round 3 added the
 digest-exhausted case to the exception sentence; section digest
-`33a40772`, the value pinned in `scripts/test_skill_contract.py` until the
+`33a40772`, the value pinned in `loom-workflow/tests/loom-memory/test_skill_contract.py` until the
 2026-09-16 run below.
 Twelve candidates. Reader: one fresh-context `sonnet` agent, no tools used.
 

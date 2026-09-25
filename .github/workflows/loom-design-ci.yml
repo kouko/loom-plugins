@@ -34,6 +34,9 @@ on:
       # marketplace.json, so an edit there must fire this gate too —
       # else a removed/renamed entry merges ungated (fail-open).
       - '.claude-plugin/marketplace.json'
+      # The shared inventory decides what this job runs, so an edit to it
+      # must fire this gate too.
+      - 'scripts/run_package_tests.py'
       - '.github/workflows/loom-design-ci.yml'
   push:
     branches: [main]
@@ -42,6 +45,7 @@ on:
       - 'loom-code/hooks/**'
       - 'loom-code/contract/**'
       - '.claude-plugin/marketplace.json'
+      - 'scripts/run_package_tests.py'
       - '.github/workflows/loom-design-ci.yml'
 
 permissions:
@@ -65,7 +69,7 @@ jobs:
         # workflow to check its own path triggers.
         run: python3 -m pip install --quiet pytest pyyaml
 
-      - name: Run the loom-design scripts pytest suite
+      - name: Run the loom-design pytest suite
         # Trade accepted deliberately: the deleted per-station jobs gave
         # per-station visibility in the Actions UI and ran -v, and this one
         # step gives up both. -q is kept because a >1000-test -v listing is

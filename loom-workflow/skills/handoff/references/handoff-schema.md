@@ -386,7 +386,7 @@ to miss the critical detail that makes the error actionable.
 Block 9 says: "Run the test suite to check things are working."
 The cold AI runs `pytest` with no flags and 3 unrelated test failures from
 unfinished work cause it to stop. The correct command was
-`pytest loom-workflow/skills/handoff/scripts/ -v --tb=short`.
+`pytest loom-workflow/tests/handoff/ -v --tb=short`.
 Plain-language softening ("run the test suite") removed the scope constraint
 that made the command safe to execute.
 
@@ -431,8 +431,8 @@ T1 bundle commit are done. About to begin T2 (SKILL.md authoring). Branch:
 - Rejected splitting prepare/resume into two separate skills — one skill with
   two modes is simpler and matches softaworks CREATE MODE / RESUME MODE pattern
 - Bundle path: `loom-workflow/skills/handoff/references/handoff-schema.md`
-- Test path: `loom-workflow/skills/handoff/scripts/test_handoff_schema.py`
-- Quote from plan: "RED: `PYTHONDONTWRITEBYTECODE=1 pytest loom-workflow/skills/handoff/scripts/test_handoff_schema.py::test_all_ten_blocks_and_five_principles_present -v` fails initially"
+- Test path: `loom-workflow/tests/handoff/test_handoff_schema.py`
+- Quote from plan: "RED: `PYTHONDONTWRITEBYTECODE=1 pytest loom-workflow/tests/handoff/test_handoff_schema.py::test_all_ten_blocks_and_five_principles_present -v` fails initially"
 
 ### All User Messages
 
@@ -467,7 +467,7 @@ reader is confused by vague descriptions, not helped by them
 | File path | Why it matters | Recently modified |
 |---|---|---|
 | `loom-workflow/skills/handoff/references/handoff-schema.md` | SSOT for 10-block schema — SKILL.md routes here | Yes — just created (T1 GREEN) |
-| `loom-workflow/skills/handoff/scripts/test_handoff_schema.py` | Structural gate test for bundle | Yes — created in T1 RED commit `7b09c92a` |
+| `loom-workflow/tests/handoff/test_handoff_schema.py` | Structural gate test for bundle | Yes — created in T1 RED commit `7b09c92a` |
 | `loom-workflow/.claude-plugin/plugin.json` | Plugin manifest — needs version bump in T4 | No — untouched until T4 |
 
 ### Do Not Touch
@@ -480,7 +480,7 @@ reader is confused by vague descriptions, not helped by them
 ### Verification Commands
 
 - [T1] `git log --oneline -3` — expected: `7b09c92a` at or near top (RED commit)
-- [T1] `PYTHONDONTWRITEBYTECODE=1 pytest loom-workflow/skills/handoff/scripts/test_handoff_schema.py -v` — expected: 1 passed
+- [T1] `PYTHONDONTWRITEBYTECODE=1 pytest loom-workflow/tests/handoff/test_handoff_schema.py -v` — expected: 1 passed
 - [T1] `ls loom-workflow/skills/handoff/references/` — expected: `handoff-schema.md` listed
 - [T1] `cat loom-workflow/.claude-plugin/plugin.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['version'])"` — expected: `2.10.0`
 - [T2] `git status --short` — expected: `feat/handoff-v0.1` dirty set; benign drift: +1 untracked line for `.claude/handoffs/` (this HANDOFF file)

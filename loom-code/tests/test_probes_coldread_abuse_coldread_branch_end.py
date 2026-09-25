@@ -203,7 +203,7 @@ def test_run_headers_carry_status_ok_model_sonnet_and_correct_prompt_hash(dirnam
 
 
 def test_graduated_probe_copies_byte_identical_to_evidence_originals() -> None:
-    """The nine `loom-code/scripts/test_probes_coldread_*.py` files are
+    """The nine `loom-code/tests/test_probes_coldread_*.py` files are
     supposed to be graduated copies of the nine `evidence/probes/
     test_*.py` files, with at most their path-referencing lines
     differing (the plan says the fixture-verbatim check is "rewritten

@@ -18,7 +18,7 @@ per test with `classname`, `name`, and a `<skipped message=…>` or
 `<failure>` child. Two traps inside it:
 
 - This pytest writes no `file` attribute, so the path must be rebuilt
-  from `classname` (`loom_code.scripts.test_x` → `loom-code/scripts/test_x.py`).
+  from `classname` (`loom_code.tests.test_x` → `loom-code/tests/test_x.py`).
   A test inside a class makes `classname` `…test_x.TestThing`; splitting
   naively yields `…/test_x/TestThing.py`, a nodeid pytest cannot select.
   Split at the last dotted segment whose `.py` exists in the tree and

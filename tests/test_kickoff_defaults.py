@@ -1,10 +1,10 @@
 """W1-05 — `docs/loom/KICKOFF-DEFAULTS.md`'s `package-tests` line covers
-`loom-design/scripts/`, and its trailing note stops claiming CI runs the
-identical path set.
+loom-design's tests (`loom-design/tests/`), and its trailing note stops
+claiming CI runs the identical path set.
 
 #791 went red in CI twice because the recorded package-tests command
 (the one `push.probes-package-tests` compares a recorded run against) never
-ran loom-design's own tests -- CI runs those in a separate job
+ran loom-design's own tests -- CI ran those in a separate job
 (`.github/workflows/loom-design-ci.yml`, `python3 -m pytest
 loom-design/scripts/ -q`), not the loom-code job KICKOFF used to claim
 parity with.
