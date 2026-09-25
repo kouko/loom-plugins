@@ -1,5 +1,5 @@
 """loom-design must keep its own CI workflow, running the whole
-`loom-design/scripts/` suite in one invocation, with path triggers on both
+`loom-design/tests/` suite in one invocation, with path triggers on both
 `pull_request` and `push`.
 
 Ported from `scripts/pipeline/test_pipeline_ci_workflow.py`, which was

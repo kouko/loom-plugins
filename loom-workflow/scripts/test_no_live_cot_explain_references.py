@@ -11,7 +11,7 @@ Which files are the repository's own is git's answer, taken from
 out inside the tree are not live paths of this repository. `docs/` stays in
 this scanner's own `SKIPPED_DIRS` — it is this rule's history exemption, not a
 generic ignore name. The loom-code module is reached across trees by sys.path,
-as `loom-design/scripts/spec/test_write_spec_contract.py` already does.
+as `loom-design/tests/spec/test_write_spec_contract.py` already does.
 """
 from __future__ import annotations
 

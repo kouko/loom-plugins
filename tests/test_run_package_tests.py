@@ -53,7 +53,7 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
     assert {"tests", "loom-code/tests"} <= set(code)
     assert "scripts" not in code and ".claude/hooks" not in code
     assert "loom-code/scripts" not in code
-    assert any("loom-design/scripts" in command for command in rendered)
+    assert any("loom-design/tests" in command for command in rendered)
     assert any(command[3:4] == ["loom-workflow/tests"] for command in commands)
     assert any("loom-workflow/tests/test-privacy-gate-compose-commit.sh" in command for command in rendered)
 

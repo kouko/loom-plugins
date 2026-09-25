@@ -143,11 +143,11 @@ loom-design 本身沒有 hook；loom-code 的 hook 只在 `agy` CLI 執行，Ant
 ## 跑測試
 
 ```sh
-python3 -m pytest loom-design/scripts/
+python3 -m pytest loom-design/tests/
 ```
 
 一次呼叫就收齊 `interface/`、`principles/`、`spec/` 三個目錄；
-`scripts/pytest.ini` 設 `--import-mode=importlib`，讓同名的 test 模組能並存。
+`tests/pytest.ini` 設 `--import-mode=importlib`，讓同名的 test 模組能並存。
 三個 plugin 的完整套件測試從 repo 根目錄執行：
 
 ```sh

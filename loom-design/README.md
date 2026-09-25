@@ -153,11 +153,11 @@ in the Antigravity desktop app or IDE.
 ## Tests
 
 ```sh
-python3 -m pytest loom-design/scripts/
+python3 -m pytest loom-design/tests/
 ```
 
 One invocation collects the `interface/`, `principles/` and `spec/`
-directories; `scripts/pytest.ini` sets `--import-mode=importlib` so
+directories; `tests/pytest.ini` sets `--import-mode=importlib` so
 same-named test modules can sit side by side. The complete package suite
 for all three plugins runs from the repository root:
 

@@ -34,7 +34,7 @@ a `.gitignore` hides from the first). A repository-root `pytest.ini` would also 
 `pytest` run at the root, which is known to abort on dbt-wiki collection, so
 the exclusion is passed per command instead. Where the worktrees are is a git
 question, and git questions live in `loom-code/scripts/repo_files.py`, imported
-via sys.path the way `loom-design/scripts/spec/test_write_spec_contract.py`
+via sys.path the way `loom-design/tests/spec/test_write_spec_contract.py`
 reaches across trees.
 """
 from __future__ import annotations
@@ -48,7 +48,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "loom-code" / "scri
 from repo_files import nested_repositories, nested_worktrees  # noqa: E402
 
 LOCAL = "local"
-LEGACY_DESIGN = ("loom-design/scripts",)
 LEGACY_WORKFLOW = ("loom-workflow/scripts", "loom-workflow/skills/*/scripts")
 GROUPS = {"code", "design", "workflow-python", "workflow-shell", "workflow-mermaid"}
 
@@ -119,7 +118,6 @@ def loom_family_commands(
             commands.append([*pytest, *code, verbosity, "-n", "auto"])
     if only in {None, "design"}:
         sessions += [s for s in [_tests_session(repo, [repo / "loom-design" / "tests"])] if s]
-        sessions += [[f.relative_to(repo).as_posix()] for f in _legacy(repo, LEGACY_DESIGN)]
     if only in {None, "workflow-python"}:
         sessions += _workflow_sessions(repo)
     commands += [[*pytest, *session, verbosity] for session in sessions]

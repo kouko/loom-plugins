@@ -1,13 +1,13 @@
 name: loom-design CI
 
-# Runs the whole loom-design plugin pytest suite (loom-design/scripts/),
+# Runs the whole loom-design plugin pytest suite (loom-design/tests/),
 # covering every station directory — interface, principles and spec — in
 # ONE invocation.
 #
-# One job, one invocation: `loom-design/scripts/pytest.ini` sets
+# One job, one invocation: `loom-design/tests/pytest.ini` sets
 # `--import-mode=importlib`, so same-basename test files across stations
 # no longer collide at collection; the same file's `pythonpath` line puts
-# each station directory on `sys.path`, which importlib mode otherwise
+# each station's scripts directory on `sys.path`, which importlib mode otherwise
 # stops doing and the repo's bare sibling imports need. Before that root
 # existed the stations needed a job each — this job replaces the four that
 # loom-siblings-ci.yml and loom-spec-ci.yml used to run.
@@ -30,7 +30,7 @@ on:
       # gated by its hooks, so edits to either must fire this gate too.
       - 'loom-code/hooks/**'
       - 'loom-code/contract/**'
-      # loom-design/scripts/test_marketplace_entry.py reads the repo-root
+      # loom-design/tests/test_marketplace_entry.py reads the repo-root
       # marketplace.json, so an edit there must fire this gate too —
       # else a removed/renamed entry merges ungated (fail-open).
       - '.claude-plugin/marketplace.json'

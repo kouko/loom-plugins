@@ -152,11 +152,11 @@ Antigravity のデスクトップアプリや IDE では走らない。
 ## テスト
 
 ```sh
-python3 -m pytest loom-design/scripts/
+python3 -m pytest loom-design/tests/
 ```
 
 1 回の実行で `interface/`・`principles/`・`spec/` の各ディレクトリを
-収集する。`scripts/pytest.ini` が `--import-mode=importlib` を設定し、
+収集する。`tests/pytest.ini` が `--import-mode=importlib` を設定し、
 同名の test モジュールが並存できるようにしている。3 つの plugin すべての
 パッケージテストは、リポジトリのルートから実行する：
 

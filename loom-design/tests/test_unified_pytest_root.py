@@ -22,7 +22,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SUITE_ROOT = Path(__file__).resolve().parent
-SUITE = "loom-design/scripts/"
+SUITE = "loom-design/tests/"
+SCRIPTS_ROOT = REPO_ROOT / "loom-design" / "scripts"
 PYTEST_INI = SUITE_ROOT / "pytest.ini"
 
 # The station list governs the checks below -- which directories unified
@@ -84,10 +85,14 @@ def test_unified_collection_reports_no_errors():
 
 
 def _pythonpath_entries():
-    """The `pythonpath = ...` station list from pytest.ini, in file order."""
+    """The `pythonpath = ...` station list from pytest.ini, in file order.
+
+    Each entry is `../scripts/<station>`, the station's scripts directory;
+    the station is its last segment.
+    """
     for line in PYTEST_INI.read_text(encoding="utf-8").splitlines():
         if line.startswith("pythonpath"):
-            return line.split("=", 1)[1].split()
+            return [Path(e).name for e in line.split("=", 1)[1].split()]
     raise AssertionError(f"no `pythonpath` line in {PYTEST_INI}")
 
 
@@ -96,7 +101,7 @@ def _non_test_modules():
     return {
         station: {
             f.name
-            for f in (SUITE_ROOT / station).glob("*.py")
+            for f in (SCRIPTS_ROOT / station).glob("*.py")
             if not f.name.startswith("test_")
         }
         for station in STATIONS
