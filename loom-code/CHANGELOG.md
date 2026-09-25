@@ -12,9 +12,12 @@ the contract manifest version stays 2.3.1.
 - The code lens gains `architecture-conformance`, so it scores twelve
   dimensions; the dimension is N/A when the repository has no
   `ARCHITECTURE.md`. `reviewer.md` lists it.
+- An `architecture-conformance` violation is at least `important`.
 - The standing WARN now names a missing `ARCHITECTURE.md` beside
   `PRINCIPLES.md` and `DESIGN.md`. It never blocks, and `standing-docs:
   waived` silences it too.
+- The standing WARN's second line is now document-neutral: the closing-review
+  station "cannot check any change against it".
 - The contract manifest registers the `architecture` tool (owner
   loom-design), the `ARCHITECTURE.md` standing doc and its `standing`
   artifact type.
