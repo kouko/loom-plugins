@@ -63,6 +63,13 @@ charter: 1.0
 - Test: A2 positive: single-ratified-line-and-nonempty-decisions-valid; negative: second-ratified-line-or-top-prose-rejected. A3 positive: skill-records-package-tests-when-absent; negative: step5-commits-edited-config.
 - Risk: classes "guards may not run", "validator accepts malformed top matter", "know-how beyond its sources" searched in the skill, schema, validator, know-how; dismissed: validator path check (skill writes root); agent-decided.
 
+### Wave 4 — CI fix at Ship
+
+**W4-01 Root standing-document name lists know ARCHITECTURE.md; changelog completeness**  after: W3-02  acceptance: 7
+- Files: `loom-code/scripts/check-skill-crossrefs.py`, `loom-code/scripts/check_contract_citations.py`, `loom-code/tests/test_check_skill_crossrefs.py`, `loom-code/CHANGELOG.md`
+- Test: A7 positive: architecture-md-bare-name-resolves-as-root-file; negative: unknown-bare-name-still-flagged.
+- Risk: class "root standing-document name lists missing ARCHITECTURE.md" searched in loom-code/scripts and scripts/; CI step check-skill-crossrefs failed on PR #54; agent-decided.
+
 ## Questions asked
 ① — what — 我原本以為他就是要幫我 設計整個系統架構 的噎 → 我想要走方案 2 因為正常流程就是應該要設計好工程架構跟專案資料夾管理
 ① — done — 對
