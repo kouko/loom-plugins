@@ -1,5 +1,7 @@
 # A standing ARCHITECTURE.md that agents are held to — acceptance test evidence
 
+Evidence stays in English per the acceptance-tester contract; the report is in Traditional Chinese.
+
 Tried on 2026-09-25, in a clean copy of the project at 8b80c9ce
 (`git worktree add $TMPDIR/at-arch/clean HEAD`; all loom scripts below were
 run from that clean copy, never from the working tree).
@@ -86,3 +88,59 @@ option every time and said "yes" to the restatement.
 ## Suite
 - Criterion tests (clean copy): `env -u FORCE_COLOR uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q -p no:cacheprovider --color=no loom-design/tests/architecture loom-code/tests/test_architecture_doc_consumers.py loom-code/tests/test_loom_checker_standing.py` → `56 passed in 3.63s`.
 - Package suite, run once at the station's request: `env -u FORCE_COLOR uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` → exit 0; pytest roots `2351 passed, 2 skipped`, `267 passed, 1 skipped`, `261 passed`, `196 passed`, … all passing, no failures. `finalize-review` runs it again and blocks on failure.
+
+# Re-run after fixes (87f50da3..21289e5d, plan tasks W3-01, W3-02)
+
+Tried on 2026-09-25 in a new clean copy at 21289e5d
+(`git worktree add --detach $TMPDIR/at-arch/clean2 21289e5d`); every loom
+script below ran from that copy. Reused throwaway repos `proj` and `bare`;
+built `proj3` (same notes CLI, no `docs/loom/KICKOFF-DEFAULTS.md`).
+
+Setup check: `python3 loom-code/scripts/loom_checker.py contract --require 2.1`
+→ `contract 2.3.1 satisfies requires-contract >=2.1`, exit 0; `architecture`
+still listed in `loom-design/.claude-plugin/plugin.json:19` and
+`loom-design/.codex-plugin/plugin.json:18`.
+
+Scope, checked against `git diff 87f50da3..21289e5d`:
+- Re-tested A2 (validator), A3 (`SKILL.md` Step 3/5), A5 (`write-plan/SKILL.md:319-325`), A6 (`lenses.md:59`), A7 (`standing.py` STANDING_WARN), A8 (`SKILL.md` Step 4 re-ratify; schema "Updating" section removed).
+- Carried over A1: diff to `design-know-how.md` only re-sources the Pylint 1000-line default and rewords security-scanning cost; the A1 proposal's options (300 vs 1000 lines, lint-then-tests) are unchanged.
+- Carried over A4: `SKILL.md` Step 3 now points to the schema's "Guard failure message" section, which the diff does not touch; the same message was observed again under A3.
+
+## A2 re-run
+`V = python3 $TMPDIR/at-arch/clean2/loom-design/scripts/architecture/validate_architecture_output.py`, in `proj`:
+- `V ARCHITECTURE.md` → `OK`, exit 0
+- two `ratified-by:` lines → `more than one 'ratified-by:' line; keep exactly one, replacing the old line when re-ratifying`, exit 1 (also with `--draft`, exit 1)
+- `This project is a small notes CLI.` under the title → `line above the first '## ' section is not allowed; ...`, exit 1
+- `## Decisions` emptied → `section '## Decisions' is empty; ...`, exit 1
+- no `ratified-by:` → `--draft` OK exit 0; without `--draft` `no 'ratified-by:' line; ...`, exit 1
+- `## Overview` / `## Data models` → `section ... is not allowed`, exit 1 each; `### API interfaces` + `- GET /notes` → both lines break the rule grammar, exit 1
+- `## File size` emptied → `OK`, exit 0 (empty rule sections accepted — the dismissed Codex finding; behaves as the dismissal says)
+
+## A3 re-run
+In `proj3` (no `docs/loom/KICKOFF-DEFAULTS.md`), following `SKILL.md` Step 3: as agent proposed `python3 -m pytest -q` (pyproject `testpaths = ["tests"]`), as user accepted, recorded
+`- package-tests: python3 -m pytest -q — runs tests/ incl. tests/arch guards, pytest testpaths in pyproject.toml (2026-09-25)`.
+Wrote `ARCHITECTURE.md` (D-1, FP-1 → `tests/arch/test_placement.py`, other rule sections empty); `V --draft` OK exit 0; added ratified line; `V` OK exit 0.
+Step 5: `git add ARCHITECTURE.md tests/arch/test_placement.py docs/loom/KICKOFF-DEFAULTS.md` → commit `2b7e668` shows `ARCHITECTURE.md`, `docs/loom/KICKOFF-DEFAULTS.md` (the guard file was already in my setup commit).
+Ran the recorded command → `2 passed`; with `helpers.py` at root → `1 failed, 1 passed`, `AssertionError: FP-1 (every Python source file lives under src/notes/ and every test under tests/) broken by helpers.py. Conform to the rule, or change the rule and its guard together in ARCHITECTURE.md and re-ratify.`; removed `helpers.py`.
+Limitation: the validator checks the guard file exists, not that the recorded command collects it.
+
+## A5 re-run
+`loom-code/skills/write-plan/SKILL.md:319-325` now: place files by the rules, name the rule id on the Risk line; when a task must break a rule the planner runs the `architecture` re-design mode with the user before Build and lists `ARCHITECTURE.md` and the guard in the task's Files (template `loom-code/contract/templates/plan.md` `- Files:` line); "an implementer never changes a rule on its own". No full write-plan run.
+
+## A6 re-run
+`lenses.md:59` adds "A violation of an `ARCHITECTURE.md` rule is at least `important`, so the round sends it back to Build." `closing-review/SKILL.md:266` Round 2 "Batch fatal and important findings, return to Build", and `:295` collects every fatal or important finding before fixes — so a single important is sent back even when the verdict is `PASS_WITH_NOTES`. `git diff --quiet 499f127b..HEAD -- loom-code/scripts/loom_checker/reviewers.py loom-code/scripts/loom_checker/command_handlers/reviewer_count.py` → exit 0 (unchanged); `reviewer.md:49` still one dimension-list line. No live closing review with a violating diff was run.
+
+## A7 re-run
+`bare`, `python3 $TMPDIR/at-arch/clean2/loom-code/scripts/loom_checker.py standing docs/loom/intent/2026-09-25-add-tags.md`:
+- none present → `WARN: this repo has no PRINCIPLES.md or DESIGN.md or ARCHITECTURE.md yet.` / `WARN: without it, the closing-review station cannot check any change against it.` / waiver hint, exit 0
+- `- standing-docs: waived — throwaway test repo (2026-09-25)` → silent, exit 0
+- only ARCHITECTURE.md missing → `WARN: this repo has no ARCHITECTURE.md yet.` + the same neutral line 2, exit 0
+- all three present → silent, exit 0
+- N/A: `lenses.md:43` and `:59` unchanged in meaning.
+
+## A8 re-run
+In `proj`: replacing `ratified-by: tester 2026-09-25` with `... 2026-09-26` → `OK`, exit 0; a second line is rejected (A2). `SKILL.md` Step 1 keeps "update the affected decisions, rules and guards in the same commit"; Step 4 "replace the existing `ratified-by:` line; never add a second". Suite `python3 -m pytest -q` → `5 passed`. Still nothing mechanical detects a re-design that keeps the old date.
+
+## Suite (re-run)
+- Criterion tests in the clean copy: `env -u FORCE_COLOR uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q -p no:cacheprovider --color=no loom-design/tests/architecture loom-code/tests/test_architecture_doc_consumers.py loom-code/tests/test_loom_checker_standing.py` → `58 passed in 3.60s`.
+- Full package suite not run by me this round; `finalize-review` runs `env -u FORCE_COLOR uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` and blocks on failure.
