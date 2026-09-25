@@ -34,7 +34,10 @@ CASE_BLOCK = re.compile(r"```json routing-cases\n(?P<body>.*?)\n```", re.DOTALL)
 # table before comparing with the on-disk set, so the hash stays pinned.
 # Leaves added after the baseline was frozen; they stay outside the frozen
 # hash but still count toward the rendered description budget.
-ADDED_LEAVES = {"loom-code/skills/expert-mode/SKILL.md"}
+ADDED_LEAVES = {
+    "loom-code/skills/expert-mode/SKILL.md",
+    "loom-design/skills/architecture/SKILL.md",
+}
 RENAMED_LEAVES = {
     "loom-workflow/skills/cot-explain/SKILL.md": "loom-workflow/skills/loom-visualization/SKILL.md",
 }

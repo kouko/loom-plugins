@@ -32,6 +32,7 @@ WRITE_SPEC = REPO / "loom-design/skills/write-spec/SKILL.md"
 TOOL_SKILLS = (
     REPO / "loom-design/skills/design-system/SKILL.md",
     REPO / "loom-design/skills/product-principles/SKILL.md",
+    REPO / "loom-design/skills/architecture/SKILL.md",
 )
 STATION_TABLE_HEADER = "| station | artifact | who decides | checker | checkpoint |"
 LOCATE_REFERENCE = REPO / "loom-design/skills/capture-intent/references/locate-loom-code.md"
@@ -40,6 +41,7 @@ LOCATE_LINKS = {
     WRITE_SPEC: "../capture-intent/references/locate-loom-code.md",
     TOOL_SKILLS[0]: "../capture-intent/references/locate-loom-code.md",
     TOOL_SKILLS[1]: "../capture-intent/references/locate-loom-code.md",
+    TOOL_SKILLS[2]: "../capture-intent/references/locate-loom-code.md",
 }
 HOST_TABLE_HEADER = "| Where `loom-code` lives |"
 CONTRACT_COMMAND = "python3 <loom-code>/scripts/loom_checker.py contract --require 2.1"
