@@ -40,6 +40,11 @@ charter: 1.0
 - Test: A3 positive: ci-runs-same-groups; negative: ci-path-filter-misses-tests. A4 positive: agents-md-states-tests-folders; negative: runtime-doc-old-path-detected. A5 positive: rules-26-mechanisms-unchanged; negative: no-dispatch-words.
 - Risk: memory entries are durable guidance, so their test paths are updated; merged plans, reports and CHANGELOG history are not edited; agent-decided.
 
+**W1-03 Refuse any test outside a tests folder; graduate the probe**  after: W1-01  acceptance: 1, 3
+- Files: `tests/test_tests_folder_convention.py`, `loom-code/tests/local/README.md`, `docs/loom/memory/a-prose-pin-must-require-an-affirmative-un-negated-sentence.md`, `docs/loom/2026-09-25-tests-live-in-tests-folders/evidence/probes/test_abuse_stray_test_outside_tests_folders.py`
+- Test: A1 positive: repo-wide-stray-test-refused; negative: tests-folder-test-allowed. A3 positive: new-plugin-tests-folder-covered; boundary: docs-loom-evidence-exempt.
+- Risk: adversary finding: a test placed in root scripts/ or .claude/hooks/ stopped being collected with no guard; the probe graduates into the repo-level guard; agent-decided.
+
 **W1-02 Release metadata for three plugins**  after: W1-01  acceptance: 5
 - Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`, `loom-workflow/CHANGELOG.md`, `README.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A5 positive: versions-synchronized; negative: check-mechanisms-not-raised.
