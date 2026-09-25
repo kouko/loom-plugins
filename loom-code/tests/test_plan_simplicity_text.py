@@ -12,6 +12,7 @@ from prose_pin import affirms, has_negation, rule_prose, split_sentences
 
 REPO = Path(__file__).resolve().parents[2]
 WRITE_PLAN = REPO / "loom-code/skills/write-plan/SKILL.md"
+PLAN_SIMPLICITY = REPO / "loom-code/skills/write-plan/references/plan-simplicity.md"
 LENSES = REPO / "loom-code/skills/closing-review/references/lenses.md"
 REVIEWER = REPO / "loom-code/agents/reviewer.md"
 STATIONS = (
@@ -22,9 +23,12 @@ STATIONS = (
 
 
 def _step() -> str:
-    """The write-plan paragraph headed `**Simplicity check.**`, flattened."""
-    match = re.search(r"\*\*Simplicity check\.\*\*(.*?)\n\n", WRITE_PLAN.read_text(encoding="utf-8"), re.S)
-    assert match, "write-plan has no **Simplicity check.** step"
+    """The `**Simplicity check.**` step: write-plan's pointer, then the reference it loads, flattened."""
+    pointer = re.search(r"\*\*Simplicity check\.\*\*(.*?)\n\n", WRITE_PLAN.read_text(encoding="utf-8"), re.S)
+    assert pointer, "write-plan has no **Simplicity check.** step"
+    assert "references/plan-simplicity.md" in pointer.group(1)
+    match = re.search(r"\*\*Simplicity check\.\*\*(.*?)(?:\n\n|\Z)", PLAN_SIMPLICITY.read_text(encoding="utf-8"), re.S)
+    assert match, "plan-simplicity.md has no **Simplicity check.** step"
     return " ".join(match.group(1).split())
 
 
