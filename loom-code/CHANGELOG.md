@@ -11,8 +11,7 @@ deletion-first, before the plan commit; adoption is agent-decided, with no
 user question. Build §1 now runs `loom_checker.py plan` at entry as well as
 `selection show`. The adversary marks a reused test with its `concern:` line
 in the same dispatch that names it as the reused program. Station summary
-tables are updated across `write-plan`, `build`, `capture-intent` and
-`write-spec`. No new checker rule id, gate or mechanism; the net mechanism
+tables are updated across `write-plan`, `capture-intent` and `write-spec`. No new checker rule id, gate or mechanism; the net mechanism
 count stays 142; the contract manifest version stays 2.3.1.
 
 ## [3.17.0] — 2026-09-25 — test budget
