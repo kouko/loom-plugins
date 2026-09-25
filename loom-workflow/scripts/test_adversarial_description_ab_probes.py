@@ -3,7 +3,7 @@
 Targets: the A/B runner's stream parser and decision rule (ab/run_ab.py), the
 committed tested-hash guard (test_loom_visualization_description_ab.py), and the
 description renderer shared with the budget guard
-(scripts/test_loom_skill_description_catalog.py). The renderer probes take the
+(tests/test_loom_skill_description_catalog.py). The renderer probes take the
 renderer, the shipped text and the tested hash from the guard itself, so they
 follow whatever text the guard pins.
 
@@ -28,7 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CHANGE_DIR = REPO_ROOT / "docs/loom/2026-09-14-loom-visualization-description-trigger"
 RUN_AB = CHANGE_DIR / "ab/run_ab.py"
 GUARD = Path(__file__).resolve().parent / "test_loom_visualization_description_ab.py"
-CATALOG = REPO_ROOT / "scripts/test_loom_skill_description_catalog.py"
+CATALOG = REPO_ROOT / "tests/test_loom_skill_description_catalog.py"
 SKILL = REPO_ROOT / "loom-workflow/skills/loom-visualization/SKILL.md"
 
 
@@ -43,6 +43,9 @@ def _load(name: str, path: Path):
 
 @pytest.fixture(scope="module")
 def run_ab():
+    # run_ab.py imports the catalog renderer by bare name from the folder it
+    # was written beside; the catalog test now lives in the root tests/ folder.
+    sys.path.insert(0, str(CATALOG.parent))
     return _load("adversarial_run_ab", RUN_AB)
 
 
@@ -197,7 +200,7 @@ def test_guard_without_docs_still_collects(tmp_path: Path) -> None:
     """The committed guard needs only SKILL.md and the catalog renderer, nothing under docs/."""
     for rel in ("loom-workflow/scripts/test_loom_visualization_description_ab.py",
                 "loom-workflow/skills/loom-visualization/SKILL.md",
-                "scripts/test_loom_skill_description_catalog.py"):
+                "tests/test_loom_skill_description_catalog.py"):
         (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(REPO_ROOT / rel, tmp_path / rel)
     proc = subprocess.run(

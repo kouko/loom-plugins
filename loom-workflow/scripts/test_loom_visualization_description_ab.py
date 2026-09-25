@@ -14,7 +14,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SKILL_PATH = REPO_ROOT / "loom-workflow/skills/loom-visualization/SKILL.md"
-CATALOG = REPO_ROOT / "scripts/test_loom_skill_description_catalog.py"
+CATALOG = REPO_ROOT / "tests/test_loom_skill_description_catalog.py"
 
 # Provenance: the ab/results.md (variant B, KEEP B) and ab/protocol.md (variant A,
 # the description it renamed) of the 2026-09-23 change that renamed the step to

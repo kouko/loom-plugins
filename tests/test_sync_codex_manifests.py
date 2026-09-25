@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-SCRIPT = Path(__file__).resolve().parent / "sync_codex_manifests.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "sync_codex_manifests.py"
 
 SHARED_FIELDS = (
     "name",

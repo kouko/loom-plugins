@@ -15,7 +15,7 @@ import pytest
 
 import sync_codex_manifests as m
 
-SCRIPT = Path(__file__).resolve().parent / "sync_codex_manifests.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "sync_codex_manifests.py"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CARD_REL = ("skills", "loom-visualization", "assets", "trigger-card.md")
 CARD_TEXT = "# Card (probe)\nInvoke `loom-visualization` FIRST.\n"

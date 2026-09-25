@@ -45,6 +45,9 @@ on:
       # 9 tests and never listed, so a PR editing only that gate ran none of
       # them (fail-open on the gate's own maintenance).
       - 'scripts/**'
+      # The repository-level tests of those scripts live in the root tests/
+      # folder and run in the same pytest step.
+      - 'tests/**'
       # Repo-root drift guards scan the whole loom-*/ tree
       # (scripts/test_state_anchor_carrier_inventory.py's population is
       # EVERYTHING under loom-*/), the mechanism recompute counts every
@@ -74,6 +77,7 @@ on:
       - '**/.claude-plugin/plugin.json'
       - '**/.codex-plugin/plugin.json'
       - 'scripts/**'
+      - 'tests/**'
       # Same repo-root drift-guard rationale as the pull_request trigger above.
       - 'loom-design/**'
       - 'loom-workflow/**'

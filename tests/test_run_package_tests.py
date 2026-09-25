@@ -49,19 +49,22 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
     commands = loom_family_commands(REPO, verbosity="-q")
     rendered = [" ".join(command) for command in commands]
 
-    assert any("loom-code/scripts/ scripts/ .claude/hooks/" in command for command in rendered)
-    assert any("loom-design/scripts/" in command for command in rendered)
-    assert any("loom-workflow/tests/test_loom_visualization_page_scripts.py" in command for command in rendered)
+    code = loom_family_commands(REPO, verbosity="-q", only="code")[0]
+    assert {"tests", "loom-code/scripts"} <= set(code)
+    assert "scripts" not in code and ".claude/hooks" not in code
+    assert any("loom-design/scripts" in command for command in rendered)
+    assert any(command[3:4] == ["loom-workflow/tests"] for command in commands)
     assert any("loom-workflow/tests/test-privacy-gate-compose-commit.sh" in command for command in rendered)
 
     expected_skill_dirs = sorted(
-        path.as_posix() for path in (REPO / "loom-workflow/skills").glob("*/scripts")
+        path.relative_to(REPO).as_posix()
+        for path in (REPO / "loom-workflow/skills").glob("*/scripts")
         if any(path.glob("test_*.py"))
     )
     actual_skill_dirs = sorted(
         command[3] for command in commands
         if command[:3] == [sys.executable, "-m", "pytest"]
-        and "/loom-workflow/skills/" in command[3]
+        and command[3].startswith("loom-workflow/skills/")
     )
     assert actual_skill_dirs == expected_skill_dirs
 
@@ -188,3 +191,95 @@ def test_loom_family_preset_is_the_only_test_command_named_by_ci_and_kickoff() -
     ):
         text = workflow.read_text(encoding="utf-8")
         assert "scripts/run_package_tests.py --loom-family" in text
+
+
+# --- tests live in tests/ folders, and the inventory discovers them ---------
+
+
+def _stray_root_tests(repo: Path) -> list[str]:
+    """Test files left beside the repository-level code they test."""
+    return sorted(
+        path.relative_to(repo).as_posix()
+        for folder in (repo / "scripts", repo / ".claude" / "hooks")
+        for pattern in ("test_*.py", "test-*.sh")
+        for path in folder.glob(pattern)
+    )
+
+
+def test_no_repository_level_test_outside_tests_folder() -> None:
+    assert _stray_root_tests(REPO) == []
+
+
+def test_stray_repository_level_test_is_detected(tmp_path: Path) -> None:
+    (tmp_path / "scripts").mkdir()
+    (tmp_path / "scripts" / "test_stray.py").write_text("")
+    (tmp_path / ".claude" / "hooks").mkdir(parents=True)
+    (tmp_path / ".claude" / "hooks" / "test-stray.sh").write_text("")
+    assert _stray_root_tests(tmp_path) == [".claude/hooks/test-stray.sh", "scripts/test_stray.py"]
+
+
+def _write_test(path: Path, name: str) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+    (path / f"test_{name}.py").write_text(f"def test_{name}():\n    pass\n")
+
+
+def _collected(repo: Path, only: str) -> str:
+    """Collect every pytest command of one group exactly as the runner builds it."""
+    out = []
+    for command in loom_family_commands(repo, verbosity="-q", only=only):
+        command = [t for t in command if t not in {"-n", "auto"}]
+        result = subprocess.run(
+            [*command, "-p", "no:cacheprovider", "--collect-only"],
+            cwd=repo, capture_output=True, text=True,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        out.append(result.stdout)
+    return "\n".join(out)
+
+
+def test_code_group_discovers_tests_folders_and_skips_local(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+    _write_test(repo / "tests", "new_root")
+    _write_test(repo / "tests" / "hooks", "hook")
+    _write_test(repo / "tests" / "local", "local_only")
+    _write_test(repo / "loom-code" / "tests", "new_plugin")
+    _write_test(repo / "loom-code" / "tests" / "local", "plugin_local_only")
+
+    collected = _collected(repo, "code")
+
+    for name in ("test_new_root", "test_hook", "test_new_plugin", "test_seed"):
+        assert name in collected
+    assert "local_only" not in collected
+
+
+def test_design_group_discovers_its_tests_folder(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+    _write_test(repo / "loom-design" / "tests", "design_new")
+    _write_test(repo / "loom-design" / "tests" / "local", "design_local_only")
+
+    collected = _collected(repo, "design")
+
+    assert "test_design_new" in collected
+    assert "local_only" not in collected
+
+
+def test_workflow_tests_subfolders_run_in_their_own_sessions(tmp_path: Path) -> None:
+    """Per-skill subfolders may share basenames, so each is its own session."""
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+    tests = repo / "loom-workflow" / "tests"
+    _write_test(tests, "top")
+    for skill in ("alpha", "beta"):
+        _write_test(tests / skill, "dup")
+    _write_test(tests / "local", "wf_local_only")
+
+    commands = loom_family_commands(repo, verbosity="-q", only="workflow-python")
+    collected = _collected(repo, "workflow-python")
+
+    targets = [command[3] for command in commands]
+    assert targets == ["loom-workflow/tests", "loom-workflow/tests/alpha", "loom-workflow/tests/beta"]
+    assert collected.count("::test_dup") == 2
+    assert "test_top" in collected
+    assert "local_only" not in collected

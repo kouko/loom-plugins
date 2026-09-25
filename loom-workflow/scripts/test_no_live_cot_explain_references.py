@@ -37,7 +37,7 @@ INTENTIONAL = {
     "loom-workflow/scripts/test_no_live_cot_explain_references.py",
     "loom-workflow/scripts/test_loom_visualization_compaction.py",
     "loom-workflow/tests/test_loom_visualization_page_scripts.py",
-    "scripts/test_loom_skill_description_catalog.py",
+    "tests/test_loom_skill_description_catalog.py",
 }
 
 

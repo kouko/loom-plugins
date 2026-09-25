@@ -47,13 +47,13 @@ mechanisms:
   #     the 2 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
-    eval: scripts/test_loom_skill_description_catalog.py
+    eval: tests/test_loom_skill_description_catalog.py
   - id: using-loom-design
     class: skill
-    eval: scripts/test_loom_skill_description_catalog.py
+    eval: tests/test_loom_skill_description_catalog.py
   - id: using-loom-workflow
     class: skill
-    eval: scripts/test_loom_skill_description_catalog.py
+    eval: tests/test_loom_skill_description_catalog.py
   - id: capture-intent
     class: skill
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
@@ -216,7 +216,7 @@ mechanisms:
     eval: loom-workflow/scripts/test_visualization_card_hook.py
   - id: "UserPromptSubmit::visualization-card@codex"
     class: hook
-    eval: scripts/test_loom_plugin_install_layout.py::test_codex_manifest_points_at_prompt_submit_card_hook
+    eval: tests/test_loom_plugin_install_layout.py::test_codex_manifest_points_at_prompt_submit_card_hook
   - id: "PostToolUse:Write|Edit:validate-skill-folder-structure.sh"
     class: hook
     eval: loom-workflow/scripts/test_validate_skill_folder_structure_hook.py::test_nested_subfolder_is_blocked
