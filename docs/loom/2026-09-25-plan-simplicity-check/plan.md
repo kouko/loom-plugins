@@ -1,6 +1,6 @@
 # Check every plan for a simpler way to reach the same outcome before Build — plan
 intent: 2026-09-25-plan-simplicity-check@1a7f320b
-charter: 1.0
+charter: 1.1
 
 ## Current State Evidence
 - Forward: `loom-code/skills/write-plan/SKILL.md:73` says write-plan has no formal plan review; nothing asks for a simpler shape before Build.
@@ -47,6 +47,13 @@ charter: 1.0
 - Test: A1 positive: pointer-and-reference-state-the-dispatch; negative: write-plan-body-under-word-cap. A5 positive: reference-records-agent-decided; negative: build-entry-names-no-other-station.
 - Risk: class "W0-02 prose breaks station structural limits" searched across the three station files W0-02 edited; detail moves to a write-plan reference; agent-decided.
 
+### Wave 3 — adversary fixes
+
+**W3-01 Skip line with a missing Files field blocks instead of crashing; graduate the probe**  after: W2-01  acceptance: 2, 4
+- Files: `loom-code/scripts/loom_checker/rule_checks/intake.py`, `loom-code/skills/build/SKILL.md`, `docs/loom/2026-09-25-plan-simplicity-check/evidence/probes/test_plan_skip_missing_files.py`, `loom-code/tests/test_plan_skip_missing_files.py`
+- Test: A2 positive: missing-files-with-record-blocks-cleanly; negative: missing-files-never-internal-error. A4 positive: narrow-skip-still-accepted; negative: skip-with-missing-files-blocks.
+- Risk: class "the plan check can fail without a BLOCK" searched in intake.py and Build entry; Build stops on any non-zero exit; probe moves unchanged; agent-decided.
+
 ## Simplicity check
 - Fold the record into plan.field-caps instead of a new rule id — taken
 - Run the existing plan command at Build entry instead of new handler wiring — taken
@@ -63,3 +70,4 @@ charter: 1.0
 1. user-decided — the checker blocks Build on a plan without the simplicity record (2026-09-25).
 2. Each non-narrow change gains one reviewer dispatch before Build, a standing cost the user accepted.
 3. Keep tests within the new test budget: one pair per Acceptance line, reuse existing test helpers.
+4. Known limitation: a charter value without a dot (e.g. `2`) skips the simplicity check; every plan in the repo uses X.Y.
