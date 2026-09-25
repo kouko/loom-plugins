@@ -1,6 +1,7 @@
 """The tests-folder convention is stated, and CI follows it.
-concern: a test file placed outside every tests folder (root scripts/,
-.claude/hooks/, a plugin's hooks or contract folder, a new plugin) is neither
+concern: a test file placed outside every test root the suite runs (root
+scripts/, .claude/hooks/, a plugin's hooks or contract folder, a tests folder
+under any of those, a new plugin not yet in `TEST_ROOTS`) is neither
 collected by the package suite nor refused by any guard, so it goes dark.
 
 Tests live in `tests/` folders apart from the code they test. Four things keep
@@ -8,25 +9,29 @@ that true after the move: the contributor guidance (AGENTS.md) says so, every
 CI workflow is triggered by edits under the test folders it runs and runs them
 through the shared inventory (`scripts/run_package_tests.py --loom-family`),
 neither the guidance nor the workflows still names an old test location, and
-no test file in the working tree sits outside a tests folder.
+no test file in the working tree sits outside the runner's `TEST_ROOTS`.
 
-Bound of the repository-wide guard: it reads `git ls-files --cached --others
---exclude-standard` (tracked plus untracked, non-ignored files), matches file names
-`test_*.py`, `*_test.py` and `test-*.sh`, and allows a match only when a
-folder named `tests` appears anywhere in its path or it sits under
-`docs/loom/` (change evidence and probes). A test named any other way, or a
-tests folder the inventory does not discover, is outside this guard.
+Bound of the repository-wide guard: it reads `repo_files.repository_files`
+(tracked plus untracked, non-ignored files; a plain walk without git), matches
+file names `test_*.py`, `*_test.py` and `test-*.sh`, and allows a match only
+when it sits under one of the runner's `TEST_ROOTS` or under `docs/loom/`
+(change evidence and probes). A root's `local/` folder is allowed although the
+suite skips it. A test named any other way is outside this guard.
 """
 from __future__ import annotations
 
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+from run_package_tests import TEST_ROOTS, loom_family_commands  # noqa: E402
+from repo_files import repository_files  # noqa: E402  (on sys.path via the runner)
 WORKFLOWS = REPO / ".github" / "workflows"
 GROUPS = {"code", "design", "workflow-python", "workflow-shell", "workflow-mermaid"}
 
@@ -65,16 +70,12 @@ TEST_FILE = re.compile(r"(^|/)(test_[^/]*\.py|[^/]*_test\.py|test-[^/]*\.sh)\Z")
 
 
 def _tracked_strays(root: Path) -> list[str]:
-    """Tracked or untracked, non-ignored test files outside every `tests/` folder and outside `docs/loom/`."""
-    tracked = subprocess.run(
-        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], cwd=root, capture_output=True, check=True
-    ).stdout.decode("utf-8").split("\0")
+    """Test files of the repository outside every test root the suite runs and outside `docs/loom/`."""
+    allowed = tuple(f"{r}/" for r in TEST_ROOTS) + ("docs/loom/",)
     return sorted(
-        path
-        for path in filter(None, tracked)
-        if TEST_FILE.search(path)
-        and not path.startswith("docs/loom/")
-        and "tests" not in path.split("/")[:-1]
+        rel
+        for rel in (path.relative_to(root).as_posix() for path in repository_files(root))
+        if TEST_FILE.search(rel) and not rel.startswith(allowed)
     )
 
 
@@ -178,10 +179,34 @@ def test_no_test_file_sits_outside_a_tests_folder() -> None:
         "loom-code/hooks/test_zz_planted_stray.py",
         "loom-new/contract/zz_planted_test.py",
         "loom-new/scripts/test-zz-planted.sh",
+        # A folder named tests that the package suite does not run.
+        "scripts/tests/test_zz.py",
+        ".claude/hooks/tests/test_zz.py",
+        "loom-code/hooks/tests/test_zz.py",
+        "loom-new/tests/test_zz_planted_stray.py",
+        "loom-code/skills/build/tests/test_zz.py",
+        # The cases the per-plugin and root-level guards covered.
+        "scripts/test_stray.py",
+        ".claude/hooks/test-stray.sh",
+        "loom-code/scripts/test_stray.py",
+        "loom-code/skills/build/probes/test_recovery_rules.py",
+        "loom-design/scripts/interface/test_stray.py",
+        "loom-design/skills/write-spec/test_stray.py",
+        "loom-workflow/skills/handoff/scripts/test_stray.py",
+        "loom-workflow/scripts/test_stray.py",
+        "loom-workflow/.claude-plugin/test_stray.py",
     ],
 )
 def test_planted_stray_outside_tests_folders_is_refused(tmp_path: Path, rel: str) -> None:
     assert _tracked_strays(_planted_repo(tmp_path, rel)) == [rel]
+
+
+def test_stray_is_refused_without_git(tmp_path: Path) -> None:
+    """The listing comes from `repository_files`, which walks a tree git does not own."""
+    stray = tmp_path / "scripts" / "test_zz.py"
+    stray.parent.mkdir(parents=True)
+    stray.write_text("", encoding="utf-8")
+    assert _tracked_strays(tmp_path) == ["scripts/test_zz.py"]
 
 
 @pytest.mark.parametrize(
@@ -189,12 +214,18 @@ def test_planted_stray_outside_tests_folders_is_refused(tmp_path: Path, rel: str
     [
         "tests/test_zz_planted_stray.py",
         "tests/hooks/test_zz_planted_stray.py",
-        "loom-new/tests/test_zz_planted_stray.py",
+        "loom-design/tests/spec/test_zz_planted_stray.py",
         "loom-workflow/tests/loom-memory/test-zz-planted.sh",
+        "loom-code/tests/sub/test-zz-planted.sh",
+        "loom-code/tests/local/test-zz-local.sh",
         "docs/loom/some-change/evidence/probes/test_zz_planted_stray.py",
     ],
 )
 def test_planted_test_in_a_tests_folder_or_docs_loom_is_allowed(
     tmp_path: Path, rel: str
 ) -> None:
-    assert _tracked_strays(_planted_repo(tmp_path, rel)) == []
+    repo = _planted_repo(tmp_path, rel)
+    assert _tracked_strays(repo) == []
+    if rel.endswith(".sh") and "/local/" not in rel:
+        shell = loom_family_commands(repo, verbosity="-q", only="workflow-shell")
+        assert ["bash", (repo / rel).as_posix()] in shell, "allowed but never run"

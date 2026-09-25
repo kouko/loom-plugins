@@ -1,6 +1,6 @@
 ---
 name: test-must-land-in-the-ci-lane-its-plugin-runs
-description: A new test only gates if it lands in the exact lane its plugin's CI actually runs — dev-workflow CI runs ONLY dev-workflow/tests/test-*.sh (bash glob, no pytest job over dev-workflow/skills/**), and loom-code CI runs pytest loom-code/tests/ + only 3 explicitly-named integration .sh (it does NOT glob loom-code/tests/*.sh); a test dropped in the wrong lane is a dark test that passes locally and never gates
+description: A new test only gates if it lands in the exact lane its plugin's CI actually runs — dev-workflow CI runs ONLY dev-workflow/tests/test-*.sh (bash glob, no pytest job over dev-workflow/skills/**), and loom-code CI runs pytest loom-code/tests/; a test dropped in the wrong lane is a dark test that passes locally and never gates
 type: gotcha
 sources:
   - resource: PR closeout-privacy-gate (2026-07-19) — caught twice at plan + execution time
@@ -18,13 +18,8 @@ different ways, and neither globs everything:
   a bash CLI test under `dev-workflow/tests/test-*.sh` that exercises the
   real script (exit codes / output), not only a pytest.
 - **loom-code** (`.github/workflows/loom-code-ci.yml`) runs
-  `pytest loom-code/tests/ tests/` PLUS only **three
-  explicitly-named** integration shells
-  (`tests/integration/test-command-surface-*.sh`,
-  `test-rule-sheet-drift.sh`). It does **NOT** glob `loom-code/tests/*.sh`.
-  A new bash test dropped in `loom-code/tests/` (outside those three
-  named) is dark; the gating lane for a SKILL.md prose pin is a
-  `loom-code/tests/test_*.py` pytest (precedent:
+  `pytest loom-code/tests/ tests/`; the gating lane for a SKILL.md
+  prose pin is a `loom-code/tests/test_*.py` pytest (precedent:
   `test_finishing_merge_path_guidance.py`).
 
 Caught twice in one arc: a plan first routed finishing-SKILL pins to
@@ -42,9 +37,7 @@ target plugin's CI actually executes.
 target plugin's `.github/workflows/*-ci.yml` and read the actual `run:`
 lines. Place the test where that workflow will execute it: for
 `dev-workflow/skills/**`, a bash test in `dev-workflow/tests/`; for a
-loom-code SKILL.md/prose pin, a pytest under `loom-code/tests/`. A rich
-pytest may still live beside the code as dev-time coverage, but the
-CI-gating test must sit in the lane the workflow runs. (Extends
+loom-code SKILL.md/prose pin, a pytest under `loom-code/tests/`. (Extends
 [[gha-paths-filter-gates-at-workflow-level]]: that entry is about which
 *pushes* trigger a workflow; this is about which *tests* a triggered
 workflow actually executes.)

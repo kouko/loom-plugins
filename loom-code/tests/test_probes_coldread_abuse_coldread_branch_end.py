@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
@@ -226,40 +225,11 @@ def test_graduated_probe_copies_byte_identical_to_evidence_originals() -> None:
         if graduated_path.resolve() == Path(__file__).resolve():
             continue
         checked += 1
-        if _differs_beyond_graduated_dir(graduated_path.read_bytes(), original_path.read_bytes()):
+        if graduated_path.read_bytes() != original_path.read_bytes():
             non_identical.append((graduated_path.name, original_path.name))
 
     assert checked >= 1, "no graduated/original pairs matched by name; naming scheme may have drifted"
     assert non_identical == [], f"graduated copies differ from their evidence originals: {non_identical}"
-
-
-# "at most their path-referencing lines differing" (docstring above): the
-# 2026-09-25 move into loom-code/tests rewrote only the `graduated_dir =` line.
-_GRADUATED_DIR_ASSIGNMENT = re.compile(rb"^\s*graduated_dir = \S.*$")
-
-
-def _differs_beyond_graduated_dir(graduated: bytes, original: bytes) -> bool:
-    """True unless the differing lines are exactly `graduated_dir =` assignments."""
-    ours, theirs = graduated.splitlines(keepends=True), original.splitlines(keepends=True)
-    if len(ours) != len(theirs):
-        return True
-    differing = {i for i, (a, b) in enumerate(zip(ours, theirs)) if a != b}
-    allowed = {
-        i for i in differing
-        if _GRADUATED_DIR_ASSIGNMENT.match(ours[i].rstrip(b"\r\n"))
-        and _GRADUATED_DIR_ASSIGNMENT.match(theirs[i].rstrip(b"\r\n"))
-    }
-    return differing != allowed
-
-
-def test_byte_identity_tolerates_only_the_graduated_dir_line() -> None:
-    original = b'x = 1\n    graduated_dir = SCRIPTS_DIR\ny = 2\n'
-    moved = b'x = 1\n    graduated_dir = REPO_ROOT / "loom-code" / "tests"\ny = 2\n'
-    assert not _differs_beyond_graduated_dir(original, original)
-    assert not _differs_beyond_graduated_dir(moved, original)
-    assert _differs_beyond_graduated_dir(moved.replace(b"y = 2", b"y = 3"), original)
-    assert _differs_beyond_graduated_dir(original.replace(b"x = 1", b"x = 9"), original)
-    assert _differs_beyond_graduated_dir(moved + b"z = 3\n", original)
 
 
 def test_readme_paragraph_numbers_agree_with_current_adversary_summary() -> None:

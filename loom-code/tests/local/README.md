@@ -1,4 +1,4 @@
-# Integration tests — cross-plugin behaviors
+# Local-only integration tests — cross-plugin behaviors
 
 > **Phase**: v0.4.0-draft Phase 4 build. Tests verify loom-code's cross-plugin contracts hold when other plugins (loom-workflow, domain-teams:code-team, obra/superpowers) are installed alongside.
 
@@ -13,7 +13,7 @@
 
 ## How to run
 
-All scripts gracefully skip when their prerequisites are missing — safe to run in CI without pre-installing every plugin.
+These scripts are local-only: neither the package suite nor CI runs them, so run them by hand. Each one gracefully skips when its prerequisites are missing.
 
 ```bash
 cd /path/to/loom-plugins/.worktrees/loom-code-design

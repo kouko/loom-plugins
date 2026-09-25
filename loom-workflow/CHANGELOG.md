@@ -13,13 +13,14 @@ Patch. File locations only; no behaviour or test assertion changes.
   `loom-workflow/tests/scripts/`, and `.claude-plugin/test_plugin_manifest.py`
   to `loom-workflow/tests/`. Runtime scripts stay in the skill folders.
 - The package suite discovers `loom-workflow/tests/`: the top level in one
-  session and each subfolder in its own. The manifest test is collected for
-  the first time. A new guard fails when a `test_*.py` is left under
-  `skills/`, `scripts/` or `.claude-plugin/`.
-- Python counts: 1052 passed, 3 skipped before; 1055 passed, 3 skipped
-  after, in the same 11 sessions. The three new tests are the manifest test
-  and the guard with its negative case. Shell tests: 145 PASS before and
-  after.
+  session and each subfolder in its own, and runs every `test-*.sh` under
+  `loom-workflow/tests/`, subfolders included. The manifest test is
+  collected for the first time. The repository-wide guard fails when a test
+  file is left under `skills/`, `scripts/`, `.claude-plugin/` or anywhere
+  else outside `loom-workflow/tests/`.
+- Python counts: 1052 passed, 3 skipped before; 1053 passed, 3 skipped
+  after, in the same 11 sessions. The one new test is the manifest test.
+  Shell tests: 145 PASS before and after.
 - The version bump lets installed copies pick up the moved paths.
 
 ## [5.3.2] — 2026-09-23 — the blind run is renamed to independent acceptance testing

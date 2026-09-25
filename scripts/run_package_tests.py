@@ -2,13 +2,16 @@
 """Run one pytest session per `--then`-separated group of arguments.
 
 `--loom-family [--only <group>]` runs the whole Loom test surface instead. Tests
-live in `tests/` folders apart from the code they test, and the inventory is
-discovered rather than listed: any pytest file placed in one of those folders
-runs without editing this file, and a `tests/local/` folder -- tests that only
-make sense on a developer's machine -- is skipped. The groups, which CI selects
-with `--only`, are:
+live in the folders named by `TEST_ROOTS`, apart from the code they test, and
+the inventory inside them is discovered rather than listed: any pytest file or
+`test-*.sh` placed in one of those roots or their subfolders runs without
+editing this file, and a root's `local/` folder -- tests that only make sense
+on a developer's machine -- is skipped. A test anywhere else does not run; a
+new plugin's tests run once its root is added to `TEST_ROOTS`. The groups,
+which CI selects with `--only`, are:
 
-- `code`: the repository-level `tests/` and `loom-code/tests/`, one xdist session.
+- `code`: every root except loom-design's and loom-workflow's -- today the
+  repository-level `tests/` and `loom-code/tests/` -- in one xdist session.
 - `design`: `loom-design/tests/`, its own session, because loom-design carries
   its own pytest.ini (importlib import mode); a single session that also names
   loom-code paths adopts that ini, and the loom-code modules that rely on bare
@@ -16,7 +19,8 @@ with `--only`, are:
 - `workflow-python`: `loom-workflow/tests/`, one session for its top level and
   one per subfolder that holds tests, because per-skill subfolders repeat test
   basenames and carry their own conftest.py or pytest.ini.
-- `workflow-shell`: every `loom-workflow/tests/test-*.sh`.
+- `workflow-shell`: every `test-*.sh` under any root, subfolders included,
+  outside the roots' `local/` folders.
 - `workflow-mermaid`: the Mermaid validator and its negative check.
 
 Whole directories are handed to pytest, and a nested git repository placed
@@ -44,6 +48,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "loom-code" / "scri
 from repo_files import nested_repositories, nested_worktrees  # noqa: E402
 
 LOCAL = "local"
+# Every folder the package suite runs, subfolders included; nothing else runs.
+TEST_ROOTS = ("tests", "loom-code/tests", "loom-design/tests", "loom-workflow/tests")
+DESIGN_ROOT, WORKFLOW_ROOT = "loom-design/tests", "loom-workflow/tests"
 GROUPS = {"code", "design", "workflow-python", "workflow-shell", "workflow-mermaid"}
 
 
@@ -77,8 +84,18 @@ def _tests_session(repo: Path, folders: list[Path]) -> list[str]:
     return [*targets, *ignores] if targets else []
 
 
+def _shell_tests(repo: Path) -> list[Path]:
+    """Every `test-*.sh` under a test root, subfolders included, minus `tests/local/`."""
+    return sorted(
+        path
+        for folder in (repo / root for root in TEST_ROOTS) if folder.is_dir()
+        for path in folder.rglob("test-*.sh")
+        if "node_modules" not in path.parts and folder / LOCAL not in path.parents
+    )
+
+
 def _workflow_sessions(repo: Path) -> list[list[str]]:
-    tests = repo / "loom-workflow" / "tests"
+    tests = repo / WORKFLOW_ROOT
     local = tests / LOCAL
     subfolders = sorted(
         d for d in tests.iterdir()
@@ -103,19 +120,17 @@ def loom_family_commands(
     sessions: list[list[str]] = []
     commands: list[list[str]] = []
     if only in {None, "code"}:
-        code = _tests_session(repo, [repo / "tests", repo / "loom-code" / "tests"])
+        code_roots = [r for r in TEST_ROOTS if r not in {DESIGN_ROOT, WORKFLOW_ROOT}]
+        code = _tests_session(repo, [repo / r for r in code_roots])
         if code:
             commands.append([*pytest, *code, verbosity, "-n", "auto"])
     if only in {None, "design"}:
-        sessions += [s for s in [_tests_session(repo, [repo / "loom-design" / "tests"])] if s]
+        sessions += [s for s in [_tests_session(repo, [repo / DESIGN_ROOT])] if s]
     if only in {None, "workflow-python"}:
         sessions += _workflow_sessions(repo)
     commands += [[*pytest, *session, verbosity] for session in sessions]
     if only in {None, "workflow-shell"}:
-        commands.extend(
-            [["bash", test.as_posix()]
-             for test in sorted((repo / "loom-workflow/tests").glob("test-*.sh"))]
-        )
+        commands.extend([["bash", test.as_posix()] for test in _shell_tests(repo)])
     if only in {None, "workflow-mermaid"}:
         # No skip path: a missing node or npm fails the group.
         commands.extend([

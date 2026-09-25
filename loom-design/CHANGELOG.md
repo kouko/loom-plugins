@@ -21,11 +21,11 @@ assertion changes.
   in the same `interface/`, `principles/` and `spec/` station folders;
   `pytest.ini` moves with them, and the validators stay in
   `loom-design/scripts/`.
-- The package suite discovers `loom-design/tests/` as the design group. A
-  new guard fails when a `test_*.py` is left under `loom-design/scripts/`
-  or `loom-design/skills/`.
-- Design group counts: 245 passed, 1 skipped before; 247 passed, 1 skipped
-  after. The two new tests are that guard and its negative case.
+- The package suite discovers `loom-design/tests/` as the design group. The
+  repository-wide guard fails when a test file is left under
+  `loom-design/scripts/`, `loom-design/skills/` or anywhere else outside
+  `loom-design/tests/`.
+- Design group counts: 245 passed, 1 skipped before and after.
 - The version bump lets installed copies pick up the moved paths.
 
 ## [2.3.1] — 2026-09-23 — the blind run is renamed to independent acceptance testing

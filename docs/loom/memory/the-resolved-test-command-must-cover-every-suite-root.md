@@ -1,6 +1,6 @@
 ---
 name: the-resolved-test-command-must-cover-every-suite-root
-description: this repo runs two pytest suites (repo-root scripts/ and loom-code/scripts, ~310 + ~1870 tests) — a "suite green" claim resolved from only the root suite let two version-pin failures and a compaction-pin failure ride three tasks undetected until a reviewer independently ran both; resolve the package test command as BOTH invocations, and treat any single-suite green claim as unverified
+description: this repo then ran two pytest suites (repo-root scripts/ and loom-code/scripts, ~310 + ~1870 tests) — a "suite green" claim resolved from only the root suite let two version-pin failures and a compaction-pin failure ride three tasks undetected until a reviewer independently ran both; resolve the package test command as `python3 scripts/run_package_tests.py --loom-family`, which runs every suite root, and treat any single-suite green claim as unverified
 type: Memory
 sources:
   - resource: introducing commit ae8449b6376409f296057e05bfbf8cc1339e1072
@@ -22,8 +22,7 @@ silently narrows every downstream "green" claim to that suite; the gap
 compounds because each task inherits the same resolved command.
 
 **How to apply:** when resolving this repo's package test command,
-resolve it as both `python3 -m pytest scripts/ -q` AND
-`python3 -m pytest loom-code/scripts -q`, and require both tails in any
-green claim; generalized — enumerate every pytest root before caching a
+resolve it as `python3 scripts/run_package_tests.py --loom-family`,
+and require its tail in any green claim; generalized — enumerate every pytest root before caching a
 resolved command, and re-verify the enumeration when a new suite root
 appears in CI config.

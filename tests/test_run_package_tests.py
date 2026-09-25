@@ -9,7 +9,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 RUNNER = REPO / "scripts" / "run_package_tests.py"
 sys.path.insert(0, str(RUNNER.parent))
-from run_package_tests import loom_family_commands, split_groups  # noqa: E402
+from run_package_tests import TEST_ROOTS, loom_family_commands, split_groups  # noqa: E402
 
 
 def test_split_groups_separates_on_double_dash() -> None:
@@ -197,28 +197,6 @@ def test_loom_family_preset_is_the_only_test_command_named_by_ci_and_kickoff() -
 # --- tests live in tests/ folders, and the inventory discovers them ---------
 
 
-def _stray_root_tests(repo: Path) -> list[str]:
-    """Test files left beside the repository-level code they test."""
-    return sorted(
-        path.relative_to(repo).as_posix()
-        for folder in (repo / "scripts", repo / ".claude" / "hooks")
-        for pattern in ("test_*.py", "test-*.sh")
-        for path in folder.glob(pattern)
-    )
-
-
-def test_no_repository_level_test_outside_tests_folder() -> None:
-    assert _stray_root_tests(REPO) == []
-
-
-def test_stray_repository_level_test_is_detected(tmp_path: Path) -> None:
-    (tmp_path / "scripts").mkdir()
-    (tmp_path / "scripts" / "test_stray.py").write_text("")
-    (tmp_path / ".claude" / "hooks").mkdir(parents=True)
-    (tmp_path / ".claude" / "hooks" / "test-stray.sh").write_text("")
-    assert _stray_root_tests(tmp_path) == [".claude/hooks/test-stray.sh", "scripts/test_stray.py"]
-
-
 def _write_test(path: Path, name: str) -> None:
     path.mkdir(parents=True, exist_ok=True)
     (path / f"test_{name}.py").write_text(f"def test_{name}():\n    pass\n")
@@ -284,3 +262,37 @@ def test_workflow_tests_subfolders_run_in_their_own_sessions(tmp_path: Path) -> 
     assert collected.count("::test_dup") == 2
     assert "test_top" in collected
     assert "local_only" not in collected
+
+
+def _plant_shell(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("#!/usr/bin/env bash\nexit 0\n")
+
+
+def test_shell_group_discovers_test_scripts_under_every_root(tmp_path: Path) -> None:
+    """A `test-*.sh` in any tests root or its subfolders runs; `tests/local/` does not."""
+    repo = tmp_path / "repo"; repo.mkdir()
+    _seed_repo(repo)
+    planted = [repo / "loom-code/tests/test-x.sh", repo / "loom-workflow/tests/sub/test-y.sh"]
+    local = repo / "tests/local/test-z.sh"
+    for path in (*planted, local):
+        _plant_shell(path)
+
+    commands = loom_family_commands(repo, verbosity="-q", only="workflow-shell")
+
+    for path in planted:
+        assert ["bash", path.as_posix()] in commands
+    assert not any(local.as_posix() in command for command in commands)
+
+
+def test_test_roots_are_the_folders_the_pytest_groups_run() -> None:
+    assert TEST_ROOTS == ("tests", "loom-code/tests", "loom-design/tests", "loom-workflow/tests")
+    targets = {
+        token
+        for command in loom_family_commands(REPO, verbosity="-q")
+        if command[:3] == [sys.executable, "-m", "pytest"]
+        for token in command[3:]
+        if not token.startswith("-") and token != "auto"
+    }
+    assert set(TEST_ROOTS) <= targets
+    assert all(any(t == r or t.startswith(r + "/") for r in TEST_ROOTS) for t in targets)
