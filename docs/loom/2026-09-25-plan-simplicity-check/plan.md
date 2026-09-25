@@ -19,7 +19,7 @@ charter: 1.1
 - Risk: widens `test_plan_field_caps.py` coverage; charter 1.0 plans stay unchecked, so in-flight plans elsewhere keep working; narrow judged from Files entries with the existing classifier; agent-decided.
 
 **W0-02 Plan lens, write-plan dispatch step, Build entry check, station tables**  after: W0-01  acceptance: 1, 3, 5
-- Files: `loom-code/skills/closing-review/references/lenses.md`, `loom-code/agents/reviewer.md`, `loom-code/skills/write-plan/SKILL.md`, `loom-code/skills/build/SKILL.md`, `loom-design/skills/capture-intent/SKILL.md`, `loom-design/skills/write-spec/SKILL.md`, `loom-code/tests/test_plan_simplicity_text.py`, `loom-code/tests/test_simplified_station_text.py`
+- Files: `loom-code/skills/closing-review/references/lenses.md`, `loom-code/agents/reviewer.md`, `loom-code/skills/write-plan/SKILL.md`, `loom-code/skills/build/SKILL.md`, `loom-design/skills/capture-intent/SKILL.md`, `loom-design/skills/write-spec/SKILL.md`, `loom-code/tests/test_plan_simplicity_text.py`
 - Test: A1 positive: write-plan-dispatches-fresh-plan-lens-reviewer; negative: no-copy-says-no-formal-plan-review. A3 positive: lens-is-loom-code-reviewer; negative: no-loom-workflow-dependency. A5 positive: adoption-recorded-agent-decided; negative: no-user-question.
 - Risk: the plan lens scores only deletion-first; Build §1 runs the existing `plan` command; three byte-identical table copies change together; agent-decided.
 
@@ -53,6 +53,13 @@ charter: 1.1
 - Files: `loom-code/scripts/loom_checker/rule_checks/intake.py`, `loom-code/skills/build/SKILL.md`, `docs/loom/2026-09-25-plan-simplicity-check/evidence/probes/test_plan_skip_missing_files.py`, `loom-code/tests/test_plan_skip_missing_files.py`
 - Test: A2 positive: missing-files-with-record-blocks-cleanly; negative: missing-files-never-internal-error. A4 positive: narrow-skip-still-accepted; negative: skip-with-missing-files-blocks.
 - Risk: class "the plan check can fail without a BLOCK" searched in intake.py and Build entry; Build stops on any non-zero exit; probe moves unchanged; agent-decided.
+
+### Wave 4 — closing review round 1 fixes
+
+**W4-01 The simplicity step can be followed as written**  after: W3-01  acceptance: 1, 5
+- Files: `loom-code/skills/write-plan/references/plan-simplicity.md`, `loom-code/skills/write-plan/SKILL.md`, `loom-code/skills/closing-review/references/lenses.md`, `loom-code/agents/reviewer.md`, `loom-code/CHANGELOG.md`, `loom-code/tests/test_plan_simplicity_text.py`
+- Test: A1 positive: check-runs-before-the-checker-commands; negative: no-both-checks-pass-precondition. A5 positive: lens-maps-shapes-to-deletion-first-findings; negative: plan-lens-has-no-fix-round.
+- Risk: class "the plan-simplicity step cannot be followed as written" searched in the reference, SKILL pointer, plan lens and reviewer input; write-plan stays under its word cap; agent-decided.
 
 ## Simplicity check
 - Fold the record into plan.field-caps instead of a new rule id — taken
