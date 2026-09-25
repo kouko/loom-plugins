@@ -8,7 +8,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).parents[2] / "skills" / "architecture"
+ROOT = Path(__file__).parents[2] / "skills" / "architecture-design"
 SKILL = ROOT / "SKILL.md"
 SCHEMA = ROOT / "references" / "architecture-md-schema.md"
 

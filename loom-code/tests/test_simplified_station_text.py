@@ -47,7 +47,7 @@ def _design_skill(name: str) -> str:
 
 # The station summary table lives in the three stations only; the three
 # loom-design tools (product-principles, design-system, architecture) carry none.
-TOOL_SKILLS = ("product-principles", "design-system", "architecture")
+TOOL_SKILLS = ("product-principles", "design-system", "architecture-design")
 
 
 def test_station_summaries_do_not_duplicate_reviewer_counts() -> None:

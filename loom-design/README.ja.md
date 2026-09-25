@@ -28,7 +28,7 @@ flowchart TD
     subgraph tools["オンデマンドのツール（フローの段階ではない）"]
         principles["loom-design:product-principles<br/>PRINCIPLES.md を ratify"]
         designsys["loom-design:design-system<br/>DESIGN.md を ratify"]
-        arch["loom-design:architecture<br/>ARCHITECTURE.md を設計して ratify"]
+        arch["loom-design:architecture-design<br/>ARCHITECTURE.md を設計して ratify"]
     end
 
     intent -->|"needs-design: yes"| spec

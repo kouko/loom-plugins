@@ -1,5 +1,5 @@
 ---
-name: architecture
+name: architecture-design
 description: |
   Design and ratify ARCHITECTURE.md with the user: module boundaries, tech choices, folder layout, CI stages, then guard tests. Use to design or change a project's architecture. 架構設計 / 架構規則 / アーキテクチャ設計.
 version: 1.0.0

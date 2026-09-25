@@ -28,7 +28,7 @@ flowchart TD
     subgraph tools["On-demand tools, not flow steps"]
         principles["loom-design:product-principles<br/>ratifies PRINCIPLES.md"]
         designsys["loom-design:design-system<br/>ratifies DESIGN.md"]
-        arch["loom-design:architecture<br/>designs and ratifies ARCHITECTURE.md"]
+        arch["loom-design:architecture-design<br/>designs and ratifies ARCHITECTURE.md"]
     end
 
     intent -->|"needs-design: yes"| spec
