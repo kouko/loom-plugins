@@ -25,6 +25,13 @@ charter: 1.0
 - Test: A4 positive: versions-synchronized-3.17.0; negative: check-mechanisms-net-unchanged.
 - Risk: minor because agent and lens guidance changes; release pin in `loom-code/tests/test_write_plan_station_text.py` updated too; agent-decided.
 
+### Wave 2 — adversary fixes
+
+**W2-01 Budget wording agrees and covers added tests only; pins reject negation**  after: W1-01  acceptance: 1, 3
+- Files: `loom-code/agents/implementer.md`, `loom-code/skills/closing-review/references/lenses.md`, `loom-code/tests/test_test_budget_text.py`
+- Test: A1 positive: implementer-budget-sentence-not-negated; negative: negated-budget-sentence-fails-pin. A3 positive: overbuilt-clause-limited-to-added-tests; negative: negated-finding-sentence-fails-pin.
+- Risk: classes "budget wording inconsistent or over-broad" and "pins miss a polarity flip" searched in the three prose files and the pin test; extends two existing tests, none added; agent-decided.
+
 ## Questions asked
 ① — done — 對
 
