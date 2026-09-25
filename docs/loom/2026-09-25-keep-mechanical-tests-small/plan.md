@@ -32,9 +32,17 @@ charter: 1.0
 - Test: A1 positive: implementer-budget-sentence-not-negated; negative: negated-budget-sentence-fails-pin. A3 positive: overbuilt-clause-limited-to-added-tests; negative: negated-finding-sentence-fails-pin.
 - Risk: classes "budget wording inconsistent or over-broad" and "pins miss a polarity flip" searched in the three prose files and the pin test; extends two existing tests, none added; agent-decided.
 
+### Wave 3 — finalize fixes
+
+**W3-01 Changelog states the per-finding budget as the contracts do**  after: W2-01  acceptance: 1
+- Files: `loom-code/CHANGELOG.md`
+- Test: A1 positive: changelog-one-test-per-finding; negative: changelog-no-two-case-finding-allowance.
+- Risk: both round 1 reviewers flagged the stale sentence; the reused probe gets its `concern:` line from the adversary, not an implementer; agent-decided.
+
 ## Questions asked
 ① — done — 對
 
 ## Risks
 1. The budget is prose read by agents plus a reviewer finding; there is no mechanical count, by the intent's constraint.
 2. Keep this change's own tests small: one pin test file, one assertion per Acceptance case.
+3. Round 1 nits left as follow-ups: graduated-probe exemption clause, duplicated reader in the pin test, gate-marker count touching lenses.md.
