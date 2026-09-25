@@ -9,6 +9,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from prose_pin import has_negation, split_sentences
+
 REPO = Path(__file__).resolve().parents[2]
 IMPLEMENTER = REPO / "loom-code/agents/implementer.md"
 ADVERSARIAL = REPO / "loom-code/skills/closing-review/references/adversarial.md"
@@ -21,9 +23,11 @@ def _read(path: Path) -> str:
 
 def test_implementer_states_budget_and_net_lines():
     text = _read(IMPLEMENTER)
+    budget = next(s for s in split_sentences(text) if "stay within a budget" in s)
+    assert not has_negation(budget), budget
     assert (
-        "at most one positive and one negative or boundary case per Acceptance line or finding"
-        in text
+        "at most one positive and one negative or boundary case per Acceptance line;" in text
+        and "a finding's fix adds at most one test, extending an existing test first" in text
         and "existing helpers and fixtures" in text
         and "no new test harness" in text
         and "no tests of tests" in text
@@ -51,7 +55,9 @@ def test_five_program_cap_unchanged():
 def test_tests_dimension_overbuilt_is_finding():
     row = next(line for line in LENSES.read_text(encoding="utf-8").splitlines()
                if line.startswith("| tests |"))
-    assert "tests beyond what the behaviour needs" in row and "names the smaller shape" in row
+    overbuilt = next(s for s in split_sentences(row) if "beyond what the behaviour needs" in s)
+    assert not has_negation(overbuilt), overbuilt
+    assert "tests the change adds beyond what the behaviour needs" in row and "names the smaller shape" in row
 
 
 def test_fix_adds_at_most_one_test():
