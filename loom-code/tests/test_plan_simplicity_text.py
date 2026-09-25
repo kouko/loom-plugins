@@ -60,3 +60,29 @@ def test_a5_plan_step_asks_the_user_nothing() -> None:
     user_sentences = [s for s in split_sentences(_step()) if "user" in s]
     assert user_sentences, "the step must state that it never asks the user"
     assert all(has_negation(s) for s in user_sentences), user_sentences
+
+
+def _plan_lens() -> str:
+    """The `## Plan lens` section of lenses.md, flattened."""
+    match = re.search(r"^## Plan lens\n(.*?)(?=^## |\Z)", LENSES.read_text(encoding="utf-8"), re.S | re.M)
+    assert match, "lenses.md has no ## Plan lens section"
+    return " ".join(match.group(1).split())
+
+
+def test_a1_step_runs_before_the_checker_commands() -> None:
+    text = WRITE_PLAN.read_text(encoding="utf-8")
+    assert text.index("**Simplicity check.**") < text.index("run both commands before committing it")
+    assert affirms(_step(), "before", "loom_checker.py plan")
+
+
+def test_a1_no_both_checks_pass_precondition() -> None:
+    assert "After both checks pass" not in PLAN_SIMPLICITY.read_text(encoding="utf-8")
+
+
+def test_a5_lens_maps_shapes_to_deletion_first_findings() -> None:
+    assert affirms(_plan_lens(), "Return each", "`deletion-first` finding", "`fix`")
+
+
+def test_a5_plan_lens_has_no_fix_round() -> None:
+    assert "has no fix round" in _plan_lens()
+    assert "Return either" not in _plan_lens()

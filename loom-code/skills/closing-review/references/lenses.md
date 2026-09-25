@@ -118,5 +118,7 @@ omission too — an unregistered rule is a mechanism nobody recomputes.
 write-plan dispatches this lens on a draft plan before Build, with the
 intent and the draft plan as ground truth. It scores `deletion-first` only:
 can the same Acceptance lines be met with a simpler shape — fewer tasks,
-files or mechanisms, or less code? Return either "no simpler shape", or
-each concrete smaller shape with the tasks or files it removes.
+files or mechanisms, or less code? Return each concrete smaller shape as one
+`deletion-first` finding whose `fix` names the shape and the tasks or files
+it removes. With none, return PASS with no findings and the note "no simpler
+shape". The plan lens has no fix round.

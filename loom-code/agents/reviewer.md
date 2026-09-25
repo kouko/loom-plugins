@@ -39,7 +39,8 @@ ground truth: intent, and the spec and plan when they exist
 dimensions: loom-code/skills/closing-review/references/lenses.md
 ```
 
-If any of these is missing, say so and stop; do not guess a lens or invent
+For lens `plan`, `reviewed_sha` and `changed paths` carry the draft plan's
+path, not a sha. If any of these is missing, say so and stop; do not guess a lens or invent
 a base. Read `loom-code/skills/closing-review/references/lenses.md` before scoring — it defines every
 dimension named below and every severity and verdict rule.
 

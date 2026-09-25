@@ -382,7 +382,11 @@ spoken to the user rather than read as a machine artifact.
   questions live: one `user-decided — <what they chose and why>` line each,
   because with no spec there is no `## Design decision` to hold them.
 
-After the draft exists, run both commands before committing it:
+**Simplicity check.** After the draft exists, follow
+[`references/plan-simplicity.md`](references/plan-simplicity.md) unless the
+plan records a narrow skip.
+
+Then run both commands before committing it:
 
 ```
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py plan docs/loom/<change-id>/plan.md
@@ -392,10 +396,6 @@ python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py intake write-plan <change-
 The second run is when `intake.test-case-pair` can inspect the completed
 Task DAG and block missing ownership, empty case pairs, or unresolved intent
 questions. A pre-plan intake pass cannot substitute for this readiness run.
-
-**Simplicity check.** Before the plan commit, follow
-[`references/plan-simplicity.md`](references/plan-simplicity.md) unless the
-plan records a narrow skip.
 
 ### Resolve `second-vendor: suggest`
 
