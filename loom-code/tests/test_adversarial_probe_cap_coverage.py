@@ -28,6 +28,9 @@ from loom_checker.probes import MAX_PROBE_PROGRAMS  # noqa: E402
 from loom_checker.probes import check_adversarial_proportionate  # noqa: E402
 from loom_checker.probes import command_executes_artifact  # noqa: E402
 from loom_checker.probes import command_names_artifact  # noqa: E402
+from loom_checker.probes import graduated_probe_programs  # noqa: E402
+from loom_checker.probes import suite_collects  # noqa: E402
+from loom_checker.reviewers import committed_branch_delta  # noqa: E402
 
 CHANGE_ID = "2026-09-23-adversarial-probes-earn-their-place"
 OVER_THE_CAP = MAX_PROBE_PROGRAMS + 2
@@ -89,6 +92,132 @@ def test_cap_programs_inside_the_expected_directory_are_refused() -> None:
     ]
     repo, head = _commit(dict.fromkeys(paths, PROGRAM))
     assert check_adversarial_proportionate(repo, head, CHANGE_ID) != []
+
+
+RUNNER_SOURCE = REPO_ROOT / "scripts" / "run_package_tests.py"
+SUITE = "loom-code/tests"
+
+
+def _git(repo: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], check=True, capture_output=True, text=True
+    ).stdout.strip()
+
+
+def _write(repo: Path, files: dict[str, str]) -> None:
+    for name, text in files.items():
+        path = repo / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+
+def _probe(index: int) -> str:
+    """A concern-bearing probe with enough distinct body that two of them are
+    not similar to each other in git's rename sense."""
+    body = "".join(f"    assert {index} * {line} == {index * line}\n" for line in range(1, 30))
+    return f"# concern: defect class {index}\ndef test_probe_{index}() -> None:\n{body}"
+
+
+def _branch(base: dict[str, str]) -> Path:
+    """A repo whose trunk holds the runner plus `base`, checked out on a
+    feature branch with nothing committed on it yet."""
+    repo = Path(tempfile.mkdtemp())
+    _git(repo, "init", "-q", "-b", "main")
+    _git(repo, "config", "user.email", "adversary@example.invalid")
+    _git(repo, "config", "user.name", "adversary")
+    _write(repo, {
+        "scripts/run_package_tests.py": RUNNER_SOURCE.read_text(encoding="utf-8"),
+        f"{SUITE}/test_anchor.py": "def test_anchor() -> None:\n    assert True\n",
+        **base,
+    })
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-qm", "base")
+    _git(repo, "checkout", "-q", "-b", "feature")
+    return repo
+
+
+def _commit_branch(repo: Path) -> str:
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-qm", "branch")
+    return _git(repo, "rev-parse", "HEAD")
+
+
+MOVED = MAX_PROBE_PROGRAMS + 1
+
+
+def test_moved_concern_tests_are_not_counted() -> None:
+    """Acceptance 1: a branch that only `git mv`s six concern-bearing tests
+    into the suite folder produces no probe program of its own."""
+    old = {f"loom-code/scripts/test_probe_{i}.py": _probe(i) for i in range(MOVED)}
+    repo = _branch(old)
+    for i in range(MOVED):
+        _git(repo, "mv", f"loom-code/scripts/test_probe_{i}.py", f"{SUITE}/test_probe_{i}.py")
+    head = _commit_branch(repo)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == []
+    assert check_adversarial_proportionate(repo, head, CHANGE_ID) == []
+
+
+def test_moved_and_rewritten_into_a_new_probe_is_counted() -> None:
+    """Acceptance 2 negative: a move whose content falls below git's default
+    rename similarity (50%) is a removal plus a new probe, and counts."""
+    repo = _branch({"loom-code/scripts/test_probe_0.py": _probe(0)})
+    _git(repo, "mv", "loom-code/scripts/test_probe_0.py", f"{SUITE}/test_probe_0.py")
+    _write(repo, {f"{SUITE}/test_probe_0.py": _probe(99)})
+    head = _commit_branch(repo)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == [f"{SUITE}/test_probe_0.py"]
+
+
+def test_moved_with_a_small_edit_is_still_a_move() -> None:
+    """At or above git's default 50% similarity the pair stays a rename."""
+    repo = _branch({"loom-code/scripts/test_probe_0.py": _probe(0)})
+    _git(repo, "mv", "loom-code/scripts/test_probe_0.py", f"{SUITE}/test_probe_0.py")
+    _write(repo, {f"{SUITE}/test_probe_0.py": _probe(0) + "    assert True\n"})
+    head = _commit_branch(repo)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == []
+
+
+def test_new_probes_are_counted_and_over_the_cap_refused() -> None:
+    """Acceptance 2 positive: brand-new probes still count, six still refuse."""
+    repo = _branch({})
+    _write(repo, {f"{SUITE}/test_probe_{i}.py": _probe(i) for i in range(MOVED)})
+    head = _commit_branch(repo)
+    assert len(graduated_probe_programs(repo, head, CHANGE_ID)) == MOVED
+    assert check_adversarial_proportionate(repo, head, CHANGE_ID) != []
+
+
+def test_a_copied_probe_under_a_new_name_is_counted() -> None:
+    """Acceptance 2 boundary: a copy whose original stays on the branch is a
+    new program; only a pair whose old path left the branch is a move."""
+    repo = _branch({f"{SUITE}/test_probe_0.py": _probe(0)})
+    _write(repo, {f"{SUITE}/test_probe_copy.py": _probe(0)})
+    head = _commit_branch(repo)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == [f"{SUITE}/test_probe_copy.py"]
+
+
+def test_a_program_under_tests_local_is_not_graduated() -> None:
+    """Acceptance 3: the package suite skips `tests/local/`, so a probe there
+    is not in the suite and not counted as graduated into it."""
+    repo = _branch({})
+    local = f"{SUITE}/local/test_probe_0.py"
+    kept = f"{SUITE}/test_probe_1.py"
+    _write(repo, {local: _probe(0), kept: _probe(1)})
+    head = _commit_branch(repo)
+    assert not suite_collects(repo, local)
+    assert suite_collects(repo, kept)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == [kept]
+
+
+def test_the_branch_delta_still_reads_a_move_as_removal_plus_addition() -> None:
+    """Acceptance 5: the shared delta keeps `--no-renames` for its other
+    callers (reviewer floor, narrow delta, finalize)."""
+    repo = _branch({"loom-code/scripts/test_probe_0.py": _probe(0)})
+    _git(repo, "mv", "loom-code/scripts/test_probe_0.py", f"{SUITE}/test_probe_0.py")
+    head = _commit_branch(repo)
+    delta = committed_branch_delta(repo, CHANGE_ID, head)
+    assert delta is not None
+    _paths, removed, added = delta
+    assert removed == {"loom-code/scripts/test_probe_0.py"}
+    assert added == {f"{SUITE}/test_probe_0.py"}
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from fnmatch import fnmatch
+from loom_checker.helpers import UsageError
+from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import kickoff_defaults
@@ -76,21 +78,39 @@ def _declared_suite_commands(repo: Path) -> list[list[str]]:
         return []
 
 
+def _ignored(repo: Path, command: list[str], wanted: Path) -> bool:
+    """True when one of the command's pytest `--ignore=` paths holds `wanted`."""
+    for token in command[1:]:
+        if not token.startswith("--ignore="):
+            continue
+        ignored = Path(token.partition("=")[2])
+        ignored = (ignored if ignored.is_absolute() else repo / ignored).resolve()
+        if wanted == ignored or ignored in wanted.parents:
+            return True
+    return False
+
+
 def suite_collects(repo: Path, artifact: str) -> bool:
     """True when the declared package suite already runs `artifact`.
 
     A graduated probe program -- one carried out of a change's store into the
     permanent suite -- is named by a pytest path the runner declares, either
     as that path itself or as a file pytest collects under a declared
-    directory. A neighbour the suite would never collect is not in the suite.
+    directory. A neighbour the suite would never collect is not in the suite,
+    and neither is a file under a folder the command passes to pytest as
+    `--ignore=` -- that is how the runner skips every `tests/local/` folder,
+    so the runner's own rule is honoured rather than restated here.
     """
     wanted = os.path.normpath(artifact)
+    wanted_path = (repo / wanted).resolve()
     for command in _declared_suite_commands(repo):
         if not command:
             continue
         runs_pytest = "pytest" in command[:4]
         runs_shell = Path(command[0]).name in {"bash", "sh"}
         if not (runs_pytest or runs_shell):
+            continue
+        if runs_pytest and _ignored(repo, command, wanted_path):
             continue
         for token in command[1:]:
             if token.startswith("-") or token == "pytest":
@@ -132,6 +152,32 @@ def _carries_concern(repo: Path, head_sha: str, path: str) -> bool:
     return CONCERN_LINE.search(head) is not None
 
 
+def _moved_paths(repo: Path, head_sha: str, removed: set[str]) -> set[str]:
+    """Added paths git pairs as a rename of a path this branch removed.
+
+    The shared branch delta reads with `--no-renames`, and the other rules
+    keep that; the pairing is computed here only, over the same base, with
+    `-M` at git's default similarity threshold of 50%
+    (https://git-scm.com/docs/git-diff#Documentation/git-diff.txt--Mltngt).
+    A file rewritten below that threshold is a removal plus a new file and
+    stays counted. `-M` alone never reports copies, and the old path must be
+    one the branch removed, so a probe copied under a new name while the
+    original stays is counted too. When the pairing cannot be read, nothing
+    is excluded -- the cap fails closed.
+    """
+    try:
+        base = branch_base(repo)
+    except UsageError:
+        return set()
+    status = git_maybe(repo, "diff", "--name-status", "-M", base, head_sha) or ""
+    moved: set[str] = set()
+    for line in status.splitlines():
+        fields = line.split("\t")
+        if len(fields) == 3 and fields[0].upper().startswith("R") and fields[1] in removed:
+            moved.add(fields[2].strip())
+    return moved
+
+
 def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[str]:
     """Probe programs this branch adds straight into the package suite.
 
@@ -147,14 +193,21 @@ def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
     no probe programs; a graduated probe that drops the line to duck the cap
     has stopped claiming to be a probe, and if finalize-review still executes
     it as one it is counted and answers for the line anyway.
+
+    A test the branch only moved or renamed is not counted: it is an earlier
+    change's probe, not this change's output, and counting it once refused a
+    change that moved every test into `tests/` folders. See `_moved_paths`
+    for how a move is told apart from a new or copied probe.
     """
     delta = committed_branch_delta(repo, change_id, head_sha)
     if delta is None:
         return []
-    _paths, _removed, added = delta
+    _paths, removed, added = delta
+    moved = _moved_paths(repo, head_sha, removed)
     return sorted(
         path for path in added
-        if is_program_path(path)
+        if path not in moved
+        and is_program_path(path)
         and suite_collects(repo, path)
         and _carries_concern(repo, head_sha, path)
     )
