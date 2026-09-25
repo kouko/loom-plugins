@@ -83,10 +83,17 @@ def test_skill_states_redesign_updates_decisions_rules_guards():
 
 
 def test_guard_failure_message_fields_stated():
-    for doc in (_text(), SCHEMA.read_text(encoding="utf-8")):
-        low = doc.lower()
-        for field in ("rule id", "offending path", "conform", "change the rule and its guard"):
-            assert field in low, f"missing guard failure-message field: {field!r}"
+    low = SCHEMA.read_text(encoding="utf-8").lower()
+    for field in ("rule id", "offending path", "conform", "change the rule and its guard"):
+        assert field in low, f"missing guard failure-message field: {field!r}"
+    assert "guard failure message" in _text().lower()
+
+
+def test_skill_records_package_tests_when_absent_and_commits_edited_config():
+    text = " ".join(_text().split())
+    assert "- package-tests: <command> — <reason> (<date>)" in text
+    step5 = text.split("## Step 5", 1)[1].split("## Downstream", 1)[0]
+    assert "KICKOFF-DEFAULTS.md" in step5 and "Step 3 edited" in step5
 
 
 def test_no_gate_marker():

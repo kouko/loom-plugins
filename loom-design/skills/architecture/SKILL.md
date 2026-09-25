@@ -82,14 +82,15 @@ background section.
 For every rule that can be checked mechanically, write a guard test in the
 repository's **own test framework**, under a path its `package-tests:`
 command in `docs/loom/KICKOFF-DEFAULTS.md` already runs — or extend that
-command so it does; a guard the suite never runs holds nothing. Record the
-guard's path on the rule line (`check: <guard path>`). A rule that needs
-judgment says `check: review` and gets no guard.
+command so it does; a guard the suite never runs holds nothing. When that
+file or its `package-tests:` line is absent or `none`, propose the
+repository's test command to the user and record it there as
+`- package-tests: <command> — <reason> (<date>)` before writing guards.
+Record the guard's path on the rule line (`check: <guard path>`). A rule
+that needs judgment says `check: review` and gets no guard.
 
-Each guard's failure message names the **rule id** and the rule text, the
-**offending path**, and both ways out: **conform** to the rule, or
-**change the rule and its guard** together and re-ratify. Run the guards
-once; a guard that fails on today's code is either a rule the user must
+Each guard's failure message follows the schema's "Guard failure message"
+section. Run the guards once; a guard that fails on today's code is either a rule the user must
 restate or a violation to show them.
 
 Then check the file, with `<loom-design>` standing for this plugin's own
@@ -118,7 +119,9 @@ second. Run the validator again without `--draft`.
 
 ## Step 5 — Commit
 
-Add `ARCHITECTURE.md` and the guard files by name, then:
+Add `ARCHITECTURE.md`, the guard files, and every file Step 3 edited so the
+suite runs the guards (`docs/loom/KICKOFF-DEFAULTS.md`, test or tool
+config) by name, then:
 
 ```
 git commit -m "docs(loom): ARCHITECTURE.md ratified"
