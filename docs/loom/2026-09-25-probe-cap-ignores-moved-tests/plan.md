@@ -18,6 +18,11 @@ charter: 1.0
 - Test: A1 positive: renamed-concern-tests-not-counted; negative: rename-plus-edit-into-new-probe-counted. A2 positive: new-probe-counted; boundary: copied-probe-under-new-name-counted. A3 positive: tests-local-program-not-graduated; negative: tests-program-still-graduated. A5 positive: rules-26; negative: delta-callers-unchanged.
 - Risk: rename detection stays local to the probe count (git's rename pairing over the same base), so reviewer floor and narrow delta keep `--no-renames`; agent-decided.
 
+**W0-02 Close the two undercount paths; graduate the probes**  after: W0-01, W1-01  acceptance: 1, 2, 3
+- Files: `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_adversarial_probe_cap_coverage.py`, `docs/loom/2026-09-25-probe-cap-ignores-moved-tests/evidence/probes/test_moved_paths_source_without_concern.py`, `docs/loom/2026-09-25-probe-cap-ignores-moved-tests/evidence/probes/test_suite_collects_symlinked_local.py`
+- Test: A1 positive: move-of-concern-probe-not-counted; negative: rename-from-plain-test-counted. A3 positive: tests-local-not-graduated; negative: symlink-into-local-counted. A2 positive: rename-limit-pinned; boundary: config-independent-count.
+- Risk: adversary findings: a rename whose source never carried `concern:` hid a new probe; a symlink into tests/local hid a run probe. Probes graduate; agent-decided.
+
 ### Wave 1 — record and release
 
 **W1-01 Memory entry and minor release 3.15.0**  after: W0-01  acceptance: 4, 5
