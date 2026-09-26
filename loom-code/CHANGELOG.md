@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.21.0] — 2026-09-26 — preserve step and architecture boundaries
+
+Minor: honor omitted documents throughout the stations without predicting
+completed scope from partial commits.
+
+- Preserve plain-language skipping with existing instruction records;
+  omitted specs and plans use confirmed intent and bounded task handoffs.
+- Keep entry defaults complete and retain narrow-change simplification
+  during finalization and attestation validation.
+- Apply architecture rules in planning and review only after ratification.
+
 ## [3.20.0] — 2026-09-26 — consistent flow policy enforcement
 
 Minor: closing-review and expert-mode guidance now follows bound verification
