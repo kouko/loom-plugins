@@ -29,16 +29,14 @@ acceptance-test), plus any step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
 invoke. Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
-`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty `skip`
-field, the checker judged this change narrow: as you omit those steps, tell the
-user its `narrow_change_line` field (`Skipped as a narrow change: <steps>`)
-exactly as printed, rather than rebuilding it from conversation recall or the
-raw `skip` ids. The default is the full flow:
+`acceptance-test` step. At station entry, keep the full flow unless the user
+selected or instructed a skip. Automatic narrow-change simplification belongs
+to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, write it straight into the PR body's
-`Skipped by instruction:` line (§2); Ship only reads the plan's
-`skipped-by-instruction:` lines and leaves the plan unchanged, because plan.md
+`Skipped by instruction:` line (§2); Ship only reads the intent's and plan's
+`skipped-by-instruction:` lines and leaves both unchanged, because each
 is functional content and an appended line would make the attestation stale.
 Never ask the user for a generated code to skip a step.
 
@@ -83,13 +81,12 @@ where `<status>` is the status `publish` computes locally and prints on its
 `Verification <status> for <head>` line: `valid`, `valid (skipped: <steps>)`,
 `absent`, or `stale (<reason>)`. When the printed status differs from the
 body, correct the body in place. Build the line
-`Skipped by instruction: <steps>` from the plan's `skipped-by-instruction:`
+`Skipped by instruction: <steps>` from the intent's and plan's `skipped-by-instruction:`
 lines plus any skip decided at Ship (§1), not from conversation recall; with
 none recorded or decided, write no such line,
 and the recomputed `(missing: …)` clause still discloses the absent records.
-Copy the line `Skipped as a narrow change: <steps>` exactly as `selection show`
-prints it in its `narrow_change_line` field, not from conversation recall or
-the raw `skip` ids; when that field is null, write no such line.
+Report automatic narrow-change simplification from the generated attestation's
+verification evidence, rather than inferring it from station entry.
 List each finding of severity `important` or worse that closing review
 dismissed after the acceptance tester's last dispatch, with its reason, as
 closing review's hand-off reports them.

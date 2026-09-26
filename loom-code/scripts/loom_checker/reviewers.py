@@ -181,7 +181,7 @@ def auto_skipped_steps(
     """Steps the committed delta skips with no typed confirmation.
 
     Recomputed from the delta itself, so finalize-review, the attestation
-    validator and `selection show` all read the same answer without a
+    validator read the same answer without a
     recorded event to consult.
 
     That recomputation is the reason an unreadable delta returns the whole

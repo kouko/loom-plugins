@@ -16,6 +16,11 @@ which bounds your task's three lines; when a line leaves you unable to
 start, NEEDS_CONTEXT is the answer, and the spec is where the behaviour
 lives.
 
+When the station says plan or spec is skipped, use the confirmed intent and
+its bounded task handoff (files, Acceptance references, test command and risks)
+instead of that artifact. Require no replacement plan or spec. Other
+requirements in this contract remain in force unless explicitly skipped.
+
 Read [`../references/engineering-baseline.md`](../references/engineering-baseline.md)
 before writing any code: the iron law, red → green → refactor, the
 false-green diagnostic, the four debugging phases, the wrong-direction

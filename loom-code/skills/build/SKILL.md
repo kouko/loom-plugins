@@ -12,8 +12,8 @@ generate publication evidence.
 
 ## 1. Establish scope
 
-Read the confirmed intent, spec when present, plan, current branch, and branch
-base. Preserve unrelated and untracked work. Work only on planned paths.
+Read the confirmed intent, retained spec and plan when present, current branch,
+and branch base. Preserve unrelated and untracked work. Work only on scoped paths.
 
 At entry, run `loom_checker.py selection show <change-id>` and omit the steps
 `selection show` lists as skipped (spec, plan, implementer, tdd, adversarial,
@@ -22,18 +22,24 @@ step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
 invoke. Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
-`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty
-`skip` field, the checker judged this change narrow: as you omit those steps,
-tell the user its `narrow_change_line` field (`Skipped as a narrow change:
-<steps>`) exactly as printed, rather than rebuilding it from conversation recall
-or the raw `skip` ids. The default is the full
+`acceptance-test` step. At station entry, keep the full flow unless the user
+selected or instructed a skip. Automatic narrow-change simplification belongs
+to finalization and attestation validation. The default is the full
 flow: skip a step only when the user tells
 you to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, append one line
-`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
-and commit it. Never ask the user for a generated code to skip a step.
+`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section,
+or the intent's `## Constraints` section when plan is absent or skipped, and commit it
+before dependent checks. Never ask the user for a generated code to skip a step.
 
-Also at entry, run `loom_checker.py plan docs/loom/<change-id>/plan.md`; a
+Use the confirmed intent when spec or plan is skipped. Hand each agent the
+retained artifact paths and the omitted steps; never demand the omitted artifact.
+When plan is skipped, omit the plan command and hand the implementer the intent
+path plus a bounded task, files, Acceptance references, test command and risks
+directly; create no replacement plan. Remaining dispatch, TDD and verification
+requirements still apply. Resolve open intent questions before implementation.
+
+When plan is retained, run `loom_checker.py plan docs/loom/<change-id>/plan.md`; a
 BLOCK or any other non-zero exit stops Build until the plan passes.
 
 Finding no task left to implement is not a reason to end Build. It means §2 has
@@ -99,7 +105,7 @@ mechanical checks, in this order:
 2. Dispatch the `loom-code:adversary` agent fresh-context, resolving its
    profile as §2 requires before every host-native dispatch. Never dispatch an
    agent that implemented any part of the change. Give it only the change id,
-   `HEAD`, and paths: the intent, the plan, and the changed paths with their
+   `HEAD`, and paths: the intent, the retained plan when present, and the changed paths with their
    artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
    adversarial programs. It works from the recipes in
    [`adversarial.md`](../closing-review/references/adversarial.md).

@@ -610,10 +610,8 @@ def test_selection_only_detector_rejects_the_old_forms() -> None:
 # acceptance-test and adversarial steps, so every station that honours it says so in
 # one line, in the same plain words a user-instructed skip already gets.
 NARROW_SKIP_ANNOUNCED = (
-    "When `selection show` reports `bound: false` with a non-empty `skip` field, the "
-    "checker judged this change narrow: as you omit those steps, tell the user its "
-    "`narrow_change_line` field (`Skipped as a narrow change: <steps>`) exactly as "
-    "printed, rather than rebuilding it from conversation recall or the raw `skip` ids."
+    "At station entry, keep the full flow unless the user selected or instructed a skip. "
+    "Automatic narrow-change simplification belongs to finalization and attestation validation."
 )
 
 
@@ -626,9 +624,8 @@ def test_each_station_names_the_narrow_auto_skip_to_the_user() -> None:
 
 
 NARROW_SKIP_IN_PR = (
-    "Copy the line `Skipped as a narrow change: <steps>` exactly as `selection show` "
-    "prints it in its `narrow_change_line` field, not from conversation recall or the "
-    "raw `skip` ids; when that field is null, write no such line."
+    "Report automatic narrow-change simplification from the generated attestation's "
+    "verification evidence, rather than inferring it from station entry."
 )
 
 
@@ -641,7 +638,8 @@ def test_ship_lists_the_narrow_auto_skip_in_the_pr_body() -> None:
 
 SKIP_RECORD = (
     "When you honour such a skip, append one line `skipped-by-instruction: <step> "
-    "<YYYY-MM-DD>` to the plan's `## Risks` section and commit it."
+    "<YYYY-MM-DD>` to the plan's `## Risks` section, or the intent's `## Constraints` "
+    "section when plan is absent or skipped, and commit it before dependent checks."
 )
 
 
@@ -653,12 +651,14 @@ def test_each_station_records_a_plain_words_skip_in_the_plan() -> None:
         prose = " ".join(text.split())
         assert prose.count(SKIP_RECORD) == 1, name
         assert prose.index(SKIP_RULE) < prose.index(SKIP_RECORD) < prose.index(NO_CODE), name
+        assert "Use the confirmed intent when spec or plan is skipped." in prose
+    assert "When plan is skipped, omit the plan command" in " ".join(BUILD.split())
 
 
 SHIP_SKIP_TO_BODY = (
     "When you honour such a skip, write it straight into the PR body's "
-    "`Skipped by instruction:` line (§2); Ship only reads the plan's "
-    "`skipped-by-instruction:` lines and leaves the plan unchanged, because plan.md is "
+    "`Skipped by instruction:` line (§2); Ship only reads the intent's and plan's "
+    "`skipped-by-instruction:` lines and leaves both unchanged, because each is "
     "functional content and an appended line would make the attestation stale."
 )
 REVIEW_SKIP_BEFORE_DIGEST = (
@@ -714,7 +714,7 @@ def test_ship_builds_skipped_by_instruction_from_recorded_lines() -> None:
         SHIP.split("Under the Verification heading", 1)[1].split("When the attestation", 1)[0].split()
     )
     assert (
-        "Build the line `Skipped by instruction: <steps>` from the plan's "
+        "Build the line `Skipped by instruction: <steps>` from the intent's and plan's "
         "`skipped-by-instruction:` lines plus any skip decided at Ship (§1), not from "
         "conversation recall; with none recorded or decided, "
         "write no such line, and the recomputed `(missing: …)` clause still discloses the "

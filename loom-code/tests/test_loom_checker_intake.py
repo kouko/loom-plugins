@@ -1,3 +1,4 @@
+# concern: Quoted skip-record examples must not waive retained intake requirements.
 """Executable contract for `loom_checker.py intake <station> <change-id>`
 (plan W0-03) -- what write-spec and write-plan are allowed to accept.
 
@@ -88,6 +89,81 @@ def make_repo(tmp_path: Path) -> Path:
     # main` is HEAD, and branch_base() refuses to hand a rule an empty diff.
     git(repo, "checkout", "-q", "-b", "work")
     return repo
+
+
+@pytest.mark.parametrize("carrier", ["intent", "plan", "bound", "intent-spec-only"])
+def test_omitted_artifacts_keep_intent_requirements(tmp_path: Path, carrier: str, monkeypatch) -> None:
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="yes")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    assert "intake.spec-ready" in blocked_rules(run_checker("intake", "write-plan", CHANGE, cwd=repo))
+    if carrier == "bound":
+        import test_selection_store
+        from test_selection_store import checker, confirm
+        monkeypatch.setattr(test_selection_store, "CHANGE", CHANGE)
+        assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "spec,plan").returncode == 0
+        confirm(repo)
+    else:
+        path = intent if carrier.startswith("intent") else repo / f"docs/loom/{CHANGE}/plan.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        records = "skipped-by-instruction: spec 2026-09-26\n"
+        if carrier != "intent-spec-only":
+            records += "skipped-by-instruction: plan 2026-09-26\n"
+        if carrier.startswith("intent"):
+            path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + records))
+        else:
+            path.write_text("# Plan\n\n## Risks\n" + records)
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+    intent.write_text(intent.read_text().replace("status: confirmed 2026-09-02", "status: open"))
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.confirmed" in blocked_rules(result)
+
+
+@pytest.mark.parametrize("carrier", ["intent", "plan"])
+def test_intake_quotedskip_keepsrequirements(tmp_path: Path, carrier: str) -> None:
+    """A fenced example is document content, not authorization to omit a spec."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="yes")
+    before = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.spec-ready" in blocked_rules(before)
+    example = (
+        "Reference example only; no step was skipped.\n"
+        "```text\nskipped-by-instruction: spec 2026-09-26\n```\n"
+    )
+    if carrier == "intent":
+        path = repo / f"docs/loom/intent/{CHANGE}.md"
+        path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + example))
+    else:
+        path = repo / f"docs/loom/{CHANGE}/plan.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# Plan\n\n## Risks\n" + example)
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.spec-ready" in blocked_rules(result), result.stderr
+
+
+@pytest.mark.parametrize("opening,inner,closing", [
+    ("````text", "```", "````"),
+    ("~~~text", "```", "~~~"),
+    ("```text", "~~~", "```"),
+    ("```text", "``` not a closing fence", "````"),
+    ("```text", "    ```", "   ```\t"),
+])
+def test_intake_fence_boundaries_keep_requirements(
+    tmp_path: Path, opening: str, inner: str, closing: str,
+) -> None:
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="yes")
+    path = repo / f"docs/loom/intent/{CHANGE}.md"
+    record = "skipped-by-instruction: spec 2026-09-26\n"
+    example = f"{opening}\n{inner}\n{record}{closing}\n"
+    path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + example))
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.spec-ready" in blocked_rules(result), result.stderr
+    # A valid close restores prose, including a real instruction after it.
+    path.write_text(path.read_text().replace(example, example + record))
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
 
 
 def write_attestation(repo: Path, *, payload: dict | None = None, change: str = CHANGE) -> None:

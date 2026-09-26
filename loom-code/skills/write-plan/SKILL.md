@@ -15,16 +15,14 @@ implement or ask the user to approve task splitting; decide and record why.
 
 ## Decision boundary
 
-This station chooses the simplest reversible implementation that satisfies the
-confirmed specification. It may split that work into tasks and tests, but it
-must not invent or reinterpret product behaviour. A product gap is returned
-for clarification instead of being silently filled in the plan.
+Choose the simplest reversible implementation satisfying the
+confirmed specification. Split work into tasks and tests without inventing or
+reinterpreting product behaviour; return product gaps for clarification.
 
 ## Workflow setup
 
-When `loom-design` is installed, an upstream station (`capture-intent`)
-has already interviewed the user and confirmed the intent. When it is not
-installed, **you also run that confirmation yourself** — step 3 below.
+With `loom-design` installed, `capture-intent` already confirmed the intent.
+Otherwise, **run that confirmation yourself** in step 3.
 
 Use the installed checker's host-specific prefix:
 
@@ -47,18 +45,27 @@ acceptance-test), plus any step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
 invoke. Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
-`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty `skip`
-field, the checker judged this change narrow: as you omit those steps, tell the
-user its `narrow_change_line` field (`Skipped as a narrow change: <steps>`)
-exactly as printed, rather than rebuilding it from conversation recall or the
-raw `skip` ids. The default is the full flow:
+`acceptance-test` step. At station entry, keep the full flow unless the user
+selected or instructed a skip. Automatic narrow-change simplification belongs
+to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, append one line
-`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
-and commit it. Never ask the user for a generated code to skip a step.
+`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section,
+or the intent's `## Constraints` section when plan is absent or skipped, and commit it
+before dependent checks. Never ask the user for a generated code to skip a step.
 
 ## Artifact vocabulary
+
+Use the confirmed intent when spec or plan is skipped. Skipped spec waives step 4's
+creation, carried-detail routing, review and behavior-confirmation checks;
+use intent Acceptance directly. Record instructions before intake; bound
+selections already supply exemptions. Skipped plan waives step 5's document,
+plan check, plan review and plan-dependent configuration prompts. Run intake
+for confirmed-intent and non-skipped checks; hand Build intent and retained
+spec paths, omitted steps and bounded implementation scope. Resolve open
+questions in intent; never create a substitute plan or fabricate a selection
+confirmation.
 
 `kind: product` changes what a user reads, types, or sees happen;
 `kind: engineering` covers internal work, tooling, tests, and docs.
@@ -316,8 +323,10 @@ Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 declared dependencies, and positive plus negative/boundary cases. Split
 unrelated behaviour; keep scenario detail in the spec and never size by time.
 
-**Architecture.** When the repository root has `ARCHITECTURE.md`, read it
-before writing the Task DAG. Place every added or moved file by its rules,
+**Architecture.** When the repository root has `ARCHITECTURE.md` carrying
+`ratified-by: <name> <date>`, read it before writing the Task DAG. Treat an
+unratified draft as advisory; it cannot require changes or block planning.
+Place every added or moved file by the ratified rules,
 and name the rule id you followed on that task's Risk line (`FP-2`). When a
 task must break a rule, the planner runs the loom-design `architecture-design`
 tool's re-design mode with the user before Build starts, and lists
@@ -327,11 +336,9 @@ never changes a rule on its own. With no `ARCHITECTURE.md`, nothing changes.
 A task that removes or materially rewrites a function, recognizer, or rule
 that already has tests names the existing test file on its Risk line and
 states whether the change preserves, widens, or narrows what those tests
-cover — not just that "tests pass" once the change is made. "Tests pass" is
-also true of a change that quietly drops the one case those tests existed to
-catch; read the current tests as the coverage spec before touching the code
-they protect, and treat any case they exercise today as a fact the new
-version must still hold, not a suggestion.
+cover. Read current tests as the coverage spec before touching protected
+code; preserve every exercised case. Passing tests alone cannot establish
+this when coverage was dropped.
 
 **Shape.**
 
@@ -362,11 +369,9 @@ version must still hold, not a suggestion.
 
 **Sections.**
 
-The plan itself — `plan.md`, its Current State Evidence section, and every
-evidence note — is written in English, though the Questions asked section
-copies the user's own words verbatim rather than translating them; the
-restatement at decision point ① stays in the user's language, since it is
-spoken to the user rather than read as a machine artifact.
+Write `plan.md`, Current State Evidence and every evidence note in English.
+Questions asked copies the user's words verbatim; the decision point ①
+restatement stays in the user's language.
 
 - When `needs-design: no`, the plan opens with **Current State Evidence** —
   Forward, Reverse, Error, Data, Boundary, each with a path and an anchor.
@@ -383,8 +388,8 @@ spoken to the user rather than read as a machine artifact.
   because with no spec there is no `## Design decision` to hold them.
 
 **Simplicity check.** After the draft exists, follow
-[`references/plan-simplicity.md`](references/plan-simplicity.md) unless the
-plan records a narrow skip.
+[`references/plan-simplicity.md`](references/plan-simplicity.md). Planned
+filenames cannot establish that the completed change will be narrow.
 
 Then run both commands before committing it:
 
