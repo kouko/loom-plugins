@@ -90,6 +90,32 @@ def make_repo(tmp_path: Path) -> Path:
     return repo
 
 
+@pytest.mark.parametrize("carrier", ["intent", "plan", "bound", "intent-spec-only"])
+def test_omitted_artifacts_keep_intent_requirements(tmp_path: Path, carrier: str, monkeypatch) -> None:
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="yes")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    assert "intake.spec-ready" in blocked_rules(run_checker("intake", "write-plan", CHANGE, cwd=repo))
+    if carrier == "bound":
+        import test_selection_store
+        from test_selection_store import checker, confirm
+        monkeypatch.setattr(test_selection_store, "CHANGE", CHANGE)
+        assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "spec,plan").returncode == 0
+        confirm(repo)
+    else:
+        path = intent if carrier.startswith("intent") else repo / f"docs/loom/{CHANGE}/plan.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a") as handle:
+            handle.write("\nskipped-by-instruction: spec 2026-09-26\n")
+            if carrier != "intent-spec-only":
+                handle.write("skipped-by-instruction: plan 2026-09-26\n")
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+    intent.write_text(intent.read_text().replace("status: confirmed 2026-09-02", "status: open"))
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.confirmed" in blocked_rules(result)
+
+
 def write_attestation(repo: Path, *, payload: dict | None = None, change: str = CHANGE) -> None:
     path = repo / "docs/loom" / change / "attestation.json"
     path.parent.mkdir(parents=True, exist_ok=True)

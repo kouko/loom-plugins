@@ -69,8 +69,8 @@ def _one_change_id(sub: str, args: list[str]) -> str:
 def _show(repo: Path, args: list[str], out, err) -> int:
     _one_change_id("show", args)
     shown = store.effective_selection(repo, args[0])
-    # The narrow-change line stations say and Ship writes, rendered here so
-    # they copy it rather than rebuild it from the raw `skip` ids.
+    # Retain the output field for compatibility. Entry selection no longer
+    # infers narrow scope from an incomplete branch delta.
     narrow = not shown["bound"] and shown["skip"]
     shown["narrow_change_line"] = (
         f"Skipped as a narrow change: {plain_step_names(shown['skip'])}" if narrow else None)

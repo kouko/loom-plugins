@@ -142,11 +142,11 @@ def test_check_plan_field_caps_charter_1_1_simplicity_record_required() -> None:
     assert any(r == "plan.field-caps" and "Simplicity check" in m for r, m in failures)
 
 
-def test_check_plan_field_caps_skip_line_only_for_a_narrow_plan() -> None:
-    """A4: the skip line passes when every task's Files are narrow
-    (docs only) and is refused when a task touches production code."""
+def test_check_plan_field_caps_does_not_predict_narrow_scope_from_filenames() -> None:
+    template = Path(__file__).parents[1] / "contract/templates/plan.md"
+    assert "skipped — narrow change" not in template.read_text()
     skip = "- skipped — narrow change"
     narrow = _plan(charter="charter: 1.1", files="`docs/guide.md`", simplicity=skip)
-    assert check_plan_field_caps(narrow) == []
+    assert check_plan_field_caps(narrow)
     failures = check_plan_field_caps(_plan(charter="charter: 1.1", simplicity=skip))
     assert any(r == "plan.field-caps" and "required" in m for r, m in failures)

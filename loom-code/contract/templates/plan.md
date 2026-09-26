@@ -19,7 +19,7 @@ charter: 1.1
 - Risk: <risk and the default choice; mark agent-decided>  <!-- ≤40 words -->
 
 ## Simplicity check
-<!-- one line each: `- <simpler shape> — taken` | `- <simpler shape> — declined: <reason>`; or only `- none found`; or only `- skipped — narrow change` when every task's Files are narrow -->
+<!-- one line each: `- <simpler shape> — taken` | `- <simpler shape> — declined: <reason>`; or only `- none found` -->
 
 ## Questions asked                        # every question asked at decision point ① (and at ② when it runs here)
 <decision point id> — <what|behaviour|done|consequence> — <verbatim quote>

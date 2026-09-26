@@ -47,18 +47,27 @@ acceptance-test), plus any step the user told you to skip in plain words;
 [expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
 invoke. Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
-`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty `skip`
-field, the checker judged this change narrow: as you omit those steps, tell the
-user its `narrow_change_line` field (`Skipped as a narrow change: <steps>`)
-exactly as printed, rather than rebuilding it from conversation recall or the
-raw `skip` ids. The default is the full flow:
+`acceptance-test` step. At station entry, keep the full flow unless the user
+selected or instructed a skip. Automatic narrow-change simplification belongs
+to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, append one line
-`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
-and commit it. Never ask the user for a generated code to skip a step.
+`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section,
+or the intent's `## Constraints` section when plan is absent or skipped, and commit it
+before dependent checks. Never ask the user for a generated code to skip a step.
 
 ## Artifact vocabulary
+
+Use the confirmed intent when spec or plan is skipped. A skipped spec waives
+its creation, carried-detail routing, review and behavior-confirmation checks
+in step 4; use the intent's Acceptance directly. Record the instruction before
+running intake; a bound selection already supplies the exemption. A skipped
+plan waives step 5's document, plan check, plan review and plan-dependent
+configuration prompts. Run intake to retain confirmed-intent and other
+non-skipped checks, then hand Build the intent and retained spec paths, omitted
+steps and bounded implementation scope. Resolve open questions in the intent;
+do not create a substitute plan or fabricate a selection confirmation.
 
 `kind: product` changes what a user reads, types, or sees happen;
 `kind: engineering` covers internal work, tooling, tests, and docs.
@@ -383,8 +392,8 @@ spoken to the user rather than read as a machine artifact.
   because with no spec there is no `## Design decision` to hold them.
 
 **Simplicity check.** After the draft exists, follow
-[`references/plan-simplicity.md`](references/plan-simplicity.md) unless the
-plan records a narrow skip.
+[`references/plan-simplicity.md`](references/plan-simplicity.md). Planned
+filenames cannot establish that the completed change will be narrow.
 
 Then run both commands before committing it:
 

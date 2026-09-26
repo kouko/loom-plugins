@@ -157,7 +157,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       must:
         - "Current State Evidence as path plus anchor when no spec exists"
         - "Task DAG with acceptance ownership plus Files, paired Test and Risk one line each"
-        - "Simplicity check record (charter 1.1): each simpler shape taken or declined with a reason, none found, or skipped for a narrow change"
+        - "Simplicity check record (charter 1.1): each simpler shape taken or declined with a reason, or none found"
         - "Questions asked verbatim"
         - "plan-wide Risks"
       must_not:
@@ -246,6 +246,9 @@ standing_docs:       # not per-change (§2a, §8)
     # one shape for the checker to read (wave-end:0-05).
 
 step_selection:      # the only step names a user selection may run or skip; the intent (landing requires it), publication, the merge decision and the attestation are deliberately absent; steps carry no dependencies, so any one may be skipped alone
+  # Omitted spec/plan artifacts have no mandatory consumers. Use confirmed
+  # intent and bounded task handoffs; instruction records stay in plan Risks
+  # or intent Constraints when plan is absent or omitted, never a new binding.
   steps:
     - {name: spec}
     - {name: plan}

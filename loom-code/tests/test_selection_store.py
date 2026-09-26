@@ -189,22 +189,22 @@ def test_reused_change_id_on_new_branch_inherits_nothing(tmp_path: Path) -> None
     commit(repo, "two.txt")
     state = show(repo)
     assert state["bound"] is False
-    # Auto-skip activates for narrow deltas: .txt file outside docs/loom/ makes floor=1
-    # so spec/plan/adversarial/acceptance-test are auto-skipped
-    assert state["skip"] == ["spec", "plan", "adversarial", "acceptance-test"]
-    for step in ("spec", "plan", "adversarial", "acceptance-test"):
-        assert step not in state["run"]
+    assert state["skip"] == []
+    assert state["run"] == FULL
 
 
-def test_show_renders_the_narrow_change_line(tmp_path: Path) -> None:
+def test_entry_keeps_steps_before_implementation_even_on_a_docs_delta(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     git(repo, "checkout", "-q", "main")
     git(repo, "checkout", "-q", "-b", "feature-two")
-    commit(repo, "two.txt")  # narrow delta: the checker auto-skips four steps
-    assert show(repo)["narrow_change_line"] == (
-        "Skipped as a narrow change: spec, plan, adversarial, "
-        "acceptance-test (independent acceptance testing)"
-    )
+    commit(repo, "two.txt")
+    for stage in ("absent", "untracked", "staged"):
+        if stage != "absent":
+            (repo / "runtime.py").write_text("print('work')\n")
+        if stage == "staged":
+            git(repo, "add", "runtime.py")
+        assert show(repo)["skip"] == []
+        assert show(repo)["narrow_change_line"] is None
     assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "acceptance-test").returncode == 0
     confirm(repo)
     assert show(repo)["narrow_change_line"] is None  # a bound selection is not narrow

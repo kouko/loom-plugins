@@ -14,7 +14,7 @@ Reviewer findings and generated evidence are written in English.
 
 ## 1. Establish the content
 
-Resolve the branch base, read the confirmed intent and plan, and list the
+Resolve the branch base, read the confirmed intent and retained plan when present, and list the
 cumulative diff. If only publication metadata changed and a matching
 attestation already exists, stop: the evidence is still valid and Ship owns
 the remaining work.
@@ -25,21 +25,28 @@ plain words; §2 and §3 say how skipped reviewers, adversarial and acceptance-t
 handled; [expert-mode](../expert-mode/SKILL.md) stays an optional route the
 user may invoke. Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
-`acceptance-test` step. When `selection show` reports `bound: false` with a non-empty
-`skip` field, the checker judged this change narrow: as you omit those steps,
-tell the user its `narrow_change_line` field (`Skipped as a narrow change:
-<steps>`) exactly as printed, rather than rebuilding it from conversation recall
-or the raw `skip` ids. The default is the full
+`acceptance-test` step. At station entry, keep the full flow unless the user
+selected or instructed a skip. Automatic narrow-change simplification belongs
+to finalization and attestation validation. The default is the full
 flow: skip a step only when the user
 tells you to in plain words, then tell the user in one line which step is
 skipped and continue. When you honour such a skip, append one line
-`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section
-and commit it. Commit that line before reviewers read the final digest,
+`skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section,
+or the intent's `## Constraints` section when plan is absent or skipped, and commit it
+before dependent checks. Commit that line before reviewers read the final digest,
 because it changes the digest; a later commit is harmless only when the skip
 sends the change to Ship unattested (§5). Never ask the user for a generated
 code to skip a step.
 
 ## 2. Compute review depth
+
+Use the confirmed intent when spec or plan is skipped. Give reviewers and
+testers the retained artifact paths and omitted steps; apply Acceptance
+directly when spec is omitted, and use bounded task handoffs when plan is
+omitted. Any downstream reference to a spec, plan or its sections applies
+only when that artifact is retained; use the intent's Constraints for a
+record otherwise assigned to plan Risks. Missing skipped artifacts require
+no recovery; all retained verification still applies.
 
 Before every host-native dispatch, the station must resolve the model-and-effort
 profile as the [shared dispatch profile](../../references/dispatch-profile.md)

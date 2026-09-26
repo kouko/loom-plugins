@@ -18,7 +18,9 @@ from loom_checker.rule_checks.intake import check_test_case_pairs
 from loom_checker.rule_checks.intake import check_ui_flows_recompute
 from loom_checker.rule_checks.intent import check_kind_recompute
 from loom_checker.rule_checks.intent import touched_interface_surfaces
+from loom_checker.selection import effective_selection
 from pathlib import Path
+import re
 import sys
 
 
@@ -45,15 +47,25 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         return report(failures, err)
     intent_path = artifact_path(manifest, "intent", change_id, repo)
     front, sections = parse_document(read_text(intent_path))
+    skipped = set(effective_selection(repo, change_id, manifest)["skip"])
+    # Existing instruction records waive artifact dependencies only; they
+    # never create a bound selection or waive verification evidence.
+    for artifact in ("intent", "plan"):
+        path = artifact_path(manifest, artifact, change_id, repo)
+        if path.is_file():
+            skipped.update(re.findall(
+                r"^skipped-by-instruction: (spec|plan) \d{4}-\d{2}-\d{2}$",
+                read_text(path), re.MULTILINE,
+            ))
 
     failures: list[tuple[str, str]] = []
-    if station == "write-plan":
+    if station == "write-plan" and "plan" not in skipped:
         failures += check_test_case_pairs(manifest, repo, change_id, sections)
         failures += check_plan_field_caps_at(manifest, repo, change_id)
 
     kind = front.get("kind", "").strip()
     needs_design = front.get("needs-design", "").strip().split()[:1]
-    yes_at_write_plan = station == "write-plan" and needs_design == ["yes"]
+    yes_at_write_plan = station == "write-plan" and needs_design == ["yes"] and "spec" not in skipped
 
     touched: list[str] = []
     if kind == "engineering" or yes_at_write_plan:
@@ -61,12 +73,13 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     if kind == "engineering":
         failures += check_kind_recompute(touched)
 
-    failures += check_req_grammar(manifest, repo, change_id, sections)
+    if "spec" not in skipped:
+        failures += check_req_grammar(manifest, repo, change_id, sections)
 
     if yes_at_write_plan:
         failures += check_spec_ready(manifest, repo, change_id)
         failures += check_ui_flows_recompute(manifest, repo, change_id, touched)
-    if station == "write-plan" and kind == "product":
+    if station == "write-plan" and kind == "product" and "spec" not in skipped:
         # "A product spec needs confirmed-behavior before it becomes a plan"
         # does not depend on needs-design: under `no`, a carried-details list
         # forces a spec and write-plan runs decision point 2 on it. With no

@@ -35,7 +35,8 @@ its reason.
    run has not shipped. This setup check — the change installs or loads in
    the clean copy and is usable — happens on every run, re-runs included.
 3. **Walk every Acceptance line of the intent, in order**, and every UI
-   flow of the spec for a product change — doing what the line says a
+   flow of the retained spec for a product change (when spec is skipped,
+   use the intent directly) — doing what the line says a
    user will be able to do, with only what a user would have.
 4. **Capture evidence as you go** — a screenshot, the captured output, what
    you typed or pressed and what came back. Write it down as it happens, in

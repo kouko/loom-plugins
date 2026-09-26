@@ -12,7 +12,6 @@ from loom_checker.intent_state import intent_delivery_state
 from loom_checker.parsing import LIST_ITEM
 from loom_checker.parsing import _squeeze
 from loom_checker.parsing import parse_document
-from loom_checker.reviewers import is_narrow_delta
 from pathlib import Path
 import hashlib
 import re
@@ -607,7 +606,7 @@ def check_plan_field_caps(plan_text: str) -> list[tuple[str, str]]:
 
     version = re.match(r"(\d+)\.(\d+)", front["charter"])
     if version and (int(version.group(1)), int(version.group(2))) >= (1, 1):
-        failures += _simplicity_check_failures(sections, tasks, front.get("intent", ""))
+        failures += _simplicity_check_failures(sections)
 
     return failures
 
@@ -616,9 +615,9 @@ SIMPLICITY_ENTRY = re.compile(r"^- \S.*? (?:—|–|--) (?:taken|declined: \S.*)
 SIMPLICITY_SKIP = re.compile(r"^- skipped (?:—|–|--) narrow change$")
 
 
-def _simplicity_check_failures(sections, tasks, intent: str) -> list[tuple[str, str]]:
+def _simplicity_check_failures(sections) -> list[tuple[str, str]]:
     """Charter 1.1+: the `## Simplicity check` record (entries, `- none
-    found`, or a skip line that only a narrow plan may use)."""
+    found`). Filenames cannot prove the eventual change is narrow."""
     lines = [
         line.strip()
         for line in re.sub(r"<!--.*?-->", "", sections.get("Simplicity check", ""), flags=re.S).splitlines()
@@ -629,16 +628,7 @@ def _simplicity_check_failures(sections, tasks, intent: str) -> list[tuple[str, 
     if lines == ["- none found"]:
         return []
     if len(lines) == 1 and SIMPLICITY_SKIP.match(lines[0]):
-        paths = {
-            entry.strip().strip("`")
-            for fields in tasks.values()
-            for entry in _split_respecting_backticks(fields.get("Files") or "")
-            if entry.strip()
-        }
-        change_id = intent.split("@", 1)[0].strip()
-        if is_narrow_delta(paths, change_id):
-            return []
-        return [("plan.field-caps", "Simplicity check skipped but the plan's Files are not narrow; the check is required")]
+        return [("plan.field-caps", "Simplicity check required: planned filenames do not prove a narrow change")]
     return [
         ("plan.field-caps", f"Simplicity check#{index} not '<shape> — taken' or '<shape> — declined: <reason>'")
         for index, line in enumerate(lines, start=1)
