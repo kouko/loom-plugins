@@ -1,7 +1,7 @@
 originator: kouko
 kind: engineering
-needs-design: no — rename of internal skill identifiers; slash command name is registered via plugin.json and no new CLI surface is introduced
-status: confirmed — 2026-09-26
+needs-design: no — rename of skill identifiers within the existing skill surface; no new workflow or multi-state behavior
+status: confirmed 2026-09-26
 
 # Rename architecture skill to architecture-design
 
@@ -12,26 +12,25 @@ The `architecture` skill is currently named `architecture`, which is inconsisten
 Rename the skill tool from `architecture` to `architecture-design` across all relevant files, with no alias period (user confirmed no backward compatibility needed). The ARCHITECTURE.md document filename stays unchanged (it's a project artifact, not a skill name). The `architecture-conformance` review dimension stays unchanged. All tests, documentation, plugin registrations, and manifest entries are updated to use the new name.
 
 ## Acceptance
-1. **Skill name**: `loom-design/skills/architecture/SKILL.md` has `name: architecture-design-design` instead of `name: architecture`
-2. **Manifest**: `loom-code/contract/manifest.yaml` has `name: architecture-design-design` instead of `name: architecture` (both entries)
-3. **Plugin registrations**: All 4 plugin.json files (loom-design, .claude-plugin, .codex-plugin, marketplace) reference `architecture-design` instead of `architecture`
-4. **write-plan Step 5**: `loom-code/skills/write-plan/SKILL.md` references `loom-design:architecture-design` instead of `loom-design:architecture`
-5. **Tests**: All test files in `loom-design/tests/architecture-design/` are moved to `loom-design/tests/architecture-design/` with updated references
-4. **Documentation**: All README/CHANGELOG files reference `architecture-design` where they previously referenced `architecture`
-5. **Verification**: After changes, `python3 loom-code/scripts/loom_checker.py intent docs/loom/intent/2026-09-26-architecture-design-rename.md` exits 0
+1. The skill is discoverable as `architecture-design`, with no `architecture` alias.
+2. The contract manifest names `architecture-design` as the tool producing `ARCHITECTURE.md`.
+3. Plugin registrations and marketplace descriptions consistently identify `architecture-design`.
+4. The write-plan and using-loom-design routes direct agents to `architecture-design`.
+5. Renamed skill, validator, and test locations resolve correctly, and regression tests reject stale operative references.
+6. Current documentation describes and links the renamed tool; historical records retain their original evidence. Release metadata is synchronized for every changed plugin.
+7. Intent validation, the complete package suite, independent review, and the PR checks pass.
 
 ## Constraints
 - ARCHITECTURE.md document filename stays unchanged
 - `architecture-conformance` review dimension name stays unchanged
 - No backward-compatible alias period (user explicitly said no)
-- Changes happen across 34+ files in multiple directories
 - Package tests must pass after changes
 
 ## Out of scope
 - Changing the ARCHITECTURE.md document filename
 - Changing the `architecture-conformance` review dimension name
 - Adding backward compatibility aliases
-- Renaming `loom-design/scripts/architecture-design/` (it's a scripts directory, not a skill directory)
+- Changing validator behavior or the architecture design workflow
 
 ## Open questions
 - none
