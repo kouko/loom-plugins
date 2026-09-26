@@ -106,10 +106,13 @@ def test_omitted_artifacts_keep_intent_requirements(tmp_path: Path, carrier: str
     else:
         path = intent if carrier.startswith("intent") else repo / f"docs/loom/{CHANGE}/plan.md"
         path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("a") as handle:
-            handle.write("\nskipped-by-instruction: spec 2026-09-26\n")
-            if carrier != "intent-spec-only":
-                handle.write("skipped-by-instruction: plan 2026-09-26\n")
+        records = "skipped-by-instruction: spec 2026-09-26\n"
+        if carrier != "intent-spec-only":
+            records += "skipped-by-instruction: plan 2026-09-26\n"
+        if carrier.startswith("intent"):
+            path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + records))
+        else:
+            path.write_text("# Plan\n\n## Risks\n" + records)
     result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
     assert result.returncode == 0, result.stderr
     intent.write_text(intent.read_text().replace("status: confirmed 2026-09-02", "status: open"))

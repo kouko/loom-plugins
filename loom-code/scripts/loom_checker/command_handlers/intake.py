@@ -16,6 +16,7 @@ from loom_checker.rule_checks.intake import check_req_grammar
 from loom_checker.rule_checks.intake import check_spec_ready
 from loom_checker.rule_checks.intake import check_test_case_pairs
 from loom_checker.rule_checks.intake import check_ui_flows_recompute
+from loom_checker.rule_checks.intake import prose_lines
 from loom_checker.rule_checks.intent import check_kind_recompute
 from loom_checker.rule_checks.intent import touched_interface_surfaces
 from loom_checker.selection import effective_selection
@@ -50,12 +51,14 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     skipped = set(effective_selection(repo, change_id, manifest)["skip"])
     # Existing instruction records waive artifact dependencies only; they
     # never create a bound selection or waive verification evidence.
-    for artifact in ("intent", "plan"):
+    for artifact, section in (("intent", "Constraints"), ("plan", "Risks")):
         path = artifact_path(manifest, artifact, change_id, repo)
         if path.is_file():
+            # Filter before parsing so example headings cannot become carriers.
+            _, record_sections = parse_document("\n".join(prose_lines(read_text(path))))
             skipped.update(re.findall(
                 r"^skipped-by-instruction: (spec|plan) \d{4}-\d{2}-\d{2}$",
-                read_text(path), re.MULTILINE,
+                record_sections.get(section, ""), re.MULTILINE,
             ))
 
     failures: list[tuple[str, str]] = []
