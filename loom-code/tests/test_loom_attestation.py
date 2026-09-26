@@ -1,3 +1,4 @@
+# concern: Protected rule documents must not receive narrow-change waivers.
 from __future__ import annotations
 
 import subprocess

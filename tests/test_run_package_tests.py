@@ -1,4 +1,5 @@
 """fix:W1-05 — the package-tests runner runs one pytest session per group."""
+# concern: Test discovery must not omit supported names or execute excluded trees.
 from __future__ import annotations
 
 import os

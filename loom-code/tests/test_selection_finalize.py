@@ -6,6 +6,7 @@ user-typed confirmation skipped, records a failure event on every non-zero
 exit, and the v2 attestation carries a `selection` the validator re-reads
 from the local records.
 """
+# concern: Automatic waivers must not erase bound verification choices.
 from __future__ import annotations
 
 import hashlib
