@@ -32,7 +32,7 @@ WRITE_SPEC = REPO / "loom-design/skills/write-spec/SKILL.md"
 TOOL_SKILLS = (
     REPO / "loom-design/skills/design-system/SKILL.md",
     REPO / "loom-design/skills/product-principles/SKILL.md",
-    REPO / "loom-design/skills/architecture/SKILL.md",
+    REPO / "loom-design/skills/architecture-design/SKILL.md",
 )
 STATION_TABLE_HEADER = "| station | artifact | who decides | checker | checkpoint |"
 LOCATE_REFERENCE = REPO / "loom-design/skills/capture-intent/references/locate-loom-code.md"

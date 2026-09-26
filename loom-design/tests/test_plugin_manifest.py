@@ -79,7 +79,7 @@ def test_manifest_valid():
         "write-spec",
         "product-principles",
         "design-system",
-        "architecture",
+        "architecture-design",
         "constitution",
         "principles",
         "interface-design",
