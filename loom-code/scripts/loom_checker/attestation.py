@@ -121,7 +121,8 @@ def validate_attestation(
             return [(rule, "attestation selection does not match the local selection records")]
         if recorded is not None:
             skip = set(recorded["skip"])
-    skip |= auto_skipped_steps(repo, change_id, head_sha)
+    if schema != ATTESTATION_SCHEMA or attestation.get("selection") is None:
+        skip = auto_skipped_steps(repo, change_id, head_sha)
 
     executions = attestation.get("executions")
     if not isinstance(executions, list) or (

@@ -105,8 +105,8 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
                  f"({', '.join(sorted(TRUNK_BRANCH_NAMES))}), or fetch it")]
     manifest = load_manifest()
     bound = selection_evidence(repo, change_id, manifest)
-    skip = set(bound["skip"]) if bound else set()
-    skip |= auto_skipped_steps(repo, change_id, head_sha)
+    skip = (set(bound["skip"]) if bound is not None
+            else auto_skipped_steps(repo, change_id, head_sha))
     verdicts = review_input.get("verdicts", [] if "reviewers" in skip else None)
     findings = review_input.get("findings", [])
     adversarial = review_input.get("adversarial", [])
