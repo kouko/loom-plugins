@@ -12,11 +12,11 @@ The `architecture` skill is currently named `architecture`, which is inconsisten
 Rename the skill tool from `architecture` to `architecture-design` across all relevant files, with no alias period (user confirmed no backward compatibility needed). The ARCHITECTURE.md document filename stays unchanged (it's a project artifact, not a skill name). The `architecture-conformance` review dimension stays unchanged. All tests, documentation, plugin registrations, and manifest entries are updated to use the new name.
 
 ## Acceptance
-1. **Skill name**: `loom-design/skills/architecture/SKILL.md` has `name: architecture-design` instead of `name: architecture`
-2. **Manifest**: `loom-code/contract/manifest.yaml` has `name: architecture-design` instead of `name: architecture` (both entries)
+1. **Skill name**: `loom-design/skills/architecture/SKILL.md` has `name: architecture-design-design` instead of `name: architecture`
+2. **Manifest**: `loom-code/contract/manifest.yaml` has `name: architecture-design-design` instead of `name: architecture` (both entries)
 3. **Plugin registrations**: All 4 plugin.json files (loom-design, .claude-plugin, .codex-plugin, marketplace) reference `architecture-design` instead of `architecture`
 4. **write-plan Step 5**: `loom-code/skills/write-plan/SKILL.md` references `loom-design:architecture-design` instead of `loom-design:architecture`
-5. **Tests**: All test files in `loom-design/tests/architecture/` are moved to `loom-design/tests/architecture-design/` with updated references
+5. **Tests**: All test files in `loom-design/tests/architecture-design/` are moved to `loom-design/tests/architecture-design/` with updated references
 4. **Documentation**: All README/CHANGELOG files reference `architecture-design` where they previously referenced `architecture`
 5. **Verification**: After changes, `python3 loom-code/scripts/loom_checker.py intent docs/loom/intent/2026-09-26-architecture-design-rename.md` exits 0
 
@@ -31,7 +31,7 @@ Rename the skill tool from `architecture` to `architecture-design` across all re
 - Changing the ARCHITECTURE.md document filename
 - Changing the `architecture-conformance` review dimension name
 - Adding backward compatibility aliases
-- Renaming `loom-design/scripts/architecture/` (it's a scripts directory, not a skill directory)
+- Renaming `loom-design/scripts/architecture-design/` (it's a scripts directory, not a skill directory)
 
 ## Open questions
 - none

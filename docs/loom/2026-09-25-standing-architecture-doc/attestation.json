@@ -12,8 +12,8 @@
     },
     {
       "kind": "adversarial",
-      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/architecture/test_abuse_architecture_validator.py -q",
-      "artifact": "loom-design/tests/architecture/test_abuse_architecture_validator.py",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/architecture-design/test_abuse_architecture_validator.py -q",
+      "artifact": "loom-design/tests/architecture-design/test_abuse_architecture_validator.py",
       "result": "pass",
       "command_digest": "d6dd5aa08b86523fca90159a559a9e3bd348c7a4b8ad090d1883936384fa6277"
     }
@@ -29,7 +29,7 @@
         {
           "severity": "nit",
           "dimension": "refactoring",
-          "anchor": "loom-design/tests/architecture/test_abuse_architecture_validator.py:14",
+          "anchor": "loom-design/tests/architecture-design/test_abuse_architecture_validator.py:14",
           "text": "Dead parents[5] path and sys.path.insert in the graduated probe; dismissed because others never edit adversarial programs."
         }
       ]

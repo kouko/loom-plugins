@@ -97,7 +97,7 @@ Then check the file, with `<loom-design>` standing for this plugin's own
 checkout:
 
 ```
-python3 <loom-design>/scripts/architecture/validate_architecture_output.py ARCHITECTURE.md --draft
+python3 <loom-design>/scripts/architecture-design/validate_architecture_output.py ARCHITECTURE.md --draft
 ```
 
 Exit 0: go to Step 4. Non-zero: fix what it names and run it again. Never

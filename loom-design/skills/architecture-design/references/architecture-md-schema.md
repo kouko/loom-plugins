@@ -41,7 +41,7 @@ change's spec.
      be checked mechanically says `check: review` and has no guard; the
      closing review's `architecture-conformance` dimension reads it instead.
 
-`scripts/architecture/validate_architecture_output.py` checks:
+`scripts/architecture-design/validate_architecture_output.py` checks:
 
 - exactly one well-formed `ratified-by:` line (with `--draft`, zero or one);
 - nothing above the first `## ` section but the title and that line;

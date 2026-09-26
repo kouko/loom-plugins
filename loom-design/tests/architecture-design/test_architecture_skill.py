@@ -52,7 +52,7 @@ def test_referenced_relative_paths_exist():
 def test_references_schema_validator_ratify_and_commit():
     text = _text()
     assert "references/architecture-md-schema.md" in text
-    assert "scripts/architecture/validate_architecture_output.py" in text
+    assert "scripts/architecture-design/validate_architecture_output.py" in text
     assert "ratified-by:" in text
     assert "docs(loom): ARCHITECTURE.md ratified" in text
 
