@@ -193,7 +193,12 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
         "loom-code/contract/manifest.yaml",
         "loom-code/hooks/hooks.json",
         "docs/loom/KICKOFF-DEFAULTS.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "DESIGN.md",
         "PRINCIPLES.md",
+        "ARCHITECTURE.md",
+        "docs/architecture.md",
         "unknown.bin",
         f"docs/loom/{CHANGE}/../../src.py",
         "tests/skills/SKILL.md",
@@ -204,6 +209,7 @@ def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:
             change_paths | {protected}, CHANGE
         ) == 2
         assert reviewers.is_narrow_delta(change_paths | {protected}, CHANGE) is False
+        assert reviewers.is_narrow_delta({protected}, CHANGE) is False
 
 
 def test_reviewer_floor_is_two_when_the_delta_removes_a_test() -> None:
