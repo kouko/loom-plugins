@@ -1,6 +1,6 @@
 {
   "name": "loom-design",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "requires-contract": ">=2.1",
   "description": "Optional using-loom-design discovery routing and two stations — capture-intent, write-spec — turn a rough idea into a confirmed intent and a risk-declared spec, route non-blocking second-vendor suggestions, and provide product-principles, design-system and architecture-design tools. Reads loom-code's contract package. Claude Code, Codex + Antigravity CLI.",
   "author": {
