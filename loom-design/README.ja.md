@@ -49,7 +49,7 @@ flowchart TD
   ときは、計画の前に `loom-code:closing-review` で fresh-context の
   `spec+adversarial` reviewer 1 人の review を受ける。そうでなければ
   `loom-code:write-plan` へ直接進む。
-- **ツール** — `product-principles`・`design-system`・`architecture` は頼まれたときに
+- **ツール** — `product-principles`・`design-system`・`architecture-design` は頼まれたときに
   動き、それぞれプロジェクトのルートに常設ドキュメントを 1 つ書く。フローの段階
   ではない。
 
@@ -61,7 +61,7 @@ flowchart TD
 | [`write-spec`](skills/write-spec/SKILL.md) | ステーション | `docs/loom/<change-id>/spec.md` | 確認済みの intent から要件、設計上の決定、現状の証拠、UI flows を書く（決定ポイント ②、product のみ）。 |
 | [`product-principles`](skills/product-principles/SKILL.md) | ツール | `PRINCIPLES.md` | プロダクトの常設の原則を ratify する：順序付きの Non-negotiables 3 件以上と `ratified-by: <name> <date>` の行。 |
 | [`design-system`](skills/design-system/SKILL.md) | ツール | `DESIGN.md` | UI を持つプロダクトのビジュアルシステムを ratify する：色・タイポグラフィ・余白・形状・コンポーネントの token。 |
-| [`architecture`](skills/architecture/SKILL.md) | ツール | `ARCHITECTURE.md` | ユーザーと一緒にプロジェクトのアーキテクチャを設計する：モジュール境界・技術選定・フォルダ構成・CI ステージ。その後、各ルールをガードテストで裏付ける。 |
+| [`architecture-design`](skills/architecture-design/SKILL.md) | ツール | `ARCHITECTURE.md` | ユーザーと一緒にプロジェクトのアーキテクチャを設計する：モジュール境界・技術選定・フォルダ構成・CI ステージ。その後、各ルールをガードテストで裏付ける。 |
 | [`using-loom-design`](skills/using-loom-design/SKILL.md) | ルーター | — | 任意：プロダクト定義に関する幅広い依頼を上の 5 skills のどれかに振り分ける。前提条件ではなく、各 skill は直接呼び出せる。 |
 
 **常設ドキュメント。** リポジトリに ratify 済みの `PRINCIPLES.md` が無い

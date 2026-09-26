@@ -8,12 +8,12 @@ charter: 1.0
 ### Wave 0 — the tool and its consumers
 
 **W0-01 The architecture tool, its schema and validator**  after: —  acceptance: 2, 3, 4
-- Files: `loom-design/skills/architecture-design/SKILL.md`, `loom-design/skills/architecture-design/references/architecture-md-schema.md`, `loom-design/scripts/architecture-design/validate_architecture_output.py`, `loom-design/tests/architecture-design/test_architecture_skill.py`, `loom-design/tests/architecture-design/test_validate_architecture_output.py`, `loom-design/tests/pytest.ini`
+- Files: `loom-design/skills/architecture/SKILL.md`, `loom-design/skills/architecture/references/architecture-md-schema.md`, `loom-design/scripts/architecture/validate_architecture_output.py`, `loom-design/tests/architecture/test_architecture_skill.py`, `loom-design/tests/architecture/test_validate_architecture_output.py`, `loom-design/tests/pytest.ini`
 - Test: A2 positive: ratified-rules-only-file-valid; negative: overview-section-rejected. A3 positive: rule-with-existing-guard-valid; negative: missing-guard-path-rejected. A4 positive: schema-states-failure-message-fields; boundary: review-only-rule-needs-no-guard.
 - Risk: landed as 7c2fb913 (record-only scope); mirrors design-system's shape (spec Design decision); no gate marker; agent-decided.
 
 **W0-04 The tool designs with the user; Decisions section; re-design mode**  after: W0-01  acceptance: 1, 2, 8
-- Files: `loom-design/skills/architecture-design/SKILL.md`, `loom-design/skills/architecture-design/references/architecture-md-schema.md`, `loom-design/skills/architecture-design/references/design-know-how.md`, `loom-design/scripts/architecture-design/validate_architecture_output.py`, `loom-design/tests/architecture-design/test_architecture_skill.py`, `loom-design/tests/architecture-design/test_validate_architecture_output.py`, `docs/loom/2026-09-25-standing-architecture-doc/evidence/architecture-design-research.md`
+- Files: `loom-design/skills/architecture/SKILL.md`, `loom-design/skills/architecture/references/architecture-md-schema.md`, `loom-design/skills/architecture/references/design-know-how.md`, `loom-design/scripts/architecture/validate_architecture_output.py`, `loom-design/tests/architecture/test_architecture_skill.py`, `loom-design/tests/architecture/test_validate_architecture_output.py`, `docs/loom/2026-09-25-standing-architecture-doc/evidence/architecture-design-research.md`
 - Test: A1 positive: skill-reads-code-and-proposes-two-options-per-choice; negative: single-answer-proposal-not-allowed. A2 positive: decisions-section-valid; negative: decisions-section-missing-rejected. A8 positive: skill-states-redesign-updates-decisions-rules-guards; negative: unratified-file-rejected.
 - Risk: intent amended at decision point one after W0-01 landed; widens `test_validate_architecture_output.py` coverage, none narrowed; know-how cited from the research evidence; agent-decided.
 
@@ -47,7 +47,7 @@ charter: 1.0
 ### Wave 2 — adversary fixes
 
 **W2-01 Validator rejects outside, duplicated and misordered sections; root-only lookup; graduate the probe**  after: W1-03  acceptance: 2, 3, 7
-- Files: `loom-design/scripts/architecture-design/validate_architecture_output.py`, `loom-code/scripts/loom_checker/command_handlers/standing.py`, `loom-code/tests/test_loom_checker_standing.py`, `docs/loom/2026-09-25-standing-architecture-doc/evidence/probes/test_abuse_architecture_validator.py`, `loom-design/tests/architecture-design/test_abuse_architecture_validator.py`
+- Files: `loom-design/scripts/architecture/validate_architecture_output.py`, `loom-code/scripts/loom_checker/command_handlers/standing.py`, `loom-code/tests/test_loom_checker_standing.py`, `docs/loom/2026-09-25-standing-architecture-doc/evidence/probes/test_abuse_architecture_validator.py`, `loom-design/tests/architecture/test_abuse_architecture_validator.py`
 - Test: A2 positive: in-order-single-sections-valid; negative: duplicated-or-misordered-section-rejected. A3 positive: repo-relative-guard-valid; negative: absolute-or-parent-guard-rejected. A7 positive: root-architecture-silences-warn; negative: docs-loom-architecture-still-warns.
 - Risk: class "validator accepts a malformed ARCHITECTURE.md" searched across the validator and schema; lookup class searched across standing handler, write-plan, skill, manifest; probe graduates unchanged; agent-decided.
 
@@ -59,7 +59,7 @@ charter: 1.0
 - Risk: class "a rule-breaking change may pass review or change a rule without the user" searched in lenses.md, reviewer.md, write-plan, the architecture skill; widens standing wording test; agent-decided.
 
 **W3-02 Guards the suite runs; validator rejects malformed top matter; sourced know-how**  after: W3-01  acceptance: 2, 3
-- Files: `loom-design/skills/architecture-design/SKILL.md`, `loom-design/skills/architecture-design/references/architecture-md-schema.md`, `loom-design/skills/architecture-design/references/design-know-how.md`, `loom-design/scripts/architecture-design/validate_architecture_output.py`, `loom-design/skills/using-loom-design/SKILL.md`, `loom-design/tests/architecture-design/test_validate_architecture_output.py`, `loom-design/tests/architecture-design/test_architecture_skill.py`
+- Files: `loom-design/skills/architecture/SKILL.md`, `loom-design/skills/architecture/references/architecture-md-schema.md`, `loom-design/skills/architecture/references/design-know-how.md`, `loom-design/scripts/architecture/validate_architecture_output.py`, `loom-design/skills/using-loom-design/SKILL.md`, `loom-design/tests/architecture/test_validate_architecture_output.py`, `loom-design/tests/architecture/test_architecture_skill.py`
 - Test: A2 positive: single-ratified-line-and-nonempty-decisions-valid; negative: second-ratified-line-or-top-prose-rejected. A3 positive: skill-records-package-tests-when-absent; negative: step5-commits-edited-config.
 - Risk: classes "guards may not run", "validator accepts malformed top matter", "know-how beyond its sources" searched in the skill, schema, validator, know-how; dismissed: validator path check (skill writes root); agent-decided.
 

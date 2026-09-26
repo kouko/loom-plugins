@@ -35,7 +35,7 @@ option every time and said "yes" to the restatement.
 
 ## 2. The chosen design is written as a user-ratified ARCHITECTURE.md at the repository root holding the design decisions with their reasons and the structural rules, with no project overview and no data models or API interfaces.
 - How I tried it: wrote `ARCHITECTURE.md` at the project root per `references/architecture-md-schema.md` (D-1..D-5 decisions; MB-1, FP-1, FS-1 with guards; CI-1 `check: review`), then:
-  - `python3 <clean>/loom-design/scripts/architecture-design/validate_architecture_output.py ARCHITECTURE.md --draft` → `OK`, exit 0
+  - `python3 <clean>/loom-design/scripts/architecture/validate_architecture_output.py ARCHITECTURE.md --draft` → `OK`, exit 0
   - same without `--draft`, before ratifying → `INVALID ... no 'ratified-by:' line`, exit 1
   - added `ratified-by: tester 2026-09-25`, re-ran without `--draft` → `OK`, exit 0; committed (`1fed7aa docs(loom): ARCHITECTURE.md ratified` in the throwaway repo)
   - negative copies: appended `## Overview` → `section '## Overview' is not allowed`, exit 1; appended `## Data models` → `section '## Data models' is not allowed`, exit 1; appended `### API interfaces` + `- GET /notes` under CI stages → both lines rejected as breaking the rule grammar, exit 1
@@ -107,7 +107,7 @@ Scope, checked against `git diff 87f50da3..21289e5d`:
 - Carried over A4: `SKILL.md` Step 3 now points to the schema's "Guard failure message" section, which the diff does not touch; the same message was observed again under A3.
 
 ## A2 re-run
-`V = python3 $TMPDIR/at-arch/clean2/loom-design/scripts/architecture-design/validate_architecture_output.py`, in `proj`:
+`V = python3 $TMPDIR/at-arch/clean2/loom-design/scripts/architecture/validate_architecture_output.py`, in `proj`:
 - `V ARCHITECTURE.md` → `OK`, exit 0
 - two `ratified-by:` lines → `more than one 'ratified-by:' line; keep exactly one, replacing the old line when re-ratifying`, exit 1 (also with `--draft`, exit 1)
 - `This project is a small notes CLI.` under the title → `line above the first '## ' section is not allowed; ...`, exit 1

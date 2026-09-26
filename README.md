@@ -124,7 +124,7 @@ contract package it reads.
 | `write-spec` | Write a design spec from a confirmed `needs-design: yes` intent (decision point ②). |
 | `product-principles` | Ratify `PRINCIPLES.md`, the rules that govern product and engineering trade-offs. |
 | `design-system` | Ratify a visual `DESIGN.md`: colour, type, layout and component tokens. |
-| `architecture` | Design and ratify `ARCHITECTURE.md`: module boundaries, tech choices, folder layout and CI stages, each rule backed by a guard test. |
+| `architecture-design` | Design and ratify `ARCHITECTURE.md`: module boundaries, tech choices, folder layout and CI stages, each rule backed by a guard test. |
 | `using-loom-design` | Optional router to the right product-definition skill. |
 
 ## loom-code

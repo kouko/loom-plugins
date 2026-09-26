@@ -53,7 +53,7 @@ the contract manifest version stays 2.3.1.
   so a twenty-fourth counted skill still fails.
 - Net mechanism count rises from 140 to 142: the `architecture` skill and
   its contract entry `tool:architecture`.
-- budget-exception: architecture — new loom-design architecture tool, user-decided 2026-09-25; eval loom-design/tests/architecture-design/test_architecture_skill.py.
+- budget-exception: architecture — new loom-design architecture tool, user-decided 2026-09-25; eval loom-design/tests/architecture/test_architecture_skill.py.
 - budget-exception: tool:architecture — contract entry for the new loom-design architecture tool, user-decided 2026-09-25; eval loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner.
 - The version bump lets installed copies pick up the change.
 
