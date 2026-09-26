@@ -8,7 +8,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).parents[2] / "skills" / "architecture"
+ROOT = Path(__file__).parents[2] / "skills" / "architecture-design"
 SKILL = ROOT / "SKILL.md"
 SCHEMA = ROOT / "references" / "architecture-md-schema.md"
 
@@ -29,7 +29,7 @@ def _frontmatter() -> str:
 
 def test_frontmatter_declares_name_and_version():
     fm = _frontmatter()
-    assert "name: architecture" in fm
+    assert re.findall(r"^name: (.+)$", fm, re.MULTILINE) == ["architecture-design"]
     assert "version: 1.0.0" in fm
 
 
@@ -47,12 +47,21 @@ def test_referenced_relative_paths_exist():
     for m in re.finditer(r"`(\.\./[\w./-]+|references/[\w./-]+)`", text):
         candidate = SKILL.parent / m.group(1)
         assert candidate.is_file(), f"SKILL.md references missing path: {m.group(1)}"
+    plugin = ROOT.parents[1]
+    for readme in (plugin.parent / "README.md", *sorted(plugin.glob("README*.md"))):
+        text = readme.read_text(encoding="utf-8")
+        assert "`architecture-design`" in text, readme
+        assert "`architecture`" not in text, readme
+        if readme.parent == plugin:
+            assert "[`architecture-design`](skills/architecture-design/SKILL.md)" in text
+        for target in re.findall(r"\]\((skills/[^)]+)\)", text):
+            assert (readme.parent / target).is_file(), (readme, target)
 
 
 def test_references_schema_validator_ratify_and_commit():
     text = _text()
     assert "references/architecture-md-schema.md" in text
-    assert "scripts/architecture/validate_architecture_output.py" in text
+    assert "scripts/architecture-design/validate_architecture_output.py" in text
     assert "ratified-by:" in text
     assert "docs(loom): ARCHITECTURE.md ratified" in text
 

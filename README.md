@@ -13,8 +13,8 @@ Codex and Antigravity CLI:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/) | 2.4.1 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/) | 3.18.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-design`](loom-design/) | 2.5.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
+| [`loom-code`](loom-code/) | 3.19.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
 | [`loom-workflow`](loom-workflow/) | 5.3.3 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
@@ -114,7 +114,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.4.1. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.5.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools. Requires `loom-code`, whose
 contract package it reads.
 
@@ -124,12 +124,12 @@ contract package it reads.
 | `write-spec` | Write a design spec from a confirmed `needs-design: yes` intent (decision point ②). |
 | `product-principles` | Ratify `PRINCIPLES.md`, the rules that govern product and engineering trade-offs. |
 | `design-system` | Ratify a visual `DESIGN.md`: colour, type, layout and component tokens. |
-| `architecture` | Design and ratify `ARCHITECTURE.md`: module boundaries, tech choices, folder layout and CI stages, each rule backed by a guard test. |
+| `architecture-design` | Design and ratify `ARCHITECTURE.md`: module boundaries, tech choices, folder layout and CI stages, each rule backed by a guard test. |
 | `using-loom-design` | Optional router to the right product-definition skill. |
 
 ## loom-code
 
-Version 3.18.0. Five stations carry one change from plan to PR with
+Version 3.19.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |

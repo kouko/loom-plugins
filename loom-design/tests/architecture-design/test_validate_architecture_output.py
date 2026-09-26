@@ -5,7 +5,9 @@ grammar, unique ids, and every `check:` guard path existing).
 
 from pathlib import Path
 
-from validate_architecture_output import validate
+import pytest
+
+from validate_architecture_output import main, validate
 
 _VALID = """\
 # Architecture
@@ -40,6 +42,15 @@ def _write(tmp_path: Path, text: str, guard: bool = True) -> Path:
 def test_decisions_section_valid(tmp_path):
     ok, problems = validate(_write(tmp_path, _VALID))
     assert ok, problems
+
+
+def test_cli_help_names_architecture_design(capsys):
+    with pytest.raises(SystemExit) as result:
+        main(["--help"])
+    assert result.value.code == 0
+    help_text = " ".join(capsys.readouterr().out.split())
+    assert "architecture-design tool's authoring contract" in help_text
+    assert "architecture tool" not in help_text
 
 
 def test_decisions_section_missing_rejected(tmp_path):

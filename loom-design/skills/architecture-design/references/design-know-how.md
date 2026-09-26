@@ -1,6 +1,6 @@
 # Design know-how
 
-The heuristics the architecture tool draws on when it proposes options.
+The heuristics the architecture-design tool draws on when it proposes options.
 Each is a starting point to put in front of the user as an option with a
 trade-off, never a verdict. Tool versions drift: re-check a number against
 its source before quoting it as current.

@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.19.0] — 2026-09-26 — route the renamed architecture-design tool
+
+Minor: the contract manifest and `write-plan` now name loom-design's
+`architecture-design` tool. The `ARCHITECTURE.md` filename and
+`architecture-conformance` review dimension are unchanged. No alias for
+the old tool name is retained; historical release and review evidence
+keep their original names and paths.
+
 ## [3.18.0] — 2026-09-25 — plan simplicity check
 
 Minor: `plan.field-caps` now requires a `## Simplicity check` record on

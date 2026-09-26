@@ -17,7 +17,7 @@ intent capture from specification.
 | A requested spec, or a confirmed intent marked `needs-design: yes` without a spec | [write-spec](../write-spec/SKILL.md) |
 | Product principles are needed, or the user asks what governs a product, design, or engineering trade-off | [product-principles](../product-principles/SKILL.md) |
 | A visual design system: colors, type, layout, or component tokens | [design-system](../design-system/SKILL.md) |
-| A project's architecture: module boundaries, tech choices, folder layout, or CI stages | [architecture](../architecture/SKILL.md) |
+| A project's architecture: module boundaries, tech choices, folder layout, or CI stages | [architecture-design](../architecture-design/SKILL.md) |
 
 For implementation, delivery, or general toolbox requests, none of these
 routes applies. Leave the request to the host's skill selection. The selected

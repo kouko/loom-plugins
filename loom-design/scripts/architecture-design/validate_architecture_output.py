@@ -1,4 +1,4 @@
-"""Validate a repository's ARCHITECTURE.md against the architecture tool's
+"""Validate a repository's ARCHITECTURE.md against the architecture-design tool's
 authoring contract.
 
 Valid iff:
@@ -170,7 +170,7 @@ def validate(path: Path, draft: bool = False) -> tuple[bool, list[str]]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Validate a repository's ARCHITECTURE.md against the "
-                    "architecture tool's authoring contract.")
+                    "architecture-design tool's authoring contract.")
     parser.add_argument("architecture_md", help="path to ARCHITECTURE.md")
     parser.add_argument("--draft", action="store_true",
                         help="accept a file with no 'ratified-by:' line yet")

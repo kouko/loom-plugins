@@ -12,6 +12,18 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.5.0] — 2026-09-26 — rename architecture tool to architecture-design
+
+Minor: rename the `architecture` tool to `architecture-design` for clarity
+and consistency with the skill naming convention.
+
+- Skill directory: `skills/architecture/` → `skills/architecture-design/`
+- Test directory: `tests/architecture/` → `tests/architecture-design/`
+- Scripts directory: `scripts/architecture/` → `scripts/architecture-design/`
+- Updated all references: manifest.yaml, mechanisms.yaml, plugin.json files,
+  README files, using-loom-design/SKILL.md routing table, write-plan/SKILL.md,
+  and all test files.
+
 ## [2.4.1] — 2026-09-25 — mirrored station table update
 
 Patch: the station table mirrored from `loom-code` picks up loom-code

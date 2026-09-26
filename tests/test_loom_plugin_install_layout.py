@@ -57,7 +57,7 @@ DESIGN_SKILLS = {
     "write-spec",
     "product-principles",
     "design-system",
-    "architecture",
+    "architecture-design",
     "using-loom-design",
 }
 

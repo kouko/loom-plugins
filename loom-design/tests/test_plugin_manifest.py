@@ -41,6 +41,10 @@ def test_version_is_semver():
 def test_description_is_non_empty():
     # Why: an empty description gives the host nothing to surface to users.
     assert _load()["description"].strip()
+    codex = json.loads((MANIFEST.parents[1] / ".codex-plugin/plugin.json").read_text())
+    assert re.findall(r"and (\S+) designs", codex["interface"]["longDescription"]) == [
+        "architecture-design"
+    ]
 
 
 def test_description_within_codex_limit():
@@ -79,7 +83,7 @@ def test_manifest_valid():
         "write-spec",
         "product-principles",
         "design-system",
-        "architecture",
+        "architecture-design",
         "constitution",
         "principles",
         "interface-design",

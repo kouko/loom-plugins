@@ -81,9 +81,9 @@ mechanisms:
   - id: design-system
     class: skill
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
-  - id: architecture
+  - id: architecture-design
     class: skill
-    eval: "loom-design/tests/architecture/test_architecture_skill.py"
+    eval: "loom-design/tests/architecture-design/test_architecture_skill.py"
   - id: decision-map
     class: skill
     eval: "loom-workflow/tests/decision-map/test_decision_map_intent_binding.py"
@@ -240,7 +240,7 @@ mechanisms:
   - {id: "station:maintain",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_seven_stations_with_owner"}
   - {id: "tool:product-principles",  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:design-system",       class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:architecture",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:architecture-design", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:decision-map",        class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:handoff",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:recap-state",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}

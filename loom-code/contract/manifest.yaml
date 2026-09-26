@@ -21,7 +21,7 @@ stations:            # produce one per-change artifact each (§3)
 tools:               # user-invoked, or raised by a station on a mechanical condition; standalone ones are not counted
   - {name: product-principles,  owner: loom-design,   produces: PRINCIPLES.md}
   - {name: design-system,       owner: loom-design,   produces: DESIGN.md}
-  - {name: architecture,        owner: loom-design,   produces: ARCHITECTURE.md}
+  - {name: architecture-design,  owner: loom-design,   produces: ARCHITECTURE.md}
   - {name: decision-map,        owner: loom-workflow}
   - {name: handoff,             owner: loom-workflow}
   - {name: recap-state,         owner: loom-workflow}
@@ -239,7 +239,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
 standing_docs:       # not per-change (§2a, §8)
   - {name: PRINCIPLES.md,       tool: product-principles, ratified_by: required, reject_when: "kind: product and missing"}
   - {name: DESIGN.md,           tool: design-system,      ratified_by: required, reject_when: never}
-  - {name: ARCHITECTURE.md,     tool: architecture,       ratified_by: required, reject_when: never}
+  - {name: ARCHITECTURE.md,     tool: architecture-design,       ratified_by: required, reject_when: never}
   - {name: KICKOFF-DEFAULTS.md, tool: null,               path: docs/loom/KICKOFF-DEFAULTS.md}
     # its charter (what it answers, must/must-not, sign-off, edits-after)
     # lives at artifacts.kickoff-defaults.charter, not duplicated here --
