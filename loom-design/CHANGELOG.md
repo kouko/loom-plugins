@@ -12,7 +12,7 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
-## [2.4.2] — 2026-09-26 — rename architecture tool to architecture-design
+## [2.5.0] — 2026-09-26 — rename architecture tool to architecture-design
 
 Minor: rename the `architecture` tool to `architecture-design` for clarity
 and consistency with the skill naming convention.
