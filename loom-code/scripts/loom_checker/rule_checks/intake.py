@@ -157,12 +157,17 @@ def visible_count(text: str) -> int:
 
 def prose_lines(body: str) -> list[str]:
     """The body minus fenced code blocks and HTML comments."""
-    kept, inside_fence = [], False
+    kept, fence = [], ""
     for line in HTML_COMMENT.sub(" ", body).splitlines():
-        if FENCE.match(line):
-            inside_fence = not inside_fence
+        marker = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if fence:
+            if (marker and marker[1][0] == fence[0]
+                    and len(marker[1]) >= len(fence)
+                    and not marker[2].strip(" \t")):
+                fence = ""
             continue
-        if inside_fence:
+        if marker and (marker[1][0] != "`" or "`" not in marker[2]):
+            fence = marker[1]
             continue
         if line.startswith(("    ", "\t")):
             # Indented code block (CommonMark): the same semantic class as a

@@ -4,15 +4,15 @@ pre-build-review: not-required — bounded repair of existing internal policies;
 
 ## Requirements
 REQ-1 — Plain-language skips remain usable
-  A user instruction may skip its named step without expert-mode confirmation. Other steps remain required, and missing verification is disclosed honestly. → Acceptance #1
+  When a user instructs Loom to skip a step, Loom shall skip that named step without expert-mode confirmation, retain other required steps, and disclose missing verification honestly. → Acceptance #1
 REQ-2 — Omitted artifacts have no mandatory consumers
-  Skipping spec or plan removes its creation, intake and downstream dependency, while confirmed intent and non-skipped checks remain. → Acceptance #2
+  When spec or plan is skipped, Loom shall remove its creation, intake and downstream dependency while retaining confirmed intent and non-skipped checks. → Acceptance #2
 REQ-3 — Early progress is not a complete scope
-  Before implementation, a docs-only committed delta does not waive planning steps. Late verification may simplify based on committed functional content; explicit selections take precedence. → Acceptance #3
+  Before implementation, Loom shall not waive planning steps based on a docs-only committed delta. During late verification, Loom may simplify based on committed functional content; explicit selections shall take precedence. → Acceptance #3
 REQ-4 — Architecture takes effect on ratification
-  Draft architecture is advisory; only ratified rules constrain planning, review and activated guards. Existing ratified rules continue during redesign. → Acceptance #4
+  While architecture is unratified, Loom shall treat it as advisory and constrain planning, review and activated guards only with ratified rules. During redesign, Loom shall retain existing ratified rules. → Acceptance #4
 REQ-5 — Reuse the existing policy surfaces
-  Use existing records and carriers; add no ledger, phase store, confirmation ceremony or speculative abstraction. → Acceptance #5
+  Loom shall reuse existing records and carriers without adding a ledger, phase store, confirmation ceremony or speculative abstraction. → Acceptance #5
 
 ## Design decision
 - user-decided — repair all three issues together, preserve direct natural-language skips, and avoid additional complexity.

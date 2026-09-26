@@ -142,6 +142,30 @@ def test_intake_quotedskip_keepsrequirements(tmp_path: Path, carrier: str) -> No
     assert "intake.spec-ready" in blocked_rules(result), result.stderr
 
 
+@pytest.mark.parametrize("opening,inner,closing", [
+    ("````text", "```", "````"),
+    ("~~~text", "```", "~~~"),
+    ("```text", "~~~", "```"),
+    ("```text", "``` not a closing fence", "````"),
+    ("```text", "    ```", "   ```\t"),
+])
+def test_intake_fence_boundaries_keep_requirements(
+    tmp_path: Path, opening: str, inner: str, closing: str,
+) -> None:
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="yes")
+    path = repo / f"docs/loom/intent/{CHANGE}.md"
+    record = "skipped-by-instruction: spec 2026-09-26\n"
+    example = f"{opening}\n{inner}\n{record}{closing}\n"
+    path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + example))
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.spec-ready" in blocked_rules(result), result.stderr
+    # A valid close restores prose, including a real instruction after it.
+    path.write_text(path.read_text().replace(example, example + record))
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
 def write_attestation(repo: Path, *, payload: dict | None = None, change: str = CHANGE) -> None:
     path = repo / "docs/loom" / change / "attestation.json"
     path.parent.mkdir(parents=True, exist_ok=True)
