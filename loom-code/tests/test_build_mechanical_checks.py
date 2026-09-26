@@ -55,8 +55,8 @@ def test_build_dispatches_fresh_adversary_then_suite_after_tasks() -> None:
 
 def test_adversary_prompt_carries_no_implementer_explanation() -> None:
     assert (
-        "Give it only the change id, `HEAD`, and paths: the intent, the plan, and the "
-        "changed paths with their artifact types"
+        "Give it only the change id, `HEAD`, and paths: the intent, the retained plan "
+        "when present, and the changed paths with their artifact types"
     ) in VERIFY
     assert "never pass an implementer's explanation of its own code" in VERIFY
     for leak in ("implementer's report", "implementer's summary", "self_review"):

@@ -15,16 +15,14 @@ implement or ask the user to approve task splitting; decide and record why.
 
 ## Decision boundary
 
-This station chooses the simplest reversible implementation that satisfies the
-confirmed specification. It may split that work into tasks and tests, but it
-must not invent or reinterpret product behaviour. A product gap is returned
-for clarification instead of being silently filled in the plan.
+Choose the simplest reversible implementation satisfying the
+confirmed specification. Split work into tasks and tests without inventing or
+reinterpreting product behaviour; return product gaps for clarification.
 
 ## Workflow setup
 
-When `loom-design` is installed, an upstream station (`capture-intent`)
-has already interviewed the user and confirmed the intent. When it is not
-installed, **you also run that confirmation yourself** — step 3 below.
+With `loom-design` installed, `capture-intent` already confirmed the intent.
+Otherwise, **run that confirmation yourself** in step 3.
 
 Use the installed checker's host-specific prefix:
 
@@ -59,15 +57,15 @@ before dependent checks. Never ask the user for a generated code to skip a step.
 
 ## Artifact vocabulary
 
-Use the confirmed intent when spec or plan is skipped. A skipped spec waives
-its creation, carried-detail routing, review and behavior-confirmation checks
-in step 4; use the intent's Acceptance directly. Record the instruction before
-running intake; a bound selection already supplies the exemption. A skipped
-plan waives step 5's document, plan check, plan review and plan-dependent
-configuration prompts. Run intake to retain confirmed-intent and other
-non-skipped checks, then hand Build the intent and retained spec paths, omitted
-steps and bounded implementation scope. Resolve open questions in the intent;
-do not create a substitute plan or fabricate a selection confirmation.
+Use the confirmed intent when spec or plan is skipped. Skipped spec waives step 4's
+creation, carried-detail routing, review and behavior-confirmation checks;
+use intent Acceptance directly. Record instructions before intake; bound
+selections already supply exemptions. Skipped plan waives step 5's document,
+plan check, plan review and plan-dependent configuration prompts. Run intake
+for confirmed-intent and non-skipped checks; hand Build intent and retained
+spec paths, omitted steps and bounded implementation scope. Resolve open
+questions in intent; never create a substitute plan or fabricate a selection
+confirmation.
 
 `kind: product` changes what a user reads, types, or sees happen;
 `kind: engineering` covers internal work, tooling, tests, and docs.
@@ -338,11 +336,9 @@ never changes a rule on its own. With no `ARCHITECTURE.md`, nothing changes.
 A task that removes or materially rewrites a function, recognizer, or rule
 that already has tests names the existing test file on its Risk line and
 states whether the change preserves, widens, or narrows what those tests
-cover — not just that "tests pass" once the change is made. "Tests pass" is
-also true of a change that quietly drops the one case those tests existed to
-catch; read the current tests as the coverage spec before touching the code
-they protect, and treat any case they exercise today as a fact the new
-version must still hold, not a suggestion.
+cover. Read current tests as the coverage spec before touching protected
+code; preserve every exercised case. Passing tests alone cannot establish
+this when coverage was dropped.
 
 **Shape.**
 
@@ -373,11 +369,9 @@ version must still hold, not a suggestion.
 
 **Sections.**
 
-The plan itself — `plan.md`, its Current State Evidence section, and every
-evidence note — is written in English, though the Questions asked section
-copies the user's own words verbatim rather than translating them; the
-restatement at decision point ① stays in the user's language, since it is
-spoken to the user rather than read as a machine artifact.
+Write `plan.md`, Current State Evidence and every evidence note in English.
+Questions asked copies the user's words verbatim; the decision point ①
+restatement stays in the user's language.
 
 - When `needs-design: no`, the plan opens with **Current State Evidence** —
   Forward, Reverse, Error, Data, Boundary, each with a path and an anchor.
