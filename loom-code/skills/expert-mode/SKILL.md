@@ -81,8 +81,10 @@ Claim a skip is in effect only from `loom_checker.py selection show <change-id>`
 
 ## Boundary
 
-- Never evaluate a gate. `finalize-review` re-reads the records and waives only
-  a bound skip; `publish` discloses the status.
+- Never evaluate a gate. `finalize-review` re-reads the records: a bound
+  selection controls all skips, even when its skip list is empty. Automatic
+  narrow-change skips apply only without a bound selection; `publish`
+  discloses the status.
 - Local hooks only remind; GitHub rules and the PR-floor check are the trust
   boundary.
 - A reviewer rejection is recorded only when `closing-review` hands it to the checker

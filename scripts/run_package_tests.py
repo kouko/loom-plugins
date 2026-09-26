@@ -69,7 +69,7 @@ def _holds_tests(folder: Path, skip: tuple[Path, ...] = ()) -> bool:
     """True when pytest would find a test file under `folder` outside `skip`."""
     return folder.is_dir() and any(
         "node_modules" not in path.parts and not any(s in path.parents for s in skip)
-        for path in folder.rglob("test_*.py")
+        for pattern in ("test_*.py", "*_test.py") for path in folder.rglob(pattern)
     )
 
 

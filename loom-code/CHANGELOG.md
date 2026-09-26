@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.20.0] — 2026-09-26 — consistent flow policy enforcement
+
+Minor: closing-review and expert-mode guidance now follows bound verification
+choices consistently with finalization and attestation validation.
+
+- Protect `ARCHITECTURE.md` changes with the same reviewer requirements and
+  automatic-skip policy as other protected rule documents. Existing weak
+  architecture-only attestations may become stale and require a new review
+  to regain valid status; stale status does not universally block publication.
+- Discover both `test_*.py` and `*_test.py` in the package suite while
+  preserving existing grouping and excluded folders.
+- Honor confirmed, bound verification choices when producing and validating
+  attestations. Automatic skips still apply when no selection is bound.
+
+No new schema, checker rule id or dependency.
+
 ## [3.19.0] — 2026-09-26 — route the renamed architecture-design tool
 
 Minor: the contract manifest and `write-plan` now name loom-design's

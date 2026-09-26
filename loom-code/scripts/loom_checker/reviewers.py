@@ -21,7 +21,7 @@ _REVIEW_PROTECTED_PARTS = frozenset(
 
 
 _REVIEW_PROTECTED_NAMES = frozenset(
-    {"agents.md", "claude.md", "design.md", "kickoff-defaults.md", "principles.md", "skill.md"}
+    {"agents.md", "architecture.md", "claude.md", "design.md", "kickoff-defaults.md", "principles.md", "skill.md"}
 )
 
 

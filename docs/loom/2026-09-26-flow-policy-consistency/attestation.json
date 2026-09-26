@@ -1,0 +1,64 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-26-flow-policy-consistency",
+  "content_digest": "410157905ed133dc168665427607e15c44a25321",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_loom_attestation.py -q",
+      "artifact": "loom-code/tests/test_loom_attestation.py",
+      "result": "pass",
+      "command_digest": "af345b97f00250d08679d3333001e18314d18b2a9edaf90140375d4c6a298c12"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest tests/test_run_package_tests.py -q",
+      "artifact": "tests/test_run_package_tests.py",
+      "result": "pass",
+      "command_digest": "53da9ea6883ddb47c210a81c3683c34b8a82688a17bc6143dced8d12911591cf"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_selection_finalize.py -q",
+      "artifact": "loom-code/tests/test_selection_finalize.py",
+      "result": "pass",
+      "command_digest": "d14f2d3c1fa42c6d0a3037cba2372f402efe2a4448c579b664bd3bf078c281c4"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/review_code",
+      "vendor": "OpenAI",
+      "model": "inherited-unobservable",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [],
+      "notes": [
+        "Independently ran all six changed test modules: 194 passed, no skips. No smaller equivalent repair identified.",
+        "Historical RED evidence limitation: A1 original RED output is unavailable; A3 RED is supported by the implementer handoff without retained raw logs. Current regression tests were independently verified."
+      ],
+      "reviewed_head": "9bd0fef04b090ab28f486fcd171bd12cc4bdd93b"
+    },
+    {
+      "reviewer": "/root/review_skill",
+      "vendor": "OpenAI",
+      "model": "inherited-unobservable",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [],
+      "notes": [
+        "Independently ran changed guidance and release assertions: 124 passed. All skill dimensions passed; no added mechanism or contradiction found."
+      ],
+      "reviewed_head": "9bd0fef04b090ab28f486fcd171bd12cc4bdd93b"
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

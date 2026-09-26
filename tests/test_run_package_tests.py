@@ -1,4 +1,5 @@
 """fix:W1-05 — the package-tests runner runs one pytest session per group."""
+# concern: Test discovery must not omit supported names or execute excluded trees.
 from __future__ import annotations
 
 import os
@@ -60,7 +61,9 @@ def test_loom_family_preset_covers_every_ci_test_surface() -> None:
     expected_skill_dirs = sorted(
         path.relative_to(REPO).as_posix()
         for path in (REPO / "loom-workflow/tests").iterdir()
-        if path.is_dir() and any(path.glob("test_*.py"))
+        if path.is_dir() and any(
+            test for pattern in ("test_*.py", "*_test.py") for test in path.glob(pattern)
+        )
     )
     actual_skill_dirs = sorted(
         command[3] for command in commands
@@ -237,11 +240,21 @@ def test_design_group_discovers_its_tests_folder(tmp_path: Path) -> None:
     _seed_repo(repo)
     _write_test(repo / "loom-design" / "tests", "design_new")
     _write_test(repo / "loom-design" / "tests" / "local", "design_local_only")
+    tests = repo / "loom-design" / "tests"
+    (tests / "test_design_new.py").rename(tests / "design_new_test.py")
+    (tests / "local" / "test_design_local_only.py").rename(tests / "local" / "design_local_only_test.py")
 
     collected = _collected(repo, "design")
 
     assert "test_design_new" in collected
     assert "local_only" not in collected
+    (tests / "design_new_test.py").write_text("def test_design_new():\n    assert False\n")
+    result = subprocess.run(
+        [sys.executable, str(RUNNER), "--loom-family", "--only", "design"],
+        cwd=repo, capture_output=True, text=True,
+    )
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "test_design_new" in result.stdout
 
 
 def test_workflow_tests_subfolders_run_in_their_own_sessions(tmp_path: Path) -> None:

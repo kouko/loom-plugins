@@ -358,8 +358,11 @@ python3 <loom-code>/scripts/loom_checker.py finalize-review <change-id> --input 
 ```
 
 The checker runs the declared package suite and each adversarial program once.
-`finalize-review` waives reviewers, adversarial and package-tests solely for a
-bound selection that lists them.
+When a bound selection exists, `finalize-review` waives only the reviewers,
+adversarial and package-tests steps it lists, including no waivers when its
+skip list is empty. Automatic narrow-change skips apply only without a bound
+selection; attestation validation follows the same precedence, using the
+attestation's selection claim in CI where local records are unavailable.
 Only after all executions and verdicts pass does it atomically generate the
 attestation bound to the functional-content digest. Commit the generated file
 with any remaining publication metadata; publication validates that single

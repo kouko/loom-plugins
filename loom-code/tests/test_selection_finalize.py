@@ -6,6 +6,7 @@ user-typed confirmation skipped, records a failure event on every non-zero
 exit, and the v2 attestation carries a `selection` the validator re-reads
 from the local records.
 """
+# concern: Automatic waivers must not erase bound verification choices.
 from __future__ import annotations
 
 import hashlib
@@ -191,6 +192,39 @@ def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> 
         repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, None,
         claimed_selection=True,
     ) == []
+    propose(repo, "adversarial")
+    confirm(repo, "2026-09-14T00:00:00Z")
+    # Finalization leaves an untracked attestation; remove only that output.
+    (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
+    assert finalize(repo, review_input(tmp_path, PASSING[:1], [])).returncode == 0
+    attestation = written(repo)
+    assert attestation["selection"]["skip"] == ["adversarial"]
+    assert validate(repo, attestation) == []
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, None,
+        claimed_selection=True,
+    ) == []
+
+
+@pytest.mark.parametrize("skip", ["reviewers", ""])
+def test_bound_kept_adversarial_required_on_narrow_delta(tmp_path: Path, skip: str) -> None:
+    repo = make_narrow_repo(tmp_path)
+    assert finalize(repo, review_input(tmp_path, PASSING[:1], [])).returncode == 0
+    attestation = written(repo)
+    (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
+    propose(repo, skip)
+    confirm(repo, "2026-09-14T00:00:00Z")
+    attestation["selection"] = attestation_module.selection_evidence(repo, CHANGE)
+    local_errors = validate(repo, attestation)
+    claimed_errors = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, None,
+        claimed_selection=True,
+    )
+    refused = finalize(repo, review_input(tmp_path, PASSING[:1], []))
+    assert (refused.returncode, bool(local_errors), bool(claimed_errors)) == (1, True, True)
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    assert all(any("adversarial" in reason for _, reason in errors)
+               for errors in (local_errors, claimed_errors))
 
 
 def trunkless_clone(origin: Path, tmp_path: Path, branch: str = "feature") -> Path:
