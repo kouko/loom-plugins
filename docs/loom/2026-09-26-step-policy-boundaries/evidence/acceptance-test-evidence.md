@@ -92,3 +92,58 @@ uv run --isolated --with-requirements requirements-package-tests.lock python scr
 ## Findings and decisions
 
 No confirmed product defect was observed. No dismissed important/fatal findings were supplied. Partial verdicts identify missing full host workflow evidence, not a waiver or fabricated pass. The mixed-session import error was resolved by the repository's documented test grouping without changing product files.
+
+## Extended scoped run on 2026-09-26, candidate b7aa3cb9
+
+This extension supersedes the initial partly verdicts where actual agent execution is documented below. It does not require publication, installed-host hook firing, or a full architecture interview: none is part of the five requested outcomes. Fixture-user instructions are test data only and do not skip verification of the real change.
+
+### 1–2. Actual native-dispatched implementation without spec or plan
+
+Created a fresh toy Git repository with an empty existing `greeting(name)` implementation, README's standard-library unittest command, and a confirmed intent whose Acceptance requires `greeting("Ada") == "Hello, Ada!"`. No spec or plan was supplied. Fixture request: “規格和計畫都略過，直接修好 greeting；保留實作代理與先寫失敗測試。這個暫存案例略過對抗、完整套件、closing review 和發布。不要改外面的正式專案。”
+
+Executed candidate `loom-code/scripts/dispatch_profile.py` with null model and effort, empty capabilities, inheritance true, ordinary evidence. Result: `outcome: dispatch`, `effective_profile: inherited`, `overrides: null`, `reason: unobservable-main-profile`. Dispatched a fresh-context native implementer with resource paths to candidate Build/implementer contracts and fixture request/intent; no expected solution was passed. The witness did not implement the solution.
+
+Observed actual agent result and artifacts:
+
+```text
+selection show 2026-09-26-toy-greeting: exit 0; bound false, skip []
+d8c4445 docs(fixture): record explicitly omitted workflow steps
+python3 -m unittest discover -s tests -v [RED before implementation]: exit 1
+AssertionError: '' != 'Hello, Ada!'; Ran 1 test; FAILED (failures=1)
+python3 -m unittest discover -s tests -v [GREEN after implementation]: exit 0
+Ran 1 test; OK
+60dcb66 fix(greeting): return the requested named greeting
+changed files: greeting.py, tests/test_greeting.py
+git status --short: empty
+Requested confirmation: none. Blocker: none.
+```
+
+The witness read the actual agent report `/tmp/loom-downstream-result.md`, inspected the commits and focused test file, and independently reran the focused unittest: 1 test, OK. Spec/plan were absent. Eight test lines were added. The agent preserved the one-argument public function interface. Its only concern was `sync-trunk` WARN because the toy repository has no remote; candidate policy explicitly permits continuing on this WARN. No publication or real-project skips occurred. Together with the earlier real intake negative cases, criteria 1 and 2 now work over the requested scope.
+
+### 3 and 5. Previous evidence retained
+
+The candidate implementation did not change. The new actual downstream run also used only the existing intent carrier and created only the scoped production/test files; no replacement planning document or selection confirmation was needed. Prior focused test results remain applicable. No full package suite was run by this witness.
+
+### 4. Actual fresh-context architecture consumer artifacts
+
+Created two toy snapshots with the same FP-1 rule, `Python implementation files live under src/`, and a proposed root-level `greeting.py` addition. Only the second snapshot carried `ratified-by: fixture-user 2026-09-26`. A fresh native reader received paths to both documents, candidate write-plan and code lenses, and the proposed change; no expected verdict was supplied.
+
+The initial dispatch hit the host concurrency limit. The profile resolver's `host-rejection` event returned inherited/no overrides, `reason: host-rejection-replacement`. After the implementer finished, the fresh reader dispatch succeeded. This was a capacity limit, not a candidate behavior failure.
+
+The reader wrote `/tmp/loom-architecture-reader/verdict.md`; the witness read the artifact. Actual output:
+
+```text
+Draft: N/A. No ratified-by line; rules advisory. Findings: none.
+Planned task: add greeting.py at root.
+Risk: draft FP-1 cannot require a move or block planning.
+
+Ratified: PASS_WITH_NOTES, one important finding, returns to Build.
+Finding: root greeting.py violates FP-1.
+Anchor: ratified ARCHITECTURE.md:2 (ratification), :11 (FP-1).
+Concrete fix and planned task: add src/greeting.py.
+Risk: follow ratified FP-1, preserve MB-1 independence and FS-1 size bound.
+```
+
+The verdict label matches the supplied lens severity rubric (one important => PASS_WITH_NOTES); the reader explicitly required correction and did not treat it as a clean pass. Neither architecture document was modified. Combined with the existing executed live/draft/redesign guard isolation checks, criterion 4 works over the requested planning, review, and ordinary-test boundaries. Earlier first-run `partly` text is retained as historical evidence and superseded by this extension, not silently promoted from text assertions. A full design interview and installation/publication were not run and are outside these acceptance outcomes.
+
+No product defect emerged from the extension. All five final report rows are works. Only scoped fixture code, tests, commits, and reader artifacts were created; the real candidate implementation was unchanged.
