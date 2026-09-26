@@ -147,3 +147,38 @@ Risk: follow ratified FP-1, preserve MB-1 independence and FS-1 size bound.
 The verdict label matches the supplied lens severity rubric (one important => PASS_WITH_NOTES); the reader explicitly required correction and did not treat it as a clean pass. Neither architecture document was modified. Combined with the existing executed live/draft/redesign guard isolation checks, criterion 4 works over the requested planning, review, and ordinary-test boundaries. Earlier first-run `partly` text is retained as historical evidence and superseded by this extension, not silently promoted from text assertions. A full design interview and installation/publication were not run and are outside these acceptance outcomes.
 
 No product defect emerged from the extension. All five final report rows are works. Only scoped fixture code, tests, commits, and reader artifacts were created; the real candidate implementation was unchanged.
+
+## Re-run on 2026-09-26, at bb57bbe5ae642918d45d7987a05d3fdd70dee320
+
+Independently read `git diff 94e794f0..bb57bbe5`. The only changed files are spec wording (the same five requirements expressed as shall/when clauses), `rule_checks/intake.py`'s existing `prose_lines` fence recognition, and five parameterized regression cases in the existing intake test module. The parser now retains opening marker type/length and only accepts matching valid closes. No station, architecture rule consumer, dispatch, late simplification, or persistent schema changed.
+
+Fresh clone: `git clone --local --no-hardlinks . /tmp/loom-acceptance-bb57bbe5`. Read README setup guidance already recorded above; reran cloned `loom_checker.py contract --require 2.1` (contract 2.3.1 satisfies >=2.1) and `sync_codex_manifests.py --check --all` (exit 0). Used README's isolated locked environment, with authorized narrow cache access.
+
+Independent test command and actual output:
+
+```sh
+uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_checker_intake.py
+# 123 passed in 58.13s
+```
+
+This is this witness's run, not the coordinator's Build result. It includes all ordinary intake cases, all four skip carriers, both original quoted-skip adversarial cases, and the five new nested/mismatched fence cases. Each new case rejects the quoted skip and accepts the real instruction following a valid close. Running the whole relevant module also exercised shared prose parsing consumers, including specification requirements and UI flows. The full package suite was not run by this witness; package-tests and finalize-review remain retained and failure-blocking.
+
+Reused the existing temporary CLI walkthrough with only its checker root replaced by the repaired clone, stopping before unrelated architecture guards. A new temporary toy Git repo produced:
+
+```text
+selection show: exit 0; bound false; skip []; code null; all eight steps retained
+intake before instruction: exit 1, BLOCK intake.spec-ready
+intake after committed genuine spec/plan instruction records: exit 0
+spec.md exists: false; plan.md exists: false
+intake after status changed to open: exit 1, BLOCK intake.confirmed
+ordinary files: seed.txt and existing intent only
+.git/loom/selections exists: false
+```
+
+- 1: re-tested — actual command sequence, all carrier/quoted-content tests, and unchanged fresh-agent natural-language handling evidence together cover direct skipping and retained requirements. The agent contract and instruction recorder are unchanged in the inspected fix delta; therefore the previous actual agent result remains evidence for that surface without redispatch.
+- 2: re-tested — real missing-artifact intake, all carrier cases, and retained-intent rejection rerun; the previously executed implementation/TDD/commit handoff remains applicable because no downstream station or worker code changed.
+- 3: carried over — selection and late simplification were untouched; wording makes the existing requirement explicit rather than changing it. The repeated CLI also retained all early steps.
+- 4: carried over — architecture planning/review/guard activation surfaces were untouched; prior fresh-reader verdicts/tasks and real live/draft/redesign guard executions still cover the complete criterion.
+- 5: re-tested — no new state observed in the new toy repo, manifest check passed, and inspected delta modifies the existing parser with no new storage or workflow subsystem; previous release metadata test remains applicable because manifests were untouched.
+
+No new findings. No dismissed important/fatal findings were supplied. Final criterion verdicts remain works; no claims rely on the coordinator's suite counts.
