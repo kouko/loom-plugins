@@ -12,10 +12,10 @@ directory.
 
 The user asks for an architecture for a repository. You design it with the
 user — read what exists, propose options with trade-offs, let the user pick
-— then write `ARCHITECTURE.md` at the repository root holding **the
+— then draft `ARCHITECTURE.md` in a temporary copy holding **the
 decisions and the rules only**, write a guard test for every rule that can
 be checked mechanically, restate them, and — on "yes" — write the
-`ratified-by:` line.
+`ratified-by:` line and install the ratified document and guards.
 
 ## Step 0 — Check the contract version
 
@@ -36,7 +36,9 @@ Run this **on request** only. `ARCHITECTURE.md` is **never required**: an
 absent or unratified `ARCHITECTURE.md` never blocks a change, at any
 station.
 
-When `ARCHITECTURE.md` already exists, run in **re-design mode**: when a
+When `ARCHITECTURE.md` already exists, run in **re-design mode**. Keep the
+ratified root document and its active guards unchanged while drafting in a
+temporary copy. When a
 change alters the structure, re-design only the affected part with the
 user (Step 2, for the affected choices alone), then update the affected
 decisions, rules and guards in the **same commit**, run the validator, and
@@ -71,7 +73,9 @@ on a question, answer it and present the options again.
 Data models and API interfaces stay out of this design: they belong to
 each change's spec.
 
-**Write.** Write `ARCHITECTURE.md` at the repository root following
+**Write.** Work in a temporary copy of the repository outside its normal
+test discovery paths. Write the draft `ARCHITECTURE.md` at that copy's root,
+without a `ratified-by:` line, following
 `references/architecture-md-schema.md`: a title, a `## Decisions` section
 recording each pick (the choice, the options considered, the reason), then
 exactly the four rule sections, one line per rule, and no overview or
@@ -79,8 +83,8 @@ background section.
 
 ## Step 3 — Write the guards and validate
 
-For every rule that can be checked mechanically, write a guard test in the
-repository's **own test framework**, under a path its `package-tests:`
+In the temporary copy, for every rule that can be checked mechanically,
+write a guard test in the repository's **own test framework**, under a path its `package-tests:`
 command in `docs/loom/KICKOFF-DEFAULTS.md` already runs — or extend that
 command so it does; a guard the suite never runs holds nothing. When that
 file or its `package-tests:` line is absent or `none`, propose the
@@ -90,7 +94,7 @@ Record the guard's path on the rule line (`check: <guard path>`). A rule
 that needs judgment says `check: review` and gets no guard.
 
 Each guard's failure message follows the schema's "Guard failure message"
-section. Run the guards once; a guard that fails on today's code is either a rule the user must
+section. Run the guards once in the temporary copy; a guard that fails on today's code is either a rule the user must
 restate or a violation to show them.
 
 Then check the file, with `<loom-design>` standing for this plugin's own
@@ -114,8 +118,11 @@ ratified-by: <name> <date>
 ```
 
 `<name>` is the user's own name or handle; `<date>` is today, `YYYY-MM-DD`.
-In re-design mode, replace the existing `ratified-by:` line; never add a
-second. Run the validator again without `--draft`.
+Run the validator again without `--draft` in the temporary copy. On success,
+install the ratified document, guards and associated suite configuration in
+the working repository together, replacing the old versions in re-design
+mode. Activate the guards only after ratification. Run the normal suite;
+never commit an unvalidated draft as the active architecture.
 
 ## Step 5 — Commit
 
@@ -129,10 +136,11 @@ git commit -m "docs(loom): ARCHITECTURE.md ratified"
 
 ## Downstream — how the rest of the flow uses it
 
-`write-plan` reads `ARCHITECTURE.md`, when present, before its Task DAG: it
+`write-plan` reads `ARCHITECTURE.md`, when ratified with the existing
+`ratified-by: <name> <date>` line, before its Task DAG: it
 places added or moved files by the rules and names the rule id on the
 task's Risk line. At `closing-review`, the code lens dimension
 `architecture-conformance` scores the diff against the rules — a violation
-is a finding with a fix; with no `ARCHITECTURE.md` the dimension is scored
+is a finding with a fix; with no ratified `ARCHITECTURE.md` the dimension is scored
 **N/A with a one-line reason**. A missing `ARCHITECTURE.md` is only the
 standing WARN the checker prints and never blocks any station.

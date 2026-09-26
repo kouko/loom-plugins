@@ -89,6 +89,9 @@ def test_skill_states_redesign_updates_decisions_rules_guards():
     assert "decisions, rules and guards" in low
     assert "same commit" in low
     assert "re-ratify" in low
+    assert "keep the ratified root document and its active guards unchanged" in low
+    assert "temporary copy" in low
+    assert "activate the guards only after ratification" in low
 
 
 def test_guard_failure_message_fields_stated():

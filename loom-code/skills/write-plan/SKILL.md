@@ -325,8 +325,10 @@ Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 declared dependencies, and positive plus negative/boundary cases. Split
 unrelated behaviour; keep scenario detail in the spec and never size by time.
 
-**Architecture.** When the repository root has `ARCHITECTURE.md`, read it
-before writing the Task DAG. Place every added or moved file by its rules,
+**Architecture.** When the repository root has `ARCHITECTURE.md` carrying
+`ratified-by: <name> <date>`, read it before writing the Task DAG. Treat an
+unratified draft as advisory; it cannot require changes or block planning.
+Place every added or moved file by the ratified rules,
 and name the rule id you followed on that task's Risk line (`FP-2`). When a
 task must break a rule, the planner runs the loom-design `architecture-design`
 tool's re-design mode with the user before Build starts, and lists

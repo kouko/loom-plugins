@@ -30,6 +30,8 @@ def _step5_architecture_paragraph() -> str:
 def test_write_plan_step5_reads_architecture_and_names_rule() -> None:
     para = _step5_architecture_paragraph()
     assert "Risk line" in para and "rule id" in para, para
+    assert "ratified-by: <name> <date>" in para
+    assert "Treat an unratified draft as advisory" in para
 
 
 def test_absent_architecture_doc_adds_no_step() -> None:
@@ -45,6 +47,8 @@ def test_code_lens_has_architecture_conformance_na_without_doc() -> None:
     assert re.search(r"^\| architecture \| .*SOLID", code, re.M), "SOLID row changed"
     na_rule = " ".join(text[text.index("A dimension with nothing to conform to"):].split())[:200]
     assert "`ARCHITECTURE.md`" in na_rule, na_rule
+    assert "Scored only for ratified rules" in code
+    assert "ratified-by: <name> <date>" in code
 
 
 def test_reviewer_lists_it_and_reviewer_count_unchanged() -> None:
