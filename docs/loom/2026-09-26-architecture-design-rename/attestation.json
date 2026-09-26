@@ -1,0 +1,66 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-26-architecture-design-rename",
+  "content_digest": "f5c0be41aeb5f222628b793e091bd4266e5f6f14",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-design/tests/architecture-design/test_abuse_architecture_validator.py -c /dev/null -q -p no:cacheprovider",
+      "artifact": "loom-design/tests/architecture-design/test_abuse_architecture_validator.py",
+      "result": "pass",
+      "command_digest": "3b8afe85a804e43503430b97b827f8b341bcdb9f5319ec01c7f3dbe2a7be060a"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/review_code",
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "d641befc22cf2a69d223869af3fa166642ad4aa0",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS",
+        "architecture-conformance": "N/A — repository root has no ARCHITECTURE.md."
+      },
+      "findings": []
+    },
+    {
+      "reviewer": "/root/review_docs",
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "d641befc22cf2a69d223869af3fa166642ad4aa0",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
