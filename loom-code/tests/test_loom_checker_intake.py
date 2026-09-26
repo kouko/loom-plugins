@@ -1,3 +1,4 @@
+# concern: Quoted skip-record examples must not waive retained intake requirements.
 """Executable contract for `loom_checker.py intake <station> <change-id>`
 (plan W0-03) -- what write-spec and write-plan are allowed to accept.
 
@@ -114,6 +115,28 @@ def test_omitted_artifacts_keep_intent_requirements(tmp_path: Path, carrier: str
     intent.write_text(intent.read_text().replace("status: confirmed 2026-09-02", "status: open"))
     result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
     assert "intake.confirmed" in blocked_rules(result)
+
+
+@pytest.mark.parametrize("carrier", ["intent", "plan"])
+def test_intake_quotedskip_keepsrequirements(tmp_path: Path, carrier: str) -> None:
+    """A fenced example is document content, not authorization to omit a spec."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, kind="product", needs_design="yes")
+    before = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.spec-ready" in blocked_rules(before)
+    example = (
+        "Reference example only; no step was skipped.\n"
+        "```text\nskipped-by-instruction: spec 2026-09-26\n```\n"
+    )
+    if carrier == "intent":
+        path = repo / f"docs/loom/intent/{CHANGE}.md"
+        path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + example))
+    else:
+        path = repo / f"docs/loom/{CHANGE}/plan.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# Plan\n\n## Risks\n" + example)
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert "intake.spec-ready" in blocked_rules(result), result.stderr
 
 
 def write_attestation(repo: Path, *, payload: dict | None = None, change: str = CHANGE) -> None:
