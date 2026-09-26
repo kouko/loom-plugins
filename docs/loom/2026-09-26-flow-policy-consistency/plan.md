@@ -24,7 +24,7 @@ charter: 1.1
 - Risk: agent-decided — preserve existing grouping and exclusions; extend existing runner cases, not pytest collection or a separate discovery framework.
 
 **W0-03 Honor bound verification choices throughout finalization**  after: W0-02  acceptance: 3
-- Files: loom-code/scripts/loom_checker/attestation.py, loom-code/scripts/loom_checker/command_handlers/finalize.py, loom-code/tests/test_selection_finalize.py, loom-code/skills/closing-review/SKILL.md, loom-code/skills/expert-mode/SKILL.md
+- Files: loom-code/scripts/loom_checker/attestation.py, loom-code/scripts/loom_checker/command_handlers/finalize.py, loom-code/tests/test_selection_finalize.py, loom-code/skills/closing-review/SKILL.md, loom-code/skills/expert-mode/SKILL.md, loom-code/tests/test_expert_mode_skill.py, loom-code/tests/test_simplified_station_text.py
 - Test: A3 positive: bound-kept-adversarial-required; boundary: unbound-auto-skip-and-explicit-skip.
 - Risk: agent-decided — preserve claimed-selection CI validation and legacy evidence; prefer existing selection evidence over new state or schema; search every auto_skipped_steps consumer for the same precedence defect.
 

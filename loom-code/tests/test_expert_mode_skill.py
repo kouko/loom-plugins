@@ -136,8 +136,10 @@ def test_skill_round1_boundary_intent_skip_and_withdrawal_split() -> None:
     assert ("In a checkout without its records, the selection shows as `stale` on the PR; "
             "publishing still proceeds.") in boundary
     assert "a fresh clone refuses it" not in boundary
-    assert ("Never evaluate a gate. `finalize-review` re-reads the records and waives only a "
-            "bound skip; `publish` discloses the status.") in boundary
+    assert ("Never evaluate a gate. `finalize-review` re-reads the records: a bound "
+            "selection controls all skips, even when its skip list is empty. Automatic "
+            "narrow-change skips apply only without a bound selection; `publish` "
+            "discloses the status.") in boundary
     assert ("Local hooks only remind; GitHub rules and the PR-floor check are the trust "
             "boundary.") in boundary
     assert "independent CI stays the trust boundary" not in boundary

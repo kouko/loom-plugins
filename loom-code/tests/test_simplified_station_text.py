@@ -407,8 +407,11 @@ def test_review_hands_reviewer_failures_and_scopes_the_waiver() -> None:
         "`loom_checker.py selection record-failure <change-id> --step reviewers --rule <verdict>`"
     ) in review_prose
     assert (
-        "`finalize-review` waives reviewers, adversarial and package-tests solely for a "
-        "bound selection that lists them"
+        "When a bound selection exists, `finalize-review` waives only the reviewers, "
+        "adversarial and package-tests steps it lists, including no waivers when its "
+        "skip list is empty. Automatic narrow-change skips apply only without a bound "
+        "selection; attestation validation follows the same precedence, using the "
+        "attestation's selection claim in CI where local records are unavailable."
     ) in review_prose
 
 
