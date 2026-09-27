@@ -131,6 +131,9 @@ Where there is no generator (branching decision, reasoning chain, state
 lifecycle, timeline), adapt the template's ASCII by hand. The data model has
 no ASCII form; use its table substitute.
 
+For how a node's text is structured and verified, see
+`references/node-structure.md`.
+
 Always verify before sending:
 
 ```
@@ -187,3 +190,7 @@ never publish before the fidelity check passes.
   `obsidian:obsidian-mermaid-visualizer`.
 - **A page drawn without reading the source, or padded to reach five nodes.**
   Page mode's extraction is the work; three reasoning states get prose.
+- **Unstructured multi-line box.** A box interior with multiple content lines
+  and no separator row — the node structure was skipped.
+- **Empty separator.** A separator row with no body line after it — the
+  container rule was violated.
