@@ -324,7 +324,7 @@ def test_external_goal_tool_contracts_are_cited_at_the_call_site():
 
 
 def test_session_stops_after_prompt_and_host_activation():
-    session_body = _normalize_ws(_section(_read_skill_md(), "SESSION mode"))
+    session_body = _gate(_read_skill_md(), "goal-create.session-activation")
     assert "ends after presenting the prompt and reporting host activation" in session_body
     assert "does not invoke Loom stations or change their workflow rules" in session_body
 
@@ -337,7 +337,10 @@ def test_codex_activation_requires_an_exposed_tool():
 
 
 def test_artifact_input_is_optional_and_preserves_intent_constraints():
-    text = _normalize_ws((SKILL_DIR / "references" / "input-floor.md").read_text())
+    text = _gate(
+        (SKILL_DIR / "references" / "input-floor.md").read_text(),
+        "goal-create.artifact-input",
+    )
     assert "Confirmed artifacts are optional input sources, not prerequisites" in text
     assert "intent's Constraints" in text
     assert "does not create or confirm those artifacts" in text

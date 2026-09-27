@@ -43,12 +43,12 @@ The script exits 1 on any hard failure and 0 otherwise. On exit 1, the
 draft is rewritten to fix what it flagged and the checker is re-run — a
 draft is never shown to the user until it exits 0.
 
+<!-- gate: goal-create.session-activation -->
 This skill ends after presenting the prompt and reporting host activation
 or recovery below. It does not invoke Loom stations or change their workflow
 rules. The prompt may refer its executor to an existing workflow; executing
 that prompt is outside this skill.
 
-<!-- gate: goal-create.session-activation -->
 After exit 0, show the complete four-field condition in one copyable code block,
 then use the capability actually exposed by the current host. Invoking the
 named `goal-create SESSION` mode is explicit authorization to replace any
