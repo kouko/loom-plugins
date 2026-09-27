@@ -114,3 +114,21 @@ Tested on 2026-09-27 in a fresh local clone at `eef456ba` (`/private/tmp/loom-go
 - 9: re-tested — checked the unavailable-tool fallback, complete `/goal` command, replacement disclosure, and no internal-settings advice in the skill and READMEs; no real missing-tool response was rendered.
 - 10: re-tested — checked the non-success fallback, inactive status, complete manual command, and replacement disclosure in the skill and READMEs; no real refusal output was captured.
 - 11: re-tested — checked the newly gate-covered skill exit, no Loom-station invocation, prompt display before host result, and no goal work in this acceptance run; no real host output was captured.
+
+## Re-run on 2026-09-27, at `f95743e7`
+
+- Fresh setup: `git clone --local --no-hardlinks --no-checkout . /private/tmp/loom-goal-acceptance-final-20260927`, then `git -C /private/tmp/loom-goal-acceptance-final-20260927 checkout --detach f95743e7e765ec198090af09ce74e5a0deab0e10`; status was clean. `agy plugin validate ./loom-workflow` returned exit 0, `skills: 12 processed`, and `hooks: 1 processed`.
+- Fix inspected: `git diff c813ac87..f95743e7` adds only `# concern: unavailable Codex Goal tool must not be treated as native activation.` as the first line of `loom-workflow/tests/goal-create/test_skill_md.py`. No executable test statement, skill instruction, reference, README, checker, ARC, or release metadata changed. Thus none of the 11 Acceptance/UI-flow rows is affected.
+- Direct adversarial recheck: `/Users/kouko/.conda/envs/dbt-redshift/bin/python -m pytest -q loom-workflow/tests/goal-create/test_skill_md.py` returned `15 passed in 0.14s`. A search of the three skill-local READMEs found no old two-site or `purpose-link` claim; the prior nit stays closed.
+- The previously dismissed important clean-host dogfood gap remains. No real Goal tool was called. The full package suite is planned for `finalize-review`; no full-suite result is claimed here.
+- 1: carried over — only a non-executable test-file comment changed; prompt sources, constraints, and execution boundary did not.
+- 2: carried over — the Codex host branch and assertions did not change; the new comment describes an existing unavailable-tool concern.
+- 3: carried over — the Claude proposal and manual fallback branches did not change.
+- 4: carried over — ARC, four-field shape, lint/refusal, and version metadata did not change.
+- 5: carried over — the missing-input refusal rule did not change.
+- 6: carried over — the draft-source and prompt-display rules did not change.
+- 7: carried over — the Codex available-tool success/refusal branch did not change.
+- 8: carried over — the Claude proposal and pending-confirmation branch did not change.
+- 9: carried over — the Claude unavailable-tool fallback did not change.
+- 10: carried over — the Claude non-success fallback did not change.
+- 11: carried over — the skill stop boundary and non-execution rule did not change.
