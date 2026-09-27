@@ -30,6 +30,7 @@ def _is_task_exempt_from_test_pairs(change_id: str, files_str: str | None, repo:
     (a) low-risk doc extension (.md/.mdx/.rst/.txt) NOT under a protected part
         (skills/agents/hooks/contract/templates/api/cli/commands)
     (b) under the change store `docs/loom/<change-id>/` or `docs/loom/evidence/`
+        AND having low-risk doc extension (.md/.mdx/.rst/.txt)
     (c) release metadata: plugin.json, .claude-plugin/plugin.json, .codex-plugin/plugin.json,
         CHANGELOG.md, README*.md at plugin root
 
@@ -57,10 +58,12 @@ def _is_task_exempt_from_test_pairs(change_id: str, files_str: str | None, repo:
         if parts.intersection(_REVIEW_PROTECTED_PARTS) or name in _REVIEW_PROTECTED_NAMES:
             return False
 
-        # Check if it's under change store or evidence store (exempt)
+        # Check if it's under change store or evidence store (exempt ONLY if low-risk doc extension)
         if path.as_posix().startswith(f"docs/loom/{change_id}/") or \
            path.as_posix().startswith("docs/loom/evidence/"):
-            continue
+            if path.suffix.casefold() in _LOW_RISK_DOC_EXTENSIONS:
+                continue
+            return False
 
         # Check if it's release metadata at plugin root (exempt)
         # A file is at plugin root if it has no parent directory (i.e., just a filename)
