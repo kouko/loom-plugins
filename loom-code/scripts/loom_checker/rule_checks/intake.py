@@ -17,6 +17,73 @@ import hashlib
 import re
 import sys
 
+from loom_checker.reviewers import _LOW_RISK_DOC_EXTENSIONS
+from loom_checker.reviewers import _REVIEW_PROTECTED_PARTS
+from loom_checker.reviewers import _REVIEW_PROTECTED_NAMES
+from loom_checker.reviewers import _is_test_path
+
+
+def _is_task_exempt_from_test_pairs(change_id: str, files_str: str | None, repo: Path) -> bool:
+    """Return True if a task is exempt from the test case pair requirement.
+
+    A task is exempt iff EVERY path in its Files line is one of:
+    (a) low-risk doc extension (.md/.mdx/.rst/.txt) NOT under a protected part
+        (skills/agents/hooks/contract/templates/api/cli/commands)
+    (b) under the change store `docs/loom/<change-id>/` or `docs/loom/evidence/`
+    (c) release metadata: plugin.json, .claude-plugin/plugin.json, .codex-plugin/plugin.json,
+        CHANGELOG.md, README*.md at plugin root
+
+    ANY path that is a test path, a .py/.sh program, or under protected parts
+    keeps the pair requirement.
+    """
+    if not files_str:
+        return False
+
+    entries = _split_respecting_backticks(files_str)
+    if not entries:
+        return False
+
+    for entry in entries:
+        # Remove backticks that may surround the entry
+        path_str = entry.strip('`')
+        path = Path(path_str)
+        # Check if it's a test path (keeps requirement)
+        if _is_test_path(path):
+            return False
+
+        # Check if it's under protected parts (keeps requirement)
+        parts = {part.casefold() for part in path.parts}
+        name = path.name.casefold()
+        if parts.intersection(_REVIEW_PROTECTED_PARTS) or name in _REVIEW_PROTECTED_NAMES:
+            return False
+
+        # Check if it's under change store or evidence store (exempt)
+        if path.as_posix().startswith(f"docs/loom/{change_id}/") or \
+           path.as_posix().startswith("docs/loom/evidence/"):
+            continue
+
+        # Check if it's release metadata at plugin root (exempt)
+        # A file is at plugin root if it has no parent directory (i.e., just a filename)
+        if len(path.parts) == 1:
+            if path.name in {"plugin.json", ".claude-plugin/plugin.json", ".codex-plugin/plugin.json",
+                           "CHANGELOG.md"} or (path.name.startswith("README") and
+                                               (len(path.name) == 5 or  # exactly "README"
+                                                path.name[5:] == ".md" or  # README.md
+                                                path.name[5:] == ".markdown" or  # README.markdown
+                                                path.name[5:] == ".txt" or  # README.txt
+                                                path.name[5:] == "")):  # just README (no extension)
+                continue
+
+        # Check if it's low-risk doc extension NOT under docs/loom/ (exempt)
+        if (path.suffix.casefold() in _LOW_RISK_DOC_EXTENSIONS and
+            not path.as_posix().startswith("docs/loom/")):
+            continue
+
+        # If we get here, the path doesn't match any exemption criteria
+        return False
+
+    return True
+
 
 REQ_LINE = re.compile(r"^\s*(?:[-*+]\s+)?REQ-(\d+)\s*(?:—|–|--)\s*(\S.*)$")
 
@@ -446,6 +513,12 @@ def check_test_case_pairs(
                 )
             )
         owned.update(set(references) & acceptance_numbers)
+
+        # Check if task is exempt from test case pair requirement
+        task_files = fields.get(task_id, {}).get("Files")
+        if _is_task_exempt_from_test_pairs(change_id, task_files, repo):
+            continue  # Skip test case pair check for exempt tasks
+
         cases = {
             int(match.group("number")): match
             for match in TEST_CASE.finditer(str(fields.get(task_id, {}).get("Test") or ""))
