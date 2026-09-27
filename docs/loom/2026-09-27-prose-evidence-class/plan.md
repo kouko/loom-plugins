@@ -38,7 +38,7 @@ charter: 1.1
 ## Simplicity check
 - Reuse reviewers.py path sets for the exemption instead of a new classifier — taken
 - Mirror loom-workflow's release-metadata test shape instead of a consistency-only check — declined: plan-lens review found A4 is satisfied by a CURRENT_VERSION constant in the existing test file; no new file, constant is the single location
-- Drop change-level pair aggregation, keep per-task pairs — taken: intake.py:465-473 already implements change-level coverage; only the per-task exemption is new
+- Drop change-level pair aggregation; intake.py:465-473 already covers ownership — taken
 - Make the lens carve-out part of the existing tests row, not a new dimension — taken
 
 ## Questions asked
