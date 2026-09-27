@@ -91,6 +91,8 @@ def test_tri_language_discovery_promises_activation_and_honest_fallback():
         activation, fallback = SKILL_ACTIVATION_TERMS[label]
         assert activation in text, f"{label}: missing supported-host activation"
         assert fallback in text, f"{label}: missing manual fallback"
+        assert re.search(r"Codex[^.!?。]*`create_goal`", text), label
+        assert re.search(r"Claude Code[^.!?。]*`ProposeGoal`[^.!?。]*`/goal`", text), label
 
     for label, (path, activation, fallback) in PLUGIN_READMES.items():
         text = path.read_text(encoding="utf-8")
