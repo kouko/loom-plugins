@@ -6,7 +6,7 @@ instead of restating its caps or its edits-after policy list.
 from __future__ import annotations
 
 # Version sync constant - updated only on releases
-CURRENT_VERSION = "3.21.0"
+CURRENT_VERSION = "3.22.0"
 
 # Three literals are load-bearing and pinned here:
 # - the SKILL.md sentence naming `artifacts.plan.charter`
