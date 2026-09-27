@@ -20,8 +20,10 @@
   `references/input-floor.md`。呈現草案前，會先跑過機械式下限檢查
   `scripts/goal_lint.py`——只檢查結構，從不判斷文字是否真的可判定。接著在
   host 接受時啟用原生 Goal；否則明確標示尚未啟用並提供復原操作。Codex
-  已有未完成 Goal 時先執行 `/goal clear` 再重跑 skill；缺少能力時提供一條
-  手動 `/goal` 指令。
+  已有未完成 Goal 時先執行 `/goal clear` 再重跑 skill。Codex 未提供
+  `create_goal` 時，保留完整提示詞供手動使用，並說明 Goal 尚未啟用。
+  Claude Code 未提供 `ProposeGoal`，或原生啟用未成功時，提供一條含完整
+  條件的手動 `/goal` 指令，並說明提交會取代任何現有 Goal。
 
 - **ARC 模式** 產出儲存庫 purpose 產物 `docs/loom/PURPOSE.md` 的
   `Why` 與 `Done when` 草案。這個 skill 本身絕不會寫入該檔案——草案只能
@@ -35,9 +37,9 @@
 
 ## 呼叫
 
-這個 skill 不會自己觸發。它在兩個目標需求已經浮現的地方被點名為可用
-選項：`loom-workflow:handoff` 的 Prepare 模式,以及 `loom-code` 的
-purpose-link 檢查印出的未回答 purpose 訊息。在那裡被點名不等於被呼叫。
+這個 skill 不會自己觸發。它只在一個目標需求已經浮現的地方被點名為可用
+選項：`loom-workflow:handoff` 的 Prepare 模式。在那裡被點名不等於被呼叫；
+使用者必須指名呼叫這個 skill。
 
 ---
 

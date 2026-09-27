@@ -1,8 +1,8 @@
 ---
 name: goal-create
-version: 0.1.0
+version: 0.2.0
 description: |
-  Create a session goal or draft repository purpose. This skill never fires on its own; it must be invoked by name.
+  Create a session goal prompt or draft repository purpose. This skill never fires on its own; it must be invoked by name. Can synthesize a prompt from confirmed intent or spec and activate it through an available native host goal tool; does not operate the Loom workflow.
 ---
 
 # Goal Create
@@ -44,7 +44,12 @@ draft is rewritten to fix what it flagged and the checker is re-run — a
 draft is never shown to the user until it exits 0.
 
 <!-- gate: goal-create.session-activation -->
-After exit 0, show the complete four-field condition in the conversation,
+This skill ends after presenting the prompt and reporting host activation
+or recovery below. It does not invoke Loom stations or change their workflow
+rules. The prompt may refer its executor to an existing workflow; executing
+that prompt is outside this skill.
+
+After exit 0, show the complete four-field condition in one copyable code block,
 then use the capability actually exposed by the current host. Invoking the
 named `goal-create SESSION` mode is explicit authorization to replace any
 active Goal with this condition, without a separate replacement confirmation.
@@ -53,7 +58,10 @@ changed from the user's words, use the host's confirmation path.
 
 ### Codex activation
 
-Call `create_goal` with the complete four-field condition as its objective.
+When the current session exposes `create_goal`, call it with the complete
+four-field condition as its objective. If `create_goal` is unavailable, say
+the Goal is not active and keep the complete prompt available for manual use;
+do not emulate activation through another process or tool.
 The authoritative schema and unfinished-Goal refusal are in OpenAI Codex's
 [`spec.rs`](https://github.com/openai/codex/blob/main/codex-rs/ext/goal/src/spec.rs)
 and [`tool.rs`](https://github.com/openai/codex/blob/main/codex-rs/ext/goal/src/tool.rs).
@@ -63,6 +71,12 @@ unfinished Goal makes `create_goal` refuse replacement, preserve it and tell
 the user to run `/goal clear`, then run `goal-create SESSION` again.
 
 ### Claude Code activation
+
+`/goal` availability does not imply that `ProposeGoal` is exposed to the
+agent. Use the native proposal path only when the current session's tools
+actually include it. Otherwise go directly to the manual fallback below.
+Do not ask the user to change internal settings or feature flags to expose
+the tool, or infer availability from SDK types or installed package code.
 
 When the interactive session exposes `ProposeGoal`, derive a proposal of at
 most 500 characters from the complete condition just shown. It preserves the
@@ -85,7 +99,7 @@ authorizes replacing it without a separate replacement confirmation.
 
 When the current session does not expose `ProposeGoal`, or native activation
 returns a non-success result, say the Goal is not active and user action is
-required. Emit one copyable `/goal <condition>` command containing the
+required. Emit one copyable `/goal <condition>` command in a code block containing the
 complete condition, not the compact proposal, and disclose that submitting it
 replaces any active Goal. Do not invoke `claude -p`, inject keystrokes, launch
 another process, or install a custom Stop hook.
@@ -120,6 +134,12 @@ deleted the other two offer sites with the skills that carried them.
 When `loom-design:capture-intent` is already running for the same work,
 that station keeps discovery and this skill runs only after its intent
 exists, rather than competing for the same turn.
+
+A user may also invoke this skill by name later in a run — after a
+confirmed intent or spec — to synthesize the prompt from those artifacts
+and attempt native host activation. That is the same manual
+invocation, not a new offer site: this skill is still never invoked by
+anything other than a user.
 
 ## See also
 

@@ -4,7 +4,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.3.3 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.4.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 這是什麼
 
@@ -114,7 +114,7 @@ flowchart TD
 | [`distill-sessions`](skills/distill-sessions/) | 挖掘過去的 Claude Code 與 Codex session（可用時加上 `/insights` facets），產出依 skill 排序的 friction 與可審閱的 SKILL.md 提案。 |
 | [`independent-advisor`](skills/independent-advisor/) | 對 plan 或決策，向另一個 executor——另一個 model tier、更高的 effort，或另一家廠商——取得 second opinion。花錢或把資料送出本機需經同意。 |
 | [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。plain-language reference 收錄寫法指引、選項判斷規則、八種對話情境表格與表格規則，另有軟體、設計、商業三份表格集。不用於 Obsidian 筆記。 |
-| [`goal-create`](skills/goal-create/) | 只在指名呼叫時執行。SESSION 起草四欄 goal condition，在 host 接受時啟用，否則誠實提供復原操作；ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
+| [`goal-create`](skills/goal-create/) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
 Loom 的契約計入其中八個工具。`goal-create` 與 `dbt-model-style` 是 Loom
 流程之外的 standalone skill，`loom-memory` 與入口路由則維持在契約之外。

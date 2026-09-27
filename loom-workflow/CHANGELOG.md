@@ -4,6 +4,21 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.4.0] — 2026-09-27 — goal-create prompt sources and execution boundary
+
+- `goal-create` (SESSION) can synthesize its four-field prompt from confirmed
+  intent/spec artifacts while preserving intent constraints. Those artifacts
+  are optional; conversation evidence remains sufficient.
+- The skill ends after presenting the prompt and reporting native host goal
+  activation or recovery. It does not invoke Loom stations or alter their
+  workflow rules. Native activation remains supported when the host exposes
+  the tool; an unavailable Codex tool leaves the prompt ready for manual use.
+- Always show the complete prompt in a copyable code block. Claude Code's
+  `/goal` command does not establish agent access to `ProposeGoal`: when that
+  tool is absent, immediately provide the complete manual command without
+  suggesting internal settings or feature-flag changes.
+- Bumped the skill to 0.2.0.
+
 ## [5.3.3] — 2026-09-25 — tests live in loom-workflow/tests
 
 Patch. File locations only; no behaviour or test assertion changes.

@@ -4,7 +4,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.3.3 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.4.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## What it is
 
@@ -124,7 +124,7 @@ Twelve skills: eleven tools and one optional router.
 | [`distill-sessions`](skills/distill-sessions/) | Mine past Claude Code and Codex sessions, with `/insights` facets when available, for friction ranked by skill and reviewable SKILL.md proposals. |
 | [`independent-advisor`](skills/independent-advisor/) | Get a second opinion on a plan or decision from a different executor: another model tier, higher effort or another vendor. Spending money or sending material off the machine needs approval. |
 | [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
-| [`goal-create`](skills/goal-create/) | Invoked by name only. SESSION drafts a four-field goal condition and activates it when accepted by the host, with an honest recovery action otherwise; ARC drafts the repository purpose (`Why` / `Done when`). |
+| [`goal-create`](skills/goal-create/) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
 
 Loom's contract counts eight of these tools. `goal-create` and
 `dbt-model-style` are standalone skills outside the Loom flow, and

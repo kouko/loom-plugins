@@ -1,0 +1,49 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-27-goal-create-prompt-boundary",
+  "content_digest": "46d4cdd37de1b409f9476386b65d91641736c40e",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/goal-create/test_skill_md.py -q",
+      "artifact": "loom-workflow/tests/goal-create/test_skill_md.py",
+      "result": "pass",
+      "command_digest": "551cbf3fb155f912b3ab4f0d12db39c2414fa709890d611c2d09ff70f0729c2d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "closing_skill_review",
+      "vendor": "codex",
+      "model": "host-inherited-unobserved",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "closing_code_review",
+      "vendor": "codex",
+      "model": "host-inherited-unobserved",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "tests",
+          "anchor": "loom-workflow/tests/goal-create/test_skill_md.py:335",
+          "text": "Clean-clone evidence does not capture repeatable SESSION-generated prompt and fallback output.",
+          "fix": "Record a clean-context SESSION case with a confirmed artifact and unavailable host tool."
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

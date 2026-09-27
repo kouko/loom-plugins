@@ -25,7 +25,11 @@ never by the agent guessing from context.
   whether the prose actually reads as decidable. It then activates the native
   Goal when accepted or labels the recovery as not yet active. In Codex, an
   unfinished Goal requires `/goal clear` and then running the skill again;
-  other unavailable paths provide one manual `/goal` command.
+  if Codex does not expose `create_goal`, the complete prompt remains
+  available for manual use and the Goal is not active. When Claude Code does
+  not expose `ProposeGoal` or native activation returns a non-success result,
+  the skill provides one complete manual `/goal` command and states that
+  submitting it replaces any active Goal.
 
 - **ARC mode** produces a draft `Why` and `Done when` for the
   repository's purpose artifact, `docs/loom/PURPOSE.md`. It never writes
@@ -43,10 +47,9 @@ are read from; this file does not restate it.
 ## Invocation
 
 This skill never fires on its own. It is named as an available option at
-two points where the need for a goal is already visible:
-`loom-workflow:handoff`'s Prepare mode, and the unanswered-purpose
-message `loom-code`'s purpose-link check prints. Naming it there does not
-invoke it.
+one point where the need for a goal is already visible:
+`loom-workflow:handoff`'s Prepare mode. Naming it there does not invoke it;
+the user invokes the skill by name.
 
 ---
 
