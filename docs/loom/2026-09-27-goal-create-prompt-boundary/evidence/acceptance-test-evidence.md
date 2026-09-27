@@ -94,3 +94,23 @@ Tested on 2026-09-27 in a fresh local clone at `eef456ba` (`/private/tmp/loom-go
 - 9: carried over — the Claude unavailable-tool fallback is untouched.
 - 10: carried over — the Claude non-success fallback is untouched.
 - 11: carried over — the skill's stop boundary and execution scope are untouched.
+
+## Re-run on 2026-09-27, at `1b44f358`
+
+- Fresh setup: `git clone --local --no-hardlinks --no-checkout . /private/tmp/loom-goal-acceptance-round1-20260927`, then `git -C /private/tmp/loom-goal-acceptance-round1-20260927 checkout --detach 1b44f358aee4871491afb0faf1cd0cd8e51c7c01`; status was clean. `agy plugin validate ./loom-workflow` returned exit 0, `skills: 12 processed`, and `hooks: 1 processed`.
+- Fix inspected: `git diff 4086cc02..1b44f358` changed the `goal-create.session-activation` gate markers in SKILL.md and input-floor.md, the English/Japanese/Traditional Chinese skill-local README recovery descriptions, and matching tests. It did not change the Codex or Claude tool branches, the checker implementation, ARC, or release metadata.
+- Focused re-test: `/Users/kouko/.conda/envs/dbt-redshift/bin/python -m pytest -q loom-workflow/tests/goal-create/test_skill_md.py loom-workflow/tests/goal-create/test_input_floor.py loom-workflow/tests/goal-create/test_goal_shape.py loom-workflow/tests/goal-create/test_goal_lint.py loom-workflow/tests/goal-create/test_goal_lint_languages.py loom-workflow/tests/goal-create/test_readmes.py loom-workflow/tests/scripts/test_release_metadata.py loom-workflow/tests/test_plugin_manifest.py` returned `57 passed in 0.28s`.
+- Direct checker re-test: A sample containing all four fields, a stated constraint, a backticked `test -f report.md` verification, and a 20-turn bound exited 0 with only `UNCHECKED [condition-currently-false]`. An Outcome-only sample exited 1 and named the three missing fields. These are structural samples, not a generated user prompt.
+- The old two-offer-site claim remains absent from all three skill-local READMEs; each still names only `loom-workflow:handoff`. The prior nit stays closed. No native Goal call was made. The full package suite is planned for `finalize-review`, not run here.
+- Station-supplied dismissed important finding: a deterministic pytest invocation of this Markdown/LLM skill and real host API would need a new execution harness and still could not establish real host activation. Controlled local dogfood was reported but has no committed clean-host assertion. This limits the evidence to structural/focused checks, so relevant verdicts remain `partly` or `not verified`.
+- 1: re-tested — inspected the confirmed-artifact and conversation-source clauses, preserved Constraints, all four fields, lint output, and the gate-covered no-execution boundary; focused tests passed, but no prompt was produced by a host agent.
+- 2: re-tested — checked Codex success, unavailable-tool, and unfinished-Goal refusal instructions and the clarified README recovery wording; focused tests passed, but no real `create_goal` result was obtained.
+- 3: re-tested — checked the exposed-tool proposal, pending-confirmation, unavailable-tool, non-success, full manual command, replacement warning, and no-settings-change paths plus all three READMEs; focused tests passed, but no Claude host result was obtained.
+- 4: carried over — ARC, shape, lint/refusal, and version metadata did not change; the focused tests also passed during this round.
+- 5: carried over — missing-slot refusal rule and its test did not change.
+- 6: re-tested — validated a four-field sample, the confirmed-artifact source rule, constraint retention, and instruction to show the full prompt before activation; no host-rendered prompt was captured.
+- 7: carried over — host-success/refusal branch did not change; README changes concern Codex missing-tool recovery, not this available-tool flow.
+- 8: carried over — Claude proposal and pending-confirmation branch did not change; README changes concern missing-tool or non-success recovery.
+- 9: re-tested — checked the unavailable-tool fallback, complete `/goal` command, replacement disclosure, and no internal-settings advice in the skill and READMEs; no real missing-tool response was rendered.
+- 10: re-tested — checked the non-success fallback, inactive status, complete manual command, and replacement disclosure in the skill and READMEs; no real refusal output was captured.
+- 11: re-tested — checked the newly gate-covered skill exit, no Loom-station invocation, prompt display before host result, and no goal work in this acceptance run; no real host output was captured.
