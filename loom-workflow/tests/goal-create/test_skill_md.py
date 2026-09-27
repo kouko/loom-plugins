@@ -301,11 +301,16 @@ def test_session_confirmation_and_replacement_follow_user_intent():
 
 def test_session_falls_back_without_starting_another_process():
     session_body = _section(_read_skill_md(), "SESSION mode")
+    normalized = _normalize_ws(session_body)
 
     assert "does not expose `ProposeGoal`" in session_body
     assert "one copyable `/goal <condition>` command" in session_body
     assert "replaces any active Goal" in session_body
     assert "Do not invoke `claude -p`" in session_body
+    assert "`/goal` availability does not imply that `ProposeGoal` is exposed" in normalized
+    assert "Do not ask the user to change internal settings or feature flags" in normalized
+    assert "Otherwise go directly to the manual fallback below" in normalized
+    assert "one copyable code block" in normalized
 
 
 def test_external_goal_tool_contracts_are_cited_at_the_call_site():
@@ -316,6 +321,26 @@ def test_external_goal_tool_contracts_are_cited_at_the_call_site():
     assert "/codex-rs/ext/goal/src/tool.rs" in session_body
     assert "https://unpkg.com/@anthropic-ai/claude-code@" in session_body
     assert "/sdk-tools.d.ts" in session_body
+
+
+def test_session_stops_after_prompt_and_host_activation():
+    session_body = _normalize_ws(_section(_read_skill_md(), "SESSION mode"))
+    assert "ends after presenting the prompt and reporting host activation" in session_body
+    assert "does not invoke Loom stations or change their workflow rules" in session_body
+
+
+def test_codex_activation_requires_an_exposed_tool():
+    session_body = _normalize_ws(_section(_read_skill_md(), "SESSION mode"))
+    assert "When the current session exposes `create_goal`" in session_body
+    assert "If `create_goal` is unavailable" in session_body
+    assert "keep the complete prompt available for manual use" in session_body
+
+
+def test_artifact_input_is_optional_and_preserves_intent_constraints():
+    text = _normalize_ws((SKILL_DIR / "references" / "input-floor.md").read_text())
+    assert "Confirmed artifacts are optional input sources, not prerequisites" in text
+    assert "intent's Constraints" in text
+    assert "does not create or confirm those artifacts" in text
 
 
 def test_arc_points_at_the_purpose_template_without_restating_it():

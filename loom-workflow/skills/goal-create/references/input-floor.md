@@ -21,6 +21,15 @@ come from):
 - **Wanted difference** — what must become true instead. This is the change
   the run exists to produce, not the direction it should move in.
 
+Confirmed artifacts are optional input sources, not prerequisites. When
+available, `docs/loom/intent/<change-id>.md` supplies the recorded current
+state, Proposed outcome and Acceptance; `docs/loom/<change-id>/spec.md` adds
+confirmed detail. Preserve the intent's Constraints when using either source.
+Check recorded current-state claims against available evidence before using
+them. Without these files, use conversation evidence under the same two-slot
+rule. This skill does not create or confirm those artifacts, and reading them
+does not authorize execution or publication.
+
 ## 2 — Slot-to-field mapping
 
 Each input slot feeds exactly one field of the four-field goal shape:
