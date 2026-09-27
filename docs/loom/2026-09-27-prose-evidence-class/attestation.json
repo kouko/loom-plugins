@@ -1,0 +1,62 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-27-prose-evidence-class",
+  "content_digest": "d4df70e50715d0f9ddb33367da6dc68c8b59a8e6",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-27-prose-evidence-class/evidence/probes/test_exemption_mixed_delta.py",
+      "artifact": "docs/loom/2026-09-27-prose-evidence-class/evidence/probes/test_exemption_mixed_delta.py",
+      "result": "pass",
+      "command_digest": "cf38618e29abb51d0c2c7bd047ab8879019b24ba00fd432afb15729f6f2f39fb"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-27-prose-evidence-class/evidence/probes/test_exemption_non_test_py_under_evidence.py",
+      "artifact": "docs/loom/2026-09-27-prose-evidence-class/evidence/probes/test_exemption_non_test_py_under_evidence.py",
+      "result": "pass",
+      "command_digest": "d907efea85d77aec4d703b064da6ccac476f1a6539d162a2cc380ff3fff8d20e"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-27-prose-evidence-class/evidence/probes/test_exemption_py_under_change_store.py",
+      "artifact": "docs/loom/2026-09-27-prose-evidence-class/evidence/probes/test_exemption_py_under_change_store.py",
+      "result": "pass",
+      "command_digest": "f603520e78a82c7ce334f95860af4ebd152add9fad51270fb201d4c99d96d412"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-27-prose-evidence-class/evidence/probes/test_exemption_sh_under_evidence.py",
+      "artifact": "docs/loom/2026-09-27-prose-evidence-class/evidence/probes/test_exemption_sh_under_evidence.py",
+      "result": "pass",
+      "command_digest": "62de2eb3ff6ae08cb85e781cf0157934f4b45297c438ce29e6721567d7a4da73"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-A",
+      "vendor": "none",
+      "model": "sonnet",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-B",
+      "vendor": "none",
+      "model": "sonnet",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

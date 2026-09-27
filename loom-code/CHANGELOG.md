@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.22.0] — 2026-09-27 — Make prose evidence a definition in the tests lens, exempt docs/release tasks from per-task test pairs, and consolidate version sync to one constant.
+
+Minor: rule text and station guidance changed.
+
+- Prose changes are now a named evidence class in the tests lens, reviewed semantically rather than by literal sensor.
+- Tasks whose files are all docs/release-classed are exempt from the per-task positive/negative test pair requirement; change-level coverage at intake is unchanged.
+- Version sync consolidated to a single CURRENT_VERSION constant in the version-sync test.
+
 ## [3.21.0] — 2026-09-26 — preserve step and architecture boundaries
 
 Minor: honor omitted documents throughout the stations without predicting

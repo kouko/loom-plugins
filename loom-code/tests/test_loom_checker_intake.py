@@ -1569,3 +1569,224 @@ def test_empty_ui_flows_still_blocked(tmp_path: Path, label: str) -> None:
     result = ui_flows_verdict(tmp_path, EMPTY_FLOW_FORMS[label])
     assert result.returncode == 1, result.stdout
     assert "spec.ui-flows-recompute" in blocked_rules(result)
+
+
+# --- intake.test-case-pair: prose/release exemption (W0-01) --------------------
+
+def test_prose_only_task_with_doc_files_is_exempt_from_test_pairs(tmp_path: Path) -> None:
+    """A1 positive: a task with only low-risk doc files passes without test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Docs**  after: —  acceptance: 1\n"
+        "- Files: `README.md`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — docs only.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
+def test_prose_only_task_with_change_store_files_is_exempt(tmp_path: Path) -> None:
+    """A1 positive: a task with only change-store files passes without test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Evidence**  after: —  acceptance: 1\n"
+        "- Files: `docs/loom/2026-09-02-a/evidence.md`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — evidence only.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
+def test_prose_only_task_with_evidence_store_files_is_exempt(tmp_path: Path) -> None:
+    """A1 positive: a task with only evidence-store files passes without test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Evidence**  after: —  acceptance: 1\n"
+        "- Files: `docs/loom/evidence/notes.md`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — evidence only.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
+def test_prose_only_task_with_release_metadata_is_exempt(tmp_path: Path) -> None:
+    """A1 positive: a task with only release metadata passes without test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Release**  after: —  acceptance: 1\n"
+        "- Files: `loom-code/plugin.json, loom-code/CHANGELOG.md`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — release metadata.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
+def test_behaviour_task_with_py_file_requires_test_pairs(tmp_path: Path) -> None:
+    """A2 positive: a task touching a .py file still requires test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Code**  after: —  acceptance: 1\n"
+        "- Files: `first.py`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — fixture.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_behaviour_task_with_sh_file_requires_test_pairs(tmp_path: Path) -> None:
+    """A2 positive: a task touching a .sh file still requires test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Script**  after: —  acceptance: 1\n"
+        "- Files: `script.sh`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — fixture.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_task_with_test_file_requires_test_pairs(tmp_path: Path) -> None:
+    """A2 boundary: a task touching a test file still requires test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Test**  after: —  acceptance: 1\n"
+        "- Files: `tests/test_something.py`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — fixture.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_task_with_protected_part_requires_test_pairs(tmp_path: Path) -> None:
+    """A2 boundary: a task touching a protected part (skills/) still requires test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Skill**  after: —  acceptance: 1\n"
+        "- Files: `skills/my-skill/SKILL.md`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — fixture.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_mixed_docs_and_code_task_requires_test_pairs(tmp_path: Path) -> None:
+    """Boundary: a task with both docs and code files still requires test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Mixed**  after: —  acceptance: 1\n"
+        "- Files: `README.md, first.py`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — fixture.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_protected_name_file_requires_test_pairs(tmp_path: Path) -> None:
+    """Boundary: a task touching a protected name (skill.md) still requires test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 SkillDoc**  after: —  acceptance: 1\n"
+        "- Files: `skill.md`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — fixture.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_py_under_change_store_requires_test_pairs(tmp_path: Path) -> None:
+    """A .py file under docs/loom/<change-id>/ should NOT be exempt from test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        f"**W0-01 Behavior Change**  after: —  acceptance: 1\n"
+        f"- Files: `docs/loom/{CHANGE}/behavior_change.py`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — should require test pair.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_sh_under_evidence_requires_test_pairs(tmp_path: Path) -> None:
+    """A .sh file under docs/loom/evidence/ should NOT be exempt from test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        "**W0-01 Setup Script**  after: —  acceptance: 1\n"
+        "- Files: `docs/loom/evidence/setup_test_env.sh`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — should require test pair.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_mixed_docs_and_py_under_change_store_requires_test_pairs(tmp_path: Path) -> None:
+    """A task with both .md and .py files under change store should NOT be exempt."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        f"**W0-01 Mixed Task**  after: —  acceptance: 1\n"
+        f"- Files: `docs/loom/{CHANGE}/README.md, docs/loom/{CHANGE}/processor.py`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — should require test pair due to .py file.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.test-case-pair" in blocked_rules(result)
+
+
+def test_md_under_change_store_still_exempt(tmp_path: Path) -> None:
+    """A .md file under docs/loom/<change-id>/ should still be exempt from test pairs."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    write_plan(
+        repo,
+        f"**W0-01 Docs**  after: —  acceptance: 1\n"
+        f"- Files: `docs/loom/{CHANGE}/README.md`\n"
+        "- Test: \n"
+        "- Risk: agent-decided — docs only.\n",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
