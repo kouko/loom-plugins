@@ -1,6 +1,6 @@
 # Goal-create prompt and native activation boundary — spec
 intent: 2026-09-27-goal-create-prompt-boundary@edc69163
-confirmed-behavior: 2026-09-27 @7c8532a
+confirmed-behavior: 2026-09-27 @0fde006
 pre-build-review: required — goal-create's user-facing invocation and activation contract changes across two hosts
 
 ## Requirements
@@ -12,7 +12,7 @@ REQ-2 — Codex native result
   IF the current Codex session exposes create_goal THEN goal-create shall submit the complete condition and report activation only from host success; otherwise it shall retain the complete condition and report the actual inactive or refused status → Acceptance #2
 
 REQ-3 — Claude Code proposal or manual command
-  IF the current Claude Code session exposes ProposeGoal THEN goal-create may propose the condition; otherwise it shall display one complete copyable /goal command, disclose replacement of an existing goal, and avoid advice to change internal settings → Acceptance #3
+  IF the current Claude Code session exposes ProposeGoal and a faithful proposal fits THEN goal-create may propose the condition, keeping pending confirmation distinct from activation; otherwise, including a non-success proposal result, it shall display one complete copyable /goal command, report inactive status, disclose replacement of an existing goal, and avoid advice to change internal settings → Acceptance #3
 
 REQ-4 — Existing modes and release parity
   WHERE goal-create is invoked, the existing ARC draft path and SESSION's four-field lint and refusal contract shall remain available, and release metadata shall agree on one version → Acceptance #4
@@ -34,7 +34,7 @@ REQ-4 — Existing modes and release parity
 
 - Forward: loom-workflow/skills/goal-create/SKILL.md, SESSION mode and activation gate.
 - Reverse: loom-workflow/skills/using-loom-workflow/SKILL.md, explicit goal-create routing; loom-workflow/skills/handoff/SKILL.md, optional offer.
-- Error: loom-workflow/skills/goal-create/SKILL.md, Codex and Claude missing-tool recovery text; prior working-tree proposal attempted to drive Loom stations.
+- Error: loom-workflow/skills/goal-create/SKILL.md, Codex and Claude missing-tool or non-success recovery text.
 - Data: loom-workflow/skills/goal-create/references/goal-shape.md, four-field condition; references/input-floor.md, two slots and provenance.
 - Boundary: loom-workflow/skills/goal-create/SKILL.md, skill exit after presenting prompt and host result; Loom stations remain separately owned.
 
@@ -47,4 +47,5 @@ REQ-4 — Existing modes and release parity
 | Codex 工具可用 | 在有原生工具的工作階段指名呼叫 | 工具成功後才看到「已啟用」；失敗時看到原因及未啟用狀態 |
 | Claude 提議工具可用 | 在有原生工具的互動工作階段指名呼叫 | 收到提議與主機的確認／啟用結果，待確認不被說成已啟用 |
 | Claude 提議工具不可用 | 在一般工作階段指名呼叫 | 看到完整可複製的 `/goal` 指令與取代現有目標的提醒，不被要求修改內部設定 |
+| Claude 提議未成功 | 原生提議失敗，或無法在長度限制內完整表達 | 看到未啟用狀態、完整可複製的 `/goal` 指令，以及取代現有目標的提醒 |
 | 目標內容未完成 | 提示詞已顯示、尚未手動提交指令 | 仍可複製提示詞；skill 不替使用者執行其中的工作 |
