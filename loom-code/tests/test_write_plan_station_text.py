@@ -1,13 +1,18 @@
 """W2-01 -- write-plan's station text and the plan template cite the plan
 row of the artifact charter (`contract/manifest.yaml`, `artifacts.plan.charter`)
 instead of restating its caps or its edits-after policy list.
-
-Three literals are load-bearing and pinned here: the SKILL.md sentence
-naming `artifacts.plan.charter`, the `loom_checker.py plan
-docs/loom/<change-id>/plan.md` command line the station runs before the
-plan commit, and the template's one-sentence spec-change-path comment.
 """
+
 from __future__ import annotations
+
+# Version sync constant - updated only on releases
+CURRENT_VERSION = "3.21.0"
+
+# Three literals are load-bearing and pinned here:
+# - the SKILL.md sentence naming `artifacts.plan.charter`
+# - the `loom_checker.py plan docs/loom/<change-id>/plan.md` command line
+#   the station runs before the plan commit
+# - the template's one-sentence spec-change-path comment
 
 import json
 import re
@@ -475,10 +480,10 @@ def test_current_release_metadata_is_synchronized() -> None:
     agy_manifest = json.loads(
         (REPO / "loom-code/plugin.json").read_text(encoding="utf-8")
     )
-    assert claude_manifest["version"] == "3.21.0"
-    assert codex_manifest["version"] == "3.21.0"
-    assert agy_manifest["version"] == "3.21.0"
-    assert "## [3.21.0]" in changelog
+    assert claude_manifest["version"] == CURRENT_VERSION
+    assert codex_manifest["version"] == CURRENT_VERSION
+    assert agy_manifest["version"] == CURRENT_VERSION
+    assert f"## [{CURRENT_VERSION}]" in changelog
 
 
 @pytest.mark.parametrize(
