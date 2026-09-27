@@ -13,32 +13,32 @@ charter: 1.1
 
 ### Wave 0 — mechanism text and single version check
 
-**W0-01 intake.test-case-pair: docs/release exemption and change-level pair ownership**  after: —  acceptance: 1, 2
+**W0-01 intake.test-case-pair: per-task prose/release exemption**  after: —  acceptance: 1, 2
 - Files: `loom-code/scripts/loom_checker/rules.py`, `loom-code/scripts/loom_checker/rule_checks/intake.py`, `loom-code/skills/write-plan/SKILL.md`, `loom-code/tests/test_loom_checker_intake.py`
 - Test: A1 positive: prose-only-task-plan-passes-intake; negative: protected-task-without-pair-blocked. A2 positive: behaviour-task-pair-required; boundary: mixed-docs-code-task-keeps-pair.
-- Risk: Rewrites the pair recompute in intake.py; existing test_loom_checker_intake.py cases preserved, coverage widened with exemption paths. Exemption reuses reviewers.py path sets. agent-decided.
+- Risk: Exemption branch only; existing change-level coverage at intake.py:465-473 retained unchanged. Reuses reviewers.py path sets. agent-decided.
 
 **W0-02 tests lens names the prose evidence class**  after: —  acceptance: 3
 - Files: `loom-code/skills/closing-review/references/lenses.md`, `loom-code/tests/test_reviewer_mechanical_evidence.py`, `loom-code/tests/test_test_budget_text.py`
 - Test: A3 positive: tests-dimension-names-prose-evidence; negative: behaviour-changes-still-require-executable-evidence.
 - Risk: Definition row plus one explicit sentence that lens definition rows are reviewer-executed and checker-unrecomputed. Two existing pin files narrowed then extended same commit. agent-decided.
 
-**W0-03 one release-metadata test replaces hardcoded version pins**  after: —  acceptance: 4
-- Files: `loom-code/tests/test_release_metadata.py`, `loom-code/tests/test_write_plan_station_text.py`
-- Test: A4 positive: single-test-covers-manifests-changelog-readmes; negative: stale-or-split-version-fails.
-- Risk: Removes two hardcoded-version tests (test_write_plan_station_text.py), coverage preserved and widened (readmes join). Keeps a hardcoded CURRENT constant — it is the no-bump enforcer. agent-decided.
+**W0-03 one CURRENT_VERSION constant replaces hardcoded version pins**  after: —  acceptance: 4
+- Files: `loom-code/tests/test_write_plan_station_text.py`
+- Test: A4 positive: constant-covers-manifests-changelog-readmes; negative: stale-or-split-version-fails.
+- Risk: Refactors existing file only, no new test file; keeps a hardcoded CURRENT constant (the no-bump enforcer). agent-decided.
 
 ### Wave 1 — release
 
 **W1-01 loom-code minor release 3.22.0**  after: W0-01, W0-02, W0-03  acceptance: 4, 5
-- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `loom-code/tests/test_release_metadata.py`
+- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A4 positive: metadata-current-at-3.22.0; boundary: no-bump-detected. A5 positive: package-suite-green; boundary: rule-population-still-26.
 - Risk: Minor: rule text and station guidance change, no new mechanism. Release edits only the metadata test's CURRENT line. agent-decided.
 
 ## Simplicity check
 - Reuse reviewers.py path sets for the exemption instead of a new classifier — taken
-- Mirror loom-workflow's release-metadata test shape instead of a consistency-only check — taken
-- Drop change-level pair aggregation, keep per-task pairs — declined: the user confirmed change-level ownership; intake.py already parses every task, so aggregation is small
+- Mirror loom-workflow's release-metadata test shape instead of a consistency-only check — declined: plan-lens review found A4 is satisfied by a CURRENT_VERSION constant in the existing test file; no new file, constant is the single location
+- Drop change-level pair aggregation, keep per-task pairs — taken: intake.py:465-473 already implements change-level coverage; only the per-task exemption is new
 - Make the lens carve-out part of the existing tests row, not a new dimension — taken
 
 ## Questions asked
