@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# concern: double separator / empty separator case
 """Adversarial test: double separator (two separators in a row).
 The second separator should be flagged as having no content line after it.
 """

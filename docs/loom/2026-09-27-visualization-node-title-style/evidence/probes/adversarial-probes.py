@@ -1,3 +1,4 @@
+# concern: width-budget wrapping at width=1, empty-body ValueError, embedded-newline body, separator cases, backward-compat centered labels
 import sys
 from pathlib import Path
 sys.path.append("/Users/kouko/.herdr/worktrees/loom-plugins/visionazation-node-title-style/loom-workflow/skills/loom-visualization/scripts")

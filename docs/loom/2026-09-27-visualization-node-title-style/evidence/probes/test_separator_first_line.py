@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# concern: separator replacing title / missing title case
 """Adversarial test: separator as first interior line (replacing title).
 This should be flagged as an unstructured multi-line box but currently is not.
 """
@@ -28,7 +29,7 @@ def test_separator_replaces_title():
     print(f"\nIssues found: {issues}")
 
     # Check if the expected issue is present
-    expected_msg = "box interior with two or more content lines in title part and no separator row between them"
+    expected_msg = "separator row with no content line before it (missing title)"
     if any(expected_msg in issue[2] for issue in issues):
         print("\n✓ EXPECTED: Issue correctly flagged")
         return True
