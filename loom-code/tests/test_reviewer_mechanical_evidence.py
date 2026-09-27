@@ -136,6 +136,23 @@ def test_suite_ban_holds_in_every_round() -> None:
                 assert not _ROUND_SCOPED.search(sentence), f"{path.name}: {sentence!r}"
 
 
+def test_prose_evidence_sentence_present() -> None:
+    """A3 positive: tests-dimension-names-prose-evidence"""
+    lenses_text = _flat(LENSES_PATH)
+    assert "prose artifacts' qualified evidence = the checker's recomputed rules, fresh-context review" in lenses_text
+    assert "a prose-only change needs no new executable test file" in lenses_text
+
+
+def test_prose_does_not_eliminate_behavior_evidence() -> None:
+    """A3 negative: behaviour-changes-still-require-executable-evidence"""
+    lenses_text = _flat(LENSES_PATH)
+    # The lens must not say prose needs no behavior evidence at all
+    assert "prose needs no behavior evidence" not in lenses_text
+    assert "prose-only change needs no behavior evidence" not in lenses_text
+    # Behavior changes still require executable evidence (the original RED→GREEN sentence remains)
+    assert "Every shipped behaviour has focused RED→GREEN evidence" in lenses_text
+
+
 _SUITE = re.compile(r"package suite|adversarial programs?\b", re.IGNORECASE)
 _NEGATION = re.compile(r"\b(never|not|no)\b", re.IGNORECASE)
 _DOWNGRADE_FOR_NOT_RUNNING = re.compile(
