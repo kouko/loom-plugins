@@ -43,10 +43,9 @@ are read from; this file does not restate it.
 ## Invocation
 
 This skill never fires on its own. It is named as an available option at
-two points where the need for a goal is already visible:
-`loom-workflow:handoff`'s Prepare mode, and the unanswered-purpose
-message `loom-code`'s purpose-link check prints. Naming it there does not
-invoke it.
+one point where the need for a goal is already visible:
+`loom-workflow:handoff`'s Prepare mode. Naming it there does not invoke it;
+the user invokes the skill by name.
 
 ---
 

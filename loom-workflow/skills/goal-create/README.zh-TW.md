@@ -35,9 +35,9 @@
 
 ## 呼叫
 
-這個 skill 不會自己觸發。它在兩個目標需求已經浮現的地方被點名為可用
-選項：`loom-workflow:handoff` 的 Prepare 模式,以及 `loom-code` 的
-purpose-link 檢查印出的未回答 purpose 訊息。在那裡被點名不等於被呼叫。
+這個 skill 不會自己觸發。它只在一個目標需求已經浮現的地方被點名為可用
+選項：`loom-workflow:handoff` 的 Prepare 模式。在那裡被點名不等於被呼叫；
+使用者必須指名呼叫這個 skill。
 
 ---
 

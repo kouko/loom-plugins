@@ -12,6 +12,7 @@ produces (both of its two draft field labels), and must point at SKILL.md
 rather than restate its contract.
 """
 
+import re
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parents[2] / "skills" / "goal-create"
@@ -100,3 +101,13 @@ def test_tri_language_discovery_promises_activation_and_honest_fallback():
     assert "`/goal clear`" in README_EN.read_text(encoding="utf-8")
     assert "`/goal clear`" in README_JA.read_text(encoding="utf-8")
     assert "`/goal clear`" in README_ZHTW.read_text(encoding="utf-8")
+
+
+def test_invocation_documents_only_the_handoff_offer_site():
+    for label, path in READMES.items():
+        text = path.read_text(encoding="utf-8")
+        invocation = re.split(r"^## (?:Invocation|呼び出し|呼叫)\s*$", text, flags=re.M)[1]
+        invocation = invocation.split("\n## ", 1)[0]
+        references = set(re.findall(r"`(loom-[^`]+)`", invocation))
+        assert references == {"loom-workflow:handoff"}, label
+        assert "purpose-link" not in text, label
