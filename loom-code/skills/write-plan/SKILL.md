@@ -358,10 +358,7 @@ this when coverage was dropped.
   Acceptance lines it owns. Each referenced number appears in the task's
   Test line as `A<n> positive: <case-id>; negative: <case-id>` or with
   `boundary:` instead. Empty cases, nonexistent references, and Acceptance
-  lines owned by no task are blocked by `intake.test-case-pair`. A task whose
-  Files are all docs/release-classed (low-risk docs outside protected parts,
-  change/evidence stores, or release metadata at plugin root) is exempt from
-  the Test pair requirement; any code, test, or protected-path file keeps it.
+  lines owned by no task are blocked by `intake.test-case-pair`. Files limited to docs/release-classed (low-risk docs outside protected parts, change/evidence stores, or plugin-root release metadata) exempt Test pair requirement; otherwise it applies.
 - Each task carries three one-line fields -- Files, Test and Risk -- whose
   content kinds and word caps are set by the plan row of the artifact
   charter (`contract/manifest.yaml`, `artifacts.plan.charter`, rendered by

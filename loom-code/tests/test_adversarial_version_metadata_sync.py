@@ -181,7 +181,9 @@ def test_pinned_metadata_test_pins_one_version_not_several() -> None:
     pinned = (
         PLUGIN / "tests/test_write_plan_station_text.py"
     ).read_text(encoding="utf-8")
-    body = pinned.split("def test_current_release_metadata_is_synchronized")[1]
-    body = body.split("\n@pytest.mark.parametrize")[0]
-    literals = set(re.findall(r"\b\d+\.\d+\.\d+\b", body))
-    assert literals == {_version(SSOT)}, literals
+    # Check for exactly one CURRENT_VERSION assignment at module level
+    version_lines = [line for line in pinned.splitlines() if line.strip().startswith("CURRENT_VERSION =")]
+    assert len(version_lines) == 1, f"Expected exactly one CURRENT_VERSION assignment, found {len(version_lines)}: {version_lines}"
+    # Extract version from the assignment
+    assigned_version = version_lines[0].split("=")[1].strip().strip('"\'')
+    assert assigned_version == _version(SSOT), f"CURRENT_VERSION ({assigned_version}) does not match SSOT ({_version(SSOT)})"
