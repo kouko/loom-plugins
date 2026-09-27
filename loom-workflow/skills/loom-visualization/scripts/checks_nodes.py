@@ -150,12 +150,31 @@ def _check_box_interior(lines: list[str], box_top: int, box_bottom: int) -> list
 
     has_seen_separator = False
     seen_content_in_title = False
+    prev_line_was_separator = False
 
     for line_idx in range(box_top + 1, box_bottom):
         line = lines[line_idx]
 
         if _is_separator(line):
+            # Defect 1: separator as first interior line (no title content before it)
+            if not has_seen_separator and not seen_content_in_title:
+                issues.append((
+                    line_idx + 1,
+                    _get_display_col_of_separator(line),
+                    "separator row with no content line before it (missing title)"
+                ))
+
+            # Defect 2: two consecutive separators (no content between them)
+            if prev_line_was_separator:
+                issues.append((
+                    line_idx + 1,
+                    _get_display_col_of_separator(line),
+                    "separator row with no content line after it before box's bottom border"
+                ))
+
             has_seen_separator = True
+            prev_line_was_separator = True
+
             # Check if this separator is immediately followed by bottom border (no content after)
             # Find next content line or bottom border
             found_content_after = False
@@ -174,6 +193,7 @@ def _check_box_interior(lines: list[str], box_top: int, box_bottom: int) -> list
                 ))
 
         elif _is_content_line(line):
+            prev_line_was_separator = False
             if not has_seen_separator:
                 # We are in the Title part. Only ONE content line allowed.
                 if seen_content_in_title:
@@ -188,6 +208,7 @@ def _check_box_interior(lines: list[str], box_top: int, box_bottom: int) -> list
                 pass
 
         elif _is_blank_interior(line):
+            prev_line_was_separator = False
             pass
 
     return issues
