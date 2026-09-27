@@ -598,26 +598,27 @@ def test_gen_arch_multiline_component_grows_band_taller():
     assert len(widths) == 1, f"multiline lines misaligned: {sorted(widths)}"
 
     # 2. The first band gains extra rows. Single-line band = 5 lines
-    #    [top, name, separator, row, bottom]. The first band has a 2-line name
-    #    (+1 name line) and a 2-line tallest cell (+1 row line), so it is
-    #    5 + 1 + 1 = 7 lines. Total = 7 + 5 = 12 lines.
-    assert len(lines) == 12, f"expected 12 lines (7 + 5), got {len(lines)}"
+    #    [top, name, component_separator, row, bottom]. The first band has a 2-line name
+    #    (title + separator + body = +2 lines) and a 2-line tallest cell (+1 row line),
+    #    so it is 5 + 2 + 1 = 8 lines. Total = 8 + 5 = 13 lines.
+    assert len(lines) == 13, f"expected 13 lines (8 + 5), got {len(lines)}"
 
-    # 3. The multi-line NAME renders across two centered lines. Both name
-    #    fragments must appear as their own lines.
-    name_lines = [ln for ln in lines[:7] if "資料層" in ln or "Data Layer" in ln]
-    assert any("資料層" in ln for ln in name_lines), "first name line missing"
-    assert any("Data Layer" in ln for ln in name_lines), "second name line missing"
-    # They are on distinct lines (not concatenated onto one).
-    assert not any(
-        "資料層" in ln and "Data Layer" in ln for ln in name_lines
-    ), "name lines should not be concatenated"
+    # 3. The multi-line NAME renders as title, separator, and body.
+    #    Title line (index 1), separator line (index 2), body line (index 3).
+    assert "資料層" in lines[1], "first name line missing"
+    assert "Data Layer" in lines[3], "second name line missing"
+    # Title line should be left-aligned (starts with "│ ")
+    assert lines[1].startswith("│ "), "title line should be left-aligned"
+    # Body line should be left-aligned (starts with "│ ")
+    assert lines[3].startswith("│ "), "body line should be left-aligned"
+    # Separator line should be the structured node separator
+    assert "├────────────┤" in lines[2], "separator line missing"
 
     # 4. The multi-line CELL top-aligns: "快取" appears on the first row line,
     #    "Cache" on the second; the single-line "DB" sits beside "快取" on the
     #    first row line and the blank below it on the second.
-    #    Band layout: [top, name0, name1, separator, row0, row1, bottom].
-    row0, row1 = lines[4], lines[5]
+    #    Band layout: [top, title, separator, body, component_separator, row0, row1, bottom].
+    row0, row1 = lines[5], lines[6]
     assert "快取" in row0 and "DB" in row0, f"row0 missing top cell text: {row0!r}"
     assert "Cache" in row1, f"row1 missing continuation text: {row1!r}"
     assert "DB" not in row1, f"single-line DB should not repeat on row1: {row1!r}"

@@ -189,11 +189,34 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
         top = "┌" + "─" * interior + "┐"
         name = layer["name"]
         if isinstance(name, str):
-            # String name: current behavior (centered)
-            name_lines = [
-                "│" + _center(nl, interior) + "│"
-                for nl in split_lines(name)
-            ]
+            # String name: if contains \n, treat as structured node (first line
+            # title, remaining lines body); otherwise centered label.
+            if '\n' in name:
+                lines_split = split_lines(name)
+                title = lines_split[0]
+                body = lines_split[1:]
+                if not body:
+                    raise ValueError("Body cannot be empty for structured node from string with \\n")
+
+                # Add title line (left-aligned)
+                name_lines = [
+                    "│ " + title + " " * (interior - display_width(title) - 1) + "│"
+                ]
+
+                # Add separator line
+                name_lines.append("├" + "─" * interior + "┤")
+
+                # Add body lines (left-aligned, wrapped at interior - 1)
+                for body_line in body:
+                    wrapped_lines = wrap_label(body_line, interior - 1)
+                    for wrapped_line in wrapped_lines:
+                        name_lines.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
+            else:
+                # String name without \n: current behavior (centered)
+                name_lines = [
+                    "│" + _center(nl, interior) + "│"
+                    for nl in split_lines(name)
+                ]
         else:
             # Dict name: structured node with title and body
             title = name["title"]
