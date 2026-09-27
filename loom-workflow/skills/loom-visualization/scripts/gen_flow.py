@@ -22,7 +22,7 @@ display_width, so CJK (2 cells) and ASCII (1 cell) labels align.
 
 import pathlib
 import sys
-from typing import Union
+from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
@@ -41,7 +41,7 @@ def _center(label: str, interior: int) -> str:
     return " " * left + label + " " * right
 
 
-def render_flow(steps: list[Union[str, dict]]) -> str:
+def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> str:
     """Render steps as vertically-stacked boxes joined by a down-arrow.
 
     Each step can be either:
@@ -60,26 +60,37 @@ def render_flow(steps: list[Union[str, dict]]) -> str:
     if not steps:
         return ""
 
-    # Interior width = widest label line (a step may carry embedded
-    # newlines, rendered one body line per physical line) + one padding
-    # space on each side.
-    # For structured nodes (including strings with \n treated as structured),
-    # we need to consider:
-    # - Title line width
-    # - Each body line width (after wrapping)
+    # Set budget: use provided width or default 40
+    budget = width if width is not None else 40
+
+    # Interior width = max over steps of max(display_width(title), min(natural_body_width, budget)) + 2
     def get_step_width(step: Union[str, dict]) -> int:
         if isinstance(step, str):
             # For string steps, if it contains \n, treat as structured node
             if '\n' in step:
                 lines = split_lines(step)
                 if lines:
-                    return display_width(lines[0])
-                return 0
+                    title_width = display_width(lines[0])
+                    # For body lines, we need the max width of unwrapped body lines
+                    if len(lines) > 1:
+                        natural_body_width = max(display_width(line) for line in lines[1:])
+                    else:
+                        natural_body_width = 0
+                else:
+                    title_width = 0
+                    natural_body_width = 0
+                return max(title_width, min(natural_body_width, budget))
             else:
                 # For string steps without \n, consider all lines from split_lines
                 return max(display_width(line) for line in split_lines(step))
         else:  # dict with title and body
-            return display_width(step["title"])
+            title_width = display_width(step["title"])
+            # Calculate natural body width (unwrapped)
+            if step["body"]:
+                natural_body_width = max(display_width(line) for line in step["body"])
+            else:
+                natural_body_width = 0  # Will be caught by empty body validation later
+            return max(title_width, min(natural_body_width, budget))
 
     interior = max(
         get_step_width(step) for step in steps
@@ -120,10 +131,10 @@ def render_flow(steps: list[Union[str, dict]]) -> str:
                 # Add separator line
                 block.append("├" + "─" * interior + "┤")
 
-                # Add body lines (left-aligned, wrapped)
+                # Add body lines (left-aligned, wrapped at interior - 1)
                 for body_line in body:
-                    # Wrap the body line at interior width
-                    wrapped_lines = wrap_label(body_line, interior)
+                    # Wrap the body line at interior - 1 (true content budget)
+                    wrapped_lines = wrap_label(body_line, interior - 1)
                     for wrapped_line in wrapped_lines:
                         # Each wrapped line gets one leading space, then content, then padded to interior
                         block.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
@@ -146,10 +157,10 @@ def render_flow(steps: list[Union[str, dict]]) -> str:
             # Add separator line
             block.append("├" + "─" * interior + "┤")
 
-            # Add body lines (left-aligned, wrapped)
+            # Add body lines (left-aligned, wrapped at interior - 1)
             for body_line in body:
-                # Wrap the body line at interior width
-                wrapped_lines = wrap_label(body_line, interior)
+                # Wrap the body line at interior - 1 (true content budget)
+                wrapped_lines = wrap_label(body_line, interior - 1)
                 for wrapped_line in wrapped_lines:
                     # Each wrapped line gets one leading space, then content, then padded to interior
                     block.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")

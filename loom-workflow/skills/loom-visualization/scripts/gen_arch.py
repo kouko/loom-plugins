@@ -21,7 +21,7 @@ and ASCII (1 cell) labels align in a monospace terminal.
 
 import pathlib
 import sys
-from typing import Union
+from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
@@ -63,7 +63,7 @@ def _row_natural_width(components: list[str]) -> int:
     return cells_width + seams
 
 
-def render_arch(layers: list[dict]) -> str:
+def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
     """Render layers as vertically-stacked independent boxes.
 
     `layers` is a list of dicts. Each dict has:
@@ -84,17 +84,40 @@ def render_arch(layers: list[dict]) -> str:
     if not layers:
         return ""
 
+    # Set budget: use provided width or default 40
+    budget = width if width is not None else 40
+
     def _name_width(name: Union[str, dict]) -> int:
         if isinstance(name, str):
             return max(display_width(ln) for ln in split_lines(name))
         else:  # dict with title and body
             return display_width(name["title"])
 
-    # Shared outer interior width = max over all layers of the layer's
-    # natural component-row width and its name display width.
+    def _body_width(name: Union[str, dict]) -> int:
+        if isinstance(name, str):
+            return 0
+        else:  # dict with title and body
+            if not name["body"]:
+                return 0
+            return max(display_width(ln) for ln in name["body"])
+
+    # Shared outer interior width = max over all layers of:
+    # max(display_width(name), min(_row_natural_width(component), budget))
+    def get_layer_width(layer: dict) -> int:
+        name_width = _name_width(layer["name"])
+        # For dict name, apply budget to body width; for string name, body width is 0
+        body_width = _body_width(layer["name"])
+        bounded_body_width = min(body_width, budget) if layer["name"] and isinstance(layer["name"], dict) else 0
+        # For dict name, the effective name width is max(title width, bounded body width)
+        if isinstance(layer["name"], dict):
+            effective_name_width = max(name_width, bounded_body_width)
+        else:
+            effective_name_width = name_width
+        component_width = _row_natural_width(layer["components"])
+        return max(effective_name_width, component_width)
+
     interior = max(
-        max(_row_natural_width(layer["components"]), _name_width(layer["name"]))
-        for layer in layers
+        get_layer_width(layer) for layer in layers
     )
 
     lines: list[str] = []
@@ -188,10 +211,10 @@ def render_arch(layers: list[dict]) -> str:
             # Add separator line
             name_lines.append("├" + "─" * interior + "┤")
 
-            # Add body lines (left-aligned, wrapped)
+            # Add body lines (left-aligned, wrapped at interior - 1)
             for body_line in body:
-                # Wrap the body line at interior width
-                wrapped_lines = wrap_label(body_line, interior)
+                # Wrap the body line at interior - 1 (true content budget)
+                wrapped_lines = wrap_label(body_line, interior - 1)
                 for wrapped_line in wrapped_lines:
                     # Each wrapped line gets one leading space, then content, then padded to interior
                     name_lines.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
