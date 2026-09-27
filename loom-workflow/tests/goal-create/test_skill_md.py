@@ -1,3 +1,4 @@
+# concern: unavailable Codex Goal tool must not be treated as native activation.
 """
 Structural tests for SKILL.md, the skill's entry point (Task 5).
 
