@@ -21,7 +21,7 @@ come from):
 - **Wanted difference** — what must become true instead. This is the change
   the run exists to produce, not the direction it should move in.
 
-<!-- gate: goal-create.artifact-input -->
+<!-- gate: goal-create.session-activation -->
 Confirmed artifacts are optional input sources, not prerequisites. When
 available, `docs/loom/intent/<change-id>.md` supplies the recorded current
 state, Proposed outcome and Acceptance; `docs/loom/<change-id>/spec.md` adds

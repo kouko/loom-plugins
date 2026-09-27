@@ -269,6 +269,14 @@ def test_session_activation_rules_are_one_registered_gate():
     ):
         assert obligation in gate
 
+    input_gate = _gate(
+        (SKILL_DIR / "references" / "input-floor.md").read_text(),
+        "goal-create.session-activation",
+    )
+    assert "Confirmed artifacts are optional input sources" in input_gate
+    assert "Preserve the intent's Constraints" in input_gate
+    assert "does not authorize execution or publication" in input_gate
+
 
 def test_session_uses_a_faithful_bounded_claude_proposal():
     session_body = _section(_read_skill_md(), "SESSION mode")
@@ -339,7 +347,7 @@ def test_codex_activation_requires_an_exposed_tool():
 def test_artifact_input_is_optional_and_preserves_intent_constraints():
     text = _gate(
         (SKILL_DIR / "references" / "input-floor.md").read_text(),
-        "goal-create.artifact-input",
+        "goal-create.session-activation",
     )
     assert "Confirmed artifacts are optional input sources, not prerequisites" in text
     assert "intent's Constraints" in text
