@@ -4,6 +4,15 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.5.0] — 2026-09-27 — structured nodes in flow, arch and tree generators
+
+- Flow, arch and tree generators now use structured nodes with title, separator
+  and body fields instead of a single string.
+- The `loom-visualization` skill gains a `node-structure` reference and
+  validation check; templates adopt the new node input shape.
+- Mermaid flowchart templates use the div-label structure with explicit
+  title/separator/body rendering.
+
 ## [5.4.0] — 2026-09-27 — goal-create prompt sources and execution boundary
 
 - `goal-create` (SESSION) can synthesize its four-field prompt from confirmed
