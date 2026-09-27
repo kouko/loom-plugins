@@ -21,10 +21,11 @@ and ASCII (1 cell) labels align in a monospace terminal.
 
 import pathlib
 import sys
+from typing import Union
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines
+from width import display_width, split_lines, wrap_label
 
 
 def _center(label: str, interior: int) -> str:
@@ -65,17 +66,32 @@ def _row_natural_width(components: list[str]) -> int:
 def render_arch(layers: list[dict]) -> str:
     """Render layers as vertically-stacked independent boxes.
 
-    `layers` is [{"name": str, "components": [str, ...]}, ...]. Returns
-    the multi-line diagram as a single string (no trailing newline).
+    `layers` is a list of dicts. Each dict has:
+    - "components": [str, ...] (list of component strings, unchanged)
+    - "name": either a string (current behavior: centered) or a dict with
+      "title" (str) and "body" (list of str) for structured nodes
+
+    For string name: current behavior (centered label)
+    For dict name:
+      - Title line is left-aligned
+      - Followed by a separator row "├─────┤"
+      - Followed by left-aligned body lines (one leading space + content)
+      - Body lines are wrapped at the interior width
+      - Empty body raises ValueError
+
+    Returns the multi-line diagram as a single string (no trailing newline).
     """
     if not layers:
         return ""
 
+    def _name_width(name: Union[str, dict]) -> int:
+        if isinstance(name, str):
+            return max(display_width(ln) for ln in split_lines(name))
+        else:  # dict with title and body
+            return display_width(name["title"])
+
     # Shared outer interior width = max over all layers of the layer's
     # natural component-row width and its name display width.
-    def _name_width(name: str) -> int:
-        return max(display_width(ln) for ln in split_lines(name))
-
     interior = max(
         max(_row_natural_width(layer["components"]), _name_width(layer["name"]))
         for layer in layers
@@ -148,10 +164,38 @@ def render_arch(layers: list[dict]) -> str:
             return left + "".join(chars) + right
 
         top = "┌" + "─" * interior + "┐"
-        name_lines = [
-            "│" + _center(nl, interior) + "│"
-            for nl in split_lines(layer["name"])
-        ]
+        name = layer["name"]
+        if isinstance(name, str):
+            # String name: current behavior (centered)
+            name_lines = [
+                "│" + _center(nl, interior) + "│"
+                for nl in split_lines(name)
+            ]
+        else:
+            # Dict name: structured node with title and body
+            title = name["title"]
+            body = name["body"]
+
+            # Validate body is not empty
+            if not body:
+                raise ValueError("Body cannot be empty for structured node")
+
+            # Add title line (left-aligned)
+            name_lines = [
+                "│ " + title + " " * (interior - display_width(title) - 1) + "│"
+            ]
+
+            # Add separator line
+            name_lines.append("├" + "─" * interior + "┤")
+
+            # Add body lines (left-aligned, wrapped)
+            for body_line in body:
+                # Wrap the body line at interior width
+                wrapped_lines = wrap_label(body_line, interior)
+                for wrapped_line in wrapped_lines:
+                    # Each wrapped line gets one leading space, then content, then padded to interior
+                    name_lines.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
+
         separator = border("├", "┬", "┤")
         row_lines = [
             "│" + "│".join(grid[r] for grid in cell_line_grids) + "│"
