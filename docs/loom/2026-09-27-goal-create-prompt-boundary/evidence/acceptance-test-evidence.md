@@ -76,3 +76,21 @@ Tested on 2026-09-27 in a fresh local clone at `eef456ba` (`/private/tmp/loom-go
 - How I tried it: Ran `test_session_stops_after_prompt_and_host_activation`; inspected the exit boundary. No generated goal was executed in this acceptance run.
 - What came back: The test passed, and this run did no goal work. No real SESSION output was displayed, so the copyable prompt portion is unverified.
 - Evidence: `loom-workflow/skills/goal-create/SKILL.md:46-49`, `loom-workflow/tests/goal-create/test_skill_md.py:326-329`.
+
+## Re-run on 2026-09-27, at `5523b3c0`
+
+- Fresh setup: `git clone --local --no-hardlinks --no-checkout . /private/tmp/loom-goal-acceptance-rerun-20260927`, then `git -C /private/tmp/loom-goal-acceptance-rerun-20260927 checkout --detach 5523b3c05ecb5b96df97f5351a443e4f58281ef2`; status was clean. `agy plugin validate ./loom-workflow` again returned exit 0, `skills: 12 processed`, and `hooks: 1 processed`.
+- Fix inspected: `git diff 1ae51680..5523b3c0` changed only the Invocation section of the English, Japanese, and Traditional Chinese skill-local READMEs plus `test_readmes.py`. There were no runtime skill, reference, checker, host-activation, ARC, or release-metadata changes. Thus none of the 11 Acceptance/UI-flow rows is affected.
+- Focused recheck: `/Users/kouko/.conda/envs/dbt-redshift/bin/python -m pytest -q loom-workflow/tests/goal-create/test_readmes.py loom-workflow/tests/goal-create/test_skill_md.py` returned `18 passed in 0.24s`. A search of the three skill-local READMEs found no old two-site or `purpose-link` claim; each now names only `loom-workflow:handoff` and direct user invocation. The prior nit is closed.
+- The full package suite remains delegated to `finalize-review`; no new suite result is claimed. No real Goal tool was called on this re-run.
+- 1: carried over — the fix changes invocation documentation only; source selection, prompt construction, constraint retention, and stop boundary are untouched.
+- 2: carried over — the Codex tool branch and its tests are untouched.
+- 3: carried over — the Claude proposal and manual fallback branches are untouched.
+- 4: carried over — ARC, goal shape, lint/refusal, plugin version, changelog, and release metadata are untouched; the README invocation fix does not change those surfaces.
+- 5: carried over — the missing-input refusal rule and its test are untouched.
+- 6: carried over — the drafting, validation, and prompt-display rules are untouched.
+- 7: carried over — the Codex success/refusal branch is untouched, and no real Goal call was made.
+- 8: carried over — the Claude proposal and pending-confirmation branch is untouched, and no live proposal was made.
+- 9: carried over — the Claude unavailable-tool fallback is untouched.
+- 10: carried over — the Claude non-success fallback is untouched.
+- 11: carried over — the skill's stop boundary and execution scope are untouched.
