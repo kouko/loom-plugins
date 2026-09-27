@@ -70,6 +70,27 @@ def test_fix_adds_at_most_one_test():
 def test_no_new_gate_marker():
     count = sum(p.read_text(encoding="utf-8").count("<!-- gate:")
                 for p in (IMPLEMENTER, ADVERSARIAL, LENSES))
-    # lenses.md already holds two: the charter.plan-omission-narrow marker and
-    # the prose that explains the `<!-- gate: <id> -->` form.
-    assert count == 2
+    # lenses.md holds: the charter.plan-omission-narrow marker (1), the prose in
+    # the skill-lens section explaining the "<!-- gate: <id> -->" form (1), and
+    # the carve-out sentence in the tests dimension referencing the same syntax (1).
+    # Total 3; this test ensures no new *actual* gate markers are added beyond these.
+    assert count == 3
+
+
+def test_tests_dimension_names_prose_evidence():
+    """A3 positive: tests-dimension-names-prose-evidence"""
+    text = LENSES.read_text(encoding="utf-8")
+    row = next(line for line in text.splitlines() if line.startswith("| tests |"))
+    assert "prose artifacts' qualified evidence = the checker's recomputed rules, fresh-context review" in row
+    assert "a prose-only change needs no new executable test file" in row
+
+
+def test_behaviour_changes_still_require_executable_evidence():
+    """A3 negative: behaviour-changes-still-require-executable-evidence"""
+    text = LENSES.read_text(encoding="utf-8")
+    row = next(line for line in text.splitlines() if line.startswith("| tests |"))
+    # The lens must not say prose needs no behavior evidence at all
+    assert "prose needs no behavior evidence" not in row
+    assert "prose-only change needs no behavior evidence" not in row
+    # Behavior changes still require executable evidence (the original RED→GREEN sentence remains)
+    assert "Every shipped behaviour has focused RED→GREEN evidence" in row

@@ -51,7 +51,9 @@ RULES: list[tuple[str, str]] = [
     (
         "intake.test-case-pair",
         "Every task in a newly authored plan names the intent Acceptance lines it owns, "
-        "and each named line has positive plus negative or boundary test cases.",
+        "and each named line has positive plus negative or boundary test cases, unless "
+        "the task's Files are all docs/release-classed (low-risk docs outside protected "
+        "parts, change/evidence stores, or release metadata at plugin root).",
     ),
     (
         "intake.spec-ready",
