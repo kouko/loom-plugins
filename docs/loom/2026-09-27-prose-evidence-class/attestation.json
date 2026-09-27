@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-27-prose-evidence-class",
-  "content_digest": "eb57e0adc5424a411c4b9c3d1b0bfdcbd492bdec",
+  "content_digest": "d4df70e50715d0f9ddb33367da6dc68c8b59a8e6",
   "executions": [
     {
       "kind": "package-tests",
