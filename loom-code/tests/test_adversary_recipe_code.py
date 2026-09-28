@@ -12,6 +12,10 @@ to the skill-and-gate recipe or to the shared protocol does not.
 """
 from __future__ import annotations
 
+import re
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 # The reader is `prose_pin`'s, under this module's own name: the protocol's
@@ -76,3 +80,29 @@ def test_procedure_fragments_helper_synthetic() -> None:
 
 def test_procedure_sentence_in_both_files_rejected() -> None:
     assert _procedure_fragments_in_both(ADVERSARY_PROSE, ADVERSARIAL_CODE) == []
+
+
+# --- Adversarial: a kept test that no longer reads what its name says ------
+# concern: dropping a case class row from this recipe must redden the test
+# named for it (test_recipe_names_every_class_to_draw_cases_from, above),
+# not stay green with a stale name. Graduated from W4-01 (2026-09-27
+# prose-pin-stock-cleanup); evidence original kept under that change's
+# evidence/probes/.
+
+
+def test_case_class_check_recipe_row_dropped_goes_red(tmp_path: Path) -> None:
+    """Dropping a case class row from the code recipe must redden the test named for it."""
+    shutil.copytree(ROOT / "loom-code", tmp_path / "loom-code", ignore=shutil.ignore_patterns("__pycache__"))
+    recipe = tmp_path / "loom-code/skills/closing-review/references/adversarial-code.md"
+    text = recipe.read_text(encoding="utf-8")
+    # Bounded by pipes rather than by line: the routing suite's reword guard
+    # can fold this table onto one line, and the row must still be findable.
+    row = re.search(r"\| Boundary \|[^|]*\|", text)
+    assert row, "no Boundary row found in the recipe copy"
+    recipe.write_text(text[: row.start()] + text[row.end() :], encoding="utf-8")
+    run = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
+         "loom-code/tests/test_adversary_recipe_code.py::test_recipe_names_every_class_to_draw_cases_from"],
+        cwd=tmp_path, capture_output=True, text=True,
+    )
+    assert run.returncode != 0, "recipe lost a case class and the test named for it stayed green"
