@@ -1,23 +1,19 @@
-"""Adversarial probes for the loom-visualization description A/B change.
+"""Adversarial probes for the loom-visualization description A/B runner.
 
-Targets: the A/B runner's stream parser and decision rule (ab/run_ab.py), the
-committed tested-hash guard (test_loom_visualization_description_ab.py), and the
-description renderer shared with the budget guard
-(tests/test_loom_skill_description_catalog.py). The renderer probes take the
-renderer, the shipped text and the tested hash from the guard itself, so they
-follow whatever text the guard pins.
+Targets: the A/B runner's stream parser and decision rule (ab/run_ab.py). The
+runner imports the description renderer from
+tests/test_loom_skill_description_catalog.py, so the fixture puts that folder
+on the import path.
 
 The probes are ordinary tests: each asserts the behaviour that should hold, and
-a passing probe records an attack the change survived. The probes that load
-ab/run_ab.py skip when docs/ is absent.
+a passing probe records an attack the change survived. The probes skip when
+docs/ is absent.
 """
 
 from __future__ import annotations
 
 import importlib.util
 import json
-import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -27,9 +23,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CHANGE_DIR = REPO_ROOT / "docs/loom/2026-09-14-loom-visualization-description-trigger"
 RUN_AB = CHANGE_DIR / "ab/run_ab.py"
-GUARD = Path(__file__).resolve().parent / "test_loom_visualization_description_ab.py"
 CATALOG = REPO_ROOT / "tests/test_loom_skill_description_catalog.py"
-SKILL = REPO_ROOT / "loom-workflow/skills/loom-visualization/SKILL.md"
 
 
 def _load(name: str, path: Path):
@@ -47,11 +41,6 @@ def run_ab():
     # was written beside; the catalog test now lives in the root tests/ folder.
     sys.path.insert(0, str(CATALOG.parent))
     return _load("adversarial_run_ab", RUN_AB)
-
-
-@pytest.fixture(scope="module")
-def guard():
-    return _load("adversarial_description_guard", GUARD)
 
 
 def _tool(name: str, inp: object) -> dict:
@@ -145,66 +134,3 @@ def test_report_errored_b_session_holds(run_ab, tmp_path: Path, monkeypatch) -> 
         json.dumps({"type": "result", "is_error": True, "api_error_status": 429, "result": "limit"})])
     run_ab.report(runs=1)
     assert "**SHIP**" not in (tmp_path / "results.md").read_text(encoding="utf-8")
-
-
-# --- tested-hash guard ----------------------------------------------------
-
-
-# The results.md probes (missing, uppercase, duplicate hash line; HOLD decision)
-# were removed: the guard now pins the tested hash as a literal and reads no results.md.
-
-
-def test_guard_edited_skill_description_fails_closed(guard, tmp_path: Path, monkeypatch) -> None:
-    """A one-character edit to the shipped description fails the pinned-hash guard."""
-    text = SKILL.read_text(encoding="utf-8")
-    edited = tmp_path / "SKILL.md"
-    edited.write_text(text.replace("Obsidian notes.", "Obsidian notes!", 1), encoding="utf-8")
-    assert edited.read_text(encoding="utf-8") != text
-    monkeypatch.setattr(guard, "SKILL_PATH", edited)
-    with pytest.raises(AssertionError):
-        guard.test_description_shipped_text_equals_tested_hash()
-
-
-# --- renderer shared by the hash guard and the budget guard ---------------
-
-
-def test_render_description_trailing_whitespace_renders_identically(guard) -> None:
-    """Trailing spaces on the scalar line render to the same text, so the hash is unchanged."""
-    text = SKILL.read_text(encoding="utf-8")
-    head, rest = text.split("\n---\n", 1)
-    padded = head.replace(guard._shipped(), guard._shipped() + "   \t") + "\n---\n" + rest
-    assert guard._render_description(padded) == guard._shipped()
-
-
-def test_render_description_folded_scalar_fails_closed(guard) -> None:
-    """A folded (>) or plain scalar is not silently rendered as an empty description."""
-    for header in ("description: >\n", "description: "):
-        text = f"---\nname: x\n{header}  {guard._shipped()}\n---\nbody\n"
-        with pytest.raises(AssertionError):
-            guard._render_description(text)
-
-
-def test_render_description_blank_line_paragraph_changes_hash(guard) -> None:
-    """Text appended after a blank line inside the block scalar must change the rendered description."""
-    text = SKILL.read_text(encoding="utf-8")
-    edited = text.replace(guard._shipped() + "\n",
-                          guard._shipped() + "\n\n  " + "untested extra words " * 200 + "\n", 1)
-    assert edited != text
-    assert guard._sha256(guard._render_description(edited)) != guard.TESTED_SHA256
-
-
-# --- guard dependency on the A/B runner -----------------------------------
-
-
-def test_guard_without_docs_still_collects(tmp_path: Path) -> None:
-    """The committed guard needs only SKILL.md and the catalog renderer, nothing under docs/."""
-    for rel in ("loom-workflow/tests/scripts/test_loom_visualization_description_ab.py",
-                "loom-workflow/skills/loom-visualization/SKILL.md",
-                "tests/test_loom_skill_description_catalog.py"):
-        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy(REPO_ROOT / rel, tmp_path / rel)
-    proc = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider",
-         "loom-workflow/tests/scripts/test_loom_visualization_description_ab.py"],
-        cwd=tmp_path, capture_output=True, text=True, env={"PYTHONDONTWRITEBYTECODE": "1", "PATH": "/usr/bin:/bin"})
-    assert proc.returncode == 0, proc.stdout[-800:]

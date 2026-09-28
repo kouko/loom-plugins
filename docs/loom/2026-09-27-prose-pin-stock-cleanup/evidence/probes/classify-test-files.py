@@ -307,16 +307,14 @@ MANUAL_OVERRIDES = {
         "pure sentence pin on codex-first-contact.md, named by the mechanisms.yaml "
         "eval of write-plan.codex-installed-hook-trust-boundary; batch 2",
     ),
+    "loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py": (
+        "behavior",
+        "loads run_ab.py and executes parse_stream/decide/report on fixtures",
+    ),
     "loom-workflow/tests/scripts/test_distill_sessions_compaction.py": (
         "gate-eval",
         "needle presence in SKILL.md, some needles phrases (Read it when, No "
         "network calls); named by the mechanisms.yaml eval of distill-sessions; batch 2",
-    ),
-    "loom-workflow/tests/scripts/test_loom_visualization_description_ab.py": (
-        "behavior",
-        "binds the shipped description to the A/B-measured text by hash, and "
-        "test_adversarial_description_ab_probes.py runs it as a program; also "
-        "pins one phrase; batch 2",
     ),
     "loom-workflow/tests/scripts/test_no_retired_loom_code_skill_names.py": (
         "structure",
@@ -329,13 +327,13 @@ MANUAL_OVERRIDES = {
     ),
     "tests/test_kickoff_defaults.py": (
         "structure",
-        "package-tests command value and lock package set, plus phrase pins "
-        "on the trailing note; batch 2",
+        "the lock-file hash graph and the package-tests preset command shape; "
+        "no prose literal",
     ),
     "tests/test_principles_ratification.py": (
         "structure",
-        "one ratified-by line holding the amendment as a `; ` log entry, and "
-        "no pending-ratification line",
+        "exactly one ratified-by line and no pending-ratification line; no "
+        "prose literal",
     ),
 }
 
