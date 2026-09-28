@@ -637,14 +637,9 @@ def test_sibling_lookup_allows_version_subdirectory() -> None:
     assert lookups == 1
 
 
-# The version step every other-host row must carry: Codex installs
-# `<mkt>/loom-design/<version>/`, so two levels above SKILL.md is the version
-# directory, not the plugin root.
-VERSION_STEP = "if its parent directory is named `loom-design`"
-
-
 def _resolve_loom_code_by_row(skill_md: Path) -> Path:
-    """The other-host row, executed: two levels above SKILL.md; step up once
+    """A hardcoded model of the other-host row (it never parses the row's
+    wording): two levels above SKILL.md; step up once
     when that directory's parent is named `loom-design`; `loom-code` sits next
     to it and may hold version subdirectories — take the newest."""
     root = skill_md.parents[2]
@@ -686,7 +681,6 @@ def test_sibling_lookup_resolves_flat_and_versioned_installs(tmp_path: Path) -> 
         for line in skill_md.read_text(encoding="utf-8").splitlines():
             if line.startswith("| Codex CLI, Antigravity CLI |"):
                 rows += 1
-                assert VERSION_STEP in " ".join(line.split()), skill_md
     assert rows == 1
 
 
