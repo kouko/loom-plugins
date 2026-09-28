@@ -23,12 +23,12 @@ charter: 1.1
 - Test: A1 positive: protocol-module-coupling-listed; negative: no-coupling-file-not-listed.
 - Risk: 列出每檔被誰 import／引用；決定每檔刪除或保留的依賴；agent-decided。
 
-### Wave 1 — 無耦合 sentence-pin 整檔刪除
+### Wave 1 — sentence-pin 清理
 
-**W1-01 刪 loom-code 無耦合 sentence-pin 檔（9 檔中 4 檔）**  after: W0-02  acceptance: 2, 4
+**W1-01 裁剪 recipe 系 sentence-pin 檔（4 檔）**  after: W0-02  acceptance: 2, 4
 - Files: loom-code/tests/test_adversary_recipe_code.py, loom-code/tests/test_adversary_recipe_shape.py, loom-code/tests/test_adversary_recipe_skill_gate.py, loom-code/tests/test_adversary_recipe_spec.py
-- Test: A2 positive: files-deleted-and-suite-green; negative: referenced-file-not-deleted. A4 positive: deleted-files-vanish-from-census; boundary: grammar-invariant-file-not-deleted.
-- Risk: recipe 系四檔互為兄弟（import 其他測試非生產碼），全刪無殘留；agent-decided。
+- Test: A2 positive: pinned-sentence-assertions-removed-file-kept; negative: routing-suite-green-after-prune. A4 positive: no-sentence-pin-remains-in-file; boundary: file-still-exists-for-routing.
+- Risk: 此 4 檔是 routing 機制的『每 kind 一測試檔』載體（test_adversary_routing `_reword_candidates`/`recipe_pins` 動態依賴其存在），不能整檔刪；只刪檔內釘住散文句子的斷言與其測試函式，保留檔案、helper、與 routing 需要的 fixture；agent-decided。
 
 **W1-02 刪 loom-code 剩餘 sentence-pin 檔（3 檔）**  after: W0-02  acceptance: 2, 4
 - Files: loom-code/tests/test_agy_tool_mapping.py, loom-code/tests/test_build_recovery_rules.py, loom-code/tests/test_closing_review_recovery_rules.py, loom-code/tests/test_dispatch_profile_contract.py
