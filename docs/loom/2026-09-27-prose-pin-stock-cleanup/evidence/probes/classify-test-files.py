@@ -132,6 +132,42 @@ def code_only(text: str) -> str:
     return "".join(lines)
 
 
+def loop_pin_lines(text: str) -> list[int]:
+    """Lines of the loop-form phrase pin: `for p in (<literals>): assert p in TEXT`.
+
+    The loop runs over a tuple, list or set of string literals, written inline or
+    bound to a module-level name, and at least one literal is a phrase of three
+    or more words (a path, key or token list is not prose). Only a positive `in`
+    on the loop variable counts; `not in` and `.exists()` loops do not.
+    """
+    import ast
+
+    def phrases(node) -> bool:
+        return isinstance(node, (ast.Tuple, ast.List, ast.Set)) and any(
+            isinstance(e, ast.Constant) and isinstance(e.value, str) and len(e.value.split()) >= 3
+            for e in node.elts)
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return []
+    consts = {t.id: n.value for n in tree.body if isinstance(n, ast.Assign)
+              for t in n.targets if isinstance(t, ast.Name)}
+    hits = []
+    for loop in ast.walk(tree):
+        if not (isinstance(loop, ast.For) and isinstance(loop.target, ast.Name)):
+            continue
+        it = consts.get(loop.iter.id) if isinstance(loop.iter, ast.Name) else loop.iter
+        if not phrases(it):
+            continue
+        for node in ast.walk(loop):
+            test = node.test if isinstance(node, ast.Assert) else None
+            if (isinstance(test, ast.Compare) and isinstance(test.left, ast.Name)
+                    and test.left.id == loop.target.id and isinstance(test.ops[0], ast.In)):
+                hits.append(node.lineno)
+    return hits
+
+
 def executes(text: str) -> bool:
     """Execution signal: a program run (subprocess/checker/script) whose result is asserted."""
     has_subprocess_assert = bool(re.search(r'\.(?:stdout|stderr|returncode)|pytest\.raises', text))
@@ -306,10 +342,11 @@ def _classify(path: Path) -> tuple[str, dict]:
                     break
 
     is_behavior = is_behavior_from_execution or is_behavior_from_script_import
+    loop_pin = bool(loop_pin_lines(text))  # the loop form of a phrase pin, which the regex cannot see
     if is_behavior:
         secondary = {}
         # Check for sentence pins (secondary marker for behavior files that also pin prose)
-        secondary["has_pins"] = "yes" if (SENTENCE_ASSERT.search(text) and PROSE_PIN_IMPORT.search(text)) else "no"
+        secondary["has_pins"] = "yes" if (SENTENCE_ASSERT.search(text) and PROSE_PIN_IMPORT.search(text)) or loop_pin else "no"
         # Check if it also has grammar-invariant content (additional marker)
         if GRAMMAR_INVARIANT_CONTENT.search(text):
             secondary["marker"] = "grammar-invariant-content"
@@ -323,15 +360,15 @@ def _classify(path: Path) -> tuple[str, dict]:
     has_prose_pin_import = PROSE_PIN_IMPORT.search(text)
     has_prose_helpers = bool(re.search(r'flat_prose\(|rule_prose\(|split_sentences\(|_flat\(', text))
     has_prose_normalization = bool(re.search(r'_normalize|_flat\s*=', text))
-    has_sentence_assert = SENTENCE_ASSERT.search(text)
+    has_sentence_assert = SENTENCE_ASSERT.search(text) or loop_pin
 
     is_sentence_pin_candidate = has_sentence_assert and (has_prose_pin_import or has_prose_helpers or has_prose_normalization)
 
     # Check for grammar-invariant (when not also sentence-pin, or when sentence-pin doesn't win)
     if is_grammar_invariant_candidate:
         secondary = {}
-        secondary["has_pins"] = "yes" if SENTENCE_ASSERT.search(text) else "no"
-        if SENTENCE_ASSERT.search(text):
+        secondary["has_pins"] = "yes" if has_sentence_assert else "no"
+        if has_sentence_assert:
             secondary["note"] = "mixed-grammar-and-pin"
         return "grammar-invariant", secondary
 
@@ -343,7 +380,7 @@ def _classify(path: Path) -> tuple[str, dict]:
 
     # Check for structure
     if STRUCTURE.search(text):
-        return "structure", {}
+        return "structure", ({"has_pins": "yes"} if loop_pin else {})
 
     return "other", {}
 
@@ -495,6 +532,41 @@ MANUAL_OVERRIDES = {
         "structure",
         "exactly one ratified-by line and no pending-ratification line; no "
         "prose literal",
+    ),
+    # Batch 2 loop-form fix: files whose only loop-form hit is not prose. The
+    # reason names that hit; other asserts in the file are not re-judged here.
+    "loom-code/tests/test_adversary_layout.py": (
+        "behavior",
+        "loop-form hit is SHARED_HEADINGS asserted in the protocol's parsed "
+        "heading list: section headings, not prose",
+    ),
+    "loom-code/tests/test_loom_publish.py": (
+        "behavior",
+        "loop-form hit is CONTEXT_HEADINGS asserted in the reason the checker's "
+        "validate_contextual_pr_body returns: headings in program output",
+    ),
+    "loom-workflow/tests/decision-map/test_skill_doc.py": (
+        "behavior",
+        "loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same "
+        "test also runs",
+    ),
+    "loom-workflow/tests/scripts/test_loom_visualization_compaction.py": (
+        "structure",
+        "loop-form hit is a list of `## ` headings in SKILL.md",
+    ),
+    "tests/test_agy_install_docs.py": (
+        "structure",
+        "loop-form hit is agy and git command shapes in the Antigravity CLI section",
+    ),
+    "loom-design/tests/interface/test_design_system_skill.py": (
+        "structure",
+        "loop-form hit is the eight canonical DESIGN.md section names in the schema",
+    ),
+    "loom-design/tests/architecture-design/test_architecture_skill.py": (
+        "structure",
+        "loop-form hit is the four bold field labels of the schema's Guard "
+        "failure message section (rule id, offending path, conform, change the "
+        "rule and its guard): schema field labels",
     ),
 }
 

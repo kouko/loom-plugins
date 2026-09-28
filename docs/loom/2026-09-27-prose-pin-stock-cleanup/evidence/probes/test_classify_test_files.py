@@ -29,6 +29,26 @@ def test_reader_call_with_no_literal_is_not_a_pin(tmp_path: Path) -> None:
     assert ctf.classify(f)[0] != "sentence-pin"
 
 
+LOOP_HEAD = 'TEXT = open("SKILL.md").read()\nPHRASES = ("the rule is stated here", "x")\n\ndef test_h():\n    assert TEXT.startswith("# T")\n\n'
+
+
+def _pinned(tmp_path: Path, body: str) -> bool:
+    f = tmp_path / "test_loop.py"
+    f.write_text(LOOP_HEAD + body)
+    cls, secondary = ctf.classify(f)
+    return cls == "sentence-pin" or secondary.get("has_pins") == "yes"
+
+
+def test_loop_over_prose_phrases_asserted_in_counts_as_pin(tmp_path: Path) -> None:
+    assert _pinned(tmp_path, "def test_x():\n    for p in PHRASES:\n        assert p in TEXT\n")
+
+
+def test_path_exists_loop_and_absence_loop_are_not_pins(tmp_path: Path) -> None:
+    body = ('def test_x():\n    for p in ("a b c.md", "d e f.md"):\n        assert Path(p).exists()\n'
+            "    for p in PHRASES:\n        assert p not in TEXT\n")
+    assert not _pinned(tmp_path, body)
+
+
 def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tmp_path: Path) -> None:
     root = tmp_path / "loom-code" / "tests"
     root.mkdir(parents=True)
