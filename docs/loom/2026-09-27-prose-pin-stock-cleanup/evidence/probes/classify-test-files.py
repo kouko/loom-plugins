@@ -40,10 +40,31 @@ EXECUTE = re.compile(
 )
 # Simpler approach: just look for subprocess.run AND git/pytest/python3
 # Matches: subprocess.run(["git", ...]), subprocess.run("git ...", ...), etc.
+# But exclude git rev-parse --show-toplevel and --absolute-git-dir (repo root lookup, not behavior)
 # Uses DOTALL flag to match across newlines
-SUBPROCESS_EXECUTE = re.compile(
-    r"subprocess\.(?:run|check_output|Popen|call)"
-    r".*?(?:\[\"git\"|\[\"pytest\"|\[\"python3\"|git\s|pytest|python3|loom_checker\.py|check_)",
+# We use multiple specific patterns to avoid matching commands far from the subprocess call
+SUBPROCESS_GIT_LIST = re.compile(
+    r"subprocess\.(?:run|check_output|Popen|call)\s*\(\s*\[[^]]*?\"git\"(?!.*?(?:rev-parse.*?--show-toplevel|rev-parse.*?--absolute-git-dir))[^]]*?\]",
+    re.DOTALL
+)
+SUBPROCESS_GIT_STR = re.compile(
+    r"subprocess\.(?:run|check_output|Popen|call)\s*\(\s*\"git\s(?!.*?(?:rev-parse.*?--show-toplevel|rev-parse.*?--absolute-git-dir))[^\"]*\"",
+    re.DOTALL
+)
+SUBPROCESS_PYTEST = re.compile(
+    r"subprocess\.(?:run|check_output|Popen|call)\s*\(\s*(\[.*?\"pytest\"|\"pytest\s)",
+    re.DOTALL
+)
+SUBPROCESS_PYTHON = re.compile(
+    r"subprocess\.(?:run|check_output|Popen|call)\s*\(\s*(\[.*?\"python3\"|\"python3\s)",
+    re.DOTALL
+)
+SUBPROCESS_LOOM = re.compile(
+    r"subprocess\.(?:run|check_output|Popen|call)\s*\([^)]*?loom_checker\.py",
+    re.DOTALL
+)
+SUBPROCESS_CHECK = re.compile(
+    r"subprocess\.(?:run|check_output|Popen|call)\s*\([^)]*?check_.*?\.py",
     re.DOTALL
 )
 # Imports production logic (not the prose_pin matcher, not other tests).
@@ -89,11 +110,21 @@ def classify(path: Path) -> tuple[str, dict]:
 
     # Check for behavior FIRST (executes programs or imports production logic)
     # Behavior wins ties per the spec
-    # For SUBPROCESS_EXECUTE, also require assertions on subprocess results
+    # For subprocess calls, also require assertions on subprocess results
     has_subprocess_assert = bool(re.search(r'\.(?:stdout|stderr|returncode)|pytest\.raises', text))
     is_behavior_from_execution = (
         EXECUTE.search(text)
-        or (SUBPROCESS_EXECUTE.search(text) and has_subprocess_assert)
+        or (
+            (
+                SUBPROCESS_GIT_LIST.search(text)
+                or SUBPROCESS_GIT_STR.search(text)
+                or SUBPROCESS_PYTEST.search(text)
+                or SUBPROCESS_PYTHON.search(text)
+                or SUBPROCESS_LOOM.search(text)
+                or SUBPROCESS_CHECK.search(text)
+            )
+            and has_subprocess_assert
+        )
         or PROD_IMPORT.search(text)
     )
 
