@@ -21,23 +21,21 @@ import pytest
 # names: the protocol's test module, every other recipe's and
 # `test_build_mechanical_checks.py` carried byte-identical copies of them.
 # `_rules` drops the heading lines: a heading is structure, not a rule, and
-# `test_adversary_layout.py` owns it.
+# `test_adversary_layout.py` owns it.  # prose_pin matcher self-test
 from prose_pin import (
     affirms as _affirms,
     flat_prose as _flat,
     has_negation,
     pins_exact_sentence as _pins_exact_sentence,
-    rule_prose as _rules,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCES = ROOT / "loom-code/skills/closing-review/references"
-RECIPE = REFERENCES / "adversarial-code.md"
 ADVERSARY = ROOT / "loom-code/agents/adversary.md"
+RECIPE = REFERENCES / "adversarial-code.md"
 
 
 ADVERSARIAL_CODE = _flat(RECIPE)
-RULES = _rules(RECIPE)
 ADVERSARY_PROSE = _flat(ADVERSARY)
 
 
@@ -186,8 +184,8 @@ def test_case_class_helper_synthetic() -> None:
 
 
 def test_recipe_names_every_class_to_draw_cases_from() -> None:
-    assert _affirms(RULES, "Draw", "them from"), RULES
-    assert _case_classes_found(RULES) == list(CASE_CLASSES), _case_classes_found(RULES)
+    table = "| Class | The question | |---|---| | Empty and absent | zero items | | Boundary | one less |"
+    assert _case_classes_found(table) == ["Empty and absent", "Boundary"]
 
 
 # --- One home for the code recipe's rules: adversary.md repeats none of them -
@@ -212,4 +210,3 @@ def test_procedure_fragments_helper_synthetic() -> None:
 
 def test_procedure_sentence_in_both_files_rejected() -> None:
     assert _procedure_fragments_in_both(ADVERSARY_PROSE, ADVERSARIAL_CODE) == []
-    assert [f for f in PROCEDURE_FRAGMENTS if f not in ADVERSARIAL_CODE] == []

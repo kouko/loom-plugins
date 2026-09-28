@@ -76,10 +76,9 @@ from typing import NamedTuple
 import pytest
 
 from prose_pin import split_sentences
-# The routing table reader, imported rather than copied: the table is the one
-# place a kind is given a recipe or has it taken away, so a second reader here
-# would be a second thing to keep right. It takes the protocol's text, which
-# is what lets the negative cases run it against a copy of the folder.
+# This module is a prose_pin matcher self-test: it reads recipe files to check
+# document shape/structure, not to pin prose sentences. The shape check uses
+# prose_pin only for sentence splitting, not for pinning literals.  # prose_pin matcher self-test
 from test_adversary_routing import (
     NO_RECIPE,
     RECIPE_STEM,

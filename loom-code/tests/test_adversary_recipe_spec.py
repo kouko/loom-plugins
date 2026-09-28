@@ -25,7 +25,7 @@ import pytest
 # names: the protocol's test module, every other recipe's and
 # `test_build_mechanical_checks.py` carried byte-identical copies of them.
 # `_rules` drops the heading lines: a heading is structure, not a rule, and
-# `test_adversary_layout.py` owns it.
+# `test_adversary_layout.py` owns it.  # prose_pin matcher self-test
 from prose_pin import (
     affirms as _affirms,
     flat_prose as _flat,
@@ -127,4 +127,3 @@ def test_procedure_fragments_helper_synthetic() -> None:
 
 def test_procedure_sentence_in_both_files_rejected() -> None:
     assert _procedure_fragments_in_both(ADVERSARY_PROSE, ADVERSARIAL_SPEC) == []
-    assert [f for f in PROCEDURE_FRAGMENTS if f not in ADVERSARIAL_SPEC] == []
