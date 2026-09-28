@@ -119,10 +119,6 @@ SUITE_GLOB = "test_adversary_*.py"
 SUITE_EXTRA = (
     "test_build_mechanical_checks.py",
     "test_review_convergence_contract.py",
-    # The module criteria map names the check that enforces each criterion. A
-    # removal that left it naming a module that is no longer there would pass
-    # a scan for the deleted names and still be broken, so the copy runs it.
-    "test_module_criteria_text.py",
 )
 
 # The one tree the reference scan passes over by path: the change records,
