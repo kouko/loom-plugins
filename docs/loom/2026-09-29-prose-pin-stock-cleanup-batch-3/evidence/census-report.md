@@ -346,7 +346,7 @@ Command: `python3 <HEAD wt>/docs/loom/2026-09-27-prose-pin-stock-cleanup/evidenc
 **Negative, deleted-function-tagged-exec-fails.** Two checks, both from `stitch_mappings.py`:
 
 - **Is any deleted function on the base exec list?** None. 25 test functions were deleted across 7 files: `test_references.py` 9 (plus the helpers `polarity_errors` and `_sentence_with`), `test_skill_contract.py` 6, `test_knowledge_triage.py` 4, `test_templates.py` 3, and 1 each in `test_architecture_doc_consumers.py`, `decision-map/test_skill_doc.py` and `test_skill_script_paths.py`. None of the 25 is on the base `--count-exec --list` output.
-- **Was any `exec`-tagged row deleted?** No. `deletion-list.md` tags one row `exec`, `decision-map/test_skill_doc.py::test_v3_public_surface_commands_templates_and_version_are_synchronized`, and gives it the action `prune`. That function is still defined at HEAD, and it still runs the documented commands.
+- **Was any `exec`-tagged row deleted?** No. `deletion-list.md` tags two rows `exec`, `decision-map/test_skill_doc.py::test_v3_public_surface_commands_templates_and_version_are_synchronized` and `tests/test_loom_plugin_install_layout.py::test_isolated_loom_plugins_are_standalone_and_compose_by_public_contract` (added in W3-01), and gives both the action `prune`. Both functions are still defined at HEAD and still run their programs.
 
 ## Known limits
 
