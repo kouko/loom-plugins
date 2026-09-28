@@ -18,7 +18,10 @@ python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-te
 |---|---|---|---|---|---|---|
 | base `5704cc23`, batch-2 classifier | 0 | 0 | 66 | 0 | 19 | batch-2 report |
 | after W0-01 widened the classifier (`0001ad25` + W0-01) | 9 | 1 | 56 | 0 | 39 | `deletion-list.md` |
-| HEAD (after W1-01 to W1-07 and this task's overrides) | **0** | **0** | **66** | **0** | **22** | this run |
+| after W1-01 to W1-07 and this task's overrides (`37aabc5d`) | **0** | **0** | **66** | **0** | **22** | this run |
+| after W3-01 fixed the output-taint gap (the W3-01 commit) | **0** | **0** | **66** | **0** | **23** | W3-01 run, below |
+
+**W3-01 rerun.** The build adversary found pins the census missed because their markdown read counted as program output: a helper calling `yaml.safe_load` tainted its whole return, and a skill file read from a plugin copy installed under `tmp_path` counted as a temp-dir file. W3-01 changed the detector so that only a parsed value is output, and a plain read of a skill, agent or reference path is prose even under a temp dir. The rerun from a clean worktree of the W3-01 commit, exit 0, printed `{'behavior': 109, 'gate-eval': 0, 'grammar-invariant': 2, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 66}`. Before the prunes, the fixed detector newly flagged exactly 2 files: `loom-workflow/tests/distill-sessions/test_prompts_parseable.py` and `tests/test_loom_plugin_install_layout.py`. Both were pruned (`deletion-list.md`, "W3-01 output-taint fix round") and now carry no pin. The 23rd `has_pins=yes` file is the graduated adversary program `loom-code/tests/test_adversarial_batch3_census_misses.py` (behavior, new row). Its hit is a synthetic test source string that it feeds to the classifier, not prose.
 
 The widened classifier also sees a direct sentence pin: a literal of three or more words asserted against text read from a skill, agent or reference markdown file, with no prose-helper import needed. Program output does not count (`deletion-list.md`, "Widened census"). So this `sentence-pin = 0` covers the direct form that batch 2's did not.
 
@@ -74,13 +77,13 @@ Sources: `mapping-known.md` (W1-01, with this task's fix), `mapping-new-code.md`
 
 **This task's fix to `mapping-known.md`.** The `test_goal_shape.py::test_defines_four_fields_budget_and_surfacing` row listed "the file-pointer rule" among what the function keeps. W1-07 later pruned that regex (`mapping-residual.md`), so the row now says the rule is review-only.
 
-**Rows by kind (61 total):**
+**Rows by kind (67 total, 6 of them from W3-01):**
 
 | kind | rows |
 |---|---|
-| review lens dimension | 36 |
-| kept structural test | 24 |
-| checker rule id | 1 |
+| review lens dimension | 38 |
+| kept structural test | 27 |
+| checker rule id | 2 |
 
 | source | rows |
 |---|---|
@@ -88,16 +91,16 @@ Sources: `mapping-known.md` (W1-01, with this task's fix), `mapping-new-code.md`
 | mapping-new-code | 8 |
 | mapping-new-design | 6 |
 | mapping-new-workflow | 12 |
-| mapping-residual | 8 |
+| mapping-residual | 14 |
 
-**Replacement check.** The throwaway script `stitch_mappings.py` (text below) ran from the HEAD worktree root, with the base `--count-exec --list` output as its second argument. It printed:
+**Replacement check.** The throwaway script `stitch_mappings.py` (text below) ran from the HEAD worktree root, with the base `--count-exec --list` output as its second argument. W3-01 re-ran it unchanged from a clean worktree of its commit. It printed:
 
 ```
-rows: 61
-by kind: {'review lens dimension': 36, 'kept structural test': 24, 'checker rule id': 1}
+rows: 67
+by kind: {'review lens dimension': 38, 'kept structural test': 27, 'checker rule id': 2}
 deleted defs in changed test files: 27 (test functions: 25 )
 deleted test functions on the base exec list: 0 []
-deletion-list rows tagged exec: 1 ; of them deleted at HEAD: 0
+deletion-list rows tagged exec: 2 ; of them deleted at HEAD: 0
 problems: 0
 ```
 
@@ -305,12 +308,18 @@ for p in problems:
 | mapping-residual | `test_goal_shape.py::test_constraints_carries_the_standing_decision_rule` (pruned: `does not pre-decide`, `run's to make`, `by default`) | Constraints stops leaving undecided choices to the run, or SESSION mode stops emitting the entry | skill lens, `omission`; the same function keeps the section anchor `## 2 — \`Constraints\``, the terms `search`/`decide`/`record`/`candidate`/`source`/`named file`, the never-ask polarity check, the `derived` tag and the `irreversible`/`outward-facing` boundary | review lens dimension |
 | mapping-residual | `test_goal_shape.py::test_stop_when_is_one_bound_written_as_completion` (pruned: negation bound to `a list of`, `the condition` and `releases the run`) | Stop-when becomes a list of exit conditions, or a bare stop clause counts as the condition being met | skill lens, `inconsistency` (the §4 wording against the evaluator behaviour it describes); the same function keeps the `## 4 — \`Stop-when\`` anchor, `one`/`bound`, the report-completes co-occurrence, `failure report`, `permission`, the never-a-`Stop-when branch` polarity check and the `input-floor` pointer | review lens dimension |
 | mapping-residual | `test_skill_doc.py::test_v3_public_surface_commands_templates_and_version_are_synchronized` (pruned: "machine-measured feasibility", "human evaluates" in `prototype-contract.md`) | the prototype contract stops sorting research from prototype by who judges | the same function keeps the `research` and `prototype` type names and the `ticket_template` grammar `type: <grilling\|research\|prototype>`; the routing criteria's wording goes to skill lens `ambiguity` | kept structural test |
+| mapping-residual | `loom-workflow/tests/distill-sessions/test_prompts_parseable.py::test_failure_prompt_structure` (pruned: "never mention ground truth") | the failure prompt drops its ground-truth-blind hard constraint | skill lens, `omission`; the rule's frontmatter `hard_constraints` list still has to parse and carry its keys (`::test_both_prompt_files_have_required_sections`) | review lens dimension |
+| mapping-residual | `…/test_prompts_parseable.py::test_failure_prompt_structure`, `::test_success_prompt_structure` (pruned: "no more than 3" / "max 3" / "maximum of 3") | a prompt stops capping Memory Items at 3 | skill lens, `omission` | review lens dimension |
+| mapping-residual | `…/test_prompts_parseable.py::test_both_prompts_forbid_orchestrator_memory_reference` (pruned: body "never reference the orchestrator's project memory"; redundant "orchestrator's project memory" alternative) | the body stops restating the no-memory-citation rule | `loom-workflow/tests/distill-sessions/test_prompts_parseable.py::test_both_prompts_forbid_orchestrator_memory_reference`: the frontmatter `hard_constraints` check (`project memory`) stays; the body restatement goes to skill lens `inconsistency` (body against frontmatter) | kept structural test |
+| mapping-residual | `…/test_prompts_parseable.py::test_advisory_prompt_structure` (pruned: "fenced code block", redundant) | the advisory prompt stops documenting code-block wrapping | `loom-workflow/tests/distill-sessions/test_prompts_parseable.py::test_advisory_prompt_structure`: the `code block` term in the same assert already covered every case | kept structural test |
+| mapping-residual | `…/test_prompts_parseable.py::_assert_common_shape`, `::test_success_prompt_structure` (re-anchored: "How the orchestrator dispatches this prompt", "Lean Solution Path") | the dispatch section or the Lean Solution Path section disappears | the same functions, now matching the existing `## How the orchestrator dispatches this prompt` and `## Lean Solution Path output format` headings | kept structural test |
+| mapping-residual | `tests/test_loom_plugin_install_layout.py::test_isolated_loom_plugins_are_standalone_and_compose_by_public_contract` (pruned: "positive" + "negative or boundary", "closing-review station once at branch end" in the installed write-plan `SKILL.md`) | write-plan stops asking for test-case pairs per Acceptance line, or stops placing closing review once at branch end | `intake.test-case-pair` recomputes the pair on every newly authored plan; the branch-end review sentence goes to skill lens `inconsistency` (write-plan against the closing-review station) | checker rule id |
 
 ## A4 — mechanism census
 
 Command: `python3 loom-code/scripts/check_mechanisms.py`, from the HEAD worktree root.
 
-**Exit 0, all clear.** The net mechanism count is **142**, not counting host-hygiene. That matches the base, so it did not grow. By kind: skill 23, checker-rule 26, hook 10 (9 in the net count), contract 64, prose-gate 20. One hook is exempt from the net count: `PostToolUse:Skill:language-anchor.py`.
+**Exit 0, all clear.** The net mechanism count is **142**, not counting host-hygiene. That matches the base, so it did not grow. W3-01 re-ran it from a clean worktree of its commit: exit 0, all clear, 142. By kind: skill 23, checker-rule 26, hook 10 (9 in the net count), contract 64, prose-gate 20. One hook is exempt from the net count: `PostToolUse:Skill:language-anchor.py`.
 
 **`mapping-evals.md` summary (W0-02).** One eval moved. L89 `decision-map` pointed at the whole of `test_decision_map_intent_binding.py`. It now points at `loom-workflow/tests/decision-map/test_start_delivery.py::test_creates_intent_and_lists_it_under_the_criterion`, which runs `start_delivery`. Five evals were checked and kept: L113 `loom-memory`, L50/53/56 the three routers, and L110 `critique`. L219, the visualization-card hook, was also kept, because its subprocess tests stay. Three evals name a single function in a file on the deletion list: L351, L354/L357 (`test_templates.py`) and L222. None of those functions was deleted, so they still resolve.
 
@@ -329,9 +338,10 @@ Command: `python3 <HEAD wt>/docs/loom/2026-09-27-prose-pin-stock-cleanup/evidenc
 | ref | executing test functions |
 |---|---|
 | base `5704cc23` | **1925** (the baseline in `deletion-list.md`) |
-| HEAD | **1925** |
+| `37aabc5d` (W2-01) | **1925** |
+| the W3-01 commit | **1927** |
 
-**Positive, recount-not-below-base.** 1925 ≥ 1925. The two `--list` outputs are identical (`diff` exits 0), so nothing was removed and nothing was added.
+**Positive, recount-not-below-base.** 1925 ≥ 1925 at W2-01: the two `--list` outputs are identical (`diff` exits 0), so nothing was removed and nothing was added. At W3-01, 1927 ≥ 1925. The `diff` against the base list shows only two added lines, the two test functions of the graduated `loom-code/tests/test_adversarial_batch3_census_misses.py`, which call the path-loaded classifier. Nothing was removed. W3-01 changed only the direct-pin detector, not the counting code.
 
 **Negative, deleted-function-tagged-exec-fails.** Two checks, both from `stitch_mappings.py`:
 
@@ -342,5 +352,6 @@ Command: `python3 <HEAD wt>/docs/loom/2026-09-27-prose-pin-stock-cleanup/evidenc
 
 - **Detector threshold.** A literal counts as prose only when it has three or more words that contain a letter. A two-word phrase copied from the prose, or a single term, is invisible to the census. W1-05 and W1-07 found some of these by reading, for example `"do not dispatch"`, and pruned them.
 - **Phrases inside local validators.** `direct_pin_lines` skips literals inside local helpers named `*errors*`, `validate`, `check` and similar, so it does not mistake program output for prose. It also skips `.index()` lookups and sentence regexes. Phrases hidden in these forms are found by reading, not by the script. W1-06 found the `.index()` pins that way, and W1-07 found the pins inside `table_rule_one_errors`, `routing_errors`, `in_cell_errors` and a `required` tuple. `sentence-pin = 0` therefore means no pin the detector can see. It does not mean no pin exists.
+- **Output taint (W3-01).** A json or yaml parse now taints only its parsed value. A helper's returned tuple is read position by position, so a body returned beside parsed frontmatter is prose. A plain read of a skill, agent or reference path is prose even under a temp dir. Two heuristic limits remain, and the `direct_pin_lines` docstring records both. A local helper whose name contains a validator word, such as `_checklist()` matching `check`, is taken as output. A variable name is judged across the whole file, so a name that holds README.md in one test and SKILL.md in another counts as non-prose everywhere.
 - **Kept gate polarity checks.** `test_templates.py` keeps `pinned_sentence_ok` with `MERMAID_PIN`, `TABLE_ASCII_PIN` and `CHAT_PROCEEDS_PIN` (agent-decided). They read only sentences inside the `loom-visualization.mermaid-only-when-confirmed` and `loom-visualization.obsidian-boundary` `<!-- gate: -->` blocks. Those gates' `mechanisms.yaml` evals are in this file: L357 is `test_mermaid_gate_paragraph_present_requires_confirmed_host`, which calls the first two, and L354 is `test_skill_declines_vault_target`. Each check fails a negated sentence, as its own negative example tests show, so it guards the rule's polarity and not only its wording. A rewording of these gate sentences will still turn them red.
 - **Interface string kept.** `decision-map/test_skill_doc.py` keeps `"Use decision-map to start or resume an Outcome Map v3 for this repo." in codex_interface["defaultPrompt"]`. This is a Codex manifest field that the host shows, not skill or reference prose, so it is out of scope (`mapping-residual.md`, "Kept on purpose").

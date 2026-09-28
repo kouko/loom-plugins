@@ -39,3 +39,24 @@ Where we searched: every literal and regex in `loom-workflow/tests/loom-visualiz
 - **A2 negative, suite-green-after-prune.** See the W1-07 report for the `loom-workflow/tests` run.
 - **A3 positive, mapping-row-per-removed-pin.** Every pruned literal or regex has a row in "Removed pins".
 - **A3 boundary, validator-wrapped-phrase-judged.** The phrases inside `table_rule_one_errors`, `routing_errors`, `in_cell_errors` and the `required` list were judged one by one. The validators and their negative partners stay: `::test_rule_one_without_exception_fails` still goes red when rule 1 loses `key-value`.
+
+## W3-01: pins hidden by the output-taint gap
+
+Defect class: a direct prose pin hidden from the census because its markdown read is misclassified as program output (a yaml-parsing frontmatter helper, or a skill file read from an installed plugin copy under `tmp_path`). Where we searched: the build adversary's findings over all changed files, then a census rerun with the fixed detector from a clean worktree over the four test roots. The rerun newly flags only the two files below. Every kept test named here exists after this edit. No function was deleted.
+
+| file::function(s) | defect class it guarded | named replacement | kind |
+|---|---|---|---|
+| `loom-workflow/tests/distill-sessions/test_prompts_parseable.py::test_failure_prompt_structure` (pruned: "never mention ground truth") | the failure prompt drops its ground-truth-blind hard constraint | skill lens, `omission`; the rule's frontmatter `hard_constraints` list still has to parse and carry its keys (`::test_both_prompt_files_have_required_sections`) | review lens dimension |
+| `…/test_prompts_parseable.py::test_failure_prompt_structure`, `::test_success_prompt_structure` (pruned: "no more than 3" / "max 3" / "maximum of 3") | a prompt stops capping Memory Items at 3 | skill lens, `omission` | review lens dimension |
+| `…/test_prompts_parseable.py::test_both_prompts_forbid_orchestrator_memory_reference` (pruned: body "never reference the orchestrator's project memory"; redundant "orchestrator's project memory" alternative) | the body stops restating the no-memory-citation rule | `loom-workflow/tests/distill-sessions/test_prompts_parseable.py::test_both_prompts_forbid_orchestrator_memory_reference`: the frontmatter `hard_constraints` check (`project memory`) stays; the body restatement goes to skill lens `inconsistency` (body against frontmatter) | kept structural test |
+| `…/test_prompts_parseable.py::test_advisory_prompt_structure` (pruned: "fenced code block", redundant) | the advisory prompt stops documenting code-block wrapping | `loom-workflow/tests/distill-sessions/test_prompts_parseable.py::test_advisory_prompt_structure`: the `code block` term in the same assert already covered every case | kept structural test |
+| `…/test_prompts_parseable.py::_assert_common_shape`, `::test_success_prompt_structure` (re-anchored: "How the orchestrator dispatches this prompt", "Lean Solution Path") | the dispatch section or the Lean Solution Path section disappears | the same functions, now matching the existing `## How the orchestrator dispatches this prompt` and `## Lean Solution Path output format` headings | kept structural test |
+| `tests/test_loom_plugin_install_layout.py::test_isolated_loom_plugins_are_standalone_and_compose_by_public_contract` (pruned: "positive" + "negative or boundary", "closing-review station once at branch end" in the installed write-plan `SKILL.md`) | write-plan stops asking for test-case pairs per Acceptance line, or stops placing closing review once at branch end | `intake.test-case-pair` recomputes the pair on every newly authored plan; the branch-end review sentence goes to skill lens `inconsistency` (write-plan against the closing-review station) | checker rule id |
+
+### Test cases
+
+- **A1 positive, yaml-helper-body-pin-flagged; negative, parsed-frontmatter-value-not-flagged.** `docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_classify_test_files.py::test_yaml_helper_body_pin_flagged` (red before the fix) and `::test_parsed_frontmatter_value_not_flagged`.
+- **A2 positive, behavior-checks-kept.** `find_boundary_violations`, the dependency checks and the frontmatter checks stay; the two files pass alone.
+- **A2 negative, suite-green-after-prune.** See the W3-01 report for the `loom-code/tests`, `loom-workflow/tests` and root `tests` runs.
+- **A3 positive, mapping-row-per-removed-pin.** Every pruned or re-anchored literal has a row above.
+- **A3 boundary, installed-copy-skill-read-counts-as-prose.** `…/test_classify_test_files.py::test_installed_copy_skill_read_counts_as_prose`: a `SKILL.md` read from a `tmp_path` install is prose. The census sees it soundly: the rerun adds only the install-layout file.

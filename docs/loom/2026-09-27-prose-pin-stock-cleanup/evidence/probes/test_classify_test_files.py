@@ -64,6 +64,24 @@ def test_short_heading_literal_not_flagged(tmp_path: Path) -> None:
     assert not _pinned(tmp_path, 'def test_x():\n    assert "## Scope and rules" in TEXT\n    assert "Scope rules" in TEXT\n')
 
 
+YAML_SPLIT = ('import yaml\nP = "agents/prompt.md"\n\ndef _split(text):\n    fm = yaml.safe_load(text.split("---")[1])\n'
+              '    return fm, text.split("---", 2)[2]\n\ndef test_x():\n    fm, body = _split(open(P).read())\n')
+
+
+def test_yaml_helper_body_pin_flagged() -> None:
+    assert ctf.direct_pin_lines(YAML_SPLIT + '    assert "never mention the truth" in body.lower()\n') == [10]
+
+
+def test_parsed_frontmatter_value_not_flagged() -> None:
+    assert ctf.direct_pin_lines(YAML_SPLIT + '    assert "never mention the truth" in str(fm["rules"])\n') == []
+
+
+def test_installed_copy_skill_read_counts_as_prose() -> None:
+    src = ('def test_x(tmp_path):\n    root = tmp_path / "cache"\n'
+           '    text = (root / "skills" / "SKILL.md").read_text()\n    assert "the rule is stated here" in text\n')
+    assert ctf.direct_pin_lines(src) == [4]
+
+
 def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tmp_path: Path) -> None:
     root = tmp_path / "loom-code" / "tests"
     root.mkdir(parents=True)

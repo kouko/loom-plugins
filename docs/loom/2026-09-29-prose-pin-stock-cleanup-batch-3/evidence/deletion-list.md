@@ -101,3 +101,16 @@ There are 14 files, which is more than ~10, so they are grouped into disjoint pe
 | file::function | action | tag | pinned literal(s) |
 |---|---|---|---|
 | `tests/test_loom_plugin_install_layout.py::test_sibling_lookup_allows_version_subdirectory` | prune | pin | "on any other host", "two levels above this SKILL.md", "may contain one version subdirectory", "use the newest" (640-643); the link counts and pointer stay |
+
+## W3-01 output-taint fix round
+
+Defect class: a direct prose pin hidden from the census because its markdown read is misclassified as program output. Two gaps: a helper that calls `yaml.safe_load` anywhere made its whole return value output, so a body sentence asserted against that helper's return was not flagged; and a skill file read from a plugin copy installed under `tmp_path` counted as temp-dir output. After the fix, only a parsed value is output, and a plain read of a skill, agent or reference path is prose even under a temp dir. A census rerun from a clean worktree newly flags exactly these 2 files, plus the graduated adversary program, which gets a `MANUAL_OVERRIDES` row because its hit is a synthetic source string, not prose. No function was deleted. Line numbers are at `9b6579c2`.
+
+| file::function | action | tag | pinned literal(s) |
+|---|---|---|---|
+| `loom-workflow/tests/distill-sessions/test_prompts_parseable.py::test_failure_prompt_structure` | prune | pin | "never mention ground truth" (156), "no more than 3" / "max 3" / "maximum of 3" (163-165); the common shape and role check stay |
+| `…/test_prompts_parseable.py::test_success_prompt_structure` | prune | pin | "no more than 3" / "max 3" / "maximum of 3" (194-196); "Lean Solution Path" (179) is re-anchored on its existing `## Lean Solution Path output format` heading; the dead-end marker words stay |
+| `…/test_prompts_parseable.py::_assert_common_shape` | prune | pin | "How the orchestrator dispatches this prompt" (135) is re-anchored on its existing `## ` heading; frontmatter keys, model, step markers and Memory Item fields stay |
+| `…/test_prompts_parseable.py::test_advisory_prompt_structure` | prune | pin | "fenced code block" (292), redundant with the kept `code block` term in the same assert |
+| `…/test_prompts_parseable.py::test_both_prompts_forbid_orchestrator_memory_reference` | prune | pin | "never reference the orchestrator's project memory" (454) in the body; "orchestrator's project memory" (447), redundant with the kept frontmatter `project memory` check in the same assert |
+| `tests/test_loom_plugin_install_layout.py::test_isolated_loom_plugins_are_standalone_and_compose_by_public_contract` | prune | exec | "negative or boundary" with "positive" (430), "closing-review station once at branch end" (431), read from the installed write-plan `SKILL.md`; the boundary-violation run, dependency checks and `docs/loom/` path pointers stay |

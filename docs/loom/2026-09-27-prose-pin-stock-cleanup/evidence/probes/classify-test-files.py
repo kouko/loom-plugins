@@ -217,6 +217,12 @@ def direct_pin_lines(text: str) -> list[int]:
       A5 count), a local function named like a validator (error, issue, violation,
       problem, finding, validate, check, lint, reason), a local helper (or a fixture
       parameter of that name) that does any of these, or a name assigned from any of these.
+      A json/yaml parse taints only its parsed value: a helper is output when it returns a
+      parsed value, and when it returns a tuple only the parsed positions are output, so a
+      markdown body returned beside parsed frontmatter stays markdown text.
+    - One exception to output-wins: a plain read of a path naming a skill, agent or reference
+      file (SKILL.md, agents/, references/ ...) is markdown text even under a temp dir, since an
+      installed copy of a plugin's own skill file is still its prose.
     - A prose literal (see _prose_literal: 3+ words with letters, no heading, table row,
       command or path), inline or a module-level string name, counts when asserted with
       `in`, `==`, `.startswith()` or `.endswith()` against markdown text inside an
@@ -225,6 +231,9 @@ def direct_pin_lines(text: str) -> list[int]:
       collected when `not in` it. Nested functions are read with their enclosing one.
     A comparison written in an `if` of a helper, a regex search, or on a helper parameter
     is not seen; such files need a reader.
+    Known limits: a local helper named like a validator word (`_checklist()` matches
+    'check') is taken as output; and a variable name is judged file-wide, so one name
+    holding README.md in one test and SKILL.md in another counts as non-prose everywhere.
     """
     import ast
 
@@ -266,23 +275,72 @@ def direct_pin_lines(text: str) -> list[int]:
             (isinstance(c.func, ast.Attribute) and c.func.attr in READ_ATTRS)
             or _dotted(c.func) == "open") and receiver_is_prose(c) for c in ast.walk(node))
 
-    def raw_output(node) -> bool:
+    def raw_output(node, parse: bool = True) -> bool:
         called = calls(node)
         return any(isinstance(c, ast.Attribute) and c.attr in OUTPUT_ATTRS for c in ast.walk(node)) or bool(
-            called & (RUNNER_CALLS | PARSE_CALLS)) or bool(
+            called & (RUNNER_CALLS | (PARSE_CALLS if parse else set()))) or bool(
             names(node) & TMP_NAMES or {c.split(".")[-1] for c in called} & TMP_NAMES) or any(
             c.split(".")[0] in prod or (c in funcs and VALIDATOR_NAME.search(c)) for c in called)
 
-    runners = {n for n, f in funcs.items() if raw_output(f)}
-    readers = {n for n, f in funcs.items() if raw_read(f) and n not in runners}
+    # A helper that parses (json/yaml) is output only in what it returns from the parse:
+    # a whole parsed return makes it a runner; in a returned tuple only the parsed
+    # positions are output (tuple_out), so a markdown body returned beside them stays prose.
+    runners = {n for n, f in funcs.items() if raw_output(f, parse=False)}
+    tuple_out: dict[str, tuple[bool, ...]] = {}
+
+    def shape(f):
+        parsed: set[str] = set()
+
+        def derived(e) -> bool:
+            return bool(calls(e) & PARSE_CALLS or names(e) & parsed
+                        or {c.split(".")[-1] for c in calls(e)} & runners)
+        while True:
+            size = len(parsed)
+            for targets, value, forced in bindings(f):
+                if forced or derived(value):
+                    parsed |= {t.id for t in targets}
+            if len(parsed) == size:
+                break
+        rets = [r.value for r in ast.walk(f) if isinstance(r, ast.Return) and r.value is not None]
+        if any(not isinstance(r, ast.Tuple) and derived(r) for r in rets):
+            return True
+        tups = [r for r in rets if isinstance(r, ast.Tuple)]
+        width = max((len(r.elts) for r in tups), default=0)
+        flags = tuple(any(len(r.elts) == width and derived(r.elts[i]) for r in tups) for i in range(width))
+        return flags if any(flags) else None
+
+    def bindings(scope):
+        for n in ast.walk(scope):
+            if isinstance(n, (ast.Assign, ast.AnnAssign, ast.AugAssign)) and n.value is not None:
+                targets = n.targets if isinstance(n, ast.Assign) else [n.target]
+                flags = tuple_out.get(_dotted(n.value.func).split(".")[-1]) if isinstance(n.value, ast.Call) else None
+                if flags and len(targets) == 1 and isinstance(targets[0], (ast.Tuple, ast.List)) \
+                        and len(targets[0].elts) == len(flags):
+                    for elt, flag in zip(targets[0].elts, flags):
+                        yield [t for t in ast.walk(elt) if isinstance(t, ast.Name)], n.value, flag
+                    continue
+                yield [t for tg in targets for t in ast.walk(tg) if isinstance(t, ast.Name)], n.value, False
+            elif isinstance(n, (ast.For, ast.comprehension)):
+                yield [t for t in ast.walk(n.target) if isinstance(t, ast.Name)], n.iter, False
+            elif isinstance(n, ast.withitem) and n.optional_vars is not None:
+                yield [t for t in ast.walk(n.optional_vars) if isinstance(t, ast.Name)], n.context_expr, False
+
     while True:
         more_r = {n for n, f in funcs.items() if n not in runners
                   and {c.split(".")[-1] for c in calls(f)} & runners}
-        more_m = {n for n, f in funcs.items() if n not in readers | runners | more_r
-                  and {c.split(".")[-1] for c in calls(f)} & readers}
-        if not (more_r or more_m):
+        shapes = {n: shape(f) for n, f in funcs.items() if n not in runners | more_r}
+        more_r |= {n for n, s in shapes.items() if s is True}
+        new_t = {n: s for n, s in shapes.items() if isinstance(s, tuple) and n not in more_r}
+        if not more_r and new_t == tuple_out:
             break
         runners |= more_r
+        tuple_out = new_t
+    readers = {n for n, f in funcs.items() if raw_read(f) and n not in runners}
+    while True:
+        more_m = {n for n, f in funcs.items() if n not in readers | runners
+                  and {c.split(".")[-1] for c in calls(f)} & readers}
+        if not more_m:
+            break
         readers |= more_m
 
     def is_output(node, out) -> bool:
@@ -296,23 +354,26 @@ def direct_pin_lines(text: str) -> list[int]:
             NON_PROSE_PATH.search(src.get(i, "") + i) for a in c.args for i in names(a)) for c in ast.walk(node))
         return raw_read(node) or read_helper or bool(names(node) & md)
 
-    def bindings(scope):
-        for n in ast.walk(scope):
-            if isinstance(n, (ast.Assign, ast.AnnAssign, ast.AugAssign)) and n.value is not None:
-                targets = n.targets if isinstance(n, ast.Assign) else [n.target]
-                yield [t for tg in targets for t in ast.walk(tg) if isinstance(t, ast.Name)], n.value
-            elif isinstance(n, (ast.For, ast.comprehension)):
-                yield [t for t in ast.walk(n.target) if isinstance(t, ast.Name)], n.iter
-            elif isinstance(n, ast.withitem) and n.optional_vars is not None:
-                yield [t for t in ast.walk(n.optional_vars) if isinstance(t, ast.Name)], n.context_expr
+    def copy_read(node) -> bool:
+        """The value is a plain read of a path naming a skill, agent or reference file (a copy
+        of prose, even under a temp dir), with no runner or parse call on the way."""
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and node.func.attr in READ_ATTRS):
+            return False
+        seg = ast.get_source_segment(text, node.func.value) or ""
+        called = calls(node.func.value)
+        return bool(PRODUCTION_MD.search(seg)) and not NON_PROSE_PATH.search(seg) and not (
+            called & (RUNNER_CALLS | PARSE_CALLS) or {c.split(".")[-1] for c in called} & runners)
 
     def taint(scope, md, out):
         md, out = set(md), set(out)
         while True:
             size = len(md) + len(out)
-            for targets, value in bindings(scope):
+            for targets, value, parsed in bindings(scope):
                 ids = {t.id for t in targets}
-                if is_output(value, out):
+                if not parsed and copy_read(value):
+                    md |= ids
+                elif parsed or is_output(value, out):
                     out |= ids
                 elif is_md(value, md, out):
                     md |= ids - out
@@ -831,6 +892,14 @@ MANUAL_OVERRIDES = {
         "blocks, whose mechanisms.yaml evals (L357, L354) sit in this file, "
         "and each fails a negated sentence, so they check the rule's "
         "polarity, not only its wording",
+    ),
+    # Batch 3 (W3-01): the graduated build-adversary program.
+    "loom-code/tests/test_adversarial_batch3_census_misses.py": (
+        "behavior",
+        "runs this classifier (path-loaded) and asserts on its result; the "
+        "direct-pin hit is a synthetic test source string fed to "
+        "direct_pin_lines, and the residual check asserts named files carry "
+        "no skill sentence, an absence",
     ),
 }
 
