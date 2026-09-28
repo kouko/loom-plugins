@@ -297,6 +297,12 @@ MANUAL_OVERRIDES = {
         "one-home check: asserts no rule fragment sits in both the recipe and "
         "adversary.md; never asserts a sentence is present",
     ),
+    # Fix round 2: restored with its structure checks only.
+    "loom-code/tests/test_agy_tool_mapping.py": (
+        "structure",
+        "mapping-table column scan, per-role dispatch line and link resolution, "
+        "plus synthetic self-tests; no sentence asserted",
+    ),
     "loom-code/tests/test_check_skill_crossrefs.py": (
         "behavior",
         "loads check-skill-crossrefs.py by path and runs find_broken_crossrefs "
