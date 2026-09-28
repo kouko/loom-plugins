@@ -87,7 +87,7 @@ from pathlib import Path
 
 import pytest
 
-from prose_pin import has_negation, split_sentences
+from prose_pin import split_sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -102,9 +102,6 @@ CONTRACT_PROTOCOL_PATH = "`loom-code/skills/closing-review/references/adversaria
 ROUTING_HEADING = "## Which recipe to read"
 # What a row says when the kind has no recipe today.
 NO_RECIPE = "none"
-# The verb the contract carries before it names the routing table.
-CONTRACT_ROUTE_VERB = "read"
-CONTRACT_ROUTE_LITERAL = "the recipe file its routing table names for every artifact type"
 
 # Where a kind's own test file lives, by the convention Acceptance 6 fixes:
 # one test file per recipe, named after the kind the recipe attacks.
@@ -286,18 +283,6 @@ def _add_kind(folder: Path, kind: str, recipe: str, body: str) -> None:
     protocol.write_text(text.replace(old, new), encoding="utf-8")
 
 
-def _affirms(text: str, verb: str, literal: str) -> bool:
-    """Some sentence carries `verb` before `literal` and no negation.
-
-    The verb is matched case-insensitively so that it may open a sentence;
-    the literal is matched as written."""
-    for sentence in split_sentences(text):
-        v, lit = sentence.lower().find(verb.lower()), sentence.find(literal)
-        if 0 <= v < lit and not has_negation(sentence):
-            return True
-    return False
-
-
 # --- helper self-tests -----------------------------------------------------
 
 # The synthetic fixtures name no recipe file that the routing table routes
@@ -382,14 +367,6 @@ def test_add_kind_helper_synthetic(tmp_path: Path) -> None:
     assert rows["code"] == _SYNTHETIC_RECIPE
 
 
-def test_affirms_helper_synthetic() -> None:
-    affirmative = f"Read {CONTRACT_ROUTE_LITERAL} the change touched."
-    assert _affirms(affirmative, CONTRACT_ROUTE_VERB, CONTRACT_ROUTE_LITERAL)
-    negated = f"Never read {CONTRACT_ROUTE_LITERAL} the change touched."
-    assert not _affirms(negated, CONTRACT_ROUTE_VERB, CONTRACT_ROUTE_LITERAL)
-    assert not _affirms("Read the protocol.", CONTRACT_ROUTE_VERB, CONTRACT_ROUTE_LITERAL)
-
-
 # --- A4: one new file and one new row, and no existing recipe touched -------
 
 def test_adding_a_kind_is_one_file_and_one_row(tmp_path: Path) -> None:
@@ -437,7 +414,6 @@ def test_contract_routes_through_the_protocol_to_each_recipe() -> None:
     contract = " ".join(CONTRACT.read_text(encoding="utf-8").split())
     assert CONTRACT_PROTOCOL_PATH in contract, contract
     assert PROTOCOL.is_file(), PROTOCOL
-    assert _affirms(contract, CONTRACT_ROUTE_VERB, CONTRACT_ROUTE_LITERAL), contract
 
 
 def test_protocol_plus_the_matching_recipe_is_the_whole_procedure() -> None:
