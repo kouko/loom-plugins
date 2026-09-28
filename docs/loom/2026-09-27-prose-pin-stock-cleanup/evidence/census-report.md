@@ -1,18 +1,18 @@
 # Census Report — Prose-Pin Stock Cleanup (W0-01)
 
 Generated: 2026-09-28
-Total test files scanned: 167
+Total test files scanned: 238
 
 ## Per-Class Counts
 
 | Class | Count |
 |-------|-------|
-| behavior | 79 |
+| behavior | 96 |
 | grammar-invariant | 5 |
-| not-prose | 33 |
-| other | 10 |
-| sentence-pin | 11 |
-| structure | 29 |
+| not-prose | 58 |
+| other | 12 |
+| sentence-pin | 15 |
+| structure | 52 |
 
 ## Full Per-File Classification
 
@@ -72,11 +72,12 @@ Total test files scanned: 167
 | loom-code/tests/test_plan_simplicity_text.py | behavior | has_pins=yes |
 | loom-code/tests/test_pr_floor.py | behavior | has_pins=no |
 | loom-code/tests/test_probes_charter_charter.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coldread_branch_end.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coldread_run_status.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coldread_runner.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coldread_scoring.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coldread_wave1.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coderead_branch_end.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coderead_run_status.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coderead_runner.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coderead_scoring.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coderead_wave1.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coderead_wave1_fix.py | behavior | has_pins=no |
 | loom-code/tests/test_probes_coldread_baselines_four_dirs_n10_sonnet.py | structure |  |
 | loom-code/tests/test_probes_coldread_changelog_carries_1_5_1.py | structure |  |
 | loom-code/tests/test_probes_coldread_readme_role_section_has_three_way_paragraph.py | structure |  |
@@ -145,8 +146,7 @@ Total test files scanned: 167
 | loom-design/tests/interface/test_validate_design_output.py | structure |  |
 | loom-design/tests/principles/test_principles_checker_parity.py | behavior | has_pins=no |
 | loom-design/tests/principles/test_principles_ratified_line.py | structure |  |
-| loom-design/tests/principles/test_principles_ratified_line.py | structure |  |
-| loom-design/tests/principles/test_validate_principles_output.py | structure |  |
+| loom-design/tests/principles/test_principles_validate_principles_output.py | structure |  |
 | loom-design/tests/spec/test_capture_intent_contract.py | behavior | has_pins=yes, marker=grammar-invariant-content |
 | loom-design/tests/spec/test_write_spec_contract.py | behavior | has_pins=yes, marker=grammar-invariant-content |
 | loom-code/tests/conftest.py | not-prose |  |
@@ -202,7 +202,7 @@ Total test files scanned: 167
 | loom-code/tests/test_loom_checker_intake.py | behavior (has_pins=no) | behavior (has_pins=no) | Executes loom_checker.py via subprocess, asserts on returncode ✅ |
 | loom-code/tests/test_selection_store.py | not-prose () | not-prose () | No .md references — pure git/selection store logic ✅ |
 | loom-code/tests/test_prose_pin_rule_text.py | grammar-invariant (has_pins=no) | grammar-invariant (has_pins=no) | Tests prose_pin matcher rules in adversary.md & engineering-baseline.md ✅ |
-| loom-code/tests/test_lenses_deletion_first.py | sentence-pin (has_pins=yes, note) | grammar-invariant (has_pins=yes, note=mixed-grammar-and-pin) | Tests negation matcher self-tests (baseline §8) — imports prose_pin, has sentence assertions, has_pins=yes ✓ |
+| loom-code/tests/test_lenses_deletion_first.py | grammar-invariant (has_pins=yes, note=mixed-grammar-and-pin) | grammar-invariant (has_pins=yes, note=mixed-grammar-and-pin) | Tests negation matcher self-tests (baseline §8) — imports prose_pin, has sentence assertions, has_pins=yes ✓ |
 | loom-code/tests/test_write_plan_station_text.py | behavior (has_pins=yes) | behavior (has_pins=yes, marker=grammar-invariant-content) | Executes loom_checker.py, pins exact station prose sentences ✅ |
 | loom-code/tests/test_simplified_station_text.py | behavior (has_pins=yes) | behavior (has_pins=yes) | Executes loom_checker.py, pins simplified station prose ✅ |
 | loom-code/tests/test_package_tests_command.py | structure () | structure () | Only asserts on document shape (frontmatter, sections, gate markers) ✅ |
