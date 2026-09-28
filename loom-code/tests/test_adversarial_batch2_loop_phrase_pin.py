@@ -12,7 +12,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[2]
 BATCH_2 = [
     "loom-code/tests/test_acceptance_test_report_shape.py",
     "loom-code/tests/test_adversary_protocol.py",
