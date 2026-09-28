@@ -39,9 +39,12 @@ EXECUTE = re.compile(
     r"|loom_checker\.py|loom_check)"
 )
 # Simpler approach: just look for subprocess.run AND git/pytest/python3
+# Matches: subprocess.run(["git", ...]), subprocess.run("git ...", ...), etc.
+# Uses DOTALL flag to match across newlines
 SUBPROCESS_EXECUTE = re.compile(
     r"subprocess\.(?:run|check_output|Popen|call)"
-    r".*?(?:git\s|pytest|python3|loom_checker\.py|check_)"
+    r".*?(?:\[\"git\"|\[\"pytest\"|\[\"python3\"|git\s|pytest|python3|loom_checker\.py|check_)",
+    re.DOTALL
 )
 # Imports production logic (not the prose_pin matcher, not other tests).
 PROD_IMPORT = re.compile(
@@ -50,9 +53,10 @@ PROD_IMPORT = re.compile(
 )
 PROSE_PIN_IMPORT = re.compile(r"from prose_pin\b|import prose_pin\b")
 # Sentence-literal assertions on prose content.
-# Matches: assert "literal" in text, assert text == "literal", or prose_pin matcher calls
+# Matches both: assert ... in/== "literal" and assert "literal" in/== ...
 SENTENCE_ASSERT = re.compile(
-    r"assert[^\n]*\b(?:in|==)\s*[\"']"
+    r"assert[^\n]*\b(?:in|==)\s*[\"']"  # assert ... in/== "literal"
+    r"|assert\s*[\"'][^\"'\n]{5,}[\"']\s*\b(?:in|==)\b"  # assert "literal" in/== ...
     r"|pins_exact_sentence\("
     r"|_affirms\(|affirms\(|_stated_once\(|_flat\("
     r"|flat_prose\(|rule_prose\(|split_sentences\("
@@ -65,11 +69,13 @@ STRUCTURE = re.compile(
 # Does NOT fire on adversary.md/engineering-baseline.md references alone —
 # those are contract/reference filenames many behavior files mention.
 # Fires only on signals that the file is pinning MATCHER RULES or
-# GATE-MARKER GRAMMAR specifically.
+# GATE-MARKER GRAMMAR specifically, or is a MATCHER SELF-TEST.
+# Self-test signals: NEGATION_RE (shared matcher), self-test/synthetic keywords,
+# testing of prose_pin internal matchers (_has_negation, etc.)
 GRAMMAR_INVARIANT_CONTENT = re.compile(
     r"prose_pin.*matcher.*rule|matcher.*rule.*prose_pin|"
     r"gate.*marker|<!--\s*gate:|version.*format|"
-    r"synthetic.*self-test|self-test.*synthetic"
+    r"NEGATION_RE|_SELFTEST_KW_RE|_has_negation|prose_pin.*self[- ]?test|self[- ]?test.*prose_pin"
 )
 
 
@@ -83,7 +89,14 @@ def classify(path: Path) -> tuple[str, dict]:
 
     # Check for behavior FIRST (executes programs or imports production logic)
     # Behavior wins ties per the spec
-    if EXECUTE.search(text) or SUBPROCESS_EXECUTE.search(text) or PROD_IMPORT.search(text):
+    # For SUBPROCESS_EXECUTE, also require assertions on subprocess results
+    has_subprocess_assert = bool(re.search(r'\.returncode|result\.(stdout|stderr|returncode)|pytest\.raises', text))
+    is_behavior = (
+        EXECUTE.search(text)
+        or (SUBPROCESS_EXECUTE.search(text) and has_subprocess_assert)
+        or PROD_IMPORT.search(text)
+    )
+    if is_behavior:
         secondary = {}
         # Check for sentence pins (secondary marker for behavior files that also pin prose)
         secondary["has_pins"] = "yes" if (SENTENCE_ASSERT.search(text) and PROSE_PIN_IMPORT.search(text)) else "no"
@@ -92,36 +105,31 @@ def classify(path: Path) -> tuple[str, dict]:
             secondary["marker"] = "grammar-invariant-content"
         return "behavior", secondary
 
-    # Check for sentence-pin conditions
-    is_sentence_pin = PROSE_PIN_IMPORT.search(text) and SENTENCE_ASSERT.search(text)
-    # Check for grammar-invariant conditions
-    is_grammar_invariant = PROSE_PIN_IMPORT.search(text) and GRAMMAR_INVARIANT_CONTENT.search(text)
+    # Check for grammar-invariant candidate (imports prose_pin AND has grammar-invariant content)
+    is_grammar_invariant_candidate = PROSE_PIN_IMPORT.search(text) and GRAMMAR_INVARIANT_CONTENT.search(text)
+    # Check for sentence-pin candidate (has sentence assertions about prose)
+    # Requires prose_pin import OR prose_pin helper function calls (flat_prose, split_sentences, etc.)
+    # OR prose normalization helpers (_normalize, _flat) used for sentence pinning compaction tests
+    has_prose_pin_import = PROSE_PIN_IMPORT.search(text)
+    has_prose_helpers = bool(re.search(r'flat_prose\(|rule_prose\(|split_sentences\(|_flat\(', text))
+    has_prose_normalization = bool(re.search(r'_normalize|_flat\s*=', text))
+    has_sentence_assert = SENTENCE_ASSERT.search(text)
 
-    # Check for sentence-pin (imports prose_pin and has sentence assertions, no behavior)
-    if is_sentence_pin:
-        # grammar-invariant wins over sentence-pin only for matcher self-tests and gate-marker grammar
-        if is_grammar_invariant:
-            # Check if it's matcher self-tests or gate-marker grammar (the cases where grammar-invariant wins)
-            # For now, we'll use the existing GRAMMAR_INVARIANT_CONTENT to detect these cases
-            # The plan specifies these are retained as grammar-invariant
-            secondary = {}
-            secondary["has_pins"] = "yes" if SENTENCE_ASSERT.search(text) else "no"
-            if SENTENCE_ASSERT.search(text):
-                secondary["note"] = "mixed-grammar-and-pin"
-            return "grammar-invariant", secondary
-        else:
-            # Default case: sentence-pin wins
-            secondary = {}
-            secondary["has_pins"] = "yes"
-            return "sentence-pin", secondary
+    is_sentence_pin_candidate = has_sentence_assert and (has_prose_pin_import or has_prose_helpers or has_prose_normalization)
 
     # Check for grammar-invariant (when not also sentence-pin, or when sentence-pin doesn't win)
-    if is_grammar_invariant:
+    if is_grammar_invariant_candidate:
         secondary = {}
         secondary["has_pins"] = "yes" if SENTENCE_ASSERT.search(text) else "no"
         if SENTENCE_ASSERT.search(text):
             secondary["note"] = "mixed-grammar-and-pin"
         return "grammar-invariant", secondary
+
+    # Check for sentence-pin (has sentence assertions about prose, no behavior)
+    if is_sentence_pin_candidate:
+        secondary = {}
+        secondary["has_pins"] = "yes"
+        return "sentence-pin", secondary
 
     # Check for structure
     if STRUCTURE.search(text):
@@ -135,7 +143,7 @@ def main() -> int:
     counts: dict[str, int] = {}
     rows = []  # (file, class, secondary_markers)
     for root in roots:
-        for p in sorted((REPO / root).glob("*.py")):
+        for p in sorted((REPO / root).rglob("*.py")):
             cls, secondary = classify(p)
             counts[cls] = counts.get(cls, 0) + 1
             if cls in {"sentence-pin", "structure", "grammar-invariant", "behavior"}:
