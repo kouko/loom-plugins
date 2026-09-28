@@ -90,12 +90,39 @@ def classify(path: Path) -> tuple[str, dict]:
     # Check for behavior FIRST (executes programs or imports production logic)
     # Behavior wins ties per the spec
     # For SUBPROCESS_EXECUTE, also require assertions on subprocess results
-    has_subprocess_assert = bool(re.search(r'\.returncode|result\.(stdout|stderr|returncode)|pytest\.raises', text))
-    is_behavior = (
+    has_subprocess_assert = bool(re.search(r'\.(?:stdout|stderr|returncode)|pytest\.raises', text))
+    is_behavior_from_execution = (
         EXECUTE.search(text)
         or (SUBPROCESS_EXECUTE.search(text) and has_subprocess_assert)
         or PROD_IMPORT.search(text)
     )
+
+    # Additional behavior check: imports of production modules located in a scripts directory
+    is_behavior_from_script_import = False
+    if not is_behavior_from_execution:  # only check if we haven't already found behavior
+        # Look for import statements that import a top-level module
+        # Allows trailing comments
+        import_pattern = re.compile(r'^\s*import\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:#.*)?$|^\s*from\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+import', re.MULTILINE)
+        # Known test helper modules in scripts/ that should NOT trigger behavior classification
+        TEST_HELPER_MODULES = {"prose_pin", "rehearse_probes"}
+        for match in import_pattern.finditer(text):
+            mod = match.group(1) or match.group(2)
+            if mod and mod not in TEST_HELPER_MODULES:
+                # Skip if mod is a known stdlib or common test dependency to avoid false positives
+                # We'll skip if we can't find the module in a scripts directory (not under tests)
+                found = False
+                for scripts_dir in REPO.rglob('scripts'):
+                    if 'tests' in scripts_dir.parts:
+                        continue
+                    mod_file = scripts_dir / (mod + '.py')
+                    if mod_file.is_file():
+                        found = True
+                        break
+                if found:
+                    is_behavior_from_script_import = True
+                    break
+
+    is_behavior = is_behavior_from_execution or is_behavior_from_script_import
     if is_behavior:
         secondary = {}
         # Check for sentence pins (secondary marker for behavior files that also pin prose)

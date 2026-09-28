@@ -7,12 +7,12 @@ Total test files scanned: 238
 
 | Class | Count |
 |-------|-------|
-| behavior | 96 |
-| grammar-invariant | 5 |
+| behavior | 112 |
+| grammar-invariant | 4 |
 | not-prose | 58 |
-| other | 12 |
-| sentence-pin | 15 |
-| structure | 52 |
+| other | 10 |
+| sentence-pin | 13 |
+| structure | 41 |
 
 ## Full Per-File Classification
 
@@ -41,11 +41,9 @@ Total test files scanned: 238
 | loom-code/tests/test_build_mechanical_checks.py | behavior | has_pins=yes |
 | loom-code/tests/test_build_recovery_rules.py | sentence-pin | has_pins=yes |
 | loom-code/tests/test_check_contract_citations.py | behavior | has_pins=no |
-| loom-code/tests/test_check_doc_citations.py | structure |  |
+| loom-code/tests/test_check_doc_citations.py | behavior | has_pins=no |
 | loom-code/tests/test_check_mechanisms.py | behavior | has_pins=no, marker=grammar-invariant-content |
-| loom-code/tests/test_check_skill_crossrefs.py | sentence-pin | has_pins=yes |
 | loom-code/tests/test_closing_review_recovery_rules.py | sentence-pin | has_pins=yes |
-| loom-code/tests/test_codex_hook_trust_contract.py | sentence-pin | has_pins=yes |
 | loom-code/tests/test_coldread_role_split.py | behavior | has_pins=no |
 | loom-code/tests/test_contract_manifest.py | behavior | has_pins=no, marker=grammar-invariant-content |
 | loom-code/tests/test_dispatch_profile_contract.py | sentence-pin | has_pins=yes |
@@ -72,23 +70,21 @@ Total test files scanned: 238
 | loom-code/tests/test_plan_simplicity_text.py | behavior | has_pins=yes |
 | loom-code/tests/test_pr_floor.py | behavior | has_pins=no |
 | loom-code/tests/test_probes_charter_charter.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coderead_branch_end.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coderead_run_status.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coderead_runner.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coderead_scoring.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coderead_wave1.py | behavior | has_pins=no |
-| loom-code/tests/test_probes_coldread_abuse_coderead_wave1_fix.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coldread_branch_end.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coldread_run_status.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coldread_runner.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coldread_scoring.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coldread_wave1.py | behavior | has_pins=no |
+| loom-code/tests/test_probes_coldread_abuse_coldread_wave1_fix.py | behavior | has_pins=no |
 | loom-code/tests/test_probes_coldread_baselines_four_dirs_n10_sonnet.py | structure |  |
 | loom-code/tests/test_probes_coldread_changelog_carries_1_5_1.py | structure |  |
 | loom-code/tests/test_probes_coldread_readme_role_section_has_three_way_paragraph.py | structure |  |
-| loom-code/tests/test_probes_coldread_baselines_four_dirs_n10_sonnet.py | structure |  |
-| loom-code/tests/test_probes_coldread_changelog_carries_1_5_1.py | structure |  |
-| loom-code/tests/test_probes_coldread_baselines_four_dirs_n10_sonnet.py | structure |  |
-| loom-code/tests/test_probes_cumulative_boundary_reassessment.py | structure |  |
+| loom-code/tests/test_probes_cumulative_boundary_reassessment.py | behavior | has_pins=no |
 | loom-code/tests/test_probes_language_policy.py | structure |  |
 | loom-code/tests/test_probes_replaceable_boundary_behavior.py | behavior | has_pins=no |
+| loom-code/tests/test_prose_pin_rule_text.py | behavior | has_pins=no, marker=grammar-invariant-content |
 | loom-code/tests/test_publish_command_detection.py | behavior | has_pins=no |
-| loom-code/tests/test_readme_review_order.py | sentence-pin | has_pins=yes |
+| loom-code/tests/test_readme_review_order.py | structure |  |
 | loom-code/tests/test_review_convergence_contract.py | behavior | has_pins=yes, marker=grammar-invariant-content |
 | loom-code/tests/test_reviewer_mechanical_evidence.py | grammar-invariant | has_pins=yes, note=mixed-grammar-and-pin |
 | loom-code/tests/test_second_vendor_policy.py | behavior | has_pins=no |
@@ -104,6 +100,51 @@ Total test files scanned: 238
 | loom-code/tests/test_verification_status.py | behavior | has_pins=no |
 | loom-code/tests/test_write_plan_shape_text.py | grammar-invariant | has_pins=yes, note=mixed-grammar-and-pin |
 | loom-code/tests/test_write_plan_station_text.py | behavior | has_pins=yes, marker=grammar-invariant-content |
+| loom-workflow/tests/decision-map/test_check_map_fog.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_check_map_links.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_decision_map_intent_binding.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_delivery_binding.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_delivery_evidence.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_governance_ratification.py | structure |  |
+| loom-workflow/tests/decision-map/test_map_init.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_map_module_boundaries.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_map_progress.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_map_store.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_map_transaction.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_migrate_map_v3.py | behavior | has_pins=no |
+| loom-workflow/tests/decision-map/test_skill_doc.py | behavior | has_pins=no, marker=grammar-invariant-content |
+| loom-workflow/tests/decision-map/test_start_delivery.py | behavior | has_pins=no |
+| loom-workflow/tests/distill-sessions/test_apply.py | behavior | has_pins=no |
+| loom-workflow/tests/distill-sessions/test_main.py | behavior | has_pins=no |
+| loom-workflow/tests/distill-sessions/test_main_e2e.py | behavior | has_pins=no |
+| loom-workflow/tests/distill-sessions/test_prompts_parseable.py | structure |  |
+| loom-workflow/tests/distill-sessions/test_propose.py | behavior | has_pins=no |
+| loom-workflow/tests/distill-sessions/test_report.py | behavior | has_pins=no |
+| loom-workflow/tests/git-memory/test_loom_delegation.py | structure |  |
+| loom-workflow/tests/git-memory/test_memory_grep_version.py | structure |  |
+| loom-workflow/tests/git-memory/test_privacy_scan.py | behavior | has_pins=no |
+| loom-workflow/tests/git-memory/test_probes_memory_grep_render.py | behavior | has_pins=no |
+| loom-workflow/tests/git-memory/test_probes_memory_grep_single_pass.py | behavior | has_pins=no |
+| loom-workflow/tests/goal-create/test_goal_lint.py | behavior | has_pins=no |
+| loom-workflow/tests/goal-create/test_goal_shape.py | structure |  |
+| loom-workflow/tests/goal-create/test_input_floor.py | sentence-pin | has_pins=yes |
+| loom-workflow/tests/goal-create/test_readmes.py | structure |  |
+| loom-workflow/tests/goal-create/test_skill_md.py | sentence-pin | has_pins=yes |
+| loom-workflow/tests/handoff/test_handoff_readmes.py | structure |  |
+| loom-workflow/tests/handoff/test_handoff_schema.py | structure |  |
+| loom-workflow/tests/handoff/test_handoff_skill_md.py | structure |  |
+| loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py | structure |  |
+| loom-workflow/tests/loom-memory/test_loom_memory.py | behavior | has_pins=no |
+| loom-workflow/tests/loom-memory/test_migrate_legacy_store.py | behavior | has_pins=no |
+| loom-workflow/tests/loom-memory/test_skill_contract.py | behavior | has_pins=no |
+| loom-workflow/tests/loom-visualization/test_adversarial_probes.py | behavior | has_pins=no |
+| loom-workflow/tests/loom-visualization/test_detect_client.py | behavior | has_pins=no |
+| loom-workflow/tests/loom-visualization/test_references.py | structure |  |
+| loom-workflow/tests/loom-visualization/test_skill_script_paths.py | behavior | has_pins=no |
+| loom-workflow/tests/loom-visualization/test_templates.py | behavior | has_pins=no, marker=grammar-invariant-content |
+| loom-workflow/tests/recap-state/test_readmes.py | structure |  |
+| loom-workflow/tests/recap-state/test_seven_block_schema.py | structure |  |
+| loom-workflow/tests/recap-state/test_skill_md.py | structure |  |
 | loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_adversarial_hook_probes.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_adversarial_visualization_card_hosts.py | behavior | has_pins=no |
@@ -115,21 +156,19 @@ Total test files scanned: 238
 | loom-workflow/tests/scripts/test_independent_advisor_compaction.py | structure |  |
 | loom-workflow/tests/scripts/test_independent_advisor_plugin_readmes.py | structure |  |
 | loom-workflow/tests/scripts/test_loom_visualization_compaction.py | structure |  |
-| loom-workflow/tests/scripts/test_loom_visualization_description_ab.py | sentence-pin | has_pins=yes |
 | loom-workflow/tests/scripts/test_no_live_cot_explain_references.py | behavior | has_pins=no |
-| loom-workflow/tests/scripts/test_no_retired_loom_code_skill_names.py | sentence-pin | has_pins=yes |
 | loom-workflow/tests/scripts/test_readme_card_timing.py | structure |  |
 | loom-workflow/tests/scripts/test_recap_state_compaction.py | structure |  |
 | loom-workflow/tests/scripts/test_release_metadata.py | structure |  |
 | loom-workflow/tests/scripts/test_validate_skill_folder_structure_hook.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_visualization_card_hook.py | behavior | has_pins=no, marker=grammar-invariant-content |
+| loom-workflow/tests/test_loom_visualization_page_scripts.py | behavior | has_pins=no |
 | tests/hooks/test_check_codex_manifest_drift.py | behavior | has_pins=no |
 | tests/hooks/test_check_memory_store_integrity.py | behavior | has_pins=no |
 | tests/hooks/test_remind_memory_mirror.py | behavior | has_pins=no |
 | tests/test_adversarial_agy_rule_sync.py | behavior | has_pins=no |
 | tests/test_agy_install_docs.py | structure |  |
 | tests/test_check_plugin_boundaries.py | behavior | has_pins=no |
-| tests/test_kickoff_defaults.py | structure |  |
 | tests/test_loom_plugin_install_layout.py | behavior | has_pins=no |
 | tests/test_loom_skill_description_catalog.py | structure |  |
 | tests/test_run_package_tests.py | behavior | has_pins=no |
@@ -146,52 +185,9 @@ Total test files scanned: 238
 | loom-design/tests/interface/test_validate_design_output.py | structure |  |
 | loom-design/tests/principles/test_principles_checker_parity.py | behavior | has_pins=no |
 | loom-design/tests/principles/test_principles_ratified_line.py | structure |  |
-| loom-design/tests/principles/test_principles_validate_principles_output.py | structure |  |
+| loom-design/tests/principles/test_validate_principles_output.py | structure |  |
 | loom-design/tests/spec/test_capture_intent_contract.py | behavior | has_pins=yes, marker=grammar-invariant-content |
 | loom-design/tests/spec/test_write_spec_contract.py | behavior | has_pins=yes, marker=grammar-invariant-content |
-| loom-code/tests/conftest.py | not-prose |  |
-| loom-code/tests/test_adversarial_case_count_scan.py | not-prose |  |
-| loom-code/tests/test_adversarial_change_store_programs.py | not-prose |  |
-| loom-code/tests/test_adversarial_probe_cap_coverage.py | not-prose |  |
-| loom-code/tests/test_check_mechanisms_adversarial.py | not-prose |  |
-| loom-code/tests/test_claede_reviewer.py | not-prose |  |
-| loom-code/tests/test_codex_stale_hook.py | not-prose |  |
-| loom-code/tests/test_contract_charter.py | not-prose |  |
-| loom-code/tests/test_git_exec.py | not-prose |  |
-| loom-code/tests/test_github_rules.py | not-prose |  |
-| loom-code/tests/test_land_cleanup.py | not-prose |  |
-| loom-code/tests/test_land_sweep.py | not-prose |  |
-| loom-code/tests/test_lang_detect.py | not-prose |  |
-| loom-code/tests/test_loom_checker_modules.py | not-prose |  |
-| loom-code/tests/test_migration_history.py | not-prose |  |
-| loom-code/tests/test_plan_skip_missing_files.py | not-prose |  |
-| loom-code/tests/test_pr_floor_workflow.py | not-prose |  |
-| loom-code/tests/test_probes_coldread_fixture_items_verbatim_prior_list.py | not-prose |  |
-| loom-code/tests/test_probes_rehearsal_abuse_rehearse_probes.py | not-prose |  |
-| loom-code/tests/test_rehearse_probes.py | not-prose |  |
-| loom-code/tests/test_repo_files.py | not-prose |  |
-| loom-code/tests/test_review_json_template.py | not-prose |  |
-| loom-code/tests/test_selection_capture.py | not-prose |  |
-| loom-code/tests/test_selection_ledger.py | not-prose |  |
-| loom-code/tests/test_selection_store.py | not-prose |  |
-| loom-code/tests/test_sync_trunk.py | not-prose |  |
-| loom-design/tests/test_ci_workflow.py | not-prose |  |
-| loom-design/tests/test_marketplace_entry.py | not-prose |  |
-| loom-design/tests/test_plugin_manifest.py | not-prose |  |
-| loom-design/tests/test_unified_pytest_root.py | not-prose |  |
-| tests/conftest.py | not-prose |  |
-| tests/test_adversarial_agy_sync.py | not-prose |  |
-| tests/test_loom_design_ci_unified_root.py | not-prose |  |
-| loom-code/tests/test_check_skill_crossrefs.py | other |  |
-| loom-code/tests/test_codex_hook_trust_contract.py | other |  |
-| loom-code/tests/test_principles_amendment.py | other |  |
-| loom-code/tests/test_ship_guidance_presence.py | other |  |
-| loom-workflow/tests/scripts/test_distill_sessions_compaction.py | other |  |
-| loom-workflow/tests/scripts/test_loom_visualization_description_ab.py | other |  |
-| loom-workflow/tests/scripts/test_no_retired_loom_code_skill_names.py | other |  |
-| loom-workflow/tests/scripts/test_skill_count.py | other |  |
-| tests/test_kickoff_defaults.py | other |  |
-| tests/test_principles_ratification.py | other |  |
 
 ## Spot-Check Verification (≥8 files)
 
@@ -211,3 +207,5 @@ Total test files scanned: 238
 | loom-workflow/tests/scripts/test_goal_create_compaction.py | sentence-pin (has_pins=yes) | sentence-pin (has_pins=yes) | Compaction test: pins exact sentences from goal-create skill ✅ |
 | loom-workflow/tests/handoff/test_handoff_skill_md.py | structure () | structure () | Compaction test: checks structural elements (key presence in dictionaries) ✅ |
 | loom-workflow/tests/scripts/test_recap_state_compaction.py | structure () | structure () | Compaction test: checks document shape (frontmatter, sections, headings) ✅ |
+| loom-workflow/tests/loom-memory/test_skill_contract.py | behavior (has_pins=no) | behavior (has_pins=no) | Runs subprocess git ls-files, binds .stdout to staged variable, asserts on returncode ✅ |
+| loom-workflow/tests/decision-map/test_delivery_binding.py | behavior (has_pins=no) | behavior (has_pins=no) | Imports delivery_binding production module (scripts/), validates ticket/brief bindings with repo I/O ✅ |
