@@ -15,7 +15,7 @@ Codex and Antigravity CLI:
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.6.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
 | [`loom-code`](loom-code/) | 3.22.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.4.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
+| [`loom-workflow`](loom-workflow/) | 5.5.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -147,7 +147,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.4.0. Workflow tools used around the stations; all work without
+Version 5.5.0. Workflow tools used around the stations; all work without
 `loom-code`; only `decision-map`'s delivery step, which writes an intent,
 needs it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they

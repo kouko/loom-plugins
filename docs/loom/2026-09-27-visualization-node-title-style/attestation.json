@@ -1,0 +1,119 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-27-visualization-node-title-style",
+  "content_digest": "4a4bd1af8a56e19abff743fc29a2f9f7458a66cd",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-27-visualization-node-title-style/evidence/probes/adversarial-probes.py",
+      "artifact": "docs/loom/2026-09-27-visualization-node-title-style/evidence/probes/adversarial-probes.py",
+      "result": "pass",
+      "command_digest": "b9132d91858aaaa8cc7d9bd7ef17fe14492fd5a39bfbd555b4530d5ce257ea56"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-27-visualization-node-title-style/evidence/probes/test_double_separator.py",
+      "artifact": "docs/loom/2026-09-27-visualization-node-title-style/evidence/probes/test_double_separator.py",
+      "result": "pass",
+      "command_digest": "0886809f614e8d24ce416688d253696b18a2a36c6b0b8038887b474ce0d0dd7e"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-09-27-visualization-node-title-style/evidence/probes/test_separator_first_line.py",
+      "artifact": "docs/loom/2026-09-27-visualization-node-title-style/evidence/probes/test_separator_first_line.py",
+      "result": "pass",
+      "command_digest": "de89ca85f7a6e60be726522bf1f3abded90894c86cd2b1bf43ac67ed842e3922"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a60762a13e10ca62e",
+      "vendor": "claude",
+      "model": "orcarouter-only[1m]",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "d70fbc57",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS",
+        "architecture-conformance": "N/A — repository root has no ARCHITECTURE.md"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "loom-workflow/skills/loom-visualization/scripts/gen_flow.py:125",
+          "text": "suggestion (non-blocking): gen_flow.py and gen_arch.py inline duplicated structured-node rendering logic.",
+          "fix": "extract the structured-node rendering block into a shared helper in width.py."
+        }
+      ]
+    },
+    {
+      "reviewer": "acb091aac96dea623",
+      "vendor": "claude",
+      "model": "orcarouter-only[1m]",
+      "lens": "spec-conformance",
+      "verdict": "PASS",
+      "reviewed_sha": "d70fbc57",
+      "dimension_scores": {
+        "spec-conformance": "PASS",
+        "user-judgment-leak": "PASS",
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS"
+      },
+      "findings": []
+    },
+    {
+      "reviewer": "a12659c87a8f2c522",
+      "vendor": "claude",
+      "model": "opus",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "d8c7186a",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md",
+        "spec-conformance": "PASS",
+        "user-judgment-leak": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "loom-workflow/skills/loom-visualization/SKILL.md:146-148",
+          "text": "SKILL.md's align.py check list omits the newly added checks_nodes.py.",
+          "fix": "Add node-structure (scripts/checks_nodes.py) to the list. — FIXED in 3b737c89"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

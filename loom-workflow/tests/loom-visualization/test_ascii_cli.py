@@ -373,7 +373,7 @@ _HERE = pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualiza
 
 PORTED_MODULES = (
     "width", "glyphs", "align", "generate",
-    "checks_seam", "checks_table", "checks_kink",
+    "checks_seam", "checks_table", "checks_kink", "checks_nodes",
     "gen_table", "gen_flow", "gen_tree", "gen_bar", "gen_arch", "gen_seq",
 )
 

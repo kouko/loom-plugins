@@ -131,6 +131,9 @@ Where there is no generator (branching decision, reasoning chain, state
 lifecycle, timeline), adapt the template's ASCII by hand. The data model has
 no ASCII form; use its table substitute.
 
+For how a node's text is structured and verified, see
+`references/node-structure.md`.
+
 Always verify before sending:
 
 ```
@@ -141,8 +144,9 @@ It prints a per-line width report, then either `line N: col C: message` for
 each drift or `✓ no drift`, exiting 0 when clean and 1 on drift. Fix only the
 flagged lines and rerun until it is clean. The checks it runs are the vertical
 seam (`scripts/checks_seam.py`), table equal width
-(`scripts/checks_table.py`) and kink plus arrowhead landing
-(`scripts/checks_kink.py`). The one exception is `seq` output: it is correct
+(`scripts/checks_table.py`), kink plus arrowhead landing
+(`scripts/checks_kink.py`) and node structure (`scripts/checks_nodes.py`). The
+one exception is `seq` output: it is correct
 by construction, its blank off-span lifelines sit outside the seam model, and
 it is sent unedited.
 
@@ -187,3 +191,7 @@ never publish before the fidelity check passes.
   `obsidian:obsidian-mermaid-visualizer`.
 - **A page drawn without reading the source, or padded to reach five nodes.**
   Page mode's extraction is the work; three reasoning states get prose.
+- **Unstructured multi-line box.** A box interior with multiple content lines
+  and no separator row — the node structure was skipped.
+- **Empty separator.** A separator row with no body line after it — the
+  container rule was violated.
