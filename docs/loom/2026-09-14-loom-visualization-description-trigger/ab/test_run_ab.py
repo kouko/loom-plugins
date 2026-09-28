@@ -85,6 +85,25 @@ def test_build_extracts_current_description_variants(tmp_path: Path, monkeypatch
     assert "| A | 9/9 |" in (tmp_path / "out/results.md").read_text(encoding="utf-8")
 
 
+def test_run_exits_nonzero_when_every_session_errors(tmp_path: Path, monkeypatch) -> None:
+    # a stub `claude` that rejects the model every time, as `unrecognized_model` did
+    stub = tmp_path / "bin" / "claude"
+    stub.parent.mkdir()
+    failed = json.dumps({"type": "result", "is_error": True, "result": "unrecognized_model"})
+    stub.write_text(f"#!/bin/sh\necho '{failed}'\nexit 1\n", encoding="utf-8")
+    stub.chmod(0o755)
+    (tmp_path / "home/.claude").mkdir(parents=True)
+    (tmp_path / "home/.claude/settings.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("PATH", f"{stub.parent}:{os.environ['PATH']}")
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    monkeypatch.setattr(run_ab, "SCRATCH", tmp_path / "scratch")
+    monkeypatch.setattr(run_ab, "verify_copies", lambda a, b: None)
+    run_ab.set_output(tmp_path / "out")
+    with pytest.raises(SystemExit) as exc:
+        run_ab.run(runs=1, workers=4)
+    assert exc.value.code not in (0, None)
+
+
 def test_output_dir_inside_old_change_is_refused(tmp_path: Path) -> None:
     with pytest.raises(SystemExit):
         run_ab.set_output(run_ab.CHANGE_DIR / "evidence")

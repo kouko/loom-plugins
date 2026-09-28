@@ -8,7 +8,8 @@ which may not lie inside this 2026-09-14 change directory.
 
 Rerun for the current description (from the repo root; stdlib only). Needs the
 `claude` CLI on PATH, logged in, with quota for 9 prompts x --runs x 2 variants
-sessions (36 at the default --runs 2; 18 at --runs 1):
+sessions (36 at the default --runs 2; 18 at --runs 1).
+If `claude -p` rejects the default model, export ANTHROPIC_MODEL=<model> first; both variants inherit it.
 
   AB=docs/loom/2026-09-14-loom-visualization-description-trigger/ab/run_ab.py
   OUT=docs/loom/2026-09-28-prose-pin-stock-cleanup-batch-2/evidence/ab-rerun
@@ -18,7 +19,8 @@ sessions (36 at the default --runs 2; 18 at --runs 1):
   python3 $AB report --prompts $OUT/protocol.md --out $OUT --runs 2
 
 `run` skips sessions whose stream is already complete, so it can be repeated
-(or capped with --limit N) until every session has a result.
+(or capped with --limit N) until every session has a result. `run` exits non-zero
+when every session it started errored.
 """
 
 from __future__ import annotations
@@ -217,6 +219,9 @@ def run(runs: int, workers: int, limit: int | None = None) -> None:
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for line in pool.map(lambda j: _run_one(*j, settings_json), jobs):
             print(line, flush=True)
+    failed = pending_jobs(jobs, EVIDENCE, None)
+    if jobs and len(failed) == len(jobs):  # nothing measured: a setup fault, e.g. a rejected model
+        raise SystemExit(f"every one of the {len(jobs)} sessions errored; see the .stderr.txt files")
 
 
 def report(runs: int) -> None:

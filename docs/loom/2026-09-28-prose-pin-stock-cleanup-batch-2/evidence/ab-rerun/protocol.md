@@ -33,7 +33,8 @@ Neither text is hard-coded in `run_ab.py`.
 ## Rerun command
 
 From the repo root. Needs the `claude` CLI on PATH, logged in, with quota for
-9 prompts × 2 runs × 2 variants = 36 sessions (18 with `--runs 1`):
+9 prompts × 2 runs × 2 variants = 36 sessions (18 with `--runs 1`).
+If `claude -p` rejects the default model, export ANTHROPIC_MODEL=<model> first; both variants inherit it.
 
 ```
 AB=docs/loom/2026-09-14-loom-visualization-description-trigger/ab/run_ab.py
@@ -45,7 +46,8 @@ python3 $AB report --prompts $OUT/protocol.md --out $OUT --runs 2
 ```
 
 `run` skips sessions whose stream is already complete, so it can be repeated,
-or capped with `--limit N`, until every session has a result. `--out` inside the
+or capped with `--limit N`, until every session has a result. `run` exits non-zero when every session it
+started errored. `--out` inside the
 2026-09-14 change directory is refused. Do not pass `--disable-slash-commands`:
 it also disables skills.
 
