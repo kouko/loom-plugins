@@ -62,6 +62,9 @@ def test_class_relative_route_and_insufficient_evidence_boundary() -> None:
     flat = _flat(text)
 
     assert "mechanical > complex > ordinary" in flat
+    _affirmative_sentence(text, "lower the model by one tier and preserve effort")
+    _affirmative_sentence(text, "raise the model by one tier and preserve effort")
+    _affirmative_sentence(text, "preserve both model and effort")
     assert "exact transformation, bounded targets, and a mechanical oracle" in flat
     assert "insufficient-task-evidence" in flat
     assert "route as `ordinary`" in flat
@@ -92,12 +95,29 @@ def test_nonconforming_output_retry_keeps_validation_and_retry_ownership_separat
     review = _flat((PLUGIN / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8"))
     runner = (PLUGIN / "scripts" / "claude_reviewer.py").read_text(encoding="utf-8")
 
+    assert "retry the same effective profile without model or effort escalation" in profile
     assert "missing kind or another known kind returns `execution-failed`" in profile
     assert "an unknown kind is malformed input" in profile
     assert "consumes the shared completed-redispatch budget" in profile
     assert "`closing-review` orchestrator enforces its stricter one-retry limit" in review
     assert "never parse or validate reviewer YAML" in review
     assert "never retry or interpret reviewer content" in runner
+
+
+RESOLVER_INVOCATION_PHRASES = (
+    "classify the task from its evidence",
+    "resolve the atomic model-and-effort profile",
+    "active task context only",
+    "static model or effort pin",
+    "python3 <loom-code>/scripts/dispatch_profile.py",
+    "pass the resolver's deterministic JSON result to the host-native spawn",
+    "apply both fields from `overrides`, or apply neither when it is `null`",
+    "apply the resolved overrides at invocation time",
+    "feed every completed result back as an `after-execution` event before any redispatch",
+    "post-execution capability-quality failure",
+    "as a pre-execution host rejection",
+    "selects the one atomic fallback instead of model escalation",
+)
 
 
 def test_stations_do_not_restate_the_resolver_invocation() -> None:
@@ -172,19 +192,3 @@ def test_cost_pilot_sparse_ladder_is_historical_not_normative_routing() -> None:
     assert "final routing" in report
     assert "`standard/medium` → `frontier/medium`" in report
     assert "comparison and calibration evidence" in report
-
-
-RESOLVER_INVOCATION_PHRASES = (
-    "classify the task from its evidence",
-    "resolve the atomic model-and-effort profile",
-    "active task context only",
-    "static model or effort pin",
-    "python3 <loom-code>/scripts/dispatch_profile.py",
-    "pass the resolver's deterministic JSON result to the host-native spawn",
-    "apply both fields from `overrides`, or apply neither when it is `null`",
-    "apply the resolved overrides at invocation time",
-    "feed every completed result back as an `after-execution` event before any redispatch",
-    "post-execution capability-quality failure",
-    "as a pre-execution host rejection",
-    "selects the one atomic fallback instead of model escalation",
-)
