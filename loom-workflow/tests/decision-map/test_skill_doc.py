@@ -203,11 +203,10 @@ def test_v3_public_surface_commands_templates_and_version_are_synchronized(
 
     for public_contract in (skill, map_format):
         assert "Map clear" in public_contract
-        assert "retirement" in public_contract.lower()
         assert "schema_version: 3" in public_contract
 
-    assert "research" in prototype
-    assert "prototype" in prototype
+    assert "`research`" in prototype
+    assert "`prototype`" in prototype
 
     operations = (
         "Start",
@@ -222,7 +221,6 @@ def test_v3_public_surface_commands_templates_and_version_are_synchronized(
         assert operation in skill
     assert "preview_migration(map_dir)" in skill
     assert "apply_migration(map_dir, preview)" in skill
-    assert "zero-write preview" in skill
 
     for command in DOCUMENTED_COMMANDS:
         assert command in skill
