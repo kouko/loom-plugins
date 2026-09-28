@@ -30,6 +30,7 @@ publication: automatic — authorized 2026-09-27 by kouko
 - 變更 PR #61 已確立的證據政策（tests lens 散文條款、intake 豁免、單一版本常數）。
 - docs/loom 工作文件（本來就無測試）。
 - 第二批（2026-09-28 kouko 決定分批）：普查歸為行為類、但檔內仍夾帶句子釘住斷言的 15 個檔案，以及 gate eval 檔案內的釘住斷言替換；另開變更處理，清單見本變更 census-report。
+- 修復 loom-visualization 描述的 A/B 重跑腳本（`docs/loom/2026-09-14-loom-visualization-description-trigger/ab/run_ab.py`：import 路徑已失效、寫死舊描述）；2026-09-28 kouko 決定描述證據改為語意審查＋結果重跑後，結果重跑須待此修復，另開變更。
 
 ## Open questions
 - none
