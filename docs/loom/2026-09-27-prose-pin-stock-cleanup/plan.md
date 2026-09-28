@@ -67,7 +67,7 @@ charter: 1.1
 ### Wave 4 — closing review entry
 
 **W4-01 Graduate the adversarial probes that caught defects**  after: W3-02  acceptance: 1, 2
-- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_census_gaming.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_pruned_guards.py, loom-code/tests/test_adversarial_census_gaming.py, loom-code/tests/test_adversarial_pruned_guards.py
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_census_gaming.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_pruned_guards.py, loom-code/tests/test_adversarial_census_gaming.py, loom-code/tests/test_adversary_recipe_code.py
 - Test: A1 positive: census-class-ignores-comments-in-suite; negative: census-script-absent-skips-with-reason. A2 positive: recipe-row-dropped-goes-red-in-suite; negative: intact-recipe-stays-green.
 - Risk: review.probe-graduation — both caught a defect here (comment-steered census class; vacuous case-class check); graduated copies stay byte copies, path line aside, and skip with a reason when the evidence script is absent; agent-decided.
 
