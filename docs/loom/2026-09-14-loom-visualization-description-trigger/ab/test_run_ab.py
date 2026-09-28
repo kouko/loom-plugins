@@ -1,8 +1,9 @@
-"""Focused tests for run_ab.py's pure parts: decision rule, hash, parsing, argv."""
+"""Focused tests for run_ab.py: decision rule, parsing, argv, build, output dir."""
 
 from __future__ import annotations
 
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -61,11 +62,33 @@ def test_scratch_default_is_under_system_temp_not_a_session_path() -> None:
     assert "claude-501" not in run_ab.Path(run_ab.__file__).read_text(encoding="utf-8")
 
 
-def test_candidate_hash_recorded_and_mismatch_detected() -> None:
-    assert run_ab.sha256_text(run_ab.DESCRIPTION_B) == run_ab.DESCRIPTION_B_SHA256
-    run_ab.check_hash(run_ab.DESCRIPTION_B)
-    with pytest.raises(ValueError):
-        run_ab.check_hash(run_ab.DESCRIPTION_B + " ")
+def test_build_extracts_current_description_variants(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(run_ab, "SCRATCH", tmp_path / "scratch")
+    run_ab.build("6ad80799")
+    a, b = (run_ab._render_description((tmp_path / "scratch" / v / run_ab.SKILL_REL).read_text(encoding="utf-8"))
+            for v in ("A", "B"))
+    assert b == run_ab.current_description() and a != b and a.endswith("coding chat; not Obsidian notes.")
+    # run with a stub `claude` that writes one canned stream; report writes results.md in the output dir
+    stub = tmp_path / "bin" / "claude"
+    stub.parent.mkdir()
+    canned = "\n".join(json.dumps(e) for e in [_tool("Skill", {"skill": "loom-visualization"}),
+                                                  {"type": "result", "result": "ok"}])
+    stub.write_text(f"#!/bin/sh\ncat <<'EOF'\n{canned}\nEOF\n", encoding="utf-8")
+    stub.chmod(0o755)
+    (tmp_path / "home/.claude").mkdir(parents=True)
+    (tmp_path / "home/.claude/settings.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("PATH", f"{stub.parent}:{os.environ['PATH']}")
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    run_ab.set_output(tmp_path / "out")
+    run_ab.run(runs=1, workers=4)
+    run_ab.report(runs=1)
+    assert "| A | 9/9 |" in (tmp_path / "out/results.md").read_text(encoding="utf-8")
+
+
+def test_output_dir_inside_old_change_is_refused(tmp_path: Path) -> None:
+    with pytest.raises(SystemExit):
+        run_ab.set_output(run_ab.CHANGE_DIR / "evidence")
+    assert run_ab.set_output(tmp_path / "out") == tmp_path / "out"
 
 
 def _stream(tmp: Path, events: list[dict]) -> Path:
@@ -135,8 +158,8 @@ def test_copies_differing_beyond_description_are_rejected() -> None:
             (root / "loom-code/x.md").write_text("same\n", encoding="utf-8")
         skill = "---\nname: loom-visualization\ndescription: |\n  {}\n---\nbody\n"
         rel = run_ab.SKILL_REL
-        (a / rel).write_text(skill.format(run_ab.DESCRIPTION_A), encoding="utf-8")
-        (b / rel).write_text(skill.format(run_ab.DESCRIPTION_B), encoding="utf-8")
+        (a / rel).write_text(skill.format("old text"), encoding="utf-8")
+        (b / rel).write_text(skill.format(run_ab.current_description()), encoding="utf-8")
         run_ab.verify_copies(a, b)
         (a / "loom-code/__pycache__").mkdir()
         (a / "loom-code/__pycache__/hook.cpython-312.pyc").write_bytes(b"\0")
