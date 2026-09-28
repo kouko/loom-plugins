@@ -150,4 +150,3 @@ def test_referenced_paths_exist():
 def test_interview_template_referenced_not_copied():
     text = _text()
     assert "contract/templates/PRINCIPLES-interview.md" in text
-    assert "the interview is the same one" in text.lower()

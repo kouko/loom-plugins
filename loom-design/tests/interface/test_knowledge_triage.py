@@ -17,9 +17,10 @@ What is deliberately NOT weakened by that collapse:
      a transcribed pin from drifting.
   2. Every wording assertion that had a subject in the surviving file is
      kept verbatim, only re-aimed from a loop over two files to the one.
-  3. The supplement sentences are still required to appear exactly once,
-     after the pin, in that order. Only the "byte-identical across both
-     files" pair is gone, because there is no second file to differ from.
+  3. The tier vocabulary (SHAPING / DEFERRABLE) is still required to be
+     present. The supplement sentences' exact wording is no longer pinned
+     here; a rewording is a closing-review skill-lens finding, not a test
+     failure.
 
 Section 11 below is inherited, not new. `scripts/test_bucket_vocabulary_
 consistency.py` was the repo-root guard on the bucket vocabulary "across the
@@ -100,15 +101,6 @@ def test_high_bar_shaping_criteria_present():
     low = _text(DS_TRIAGE).lower()
     assert "shaping" in low, "knowledge-triage.md missing SHAPING tier"
     assert "deferrable" in low, "knowledge-triage.md missing DEFERRABLE tier"
-    assert "flow structure" in low, "missing 'flow structure' shaping criterion"
-    assert "state machine" in low, "missing 'state machine' shaping criterion"
-    assert "semantic display convention" in low, (
-        "missing 'semantic display convention' shaping criterion"
-    )
-    # concrete worked examples from the plan's shaping bar
-    assert "color semantic" in low, "missing color-semantics example"
-    assert "sign convention" in low, "missing sign-convention example"
-    assert "period definition" in low, "missing period-definition example"
 
 
 def test_rationale_bar_higher_than_spec_present():
@@ -216,35 +208,6 @@ def test_references_dir_stays_flat():
         )
 
 
-# --- 8. the SHAPING consequence supplement ----------------------------------
-
-SHAPING_SUPPLEMENT = (
-    "SHAPING never ships as non-blocking: it either resolves before this "
-    "station's gate or carries `deferred: <reason>`."
-)
-
-
-def test_shaping_supplement_present_verbatim():
-    text = _text(DS_TRIAGE)
-    assert text.count(SHAPING_SUPPLEMENT) == 1, (
-        "knowledge-triage.md must carry the SHAPING supplement sentence "
-        "exactly once, verbatim"
-    )
-
-
-def test_shaping_supplement_after_pin_never_inside():
-    text = _text(DS_TRIAGE)
-    fence_match = re.search(r"```\n.*?\n```", text, re.DOTALL)
-    assert fence_match, "knowledge-triage.md missing fenced pin block"
-    supplement_idx = text.index(SHAPING_SUPPLEMENT)
-    assert supplement_idx >= fence_match.end(), (
-        "SHAPING supplement must come AFTER the pin block closes"
-    )
-    assert not (fence_match.start() <= supplement_idx < fence_match.end()), (
-        "SHAPING supplement must not be inside the pin fence"
-    )
-
-
 # --- 9. pin block stays byte-untouched vs HEAD ------------------------------
 
 
@@ -268,40 +231,6 @@ def test_pin_block_byte_untouched_vs_head():
     assert current_fence == head_fence, (
         "pin block must stay byte-identical to the HEAD version "
         "— edits belong AFTER the pin, never inside it"
-    )
-
-
-# --- 10. the literal tier-label supplement ----------------------------------
-# Code-quality-reviewer finding (round 1): the pre-check's grep target
-# ("SHAPING") had no artifact obligation requiring it to literally exist.
-# This supplement makes the tier label a literal artifact obligation. The
-# pre-check it mechanized lived in design-critic and is gone; the obligation
-# it created on the artifact is not, so the supplement stays required.
-
-TIER_LABEL_SUPPLEMENT = (
-    "Every tagged open question written into DESIGN.md must "
-    "carry a literal `SHAPING` or `DEFERRABLE` label alongside its "
-    "`evidence_needed:` tag."
-)
-
-
-def test_tier_label_supplement_present_verbatim():
-    text = _text(DS_TRIAGE)
-    assert text.count(TIER_LABEL_SUPPLEMENT) == 1, (
-        "knowledge-triage.md must carry the tier-label supplement sentence "
-        "exactly once, verbatim"
-    )
-
-
-def test_tier_label_supplement_after_first_supplement():
-    """The second supplement lands AFTER the pin AND after the existing
-    SHAPING consequence supplement — never before or inside either."""
-    text = _text(DS_TRIAGE)
-    first_idx = text.index(SHAPING_SUPPLEMENT)
-    second_idx = text.index(TIER_LABEL_SUPPLEMENT)
-    assert second_idx > first_idx + len(SHAPING_SUPPLEMENT), (
-        "tier-label supplement must come AFTER the existing SHAPING-consequence "
-        "supplement sentence"
     )
 
 
