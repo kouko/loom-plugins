@@ -18,13 +18,13 @@ TRIGGER = "# prose_pin matcher self-test"
 RECIPE_MODULES = ("code", "shape", "skill_gate", "spec")
 
 
-def test_census_class_comment_token_stripped_is_unchanged(tmp_path: Path) -> None:
-    """Removing a comment that asserts nothing must not change a file's census class."""
+def test_census_class_comment_token_planted_is_unchanged(tmp_path: Path) -> None:
+    """Adding a comment that asserts nothing must not change a file's census class."""
     flipped = []
     for name in RECIPE_MODULES:
         path = ctf.REPO / f"loom-code/tests/test_adversary_recipe_{name}.py"
         copy = tmp_path / path.name
-        copy.write_text(path.read_text(encoding="utf-8").replace(TRIGGER, ""), encoding="utf-8")
+        copy.write_text(path.read_text(encoding="utf-8") + f"\n{TRIGGER}\n", encoding="utf-8")
         before, after = ctf.classify(path)[0], ctf.classify(copy)[0]
         if before != after:
             flipped.append((path.name, before, after))
