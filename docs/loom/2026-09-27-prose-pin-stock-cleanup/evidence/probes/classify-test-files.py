@@ -19,7 +19,7 @@ A file is a prose reader if it names a .md path. `behavior` wins ties;
 `grammar-invariant` wins over `sentence-pin` only for matcher self-tests
 and gate-marker grammar, which the plan lists explicitly as retained.
 
-Usage: python3 classify-test-files.py [--roots ...]  (prints a table)
+Usage: python3 classify-test-files.py [--roots a,b,...]  (prints a table)
        python3 classify-test-files.py --count-exec <dir>  (A5: test functions
        whose body carries the execution signal, under <dir>'s four test roots)
 """
@@ -105,6 +105,26 @@ GRAMMAR_INVARIANT_CONTENT = re.compile(
 )
 
 
+def code_only(text: str) -> str:
+    """The source with its `#` comments removed, so no comment can change a class.
+
+    Docstrings are kept: stripping them reclassifies 15 files (none into
+    sentence-pin), a wider census change than this fix round covers.
+    """
+    import io
+    import tokenize
+
+    lines = text.splitlines(keepends=True)
+    try:
+        tokens = list(tokenize.generate_tokens(io.StringIO(text).readline))
+    except (SyntaxError, tokenize.TokenError):
+        return text
+    for tok in reversed([t for t in tokens if t.type == tokenize.COMMENT]):
+        (row, col), (_row, end) = tok.start, tok.end
+        lines[row - 1] = lines[row - 1][:col] + lines[row - 1][end:]
+    return "".join(lines)
+
+
 def executes(text: str) -> bool:
     """Execution signal: a program run (subprocess/checker/script) whose result is asserted."""
     has_subprocess_assert = bool(re.search(r'\.(?:stdout|stderr|returncode)|pytest\.raises', text))
@@ -175,7 +195,7 @@ def count_executing_tests(base: Path) -> int:
 
 
 def _classify(path: Path) -> tuple[str, dict]:
-    text = path.read_text(encoding="utf-8", errors="replace")
+    text = code_only(path.read_text(encoding="utf-8", errors="replace"))
     has_md = ".md" in text or ".markdown" in text
 
     if not has_md:
@@ -255,11 +275,17 @@ def _classify(path: Path) -> tuple[str, dict]:
 
 
 def main() -> int:
-    if "--count-exec" in sys.argv:
-        base = Path(sys.argv[sys.argv.index("--count-exec") + 1]).resolve()
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Census classifier for the prose-pin stock cleanup.")
+    parser.add_argument("--roots", default=",".join(DEFAULT_ROOTS), help="comma-separated test roots")
+    parser.add_argument("--count-exec", metavar="DIR", help="count executing test functions under DIR")
+    args = parser.parse_args()
+    if args.count_exec is not None:
+        base = Path(args.count_exec).resolve()
         print(f"executing test functions under {base}: {count_executing_tests(base)}")
         return 0
-    roots = DEFAULT_ROOTS if "--roots" not in sys.argv else sys.argv[sys.argv.index("--roots") + 1:].split(",")
+    roots = [r for r in args.roots.split(",") if r]
     gate_evals = load_gate_evals()
     counts: dict[str, int] = {"sentence-pin": 0, "gate-eval": 0}  # A4 reads these even at zero
     rows = []  # (file, class, secondary_markers)

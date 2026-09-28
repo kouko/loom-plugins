@@ -1077,15 +1077,15 @@ def test_reword_candidates_pass_over_a_recipe_already_red_synthetic() -> None:
 
 
 def test_reword_plants_when_prose_pin_exists_synthetic(tmp_path: Path) -> None:
-    """A2 negative: if a prose pin existed, a reword WOULD plant a failure.
+    """A2 negative: a pin on the sentence the guard rewords goes red.
 
-    This is the guard's self-test. It constructs a tiny synthetic repo copy
-    (tmp_path, no full repo copy needed): a fake recipe md + a fake test
-    module that pins a sentence of it, rewords the sentence in the copy,
+    It constructs a tiny synthetic repo copy (tmp_path, no full repo copy
+    needed): a fake recipe md + a fake test module that pins its longest
+    sentence, swaps that sentence's first two words the way the guard does,
     runs pytest on the fake module, and asserts the pin test went red.
 
-    Without this, the inverted assertion proves nothing — it would pass
-    whether or not the no-pin invariant actually holds.
+    It shows only that the swap disturbs a pin on the longest sentence; a
+    pin on a shorter sentence is outside what the guard or this test checks.
     """
     # Create a synthetic references folder structure
     refs = tmp_path / "loom-code/skills/closing-review/references"
@@ -1341,9 +1341,11 @@ def test_a_reworded_recipe_plants_no_failure_for_the_addition_to_be_judged_on(
     sentences. W1-01 pruned all prose-pin assertions from the four recipe test
     modules (45bd949d). The new premise — grounded in the current intent
     (2026-09-27-prose-pin-stock-cleanup) — is that a reword must make NO test
-    red. This inverted assertion is a grammar-level invariant that also guards
-    against prose pins being reintroduced: if anyone adds a pin back, a reword
-    will redden that pin test, and this test will fail.
+    red. What it checks is narrower than "no pin anywhere": the reword swaps
+    the first two words of each candidate recipe's longest sentence, so only
+    a pin on that sentence (or a literal opening at its first word) would go
+    red and fail this test. A pin on any other sentence is not disturbed and
+    goes unseen here.
 
     The machinery (_reword_candidates, _copy_repository, _reword_a_recipe_in,
     _run_adversary_tests, caused_by_the_edit) is kept; the assertion flips:
