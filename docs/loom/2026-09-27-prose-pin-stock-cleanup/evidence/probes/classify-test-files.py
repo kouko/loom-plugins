@@ -196,6 +196,11 @@ PLACEHOLDER = re.compile(r"<[A-Za-z][\w -]*>|\{[\w-]*\}")
 KEY_LINE = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*|\")?[a-z][\w.-]*(?:\*\*|\")?:(?:\s|$)")
 COMMIT_SUBJECT = re.compile(r"^[a-z]+\([\w-]+\): ")
 FILE_EXT = re.compile(r"\w\.[A-Za-z][A-Za-z0-9]{0,4}\b")
+MERMAID_KEYWORDS = {"flowchart", "graph", "sequenceDiagram", "classDiagram", "stateDiagram", "stateDiagram-v2",
+                    "erDiagram", "journey", "gantt", "pie", "quadrantChart", "requirementDiagram", "gitGraph",
+                    "mindmap", "timeline", "sankey-beta", "xychart-beta", "block-beta", "packet-beta", "kanban",
+                    "architecture-beta"}
+MERMAID_DIRECTIONS = {"LR", "RL", "TD", "TB", "BT"}
 CODE_MARK = re.compile(r"_|\(\)|\[\]|`|\w\.\w|=|\$|\\|^-|-$|[A-Za-z]\d|\w:\w")
 REGEX_NORM = ((re.compile(r"\(\?[aimsxu]+\)|\\b|\\A|\\Z|(?<!\\)[\^$]"), ""),
               (re.compile(r"\\s[+*?]?"), " "), (re.compile(r"\\([.|()\[\]?*+-])"), r"\1"),
@@ -240,6 +245,9 @@ def literal_class(s: str, regex: bool = False) -> tuple[str, str] | None:
       1-2 words  — path: contains `/` or a file extension (`x.md`, or `.md` alone)
                  — repo name: a word is a hyphenated skill, plugin or script name found on
                    disk (loom-code, write-spec, sync-trunk ...)
+                 — Mermaid diagram keyword: first word opens a Mermaid block (flowchart, erDiagram,
+                   stateDiagram-v2 ...), any other word a direction token (LR, TD ...)
+                 — generator name: a single word that is `<name>` of a gen_<name> script on disk
                  — code identifier: contains `_`, `()`, `[]`, a backtick, `a.b` (also dotted
                    rule and gate ids), `=`, `$`, a backslash (regex grammar), `a:b` (a skill id), a leading or
                    trailing `-` (a name fragment), or a letter followed by a digit (sha1, v3)
@@ -286,6 +294,10 @@ def literal_class(s: str, regex: bool = False) -> tuple[str, str] | None:
         return "structural", "path"
     if any(w.strip("`'\".,:;()") in _repo_names() for w in words):
         return "structural", "names a skill, plugin or script (a hyphenated repo name)"
+    if words[0] in MERMAID_KEYWORDS and set(words[1:]) <= MERMAID_DIRECTIONS:
+        return "structural", "Mermaid diagram keyword"
+    if len(words) == 1 and words[0] in _generator_names():
+        return "structural", "generator name (a gen_<name> script on disk)"
     if CODE_MARK.search(t):
         return "structural", "code identifier"
     if not any(ch.islower() for ch in t):
@@ -307,6 +319,11 @@ def _repo_names() -> set[str]:
         found |= {q.stem for q in REPO.glob("*/skills/*/scripts/*")} | {q.stem for q in REPO.glob("*/scripts/*")}
         _NAMES_CACHE[REPO] = {n for n in found if "-" in n}
     return _NAMES_CACHE[REPO]
+
+
+def _generator_names() -> set[str]:
+    """Generator names from `gen_<name>` scripts on disk (`seq` from gen_seq.py)."""
+    return {q.stem[4:] for q in REPO.glob("*/skills/*/scripts/gen_*.py")}
 
 
 def _repo_production_modules() -> set[str]:

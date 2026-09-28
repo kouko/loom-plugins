@@ -100,6 +100,16 @@ def test_heading_marker_field_key_classed_structural() -> None:
     assert [c["cls"] for c in found if c["func"] == "test_x"] == ["structural"] * 3, found
 
 
+def test_mermaid_keyword_and_generator_name_classed_structural() -> None:
+    for lit in ("flowchart LR", "stateDiagram-v2", "erDiagram", "graph TD", "seq"):
+        assert ctf.literal_class(lit)[0] == "structural", lit
+
+
+def test_prose_needle_with_a_diagram_word_still_flagged() -> None:
+    for lit in ("flowchart rectangles", "never dispatch", "timeline view"):
+        assert ctf.literal_class(lit)[0] == "prose", lit
+
+
 def test_helper_fed_prose_and_index_and_regex_flagged() -> None:
     body = ('import re\n\ndef _errors(text):\n    if "never dispatch" not in text:\n        return ["x"]\n    return []\n\n'
             'def test_x():\n    assert not _errors(TEXT)\n    TEXT.index("never dispatch")\n'
