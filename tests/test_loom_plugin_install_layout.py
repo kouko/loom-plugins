@@ -602,13 +602,12 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
             )
 
 
-def test_sibling_lookup_allows_version_subdirectory() -> None:
-    """Every design skill that locates `loom-code` by host covers the
-    non-Claude hosts too. Claude and Codex caches hold `<name>/<version>/`;
-    Antigravity CLI installs `<name>/` with no version directory, so the
-    other-host row must allow, not require, one version subdirectory.
-    The five skills share one lookup table in capture-intent's references
-    and each links it from Step 0."""
+def test_lookup_table_lives_in_one_place_and_every_skill_links_it() -> None:
+    """Every one of the five design skills with a Step 0 contract-version
+    check links the shared `locate-loom-code.md` lookup table instead of
+    carrying its own copy. Exactly one file in `loom-design/skills` holds
+    that lookup table, and its table has exactly one merged Codex/Antigravity
+    row."""
     design_skills = REPO_ROOT / "loom-design" / "skills"
     linking = 0
     for skill_md in sorted(design_skills.glob("*/SKILL.md")):
