@@ -192,7 +192,7 @@ def test_unsupported_nutt_figures_absent():
     assert nutt_citation_errors(old) != []
 
 
-def test_rewrite_opens_with_conclusion_and_keeps_facts():
+def test_rewrite_opens_with_conclusion():
     text = _text()
     assert "first rewrite step is not conclusion-first" not in guide_errors(text)
 

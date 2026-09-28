@@ -43,7 +43,7 @@ def test_code_lens_has_architecture_conformance_na_without_doc() -> None:
     assert "ratified-by: <name> <date>" in code
 
 
-def test_reviewer_lists_it_and_reviewer_count_unchanged() -> None:
+def test_reviewer_code_row_lists_architecture_conformance() -> None:
     row = next(
         line for line in REVIEWER.read_text(encoding="utf-8").splitlines()
         if line.startswith("| `code` |")

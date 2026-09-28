@@ -266,8 +266,8 @@ def test_v3_public_surface_commands_templates_and_version_are_synchronized(
     assert ticket_template in map_format
 
 
-def test_v3_contract_pins_release_boundary_and_metric_definition():
-    """Current map instructions retain the v3 boundary and metric facts."""
+def test_map_format_declares_schema_version_3_without_v1():
+    """The map format declares `schema_version: 3` and never mentions v1."""
     map_format_text = MAP_FORMAT_MD.read_text(encoding="utf-8")
 
     assert "schema_version: 3" in map_format_text

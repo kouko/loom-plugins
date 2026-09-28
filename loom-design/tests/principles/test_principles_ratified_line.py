@@ -147,6 +147,6 @@ def test_referenced_paths_exist():
         assert candidate.is_file(), f"SKILL.md references missing path: {m.group(1)}"
 
 
-def test_interview_template_referenced_not_copied():
+def test_interview_template_path_is_referenced():
     text = _text()
     assert "contract/templates/PRINCIPLES-interview.md" in text

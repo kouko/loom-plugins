@@ -24,7 +24,7 @@ def _markdown(skill_dir):
     return sorted(skill_dir.rglob("*.md"))
 
 
-def test_skill_dir_phrase_defined_and_used_for_every_script_call():
+def test_each_skill_calls_a_script_through_skill_dir():
     for skill_dir in SKILL_DIRS:
         prose = " ".join((skill_dir / "SKILL.md").read_text(encoding="utf-8").split())
         assert SKILL_DIR_SCRIPT.search(prose), skill_dir.name

@@ -97,7 +97,7 @@ def test_pin_precedes_station_doctrine():
 # --- 2. HIGH-bar two-tier wording -------------------------------------------
 
 
-def test_high_bar_shaping_criteria_present():
+def test_triage_names_shaping_and_deferrable_tiers():
     low = _text(DS_TRIAGE).lower()
     assert "shaping" in low, "knowledge-triage.md missing SHAPING tier"
     assert "deferrable" in low, "knowledge-triage.md missing DEFERRABLE tier"

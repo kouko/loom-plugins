@@ -149,7 +149,7 @@ def test_failure_prompt_structure() -> None:
 
 
 def test_success_prompt_structure() -> None:
-    """prompt-success-analysis.md must enforce Lean Solution Path distillation."""
+    """prompt-success-analysis.md has a Lean Solution Path section and asks to strip dead ends."""
     fm, body = _assert_common_shape(SUCCESS_PATH)
 
     # Role should signal success-analysis side.

@@ -127,9 +127,9 @@ def test_reviewer_nitclause_absent():
     English, (ii) mentions EARS or SHALL, (iii) mentions "Conventional
     Comments" or a label list, (iv) says nit, and (v) sits outside the
     docs-lint carve-out (stating the rule holds "regardless" of docs-lint).
-    Also assert the carve-out paragraph itself still exists, so the clause
-    is provably a *second*, separate paragraph, not folded into the
-    carve-out's own scope. RED today — reviewer.md contains none of
+    Also assert the docs-lint carve-out is still named in the file; whether
+    the clause is a separate paragraph from the carve-out is left to
+    review. RED today — reviewer.md contains none of
     "English", "EARS", "shall", or "Conventional Comments" anywhere (grep
     confirmed). GREEN target: W1-02."""
     text = REVIEWER_MD.read_text(encoding="utf-8")

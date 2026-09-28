@@ -34,7 +34,7 @@ def test_start_delivery_writes_an_intent_not_a_brief():
     assert "start_delivery.py" in skill
 
 
-def test_delivery_state_derives_from_the_intent_status():
+def test_skill_lists_the_intent_status_values():
     skill = _flat(SKILL_MD.read_text(encoding="utf-8"))
     for status in ("`open`", "`confirmed <date>`", "`closed`", "`withdrawn"):
         assert status in skill

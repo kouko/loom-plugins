@@ -135,7 +135,7 @@ def test_all_ten_blocks_and_five_principles_present() -> None:
     )
 
 
-def test_resume_launcher_section_present_and_constrained() -> None:
+def test_resume_launcher_section_has_directive_and_example_headings() -> None:
     """
     v0.2.0 gate: the schema documents the Resume Launcher (init prompt) as a
     prepare-mode output, with a USER DIRECTIVE field, plus good/bad example
@@ -170,11 +170,11 @@ def test_resume_launcher_section_present_and_constrained() -> None:
         )
 
 
-def test_conversation_language_captured_and_propagated() -> None:
+def test_conversation_language_captured_in_frontmatter() -> None:
     """
     v0.3.0 language-preservation gate: the HANDOFF must capture the session's
-    conversation language (Block 1 frontmatter) AND the Resume Launcher must tell
-    the next session to reply in it.
+    conversation language (Block 1 frontmatter). That the Resume Launcher tells
+    the next session to reply in it is left to review.
 
     WHY: a cold resume has no warm context for which language the user was
     conversing in, so it defaults to English — dropping the user's

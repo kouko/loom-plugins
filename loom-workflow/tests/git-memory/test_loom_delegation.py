@@ -11,11 +11,12 @@ _PR_PROTOCOL = _GIT_MEMORY_ROOT / "protocols" / "compose-pr.md"
 _PRIVACY_SPEC = _GIT_MEMORY_ROOT / "protocols" / "privacy-judge-spec.md"
 
 
-def test_loom_closeout_delegation_does_not_reconfirm_authorized_publish() -> None:
-    """A close-out authorization is consumed by the orchestrator, not re-asked.
+def test_delegated_heading_precedes_direct_heading_in_commit_protocol_only() -> None:
+    """The delegated close-out heading sits before the confirm-first heading
+    in the commit protocol and is absent from the PR protocol.
 
-    This deliberately verifies the documented behavioral contract because the
-    protocols, rather than executable code, decide whether an agent pauses.
+    Only heading order and placement are checked; whether the delegated
+    route actually skips re-confirmation is left to review.
     """
     commit_protocol = _COMMIT_PROTOCOL.read_text(encoding="utf-8")
     pr_protocol = _PR_PROTOCOL.read_text(encoding="utf-8")
@@ -30,12 +31,12 @@ def test_loom_closeout_delegation_does_not_reconfirm_authorized_publish() -> Non
     assert delegated_heading not in pr_protocol
 
 
-def test_privacy_judge_only_runs_for_ambiguous_private_party_text() -> None:
+def test_privacy_spec_names_the_bypass_trailer() -> None:
     spec = _PRIVACY_SPEC.read_text(encoding="utf-8")
     assert "Privacy-Bypass-Reason:" in spec
 
 
-def test_bypass_never_applies_to_deterministic_secret_findings() -> None:
+def test_both_protocols_name_the_bypass_trailer() -> None:
     for path in (_COMMIT_PROTOCOL, _PR_PROTOCOL):
         text = path.read_text(encoding="utf-8")
         assert "Privacy-Bypass-Reason:" in text

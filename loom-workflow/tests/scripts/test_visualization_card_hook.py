@@ -552,8 +552,8 @@ def test_situations_named_in_a_negated_sentence_do_not_count():
     ) == list(SITUATIONS)
 
 
-def test_coexist_card_skip_sentence_names_the_skill():
-    """'Skip it' was ambiguous next to the ascii-graph card; the skip sentence names the skill."""
+def test_coexist_card_has_no_bare_skip_it():
+    """'Skip it' was ambiguous next to the ascii-graph card, so the card must not say it."""
     body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
     assert "Skip it" not in body
 

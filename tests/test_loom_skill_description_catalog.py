@@ -154,7 +154,7 @@ def test_candidate_rendered_description_total_counts_router_overhead() -> None:
     assert candidate * 100 <= BASELINE_RENDERED_DESCRIPTION_CHARS * 60
 
 
-def test_router_tables_preserve_direct_leaf_targets_and_goal_boundary() -> None:
+def test_router_tables_preserve_direct_leaf_targets() -> None:
     """Check executable links, not an inferred model verdict."""
     for plugin, skills in _skills().items():
         router_name = ROUTER_NAMES[plugin]

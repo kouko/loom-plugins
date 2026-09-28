@@ -42,7 +42,7 @@ def _read_reference() -> str:
     return REFERENCE_PATH.read_text(encoding="utf-8")
 
 
-def test_defines_four_fields_budget_and_surfacing() -> None:
+def test_defines_four_fields_and_budget() -> None:
     content = _read_reference()
     content_lower = content.lower()
 
