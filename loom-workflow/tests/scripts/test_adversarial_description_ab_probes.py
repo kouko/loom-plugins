@@ -8,6 +8,8 @@ so its fixture puts the catalog folder on the import path.
 The probes are ordinary tests: each asserts the behaviour that should hold, and
 a passing probe records an attack the change survived. The probes that load
 ab/run_ab.py skip when docs/ is absent.
+
+concern: the --out guard that keeps rerun output out of the 2026-09-14 change is bypassed by the same directory spelled in another case.
 """
 
 from __future__ import annotations
@@ -161,6 +163,15 @@ def test_render_description_folded_scalar_fails_closed(catalog) -> None:
         text = f"---\nname: x\n{header}  {shipped}\n---\nbody\n"
         with pytest.raises(AssertionError):
             catalog._render_description(text)
+
+
+def test_set_output_case_variant_of_old_change_refused(run_ab) -> None:
+    """The old change dir spelled in upper case is refused when it is the same directory."""
+    variant = run_ab.CHANGE_DIR.parent / run_ab.CHANGE_DIR.name.upper() / "evidence"
+    if not variant.parent.exists():
+        pytest.skip("case-sensitive filesystem: the variant is a different directory")
+    with pytest.raises(SystemExit):
+        run_ab.set_output(variant)
 
 
 def test_render_description_blank_line_paragraph_is_rendered(catalog) -> None:

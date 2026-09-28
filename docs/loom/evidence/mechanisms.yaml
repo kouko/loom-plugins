@@ -98,7 +98,7 @@ mechanisms:
     eval: "loom-workflow/tests/scripts/test_loom_visualization_compaction.py"
   - id: distill-sessions
     class: skill
-    eval: "loom-workflow/tests/scripts/test_distill_sessions_compaction.py"
+    eval: "loom-workflow/tests/distill-sessions/test_apply.py::test_refuses_without_approved_flag"
   - id: git-memory
     class: skill
     eval: "loom-workflow/tests/scripts/test_git_memory_compaction.py"
@@ -107,13 +107,13 @@ mechanisms:
     eval: "loom-workflow/tests/scripts/test_independent_advisor_compaction.py"
   - id: critique
     class: skill
-    eval: "loom-workflow/tests/scripts/test_critique_compaction.py"
+    eval: "tests/test_loom_skill_description_catalog.py"
   - id: loom-memory
     class: skill
     eval: "loom-workflow/tests/loom-memory/test_skill_contract.py"
   - id: expert-mode
     class: skill
-    eval: "loom-code/tests/test_expert_mode_skill.py::test_skill_procedure_maps_proposes_reports_withdraws_and_relapses"
+    eval: "loom-code/tests/test_expert_mode_skill.py::test_suggestion_then_plain_yes_skips_nothing"
 
   # --- checker-rule (loom_checker.py --list-rules is the count) ---
   - id: adversarial.proportionate
@@ -312,7 +312,7 @@ mechanisms:
     eval: loom-code/tests/test_simplified_station_text.py
   - id: "write-plan.codex-installed-hook-trust-boundary"
     class: prose-gate
-    eval: loom-code/tests/test_codex_hook_trust_contract.py
+    eval: loom-code/tests/test_codex_hook_trust_contract.py::test_first_contact_new_worktree_does_not_create_loom_trust_work
   - id: "capture-intent.no-confirmed-without-restatement"
     class: prose-gate
     eval: "cold-read: docs/loom/2026-09-02-simple-loom-flow/evidence/w2-checkpoint-reviews.md"
@@ -339,16 +339,16 @@ mechanisms:
     eval: loom-code/tests/test_review_convergence_contract.py
   - id: "review.probe-graduation"
     class: prose-gate
-    eval: loom-code/tests/test_review_convergence_contract.py::test_probe_graduation_gate_states_both_halves
+    eval: loom-code/tests/test_selection_finalize.py::test_finalize_accepts_a_graduated_program_the_suite_already_runs
   - id: "review.atomic-claude-dispatch"
     class: prose-gate
-    eval: loom-code/tests/test_dispatch_profile_contract.py::test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack
+    eval: loom-code/tests/test_claude_reviewer.py::test_main_rejects_partial_override_before_spawn
   - id: "goal-create.session-activation"
     class: prose-gate
     eval: loom-workflow/tests/goal-create/test_skill_md.py::test_session_activation_rules_are_one_registered_gate
   - id: "dispatch-profile.relative-routing"
     class: prose-gate
-    eval: loom-code/tests/test_dispatch_profile_contract.py::test_class_relative_route_and_insufficient_evidence_boundary
+    eval: loom-code/tests/test_dispatch_profile_resolver.py::test_mechanical_route_computes_each_model_tier
   - id: "loom-visualization.obsidian-boundary"
     class: prose-gate
     eval: loom-workflow/tests/loom-visualization/test_templates.py::test_skill_declines_vault_target
@@ -357,7 +357,7 @@ mechanisms:
     eval: loom-workflow/tests/loom-visualization/test_templates.py::test_mermaid_gate_paragraph_present_requires_confirmed_host
   - id: "build.absence-recovery"
     class: prose-gate
-    eval: loom-code/tests/test_build_recovery_rules.py
+    eval: loom-code/tests/test_build_recovery_rules.py::test_RL_12_the_pointer_is_not_a_second_copy_of_the_rule
   - id: "review.absence-recovery"
     class: prose-gate
-    eval: loom-code/tests/test_closing_review_recovery_rules.py
+    eval: loom-code/tests/test_closing_review_recovery_rules.py::test_RL_04_no_second_copy_of_the_artifact_station_mapping

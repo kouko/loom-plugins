@@ -1,6 +1,6 @@
 """Adversarial probes against the census classifier (A1, A4).
 
-concern: a census class decided by a comment token instead of by what the file asserts, and a documented CLI flag that crashes.
+concern: a census class decided by a comment token instead of by what the file asserts, a documented CLI flag that crashes, and a phrase pin in loop form reported as pin-free.
 """
 from __future__ import annotations
 
@@ -47,3 +47,17 @@ def test_census_roots_flag_given_is_accepted() -> None:
         capture_output=True, text=True,
     )
     assert run.returncode == 0, run.stderr[-400:]
+
+
+def test_census_loop_phrase_pin_is_pinned(tmp_path: Path) -> None:
+    """`for p in ("<phrase>", ...): assert p in TEXT` is a pin, even beside a structure signal."""
+    f = tmp_path / "test_probe.py"
+    f.write_text(
+        'from prose_pin import flat_prose\nTEXT = flat_prose("SKILL.md")\n\n'
+        'def test_heading():\n    assert TEXT.startswith("# Title")\n\n'
+        'def test_x():\n    for phrase in ("the rule is stated here", "a second clause here"):\n'
+        "        assert phrase in TEXT\n",
+        encoding="utf-8",
+    )
+    cls, secondary = ctf.classify(f)
+    assert cls == "sentence-pin" or secondary.get("has_pins") == "yes", (cls, secondary)

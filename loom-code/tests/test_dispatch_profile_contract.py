@@ -1,4 +1,8 @@
-"""Executable pins for Loom's shared, host-neutral dispatch profile."""
+"""One-home, gate-registration and packaging checks for Loom's shared dispatch profile.
+
+The profile's routing wording is review-only; its behaviour is proven by
+test_dispatch_profile_resolver.py and test_claude_reviewer.py.
+"""
 
 from __future__ import annotations
 
@@ -9,13 +13,6 @@ from pathlib import Path
 PLUGIN = Path(__file__).resolve().parents[1]
 PROFILE = PLUGIN / "references" / "dispatch-profile.md"
 MECHANISMS = PLUGIN.parent / "docs" / "loom" / "evidence" / "mechanisms.yaml"
-PILOT_REPORT = (
-    PLUGIN.parent
-    / "docs"
-    / "skill-dogfood"
-    / "2026-09-09-model-effort-cost-pilot"
-    / "report.md"
-)
 STATIONS = (
     PLUGIN / "skills" / "build" / "SKILL.md",
     PLUGIN / "skills" / "closing-review" / "SKILL.md",
@@ -28,80 +25,6 @@ def _contract() -> str:
 
 def _flat(text: str) -> str:
     return " ".join(text.split())
-
-
-def _affirmative_sentence(text: str, anchor: str) -> str:
-    sentence = next(
-        part.strip()
-        for part in text.replace("\n", " ").split(".")
-        if anchor in part
-    )
-    assert "must" in sentence.lower()
-    assert not any(
-        token in sentence.lower().split()
-        for token in ("not", "never", "neither", "without")
-    )
-    return sentence
-
-
-def test_affirmative_sentence_helper_accepts_requirement() -> None:
-    assert _affirmative_sentence("The dispatcher must preserve effort.", "preserve effort")
-
-
-def test_affirmative_sentence_helper_rejects_negated_requirement() -> None:
-    try:
-        _affirmative_sentence("The dispatcher must not preserve effort.", "preserve effort")
-    except AssertionError:
-        pass
-    else:
-        raise AssertionError("negated prose must not satisfy an affirmative contract pin")
-
-
-def test_class_relative_route_and_insufficient_evidence_boundary() -> None:
-    text = _contract()
-    flat = _flat(text)
-
-    assert "mechanical > complex > ordinary" in flat
-    _affirmative_sentence(text, "lower the model by one tier and preserve effort")
-    _affirmative_sentence(text, "raise the model by one tier and preserve effort")
-    _affirmative_sentence(text, "preserve both model and effort")
-    assert "exact transformation, bounded targets, and a mechanical oracle" in flat
-    assert "insufficient-task-evidence" in flat
-    assert "route as `ordinary`" in flat
-    assert "Role names and round labels are not routing evidence" in flat
-
-
-def test_capability_quality_transition_is_complete_at_the_model_ceiling() -> None:
-    text = _contract()
-    flat = _flat(text)
-
-    assert "Below `frontier`, a capability-quality failure raises the model one tier" in flat
-    assert "At `frontier`, capability-quality uses the same effort handling" in flat
-    assert "`low` raises to `medium`" in flat
-    assert "does not bypass the `high` or `xhigh` evidence gates" in flat
-
-
-def test_failure_observations_define_conformance_and_trigger_requirements() -> None:
-    text = _contract()
-    flat = _flat(text)
-
-    assert "`success: false` and `conforming: true`" in flat
-    assert "`conforming: false` means the output cannot be graded" in flat
-    assert "`failure_trigger` is required only for a transition into `high` or `xhigh`" in flat
-
-
-def test_nonconforming_output_retry_keeps_validation_and_retry_ownership_separate() -> None:
-    profile = _flat(_contract())
-    review = _flat((PLUGIN / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8"))
-    runner = (PLUGIN / "scripts" / "claude_reviewer.py").read_text(encoding="utf-8")
-
-    assert "retry the same effective profile without model or effort escalation" in profile
-    assert "missing kind or another known kind returns `execution-failed`" in profile
-    assert "an unknown kind is malformed input" in profile
-    assert "consumes the shared completed-redispatch budget" in profile
-    assert "`closing-review` orchestrator enforces its stricter one-retry limit" in review
-    assert "never parse or validate reviewer YAML" in review
-    assert "never retry or interpret reviewer content" in runner
 
 
 RESOLVER_INVOCATION_PHRASES = (
@@ -121,29 +44,10 @@ RESOLVER_INVOCATION_PHRASES = (
 
 
 def test_stations_do_not_restate_the_resolver_invocation() -> None:
-    profile = _flat(_contract()).lower()
     for phrase in RESOLVER_INVOCATION_PHRASES:
-        assert profile.count(phrase.lower()) == 1, phrase
         for station in STATIONS:
             flat = _flat(station.read_text(encoding="utf-8")).lower()
             assert phrase.lower() not in flat, f"{station.parent.name} restates: {phrase}"
-
-
-def test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack() -> None:
-    review = (PLUGIN / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8")
-    flat = _flat(review)
-
-    assert "--model <model> --effort <effort>" in flat
-    assert "invoke the runner with neither flag" in flat
-    assert "rejects a partial pair before starting Claude" in flat
-    assert "must not enter the generic transient-executor retry" in flat
-    assert "`rejection_retried: true`" in flat
-    assert "`[claude-code:unrecognized_model]`" in flat
-    assert "Every other non-zero exit" in flat
-    assert "consumes the one same-digest transient-retry slot" in flat
-    assert "no further Claude invocation occurs for that digest" in flat
-    assert "stderr JSON `kind`" in flat
-    assert "plain-text exit 2" in flat
 
 
 def test_atomic_claude_dispatch_gate_is_registered_with_executable_eval() -> None:
@@ -155,8 +59,8 @@ def test_atomic_claude_dispatch_gate_is_registered_with_executable_eval() -> Non
     assert review.count("<!-- /gate -->", review.find(f"<!-- gate: {gate_id} -->")) >= 1
     assert f'- id: "{gate_id}"' in mechanisms
     assert (
-        "eval: loom-code/tests/test_dispatch_profile_contract.py::"
-        "test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack"
+        "eval: loom-code/tests/test_claude_reviewer.py::"
+        "test_main_rejects_partial_override_before_spawn"
     ) in mechanisms
 
 
@@ -180,15 +84,6 @@ def test_shared_routing_gate_is_registered_once_with_executable_eval() -> None:
     assert profile.count(marker) == 1
     assert f'- id: "{gate_id}"' in mechanisms
     assert (
-        "eval: loom-code/tests/test_dispatch_profile_contract.py::"
-        "test_class_relative_route_and_insufficient_evidence_boundary"
+        "eval: loom-code/tests/test_dispatch_profile_resolver.py::"
+        "test_mechanical_route_computes_each_model_tier"
     ) in mechanisms
-
-
-def test_cost_pilot_sparse_ladder_is_historical_not_normative_routing() -> None:
-    report = _flat(PILOT_REPORT.read_text(encoding="utf-8"))
-
-    assert "historical experiment design" in report
-    assert "final routing" in report
-    assert "`standard/medium` → `frontier/medium`" in report
-    assert "comparison and calibration evidence" in report

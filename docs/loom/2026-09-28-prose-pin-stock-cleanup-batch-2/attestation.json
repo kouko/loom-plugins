@@ -1,0 +1,55 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-28-prose-pin-stock-cleanup-batch-2",
+  "content_digest": "2eb009ceb13b2c44f6b6a5afdfd0d962f1b8e263",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_adversarial_batch2_loop_phrase_pin.py -q",
+      "artifact": "loom-code/tests/test_adversarial_batch2_loop_phrase_pin.py",
+      "result": "pass",
+      "command_digest": "c355192be99267cd6cbf6b09374b00882e94015d2027b6df3d65d579073730ca"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_adversarial_census_gaming.py -q",
+      "artifact": "loom-code/tests/test_adversarial_census_gaming.py",
+      "result": "pass",
+      "command_digest": "d10dc96aee061848ed55d17962f9332fb38a94fb19e96f91c2f3fd432ff44977"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py -q",
+      "artifact": "loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py",
+      "result": "pass",
+      "command_digest": "aa74cfa42ec46a1b1e5236f7c9bd1b19f373f53a48ee202ecf5cf407fb009d3d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a92d6f4f20a95b3c4",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "a08eef0f7a5f30cc1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

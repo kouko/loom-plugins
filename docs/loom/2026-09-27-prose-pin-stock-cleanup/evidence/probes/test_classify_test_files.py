@@ -29,6 +29,26 @@ def test_reader_call_with_no_literal_is_not_a_pin(tmp_path: Path) -> None:
     assert ctf.classify(f)[0] != "sentence-pin"
 
 
+LOOP_HEAD = 'TEXT = open("SKILL.md").read()\nPHRASES = ("the rule is stated here", "x")\n\ndef test_h():\n    assert TEXT.startswith("# T")\n\n'
+
+
+def _pinned(tmp_path: Path, body: str) -> bool:
+    f = tmp_path / "test_loop.py"
+    f.write_text(LOOP_HEAD + body)
+    cls, secondary = ctf.classify(f)
+    return cls == "sentence-pin" or secondary.get("has_pins") == "yes"
+
+
+def test_loop_over_prose_phrases_asserted_in_counts_as_pin(tmp_path: Path) -> None:
+    assert _pinned(tmp_path, "def test_x():\n    for p in PHRASES:\n        assert p in TEXT\n")
+
+
+def test_path_exists_loop_and_absence_loop_are_not_pins(tmp_path: Path) -> None:
+    body = ('def test_x():\n    for p in ("a b c.md", "d e f.md"):\n        assert Path(p).exists()\n'
+            "    for p in PHRASES:\n        assert p not in TEXT\n")
+    assert not _pinned(tmp_path, body)
+
+
 def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tmp_path: Path) -> None:
     root = tmp_path / "loom-code" / "tests"
     root.mkdir(parents=True)
@@ -41,6 +61,21 @@ def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tm
         '    assert "x" in "xy"\n'
     )
     assert ctf.count_executing_tests(tmp_path) == 1
+
+
+def _count_one(tmp_path: Path, body: str) -> int:
+    root = tmp_path / "tests"
+    root.mkdir()
+    (root / "test_one.py").write_text(body)
+    return ctf.count_executing_tests(tmp_path)
+
+
+def test_subprocess_call_counts_as_exec(tmp_path: Path) -> None:
+    assert _count_one(tmp_path, 'import subprocess\n\ndef test_x():\n    subprocess.run(["git", "status"])\n') == 1
+
+
+def test_loom_checker_string_literal_not_counted(tmp_path: Path) -> None:
+    assert _count_one(tmp_path, 'TEXT = ""\n\ndef test_x():\n    assert "loom_checker.py selection show" in TEXT\n') == 0
 
 
 def test_census_at_head_places_every_prose_reader_in_a_named_class(monkeypatch, capsys) -> None:

@@ -21,8 +21,9 @@ A file is a prose reader if it names a .md path. `behavior` wins ties;
 and gate-marker grammar, which the plan lists explicitly as retained.
 
 Usage: python3 classify-test-files.py [--roots a,b,...]  (prints a table)
-       python3 classify-test-files.py --count-exec <dir>  (A5: test functions
-       whose body carries the execution signal, under <dir>'s four test roots)
+       python3 classify-test-files.py --count-exec <dir> [--list]  (A5: test
+       functions that run a program, directly or through a helper, under <dir>'s
+       four test roots; --list prints each counted file::function)
 """
 from __future__ import annotations
 
@@ -86,8 +87,9 @@ SENTENCE_ASSERT = re.compile(
     r"|assert\s*[\"'](?!#)[^\"'\n]{5,}[\"']\s*\b(?:in|==)\b"  # assert "literal" in/== ... (a "#..." heading is structure)
     r"|pins_exact_sentence\("
     r"|_affirms\(|affirms\(|_stated_once\("
-    # split_sentences stays: the recovery-rules files pin phrases through
-    # `_require` lists and exact endings, which no alternative above sees.
+    # split_sentences stays: a phrase pin read sentence by sentence is seen by
+    # no alternative above. Files that use it only for a one-home scan carry
+    # a MANUAL_OVERRIDES row saying so.
     r"|split_sentences\("
     # Reader calls (_flat, flat_prose, rule_prose) are not pins: a pin
     # asserts a literal, which the first alternative catches.
@@ -128,6 +130,42 @@ def code_only(text: str) -> str:
         (row, col), (_row, end) = tok.start, tok.end
         lines[row - 1] = lines[row - 1][:col] + lines[row - 1][end:]
     return "".join(lines)
+
+
+def loop_pin_lines(text: str) -> list[int]:
+    """Lines of the loop-form phrase pin: `for p in (<literals>): assert p in TEXT`.
+
+    The loop runs over a tuple, list or set of string literals, written inline or
+    bound to a module-level name, and at least one literal is a phrase of three
+    or more words (a path, key or token list is not prose). Only a positive `in`
+    on the loop variable counts; `not in` and `.exists()` loops do not.
+    """
+    import ast
+
+    def phrases(node) -> bool:
+        return isinstance(node, (ast.Tuple, ast.List, ast.Set)) and any(
+            isinstance(e, ast.Constant) and isinstance(e.value, str) and len(e.value.split()) >= 3
+            for e in node.elts)
+
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return []
+    consts = {t.id: n.value for n in tree.body if isinstance(n, ast.Assign)
+              for t in n.targets if isinstance(t, ast.Name)}
+    hits = []
+    for loop in ast.walk(tree):
+        if not (isinstance(loop, ast.For) and isinstance(loop.target, ast.Name)):
+            continue
+        it = consts.get(loop.iter.id) if isinstance(loop.iter, ast.Name) else loop.iter
+        if not phrases(it):
+            continue
+        for node in ast.walk(loop):
+            test = node.test if isinstance(node, ast.Assert) else None
+            if (isinstance(test, ast.Compare) and isinstance(test.left, ast.Name)
+                    and test.left.id == loop.target.id and isinstance(test.ops[0], ast.In)):
+                hits.append(node.lineno)
+    return hits
 
 
 def executes(text: str) -> bool:
@@ -184,18 +222,85 @@ def classify(path: Path, gate_evals: set[str] = frozenset()) -> tuple[str, dict]
     return cls, secondary
 
 
-def count_executing_tests(base: Path) -> int:
-    """Count test functions whose own body carries the execution signal, under base's four test roots."""
+RUNNER_CALLS = {"subprocess.run", "subprocess.check_output", "subprocess.check_call",
+                "subprocess.call", "subprocess.Popen", "os.system", "os.popen"}
+LOADER_CALLS = {"module_from_spec", "import_module", "run_path", "run_module"}
+COUNT_HELPER_MODULES = {"prose_pin", "rehearse_probes", "__init__"}  # test helpers kept in scripts/
+
+
+def production_modules(base: Path) -> set[str]:
+    """Module names defined under a `scripts` dir of base that is not a test or docs dir."""
+    names: set[str] = set()
+    for d in base.rglob("scripts"):
+        if not d.is_dir() or {"tests", "docs", ".claude", ".git"} & set(d.relative_to(base).parts):
+            continue
+        names.update(p.stem for p in d.rglob("*.py"))
+        names.update(p.name for p in d.iterdir() if p.is_dir())
+        names.add("scripts")  # `from scripts.<module> import ...`
+    return names - COUNT_HELPER_MODULES
+
+
+def _dotted(node) -> str:
     import ast
 
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return f"{_dotted(node.value)}.{node.attr}"
+    return ""
+
+
+def executing_test_names(src: str, prod: set[str]) -> list[str]:
+    """Test functions that run a program: a subprocess/os call, a production-code call, or a
+    local helper (or fixture parameter) that does either. String literals never count."""
+    import ast
+
+    tree = ast.parse(src)
+    funcs = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    prod_names: set[str] = set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.ImportFrom) and n.module and n.module.split(".")[0] in prod:
+            prod_names.update(a.asname or a.name for a in n.names)
+        elif isinstance(n, ast.Import):
+            prod_names.update((a.asname or a.name).split(".")[0] for a in n.names if a.name.split(".")[0] in prod)
+    loaders = set(LOADER_CALLS) | {f.name for f in funcs if any(
+        isinstance(c, ast.Call) and _dotted(c.func).split(".")[-1] in LOADER_CALLS for c in ast.walk(f))}
+    for n in tree.body:  # module names bound to a path-loaded module or a production attribute
+        if isinstance(n, ast.Assign):
+            loaded = isinstance(n.value, ast.Call) and _dotted(n.value.func).split(".")[-1] in loaders
+            if loaded or _dotted(n.value).split(".")[0] in prod_names:
+                prod_names.update(t.id for t in n.targets if isinstance(t, ast.Name))
+
+    def direct(fn) -> bool:
+        for c in ast.walk(fn):
+            if isinstance(c, ast.Call):
+                name = _dotted(c.func)
+                if name in RUNNER_CALLS or name.split(".")[-1] in LOADER_CALLS:
+                    return True
+                if name and name.split(".")[0] in prod_names:
+                    return True
+        return False
+
+    def called(fn) -> set[str]:
+        out = {_dotted(c.func).split(".")[-1] for c in ast.walk(fn) if isinstance(c, ast.Call)}
+        return out | {a.arg for a in fn.args.args}  # fixture parameters
+
+    runs = {f.name for f in funcs if direct(f)}
+    while True:
+        more = {f.name for f in funcs if f.name not in runs and called(f) & runs}
+        if not more:
+            break
+        runs |= more
+    return [f.name for f in funcs if f.name.startswith("test") and f.name in runs]
+
+
+def count_executing_tests(base: Path) -> int:
+    """Count test functions that run a program (see executing_test_names), under base's four test roots."""
+    prod = production_modules(base)
     total = 0
     for root in DEFAULT_ROOTS:
         for p in sorted((base / root).rglob("*.py")):
-            src = p.read_text(encoding="utf-8", errors="replace")
-            for node in ast.walk(ast.parse(src)):
-                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test"):
-                    if executes(ast.get_source_segment(src, node) or ""):
-                        total += 1
+            total += len(executing_test_names(p.read_text(encoding="utf-8", errors="replace"), prod))
     return total
 
 
@@ -237,10 +342,11 @@ def _classify(path: Path) -> tuple[str, dict]:
                     break
 
     is_behavior = is_behavior_from_execution or is_behavior_from_script_import
+    loop_pin = bool(loop_pin_lines(text))  # the loop form of a phrase pin, which the regex cannot see
     if is_behavior:
         secondary = {}
         # Check for sentence pins (secondary marker for behavior files that also pin prose)
-        secondary["has_pins"] = "yes" if (SENTENCE_ASSERT.search(text) and PROSE_PIN_IMPORT.search(text)) else "no"
+        secondary["has_pins"] = "yes" if (SENTENCE_ASSERT.search(text) and PROSE_PIN_IMPORT.search(text)) or loop_pin else "no"
         # Check if it also has grammar-invariant content (additional marker)
         if GRAMMAR_INVARIANT_CONTENT.search(text):
             secondary["marker"] = "grammar-invariant-content"
@@ -254,15 +360,15 @@ def _classify(path: Path) -> tuple[str, dict]:
     has_prose_pin_import = PROSE_PIN_IMPORT.search(text)
     has_prose_helpers = bool(re.search(r'flat_prose\(|rule_prose\(|split_sentences\(|_flat\(', text))
     has_prose_normalization = bool(re.search(r'_normalize|_flat\s*=', text))
-    has_sentence_assert = SENTENCE_ASSERT.search(text)
+    has_sentence_assert = SENTENCE_ASSERT.search(text) or loop_pin
 
     is_sentence_pin_candidate = has_sentence_assert and (has_prose_pin_import or has_prose_helpers or has_prose_normalization)
 
     # Check for grammar-invariant (when not also sentence-pin, or when sentence-pin doesn't win)
     if is_grammar_invariant_candidate:
         secondary = {}
-        secondary["has_pins"] = "yes" if SENTENCE_ASSERT.search(text) else "no"
-        if SENTENCE_ASSERT.search(text):
+        secondary["has_pins"] = "yes" if has_sentence_assert else "no"
+        if has_sentence_assert:
             secondary["note"] = "mixed-grammar-and-pin"
         return "grammar-invariant", secondary
 
@@ -274,7 +380,7 @@ def _classify(path: Path) -> tuple[str, dict]:
 
     # Check for structure
     if STRUCTURE.search(text):
-        return "structure", {}
+        return "structure", ({"has_pins": "yes"} if loop_pin else {})
 
     return "other", {}
 
@@ -309,15 +415,107 @@ MANUAL_OVERRIDES = {
         "loads check-skill-crossrefs.py by path and runs find_broken_crossrefs "
         "on temp fixtures",
     ),
-    "loom-code/tests/test_codex_hook_trust_contract.py": (
-        "gate-eval",
-        "pure sentence pin on codex-first-contact.md, named by the mechanisms.yaml "
-        "eval of write-plan.codex-installed-hook-trust-boundary; batch 2",
+    # Batch 2 (W1-01): kept one-home and resolver scans, and the gate-eval
+    # files pruned to structure.
+    "loom-code/tests/test_build_recovery_rules.py": (
+        "structure",
+        "one-home scans only: the build.absence-recovery gate block restates no "
+        "artifact-to-station mapping, and §1-§2 repeat none of the rule; the "
+        "block cites the three manifest keys (path pointers); split_sentences "
+        "feeds the scan, no sentence is asserted present; RL-12 is the eval of "
+        "build.absence-recovery",
+    ),
+    "loom-code/tests/test_closing_review_recovery_rules.py": (
+        "structure",
+        "one-home scan only: the review.absence-recovery gate block restates no "
+        "artifact-to-station mapping; split_sentences feeds that scan, no "
+        "sentence is asserted present; RL-04 is the eval of review.absence-recovery",
+    ),
+    "loom-code/tests/test_dispatch_profile_contract.py": (
+        "structure",
+        "resolver one-home scan (no invocation phrase restated in a station; "
+        "the presence-in-profile half was removed in closing review round 1), "
+        "gate markers with their eval registration, and the packaged profile "
+        "link resolving",
+    ),
+    "loom-workflow/tests/goal-create/test_skill_md.py": (
+        "structure",
+        "mode headings, reference paths resolving, the floor command shape, the "
+        "session-activation gate blocks, template non-restatement and the "
+        "offer-site count (its number recomputed from the sites scanned in the "
+        "repo); eval of goal-create.session-activation, no sentence asserted",
+    ),
+    # Batch 2 residual fix: the pruned batch-2 files, each read in full after
+    # their last sentence pins were removed.
+    "loom-code/tests/test_acceptance_test_report_shape.py": (
+        "structure",
+        "template table columns, rows and markers, the evidence block heading, "
+        "the template path pointer in the tester contract, a full-suite "
+        "absence scan fed by split_sentences, no gate marker, and the evidence "
+        "path pointer outside every gate block; the two station phrases it "
+        "once looped over were pruned in the batch-2 loop-form fix, so no "
+        "sentence is asserted present",
+    ),
+    "loom-code/tests/test_adversary_protocol.py": (
+        "behavior",
+        "imports MAX_PROBE_PROGRAMS from loom_checker for the case-count scan; "
+        "the rest is a one-home absence scan and YAML keys of the return "
+        "block; no sentence asserted present",
+    ),
+    "loom-code/tests/test_adversary_routing.py": (
+        "behavior",
+        "runs the adversary tests in repo copies after real add, remove and "
+        "reword edits; literals are a recipe's link back to the protocol, "
+        "exception messages and pytest stdout; split_sentences only picks a "
+        "sentence to reword; no sentence asserted present",
+    ),
+    "loom-code/tests/test_lenses_deletion_first.py": (
+        "structure",
+        "reviewer.md lens table rows end with the deletion-first dimension "
+        "token; no sentence asserted",
+    ),
+    "loom-code/tests/test_plan_simplicity_text.py": (
+        "structure",
+        "absence checks, the write-plan step's path pointer to "
+        "plan-simplicity.md, and a scan that every user sentence of the step is "
+        "negated (split_sentences); no sentence asserted present",
+    ),
+    "loom-code/tests/test_review_convergence_contract.py": (
+        "structure",
+        "gate-marker presence, heading-anchored sections, and absence or "
+        "negation scans fed by split_sentences; no sentence asserted present",
+    ),
+    "loom-code/tests/test_reviewer_mechanical_evidence.py": (
+        "structure",
+        "the lenses path pointer count in reviewer.md and absence or negation "
+        "scans; no sentence asserted present",
+    ),
+    "loom-code/tests/test_ship_station_text.py": (
+        "behavior",
+        "recomputes the refusal premise from publish.py source; the rest is "
+        "headings, absences and gate-region placement; no sentence asserted present",
+    ),
+    "loom-code/tests/test_simplified_station_text.py": (
+        "behavior",
+        "imports the checker's STEP_PLAIN_NAMES; the rest is absence and "
+        "negation scans (split_sentences), summary-table rows and a manifest "
+        "YAML value; no sentence asserted present",
+    ),
+    "loom-code/tests/test_sync_before_review_text.py": (
+        "behavior",
+        "runs sync-trunk on real repositories and asserts its stdout and the "
+        "digest; the prose half is absences under the §2 heading and a count "
+        "of sync-trunk; no sentence asserted present",
+    ),
+    "loom-code/tests/test_test_budget_text.py": (
+        "structure",
+        "no line-number threshold in implementer.md and a gate-marker count; "
+        "no sentence asserted",
     ),
     "loom-workflow/tests/scripts/test_distill_sessions_compaction.py": (
-        "gate-eval",
-        "needle presence in SKILL.md, some needles phrases (Read it when, No "
-        "network calls); named by the mechanisms.yaml eval of distill-sessions; batch 2",
+        "structure",
+        "token and path needles only (top.json, merged.json, --approved, the "
+        "runtime-protocol pointer resolving); no sentence asserted",
     ),
     "loom-workflow/tests/scripts/test_no_retired_loom_code_skill_names.py": (
         "structure",
@@ -338,6 +536,50 @@ MANUAL_OVERRIDES = {
         "exactly one ratified-by line and no pending-ratification line; no "
         "prose literal",
     ),
+    # Batch 2 loop-form fix: files whose only loop-form hit is not prose. The
+    # reason names that hit; other asserts in the file are not re-judged here.
+    "loom-code/tests/test_adversary_layout.py": (
+        "behavior",
+        "loop-form hit is SHARED_HEADINGS asserted in the protocol's parsed "
+        "heading list: section headings, not prose",
+    ),
+    "loom-code/tests/test_loom_publish.py": (
+        "behavior",
+        "loop-form hit is CONTEXT_HEADINGS asserted in the reason the checker's "
+        "validate_contextual_pr_body returns: headings in program output",
+    ),
+    "loom-workflow/tests/decision-map/test_skill_doc.py": (
+        "behavior",
+        "loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same "
+        "test also runs. The file also holds direct sentence asserts on "
+        "SKILL.md and map-format prose (lines 181-183, 216-221, 281-287, 310-312, e.g. "
+        "'Exactly three ticket closure types exist'), which the classifier "
+        "does not see; they are left for batch 3",
+    ),
+    "loom-workflow/tests/scripts/test_loom_visualization_compaction.py": (
+        "structure",
+        "loop-form hit is a list of `## ` headings in SKILL.md",
+    ),
+    "tests/test_agy_install_docs.py": (
+        "structure",
+        "loop-form hit is agy and git command shapes in the Antigravity CLI section",
+    ),
+    "loom-design/tests/interface/test_design_system_skill.py": (
+        "structure",
+        "loop-form hit is the eight canonical DESIGN.md section names in the schema",
+    ),
+    "loom-design/tests/architecture-design/test_architecture_skill.py": (
+        "structure",
+        "loop-form hit is the four bold field labels of the schema's Guard "
+        "failure message section (rule id, offending path, conform, change the "
+        "rule and its guard): schema field labels. The rest is path pointers, "
+        "the ratified-by line and commit subject shape, the re-design and "
+        "re-ratify tokens, the two-word terms never required and never blocks, "
+        "the SKILL.md mention of the Guard failure message section name, and a "
+        "heading-bounded Step 5 scan; the direct sentence "
+        "asserts (single answer, re-design procedure) were pruned in closing "
+        "review round 1",
+    ),
 }
 
 
@@ -347,9 +589,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Census classifier for the prose-pin stock cleanup.")
     parser.add_argument("--roots", default=",".join(DEFAULT_ROOTS), help="comma-separated test roots")
     parser.add_argument("--count-exec", metavar="DIR", help="count executing test functions under DIR")
+    parser.add_argument("--list", action="store_true", help="with --count-exec, print each counted function")
     args = parser.parse_args()
     if args.count_exec is not None:
         base = Path(args.count_exec).resolve()
+        if args.list:
+            prod = production_modules(base)
+            for root in DEFAULT_ROOTS:
+                for p in sorted((base / root).rglob("*.py")):
+                    for name in executing_test_names(p.read_text(encoding="utf-8", errors="replace"), prod):
+                        print(f"{p.relative_to(base).as_posix()}::{name}")
         print(f"executing test functions under {base}: {count_executing_tests(base)}")
         return 0
     roots = [r for r in args.roots.split(",") if r]
