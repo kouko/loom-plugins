@@ -69,8 +69,9 @@ def set_output(out: Path) -> Path:
     """Point streams and results.md at `out`; refuse the old change directory."""
     global EVIDENCE, RESULTS
     out = Path(out).resolve()
-    if out == CHANGE_DIR or CHANGE_DIR in out.parents:
-        raise SystemExit(f"refusing --out inside the 2026-09-14 change: {out}")
+    for p in (out, *out.parents):  # samefile: a case variant on a case-insensitive disk is the same dir
+        if p == CHANGE_DIR or (p.exists() and os.path.samefile(p, CHANGE_DIR)):
+            raise SystemExit(f"refusing --out inside the 2026-09-14 change: {out}")
     EVIDENCE, RESULTS = out, out / "results.md"
     return out
 
