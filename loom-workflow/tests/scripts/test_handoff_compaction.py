@@ -6,12 +6,36 @@ SKILL_PATH = REPO_ROOT / "loom-workflow/skills/handoff/SKILL.md"
 SCHEMA_PATH = (
     REPO_ROOT / "loom-workflow/skills/handoff/references/handoff-schema.md"
 )
+STRUCTURAL_TOKENS = (
+    "Prepare mode",
+    "Resume mode",
+    "recap-state",
+    "git rev-parse HEAD",
+    "git rev-parse --abbrev-ref HEAD",
+    "git status --short",
+    "git log --oneline -5",
+    "claude --version",
+    "Recent decisions",
+    "Verification commands",
+    "Confidence flags",
+    "Resume Launcher",
+    "USER DIRECTIVE:",
+    "conversation_language",
+    "ls -t .claude/handoffs/ | head -1",
+    "[T1]",
+    "[T2]",
+    "Synthesis-check",
+)
 
 
-def test_each_mode_reads_the_schema_before_its_artifact_step():
-    """Both modes point to the schema before they write or read a HANDOFF.
-    The entrypoint's wording is review-only."""
+def test_entrypoint_structure_and_schema_before_artifact_steps():
+    """The mode names, state commands, block labels, launcher labels and tier
+    tags stay, and both modes point to the schema before they write or read a
+    HANDOFF. The entrypoint's prose wording is review-only."""
     text = SKILL_PATH.read_text(encoding="utf-8")
+
+    missing = [token for token in STRUCTURAL_TOKENS if token not in text]
+    assert not missing, f"entrypoint no longer names: {missing}"
 
     prepare = text.index("## Prepare mode")
     prepare_schema = text.index("references/handoff-schema.md", prepare)

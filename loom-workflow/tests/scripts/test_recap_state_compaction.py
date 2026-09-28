@@ -9,10 +9,17 @@ SCHEMA_PATH = (
 )
 
 
-def test_entrypoint_reads_schema_before_the_ordered_six_section_template():
-    """The schema pointer precedes the template, whose six headings keep their
-    order and carry no internal tags. The entrypoint's wording is review-only."""
+STRUCTURAL_TOKENS = ("HANDOFF", "Synthesis-check", "ASCII")
+
+
+def test_entrypoint_tokens_and_schema_before_the_ordered_six_section_template():
+    """The routing, gate and format tokens stay; the schema pointer precedes the
+    template, whose six headings keep their order and carry no internal tags.
+    The entrypoint's prose wording is review-only."""
     text = SKILL_PATH.read_text(encoding="utf-8")
+
+    missing = [token for token in STRUCTURAL_TOKENS if token not in text]
+    assert not missing, f"entrypoint no longer names: {missing}"
 
     what_to_do = text.index("## What to do")
     schema_read = text.index("references/seven-block-schema.md", what_to_do)

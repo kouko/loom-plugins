@@ -31,6 +31,24 @@ POINTERS = (
     "references/fidelity-check.md",
     "assets/cot-report-template.md",
 )
+STRUCTURAL_TOKENS = (
+    "scripts/detect_client.py --target",
+    "obsidian:obsidian-mermaid-visualizer",
+)
+PAGE_MODE_TOKENS = (
+    "think-orbit:thinking-session",
+    "think-orbit:break-assumption",
+    "File mode",
+    "Conversation mode",
+    "Rejected options",
+    "Assumptions",
+    "Open questions",
+    "Co-premises",
+    "r1 -->|",
+    "<name>.fidelity.md",
+    "reviewed_md_sha256:",
+    "${TMPDIR:-/tmp}/loom-visualization/",
+)
 
 
 def test_entrypoint_has_required_sections_and_routes():
@@ -53,18 +71,24 @@ def test_entrypoint_has_required_sections_and_routes():
     for pointer in POINTERS:
         assert pointer in text, pointer
         assert (SKILL_DIR / pointer).is_file(), pointer
+    missing = [token for token in STRUCTURAL_TOKENS if token not in text]
+    assert not missing, f"entrypoint no longer names: {missing}"
 
 
 def test_entrypoint_within_word_cap():
     assert len(SKILL_PATH.read_text(encoding="utf-8").split()) <= WORD_CAP
 
 
-def test_page_mode_names_render_and_verify_commands():
-    """The render and verify commands, in order; page mode's wording is
+def test_page_mode_keeps_structural_tokens_and_render_verify_commands():
+    """Skill ids, mode and extraction labels, layout, path and field tokens,
+    and the render and verify commands in order; page mode's prose wording is
     review-only."""
     text = SKILL_PATH.read_text(encoding="utf-8") + PAGE_MODE_PATH.read_text(
         encoding="utf-8"
     )
+
+    missing = [token for token in PAGE_MODE_TOKENS if token not in text]
+    assert not missing, f"page mode no longer names: {missing}"
 
     commands = "\n".join(
         [
