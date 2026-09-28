@@ -50,9 +50,14 @@ charter: 1.1
 - Test: A2 positive: behavior-and-structure-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: index-lookup-pin-judged.
 - Risk: agent-decided — count-form and index-form sentence lookups in test_knowledge_triage.py are pins unless tagged structural.
 
+**W1-07 Undetected residual pins in known files**  after: W1-01  acceptance: 2, 3
+- Files: loom-workflow/tests/loom-visualization/test_references.py, loom-workflow/tests/goal-create/test_goal_shape.py, loom-workflow/tests/decision-map/test_skill_doc.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-residual.md
+- Test: A2 positive: structure-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: validator-wrapped-phrase-judged.
+- Risk: agent-decided — W1-01 found phrases hidden in local validators, required lists, regexes and two-word literals; Acceptance 1 covers the known files, so they are judged here, not deferred.
+
 ### Wave 2 — close-out
 
-**W2-01 Census and recount**  after: W1-01, W1-03, W1-04, W1-05, W1-06  acceptance: 1, 4, 5
+**W2-01 Census and recount**  after: W1-01, W1-03, W1-04, W1-05, W1-06, W1-07  acceptance: 1, 4, 5
 - Files: docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/census-report.md
 - Test: A1 positive: clean-worktree-census-zero-pins; negative: other-bucket-exits-1. A4 positive: check-mechanisms-all-clear; negative: dangling-eval-reported. A5 positive: recount-not-below-base; negative: deleted-function-tagged-exec-fails.
 - Risk: agent-decided — stitches the mapping files into one table; every remaining has_pins=yes file has a visible override row with its reason; runs from a clean worktree.
