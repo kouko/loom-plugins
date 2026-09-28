@@ -4,6 +4,13 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.5.3] — 2026-09-29 — Prose-pin stock cleanup batch 4 and patch release bump.
+
+Patch: tests only; no skill or reference content changed.
+
+- Batch 4 of the prose-pin stock cleanup: short-phrase and helper-hidden pins removed from `loom-workflow` tests, kept to their structure/behavior checks.
+- `loom-code`, `loom-design` and `loom-workflow` patch versions bumped together so `claude plugin update` refreshes installed copies with the batch 4 test changes.
+
 ## [5.5.2] — 2026-09-29 — Prose-pin stock cleanup batches 2-3 and deferred release bump.
 
 Patch: tests, evidence and version metadata only; no station guidance, field, rule id or contract change.
