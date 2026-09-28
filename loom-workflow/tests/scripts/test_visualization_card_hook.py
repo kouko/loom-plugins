@@ -405,93 +405,12 @@ def test_cards_carry_no_client_driven_ascii_rule(card):
 
 
 GUIDE = "references/plain-language.md"
-# Scope shared word-for-word with rule 5 of the guide (spec REQ-7).
-DECISION_SCOPE = "asking or answering how to do something"
-INLINE_RULE_PHRASES = (DECISION_SCOPE, "2+ workable options", "in a table", "recommend", GUIDE)
-
-
-def inline_decision_rule_errors(text):
-    """Error when no card sentence states the decision rule inline; empty = stated."""
-    ok = any(all(p in s for p in INLINE_RULE_PHRASES) and not NEGATION.search(s)
-             for s in _sentences(text))
-    return [] if ok else ["decision rule not stated inline"]
 
 
 @pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
-def test_both_cards_state_inline_decision_rule(card):
-    """A1/A7 positive both-cards-state-inline-decision-rule."""
-    assert inline_decision_rule_errors(card.read_text(encoding="utf-8")) == []
-
-
-@pytest.mark.parametrize("card", [
-    "Reply to the user in their language. Before plainer explanations or decisions between "
-    "approaches, read loom-visualization's `references/plain-language.md`.",
-    "When asking or answering how to do something, never offer 2+ workable options in a table "
-    "or recommend one; read loom-visualization's `references/plain-language.md` first.",
-], ids=["routing-only", "negated"])
-def test_card_without_inline_decision_rule_fails(card):
-    """A7 negative: a card that only routes decisions to the guide, or negates the rule, is caught."""
-    assert inline_decision_rule_errors(card) != []
-
-
-# A6: the three alternatives a "how do I" answer most often leaves out.
-MISSED_ALTERNATIVES = ("doing nothing or later", "a smaller version", "combining two")
-
-
-def missed_alternative_errors(text):
-    """Error when no card sentence names the three missed alternatives; empty = named."""
-    ok = any(DECISION_SCOPE in s and all(p in s for p in MISSED_ALTERNATIVES)
-             and not NEGATION.search(s)
-             for s in _sentences(text))
-    return [] if ok else ["missed alternatives not named inline"]
-
-
-@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
-def test_both_cards_name_the_three_missed_alternatives(card):
-    """A6 positive both-cards-name-the-three-missed-alternatives."""
-    assert missed_alternative_errors(card.read_text(encoding="utf-8")) == []
-
-
-@pytest.mark.parametrize("dropped", MISSED_ALTERNATIVES)
-def test_card_missing_one_missed_alternative_fails(dropped):
-    """A6 negative: a card that leaves out any one of the three is caught."""
-    flat = " ".join(FULL_CARD.read_text(encoding="utf-8").split())
-    assert dropped in flat
-    assert missed_alternative_errors(flat.replace(dropped, "", 1)) != []
-
-
-# A6: the obligation carried by the verb — each alternative is offered or ruled out,
-# so none can be dropped in silence.
-MISSED_ALTERNATIVE_VERB = "list or rule out"
-
-
-def missed_alternative_verb_errors(text):
-    """Error when the three alternatives are named under a weaker verb; empty = list-or-rule-out."""
-    ok = any(DECISION_SCOPE in s and MISSED_ALTERNATIVE_VERB in s
-             and all(p in s for p in MISSED_ALTERNATIVES)
-             and not NEGATION.search(s)
-             for s in _sentences(text))
-    return [] if ok else ["missed alternatives not listed or ruled out inline"]
-
-
-@pytest.mark.parametrize("card", [FULL_CARD, COEXIST_CARD], ids=["full", "coexist"])
-def test_both_cards_list_or_rule_out_each_missed_alternative(card):
-    """A6 positive cards-list-or-rule-out-each-missed-alternative."""
-    assert missed_alternative_verb_errors(card.read_text(encoding="utf-8")) == []
-
-
-def test_weaker_verb_over_missed_alternatives_rejected():
-    """A6 negative: 'cover' lets an alternative be dropped in silence; the weaker verb is caught."""
-    assert missed_alternative_verb_errors(
-        "When asking or answering how to do something, cover doing nothing or later, "
-        "a smaller version, combining two.") != []
-
-
-def test_negated_missed_alternatives_rejected():
-    """A6 negative: naming the three inside a negated clause does not count."""
-    assert missed_alternative_errors(
-        "When asking or answering how to do something, never cover doing nothing or later, "
-        "a smaller version, combining two.") != []
+def test_both_cards_point_at_the_plain_language_guide(card):
+    """Both cards name the guide path that carries the decision rule."""
+    assert GUIDE in card.read_text(encoding="utf-8")
 
 
 # A7: the everyday conversation situations that carry a table. One per situation

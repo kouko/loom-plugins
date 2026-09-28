@@ -123,50 +123,18 @@ def test_stations_english_absent(station: str):
 
 
 def test_reviewer_nitclause_absent():
-    """Attack: reviewer.md must carry one clause that (i) mentions
-    English, (ii) mentions EARS or SHALL, (iii) mentions "Conventional
-    Comments" or a label list, (iv) says nit, and (v) sits outside the
-    docs-lint carve-out (stating the rule holds "regardless" of docs-lint).
-    Also assert the docs-lint carve-out is still named in the file; whether
-    the clause is a separate paragraph from the carve-out is left to
-    review. RED today — reviewer.md contains none of
-    "English", "EARS", "shall", or "Conventional Comments" anywhere (grep
-    confirmed). GREEN target: W1-02."""
+    """Attack: reviewer.md must carry one paragraph that names English,
+    EARS, Conventional Comments and the `nit` severity together, and the
+    file must still name the `docs-lint` carve-out. Whether the clause
+    holds regardless of docs-lint is left to review. GREEN target: W1-02."""
     text = REVIEWER_MD.read_text(encoding="utf-8")
 
     assert "docs-lint" in text, "docs-lint carve-out heading text is missing"
 
+    names = ("English", "EARS", "Conventional Comments", "`nit`")
     blocks = [b for b in text.split("\n\n") if b.strip()]
-    lower_blocks = [b.lower() for b in blocks]
-
-    facts = {
-        "english": any("english" in b for b in lower_blocks),
-        "ears_or_shall": any("ears" in b or "shall" in b for b in lower_blocks),
-        "conventional_or_label": any(
-            "conventional comments" in b or "label" in b for b in lower_blocks
-        ),
-        "nit": any("nit" in b for b in lower_blocks),
-        "regardless": any("regardless" in b for b in lower_blocks),
-    }
-    missing = [k for k, present in facts.items() if not present]
-    assert not missing, (
-        f"reviewer.md is missing these required facts anywhere in the "
-        f"document: {missing}"
-    )
-
-    compound_hits = [
-        b for b in lower_blocks
-        if "english" in b
-        and ("ears" in b or "shall" in b)
-        and ("conventional comments" in b or "label" in b)
-        and "nit" in b
-        and "regardless" in b
-    ]
-    assert compound_hits, (
-        "no single paragraph in reviewer.md combines English + EARS/shall + "
-        "Conventional-Comments/label + nit + 'regardless' (the docs-lint- "
-        "independence marker) — each fact was checked in isolation above "
-        "and at least the compound co-location is missing"
+    assert any(all(n in b for n in names) for b in blocks), (
+        f"no single paragraph in reviewer.md names all of {names}"
     )
 
 

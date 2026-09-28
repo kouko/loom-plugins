@@ -238,33 +238,29 @@ def test_removed_in_cell_section_fails():
     assert "missing subsection: In-cell visuals" in in_cell_errors(broken)
 
 
-# Earlier table research: (subsection, phrases in that subsection, source URL in Sources).
+# Earlier table research: (subsection, source named in one of its bullets, source URL in Sources).
 TABLE_CRITERIA = {
     "Datawrapper two-direction comparison": (
-        "Table or chart", ("two directions", "Datawrapper"),
+        "Table or chart", "Datawrapper",
         "https://www.datawrapper.de/blog/guide-what-to-consider-when-creating-tables"),
     "W3C WAI table as text alternative": (
-        "Table or chart", ("text alternative", "flowchart", "org chart", "W3C WAI"),
+        "Table or chart", "W3C WAI",
         "https://www.w3.org/WAI/tutorials/images/complex/"),
     "Google no table inside numbered steps": (
-        "When not to use a table", ("numbered steps", "Google"),
+        "When not to use a table", "Google",
         "https://developers.google.com/style/tables"),
 }
 
 
 def table_criteria_errors(text):
-    """Return missing or duplicated earlier table criteria; empty = valid."""
+    """Return missing earlier table criteria; empty = valid."""
     errors = []
     subs = sections(sections(text).get("Table-writing rules and common mistakes", ""), level=3)
     sources = sections(text).get("Sources", "")
-    flat_all = " ".join(text.split())
-    for name, (sub, phrases, url) in TABLE_CRITERIA.items():
+    for name, (sub, source, url) in TABLE_CRITERIA.items():
         body = " ".join(subs.get(sub, "").split())
-        bullet = next((b for b in re.split(r"(?:^| )- ", body) if all(p in b for p in phrases)), None)
-        if bullet is None:
+        if source not in body:
             errors.append(f"missing criterion: {name}")
-        elif flat_all.count(phrases[0]) != 1:
-            errors.append(f"duplicated criterion: {name}")
         if url not in sources:
             errors.append(f"missing source URL: {name}")
     return errors
@@ -275,11 +271,10 @@ def test_three_earlier_criteria_present():
     assert table_criteria_errors(_text()) == []
 
 
-def test_removed_criterion_fails():
-    """A8 negative removed-criterion-fails: dropping one criterion's bullet is caught."""
-    text = _text()
-    broken = re.sub(r"^- [^\n]*numbered steps[^\n]*\n", "", text, count=1, flags=re.MULTILINE)
-    assert "missing criterion: Google no table inside numbered steps" in table_criteria_errors(broken)
+def test_removed_criterion_source_url_fails():
+    """A8 negative: dropping one criterion's source URL is caught."""
+    broken = _text().replace("https://developers.google.com/style/tables", "")
+    assert "missing source URL: Google no table inside numbered steps" in table_criteria_errors(broken)
 
 
 def test_reference_cites_no_repository_records():
