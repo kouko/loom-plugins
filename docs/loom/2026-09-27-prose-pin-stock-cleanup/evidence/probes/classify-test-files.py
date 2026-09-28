@@ -24,6 +24,9 @@ Usage: python3 classify-test-files.py [--roots a,b,...]  (prints a table)
        python3 classify-test-files.py --count-exec <dir> [--list]  (A5: test
        functions that run a program, directly or through a helper, under <dir>'s
        four test roots; --list prints each counted file::function)
+       python3 classify-test-files.py --candidates  (batch 4: every literal asserted against
+       skill/agent/reference markdown, classed prose or structural by literal_class, whose
+       docstring holds the structural rules; batch-3 kept items print as kept-batch3)
 """
 from __future__ import annotations
 
@@ -189,7 +192,121 @@ def _prose_literal(s: str) -> bool:
     return not (first in COMMAND_WORDS or "/" in first or first.endswith((".py", ".sh")) or " --" in s)
 
 
+PLACEHOLDER = re.compile(r"<[A-Za-z][\w -]*>|\{[\w-]*\}")
+KEY_LINE = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*|\")?[a-z][\w.-]*(?:\*\*|\")?:(?:\s|$)")
+COMMIT_SUBJECT = re.compile(r"^[a-z]+\([\w-]+\): ")
+FILE_EXT = re.compile(r"\w\.[A-Za-z][A-Za-z0-9]{0,4}\b")
+CODE_MARK = re.compile(r"_|\(\)|\[\]|`|\w\.\w|=|\$|\\|^-|-$|[A-Za-z]\d|\w:\w")
+REGEX_NORM = ((re.compile(r"\(\?[aimsxu]+\)|\\b|\\A|\\Z|(?<!\\)[\^$]"), ""),
+              (re.compile(r"\\s[+*?]?"), " "), (re.compile(r"\\([.|()\[\]?*+-])"), r"\1"),
+              (re.compile(r"\(\?:"), "("))
+
+
+def _top_alternatives(pattern: str) -> list[str]:
+    """A regex split on its top-level unescaped `|` (alternatives inside groups stay whole)."""
+    alts, depth, cur, i = [], 0, "", 0
+    while i < len(pattern):
+        ch = pattern[i]
+        if ch == "\\":
+            cur += pattern[i:i + 2]
+            i += 2
+            continue
+        depth += (ch in "([") - (ch in ")]")
+        if ch == "|" and depth == 0:
+            alts.append(cur)
+            cur = ""
+        else:
+            cur += ch
+        i += 1
+    return alts + [cur]
+
+
+def literal_class(s: str, regex: bool = False) -> tuple[str, str] | None:
+    """Class a literal asserted against prose: (`prose`|`structural`, reason), or None.
+
+    None when the literal has no word with a letter (not a candidate). A regex pattern with
+    top-level alternatives is prose when any alternative is prose, else the first alternative's
+    class. Each pattern is first normalized: flags, anchors and `\\b` removed, `\\s`/`\\s+` read as a space, escaped
+    punctuation unescaped. Then, first rule that matches wins:
+      structural — markdown heading: starts with `#`
+      structural — gate or HTML marker: contains `<!--` or `-->`
+      structural — table row or cell: starts or ends with `|`, or contains ` | `
+      structural — line grammar placeholder: contains `<word>` or `{word}`
+      structural — field key or label: a lowercase `key:` opening the literal (optionally a
+                   list item or bold), a single word ending in `:`, or a whole `**bold**` label
+      structural — command: first word is a command (git, python3, uv, claude ...) or ` --flag`
+      structural — commit subject grammar: opens with `type(scope): `
+      3+ words   — path if the first word has `/` or ends in .py/.sh; otherwise prose
+      1-2 words  — path: contains `/` or a file extension (`x.md`, or `.md` alone)
+                 — repo name: a word is a hyphenated skill, plugin or script name found on
+                   disk (loom-code, write-spec, sync-trunk ...)
+                 — code identifier: contains `_`, `()`, `[]`, a backtick, `a.b` (also dotted
+                   rule and gate ids), `=`, `$`, a backslash (regex grammar), `a:b` (a skill id), a leading or
+                   trailing `-` (a name fragment), or a letter followed by a digit (sha1, v3)
+                 — ALL_CAPS token, rule id or verdict: no lowercase letter (PASS, RL-12, REQ-3)
+                 — capitalized label: its first word starts with an uppercase letter (heading text, a
+                   table-header cell, a bold field label or a name)
+                 — otherwise prose (a 1-2 word phrase or single term)
+    """
+    t = s
+    if regex:
+        alts = _top_alternatives(s)
+        if len(alts) > 1:
+            got = [(a, g) for a, g in ((a, literal_class(a, regex=True)) for a in alts) if g]
+            prose = [a for a, g in got if g[0] == "prose"]
+            if prose:
+                return "prose", f"regex alternative {prose[0]!r} is prose"
+            return got[0][1] if got else None
+        for pat, rep in REGEX_NORM:
+            t = pat.sub(rep, t)
+    t = t.strip()
+    words = [w for w in t.split() if any(ch.isalpha() for ch in w)]
+    if not words:
+        return None
+    if t.startswith("#"):
+        return "structural", "markdown heading"
+    if "<!--" in t or "-->" in t:
+        return "structural", "gate or HTML marker"
+    if t.startswith("|") or t.endswith("|") or " | " in t:
+        return "structural", "table row or cell"
+    if PLACEHOLDER.search(t):
+        return "structural", "line grammar placeholder"
+    if KEY_LINE.match(t) or (len(t.split()) == 1 and t.endswith(":")) or re.fullmatch(r"\*\*[^*]+\*\*:?", t):
+        return "structural", "field key or label"
+    first = words[0].strip("`$")
+    if first in COMMAND_WORDS or " --" in f" {t}":
+        return "structural", "command"
+    if COMMIT_SUBJECT.match(t):
+        return "structural", "commit subject grammar"
+    if len(words) >= 3:
+        if "/" in first or first.endswith((".py", ".sh")):
+            return "structural", "path"
+        return "prose", "phrase of 3+ words"
+    if "/" in t or FILE_EXT.search(t) or re.fullmatch(r"\.\w{1,5}", t):
+        return "structural", "path"
+    if any(w.strip("`'\".,:;()") in _repo_names() for w in words):
+        return "structural", "names a skill, plugin or script (a hyphenated repo name)"
+    if CODE_MARK.search(t):
+        return "structural", "code identifier"
+    if not any(ch.islower() for ch in t):
+        return "structural", "ALL_CAPS token, rule id or verdict"
+    if words[0][0].isupper():
+        return "structural", "capitalized label (heading text, table-header cell, bold label or name)"
+    return "prose", "1-2 word phrase or term"
+
+
 _PROD_CACHE: dict[Path, set[str]] = {}
+_NAMES_CACHE: dict[Path, set[str]] = {}
+
+
+def _repo_names() -> set[str]:
+    """Hyphenated skill, plugin and script names on disk (`loom-code`, `write-spec`, `sync-trunk`)."""
+    if REPO not in _NAMES_CACHE:
+        found = {d.name for d in REPO.glob("*/skills/*") if d.is_dir()}
+        found |= {d.name for d in REPO.iterdir() if d.is_dir()}
+        found |= {q.stem for q in REPO.glob("*/skills/*/scripts/*")} | {q.stem for q in REPO.glob("*/scripts/*")}
+        _NAMES_CACHE[REPO] = {n for n in found if "-" in n}
+    return _NAMES_CACHE[REPO]
 
 
 def _repo_production_modules() -> set[str]:
@@ -199,7 +316,14 @@ def _repo_production_modules() -> set[str]:
 
 
 def direct_pin_lines(text: str) -> list[int]:
-    """Lines of a direct sentence pin: a prose literal asserted against text read from a markdown file.
+    """Lines of a direct prose pin: the lines of every `prose`-class pin_candidates row."""
+    return sorted({c["line"] for c in pin_candidates(text) if c["cls"] == "prose"})
+
+
+def pin_candidates(text: str) -> list[dict]:
+    """Every literal asserted against text read from a markdown file, classed by literal_class.
+
+    Each row: line, func (the top-level function read), literal, form, cls, reason.
 
     Heuristic, AST-based and conservative (it misses rather than guesses):
     - Only a file that names a production skill, agent or reference markdown path
@@ -223,14 +347,29 @@ def direct_pin_lines(text: str) -> list[int]:
     - One exception to output-wins: a plain read of a path naming a skill, agent or reference
       file (SKILL.md, agents/, references/ ...) is markdown text even under a temp dir, since an
       installed copy of a plugin's own skill file is still its prose.
-    - A prose literal (see _prose_literal: 3+ words with letters, no heading, table row,
-      command or path), inline or a module-level string name, counts when asserted with
-      `in`, `==`, `.startswith()` or `.endswith()` against markdown text inside an
-      `assert` (also `text.count(<literal>) == N`, `>=`/`>` N with N >= 1; `<= 1` is a
-      one-home check and does not count), as does a phrase-collection comprehension variable asserted `in` it or
-      collected when `not in` it. Nested functions are read with their enclosing one.
-    A comparison written in an `if` of a helper, a regex search, or on a helper parameter
-    is not seen; such files need a reader.
+    - A literal (any length with a letter; an inline string, a module-level string name, or an
+      f-string's constant parts) is a candidate when it is asserted with `in`, `==`,
+      `.startswith()` or `.endswith()` against markdown text inside an `assert` (also
+      `text.count(<literal>) == N`, `>=`/`>` N with N >= 1; `<= 1` is a one-home check and
+      does not count), as is each literal of a collection (module-level or local tuple, list
+      or set) whose comprehension variable is asserted `in` it or collected when `not in` it.
+    - Batch 4 forms: a literal required by an `if` (`if "x" not in text`, or `in` under an
+      odd number of `not`; an `if` whose body is only `continue`/`pass` is a filter and does
+      not count) or returned (`return "x" in text`); a `.index()`/`.rindex()` lookup of a
+      literal on markdown text (it raises when the literal is gone); and a `re.search`/
+      `match`/`fullmatch`/`findall`/`finditer` (or the same method on a name bound to
+      `re.compile(<literal>)`) whose pattern is a literal and whose subject is markdown text,
+      unless directly negated (`not re.search(...)`, an absence); in an `if` test it counts
+      only under an odd number of `not` (and not as a continue/pass filter), and in a
+      comprehension condition it is a filter and does not count.
+    - A local helper, validator-named or not, whose parameter receives markdown text at any
+      call site in the file (to a fixed point) reads that parameter as markdown text, so a
+      literal it requires of its input is a candidate on the helper's own line.
+      Nested functions are read with their enclosing one.
+    - literal_class then classes each candidate prose or structural; only prose ones count as
+      pins (direct_pin_lines), the census `--candidates` mode lists both.
+    Not seen: a literal passed through a parameter (`pinned_sentence_ok(s, *PIN)`), a
+    non-literal regex, and asserts on names the file-wide judgment calls output.
     Known limits: a local helper named like a validator word (`_checklist()` matches
     'check') is taken as output; and a variable name is judged file-wide, so one name
     holding README.md in one test and SKILL.md in another counts as non-prose everywhere.
@@ -385,58 +524,173 @@ def direct_pin_lines(text: str) -> list[int]:
             return node.value
         if isinstance(node, ast.Name):
             return mod_strs.get(node.id)
+        if isinstance(node, ast.JoinedStr):  # an f-string: its constant parts, `{}` for each value
+            return "".join(v.value if isinstance(v, ast.Constant) else "{}" for v in node.values)
         return None
 
-    def phrase_coll(node) -> bool:
-        node = mod_colls.get(node.id) if isinstance(node, ast.Name) else node
-        return isinstance(node, (ast.Tuple, ast.List, ast.Set)) and any(
-            _prose_literal(literal(e) or "") for e in node.elts)
+    def coll_lits(node, colls) -> list[str]:
+        node = colls.get(node.id) if isinstance(node, ast.Name) else node
+        if not isinstance(node, (ast.Tuple, ast.List, ast.Set)):
+            return []
+        return [s for s in (literal(e) for e in node.elts) if s is not None]
+
+    def re_bound(scope) -> dict[str, str]:
+        """Names bound to `re.compile(<literal>)` in scope (not descending into functions for the module)."""
+        nodes = scope.body if isinstance(scope, ast.Module) else list(ast.walk(scope))
+        return {t.id: literal(n.value.args[0]) for n in nodes if isinstance(n, ast.Assign)
+                and isinstance(n.value, ast.Call) and _dotted(n.value.func) == "re.compile"
+                and n.value.args and literal(n.value.args[0]) is not None
+                for t in n.targets if isinstance(t, ast.Name)}
+
+    parent = {id(ch): p for p in ast.walk(tree) for ch in ast.iter_child_nodes(p)}
+
+    def nots(node, root) -> int:
+        n, x = 0, node
+        while x is not root and id(x) in parent:
+            x = parent[id(x)]
+            n += isinstance(x, ast.UnaryOp) and isinstance(x.op, ast.Not)
+        return n
 
     mod_md, mod_out = taint(ast.Module(body=[n for n in tree.body if not isinstance(
         n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))], type_ignores=[]), set(), set())
-    hits: set[int] = set()
+    mod_re = re_bound(tree)
     nested = {id(g) for f in funcs.values() for g in ast.walk(f) if g is not f and g in funcs.values()}
-    for f in (f for f in funcs.values() if id(f) not in nested):  # a nested helper is read with its parent
-        params = {a.arg for a in f.args.args}  # a local fixture of that name decides the parameter
-        md, out = taint(f, mod_md | (params & readers), mod_out | (params & runners))
-        phrase_vars = {g.target.id for n in ast.walk(f) if isinstance(n, (ast.ListComp, ast.SetComp, ast.GeneratorExp))
-                       for g in n.generators if isinstance(g.target, ast.Name) and phrase_coll(g.iter)}
+    top = [f for f in funcs.values() if id(f) not in nested]  # a nested helper is read with its parent
+    fed: dict[str, set[str]] = {}  # helper -> parameters that receive markdown text at some call site
+
+    def scope_taint(f):
+        own = {a.arg for a in f.args.args}  # a local fixture of that name decides the parameter
+        fed_here = set().union(*(fed.get(g.name, set()) for g in ast.walk(f)
+                                 if isinstance(g, (ast.FunctionDef, ast.AsyncFunctionDef))))
+        return taint(f, mod_md | (own & readers) | fed_here, mod_out | (own & runners))
+
+    while True:
+        size = sum(map(len, fed.values()))
+        for f in top:
+            md, out = scope_taint(f)
+            for c in ast.walk(f):
+                if isinstance(c, ast.Call) and isinstance(c.func, ast.Name) and c.func.id in funcs:
+                    gp = [a.arg for a in funcs[c.func.id].args.args]
+                    got = {gp[i] for i, a in enumerate(c.args) if i < len(gp)
+                           and not isinstance(a, ast.Starred) and is_md(a, md, out)}
+                    got |= {k.arg for k in c.keywords if k.arg in gp and is_md(k.value, md, out)}
+                    if got:
+                        fed.setdefault(c.func.id, set()).update(got)
+        if sum(map(len, fed.values())) == size:
+            break
+
+    rows: list[dict] = []
+    seen: set[tuple] = set()
+
+    def add(line, fname, lit, form, regex=False) -> None:
+        got = literal_class(lit, regex) if lit is not None else None
+        if got and (line, lit, form) not in seen:
+            seen.add((line, lit, form))
+            rows.append({"line": line, "func": fname, "literal": lit, "form": form,
+                         "cls": got[0], "reason": got[1]})
+
+    comps = (ast.ListComp, ast.SetComp, ast.GeneratorExp)
+    for f in top:
+        md, out = scope_taint(f)
+        colls = {**mod_colls, **{t.id: n.value for n in ast.walk(f) if isinstance(n, ast.Assign)
+                                 and isinstance(n.value, (ast.Tuple, ast.List, ast.Set))
+                                 for t in n.targets if isinstance(t, ast.Name)}}
+        bound_re = {**mod_re, **re_bound(f)}
+        def bound_lits(name, node) -> list[str]:
+            """Literals of the collection the nearest enclosing comprehension or `for` binds name to."""
+            x = node
+            while id(x) in parent:
+                x = parent[id(x)]
+                gens = x.generators if isinstance(x, comps) else [x] if isinstance(x, ast.For) else []
+                for g in gens:
+                    if isinstance(g.target, ast.Name) and g.target.id == name:
+                        return coll_lits(g.iter, colls)
+            return []
+
+        def required(c, form) -> None:
+            left, right = c.left, c.comparators[0]
+            lits = [literal(left)] if literal(left) is not None else (
+                bound_lits(left.id, c) if isinstance(left, ast.Name) else [])
+            if lits and is_md(right, md, out):
+                for s in lits:
+                    add(c.lineno, f.name, s, form)
+
         for node in ast.walk(f):
             if isinstance(node, ast.Assert):
                 for c in ast.walk(node.test):
                     if isinstance(c, ast.Compare) and len(c.ops) == 1:
                         left, right = c.left, c.comparators[0]
-                        pinned = _prose_literal(literal(left) or "") or (
-                            isinstance(left, ast.Name) and left.id in phrase_vars)
-                        if isinstance(c.ops[0], ast.In) and pinned and is_md(right, md, out):
-                            hits.add(c.lineno)
-                        elif isinstance(c.ops[0], ast.Eq) and any(
-                                _prose_literal(literal(a) or "") and is_md(b, md, out)
-                                for a, b in ((left, right), (right, left))):
-                            hits.add(c.lineno)
-                        elif isinstance(c.ops[0], (ast.Eq, ast.GtE, ast.Gt)) and isinstance(left, ast.Call) \
+                        if isinstance(c.ops[0], ast.In):
+                            required(c, "assert in")
+                        elif isinstance(c.ops[0], ast.Eq) and not isinstance(left, ast.Call):
+                            for a, b in ((left, right), (right, left)):
+                                if literal(a) is not None and is_md(b, md, out):
+                                    add(c.lineno, f.name, literal(a), "assert ==")
+                        if isinstance(c.ops[0], (ast.Eq, ast.GtE, ast.Gt)) and isinstance(left, ast.Call) \
                                 and isinstance(left.func, ast.Attribute) and left.func.attr == "count" \
-                                and left.args and _prose_literal(literal(left.args[0]) or "") \
-                                and isinstance(right, ast.Constant) and isinstance(right.value, int) \
-                                and right.value >= 1 and is_md(left.func.value, md, out):
-                            hits.add(c.lineno)  # `text.count(<sentence>) == 1`: present, not "at most once"
+                                and left.args and isinstance(right, ast.Constant) \
+                                and isinstance(right.value, int) and right.value >= 1 \
+                                and is_md(left.func.value, md, out):
+                            # `text.count(<literal>) == 1`: present, not "at most once"
+                            add(c.lineno, f.name, literal(left.args[0]), "assert count")
                     elif isinstance(c, ast.Call) and isinstance(c.func, ast.Attribute) \
-                            and c.func.attr in ("startswith", "endswith") and c.args:
+                            and c.func.attr in ("startswith", "endswith") and c.args \
+                            and is_md(c.func.value, md, out):
                         arg = c.args[0]
-                        lits = [literal(e) for e in arg.elts] if isinstance(arg, ast.Tuple) else [literal(arg)]
-                        if any(_prose_literal(s or "") for s in lits) and is_md(c.func.value, md, out):
-                            hits.add(c.lineno)
-            elif isinstance(node, (ast.ListComp, ast.SetComp, ast.GeneratorExp)):
+                        for s in ([literal(e) for e in arg.elts] if isinstance(arg, ast.Tuple) else [literal(arg)]):
+                            add(c.lineno, f.name, s, f"assert .{c.func.attr}()")
+            elif isinstance(node, ast.If):
+                if all(isinstance(b, (ast.Continue, ast.Pass)) for b in node.body):
+                    continue  # a filter, not a requirement
+                for c in ast.walk(node.test):
+                    if isinstance(c, ast.Compare) and len(c.ops) == 1 and isinstance(c.ops[0], (ast.In, ast.NotIn)) \
+                            and isinstance(c.ops[0], ast.NotIn) != (nots(c, node.test) % 2 == 1):
+                        required(c, "if requires")
+            elif isinstance(node, ast.Return) and node.value is not None:
+                for c in ast.walk(node.value):
+                    if isinstance(c, ast.Compare) and len(c.ops) == 1 and isinstance(c.ops[0], ast.In) \
+                            and nots(c, node.value) == 0:
+                        required(c, "return in")
+            elif isinstance(node, comps):
                 for g in node.generators:
-                    if not (isinstance(g.target, ast.Name) and phrase_coll(g.iter)):
-                        continue
-                    for cond in g.ifs:
+                    lits = coll_lits(g.iter, colls) if isinstance(g.target, ast.Name) else []
+                    for cond in (g.ifs if lits else []):
                         for c in ast.walk(cond):
                             if isinstance(c, ast.Compare) and isinstance(c.left, ast.Name) \
                                     and c.left.id == g.target.id and isinstance(c.ops[0], ast.NotIn) \
                                     and is_md(c.comparators[0], md, out):
-                                hits.add(c.lineno)
-    return sorted(hits)
+                                for s in lits:
+                                    add(c.lineno, f.name, s, "collected when not in")
+            elif isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+                attr, recv = node.func.attr, node.func.value
+                if attr in ("index", "rindex") and node.args and is_md(recv, md, out):
+                    add(node.lineno, f.name, literal(node.args[0]), f".{attr}()")
+                elif attr in ("search", "match", "fullmatch", "findall", "finditer"):
+                    pat = None
+                    if isinstance(recv, ast.Name) and recv.id == "re":
+                        if len(node.args) >= 2 and is_md(node.args[1], md, out):
+                            pat = literal(node.args[0])
+                    elif node.args and is_md(node.args[0], md, out):
+                        pat = literal(recv.args[0]) if isinstance(recv, ast.Call) and recv.args \
+                            and _dotted(recv.func) == "re.compile" else (
+                            bound_re.get(recv.id) if isinstance(recv, ast.Name) else None)
+                    up = parent.get(id(node))
+                    negated = (isinstance(up, ast.UnaryOp) and isinstance(up.op, ast.Not)) or (
+                        isinstance(up, ast.Compare) and isinstance(up.ops[0], ast.Is))
+                    x = node  # in an `if` test it is required only when negated; a filter never is
+                    while id(x) in parent and not isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        p = parent[id(x)]
+                        if isinstance(p, ast.If) and x is p.test:
+                            negated = nots(node, p.test) % 2 == 0 or all(
+                                isinstance(b, (ast.Continue, ast.Pass)) for b in p.body)
+                            break
+                        if isinstance(p, ast.comprehension) and x in p.ifs:
+                            negated = True
+                            break
+                        x = p
+                    if pat is not None and not negated:
+                        add(node.lineno, f.name, pat, f"re.{attr}", regex=True)
+    return sorted(rows, key=lambda r: (r["line"], r["literal"]))
 
 
 def executes(text: str) -> bool:
@@ -904,6 +1158,71 @@ MANUAL_OVERRIDES = {
 }
 
 
+# Batch 3 kept these on purpose (census-report "Known limits"); --candidates lists each
+# matching line as class kept-batch3 instead of prose or structural.
+KEPT_BATCH3 = {
+    "loom-workflow/tests/loom-visualization/test_templates.py": (
+        r"assert .*pinned_sentence_ok\(s\b",
+        "batch-3 kept gate polarity check (MERMAID_PIN, TABLE_ASCII_PIN, CHAT_PROCEEDS_PIN): "
+        "reads only sentences in the mermaid-only-when-confirmed and obsidian-boundary gate "
+        "blocks and fails a negated sentence; the literals pass through a parameter",
+    ),
+    "loom-workflow/tests/decision-map/test_skill_doc.py": (
+        r"defaultPrompt",
+        "batch-3 kept interface string: the Codex manifest defaultPrompt, not skill prose",
+    ),
+}
+PLUGIN_ORDER = (("tests", "root tests"), ("loom-code", "loom-code"),
+                ("loom-design", "loom-design"), ("loom-workflow", "loom-workflow"))
+
+
+def candidates_report(roots: list[str]) -> str:
+    """Markdown of every pin_candidates row under roots, grouped by plugin then file."""
+    import ast
+
+    by_plugin: dict[str, dict[str, list[dict]]] = {label: {} for _, label in PLUGIN_ORDER}
+    for root in roots:
+        for p in sorted((REPO / root).rglob("*.py")):
+            key = p.relative_to(REPO).as_posix()
+            text = code_only(p.read_text(encoding="utf-8", errors="replace"))
+            rows = pin_candidates(text)
+            if key in KEPT_BATCH3:
+                pat, reason = KEPT_BATCH3[key]
+                tops = [(n.lineno, n.end_lineno, n.name) for n in ast.parse(text).body
+                        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+                for i, line in enumerate(text.splitlines(), 1):
+                    if re.search(pat, line):
+                        rows = [r for r in rows if r["line"] != i]
+                        func = next((nm for a, b, nm in tops if a <= i <= b), "<module>")
+                        rows.append({"line": i, "func": func, "literal": line.strip(), "form": "kept line",
+                                     "cls": "kept-batch3", "reason": reason})
+            if rows:
+                label = next((lb for pre, lb in PLUGIN_ORDER[1:] if key.startswith(pre + "/")), "root tests")
+                by_plugin[label][key] = sorted(rows, key=lambda r: (r["line"], r["literal"]))
+
+    out = ["| plugin | prose | structural | kept-batch3 | files with >=1 prose candidate |",
+           "|---|---|---|---|---|"]
+    total = {"prose": 0, "structural": 0, "kept-batch3": 0, "files": 0}
+    for _, label in PLUGIN_ORDER:
+        rows = [r for rs in by_plugin[label].values() for r in rs]
+        n = {c: sum(r["cls"] == c for r in rows) for c in ("prose", "structural", "kept-batch3")}
+        n["files"] = sum(any(r["cls"] == "prose" for r in rs) for rs in by_plugin[label].values())
+        total = {k: total[k] + n[k] for k in total}
+        out.append(f"| {label} | {n['prose']} | {n['structural']} | {n['kept-batch3']} | {n['files']} |")
+    out.append(f"| **total** | {total['prose']} | {total['structural']} | {total['kept-batch3']} | {total['files']} |")
+    for _, label in PLUGIN_ORDER:
+        out += ["", f"## {label}", ""]
+        for key, rows in by_plugin[label].items():
+            out += [f"### {key}", "", "| file:line | function | literal / form | class | reason |",
+                    "|---|---|---|---|---|"]
+            for r in rows:
+                lit = repr(r["literal"]).replace("|", "\\|")
+                out.append(f"| {key}:{r['line']} | {r['func']} | {lit} ({r['form']}) | {r['cls']} | {r['reason']} |")
+            out.append("")
+        out += [f"### Decisions — {label}", "", "(W1 implementers: one row per candidate judged.)"]
+    return "\n".join(out) + "\n"
+
+
 def main() -> int:
     import argparse
 
@@ -911,7 +1230,11 @@ def main() -> int:
     parser.add_argument("--roots", default=",".join(DEFAULT_ROOTS), help="comma-separated test roots")
     parser.add_argument("--count-exec", metavar="DIR", help="count executing test functions under DIR")
     parser.add_argument("--list", action="store_true", help="with --count-exec, print each counted function")
+    parser.add_argument("--candidates", action="store_true", help="print every pin candidate as markdown")
     args = parser.parse_args()
+    if args.candidates:
+        print(candidates_report([r for r in args.roots.split(",") if r]), end="")
+        return 0
     if args.count_exec is not None:
         base = Path(args.count_exec).resolve()
         if args.list:
