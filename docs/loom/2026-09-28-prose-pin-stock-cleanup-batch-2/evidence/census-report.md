@@ -195,7 +195,22 @@ for name in FILES:
                     problems.append(f"{name}: rule {rid} not in --list-rules")
 
 with open(sys.argv[1], "w", encoding="utf-8") as out:
-    out.write("| source | file::function(s) | defect class / gate | named replacement | kind |
+    out.write("| source | file::function(s) | defect class / gate | named replacement | kind |\n|---|---|---|---|---|\n")
+    for r in rows:
+        out.write("| " + " | ".join(c.replace("\n", " ") for c in r) + " |\n")
+print("rows:", len(rows))
+print("by kind:", dict(kinds.most_common()))
+print("deleted defs in changed files:", len(deleted))
+print("problems:", len(problems))
+for p in problems:
+    print("  ", p)
+```
+
+</details>
+
+### Stitched table
+
+| source | file::function(s) | defect class / gate | named replacement | kind |
 |---|---|---|---|---|
 | mapping-evals | `loom-workflow/tests/scripts/test_distill_sessions_compaction.py` | `distill-sessions` | `loom-workflow/tests/distill-sessions/test_apply.py::test_refuses_without_approved_flag` | eval re-point |
 | mapping-evals | `loom-workflow/tests/scripts/test_critique_compaction.py` | `critique` | `tests/test_loom_skill_description_catalog.py` | eval re-point |
