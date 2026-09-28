@@ -28,14 +28,20 @@ REPO = Path(__file__).resolve().parents[4]
 DEFAULT_ROOTS = ["loom-code/tests", "loom-workflow/tests/scripts", "tests", "loom-design/tests"]
 
 # Program-executing signals (in test functions, not just module-level setup).
-# Distinguishes real checker/script execution (returns .returncode, has
-# assertions on results) from module-level path resolution setup that merely
-# constructs a path string or runs git to find the repo root.
+# Matches subprocess.run/check_output/Popen/call WHEN combined with a program name
+# (pytest, python3, loom_checker.py, check_*.py, git) OR when .returncode is asserted.
+# This catches behavior tests while potentially including module-level setup calls.
 EXECUTE = re.compile(
-    r"loom_checker\.py"
-    r"|pytest\.raises"
+    r"(subprocess\.(?:run|check_output|Popen|call).*["
+    r"py]|pytest\.raises"
+    r"|\.returncode"
     r"|check_mechanisms\.py|check_doc_citations\.py|check_contract_citations\.py"
-    r"|loom_check"
+    r"|loom_checker\.py|loom_check)"
+)
+# Simpler approach: just look for subprocess.run AND git/pytest/python3
+SUBPROCESS_EXECUTE = re.compile(
+    r"subprocess\.(?:run|check_output|Popen|call)"
+    r".*?(?:git\s|pytest|python3|loom_checker\.py|check_)"
 )
 # Imports production logic (not the prose_pin matcher, not other tests).
 PROD_IMPORT = re.compile(
@@ -55,11 +61,12 @@ SENTENCE_ASSERT = re.compile(
 STRUCTURE = re.compile(
     r"startswith\(\"#|## |frontmatter|yaml\.safe_load|json\.loads|\.get\(\"status|\"### |gate: |#+ .*——"
 )
-# Grammar-invariant signals: pins matcher rules or gate markers specifically.
-# Matches: pins the prose_pin matcher rules (adversary.md, engineering-baseline.md),
-# gate marker grammar (<!-- gate: -->), version format grammar, or matcher self-tests.
+# Grammar-invariant signals: pins matcher rules or gate-marker grammar.
+# Does NOT fire on adversary.md/engineering-baseline.md references alone —
+# those are contract/reference filenames many behavior files mention.
+# Fires only on signals that the file is pinning MATCHER RULES or
+# GATE-MARKER GRAMMAR specifically.
 GRAMMAR_INVARIANT_CONTENT = re.compile(
-    r"adversary\.md|engineering-baseline\.md|"
     r"prose_pin.*matcher.*rule|matcher.*rule.*prose_pin|"
     r"gate.*marker|<!--\s*gate:|version.*format|"
     r"synthetic.*self-test|self-test.*synthetic"
@@ -76,7 +83,7 @@ def classify(path: Path) -> tuple[str, dict]:
 
     # Check for behavior FIRST (executes programs or imports production logic)
     # Behavior wins ties per the spec
-    if EXECUTE.search(text) or PROD_IMPORT.search(text):
+    if EXECUTE.search(text) or SUBPROCESS_EXECUTE.search(text) or PROD_IMPORT.search(text):
         secondary = {}
         # Check for sentence pins (secondary marker for behavior files that also pin prose)
         secondary["has_pins"] = "yes" if (SENTENCE_ASSERT.search(text) and PROSE_PIN_IMPORT.search(text)) else "no"
