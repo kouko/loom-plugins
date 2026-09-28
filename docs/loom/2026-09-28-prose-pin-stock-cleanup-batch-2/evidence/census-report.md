@@ -2,7 +2,7 @@
 
 All numbers below come from clean worktrees (`git worktree add --detach <scratchpad>/<wt> <ref>`), each removed afterwards (Risk 3). HEAD is `c3367d32`, after the loop-form fix round that followed the build adversary; where a number is still the earlier one at `3db2f21a`, the text says so. The base is `7244374d`. The closing review round 1 fix, after `d8f2615f`, updated A1 (scope, batch-3 list, two override rows), A3 (table, counts, population) and A5 (recount); each of those parts says so.
 
-**Headline for acceptance testing: A5's broad count is 1922 at base and 1923 at HEAD.** At `3db2f21a` it had gone down by one, to 1921. The one function that dropped out never ran a program; it only imported test modules. The fix round then added two graduated adversary tests that run code. Counted the way the intent defines an execution test, nothing drops: 1920 at base, 1921 at HEAD. See A5.
+**Headline for acceptance testing: A5's broad count is 1922 at base and 1925 after the closing review round 1 fix (restricted count: 1920 → 1921).** At `3db2f21a` it had gone down by one, to 1921. The one function that dropped out never ran a program; it only imported test modules. The fix round then added two graduated adversary tests that run code. Counted the way the intent defines an execution test, nothing drops: 1920 at base, 1921 at HEAD. See A5.
 
 ## A1 — census
 
