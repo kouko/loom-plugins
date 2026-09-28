@@ -348,7 +348,7 @@ python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-te
 
 ## Batch 2 (deferred)
 
-Files that still carry sentence pins after this batch, left for a second batch (intent A2/A4 as amended). Gate-eval files (7): named by a `docs/loom/evidence/mechanisms.yaml` `eval:` value, so they are a gate's execution evidence.
+Files that still carry sentence pins after this batch, left for a second batch (intent A2/A4 as amended). Gate-eval files (7): named by a `docs/loom/evidence/mechanisms.yaml` `eval:` value, so they are a gate's execution evidence. Batch 1 kept every test an `eval:` names untouched (a file-level eval such as critique's keeps the whole file); sentence-pin functions no eval names were pruned here: 6 in `loom-code/tests/test_dispatch_profile_contract.py`, 9 in `loom-workflow/tests/goal-create/test_skill_md.py` (see the mapping rows).
 
 - `loom-code/tests/test_build_recovery_rules.py` — gate-eval
 - `loom-code/tests/test_closing_review_recovery_rules.py` — gate-eval

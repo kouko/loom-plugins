@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Census classifier for the prose-pin stock cleanup (W0-01).
+concern: a test file that pins prose sentences but is counted as behavior, structure or grammar-invariant, hiding a pin from the census.
 
 Classifies every test file that reads prose (.md) into one of:
   behavior   — executes programs (subprocess/checker/scripts) or imports

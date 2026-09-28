@@ -1,4 +1,7 @@
-"""Census classifier probes (W3-02): the gate-eval class and the A5 execution count."""
+"""Census classifier probes (W3-02): the gate-eval class and the A5 execution count.
+
+concern: a classifier regression that misfiles gate-eval files or miscounts the tests that execute a program (A5).
+"""
 from __future__ import annotations
 
 import importlib.util
