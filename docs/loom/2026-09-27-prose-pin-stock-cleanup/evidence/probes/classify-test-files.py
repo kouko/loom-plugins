@@ -378,7 +378,8 @@ def pin_candidates(text: str) -> list[dict]:
       `re.compile(<literal>)`) whose pattern is a literal and whose subject is markdown text,
       unless directly negated (`not re.search(...)`, an absence); in an `if` test it counts
       only under an odd number of `not` (and not as a continue/pass filter), and in a
-      comprehension condition it is a filter and does not count.
+      comprehension condition it is a filter and does not count, except a negated one
+      (`[k for k, pat in D.items() if not re.search(pat, md)]` collects what is missing, W2-01).
     - A local helper, validator-named or not, whose parameter receives markdown text at any
       call site in the file (to a fixed point) reads that parameter as markdown text, so a
       literal it requires of its input is a candidate on the helper's own line.
@@ -781,6 +782,12 @@ def pin_candidates(text: str) -> list[dict]:
                 required(node, "stored in")
             elif isinstance(node, comps):
                 for g in node.generators:
+                    for cond in g.ifs:  # `[k for k, pat in D.items() if not re.search(pat, md)]`
+                        r = cond.operand if isinstance(cond, ast.UnaryOp) and isinstance(cond.op, ast.Not) else None
+                        if isinstance(r, ast.Call) and _dotted(r.func) in ("re.search", "re.match", "re.fullmatch") \
+                                and len(r.args) >= 2 and is_md(r.args[1], md, out):
+                            for pat in lits(r.args[0], ctx, pids):
+                                put(r.lineno, pat, "collected when unmatched", regex=True)
                     if not isinstance(g.target, ast.Name):
                         continue
                     for cond in g.ifs:
@@ -1152,8 +1159,10 @@ MANUAL_OVERRIDES = {
         "template table columns, rows and markers, the evidence block heading, "
         "the template path pointer in the tester contract, a full-suite "
         "absence scan fed by split_sentences, no gate marker, and the evidence "
-        "path pointer outside every gate block; the two station phrases it "
-        "once looped over were pruned in the batch-2 loop-form fix, so no "
+        "path pointer outside every gate block; the remaining hits are the "
+        "Verdict column enum (works|partly|not verified|fails) and the Re-run "
+        "cell grammar (`carried over — <reason>`, `re-tested`); the two "
+        "sentence-anchored verdict scans were deleted in batch 4 (W1-01), so no "
         "sentence is asserted present",
     ),
     "loom-code/tests/test_adversary_protocol.py": (
@@ -1241,7 +1250,11 @@ MANUAL_OVERRIDES = {
     "loom-code/tests/test_adversary_layout.py": (
         "behavior",
         "loop-form hit is SHARED_HEADINGS asserted in the protocol's parsed "
-        "heading list: section headings, not prose",
+        "heading list: section headings, not prose. The batch-4 hits are the "
+        "KIND_MARKERS fragments of a one-home absence check (each asserted absent "
+        "outside its own file), the `at commit`/`at split commit` sha lines of the "
+        "frozen correspondence note fed to git show, the `(preamble)` sentinel "
+        "cell, and the `Reuse first, update with evidence` heading",
     ),
     "loom-code/tests/test_loom_publish.py": (
         "behavior",
@@ -1272,36 +1285,40 @@ MANUAL_OVERRIDES = {
     ),
     "loom-design/tests/architecture-design/test_architecture_skill.py": (
         "structure",
-        "loop-form hit is the four bold field labels of the schema's Guard "
-        "failure message section (rule id, offending path, conform, change the "
-        "rule and its guard): schema field labels. The rest is path pointers, "
-        "the ratified-by line and commit subject shape, the re-design and "
-        "re-ratify tokens, the two-word terms never required and never blocks, "
-        "the SKILL.md mention of the Guard failure message section name, and a "
-        "heading-bounded Step 5 scan; the direct sentence "
-        "asserts (single answer, re-design procedure) were pruned in closing "
-        "review round 1",
+        "no pin hit is left: frontmatter name and version, the description's "
+        "length and two CJK trigger terms, referenced paths resolving, README "
+        "skill-name links, the schema and validator paths, the `ratified-by:` "
+        "line and commit subject shape, the package-tests line grammar, the "
+        "KICKOFF-DEFAULTS.md pointer inside the Step 5 heading section, no gate "
+        "marker, and the word cap; the tests of the Guard failure field labels, "
+        "the re-design tokens and the two-word terms were deleted in batch 4 "
+        "(W1-02)",
     ),
     # Batch 3 (W2-01): files whose remaining direct-pin hit is not prose.
     "loom-code/tests/test_architecture_doc_consumers.py": (
         "structure",
-        "direct-pin hits are the `ratified-by: <name> <date>` line grammar in "
-        "write-plan Step 5 and the lenses code table; the rest is the Risk "
-        "line and rule id terms, lens-table row regexes, a heading-bounded "
-        "N/A bullet check and the reviewer code row; the sentence asserts "
-        "were pruned in batch 3 (W1-01)",
+        "remaining hit is the `architecture-conformance` dimension id in the "
+        "reviewer code row; the rest is the `ratified-by: <name> <date>` line "
+        "grammar in write-plan Step 5 and the lenses code table, the Risk line "
+        "field name, a lens-table row regex and a heading-bounded N/A bullet "
+        "check; the sentence asserts were pruned in batch 3 (W1-01) and the "
+        "'rule id' phrase in batch 4 (W1-01)",
     ),
     "loom-workflow/tests/decision-map/test_decision_map_intent_binding.py": (
         "behavior",
-        "direct-pin hit is the Map line format `- delivery-intent: DA-<n> | "
-        "docs/loom/intent/<change-id>.md` in map-format.md: line grammar, not "
-        "prose; the rest is path and front-matter tokens, status tokens, "
+        "the Map line format `- delivery-intent: DA-<n> | "
+        "docs/loom/intent/<change-id>.md` in map-format.md is line grammar, not "
+        "prose (batch 3's direct-pin hit; the batch-4 census classes it "
+        "structural); the rest is path and front-matter tokens, status tokens, "
         "absences, and the citation checker's scope loaded by path",
     ),
     "loom-workflow/tests/loom-visualization/test_templates.py": (
         "behavior",
-        "direct-pin hit is the client-matrix table column header 'Form in a "
-        "chat reply'. The three pinned_sentence_ok polarity checks "
+        "direct-pin hits are the client-matrix table column header 'Form in a "
+        "chat reply' and its column-parsed cell value 'markdown table', the "
+        "template heading 'When to use', the `title`/`body` keys of the "
+        "templates' JSON examples, and the ASCII_BY_CLIENT regex, an absence "
+        "(asserted to find nothing). The three pinned_sentence_ok polarity checks "
         "(MERMAID_PIN, TABLE_ASCII_PIN, CHAT_PROCEEDS_PIN) are kept on purpose "
         "(agent-decided): they read only sentences inside the "
         "mermaid-only-when-confirmed and obsidian-boundary `<!-- gate: -->` "
@@ -1313,9 +1330,99 @@ MANUAL_OVERRIDES = {
     "loom-code/tests/test_adversarial_batch3_census_misses.py": (
         "behavior",
         "runs this classifier (path-loaded) and asserts on its result; the "
-        "direct-pin hit is a synthetic test source string fed to "
+        "sentence-assert hit is a synthetic test source string fed to "
         "direct_pin_lines, and the residual check asserts named files carry "
         "no skill sentence, an absence",
+    ),
+    # Batch 4 (W2-01): files whose remaining hits the W1 mappings decided as not prose.
+    "loom-code/tests/test_build_mechanical_checks.py": (
+        "structure",
+        "remaining hits are absence scans: no added sentence in which another "
+        "role edits an `adversarial program`, no un-negated implementer "
+        "`floor` sentence, and no retired attack-catalogue or trailer pointer; "
+        "no sentence asserted present",
+    ),
+    "loom-code/tests/test_dispatch_profile_resolver.py": (
+        "behavior",
+        "runs the dispatch-profile resolver; the prose-side hit is the "
+        "`capabilities` JSON input key of the resolver boundary in "
+        "dispatch-profile.md, next to the `event` keys",
+    ),
+    "loom-code/tests/test_probes_language_policy.py": (
+        "structure",
+        "remaining hits are the `docs-lint` KICKOFF-DEFAULTS key, the negation "
+        "token set of a polarity check, and the concept noun `english` in the "
+        "paragraph that names the probe file shape; the nit clause keeps only "
+        "proper names (English, EARS, Conventional Comments) and the `nit` value",
+    ),
+    "loom-code/tests/test_write_plan_station_text.py": (
+        "grammar-invariant",
+        "remaining hit is LANE_WORDING_RE in lane_hits, an absence scan (no "
+        "runtime file names a lane); the rest is release-metadata pins, "
+        "heading-anchored key scans and grammar checks",
+    ),
+    "loom-workflow/tests/goal-create/test_goal_shape.py": (
+        "structure",
+        "remaining hits are the vendor names openai and anthropic in the "
+        "paragraphs located by the `## The 4,000-character budget` heading and "
+        "the `**Attribution accuracy**` bold label, and the four-field names "
+        "outcome, constraints and verification",
+    ),
+    "loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py": (
+        "structure",
+        "remaining hit is OVERCLAIM_PATTERN, an absence (asserted to find "
+        "nothing in the READMEs); the concept matchers left are the skill name, "
+        "the sibling skill name and the mode identifiers",
+    ),
+    "loom-workflow/tests/loom-visualization/test_references.py": (
+        "structure",
+        "remaining hits are H3 situation titles matched against the parsed "
+        "heading list and in `Pointer:` lines, the `Load this when:` line "
+        "label, document-type names read as cells of SKILL.md's routing table, "
+        "the `key-value` table-form term, the IN_CELL_ITEMS glyph, source and "
+        "cross-reference tokens, and the node-structure reference's headings "
+        "and bold labels",
+    ),
+    "loom-workflow/tests/scripts/test_readme_card_timing.py": (
+        "structure",
+        "remaining hit is `visualization card`, the component's own current "
+        "name, required in the README descriptions and the hook docstring",
+    ),
+    "loom-workflow/tests/scripts/test_visualization_card_hook.py": (
+        "behavior",
+        "runs the hook as a subprocess; the prose-side hits are the kept "
+        "rule_polarity_errors gate (batch 3's named replacement) with its "
+        "mutation sites, and the `ascii-graph` skill name; the SITUATIONS "
+        "phrases were deleted in batch 4 (W2-01)",
+    ),
+    "loom-workflow/tests/scripts/test_git_memory_compaction.py": (
+        "structure",
+        "entrypoint pointer paths resolve; code tokens, command shapes and "
+        "trailer keys (BLOCKED, `git log --grep`, memory-grep.sh --verify, "
+        "Privacy-Bypass-Reason:, Decision:, recall flags) in SKILL.md and its "
+        "protocols; a no-hash self-check; no sentence asserted",
+    ),
+    "loom-workflow/tests/scripts/test_independent_advisor_compaction.py": (
+        "structure",
+        "reference pointers resolve; frontmatter name and version, backticked "
+        "mode, field and exclusion-reason tokens, codex command shapes and "
+        "report-contract field names; the SKILL.md word cap; no sentence asserted",
+    ),
+    "loom-design/tests/interface/test_design_md_schema_keys.py": (
+        "behavior",
+        "imports the design_md_spec_keys script; remaining hits are the "
+        "`> **Grounding.**` and `> **Scope` blockquote "
+        "labels that bound the grounding note, component sub-token keys (size, "
+        "height, padding, width) as a mutation precondition, and a "
+        "confirm-and-spec header check that is asserted absent; docstring pins "
+        "are out of scope",
+    ),
+    "loom-design/tests/interface/test_knowledge_triage.py": (
+        "behavior",
+        "runs git show as a subprocess; remaining hits are the tier labels "
+        "shaping and deferrable, the "
+        "`design-conformance` lens name, and the bucket names craft, "
+        "domain-convention and project-local",
     ),
 }
 

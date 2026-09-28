@@ -83,3 +83,21 @@ The name `test_reviewer_nitclause_absent` is kept, because it is the probe's att
 | loom-workflow/tests/scripts/test_visualization_card_hook.py | behavior | yes | the `rule_polarity_errors` gate, its mutation sites and `ascii-graph` (kept) |
 
 W2-01 adds the override rows for these heading, label and name hits.
+
+## W2-01 additions
+
+The W1-09 census could not see the `SITUATIONS` regex values in `loom-workflow/tests/scripts/test_visualization_card_hook.py`. They reach `re.search` through `SITUATIONS.items()` inside a negated comprehension filter, which collects the situations a card does not name. W2-01 taught `pin_candidates` that form (probe `docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_classify_test_files.py::test_regex_values_through_items_collected_when_unmatched_flagged`). The census then listed 8 new prose rows, all of them in `situation_errors`.
+
+Rule 3: no mechanisms.yaml eval, AGENTS.md line or `test_module_criteria_text.py` line names the deleted functions. `mechanisms.yaml` line 219 names the whole file, and its hook subprocess tests stay. None of the deleted functions runs a program. A frozen probe of an earlier change, `docs/loom/2026-09-16-plain-language-follow-ups/evidence/probes/test_probe_card_guard_bypasses.py`, imports `situation_errors` and `SITUATIONS`. It also imports the `missed_alternative_*` helpers that W1-09 deleted. It is not in the package suite (`census-report.md`, Known limits).
+
+### Decisions
+
+| file::function | literal(s) | decision | reason |
+|---|---|---|---|
+| loom-workflow/tests/scripts/test_visualization_card_hook.py::situation_errors | the 8 `SITUATIONS` regexes (`\bprogress\b`, `\bbefore and after\b`, `what each choice means`, `\breadiness\b`, `confirmed against unconfirmed`, `\bfindings\b`, `\brisks\b`, `supported environments`) | delete | situation phrases matched against the card's prose. Rewording a card sentence turns it red, and no heading or gate marker bounds the trigger sentence (P2) |
+
+### Mapping
+
+| file::function(s) | defect class it guarded | named replacement | kind |
+|---|---|---|---|
+| loom-workflow/tests/scripts/test_visualization_card_hook.py::situation_errors, `SITUATIONS`, `_flat_body`, ::test_both_cards_name_the_conversation_situations, ::test_card_naming_only_data_shapes_fails, ::test_card_missing_one_situation_fails, ::test_situations_named_in_a_negated_sentence_do_not_count (all deleted) | a card drops one of the conversation situations, or names them only inside a negated trigger sentence | skill lens, `omission` (a dropped situation) and `inconsistency` (a negated sentence against the guide's situation tables). `::test_both_cards_point_at_the_plain_language_guide` still requires the guide path in both cards | review lens dimension |

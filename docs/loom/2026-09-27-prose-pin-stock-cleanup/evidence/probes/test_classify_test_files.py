@@ -141,6 +141,14 @@ def test_parameter_passed_needle_flagged() -> None:
     assert ctf.direct_pin_lines(LOOP_HEAD + body) == [11]
 
 
+def test_regex_values_through_items_collected_when_unmatched_flagged() -> None:
+    body = ('import re\nSITS = {{"a": r"what each choice means", "b": r"\\bthe rule is stated\\b"}}\n\n'
+            'def situation_errors(text):\n    return [n for n, pat in SITS.items() if {cond}re.search(pat, text)]\n\n'
+            'def test_x():\n    assert situation_errors(TEXT) == []\n')
+    assert ctf.direct_pin_lines(LOOP_HEAD + body.format(cond="not ")) == [11]
+    assert ctf.direct_pin_lines(LOOP_HEAD + body.format(cond="")) == []  # collected when present: an absence
+
+
 def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tmp_path: Path) -> None:
     root = tmp_path / "loom-code" / "tests"
     root.mkdir(parents=True)
