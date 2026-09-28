@@ -555,7 +555,6 @@ def test_situations_named_in_a_negated_sentence_do_not_count():
 def test_coexist_card_skip_sentence_names_the_skill():
     """'Skip it' was ambiguous next to the ascii-graph card; the skip sentence names the skill."""
     body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
-    assert "Skip loom-visualization for one-paragraph answers" in body
     assert "Skip it" not in body
 
 

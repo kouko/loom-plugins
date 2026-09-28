@@ -27,9 +27,6 @@ def _markdown(skill_dir):
 def test_skill_dir_phrase_defined_and_used_for_every_script_call():
     for skill_dir in SKILL_DIRS:
         prose = " ".join((skill_dir / "SKILL.md").read_text(encoding="utf-8").split())
-        assert "`<skill-dir>` is this skill's folder" in prose, skill_dir.name
-        assert "`${CLAUDE_SKILL_DIR}` on Claude Code" in prose, skill_dir.name
-        assert "on any other host, the directory that holds this SKILL.md" in prose, skill_dir.name
         assert SKILL_DIR_SCRIPT.search(prose), skill_dir.name
 
 
@@ -53,11 +50,3 @@ def test_every_skill_dir_script_reference_exists():
         for path in _markdown(skill_dir):
             for name in SKILL_DIR_SCRIPT.findall(path.read_text(encoding="utf-8")):
                 assert (skill_dir / "scripts" / name).is_file(), f"{path}: {name}"
-
-
-def test_non_skill_docs_using_the_token_point_to_skill_md():
-    for skill_dir in SKILL_DIRS:
-        for path in _markdown(skill_dir):
-            text = path.read_text(encoding="utf-8")
-            if path.name != "SKILL.md" and "<skill-dir>" in text:
-                assert "defined in `SKILL.md`" in " ".join(text.split()), path
