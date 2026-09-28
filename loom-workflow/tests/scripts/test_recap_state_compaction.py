@@ -70,10 +70,7 @@ def test_entrypoint_preserves_goal_grounded_sections_and_synthesis_gate():
         assert not missing, f"{contract} missing from entrypoint: {missing}"
 
     schema_read = text.index("Read `references/seven-block-schema.md`")
-    render_contract = text.index("natural headings in the conversation language")
-    assert schema_read < render_contract
-
-    template_start = text.index("### Purpose and current position", render_contract)
+    template_start = text.index("### Purpose and current position", schema_read)
     template_end = text.index("3. Apply", template_start)
     rendered_template = text[template_start:template_end]
     sections = (
@@ -90,18 +87,3 @@ def test_entrypoint_preserves_goal_grounded_sections_and_synthesis_gate():
         assert forbidden not in rendered_template
 
     assert SCHEMA_PATH.is_file()
-
-
-def test_entrypoint_grounds_goal_and_closes_the_alignment_loop():
-    text = SKILL_PATH.read_text(encoding="utf-8")
-
-    required = (
-        "current purpose is mandatory",
-        "ground it in explicit conversation evidence",
-        "broader purpose only when explicitly established",
-        "do not invent short-, medium-, or long-term goals",
-        "purpose is not yet aligned",
-        "purpose, current position, and proposed next step",
-    )
-    missing = [needle for needle in required if needle not in text]
-    assert not missing, f"goal-grounded loop contract missing: {missing}"

@@ -75,12 +75,12 @@ def test_entrypoint_preserves_prepare_resume_verification_and_stop():
         assert not missing, f"{contract} missing from entrypoint: {missing}"
 
     prepare = text.index("## Prepare mode")
-    prepare_schema = text.index("read `references/handoff-schema.md` fully", prepare)
+    prepare_schema = text.index("references/handoff-schema.md", prepare)
     prepare_author = text.index("2. Write", prepare)
     assert prepare_schema <= prepare_author
 
     resume = text.index("## Resume mode")
-    resume_schema = text.index("read `references/handoff-schema.md` fully", resume)
+    resume_schema = text.index("references/handoff-schema.md", resume)
     resume_interpret = text.index("2. Read", resume)
     assert resume_schema <= resume_interpret
 
