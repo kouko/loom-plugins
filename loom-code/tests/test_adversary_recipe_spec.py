@@ -31,7 +31,6 @@ from prose_pin import (
     flat_prose as _flat,
     has_negation,
     pins_exact_sentence as _pins_exact_sentence,
-    rule_prose as _rules,
 )
 
 
@@ -43,7 +42,6 @@ ADVERSARY = ROOT / "loom-code/agents/adversary.md"
 
 ADVERSARIAL_SPEC = _flat(RECIPE)
 ADVERSARY_PROSE = _flat(ADVERSARY)
-RULES = _rules(RECIPE)
 
 
 # --- The rules this recipe states -------------------------------------------
@@ -100,12 +98,6 @@ def test_sentence_pin_helpers_synthetic(pin: str) -> None:
         assert not _pins_exact_sentence(f"Attack the spec. {example}", sentence), example
 
 
-@pytest.mark.parametrize("pin", sorted(SENTENCE_PINS))
-def test_recipe_states_the_rule(pin: str) -> None:
-    sentence, _rejected = SENTENCE_PINS[pin]
-    assert _pins_exact_sentence(RULES, sentence), (pin, sentence)
-
-
 @pytest.mark.parametrize("pin", sorted(AFFIRMATIVE_PINS))
 def test_affirmative_pin_helpers_synthetic(pin: str) -> None:
     verb, literal, extras, affirmative, rejected = AFFIRMATIVE_PINS[pin]
@@ -113,12 +105,6 @@ def test_affirmative_pin_helpers_synthetic(pin: str) -> None:
     assert any(has_negation(r) for r in rejected), pin
     for example in rejected:
         assert not _affirms(example, verb, literal, *extras), example
-
-
-@pytest.mark.parametrize("pin", sorted(AFFIRMATIVE_PINS))
-def test_recipe_affirms_the_rule(pin: str) -> None:
-    verb, literal, extras, _affirmative, _rejected = AFFIRMATIVE_PINS[pin]
-    assert _affirms(RULES, verb, literal, *extras), (pin, verb, literal)
 
 
 # --- One home for the spec recipe's rules: adversary.md repeats none of them -

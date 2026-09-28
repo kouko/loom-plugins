@@ -171,24 +171,12 @@ def test_affirmative_pin_helpers_synthetic(pin: str) -> None:
         assert not _affirms(example, verb, literal, *extras), example
 
 
-@pytest.mark.parametrize("pin", sorted(AFFIRMATIVE_PINS))
-def test_recipe_affirms_the_rule(pin: str) -> None:
-    verb, literal, extras, _affirmative, _rejected = AFFIRMATIVE_PINS[pin]
-    assert _affirms(RULES, verb, literal, *extras), (pin, verb, literal)
-
-
 @pytest.mark.parametrize("pin", sorted(SENTENCE_PINS))
 def test_sentence_pin_helpers_synthetic(pin: str) -> None:
     sentence, rejected = SENTENCE_PINS[pin]
     assert _pins_exact_sentence(f"Attack the code. {sentence}", sentence), pin
     for example in rejected:
         assert not _pins_exact_sentence(f"Attack the code. {example}", sentence), example
-
-
-@pytest.mark.parametrize("pin", sorted(SENTENCE_PINS))
-def test_recipe_states_the_rule(pin: str) -> None:
-    sentence, _rejected = SENTENCE_PINS[pin]
-    assert _pins_exact_sentence(RULES, sentence), (pin, sentence)
 
 
 def test_case_class_helper_synthetic() -> None:

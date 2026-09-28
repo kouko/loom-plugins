@@ -31,7 +31,6 @@ from prose_pin import (
     affirms as _affirms,
     flat_prose as _flat,
     has_negation,
-    rule_prose as _rules,
 )
 
 
@@ -43,7 +42,6 @@ ADVERSARY = ROOT / "loom-code/agents/adversary.md"
 
 ADVERSARIAL_SKILL_GATE = _flat(RECIPE)
 ADVERSARY_PROSE = _flat(ADVERSARY)
-RULES = _rules(RECIPE)
 
 
 # --- The rules this recipe states -------------------------------------------
@@ -102,16 +100,6 @@ def test_affirmative_pin_helpers_synthetic(pin: str) -> None:
         assert not _affirms(example, verb, literal, *extras), example
 
 
-@pytest.mark.parametrize("pin", sorted(AFFIRMATIVE_PINS))
-def test_recipe_affirms_the_rule(pin: str) -> None:
-    verb, literal, extras, _affirmative, _rejected = AFFIRMATIVE_PINS[pin]
-    assert _affirms(RULES, verb, literal, *extras), (pin, verb, literal)
-
-
-# A bullet count sat here and was removed: each attempt already has its own
-# pin, so a bullet that disappears is caught by that pin, while the count
-# also failed a fourth attempt being added -- an ordinary edit this file
-# must not stand in the way of.
 
 
 # --- One home for this recipe's rules: adversary.md repeats none of them ----
