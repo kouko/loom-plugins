@@ -168,6 +168,277 @@ def loop_pin_lines(text: str) -> list[int]:
     return hits
 
 
+PRODUCTION_MD = re.compile(
+    r"SKILL\.md|\b(?:agents|references|protocols|checklists|rubrics|standards|skills)\b\s*[/\"']")
+READ_ATTRS = {"read_text", "read", "readlines"}
+OUTPUT_ATTRS = {"stdout", "stderr", "output", "readouterr"}
+PARSE_CALLS = {"json.loads", "json.load", "yaml.safe_load", "yaml.load", "tomllib.loads"}
+NON_PROSE_PATH = re.compile(r"\.(?:json|ya?ml|py|toml|lock|txt|sh|html)\b|CHANGELOG|README|AGENTS\.md|CLAUDE\.md")
+TMP_NAMES = {"tmp_path", "tmpdir", "tmp_path_factory", "mkdtemp", "TemporaryDirectory"}
+VALIDATOR_NAME = re.compile(r"error|issue|violation|problem|finding|validate|check|lint|reason", re.I)
+COMMAND_WORDS = {"git", "python", "python3", "uv", "gh", "bash", "sh", "pytest", "npm", "pnpm",
+                 "pip", "claude", "codex", "make", "cd", "agy"}
+
+
+def _prose_literal(s: str) -> bool:
+    """A literal of 3+ words that is not a heading, table row, command or path."""
+    words = [w for w in s.split() if any(ch.isalpha() for ch in w)]
+    if len(words) < 3 or s.lstrip().startswith(("#", "|")):
+        return False
+    first = words[0].strip("`$")
+    return not (first in COMMAND_WORDS or "/" in first or first.endswith((".py", ".sh")) or " --" in s)
+
+
+_PROD_CACHE: dict[Path, set[str]] = {}
+
+
+def _repo_production_modules() -> set[str]:
+    if REPO not in _PROD_CACHE:
+        _PROD_CACHE[REPO] = production_modules(REPO)
+    return _PROD_CACHE[REPO]
+
+
+def direct_pin_lines(text: str) -> list[int]:
+    """Lines of a direct sentence pin: a prose literal asserted against text read from a markdown file.
+
+    Heuristic, AST-based and conservative (it misses rather than guesses):
+    - Only a file that names a production skill, agent or reference markdown path
+      (SKILL.md, agents/, references/, protocols/, skills/ ...) is scanned.
+    - Markdown text is an expression that calls `.read_text()`, `.read()`, `open()`, or a
+      local helper (or a fixture parameter of that name) whose body reads a file, or a
+      name assigned from such an expression (module or function scope, `for` and
+      comprehension targets too). A read whose path (the receiver, or the argument of a
+      reader helper, followed through the names it was assigned from) names a .json/.yaml/
+      .py/.html/CHANGELOG/README/AGENTS.md/CLAUDE.md path is not skill prose.
+    - Program output is never markdown text, and output wins over a read: an expression
+      touching `.stdout`, `.stderr`, `.output`, `readouterr`, json/yaml parsing, a runner
+      call (subprocess, os.system), `tmp_path`/`tmpdir`/a temp dir (files a program or
+      fixture wrote), a call into production code (imported or path-loaded, as in the
+      A5 count), a local function named like a validator (error, issue, violation,
+      problem, finding, validate, check, lint, reason), a local helper (or a fixture
+      parameter of that name) that does any of these, or a name assigned from any of these.
+      A json/yaml parse taints only its parsed value: a helper is output when it returns a
+      parsed value, and when it returns a tuple only the parsed positions are output, so a
+      markdown body returned beside parsed frontmatter stays markdown text.
+    - One exception to output-wins: a plain read of a path naming a skill, agent or reference
+      file (SKILL.md, agents/, references/ ...) is markdown text even under a temp dir, since an
+      installed copy of a plugin's own skill file is still its prose.
+    - A prose literal (see _prose_literal: 3+ words with letters, no heading, table row,
+      command or path), inline or a module-level string name, counts when asserted with
+      `in`, `==`, `.startswith()` or `.endswith()` against markdown text inside an
+      `assert` (also `text.count(<literal>) == N`, `>=`/`>` N with N >= 1; `<= 1` is a
+      one-home check and does not count), as does a phrase-collection comprehension variable asserted `in` it or
+      collected when `not in` it. Nested functions are read with their enclosing one.
+    A comparison written in an `if` of a helper, a regex search, or on a helper parameter
+    is not seen; such files need a reader.
+    Known limits: a local helper named like a validator word (`_checklist()` matches
+    'check') is taken as output; and a variable name is judged file-wide, so one name
+    holding README.md in one test and SKILL.md in another counts as non-prose everywhere.
+    """
+    import ast
+
+    if not PRODUCTION_MD.search(text):
+        return []
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return []
+    mod_strs = {t.id: n.value.value for n in tree.body if isinstance(n, ast.Assign)
+                and isinstance(n.value, ast.Constant) and isinstance(n.value.value, str)
+                for t in n.targets if isinstance(t, ast.Name)}
+    mod_colls = {t.id: n.value for n in tree.body if isinstance(n, ast.Assign)
+                 and isinstance(n.value, (ast.Tuple, ast.List, ast.Set))
+                 for t in n.targets if isinstance(t, ast.Name)}
+    src: dict[str, str] = {}  # every name's assigned source, any scope: where a read's path came from
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Assign):
+            for t in n.targets:
+                if isinstance(t, ast.Name):
+                    src[t.id] = src.get(t.id, "") + (ast.get_source_segment(text, n.value) or "")
+    funcs = {f.name: f for f in ast.walk(tree) if isinstance(f, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    prod = _production_names(tree, _repo_production_modules())
+
+    def names(node) -> set[str]:
+        return {n.id for n in ast.walk(node) if isinstance(n, ast.Name)}
+
+    def calls(node) -> set[str]:
+        return {_dotted(c.func) for c in ast.walk(node) if isinstance(c, ast.Call)}
+
+    def receiver_is_prose(call) -> bool:
+        seg = ast.get_source_segment(text, call.func.value) if isinstance(call.func, ast.Attribute) else (
+            ast.get_source_segment(text, call.args[0]) if call.args else "")
+        seg = seg or ""
+        return not NON_PROSE_PATH.search("".join(src.get(i, "") for i in re.findall(r"\w+", seg)) + seg)
+
+    def raw_read(node) -> bool:
+        return any(isinstance(c, ast.Call) and (
+            (isinstance(c.func, ast.Attribute) and c.func.attr in READ_ATTRS)
+            or _dotted(c.func) == "open") and receiver_is_prose(c) for c in ast.walk(node))
+
+    def raw_output(node, parse: bool = True) -> bool:
+        called = calls(node)
+        return any(isinstance(c, ast.Attribute) and c.attr in OUTPUT_ATTRS for c in ast.walk(node)) or bool(
+            called & (RUNNER_CALLS | (PARSE_CALLS if parse else set()))) or bool(
+            names(node) & TMP_NAMES or {c.split(".")[-1] for c in called} & TMP_NAMES) or any(
+            c.split(".")[0] in prod or (c in funcs and VALIDATOR_NAME.search(c)) for c in called)
+
+    # A helper that parses (json/yaml) is output only in what it returns from the parse:
+    # a whole parsed return makes it a runner; in a returned tuple only the parsed
+    # positions are output (tuple_out), so a markdown body returned beside them stays prose.
+    runners = {n for n, f in funcs.items() if raw_output(f, parse=False)}
+    tuple_out: dict[str, tuple[bool, ...]] = {}
+
+    def shape(f):
+        parsed: set[str] = set()
+
+        def derived(e) -> bool:
+            return bool(calls(e) & PARSE_CALLS or names(e) & parsed
+                        or {c.split(".")[-1] for c in calls(e)} & runners)
+        while True:
+            size = len(parsed)
+            for targets, value, forced in bindings(f):
+                if forced or derived(value):
+                    parsed |= {t.id for t in targets}
+            if len(parsed) == size:
+                break
+        rets = [r.value for r in ast.walk(f) if isinstance(r, ast.Return) and r.value is not None]
+        if any(not isinstance(r, ast.Tuple) and derived(r) for r in rets):
+            return True
+        tups = [r for r in rets if isinstance(r, ast.Tuple)]
+        width = max((len(r.elts) for r in tups), default=0)
+        flags = tuple(any(len(r.elts) == width and derived(r.elts[i]) for r in tups) for i in range(width))
+        return flags if any(flags) else None
+
+    def bindings(scope):
+        for n in ast.walk(scope):
+            if isinstance(n, (ast.Assign, ast.AnnAssign, ast.AugAssign)) and n.value is not None:
+                targets = n.targets if isinstance(n, ast.Assign) else [n.target]
+                flags = tuple_out.get(_dotted(n.value.func).split(".")[-1]) if isinstance(n.value, ast.Call) else None
+                if flags and len(targets) == 1 and isinstance(targets[0], (ast.Tuple, ast.List)) \
+                        and len(targets[0].elts) == len(flags):
+                    for elt, flag in zip(targets[0].elts, flags):
+                        yield [t for t in ast.walk(elt) if isinstance(t, ast.Name)], n.value, flag
+                    continue
+                yield [t for tg in targets for t in ast.walk(tg) if isinstance(t, ast.Name)], n.value, False
+            elif isinstance(n, (ast.For, ast.comprehension)):
+                yield [t for t in ast.walk(n.target) if isinstance(t, ast.Name)], n.iter, False
+            elif isinstance(n, ast.withitem) and n.optional_vars is not None:
+                yield [t for t in ast.walk(n.optional_vars) if isinstance(t, ast.Name)], n.context_expr, False
+
+    while True:
+        more_r = {n for n, f in funcs.items() if n not in runners
+                  and {c.split(".")[-1] for c in calls(f)} & runners}
+        shapes = {n: shape(f) for n, f in funcs.items() if n not in runners | more_r}
+        more_r |= {n for n, s in shapes.items() if s is True}
+        new_t = {n: s for n, s in shapes.items() if isinstance(s, tuple) and n not in more_r}
+        if not more_r and new_t == tuple_out:
+            break
+        runners |= more_r
+        tuple_out = new_t
+    readers = {n for n, f in funcs.items() if raw_read(f) and n not in runners}
+    while True:
+        more_m = {n for n, f in funcs.items() if n not in readers | runners
+                  and {c.split(".")[-1] for c in calls(f)} & readers}
+        if not more_m:
+            break
+        readers |= more_m
+
+    def is_output(node, out) -> bool:
+        called = {c.split(".")[-1] for c in calls(node)}
+        return raw_output(node) or bool(called & runners) or bool(names(node) & out)
+
+    def is_md(node, md, out) -> bool:
+        if is_output(node, out):
+            return False
+        read_helper = any(isinstance(c, ast.Call) and _dotted(c.func).split(".")[-1] in readers and not any(
+            NON_PROSE_PATH.search(src.get(i, "") + i) for a in c.args for i in names(a)) for c in ast.walk(node))
+        return raw_read(node) or read_helper or bool(names(node) & md)
+
+    def copy_read(node) -> bool:
+        """The value is a plain read of a path naming a skill, agent or reference file (a copy
+        of prose, even under a temp dir), with no runner or parse call on the way."""
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and node.func.attr in READ_ATTRS):
+            return False
+        seg = ast.get_source_segment(text, node.func.value) or ""
+        called = calls(node.func.value)
+        return bool(PRODUCTION_MD.search(seg)) and not NON_PROSE_PATH.search(seg) and not (
+            called & (RUNNER_CALLS | PARSE_CALLS) or {c.split(".")[-1] for c in called} & runners)
+
+    def taint(scope, md, out):
+        md, out = set(md), set(out)
+        while True:
+            size = len(md) + len(out)
+            for targets, value, parsed in bindings(scope):
+                ids = {t.id for t in targets}
+                if not parsed and copy_read(value):
+                    md |= ids
+                elif parsed or is_output(value, out):
+                    out |= ids
+                elif is_md(value, md, out):
+                    md |= ids - out
+            if len(md) + len(out) == size:
+                return md, out
+
+    def literal(node) -> str | None:
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return node.value
+        if isinstance(node, ast.Name):
+            return mod_strs.get(node.id)
+        return None
+
+    def phrase_coll(node) -> bool:
+        node = mod_colls.get(node.id) if isinstance(node, ast.Name) else node
+        return isinstance(node, (ast.Tuple, ast.List, ast.Set)) and any(
+            _prose_literal(literal(e) or "") for e in node.elts)
+
+    mod_md, mod_out = taint(ast.Module(body=[n for n in tree.body if not isinstance(
+        n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))], type_ignores=[]), set(), set())
+    hits: set[int] = set()
+    nested = {id(g) for f in funcs.values() for g in ast.walk(f) if g is not f and g in funcs.values()}
+    for f in (f for f in funcs.values() if id(f) not in nested):  # a nested helper is read with its parent
+        params = {a.arg for a in f.args.args}  # a local fixture of that name decides the parameter
+        md, out = taint(f, mod_md | (params & readers), mod_out | (params & runners))
+        phrase_vars = {g.target.id for n in ast.walk(f) if isinstance(n, (ast.ListComp, ast.SetComp, ast.GeneratorExp))
+                       for g in n.generators if isinstance(g.target, ast.Name) and phrase_coll(g.iter)}
+        for node in ast.walk(f):
+            if isinstance(node, ast.Assert):
+                for c in ast.walk(node.test):
+                    if isinstance(c, ast.Compare) and len(c.ops) == 1:
+                        left, right = c.left, c.comparators[0]
+                        pinned = _prose_literal(literal(left) or "") or (
+                            isinstance(left, ast.Name) and left.id in phrase_vars)
+                        if isinstance(c.ops[0], ast.In) and pinned and is_md(right, md, out):
+                            hits.add(c.lineno)
+                        elif isinstance(c.ops[0], ast.Eq) and any(
+                                _prose_literal(literal(a) or "") and is_md(b, md, out)
+                                for a, b in ((left, right), (right, left))):
+                            hits.add(c.lineno)
+                        elif isinstance(c.ops[0], (ast.Eq, ast.GtE, ast.Gt)) and isinstance(left, ast.Call) \
+                                and isinstance(left.func, ast.Attribute) and left.func.attr == "count" \
+                                and left.args and _prose_literal(literal(left.args[0]) or "") \
+                                and isinstance(right, ast.Constant) and isinstance(right.value, int) \
+                                and right.value >= 1 and is_md(left.func.value, md, out):
+                            hits.add(c.lineno)  # `text.count(<sentence>) == 1`: present, not "at most once"
+                    elif isinstance(c, ast.Call) and isinstance(c.func, ast.Attribute) \
+                            and c.func.attr in ("startswith", "endswith") and c.args:
+                        arg = c.args[0]
+                        lits = [literal(e) for e in arg.elts] if isinstance(arg, ast.Tuple) else [literal(arg)]
+                        if any(_prose_literal(s or "") for s in lits) and is_md(c.func.value, md, out):
+                            hits.add(c.lineno)
+            elif isinstance(node, (ast.ListComp, ast.SetComp, ast.GeneratorExp)):
+                for g in node.generators:
+                    if not (isinstance(g.target, ast.Name) and phrase_coll(g.iter)):
+                        continue
+                    for cond in g.ifs:
+                        for c in ast.walk(cond):
+                            if isinstance(c, ast.Compare) and isinstance(c.left, ast.Name) \
+                                    and c.left.id == g.target.id and isinstance(c.ops[0], ast.NotIn) \
+                                    and is_md(c.comparators[0], md, out):
+                                hits.add(c.lineno)
+    return sorted(hits)
+
+
 def executes(text: str) -> bool:
     """Execution signal: a program run (subprocess/checker/script) whose result is asserted."""
     has_subprocess_assert = bool(re.search(r'\.(?:stdout|stderr|returncode)|pytest\.raises', text))
@@ -250,12 +521,11 @@ def _dotted(node) -> str:
     return ""
 
 
-def executing_test_names(src: str, prod: set[str]) -> list[str]:
-    """Test functions that run a program: a subprocess/os call, a production-code call, or a
-    local helper (or fixture parameter) that does either. String literals never count."""
+def _production_names(tree, prod: set[str]) -> set[str]:
+    """Names bound to production code: imported from a production module, or a module-level
+    name bound to a path-loaded module or a production attribute."""
     import ast
 
-    tree = ast.parse(src)
     funcs = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
     prod_names: set[str] = set()
     for n in ast.walk(tree):
@@ -270,6 +540,17 @@ def executing_test_names(src: str, prod: set[str]) -> list[str]:
             loaded = isinstance(n.value, ast.Call) and _dotted(n.value.func).split(".")[-1] in loaders
             if loaded or _dotted(n.value).split(".")[0] in prod_names:
                 prod_names.update(t.id for t in n.targets if isinstance(t, ast.Name))
+    return prod_names
+
+
+def executing_test_names(src: str, prod: set[str]) -> list[str]:
+    """Test functions that run a program: a subprocess/os call, a production-code call, or a
+    local helper (or fixture parameter) that does either. String literals never count."""
+    import ast
+
+    tree = ast.parse(src)
+    funcs = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    prod_names = _production_names(tree, prod)
 
     def direct(fn) -> bool:
         for c in ast.walk(fn):
@@ -342,11 +623,13 @@ def _classify(path: Path) -> tuple[str, dict]:
                     break
 
     is_behavior = is_behavior_from_execution or is_behavior_from_script_import
-    loop_pin = bool(loop_pin_lines(text))  # the loop form of a phrase pin, which the regex cannot see
+    direct_pin = bool(direct_pin_lines(text))  # a sentence asserted against markdown text, no helper needed
+    # the loop form of a phrase pin or a direct pin, neither of which the regex can see
+    phrase_pin = bool(loop_pin_lines(text)) or direct_pin
     if is_behavior:
         secondary = {}
         # Check for sentence pins (secondary marker for behavior files that also pin prose)
-        secondary["has_pins"] = "yes" if (SENTENCE_ASSERT.search(text) and PROSE_PIN_IMPORT.search(text)) or loop_pin else "no"
+        secondary["has_pins"] = "yes" if (SENTENCE_ASSERT.search(text) and PROSE_PIN_IMPORT.search(text)) or phrase_pin else "no"
         # Check if it also has grammar-invariant content (additional marker)
         if GRAMMAR_INVARIANT_CONTENT.search(text):
             secondary["marker"] = "grammar-invariant-content"
@@ -360,9 +643,10 @@ def _classify(path: Path) -> tuple[str, dict]:
     has_prose_pin_import = PROSE_PIN_IMPORT.search(text)
     has_prose_helpers = bool(re.search(r'flat_prose\(|rule_prose\(|split_sentences\(|_flat\(', text))
     has_prose_normalization = bool(re.search(r'_normalize|_flat\s*=', text))
-    has_sentence_assert = SENTENCE_ASSERT.search(text) or loop_pin
+    has_sentence_assert = SENTENCE_ASSERT.search(text) or phrase_pin
 
-    is_sentence_pin_candidate = has_sentence_assert and (has_prose_pin_import or has_prose_helpers or has_prose_normalization)
+    is_sentence_pin_candidate = (has_sentence_assert and (
+        has_prose_pin_import or has_prose_helpers or has_prose_normalization)) or direct_pin
 
     # Check for grammar-invariant (when not also sentence-pin, or when sentence-pin doesn't win)
     if is_grammar_invariant_candidate:
@@ -380,7 +664,7 @@ def _classify(path: Path) -> tuple[str, dict]:
 
     # Check for structure
     if STRUCTURE.search(text):
-        return "structure", ({"has_pins": "yes"} if loop_pin else {})
+        return "structure", ({"has_pins": "yes"} if phrase_pin else {})
 
     return "other", {}
 
@@ -551,10 +835,12 @@ MANUAL_OVERRIDES = {
     "loom-workflow/tests/decision-map/test_skill_doc.py": (
         "behavior",
         "loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same "
-        "test also runs. The file also holds direct sentence asserts on "
-        "SKILL.md and map-format prose (lines 181-183, 216-221, 281-287, 310-312, e.g. "
-        "'Exactly three ticket closure types exist'), which the classifier "
-        "does not see; they are left for batch 3",
+        "test also runs (start_delivery.py excepted; test_start_delivery.py owns "
+        "it). The direct sentence asserts batch 2 left were pruned in batch 3 "
+        "(W1-01, W1-07); the rest is operation headings, fixed terms, re-entry "
+        "and phase code tokens recomputed from the scripts, the ticket template "
+        "grammar, schema_version, manifest fields, and the Codex manifest "
+        "defaultPrompt sentence, kept as an interface string, not skill prose",
     ),
     "loom-workflow/tests/scripts/test_loom_visualization_compaction.py": (
         "structure",
@@ -579,6 +865,41 @@ MANUAL_OVERRIDES = {
         "heading-bounded Step 5 scan; the direct sentence "
         "asserts (single answer, re-design procedure) were pruned in closing "
         "review round 1",
+    ),
+    # Batch 3 (W2-01): files whose remaining direct-pin hit is not prose.
+    "loom-code/tests/test_architecture_doc_consumers.py": (
+        "structure",
+        "direct-pin hits are the `ratified-by: <name> <date>` line grammar in "
+        "write-plan Step 5 and the lenses code table; the rest is the Risk "
+        "line and rule id terms, lens-table row regexes, a heading-bounded "
+        "N/A bullet check and the reviewer code row; the sentence asserts "
+        "were pruned in batch 3 (W1-01)",
+    ),
+    "loom-workflow/tests/decision-map/test_decision_map_intent_binding.py": (
+        "behavior",
+        "direct-pin hit is the Map line format `- delivery-intent: DA-<n> | "
+        "docs/loom/intent/<change-id>.md` in map-format.md: line grammar, not "
+        "prose; the rest is path and front-matter tokens, status tokens, "
+        "absences, and the citation checker's scope loaded by path",
+    ),
+    "loom-workflow/tests/loom-visualization/test_templates.py": (
+        "behavior",
+        "direct-pin hit is the client-matrix table column header 'Form in a "
+        "chat reply'. The three pinned_sentence_ok polarity checks "
+        "(MERMAID_PIN, TABLE_ASCII_PIN, CHAT_PROCEEDS_PIN) are kept on purpose "
+        "(agent-decided): they read only sentences inside the "
+        "mermaid-only-when-confirmed and obsidian-boundary `<!-- gate: -->` "
+        "blocks, whose mechanisms.yaml evals (L357, L354) sit in this file, "
+        "and each fails a negated sentence, so they check the rule's "
+        "polarity, not only its wording",
+    ),
+    # Batch 3 (W3-01): the graduated build-adversary program.
+    "loom-code/tests/test_adversarial_batch3_census_misses.py": (
+        "behavior",
+        "runs this classifier (path-loaded) and asserts on its result; the "
+        "direct-pin hit is a synthetic test source string fed to "
+        "direct_pin_lines, and the residual check asserts named files carry "
+        "no skill sentence, an absence",
     ),
 }
 

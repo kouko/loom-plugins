@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.6.1] — 2026-09-29 — deferred release bump, version sync only
+
+Patch: batches 2-3 pruned sentence pins from loom-design tests only; no
+skill or reference content changed.
+
 ## [2.6.0] — 2026-09-26 — keep architecture drafts advisory
 
 Minor: validate proposed architecture documents and guards in a temporary

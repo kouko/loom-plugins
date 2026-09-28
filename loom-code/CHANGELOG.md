@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.22.2] — 2026-09-29 — Prose-pin stock cleanup batches 2-3 and deferred release bump.
+
+Patch: tests, evidence and version metadata only; no station guidance, field, rule id or contract change.
+
+- Batch 2 (PR #65): sentence-pin assertions removed from 26 test files across the family; `docs/loom/evidence/mechanisms.yaml` re-pointed to existing behavior/structure tests or cold-read records; the census script's execution count now counts only real subprocess/checker calls; the loom-visualization A/B rerun script repaired.
+- Batch 3: the census script widened to see sentence pins written directly (without a prose-helper import); the known and newly flagged files pruned to their structure/behavior/grammar checks.
+- Version bump deferred by batch 2 (PR #65 Follow-ups): loom-code, loom-design and loom-workflow patch versions bumped together so `claude plugin update` refreshes installed copies with the batch 2/3 test changes.
+
 ## [3.22.1] — 2026-09-28 — Remove sentence-pin tests (batch 1 of the prose-pin stock cleanup).
 
 Patch: tests only; no station guidance, field, rule id or contract change.

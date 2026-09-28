@@ -170,12 +170,8 @@ def test_live_consumers_require_contract_two() -> None:
             assert "contract --require 1.0" not in text, path
 
 
-def test_implementer_runs_focused_tests_not_the_package_suite() -> None:
+def test_implementer_has_no_per_task_package_suite_wording() -> None:
     text = (ROOT / "loom-code/agents/implementer.md").read_text(encoding="utf-8")
-    assert (
-        "The complete package suite runs at the end of Build and again in "
-        "`finalize-review`, never per task."
-    ) in " ".join(text.split())
     assert "Closing Review owns the single package-level run" not in text
     assert "plus the package test command passing" not in text
     assert "the package suite ran green" not in text

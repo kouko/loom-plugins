@@ -285,9 +285,6 @@ def test_obsidian_gate_paragraph_chat_in_vault_cwd_proceeds():
 CLIENT_MATRIX = SKILL_DIR / "references" / "client-matrix.md"
 DETECT_CLIENT = SKILL_DIR / "scripts" / "detect_client.py"
 
-TABLE_DEFAULT_PIN = ("gets", ("markdown table by default",
-                              "a destination that does not render markdown"))
-
 # A rule that picks the drawn form because of the client the agent runs in.
 ASCII_BY_CLIENT = re.compile(
     r"(?:remote[ _]viewer|terminal client|because of the client)[^.]*\bASCII\b"
@@ -296,25 +293,8 @@ ASCII_BY_CLIENT = re.compile(
 )
 
 
-def test_table_default_pin_affirmative_example_accepted():
-    sentence = ("Shaped content in a chat reply gets a markdown table by default; the "
-                "drawn form is for a destination that does not render markdown.")
-    assert pinned_sentence_ok(sentence, *TABLE_DEFAULT_PIN)
-
-
-def test_table_default_pin_negated_example_rejected():
-    sentence = ("Shaped content in a chat reply never gets a markdown table by default; the "
-                "drawn form is for a destination that does not render markdown.")
-    assert not pinned_sentence_ok(sentence, *TABLE_DEFAULT_PIN)
-
-
 def test_shaped_content_defaults_to_a_markdown_table():
-    """A8 positive: the skill and the matrix make the table the default form."""
-    text = SKILL_MD.read_text(encoding="utf-8")
-    assert any(pinned_sentence_ok(s, *TABLE_DEFAULT_PIN) for s in gate_sentences(text)), (
-        "SKILL.md pins no affirmative sentence making the markdown table the default form"
-    )
-
+    """A8 positive: the client matrix makes the table the default form."""
     matrix = CLIENT_MATRIX.read_text(encoding="utf-8")
     rows = [line for line in matrix.splitlines()
             if line.startswith("|") and not re.match(r"^\|[\s:|-]+\|\s*$", line)]
@@ -395,12 +375,3 @@ def test_w2_02_templates_adopt_node_structure():
     for name in ("03-branching-decision.md", "05-state-lifecycle.md"):
         mermaid = [b for lang, b in fences(sections(_read(name))["Mermaid"]) if lang == "mermaid"][0]
         assert div_label not in mermaid, f"{name}: Mermaid diamonds/states must stay title-only"
-
-
-def test_every_ascii_section_names_its_destination_condition():
-    """The drawn form is conditioned on the destination in every template."""
-    for name in EXPECTED:
-        if name == "09-data-model.md":
-            continue  # no ASCII form at all; it points at the table substitute
-        body = " ".join(sections(_read(name))["ASCII"].split())
-        assert "does not render markdown" in body, name

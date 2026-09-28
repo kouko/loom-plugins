@@ -427,8 +427,6 @@ def test_isolated_loom_plugins_are_standalone_and_compose_by_public_contract(
     assert "DESIGN.md" in design_system
     assert "docs/loom/<change-id>/" in design_spec
     assert "docs/loom/<change-id>/" in code_planning
-    assert "positive" in code_planning and "negative or boundary" in code_planning
-    assert "closing-review station once at branch end" in " ".join(code_planning.split())
 
 
 def test_isolated_plugins_execute_local_behavior_without_sibling(tmp_path: Path) -> None:
@@ -604,13 +602,12 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
             )
 
 
-def test_sibling_lookup_allows_version_subdirectory() -> None:
-    """Every design skill that locates `loom-code` by host covers the
-    non-Claude hosts too. Claude and Codex caches hold `<name>/<version>/`;
-    Antigravity CLI installs `<name>/` with no version directory, so the
-    other-host row must allow, not require, one version subdirectory.
-    The five skills share one lookup table in capture-intent's references
-    and each links it from Step 0."""
+def test_lookup_table_lives_in_one_place_and_every_skill_links_it() -> None:
+    """Every one of the five design skills with a Step 0 contract-version
+    check links the shared `locate-loom-code.md` lookup table instead of
+    carrying its own copy. Exactly one file in `loom-design/skills` holds
+    that lookup table, and its table has exactly one merged Codex/Antigravity
+    row."""
     design_skills = REPO_ROOT / "loom-design" / "skills"
     linking = 0
     for skill_md in sorted(design_skills.glob("*/SKILL.md")):
@@ -636,22 +633,12 @@ def test_sibling_lookup_allows_version_subdirectory() -> None:
             if "Codex CLI" in row and "Antigravity CLI" in row
         ]
         assert len(other) == 1, f"{skill_md} lacks one Codex/Antigravity row"
-        row = " ".join(other[0].split())
-        assert "on any other host" in row, skill_md
-        assert "two levels above this SKILL.md" in row, skill_md
-        assert "may contain one version subdirectory" in row, skill_md
-        assert "use the newest" in row, skill_md
     assert lookups == 1
 
 
-# The version step every other-host row must carry: Codex installs
-# `<mkt>/loom-design/<version>/`, so two levels above SKILL.md is the version
-# directory, not the plugin root.
-VERSION_STEP = "if its parent directory is named `loom-design`"
-
-
 def _resolve_loom_code_by_row(skill_md: Path) -> Path:
-    """The other-host row, executed: two levels above SKILL.md; step up once
+    """A hardcoded model of the other-host row (it never parses the row's
+    wording): two levels above SKILL.md; step up once
     when that directory's parent is named `loom-design`; `loom-code` sits next
     to it and may hold version subdirectories — take the newest."""
     root = skill_md.parents[2]
@@ -693,7 +680,6 @@ def test_sibling_lookup_resolves_flat_and_versioned_installs(tmp_path: Path) -> 
         for line in skill_md.read_text(encoding="utf-8").splitlines():
             if line.startswith("| Codex CLI, Antigravity CLI |"):
                 rows += 1
-                assert VERSION_STEP in " ".join(line.split()), skill_md
     assert rows == 1
 
 

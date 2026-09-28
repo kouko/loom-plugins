@@ -165,10 +165,6 @@ def test_l3_contract_defines_goal_grounded_natural_output() -> None:
         "Why confirmation is needed now",
         "Pending work",
         "Align purpose and next step",
-        "broader purpose only when explicitly established",
-        "purpose is not yet aligned",
-        "Never output `<thinking>` or `<recap>` tags",
-        "Never expose `Block N` labels",
     )
     missing = [needle for needle in required if needle not in text]
     assert not missing, f"L3 natural-output contract missing: {missing}"
@@ -187,7 +183,6 @@ def test_l3_contract_defines_goal_grounded_natural_output() -> None:
     assert "instead of the 7 blocks" not in text
     assert "`loom-workflow:recap-state`" in text
     assert "loom-workflow/skills/recap-state/scripts/" in text
-    assert "Support counts as known only" in text
 
 
 def test_english_reference_keeps_localized_text_to_explicit_quotations() -> None:

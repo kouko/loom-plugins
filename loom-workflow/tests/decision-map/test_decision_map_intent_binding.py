@@ -34,12 +34,10 @@ def test_start_delivery_writes_an_intent_not_a_brief():
     assert "start_delivery.py" in skill
 
 
-def test_delivery_state_derives_from_the_intent_status():
+def test_skill_lists_the_intent_status_values():
     skill = _flat(SKILL_MD.read_text(encoding="utf-8"))
-    assert "Delivery state is derived from the intent's own `status:` field" in skill
     for status in ("`open`", "`confirmed <date>`", "`closed`", "`withdrawn"):
         assert status in skill
-    assert "The Map is read-only on intents" in skill
     assert "retired — <reason>" in skill
 
 
@@ -48,14 +46,11 @@ def test_map_lists_the_change_id_under_its_criterion():
     assert (
         "`- delivery-intent: DA-<n> | docs/loom/intent/<change-id>.md`" in map_format
     )
-    assert "opens no second arc" in map_format
-    assert "replacement intent" in map_format
 
 
 def test_no_delivery_ticket_is_authored_any_more():
     for path in CONTRACTS:
         text = path.read_text(encoding="utf-8")
-        assert "Exactly three ticket closure types exist" in text, path
         assert "|delivery>" not in text, path
 
 

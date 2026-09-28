@@ -4,6 +4,14 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.5.2] — 2026-09-29 — Prose-pin stock cleanup batches 2-3 and deferred release bump.
+
+Patch: tests, evidence and version metadata only; no station guidance, field, rule id or contract change.
+
+- Batch 2 (PR #65): goal-create and other `loom-workflow` sentence-pin assertions removed; kept structure and behavior checks; the census script's execution count fixed to only count real subprocess/checker calls; the `loom-visualization` A/B rerun script (`run_ab.py`) repaired (base ref, prompts file and output directory now parameters; fails non-zero when every session errors).
+- Batch 3: the known and newly flagged `loom-workflow` files pruned of direct sentence pins the widened census script now sees.
+- Version bump deferred by batch 2 (PR #65 Follow-ups): `loom-code`, `loom-design` and `loom-workflow` patch versions bumped together so `claude plugin update` refreshes installed copies with the batch 2/3 test changes.
+
 ## [5.5.1] — 2026-09-28 — Remove goal-create sentence-pin tests (batch 1 of the prose-pin stock cleanup).
 
 Patch: tests only; no station guidance, field, rule id or contract change.

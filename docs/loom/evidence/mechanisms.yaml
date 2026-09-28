@@ -86,7 +86,7 @@ mechanisms:
     eval: "loom-design/tests/architecture-design/test_architecture_skill.py"
   - id: decision-map
     class: skill
-    eval: "loom-workflow/tests/decision-map/test_decision_map_intent_binding.py"
+    eval: "loom-workflow/tests/decision-map/test_start_delivery.py::test_creates_intent_and_lists_it_under_the_criterion"
   - id: handoff
     class: skill
     eval: "loom-workflow/tests/scripts/test_handoff_compaction.py"
