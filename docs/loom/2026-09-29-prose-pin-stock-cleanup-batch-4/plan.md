@@ -50,9 +50,14 @@ charter: 1.1
 - Test: A2 positive: behavior-and-structure-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: compaction-output-assert-left-untouched.
 - Risk: agent-decided — same pruning and rename rules as W1-01; compaction scripts' output asserts are behavior checks.
 
+**W1-07 Census follows needles routed through containers**  after: W1-01, W1-02, W1-03, W1-06  acceptance: 1, 2, 3
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_classify_test_files.py, test files newly flagged, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/mapping-containers.md
+- Test: A1 positive: dict-of-needles-against-skill-text-flagged; negative: needles-against-script-output-not-flagged. A2 positive: behavior-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: parameter-passed-needle-judged.
+- Risk: agent-decided — W1 found prose needles in dicts, lists and helper parameters (compaction essence dicts, TABLE_CRITERIA, 'regardless'); the census follows them and every new candidate is judged here.
+
 ### Wave 2 — close-out
 
-**W2-01 Census and recount**  after: W1-01, W1-02, W1-03, W1-04, W1-06  acceptance: 1, 4, 5
+**W2-01 Census and recount**  after: W1-04, W1-07  acceptance: 1, 4, 5
 - Files: docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/census-report.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/candidate-list.md
 - Test: A1 positive: clean-worktree-census-zero-pins; negative: other-bucket-exits-1. A4 positive: check-mechanisms-all-clear; negative: dangling-eval-reported. A5 positive: recount-not-below-base; negative: deleted-function-tagged-exec-fails.
 - Risk: agent-decided — every remaining flagged file has a visible override row with its reason; each moved eval is listed old -> new beside the check_mechanisms result; runs from a clean worktree.
