@@ -64,6 +64,13 @@ charter: 1.1
 - Test: A1 positive: census-rerun-matches-report; negative: deleted-file-not-in-census. A4 positive: sentence-pin-zero-grammar-kept; boundary: structure-class-kept-not-deleted. A5 positive: executable-test-count-not-decreased; boundary: count-verified-before-and-after.
 - Risk: 行為測試數守護（A5）以 package suite 測試函式數前後對照（base 6f3acd78 vs HEAD）；agent-decided。分類器新增 `gate-eval` 類：被 mechanisms.yaml `eval:` 指到的檔案單獨列類（A4 修訂後的豁免），報告另列第二批清單（行為類但 has_pins=yes 的 15 檔）；user-decided 2026-09-28。
 
+### Wave 4 — closing review entry
+
+**W4-01 Graduate the adversarial probes that caught defects**  after: W3-02  acceptance: 1, 2
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_census_gaming.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_pruned_guards.py, loom-code/tests/test_adversarial_census_gaming.py, loom-code/tests/test_adversarial_pruned_guards.py
+- Test: A1 positive: census-class-ignores-comments-in-suite; negative: census-script-absent-skips-with-reason. A2 positive: recipe-row-dropped-goes-red-in-suite; negative: intact-recipe-stays-green.
+- Risk: review.probe-graduation — both caught a defect here (comment-steered census class; vacuous case-class check); graduated copies stay byte copies, path line aside, and skip with a reason when the evidence script is absent; agent-decided.
+
 ## Simplicity check
 - 用既有 `prose_pin` 分類語意（import + 斷言 pattern）建普查腳本，不另造分類框架 — taken
 - 刪除工作依「無耦合整檔刪 / 有耦合裁剪」二分，避免逐檔客製 — taken
