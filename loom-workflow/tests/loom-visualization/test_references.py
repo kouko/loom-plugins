@@ -34,7 +34,6 @@ DECISION_PHRASES = (
     "combining two",
     "why there is no third",
 )
-METAPHOR_WORDS = ('"like"', '"imagine"', '"think of it as"', "analog")
 
 
 def sections(text, level=2):
@@ -161,9 +160,6 @@ def test_guide_has_seven_rules_and_rewrite_steps():
     assert "rule 3 does not ban metaphors and analogies" not in polarity_errors(text)
     assert "Scope" in sections(text)
     assert "Internal terms" in sections(text)
-    rule3 = rule_titles(text)[3]
-    for word in METAPHOR_WORDS:
-        assert word in rule3, word
 
 
 def test_guide_without_metaphor_check_fails():

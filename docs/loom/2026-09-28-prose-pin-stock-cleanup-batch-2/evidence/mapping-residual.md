@@ -31,7 +31,7 @@ Each of these files got a `MANUAL_OVERRIDES` row in `classify-test-files.py`. Th
 
 | file | what its remaining literals are |
 |---|---|
-| `test_acceptance_test_report_shape.py` | table columns and markers, the evidence-block heading, the template path pointer, a full-suite absence scan |
+| `test_acceptance_test_report_shape.py` | table columns and markers, the evidence-block heading, the template path pointer, a full-suite absence scan, the `EVIDENCE_PATH` pointer sitting outside every gate block (the two ungated phrases went in the loop-form fix below) |
 | `test_adversary_protocol.py` | `loom_checker` import for the case-count scan, a one-home absence scan, YAML keys of the return block |
 | `test_adversary_routing.py` | recipe link back to the protocol, exception messages, pytest stdout, `split_sentences` used only to pick a sentence to reword |
 | `test_lenses_deletion_first.py` | lens table rows end with the `deletion-first` token |
@@ -44,6 +44,21 @@ Each of these files got a `MANUAL_OVERRIDES` row in `classify-test-files.py`. Th
 | `test_test_budget_text.py` | no line-number threshold, a gate-marker count |
 
 Two existing rows got more precise reasons: `test_build_recovery_rules.py` (it also cites the three manifest keys) and `loom-workflow/tests/goal-create/test_skill_md.py` (the offer-site number is recomputed from the repository).
+
+## Loop-form pins found by the census fix
+
+Defect class: the loop form of a phrase pin, `for p in (<literals>): assert p in TEXT`, where at least one literal is a phrase of three or more words. The census could not see it before the classifier fix. Where we searched: the full census inventory (`loom-code/tests`, `loom-workflow/tests`, `tests`, `loom-design/tests`). The functions are listed in `deletion-list.md` under "Found by the adversary's loop-form census fix". Paths below are repo-relative.
+
+| file::function(s) | defect class it guarded | named replacement | kind |
+|---|---|---|---|
+| `loom-code/tests/test_acceptance_test_report_shape.py::test_no_new_gate_marker` (the phrases ``"`package-tests` or `finalize-review` is skipped"`` and `"steps 6-7 govern"`) | the station's skip rule or its steps 6-7 rule moved inside a gate block | the same function keeps the `EVIDENCE_PATH` pointer outside every gate block and the no-gate-marker absences in the tester and the template: `loom-code/tests/test_acceptance_test_report_shape.py::test_no_new_gate_marker` | kept structural test |
+| `loom-code/tests/test_sync_codex_manifest.py::test_loom_code_manifest_and_docs_preserve_optional_composition` (`independently installable`, `plugin-qualified skill names`, `N/A with the reason`) | the loom-code README stops saying the plugins install on their own and compose only through qualified names | the same function keeps the check that neither manifest makes loom-design mandatory, and the `docs/loom/` pointer: `loom-code/tests/test_sync_codex_manifest.py::test_loom_code_manifest_and_docs_preserve_optional_composition`; the README wording is docs lens `omission` | kept structural test |
+| `loom-workflow/tests/loom-memory/test_skill_contract.py::test_record_contract_states_when_to_record`, `::test_record_contract_states_how_much_to_record` (deleted, with `TIMING_ELEMENTS` and `SCARCITY_ELEMENTS`) | the Record contract loses its timing or scarcity clauses | `loom-workflow/tests/loom-memory/test_skill_contract.py::test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against` goes red on any edit to the Record section and sends the editor to re-run `loom-workflow/skills/loom-memory/evals/record-timing.md` | kept structural test |
+| `loom-workflow/tests/goal-create/test_goal_shape.py::test_defines_four_fields_budget_and_surfacing` (the three quoted Anthropic bullet labels) | the attribution paragraph stops quoting the source's own labels | the same function keeps the paragraph found by its bold lead label, the field and vendor names, and the `named by both` absence; whether the quotes support the claim is docs lens `incorrect-fact` | review lens dimension |
+| `loom-design/tests/architecture-design/test_architecture_skill.py::test_skill_reads_code_and_proposes_two_options_per_choice` (eight prose words: existing code, at least two options, trade-off and the rest) | the design step stops reading the code or stops offering two options with a recommendation | the same function keeps the `references/design-know-how.md` pointer and the `## decisions` heading; the step's content is skill lens `omission` | review lens dimension |
+| `loom-workflow/tests/loom-visualization/test_references.py::test_guide_has_seven_rules_and_rewrite_steps` (the rule-3 example words, with `METAPHOR_WORDS`) | rule 3 stops listing the metaphor trigger words | the same function keeps `guide_errors` (seven rules, five rewrite steps, the last one a metaphor check) and the rule-3 ban check through `polarity_errors`: `loom-workflow/tests/loom-visualization/test_references.py::test_guide_has_seven_rules_and_rewrite_steps` | kept structural test |
+
+Seven files got a `MANUAL_OVERRIDES` row instead, because their loop-form hit is not prose. The row names the hit: `loom-code/tests/test_adversary_layout.py` (section headings), `loom-code/tests/test_loom_publish.py` (headings in the checker's returned reason), `loom-workflow/tests/decision-map/test_skill_doc.py` (command shapes the test also runs), `loom-workflow/tests/scripts/test_loom_visualization_compaction.py` (`## ` headings), `tests/test_agy_install_docs.py` (command shapes), `loom-design/tests/interface/test_design_system_skill.py` (canonical section names) and `loom-design/tests/architecture-design/test_architecture_skill.py` (the second hit: bold field labels of the schema's Guard failure message section).
 
 ## Judged not pins, and kept
 

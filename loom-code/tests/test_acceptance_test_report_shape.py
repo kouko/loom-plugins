@@ -199,8 +199,7 @@ def test_no_new_gate_marker():
     text = STATION.read_text(encoding="utf-8")
     ungated = re.sub(r"<!-- gate: [\w.-]+ -->.*?<!-- /gate -->", "", text, flags=re.S)
     flat = " ".join(ungated.split())
-    for phrase in ("`package-tests` or `finalize-review` is skipped", "steps 6-7 govern", EVIDENCE_PATH):
-        assert phrase in flat, f"{phrase!r} sits inside a gate block"
+    assert EVIDENCE_PATH in flat, f"{EVIDENCE_PATH!r} sits inside a gate block"
 
 
 # --- graduated adversarial probes ---------------------------------------------

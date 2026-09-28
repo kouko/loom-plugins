@@ -350,7 +350,7 @@ def test_skills_mount_declared_in_claude_manifest() -> None:
 # not a reason to delete the pin. The correct response to a red is:
 #
 #   1. check the clause is still in the contract and still says the same;
-#   2. if it is, update the phrase list below in the same commit as the
+#   2. if it is, update the phrase below in the same commit as the
 #      rewrite, and say in that commit that the meaning was preserved;
 #   3. if it is not, you are removing part of what this plugin promises —
 #      that needs an intent, not an edit here.
@@ -379,53 +379,10 @@ def _flat(text: str) -> str:
     return " ".join(text.split()).lower()
 
 
-TIMING_ELEMENTS = (
-    "before the branch closes",
-    "that same branch",
-    "separate post-merge branch",
-    "pure overhead",
-    "only confirmable by observing",
-    "batched",
-)
-
-SCARCITY_ELEMENTS = (
-    "not a durable lesson",
-    "belongs in its commit",
-    "belongs in the change's evidence",
-    "belongs in an intent",
-    "zero to one durable lesson per change",
-)
-
 # sha256 of the whitespace-flattened Record section of SKILL.md. Its only job
 # is to go red when that section changes at all, so the dilution guard cannot
 # fall silently out of date behind a literal pin that still passes.
 RECORD_SECTION_DIGEST = "945a9cb29dfb5a9090e4ad036e5f980accf19fe94b22ff3014c1c066635ddcc9"
-
-
-def test_record_contract_states_when_to_record() -> None:
-    """Timing half: a fact known before the branch closes lands in that branch.
-
-    Scoped to SKILL.md's own Record section, not the union of the skill text.
-    Against the union an adversarial probe showed the pin staying green while
-    the shipped contract was rewritten, because `references/operations.md`
-    still carried the phrases — the reference copy was propping up a clause
-    that had left the surface a reader actually follows."""
-    flat = _flat(_section(_skill_md_text(), "Record"))
-    for element in TIMING_ELEMENTS:
-        assert element in flat, (
-            f"the Record contract no longer states {element!r}. {_A4_WHY}"
-        )
-
-
-def test_record_contract_states_how_much_to_record() -> None:
-    """Scarcity half: most of what a change surfaces is not a durable lesson.
-
-    Scoped to SKILL.md's Record section for the reason given above."""
-    flat = _flat(_section(_skill_md_text(), "Record"))
-    for element in SCARCITY_ELEMENTS:
-        assert element in flat, (
-            f"the Record contract no longer states {element!r}. {_A4_WHY}"
-        )
 
 
 def test_record_section_routes_unfinished_item_to_intent() -> None:

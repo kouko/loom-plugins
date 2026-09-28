@@ -450,8 +450,10 @@ MANUAL_OVERRIDES = {
         "structure",
         "template table columns, rows and markers, the evidence block heading, "
         "the template path pointer in the tester contract, a full-suite "
-        "absence scan fed by split_sentences and no gate marker; no sentence "
-        "asserted present",
+        "absence scan fed by split_sentences, no gate marker, and the evidence "
+        "path pointer outside every gate block; the two station phrases it "
+        "once looped over were pruned in the batch-2 loop-form fix, so no "
+        "sentence is asserted present",
     ),
     "loom-code/tests/test_adversary_protocol.py": (
         "behavior",
