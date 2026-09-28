@@ -107,6 +107,30 @@ def test_helper_fed_prose_and_index_and_regex_flagged() -> None:
     assert ctf.direct_pin_lines(LOOP_HEAD + body) == [10, 16, 17]
 
 
+NEEDLE_DICT = ('ESSENCE = {{"routing": ["the rule is stated here"], "stop": ("never dispatch", "x")}}\n\n'
+               'def test_x():\n    for name, needles in ESSENCE.items():\n'
+               '        missing = [n for n in needles if n not in {subject}]\n        assert not missing\n\n'
+               'def test_y():\n    facts = {{"r": any("regardless" in b for b in {subject}.split())}}\n'
+               '    assert all(facts.values())\n')
+
+
+def test_dict_of_needles_against_skill_text_flagged() -> None:
+    src = LOOP_HEAD + NEEDLE_DICT.format(subject="TEXT")
+    assert ctf.direct_pin_lines(src) == [11, 15], ctf.pin_candidates(src)
+
+
+def test_needles_against_script_output_not_flagged() -> None:
+    src = LOOP_HEAD + "import subprocess\nOUT = subprocess.run(['python3', 'x.py']).stdout\n" + NEEDLE_DICT.format(
+        subject="OUT")
+    assert ctf.direct_pin_lines(src) == []
+
+
+def test_parameter_passed_needle_flagged() -> None:
+    body = ('def _has(text, phrase):\n    return phrase in text\n\n'
+            'def test_x():\n    assert _has(TEXT, "the rule is stated here")\n    assert _has("synthetic", "never dispatch")\n')
+    assert ctf.direct_pin_lines(LOOP_HEAD + body) == [11]
+
+
 def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tmp_path: Path) -> None:
     root = tmp_path / "loom-code" / "tests"
     root.mkdir(parents=True)

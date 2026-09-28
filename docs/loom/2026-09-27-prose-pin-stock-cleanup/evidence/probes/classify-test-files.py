@@ -366,10 +366,21 @@ def pin_candidates(text: str) -> list[dict]:
       call site in the file (to a fixed point) reads that parameter as markdown text, so a
       literal it requires of its input is a candidate on the helper's own line.
       Nested functions are read with their enclosing one.
+    - Needles routed through containers (W1-07): in every form above, a needle may be a name
+      that a `for` or comprehension target binds (tuple targets too) over a collection, a dict
+      (its keys), `.items()`/`.values()`/`.keys()`, or another such bound name, or a
+      `pytest.mark.parametrize` parameter; each string it can hold is a candidate, classed on
+      its own. `.lower()`-style calls on the needle are looked through. A positive `in` whose
+      statement stores or passes its value (`facts = {"k": any("x" in b for b in blocks)}`)
+      counts too, unless negated or in a comprehension filter; a filter of a `next(...)`
+      first-match lookup still counts, since a miss yields the default.
+    - A literal (or a collection, spread with `*`) passed to a local helper that requires it
+      of markdown text is a candidate on the call line, for calls that pass markdown text in.
     - literal_class then classes each candidate prose or structural; only prose ones count as
       pins (direct_pin_lines), the census `--candidates` mode lists both.
-    Not seen: a literal passed through a parameter (`pinned_sentence_ok(s, *PIN)`), a
-    non-literal regex, and asserts on names the file-wide judgment calls output.
+    Not seen: a needle passed through two helper levels, a subscript (`phrases[0]`), a
+    non-literal regex, and asserts on names the file-wide judgment calls output. A stored
+    `in` later asserted absent is counted anyway (a false candidate, judged by hand).
     Known limits: a local helper named like a validator word (`_checklist()` matches
     'check') is taken as output; and a variable name is judged file-wide, so one name
     holding README.md in one test and SKILL.md in another counts as non-prose everywhere.
@@ -386,7 +397,7 @@ def pin_candidates(text: str) -> list[dict]:
                 and isinstance(n.value, ast.Constant) and isinstance(n.value.value, str)
                 for t in n.targets if isinstance(t, ast.Name)}
     mod_colls = {t.id: n.value for n in tree.body if isinstance(n, ast.Assign)
-                 and isinstance(n.value, (ast.Tuple, ast.List, ast.Set))
+                 and isinstance(n.value, (ast.Tuple, ast.List, ast.Set, ast.Dict))
                  for t in n.targets if isinstance(t, ast.Name)}
     src: dict[str, str] = {}  # every name's assigned source, any scope: where a read's path came from
     for n in ast.walk(tree):
@@ -528,12 +539,6 @@ def pin_candidates(text: str) -> list[dict]:
             return "".join(v.value if isinstance(v, ast.Constant) else "{}" for v in node.values)
         return None
 
-    def coll_lits(node, colls) -> list[str]:
-        node = colls.get(node.id) if isinstance(node, ast.Name) else node
-        if not isinstance(node, (ast.Tuple, ast.List, ast.Set)):
-            return []
-        return [s for s in (literal(e) for e in node.elts) if s is not None]
-
     def re_bound(scope) -> dict[str, str]:
         """Names bound to `re.compile(<literal>)` in scope (not descending into functions for the module)."""
         nodes = scope.body if isinstance(scope, ast.Module) else list(ast.walk(scope))
@@ -590,30 +595,130 @@ def pin_candidates(text: str) -> list[dict]:
                          "cls": got[0], "reason": got[1]})
 
     comps = (ast.ListComp, ast.SetComp, ast.GeneratorExp)
-    for f in top:
-        md, out = scope_taint(f)
-        colls = {**mod_colls, **{t.id: n.value for n in ast.walk(f) if isinstance(n, ast.Assign)
-                                 and isinstance(n.value, (ast.Tuple, ast.List, ast.Set))
-                                 for t in n.targets if isinstance(t, ast.Name)}}
-        bound_re = {**mod_re, **re_bound(f)}
-        def bound_lits(name, node) -> list[str]:
-            """Literals of the collection the nearest enclosing comprehension or `for` binds name to."""
-            x = node
-            while id(x) in parent:
-                x = parent[id(x)]
-                gens = x.generators if isinstance(x, comps) else [x] if isinstance(x, ast.For) else []
-                for g in gens:
-                    if isinstance(g.target, ast.Name) and g.target.id == name:
-                        return coll_lits(g.iter, colls)
+    str_methods = {"lower", "casefold", "strip", "upper"}
+
+    def local_colls(f) -> dict:
+        return {**mod_colls, **{t.id: n.value for n in ast.walk(f) if isinstance(n, ast.Assign)
+                                and isinstance(n.value, (ast.Tuple, ast.List, ast.Set, ast.Dict))
+                                for t in n.targets if isinstance(t, ast.Name)}}
+
+    def parametrized(f) -> dict[str, list]:
+        """Test parameters bound by `@pytest.mark.parametrize("a,b", [...])` to the values they take."""
+        got: dict[str, list] = {}
+        for d in f.decorator_list:
+            if isinstance(d, ast.Call) and _dotted(d.func).endswith("parametrize") and len(d.args) >= 2 \
+                    and isinstance(d.args[0], ast.Constant) and isinstance(d.args[0].value, str) \
+                    and isinstance(d.args[1], (ast.List, ast.Tuple)):
+                argn = [a.strip() for a in d.args[0].value.split(",") if a.strip()]
+                for row in d.args[1].elts:
+                    vals = [row] if len(argn) == 1 else (
+                        row.elts if isinstance(row, (ast.Tuple, ast.List)) else [])
+                    for a, v in zip(argn, vals):
+                        got.setdefault(a, []).append(v)
+        return got
+
+    # ctx = (collections by name, parameter values by name). A needle is followed through a
+    # named collection or dict, `.items()`/`.values()`/`.keys()`, loop and comprehension targets
+    # (tuple targets too) and parameters, to the string values it can hold.
+    def values_of(node, ctx, depth=0) -> list:
+        if depth > 8:
             return []
+        if isinstance(node, ast.Name):
+            got = bound(node, ctx, depth)
+            if got is not None:
+                return got
+            if node.id in ctx[0]:
+                return [ctx[0][node.id]]
+            if node.id in ctx[1]:
+                return ctx[1][node.id]
+        return [node]
+
+    def elems(it, ctx, depth=0) -> list:
+        if depth > 8:
+            return []
+        if isinstance(it, ast.Call):
+            fn = it.func
+            if isinstance(fn, ast.Name) and fn.id in ("sorted", "list", "tuple", "set", "reversed") and it.args:
+                return elems(it.args[0], ctx, depth + 1)
+            if isinstance(fn, ast.Attribute) and fn.attr in ("items", "values", "keys") and not it.args:
+                got = []
+                for d in values_of(fn.value, ctx, depth + 1):
+                    if isinstance(d, ast.Dict):
+                        for k, v in zip(d.keys, d.values):
+                            if k is not None:
+                                got.append(ast.Tuple(elts=[k, v]) if fn.attr == "items"
+                                           else k if fn.attr == "keys" else v)
+                return got
+            return []
+        got = []
+        for v in values_of(it, ctx, depth + 1):
+            if isinstance(v, (ast.Tuple, ast.List, ast.Set)):
+                got += v.elts
+            elif isinstance(v, ast.Dict):
+                got += [k for k in v.keys if k is not None]
+        return got
+
+    def destructure(target, name, value, ctx, depth) -> list:
+        if isinstance(target, ast.Name):
+            return [value] if target.id == name else []
+        got = []
+        if isinstance(target, (ast.Tuple, ast.List)):
+            for v in values_of(value, ctx, depth + 1):
+                if isinstance(v, (ast.Tuple, ast.List)) and len(v.elts) == len(target.elts):
+                    for t, e in zip(target.elts, v.elts):
+                        got += destructure(t, name, e, ctx, depth + 1)
+        return got
+
+    def bound(node, ctx, depth):
+        """What the nearest enclosing `for` or comprehension binding node's name iterates, or None."""
+        x = node
+        while id(x) in parent:
+            p = parent[id(x)]
+            gens = p.generators if isinstance(p, comps) else [p] if isinstance(p, ast.For) and x is not p.iter else []
+            for g in gens:
+                if any(isinstance(t, ast.Name) and t.id == node.id for t in ast.walk(g.target)):
+                    return [v for e in elems(g.iter, ctx, depth + 1)
+                            for v in destructure(g.target, node.id, e, ctx, depth + 1)]
+            x = p
+        return None
+
+    def lits(node, ctx, pids) -> list[str]:
+        """Needle literals of an expression (with pids, only values a call site passed in)."""
+        while isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) \
+                and node.func.attr in str_methods and not node.args:
+            node = node.func.value
+        vals = values_of(node, ctx) if isinstance(node, ast.Name) else [node]
+        return [literal(v) for v in vals if literal(v) is not None and (pids is None or id(v) in pids)]
+
+    def stored(c) -> bool:
+        """A positive `in` whose statement stores or passes its value (not assert, if or return,
+        which have their own forms), outside a comprehension filter unless that comprehension is
+        a `next(...)` first-match lookup (a miss yields the default)."""
+        n, x = 0, c
+        while id(x) in parent:
+            p = parent[id(x)]
+            n += isinstance(p, ast.UnaryOp) and isinstance(p.op, ast.Not)
+            if isinstance(p, ast.comprehension) and any(x is i for i in p.ifs):
+                comp = parent.get(id(p))
+                up = parent.get(id(comp))
+                if not (isinstance(up, ast.Call) and _dotted(up.func) == "next" and up.args and up.args[0] is comp):
+                    return False
+            if isinstance(p, ast.stmt):
+                return isinstance(p, (ast.Assign, ast.AnnAssign, ast.AugAssign, ast.Expr)) and n % 2 == 0
+            x = p
+        return False
+
+    def scan(f, fname, ctx, pids=None, at=None) -> None:
+        md, out = scope_taint(f)
+        bound_re = {**mod_re, **re_bound(f)}
+
+        def put(line, lit, form, regex=False) -> None:
+            add(at or line, fname, lit, form if at is None else f"{form} via {f.name}()", regex)
 
         def required(c, form) -> None:
-            left, right = c.left, c.comparators[0]
-            lits = [literal(left)] if literal(left) is not None else (
-                bound_lits(left.id, c) if isinstance(left, ast.Name) else [])
-            if lits and is_md(right, md, out):
-                for s in lits:
-                    add(c.lineno, f.name, s, form)
+            if is_md(c.comparators[0], md, out):
+                for s in lits(c.left, ctx, pids):
+                    put(c.lineno, s, form)
 
         for node in ast.walk(f):
             if isinstance(node, ast.Assert):
@@ -624,21 +729,24 @@ def pin_candidates(text: str) -> list[dict]:
                             required(c, "assert in")
                         elif isinstance(c.ops[0], ast.Eq) and not isinstance(left, ast.Call):
                             for a, b in ((left, right), (right, left)):
-                                if literal(a) is not None and is_md(b, md, out):
-                                    add(c.lineno, f.name, literal(a), "assert ==")
+                                if is_md(b, md, out):
+                                    for s in lits(a, ctx, pids):
+                                        put(c.lineno, s, "assert ==")
                         if isinstance(c.ops[0], (ast.Eq, ast.GtE, ast.Gt)) and isinstance(left, ast.Call) \
                                 and isinstance(left.func, ast.Attribute) and left.func.attr == "count" \
                                 and left.args and isinstance(right, ast.Constant) \
                                 and isinstance(right.value, int) and right.value >= 1 \
                                 and is_md(left.func.value, md, out):
                             # `text.count(<literal>) == 1`: present, not "at most once"
-                            add(c.lineno, f.name, literal(left.args[0]), "assert count")
+                            for s in lits(left.args[0], ctx, pids):
+                                put(c.lineno, s, "assert count")
                     elif isinstance(c, ast.Call) and isinstance(c.func, ast.Attribute) \
                             and c.func.attr in ("startswith", "endswith") and c.args \
                             and is_md(c.func.value, md, out):
                         arg = c.args[0]
-                        for s in ([literal(e) for e in arg.elts] if isinstance(arg, ast.Tuple) else [literal(arg)]):
-                            add(c.lineno, f.name, s, f"assert .{c.func.attr}()")
+                        for e in (arg.elts if isinstance(arg, ast.Tuple) else [arg]):
+                            for s in lits(e, ctx, pids):
+                                put(c.lineno, s, f"assert .{c.func.attr}()")
             elif isinstance(node, ast.If):
                 if all(isinstance(b, (ast.Continue, ast.Pass)) for b in node.body):
                     continue  # a filter, not a requirement
@@ -651,29 +759,35 @@ def pin_candidates(text: str) -> list[dict]:
                     if isinstance(c, ast.Compare) and len(c.ops) == 1 and isinstance(c.ops[0], ast.In) \
                             and nots(c, node.value) == 0:
                         required(c, "return in")
+            elif isinstance(node, ast.Compare) and len(node.ops) == 1 and isinstance(node.ops[0], ast.In) \
+                    and stored(node):
+                required(node, "stored in")
             elif isinstance(node, comps):
                 for g in node.generators:
-                    lits = coll_lits(g.iter, colls) if isinstance(g.target, ast.Name) else []
-                    for cond in (g.ifs if lits else []):
+                    if not isinstance(g.target, ast.Name):
+                        continue
+                    for cond in g.ifs:
                         for c in ast.walk(cond):
                             if isinstance(c, ast.Compare) and isinstance(c.left, ast.Name) \
                                     and c.left.id == g.target.id and isinstance(c.ops[0], ast.NotIn) \
                                     and is_md(c.comparators[0], md, out):
-                                for s in lits:
-                                    add(c.lineno, f.name, s, "collected when not in")
+                                for s in [s for e in elems(g.iter, ctx) for s in lits(e, ctx, pids)]:
+                                    put(c.lineno, s, "collected when not in")
             elif isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
                 attr, recv = node.func.attr, node.func.value
                 if attr in ("index", "rindex") and node.args and is_md(recv, md, out):
-                    add(node.lineno, f.name, literal(node.args[0]), f".{attr}()")
+                    for s in lits(node.args[0], ctx, pids):
+                        put(node.lineno, s, f".{attr}()")
                 elif attr in ("search", "match", "fullmatch", "findall", "finditer"):
-                    pat = None
+                    pats = []
                     if isinstance(recv, ast.Name) and recv.id == "re":
                         if len(node.args) >= 2 and is_md(node.args[1], md, out):
-                            pat = literal(node.args[0])
+                            pats = lits(node.args[0], ctx, pids)
                     elif node.args and is_md(node.args[0], md, out):
-                        pat = literal(recv.args[0]) if isinstance(recv, ast.Call) and recv.args \
-                            and _dotted(recv.func) == "re.compile" else (
-                            bound_re.get(recv.id) if isinstance(recv, ast.Name) else None)
+                        if isinstance(recv, ast.Call) and recv.args and _dotted(recv.func) == "re.compile":
+                            pats = lits(recv.args[0], ctx, pids)
+                        elif isinstance(recv, ast.Name) and recv.id in bound_re and pids is None:
+                            pats = [bound_re[recv.id]]
                     up = parent.get(id(node))
                     negated = (isinstance(up, ast.UnaryOp) and isinstance(up.op, ast.Not)) or (
                         isinstance(up, ast.Compare) and isinstance(up.ops[0], ast.Is))
@@ -688,8 +802,39 @@ def pin_candidates(text: str) -> list[dict]:
                             negated = True
                             break
                         x = p
-                    if pat is not None and not negated:
-                        add(node.lineno, f.name, pat, f"re.{attr}", regex=True)
+                    if not negated:
+                        for pat in pats:
+                            put(node.lineno, pat, f"re.{attr}", regex=True)
+
+    for f in top:
+        ctx = (local_colls(f), parametrized(f))
+        scan(f, f.name, ctx)
+        # A literal passed to a local helper that requires it of markdown text: judged on the
+        # call line, only for calls that pass markdown text in (a synthetic self-test does not).
+        md, out = scope_taint(f)
+        for c in ast.walk(f):
+            if not (isinstance(c, ast.Call) and isinstance(c.func, ast.Name) and c.func.id in funcs
+                    and funcs[c.func.id] is not f):
+                continue
+            args = [a.value if isinstance(a, ast.Starred) else a for a in c.args] + [k.value for k in c.keywords]
+            if not any(is_md(a, md, out) for a in args):
+                continue
+            h = funcs[c.func.id]
+            gp = [a.arg for a in h.args.args]
+            params: dict[str, list] = {}
+            i = 0
+            for a in c.args:
+                vals = [values_of(e, ctx) for e in elems(a.value, ctx)] if isinstance(a, ast.Starred) else [
+                    values_of(a, ctx)]
+                for v in vals:
+                    if i < len(gp):
+                        params.setdefault(gp[i], []).extend(v)
+                    i += 1
+            for k in c.keywords:
+                if k.arg in gp:
+                    params.setdefault(k.arg, []).extend(values_of(k.value, ctx))
+            pids = {id(n) for vs in params.values() for v in vs for n in ast.walk(v)}
+            scan(h, f.name, (local_colls(h), params), pids, c.lineno)
     return sorted(rows, key=lambda r: (r["line"], r["literal"]))
 
 
