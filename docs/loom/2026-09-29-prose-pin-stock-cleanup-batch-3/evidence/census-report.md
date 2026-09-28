@@ -104,18 +104,18 @@ Sources: `mapping-known.md` (W1-01, with this task's fix), `mapping-new-code.md`
 ```
 rows: 68
 by kind: {'review lens dimension': 50, 'kept structural test': 16, 'checker rule id': 2}
-deleted defs in changed test files: 43 (test functions: 41 )
+deleted defs in changed test files: 44 (test functions: 42 )
 deleted test functions on the base exec list: 0 []
 deletion-list rows tagged exec: 2 ; of them deleted at HEAD: 0
 problems: 0
 ```
 
-The deleted-def count is 43 (41 test functions), not 27 (25), because W4-02 renamed 16 pruned test functions and the script counts a rename as a deleted def plus a new one; it does not read which name a mapping row cites, so fixing those rows to the renamed names left every number unchanged. No further function was deleted.
+The deleted-def count is 44 (42 test functions), not 27 (25), because 17 pruned test functions were renamed (16 in W4-02, one more in the W4 follow-up) and the script counts a rename as a deleted def plus a new one; it does not read which name a mapping row cites, so fixing those rows to the renamed names changed no other number. No further function was deleted.
 
 The script checks these things:
 
 - Every `file::function` named in a replacement cell is a `def` at HEAD. A bare `::name` resolves to the last file named in that cell, else the row's own file, else the `## <path>` section heading. A bare file name resolves by basename.
-- None of those names is one of the defs that `5704cc23..HEAD` deleted from the changed test files (27 defs from 24 files at W2-01; 43 defs, renames included, from 26 files at W4-01).
+- None of those names is one of the defs that `5704cc23..HEAD` deleted from the changed test files (27 defs from 24 files at W2-01; 43 defs, renames included, from 26 files at W4-01; 44 after the W4 follow-up rename).
 - Every backticked rule id in a `checker rule id` row appears in `loom_checker.py --list-rules`.
 
 The first run reported 1 problem: `test_start_delivery.py::test_writes_no_brief_and_no_ticket_binding` did not resolve, because the script only looked among changed files. After it also looked at tracked test files, the count was 0. No mapping row changed.
