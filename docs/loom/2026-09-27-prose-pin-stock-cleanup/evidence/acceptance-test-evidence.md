@@ -231,3 +231,92 @@ one of those, so all five rows were re-tested in full. Clean copy:
 - Probes, each its own command: `test_classify_test_files.py` 5 passed,
   `test_adversarial_census_gaming.py` 2 passed,
   `test_adversarial_pruned_guards.py` 1 passed.
+
+## Re-run on 2026-09-28, at 09bf5a27
+
+Fix range 4ca1cc59..09bf5a27 (plan W4-03, user-decided) deletes
+`loom-workflow/tests/scripts/test_loom_visualization_description_ab.py`,
+prunes `test_adversarial_description_ab_probes.py`, `tests/test_kickoff_defaults.py`
+and `tests/test_principles_ratification.py`, and changes the classifier
+overrides and the census report. Every Acceptance line reads one of those,
+so all five rows were re-tested in full. Clean copy:
+`git worktree add <scratch>/at-wt3 09bf5a27` (`git status --short` empty).
+`P` = `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q -p no:cacheprovider`.
+
+- Setup: the README package-test environment resolved in the clean copy;
+  every targeted run below passed.
+- 1: re-tested — `python3 $C`: exit 0,
+  `counts: {'behavior': 113, 'gate-eval': 7, 'grammar-invariant': 5, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 48}`
+  (227 files). Parsed the classifier's per-file output and the report's
+  "Full Per-File Classification" table: 227 = 227 rows, no class differs
+  (the one extra name the parse saw, `test_principles_amendment.py`, occurs
+  only in the report's deletion/replacement tables, not the per-file table).
+  Verdict: works.
+- 2: re-tested — `ls loom-workflow/tests/scripts/test_loom_visualization_description_ab.py`
+  → no such file; `git grep -l test_loom_visualization_description_ab` hits
+  only `docs/loom/` history (2026-09-14 change records and this change's
+  plan/evidence), no code or `mechanisms.yaml`. `tests/test_kickoff_defaults.py`
+  keeps `test_package_tests_command_uses_the_complete_loom_family_preset`
+  (command equality) and `test_package_test_lock_pins_and_hashes_the_complete_graph`;
+  the trailing-note phrase test is gone. `tests/test_principles_ratification.py`
+  asserts one `ratified-by:` line and no pending line, no literal.
+  `P loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py tests/test_kickoff_defaults.py tests/test_principles_ratification.py tests/test_loom_skill_description_catalog.py loom-code/tests/test_loom_checker_standing.py`
+  → `48 passed in 3.82s`. Full suite not run here (finalize-review runs
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+  and refuses the attestation on failure). Verdict: works.
+- 3: re-tested — replacement table: 18 rows (14 earlier + 4 W4-03). Extracted
+  every `file::function` named (29) and grepped each `def` in the tracked
+  files: 0 missing. `loom_checker.py --list-rules` lists
+  `standing.product-principles-reject`. Two spot checks fail:
+  - Row `test_loom_visualization_description_ab.py` names "rerun
+    docs/loom/2026-09-14-loom-visualization-description-trigger/ab/run_ab.py".
+    `python3 .../ab/run_ab.py --help` in the clean copy →
+    `ModuleNotFoundError: No module named 'test_loom_skill_description_catalog'`
+    (run_ab.py:58 imports it from `REPO/"scripts"`; the catalog moved to
+    `tests/` in d10223e3; only the probe fixture adds `tests/` to `sys.path`).
+    Also run_ab.py:46-55 hard-codes `DESCRIPTION_A`/`DESCRIPTION_B` (B ends
+    "blind-run results") with `DESCRIPTION_B_SHA256`, and `verify_copies`
+    (run_ab.py:140-142) raises unless the two trees render exactly those
+    texts; the shipped description (SKILL.md:4) says "acceptance test
+    results" (the 2026-09-23 A/B's variant, which has protocol/results only,
+    no runner). So the named rerun cannot measure a future edit without
+    editing the script first.
+  - Row `test_adversarial_description_ab_probes.py` says "none needed (their
+    target is deleted)". At base, `test_render_description_folded_scalar_fails_closed`
+    and `test_render_description_trailing_whitespace_renders_identically`
+    (section header "renderer shared by the hash guard and the budget guard")
+    exercised `_render_description`, which still lives at
+    `tests/test_loom_skill_description_catalog.py:46` and feeds the
+    description-budget check (`:63`). No remaining test covers the folded /
+    plain scalar case (`git grep "description: >"` under the four test roots:
+    none). Behaviour today still holds: both headers raise
+    `AssertionError missing block-scalar description` (run by hand).
+  Verdict: partly.
+- 4: re-tested — same classifier run: `sentence-pin: 0`, gate-eval its own
+  class (7). The two files flagged last run: the hash guard is deleted;
+  `tests/test_kickoff_defaults.py` has no phrase assert left. Every
+  `MANUAL_OVERRIDES` file (11) grepped for sentence-literal asserts
+  (`assert "<16+ chars>" in`): 0 everywhere except
+  `test_check_skill_crossrefs.py` (4, all file paths in checker output at
+  lines 60/200/243/271 — behaviour). The two gate-eval overrides are named
+  by `mechanisms.yaml` evals (checked last run, unchanged by the fix).
+  `test_adversarial_description_ab_probes.py` is now `behavior`: it calls
+  run_ab.py functions in-process on fixtures and asserts parse/decision
+  results, no prose literal. Verdict: works.
+- 5: re-tested — `git archive` of 6f3acd78, 946e06d1 and 4ca1cc59 into
+  scratch; `python3 $C --count-exec` → 727, 727, 730; clean 09bf5a27 → 727.
+  Per-name diff with the classifier's own `executes()` predicate,
+  946e06d1 → HEAD: gone
+  `test_adversarial_description_ab_probes.py::test_guard_edited_skill_description_fails_closed`,
+  `::test_guard_without_docs_still_collects`,
+  `::test_render_description_folded_scalar_fails_closed`; added
+  `test_adversarial_census_gaming.py::test_census_roots_flag_given_is_accepted`,
+  `test_adversary_recipe_code.py::test_case_class_check_recipe_row_dropped_goes_red`,
+  `test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic`
+  (matches the census report). The first two tested only the deleted guard
+  (user decision). The third tested the surviving renderer (see row 3), so
+  the count holds (727 ≥ 727) but one behaviour test of shipped code was
+  deleted. Verdict: partly.
+- Probes, each its own command: `test_classify_test_files.py` 5 passed,
+  `test_adversarial_census_gaming.py` 2 passed,
+  `test_adversarial_pruned_guards.py` 1 passed.
