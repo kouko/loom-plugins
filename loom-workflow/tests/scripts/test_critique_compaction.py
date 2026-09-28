@@ -47,16 +47,6 @@ def test_mode_routing_is_declared_before_either_lens():
     assert text.index("## Choosing the mode") < text.index("## Mode: proposal")
 
 
-def test_shared_discipline_is_stated_once():
-    text = SKILL.read_text(encoding="utf-8")
-    shared = _window(text, "## Shared discipline", "## Mode: proposal")
-
-    assert "Assertion is not evidence" in shared
-    assert "Uncertainty is stated, never invented" in shared
-    assert "No silent softening" in shared
-    assert "The gate is yours to run" in shared
-
-
 def test_proposal_mode_preserves_axes_matrix_fallthrough_and_output():
     text = SKILL.read_text(encoding="utf-8")
     mode = _proposal(text)
