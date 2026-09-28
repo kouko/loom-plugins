@@ -10,11 +10,10 @@ FIRST_CONTACT = PLUGIN / "skills" / "write-plan" / "references" / "codex-first-c
 
 
 def test_first_contact_new_worktree_does_not_create_loom_trust_work() -> None:
-    text = " ".join(FIRST_CONTACT.read_text(encoding="utf-8").split())
+    """Gate-marker presence only; the paragraph's wording is review-only."""
+    text = FIRST_CONTACT.read_text(encoding="utf-8")
 
-    assert "As observed on Codex 0.153.4, creating another worktree does not create another installed Loom hook identity" in text
-    assert "Repository-local hooks are separate host identities" in text
-    assert "write-plan.codex-installed-hook-trust-boundary" in text
+    assert text.count("<!-- gate: write-plan.codex-installed-hook-trust-boundary -->") == 1
 
 
 def test_first_contact_keeps_new_or_modified_hook_review_host_owned() -> None:

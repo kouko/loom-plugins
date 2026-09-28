@@ -155,8 +155,8 @@ def test_atomic_claude_dispatch_gate_is_registered_with_executable_eval() -> Non
     assert review.count("<!-- /gate -->", review.find(f"<!-- gate: {gate_id} -->")) >= 1
     assert f'- id: "{gate_id}"' in mechanisms
     assert (
-        "eval: loom-code/tests/test_dispatch_profile_contract.py::"
-        "test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack"
+        "eval: loom-code/tests/test_claude_reviewer.py::"
+        "test_main_rejects_partial_override_before_spawn"
     ) in mechanisms
 
 
@@ -180,8 +180,8 @@ def test_shared_routing_gate_is_registered_once_with_executable_eval() -> None:
     assert profile.count(marker) == 1
     assert f'- id: "{gate_id}"' in mechanisms
     assert (
-        "eval: loom-code/tests/test_dispatch_profile_contract.py::"
-        "test_class_relative_route_and_insufficient_evidence_boundary"
+        "eval: loom-code/tests/test_dispatch_profile_resolver.py::"
+        "test_mechanical_route_computes_each_model_tier"
     ) in mechanisms
 
 

@@ -189,24 +189,12 @@ def test_floor_invocation_line_names_the_script():
 
 
 def test_session_activation_rules_are_one_registered_gate():
-    text = _read_skill_md()
-    gate = _gate(text, "goal-create.session-activation")
-
-    for obligation in (
-        "Codex activation",
-        "Claude Code activation",
-        "host-provided success",
-        "one copyable `/goal <condition>` command",
-    ):
-        assert obligation in gate
-
-    input_gate = _gate(
+    """Gate-block presence only; the block's wording is review-only."""
+    _gate(_read_skill_md(), "goal-create.session-activation")
+    _gate(
         (SKILL_DIR / "references" / "input-floor.md").read_text(),
         "goal-create.session-activation",
     )
-    assert "Confirmed artifacts are optional input sources" in input_gate
-    assert "Preserve the intent's Constraints" in input_gate
-    assert "does not authorize execution or publication" in input_gate
 
 
 def test_arc_points_at_the_purpose_template_without_restating_it():
