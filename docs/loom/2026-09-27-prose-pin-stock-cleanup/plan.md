@@ -47,14 +47,19 @@ charter: 1.1
 - Test: A2 positive: routing-SUITE_EXTRA-and-AGENTS-ref-removed-then-file-deleted; negative: module-criteria-checks-still-enforced. A4 positive: file-vanishes-from-census; boundary: no-sentence-pin-left-in-repo.
 - Risk: 此檔釘 AGENTS.md module criteria 散文＋記四條判準由哪支 check 執行；刪除需同步移除 routing SUITE_EXTRA 與 AGENTS.md:54 引用；四條判準的可執行 check 本身（test_adversary_routing/layout 內）保留；agent-decided。
 
+**W2-02 reword 測試語義反轉**  after: W1-01  acceptance: 2, 4
+- Files: loom-code/tests/test_adversary_routing.py
+- Test: A2 positive: reword-plants-nothing-asserted; negative: reintroduced-prose-pin-would-plant. A4 positive: grammar-invariant-guard-lives-in-routing; boundary: helper-synthetic-tests-unchanged.
+- Risk: routing 的 `test_a_reworded_recipe_is_not_blamed_on_the_addition` 以 prose-pin 為『recipe 變紅』偵測器；pins 刪除後偵測器消失。語義反轉為『reword 不讓任何測試紅』（字面感應層已由語意審查取代），未來若 prose-pin 復活此測試即紅——成為 A4 的機制化守護；agent-decided。
+
 ### Wave 3 — 驗證
 
-**W3-01 對應表：刪除釘住 → 具名替代證據**  after: W1-01, W1-02, W1-03, W2-01  acceptance: 3
+**W3-01 對應表：刪除釘住 → 具名替代證據**  after: W1-01, W1-02, W1-03, W2-01, W2-02  acceptance: 3
 - Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
 - Test: A3 positive: each-deleted-pin-lists-replacement-evidence; negative: deleted-pin-without-replacement-fails. A3 boundary: replacement-names-checker-rule-or-lens-dimension.
 - Risk: 每檔刪除的釘住測試列出具名替代（checker 重算規則 id、結構測試名或 review lens 面向）；agent-decided。
 
-**W3-02 重算普查與行為守護**  after: W1-01, W1-02, W1-03, W2-01  acceptance: 1, 4, 5
+**W3-02 重算普查與行為守護**  after: W1-01, W1-02, W1-03, W2-01, W2-02  acceptance: 1, 4, 5
 - Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
 - Test: A1 positive: census-rerun-matches-report; negative: deleted-file-not-in-census. A4 positive: sentence-pin-zero-grammar-kept; boundary: structure-class-kept-not-deleted. A5 positive: executable-test-count-not-decreased; boundary: count-verified-before-and-after.
 - Risk: 行為測試數守護（A5）以 package suite 測試函式數前後對照；agent-decided。
