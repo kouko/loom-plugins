@@ -320,3 +320,66 @@ so all five rows were re-tested in full. Clean copy:
 - Probes, each its own command: `test_classify_test_files.py` 5 passed,
   `test_adversarial_census_gaming.py` 2 passed,
   `test_adversarial_pruned_guards.py` 1 passed.
+
+## Re-run on 2026-09-28, at 5703d96c
+
+Fix range fe1fb32a..5703d96c: 22c7b169 adds the run_ab.py repair to the
+intent's Out of scope; 5703d96c restores three renderer probes in
+`loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py`,
+drops that file's `MANUAL_OVERRIDES` row in the classifier, and rewrites the
+census report's per-file row, two mapping rows and the A5 section. Rows 1, 4
+read the classifier, row 2 the test file, rows 3 and 5 the report — all five
+re-tested in full. Clean copy: `git worktree add <scratch>/at-wt4 5703d96c`
+(`git status --short` empty). `P` as in the previous re-run.
+
+- Setup: the README package-test environment resolved in the clean copy;
+  every targeted run below passed.
+- 1: re-tested — `python3 $C`: exit 0,
+  `counts: {'behavior': 113, 'gate-eval': 7, 'grammar-invariant': 5, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 48}`
+  (227 files). Parsed classifier output vs the report's "Full Per-File
+  Classification" table: 227 = 227, no class differs (the parse's one extra
+  name, `test_principles_amendment.py`, is the spot-check row at
+  census-report.md:275, not the per-file table).
+  `test_adversarial_description_ab_probes.py` → `behavior has_pins=no`, no
+  override. Verdict: works.
+- 2: re-tested — `P -v loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py`
+  → `10 passed` (7 run_ab probes + 3 restored renderer probes).
+  `P loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py tests/test_kickoff_defaults.py tests/test_principles_ratification.py tests/test_loom_skill_description_catalog.py loom-code/tests/test_loom_checker_standing.py`
+  → `51 passed in 3.80s`. `grep -nE "sha|hash"` on the probe file: no hit
+  outside the section comment. Full suite not run here (finalize-review runs
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+  and refuses the attestation on failure). Verdict: works.
+- 3: re-tested — replacement table: 18 rows; every `file::function` named
+  (32) has a `def` in the tracked tree (the three restored probes checked
+  in the probe file, which the parse attributed to column 1). Last run's two
+  failed spot checks:
+  - hash-guard row now reads "review lens: semantic reading of the
+    description", and says a results rerun needs run_ab.py repaired first,
+    as follow-up outside this change; the intent's Out of scope carries the
+    same line (22c7b169). `python3 .../ab/run_ab.py --help` still →
+    `ModuleNotFoundError: No module named 'test_loom_skill_description_catalog'`,
+    which the row now states. The named replacement is a lens reading, not a
+    facet id (the skill lens in `lenses.md:107-114` scores on the docs
+    dimensions); accepted as the user-decided replacement (plan.md:82).
+  - probe-file row no longer claims "none needed" for the renderer probes;
+    it names the three restored tests, all present.
+  Verdict: works.
+- 4: re-tested — same classifier run: `sentence-pin: 0`, gate-eval its own
+  class (7); the dropped override leaves 10 `MANUAL_OVERRIDES` rows, all
+  checked in the previous re-run and unchanged. The restored probes assert
+  rendered text equality and `pytest.raises`, no prose literal. Verdict: works.
+- 5: re-tested — `git archive 946e06d1 | tar -x -C <scratch>/base946b`;
+  `python3 $C --count-exec` → 727; clean 5703d96c → 728. Per-name diff with
+  the classifier's `executes()`: gone `test_adversarial_description_ab_probes.py::test_guard_edited_skill_description_fails_closed`,
+  `::test_guard_without_docs_still_collects` (deleted guard only); added
+  `test_adversarial_census_gaming.py::test_census_roots_flag_given_is_accepted`,
+  `test_adversary_recipe_code.py::test_case_class_check_recipe_row_dropped_goes_red`,
+  `test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic`
+  — matches the report. Mutation check in the scratch copy (reverted with
+  `git checkout`, tree clean after) on `_render_description`
+  (`tests/test_loom_skill_description_catalog.py:46`), `P ... -k render`:
+  missing header returns `""` → 1 failed; stop at blank line → 1 failed;
+  keep trailing whitespace → 1 failed. Verdict: works.
+- Probes, each its own command: `test_classify_test_files.py` 5 passed,
+  `test_adversarial_census_gaming.py` 2 passed,
+  `test_adversarial_pruned_guards.py` 1 passed.
