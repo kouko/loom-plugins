@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.5.1] — 2026-09-28 — Remove goal-create and critique sentence-pin tests (batch 1 of the prose-pin stock cleanup).
+
+Patch: tests only; no station guidance, field, rule id or contract change.
+
+- Goal-create and critique whole-file sentence-pin tests deleted, pruned to structure and behavior checks.
+
 ## [5.5.0] — 2026-09-27 — structured nodes in flow, arch and tree generators
 
 - Flow, arch and tree generators now use structured nodes with title, separator
