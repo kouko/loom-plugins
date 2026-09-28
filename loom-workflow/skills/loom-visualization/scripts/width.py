@@ -56,3 +56,92 @@ def split_lines(label: str) -> list[str]:
                 f"label {label!r} contains control character U+{ord(c):04X}; remove it"
             )
     return label.splitlines() or [""]
+
+
+def wrap_label(text: str, max_width: int) -> list[str]:
+    """Width-aware wrapping that breaks preferentially at ASCII spaces.
+
+    Args:
+        text: The text to wrap
+        max_width: Maximum width in display cells per line
+
+    Returns:
+        List of wrapped lines
+    """
+    if max_width <= 0:
+        raise ValueError("max_width must be positive")
+
+    if not text:
+        return [""]
+
+    # If the whole text fits, return it as a single line
+    if display_width(text) <= max_width:
+        return [text]
+
+    lines = []
+    remaining = text
+
+    while remaining:
+        # If remaining fits, we're done
+        if display_width(remaining) <= max_width:
+            lines.append(remaining)
+            break
+
+        # Find k = max number of characters that fit
+        k = 0
+        width_so_far = 0
+        while k < len(remaining):
+            c = remaining[k]
+            c_width = char_width(c)
+            if width_so_far + c_width > max_width:
+                break
+            width_so_far += c_width
+            k += 1
+
+        # Now k characters fit, but k+1 would not (if k < len(remaining))
+        if k == len(remaining):
+            # The whole remaining string fits
+            line = remaining
+            remaining = ""
+        elif remaining[k] == ' ' and ord(remaining[k]) < 128:  # ASCII space
+            # Case: next character is a space -> break before the space
+            line = remaining[:k]
+            remaining = remaining[k:]  # includes the space and everything after
+            # Strip any leading spaces (to handle multiple consecutive spaces)
+            remaining = remaining.lstrip(' ')
+        else:
+            # Case: next character is not a space
+            # Look for the last space in remaining[0:k]
+            last_space_idx = -1
+            for i in range(k - 1, -1, -1):
+                if remaining[i] == ' ' and ord(remaining[i]) < 128:  # ASCII space
+                    last_space_idx = i
+                    break
+
+            if last_space_idx >= 0:
+                # Break after the last space
+                line = remaining[:last_space_idx + 1]
+                remaining = remaining[last_space_idx + 1:]
+            else:
+                # No space found, look for the last ASCII-CJK or CJK-ASCII boundary
+                last_boundary_idx = -1
+                for i in range(k - 1, 0, -1):  # Check from end to start, need at least 2 chars for a boundary
+                    if char_width(remaining[i - 1]) != char_width(remaining[i]):
+                        last_boundary_idx = i
+                        break
+
+                if last_boundary_idx >= 0:
+                    # Break before the boundary character
+                    line = remaining[:last_boundary_idx]
+                    remaining = remaining[last_boundary_idx:]
+                else:
+                    # No boundary, break at k (per-character break)
+                    line = remaining[:k]
+                    remaining = remaining[k:]
+
+            # Strip leading spaces (to handle cases where we broke at a space and there are multiple spaces)
+            remaining = remaining.lstrip(' ')
+
+        lines.append(line)
+
+    return lines

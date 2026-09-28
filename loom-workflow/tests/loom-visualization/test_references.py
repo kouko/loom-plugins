@@ -651,3 +651,90 @@ def test_conversation_reply_routes_to_general_only():
     removed = re.sub(r"conversation-situation reply", "reply", text)
     assert "no sentence routing conversation replies to the general set only" \
         in routing_errors(removed)
+
+
+# --- W2-01: node-structure reference (Acceptance #3) ---
+
+NODE_STRUCTURE = REFS / "node-structure.md"
+
+
+def _node_structure_text():
+    return NODE_STRUCTURE.read_text(encoding="utf-8")
+
+
+def test_node_structure_reference_strips_required_phrases():
+    """W2-01 positive: node-structure.md states the structure, body forms,
+    separator and bullet marks, left alignment, content rule, width budget,
+    scope A and the Mermaid counterpart."""
+    text = _node_structure_text()
+    flat = " ".join(text.split()).lower()
+    required = [
+        # structure: title line, separator, body
+        "title line",
+        "separator row",
+        "├───┤",
+        "body",
+        # two body forms
+        "wrapped prose",
+        "bullet lines",
+        # bullet marks
+        "* ",
+        # left alignment
+        "left-aligned",
+        "left alignment",
+        # content rule: expand-or-delete, never empty separator
+        "expanded into an informative phrase or removed from the diagram",
+        "never drawn with an empty separator",
+        "container rule",
+        # width budget
+        "40",
+        "default",
+        "width budget",
+        # scope a
+        "box-drawn nodes",
+        "flow steps",
+        "edge labels",
+        "sequence participants",
+        "single-line",
+        # mermaid counterpart
+        "<div style='text-align:left'>",
+        "<br/>━━━━━━<br/>",
+        "• ",
+        "flowchart rectangles",
+        "diamonds",
+        "state nodes stay title-only",
+        # points at mermaid-cot-spec.md (does not restate it)
+        "references/mermaid-cot-spec.md",
+    ]
+    missing = [p for p in required if p not in flat]
+    assert not missing, f"node-structure.md missing: {missing}"
+
+
+def test_node_structure_reference_cites_no_repository_records():
+    text = _node_structure_text()
+    assert "docs/loom" not in text
+    assert "doc/loom" not in text
+
+
+def test_node_structure_reference_does_not_restate_skills_width_table():
+    """W2-01: node-structure.md must cross-reference SKILL.md's width table,
+    not redefine emoji/ambiguous-symbol width rules."""
+    text = _node_structure_text()
+    # Should point SKILL.md's width rules rather than restating them
+    assert "SKILL.md" in text
+    assert "width rules" in " ".join(text.split()) or "width table" in " ".join(text.split())
+
+
+def test_skill_md_points_to_node_structure_reference():
+    """W2-01 negative: SKILL.md Step 4 points at references/node-structure.md."""
+    text = SKILL.read_text(encoding="utf-8")
+    assert "references/node-structure.md" in text
+
+
+def test_skill_md_names_unstructured_multiline_box_failure_mode():
+    """W2-01 negative: SKILL.md names the unstructured multi-line box
+    failure (content lines with no separator)."""
+    text = SKILL.read_text(encoding="utf-8")
+    fail = " ".join(text.split())
+    assert "no separator" in fail or "without a separator" in fail
+    assert "unstructured" in fail.lower()

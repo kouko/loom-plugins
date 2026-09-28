@@ -29,21 +29,33 @@ No generator covers labelled edges. Hand-author the chain, then verify it with
 ```
 ┌───────────────────────────┐
 │ p95 latency doubled       │
+├───────────────────────────┤
+│ * 2x increase observed    │
+│ * isolated to /orders     │
 └─────────────┬─────────────┘
               │ because
               ▼
 ┌───────────────────────────┐
 │ N+1 queries on /orders    │
+├───────────────────────────┤
+│ * 50+ queries per request │
+│ * line items loaded 1-by-1│
 └─────────────┬─────────────┘
               │ because
               ▼
 ┌───────────────────────────┐
 │ ORM lazy-loads line items │
+├───────────────────────────┤
+│ * default relationship    │
+│ * missing eager fetch     │
 └─────────────┬─────────────┘
               │ so
               ▼
 ┌───────────────────────────┐
 │ eager-load in one query   │
+├───────────────────────────┤
+│ * use joinedload          │
+│ * single round-trip       │
 └───────────────────────────┘
 ```
 
@@ -57,11 +69,11 @@ every edge is labelled, and `==>` marks the step into the conclusion.
 flowchart TD
     subgraph r1["Symptom"]
         direction LR
-        A["p95 latency doubled"] -->|"traced to"| B["N+1 queries on /orders"]
+        A[<div style='text-align:left'>p95 latency doubled<br/>━━━━━━━━━━━━━━━━━━<br/>• 2x increase observed<br/>• isolated to /orders</div>] -->|"traced to"| B[<div style='text-align:left'>N+1 queries on /orders<br/>━━━━━━━━━━━━━━━━━━━━━━<br/>• 50+ queries per request<br/>• line items loaded 1-by-1</div>]
     end
     subgraph r2["Cause and fix"]
         direction LR
-        C["ORM lazy-loads line items"] ==>|"so we"| D["Eager-load in one query"]
+        C[<div style='text-align:left'>ORM lazy-loads line items<br/>━━━━━━━━━━━━━━━━━━━━━━━━━<br/>• default relationship<br/>• missing eager fetch</div>] ==>|"so we"| D[<div style='text-align:left'>Eager-load in one query<br/>━━━━━━━━━━━━━━━━━━━━━━━<br/>• use joinedload<br/>• single round-trip</div>]
     end
     r1 -->|"profiler shows"| r2
     style A fill:#f8f9fa,stroke:#868e96,stroke-width:2px

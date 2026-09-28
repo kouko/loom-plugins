@@ -27,7 +27,7 @@ Run `python3 <skill-dir>/scripts/generate.py tree` (`<skill-dir>` is defined
 in `SKILL.md`) with this input on stdin:
 
 ```json
-{"node": {"label": "loom-workflow", "children": [{"label": "skills", "children": [{"label": "loom-visualization"}, {"label": "handoff"}]}, {"label": "hooks"}, {"label": "scripts"}]}}
+{"node": {"label": "loom-workflow", "children": [{"label": {"title": "skills", "body": ["* loom-visualization", "* handoff"]}}, {"label": "hooks"}, {"label": "scripts"}]}}
 ```
 
 Output:
@@ -35,8 +35,8 @@ Output:
 ```
 loom-workflow
 ├─ skills
-│  ├─ loom-visualization
-│  └─ handoff
+│  * loom-visualization
+│  * handoff
 ├─ hooks
 └─ scripts
 ```

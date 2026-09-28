@@ -29,14 +29,17 @@ in `SKILL.md`) with this input on stdin. The layer
 bands carry no arrows; state the dependencies in the table or below the diagram.
 
 ```json
-{"layers": [{"name": "プレゼンテーション層", "components": ["Web UI", "CLI"]}, {"name": "アプリケーション層", "components": ["API サーバー", "ワーカー"]}, {"name": "データ層", "components": ["PostgreSQL", "Redis"]}]}
+{"layers": [{"name": {"title": "プレゼンテーション層", "body": ["* Web UI", "* CLI"]}, "components": ["Web UI", "CLI"]}, {"name": "アプリケーション層", "components": ["API サーバー", "ワーカー"]}, {"name": "データ層", "components": ["PostgreSQL", "Redis"]}]}
 ```
 
 Output:
 
 ```
 ┌─────────────────────────┐
-│  プレゼンテーション層   │
+│ プレゼンテーション層    │
+├─────────────────────────┤
+│ * Web UI                │
+│ * CLI                   │
 ├─────────────┬───────────┤
 │ Web UI      │ CLI       │
 └─────────────┴───────────┘
@@ -58,7 +61,7 @@ Container level: one subgraph per layer.
 
 ```mermaid
 flowchart TB
-    subgraph P["プレゼンテーション層"]
+    subgraph P["<div style='text-align:left'>プレゼンテーション層<br/>━━━━━━━━━━━━━━━━━━━━━━━<br/>• Web UI<br/>• CLI</div>"]
         UI["Web UI"]
         CLI["CLI"]
     end

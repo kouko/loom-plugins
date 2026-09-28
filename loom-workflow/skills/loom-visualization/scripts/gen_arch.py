@@ -21,10 +21,11 @@ and ASCII (1 cell) labels align in a monospace terminal.
 
 import pathlib
 import sys
+from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines
+from width import display_width, split_lines, wrap_label
 
 
 def _center(label: str, interior: int) -> str:
@@ -62,23 +63,61 @@ def _row_natural_width(components: list[str]) -> int:
     return cells_width + seams
 
 
-def render_arch(layers: list[dict]) -> str:
+def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
     """Render layers as vertically-stacked independent boxes.
 
-    `layers` is [{"name": str, "components": [str, ...]}, ...]. Returns
-    the multi-line diagram as a single string (no trailing newline).
+    `layers` is a list of dicts. Each dict has:
+    - "components": [str, ...] (list of component strings, unchanged)
+    - "name": either a string (current behavior: centered) or a dict with
+      "title" (str) and "body" (list of str) for structured nodes
+
+    For string name: current behavior (centered label)
+    For dict name:
+      - Title line is left-aligned
+      - Followed by a separator row "├─────┤"
+      - Followed by left-aligned body lines (one leading space + content)
+      - Body lines are wrapped at the interior width
+      - Empty body raises ValueError
+
+    Returns the multi-line diagram as a single string (no trailing newline).
     """
     if not layers:
         return ""
 
-    # Shared outer interior width = max over all layers of the layer's
-    # natural component-row width and its name display width.
-    def _name_width(name: str) -> int:
-        return max(display_width(ln) for ln in split_lines(name))
+    # Set budget: use provided width or default 40
+    budget = width if width is not None else 40
+
+    def _name_width(name: Union[str, dict]) -> int:
+        if isinstance(name, str):
+            return max(display_width(ln) for ln in split_lines(name))
+        else:  # dict with title and body
+            return display_width(name["title"])
+
+    def _body_width(name: Union[str, dict]) -> int:
+        if isinstance(name, str):
+            return 0
+        else:  # dict with title and body
+            if not name["body"]:
+                return 0
+            return max(display_width(ln) for ln in name["body"])
+
+    # Shared outer interior width = max over all layers of:
+    # max(display_width(name), min(_row_natural_width(component), budget))
+    def get_layer_width(layer: dict) -> int:
+        name_width = _name_width(layer["name"])
+        # For dict name, apply budget to body width; for string name, body width is 0
+        body_width = _body_width(layer["name"])
+        bounded_body_width = min(body_width, budget) if layer["name"] and isinstance(layer["name"], dict) else 0
+        # For dict name, the effective name width is max(title width, bounded body width)
+        if isinstance(layer["name"], dict):
+            effective_name_width = max(name_width, bounded_body_width)
+        else:
+            effective_name_width = name_width
+        component_width = _row_natural_width(layer["components"])
+        return max(effective_name_width, component_width)
 
     interior = max(
-        max(_row_natural_width(layer["components"]), _name_width(layer["name"]))
-        for layer in layers
+        get_layer_width(layer) for layer in layers
     )
 
     lines: list[str] = []
@@ -148,10 +187,61 @@ def render_arch(layers: list[dict]) -> str:
             return left + "".join(chars) + right
 
         top = "┌" + "─" * interior + "┐"
-        name_lines = [
-            "│" + _center(nl, interior) + "│"
-            for nl in split_lines(layer["name"])
-        ]
+        name = layer["name"]
+        if isinstance(name, str):
+            # String name: if contains \n, treat as structured node (first line
+            # title, remaining lines body); otherwise centered label.
+            if '\n' in name:
+                lines_split = split_lines(name)
+                title = lines_split[0]
+                body = lines_split[1:]
+                if not body:
+                    raise ValueError("Body cannot be empty for structured node from string with \\n")
+
+                # Add title line (left-aligned)
+                name_lines = [
+                    "│ " + title + " " * (interior - display_width(title) - 1) + "│"
+                ]
+
+                # Add separator line
+                name_lines.append("├" + "─" * interior + "┤")
+
+                # Add body lines (left-aligned, wrapped at interior - 1)
+                for body_line in body:
+                    wrapped_lines = wrap_label(body_line, interior - 1)
+                    for wrapped_line in wrapped_lines:
+                        name_lines.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
+            else:
+                # String name without \n: current behavior (centered)
+                name_lines = [
+                    "│" + _center(nl, interior) + "│"
+                    for nl in split_lines(name)
+                ]
+        else:
+            # Dict name: structured node with title and body
+            title = name["title"]
+            body = name["body"]
+
+            # Validate body is not empty
+            if not body:
+                raise ValueError("Body cannot be empty for structured node")
+
+            # Add title line (left-aligned)
+            name_lines = [
+                "│ " + title + " " * (interior - display_width(title) - 1) + "│"
+            ]
+
+            # Add separator line
+            name_lines.append("├" + "─" * interior + "┤")
+
+            # Add body lines (left-aligned, wrapped at interior - 1)
+            for body_line in body:
+                # Wrap the body line at interior - 1 (true content budget)
+                wrapped_lines = wrap_label(body_line, interior - 1)
+                for wrapped_line in wrapped_lines:
+                    # Each wrapped line gets one leading space, then content, then padded to interior
+                    name_lines.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
+
         separator = border("├", "┬", "┤")
         row_lines = [
             "│" + "│".join(grid[r] for grid in cell_line_grids) + "│"

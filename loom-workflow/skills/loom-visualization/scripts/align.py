@@ -23,8 +23,9 @@ from width import display_width
 from checks_seam import find_issues as seam_issues
 from checks_table import find_issues as table_issues
 from checks_kink import find_issues as kink_issues
+from checks_nodes import find_issues as nodes_issues
 
-_CHECKS = (seam_issues, table_issues, kink_issues)
+_CHECKS = (seam_issues, table_issues, kink_issues, nodes_issues)
 
 
 def analyze(text: str) -> tuple[str, list[tuple[int, int, str]]]:

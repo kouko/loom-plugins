@@ -349,3 +349,86 @@ def test_kink_issue_tuple_shape():
     assert isinstance(ln, int) and ln >= 1
     assert isinstance(col, int) and col >= 0
     assert isinstance(msg, str) and msg
+
+
+# ---------------------------------------------------------------------------
+# From ascii-graph tests/test_checks_nodes.py (new node-structure checks)
+# ---------------------------------------------------------------------------
+
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"))
+
+from checks_nodes import find_issues as nodes_find_issues
+
+
+# --- Fixtures --------------------------------------------------------------
+
+# Clean structured box: title / separator / body
+CLEAN_NODE = """\
+┌──────┐
+│ Title│
+├──────┤
+│ Body │
+└──────┘"""
+
+# Clean single-line box (no separator needed)
+CLEAN_SINGLE_LINE = """\
+┌──────┐
+│ Only │
+└──────┘"""
+
+# F1: Separator as first interior line (no title above it) - MUST FLAG
+SEPARATOR_FIRST_LINE = """\
+┌───┐
+├───┤
+│ B │
+└───┘"""
+
+# F2: Two consecutive separators (second has no content between) - MUST FLAG
+DOUBLE_SEPARATOR = """\
+┌────┐
+│ T  │
+├────┤
+├────┤
+│ B  │
+└────┘"""
+
+
+def test_clean_structured_box_has_no_violations():
+    """A clean structured box (title / separator / body) must not be flagged."""
+    assert nodes_find_issues(CLEAN_NODE.splitlines()) == []
+
+
+def test_clean_single_line_box_has_no_violations():
+    """A clean single-line box (no separator) must not be flagged."""
+    assert nodes_find_issues(CLEAN_SINGLE_LINE.splitlines()) == []
+
+
+def test_separator_first_line_is_flagged():
+    """A box where the first interior line is a separator (no title) must be flagged."""
+    issues = nodes_find_issues(SEPARATOR_FIRST_LINE.splitlines())
+    assert len(issues) >= 1
+    # The issue should be about separator with no content before it
+    messages = [msg for _ln, _col, msg in issues]
+    # Check for the expected issue message family
+    assert any("separator" in m.lower() and "before" in m.lower() for m in messages)
+
+
+def test_double_separator_is_flagged():
+    """A box with two consecutive separators must flag the second one."""
+    issues = nodes_find_issues(DOUBLE_SEPARATOR.splitlines())
+    assert len(issues) >= 1
+    # The issue should be about separator with no content between separators
+    messages = [msg for _ln, _col, msg in issues]
+    assert any("separator" in m.lower() for m in messages)
+
+
+def test_nodes_issue_tuple_shape():
+    issues = nodes_find_issues(SEPARATOR_FIRST_LINE.splitlines())
+    if issues:
+        ln, col, msg = issues[0]
+        assert isinstance(ln, int) and ln >= 1
+        assert isinstance(col, int) and col >= 0
+        assert isinstance(msg, str) and msg

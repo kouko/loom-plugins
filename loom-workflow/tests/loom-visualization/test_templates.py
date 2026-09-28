@@ -345,6 +345,58 @@ def test_remote_viewer_no_longer_forces_ascii():
         assert not hit, f"{path.name}: {hit.group(0)!r}"
 
 
+def test_w2_02_templates_adopt_node_structure():
+    """REQ-2 / Acceptance #2: templates show the node structure in ASCII and Mermaid."""
+    # Generated examples demonstrate structured nodes (title + body).
+    # 02-linear-steps: at least one step carries {"title":..., "body":[...]}
+    examples = generator_examples(_read("02-linear-steps.md"))
+    assert examples, "02: no generator example"
+    assert any(
+        isinstance(step, dict) and "title" in step and "body" in step
+        for _, payload, _ in examples
+        for step in payload.get("steps", [])
+    ), "02: payload must include at least one structured step"
+
+    # 07-hierarchy: at least one node label is a structured dict
+    def _has_structured_label(node):
+        label = node.get("label")
+        if isinstance(label, dict) and "title" in label and "body" in label:
+            return True
+        return any(_has_structured_label(child) for child in node.get("children") or [])
+
+    examples = generator_examples(_read("07-hierarchy.md"))
+    assert examples
+    assert any(
+        _has_structured_label(payload.get("node", {}))
+        for _, payload, _ in examples
+    ), "07: payload must include at least one structured node label"
+
+    # 08-system-architecture: at least one layer name is a structured dict
+    examples = generator_examples(_read("08-system-architecture.md"))
+    assert examples
+    assert any(
+        isinstance(layer.get("name"), dict) and "title" in layer.get("name", {}) and "body" in layer.get("name", {})
+        for _, payload, _ in examples
+        for layer in payload.get("layers", [])
+    ), "08: payload must include at least one structured layer name"
+
+    # Hand-authored ASCII (03, 04, 05) use the three-segment box structure (tee separator)
+    tee_separator = re.compile(r"├[─━]+┤")
+    for name in ("03-branching-decision.md", "04-reasoning-chain.md", "05-state-lifecycle.md"):
+        ascii_block = [b for lang, b in fences(sections(_read(name))["ASCII"]) if lang == ""][0]
+        assert tee_separator.search(ascii_block), f"{name}: no tee separator in ASCII box"
+
+    # Mermaid: rectangles use div-label structure (02, 04, 08), diamonds/states stay title-only (03, 05)
+    div_label = "<div style='text-align:left'>"
+    for name in ("02-linear-steps.md", "04-reasoning-chain.md", "08-system-architecture.md"):
+        mermaid = [b for lang, b in fences(sections(_read(name))["Mermaid"]) if lang == "mermaid"][0]
+        assert div_label in mermaid, f"{name}: Mermaid missing div-label structure for structured nodes"
+
+    for name in ("03-branching-decision.md", "05-state-lifecycle.md"):
+        mermaid = [b for lang, b in fences(sections(_read(name))["Mermaid"]) if lang == "mermaid"][0]
+        assert div_label not in mermaid, f"{name}: Mermaid diamonds/states must stay title-only"
+
+
 def test_every_ascii_section_names_its_destination_condition():
     """The drawn form is conditioned on the destination in every template."""
     for name in EXPECTED:

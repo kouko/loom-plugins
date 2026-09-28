@@ -9,7 +9,7 @@ the matching generator, prints the rendered diagram, returns 0. Shapes:
     tree   {"node": {...}}
     bar    {"pairs": [["label", value], ...], "width": 20}
     arch   {"layers": [{"name": str, "components": [str, ...]}, ...]}
-    seq    {"participants": [str, ...], "messages": [{"from","to","label"}, ...]}
+    seq    {"participants": [str, ...], [{"from","to","label"}, ...]}
 
 Unknown shape -> error message on stderr, return 2.
 """
@@ -46,14 +46,14 @@ def render(shape: str, payload: dict) -> str:
             ascii_only=payload.get("ascii_only", False),
         )
     if shape == "flow":
-        return render_flow(payload["steps"])
+        return render_flow(payload["steps"], width=payload.get("width"))
     if shape == "tree":
         return render_tree(payload["node"])
     if shape == "bar":
         pairs = [(label, value) for label, value in payload["pairs"]]
         return render_bar(pairs, width=payload.get("width", 20))
     if shape == "arch":
-        return render_arch(payload["layers"])
+        return render_arch(payload["layers"], width=payload.get("width"))
     if shape == "seq":
         return render_seq(payload["participants"], payload["messages"])
     raise ValueError(f"unknown shape: {shape!r} (expected one of {_SHAPES})")
