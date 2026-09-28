@@ -30,19 +30,29 @@ charter: 1.1
 - Test: A2 positive: structure-and-grammar-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; negative: no-row-names-deleted-test.
 - Risk: agent-decided — kept scans re-anchor only on existing headings or gate markers; catalog description-shape checks stay; polarity checks in test_references.py go unless tagged structural.
 
-**W1-03 Newly flagged files**  after: W0-02  acceptance: 2, 3
-- Files: every file in the "newly flagged" section of docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/deletion-list.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-new.md
+**W1-03 Newly flagged loom-code and root files**  after: W0-02  acceptance: 2, 3
+- Files: loom-code/tests/test_agent_model_frontmatter.py, loom-code/tests/test_dispatch_profile_resolver.py, loom-code/tests/test_legacy_contract_removed.py, loom-code/tests/test_probes_language_policy.py, loom-code/tests/test_ship_worktree_merge.py, tests/test_loom_plugin_install_layout.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-new-code.md
 - Test: A2 positive: behavior-and-structure-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: output-assert-left-untouched.
-- Risk: agent-decided — when the section exceeds about 10 files, Build splits it into disjoint per-plugin tasks W1-05 onward and updates this plan before dispatch.
+- Risk: agent-decided — split by plugin after W0-01 flagged 14 new files; resolver and install-layout behavior checks stay.
 
 **W1-04 Deferred patch release bump**  after: —  acceptance: 6
 - Files: loom-*/plugin.json, loom-*/.claude-plugin/plugin.json, loom-*/.codex-plugin/plugin.json, loom-*/CHANGELOG.md, README.md and loom-*/README*.md, loom-code/tests/test_write_plan_station_text.py, loom-design/tests/spec/test_capture_intent_contract.py, loom-workflow/tests/scripts/test_release_metadata.py
 - Test: A6 positive: current-release-metadata-synchronized; negative: stale-pin-fails-before-rewrite.
 - Risk: agent-decided — loom-code 3.22.2, loom-design 2.6.1, loom-workflow 5.5.2; CHANGELOG entries cover batches 2 and 3; committed in Build so the attestation covers it.
 
+**W1-05 Newly flagged loom-workflow files**  after: W0-02, W1-01  acceptance: 2, 3
+- Files: loom-workflow/tests/decision-map/test_decision_map_intent_binding.py, loom-workflow/tests/git-memory/test_loom_delegation.py, loom-workflow/tests/loom-visualization/test_skill_script_paths.py, loom-workflow/tests/loom-visualization/test_templates.py, loom-workflow/tests/recap-state/test_seven_block_schema.py, loom-workflow/tests/scripts/test_visualization_card_hook.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-new-workflow.md
+- Test: A2 positive: behavior-and-structure-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: table-header-assert-gets-override.
+- Risk: agent-decided — after W1-01 because both touch loom-visualization tests; misses the detector named (regex, pinned_sentence_ok) are judged per row.
+
+**W1-06 Newly flagged loom-design files**  after: W0-02  acceptance: 2, 3
+- Files: loom-design/tests/interface/test_knowledge_triage.py, loom-design/tests/principles/test_principles_ratified_line.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-new-design.md
+- Test: A2 positive: behavior-and-structure-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: index-lookup-pin-judged.
+- Risk: agent-decided — count-form and index-form sentence lookups in test_knowledge_triage.py are pins unless tagged structural.
+
 ### Wave 2 — close-out
 
-**W2-01 Census and recount**  after: W1-01, W1-03, W1-04  acceptance: 1, 4, 5
+**W2-01 Census and recount**  after: W1-01, W1-03, W1-04, W1-05, W1-06  acceptance: 1, 4, 5
 - Files: docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/census-report.md
 - Test: A1 positive: clean-worktree-census-zero-pins; negative: other-bucket-exits-1. A4 positive: check-mechanisms-all-clear; negative: dangling-eval-reported. A5 positive: recount-not-below-base; negative: deleted-function-tagged-exec-fails.
 - Risk: agent-decided — stitches the mapping files into one table; every remaining has_pins=yes file has a visible override row with its reason; runs from a clean worktree.
