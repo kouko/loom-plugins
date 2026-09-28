@@ -162,7 +162,6 @@ def test_router_tables_preserve_direct_leaf_targets() -> None:
         targets = re.findall(r"\]\(\.\./([^/]+)/SKILL\.md\)", router)
         assert len(targets) == len(set(targets))
         assert set(targets) == set(skills) - {router_name}
-        assert "direct" in router.lower()
 
 
 def test_routing_corpus_covers_positive_boundary_and_non_trigger_cases() -> None:

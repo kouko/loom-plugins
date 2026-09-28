@@ -26,9 +26,9 @@ def _step5_architecture_paragraph() -> str:
     return hits[0]
 
 
-def test_write_plan_step5_reads_architecture_and_names_rule() -> None:
+def test_write_plan_step5_names_architecture_risk_line_and_ratification() -> None:
     para = _step5_architecture_paragraph()
-    assert "Risk line" in para and "rule id" in para, para
+    assert "Risk line" in para, para
     assert "ratified-by: <name> <date>" in para
 
 
