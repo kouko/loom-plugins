@@ -11,12 +11,17 @@ Classifies every test file that reads prose (.md) into one of:
                `in`-style literal checks) with no executable behavior
   grammar-invariant — pins a syntax/grammar rule the checker cannot express
                (gate marker form, version format, matcher self-tests)
+  gate-eval  — would be sentence-pin, but its path is named by an `eval:` value
+               in docs/loom/evidence/mechanisms.yaml (a gate's execution evidence;
+               kept in batch 1, W3-02)
 
 A file is a prose reader if it names a .md path. `behavior` wins ties;
 `grammar-invariant` wins over `sentence-pin` only for matcher self-tests
 and gate-marker grammar, which the plan lists explicitly as retained.
 
 Usage: python3 classify-test-files.py [--roots ...]  (prints a table)
+       python3 classify-test-files.py --count-exec <dir>  (A5: test functions
+       whose body carries the execution signal, under <dir>'s four test roots)
 """
 from __future__ import annotations
 
@@ -100,19 +105,10 @@ GRAMMAR_INVARIANT_CONTENT = re.compile(
 )
 
 
-def classify(path: Path) -> tuple[str, dict]:
-    """Return (primary_class, secondary_markers)."""
-    text = path.read_text(encoding="utf-8", errors="replace")
-    has_md = ".md" in text or ".markdown" in text
-
-    if not has_md:
-        return "not-prose", {}
-
-    # Check for behavior FIRST (executes programs or imports production logic)
-    # Behavior wins ties per the spec
-    # For subprocess calls, also require assertions on subprocess results
+def executes(text: str) -> bool:
+    """Execution signal: a program run (subprocess/checker/script) whose result is asserted."""
     has_subprocess_assert = bool(re.search(r'\.(?:stdout|stderr|returncode)|pytest\.raises', text))
-    is_behavior_from_execution = (
+    return bool(
         EXECUTE.search(text)
         or (
             (
@@ -125,8 +121,70 @@ def classify(path: Path) -> tuple[str, dict]:
             )
             and has_subprocess_assert
         )
-        or PROD_IMPORT.search(text)
     )
+
+
+def load_gate_evals(repo: Path = REPO) -> set[str]:
+    """Repo paths named by any `eval:` value of mechanisms.yaml (the part before `::`)."""
+    import yaml
+
+    data = yaml.safe_load((repo / "docs/loom/evidence/mechanisms.yaml").read_text(encoding="utf-8"))
+    found: set[str] = set()
+
+    def walk(node) -> None:
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k == "eval" and isinstance(v, str):
+                    found.add(v.strip().strip("\"'").split("::")[0].strip())
+                else:
+                    walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                walk(v)
+
+    walk(data)
+    return found
+
+
+def classify(path: Path, gate_evals: set[str] = frozenset()) -> tuple[str, dict]:
+    """Return (primary_class, secondary_markers)."""
+    cls, secondary = _classify(path)
+    if cls == "sentence-pin":
+        try:
+            key = path.resolve().relative_to(REPO).as_posix()
+        except ValueError:
+            key = path.as_posix()
+        if key in gate_evals:
+            return "gate-eval", secondary
+    return cls, secondary
+
+
+def count_executing_tests(base: Path) -> int:
+    """Count test functions whose own body carries the execution signal, under base's four test roots."""
+    import ast
+
+    total = 0
+    for root in DEFAULT_ROOTS:
+        for p in sorted((base / root).rglob("*.py")):
+            src = p.read_text(encoding="utf-8", errors="replace")
+            for node in ast.walk(ast.parse(src)):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test"):
+                    if executes(ast.get_source_segment(src, node) or ""):
+                        total += 1
+    return total
+
+
+def _classify(path: Path) -> tuple[str, dict]:
+    text = path.read_text(encoding="utf-8", errors="replace")
+    has_md = ".md" in text or ".markdown" in text
+
+    if not has_md:
+        return "not-prose", {}
+
+    # Check for behavior FIRST (executes programs or imports production logic)
+    # Behavior wins ties per the spec
+    # For subprocess calls, also require assertions on subprocess results
+    is_behavior_from_execution = executes(text) or PROD_IMPORT.search(text)
 
     # Additional behavior check: imports of production modules located in a scripts directory
     is_behavior_from_script_import = False
@@ -197,14 +255,19 @@ def classify(path: Path) -> tuple[str, dict]:
 
 
 def main() -> int:
+    if "--count-exec" in sys.argv:
+        base = Path(sys.argv[sys.argv.index("--count-exec") + 1]).resolve()
+        print(f"executing test functions under {base}: {count_executing_tests(base)}")
+        return 0
     roots = DEFAULT_ROOTS if "--roots" not in sys.argv else sys.argv[sys.argv.index("--roots") + 1:].split(",")
-    counts: dict[str, int] = {}
+    gate_evals = load_gate_evals()
+    counts: dict[str, int] = {"sentence-pin": 0, "gate-eval": 0}  # A4 reads these even at zero
     rows = []  # (file, class, secondary_markers)
     for root in roots:
         for p in sorted((REPO / root).rglob("*.py")):
-            cls, secondary = classify(p)
+            cls, secondary = classify(p, gate_evals)
             counts[cls] = counts.get(cls, 0) + 1
-            if cls in {"sentence-pin", "structure", "grammar-invariant", "behavior"}:
+            if cls in {"sentence-pin", "gate-eval", "structure", "grammar-invariant", "behavior"}:
                 secondary_str = ", ".join(f"{k}={v}" for k, v in secondary.items()) if secondary else ""
                 rows.append((p.relative_to(REPO).as_posix(), cls, secondary_str))
 
