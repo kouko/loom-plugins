@@ -307,10 +307,6 @@ MANUAL_OVERRIDES = {
         "pure sentence pin on codex-first-contact.md, named by the mechanisms.yaml "
         "eval of write-plan.codex-installed-hook-trust-boundary; batch 2",
     ),
-    "loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py": (
-        "behavior",
-        "loads run_ab.py and executes parse_stream/decide/report on fixtures",
-    ),
     "loom-workflow/tests/scripts/test_distill_sessions_compaction.py": (
         "gate-eval",
         "needle presence in SKILL.md, some needles phrases (Read it when, No "

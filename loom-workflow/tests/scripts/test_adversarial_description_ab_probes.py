@@ -1,13 +1,13 @@
 """Adversarial probes for the loom-visualization description A/B runner.
 
-Targets: the A/B runner's stream parser and decision rule (ab/run_ab.py). The
-runner imports the description renderer from
-tests/test_loom_skill_description_catalog.py, so the fixture puts that folder
-on the import path.
+Targets: the A/B runner's stream parser and decision rule (ab/run_ab.py), and
+the description renderer in tests/test_loom_skill_description_catalog.py that
+feeds the description-length budget check. The runner imports that renderer,
+so its fixture puts the catalog folder on the import path.
 
 The probes are ordinary tests: each asserts the behaviour that should hold, and
-a passing probe records an attack the change survived. The probes skip when
-docs/ is absent.
+a passing probe records an attack the change survived. The probes that load
+ab/run_ab.py skip when docs/ is absent.
 """
 
 from __future__ import annotations
@@ -24,6 +24,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 CHANGE_DIR = REPO_ROOT / "docs/loom/2026-09-14-loom-visualization-description-trigger"
 RUN_AB = CHANGE_DIR / "ab/run_ab.py"
 CATALOG = REPO_ROOT / "tests/test_loom_skill_description_catalog.py"
+SKILL = REPO_ROOT / "loom-workflow/skills/loom-visualization/SKILL.md"
 
 
 def _load(name: str, path: Path):
@@ -41,6 +42,11 @@ def run_ab():
     # was written beside; the catalog test now lives in the root tests/ folder.
     sys.path.insert(0, str(CATALOG.parent))
     return _load("adversarial_run_ab", RUN_AB)
+
+
+@pytest.fixture(scope="module")
+def catalog():
+    return _load("adversarial_description_catalog", CATALOG)
 
 
 def _tool(name: str, inp: object) -> dict:
@@ -134,3 +140,34 @@ def test_report_errored_b_session_holds(run_ab, tmp_path: Path, monkeypatch) -> 
         json.dumps({"type": "result", "is_error": True, "api_error_status": 429, "result": "limit"})])
     run_ab.report(runs=1)
     assert "**SHIP**" not in (tmp_path / "results.md").read_text(encoding="utf-8")
+
+
+# --- renderer shared with the description budget check -------------------
+
+
+def test_render_description_trailing_whitespace_renders_identically(catalog) -> None:
+    """Trailing spaces on the scalar line render to the same text."""
+    text = SKILL.read_text(encoding="utf-8")
+    shipped = catalog._render_description(text)
+    head, rest = text.split("\n---\n", 1)
+    padded = head.replace(shipped, shipped + "   \t") + "\n---\n" + rest
+    assert catalog._render_description(padded) == shipped
+
+
+def test_render_description_folded_scalar_fails_closed(catalog) -> None:
+    """A folded (>) or plain scalar is not silently rendered as an empty description."""
+    shipped = catalog._render_description(SKILL.read_text(encoding="utf-8"))
+    for header in ("description: >\n", "description: "):
+        text = f"---\nname: x\n{header}  {shipped}\n---\nbody\n"
+        with pytest.raises(AssertionError):
+            catalog._render_description(text)
+
+
+def test_render_description_blank_line_paragraph_is_rendered(catalog) -> None:
+    """Text after a blank line inside the block scalar is part of the rendered description."""
+    text = SKILL.read_text(encoding="utf-8")
+    shipped = catalog._render_description(text)
+    extra = "untested extra words"
+    edited = text.replace(shipped + "\n", shipped + "\n\n  " + extra + "\n", 1)
+    assert edited != text
+    assert catalog._render_description(edited) == shipped + " " + extra

@@ -1,6 +1,6 @@
 # Census Report — Prose-Pin Stock Cleanup (W0-01, regenerated in the end-of-Build fix round)
 
-Regenerated in W4-03 (2026-09-28) at commit `04eedd4c` of branch `engineering/2026-09-27-prose-pin-stock-cleanup`, in a clean `git worktree` of that commit (no untracked files), from
+Regenerated in the W4-03 fix round (2026-09-28) on branch `engineering/2026-09-27-prose-pin-stock-cleanup`, in a clean `git worktree` of the fix-round tree (parent `22c7b169` plus this round's probe-file and classifier changes) (no untracked files), from
 `python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py` (exit 0; it exits 1 while any file is `other`).
 Total test files scanned: 227
 
@@ -194,7 +194,7 @@ Every scanned file, `not-prose` and `other` included.
 | loom-workflow/tests/recap-state/test_readmes.py | structure |  |
 | loom-workflow/tests/recap-state/test_seven_block_schema.py | structure |  |
 | loom-workflow/tests/recap-state/test_skill_md.py | structure |  |
-| loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py | behavior | auto=other, override=behavior, reason=loads run_ab.py and executes parse_stream/decide/report on fixtures |
+| loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_adversarial_hook_probes.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_adversarial_visualization_card_hosts.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_critique_compaction.py | gate-eval | has_pins=yes |
@@ -285,7 +285,7 @@ The end-of-Build adversary showed the earlier zero came partly from comments. Co
 - **`split_sentences(` kept.** Removing it moved `test_build_recovery_rules.py` and `test_closing_review_recovery_rules.py` from gate-eval to structure, yet both really pin phrases (`_require` phrase lists, exact paragraph endings) in a form no other signal sees; that part was reverted.
 - **One manual override** (`MANUAL_OVERRIDES` in the classifier, printed as `auto=…, override=…`): `loom-code/tests/test_adversary_recipe_shape.py` → structure, because split_sentences feeds a duplicate-sentence check across recipe files and no prose literal is asserted.
 - **W4-02: the `other` bucket emptied.** Acceptance testing found 12 prose-reading files in a fifth `other` bucket the table did not print. Each now has a `MANUAL_OVERRIDES` row with a reason tied to what it asserts (printed in the per-file table), two pure pins were deleted, the table prints every file, and the classifier exits 1 while any file is `other`.
-- **W4-03: no override hides a pin.** Each override states the file's true class with a reason that matches what it asserts. The hash guard is deleted; the kickoff phrase pins and the exact amendment literal in `tests/test_principles_ratification.py` are removed, so those two files are structure with no prose literal; `test_adversarial_description_ab_probes.py` is behavior (it loads run_ab.py and executes parse_stream/decide/report).
+- **W4-03: no override hides a pin.** Each override states the file's true class with a reason that matches what it asserts. The hash guard is deleted; the kickoff phrase pins and the exact amendment literal in `tests/test_principles_ratification.py` are removed, so those two files are structure with no prose literal; `test_adversarial_description_ab_probes.py` is behavior on its own (its restored renderer probes assert `pytest.raises`), so the fix round dropped its override.
 
 Also in this round: the appended `# prose_pin matcher self-test` comments were removed from the four recipe modules, and their leftover pin tables and synthetic pin tests deleted.
 
@@ -309,8 +309,8 @@ Dispositions are the net diff against base `946e06d1`. Review-lens facets are th
 | `loom-workflow/tests/scripts/test_goal_create_compaction.py` | deleted | Goal-create entrypoint keeps modes, floor, invocation | `test_skill_md.py::test_declares_two_modes_and_conditional_arc`, `::test_floor_invocation_line_names_the_script`, `::test_invocation_section_counts_the_offer_sites_that_exist` |
 | `loom-code/tests/test_principles_amendment.py` | deleted (W4-02) | PRINCIPLES.md non-negotiable 2 sentences and the exact ratified-by line | `tests/test_principles_ratification.py::test_exactly_one_ratified_by_line` (one log line); checker rule `standing.product-principles-reject` (signature grammar); lens facet `omission` (the wording) |
 | `loom-code/tests/test_ship_guidance_presence.py` | deleted (W4-02) | Ship SKILL.md table and no-inline-list guidance sentences | lens facet `omission` |
-| `loom-workflow/tests/scripts/test_loom_visualization_description_ab.py` | deleted (W4-03, user-decided) | loom-visualization description equals the A/B-tested text (two hash comparisons, one phrase pin) | review lens semantic reading of the description + rerun docs/loom/2026-09-14-loom-visualization-description-trigger/ab/run_ab.py |
-| `loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py` | pruned (W4-03: `test_guard_edited_skill_description_fails_closed`, `test_render_description_trailing_whitespace_renders_identically`, `test_render_description_folded_scalar_fails_closed`, `test_render_description_blank_line_paragraph_changes_hash`, `test_guard_without_docs_still_collects`) | Attacks on the deleted hash guard and its renderer | none needed (their target is deleted); the run_ab.py parser/decision probes are kept |
+| `loom-workflow/tests/scripts/test_loom_visualization_description_ab.py` | deleted (W4-03, user-decided) | loom-visualization description equals the A/B-tested text (two hash comparisons, one phrase pin) | review lens: semantic reading of the description. A results rerun needs docs/loom/2026-09-14-loom-visualization-description-trigger/ab/run_ab.py repaired first: it fails at import (the catalog moved to tests/) and hard-codes the old description; that repair is follow-up work outside this change. |
+| `loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py` | pruned (W4-03: `test_guard_edited_skill_description_fails_closed`, `test_guard_without_docs_still_collects`) | Attacks on the deleted hash guard only | none needed (their target is deleted). Restored in the fix round, loading `_render_description` from `tests/test_loom_skill_description_catalog.py` (it still feeds the description-length budget check) and asserting rendered text, never a hash: `::test_render_description_trailing_whitespace_renders_identically`, `::test_render_description_folded_scalar_fails_closed`, and `::test_render_description_blank_line_paragraph_is_rendered` (was `..._changes_hash`; now asserts the paragraph appears in the rendered text). The run_ab.py parser/decision probes are kept |
 | `tests/test_kickoff_defaults.py` | pruned (W4-03: `test_trailing_note_no_longer_claims_ci_runs_the_same_paths`) | Phrases in the KICKOFF-DEFAULTS.md package-tests trailing note | kept structure tests `test_kickoff_defaults.py::test_package_tests_command_uses_the_complete_loom_family_preset`, `::test_package_test_lock_pins_and_hashes_the_complete_graph`; lens facet `incorrect-fact` (the note's claims) |
 | `tests/test_principles_ratification.py` | pruned (W4-03: exact amendment literal removed; `test_ratified_by_names_2026_09_15_non_negotiable_2_amendment` renamed `test_exactly_one_ratified_by_line`) | The ratified-by line holds the exact 2026-09-15 amendment entry (not a registered `eval:`, not a grammar check) | kept structure tests `test_principles_ratification.py::test_exactly_one_ratified_by_line`, `::test_pending_ratification_line_absent`; checker rule `standing.product-principles-reject` (signature grammar); lens facet `omission` |
 
@@ -330,9 +330,9 @@ Test functions (`test*`) under the four test roots whose own body carries the cl
 | Tree | Count |
 |------|-------|
 | base `6f3acd78` (pre-cleanup) | 727 |
-| HEAD `04eedd4c` (clean worktree) | 727 |
+| HEAD, W4-03 fix-round tree (clean worktree) | 728 |
 
-HEAD >= base (equal). A per-function name diff of the two trees: three functions disappeared, all W4-03 probes of the deleted hash guard in `loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py` (`test_guard_edited_skill_description_fails_closed`, `test_guard_without_docs_still_collects`, `test_render_description_folded_scalar_fails_closed`); the three additions are `loom-code/tests/test_adversarial_census_gaming.py::test_census_roots_flag_given_is_accepted`, `loom-code/tests/test_adversary_recipe_code.py::test_case_class_check_recipe_row_dropped_goes_red` and `loom-code/tests/test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic`. The two files deleted in W4-02 held no executing function.
+HEAD >= base. A per-function name diff of the two trees: two functions disappeared, both W4-03 probes of the deleted hash guard in `loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py` (`test_guard_edited_skill_description_fails_closed`, `test_guard_without_docs_still_collects`); the three additions are `loom-code/tests/test_adversarial_census_gaming.py::test_census_roots_flag_given_is_accepted`, `loom-code/tests/test_adversary_recipe_code.py::test_case_class_check_recipe_row_dropped_goes_red` and `loom-code/tests/test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic`. The two files deleted in W4-02 held no executing function.
 
 Commands (from the repo root; `<scratch>` is any directory outside the repo):
 
