@@ -209,3 +209,20 @@ Total test files scanned: 238
 | loom-workflow/tests/scripts/test_recap_state_compaction.py | structure () | structure () | Compaction test: checks document shape (frontmatter, sections, headings) ✅ |
 | loom-workflow/tests/loom-memory/test_skill_contract.py | behavior (has_pins=no) | behavior (has_pins=no) | Runs subprocess git ls-files, binds .stdout to staged variable, asserts on returncode ✅ |
 | loom-workflow/tests/decision-map/test_delivery_binding.py | behavior (has_pins=no) | behavior (has_pins=no) | Imports delivery_binding production module (scripts/), validates ticket/brief bindings with repo I/O ✅ |
+
+## Removed sentence-pin tests → replacement evidence
+
+| File | Disposition | What the pins guarded | Replacement evidence |
+| :--- | :--- | :--- | :--- |
+| `loom-code/tests/test_adversary_recipe_code.py` | pruned | Prose recipe rules for adversary | Structural tests + review lens: omission |
+| `loom-code/tests/test_adversary_recipe_shape.py` | pruned | Prose recipe shape for adversary | Structural tests + review lens: omission |
+| `loom-code/tests/test_adversary_recipe_skill_gate.py` | pruned | Prose recipe gates for adversary | Structural tests + review lens: omission |
+| `loom-code/tests/test_adversary_recipe_spec.py` | pruned | Prose recipe spec for adversary | Structural tests + review lens: omission |
+| `loom-code/tests/test_adversary_routing.py` | pruned | Reword-planting assertion | Reword-planting guard |
+| `loom-code/tests/test_agy_tool_mapping.py` | deleted | Reference mapping to AgY tools | Review lens: incorrect-fact |
+| `loom-code/tests/test_dispatch_profile_contract.py` | pruned | Dispatch profile prose contract | Structural tests + review lens: incorrect-fact |
+| `loom-code/tests/test_module_criteria_text.py` | deleted | Modular split criteria | Checker rules + review lens: ambiguity |
+| `loom-workflow/tests/goal-create/test_input_floor.py` | deleted | Input slot names contract | Structural tests |
+| `loom-workflow/tests/goal-create/test_skill_md.py` | pruned | Goal-create input prose pins | Structural tests + review lens: inconsistency |
+| `loom-workflow/tests/scripts/test_critique_compaction.py` | pruned | Critique skill compaction | Structural tests + review lens: omission |
+| `loom-workflow/tests/scripts/test_goal_create_compaction.py` | deleted | Goal-create skill compaction | Structural tests |
