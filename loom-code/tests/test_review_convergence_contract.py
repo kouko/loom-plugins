@@ -6,9 +6,9 @@ from prose_pin import has_negation, split_sentences
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
-# The attack protocol's own text is pinned in test_adversary_protocol.py, so
-# that a change to it turns that file red and names it; this module keeps the
-# station's text.
+# The attack protocol's own structure is checked in test_adversary_protocol.py
+# (a one-home scan and the return-block keys; its wording is not pinned); this
+# module keeps the station's text.
 REVIEWER = (ROOT / "loom-code/agents/reviewer.md").read_text(encoding="utf-8")
 REVIEW_WORDS = " ".join(REVIEW.split())
 CONTRACT = " ".join((REVIEW + "\n" + REVIEWER).split())
