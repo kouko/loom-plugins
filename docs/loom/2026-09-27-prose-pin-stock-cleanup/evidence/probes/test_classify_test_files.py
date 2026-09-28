@@ -43,6 +43,21 @@ def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tm
     assert ctf.count_executing_tests(tmp_path) == 1
 
 
+def _count_one(tmp_path: Path, body: str) -> int:
+    root = tmp_path / "tests"
+    root.mkdir()
+    (root / "test_one.py").write_text(body)
+    return ctf.count_executing_tests(tmp_path)
+
+
+def test_subprocess_call_counts_as_exec(tmp_path: Path) -> None:
+    assert _count_one(tmp_path, 'import subprocess\n\ndef test_x():\n    subprocess.run(["git", "status"])\n') == 1
+
+
+def test_loom_checker_string_literal_not_counted(tmp_path: Path) -> None:
+    assert _count_one(tmp_path, 'TEXT = ""\n\ndef test_x():\n    assert "loom_checker.py selection show" in TEXT\n') == 0
+
+
 def test_census_at_head_places_every_prose_reader_in_a_named_class(monkeypatch, capsys) -> None:
     monkeypatch.setattr("sys.argv", ["classify-test-files.py"])
     assert ctf.main() == 0

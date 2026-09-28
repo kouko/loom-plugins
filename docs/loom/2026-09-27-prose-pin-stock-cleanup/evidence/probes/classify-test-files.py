@@ -21,8 +21,9 @@ A file is a prose reader if it names a .md path. `behavior` wins ties;
 and gate-marker grammar, which the plan lists explicitly as retained.
 
 Usage: python3 classify-test-files.py [--roots a,b,...]  (prints a table)
-       python3 classify-test-files.py --count-exec <dir>  (A5: test functions
-       whose body carries the execution signal, under <dir>'s four test roots)
+       python3 classify-test-files.py --count-exec <dir> [--list]  (A5: test
+       functions that run a program, directly or through a helper, under <dir>'s
+       four test roots; --list prints each counted file::function)
 """
 from __future__ import annotations
 
@@ -184,18 +185,85 @@ def classify(path: Path, gate_evals: set[str] = frozenset()) -> tuple[str, dict]
     return cls, secondary
 
 
-def count_executing_tests(base: Path) -> int:
-    """Count test functions whose own body carries the execution signal, under base's four test roots."""
+RUNNER_CALLS = {"subprocess.run", "subprocess.check_output", "subprocess.check_call",
+                "subprocess.call", "subprocess.Popen", "os.system", "os.popen"}
+LOADER_CALLS = {"module_from_spec", "import_module", "run_path", "run_module"}
+COUNT_HELPER_MODULES = {"prose_pin", "rehearse_probes", "__init__"}  # test helpers kept in scripts/
+
+
+def production_modules(base: Path) -> set[str]:
+    """Module names defined under a `scripts` dir of base that is not a test or docs dir."""
+    names: set[str] = set()
+    for d in base.rglob("scripts"):
+        if not d.is_dir() or {"tests", "docs", ".claude", ".git"} & set(d.relative_to(base).parts):
+            continue
+        names.update(p.stem for p in d.rglob("*.py"))
+        names.update(p.name for p in d.iterdir() if p.is_dir())
+        names.add("scripts")  # `from scripts.<module> import ...`
+    return names - COUNT_HELPER_MODULES
+
+
+def _dotted(node) -> str:
     import ast
 
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return f"{_dotted(node.value)}.{node.attr}"
+    return ""
+
+
+def executing_test_names(src: str, prod: set[str]) -> list[str]:
+    """Test functions that run a program: a subprocess/os call, a production-code call, or a
+    local helper (or fixture parameter) that does either. String literals never count."""
+    import ast
+
+    tree = ast.parse(src)
+    funcs = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    prod_names: set[str] = set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.ImportFrom) and n.module and n.module.split(".")[0] in prod:
+            prod_names.update(a.asname or a.name for a in n.names)
+        elif isinstance(n, ast.Import):
+            prod_names.update((a.asname or a.name).split(".")[0] for a in n.names if a.name.split(".")[0] in prod)
+    loaders = set(LOADER_CALLS) | {f.name for f in funcs if any(
+        isinstance(c, ast.Call) and _dotted(c.func).split(".")[-1] in LOADER_CALLS for c in ast.walk(f))}
+    for n in tree.body:  # module names bound to a path-loaded module or a production attribute
+        if isinstance(n, ast.Assign):
+            loaded = isinstance(n.value, ast.Call) and _dotted(n.value.func).split(".")[-1] in loaders
+            if loaded or _dotted(n.value).split(".")[0] in prod_names:
+                prod_names.update(t.id for t in n.targets if isinstance(t, ast.Name))
+
+    def direct(fn) -> bool:
+        for c in ast.walk(fn):
+            if isinstance(c, ast.Call):
+                name = _dotted(c.func)
+                if name in RUNNER_CALLS or name.split(".")[-1] in LOADER_CALLS:
+                    return True
+                if name and name.split(".")[0] in prod_names:
+                    return True
+        return False
+
+    def called(fn) -> set[str]:
+        out = {_dotted(c.func).split(".")[-1] for c in ast.walk(fn) if isinstance(c, ast.Call)}
+        return out | {a.arg for a in fn.args.args}  # fixture parameters
+
+    runs = {f.name for f in funcs if direct(f)}
+    while True:
+        more = {f.name for f in funcs if f.name not in runs and called(f) & runs}
+        if not more:
+            break
+        runs |= more
+    return [f.name for f in funcs if f.name.startswith("test") and f.name in runs]
+
+
+def count_executing_tests(base: Path) -> int:
+    """Count test functions that run a program (see executing_test_names), under base's four test roots."""
+    prod = production_modules(base)
     total = 0
     for root in DEFAULT_ROOTS:
         for p in sorted((base / root).rglob("*.py")):
-            src = p.read_text(encoding="utf-8", errors="replace")
-            for node in ast.walk(ast.parse(src)):
-                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name.startswith("test"):
-                    if executes(ast.get_source_segment(src, node) or ""):
-                        total += 1
+            total += len(executing_test_names(p.read_text(encoding="utf-8", errors="replace"), prod))
     return total
 
 
@@ -347,9 +415,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Census classifier for the prose-pin stock cleanup.")
     parser.add_argument("--roots", default=",".join(DEFAULT_ROOTS), help="comma-separated test roots")
     parser.add_argument("--count-exec", metavar="DIR", help="count executing test functions under DIR")
+    parser.add_argument("--list", action="store_true", help="with --count-exec, print each counted function")
     args = parser.parse_args()
     if args.count_exec is not None:
         base = Path(args.count_exec).resolve()
+        if args.list:
+            prod = production_modules(base)
+            for root in DEFAULT_ROOTS:
+                for p in sorted((base / root).rglob("*.py")):
+                    for name in executing_test_names(p.read_text(encoding="utf-8", errors="replace"), prod):
+                        print(f"{p.relative_to(base).as_posix()}::{name}")
         print(f"executing test functions under {base}: {count_executing_tests(base)}")
         return 0
     roots = [r for r in args.roots.split(",") if r]
