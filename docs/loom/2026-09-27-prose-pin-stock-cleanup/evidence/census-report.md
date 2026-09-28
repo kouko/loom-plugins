@@ -1,14 +1,14 @@
 # Census Report — Prose-Pin Stock Cleanup (W0-01, regenerated in the end-of-Build fix round)
 
-Regenerated in W4-02 (2026-09-28) at commit `56320617` of branch `engineering/2026-09-27-prose-pin-stock-cleanup`, in a clean `git worktree` of that commit (no untracked files), from
+Regenerated in W4-03 (2026-09-28) at commit `04eedd4c` of branch `engineering/2026-09-27-prose-pin-stock-cleanup`, in a clean `git worktree` of that commit (no untracked files), from
 `python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py` (exit 0; it exits 1 while any file is `other`).
-Total test files scanned: 228
+Total test files scanned: 227
 
 ## Per-Class Counts
 
 | Class | Count |
 |-------|-------|
-| behavior | 114 |
+| behavior | 113 |
 | gate-eval | 7 |
 | grammar-invariant | 5 |
 | not-prose | 54 |
@@ -194,7 +194,7 @@ Every scanned file, `not-prose` and `other` included.
 | loom-workflow/tests/recap-state/test_readmes.py | structure |  |
 | loom-workflow/tests/recap-state/test_seven_block_schema.py | structure |  |
 | loom-workflow/tests/recap-state/test_skill_md.py | structure |  |
-| loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py | behavior | has_pins=no |
+| loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py | behavior | auto=other, override=behavior, reason=loads run_ab.py and executes parse_stream/decide/report on fixtures |
 | loom-workflow/tests/scripts/test_adversarial_hook_probes.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_adversarial_visualization_card_hosts.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_critique_compaction.py | gate-eval | has_pins=yes |
@@ -205,7 +205,6 @@ Every scanned file, `not-prose` and `other` included.
 | loom-workflow/tests/scripts/test_independent_advisor_compaction.py | structure |  |
 | loom-workflow/tests/scripts/test_independent_advisor_plugin_readmes.py | structure |  |
 | loom-workflow/tests/scripts/test_loom_visualization_compaction.py | structure |  |
-| loom-workflow/tests/scripts/test_loom_visualization_description_ab.py | behavior | auto=other, override=behavior, reason=binds the shipped description to the A/B-measured text by hash, and test_adversarial_description_ab_probes.py runs it as a program; also pins one phrase; batch 2 |
 | loom-workflow/tests/scripts/test_no_live_cot_explain_references.py | behavior | has_pins=no |
 | loom-workflow/tests/scripts/test_no_retired_loom_code_skill_names.py | structure | auto=other, override=structure, reason=asserts no retired loom-code skill name against the skills on disk, plus scanner self-tests; no sentence asserted |
 | loom-workflow/tests/scripts/test_readme_card_timing.py | structure |  |
@@ -224,11 +223,11 @@ Every scanned file, `not-prose` and `other` included.
 | tests/test_adversarial_agy_sync.py | not-prose |  |
 | tests/test_agy_install_docs.py | structure |  |
 | tests/test_check_plugin_boundaries.py | behavior | has_pins=no |
-| tests/test_kickoff_defaults.py | structure | auto=other, override=structure, reason=package-tests command value and lock package set, plus phrase pins on the trailing note; batch 2 |
+| tests/test_kickoff_defaults.py | structure | auto=other, override=structure, reason=the lock-file hash graph and the package-tests preset command shape; no prose literal |
 | tests/test_loom_design_ci_unified_root.py | not-prose |  |
 | tests/test_loom_plugin_install_layout.py | behavior | has_pins=no |
 | tests/test_loom_skill_description_catalog.py | structure |  |
-| tests/test_principles_ratification.py | structure | auto=other, override=structure, reason=one ratified-by line holding the amendment as a `; ` log entry, and no pending-ratification line |
+| tests/test_principles_ratification.py | structure | auto=other, override=structure, reason=exactly one ratified-by line and no pending-ratification line; no prose literal |
 | tests/test_run_package_tests.py | behavior | has_pins=no |
 | tests/test_state_anchor_carrier_inventory.py | behavior | has_pins=no |
 | tests/test_sync_codex_manifests.py | behavior | has_pins=no |
@@ -286,6 +285,7 @@ The end-of-Build adversary showed the earlier zero came partly from comments. Co
 - **`split_sentences(` kept.** Removing it moved `test_build_recovery_rules.py` and `test_closing_review_recovery_rules.py` from gate-eval to structure, yet both really pin phrases (`_require` phrase lists, exact paragraph endings) in a form no other signal sees; that part was reverted.
 - **One manual override** (`MANUAL_OVERRIDES` in the classifier, printed as `auto=…, override=…`): `loom-code/tests/test_adversary_recipe_shape.py` → structure, because split_sentences feeds a duplicate-sentence check across recipe files and no prose literal is asserted.
 - **W4-02: the `other` bucket emptied.** Acceptance testing found 12 prose-reading files in a fifth `other` bucket the table did not print. Each now has a `MANUAL_OVERRIDES` row with a reason tied to what it asserts (printed in the per-file table), two pure pins were deleted, the table prints every file, and the classifier exits 1 while any file is `other`.
+- **W4-03: no override hides a pin.** Each override states the file's true class with a reason that matches what it asserts. The hash guard is deleted; the kickoff phrase pins and the exact amendment literal in `tests/test_principles_ratification.py` are removed, so those two files are structure with no prose literal; `test_adversarial_description_ab_probes.py` is behavior (it loads run_ab.py and executes parse_stream/decide/report).
 
 Also in this round: the appended `# prose_pin matcher self-test` comments were removed from the four recipe modules, and their leftover pin tables and synthetic pin tests deleted.
 
@@ -307,8 +307,12 @@ Dispositions are the net diff against base `946e06d1`. Review-lens facets are th
 | `loom-workflow/tests/goal-create/test_skill_md.py` | pruned (9 functions) | Goal-create session and activation prose | `test_skill_md.py::test_session_activation_rules_are_one_registered_gate`; `test_skill_md.py::test_invocation_section_counts_the_offer_sites_that_exist`; lens facet `inconsistency` |
 | `loom-workflow/tests/scripts/test_critique_compaction.py` | pruned (`test_shared_discipline_is_stated_once`) | Shared discipline stated once in critique SKILL.md | `test_critique_compaction.py::test_routing_boundaries_survive_the_merge`; lens facet `inconsistency` |
 | `loom-workflow/tests/scripts/test_goal_create_compaction.py` | deleted | Goal-create entrypoint keeps modes, floor, invocation | `test_skill_md.py::test_declares_two_modes_and_conditional_arc`, `::test_floor_invocation_line_names_the_script`, `::test_invocation_section_counts_the_offer_sites_that_exist` |
-| `loom-code/tests/test_principles_amendment.py` | deleted (W4-02) | PRINCIPLES.md non-negotiable 2 sentences and the exact ratified-by line | `tests/test_principles_ratification.py::test_ratified_by_names_2026_09_15_non_negotiable_2_amendment` (log entry); checker rule `standing.product-principles-reject` (signature grammar); lens facet `omission` (the wording) |
+| `loom-code/tests/test_principles_amendment.py` | deleted (W4-02) | PRINCIPLES.md non-negotiable 2 sentences and the exact ratified-by line | `tests/test_principles_ratification.py::test_exactly_one_ratified_by_line` (one log line); checker rule `standing.product-principles-reject` (signature grammar); lens facet `omission` (the wording) |
 | `loom-code/tests/test_ship_guidance_presence.py` | deleted (W4-02) | Ship SKILL.md table and no-inline-list guidance sentences | lens facet `omission` |
+| `loom-workflow/tests/scripts/test_loom_visualization_description_ab.py` | deleted (W4-03, user-decided) | loom-visualization description equals the A/B-tested text (two hash comparisons, one phrase pin) | review lens semantic reading of the description + rerun docs/loom/2026-09-14-loom-visualization-description-trigger/ab/run_ab.py |
+| `loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py` | pruned (W4-03: `test_guard_edited_skill_description_fails_closed`, `test_render_description_trailing_whitespace_renders_identically`, `test_render_description_folded_scalar_fails_closed`, `test_render_description_blank_line_paragraph_changes_hash`, `test_guard_without_docs_still_collects`) | Attacks on the deleted hash guard and its renderer | none needed (their target is deleted); the run_ab.py parser/decision probes are kept |
+| `tests/test_kickoff_defaults.py` | pruned (W4-03: `test_trailing_note_no_longer_claims_ci_runs_the_same_paths`) | Phrases in the KICKOFF-DEFAULTS.md package-tests trailing note | kept structure tests `test_kickoff_defaults.py::test_package_tests_command_uses_the_complete_loom_family_preset`, `::test_package_test_lock_pins_and_hashes_the_complete_graph`; lens facet `incorrect-fact` (the note's claims) |
+| `tests/test_principles_ratification.py` | pruned (W4-03: exact amendment literal removed; `test_ratified_by_names_2026_09_15_non_negotiable_2_amendment` renamed `test_exactly_one_ratified_by_line`) | The ratified-by line holds the exact 2026-09-15 amendment entry (not a registered `eval:`, not a grammar check) | kept structure tests `test_principles_ratification.py::test_exactly_one_ratified_by_line`, `::test_pending_ratification_line_absent`; checker rule `standing.product-principles-reject` (signature grammar); lens facet `omission` |
 
 ### W4-02 deletion list (written before deleting)
 
@@ -326,9 +330,9 @@ Test functions (`test*`) under the four test roots whose own body carries the cl
 | Tree | Count |
 |------|-------|
 | base `6f3acd78` (pre-cleanup) | 727 |
-| HEAD `56320617` (clean worktree) | 730 |
+| HEAD `04eedd4c` (clean worktree) | 727 |
 
-HEAD >= base. A per-function name diff of the two trees shows no function disappeared; the three additions are `loom-code/tests/test_adversarial_census_gaming.py::test_census_roots_flag_given_is_accepted`, `loom-code/tests/test_adversary_recipe_code.py::test_case_class_check_recipe_row_dropped_goes_red` and `loom-code/tests/test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic`. The two files deleted in W4-02 held no executing function.
+HEAD >= base (equal). A per-function name diff of the two trees: three functions disappeared, all W4-03 probes of the deleted hash guard in `loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py` (`test_guard_edited_skill_description_fails_closed`, `test_guard_without_docs_still_collects`, `test_render_description_folded_scalar_fails_closed`); the three additions are `loom-code/tests/test_adversarial_census_gaming.py::test_census_roots_flag_given_is_accepted`, `loom-code/tests/test_adversary_recipe_code.py::test_case_class_check_recipe_row_dropped_goes_red` and `loom-code/tests/test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic`. The two files deleted in W4-02 held no executing function.
 
 Commands (from the repo root; `<scratch>` is any directory outside the repo):
 
@@ -349,11 +353,6 @@ Files that still carry sentence pins after this batch, left for a second batch (
 - `loom-workflow/tests/goal-create/test_skill_md.py` — gate-eval
 - `loom-workflow/tests/scripts/test_critique_compaction.py` — gate-eval
 - `loom-workflow/tests/scripts/test_distill_sessions_compaction.py` — gate-eval (W4-02 override; needle phrases, eval of `distill-sessions`)
-
-Files from the W4-02 `other` bucket that pin but are not pruned now (2):
-
-- `loom-workflow/tests/scripts/test_loom_visualization_description_ab.py` — behavior (override), has_pins=yes: a hash pin on the A/B-tested description that `test_adversarial_description_ab_probes.py` loads and runs
-- `tests/test_kickoff_defaults.py` — structure (override), has_pins=yes: mixed; command value and lock set are structure, the trailing-note phrase checks are pins
 
 Behavior files with `has_pins=yes` (15): they execute programs and also pin sentences.
 
