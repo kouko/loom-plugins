@@ -35,10 +35,10 @@ charter: 1.1
 - Test: A2 positive: mechanism-tests-kept-pins-removed-and-agy-deleted; negative: mechanisms-yaml-evals-resolve. A4 positive: no-sentence-pin-remains-in-file; boundary: gate-marker-checks-kept.
 - Risk: 整檔刪除輪（8d5b465d）誤刪 3 個機制測試檔（dispatch_profile_contract 測 resolver 語義＋4 個 mechanism eval 依附；2 個 recovery 檔測 RL-0x absence-recovery 規則）——classifier 把 gate-marker/機制檢查誤歸 sentence-pin；已恢復並改走裁剪：移除純散文句子釘住斷言，保留機制檢查與 gate-marker 檢查（文法級不變量）。test_agy_tool_mapping 是真 pin，整檔刪；agent-decided。
 
-**W1-03 刪 loom-workflow sentence-pin 檔（4 檔）**  after: W0-02  acceptance: 2, 4
+**W1-03 裁剪 loom-workflow 混合檔（2 檔裁剪 + 2 檔刪除）**  after: W0-02  acceptance: 2, 4
 - Files: loom-workflow/tests/goal-create/test_input_floor.py, loom-workflow/tests/goal-create/test_skill_md.py, loom-workflow/tests/scripts/test_critique_compaction.py, loom-workflow/tests/scripts/test_goal_create_compaction.py
-- Test: A2 positive: files-deleted-and-suite-green; negative: referenced-file-not-deleted. A4 positive: deleted-files-vanish-from-census; boundary: behavior-file-not-deleted.
-- Risk: skill_md 被 3 檔測試名提及（非 import）；goal_create_compaction↔skill_md 互為 NOTE 提及（duplicate pin）；agent-decided。
+- Test: A2 positive: eval-target-tests-survive-pins-removed-and-pure-pins-deleted; negative: mechanisms-yaml-evals-resolve. A4 positive: no-sentence-pin-remains-in-file; boundary: gate-marker-checks-kept.
+- Risk: 人審結果（W1-02 誤刪教訓後逐檔檢視）：test_critique_compaction（mechanisms.yaml:110 eval 依附）與 test_skill_md（mechanisms.yaml:348 eval 依附 test_session_activation_rules_are_one_registered_gate）是混合檔——裁剪；test_input_floor 與 test_goal_create_compaction 無機制依附（goal_create_compaction↔skill_md 僅註解提及）——整檔刪；agent-decided。
 
 ### Wave 2 — 耦合檔處理
 
