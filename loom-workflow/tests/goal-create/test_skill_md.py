@@ -2,7 +2,7 @@
 """
 Structural tests for SKILL.md, the skill's entry point (Task 5).
 
-Five tests:
+Four tests:
   1. test_declares_two_modes_and_conditional_arc — the RED/GREEN driver:
      both mode names (SESSION, ARC) appear as headings; ARC's
      user-lands-it rule; ARC's not-applicable path names its reason
@@ -17,10 +17,6 @@ Five tests:
      cites the purpose artifact's format by pointer (its path, or its
      `Done when:` anchor) and reproduces none of the purpose template's
      own field text verbatim — that template is the format SSOT.
-  5. test_invocation_contract_is_offer_not_trigger — Task 6: the
-     description states this skill never auto-fires; an `## Invocation`
-     section names the three offer points where it is surfaced (never
-     invoked) and states the ordering rule against `brainstorming`.
 
 Every polarity-bearing assertion is scoped to a heading section or a
 sentence, never to a raw character window (a legitimate rewording that
@@ -103,63 +99,8 @@ def test_declares_two_modes_and_conditional_arc():
     session_body = _section(text, "SESSION mode")
     arc_body = _section(text, "ARC mode")
 
-    # --- Mode choice is by what the user asks, not agent inference. ---
-    # Pinned verbatim: this sentence is the whole point of the two-mode
-    # split — a rewording that drops "chosen by" or "never by the agent
-    # guessing" must fail this test so the next editor updates the pin
-    # deliberately instead of drifting the rule silently.
-    intro_pin = (
-        "Which mode runs is\nchosen by what the user asks for — a goal for "
-        "this run, or a purpose for\nthe repository — never by the agent "
-        "guessing from context."
-    )
-    assert _normalize_ws(intro_pin) in _normalize_ws(text), (
-        "The mode-choice sentence changed — if this is a deliberate "
-        "reword, update this pin to match (see module docstring)."
-    )
-
     # --- SESSION emits the four-field goal (structural: its own section). ---
     assert "four-field goal" in session_body
-
-    # --- ARC never writes the file without the user's confirmation. ---
-    # Pinned verbatim for the same reason as above: this is the one rule
-    # standing between ARC and silently landing an unconfirmed file.
-    confirmation_pin = (
-        "ARC never writes that file itself; the\ndraft is only ever "
-        "landed by the user's own confirmation."
-    )
-    assert _normalize_ws(confirmation_pin) in _normalize_ws(arc_body), (
-        "ARC's confirmation-required sentence changed — update this pin "
-        "if the reword is deliberate."
-    )
-
-    # --- The not-applicable path: named condition, named reason, no
-    # scaffolding. The condition is a CONJUNCTION — no store AND no
-    # purpose file — not "no purpose file" alone: `check_north_star_link.py`
-    # checks `store.is_dir()` and `purpose_path.is_file()` as two
-    # independent conditions with different exits, and `loom-init`
-    # commonly scaffolds the store while leaving the purpose file
-    # unanswered, which is a real, handled, ARC-applicable case, not a
-    # not-applicable one.
-    #
-    # NOTE — this exact sentence is also pinned verbatim in
-    # loom-workflow/tests/scripts/test_goal_create_compaction.py
-    # (`arc_not_applicable`). A change here requires the same change
-    # there, or that test breaks on its own next run.
-    not_applicable_sentence = (
-        "ARC is conditional. When the repository has no "
-        "`docs/loom/` store and no\n`docs/loom/PURPOSE.md` file — "
-        "nothing yet scaffolded to hold one — ARC\nreports itself not "
-        "applicable, names the reason, and scaffolds nothing — creating "
-        "the store is\n`loom-init`'s job, not this skill's."
-    )
-    assert _normalize_ws(not_applicable_sentence) in _normalize_ws(arc_body), (
-        "ARC's not-applicable sentence changed — update this pin if the "
-        "reword is deliberate (must still: name the missing-store-AND-"
-        "missing-purpose-file condition as a conjunction, require naming "
-        "the reason, and forbid scaffolding) — and update the twin pin in "
-        "loom-workflow/tests/scripts/test_goal_create_compaction.py."
-    )
 
 
 def test_reference_pointers_resolve():
@@ -247,17 +188,6 @@ def test_floor_invocation_line_names_the_script():
     )
 
 
-def test_session_activates_codex_only_after_lint_and_reports_host_evidence():
-    session_body = _section(_read_skill_md(), "SESSION mode")
-
-    assert "create_goal" in session_body
-    assert "complete four-field condition" in session_body
-    assert "host-provided success" in session_body
-    assert "not active" in session_body
-    assert "`/goal clear`" in session_body
-    assert "run `goal-create SESSION` again" in session_body
-
-
 def test_session_activation_rules_are_one_registered_gate():
     text = _read_skill_md()
     gate = _gate(text, "goal-create.session-activation")
@@ -277,82 +207,6 @@ def test_session_activation_rules_are_one_registered_gate():
     assert "Confirmed artifacts are optional input sources" in input_gate
     assert "Preserve the intent's Constraints" in input_gate
     assert "does not authorize execution or publication" in input_gate
-
-
-def test_session_uses_a_faithful_bounded_claude_proposal():
-    session_body = _section(_read_skill_md(), "SESSION mode")
-    normalized = _normalize_ws(session_body)
-
-    assert "ProposeGoal" in session_body
-    assert "500 characters" in normalized
-    for required_part in (
-        "Outcome",
-        "every behavior-changing Constraint",
-        "Verification",
-        "Stop-when",
-    ):
-        assert required_part in normalized
-    assert "exact reference" in normalized
-    assert "skip `ProposeGoal`" in normalized
-    assert "not the compact proposal" in normalized
-    assert "truncate" not in normalized.lower()
-
-
-def test_session_confirmation_and_replacement_follow_user_intent():
-    session_body = _section(_read_skill_md(), "SESSION mode")
-    normalized = _normalize_ws(session_body)
-
-    assert "explicit authorization to replace" in normalized
-    assert "without a separate replacement confirmation" in normalized
-    assert "inferred" in normalized and "materially changed" in normalized
-    assert "ask_user: false" in session_body
-
-
-def test_session_falls_back_without_starting_another_process():
-    session_body = _section(_read_skill_md(), "SESSION mode")
-    normalized = _normalize_ws(session_body)
-
-    assert "does not expose `ProposeGoal`" in session_body
-    assert "one copyable `/goal <condition>` command" in session_body
-    assert "replaces any active Goal" in session_body
-    assert "Do not invoke `claude -p`" in session_body
-    assert "`/goal` availability does not imply that `ProposeGoal` is exposed" in normalized
-    assert "Do not ask the user to change internal settings or feature flags" in normalized
-    assert "Otherwise go directly to the manual fallback below" in normalized
-    assert "one copyable code block" in normalized
-
-
-def test_external_goal_tool_contracts_are_cited_at_the_call_site():
-    session_body = _section(_read_skill_md(), "SESSION mode")
-
-    assert "https://github.com/openai/codex/blob/" in session_body
-    assert "/codex-rs/ext/goal/src/spec.rs" in session_body
-    assert "/codex-rs/ext/goal/src/tool.rs" in session_body
-    assert "https://unpkg.com/@anthropic-ai/claude-code@" in session_body
-    assert "/sdk-tools.d.ts" in session_body
-
-
-def test_session_stops_after_prompt_and_host_activation():
-    session_body = _gate(_read_skill_md(), "goal-create.session-activation")
-    assert "ends after presenting the prompt and reporting host activation" in session_body
-    assert "does not invoke Loom stations or change their workflow rules" in session_body
-
-
-def test_codex_activation_requires_an_exposed_tool():
-    session_body = _normalize_ws(_section(_read_skill_md(), "SESSION mode"))
-    assert "When the current session exposes `create_goal`" in session_body
-    assert "If `create_goal` is unavailable" in session_body
-    assert "keep the complete prompt available for manual use" in session_body
-
-
-def test_artifact_input_is_optional_and_preserves_intent_constraints():
-    text = _gate(
-        (SKILL_DIR / "references" / "input-floor.md").read_text(),
-        "goal-create.session-activation",
-    )
-    assert "Confirmed artifacts are optional input sources, not prerequisites" in text
-    assert "intent's Constraints" in text
-    assert "does not create or confirm those artifacts" in text
 
 
 def test_arc_points_at_the_purpose_template_without_restating_it():
@@ -385,49 +239,6 @@ def test_arc_points_at_the_purpose_template_without_restating_it():
         assert field_line not in arc_body, (
             f"ARC section restates the purpose template's field text verbatim: {field_line!r}"
         )
-
-
-def test_invocation_contract_is_offer_not_trigger():
-    text = _read_skill_md()
-
-    # --- The description states this skill never auto-fires. ---
-    # Pinned verbatim: this is the one sentence standing between this
-    # skill and a description that silently claims auto-fire behavior
-    # it does not have — update this pin if a reword is deliberate.
-    never_fire_description_pin = (
-        "This skill never fires on its own; it must be invoked by name."
-    )
-    assert never_fire_description_pin in _frontmatter(text)
-
-    invocation_body = _section(text, "Invocation")
-
-    # --- Named at exactly three offer points, each stated as a pointer
-    # the caller must actively invoke, never as auto-fire sites. ---
-    # Pinned verbatim for the same reason as above.
-    offer_points_pin = (
-        "It is named as an available\n"
-        "option at exactly one point where the need for a goal is already\n"
-        "visible: `loom-workflow:handoff`'s Prepare mode, when a user closes a\n"
-        "session without capturing an explicit goal. That surface names this\n"
-        "skill as an option the user can invoke; it never invokes it."
-    )
-    assert _normalize_ws(offer_points_pin) in _normalize_ws(invocation_body), (
-        "The offer-points sentence changed — if this is a deliberate "
-        "reword, update this pin to match (see module docstring)."
-    )
-
-    # --- Ordering rule against `brainstorming`: discovery stays with
-    # brainstorming; this skill runs only after its brief exists. ---
-    # Pinned verbatim for the same reason as above.
-    ordering_pin = (
-        "When `loom-design:capture-intent` is already running for the same "
-        "work,\nthat station keeps discovery and this skill runs only after "
-        "its intent\nexists, rather than competing for the same turn."
-    )
-    assert _normalize_ws(ordering_pin) in _normalize_ws(invocation_body), (
-        "The brainstorming-ordering sentence changed — if this is a "
-        "deliberate reword, update this pin to match (see module docstring)."
-    )
 
 
 # The token the Invocation section must contain for each surface that

@@ -71,45 +71,6 @@ def test_class_relative_route_and_insufficient_evidence_boundary() -> None:
     assert "Role names and round labels are not routing evidence" in flat
 
 
-def test_five_portable_effort_tiers_and_native_values_are_inheritance_only() -> None:
-    text = _contract()
-    flat = _flat(text)
-
-    assert "`economy < standard < frontier`" in flat
-    assert "`low < medium < high < xhigh < max`" in flat
-    assert "host-native effort" in flat
-    _affirmative_sentence(text, "preserve an inherited host-native effort unchanged")
-    _affirmative_sentence(text, "use `xhigh` as its generation ceiling")
-    _affirmative_sentence(text, "remain inheritance-only values")
-    assert "Portable arithmetic generates `ultra`" not in flat
-
-
-def test_atomic_fallback_forbids_partial_profiles() -> None:
-    text = _contract()
-    flat = _flat(text)
-
-    _affirmative_sentence(text, "verify the selected model accepts the requested effort")
-    _affirmative_sentence(text, "omit both overrides")
-    assert "retry once with both overrides omitted" in flat
-    assert "partial profile" in flat
-    assert "keep the supported override" not in flat
-    assert "ask the user to choose" not in flat
-
-
-def test_high_and_xhigh_are_sequential_and_max_is_inherited_only() -> None:
-    text = _contract()
-    flat = _flat(text)
-
-    assert "completed `frontier/medium` attempt" in flat
-    assert "completed `frontier/high` attempt" in flat
-    assert "`frontier/medium` → `frontier/high` → `frontier/xhigh`" in flat
-    _affirmative_sentence(text, "retain the matching failure trigger")
-    _affirmative_sentence(text, "use `xhigh` as its generation ceiling")
-    _affirmative_sentence(text, "remain inheritance-only values")
-    assert "An inherited `max`" in flat
-    assert "initial dispatch may newly enter only `low` or `medium`" in flat
-
-
 def test_capability_quality_transition_is_complete_at_the_model_ceiling() -> None:
     text = _contract()
     flat = _flat(text)
@@ -143,15 +104,6 @@ def test_nonconforming_output_retry_keeps_validation_and_retry_ownership_separat
     assert "never retry or interpret reviewer content" in runner
 
 
-def test_final_allowed_redispatch_success_returns_routed() -> None:
-    text = _contract()
-
-    _affirmative_sentence(
-        text,
-        "successful execution returns `routed` regardless of its position in the budget",
-    )
-
-
 RESOLVER_INVOCATION_PHRASES = (
     "classify the task from its evidence",
     "resolve the atomic model-and-effort profile",
@@ -168,17 +120,6 @@ RESOLVER_INVOCATION_PHRASES = (
 )
 
 
-def test_build_and_review_resolve_the_shared_profile_before_every_dispatch() -> None:
-    for station in STATIONS:
-        text = station.read_text(encoding="utf-8")
-        link = "../../references/dispatch-profile.md"
-
-        assert f"]({link})" in text, f"{station.name} must link the packaged contract"
-        sentence = _affirmative_sentence(text, "Before every host-native dispatch")
-        assert "shared dispatch profile" in sentence
-        assert "apply its result" in _flat(text)
-
-
 def test_stations_do_not_restate_the_resolver_invocation() -> None:
     profile = _flat(_contract()).lower()
     for phrase in RESOLVER_INVOCATION_PHRASES:
@@ -186,15 +127,6 @@ def test_stations_do_not_restate_the_resolver_invocation() -> None:
         for station in STATIONS:
             flat = _flat(station.read_text(encoding="utf-8")).lower()
             assert phrase.lower() not in flat, f"{station.parent.name} restates: {phrase}"
-
-
-def test_moved_invocation_obligations_stay_affirmative_in_the_profile() -> None:
-    text = _contract()
-
-    _affirmative_sentence(text, "classify the task from its evidence")
-    _affirmative_sentence(text, "feed every completed result back as an `after-execution` event")
-    _affirmative_sentence(text, "apply the resolved overrides at invocation time")
-    _affirmative_sentence(text, "static model or effort pin")
 
 
 def test_claude_reviewer_dispatch_is_atomic_and_retry_budgets_do_not_stack() -> None:

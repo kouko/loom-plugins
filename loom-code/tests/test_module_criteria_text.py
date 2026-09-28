@@ -2,12 +2,10 @@
 
 Acceptance 9 of `docs/loom/intent/2026-09-18-modular-adversary-recipes.md`.
 
-Two things are pinned here. `AGENTS.md` states each of the four properties --
-change, add, remove, locate -- once, in the pin discipline the rest of these
-tests use: an affirmative verb before the pinned literal, a negation in the
-same sentence rejected, the helper self-tested both ways. And `loom-code/
-ROADMAP.md` states that the rest of loom is brought to this shape one skill
-per change, naming the worked example.
+`AGENTS.md` names each of the four properties -- change, add, remove,
+locate -- under its Module Criteria heading, and names no others. What each
+property says is left to semantic review; what is recomputed here is that
+each one is enforced.
 
 The negative case is a property with no check behind it. A property is only
 worth stating if something in this repository recomputes it, so every
@@ -36,14 +34,12 @@ from pathlib import Path
 
 import pytest
 
-from prose_pin import has_negation, split_sentences
 from test_adversary_routing import RECIPE_TEST_STEM
 
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "loom-code/tests"
 CONVENTIONS = ROOT / "AGENTS.md"
-ROADMAP = ROOT / "loom-code/ROADMAP.md"
 
 CRITERIA_HEADING = "### Module Criteria"
 
@@ -55,83 +51,10 @@ def _section(text: str, heading: str) -> str:
     return " ".join(body.split())
 
 
-def _flat(path: Path) -> str:
-    return " ".join(path.read_text(encoding="utf-8").split())
-
-
-def _affirms(text: str, verb: str, literal: str) -> bool:
-    """`text` carries `verb` before `literal`, with no negation in it."""
-    v, lit = text.find(verb), text.find(literal)
-    return 0 <= v < lit and not has_negation(text)
-
-
-def _stated_once(text: str, verb: str, literal: str) -> bool:
-    """Exactly one sentence carries `verb` before `literal` and no negation."""
-    return sum(1 for s in split_sentences(text) if _affirms(s, verb, literal)) == 1
-
-
-def _units(path: Path) -> list[str]:
-    """The file's bullets and paragraphs, each flattened.
-
-    The roadmap's bullets carry no closing period, so sentence splitting
-    would sweep several of them into one span and a negation in a
-    neighbouring bullet would reject a pin that is not about it.
-    """
-    text = path.read_text(encoding="utf-8")
-    blocks = re.split(r"\n\s*\n|\n(?=- )", text)
-    return [" ".join(b.split()) for b in blocks if b.strip()]
-
-
 def _named_properties(section: str) -> list[str]:
     """The property names the section states, in the order it states them."""
     return re.findall(r"- \*\*([a-z]+)\*\* —", section)
 
-
-# --- What each property says, and what recomputes it ------------------------
-#
-# name: (verb, literal, affirmative example, rejected examples)
-PROPERTY_PINS = {
-    "change": (
-        "Editing one capability touches",
-        "that capability's file and its own test",
-        "- **change** — Editing one capability touches that capability's file and its own "
-        "test, where it has one, and nothing else.",
-        ("- **change** — Editing one capability touches that capability's file and its own "
-         "test, but not only those.",
-         "- **change** — Editing one capability touches whatever the edit reaches."),
-    ),
-    "add": (
-        "Adding a capability is",
-        "a new file plus one routing entry",
-        "- **add** — Adding a capability is a new file plus one routing entry, and every "
-        "existing capability file stays untouched.",
-        ("- **add** — Adding a capability is a new file plus one routing entry, and no "
-         "existing capability file stays untouched.",
-         "- **add** — Adding a capability is an edit to the shared file."),
-    ),
-    "remove": (
-        "Removing a capability deletes",
-        "its file, its routing entry and its own test where it has one",
-        "- **remove** — Removing a capability deletes its file, its routing entry and its "
-        "own test where it has one, and leaves nothing behind that still names it.",
-        ("- **remove** — Removing a capability deletes its file, its routing entry and its "
-         "own test where it has one, but not what still names it.",
-         "- **remove** — Removing a capability deletes its file and its routing entry, and "
-         "leaves nothing behind that still names it.",
-         "- **remove** — Removing a capability deletes the passages that belong to it."),
-    ),
-    "locate": (
-        "A rule that belongs to one capability lives in",
-        "that capability's file",
-        "- **locate** — A rule that belongs to one capability lives in that capability's "
-        "file, while the shared part carries only what every capability shares and a "
-        "sibling file carries only its own.",
-        ("- **locate** — A rule that belongs to one capability lives in that capability's "
-         "file, not in the shared part.",
-         "- **locate** — A rule that belongs to one capability lives wherever it was "
-         "written."),
-    ),
-}
 
 # name: the checks in this repository that recompute the property.
 # path -> the test functions in it that do the recomputing.
@@ -145,7 +68,9 @@ PROPERTY_PINS = {
 # existence depends on.
 ENFORCED_BY = {
     "change": {
-        "test_adversary_routing.py": ("test_a_reworded_recipe_is_not_blamed_on_the_addition",),
+        "test_adversary_routing.py": (
+            "test_a_reworded_recipe_plants_no_failure_for_the_addition_to_be_judged_on",
+        ),
     },
     "add": {
         "test_adversary_routing.py": (
@@ -167,22 +92,6 @@ ENFORCED_BY = {
         ),
     },
 }
-
-# The trade `add` and `change` make together, which used to be recorded only
-# in two test modules' docstrings: `add` is one file plus one routing entry,
-# so a capability may exist with no test module of its own, and `change` has
-# to be read that way too. A reader of the conventions opens neither module,
-# so the conventions state it themselves.
-OPTIONAL_TEST_PIN = ("A capability's own test module is", "optional")
-OPTIONAL_TEST_AFFIRMATIVE = (
-    "- A capability's own test module is optional: `add` stays one file plus one routing "
-    "entry, and `change` reads as its own test where it has one."
-)
-OPTIONAL_TEST_REJECTED = (
-    "- A capability's own test module is never optional: `add` stays one file plus one "
-    "routing entry, and `change` reads as its own test where it has one.",
-    "- A capability's own test module is written by whoever gave it a routing entry.",
-)
 
 # Which Acceptance line of the intent each criterion is the repository's
 # wording of. The checks are grouped in their own modules under section
@@ -213,16 +122,6 @@ def _acceptance_of(text: str, function: str) -> int | None:
     return int(match.group("n")) if match else None
 
 
-ROADMAP_PIN = (
-    "The rest of loom is brought to this shape",
-    "one skill per change",
-)
-ROADMAP_REJECTED = (
-    "- The rest of loom is brought to this shape, but not one skill per change.",
-    "- The rest of loom is brought to this shape when someone gets to it.",
-)
-
-
 # --- helper self-tests -------------------------------------------------------
 
 def test_section_helper_synthetic() -> None:
@@ -237,77 +136,27 @@ def test_named_properties_helper_synthetic() -> None:
     assert _named_properties("- change — a.") == []
 
 
-def test_stated_once_helper_synthetic() -> None:
-    sentence = "Editing one capability touches that capability's file and its own test."
-    assert _stated_once(f"Read this. {sentence}", "Editing one capability touches",
-                        "that capability's file and its own test")
-    assert not _stated_once(f"{sentence} {sentence}", "Editing one capability touches",
-                            "that capability's file and its own test")
-    assert not _stated_once("Nothing here.", "Editing one capability touches",
-                            "that capability's file and its own test")
+def test_acceptance_reader_synthetic() -> None:
+    """The reader takes the nearest header, and refuses to guess past one."""
+    text = (
+        "# --- A4: adding ------\n\n"
+        "def test_added() -> None:\n    pass\n\n\n"
+        "# --- helper self-tests ------\n\n"
+        "def test_helper() -> None:\n    pass\n\n\n"
+        "# --- A5 boundary: removing ------\n\n"
+        "def test_removed() -> None:\n    pass\n"
+    )
+    assert _acceptance_of(text, "test_added") == 4
+    assert _acceptance_of(text, "test_helper") is None
+    assert _acceptance_of(text, "test_removed") == 5
+    assert _acceptance_of("def test_alone() -> None:\n    pass\n", "test_alone") is None
 
 
-@pytest.mark.parametrize("prop", sorted(PROPERTY_PINS))
-def test_property_pin_helpers_synthetic(prop: str) -> None:
-    verb, literal, affirmative, rejected = PROPERTY_PINS[prop]
-    assert _stated_once(affirmative, verb, literal), prop
-    assert any(has_negation(r) for r in rejected), prop
-    for example in rejected:
-        assert not _stated_once(example, verb, literal), example
-
-
-# --- A9 positive: the four properties are stated once, in the conventions ---
-
-@pytest.mark.parametrize("prop", sorted(PROPERTY_PINS))
-def test_conventions_state_the_property_once(prop: str) -> None:
-    verb, literal, _affirmative, _rejected = PROPERTY_PINS[prop]
-    section = _section(CONVENTIONS.read_text(encoding="utf-8"), CRITERIA_HEADING)
-    assert _stated_once(section, verb, literal), (prop, verb, literal)
-
-
-def test_optional_test_module_pin_helpers_synthetic() -> None:
-    verb, literal = OPTIONAL_TEST_PIN
-    assert _stated_once(OPTIONAL_TEST_AFFIRMATIVE, verb, literal)
-    assert any(has_negation(r) for r in OPTIONAL_TEST_REJECTED)
-    for example in OPTIONAL_TEST_REJECTED:
-        assert not _stated_once(example, verb, literal), example
-
-
-def test_conventions_say_a_capabilitys_own_test_module_is_optional() -> None:
-    """What `add` costs `change`, said where a reader of the criteria sees it."""
-    verb, literal = OPTIONAL_TEST_PIN
-    section = _section(CONVENTIONS.read_text(encoding="utf-8"), CRITERIA_HEADING)
-    assert _stated_once(section, verb, literal), section
-
+# --- A9 positive: the four properties are named, in the conventions ----------
 
 def test_conventions_name_the_four_properties_and_no_others() -> None:
     section = _section(CONVENTIONS.read_text(encoding="utf-8"), CRITERIA_HEADING)
     assert _named_properties(section) == ["change", "add", "remove", "locate"]
-
-
-def test_roadmap_pin_helpers_synthetic(tmp_path: Path) -> None:
-    verb, literal = ROADMAP_PIN
-    path = tmp_path / "ROADMAP.md"
-    path.write_text(
-        "# roadmap\n\n- Something that does not rise\n- The rest of loom is brought to this "
-        "shape one skill per change, with the split as the worked example.\n",
-        encoding="utf-8",
-    )
-    assert [u for u in _units(path) if _affirms(u, verb, literal)] == [
-        "- The rest of loom is brought to this shape one skill per change, with the split as "
-        "the worked example."
-    ]
-    for example in ROADMAP_REJECTED:
-        assert not _affirms(example, verb, literal), example
-    assert any(has_negation(r) for r in ROADMAP_REJECTED)
-
-
-def test_roadmap_records_one_skill_per_change_with_the_worked_example() -> None:
-    verb, literal = ROADMAP_PIN
-    matches = [u for u in _units(ROADMAP) if _affirms(u, verb, literal)]
-    assert len(matches) == 1, _flat(ROADMAP)
-    assert "worked example" in matches[0], matches[0]
-    assert "loom-code/skills/closing-review/references/" in matches[0], matches[0]
 
 
 # --- A9 negative: a property stated with no check behind it ------------------
@@ -347,27 +196,6 @@ def test_no_property_depends_on_one_kind_existing(prop: str) -> None:
     assert named == [], (prop, named)
 
 
-def test_acceptance_reader_synthetic() -> None:
-    """The reader takes the nearest header, and refuses to guess past one."""
-    text = (
-        "# --- A4: adding ------\n\n"
-        "def test_added() -> None:\n    pass\n\n\n"
-        "# --- helper self-tests ------\n\n"
-        "def test_helper() -> None:\n    pass\n\n\n"
-        "# --- A5 boundary: removing ------\n\n"
-        "def test_removed() -> None:\n    pass\n"
-    )
-    assert _acceptance_of(text, "test_added") == 4
-    assert _acceptance_of(text, "test_helper") is None
-    assert _acceptance_of(text, "test_removed") == 5
-    assert _acceptance_of("def test_alone() -> None:\n    pass\n", "test_alone") is None
-
-
-def test_every_criterion_has_an_acceptance_line() -> None:
-    assert set(CRITERION_ACCEPTANCE) == set(ENFORCED_BY)
-    assert len(set(CRITERION_ACCEPTANCE.values())) == len(CRITERION_ACCEPTANCE)
-
-
 @pytest.mark.parametrize("prop", sorted(ENFORCED_BY))
 def test_each_check_sits_under_the_criterion_it_enforces(prop: str) -> None:
     """A criterion's checks are the ones written for its own Acceptance line.
@@ -384,11 +212,3 @@ def test_each_check_sits_under_the_criterion_it_enforces(prop: str) -> None:
             assert _acceptance_of(text, function) == expected, (
                 prop, filename, function, _acceptance_of(text, function), expected
             )
-
-
-def test_enforcement_lookup_catches_a_check_that_is_not_there() -> None:
-    """The same lookup, run against a property whose check does not exist."""
-    missing = SCRIPTS / "test_adversary_recipe_no_such_kind.py"
-    assert not missing.exists()
-    text = (SCRIPTS / "test_adversary_routing.py").read_text(encoding="utf-8")
-    assert "def test_a_rule_nothing_recomputes(" not in text

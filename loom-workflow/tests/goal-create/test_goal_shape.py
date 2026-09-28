@@ -281,8 +281,8 @@ def _section_four(content: str) -> str:
 
 def _negation_binds(text: str, negation: str, target: str, max_gap_words: int = 6) -> bool:
     """Bound negation-to-target polarity check (word-boundary safe on
-    BOTH ends — same regex body as test_input_floor.py's sanctioned copy;
-    only the default gap differs).
+    BOTH ends; the sanctioned copy it once mirrored lived in the deleted
+    test_input_floor.py, so this is now the only copy).
 
     True iff a `negation` alternation sits within `max_gap_words` words
     directly BEFORE `target`. See

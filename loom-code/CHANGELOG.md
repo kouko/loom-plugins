@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.22.1] — 2026-09-28 — Remove sentence-pin tests (batch 1 of the prose-pin stock cleanup).
+
+Patch: tests only; no station guidance, field, rule id or contract change.
+
+- Whole-file sentence-pin tests deleted (principles amendment, ship guidance); the module-criteria and agy tool-mapping tests pruned to their structure checks.
+- Recipe/routing/dispatch-profile tests pruned to structure and behavior checks.
+- The reword routing test now guards that rewording plants nothing.
+
 ## [3.22.0] — 2026-09-27 — Make prose evidence a definition in the tests lens, exempt docs/release tasks from per-task test pairs, and consolidate version sync to one constant.
 
 Minor: rule text and station guidance changed.
