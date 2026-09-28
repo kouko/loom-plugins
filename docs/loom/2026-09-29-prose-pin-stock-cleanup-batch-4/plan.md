@@ -21,7 +21,7 @@ charter: 1.1
 **W0-02 Re-point affected evals**  after: W0-01  acceptance: 4
 - Files: docs/loom/evidence/mechanisms.yaml
 - Test: A4 positive: every-moved-eval-resolves-before-pruning; negative: check-mechanisms-rejects-dangling-node.
-- Risk: agent-decided — evals naming a function on the deletion list move to an existing behavior or structure test; no new cold read; mechanism count unchanged.
+- Risk: agent-decided — at 879b189a no eval cites a candidate function; re-point only if a W1 task deletes a whole file; mechanism count unchanged.
 
 ### Wave 1 — pruning (parallel by plugin; each task writes its own mapping file)
 
@@ -36,18 +36,23 @@ charter: 1.1
 - Risk: agent-decided — same pruning and rename rules as W1-01.
 
 **W1-03 loom-workflow test files**  after: W0-02  acceptance: 2, 3
-- Files: loom-workflow/tests/**/test_*.py flagged in candidate-list.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/mapping-workflow.md
+- Files: loom-workflow/tests/{goal-create,loom-visualization,decision-map,loom-memory,independent-advisor}/test_*.py flagged in candidate-list.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/mapping-workflow.md
 - Test: A2 positive: behavior-and-structure-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: validator-wrapped-phrase-judged.
-- Risk: agent-decided — batch-3 kept gate polarity checks and the defaultPrompt string stay out of scope; split further if the list exceeds one task.
+- Risk: agent-decided — split from W1-06 after W0-01 found 149 workflow candidates; batch-3 kept gate polarity checks and defaultPrompt stay out of scope.
 
 **W1-04 Patch release bump**  after: —  acceptance: 6
 - Files: loom-*/plugin.json, loom-*/.claude-plugin/plugin.json, loom-*/.codex-plugin/plugin.json, loom-*/CHANGELOG.md, README.md and loom-*/README*.md, loom-code/tests/test_write_plan_station_text.py, loom-design/tests/spec/test_capture_intent_contract.py, loom-workflow/tests/scripts/test_release_metadata.py
 - Test: A6 positive: current-release-metadata-synchronized; negative: stale-pin-fails-before-rewrite.
 - Risk: agent-decided — loom-code 3.22.3, loom-design 2.6.2, loom-workflow 5.5.3; committed in Build so the attestation covers it.
 
+**W1-06 loom-workflow test files, second half**  after: W0-02  acceptance: 2, 3
+- Files: loom-workflow/tests/{distill-sessions,handoff,recap-state,scripts}/test_*.py flagged in candidate-list.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/mapping-workflow-2.md
+- Test: A2 positive: behavior-and-structure-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: compaction-output-assert-left-untouched.
+- Risk: agent-decided — same pruning and rename rules as W1-01; compaction scripts' output asserts are behavior checks.
+
 ### Wave 2 — close-out
 
-**W2-01 Census and recount**  after: W1-01, W1-02, W1-03, W1-04  acceptance: 1, 4, 5
+**W2-01 Census and recount**  after: W1-01, W1-02, W1-03, W1-04, W1-06  acceptance: 1, 4, 5
 - Files: docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/census-report.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/candidate-list.md
 - Test: A1 positive: clean-worktree-census-zero-pins; negative: other-bucket-exits-1. A4 positive: check-mechanisms-all-clear; negative: dangling-eval-reported. A5 positive: recount-not-below-base; negative: deleted-function-tagged-exec-fails.
 - Risk: agent-decided — every remaining flagged file has a visible override row with its reason; each moved eval is listed old -> new beside the check_mechanisms result; runs from a clean worktree.
