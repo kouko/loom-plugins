@@ -71,6 +71,11 @@ charter: 1.1
 - Test: A1 positive: census-class-ignores-comments-in-suite; negative: census-script-absent-skips-with-reason. A2 positive: recipe-row-dropped-goes-red-in-suite; negative: intact-recipe-stays-green.
 - Risk: review.probe-graduation — both caught a defect here (comment-steered census class; vacuous case-class check); graduated copies stay byte copies, path line aside, and skip with a reason when the evidence script is absent; agent-decided.
 
+**W4-02 Classify the unclassified census files; delete pure pins found**  after: W4-01  acceptance: 1, 2, 3, 4
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md, loom-code/tests/test_codex_hook_trust_contract.py, loom-code/tests/test_principles_amendment.py, loom-code/tests/test_ship_guidance_presence.py
+- Test: A1 positive: other-class-count-zero; negative: unlisted-file-fails-census. A4 positive: pure-pin-in-other-deleted; boundary: mixed-file-listed-in-batch-2.
+- Risk: acceptance testing found 12 prose-reading files in an unlisted `other` bucket; each gets a visible reasoned class; pure pins without dependants are deleted, others go to batch 2; agent-decided.
+
 ## Simplicity check
 - 用既有 `prose_pin` 分類語意（import + 斷言 pattern）建普查腳本，不另造分類框架 — taken
 - 刪除工作依「無耦合整檔刪 / 有耦合裁剪」二分，避免逐檔客製 — taken
