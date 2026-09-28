@@ -3,10 +3,10 @@ intent: 2026-09-27-prose-pin-stock-cleanup@6f3acd78
 charter: 1.1
 
 ## Current State Evidence
-- Forward: `docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py` — 普查腳本定稿（W0-01 完成，五輪修正）：238 檔全樹掃描，13 sentence-pin / 5 grammar-invariant / 41 structure / 111 behavior / 58 not-prose / 10 other。
+- Forward: `docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py` — 普查腳本定稿（W0-01 完成，五輪修正）：238 檔全樹掃描，13 sentence-pin / 5 grammar-invariant / 41 structure / 111 behavior / 58 not-prose / 10 other。(W0-01 snapshot; superseded — see census-report.md for the final census)
 - Reverse: `docs/loom/intent/2026-09-27-prose-evidence-class.md` — 證據政策已確立：prose 合格證據 = checker 重算 + fresh-context 審查 + 行為變更時的 AT；字面感應測試只留文法級不變量。
 - Error: 最終分類已逐檔 cold-read 覆核；誤判（delivery_binding、skill_contract、prose_pin_rule_text）已修復。
-- Data: 13 檔 sentence-pin 中，僅 `test_module_criteria_text` 被外部執行（test_adversary_routing SUITE_EXTRA）與 SSOT 引用（AGENTS.md:54）；其餘 12 檔僅名字提及（註解/測試名），可整檔刪。
+- Data: 13 檔 sentence-pin 中，僅 `test_module_criteria_text` 被外部執行（test_adversary_routing SUITE_EXTRA）與 SSOT 引用（AGENTS.md:54）；其餘 12 檔僅名字提及（註解/測試名），可整檔刪。(W0-01 snapshot; superseded — see census-report.md for the final census)
 - Boundary: `test_acceptance_test_report_shape`、`test_lenses_deletion_first`、`test_prose_pin_rule_text`、`test_reviewer_mechanical_evidence`、`test_write_plan_shape_text` = grammar-invariant（保留）。
 
 ## Task DAG

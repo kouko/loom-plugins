@@ -4,7 +4,7 @@
 
 Patch: tests only; no station guidance, field, rule id or contract change.
 
-- Whole-file sentence-pin tests deleted.
+- Whole-file sentence-pin tests deleted (principles amendment, ship guidance); the module-criteria and agy tool-mapping tests pruned to their structure checks.
 - Recipe/routing/dispatch-profile tests pruned to structure and behavior checks.
 - The reword routing test now guards that rewording plants nothing.
 

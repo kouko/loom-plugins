@@ -1332,7 +1332,7 @@ def test_adding_a_kind_that_has_no_recipe_today_introduces_no_failure(
     )
 
 
-# --- A3: a reworded recipe is its own test file's business and no one else's --
+# --- A3: a reworded recipe plants no failure -------------------------------
 
 def test_a_reworded_recipe_plants_no_failure_for_the_addition_to_be_judged_on(
     tmp_path: Path, inherited_failures: frozenset[str]
@@ -1365,8 +1365,8 @@ def test_a_reworded_recipe_plants_no_failure_for_the_addition_to_be_judged_on(
             + ", ".join(sorted(_failing_modules(inherited_failures)))
         )
 
-    # One copy per candidate, and no more: the loop stops at the first reword
-    # that would have planted something, so the ordinary tree costs exactly one.
+    # One repository copy per green candidate; the assert stops the loop at the
+    # first planting.
     # Under the new premise, NO reword should plant anything.
     attempts: dict[str, frozenset[str]] = {}
     runs: dict[str, subprocess.CompletedProcess[str]] = {}
