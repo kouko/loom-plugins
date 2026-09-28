@@ -1,8 +1,8 @@
 # Batch 2 census and recount (W2-01)
 
-All numbers below come from clean worktrees (`git worktree add --detach <scratchpad>/<wt> <ref>`), each removed afterwards (Risk 3). HEAD is `3db2f21a`. The base is `7244374d`.
+All numbers below come from clean worktrees (`git worktree add --detach <scratchpad>/<wt> <ref>`), each removed afterwards (Risk 3). HEAD is `c3367d32`, after the loop-form fix round that followed the build adversary; where a number is still the earlier one at `3db2f21a`, the text says so. The base is `7244374d`.
 
-**Headline for acceptance testing: A5's broad count went down by one, from 1922 to 1921.** The one function that dropped out never ran a program. It only imported test modules. Counted the way the intent defines an execution test, nothing drops: 1920 at base and 1920 at HEAD. See A5.
+**Headline for acceptance testing: A5's broad count is 1922 at base and 1923 at HEAD.** At `3db2f21a` it had gone down by one, to 1921. The one function that dropped out never ran a program; it only imported test modules. The fix round then added two graduated adversary tests that run code. Counted the way the intent defines an execution test, nothing drops: 1920 at base, 1921 at HEAD. See A5.
 
 ## A1 — census
 
@@ -12,35 +12,44 @@ Command, run from the worktree root:
 python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py
 ```
 
-Exit 0. Counts: `{'behavior': 107, 'gate-eval': 0, 'grammar-invariant': 2, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 66}`. **sentence-pin = 0, other = 0.**
+Exit 0. Counts: `{'behavior': 108, 'gate-eval': 0, 'grammar-invariant': 2, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 66}`. **sentence-pin = 0, other = 0.** Against `3db2f21a` (behavior 107), the census file `test_adversarial_census_gaming.py` moved from not-prose to behavior, because its new loop-form case names a `SKILL.md`. The graduated `test_adversarial_batch2_loop_phrase_pin.py` is a new not-prose file.
 
-The intent allows a file to keep `has_pins=yes` only when the report gives that file a reason. Twelve files still show `has_pins=yes`, and each one has a visible `MANUAL_OVERRIDES` row in the classifier. The reason below is the override text exactly as the table prints it:
+**Loop-form fix.** The build adversary showed the classifier could not see a phrase pin written as `for p in ("...", ...): assert p in TEXT`. The classifier now counts that form: a positive `in` on the loop variable of a loop over string literals, inline or bound to a module-level name, where at least one literal has three or more words. Across the whole census inventory it flagged 12 files. Six carried real pins and were pruned (`deletion-list.md`, "Found by the adversary's loop-form census fix"; rows in `mapping-residual.md`). Seven files got override rows because their hit is headings, commands, section names or schema field labels. `test_architecture_skill.py` is in both groups.
+
+The intent allows a file to keep `has_pins=yes` only when the report gives that file a reason. Nineteen files still show `has_pins=yes`, and each one has a visible `MANUAL_OVERRIDES` row in the classifier. The reason below is the override text exactly as the table prints it:
 
 | file | auto class | class after override | override reason |
 |---|---|---|---|
-| `loom-code/tests/test_acceptance_test_report_shape.py` | grammar-invariant | structure | template table columns, rows and markers, the evidence block heading, the template path pointer in the tester contract, a full-suite absence scan fed by split_sentences and no gate marker; no sentence asserted present |
+| `loom-code/tests/test_acceptance_test_report_shape.py` | grammar-invariant | structure | template table columns, rows and markers, the evidence block heading, the template path pointer in the tester contract, a full-suite absence scan fed by split_sentences, no gate marker, and the evidence path pointer outside every gate block; the two station phrases it once looped over were pruned in the batch-2 loop-form fix, so no sentence is asserted present |
+| `loom-code/tests/test_adversary_layout.py` | behavior | behavior | loop-form hit is SHARED_HEADINGS asserted in the protocol's parsed heading list: section headings, not prose |
 | `loom-code/tests/test_adversary_protocol.py` | behavior | behavior | imports MAX_PROBE_PROGRAMS from loom_checker for the case-count scan; the rest is a one-home absence scan and YAML keys of the return block; no sentence asserted present |
 | `loom-code/tests/test_adversary_recipe_shape.py` | sentence-pin | structure | split_sentences feeds a duplicate-sentence check across recipe files; no prose literal is asserted |
 | `loom-code/tests/test_adversary_routing.py` | behavior | behavior | runs the adversary tests in repo copies after real add, remove and reword edits; literals are a recipe's link back to the protocol, exception messages and pytest stdout; split_sentences only picks a sentence to reword; no sentence asserted present |
 | `loom-code/tests/test_build_recovery_rules.py` | grammar-invariant | structure | one-home scans only: the build.absence-recovery gate block restates no artifact-to-station mapping, and §1-§2 repeat none of the rule; the block cites the three manifest keys (path pointers); split_sentences feeds the scan, no sentence is asserted present; RL-12 is the eval of build.absence-recovery |
 | `loom-code/tests/test_closing_review_recovery_rules.py` | grammar-invariant | structure | one-home scan only: the review.absence-recovery gate block restates no artifact-to-station mapping; split_sentences feeds that scan, no sentence is asserted present; RL-04 is the eval of review.absence-recovery |
+| `loom-code/tests/test_loom_publish.py` | behavior | behavior | loop-form hit is CONTEXT_HEADINGS asserted in the reason the checker's validate_contextual_pr_body returns: headings in program output |
 | `loom-code/tests/test_plan_simplicity_text.py` | sentence-pin | structure | absence checks, the write-plan step's path pointer to plan-simplicity.md, and a scan that every user sentence of the step is negated (split_sentences); no sentence asserted present |
 | `loom-code/tests/test_review_convergence_contract.py` | grammar-invariant | structure | gate-marker presence, heading-anchored sections, and absence or negation scans fed by split_sentences; no sentence asserted present |
 | `loom-code/tests/test_ship_station_text.py` | behavior | behavior | recomputes the refusal premise from publish.py source; the rest is headings, absences and gate-region placement; no sentence asserted present |
 | `loom-code/tests/test_simplified_station_text.py` | behavior | behavior | imports the checker's STEP_PLAIN_NAMES; the rest is absence and negation scans (split_sentences), summary-table rows and a manifest YAML value; no sentence asserted present |
 | `loom-code/tests/test_sync_before_review_text.py` | behavior | behavior | runs sync-trunk on real repositories and asserts its stdout and the digest; the prose half is absences under the §2 heading and a count of sync-trunk; no sentence asserted present |
+| `loom-workflow/tests/decision-map/test_skill_doc.py` | behavior | behavior | loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same test also runs |
 | `loom-workflow/tests/goal-create/test_skill_md.py` | gate-eval | structure | mode headings, reference paths resolving, the floor command shape, the session-activation gate blocks, template non-restatement and the offer-site count (its number recomputed from the sites scanned in the repo); eval of goal-create.session-activation, no sentence asserted |
+| `loom-workflow/tests/scripts/test_loom_visualization_compaction.py` | structure | structure | loop-form hit is a list of `## ` headings in SKILL.md |
+| `tests/test_agy_install_docs.py` | structure | structure | loop-form hit is agy and git command shapes in the Antigravity CLI section |
+| `loom-design/tests/architecture-design/test_architecture_skill.py` | structure | structure | loop-form hit is the four bold field labels of the schema's Guard failure message section (rule id, offending path, conform, change the rule and its guard): schema field labels |
+| `loom-design/tests/interface/test_design_system_skill.py` | structure | structure | loop-form hit is the eight canonical DESIGN.md section names in the schema |
 
 ## A3 — one stitched mapping table
 
 Sources: `mapping-evals.md`, `mapping-gate-eval.md`, `mapping-adversary.md`, `mapping-fix-budget.md`, `mapping-station.md`, `mapping-design-grammar.md`, `mapping-residual.md`. The table keeps every row that sits under a `file::function(s) | defect class it guarded | named replacement | kind` header. It also keeps the `mapping-evals.md` rows, whose kind is `eval re-point` and whose replacement is the new eval node.
 
-**Rows by kind (177 total):**
+**Rows by kind (183 total):**
 
 | kind | rows |
 |---|---|
-| kept structural test | 68 |
-| review lens dimension | 67 |
+| kept structural test | 72 |
+| review lens dimension | 69 |
 | checker rule id | 15 |
 | review-only | 11 |
 | eval re-point | 10 |
@@ -49,16 +58,16 @@ Sources: `mapping-evals.md`, `mapping-gate-eval.md`, `mapping-adversary.md`, `ma
 **Replacement check.** The throwaway script `stitch_mappings.py` (text below) ran from the HEAD worktree root and printed:
 
 ```
-rows: 177
-by kind: {'kept structural test': 68, 'review lens dimension': 67, 'checker rule id': 15, 'review-only': 11, 'eval re-point': 10, 'cold-read record': 6}
-deleted defs in changed files: 332
+rows: 183
+by kind: {'kept structural test': 72, 'review lens dimension': 69, 'checker rule id': 15, 'review-only': 11, 'eval re-point': 10, 'cold-read record': 6}
+deleted defs in changed files: 334
 problems: 0
 ```
 
 The script checks three things:
 
 - Every `file::function` named as a replacement is a `def` at HEAD.
-- None of those names is one of the 332 defs that `7244374d..HEAD` deleted from the changed test files.
+- None of those names is one of the 334 defs that `7244374d..HEAD` deleted from the changed test files.
 - Every backticked rule id in a `checker rule id` row appears in `loom_checker.py --list-rules`.
 
 Separately, the one cold-read path the rows name, `docs/loom/2026-09-19-loom-flow-recovery-loop/blind-run-report.md`, exists.
@@ -360,6 +369,12 @@ for p in problems:
 | mapping-residual | `test_ship_station_text.py::test_ship_prose_rule_is_not_marked_as_a_gate` (the presence half: `NO_HANDOVER` must occur) | the no-handover rule drops out of ship | checker rule `publish.preconditions` (the refusal is the enforceable carrier); the same function keeps the not-gate-marked half | checker rule id |
 | mapping-residual | `test_ship_station_text.py::test_ship_never_runs_setup_unasked`, `AGREES`, `_sentences` (an un-negated setup-run sentence had to carry the `AGREES` phrase) | ship runs the setup command without the user's consent | skill lens, `omission` (a setup run with no consent input). No heading or gate marker isolates the sentence | review lens dimension |
 | mapping-residual | `test_sync_before_review_text.py::test_no_op_sync_dispatches_without_rerun` (`_sentence` found one sentence by `reports \`up to date\``) | the `up to date` branch starts a re-run | re-anchored on the `## 2. Compute review depth` heading: `test_sync_before_review_text.py::test_no_op_sync_dispatches_without_rerun` now scans every §2 sentence that names the checker output `` `up to date` `` | kept structural test |
+| mapping-residual | `loom-code/tests/test_acceptance_test_report_shape.py::test_no_new_gate_marker` (the phrases ``"`package-tests` or `finalize-review` is skipped"`` and `"steps 6-7 govern"`) | the station's skip rule or its steps 6-7 rule moved inside a gate block | the same function keeps the `EVIDENCE_PATH` pointer outside every gate block and the no-gate-marker absences in the tester and the template: `loom-code/tests/test_acceptance_test_report_shape.py::test_no_new_gate_marker` | kept structural test |
+| mapping-residual | `loom-code/tests/test_sync_codex_manifest.py::test_loom_code_manifest_and_docs_preserve_optional_composition` (`independently installable`, `plugin-qualified skill names`, `N/A with the reason`) | the loom-code README stops saying the plugins install on their own and compose only through qualified names | the same function keeps the check that neither manifest makes loom-design mandatory, and the `docs/loom/` pointer: `loom-code/tests/test_sync_codex_manifest.py::test_loom_code_manifest_and_docs_preserve_optional_composition`; the README wording is docs lens `omission` | kept structural test |
+| mapping-residual | `loom-workflow/tests/loom-memory/test_skill_contract.py::test_record_contract_states_when_to_record`, `::test_record_contract_states_how_much_to_record` (deleted, with `TIMING_ELEMENTS` and `SCARCITY_ELEMENTS`) | the Record contract loses its timing or scarcity clauses | `loom-workflow/tests/loom-memory/test_skill_contract.py::test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against` goes red on any edit to the Record section and sends the editor to re-run `loom-workflow/skills/loom-memory/evals/record-timing.md` | kept structural test |
+| mapping-residual | `loom-workflow/tests/goal-create/test_goal_shape.py::test_defines_four_fields_budget_and_surfacing` (the three quoted Anthropic bullet labels) | the attribution paragraph stops quoting the source's own labels | the same function keeps the paragraph found by its bold lead label, the field and vendor names, and the `named by both` absence; whether the quotes support the claim is docs lens `incorrect-fact` | review lens dimension |
+| mapping-residual | `loom-design/tests/architecture-design/test_architecture_skill.py::test_skill_reads_code_and_proposes_two_options_per_choice` (eight prose words: existing code, at least two options, trade-off and the rest) | the design step stops reading the code or stops offering two options with a recommendation | the same function keeps the `references/design-know-how.md` pointer and the `## decisions` heading; the step's content is skill lens `omission` | review lens dimension |
+| mapping-residual | `loom-workflow/tests/loom-visualization/test_references.py::test_guide_has_seven_rules_and_rewrite_steps` (the rule-3 example words, with `METAPHOR_WORDS`) | rule 3 stops listing the metaphor trigger words | the same function keeps `guide_errors` (seven rules, five rewrite steps, the last one a metaphor check) and the rule-3 ban check through `polarity_errors`: `loom-workflow/tests/loom-visualization/test_references.py::test_guide_has_seven_rules_and_rewrite_steps` | kept structural test |
 
 ## A4 — mechanism census
 
@@ -367,11 +382,11 @@ Running `python3 loom-code/scripts/check_mechanisms.py` from the HEAD worktree e
 
 ## A5 — execution-test recount
 
-**The broad counter went down by one: 1922 at base, 1921 at HEAD.**
+**The broad counter went down by one: 1922 at base, 1921 at `3db2f21a`.** The loop-form fix round then added two, to 1923 at HEAD `c3367d32` (end of this section). The paragraphs up to that point compare base with `3db2f21a`.
 
 Command: `python3 <HEAD wt>/docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py --count-exec <wt> --list`, run once with the base worktree and once with the HEAD worktree. The classifier was not changed to move this number.
 
-Diffing the two `--list` outputs shows exactly one function missing at HEAD and none added:
+Diffing the two `--list` outputs shows exactly one function missing at `3db2f21a` and none added:
 `loom-code/tests/test_adversary_routing.py::test_recipe_test_module_and_pin_reader_synthetic`.
 
 **Why it dropped, and why no execution test was deleted.** Acceptance 5 counts test functions that run a program through a subprocess or checker call. This function only called `importlib.import_module` on recipe *test* modules, through the helper `recipe_pins()`. It ran no subprocess, no checker and no production script. By the intent's own definition it was never an execution test. The broader fixed counter counted it because that counter treats any `import_module` call as a loader.
@@ -394,12 +409,22 @@ A `module_from_spec`, `import_module`, `run_path` or `run_module` call on a test
 | ref | restricted count |
 |---|---|
 | base `7244374d` | **1920** |
-| HEAD `3db2f21a` | **1920** |
+| `3db2f21a` | **1920** |
+| HEAD `c3367d32` | **1921** |
 
-The restricted `--list` outputs at base and HEAD are identical, so nothing dropped. At base the restricted count excludes two functions that the broad counter counts:
+The restricted `--list` outputs at base and `3db2f21a` are identical, so nothing dropped. At base the restricted count excludes two functions that the broad counter counts:
 
 - `test_adversary_routing.py::test_recipe_test_module_and_pin_reader_synthetic`, the one above.
 - `test_adversarial_census_gaming.py::test_census_class_comment_token_planted_is_unchanged`, which loads the census classifier by path. That classifier is a docs probe, not a `scripts/` module. This function is present at both refs.
+
+**Loop-form fix round (`0c12e86d` to `c3367d32`).** Two test functions were deleted: `loom-workflow/tests/loom-memory/test_skill_contract.py::test_record_contract_states_when_to_record` and `::test_record_contract_states_how_much_to_record`. Neither is on the `0c12e86d` exec list of either counter. Diffing the `--list` outputs of `0c12e86d` and HEAD shows only additions:
+
+| counter | `0c12e86d` | HEAD `c3367d32` | added |
+|---|---|---|---|
+| broad (`--count-exec`) | 1921 | **1923** | `test_adversarial_census_gaming.py::test_census_loop_phrase_pin_is_pinned`, `test_adversarial_description_ab_probes.py::test_set_output_case_variant_of_old_change_refused` |
+| restricted (`restricted_count.py`) | 1920 | **1921** | `test_adversarial_description_ab_probes.py::test_set_output_case_variant_of_old_change_refused` |
+
+The census-gaming case loads the docs classifier by path, so only the broad counter counts it, like its sibling above. Both runs used the HEAD classifier, whose counting code this round did not change.
 
 <details><summary>restricted_count.py</summary>
 
