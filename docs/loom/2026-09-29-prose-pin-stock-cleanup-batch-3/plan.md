@@ -58,7 +58,7 @@ charter: 1.1
 ### Wave 2 — close-out
 
 **W2-01 Census and recount**  after: W1-01, W1-03, W1-04, W1-05, W1-06, W1-07  acceptance: 1, 4, 5
-- Files: docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/census-report.md
+- Files: docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/census-report.md, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-known.md
 - Test: A1 positive: clean-worktree-census-zero-pins; negative: other-bucket-exits-1. A4 positive: check-mechanisms-all-clear; negative: dangling-eval-reported. A5 positive: recount-not-below-base; negative: deleted-function-tagged-exec-fails.
 - Risk: agent-decided — stitches the mapping files into one table; every remaining has_pins=yes file has a visible override row with its reason; runs from a clean worktree.
 
