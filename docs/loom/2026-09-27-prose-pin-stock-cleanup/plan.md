@@ -76,6 +76,11 @@ charter: 1.1
 - Test: A1 positive: other-class-count-zero; negative: unlisted-file-fails-census. A4 positive: pure-pin-in-other-deleted; boundary: mixed-file-listed-in-batch-2.
 - Risk: acceptance testing found 12 prose-reading files in an unlisted `other` bucket; each gets a visible reasoned class; pure pins without dependants are deleted, others go to batch 2; agent-decided.
 
+**W4-03 Retire the description hash guard; prune kickoff phrase pins**  after: W4-02  acceptance: 2, 3, 4
+- Files: loom-workflow/tests/scripts/test_loom_visualization_description_ab.py, loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py, tests/test_kickoff_defaults.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
+- Test: A2 positive: hash-guard-file-deleted-runner-probes-kept; negative: suite-green-without-guard. A4 positive: no-override-hides-a-pin; boundary: kickoff-structure-checks-kept.
+- Risk: user-decided 2026-09-28 — description evidence becomes semantic review plus a run_ab.py rerun, never a text hash; nothing flags a description edit automatically any more.
+
 ## Simplicity check
 - 用既有 `prose_pin` 分類語意（import + 斷言 pattern）建普查腳本，不另造分類框架 — taken
 - 刪除工作依「無耦合整檔刪 / 有耦合裁剪」二分，避免逐檔客製 — taken
@@ -88,6 +93,7 @@ charter: 1.1
 ① — what — 把上次改機制後遺留的釘住散文句子的舊測試庫存量清掉，以後改散文不會再被舊釘子弄到要連改測試。對嗎？ — 對
 ① — consequence — 清理只到「文法級不變量」界線：字面感應測試從 ~40 檔降到僅剩文法不變量；日後發現被刪釘子本可擋下真實缺陷時，依收回條款可還原。接受？ — 對
 ① — scope (build 中發現，2026-09-28) — 清理後仍有 5 個 gate eval 檔與 15 個行為混合檔帶釘住斷言；本 PR 當第一批收尾、改寫 A2/A4、其餘另開第二批？ — A
+① — evidence (acceptance testing, 2026-09-28) — the loom-visualization description hash guard: keep, defer, or retire? — retire the hash; test by meaning and results only
 
 ## Risks
 1. 分類判定（結構 vs 釘住 vs 文法）有灰色地帶，reviewer 冷讀覆核每檔；誤刪真實行為測試由 W3 行為守護擋下。
