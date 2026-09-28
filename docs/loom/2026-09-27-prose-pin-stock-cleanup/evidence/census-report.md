@@ -371,3 +371,12 @@ Behavior files with `has_pins=yes` (15): they execute programs and also pin sent
 - `loom-code/tests/test_write_plan_station_text.py` — behavior, has_pins=yes
 - `loom-design/tests/spec/test_capture_intent_contract.py` — behavior, has_pins=yes
 - `loom-design/tests/spec/test_write_spec_contract.py` — behavior, has_pins=yes
+
+Grammar-invariant files with `has_pins=yes` (4): their grammar checks stay; their sentence asserts move to batch 2.
+
+- `loom-code/tests/test_acceptance_test_report_shape.py` — grammar-invariant, has_pins=yes
+- `loom-code/tests/test_lenses_deletion_first.py` — grammar-invariant, has_pins=yes
+- `loom-code/tests/test_reviewer_mechanical_evidence.py` — grammar-invariant, has_pins=yes
+- `loom-code/tests/test_write_plan_shape_text.py` — grammar-invariant, has_pins=yes
+
+Every other `has_pins=yes` file carries a stated reason: `loom-code/tests/test_adversary_recipe_shape.py` is a structure override (split_sentences feeds a duplicate-sentence check across recipe files; no prose literal is asserted).
