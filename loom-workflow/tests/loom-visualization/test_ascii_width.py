@@ -1,5 +1,6 @@
 # Ported from ascii-graph-toolkit v0.6.0 (monkey-skills e5b978e0), MIT.
 """Width primitive and glyph taxonomy tests (consolidated from test_width.py, test_glyphs.py)."""
+# concern: shared rendering helpers in width.py must keep generator output byte-identical
 
 import pathlib
 import sys
