@@ -326,43 +326,8 @@ def test_skills_mount_declared_in_claude_manifest() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance A4 — the timing and scarcity halves of the Record contract
-#
-# READ THIS BEFORE YOU EDIT OR DELETE ANYTHING BELOW.
-#
-# These assertions pin two clauses of the shipped Record contract. They are
-# not style checks and they are not a snapshot of prose someone liked.
-#
-# History, because it has already happened once: the timing clause was
-# enforced from 2026-07-08 (#515) by five lines inside the
-# `finishing-a-development-branch` skill plus a test pinning them. The
-# loom 1.0 cutover (#780) deleted that skill, and the instruction and its
-# test went out together. Nobody noticed, because nothing was left to go
-# red. The rule survived only as prose in one repository's own store
-# charter, which no project installing this plugin ever reads.
-#
-# WHAT KIND OF TEST THIS IS, stated accurately because the previous wording
-# here overclaimed it: this is a LITERAL-PHRASE pin. Whitespace is flattened
-# first, so the prose may rewrap freely — but the phrases below are matched
-# literally, and a faithful rewrite that says "goes in the commit message"
-# instead of "belongs in its commit message" WILL go red. That is the known
-# cost of the only mechanism available here; it is not a defect, and it is
-# not a reason to delete the pin. The correct response to a red is:
-#
-#   1. check the clause is still in the contract and still says the same;
-#   2. if it is, update the phrase below in the same commit as the
-#      rewrite, and say in that commit that the meaning was preserved;
-#   3. if it is not, you are removing part of what this plugin promises —
-#      that needs an intent, not an edit here.
-#
-# Step 2 looks like the anti-pattern every reviewer is trained to stop. It is
-# not, provided the commit shows the clause survived. Deleting the assertion
-# is what the 2026-07 cutover did.
-#
-# A literal pin cannot see DILUTION — a clause kept but drained of force
-# passes every assertion here. That half is guarded by `evals/record-timing.md`,
-# a frozen cold-reader run, and by the digest test at the end of this file
-# which makes a clause edit demand that run be repeated.
+# Acceptance A4: in SKILL.md, Record's timing and scarcity clauses are guarded by
+# test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against plus evals/record-timing.md.
 # ---------------------------------------------------------------------------
 
 _A4_WHY = (
@@ -370,7 +335,7 @@ _A4_WHY = (
     "lost once already when loom 1.0 deleted the skill carrying it along with "
     "its test. If the contract was reworded and still says this, update the "
     "phrase here in the same commit; if the clause is gone, removing it is a "
-    "contract change and needs an intent. See this section's header comment."
+    "contract change and needs an intent."
 )
 
 
@@ -409,8 +374,7 @@ def test_backlog_entry_routing_sentence_rejected() -> None:
 def test_the_reference_copy_still_carries_both_halves() -> None:
     """`references/operations.md` restates the rule for the reader who opens
     the detailed procedure instead of the summary. It is a second surface, so
-    it drifts: pin one phrase from each half there too, and keep the pin above
-    scoped to SKILL.md so neither copy can stand in for the other."""
+    it drifts: pin one phrase from each half there too."""
     operations = _flat(_read(OPERATIONS))
     assert "before the branch closes" in operations, (
         "operations.md no longer states when Record runs. " + _A4_WHY

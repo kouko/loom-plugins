@@ -551,7 +551,10 @@ MANUAL_OVERRIDES = {
     "loom-workflow/tests/decision-map/test_skill_doc.py": (
         "behavior",
         "loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same "
-        "test also runs",
+        "test also runs. The file also holds direct sentence asserts on "
+        "SKILL.md and map-format prose (lines 181-183, 216-221, 281-287, 310-312, e.g. "
+        "'Exactly three ticket closure types exist'), which the classifier "
+        "does not see; they are left for batch 3",
     ),
     "loom-workflow/tests/scripts/test_loom_visualization_compaction.py": (
         "structure",

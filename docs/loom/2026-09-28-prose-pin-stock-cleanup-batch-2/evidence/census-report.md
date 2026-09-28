@@ -1,6 +1,6 @@
 # Batch 2 census and recount (W2-01)
 
-All numbers below come from clean worktrees (`git worktree add --detach <scratchpad>/<wt> <ref>`), each removed afterwards (Risk 3). HEAD is `c3367d32`, after the loop-form fix round that followed the build adversary; where a number is still the earlier one at `3db2f21a`, the text says so. The base is `7244374d`.
+All numbers below come from clean worktrees (`git worktree add --detach <scratchpad>/<wt> <ref>`), each removed afterwards (Risk 3). HEAD is `c3367d32`, after the loop-form fix round that followed the build adversary; where a number is still the earlier one at `3db2f21a`, the text says so. The base is `7244374d`. The closing review round 1 fix, after `d8f2615f`, updated A1 (scope, batch-3 list, two override rows), A3 (table, counts, population) and A5 (recount); each of those parts says so.
 
 **Headline for acceptance testing: A5's broad count is 1922 at base and 1923 at HEAD.** At `3db2f21a` it had gone down by one, to 1921. The one function that dropped out never ran a program; it only imported test modules. The fix round then added two graduated adversary tests that run code. Counted the way the intent defines an execution test, nothing drops: 1920 at base, 1921 at HEAD. See A5.
 
@@ -12,9 +12,25 @@ Command, run from the worktree root:
 python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py
 ```
 
-Exit 0. Counts: `{'behavior': 108, 'gate-eval': 0, 'grammar-invariant': 2, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 66}`. **sentence-pin = 0, other = 0.** Against `3db2f21a` (behavior 107), the census file `test_adversarial_census_gaming.py` moved from not-prose to behavior, because its new loop-form case names a `SKILL.md`. The graduated `test_adversarial_batch2_loop_phrase_pin.py` is a new not-prose file.
+Exit 0. Counts: `{'behavior': 108, 'gate-eval': 0, 'grammar-invariant': 2, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 66}`. **sentence-pin = 0, other = 0.** Against `3db2f21a` (behavior 107), the census file `test_adversarial_census_gaming.py` moved from not-prose to behavior, because its new loop-form case names a `SKILL.md`. The graduated `test_adversarial_batch2_loop_phrase_pin.py` is a new not-prose file. After the round-1 fix the counts are unchanged, from a clean worktree, exit 0.
 
 **Loop-form fix.** The build adversary showed the classifier could not see a phrase pin written as `for p in ("...", ...): assert p in TEXT`. The classifier now counts that form: a positive `in` on the loop variable of a loop over string literals, inline or bound to a module-level name, where at least one literal has three or more words. Across the whole census inventory it flagged 12 files. Six carried real pins and were pruned (`deletion-list.md`, "Found by the adversary's loop-form census fix"; rows in `mapping-residual.md`). Seven files got override rows because their hit is headings, commands, section names or schema field labels. `test_architecture_skill.py` is in both groups.
+
+**Scope of `has_pins` (a known limit).** `has_pins` sees two forms only. The first is a sentence assert in a file that imports a prose helper (`prose_pin`, `flat_prose`, `split_sentences`, `_flat` or `_normalize`). The second is the loop form above. A direct `assert "<sentence>" in text` in a file with no prose helper import is invisible to it, so `sentence-pin = 0` does not mean the whole inventory is free of pins. The classifier is not widened to see this form: each widening so far has surfaced another population (agent-decided, closing review round 1). Where such a pin sat in a file this change already edited for other pins, it was pruned in round 1 (`mapping-residual.md`, "Count-form and direct presence pins found in closing review round 1"). The rest is a named follow-up for batch 3.
+
+**Batch-3 follow-up: direct sentence pins known so far (7 files).** Line numbers are at the round-1 fix commit.
+
+| file | lines | example |
+|---|---|---|
+| `loom-workflow/tests/loom-memory/test_skill_contract.py` | 358, plus 117, 122, 164-166, 215, 233-234 and the `operations.md` pins at 379 and 382 | `"an unfinished item belongs in an intent." in flat` |
+| `loom-code/tests/test_architecture_doc_consumers.py` | 34, 40, 50, 61 | `"Treat an unratified draft as advisory" in para` |
+| `loom-workflow/tests/decision-map/test_skill_doc.py` | 181-183, 216-221, 281-287, 310-312 | `"Exactly three ticket closure types exist" in skill_text` |
+| `loom-workflow/tests/loom-visualization/test_references.py` | `polarity_errors` (sentences found and checked by their opening words, 117-125), the `DECISION_PHRASES` comprehension at 174, and 319 | `ban.startswith("Do not use metaphors or analogies, and do not reach for")` |
+| `loom-workflow/tests/handoff/test_handoff_schema.py` | 175, 178, 207 | `"reply to me in the conversation language"` |
+| `tests/test_loom_skill_description_catalog.py` | 167-168 | `"must be invoked by name"` in the goal-create description |
+| `loom-workflow/tests/goal-create/test_goal_shape.py` | 73, 78, 84, 87, 107-108 | `"one compression pass" in content_lower` |
+
+`test_skill_contract.py`, `test_references.py` and `test_goal_shape.py` were edited by this change only to remove loop-form pins. The round-1 fix hand-off put the first two on the batch-3 list; the round-1 search found the third, and it is held back the same way. None of the three was pruned in round 1.
 
 The intent allows a file to keep `has_pins=yes` only when the report gives that file a reason. Nineteen files still show `has_pins=yes`, and each one has a visible `MANUAL_OVERRIDES` row in the classifier. The reason below is the override text exactly as the table prints it:
 
@@ -33,41 +49,45 @@ The intent allows a file to keep `has_pins=yes` only when the report gives that 
 | `loom-code/tests/test_ship_station_text.py` | behavior | behavior | recomputes the refusal premise from publish.py source; the rest is headings, absences and gate-region placement; no sentence asserted present |
 | `loom-code/tests/test_simplified_station_text.py` | behavior | behavior | imports the checker's STEP_PLAIN_NAMES; the rest is absence and negation scans (split_sentences), summary-table rows and a manifest YAML value; no sentence asserted present |
 | `loom-code/tests/test_sync_before_review_text.py` | behavior | behavior | runs sync-trunk on real repositories and asserts its stdout and the digest; the prose half is absences under the §2 heading and a count of sync-trunk; no sentence asserted present |
-| `loom-workflow/tests/decision-map/test_skill_doc.py` | behavior | behavior | loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same test also runs |
+| `loom-workflow/tests/decision-map/test_skill_doc.py` | behavior | behavior | loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same test also runs. The file also holds direct sentence asserts on SKILL.md and map-format prose (lines 181-183, 216-221, 281-287, 310-312, e.g. 'Exactly three ticket closure types exist'), which the classifier does not see; they are left for batch 3 |
 | `loom-workflow/tests/goal-create/test_skill_md.py` | gate-eval | structure | mode headings, reference paths resolving, the floor command shape, the session-activation gate blocks, template non-restatement and the offer-site count (its number recomputed from the sites scanned in the repo); eval of goal-create.session-activation, no sentence asserted |
 | `loom-workflow/tests/scripts/test_loom_visualization_compaction.py` | structure | structure | loop-form hit is a list of `## ` headings in SKILL.md |
 | `tests/test_agy_install_docs.py` | structure | structure | loop-form hit is agy and git command shapes in the Antigravity CLI section |
-| `loom-design/tests/architecture-design/test_architecture_skill.py` | structure | structure | loop-form hit is the four bold field labels of the schema's Guard failure message section (rule id, offending path, conform, change the rule and its guard): schema field labels |
+| `loom-design/tests/architecture-design/test_architecture_skill.py` | structure | structure | loop-form hit is the four bold field labels of the schema's Guard failure message section (rule id, offending path, conform, change the rule and its guard): schema field labels. The rest is path pointers, the ratified-by line and commit subject shape, the re-design and re-ratify tokens, the two-word terms never required and never blocks, the SKILL.md mention of the Guard failure message section name, and a heading-bounded Step 5 scan; the direct sentence asserts (single answer, re-design procedure) were pruned in closing review round 1 |
 | `loom-design/tests/interface/test_design_system_skill.py` | structure | structure | loop-form hit is the eight canonical DESIGN.md section names in the schema |
 
 ## A3 — one stitched mapping table
 
 Sources: `mapping-evals.md`, `mapping-gate-eval.md`, `mapping-adversary.md`, `mapping-fix-budget.md`, `mapping-station.md`, `mapping-design-grammar.md`, `mapping-residual.md`. The table keeps every row that sits under a `file::function(s) | defect class it guarded | named replacement | kind` header. It also keeps the `mapping-evals.md` rows, whose kind is `eval re-point` and whose replacement is the new eval node.
 
-**Rows by kind (183 total):**
+**Rows by kind (187 total, after the closing review round 1 fix):**
 
 | kind | rows |
 |---|---|
-| kept structural test | 72 |
-| review lens dimension | 69 |
-| checker rule id | 15 |
+| review lens dimension | 73 |
+| kept structural test | 71 |
+| checker rule id | 16 |
 | review-only | 11 |
 | eval re-point | 10 |
 | cold-read record | 6 |
 
+Round 1 added four rows (`mapping-residual.md`, count-form and direct pins) and corrected two `mapping-station.md` rows whose kept function no longer backed the claim. `test_ship_prose_rule_is_not_marked_as_a_gate` lost its presence half, so that row is now checker rule `publish.preconditions`. `test_expert_mode_holds_the_suggestion_rules_once` now keeps only no-duplicate counts, so that row is now skill lens `omission`.
+
+**Population with no executable replacement: 49 of 187 rows (26%).** 11 rows are `review-only`. 38 more rows are `review lens dimension` rows whose replacement cell names no test function, no test file, no kept half of the same function and no checker rule id, so a review lens dimension is their only guard. The other 35 lens rows also name a kept test or a checker rule. The throwaway `population.py` counted this over the stitched table (a row is a lens-only row when its replacement cell matches none of `::name`, `test_*.py`, `same function`, `keep(s)`, `stay(s)`, `checker rule`, or a backticked id from `loom_checker.py --list-rules`).
+
 **Replacement check.** The throwaway script `stitch_mappings.py` (text below) ran from the HEAD worktree root and printed:
 
 ```
-rows: 183
-by kind: {'kept structural test': 72, 'review lens dimension': 69, 'checker rule id': 15, 'review-only': 11, 'eval re-point': 10, 'cold-read record': 6}
-deleted defs in changed files: 334
+rows: 187
+by kind: {'review lens dimension': 73, 'kept structural test': 71, 'checker rule id': 16, 'review-only': 11, 'eval re-point': 10, 'cold-read record': 6}
+deleted defs in changed files: 335
 problems: 0
 ```
 
 The script checks three things:
 
 - Every `file::function` named as a replacement is a `def` at HEAD.
-- None of those names is one of the 334 defs that `7244374d..HEAD` deleted from the changed test files.
+- None of those names is one of the 335 defs that `7244374d..HEAD` deleted from the changed test files.
 - Every backticked rule id in a `checker rule id` row appears in `loom_checker.py --list-rules`.
 
 Separately, the one cold-read path the rows name, `docs/loom/2026-09-19-loom-flow-recovery-loop/blind-run-report.md`, exists.
@@ -139,7 +159,7 @@ for name in FILES:
         if not line.startswith("|"):
             mode = None if not line.strip() else mode
             continue
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        cells = [c.strip() for c in re.split(r"(?<!\\)\|", line.strip().strip("|"))]  # unescaped pipes only
         if cells[0].startswith("file::function"):
             mode = "std"
             continue
@@ -175,22 +195,7 @@ for name in FILES:
                     problems.append(f"{name}: rule {rid} not in --list-rules")
 
 with open(sys.argv[1], "w", encoding="utf-8") as out:
-    out.write("| source | file::function(s) | defect class / gate | named replacement | kind |\n|---|---|---|---|---|\n")
-    for r in rows:
-        out.write("| " + " | ".join(c.replace("\n", " ") for c in r) + " |\n")
-print("rows:", len(rows))
-print("by kind:", dict(kinds.most_common()))
-print("deleted defs in changed files:", len(deleted))
-print("problems:", len(problems))
-for p in problems:
-    print("  ", p)
-```
-
-</details>
-
-### Stitched table
-
-| source | file::function(s) | defect class / gate | named replacement | kind |
+    out.write("| source | file::function(s) | defect class / gate | named replacement | kind |
 |---|---|---|---|---|
 | mapping-evals | `loom-workflow/tests/scripts/test_distill_sessions_compaction.py` | `distill-sessions` | `loom-workflow/tests/distill-sessions/test_apply.py::test_refuses_without_approved_flag` | eval re-point |
 | mapping-evals | `loom-workflow/tests/scripts/test_critique_compaction.py` | `critique` | `tests/test_loom_skill_description_catalog.py` | eval re-point |
@@ -267,12 +272,12 @@ for p in problems:
 | mapping-station | `test_expert_mode_skill.py::test_skill_round1_boundary_intent_skip_and_withdrawal_split` (pin half) | the Boundary section loses a limit (Antigravity, same-session rule, trust boundary, skipped-review listing) | the same function keeps its `not in` absences; the limits' wording is skill lens, `omission` | review lens dimension |
 | mapping-station | `test_expert_mode_skill.py::test_readme_lists_expert_mode` | a README skill table stops listing expert-mode | docs lens, `omission` | review lens dimension |
 | mapping-station | `test_expert_mode_skill.py::test_changelog_names_failure_sources_and_limits` | the 3.4.0 CHANGELOG entry and the root README Antigravity limit change wording | released history does not change; the README limit is docs lens, `incorrect-fact` | review lens dimension |
-| mapping-station | `test_expert_mode_skill.py::test_expert_mode_holds_the_suggestion_rules_once` (pin half) | the suggestion sentence loses one of its clauses | the same function keeps the `count == 1` one-home checks; the clauses are skill lens, `omission` | kept structural test |
+| mapping-station | `test_expert_mode_skill.py::test_expert_mode_holds_the_suggestion_rules_once` (pin half) | the suggestion sentence loses one of its clauses | skill lens, `omission`; the same function keeps only no-duplicate counts (`at most once per change` `<= 1`, `--origin agent` `== 1`), which cannot see a lost clause | review lens dimension |
 | mapping-station | `test_expert_mode_skill.py::test_station_one_sentence_points_to_expert_mode` (pointer half), with its orphaned helper `assert_station_points_to_expert_mode`, `::test_station_pointer_helper_accepts_the_pointer_sentence`, `::test_station_pointer_helper_rejects_mutants` | a station stops reading `selection show` at entry or stops pointing to expert-mode | the same function keeps the MOVED_RULES absence per station; the entry read is skill lens, `omission` | kept structural test |
 | mapping-station | `test_expert_mode_skill.py::test_affirmative_helper_accepts_an_affirmative_sentence`, `::test_affirmative_helper_rejects_a_negated_sentence` (helper `affirmative` orphaned) | synthetic partners of the `affirmative()` pin helper, which no kept test calls | none needed: they proved a removed pin could fail | review-only |
 | mapping-station | `test_ship_station_text.py::test_ship_publish_title_type_equals_branch_type` | ship §3 stops saying the PR title's type equals the branch type | skill lens, `omission` | review lens dimension |
 | mapping-station | `test_ship_station_text.py::test_ship_text_runs_land_after_acceptance`, `::test_ship_text_separates_authorization_from_acceptance` (pin half) | ship merges without the acceptance decision, or treats authorization as acceptance | checker rule `land.merge` (merges nothing without `--accepted-by` and every precondition); `test_ship_station_text.py::test_ship_text_separates_authorization_from_acceptance` keeps both heading checks | checker rule id |
-| mapping-station | `test_ship_station_text.py::test_ship_prose_forbids_handing_the_command_over` | ship §3 loses the rule against handing a refused publication command to the user | `test_ship_station_text.py::test_ship_prose_rule_is_not_marked_as_a_gate` (asserts the rule occurs and is never gate-marked) | kept structural test |
+| mapping-station | `test_ship_station_text.py::test_ship_prose_forbids_handing_the_command_over` | ship §3 loses the rule against handing a refused publication command to the user | checker rule `publish.preconditions` (the refusal is the enforceable carrier); the rule's presence is skill lens `omission` | checker rule id |
 | mapping-station | `test_ship_station_text.py::test_ship_prose_covers_the_refusals_that_name_no_remedy` (pin half) | ship §3 promises a remedy where `publish` names none | the same function keeps the AST premise over `publish.py`; the scoping clause is skill lens, `inconsistency` | kept structural test |
 | mapping-station | `test_ship_station_text.py::test_ship_runs_github_rules_before_publish` | ship stops running `github-rules` before publishing | skill lens, `omission` | review lens dimension |
 | mapping-station | `test_ship_station_text.py::test_ship_never_runs_setup_unasked` (pin half), `::test_ship_template_missing_waits_for_consent_and_its_own_change` | ship runs the setup command or lands the template without consent | skill lens, `omission` (a setup run whose consent input is missing); the kept consent loop was itself a hidden pin and was removed in the residual fix (`mapping-residual.md`) | review lens dimension |
@@ -336,7 +341,7 @@ for p in problems:
 | mapping-design-grammar | test_write_spec_contract.py::test_spec_records_each_carried_detail, ::test_product_carried_detail_recorded_where_decision_point_two_shows, ::test_non_visible_detail_never_new_req, ::test_agent_proposal_not_agreed_not_recorded | Carried details not recorded, recorded as a new REQ, or an unagreed proposal recorded | Skill lens `omission` and `inconsistency` (against capture-intent's hand-off). New REQs still pass `spec.req-grammar` | review lens dimension |
 | mapping-design-grammar | test_write_spec_contract.py::test_what_you_will_be_asked_list_present, ::test_ui_flow_two_sentence_present, ::test_asked_list_leads_branching_flow_with_table_or_diagram, ::test_parallel_cases_table_branching_diagram, ::test_short_flow_stays_lines, ::test_readback_leads_with_table_or_text_diagram | Decision point ② read-back and flow-form wording (the fixed ② sentence, table or text diagram first, short flow stays lines) | Skill lens `omission` and `user-judgment-leak`. A Mermaid fence in the read-back is still caught by `test_write_spec_contract.py::test_chat_readback_has_no_mermaid` | review lens dimension |
 | mapping-design-grammar | test_write_spec_contract.py::test_intake_station_argument_is_this_station | write-spec calls intake with another station's name | `test_write_spec_contract.py::test_checker_subcommands_named_exist` (exec: `intake` is named and exists). The argument value is review-only | kept structural test |
-| mapping-design-grammar | test_write_spec_contract.py::test_risk_triggered_spec_review_contract (pruned: reviewer, write-plan, `pre-build-review` field, spec+adversarial and no-dispatch literals) | Spec review hand-off wording, the `pre-build-review` declaration | not-required — <reason>` field. The `loom-code:closing-review` absence stays in the same function. The rest is Skill lens `omission` | checker rule id |
+| mapping-design-grammar | test_write_spec_contract.py::test_risk_triggered_spec_review_contract (pruned: reviewer, write-plan, `pre-build-review` field, spec+adversarial and no-dispatch literals) | Spec review hand-off wording, the `pre-build-review` declaration | `intake.spec-ready` recomputes the `pre-build-review: required\|not-required — <reason>` field. The `loom-code:closing-review` absence stays in the same function. The rest is Skill lens `omission` | checker rule id |
 | mapping-design-grammar | test_write_spec_contract.py::test_one_way_door_copy_states_it_is_deliberate, ::test_spec_risk_classes_are_explicit | The one-way-door copy note or the list of spec risk classes dropped | Skill lens `omission` | review lens dimension |
 | mapping-design-grammar | test_write_spec_contract.py::test_chat_readback_has_no_mermaid (pruned: "Never put Mermaid in", "raw code", Design-decision sentences) | Read-back wording about Mermaid and hiding `## Design decision` | The ```` ```mermaid ```` absence stays in the same function. Hiding the Design decision is Skill lens `user-judgment-leak` | kept structural test |
 | mapping-design-grammar | test_acceptance_test_report_shape.py::test_suite_criterion_cites_finalize_review_command, ::test_no_full_suite_run_instruction (pruned: the negated full-suite sentence) | The tester's suite row stops citing `finalize-review`, or the prohibition on running the full suite goes | `test_acceptance_test_report_shape.py::test_no_full_suite_run_instruction` (no un-negated full-suite instruction stays), `::test_suitecheck_negatedinstruction_exempt` | kept structural test |
@@ -375,6 +380,10 @@ for p in problems:
 | mapping-residual | `loom-workflow/tests/goal-create/test_goal_shape.py::test_defines_four_fields_budget_and_surfacing` (the three quoted Anthropic bullet labels) | the attribution paragraph stops quoting the source's own labels | the same function keeps the paragraph found by its bold lead label, the field and vendor names, and the `named by both` absence; whether the quotes support the claim is docs lens `incorrect-fact` | review lens dimension |
 | mapping-residual | `loom-design/tests/architecture-design/test_architecture_skill.py::test_skill_reads_code_and_proposes_two_options_per_choice` (eight prose words: existing code, at least two options, trade-off and the rest) | the design step stops reading the code or stops offering two options with a recommendation | the same function keeps the `references/design-know-how.md` pointer and the `## decisions` heading; the step's content is skill lens `omission` | review lens dimension |
 | mapping-residual | `loom-workflow/tests/loom-visualization/test_references.py::test_guide_has_seven_rules_and_rewrite_steps` (the rule-3 example words, with `METAPHOR_WORDS`) | rule 3 stops listing the metaphor trigger words | the same function keeps `guide_errors` (seven rules, five rewrite steps, the last one a metaphor check) and the rule-3 ban check through `polarity_errors`: `loom-workflow/tests/loom-visualization/test_references.py::test_guide_has_seven_rules_and_rewrite_steps` | kept structural test |
+| mapping-residual | `loom-code/tests/test_dispatch_profile_contract.py::test_stations_do_not_restate_the_resolver_invocation` (the presence half: each of the 12 `RESOLVER_INVOCATION_PHRASES` exactly once in the profile) | the dispatch profile loses or repeats a resolver invocation step | the resolver the steps invoke is executed by `loom-code/tests/test_dispatch_profile_resolver.py::test_mechanical_route_computes_each_model_tier`; the profile's wording is skill lens `omission`. The same function keeps the scan that no station restates a phrase | kept structural test |
+| mapping-residual | `loom-code/tests/test_expert_mode_skill.py::test_expert_mode_holds_the_suggestion_rules_once` (`count("at most once per change") == 1`, now `<= 1`) | the suggestion rule drops out of expert-mode | skill lens `omission`; the same function keeps the no-duplicate `<= 1` check and the `--origin agent` token count | review lens dimension |
+| mapping-residual | `loom-design/tests/architecture-design/test_architecture_skill.py::test_single_answer_proposal_not_allowed` (deleted: `never present a single answer`) | the design step offers one answer instead of options | skill lens `omission`; `loom-design/tests/architecture-design/test_architecture_skill.py::test_skill_reads_code_and_proposes_two_options_per_choice` keeps the `## decisions` heading and the know-how pointer | review lens dimension |
+| mapping-residual | `loom-design/tests/architecture-design/test_architecture_skill.py::test_skill_states_redesign_updates_decisions_rules_guards` (five phrases: `decisions, rules and guards`, `same commit`, `keep the ratified root document and its active guards unchanged`, `temporary copy`, `activate the guards only after ratification`) | the re-design procedure loses a step: same-commit update, the ratified root kept until re-ratification, guards activated after it | skill lens `omission`; the same function keeps the `re-design` and `re-ratify` tokens | review lens dimension |
 
 ## A4 — mechanism census
 
@@ -515,6 +524,8 @@ print(f"restricted executing test functions under {base}: {total}")
 ```
 
 </details>
+
+**Closing review round 1 fix.** One test function was deleted: `loom-design/tests/architecture-design/test_architecture_skill.py::test_single_answer_proposal_not_allowed`, which runs nothing. Nothing dropped. The restricted count is **1921** at `d8f2615f` and after the fix. The broad count went from **1923** to **1925**, because the graduated `test_adversarial_batch2_loop_phrase_pin.py` now loads the census classifier by path, like its census-gaming sibling. Only the broad counter counts that.
 
 ## A6 — A/B rerun (pointer)
 
