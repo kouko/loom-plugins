@@ -2,17 +2,29 @@
 
 A test that loops over a tuple of multi-word phrases and asserts each one is
 `in` the prose is a phrase pin in loop form: rewording the prose turns it red.
-The batch-2 census cannot see this form, and the override rows for these files
+The batch-2 census could not see this form before 822af596, and the override rows for these files
 say "no sentence asserted present".
 
 concern: a residual positive phrase pin survives in one of the 26 batch-2 files, hidden from the census by its loop form.
 """
 from __future__ import annotations
 
-import ast
+import importlib.util
 from pathlib import Path
 
+import pytest
+
 REPO = Path(__file__).resolve().parents[2]
+_CLASSIFIER = REPO / "docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py"
+if not _CLASSIFIER.exists():
+    pytest.skip(
+        "evidence classifier for 2026-09-27-prose-pin-stock-cleanup is gone",
+        allow_module_level=True,
+    )
+_SPEC = importlib.util.spec_from_file_location("classify_test_files", _CLASSIFIER)
+ctf = importlib.util.module_from_spec(_SPEC)
+_SPEC.loader.exec_module(ctf)
+
 BATCH_2 = [
     "loom-code/tests/test_acceptance_test_report_shape.py",
     "loom-code/tests/test_adversary_protocol.py",
@@ -42,35 +54,15 @@ BATCH_2 = [
 ]
 
 
-def _phrase(node: ast.AST) -> bool:
-    return isinstance(node, ast.Constant) and isinstance(node.value, str) and len(node.value.split()) >= 3
-
-
-def loop_phrase_pins(src: str) -> list[int]:
-    """Lines of `for x in (<phrase literals>): assert x in <text>` with a positive `in`."""
-    hits = []
-    for loop in ast.walk(ast.parse(src)):
-        if not (isinstance(loop, ast.For) and isinstance(loop.target, ast.Name)):
-            continue
-        if not (isinstance(loop.iter, (ast.Tuple, ast.List)) and any(_phrase(e) for e in loop.iter.elts)):
-            continue
-        for node in ast.walk(loop):
-            test = getattr(node, "test", None) if isinstance(node, ast.Assert) else None
-            if (isinstance(test, ast.Compare) and isinstance(test.left, ast.Name)
-                    and test.left.id == loop.target.id and isinstance(test.ops[0], ast.In)):
-                hits.append(node.lineno)
-    return hits
-
-
 def test_loop_phrase_pins_synthetic_affirmative_and_negated() -> None:
     """The scan flags a positive loop pin and ignores the negated (absence) form."""
     positive = 'def t():\n    for p in ("steps six govern", "x"):\n        assert p in TEXT\n'
     negated = 'def t():\n    for p in ("steps six govern", "x"):\n        assert p not in TEXT\n'
-    assert loop_phrase_pins(positive) == [3]
-    assert loop_phrase_pins(negated) == []
+    assert ctf.loop_pin_lines(positive) == [3]
+    assert ctf.loop_pin_lines(negated) == []
 
 
 def test_batch2_files_after_prune_carry_no_loop_phrase_pin() -> None:
     """None of the pruned batch-2 files asserts a multi-word phrase present in a loop."""
-    found = {rel: loop_phrase_pins((REPO / rel).read_text(encoding="utf-8")) for rel in BATCH_2}
+    found = {rel: ctf.loop_pin_lines((REPO / rel).read_text(encoding="utf-8")) for rel in BATCH_2}
     assert {rel: lines for rel, lines in found.items() if lines} == {}

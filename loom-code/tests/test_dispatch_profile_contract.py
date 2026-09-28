@@ -44,9 +44,7 @@ RESOLVER_INVOCATION_PHRASES = (
 
 
 def test_stations_do_not_restate_the_resolver_invocation() -> None:
-    profile = _flat(_contract()).lower()
     for phrase in RESOLVER_INVOCATION_PHRASES:
-        assert profile.count(phrase.lower()) == 1, phrase
         for station in STATIONS:
             flat = _flat(station.read_text(encoding="utf-8")).lower()
             assert phrase.lower() not in flat, f"{station.parent.name} restates: {phrase}"

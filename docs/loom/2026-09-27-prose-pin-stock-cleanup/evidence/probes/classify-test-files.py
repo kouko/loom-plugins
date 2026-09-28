@@ -433,9 +433,10 @@ MANUAL_OVERRIDES = {
     ),
     "loom-code/tests/test_dispatch_profile_contract.py": (
         "structure",
-        "resolver one-home scan (each invocation phrase once in the profile, "
-        "never in a station), gate markers with their eval registration, and "
-        "the packaged profile link resolving",
+        "resolver one-home scan (no invocation phrase restated in a station; "
+        "the presence-in-profile half was removed in closing review round 1), "
+        "gate markers with their eval registration, and the packaged profile "
+        "link resolving",
     ),
     "loom-workflow/tests/goal-create/test_skill_md.py": (
         "structure",
@@ -568,7 +569,13 @@ MANUAL_OVERRIDES = {
         "structure",
         "loop-form hit is the four bold field labels of the schema's Guard "
         "failure message section (rule id, offending path, conform, change the "
-        "rule and its guard): schema field labels",
+        "rule and its guard): schema field labels. The rest is path pointers, "
+        "the ratified-by line and commit subject shape, the re-design and "
+        "re-ratify tokens, the two-word terms never required and never blocks, "
+        "the SKILL.md mention of the Guard failure message section name, and a "
+        "heading-bounded Step 5 scan; the direct sentence "
+        "asserts (single answer, re-design procedure) were pruned in closing "
+        "review round 1",
     ),
 }
 

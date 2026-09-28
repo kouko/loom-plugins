@@ -77,19 +77,10 @@ def test_skill_reads_code_and_proposes_two_options_per_choice():
         assert phrase in low, f"design step lacks {phrase!r}"
 
 
-def test_single_answer_proposal_not_allowed():
-    assert "never present a single answer" in " ".join(_text().lower().split())
-
-
 def test_skill_states_redesign_updates_decisions_rules_guards():
     low = " ".join(_text().lower().split())
     assert "re-design" in low
-    assert "decisions, rules and guards" in low
-    assert "same commit" in low
     assert "re-ratify" in low
-    assert "keep the ratified root document and its active guards unchanged" in low
-    assert "temporary copy" in low
-    assert "activate the guards only after ratification" in low
 
 
 def test_guard_failure_message_fields_stated():
