@@ -20,6 +20,12 @@ def test_sentence_pin_named_by_a_gate_eval_is_classified_gate_eval(tmp_path: Pat
     assert ctf.classify(f, gate_evals={f.as_posix()})[0] == "gate-eval"
 
 
+def test_reader_call_with_no_literal_is_not_a_pin(tmp_path: Path) -> None:
+    f = tmp_path / "test_reader.py"
+    f.write_text('from prose_pin import flat_prose as _flat\nPROSE = _flat("SKILL.md")\n\ndef test_x():\n    assert PROSE\n')
+    assert ctf.classify(f)[0] != "sentence-pin"
+
+
 def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tmp_path: Path) -> None:
     root = tmp_path / "loom-code" / "tests"
     root.mkdir(parents=True)

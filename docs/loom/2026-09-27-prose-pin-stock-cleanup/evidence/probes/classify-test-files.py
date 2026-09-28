@@ -82,10 +82,14 @@ PROSE_PIN_IMPORT = re.compile(r"from prose_pin\b|import prose_pin\b")
 # Matches both: assert ... in/== "literal" and assert "literal" in/== ...
 SENTENCE_ASSERT = re.compile(
     r"assert[^\n]*\b(?:in|==)\s*[\"']"  # assert ... in/== "literal"
-    r"|assert\s*[\"'][^\"'\n]{5,}[\"']\s*\b(?:in|==)\b"  # assert "literal" in/== ...
+    r"|assert\s*[\"'](?!#)[^\"'\n]{5,}[\"']\s*\b(?:in|==)\b"  # assert "literal" in/== ... (a "#..." heading is structure)
     r"|pins_exact_sentence\("
-    r"|_affirms\(|affirms\(|_stated_once\(|_flat\("
-    r"|flat_prose\(|rule_prose\(|split_sentences\("
+    r"|_affirms\(|affirms\(|_stated_once\("
+    # split_sentences stays: the recovery-rules files pin phrases through
+    # `_require` lists and exact endings, which no alternative above sees.
+    r"|split_sentences\("
+    # Reader calls (_flat, flat_prose, rule_prose) are not pins: a pin
+    # asserts a literal, which the first alternative catches.
 )
 # Structural-only signals (headings, frontmatter, keys, gate markers).
 STRUCTURE = re.compile(
