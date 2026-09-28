@@ -49,6 +49,21 @@ def test_path_exists_loop_and_absence_loop_are_not_pins(tmp_path: Path) -> None:
     assert not _pinned(tmp_path, body)
 
 
+def test_direct_literal_in_md_text_flagged(tmp_path: Path) -> None:
+    assert _pinned(tmp_path, 'def test_x():\n    assert "the rule is stated here" in TEXT\n')
+
+
+def test_literal_in_subprocess_output_not_flagged(tmp_path: Path) -> None:
+    body = ('import subprocess\n\ndef test_x():\n'
+            '    r = subprocess.run(["python3", "x.py"], capture_output=True, text=True)\n'
+            '    assert "the rule is stated here" in r.stdout\n')
+    assert not _pinned(tmp_path, body)
+
+
+def test_short_heading_literal_not_flagged(tmp_path: Path) -> None:
+    assert not _pinned(tmp_path, 'def test_x():\n    assert "## Scope and rules" in TEXT\n    assert "Scope rules" in TEXT\n')
+
+
 def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tmp_path: Path) -> None:
     root = tmp_path / "loom-code" / "tests"
     root.mkdir(parents=True)
