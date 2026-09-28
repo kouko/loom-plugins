@@ -286,6 +286,57 @@ MANUAL_OVERRIDES = {
         "split_sentences feeds a duplicate-sentence check across recipe files; "
         "no prose literal is asserted",
     ),
+    # W4-02: the files that fell through to `other`, each read in full.
+    "loom-code/tests/test_adversary_recipe_skill_gate.py": (
+        "structure",
+        "one-home check: asserts no rule fragment sits in both the recipe and "
+        "adversary.md; never asserts a sentence is present",
+    ),
+    "loom-code/tests/test_adversary_recipe_spec.py": (
+        "structure",
+        "one-home check: asserts no rule fragment sits in both the recipe and "
+        "adversary.md; never asserts a sentence is present",
+    ),
+    "loom-code/tests/test_check_skill_crossrefs.py": (
+        "behavior",
+        "loads check-skill-crossrefs.py by path and runs find_broken_crossrefs "
+        "on temp fixtures",
+    ),
+    "loom-code/tests/test_codex_hook_trust_contract.py": (
+        "gate-eval",
+        "pure sentence pin on codex-first-contact.md, named by the mechanisms.yaml "
+        "eval of write-plan.codex-installed-hook-trust-boundary; batch 2",
+    ),
+    "loom-workflow/tests/scripts/test_distill_sessions_compaction.py": (
+        "gate-eval",
+        "needle presence in SKILL.md, some needles phrases (Read it when, No "
+        "network calls); named by the mechanisms.yaml eval of distill-sessions; batch 2",
+    ),
+    "loom-workflow/tests/scripts/test_loom_visualization_description_ab.py": (
+        "behavior",
+        "binds the shipped description to the A/B-measured text by hash, and "
+        "test_adversarial_description_ab_probes.py runs it as a program; also "
+        "pins one phrase; batch 2",
+    ),
+    "loom-workflow/tests/scripts/test_no_retired_loom_code_skill_names.py": (
+        "structure",
+        "asserts no retired loom-code skill name against the skills on disk, "
+        "plus scanner self-tests; no sentence asserted",
+    ),
+    "loom-workflow/tests/scripts/test_skill_count.py": (
+        "structure",
+        "skill directory set and manifest tools agree; no sentence asserted",
+    ),
+    "tests/test_kickoff_defaults.py": (
+        "structure",
+        "package-tests command value and lock package set, plus phrase pins "
+        "on the trailing note; batch 2",
+    ),
+    "tests/test_principles_ratification.py": (
+        "structure",
+        "one ratified-by line holding the amendment as a `; ` log entry, and "
+        "no pending-ratification line",
+    ),
 }
 
 
@@ -302,7 +353,7 @@ def main() -> int:
         return 0
     roots = [r for r in args.roots.split(",") if r]
     gate_evals = load_gate_evals()
-    counts: dict[str, int] = {"sentence-pin": 0, "gate-eval": 0}  # A4 reads these even at zero
+    counts: dict[str, int] = {"sentence-pin": 0, "gate-eval": 0, "other": 0}  # A1/A4 read these even at zero
     rows = []  # (file, class, secondary_markers)
     for root in roots:
         for p in sorted((REPO / root).rglob("*.py")):
@@ -313,15 +364,17 @@ def main() -> int:
                 secondary = {"auto": cls, "override": forced, "reason": reason, **secondary}
                 cls = forced
             counts[cls] = counts.get(cls, 0) + 1
-            if cls in {"sentence-pin", "gate-eval", "structure", "grammar-invariant", "behavior"}:
-                secondary_str = ", ".join(f"{k}={v}" for k, v in secondary.items()) if secondary else ""
-                rows.append((p.relative_to(REPO).as_posix(), cls, secondary_str))
+            secondary_str = ", ".join(f"{k}={v}" for k, v in secondary.items()) if secondary else ""
+            rows.append((key, cls, secondary_str))  # every file, so no bucket is hidden
 
     print(f"{'file':65s} {'class':20s} secondary")
     for f, c, s in rows:
         print(f"{f:65s} {c:20s} {s}")
 
     print("\ncounts:", dict(sorted(counts.items())))
+    if counts["other"]:
+        print("FAIL: files in `other` belong to no named class; add a MANUAL_OVERRIDES row")
+        return 1
     return 0
 
 

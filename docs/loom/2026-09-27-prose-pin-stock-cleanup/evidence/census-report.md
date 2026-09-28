@@ -221,20 +221,33 @@ Also in this round: the appended `# prose_pin matcher self-test` comments were r
 
 ## Removed sentence-pin tests → replacement evidence
 
+Dispositions are the net diff against base `946e06d1`. Review-lens facets are the `docs` lens facets in `loom-code/agents/reviewer.md` (defined in `loom-code/skills/closing-review/references/lenses.md`); `a.py::f` names one test function.
+
 | File | Disposition | What the pins guarded | Replacement evidence |
 | :--- | :--- | :--- | :--- |
-| `loom-code/tests/test_adversary_recipe_code.py` | pruned | Prose recipe rules for adversary | Structural tests + review lens: omission |
-| `loom-code/tests/test_adversary_recipe_shape.py` | pruned | Prose recipe shape for adversary | Structural tests + review lens: omission |
-| `loom-code/tests/test_adversary_recipe_skill_gate.py` | pruned | Prose recipe gates for adversary | Structural tests + review lens: omission |
-| `loom-code/tests/test_adversary_recipe_spec.py` | pruned | Prose recipe spec for adversary | Structural tests + review lens: omission |
-| `loom-code/tests/test_adversary_routing.py` | pruned | Reword-planting assertion | Reword-planting guard |
-| `loom-code/tests/test_agy_tool_mapping.py` | deleted | Reference mapping to AgY tools | Review lens: incorrect-fact |
-| `loom-code/tests/test_dispatch_profile_contract.py` | pruned | Dispatch profile prose contract | Structural tests + review lens: incorrect-fact |
-| `loom-code/tests/test_module_criteria_text.py` | deleted | Modular split criteria | Checker rules + review lens: ambiguity |
-| `loom-workflow/tests/goal-create/test_input_floor.py` | deleted | Input slot names contract | Structural tests |
-| `loom-workflow/tests/goal-create/test_skill_md.py` | pruned | Goal-create input prose pins | Structural tests + review lens: inconsistency |
-| `loom-workflow/tests/scripts/test_critique_compaction.py` | pruned | Critique skill compaction | Structural tests + review lens: omission |
-| `loom-workflow/tests/scripts/test_goal_create_compaction.py` | deleted | Goal-create skill compaction | Structural tests |
+| `loom-code/tests/test_adversary_recipe_code.py` | pruned (`test_recipe_affirms_the_rule`, `test_recipe_states_the_rule` + 2 helper self-tests) | Code-recipe rules stated in the recipe | `test_adversary_layout.py::test_every_original_rule_is_still_stated_verbatim`; `test_adversary_recipe_code.py::test_recipe_names_every_class_to_draw_cases_from`; lens facet `omission` |
+| `loom-code/tests/test_adversary_recipe_shape.py` | unchanged (net diff vs `946e06d1` empty; edited in 45bd949d, restored in e4ec2437) | nothing removed | none needed |
+| `loom-code/tests/test_adversary_recipe_skill_gate.py` | pruned (`test_recipe_affirms_the_rule` + 1 helper self-test) | Skill-and-gate recipe rules stated in the recipe | `test_adversary_recipe_skill_gate.py::test_procedure_sentence_in_both_files_rejected`; `test_adversary_layout.py::test_no_kind_rule_appears_outside_its_own_file`; lens facet `omission` |
+| `loom-code/tests/test_adversary_recipe_spec.py` | pruned (`test_recipe_affirms_the_rule`, `test_recipe_states_the_rule` + 2 helper self-tests) | Spec recipe rules stated in the recipe | `test_adversary_recipe_spec.py::test_procedure_sentence_in_both_files_rejected`; `test_adversary_layout.py::test_no_kind_rule_appears_outside_its_own_file`; lens facet `omission` |
+| `loom-code/tests/test_adversary_routing.py` | pruned (`test_a_reworded_recipe_is_not_blamed_on_the_addition`, `test_first_planting_fails_when_nothing_was_planted_synthetic`) | A recipe reword must redden only that recipe's own pin test | `test_adversary_routing.py::test_a_reworded_recipe_plants_no_failure_for_the_addition_to_be_judged_on`; `test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic` |
+| `loom-code/tests/test_agy_tool_mapping.py` | deleted | AgY reference names the right tools, station pointers resolve | `test_check_skill_crossrefs.py::test_missing_backtick_path_is_reported` (pointer resolution); lens facet `incorrect-fact` (tool names, role dispatch) |
+| `loom-code/tests/test_dispatch_profile_contract.py` | pruned (6 functions) | Profile prose: atomic fallback, five effort tiers, sequential escalation, final redispatch routed | `test_dispatch_profile_resolver.py::test_selected_model_pair_is_checked_atomically`, `::test_all_five_portable_efforts_can_be_inherited`, `::test_reasoning_escalation_is_sequential_and_uses_shared_budget`, `::test_final_allowed_execution_success_is_routed`; `test_dispatch_profile_contract.py::test_stations_do_not_restate_the_resolver_invocation` |
+| `loom-code/tests/test_module_criteria_text.py` | deleted | AGENTS.md states the four module criteria, each with a check | `test_adversary_routing.py::test_adding_a_kind_is_one_file_and_one_row` (add), `::test_adding_a_kind_leaves_every_existing_recipe_file_untouched` (change), `::test_removing_a_kind_routed_today_leaves_no_reference` (remove); `test_adversary_layout.py::test_no_kind_rule_appears_outside_its_own_file` (locate); lens facet `ambiguity` |
+| `loom-workflow/tests/goal-create/test_input_floor.py` | deleted | Goal input floor: slot names, bar clause, provenance tags | `test_goal_lint.py::test_floor_fails_structure_and_warns_on_judgment`; `test_goal_lint.py::test_field_labels_match_the_shape_reference`; `test_goal_shape.py::test_defines_four_fields_budget_and_surfacing` |
+| `loom-workflow/tests/goal-create/test_skill_md.py` | pruned (9 functions) | Goal-create session and activation prose | `test_skill_md.py::test_session_activation_rules_are_one_registered_gate`; `test_skill_md.py::test_invocation_section_counts_the_offer_sites_that_exist`; lens facet `inconsistency` |
+| `loom-workflow/tests/scripts/test_critique_compaction.py` | pruned (`test_shared_discipline_is_stated_once`) | Shared discipline stated once in critique SKILL.md | `test_critique_compaction.py::test_routing_boundaries_survive_the_merge`; lens facet `inconsistency` |
+| `loom-workflow/tests/scripts/test_goal_create_compaction.py` | deleted | Goal-create entrypoint keeps modes, floor, invocation | `test_skill_md.py::test_declares_two_modes_and_conditional_arc`, `::test_floor_invocation_line_names_the_script`, `::test_invocation_section_counts_the_offer_sites_that_exist` |
+| `loom-code/tests/test_principles_amendment.py` | deleted (W4-02) | PRINCIPLES.md non-negotiable 2 sentences and the exact ratified-by line | `tests/test_principles_ratification.py::test_ratified_by_names_2026_09_15_non_negotiable_2_amendment` (log entry); checker rule `standing.product-principles-reject` (signature grammar); lens facet `omission` (the wording) |
+| `loom-code/tests/test_ship_guidance_presence.py` | deleted (W4-02) | Ship SKILL.md table and no-inline-list guidance sentences | lens facet `omission` |
+
+### W4-02 deletion list (written before deleting)
+
+Both are pure sentence pins: they assert prose wording, execute nothing, carry no `mechanisms.yaml` `eval:`, and no test or script imports or reads them (repo grep; the only hits are historical plans, attestations and evidence of earlier changes).
+
+- `loom-code/tests/test_principles_amendment.py` — exact-sentence and exact-line equality on PRINCIPLES.md (lines 58–65); nothing executed.
+- `loom-code/tests/test_ship_guidance_presence.py` — two `target in content` sentence checks on ship SKILL.md, opened by a cwd-relative path; nothing executed.
+
+Not deleted, though acceptance testing named it a likely pure pin: `loom-code/tests/test_codex_hook_trust_contract.py` is the `eval:` of `write-plan.codex-installed-hook-trust-boundary` in `mechanisms.yaml`, so it is gate-eval and goes to batch 2.
 
 ## A5 executable test count
 

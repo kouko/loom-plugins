@@ -38,3 +38,19 @@ def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tm
         '    assert "x" in "xy"\n'
     )
     assert ctf.count_executing_tests(tmp_path) == 1
+
+
+def test_census_at_head_places_every_prose_reader_in_a_named_class(monkeypatch, capsys) -> None:
+    monkeypatch.setattr("sys.argv", ["classify-test-files.py"])
+    assert ctf.main() == 0
+    assert "'other': 0" in capsys.readouterr().out
+
+
+def test_unlisted_file_fails_census_and_is_printed(tmp_path: Path, monkeypatch, capsys) -> None:
+    (tmp_path / "t").mkdir()
+    (tmp_path / "t" / "test_unlisted.py").write_text('DOC = "SKILL.md"\n\ndef test_x():\n    assert DOC\n')
+    monkeypatch.setattr(ctf, "REPO", tmp_path)
+    monkeypatch.setattr(ctf, "load_gate_evals", lambda: set())
+    monkeypatch.setattr("sys.argv", ["classify-test-files.py", "--roots", "t"])
+    assert ctf.main() == 1
+    assert any(line.startswith("t/test_unlisted.py") and " other " in line for line in capsys.readouterr().out.splitlines())
