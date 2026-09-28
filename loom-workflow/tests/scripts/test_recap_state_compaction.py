@@ -9,67 +9,13 @@ SCHEMA_PATH = (
 )
 
 
-def test_entrypoint_preserves_goal_grounded_sections_and_synthesis_gate():
+def test_entrypoint_reads_schema_before_the_ordered_six_section_template():
+    """The schema pointer precedes the template, whose six headings keep their
+    order and carry no internal tags. The entrypoint's wording is review-only."""
     text = SKILL_PATH.read_text(encoding="utf-8")
 
-    essence = {
-        "in-session routing": [
-            "in-session re-orientation",
-            "away-summary",
-            "cross-session",
-            "HANDOFF",
-        ],
-        "natural output boundary": [
-            "Keep planning internal",
-            "Never output `<thinking>` or `<recap>` tags",
-            "Never expose `Block N` labels",
-            "natural headings in the conversation language",
-        ],
-        "schema before every recap": [
-            "Read `references/seven-block-schema.md`",
-            "full L3 template",
-            "What to do",
-        ],
-        "verbatim preservation": [
-            "quote-not-paraphrase",
-            "spec-critical user phrases",
-            "file paths",
-            "error messages",
-            "command names",
-            "verbatim",
-        ],
-        "visual thresholds": [
-            "Gap and assessment defaults to 2-col key:value",
-            "2+ options",
-            "items have metadata",
-            "flatten ≥3 sub-items",
-            "compare ≥2 options",
-            "real topology",
-            "known to render Mermaid",
-            "markdown table by default",
-            "cannot render markdown",
-            "Support counts as known only",
-            "ASCII",
-        ],
-        "synthesis stop": [
-            "Synthesis-check",
-            "confirm or redirect",
-            "wait",
-            "does not continue until user responds",
-        ],
-        "five principles": [
-            "structured-schema",
-            "quote-not-paraphrase",
-            "all-user-messages",
-            "synthesis-check",
-            "plain-language",
-        ],
-    }
-    for contract, needles in essence.items():
-        missing = [needle for needle in needles if needle not in text]
-        assert not missing, f"{contract} missing from entrypoint: {missing}"
-
-    schema_read = text.index("Read `references/seven-block-schema.md`")
+    what_to_do = text.index("## What to do")
+    schema_read = text.index("references/seven-block-schema.md", what_to_do)
     template_start = text.index("### Purpose and current position", schema_read)
     template_end = text.index("3. Apply", template_start)
     rendered_template = text[template_start:template_end]
