@@ -62,6 +62,13 @@ charter: 1.1
 - Test: A1 positive: clean-worktree-census-zero-pins; negative: other-bucket-exits-1. A4 positive: check-mechanisms-all-clear; negative: dangling-eval-reported. A5 positive: recount-not-below-base; negative: deleted-function-tagged-exec-fails.
 - Risk: agent-decided — stitches the mapping files into one table; every remaining has_pins=yes file has a visible override row with its reason; runs from a clean worktree.
 
+### Wave 3 — adversary fix round
+
+**W3-01 Census output-taint gap and residual pins**  after: W2-01  acceptance: 1, 2, 3
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, loom-workflow/tests/distill-sessions/test_prompts_parseable.py, tests/test_loom_plugin_install_layout.py, loom-code/tests/test_adversarial_batch3_census_misses.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/probes/test_adversarial_census_misses.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/deletion-list.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-residual.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/census-report.md
+- Test: A1 positive: yaml-helper-body-pin-flagged; negative: parsed-frontmatter-value-not-flagged. A2 positive: behavior-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: installed-copy-skill-read-counts-as-prose.
+- Risk: agent-decided — only the parsed value of a helper is output; the adversary program graduates to loom-code/tests; newly flagged files are pruned here and the census rerun.
+
 ## Simplicity check
 - Merge the two known-file tasks into one W1-01 with one mapping file — taken
 - Split W1-03 before W0-01 runs — declined: the newly flagged file count is unknown until the widened census exists
