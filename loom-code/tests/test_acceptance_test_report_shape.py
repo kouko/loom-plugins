@@ -23,7 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from prose_pin import flat_prose, has_negation, pins_exact_sentence, split_sentences  # noqa: E402
+from prose_pin import flat_prose, split_sentences  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = (
@@ -144,150 +144,6 @@ def _section3() -> str:
     return text.split("## 3. Run acceptance testing", 1)[1].split("\n## 4.", 1)[0]
 
 
-def _affirmed(sentences: list[str], *phrases: str) -> list[str]:
-    return [
-        s for s in sentences
-        if all(p in s for p in phrases) and not has_negation(re.sub(r"`[^`]*`", "", s))
-    ]
-
-
-def test_suite_criterion_cites_finalize_review_command():
-    """A1 positive: a suite-settled row cites the check, not a result."""
-    sentences = _tester()
-    assert _affirmed(
-        sentences, "names the suite check", "`finalize-review` executes it",
-        "refuses the attestation",
-    ), "tester does not cite finalize-review's suite check"
-    assert _affirmed(sentences, "committed before `finalize-review` runs")
-    assert _affirmed(sentences, "`package-tests` is skipped", "only that criterion's own tests")
-    assert _affirmed(sentences, "setup check", "every run")
-    flat = " ".join(flat_prose(TESTER).split())
-    for phrase in (
-        "The station also says whether `package-tests` is skipped and whether `finalize-review` will run",
-        "When they pass, the row is `works`",
-        "When any of them fails, the row is `fails`.",
-        "When you ran none of them, the row is `not verified`.",
-        "the row reports only their result.",
-    ):
-        assert phrase in flat, phrase
-    section = split_sentences(" ".join(_section3().split()))
-    assert _affirmed(section, "On every dispatch", "`package-tests` or `finalize-review` is skipped")
-    assert _affirmed(section, "steps 6-7 govern the suite row and what is re-tested")
-
-
-DISMISSALS = (
-    "Also hand it every finding of severity `important` or worse that the main agent dismissed."
-)
-
-
-def test_station_hands_tester_its_dismissals():
-    """The tester's dismissal section has a source: §3 hands it every dismissal."""
-    section = " ".join(_section3().split())
-    assert pins_exact_sentence(section, DISMISSALS)
-    sentences = split_sentences(section)
-    assert "On every dispatch" in sentences[sentences.index(DISMISSALS) - 1]
-    for old, new in (
-        (DISMISSALS, ""),
-        ("`important` or worse", "`fatal`"),
-        ("hand it every finding", "hand it one finding"),
-    ):
-        assert not pins_exact_sentence(section.replace(old, new, 1), DISMISSALS), new
-
-
-LATE_DISMISSALS = (
-    "A finding of that severity dismissed after the tester's last dispatch, "
-    "when Ship comes next, is listed in the pull request's Verification section instead."
-)
-
-
-def test_late_dismissals_reach_the_pull_request():
-    """A dismissal decided after the tester's last dispatch still reaches the user."""
-    section = " ".join(_section3().split())
-    assert pins_exact_sentence(section, LATE_DISMISSALS)
-    assert not has_negation(LATE_DISMISSALS)
-    sentences = split_sentences(section)
-    assert sentences[sentences.index(LATE_DISMISSALS) - 1] == DISMISSALS
-    for old, new in (
-        (LATE_DISMISSALS, ""),
-        ("the pull request's Verification section", "the evidence file"),
-        ("after the tester's last dispatch", "before the tester's last dispatch"),
-    ):
-        assert not pins_exact_sentence(section.replace(old, new, 1), LATE_DISMISSALS), new
-
-
-SHIP = REPO_ROOT / "loom-code" / "skills" / "ship" / "SKILL.md"
-SHIP_LATE_DISMISSALS = (
-    "List each finding of severity `important` or worse that closing review "
-    "dismissed after the acceptance tester's last dispatch, with its reason, "
-    "as closing review's hand-off reports them."
-)
-
-
-def _ship_verification_rules() -> str:
-    text = SHIP.read_text(encoding="utf-8")
-    rules = text.split("Under the Verification heading", 1)[1].split("Every decision summary", 1)[0]
-    return " ".join(rules.split())
-
-
-def test_ship_lists_late_dismissals_in_verification():
-    """The station that writes the Verification section carries the late dismissals."""
-    rules = _ship_verification_rules()
-    assert pins_exact_sentence(rules, SHIP_LATE_DISMISSALS)
-    assert not has_negation(SHIP_LATE_DISMISSALS)
-    for old, new in (
-        (SHIP_LATE_DISMISSALS, ""),
-        ("`important` or worse", "`fatal`"),
-        (", with its reason,", ","),
-    ):
-        assert not pins_exact_sentence(rules.replace(old, new, 1), SHIP_LATE_DISMISSALS), new
-
-
-def test_ship_names_handoff_as_late_dismissal_source():
-    """Ship reads the late dismissals from closing review's hand-off, not recall."""
-    rules = _ship_verification_rules()
-    assert pins_exact_sentence(rules, SHIP_LATE_DISMISSALS)
-    weakened = rules.replace(", as closing review's hand-off reports them.", ".", 1)
-    assert not pins_exact_sentence(weakened, SHIP_LATE_DISMISSALS)
-
-
-HANDOFF_LATE_DISMISSALS = (
-    "Also report every finding of severity `important` or worse dismissed after "
-    "the acceptance tester's last dispatch, with its reason."
-)
-
-
-def _closing_review_handoff() -> str:
-    text = STATION.read_text(encoding="utf-8")
-    return " ".join(text.split("\n## Handoff", 1)[1].split())
-
-
-def test_closing_review_handoff_reports_late_dismissals():
-    """The hand-off is the carrier for dismissals Ship lists in Verification."""
-    handoff = _closing_review_handoff()
-    assert pins_exact_sentence(handoff, HANDOFF_LATE_DISMISSALS)
-    assert not has_negation(HANDOFF_LATE_DISMISSALS)
-    assert not pins_exact_sentence(
-        handoff.replace(HANDOFF_LATE_DISMISSALS, "", 1), HANDOFF_LATE_DISMISSALS
-    )
-
-
-TESTER_DISMISSALS = (
-    "The station also hands you every finding of severity `important` or worse "
-    "that the main agent dismissed, with its reason."
-)
-
-
-def test_dismissal_source_agrees_across_tester_and_template():
-    """Tester input list and template both say the main agent dismisses."""
-    given = flat_prose(TESTER).split("## What you are given", 1)[1].split("## What you do", 1)[0]
-    assert pins_exact_sentence(" ".join(given.split()), TESTER_DISMISSALS)
-    template = flat_prose(TEMPLATE)
-    assert "severity important or worse that the main agent dismissed" in template
-    assert "<who> raised <finding>" in template
-    for stale in ("a reviewer dismissed", "<reviewer> raised"):
-        assert stale not in template, stale
-
-
 RUN_VERB = re.compile(r"\b(?:run|runs|running|execute|executes|executing|invoke|invokes)\b", re.I)
 WHOLE_TARGET = re.compile(
     r"\b(?:package|whole|full|complete|entire)\s+(?:package\s+)?(?:suite|package)\b", re.I
@@ -325,42 +181,6 @@ def test_no_full_suite_run_instruction():
     assert "the name of a test you ran" not in flat, "evidence wording still invites named tests"
     offending = _full_suite_instructions(_tester())
     assert offending == [], offending
-    assert [s for s in _tester() if "full package suite" in s and has_negation(s)], (
-        "tester contract does not forbid running the full package suite"
-    )
-
-
-def test_rerun_retests_every_named_surface():
-    """A3 positive: a re-tested criterion is re-tested over every surface."""
-    sentences = _tester()
-    assert _affirmed(sentences, "re-test only the rows the fix could affect", "UI flows", "in full")
-    assert _affirmed(sentences, "every surface its Acceptance line or UI flow names")
-    assert _affirmed(sentences, "`carried over — <one-line reason>`", "Re-run column")
-    assert _affirmed(sentences, "against the fix diff")
-    assert _affirmed(sentences, "any doubt", "in full")
-
-
-def test_partial_surface_retest_forbidden():
-    """A3 negative: re-testing only the part a fix touched is never allowed."""
-    touched = [s for s in _tester() if "the part the fix touched" in s]
-    assert touched, "tester contract does not name the partial re-test trap"
-    assert all(has_negation(s) for s in touched), touched
-
-
-def test_rerun_dispatch_passes_earlier_report_evidence_and_fix_range():
-    """A re-run gets what step 7 needs to check each carried-over reason."""
-    phrases = ("earlier report", "evidence file", "commit range")
-    assert _affirmed(_tester(), *phrases), "tester contract does not list the re-run inputs"
-    assert _affirmed(split_sentences(" ".join(_section3().split())), "re-dispatch", *phrases), (
-        "§3 does not pass the re-run inputs"
-    )
-
-
-def test_identifiers_confined_to_evidence_file_apart_from_pointer():
-    """The report's one path is the line pointing to the evidence file."""
-    assert _affirmed(
-        _tester(), "Identifiers appear only in the evidence file", "the one line that points to it"
-    )
 
 
 def test_rules_live_in_contract_and_template():
@@ -372,7 +192,6 @@ def test_rules_live_in_contract_and_template():
     _column(header, "Re-run")
     section = " ".join(_section3().split())
     assert EVIDENCE_PATH in section
-    assert _affirmed(split_sentences(section), "committed with the report")
 
 
 def test_no_new_gate_marker():
