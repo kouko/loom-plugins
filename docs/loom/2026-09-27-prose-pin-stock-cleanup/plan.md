@@ -69,8 +69,8 @@ charter: 1.1
 - 刪除工作依「無耦合整檔刪 / 有耦合裁剪」二分，避免逐檔客製 — taken
 - 不新增 checker 規則或 gate，只重算既有測試 — taken
 - 單一普查報告作為 SSOT，W1/W2 各 task 不重複寫分類邏輯 — taken
-- plan-lens：W1 三批整檔刪合併為單一 task — declined: Files 上限 8 檔/ task（plan.field-caps），19 檔無法塞進一個 task；三批維持
-- plan-lens：`test_acceptance_test_report_shape` 同時列於 W1-01（刪）與 W2-02（裁剪）— taken: 從 W1-01 移除；該檔含 22 個結構斷言（verdict 字彙集、欄位形狀），屬裁剪非整檔刪
+- plan-lens W1 三批整檔刪合併為單一 task — declined: Files 上限 8 檔/task（plan.field-caps），19 檔無法塞進一個 task；三批維持
+- plan-lens test_acceptance_test_report_shape 重複列於刪與裁剪 — taken
 
 ## Questions asked
 ① — what — 把上次改機制後遺留的釘住散文句子的舊測試庫存量清掉，以後改散文不會再被舊釘子弄到要連改測試。對嗎？ — 對
