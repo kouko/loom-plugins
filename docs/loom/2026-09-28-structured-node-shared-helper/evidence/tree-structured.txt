@@ -1,0 +1,5 @@
+root
+child one
+child two
+├─ leaf A
+└─ leaf B

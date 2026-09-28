@@ -26,19 +26,7 @@ from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines, wrap_label
-
-
-def _center(label: str, interior: int) -> str:
-    """Pad label to `interior` display cells, label roughly centered.
-
-    Padding is computed in display cells (not characters) so CJK labels
-    are not over-padded. Extra odd cell goes to the right.
-    """
-    slack = interior - display_width(label)
-    left = slack // 2
-    right = slack - left
-    return " " * left + label + " " * right
+from width import display_width, split_lines, center, EMPTY_BODY, render_structured_node
 
 
 def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> str:
@@ -125,23 +113,11 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
                 if not body:
                     raise ValueError("Body cannot be empty for structured node from string with \\n")
 
-                # Add title line (left-aligned)
-                block.append("│ " + title + " " * (interior - display_width(title) - 1) + "│")
-
-                # Add separator line
-                block.append("├" + "─" * interior + "┤")
-
-                # Add body lines (left-aligned, wrapped at interior - 1)
-                for body_line in body:
-                    # Wrap the body line at interior - 1 (true content budget)
-                    wrapped_lines = wrap_label(body_line, interior - 1)
-                    for wrapped_line in wrapped_lines:
-                        # Each wrapped line gets one leading space, then content, then padded to interior
-                        block.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
+                block.extend(render_structured_node(title, body, interior))
             else:
                 # Regular string step: centered label, supports \n for multi-line
                 for line in split_lines(step):
-                    block.append("│" + _center(line, interior) + "│")
+                    block.append("│" + center(line, interior) + "│")
         else:
             # Dict step: structured node with title and body
             title = step["title"]
@@ -149,21 +125,9 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
 
             # Validate body is not empty
             if not body:
-                raise ValueError("Body cannot be empty for structured node")
+                raise ValueError(EMPTY_BODY)
 
-            # Add title line (left-aligned)
-            block.append("│ " + title + " " * (interior - display_width(title) - 1) + "│")
-
-            # Add separator line
-            block.append("├" + "─" * interior + "┤")
-
-            # Add body lines (left-aligned, wrapped at interior - 1)
-            for body_line in body:
-                # Wrap the body line at interior - 1 (true content budget)
-                wrapped_lines = wrap_label(body_line, interior - 1)
-                for wrapped_line in wrapped_lines:
-                    # Each wrapped line gets one leading space, then content, then padded to interior
-                    block.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
+            block.extend(render_structured_node(title, body, interior))
 
         block.append(bottom)
         blocks.append(block)

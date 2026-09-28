@@ -12,7 +12,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines
+from width import display_width, require_single_line
 
 _BAR = "█"
 
@@ -26,10 +26,10 @@ def render_bar(pairs: list[tuple[str, float]], width: int = 20) -> str:
         # split a row in two and corrupt alignment; a bare \r is a 0-width
         # control char that passes width checks yet shears the chart silently.
         # split_lines(label) != [label] is true for every line break.
-        if split_lines(label) != [label]:
-            raise ValueError(
-                f"bar label must be single-line, got line break in {label!r}"
-            )
+        require_single_line(
+            label, "bar label",
+            template="{phrase} must be single-line, got line break in {value!r}",
+        )
     label_width = max(display_width(label) for label, _ in pairs)
     max_value = max(value for _, value in pairs)
 
