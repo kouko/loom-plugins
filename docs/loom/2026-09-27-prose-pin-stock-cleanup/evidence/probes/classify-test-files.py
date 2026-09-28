@@ -383,9 +383,10 @@ MANUAL_OVERRIDES = {
     "loom-code/tests/test_build_recovery_rules.py": (
         "structure",
         "one-home scans only: the build.absence-recovery gate block restates no "
-        "artifact-to-station mapping, and §1-§2 repeat none of the rule; "
-        "split_sentences feeds that scan, no sentence is asserted present; RL-12 "
-        "is the eval of build.absence-recovery",
+        "artifact-to-station mapping, and §1-§2 repeat none of the rule; the "
+        "block cites the three manifest keys (path pointers); split_sentences "
+        "feeds the scan, no sentence is asserted present; RL-12 is the eval of "
+        "build.absence-recovery",
     ),
     "loom-code/tests/test_closing_review_recovery_rules.py": (
         "structure",
@@ -403,7 +404,73 @@ MANUAL_OVERRIDES = {
         "structure",
         "mode headings, reference paths resolving, the floor command shape, the "
         "session-activation gate blocks, template non-restatement and the "
-        "offer-site count; eval of goal-create.session-activation, no sentence asserted",
+        "offer-site count (its number recomputed from the sites scanned in the "
+        "repo); eval of goal-create.session-activation, no sentence asserted",
+    ),
+    # Batch 2 residual fix: the pruned batch-2 files, each read in full after
+    # their last sentence pins were removed.
+    "loom-code/tests/test_acceptance_test_report_shape.py": (
+        "structure",
+        "template table columns, rows and markers, the evidence block heading, "
+        "the template path pointer in the tester contract, a full-suite "
+        "absence scan fed by split_sentences and no gate marker; no sentence "
+        "asserted present",
+    ),
+    "loom-code/tests/test_adversary_protocol.py": (
+        "behavior",
+        "imports MAX_PROBE_PROGRAMS from loom_checker for the case-count scan; "
+        "the rest is a one-home absence scan and YAML keys of the return "
+        "block; no sentence asserted present",
+    ),
+    "loom-code/tests/test_adversary_routing.py": (
+        "behavior",
+        "runs the adversary tests in repo copies after real add, remove and "
+        "reword edits; literals are a recipe's link back to the protocol, "
+        "exception messages and pytest stdout; split_sentences only picks a "
+        "sentence to reword; no sentence asserted present",
+    ),
+    "loom-code/tests/test_lenses_deletion_first.py": (
+        "structure",
+        "reviewer.md lens table rows end with the deletion-first dimension "
+        "token; no sentence asserted",
+    ),
+    "loom-code/tests/test_plan_simplicity_text.py": (
+        "structure",
+        "absence checks, the write-plan step's path pointer to "
+        "plan-simplicity.md, and a scan that every user sentence of the step is "
+        "negated (split_sentences); no sentence asserted present",
+    ),
+    "loom-code/tests/test_review_convergence_contract.py": (
+        "structure",
+        "gate-marker presence, heading-anchored sections, and absence or "
+        "negation scans fed by split_sentences; no sentence asserted present",
+    ),
+    "loom-code/tests/test_reviewer_mechanical_evidence.py": (
+        "structure",
+        "the lenses path pointer count in reviewer.md and absence or negation "
+        "scans; no sentence asserted present",
+    ),
+    "loom-code/tests/test_ship_station_text.py": (
+        "behavior",
+        "recomputes the refusal premise from publish.py source; the rest is "
+        "headings, absences and gate-region placement; no sentence asserted present",
+    ),
+    "loom-code/tests/test_simplified_station_text.py": (
+        "behavior",
+        "imports the checker's STEP_PLAIN_NAMES; the rest is absence and "
+        "negation scans (split_sentences), summary-table rows and a manifest "
+        "YAML value; no sentence asserted present",
+    ),
+    "loom-code/tests/test_sync_before_review_text.py": (
+        "behavior",
+        "runs sync-trunk on real repositories and asserts its stdout and the "
+        "digest; the prose half is absences under the §2 heading and a count "
+        "of sync-trunk; no sentence asserted present",
+    ),
+    "loom-code/tests/test_test_budget_text.py": (
+        "structure",
+        "no line-number threshold in implementer.md and a gate-marker count; "
+        "no sentence asserted",
     ),
     "loom-workflow/tests/scripts/test_distill_sessions_compaction.py": (
         "structure",

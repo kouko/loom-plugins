@@ -71,9 +71,6 @@ def _gate_marked_occurrences(text: str, rule: str) -> list[int]:
 # ship-prose-rule-is-not-marked-as-a-gate (A3 negative)
 def test_ship_prose_rule_is_not_marked_as_a_gate() -> None:
     text = SHIP.read_text(encoding="utf-8")
-    assert _occurrences(text, NO_HANDOVER), (
-        "the no-handover rule is missing from the ship station"
-    )
     assert _gate_marked_occurrences(text, NO_HANDOVER) == [], (
         "PRINCIPLES.md forbids prose-only gates: every copy of the no-handover "
         "rule is advisory prose, and the enforceable carrier is the checker's "
@@ -133,21 +130,6 @@ def test_ship_prose_covers_the_refusals_that_name_no_remedy() -> None:
         "premise: `publish` emits no bare-literal attestation refusal, so "
         "every refusal may name a remedy and ship 3 could promise one outright"
     )
-
-
-AGREES = "only after the user explicitly agrees in conversation"
-
-
-def _sentences() -> list[str]:
-    return re.split(r"(?<=[.!?])\s+", " ".join(SHIP.read_text(encoding="utf-8").split()))
-
-
-# ship-never-runs-setup-unasked (A7 negative)
-def test_ship_never_runs_setup_unasked() -> None:
-    sentences = _sentences()
-    for s in sentences:
-        if ("--print-setup" in s or "setup command" in s) and re.search(r"\brun\b", s):
-            assert AGREES in s or has_negation(s), f"setup run without consent: {s}"
 
 
 TWO_COPY_DOC = (

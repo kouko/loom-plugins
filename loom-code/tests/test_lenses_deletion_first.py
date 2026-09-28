@@ -1,20 +1,8 @@
-"""W1-01 — RED/GREEN evidence: `deletion-first` reaches the docs and skill
-lenses, plus the cap-bump-candidate rule.
+"""`deletion-first` reaches the docs and skill lenses.
 
-Before this task, `deletion-first` was a code-only dimension
-(`lenses.md`'s "Code — eleven dimensions" table): only a program's new
-abstractions were asked to justify themselves against a smaller shape.
-Station text and agent contracts — the artifacts the `docs` and `skill`
-lenses actually score — could grow a new paragraph, mechanism, reserved
-task, or fallback path with nobody asking whether it replaced something or
-prevented an observed failure. This file pins that the docs table and the
-skill lens paragraph each name `deletion-first`, that the shared definition
-they both point to carries an affirmative sentence requiring the smaller
-shape, that a second sentence names a deletion candidate for a file whose
-`*_CAP` was raised in two consecutive changes, and that `reviewer.md`'s
-`docs` and `skill` lens rows end with `deletion-first`.
-
-Never `wc` for word counts — BSD/GNU disagree; `len(str.split())` only.
+What stays here is structural: `reviewer.md`'s `docs` and `skill` lens
+table rows each end with the `deletion-first` dimension token. The
+wording of the deletion-first rule in `lenses.md` is review-only.
 """
 from __future__ import annotations
 

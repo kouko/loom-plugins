@@ -1,12 +1,12 @@
 """capture-intent station contract (plan W2-01).
 
-The station is loom-design's entry point, so its SKILL.md is the one
-document a cold reader gets for Task B ("CLI todo gains a due date, both
-plugins, Claude Code", spec REQ-9). These tests pin what that reader must
-be able to find without guessing, plus the two cross-plugin invariants:
-the `## Station summary` section is byte-identical to loom-code's copy of
-it (a reader who lands on either station sees the same whole-flow table),
-and the plugin declares the contract version it needs.
+The station is loom-design's entry point. These tests check its structure:
+frontmatter, word caps, gate markers and their registration, the shared
+locate-loom-code link, resolving paths, absent deleted vocabulary, and the
+two cross-plugin invariants: the `## Station summary` section is
+byte-identical to loom-code's copy of it (a reader who lands on either
+station sees the same whole-flow table), and the plugin declares the
+contract version it needs. The station's rule wording is review-only.
 
 Reading loom-code's file from a loom-design TEST is deliberate: the ban on
 cross-plugin references is a RUNTIME portability rule for prose contracts

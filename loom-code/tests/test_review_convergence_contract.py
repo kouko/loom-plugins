@@ -209,7 +209,6 @@ def test_finalize_failure_round_requires_no_relook() -> None:
     for sentence in _sentences(finalize):
         if "technical design re-look" in sentence:
             assert has_negation(sentence), sentence
-            assert "unless the episode is stuck" in sentence, sentence
 
 
 def test_reviewer_contract_does_not_tie_relook_to_round3() -> None:

@@ -72,7 +72,6 @@ def test_template_has_one_row_per_criterion_and_evidence_file_path():
     for row in rows:
         assert re.search(r"works|partly|not verified|fails", row[verdict]), row
     report = _report_block()
-    assert "works / partly / not verified / fails" in TEMPLATE.read_text(encoding="utf-8")
     assert not re.search(r"^### \d+\.", report, flags=re.M), "per-criterion blocks remain"
     assert EVIDENCE_PATH in report, "report does not point to the evidence file"
 
@@ -83,7 +82,6 @@ def test_evidence_file_shape_is_given_and_is_plain_markdown():
     evidence = [b for b in blocks if "acceptance test evidence" in b.splitlines()[0].lower()]
     assert evidence, "template gives no shape for the evidence file"
     assert not evidence[0].startswith("#!")
-    assert re.search(r"never[^\n]*`#!`", text), "template does not forbid `#!` evidence"
 
 
 COLUMNS = ["#", "What you asked for", "Verdict", "What happened", "Re-run"]

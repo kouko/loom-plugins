@@ -77,7 +77,6 @@ that started reaching for a kind's test file by name would fail there.
 """
 from __future__ import annotations
 
-import importlib
 import os
 import re
 import shutil
@@ -236,31 +235,6 @@ def recipe_test_module(recipe: str) -> str:
     return f"{RECIPE_TEST_STEM}{recipe_kind(recipe).replace('-', '_')}.py"
 
 
-def recipe_pins() -> dict[str, tuple]:
-    """Every `RECIPE_PINS` entry the routed recipes' own test modules define.
-
-    A cross-document scan that must not flag a recipe's own pinned sentence
-    reads the pin from here. Importing one recipe's test module by name would
-    make that scan a reference the kind's removal leaves dangling; going
-    through the routing table, the scan loses exactly the pins whose recipe
-    went away and keeps the rest.
-
-    A recipe whose module defines no pin table contributes nothing. A pin name
-    two modules define is refused, because the caller looks a pin up by name
-    alone and would otherwise silently get one of the two.
-    """
-    merged: dict[str, tuple] = {}
-    for recipe in routed_recipes():
-        module_name = recipe_test_module(recipe)
-        if not (ROOT / SCRIPTS / module_name).is_file():
-            continue
-        module = importlib.import_module(module_name[:-len(".py")])
-        for name, pin in getattr(module, "RECIPE_PINS", {}).items():
-            assert name not in merged, (name, module_name)
-            merged[name] = pin
-    return merged
-
-
 def _artifact_types() -> set[str]:
     """Every type name of the repository's own artifact-type vocabulary."""
     block = MANIFEST.read_text(encoding="utf-8").split("\nartifact_types:", 1)[1]
@@ -322,30 +296,9 @@ def test_routed_recipe_reader_synthetic() -> None:
     assert recipe_kind(_SYNTHETIC_RECIPE) == "synthetic-one"
 
 
-def test_recipe_test_module_and_pin_reader_synthetic() -> None:
-    """A recipe's test module is named from the recipe, and the pin reader
-    reaches the module of every routed recipe that has one."""
+def test_recipe_test_module_synthetic() -> None:
+    """A recipe's test module is named from the recipe."""
     assert recipe_test_module(_SYNTHETIC_RECIPE) == f"{RECIPE_TEST_STEM}synthetic_one.py"
-    pins = recipe_pins()
-    # Every pin the reader returns comes from a routed recipe's own module,
-    # and every pin such a module defines is in what it returns. Not asserted:
-    # that there is any pin at all -- a repository whose recipes pin nothing
-    # is a repository with nothing for the scans to exempt, which is the state
-    # a removal case reaches when the last recipe carrying a pin table goes.
-    # Nor that a routed recipe has a module at all: requiring one would make
-    # giving a kind a recipe two files rather than the one file and one row
-    # the routing table describes, so a recipe without one contributes
-    # nothing here, exactly as `recipe_pins` reads it.
-    from_modules: dict[str, tuple] = {}
-    for recipe in routed_recipes():
-        path = ROOT / SCRIPTS / recipe_test_module(recipe)
-        if not path.is_file():
-            continue
-        module = importlib.import_module(recipe_test_module(recipe)[:-len(".py")])
-        from_modules.update(getattr(module, "RECIPE_PINS", {}))
-    assert pins == from_modules
-    for name, pin in pins.items():
-        assert len(pin) == 6, (name, pin)
 
 
 def test_cell_helper_synthetic() -> None:

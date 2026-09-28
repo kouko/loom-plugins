@@ -33,10 +33,6 @@ DEPTH = _section(REVIEW, "## 2. Compute review depth")
 REVIEW_WORDS = _flat(REVIEW)
 
 
-def _sentence(text: str, fragment: str) -> str:
-    return next(s for s in split_sentences(text) if fragment in s)
-
-
 def _git(repo: Path, *args: str) -> str:
     return subprocess.run(
         ["git", "-C", str(repo), *args], check=True, capture_output=True, text=True
@@ -121,8 +117,10 @@ def test_sync_after_finalize_invalidates_attestation(tmp_path: Path) -> None:
 
 
 def test_no_op_sync_dispatches_without_rerun() -> None:
-    current = _sentence(DEPTH, "reports `up to date`")
-    for rerun in ("package suite", "adversarial", "Build", "re-run"):
-        assert rerun not in current, current
+    # Every §2 sentence naming the checker's `up to date` output, not one
+    # sentence located by its wording.
+    for current in (s for s in split_sentences(DEPTH) if "`up to date`" in s):
+        for rerun in ("package suite", "adversarial", "Build", "re-run"):
+            assert rerun not in current, current
     # Re-sync in later rounds is out of scope: the sync names Round 1 only.
     assert REVIEW_WORDS.count("sync-trunk") == 1

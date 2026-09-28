@@ -29,15 +29,8 @@ ADVERSARIAL_REF = _flat(PROTOCOL)
 ADVERSARY_PROSE = _flat(ADVERSARY)
 
 
-# Two protocol sentences other modules use: `UPDATE_NO_WEAKENING` is a
-# one-home fragment below, and `test_build_mechanical_checks.py` exempts
-# `NO_DISCARD_UNDO` from its discard-literal scan.
+# A one-home fragment below: it may sit in the protocol, never also in adversary.md.
 UPDATE_NO_WEAKENING = "An update never deletes, skips or xfails a case to make it pass."
-NO_DISCARD_UNDO = (
-    "Discard commands (`git checkout --`, `git restore`, `git reset --hard`, `git clean`, "
-    "`git worktree remove --force`) are never used to undo a mutation, because host guards "
-    "refuse them and they can destroy uncommitted work."
-)
 
 
 # --- One home for the protocol's rules: adversary.md repeats none of them ---
