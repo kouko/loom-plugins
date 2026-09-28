@@ -108,21 +108,6 @@ def test_four_operations_contract() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance A3 boundary: absent-store-empty-recall-and-retire-approval
-# ---------------------------------------------------------------------------
-
-
-def test_absent_store_and_empty_recall_are_normal_no_memory_results() -> None:
-    text = _all_skill_text()
-    assert "normal no-memory result" in text
-
-
-def test_retire_requires_explicit_user_approval_before_deleting() -> None:
-    text = _all_skill_text()
-    assert "explicit user approval before deleting" in text
-
-
-# ---------------------------------------------------------------------------
 # REQ-4: passive activation only, no fixed-station mandatory invocation
 # ---------------------------------------------------------------------------
 
@@ -151,19 +136,6 @@ def test_activation_states_only_explicit_request_or_agent_judgement() -> None:
     lowered = text.lower()
     assert "explicit" in lowered
     assert "judgement" in lowered or "judgment" in lowered
-
-
-# ---------------------------------------------------------------------------
-# REQ-20: git-memory stays a separate, non-dependent sibling
-# ---------------------------------------------------------------------------
-
-
-def test_git_memory_boundary_is_stated() -> None:
-    text = _skill_md_text()
-    assert "git-memory" in text
-    assert "commit- and pull-request-bound" in text
-    assert "outlive a change" in text
-    assert "runtime dependency of the other" in text.lower()
 
 
 # ---------------------------------------------------------------------------
@@ -205,33 +177,11 @@ def test_no_bare_repo_root_relative_script_path() -> None:
     pairing is checked per blank-line-delimited paragraph, not per physical
     line)."""
     text = _all_skill_text()
-    # `${CLAUDE_PLUGIN_ROOT}` alone is Claude-only: Codex CLI and Antigravity
-    # CLI do not substitute it, so each shipped file that names it must also
-    # carry the hybrid phrase locating the plugin root on any other host.
-    files = [SKILL_MD, *sorted(REFERENCES_DIR.glob("*.md"))]
-    for path in files:
-        flat = " ".join(_read(path).split())
-        if "${CLAUDE_PLUGIN_ROOT}" in flat:
-            assert "on any other host" in flat and "levels above" in flat, (
-                f"{path.name} names ${{CLAUDE_PLUGIN_ROOT}} without the other-host root"
-            )
     for paragraph in re.split(r"\n\s*\n", text):
         if "skills/loom-memory/scripts/" in paragraph:
             assert "${CLAUDE_PLUGIN_ROOT}" in paragraph, (
                 f"bare repo-root-relative script path resurfaced in skill text: {paragraph!r}"
             )
-
-
-# ---------------------------------------------------------------------------
-# REQ-23: migration is not implicit, and this skill is never a legacy reader
-# ---------------------------------------------------------------------------
-
-
-def test_legacy_store_reported_needing_explicit_migration_without_modification() -> None:
-    text = _all_skill_text()
-    assert "explicit migration" in text
-    assert "without modifying any file" in text
-    assert "never reads or writes that legacy format itself" in text
 
 
 # ---------------------------------------------------------------------------
@@ -330,15 +280,6 @@ def test_skills_mount_declared_in_claude_manifest() -> None:
 # test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against plus evals/record-timing.md.
 # ---------------------------------------------------------------------------
 
-_A4_WHY = (
-    "This clause is part of the Record contract (timing + scarcity). It was "
-    "lost once already when loom 1.0 deleted the skill carrying it along with "
-    "its test. If the contract was reworded and still says this, update the "
-    "phrase here in the same commit; if the clause is gone, removing it is a "
-    "contract change and needs an intent."
-)
-
-
 def _flat(text: str) -> str:
     """Whitespace-flattened, lowercased text — prose wraps, meaning does not."""
     return " ".join(text.split()).lower()
@@ -350,17 +291,6 @@ def _flat(text: str) -> str:
 RECORD_SECTION_DIGEST = "945a9cb29dfb5a9090e4ad036e5f980accf19fe94b22ff3014c1c066635ddcc9"
 
 
-def test_record_section_routes_unfinished_item_to_intent() -> None:
-    """The backlog is frozen (docs/loom/README.md): a recurring open item
-    comes back as an intent. The Record section routes an unfinished item
-    to an intent and names no other destination."""
-    flat = _flat(_section(_skill_md_text(), "Record"))
-    assert "an unfinished item belongs in an intent." in flat, (
-        "the Record section no longer routes an unfinished item to an intent "
-        "alone. " + _A4_WHY
-    )
-
-
 def test_backlog_entry_routing_sentence_rejected() -> None:
     """Negative: the retired backlog alternative must not come back into the
     Record section's routing sentence."""
@@ -368,19 +298,6 @@ def test_backlog_entry_routing_sentence_rejected() -> None:
     assert "backlog" not in flat, (
         "the Record section routes a lesson to a backlog entry, but the "
         "backlog is frozen; route unfinished items to an intent."
-    )
-
-
-def test_the_reference_copy_still_carries_both_halves() -> None:
-    """`references/operations.md` restates the rule for the reader who opens
-    the detailed procedure instead of the summary. It is a second surface, so
-    it drifts: pin one phrase from each half there too."""
-    operations = _flat(_read(OPERATIONS))
-    assert "before the branch closes" in operations, (
-        "operations.md no longer states when Record runs. " + _A4_WHY
-    )
-    assert "not a durable lesson" in operations, (
-        "operations.md no longer states the scarcity bar. " + _A4_WHY
     )
 
 

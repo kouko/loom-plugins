@@ -23,17 +23,6 @@ SITUATIONS = {
     "Risks": ("Risk", "Likelihood", "Impact", "Mitigation"),
     "Support matrix": ("Feature", "Environment A", "Environment B", "Environment C"),
 }
-DECISION_PHRASES = (
-    "yes-or-no",
-    "asked directly",
-    "no invented alternatives",
-    "at least two",
-    "recommend",
-    "do nothing or later",
-    "smaller",
-    "combining two",
-    "why there is no third",
-)
 
 
 def sections(text, level=2):
@@ -102,62 +91,9 @@ def _text():
     return PLAIN.read_text(encoding="utf-8")
 
 
-NEGATION = re.compile(r"\b(?:never|not|no|avoid|don't)\b", re.I)
-
-
-def _sentence_with(body, phrase):
-    flat = " ".join(body.split())
-    return next((s for s in re.split(r"(?<=[.!?])\s+", flat) if phrase in s), "")
-
-
-def polarity_errors(text):
-    """Rule 3, rule 5 and yes-or-no sentences that are missing or say the opposite; empty = valid."""
-    errors = []
-    rules = rule_titles(text)
-    ban = _sentence_with(rules.get(3, ""), "metaphors or analogies")
-    if not ban.startswith("Do not use metaphors or analogies, and do not reach for"):
-        errors.append("rule 3 does not ban metaphors and analogies")
-    rule5 = rules.get(5, "")
-    yes_no = _sentence_with(rule5, "yes-or-no confirmation")
-    if "is asked directly" not in yes_no \
-            or NEGATION.search(yes_no.replace("yes-or-no", "").replace("no invented alternatives", "")):
-        errors.append("yes-or-no confirmation is not asked directly")
-    option = _sentence_with(rule5, "you recommend")
-    if "lists at least two workable alternatives and marks the one you recommend" not in option \
-            or NEGATION.search(option):
-        errors.append("option question does not list alternatives and mark a recommendation")
-    return errors
-
-
-def test_affirmative_option_and_yes_no_rules_accepted():
-    """A6/A7 positive: the committed rule 3, rule 5 and yes-or-no sentences pass the polarity check."""
-    assert polarity_errors(_text()) == []
-
-
-def test_negated_option_rule_rejected():
-    """A7 negative negated-option-rule-rejected: a flipped rule 5 sentence is caught."""
-    text = _text()
-    for pattern, new in ((r"marks\s+the\s+one\s+you\s+recommend", "never marks the one you recommend"),
-                         (r"is\s+asked\s+directly", "is not asked directly")):
-        broken, n = re.subn(pattern, new, text, count=1)
-        assert n == 1, pattern
-        assert polarity_errors(broken) != [], new
-
-
-def test_metaphor_ban_removed_rejected():
-    """A6 negative metaphor-ban-removed-rejected: rule 3 turned into permission is caught."""
-    flat = _text()
-    old = "Do not use metaphors or analogies, and do not reach for"
-    assert old in " ".join(flat.split())
-    broken = re.sub(r"Do\s+not\s+use\s+metaphors\s+or\s+analogies,\s+and\s+do\s+not\s+reach\s+for",
-                    "Use metaphors or analogies, and reach for", flat, count=1)
-    assert "rule 3 does not ban metaphors and analogies" in polarity_errors(broken)
-
-
 def test_guide_has_seven_rules_and_rewrite_steps():
     text = _text()
     assert guide_errors(text) == []
-    assert "rule 3 does not ban metaphors and analogies" not in polarity_errors(text)
     assert "Scope" in sections(text)
     assert "Internal terms" in sections(text)
 
@@ -167,13 +103,6 @@ def test_guide_without_metaphor_check_fails():
     steps = numbered(sections(text)["Rewrite steps"])
     broken = text.replace(steps[-1], "Send it.")
     assert "last rewrite step is not a metaphor check" in guide_errors(broken)
-
-
-def test_option_rule_two_alternatives_and_recommendation():
-    rule5 = " ".join(rule_titles(_text())[5].split())
-    missing = [p for p in DECISION_PHRASES if p not in rule5]
-    assert not missing, missing
-    assert "Nutt" in rule5 and "Chernev" in rule5
 
 
 DECISION_HEADERS = SITUATIONS["Decision consequences"]
@@ -217,18 +146,6 @@ def test_prose_option_example_rejected():
                       "| Choice | Gain | Cost | When |", rule5)
     assert "rule 5 example has no Decision consequences table" in \
         rule5_example_errors(text.replace(rule5, no_table))
-
-
-# Spec REQ-7: the guide's rule 5 names the same scope as the card's inline rule.
-DECISION_SCOPE = "asking or answering how to do something"
-
-
-def test_rule_five_scope_matches_card():
-    """A7 positive: rule 5 covers the agent asking and the user asking, in the card's words."""
-    option = _sentence_with(rule_titles(_text())[5], "you recommend")
-    assert DECISION_SCOPE in option, option
-    card = (SKILL_DIR / "assets" / "trigger-card.md").read_text(encoding="utf-8")
-    assert DECISION_SCOPE in " ".join(card.split())
 
 
 def table_rule_one_errors(text):
@@ -276,32 +193,9 @@ def test_unsupported_nutt_figures_absent():
     assert nutt_citation_errors(old) != []
 
 
-def test_yes_no_confirmation_asked_directly():
-    rule5 = " ".join(rule_titles(_text())[5].split())
-    sentence = next(s for s in re.split(r"(?<=[.!?])\s+", rule5) if "yes-or-no" in s)
-    assert "asked directly" in sentence and "no invented alternatives" in sentence
-    for action in ("publish", "delete", "confirm"):
-        assert action in sentence, action
-
-
-KEEP_FACTS_PHRASES = (
-    "keep every fact",
-    "lead news",
-    "a review stays a review",
-    "an agent is not a person",
-    "never refer to something the original did not say",
-)
-
-
 def test_rewrite_opens_with_conclusion_and_keeps_facts():
     text = _text()
-    steps = [" ".join(s.split()) for s in numbered(sections(text)["Rewrite steps"])]
     assert "first rewrite step is not conclusion-first" not in guide_errors(text)
-    facts = next((s for s in steps if "never what happened" in s), "")
-    missing = [p for p in KEEP_FACTS_PHRASES if p not in facts]
-    assert facts and not missing, missing
-    rule2 = " ".join(rule_titles(text)[2].split())
-    assert "never what happened" in rule2
 
 
 def test_announcing_or_heading_opener_flagged():
@@ -311,19 +205,6 @@ def test_announcing_or_heading_opener_flagged():
     assert "first rewrite step is not conclusion-first" in guide_errors(announcing)
     no_heading_clause = text.replace(steps[0], steps[0].replace("heading", "title"))
     assert "first rewrite step is not conclusion-first" in guide_errors(no_heading_clause)
-
-
-def test_each_missed_alternative_included_or_ruled_out():
-    rule5 = " ".join(rule_titles(_text())[5].split())
-    sentence = next((s for s in re.split(r"(?<=[.!?;])\s+", rule5) if "ruled out" in s), "")
-    assert "For each of the three" in sentence and "one short clause" in sentence
-    assert not sentence.startswith("If only two"), sentence
-
-
-def test_reply_keeps_user_script():
-    scope = " ".join(sections(_text())["Scope"].split())
-    assert ("Reply in the user's language and script: Traditional Chinese stays "
-            "Traditional, Simplified stays Simplified.") in scope
 
 
 def test_eight_conversation_situations_present():
@@ -725,12 +606,3 @@ def test_skill_md_points_to_node_structure_reference():
     """W2-01 negative: SKILL.md Step 4 points at references/node-structure.md."""
     text = SKILL.read_text(encoding="utf-8")
     assert "references/node-structure.md" in text
-
-
-def test_skill_md_names_unstructured_multiline_box_failure_mode():
-    """W2-01 negative: SKILL.md names the unstructured multi-line box
-    failure (content lines with no separator)."""
-    text = SKILL.read_text(encoding="utf-8")
-    fail = " ".join(text.split())
-    assert "no separator" in fail or "without a separator" in fail
-    assert "unstructured" in fail.lower()

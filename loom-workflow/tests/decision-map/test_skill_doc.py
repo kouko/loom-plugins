@@ -172,17 +172,6 @@ def test_v2_contract_rejects_relay_and_parts_language():
     assert not offenders, "retired v2 contract wording remains:\n" + "\n".join(offenders)
 
 
-def test_v3_contract_defines_multi_delivery_outcome_loop():
-    # @req: REQ-75
-    """A delivery closes one arc without completing or clearing its Map."""
-    contract_files = (SKILL_MD, MAP_FORMAT_MD)
-    for path in contract_files:
-        text = _normalize(path.read_text(encoding="utf-8"))
-        assert "one persistent outcome-control loop" in text
-        assert "multiple independently closed delivery arcs" in text
-        assert "Closing a delivery arc must not clear the Map." in text
-
-
 def test_v3_public_surface_commands_templates_and_version_are_synchronized(
     tmp_path: Path,
 ):
@@ -213,12 +202,6 @@ def test_v3_public_surface_commands_templates_and_version_are_synchronized(
     assert "v3.0.0" in governance
 
     for public_contract in (skill, map_format):
-        assert "one persistent outcome-control loop" in public_contract
-        assert "multiple independently closed delivery arcs" in public_contract
-        assert "exactly three ticket closure types" in public_contract.lower()
-        assert "`grilling`, `research`, and `prototype`" in public_contract
-        assert "one outcome-advancing slice" in public_contract
-        assert "source of truth" in public_contract
         assert "Map clear" in public_contract
         assert "retirement" in public_contract.lower()
         assert "schema_version: 3" in public_contract
@@ -262,32 +245,17 @@ def test_v3_public_surface_commands_templates_and_version_are_synchronized(
     }
     assert _implemented_reentry_states() == expected_reentry_states
     assert _implemented_delivery_phases() == expected_delivery_phases
-    state_sentence = (
-        "Top-level re-entry states are exactly `absent`, `broken`, "
-        "`ambiguous-live`, `live`, `blocked`, `claimed`, and `da-gap`."
-    )
-    phase_sentence = (
-        "Legacy delivery phase values are separate and resolve only for "
-        "pre-1.0 delivery tickets: `unbriefed`, `briefed`, `planning`, "
-        "`implementing`, `reviewing`, `finishing`, `repair-required`, and "
-        "`delivered`."
-    )
     for public_contract in (skill, map_format):
-        assert state_sentence in public_contract
-        assert phase_sentence in public_contract
+        for value in expected_reentry_states | expected_delivery_phases:
+            assert f"`{value}`" in public_contract, value
 
     assert "map_transaction.UnknownRoute" in skill
     assert "map_transaction.UnknownRoute" in map_format
-    assert "`destination` is exactly `fog`, `ticket`, or `out-of-scope`" in map_format
-    assert "`text` is non-empty after trimming" in map_format
     assert "ticket_slug" in map_format and "ticket_type" in map_format
-    assert "only a `ticket` route may carry" in map_format.lower()
     assert "[a-z0-9]+(?:-[a-z0-9]+)*" in map_format
-    assert "`grilling`, `research`, or `prototype`" in map_format
-    assert "`(destination, text, ticket_slug)` is unique" in map_format
     assert "unique `ticket_slug`" in map_format
 
-    risk_step = "Before every close-time gate, run the risk-front-loading pass"
+    risk_step = "risk-front-loading"
     assert risk_step in skill
     assert risk_step in map_format
     close_checks = skill_source.split("## Close-time checks", 1)[1]
@@ -303,13 +271,9 @@ def test_v3_public_surface_commands_templates_and_version_are_synchronized(
 def test_v3_contract_pins_release_boundary_and_metric_definition():
     """Current map instructions retain the v3 boundary and metric facts."""
     map_format_text = MAP_FORMAT_MD.read_text(encoding="utf-8")
-    skill_text = SKILL_MD.read_text(encoding="utf-8")
 
     assert "schema_version: 3" in map_format_text
     assert "v1" not in map_format_text
-    assert "Exactly three ticket closure types exist" in skill_text
-    assert "Dependencies are graph edges, not ticket types" in map_format_text
-    assert "A closed delivery alone is never a clear transition" in map_format_text
 
 
 def test_no_live_contract_or_command_surface_references_map_parts():

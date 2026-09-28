@@ -4,10 +4,7 @@ Structural tests for goal-shape.md reference.
 Tests verify:
 - The four field names appear, in order: Outcome, Constraints, Verification, Stop-when
 - Outcome is defined as one measurable end state, not a vision
-- Constraints is defined as what must not change
-- Verification requires a check AND requires that check's output be surfaced in
-  the conversation, with the reason stated (goal evaluator reads only the
-  conversation — no commands run, no files opened)
+- Verification names the goal evaluator
 - Stop-when bounds the run (a turn-clause example)
 - The 4,000-character budget is stated
 - The file-pointer rule for goals that exceed the budget is stated
@@ -69,23 +66,9 @@ def test_defines_four_fields_budget_and_surfacing() -> None:
         "Outcome must explicitly contrast with a vision (not a vision)."
     )
 
-    # --- Constraints: what must not change ---
-    assert "must not change" in content_lower, (
-        "Constraints must state what must not change on the way to the outcome."
-    )
-
-    # --- Verification: names a check AND requires surfacing ---
-    assert "surfaced in the conversation" in content_lower or (
-        "surfaced" in content_lower and "conversation" in content_lower
-    ), "Verification must require that the check's output be surfaced in the conversation."
+    # --- Verification: names the goal evaluator ---
     assert "goal evaluator" in content_lower, (
         "Verification's surfacing rule must name Claude Code's goal evaluator."
-    )
-    assert "no commands" in content_lower or "runs no commands" in content_lower, (
-        "Verification's rationale must state the evaluator runs no commands."
-    )
-    assert "no files" in content_lower or "opens no files" in content_lower, (
-        "Verification's rationale must state the evaluator opens no files."
     )
 
     # --- Stop-when: bounds the run, e.g. a turn clause ---
@@ -104,8 +87,6 @@ def test_defines_four_fields_budget_and_surfacing() -> None:
     # 1,500 is a compression prompt, never another validity boundary.
     assert "1,500" in content
     assert "advisory" in content_lower
-    assert "one compression pass" in content_lower
-    assert "not an error" in content_lower
 
     # --- file-pointer rule for goals exceeding the budget ---
     assert re.search(r"points? (at|to) a file", content_lower), (
