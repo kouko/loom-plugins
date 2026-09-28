@@ -4,6 +4,15 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.5.1] — 2026-09-28 — shared node rendering helpers
+
+- `width.py` gains the shared structured-node rendering helpers
+  (`render_structured_node`, `center`, `EMPTY_BODY`,
+  `require_single_line`); flow, arch, tree, seq and bar generators
+  consume them instead of carrying inline copies.
+- No behaviour change: generator output is byte-identical (golden-diff
+  evidence in `docs/loom/2026-09-28-structured-node-shared-helper/evidence/`).
+
 ## [5.5.0] — 2026-09-27 — structured nodes in flow, arch and tree generators
 
 - Flow, arch and tree generators now use structured nodes with title, separator
