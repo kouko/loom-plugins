@@ -524,3 +524,38 @@ Kept: `test_checker_subcommands_named_exist` and `test_checker_rules_named_exist
 | test_affirmedPin_syntheticAffirmativeSentence_accepted | delete | synthetic-partner |
 | test_affirmedPin_syntheticNegatedSentence_rejected | delete | synthetic-partner |
 | test_affirmedPin_syntheticCodeSpanNo_notNegation | delete | synthetic-partner |
+
+## Found by the adversary's loop-form census fix
+
+The census classifier now sees the loop form of a phrase pin: `for p in (<literals>): assert p in TEXT`, where at least one literal is a phrase of three or more words. It flagged 12 files across the whole census inventory. Six carry real prose pins and are listed here. The other six, plus the second hit in `test_architecture_skill.py`, are false positives (headings, commands, section names, schema field labels) and get `MANUAL_OVERRIDES` rows instead. None of the functions below is exec, and none is cited by name in `mechanisms.yaml`, `AGENTS.md` or `test_module_criteria_text.py`. `test_skill_contract.py` and `test_architecture_skill.py` are skill evals by file path, and both files stay.
+
+**loom-code/tests/test_acceptance_test_report_shape.py**
+| function | action | tag |
+|---|---|---|
+| test_no_new_gate_marker | prune (the two ungated phrases; the `EVIDENCE_PATH` pointer and the gate-marker absences stay) | pin |
+
+**loom-code/tests/test_sync_codex_manifest.py**
+| function | action | tag |
+|---|---|---|
+| test_loom_code_manifest_and_docs_preserve_optional_composition | prune (three README phrases; the `docs/loom/` path and the manifest check stay) | pin |
+
+**loom-workflow/tests/loom-memory/test_skill_contract.py**
+| function | action | tag |
+|---|---|---|
+| test_record_contract_states_when_to_record | delete (with its `TIMING_ELEMENTS` constant) | pin |
+| test_record_contract_states_how_much_to_record | delete (with its `SCARCITY_ELEMENTS` constant) | pin |
+
+**loom-workflow/tests/goal-create/test_goal_shape.py**
+| function | action | tag |
+|---|---|---|
+| test_defines_four_fields_budget_and_surfacing | prune (the three quoted Anthropic bullet labels) | pin |
+
+**loom-design/tests/architecture-design/test_architecture_skill.py**
+| function | action | tag |
+|---|---|---|
+| test_skill_reads_code_and_proposes_two_options_per_choice | prune (the prose words; the `references/design-know-how.md` path and the `## decisions` heading stay) | pin |
+
+**loom-workflow/tests/loom-visualization/test_references.py**
+| function | action | tag |
+|---|---|---|
+| test_guide_has_seven_rules_and_rewrite_steps | prune (the rule-3 example words, with the `METAPHOR_WORDS` constant) | pin |
