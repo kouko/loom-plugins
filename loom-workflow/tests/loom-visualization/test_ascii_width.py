@@ -286,3 +286,108 @@ def test_wrap_label_handles_tabs_and_control_chars():
     # For now, we'll just ensure it doesn't crash - the split_lines function will raise
     # for embedded control chars other than \n/\r, but wrap_label works on already-split lines
     pass
+
+
+# ---------------------------------------------------------------------------
+# W1-01: Shared helpers tests (EMPTY_BODY, center, require_single_line, render_structured_node)
+# ---------------------------------------------------------------------------
+
+def test_EMPTY_BODY_constant():
+    from width import EMPTY_BODY
+    assert EMPTY_BODY == "Body cannot be empty for structured node"
+
+
+def test_center_plain_ascii():
+    from width import center
+    # Even slack
+    assert center("abc", 7) == "  abc  "
+    # Odd slack (extra goes right)
+    assert center("abc", 8) == "  abc   "
+    # Label wider than interior -> negative slack -> no padding
+    assert center("abcdef", 4) == "abcdef"
+
+
+def test_center_cjk():
+    from width import center
+    # CJK chars are 2 cells each
+    # "中文" = 4 cells, interior=8 -> slack=4 -> left=2, right=2
+    assert center("中文", 8) == "  中文  "
+    # Odd slack
+    assert center("中文", 9) == "  中文   "
+    # Label wider than interior
+    assert center("中文", 3) == "中文"
+
+
+def test_require_single_line_passes():
+    from width import require_single_line
+    # Single line value should not raise
+    require_single_line("hello", "test label")
+    require_single_line("", "empty label")
+    require_single_line("中文", "cjk label")
+
+
+def test_require_single_line_raises_seq_style():
+    from width import require_single_line
+    import pytest
+    with pytest.raises(ValueError) as exc:
+        require_single_line("line1\nline2", "participant name")
+    assert "line break not supported in participant name" in str(exc.value)
+    # !r format produces 'line1\nline2' (escaped)
+    assert "line1\\nline2" in str(exc.value)
+
+
+def test_require_single_line_raises_bar_style():
+    from width import require_single_line
+    import pytest
+    with pytest.raises(ValueError) as exc:
+        require_single_line("line1\nline2", "bar label", template="{phrase} must be single-line, got line break in {value!r}")
+    assert "bar label must be single-line, got line break in" in str(exc.value)
+    assert "line1\\nline2" in str(exc.value)
+
+
+def test_render_structured_node_basic():
+    from width import render_structured_node
+    # Simple ASCII title and body
+    lines = render_structured_node("Title", ["body line"], 10)
+    # Title line: "│ Title    │" (interior=10, title="Title"=5, so 10-5-1=4 spaces)
+    assert lines[0] == "│ Title    │"
+    # Separator line: "├──────────┤"
+    assert lines[1] == "├──────────┤"
+    # Body line: "│ body line│" (interior=10, "body line"=9, so 10-9-1=0 spaces)
+    assert lines[2] == "│ body line│"
+
+
+def test_render_structured_node_cjk():
+    from width import render_structured_node
+    # CJK title and body - "標題" = 4 cells, "內容行" = 6 cells
+    lines = render_structured_node("標題", ["內容行"], 12)
+    # Title: "│ 標題       │" (interior=12, "標題"=4, so 12-4-1=7 spaces)
+    assert lines[0] == "│ 標題       │"
+    # Separator: "├────────────┤"
+    assert lines[1] == "├────────────┤"
+    # Body: "│ 內容行     │" (interior=12, "內容行"=6, so 12-6-1=5 spaces)
+    assert lines[2] == "│ 內容行     │"
+
+
+def test_render_structured_node_empty_body_list():
+    from width import render_structured_node
+    # Empty body list should still return title + separator (caller validates non-empty)
+    lines = render_structured_node("Title", [], 10)
+    assert lines[0] == "│ Title    │"
+    assert lines[1] == "├──────────┤"
+    assert len(lines) == 2  # Only title and separator, no body lines
+
+
+def test_render_structured_node_wrapped_body():
+    from width import render_structured_node
+    # Body line that needs wrapping at interior-1
+    lines = render_structured_node("Title", ["this is a long body line that wraps"], 20)
+    assert lines[0] == "│ Title              │"
+    assert lines[1] == "├────────────────────┤"
+    # Body should be wrapped at interior-1 = 19 cells
+    # "this is a long body line that wraps" width = 37 chars (ASCII) = 37 cells
+    # Wrapped at 19 cells
+    # All body lines should start with "│ " and end with "│" (no trailing space)
+    for line in lines[2:]:
+        assert line.startswith("│ ")
+        assert line.endswith("│")
