@@ -13,9 +13,9 @@ publication: automatic — authorized 2026-09-27 by kouko
 
 ## Acceptance
 1. 一份普查報告存在於變更 evidence：每個讀散文的測試檔被分類為行為／結構／句子釘住／文法不變量四類之一，分類方法可用腳本重算。
-2. 純句子釘住檔案（零可執行行為）全數刪除；混合檔案只保留行為與結構部分；清理後完整 package suite 全綠。
+2. 純句子釘住檔案（零可執行行為）全數刪除；普查歸為句子釘住類的混合檔案只保留行為與結構部分；清理後完整 package suite 全綠。
 3. 每個被刪除的釘住測試，其防守的缺陷類別對應到一個具名替代（checker 重算規則、結構測試或 review lens 面向），對應表存於 evidence，acceptance testing 抽查可驗。
-4. 清理後 repo 內僅存的字面感應測試是文法級不變量類；普查報告證明句子釘住類為零（文法不變量類除外）。
+4. 清理後普查報告證明句子釘住類為零：字面感應檔案只剩文法級不變量類，以及被 `docs/loom/evidence/mechanisms.yaml` 登記為 gate eval 的檔案（該 gate 的執行證據，本批保留並在報告中單獨列類）。
 5. 清理不刪除任何行為測試：清理前後，「會執行程式（subprocess／checker 呼叫）」的測試函式數量不減少，重算可證。
 
 ## Constraints
@@ -29,6 +29,7 @@ publication: automatic — authorized 2026-09-27 by kouko
 - 為散文引入 LLM 評審或 golden-set 行為評估。
 - 變更 PR #61 已確立的證據政策（tests lens 散文條款、intake 豁免、單一版本常數）。
 - docs/loom 工作文件（本來就無測試）。
+- 第二批（2026-09-28 kouko 決定分批）：普查歸為行為類、但檔內仍夾帶句子釘住斷言的 15 個檔案，以及 gate eval 檔案內的釘住斷言替換；另開變更處理，清單見本變更 census-report。
 
 ## Open questions
 - none

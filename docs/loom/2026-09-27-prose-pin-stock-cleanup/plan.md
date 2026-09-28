@@ -62,7 +62,7 @@ charter: 1.1
 **W3-02 重算普查與行為守護**  after: W1-01, W1-02, W1-03, W2-01, W2-02  acceptance: 1, 4, 5
 - Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
 - Test: A1 positive: census-rerun-matches-report; negative: deleted-file-not-in-census. A4 positive: sentence-pin-zero-grammar-kept; boundary: structure-class-kept-not-deleted. A5 positive: executable-test-count-not-decreased; boundary: count-verified-before-and-after.
-- Risk: 行為測試數守護（A5）以 package suite 測試函式數前後對照；agent-decided。
+- Risk: 行為測試數守護（A5）以 package suite 測試函式數前後對照（base 6f3acd78 vs HEAD）；agent-decided。分類器新增 `gate-eval` 類：被 mechanisms.yaml `eval:` 指到的檔案單獨列類（A4 修訂後的豁免），報告另列第二批清單（行為類但 has_pins=yes 的 15 檔）；user-decided 2026-09-28。
 
 ## Simplicity check
 - 用既有 `prose_pin` 分類語意（import + 斷言 pattern）建普查腳本，不另造分類框架 — taken
@@ -75,6 +75,7 @@ charter: 1.1
 ## Questions asked
 ① — what — 把上次改機制後遺留的釘住散文句子的舊測試庫存量清掉，以後改散文不會再被舊釘子弄到要連改測試。對嗎？ — 對
 ① — consequence — 清理只到「文法級不變量」界線：字面感應測試從 ~40 檔降到僅剩文法不變量；日後發現被刪釘子本可擋下真實缺陷時，依收回條款可還原。接受？ — 對
+① — scope (build 中發現，2026-09-28) — 清理後仍有 5 個 gate eval 檔與 15 個行為混合檔帶釘住斷言；本 PR 當第一批收尾、改寫 A2/A4、其餘另開第二批？ — A
 
 ## Risks
 1. 分類判定（結構 vs 釘住 vs 文法）有灰色地帶，reviewer 冷讀覆核每檔；誤刪真實行為測試由 W3 行為守護擋下。
