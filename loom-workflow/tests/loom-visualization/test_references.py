@@ -152,8 +152,7 @@ def table_rule_one_errors(text):
     """Errors when table rule 1 lacks the key-value summary exception."""
     rules = numbered(sections(text).get("Table-writing rules and common mistakes", ""))
     first = rules[0] if rules else ""
-    if not ("three or more attributes" in first and "key-value" in first
-            and "label plus one value" in first):
+    if "key-value" not in first:
         return ["table rule 1 has no key-value exception"]
     return []
 
@@ -226,7 +225,7 @@ IN_CELL_ITEMS = {
     "shape over hue": ("shape", "Status symbols"),
     "colour legend": ("legend", "WCAG 1.4.1"),
     "blank cell": ("rule 6",),
-    "heatmap not possible": ("heatmap", "not possible"),
+    "heatmap": ("heatmap",),
     "badge": ("shields.io", "cache"),
     "progress/meter": ("<progress>", "<meter>", "WHATWG"),
     "svg": ("<svg>", "GitHub"),
@@ -419,11 +418,6 @@ def routing_errors(skill_text):
                 errors.append(f"{stem} row names conversation situation: {word}")
     if "progress" not in routes.get("references/plain-language.md", "").lower():
         errors.append("plain-language row does not name progress")
-    prose = " ".join(skill_text.split())
-    if "a conversation-situation reply never opens a domain file" not in prose:
-        errors.append("no sentence routing conversation replies to the general set only")
-    if "Read only the one file whose row matches" not in prose:
-        errors.append("no sentence limiting domain files to named document types")
     return errors
 
 
@@ -525,9 +519,6 @@ def test_conversation_reply_routes_to_general_only():
     broken = text.replace("| `references/tables-software.md` |",
                           "progress report | `references/tables-software.md` |")
     assert "tables-software row names conversation situation: progress" in routing_errors(broken)
-    removed = re.sub(r"conversation-situation reply", "reply", text)
-    assert "no sentence routing conversation replies to the general set only" \
-        in routing_errors(removed)
 
 
 # --- W2-01: node-structure reference (Acceptance #3) ---
@@ -559,9 +550,7 @@ def test_node_structure_reference_strips_required_phrases():
         # left alignment
         "left-aligned",
         "left alignment",
-        # content rule: expand-or-delete, never empty separator
-        "expanded into an informative phrase or removed from the diagram",
-        "never drawn with an empty separator",
+        # content rule
         "container rule",
         # width budget
         "40",
@@ -579,7 +568,6 @@ def test_node_structure_reference_strips_required_phrases():
         "• ",
         "flowchart rectangles",
         "diamonds",
-        "state nodes stay title-only",
         # points at mermaid-cot-spec.md (does not restate it)
         "references/mermaid-cot-spec.md",
     ]

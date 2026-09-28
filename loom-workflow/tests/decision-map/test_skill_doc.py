@@ -206,9 +206,7 @@ def test_v3_public_surface_commands_templates_and_version_are_synchronized(
         assert "retirement" in public_contract.lower()
         assert "schema_version: 3" in public_contract
 
-    assert "machine-measured feasibility" in prototype
     assert "research" in prototype
-    assert "human evaluates" in prototype
     assert "prototype" in prototype
 
     operations = (

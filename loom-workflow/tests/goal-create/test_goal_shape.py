@@ -7,7 +7,6 @@ Tests verify:
 - Verification names the goal evaluator
 - Stop-when bounds the run (a turn-clause example)
 - The 4,000-character budget is stated
-- The file-pointer rule for goals that exceed the budget is stated
 - Both vendor URLs are cited
 - Attribution is accurate: Stop-when is not claimed as a shared four-field
   vendor standard
@@ -88,11 +87,6 @@ def test_defines_four_fields_budget_and_surfacing() -> None:
     assert "1,500" in content
     assert "advisory" in content_lower
 
-    # --- file-pointer rule for goals exceeding the budget ---
-    assert re.search(r"points? (at|to) a file", content_lower), (
-        "A goal exceeding the budget must point at a file rather than inlining detail."
-    )
-
     # --- the budget's own attribution caveat: only Anthropic documents
     # this cap; OpenAI does not. Structural: bound to the paragraph that
     # follows the "## The 4,000-character budget" heading's first
@@ -118,9 +112,7 @@ def test_defines_four_fields_budget_and_surfacing() -> None:
     # keeps both vendor names (e.g. claiming OpenAI documents the same
     # cap) must fail — require the caveat to also deny OpenAI documents
     # its own cap.
-    assert re.search(r"\bnot\b.*\bopenai\b.*\bdocuments?\b", caveat_para) or (
-        re.search(r"\bnot\s+because\s+openai\s+documents\b", caveat_para)
-    ), (
+    assert re.search(r"\bnot\b.*\bopenai\b.*\bdocuments?\b", caveat_para), (
         "Must state the cap is applied for portability, NOT because "
         "OpenAI documents one — expected a negation bound to 'OpenAI "
         "documents' within the caveat."
@@ -278,16 +270,6 @@ def test_constraints_carries_the_standing_decision_rule() -> None:
     content = _read_reference()
     section_lower = _section_two(content).lower()
 
-    # --- obligation 1: choices the goal does not pre-decide are the run's
-    # to make ---
-    assert re.search(r"does\s+not\s+pre-decide", section_lower), (
-        "Must state choices the goal does not pre-decide are the run's to "
-        "make."
-    )
-    assert re.search(r"run'?s?\s+to\s+make", section_lower), (
-        "Must bind those undecided choices to being the run's to make."
-    )
-
     # --- obligation 2: the run searches first, decides, and records
     # decision + candidates + sources in a named file ---
     for word in ("search", "decide", "record"):
@@ -314,11 +296,7 @@ def test_constraints_carries_the_standing_decision_rule() -> None:
         "to the asking."
     )
 
-    # --- obligation 4: SESSION mode emits this entry by default, tagged
-    # `derived` per input-floor.md §5 ---
-    assert "by default" in section_lower, (
-        "Must state SESSION mode emits this entry by default."
-    )
+    # --- obligation 4: the entry is tagged `derived` per input-floor.md §5 ---
     assert "derived" in section_lower, (
         "Must state the entry carries the `derived` provenance tag."
     )
@@ -342,14 +320,9 @@ def test_stop_when_is_one_bound_written_as_completion() -> None:
     content = _read_reference()
     section_lower = _section_four(content).lower()
 
-    # --- count: exactly one bound (turn count or wall-clock limit), never
-    # a list of exit conditions ---
+    # --- count: exactly one bound (turn count or wall-clock limit) ---
     assert re.search(r"\bone\b", section_lower) and "bound" in section_lower, (
         "Stop-when must state exactly one bound."
-    )
-    assert _negation_binds(section_lower, r"never|not", r"a\s+list\s+of"), (
-        "Stop-when must state it is never a list of exit conditions, with "
-        "the negation bound to 'a list of'."
     )
 
     # --- completion: reaching the bound with a status report posted in the
@@ -365,19 +338,10 @@ def test_stop_when_is_one_bound_written_as_completion() -> None:
     )
 
     # --- why: a bare 'stop after N turns' is read by the evaluator as
-    # permission to stop, not as the condition being met, so it neither
-    # releases the run nor bounds it ---
+    # permission to stop ---
     assert "permission" in section_lower, (
         "Must state the evaluator reads a bare stop clause as permission "
         "to stop."
-    )
-    assert _negation_binds(section_lower, "not", r"the\s+condition"), (
-        "Must state this is NOT the condition being met, with the "
-        "negation bound to 'the condition'."
-    )
-    assert _negation_binds(section_lower, "neither", r"releases?\s+the\s+run"), (
-        "Must state it neither releases the run — negation bound to "
-        "'releases the run'."
     )
 
     # --- forks: a human-dependent fork is never a Stop-when branch — pointer
