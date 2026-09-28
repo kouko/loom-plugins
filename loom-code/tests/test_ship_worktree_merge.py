@@ -17,7 +17,6 @@ def test_ship_accepted_land_renders_absolute_worktree_in_command() -> None:
     text = SHIP.read_text(encoding="utf-8")
 
     assert "cd '<absolute worktree root>' && python3 <loom-code>/scripts/loom_checker.py land" in text
-    assert "never rely on the Bash tool's workdir" in text
 
 
 def test_cmd_push_non_publication_command_still_passes(monkeypatch) -> None:

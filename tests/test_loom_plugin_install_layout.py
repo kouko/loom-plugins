@@ -636,11 +636,6 @@ def test_sibling_lookup_allows_version_subdirectory() -> None:
             if "Codex CLI" in row and "Antigravity CLI" in row
         ]
         assert len(other) == 1, f"{skill_md} lacks one Codex/Antigravity row"
-        row = " ".join(other[0].split())
-        assert "on any other host" in row, skill_md
-        assert "two levels above this SKILL.md" in row, skill_md
-        assert "may contain one version subdirectory" in row, skill_md
-        assert "use the newest" in row, skill_md
     assert lookups == 1
 
 

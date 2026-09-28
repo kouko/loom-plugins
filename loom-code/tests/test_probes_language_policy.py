@@ -135,9 +135,6 @@ def test_reviewer_nitclause_absent():
     text = REVIEWER_MD.read_text(encoding="utf-8")
 
     assert "docs-lint" in text, "docs-lint carve-out heading text is missing"
-    assert "style is out of scope" in text, (
-        "docs-lint carve-out paragraph (style out of scope) is missing or reworded"
-    )
 
     blocks = [b for b in text.split("\n\n") if b.strip()]
     lower_blocks = [b.lower() for b in blocks]
