@@ -1,8 +1,8 @@
 # Census Report — Prose-Pin Stock Cleanup (W0-01, regenerated in the end-of-Build fix round)
 
-Regenerated in the W4-03 fix round (2026-09-28) on branch `engineering/2026-09-27-prose-pin-stock-cleanup`, in a clean `git worktree` of the fix-round tree (parent `22c7b169` plus this round's probe-file and classifier changes) (no untracked files), from
+Regenerated in closing-review fix round 2 (2026-09-28) on branch `engineering/2026-09-27-prose-pin-stock-cleanup`, in a clean `git worktree` of commit `fea44693` (no untracked files), from
 `python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py` (exit 0; it exits 1 while any file is `other`).
-Total test files scanned: 227
+Total test files scanned: 230
 
 ## Per-Class Counts
 
@@ -14,7 +14,7 @@ Total test files scanned: 227
 | not-prose | 54 |
 | other | 0 |
 | sentence-pin | 0 |
-| structure | 48 |
+| structure | 51 |
 
 ## Full Per-File Classification
 
@@ -45,6 +45,7 @@ Every scanned file, `not-prose` and `other` included.
 | loom-code/tests/test_adversary_routing.py | behavior | has_pins=yes |
 | loom-code/tests/test_agent_model_frontmatter.py | structure |  |
 | loom-code/tests/test_agy_adapter.py | behavior | has_pins=no |
+| loom-code/tests/test_agy_tool_mapping.py | structure | auto=other, override=structure, reason=mapping-table column scan, per-role dispatch line and link resolution, plus synthetic self-tests; no sentence asserted |
 | loom-code/tests/test_architecture_doc_consumers.py | structure |  |
 | loom-code/tests/test_build_mechanical_checks.py | behavior | has_pins=yes |
 | loom-code/tests/test_build_recovery_rules.py | gate-eval | has_pins=yes |
@@ -84,6 +85,7 @@ Every scanned file, `not-prose` and `other` included.
 | loom-code/tests/test_loom_checker_standing.py | behavior | has_pins=no |
 | loom-code/tests/test_loom_publish.py | behavior | has_pins=no |
 | loom-code/tests/test_migration_history.py | not-prose |  |
+| loom-code/tests/test_module_criteria_text.py | structure |  |
 | loom-code/tests/test_one_way_door_copies.py | structure |  |
 | loom-code/tests/test_package_tests_command.py | structure |  |
 | loom-code/tests/test_plan_field_caps.py | behavior | has_pins=no |
@@ -171,6 +173,7 @@ Every scanned file, `not-prose` and `other` included.
 | loom-workflow/tests/goal-create/test_goal_lint.py | behavior | has_pins=no |
 | loom-workflow/tests/goal-create/test_goal_lint_languages.py | not-prose |  |
 | loom-workflow/tests/goal-create/test_goal_shape.py | structure |  |
+| loom-workflow/tests/goal-create/test_input_floor.py | structure |  |
 | loom-workflow/tests/goal-create/test_readmes.py | structure |  |
 | loom-workflow/tests/goal-create/test_skill_md.py | gate-eval | has_pins=yes |
 | loom-workflow/tests/handoff/test_handoff_readmes.py | structure |  |
@@ -286,6 +289,7 @@ The end-of-Build adversary showed the earlier zero came partly from comments. Co
 - **One manual override** (`MANUAL_OVERRIDES` in the classifier, printed as `auto=…, override=…`): `loom-code/tests/test_adversary_recipe_shape.py` → structure, because split_sentences feeds a duplicate-sentence check across recipe files and no prose literal is asserted.
 - **W4-02: the `other` bucket emptied.** Acceptance testing found 12 prose-reading files in a fifth `other` bucket the table did not print. Each now has a `MANUAL_OVERRIDES` row with a reason tied to what it asserts (printed in the per-file table), two pure pins were deleted, the table prints every file, and the classifier exits 1 while any file is `other`.
 - **W4-03: no override hides a pin.** Each override states the file's true class with a reason that matches what it asserts. The hash guard is deleted; the kickoff phrase pins and the exact amendment literal in `tests/test_principles_ratification.py` are removed, so those two files are structure with no prose literal; `test_adversarial_description_ab_probes.py` is behavior on its own (its restored renderer probes assert `pytest.raises`), so the fix round dropped its override.
+- **Closing-review fix round 2: three files restored.** `test_module_criteria_text.py`, `test_agy_tool_mapping.py` and `test_input_floor.py` come back with their structure checks only (see the mapping table). Two classify as structure on their own; `test_agy_tool_mapping.py` falls to `other` and has an override row (structure: mapping-table column scan, per-role dispatch lines and link resolution, no sentence asserted).
 
 Also in this round: the appended `# prose_pin matcher self-test` comments were removed from the four recipe modules, and their leftover pin tables and synthetic pin tests deleted.
 
@@ -330,9 +334,9 @@ Test functions (`test*`) under the four test roots whose own body carries the cl
 | Tree | Count |
 |------|-------|
 | base `6f3acd78` (pre-cleanup) | 727 |
-| HEAD, W4-03 fix-round tree (clean worktree) | 728 |
+| HEAD, closing-review fix round 2 tree `fea44693` (clean worktree) | 728 |
 
-HEAD >= base. A per-function name diff of the two trees: two functions disappeared, both W4-03 probes of the deleted hash guard in `loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py` (`test_guard_edited_skill_description_fails_closed`, `test_guard_without_docs_still_collects`); the three additions are `loom-code/tests/test_adversarial_census_gaming.py::test_census_roots_flag_given_is_accepted`, `loom-code/tests/test_adversary_recipe_code.py::test_case_class_check_recipe_row_dropped_goes_red` and `loom-code/tests/test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic`. The two files deleted in W4-02 held no executing function.
+HEAD >= base. A per-function name diff of the two trees: two functions disappeared, both W4-03 probes of the deleted hash guard in `loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py` (`test_guard_edited_skill_description_fails_closed`, `test_guard_without_docs_still_collects`); the three additions are `loom-code/tests/test_adversarial_census_gaming.py::test_census_roots_flag_given_is_accepted`, `loom-code/tests/test_adversary_recipe_code.py::test_case_class_check_recipe_row_dropped_goes_red` and `loom-code/tests/test_adversary_routing.py::test_reword_plants_when_prose_pin_exists_synthetic`. The two files deleted in W4-02 held no executing function, and the tests restored in closing-review fix round 2 execute nothing, so the count is unchanged.
 
 Commands (from the repo root; `<scratch>` is any directory outside the repo):
 
