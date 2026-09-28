@@ -87,8 +87,9 @@ SENTENCE_ASSERT = re.compile(
     r"|assert\s*[\"'](?!#)[^\"'\n]{5,}[\"']\s*\b(?:in|==)\b"  # assert "literal" in/== ... (a "#..." heading is structure)
     r"|pins_exact_sentence\("
     r"|_affirms\(|affirms\(|_stated_once\("
-    # split_sentences stays: the recovery-rules files pin phrases through
-    # `_require` lists and exact endings, which no alternative above sees.
+    # split_sentences stays: a phrase pin read sentence by sentence is seen by
+    # no alternative above. Files that use it only for a one-home scan carry
+    # a MANUAL_OVERRIDES row saying so.
     r"|split_sentences\("
     # Reader calls (_flat, flat_prose, rule_prose) are not pins: a pin
     # asserts a literal, which the first alternative catches.
@@ -377,15 +378,37 @@ MANUAL_OVERRIDES = {
         "loads check-skill-crossrefs.py by path and runs find_broken_crossrefs "
         "on temp fixtures",
     ),
-    "loom-code/tests/test_codex_hook_trust_contract.py": (
-        "gate-eval",
-        "pure sentence pin on codex-first-contact.md, named by the mechanisms.yaml "
-        "eval of write-plan.codex-installed-hook-trust-boundary; batch 2",
+    # Batch 2 (W1-01): kept one-home and resolver scans, and the gate-eval
+    # files pruned to structure.
+    "loom-code/tests/test_build_recovery_rules.py": (
+        "structure",
+        "one-home scans only: the build.absence-recovery gate block restates no "
+        "artifact-to-station mapping, and §1-§2 repeat none of the rule; "
+        "split_sentences feeds that scan, no sentence is asserted present; RL-12 "
+        "is the eval of build.absence-recovery",
+    ),
+    "loom-code/tests/test_closing_review_recovery_rules.py": (
+        "structure",
+        "one-home scan only: the review.absence-recovery gate block restates no "
+        "artifact-to-station mapping; split_sentences feeds that scan, no "
+        "sentence is asserted present; RL-04 is the eval of review.absence-recovery",
+    ),
+    "loom-code/tests/test_dispatch_profile_contract.py": (
+        "structure",
+        "resolver one-home scan (each invocation phrase once in the profile, "
+        "never in a station), gate markers with their eval registration, and "
+        "the packaged profile link resolving",
+    ),
+    "loom-workflow/tests/goal-create/test_skill_md.py": (
+        "structure",
+        "mode headings, reference paths resolving, the floor command shape, the "
+        "session-activation gate blocks, template non-restatement and the "
+        "offer-site count; eval of goal-create.session-activation, no sentence asserted",
     ),
     "loom-workflow/tests/scripts/test_distill_sessions_compaction.py": (
-        "gate-eval",
-        "needle presence in SKILL.md, some needles phrases (Read it when, No "
-        "network calls); named by the mechanisms.yaml eval of distill-sessions; batch 2",
+        "structure",
+        "token and path needles only (top.json, merged.json, --approved, the "
+        "runtime-protocol pointer resolving); no sentence asserted",
     ),
     "loom-workflow/tests/scripts/test_no_retired_loom_code_skill_names.py": (
         "structure",

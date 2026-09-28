@@ -357,7 +357,7 @@ mechanisms:
     eval: loom-workflow/tests/loom-visualization/test_templates.py::test_mermaid_gate_paragraph_present_requires_confirmed_host
   - id: "build.absence-recovery"
     class: prose-gate
-    eval: "cold-read: docs/loom/2026-09-19-loom-flow-recovery-loop/blind-run-report.md"
+    eval: loom-code/tests/test_build_recovery_rules.py::test_RL_12_the_pointer_is_not_a_second_copy_of_the_rule
   - id: "review.absence-recovery"
     class: prose-gate
-    eval: "cold-read: docs/loom/2026-09-19-loom-flow-recovery-loop/blind-run-report.md"
+    eval: loom-code/tests/test_closing_review_recovery_rules.py::test_RL_04_no_second_copy_of_the_artifact_station_mapping

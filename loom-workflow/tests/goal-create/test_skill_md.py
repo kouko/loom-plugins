@@ -2,31 +2,23 @@
 """
 Structural tests for SKILL.md, the skill's entry point (Task 5).
 
-Four tests:
-  1. test_declares_two_modes_and_conditional_arc — the RED/GREEN driver:
-     both mode names (SESSION, ARC) appear as headings; ARC's
-     user-lands-it rule; ARC's not-applicable path names its reason
-     requirement; ARC's no-scaffolding rule.
+Tests:
+  1. test_declares_two_modes_and_conditional_arc — both mode names
+     (SESSION, ARC) appear as headings.
   2. test_reference_pointers_resolve — cross-seam probe: every relative
      `references/*` and `scripts/*` path written in SKILL.md (Task 2's
      seam) resolves on disk relative to the skill directory.
   3. test_floor_invocation_line_names_the_script — cross-seam probe:
      the invocation line SKILL.md gives for the mechanical floor names
      Task 3's script path, and that path exists.
-  4. test_arc_points_at_the_purpose_template_without_restating_it — ARC
-     cites the purpose artifact's format by pointer (its path, or its
-     `Done when:` anchor) and reproduces none of the purpose template's
-     own field text verbatim — that template is the format SSOT.
+  4. test_session_activation_rules_are_one_registered_gate — the gate
+     block exists in SKILL.md and references/input-floor.md.
+  5. test_arc_points_at_the_purpose_template_without_restating_it — ARC
+     reproduces none of the purpose template's own field text verbatim;
+     that template is the format SSOT.
+  6. test_invocation_section_counts_the_offer_sites_that_exist.
 
-Every polarity-bearing assertion is scoped to a heading section or a
-sentence, never to a raw character window (a legitimate rewording that
-shifts word count must not flip these). Verbatim pins are compared
-after whitespace normalisation (runs of whitespace collapsed to a
-single space on both the pin and the searched text), so a pure
-re-wrap — line breaks moved, words unchanged — still matches; a
-genuine reword still fails. No assertion enumerates the words a rule
-forbids; each binds its negation to the structural section it governs
-instead.
+The rules' wording is review-only.
 
 The reference-path check (`test_reference_pointers_resolve`) finds
 every `references/*` and `scripts/*` path in SKILL.md regardless of
@@ -96,11 +88,8 @@ def test_declares_two_modes_and_conditional_arc():
     text = _read_skill_md()
 
     # --- Both mode names appear as their own sections. ---
-    session_body = _section(text, "SESSION mode")
-    arc_body = _section(text, "ARC mode")
-
-    # --- SESSION emits the four-field goal (structural: its own section). ---
-    assert "four-field goal" in session_body
+    _section(text, "SESSION mode")
+    _section(text, "ARC mode")
 
 
 def test_reference_pointers_resolve():
@@ -145,48 +134,6 @@ def test_floor_invocation_line_names_the_script():
     invocation_line = matching[0]
     assert "python3 <skill-dir>/scripts/goal_lint.py" in invocation_line
 
-    # Honest statement: the floor checks structure only, the bar stays
-    # judgement — required somewhere in the SESSION mode section.
-    session_body = _section(text, "SESSION mode")
-    assert "structure only" in session_body
-    assert "judgement" in session_body or "judgment" in session_body
-
-    # --- Lint-result rule: what to do with the checker's exit code.
-    # Structural: bind the obligation to the ONE sentence that states it,
-    # not to a character-distance window over the whole section.
-    session_sentences = [
-        s.strip()
-        for s in re.split(r"(?<=\.)\s+", re.sub(r"\s+", " ", session_body))
-        if s.strip()
-    ]
-    rewrite_sentence = next(
-        (
-            s
-            for s in session_sentences
-            if "exit 1" in s and "rewritten" in s
-        ),
-        None,
-    )
-    assert rewrite_sentence, (
-        "SESSION mode must state what to do on exit 1: the draft is "
-        "rewritten and re-checked."
-    )
-    # Positive-obligation check: "never" must bind to "shown" within the
-    # sentence that states the user-facing consequence — a mutant that
-    # drops the "never shown until 0" obligation (e.g. "may be shown
-    # anyway") must fail this.
-    never_shown_sentence = next(
-        (s for s in session_sentences if "shown" in s and "0" in s), None
-    )
-    assert never_shown_sentence, (
-        "SESSION mode must state a draft is never shown until the "
-        "checker exits 0."
-    )
-    assert re.search(r"\bnever\b.*\bshown\b", never_shown_sentence), (
-        "Expected 'never ... shown' bound within one sentence — a draft "
-        "must not be presented before the checker exits 0."
-    )
-
 
 def test_session_activation_rules_are_one_registered_gate():
     """Gate-block presence only; the block's wording is review-only."""
@@ -200,10 +147,6 @@ def test_session_activation_rules_are_one_registered_gate():
 def test_arc_points_at_the_purpose_template_without_restating_it():
     text = _read_skill_md()
     arc_body = _section(text, "ARC mode")
-
-    # --- Pointer present: the artifact's path AND its Done when: anchor. ---
-    assert "docs/loom/PURPOSE.md" in arc_body
-    assert "`Done when`" in arc_body or "Done when:" in arc_body
 
     # --- Never restated: the template's own field-label text must not
     # appear verbatim in this skill's ARC section. ---
