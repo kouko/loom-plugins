@@ -65,9 +65,21 @@ charter: 1.1
 ### Wave 3 — adversary fix round
 
 **W3-01 Census output-taint gap and residual pins**  after: W2-01  acceptance: 1, 2, 3
-- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, loom-workflow/tests/distill-sessions/test_prompts_parseable.py, tests/test_loom_plugin_install_layout.py, loom-code/tests/test_adversarial_batch3_census_misses.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/probes/test_adversarial_census_misses.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/deletion-list.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-residual.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/census-report.md
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, loom-workflow/tests/distill-sessions/test_prompts_parseable.py, tests/test_loom_plugin_install_layout.py, loom-code/tests/test_adversarial_batch3_census_misses.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/probes/test_adversarial_census_misses.py (graduated to loom-code/tests/test_adversarial_batch3_census_misses.py), docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/deletion-list.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-residual.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/census-report.md
 - Test: A1 positive: yaml-helper-body-pin-flagged; negative: parsed-frontmatter-value-not-flagged. A2 positive: behavior-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: installed-copy-skill-read-counts-as-prose.
 - Risk: agent-decided — only the parsed value of a helper is output; the adversary program graduates to loom-code/tests; newly flagged files are pruned here and the census rerun.
+
+### Wave 4 — closing review round 1 fixes
+
+**W4-01 Mapping rows that overclaim automated cover**  after: W3-01  acceptance: 1, 3
+- Files: docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-known.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-new-code.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-new-design.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-new-workflow.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/mapping-residual.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-3/evidence/census-report.md, tests/test_loom_plugin_install_layout.py, loom-design/CHANGELOG.md
+- Test: A1 positive: version-step-pin-pruned; negative: row-count-check-kept. A3 positive: every-kept-test-row-verified; negative: fixture-only-test-not-cited-as-cover.
+- Risk: agent-decided — every kept-structural-test row is re-verified against the test body, not only the two flagged; census headline and CHANGELOG nits ride along.
+
+**W4-02 Test names that promise removed checks**  after: W3-01  acceptance: 2
+- Files: loom-workflow/tests/git-memory/test_loom_delegation.py, loom-code/tests/test_architecture_doc_consumers.py, tests/test_loom_skill_description_catalog.py, loom-workflow/tests/scripts/test_visualization_card_hook.py, loom-workflow/tests/goal-create/test_goal_shape.py, loom-workflow/tests/loom-visualization/test_references.py, and every other pruned function in the change
+- Test: A2 positive: renamed-tests-still-pass; negative: no-cited-name-renamed.
+- Risk: agent-decided — rename and rewrite docstrings to what each body checks; names cited by mechanisms.yaml, AGENTS.md or test_module_criteria_text.py stay and get a docstring fix only.
 
 ## Simplicity check
 - Merge the two known-file tasks into one W1-01 with one mapping file — taken
