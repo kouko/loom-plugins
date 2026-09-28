@@ -62,7 +62,7 @@ The orphaned `polarity_errors`, `_sentence_with`, `NEGATION`, `DECISION_PHRASES`
 
 | file::function(s) | defect class it guarded | named replacement | kind |
 |---|---|---|---|
-| `::test_defines_four_fields_budget_and_surfacing` (pruned: "must not change", "surfaced in the conversation", "runs no commands", "opens no files", "one compression pass", "not an error") | the four-field definitions or the 1,500 advisory lose their meaning | skill lens, `inconsistency`; the same function keeps field order, `goal evaluator`, the budget numbers, `advisory`, the file-pointer rule, the budget-section caveat and the vendor URLs | review lens dimension |
+| `::test_defines_four_fields_budget_and_surfacing` (pruned: "must not change", "surfaced in the conversation", "runs no commands", "opens no files", "one compression pass", "not an error") | the four-field definitions or the 1,500 advisory lose their meaning | skill lens, `inconsistency`; the same function keeps field order, `goal evaluator`, the budget numbers, `advisory`, the budget-section caveat and the vendor URLs. The file-pointer rule is now review-only: W1-07 pruned its regex (`mapping-residual.md`) | review lens dimension |
 
 ## tests/test_loom_skill_description_catalog.py
 

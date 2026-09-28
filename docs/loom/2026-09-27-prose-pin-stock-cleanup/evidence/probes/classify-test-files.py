@@ -774,10 +774,12 @@ MANUAL_OVERRIDES = {
     "loom-workflow/tests/decision-map/test_skill_doc.py": (
         "behavior",
         "loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same "
-        "test also runs. The file also holds direct sentence asserts on "
-        "SKILL.md and map-format prose (lines 181-183, 216-221, 281-287, 310-312, e.g. "
-        "'Exactly three ticket closure types exist'), which the classifier "
-        "does not see; they are left for batch 3",
+        "test also runs (start_delivery.py excepted; test_start_delivery.py owns "
+        "it). The direct sentence asserts batch 2 left were pruned in batch 3 "
+        "(W1-01, W1-07); the rest is operation headings, fixed terms, re-entry "
+        "and phase code tokens recomputed from the scripts, the ticket template "
+        "grammar, schema_version, manifest fields, and the Codex manifest "
+        "defaultPrompt sentence, kept as an interface string, not skill prose",
     ),
     "loom-workflow/tests/scripts/test_loom_visualization_compaction.py": (
         "structure",
@@ -802,6 +804,33 @@ MANUAL_OVERRIDES = {
         "heading-bounded Step 5 scan; the direct sentence "
         "asserts (single answer, re-design procedure) were pruned in closing "
         "review round 1",
+    ),
+    # Batch 3 (W2-01): files whose remaining direct-pin hit is not prose.
+    "loom-code/tests/test_architecture_doc_consumers.py": (
+        "structure",
+        "direct-pin hits are the `ratified-by: <name> <date>` line grammar in "
+        "write-plan Step 5 and the lenses code table; the rest is the Risk "
+        "line and rule id terms, lens-table row regexes, a heading-bounded "
+        "N/A bullet check and the reviewer code row; the sentence asserts "
+        "were pruned in batch 3 (W1-01)",
+    ),
+    "loom-workflow/tests/decision-map/test_decision_map_intent_binding.py": (
+        "behavior",
+        "direct-pin hit is the Map line format `- delivery-intent: DA-<n> | "
+        "docs/loom/intent/<change-id>.md` in map-format.md: line grammar, not "
+        "prose; the rest is path and front-matter tokens, status tokens, "
+        "absences, and the citation checker's scope loaded by path",
+    ),
+    "loom-workflow/tests/loom-visualization/test_templates.py": (
+        "behavior",
+        "direct-pin hit is the client-matrix table column header 'Form in a "
+        "chat reply'. The three pinned_sentence_ok polarity checks "
+        "(MERMAID_PIN, TABLE_ASCII_PIN, CHAT_PROCEEDS_PIN) are kept on purpose "
+        "(agent-decided): they read only sentences inside the "
+        "mermaid-only-when-confirmed and obsidian-boundary `<!-- gate: -->` "
+        "blocks, whose mechanisms.yaml evals (L357, L354) sit in this file, "
+        "and each fails a negated sentence, so they check the rule's "
+        "polarity, not only its wording",
     ),
 }
 
