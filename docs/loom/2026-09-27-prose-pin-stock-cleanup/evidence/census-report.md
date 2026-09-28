@@ -1,6 +1,6 @@
-# Census Report — Prose-Pin Stock Cleanup (W0-01, regenerated W3-02)
+# Census Report — Prose-Pin Stock Cleanup (W0-01, regenerated in the end-of-Build fix round)
 
-Regenerated for W3-02 at HEAD of branch `engineering/2026-09-27-prose-pin-stock-cleanup` (2026-09-28), from
+Regenerated in the end-of-Build fix round at HEAD of branch `engineering/2026-09-27-prose-pin-stock-cleanup` (2026-09-28), from
 `python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py`.
 Total test files scanned: 234
 
@@ -10,11 +10,11 @@ Total test files scanned: 234
 |-------|-------|
 | behavior | 111 |
 | gate-eval | 5 |
-| grammar-invariant | 9 |
+| grammar-invariant | 5 |
 | not-prose | 58 |
-| other | 10 |
+| other | 13 |
 | sentence-pin | 0 |
-| structure | 41 |
+| structure | 42 |
 
 ## Full Per-File Classification
 
@@ -31,10 +31,7 @@ Total test files scanned: 234
 | loom-code/tests/test_adversarial_version_metadata_sync.py | behavior | has_pins=no |
 | loom-code/tests/test_adversary_layout.py | behavior | has_pins=no |
 | loom-code/tests/test_adversary_protocol.py | behavior | has_pins=yes |
-| loom-code/tests/test_adversary_recipe_code.py | grammar-invariant | has_pins=yes, note=mixed-grammar-and-pin |
-| loom-code/tests/test_adversary_recipe_shape.py | grammar-invariant | has_pins=yes, note=mixed-grammar-and-pin |
-| loom-code/tests/test_adversary_recipe_skill_gate.py | grammar-invariant | has_pins=yes, note=mixed-grammar-and-pin |
-| loom-code/tests/test_adversary_recipe_spec.py | grammar-invariant | has_pins=yes, note=mixed-grammar-and-pin |
+| loom-code/tests/test_adversary_recipe_shape.py | structure | auto=sentence-pin, override=structure, reason=split_sentences feeds a duplicate-sentence check across recipe files; no prose literal is asserted, has_pins=yes |
 | loom-code/tests/test_adversary_routing.py | behavior | has_pins=yes |
 | loom-code/tests/test_agent_model_frontmatter.py | structure |  |
 | loom-code/tests/test_agy_adapter.py | behavior | has_pins=no |
@@ -207,6 +204,20 @@ Total test files scanned: 234
 | loom-workflow/tests/scripts/test_recap_state_compaction.py | structure () | structure () | Compaction test: checks document shape (frontmatter, sections, headings) ✅ |
 | loom-workflow/tests/loom-memory/test_skill_contract.py | behavior (has_pins=no) | behavior (has_pins=no) | Runs subprocess git ls-files, binds .stdout to staged variable, asserts on returncode ✅ |
 | loom-workflow/tests/decision-map/test_delivery_binding.py | behavior (has_pins=no) | behavior (has_pins=no) | Imports delivery_binding production module (scripts/), validates ticket/brief bindings with repo I/O ✅ |
+| loom-code/tests/test_adversary_recipe_shape.py | structure (override) | structure (auto=sentence-pin, override=structure) | Manual override, see Classifier corrections: split_sentences feeds a duplicate-sentence check across recipe files; no prose literal asserted |
+| loom-code/tests/test_adversary_recipe_code.py | other | other (not in the table) | Was grammar-invariant only through an appended comment; the pin tables are deleted, and what is left (case-class table cells, one-home check) matches no STRUCTURE signal |
+
+## Classifier corrections in the fix round
+
+The end-of-Build adversary showed the earlier zero came partly from comments. Corrections, each applied to every file:
+
+- **Comment stripping.** `#` comments are removed (tokenize) before any signal is matched, so no comment can change a class. Docstrings are kept: stripping them reclassifies 15 unrelated files (none into sentence-pin), a wider change than this round.
+- **Reader-call signals removed.** `_flat(`, `flat_prose(` and `rule_prose(` no longer count as sentence assertions: a reader call asserts nothing, and a literal asserted on its result is still caught by the `assert ... in "literal"` alternative. Moves: `test_adversary_recipe_code.py`, `_skill_gate.py`, `_spec.py` sentence-pin → other.
+- **Heading-literal exemption.** An `assert "#..." in ...` literal (heading presence) is structure, not a pin.
+- **`split_sentences(` kept.** Removing it moved `test_build_recovery_rules.py` and `test_closing_review_recovery_rules.py` from gate-eval to structure, yet both really pin phrases (`_require` phrase lists, exact paragraph endings) in a form no other signal sees; that part was reverted.
+- **One manual override** (`MANUAL_OVERRIDES` in the classifier, printed as `auto=…, override=…`): `loom-code/tests/test_adversary_recipe_shape.py` → structure, because split_sentences feeds a duplicate-sentence check across recipe files and no prose literal is asserted.
+
+Also in this round: the appended `# prose_pin matcher self-test` comments were removed from the four recipe modules, and their leftover pin tables and synthetic pin tests deleted.
 
 ## Removed sentence-pin tests → replacement evidence
 

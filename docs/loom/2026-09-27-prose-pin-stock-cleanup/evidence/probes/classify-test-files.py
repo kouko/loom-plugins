@@ -278,6 +278,17 @@ def _classify(path: Path) -> tuple[str, dict]:
     return "other", {}
 
 
+# Explicit, visible overrides applied after automatic classification (fix
+# round). Each row prints `auto=<class>, override=<class>` in the table.
+MANUAL_OVERRIDES = {
+    "loom-code/tests/test_adversary_recipe_shape.py": (
+        "structure",
+        "split_sentences feeds a duplicate-sentence check across recipe files; "
+        "no prose literal is asserted",
+    ),
+}
+
+
 def main() -> int:
     import argparse
 
@@ -296,6 +307,11 @@ def main() -> int:
     for root in roots:
         for p in sorted((REPO / root).rglob("*.py")):
             cls, secondary = classify(p, gate_evals)
+            key = p.relative_to(REPO).as_posix()
+            if key in MANUAL_OVERRIDES:
+                forced, reason = MANUAL_OVERRIDES[key]
+                secondary = {"auto": cls, "override": forced, "reason": reason, **secondary}
+                cls = forced
             counts[cls] = counts.get(cls, 0) + 1
             if cls in {"sentence-pin", "gate-eval", "structure", "grammar-invariant", "behavior"}:
                 secondary_str = ", ".join(f"{k}={v}" for k, v in secondary.items()) if secondary else ""
