@@ -74,7 +74,11 @@ Then read what exists, because each one changes what you write:
   in. Name the components it names; do not invent a second word for a
   thing it already calls something.
 
-A missing file never blocks this station; write from what exists.
+For a `kind: product` intent, if `PRINCIPLES.md` lacks a
+`ratified-by: <name> <date>` line or a `## Non-negotiables` section with at
+least three items, **stop** and hand back to `loom-design:capture-intent`;
+never write `ratified-by:` yourself. Otherwise a missing standing document
+never blocks this station; write from what exists.
 
 ## Step 2 — Write the spec
 
