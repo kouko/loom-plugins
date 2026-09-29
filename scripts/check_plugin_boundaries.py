@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Reject references that couple one plugin to another's files.
 
-The checker scans Markdown, ``hooks*.json`` files, shell scripts (``.sh``) and
-Python scripts (``.py`` files and extensionless files with a python shebang,
-such as hooks) below a single plugin root.  In Markdown it reports relative
+The checker scans Markdown, ``hooks*.json`` files, shell scripts (``.sh`` files
+and extensionless files with any other shebang, such as hooks) and Python
+scripts (``.py`` files and extensionless files with a python shebang) below a
+single plugin root.  In Markdown it reports relative
 links whose lexically resolved path leaves that root.  In all of them it
 reports path references to another ``loom-*`` plugin's
 private ``hooks/``, ``skills/``, ``scripts/``, ``contract/`` or ``agents/``
@@ -14,7 +15,9 @@ skipped (they are never executed as a path), and so is the plugin's top-level
 ``tests/`` tree, which is development-only.  In Python it also reports a
 logical line where a literal ``"loom-*"`` plugin name is followed by a literal
 private tree name (a path join); a join whose plugin name is a variable is a
-known blind spot.  Plugin-qualified skill names such as
+known blind spot.  In shell, a ``#`` after whitespace is cut as a comment even
+inside quotes, so a path later on that line is a known blind spot too.
+Plugin-qualified skill names such as
 ``loom-code:using-loom-code`` are public names and are therefore allowed.
 
 The files it scans are what git says belongs to the repository under that
@@ -78,6 +81,20 @@ def _is_python_script(path: Path) -> bool:
     except OSError:
         return False
     return first.startswith(b"#!") and b"python" in first
+
+
+def _is_shell_script(path: Path) -> bool:
+    """A ``.sh`` file, or an extensionless file with a non-python shebang."""
+    if path.suffix == ".sh":
+        return True
+    if path.suffix:
+        return False
+    try:
+        with path.open("rb") as handle:
+            first = handle.readline()
+    except OSError:
+        return False
+    return first.startswith(b"#!") and b"python" not in first
 
 
 def _script_lines(text: str) -> list[tuple[int, str]]:
@@ -279,12 +296,12 @@ def find_boundary_violations(plugin_root: str | Path) -> list[str]:
                 enumerate(source.read_text(encoding="utf-8").splitlines(), start=1)
             )
             is_markdown = False
-        elif source.suffix == ".sh" or _is_python_script(source):
+        elif _is_shell_script(source) or _is_python_script(source):
             if plugin_name == _CHECKER_OWNER or source.relative_to(root).parts[0] == "tests":
                 continue
             text = source.read_text(encoding="utf-8")
             is_markdown = False
-            if source.suffix == ".sh":
+            if _is_shell_script(source):
                 lines = _shell_lines(text)
             else:
                 lines = _script_lines(text)

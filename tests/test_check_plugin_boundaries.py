@@ -342,6 +342,10 @@ def test_reports_loom_code_reads_in_python_scripts_and_placeholder_forms(tmp_pat
         plugin / "hooks" / "relay",
         '#!/usr/bin/env python3\nCONTRACT = "loom-code/contract/manifest.yaml"\n',
     )
+    shell_hook = _write(
+        plugin / "hooks" / "session-start",
+        '#!/usr/bin/env bash\nexec python3 "${CLAUDE_PLUGIN_ROOT}/../loom-code/scripts/review_context.py"\n',
+    )
     doc = _write(
         plugin / "skills" / "router" / "SKILL.md",
         "Run `python3 <loom-code>/scripts/loom_checker.py`.\n",
@@ -349,6 +353,7 @@ def test_reports_loom_code_reads_in_python_scripts_and_placeholder_forms(tmp_pat
 
     assert checker.find_boundary_violations(plugin) == [
         f"{hook}:2: sibling internal path: loom-code/contract/manifest.yaml",
+        f"{shell_hook}:2: sibling internal path: /../loom-code/scripts/review_context.py",
         f"{script}:1: sibling internal path: loom-code/scripts/x.py",
         f"{doc}:1: sibling placeholder path: <loom-code>",
         f"{doc}:1: sibling checker reference: loom_checker",
