@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-"""Reject Markdown references that couple one plugin to another's files.
+"""Reject references that couple one plugin to another's files.
 
-The checker scans Markdown below a single plugin root.  It reports relative
-Markdown links whose lexically resolved path leaves that root, and operational
-path references to another ``loom-*`` plugin's private ``hooks/``, ``skills/``,
-or ``scripts/`` tree.  Plugin-qualified skill names such as
+The checker scans Markdown and Python scripts (``.py`` files and extensionless
+files with a python shebang, such as hooks) below a single plugin root.  In
+Markdown it reports relative links whose lexically resolved path leaves that
+root.  In both it reports path references to another ``loom-*`` plugin's
+private ``hooks/``, ``skills/``, ``scripts/``, ``contract/`` or ``agents/``
+tree, a ``<loom-*>`` placeholder naming another plugin, and ``loom_checker``
+outside loom-code.  Scripts are scanned outside loom-code only, whose own
+scripts are repository-wide tools.  In scripts, comments and docstrings are
+skipped (they are never executed as a path), and so is the plugin's top-level
+``tests/`` tree, which is development-only.  Plugin-qualified skill names such as
 ``loom-code:using-loom-code`` are public names and are therefore allowed.
 
-The Markdown it scans is what git says belongs to the repository under that
+The files it scans are what git says belongs to the repository under that
 plugin root, via ``repo_files.repository_files``: passing a subdirectory scopes
 the listing to that subtree, so an ignored directory and a linked worktree
 checked out inside the plugin contribute no violation.  That module ships with
@@ -22,9 +28,12 @@ passed a plugin root.
 from __future__ import annotations
 
 import argparse
+import ast
+import io
 import json
 import re
 import sys
+import tokenize
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "loom-code" / "scripts"))
@@ -41,8 +50,64 @@ _SIBLING_INTERNAL_RE = re.compile(
     r"(?<![A-Za-z0-9_./:-])"
     r"(?P<target>(?:(?:/|(?:\.{1,2}|[A-Za-z0-9_.-]+)/))*"
     r"(?P<plugin>loom-[a-z0-9-]+)"
-    r"/(?:hooks|skills|scripts)/[A-Za-z0-9_./-]+)"
+    r"/(?:hooks|skills|scripts|contract|agents)/[A-Za-z0-9_./-]+)"
 )
+_PLACEHOLDER_RE = re.compile(r"<(?P<plugin>loom-[a-z0-9-]+)>")
+_CHECKER_RE = re.compile(r"\bloom_checker\b")
+# loom-code owns the checker; its scripts are repository-wide tools that name
+# sibling paths as repository data, so scripts are scanned in the other plugins.
+_CHECKER_OWNER = "loom-code"
+
+
+def _is_python_script(path: Path) -> bool:
+    """A ``.py`` file, or an extensionless file with a python shebang."""
+    if path.suffix == ".py":
+        return True
+    if path.suffix:
+        return False
+    try:
+        with path.open("rb") as handle:
+            first = handle.readline()
+    except OSError:
+        return False
+    return first.startswith(b"#!") and b"python" in first
+
+
+def _script_lines(text: str) -> list[tuple[int, str]]:
+    """Numbered code lines with comments cut and docstring lines dropped."""
+    docstring_lines: set[int] = set()
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        tree = None
+    if tree is not None:
+        for node in ast.walk(tree):
+            if not isinstance(
+                node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)
+            ) or not node.body:
+                continue
+            first = node.body[0]
+            if (
+                isinstance(first, ast.Expr)
+                and isinstance(first.value, ast.Constant)
+                and isinstance(first.value.value, str)
+            ):
+                docstring_lines.update(range(first.lineno, first.end_lineno + 1))
+    comment_cols: dict[int, int] = {}
+    try:
+        for token in tokenize.generate_tokens(io.StringIO(text).readline):
+            if token.type == tokenize.COMMENT:
+                comment_cols[token.start[0]] = token.start[1]
+    except (tokenize.TokenError, SyntaxError):
+        comment_cols = {}
+        for number, line in enumerate(text.splitlines(), start=1):
+            if line.lstrip().startswith("#"):
+                comment_cols[number] = 0
+    return [
+        (number, line[: comment_cols.get(number, len(line))])
+        for number, line in enumerate(text.splitlines(), start=1)
+        if number not in docstring_lines
+    ]
 
 
 def _is_archival_markdown(root: Path, markdown: Path) -> bool:
@@ -155,26 +220,33 @@ def find_boundary_violations(plugin_root: str | Path) -> list[str]:
     plugin_name = _plugin_name(root)
     violations: list[str] = []
 
-    markdown_files = sorted(
-        path for path in repository_files(root) if path.suffix == ".md"
-    )
-    for markdown in markdown_files:
-        if _is_archival_markdown(root, markdown):
+    for source in sorted(repository_files(root)):
+        if source.suffix == ".md":
+            if _is_archival_markdown(root, source):
+                continue
+            lines = list(
+                enumerate(source.read_text(encoding="utf-8").splitlines(), start=1)
+            )
+            is_markdown = True
+        elif _is_python_script(source):
+            if plugin_name == _CHECKER_OWNER or source.relative_to(root).parts[0] == "tests":
+                continue
+            lines = _script_lines(source.read_text(encoding="utf-8"))
+            is_markdown = False
+        else:
             continue
-        for line_number, line in enumerate(
-            markdown.read_text(encoding="utf-8").splitlines(), start=1
-        ):
+        for line_number, line in lines:
             reported_link_spans: list[tuple[int, int]] = []
-            link_matches = list(_LINK_RE.finditer(line))
-            reference_match = _REFERENCE_LINK_RE.match(line)
+            link_matches = list(_LINK_RE.finditer(line)) if is_markdown else []
+            reference_match = _REFERENCE_LINK_RE.match(line) if is_markdown else None
             if reference_match:
                 link_matches.append(reference_match)
             for match in sorted(link_matches, key=lambda item: item.start("target")):
                 target = _link_path(match.group("target"))
-                if target and _escapes(root, markdown, target):
+                if target and _escapes(root, source, target):
                     reported_link_spans.append(match.span("target"))
                     violations.append(
-                        f"{markdown}:{line_number}: escaping relative link: {target}"
+                        f"{source}:{line_number}: escaping relative link: {target}"
                     )
 
             for match in _SIBLING_INTERNAL_RE.finditer(line):
@@ -188,9 +260,25 @@ def find_boundary_violations(plugin_root: str | Path) -> list[str]:
                     for link_start, link_end in reported_link_spans
                 ):
                     continue
+                reported_link_spans.append((start, end))
                 violations.append(
-                    f"{markdown}:{line_number}: sibling internal path: "
+                    f"{source}:{line_number}: sibling internal path: "
                     f"{match.group('target')}"
+                )
+
+            for match in _PLACEHOLDER_RE.finditer(line):
+                if match.group("plugin") != plugin_name:
+                    violations.append(
+                        f"{source}:{line_number}: sibling placeholder path: "
+                        f"{match.group(0)}"
+                    )
+            # A checker token already inside a reported path is not reported twice.
+            if plugin_name != _CHECKER_OWNER and any(
+                not any(s <= m.start() and m.end() <= e for s, e in reported_link_spans)
+                for m in _CHECKER_RE.finditer(line)
+            ):
+                violations.append(
+                    f"{source}:{line_number}: sibling checker reference: loom_checker"
                 )
 
     return violations
