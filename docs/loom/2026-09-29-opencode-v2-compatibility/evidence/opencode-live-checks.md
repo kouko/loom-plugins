@@ -120,3 +120,39 @@ Other observation: the server also watches `/Users/kouko/.claude/skills` and
 offers those skills (17 non-loom skills appeared, including OpenCode's
 built-in `opencode` skill). This is OpenCode's own
 Claude-compatibility behaviour, not something the loom plugins do.
+
+## Re-check after 711a80db
+
+Same binary (v2.0.18), same isolated `<S>` tree, all turns through the default
+background service (isolated, port 4997, process cwd `/Users/kouko`; confirmed with
+`lsof -d cwd`), model `litellm/nvidia-only`, project `<S>/proj`.
+
+Install note: `plugin add` of the branch spec answered `already configured`;
+`plugin update` answered `No plugin updates available`; remove + add of the same
+branch spec reused the cached copy (`plugin list` still `33ec1d9`). The plugins
+were therefore removed and re-added pinned to the commit
+(`git+file:///Users/kouko/GitHub/loom-plugins#711a80db::path:<plugin>`), the service
+restarted, and `plugin list` then showed `loom-code`, `loom-design`, `loom-workflow`
+at `711a80d` (the first list after restart printed `No plugins found`; the same
+cold-start race as before). A branch-ref `git+file` install does not pick up new
+commits by itself; docs should tell users to pin a commit or tag when re-installing.
+
+| check | observed | verdict |
+|---|---|---|
+| 5c service cwd | service process cwd is still `/Users/kouko`; hooks no longer depend on it (see 5d) | works |
+| 5d `git push --dry-run` under the service | model `shell` result ends with `loom: change not identified (no intent for this branch); publishing anyway.`; no `is not inside a git work tree` | works (fixed) |
+| 5e nested write `skills/x/a/b/c.md` | model `write` input `{"path":"skills/x/a/b/c.md","content":"hi"}`; result: `Wrote file successfully: skills/x/a/b/c.md` then `Skill folder structure violation (loom-workflow plugin hook)`, `Skill root: <S>/proj/skills/x`, `Nested directory paths found: <S>/proj/skills/x/a/b` (absolute paths, so the relative `path` is resolved against the session directory) | works (fixed) |
+| Class C, push note in stored tool result | `GET /api/session/<id>/message`: shell tool `state.content` has two text parts, part 2 = `loom: change not identified …`. There is no `state.output` field in the stored message; in the `opencode run --format json` event, `state.output` for `shell` is still only the git text and the note sits in `state.metadata.content[1]` | partly: stored in `state.content`; the run event's `state.output` string still lacks it |
+| Class C, no duplicated skill note | Chinese prompt (`loom-code:write-plan`): stored skill `state.content` has two parts, part 1 = skill body with 0 occurrences of `會話語言`, part 2 = the reminder; the run event's `state.output` contains the reminder exactly once; English prompt: one part, no reminder | works (no duplicate) |
+
+Excerpts (`<S>` = scratch root):
+```
+shell  state.content[1].text = "loom: change not identified (no intent for this branch); publishing anyway."
+shell  run-event state.output = "To <S>/remote.git\n * [new branch]      HEAD -> feature/demo\n"
+skill  state.content[1].text = "對使用者的敘述一律使用會話語言（繁體中文）；機器面 artifact（brief/verdict/commit）維持原語言。"
+```
+
+Notes: a short mostly-ASCII Chinese prompt (`請只做一件事：用 skill 工具…`) did not
+trigger the language reminder (language detector needs a clear CJK majority); a longer
+Chinese sentence did. The `opencode` service on the default port 49374 and the user's
+own TUI processes were not touched; the isolated service was stopped afterwards.
