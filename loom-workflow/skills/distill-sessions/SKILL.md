@@ -106,6 +106,12 @@ After the bare-invocation confirmation (or with explicit initial scope), read
 SKILL.md body and observable session events, and use the current Sonnet
 generation. Fan out only disjoint trajectories.
 
+The payload names the target skill in `input.target_skill` and leaves
+`target_skill_path` and `target_skill_md_content` empty; the script reads no
+other skill's files. Before dispatch, fill both from that skill's own loaded
+base directory (the folder holding its SKILL.md). If the host has not loaded
+that skill, omit its trajectories and name them in the summary.
+
 Each subagent returns the strict-markdown Memory Item shape defined by its
 prompt. Do not ask it for JSON. Claude Code dispatch uses the harness alias
 `sonnet`; the literal `claude-sonnet-4-6` is metadata and fails Claude Code's

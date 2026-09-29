@@ -19,9 +19,8 @@ External surface verification (memory project_external_surface_grounding_discipl
   in v0.4 brief Q-v0.4-1 to cover all observed trajectory sizes (max 559K in
   v0.3 dogfood vs 1M cap; v0.3 had 7/12 overflow at 200K). Literal verified
   via https://platform.claude.com/docs/en/about-claude/models/overview (2026-05-26).
-- ``loom-code:dispatching-parallel-agents`` — internal sibling skill in
-  this repo at ``loom-code/skills/dispatching-parallel-agents/SKILL.md``;
-  verified by ``ls`` at implementer-time. Not a 3rd-party API.
+- ``loom-code:dispatching-parallel-agents`` — internal sibling skill,
+  routed by name only. Not a 3rd-party API.
 
 Per Plan Part 2 §Task 9.
 """
@@ -72,46 +71,6 @@ DEFAULT_TOP_N = 5
 
 # Default target skill glob.
 DEFAULT_TARGET_PATTERN = "loom-code:*"
-
-# Repo-root resolution: this file lives at
-# ``loom-workflow/skills/distill-sessions/scripts/main.py``. repository root
-# is 4 parents up.
-_REPO_ROOT = Path(__file__).resolve().parents[4]
-
-
-# ---------------------------------------------------------------------------
-# Skill name → SKILL.md path resolver.
-# ---------------------------------------------------------------------------
-
-
-def _resolve_skill_md_path(skill_name: str) -> Path | None:
-    """Map ``<plugin>:<skill>`` → ``<plugin>/skills/<skill>/SKILL.md`` under
-    the loom-plugins repo root.
-
-    Returns the resolved Path (regardless of existence) or None when
-    ``skill_name`` is not of the form ``<plugin>:<skill>``.
-    """
-    if ":" not in skill_name:
-        return None
-    plugin, skill = skill_name.split(":", 1)
-    if not plugin or not skill:
-        return None
-    return _REPO_ROOT / plugin / "skills" / skill / "SKILL.md"
-
-
-def _read_skill_md(path: Path | None) -> str:
-    """Read SKILL.md content; return empty string if missing / unreadable.
-
-    The payload still carries the path so the subagent can decide what to do
-    when the body is absent (e.g. external-surface skill).
-    """
-    if path is None or not path.is_file():
-        return ""
-    try:
-        return path.read_text(encoding="utf-8")
-    except OSError:
-        return ""
-
 
 # ---------------------------------------------------------------------------
 # Friction-level heuristic (per-session).
@@ -273,8 +232,6 @@ def _build_subagent_entries(
     skill_name: str,
     selected_sessions: list[str],
     events_by_session: dict[str, list[Event]],
-    target_skill_path: Path | None,
-    target_skill_md_content: str,
     session_friction: dict[str, str],
     *,
     session_to_skill: dict[str, str] | None = None,
@@ -294,7 +251,6 @@ def _build_subagent_entries(
     """
     out: list[dict[str, object]] = []
     namespace = uuid.UUID("00000000-0000-0000-0000-000000000001")
-    target_path_str = str(target_skill_path) if target_skill_path else ""
     for session_id in selected_sessions:
         # Cross-skill routing gate: skip sessions attributed to a different skill.
         if session_to_skill is not None and session_to_skill.get(session_id, skill_name) != skill_name:
@@ -328,8 +284,11 @@ def _build_subagent_entries(
                     "model": SUBAGENT_MODEL_ID,
                     "input": {
                         "session_events": session_events_dicts,
-                        "target_skill_path": target_path_str,
-                        "target_skill_md_content": target_skill_md_content,
+                        # Filled by the dispatching agent from the target
+                        # skill's own loaded base directory; no file read here.
+                        "target_skill": skill_name,
+                        "target_skill_path": "",
+                        "target_skill_md_content": "",
                     },
                 }
             )
@@ -522,9 +481,6 @@ def main(argv: list[str] | None = None) -> int:
     session_to_skill = _compute_session_to_skill(ranked)
 
     for rec in ranked:
-        target_skill_path = _resolve_skill_md_path(rec.skill_name)
-        target_skill_md_content = _read_skill_md(target_skill_path)
-
         # Per-session friction levels (uses signals attached to this rec).
         sessions_out: list[dict[str, object]] = []
         for session_id in rec.sessions:
@@ -572,8 +528,6 @@ def main(argv: list[str] | None = None) -> int:
                 skill_name=rec.skill_name,
                 selected_sessions=selected,
                 events_by_session=events_by_session,
-                target_skill_path=target_skill_path,
-                target_skill_md_content=target_skill_md_content,
                 session_friction=session_friction,
                 session_to_skill=session_to_skill,
             )
