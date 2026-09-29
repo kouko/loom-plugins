@@ -16,7 +16,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 PLUGIN = REPO / "loom-workflow"
-CURRENT = "5.5.5"
+CURRENT = "5.5.6"
 
 
 @pytest.mark.parametrize(

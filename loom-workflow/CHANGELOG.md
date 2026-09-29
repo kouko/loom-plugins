@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.5.6] — 2026-09-29 — OpenCode v2 packaging and hooks.
+
+- OpenCode v2 package: `package.json` plus `opencode/loader.js` register the skills and translate `hooks/hooks-opencode.json` (visualization card, skill-folder-structure rule) into OpenCode hooks; the READMEs carry the install steps.
+- budget-exception: UserPromptSubmit::visualization-card@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+- budget-exception: PostToolUse:Write|Edit:validate-skill-folder-structure.sh@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+
 ## [5.5.5] — 2026-09-29 — no runtime reads of loom-code files.
 
 - `decision-map` drops its loom-code contract gate and intent check (write-plan runs it).
