@@ -8,32 +8,53 @@ REQ-1 — Install through OpenCode's own plugin paths
 REQ-2 — Every skill offered, none shadowed
   WHEN a new OpenCode session starts with the three plugins installed, every skill of the three plugins shall be offered under a plugin-qualified id and load its full SKILL.md body with its base directory, including when another installed plugin registers the same short name → Acceptance #2
 REQ-3 — Whole flow on OpenCode
-  WHEN a change in a throwaway repository is driven on OpenCode with a third-party cloud model, capture-intent, write-plan, build, closing-review and ship shall each run from their own skill prose, reach the installed loom checker, and end with an opened pull request whose intent, plan and attestation the checker accepts → Acceptance #3
+  WHEN a change in a throwaway repository is driven on OpenCode with a third-party cloud model, capture-intent, write-plan, build, closing-review and ship shall each run from their own skill prose, reach the installed loom checker, and end with an opened pull request whose intent, plan and attestation the checker accepts, with the acceptance test report committed on the change branch, using the model from the user's existing OpenCode setup → Acceptance #3
 REQ-4 — Loom roles as OpenCode subagents
   WHEN a station dispatches implementer, reviewer, adversary or acceptance-tester on OpenCode, each shall run as a separate OpenCode subagent registered from loom-code's agent definitions → Acceptance #4
 REQ-5 — Hook behaviours ported or disclosed
-  WHEN OpenCode runs a loom session, the session-start station order and kickoff defaults, the publication reminder, the language reminder, the skill folder-structure rule and the selection-record guard shall each behave as on the other hosts, or be named unavailable with the reason in OpenCode's install instructions → Acceptance #5
+  WHEN OpenCode runs a loom session, the session-start station order and kickoff defaults, the publication reminder, the language reminder, the skill folder-structure rule and the selection-record guard shall each behave as on the other hosts, or be named unavailable with the reason in OpenCode's install instructions; IF a subagent prompt or a nested `opencode` run carries an expert-mode entry token and a pending code, THEN no step-skip confirmation shall be recorded → Acceptance #5
 REQ-6 — Other hosts unchanged
   The existing package suite and the Codex manifest drift check shall pass, and the Claude Code, Codex and Antigravity CLI manifests, hook configs and skill names shall be unchanged → Acceptance #6
 REQ-7 — Principles name OpenCode
-  PRINCIPLES.md shall name OpenCode v2 in its audience line and hosts non-negotiable, with a ratified-by amendment entry, keeping the Non-negotiables count → Acceptance #7
+  PRINCIPLES.md shall name OpenCode v2 in its Who line and the host-installed-hooks Fixed choice, with a ratified-by amendment entry → Acceptance #7
 REQ-8 — Release bump
   Each plugin shall carry a new version consistent across its Claude, Codex, Antigravity and OpenCode manifests, CHANGELOG and READMEs → Acceptance #8
 
 ## Design decision
-- agent-decided: each plugin gets a root `package.json` (name = plugin name, `type: module`, `exports["."]` to its OpenCode entry). A git install resolves through `exports`; the spike showed a local-folder entry ignores `exports`, but the confirmed install path is the git spec, so no root `index.js` is added.
-- agent-decided: the OpenCode `package.json` is derived by `scripts/sync_codex_manifests.py` from `.claude-plugin/plugin.json` like the Codex and Antigravity manifests, so `--check --all` in CI and the existing drift hook cover it; no second generator.
-- agent-decided: one canonical loader (`scripts/opencode/loader.js`) is copied byte-identical into each plugin's `opencode/loader.js` by the same sync script, and `--check` fails on drift; each plugin's `opencode/index.js` imports it and declares only that plugin's hook table. Plugins cannot import each other at runtime (PRINCIPLES fixed choice), so a copy is required.
-- agent-decided: skills register as `<plugin>:<skill>` and agents as `<plugin>:<agent>`, so the prose names `loom-code:reviewer` and `loom-design:write-spec` map one-to-one; the spike showed a duplicate id is silently last-wins, which the plugin prefix prevents.
-- agent-decided: hooks use the v2 API only (`ctx.tool.hook`, `ctx.session.hook`); the spike showed v1 hook exports never load on 2.0.18. The JS hook builds the Claude Code hook payload and runs the existing handler (`loom_checker.py push --hook`, `selection capture --hook`, `hooks/session-start`, `hooks/language-anchor.py`, `hooks/visualization-card`, `scripts/validate-skill-folder-structure.sh`), so no hook logic is duplicated in JavaScript. OpenCode's shell tool is `shell`, not `bash`.
-- agent-decided: a hook handler that cannot be reached (python3 missing, handler error) fails the way the Antigravity adapter does: the publication reminder and card are skipped, the selection guard denies a command that names or runs inside the selection store.
+- agent-decided: install spec per plugin is `github:kouko/loom-plugins#main::path:<plugin>`, typed into `opencode plugin add` or the TUI's plugin dialog. Each plugin gets a root `package.json` (name = plugin name, `type: module`, `main: index.js`) and a root `index.js` entry, so the package loads whether OpenCode resolves it as a git package or a local folder (the spike showed a local folder ignores `exports`). Every script the hooks run is invoked through `python3` or `bash` explicitly, so a lost executable bit in the npm-pack copy does not matter.
+- agent-decided: the OpenCode `package.json` is derived by `scripts/sync_codex_manifests.py` from `.claude-plugin/plugin.json` like the Codex and Antigravity manifests. CI's `--check --all` covers it and the loader copies; the Codex drift edit hook covers `package.json` only.
+- agent-decided: one canonical loader (`scripts/opencode/loader.js`) is copied byte-identical into each plugin's `opencode/loader.js` by the same sync script, and `--check` fails on drift. Plugins cannot import each other at runtime (PRINCIPLES fixed choice), so a copy is required. Each root `index.js` exports `default {id: <plugin name>, setup}` calling the loader; `loader.js` carries no id, because duplicate plugin ids fail to load.
+- agent-decided: skills register as `<plugin>:<skill>` and agents as `<plugin>:<agent>`, so prose names such as `loom-code:reviewer` and `loom-design:write-spec` map one-to-one; the plugin prefix prevents OpenCode's silent last-wins on a duplicate id. A skill whose frontmatter has `disable-model-invocation: true` (expert-mode) is not registered as a model-invocable skill; it is registered as a user command `/loom-code:expert-mode` whose raw text reaches the prompt hook. When Build's live check shows the typed command text does not reach the prompt hook, expert-mode is named unavailable on OpenCode in the install instructions (option A).
+- agent-decided: hooks use the v2 API only; v1 hook exports never load on 2.0.18 (spike). Each plugin declares its OpenCode hooks in `hooks/hooks-opencode.json`, in the same schema, event names and tool-name matchers as its Claude `hooks/hooks.json`. The shared loader translates them and runs the existing handler with a Claude Code payload built from the OpenCode call, so no hook logic is duplicated in JavaScript:
+
+| Claude event | OpenCode v2 hook | When | Output fed back |
+|---|---|---|---|
+| SessionStart | `session.hook("context")` | once per root session (cached by session id); never in a subagent session | `additionalContext` → one `{type:"text"}` context entry |
+| UserPromptSubmit | `session.hook("prompt")` | root session only | `additionalContext`/`systemMessage` → appended context text |
+| PreToolUse | `tool.hook("execute.before")` | every mapped tool call | exit 2 → throw with stderr as the message; `systemMessage` → appended note |
+| PostToolUse | `tool.hook("execute.after")` | every mapped tool call | exit 2 or `additionalContext` → note appended to the tool result |
+
+| OpenCode tool and argument | Claude payload |
+|---|---|
+| `shell` `command` | `Bash` `command` |
+| `write` `filePath` | `Write` `file_path` |
+| `edit` `filePath` | `Edit` `file_path` |
+| `patch` / `apply_patch` | `apply_patch` with its patch text |
+| `skill` `id` | `Skill` `skill` |
+
+- agent-decided: nested-session forgery is closed twice. The prompt hook runs selection capture and the card only for a root session (no parent session id); every handler run from a child session gets `CLAUDE_CODE_SESSION_ATTENDED=0`; and `opencode` joins `HOST_PROGRAMS` in `rule_checks/selection_guard.py`, so a nested `opencode run` carrying an entry token is refused like `claude` and `codex`.
+- agent-decided: tool calls made inside OpenCode's code-mode `execute` tool are checked live in Build. When they do not pass `tool.hook`, that bypass of the selection guard and folder rule is named in the install instructions (option A); the loader does not disable a user's OpenCode tool.
+- agent-decided: the language reminder gets its transcript from the loader: the prompt hook appends each root-session user prompt to a per-session file in the Claude transcript format `lang_detect.conversation_language` reads, and the `Skill` PostToolUse payload carries that file as `transcript_path`.
+- agent-decided: a handler that cannot be reached (python3 missing, handler error) fails as the Antigravity adapter does: the reminder, card and context are skipped, and the selection guard still denies a command or file path that names the selection store.
+- agent-decided: the mechanism census reads both `hooks/hooks-opencode.json` files with an `@opencode` qualifier, as it does for `@codex`, and `docs/loom/evidence/mechanisms.yaml` registers each entry with its regression eval: a node test that loads the plugin against a stub `ctx` and asserts every skill, agent and hook registration and translation.
 - agent-decided: `loom-code/references/opencode-tools.md` maps tool and agent names (Agent → `subagent` with `agent`, Skill → `skill` with `id`, Bash → `shell`, no effort parameter), linked from write-plan, build and closing-review beside the Antigravity line.
-- agent-decided: the mechanism census (`check_mechanisms.py`) keeps reading only JSON hook configs; the OpenCode hook table is not registered as new mechanisms because each entry reuses an already-registered handler. Disclosed as a known limit.
-- agent-decided: versions loom-code 3.24.0 (station guidance links a new host reference), loom-design 2.7.1 and loom-workflow 5.5.6 (packaging only).
+- agent-decided: versions loom-code 3.24.0 (station guidance links a new host reference), loom-design 2.7.1 and loom-workflow 5.5.6 (packaging and hook table only).
 
 ## Alternatives considered
 - v1 hook exports beside the v2 setup — never called on 2.0.18 (spike).
 - A Python adapter like `agy_adapter.py` — OpenCode hooks are in-process JavaScript; an extra Python hop per tool call adds nothing over calling the existing handlers directly.
+- Hook table hard-coded in each `index.js` — the census could not recompute it, and it would diverge from the JSON schema the other hosts use.
+- Denying the code-mode `execute` tool — changes the user's OpenCode beyond loom, which the no-new-capability constraint excludes.
 - Bare skill ids — silently shadowed by any other plugin with the same short name.
 - Publishing to npm — out of scope; install is from the repository.
 - Separate hand-written loaders per plugin — three drifting copies of the same skill/agent registration.
