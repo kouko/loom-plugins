@@ -20,9 +20,11 @@ counting: >
   the single source for its own rule population). hook = one entry per
   PreToolUse / PostToolUse / SessionStart / UserPromptSubmit hook declared in the Claude
   `loom-code/hooks/hooks.json` or Codex `hooks-codex.json` manifest, or in
-  the Claude `loom-workflow/hooks/hooks.json` manifest, id'd
+  the Claude `loom-workflow/hooks/hooks.json` manifest, or in either
+  plugin's Codex `hooks-codex.json` or OpenCode `hooks-opencode.json`
+  manifest, id'd
   as `<event>:<matcher>:<command basename>` with `@codex` appended for
-  the Codex manifest. contract = every station, non-standalone tool, action and
+  the Codex manifest and `@opencode` for the OpenCode manifest. contract = every station, non-standalone tool, action and
   artifact field declared in loom-code/contract/manifest.yaml, id'd as
   `station:<name>` / `tool:<name>` / `action:<name>` /
   `artifact:<name>.<field>` respectively — an artifact schema recomputes
@@ -228,6 +230,24 @@ mechanisms:
                           # host infrastructure outside the loom flow, but a
                           # real hook entry, so it must still be listed.
     eval: loom-code/tests/test_language_anchor_hook.py
+  - id: "SessionStart:startup|clear|compact:session-start@opencode"
+    class: hook
+    eval: loom-code/tests/test_opencode_loader.py
+  - id: "PreToolUse:Bash|Write|Edit|apply_patch:loom_checker.py@opencode"
+    class: hook
+    eval: loom-code/tests/test_opencode_loader.py
+  - id: "UserPromptSubmit::loom_checker.py@opencode"
+    class: hook
+    eval: loom-code/tests/test_opencode_loader.py
+  - id: "UserPromptSubmit::visualization-card@opencode"
+    class: hook
+    eval: loom-code/tests/test_opencode_loader.py
+  - id: "PostToolUse:Write|Edit:validate-skill-folder-structure.sh@opencode"
+    class: hook
+    eval: loom-code/tests/test_opencode_loader.py
+  - id: "PostToolUse:Skill:language-anchor.py@opencode"
+    class: host-hygiene   # excluded from the net count, like its Claude twin.
+    eval: loom-code/tests/test_opencode_loader.py
 
   # --- contract (64; loom-code/contract/manifest.yaml — stations, the 11
   #     non-standalone tools, actions and per-field artifact schemas) ---
