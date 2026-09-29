@@ -152,3 +152,27 @@ def test_role_dispatch_checks_accept_self_and_reject_plugin_typename() -> None:
     assert _plugin_agent_typenames("`TypeName` `acceptance-tester`") == ["acceptance-tester"]
     assert _plugin_agent_typenames("`TypeName` (required), for example `reviewer`.") == ["reviewer"]
     assert _plugin_agent_typenames(f"Use `{SELF_TYPENAME}`. The `reviewer` reads.") == []
+
+
+# OpenCode v2 mapping reference (W1-02).
+
+OPENCODE = PLUGIN / "references" / "opencode-tools.md"
+OPENCODE_LINK = "../../references/opencode-tools.md"
+
+
+def test_stations_link_opencode_reference() -> None:
+    for station in STATIONS:
+        skill = PLUGIN / "skills" / station / "SKILL.md"
+        assert OPENCODE_LINK in skill.read_text(encoding="utf-8"), station
+        assert (skill.parent / OPENCODE_LINK).resolve() == OPENCODE.resolve()
+
+
+def test_opencode_reference_maps_subagent_agent_ids() -> None:
+    text = OPENCODE.read_text(encoding="utf-8")
+    assert "`subagent`" in text and "`agent`" in text
+    for role in AGENTS:
+        assert f"`loom-code:{role}`" in text, role
+
+
+def test_opencode_reference_never_tells_agent_to_pass_subagent_type() -> None:
+    assert "subagent_type" not in OPENCODE.read_text(encoding="utf-8")
