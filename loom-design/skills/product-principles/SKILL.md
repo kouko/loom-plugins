@@ -24,22 +24,9 @@ time a `kind: product` change meets a repo with no ratified
 user can also run it stand-alone, on request, before any change is in
 flight.
 
-## Step 0 — Check the contract version
-
-Locate the `loom-code` directory as
-`../capture-intent/references/locate-loom-code.md` says, then run, with that
-directory in place of `<loom-code>`:
-
-```
-python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
-```
-
-Exit 0: continue. On any other result, or when the checkout cannot be found,
-follow that reference's failure rule and **stop**.
-
 ## Step 1 — Run the interview
 
-Read `<loom-code>/contract/templates/PRINCIPLES-interview.md` and ask
+Read `../capture-intent/templates/PRINCIPLES-interview.md` and ask
 exactly its five questions, in the user's own words, until each answer is
 clear. One line each on their intent:
 
@@ -89,9 +76,9 @@ ratified-by: <name> <date>
 `<name>` is the user's own name or handle; `<date>` is today,
 `YYYY-MM-DD`. A file with no `ratified-by:` line, or one whose
 `## Non-negotiables` has fewer than three entries, is not ratified —
-`loom-code`'s checker (`standing.product-principles-reject`) recomputes
-both conditions itself and rejects a `kind: product` change against an
-unratified file; nothing here can talk it out of that.
+`capture-intent` checks both conditions itself and runs the interview
+before a `kind: product` change goes on against an unratified file;
+nothing here can talk it out of that.
 
 ## Step 4 — Commit
 

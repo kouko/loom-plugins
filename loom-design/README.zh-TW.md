@@ -85,12 +85,11 @@ flowchart TD
 
 loom-design 需要 `loom-code`：
 
-- **它讀 loom-code 的 contract。** loom-design 絕不寫 `loom-code` 的
-  contract package。`plugin.json` 宣告 `requires-contract: ">=2.1"`，每個站
-  與工具的第一步都是
-  `python3 <loom-code>/scripts/loom_checker.py contract --require 2.1`，
-  版本對不上就停下，而不是對著看不懂的 contract 硬寫。在 Codex 上
-  `<loom-code>` 是已安裝的 plugin 目錄；絕不在 repo 裡建 checker 副本。
+- **它帶著 loom-code 範本的自有複本。** loom-design 絕不寫 `loom-code` 的
+  contract package，執行時也不讀它裡面的任何檔案：skill 填寫的範本都是本地
+  複本，由一支 repo 測試確保每份複本與 loom-code 原版一致。`plugin.json`
+  仍宣告 `requires-contract: ">=2.1"`，而 `loom-code:write-plan` 會在規劃前
+  跑 intent 檢查。
 - **它的 verdict 由 loom-code 下。** 規劃前的 spec review 與最後的 closing
   review 都在 `loom-code:closing-review` 由 fresh-context reviewer 進行；
   loom-design 只點名 checker 規則，從不執行它們。
@@ -98,8 +97,8 @@ loom-design 需要 `loom-code`：
   `needs-design: no` 時從 `capture-intent` 離開，否則從 `write-spec` 離開。
   沒裝 loom-design 時，`write-plan` 會自己跑決策點 ①。
 
-plugin 之間只透過帶 plugin 名的 skill 名稱（例如 `loom-design:write-spec`）、
-contract package，以及專案自己的 `docs/loom/` 產物相接。
+plugin 之間只透過帶 plugin 名的 skill 名稱（例如 `loom-design:write-spec`）
+以及專案自己的 `docs/loom/` 產物相接。
 
 ## 安裝
 

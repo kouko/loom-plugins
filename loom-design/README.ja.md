@@ -90,13 +90,12 @@ flowchart TD
 
 loom-design には `loom-code` が必要：
 
-- **loom-code の contract を読む。** loom-design は `loom-code` の
-  contract package を書かない。`plugin.json` は
-  `requires-contract: ">=2.1"` を宣言し、各ステーションとツールは最初に
-  `python3 <loom-code>/scripts/loom_checker.py contract --require 2.1`
-  を実行する。バージョンが合わなければ、理解できない contract に向けて
-  下書きを書くのではなく止まる。Codex では `<loom-code>` はインストール
-  済みの plugin ディレクトリ。リポジトリ内に checker のコピーを作らない。
+- **loom-code のテンプレートを自前のコピーで持つ。** loom-design は
+  `loom-code` の contract package を書かず、実行時にその中のファイルも
+  読まない。skill が埋めるテンプレートはローカルのコピーで、リポジトリの
+  テストが各コピーと loom-code の原本の一致を保つ。`plugin.json` は引き続き
+  `requires-contract: ">=2.1"` を宣言し、`loom-code:write-plan` が計画前に
+  intent チェックを実行する。
 - **verdict は loom-code が下す。** 計画前の spec review も最後の
   closing review も `loom-code:closing-review` で fresh-context の reviewer が行う。
   loom-design は checker のルール名を挙げるだけで、実行はしない。
@@ -105,9 +104,8 @@ loom-design には `loom-code` が必要：
   `write-spec` から入る。loom-design が入っていなければ、`write-plan` が
   決定ポイント ① を自分で行う。
 
-plugin 同士は `loom-design:write-spec` のような plugin 名付き skill 名、
-contract package、そしてプロジェクト自身の `docs/loom/` の artifact
-だけで繋がる。
+plugin 同士は `loom-design:write-spec` のような plugin 名付き skill 名と、
+プロジェクト自身の `docs/loom/` の artifact だけで繋がる。
 
 ## インストール
 

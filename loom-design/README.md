@@ -91,13 +91,12 @@ the user.
 
 loom-design requires `loom-code`:
 
-- **It reads loom-code's contract.** loom-design never writes
-  `loom-code`'s contract package. `plugin.json` declares
-  `requires-contract: ">=2.1"`, and each station and tool first runs
-  `python3 <loom-code>/scripts/loom_checker.py contract --require 2.1`,
-  stopping on a mismatch instead of drafting against a contract it does not
-  understand. On Codex, `<loom-code>` is the installed plugin directory;
-  never create a repository-local checker copy.
+- **It carries its own copies of loom-code's templates.** loom-design
+  never writes `loom-code`'s contract package and never reads a file inside
+  it at runtime: the templates its skills fill are local copies, and a
+  repository test keeps each copy identical to its loom-code original.
+  `plugin.json` still declares `requires-contract: ">=2.1"`, and
+  `loom-code:write-plan` runs the intent check before planning.
 - **Its verdicts are rendered by loom-code.** The pre-build spec review and
   the closing review both run in `loom-code:closing-review`, with fresh-context
   reviewers; loom-design only names the checker rules, it never runs them.
@@ -107,8 +106,7 @@ loom-design requires `loom-code`:
   runs decision point ① itself.
 
 The plugins compose only through plugin-qualified skill names such as
-`loom-design:write-spec`, the contract package and the project's own
-`docs/loom/` artifacts.
+`loom-design:write-spec` and the project's own `docs/loom/` artifacts.
 
 ## Install
 

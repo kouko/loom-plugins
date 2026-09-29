@@ -16,19 +16,6 @@ write the `ratified-by:` line. `DESIGN.md` documents the product's
 **visual system only** — brand, color, type, spacing, elevation, shape,
 and component tokens — never flows, screens, or navigation.
 
-## Step 0 — Check the contract version
-
-Locate the `loom-code` directory as
-`../capture-intent/references/locate-loom-code.md` says, then run, with that
-directory in place of `<loom-code>`:
-
-```
-python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
-```
-
-Exit 0: continue. On any other result, or when the checkout cannot be found,
-follow that reference's failure rule and **stop**.
-
 ## Step 1 — When to run
 
 Run this **before or during `write-spec`**, for any product with a UI a

@@ -1,8 +1,8 @@
 """capture-intent station contract (plan W2-01).
 
 The station is loom-design's entry point. These tests check its structure:
-frontmatter, word caps, gate markers and their registration, the shared
-locate-loom-code link, resolving paths, absent deleted vocabulary, and the
+frontmatter, word caps, gate markers and their registration, resolving
+paths, absent deleted vocabulary, and the
 two cross-plugin invariants: the `## Station summary` section is
 byte-identical to loom-code's copy of it (a reader who lands on either
 station sees the same whole-flow table), and the plugin declares the
@@ -31,16 +31,6 @@ TOOL_SKILLS = (
     REPO / "loom-design/skills/architecture-design/SKILL.md",
 )
 STATION_TABLE_HEADER = "| station | artifact | who decides | checker | checkpoint |"
-LOCATE_REFERENCE = REPO / "loom-design/skills/capture-intent/references/locate-loom-code.md"
-LOCATE_LINKS = {
-    SKILL: "references/locate-loom-code.md",
-    WRITE_SPEC: "../capture-intent/references/locate-loom-code.md",
-    TOOL_SKILLS[0]: "../capture-intent/references/locate-loom-code.md",
-    TOOL_SKILLS[1]: "../capture-intent/references/locate-loom-code.md",
-    TOOL_SKILLS[2]: "../capture-intent/references/locate-loom-code.md",
-}
-HOST_TABLE_HEADER = "| Where `loom-code` lives |"
-CONTRACT_COMMAND = "python3 <loom-code>/scripts/loom_checker.py contract --require 2.1"
 PLUGIN_JSON = REPO / "loom-design/.claude-plugin/plugin.json"
 MECHANISMS = REPO / "docs/loom/evidence/mechanisms.yaml"
 
@@ -136,23 +126,6 @@ def test_tool_skill_carries_station_table_is_caught() -> None:
         text = tool.read_text(encoding="utf-8")
         assert _carries_station_table(text + "\n" + table), tool
         assert _carries_station_table(text + "\n" + rows_only), tool
-
-
-def test_four_skills_link_one_locate_loom_code_reference() -> None:
-    assert LOCATE_REFERENCE.is_file(), LOCATE_REFERENCE
-    for skill_md, link in LOCATE_LINKS.items():
-        text = skill_md.read_text(encoding="utf-8")
-        step0 = _section(text, "## Step 0 — Check the contract version")
-        assert f"`{link}`" in step0, skill_md
-        assert CONTRACT_COMMAND in step0, skill_md
-        assert (skill_md.parent / link).resolve() == LOCATE_REFERENCE.resolve()
-        assert HOST_TABLE_HEADER not in text, skill_md
-    carriers = sorted(
-        path
-        for path in (REPO / "loom-design/skills").rglob("*.md")
-        if HOST_TABLE_HEADER in path.read_text(encoding="utf-8")
-    )
-    assert carriers == [LOCATE_REFERENCE]
 
 
 def test_gate_markers_present() -> None:

@@ -26,8 +26,8 @@ few places the flow stops for the user: ① at the intent, ② here, ③ at
 acceptance. `<change-id>` is `<YYYY-MM-DD>-<slug>`, and the intent file is
 `docs/loom/intent/<change-id>.md`.
 
-The file formats and the checker belong to `loom-code`; this station is one
-good way to produce them. The shapes below are not negotiable.
+`loom-code`'s stations consume and check these file formats; this station
+is one good way to produce them. The shapes below are not negotiable.
 
 ## Station summary
 
@@ -58,39 +58,11 @@ Requirements is decided by me, with the reason written down, and you can
 overturn any of it later. Nothing about how the work is split, reviewed or
 verified is ever put to you, at this station or any other.
 
-## Step 0 — Check the contract version
-
-Locate the `loom-code` directory as
-`../capture-intent/references/locate-loom-code.md` says, then run, with that
-directory in place of `<loom-code>`:
-
-```
-python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
-```
-
-Exit 0: continue. On any other result, or when the checkout cannot be found,
-follow that reference's failure rule and **stop**.
-
 ## Step 1 — Intake
 
-```
-python3 <loom-code>/scripts/loom_checker.py intake write-spec <change-id>
-```
-
-Exit 0 and you may write. Non-zero and you may not — fix what it names and
-re-run:
-
-- `intake.confirmed` — the intent's status line does not read
-  `confirmed <date>`. An intent nobody has agreed to is not yours to spec;
-  send it back to `loom-design:capture-intent`.
-- `standing.product-principles-reject` — the change is `kind: product` and
-  this repo has no ratified `PRINCIPLES.md` (a `ratified-by: <name> <date>`
-  line and at least three `## Non-negotiables` items). This is the one
-  standing-document outcome that blocks. It is not yours to fix here
-  either: the principles interview belongs to decision point ①, so hand
-  the change back to `capture-intent`, which runs the interview inside the
-  same conversation and confirms it together with the intent. Never open a
-  second stop for it, and never write `ratified-by:` on the user's behalf.
+Read the intent's `status:` line. Unless it reads `confirmed <date>`,
+**stop**: an intent nobody has agreed to is not yours to spec; send it back
+to `loom-design:capture-intent`.
 
 Then read what exists, because each one changes what you write:
 
@@ -102,14 +74,12 @@ Then read what exists, because each one changes what you write:
   in. Name the components it names; do not invent a second word for a
   thing it already calls something.
 
-Missing files print WARN lines from the checker's `standing` command. Pass
-them through verbatim; they never block, and only a product change without
-principles ever does.
+A missing file never blocks this station; write from what exists.
 
 ## Step 2 — Write the spec
 
-Write `docs/loom/<change-id>/spec.md` from `spec-minimal.md` in
-`loom-code`'s `contract/templates/` directory. Every section is required —
+Write `docs/loom/<change-id>/spec.md` from `templates/spec-minimal.md`.
+Every section is required —
 `N/A — <reason>` is an answer, silence is not.
 
 The spec is written in English, and each `REQ-<n>` line is one of the five
@@ -203,9 +173,7 @@ turns a behaviour confirmation into a quality review the user cannot do.
 
 2. **The one-way doors of this change**, in consequence form, in this same
    message. A one-way door is a choice that is expensive or impossible to
-   undo. The classes are a deliberate copy of `one-way-door.md` in
-   `loom-code`'s `write-plan` references, kept until cross-plugin copies are
-   merged:
+   undo. The classes are the same ones `loom-code:write-plan` uses:
    **(a)** hard to swap later — framework, language, database,
    authentication, hosting, package manager; **(b)** creates money or a
    standing obligation — paid services, third-party APIs needing an
@@ -314,22 +282,8 @@ that section.
 3. If `pre-build-review: not-required`, do not create a formal spec review;
    continue directly. This declaration never changes branch-end reviewer
    requirements.
-4. Confirm the next station's intake is satisfied:
-
-   ```
-   python3 <loom-code>/scripts/loom_checker.py intake write-plan <change-id>
-   ```
-
-   `intake.spec-ready` reads the risk declaration. Review independence is
-   enforced in this station without creating a persistent review ledger; for
-   a product change `intake.confirmed-behavior` reads the confirmation line.
-5. Hand the change to **`loom-code:write-plan`**, naming the change-id and
+4. Hand the change to **`loom-code:write-plan`**, naming the change-id and
    pasting the question list. Say that decision point ② has happened and
    is not to be run again, and that the plan itself is agent-decided —
    the user is not asked to approve it. The next stop the user sees is
    acceptance.
-
-## On Codex CLI
-
-Every step above is the same. Resolve `<loom-code>` to the installed plugin
-directory; never create or invoke a repository-local checker copy.
