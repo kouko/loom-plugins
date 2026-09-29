@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.22.4] — 2026-09-29 — Closing-review lenses compare polarity sentences with their base version.
+
+Patch: closing-review docs and skill lenses now compare a rewritten or deleted polarity sentence (never, must not, only, always, 不得) with its base version; a reversed or dropped direction is an inconsistency finding.
+
+- `loom-code`, `loom-design` and `loom-workflow` patch versions bumped together so `claude plugin update` refreshes installed copies.
+
 ## [3.22.3] — 2026-09-29 — Prose-pin stock cleanup batch 4 and patch release bump.
 
 Patch: tests only; no skill or reference content changed.

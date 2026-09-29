@@ -4,6 +4,10 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.5.4] — 2026-09-29 — version sync only
+
+Patch: no content change. Bumped alongside `loom-code` (closing-review polarity check) and `loom-design`.
+
 ## [5.5.3] — 2026-09-29 — Prose-pin stock cleanup batch 4 and patch release bump.
 
 Patch: tests only; no skill or reference content changed.
