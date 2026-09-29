@@ -451,6 +451,6 @@ def test_coexist_card_names_no_mermaid():
 
 
 def test_coexist_card_gives_no_sequences_to_the_ascii_graph_card():
-    """Sequences stay with loom-visualization; the toolkit card keeps its three shapes."""
+    """Sequences stay with loom-visualization: the coexist card never gives them to the ascii-graph card."""
     body = " ".join(_sentences(COEXIST_CARD.read_text(encoding="utf-8")))
     assert not re.search(r"ascii-graph card covers[^.]*sequences", body)
