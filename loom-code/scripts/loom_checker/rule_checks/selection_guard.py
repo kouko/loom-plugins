@@ -28,9 +28,22 @@ ALWAYS_DENIED = [
 
 CHECKER_PROGRAM = re.compile(r"loom_checker(?:\.py)?")
 
-HOST_PROGRAMS = {"claude", "codex", "opencode"}
+HOST_PROGRAMS = {"claude", "codex"}
+
+# Any `opencode*` program is a host: the `opencode2` alias, the `opencode-ai`
+# npm package. Package launchers are looked through to their package argument.
+OPENCODE_PREFIX = "opencode"
+
+PACKAGE_LAUNCHERS = {"npx", "bunx"}
+
+DLX_LAUNCHERS = {"pnpm", "yarn"}
+
+# An HTTP client can post the prompt to OpenCode's background service.
+HTTP_CLIENTS = {"curl", "wget", "http", "https", "xh", "xhs"}
 
 ENTRY_POINT = re.compile(r"(?<![\w-])[/$](?:loom-code:)?expert-mode(?![\w-])")
+
+HTTP_ENTRY_POINT = re.compile(r"(?<![\w-])(?:[/$](?:loom-code:)?|loom-code:)expert-mode(?![\w-])")
 
 BARE_SELECTIONS = re.compile(r"(?<![\w.-])selections/")
 
@@ -106,11 +119,28 @@ def _runs_capture(tokens: list[str]) -> bool:
     return False
 
 
-def _runs_host(tokens: list[str]) -> bool:
+def _program_words(tokens: list[str]) -> list[str]:
     program = _strip_prefix(tokens)
     while program and program[0].startswith("-"):
         program = program[1:]  # options of a stripped wrapper such as xargs
-    return bool(program) and Path(program[0]).name in HOST_PROGRAMS
+    return program
+
+
+def _runs_host(tokens: list[str]) -> bool:
+    program = _program_words(tokens)
+    if program and Path(program[0]).name in DLX_LAUNCHERS and program[1:2] == ["dlx"]:
+        program = program[1:]
+    if program and (Path(program[0]).name in PACKAGE_LAUNCHERS or program[0] == "dlx"):
+        program = [t for t in program[1:] if not t.startswith("-")]
+    if not program:
+        return False
+    name = Path(program[0]).name
+    return name in HOST_PROGRAMS or name.startswith(OPENCODE_PREFIX)
+
+
+def _runs_http_client(tokens: list[str]) -> bool:
+    program = _program_words(tokens)
+    return bool(program) and Path(program[0]).name in HTTP_CLIENTS
 
 
 def bash_guard_reason(command: str) -> str | None:
@@ -123,6 +153,8 @@ def bash_guard_reason(command: str) -> str | None:
             return reason
     if ENTRY_POINT.search(command) and any(_runs_host(tokens) for tokens in token_lists):
         return "a nested host session's expert-mode prompt would pass as user-typed"
+    if HTTP_ENTRY_POINT.search(command) and any(_runs_http_client(t) for t in token_lists):
+        return "an expert-mode prompt posted to a host session would pass as user-typed"
     if (BARE_SELECTIONS.search(command) and LOOM_OR_GIT_NAME.search(command)
             and _has_write_form(command)):
         return "writes a selections/ path"

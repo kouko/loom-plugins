@@ -53,6 +53,11 @@ function parse(raw) {
   return { data, body: raw.slice(match[0].length) };
 }
 
+// A YAML boolean: case-insensitive, a trailing ` # comment` ignored.
+function isTrue(value) {
+  return String(value ?? "").replace(/\s+#.*$/, "").trim().toLowerCase() === "true";
+}
+
 function skills() {
   const dir = join(root, "skills");
   if (!existsSync(dir)) return [];
@@ -67,7 +72,7 @@ function skills() {
         description: data.description || "",
         path,
         content: `Base directory for this skill: ${dirname(path)}\n\n${body}`,
-        userOnly: data["disable-model-invocation"] === "true",
+        userOnly: isTrue(data["disable-model-invocation"]),
       };
     });
 }

@@ -85,6 +85,7 @@ DENIED_COMMANDS = [
     "bash -c 'claude -p \"/expert-mode K7Q2\"'",
     "/usr/local/bin/codex exec '/loom-code:expert-mode K7Q2'",
     'opencode run "/loom-code:expert-mode K7Q2"',
+    'pnpm dlx opencode-ai run "/expert-mode K7Q2"',
 ]
 
 

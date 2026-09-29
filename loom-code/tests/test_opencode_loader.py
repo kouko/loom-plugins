@@ -97,6 +97,18 @@ def test_disable_model_invocation_skill_not_model_registered():
     assert seen["commands"] == [{"name": "loom-code:expert-mode", "execute": "function"}]
 
 
+def test_disable_model_invocation_read_case_insensitively_with_comment(tmp_path: Path):
+    plugin = tmp_path / "demo"
+    (plugin / "opencode").mkdir(parents=True)
+    (plugin / "skills" / "x").mkdir(parents=True)
+    (plugin / "package.json").write_text('{"name": "demo"}', encoding="utf-8")
+    shutil.copy(REPO_ROOT / "loom-code" / "index.js", plugin / "index.js")
+    shutil.copy(REPO_ROOT / "scripts" / "opencode" / "loader.js", plugin / "opencode" / "loader.js")
+    (plugin / "skills" / "x" / "SKILL.md").write_text(
+        "---\nname: x\ndisable-model-invocation: True  # user-only\n---\nbody\n", encoding="utf-8")
+    assert _node(str(plugin))["skills"] == []
+
+
 def test_agents_registered_plugin_qualified():
     seen = _register("loom-code")
     expected = {f"loom-code:{p.stem}" for p in (REPO_ROOT / "loom-code" / "agents").glob("*.md")}
