@@ -97,9 +97,9 @@ product 變更時併進 ②，用後果的形式問 —— 不另開停頓點。
 `contract/manifest.yaml` 宣告站、工具、action，以及每一種 artifact ——
 intent、spec、plan、attestation、acceptance test report、`KICKOFF-DEFAULTS.md` —— 的
 charter 與欄位，還有 standing document。空白範本在 `contract/templates/`。
-只有 loom-code 寫它。`loom-design` 讀它並宣告 `requires-contract`；
-`loom-workflow` 不宣告——只有它的 `decision-map` skill 在一次 delivery 前跑
-`contract --require`。
+只有 loom-code 寫它。`loom-design` 保留它要填的範本的逐位元組相同副本（由
+repo 測試保持一致）並宣告 `requires-contract`；兩個 sibling 執行時都不讀這個
+package。
 
 ## checker
 
@@ -122,8 +122,8 @@ hook 在 `git push` 與 `gh pr create` 之前再跑一次：重算內容 digest�
 - **loom-workflow** 在各站周圍加上工具，例如 `ship` 用
   `loom-workflow:git-memory` 為 PR 內文分類 memory。
 
-相接處只有帶 plugin 名的 skill 名（例如 `loom-design:write-spec`）、contract
-package，以及專案自己的 `docs/loom/` 產物 —— 不會去讀別的 plugin 的
+相接處只有帶 plugin 名的 skill 名（例如 `loom-design:write-spec`）
+以及專案自己的 `docs/loom/` 產物 —— 不會去讀別的 plugin 的
 `hooks/`、`skills/`、`scripts/`。
 
 ## 安裝

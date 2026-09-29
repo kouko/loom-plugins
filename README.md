@@ -115,8 +115,8 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 ## loom-design
 
 Version 2.7.0. Turns a rough idea into a confirmed intent and a risk-declared
-spec, and provides product-definition tools. Requires `loom-code`, whose
-contract package it reads.
+spec, and provides product-definition tools. Requires `loom-code` for
+planning onward; intent and spec work alone.
 
 | Skill | Role |
 | --- | --- |
@@ -185,8 +185,7 @@ claude plugin install loom-workflow@loom
 The plugins are independently installable: install only the ones you need.
 `loom-code` needs neither sibling; `loom-design` requires `loom-code`. Plugins
 compose only through plugin-qualified skill names such as
-`loom-design:write-spec`, the contract package and the project's own
-`docs/loom/` artifacts.
+`loom-design:write-spec` and the project's own `docs/loom/` artifacts.
 
 ### Codex
 
@@ -202,7 +201,7 @@ codex plugin list
 
 Antigravity CLI (`agy`) installs plugins from a local directory, so clone the
 repository and install each plugin from the clone. Install `loom-code` first:
-the other two use its contract package and checker. Before installing, check
+the other two hand off to its stations by skill name. Before installing, check
 `agy plugin list` for a plugin of the same name imported from Claude Code:
 installing replaces that imported copy, and a later `agy plugin uninstall`
 removes it.
