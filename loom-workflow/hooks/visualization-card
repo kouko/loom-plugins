@@ -101,7 +101,7 @@ def _read_card(name):
 
 def main():
     context = ""
-    # The exact token hooks/hooks-codex.json passes; keep the two in step.
+    # The exact token hooks/hooks-codex.json and hooks/hooks-opencode.json pass; keep the three in step.
     codex = "--host=codex" in sys.argv[1:]
     try:
         try:

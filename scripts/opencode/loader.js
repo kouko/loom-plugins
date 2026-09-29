@@ -129,12 +129,6 @@ async function registerAgents(ctx, found) {
         if (agent.data.description) info.description = agent.data.description;
         info.mode = "subagent";
         info.system = agent.system;
-        // Only a "provider/model" value names an OpenCode model; else inherit.
-        const model = agent.data.model;
-        if (model && model.includes("/")) {
-          const [providerID, ...rest] = model.split("/");
-          info.model = { providerID, id: rest.join("/") };
-        }
       });
     }
   });
@@ -240,6 +234,9 @@ function transcript(sessionID) {
 async function registerHooks(ctx) {
   const table = hookTable();
   // One session record per session id: its parent and its directory.
+  // Ceiling: records are cached until the service restarts, so a failed lookup
+  // marks that session a child until then, and this map, `started` and `turn`
+  // grow by one entry per session until restart.
   const records = new Map();
   const record = (sessionID) => {
     if (!sessionID) return Promise.resolve(null);
