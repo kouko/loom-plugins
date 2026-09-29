@@ -6,6 +6,8 @@ Every literal that a test in the four test roots asserts against text read from 
 
 **W3-01 regeneration.** W3-01 widened the census to two more forms (below) and regenerated this list the same way, from a clean detached worktree of the W3-01 state. It added 13 `structural` rows and no `prose` row; `decide.py` again found a Decisions row for all 106 prose rows.
 
+**Closing-review round-1 regeneration.** Regenerated the same way from a clean detached worktree of the round-1 fix. It adds 3 `structural` rows (the restored `result:` and Derivation-contract set checks) and no `prose` row. The 106 prose-row pointers carried over unchanged; only source line numbers in the two edited test files moved.
+
 Command, run from the worktree root:
 
 ```
@@ -38,10 +40,10 @@ A file is listed when it has at least one candidate. W0-01 counted 233 prose, 37
 | plugin | prose | structural | kept-batch3 | files with >=1 prose candidate |
 |---|---|---|---|---|
 | root tests | 0 | 16 | 0 | 0 |
-| loom-code | 35 | 129 | 0 | 13 |
-| loom-design | 16 | 103 | 0 | 2 |
+| loom-code | 35 | 130 | 0 | 13 |
+| loom-design | 16 | 105 | 0 | 2 |
 | loom-workflow | 55 | 374 | 3 | 7 |
-| **total** | 106 | 622 | 3 | 22 |
+| **total** | 106 | 625 | 3 | 22 |
 
 ## root tests
 
@@ -89,11 +91,12 @@ The decisions live in the mapping files. Each prose row above ends with a pointe
 | loom-code/tests/test_acceptance_test_report_shape.py:39 | _fenced_blocks | '^```markdown\\n(.*?)^```$' (re.findall) | structural | code identifier |
 | loom-code/tests/test_acceptance_test_report_shape.py:50 | _criterion_table | '## What you asked for, one line at a time' (assert in) | structural | markdown heading |
 | loom-code/tests/test_acceptance_test_report_shape.py:73 | test_template_has_one_row_per_criterion_and_evidence_file_path | 'works\|partly\|not verified\|fails' (re.search) | prose | regex alternative 'works' is prose → `mapping-code.md` Decisions row 2 |
-| loom-code/tests/test_acceptance_test_report_shape.py:76 | test_template_has_one_row_per_criterion_and_evidence_file_path | 'docs/loom/<change-id>/evidence/acceptance-test-evidence.md' (assert in) | structural | line grammar placeholder |
-| loom-code/tests/test_acceptance_test_report_shape.py:118 | test_row_has_carried_over_marker_with_reason | '^carried over — \\S.*$' (re.match) | prose | phrase of 3+ words → `mapping-code.md` Decisions row 3 |
-| loom-code/tests/test_acceptance_test_report_shape.py:127 | test_retested_row_has_no_carry_reason | 're-tested' (assert ==) | prose | 1-2 word phrase or term → `mapping-code.md` Decisions row 4 |
-| loom-code/tests/test_acceptance_test_report_shape.py:192 | test_rules_live_in_contract_and_template | 'docs/loom/<change-id>/evidence/acceptance-test-evidence.md' (assert in) | structural | line grammar placeholder |
-| loom-code/tests/test_acceptance_test_report_shape.py:202 | test_no_new_gate_marker | 'docs/loom/<change-id>/evidence/acceptance-test-evidence.md' (assert in) | structural | line grammar placeholder |
+| loom-code/tests/test_acceptance_test_report_shape.py:74 | test_template_has_one_row_per_criterion_and_evidence_file_path | 'result: ([a-z \|-]+?),' (re.search) | structural | field key or label |
+| loom-code/tests/test_acceptance_test_report_shape.py:81 | test_template_has_one_row_per_criterion_and_evidence_file_path | 'docs/loom/<change-id>/evidence/acceptance-test-evidence.md' (assert in) | structural | line grammar placeholder |
+| loom-code/tests/test_acceptance_test_report_shape.py:123 | test_row_has_carried_over_marker_with_reason | '^carried over — \\S.*$' (re.match) | prose | phrase of 3+ words → `mapping-code.md` Decisions row 3 |
+| loom-code/tests/test_acceptance_test_report_shape.py:132 | test_retested_row_has_no_carry_reason | 're-tested' (assert ==) | prose | 1-2 word phrase or term → `mapping-code.md` Decisions row 4 |
+| loom-code/tests/test_acceptance_test_report_shape.py:197 | test_rules_live_in_contract_and_template | 'docs/loom/<change-id>/evidence/acceptance-test-evidence.md' (assert in) | structural | line grammar placeholder |
+| loom-code/tests/test_acceptance_test_report_shape.py:207 | test_no_new_gate_marker | 'docs/loom/<change-id>/evidence/acceptance-test-evidence.md' (assert in) | structural | line grammar placeholder |
 
 ### loom-code/tests/test_adversary_layout.py
 
@@ -430,43 +433,45 @@ The decisions live in the mapping files. Each prose row above ends with a pointe
 | loom-design/tests/interface/test_design_md_schema_keys.py:227 | _five_group_section | '## The 8 canonical sections (in order)' (.index() via _section()) | structural | markdown heading |
 | loom-design/tests/interface/test_design_md_schema_keys.py:269 | test_schema_keys_documented_and_token_groups_named | '> **Grounding.**' (.index() via _section()) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 6 |
 | loom-design/tests/interface/test_design_md_schema_keys.py:269 | test_schema_keys_documented_and_token_groups_named | '> **Scope' (.index() via _section()) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 6 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:291 | test_component_sub_tokens_are_complete_and_exclusive | '## Components' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:291 | test_component_sub_tokens_are_complete_and_exclusive | "## Do's & Don'ts" (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:342 | test_five_group_scoping_catches_blanket_paragraph_replacement | '## Overview / Brand' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:342 | test_five_group_scoping_catches_blanket_paragraph_replacement | '## The 8 canonical sections (in order)' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:358 | test_five_group_scoping_catches_all_eight_rewrite | '## Overview / Brand' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:358 | test_five_group_scoping_catches_all_eight_rewrite | '## The 8 canonical sections (in order)' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:377 | test_five_group_scoping_catches_group_rename | '`spacing` (Layout)' (assert count) | structural | code identifier |
-| loom-design/tests/interface/test_design_md_schema_keys.py:393 | test_component_completeness_scoping_catches_deleted_bullet | '## Components' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:393 | test_component_completeness_scoping_catches_deleted_bullet | "## Do's & Don'ts" (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:397 | test_component_completeness_scoping_catches_deleted_bullet | 'height' (assert in) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 7 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:397 | test_component_completeness_scoping_catches_deleted_bullet | 'padding' (assert in) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 7 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:397 | test_component_completeness_scoping_catches_deleted_bullet | 'size' (assert in) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 7 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:397 | test_component_completeness_scoping_catches_deleted_bullet | 'width' (assert in) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 7 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:490 | test_elevation_section_disambiguates_non_spec_keys | '## Elevation & Depth' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:490 | test_elevation_section_disambiguates_non_spec_keys | '## Shapes' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:496 | test_elevation_section_disambiguates_non_spec_keys | 'confirm' (assert in) | prose | 1-2 word phrase or term → `mapping-design.md` Decisions row 7 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:496 | test_elevation_section_disambiguates_non_spec_keys | 'spec' (assert in) | prose | 1-2 word phrase or term → `mapping-design.md` Decisions row 7 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:512 | test_elevation_disambiguation_catches_reintroduced_spec_confirmation_header | '## Elevation & Depth' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:512 | test_elevation_disambiguation_catches_reintroduced_spec_confirmation_header | '## Shapes' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:513 | test_elevation_disambiguation_catches_reintroduced_spec_confirmation_header | '\\n- `' (re.search) | structural | code identifier |
-| loom-design/tests/interface/test_design_md_schema_keys.py:538 | test_elevation_disambiguation_tolerates_meaning_preserving_reword | '## Elevation & Depth' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:538 | test_elevation_disambiguation_tolerates_meaning_preserving_reword | '## Shapes' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:578 | test_elevation_mirror_probe_survives_document_already_using_new_wording | '## Elevation & Depth' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:578 | test_elevation_mirror_probe_survives_document_already_using_new_wording | '## Shapes' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:620 | test_prose_scope_clause_removed_at_both_loci | '## Components' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:620 | test_prose_scope_clause_removed_at_both_loci | '## Shapes' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:632 | test_prose_scope_clause_catches_determiner_reword | '## Overview / Brand' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:632 | test_prose_scope_clause_catches_determiner_reword | '## The 8 canonical sections (in order)' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:741 | test_component_properties_header_not_claimed_closed | '## Components' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:741 | test_component_properties_header_not_claimed_closed | "## Do's & Don'ts" (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:746 | test_component_properties_header_not_claimed_closed | 'confirm' (assert in) | prose | 1-2 word phrase or term → `mapping-design.md` Decisions row 11 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:746 | test_component_properties_header_not_claimed_closed | 'spec' (assert in) | prose | 1-2 word phrase or term → `mapping-design.md` Decisions row 11 |
-| loom-design/tests/interface/test_design_md_schema_keys.py:757 | test_generation_checklist_step3_names_all_token_groups | '## Anti-patterns' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:757 | test_generation_checklist_step3_names_all_token_groups | '## Generation checklist' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:758 | test_generation_checklist_step3_names_all_token_groups | '\\n3\\.\\s.*?(?=\\n\\d\\.\|\\Z)' (re.search) | structural | code identifier |
-| loom-design/tests/interface/test_design_md_schema_keys.py:768 | test_shapes_documents_rounded_bullet | '## Components' (.index() via _section()) | structural | markdown heading |
-| loom-design/tests/interface/test_design_md_schema_keys.py:768 | test_shapes_documents_rounded_bullet | '## Shapes' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:293 | test_schema_keys_documented_and_token_groups_named | '**Derivation contract:**' (.index() via _section()) | structural | field key or label |
+| loom-design/tests/interface/test_design_md_schema_keys.py:294 | test_schema_keys_documented_and_token_groups_named | '[A-Z]\\w+(?:\\s*/\\s*[A-Z]\\w+)+' (re.search) | structural | path |
+| loom-design/tests/interface/test_design_md_schema_keys.py:303 | test_component_sub_tokens_are_complete_and_exclusive | '## Components' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:303 | test_component_sub_tokens_are_complete_and_exclusive | "## Do's & Don'ts" (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:354 | test_five_group_scoping_catches_blanket_paragraph_replacement | '## Overview / Brand' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:354 | test_five_group_scoping_catches_blanket_paragraph_replacement | '## The 8 canonical sections (in order)' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:370 | test_five_group_scoping_catches_all_eight_rewrite | '## Overview / Brand' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:370 | test_five_group_scoping_catches_all_eight_rewrite | '## The 8 canonical sections (in order)' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:389 | test_five_group_scoping_catches_group_rename | '`spacing` (Layout)' (assert count) | structural | code identifier |
+| loom-design/tests/interface/test_design_md_schema_keys.py:405 | test_component_completeness_scoping_catches_deleted_bullet | '## Components' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:405 | test_component_completeness_scoping_catches_deleted_bullet | "## Do's & Don'ts" (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:409 | test_component_completeness_scoping_catches_deleted_bullet | 'height' (assert in) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 7 |
+| loom-design/tests/interface/test_design_md_schema_keys.py:409 | test_component_completeness_scoping_catches_deleted_bullet | 'padding' (assert in) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 7 |
+| loom-design/tests/interface/test_design_md_schema_keys.py:409 | test_component_completeness_scoping_catches_deleted_bullet | 'size' (assert in) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 7 |
+| loom-design/tests/interface/test_design_md_schema_keys.py:409 | test_component_completeness_scoping_catches_deleted_bullet | 'width' (assert in) | prose | 1-2 word phrase or term → `mapping-containers.md` Decisions row 7 |
+| loom-design/tests/interface/test_design_md_schema_keys.py:502 | test_elevation_section_disambiguates_non_spec_keys | '## Elevation & Depth' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:502 | test_elevation_section_disambiguates_non_spec_keys | '## Shapes' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:508 | test_elevation_section_disambiguates_non_spec_keys | 'confirm' (assert in) | prose | 1-2 word phrase or term → `mapping-design.md` Decisions row 7 |
+| loom-design/tests/interface/test_design_md_schema_keys.py:508 | test_elevation_section_disambiguates_non_spec_keys | 'spec' (assert in) | prose | 1-2 word phrase or term → `mapping-design.md` Decisions row 7 |
+| loom-design/tests/interface/test_design_md_schema_keys.py:524 | test_elevation_disambiguation_catches_reintroduced_spec_confirmation_header | '## Elevation & Depth' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:524 | test_elevation_disambiguation_catches_reintroduced_spec_confirmation_header | '## Shapes' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:525 | test_elevation_disambiguation_catches_reintroduced_spec_confirmation_header | '\\n- `' (re.search) | structural | code identifier |
+| loom-design/tests/interface/test_design_md_schema_keys.py:550 | test_elevation_disambiguation_tolerates_meaning_preserving_reword | '## Elevation & Depth' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:550 | test_elevation_disambiguation_tolerates_meaning_preserving_reword | '## Shapes' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:590 | test_elevation_mirror_probe_survives_document_already_using_new_wording | '## Elevation & Depth' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:590 | test_elevation_mirror_probe_survives_document_already_using_new_wording | '## Shapes' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:632 | test_prose_scope_clause_removed_at_both_loci | '## Components' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:632 | test_prose_scope_clause_removed_at_both_loci | '## Shapes' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:644 | test_prose_scope_clause_catches_determiner_reword | '## Overview / Brand' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:644 | test_prose_scope_clause_catches_determiner_reword | '## The 8 canonical sections (in order)' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:753 | test_component_properties_header_not_claimed_closed | '## Components' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:753 | test_component_properties_header_not_claimed_closed | "## Do's & Don'ts" (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:758 | test_component_properties_header_not_claimed_closed | 'confirm' (assert in) | prose | 1-2 word phrase or term → `mapping-design.md` Decisions row 11 |
+| loom-design/tests/interface/test_design_md_schema_keys.py:758 | test_component_properties_header_not_claimed_closed | 'spec' (assert in) | prose | 1-2 word phrase or term → `mapping-design.md` Decisions row 11 |
+| loom-design/tests/interface/test_design_md_schema_keys.py:769 | test_generation_checklist_step3_names_all_token_groups | '## Anti-patterns' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:769 | test_generation_checklist_step3_names_all_token_groups | '## Generation checklist' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:770 | test_generation_checklist_step3_names_all_token_groups | '\\n3\\.\\s.*?(?=\\n\\d\\.\|\\Z)' (re.search) | structural | code identifier |
+| loom-design/tests/interface/test_design_md_schema_keys.py:780 | test_shapes_documents_rounded_bullet | '## Components' (.index() via _section()) | structural | markdown heading |
+| loom-design/tests/interface/test_design_md_schema_keys.py:780 | test_shapes_documents_rounded_bullet | '## Shapes' (.index() via _section()) | structural | markdown heading |
 
 ### loom-design/tests/interface/test_design_system_skill.py
 

@@ -86,12 +86,12 @@ Command: the same script with `--candidates`. It exited 0.
 | plugin | prose | structural | kept-batch3 | files with >=1 prose candidate |
 |---|---|---|---|---|
 | root tests | 0 | 16 | 0 | 0 |
-| loom-code | 35 | 129 | 0 | 13 |
-| loom-design | 16 | 103 | 0 | 2 |
+| loom-code | 35 | 130 | 0 | 13 |
+| loom-design | 16 | 105 | 0 | 2 |
 | loom-workflow | 55 | 374 | 3 | 7 |
-| **total** | **106** | 622 | 3 | 22 |
+| **total** | **106** | 625 | 3 | 22 |
 
-These are the W3-01 counts. W2-01 listed 609 structural rows; the two W3-01 forms added 13 structural rows (all in loom-workflow) and no prose row, and `decide.py` rerun on the W3-01 list printed `prose rows: 106; undecided: 0`. The closing-review round-1 fix adds 3 structural rows and no prose row (structural 625, prose 106): the `result:` field-key regex in `test_acceptance_test_report_shape.py`, and the `**Derivation contract:**` bold label and its slash-roster regex in `test_design_md_schema_keys.py`. `candidate-list.md` was not regenerated for them.
+These are the closing-review round-1 counts. W2-01 listed 609 structural rows; the two W3-01 forms added 13 structural rows (all in loom-workflow) and no prose row, and `decide.py` rerun on the W3-01 list printed `prose rows: 106; undecided: 0`. The closing-review round-1 fix adds 3 structural rows and no prose row (structural 625, prose 106): the `result:` field-key regex in `test_acceptance_test_report_shape.py`, and the `**Derivation contract:**` bold label and its slash-roster regex in `test_design_md_schema_keys.py`. `candidate-list.md` was regenerated for them from a clean worktree, and its 106 prose-row pointers carried over unchanged.
 
 W0-01 counted 233 prose rows. **All 106 prose rows left are decided.** The throwaway script `decide.py` (text below) found a W1 or W2-01 `Decisions` row for each of them, and printed `prose rows: 106; undecided: 0`. None of the 106 is decided `prune` or `delete`. Each is a keep with a reason: heading, label, field key, column cell, proper name, absence or one-home scan, or kept gate. W2-01 also read all 106 pointers and checked that each one lands on the row that judges that literal. The pointers are in `candidate-list.md`.
 
