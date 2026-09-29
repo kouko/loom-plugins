@@ -196,6 +196,7 @@ def test_opencode_update_is_remove_then_commit_pinned_add() -> None:
     # same-branch re-add reuses the cache; only remove + commit-pinned add updates.
     for rel in AGY_READMES:
         body = _opencode_section(_read(rel))
-        assert "opencode plugin remove" in body, rel
+        # `plugin remove <name>` answers "not configured"; only the full spec removes.
+        assert "opencode plugin remove 'github:kouko/loom-plugins#" in body, rel
         assert re.search(r"opencode plugin add 'github:kouko/loom-plugins#<[^>]+>::path:", body), rel
         assert not re.search(r"To update, run|もう一度実行|再執行一次", body), rel

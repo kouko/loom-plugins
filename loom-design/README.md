@@ -159,13 +159,16 @@ opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
 opencode plugin list
 ```
 
-Or open the plugin dialog in the TUI, choose Install plugin and enter the same spec. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove <plugin>`, then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
+Then restart OpenCode (`opencode service restart`): until it restarts, `opencode plugin list` may show only some of the plugins.
+
+Or open the plugin dialog in the TUI, choose Install plugin and enter the same spec. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
 Skills are offered as `loom-design:<skill>`.
 
 Limits on OpenCode:
 
 - A plugin may take a moment to appear in `opencode plugin list` right after the background service starts.
+- loom-code's subagents can stop on an `external_directory` permission prompt when they read loom's installed files from the plugin cache, even under `opencode run --auto`, which does not cover subagent sessions. Approve reads of the loom plugin directory.
 - The OpenCode desktop app and IDE integrations are not covered.
 - Node is not needed to use the plugins.
 
