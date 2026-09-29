@@ -248,16 +248,13 @@ def _assert_component_tokens_documented(section: str) -> None:
         _bullet_line(section, token)
 
 
-def test_non_spec_keys_are_labelled_and_token_groups_named():
+def test_schema_keys_documented_and_token_groups_named():
     text = _schema_text()
 
-    # (a) extensions labelled: each of the six enumerated loom extensions
-    # appears under its own bullet, and that bullet's line states plainly
-    # that `export` does not carry it (both words present, case-insensitive).
+    # (a) extensions documented: each of the six enumerated loom extensions
+    # appears under its own bullet.
     for key in LOOM_EXTENSIONS:
-        line = _bullet_line(text, key).lower()
-        assert "extension" in line, f"`{key}` bullet has no extension label: {line!r}"
-        assert "export" in line, f"`{key}` bullet doesn't say export omits it: {line!r}"
+        _bullet_line(text, key)
 
     # (b) spec meta keys unlabelled: name/description/version/omitted are
     # documented but their bullets must NOT carry the extension label.
@@ -287,6 +284,18 @@ def test_non_spec_keys_are_labelled_and_token_groups_named():
     # and ordinary prose regardless of what this section actually says
     # (see the mutation tests below).
     _assert_all_token_groups_named(_five_group_section(text))
+
+    # (e) the `**Derivation contract:**` slash roster names exactly the
+    # TOKEN_GROUPS sections, by their `##` heading names.
+    display = {"colors": "Colors", "typography": "Typography",
+               "spacing": "Layout", "rounded": "Shapes", "components": "Components"}
+    assert set(display) == design_md_spec_keys.TOKEN_GROUPS
+    contract = _section(text, "**Derivation contract:**", "\n\n")
+    roster = re.search(r"[A-Z]\w+(?:\s*/\s*[A-Z]\w+)+", contract)
+    assert roster, "Derivation contract has no slash roster"
+    assert {n.strip() for n in roster.group(0).split("/")} == set(display.values()), (
+        roster.group(0)
+    )
 
 
 def test_component_sub_tokens_are_complete_and_exclusive():
@@ -334,7 +343,7 @@ def test_component_sub_tokens_are_complete_and_exclusive():
 # now raises — one level lower in the stack than calling the helper
 # directly, so a production test body reverted to its old, unscoped check
 # is caught here rather than leaving the suite green (proven: reverting
-# both `test_non_spec_keys_are_labelled_and_token_groups_named`'s and
+# both `test_schema_keys_documented_and_token_groups_named`'s and
 # `test_component_sub_tokens_are_complete_and_exclusive`'s helper calls to
 # their pre-fix whole-file/whole-section checks, with the document
 # pristine, used to leave 16/16 passed).
@@ -353,7 +362,7 @@ def test_five_group_scoping_catches_blanket_paragraph_replacement(monkeypatch):
 
     _monkeypatch_schema_text(monkeypatch, mutator)
     with pytest.raises(AssertionError):
-        test_non_spec_keys_are_labelled_and_token_groups_named()
+        test_schema_keys_documented_and_token_groups_named()
 
 
 def test_five_group_scoping_catches_all_eight_rewrite(monkeypatch):
@@ -372,7 +381,7 @@ def test_five_group_scoping_catches_all_eight_rewrite(monkeypatch):
 
     _monkeypatch_schema_text(monkeypatch, mutator)
     with pytest.raises(AssertionError):
-        test_non_spec_keys_are_labelled_and_token_groups_named()
+        test_schema_keys_documented_and_token_groups_named()
 
 
 def test_five_group_scoping_catches_group_rename(monkeypatch):
@@ -387,7 +396,7 @@ def test_five_group_scoping_catches_group_rename(monkeypatch):
 
     _monkeypatch_schema_text(monkeypatch, mutator)
     with pytest.raises(AssertionError):
-        test_non_spec_keys_are_labelled_and_token_groups_named()
+        test_schema_keys_documented_and_token_groups_named()
 
 
 @pytest.mark.parametrize("token", ["size", "height", "padding", "width"])
@@ -425,22 +434,6 @@ LOOM_EXTENSIONS = (
 
 # Spec meta keys that must be documented WITHOUT the extension label.
 SPEC_META_KEYS = ("name", "description", "version", "omitted")
-
-# Display names for TOKEN_GROUPS as they appear in the reference's own
-# prose rosters (e.g. the Derivation contract). Source of truth for
-# MEMBERSHIP is design_md_spec_keys.TOKEN_GROUPS; this only maps each
-# member to how the prose spells it out.
-TOKEN_GROUP_DISPLAY_NAMES = {
-    "colors": "Colors",
-    "typography": "Typography",
-    "spacing": "Layout",
-    "rounded": "Shapes",
-    "components": "Components",
-}
-assert set(TOKEN_GROUP_DISPLAY_NAMES) == design_md_spec_keys.TOKEN_GROUPS, (
-    "TOKEN_GROUP_DISPLAY_NAMES must mirror design_md_spec_keys.TOKEN_GROUPS"
-)
-
 
 _TOTALIZING_SET_SCOPE_RE = re.compile(
     r"\b(?:all|every|each|both)\b[^.!?]{0,30}?\bsets?\b", re.IGNORECASE
@@ -742,69 +735,6 @@ def test_module_docstring_not_claimed_closed():
     )
 
 
-def test_derivation_contract_excludes_elevation():
-    """Task E: the Derivation contract's roster clause ('every token in
-    <roster> MUST be derivable...') must name exactly the five
-    TOKEN_GROUPS sections (by their prose display names) — no more, no
-    less. Scoped to the roster clause itself, not the whole section — the
-    OLD pin banned the substring "Elevation" anywhere in the section, so
-    a clarifying parenthetical added elsewhere in the section
-    ("Elevation is excluded — it is not a spec token group") would have
-    false-REDded it (see the mutation test below proving the new scoping
-    tolerates exactly that addition).
-    """
-    text = _schema_text()
-    section = _section(text, "**Derivation contract:**", "## Colors")
-    match = re.search(r"every token in (.+?) MUST be derivable", section, re.DOTALL)
-    assert match, "Derivation contract roster clause not found"
-    roster = re.sub(r"\s+", " ", match.group(1))
-    names = {name.strip() for name in re.split(r"/|,|\band\b", roster) if name.strip()}
-    assert names == set(TOKEN_GROUP_DISPLAY_NAMES.values()), (
-        "Derivation contract roster must name exactly the five TOKEN_GROUPS "
-        f"sections {sorted(TOKEN_GROUP_DISPLAY_NAMES.values())}, got {sorted(names)}"
-    )
-
-
-def test_derivation_contract_roster_catches_elevation_readded(monkeypatch):
-    """Probe (item 4/5, Task E): re-adding Elevation to the roster clause
-    itself must still go RED under the new scoped check.
-    """
-    text = _schema_text()
-    section = _section(text, "**Derivation contract:**", "## Colors")
-    match = re.search(r"every token in (.+?) MUST be derivable", section, re.DOTALL)
-    assert match
-    roster = match.group(1)
-    mutated_roster = roster.rstrip() + " / Elevation"
-
-    def mutator(t: str) -> str:
-        mutated_section = section.replace(roster, mutated_roster, 1)
-        return t.replace(section, mutated_section)
-
-    _monkeypatch_schema_text(monkeypatch, mutator)
-    with pytest.raises(AssertionError):
-        test_derivation_contract_excludes_elevation()
-
-
-def test_derivation_contract_tolerates_clarifying_elevation_note_outside_roster(monkeypatch):
-    """Mirror probe (item 4, Task E): a clarifying parenthetical about
-    Elevation added OUTSIDE the roster clause (elsewhere in the same
-    section) must NOT false-RED — this is exactly what the OLD
-    whole-section substring ban on "Elevation" would have done.
-    """
-    text = _schema_text()
-    section = _section(text, "**Derivation contract:**", "## Colors")
-
-    def mutator(t: str) -> str:
-        mutated_section = (
-            section.rstrip()
-            + "\n(Elevation is excluded — it is not a spec token group.)\n\n"
-        )
-        return t.replace(section, mutated_section)
-
-    _monkeypatch_schema_text(monkeypatch, mutator)
-    test_derivation_contract_excludes_elevation()  # must NOT raise
-
-
 # --- Additional loci (items 1, 6, 7) ---
 
 
@@ -816,9 +746,7 @@ def test_component_properties_header_not_claimed_closed():
     property is accepted with a warning, not rejected: COMPONENT_SUB_TOKENS
     is the spec's RECOGNISED set, not closed. The header must stop
     claiming closedness and stop inviting spec-confirmation of a
-    closedness that doesn't exist. `## Typography`'s closed-set claim
-    (`:131`) is untouched and must stay — TYPOGRAPHY_PROPERTIES genuinely
-    is closed, unlike COMPONENT_SUB_TOKENS.
+    closedness that doesn't exist.
     """
     text = _schema_text()
 
@@ -830,13 +758,6 @@ def test_component_properties_header_not_claimed_closed():
     assert not ("confirm" in components_header and "spec" in components_header), (
         "the Components property-list header still invites spec-confirmation "
         f"of a closed set that doesn't exist: {components_header!r}"
-    )
-
-    typography_section = _section(text, "## Typography", "## Layout")
-    typography_header = _header_before_first_bullet(typography_section).lower()
-    assert "closed" in typography_header, (
-        "## Typography's closed-set claim must stay — TYPOGRAPHY_PROPERTIES "
-        "genuinely is closed, unlike COMPONENT_SUB_TOKENS"
     )
 
 
@@ -851,167 +772,16 @@ def test_generation_checklist_step3_names_all_token_groups():
     _assert_all_token_groups_named(re.sub(r"\s+", " ", step3_match.group(0)))
 
 
-def test_shapes_rounded_bullet_states_not_radius():
-    """Item 6: the '## Shapes' `rounded` bullet is the sole locus of the
-    load-bearing "Token key is `rounded` per the Google DESIGN.md spec
-    (not `radius`)" correction. Pin it.
+def test_shapes_documents_rounded_bullet():
+    """Item 6: '## Shapes' documents the `rounded` token key under its own
+    bullet (the spec's key, not `radius`).
     """
     text = _schema_text()
     section = _section(text, "## Shapes", "## Components")
-    line = _bullet_line(section, "rounded").lower()
-    assert "radius" in line and "not" in line, (
-        f"the `rounded` bullet must keep the not-`radius` correction: {line!r}"
-    )
-
-
-def test_shapes_header_distinguishes_extension_bullets_from_spec_keys():
-    """Item 7: '## Shapes' used to head its whole bullet list — including
-    the two loom-extension bullets `border_width`/`border_style` — with
-    one unscoped "confirm against the spec" hedge, which does not apply
-    to keys that aren't spec keys at all. The header must name the
-    extensions as extensions rather than fold them under the spec-key
-    hedge (Shapes stays a token-group section — this only rescopes the
-    hedge, it does not reclassify Shapes as prose).
-    """
-    text = _schema_text()
-    section = _section(text, "## Shapes", "## Components")
-    header = _header_before_first_bullet(section).lower()
-    assert "extension" in header, (
-        "the header above the bullet list must name the loom extensions "
-        f"below it as extensions, not fold them under a spec-confirmation "
-        f"hedge that doesn't apply to them: {header!r}"
-    )
-
-
-def test_overview_brand_header_distinguishes_extension_bullets_from_spec_keys():
-    """Item 7: same fix as Shapes, applied to Overview / Brand's mixed
-    frontmatter list (`name`/`description`/`version`/`omitted` spec keys
-    plus `brand_voice`/`theme` loom extensions, all previously under one
-    unscoped "confirm against the spec" hedge).
-    """
-    text = _schema_text()
-    section = _section(text, "## Overview / Brand", "## Colors")
-    header = _header_before_first_bullet(section).lower()
-    assert "extension" in header, (
-        "the header above the frontmatter bullet list must name the loom "
-        f"extensions below it as extensions: {header!r}"
-    )
+    _bullet_line(section, "rounded")
 
 
 # --- Correctness fixes (whole-branch review findings 3, 4) ---
-
-
-def _generation_checklist_step(text: str, n: int) -> str:
-    section = _section(text, "## Generation checklist", "## Anti-patterns")
-    match = re.search(rf"\n{n}\.\s.*?(?=\n\d\.|\Z)", section, re.DOTALL)
-    assert match, f"Generation checklist has no step {n}"
-    return re.sub(r"\s+", " ", match.group(0)).strip()
-
-
-def test_generation_checklist_lint_step_does_not_require_stripping_warned_extension_properties():
-    """🟡 3: step 5 said "resolve violations before declaring done" —
-    unconditional. `## Components` (:211-213) newly establishes that the
-    spec ACCEPTS an unrecognized component property with a warning
-    rather than rejecting it, so a deliberately-chosen extension
-    property that lints with a warning now has two live readings (strip
-    it, or keep it) and the checklist said which nowhere.
-
-    Property, not the literal sentence: step 5 must (a) still require
-    resolving a genuine lint failure (contrast etc. stay blockers,
-    matching '## Lint + accessibility''s own framing at :36-39, untouched
-    here), while (b) explicitly carving out a warning on such a
-    documented extension property as expected — not something this step
-    requires resolving away. Tolerant of how (a)/(b) are worded, as long
-    as both concepts are present.
-    """
-    step5 = _generation_checklist_step(_schema_text(), 5).lower()
-    assert "warning" in step5, f"step 5 must mention the warning case: {step5!r}"
-    assert "expected" in step5 or "legitimate" in step5, (
-        f"step 5 must say the warning is expected/legitimate, not a "
-        f"violation to resolve: {step5!r}"
-    )
-    assert "fail" in step5 or "blocker" in step5, (
-        f"step 5 must keep requiring a genuine failure to be resolved: {step5!r}"
-    )
-
-
-def test_generation_checklist_lint_step_catches_reverted_unconditional_resolve(monkeypatch):
-    """Probe (🟡 3): reverting step 5 to its OLD unconditional wording —
-    'Run `npx @google/design.md` lint and resolve violations before
-    declaring done.' — must go RED under the new property check.
-    """
-    text = _schema_text()
-    section = _section(text, "## Generation checklist", "## Anti-patterns")
-    match = re.search(r"\n5\.\s.*?(?=\n\d\.|\Z)", section, re.DOTALL)
-    assert match
-    old_step5 = (
-        "\n5. Run `npx @google/design.md` lint and resolve violations "
-        "before declaring done."
-    )
-
-    def mutator(t: str) -> str:
-        mutated_section = section.replace(match.group(0), old_step5)
-        return t.replace(section, mutated_section)
-
-    _monkeypatch_schema_text(monkeypatch, mutator)
-    with pytest.raises(AssertionError):
-        test_generation_checklist_lint_step_does_not_require_stripping_warned_extension_properties()
-
-
-def test_grounding_note_covers_the_consumer_behavior_claim():
-    """🟡 4: the grounding note (:7-13) dates its verification of the
-    frozen KEY SETS against `@google/design.md` `0.4.0` on 2026-08-10,
-    but the branch also asserts a spec BEHAVIOUR at `## Components`
-    (:211-213 — unknown component property -> accept with warning) that
-    this citation does not cover, in a document that hedges every other
-    spec fact (:15-26). Property, not the literal sentence: the SAME
-    dated verified-against-the-spec clause must also cover the
-    unrecognized-component-property/warning behaviour — tolerant of how
-    the clause is worded, as long as the behaviour is named alongside
-    the dated citation.
-    """
-    text = _schema_text()
-    match = re.search(r"> \*\*Grounding\.\*\*.*?(?=\n\n)", text, re.DOTALL)
-    assert match, "Grounding note not found"
-    note = re.sub(r"\s+", " ", match.group(0)).lower()
-    assert "verified against" in note and "0.4.0" in note, (
-        f"grounding note must date its verification against the spec version: {note!r}"
-    )
-    assert "warning" in note and (
-        "component property" in note or "consumer behavior" in note
-    ), (
-        "the same dated verification must also cover the "
-        f"unrecognized-component-property/warning behaviour claim: {note!r}"
-    )
-
-
-def test_grounding_note_catches_reverted_key_sets_only_scope(monkeypatch):
-    """Probe (🟡 4): reverting the grounding note's last sentence to its
-    OLD scope — covering only the three frozen key sets, silent on the
-    Consumer-Behavior warning claim — must go RED.
-    """
-    text = _schema_text()
-    match = re.search(r"> \*\*Grounding\.\*\*.*?(?=\n\n)", text, re.DOTALL)
-    assert match, "Grounding note not found"
-    note = match.group(0)
-    old_last_sentence_re = re.compile(
-        r"The frozen key sets\n> this reference checks against.*?on 2026-08-10\.",
-        re.DOTALL,
-    )
-    old_last_sentence = (
-        "The frozen key sets\n> this reference checks against "
-        "(`design_md_spec_keys.py`) were verified against\n> "
-        "`@google/design.md` version `0.4.0` on 2026-08-10."
-    )
-
-    def mutator(t: str) -> str:
-        mutated_note = old_last_sentence_re.sub(old_last_sentence, note)
-        assert mutated_note != note, "sanity: the OLD-scope sentence must replace the current one"
-        return t.replace(note, mutated_note)
-
-    _monkeypatch_schema_text(monkeypatch, mutator)
-    with pytest.raises(AssertionError):
-        test_grounding_note_covers_the_consumer_behavior_claim()
 
 
 def test_update_procedure_covers_consumer_behavior_row():

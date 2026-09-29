@@ -15,8 +15,8 @@ def test_entrypoint_preserves_essence():
     The entrypoint's safety and privacy wording is review-only."""
     text = SKILL_PATH.read_text(encoding="utf-8")
 
-    needles = ["top.json", "merged.json", "--approved", "references/runtime-protocol.md"]
-    missing = [needle for needle in needles if needle not in text]
+    structural_tokens = ["top.json", "merged.json", "--approved", "references/runtime-protocol.md"]
+    missing = [token for token in structural_tokens if token not in text]
     assert not missing, f"entrypoint no longer names: {missing}"
 
     assert RUNTIME_PROTOCOL_PATH.is_file()

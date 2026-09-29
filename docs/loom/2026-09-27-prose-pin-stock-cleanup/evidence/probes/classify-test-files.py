@@ -24,6 +24,9 @@ Usage: python3 classify-test-files.py [--roots a,b,...]  (prints a table)
        python3 classify-test-files.py --count-exec <dir> [--list]  (A5: test
        functions that run a program, directly or through a helper, under <dir>'s
        four test roots; --list prints each counted file::function)
+       python3 classify-test-files.py --candidates  (batch 4: every literal asserted against
+       skill/agent/reference markdown, classed prose or structural by literal_class, whose
+       docstring holds the structural rules; batch-3 kept items print as kept-batch3)
 """
 from __future__ import annotations
 
@@ -189,7 +192,138 @@ def _prose_literal(s: str) -> bool:
     return not (first in COMMAND_WORDS or "/" in first or first.endswith((".py", ".sh")) or " --" in s)
 
 
+PLACEHOLDER = re.compile(r"<[A-Za-z][\w -]*>|\{[\w-]*\}")
+KEY_LINE = re.compile(r"^\s*(?:[-*]\s+)?(?:\*\*|\")?[a-z][\w.-]*(?:\*\*|\")?:(?:\s|$)")
+COMMIT_SUBJECT = re.compile(r"^[a-z]+\([\w-]+\): ")
+FILE_EXT = re.compile(r"\w\.[A-Za-z][A-Za-z0-9]{0,4}\b")
+MERMAID_KEYWORDS = {"flowchart", "graph", "sequenceDiagram", "classDiagram", "stateDiagram", "stateDiagram-v2",
+                    "erDiagram", "journey", "gantt", "pie", "quadrantChart", "requirementDiagram", "gitGraph",
+                    "mindmap", "timeline", "sankey-beta", "xychart-beta", "block-beta", "packet-beta", "kanban",
+                    "architecture-beta"}
+MERMAID_DIRECTIONS = {"LR", "RL", "TD", "TB", "BT"}
+CODE_MARK = re.compile(r"_|\(\)|\[\]|`|\w\.\w|=|\$|\\|^-|-$|[A-Za-z]\d|\w:\w")
+REGEX_NORM = ((re.compile(r"\(\?[aimsxu]+\)|\\b|\\A|\\Z|(?<!\\)[\^$]"), ""),
+              (re.compile(r"\\s[+*?]?"), " "), (re.compile(r"\\([.|()\[\]?*+-])"), r"\1"),
+              (re.compile(r"\(\?:"), "("))
+
+
+def _top_alternatives(pattern: str) -> list[str]:
+    """A regex split on its top-level unescaped `|` (alternatives inside groups stay whole)."""
+    alts, depth, cur, i = [], 0, "", 0
+    while i < len(pattern):
+        ch = pattern[i]
+        if ch == "\\":
+            cur += pattern[i:i + 2]
+            i += 2
+            continue
+        depth += (ch in "([") - (ch in ")]")
+        if ch == "|" and depth == 0:
+            alts.append(cur)
+            cur = ""
+        else:
+            cur += ch
+        i += 1
+    return alts + [cur]
+
+
+def literal_class(s: str, regex: bool = False) -> tuple[str, str] | None:
+    """Class a literal asserted against prose: (`prose`|`structural`, reason), or None.
+
+    None when the literal has no word with a letter (not a candidate). A regex pattern with
+    top-level alternatives is prose when any alternative is prose, else the first alternative's
+    class. Each pattern is first normalized: flags, anchors and `\\b` removed, `\\s`/`\\s+` read as a space, escaped
+    punctuation unescaped. Then, first rule that matches wins:
+      structural — markdown heading: starts with `#`
+      structural — gate or HTML marker: contains `<!--` or `-->`
+      structural — table row or cell: starts or ends with `|`, or contains ` | `
+      structural — line grammar placeholder: contains `<word>` or `{word}`
+      structural — field key or label: a lowercase `key:` opening the literal (optionally a
+                   list item or bold), a single word ending in `:`, or a whole `**bold**` label
+      structural — command: first word is a command (git, python3, uv, claude ...) or ` --flag`
+      structural — commit subject grammar: opens with `type(scope): `
+      3+ words   — path if the first word has `/` or ends in .py/.sh; otherwise prose
+      1-2 words  — path: contains `/` or a file extension (`x.md`, or `.md` alone)
+                 — repo name: a word is a hyphenated skill, plugin or script name found on
+                   disk (loom-code, write-spec, sync-trunk ...)
+                 — Mermaid diagram keyword: first word opens a Mermaid block (flowchart, erDiagram,
+                   stateDiagram-v2 ...), any other word a direction token (LR, TD ...)
+                 — generator name: a single word that is `<name>` of a gen_<name> script on disk
+                 — code identifier: contains `_`, `()`, `[]`, a backtick, `a.b` (also dotted
+                   rule and gate ids), `=`, `$`, a backslash (regex grammar), `a:b` (a skill id), a leading or
+                   trailing `-` (a name fragment), or a letter followed by a digit (sha1, v3)
+                 — ALL_CAPS token, rule id or verdict: no lowercase letter (PASS, RL-12, REQ-3)
+                 — capitalized label: its first word starts with an uppercase letter (heading text, a
+                   table-header cell, a bold field label or a name)
+                 — otherwise prose (a 1-2 word phrase or single term)
+    """
+    t = s
+    if regex:
+        alts = _top_alternatives(s)
+        if len(alts) > 1:
+            got = [(a, g) for a, g in ((a, literal_class(a, regex=True)) for a in alts) if g]
+            prose = [a for a, g in got if g[0] == "prose"]
+            if prose:
+                return "prose", f"regex alternative {prose[0]!r} is prose"
+            return got[0][1] if got else None
+        for pat, rep in REGEX_NORM:
+            t = pat.sub(rep, t)
+    t = t.strip()
+    words = [w for w in t.split() if any(ch.isalpha() for ch in w)]
+    if not words:
+        return None
+    if t.startswith("#"):
+        return "structural", "markdown heading"
+    if "<!--" in t or "-->" in t:
+        return "structural", "gate or HTML marker"
+    if t.startswith("|") or t.endswith("|") or " | " in t:
+        return "structural", "table row or cell"
+    if PLACEHOLDER.search(t):
+        return "structural", "line grammar placeholder"
+    if KEY_LINE.match(t) or (len(t.split()) == 1 and t.endswith(":")) or re.fullmatch(r"\*\*[^*]+\*\*:?", t):
+        return "structural", "field key or label"
+    first = words[0].strip("`$")
+    if first in COMMAND_WORDS or " --" in f" {t}":
+        return "structural", "command"
+    if COMMIT_SUBJECT.match(t):
+        return "structural", "commit subject grammar"
+    if len(words) >= 3:
+        if "/" in first or first.endswith((".py", ".sh")):
+            return "structural", "path"
+        return "prose", "phrase of 3+ words"
+    if "/" in t or FILE_EXT.search(t) or re.fullmatch(r"\.\w{1,5}", t):
+        return "structural", "path"
+    if any(w.strip("`'\".,:;()") in _repo_names() for w in words):
+        return "structural", "names a skill, plugin or script (a hyphenated repo name)"
+    if words[0] in MERMAID_KEYWORDS and set(words[1:]) <= MERMAID_DIRECTIONS:
+        return "structural", "Mermaid diagram keyword"
+    if len(words) == 1 and words[0] in _generator_names():
+        return "structural", "generator name (a gen_<name> script on disk)"
+    if CODE_MARK.search(t):
+        return "structural", "code identifier"
+    if not any(ch.islower() for ch in t):
+        return "structural", "ALL_CAPS token, rule id or verdict"
+    if words[0][0].isupper():
+        return "structural", "capitalized label (heading text, table-header cell, bold label or name)"
+    return "prose", "1-2 word phrase or term"
+
+
 _PROD_CACHE: dict[Path, set[str]] = {}
+_NAMES_CACHE: dict[Path, set[str]] = {}
+
+
+def _repo_names() -> set[str]:
+    """Hyphenated skill, plugin and script names on disk (`loom-code`, `write-spec`, `sync-trunk`)."""
+    if REPO not in _NAMES_CACHE:
+        found = {d.name for d in REPO.glob("*/skills/*") if d.is_dir()}
+        found |= {d.name for d in REPO.iterdir() if d.is_dir()}
+        found |= {q.stem for q in REPO.glob("*/skills/*/scripts/*")} | {q.stem for q in REPO.glob("*/scripts/*")}
+        _NAMES_CACHE[REPO] = {n for n in found if "-" in n}
+    return _NAMES_CACHE[REPO]
+
+
+def _generator_names() -> set[str]:
+    """Generator names from `gen_<name>` scripts on disk (`seq` from gen_seq.py)."""
+    return {q.stem[4:] for q in REPO.glob("*/skills/*/scripts/gen_*.py")}
 
 
 def _repo_production_modules() -> set[str]:
@@ -199,7 +333,14 @@ def _repo_production_modules() -> set[str]:
 
 
 def direct_pin_lines(text: str) -> list[int]:
-    """Lines of a direct sentence pin: a prose literal asserted against text read from a markdown file.
+    """Lines of a direct prose pin: the lines of every `prose`-class pin_candidates row."""
+    return sorted({c["line"] for c in pin_candidates(text) if c["cls"] == "prose"})
+
+
+def pin_candidates(text: str) -> list[dict]:
+    """Every literal asserted against text read from a markdown file, classed by literal_class.
+
+    Each row: line, func (the top-level function read), literal, form, cls, reason.
 
     Heuristic, AST-based and conservative (it misses rather than guesses):
     - Only a file that names a production skill, agent or reference markdown path
@@ -223,14 +364,46 @@ def direct_pin_lines(text: str) -> list[int]:
     - One exception to output-wins: a plain read of a path naming a skill, agent or reference
       file (SKILL.md, agents/, references/ ...) is markdown text even under a temp dir, since an
       installed copy of a plugin's own skill file is still its prose.
-    - A prose literal (see _prose_literal: 3+ words with letters, no heading, table row,
-      command or path), inline or a module-level string name, counts when asserted with
-      `in`, `==`, `.startswith()` or `.endswith()` against markdown text inside an
-      `assert` (also `text.count(<literal>) == N`, `>=`/`>` N with N >= 1; `<= 1` is a
-      one-home check and does not count), as does a phrase-collection comprehension variable asserted `in` it or
-      collected when `not in` it. Nested functions are read with their enclosing one.
-    A comparison written in an `if` of a helper, a regex search, or on a helper parameter
-    is not seen; such files need a reader.
+    - A literal (any length with a letter; an inline string, a module-level string name, or an
+      f-string's constant parts) is a candidate when it is asserted with `in`, `==`,
+      `.startswith()` or `.endswith()` against markdown text inside an `assert` (also
+      `text.count(<literal>) == N`, `>=`/`>` N with N >= 1; `<= 1` is a one-home check and
+      does not count), as is each literal of a collection (module-level or local tuple, list
+      or set) whose comprehension variable is asserted `in` it or collected when `not in` it.
+    - Batch 4 forms: a literal required by an `if` (`if "x" not in text`, or `in` under an
+      odd number of `not`; an `if` whose body is only `continue`/`pass` is a filter and does
+      not count) or returned (`return "x" in text`); a `.index()`/`.rindex()` lookup of a
+      literal on markdown text (it raises when the literal is gone); and a `re.search`/
+      `match`/`fullmatch`/`findall`/`finditer` (or the same method on a name bound to
+      `re.compile(<literal>)`) whose pattern is a literal and whose subject is markdown text,
+      unless directly negated (`not re.search(...)`, an absence); in an `if` test it counts
+      only under an odd number of `not` (and not as a continue/pass filter), and in a
+      comprehension condition it is a filter and does not count, except a negated one
+      (`[k for k, pat in D.items() if not re.search(pat, md)]` collects what is missing, W2-01).
+    - W3-01 forms: a `.find()`/`.rfind()` lookup of a literal on markdown text whose result an
+      assert compares as present (`!= -1`, `>= 0`, `> -1`, `-1 <`, chained too), directly or
+      through the name it is assigned to (counted on the lookup line); and markdown held on
+      `self.<attr>`/`cls.<attr>` when any method sets that attribute from markdown text (the
+      attribute name is judged file-wide, like a variable name).
+    - A local helper, validator-named or not, whose parameter receives markdown text at any
+      call site in the file (to a fixed point) reads that parameter as markdown text, so a
+      literal it requires of its input is a candidate on the helper's own line.
+      Nested functions are read with their enclosing one.
+    - Needles routed through containers (W1-07): in every form above, a needle may be a name
+      that a `for` or comprehension target binds (tuple targets too) over a collection, a dict
+      (its keys), `.items()`/`.values()`/`.keys()`, or another such bound name, or a
+      `pytest.mark.parametrize` parameter; each string it can hold is a candidate, classed on
+      its own. `.lower()`-style calls on the needle are looked through. A positive `in` whose
+      statement stores or passes its value (`facts = {"k": any("x" in b for b in blocks)}`)
+      counts too, unless negated or in a comprehension filter; a filter of a `next(...)`
+      first-match lookup still counts, since a miss yields the default.
+    - A literal (or a collection, spread with `*`) passed to a local helper that requires it
+      of markdown text is a candidate on the call line, for calls that pass markdown text in.
+    - literal_class then classes each candidate prose or structural; only prose ones count as
+      pins (direct_pin_lines), the census `--candidates` mode lists both.
+    Not seen: a needle passed through two helper levels, a subscript (`phrases[0]`), a
+    non-literal regex, and asserts on names the file-wide judgment calls output. A stored
+    `in` later asserted absent is counted anyway (a false candidate, judged by hand).
     Known limits: a local helper named like a validator word (`_checklist()` matches
     'check') is taken as output; and a variable name is judged file-wide, so one name
     holding README.md in one test and SKILL.md in another counts as non-prose everywhere.
@@ -247,7 +420,7 @@ def direct_pin_lines(text: str) -> list[int]:
                 and isinstance(n.value, ast.Constant) and isinstance(n.value.value, str)
                 for t in n.targets if isinstance(t, ast.Name)}
     mod_colls = {t.id: n.value for n in tree.body if isinstance(n, ast.Assign)
-                 and isinstance(n.value, (ast.Tuple, ast.List, ast.Set))
+                 and isinstance(n.value, (ast.Tuple, ast.List, ast.Set, ast.Dict))
                  for t in n.targets if isinstance(t, ast.Name)}
     src: dict[str, str] = {}  # every name's assigned source, any scope: where a read's path came from
     for n in ast.walk(tree):
@@ -347,12 +520,19 @@ def direct_pin_lines(text: str) -> list[int]:
         called = {c.split(".")[-1] for c in calls(node)}
         return raw_output(node) or bool(called & runners) or bool(names(node) & out)
 
+    self_md: set[str] = set()  # attributes a method sets on self/cls from markdown text (W3-01)
+
+    def self_attr(node) -> str | None:
+        ok = isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name) and node.value.id in ("self", "cls")
+        return node.attr if ok else None
+
     def is_md(node, md, out) -> bool:
         if is_output(node, out):
             return False
         read_helper = any(isinstance(c, ast.Call) and _dotted(c.func).split(".")[-1] in readers and not any(
             NON_PROSE_PATH.search(src.get(i, "") + i) for a in c.args for i in names(a)) for c in ast.walk(node))
-        return raw_read(node) or read_helper or bool(names(node) & md)
+        return raw_read(node) or read_helper or bool(names(node) & md) or any(
+            self_attr(a) in self_md for a in ast.walk(node))
 
     def copy_read(node) -> bool:
         """The value is a plain read of a path naming a skill, agent or reference file (a copy
@@ -385,58 +565,359 @@ def direct_pin_lines(text: str) -> list[int]:
             return node.value
         if isinstance(node, ast.Name):
             return mod_strs.get(node.id)
+        if isinstance(node, ast.JoinedStr):  # an f-string: its constant parts, `{}` for each value
+            return "".join(v.value if isinstance(v, ast.Constant) else "{}" for v in node.values)
         return None
 
-    def phrase_coll(node) -> bool:
-        node = mod_colls.get(node.id) if isinstance(node, ast.Name) else node
-        return isinstance(node, (ast.Tuple, ast.List, ast.Set)) and any(
-            _prose_literal(literal(e) or "") for e in node.elts)
+    def re_bound(scope) -> dict[str, str]:
+        """Names bound to `re.compile(<literal>)` in scope (not descending into functions for the module)."""
+        nodes = scope.body if isinstance(scope, ast.Module) else list(ast.walk(scope))
+        return {t.id: literal(n.value.args[0]) for n in nodes if isinstance(n, ast.Assign)
+                and isinstance(n.value, ast.Call) and _dotted(n.value.func) == "re.compile"
+                and n.value.args and literal(n.value.args[0]) is not None
+                for t in n.targets if isinstance(t, ast.Name)}
+
+    parent = {id(ch): p for p in ast.walk(tree) for ch in ast.iter_child_nodes(p)}
+
+    def nots(node, root) -> int:
+        n, x = 0, node
+        while x is not root and id(x) in parent:
+            x = parent[id(x)]
+            n += isinstance(x, ast.UnaryOp) and isinstance(x.op, ast.Not)
+        return n
 
     mod_md, mod_out = taint(ast.Module(body=[n for n in tree.body if not isinstance(
         n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))], type_ignores=[]), set(), set())
-    hits: set[int] = set()
+    mod_re = re_bound(tree)
     nested = {id(g) for f in funcs.values() for g in ast.walk(f) if g is not f and g in funcs.values()}
-    for f in (f for f in funcs.values() if id(f) not in nested):  # a nested helper is read with its parent
-        params = {a.arg for a in f.args.args}  # a local fixture of that name decides the parameter
-        md, out = taint(f, mod_md | (params & readers), mod_out | (params & runners))
-        phrase_vars = {g.target.id for n in ast.walk(f) if isinstance(n, (ast.ListComp, ast.SetComp, ast.GeneratorExp))
-                       for g in n.generators if isinstance(g.target, ast.Name) and phrase_coll(g.iter)}
+    top = [f for f in funcs.values() if id(f) not in nested]  # a nested helper is read with its parent
+    fed: dict[str, set[str]] = {}  # helper -> parameters that receive markdown text at some call site
+
+    def scope_taint(f):
+        own = {a.arg for a in f.args.args}  # a local fixture of that name decides the parameter
+        fed_here = set().union(*(fed.get(g.name, set()) for g in ast.walk(f)
+                                 if isinstance(g, (ast.FunctionDef, ast.AsyncFunctionDef))))
+        return taint(f, mod_md | (own & readers) | fed_here, mod_out | (own & runners))
+
+    while True:
+        size = sum(map(len, fed.values())) + len(self_md)
+        for f in top:
+            md, out = scope_taint(f)
+            for c in ast.walk(f):
+                if isinstance(c, ast.Assign) and is_md(c.value, md - {"self", "cls"}, out):
+                    # `self.fm, self.body = _split(...)`: only the helper's unparsed tuple positions
+                    flags = tuple_out.get(_dotted(c.value.func).split(".")[-1]) if isinstance(c.value, ast.Call) else None
+                    for t in c.targets:
+                        elts = t.elts if isinstance(t, (ast.Tuple, ast.List)) else [t]
+                        self_md.update(self_attr(e) for i, e in enumerate(elts) if self_attr(e) and not (
+                            flags and len(flags) == len(elts) and flags[i]))
+                if isinstance(c, ast.Call) and isinstance(c.func, ast.Name) and c.func.id in funcs:
+                    gp = [a.arg for a in funcs[c.func.id].args.args]
+                    got = {gp[i] for i, a in enumerate(c.args) if i < len(gp)
+                           and not isinstance(a, ast.Starred) and is_md(a, md, out)}
+                    got |= {k.arg for k in c.keywords if k.arg in gp and is_md(k.value, md, out)}
+                    if got:
+                        fed.setdefault(c.func.id, set()).update(got)
+        if sum(map(len, fed.values())) + len(self_md) == size:
+            break
+
+    rows: list[dict] = []
+    seen: set[tuple] = set()
+
+    def add(line, fname, lit, form, regex=False) -> None:
+        got = literal_class(lit, regex) if lit is not None else None
+        if got and (line, lit, form) not in seen:
+            seen.add((line, lit, form))
+            rows.append({"line": line, "func": fname, "literal": lit, "form": form,
+                         "cls": got[0], "reason": got[1]})
+
+    comps = (ast.ListComp, ast.SetComp, ast.GeneratorExp)
+    str_methods = {"lower", "casefold", "strip", "upper"}
+
+    def local_colls(f) -> dict:
+        return {**mod_colls, **{t.id: n.value for n in ast.walk(f) if isinstance(n, ast.Assign)
+                                and isinstance(n.value, (ast.Tuple, ast.List, ast.Set, ast.Dict))
+                                for t in n.targets if isinstance(t, ast.Name)}}
+
+    def parametrized(f) -> dict[str, list]:
+        """Test parameters bound by `@pytest.mark.parametrize("a,b", [...])` to the values they take."""
+        got: dict[str, list] = {}
+        for d in f.decorator_list:
+            if isinstance(d, ast.Call) and _dotted(d.func).endswith("parametrize") and len(d.args) >= 2 \
+                    and isinstance(d.args[0], ast.Constant) and isinstance(d.args[0].value, str) \
+                    and isinstance(d.args[1], (ast.List, ast.Tuple)):
+                argn = [a.strip() for a in d.args[0].value.split(",") if a.strip()]
+                for row in d.args[1].elts:
+                    vals = [row] if len(argn) == 1 else (
+                        row.elts if isinstance(row, (ast.Tuple, ast.List)) else [])
+                    for a, v in zip(argn, vals):
+                        got.setdefault(a, []).append(v)
+        return got
+
+    # ctx = (collections by name, parameter values by name). A needle is followed through a
+    # named collection or dict, `.items()`/`.values()`/`.keys()`, loop and comprehension targets
+    # (tuple targets too) and parameters, to the string values it can hold.
+    def values_of(node, ctx, depth=0) -> list:
+        if depth > 8:
+            return []
+        if isinstance(node, ast.Name):
+            got = bound(node, ctx, depth)
+            if got is not None:
+                return got
+            if node.id in ctx[0]:
+                return [ctx[0][node.id]]
+            if node.id in ctx[1]:
+                return ctx[1][node.id]
+        return [node]
+
+    def elems(it, ctx, depth=0) -> list:
+        if depth > 8:
+            return []
+        if isinstance(it, ast.Call):
+            fn = it.func
+            if isinstance(fn, ast.Name) and fn.id in ("sorted", "list", "tuple", "set", "reversed") and it.args:
+                return elems(it.args[0], ctx, depth + 1)
+            if isinstance(fn, ast.Attribute) and fn.attr in ("items", "values", "keys") and not it.args:
+                got = []
+                for d in values_of(fn.value, ctx, depth + 1):
+                    if isinstance(d, ast.Dict):
+                        for k, v in zip(d.keys, d.values):
+                            if k is not None:
+                                got.append(ast.Tuple(elts=[k, v]) if fn.attr == "items"
+                                           else k if fn.attr == "keys" else v)
+                return got
+            return []
+        got = []
+        for v in values_of(it, ctx, depth + 1):
+            if isinstance(v, (ast.Tuple, ast.List, ast.Set)):
+                got += v.elts
+            elif isinstance(v, ast.Dict):
+                got += [k for k in v.keys if k is not None]
+        return got
+
+    def destructure(target, name, value, ctx, depth) -> list:
+        if isinstance(target, ast.Name):
+            return [value] if target.id == name else []
+        got = []
+        if isinstance(target, (ast.Tuple, ast.List)):
+            for v in values_of(value, ctx, depth + 1):
+                if isinstance(v, (ast.Tuple, ast.List)) and len(v.elts) == len(target.elts):
+                    for t, e in zip(target.elts, v.elts):
+                        got += destructure(t, name, e, ctx, depth + 1)
+        return got
+
+    def bound(node, ctx, depth):
+        """What the nearest enclosing `for` or comprehension binding node's name iterates, or None."""
+        x = node
+        while id(x) in parent:
+            p = parent[id(x)]
+            gens = p.generators if isinstance(p, comps) else [p] if isinstance(p, ast.For) and x is not p.iter else []
+            for g in gens:
+                if any(isinstance(t, ast.Name) and t.id == node.id for t in ast.walk(g.target)):
+                    return [v for e in elems(g.iter, ctx, depth + 1)
+                            for v in destructure(g.target, node.id, e, ctx, depth + 1)]
+            x = p
+        return None
+
+    def lits(node, ctx, pids) -> list[str]:
+        """Needle literals of an expression (with pids, only values a call site passed in)."""
+        while isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) \
+                and node.func.attr in str_methods and not node.args:
+            node = node.func.value
+        vals = values_of(node, ctx) if isinstance(node, ast.Name) else [node]
+        return [literal(v) for v in vals if literal(v) is not None and (pids is None or id(v) in pids)]
+
+    def stored(c) -> bool:
+        """A positive `in` whose statement stores or passes its value (not assert, if or return,
+        which have their own forms), outside a comprehension filter unless that comprehension is
+        a `next(...)` first-match lookup (a miss yields the default)."""
+        n, x = 0, c
+        while id(x) in parent:
+            p = parent[id(x)]
+            n += isinstance(p, ast.UnaryOp) and isinstance(p.op, ast.Not)
+            if isinstance(p, ast.comprehension) and any(x is i for i in p.ifs):
+                comp = parent.get(id(p))
+                up = parent.get(id(comp))
+                if not (isinstance(up, ast.Call) and _dotted(up.func) == "next" and up.args and up.args[0] is comp):
+                    return False
+            if isinstance(p, ast.stmt):
+                return isinstance(p, (ast.Assign, ast.AnnAssign, ast.AugAssign, ast.Expr)) and n % 2 == 0
+            x = p
+        return False
+
+    def num(n) -> int | None:
+        try:
+            v = ast.literal_eval(n)
+        except (ValueError, TypeError, SyntaxError):
+            return None
+        return v if type(v) is int else None
+
+    def present_cmp(c, hit) -> bool:
+        """`x != -1`, `x >= 0`, `x > -1` (or mirrored, chained too) in Compare c, x picked by hit."""
+        ops = [c.left, *c.comparators]
+        for a, op, b in zip(ops, c.ops, ops[1:]):
+            if hit(a) and ((isinstance(op, (ast.NotEq, ast.Gt)) and num(b) == -1)
+                           or (isinstance(op, ast.GtE) and num(b) == 0)):
+                return True
+            if hit(b) and ((isinstance(op, (ast.NotEq, ast.Lt)) and num(a) == -1)
+                           or (isinstance(op, ast.LtE) and num(a) == 0)):
+                return True
+        return False
+
+    def find_required(node, f) -> bool:
+        """A `.find()` result compared as present inside an assert, directly or via the name it is assigned to."""
+        up = parent.get(id(node))
+        if isinstance(up, ast.Compare) and present_cmp(up, lambda e: e is node):
+            x = up
+            while id(x) in parent and x is not f:
+                x = parent[id(x)]
+                if isinstance(x, ast.Assert):
+                    return True
+            return False
+        if isinstance(up, ast.Assign) and len(up.targets) == 1 and isinstance(up.targets[0], ast.Name):
+            t = up.targets[0].id
+            return any(isinstance(c, ast.Compare) and present_cmp(
+                c, lambda e: isinstance(e, ast.Name) and e.id == t)
+                for a in ast.walk(f) if isinstance(a, ast.Assert) for c in ast.walk(a.test))
+        return False
+
+    def scan(f, fname, ctx, pids=None, at=None) -> None:
+        md, out = scope_taint(f)
+        bound_re = {**mod_re, **re_bound(f)}
+
+        def put(line, lit, form, regex=False) -> None:
+            add(at or line, fname, lit, form if at is None else f"{form} via {f.name}()", regex)
+
+        def required(c, form) -> None:
+            if is_md(c.comparators[0], md, out):
+                for s in lits(c.left, ctx, pids):
+                    put(c.lineno, s, form)
+
         for node in ast.walk(f):
             if isinstance(node, ast.Assert):
                 for c in ast.walk(node.test):
                     if isinstance(c, ast.Compare) and len(c.ops) == 1:
                         left, right = c.left, c.comparators[0]
-                        pinned = _prose_literal(literal(left) or "") or (
-                            isinstance(left, ast.Name) and left.id in phrase_vars)
-                        if isinstance(c.ops[0], ast.In) and pinned and is_md(right, md, out):
-                            hits.add(c.lineno)
-                        elif isinstance(c.ops[0], ast.Eq) and any(
-                                _prose_literal(literal(a) or "") and is_md(b, md, out)
-                                for a, b in ((left, right), (right, left))):
-                            hits.add(c.lineno)
-                        elif isinstance(c.ops[0], (ast.Eq, ast.GtE, ast.Gt)) and isinstance(left, ast.Call) \
+                        if isinstance(c.ops[0], ast.In):
+                            required(c, "assert in")
+                        elif isinstance(c.ops[0], ast.Eq) and not isinstance(left, ast.Call):
+                            for a, b in ((left, right), (right, left)):
+                                if is_md(b, md, out):
+                                    for s in lits(a, ctx, pids):
+                                        put(c.lineno, s, "assert ==")
+                        if isinstance(c.ops[0], (ast.Eq, ast.GtE, ast.Gt)) and isinstance(left, ast.Call) \
                                 and isinstance(left.func, ast.Attribute) and left.func.attr == "count" \
-                                and left.args and _prose_literal(literal(left.args[0]) or "") \
-                                and isinstance(right, ast.Constant) and isinstance(right.value, int) \
-                                and right.value >= 1 and is_md(left.func.value, md, out):
-                            hits.add(c.lineno)  # `text.count(<sentence>) == 1`: present, not "at most once"
+                                and left.args and isinstance(right, ast.Constant) \
+                                and isinstance(right.value, int) and right.value >= 1 \
+                                and is_md(left.func.value, md, out):
+                            # `text.count(<literal>) == 1`: present, not "at most once"
+                            for s in lits(left.args[0], ctx, pids):
+                                put(c.lineno, s, "assert count")
                     elif isinstance(c, ast.Call) and isinstance(c.func, ast.Attribute) \
-                            and c.func.attr in ("startswith", "endswith") and c.args:
+                            and c.func.attr in ("startswith", "endswith") and c.args \
+                            and is_md(c.func.value, md, out):
                         arg = c.args[0]
-                        lits = [literal(e) for e in arg.elts] if isinstance(arg, ast.Tuple) else [literal(arg)]
-                        if any(_prose_literal(s or "") for s in lits) and is_md(c.func.value, md, out):
-                            hits.add(c.lineno)
-            elif isinstance(node, (ast.ListComp, ast.SetComp, ast.GeneratorExp)):
+                        for e in (arg.elts if isinstance(arg, ast.Tuple) else [arg]):
+                            for s in lits(e, ctx, pids):
+                                put(c.lineno, s, f"assert .{c.func.attr}()")
+            elif isinstance(node, ast.If):
+                if all(isinstance(b, (ast.Continue, ast.Pass)) for b in node.body):
+                    continue  # a filter, not a requirement
+                for c in ast.walk(node.test):
+                    if isinstance(c, ast.Compare) and len(c.ops) == 1 and isinstance(c.ops[0], (ast.In, ast.NotIn)) \
+                            and isinstance(c.ops[0], ast.NotIn) != (nots(c, node.test) % 2 == 1):
+                        required(c, "if requires")
+            elif isinstance(node, ast.Return) and node.value is not None:
+                for c in ast.walk(node.value):
+                    if isinstance(c, ast.Compare) and len(c.ops) == 1 and isinstance(c.ops[0], ast.In) \
+                            and nots(c, node.value) == 0:
+                        required(c, "return in")
+            elif isinstance(node, ast.Compare) and len(node.ops) == 1 and isinstance(node.ops[0], ast.In) \
+                    and stored(node):
+                required(node, "stored in")
+            elif isinstance(node, comps):
                 for g in node.generators:
-                    if not (isinstance(g.target, ast.Name) and phrase_coll(g.iter)):
+                    for cond in g.ifs:  # `[k for k, pat in D.items() if not re.search(pat, md)]`
+                        r = cond.operand if isinstance(cond, ast.UnaryOp) and isinstance(cond.op, ast.Not) else None
+                        if isinstance(r, ast.Call) and _dotted(r.func) in ("re.search", "re.match", "re.fullmatch") \
+                                and len(r.args) >= 2 and is_md(r.args[1], md, out):
+                            for pat in lits(r.args[0], ctx, pids):
+                                put(r.lineno, pat, "collected when unmatched", regex=True)
+                    if not isinstance(g.target, ast.Name):
                         continue
                     for cond in g.ifs:
                         for c in ast.walk(cond):
                             if isinstance(c, ast.Compare) and isinstance(c.left, ast.Name) \
                                     and c.left.id == g.target.id and isinstance(c.ops[0], ast.NotIn) \
                                     and is_md(c.comparators[0], md, out):
-                                hits.add(c.lineno)
-    return sorted(hits)
+                                for s in [s for e in elems(g.iter, ctx) for s in lits(e, ctx, pids)]:
+                                    put(c.lineno, s, "collected when not in")
+            elif isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+                attr, recv = node.func.attr, node.func.value
+                if attr in ("index", "rindex") and node.args and is_md(recv, md, out):
+                    for s in lits(node.args[0], ctx, pids):
+                        put(node.lineno, s, f".{attr}()")
+                elif attr in ("find", "rfind") and node.args and is_md(recv, md, out) and find_required(node, f):
+                    for s in lits(node.args[0], ctx, pids):
+                        put(node.lineno, s, f".{attr}() present")
+                elif attr in ("search", "match", "fullmatch", "findall", "finditer"):
+                    pats = []
+                    if isinstance(recv, ast.Name) and recv.id == "re":
+                        if len(node.args) >= 2 and is_md(node.args[1], md, out):
+                            pats = lits(node.args[0], ctx, pids)
+                    elif node.args and is_md(node.args[0], md, out):
+                        if isinstance(recv, ast.Call) and recv.args and _dotted(recv.func) == "re.compile":
+                            pats = lits(recv.args[0], ctx, pids)
+                        elif isinstance(recv, ast.Name) and recv.id in bound_re and pids is None:
+                            pats = [bound_re[recv.id]]
+                    up = parent.get(id(node))
+                    negated = (isinstance(up, ast.UnaryOp) and isinstance(up.op, ast.Not)) or (
+                        isinstance(up, ast.Compare) and isinstance(up.ops[0], ast.Is))
+                    x = node  # in an `if` test it is required only when negated; a filter never is
+                    while id(x) in parent and not isinstance(x, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        p = parent[id(x)]
+                        if isinstance(p, ast.If) and x is p.test:
+                            negated = nots(node, p.test) % 2 == 0 or all(
+                                isinstance(b, (ast.Continue, ast.Pass)) for b in p.body)
+                            break
+                        if isinstance(p, ast.comprehension) and x in p.ifs:
+                            negated = True
+                            break
+                        x = p
+                    if not negated:
+                        for pat in pats:
+                            put(node.lineno, pat, f"re.{attr}", regex=True)
+
+    for f in top:
+        ctx = (local_colls(f), parametrized(f))
+        scan(f, f.name, ctx)
+        # A literal passed to a local helper that requires it of markdown text: judged on the
+        # call line, only for calls that pass markdown text in (a synthetic self-test does not).
+        md, out = scope_taint(f)
+        for c in ast.walk(f):
+            if not (isinstance(c, ast.Call) and isinstance(c.func, ast.Name) and c.func.id in funcs
+                    and funcs[c.func.id] is not f):
+                continue
+            args = [a.value if isinstance(a, ast.Starred) else a for a in c.args] + [k.value for k in c.keywords]
+            if not any(is_md(a, md, out) for a in args):
+                continue
+            h = funcs[c.func.id]
+            gp = [a.arg for a in h.args.args]
+            params: dict[str, list] = {}
+            i = 0
+            for a in c.args:
+                vals = [values_of(e, ctx) for e in elems(a.value, ctx)] if isinstance(a, ast.Starred) else [
+                    values_of(a, ctx)]
+                for v in vals:
+                    if i < len(gp):
+                        params.setdefault(gp[i], []).extend(v)
+                    i += 1
+            for k in c.keywords:
+                if k.arg in gp:
+                    params.setdefault(k.arg, []).extend(values_of(k.value, ctx))
+            pids = {id(n) for vs in params.values() for v in vs for n in ast.walk(v)}
+            scan(h, f.name, (local_colls(h), params), pids, c.lineno)
+    return sorted(rows, key=lambda r: (r["line"], r["literal"]))
 
 
 def executes(text: str) -> bool:
@@ -736,8 +1217,10 @@ MANUAL_OVERRIDES = {
         "template table columns, rows and markers, the evidence block heading, "
         "the template path pointer in the tester contract, a full-suite "
         "absence scan fed by split_sentences, no gate marker, and the evidence "
-        "path pointer outside every gate block; the two station phrases it "
-        "once looped over were pruned in the batch-2 loop-form fix, so no "
+        "path pointer outside every gate block; the remaining hits are the "
+        "Verdict column enum (works|partly|not verified|fails) and the Re-run "
+        "cell grammar (`carried over — <reason>`, `re-tested`); the two "
+        "sentence-anchored verdict scans were deleted in batch 4 (W1-01), so no "
         "sentence is asserted present",
     ),
     "loom-code/tests/test_adversary_protocol.py": (
@@ -825,7 +1308,11 @@ MANUAL_OVERRIDES = {
     "loom-code/tests/test_adversary_layout.py": (
         "behavior",
         "loop-form hit is SHARED_HEADINGS asserted in the protocol's parsed "
-        "heading list: section headings, not prose",
+        "heading list: section headings, not prose. The batch-4 hits are the "
+        "KIND_MARKERS fragments of a one-home absence check (each asserted absent "
+        "outside its own file), the `at commit`/`at split commit` sha lines of the "
+        "frozen correspondence note fed to git show, the `(preamble)` sentinel "
+        "cell, and the `Reuse first, update with evidence` heading",
     ),
     "loom-code/tests/test_loom_publish.py": (
         "behavior",
@@ -856,36 +1343,40 @@ MANUAL_OVERRIDES = {
     ),
     "loom-design/tests/architecture-design/test_architecture_skill.py": (
         "structure",
-        "loop-form hit is the four bold field labels of the schema's Guard "
-        "failure message section (rule id, offending path, conform, change the "
-        "rule and its guard): schema field labels. The rest is path pointers, "
-        "the ratified-by line and commit subject shape, the re-design and "
-        "re-ratify tokens, the two-word terms never required and never blocks, "
-        "the SKILL.md mention of the Guard failure message section name, and a "
-        "heading-bounded Step 5 scan; the direct sentence "
-        "asserts (single answer, re-design procedure) were pruned in closing "
-        "review round 1",
+        "no pin hit is left: frontmatter name and version, the description's "
+        "length and two CJK trigger terms, referenced paths resolving, README "
+        "skill-name links, the schema and validator paths, the `ratified-by:` "
+        "line and commit subject shape, the package-tests line grammar, the "
+        "KICKOFF-DEFAULTS.md pointer inside the Step 5 heading section, no gate "
+        "marker, and the word cap; the tests of the Guard failure field labels, "
+        "the re-design tokens and the two-word terms were deleted in batch 4 "
+        "(W1-02)",
     ),
     # Batch 3 (W2-01): files whose remaining direct-pin hit is not prose.
     "loom-code/tests/test_architecture_doc_consumers.py": (
         "structure",
-        "direct-pin hits are the `ratified-by: <name> <date>` line grammar in "
-        "write-plan Step 5 and the lenses code table; the rest is the Risk "
-        "line and rule id terms, lens-table row regexes, a heading-bounded "
-        "N/A bullet check and the reviewer code row; the sentence asserts "
-        "were pruned in batch 3 (W1-01)",
+        "remaining hit is the `architecture-conformance` dimension id in the "
+        "reviewer code row; the rest is the `ratified-by: <name> <date>` line "
+        "grammar in write-plan Step 5 and the lenses code table, the Risk line "
+        "field name, a lens-table row regex and a heading-bounded N/A bullet "
+        "check; the sentence asserts were pruned in batch 3 (W1-01) and the "
+        "'rule id' phrase in batch 4 (W1-01)",
     ),
     "loom-workflow/tests/decision-map/test_decision_map_intent_binding.py": (
         "behavior",
-        "direct-pin hit is the Map line format `- delivery-intent: DA-<n> | "
-        "docs/loom/intent/<change-id>.md` in map-format.md: line grammar, not "
-        "prose; the rest is path and front-matter tokens, status tokens, "
+        "the Map line format `- delivery-intent: DA-<n> | "
+        "docs/loom/intent/<change-id>.md` in map-format.md is line grammar, not "
+        "prose (batch 3's direct-pin hit; the batch-4 census classes it "
+        "structural); the rest is path and front-matter tokens, status tokens, "
         "absences, and the citation checker's scope loaded by path",
     ),
     "loom-workflow/tests/loom-visualization/test_templates.py": (
         "behavior",
-        "direct-pin hit is the client-matrix table column header 'Form in a "
-        "chat reply'. The three pinned_sentence_ok polarity checks "
+        "direct-pin hits are the client-matrix table column header 'Form in a "
+        "chat reply' and its column-parsed cell value 'markdown table', the "
+        "template heading 'When to use', the `title`/`body` keys of the "
+        "templates' JSON examples, and the ASCII_BY_CLIENT regex, an absence "
+        "(asserted to find nothing). The three pinned_sentence_ok polarity checks "
         "(MERMAID_PIN, TABLE_ASCII_PIN, CHAT_PROCEEDS_PIN) are kept on purpose "
         "(agent-decided): they read only sentences inside the "
         "mermaid-only-when-confirmed and obsidian-boundary `<!-- gate: -->` "
@@ -897,11 +1388,174 @@ MANUAL_OVERRIDES = {
     "loom-code/tests/test_adversarial_batch3_census_misses.py": (
         "behavior",
         "runs this classifier (path-loaded) and asserts on its result; the "
-        "direct-pin hit is a synthetic test source string fed to "
+        "sentence-assert hit is a synthetic test source string fed to "
         "direct_pin_lines, and the residual check asserts named files carry "
         "no skill sentence, an absence",
     ),
+    # Batch 4 (W3-01): the graduated build-adversary program.
+    "loom-code/tests/test_adversarial_batch4_census_lookup_forms.py": (
+        "behavior",
+        "runs this classifier (path-loaded) and asserts on its result; the "
+        "sentence-assert hits are synthetic test source strings fed to "
+        "direct_pin_lines",
+    ),
+    # Batch 4 (W2-01): files whose remaining hits the W1 mappings decided as not prose.
+    "loom-code/tests/test_build_mechanical_checks.py": (
+        "structure",
+        "remaining hits are absence scans: no added sentence in which another "
+        "role edits an `adversarial program`, no un-negated implementer "
+        "`floor` sentence, and no retired attack-catalogue or trailer pointer; "
+        "no sentence asserted present",
+    ),
+    "loom-code/tests/test_dispatch_profile_resolver.py": (
+        "behavior",
+        "runs the dispatch-profile resolver; the prose-side hit is the "
+        "`capabilities` JSON input key of the resolver boundary in "
+        "dispatch-profile.md, next to the `event` keys",
+    ),
+    "loom-code/tests/test_probes_language_policy.py": (
+        "structure",
+        "remaining hits are the `docs-lint` KICKOFF-DEFAULTS key, the negation "
+        "token set of a polarity check, and the concept noun `english` in the "
+        "paragraph that names the probe file shape; the nit clause keeps only "
+        "proper names (English, EARS, Conventional Comments) and the `nit` value",
+    ),
+    "loom-code/tests/test_write_plan_station_text.py": (
+        "grammar-invariant",
+        "remaining hit is LANE_WORDING_RE in lane_hits, an absence scan (no "
+        "runtime file names a lane); the rest is release-metadata pins, "
+        "heading-anchored key scans and grammar checks",
+    ),
+    "loom-workflow/tests/goal-create/test_goal_shape.py": (
+        "structure",
+        "remaining hits are the vendor names openai and anthropic in the "
+        "paragraphs located by the `## The 4,000-character budget` heading and "
+        "the `**Attribution accuracy**` bold label, and the four-field names "
+        "outcome, constraints, verification and stop-when (also required in "
+        "order through `.find()` lookups, W3-01)",
+    ),
+    "loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py": (
+        "structure",
+        "remaining hit is OVERCLAIM_PATTERN, an absence (asserted to find "
+        "nothing in the READMEs); the concept matchers left are the skill name, "
+        "the sibling skill name and the mode identifiers",
+    ),
+    "loom-workflow/tests/loom-visualization/test_references.py": (
+        "structure",
+        "remaining hits are H3 situation titles matched against the parsed "
+        "heading list and in `Pointer:` lines, the `Load this when:` line "
+        "label, document-type names read as cells of SKILL.md's routing table, "
+        "the `key-value` table-form term, the IN_CELL_ITEMS glyph, source and "
+        "cross-reference tokens, and the node-structure reference's headings "
+        "and bold labels",
+    ),
+    "loom-workflow/tests/scripts/test_readme_card_timing.py": (
+        "structure",
+        "remaining hit is `visualization card`, the component's own current "
+        "name, required in the README descriptions and the hook docstring",
+    ),
+    "loom-workflow/tests/scripts/test_visualization_card_hook.py": (
+        "behavior",
+        "runs the hook as a subprocess; the prose-side hits are the kept "
+        "rule_polarity_errors gate (batch 3's named replacement) with its "
+        "mutation sites, and the `ascii-graph` skill name; the SITUATIONS "
+        "phrases were deleted in batch 4 (W2-01)",
+    ),
+    "loom-workflow/tests/scripts/test_git_memory_compaction.py": (
+        "structure",
+        "entrypoint pointer paths resolve; code tokens, command shapes and "
+        "trailer keys (BLOCKED, `git log --grep`, memory-grep.sh --verify, "
+        "Privacy-Bypass-Reason:, Decision:, recall flags) in SKILL.md and its "
+        "protocols; a no-hash self-check; no sentence asserted",
+    ),
+    "loom-workflow/tests/scripts/test_independent_advisor_compaction.py": (
+        "structure",
+        "reference pointers resolve; frontmatter name and version, backticked "
+        "mode, field and exclusion-reason tokens, codex command shapes and "
+        "report-contract field names; the SKILL.md word cap; no sentence asserted",
+    ),
+    "loom-design/tests/interface/test_design_md_schema_keys.py": (
+        "behavior",
+        "imports the design_md_spec_keys script; remaining hits are the "
+        "`> **Grounding.**` and `> **Scope` blockquote "
+        "labels that bound the grounding note, component sub-token keys (size, "
+        "height, padding, width) as a mutation precondition, and a "
+        "confirm-and-spec header check that is asserted absent; docstring pins "
+        "are out of scope",
+    ),
+    "loom-design/tests/interface/test_knowledge_triage.py": (
+        "behavior",
+        "runs git show as a subprocess; remaining hits are the tier labels "
+        "shaping and deferrable, the "
+        "`design-conformance` lens name, and the bucket names craft, "
+        "domain-convention and project-local",
+    ),
 }
+
+
+# Batch 3 kept these on purpose (census-report "Known limits"); --candidates lists each
+# matching line as class kept-batch3 instead of prose or structural.
+KEPT_BATCH3 = {
+    "loom-workflow/tests/loom-visualization/test_templates.py": (
+        r"assert .*pinned_sentence_ok\(s\b",
+        "batch-3 kept gate polarity check (MERMAID_PIN, TABLE_ASCII_PIN, CHAT_PROCEEDS_PIN): "
+        "reads only sentences in the mermaid-only-when-confirmed and obsidian-boundary gate "
+        "blocks and fails a negated sentence; the literals pass through a parameter",
+    ),
+    "loom-workflow/tests/decision-map/test_skill_doc.py": (
+        r"defaultPrompt",
+        "batch-3 kept interface string: the Codex manifest defaultPrompt, not skill prose",
+    ),
+}
+PLUGIN_ORDER = (("tests", "root tests"), ("loom-code", "loom-code"),
+                ("loom-design", "loom-design"), ("loom-workflow", "loom-workflow"))
+
+
+def candidates_report(roots: list[str]) -> str:
+    """Markdown of every pin_candidates row under roots, grouped by plugin then file."""
+    import ast
+
+    by_plugin: dict[str, dict[str, list[dict]]] = {label: {} for _, label in PLUGIN_ORDER}
+    for root in roots:
+        for p in sorted((REPO / root).rglob("*.py")):
+            key = p.relative_to(REPO).as_posix()
+            text = code_only(p.read_text(encoding="utf-8", errors="replace"))
+            rows = pin_candidates(text)
+            if key in KEPT_BATCH3:
+                pat, reason = KEPT_BATCH3[key]
+                tops = [(n.lineno, n.end_lineno, n.name) for n in ast.parse(text).body
+                        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+                for i, line in enumerate(text.splitlines(), 1):
+                    if re.search(pat, line):
+                        rows = [r for r in rows if r["line"] != i]
+                        func = next((nm for a, b, nm in tops if a <= i <= b), "<module>")
+                        rows.append({"line": i, "func": func, "literal": line.strip(), "form": "kept line",
+                                     "cls": "kept-batch3", "reason": reason})
+            if rows:
+                label = next((lb for pre, lb in PLUGIN_ORDER[1:] if key.startswith(pre + "/")), "root tests")
+                by_plugin[label][key] = sorted(rows, key=lambda r: (r["line"], r["literal"]))
+
+    out = ["| plugin | prose | structural | kept-batch3 | files with >=1 prose candidate |",
+           "|---|---|---|---|---|"]
+    total = {"prose": 0, "structural": 0, "kept-batch3": 0, "files": 0}
+    for _, label in PLUGIN_ORDER:
+        rows = [r for rs in by_plugin[label].values() for r in rs]
+        n = {c: sum(r["cls"] == c for r in rows) for c in ("prose", "structural", "kept-batch3")}
+        n["files"] = sum(any(r["cls"] == "prose" for r in rs) for rs in by_plugin[label].values())
+        total = {k: total[k] + n[k] for k in total}
+        out.append(f"| {label} | {n['prose']} | {n['structural']} | {n['kept-batch3']} | {n['files']} |")
+    out.append(f"| **total** | {total['prose']} | {total['structural']} | {total['kept-batch3']} | {total['files']} |")
+    for _, label in PLUGIN_ORDER:
+        out += ["", f"## {label}", ""]
+        for key, rows in by_plugin[label].items():
+            out += [f"### {key}", "", "| file:line | function | literal / form | class | reason |",
+                    "|---|---|---|---|---|"]
+            for r in rows:
+                lit = repr(r["literal"]).replace("|", "\\|")
+                out.append(f"| {key}:{r['line']} | {r['func']} | {lit} ({r['form']}) | {r['cls']} | {r['reason']} |")
+            out.append("")
+        out += [f"### Decisions — {label}", "", "(W1 implementers: one row per candidate judged.)"]
+    return "\n".join(out) + "\n"
 
 
 def main() -> int:
@@ -911,7 +1565,11 @@ def main() -> int:
     parser.add_argument("--roots", default=",".join(DEFAULT_ROOTS), help="comma-separated test roots")
     parser.add_argument("--count-exec", metavar="DIR", help="count executing test functions under DIR")
     parser.add_argument("--list", action="store_true", help="with --count-exec, print each counted function")
+    parser.add_argument("--candidates", action="store_true", help="print every pin candidate as markdown")
     args = parser.parse_args()
+    if args.candidates:
+        print(candidates_report([r for r in args.roots.split(",") if r]), end="")
+        return 0
     if args.count_exec is not None:
         base = Path(args.count_exec).resolve()
         if args.list:

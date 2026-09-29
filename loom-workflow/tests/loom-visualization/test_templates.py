@@ -163,10 +163,6 @@ def test_generator_examples_reproduce_their_output():
             assert got == [line.rstrip() for line in output.splitlines()], name
 
 
-def test_data_model_ascii_states_table_substitute():
-    assert "table substitute" in sections(_read("09-data-model.md"))["ASCII"].lower()
-
-
 def test_mermaid_flowcharts_use_long_arrows_only():
     for name in EXPECTED:
         (block,) = [b for lang, b in fences(sections(_read(name))["Mermaid"]) if lang == "mermaid"]

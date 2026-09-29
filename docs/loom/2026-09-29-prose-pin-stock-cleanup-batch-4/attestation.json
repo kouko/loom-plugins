@@ -1,0 +1,41 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-29-prose-pin-stock-cleanup-batch-4",
+  "content_digest": "90e3218678cce7d41c6055af554286225521d18a",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_adversarial_batch4_census_lookup_forms.py -q",
+      "artifact": "loom-code/tests/test_adversarial_batch4_census_lookup_forms.py",
+      "result": "pass",
+      "command_digest": "68bda0c1794c10fb6270566b45fb8d32d447c3ea5681069df0b2ace8b849cf5a"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "ae97afe40d53a0a6e",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "a3a298508f1fabc4c",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

@@ -1,9 +1,7 @@
 """A10/A2: the READMEs describe when the visualization card arrives, and where not.
 
-Positive: every loom-workflow README names the hosts the per-turn reminder
-does not reach (Codex IDE extension and app, Antigravity desktop app and IDE)
-and the loom-code-only install, and every current description calls the card
-by the name its own header uses. Negative: no README, and not the Codex
+Positive: every loom-workflow README names the `UserPromptSubmit` hook, and
+every current description calls the card by the name its own header uses. Negative: no README, and not the Codex
 manifest's long description, still says the card arrives at SessionStart, and
 none of the three languages reintroduces the old "trigger card" name; the
 per-turn word figure is not smaller than the committed cards.
@@ -17,28 +15,6 @@ import re
 from pathlib import Path
 
 PLUGIN_DIR = Path(__file__).resolve().parents[2]
-
-# Per-language phrases that must appear in each README's install limits note.
-LIMIT_PHRASES = {
-    "README.md": (
-        "Codex IDE extension",
-        "Codex app",
-        "Antigravity desktop app or IDE",
-        "`loom-code` without `loom-workflow`",
-    ),
-    "README.ja.md": (
-        "Codex の IDE 拡張",
-        "Codex アプリ",
-        "Antigravity のデスクトップアプリや IDE",
-        "`loom-workflow` なしで `loom-code`",
-    ),
-    "README.zh-TW.md": (
-        "Codex IDE 擴充功能",
-        "Codex app",
-        "Antigravity 桌面 app 與 IDE",
-        "只裝 `loom-code`、沒裝 `loom-workflow`",
-    ),
-}
 
 STALE_TIMING = re.compile(
     r"SessionStart|session[ -]start|startup, clear, and compact"
@@ -71,10 +47,6 @@ WORD_FIGURE = {
 
 def _read(name: str) -> str:
     return (PLUGIN_DIR / name).read_text(encoding="utf-8")
-
-
-def _missing_limits(text: str, phrases: tuple[str, ...]) -> list[str]:
-    return [p for p in phrases if p not in text]
 
 
 def _stale_lines(text: str) -> list[str]:
@@ -112,21 +84,19 @@ def test_per_turn_word_figure_is_not_below_the_committed_cards() -> None:
         assert int(match.group(1)) >= longest, (name, match.group(1), longest)
 
 
-def test_readmes_state_unreached_hosts_and_loom_code_only() -> None:
-    for name, phrases in LIMIT_PHRASES.items():
-        text = _read(name)
-        assert _missing_limits(text, phrases) == [], name
-        assert "UserPromptSubmit" in text, name
+def test_readmes_name_the_userpromptsubmit_hook() -> None:
+    for name in READMES:
+        assert "UserPromptSubmit" in _read(name), name
 
 
 def test_sessionstart_wording_removed() -> None:
-    for name in LIMIT_PHRASES:
+    for name in READMES:
         assert _stale_lines(_read(name)) == [], name
     codex = json.loads(_read(".codex-plugin/plugin.json"))
     assert _stale_lines(codex["interface"]["longDescription"]) == []
 
 
-def test_checks_catch_stale_and_missing_wording() -> None:
+def test_checks_catch_stale_wording_and_old_name() -> None:
     stale = "intro\n│   └── visualization-card SessionStart trigger card\n"
     assert _stale_lines(stale) == ["│   └── visualization-card SessionStart trigger card"]
     for line in ("The card also arrives at session-start.",
@@ -141,8 +111,3 @@ def test_checks_catch_stale_and_missing_wording() -> None:
                  "loom-visualization 的觸發卡片"):
         assert _old_name_lines("intro\n" + line + "\n") == [line], line
     assert _old_name_lines("the loom-visualization visualization card\n") == []
-    assert _missing_limits("Codex app only", LIMIT_PHRASES["README.md"]) == [
-        "Codex IDE extension",
-        "Antigravity desktop app or IDE",
-        "`loom-code` without `loom-workflow`",
-    ]

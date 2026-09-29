@@ -42,15 +42,9 @@ SKILL_MD_POINTER = "SKILL.md"
 
 PLUGIN_DIR = SKILL_DIR.parent.parent
 PLUGIN_READMES = {
-    "plugin README.md (EN)": (PLUGIN_DIR / "README.md", "when accepted", "recovery"),
-    "plugin README.ja.md (JA)": (PLUGIN_DIR / "README.ja.md", "受理された場合", "復旧"),
-    "plugin README.zh-TW.md (zh-TW)": (PLUGIN_DIR / "README.zh-TW.md", "接受時", "復原"),
-}
-
-SKILL_ACTIVATION_TERMS = {
-    "README.md (EN)": ("when accepted", "recovery"),
-    "README.ja.md (JA)": ("受理された場合", "復旧"),
-    "README.zh-TW.md (zh-TW)": ("接受時", "復原"),
+    "plugin README.md (EN)": PLUGIN_DIR / "README.md",
+    "plugin README.ja.md (JA)": PLUGIN_DIR / "README.ja.md",
+    "plugin README.zh-TW.md (zh-TW)": PLUGIN_DIR / "README.zh-TW.md",
 }
 
 
@@ -85,20 +79,17 @@ def test_tri_language_set_exists_and_names_both_modes():
         )
 
 
-def test_tri_language_discovery_promises_activation_and_honest_fallback():
+def test_tri_language_discovery_names_host_goal_tools():
     for label, path in READMES.items():
         text = path.read_text(encoding="utf-8")
-        activation, fallback = SKILL_ACTIVATION_TERMS[label]
-        assert activation in text, f"{label}: missing supported-host activation"
-        assert fallback in text, f"{label}: missing manual fallback"
         assert re.search(r"Codex[^.!?。]*`create_goal`", text), label
         assert re.search(r"Claude Code[^.!?。]*`ProposeGoal`[^.!?。]*`/goal`", text), label
 
-    for label, (path, activation, fallback) in PLUGIN_READMES.items():
+    for label, path in PLUGIN_READMES.items():
         text = path.read_text(encoding="utf-8")
         goal_row = next(line for line in text.splitlines() if "[`goal-create`]" in line)
-        assert activation in goal_row, f"{label}: goal-create row misses activation"
-        assert fallback in goal_row, f"{label}: goal-create row misses manual fallback"
+        for field in ARC_FIELD_LABELS:
+            assert f"`{field}`" in goal_row, f"{label}: goal-create row misses `{field}`"
 
     assert "`/goal clear`" in README_EN.read_text(encoding="utf-8")
     assert "`/goal clear`" in README_JA.read_text(encoding="utf-8")

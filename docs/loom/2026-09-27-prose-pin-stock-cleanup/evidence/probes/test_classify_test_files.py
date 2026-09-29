@@ -82,6 +82,80 @@ def test_installed_copy_skill_read_counts_as_prose() -> None:
     assert ctf.direct_pin_lines(src) == [4]
 
 
+def test_two_word_literal_against_skill_text_flagged(tmp_path: Path) -> None:
+    assert _pinned(tmp_path, 'def test_x():\n    assert "never dispatch" in TEXT\n')
+
+
+def test_short_literal_in_checker_output_not_flagged(tmp_path: Path) -> None:
+    body = ('import subprocess\n\ndef test_x():\n'
+            '    r = subprocess.run(["python3", "loom_checker.py"], capture_output=True, text=True)\n'
+            '    assert "never dispatch" in r.stdout\n')
+    assert not _pinned(tmp_path, body)
+
+
+def test_heading_marker_field_key_classed_structural() -> None:
+    body = ('def test_x():\n    assert "## Scope" in TEXT\n    assert "<!-- gate: a.b -->" in TEXT\n'
+            '    assert "status:" in TEXT\n')
+    found = ctf.pin_candidates(LOOP_HEAD + body)
+    assert [c["cls"] for c in found if c["func"] == "test_x"] == ["structural"] * 3, found
+
+
+def test_mermaid_keyword_and_generator_name_classed_structural() -> None:
+    for lit in ("flowchart LR", "stateDiagram-v2", "erDiagram", "graph TD", "seq"):
+        assert ctf.literal_class(lit)[0] == "structural", lit
+
+
+def test_prose_needle_with_a_diagram_word_still_flagged() -> None:
+    for lit in ("flowchart rectangles", "never dispatch", "timeline view"):
+        assert ctf.literal_class(lit)[0] == "prose", lit
+
+
+def test_helper_fed_prose_and_index_and_regex_flagged() -> None:
+    body = ('import re\n\ndef _errors(text):\n    if "never dispatch" not in text:\n        return ["x"]\n    return []\n\n'
+            'def test_x():\n    assert not _errors(TEXT)\n    TEXT.index("never dispatch")\n'
+            '    assert re.search(r"never\\s+dispatch", TEXT)\n')
+    assert ctf.direct_pin_lines(LOOP_HEAD + body) == [10, 16, 17]
+
+
+NEEDLE_DICT = ('ESSENCE = {{"routing": ["the rule is stated here"], "stop": ("never dispatch", "x")}}\n\n'
+               'def test_x():\n    for name, needles in ESSENCE.items():\n'
+               '        missing = [n for n in needles if n not in {subject}]\n        assert not missing\n\n'
+               'def test_y():\n    facts = {{"r": any("regardless" in b for b in {subject}.split())}}\n'
+               '    assert all(facts.values())\n')
+
+
+def test_dict_of_needles_against_skill_text_flagged() -> None:
+    src = LOOP_HEAD + NEEDLE_DICT.format(subject="TEXT")
+    assert ctf.direct_pin_lines(src) == [11, 15], ctf.pin_candidates(src)
+
+
+def test_needles_against_script_output_not_flagged() -> None:
+    src = LOOP_HEAD + "import subprocess\nOUT = subprocess.run(['python3', 'x.py']).stdout\n" + NEEDLE_DICT.format(
+        subject="OUT")
+    assert ctf.direct_pin_lines(src) == []
+
+
+def test_find_in_output_not_flagged() -> None:
+    body = ('import subprocess\n\ndef test_x():\n    out = subprocess.run(["python3", "x.py"]).stdout\n'
+            '    assert out.find("the rule is stated here") != -1\n')
+    assert ctf.direct_pin_lines(LOOP_HEAD + body) == []
+    assert ctf.direct_pin_lines(LOOP_HEAD + body.replace("out.find", "TEXT.find")) == [11]
+
+
+def test_parameter_passed_needle_flagged() -> None:
+    body = ('def _has(text, phrase):\n    return phrase in text\n\n'
+            'def test_x():\n    assert _has(TEXT, "the rule is stated here")\n    assert _has("synthetic", "never dispatch")\n')
+    assert ctf.direct_pin_lines(LOOP_HEAD + body) == [11]
+
+
+def test_regex_values_through_items_collected_when_unmatched_flagged() -> None:
+    body = ('import re\nSITS = {{"a": r"what each choice means", "b": r"\\bthe rule is stated\\b"}}\n\n'
+            'def situation_errors(text):\n    return [n for n, pat in SITS.items() if {cond}re.search(pat, text)]\n\n'
+            'def test_x():\n    assert situation_errors(TEXT) == []\n')
+    assert ctf.direct_pin_lines(LOOP_HEAD + body.format(cond="not ")) == [11]
+    assert ctf.direct_pin_lines(LOOP_HEAD + body.format(cond="")) == []  # collected when present: an absence
+
+
 def test_count_executing_tests_counts_only_functions_with_an_execution_signal(tmp_path: Path) -> None:
     root = tmp_path / "loom-code" / "tests"
     root.mkdir(parents=True)

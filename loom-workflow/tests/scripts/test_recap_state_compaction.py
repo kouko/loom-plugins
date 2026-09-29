@@ -9,71 +9,21 @@ SCHEMA_PATH = (
 )
 
 
-def test_entrypoint_preserves_goal_grounded_sections_and_synthesis_gate():
+STRUCTURAL_TOKENS = ("HANDOFF", "Synthesis-check", "ASCII")
+
+
+def test_entrypoint_tokens_and_schema_before_the_ordered_six_section_template():
+    """The routing, gate and format tokens stay; the schema pointer precedes the
+    template, whose six headings keep their order and carry no internal tags.
+    The entrypoint's prose wording is review-only."""
     text = SKILL_PATH.read_text(encoding="utf-8")
 
-    essence = {
-        "in-session routing": [
-            "in-session re-orientation",
-            "away-summary",
-            "cross-session",
-            "HANDOFF",
-        ],
-        "natural output boundary": [
-            "Keep planning internal",
-            "Never output `<thinking>` or `<recap>` tags",
-            "Never expose `Block N` labels",
-            "natural headings in the conversation language",
-        ],
-        "schema before every recap": [
-            "Read `references/seven-block-schema.md`",
-            "full L3 template",
-            "What to do",
-        ],
-        "verbatim preservation": [
-            "quote-not-paraphrase",
-            "spec-critical user phrases",
-            "file paths",
-            "error messages",
-            "command names",
-            "verbatim",
-        ],
-        "visual thresholds": [
-            "Gap and assessment defaults to 2-col key:value",
-            "2+ options",
-            "items have metadata",
-            "flatten ≥3 sub-items",
-            "compare ≥2 options",
-            "real topology",
-            "known to render Mermaid",
-            "markdown table by default",
-            "cannot render markdown",
-            "Support counts as known only",
-            "ASCII",
-        ],
-        "synthesis stop": [
-            "Synthesis-check",
-            "confirm or redirect",
-            "wait",
-            "does not continue until user responds",
-        ],
-        "five principles": [
-            "structured-schema",
-            "quote-not-paraphrase",
-            "all-user-messages",
-            "synthesis-check",
-            "plain-language",
-        ],
-    }
-    for contract, needles in essence.items():
-        missing = [needle for needle in needles if needle not in text]
-        assert not missing, f"{contract} missing from entrypoint: {missing}"
+    missing = [token for token in STRUCTURAL_TOKENS if token not in text]
+    assert not missing, f"entrypoint no longer names: {missing}"
 
-    schema_read = text.index("Read `references/seven-block-schema.md`")
-    render_contract = text.index("natural headings in the conversation language")
-    assert schema_read < render_contract
-
-    template_start = text.index("### Purpose and current position", render_contract)
+    what_to_do = text.index("## What to do")
+    schema_read = text.index("references/seven-block-schema.md", what_to_do)
+    template_start = text.index("### Purpose and current position", schema_read)
     template_end = text.index("3. Apply", template_start)
     rendered_template = text[template_start:template_end]
     sections = (
@@ -90,18 +40,3 @@ def test_entrypoint_preserves_goal_grounded_sections_and_synthesis_gate():
         assert forbidden not in rendered_template
 
     assert SCHEMA_PATH.is_file()
-
-
-def test_entrypoint_grounds_goal_and_closes_the_alignment_loop():
-    text = SKILL_PATH.read_text(encoding="utf-8")
-
-    required = (
-        "current purpose is mandatory",
-        "ground it in explicit conversation evidence",
-        "broader purpose only when explicitly established",
-        "do not invent short-, medium-, or long-term goals",
-        "purpose is not yet aligned",
-        "purpose, current position, and proposed next step",
-    )
-    missing = [needle for needle in required if needle not in text]
-    assert not missing, f"goal-grounded loop contract missing: {missing}"

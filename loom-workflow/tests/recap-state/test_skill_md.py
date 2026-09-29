@@ -6,7 +6,7 @@ Assertions (a-f) per plan T2 Acceptance.RED:
   c) description disambiguates from built-in /recap via away-summary + in-session markers
   d) body references references/seven-block-schema.md (relative path)
   e) body token count ≤6500 (chars/4 proxy)
-  f) body cites all 5 共通核心原則 by name
+  f) body cites all 5 共通核心原則 by name, as bold labels
 """
 
 import re
@@ -102,8 +102,8 @@ class TestFrontmatterAndRouting:
         )
 
     def test_f_five_principles_named(self):
-        """(f) body cites all 5 共通核心原則 by name."""
-        missing = [p for p in FIVE_PRINCIPLES if p not in self.body]
+        """(f) body cites all 5 共通核心原則 by name, as bold labels."""
+        missing = [p for p in FIVE_PRINCIPLES if f"**{p}**" not in self.body]
         assert not missing, (
             f"SKILL.md body missing 共通核心原則: {missing}"
         )
@@ -139,5 +139,5 @@ def test_frontmatter_and_routing():
     assert approx_tokens <= 6500
 
     # (f)
-    missing = [p for p in FIVE_PRINCIPLES if p not in body]
+    missing = [p for p in FIVE_PRINCIPLES if f"**{p}**" not in body]
     assert not missing, f"Missing principles: {missing}"

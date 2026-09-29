@@ -131,13 +131,6 @@ def test_no_fixed_station_mandatory_invocation() -> None:
         assert name not in lowered, f"skill text must not couple to station {name!r}"
 
 
-def test_activation_states_only_explicit_request_or_agent_judgement() -> None:
-    text = _skill_md_text()
-    lowered = text.lower()
-    assert "explicit" in lowered
-    assert "judgement" in lowered or "judgment" in lowered
-
-
 # ---------------------------------------------------------------------------
 # REQ-21: no host-specific path or private API
 # ---------------------------------------------------------------------------

@@ -12,7 +12,6 @@ SKILL_ROOT = Path(__file__).resolve().parents[2] / "skills" / "recap-state"  # l
 README_EN   = SKILL_ROOT / "README.md"
 README_JA   = SKILL_ROOT / "README.ja.md"
 README_ZHTW = SKILL_ROOT / "README.zh-TW.md"
-SKILL_MD    = SKILL_ROOT / "SKILL.md"
 
 
 # ---------------------------------------------------------------------------
@@ -88,10 +87,6 @@ def _en_readme_has_trigger_phrase(readme_text: str) -> bool:
     return bool(_EN_TRIGGER_RE.search(readme_text))
 
 
-def _skill_description_contains(skill_text: str, phrase: str) -> bool:
-    return phrase.lower() in skill_text.lower()
-
-
 # ---------------------------------------------------------------------------
 # (d) JA / zh-TW trigger phrases — at least 3 language-native triggers
 #     that also appear in SKILL.md description.
@@ -133,7 +128,6 @@ def test_tri_lang_readmes_consistent():
     en_text   = _read(README_EN)
     ja_text   = _read(README_JA)
     zhtw_text = _read(README_ZHTW)
-    skill_text = _read(SKILL_MD)
 
     # -----------------------------------------------------------------------
     # (b) Each README has 4 required section heading concepts
@@ -154,15 +148,6 @@ def test_tri_lang_readmes_consistent():
         "recognisable in SKILL.md description (e.g. 'where were we', 'I'm lost', "
         "'recap', 'bring me back', 'what are we doing')"
     )
-    # Verify at least one of those triggers actually appears in the skill description
-    found_in_skill = any(
-        _skill_description_contains(skill_text, phrase)
-        for phrase in ["where were we", "I'm lost", "recap", "bring me back",
-                       "what are we doing"]
-    )
-    assert found_in_skill, (
-        "SKILL.md description does not contain any of the expected EN trigger phrases"
-    )
 
     # -----------------------------------------------------------------------
     # (d) JA README: >=3 language-native triggers also in SKILL.md
@@ -173,12 +158,6 @@ def test_tri_lang_readmes_consistent():
         f"found {ja_in_readme}: "
         f"{[t for t in JA_TRIGGERS_IN_SKILL if t in ja_text]}"
     )
-    # Verify those triggers also appear in skill description
-    ja_in_skill = sum(1 for t in JA_TRIGGERS_IN_SKILL if t in skill_text)
-    assert ja_in_skill >= 3, (
-        f"SKILL.md description does not contain >=3 JA trigger phrases; "
-        f"found {ja_in_skill}"
-    )
 
     # -----------------------------------------------------------------------
     # (d) zh-TW README: >=3 language-native triggers also in SKILL.md
@@ -188,11 +167,6 @@ def test_tri_lang_readmes_consistent():
         f"zh-TW README must contain >=3 zh-TW trigger phrases that appear in SKILL.md; "
         f"found {zhtw_in_readme}: "
         f"{[t for t in ZHTW_TRIGGERS_IN_SKILL if t in zhtw_text]}"
-    )
-    zhtw_in_skill = sum(1 for t in ZHTW_TRIGGERS_IN_SKILL if t in skill_text)
-    assert zhtw_in_skill >= 3, (
-        f"SKILL.md description does not contain >=3 zh-TW trigger phrases; "
-        f"found {zhtw_in_skill}"
     )
 
 

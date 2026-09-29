@@ -15,8 +15,9 @@ What is deliberately NOT weakened by that collapse:
   1. The pin block is still compared byte-for-byte against the plan's fenced
      vocabulary AND against its own HEAD copy — the two assertions that keep
      a transcribed pin from drifting.
-  2. Every wording assertion that had a subject in the surviving file is
-     kept verbatim, only re-aimed from a loop over two files to the one.
+  2. Structural assertions (paths, tags, verdict tokens, bucket names) are
+     re-aimed from a loop over two files to the one; prose-wording
+     assertions were later pruned.
   3. The tier vocabulary (SHAPING / DEFERRABLE) is still required to be
      present. The supplement sentences' exact wording is no longer pinned
      here; a rewording is a closing-review skill-lens finding, not a test
@@ -103,46 +104,15 @@ def test_triage_names_shaping_and_deferrable_tiers():
     assert "deferrable" in low, "knowledge-triage.md missing DEFERRABLE tier"
 
 
-def test_rationale_bar_higher_than_spec_present():
-    low = _text(DS_TRIAGE).lower()
-    assert "spec" in low and "gate" in low, (
-        "must reference the spec station's gate in the rationale"
-    )
-    assert "higher" in low or "narrower" in low, (
-        "must state the bar is higher/narrower than spec's"
-    )
+# --- 3. SHAPING route: names the design-conformance lens --------------------
 
 
-# --- 3. SHAPING route: routed research BEFORE the design-conformance verdict -
-
-
-def test_shaping_route_cites_the_review_verdict_timing():
+def test_shaping_route_names_the_design_conformance_lens():
     """Was `design-critic`'s verdict; loom 1.0 moved that verdict into
-    loom-code's review station under the design-conformance lens. The
-    assertion is the same one: resolution happens BEFORE the verdict, and the
-    research is ROUTED, never self-run."""
+    loom-code's review station under the design-conformance lens."""
     low = _text(DS_TRIAGE).lower()
     assert "design-conformance" in low, (
         "must name the design-conformance lens that renders the verdict"
-    )
-    assert "before" in low and "verdict" in low, (
-        "must state resolution happens BEFORE the design-conformance verdict"
-    )
-    assert "routed research" in low or "routed" in low, (
-        "must name the research as ROUTED (orchestrator/user), not self-run"
-    )
-
-
-def test_never_websearch_restated():
-    """Cross-ref severing guard (extraction-severing-cross-ref-needs-weak-model-test):
-    the drafting skill's closed-world constraint must be restated in the
-    extracted file, not merely assumed from the SKILL.md body."""
-    low = _text(DS_TRIAGE).lower()
-    assert "never" in low and "websearch" in low, (
-        "must restate that the drafting skill itself never runs WebSearch"
-    )
-    assert "closed-world" in low, (
-        "must restate the closed-world drafting-skill framing"
     )
 
 
@@ -177,10 +147,6 @@ def test_cross_severing_guard_restates_review_verdict_vocabulary():
     text = _text(DS_TRIAGE)
     assert "PASS_WITH_NOTES" in text and "NEEDS_REVISION" in text, (
         "must restate the review station's verdict enum"
-    )
-    low = text.lower()
-    assert "unchanged" in low, (
-        "must state the verdict vocabulary is unchanged by this addition"
     )
 
 

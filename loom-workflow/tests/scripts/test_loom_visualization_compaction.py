@@ -20,9 +20,40 @@ TEMPLATES = (
     "10-timeline",
     "11-quantity",
 )
+POINTERS = (
+    *(f"templates/{name}.md" for name in TEMPLATES),
+    "scripts/detect_client.py",
+    "scripts/generate.py",
+    "scripts/align.py",
+    "references/client-matrix.md",
+    "references/page-mode.md",
+    "references/plain-language.md",
+    "references/fidelity-check.md",
+    "assets/cot-report-template.md",
+)
+STRUCTURAL_TOKENS = (
+    "scripts/detect_client.py --target",
+    "obsidian:obsidian-mermaid-visualizer",
+)
+PAGE_MODE_TOKENS = (
+    "think-orbit:thinking-session",
+    "think-orbit:break-assumption",
+    "File mode",
+    "Conversation mode",
+    "Rejected options",
+    "Assumptions",
+    "Open questions",
+    "Co-premises",
+    "r1 -->|",
+    "<name>.fidelity.md",
+    "reviewed_md_sha256:",
+    "${TMPDIR:-/tmp}/loom-visualization/",
+)
 
 
 def test_entrypoint_has_required_sections_and_routes():
+    """Headings and the files the entrypoint routes to, each of which exists.
+    The entrypoint's wording is review-only."""
     text = SKILL_PATH.read_text(encoding="utf-8")
 
     assert text.startswith("---\nname: loom-visualization\n")
@@ -37,73 +68,27 @@ def test_entrypoint_has_required_sections_and_routes():
     ):
         assert heading in text, heading
 
-    essence = {
-        "obsidian boundary": [
-            "scripts/detect_client.py --target",
-            "obsidian:obsidian-mermaid-visualizer",
-        ],
-        "shape routing": [f"templates/{name}.md" for name in TEMPLATES],
-        "client check": ["scripts/detect_client.py", "references/client-matrix.md"],
-        "ascii generation": ["scripts/generate.py", "scripts/align.py"],
-        "page mode": ["references/page-mode.md"],
-        "plain language": ["references/plain-language.md"],
-    }
-    for contract, needles in essence.items():
-        missing = [needle for needle in needles if needle not in text]
-        assert not missing, f"{contract} missing from entrypoint: {missing}"
+    for pointer in POINTERS:
+        assert pointer in text, pointer
+        assert (SKILL_DIR / pointer).is_file(), pointer
+    missing = [token for token in STRUCTURAL_TOKENS if token not in text]
+    assert not missing, f"entrypoint no longer names: {missing}"
 
 
 def test_entrypoint_within_word_cap():
     assert len(SKILL_PATH.read_text(encoding="utf-8").split()) <= WORD_CAP
 
 
-def test_page_mode_preserves_extraction_render_and_fidelity_gates():
+def test_page_mode_keeps_structural_tokens_and_render_verify_commands():
+    """Skill ids, mode and extraction labels, layout, path and field tokens,
+    and the render and verify commands in order; page mode's prose wording is
+    review-only."""
     text = SKILL_PATH.read_text(encoding="utf-8") + PAGE_MODE_PATH.read_text(
         encoding="utf-8"
     )
-    essence = {
-        "active-reasoning routing": [
-            "think-orbit:thinking-session",
-            "think-orbit:break-assumption",
-        ],
-        "source selection": ["File mode", "Conversation mode", "State which mode"],
-        "extraction net": [
-            "Rejected options",
-            "Assumptions",
-            "Open questions",
-            "Exceptions and withdrawal conditions",
-            "Co-premises",
-            "author's own hedging",
-        ],
-        "early exit": ["Fewer than 5", "stop", "answer their question directly"],
-        "layout invariants": [
-            "graph TB",
-            "direction LR",
-            "r1 -->|",
-            "Rows of at most 3",
-            "Every** edge carries a label",
-        ],
-        "markdown authority": [
-            "markdown is the artifact",
-            "hand-write the HTML",
-            "assets/cot-report-template.md",
-        ],
-        "fidelity gate": [
-            "before anything gets shared",
-            "references/fidelity-check.md",
-            "<name>.fidelity.md",
-            "reviewed_md_sha256:",
-        ],
-        "temporary paths and publishing consent": [
-            "${TMPDIR:-/tmp}/loom-visualization/",
-            "both are temporary",
-            "Ask once",
-            "do not publish unprompted",
-        ],
-    }
-    for contract, needles in essence.items():
-        missing = [needle for needle in needles if needle not in text]
-        assert not missing, f"{contract} missing from page mode: {missing}"
+
+    missing = [token for token in PAGE_MODE_TOKENS if token not in text]
+    assert not missing, f"page mode no longer names: {missing}"
 
     commands = "\n".join(
         [
