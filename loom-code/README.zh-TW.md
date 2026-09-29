@@ -211,6 +211,8 @@ OpenCode 的限制：
 
 - 背景服務剛啟動時，plugin 可能要稍等一下才會出現在 `opencode plugin list`。
 - loom-code 的 subagent 從 plugin 快取讀取 loom 自己的檔案時，可能停在 `external_directory` 權限提示；`opencode run --auto` 也不涵蓋 subagent 的 session。請允許讀取 loom 的 plugin 目錄。
+- 不加 `--auto` 的 `opencode run` 會停在第一個權限提示或模型提問，長時間的 loom 執行請從 TUI 進行。
+- OpenCode 在專案以外執行 shell 指令前不會詢問，模型可能改動整台機器（實測：系統層級的 `pip install --break-system-packages`）；請檢查它的指令，或收緊 OpenCode 的權限設定。
 - `opencode run "/loom-code:expert-mode ..."` 只會把文字當 prompt 送出，不會執行指令；請改在 TUI 輸入指令。
 - OpenCode 桌面 app 與 IDE 整合不在涵蓋範圍。
 - 使用這些 plugin 不需要 Node。

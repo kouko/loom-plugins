@@ -224,6 +224,8 @@ OpenCode での制限：
 
 - バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで少し時間がかかることがある。
 - loom-code の subagent は、plugin キャッシュにある loom のファイルを読むときに `external_directory` の許可プロンプトで止まることがある。`opencode run --auto` も subagent のセッションには効かない。loom の plugin ディレクトリの読み取りを許可する。
+- `--auto` なしの `opencode run` は最初の許可プロンプトかモデルからの質問で止まるため、長い loom の実行は TUI から行う。
+- OpenCode はプロジェクト外のシェルコマンドの前に確認しないため、モデルがマシンを変更することがある（観測例：システム全体への `pip install --break-system-packages`）。コマンドを確認するか、OpenCode の許可設定を厳しくする。
 - OpenCode のデスクトップアプリと IDE 連携は対象外。
 - plugin を使うのに Node は不要。
 

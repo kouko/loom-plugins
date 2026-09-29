@@ -232,6 +232,8 @@ Limits on OpenCode:
 
 - A plugin may take a moment to appear in `opencode plugin list` right after the background service starts.
 - loom-code's subagents can stop on an `external_directory` permission prompt when they read loom's installed files from the plugin cache, even under `opencode run --auto`, which does not cover subagent sessions. Approve reads of the loom plugin directory.
+- `opencode run` without `--auto` stops at the first permission prompt or model question, so drive long loom runs from the TUI.
+- OpenCode does not ask before shell commands outside the project, so a model can change the machine (observed: a system-wide `pip install --break-system-packages`); review its commands or tighten OpenCode's permission settings.
 - `opencode run "/loom-code:expert-mode ..."` sends the text as a prompt without running the command; type the command in the TUI instead.
 - The OpenCode desktop app and IDE integrations are not covered.
 - Node is not needed to use the plugins.
