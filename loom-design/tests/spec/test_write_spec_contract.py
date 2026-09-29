@@ -81,18 +81,6 @@ def _section(text: str, heading: str) -> str:
 
 
 @lru_cache(maxsize=1)
-def _checker_usage() -> str:
-    """The checker's own usage block — its list of sub-commands."""
-    proc = subprocess.run(
-        [sys.executable, str(CHECKER), "--help"],
-        capture_output=True,
-        text=True,
-        cwd=REPO,
-    )
-    return proc.stdout + proc.stderr
-
-
-@lru_cache(maxsize=1)
 def _checker_rule_ids() -> frozenset[str]:
     proc = subprocess.run(
         [sys.executable, str(CHECKER), "--list-rules"],
@@ -205,18 +193,10 @@ def test_no_deleted_vocabulary() -> None:
 def test_referenced_relative_paths_exist() -> None:
     """Every bundled path the station cites is skill-dir-relative."""
     skill_dir = SKILL.parent
-    cited = set(re.findall(r"`((?:references|assets|scripts)/[^`]+)`", _text()))
+    cited = set(re.findall(r"`((?:references|assets|scripts|templates)/[^`]+)`", _text()))
     assert cited, "the station cites no bundled file"
     missing = [p for p in cited if not (skill_dir / p).exists()]
     assert not missing, missing
-
-
-def test_checker_subcommands_named_exist() -> None:
-    usage = _checker_usage()
-    named = set(re.findall(r"loom_checker\.py (\w[\w-]*)", _text()))
-    assert {"intake", "contract"} <= named, named
-    for sub in named:
-        assert re.search(rf"loom_checker\.py {re.escape(sub)}\b", usage), sub
 
 
 def test_checker_rules_named_exist() -> None:

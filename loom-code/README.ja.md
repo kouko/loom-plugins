@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.22.4 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.23.0 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -109,9 +109,9 @@ engineering の変更なら ①、product の変更なら ② に、結果の形
 artifact — intent・spec・plan・attestation・acceptance test report・`KICKOFF-DEFAULTS.md` —
 の charter とフィールド、さらに standing document を宣言します。空のひな型は
 `contract/templates/` にあります。書き込むのは loom-code のみ。`loom-design` は
-これを読み `requires-contract` を宣言します。`loom-workflow` はそうではなく
-——配信（delivery）の前に `decision-map` skill だけが `contract --require` を
-実行します。
+自分が埋めるひな型をバイト単位で同一のコピーとして持ち（リポジトリのテストが
+一致を保ちます）、`requires-contract` を宣言します。どちらの sibling も実行時に
+このパッケージを読みません。
 
 ## checker
 
@@ -138,8 +138,8 @@ checker が「問題なし」と言うことはありません。ステーショ
   `loom-workflow:git-memory` は、`ship` が PR 本文の memory を分類するのに
   使います。
 
-接続点は `loom-design:write-spec` のような plugin 名付き skill 名、contract
-package、そしてプロジェクト自身の `docs/loom/` 成果物だけで、他 plugin の
+接続点は `loom-design:write-spec` のような plugin 名付き skill 名と、
+プロジェクト自身の `docs/loom/` 成果物だけで、他 plugin の
 `hooks/`・`skills/`・`scripts/` を直接読むことはありません。
 
 ## インストール

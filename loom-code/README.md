@@ -8,7 +8,7 @@
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.22.4 · **Skills**: 5 stations + 1 router + 1 user-invoked · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.23.0 · **Skills**: 5 stations + 1 router + 1 user-invoked · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -108,9 +108,9 @@ its consequence — never as an extra stop.
 charter and fields of every artifact — intent, spec, plan, attestation,
 acceptance test report and `KICKOFF-DEFAULTS.md` — plus the standing documents.
 `contract/templates/` holds the blank of each. Only loom-code writes it.
-`loom-design` reads it and declares `requires-contract`; `loom-workflow` does
-not — only its `decision-map` skill runs `contract --require` before a
-delivery.
+`loom-design` keeps byte-identical copies of the templates it fills (a
+repository test keeps them equal) and declares `requires-contract`; neither
+sibling reads this package at runtime.
 
 ## The checker
 
@@ -139,7 +139,7 @@ and continues where its own contract allows.
   body.
 
 They compose only through plugin-qualified skill names such as
-`loom-design:write-spec`, the contract package, and the project's own
+`loom-design:write-spec` and the project's own
 `docs/loom/` artifacts — never through another plugin's private `hooks/`,
 `skills/` or `scripts/` paths.
 

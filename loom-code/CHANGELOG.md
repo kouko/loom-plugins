@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.23.0] — 2026-09-29 — write-plan intent check on a confirmed intent; wider repository boundary check.
+
+- `write-plan` runs `loom_checker.py intent` on an intent that arrives already confirmed (after branching off the trunk).
+- The KICKOFF-DEFAULTS template names no loom-code path.
+- The repository boundary check now scans Python scripts and hooks, the `<loom-*>` placeholder, `loom_checker`, and contract/agents paths, and runs for loom-workflow in CI.
+
 ## [3.22.4] — 2026-09-29 — Closing-review lenses compare polarity sentences with their base version.
 
 Patch: closing-review docs and skill lenses now compare a rewritten or deleted polarity sentence (never, must not, only, always, 不得) with its base version; a reversed or dropped direction is an inconsistency finding.

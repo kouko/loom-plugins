@@ -17,7 +17,7 @@ suggesting a tool that turns out not to run costs the user a question for
 nothing. Never suggest the host itself.
 
 When `docs/loom/KICKOFF-DEFAULTS.md` has no `second-vendor:` line, create
-the file from `KICKOFF-DEFAULTS.md` in loom-code's contract templates if
+the file from capture-intent's `templates/KICKOFF-DEFAULTS.md` if
 needed and record `second-vendor: suggest`. `suggest` adds no question at
 capture-intent. Pass the observed mode forward; write-plan owns the
 post-plan availability or recommendation notice and its response timing.

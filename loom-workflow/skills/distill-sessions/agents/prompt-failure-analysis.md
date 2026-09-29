@@ -49,9 +49,12 @@ You will receive (as JSON in the dispatched Agent prompt):
 - `session_events`: a `list[Event]` (see `scripts/event.py`). One
   normalized record per turn / tool call / interrupt in the high-
   friction session that invoked the target skill.
-- `target_skill_path`: absolute path to the target skill's `SKILL.md`.
-- `target_skill_md_content`: the verbatim body of that `SKILL.md` —
-  the text whose iteration this analysis informs.
+- `target_skill`: the target skill's name. Its instructions — the text
+  whose iteration this analysis informs, which this prompt calls
+  `target_skill_md_content` — come through the host's skill mechanism by
+  that name, never by a file path. If the host cannot provide them,
+  analyze from the session events alone and say so.
+- `target_skill_path` and `target_skill_md_content`: always empty.
 
 The friction-signal classification (high vs. mid vs. low) already
 happened upstream in Stage 2 — you analyze a session that was

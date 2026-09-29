@@ -1,17 +1,15 @@
 """Installation-layout proof for the independently packaged loom plugins.
 
 Each plugin must be usable installed alone, under an arbitrary cache path,
-composing with its siblings only through host-resolved skill names, the
-loom-code contract package and the consumer project's own `docs/loom/`
-artifacts — never through a sibling plugin's private files.
+composing with its siblings only through host-resolved skill names and
+the consumer project's own `docs/loom/` artifacts — never through a sibling plugin's private files.
 
 Loom 1.0 changed what there is to prove on the loom-design side. Its skills
 used to declare `argv:` contracts running validators and verdict-minters out
 of `${CLAUDE_PLUGIN_ROOT}/scripts/`, and most of this file drove each of
 those commands from an isolated install. Those skills and scripts are gone:
-loom-design 1.0 declares no in-plugin station command at all, and its four
-SKILL.md files link one reference that says in prose that no
-`${CLAUDE_PLUGIN_ROOT}` path reaches loom-code. So the command-matrix tests are replaced by one that pins that
+loom-design 1.0 declares no in-plugin station command at all, and its
+skills name no loom-code path. So the command-matrix tests are replaced by one that pins that
 state — an empty command surface, asserted rather than assumed — plus the
 one executable the plugin still ships, exercised from the isolated install.
 """
@@ -562,13 +560,14 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
 
     Until 1.0 every design skill ran validators and verdict-minters out of
     `${CLAUDE_PLUGIN_ROOT}/scripts/`, and this file drove each one from an
-    isolated install to prove those paths resolved there. The 1.0 stations
-    call loom-code's checker instead, which they cannot reach by path — so
-    the property to pin flipped: no skill may declare an in-plugin `argv:`
-    command, and none may name a sibling plugin's private directory or its
-    own plugin by repo path (which does not exist in an install). If a
-    station command comes back, this fails, and the driving coverage it
-    replaced has to come back with it.
+    isolated install to prove those paths resolved there. The stations now
+    run no checker at all — loom-code's write-plan runs the checks on what
+    they write — so the property to pin is absence: no skill may declare an
+    in-plugin `argv:` command, and none may name a sibling plugin's private
+    directory or `<loom-code>` placeholder, or its own plugin by repo path
+    (which does not exist in an install). If a station command comes back,
+    this fails, and the driving coverage it replaced has to come back with
+    it.
     """
     design_root = _install_plugin(
         "loom-design", tmp_path / "arbitrarily named design install's root"
@@ -592,6 +591,8 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
                 "loom-code/skills",
                 "loom-code/scripts",
                 "loom-code/hooks",
+                "loom-code/contract",
+                "<loom-code>",
             ):
                 assert sibling not in text, (
                     f"{rel} names the sibling plugin's private path {sibling!r}"
@@ -600,87 +601,6 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
                 f"{rel} names its own plugin by repo path, which does not "
                 "exist in an install"
             )
-
-
-def test_lookup_table_lives_in_one_place_and_every_skill_links_it() -> None:
-    """Every one of the five design skills with a Step 0 contract-version
-    check links the shared `locate-loom-code.md` lookup table instead of
-    carrying its own copy. Exactly one file in `loom-design/skills` holds
-    that lookup table, and its table has exactly one merged Codex/Antigravity
-    row."""
-    design_skills = REPO_ROOT / "loom-design" / "skills"
-    linking = 0
-    for skill_md in sorted(design_skills.glob("*/SKILL.md")):
-        text = skill_md.read_text(encoding="utf-8")
-        if "## Step 0 — Check the contract version" not in text:
-            continue
-        linking += 1
-        assert "locate-loom-code.md`" in text, skill_md
-        assert "| Where `loom-code` lives |" not in text, skill_md
-    assert linking == 5
-    lookups = 0
-    for skill_md in sorted(
-        [*design_skills.glob("*/SKILL.md"), *design_skills.glob("*/references/*.md")]
-    ):
-        text = skill_md.read_text(encoding="utf-8")
-        if "| Where `loom-code` lives |" not in text:
-            continue
-        lookups += 1
-        rows = [line for line in text.splitlines() if line.startswith("| ")]
-        other = [
-            row
-            for row in rows
-            if "Codex CLI" in row and "Antigravity CLI" in row
-        ]
-        assert len(other) == 1, f"{skill_md} lacks one Codex/Antigravity row"
-    assert lookups == 1
-
-
-def _resolve_loom_code_by_row(skill_md: Path) -> Path:
-    """A hardcoded model of the other-host row (it never parses the row's
-    wording): two levels above SKILL.md; step up once
-    when that directory's parent is named `loom-design`; `loom-code` sits next
-    to it and may hold version subdirectories — take the newest."""
-    root = skill_md.parents[2]
-    if root.parent.name == "loom-design":
-        root = root.parent
-    code = root.parent / "loom-code"
-    versions = [p for p in code.iterdir() if p.is_dir() and re.fullmatch(r"\d+(\.\d+)*", p.name)]
-    if not versions:
-        return code
-    return max(versions, key=lambda p: tuple(int(x) for x in p.name.split(".")))
-
-
-def test_sibling_lookup_resolves_flat_and_versioned_installs(tmp_path: Path) -> None:
-    flat = tmp_path / "plugins"
-    versioned = tmp_path / "cache" / "loom"
-    layouts = {
-        flat / "loom-design" / "skills" / "capture-intent" / "SKILL.md": flat / "loom-code",
-        versioned / "loom-design" / "2.1.5" / "skills" / "capture-intent" / "SKILL.md":
-            versioned / "loom-code" / "3.1.4",
-    }
-    for version in ("3.0.0", "3.1.4"):
-        checker = versioned / "loom-code" / version / "scripts" / "loom_checker.py"
-        checker.parent.mkdir(parents=True)
-        checker.write_text("")
-    (flat / "loom-code" / "scripts").mkdir(parents=True)
-    (flat / "loom-code" / "scripts" / "loom_checker.py").write_text("")
-    for skill_md, expected in layouts.items():
-        skill_md.parent.mkdir(parents=True)
-        skill_md.write_text("")
-        resolved = _resolve_loom_code_by_row(skill_md)
-        assert resolved == expected, skill_md
-        assert (resolved / "scripts" / "loom_checker.py").is_file()
-
-    rows = 0
-    design_skills = REPO_ROOT / "loom-design" / "skills"
-    for skill_md in sorted(
-        [*design_skills.glob("*/SKILL.md"), *design_skills.glob("*/references/*.md")]
-    ):
-        for line in skill_md.read_text(encoding="utf-8").splitlines():
-            if line.startswith("| Codex CLI, Antigravity CLI |"):
-                rows += 1
-    assert rows == 1
 
 
 def test_isolated_loom_workflow_bundle_contains_required_skills_and_executes(

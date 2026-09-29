@@ -125,6 +125,7 @@ jobs:
         run: |
           python3 scripts/check_plugin_boundaries.py loom-code
           python3 scripts/check_plugin_boundaries.py loom-design
+          python3 scripts/check_plugin_boundaries.py loom-workflow
 
       - name: Codex manifest drift gate (all plugins)
         # Each CODEX_ELIGIBLE plugin's .codex-plugin/plugin.json is generated

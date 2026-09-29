@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.5.5] — 2026-09-29 — no runtime reads of loom-code files.
+
+- `decision-map` drops its loom-code contract gate and intent check (write-plan runs it).
+- `distill-sessions` no longer resolves loom-code skill files by repo path; the agent fills the target SKILL.md from the loaded skill.
+
 ## [5.5.4] — 2026-09-29 — version sync only
 
 Patch: no content change. Bumped alongside `loom-code` (closing-review polarity check) and `loom-design`.

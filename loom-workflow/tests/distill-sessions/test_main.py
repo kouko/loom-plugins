@@ -175,6 +175,10 @@ def test_main_emits_payload_json_to_stdout(tmp_path: Path) -> None:
         assert "target_skill_path" in inp
         assert "target_skill_md_content" in inp
         assert isinstance(inp["session_events"], list)
+        # No file resolution: the dispatching agent fills path and content
+        # from the target skill's own loaded base directory.
+        assert inp["target_skill"] == "loom-code:brainstorming"
+        assert inp["target_skill_path"] == inp["target_skill_md_content"] == ""
 
 
 # ---------------------------------------------------------------------------
@@ -891,8 +895,6 @@ def test_cross_skill_routing_attributes_session_to_highest_friction_skill() -> N
         skill_name=brainstorm_skill,
         selected_sessions=[shared_session],
         events_by_session=events_by_session,
-        target_skill_path=None,
-        target_skill_md_content="",
         session_friction=session_friction,
         session_to_skill=session_to_skill,
     )
@@ -900,8 +902,6 @@ def test_cross_skill_routing_attributes_session_to_highest_friction_skill() -> N
         skill_name=writing_plans_skill,
         selected_sessions=[shared_session],
         events_by_session=events_by_session,
-        target_skill_path=None,
-        target_skill_md_content="",
         session_friction=session_friction,
         session_to_skill=session_to_skill,
     )

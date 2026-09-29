@@ -149,4 +149,6 @@ def test_referenced_paths_exist():
 
 def test_interview_template_path_is_referenced():
     text = _text()
-    assert "contract/templates/PRINCIPLES-interview.md" in text
+    ref = "../capture-intent/templates/PRINCIPLES-interview.md"
+    assert ref in text
+    assert (SKILL.parent / ref).is_file()

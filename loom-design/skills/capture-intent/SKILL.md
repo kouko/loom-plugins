@@ -19,8 +19,8 @@ confirmed intent onward. Do not design, plan, or ask the user to judge quality.
 `kind: engineering` covers internal work, tooling, tests, and docs.
 `<change-id>` is `<start-date YYYY-MM-DD>-<title-in-kebab-case>`.
 
-`loom-code` owns the file formats and checker; its stations consume this
-output, so preserve the required shapes.
+`loom-code`'s stations consume this output and check its format, so
+preserve the required shapes.
 
 ## Station summary
 
@@ -55,18 +55,6 @@ request can add a stop.
 Nothing about task splitting, review mechanics, or verification is put to the
 user. With `loom-code` alone, `write-plan` performs this station's questions;
 Codex may also need one first-use repository authorisation stop.
-
-## Step 0 — Check the contract version
-
-Locate the `loom-code` directory as `references/locate-loom-code.md` says,
-then run, with that directory in place of `<loom-code>`:
-
-```
-python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
-```
-
-Exit 0 continues. On any other result, or when the checkout cannot be found,
-follow that reference's failure rule and **stop**.
 
 ## Step 1 — Interview
 
@@ -122,8 +110,7 @@ Write the intent and decision-point dialogue in the user's language; plans,
 specs, reviews, evidence, tests, and commits are English; acceptance test reports
 and PR bodies use the user's language.
 
-Write `docs/loom/intent/<change-id>.md` from the `intent.md` template in
-`loom-code`'s `contract/templates/` directory. Fill in:
+Write `docs/loom/intent/<change-id>.md` from `templates/intent.md`. Fill in:
 
 - `originator: <the user's name>` — or `map:<id>` when a decision map
   raised it.
@@ -155,7 +142,7 @@ The confirmation gate below performs the altitude pass after this list has
 been filled.
 
 <!-- gate: capture-intent.product-problem-plain-words -->
-<!-- The `gate:` markers in this file are prose gates: rules this station must follow, registered in the mechanism population and checked by cold-read evals — not checker rule ids. The checker rules are the `intent.*` / `standing.*` / `contract.*` ids named in the commands. -->
+<!-- The `gate:` markers in this file are prose gates: rules this station must follow, registered in the mechanism population and checked by cold-read evals — not checker rule ids. The checker rules are the `intent.*` / `standing.*` / `contract.*` ids named in this file. -->
 **A product Problem section is written in plain words only.** No file
 paths, no function or class identifiers, no script filenames — the section
 is what the user reads to recognise their own problem, and the checker
@@ -165,19 +152,11 @@ Engineering intents may name paths freely.
 
 ## Step 3 — Standing documents
 
-```
-python3 <loom-code>/scripts/loom_checker.py standing docs/loom/intent/<change-id>.md
-```
-
-Print its WARN lines to the user **verbatim** — do not summarise them, do
-not add to them, do not act on them. They never block.
-
-One outcome does block, `standing.product-principles-reject`: `kind:
-product` in a repo with no ratified `PRINCIPLES.md`. Ratified means the
-file carries a `ratified-by: <name> <date>` line and a `## Non-negotiables`
-section with at least three items. When that happens, run the interview in
-`loom-code`'s `contract/templates/PRINCIPLES-interview.md` **now, in this
-same conversation** — not as a separate stop and not as a question about
+For `kind: product` only, read `PRINCIPLES.md` at the repo root. It is
+ratified when it carries a `ratified-by: <name> <date>` line and a
+`## Non-negotiables` section with at least three items. When it is missing
+or not ratified, run the interview in `templates/PRINCIPLES-interview.md`
+**now, in this same conversation** — not as a separate stop and not as a question about
 whether to do it. Open with the template's opening line, translated into
 the user's language — the template's current English sentence is:
 
@@ -321,9 +300,8 @@ the intent and restate again; there is no limit on rounds here.
 2. Commit with the message `docs(loom): intent <change-id> confirmed`. Its
    body **must contain the `needs-design:` line verbatim** — the checker
    compares the two strings character for character.
-3. Verify:
-   `python3 <loom-code>/scripts/loom_checker.py intent docs/loom/intent/<change-id>.md`
-   Fix what it names and re-run until it exits 0.
+
+`loom-code:write-plan` runs the intent check on this file before planning.
 <!-- /gate -->
 
 ## Step 5 — Hand off
@@ -353,8 +331,3 @@ will **not** run decision point ① again, because `status:` is already
 written: at `write-spec`, or at `write-plan` when `needs-design: no` and
 carried details force a spec. Engineering changes go from here to a plan with
 no further stop until acceptance.
-
-## On Codex CLI
-
-Every step above is the same. Resolve `<loom-code>` to the installed plugin
-directory; never create or invoke a repository-local checker copy.
