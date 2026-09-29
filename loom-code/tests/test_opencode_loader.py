@@ -2,13 +2,16 @@
 skills and agents on a stub plugin context.
 
 The stub records what `setup(ctx)` hands to `ctx.skill.transform`,
-`ctx.agent.transform` and `ctx.command.transform`. Node is required: a missing
-node fails, it does not skip.
+`ctx.agent.transform` and `ctx.command.transform`, and keeps the functions
+handed to `ctx.tool.hook` / `ctx.session.hook` so a test can fire one with an
+OpenCode event (a session id starting with `child` has a parent session).
+Node is required: a missing node fails, it does not skip.
 """
 from __future__ import annotations
 
 import functools
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -19,28 +22,49 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 HARNESS = r"""
 import { pathToFileURL } from "node:url";
 const seen = { skills: [], agents: [], commands: [] };
+const hooks = {};
 const ctx = {
   skill: { transform: async (fn) => fn({ add: (s) => seen.skills.push(s) }) },
   agent: { transform: async (fn) => fn({ update: (id, f) => { const info = {}; f(info); seen.agents.push({ id, ...info }); } }) },
   command: { transform: async (fn) => fn({ add: (c) => seen.commands.push({ name: c.name, execute: typeof c.execute }) }) },
-  session: { prompt: async () => {} },
+  session: {
+    prompt: async () => {},
+    hook: async (name, fn) => { hooks[name] = fn; },
+    get: async ({ sessionID }) => ({ data: { id: sessionID, parentID: sessionID.startsWith("child") ? "root" : undefined } }),
+  },
+  tool: { hook: async (name, fn) => { hooks[name] = fn; } },
 };
 const mod = (await import(pathToFileURL(process.argv[1]).href)).default;
 await mod.setup(ctx);
-console.log(JSON.stringify({ id: mod.id, ...seen }));
+if (process.argv[2]) {
+  const fire = JSON.parse(process.argv[2]);
+  let threw = null;
+  try { await hooks[fire.hook](fire.event); } catch (e) { threw = e.message; }
+  console.log(JSON.stringify({ threw, event: fire.event }));
+} else {
+  console.log(JSON.stringify({ id: mod.id, ...seen }));
+}
 """
+
+
+def _node(plugin: str, *args: str, cwd=None, env=None) -> dict:
+    node = shutil.which("node")
+    assert node, "node is required to exercise the OpenCode loader"
+    proc = subprocess.run(
+        [node, "--input-type=module", "-e", HARNESS, str(REPO_ROOT / plugin / "index.js"), *args],
+        capture_output=True, text=True, timeout=60, cwd=cwd, env=env,
+    )
+    assert proc.returncode == 0, proc.stderr
+    return json.loads(proc.stdout)
 
 
 @functools.lru_cache(maxsize=None)
 def _register(plugin: str) -> dict:
-    node = shutil.which("node")
-    assert node, "node is required to exercise the OpenCode loader"
-    proc = subprocess.run(
-        [node, "--input-type=module", "-e", HARNESS, str(REPO_ROOT / plugin / "index.js")],
-        capture_output=True, text=True, timeout=60,
-    )
-    assert proc.returncode == 0, proc.stderr
-    return json.loads(proc.stdout)
+    return _node(plugin)
+
+
+def _fire(plugin: str, hook: str, event: dict, cwd: Path, env=None) -> dict:
+    return _node(plugin, json.dumps({"hook": hook, "event": event}), cwd=cwd, env=env)
 
 
 def _skill_dirs(plugin: str) -> dict:
@@ -82,3 +106,39 @@ def test_plugin_without_agents_registers_none():
     for plugin in ("loom-design", "loom-workflow"):
         seen = _register(plugin)
         assert seen["agents"] == [] and seen["commands"] == []
+
+
+def test_shell_push_routed_to_push_hook(tmp_path: Path):
+    event = {"tool": "shell", "sessionID": "root", "id": "c1", "input": {"command": "ls .git/loom"}}
+    threw = _fire("loom-code", "execute.before", event, tmp_path)["threw"]
+    # the checker's own refusal, not the loader's unreachable-handler fallback
+    assert threw and threw.startswith("BLOCK selection.guard") and "checker failed" not in threw
+
+
+def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
+    bin_dir, log = tmp_path / "bin", tmp_path / "python3.log"
+    bin_dir.mkdir()
+    fake = bin_dir / "python3"
+    fake.write_text(f'#!/bin/bash\necho "$*" >> "{log}"\ncat >/dev/null\n', encoding="utf-8")
+    fake.chmod(0o755)
+    env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}", "TMPDIR": str(tmp_path)}
+    for session in ("child-1", "root"):
+        event = {"sessionID": session, "messageID": "m1",
+                 "prompt": {"text": "/loom-code:expert-mode K7Q2"}}
+        _fire("loom-code", "prompt", event, tmp_path, env)
+        if session.startswith("child"):
+            assert not log.exists()
+            assert not (tmp_path / "loom-opencode" / f"{session}.jsonl").exists()
+    assert "selection capture --hook" in log.read_text(encoding="utf-8")  # the root control
+
+
+def test_nested_skill_folder_write_noted(tmp_path: Path):
+    nested = tmp_path / "skills" / "demo" / "assets" / "sub" / "x.md"
+    nested.parent.mkdir(parents=True)
+    (tmp_path / "skills" / "demo" / "SKILL.md").write_text("---\nname: demo\n---\n", encoding="utf-8")
+    nested.write_text("x", encoding="utf-8")
+    event = {"tool": "write", "sessionID": "root", "id": "c2", "status": "completed",
+             "input": {"filePath": str(nested), "content": "x"},
+             "result": {"content": [{"type": "text", "text": "Wrote file"}]}}
+    content = _fire("loom-workflow", "execute.after", event, tmp_path)["event"]["result"]["content"]
+    assert any("Skill folder structure violation" in part["text"] for part in content)

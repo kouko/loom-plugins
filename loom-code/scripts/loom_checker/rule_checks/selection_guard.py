@@ -28,7 +28,7 @@ ALWAYS_DENIED = [
 
 CHECKER_PROGRAM = re.compile(r"loom_checker(?:\.py)?")
 
-HOST_PROGRAMS = {"claude", "codex"}
+HOST_PROGRAMS = {"claude", "codex", "opencode"}
 
 ENTRY_POINT = re.compile(r"(?<![\w-])[/$](?:loom-code:)?expert-mode(?![\w-])")
 
