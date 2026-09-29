@@ -210,6 +210,28 @@ Antigravity のデスクトップアプリや IDE では走りません。`agy` 
 agy の `self` subagent として Gemini モデルで動きます。review station は
 どの host でも `closing-review` で、旧名 `review` は別名なしで削除されました。
 
+### OpenCode
+
+OpenCode v2（CLI と TUI、2.0.18 で確認）は GitHub から plugin をインストールする。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
+opencode plugin list
+```
+
+TUI の plugin ダイアログで Install plugin を選び、同じ spec を入力してもよい。更新するには `plugin add` をもう一度実行する。
+
+skill は `loom-code:<skill>` として提供される。loom の役割は OpenCode の subagent `loom-code:<role>` として `subagent` ツール経由でセッションのモデルで動く。expert-mode はコマンド `/loom-code:expert-mode`。
+
+OpenCode では、セッションコンテキスト、公開リマインダー、言語リマインダー、選択記録ガードが plugin の v2 hook で動く。
+
+OpenCode での制限：
+
+- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで少し時間がかかることがある。
+- `opencode run "/loom-code:expert-mode ..."` はテキストを prompt として送るだけでコマンドは実行されない。コマンドは TUI で入力する。
+- OpenCode のデスクトップアプリと IDE 連携は対象外。
+- plugin を使うのに Node は不要。
+
 ## ライセンス
 
 MIT。loom-code は `monkey-skills` で開発され、現在は

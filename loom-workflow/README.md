@@ -213,6 +213,27 @@ Its hooks run only in the `agy` CLI, not in the Antigravity desktop app or IDE.
 On agy, the visualization card for loom-visualization is delivered as a plugin rule, so it
 is always on.
 
+### OpenCode
+
+OpenCode v2 (CLI and TUI, verified on 2.0.18) installs plugins from GitHub. Install `loom-code` first: `opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`. 
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
+opencode plugin list
+```
+
+Or open the plugin dialog in the TUI, choose Install plugin and enter the same spec. To update, run the `plugin add` command again.
+
+Skills are offered as `loom-workflow:<skill>`.
+
+On OpenCode, the skill-folder rule run through the plugin's v2 hooks.
+
+Limits on OpenCode:
+
+- A plugin may take a moment to appear in `opencode plugin list` right after the background service starts.
+- The OpenCode desktop app and IDE integrations are not covered.
+- Node is not needed to use the plugins.
+
 ### Where the per-turn reminder does not arrive
 
 On Claude Code and Codex, `loom-workflow` sends the visualization card for

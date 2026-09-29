@@ -9,7 +9,7 @@ You are asked only three times: to confirm what the change is, to confirm
 visible product behaviour when there is any, and to accept the result, through the acceptance test report when one is required.
 
 Loom ships as three independently installable plugins for Claude Code,
-Codex and Antigravity CLI:
+Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
@@ -239,6 +239,30 @@ Limits on Antigravity:
   was removed and has no alias.
 - `expert-mode` selections do not take effect: agy captures no prompt, so the
   full process applies.
+
+### OpenCode
+
+OpenCode v2 (CLI and TUI, verified on 2.0.18) installs plugins from GitHub. 
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
+opencode plugin list
+```
+
+Or open the plugin dialog in the TUI, choose Install plugin and enter the same spec. To update, run the `plugin add` command again.
+
+Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model; expert-mode is the command `/loom-code:expert-mode`.
+
+On OpenCode, the session context, the publication reminder, the language reminder and the selection-record guard (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
+
+Limits on OpenCode:
+
+- A plugin may take a moment to appear in `opencode plugin list` right after the background service starts.
+- `opencode run "/loom-code:expert-mode ..."` sends the text as a prompt without running the command; type the command in the TUI instead.
+- The OpenCode desktop app and IDE integrations are not covered.
+- Node is not needed to use the plugins.
 
 ## Development
 

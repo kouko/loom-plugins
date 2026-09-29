@@ -149,6 +149,25 @@ agy plugin install ./loom-design
 loom-design 自体は hook を持たない。loom-code の hook が走るのは `agy` CLI だけで、
 Antigravity のデスクトップアプリや IDE では走らない。
 
+### OpenCode
+
+OpenCode v2（CLI と TUI、2.0.18 で確認）は GitHub から plugin をインストールする。`loom-code` を先にインストールする：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
+opencode plugin list
+```
+
+TUI の plugin ダイアログで Install plugin を選び、同じ spec を入力してもよい。更新するには `plugin add` をもう一度実行する。
+
+skill は `loom-design:<skill>` として提供される。
+
+OpenCode での制限：
+
+- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで少し時間がかかることがある。
+- OpenCode のデスクトップアプリと IDE 連携は対象外。
+- plugin を使うのに Node は不要。
+
 ## テスト
 
 ```sh

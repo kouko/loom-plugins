@@ -190,6 +190,28 @@ context 與語言提醒）只在 `agy` CLI 執行，Antigravity 桌面 app 與 I
 `self` subagent 執行，遵循 loom 的 agent 契約，使用 Gemini 模型。審查站在所有
 host 上都叫 `closing-review`，舊名 `review` 已移除，沒有別名。
 
+### OpenCode
+
+OpenCode v2（CLI 與 TUI，已在 2.0.18 驗證）從 GitHub 安裝 plugin。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
+opencode plugin list
+```
+
+也可以在 TUI 開啟 plugin 對話框，選 Install plugin 並輸入同一個 spec。更新時再執行一次 `plugin add`。
+
+skill 以 `loom-code:<skill>` 提供。loom 的角色以 OpenCode subagent `loom-code:<role>` 透過 `subagent` 工具執行，使用 session 的模型；expert-mode 是指令 `/loom-code:expert-mode`。
+
+在 OpenCode 上，session context、發布提醒、語言提醒與選擇紀錄防護透過 plugin 的 v2 hook 執行。
+
+OpenCode 的限制：
+
+- 背景服務剛啟動時，plugin 可能要稍等一下才會出現在 `opencode plugin list`。
+- `opencode run "/loom-code:expert-mode ..."` 只會把文字當 prompt 送出，不會執行指令；請改在 TUI 輸入指令。
+- OpenCode 桌面 app 與 IDE 整合不在涵蓋範圍。
+- 使用這些 plugin 不需要 Node。
+
 ## 授權
 
 MIT。loom-code 原本在 `monkey-skills` 開發，現在位於

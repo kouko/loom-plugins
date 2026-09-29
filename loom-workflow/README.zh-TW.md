@@ -196,6 +196,27 @@ agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模�
 hook 只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。
 在 agy 上，loom-visualization 的 visualization card 以 plugin rule 送達，因此永遠生效。
 
+### OpenCode
+
+OpenCode v2（CLI 與 TUI，已在 2.0.18 驗證）從 GitHub 安裝 plugin。先安裝 `loom-code`：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
+opencode plugin list
+```
+
+也可以在 TUI 開啟 plugin 對話框，選 Install plugin 並輸入同一個 spec。更新時再執行一次 `plugin add`。
+
+skill 以 `loom-workflow:<skill>` 提供。
+
+在 OpenCode 上，skill 資料夾規則透過 plugin 的 v2 hook 執行。
+
+OpenCode 的限制：
+
+- 背景服務剛啟動時，plugin 可能要稍等一下才會出現在 `opencode plugin list`。
+- OpenCode 桌面 app 與 IDE 整合不在涵蓋範圍。
+- 使用這些 plugin 不需要 Node。
+
 ### 每輪提醒送不到的地方
 
 在 Claude Code 與 Codex 上，`loom-workflow` 透過 UserPromptSubmit hook，在你每次送出訊息時

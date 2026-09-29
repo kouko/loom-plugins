@@ -163,3 +163,29 @@ def test_principles_non_negotiables_count_unchanged() -> None:
     text = _read("PRINCIPLES.md")
     body = re.search(r"^## Non-negotiables \(ordered\)\n(.*?)^## ", text, re.S | re.M).group(1)
     assert len(re.findall(r"^\d+\. ", body, re.M)) == 5
+
+
+def _opencode_section(text: str) -> str:
+    match = re.search(r"^### OpenCode\n(.*?)(?=^#{1,3} )", text, re.S | re.M)
+    assert match, "no '### OpenCode' section"
+    return match.group(1)
+
+
+def test_every_readme_has_opencode_install_section() -> None:
+    spec = "opencode plugin add 'github:kouko/loom-plugins#main::path:{}'"
+    for rel in AGY_READMES:
+        body = _opencode_section(_read(rel))
+        names = PLUGINS if rel == "README.md" else (rel.split("/")[0],)
+        for plugin in names:
+            assert spec.format(plugin) in body, (rel, plugin)
+        assert "opencode plugin list" in body, rel
+
+
+def test_principles_name_opencode() -> None:
+    text = _read("PRINCIPLES.md")
+    who = re.search(r"^## Who\n(.*?)^## ", text, re.S | re.M).group(1)
+    assert "OpenCode v2" in who
+    hooks = next(l for l in text.splitlines() if l.startswith("- Host-installed plugin hooks"))
+    assert "OpenCode v2" in hooks
+    ratified = next(l for l in text.splitlines() if l.startswith("ratified-by:"))
+    assert "OpenCode v2 added) by kouko 2026-09-29" in ratified

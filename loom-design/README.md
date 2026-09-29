@@ -150,6 +150,25 @@ agent may act outside the project; pass it in interactive mode too.
 loom-design ships no hooks; loom-code's hooks run only in the `agy` CLI, not
 in the Antigravity desktop app or IDE.
 
+### OpenCode
+
+OpenCode v2 (CLI and TUI, verified on 2.0.18) installs plugins from GitHub. Install `loom-code` first: `opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`. 
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
+opencode plugin list
+```
+
+Or open the plugin dialog in the TUI, choose Install plugin and enter the same spec. To update, run the `plugin add` command again.
+
+Skills are offered as `loom-design:<skill>`.
+
+Limits on OpenCode:
+
+- A plugin may take a moment to appear in `opencode plugin list` right after the background service starts.
+- The OpenCode desktop app and IDE integrations are not covered.
+- Node is not needed to use the plugins.
+
 ## Tests
 
 ```sh
