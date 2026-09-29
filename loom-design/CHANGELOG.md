@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.6.3] — 2026-09-29 — version sync only
+
+Patch: no content change. Bumped alongside `loom-code` (closing-review polarity check) and `loom-workflow`.
+
 ## [2.6.2] — 2026-09-29 — Prose-pin stock cleanup batch 4 and patch release bump.
 
 Patch: tests only; no skill or reference content changed.
