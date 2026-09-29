@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-29-prose-pin-stock-cleanup-batch-4",
-  "content_digest": "e67b6ccaffa0bf6912bd9a3ffab4fcab0569bd1d",
+  "content_digest": "90e3218678cce7d41c6055af554286225521d18a",
   "executions": [
     {
       "kind": "package-tests",
