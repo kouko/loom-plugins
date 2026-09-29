@@ -4,13 +4,15 @@ Every literal that a test in the four test roots asserts against text read from 
 
 **Final state (W2-01).** This list was regenerated at the end of the build, from a clean detached worktree of the W2-01 commit, and it replaces the W0-01 list. Every candidate the W1 tasks pruned or deleted is gone from it. Every `prose` row still listed was judged and kept by a W1 task or by W2-01. Its reason cell ends with `→ <mapping file> Decisions row N`. N counts the data rows of that file's `## Decisions` table, then its `### Decisions` table under `## W2-01 additions`, in order. In `mapping-code.md`, N equals the `#` column. The throwaway script `decide.py` added those pointers, and its text is in `census-report.md`. It found a Decisions row for all 106 prose rows, and none was left undecided.
 
+**W3-01 regeneration.** W3-01 widened the census to two more forms (below) and regenerated this list the same way, from a clean detached worktree of the W3-01 state. It added 13 `structural` rows and no `prose` row; `decide.py` again found a Decisions row for all 106 prose rows.
+
 Command, run from the worktree root:
 
 ```
 python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py --candidates
 ```
 
-The structural rules live in the `literal_class` docstring, and the detected forms in the `pin_candidates` docstring, both in that script. W2-01 added one form: a negated `re.search` in a comprehension filter over `.items()` values, which collects what a text does not name. Program output is still excluded, as batch-3 W3-01 fixed: subprocess and checker output, parsed json/yaml values, production calls, and temp-dir output other than an installed copy's skill file. Comments are stripped before scanning, so line numbers are source lines.
+The structural rules live in the `literal_class` docstring, and the detected forms in the `pin_candidates` docstring, both in that script. W2-01 added one form: a negated `re.search` in a comprehension filter over `.items()` values, which collects what a text does not name. W3-01 added two: a `.find()`/`.rfind()` lookup whose result an assert compares as present (`!= -1`, `>= 0`, `> -1`, `-1 <`), and markdown held on `self.<attr>`/`cls.<attr>` set from a markdown read in any method. Program output is still excluded, as batch-3 W3-01 fixed: subprocess and checker output, parsed json/yaml values, production calls, and temp-dir output other than an installed copy's skill file. Comments are stripped before scanning, so line numbers are source lines.
 
 **Kept by batch 3.** These rows are class `kept-batch3` and out of scope, per the intent's Out of scope:
 
@@ -38,8 +40,8 @@ A file is listed when it has at least one candidate. W0-01 counted 233 prose, 37
 | root tests | 0 | 16 | 0 | 0 |
 | loom-code | 35 | 129 | 0 | 13 |
 | loom-design | 16 | 103 | 0 | 2 |
-| loom-workflow | 55 | 361 | 3 | 7 |
-| **total** | 106 | 609 | 3 | 22 |
+| loom-workflow | 55 | 374 | 3 | 7 |
+| **total** | 106 | 622 | 3 | 22 |
 
 ## root tests
 
@@ -633,10 +635,14 @@ The decisions live in the mapping files. Each prose row above ends with a pointe
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:259 | test_advisory_prompt_structure | '{{lang}}' (assert in) | structural | line grammar placeholder |
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:282 | test_advisory_prompt_forbids_orchestrator_memory_reference | 'feedback_' (assert in) | structural | code identifier |
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:282 | test_advisory_prompt_forbids_orchestrator_memory_reference | 'project_' (assert in) | structural | code identifier |
+| loom-workflow/tests/distill-sessions/test_prompts_parseable.py:301 | test_advisory_prompt_defines_skill_dir_before_first_use | '<skill-dir>' (.find() present) | structural | line grammar placeholder |
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:307 | test_advisory_prompt_defines_skill_dir_before_first_use | 'skill.md' (assert in) | structural | path |
+| loom-workflow/tests/distill-sessions/test_prompts_parseable.py:326 | test_advisory_prompt_declares_skill_dir_input | '## Context you will receive' (.find() present) | structural | markdown heading |
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:330 | test_advisory_prompt_declares_skill_dir_input | '^- `skill_dir`' (re.search) | structural | code identifier |
+| loom-workflow/tests/distill-sessions/test_prompts_parseable.py:350 | test_skill_md_advisory_dispatch_names_skill_dir_key | '## Optional advisory report' (.find() present) | structural | markdown heading |
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:354 | test_skill_md_advisory_dispatch_names_skill_dir_key | '`skill_dir`' (assert in) | structural | code identifier |
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:354 | test_skill_md_advisory_dispatch_names_skill_dir_key | 'dispatch_payload.input' (assert in) | structural | path |
+| loom-workflow/tests/distill-sessions/test_prompts_parseable.py:364 | test_host_advisory_dispatch_template_passes_skill_dir | '## Stage 5c single dispatch' (.find() present) | structural | markdown heading |
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:368 | test_host_advisory_dispatch_template_passes_skill_dir | 'dispatch_payload.input' (assert in) | structural | path |
 | loom-workflow/tests/distill-sessions/test_prompts_parseable.py:368 | test_host_advisory_dispatch_template_passes_skill_dir | 'skill_dir' (assert in) | structural | code identifier |
 
@@ -657,6 +663,10 @@ The decisions live in the mapping files. Each prose row above ends with a pointe
 
 | file:line | function | literal / form | class | reason |
 |---|---|---|---|---|
+| loom-workflow/tests/goal-create/test_goal_shape.py:52 | test_defines_four_fields_and_budget | 'Constraints' (.find() present) | structural | capitalized label (heading text, table-header cell, bold label or name) |
+| loom-workflow/tests/goal-create/test_goal_shape.py:52 | test_defines_four_fields_and_budget | 'Outcome' (.find() present) | structural | capitalized label (heading text, table-header cell, bold label or name) |
+| loom-workflow/tests/goal-create/test_goal_shape.py:52 | test_defines_four_fields_and_budget | 'Stop-when' (.find() present) | structural | capitalized label (heading text, table-header cell, bold label or name) |
+| loom-workflow/tests/goal-create/test_goal_shape.py:52 | test_defines_four_fields_and_budget | 'Verification' (.find() present) | structural | capitalized label (heading text, table-header cell, bold label or name) |
 | loom-workflow/tests/goal-create/test_goal_shape.py:69 | test_defines_four_fields_and_budget | '## The 4,000-character budget\\n\\n.*?\\n\\n(.*?)(?=\\n---\|\\Z)' (re.search) | structural | markdown heading |
 | loom-workflow/tests/goal-create/test_goal_shape.py:76 | test_defines_four_fields_and_budget | 'anthropic' (assert in) | prose | 1-2 word phrase or term → `mapping-workflow.md` Decisions row 3 |
 | loom-workflow/tests/goal-create/test_goal_shape.py:76 | test_defines_four_fields_and_budget | 'openai' (assert in) | prose | 1-2 word phrase or term → `mapping-workflow.md` Decisions row 3 |
@@ -720,6 +730,10 @@ The decisions live in the mapping files. Each prose row above ends with a pointe
 
 | file:line | function | literal / form | class | reason |
 |---|---|---|---|---|
+| loom-workflow/tests/handoff/test_handoff_skill_md.py:98 | test_d_relative_path_reference | 'references/handoff-schema.md' (assert in) | structural | path |
+| loom-workflow/tests/handoff/test_handoff_skill_md.py:118 | test_g_prepare_and_resume_modes | '## Prepare mode' (assert in) | structural | markdown heading |
+| loom-workflow/tests/handoff/test_handoff_skill_md.py:121 | test_g_prepare_and_resume_modes | '## Resume mode' (assert in) | structural | markdown heading |
+| loom-workflow/tests/handoff/test_handoff_skill_md.py:127 | test_h_handoffs_path | '.claude/handoffs/' (assert in) | structural | path |
 | loom-workflow/tests/handoff/test_handoff_skill_md.py:153 | test_frontmatter_and_routing | 'references/handoff-schema.md' (assert in) | structural | path |
 | loom-workflow/tests/handoff/test_handoff_skill_md.py:164 | test_frontmatter_and_routing | '## Prepare mode' (assert in) | structural | markdown heading |
 | loom-workflow/tests/handoff/test_handoff_skill_md.py:165 | test_frontmatter_and_routing | '## Resume mode' (assert in) | structural | markdown heading |
@@ -902,6 +916,7 @@ The decisions live in the mapping files. Each prose row above ends with a pointe
 
 | file:line | function | literal / form | class | reason |
 |---|---|---|---|---|
+| loom-workflow/tests/recap-state/test_skill_md.py:93 | test_d_relative_path_reference | 'references/seven-block-schema.md' (assert in) | structural | path |
 | loom-workflow/tests/recap-state/test_skill_md.py:135 | test_frontmatter_and_routing | 'references/seven-block-schema.md' (assert in) | structural | path |
 
 ### loom-workflow/tests/scripts/test_critique_compaction.py

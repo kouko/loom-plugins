@@ -101,3 +101,17 @@ Rule 3: no mechanisms.yaml eval, AGENTS.md line or `test_module_criteria_text.py
 | file::function(s) | defect class it guarded | named replacement | kind |
 |---|---|---|---|
 | loom-workflow/tests/scripts/test_visualization_card_hook.py::situation_errors, `SITUATIONS`, `_flat_body`, ::test_both_cards_name_the_conversation_situations, ::test_card_naming_only_data_shapes_fails, ::test_card_missing_one_situation_fails, ::test_situations_named_in_a_negated_sentence_do_not_count (all deleted) | a card drops one of the conversation situations, or names them only inside a negated trigger sentence | skill lens, `omission` (a dropped situation) and `inconsistency` (a negated sentence against the guide's situation tables). `::test_both_cards_point_at_the_plain_language_guide` still requires the guide path in both cards | review lens dimension |
+
+## W3-01 additions
+
+W3-01 taught `pin_candidates` two forms the batch-4 adversary found: a `.find()`/`.rfind()` lookup whose result an assert compares as present, and markdown held on `self.<attr>`/`cls.<attr>`. The probes are `loom-code/tests/test_adversarial_batch4_census_lookup_forms.py` (graduated) and `test_classify_test_files.py::test_find_in_output_not_flagged`. Rerun from a clean worktree, the census surfaced 13 new candidates, all `structural`, and **no prose candidate**. So nothing was pruned and this section has no mapping rows. W3-01 re-read each row, including the four `capitalized label` rows, and kept all 13 as structural:
+
+| file:line | function | literal(s) | kept because |
+|---|---|---|---|
+| loom-workflow/tests/goal-create/test_goal_shape.py:52 | test_defines_four_fields_and_budget | `Outcome`, `Constraints`, `Verification`, `Stop-when` (`.find()` present, in order) | the four field names, each a `## N — \`<name>\`` heading and a numbered list item of goal-shape.md |
+| loom-workflow/tests/handoff/test_handoff_skill_md.py:98, 127 | test_d_relative_path_reference, test_h_handoffs_path | `references/handoff-schema.md`, `.claude/handoffs/` (on `self.body`) | paths |
+| loom-workflow/tests/handoff/test_handoff_skill_md.py:118, 121 | test_g_prepare_and_resume_modes | `## Prepare mode`, `## Resume mode` (on `self.body`) | headings |
+| loom-workflow/tests/recap-state/test_skill_md.py:93 | test_d_relative_path_reference | `references/seven-block-schema.md` (on `self.body`) | path |
+| loom-workflow/tests/distill-sessions/test_prompts_parseable.py:301, 326, 350, 364 | test_advisory_prompt_defines_skill_dir_before_first_use, test_advisory_prompt_declares_skill_dir_input, test_skill_md_advisory_dispatch_names_skill_dir_key, test_host_advisory_dispatch_template_passes_skill_dir | `<skill-dir>`, `## Context you will receive`, `## Optional advisory report`, `## Stage 5c single dispatch` (`.find()` present) | a placeholder and headings that locate a section |
+
+The goal-create override row's reason now names `stop-when` and the `.find()` lookups. `test_goal_shape.py` keeps its override row, and the other three files stay `structure` with no override row.

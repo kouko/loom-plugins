@@ -380,6 +380,11 @@ def pin_candidates(text: str) -> list[dict]:
       only under an odd number of `not` (and not as a continue/pass filter), and in a
       comprehension condition it is a filter and does not count, except a negated one
       (`[k for k, pat in D.items() if not re.search(pat, md)]` collects what is missing, W2-01).
+    - W3-01 forms: a `.find()`/`.rfind()` lookup of a literal on markdown text whose result an
+      assert compares as present (`!= -1`, `>= 0`, `> -1`, `-1 <`, chained too), directly or
+      through the name it is assigned to (counted on the lookup line); and markdown held on
+      `self.<attr>`/`cls.<attr>` when any method sets that attribute from markdown text (the
+      attribute name is judged file-wide, like a variable name).
     - A local helper, validator-named or not, whose parameter receives markdown text at any
       call site in the file (to a fixed point) reads that parameter as markdown text, so a
       literal it requires of its input is a candidate on the helper's own line.
@@ -515,12 +520,19 @@ def pin_candidates(text: str) -> list[dict]:
         called = {c.split(".")[-1] for c in calls(node)}
         return raw_output(node) or bool(called & runners) or bool(names(node) & out)
 
+    self_md: set[str] = set()  # attributes a method sets on self/cls from markdown text (W3-01)
+
+    def self_attr(node) -> str | None:
+        ok = isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name) and node.value.id in ("self", "cls")
+        return node.attr if ok else None
+
     def is_md(node, md, out) -> bool:
         if is_output(node, out):
             return False
         read_helper = any(isinstance(c, ast.Call) and _dotted(c.func).split(".")[-1] in readers and not any(
             NON_PROSE_PATH.search(src.get(i, "") + i) for a in c.args for i in names(a)) for c in ast.walk(node))
-        return raw_read(node) or read_helper or bool(names(node) & md)
+        return raw_read(node) or read_helper or bool(names(node) & md) or any(
+            self_attr(a) in self_md for a in ast.walk(node))
 
     def copy_read(node) -> bool:
         """The value is a plain read of a path naming a skill, agent or reference file (a copy
@@ -588,10 +600,17 @@ def pin_candidates(text: str) -> list[dict]:
         return taint(f, mod_md | (own & readers) | fed_here, mod_out | (own & runners))
 
     while True:
-        size = sum(map(len, fed.values()))
+        size = sum(map(len, fed.values())) + len(self_md)
         for f in top:
             md, out = scope_taint(f)
             for c in ast.walk(f):
+                if isinstance(c, ast.Assign) and is_md(c.value, md - {"self", "cls"}, out):
+                    # `self.fm, self.body = _split(...)`: only the helper's unparsed tuple positions
+                    flags = tuple_out.get(_dotted(c.value.func).split(".")[-1]) if isinstance(c.value, ast.Call) else None
+                    for t in c.targets:
+                        elts = t.elts if isinstance(t, (ast.Tuple, ast.List)) else [t]
+                        self_md.update(self_attr(e) for i, e in enumerate(elts) if self_attr(e) and not (
+                            flags and len(flags) == len(elts) and flags[i]))
                 if isinstance(c, ast.Call) and isinstance(c.func, ast.Name) and c.func.id in funcs:
                     gp = [a.arg for a in funcs[c.func.id].args.args]
                     got = {gp[i] for i, a in enumerate(c.args) if i < len(gp)
@@ -599,7 +618,7 @@ def pin_candidates(text: str) -> list[dict]:
                     got |= {k.arg for k in c.keywords if k.arg in gp and is_md(k.value, md, out)}
                     if got:
                         fed.setdefault(c.func.id, set()).update(got)
-        if sum(map(len, fed.values())) == size:
+        if sum(map(len, fed.values())) + len(self_md) == size:
             break
 
     rows: list[dict] = []
@@ -726,6 +745,42 @@ def pin_candidates(text: str) -> list[dict]:
             x = p
         return False
 
+    def num(n) -> int | None:
+        try:
+            v = ast.literal_eval(n)
+        except (ValueError, TypeError, SyntaxError):
+            return None
+        return v if type(v) is int else None
+
+    def present_cmp(c, hit) -> bool:
+        """`x != -1`, `x >= 0`, `x > -1` (or mirrored, chained too) in Compare c, x picked by hit."""
+        ops = [c.left, *c.comparators]
+        for a, op, b in zip(ops, c.ops, ops[1:]):
+            if hit(a) and ((isinstance(op, (ast.NotEq, ast.Gt)) and num(b) == -1)
+                           or (isinstance(op, ast.GtE) and num(b) == 0)):
+                return True
+            if hit(b) and ((isinstance(op, (ast.NotEq, ast.Lt)) and num(a) == -1)
+                           or (isinstance(op, ast.LtE) and num(a) == 0)):
+                return True
+        return False
+
+    def find_required(node, f) -> bool:
+        """A `.find()` result compared as present inside an assert, directly or via the name it is assigned to."""
+        up = parent.get(id(node))
+        if isinstance(up, ast.Compare) and present_cmp(up, lambda e: e is node):
+            x = up
+            while id(x) in parent and x is not f:
+                x = parent[id(x)]
+                if isinstance(x, ast.Assert):
+                    return True
+            return False
+        if isinstance(up, ast.Assign) and len(up.targets) == 1 and isinstance(up.targets[0], ast.Name):
+            t = up.targets[0].id
+            return any(isinstance(c, ast.Compare) and present_cmp(
+                c, lambda e: isinstance(e, ast.Name) and e.id == t)
+                for a in ast.walk(f) if isinstance(a, ast.Assert) for c in ast.walk(a.test))
+        return False
+
     def scan(f, fname, ctx, pids=None, at=None) -> None:
         md, out = scope_taint(f)
         bound_re = {**mod_re, **re_bound(f)}
@@ -802,6 +857,9 @@ def pin_candidates(text: str) -> list[dict]:
                 if attr in ("index", "rindex") and node.args and is_md(recv, md, out):
                     for s in lits(node.args[0], ctx, pids):
                         put(node.lineno, s, f".{attr}()")
+                elif attr in ("find", "rfind") and node.args and is_md(recv, md, out) and find_required(node, f):
+                    for s in lits(node.args[0], ctx, pids):
+                        put(node.lineno, s, f".{attr}() present")
                 elif attr in ("search", "match", "fullmatch", "findall", "finditer"):
                     pats = []
                     if isinstance(recv, ast.Name) and recv.id == "re":
@@ -1334,6 +1392,13 @@ MANUAL_OVERRIDES = {
         "direct_pin_lines, and the residual check asserts named files carry "
         "no skill sentence, an absence",
     ),
+    # Batch 4 (W3-01): the graduated build-adversary program.
+    "loom-code/tests/test_adversarial_batch4_census_lookup_forms.py": (
+        "behavior",
+        "runs this classifier (path-loaded) and asserts on its result; the "
+        "sentence-assert hits are synthetic test source strings fed to "
+        "direct_pin_lines",
+    ),
     # Batch 4 (W2-01): files whose remaining hits the W1 mappings decided as not prose.
     "loom-code/tests/test_build_mechanical_checks.py": (
         "structure",
@@ -1366,7 +1431,8 @@ MANUAL_OVERRIDES = {
         "remaining hits are the vendor names openai and anthropic in the "
         "paragraphs located by the `## The 4,000-character budget` heading and "
         "the `**Attribution accuracy**` bold label, and the four-field names "
-        "outcome, constraints and verification",
+        "outcome, constraints, verification and stop-when (also required in "
+        "order through `.find()` lookups, W3-01)",
     ),
     "loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py": (
         "structure",

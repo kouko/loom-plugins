@@ -1,6 +1,6 @@
 # Batch 4 census and recount (W2-01)
 
-Every number below comes from a clean detached worktree (`git worktree add --detach <scratchpad>/<wt> <ref>`), removed afterwards (plan Risk 3). HEAD is the W2-01 commit, the one that adds this report. The base is `1ef82fe8`.
+Every number below comes from a clean detached worktree (`git worktree add --detach <scratchpad>/<wt> <ref>`), removed afterwards (plan Risk 3). HEAD is the W2-01 commit, the one that adds this report. The base is `1ef82fe8`. W3-01 later refreshed the A1 census, the candidate counts and the A5 recount from a clean worktree of its own state; the A4 and stitch sections are W2-01's run, and W3-01 changed no mapping row they count.
 
 A census run from the main checkout gives different counts (`not-prose 59` instead of 54), because nested worktrees under `.claude/worktrees` add files to the scan. Only the clean-worktree numbers count.
 
@@ -11,6 +11,15 @@ A census run from the main checkout gives different counts (`not-prose 59` inste
 - **Stale mapping citations (plan item 5).** Three replacement cells in `mapping-workflow-2.md` cited compaction test names that W1-08 later renamed. They now cite `test_recap_state_compaction.py::test_entrypoint_tokens_and_schema_before_the_ordered_six_section_template` (two rows) and `test_handoff_compaction.py::test_entrypoint_structure_and_schema_before_artifact_steps`. W2-01 read both bodies, and they still check what the rows claim: the schema pointer comes before the template or before step 2, and the heading order holds.
 - **`candidate-list.md` regenerated** at HEAD. Every remaining prose row points at its Decisions row.
 
+## What W3-01 changed
+
+W3-01 is the adversary fix round. The build adversary's program (commit `35396265`) found two lookup forms the census missed, both already used by the repository's own tests. Its two probes were red. The program graduated unchanged, except for its import path, to `loom-code/tests/test_adversarial_batch4_census_lookup_forms.py`, and both probes are now green. `pin_candidates` gained two forms:
+
+- **`.find()` presence lookups.** A `.find()`/`.rfind()` lookup of a literal on markdown text counts when an assert compares its result as present (`!= -1`, `>= 0`, `> -1`, `-1 <`, mirrored or chained), either directly or through the name the result is assigned to. It is counted on the lookup line. Negative probe: `test_classify_test_files.py::test_find_in_output_not_flagged` (the same lookup on subprocess output is not a pin).
+- **Markdown held on `self`/`cls`.** An attribute that any method sets from markdown text (`self.body = SKILL.read_text()`, or the unparsed position of `self.fm, self.body = _parse_skill_md()`) is markdown text wherever `self.<attr>` or `cls.<attr>` is read. The attribute name is judged file-wide, like a variable name.
+
+The rerun surfaced 13 new candidates, all `structural` (field names, headings, paths, one placeholder) and **no prose row**, so nothing was pruned. The rows are in `mapping-containers.md` under `## W3-01 additions`. `MANUAL_OVERRIDES` gained one row for the graduated program, and the `test_goal_shape.py` reason now names `stop-when` and the `.find()` lookups.
+
 ## A1 — census
 
 Command, run from the worktree root:
@@ -19,13 +28,14 @@ Command, run from the worktree root:
 python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py
 ```
 
-**Exit 0. Counts at HEAD: `{'behavior': 109, 'gate-eval': 0, 'grammar-invariant': 2, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 66}`. 34 files show `has_pins=yes`, and every one has an override row (49 override rows in all).**
+**Exit 0. Counts at HEAD (W3-01): `{'behavior': 110, 'gate-eval': 0, 'grammar-invariant': 2, 'not-prose': 54, 'other': 0, 'sentence-pin': 0, 'structure': 66}`. 34 files show `has_pins=yes`, and every one has an override row (50 override rows in all).** The one extra `behavior` file is the graduated adversary program. At W2-01 the counts were the same except `behavior: 109`, with 49 override rows.
 
 | point | sentence-pin | gate-eval | structure | other | `has_pins=yes` files | source |
 |---|---|---|---|---|---|---|
 | batch-3 HEAD (batch-3 classifier) | 0 | 0 | 66 | 0 | 23 | batch-3 report |
 | `4d81b1c0`, after W1-09, before W2-01 | 6 | 0 | 58 | 2 | 34 (13 without an override row) | this task's first run |
-| HEAD (W2-01) | **0** | **0** | **66** | **0** | **34 (all with an override row)** | this run |
+| W2-01 | 0 | 0 | 66 | 0 | 34 (all with an override row) | W2-01 run |
+| HEAD (W3-01) | **0** | **0** | **66** | **0** | **34 (all with an override row)** | this run |
 
 **Negative case, other-bucket-exits-1.** In a throwaway worktree of HEAD, not committed, the key of the `test_git_memory_compaction.py` override row was changed so that it no longer matched. The census printed `other: 1`, listed that file as `other`, printed `FAIL: files in \`other\` belong to no named class; add a MANUAL_OVERRIDES row` and **exited 1**.
 
@@ -35,6 +45,7 @@ python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-te
 |---|---|---|---|
 | `loom-code/tests/test_acceptance_test_report_shape.py` | grammar-invariant | structure | template table columns, rows and markers, the evidence block heading, the template path pointer in the tester contract, a full-suite absence scan fed by split_sentences, no gate marker, and the evidence path pointer outside every gate block; the remaining hits are the Verdict column enum (works\|partly\|not verified\|fails) and the Re-run cell grammar (`carried over — <reason>`, `re-tested`); the two sentence-anchored verdict scans were deleted in batch 4 (W1-01), so no sentence is asserted present |
 | `loom-code/tests/test_adversarial_batch3_census_misses.py` | sentence-pin | behavior | runs this classifier (path-loaded) and asserts on its result; the sentence-assert hit is a synthetic test source string fed to direct_pin_lines, and the residual check asserts named files carry no skill sentence, an absence |
+| `loom-code/tests/test_adversarial_batch4_census_lookup_forms.py` | other | behavior | runs this classifier (path-loaded) and asserts on its result; the sentence-assert hits are synthetic test source strings fed to direct_pin_lines |
 | `loom-code/tests/test_adversary_layout.py` | behavior | behavior | loop-form hit is SHARED_HEADINGS asserted in the protocol's parsed heading list: section headings, not prose. The batch-4 hits are the KIND_MARKERS fragments of a one-home absence check (each asserted absent outside its own file), the `at commit`/`at split commit` sha lines of the frozen correspondence note fed to git show, the `(preamble)` sentinel cell, and the `Reuse first, update with evidence` heading |
 | `loom-code/tests/test_adversary_protocol.py` | behavior | behavior | imports MAX_PROBE_PROGRAMS from loom_checker for the case-count scan; the rest is a one-home absence scan and YAML keys of the return block; no sentence asserted present |
 | `loom-code/tests/test_adversary_recipe_shape.py` | sentence-pin | structure | split_sentences feeds a duplicate-sentence check across recipe files; no prose literal is asserted |
@@ -55,7 +66,7 @@ python3 docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-te
 | `loom-code/tests/test_sync_before_review_text.py` | behavior | behavior | runs sync-trunk on real repositories and asserts its stdout and the digest; the prose half is absences under the §2 heading and a count of sync-trunk; no sentence asserted present |
 | `loom-code/tests/test_write_plan_station_text.py` | grammar-invariant | grammar-invariant | remaining hit is LANE_WORDING_RE in lane_hits, an absence scan (no runtime file names a lane); the rest is release-metadata pins, heading-anchored key scans and grammar checks |
 | `loom-workflow/tests/decision-map/test_skill_doc.py` | behavior | behavior | loop-form hit is DOCUMENTED_COMMANDS: command shapes, which the same test also runs (start_delivery.py excepted; test_start_delivery.py owns it). The direct sentence asserts batch 2 left were pruned in batch 3 (W1-01, W1-07); the rest is operation headings, fixed terms, re-entry and phase code tokens recomputed from the scripts, the ticket template grammar, schema_version, manifest fields, and the Codex manifest defaultPrompt sentence, kept as an interface string, not skill prose |
-| `loom-workflow/tests/goal-create/test_goal_shape.py` | sentence-pin | structure | remaining hits are the vendor names openai and anthropic in the paragraphs located by the `## The 4,000-character budget` heading and the `**Attribution accuracy**` bold label, and the four-field names outcome, constraints and verification |
+| `loom-workflow/tests/goal-create/test_goal_shape.py` | sentence-pin | structure | remaining hits are the vendor names openai and anthropic in the paragraphs located by the `## The 4,000-character budget` heading and the `**Attribution accuracy**` bold label, and the four-field names outcome, constraints, verification and stop-when (also required in order through `.find()` lookups, W3-01) |
 | `loom-workflow/tests/goal-create/test_skill_md.py` | gate-eval | structure | mode headings, reference paths resolving, the floor command shape, the session-activation gate blocks, template non-restatement and the offer-site count (its number recomputed from the sites scanned in the repo); eval of goal-create.session-activation, no sentence asserted |
 | `loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py` | sentence-pin | structure | remaining hit is OVERCLAIM_PATTERN, an absence (asserted to find nothing in the READMEs); the concept matchers left are the skill name, the sibling skill name and the mode identifiers |
 | `loom-workflow/tests/loom-visualization/test_references.py` | sentence-pin | structure | remaining hits are H3 situation titles matched against the parsed heading list and in `Pointer:` lines, the `Load this when:` line label, document-type names read as cells of SKILL.md's routing table, the `key-value` table-form term, the IN_CELL_ITEMS glyph, source and cross-reference tokens, and the node-structure reference's headings and bold labels |
@@ -77,8 +88,10 @@ Command: the same script with `--candidates`. It exited 0.
 | root tests | 0 | 16 | 0 | 0 |
 | loom-code | 35 | 129 | 0 | 13 |
 | loom-design | 16 | 103 | 0 | 2 |
-| loom-workflow | 55 | 361 | 3 | 7 |
-| **total** | **106** | 609 | 3 | 22 |
+| loom-workflow | 55 | 374 | 3 | 7 |
+| **total** | **106** | 622 | 3 | 22 |
+
+These are the W3-01 counts. W2-01 listed 609 structural rows; the two W3-01 forms added 13 structural rows (all in loom-workflow) and no prose row, and `decide.py` rerun on the W3-01 list printed `prose rows: 106; undecided: 0`.
 
 W0-01 counted 233 prose rows. **All 106 prose rows left are decided.** The throwaway script `decide.py` (text below) found a W1 or W2-01 `Decisions` row for each of them, and printed `prose rows: 106; undecided: 0`. None of the 106 is decided `prune` or `delete`. Each is a keep with a reason: heading, label, field key, column cell, proper name, absence or one-home scan, or kept gate. W2-01 also read all 106 pointers and checked that each one lands on the row that judges that literal. The pointers are in `candidate-list.md`.
 
@@ -104,8 +117,9 @@ Command: `python3 <HEAD wt>/docs/loom/2026-09-27-prose-pin-stock-cleanup/evidenc
 |---|---|
 | base `1ef82fe8` | **1927** |
 | HEAD (W2-01) | **1927** |
+| HEAD (W3-01) | **1929** |
 
-**Positive, recount-not-below-base.** 1927 ≥ 1927. The two `--list` outputs are identical: nothing was removed and nothing was added.
+**Positive, recount-not-below-base.** 1927 ≥ 1927. The two `--list` outputs are identical: nothing was removed and nothing was added. At W3-01 (run with the W3-01 classifier, whose counting code is unchanged) the count is 1929 ≥ 1927: the `--list` diff against the base adds exactly the two tests of the graduated adversary program, which load and run the classifier, and removes nothing.
 
 **Negative, deleted-function-tagged-exec-fails.** `stitch4.py` (below) lists every def that `1ef82fe8..HEAD` removed from a changed test file. There are 81, 64 of them test functions, and a rename counts as a removal. **None of the 64 is on the base `--list` output.** In a throwaway worktree, `test_visualization_card_hook.py::test_enabled_toolkit_prints_coexist_card`, which runs the hook, was deleted and the deletion committed there. The recount printed 1926, and the `--list` diff named that function. `stitch4.py` reported it under "deleted test functions on the base exec list". The worktree and its commit were thrown away. That scratch commit used `--no-verify`, because it lived only in a detached throwaway worktree and never on the branch.
 
@@ -157,11 +171,14 @@ The first run, before this task's fix, reported the three stale `mapping-workflo
 - **The W2-01 detector form is narrow.** It sees a negated `re.search`, `re.match` or `re.fullmatch` in a comprehension filter, whose pattern is bound by that comprehension's target. A negated search through a `re.compile`-bound name in the same position is not covered.
 - **Frozen probe of an earlier change.** `docs/loom/2026-09-16-plain-language-follow-ups/evidence/probes/test_probe_card_guard_bypasses.py` imports `missed_alternative_errors` and `missed_alternative_verb_errors`, which W1-09 deleted, and `situation_errors` and `SITUATIONS`, which W2-01 deleted. It no longer imports cleanly. It is not in the package suite, and only that change's own `attestation.json` names it.
 - **Decision pointers are machine-matched.** `decide.py` matches on the file's basename, then the literal as a token, then the function name. W2-01 read all 106 matches. Where one Decisions row covers several functions or literals, the pointer names that shared row.
+- **Synthetic-only lookup forms (W3-01).** The batch-4 adversary also listed forms that no test in the repository uses, and W3-01 did no detector work for them: `md.count(x)` bare or `!= 0`, `md.partition(x)[1]`, `len(md.split(x)) == 2`, an annotated module constant (`X: str = "..."`), a `frozenset({...})` collection, a `'a ' + 'b'` concatenated constant, and `parametrize(..., argvalues=[...])` passed by keyword. A needle in any of these forms is not seen.
+- **`.find()` in a file that reads no skill markdown.** The W3-01 `.find()` form follows the same file rule as every other form. `tests/test_agy_install_docs.py:61` compares `-1 < body.find(...)`, but `body` is a README section and the file names no skill, agent or reference markdown path, so the census does not scan it. Its needle, an `agy plugin install` command, would be classed structural anyway.
+- **`.find()` markers with no letter.** `test_prompts_parseable.py:120` looks up the step markers `1.` to `4.` through `.find()`. The form is seen, but a literal with no letter is never a candidate.
 - **Kept by batch 3** (out of scope): the three `pinned_sentence_ok` gate polarity checks in `test_templates.py`, and the Codex `defaultPrompt` string in `decision-map/test_skill_doc.py`.
 
 ## Package suite
 
-`env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`, run on the W2-01 code state. **EXIT=0**: 3211 pytest tests passed, 0 failed, and every shell test printed PASS.
+`env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`, run on the W2-01 code state. **EXIT=0**: 3211 pytest tests passed, 0 failed, and every shell test printed PASS. Rerun on the W3-01 code state: **EXIT=0**, 3213 pytest tests passed (the two added are the graduated adversary program), 0 failed, and every shell test printed PASS.
 
 <details><summary>decide.py</summary>
 

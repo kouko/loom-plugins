@@ -135,6 +135,13 @@ def test_needles_against_script_output_not_flagged() -> None:
     assert ctf.direct_pin_lines(src) == []
 
 
+def test_find_in_output_not_flagged() -> None:
+    body = ('import subprocess\n\ndef test_x():\n    out = subprocess.run(["python3", "x.py"]).stdout\n'
+            '    assert out.find("the rule is stated here") != -1\n')
+    assert ctf.direct_pin_lines(LOOP_HEAD + body) == []
+    assert ctf.direct_pin_lines(LOOP_HEAD + body.replace("out.find", "TEXT.find")) == [11]
+
+
 def test_parameter_passed_needle_flagged() -> None:
     body = ('def _has(text, phrase):\n    return phrase in text\n\n'
             'def test_x():\n    assert _has(TEXT, "the rule is stated here")\n    assert _has("synthetic", "never dispatch")\n')

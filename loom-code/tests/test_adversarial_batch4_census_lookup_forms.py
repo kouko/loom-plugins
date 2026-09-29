@@ -7,8 +7,15 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[5]
+import pytest
+
+REPO = Path(__file__).resolve().parents[2]
 _CLASSIFIER = REPO / "docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py"
+if not _CLASSIFIER.exists():
+    pytest.skip(
+        "evidence classifier for 2026-09-27-prose-pin-stock-cleanup is gone",
+        allow_module_level=True,
+    )
 _SPEC = importlib.util.spec_from_file_location("classify_test_files", _CLASSIFIER)
 ctf = importlib.util.module_from_spec(_SPEC)
 _SPEC.loader.exec_module(ctf)
