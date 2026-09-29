@@ -72,6 +72,13 @@ charter: 1.1
 - Test: A1 positive: clean-worktree-census-zero-pins; negative: other-bucket-exits-1. A4 positive: check-mechanisms-all-clear; negative: dangling-eval-reported. A5 positive: recount-not-below-base; negative: deleted-function-tagged-exec-fails.
 - Risk: agent-decided — every remaining flagged file has a visible override row with its reason; each moved eval is listed old -> new beside the check_mechanisms result; runs from a clean worktree.
 
+### Wave 3 — adversary fix round
+
+**W3-01 Census sees .find() lookups and markdown held on self**  after: W2-01  acceptance: 1, 2, 3
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/probes/test_census_hidden_lookup_forms.py (graduated to loom-code/tests/test_adversarial_batch4_census_lookup_forms.py), test files newly flagged, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/census-report.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/candidate-list.md, docs/loom/2026-09-29-prose-pin-stock-cleanup-batch-4/evidence/mapping-containers.md
+- Test: A1 positive: find-presence-lookup-flagged; negative: find-in-output-not-flagged; boundary: self-attribute-markdown-flagged. A2 positive: behavior-checks-kept; negative: suite-green-after-prune. A3 positive: mapping-row-per-removed-pin; boundary: known-limits-lists-synthetic-forms.
+- Risk: agent-decided — adversary program red at 35396265 graduates to loom-code/tests; synthetic-only forms (count, partition, split, annotated constants, frozenset, concatenation, argvalues) go to Known limits.
+
 ## Simplicity check
 - Drop the memory-entry task, which owns no Acceptance line and breaks the file Constraint; the lesson rides a later change — taken
 - Drop mapping-evals.md; record moved evals in census-report.md — taken
