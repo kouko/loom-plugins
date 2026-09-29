@@ -285,6 +285,18 @@ def test_schema_keys_documented_and_token_groups_named():
     # (see the mutation tests below).
     _assert_all_token_groups_named(_five_group_section(text))
 
+    # (e) the `**Derivation contract:**` slash roster names exactly the
+    # TOKEN_GROUPS sections, by their `##` heading names.
+    display = {"colors": "Colors", "typography": "Typography",
+               "spacing": "Layout", "rounded": "Shapes", "components": "Components"}
+    assert set(display) == design_md_spec_keys.TOKEN_GROUPS
+    contract = _section(text, "**Derivation contract:**", "\n\n")
+    roster = re.search(r"[A-Z]\w+(?:\s*/\s*[A-Z]\w+)+", contract)
+    assert roster, "Derivation contract has no slash roster"
+    assert {n.strip() for n in roster.group(0).split("/")} == set(display.values()), (
+        roster.group(0)
+    )
+
 
 def test_component_sub_tokens_are_complete_and_exclusive():
     text = _schema_text()

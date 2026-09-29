@@ -71,6 +71,11 @@ def test_template_has_one_row_per_criterion_and_evidence_file_path():
     assert [r[number] for r in rows][:2] == ["1", "2"], "rows are not one per criterion"
     for row in rows:
         assert re.search(r"works|partly|not verified|fails", row[verdict]), row
+    returned = re.search(r"result: ([a-z |-]+?),", TESTER.read_text(encoding="utf-8"))
+    assert returned, "tester contract no longer lists its `result:` values"
+    assert {v.strip() for v in returned.group(1).split("|")} == {
+        "works", "partly", "not verified", "fails"
+    }, returned.group(1)
     report = _report_block()
     assert not re.search(r"^### \d+\.", report, flags=re.M), "per-criterion blocks remain"
     assert EVIDENCE_PATH in report, "report does not point to the evidence file"
