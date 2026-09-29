@@ -84,7 +84,8 @@ function agents() {
     .filter((f) => f.endsWith(".md"))
     .map((f) => {
       const { data, body } = parse(readFileSync(join(dir, f), "utf8"));
-      return { id: `${plugin}:${basename(f, ".md")}`, data, system: body.trim() };
+      const where = `Plugin root for this agent: ${root} — a path written as \`${plugin}/<rest>\` or \`<plugin>/<rest>\` is \`${root}/<rest>\`.`;
+      return { id: `${plugin}:${basename(f, ".md")}`, data, system: `${where}\n\n${body.trim()}` };
     });
 }
 

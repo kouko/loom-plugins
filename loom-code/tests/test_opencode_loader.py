@@ -115,6 +115,8 @@ def test_agents_registered_plugin_qualified():
     assert {a["id"] for a in seen["agents"]} == expected
     for agent in seen["agents"]:
         assert agent["mode"] == "subagent" and agent["system"].strip()
+        first = agent["system"].splitlines()[0]
+        assert str(REPO_ROOT / "loom-code") in first and "<plugin>/" in first
 
 
 def test_plugin_without_agents_registers_none():
