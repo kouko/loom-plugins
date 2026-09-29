@@ -71,6 +71,17 @@ literally wrong the text is:
 | missing-population | A measured number with no denominator or scope: "0% false positives" without saying over what |
 | deletion-first | See "Deletion-first for docs and skill" below — the same rule as the code lens's `deletion-first`, applied to station text and agent contracts |
 
+**Polarity against the base.** This sharpens `inconsistency` for changed
+against base, in the docs lens and so in the skill lens that scores these
+five dimensions. When the diff deletes or rewrites a sentence carrying a
+polarity word — never, must not, only, always, 不得 and their kin (no, do
+not, may not, forbid, 禁止, 絕不) — read the base version with
+`git show <base>:<path>` and compare each such sentence with its new form.
+A reversed direction (must ↔ may, never ↔ always, forbid ↔ allow), or a
+polarity clause dropped with nothing else in the delta carrying it, is an
+`inconsistency` finding, severity by consequence; a rewording that keeps
+the direction is not a finding.
+
 <!-- gate: charter.plan-omission-narrow -->
 **Plan omission, narrowed by the charter.** Omission on a `plan` is
 exactly one thing: a task whose Files, Test or Risk line leaves the
