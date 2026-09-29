@@ -202,12 +202,15 @@ installed, hand this to its `product-principles` tool instead.
 
 ## Step 3 — Decision point ①: restate and confirm
 
-When the intent's `status:` is already `confirmed`, skip this step.
+When `status:` is already `confirmed`, skip confirmation: branch first
+(Step 6), then run
+`loom_checker.py intent docs/loom/intent/<change-id>.md` until it exits 0.
+Fix `needs-design:` with one new commit quoting the changed line verbatim
+in its body.
+
 Otherwise read `references/confirm-intent.md` and follow it fully before step 4,
-in the single message it describes: the restatement, one-way doors, any
-`second-vendor: ask` question, the principles interview, and engineering
-carried details, then the intent's confirmation commit. Step 5 writes the
-question list kept per that reference.
+in the single message it describes, ending with the intent's confirmation
+commit. Step 5 writes the question list kept per that reference.
 
 ## Step 4 — Does this need a spec?
 
@@ -458,9 +461,8 @@ squash-merge commit on the trunk. Individual task commits keep their own
 Conventional Commits type as the implementer contract sets it, and the
 `docs(loom):` intent and plan commits keep their fixed form.
 
-The intent may already be committed on the trunk; that is fine and nothing
-needs moving. It is the plan and everything after it that belongs on the
-branch.
+An intent already committed on the trunk stays there; the plan and
+everything after it belong on the branch.
 
 Commit the plan with the message `docs(loom): plan <change-id>`. Then hand
 the change to the build station — `loom-code:build` — which dispatches one
