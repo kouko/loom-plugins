@@ -130,6 +130,14 @@ def test_shell_push_routed_to_push_hook(tmp_path: Path):
     threw = _fire("loom-code", "execute.before", event, tmp_path)["threw"]
     # the checker's own refusal, not the loader's unreachable-handler fallback
     assert threw and threw.startswith("BLOCK selection.guard") and "checker failed" not in threw
+    # `workdir` moves the call into the store: a plain redirect write is refused
+    repo = tmp_path / "proj"
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    (repo / ".git" / "loom" / "selections").mkdir(parents=True)
+    moved = {**event, "input": {"command": "printf x > rec", "workdir": ".git/loom/selections"}}
+    env = {**os.environ, "STUB_SESSION_DIR": str(repo)}
+    threw = _fire("loom-code", "execute.before", moved, tmp_path, env)["threw"]
+    assert threw and threw.startswith("BLOCK selection.guard")
 
 
 def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):

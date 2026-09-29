@@ -156,8 +156,11 @@ export async function setup(ctx) {
 // OpenCode call, so the handlers are the ones every other host runs.
 // OpenCode 2.0.18 sends write/edit `path` relative to the session directory.
 const file = (i, dir) => (typeof (i.path ?? i.filePath) === "string" ? resolve(dir, i.path ?? i.filePath) : undefined);
+// `shell` `workdir` moves where the command runs; it becomes the call's cwd.
+const at = (i, dir) => (typeof (i.workdir ?? i.cwd) === "string" ? resolve(dir, i.workdir ?? i.cwd) : dir);
+// Each entry returns [Claude tool name, Claude tool_input, the call's cwd if it moves].
 const TOOLS = {
-  shell: (i) => ["Bash", { command: i.command }],
+  shell: (i, dir) => ["Bash", { command: i.command }, at(i, dir)],
   write: (i, dir) => ["Write", { file_path: file(i, dir), content: i.content }],
   edit: (i, dir) => ["Edit", { file_path: file(i, dir), old_string: i.oldString, new_string: i.newString }],
   patch: (i) => ["apply_patch", { ...i }],
@@ -312,13 +315,13 @@ async function registerHooks(ctx) {
     const dir = await dirFor(ev.sessionID);
     const mapped = TOOLS[ev.tool]?.(ev.input ?? {}, dir);
     if (!mapped) return;
-    const [name, input] = mapped;
+    const [name, input, cwd = dir] = mapped;
     const env = await envFor(ev.sessionID);
-    const body = await payload(ev.sessionID, "PreToolUse", { tool_name: name, tool_input: input });
+    const body = await payload(ev.sessionID, "PreToolUse", { tool_name: name, tool_input: input, cwd });
     for (const hook of commands(table, "PreToolUse", name)) {
       const result = await run(hook, body, env);
       if (result.status === 2) throw new Error(result.stderr.trim() || `loom: a PreToolUse hook refused ${name}`);
-      if (result.status !== 0 && namesStore(name, input, dir)) {
+      if (result.status !== 0 && namesStore(name, input, cwd)) {
         const why = result.stderr.trim() || `exit ${result.status}`;
         throw new Error(`BLOCK selection.guard: names the selection record store and the checker failed (${why})`);
       }
@@ -329,12 +332,13 @@ async function registerHooks(ctx) {
   await ctx.tool.hook("execute.after", async (ev) => {
     const held = notes.get(ev.id) ?? [];
     notes.delete(ev.id);
-    const mapped = TOOLS[ev.tool]?.(ev.input ?? {}, await dirFor(ev.sessionID));
+    const dir = await dirFor(ev.sessionID);
+    const mapped = TOOLS[ev.tool]?.(ev.input ?? {}, dir);
     if (mapped && ev.status !== "error") {
-      const [name, input] = mapped;
+      const [name, input, cwd = dir] = mapped;
       const env = await envFor(ev.sessionID);
       const body = await payload(ev.sessionID, "PostToolUse",
-        { tool_name: name, tool_input: input, transcript_path: transcript(ev.sessionID) });
+        { tool_name: name, tool_input: input, cwd, transcript_path: transcript(ev.sessionID) });
       for (const hook of commands(table, "PostToolUse", name)) {
         const result = await run(hook, body, env);
         held.push(result.status === 2 ? result.stderr.trim() : output(result).context);

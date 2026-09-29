@@ -36,7 +36,7 @@ REQ-8 — Release bump
 
 | OpenCode tool and argument | Claude payload |
 |---|---|
-| `shell` `command` | `Bash` `command` |
+| `shell` `command`, `workdir` | `Bash` `command`; `workdir`, resolved against the session directory, is the payload `cwd` and the handlers' working directory for that call |
 | `write` `path` | `Write` `file_path` |
 | `edit` `path` | `Edit` `file_path` |
 | `patch` / `apply_patch` | `apply_patch` with its patch text |
