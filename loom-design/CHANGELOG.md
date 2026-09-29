@@ -12,6 +12,12 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.7.0] — 2026-09-29 — loom-design no longer reads or runs loom-code files.
+
+- The five skills drop their contract-version checks and `intake` runs; templates are local copies kept identical to loom-code's by a repository test.
+- The principles check reads `PRINCIPLES.md` directly (interview timing unchanged).
+- The locate-loom-code reference is deleted; manifests and READMEs no longer claim to read loom-code's contract package.
+
 ## [2.6.3] — 2026-09-29 — version sync only
 
 Patch: no content change. Bumped alongside `loom-code` (closing-review polarity check) and `loom-workflow`.
