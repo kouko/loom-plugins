@@ -10,14 +10,9 @@ HTTP API reaches that prompt hook unrefused.
 """
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[5] / "loom-code" / "scripts"))
-
-from loom_checker.rule_checks.selection_guard import bash_guard_reason  # noqa: E402
+from loom_checker.rule_checks.selection_guard import bash_guard_reason
 
 TOKEN = "/loom-code:" + "expert-mode ABC123"
 API = "http://127.0.0.1:49374/api/session"
