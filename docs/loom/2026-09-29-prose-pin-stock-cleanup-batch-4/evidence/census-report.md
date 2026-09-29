@@ -1,6 +1,6 @@
 # Batch 4 census and recount (W2-01)
 
-Every number below comes from a clean detached worktree (`git worktree add --detach <scratchpad>/<wt> <ref>`), removed afterwards (plan Risk 3). HEAD is the W2-01 commit, the one that adds this report. The base is `1ef82fe8`. W3-01 later refreshed the A1 census, the candidate counts and the A5 recount from a clean worktree of its own state; the A4 and stitch sections are W2-01's run, and W3-01 changed no mapping row they count.
+Every number below comes from a clean detached worktree (`git worktree add --detach <scratchpad>/<wt> <ref>`), removed afterwards (plan Risk 3). HEAD is the W2-01 commit, the one that adds this report. The base is `1ef82fe8`. W3-01 later refreshed the A1 census, the candidate counts and the A5 recount from a clean worktree of its own state; the A4 section is W2-01's run, and W3-01 changed no mapping row. The stitch section is the closing-review round-1 fix's run, from a clean worktree of the fix commit, because that fix changed mapping rows.
 
 A census run from the main checkout gives different counts (`not-prose 59` instead of 54), because nested worktrees under `.claude/worktrees` add files to the scan. Only the clean-worktree numbers count.
 
@@ -91,7 +91,7 @@ Command: the same script with `--candidates`. It exited 0.
 | loom-workflow | 55 | 374 | 3 | 7 |
 | **total** | **106** | 622 | 3 | 22 |
 
-These are the W3-01 counts. W2-01 listed 609 structural rows; the two W3-01 forms added 13 structural rows (all in loom-workflow) and no prose row, and `decide.py` rerun on the W3-01 list printed `prose rows: 106; undecided: 0`.
+These are the W3-01 counts. W2-01 listed 609 structural rows; the two W3-01 forms added 13 structural rows (all in loom-workflow) and no prose row, and `decide.py` rerun on the W3-01 list printed `prose rows: 106; undecided: 0`. The closing-review round-1 fix adds 3 structural rows and no prose row (structural 625, prose 106): the `result:` field-key regex in `test_acceptance_test_report_shape.py`, and the `**Derivation contract:**` bold label and its slash-roster regex in `test_design_md_schema_keys.py`. `candidate-list.md` was not regenerated for them.
 
 W0-01 counted 233 prose rows. **All 106 prose rows left are decided.** The throwaway script `decide.py` (text below) found a W1 or W2-01 `Decisions` row for each of them, and printed `prose rows: 106; undecided: 0`. None of the 106 is decided `prune` or `delete`. Each is a keep with a reason: heading, label, field key, column cell, proper name, absence or one-home scan, or kept gate. W2-01 also read all 106 pointers and checked that each one lands on the row that judges that literal. The pointers are in `candidate-list.md`.
 
@@ -127,18 +127,20 @@ Command: `python3 <HEAD wt>/docs/loom/2026-09-27-prose-pin-stock-cleanup/evidenc
 
 Sources: `mapping-code.md` (W1-01), `mapping-design.md` (W1-02), `mapping-workflow.md` (W1-03), `mapping-workflow-2.md` (W1-06), `mapping-compaction.md` (W1-08) and `mapping-containers.md` (W1-09, plus `## W2-01 additions`). The stitch keeps every row under a `file::function(s) | defect class it guarded | named replacement | kind` header.
 
-**72 rows in all.**
+These counts are from the closing-review round-1 fix, rerun from a clean worktree of the fix commit. That fix audited all 28 rows marked `kept structural test` against the test each one cites. 23 cited a test that stays green when the row's defect class happens, and they are now `review lens dimension`, with the test kept as a side note. It restored two field-key and roster set checks, so two rows became `kept structural test`: mapping-code's `result:` row and mapping-design's Derivation contract row, which was `review-only`. It also split mapping-code's verdict-vocabulary row in two. At W2-01 the stitch counted 72 rows: 41 review lens dimension, 28 kept structural test, 2 review-only, 1 checker rule id.
+
+**73 rows in all.**
 
 | kind | rows |
 |---|---|
-| review lens dimension | 41 |
-| kept structural test | 28 |
-| review-only | 2 |
+| review lens dimension | 64 |
+| kept structural test | 7 |
+| review-only | 1 |
 | checker rule id | 1 |
 
 | source | rows |
 |---|---|
-| mapping-code | 6 |
+| mapping-code | 7 |
 | mapping-design | 16 |
 | mapping-workflow | 21 |
 | mapping-workflow-2 | 13 |
@@ -148,12 +150,12 @@ Sources: `mapping-code.md` (W1-01), `mapping-design.md` (W1-02), `mapping-workfl
 **Replacement check (plan item 5).** `stitch4.py`, run from the HEAD worktree root, printed:
 
 ```
-rows: 72
-by kind: {'kept structural test': 28, 'review lens dimension': 41, 'checker rule id': 1, 'review-only': 2}
-by file: {'mapping-code': 6, 'mapping-design': 16, 'mapping-workflow': 21, 'mapping-workflow-2': 13, 'mapping-compaction': 7, 'mapping-containers': 9}
+rows: 73
+by kind: {'kept structural test': 7, 'review lens dimension': 64, 'checker rule id': 1, 'review-only': 1}
+by file: {'mapping-code': 7, 'mapping-design': 16, 'mapping-workflow': 21, 'mapping-workflow-2': 13, 'mapping-compaction': 7, 'mapping-containers': 9}
 replacement defs cited and resolved: 43
 deleted defs in changed test files: 81 (test functions: 64 )
-exec base: 1927 head: 1927 removed from list: [] added: []
+exec base: 1927 head: 1929 removed from list: [] added: ['loom-code/tests/test_adversarial_batch4_census_lookup_forms.py::test_census_find_presence_lookup_flags_pin', 'loom-code/tests/test_adversarial_batch4_census_lookup_forms.py::test_census_self_attribute_markdown_flags_pin']
 deleted test functions on the base exec list: []
 problems: 0
 ```
