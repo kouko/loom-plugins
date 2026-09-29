@@ -102,15 +102,18 @@ dispatches, not sessions.
 After the bare-invocation confirmation (or with explicit initial scope), read
 `top.json` and dispatch one independent subagent per payload. Use
 `agents/prompt-failure-analysis.md` or
-`agents/prompt-success-analysis.md` according to `kind`, include the target
-SKILL.md body and observable session events, and use the current Sonnet
-generation. Fan out only disjoint trajectories.
+`agents/prompt-success-analysis.md` according to `kind`, include the
+observable session events, and use the current Sonnet generation. Fan out only
+disjoint trajectories.
 
 The payload names the target skill in `input.target_skill` and leaves
 `target_skill_path` and `target_skill_md_content` empty; the script reads no
-other skill's files. Before dispatch, fill both from that skill's own loaded
-base directory (the folder holding its SKILL.md). If the host has not loaded
-that skill, omit its trajectories and name them in the summary.
+other skill's files, and both keys stay empty at dispatch. Pass the target
+skill by name only: the subagent gets its instructions through the host's
+skill mechanism by that name, never by a file path. Do not invoke a target
+skill merely to discover its path. If the host cannot provide the skill by
+name, the subagent analyzes the trajectory without it, and the summary says
+so; do not drop the trajectory.
 
 Each subagent returns the strict-markdown Memory Item shape defined by its
 prompt. Do not ask it for JSON. Claude Code dispatch uses the harness alias
@@ -299,7 +302,7 @@ and identify it in the user-facing summary. Do not truncate the trajectory
 silently, because a partial session can invert the apparent cause of friction.
 
 Give every analysis subagent only its own payload, the matching analysis
-prompt, and the current target SKILL.md. Do not add the desired conclusion,
+prompt, and the target skill's name. Do not add the desired conclusion,
 suspected change, or other trajectories’ results. Independent inputs keep the
 fan-out parallel and prevent one analysis from anchoring another. A subagent is
 an analyst here: it returns Memory Items and does not edit repository files,
@@ -369,7 +372,7 @@ Stop and surface the reason when:
 - a trajectory exceeds the 1M-token estimate;
 - input would include hidden or encrypted reasoning rather than observable
   records;
-- a required prompt, target SKILL.md, `top.json`, or `merged.json` is missing;
+- a required prompt, `top.json`, or `merged.json` is missing;
 - a Memory Item lacks required fields or has an unresolved anchor;
 - `apply.py` refuses approval, path, anchor, or diff validation; or
 - any relevant test fails or is skipped.

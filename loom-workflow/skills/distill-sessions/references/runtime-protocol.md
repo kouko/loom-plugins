@@ -11,7 +11,10 @@ Read `top.json`, then fan out one subagent for every
 `subagent_payload[]` entry. Select
 `agents/prompt-failure-analysis.md` or
 `agents/prompt-success-analysis.md` from the payload `kind`; pass the
-observable session events and current target SKILL.md. Sibling dispatches are
+observable session events and the target skill by name (`target_skill`),
+never by a file path; `target_skill_path` and `target_skill_md_content` stay
+empty. If the host cannot provide that skill by name, the subagent analyzes the
+trajectory without it and the summary says so. Sibling dispatches are
 independent because they read disjoint trajectories.
 
 Claude Code uses the dispatch alias `model: "sonnet"`; its tool rejects the
