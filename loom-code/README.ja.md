@@ -219,7 +219,7 @@ opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
 opencode plugin list
 ```
 
-TUI の plugin ダイアログで Install plugin を選び、同じ spec を入力してもよい。更新するには `plugin add` をもう一度実行する。
+TUI の plugin ダイアログで Install plugin を選び、同じ spec を入力してもよい。更新するには、`plugin add` や `plugin update` を再実行しても何も起きない（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用する）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動する：`opencode plugin remove <plugin>`、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
 skill は `loom-code:<skill>` として提供される。loom の役割は OpenCode の subagent `loom-code:<role>` として `subagent` ツール経由でセッションのモデルで動く。expert-mode はコマンド `/loom-code:expert-mode`。
 

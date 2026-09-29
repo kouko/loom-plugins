@@ -189,3 +189,13 @@ def test_principles_name_opencode() -> None:
     assert "OpenCode v2" in hooks
     ratified = next(l for l in text.splitlines() if l.startswith("ratified-by:"))
     assert "OpenCode v2 added) by kouko 2026-09-29" in ratified
+
+
+def test_opencode_update_is_remove_then_commit_pinned_add() -> None:
+    # Live on 2.0.18: re-running `plugin add` says "already configured" and a
+    # same-branch re-add reuses the cache; only remove + commit-pinned add updates.
+    for rel in AGY_READMES:
+        body = _opencode_section(_read(rel))
+        assert "opencode plugin remove" in body, rel
+        assert re.search(r"opencode plugin add 'github:kouko/loom-plugins#<[^>]+>::path:", body), rel
+        assert not re.search(r"To update, run|もう一度実行|再執行一次", body), rel

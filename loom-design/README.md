@@ -159,7 +159,7 @@ opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
 opencode plugin list
 ```
 
-Or open the plugin dialog in the TUI, choose Install plugin and enter the same spec. To update, run the `plugin add` command again.
+Or open the plugin dialog in the TUI, choose Install plugin and enter the same spec. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove <plugin>`, then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
 Skills are offered as `loom-design:<skill>`.
 

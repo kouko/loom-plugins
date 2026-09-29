@@ -199,7 +199,7 @@ opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
 opencode plugin list
 ```
 
-也可以在 TUI 開啟 plugin 對話框，選 Install plugin 並輸入同一個 spec。更新時再執行一次 `plugin add`。
+也可以在 TUI 開啟 plugin 對話框，選 Install plugin 並輸入同一個 spec。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove <plugin>`，接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
 skill 以 `loom-code:<skill>` 提供。loom 的角色以 OpenCode subagent `loom-code:<role>` 透過 `subagent` 工具執行，使用 session 的模型；expert-mode 是指令 `/loom-code:expert-mode`。
 
