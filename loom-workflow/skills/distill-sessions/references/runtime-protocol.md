@@ -48,6 +48,7 @@ Convert each Memory Item block to one JSON entry. The source of truth is
 [
   {
     "session_id": "<subagent_payload session>",
+    "target_skill": "<subagent_payload input.target_skill>",
     "target_skill_path": "<subagent_payload target>",
     "memory_items": [
       {

@@ -123,7 +123,7 @@ dispatch enum. Codex uses its host-specific dispatch mechanism.
 ### 3. Collect `merged.json`
 
 Mechanically convert each returned Memory Item into `memory_items[]`, carrying
-the source `session_id` and `target_skill_path`. Every item needs `title`,
+the source `session_id`, `target_skill` and `target_skill_path`. Every item needs `title`,
 `description`, `content`, `kind`, and a non-blank `section_anchor` that names a
 real target heading. `requires_new_reference_file` is optional and defaults to
 false.

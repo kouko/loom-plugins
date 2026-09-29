@@ -103,7 +103,7 @@ consult any external resource beyond these four inputs.
    qualifies.
 
 3. **Build per-target SKILL.md modification list.** Group Memory Items
-   by `target_skill_path`. For each target, list the proposed edits
+   by `target_skill` (or `target_skill_path` when set). For each target, list the proposed edits
    (insertions / replacements / additions) as code-block-wrapped text
    the operator can paste directly. Surround each edit with a
    one-sentence `{{lang}}` rationale citing the Memory Item(s) that
@@ -153,9 +153,9 @@ defensible as semantically coherent.>
 
 ## Per-target SKILL.md modifications
 
-<Grouped by `target_skill_path`. For each target:
+<Grouped by `target_skill` (or `target_skill_path` when set). For each target:
 
-### `<target_skill_path>`
+### `<target_skill>`
 
 <One-sentence framing in {{lang}}: how many Items propose changes to
 this skill, what aspect they touch.>

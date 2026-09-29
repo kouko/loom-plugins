@@ -921,3 +921,12 @@ def test_extract_memory_items_filters_by_target_skill_path() -> None:
         f"Orphan entry (missing target_skill_path) must be skipped under filter, "
         f"got {len(only_a_with_orphan)}"
     )
+
+    # Name-routed payloads leave target_skill_path empty and name the skill
+    # in target_skill; the entry matches by the skill part of that name.
+    named = [
+        {**entry, "target_skill_path": "", "target_skill": f"plug:skill-{s}"}
+        for entry, s in zip(results, "AB")
+    ]
+    by_name = extract_memory_items(named, target_skill_path="/path/to/skill-A/SKILL.md")
+    assert [it["title"] for it in by_name] == ["A item 1", "A item 2"]

@@ -157,13 +157,18 @@ def extract_memory_items(
     distill-sessions targeted both writing-plans AND brainstorming).
     Without this filter, items intended for skill A leak into skill B's
     proposal. ``None`` default preserves backward-compat (legacy callers
-    that pre-filter merged.json themselves are unaffected).
+    that pre-filter merged.json themselves are unaffected). An entry with an
+    empty path (name-routed payload) matches when the skill part of its
+    ``target_skill`` name (``plugin:skill``) equals the target's directory.
     """
     flat: list[dict] = []
+    target_dir = Path(target_skill_path).parent.name if target_skill_path else ""
     for entry in results:
         if target_skill_path is not None:
             entry_path = entry.get("target_skill_path")
-            if entry_path != target_skill_path:
+            entry_name = str(entry.get("target_skill") or "").rsplit(":", 1)[-1]
+            by_name = not entry_path and entry_name and entry_name == target_dir
+            if entry_path != target_skill_path and not by_name:
                 continue
         session_id = entry.get("session_id", "unknown")
         for raw_item in entry.get("memory_items", []):
