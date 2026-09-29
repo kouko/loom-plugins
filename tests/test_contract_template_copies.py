@@ -3,6 +3,7 @@
 loom-design skills read local copies instead of loom-code's files, so a copy
 and its original must change together; this test fails when one side moves.
 """
+# concern: a one-side edit of a template copy or its loom-code original drifts silently.
 from __future__ import annotations
 
 import re
