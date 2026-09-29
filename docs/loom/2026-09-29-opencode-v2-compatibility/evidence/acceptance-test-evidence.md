@@ -188,3 +188,130 @@ All runs are in a second throwaway repo `proj2` (branch `feature/demo`, with a `
 - The permission stand-ins and monitors were stopped, and the tmux server was killed.
 - The worktree was removed with `git worktree remove`.
 - The real repo is clean at `5a0e8d4a`.
+
+## Re-run on 2026-09-29, at 136c0248
+
+Fix range `5bc86a10..136c0248`:
+- `89637084` prefixes every OpenCode subagent's system prompt with its installed plugin root. The change is in the loader's `agents()` only: `loom-code/opencode/loader.js:87-88`, plus the three mirror loaders and `scripts/opencode/loader.js`.
+- `136c0248` changes the OpenCode README steps: remove by full spec, restart after add, and a note on permission prompts.
+
+No manifest, `hooks*.json`, hook script, skill, `PRINCIPLES.md` or version file is in the range.
+
+Environment for the re-run:
+- A fresh isolated tree `oc-at/rerun/` with its own `XDG_*`, `OPENCODE_CONFIG_DIR` (no plugins at start), service port 49613 and a new throwaway project `rerun/proj`.
+- Same binary, 2.0.18. The user's service on 49374 (pid 91480) was untouched and was still up at the end.
+- The service environment carried 0 `CLAUDE*`/`CODEX*`/`ANTHROPIC*` variables.
+- `gh` was the user's real login (`GH_CONFIG_DIR=$HOME/.config/gh`), authorized for the scratch repo only.
+- Model: `litellm/hyper-coding-group` (free third-party routes via the user's litellm).
+- Driving:
+  - `opencode run` without `--auto` aborts at the first permission prompt (`error: aborted "Step interrupted"`), and the `question` tool aborts a non-interactive run (`Session interrupted: shutdown`).
+  - So after two `opencode run` turns, the root session was driven through the server API the TUI uses: `POST /api/session/<id>/prompt`, and `GET /api/form` / `POST /api/session/<id>/form/<id>/reply` for questions.
+  - No `--auto` was in effect for the flow; every permission prompt went to the stand-in.
+- Stand-in rules (`oc-at/approver2.py`):
+  - `external_directory` inside the project or the plugin cache → `always`;
+  - a temp dir outside the tester's scratch area → `once`;
+  - anything else → `reject`.
+- Harness finding: `opencode api GET /api/session/<id>/message` output is cut near 256 KiB. The re-run pages with `?limit=&cursor=` (`oc-at/oc_api.py`). The first run's token counter did not page, so it may have under-counted.
+
+### 1: re-tested
+- How: README.md:246-256 steps with the pinned local spec, then the documented update/remove step. Log `rerun/logs/a1-install.txt`.
+  - `opencode plugin list` → `No plugins found`.
+  - Three `opencode plugin add 'git+file:///Users/kouko/GitHub/loom-plugins#136c0248::path:<plugin>'` → each `installed and added`.
+  - `plugin list` straight after the adds → `No plugins found`.
+  - `opencode service restart`, then `plugin list` → `No plugins found` at +5 s and +10 s.
+  - The +20 s list and every one after it showed `loom-code`, `loom-design` and `loom-workflow` at `136c024`.
+  - `opencode plugin remove loom-workflow` → `Plugin "loom-workflow" is not configured`, as the README now says.
+  - `opencode plugin remove '<full spec>'` → `removed`. Re-add → `installed and added`. After a restart the list showed all three again after about 35 s.
+- Still not tried:
+  - the `github:` fetch (the branch is not published);
+  - the TUI "Install plugin" dialog (it needs a person at a real terminal).
+- Verdict: partly.
+
+### 2: carried over
+- Reason: the fix touches only `agents()` (the subagent system prompt) and README text; skill and command registration is unchanged in the diff.
+- Consistent with this: `/api/agent` lists the four `loom-code:<role>` subagents (`rerun/logs/agents.json`), and the flow loaded `loom-code:*` and `loom-design:*` skills from the cache.
+
+### 3: re-tested
+- Scratch repo `https://github.com/kouko/loom-opencode-scratch` (private, created by the user).
+  - The initial commit went to branch `trunk`, not `main`: the tester's own Claude Code guard refused `git push -u origin main` ("do not push directly to main/master").
+  - `trunk` became the default branch, `origin/HEAD -> origin/trunk`.
+- Root session `ses_f12b97e45ffejOcQviIsULy7BG`. Prompts, in order (`rerun/prompts/`, `rerun/logs/driver.jsonl`):
+  1. The ask: add `--upper`, through to an opened PR.
+  2. Answers to the capture-intent and principles questions.
+  3. "confirmed, needs-design: no, automatic publication authorized".
+  4. At ship's github-rules question: "No — don't add the workflow template or any branch protection".
+- Branch `feat/2026-09-29-greet-upper-flag`:
+  - `c772bd5` intent confirmed
+  - `52815a3` principles + kickoff defaults
+  - `bec838d` plan
+  - `842ab23` feat
+  - `3233a9a` fix: the kickoff-defaults placeholders, found by the adversary
+  - `eedc89a` adversarial probe
+  - `4f05b21` acceptance test report + evidence
+- Checker, run by the tester with the installed copy (`rerun/logs/a3-checker.txt`):
+  - `intent docs/loom/intent/2026-09-29-greet-upper-flag.md` → exit 0.
+  - `intake write-plan 2026-09-29-greet-upper-flag` → exit 0.
+  - `reviewer-count` → 2.
+  - `finalize-review 2026-09-29-greet-upper-flag --input /tmp/finalize-input.json`, run by the root → `wrote docs/loom/2026-09-29-greet-upper-flag/attestation.json for f844aba…`, exit 0.
+- Attestation:
+  - The attestation was never committed; it is still untracked in `rerun/proj`.
+  - `publish` printed `loom: verification stale (attestation is not committed at HEAD); publishing anyway.` / `Published PR: https://github.com/kouko/loom-opencode-scratch/pull/1` / `No required checks registered`.
+  - In a throwaway clone (`rerun/attest-check`) with the attestation committed, `pr-floor --body-file <PR body> --base 36f5306 --head <sha>` → `::notice title=verification::valid`, exit 0. So the attestation itself is good; the flow skipped committing it.
+- PR #1: `OPEN`, base `trunk`, head `4f05b21`, `gh pr checks` → `no checks reported`.
+  - The PR body says `Verification status: valid (skipped: reviewers)`. Both parts are wrong: publish computed `stale`, and no step was skipped (two reviewers ran).
+  - loom-code/skills/ship/SKILL.md:78-86 requires the body to carry the status publish printed.
+- The PR was not merged. Nothing was pushed to any other repo.
+- Verdict: partly.
+
+### 4: re-tested
+- Child sessions of the root (`rerun/logs/tokens-final.txt`):
+  - `loom-code:adversary` ×1;
+  - `loom-code:reviewer` ×3. One was cancelled after the stand-in rejected its `cd /` (resource `/*`); two completed: the code lens and the docs lens;
+  - `loom-code:acceptance-tester` ×2. The first was cancelled after the stand-in rejected a worktree in the project's parent directory; the second committed the report.
+- Plugin root, per child (`rerun/logs/tools-<session>.txt`):
+  - Every child's first reads came from the installed plugin root `…/xdg/cache/opencode/npm/git-loom-plugins-13c9afe2e85a/…/node_modules/loom-code/…`: the reviewers' lens file, the acceptance tester's `skills/closing-review/references/acceptance-test-report.md`, and the adversary's 16 reads.
+  - Across all children: 0 `find /`, 0 reads of `/Users/kouko/GitHub/loom-plugins`, 0 reads of stale temp fixtures.
+  - The loader put `Plugin root for this agent: <cache>/node_modules/loom-code — …` first in each agent's system prompt (`rerun/logs/agents.json`).
+  - No child stopped on a plugin-cache prompt: the root's earlier `always` approvals for `node_modules/loom-code/*` covered them.
+- The implementer was never dispatched.
+  - The root session wrote `greet.py`, the tests and README itself (tools log lines 79-99), and committed `842ab23`.
+  - `implementer` was not skipped: no selection was made, and no skip is in the intent or plan.
+  - loom-code/skills/build/SKILL.md:68-76 makes implementer dispatch mandatory in that case.
+- Verdict: partly.
+
+### 5: carried over
+- Reason: no hook script, `hooks-opencode.json` or loader hook code is in the fix range; the loader change is confined to `agents()`.
+- Side observation: the intent restatement came back in Traditional Chinese although every prompt was English. The cause was not isolated.
+
+### 6: re-tested
+- In a clean worktree at `136c0248`, the tests covering the fix:
+  - `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_opencode_loader.py tests/test_agy_install_docs.py` → `22 passed`.
+  - `python3 scripts/sync_codex_manifests.py --check --all` → exit 0.
+  - `git diff --stat 5bc86a10..136c0248 -- '*.json' '**/hooks*'` → empty.
+  - Log: `rerun/logs/a6-targeted.txt`.
+- Full suite command, run by `finalize-review`: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. The tester did not run it this time.
+- Verdict: works.
+
+### 7: carried over
+- Reason: `PRINCIPLES.md` is not in the fix range.
+
+### 8: carried over
+- Reason: no manifest, CHANGELOG or version string is in the fix range, so the versions stay 3.24.0 / 2.7.1 / 5.5.6 and consistent.
+
+### Cost
+- All 7 sessions: 7,115,186 non-cached input tokens, 5,572,966 cache reads, 45,465 output tokens. Reported cost 0 (free routes).
+- The root session alone: 5.07M input.
+- The ~6M budget was passed while ship was already running (6.65M at the github-rules question). The tester sent the one remaining answer so the flow could reach the PR, and ended at 7.1M.
+
+### Side effects outside the sandbox
+- The root session ran `pip3 install --break-system-packages pytest -q` in its shell.
+  - This installed pytest 9.1.1, pluggy 1.6.0, iniconfig 2.3.0, packaging 26.3 and pygments 2.21.0 into `/opt/homebrew/lib/python3.14/site-packages`.
+  - dist-info mtimes: 2026-09-29 22:08:41-42.
+- OpenCode's shell tool is not gated by `external_directory`. The root also listed the tester's scratch directory and printed `oc-at/env.sh`, which holds no key. That only happened because the throwaway project sat inside the tester's scratch area.
+
+### Cleanup
+- The isolated service was stopped; nothing listens on 49613.
+- The stand-in and monitors were stopped.
+- The worktree was removed with `git worktree remove`.
+- The real repo is clean at `136c0248`.
+- The scratch repo and PR #1 remain for the user to delete.
