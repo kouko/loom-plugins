@@ -30,17 +30,20 @@ const ctx = {
   session: {
     prompt: async () => {},
     hook: async (name, fn) => { hooks[name] = fn; },
-    get: async ({ sessionID }) => ({ data: { id: sessionID, parentID: sessionID.startsWith("child") ? "root" : undefined } }),
+    get: async ({ sessionID }) => ({ data: { id: sessionID, parentID: sessionID.startsWith("child") ? "root" : undefined,
+      location: process.env.STUB_SESSION_DIR ? { directory: process.env.STUB_SESSION_DIR } : undefined } }),
   },
   tool: { hook: async (name, fn) => { hooks[name] = fn; } },
 };
 const mod = (await import(pathToFileURL(process.argv[1]).href)).default;
 await mod.setup(ctx);
 if (process.argv[2]) {
-  const fire = JSON.parse(process.argv[2]);
-  let threw = null;
-  try { await hooks[fire.hook](fire.event); } catch (e) { threw = e.message; }
-  console.log(JSON.stringify({ threw, event: fire.event }));
+  let threw = null, event = null;
+  for (const fire of [].concat(JSON.parse(process.argv[2]))) {
+    threw = null; event = fire.event;
+    try { await hooks[fire.hook](fire.event); } catch (e) { threw = e.message; }
+  }
+  console.log(JSON.stringify({ threw, event }));
 } else {
   console.log(JSON.stringify({ id: mod.id, ...seen }));
 }
@@ -133,12 +136,32 @@ def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
 
 
 def test_nested_skill_folder_write_noted(tmp_path: Path):
-    nested = tmp_path / "skills" / "demo" / "assets" / "sub" / "x.md"
+    # OpenCode 2.0.18 sends `path` relative to the session's directory, which
+    # differs from the loader process's cwd under the background service.
+    project, elsewhere = tmp_path / "proj", tmp_path / "home"
+    nested = project / "skills" / "demo" / "assets" / "sub" / "x.md"
     nested.parent.mkdir(parents=True)
-    (tmp_path / "skills" / "demo" / "SKILL.md").write_text("---\nname: demo\n---\n", encoding="utf-8")
+    elsewhere.mkdir()
+    (project / "skills" / "demo" / "SKILL.md").write_text("---\nname: demo\n---\n", encoding="utf-8")
     nested.write_text("x", encoding="utf-8")
     event = {"tool": "write", "sessionID": "root", "id": "c2", "status": "completed",
-             "input": {"filePath": str(nested), "content": "x"},
-             "result": {"content": [{"type": "text", "text": "Wrote file"}]}}
-    content = _fire("loom-workflow", "execute.after", event, tmp_path)["event"]["result"]["content"]
-    assert any("Skill folder structure violation" in part["text"] for part in content)
+             "input": {"path": "skills/demo/assets/sub/x.md", "content": "x"},
+             "result": {"output": "Wrote file", "content": [{"type": "text", "text": "Wrote file"}]}}
+    env = {**os.environ, "STUB_SESSION_DIR": str(project)}
+    result = _fire("loom-workflow", "execute.after", event, elsewhere, env)["event"]["result"]
+    assert any("Skill folder structure violation" in part["text"] for part in result["content"])
+    assert "Skill folder structure violation" in result["output"]  # the field OpenCode stores
+
+
+def test_push_reminder_uses_session_directory(tmp_path: Path):
+    repo, elsewhere = tmp_path / "proj", tmp_path / "home"
+    repo.mkdir()
+    elsewhere.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "feature/demo", str(repo)], check=True)
+    call = {"tool": "shell", "sessionID": "root", "id": "c3", "status": "completed",
+            "input": {"command": "git push --dry-run origin HEAD"},
+            "result": {"output": "pushed", "content": [{"type": "text", "text": "pushed"}]}}
+    fires = [{"hook": "execute.before", "event": call}, {"hook": "execute.after", "event": call}]
+    env = {**os.environ, "STUB_SESSION_DIR": str(repo)}
+    output = _node("loom-code", json.dumps(fires), cwd=elsewhere, env=env)["event"]["result"]["output"]
+    assert "change not identified" in output and "not inside a git work tree" not in output

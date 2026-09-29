@@ -146,12 +146,14 @@ export async function setup(ctx) {
 
 // hooks/hooks-opencode.json has the Claude hooks.json schema, event names and
 // tool-name matchers. Each command runs through `bash -c` with PLUGIN_ROOT set
-// and cwd = the project, fed the Claude Code payload built from the OpenCode
-// call, so the handlers are the ones every other host runs.
+// and cwd = the session's directory, fed the Claude Code payload built from the
+// OpenCode call, so the handlers are the ones every other host runs.
+// OpenCode 2.0.18 sends write/edit `path` relative to the session directory.
+const file = (i, dir) => (typeof (i.path ?? i.filePath) === "string" ? resolve(dir, i.path ?? i.filePath) : undefined);
 const TOOLS = {
   shell: (i) => ["Bash", { command: i.command }],
-  write: (i) => ["Write", { file_path: i.filePath, content: i.content }],
-  edit: (i) => ["Edit", { file_path: i.filePath, old_string: i.oldString, new_string: i.newString }],
+  write: (i, dir) => ["Write", { file_path: file(i, dir), content: i.content }],
+  edit: (i, dir) => ["Edit", { file_path: file(i, dir), old_string: i.oldString, new_string: i.newString }],
   patch: (i) => ["apply_patch", { ...i }],
   apply_patch: (i) => ["apply_patch", { ...i }],
   skill: (i) => ["Skill", { skill: i.id }],
@@ -189,7 +191,7 @@ function run(hook, payload, env) {
     let stdout = "";
     let stderr = "";
     const child = spawn("bash", ["-c", hook.command], {
-      cwd: process.cwd(),
+      cwd: payload.cwd,
       env: { ...process.env, PLUGIN_ROOT: root, ...env },
       timeout: (hook.timeout ?? 30) * 1000,
     });
@@ -214,9 +216,10 @@ function output(result) {
   }
 }
 
+// The model reads `content`; OpenCode stores `output`, so a note goes in both.
 function note(result, text) {
   if (Array.isArray(result?.content)) result.content.push({ type: "text", text });
-  else if (typeof result?.output === "string") result.output += `\n\n${text}`;
+  if (typeof result?.output === "string") result.output += `\n\n${text}`;
 }
 
 // The per-session user-prompt file lang_detect reads as a Claude transcript.
@@ -227,20 +230,28 @@ function transcript(sessionID) {
 
 async function registerHooks(ctx) {
   const table = hookTable();
-  const payload = (sessionID, event, extra) =>
-    ({ hook_event_name: event, session_id: sessionID, cwd: process.cwd(), ...extra });
-
-  // A session with a parent, or one whose parent cannot be read, is a child:
-  // it gets no context, records no prompt, and its handlers run unattended.
-  const parents = new Map();
-  const isChild = (sessionID) => {
-    if (!sessionID) return Promise.resolve(true);
-    if (!parents.has(sessionID)) {
-      parents.set(sessionID, Promise.resolve()
+  // One session record per session id: its parent and its directory.
+  const records = new Map();
+  const record = (sessionID) => {
+    if (!sessionID) return Promise.resolve(null);
+    if (!records.has(sessionID)) {
+      records.set(sessionID, Promise.resolve()
         .then(() => ctx.session.get({ sessionID }))
-        .then((r) => Boolean((r?.data ?? r)?.parentID), () => true));
+        .then((r) => (r?.data ?? r) || {}, () => null));
     }
-    return parents.get(sessionID);
+    return records.get(sessionID);
+  };
+  // The background service runs from the user's home, so the project is the
+  // session's directory; the loader's own cwd is only a fallback.
+  const dirFor = async (sessionID) => (await record(sessionID))?.location?.directory || process.cwd();
+  const payload = async (sessionID, event, extra) =>
+    ({ hook_event_name: event, session_id: sessionID, cwd: await dirFor(sessionID), ...extra });
+
+  // A session with a parent, or one whose record cannot be read, is a child:
+  // it gets no context, records no prompt, and its handlers run unattended.
+  const isChild = async (sessionID) => {
+    const r = await record(sessionID);
+    return !r || Boolean(r.parentID);
   };
   const envFor = async (sessionID) =>
     ((await isChild(sessionID)) ? { CLAUDE_CODE_SESSION_ATTENDED: "0" } : {});
@@ -255,7 +266,7 @@ async function registerHooks(ctx) {
         started.set(id, (async () => {
           const texts = [];
           for (const hook of commands(table, "SessionStart")) {
-            texts.push(output(await run(hook, payload(id, "SessionStart", { source: "startup" }))).context);
+            texts.push(output(await run(hook, await payload(id, "SessionStart", { source: "startup" }))).context);
           }
           return texts.filter(Boolean).join("\n\n");
         })());
@@ -281,7 +292,7 @@ async function registerHooks(ctx) {
       }
       const added = [];
       for (const hook of commands(table, "UserPromptSubmit")) {
-        const result = output(await run(hook, payload(id, "UserPromptSubmit",
+        const result = output(await run(hook, await payload(id, "UserPromptSubmit",
           { prompt: text, prompt_id: ev.messageID, transcript_path: file })));
         added.push(result.context, result.message);
       }
@@ -292,15 +303,16 @@ async function registerHooks(ctx) {
   if (!table.PreToolUse && !table.PostToolUse) return;
   const notes = new Map(); // tool call id -> PreToolUse systemMessage lines
   await ctx.tool.hook("execute.before", async (ev) => {
-    const mapped = TOOLS[ev.tool]?.(ev.input ?? {});
+    const dir = await dirFor(ev.sessionID);
+    const mapped = TOOLS[ev.tool]?.(ev.input ?? {}, dir);
     if (!mapped) return;
     const [name, input] = mapped;
     const env = await envFor(ev.sessionID);
-    const body = payload(ev.sessionID, "PreToolUse", { tool_name: name, tool_input: input });
+    const body = await payload(ev.sessionID, "PreToolUse", { tool_name: name, tool_input: input });
     for (const hook of commands(table, "PreToolUse", name)) {
       const result = await run(hook, body, env);
       if (result.status === 2) throw new Error(result.stderr.trim() || `loom: a PreToolUse hook refused ${name}`);
-      if (result.status !== 0 && namesStore(name, input, process.cwd())) {
+      if (result.status !== 0 && namesStore(name, input, dir)) {
         const why = result.stderr.trim() || `exit ${result.status}`;
         throw new Error(`BLOCK selection.guard: names the selection record store and the checker failed (${why})`);
       }
@@ -311,11 +323,11 @@ async function registerHooks(ctx) {
   await ctx.tool.hook("execute.after", async (ev) => {
     const held = notes.get(ev.id) ?? [];
     notes.delete(ev.id);
-    const mapped = TOOLS[ev.tool]?.(ev.input ?? {});
+    const mapped = TOOLS[ev.tool]?.(ev.input ?? {}, await dirFor(ev.sessionID));
     if (mapped && ev.status !== "error") {
       const [name, input] = mapped;
       const env = await envFor(ev.sessionID);
-      const body = payload(ev.sessionID, "PostToolUse",
+      const body = await payload(ev.sessionID, "PostToolUse",
         { tool_name: name, tool_input: input, transcript_path: transcript(ev.sessionID) });
       for (const hook of commands(table, "PostToolUse", name)) {
         const result = await run(hook, body, env);

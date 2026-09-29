@@ -37,8 +37,8 @@ REQ-8 — Release bump
 | OpenCode tool and argument | Claude payload |
 |---|---|
 | `shell` `command` | `Bash` `command` |
-| `write` `filePath` | `Write` `file_path` |
-| `edit` `filePath` | `Edit` `file_path` |
+| `write` `path` | `Write` `file_path` |
+| `edit` `path` | `Edit` `file_path` |
 | `patch` / `apply_patch` | `apply_patch` with its patch text |
 | `skill` `id` | `Skill` `skill` |
 

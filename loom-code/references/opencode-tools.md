@@ -16,8 +16,8 @@ live tool schema instead of assuming.
 | Resume a dispatched agent | the agent's task id | `subagent` with `sessionID` |
 | Load a skill | `Skill` | `skill` with `id: "<plugin>:<skill>"` |
 | Run a shell command | `Bash` | `shell` |
-| Create or overwrite a file | `Write` | `write` with `filePath` |
-| Replace text in a file | `Edit` | `edit` with `filePath` |
+| Create or overwrite a file | `Write` | `write` with `path` |
+| Replace text in a file | `Edit` | `edit` with `path` |
 | Apply a multi-file change | (none) | `patch` |
 
 ## Dispatching loom roles
