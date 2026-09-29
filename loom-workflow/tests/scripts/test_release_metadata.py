@@ -1,5 +1,7 @@
 """loom-workflow version pins stay in step with each other.
 
+concern: split-version release -- a manifest, CHANGELOG entry or README version string left behind by a patch bump
+
 The installer only refetches a plugin when its version changes, so a content
 change shipped under a stale or split version never reaches installed copies.
 """
