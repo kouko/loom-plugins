@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 """Reject references that couple one plugin to another's files.
 
-The checker scans Markdown and Python scripts (``.py`` files and extensionless
-files with a python shebang, such as hooks) below a single plugin root.  In
-Markdown it reports relative links whose lexically resolved path leaves that
-root.  In both it reports path references to another ``loom-*`` plugin's
+The checker scans Markdown, ``hooks*.json`` files, shell scripts (``.sh``) and
+Python scripts (``.py`` files and extensionless files with a python shebang,
+such as hooks) below a single plugin root.  In Markdown it reports relative
+links whose lexically resolved path leaves that root.  In all of them it
+reports path references to another ``loom-*`` plugin's
 private ``hooks/``, ``skills/``, ``scripts/``, ``contract/`` or ``agents/``
 tree, a ``<loom-*>`` placeholder naming another plugin, and ``loom_checker``
 outside loom-code.  Scripts are scanned outside loom-code only, whose own
 scripts are repository-wide tools.  In scripts, comments and docstrings are
 skipped (they are never executed as a path), and so is the plugin's top-level
-``tests/`` tree, which is development-only.  Plugin-qualified skill names such as
+``tests/`` tree, which is development-only.  In Python it also reports a
+logical line where a literal ``"loom-*"`` plugin name is followed by a literal
+private tree name (a path join); a join whose plugin name is a variable is a
+known blind spot.  Plugin-qualified skill names such as
 ``loom-code:using-loom-code`` are public names and are therefore allowed.
 
 The files it scans are what git says belongs to the repository under that
@@ -57,6 +61,9 @@ _CHECKER_RE = re.compile(r"\bloom_checker\b")
 # loom-code owns the checker; its scripts are repository-wide tools that name
 # sibling paths as repository data, so scripts are scanned in the other plugins.
 _CHECKER_OWNER = "loom-code"
+_SHELL_COMMENT_RE = re.compile(r"(?:^|\s)#.*$")
+_PLUGIN_NAME_RE = re.compile(r"loom-[a-z0-9-]+")
+_PRIVATE_TREES = {"hooks", "skills", "scripts", "contract", "agents"}
 
 
 def _is_python_script(path: Path) -> bool:
@@ -108,6 +115,45 @@ def _script_lines(text: str) -> list[tuple[int, str]]:
         for number, line in enumerate(text.splitlines(), start=1)
         if number not in docstring_lines
     ]
+
+
+def _shell_lines(text: str) -> list[tuple[int, str]]:
+    """Numbered shell lines with ``#`` comments (line or trailing) cut."""
+    return [
+        (number, _SHELL_COMMENT_RE.sub("", line))
+        for number, line in enumerate(text.splitlines(), start=1)
+    ]
+
+
+def _path_joins(text: str) -> list[tuple[int, str, str]]:
+    """``(line, plugin, tree)`` for each logical Python line where a string
+    literal equal to a ``loom-*`` name is followed by one equal to a private
+    tree name, as in ``root / "loom-code" / "contract"``."""
+    hits: list[tuple[int, str, str]] = []
+    strings: list[str] = []
+    start = 0
+    try:
+        for token in tokenize.generate_tokens(io.StringIO(text).readline):
+            if token.type == tokenize.STRING:
+                start = start or token.start[0]
+                try:
+                    value = ast.literal_eval(token.string)
+                except (ValueError, SyntaxError):
+                    continue
+                if isinstance(value, str):
+                    strings.append(value)
+            elif token.type in (tokenize.NEWLINE, tokenize.ENDMARKER):
+                # The tree must follow the plugin name, so an own skill named
+                # like a plugin ("skills", "loom-visualization") stays clean.
+                hits.extend(
+                    (start, plugin, tree)
+                    for plugin, tree in zip(strings, strings[1:])
+                    if _PLUGIN_NAME_RE.fullmatch(plugin) and tree in _PRIVATE_TREES
+                )
+                strings, start = [], 0
+    except (tokenize.TokenError, SyntaxError):
+        pass
+    return hits
 
 
 def _is_archival_markdown(root: Path, markdown: Path) -> bool:
@@ -228,11 +274,25 @@ def find_boundary_violations(plugin_root: str | Path) -> list[str]:
                 enumerate(source.read_text(encoding="utf-8").splitlines(), start=1)
             )
             is_markdown = True
-        elif _is_python_script(source):
+        elif source.suffix == ".json" and source.name.startswith("hooks"):
+            lines = list(
+                enumerate(source.read_text(encoding="utf-8").splitlines(), start=1)
+            )
+            is_markdown = False
+        elif source.suffix == ".sh" or _is_python_script(source):
             if plugin_name == _CHECKER_OWNER or source.relative_to(root).parts[0] == "tests":
                 continue
-            lines = _script_lines(source.read_text(encoding="utf-8"))
+            text = source.read_text(encoding="utf-8")
             is_markdown = False
+            if source.suffix == ".sh":
+                lines = _shell_lines(text)
+            else:
+                lines = _script_lines(text)
+                violations.extend(
+                    f"{source}:{number}: sibling path join: {plugin}/{tree}"
+                    for number, plugin, tree in _path_joins(text)
+                    if plugin != plugin_name
+                )
         else:
             continue
         for line_number, line in lines:
