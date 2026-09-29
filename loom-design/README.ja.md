@@ -160,13 +160,13 @@ opencode plugin list
 
 その後 OpenCode を再起動する（`opencode service restart`）。再起動するまで、`opencode plugin list` には一部の plugin しか出ないことがある。
 
-TUI の plugin ダイアログで Install plugin を選び、同じ spec を入力してもよい。更新するには、`plugin add` や `plugin update` を再実行しても何も起きない（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用する）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動する：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのまま。plugin 名だけでは `not configured` と返る）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+ctrl+p を押して Plugins を開き、shift+I（Install plugin）を押して同じ spec を入力してもよい。更新するには、`plugin add` や `plugin update` を再実行しても何も起きない（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用する）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動する：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのまま。plugin 名だけでは `not configured` と返る）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
 skill は `loom-design:<skill>` として提供される。
 
 OpenCode での制限：
 
-- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで少し時間がかかることがある。
+- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで最大 40 秒ほどかかることがある。
 - loom-code の subagent は、plugin キャッシュにある loom のファイルを読むときに `external_directory` の許可プロンプトで止まることがある。`opencode run --auto` も subagent のセッションには効かない。loom の plugin ディレクトリの読み取りを許可する。
 - `--auto` なしの `opencode run` は最初の許可プロンプトかモデルからの質問で止まるため、長い loom の実行は TUI から行う。
 - OpenCode はプロジェクト外のシェルコマンドの前に確認しないため、モデルがマシンを変更することがある（観測例：システム全体への `pip install --break-system-packages`）。コマンドを確認するか、OpenCode の許可設定を厳しくする。

@@ -55,6 +55,7 @@ levels above the invoking station's `SKILL.md`.
 
 ## Hooks and expert mode
 
-loom-code's own plugin hooks run on OpenCode; for any behaviour a station
-lists as unavailable, follow the plugin's install instructions. There is no
-automatic expert-mode switch: the user types `/loom-code:expert-mode <CODE>`.
+loom-code's plugin hooks run on OpenCode; the install instructions list
+OpenCode's limits. There is no automatic expert-mode switch: the user types
+`/loom-code:expert-mode <CODE>` in the TUI (`opencode run` sends it as plain
+text).

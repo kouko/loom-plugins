@@ -207,15 +207,15 @@ opencode plugin list
 
 接著重啟 OpenCode（`opencode service restart`）；重啟之前，`opencode plugin list` 可能只列出部分 plugin。
 
-也可以在 TUI 開啟 plugin 對話框，選 Install plugin 並輸入同一個 spec。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+也可以按 ctrl+p，開啟 Plugins，按 shift+I（Install plugin），再輸入同一個 spec。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
 skill 以 `loom-workflow:<skill>` 提供。
 
-在 OpenCode 上，skill 資料夾規則透過 plugin 的 v2 hook 執行。
+在 OpenCode 上，visualization card 與 skill 資料夾規則透過 plugin 的 v2 hook 執行。
 
 OpenCode 的限制：
 
-- 背景服務剛啟動時，plugin 可能要稍等一下才會出現在 `opencode plugin list`。
+- 背景服務剛啟動時，plugin 最多約 40 秒才會出現在 `opencode plugin list`。
 - loom-code 的 subagent 從 plugin 快取讀取 loom 自己的檔案時，可能停在 `external_directory` 權限提示；`opencode run --auto` 也不涵蓋 subagent 的 session。請允許讀取 loom 的 plugin 目錄。
 - 不加 `--auto` 的 `opencode run` 會停在第一個權限提示或模型提問，長時間的 loom 執行請從 TUI 進行。
 - OpenCode 在專案以外執行 shell 指令前不會詢問，模型可能改動整台機器（實測：系統層級的 `pip install --break-system-packages`）；請檢查它的指令，或收緊 OpenCode 的權限設定。
@@ -224,7 +224,7 @@ OpenCode 的限制：
 
 ### 每輪提醒送不到的地方
 
-在 Claude Code 與 Codex 上，`loom-workflow` 透過 UserPromptSubmit hook，在你每次送出訊息時
+在 Claude Code、Codex 與 OpenCode 上，`loom-workflow` 透過 UserPromptSubmit hook，在你每次送出訊息時
 把 loom-visualization 的 visualization card（用使用者的語言回覆、結論先講、白話說明、
 照字面講不用比喻、用表格或圖）送給 agent，每輪最多增加 181 個英文字。以下情況收不到：
 

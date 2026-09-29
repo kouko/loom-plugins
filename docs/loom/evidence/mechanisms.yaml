@@ -197,7 +197,7 @@ mechanisms:
     class: checker-rule
     eval: loom-code/tests/test_loom_checker_standing.py::test_missing_standing_docs_warn_in_exactly_three_lines
 
-  # --- hook (9 raw entries across host manifests; 8 counted, 1 host-hygiene) ---
+  # --- hook (16 raw entries across host manifests; 14 counted, 2 host-hygiene) ---
   - id: "SessionStart:startup|clear|compact:session-start"
     class: hook
     eval: loom-code/tests/test_session_start_words.py
