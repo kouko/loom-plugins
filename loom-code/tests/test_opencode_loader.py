@@ -17,6 +17,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 HARNESS = r"""
@@ -155,6 +157,44 @@ def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
             assert not log.exists()
             assert not (tmp_path / "loom-opencode" / f"{session}.jsonl").exists()
     assert "selection capture --hook" in log.read_text(encoding="utf-8")  # the root control
+
+
+ZH = "請幫我把這個功能的測試補齊，然後說明一下為什麼之前的版本會失敗，謝謝你。"
+SKILL_CALL = {"tool": "skill", "sessionID": "root", "id": "c4", "status": "completed",
+              "input": {"id": "loom-code:build"}, "result": {"output": "ok", "content": []}}
+
+
+@pytest.mark.parametrize("plugin, fires, needle", [
+    ("loom-code", [("context", {"sessionID": "root", "system": []})], "Station order:"),
+    ("loom-code", [("context", {"sessionID": "child-1", "system": []})], None),
+    ("loom-workflow", [("prompt", {"sessionID": "root", "messageID": "m1", "prompt": {"text": "hi"}}),
+                       ("context", {"sessionID": "root", "system": []})], "Visualization card (loom-workflow)"),
+    ("loom-code", [("prompt", {"sessionID": "root", "messageID": "m1", "prompt": {"text": ZH}}),
+                   ("execute.after", SKILL_CALL)], "會話語言（繁體中文）"),
+], ids=["session-start", "session-start-child", "visualization-card", "language-anchor"])
+def test_session_and_skill_hooks_feed_text_back(tmp_path: Path, plugin, fires, needle):
+    env = {**os.environ, "TMPDIR": str(tmp_path)}
+    fired = [{"hook": hook, "event": event} for hook, event in fires]
+    event = _node(plugin, json.dumps(fired), cwd=tmp_path, env=env)["event"]
+    texts = [part["text"] for part in event.get("system", event.get("result", {}).get("content"))]
+    if needle is None:
+        assert texts == []
+    else:
+        assert any(needle in text for text in texts), texts
+
+
+def test_unreachable_handler_still_denies_the_store(tmp_path: Path):
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    (bin_dir / "python3").write_text("#!/bin/bash\ncat >/dev/null\nexit 1\n", encoding="utf-8")
+    (bin_dir / "python3").chmod(0o755)
+    env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+    write = {"tool": "write", "sessionID": "root", "id": "c5",
+             "input": {"path": ".git/loom/selections/rec", "content": "x"}}
+    threw = _fire("loom-code", "execute.before", write, tmp_path, env)["threw"]
+    assert threw and "checker failed" in threw
+    benign = {"tool": "shell", "sessionID": "root", "id": "c6", "input": {"command": "ls"}}
+    assert _fire("loom-code", "execute.before", benign, tmp_path, env)["threw"] is None
 
 
 def test_nested_skill_folder_write_noted(tmp_path: Path):
