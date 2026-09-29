@@ -78,9 +78,9 @@ polarity word — never, must not, only, always, 不得 and their kin (no, do
 not, may not, forbid, 禁止, 絕不) — read the base version with
 `git show <base>:<path>` and compare each such sentence with its new form.
 A reversed direction (must ↔ may, never ↔ always, forbid ↔ allow), or a
-polarity clause dropped with nothing else in the delta carrying it, is an
-`inconsistency` finding, severity by consequence; a rewording that keeps
-the direction is not a finding.
+polarity clause dropped with nothing else in the delta or the unchanged
+tree carrying it, is an `inconsistency` finding, severity by consequence;
+a rewording that keeps the direction is not a finding.
 
 <!-- gate: charter.plan-omission-narrow -->
 **Plan omission, narrowed by the charter.** Omission on a `plan` is
