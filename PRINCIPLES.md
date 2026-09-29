@@ -1,5 +1,5 @@
 # Product principles — loom (loom-plugins)
-ratified-by: kouko 2026-09-05; Fixed-choices plugin clause amended (three plugins to four, loom-memory independent) by kouko 2026-09-11; reverted (four plugins back to three, loom-memory retired into loom-workflow) by kouko 2026-09-11; reviewer-floor clause amended by kouko 2026-09-12; hosts clause amended (Antigravity CLI added) by kouko 2026-09-14; non-negotiable 2 user-skipped-steps amendment ratified by kouko 2026-09-15; non-negotiable 2 plain-words-skip amendment by kouko 2026-09-22; non-negotiable 2 narrow-delta-skip amendment by kouko 2026-09-23; blind run renamed to independent acceptance testing by kouko 2026-09-23
+ratified-by: kouko 2026-09-05; Fixed-choices plugin clause amended (three plugins to four, loom-memory independent) by kouko 2026-09-11; reverted (four plugins back to three, loom-memory retired into loom-workflow) by kouko 2026-09-11; reviewer-floor clause amended by kouko 2026-09-12; hosts clause amended (Antigravity CLI added) by kouko 2026-09-14; non-negotiable 2 user-skipped-steps amendment ratified by kouko 2026-09-15; non-negotiable 2 plain-words-skip amendment by kouko 2026-09-22; non-negotiable 2 narrow-delta-skip amendment by kouko 2026-09-23; blind run renamed to independent acceptance testing by kouko 2026-09-23; Fixed-choices plugin clause amended (dependency by skill name, template copies) by kouko 2026-09-29
 
 ## Who
 People who describe what they want in plain words and have only basic software-engineering knowledge, working alone or in a small team, on Claude Code, Codex CLI or Antigravity CLI. They cannot judge the quality of a spec, a plan, or a diff.
@@ -20,6 +20,6 @@ People who describe what they want in plain words and have only basic software-e
 Work that passes every gate while its quality is insufficient and the user cannot see that it is — the user says "OK" to an acceptance test report that hides the problem.
 
 ## Fixed choices
-- Three plugins with one-way dependency on loom-code's versioned contract package. (Briefly four, 2026-09-05 to 2026-09-11, while `loom-memory` shipped as its own independent plugin; retired back into loom-workflow the same day the fourth-plugin wording was ratified.)
+- Three plugins with one-way dependency on loom-code: the others hand off to its stations by skill name and never read or run a file inside it at runtime; templates they fill are byte-identical copies kept equal by a repository test. (Briefly four, 2026-09-05 to 2026-09-11, while `loom-memory` shipped as its own independent plugin; retired back into loom-workflow the same day the fourth-plugin wording was ratified.)
 - Host-installed plugin hooks (Claude Code, Codex and Antigravity CLI), never repository-local or git hooks.
 - Hard cutover: pre-1.0 artifacts are archived in place, never converted.
