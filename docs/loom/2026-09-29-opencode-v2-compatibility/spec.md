@@ -4,7 +4,7 @@ pre-build-review: required — cross-system architecture: a fourth host runtime 
 
 ## Requirements
 REQ-1 — Install through OpenCode's own plugin paths
-  WHEN a user with OpenCode v2 and no loom install adds loom-code, loom-design or loom-workflow from this repository by OpenCode's official plugin command or the TUI's plugin dialog (carried: 「要能用 openCode v2 官方的指令 & 內建 TUI 介面 指定 repo 與 plugin 安裝」), the plugin shall install and appear in OpenCode's plugin list → Acceptance #1
+  WHEN a user with OpenCode v2 and no loom install adds loom-code, loom-design or loom-workflow from this repository by OpenCode's official plugin command or the TUI's plugin dialog (carried: 「要能用 openCode v2 官方的指令 & 內建 TUI 介面 指定 repo 與 plugin 安裝」), the plugin shall install and appear in OpenCode's plugin list → Acceptance #1 (The TUI has no such dialog on 2.0.18–2.0.20; see Design decision — install is by the plugin command or `opencode.json`.)
 REQ-2 — Every skill offered, none shadowed
   WHEN a new OpenCode session starts with the three plugins installed, every skill of the three plugins shall be offered under a plugin-qualified id and load its full SKILL.md body with its base directory, including when another installed plugin registers the same short name → Acceptance #2
 REQ-3 — Whole flow on OpenCode
