@@ -163,7 +163,7 @@ Then restart OpenCode (`opencode service restart`): until it restarts, `opencode
 
 The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
-Skills are offered as `loom-design:<skill>`.
+Skills are offered as `loom-design:<skill>`. Start loom with the command `/loom-design:using-loom-design`, which stays a skill too.
 
 Limits on OpenCode:
 

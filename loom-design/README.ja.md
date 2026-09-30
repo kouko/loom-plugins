@@ -162,7 +162,7 @@ opencode plugin list
 
 OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする項目はない。`plugin add` の代わりに、同じ spec を `opencode.json`（`plugin add` が OpenCode の設定フォルダ `~/.config/opencode/` に書き込むファイル）の `plugins` リストに追加してもよい。更新するには、`plugin add` や `plugin update` を再実行しても何も起きない（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用する）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動する：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのまま。plugin 名だけでは `not configured` と返る）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
-skill は `loom-design:<skill>` として提供される。
+skill は `loom-design:<skill>` として提供される。loom はコマンド `/loom-design:using-loom-design` で始める（skill としても引き続き提供される）。
 
 OpenCode での制限：
 

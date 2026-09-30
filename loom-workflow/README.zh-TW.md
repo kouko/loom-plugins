@@ -209,7 +209,7 @@ opencode plugin list
 
 OpenCode 的 TUI（2.0.18–2.0.20）沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 `opencode.json`（`plugin add` 寫入 OpenCode 設定資料夾 `~/.config/opencode/` 的那個檔案）的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
-skill 以 `loom-workflow:<skill>` 提供。
+skill 以 `loom-workflow:<skill>` 提供。以指令 `/loom-workflow:using-loom-workflow` 開始使用 loom；`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:goal-create` 也是指令，且都同時仍是 skill。
 
 在 OpenCode 上，visualization card 與 skill 資料夾規則透過 plugin 的 v2 hook 執行。
 

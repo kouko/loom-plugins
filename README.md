@@ -255,7 +255,7 @@ Then restart OpenCode (`opencode service restart`): until it restarts, `opencode
 
 The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
-Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model; expert-mode is the command `/loom-code:expert-mode`.
+Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model; expert-mode is the command `/loom-code:expert-mode`. Start loom with `/loom-code:using-loom-code`, `/loom-design:using-loom-design` or `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state` and `/loom-workflow:goal-create` are also commands, and each of these stays a skill too.
 
 On OpenCode, the session context, the publication reminder, the language reminder and the selection-record guard (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
 
