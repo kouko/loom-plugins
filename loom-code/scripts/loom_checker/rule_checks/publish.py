@@ -29,17 +29,17 @@ def plain_step_names(steps) -> str:
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
 
 
-# `:`, `：` and a table cell border `|` all separate the label from its value.
-# The value runs from past the separators and emphasis to the next cell border.
-_STATUS_CLAIM = re.compile(r"^[: ]*(?:\d+ )?(?:x )?verification status ?:")
-_STATUS_VALUE = re.compile(r"status[\W_]*?[:：|][\s:：|*_`]*([^|]*)", re.IGNORECASE)
+# Only `:` or `：` separates the label from its value: a table cell border
+# cannot, since one line cannot tell a header row from a data row. The value
+# runs from past the separators and emphasis to the next cell border.
+_STATUS_CLAIM = re.compile(r"^(?:\d+ )?(?:x )?verification status ?:")
+_STATUS_VALUE = re.compile(r"status[\W_]*?[:：][\s:：|*_`]*([^|]*)", re.IGNORECASE)
 
 
 def _status_claim(line: str) -> bool:
     """Whether the line, with all Markdown punctuation reduced to spaces,
     opens with the `Verification status:` label."""
-    separated = line.casefold().replace("：", ":").replace("|", ":")
-    normalized = re.sub(r"[^\w:]+|_", " ", separated).strip()
+    normalized = re.sub(r"[^\w:]+|_", " ", line.casefold().replace("：", ":")).strip()
     return _STATUS_CLAIM.match(normalized) is not None
 
 

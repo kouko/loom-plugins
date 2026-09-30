@@ -1457,7 +1457,10 @@ def test_stated_status_must_equal_the_computed_status() -> None:
     assert check(two, "absent") is not None
     assert check(body("> **Verification status:** absent"), "absent") is None
     assert check(body("| Verification status: | absent |"), "absent") is None
-    assert check(body("| Verification status | valid |"), "absent") is not None
+    assert check(body("| Verification status | valid |"), "absent") is None  # not judged
+    assert check(body("| Verification status: valid |"), "absent") is not None
+    header = "| Verification status | Reviewer |\n| --- | --- |\n| absent | Test |"
+    assert check(body(header), "absent") is None
     assert check(body("| Verification status | absent |"), "absent") is None
     assert check(body("| Verification status is shown | yes |"), "absent") is None
     assert check(body("| Verification status | absent | from CI |"), "absent") is None
