@@ -1345,7 +1345,7 @@ def test_body_without_disclosure_refused_when_selection_bound(
 
 
 def unattested_publication(tmp_path: Path, monkeypatch, body_text: str, *,
-                           with_intent: bool = True):
+                           with_intent: bool = True, untracked_attestation: bool = False):
     """A branch off main carrying (or not) its committed intent and no
     attestation, published for real: identification and status are computed."""
     calls = ExternalCalls("")
@@ -1356,6 +1356,8 @@ def unattested_publication(tmp_path: Path, monkeypatch, body_text: str, *,
         publication_intent(repo, automatic=False)
     git(repo, "add", ".")
     git(repo, "commit", "-q", "-m", "work without an attestation")
+    if untracked_attestation:
+        attestation(repo)
     body = tmp_path / "body.md"
     body.write_text(body_text, encoding="utf-8")
     calls.head = git(repo, "rev-parse", "HEAD")
@@ -1436,3 +1438,43 @@ def test_status_and_skip_lines_accepted_beside_a_bound_disclosure() -> None:
         assert publish_rules.validate_selection_disclosure(
             body, {"selection": SELECTION}
         ) is None, lines
+
+
+# --- publish refuses a misstated status or an uncommitted attestation ---------
+
+
+def test_stated_status_must_equal_the_computed_status() -> None:
+    def body(line: str) -> str:
+        return disclosed_body([line])
+
+    check = publish_rules.validate_stated_status
+    assert check(body("Verification status:   absent  "), "absent") is None
+    assert check(body("Verification status: stale (head moved)"), "stale (head moved)") is None
+    assert check(contextual_body(), "absent") is None
+    assert check(body("<!-- Verification status: valid -->"), "absent") is None
+    assert "Verification status: absent" in check(body("Verification status: valid"), "absent")
+    two = disclosed_body(["Verification status: absent", "Verification status: valid"])
+    assert check(two, "absent") is not None
+
+
+def test_misstated_status_refused_before_network(tmp_path: Path, monkeypatch) -> None:
+    rc, _out, err, calls = unattested_publication(
+        tmp_path, monkeypatch, disclosed_body(["Verification status: valid (skipped: reviewers)"])
+    )
+
+    assert rc == 1
+    assert "push.contextual-body" in err
+    assert "Verification status: absent" in err
+    assert calls.calls == []
+
+
+def test_uncommitted_attestation_refused_before_network(tmp_path: Path, monkeypatch) -> None:
+    rc, _out, err, calls = unattested_publication(
+        tmp_path, monkeypatch, disclosed_body(["Verification status: absent"]),
+        untracked_attestation=True,
+    )
+
+    assert rc == 1
+    assert "publish.preconditions" in err
+    assert "docs/loom/change/attestation.json is not committed — commit it" in err
+    assert calls.calls == []

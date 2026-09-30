@@ -23,9 +23,22 @@ def plain_step_names(steps) -> str:
     return ", ".join(STEP_PLAIN_NAMES.get(step, step) for step in steps)
 
 
-# Ship's own lines: always accepted, never validated -- the CI check recomputes
-# the status, so the body's copy is a courtesy, not a claim anything trusts.
+# Ship's own lines, never part of the disclosure. Publish refuses a
+# `Verification status:` line that differs from the status it computes
+# (`validate_stated_status`); CI still recomputes the status itself.
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
+
+
+def validate_stated_status(body: str, status: str) -> str | None:
+    """Every visible `Verification status:` line states `status`, compared
+    whitespace-trimmed; a body without such a line is not judged here."""
+    prefix = STATUS_PREFIXES[0]
+    for line in _body_sections(body, strip_comments=True)[1]:
+        stated = line.strip()
+        if stated.startswith(prefix) and stated[len(prefix):].strip() != status:
+            return (f"PR body states '{stated}', but publish computes a different "
+                    f"status; the body must carry exactly:\n{prefix} {status}")
+    return None
 
 
 def _visible_part(line: str, in_comment: bool) -> tuple[str, bool]:

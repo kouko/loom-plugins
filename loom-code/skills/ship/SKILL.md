@@ -171,7 +171,9 @@ a non-forced push; and opens or reuses one PR. Publishing proceeds without an
 attestation: an absent or stale one is disclosed, not refused. Before pushing,
 beyond authorization and repository safety, it refuses only a malformed body
 (naming the heading), a `Skipped steps:` mismatch against a bound selection,
-and an unidentified change. Do not run a
+a `Verification status:` line that differs from the computed status (naming
+the line to carry), an attestation left uncommitted, and an unidentified
+change. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
 hand a refused publication command to the user to run; where a refusal names a
 remedy, take it, and where it names none, report the refusal and stop.

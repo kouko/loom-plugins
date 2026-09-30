@@ -14,6 +14,7 @@ from loom_checker.helpers import report
 from loom_checker.parsing import parse_document
 from loom_checker.rule_checks.publish import validate_contextual_pr_body
 from loom_checker.rule_checks.publish import validate_selection_disclosure
+from loom_checker.rule_checks.publish import validate_stated_status
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
 from loom_checker.rule_checks.push import github_repo_from_origin
 from loom_checker.verification import identify_change
@@ -421,6 +422,13 @@ def _cmd_publish_trusted(
 
     # The `Skipped steps:` disclosure is owed only for a selection the
     # attestation binds; without one the body's skip lines are Ship's own.
+    attestation_file = artifact_path(load_manifest(), "attestation", change_id, repo)
+    attestation_rel = attestation_file.relative_to(repo).as_posix()
+    if attestation_file.exists() and git_maybe(
+        repo, "status", "--porcelain", "--", attestation_rel
+    ) != "":
+        return report([("publish.preconditions", f"{attestation_rel} is not committed — "
+                                                 "commit it, then publish again")], err)
     try:
         _attested_id, attested, _error = _publication_attestation(repo)
     except UsageError:
@@ -432,6 +440,9 @@ def _cmd_publish_trusted(
         if disclosure_error:
             return report([("push.contextual-body", disclosure_error)], err)
     status = verification_status(repo, change_id, depth="local", head=head)
+    stated_error = validate_stated_status(body_file.read_text(encoding="utf-8"), status)
+    if stated_error:
+        return report([("push.contextual-body", stated_error)], err)
     out.write(f"Verification {status} for {head}\n")
     if status != "valid":
         clause = missing_clause(missing_records(repo, change_id, status, head))
