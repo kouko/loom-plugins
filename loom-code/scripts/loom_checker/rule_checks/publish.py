@@ -23,9 +23,44 @@ def plain_step_names(steps) -> str:
     return ", ".join(STEP_PLAIN_NAMES.get(step, step) for step in steps)
 
 
-# Ship's own lines: always accepted, never validated -- the CI check recomputes
-# the status, so the body's copy is a courtesy, not a claim anything trusts.
+# Ship's own lines, never part of the disclosure. Publish refuses a
+# `Verification status:` line that differs from the status it computes
+# (`validate_stated_status`); CI still recomputes the status itself.
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
+
+
+# Only `:` or `：` separates the label from its value: a table cell border
+# cannot, since one line cannot tell a header row from a data row. The value
+# runs from past the separators and emphasis to the next cell border.
+_STATUS_CLAIM = re.compile(r"^(?:\d+ )?(?:x )?verification status ?:")
+_STATUS_VALUE = re.compile(r"status[\W_]*?[:：][\s:：|*_`]*([^|]*)", re.IGNORECASE)
+
+
+def _status_claim(line: str) -> bool:
+    """Whether the line, with all Markdown punctuation reduced to spaces,
+    opens with the `Verification status:` label."""
+    normalized = re.sub(r"[^\w:]+|_", " ", line.casefold().replace("：", ":")).strip()
+    return _STATUS_CLAIM.match(normalized) is not None
+
+
+def validate_stated_status(body: str, status: str) -> str | None:
+    """Every visible status claim, in any Markdown dress, states `status`:
+    its value (past the label's separators, up to the next cell border,
+    trimmed of whitespace and `*_`|`) equals it exactly; a body without such
+    a claim, or a label with no value such as a table header, is not judged."""
+    prefix = STATUS_PREFIXES[0]
+    for line in _body_sections(body, strip_comments=True)[1]:
+        stated = line.strip()
+        if not _status_claim(line):
+            continue
+        # Detection casefolds; the raw line may not match (a ligature such
+        # as "ﬆ"), and a claim whose value cannot be parsed is refused.
+        parsed = _STATUS_VALUE.search(line)
+        value = parsed.group(1).strip(" \t*_`|") if parsed else None
+        if value is None or (value and value != status):
+            return (f"PR body states '{stated}'; the body must carry exactly this "
+                    f"bare line:\n{prefix} {status}")
+    return None
 
 
 def _visible_part(line: str, in_comment: bool) -> tuple[str, bool]:

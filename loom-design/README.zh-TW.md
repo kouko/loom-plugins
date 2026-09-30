@@ -5,7 +5,7 @@
 > 草稿，不打分數。這裡產出的東西一律由 `loom-code:closing-review` 下 verdict，而且
 > 下判斷的 agent 不是寫草稿的那一個。
 
-**Version**: 2.7.1 — 5 個 skill + 1 個可選入口路由。版本資訊見
+**Version**: 2.7.2 — 5 個 skill + 1 個可選入口路由。版本資訊見
 [CHANGELOG.md](CHANGELOG.md)。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -143,7 +143,7 @@ loom-design 本身沒有 hook；loom-code 的 hook 只在 `agy` CLI 執行，Ant
 
 ### OpenCode
 
-OpenCode v2（CLI 與 TUI，已在 2.0.18 驗證）從 GitHub 安裝 plugin。先安裝 `loom-code`：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+OpenCode v2（已在 2.0.18 驗證；從 CLI 安裝的 plugin 在 TUI 裡也會載入）從 GitHub 安裝 plugin。先安裝 `loom-code`：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
 
 ```sh
 opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
@@ -152,7 +152,7 @@ opencode plugin list
 
 接著重啟 OpenCode（`opencode service restart`）；重啟之前，`opencode plugin list` 可能只列出部分 plugin。
 
-OpenCode 的 TUI 沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 OpenCode 設定資料夾（`~/.config/opencode/`，也就是 `plugin add` 寫入的檔案）裡 `opencode.json` 的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+OpenCode 的 TUI（2.0.18–2.0.20）沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 `opencode.json`（`plugin add` 寫入 OpenCode 設定資料夾 `~/.config/opencode/` 的那個檔案）的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
 skill 以 `loom-design:<skill>` 提供。
 

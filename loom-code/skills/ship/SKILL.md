@@ -79,8 +79,8 @@ Use a Markdown table for any list‑type or comparison‑type information (optio
 Under the Verification heading, write the line `Verification status: <status>`,
 where `<status>` is the status `publish` computes locally and prints on its
 `Verification <status> for <head>` line: `valid`, `valid (skipped: <steps>)`,
-`absent`, or `stale (<reason>)`. When the printed status differs from the
-body, correct the body in place. Build the line
+`absent`, or `stale (<reason>)`. When publish refuses the line, copy the
+`Verification status:` line the refusal prints into the body. Build the line
 `Skipped by instruction: <steps>` from the intent's and plan's `skipped-by-instruction:`
 lines plus any skip decided at Ship (§1), not from conversation recall; with
 none recorded or decided, write no such line,
@@ -171,7 +171,9 @@ a non-forced push; and opens or reuses one PR. Publishing proceeds without an
 attestation: an absent or stale one is disclosed, not refused. Before pushing,
 beyond authorization and repository safety, it refuses only a malformed body
 (naming the heading), a `Skipped steps:` mismatch against a bound selection,
-and an unidentified change. Do not run a
+a `Verification status:` line that differs from the computed status (naming
+the line to carry), an attestation left uncommitted, and an unidentified
+change. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
 hand a refused publication command to the user to run; where a refusal names a
 remedy, take it, and where it names none, report the refusal and stop.

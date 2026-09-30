@@ -197,6 +197,8 @@ def test_opencode_install_has_no_tui_route() -> None:
         assert "shift+i" not in _read(rel).lower(), rel
         assert "`opencode.json`" in _opencode_section(_read(rel)), rel
         assert "`~/.config/opencode/`" in _opencode_section(_read(rel)), rel
+        # The no-install claim is bounded to the versions it was verified on.
+        assert re.search(r"TUI[^;；。\n]*2\.0\.18–2\.0\.20", _opencode_section(_read(rel))), rel
 
 
 def test_opencode_update_is_remove_then_commit_pinned_add() -> None:

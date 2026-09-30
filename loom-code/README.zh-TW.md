@@ -6,7 +6,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.24.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個使用者呼叫 · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.25.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個使用者呼叫 · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -192,7 +192,7 @@ host 上都叫 `closing-review`，舊名 `review` 已移除，沒有別名。
 
 ### OpenCode
 
-OpenCode v2（CLI 與 TUI，已在 2.0.18 驗證）從 GitHub 安裝 plugin。
+OpenCode v2（已在 2.0.18 驗證；從 CLI 安裝的 plugin 在 TUI 裡也會載入）從 GitHub 安裝 plugin。
 
 ```sh
 opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
@@ -201,7 +201,7 @@ opencode plugin list
 
 接著重啟 OpenCode（`opencode service restart`）；重啟之前，`opencode plugin list` 可能只列出部分 plugin。
 
-OpenCode 的 TUI 沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 OpenCode 設定資料夾（`~/.config/opencode/`，也就是 `plugin add` 寫入的檔案）裡 `opencode.json` 的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+OpenCode 的 TUI（2.0.18–2.0.20）沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 `opencode.json`（`plugin add` 寫入 OpenCode 設定資料夾 `~/.config/opencode/` 的那個檔案）的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
 skill 以 `loom-code:<skill>` 提供。loom 的角色以 OpenCode subagent `loom-code:<role>` 透過 `subagent` 工具執行，使用 session 的模型；expert-mode 是指令 `/loom-code:expert-mode`。
 

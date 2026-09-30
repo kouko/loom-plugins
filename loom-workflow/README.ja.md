@@ -4,7 +4,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat の図表と推論ページ、second opinion。
 
-**Version**：5.5.6 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.5.7 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 概要
 
@@ -205,7 +205,7 @@ agy では loom-visualization の visualization card を plugin rule として�
 
 ### OpenCode
 
-OpenCode v2（CLI と TUI、2.0.18 で確認）は GitHub から plugin をインストールします。`loom-code` を先にインストールしてください：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+OpenCode v2（2.0.18 で確認。CLI でインストールした plugin は TUI でも読み込まれる）は GitHub から plugin をインストールします。`loom-code` を先にインストールしてください：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
 
 ```sh
 opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
@@ -214,7 +214,7 @@ opencode plugin list
 
 その後 OpenCode を再起動します（`opencode service restart`）。再起動するまで、`opencode plugin list` には一部の plugin しか出ないことがあります。
 
-OpenCode の TUI には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を OpenCode の設定フォルダ（`~/.config/opencode/`、`plugin add` が書き込むファイル）の `opencode.json` の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を `opencode.json`（`plugin add` が OpenCode の設定フォルダ `~/.config/opencode/` に書き込むファイル）の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
 skill は `loom-workflow:<skill>` として提供されます。
 
