@@ -5,16 +5,11 @@ Reuses test_loom_publish.py's real-flow helper; nothing is stubbed but the netwo
 """
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[5]
-sys.path.insert(0, str(ROOT / "loom-code" / "scripts"))
-sys.path.insert(0, str(ROOT / "loom-code" / "tests"))
-
-from test_loom_publish import disclosed_body, unattested_publication  # noqa: E402
+from test_loom_publish import disclosed_body, unattested_publication
 
 
 @pytest.mark.parametrize("line", [
