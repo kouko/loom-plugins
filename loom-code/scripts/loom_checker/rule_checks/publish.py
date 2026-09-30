@@ -30,8 +30,9 @@ STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
 
 
 # `:`, `：` and a table cell border `|` all separate the label from its value.
-_STATUS_CLAIM = re.compile(r"^[: ]*(?:\d+ )?verification status ?:")
-_STATUS_VALUE = re.compile(r"status[\W_]*?[:：|](.*)", re.IGNORECASE)
+# The value runs from past the separators and emphasis to the next cell border.
+_STATUS_CLAIM = re.compile(r"^[: ]*(?:\d+ )?(?:x )?verification status ?:")
+_STATUS_VALUE = re.compile(r"status[\W_]*?[:：|][\s:：|*_`]*([^|]*)", re.IGNORECASE)
 
 
 def _status_claim(line: str) -> bool:
@@ -44,16 +45,16 @@ def _status_claim(line: str) -> bool:
 
 def validate_stated_status(body: str, status: str) -> str | None:
     """Every visible status claim, in any Markdown dress, states `status`:
-    the text after the separator that follows its label, trimmed of
-    whitespace and `*_`|`, equals it exactly; a body without such a claim
-    is not judged."""
+    its value (past the label's separators, up to the next cell border,
+    trimmed of whitespace and `*_`|`) equals it exactly; a body without such
+    a claim, or a label with no value such as a table header, is not judged."""
     prefix = STATUS_PREFIXES[0]
     for line in _body_sections(body, strip_comments=True)[1]:
         stated = line.strip()
         if not _status_claim(line):
             continue
         value = _STATUS_VALUE.search(line).group(1).strip(" \t*_`|")
-        if value != status:
+        if value and value != status:
             return (f"PR body states '{stated}'; the body must carry exactly this "
                     f"bare line:\n{prefix} {status}")
     return None
