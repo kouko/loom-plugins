@@ -315,3 +315,66 @@ Environment for the re-run:
 - The worktree was removed with `git worktree remove`.
 - The real repo is clean at `136c0248`.
 - The scratch repo and PR #1 remain for the user to delete.
+- Correction, found on 2026-09-30: the re-run's isolated service on 49613 (pid 50881, `XDG_CONFIG_HOME=…/oc-at/rerun/xdg/config`) was in fact still running. It was stopped on 2026-09-30 with `opencode service stop` under its own isolated environment.
+
+## Second re-run on 2026-09-30, at bbf3738a
+
+Fix range `89299b7a..bbf3738a` (`89299b7a` itself only adds `attestation.json`):
+- The nine plugin READMEs and the root README replace the "ctrl+p → Plugins → shift+I (Install plugin)" sentence with "The OpenCode TUI has no plugin-install option; … add the same spec to the `plugins` list in `opencode.json`".
+- `tests/test_agy_install_docs.py::test_opencode_install_has_no_tui_route` added.
+- One spec line (design decision on the install spec).
+- `git diff --stat 89299b7a..bbf3738a -- '*.json' '**/hooks*'` → empty. No loader, hook, skill, agent, manifest, CHANGELOG or `PRINCIPLES.md` change.
+
+Environment:
+- Clean detached worktree of `bbf3738a` for reading the README (README.md:244-258), removed afterwards.
+- Binary `/Users/kouko/.opencode/bin/opencode`, called by absolute path. It reports `opencode v2.0.20` (auto-updated since the 2.0.18 runs). The first attempt went through the host shell's `opencode` function, which injects `--standalone` and failed with `Unrecognized flag: --standalone`; nothing was installed by it, and it was discarded.
+- Two fresh isolated trees `oc-at3/a` and `oc-at3/b`, each with its own `XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_CACHE_HOME`, `XDG_STATE_HOME`, `OPENCODE_CONFIG_DIR`, plus `OPENCODE_DISABLE_AUTOUPDATE=1`, `OPENCODE_DISABLE_PROJECT_CONFIG=1`, 0 `CLAUDE*`/`CODEX*`/`ANTHROPIC*`/other `OPENCODE*` variables. Env files `oc-at3/envA.sh`, `oc-at3/envB.sh`. Session directory: an empty `git init` repo `oc-at3/proj`.
+- `opencode service set port` was the first service command in each tree: 49631 (A), 49632 (B).
+- No model, provider or API key was configured or used. No prompt was sent.
+- `git ls-remote origin engineering/2026-09-29-opencode-v2-compatibility` → `89299b7a…`: the published branch does not yet carry `bbf3738a`. Installs resolved to `89299b7`, whose plugin code is identical to `bbf3738a` (the fix touches only README/test/spec text), but the installed copy's READMEs still carry the old shift+I sentence.
+- The user's services on 49374 (pid 91480) and 59971 (pid 74913, `serve --stdio`) were not touched and were still up at the end.
+
+### 1: re-tested
+
+Route A — official command, as README.md:246-254 says, with the published branch in place of `main` (log `oc-at3/logs/a-install.txt`):
+- `opencode plugin list` → `No plugins found`.
+- `opencode plugin add 'github:kouko/loom-plugins#engineering/2026-09-29-opencode-v2-compatibility::path:loom-code'`, then `loom-design`, `loom-workflow` → each `Plugin "<spec>" installed and added to …/oc-at3/a/cfg/opencode.json`.
+- `opencode plugin list` straight after → `loom-code` and `loom-design` only (the README's restart note covers this).
+- `opencode service restart` → `http://127.0.0.1:49631`.
+- `plugin list` at +5 s → `No plugins found`; at +10 s and every list through +60 s → `loom-code`, `loom-design`, `loom-workflow`, version `89299b7`, source the three `github:` specs.
+- `oc-at3/a/cfg/opencode.json` afterwards holds exactly `{"plugins": [<the three specs>]}`.
+- Consistency (not part of #1): `opencode api GET /api/agent` lists `loom-code:acceptance-tester`, `adversary`, `implementer`, `reviewer`. `GET /api/skill?directory=…/proj` shows 22 `loom-*:` ids before the output is cut at 256 KiB (known API truncation), log `oc-at3/logs/a-skill-ids.txt`.
+
+Route B — `plugins` list in `opencode.json`, fresh tree (log `oc-at3/logs/b-config.txt`):
+- Wrote `oc-at3/b/cfg/opencode.json` = `{"plugins": [<the three github: specs>]}` before any OpenCode command other than `service set port 49632`. The README does not say which `opencode.json`; this is the global one that `plugin add` writes to under the isolated `OPENCODE_CONFIG_DIR`.
+- `opencode plugin list` → `No plugins found` at first contact, +5, +10, +15 s (first fetch from GitHub); at +20 s and every list through +60 s → all three at `89299b7`.
+- `opencode service restart`; list at +15 s → `No plugins found` (cold start); +25, +35, +45 s → all three.
+
+TUI plugin dialog:
+- Official docs, https://opencode.ai/v2/docs/plugins/ (fetched 2026-09-30): install routes are the `"plugins"` key in `opencode.json(c)` and `opencode plugin add|list|remove|update`; git specs include `github:acme/plugins#main::path:packages/opencode-plugin`. No TUI, dialog or keybind install route is mentioned.
+- Corrected READMEs (README.md:256 and the nine plugin READMEs): "The OpenCode TUI has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`."
+- Driven in a private tmux server (`tmux -L ocat3`, 160×45, `TERM=xterm-256color`) against tree A, no message sent:
+  - ctrl+p, `plugin` → one entry, `Plugins` (System). Opening it lists `loom-code`, `loom-design`, `loom-workflow` at `89299b7`; footer `check for updates ctrl+r  ctrl+a show internal`, no install hint.
+  - `I` and the CSI-u sequence `ESC[105;2u` in the dialog → both typed `I` into the dialog's search field.
+  - `oc-at3/a/cfg/tui.json` = `{"keybinds": {"plugins.install": "ctrl+g"}}`, TUI restarted, ctrl+g → nothing opened; ctrl+p, `install` → `No results found`.
+- Binary check: the 2.0.20 binary's keybinding table contains `"dialog.plugins.install":p("shift+i","Install plugin from plugin dialog")` and `"plugins.install":p("none","Install plugin")`, but no reachable entry was found as above. Whether a later build exposes it is unknown.
+- Limit: a person at a real terminal might still send a true shift+I that tmux cannot; the maintainer reports trying the TUI and finding no install option.
+
+- Verdict: partly. Both documented routes install all three plugins from GitHub and `plugin list` shows them. The TUI plugin dialog route that the Acceptance line names does not exist in 2.0.20; the maintainer accepted it as a documented limitation on 2026-09-30, and the intent line is unchanged.
+
+### 2, 3, 4, 5, 7, 8: carried over
+- Reason for each: the fix range changes only README prose, one docs test and one spec line. No loader, hook, skill, agent, manifest, CHANGELOG, version string or `PRINCIPLES.md` is in it, so skill registration (2), the flow run (3), subagent dispatch (4), hook behaviour and the README's "Limits on OpenCode" list (5, lines unchanged in the diff), principles (7) and versions (8) are unaffected.
+
+### 6: re-tested
+- The fix adds a test, so the covering tests were re-run in the repo at `bbf3738a` (clean tree):
+  - `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q tests/test_agy_install_docs.py` → `14 passed`.
+  - `python3 scripts/sync_codex_manifests.py --check --all` → exit 0.
+  - `git diff --stat 89299b7a..bbf3738a -- '*.json' '**/hooks*'` → empty.
+- Full suite command, run by `finalize-review`: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. Not run by the tester.
+- Verdict: works.
+
+### Cleanup
+- tmux server `ocat3` killed.
+- `opencode service stop` in trees A and B; nothing listens on 49631 or 49632.
+- The leftover 49613 service from the first re-run was stopped (see the correction above).
+- Worktree removed with `git worktree remove`; the real repo is clean at `bbf3738a` apart from this report and evidence.
