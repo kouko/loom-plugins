@@ -1455,7 +1455,9 @@ def test_stated_status_must_equal_the_computed_status() -> None:
     assert "Verification status: absent" in check(body("Verification status: valid"), "absent")
     two = disclosed_body(["Verification status: absent", "Verification status: valid"])
     assert check(two, "absent") is not None
-    assert "Verification status: absent" in check(body("> **Verification status:** absent"), "absent")
+    assert check(body("> **Verification status:** absent"), "absent") is None
+    assert check(body("| Verification status: | absent |"), "absent") is None
+    assert "Verification status: absent" in check(body("**Verification status:** valid"), "absent")
     assert check(body("Ship computes the verification status: see CI."), "absent") is None
     assert check(body("Verification status：valid"), "absent") is not None
 

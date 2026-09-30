@@ -40,15 +40,16 @@ def _status_claim(line: str) -> bool:
 
 
 def validate_stated_status(body: str, status: str) -> str | None:
-    """Every visible status claim is exactly the bare line
-    `Verification status: <status>` (whitespace-trimmed); a body without
-    such a claim is not judged."""
+    """Every visible status claim, in any Markdown dress, states `status`:
+    the text after its first colon, trimmed of whitespace and `*_`|`,
+    equals it exactly; a body without such a claim is not judged."""
     prefix = STATUS_PREFIXES[0]
     for line in _body_sections(body, strip_comments=True)[1]:
         stated = line.strip()
         if not _status_claim(line):
             continue
-        if not stated.startswith(prefix) or stated[len(prefix):].strip() != status:
+        value = re.split(r"[:：]", line, maxsplit=1)[1].strip(" \t*_`|")
+        if value != status:
             return (f"PR body states '{stated}'; the body must carry exactly this "
                     f"bare line:\n{prefix} {status}")
     return None
