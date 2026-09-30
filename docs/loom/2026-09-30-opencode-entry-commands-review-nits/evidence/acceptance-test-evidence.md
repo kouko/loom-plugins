@@ -92,3 +92,64 @@ with the repo's documented command. Both worked.
 - tmux server `ocatn` killed; the standalone OpenCode processes exited with it; fake server stopped; nothing listens on 49811. User's service pid 91480 on 49374 still listening.
 - Worktree removed with `git worktree remove`. Scratch tree `oc/` (isolated config, installed plugin cache, transcripts) left in the session scratch directory only; nothing written to the system temp folder or `~/.config/opencode`.
 - Cost: zero model spend (local fake model).
+
+## Re-run on 2026-09-30, at b4b6fa5b
+
+Fix range `9bba77e9..b4b6fa5b` touches: `scripts/opencode/loader.js` and its three
+plugin copies (constant `SKILL_DIR` renamed `SKILL_SEPARATOR`, `spoken()` comment
+rewrapped), `loom-code/tests/test_opencode_loader.py` (test parametrized with two new
+cases), and line 30 of `docs/loom/2026-09-30-opencode-entry-commands/acceptance-test-report.md`.
+No CHANGELOG, README, manifest or package.json changed (`git diff --name-only` grep count 0).
+
+Setup check (step 2): clean detached worktree at `b4b6fa5b` (status empty, removed
+afterwards); the three plugins install in OpenCode from the pinned local spec; the covering
+tests run with the documented command. Both worked.
+
+- 1: carried over — the fix range touches no CHANGELOG file.
+- 2: re-tested — the fix edits the loader that records the transcript, so the line was
+  re-run live over every surface it names, not only through tests. Same method as the
+  first run, in a new scratch tree `oc2/` (own XDG_*, `OPENCODE_CONFIG_DIR`,
+  `OPENCODE_DISABLE_AUTOUPDATE=1`, `OPENCODE_DISABLE_PROJECT_CONFIG=1`, `GH_CONFIG_DIR`,
+  `TMPDIR=oc2/tmp`; `CLAUDE*|CODEX*|ANTHROPIC*|OPENAI*|GH_TOKEN|GITHUB_*` count 0; no key
+  anywhere; local fake model on 127.0.0.1:49811). Install:
+  `opencode plugin add 'git+file:///Users/kouko/GitHub/loom-plugins#b4b6fa5b::path:<plugin>'`
+  for loom-code, loom-design, loom-workflow → each "installed and added". The three installed
+  `node_modules/loom-*/opencode/loader.js` are byte-identical to HEAD's
+  `scripts/opencode/loader.js` (5 `SKILL_SEPARATOR` occurrences each). TUI
+  `opencode --standalone` in private tmux server `ocatn2`, 160x50; each step in a fresh
+  session (`/new`):
+  1. Typed `/loom-code:using-loom-code`, Tab, `幫這個空專案加一個 hello.py`, Enter →
+     `ses_f0d2be749ffeFNPeFmP1es9ukQ` transcript `"/loom-code:using-loom-code 幫這個空專案加一個 hello.py"`;
+     the model received that plus `\n\nBase directory for this skill: …/node_modules/loom-code/skills/using-loom-code\n\n\n# Using Loom Code…`.
+  2. Typed `/loom-workflow:recap-state`, Tab, Enter → `ses_f0d2b8b94ffe53zpE2rzxFKqRs`
+     transcript `"/loom-workflow:recap-state"`; the model received it plus the recap-state skill body.
+  3. Bracketed paste `please look at this pasted note\n\nBase directory for this skill: /tmp/x/skills/demo\n\nend of note`, Enter →
+     `ses_f0d2b4cd6ffeRMMfO9ldGTIVWS` transcript `"please look at this pasted note\n\nBase directory for this skill: /tmp/x/skills/demo\n\nend of note "` — whole, identical to what the model received.
+  4. Bracketed paste `/notes:today see below\n\nBase directory for this skill: /tmp/x/skills/other\n\nend`, Enter →
+     `ses_f0d2aff83ffe0mSIi234DAQFW1` transcript `"/notes:today see below\n\nBase directory for this skill: /tmp/x/skills/other\n\nend "` — whole, identical to what the model received.
+  - Suite tests for this line, in the clean worktree:
+    `test_opencode_loader.py::test_skill_separator_prompt_recorded_whole_or_trimmed[not-a-command|foreign-base-dir|windows-base-dir]`
+    PASSED, plus `test_adversarial_cross_plugin_command_transcript.py` and
+    `test_adversarial_opencode_command_language.py` (19 passed across the three files).
+  - Evidence: `oc2/logs/fake-requests.jsonl`, `oc2/logs/tui-last.txt`, `oc2/tmp/loom-opencode/*.jsonl` (scratch tree).
+  - Verdict: works.
+- 3: carried over — the fix range touches no README file.
+- 4: re-tested — read line 30 of the prior change's report: now "安裝方式本身在 9/29 那次 OpenCode v2 驗收已驗證過".
+  `grep -n "上次\|上一次\|important\|Build 階段"` over that report: no match. The plan was not
+  touched by the fix; its line range and W2-01 file list stand as checked in section 4.
+  Verdict cells of that report unchanged (the diff is that one line). Verdict: works.
+- 5: re-tested — in the clean worktree: `grep -c "Base directory for this skill: " scripts/opencode/loader.js` → 1
+  (`const SKILL_SEPARATOR`, loader.js:24), used at loader.js:78 (command body) and
+  loader.js:246/248 (`spoken()`); no `SKILL_DIR` left; `node --check` OK; header loader.js:11-12
+  still "with both keys set, disable-model-invocation wins and it stays command-only"; the three
+  plugin copies `cmp`-identical to `scripts/opencode/loader.js`;
+  `test_plugin_without_agents_registers_no_agents_and_its_entry_commands` PASSED. Verdict: works.
+- 6: re-tested — the fix edits a suite test file, so the covering command from section 6 was re-run in the
+  clean worktree: `60 passed in 2.48s` (58 before + the 2 new parametrized cases);
+  `/opt/homebrew/bin/python3 scripts/sync_codex_manifests.py --check --all` exit 0; the release-metadata
+  tests in that command passed; no version file in the fix range. Full suite command is still run by
+  `finalize-review`, not by the tester. Verdict: works.
+
+Cleanup: tmux server `ocatn2` killed (0 standalone OpenCode processes left); fake server
+stopped (nothing on 49811); user's OpenCode service pid 91480 on 49374 still listening;
+`~/.config/opencode` not touched; worktree removed; repo status clean. Cost: zero model spend.
