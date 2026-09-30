@@ -420,15 +420,17 @@ def _cmd_publish_trusted(
         return _publish_block("literal origin is not a supported GitHub repository URL", err)
     env = _publish_env(identity, repo, (trusted_git, trusted_gh))
 
-    # The `Skipped steps:` disclosure is owed only for a selection the
-    # attestation binds; without one the body's skip lines are Ship's own.
     attestation_file = artifact_path(load_manifest(), "attestation", change_id, repo)
     attestation_rel = attestation_file.relative_to(repo).as_posix()
+    # Ceiling: a gitignored attestation is invisible to git status; a git failure fails closed as 'not committed'.
+    # git status --porcelain -- <pathspec> prints nothing for a clean tracked path: https://git-scm.com/docs/git-status
     if attestation_file.exists() and git_maybe(
         repo, "status", "--porcelain", "--", attestation_rel
     ) != "":
         return report([("publish.preconditions", f"{attestation_rel} is not committed — "
                                                  "commit it, then publish again")], err)
+    # The `Skipped steps:` disclosure is owed only for a selection the
+    # attestation binds; without one the body's skip lines are Ship's own.
     try:
         _attested_id, attested, _error = _publication_attestation(repo)
     except UsageError:

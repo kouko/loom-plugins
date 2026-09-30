@@ -29,22 +29,28 @@ def plain_step_names(steps) -> str:
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
 
 
-_LINE_DECORATION = re.compile(r"^(?:[\s>|`*_+-]|\d+\.)+")
-_STATUS_LABEL = re.compile(r"verification\s+status\s*:", re.IGNORECASE)
+_STATUS_CLAIM = re.compile(r"^(?:\d+ )?verification status ?:")
+
+
+def _status_claim(line: str) -> bool:
+    """Whether the line, with all Markdown punctuation reduced to spaces,
+    opens with the `Verification status:` label."""
+    normalized = re.sub(r"[^\w:]+|_", " ", line.casefold().replace("：", ":")).strip()
+    return _STATUS_CLAIM.match(normalized) is not None
 
 
 def validate_stated_status(body: str, status: str) -> str | None:
-    """Every visible line whose label, once leading Markdown decoration is
-    removed, reads `Verification status:` is exactly that bare line stating
-    `status` (whitespace-trimmed); a body without such a line is not judged."""
+    """Every visible status claim is exactly the bare line
+    `Verification status: <status>` (whitespace-trimmed); a body without
+    such a claim is not judged."""
     prefix = STATUS_PREFIXES[0]
     for line in _body_sections(body, strip_comments=True)[1]:
         stated = line.strip()
-        if not _STATUS_LABEL.match(_LINE_DECORATION.sub("", line)):
+        if not _status_claim(line):
             continue
         if not stated.startswith(prefix) or stated[len(prefix):].strip() != status:
-            return (f"PR body states '{stated}', but publish computes a different "
-                    f"status; the body must carry exactly:\n{prefix} {status}")
+            return (f"PR body states '{stated}'; the body must carry exactly this "
+                    f"bare line:\n{prefix} {status}")
     return None
 
 

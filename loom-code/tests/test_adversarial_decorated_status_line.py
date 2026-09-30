@@ -16,6 +16,8 @@ from test_loom_publish import disclosed_body, unattested_publication
     "- Verification status: valid (skipped: reviewers)",
     "**Verification status:** valid (skipped: reviewers)",
     "Verification Status: valid (skipped: reviewers)",
+    "**Verification status**: valid (skipped: reviewers)",
+    "### Verification status: valid (skipped: reviewers)",
 ])
 def test_publish_decoratedMisstatedStatus_refusedBeforePush(
     line: str, tmp_path: Path, monkeypatch

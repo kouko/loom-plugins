@@ -79,8 +79,8 @@ Use a Markdown table for any list‑type or comparison‑type information (optio
 Under the Verification heading, write the line `Verification status: <status>`,
 where `<status>` is the status `publish` computes locally and prints on its
 `Verification <status> for <head>` line: `valid`, `valid (skipped: <steps>)`,
-`absent`, or `stale (<reason>)`. When the printed status differs from the
-body, correct the body in place. Build the line
+`absent`, or `stale (<reason>)`. When publish refuses the line, copy the
+`Verification status:` line the refusal prints into the body. Build the line
 `Skipped by instruction: <steps>` from the intent's and plan's `skipped-by-instruction:`
 lines plus any skip decided at Ship (§1), not from conversation recall; with
 none recorded or decided, write no such line,
