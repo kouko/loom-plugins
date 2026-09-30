@@ -296,7 +296,10 @@ async function registerHooks(ctx) {
       if (keepsTranscript) {
         try {
           mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
-          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: text } })}\n`);
+          // A command's prompt is the typed `/<id> <args>` plus the skill body;
+          // only the typed part is the user's words. Hooks still get the full text.
+          const said = text.split("\n\nBase directory for this skill: ")[0];
+          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: said } })}\n`);
         } catch {} // no transcript only costs the language reminder
       }
       const added = [];
