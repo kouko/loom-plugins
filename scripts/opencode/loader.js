@@ -8,7 +8,8 @@
 // The plugin root is the parent of this file's opencode/ directory.
 //   <root>/skills/<name>/SKILL.md -> skill "<plugin>:<name>"
 //     (disable-model-invocation: true -> user command "/<plugin>:<name>" instead;
-//      user-invocable: true -> that command as well as the skill)
+//      user-invocable: true -> that command as well as the skill; with both
+//      keys set, disable-model-invocation wins and it stays command-only)
 //   <root>/agents/<name>.md       -> subagent "<plugin>:<name>"
 //   <root>/hooks/hooks-opencode.json -> v2 tool and session hooks (registerHooks)
 import { spawn } from "node:child_process";
@@ -144,7 +145,7 @@ export async function setup(ctx) {
   await registerSkills(ctx, found);
   await registerCommands(ctx, found);
   await registerAgents(ctx, agents());
-  await registerHooks(ctx);
+  await registerHooks(ctx, found);
 }
 
 // hooks/hooks-opencode.json has the Claude hooks.json schema, event names and
@@ -234,7 +235,7 @@ function transcript(sessionID) {
   return join(tmpdir(), "loom-opencode", `${name}.jsonl`);
 }
 
-async function registerHooks(ctx) {
+async function registerHooks(ctx, found) {
   const table = hookTable();
   // One session record per session id: its parent and its directory.
   // Ceiling: records are cached until the service restarts, so a failed lookup
@@ -288,6 +289,7 @@ async function registerHooks(ctx) {
 
   if (table.UserPromptSubmit) {
     const keepsTranscript = commands(table, "PostToolUse", "Skill").length > 0;
+    const bodies = found.filter((s) => s.userOnly || s.userInvocable).map((s) => `\n\n${s.content}`);
     await ctx.session.hook("prompt", async (ev) => {
       const id = ev.sessionID;
       const text = ev.prompt?.text;
@@ -298,7 +300,8 @@ async function registerHooks(ctx) {
           mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
           // A command's prompt is the typed `/<id> <args>` plus the skill body;
           // only the typed part is the user's words. Hooks still get the full text.
-          const said = text.split("\n\nBase directory for this skill: ")[0];
+          const body = bodies.find((b) => text.endsWith(b));
+          const said = body ? text.slice(0, -body.length) : text;
           appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: said } })}\n`);
         } catch {} // no transcript only costs the language reminder
       }
