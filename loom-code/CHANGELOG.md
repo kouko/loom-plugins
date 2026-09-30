@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.25.0] — 2026-09-30 — publish checks the stated verification status and a committed attestation.
+
+- `loom_checker.py publish` refuses a PR body whose `Verification status:` line differs from the computed status, and names the line the body must carry.
+- `loom_checker.py publish` refuses an attestation left uncommitted.
+- The Ship station lists both refusals.
+- The OpenCode README wording bounds the TUI claim to OpenCode 2.0.18–2.0.20 and names `opencode.json` as the file in the config folder.
+
 ## [3.24.0] — 2026-09-29 — OpenCode v2 support.
 
 - OpenCode v2 package: `package.json` plus `opencode/loader.js` register the skills and agents and translate `hooks/hooks-opencode.json` into OpenCode hooks.
