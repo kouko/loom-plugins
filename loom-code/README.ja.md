@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.23.0 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.24.0 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -209,6 +209,33 @@ Antigravity のデスクトップアプリや IDE では走りません。`agy` 
 （implementer・reviewer・adversary・acceptance-tester）は、loom の agent 契約に従う
 agy の `self` subagent として Gemini モデルで動きます。review station は
 どの host でも `closing-review` で、旧名 `review` は別名なしで削除されました。
+
+### OpenCode
+
+OpenCode v2（CLI と TUI、2.0.18 で確認）は GitHub から plugin をインストールします。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
+opencode plugin list
+```
+
+その後 OpenCode を再起動します（`opencode service restart`）。再起動するまで、`opencode plugin list` には一部の plugin しか出ないことがあります。
+
+OpenCode の TUI には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を OpenCode の設定フォルダ（`~/.config/opencode/`、`plugin add` が書き込むファイル）の `opencode.json` の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+
+skill は `loom-code:<skill>` として提供されます。loom の役割は OpenCode の subagent `loom-code:<role>` として `subagent` ツール経由でセッションのモデルで動きます。expert-mode はコマンド `/loom-code:expert-mode` です。
+
+OpenCode では、セッションコンテキスト、公開リマインダー、言語リマインダー、選択記録ガードが plugin の v2 hook で動きます。
+
+OpenCode での制限は次のとおりです。
+
+- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで最大 40 秒ほどかかることがあります。
+- loom-code の subagent は、plugin キャッシュにある loom のファイルを読むときに `external_directory` の許可プロンプトで止まることがあります。`opencode run --auto` も subagent のセッションには効きません。loom の plugin ディレクトリの読み取りを許可してください。
+- `--auto` なしの `opencode run` は最初の許可プロンプトかモデルからの質問で止まるため、長い loom の実行は TUI から行ってください。
+- OpenCode はプロジェクト外のシェルコマンドの前に確認しないため、モデルがマシンを変更することがあります（観測例：システム全体への `pip install --break-system-packages`）。コマンドを確認するか、OpenCode の許可設定を厳しくしてください。
+- `opencode run "/loom-code:expert-mode ..."` はテキストを prompt として送るだけでコマンドは実行されません。コマンドは TUI で入力してください。
+- OpenCode のデスクトップアプリと IDE 連携は対象外です。
+- plugin を使うのに Node は不要です。
 
 ## ライセンス
 

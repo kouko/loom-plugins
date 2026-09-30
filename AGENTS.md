@@ -63,6 +63,7 @@ skills/init/references/v1/spec.md     ← references/ 下開 v1/
 - 不可把測試放在 production code 旁邊（`scripts/` 內）或 skill 資料夾內（含 `probes/`）
 - `tests/local/` 放需要本機安裝 CLI 的測試，package suite 和 CI 都會跳過它
 - Package suite（`scripts/run_package_tests.py --loom-family`）只跑四個 test root：root `tests/`、`loom-code/tests/`、`loom-design/tests/`、`loom-workflow/tests/`，含它們的子資料夾，pytest 檔（`test_*.py`、`*_test.py`）和 shell 測試（`test-*.sh`）都自動探索，新增測試不用改 suite command；CI 也跑同一份 inventory
+- Package suite 需要本機有 `node`（OpenCode plugin 的 loader 測試會執行它）；使用者安裝 plugin 不需要 node
 - 四個 root 定義在 `scripts/run_package_tests.py` 的 `TEST_ROOTS` 常數；新增 plugin 時要把它的 `<plugin>/tests/` 加進這個常數，否則它的測試不會跑，repo-wide guard 也會擋下
 - 例外：`docs/loom/` 底下的 evidence probe 程式留在原處
 - 移除一個 skill 時一併刪掉它的測試（Module Criteria 的 **remove**）：loom-workflow 刪 `tests/<skill>/` 資料夾；loom-code 刪 `loom-code/tests/` 裡以該 skill 命名的檔案

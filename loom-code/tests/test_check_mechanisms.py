@@ -254,6 +254,24 @@ class TestRecompute:
         assert "SessionStart:startup|clear|compact:visualization-card" in hooks
         assert len(hooks) == 5
 
+    def test_hooks_include_host_qualified_opencode_manifests(self, tmp_path):
+        """Both plugins' OpenCode hooks files are counted with `@opencode`."""
+        repo = _build_repo(tmp_path)
+        (repo / "loom-code/hooks/hooks-opencode.json").write_text(json.dumps(HOOKS_JSON))
+        (repo / "loom-workflow" / "hooks").mkdir(parents=True)
+        (repo / "loom-workflow/hooks/hooks-opencode.json").write_text(
+            json.dumps(WORKFLOW_CODEX_HOOKS_JSON)
+        )
+
+        assert cm.recompute_hooks(repo) - {
+            "SessionStart:startup:session-start",
+            "PreToolUse:Bash:loom_checker.py",
+        } == {
+            "SessionStart:startup:session-start@opencode",
+            "PreToolUse:Bash:loom_checker.py@opencode",
+            "SessionStart:startup|clear|compact:visualization-card@opencode",
+        }
+
     def test_hook_id_uses_first_script_path_in_compound_command(self, tmp_path):
         repo = _build_repo(tmp_path)
         path = repo / "loom-code/hooks/hooks.json"
@@ -392,6 +410,17 @@ class TestChecks:
         result = cm.run_checks(repo, baseline_total_override=len(FULL_MECHANISMS))
         assert result.exit_code == 1
         assert any(f.rule == "R3" for f in result.findings)
+
+    def test_r3_red_when_opencode_hook_has_no_budget_exception_line(self, tmp_path):
+        """A counted `@opencode` hook raises the net count; without its
+        budget-exception line the census fails on R3 alone."""
+        opencode_id = "PreToolUse:Bash:loom_checker.py@opencode"
+        mechs = FULL_MECHANISMS + [{"id": opencode_id, "class": "hook", "eval": "tests/test_hook.py"}]
+        repo = _build_repo(tmp_path, mechanisms=mechs)
+        opencode = {"hooks": {"PreToolUse": HOOKS_JSON["hooks"]["PreToolUse"]}}
+        (repo / "loom-code/hooks/hooks-opencode.json").write_text(json.dumps(opencode))
+        result = cm.run_checks(repo, baseline_total_override=len(FULL_MECHANISMS))
+        assert {f.rule for f in result.findings} == {"R3"}
 
     def test_r3_is_a_warning_when_the_baseline_was_only_approximated(self, tmp_path):
         """An approximated baseline counts SKILL.md files and hook entries —

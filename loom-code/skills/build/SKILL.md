@@ -54,8 +54,9 @@ defines and apply its result. `<loom-code>` (this plugin's root) is
 `${CLAUDE_PLUGIN_ROOT}` on Claude Code; on any other host it is the directory
 two levels above this SKILL.md.
 
-On Antigravity CLI, map tool and agent names with
-[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
+On Antigravity CLI or OpenCode, map tool and agent names with
+[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md) or
+[`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
 Unless `tdd` is skipped (listed by `selection show` or skipped by the user's
 plain-words instruction), for every behavior change:

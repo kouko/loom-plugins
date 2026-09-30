@@ -4,7 +4,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat の図表と推論ページ、second opinion。
 
-**Version**：5.5.5 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.5.6 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 概要
 
@@ -203,9 +203,35 @@ agy plugin install ./loom-workflow
 hook が走るのは `agy` CLI だけで、Antigravity のデスクトップアプリや IDE では走らない。
 agy では loom-visualization の visualization card を plugin rule として届けるため、常に有効になる。
 
+### OpenCode
+
+OpenCode v2（CLI と TUI、2.0.18 で確認）は GitHub から plugin をインストールします。`loom-code` を先にインストールしてください：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
+opencode plugin list
+```
+
+その後 OpenCode を再起動します（`opencode service restart`）。再起動するまで、`opencode plugin list` には一部の plugin しか出ないことがあります。
+
+OpenCode の TUI には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を OpenCode の設定フォルダ（`~/.config/opencode/`、`plugin add` が書き込むファイル）の `opencode.json` の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+
+skill は `loom-workflow:<skill>` として提供されます。
+
+OpenCode では、visualization card とスキルフォルダのルールが plugin の v2 hook で動きます。
+
+OpenCode での制限は次のとおりです。
+
+- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで最大 40 秒ほどかかることがあります。
+- loom-code の subagent は、plugin キャッシュにある loom のファイルを読むときに `external_directory` の許可プロンプトで止まることがあります。`opencode run --auto` も subagent のセッションには効きません。loom の plugin ディレクトリの読み取りを許可してください。
+- `--auto` なしの `opencode run` は最初の許可プロンプトかモデルからの質問で止まるため、長い loom の実行は TUI から行ってください。
+- OpenCode はプロジェクト外のシェルコマンドの前に確認しないため、モデルがマシンを変更することがあります（観測例：システム全体への `pip install --break-system-packages`）。コマンドを確認するか、OpenCode の許可設定を厳しくしてください。
+- OpenCode のデスクトップアプリと IDE 連携は対象外です。
+- plugin を使うのに Node は不要です。
+
 ### 毎ターンのリマインダーが届かない環境
 
-Claude Code と Codex では、`loom-workflow` が loom-visualization の visualization card
+Claude Code、Codex、OpenCode では、`loom-workflow` が loom-visualization の visualization card
 （ユーザーの言語で返答、結論を先に、平易な言葉、比喩を使わない文字どおりの表現、表や図）を
 UserPromptSubmit hook で、メッセージを送るたびに agent に届ける。1 ターンあたり最大 181 語
 （英語）増える。次の環境には届かない：

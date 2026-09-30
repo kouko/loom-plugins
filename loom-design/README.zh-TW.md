@@ -5,7 +5,7 @@
 > 草稿，不打分數。這裡產出的東西一律由 `loom-code:closing-review` 下 verdict，而且
 > 下判斷的 agent 不是寫草稿的那一個。
 
-**Version**: 2.7.0 — 5 個 skill + 1 個可選入口路由。版本資訊見
+**Version**: 2.7.1 — 5 個 skill + 1 個可選入口路由。版本資訊見
 [CHANGELOG.md](CHANGELOG.md)。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -140,6 +140,30 @@ agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模�
 
 loom-design 本身沒有 hook；loom-code 的 hook 只在 `agy` CLI 執行，Antigravity
 桌面 app 與 IDE 裡不會執行。
+
+### OpenCode
+
+OpenCode v2（CLI 與 TUI，已在 2.0.18 驗證）從 GitHub 安裝 plugin。先安裝 `loom-code`：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
+opencode plugin list
+```
+
+接著重啟 OpenCode（`opencode service restart`）；重啟之前，`opencode plugin list` 可能只列出部分 plugin。
+
+OpenCode 的 TUI 沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 OpenCode 設定資料夾（`~/.config/opencode/`，也就是 `plugin add` 寫入的檔案）裡 `opencode.json` 的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+
+skill 以 `loom-design:<skill>` 提供。
+
+OpenCode 的限制：
+
+- 背景服務剛啟動時，plugin 最多約 40 秒才會出現在 `opencode plugin list`。
+- loom-code 的 subagent 從 plugin 快取讀取 loom 自己的檔案時，可能停在 `external_directory` 權限提示；`opencode run --auto` 也不涵蓋 subagent 的 session。請允許讀取 loom 的 plugin 目錄。
+- 不加 `--auto` 的 `opencode run` 會停在第一個權限提示或模型提問，長時間的 loom 執行請從 TUI 進行。
+- OpenCode 在專案以外執行 shell 指令前不會詢問，模型可能改動整台機器（實測：系統層級的 `pip install --break-system-packages`）；請檢查它的指令，或收緊 OpenCode 的權限設定。
+- OpenCode 桌面 app 與 IDE 整合不在涵蓋範圍。
+- 使用這些 plugin 不需要 Node。
 
 ## 跑測試
 

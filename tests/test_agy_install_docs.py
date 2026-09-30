@@ -163,3 +163,48 @@ def test_principles_non_negotiables_count_unchanged() -> None:
     text = _read("PRINCIPLES.md")
     body = re.search(r"^## Non-negotiables \(ordered\)\n(.*?)^## ", text, re.S | re.M).group(1)
     assert len(re.findall(r"^\d+\. ", body, re.M)) == 5
+
+
+def _opencode_section(text: str) -> str:
+    match = re.search(r"^### OpenCode\n(.*?)(?=^#{1,3} )", text, re.S | re.M)
+    assert match, "no '### OpenCode' section"
+    return match.group(1)
+
+
+def test_every_readme_has_opencode_install_section() -> None:
+    spec = "opencode plugin add 'github:kouko/loom-plugins#main::path:{}'"
+    for rel in AGY_READMES:
+        body = _opencode_section(_read(rel))
+        names = PLUGINS if rel == "README.md" else (rel.split("/")[0],)
+        for plugin in names:
+            assert spec.format(plugin) in body, (rel, plugin)
+        assert "opencode plugin list" in body, rel
+
+
+def test_principles_name_opencode() -> None:
+    text = _read("PRINCIPLES.md")
+    who = re.search(r"^## Who\n(.*?)^## ", text, re.S | re.M).group(1)
+    assert "OpenCode v2" in who
+    hooks = next(l for l in text.splitlines() if l.startswith("- Host-installed plugin hooks"))
+    assert "OpenCode v2" in hooks
+    ratified = next(l for l in text.splitlines() if l.startswith("ratified-by:"))
+    assert "OpenCode v2 added) by kouko 2026-09-29" in ratified
+
+
+def test_opencode_install_has_no_tui_route() -> None:
+    # OpenCode v2 TUI has no plugin-install option; the only other route is opencode.json.
+    for rel in AGY_READMES:
+        assert "shift+i" not in _read(rel).lower(), rel
+        assert "`opencode.json`" in _opencode_section(_read(rel)), rel
+        assert "`~/.config/opencode/`" in _opencode_section(_read(rel)), rel
+
+
+def test_opencode_update_is_remove_then_commit_pinned_add() -> None:
+    # Live on 2.0.18: re-running `plugin add` says "already configured" and a
+    # same-branch re-add reuses the cache; only remove + commit-pinned add updates.
+    for rel in AGY_READMES:
+        body = _opencode_section(_read(rel))
+        # `plugin remove <name>` answers "not configured"; only the full spec removes.
+        assert "opencode plugin remove 'github:kouko/loom-plugins#" in body, rel
+        assert re.search(r"opencode plugin add 'github:kouko/loom-plugins#<[^>]+>::path:", body), rel
+        assert not re.search(r"To update, run|もう一度実行|再執行一次", body), rel

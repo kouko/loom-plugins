@@ -318,7 +318,13 @@ def _build_all_eligible(repo_root: Path) -> dict:
         claude["name"] = name
         dirs[name] = _build_plugin(repo_root / name, claude, _stale_codex())
     _write_card(dirs["loom-workflow"])
+    loader = repo_root / "scripts" / "opencode" / "loader.js"
+    loader.parent.mkdir(parents=True, exist_ok=True)
+    loader.write_text(LOADER_TEXT, encoding="utf-8")
     return dirs
+
+
+LOADER_TEXT = "// canonical OpenCode loader (fixture)\nexport async function setup() {}\n"
 
 
 CARD_REL = ("skills", "loom-visualization", "assets", "trigger-card.md")
@@ -504,6 +510,34 @@ def test_codex_manifests_unchanged_by_root_manifest_sync(tmp_path):
                  for h in (".claude-plugin", ".codex-plugin")}
         assert after == before, f"{name}: host manifests mutated"
         assert m.sync_plugin(copy, check=True), f"{name}: codex drift"
+
+
+def test_package_json_derived_per_plugin(tmp_path):
+    """OpenCode A1 positive: --all derives package.json and copies the loader."""
+    dirs = _build_all_eligible(tmp_path)
+    assert _run_all([], tmp_path).returncode == 0
+
+    for name, plugin in dirs.items():
+        text = (plugin / "package.json").read_text(encoding="utf-8")
+        assert json.loads(text) == {
+            "name": name, "version": "1.4.0", "description": "new description",
+            "private": True, "type": "module", "main": "index.js",
+        }
+        assert (plugin / "opencode" / "loader.js").read_text(encoding="utf-8") == LOADER_TEXT
+    assert _run_all(["--check"], tmp_path).returncode == 0
+
+
+def test_drifted_loader_copy_fails_check(tmp_path):
+    """OpenCode A1 negative: a hand-edited loader copy fails --all --check."""
+    dirs = _build_all_eligible(tmp_path)
+    assert _run_all([], tmp_path).returncode == 0
+    copy = dirs["loom-code"] / "opencode" / "loader.js"
+    copy.write_text(LOADER_TEXT + "// local edit\n", encoding="utf-8")
+
+    proc = _run_all(["--check"], tmp_path)
+    assert proc.returncode != 0
+    assert "DRIFT" in proc.stderr and "loader.js" in proc.stderr, proc.stderr
+    assert copy.read_text(encoding="utf-8").endswith("// local edit\n")
 
 
 def test_all_eligible_agy_root_manifests_in_sync():

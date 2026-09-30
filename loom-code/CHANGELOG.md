@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.24.0] — 2026-09-29 — OpenCode v2 support.
+
+- OpenCode v2 package: `package.json` plus `opencode/loader.js` register the skills and agents and translate `hooks/hooks-opencode.json` into OpenCode hooks.
+- New `references/opencode-tools.md` maps tool and dispatch names for OpenCode; write-plan, build and closing-review link it.
+- The selection guard recognises `opencode` as a host program.
+- The mechanism census counts both plugins' `hooks-opencode.json` with an `@opencode` qualifier.
+- budget-exception: SessionStart:startup|clear|compact:session-start@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+- budget-exception: PreToolUse:Bash|Write|Edit|apply_patch:loom_checker.py@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+- budget-exception: UserPromptSubmit::loom_checker.py@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+
 ## [3.23.0] — 2026-09-29 — write-plan intent check on a confirmed intent; wider repository boundary check.
 
 - `write-plan` runs `loom_checker.py intent` on an intent that arrives already confirmed (after branching off the trunk).

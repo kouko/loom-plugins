@@ -4,7 +4,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.5.5 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.5.6 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## What it is
 
@@ -213,9 +213,35 @@ Its hooks run only in the `agy` CLI, not in the Antigravity desktop app or IDE.
 On agy, the visualization card for loom-visualization is delivered as a plugin rule, so it
 is always on.
 
+### OpenCode
+
+OpenCode v2 (CLI and TUI, verified on 2.0.18) installs plugins from GitHub. Install `loom-code` first: `opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`.
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
+opencode plugin list
+```
+
+Then restart OpenCode (`opencode service restart`): until it restarts, `opencode plugin list` may show only some of the plugins.
+
+The OpenCode TUI has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json` in OpenCode's config folder (`~/.config/opencode/`, the file `plugin add` writes). To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
+
+Skills are offered as `loom-workflow:<skill>`.
+
+On OpenCode, the visualization card and the skill-folder rule run through the plugin's v2 hooks.
+
+Limits on OpenCode:
+
+- A plugin can take up to about 40 seconds to appear in `opencode plugin list` right after the background service starts.
+- loom-code's subagents can stop on an `external_directory` permission prompt when they read loom's installed files from the plugin cache, even under `opencode run --auto`, which does not cover subagent sessions. Approve reads of the loom plugin directory.
+- `opencode run` without `--auto` stops at the first permission prompt or model question, so drive long loom runs from the TUI.
+- OpenCode does not ask before shell commands outside the project, so a model can change the machine (observed: a system-wide `pip install --break-system-packages`); review its commands or tighten OpenCode's permission settings.
+- The OpenCode desktop app and IDE integrations are not covered.
+- Node is not needed to use the plugins.
+
 ### Where the per-turn reminder does not arrive
 
-On Claude Code and Codex, `loom-workflow` sends the visualization card for
+On Claude Code, Codex and OpenCode, `loom-workflow` sends the visualization card for
 loom-visualization (reply in the user's language, conclusion first, plain words,
 literal wording, tables and diagrams) to the agent on every message you send,
 through a UserPromptSubmit hook; it adds up to 181 words per turn. It does not

@@ -6,7 +6,7 @@
 > never grades. Every verdict on what it produces is rendered by
 > `loom-code:closing-review`, by an agent that did not write the draft.
 
-**Version**: 2.7.0 — 5 skills + 1 optional router. See
+**Version**: 2.7.1 — 5 skills + 1 optional router. See
 [CHANGELOG.md](CHANGELOG.md) for releases.
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -149,6 +149,30 @@ agent may act outside the project; pass it in interactive mode too.
 
 loom-design ships no hooks; loom-code's hooks run only in the `agy` CLI, not
 in the Antigravity desktop app or IDE.
+
+### OpenCode
+
+OpenCode v2 (CLI and TUI, verified on 2.0.18) installs plugins from GitHub. Install `loom-code` first: `opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`.
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
+opencode plugin list
+```
+
+Then restart OpenCode (`opencode service restart`): until it restarts, `opencode plugin list` may show only some of the plugins.
+
+The OpenCode TUI has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json` in OpenCode's config folder (`~/.config/opencode/`, the file `plugin add` writes). To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
+
+Skills are offered as `loom-design:<skill>`.
+
+Limits on OpenCode:
+
+- A plugin can take up to about 40 seconds to appear in `opencode plugin list` right after the background service starts.
+- loom-code's subagents can stop on an `external_directory` permission prompt when they read loom's installed files from the plugin cache, even under `opencode run --auto`, which does not cover subagent sessions. Approve reads of the loom plugin directory.
+- `opencode run` without `--auto` stops at the first permission prompt or model question, so drive long loom runs from the TUI.
+- OpenCode does not ask before shell commands outside the project, so a model can change the machine (observed: a system-wide `pip install --break-system-packages`); review its commands or tighten OpenCode's permission settings.
+- The OpenCode desktop app and IDE integrations are not covered.
+- Node is not needed to use the plugins.
 
 ## Tests
 

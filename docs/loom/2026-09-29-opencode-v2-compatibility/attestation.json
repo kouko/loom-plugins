@@ -1,0 +1,67 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-29-opencode-v2-compatibility",
+  "content_digest": "5253a814da4ab6d441e4fa6fbbea01b35fba3892",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_opencode_nested_prompt.py -q",
+      "artifact": "loom-code/tests/test_adversarial_opencode_nested_prompt.py",
+      "result": "pass",
+      "command_digest": "d535386ff6c092709cd7a066d56204d453176638ad036cc6835fe570134d7c19"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "loom-code:reviewer#a42c7c0ecf95eb8e8",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "naming",
+          "anchor": "scripts/opencode/loader.js:234",
+          "text": "registerHooks exceeds 100 lines; split per hook the next time the loader is touched."
+        }
+      ]
+    },
+    {
+      "reviewer": "loom-code:reviewer#aa9a0dcb7fcb93c0e",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-09-29-opencode-v2-compatibility/acceptance-test-report.md:24",
+          "text": "Report still says the README does not name which opencode.json; 61b46c87 added the location after the report was written."
+        },
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-09-29-opencode-v2-compatibility/spec.md:7",
+          "text": "REQ-1 still names the TUI plugin dialog while spec.md:24 says the TUI has no install option; deliberate, accepted as a documented limitation on 2026-09-30."
+        },
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "anchor": "README.md:256",
+          "text": "'The OpenCode TUI has no plugin-install option' is absolute though 2.0.20 still carries an unreachable shift+i binding; the parenthetical calls the folder a file."
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

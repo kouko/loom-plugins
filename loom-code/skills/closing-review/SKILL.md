@@ -55,8 +55,9 @@ second-vendor reviewer, and acceptance tester dispatch. `<loom-code>` (this plug
 root) is `${CLAUDE_PLUGIN_ROOT}` on Claude Code; on any other host it is the
 directory two levels above this SKILL.md.
 
-On Antigravity CLI, map tool and agent names with
-[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
+On Antigravity CLI or OpenCode, map tool and agent names with
+[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md) or
+[`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
 Before dispatching reviewers in Round 1, run
 `python3 <loom-code>/scripts/loom_checker.py sync-trunk` from the change
