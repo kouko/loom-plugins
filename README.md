@@ -13,9 +13,9 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/) | 2.7.2 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/) | 3.25.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.5.7 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
+| [`loom-design`](loom-design/) | 2.8.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
+| [`loom-code`](loom-code/) | 3.26.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/) | 5.6.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -114,7 +114,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.7.2. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.8.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
@@ -129,7 +129,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.25.0. Five stations carry one change from plan to PR with
+Version 3.26.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -147,7 +147,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.5.7. Workflow tools used around the stations; all work without
+Version 5.6.0. Workflow tools used around the stations; all work without
 `loom-code`; only `decision-map`'s delivery step, which writes an intent,
 needs it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
@@ -255,7 +255,7 @@ Then restart OpenCode (`opencode service restart`): until it restarts, `opencode
 
 The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
-Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model; expert-mode is the command `/loom-code:expert-mode`.
+Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model; expert-mode is the command `/loom-code:expert-mode`. Start loom with `/loom-code:using-loom-code`, `/loom-design:using-loom-design` or `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state` and `/loom-workflow:goal-create` are also commands, and each of these stays a skill too.
 
 On OpenCode, the session context, the publication reminder, the language reminder and the selection-record guard (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
 

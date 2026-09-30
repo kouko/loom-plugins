@@ -3,6 +3,7 @@ name: handoff
 version: 0.3.0
 description: |
   Save or resume a HANDOFF across sessions. Use for 'wrap up' or 'save state'; in-session re-orientation belongs to recap-state.
+user-invocable: true
 ---
 
 # Handoff

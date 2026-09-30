@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.8.0] — 2026-09-30 — OpenCode start command.
+
+- On OpenCode, `using-loom-design` is also a `/` command and remains a skill; its frontmatter carries `user-invocable: true`.
+- The README OpenCode sections name the start command.
+
 ## [2.7.2] — 2026-09-30 — OpenCode README wording.
 
 - The OpenCode README wording bounds the TUI claim to OpenCode 2.0.18–2.0.20 and names `opencode.json` as the file in the config folder.

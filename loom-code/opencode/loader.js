@@ -7,7 +7,8 @@
 // `default { id: "<plugin>", setup }`, because duplicate plugin ids fail to load.
 // The plugin root is the parent of this file's opencode/ directory.
 //   <root>/skills/<name>/SKILL.md -> skill "<plugin>:<name>"
-//     (disable-model-invocation: true -> user command "/<plugin>:<name>" instead)
+//     (disable-model-invocation: true -> user command "/<plugin>:<name>" instead;
+//      user-invocable: true -> that command as well as the skill)
 //   <root>/agents/<name>.md       -> subagent "<plugin>:<name>"
 //   <root>/hooks/hooks-opencode.json -> v2 tool and session hooks (registerHooks)
 import { spawn } from "node:child_process";
@@ -73,6 +74,7 @@ function skills() {
         path,
         content: `Base directory for this skill: ${dirname(path)}\n\n${body}`,
         userOnly: isTrue(data["disable-model-invocation"]),
+        userInvocable: isTrue(data["user-invocable"]),
       };
     });
 }
@@ -92,14 +94,15 @@ function agents() {
 async function registerSkills(ctx, found) {
   const model = found.filter((s) => !s.userOnly);
   await ctx.skill.transform((draft) => {
-    for (const { userOnly, ...skill } of model) draft.add(skill);
+    for (const { userOnly, userInvocable, ...skill } of model) draft.add(skill);
   });
 }
 
-// A user-only skill becomes a command whose prompt starts with the typed
-// `/<plugin>:<name> <args>` text, so the prompt hook sees what the user typed.
+// A user-only or user-invocable skill becomes a command whose prompt starts
+// with the typed `/<plugin>:<name> <args>` text, so the prompt hook sees what
+// the user typed.
 async function registerCommands(ctx, found) {
-  const commands = found.filter((s) => s.userOnly);
+  const commands = found.filter((s) => s.userOnly || s.userInvocable);
   if (commands.length === 0) return;
   await ctx.command.transform((draft) => {
     for (const skill of commands) {
@@ -293,7 +296,10 @@ async function registerHooks(ctx) {
       if (keepsTranscript) {
         try {
           mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
-          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: text } })}\n`);
+          // A command's prompt is the typed `/<id> <args>` plus the skill body;
+          // only the typed part is the user's words. Hooks still get the full text.
+          const said = text.split("\n\nBase directory for this skill: ")[0];
+          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: said } })}\n`);
         } catch {} // no transcript only costs the language reminder
       }
       const added = [];

@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.26.0] — 2026-09-30 — OpenCode start command.
+
+- On OpenCode, `using-loom-code` is also a `/` command and remains a skill; the loader registers every skill whose frontmatter carries `user-invocable: true` as a command.
+- `expert-mode` stays command-only.
+- The README OpenCode sections name the start command.
+
 ## [3.25.0] — 2026-09-30 — publish checks the stated verification status and a committed attestation.
 
 - `loom_checker.py publish` refuses a PR body whose `Verification status:` line differs from the computed status, and names the line the body must carry.

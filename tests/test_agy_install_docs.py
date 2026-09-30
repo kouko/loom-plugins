@@ -181,6 +181,22 @@ def test_every_readme_has_opencode_install_section() -> None:
         assert "opencode plugin list" in body, rel
 
 
+START_COMMANDS = {
+    "loom-code": ("/loom-code:using-loom-code",),
+    "loom-design": ("/loom-design:using-loom-design",),
+    "loom-workflow": ("/loom-workflow:using-loom-workflow", "/loom-workflow:handoff",
+                      "/loom-workflow:recap-state", "/loom-workflow:goal-create"),
+}
+
+
+def test_opencode_sections_name_start_commands() -> None:
+    for rel in AGY_READMES:
+        body = _opencode_section(_read(rel))
+        names = PLUGINS if rel == "README.md" else (rel.split("/")[0],)
+        for command in (c for p in names for c in START_COMMANDS[p]):
+            assert f"`{command}`" in body, (rel, command)
+
+
 def test_principles_name_opencode() -> None:
     text = _read("PRINCIPLES.md")
     who = re.search(r"^## Who\n(.*?)^## ", text, re.S | re.M).group(1)
