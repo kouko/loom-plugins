@@ -92,3 +92,36 @@ Tried on 2026-09-30, in a clean copy of the project at 2c6c419e.
   - loom-design 2.7.2 and loom-workflow 5.5.7: same set, all consistent. Root `.claude-plugin/marketplace.json` carries no version.
   - `sync_codex_manifests.py --check --all`: exit 0.
 - Evidence: suite output above; `finalize-review` runs the same suite before the change is accepted and blocks on failure.
+
+## Re-run on 2026-09-30, at cf17c38e
+
+Fix range d867cf9c..cf17c38e (cf17c38e code: status-claim normalisation, refusal wording, rule texts, Ship prose; 924c5124 docs: README intro line, spec.md:24 version bound, dated notes in the old report). Fresh clean worktree at cf17c38e, fresh base worktree at adafa838, same `scenarios.sh` / `stale.sh` / `drive_publish.py` method (origin `https://git.invalid/...`, outward-call seam, local bare remote; nothing contacted any network host). Checker loads: `--list-rules` prints 26 rules.
+
+- 1: re-tested — all earlier forms again plus three new ones, against `absent` branches, and `valid` against the `stale` branch. Every one exit 1, `outward calls attempted: 0`, bare origin `[]`, with the new wording:
+  ```
+  BLOCK push.contextual-body: PR body states 'Verification status: valid (skipped: reviewers)'; the body must carry exactly this bare line:
+  Verification status: absent
+  ... '- Verification status: valid' ...                       -> Verification status: absent
+  ... '**Verification status:** valid (skipped: reviewers)' ... -> Verification status: absent
+  ... '> Verification Status: valid' ...                       -> Verification status: absent
+  ... '**Verification status**: valid' ...   (new)             -> Verification status: absent
+  ... '### Verification status: valid' ...   (new)             -> Verification status: absent
+  ... 'Verification status：valid' ...  (new, full-width colon) -> Verification status: absent
+  ... 'Verification status: valid' (stale branch) -> Verification status: stale (attestation has an unknown or incomplete schema)
+  ```
+- 2: re-tested (the same scenario script covers it; the fix only moved comments around the check and extended the rule text) — untracked and modified attestation both: `BLOCK publish.preconditions: docs/loom/demo-change/attestation.json is not committed — commit it, then publish again`, exit 1, 0 outward calls, bare origin `[]`.
+- 3: re-tested — truthful bare `absent`, no status line, prose line `Ship computes the verification status: see CI.`, and truthful bare `stale (attestation has an unknown or incomplete schema)`: each prints `Verification <status> for <sha>`, makes the same 5 outward calls as base (`gh repo view`, `ls-remote`, `push ... origin <sha>:refs/heads/engineering/demo-change`, `ls-remote`, stopped `gh api`) and the bare origin holds `refs/heads/engineering/demo-change`.
+  New cases, truthful status in non-bare form, HEAD vs base:
+  ```
+  body line                            HEAD cf17c38e                                   base adafa838
+  Verification status：absent          BLOCK push.contextual-body ... bare line; bare []   published, bare has branch
+  **Verification status:** absent      BLOCK push.contextual-body ... bare line; bare []   published, bare has branch
+  - Verification status: absent        BLOCK push.contextual-body ... bare line; bare []   published, bare has branch
+  ```
+  A body that states the computed status, only decorated, no longer behaves as before: it is refused, with the exact bare line as the remedy. The bullet case was already refused at 2c6c419e (the first run did not try it; `test_stated_status_must_equal_the_computed_status` pins `> **Verification status:** absent` as refused). This is a conflict with the intent's Constraint "only a body that misstates the status ... is refused" -> verdict partly.
+- 4: re-tested over all three surfaces —
+  - READMEs: the intro line in all ten now reads "OpenCode v2 (verified on 2.0.18; plugins installed from the CLI also load in the TUI) installs plugins from GitHub." (ja/zh-TW equivalents); `grep "CLI and TUI|CLI と TUI|CLI 與 TUI"` over the ten = 0 hits. The bounded "TUI (2.0.18–2.0.20) has no plugin-install option" sentence and the folder/file wording are unchanged from the first run.
+  - spec.md: line 7 (REQ-1) unchanged, still annotated; line 24 design decision now says "no plugin-install option on 2.0.18–2.0.20".
+  - Old report: line 24 restored to 「說明沒講設定檔在哪 … 沒說是哪個位置的設定檔」 plus 「（2026-09-30 更正：此次重跑時說明未寫出位置；61b46c87 之後已寫明 `~/.config/opencode/opencode.json`）」; line 34 now names the isolated config folder's `opencode.json`; line 49 restored with the same dated correction note. The report now records the run's observation and marks it superseded, so it no longer tells a reader the current install steps omit the settings file.
+- 5: carried over — `git diff --stat d867cf9c..cf17c38e` touches no file under `docs/loom/memory/`.
+- 6: re-tested — suite in the clean worktree at cf17c38e: exit 0, no failures (largest pytest run `2095 passed, 2 skipped`; every other pytest run and shell-test summary passed, e.g. `Summary: 9 PASS / 0 FAIL`). Focused: `loom-code/tests/test_loom_publish.py`, `loom-code/tests/test_adversarial_decorated_status_line.py`, `tests/test_agy_install_docs.py`: 106 passed. The fix range changes no manifest, CHANGELOG or README version string; versions stay loom-code 3.25.0 / loom-design 2.7.2 / loom-workflow 5.5.7, consistent as in the first run.
