@@ -141,3 +141,48 @@ Fix range 7b548699..df8feb8c (df8feb8c: `validate_stated_status` compares only t
   on an `absent` branch printed `Verification absent for <sha>`, made the 5 outward calls, and the bare origin holds `refs/heads/engineering/demo-change`. `_status_claim` matches only `verification status` followed by `:`, so this line is never judged (same at 2c6c419e and cf17c38e). Verdict partly.
 - 3: re-tested — correct value `absent` in every form, each `Verification absent for <sha>`, 5 outward calls identical to base, bare origin holds the branch: bare `Verification status: absent`; no status line; prose `Ship computes the verification status: see CI.`; `Verification status：absent`; `**Verification status:** absent`; `- Verification status: absent`; `> Verification status: absent`; `| Verification status: absent |`; `### Verification status: absent`; `**Verification status**: absent`; `` `Verification status: absent` ``. Truthful bare `stale (attestation has an unknown or incomplete schema)` on the stale branch: same, published. The three forms refused at cf17c38e (full-width colon, bold, bullet) now publish as at base.
 - Decision raised at cf17c38e (should a correct but decorated status be refused?): settled by the intent — Constraints: "only a body that misstates the status, or an attestation generated but left uncommitted, is refused", and Acceptance 3. Removed from the report's open questions.
+
+## Re-run on 2026-09-30, at f93e1ea6
+
+Fix range d5c8187a..f93e1ea6 (f93e1ea6: `|` now also separates label from value — `_status_claim` maps `|` to `:` before matching `^[: ]*(?:\d+ )?verification status ?:`, and the value is `status[\W_]*?[:：|](.*)` stripped of whitespace and `*_`|`). Fresh clean worktree at f93e1ea6, same method (origin `https://git.invalid/...`, outward-call seam, local bare remote; no network host contacted). Checker loads (26 rules). Focused tests `test_loom_publish.py` + `test_adversarial_decorated_status_line.py`: 92 passed. Rows 1 and 3 now carry f93e1ea6 results; rows 2, 4, 6 keep cf17c38e and row 5 keeps 2c6c419e (the range touches only the status-claim parser and its test).
+
+Every branch below computes `absent` unless marked stale. "REFUSED" = exit 1, `BLOCK push.contextual-body: PR body states '<line>'; the body must carry exactly this bare line:` / `Verification status: absent`, 0 outward calls, bare origin empty. "published" = `Verification absent for <sha>`, the same 5 outward calls as base, bare origin holds `refs/heads/engineering/demo-change`.
+
+- 1: re-tested — wrong value `valid`:
+
+  | Body line(s) | Result |
+  |---|---|
+  | `Verification status: valid (skipped: reviewers)` | REFUSED |
+  | `- Verification status: valid` | REFUSED |
+  | `**Verification status:** valid (skipped: reviewers)` | REFUSED |
+  | `> Verification Status: valid` | REFUSED |
+  | `**Verification status**: valid` | REFUSED |
+  | `### Verification status: valid` | REFUSED |
+  | `Verification status：valid` | REFUSED |
+  | `\| Verification status: valid \|` | REFUSED |
+  | table header + `\| Verification status \| valid \|` (separate cells, the round-2 gap) | REFUSED |
+  | `\|Verification status\|valid\|` | REFUSED |
+  | table header + `\| **Verification status** \| `valid` \|` | REFUSED |
+  | `Verification status \| valid` | REFUSED |
+  | `\| Verification status \| valid \| from CI \|` | REFUSED |
+  | `1. Verification status: valid` | REFUSED |
+  | `  * Verification status: valid` | REFUSED |
+  | `Verification status: valid` on the stale branch | REFUSED, names `Verification status: stale (attestation has an unknown or incomplete schema)` |
+  | `- [x] Verification status: valid` (task list) | **published** |
+  | table header + `\| Status line \| Verification status: valid \|` (claim in second cell) | **published** |
+  | `Verification status - valid` (dash separator) | **published** |
+
+  The task-list line normalises to `x verification status :`, which the `^[: ]*(?:\d+ )?` prefix does not allow; the second-cell and dash lines never reach the `verification status :` shape at line start. Verdict partly.
+- 3: re-tested — correct value:
+
+  | Body line(s) | Result |
+  |---|---|
+  | `Verification status: absent`; no status line; prose `Ship computes the verification status: see CI.` | published |
+  | `Verification status：absent`, `**Verification status:** absent`, `- Verification status: absent`, `> Verification status: absent`, `\| Verification status: absent \|`, `### Verification status: absent`, `**Verification status**: absent`, `` `Verification status: absent` ``, `1. Verification status: absent` | published |
+  | table header + `\| Verification status \| absent \|`; `\|Verification status\|absent\|`; `\| **Verification status** \| `absent` \|` | published |
+  | table header + `\| Ship computes the verification status \| see CI \|` (mention only) | published (not judged) |
+  | `Verification status: stale (attestation has an unknown or incomplete schema)` on the stale branch | published |
+  | `\| Verification status \| absent \| from CI \|` (three cells) | **REFUSED** — value parsed as `absent \| from CI` |
+  | `\| Verification status \| Reviewer \|` / `\|---\|---\|` / `\| absent \| CI \|` (header names the column, value in the next row) | **REFUSED** — header row judged, value parsed as `Reviewer` |
+
+  At base adafa838 both refused tables would have published (base never judged the status line). A body stating the computed status is refused in these two table shapes, against the intent's Constraint. Verdict partly.
