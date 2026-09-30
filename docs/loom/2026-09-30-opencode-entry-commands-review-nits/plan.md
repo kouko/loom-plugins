@@ -15,15 +15,20 @@ Wave 1 fixes the loader; wave 2 carries every prose, version and changelog edit.
 **W1-01 Loader records a command prompt minus the body it appended**  after: none  acceptance: 2, 5
 - Files: scripts/opencode/loader.js, loom-code/opencode/loader.js, loom-design/opencode/loader.js, loom-workflow/opencode/loader.js, loom-code/tests/test_opencode_loader.py
 - Test: A2 positive: command prompt recorded as typed text only; negative: typed message containing the separator recorded whole. A5 positive: header comment names the both-keys case; boundary: renamed test still pins agents and command lists.
-- Risk: agent-decided — the prompt hook strips a trailing `\n\n${skill.content}` of a command skill instead of splitting on the separator, so the literal stays only in the content builder; preserves test_adversarial_opencode_command_language.py and widens test_opencode_loader.py by one case.
+- Risk: agent-decided — trim at one shared separator constant only when the text opens with `/<ns>:<name>` and the base directory ends in `skills/<name>`, since loom-code's hook records every loom plugin's commands; preserves test_adversarial_opencode_command_language.py.
 
 **W2-01 README label, old report and plan wording, version bump and changelog note**  after: W1-01  acceptance: 1, 3, 4, 6
 - Files: loom-*/**/plugin.json, loom-*/package.json, loom-*/CHANGELOG.md, README.md, loom-*/README*.md, docs/loom/2026-09-30-opencode-entry-commands/*.md, loom-*/tests/**/test_*.py
 - Test: A1 positive: new entries note the fix; negative: released entries unchanged. A3 positive: label reads command-only; negative: no "user-invoked" left. A4 positive: three terms explained; boundary: verdict cells unchanged. A6 positive: pins pass; negative: sync check exits 0.
 - Risk: agent-decided — patch for all three (each ships the synced loader); the note rides new entries so released ones stay as published; version pins include loom-design/tests/spec/test_capture_intent_contract.py.
 
+**W2-02 Graduate the cross-plugin command probe into the suite**  after: W1-01  acceptance: 2
+- Files: docs/loom/2026-09-30-opencode-entry-commands-review-nits/evidence/probes/test_adversarial_cross_plugin_command_transcript.py, loom-code/tests/test_adversarial_cross_plugin_command_transcript.py
+- Test: A2 positive: moved program passes in the package suite; negative: a loom-workflow command prompt never reaches the transcript with its skill body.
+- Risk: agent-decided — the probe caught a real regression, so it moves via git mv, changing only path helpers.
+
 ## Simplicity check
-- Strip the command's own appended body instead of a prefix match plus shared constant — taken
+- Strip only the command's own appended body instead of a prefix match plus shared constant — declined: the adversary showed loom-code's hook also records other plugins' commands
 - Merge the prose task into the bump task, since both edit loom-code/README.md line 11 — taken
 - Drop the source-text count of the separator literal — taken
 
