@@ -29,13 +29,20 @@ def plain_step_names(steps) -> str:
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
 
 
+_LINE_DECORATION = re.compile(r"^(?:[\s>|`*_+-]|\d+\.)+")
+_STATUS_LABEL = re.compile(r"verification\s+status\s*:", re.IGNORECASE)
+
+
 def validate_stated_status(body: str, status: str) -> str | None:
-    """Every visible `Verification status:` line states `status`, compared
-    whitespace-trimmed; a body without such a line is not judged here."""
+    """Every visible line whose label, once leading Markdown decoration is
+    removed, reads `Verification status:` is exactly that bare line stating
+    `status` (whitespace-trimmed); a body without such a line is not judged."""
     prefix = STATUS_PREFIXES[0]
     for line in _body_sections(body, strip_comments=True)[1]:
         stated = line.strip()
-        if stated.startswith(prefix) and stated[len(prefix):].strip() != status:
+        if not _STATUS_LABEL.match(_LINE_DECORATION.sub("", line)):
+            continue
+        if not stated.startswith(prefix) or stated[len(prefix):].strip() != status:
             return (f"PR body states '{stated}', but publish computes a different "
                     f"status; the body must carry exactly:\n{prefix} {status}")
     return None

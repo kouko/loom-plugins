@@ -1455,6 +1455,8 @@ def test_stated_status_must_equal_the_computed_status() -> None:
     assert "Verification status: absent" in check(body("Verification status: valid"), "absent")
     two = disclosed_body(["Verification status: absent", "Verification status: valid"])
     assert check(two, "absent") is not None
+    assert "Verification status: absent" in check(body("> **Verification status:** absent"), "absent")
+    assert check(body("Ship computes the verification status: see CI."), "absent") is None
 
 
 def test_misstated_status_refused_before_network(tmp_path: Path, monkeypatch) -> None:
