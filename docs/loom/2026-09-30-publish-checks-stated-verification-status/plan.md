@@ -32,6 +32,11 @@ Wave 1 holds three independent tasks; wave 2 bumps versions over their result.
 - Test: A6 positive: release-metadata sync test passes at loom-code 3.25.0, loom-design 2.7.2, loom-workflow 5.5.7; negative: `sync_codex_manifests.py --check --all` exits 0 (no drift).
 - Risk: agent-decided — loom-code minor (Ship station guidance changes), others patch (README only). Every manifest sync script output committed.
 
+**W2-02 Graduate the decorated-status probe into the suite**  after: W1-01  acceptance: 1
+- Files: docs/loom/2026-09-30-publish-checks-stated-verification-status/evidence/probes/test_abuse_decorated_status_line.py, loom-code/tests/test_adversarial_decorated_status_line.py
+- Test: A1 positive: moved program passes in the package suite; negative: its three decorated misstated lines stay refused.
+- Risk: agent-decided — the probe caught a real defect (fixed in 5eec9efb), so it moves into loom-code/tests/ unchanged except imports and path helpers.
+
 ## Simplicity check
 - Compare the status inside `validate_contextual_pr_body` — declined: that function is structural and has no repository; the computed status exists only in the command handler.
 - Exact whitespace-trimmed string equality of stated and computed status — taken
