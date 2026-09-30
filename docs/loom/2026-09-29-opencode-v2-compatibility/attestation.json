@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-29-opencode-v2-compatibility",
-  "content_digest": "a771c9843afaa51c48e0a168eb51ecd1592bccd0",
+  "content_digest": "5253a814da4ab6d441e4fa6fbbea01b35fba3892",
   "executions": [
     {
       "kind": "package-tests",
@@ -28,9 +28,9 @@
       "findings": [
         {
           "severity": "nit",
-          "dimension": "maintainability",
+          "dimension": "naming",
           "anchor": "scripts/opencode/loader.js:234",
-          "text": "registerHooks exceeds 100 lines; splitting the per-event wiring would ease reading."
+          "text": "registerHooks exceeds 100 lines; split per hook the next time the loader is touched."
         }
       ]
     },
@@ -40,7 +40,26 @@
       "model": "claude-opus-5-5",
       "lens": "docs",
       "verdict": "PASS",
-      "findings": []
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-09-29-opencode-v2-compatibility/acceptance-test-report.md:24",
+          "text": "Report still says the README does not name which opencode.json; 61b46c87 added the location after the report was written."
+        },
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-09-29-opencode-v2-compatibility/spec.md:7",
+          "text": "REQ-1 still names the TUI plugin dialog while spec.md:24 says the TUI has no install option; deliberate, accepted as a documented limitation on 2026-09-30."
+        },
+        {
+          "severity": "nit",
+          "dimension": "ambiguity",
+          "anchor": "README.md:256",
+          "text": "'The OpenCode TUI has no plugin-install option' is absolute though 2.0.20 still carries an unreachable shift+i binding; the parenthetical calls the folder a file."
+        }
+      ]
     }
   ],
   "findings": [],
