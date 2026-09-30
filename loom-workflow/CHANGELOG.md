@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.6.0] — 2026-09-30 — OpenCode start commands.
+
+- On OpenCode, `using-loom-workflow`, `handoff`, `recap-state` and `goal-create` are also `/` commands and remain skills; their frontmatter carries `user-invocable: true`.
+- The README OpenCode sections name the start commands.
+
 ## [5.5.7] — 2026-09-30 — OpenCode README wording.
 
 - The OpenCode README wording bounds the TUI claim to OpenCode 2.0.18–2.0.20 and names `opencode.json` as the file in the config folder.
