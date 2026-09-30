@@ -238,7 +238,7 @@ function transcript(sessionID) {
 }
 
 // A command's prompt is the typed `/<ns>:<name> <args>` plus SKILL_DIR and a
-// base directory ending in `skills/<name>`; only the typed part is the user's
+// base directory ending in `skills/<name>` (or `\` on Windows); only the typed part is the user's
 // words. Any loom plugin's command qualifies, since loom-code alone keeps the
 // transcript. Other text is returned whole.
 function spoken(text) {
@@ -247,7 +247,8 @@ function spoken(text) {
   if (!name || cut < 0) return text;
   const rest = text.slice(cut + SKILL_DIR.length);
   const nl = rest.indexOf("\n");
-  return nl >= 0 && rest.slice(0, nl).endsWith(`skills/${name}`) ? text.slice(0, cut) : text;
+  const dir = nl >= 0 ? rest.slice(0, nl) : "";
+  return [`skills/${name}`, `skills\\${name}`].some((end) => dir.endsWith(end)) ? text.slice(0, cut) : text;
 }
 
 async function registerHooks(ctx) {
