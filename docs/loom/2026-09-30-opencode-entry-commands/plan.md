@@ -21,6 +21,11 @@ Wave 1 holds two independent tasks; wave 2 bumps versions over their result.
 - Test: A5 positive: release-metadata sync test passes at loom-code 3.26.0, loom-design 2.8.0, loom-workflow 5.6.0; negative: `sync_codex_manifests.py --check --all` exits 0.
 - Risk: agent-decided — minor for all three: each gains a skill frontmatter field and new OpenCode commands. Every sync script output committed.
 
+**W2-02 Graduate the command-language probe into the suite**  after: W1-01  acceptance: 1
+- Files: docs/loom/2026-09-30-opencode-entry-commands/evidence/probes/test_opencode_command_language.py, loom-code/tests/test_adversarial_opencode_command_language.py
+- Test: A1 positive: moved program passes in the package suite; negative: a command prompt's skill body never reaches the transcript as user words.
+- Risk: agent-decided — the probe caught a real defect (fixed in 78b3ba6c), so it moves into loom-code/tests/ via git mv, changing only imports and path helpers.
+
 ## Simplicity check
 - Reuse existing loader assertions instead of new negative and boundary cases — taken
 - Drop the README expert-mode pin no Acceptance line asks for — taken
