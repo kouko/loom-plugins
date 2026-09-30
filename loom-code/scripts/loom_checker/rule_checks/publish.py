@@ -53,8 +53,11 @@ def validate_stated_status(body: str, status: str) -> str | None:
         stated = line.strip()
         if not _status_claim(line):
             continue
-        value = _STATUS_VALUE.search(line).group(1).strip(" \t*_`|")
-        if value and value != status:
+        # Detection casefolds; the raw line may not match (a ligature such
+        # as "ﬆ"), and a claim whose value cannot be parsed is refused.
+        parsed = _STATUS_VALUE.search(line)
+        value = parsed.group(1).strip(" \t*_`|") if parsed else None
+        if value is None or (value and value != status):
             return (f"PR body states '{stated}'; the body must carry exactly this "
                     f"bare line:\n{prefix} {status}")
     return None
