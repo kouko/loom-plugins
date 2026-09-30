@@ -205,7 +205,7 @@ agy では loom-visualization の visualization card を plugin rule として�
 
 ### OpenCode
 
-OpenCode v2（CLI と TUI、2.0.18 で確認）は GitHub から plugin をインストールします。`loom-code` を先にインストールしてください：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+OpenCode v2（2.0.18 で確認。CLI でインストールした plugin は TUI でも読み込まれる）は GitHub から plugin をインストールします。`loom-code` を先にインストールしてください：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
 
 ```sh
 opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'

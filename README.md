@@ -242,7 +242,7 @@ Limits on Antigravity:
 
 ### OpenCode
 
-OpenCode v2 (CLI and TUI, verified on 2.0.18) installs plugins from GitHub.
+OpenCode v2 (verified on 2.0.18; plugins installed from the CLI also load in the TUI) installs plugins from GitHub.
 
 ```sh
 opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'

@@ -143,7 +143,7 @@ loom-design 本身沒有 hook；loom-code 的 hook 只在 `agy` CLI 執行，Ant
 
 ### OpenCode
 
-OpenCode v2（CLI 與 TUI，已在 2.0.18 驗證）從 GitHub 安裝 plugin。先安裝 `loom-code`：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+OpenCode v2（已在 2.0.18 驗證；從 CLI 安裝的 plugin 在 TUI 裡也會載入）從 GitHub 安裝 plugin。先安裝 `loom-code`：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
 
 ```sh
 opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'

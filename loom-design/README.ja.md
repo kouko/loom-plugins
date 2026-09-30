@@ -151,7 +151,7 @@ Antigravity のデスクトップアプリや IDE では走らない。
 
 ### OpenCode
 
-OpenCode v2（CLI と TUI、2.0.18 で確認）は GitHub から plugin をインストールする。`loom-code` を先にインストールする：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+OpenCode v2（2.0.18 で確認。CLI でインストールした plugin は TUI でも読み込まれる）は GitHub から plugin をインストールする。`loom-code` を先にインストールする：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
 
 ```sh
 opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
