@@ -191,6 +191,13 @@ def test_principles_name_opencode() -> None:
     assert "OpenCode v2 added) by kouko 2026-09-29" in ratified
 
 
+def test_opencode_install_has_no_tui_route() -> None:
+    # OpenCode v2 TUI has no plugin-install option; the only other route is opencode.json.
+    for rel in AGY_READMES:
+        assert "shift+i" not in _read(rel).lower(), rel
+        assert "`opencode.json`" in _opencode_section(_read(rel)), rel
+
+
 def test_opencode_update_is_remove_then_commit_pinned_add() -> None:
     # Live on 2.0.18: re-running `plugin add` says "already configured" and a
     # same-branch re-add reuses the cache; only remove + commit-pinned add updates.

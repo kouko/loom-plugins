@@ -224,7 +224,7 @@ opencode plugin list
 
 Then restart OpenCode (`opencode service restart`): until it restarts, `opencode plugin list` may show only some of the plugins.
 
-Or press ctrl+p, open Plugins, press shift+I (Install plugin) and enter the same spec. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
+The OpenCode TUI has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
 Skills are offered as `loom-workflow:<skill>`.
 

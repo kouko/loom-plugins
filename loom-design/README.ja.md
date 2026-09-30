@@ -160,7 +160,7 @@ opencode plugin list
 
 その後 OpenCode を再起動する（`opencode service restart`）。再起動するまで、`opencode plugin list` には一部の plugin しか出ないことがある。
 
-ctrl+p を押して Plugins を開き、shift+I（Install plugin）を押して同じ spec を入力してもよい。更新するには、`plugin add` や `plugin update` を再実行しても何も起きない（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用する）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動する：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのまま。plugin 名だけでは `not configured` と返る）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+OpenCode の TUI には plugin をインストールする項目はない。`plugin add` の代わりに、同じ spec を `opencode.json` の `plugins` リストに追加してもよい。更新するには、`plugin add` や `plugin update` を再実行しても何も起きない（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用する）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動する：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのまま。plugin 名だけでは `not configured` と返る）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
 skill は `loom-design:<skill>` として提供される。
 
