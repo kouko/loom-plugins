@@ -196,6 +196,7 @@ def test_opencode_install_has_no_tui_route() -> None:
     for rel in AGY_READMES:
         assert "shift+i" not in _read(rel).lower(), rel
         assert "`opencode.json`" in _opencode_section(_read(rel)), rel
+        assert "`~/.config/opencode/`" in _opencode_section(_read(rel)), rel
 
 
 def test_opencode_update_is_remove_then_commit_pinned_add() -> None:
