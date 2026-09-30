@@ -20,6 +20,8 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const plugin = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).name;
+// Joins a command's typed text to its skill body; the prompt hook cuts there.
+const SKILL_DIR = "\n\nBase directory for this skill: ";
 
 function unquote(value) {
   if (value.length > 1 && value.startsWith("'") && value.endsWith("'")) {
@@ -73,7 +75,7 @@ function skills() {
         name: data.name || e.name,
         description: data.description || "",
         path,
-        content: `Base directory for this skill: ${dirname(path)}\n\n${body}`,
+        content: `${SKILL_DIR.trimStart()}${dirname(path)}\n\n${body}`,
         userOnly: isTrue(data["disable-model-invocation"]),
         userInvocable: isTrue(data["user-invocable"]),
       };
@@ -145,7 +147,7 @@ export async function setup(ctx) {
   await registerSkills(ctx, found);
   await registerCommands(ctx, found);
   await registerAgents(ctx, agents());
-  await registerHooks(ctx, found);
+  await registerHooks(ctx);
 }
 
 // hooks/hooks-opencode.json has the Claude hooks.json schema, event names and
@@ -235,7 +237,20 @@ function transcript(sessionID) {
   return join(tmpdir(), "loom-opencode", `${name}.jsonl`);
 }
 
-async function registerHooks(ctx, found) {
+// A command's prompt is the typed `/<ns>:<name> <args>` plus SKILL_DIR and a
+// base directory ending in `skills/<name>`; only the typed part is the user's
+// words. Any loom plugin's command qualifies, since loom-code alone keeps the
+// transcript. Other text is returned whole.
+function spoken(text) {
+  const name = text.match(/^\/[\w.-]+:([\w.-]+)(?:\s|$)/)?.[1];
+  const cut = text.indexOf(SKILL_DIR);
+  if (!name || cut < 0) return text;
+  const rest = text.slice(cut + SKILL_DIR.length);
+  const nl = rest.indexOf("\n");
+  return nl >= 0 && rest.slice(0, nl).endsWith(`skills/${name}`) ? text.slice(0, cut) : text;
+}
+
+async function registerHooks(ctx) {
   const table = hookTable();
   // One session record per session id: its parent and its directory.
   // Ceiling: records are cached until the service restarts, so a failed lookup
@@ -289,7 +304,6 @@ async function registerHooks(ctx, found) {
 
   if (table.UserPromptSubmit) {
     const keepsTranscript = commands(table, "PostToolUse", "Skill").length > 0;
-    const bodies = found.filter((s) => s.userOnly || s.userInvocable).map((s) => `\n\n${s.content}`);
     await ctx.session.hook("prompt", async (ev) => {
       const id = ev.sessionID;
       const text = ev.prompt?.text;
@@ -298,11 +312,8 @@ async function registerHooks(ctx, found) {
       if (keepsTranscript) {
         try {
           mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
-          // A command's prompt is the typed `/<id> <args>` plus the skill body;
-          // only the typed part is the user's words. Hooks still get the full text.
-          const body = bodies.find((b) => text.endsWith(b));
-          const said = body ? text.slice(0, -body.length) : text;
-          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: said } })}\n`);
+          // Hooks still get the full text.
+          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: spoken(text) } })}\n`);
         } catch {} // no transcript only costs the language reminder
       }
       const added = [];
