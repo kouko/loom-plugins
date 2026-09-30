@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.26.1] — 2026-09-30 — OpenCode transcript note and README label.
+
+- On OpenCode, a command's skill body is not recorded as the user's words, so the language reminder keeps the user's language (shipped in 3.26.0); a message the user types that contains the skill-body separator is now recorded whole.
+- The README skill count calls `expert-mode` command-only instead of user-invoked.
+
 ## [3.26.0] — 2026-09-30 — OpenCode start command.
 
 - On OpenCode, `using-loom-code` is also a `/` command and remains a skill; the loader registers every skill whose frontmatter carries `user-invocable: true` as a command.
