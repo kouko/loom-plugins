@@ -122,7 +122,7 @@ def test_agents_registered_plugin_qualified():
         assert str(REPO_ROOT / "loom-code") in first and "<plugin>/" in first
 
 
-def test_plugin_without_agents_registers_none():
+def test_plugin_without_agents_registers_no_agents_and_its_entry_commands():
     expected = {
         "loom-design": ["loom-design:using-loom-design"],
         "loom-workflow": ["loom-workflow:goal-create", "loom-workflow:handoff",
@@ -164,6 +164,19 @@ def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
             assert not log.exists()
             assert not (tmp_path / "loom-opencode" / f"{session}.jsonl").exists()
     assert "selection capture --hook" in log.read_text(encoding="utf-8")  # the root control
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("look at this\n\nBase directory for this skill: x", None),
+    ("/loom-code:build x\n\nBase directory for this skill: /elsewhere\n\nrest", None),
+    ("/loom-code:using-loom-code\n\nBase directory for this skill: C:\\p\\skills\\using-loom-code\n\nbody",
+     "/loom-code:using-loom-code"),
+], ids=["not-a-command", "foreign-base-dir", "windows-base-dir"])
+def test_skill_separator_prompt_recorded_whole_or_trimmed(tmp_path: Path, text, expected):
+    event = {"sessionID": "root", "messageID": "m1", "prompt": {"text": text}}
+    _fire("loom-code", "prompt", event, tmp_path, {**os.environ, "TMPDIR": str(tmp_path)})
+    line = (tmp_path / "loom-opencode" / "root.jsonl").read_text(encoding="utf-8").splitlines()[0]
+    assert json.loads(line)["message"]["content"] == (text if expected is None else expected)
 
 
 ZH = "請幫我把這個功能的測試補齊，然後說明一下為什麼之前的版本會失敗，謝謝你。"

@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.8.1] — 2026-09-30 — OpenCode transcript note.
+
+- On OpenCode, a command's skill body is not recorded as the user's words, so the language reminder keeps the user's language (shipped in 2.8.0); a message the user types that contains the skill-body separator is now recorded whole.
+
 ## [2.8.0] — 2026-09-30 — OpenCode start command.
 
 - On OpenCode, `using-loom-design` is also a `/` command and remains a skill; its frontmatter carries `user-invocable: true`.

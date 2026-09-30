@@ -8,7 +8,8 @@
 // The plugin root is the parent of this file's opencode/ directory.
 //   <root>/skills/<name>/SKILL.md -> skill "<plugin>:<name>"
 //     (disable-model-invocation: true -> user command "/<plugin>:<name>" instead;
-//      user-invocable: true -> that command as well as the skill)
+//      user-invocable: true -> that command as well as the skill; with both
+//      keys set, disable-model-invocation wins and it stays command-only)
 //   <root>/agents/<name>.md       -> subagent "<plugin>:<name>"
 //   <root>/hooks/hooks-opencode.json -> v2 tool and session hooks (registerHooks)
 import { spawn } from "node:child_process";
@@ -19,6 +20,8 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const plugin = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).name;
+// Joins a command's typed text to its skill body; the prompt hook cuts there.
+const SKILL_SEPARATOR = "\n\nBase directory for this skill: ";
 
 function unquote(value) {
   if (value.length > 1 && value.startsWith("'") && value.endsWith("'")) {
@@ -72,7 +75,7 @@ function skills() {
         name: data.name || e.name,
         description: data.description || "",
         path,
-        content: `Base directory for this skill: ${dirname(path)}\n\n${body}`,
+        content: `${SKILL_SEPARATOR.trimStart()}${dirname(path)}\n\n${body}`,
         userOnly: isTrue(data["disable-model-invocation"]),
         userInvocable: isTrue(data["user-invocable"]),
       };
@@ -234,6 +237,20 @@ function transcript(sessionID) {
   return join(tmpdir(), "loom-opencode", `${name}.jsonl`);
 }
 
+// A command's prompt is the typed `/<ns>:<name> <args>` plus SKILL_SEPARATOR
+// and a base directory ending in `skills/<name>` (or `\` on Windows); only
+// the typed part is the user's words. Any loom plugin's command qualifies,
+// since loom-code alone keeps the transcript. Other text is returned whole.
+function spoken(text) {
+  const name = text.match(/^\/[\w.-]+:([\w.-]+)(?:\s|$)/)?.[1];
+  const cut = text.indexOf(SKILL_SEPARATOR);
+  if (!name || cut < 0) return text;
+  const rest = text.slice(cut + SKILL_SEPARATOR.length);
+  const nl = rest.indexOf("\n");
+  const dir = nl >= 0 ? rest.slice(0, nl) : "";
+  return [`skills/${name}`, `skills\\${name}`].some((end) => dir.endsWith(end)) ? text.slice(0, cut) : text;
+}
+
 async function registerHooks(ctx) {
   const table = hookTable();
   // One session record per session id: its parent and its directory.
@@ -296,10 +313,8 @@ async function registerHooks(ctx) {
       if (keepsTranscript) {
         try {
           mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
-          // A command's prompt is the typed `/<id> <args>` plus the skill body;
-          // only the typed part is the user's words. Hooks still get the full text.
-          const said = text.split("\n\nBase directory for this skill: ")[0];
-          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: said } })}\n`);
+          // Hooks still get the full text.
+          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: spoken(text) } })}\n`);
         } catch {} // no transcript only costs the language reminder
       }
       const added = [];
