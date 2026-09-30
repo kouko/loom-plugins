@@ -3,6 +3,7 @@ name: goal-create
 version: 0.2.0
 description: |
   Create a session goal prompt or draft repository purpose. This skill never fires on its own; it must be invoked by name. Can synthesize a prompt from confirmed intent or spec and activate it through an available native host goal tool; does not operate the Loom workflow.
+user-invocable: true
 ---
 
 # Goal Create

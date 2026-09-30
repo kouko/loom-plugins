@@ -2,6 +2,7 @@
 name: using-loom-code
 description: |
   Route general Loom implementation requests to the right station. Use when asked to use Loom for a change without naming a station.
+user-invocable: true
 ---
 
 # Using Loom Code

@@ -96,7 +96,8 @@ def test_skills_registered_plugin_qualified():
 def test_disable_model_invocation_skill_not_model_registered():
     seen = _register("loom-code")
     assert "loom-code:expert-mode" not in {s["id"] for s in seen["skills"]}
-    assert seen["commands"] == [{"name": "loom-code:expert-mode", "execute": "function"}]
+    assert [c["name"] for c in seen["commands"]] == ["loom-code:expert-mode", "loom-code:using-loom-code"]
+    assert all(c["execute"] == "function" for c in seen["commands"])
 
 
 def test_disable_model_invocation_read_case_insensitively_with_comment(tmp_path: Path):
@@ -122,9 +123,15 @@ def test_agents_registered_plugin_qualified():
 
 
 def test_plugin_without_agents_registers_none():
-    for plugin in ("loom-design", "loom-workflow"):
+    expected = {
+        "loom-design": ["loom-design:using-loom-design"],
+        "loom-workflow": ["loom-workflow:goal-create", "loom-workflow:handoff",
+                          "loom-workflow:recap-state", "loom-workflow:using-loom-workflow"],
+    }
+    for plugin, commands in expected.items():
         seen = _register(plugin)
-        assert seen["agents"] == [] and seen["commands"] == []
+        assert seen["agents"] == []
+        assert [c["name"] for c in seen["commands"]] == commands
 
 
 def test_shell_push_routed_to_push_hook(tmp_path: Path):

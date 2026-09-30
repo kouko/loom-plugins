@@ -2,6 +2,7 @@
 name: using-loom-workflow
 description: |
   Route broad Loom workflow-tool requests to the right skill. Use when the request spans tools or the right workflow skill is unclear.
+user-invocable: true
 ---
 
 # Using loom-workflow

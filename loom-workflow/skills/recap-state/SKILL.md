@@ -3,6 +3,7 @@ name: recap-state
 version: 0.1.0
 description: |
   Give an in-session recap for 'where were we', '我們剛剛在幹嘛', '剛剛講到哪', '我跟丟了', 'ちょっと振り返って', '今どこだっけ', or '振り返り'. The built-in /recap is an away-summary.
+user-invocable: true
 ---
 
 # Recap
