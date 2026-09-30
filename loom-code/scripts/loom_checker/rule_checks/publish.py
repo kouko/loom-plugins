@@ -29,26 +29,30 @@ def plain_step_names(steps) -> str:
 STATUS_PREFIXES = ("Verification status:", "Skipped by instruction:")
 
 
-_STATUS_CLAIM = re.compile(r"^(?:\d+ )?verification status ?:")
+# `:`, `：` and a table cell border `|` all separate the label from its value.
+_STATUS_CLAIM = re.compile(r"^[: ]*(?:\d+ )?verification status ?:")
+_STATUS_VALUE = re.compile(r"status[\W_]*?[:：|](.*)", re.IGNORECASE)
 
 
 def _status_claim(line: str) -> bool:
     """Whether the line, with all Markdown punctuation reduced to spaces,
     opens with the `Verification status:` label."""
-    normalized = re.sub(r"[^\w:]+|_", " ", line.casefold().replace("：", ":")).strip()
+    separated = line.casefold().replace("：", ":").replace("|", ":")
+    normalized = re.sub(r"[^\w:]+|_", " ", separated).strip()
     return _STATUS_CLAIM.match(normalized) is not None
 
 
 def validate_stated_status(body: str, status: str) -> str | None:
     """Every visible status claim, in any Markdown dress, states `status`:
-    the text after its first colon, trimmed of whitespace and `*_`|`,
-    equals it exactly; a body without such a claim is not judged."""
+    the text after the separator that follows its label, trimmed of
+    whitespace and `*_`|`, equals it exactly; a body without such a claim
+    is not judged."""
     prefix = STATUS_PREFIXES[0]
     for line in _body_sections(body, strip_comments=True)[1]:
         stated = line.strip()
         if not _status_claim(line):
             continue
-        value = re.split(r"[:：]", line, maxsplit=1)[1].strip(" \t*_`|")
+        value = _STATUS_VALUE.search(line).group(1).strip(" \t*_`|")
         if value != status:
             return (f"PR body states '{stated}'; the body must carry exactly this "
                     f"bare line:\n{prefix} {status}")
