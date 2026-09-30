@@ -12,7 +12,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[5]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # loom-code and a sibling plugin share one OpenCode session: the sibling's
 # command prompt is delivered to loom-code's prompt hook.
