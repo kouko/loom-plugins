@@ -220,7 +220,8 @@ When `acceptance-test` is skipped by the user's plain-words
 instruction, run no acceptance testing.
 When `acceptance-test` is skipped and so no report exists, tell the user, in the conversation before Ship,
 every step skipped by instruction, read from the committed
-`skipped-by-instruction:` lines.
+`skipped-by-instruction:` lines and described in plain words by what it would
+have done, not as its record id.
 
 On every dispatch, tell the acceptance tester whether `package-tests` or
 `finalize-review` is skipped. Also hand it every finding of severity

@@ -62,9 +62,10 @@ severity important or worse that the main agent dismissed. One bullet each:>
 
 <Every step skipped on the user's instruction, read from the committed
 `skipped-by-instruction: <step> <YYYY-MM-DD>` lines in the plan's
-`## Risks` and the intent's `## Constraints`. One bullet each, the step in
-plain words and the date; write `acceptance-test` as
-`acceptance-test (independent acceptance testing)`.>
+`## Risks` and the intent's `## Constraints`. One bullet each, with the
+date: describe the step in plain words by what it would have done — "the
+independent code review", "the full test suite", "the deliberate attempt
+to break the change" — not as its record id.>
 
 - <the step, in plain words> — skipped on your instruction, <date>.
 
