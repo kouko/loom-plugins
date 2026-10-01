@@ -1,9 +1,11 @@
 """`push --hook`: the PreToolUse hook every host runs before a shell call.
 
-Nothing is refused here. A publication command's most common shape earns
-one reminder line naming the branch's verification status, every other
-shape is silent, and a failure inside that path allows (spec
-2026-09-22-publication-floor-moves-to-github REQ-4, REQ-12).
+No publication command is refused here. A publication command's most
+common shape earns one reminder line naming the branch's verification
+status, every other shape is silent, and a failure inside that path allows
+(spec 2026-09-22-publication-floor-moves-to-github REQ-4, REQ-12). The one
+remaining refusal is an unreadable hook call: a missing, empty, malformed
+or non-object payload exits 2.
 """
 from __future__ import annotations
 
@@ -23,7 +25,8 @@ import sys
 def read_hook_payload(stdin=sys.stdin) -> dict | None:
     """PreToolUse payload (Claude Code and Codex share the shape) when the
     checker is invoked as a hook; None when run from a terminal or with an
-    empty stdin. Malformed JSON is a UsageError → exit 2 (fail-closed)."""
+    empty stdin. Malformed JSON or a non-object payload is a UsageError →
+    exit 2."""
     if stdin is None or stdin.isatty():
         return None
     raw = stdin.read()
