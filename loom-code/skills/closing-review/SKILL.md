@@ -19,14 +19,11 @@ cumulative diff. If only publication metadata changed and a matching
 attestation already exists, stop: the evidence is still valid and Ship owns
 the remaining work.
 
-At entry, run `loom_checker.py selection show <change-id>` and omit the steps
-`selection show` lists as skipped, plus any step the user told you to skip in
-plain words; §2 and §3 say how skipped reviewers, adversarial and acceptance-test are
-handled; [expert-mode](../expert-mode/SKILL.md) stays an optional route the
-user may invoke. Words that ask to skip independent acceptance testing —
+At entry, omit any step the user told you to skip in plain words; §2 and §3
+say how skipped reviewers, adversarial and acceptance-test are handled. Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
 `acceptance-test` step. At station entry, keep the full flow unless the user
-selected or instructed a skip. Automatic narrow-change simplification belongs
+instructed a skip. Automatic narrow-change simplification belongs
 to finalization and attestation validation. The default is the full
 flow: skip a step only when the user
 tells you to in plain words, then tell the user in one line which step is
@@ -35,8 +32,7 @@ skipped and continue. When you honour such a skip, append one line
 or the intent's `## Constraints` section when plan is absent or skipped, and commit it
 before dependent checks. Commit that line before reviewers read the final digest,
 because it changes the digest; a later commit is harmless only when the skip
-sends the change to Ship unattested (§5). Never ask the user for a generated
-code to skip a step.
+sends the change to Ship unattested (§5).
 
 ## 2. Compute review depth
 
@@ -72,10 +68,10 @@ acceptance testing (§3), so acceptance testing exercises the synced content.
 
 Before dispatching reviewers in any round, confirm on the current functional
 content (a committed acceptance test report aside) that Build's hand-off reports the
-complete package suite passing or `package-tests` is skipped (listed by
-`selection show` or skipped by the user's plain-words instruction), and that it
-reports every adversarial program passing or `adversarial` is skipped (listed
-by `selection show` or skipped by the user's plain-words instruction), each
+complete package suite passing or `package-tests` is skipped by the user's plain-words
+instruction, and that it
+reports every adversarial program passing or `adversarial` is skipped by the user's
+plain-words instruction, each
 skip waiving only its own check. When that hand-off reports a check failing, return the change to
 Build and dispatch no reviewer. Reviewers read only content whose Build
 mechanical checks passed.
@@ -133,8 +129,8 @@ fresh-context reviewers with distinct agent identities. The checker derives the
 floor from the cumulative branch delta and fails closed to two when it cannot
 classify the whole change. `finalize-review` recomputes the same policy, and
 the PR's verification status reports a mismatch as `stale`; the orchestrator
-never declares or overrides it. When `reviewers` is skipped (listed by
-`selection show` or skipped by the user's plain-words instruction), dispatch no
+never declares or overrides it. When `reviewers` is skipped by the user's plain-words
+instruction, dispatch no
 reviewer and pass no `verdicts`.
 - Unless reviewers are skipped, a selected second vendor remains required.
   Resolve it from the standing
@@ -220,8 +216,8 @@ committed after their verdicts is new functional content and needs the next
 round. Its evidence file,
 `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`, is functional
 content too and is committed with the report under the same deadline.
-When `acceptance-test` is skipped (listed by `selection show` or skipped by
-the user's plain-words instruction), run no acceptance testing.
+When `acceptance-test` is skipped by the user's plain-words
+instruction, run no acceptance testing.
 
 On every dispatch, tell the acceptance tester whether `package-tests` or
 `finalize-review` is skipped. Also hand it every finding of severity
@@ -234,8 +230,8 @@ tester's steps 6-7 govern the suite row and what is re-tested.
 Closing review dispatches no adversary and creates no adversarial program.
 Build commits the adversarial programs, and its hand-off names each program's
 path and command; §5 passes them to `finalize-review`. Do not record a claimed
-result; finalization executes them. When `adversarial` is skipped (listed by
-`selection show` or skipped by the user's plain-words instruction), Build hands
+result; finalization executes them. When `adversarial` is skipped by the user's plain-words
+instruction, Build hands
 off no adversarial program and §5 omits the `adversarial` input.
 
 <!-- gate: review.probe-graduation -->
@@ -309,12 +305,8 @@ findings themselves, go to Build as one hand-off that names every one of their
 instances; findings of different classes go as separate hand-offs. Every
 hand-off from the list goes to Build in the same fix round, before the
 reviewers resume. A verdict label such as `NEEDS_REVISION` names no class.
-The per-verdict failure record below is disclosure for the pull request only;
-each fix is scoped from this list.
 
-Before any fix round, pass each non-passing reviewer verdict to
-`loom_checker.py selection record-failure <change-id> --step reviewers --rule <verdict>`;
-a rejection never handed over stays unrecorded. Build scopes each fix to its
+Build scopes each fix to its
 defect's whole class before an implementer or the main agent makes it, as
 Build §2 states.
 
@@ -366,19 +358,13 @@ python3 <loom-code>/scripts/loom_checker.py finalize-review <change-id> --input 
 ```
 
 The checker runs the declared package suite and each adversarial program once.
-When a bound selection exists, `finalize-review` waives only the reviewers,
-adversarial and package-tests steps it lists, including no waivers when its
-skip list is empty. Automatic narrow-change skips apply only without a bound
-selection; attestation validation follows the same precedence, using the
-attestation's selection claim in CI where local records are unavailable.
 Only after all executions and verdicts pass does it atomically generate the
 attestation bound to the functional-content digest. Commit the generated file
 with any remaining publication metadata; publication validates that single
 attestation directly.
 
 When a step that `finalize-review` needs (reviewers, adversarial, package-tests)
-was skipped by the user's plain-words instruction rather than a bound
-selection, skip `finalize-review` and leave the change unattested: tell the
+was skipped by the user's plain-words instruction, skip `finalize-review` and leave the change unattested: tell the
 user in one line that the PR will show `verification absent`, and hand the
 change to Ship.
 

@@ -40,33 +40,28 @@ Antigravity CLI, OpenCode: map tool/agent names via
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md),
 [`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
-At entry, run `loom_checker.py selection show <change-id>` and omit the prose
-steps `selection show` lists as skipped (spec, plan, implementer, tdd,
-acceptance-test), plus any step the user told you to skip in plain words;
-[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
-invoke. Words that ask to skip independent acceptance testing —
+At entry, omit the prose steps the user told you to skip in plain words (spec,
+plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
 `acceptance-test` step. At station entry, keep the full flow unless the user
-selected or instructed a skip. Automatic narrow-change simplification belongs
+instructed a skip. Automatic narrow-change simplification belongs
 to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, append one line
 `skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section,
 or the intent's `## Constraints` section when plan is absent or skipped, and commit it
-before dependent checks. Never ask the user for a generated code to skip a step.
+before dependent checks.
 
 ## Artifact vocabulary
 
 Use the confirmed intent when spec or plan is skipped. Skipped spec waives step 4's
 creation, carried-detail routing, review and behavior-confirmation checks;
-use intent Acceptance directly. Record instructions before intake; bound
-selections already supply exemptions. Skipped plan waives step 5's document,
+use intent Acceptance directly. Record instructions before intake. Skipped plan waives step 5's document,
 plan check, plan review and plan-dependent configuration prompts. Run intake
 for confirmed-intent and non-skipped checks; hand Build intent and retained
 spec paths, omitted steps and bounded implementation scope. Resolve open
-questions in intent; never create a substitute plan or fabricate a selection
-confirmation.
+questions in intent; never create a substitute plan.
 
 `kind: product` changes what a user reads, types, or sees happen;
 `kind: engineering` covers internal work, tooling, tests, and docs.
@@ -349,8 +344,8 @@ this when coverage was dropped.
 - Group tasks into **waves** as dependency and integration boundaries. Waves
   do not schedule formal review; after all tasks and package tests pass,
   Build transitions once to the closing `branch-end` review.
-- Unless `implementer` is skipped (listed by `selection show` or skipped by the
-  user's plain-words instruction), implementer dispatch is mandatory for every
+- Unless `implementer` is skipped by the user's plain-words
+  instruction, implementer dispatch is mandatory for every
   implementation task. Scheduling multiple implementers
   concurrently is optional.
 - Task ids are `W<n>-<nn>` and remain stable once written so hand-offs can

@@ -1,8 +1,7 @@
 """Codex publication hook lifecycle regression tests.
 
 The retained hook command must remain useful after its versioned plugin root
-has disappeared: commands stay available and each one says the hook failed,
-while a malformed payload or the selection record store is still denied.
+has disappeared: commands stay available and each one says the hook failed.
 """
 from __future__ import annotations
 

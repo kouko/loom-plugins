@@ -136,7 +136,7 @@ acceptance tester＝`acceptance-tester`、讀者＝`reviewer`、對抗者＝`adv
 | 8 | review→ship | `finalize-review` 重跑套件與對抗程式、生成 attestation | 之後 ship 才發布 |
 
 acceptance test report 要在讀者讀之前 commit，因為 verdict 綁 digest——晚進樹的
-報告是新的功能內容，要下一輪才讀得到。`selection show` 列為 skipped
+報告是新的功能內容，要下一輪才讀得到。使用者用白話要求跳過
 的步驟直接省略。
 
 三方歸屬：一條 finding 不是「我的」就一定是別人的，判給誰要照

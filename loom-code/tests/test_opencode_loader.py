@@ -93,10 +93,9 @@ def test_skills_registered_plugin_qualified():
             assert skill["content"].strip() and skill["description"].strip() not in ("", "|")
 
 
-def test_disable_model_invocation_skill_not_model_registered():
+def test_loom_code_registers_only_its_router_command():
     seen = _register("loom-code")
-    assert "loom-code:expert-mode" not in {s["id"] for s in seen["skills"]}
-    assert [c["name"] for c in seen["commands"]] == ["loom-code:expert-mode", "loom-code:using-loom-code"]
+    assert [c["name"] for c in seen["commands"]] == ["loom-code:using-loom-code"]
     assert all(c["execute"] == "function" for c in seen["commands"])
 
 
@@ -158,7 +157,7 @@ def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
     env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}", "TMPDIR": str(tmp_path)}
     for session in ("child-1", "root"):
         event = {"sessionID": session, "messageID": "m1",
-                 "prompt": {"text": "/loom-code:expert-mode K7Q2"}}
+                 "prompt": {"text": "/loom-code:using-loom-code"}}
         _fire("loom-code", "prompt", event, tmp_path, env)
         if session.startswith("child"):
             assert not log.exists()

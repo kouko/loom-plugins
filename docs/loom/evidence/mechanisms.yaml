@@ -44,8 +44,7 @@ counting: >
   is not host-hygiene.
 
 mechanisms:
-  # --- skill (23; 7 stations + 12 non-standalone tools + 3 optional routers
-  #     + the user-invoked expert-mode skill;
+  # --- skill (22; 7 stations + 12 non-standalone tools + 3 optional routers;
   #     the 2 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
@@ -113,9 +112,6 @@ mechanisms:
   - id: loom-memory
     class: skill
     eval: "loom-workflow/tests/loom-memory/test_skill_contract.py"
-  - id: expert-mode
-    class: skill
-    eval: "loom-code/tests/test_expert_mode_skill.py"
 
   # --- checker-rule (loom_checker.py --list-rules is the count) ---
   - id: adversarial.proportionate
