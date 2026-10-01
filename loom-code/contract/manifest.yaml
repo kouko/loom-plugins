@@ -214,6 +214,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
         - "one line per Acceptance"
         - "What this did to existing data"
         - "I decided for you"
+        - "Steps you told me to skip"
         - "open questions"
       must_not:
         - {kind: "design rationale", goes_to: spec}
