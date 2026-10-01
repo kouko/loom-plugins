@@ -163,7 +163,9 @@ def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
         if session.startswith("child"):
             assert not log.exists()
             assert not (tmp_path / "loom-opencode" / f"{session}.jsonl").exists()
-    assert "selection capture --hook" in log.read_text(encoding="utf-8")  # the root control
+    # the root control: its transcript is kept, and no prompt hook runs a handler
+    assert (tmp_path / "loom-opencode" / "root.jsonl").exists()
+    assert not log.exists()
 
 
 @pytest.mark.parametrize("text, expected", [
@@ -203,7 +205,7 @@ def test_session_and_skill_hooks_feed_text_back(tmp_path: Path, plugin, fires, n
         assert any(needle in text for text in texts), texts
 
 
-def test_unreachable_handler_still_denies_the_store(tmp_path: Path):
+def test_unreachable_handler_allows(tmp_path: Path):
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     (bin_dir / "python3").write_text("#!/bin/bash\ncat >/dev/null\nexit 1\n", encoding="utf-8")
@@ -211,8 +213,7 @@ def test_unreachable_handler_still_denies_the_store(tmp_path: Path):
     env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
     write = {"tool": "write", "sessionID": "root", "id": "c5",
              "input": {"path": ".git/loom/selections/rec", "content": "x"}}
-    threw = _fire("loom-code", "execute.before", write, tmp_path, env)["threw"]
-    assert threw and "checker failed" in threw
+    assert _fire("loom-code", "execute.before", write, tmp_path, env)["threw"] is None
     benign = {"tool": "shell", "sessionID": "root", "id": "c6", "input": {"command": "ls"}}
     assert _fire("loom-code", "execute.before", benign, tmp_path, env)["threw"] is None
 

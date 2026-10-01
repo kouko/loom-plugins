@@ -197,7 +197,7 @@ mechanisms:
     class: checker-rule
     eval: loom-code/tests/test_loom_checker_standing.py::test_missing_standing_docs_warn_in_exactly_three_lines
 
-  # --- hook (16 raw entries across host manifests; 14 counted, 2 host-hygiene) ---
+  # --- hook (13 raw entries across host manifests; 11 counted, 2 host-hygiene) ---
   - id: "SessionStart:startup|clear|compact:session-start"
     class: hook
     eval: loom-code/tests/test_session_start_words.py
@@ -210,12 +210,6 @@ mechanisms:
   - id: "PreToolUse:apply_patch|Edit|Write:loom_checker.py@codex"
     class: hook
     eval: loom-code/tests/test_selection_guard.py::test_codex_file_tool_hook_delegates_to_checker_and_passes_when_missing
-  - id: "UserPromptSubmit::loom_checker.py"
-    class: hook
-    eval: loom-code/tests/test_selection_capture.py::test_user_prompt_with_code_binds_and_returns_system_message
-  - id: "UserPromptSubmit::loom_checker.py@codex"
-    class: hook
-    eval: loom-code/tests/test_selection_capture.py::test_codex_hook_never_blocks_when_checker_is_missing
   - id: "UserPromptSubmit::visualization-card"
     class: hook
     eval: loom-workflow/tests/scripts/test_visualization_card_hook.py
@@ -234,9 +228,6 @@ mechanisms:
     class: hook
     eval: loom-code/tests/test_opencode_loader.py
   - id: "PreToolUse:Bash|Write|Edit|apply_patch:loom_checker.py@opencode"
-    class: hook
-    eval: loom-code/tests/test_opencode_loader.py
-  - id: "UserPromptSubmit::loom_checker.py@opencode"
     class: hook
     eval: loom-code/tests/test_opencode_loader.py
   - id: "UserPromptSubmit::visualization-card@opencode"

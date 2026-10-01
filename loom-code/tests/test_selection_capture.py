@@ -21,9 +21,7 @@ import pytest
 from loom_checker import selection
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
-PLUGIN_ROOT = SCRIPTS.parent
 CHECKER = SCRIPTS / "loom_checker.py"
-HOOKS = PLUGIN_ROOT / "hooks"
 CHANGE = "2026-09-14-example"
 
 
@@ -107,21 +105,6 @@ def show(repo: Path, change: str = CHANGE, env: dict | None = None) -> dict:
 def system_message(result: subprocess.CompletedProcess) -> str:
     assert result.returncode == 0, result.stderr
     return json.loads(result.stdout)["systemMessage"]
-
-
-def manifest_command(name: str) -> str:
-    hooks = json.loads((HOOKS / name).read_text(encoding="utf-8"))["hooks"]
-    (entry,) = hooks["UserPromptSubmit"]
-    (hook,) = entry["hooks"]
-    return hook["command"]
-
-
-def run_manifest(name: str, repo: Path, payload: dict, plugin_root: Path = PLUGIN_ROOT):
-    env = dict(os.environ, CLAUDE_PLUGIN_ROOT=str(plugin_root), PLUGIN_ROOT=str(plugin_root))
-    return subprocess.run(
-        manifest_command(name), shell=True, cwd=str(repo), env=env, text=True,
-        capture_output=True, input=json.dumps(payload, ensure_ascii=False),
-    )
 
 
 # --- Acceptance 1 -----------------------------------------------------------
@@ -363,41 +346,9 @@ def test_capture_binds_the_newest_unconfirmed_proposal(repo):
 
 # --- Acceptance 9 -----------------------------------------------------------
 
-def test_codex_turn_id_payload_binds_same_record(repo):
-    code = propose(repo)
-    prompt = f"$loom-code:expert-mode {code}"
-    result = run_manifest("hooks-codex.json", repo, codex_payload(prompt))
-    message = system_message(result)
-    (codex_confirmation,) = events(repo, "confirmation")
-    assert codex_confirmation["prompt_ref"] == "turn-7"
-    assert codex_confirmation["source"] == "user-typed"
-    codex_view = show(repo)
-
-    # The same prompt through the Claude Code manifest, on a fresh proposal.
-    checker(repo, "cancel", CHANGE)
-    propose(repo)
-    message_claude = system_message(
-        run_manifest("hooks.json", repo, claude_payload(prompt, prompt_id="p9")))
-    claude_confirmation = events(repo, "confirmation")[-1]
-    assert set(claude_confirmation) == set(codex_confirmation)
-    assert claude_confirmation["prompt_ref"] == "p9"
-    claude_view = show(repo)
-    for key in ("bound", "run", "skip", "code", "source"):
-        assert claude_view[key] == codex_view[key], key
-    assert message_claude == message
-
-
 @pytest.mark.parametrize("token", ["$expert-mode", "/expert-mode", "$loom-code:expert-mode",
                                    "/loom-code:expert-mode"])
 def test_bare_expert_mode_token_matches(repo, token):
     code = propose(repo)
     system_message(capture(repo, codex_payload(f"{token} {code.lower()}")))
     assert show(repo)["bound"] is True
-
-
-def test_codex_hook_never_blocks_when_checker_is_missing(repo, tmp_path):
-    code = propose(repo)
-    result = run_manifest("hooks-codex.json", repo, codex_payload(f"$expert-mode {code}"),
-                          plugin_root=tmp_path / "gone")
-    assert result.returncode == 0
-    assert events(repo, "confirmation") == []

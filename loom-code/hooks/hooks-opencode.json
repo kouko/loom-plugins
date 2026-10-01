@@ -22,16 +22,6 @@
         ]
       }
     ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${PLUGIN_ROOT}/scripts/loom_checker.py\" selection capture --hook"
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Skill",

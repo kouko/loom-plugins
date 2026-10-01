@@ -168,21 +168,6 @@ const TOOLS = {
   skill: (i) => ["Skill", { skill: i.id }],
 };
 
-// selection.guard's store patterns, applied only when the checker cannot be
-// reached: a failed handler never loosens the guard.
-const STORE = [/loom\/selections\//, /\.git\/loom/];
-const STORE_TEXT = [...STORE, /(?<![\w.-])selections\//, /git-common-dir|--git-dir|\bGIT_DIR\b/];
-const PATCH_TARGET = /^\*\*\* (?:Add File|Update File|Delete File|Move to): (.+?)\s*$/gm;
-
-function namesStore(name, input, cwd) {
-  const hit = (patterns, text) => patterns.some((p) => p.test(text));
-  if (name === "Bash") return hit(STORE, `${resolve(cwd)}/`) || hit(STORE_TEXT, input.command ?? "");
-  const targets = [input.file_path, ...Object.values(input)
-    .filter((v) => typeof v === "string")
-    .flatMap((v) => [...v.matchAll(PATCH_TARGET)].map((m) => m[1]))];
-  return targets.some((t) => typeof t === "string" && hit(STORE, `${resolve(cwd, t)}/`));
-}
-
 function hookTable() {
   const path = join(root, "hooks", "hooks-opencode.json");
   return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")).hooks ?? {} : {};
@@ -303,8 +288,8 @@ async function registerHooks(ctx) {
     });
   }
 
-  if (table.UserPromptSubmit) {
-    const keepsTranscript = commands(table, "PostToolUse", "Skill").length > 0;
+  const keepsTranscript = commands(table, "PostToolUse", "Skill").length > 0;
+  if (table.UserPromptSubmit || keepsTranscript) {
     await ctx.session.hook("prompt", async (ev) => {
       const id = ev.sessionID;
       const text = ev.prompt?.text;
@@ -339,10 +324,6 @@ async function registerHooks(ctx) {
     for (const hook of commands(table, "PreToolUse", name)) {
       const result = await run(hook, body, env);
       if (result.status === 2) throw new Error(result.stderr.trim() || `loom: a PreToolUse hook refused ${name}`);
-      if (result.status !== 0 && namesStore(name, input, cwd)) {
-        const why = result.stderr.trim() || `exit ${result.status}`;
-        throw new Error(`BLOCK selection.guard: names the selection record store and the checker failed (${why})`);
-      }
       const { message } = output(result);
       if (message) notes.set(ev.id, [...(notes.get(ev.id) ?? []), message]);
     }

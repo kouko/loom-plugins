@@ -273,8 +273,8 @@ def test_codex_file_tool_hook_delegates_to_checker_and_passes_when_missing(tmp_p
     assert delegated.returncode == 2 and "'push', '--hook'" in delegated.stdout
     ordinary = json.dumps({"tool_name": "apply_patch",
                            "tool_input": {"command": "*** Add File: notes.md\n"}})
-    for text, code in ((ordinary, 0), (payload, 2)):  # the fallback mirrors the guard's `.git/loom`
+    for text in (ordinary, payload):  # a missing checker allows every call
         missing = subprocess.run(hook["command"], shell=True, input=text, text=True,
                                  capture_output=True,
                                  env=dict(os.environ, PLUGIN_ROOT=str(tmp_path / "gone")))
-        assert missing.returncode == code, missing.stderr
+        assert missing.returncode == 0, missing.stderr

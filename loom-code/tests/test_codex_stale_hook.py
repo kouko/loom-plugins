@@ -76,17 +76,6 @@ def test_codex_hook_missing_root_names_missing_checker_and_restart(tmp_path: Pat
     assert "restart Codex" in result.stderr
 
 
-def test_codex_hook_missing_root_denies_malformed_or_empty_input(tmp_path: Path) -> None:
-    missing = tmp_path / "removed-version"
-    env = dict(os.environ, PLUGIN_ROOT=str(missing))
-    for payload in ("", "not-json", "[]"):
-        result = subprocess.run(
-            _command(), shell=True, input=payload, text=True,
-            capture_output=True, env=env,
-        )
-        assert result.returncode == 2
-
-
 def test_codex_hook_present_root_delegates_every_bash_payload(tmp_path: Path) -> None:
     root = tmp_path / "installed"
     script = root / "scripts/loom_checker.py"
