@@ -50,3 +50,4 @@ Wave 1 removes the hooks; wave 2 removes the checker, then the skill and prose, 
 ## Risks
 1. Removing the selection guard makes the old record store writable again; it holds only stale local records and nothing reads it after this change.
 2. Attestations already generated with a non-null `selection` become stale; none exist on open branches today.
+3. user-decided — second-vendor selection-confirmed: codex
