@@ -1,3 +1,4 @@
+# concern: A forged non-null attestation selection must not read as valid or waive any step.
 """Change identification and verification status (plan W0-02).
 
 Spec 2026-09-22-publication-floor-moves-to-github REQ-3 and REQ-10, Design
