@@ -135,18 +135,18 @@ def test_plugin_without_agents_registers_no_agents_and_its_entry_commands():
 
 
 def test_shell_push_routed_to_push_hook(tmp_path: Path):
-    event = {"tool": "shell", "sessionID": "root", "id": "c1", "input": {"command": "ls .git/loom"}}
-    threw = _fire("loom-code", "execute.before", event, tmp_path)["threw"]
-    # the checker's own refusal, not the loader's unreachable-handler fallback
-    assert threw and threw.startswith("BLOCK selection.guard") and "checker failed" not in threw
-    # `workdir` moves the call into the store: a plain redirect write is refused
-    repo = tmp_path / "proj"
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
-    (repo / ".git" / "loom" / "selections").mkdir(parents=True)
-    moved = {**event, "input": {"command": "printf x > rec", "workdir": ".git/loom/selections"}}
-    env = {**os.environ, "STUB_SESSION_DIR": str(repo)}
-    threw = _fire("loom-code", "execute.before", moved, tmp_path, env)["threw"]
-    assert threw and threw.startswith("BLOCK selection.guard")
+    bin_dir, log = tmp_path / "bin", tmp_path / "python3.log"
+    bin_dir.mkdir()
+    fake = bin_dir / "python3"
+    fake.write_text(f'#!/bin/bash\necho "$*" >> "{log}"\ncat >/dev/null\n', encoding="utf-8")
+    fake.chmod(0o755)
+    env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+    write = {"tool": "write", "sessionID": "root", "id": "c0", "input": {"path": "a.md", "content": "x"}}
+    assert _fire("loom-code", "execute.before", write, tmp_path, env)["threw"] is None
+    assert not log.exists()  # a file tool never reaches the push hook
+    shell = {"tool": "shell", "sessionID": "root", "id": "c1", "input": {"command": "ls"}}
+    assert _fire("loom-code", "execute.before", shell, tmp_path, env)["threw"] is None
+    assert "loom_checker.py push --hook" in log.read_text(encoding="utf-8")
 
 
 def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):

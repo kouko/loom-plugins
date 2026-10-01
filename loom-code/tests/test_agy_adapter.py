@@ -90,13 +90,6 @@ def test_push_with_running_checker_allows_and_forwards_reminder(change_repo, tmp
     assert out["reason"].startswith("loom: "), out
 
 
-def test_selection_store_write_with_running_checker_denies(change_repo, tmp_path):
-    out = _run("push-gate", _tool_payload("echo x >> .git/loom/selections/c.jsonl", ".",
-                                          [str(change_repo)]), tmp_path)
-    assert out["decision"] == "deny"
-    assert "BLOCK selection.guard" in out["reason"]
-
-
 def test_non_push_command_returns_allow(change_repo, tmp_path):
     out = _run("push-gate", _tool_payload("git status", ".", [str(change_repo)]), tmp_path)
     assert out == {"decision": "allow"}

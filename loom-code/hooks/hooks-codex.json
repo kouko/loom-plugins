@@ -9,15 +9,6 @@
             "command": "if [ -f \"${PLUGIN_ROOT}/scripts/loom_checker.py\" ]; then exec python3 \"${PLUGIN_ROOT}/scripts/loom_checker.py\" push --hook; else cat >/dev/null; echo \"loom: publication hook failed (installed checker is unavailable at ${PLUGIN_ROOT}/scripts/loom_checker.py; restart Codex to load the installed plugin version); allowing.\" >&2; exit 0; fi"
           }
         ]
-      },
-      {
-        "matcher": "apply_patch|Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f \"${PLUGIN_ROOT}/scripts/loom_checker.py\" ]; then exec python3 \"${PLUGIN_ROOT}/scripts/loom_checker.py\" push --hook; else cat >/dev/null; echo \"loom: publication hook failed (installed checker is unavailable at ${PLUGIN_ROOT}/scripts/loom_checker.py; restart Codex to load the installed plugin version); allowing.\" >&2; exit 0; fi"
-          }
-        ]
       }
     ]
   }

@@ -152,10 +152,9 @@ STEP_NAMES_SENTENCE = (
 
 
 def test_ship_step_names_example_matches_the_checker_mapping() -> None:
-    from loom_checker.rule_checks.publish import STEP_PLAIN_NAMES
-
     examples = re.findall(r"write `([^`]+)` as `([^`]+)`", STEP_NAMES_SENTENCE)
-    assert dict(examples) == STEP_PLAIN_NAMES
+    assert dict(examples) == {
+        "acceptance-test": "acceptance-test (independent acceptance testing)"}
 
 
 def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None:

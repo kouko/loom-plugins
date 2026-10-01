@@ -73,12 +73,16 @@ def test_session_start_runs_the_rewritten_script(hooks):
     assert command.endswith('/hooks/session-start"')
 
 
-def test_pre_tool_use_matcher_set_is_bash_and_file_tools(hooks):
-    assert _matchers(hooks["PreToolUse"]) == {"Bash|Write|Edit|MultiEdit|NotebookEdit"}
+def test_pre_tool_use_matcher_set_is_bash_only(hooks):
+    """`push --hook` reads only shell commands, so no host runs it on a
+    file-editing tool."""
+    assert _matchers(hooks["PreToolUse"]) == {"Bash"}
+    opencode = json.loads((HOOKS_DIR / "hooks-opencode.json").read_text(encoding="utf-8"))
+    assert _matchers(opencode["hooks"]["PreToolUse"]) == {"Bash"}
 
 
 def test_codex_pre_tool_use_uses_native_root_and_bash_matcher(codex_hooks):
-    assert _matchers(codex_hooks["PreToolUse"]) == {"Bash", "apply_patch|Edit|Write"}
+    assert _matchers(codex_hooks["PreToolUse"]) == {"Bash"}
     for command in _commands(codex_hooks["PreToolUse"]):
         assert "${PLUGIN_ROOT}" in command
         assert "${CLAUDE_PLUGIN_ROOT}" not in command
@@ -123,10 +127,10 @@ def _fallback_program(command: str) -> str:
 
 
 def test_checker_missing_fallback_programs_are_identical(hooks, codex_hooks):
-    """The Claude Code fallback and both Codex fallbacks run one program."""
+    """The Claude Code fallback and the Codex fallback run one program."""
     programs = [_fallback_program(c) for c in _commands(hooks["PreToolUse"])]
     programs += [_fallback_program(c) for c in _commands(codex_hooks["PreToolUse"])]
-    assert len(programs) == 3
+    assert len(programs) == 2
     assert len(set(programs)) == 1
 
 

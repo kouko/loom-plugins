@@ -91,28 +91,21 @@ def make_repo(tmp_path: Path) -> Path:
     return repo
 
 
-@pytest.mark.parametrize("carrier", ["intent", "plan", "bound", "intent-spec-only"])
-def test_omitted_artifacts_keep_intent_requirements(tmp_path: Path, carrier: str, monkeypatch) -> None:
+@pytest.mark.parametrize("carrier", ["intent", "plan", "intent-spec-only"])
+def test_omitted_artifacts_keep_intent_requirements(tmp_path: Path, carrier: str) -> None:
     repo = make_repo(tmp_path)
     write_intent(repo, kind="product", needs_design="yes")
     intent = repo / f"docs/loom/intent/{CHANGE}.md"
     assert "intake.spec-ready" in blocked_rules(run_checker("intake", "write-plan", CHANGE, cwd=repo))
-    if carrier == "bound":
-        import test_selection_store
-        from test_selection_store import checker, confirm
-        monkeypatch.setattr(test_selection_store, "CHANGE", CHANGE)
-        assert checker(repo, "propose", CHANGE, "--origin", "user", "--skip", "spec,plan").returncode == 0
-        confirm(repo)
+    path = intent if carrier.startswith("intent") else repo / f"docs/loom/{CHANGE}/plan.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    records = "skipped-by-instruction: spec 2026-09-26\n"
+    if carrier != "intent-spec-only":
+        records += "skipped-by-instruction: plan 2026-09-26\n"
+    if carrier.startswith("intent"):
+        path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + records))
     else:
-        path = intent if carrier.startswith("intent") else repo / f"docs/loom/{CHANGE}/plan.md"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        records = "skipped-by-instruction: spec 2026-09-26\n"
-        if carrier != "intent-spec-only":
-            records += "skipped-by-instruction: plan 2026-09-26\n"
-        if carrier.startswith("intent"):
-            path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + records))
-        else:
-            path.write_text("# Plan\n\n## Risks\n" + records)
+        path.write_text("# Plan\n\n## Risks\n" + records)
     result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
     assert result.returncode == 0, result.stderr
     intent.write_text(intent.read_text().replace("status: confirmed 2026-09-02", "status: open"))
@@ -120,9 +113,10 @@ def test_omitted_artifacts_keep_intent_requirements(tmp_path: Path, carrier: str
     assert "intake.confirmed" in blocked_rules(result)
 
 
-@pytest.mark.parametrize("carrier", ["intent", "plan"])
+@pytest.mark.parametrize("carrier", ["intent", "plan", "undated"])
 def test_intake_quotedskip_keepsrequirements(tmp_path: Path, carrier: str) -> None:
-    """A fenced example is document content, not authorization to omit a spec."""
+    """A fenced example is document content, not authorization to omit a spec;
+    neither is a record that carries no date."""
     repo = make_repo(tmp_path)
     write_intent(repo, kind="product", needs_design="yes")
     before = run_checker("intake", "write-plan", CHANGE, cwd=repo)
@@ -131,7 +125,9 @@ def test_intake_quotedskip_keepsrequirements(tmp_path: Path, carrier: str) -> No
         "Reference example only; no step was skipped.\n"
         "```text\nskipped-by-instruction: spec 2026-09-26\n```\n"
     )
-    if carrier == "intent":
+    if carrier == "undated":
+        example = "skipped-by-instruction: spec\n"
+    if carrier in ("intent", "undated"):
         path = repo / f"docs/loom/intent/{CHANGE}.md"
         path.write_text(path.read_text().replace("## Constraints\n", "## Constraints\n" + example))
     else:

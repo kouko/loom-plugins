@@ -15,7 +15,6 @@ from pathlib import Path
 
 import pytest
 
-from loom_checker import attestation as attestation_module
 from loom_checker import digest
 from loom_checker import verification
 from loom_checker.helpers import load_manifest
@@ -65,7 +64,8 @@ def confirmed_intent(repo: Path, change_id: str = CHANGE) -> None:
 
 
 def attestation(repo: Path, *, skip: list[str] | None = None) -> dict:
-    """A content-valid attestation at HEAD; `skip` claims a v2 selection."""
+    """A content-valid attestation at HEAD; `skip` claims a v2 selection,
+    which nothing can bind any more."""
     head = git(repo, "rev-parse", "HEAD")
     package = "python3 -m pytest -q"
     adversarial = "python3 src.py"
@@ -142,37 +142,15 @@ def test_attestation_must_agree_with_identified_change(tmp_path: Path) -> None:
 # --- status, CI depth -------------------------------------------------------
 
 
-def test_skip_set_reports_valid_skipped(tmp_path: Path, monkeypatch) -> None:
+@pytest.mark.parametrize("depth", ["local", "ci"])
+def test_claimed_selection_is_stale_at_both_depths(tmp_path: Path, depth: str) -> None:
+    """No typed confirmation exists any more, so a non-null `selection`
+    matches nothing: it is stale, never `valid (skipped: ...)`."""
     repo = branch_repo(tmp_path)
     confirmed_intent(repo)
     commit(repo, "intent")
     commit_attestation(repo, attestation(repo, skip=["adversarial"]))
-
-    def no_records(*_args, **_kwargs):
-        raise AssertionError("CI depth must not compare selection records")
-
-    monkeypatch.setattr(attestation_module, "selection_evidence", no_records)
-    status = verification.verification_status(repo, CHANGE, depth="ci")
-    assert status == "valid (skipped: adversarial)"
-
-
-def test_skipped_status_names_the_acceptance_step_in_plain_words(tmp_path: Path) -> None:
-    repo = branch_repo(tmp_path)
-    confirmed_intent(repo)
-    commit(repo, "intent")
-    commit_attestation(repo, attestation(repo, skip=["adversarial", "acceptance-test"]))
-    status = verification.verification_status(repo, CHANGE, depth="ci")
-    assert status == (
-        "valid (skipped: adversarial, acceptance-test (independent acceptance testing))"
-    )
-
-
-def test_local_depth_compares_selection_records(tmp_path: Path) -> None:
-    repo = branch_repo(tmp_path)
-    confirmed_intent(repo)
-    commit(repo, "intent")
-    commit_attestation(repo, attestation(repo, skip=["adversarial"]))
-    status = verification.verification_status(repo, CHANGE)  # no local records
+    status = verification.verification_status(repo, CHANGE, depth=depth)
     assert status.startswith("stale (") and "selection" in status
 
 

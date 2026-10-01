@@ -122,7 +122,7 @@ def test_pushgate_checker_exit_zero_silent_allows_bare(stub_checker_adapter, cha
 
 
 def test_pushgate_checker_exit_two_passes_its_reason(stub_checker_adapter, change_repo, tmp_path):
-    reason = "BLOCK selection.guard: names the selection record store"
+    reason = "BLOCK example.rule: a refusal reason"
     out = _run("push-gate", _push("ls .git/loom", ".", [str(change_repo)]), tmp_path,
                adapter=stub_checker_adapter(2, stderr=reason))
     assert out == {"decision": "deny", "reason": reason}

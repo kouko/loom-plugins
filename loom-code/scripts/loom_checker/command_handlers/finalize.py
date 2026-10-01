@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from loom_checker import selection
 from loom_checker.attestation import ATTESTATION_SCHEMA
 from loom_checker.attestation import _command_digest
-from loom_checker.attestation import selection_evidence
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
-from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
 from loom_checker.helpers import load_manifest
@@ -35,33 +32,6 @@ import sys
 import tempfile
 
 
-# The step a refused finalize rule belongs to. Only these rules (execution
-# failures included) record a failure; refusals no step owns, such as a dirty
-# tree, a usage error or a malformed input, verify nothing and record none.
-STEP_BY_RULE = {
-    "finalize.verdicts": "reviewers",
-    "finalize.adversarial": "adversarial",
-    "adversarial.proportionate": "adversarial",
-    "finalize.package-tests": "package-tests",
-}
-
-
-def _record_failure(repo: Path, change_id: str, rule: str) -> None:
-    """Append a failure event for a step's rule; a store that cannot be
-    written never masks the refusal."""
-    if rule not in STEP_BY_RULE:
-        return
-    try:
-        selection.append_event(repo, change_id, {
-            "event": "failure", "step": STEP_BY_RULE[rule], "rule": rule,
-            "head_sha": git_maybe(repo, "rev-parse", "HEAD"),
-            "branch": git_maybe(repo, "rev-parse", "--abbrev-ref", "HEAD"),
-            "at": selection.now(),
-        })
-    except (UsageError, OSError):
-        pass
-
-
 def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     """Run functional verification once and generate content-bound evidence."""
     if not args:
@@ -70,7 +40,6 @@ def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     repo = repo_root(Path.cwd())
     findings = _finalize(repo, change_id, rest, out)
     if findings:
-        _record_failure(repo, change_id, findings[0][0])
         return report(findings, err)
     return 0
 
@@ -104,9 +73,7 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
                  "finalize review in a checkout that resolves the trunk "
                  f"({', '.join(sorted(TRUNK_BRANCH_NAMES))}), or fetch it")]
     manifest = load_manifest()
-    bound = selection_evidence(repo, change_id, manifest)
-    skip = (set(bound["skip"]) if bound is not None
-            else auto_skipped_steps(repo, change_id, head_sha))
+    skip = auto_skipped_steps(repo, change_id, head_sha)
     verdicts = review_input.get("verdicts", [] if "reviewers" in skip else None)
     findings = review_input.get("findings", [])
     adversarial = review_input.get("adversarial", [])
@@ -205,7 +172,7 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     attestation = {
         "schema": ATTESTATION_SCHEMA, "change_id": change_id,
         "content_digest": digest, "executions": executions,
-        "verdicts": verdicts, "findings": findings, "selection": bound,
+        "verdicts": verdicts, "findings": findings, "selection": None,
     }
     target = artifact_path(manifest, "attestation", change_id, repo)
     target.parent.mkdir(parents=True, exist_ok=True)
