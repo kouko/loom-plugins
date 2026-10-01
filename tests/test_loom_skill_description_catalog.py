@@ -35,7 +35,6 @@ CASE_BLOCK = re.compile(r"```json routing-cases\n(?P<body>.*?)\n```", re.DOTALL)
 # Leaves added after the baseline was frozen; they stay outside the frozen
 # hash but still count toward the rendered description budget.
 ADDED_LEAVES = {
-    "loom-code/skills/expert-mode/SKILL.md",
     "loom-design/skills/architecture-design/SKILL.md",
 }
 RENAMED_LEAVES = {

@@ -1,19 +1,17 @@
-"""`push --hook`: the PreToolUse hook every host runs before a tool call.
+"""`push --hook`: the PreToolUse hook every host runs before a shell call.
 
-The selection-store guard judges first and is the only refusal left here.
-A publication command is never refused: its most common shape earns one
-reminder line naming the branch's verification status, every other shape is
-silent, and a failure inside that path allows (spec
-2026-09-22-publication-floor-moves-to-github REQ-4, REQ-12).
+No publication command is refused here. A publication command's most
+common shape earns one reminder line naming the branch's verification
+status, every other shape is silent, and a failure inside that path allows
+(spec 2026-09-22-publication-floor-moves-to-github REQ-4, REQ-12). The one
+remaining refusal is an unreadable hook call: a missing, empty, malformed
+or non-object payload exits 2.
 """
 from __future__ import annotations
 
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import repo_root
 from loom_checker.rule_checks.push import publication_kind
-from loom_checker.rule_checks.selection_guard import FILE_TOOLS as SELECTION_GUARD_FILE_TOOLS
-from loom_checker.rule_checks.selection_guard import RULE_ID as SELECTION_GUARD_RULE
-from loom_checker.rule_checks.selection_guard import guard_reason as selection_guard_reason
 from loom_checker.verification import identify_change
 from loom_checker.verification import missing_clause
 from loom_checker.verification import missing_records
@@ -27,7 +25,8 @@ import sys
 def read_hook_payload(stdin=sys.stdin) -> dict | None:
     """PreToolUse payload (Claude Code and Codex share the shape) when the
     checker is invoked as a hook; None when run from a terminal or with an
-    empty stdin. Malformed JSON is a UsageError → exit 2 (fail-closed)."""
+    empty stdin. Malformed JSON or a non-object payload is a UsageError →
+    exit 2."""
     if stdin is None or stdin.isatty():
         return None
     raw = stdin.read()
@@ -52,16 +51,6 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     payload = read_hook_payload()
     if payload is None:
         raise UsageError("push --hook expects a PreToolUse JSON payload on stdin.")
-    # The record-store guard judges every matched tool call first.
-    try:
-        guard_reason = selection_guard_reason(payload)
-    except Exception as exc:  # a guard that cannot judge refuses: never loosened
-        guard_reason = f"the guard failed ({type(exc).__name__}: {exc})"
-    if guard_reason:
-        print(f"BLOCK {SELECTION_GUARD_RULE}: {guard_reason}", file=err)
-        return 2
-    if payload.get("tool_name") in SELECTION_GUARD_FILE_TOOLS:
-        return 0
     command = str((payload.get("tool_input") or {}).get("command", ""))
     kind = publication_kind(command)
     if kind is None:

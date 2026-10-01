@@ -207,6 +207,31 @@ def test_no_new_gate_marker():
     assert EVIDENCE_PATH in flat, f"{EVIDENCE_PATH!r} sits inside a gate block"
 
 
+# --- plan W2-03: steps the user skipped ------------------------------------
+
+SKIPPED_HEADING = "## Steps you told me to skip"
+
+
+def test_template_lists_steps_the_user_skipped():
+    """A6 positive: the report has a section fed from the skip lines."""
+    report = _report_block()
+    assert SKIPPED_HEADING in report, "report block has no skipped-steps section"
+    section = report.split(SKIPPED_HEADING, 1)[1].split("\n## ", 1)[0]
+    assert "skipped-by-instruction:" in section
+    assert "acceptance-test (independent acceptance testing)" not in section
+    assert "not as its record id" in section
+
+
+def test_section3_tells_user_skipped_steps_when_acceptance_test_skipped():
+    """A6 negative: with no report, the user hears the skipped steps in chat."""
+    section = " ".join(_section3().split())
+    assert re.search(
+        r"When `acceptance-test` is skipped[^.]*tell the user, in the conversation before Ship,"
+        r"[^.]*in plain words",
+        section,
+    ), "§3 has no chat fallback for skipped steps"
+
+
 # --- graduated adversarial probes ---------------------------------------------
 # The build adversary's probes for this change went red on the contract and
 # template as first committed. The attack carried here: the matchers the

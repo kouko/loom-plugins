@@ -1,14 +1,11 @@
 """Which change a branch carries, and how verified it is.
 
 Neither function refuses: identification returns an error string naming the
-fix, and status is a value (`valid`, `valid (skipped: <steps>)`, `absent`,
-`stale (<reason>)`) that publish, land, the hook and CI print.
+fix, and status is a value (`valid`, `absent`, `stale (<reason>)`) that
+publish, land, the hook and CI print.
 
-Two depths. `local` runs the full `validate_attestation`, including the
-comparison with the local selection records. `ci` runs the content-level
-checks only, because a fresh checkout has no selection records; it treats
-the attestation's own `selection` as a claim and reports any claimed skip
-as `valid (skipped: ...)`, never plain `valid`.
+Two depths, `local` and `ci`, accepted by every caller; both run the same
+`validate_attestation`, since no local record feeds it any more.
 """
 
 from __future__ import annotations
@@ -22,7 +19,6 @@ from loom_checker.helpers import git_text
 from loom_checker.helpers import glob_to_regex
 from loom_checker.helpers import load_manifest
 from loom_checker.parsing import parse_document
-from loom_checker.rule_checks.publish import plain_step_names
 from pathlib import Path
 import json
 import re
@@ -104,7 +100,7 @@ def verification_status(
     repo: Path, change_id: str, *, depth: str = "local", base: str | None = None,
     head: str = "HEAD", manifest: dict | None = None,
 ) -> str:
-    """`valid`, `valid (skipped: <steps>)`, `absent` or `stale (<reason>)`."""
+    """`valid`, `absent` or `stale (<reason>)`."""
     if depth not in {"local", "ci"}:
         raise ValueError(f"unknown verification depth {depth!r}")
     manifest = manifest if manifest is not None else load_manifest()
@@ -127,16 +123,12 @@ def verification_status(
     except json.JSONDecodeError:
         return "stale (attestation is not readable JSON)"
     try:
-        failures = validate_attestation(
-            repo, head_sha, change_id, payload, manifest, claimed_selection=(depth == "ci")
-        )
+        failures = validate_attestation(repo, head_sha, change_id, payload, manifest)
     except (UsageError, ValueError) as exc:
         return f"stale ({exc})"
     if failures:
         return f"stale ({failures[0][1]})"
-    selection = payload.get("selection")
-    skip = selection.get("skip") if isinstance(selection, dict) else None
-    return f"valid (skipped: {plain_step_names(skip)})" if skip else "valid"
+    return "valid"
 
 
 def missing_records(repo: Path, change_id: str, status: str, head: str = "HEAD",

@@ -86,20 +86,6 @@ def test_pushgate_crashing_checker_push_allows_and_says_so(crashing_checker_adap
     assert out["reason"].endswith("; allowing."), out
 
 
-@pytest.mark.parametrize("command", [
-    "echo x >> .git/loom/selections/c.jsonl",
-    "git status\ncp forged .git/loom/selections/c.jsonl",
-    "bash -c 'tee -a /r/.git/loom/selections/c.jsonl < ev'",
-])
-def test_pushgate_crashing_checker_selection_store_denies(crashing_checker_adapter, change_repo, tmp_path,
-                                                          command):
-    """A crashed checker never loosens the selection-store guard."""
-    out = _run("push-gate", _push(command, ".", [str(change_repo)]), tmp_path,
-               adapter=crashing_checker_adapter)
-    assert out["decision"] == "deny", out
-    assert "BLOCK selection.guard" in out["reason"]
-
-
 def test_pushgate_crashing_checker_git_dash_c_status_allows(crashing_checker_adapter, change_repo, tmp_path):
     """The fallback still allows a read-only command (``git -C dir status``)."""
     out = _run("push-gate", _push(f"git -C {change_repo} status --short", ".", [str(change_repo)]),
@@ -136,7 +122,7 @@ def test_pushgate_checker_exit_zero_silent_allows_bare(stub_checker_adapter, cha
 
 
 def test_pushgate_checker_exit_two_passes_its_reason(stub_checker_adapter, change_repo, tmp_path):
-    reason = "BLOCK selection.guard: names the selection record store"
+    reason = "BLOCK example.rule: a refusal reason"
     out = _run("push-gate", _push("ls .git/loom", ".", [str(change_repo)]), tmp_path,
                adapter=stub_checker_adapter(2, stderr=reason))
     assert out == {"decision": "deny", "reason": reason}

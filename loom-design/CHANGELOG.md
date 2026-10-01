@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.9.0] — 2026-10-01 — expert-mode removed.
+
+- The capture-intent decision-point list no longer names an expert-mode request as a source of an extra stop; `loom-code` removed the `expert-mode` skill.
+- The OpenCode loader no longer guards the selection record store when a hook fails.
+
 ## [2.8.1] — 2026-09-30 — OpenCode transcript note.
 
 - On OpenCode, a command's skill body is not recorded as the user's words, so the language reminder keeps the user's language (shipped in 2.8.0); a message the user types that contains the skill-body separator is now recorded whole.

@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from loom_checker import selection
 from loom_checker.digest import functional_content_digest
-from loom_checker.helpers import UsageError
 from loom_checker.helpers import git_ok
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
@@ -25,74 +23,19 @@ ATTESTATION_KEYS = ATTESTATION_KEYS_V1 | {"selection"}
 KEYS_BY_SCHEMA = {ATTESTATION_SCHEMA_V1: ATTESTATION_KEYS_V1, ATTESTATION_SCHEMA: ATTESTATION_KEYS}
 
 
-FAILURE_FIELDS = ("step", "rule", "head_sha", "branch", "at")
-
-
 def _command_digest(command: str) -> str:
     return hashlib.sha256(command.encode("utf-8")).hexdigest()
 
 
-def selection_evidence(repo: Path, change_id: str, manifest: dict | None = None) -> dict | None:
-    """The attestation `selection` the local records support, or None.
-
-    Only a valid confirmation whose source is `user-typed`, recorded on the
-    current branch and merge base, binds; anything else is the full process.
-    `confirmations` lists only bindings no later cancel withdrew, and
-    `prior_failures` lists failures recorded before the newest of them (by
-    position in the append-only file, not by timestamp)."""
-    events = selection.read_events(repo, change_id)
-    if not any(event.get("event") == "confirmation" for event in events):
-        return None
-    vocabulary = manifest if isinstance(manifest, dict) and manifest.get("step_selection") else None
-    try:
-        effective = selection.effective_selection(repo, change_id, vocabulary)
-        branch, merge_base = selection.current_scope(repo)
-        names = [step["name"] for step in selection.step_vocabulary(vocabulary)]
-    except UsageError:
-        return None
-    if not effective["bound"] or effective.get("source") != "user-typed":
-        return None
-    def in_scope(event: dict) -> bool:
-        return event.get("branch") == branch and event.get("merge_base") == merge_base
-
-    proposals = {e.get("id"): e for e in events if in_scope(e) and e.get("event") == "proposal"}
-    confirmations = []
-    latest = -1
-    for index, event in enumerate(events):
-        if not in_scope(event):
-            continue
-        if event.get("event") == "cancel":
-            confirmations, latest = [], -1  # withdrawn bindings are not disclosed
-            continue
-        if event.get("event") != "confirmation" or event.get("source") != "user-typed":
-            continue
-        proposal = proposals.get(event.get("proposal_id"))
-        if (proposal is None or not selection.confirmation_is_valid(event, proposal)
-                or not selection.session_matches(event)):
-            continue
-        confirmations.append({
-            "code": proposal["code"], "skip": [n for n in names if n in proposal["skip"]],
-            "source": event["source"], "at": event.get("at"),
-        })
-        latest = index
-    prior = [
-        {key: failure.get(key) for key in FAILURE_FIELDS}
-        for failure in events[:max(latest, 0)]
-        if failure.get("event") == "failure"
-    ]
-    return {"confirmations": confirmations, "skip": effective["skip"],
-            "source": "user-typed", "prior_failures": prior}
-
-
 def validate_attestation(
     repo: Path, head_sha: str, change_id: str, attestation: object,
-    manifest: dict | None = None, claimed_selection: bool = False,
+    manifest: dict | None = None,
 ) -> list[tuple[str, str]]:
     """Validate generated evidence without executing the recorded programs.
 
-    `claimed_selection` runs the content-level checks only: the attestation's
-    own `selection` is taken as a claim and never compared with the local
-    selection records, which a fresh checkout (CI) does not have."""
+    A v2 attestation keeps its `selection` key, and the key must be null: no
+    typed confirmation can waive a step any more, so a recorded selection
+    matches nothing. Only the automatic narrow-change simplification skips."""
     rule = "push.attestation"
     if not isinstance(attestation, dict) or set(attestation) not in KEYS_BY_SCHEMA.values():
         return [(rule, "attestation has an unknown or incomplete schema")]
@@ -107,22 +50,9 @@ def validate_attestation(
     if expected is None or attestation.get("content_digest") != expected:
         return [(rule, "attestation functional content digest does not match the selected tree")]
 
-    skip: set[str] = set()
-    if schema == ATTESTATION_SCHEMA and claimed_selection:
-        claim = attestation.get("selection")
-        if claim is not None:
-            claimed = claim.get("skip") if isinstance(claim, dict) else None
-            if not isinstance(claimed, list) or not all(isinstance(s, str) for s in claimed):
-                return [(rule, "attestation selection claim is malformed")]
-            skip = set(claimed)
-    elif schema == ATTESTATION_SCHEMA:
-        recorded = selection_evidence(repo, change_id, manifest)
-        if attestation.get("selection") != recorded:
-            return [(rule, "attestation selection does not match the local selection records")]
-        if recorded is not None:
-            skip = set(recorded["skip"])
-    if schema != ATTESTATION_SCHEMA or attestation.get("selection") is None:
-        skip = auto_skipped_steps(repo, change_id, head_sha)
+    if schema == ATTESTATION_SCHEMA and attestation.get("selection") is not None:
+        return [(rule, "attestation records a step selection, which nothing can bind")]
+    skip = auto_skipped_steps(repo, change_id, head_sha)
 
     executions = attestation.get("executions")
     if not isinstance(executions, list) or (

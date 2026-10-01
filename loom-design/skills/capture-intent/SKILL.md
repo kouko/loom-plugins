@@ -37,8 +37,7 @@ preserve the required shapes.
 ## What you will be asked, in plain words
 
 Give the user this list if they ask what is coming. These are the decision
-points, and a legacy intent at ship, changed requirements, or an expert-mode
-request can add a stop.
+points, and a legacy intent at ship or changed requirements can add a stop.
 
 1. **Here:** one message confirms the restated intent, every expensive-to-undo
    choice in consequence form, a product's new principles when needed, and —

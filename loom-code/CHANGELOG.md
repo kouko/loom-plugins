@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.27.0] — 2026-10-01 — expert-mode removed; acceptance report lists skipped steps.
+
+- The `expert-mode` skill and its typed skip confirmation are removed; a user still skips a step by saying so in plain words.
+- No hook captures prompts any more, and no hook fallback guards the selection record store.
+- `loom_checker.py selection` is removed; an attestation's `selection` field is always null.
+- The acceptance test report gains a "Steps you told me to skip" section that lists, in plain words, each step the user told the agent to skip.
+
 ## [3.26.1] — 2026-09-30 — OpenCode transcript note and README label.
 
 - On OpenCode, a command's skill body is not recorded as the user's words, so the language reminder keeps the user's language (shipped in 3.26.0); a message the user types that contains the skill-body separator is now recorded whole.

@@ -34,7 +34,6 @@ BATCH_2 = [
     "loom-code/tests/test_closing_review_recovery_rules.py",
     "loom-code/tests/test_codex_hook_trust_contract.py",
     "loom-code/tests/test_dispatch_profile_contract.py",
-    "loom-code/tests/test_expert_mode_skill.py",
     "loom-code/tests/test_fix_scope_text.py",
     "loom-code/tests/test_lenses_deletion_first.py",
     "loom-code/tests/test_plan_simplicity_text.py",

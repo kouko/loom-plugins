@@ -44,8 +44,7 @@ counting: >
   is not host-hygiene.
 
 mechanisms:
-  # --- skill (23; 7 stations + 12 non-standalone tools + 3 optional routers
-  #     + the user-invoked expert-mode skill;
+  # --- skill (22; 7 stations + 12 non-standalone tools + 3 optional routers;
   #     the 2 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
@@ -113,9 +112,6 @@ mechanisms:
   - id: loom-memory
     class: skill
     eval: "loom-workflow/tests/loom-memory/test_skill_contract.py"
-  - id: expert-mode
-    class: skill
-    eval: "loom-code/tests/test_expert_mode_skill.py::test_suggestion_then_plain_yes_skips_nothing"
 
   # --- checker-rule (loom_checker.py --list-rules is the count) ---
   - id: adversarial.proportionate
@@ -197,25 +193,16 @@ mechanisms:
     class: checker-rule
     eval: loom-code/tests/test_loom_checker_standing.py::test_missing_standing_docs_warn_in_exactly_three_lines
 
-  # --- hook (16 raw entries across host manifests; 14 counted, 2 host-hygiene) ---
+  # --- hook (12 raw entries across host manifests; 10 counted, 2 host-hygiene) ---
   - id: "SessionStart:startup|clear|compact:session-start"
     class: hook
     eval: loom-code/tests/test_session_start_words.py
-  - id: "PreToolUse:Bash|Write|Edit|MultiEdit|NotebookEdit:loom_checker.py"
+  - id: "PreToolUse:Bash:loom_checker.py"
     class: hook
-    eval: loom-code/tests/test_selection_guard.py::test_claude_matcher_covers_bash_and_file_tools
+    eval: loom-code/tests/test_hooks_json.py::test_pre_tool_use_matcher_set_is_bash_only
   - id: "PreToolUse:Bash:loom_checker.py@codex"
     class: hook
     eval: loom-code/tests/test_codex_stale_hook.py
-  - id: "PreToolUse:apply_patch|Edit|Write:loom_checker.py@codex"
-    class: hook
-    eval: loom-code/tests/test_selection_guard.py::test_codex_file_tool_hook_delegates_to_checker_and_passes_when_missing
-  - id: "UserPromptSubmit::loom_checker.py"
-    class: hook
-    eval: loom-code/tests/test_selection_capture.py::test_user_prompt_with_code_binds_and_returns_system_message
-  - id: "UserPromptSubmit::loom_checker.py@codex"
-    class: hook
-    eval: loom-code/tests/test_selection_capture.py::test_codex_hook_never_blocks_when_checker_is_missing
   - id: "UserPromptSubmit::visualization-card"
     class: hook
     eval: loom-workflow/tests/scripts/test_visualization_card_hook.py
@@ -233,10 +220,7 @@ mechanisms:
   - id: "SessionStart:startup|clear|compact:session-start@opencode"
     class: hook
     eval: loom-code/tests/test_opencode_loader.py
-  - id: "PreToolUse:Bash|Write|Edit|apply_patch:loom_checker.py@opencode"
-    class: hook
-    eval: loom-code/tests/test_opencode_loader.py
-  - id: "UserPromptSubmit::loom_checker.py@opencode"
+  - id: "PreToolUse:Bash:loom_checker.py@opencode"
     class: hook
     eval: loom-code/tests/test_opencode_loader.py
   - id: "UserPromptSubmit::visualization-card@opencode"
@@ -317,7 +301,7 @@ mechanisms:
   - {id: "artifact:attestation.executions",     class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
   - {id: "artifact:attestation.verdicts",       class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
   - {id: "artifact:attestation.findings",       class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
-  - {id: "artifact:attestation.selection",      class: contract, eval: "loom-code/tests/test_selection_finalize.py::test_bound_skip_of_reviewers_and_adversarial_validates"}
+  - {id: "artifact:attestation.selection",      class: contract, eval: "loom-code/tests/test_selection_finalize.py::test_v2_without_selection_keeps_every_floor"}
 
   # --- prose-gate: landed stations mark their real `<!-- gate: … -->`
   #     paragraphs in W1/W2, W3-06 §11 recomputes ---

@@ -6,7 +6,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.26.1 · **Skills**：5 個站 + 1 個入口路由 + 1 個僅限指令 · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.27.0 · **Skills**：5 個站 + 1 個入口路由 · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -62,7 +62,6 @@ flowchart TD
 | [`ship`](skills/ship/SKILL.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
 | [`maintain`](skills/maintain/SKILL.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
-| [`expert-mode`](skills/expert-mode/SKILL.md) | 僅限使用者主動呼叫：為單一變更選擇要執行或略過的 Loom 步驟；以使用者輸入的確認才生效。 |
 
 ## Agents
 
@@ -203,9 +202,9 @@ opencode plugin list
 
 OpenCode 的 TUI（2.0.18–2.0.20）沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 `opencode.json`（`plugin add` 寫入 OpenCode 設定資料夾 `~/.config/opencode/` 的那個檔案）的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
-skill 以 `loom-code:<skill>` 提供。loom 的角色以 OpenCode subagent `loom-code:<role>` 透過 `subagent` 工具執行，使用 session 的模型；expert-mode 是指令 `/loom-code:expert-mode`。以指令 `/loom-code:using-loom-code` 開始使用 loom（它同時仍是 skill）。
+skill 以 `loom-code:<skill>` 提供。loom 的角色以 OpenCode subagent `loom-code:<role>` 透過 `subagent` 工具執行，使用 session 的模型。以指令 `/loom-code:using-loom-code` 開始使用 loom（它同時仍是 skill）。
 
-在 OpenCode 上，session context、發布提醒、語言提醒與選擇紀錄防護透過 plugin 的 v2 hook 執行。
+在 OpenCode 上，session context、發布提醒與語言提醒透過 plugin 的 v2 hook 執行。
 
 OpenCode 的限制：
 
@@ -213,7 +212,6 @@ OpenCode 的限制：
 - loom-code 的 subagent 從 plugin 快取讀取 loom 自己的檔案時，可能停在 `external_directory` 權限提示；`opencode run --auto` 也不涵蓋 subagent 的 session。請允許讀取 loom 的 plugin 目錄。
 - 不加 `--auto` 的 `opencode run` 會停在第一個權限提示或模型提問，長時間的 loom 執行請從 TUI 進行。
 - OpenCode 在專案以外執行 shell 指令前不會詢問，模型可能改動整台機器（實測：系統層級的 `pip install --break-system-packages`）；請檢查它的指令，或收緊 OpenCode 的權限設定。
-- `opencode run "/loom-code:expert-mode ..."` 只會把文字當 prompt 送出，不會執行指令；請改在 TUI 輸入指令。
 - OpenCode 桌面 app 與 IDE 整合不在涵蓋範圍。
 - 使用這些 plugin 不需要 Node。
 

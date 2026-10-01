@@ -2,8 +2,6 @@ from pathlib import Path
 
 import re
 
-from prose_pin import has_negation, split_sentences
-
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
@@ -22,7 +20,6 @@ PLAN_CONFIRM = (
     ROOT / "loom-code/skills/write-plan/references/confirm-intent.md"
 ).read_text(encoding="utf-8")
 CONTRACT_MANIFEST = (ROOT / "loom-code/contract/manifest.yaml").read_text(encoding="utf-8")
-SKIPPED_BY = "(listed by `selection show` or skipped by the user's plain-words instruction)"
 
 
 def test_review_uses_one_computed_reviewer_floor_without_prose_allowlist() -> None:
@@ -124,16 +121,6 @@ def test_shared_intent_contract_names_altitude_without_new_schema() -> None:
     assert "question-id" not in CONTRACT_MANIFEST
 
 
-def test_stations_read_the_bound_selection_at_entry() -> None:
-    prose_read = (
-        "run `loom_checker.py selection show <change-id>` and omit the prose steps "
-        "`selection show` lists as skipped (spec, plan, implementer, tdd, acceptance-test), plus "
-        "any step the user told you to skip in plain words"
-    )
-    assert prose_read not in " ".join(REVIEW.split())
-    assert prose_read not in " ".join(BUILD.split())
-
-
 def test_build_obligations_yield_to_a_bound_selection() -> None:
     assert "For every behavior change:" not in BUILD
 
@@ -145,17 +132,16 @@ def test_review_dispatches_nothing_for_skipped_steps() -> None:
 # One shared sentence for the step-list lines Ship builds itself; its example
 # is the checker's own mapping, so prose and code cannot drift apart.
 STEP_NAMES_SENTENCE = (
-    "In the `<steps>` of the `Skipped by instruction:` and `Skipped steps:` lines, write "
+    "In the `<steps>` of the `Skipped by instruction:` line, write "
     "`acceptance-test` as `acceptance-test (independent acceptance testing)`; every other "
     "step reads as recorded."
 )
 
 
 def test_ship_step_names_example_matches_the_checker_mapping() -> None:
-    from loom_checker.rule_checks.publish import STEP_PLAIN_NAMES
-
     examples = re.findall(r"write `([^`]+)` as `([^`]+)`", STEP_NAMES_SENTENCE)
-    assert dict(examples) == STEP_PLAIN_NAMES
+    assert dict(examples) == {
+        "acceptance-test": "acceptance-test (independent acceptance testing)"}
 
 
 def test_ship_renders_selection_disclosure_and_skipped_intent_decision() -> None:
@@ -221,48 +207,26 @@ def test_acceptance_tester_names_current_artifacts_and_package_suite_owners() ->
 ROUTER = (ROOT / "loom-code/skills/using-loom-code/SKILL.md").read_text(encoding="utf-8")
 SKIP_STATIONS = {"build": BUILD, "closing-review": REVIEW, "ship": SHIP, "using-loom-code": ROUTER,
                  "write-plan": PLAN}
-CODE_REQUEST = re.compile(
-    r"expert-mode <code>|generated code|typed code|confirm\w* by typing|skip is still confirmed"
-)
+# Acceptance 3 of 2026-10-01-remove-expert-mode: no current surface offers
+# expert-mode, a selection command or a typed skip code.
+REMOVED_OFFERS = re.compile(r"expert[- ]mode|selection (show|record-failure|propose)"
+                            r"|Skipped steps:|valid \(skipped|generated code", re.I)
 
 
-# no-generated-code-requested (A10 negative)
-def test_no_generated_code_requested() -> None:
+def test_no_current_surface_offers_expert_mode() -> None:
+    surfaces = [*(ROOT / "loom-code").glob("skills/**/*.md"),
+                *(ROOT / "loom-design").glob("skills/**/*.md"),
+                *(ROOT / "loom-code/references").glob("*.md"),
+                *(ROOT / "loom-code").glob("README*.md"), ROOT / "README.md"]
+    hits = [str(p.relative_to(ROOT)) for p in surfaces
+            if REMOVED_OFFERS.search(p.read_text(encoding="utf-8"))]
+    assert hits == []
+
+
+def test_each_station_keeps_the_plain_words_skip_rule() -> None:
     for name, text in SKIP_STATIONS.items():
         prose = " ".join(text.split())
-        for sentence in split_sentences(prose):
-            if CODE_REQUEST.search(sentence):
-                assert has_negation(sentence), (name, sentence)
-
-
-# Every skip condition in a station honours both skip sources: the bound
-# selection and the user's plain-words instruction. A sentence that names a
-# skip read only from `selection show` contradicts the plain-words rule.
-SKIP_CONDITION_STATIONS = {"build": BUILD, "closing-review": REVIEW, "ship": SHIP,
-                           "write-plan": PLAN}
-SELECTION_ONLY = re.compile(r"`selection show` lists `|\bit lists `|omit only the")
-
-
-def _selection_only_skip_conditions(prose: str) -> list[str]:
-    return [s for s in split_sentences(prose)
-            if SELECTION_ONLY.search(s)
-            or (re.search(r"\blists\b.*\bas skipped\b", s) and "plain words" not in s)]
-
-
-def test_no_skip_condition_reads_selection_show_alone() -> None:
-    for name, text in SKIP_CONDITION_STATIONS.items():
-        assert _selection_only_skip_conditions(" ".join(text.split())) == [], name
-
-
-def test_selection_only_detector_rejects_the_old_forms() -> None:
-    for old in (
-        "Unless `selection show` lists `tdd` as skipped, for every behavior change:",
-        "until every adversarial program has passed or it lists `adversarial` as skipped.",
-        "At entry, run it and omit only the steps it lists as skipped (spec, plan).",
-    ):
-        assert _selection_only_skip_conditions(old), old
-    assert not _selection_only_skip_conditions(
-        "Unless `tdd` is skipped " + SKIPPED_BY + ", for every behavior change:")
+        assert "skip a step only when the user tells you to in plain words" in prose, name
 
 
 def test_review_floor_mismatch_surfaces_as_stale() -> None:

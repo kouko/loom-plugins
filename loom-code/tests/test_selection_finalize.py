@@ -1,25 +1,21 @@
-"""Finalization and attestation v2 under a bound step selection (plan W2-03).
+"""Finalization and attestation v2: probe caps, narrow-change skipping and
+the floors every attestation keeps.
 
-Spec 2026-09-14-expert-mode-step-selection REQ-2, REQ-3, REQ-7, REQ-11 and
-decisions 3, 6, 8, 9: finalize-review waives exactly the checks of steps a
-user-typed confirmation skipped, records a failure event on every non-zero
-exit, and the v2 attestation carries a `selection` the validator re-reads
-from the local records.
+The v2 attestation keeps its `selection` key, but finalize-review always
+writes `null` and validation refuses anything else: no typed confirmation
+can waive a step (change 2026-10-01-remove-expert-mode).
 """
-# concern: Automatic waivers must not erase bound verification choices.
+# concern: Automatic waivers must not erase verification floors.
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import subprocess
 import sys
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from loom_checker import attestation as attestation_module
-from loom_checker import intent_state
-from loom_checker import selection
+from loom_checker import verification
 from loom_checker.probes import MAX_PROBE_PROGRAMS
 
 import pytest
@@ -87,30 +83,6 @@ def make_narrow_repo(tmp_path: Path) -> Path:
     return repo
 
 
-def propose(repo: Path, skip: str) -> None:
-    result = subprocess.run(
-        [sys.executable, str(CHECKER), "selection", "propose", CHANGE,
-         "--origin", "user", "--skip", skip],
-        capture_output=True, text=True, cwd=str(repo),
-    )
-    assert result.returncode == 0, result.stderr
-
-
-def confirm(repo: Path, at: str, source: str = "user-typed", tamper: bool = False) -> dict:
-    """Stand in for the W2-01 capture hook: bind the newest proposal."""
-    proposal = [e for e in selection.read_events(repo, CHANGE) if e["event"] == "proposal"][-1]
-    text = f"/loom-code:expert-mode 確認 {proposal['code']}"
-    event = {
-        "event": "confirmation", "proposal_id": proposal["id"], "code": proposal["code"],
-        "source": source, "session_id": "s1", "prompt_ref": "p1",
-        "prompt_text": text + (" extra" if tamper else ""),
-        "prompt_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        "branch": proposal["branch"], "merge_base": proposal["merge_base"], "at": at,
-    }
-    selection.append_event(repo, CHANGE, event)
-    return event
-
-
 def review_input(tmp_path: Path, verdicts: list, adversarial: list) -> Path:
     path = tmp_path / "review-input.json"
     path.write_text(json.dumps(
@@ -136,15 +108,6 @@ def validate(repo: Path, attestation: dict) -> list:
     )
 
 
-def failures(repo: Path) -> list[dict]:
-    return [e for e in selection.read_events(repo, CHANGE) if e["event"] == "failure"]
-
-
-def shift(stamp: str, seconds: int) -> str:
-    moment = datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-    return (moment + timedelta(seconds=seconds)).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
 PASSING = [
     {"reviewer": "r1", "vendor": "openai", "model": "m", "lens": "code", "verdict": "PASS", "findings": []},
     {"reviewer": "r2", "vendor": "other", "model": "m", "lens": "code", "verdict": "PASS", "findings": []},
@@ -152,30 +115,6 @@ PASSING = [
 
 
 # --- Acceptance 3 -----------------------------------------------------------
-
-def test_bound_skip_of_reviewers_and_adversarial_validates(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path)
-    propose(repo, "reviewers,adversarial")
-    event = confirm(repo, "2026-09-14T00:00:00Z")
-
-    result = finalize(repo, review_input(tmp_path, [], []))
-
-    assert result.returncode == 0, result.stderr
-    attestation = written(repo)
-    assert attestation["schema"] == "loom-attestation/v2"
-    assert attestation["verdicts"] == []
-    assert [run["kind"] for run in attestation["executions"]] == ["package-tests"]
-    assert attestation["selection"] == {
-        "confirmations": [{"code": event["code"], "skip": ["reviewers", "adversarial"],
-                           "source": "user-typed", "at": "2026-09-14T00:00:00Z"}],
-        "skip": ["reviewers", "adversarial"],
-        "source": "user-typed",
-        "prior_failures": [],
-    }
-    assert validate(repo, attestation) == []
-    # The merged witness shape accepts the v2 evidence too.
-    assert intent_state._delivery_witness_valid(attestation, CHANGE)
-
 
 def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> None:
     """A narrow delta auto-skips the adversarial step, with no typed skip."""
@@ -188,43 +127,6 @@ def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> 
     assert [run["kind"] for run in attestation["executions"]] == ["package-tests"]
     assert attestation["selection"] is None  # no typed confirmation was bound
     assert validate(repo, attestation) == []
-    assert attestation_module.validate_attestation(
-        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, None,
-        claimed_selection=True,
-    ) == []
-    propose(repo, "adversarial")
-    confirm(repo, "2026-09-14T00:00:00Z")
-    # Finalization leaves an untracked attestation; remove only that output.
-    (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
-    assert finalize(repo, review_input(tmp_path, PASSING[:1], [])).returncode == 0
-    attestation = written(repo)
-    assert attestation["selection"]["skip"] == ["adversarial"]
-    assert validate(repo, attestation) == []
-    assert attestation_module.validate_attestation(
-        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, None,
-        claimed_selection=True,
-    ) == []
-
-
-@pytest.mark.parametrize("skip", ["reviewers", ""])
-def test_bound_kept_adversarial_required_on_narrow_delta(tmp_path: Path, skip: str) -> None:
-    repo = make_narrow_repo(tmp_path)
-    assert finalize(repo, review_input(tmp_path, PASSING[:1], [])).returncode == 0
-    attestation = written(repo)
-    (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
-    propose(repo, skip)
-    confirm(repo, "2026-09-14T00:00:00Z")
-    attestation["selection"] = attestation_module.selection_evidence(repo, CHANGE)
-    local_errors = validate(repo, attestation)
-    claimed_errors = attestation_module.validate_attestation(
-        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, None,
-        claimed_selection=True,
-    )
-    refused = finalize(repo, review_input(tmp_path, PASSING[:1], []))
-    assert (refused.returncode, bool(local_errors), bool(claimed_errors)) == (1, True, True)
-    assert "BLOCK finalize.adversarial" in refused.stderr
-    assert all(any("adversarial" in reason for _, reason in errors)
-               for errors in (local_errors, claimed_errors))
 
 
 def trunkless_clone(origin: Path, tmp_path: Path, branch: str = "feature") -> Path:
@@ -572,65 +474,15 @@ def test_a_file_the_suite_never_collects_is_still_refused(tmp_path: Path) -> Non
     assert "package suite" in refused.stderr
 
 
-def test_skipping_every_executed_step_allows_empty_executions(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path, package="python3 -c 'raise SystemExit(3)'")
-    propose(repo, "reviewers,adversarial,package-tests")
-    confirm(repo, "2026-09-14T00:00:00Z")
-
-    result = finalize(repo, review_input(tmp_path, [], []))
-
-    assert result.returncode == 0, result.stderr
-    attestation = written(repo)
-    assert attestation["executions"] == []
-    assert validate(repo, attestation) == []
-
-
-def test_unbound_skip_refused_and_digest_mismatch_blocks(tmp_path: Path) -> None:
+def test_reviewers_skipped_in_plain_words_leave_the_change_unattested(tmp_path: Path) -> None:
+    """A plain-words skip of reviewers runs no reviewer, so finalize-review
+    refuses and writes nothing; the branch status is `absent`."""
     repo = make_repo(tmp_path)
-    # A proposal alone binds nothing: today's floors apply.
-    propose(repo, "reviewers,adversarial")
     refused = finalize(repo, review_input(tmp_path, [], []))
     assert refused.returncode == 1
     assert "finalize.verdicts" in refused.stderr
-
-    # Neither an agent-recorded source nor a tampered prompt binds.
-    confirm(repo, "2026-09-14T00:00:00Z", source="agent-recorded")
-    assert "finalize.verdicts" in finalize(repo, review_input(tmp_path, [], [])).stderr
-    confirm(repo, "2026-09-14T00:00:01Z", tamper=True)
-    assert "finalize.verdicts" in finalize(repo, review_input(tmp_path, [], [])).stderr
-
-    # A skip of reviewers does not waive the adversarial floor.
-    confirm(repo, "2026-09-14T00:00:02Z")
-    propose(repo, "reviewers")
-    confirm(repo, "2026-09-14T00:00:03Z")
-    partial = finalize(repo, review_input(tmp_path, [], []))
-    assert partial.returncode == 1
-    assert "finalize.adversarial" in partial.stderr
-
-    # Bound skip validates; an attestation claiming a skip the records do not
-    # hold (records cancelled) is refused, and so is a digest mismatch.
-    propose(repo, "reviewers,adversarial")
-    confirm(repo, "2026-09-14T00:00:04Z")
-    assert finalize(repo, review_input(tmp_path, [], [])).returncode == 0
-    attestation = written(repo)
-    assert validate(repo, attestation) == []
-
-    forged = dict(attestation, selection=None)
-    assert any("selection" in reason for _, reason in validate(repo, forged))
-
-    selection.append_event(repo, CHANGE, {
-        "event": "cancel", "source": "agent-run", "prompt_ref": None,
-        "branch": attestation_branch(repo), "merge_base": event_base(repo),
-        "at": "2026-09-14T00:00:05Z",
-    })
-    assert any("selection" in reason for _, reason in validate(repo, attestation))
-
-    (repo / "src.py").write_text("VALUE = 2\n", encoding="utf-8")
-    commit_all(repo, "functional change")
-    propose(repo, "reviewers,adversarial")
-    confirm(repo, "2026-09-14T00:00:06Z")
-    stale = validate(repo, attestation)
-    assert any("functional content digest" in reason for _, reason in stale)
+    assert not (repo / f"docs/loom/{CHANGE}/attestation.json").exists()
+    assert verification.verification_status(repo, CHANGE) == "absent"
 
 
 def test_v2_without_selection_keeps_every_floor(tmp_path: Path) -> None:
@@ -651,99 +503,11 @@ def test_v2_without_selection_keeps_every_floor(tmp_path: Path) -> None:
         broken = json.loads(json.dumps(attestation))
         mutate(broken)
         assert validate(repo, broken) != []
+    # A non-null selection can no longer match anything.
+    assert validate(repo, dict(attestation, selection={"skip": []})) != []
 
 
-def attestation_branch(repo: Path) -> str:
-    return git(repo, "rev-parse", "--abbrev-ref", "HEAD")
-
-
-def event_base(repo: Path) -> str:
-    return selection.current_scope(repo)[1]
-
-
-# --- Acceptance 7 -----------------------------------------------------------
-
-def test_finalize_failure_recorded_and_listed_as_prior(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path)
-    refused = finalize(repo, review_input(tmp_path, [], []))
-    assert refused.returncode == 1
-
-    recorded = failures(repo)
-    assert len(recorded) == 1
-    failure = recorded[0]
-    assert failure["step"] == "reviewers"
-    assert failure["rule"] == "finalize.verdicts"
-    assert failure["head_sha"] == git(repo, "rev-parse", "HEAD")
-    assert failure["branch"] == "feature"
-
-    propose(repo, "reviewers,adversarial")
-    confirm(repo, shift(failure["at"], 1))
-    result = finalize(repo, review_input(tmp_path, [], []))
-
-    assert result.returncode == 0, result.stderr
-    attestation = written(repo)
-    assert attestation["selection"]["prior_failures"] == [
-        {key: failure[key] for key in ("step", "rule", "head_sha", "branch", "at")}
-    ]
-    assert validate(repo, attestation) == []
-
-
-def test_confirmation_from_another_session_keeps_the_full_floor(tmp_path: Path, monkeypatch) -> None:
-    """Spec decision 18 (c): a confirmation recorded by a nested session
-    (`timeout 60 claude -p`, `script -q /dev/null claude -p`, `npx
-    @anthropic-ai/claude-code -p`) carries that session's id, so finalize in
-    the attended session refuses the skip; the recording session may use it."""
-    repo = make_repo(tmp_path)
-    propose(repo, "reviewers,adversarial")
-    confirm(repo, "2026-09-14T00:00:00Z")  # recorded with session_id "s1"
-
-    refused = finalize(repo, review_input(tmp_path, [], []), env={"CLAUDE_CODE_SESSION_ID": "other"})
-    assert refused.returncode == 1 and "finalize.verdicts" in refused.stderr
-
-    accepted = finalize(repo, review_input(tmp_path, [], []), env={"CLAUDE_CODE_SESSION_ID": "s1"})
-    assert accepted.returncode == 0, accepted.stderr
-    attestation = written(repo)
-    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", "s1")
-    assert validate(repo, attestation) == []
-    monkeypatch.setenv("CLAUDE_CODE_SESSION_ID", "other")
-    assert attestation_module.selection_evidence(repo, CHANGE) is None
-    assert any("selection" in reason for _, reason in validate(repo, attestation))
-
-
-def test_cancelled_confirmation_is_not_disclosed(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path)
-    propose(repo, "reviewers")
-    confirm(repo, "2026-09-14T00:00:01Z")
-    selection.append_event(repo, CHANGE, {
-        "event": "cancel", "source": "agent-run", "prompt_ref": None,
-        "branch": attestation_branch(repo), "merge_base": event_base(repo),
-        "at": "2026-09-14T00:00:02Z",
-    })
-    propose(repo, "adversarial")
-    second = confirm(repo, "2026-09-14T00:00:03Z")
-    evidence = attestation_module.selection_evidence(repo, CHANGE)
-    assert evidence["skip"] == ["adversarial"]
-    assert evidence["confirmations"] == [{"code": second["code"], "skip": ["adversarial"],
-                                          "source": "user-typed", "at": "2026-09-14T00:00:03Z"}]
-
-
-def test_prior_failure_decided_by_record_order_not_timestamp(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path)
-    branch = attestation_branch(repo)
-    same_second = "2026-09-14T00:00:05Z"
-    selection.append_event(repo, CHANGE, {
-        "event": "failure", "step": "reviewers", "rule": "before", "head_sha": "h",
-        "branch": branch, "at": same_second})
-    propose(repo, "reviewers")
-    confirm(repo, same_second)
-    selection.append_event(repo, CHANGE, {
-        "event": "failure", "step": "reviewers", "rule": "after", "head_sha": "h",
-        "branch": branch, "at": "2026-09-14T00:00:00Z"})
-    prior = attestation_module.selection_evidence(repo, CHANGE)["prior_failures"]
-    assert [f["rule"] for f in prior] == ["before"]
-
-
-def test_non_verification_refusals_record_no_failure(tmp_path: Path) -> None:
+def test_usage_error_and_dirty_tree_are_refused(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     usage = subprocess.run(
         [sys.executable, str(CHECKER), "finalize-review", CHANGE, "--bogus"],
@@ -752,23 +516,4 @@ def test_non_verification_refusals_record_no_failure(tmp_path: Path) -> None:
     (repo / "dirty.txt").write_text("x", encoding="utf-8")
     dirty = finalize(repo, review_input(tmp_path, [], []))
     assert dirty.returncode == 1 and "finalize.clean-tree" in dirty.stderr
-    assert failures(repo) == []
 
-
-def test_failure_after_confirmation_not_listed_as_prior(tmp_path: Path) -> None:
-    repo = make_repo(tmp_path)
-    write_probes(repo, 1)
-    propose(repo, "reviewers")
-    confirm(repo, "2026-01-01T00:00:00Z")
-    refused = finalize(repo, review_input(tmp_path, [], []))
-    assert refused.returncode == 1
-    assert [e["rule"] for e in failures(repo)] == ["finalize.adversarial"]
-
-    result = finalize(repo, review_input(
-        tmp_path, [], ADVERSARIAL
-    ))
-
-    assert result.returncode == 0, result.stderr
-    attestation = written(repo)
-    assert attestation["selection"]["prior_failures"] == []
-    assert validate(repo, attestation) == []

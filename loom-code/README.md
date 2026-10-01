@@ -8,7 +8,7 @@
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.26.1 · **Skills**: 5 stations + 1 router + 1 command-only · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.27.0 · **Skills**: 5 stations + 1 router · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -69,7 +69,6 @@ flowchart TD
 | [`ship`](skills/ship/SKILL.md) | Validate the attestation, push, open the PR and verify required checks (decision point ③). Never merges. |
 | [`maintain`](skills/maintain/SKILL.md) | Reproduce an incident outside an active unmerged change, attach it to a matching open intent or create one, and hand it to `write-plan`. |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | Optional router that picks the station for a general Loom request; every station stays directly callable. |
-| [`expert-mode`](skills/expert-mode/SKILL.md) | User-invoked only: choose which Loom steps one change runs or skips; binds on a typed confirmation. |
 
 ## Agents
 
@@ -224,9 +223,9 @@ Then restart OpenCode (`opencode service restart`): until it restarts, `opencode
 
 The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
-Skills are offered as `loom-code:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model; expert-mode is the command `/loom-code:expert-mode`. Start loom with the command `/loom-code:using-loom-code`, which stays a skill too.
+Skills are offered as `loom-code:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model. Start loom with the command `/loom-code:using-loom-code`, which stays a skill too.
 
-On OpenCode, the session context, the publication reminder, the language reminder and the selection-record guard run through the plugin's v2 hooks.
+On OpenCode, the session context, the publication reminder and the language reminder run through the plugin's v2 hooks.
 
 Limits on OpenCode:
 
@@ -234,7 +233,6 @@ Limits on OpenCode:
 - loom-code's subagents can stop on an `external_directory` permission prompt when they read loom's installed files from the plugin cache, even under `opencode run --auto`, which does not cover subagent sessions. Approve reads of the loom plugin directory.
 - `opencode run` without `--auto` stops at the first permission prompt or model question, so drive long loom runs from the TUI.
 - OpenCode does not ask before shell commands outside the project, so a model can change the machine (observed: a system-wide `pip install --break-system-packages`); review its commands or tighten OpenCode's permission settings.
-- `opencode run "/loom-code:expert-mode ..."` sends the text as a prompt without running the command; type the command in the TUI instead.
 - The OpenCode desktop app and IDE integrations are not covered.
 - Node is not needed to use the plugins.
 

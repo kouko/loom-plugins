@@ -93,10 +93,9 @@ def test_skills_registered_plugin_qualified():
             assert skill["content"].strip() and skill["description"].strip() not in ("", "|")
 
 
-def test_disable_model_invocation_skill_not_model_registered():
+def test_loom_code_registers_only_its_router_command():
     seen = _register("loom-code")
-    assert "loom-code:expert-mode" not in {s["id"] for s in seen["skills"]}
-    assert [c["name"] for c in seen["commands"]] == ["loom-code:expert-mode", "loom-code:using-loom-code"]
+    assert [c["name"] for c in seen["commands"]] == ["loom-code:using-loom-code"]
     assert all(c["execute"] == "function" for c in seen["commands"])
 
 
@@ -135,18 +134,18 @@ def test_plugin_without_agents_registers_no_agents_and_its_entry_commands():
 
 
 def test_shell_push_routed_to_push_hook(tmp_path: Path):
-    event = {"tool": "shell", "sessionID": "root", "id": "c1", "input": {"command": "ls .git/loom"}}
-    threw = _fire("loom-code", "execute.before", event, tmp_path)["threw"]
-    # the checker's own refusal, not the loader's unreachable-handler fallback
-    assert threw and threw.startswith("BLOCK selection.guard") and "checker failed" not in threw
-    # `workdir` moves the call into the store: a plain redirect write is refused
-    repo = tmp_path / "proj"
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
-    (repo / ".git" / "loom" / "selections").mkdir(parents=True)
-    moved = {**event, "input": {"command": "printf x > rec", "workdir": ".git/loom/selections"}}
-    env = {**os.environ, "STUB_SESSION_DIR": str(repo)}
-    threw = _fire("loom-code", "execute.before", moved, tmp_path, env)["threw"]
-    assert threw and threw.startswith("BLOCK selection.guard")
+    bin_dir, log = tmp_path / "bin", tmp_path / "python3.log"
+    bin_dir.mkdir()
+    fake = bin_dir / "python3"
+    fake.write_text(f'#!/bin/bash\necho "$*" >> "{log}"\ncat >/dev/null\n', encoding="utf-8")
+    fake.chmod(0o755)
+    env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+    write = {"tool": "write", "sessionID": "root", "id": "c0", "input": {"path": "a.md", "content": "x"}}
+    assert _fire("loom-code", "execute.before", write, tmp_path, env)["threw"] is None
+    assert not log.exists()  # a file tool never reaches the push hook
+    shell = {"tool": "shell", "sessionID": "root", "id": "c1", "input": {"command": "ls"}}
+    assert _fire("loom-code", "execute.before", shell, tmp_path, env)["threw"] is None
+    assert "loom_checker.py push --hook" in log.read_text(encoding="utf-8")
 
 
 def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
@@ -158,12 +157,14 @@ def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
     env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}", "TMPDIR": str(tmp_path)}
     for session in ("child-1", "root"):
         event = {"sessionID": session, "messageID": "m1",
-                 "prompt": {"text": "/loom-code:expert-mode K7Q2"}}
+                 "prompt": {"text": "/loom-code:using-loom-code"}}
         _fire("loom-code", "prompt", event, tmp_path, env)
         if session.startswith("child"):
             assert not log.exists()
             assert not (tmp_path / "loom-opencode" / f"{session}.jsonl").exists()
-    assert "selection capture --hook" in log.read_text(encoding="utf-8")  # the root control
+    # the root control: its transcript is kept, and no prompt hook runs a handler
+    assert (tmp_path / "loom-opencode" / "root.jsonl").exists()
+    assert not log.exists()
 
 
 @pytest.mark.parametrize("text, expected", [
@@ -203,7 +204,7 @@ def test_session_and_skill_hooks_feed_text_back(tmp_path: Path, plugin, fires, n
         assert any(needle in text for text in texts), texts
 
 
-def test_unreachable_handler_still_denies_the_store(tmp_path: Path):
+def test_unreachable_handler_allows(tmp_path: Path):
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     (bin_dir / "python3").write_text("#!/bin/bash\ncat >/dev/null\nexit 1\n", encoding="utf-8")
@@ -211,8 +212,7 @@ def test_unreachable_handler_still_denies_the_store(tmp_path: Path):
     env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
     write = {"tool": "write", "sessionID": "root", "id": "c5",
              "input": {"path": ".git/loom/selections/rec", "content": "x"}}
-    threw = _fire("loom-code", "execute.before", write, tmp_path, env)["threw"]
-    assert threw and "checker failed" in threw
+    assert _fire("loom-code", "execute.before", write, tmp_path, env)["threw"] is None
     benign = {"tool": "shell", "sessionID": "root", "id": "c6", "input": {"command": "ls"}}
     assert _fire("loom-code", "execute.before", benign, tmp_path, env)["threw"] is None
 

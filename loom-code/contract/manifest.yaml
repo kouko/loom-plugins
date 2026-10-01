@@ -201,7 +201,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       - {name: executions,     kind: json, required: true, grammar: "[{kind, command, artifact, result, command_digest}]"}
       - {name: verdicts,       kind: json, required: true, grammar: "[{reviewer, vendor, model, lens, verdict, findings}]"}
       - {name: findings,       kind: json, required: true, grammar: "[{id, anchor, raised_by, resolution} | {severity, dimension, anchor, text}]"}
-      - {name: selection,      kind: json, required: true, grammar: "{confirmations: [{code, skip, source, at}], skip, source, prior_failures: [{step, rule, head_sha, branch, at}]} | null", note: "schema loom-attestation/v2; recomputed from the local selection records, and only steps in skip waive their checks; v1 attestations carry no selection and stay valid"}
+      - {name: selection,      kind: json, required: true, grammar: "null", note: "schema loom-attestation/v2; always null, and any other value is refused because no typed selection can waive a step; v1 attestations carry no selection and stay valid"}
 
   acceptance-test-report:
     path: docs/loom/<change-id>/acceptance-test-report.md
@@ -214,6 +214,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
         - "one line per Acceptance"
         - "What this did to existing data"
         - "I decided for you"
+        - "Steps you told me to skip"
         - "open questions"
       must_not:
         - {kind: "design rationale", goes_to: spec}
@@ -244,20 +245,6 @@ standing_docs:       # not per-change (§2a, §8)
     # its charter (what it answers, must/must-not, sign-off, edits-after)
     # lives at artifacts.kickoff-defaults.charter, not duplicated here --
     # one shape for the checker to read (wave-end:0-05).
-
-step_selection:      # the only step names a user selection may run or skip; the intent (landing requires it), publication, the merge decision and the attestation are deliberately absent; steps carry no dependencies, so any one may be skipped alone
-  # Omitted spec/plan artifacts have no mandatory consumers. Use confirmed
-  # intent and bounded task handoffs; instruction records stay in plan Risks
-  # or intent Constraints when plan is absent or omitted, never a new binding.
-  steps:
-    - {name: spec}
-    - {name: plan}
-    - {name: implementer}
-    - {name: tdd}
-    - {name: reviewers}
-    - {name: adversarial}
-    - {name: acceptance-test}
-    - {name: package-tests}
 
 kickoff_defaults:   # grammar: `- <key>: <value> — <reason> (<date>)`
   - {name: second-vendor,          grammar: "<cli> | ask | suggest", note: "`ask` blocks once per change; `suggest` reports availability without waiting and permits opt-in only before Closing Review"}

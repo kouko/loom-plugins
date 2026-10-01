@@ -53,9 +53,7 @@ OpenCode never substitutes `CLAUDE_PLUGIN_ROOT`. The `skill` tool's output
 states "Base directory for this skill"; `<loom-code>` is the directory two
 levels above the invoking station's `SKILL.md`.
 
-## Hooks and expert mode
+## Hooks
 
 loom-code's plugin hooks run on OpenCode; the install instructions list
-OpenCode's limits. There is no automatic expert-mode switch: the user types
-`/loom-code:expert-mode <CODE>` in the TUI (`opencode run` sends it as plain
-text).
+OpenCode's limits.

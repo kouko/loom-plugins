@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.26.1 · **Skills**: 5 ステーション + 1 ルーター + 1 コマンド専用 · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.27.0 · **Skills**: 5 ステーション + 1 ルーター · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -69,7 +69,6 @@ flowchart TD
 | [`ship`](skills/ship/SKILL.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
 | [`maintain`](skills/maintain/SKILL.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
-| [`expert-mode`](skills/expert-mode/SKILL.md) | ユーザーが明示的に呼び出す場合のみ：1 つの変更で実行・スキップする Loom ステップを選ぶ。入力された確認でのみ確定する。 |
 
 ## Agents
 
@@ -223,9 +222,9 @@ opencode plugin list
 
 OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を `opencode.json`（`plugin add` が OpenCode の設定フォルダ `~/.config/opencode/` に書き込むファイル）の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
-skill は `loom-code:<skill>` として提供されます。loom の役割は OpenCode の subagent `loom-code:<role>` として `subagent` ツール経由でセッションのモデルで動きます。expert-mode はコマンド `/loom-code:expert-mode` です。loom はコマンド `/loom-code:using-loom-code` で始めます（skill としても引き続き提供されます）。
+skill は `loom-code:<skill>` として提供されます。loom の役割は OpenCode の subagent `loom-code:<role>` として `subagent` ツール経由でセッションのモデルで動きます。loom はコマンド `/loom-code:using-loom-code` で始めます（skill としても引き続き提供されます）。
 
-OpenCode では、セッションコンテキスト、公開リマインダー、言語リマインダー、選択記録ガードが plugin の v2 hook で動きます。
+OpenCode では、セッションコンテキスト、公開リマインダー、言語リマインダーが plugin の v2 hook で動きます。
 
 OpenCode での制限は次のとおりです。
 
@@ -233,7 +232,6 @@ OpenCode での制限は次のとおりです。
 - loom-code の subagent は、plugin キャッシュにある loom のファイルを読むときに `external_directory` の許可プロンプトで止まることがあります。`opencode run --auto` も subagent のセッションには効きません。loom の plugin ディレクトリの読み取りを許可してください。
 - `--auto` なしの `opencode run` は最初の許可プロンプトかモデルからの質問で止まるため、長い loom の実行は TUI から行ってください。
 - OpenCode はプロジェクト外のシェルコマンドの前に確認しないため、モデルがマシンを変更することがあります（観測例：システム全体への `pip install --break-system-packages`）。コマンドを確認するか、OpenCode の許可設定を厳しくしてください。
-- `opencode run "/loom-code:expert-mode ..."` はテキストを prompt として送るだけでコマンドは実行されません。コマンドは TUI で入力してください。
 - OpenCode のデスクトップアプリと IDE 連携は対象外です。
 - plugin を使うのに Node は不要です。
 
