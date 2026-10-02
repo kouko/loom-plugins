@@ -64,8 +64,10 @@ def test_event_set_is_exact(hooks):
     assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse"}
 
 
-def test_codex_event_set_is_publication_interception(codex_hooks):
-    assert set(codex_hooks) == {"PreToolUse"}
+def test_codex_event_set_is_session_start_and_publication_interception(codex_hooks):
+    assert set(codex_hooks) == {"SessionStart", "PreToolUse"}
+    (command,) = _commands(codex_hooks["SessionStart"])
+    assert command == '"${PLUGIN_ROOT}/hooks/session-start"'
 
 
 def test_session_start_runs_the_rewritten_script(hooks):

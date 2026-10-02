@@ -69,11 +69,22 @@ def test_word_count_is_within_budget(empty_repo):
     assert len(_run(empty_repo).split()) <= WORD_CAP
 
 
-def test_emits_the_canonical_and_defensive_context_keys(empty_repo):
+def test_emits_only_the_canonical_context_key(empty_repo):
+    """Codex 0.154 marks a hook Failed when its JSON carries keys beside
+    hookSpecificOutput, so every host gets only that key."""
     payload = json.loads(_run(empty_repo))
     assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
     assert payload["hookSpecificOutput"]["additionalContext"]
-    assert set(payload) == {"hookSpecificOutput", "additional_context", "additionalContext"}
+    assert set(payload) == {"hookSpecificOutput"}
+
+
+def test_routes_software_development_requests_into_loom(empty_repo):
+    """A4: without outside rules, the text alone says which requests enter."""
+    context = _context(_run(empty_repo))
+    assert "adds a feature or fixes a bug starts at capture-intent before you edit any file" in context
+    assert "in any repository, even when the user never says loom and there is no docs/loom folder" in context
+    assert "A small edit (a typo fix, a rename) and work that is not software development (research, notes) go direct" in context
+    assert "this repo runs through stations" not in context
 
 
 def test_names_every_station_in_manifest_order(empty_repo, manifest):
@@ -131,7 +142,8 @@ def test_escape_hatch_still_returns_empty_context(empty_repo):
         env={**os.environ, "LOOM_CODE_MODE": "off"},
     )
     assert proc.returncode == 0
-    assert json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"] == ""
+    payload = json.loads(proc.stdout)
+    assert payload == {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ""}}
 
 
 def test_no_deleted_mechanism_is_mentioned(empty_repo):
