@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.28.0] — 2026-10-02 — software-development requests enter loom on every host.
+
+- The session-start text gains a routing paragraph: any request to add a feature or fix a bug starts at the entry station before any file is edited, in any repository, even when loom is not named; an incident outside an active change starts at the maintain station.
+- `session-start` prints only `hookSpecificOutput.additionalContext`; the extra `additional_context` and bare `additionalContext` keys are gone, because Codex marks a hook Failed when its JSON carries any other top-level key.
+- Codex gets a SessionStart hook in `hooks/hooks-codex.json`, so it receives the routing text at session start. Codex users must trust the plugin's hooks once before it runs.
+- The `write-plan` description is narrowed: it turns a confirmed intent into tasks and is not the entry for a new request.
+- PR #74 leftovers removed: the ship sentence about `Skipped as a narrow change:`, the no-op `depth` parameter of `verification_status`, and a trailing blank line in a test file.
+- budget-exception: SessionStart::session-start@codex — Codex gets the loom routing text at session start
+
 ## [3.27.0] — 2026-10-01 — expert-mode removed; acceptance report lists skipped steps.
 
 - The `expert-mode` skill and its typed skip confirmation are removed; a user still skips a step by saying so in plain words.
