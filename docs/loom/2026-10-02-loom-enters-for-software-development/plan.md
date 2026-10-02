@@ -33,8 +33,8 @@ Wave 1 changes the entry surfaces and fixes the #74 leftovers independently; wav
 - Risk: agent-decided — minor for loom-code and loom-design (station guidance and hook change); loom-workflow untouched unless a synced file changes.
 
 **W3-01 Graduate the loom-code-only entry probe into the suite**  after: W2-01  acceptance: 1
-- Files: docs/loom/2026-10-02-loom-enters-for-software-development/evidence/probes/test_abuse_loom_code_only_entry.py, loom-code/tests/test_session_start_words.py
-- Test: A1 positive: loom-code-only-install-routes-new-request-to-write-plan; negative: both-plugins-route-to-capture-intent.
+- Files: docs/loom/2026-10-02-loom-enters-for-software-development/evidence/probes/test_abuse_loom_code_only_entry.py, loom-code/tests/test_session_start_loom_code_only_entry.py
+- Test: A1 positive: loom-code-only-session-start-names-write-plan-fallback; negative: write-plan-description-keeps-loom-code-only-entry-role.
 - Risk: agent-decided — move the adversary's red probe into loom-code/tests after the routing fix makes it green; the probe file leaves the change store.
 
 ## Simplicity check
