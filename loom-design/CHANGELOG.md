@@ -14,7 +14,7 @@ is the whole record. Their version numbers never continued here —
 
 ## [2.10.0] — 2026-10-02 — capture-intent claims unnamed feature and bug-fix requests.
 
-- The `capture-intent` description claims any software request to add a feature or fix a bug, before files are edited, even when loom is not named or the repo has no loom folder; a typo or rename (unless loom is asked for) and non-software work stay outside it.
+- The `capture-intent` description claims any software request to add a feature or fix a bug, before files are edited, even when loom is not named or the repo has no loom folder; a typo or a rename that changes no behaviour (unless loom is asked for) and non-software work stay outside it.
 
 ## [2.9.0] — 2026-10-01 — expert-mode removed.
 
