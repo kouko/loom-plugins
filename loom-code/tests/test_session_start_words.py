@@ -83,8 +83,8 @@ def test_routes_software_development_requests_into_loom(empty_repo):
     context = _context(_run(empty_repo))
     assert "adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file" in context
     assert "in any repository, even when the user never says loom and there is no docs/loom folder" in context
-    assert "fixes a bug or changes behaviour goes through loom however small" in context
-    assert "only a typo fix or a rename that changes no behaviour, and work that is not software development (research, notes), go direct" in context
+    assert "Outside an active change, a feature or bug-fix request goes through loom however small" in context
+    assert "edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom" in context
     assert "this repo runs through stations" not in context
 
 
