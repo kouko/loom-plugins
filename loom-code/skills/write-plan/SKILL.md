@@ -1,7 +1,7 @@
 ---
 name: write-plan
 description: |
-  Plan an engineering change or turn a confirmed intent into implementation tasks. Use when planning or starting work without a plan.
+  Turn a confirmed intent into implementation tasks. Use when an intent already exists and needs a plan; not the entry for a new request.
 version: 1.0.1
 ---
 

@@ -153,6 +153,18 @@ def test_candidate_rendered_description_total_counts_router_overhead() -> None:
     assert candidate * 100 <= BASELINE_RENDERED_DESCRIPTION_CHARS * 60
 
 
+def test_entry_descriptions_claim_unnamed_feature_and_bug_fix_requests() -> None:
+    """capture-intent is the entry for unbranded work; write-plan needs an intent."""
+    skills = _skills()
+    entry = _description(skills["loom-design"]["capture-intent"]).lower()
+    for phrase in ("feature", "fix a bug", "before editing", "loom is not named",
+                   "typo", "rename", "non-software"):
+        assert phrase in entry, phrase
+    plan = _description(skills["loom-code"]["write-plan"]).lower()
+    assert "starting work without a plan" not in plan
+    assert "confirmed intent" in plan
+
+
 def test_router_tables_preserve_direct_leaf_targets() -> None:
     """Check executable links, not an inferred model verdict."""
     for plugin, skills in _skills().items():

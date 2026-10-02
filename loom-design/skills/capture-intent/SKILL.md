@@ -1,7 +1,7 @@
 ---
 name: capture-intent
 description: |
-  Capture and confirm a change intent. Use when someone wants a feature or change and no intent file exists yet.
+  Capture and confirm a change intent. Use for any software request to add a feature or fix a bug, before editing files, even when loom is not named or the repo has no loom folder. Skip a typo or rename unless loom is asked for, and non-software work.
 version: 1.0.0
 ---
 
