@@ -163,6 +163,7 @@ def test_entry_descriptions_claim_unnamed_feature_and_bug_fix_requests() -> None
     plan = _description(skills["loom-code"]["write-plan"]).lower()
     assert "starting work without a plan" not in plan
     assert "confirmed intent" in plan
+    assert "bug report" not in _description(skills["loom-code"]["maintain"]).lower()
 
 
 def test_router_tables_preserve_direct_leaf_targets() -> None:

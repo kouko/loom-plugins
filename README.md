@@ -45,7 +45,7 @@ flowchart TD
         build["loom-code:build<br/>test-first, one commit per task"]
         review["loom-code:closing-review<br/>fresh-context review<br/>→ attestation"]
         ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (acceptance test report when required)"]
-        maintain["loom-code:maintain<br/>bugs, alerts, regressions"]
+        maintain["loom-code:maintain<br/>alerts, CI or regression failures"]
     end
 
     merged(["Merged PR<br/>merged separately after<br/>loom-code:ship"])
@@ -138,7 +138,7 @@ content-bound verification, one closing review and a GitHub-enforced PR floor.
 | `build` | Implement the plan test-first, one task at a time, ending with the adversary and the package suite. |
 | `closing-review` | Run the closing review (read, acceptance testing) on Build-checked content and generate an attestation. |
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
-| `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
+| `maintain` | Attach alerts, CI or regression failures or incidents that arrive without a user's bug-fix request to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |
 
 It also ships the `implementer`, `reviewer`, `acceptance-tester` and `adversary`

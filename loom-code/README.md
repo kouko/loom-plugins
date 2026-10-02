@@ -26,7 +26,7 @@ flowchart TD
     attest[["Attestation generated<br/>by loom-code:closing-review"]]
     ship["loom-code:ship<br/>Push + PR + checks<br/>③ You accept the result<br/>through the acceptance test report when required"]
     merged(["Merged separately<br/>after loom-code:ship, on your own authorization"])
-    maintain["loom-code:maintain<br/>Bug, alert, regression or incident"]
+    maintain["loom-code:maintain<br/>Alert, CI or regression failure, or incident"]
 
     intent --> plan
     intent -.->|"needs-design: yes"| spec
@@ -55,9 +55,10 @@ flowchart TD
 - **Ship** — pushes the branch, opens the PR and verifies required checks
   (③). Ship never merges: merging is a separate step that needs your own
   explicit authorization.
-- **Maintain** — outside an active unmerged change, a bug report, alert,
-  regression or incident is attached to a matching open intent, or a new one
-  is created, and handed to `write-plan`.
+- **Maintain** — outside an active unmerged change, an alert, CI or regression
+  failure, or incident that arrives without a user's request to fix a bug is
+  attached to a matching open intent, or a new one is created, and handed to
+  `write-plan`. A user asking for a bug fix starts at the entry station.
 
 ## Skills
 

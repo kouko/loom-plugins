@@ -24,7 +24,7 @@ flowchart TD
     attest[["產生 attestation<br/>由 loom-code:closing-review"]]
     ship["loom-code:ship<br/>push + PR + checks<br/>③ 你驗收結果<br/>需要時透過 acceptance test report"]
     merged(["合併是另一步<br/>在 loom-code:ship 之後，由你另外授權"])
-    maintain["loom-code:maintain<br/>bug、告警、回歸或事故"]
+    maintain["loom-code:maintain<br/>告警、CI 或回歸失敗、事故"]
 
     intent --> plan
     intent -.->|"needs-design: yes"| spec
@@ -49,8 +49,9 @@ flowchart TD
   綁定受審功能內容的 attestation。
 - **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
   另一步，需要你另外明確授權。
-- **Maintain** —— 在進行中未合併變更之外發生的 bug 回報、告警、回歸或事故，
-  會掛到相符的 open intent 上，沒有就新建一份，再交給 `write-plan`。
+- **Maintain** —— 在進行中未合併變更之外發生、且不是使用者要求修 bug 的告警、
+  CI 或回歸失敗、事故，會掛到相符的 open intent 上，沒有就新建一份，再交給
+  `write-plan`。使用者要求修 bug 時從入口站開始。
 
 ## Skills
 
