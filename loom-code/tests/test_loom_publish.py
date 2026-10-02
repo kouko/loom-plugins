@@ -765,7 +765,7 @@ def test_publish_does_not_replay_functional_executables(tmp_path: Path, monkeypa
         "--confirm-authorized", "--title", "feat(loom): safe",
         "--body-file", str(body),
     ]) == 0
-    assert checked == [["change", {"depth": "local", "head": calls.head}]]
+    assert checked == [["change", {"head": calls.head}]]
 
 
 def test_publish_rejects_diverged_remote_before_push(tmp_path: Path, monkeypatch) -> None:

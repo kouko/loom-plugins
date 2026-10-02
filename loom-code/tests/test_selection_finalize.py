@@ -516,4 +516,3 @@ def test_usage_error_and_dirty_tree_are_refused(tmp_path: Path) -> None:
     (repo / "dirty.txt").write_text("x", encoding="utf-8")
     dirty = finalize(repo, review_input(tmp_path, [], []))
     assert dirty.returncode == 1 and "finalize.clean-tree" in dirty.stderr
-

@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.27.0 · **Skills**: 5 ステーション + 1 ルーター · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.28.0 · **Skills**: 5 ステーション + 1 ルーター · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -26,7 +26,7 @@ flowchart TD
     attest[["attestation を生成<br/>loom-code:closing-review による"]]
     ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは acceptance test report で"]
     merged(["マージは別手順<br/>loom-code:ship の後、あなた自身の許可で"])
-    maintain["loom-code:maintain<br/>バグ・アラート・リグレッション・障害"]
+    maintain["loom-code:maintain<br/>アラート・CI やリグレッションの失敗・障害"]
 
     intent --> plan
     intent -.->|"needs-design: yes"| spec
@@ -55,9 +55,10 @@ flowchart TD
   attestation として生成されます。
 - **Ship** — ブランチを push し、PR を開き、必須チェックを確認します（③）。
   Ship はマージしません。マージは、あなた自身の明示的な許可が要る別の手順です。
-- **Maintain** — 進行中の未マージ変更の外で起きたバグ報告・アラート・
-  リグレッション・障害を、一致する open な intent に結び付けるか新しい
-  intent を作り、`write-plan` に渡します。
+- **Maintain** — 進行中の未マージ変更の外で起き、ユーザーからのバグ修正依頼
+  ではないアラート・CI やリグレッションの失敗・障害を、一致する open な
+  intent に結び付けるか新しい intent を作り、`write-plan` に渡します。
+  ユーザーがバグ修正を依頼したときは入口のステーションから始めます。
 
 ## Skills
 

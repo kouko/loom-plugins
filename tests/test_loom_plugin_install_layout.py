@@ -447,8 +447,14 @@ def test_isolated_codex_install_selects_only_its_native_hook_manifest(
     selected = (code_root / manifest["hooks"]).resolve()
     selected.relative_to(code_root.resolve())
     hooks = json.loads(selected.read_text(encoding="utf-8"))["hooks"]
-    assert set(hooks) == {"PreToolUse"}
+    assert set(hooks) == {"SessionStart", "PreToolUse"}
     assert "${PLUGIN_ROOT}" in hooks["PreToolUse"][0]["hooks"][0]["command"]
+    # Codex marks a hook Failed on keys beside hookSpecificOutput.
+    start = _run_hook_command(hooks["SessionStart"][0]["hooks"][0]["command"],
+                              "PLUGIN_ROOT", code_root, tmp_path, tmp_path)
+    assert start.returncode == 0, start.stderr
+    assert set(json.loads(start.stdout)) == {"hookSpecificOutput"}
+    assert "starts at capture-intent (write-plan when loom-design is not installed)" in json.loads(start.stdout)["hookSpecificOutput"]["additionalContext"]
     codex_commands = [
         hook["command"]
         for groups in hooks.values()

@@ -4,8 +4,8 @@ Neither function refuses: identification returns an error string naming the
 fix, and status is a value (`valid`, `absent`, `stale (<reason>)`) that
 publish, land, the hook and CI print.
 
-Two depths, `local` and `ci`, accepted by every caller; both run the same
-`validate_attestation`, since no local record feeds it any more.
+Every caller, local or CI, runs the same `validate_attestation`, since no
+local record feeds it any more.
 """
 
 from __future__ import annotations
@@ -97,12 +97,10 @@ def identify_change(
 
 
 def verification_status(
-    repo: Path, change_id: str, *, depth: str = "local", base: str | None = None,
+    repo: Path, change_id: str, *, base: str | None = None,
     head: str = "HEAD", manifest: dict | None = None,
 ) -> str:
     """`valid`, `absent` or `stale (<reason>)`."""
-    if depth not in {"local", "ci"}:
-        raise ValueError(f"unknown verification depth {depth!r}")
     manifest = manifest if manifest is not None else load_manifest()
     try:
         head_sha = git_text(repo, "rev-parse", head)

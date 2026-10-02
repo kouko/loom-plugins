@@ -68,7 +68,7 @@ def _reminder(kind: str, cwd: Path) -> str | None:
     """The one line a direct push, PR create or PR merge earns, or None."""
     repo = repo_root(cwd)
     change_id, _unidentified = identify_change(repo)
-    status = verification_status(repo, change_id, depth="local") if change_id else None
+    status = verification_status(repo, change_id) if change_id else None
     clause = missing_clause(missing_records(repo, change_id, status)) if change_id else ""
     clause = f" {clause}" if clause else ""
     if kind == "merge":

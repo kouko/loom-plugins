@@ -193,10 +193,13 @@ mechanisms:
     class: checker-rule
     eval: loom-code/tests/test_loom_checker_standing.py::test_missing_standing_docs_warn_in_exactly_three_lines
 
-  # --- hook (12 raw entries across host manifests; 10 counted, 2 host-hygiene) ---
+  # --- hook (13 raw entries across host manifests; 11 counted, 2 host-hygiene) ---
   - id: "SessionStart:startup|clear|compact:session-start"
     class: hook
     eval: loom-code/tests/test_session_start_words.py
+  - id: "SessionStart::session-start@codex"
+    class: hook
+    eval: loom-code/tests/test_hooks_json.py::test_codex_event_set_is_session_start_and_publication_interception
   - id: "PreToolUse:Bash:loom_checker.py"
     class: hook
     eval: loom-code/tests/test_hooks_json.py::test_pre_tool_use_matcher_set_is_bash_only

@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.10.0] — 2026-10-02 — capture-intent claims unnamed feature and bug-fix requests.
+
+- The `capture-intent` description claims any software request to add a feature or fix a bug, before files are edited, even when loom is not named or the repo has no loom folder; a typo or a rename that changes no behaviour (unless loom is asked for) and non-software work stay outside it.
+
 ## [2.9.0] — 2026-10-01 — expert-mode removed.
 
 - The capture-intent decision-point list no longer names an expert-mode request as a source of an extra stop; `loom-code` removed the `expert-mode` skill.

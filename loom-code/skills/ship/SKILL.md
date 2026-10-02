@@ -89,8 +89,8 @@ closing review's hand-off reports them.
 
 In the `<steps>` of the `Skipped by instruction:` line,
 write `acceptance-test` as `acceptance-test (independent acceptance testing)`;
-every other step reads as recorded. The `Verification status:` and
-`Skipped as a narrow change:` lines already arrive in that form from the checker.
+every other step reads as recorded. The `Verification status:` line already
+arrives in that form from the checker.
 
 Every decision summary states the chosen option, material alternatives,
 trade-offs, supporting evidence, and observed or expected outcome. This is an
