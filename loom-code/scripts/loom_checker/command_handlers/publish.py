@@ -394,7 +394,7 @@ def _cmd_publish_trusted(
     ) != "":
         return report([("publish.preconditions", f"{attestation_rel} is not committed — "
                                                  "commit it, then publish again")], err)
-    status = verification_status(repo, change_id, depth="local", head=head)
+    status = verification_status(repo, change_id, head=head)
     stated_error = validate_stated_status(body_file.read_text(encoding="utf-8"), status)
     if stated_error:
         return report([("push.contextual-body", stated_error)], err)

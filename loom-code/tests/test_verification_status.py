@@ -14,8 +14,6 @@ import json
 import subprocess
 from pathlib import Path
 
-import pytest
-
 from loom_checker import digest
 from loom_checker import verification
 from loom_checker.helpers import load_manifest
@@ -140,46 +138,42 @@ def test_attestation_must_agree_with_identified_change(tmp_path: Path) -> None:
     assert "2026-09-21-other" in error and CHANGE in error
 
 
-# --- status, CI depth -------------------------------------------------------
+# --- status -----------------------------------------------------------------
 
 
-@pytest.mark.parametrize("depth", ["local", "ci"])
-def test_claimed_selection_is_stale_at_both_depths(tmp_path: Path, depth: str) -> None:
+def test_claimed_selection_is_stale(tmp_path: Path) -> None:
     """No typed confirmation exists any more, so a non-null `selection`
     matches nothing: it is stale, never `valid (skipped: ...)`."""
     repo = branch_repo(tmp_path)
     confirmed_intent(repo)
     commit(repo, "intent")
     commit_attestation(repo, attestation(repo, skip=["adversarial"]))
-    status = verification.verification_status(repo, CHANGE, depth=depth)
+    status = verification.verification_status(repo, CHANGE)
     assert status.startswith("stale (") and "selection" in status
 
 
-def test_plain_attestation_is_valid_at_both_depths(tmp_path: Path) -> None:
+def test_plain_attestation_is_valid(tmp_path: Path) -> None:
     repo = branch_repo(tmp_path)
     confirmed_intent(repo)
     commit(repo, "intent")
     commit_attestation(repo, attestation(repo))
     assert verification.verification_status(repo, CHANGE) == "valid"
-    assert verification.verification_status(repo, CHANGE, depth="ci") == "valid"
 
 
-@pytest.mark.parametrize("depth", ["local", "ci"])
-def test_two_attestations_and_bad_json_are_stale(tmp_path: Path, depth: str) -> None:
+def test_two_attestations_and_bad_json_are_stale(tmp_path: Path) -> None:
     repo = branch_repo(tmp_path)
     confirmed_intent(repo)
     commit(repo, "intent")
     commit_attestation(repo, "{not json")
-    status = verification.verification_status(repo, CHANGE, depth=depth)
+    status = verification.verification_status(repo, CHANGE)
     assert status.startswith("stale (") and "JSON" in status
 
     commit_attestation(repo, attestation(repo), "docs/loom/2026-09-21-other/attestation.json")
-    status = verification.verification_status(repo, CHANGE, depth=depth)
+    status = verification.verification_status(repo, CHANGE)
     assert status == "stale (branch carries 2 attestations)"
 
 
-@pytest.mark.parametrize("depth", ["local", "ci"])
-def test_unparseable_recorded_command_is_stale(tmp_path: Path, depth: str) -> None:
+def test_unparseable_recorded_command_is_stale(tmp_path: Path) -> None:
     repo = branch_repo(tmp_path)
     confirmed_intent(repo)
     commit(repo, "intent")
@@ -189,7 +183,7 @@ def test_unparseable_recorded_command_is_stale(tmp_path: Path, depth: str) -> No
         command=command, command_digest=hashlib.sha256(command.encode()).hexdigest()
     )
     commit_attestation(repo, payload)
-    status = verification.verification_status(repo, CHANGE, depth=depth)
+    status = verification.verification_status(repo, CHANGE)
     assert status.startswith("stale (")
 
 
@@ -200,7 +194,7 @@ def test_content_failure_is_stale_with_reason(tmp_path: Path) -> None:
     commit_attestation(repo, attestation(repo))
     write(repo, "src.py", "VALUE = 2\n")
     commit(repo, "functional change after review")
-    status = verification.verification_status(repo, CHANGE, depth="ci")
+    status = verification.verification_status(repo, CHANGE)
     assert status == (
         "stale (attestation functional content digest does not match the selected tree)"
     )
@@ -215,7 +209,7 @@ def test_explicit_base_and_head_read_committed_delta(tmp_path: Path) -> None:
     head = git(repo, "rev-parse", "HEAD")
     git(repo, "switch", "-q", "--detach", head)
     assert verification.verification_status(
-        repo, CHANGE, depth="ci", base=base, head=head
+        repo, CHANGE, base=base, head=head
     ) == "valid"
     assert verification.identify_change(
         repo, base=base, head=head, branch=f"fix/{CHANGE}"
@@ -267,7 +261,7 @@ def test_explicit_base_diffs_from_the_fork_point_when_trunk_moved(tmp_path: Path
     base = git(repo, "rev-parse", "main")
     head = git(repo, "rev-parse", f"feat/{CHANGE}")
     assert verification.verification_status(
-        repo, CHANGE, depth="ci", base=base, head=head
+        repo, CHANGE, base=base, head=head
     ) == "valid"
     assert verification.identify_change(
         repo, base=base, head=head, branch=f"feat/{CHANGE}"

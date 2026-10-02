@@ -2,7 +2,7 @@
 
 The CI check on a pull request. It fails only on the PR body's structure
 (the nine contextual headings), naming the heading. The verification status
-is recomputed at CI depth from git and published to the job summary and a
+is recomputed from git between base and head and published to the job summary and a
 `::notice` annotation; every status passes, and no status text is ever read
 from the body. Reads files and git only; executes nothing from the PR.
 """
@@ -56,7 +56,7 @@ def cmd_pr_floor(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     if change_id is None:
         status = f"stale (change not identified: {error})"
     else:
-        status = verification_status(repo, change_id, depth="ci", base=base, head=head)
+        status = verification_status(repo, change_id, base=base, head=head)
     summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if summary:
         with open(summary, "a", encoding="utf-8") as handle:

@@ -88,7 +88,7 @@ class LandTarget:
     trusted_gh: str
     env: dict[str, str]
     change_id: str = ""
-    status: str = ""  # verification status at local depth, computed before merging
+    status: str = ""  # verification status, computed before merging
     body: str = ""  # the live PR body checked before the checks and merge state
 
 
@@ -962,7 +962,7 @@ def _merge_preconditions(
     env = _publish_env(identity, repo, (trusted_git, trusted_gh))
 
     # Disclosed after the merge, never refused (spec 'Skipping').
-    status = verification_status(repo, change_id, depth="local")
+    status = verification_status(repo, change_id)
 
     # (3) exactly one open PR for this branch against the default base
     base_result = _read(
