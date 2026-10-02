@@ -41,6 +41,14 @@
           "text": "capture-intent description lacks 'outside an active change'; a mid-change bug-fix request may open a second intent instead of staying in the current change (still goes through loom)."
         }
       ]
+    },
+    {
+      "reviewer": "codex-exec#gpt-5.5-closing",
+      "vendor": "openai",
+      "model": "gpt-5.5",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": []
     }
   ],
   "findings": [
