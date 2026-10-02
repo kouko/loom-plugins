@@ -81,9 +81,10 @@ def test_emits_only_the_canonical_context_key(empty_repo):
 def test_routes_software_development_requests_into_loom(empty_repo):
     """A4: without outside rules, the text alone says which requests enter."""
     context = _context(_run(empty_repo))
-    assert "adds a feature or fixes a bug starts at capture-intent before you edit any file" in context
+    assert "adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file" in context
     assert "in any repository, even when the user never says loom and there is no docs/loom folder" in context
-    assert "A small edit (a typo fix, a rename) and work that is not software development (research, notes) go direct" in context
+    assert "fixes a bug or changes behaviour goes through loom however small" in context
+    assert "only a typo fix or a rename that changes no behaviour, and work that is not software development (research, notes), go direct" in context
     assert "this repo runs through stations" not in context
 
 

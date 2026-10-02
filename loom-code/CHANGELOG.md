@@ -2,10 +2,10 @@
 
 ## [3.28.0] — 2026-10-02 — software-development requests enter loom on every host.
 
-- The session-start text gains a routing paragraph: any request to add a feature or fix a bug starts at the entry station before any file is edited, in any repository, even when loom is not named; an incident outside an active change starts at the maintain station.
+- The session-start text gains a routing paragraph: any request to add a feature or fix a bug starts at the entry station (write-plan when loom-design is not installed) before any file is edited, in any repository, even when loom is not named; an incident outside an active change starts at the maintain station. A bug fix or behaviour change goes through loom however small; only a typo fix or a rename that changes no behaviour goes direct.
 - `session-start` prints only `hookSpecificOutput.additionalContext`; the extra `additional_context` and bare `additionalContext` keys are gone, because Codex marks a hook Failed when its JSON carries any other top-level key.
 - Codex gets a SessionStart hook in `hooks/hooks-codex.json`, so it receives the routing text at session start. Codex users must trust the plugin's hooks once before it runs.
-- The `write-plan` description is narrowed: it turns a confirmed intent into tasks and is not the entry for a new request.
+- The `write-plan` description is narrowed: it turns a confirmed intent into tasks, and is the entry for a new feature or bug-fix request only when loom-design is not installed.
 - PR #74 leftovers removed: the ship sentence about `Skipped as a narrow change:`, the no-op `depth` parameter of `verification_status`, and a trailing blank line in a test file.
 - budget-exception: SessionStart::session-start@codex — Codex gets the loom routing text at session start
 

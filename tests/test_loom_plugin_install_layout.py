@@ -454,7 +454,7 @@ def test_isolated_codex_install_selects_only_its_native_hook_manifest(
                               "PLUGIN_ROOT", code_root, tmp_path, tmp_path)
     assert start.returncode == 0, start.stderr
     assert set(json.loads(start.stdout)) == {"hookSpecificOutput"}
-    assert "starts at capture-intent" in json.loads(start.stdout)["hookSpecificOutput"]["additionalContext"]
+    assert "starts at capture-intent (write-plan when loom-design is not installed)" in json.loads(start.stdout)["hookSpecificOutput"]["additionalContext"]
     codex_commands = [
         hook["command"]
         for groups in hooks.values()

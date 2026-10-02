@@ -1,7 +1,7 @@
 ---
 name: write-plan
 description: |
-  Turn a confirmed intent into implementation tasks. Use when an intent already exists and needs a plan; not the entry for a new request.
+  Turn a confirmed intent into implementation tasks. Use when an intent needs a plan; also the entry for a new feature or bug-fix request when loom-design is not installed.
 version: 1.0.1
 ---
 

@@ -80,7 +80,7 @@ body="You have loom-code. Software-development work runs through stations, one a
 
 Station order: ${flow}; ${tail_station} on alerts.
 
-Any software-development request that adds a feature or fixes a bug starts at ${entry_station} before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder; an incident outside an active change starts at ${tail_station}. A small edit (a typo fix, a rename) and work that is not software development (research, notes) go direct unless the user asks for loom.
+Any software-development request that adds a feature or fixes a bug starts at ${entry_station} (write-plan when loom-design is not installed) before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder; an incident outside an active change starts at ${tail_station}. A change that fixes a bug or changes behaviour goes through loom however small; only a typo fix or a rename that changes no behaviour, and work that is not software development (research, notes), go direct unless the user asks for loom.
 
 You ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:
 ① after the intent is written (${dp1}) — restate the problem and the acceptance conditions in plain words and get \"yes, this is what I want\"; fold a missing-principles interview, any \`second-vendor: ask\` question, and (engineering changes) any one-way-door choice into this same conversation.
