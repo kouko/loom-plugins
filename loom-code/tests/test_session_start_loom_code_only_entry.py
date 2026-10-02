@@ -1,7 +1,7 @@
 # concern: a loom-code-only install (no loom-design) is left with no skill that claims a new feature or bug-fix request.
-"""Adversary probe: the routing added by this change must still reach an
-installed entry station when loom-design is absent, the install path the
-loom-code README documents ("or loom-code:write-plan without loom-design").
+"""Suite guard: the session-start routing still reaches an installed entry
+station when loom-design is absent, the install path the loom-code README
+documents ("or loom-code:write-plan without loom-design").
 """
 
 from __future__ import annotations
@@ -43,3 +43,4 @@ def test_write_plan_description_loom_code_only_keeps_entry_role():
     text = (CODE / "skills" / "write-plan" / "SKILL.md").read_text(encoding="utf-8")
     description = text.split("---")[1]
     assert "not the entry" not in description, description
+    assert "when loom-design is not installed" in description, description

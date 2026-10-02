@@ -129,7 +129,10 @@ the user named a change, match the slug.
   there **unless** the user wants to describe the change now. If they do,
   run step 3's restate-and-confirm as a short interview instead: ask what
   the problem is, who it hurts, and what they will be able to do when it
-  is done; write the file yourself from their answers. Keep it short — an
+  is done; write the file yourself from their answers. A feature or
+  bug-fix request already describes the change: run the short interview
+  and write the file; offer the template path only when the user asks for
+  it. Keep it short — an
   engineering intent is normally three to five lines, and writing it by
   hand beats interviewing. The user never hand-writes the file. When you
   write it, `## Open questions` must be non-empty — the checker requires
