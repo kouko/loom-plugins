@@ -51,3 +51,4 @@ Wave 1 changes three independent surfaces; wave 2 bumps versions.
 ## Risks
 1. user-decided — publish never retries on its own; the hint relies on the agent or user following it once.
 2. The flags-before-artifact check keeps the existing gap that a collect-only pytest option passes without executing tests; recorded as a known limitation, not widened.
+3. user-decided — second-vendor selection-confirmed: codex
