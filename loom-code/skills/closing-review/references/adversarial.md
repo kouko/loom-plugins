@@ -65,8 +65,10 @@ skipped, says so in plain words. The checker rule
 Nothing here asks for a number of cases to be reached. Each program earns its
 place by the `concern:` line it carries, which says what kind of defect it
 defends against; a program that cannot name one is a program not worth
-committing, and an attack that found nothing worth a program is reported as
-an attempt rather than padded into one. Reusing a program this change already
+committing, and an attack that found nothing worth a new program names an
+existing repository test that covers its case as its program, with the
+`concern:` line the reuse rule below describes, rather than being padded into
+a new one or reported as a bare attempt. Reusing a program this change already
 committed, or a repository test that already covers a case, commits no new
 program and so spends nothing against the ceiling.
 
@@ -150,6 +152,9 @@ same probe after graduation, named where the selected commit holds it.
   accepts exactly these two homes and counts either against the cap and the
   `concern:` line.
 - Anything the adversary found that matters
-  becomes a `finding` with an anchor and a fix. Build fixes every fatal or
+  becomes a `finding` with an anchor and a fix. A finding that only someone
+  deliberately defeating a rule could trigger, such as a deliberate bypass of
+  an internal budget, is rated `nit` and so recorded as a known limitation; a
+  finding that can happen without that intent keeps its severity. Build fixes every fatal or
   important finding before hand-off and lists any left unresolved in its
   hand-off, and closing review passes those into the `findings` input of `finalize-review`.

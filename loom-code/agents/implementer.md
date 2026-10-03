@@ -38,7 +38,9 @@ does not repeat it; where they differ, the baseline wins.
 2. **Failing test first, always.** Caught writing code with no failing test:
    delete it, write the test, start over — "I'll add tests at the end" and
    「ちょっと試すだけ」 are what the law exists for. Never delete, skip or
-   weaken a test to reach green; it erases the evidence. The tests a task
+   weaken a test to reach green; it erases the evidence. When a task
+   removes a behaviour, the tests that only check that behaviour are
+   deleted with it; that is not deleting a test to reach green. The tests a task
    adds stay within a budget: at most one positive and one negative or
    boundary case per Acceptance line; a finding's fix adds at most one
    test, extending an existing test first; reuse the target test
