@@ -135,13 +135,15 @@ def test_kickoff_defaults_control_characters_do_not_break_the_json(tmp_path, man
     subprocess.run(["git", "init", "-q", str(repo)], check=True)
     (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
         "# KICKOFF-DEFAULTS\n\n- second-vendor: codex\f \x1b[31mred\x1b[0m (2026-09-02)\n"
-        "- standing-docs: waived — spike repo (2026-09-02)\n",
+        "- standing-docs: waived — spike repo (2026-09-02)\n"
+        "-\x1b 語言: 繁體中文 (2026-09-02)\n",
         encoding="utf-8",
     )
     context = _context(_run(repo))
     flow = [s["name"] for s in manifest["stations"] if s["name"] != "maintain"]
     assert " → ".join(flow) in context
     assert "standing-docs: waived — spike repo (2026-09-02)" in context
+    assert "- 語言: 繁體中文 (2026-09-02)" in context
     assert "\f" not in context and "\x1b" not in context
 
 

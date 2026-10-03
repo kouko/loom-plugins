@@ -98,7 +98,10 @@ The full station summary table (what each station reads, produces, and when the 
 # --- repo defaults --------------------------------------------------------
 DEFAULTS_FILE="docs/loom/KICKOFF-DEFAULTS.md"
 if [ -f "${DEFAULTS_FILE}" ]; then
-  defaults="$(sed -n 's/^-[[:space:]]\{1,\}\(.*: .*\)$/- \1/p' "${DEFAULTS_FILE}" | tr -d '\000-\010\013-\037\177')"
+  # Strip control bytes, then drop invalid UTF-8 (iconv -c may exit non-zero), before sed matches.
+  defaults="$(LC_ALL=C tr -d '\000-\010\013-\037\177' < "${DEFAULTS_FILE}" \
+    | { iconv -c -f UTF-8 -t UTF-8 2>/dev/null || true; } \
+    | sed -n 's/^-[[:space:]]\{1,\}\(.*: .*\)$/- \1/p')"
   if [ -n "${defaults}" ]; then
     body="${body}
 
