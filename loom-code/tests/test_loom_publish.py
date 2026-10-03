@@ -871,6 +871,8 @@ def test_publish_rejects_cross_repository_pr_match(tmp_path: Path, monkeypatch) 
     _, rc, _, err = invoke(tmp_path, monkeypatch, calls)
     assert rc == 1
     assert "identity" in err
+    assert "retry once, and stop if it is refused again" in err
+    assert sum(any("/pulls?" in token for token in call) for call in calls.calls) == 1
     assert not any("create" in call for call in calls.calls)
 
 
