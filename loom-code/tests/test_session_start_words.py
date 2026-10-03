@@ -46,7 +46,7 @@ def empty_repo(tmp_path_factory) -> Path:
     return repo
 
 
-def _run(cwd: Path) -> str:
+def _run(cwd: Path, env: dict | None = None) -> str:
     # R30-O3: capture bytes and decode explicitly (errors="replace") rather
     # than text=True, so a non-UTF-8 byte in the hook's output cannot raise
     # a UnicodeDecodeError inside subprocess.run itself.
@@ -55,6 +55,7 @@ def _run(cwd: Path) -> str:
         cwd=str(cwd),
         stdin=subprocess.DEVNULL,
         capture_output=True,
+        env=env,
     )
     assert proc.returncode == 0, proc.stderr.decode("utf-8", errors="replace")
     return proc.stdout.decode("utf-8", errors="replace")
@@ -127,6 +128,42 @@ def test_kickoff_defaults_lines_are_injected_when_the_file_exists(empty_repo, tm
     context = _context(_run(repo))
     assert "second-vendor: codex — user picked (2026-09-02)" in context
     assert "standing-docs: waived — spike repo (2026-09-02)" in context
+
+
+def test_kickoff_defaults_control_characters_do_not_break_the_json(tmp_path, manifest):
+    repo = tmp_path / "repo-with-control-chars"
+    (repo / "docs" / "loom").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
+        "# KICKOFF-DEFAULTS\n\n- second-vendor: codex\f \x1b[31mred\x1b[0m (2026-09-02)\n"
+        "- standing-docs: waived — spike repo (2026-09-02)\n"
+        "-\x1b 語言: 繁體中文 (2026-09-02)\n"
+        "-\fa: one\n-\vb: two\n",
+        encoding="utf-8",
+    )
+    context = _context(_run(repo))
+    assert "- a: one" in context and "- b: two" in context
+    flow = [s["name"] for s in manifest["stations"] if s["name"] != "maintain"]
+    assert " → ".join(flow) in context
+    assert "standing-docs: waived — spike repo (2026-09-02)" in context
+    assert "- 語言: 繁體中文 (2026-09-02)" in context
+    assert "\f" not in context and "\x1b" not in context
+
+
+def test_kickoff_defaults_survive_an_iconv_that_fails_without_reading(tmp_path):
+    repo = tmp_path / "repo-with-broken-iconv"
+    (repo / "docs" / "loom").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
+        "- standing-docs: waived — spike repo (2026-09-02)\n" + "# pad\n" * 20000,
+        encoding="utf-8",
+    )
+    shim = tmp_path / "bin"
+    shim.mkdir()
+    (shim / "iconv").write_text("#!/bin/sh\nexit 127\n", encoding="utf-8")
+    (shim / "iconv").chmod(0o755)
+    env = {**os.environ, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}"}
+    assert "standing-docs: waived — spike repo (2026-09-02)" in _context(_run(repo, env))
 
 
 def test_no_kickoff_section_when_the_file_is_absent(empty_repo):

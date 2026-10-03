@@ -98,7 +98,17 @@ The full station summary table (what each station reads, produces, and when the 
 # --- repo defaults --------------------------------------------------------
 DEFAULTS_FILE="docs/loom/KICKOFF-DEFAULTS.md"
 if [ -f "${DEFAULTS_FILE}" ]; then
-  defaults="$(sed -n 's/^-[[:space:]]\{1,\}\(.*: .*\)$/- \1/p' "${DEFAULTS_FILE}")"
+  # Turn vertical tab and form feed into spaces, delete the other control
+  # bytes (tab and newline kept), then drop invalid UTF-8, before sed matches.
+  # POSIX iconv -c omits invalid input characters; glibc, libiconv and BSD
+  # may still exit non-zero, and iconv may be missing, so `|| cat` drains
+  # stdin (EOF after -c consumed it) and the hook still exits 0. Without
+  # iconv, invalid bytes pass through unfiltered; sed runs under LC_ALL=C
+  # so such a byte cannot make it fail.
+  defaults="$(LC_ALL=C tr '\013\014' '  ' < "${DEFAULTS_FILE}" \
+    | LC_ALL=C tr -d '\000-\010\015-\037\177' \
+    | { iconv -c -f UTF-8 -t UTF-8 2>/dev/null || cat; } \
+    | LC_ALL=C sed -n 's/^-[[:space:]]\{1,\}\(.*: .*\)$/- \1/p')"
   if [ -n "${defaults}" ]; then
     body="${body}
 

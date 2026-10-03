@@ -1,0 +1,41 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-03-session-start-control-characters",
+  "content_digest": "8baab7f5335c85e2f669707b4fbb1b5a552112f8",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_session_start_c1_byte.py -q",
+      "artifact": "loom-code/tests/test_adversarial_session_start_c1_byte.py",
+      "result": "pass",
+      "command_digest": "0d40b0d23bf77efad2a67cd5fcdb4d42c4118ab8636251fe9db2a9e555d23263"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "loom-code:reviewer#ad30fd79",
+      "vendor": "claude",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "loom-code:reviewer#af2efeb8",
+      "vendor": "claude",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
