@@ -309,6 +309,13 @@ def command_names_artifact(command: str, artifact: str) -> bool:
 SHELL_METACHARACTERS = re.compile(r"[;&|<>()$`*?\[\]{}\n]")
 
 
+PYTEST_VALUE_OPTIONS = frozenset({
+    "-p", "-k", "-m", "-o", "-c", "-W", "-r", "--deselect", "--ignore",
+    "--ignore-glob", "--rootdir", "--confcutdir", "--basetemp", "--tb",
+    "--maxfail",
+})
+
+
 PROBE_RUN_TIMEOUT = int(os.environ.get("LOOM_PROBE_RUN_TIMEOUT", "600"))
 
 
@@ -337,9 +344,16 @@ def command_executes_artifact(command: str, artifact: str) -> bool:
                            if Path(tokens[i]).name.startswith("python")), [""])
         args = tokens[1:]
         # `python -m pytest [-opts] X`: the first non-option argument is X.
-        # An option's value (`-k expr`) is taken as X and refused -- fail-closed.
+        # A known option's separate value (`-p no:cacheprovider`) is skipped;
+        # an unknown option's value is taken as X and refused -- fail-closed.
         if args[:2] == ["-m", "pytest"]:
-            args = [arg for arg in args[2:] if not arg.startswith("-")]
+            rest, args = args[2:], []
+            while rest:
+                arg = rest.pop(0)
+                if arg in PYTEST_VALUE_OPTIONS:
+                    rest = rest[1:]
+                elif not arg.startswith("-"):
+                    args.append(arg)
         return (Path(tokens[0]).name.startswith("python") and bool(args)
                 and os.path.normpath(args[0]) == wanted)
     if suffix == ".sh":
