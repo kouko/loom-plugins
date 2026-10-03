@@ -508,7 +508,11 @@ def _cmd_publish_trusted(
         except (KeyError, TypeError, AttributeError):
             matches = False
         if not matches:
-            return _publish_block("existing pull request identity does not match origin, HEAD, and base", err)
+            return _publish_block(
+                "existing pull request identity does not match origin, HEAD, and base; "
+                "right after a push GitHub may not yet show the new commit, so "
+                "retry once, and stop if it is refused again", err,
+            )
         candidate_matches.append((candidate_url, bool(candidate.get("draft", False))))
     if len(candidate_matches) > 1:
         return _publish_block("multiple open pull requests match the current branch", err)

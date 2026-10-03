@@ -333,6 +333,17 @@ def test_pytest_runner_directly_executes_named_artifact() -> None:
     assert probes.command_executes_artifact(
         "python3 -m pytest tests/probe.py -q", "tests/probe.py"
     )
+    for command in ("python3 -m pytest -q -x tests/probe.py",
+                    "uv run --with x python -m pytest -q tests/probe.py",
+                    "python3 -m pytest -pno:cacheprovider tests/probe.py",
+                    "python3 -m pytest --tb=short tests/probe.py"):
+        assert probes.command_executes_artifact(command, "tests/probe.py")
+    for command in ("python3 -m pytest -q tests/other.py",
+                    "python3 -m pytest --help tests/probe.py",
+                    "python3 -m pytest --version tests/probe.py",
+                    "python3 -m pytest tests/probe.py --collect-only",
+                    "python3 -m pytest --junitxml tests/probe.py tests/other.py"):
+        assert not probes.command_executes_artifact(command, "tests/probe.py")
 
 
 def bare_repo(tmp_path: Path) -> Path:

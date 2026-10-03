@@ -37,15 +37,17 @@ to `none`.
 ## Two parts: attack, then pin
 
 The adversarial step runs in two parts. The first part reads the change and
-attacks it, and it writes nothing but its report: it names every attack point
-it found and what each one did. Only an attack that succeeded opens the second
+attacks it, and it writes no new program: besides its report, it may only add
+a `concern:` line to an existing test it names as its program. The report names
+every attack point it found and what each one did. Only an attack that succeeded opens the second
 part, where a program is written to pin what that attack exposed. A change the
-first part leaves standing ends there, with its report alone.
+first part leaves standing ends there, with its report and, when one exists,
+the existing test it names as its program under How many cases.
 
 A probe program is committed only when it is red against the change as it
 stands, because a program that is green the moment it is written restates a
 behaviour instead of demonstrating a defect. An attack the change survives is
-reported as an attempt, and the second part writes nothing for it.
+still reported as an attempt, and the second part writes no new program for it.
 
 The report states three numbers: how many attack points the first part found,
 how many of them earned a program, and how many programs were committed.
@@ -65,8 +67,11 @@ skipped, says so in plain words. The checker rule
 Nothing here asks for a number of cases to be reached. Each program earns its
 place by the `concern:` line it carries, which says what kind of defect it
 defends against; a program that cannot name one is a program not worth
-committing, and an attack that found nothing worth a program is reported as
-an attempt rather than padded into one. Reusing a program this change already
+committing. An attack the change survives is still reported as an attempt;
+when no attack earned a new program, the adversary names one existing
+repository test that covers the change as this change's program, adding the
+`concern:` line the reuse rule below describes, when such a test exists,
+rather than padding a new one. Reusing a program this change already
 committed, or a repository test that already covers a case, commits no new
 program and so spends nothing against the ceiling.
 
@@ -150,6 +155,10 @@ same probe after graduation, named where the selected commit holds it.
   accepts exactly these two homes and counts either against the cap and the
   `concern:` line.
 - Anything the adversary found that matters
-  becomes a `finding` with an anchor and a fix. Build fixes every fatal or
+  becomes a `finding` with an anchor and a fix. A finding that only a loom agent or
+  user deliberately defeating one of loom's own internal rules (a budget, a
+  cap, a check) could trigger is rated `nit` and so recorded as a known
+  limitation; a finding reachable by untrusted input, including a deliberate
+  attacker, or without that intent keeps its severity. Build fixes every fatal or
   important finding before hand-off and lists any left unresolved in its
   hand-off, and closing review passes those into the `findings` input of `finalize-review`.

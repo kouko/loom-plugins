@@ -113,6 +113,7 @@ repository's development records under `docs/`.
 - 三份 manifest（`loom-code/plugin.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`）必須同步
 - `CHANGELOG.md` 必須在同一 commit 加入新區段 `## [X.Y.Z] — <date> — <summary>`
 - README 版號字串同步更新
+- 版號在最後一輪 fix 就 bump，要在 closing-review 的 finalize-review 產生 attestation 之前；在它之後才 bump 會讓 attestation 失效（stale）
 - 理由：`claude plugin update` 只比對版本字串；未 bump 的變更永遠不會發到已安裝副本
 - 機制化：`test_write_plan_station_text.py::test_current_release_metadata_is_synchronized` 斷言版號一致；bump packet 必須列出 CHANGELOG entry、pin test rewrite 為交付項
 - 參考記憶：`docs/loom/memory/version-bump-packets-must-name-changelog-entry.md`、`docs/loom/memory/version-bump-on-every-pr.md`

@@ -309,6 +309,42 @@ def command_names_artifact(command: str, artifact: str) -> bool:
 SHELL_METACHARACTERS = re.compile(r"[;&|<>()$`*?\[\]{}\n]")
 
 
+PYTEST_VALUE_OPTIONS = frozenset({
+    "-p", "-k", "-m", "-o", "-c", "-W", "-r", "--deselect", "--ignore",
+    "--ignore-glob", "--rootdir", "--confcutdir", "--basetemp", "--tb",
+    "--maxfail", "--keyword", "--override-ini", "--config-file",
+    "--pythonwarnings",
+})
+PYTEST_FLAGS = frozenset({
+    "--quiet", "--verbose", "--exitfirst", "--no-header", "--strict-markers",
+})
+PYTEST_SHORT_FLAG_CLUSTER = re.compile(r"-[qvxsl]+")
+
+
+def pytest_positionals(args: list[str]) -> list[str] | None:
+    """The positional arguments of a pytest argv, or None when any option is
+    not on the allowlist -- fail-closed, since an unlisted option may run no
+    tests (`--help`, `--collect-only`) or take the artifact as its value."""
+    positionals, rest = [], list(args)
+    while rest:
+        arg = rest.pop(0)
+        if not arg.startswith("-"):
+            positionals.append(arg)
+        elif arg in PYTEST_VALUE_OPTIONS:
+            if not rest:
+                return None
+            rest.pop(0)
+        elif arg in PYTEST_FLAGS or PYTEST_SHORT_FLAG_CLUSTER.fullmatch(arg):
+            continue
+        elif arg.startswith("--") and arg.split("=", 1)[0] in PYTEST_VALUE_OPTIONS and "=" in arg:
+            continue
+        elif not arg.startswith("--") and arg[:2] in PYTEST_VALUE_OPTIONS and len(arg) > 2:
+            continue
+        else:
+            return None
+    return positionals
+
+
 PROBE_RUN_TIMEOUT = int(os.environ.get("LOOM_PROBE_RUN_TIMEOUT", "600"))
 
 
@@ -331,34 +367,17 @@ def command_executes_artifact(command: str, artifact: str) -> bool:
     wanted = os.path.normpath(artifact)
     suffix = Path(artifact).suffix.lower()
     if suffix == ".py":
-        # Handle direct python command or python -m pytest
-        python = Path(tokens[0]).name.startswith("python")
-        direct = len(tokens) >= 2 and os.path.normpath(tokens[1]) == wanted
-        pytest_direct = (
-            len(tokens) >= 4 and tokens[1:3] == ["-m", "pytest"]
-            and os.path.normpath(tokens[3]) == wanted
-        )
-        # Handle uv run ... python ... or uv run ... python -m pytest ...
-        uv_run_python = (
-            len(tokens) >= 3
-            and tokens[0] == "uv"
-            and tokens[1] == "run"
-        )
-        if uv_run_python:
-            # Find the python token after uv run options
-            for i in range(2, len(tokens)):
-                if Path(tokens[i]).name.startswith("python"):
-                    python_tokens = tokens[i:]
-                    python = True
-                    direct = len(python_tokens) >= 2 and os.path.normpath(python_tokens[1]) == wanted
-                    pytest_direct = (
-                        len(python_tokens) >= 4 and python_tokens[1:3] == ["-m", "pytest"]
-                        and os.path.normpath(python_tokens[3]) == wanted
-                    )
-                    if python and (direct or pytest_direct):
-                        return True
-                    break
-        return python and (direct or pytest_direct)
+        # `uv run [opts] python ...` is checked as the python argv it wraps.
+        if tokens[:2] == ["uv", "run"]:
+            tokens = next((tokens[i:] for i in range(2, len(tokens))
+                           if Path(tokens[i]).name.startswith("python")), [""])
+        args = tokens[1:]
+        # `python -m pytest ... X ...`: every option, in any position, must be
+        # on the allowlist, and the first positional argument must be X.
+        if args[:2] == ["-m", "pytest"]:
+            args = pytest_positionals(args[2:]) or []
+        return (Path(tokens[0]).name.startswith("python") and bool(args)
+                and os.path.normpath(args[0]) == wanted)
     if suffix == ".sh":
         return len(tokens) >= 2 and Path(tokens[0]).name in {"bash", "sh"} and os.path.normpath(tokens[1]) == wanted
     return os.path.normpath(tokens[0]) in {wanted, os.path.join(".", wanted)}
