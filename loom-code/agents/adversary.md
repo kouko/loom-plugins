@@ -44,7 +44,9 @@ You attack in two parts, and the first part commits no new program.
    held. When the change held against everything you tried, name one existing
    repository test that covers the change as this change's program, adding its
    `concern:` line per the reuse rule in `adversarial.md`, when such a test
-   exists; your run then ends here with that report.
+   exists; when none exists, say so in your report, so Build can ask the
+   user, in plain words, whether to skip `adversarial`. Your run then ends
+   here with that report.
 2. **Pin what fell.** For each attack that succeeded, and only those, write
    one program that turns RED against the change as it stands. Run it, see it
    RED, and commit it; a program that is GREEN the first time you run it is

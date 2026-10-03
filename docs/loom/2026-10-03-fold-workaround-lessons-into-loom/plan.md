@@ -23,7 +23,7 @@ Wave 1 changes three independent surfaces; wave 2 bumps versions.
 - Risk: agent-decided — append one hint sentence to the existing refusal text; no retry loop, exit code unchanged; existing publish tests matching the message stay valid.
 
 **W1-03 Guidance text absorbs the lessons**  after: none  acceptance: 2, 4, 5, 6, 7
-- Files: loom-code/skills/closing-review/references/adversarial.md, loom-code/agents/implementer.md, loom-design/skills/capture-intent/SKILL.md, AGENTS.md
+- Files: loom-code/skills/closing-review/references/adversarial.md, loom-code/agents/implementer.md, loom-code/agents/adversary.md, loom-design/skills/capture-intent/SKILL.md, AGENTS.md
 - Test: A2 positive: empty-attack-reuses-test; negative: no-bare-attempt. A4 positive: bypass-rated-nit; boundary: ordinary-keeps-severity. A5 positive: removed-tests-deleted; negative: green-deletion-forbidden. A6 positive: bump-last-round; negative: rule-unchanged. A7 positive: excludes-active-change; boundary: budget-met.
 - Risk: agent-decided — prose only, no gate marker, no docs/ citation; deliberate-only findings rated nit at the source keeps Build's fix-every-important rule; description stays within the 4,047-char budget.
 
@@ -38,7 +38,7 @@ Wave 1 changes three independent surfaces; wave 2 bumps versions.
 - Risk: agent-decided — move the adversary's red probe into loom-code/tests once the value-option fix makes it green; the probe leaves the change store.
 
 ## Simplicity check
-- Drop adversary.md; adversarial.md alone holds the A2 and A4 wording — taken
+- Drop adversary.md — reverted: its 'run ends here' sentence contradicted the reuse rule
 - Drop the A7 description phrase test; the existing budget test covers the boundary — taken
 - Merge the entry-description and AGENTS.md task into the guidance task — taken
 
