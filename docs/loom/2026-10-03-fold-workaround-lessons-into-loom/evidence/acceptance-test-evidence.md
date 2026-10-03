@@ -1,5 +1,88 @@
 # Fold workaround lessons into loom — acceptance test evidence
 
+## Re-run after fix (2026-10-03, HEAD 87f73a96, fix range 162e9638..87f73a96)
+
+Clean copy: `git worktree add --detach <scratch>/at-wt2 87f73a96`.
+Setup check: criterion tests import and run in the clean copy, and
+`/opt/homebrew/bin/python3 scripts/sync_codex_manifests.py --check --all`
+exits 0, so the change loads and is usable there.
+
+Fix diff touches: `loom-code/scripts/loom_checker/probes.py`,
+`loom-code/tests/test_loom_attestation.py`, `loom-code/skills/closing-review/references/adversarial.md`,
+`loom-code/agents/adversary.md`, `loom-code/CHANGELOG.md`, the plan.
+Re-tested in full: 1, 2, 4, 8. Carried over: 3 (no change to
+`command_handlers/publish.py` or `test_loom_publish.py`), 5 (no change to
+`agents/implementer.md`), 6 (no change to `AGENTS.md`), 7 (no change to
+`loom-design/skills/capture-intent/SKILL.md`) — checked against
+`git diff --stat 162e9638..87f73a96`.
+
+### R1 (line 1)
+- How: `scratchpad/line1b.py <clean copy>` calls `command_names_artifact` and
+  `command_executes_artifact` (the pair `finalize-review` and the attestation
+  check apply) for 38 commands, artifact A = `docs/loom/c/probes/test_x_state_expected.py`.
+- What came back at 87f73a96:
+  - ACCEPT: `pytest A`, `-q A`, `-q -p no:cacheprovider A`, `--tb=short -x A`,
+    `-k smoke A`, `uv run --isolated --with pytest python -m pytest -q A`,
+    `/opt/homebrew/bin/python3 -m pytest -v -W error A`, `python3 A`,
+    `-pno:cacheprovider A`, `-rA A`, `-vx A`, `--strict-markers --no-header A`,
+    `A -q --tb=short`.
+  - REFUSE (does not run A): `tests/other.py A`, `--deselect A tests/other.py`,
+    `--ignore A tests/other.py`, `-q` (no file), `python3 -c A`, `bash A`,
+    `node A`, `A; touch x`, `--unknown-opt value A`, `uv run pytest A`,
+    `-q A --deselect` (value option with no value).
+  - REFUSE (runs no tests; earlier nit): `--co A`, `--collect-only A`,
+    `A --collect-only`, `A --co`, `A -q --co`, `--help A`, `-h A`,
+    `--version A`, `-V A`, `--setup-only A`, `--setup-plan A`, `--fixtures A`,
+    `--markers A`.
+  - REFUSE (unlisted but ordinary; fail-closed): `--junitxml out.xml A`, `-n 4 A`.
+- Extra probe with real pytest on a red test file (`scratchpad/oprobe/test_red.py`):
+  `-o addopts=--collect-only` is accepted by the checker but pytest still runs
+  the test (exit 1), so it is no bypass; `-k nomatch` is accepted and exits 5
+  (no test run, non-zero, so not a false pass).
+- Criterion tests (pass, clean copy):
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --no-project --python /opt/homebrew/bin/python3 --with pytest python -m pytest -q -p no:cacheprovider loom-code/tests/test_loom_attestation.py::test_pytest_runner_directly_executes_named_artifact loom-code/tests/test_adversarial_pytest_option_order.py loom-code/tests/test_write_plan_station_text.py::test_current_release_metadata_is_synchronized`
+  -> `5 passed`.
+- Earlier nit (collect-only accepted before the file): resolved.
+
+### R2 (line 2)
+- How: read the shipped text in the clean copy.
+- What came back: `adversarial.md:39-46` — the first part "writes no new
+  program: besides its report, it may only add a `concern:` line to an existing
+  test it names as its program"; `adversarial.md:70-76` unchanged (no attack
+  earned a program -> name one existing covering test with its `concern:`
+  line); reuse rule `adversarial.md:78-92`. `adversary.md:42-49` — same, plus
+  "when none exists, say so in your report, so Build can ask the user, in plain
+  words, whether to skip `adversarial`." Build's plain-words skip handling:
+  `loom-code/skills/build/SKILL.md:127-130`.
+
+### R4 (line 4)
+- How: read the shipped text.
+- What came back: `adversarial.md:158-164` — "A finding that only a loom agent
+  or user deliberately defeating one of loom's own internal rules (a budget, a
+  cap, a check) could trigger is rated `nit` and so recorded as a known
+  limitation; a finding reachable by untrusted input, including a deliberate
+  attacker, or without that intent keeps its severity. Build fixes every fatal
+  or important finding before hand-off" (Build's rule unchanged).
+- Note: narrower than the intent's literal wording ("someone deliberately
+  defeating a rule"); recorded in the report as decided on the user's behalf.
+
+### R8 (line 8)
+- How (clean copy): manifest check above; `"version"` grep across
+  `plugin.json`, `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`,
+  `package.json`; top CHANGELOG heading; README grep; release-metadata test (R1 run).
+- What came back: loom-code 3.29.0 x4, CHANGELOG `## [3.29.0] — 2026-10-03`,
+  3.29.0 in README / README.ja / README.zh-TW; loom-design 2.11.0 x4,
+  CHANGELOG `## [2.11.0] — 2026-10-03`; loom-workflow 5.6.2 unchanged,
+  `git diff --stat fa7d0dee..HEAD -- loom-workflow` empty.
+- Full suite: not run by me this round (step 6). It is executed by
+  `finalize-review`, which refuses the attestation on failure:
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+  The orchestrator reports this command exited 0 on 87f73a96 (not my result).
+
+---
+
+## First run
+
 Tried on 2026-10-03, in a clean copy of the project at 18ce2b02
 (`git worktree add --detach <scratch>/at-wt HEAD`). For comparison a second
 clean copy at the base commit fa7d0dee was made (`<scratch>/base-wt`).
