@@ -98,7 +98,7 @@ The full station summary table (what each station reads, produces, and when the 
 # --- repo defaults --------------------------------------------------------
 DEFAULTS_FILE="docs/loom/KICKOFF-DEFAULTS.md"
 if [ -f "${DEFAULTS_FILE}" ]; then
-  defaults="$(sed -n 's/^-[[:space:]]\{1,\}\(.*: .*\)$/- \1/p' "${DEFAULTS_FILE}")"
+  defaults="$(sed -n 's/^-[[:space:]]\{1,\}\(.*: .*\)$/- \1/p' "${DEFAULTS_FILE}" | tr -d '\000-\010\013-\037\177')"
   if [ -n "${defaults}" ]; then
     body="${body}
 

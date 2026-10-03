@@ -129,6 +129,22 @@ def test_kickoff_defaults_lines_are_injected_when_the_file_exists(empty_repo, tm
     assert "standing-docs: waived — spike repo (2026-09-02)" in context
 
 
+def test_kickoff_defaults_control_characters_do_not_break_the_json(tmp_path, manifest):
+    repo = tmp_path / "repo-with-control-chars"
+    (repo / "docs" / "loom").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
+        "# KICKOFF-DEFAULTS\n\n- second-vendor: codex\f \x1b[31mred\x1b[0m (2026-09-02)\n"
+        "- standing-docs: waived — spike repo (2026-09-02)\n",
+        encoding="utf-8",
+    )
+    context = _context(_run(repo))
+    flow = [s["name"] for s in manifest["stations"] if s["name"] != "maintain"]
+    assert " → ".join(flow) in context
+    assert "standing-docs: waived — spike repo (2026-09-02)" in context
+    assert "\f" not in context and "\x1b" not in context
+
+
 def test_no_kickoff_section_when_the_file_is_absent(empty_repo):
     assert "KICKOFF-DEFAULTS" not in _context(_run(empty_repo))
 
