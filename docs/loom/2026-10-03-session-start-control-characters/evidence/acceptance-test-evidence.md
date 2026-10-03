@@ -102,3 +102,79 @@ noted.
   finalize-review executes it and refuses the attestation on failure. (The
   orchestrator reported its own run of it at d01d6ddb with exit 0; not
   witnessed here.)
+
+## Re-run on 2026-10-03, at 4dea7292
+Fix range 834115b2..4dea7292 (a10e667d: `|| cat` fallback when iconv is
+missing or fails, sed under `LC_ALL=C`; 4dea7292: form feed and vertical tab
+become spaces, CHANGELOG 3.29.1 bullet reworded). Fresh detached worktrees at
+4dea7292 (head), c14e176c (base) and 834115b2 (previous head), none edited.
+
+Setup check: `claude plugin validate <head>/loom-code` -> "Validation passed";
+`loom-code/hooks/hooks.json` still registers `hooks/session-start` for
+SessionStart (`startup|clear|compact`).
+
+Harness (scratch `walk2.py`, not committed): one fresh `git init` repo per
+case, bytes written to `docs/loom/KICKOFF-DEFAULTS.md`, `/bin/bash
+<tree>/loom-code/hooks/session-start </dev/null` under `LC_ALL=en_US.UTF-8`
+and `LC_ALL=C`, stdout parsed with strict `json.loads(stdout.decode("utf-8"))`.
+Every head case was also run with no working iconv, two ways:
+- shim127: PATH prefixed with a dir whose `iconv` is `#!/bin/sh` + `exit 127`
+  (exits without reading stdin);
+- no-iconv: PATH set to a dir of symlinks to every `/usr/bin` and `/bin`
+  tool except `iconv` (`command -v iconv` finds nothing).
+A first attempt with a hand-picked tool list exited 127 because `paste` was
+missing from that PATH; a harness gap, not the hook. Rebuilt as above.
+
+- 1: re-tested — cases, each followed by `- standing-docs: waived (2026-09-02)`:
+
+  | case | base c14e176c | head 4dea7292 (iconv) | head shim127 / no-iconv |
+  |---|---|---|---|
+  | form feed mid-line `strict\x0cpage two` | exit 0, JSON invalid (col 2682) | valid; station order; `- review-note: strict page two (2026-10-03)` + standing-docs | byte-identical to the iconv run, valid, both locales |
+  | vertical tab mid-line | JSON invalid (col 2682) | valid; `- review-note: strict page two (2026-10-03)` + standing-docs | identical, valid |
+  | form feed between dash and key `-\x0creview-note:` | valid, line kept | valid, line kept, byte-identical to base (834115b2 dropped this line) | identical, valid |
+  | CJK + form feed `繁體\x0c中文` | JSON invalid (col 2669) | valid; `- 語言: 繁體 中文 (2026-10-03)` + standing-docs | identical, valid |
+  | ESC colour code | JSON invalid (col 2675) | valid; `- shell-note: [31mred[0m pasted (2026-10-03)` + standing-docs (same bytes as 834115b2) | identical, valid |
+  | ESC between dash and key | valid, line dropped | valid; `- second-vendor: suggest (2026-10-03)` kept (same as 834115b2) | identical, valid |
+  | BEL / DEL / NUL | JSON invalid | valid; `- note-a: xyzw (2026-10-03)` (same as 834115b2) | identical, valid |
+  | invalid UTF-8 `caf\xe9 \x85` | UTF-8 locale: exit 1, no output (`sed: RE error: illegal byte sequence`) | valid; `- lang-note: caf  pasted (2026-10-03)` | exit 0, 2769 bytes, NOT decodable as UTF-8 (0xe9 passes through), both locales |
+
+  No head context (any PATH) contained a character below U+0020 other than
+  newline and tab; station order present in every head run. The
+  invalid-UTF-8-without-iconv row is outside line 1 (form feed / ESC) and
+  matches the CHANGELOG's stated limitation; whether Claude Code accepts that
+  output was not tried here.
+- 2: re-tested — head vs base, byte for byte, both locales, plus shim127 / no-iconv:
+  - repository's own defaults file: 4299 bytes, identical to base; identical under shim127 and no-iconv
+  - synthetic three-key file with a tab-indented line: 2808 bytes, identical; same without iconv
+  - CJK only: 2788 bytes, identical; same without iconv
+  - lone CR endings: 2624 bytes, identical; same without iconv
+  - no defaults file: 2624 bytes, identical; same without iconv
+  - CRLF endings: not identical, as in the first run (base 2771 bytes with an
+    escaped `\r` per defaults line, head 2767 without); same visible text, both valid
+- 3: re-tested — the 3.29.0 first bullet is untouched by the fix (the diff
+  changes only the 3.29.1 first bullet) and still reads "... A no-run option
+  injected through a configuration override (`-o addopts=--collect-only`)
+  still gets through; this is a known limitation." Checker re-run from
+  `<head>/loom-code/scripts`:
+  `pytest_positionals(['--collect-only','t.py'])` -> None,
+  `(['--help','t.py'])` -> None, `(['-o','addopts=--collect-only','t.py'])` -> ['t.py'];
+  `command_executes_artifact('python3 -m pytest t.py --collect-only','t.py')` -> False,
+  `('python3 -m pytest -o addopts=--collect-only t.py','t.py')` -> True.
+  The reworded 3.29.1 bullet was checked against the runs above: form feed and
+  vertical tab become spaces, other control characters removed, invalid bytes
+  dropped with iconv and passed through without it, and a missing or failing
+  iconv no longer silences the hook (exit 0 in every shim127 / no-iconv run):
+  all confirmed.
+- 4: re-tested — the fix touched a test file, so the criterion's tests were re-run:
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --no-project --python /opt/homebrew/bin/python3 --with pytest --with pyyaml python -m pytest -q -p no:cacheprovider loom-code/tests/test_session_start_words.py loom-code/tests/test_adversarial_session_start_c1_byte.py "loom-code/tests/test_write_plan_station_text.py::test_current_release_metadata_is_synchronized"`
+  -> `17 passed in 0.88s` (one more than the first run: the new failing-iconv test).
+  `scripts/sync_codex_manifests.py --check --all` exit 0. Versions:
+  `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`,
+  `loom-code/.codex-plugin/plugin.json`, `loom-code/package.json` all 3.29.1;
+  `README.md:17`, `README.md:132`, `loom-code/README.md`, `loom-code/README.ja.md`,
+  `loom-code/README.zh-TW.md` carry 3.29.1; no manifest or README changed in the
+  fix range. (Correction to the first run: those manifests and the ja / zh-TW
+  READMEs live under `loom-code/`.) Full suite not run by the acceptance
+  tester; `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+  is executed by finalize-review, which refuses the attestation on failure.
+  (Orchestrator reported its own run at 4dea7292 with exit 0; not witnessed here.)
