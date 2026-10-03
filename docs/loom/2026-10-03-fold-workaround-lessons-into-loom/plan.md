@@ -32,6 +32,11 @@ Wave 1 changes three independent surfaces; wave 2 bumps versions.
 - Test: A8 positive: release-metadata sync tests pass at the new versions; negative: `sync_codex_manifests.py --check --all` exits 0.
 - Risk: agent-decided — minor for loom-code (station guidance, checker) and loom-design (entry description); loom-workflow untouched.
 
+**W3-01 Graduate the pytest option-order probe into the suite**  after: W2-01  acceptance: 1
+- Files: docs/loom/2026-10-03-fold-workaround-lessons-into-loom/evidence/probes/test_abuse_pytest_option_order.py, loom-code/tests/test_adversarial_pytest_option_order.py
+- Test: A1 positive: value-option-before-artifact-accepted; negative: deselected-artifact-refused.
+- Risk: agent-decided — move the adversary's red probe into loom-code/tests once the value-option fix makes it green; the probe leaves the change store.
+
 ## Simplicity check
 - Drop adversary.md; adversarial.md alone holds the A2 and A4 wording — taken
 - Drop the A7 description phrase test; the existing budget test covers the boundary — taken
