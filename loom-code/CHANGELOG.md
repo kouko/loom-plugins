@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.29.0] — 2026-10-03 — workaround lessons folded into loom guidance and checker.
+
+- The checker accepts an adversarial program command whose pytest options come before the test file, and still refuses a command that does not run the declared program.
+- The publish refusal for an existing pull request whose identity does not match origin, HEAD and base now says that right after a push GitHub may not yet show the new commit, so retry once and stop if it is refused again; publish itself still never retries.
+- `adversarial.md`: an attack that found nothing worth a new program names an existing repository test that covers its case as its program, with a `concern:` line, instead of a bare attempt; a finding that only someone deliberately defeating a rule could trigger is rated `nit` and recorded as a known limitation, while one that can happen without that intent keeps its severity.
+- The implementer contract says the tests that only check a removed behaviour are deleted with it, and that this is not deleting a test to reach green.
+
 ## [3.28.0] — 2026-10-02 — software-development requests enter loom on every host.
 
 - The session-start text gains a routing paragraph: any request to add a feature or fix a bug starts at the entry station (write-plan when loom-design is not installed) before any file is edited, in any repository, even when loom is not named; a user's bug-fix request starts there even when it reads as a bug report, while alerts, CI or regression failures and dogfood incidents without a fix request start at the maintain station. Outside an active change, a feature or bug-fix request goes through loom however small; other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) go direct unless the user asks for loom. The loom-design-absent fallback station is derived from the manifest.
