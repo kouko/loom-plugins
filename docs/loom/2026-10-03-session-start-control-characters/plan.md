@@ -22,6 +22,11 @@ Wave 1 fixes the hook; wave 2 rewords the 3.29.0 bullet and bumps the version.
 - Test: A3 positive: changelog-names-config-override-gap; negative: no-always-refused-claim. A4 positive: release-metadata sync test passes at 3.29.1; negative: `sync_codex_manifests.py --check --all` exits 0.
 - Risk: agent-decided — patch for loom-code (hook fix, no guidance, field or rule change); reword the 3.29.0 bullet in place, no allowlist code change; loom-design and loom-workflow untouched.
 
+**W3-01 Graduate the non-UTF-8 byte probe into the suite**  after: W2-01  acceptance: 1
+- Files: docs/loom/2026-10-03-session-start-control-characters/evidence/probes/test_session_start_c1_byte_keeps_json.py, loom-code/tests/test_adversarial_session_start_c1_byte.py
+- Test: A1 positive: invalid-utf8-byte-keeps-valid-json; negative: other-defaults-line-still-present.
+- Risk: agent-decided — move the adversary's red probe into loom-code/tests once the hook fix makes it green; the probe leaves the change store.
+
 ## Simplicity check
 - One new test, reusing the existing defaults test as A2 evidence — taken
 - Fold the CHANGELOG rewording into the release-metadata task — taken
