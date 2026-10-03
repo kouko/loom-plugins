@@ -312,8 +312,37 @@ SHELL_METACHARACTERS = re.compile(r"[;&|<>()$`*?\[\]{}\n]")
 PYTEST_VALUE_OPTIONS = frozenset({
     "-p", "-k", "-m", "-o", "-c", "-W", "-r", "--deselect", "--ignore",
     "--ignore-glob", "--rootdir", "--confcutdir", "--basetemp", "--tb",
-    "--maxfail",
+    "--maxfail", "--keyword", "--override-ini", "--config-file",
+    "--pythonwarnings",
 })
+PYTEST_FLAGS = frozenset({
+    "--quiet", "--verbose", "--exitfirst", "--no-header", "--strict-markers",
+})
+PYTEST_SHORT_FLAG_CLUSTER = re.compile(r"-[qvxsl]+")
+
+
+def pytest_positionals(args: list[str]) -> list[str] | None:
+    """The positional arguments of a pytest argv, or None when any option is
+    not on the allowlist -- fail-closed, since an unlisted option may run no
+    tests (`--help`, `--collect-only`) or take the artifact as its value."""
+    positionals, rest = [], list(args)
+    while rest:
+        arg = rest.pop(0)
+        if not arg.startswith("-"):
+            positionals.append(arg)
+        elif arg in PYTEST_VALUE_OPTIONS:
+            if not rest:
+                return None
+            rest.pop(0)
+        elif arg in PYTEST_FLAGS or PYTEST_SHORT_FLAG_CLUSTER.fullmatch(arg):
+            continue
+        elif arg.startswith("--") and arg.split("=", 1)[0] in PYTEST_VALUE_OPTIONS and "=" in arg:
+            continue
+        elif not arg.startswith("--") and arg[:2] in PYTEST_VALUE_OPTIONS and len(arg) > 2:
+            continue
+        else:
+            return None
+    return positionals
 
 
 PROBE_RUN_TIMEOUT = int(os.environ.get("LOOM_PROBE_RUN_TIMEOUT", "600"))
@@ -343,17 +372,10 @@ def command_executes_artifact(command: str, artifact: str) -> bool:
             tokens = next((tokens[i:] for i in range(2, len(tokens))
                            if Path(tokens[i]).name.startswith("python")), [""])
         args = tokens[1:]
-        # `python -m pytest [-opts] X`: the first non-option argument is X.
-        # A known option's separate value (`-p no:cacheprovider`) is skipped;
-        # an unknown option's value is taken as X and refused -- fail-closed.
+        # `python -m pytest ... X ...`: every option, in any position, must be
+        # on the allowlist, and the first positional argument must be X.
         if args[:2] == ["-m", "pytest"]:
-            rest, args = args[2:], []
-            while rest:
-                arg = rest.pop(0)
-                if arg in PYTEST_VALUE_OPTIONS:
-                    rest = rest[1:]
-                elif not arg.startswith("-"):
-                    args.append(arg)
+            args = pytest_positionals(args[2:]) or []
         return (Path(tokens[0]).name.startswith("python") and bool(args)
                 and os.path.normpath(args[0]) == wanted)
     if suffix == ".sh":
