@@ -7,14 +7,9 @@ value naming the artifact lets a different program run in its place.
 """
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[5] / "loom-code" / "scripts"))
-
-from loom_checker import probes  # noqa: E402
+from loom_checker import probes
 
 ARTIFACT = "tests/probe.py"
 
