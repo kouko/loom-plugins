@@ -2,9 +2,9 @@
 
 ## [3.29.0] — 2026-10-03 — workaround lessons folded into loom guidance and checker.
 
-- The checker accepts an adversarial program command whose pytest options come before the test file, and still refuses a command that does not run the declared program.
+- The checker accepts an adversarial program command whose pytest options come before the test file, skipping the value of common pytest options that take one (`-p no:cacheprovider`); it still refuses a command that does not run the declared program, including one whose option value names it (`--deselect`).
 - The publish refusal for an existing pull request whose identity does not match origin, HEAD and base now says that right after a push GitHub may not yet show the new commit, so retry once and stop if it is refused again; publish itself still never retries.
-- `adversarial.md`: an attack that found nothing worth a new program names an existing repository test that covers its case as its program, with a `concern:` line, instead of a bare attempt; a finding that only someone deliberately defeating a rule could trigger is rated `nit` and recorded as a known limitation, while one that can happen without that intent keeps its severity.
+- `adversarial.md`: an attack the change survives is still reported as an attempt, and when no attack earned a new program the adversary names an existing repository test that covers the change as its program, with a `concern:` line (the adversary contract says the same); a finding that only someone deliberately defeating a rule could trigger is rated `nit` and recorded as a known limitation, while one that can happen without that intent keeps its severity.
 - The implementer contract says the tests that only check a removed behaviour are deleted with it, and that this is not deleting a test to reach green.
 
 ## [3.28.0] — 2026-10-02 — software-development requests enter loom on every host.
