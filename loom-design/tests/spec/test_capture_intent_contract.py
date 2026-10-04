@@ -1,3 +1,4 @@
+# concern: capture-intent's complexity check drifts out of Step 4, loses a pinned sentence (one stop, trigger, exemption, absent-plugin skip), swaps critique's mode or reaches into loom-workflow's files
 """capture-intent station contract (plan W2-01).
 
 The station is loom-design's entry point. These tests check its structure:
