@@ -51,7 +51,9 @@ def main() -> int:
         return 0
     if not isinstance(payload, dict):
         return 0
-    event = payload.get("hook_event_name") or "PostToolUse"
+    event = payload.get("hook_event_name", "PostToolUse")
+    if event not in ("SessionStart", "PostToolUse"):
+        return 0
     if event != "SessionStart" and payload.get("tool_name") not in ("Skill", "Agent"):
         return 0
     transcript_path = payload.get("transcript_path")

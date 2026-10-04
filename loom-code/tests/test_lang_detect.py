@@ -117,6 +117,42 @@ def test_conversation_language_skips_malformed_line(tmp_path):
     assert lang_detect.conversation_language(transcript) == "ja"
 
 
+_ZH = "請幫我確認這個修改是否符合原本的設計規範，並且說明理由。"
+_SUMMARY = (
+    "This session is being continued from a previous conversation that ran "
+    "out of context. The summary below covers the earlier portion."
+)
+_REINVOKE = (
+    "(Re-invocation of /loom-code:build) Implement a committed plan with "
+    "test-first changes when a confirmed intent and plan are ready."
+)
+
+
+def _write(tmp_path, entries):
+    lines = [json.dumps({"type": "user", **flags, "message": {"content": text}})
+             for text, flags in entries]
+    transcript = tmp_path / "transcript.jsonl"
+    transcript.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return transcript
+
+
+@pytest.mark.parametrize(
+    "entries, expected",
+    [
+        ([(_ZH, {}), (_SUMMARY, {"isCompactSummary": True})], "zh"),
+        ([(_ZH, {}), (_SUMMARY, {})], "zh"),
+        ([(_ZH, {}), (_REINVOKE, {"isMeta": True})], "zh"),
+        ([(_ZH, {}), (_REINVOKE, {})], "zh"),
+        ([(_ZH, {}), ("Please check that this change matches the design.", {}),
+          ("Please explain why the review failed on this branch.", {})], "en"),
+    ],
+    ids=["compact-flag", "compact-prefix", "reinvoke-meta", "reinvoke-prefix",
+         "genuine-english-still-counts"],
+)
+def test_conversation_language_ignores_harness_written_turns(tmp_path, entries, expected):
+    assert _load_lang_detect().conversation_language(_write(tmp_path, entries)) == expected
+
+
 def test_conversation_language_missing_file_returns_none(tmp_path):
     lang_detect = _load_lang_detect()
     missing = tmp_path / "does_not_exist.jsonl"
