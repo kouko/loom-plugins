@@ -223,6 +223,9 @@ mechanisms:
   - id: "SessionStart:compact|resume:language-anchor.py"
     class: host-hygiene   # excluded from the net count, like its PostToolUse twin.
     eval: loom-code/tests/test_language_anchor_hook.py::test_session_start_compact_emits_with_session_start_event
+  - id: "UserPromptSubmit::language-anchor.py"
+    class: host-hygiene   # excluded from the net count, like its PostToolUse twin.
+    eval: loom-code/tests/test_language_anchor_hook.py::test_user_prompt_submit_emits_with_user_prompt_submit_event
   - id: "SessionStart:startup|clear|compact:session-start@opencode"
     class: hook
     eval: loom-code/tests/test_opencode_loader.py

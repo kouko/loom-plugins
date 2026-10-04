@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Language anchor hook: PostToolUse (tool_name "Skill" or "Agent") and
-SessionStart (compact / resume) — re-states the conversation language.
+"""Language anchor hook: PostToolUse (tool_name "Skill" or "Agent"),
+SessionStart (compact / resume) and UserPromptSubmit — re-states the
+conversation language.
 
 Detects the conversation language from the transcript (via
 ``lang_detect.conversation_language()``, reused by path — no target
@@ -52,9 +53,9 @@ def main() -> int:
     if not isinstance(payload, dict):
         return 0
     event = payload.get("hook_event_name", "PostToolUse")
-    if event not in ("SessionStart", "PostToolUse"):
+    if event not in ("SessionStart", "PostToolUse", "UserPromptSubmit"):
         return 0
-    if event != "SessionStart" and payload.get("tool_name") not in ("Skill", "Agent"):
+    if event == "PostToolUse" and payload.get("tool_name") not in ("Skill", "Agent"):
         return 0
     transcript_path = payload.get("transcript_path")
     if not transcript_path:

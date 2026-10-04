@@ -4,8 +4,9 @@ entry (concept-model §7, §7a).
 The old mechanism (git-guard, ask-triage, the router card, the family
 reception/relay prose, language-stop-check) is deleted; what remains is
 SessionStart -> hooks/session-start, PreToolUse(Bash) -> the single
-loom checker, PostToolUse(Skill) -> language-anchor (host hygiene, not a
-loom flow mechanism — plan W0-05 risk note).
+loom checker, PostToolUse(Skill|Agent), SessionStart(compact|resume) and
+UserPromptSubmit -> language-anchor (host hygiene, not a loom flow
+mechanism — plan W0-05 risk note).
 
 External surfaces grounded:
 - Claude Code hook config shape (``hooks.<Event>[].matcher`` +
@@ -61,7 +62,7 @@ def _commands(entries) -> list[str]:
 
 
 def test_event_set_is_exact(hooks):
-    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse"}
+    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit"}
 
 
 def test_codex_event_set_is_session_start_and_publication_interception(codex_hooks):
@@ -147,6 +148,11 @@ def test_post_tool_use_keeps_language_anchor(hooks):
     assert _matchers(hooks["PostToolUse"]) == {"Skill|Agent"}
     (command,) = _commands(hooks["PostToolUse"])
     assert "/hooks/language-anchor.py" in command
+
+
+def test_user_prompt_submit_runs_language_anchor(hooks):
+    (command,) = _commands(hooks["UserPromptSubmit"])
+    assert command == 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"'
 
 
 def test_no_removed_hook_is_referenced(hooks):

@@ -154,9 +154,32 @@ def test_session_start_compact_emits_with_session_start_event():
     assert ZH_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
 
 
+def test_user_prompt_submit_emits_with_user_prompt_submit_event():
+    """A background agent's completion notification starts a turn through
+    UserPromptSubmit, which carries no tool_name; the anchor fires there."""
+    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
+    result = run_hook(
+        {"hook_event_name": "UserPromptSubmit", "transcript_path": transcript}
+    )
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
+    assert ZH_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
+
+
+def test_user_prompt_submit_en_majority_stays_silent():
+    transcript = _write_transcript([EN_TURN, EN_TURN, EN_TURN])
+    result = run_hook(
+        {"hook_event_name": "UserPromptSubmit", "transcript_path": transcript}
+    )
+    assert result.returncode == 0
+    assert result.stdout == ""
+
+
 @pytest.mark.parametrize("event", [["SessionStart"], "Stop", 7])
 def test_unknown_hook_event_name_stays_silent(event):
-    """Only "SessionStart" / "PostToolUse" are echoed back as hookEventName."""
+    """Only "SessionStart" / "PostToolUse" / "UserPromptSubmit" are echoed
+    back as hookEventName."""
     transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
     result = run_hook(
         {"hook_event_name": event, "tool_name": "Skill", "transcript_path": transcript}
