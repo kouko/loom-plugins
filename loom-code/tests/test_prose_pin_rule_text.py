@@ -177,17 +177,24 @@ def test_engineeringbaselinemd_codefirstbackfill_present() -> None:
     characterised first and its scope recorded (A1); an uninstructed skip
     stays a violation, later code follows the iron law, and a compile
     failure proves only a missing interface (A2). The legacy paragraph it
-    extends stays."""
-    from prose_pin import affirms, rule_prose
+    extends stays. Each sentence is pinned exactly: a keyword-subset pin
+    admits a clause that reverses the rule without a negation word."""
+    from prose_pin import affirms, pins_exact_sentence, rule_prose
 
     text = rule_prose(BASELINE_MD)
-    assert affirms(text, "characterises", "predates the flow",
-                   "skipped-by-instruction: tdd", "bugs included")
-    assert affirms(text, "remains", "violation", "uninstructed skip")
-    assert affirms(text, "follows", "iron law", "after the flow began")
-    assert affirms(text, "proves only", "interface is missing",
-                   "compile or import failure")
-    assert affirms(text, "break", "watch the test fail", "false-green diagnostic")
+    for sentence in (
+        "**Code-first backfill.** When the user instructs a `tdd` skip in "
+        "plain words for code written before the flow began "
+        "(`skipped-by-instruction: tdd <date>`), the backfill characterises "
+        "that code first — pin its current behaviour, bugs included — before "
+        "changing it, and the plan records which code predates the flow.",
+        "An uninstructed skip remains a violation.",
+        "Code written after the flow began follows the iron law.",
+        "A compile or import failure proves only that an interface is missing;",
+        "break the covered behaviour and watch the test fail (false-green "
+        "diagnostic) to show it catches a defect.",
+    ):
+        assert pins_exact_sentence(text, sentence), sentence
     assert affirms(text, "is", "violation whatever the code's age")
 
 
