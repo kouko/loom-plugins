@@ -5,7 +5,8 @@ Tried on 2026-10-04, in a clean copy of the project at a5d7235b
 Claude Code 2.1.289. Interpreter for direct hook runs: bare `python3`, as
 the installed hook command uses it. Scratch transcripts lived under
 `.git/loom-scratch/at-tx/` and `/tmp/at-relay/`; nothing from them is
-committed.
+committed. A re-run after the fix (da74a343..22042c50) is the last
+section of this file.
 
 ## Setup
 - How I tried it: README "Install" section names `claude plugin install
@@ -185,3 +186,108 @@ committed.
   the three loom-code READMEs, and CHANGELOG `## [3.31.0] — 2026-10-04`.
 - Full package suite command (run by `finalize-review`, which refuses the
   attestation on failure): `scripts/run_package_tests.py --loom-family`.
+
+## Re-run on 2026-10-04, at 22042c50
+Fix range da74a343..22042c50: plan W1-04; `language-anchor.py` accepts
+`UserPromptSubmit` (tool_name check now only for PostToolUse); `hooks.json`
+gains a matcher-less `UserPromptSubmit` entry; `mechanisms.yaml` registers
+it; CHANGELOG bullet; tests. `git diff da74a343..22042c50 --
+loom-code/skills loom-code/agents contract` is empty (0 lines).
+
+- Setup: re-tested — fresh clean copy `git worktree add
+  .git/loom-scratch/at-relay2 22042c50`; `claude plugin validate
+  <clean copy>/loom-code` → `✔ Validation passed`; `hooks.json parses`.
+  Live sessions used `claude -p --model haiku --plugin-dir <clean
+  copy>/loom-code`, cwd under `/tmp/at-relay2/`. The installed loom-code is
+  3.30.0, whose hooks.json has no UserPromptSubmit language anchor and
+  whose zh text still says 繁體中文, so the new zh wording on a
+  `UserPromptSubmit` entry can only come from the clean copy.
+- 1: carried over — the fix changes no station text (empty diff above).
+- 2: carried over — the fix changes no station text (empty diff above).
+- 3: re-tested — every surface the line names (after compaction, after
+  resume, subagent result return foreground and background), plus the
+  English-silent negative.
+  - Direct hook runs (`python3 <clean copy>/loom-code/hooks/language-anchor.py`,
+    synthetic transcripts of 3 user turns, files under `/tmp/at-relay2/direct/`):
+
+    | Payload | Transcript | Output |
+    |---|---|---|
+    | UserPromptSubmit | zh-TW, zh-CN | zh anchor, `hookEventName: UserPromptSubmit` |
+    | UserPromptSubmit | ja | ja anchor, `hookEventName: UserPromptSubmit` |
+    | UserPromptSubmit | en, ko | silent, exit 0 |
+    | UserPromptSubmit | 3 zh-TW turns + 3 `<task-notification>` turns (English result text) | zh anchor |
+    | UserPromptSubmit | empty file; payload without transcript_path | silent, exit 0 |
+    | PostToolUse Bash; Stop | zh-TW | silent, exit 0 |
+    | SessionStart compact | zh-TW | zh anchor, `hookEventName: SessionStart` |
+
+  - Live A (session 5986cd83, `/tmp/at-relay2/live-bg`): Chinese prompt
+    asking for a background Agent, written with many English identifiers
+    (`run_in_background: true`, `subagent_type`, `general-purpose`). No
+    language anchor anywhere in the transcript — not at launch, not on the
+    completion turn. `lang_detect.conversation_language(<transcript>)` →
+    `en`; piping the transcript to the hook as UserPromptSubmit → silent.
+    This is the pre-existing per-letter weighting (deferred follow-up), not
+    the fix; the earlier run's trial 4 used a plainer prompt.
+  - Live B (session 923deecf, `/tmp/at-relay2/live-bg2`): plain Chinese
+    prompt 「請派一個在背景執行的子代理（背景模式要打開）…」.
+    Line 32 Agent tool_use with `run_in_background`; lines 34-35
+    `PostToolUse:Agent` + zh anchor at launch (15:01:08.498Z); line 47 the
+    user-role `<task-notification>` completion turn (15:01:11.728Z);
+    lines 48-50 UserPromptSubmit additionalContext entries, line 50 = the zh
+    anchor 「對使用者的敘述一律使用使用者在對話中所用的語言與文字；…」
+    (15:01:11.761Z); line 52 reply in Chinese. So the anchor now reaches
+    the model on the background completion turn.
+  - Live C, English negative (session 80c6ff97, `/tmp/at-relay2/live-en`):
+    English prompt for a background Agent. Lines 17-18 and 45-46 are the
+    only UserPromptSubmit additionalContext entries (user's delegation hook
+    and the loom-workflow card); `grep -c` for the zh/ja anchor text → 0;
+    no `hook_error` / `non_blocking_error` entries in either B or C.
+  - Resume: Live D (session 7f37281e, `/tmp/at-relay2/live-cn`) line 41-43
+    `SessionStart:resume` + zh anchor; line 48 UserPromptSubmit zh anchor
+    on the resumed turn.
+  - Compaction: unchanged code path (`SessionStart` branch untouched by the
+    diff); direct run above still emits; the earlier live trial 3 stands.
+  - First message of a session gets no anchor: in Live B the first
+    UserPromptSubmit (lines 17-18) carried none. The hook reads the
+    transcript, which does not yet hold the prompt being submitted:
+    `conversation_language(head -8)` → `None`, `(head -16)` (prompt
+    written) → `zh`. The hook does not read the payload's `prompt` field.
+  - Still not covered: Codex and OpenCode hosts (not rewired, plan Risk 3);
+    the first message of a session (above); interactive-mode background
+    completion (print mode only tried); zh dense with English terms
+    (deferred follow-up, disclosed at PR and decision point ③); languages
+    other than zh/ja (out of scope, no Acceptance line requires them).
+    `SubagentStop` remains unwired.
+- 4: re-tested — the anchor now fires on every user turn, so exposure of a
+  Simplified-Chinese user to the Traditional-script anchor text grew.
+  - `_ANCHOR_TEXT` unchanged in the diff; zh text names no script variant.
+  - Two-turn zh-CN sessions (turn 1 「你好，请用一句话介绍一下你自己。」, turn 2
+    via `--resume` 「请用两三句话说明为什么写测试很重要。」), script
+    `/tmp/at-relay2/trial.sh`, counting a fixed set of Traditional-only vs
+    Simplified-only characters in the turn-2 reply:
+
+    | Run | Clean copy loaded | Anchor entries | Turn-2 reply script |
+    |---|---|---|---|
+    | 7f37281e | yes | 2 (resume + UserPromptSubmit) | Traditional (「測試讓你在改動代碼時有信心…」) |
+    | 6c8ef1d3, 4a4bb1b8, 609a8527, b4a06609, 4c5a32b6, 2d025911, e9a96091 | yes | 2 each | Simplified (7–15 Simplified-only chars, 0 Traditional-only) |
+    | 232591a9, 0d230739, 236ca93f | no (control) | 0 | Simplified |
+
+    1 of 8 with the anchor flipped to Traditional; 0 of 3 without. The
+    sample cannot separate the anchor from chance; the user's own
+    Traditional-Chinese delegation card is present in every run, both arms.
+- 5: carried over — the fix changes no station or agent text (empty diff
+  above); the English-artifact sentences are in skill files outside the
+  fix range.
+- 6: re-tested.
+  - Same criterion command as row 6 above, run in the clean copy at
+    22042c50 → `132 passed in 6.16s` (3 more than before: the two new
+    UserPromptSubmit anchor tests and the hooks.json UserPromptSubmit test).
+  - Registry touched by the fix: `pytest loom-code/tests/test_check_mechanisms.py -q`
+    → `66 passed in 3.49s`.
+  - `/opt/homebrew/bin/python3 scripts/sync_codex_manifests.py --check --all`
+    → exit 0. Version 3.31.0 in the four loom-code manifests, root README
+    (2 places), the three loom-code READMEs and CHANGELOG
+    `## [3.31.0] — 2026-10-04`.
+  - Full package suite (`scripts/run_package_tests.py --loom-family`) not
+    run here; `finalize-review` runs it on committed content and refuses
+    the attestation on failure.
