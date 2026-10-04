@@ -1,3 +1,4 @@
+# concern: capture-intent's complexity check drifts out of Step 4, loses a pinned sentence (one stop, trigger, exemption, absent-plugin skip), swaps critique's mode or reaches into loom-workflow's files
 """capture-intent station contract (plan W2-01).
 
 The station is loom-design's entry point. These tests check its structure:
@@ -72,6 +73,47 @@ def _section(text: str, heading: str) -> str:
     m = re.search(rf"^{re.escape(heading)}$.*?(?=^## |\Z)", text, re.M | re.S)
     assert m, f"section {heading!r} missing"
     return m.group(0)
+
+
+STEP_4 = "## Step 4 — Decision point ①: restate and confirm"
+
+# Whole sentences, not keyword subsets: a keyword pin lets reversed meaning pass.
+NO_SECOND_STOP = (
+    "Compose **one message**. Everything below goes into it; you do not stop "
+    "twice, and this is the only stop this station makes."
+)
+COMPLEXITY_CHECK = (
+    "When the user's request or an option under discussion would add a "
+    "mechanism, field, rule or step, run `loom-workflow:critique` in complexity "
+    "mode before you compose this message.",
+    "Carry only its verdict and its smaller alternative into this message, in "
+    "the user's plain words; this adds no stop, and the user still chooses.",
+    "Never paste critique's full response, its mindset or its "
+    "question-by-question shape.",
+    "A request that adds no such cost, such as a bug fix or a wording change, "
+    "does not run it.",
+    "When loom-workflow is not installed, skip this item; the rest of this "
+    "message is unchanged.",
+)
+
+
+def _flat(text: str) -> str:
+    return " ".join(text.split())
+
+
+def test_step_4_runs_complexity_check_in_the_one_message() -> None:
+    """A1-A4 positive, A2 boundary: the pinned sentences and the one-stop rule."""
+    step_4 = _flat(_section(_text(), STEP_4))
+    for sentence in (NO_SECOND_STOP, *COMPLEXITY_CHECK):
+        assert sentence in step_4, sentence
+
+
+def test_critique_named_only_in_step_4() -> None:
+    """A1 negative: no other step runs it, and no path reaches into loom-workflow."""
+    text = _text()
+    outside = text.replace(_section(text, STEP_4), "")
+    assert "critique" not in outside.lower()
+    assert "loom-workflow/" not in text
 
 
 def test_skill_file_exists() -> None:
@@ -163,17 +205,21 @@ def test_loom_design_version_2_2_0_consistent() -> None:
     agy_manifest = json.loads(
         (REPO / "loom-design/plugin.json").read_text(encoding="utf-8")
     )
+    package_manifest = json.loads(
+        (REPO / "loom-design/package.json").read_text(encoding="utf-8")
+    )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.11.0"
-    assert codex_manifest["version"] == "2.11.0"
-    assert agy_manifest["version"] == "2.11.0"
-    assert "## [2.11.0]" in changelog
+    assert claude_manifest["version"] == "2.12.0"
+    assert codex_manifest["version"] == "2.12.0"
+    assert agy_manifest["version"] == "2.12.0"
+    assert package_manifest["version"] == "2.12.0"
+    assert "## [2.12.0]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/) | 2.11.0 |",
-        "loom-design/README.md": "**Version**: 2.11.0",
-        "loom-design/README.ja.md": "**Version**: 2.11.0",
-        "loom-design/README.zh-TW.md": "**Version**: 2.11.0",
+        "README.md": "| [`loom-design`](loom-design/) | 2.12.0 |",
+        "loom-design/README.md": "**Version**: 2.12.0",
+        "loom-design/README.ja.md": "**Version**: 2.12.0",
+        "loom-design/README.zh-TW.md": "**Version**: 2.12.0",
     }
     for name, pin in readme_pins.items():
         assert pin in (REPO / name).read_text(encoding="utf-8"), name
