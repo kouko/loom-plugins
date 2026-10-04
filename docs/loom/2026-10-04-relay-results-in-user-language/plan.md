@@ -22,10 +22,20 @@ Wave 1 changes station prose and the existing anchor independently; wave 2 relea
 - Test: A3 positive: compact-resume-and-agent-result-emit-anchor; negative: bash-tool-stays-silent. A4 positive: zh-anchor-names-conversation-language; negative: en-majority-stays-silent.
 - Risk: agent-decided — separate SessionStart compact|resume entry; hook_event_name echoed, PostToolUse when absent; `_ANCHOR_TEXT` keys kept; new ids registered host-hygiene; tests widened, ZH_FRAGMENT changed; SubagentStop skipped.
 
+**W1-03 Language detection ignores harness-written user turns**  after: W1-02  acceptance: 3
+- Files: loom-code/hooks/lang_detect.py, loom-code/hooks/language-anchor.py, loom-code/tests/test_lang_detect.py, loom-code/tests/test_language_anchor_hook.py
+- Test: A3 positive: zh-turns-plus-compact-summary-still-zh; negative: genuine-english-user-turn-still-counts. A3 boundary: skill-reinvocation-echo-not-counted.
+- Risk: agent-decided — adversary found English compaction summaries outvote the user; skip isCompactSummary and isMeta turns plus the re-invocation prefix; reject non-string hook_event_name; detector coverage widened only.
+
 **W2-01 Release metadata for loom-code 3.31.0**  after: W1-01, W1-02  acceptance: 6
 - Files: loom-code/CHANGELOG.md, loom-code/plugin.json, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/package.json, README.md, loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py
 - Test: A6 positive: release-metadata-sync-test-passes-at-3.31.0; negative: sync-codex-manifests-check-exits-0.
 - Risk: agent-decided — minor bump because station guidance and a hook trigger change; loom-design and loom-workflow untouched.
+
+**W2-02 Graduate the compact-summary probe**  after: W1-03  acceptance: 3
+- Files: docs/loom/2026-10-04-relay-results-in-user-language/evidence/probes/test_language_anchor_compact_summary.py, loom-code/tests/test_adversarial_language_anchor_compact_summary.py
+- Test: A3 positive: graduated-probe-passes-in-suite; negative: compact-summary-vote-regression-fails-probe.
+- Risk: agent-decided — the probe caught the compact-summary vote defect, so review.probe-graduation moves it into loom-code/tests unchanged apart from the path.
 
 ## Simplicity check
 - Reuse the existing anchor and its detector instead of a new reminder hook — taken
