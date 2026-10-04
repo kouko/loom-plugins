@@ -27,6 +27,11 @@ Wave 1 changes station prose and the existing anchor independently; wave 2 relea
 - Test: A3 positive: zh-turns-plus-compact-summary-still-zh; negative: genuine-english-user-turn-still-counts. A3 boundary: skill-reinvocation-echo-not-counted.
 - Risk: agent-decided — adversary found English compaction summaries outvote the user; skip isCompactSummary and isMeta turns plus the re-invocation prefix; reject non-string hook_event_name; detector coverage widened only.
 
+**W1-04 Language anchor also fires on UserPromptSubmit**  after: W1-03  acceptance: 3
+- Files: loom-code/hooks/language-anchor.py, loom-code/hooks/hooks.json, docs/loom/evidence/mechanisms.yaml, loom-code/tests/test_language_anchor_hook.py, loom-code/tests/test_hooks_json.py
+- Test: A3 positive: user-prompt-submit-payload-emits-anchor-with-its-event-name; negative: user-prompt-submit-in-english-conversation-stays-silent.
+- Risk: agent-decided — acceptance testing saw UserPromptSubmit fire on a background completion turn, whose `<task-notification>` text the detector already skips; one matcher-less entry, one accepted event; host-hygiene; tests widened only.
+
 **W2-01 Release metadata for loom-code 3.31.0**  after: W1-01, W1-02  acceptance: 6
 - Files: loom-code/CHANGELOG.md, loom-code/plugin.json, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/package.json, README.md, loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py
 - Test: A6 positive: release-metadata-sync-test-passes-at-3.31.0; negative: sync-codex-manifests-check-exits-0.
@@ -47,6 +52,6 @@ Wave 1 changes station prose and the existing anchor independently; wave 2 relea
 ① — what — 覆述 intent（含自動發布授權） → 「對」
 
 ## Risks
-1. PostToolUse(Agent) covers foreground agents only; a background agent's completion turn has no documented hook and SubagentStop is skipped, so acceptance testing reports both as uncovered.
+1. PostToolUse(Agent) covers foreground agents only; a background agent's completion turn is covered by UserPromptSubmit (W1-04, observed in acceptance testing, not documented) and SubagentStop is skipped.
 2. Prose and reminders already failed once on a turn that carried a reminder; this change raises the odds, it does not prove the drift is gone.
 3. Codex and OpenCode hook files are not rewired; Claude Code only.
