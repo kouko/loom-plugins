@@ -13,9 +13,9 @@ charter: 1.1
 Wave 1 writes the guidance; wave 2 releases it.
 
 **W1-01 Baseline states the code-first backfill path**  after: none  acceptance: 1, 2
-- Files: loom-code/references/engineering-baseline.md, loom-code/tests/test_prose_pin_rule_text.py
+- Files: loom-code/references/engineering-baseline.md, loom-code/skills/build/SKILL.md, loom-code/tests/test_prose_pin_rule_text.py
 - Test: A1 positive: baseline-states-characterise-first-and-record-scope; negative: legacy-paragraph-still-present. A2 positive: baseline-keeps-uninstructed-skip-violation; boundary: compile-failure-not-red-evidence.
-- Risk: agent-decided — one paragraph after the Legacy backfill paragraph; one pin test reusing the shared prose_pin matcher; existing baseline pins preserved, coverage widened only.
+- Risk: agent-decided — one paragraph after the Legacy backfill paragraph; closing review round 1 added one scoping clause to build's tdd-skip sentence and named where the predates record goes; one pin test reusing the shared prose_pin matcher; existing baseline pins preserved, coverage widened only.
 
 **W2-01 Release metadata for loom-code 3.30.0**  after: W1-01  acceptance: 3, 4
 - Files: loom-code/CHANGELOG.md, loom-code/plugin.json, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/package.json, README.md, loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py
