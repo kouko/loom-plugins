@@ -123,3 +123,62 @@ env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --no-project --python /opt/h
 ...........................                                              [100%]
 27 passed in 0.35s
 ```
+
+## Re-run on 2026-10-04, at f7100f06
+Fix range ea33b305..f7100f06 touches `loom-code/references/engineering-baseline.md`
+(legacy sentence + record place), `loom-code/skills/build/SKILL.md:58-61`
+(tdd-skip scope), `loom-code/CHANGELOG.md`, the pin test and the plan. Every
+row names a surface the fix touched, so all four were re-tested in full; none
+is carried over. Clean copies: `git worktree add --detach
+.git/loom-scratch/at2-head f7100f06` and `.git/loom-scratch/at2-base 620572db`,
+both removed afterwards.
+
+- Setup: `claude plugin validate ./loom-code` in the clean copy →
+  `✔ Validation passed`. The new link in build's sentence
+  (`../../references/engineering-baseline.md`) resolves to an existing file.
+- 1: re-tested — read `engineering-baseline.md:64-73`. Plain-words `tdd`
+  skip, code written before the flow, characterise first with bugs pinned,
+  then change: unchanged and present. Record place is now named: "the plan
+  records which code predates the flow in its `## Risks`, beside the skip
+  line, or the intent's `## Constraints` does when plan is absent or
+  skipped" (67-69) — the same two places build writes the skip line to
+  (`build/SKILL.md:26-28`). The earlier open question (which plan section)
+  is resolved. Break check: replaced "in its `## Risks`" with "somewhere" →
+  `FAILED test_prose_pin_rule_text.py::test_engineeringbaselinemd_codefirstbackfill_present`,
+  `1 failed, 5 passed`; restored with the edit tool; `6 passed`.
+- 2: re-tested — three boundaries still present (69-73: uninstructed skip
+  is a violation; code written after the flow began follows the iron law;
+  compile/import failure proves only a missing interface, false-green
+  diagnostic). The legacy sentence now reads "If it did and was skipped, it
+  is a violation whatever the code's age, unless the user instructed the
+  skip (Code-first backfill, below)." (60-62), so the two paragraphs no
+  longer contradict. Build station: `build/SKILL.md:58-61` now reads
+  "Unless `tdd` is skipped by the user's plain-words instruction — a skip
+  that covers only code written before the flow began
+  ([engineering-baseline.md](../../references/engineering-baseline.md),
+  Code-first backfill) — for every behavior change:". The post-flow
+  boundary is now in the station text itself, so a main agent implementing
+  without the implementer agent sees it. Earlier finding resolved. Break
+  check: removed "a skip that covers only code written before the flow
+  began" → same test `1 failed, 5 passed` (assert on the build sentence);
+  restored; `git status --short` empty.
+- 3: re-tested — `loom_checker.py --list-rules` at 620572db and f7100f06:
+  26 lines each, `diff` empty (RULES_IDENTICAL). `git diff --stat 620572db
+  f7100f06 -- loom-code/contract/ loom-code/scripts/ loom-code/skills/
+  loom-code/agents/ loom-code/hooks/ loom-design/ loom-workflow/` → only
+  `loom-code/skills/build/SKILL.md | 6 ++++--`, and that diff is the one
+  sentence above: it narrows what a `tdd` skip covers and adds no step
+  (numbered-step count `grep -cE '^[0-9]+\. '` is 6 at both commits).
+  Contract manifest `version: 2.3.1` at both commits. No intent field
+  added. `check_contract_citations.py` → `OK: 4 known-violating files
+  unchanged, no new contract citations`, rc=0.
+- 4: re-tested — `loom-code/plugin.json`, `loom-code/package.json`,
+  `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`
+  all `3.30.0`; `3.30.0` appears in root `README.md` (2) and the three
+  loom-code READMEs (1 each); CHANGELOG top entry still `## [3.30.0] —
+  2026-10-04`, with a second bullet describing the fix;
+  `scripts/sync_codex_manifests.py --check --all` rc=0. Full package suite
+  not run here (left to finalize-review, which runs it and refuses the
+  attestation on failure); suite command as in section 4.
+- Focused run at f7100f06 (same command and test list as above):
+  `27 passed in 0.35s`.
