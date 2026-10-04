@@ -10,6 +10,15 @@
             "async": false
           }
         ]
+      },
+      {
+        "matcher": "compact|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\""
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -25,7 +34,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Skill",
+        "matcher": "Skill|Agent",
         "hooks": [
           {
             "type": "command",

@@ -71,8 +71,15 @@ def test_codex_event_set_is_session_start_and_publication_interception(codex_hoo
 
 
 def test_session_start_runs_the_rewritten_script(hooks):
-    (command,) = _commands(hooks["SessionStart"])
+    (entry,) = [e for e in hooks["SessionStart"] if e["matcher"] == "startup|clear|compact"]
+    (command,) = _commands([entry])
     assert command.endswith('/hooks/session-start"')
+
+
+def test_session_start_reanchors_language_after_compact_or_resume(hooks):
+    (entry,) = [e for e in hooks["SessionStart"] if e["matcher"] == "compact|resume"]
+    (command,) = _commands([entry])
+    assert "/hooks/language-anchor.py" in command
 
 
 def test_pre_tool_use_matcher_set_is_bash_only(hooks):
@@ -137,7 +144,7 @@ def test_checker_missing_fallback_programs_are_identical(hooks, codex_hooks):
 
 
 def test_post_tool_use_keeps_language_anchor(hooks):
-    assert _matchers(hooks["PostToolUse"]) == {"Skill"}
+    assert _matchers(hooks["PostToolUse"]) == {"Skill|Agent"}
     (command,) = _commands(hooks["PostToolUse"])
     assert "/hooks/language-anchor.py" in command
 

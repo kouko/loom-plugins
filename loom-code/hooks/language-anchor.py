@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""PostToolUse hook (tool_name "Skill"): tail language anchor.
+"""Language anchor hook: PostToolUse (tool_name "Skill" or "Agent") and
+SessionStart (compact / resume) — re-states the conversation language.
 
 Detects the conversation language from the transcript (via
 ``lang_detect.conversation_language()``, reused by path — no target
@@ -25,11 +26,11 @@ _LANG_DETECT_PATH = _HOOKS_DIR / "lang_detect.py"
 # behavior selector (brief Non-goals: no hardcoded output language).
 _ANCHOR_TEXT = {
     "zh": (
-        "對使用者的敘述一律使用會話語言（繁體中文）；"
+        "對使用者的敘述一律使用使用者在對話中所用的語言與文字；"
         "機器面 artifact（brief/verdict/commit）維持原語言。"
     ),
     "ja": (
-        "ユーザー向けの説明は常に会話言語（日本語）を使用してください。"
+        "ユーザー向けの説明は常にユーザーの会話言語（日本語）を使用してください。"
         "brief/verdict/commit などの機械向けアーティファクトは元の言語のままにします。"
     ),
 }
@@ -50,7 +51,8 @@ def main() -> int:
         return 0
     if not isinstance(payload, dict):
         return 0
-    if payload.get("tool_name") != "Skill":
+    event = payload.get("hook_event_name") or "PostToolUse"
+    if event != "SessionStart" and payload.get("tool_name") not in ("Skill", "Agent"):
         return 0
     transcript_path = payload.get("transcript_path")
     if not transcript_path:
@@ -68,7 +70,7 @@ def main() -> int:
 
     print(json.dumps({
         "hookSpecificOutput": {
-            "hookEventName": "PostToolUse",
+            "hookEventName": event,
             "additionalContext": text,
         }
     }))

@@ -35,7 +35,7 @@ HOOK = Path(__file__).resolve().parent.parent / "hooks" / "language-anchor.py"
 # Distinctive stable fragments of the pinned directive text
 # (language-anchor.py:26-35) — substring matches, not full-string
 # equality, so incidental rewording elsewhere doesn't break the test.
-ZH_FRAGMENT = "會話語言（繁體中文）"
+ZH_FRAGMENT = "使用者在對話中所用的語言"
 JA_FRAGMENT = "会話言語（日本語）"
 
 # zh sample: well over the 20-visible-char / majority-Han floor
@@ -136,3 +136,39 @@ def test_non_skill_tool_name_stays_silent():
     )
     assert result.returncode == 0
     assert result.stdout == ""
+
+
+def test_session_start_compact_emits_with_session_start_event():
+    """Post-compaction / resume SessionStart payloads carry no tool_name;
+    the anchor fires and echoes the payload's hook_event_name."""
+    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
+    result = run_hook(
+        {"hook_event_name": "SessionStart", "source": "compact",
+         "transcript_path": transcript}
+    )
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert ZH_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
+
+
+def test_agent_tool_result_emits_directive():
+    transcript = _write_transcript([JA_TURN, JA_TURN, JA_TURN])
+    result = run_hook(
+        {"hook_event_name": "PostToolUse", "tool_name": "Agent",
+         "transcript_path": transcript}
+    )
+    assert result.returncode == 0
+    payload = json.loads(result.stdout)
+    assert payload["hookSpecificOutput"]["hookEventName"] == "PostToolUse"
+    assert JA_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
+
+
+def test_zh_directive_names_no_script_variant():
+    """A Simplified-Chinese user must not be told to switch to
+    Traditional (or the reverse): the zh text names neither variant."""
+    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
+    result = run_hook({"tool_name": "Skill", "transcript_path": transcript})
+    text = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
+    for variant in ("繁體", "繁体", "简体", "簡體"):
+        assert variant not in text

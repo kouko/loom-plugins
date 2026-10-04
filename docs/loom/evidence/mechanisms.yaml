@@ -215,11 +215,14 @@ mechanisms:
   - id: "PostToolUse:Write|Edit:validate-skill-folder-structure.sh"
     class: hook
     eval: loom-workflow/tests/scripts/test_validate_skill_folder_structure_hook.py::test_nested_subfolder_is_blocked
-  - id: "PostToolUse:Skill:language-anchor.py"
+  - id: "PostToolUse:Skill|Agent:language-anchor.py"
     class: host-hygiene   # excluded from the net count — language-anchor is
                           # host infrastructure outside the loom flow, but a
                           # real hook entry, so it must still be listed.
     eval: loom-code/tests/test_language_anchor_hook.py
+  - id: "SessionStart:compact|resume:language-anchor.py"
+    class: host-hygiene   # excluded from the net count, like its PostToolUse twin.
+    eval: loom-code/tests/test_language_anchor_hook.py::test_session_start_compact_emits_with_session_start_event
   - id: "SessionStart:startup|clear|compact:session-start@opencode"
     class: hook
     eval: loom-code/tests/test_opencode_loader.py
