@@ -179,7 +179,7 @@ def test_engineeringbaselinemd_codefirstbackfill_present() -> None:
     failure proves only a missing interface (A2). The legacy paragraph it
     extends stays. Each sentence is pinned exactly: a keyword-subset pin
     admits a clause that reverses the rule without a negation word."""
-    from prose_pin import affirms, pins_exact_sentence, rule_prose
+    from prose_pin import affirms, flat_prose, pins_exact_sentence, rule_prose
 
     text = rule_prose(BASELINE_MD)
     for sentence in (
@@ -187,7 +187,11 @@ def test_engineeringbaselinemd_codefirstbackfill_present() -> None:
         "plain words for code written before the flow began "
         "(`skipped-by-instruction: tdd <date>`), the backfill characterises "
         "that code first — pin its current behaviour, bugs included — before "
-        "changing it, and the plan records which code predates the flow.",
+        "changing it, and the plan records which code predates the flow in "
+        "its `## Risks`, beside the skip line, or the intent's "
+        "`## Constraints` does when plan is absent or skipped.",
+        "If it did and was skipped, it is a violation whatever the code's "
+        "age, unless the user instructed the skip (Code-first backfill, below).",
         "An uninstructed skip remains a violation.",
         "Code written after the flow began follows the iron law.",
         "A compile or import failure proves only that an interface is missing;",
@@ -196,6 +200,13 @@ def test_engineeringbaselinemd_codefirstbackfill_present() -> None:
     ):
         assert pins_exact_sentence(text, sentence), sentence
     assert affirms(text, "is", "violation whatever the code's age")
+    build = flat_prose(REPO / "loom-code" / "skills" / "build" / "SKILL.md")
+    assert (
+        "Unless `tdd` is skipped by the user's plain-words instruction — a skip "
+        "that covers only code written before the flow began "
+        "([engineering-baseline.md](../../references/engineering-baseline.md), "
+        "Code-first backfill) — for every behavior change:"
+    ) in build
 
 
 if __name__ == "__main__":  # pragma: no cover

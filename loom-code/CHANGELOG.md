@@ -3,6 +3,7 @@
 ## [3.30.0] — 2026-10-04 — engineering baseline states the code-first backfill path
 
 - `engineering-baseline.md` gains a "Code-first backfill" paragraph: when the user instructs a plain-words `tdd` skip for code written before the flow began, the backfill characterises that code first and the plan records which code predates the flow; an uninstructed skip remains a violation, and a compile or import failure is not defect-catching evidence. No checker rule, intent field, manifest entry or station step changes.
+- Build's `tdd`-skip sentence now names its scope: the skip covers only code written before the flow began. The baseline names where the predates-the-flow record goes (the plan's `## Risks` beside the skip line, or the intent's `## Constraints` when plan is absent or skipped), and the legacy paragraph's "violation whatever the code's age" now points to that user-instructed exception.
 
 ## [3.29.1] — 2026-10-03 — session-start drops control characters and invalid UTF-8; 3.29.0 checker note corrected.
 

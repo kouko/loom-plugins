@@ -58,13 +58,16 @@ with Legacy Code*): code inherited without tests is characterised first —
 pin its current behaviour, bugs included — and new behaviour then follows
 the iron law. The deciding question is whether the test-first opportunity
 existed when the code was written. If it did and was skipped, it is a
-violation whatever the code's age.
+violation whatever the code's age, unless the user instructed the skip
+(Code-first backfill, below).
 
 **Code-first backfill.** When the user instructs a `tdd` skip in plain words
 for code written before the flow began (`skipped-by-instruction: tdd <date>`),
 the backfill characterises that code first — pin its current behaviour, bugs
 included — before changing it, and the plan records which code predates the
-flow. An uninstructed skip remains a violation. Code written after the flow
+flow in its `## Risks`, beside the skip line, or the intent's `## Constraints`
+does when plan is absent or skipped. An uninstructed skip remains a violation.
+Code written after the flow
 began follows the iron law. A compile or import failure proves only that an
 interface is missing; break the covered behaviour and watch the test fail
 (false-green diagnostic) to show it catches a defect.

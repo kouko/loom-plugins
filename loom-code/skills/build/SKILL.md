@@ -55,8 +55,10 @@ On Antigravity CLI or OpenCode, map tool and agent names with
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md) or
 [`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
-Unless `tdd` is skipped by the user's plain-words
-instruction, for every behavior change:
+Unless `tdd` is skipped by the user's plain-words instruction — a skip that
+covers only code written before the flow began
+([engineering-baseline.md](../../references/engineering-baseline.md),
+Code-first backfill) — for every behavior change:
 
 1. Write the smallest failing test and run it to observe RED.
 2. Implement the minimum change and run it to GREEN.
