@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.31.0] — 2026-10-04 — every message to the user, relayed agent results included, uses the user's language
+
+- Build, closing-review and ship now say that every message to the user uses the user's conversation language: relayed agent results, turns with no new user message, and decision point 3 (acceptance test report acceptance).
+- The language-anchor hook now also fires on SessionStart `compact|resume` and on Agent tool results, and its zh wording no longer hardcodes a script variant. A background agent's completion turn has no hook, so it stays uncovered.
+
 ## [3.30.0] — 2026-10-04 — engineering baseline states the code-first backfill path
 
 - `engineering-baseline.md` gains a "Code-first backfill" paragraph: when the user instructs a plain-words `tdd` skip for code written before the flow began, the backfill characterises that code first and the plan records which code predates the flow; an uninstructed skip remains a violation, and a compile or import failure is not defect-catching evidence. No checker rule, intent field, manifest entry or station step changes.
