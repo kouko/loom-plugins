@@ -22,6 +22,11 @@ Wave 1 writes the guidance; wave 2 releases it.
 - Test: A3 positive: existing-rule-population-pin-passes; negative: existing-manifest-version-pin-passes. A4 positive: release-metadata-sync-test-passes-at-3.30.0; negative: sync-codex-manifests-check-exits-0.
 - Risk: agent-decided — minor bump because engineering guidance read by implementers changes; loom-design and loom-workflow untouched.
 
+**W2-02 Graduate the backfill-pin adversarial probes**  after: W2-01  acceptance: 1, 2
+- Files: docs/loom/2026-10-04-code-first-backfill-guidance/evidence/probes/test_adversarial_backfill_pin_a1.py, docs/loom/2026-10-04-code-first-backfill-guidance/evidence/probes/test_adversarial_backfill_pin_a2.py, loom-code/tests/test_adversarial_backfill_pin_a1.py, loom-code/tests/test_adversarial_backfill_pin_a2.py
+- Test: A1 positive: graduated-a1-probe-passes-in-suite; negative: characterise-after-change-rewrite-fails-pin. A2 positive: graduated-a2-probe-passes-in-suite; boundary: compile-failure-counted-as-red-rewrite-fails-pin.
+- Risk: agent-decided — both probes caught the weak pin fixed in 1e2e2d32, so review.probe-graduation moves them into loom-code/tests unchanged apart from the path; coverage widened only.
+
 ## Simplicity check
 - Reuse existing rule-population and manifest-version pins as A3 evidence instead of new A3 cases — taken
 
