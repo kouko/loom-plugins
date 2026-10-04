@@ -13,14 +13,14 @@ charter: 1.1
 Wave 1 changes station prose and the existing anchor independently; wave 2 releases.
 
 **W1-01 Stations say agent results reach the user in the user's language**  after: none  acceptance: 1, 2, 5
-- Files: loom-code/skills/build/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-code/skills/ship/SKILL.md, loom-code/tests/test_relay_language_text.py
+- Files: loom-code/skills/build/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-code/skills/ship/SKILL.md, loom-code/tests/test_simplified_station_text.py
 - Test: A1 positive: build-and-closing-review-relay-sentence-pinned; boundary: no-user-message-turn-clause-pinned. A2 positive: ship-sentence-covers-every-user-message; boundary: decision-point-3-named. A5 positive: english-artifact-sentences-unchanged; negative: pr-body-language-clause-kept.
 - Risk: agent-decided — one sentence beside each existing English-artifact sentence; ship's line 12 widened, not duplicated; exact-sentence pins.
 
 **W1-02 Language anchor fires on resume and agent results with neutral wording**  after: none  acceptance: 3, 4
-- Files: loom-code/hooks/language-anchor.py, loom-code/hooks/hooks.json, loom-code/tests/test_language_anchor_hook.py, loom-code/tests/test_hooks_json.py
+- Files: loom-code/hooks/language-anchor.py, loom-code/hooks/hooks.json, docs/loom/evidence/mechanisms.yaml, loom-code/tests/test_language_anchor_hook.py, loom-code/tests/test_hooks_json.py
 - Test: A3 positive: compact-resume-and-agent-result-emit-anchor; negative: bash-tool-stays-silent. A4 positive: zh-anchor-names-conversation-language; negative: en-majority-stays-silent.
-- Risk: agent-decided — echo payload hook_event_name; keep `_ANCHOR_TEXT` keys; tests widened (Agent, SessionStart) and ZH_FRAGMENT changed; SubagentStop skipped, delivery to main agent unconfirmed.
+- Risk: agent-decided — separate SessionStart compact|resume entry; hook_event_name echoed, PostToolUse when absent; `_ANCHOR_TEXT` keys kept; new ids registered host-hygiene; tests widened, ZH_FRAGMENT changed; SubagentStop skipped.
 
 **W2-01 Release metadata for loom-code 3.31.0**  after: W1-01, W1-02  acceptance: 6
 - Files: loom-code/CHANGELOG.md, loom-code/plugin.json, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/package.json, README.md, loom-code/README*.md, loom-code/tests/test_write_plan_station_text.py
@@ -37,6 +37,6 @@ Wave 1 changes station prose and the existing anchor independently; wave 2 relea
 ① — what — 覆述 intent（含自動發布授權） → 「對」
 
 ## Risks
-1. Background-agent completion turns have no documented hook; acceptance testing must report that timing as uncovered.
+1. PostToolUse(Agent) covers foreground agents only; a background agent's completion turn has no documented hook and SubagentStop is skipped, so acceptance testing reports both as uncovered.
 2. Prose and reminders already failed once on a turn that carried a reminder; this change raises the odds, it does not prove the drift is gone.
 3. Codex and OpenCode hook files are not rewired; Claude Code only.
