@@ -239,9 +239,12 @@ twice, and this is the only stop this station makes.
    compose this message. Carry only its verdict and its smaller alternative
    into this message, in the user's plain words; this adds no stop, and the
    user still chooses. Never paste critique's full response, its mindset or
-   its question-by-question shape. A request that adds no such cost, such as
-   a bug fix or a wording change, does not run it. When loom-workflow is not
-   installed, skip this item; the rest of this message is unchanged.
+   its question-by-question shape. Answer critique's own questions from the
+   draft intent; never put them to the user. A request that adds no such
+   cost, such as a bug fix or a wording change, does not run it. A wording
+   change that adds a mechanism, field, rule or step still runs it. When
+   loom-workflow is not installed, skip this item; the rest of this message
+   is unchanged.
 
 Questions may only ask what the user wants, what they will see (reserved for
 decision point ②, where the product spec is written), whether acceptance worked (decision point ③
