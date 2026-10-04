@@ -18,7 +18,7 @@ Wave 1 changes station prose and the existing anchor independently; wave 2 relea
 - Risk: agent-decided — one sentence beside each existing English-artifact sentence; ship's line 12 widened, not duplicated; exact-sentence pins.
 
 **W1-02 Language anchor fires on resume and agent results with neutral wording**  after: none  acceptance: 3, 4
-- Files: loom-code/hooks/language-anchor.py, loom-code/hooks/hooks.json, docs/loom/evidence/mechanisms.yaml, loom-code/tests/test_language_anchor_hook.py, loom-code/tests/test_hooks_json.py
+- Files: loom-code/hooks/language-anchor.py, loom-code/hooks/hooks.json, docs/loom/evidence/mechanisms.yaml, loom-code/tests/test_language_anchor_hook.py, loom-code/tests/test_hooks_json.py, loom-code/tests/test_agy_adapter.py, loom-code/tests/test_opencode_loader.py, loom-code/tests/test_adversarial_opencode_command_language.py
 - Test: A3 positive: compact-resume-and-agent-result-emit-anchor; negative: bash-tool-stays-silent. A4 positive: zh-anchor-names-conversation-language; negative: en-majority-stays-silent.
 - Risk: agent-decided — separate SessionStart compact|resume entry; hook_event_name echoed, PostToolUse when absent; `_ANCHOR_TEXT` keys kept; new ids registered host-hygiene; tests widened, ZH_FRAGMENT changed; SubagentStop skipped.
 
