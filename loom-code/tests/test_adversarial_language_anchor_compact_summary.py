@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-_TESTS = Path(__file__).resolve().parents[5] / "loom-code" / "tests"
+_TESTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(_TESTS))
 from test_language_anchor_hook import ZH_FRAGMENT, ZH_TURN, run_hook  # noqa: E402
 
