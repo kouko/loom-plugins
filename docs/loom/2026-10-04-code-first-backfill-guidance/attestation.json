@@ -1,0 +1,61 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-04-code-first-backfill-guidance",
+  "content_digest": "aa0b854b64eec12c3aa18ce2e5e1247992f7f0c8",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_backfill_pin_a1.py -q",
+      "artifact": "loom-code/tests/test_adversarial_backfill_pin_a1.py",
+      "result": "pass",
+      "command_digest": "b873bef98a8fee497c9a2860df9c8bb2dd5d46d96427c52ce2f8a20ba7076223"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_backfill_pin_a2.py -q",
+      "artifact": "loom-code/tests/test_adversarial_backfill_pin_a2.py",
+      "result": "pass",
+      "command_digest": "6be8aa13846d48208017613d327b3070db89bacde5b36ce2f0f020aea4ad13bd"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "loom-code:reviewer#docs-a4ca6b1",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "loom-code:reviewer#code-aba421a",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "loom-code/references/engineering-baseline.md :: violation whatever the code's age, unless the user instructed the skip",
+          "text": "exception clause does not name which code it covers; the cross-referenced paragraph and the build clause narrow it",
+          "fix": "append 'for code written before the flow began' and update the pin"
+        },
+        {
+          "severity": "nit",
+          "anchor": "loom-code/tests/test_adversarial_backfill_pin_a2.py:24",
+          "text": "_pin_fails_on duplicated from a1; below the Rule of Three",
+          "fix": "extract only if a third probe graduates"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
