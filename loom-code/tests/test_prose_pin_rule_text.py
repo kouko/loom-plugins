@@ -172,6 +172,25 @@ def test_sentencepinsunseenprobeamendrule_negatedsynthetic_rejected() -> None:
     )
 
 
+def test_engineeringbaselinemd_codefirstbackfill_present() -> None:
+    """A user-instructed `tdd` skip for code written before the flow is
+    characterised first and its scope recorded (A1); an uninstructed skip
+    stays a violation, later code follows the iron law, and a compile
+    failure proves only a missing interface (A2). The legacy paragraph it
+    extends stays."""
+    from prose_pin import affirms, rule_prose
+
+    text = rule_prose(BASELINE_MD)
+    assert affirms(text, "characterises", "predates the flow",
+                   "skipped-by-instruction: tdd", "bugs included")
+    assert affirms(text, "remains", "violation", "uninstructed skip")
+    assert affirms(text, "follows", "iron law", "after the flow began")
+    assert affirms(text, "proves only", "interface is missing",
+                   "compile or import failure")
+    assert affirms(text, "break", "watch the test fail", "false-green diagnostic")
+    assert affirms(text, "is", "violation whatever the code's age")
+
+
 if __name__ == "__main__":  # pragma: no cover
     import sys
     import pytest
