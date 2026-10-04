@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.30.0] — 2026-10-04 — engineering baseline states the code-first backfill path
+
+- `engineering-baseline.md` gains a "Code-first backfill" paragraph: when the user instructs a plain-words `tdd` skip for code written before the flow began, the backfill characterises that code first and the plan records which code predates the flow; an uninstructed skip remains a violation, and a compile or import failure is not defect-catching evidence. No checker rule, intent field, manifest entry or station step changes.
+
 ## [3.29.1] — 2026-10-03 — session-start drops control characters and invalid UTF-8; 3.29.0 checker note corrected.
 
 - The `session-start` hook cleans the repository's KICKOFF-DEFAULTS lines before it matches and prints them: form feed and vertical tab become spaces, and the other control characters except tab and newline (carriage return included) are removed; a form feed or escape character there used to make the hook emit invalid JSON, so the session got no loom guidance. When `iconv` is available, bytes that are not valid UTF-8 are dropped while valid UTF-8 text such as CJK is kept; an invalid byte used to make the hook exit with no output. Without `iconv` such bytes pass through unfiltered, and a missing or failing `iconv` no longer silences the hook.
