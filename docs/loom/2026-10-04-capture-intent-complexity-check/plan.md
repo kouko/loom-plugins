@@ -13,7 +13,7 @@ charter: 1.1
 Wave 1 writes the guidance; wave 2 releases it.
 
 **W1-01 Capture-intent runs a complexity check before decision point ①**  after: none  acceptance: 1, 2, 3, 4
-- Files: loom-design/skills/capture-intent/SKILL.md, loom-design/tests/spec/test_capture_intent_contract.py
+- Files: loom-design/skills/capture-intent/SKILL.md, loom-design/tests/spec/test_capture_intent_contract.py, loom-design/tests/spec/test_capture_intent_complexity_check.py
 - Test: A1 positive: skill-names-critique-complexity-when-scope-adds-mechanism; negative: critique-not-named-outside-step-4. A2 positive: verdict-and-smaller-alternative-in-the-one-message; boundary: no-second-stop-sentence-preserved. A3 positive: no-added-cost-request-skips-check; negative: bug-fix-wording-not-a-trigger. A4 positive: absent-loom-workflow-means-unchanged-behaviour; boundary: plugin-boundary-check-exits-0.
 - Risk: agent-decided — one Step 4 item: run critique first, carry only verdict and smaller alternative in plain words, never paste its response; public skill name; unmarked prose; pins widened only.
 
