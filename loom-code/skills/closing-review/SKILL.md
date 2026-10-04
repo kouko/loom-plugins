@@ -8,6 +8,10 @@ version: 1.5.0
 # Closing review
 
 Reviewer findings and generated evidence are written in English.
+Every message to the user, including a relayed reviewer or acceptance-tester
+result, is written in the user's conversation language, even on a turn with no
+new user message, such as a background agent's completion or a resume after
+compaction.
 
 `closing-review` decides whether the completed functional content is ready. It produces
 `docs/loom/<change-id>/attestation.json`; agents never edit that file by hand.

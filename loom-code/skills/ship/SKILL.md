@@ -9,8 +9,10 @@ version: 1.1.0
 
 Ship validates publication state; it does not repeat functional verification.
 It does not execute package tests or adversarial probes.
-Write the PR body in the user's conversation language when the host can
-establish it from the confirmed intent or active conversation. Repository
+Write the PR body and every message to the user, including the decision
+point ③ result and acceptance question, in the user's conversation language
+when the host can establish it from the confirmed intent or active
+conversation. Repository
 conventions still govern committed artifacts. Internal publication reports
 remain English.
 
