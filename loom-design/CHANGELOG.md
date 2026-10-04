@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.12.0] — 2026-10-04 — capture-intent runs a complexity check before decision point ①
+
+- `capture-intent` Step 4 runs `loom-workflow:critique` in complexity mode when the confirmed scope adds a mechanism, field, rule or step; only its verdict and the smaller alternative go into the one confirmation message, it adds no new stop, and it is skipped when `loom-workflow` is not installed.
+
 ## [2.11.0] — 2026-10-03 — capture-intent skips requests inside an active change.
 
 - The `capture-intent` description skips a request inside an active change, because that change's station continues it.
