@@ -3,7 +3,7 @@
 ## [3.31.0] — 2026-10-04 — every message to the user, relayed agent results included, uses the user's language
 
 - Build, closing-review and ship now say that every message to the user uses the user's conversation language: relayed agent results, turns with no new user message, and decision point 3 (acceptance test report acceptance).
-- The language-anchor hook now also fires on SessionStart `compact|resume` and on Agent tool results, and its zh wording no longer hardcodes a script variant. A background agent's completion turn has no hook, so it stays uncovered.
+- The language-anchor hook now also fires on SessionStart `compact|resume` and on Agent tool results and UserPromptSubmit (which also fires on the turn a background agent's completion starts), and its zh wording no longer hardcodes a script variant.
 - The language detector now ignores harness-written user turns (compaction summaries, skill re-invocation echoes), which had outvoted the user's language after a compaction; and the anchor ignores an unknown hook event name.
 
 ## [3.30.0] — 2026-10-04 — engineering baseline states the code-first backfill path
