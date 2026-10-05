@@ -3,9 +3,10 @@
 
 Intent A2 says the pin fails on a sentence that inverts the entry definition
 with "cannot" or a similar negating contraction. The pin's NEGATION pattern
-matches only the ASCII apostrophe in "n't", so the same contraction written
-with U+2019 (common in Markdown typed on macOS or pasted from prose) reads as
-an affirmative definition and the pin stays green.
+once matched only the ASCII apostrophe in "n't"; these cases keep a
+contraction typed with U+2019 (common in Markdown typed on macOS or pasted
+from prose), such as can’t, rejected rather than read as an affirmative
+definition.
 """
 from __future__ import annotations
 
