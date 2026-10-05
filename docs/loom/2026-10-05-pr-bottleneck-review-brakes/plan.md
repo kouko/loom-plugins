@@ -35,6 +35,13 @@ Wave 2 — release metadata.
 - Test: A4 positive: readme-version-matches-manifest; negative: root-readme-table-row-stale-3.32.0-absent.
 - Risk: a grep for 3.32.0 outside docs/ lists exactly these four plus W2-01's files; historical CHANGELOG sections keep their old version strings.
 
+Wave 3 — probe graduation (closing-review gate review.probe-graduation).
+
+**W3-01 Graduate the agent-decided door probe into the package suite**  after: W2-02  acceptance: 3
+- Files: docs/loom/2026-10-05-pr-bottleneck-review-brakes/evidence/probes/test_ship_risk_section_agent_decided_door.py, loom-code/tests/test_ship_risk_section_agent_decided_door.py
+- Test: A3 positive: graduated-probe-collected-and-green-in-package-suite; negative: probe-red-against-94d92602-placeholder.
+- Risk: git mv only, content unchanged except repo-root path resolution; agent-decided: loom-code/tests/ per AGENTS.md Test Location; the probe caught the agent-decided door defect fixed in d9d88c65.
+
 ## Simplicity check
 - none found
 
