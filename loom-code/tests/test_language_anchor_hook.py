@@ -1,27 +1,18 @@
-"""Tests for loom-code/hooks/language-anchor.py — the PostToolUse
-language-anchor hook (legacy backfill; hook was already live in
-hooks.json with zero tests).
+"""Tests for loom-code/hooks/language-anchor.py — the language-anchor hook.
 
-Each test subprocess-runs the hook exactly as Claude Code would invoke
-it: hook-event JSON (with a ``transcript_path`` pointing at a temp
-JSONL transcript) on stdin, output on stdout, exit 0. Subprocess (not
-import) is required — ``language-anchor.py`` is a hyphenated filename
-and is not importable as a Python module, same constraint documented
-for ``ask-triage.py`` in ``test_ask_triage_hook.py``.
+The hook detects nothing: on an accepted event (SessionStart,
+UserPromptSubmit, or PostToolUse for the Skill or Agent tool) it emits one
+fixed English reminder, whatever language the transcript holds and whether
+or not a transcript exists. The replying model identifies the language.
 
-External surfaces grounded (per
-loom-code/skills/subagent-driven-development/standards/external-surface-grounding.md):
+Each test subprocess-runs the hook exactly as Claude Code would invoke it:
+hook-event JSON on stdin, output on stdout, exit 0. Subprocess (not import)
+is required — ``language-anchor.py`` is a hyphenated filename.
 
-- Claude Code PostToolUse hook contract (JSON event with
-  ``tool_name``/``transcript_path`` on stdin; ``hookSpecificOutput``
-  JSON on stdout when emitting, empty stdout otherwise; exit 0): the
-  hook is registered under ``PostToolUse`` (matcher ``Skill``) in
-  ``loom-code/hooks/hooks.json``, source-(d) in-repo evidence.
-- Transcript JSONL turn shape (``{"type": "user", "isSidechain":
-  false, "message": {"content": <str>}}``): read directly from
-  ``loom-code/hooks/lang_detect.py`` ``_iter_user_turns`` /
-  ``_extract_text`` — the parser this hook's ``conversation_language``
-  call reads through.
+External surface grounded: the Claude Code hook contract (JSON event with
+``hook_event_name`` / ``tool_name`` / ``transcript_path`` on stdin;
+``hookSpecificOutput`` JSON on stdout when emitting, empty stdout
+otherwise; exit 0), registered in ``loom-code/hooks/hooks.json``.
 """
 
 import json
@@ -34,40 +25,30 @@ import pytest
 
 HOOK = Path(__file__).resolve().parent.parent / "hooks" / "language-anchor.py"
 
-# Distinctive stable fragments of the pinned directive text
-# (language-anchor.py:26-35) — substring matches, not full-string
-# equality, so incidental rewording elsewhere doesn't break the test.
-ZH_FRAGMENT = "使用者在對話中所用的語言"
-JA_FRAGMENT = "会話言語（日本語）"
+ANCHOR = (
+    "Write every message to the user in the language and script the user "
+    "writes in during this conversation; machine-facing artifacts "
+    "(brief/verdict/commit) keep their own language."
+)
 
-# zh sample: well over the 20-visible-char / majority-Han floor
-# (lang_detect.detect_script _MIN_VISIBLE_CHARS / _MAJORITY_SCRIPT_RATIO).
 ZH_TURN = "請幫我確認這個修改是否符合原本的設計規範，並且說明理由。"
-# ja sample: kana ratio + CJK share both clear the ja thresholds
-# (lang_detect.py _KANA_SIGNAL_RATIO / _MIN_CJK_SHARE_FOR_JA).
-JA_TURN = "この変更が仕様に合っているかどうかを確認してください。よろしくお願いします。"
-# en sample: ascii-letter majority, no CJK — resolves to 'en', for
-# which language-anchor.py has no _ANCHOR_TEXT entry (stays silent).
-EN_TURN = "Please confirm this change matches the original design specification and explain why."
+# Chinese dense with English terms: the per-letter count the old detector
+# used read this as English and stayed silent.
+ZH_WITH_TERMS = (
+    "幫我看 loom-code 的 PostToolUse hook、SessionStart compact、"
+    "transcript_path、additionalContext 跟 OpenCode loader 的 execute.after"
+)
 
 
 def _write_transcript(turns):
-    """Write a JSONL transcript with one main-chain user turn per text
-    in ``turns`` and return its path."""
+    """Write a JSONL transcript with one main-chain user turn per text."""
     fh = tempfile.NamedTemporaryFile(
         mode="w", suffix=".jsonl", delete=False, encoding="utf-8"
     )
     for text in turns:
-        fh.write(
-            json.dumps(
-                {
-                    "type": "user",
-                    "isSidechain": False,
-                    "message": {"content": text},
-                }
-            )
-            + "\n"
-        )
+        fh.write(json.dumps(
+            {"type": "user", "isSidechain": False, "message": {"content": text}}
+        ) + "\n")
     fh.close()
     return fh.name
 
@@ -76,135 +57,73 @@ def run_hook(payload):
     """Run the hook with `payload` (dict → JSON, str → raw) on stdin."""
     stdin = payload if isinstance(payload, str) else json.dumps(payload)
     return subprocess.run(
-        [sys.executable, str(HOOK)],
-        input=stdin,
-        capture_output=True,
-        text=True,
+        [sys.executable, str(HOOK)], input=stdin, capture_output=True, text=True,
     )
 
 
-def test_zh_majority_emits_zh_directive():
-    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
-    result = run_hook(
-        {"tool_name": "Skill", "transcript_path": transcript}
-    )
+def emitted(payload):
+    """Run the hook and return (hookEventName, additionalContext)."""
+    result = run_hook(payload)
     assert result.returncode == 0
-    payload = json.loads(result.stdout)
-    assert payload["hookSpecificOutput"]["hookEventName"] == "PostToolUse"
-    assert ZH_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
+    assert result.stdout, "anchor stayed silent"
+    out = json.loads(result.stdout)["hookSpecificOutput"]
+    return out["hookEventName"], out["additionalContext"]
 
 
-def test_ja_majority_emits_ja_directive():
-    transcript = _write_transcript([JA_TURN, JA_TURN, JA_TURN])
-    result = run_hook(
-        {"tool_name": "Skill", "transcript_path": transcript}
-    )
-    assert result.returncode == 0
-    payload = json.loads(result.stdout)
-    assert payload["hookSpecificOutput"]["hookEventName"] == "PostToolUse"
-    assert JA_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
+def test_zh_with_english_terms_gets_anchor():
+    transcript = _write_transcript([ZH_WITH_TERMS] * 3)
+    assert emitted({"tool_name": "Skill", "transcript_path": transcript}) == (
+        "PostToolUse", ANCHOR)
 
 
-def test_en_majority_stays_silent():
-    transcript = _write_transcript([EN_TURN, EN_TURN, EN_TURN])
-    result = run_hook(
-        {"tool_name": "Skill", "transcript_path": transcript}
-    )
-    assert result.returncode == 0
-    assert result.stdout == ""
+@pytest.mark.parametrize("turn", [
+    "Please confirm this change matches the original design and explain why.",
+    "이 변경 사항이 원래 설계와 일치하는지 확인하고 이유를 설명해 주세요.",
+    "Merci de vérifier que cette modification respecte la conception d'origine.",
+], ids=["en", "ko", "fr"])
+def test_en_ko_fr_transcripts_get_same_text(turn):
+    transcript = _write_transcript([turn] * 3)
+    assert emitted({"tool_name": "Agent", "transcript_path": transcript})[1] == ANCHOR
 
 
-def test_malformed_stdin_stays_silent():
-    """language-anchor.py:47-50 fail-open path: malformed stdin must
-    exit 0 and emit nothing, never crash the PostToolUse hook chain."""
-    result = run_hook("not json {{{")
-    assert result.returncode == 0
-    assert result.stdout == ""
+def test_text_names_no_language_or_script():
+    _, text = emitted({"tool_name": "Skill", "transcript_path": _write_transcript([ZH_TURN])})
+    for name in ("中文", "日本語", "繁體", "繁体", "简体", "簡體",
+                 "Chinese", "Japanese", "English", "Korean"):
+        assert name not in text
 
 
-def test_empty_stdin_stays_silent():
-    result = run_hook("")
-    assert result.returncode == 0
-    assert result.stdout == ""
+def test_text_asks_for_user_language_and_script():
+    _, text = emitted({"tool_name": "Skill", "transcript_path": _write_transcript([ZH_TURN])})
+    assert "in the language and script the user writes in" in text
 
 
-def test_non_skill_tool_name_stays_silent():
-    """tool_name gate (language-anchor.py:53-54): even a transcript
-    with a clear zh majority must not fire outside a Skill PostToolUse
-    invocation."""
-    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
-    result = run_hook(
-        {"tool_name": "Bash", "transcript_path": transcript}
-    )
-    assert result.returncode == 0
-    assert result.stdout == ""
+def test_missing_transcript_still_emits():
+    assert emitted({"hook_event_name": "UserPromptSubmit"}) == ("UserPromptSubmit", ANCHOR)
 
 
-def test_session_start_compact_emits_with_session_start_event():
-    """Post-compaction / resume SessionStart payloads carry no tool_name;
-    the anchor fires and echoes the payload's hook_event_name."""
-    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
-    result = run_hook(
-        {"hook_event_name": "SessionStart", "source": "compact",
-         "transcript_path": transcript}
-    )
-    assert result.returncode == 0
-    payload = json.loads(result.stdout)
-    assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
-    assert ZH_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
+def test_machine_artifact_clause_kept():
+    _, text = emitted({"hook_event_name": "SessionStart", "source": "resume"})
+    assert "machine-facing artifacts (brief/verdict/commit) keep their own language" in text
 
 
-def test_user_prompt_submit_emits_with_user_prompt_submit_event():
-    """A background agent's completion notification starts a turn through
-    UserPromptSubmit, which carries no tool_name; the anchor fires there."""
-    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
-    result = run_hook(
-        {"hook_event_name": "UserPromptSubmit", "transcript_path": transcript}
-    )
-    assert result.returncode == 0
-    payload = json.loads(result.stdout)
-    assert payload["hookSpecificOutput"]["hookEventName"] == "UserPromptSubmit"
-    assert ZH_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
-
-
-def test_user_prompt_submit_en_majority_stays_silent():
-    transcript = _write_transcript([EN_TURN, EN_TURN, EN_TURN])
-    result = run_hook(
-        {"hook_event_name": "UserPromptSubmit", "transcript_path": transcript}
-    )
+def test_bash_tool_stays_silent():
+    transcript = _write_transcript([ZH_TURN])
+    result = run_hook({"tool_name": "Bash", "transcript_path": transcript})
     assert result.returncode == 0
     assert result.stdout == ""
 
 
 @pytest.mark.parametrize("event", [["SessionStart"], "Stop", 7])
 def test_unknown_hook_event_name_stays_silent(event):
-    """Only "SessionStart" / "PostToolUse" / "UserPromptSubmit" are echoed
-    back as hookEventName."""
-    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
-    result = run_hook(
-        {"hook_event_name": event, "tool_name": "Skill", "transcript_path": transcript}
-    )
+    result = run_hook({"hook_event_name": event, "tool_name": "Skill"})
     assert result.returncode == 0
     assert result.stdout == ""
 
 
-def test_agent_tool_result_emits_directive():
-    transcript = _write_transcript([JA_TURN, JA_TURN, JA_TURN])
-    result = run_hook(
-        {"hook_event_name": "PostToolUse", "tool_name": "Agent",
-         "transcript_path": transcript}
-    )
+@pytest.mark.parametrize("stdin", ["not json {{{", "", "[1, 2]"],
+                         ids=["malformed", "empty", "non-object"])
+def test_malformed_stdin_stays_silent(stdin):
+    result = run_hook(stdin)
     assert result.returncode == 0
-    payload = json.loads(result.stdout)
-    assert payload["hookSpecificOutput"]["hookEventName"] == "PostToolUse"
-    assert JA_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
-
-
-def test_zh_directive_names_no_script_variant():
-    """A Simplified-Chinese user must not be told to switch to
-    Traditional (or the reverse): the zh text names neither variant."""
-    transcript = _write_transcript([ZH_TURN, ZH_TURN, ZH_TURN])
-    result = run_hook({"tool_name": "Skill", "transcript_path": transcript})
-    text = json.loads(result.stdout)["hookSpecificOutput"]["additionalContext"]
-    for variant in ("繁體", "繁体", "简体", "簡體"):
-        assert variant not in text
+    assert result.stdout == ""

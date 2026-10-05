@@ -191,7 +191,7 @@ SKILL_CALL = {"tool": "skill", "sessionID": "root", "id": "c4", "status": "compl
     ("loom-workflow", [("prompt", {"sessionID": "root", "messageID": "m1", "prompt": {"text": "hi"}}),
                        ("context", {"sessionID": "root", "system": []})], "Visualization card (loom-workflow)"),
     ("loom-code", [("prompt", {"sessionID": "root", "messageID": "m1", "prompt": {"text": ZH}}),
-                   ("execute.after", SKILL_CALL)], "使用者在對話中所用的語言"),
+                   ("execute.after", SKILL_CALL)], "in the language and script the user writes in"),
 ], ids=["session-start", "session-start-child", "visualization-card", "language-anchor"])
 def test_session_and_skill_hooks_feed_text_back(tmp_path: Path, plugin, fires, needle):
     env = {**os.environ, "TMPDIR": str(tmp_path)}
