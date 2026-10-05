@@ -28,7 +28,7 @@ PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 ADAPTER = PLUGIN_ROOT / "hooks" / "agy_adapter.py"
 
 JA_FRAGMENT = "会話言語（日本語）"
-ZH_FRAGMENT = "會話語言（繁體中文）"
+ZH_FRAGMENT = "使用者在對話中所用的語言"
 JA_TURN = "この変更が仕様に合っているかどうかを確認してください。よろしくお願いします。"
 ZH_TURN = "請幫我確認這個修改是否符合原本的設計規範，並且說明理由。"
 EN_TURN = "Please confirm this change matches the original design specification and explain why."

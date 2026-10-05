@@ -55,4 +55,4 @@ def test_entry_command_chinese_conversation_keeps_chinese_anchor(tmp_path: Path)
     )
     assert proc.returncode == 0, proc.stderr
     texts = json.loads(proc.stdout)
-    assert any("會話語言（繁體中文）" in text for text in texts), texts
+    assert any("使用者在對話中所用的語言" in text for text in texts), texts

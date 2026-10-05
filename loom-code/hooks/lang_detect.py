@@ -74,9 +74,14 @@ _LOG_LINE_RE = re.compile(
 # a Traditional-Chinese conversation was misdetected as undetermined
 # because one skill-body turn plus one interrupt marker flooded the
 # last-n-turns window with English/no-signal text).
+# The last two are Claude Code's compaction summary and skill
+# re-invocation echo, matched by text for hosts that lack the
+# ``isCompactSummary`` / ``isMeta`` flags ``_iter_user_turns`` skips on.
 _HARNESS_INJECTION_PREFIXES = (
     "Base directory for this skill:",
     "[Request interrupted",
+    "This session is being continued from a previous conversation",
+    "(Re-invocation of /",
 )
 # Slash-command / skill-invocation echoes ('Run the "<name>" workflow.'
 # followed by the skill's own English description) are the same failure
@@ -199,6 +204,10 @@ def _iter_user_turns(transcript_path):
             if entry.get("type") != "user":
                 continue
             if entry.get("isSidechain"):
+                continue
+            # Harness-written user-role turns: compaction summaries and
+            # meta entries (skill bodies, re-invocation echoes).
+            if entry.get("isCompactSummary") or entry.get("isMeta"):
                 continue
             message = entry.get("message")
             if not isinstance(message, dict):

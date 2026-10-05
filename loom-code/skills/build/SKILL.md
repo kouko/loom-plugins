@@ -88,6 +88,10 @@ hand-off and the fix's commit message each state the class and the places
 searched, even when the flagged instance is the only one found.
 
 Internal plans, commits, and verification evidence are written in English.
+Every message to the user, including a relayed implementer, adversary or
+reviewer result, is written in the user's conversation language, even on a
+turn with no new user message, such as a background agent's completion or a
+resume after compaction.
 
 ## 3. Verify integration
 

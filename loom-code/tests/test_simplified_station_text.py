@@ -245,3 +245,43 @@ def test_readmes_name_the_hook_a_publication_reminder() -> None:
         text = (ROOT / name).read_text(encoding="utf-8")
         assert "publication gate" not in text, name
     assert "push gate" not in root and "fast publication gate" not in root
+
+
+_NO_USER_MESSAGE_CLAUSE = (
+    "even on a turn with no new user message, such as a background agent's "
+    "completion or a resume after compaction."
+)
+
+
+def test_build_and_review_relay_results_in_the_users_language() -> None:
+    build = (
+        "Every message to the user, including a relayed implementer, adversary "
+        "or reviewer result, is written in the user's conversation language, "
+        + _NO_USER_MESSAGE_CLAUSE
+    )
+    review = (
+        "Every message to the user, including a relayed reviewer or "
+        "acceptance-tester result, is written in the user's conversation "
+        "language, " + _NO_USER_MESSAGE_CLAUSE
+    )
+    assert build in " ".join(BUILD.split())
+    assert review in " ".join(REVIEW.split())
+
+
+def test_ship_language_sentence_covers_every_user_message() -> None:
+    widened = (
+        "Write the PR body and every message to the user, including the "
+        "decision point ③ result and acceptance question, in the user's "
+        "conversation language when the host can establish it from the "
+        "confirmed intent or active conversation."
+    )
+    assert widened in SHIP_PROSE
+    assert "Write the PR body in the user's conversation language" not in SHIP_PROSE
+
+
+def test_english_artifact_sentences_unchanged() -> None:
+    assert ("Internal plans, commits, and verification evidence are written "
+            "in English.") in " ".join(BUILD.split())
+    assert "Reviewer findings and generated evidence are written in English." in REVIEW
+    assert ("Repository conventions still govern committed artifacts. Internal "
+            "publication reports remain English.") in SHIP_PROSE

@@ -4,8 +4,9 @@ entry (concept-model §7, §7a).
 The old mechanism (git-guard, ask-triage, the router card, the family
 reception/relay prose, language-stop-check) is deleted; what remains is
 SessionStart -> hooks/session-start, PreToolUse(Bash) -> the single
-loom checker, PostToolUse(Skill) -> language-anchor (host hygiene, not a
-loom flow mechanism — plan W0-05 risk note).
+loom checker, PostToolUse(Skill|Agent), SessionStart(compact|resume) and
+UserPromptSubmit -> language-anchor (host hygiene, not a loom flow
+mechanism — plan W0-05 risk note).
 
 External surfaces grounded:
 - Claude Code hook config shape (``hooks.<Event>[].matcher`` +
@@ -61,7 +62,7 @@ def _commands(entries) -> list[str]:
 
 
 def test_event_set_is_exact(hooks):
-    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse"}
+    assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit"}
 
 
 def test_codex_event_set_is_session_start_and_publication_interception(codex_hooks):
@@ -71,8 +72,15 @@ def test_codex_event_set_is_session_start_and_publication_interception(codex_hoo
 
 
 def test_session_start_runs_the_rewritten_script(hooks):
-    (command,) = _commands(hooks["SessionStart"])
+    (entry,) = [e for e in hooks["SessionStart"] if e["matcher"] == "startup|clear|compact"]
+    (command,) = _commands([entry])
     assert command.endswith('/hooks/session-start"')
+
+
+def test_session_start_reanchors_language_after_compact_or_resume(hooks):
+    (entry,) = [e for e in hooks["SessionStart"] if e["matcher"] == "compact|resume"]
+    (command,) = _commands([entry])
+    assert "/hooks/language-anchor.py" in command
 
 
 def test_pre_tool_use_matcher_set_is_bash_only(hooks):
@@ -137,9 +145,14 @@ def test_checker_missing_fallback_programs_are_identical(hooks, codex_hooks):
 
 
 def test_post_tool_use_keeps_language_anchor(hooks):
-    assert _matchers(hooks["PostToolUse"]) == {"Skill"}
+    assert _matchers(hooks["PostToolUse"]) == {"Skill|Agent"}
     (command,) = _commands(hooks["PostToolUse"])
     assert "/hooks/language-anchor.py" in command
+
+
+def test_user_prompt_submit_runs_language_anchor(hooks):
+    (command,) = _commands(hooks["UserPromptSubmit"])
+    assert command == 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"'
 
 
 def test_no_removed_hook_is_referenced(hooks):
