@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.12.1] — 2026-10-05 — OpenCode loader stops recording user prompts
+
+- The synced OpenCode loader copy no longer writes the per-session prompt file under `tmpdir/loom-opencode/`, and drops `transcript_path` from hook payloads, matching `loom-code` 3.32.0.
+
 ## [2.12.0] — 2026-10-04 — capture-intent runs a complexity check before decision point ①
 
 - `capture-intent` Step 4 runs `loom-workflow:critique` in complexity mode when the confirmed scope adds a mechanism, field, rule or step; only its verdict and the smaller alternative go into the one confirmation message, it adds no new stop, and it is skipped when `loom-workflow` is not installed.
