@@ -324,6 +324,9 @@ Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 **Task size.** Each task owns coherent Acceptance lines, one module boundary,
 declared dependencies, and positive plus negative/boundary cases. Split
 unrelated behaviour; keep scenario detail in the spec and never size by time.
+Code tasks: Files marks the module entry tests call; case-ids name behaviour
+seen there, never internals; unreachable logic becomes its own module.
+Docs/metadata tasks mark none.
 
 **Architecture.** When the repository root has `ARCHITECTURE.md` carrying
 `ratified-by: <name> <date>`, read it before writing the Task DAG. Treat an
