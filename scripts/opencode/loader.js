@@ -13,7 +13,8 @@
 //   <root>/agents/<name>.md       -> subagent "<plugin>:<name>"
 //   <root>/hooks/hooks-opencode.json -> v2 tool and session hooks (registerHooks)
 import { spawn } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -142,6 +143,11 @@ async function registerAgents(ctx, found) {
 // Each capability registers in its own step, so a later one (hooks) is one
 // more function and one more line here.
 export async function setup(ctx) {
+  // Earlier loader versions recorded user prompts here; nothing reads them.
+  // A symlink is removed as a link, its target untouched.
+  try {
+    rmSync(join(tmpdir(), "loom-opencode"), { recursive: true, force: true });
+  } catch {}
   const found = skills();
   await registerSkills(ctx, found);
   await registerCommands(ctx, found);

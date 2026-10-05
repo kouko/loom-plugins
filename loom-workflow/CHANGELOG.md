@@ -7,6 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [5.6.3] — 2026-10-05 — OpenCode loader stops recording user prompts
 
 - The synced OpenCode loader copy no longer writes the per-session prompt file under `tmpdir/loom-opencode/`, and drops `transcript_path` from hook payloads, matching `loom-code` 3.32.0.
+- The synced OpenCode loader copy now deletes the prompt files earlier versions left in `tmpdir/loom-opencode/` when it loads.
 
 ## [5.6.2] — 2026-10-01 — OpenCode loader sync.
 

@@ -52,6 +52,12 @@ if (process.argv[2]) {
 """
 
 
+@pytest.fixture(autouse=True)
+def _own_tmpdir(tmp_path: Path, monkeypatch):
+    # The loader deletes tmpdir/loom-opencode on load; keep it off the real one.
+    monkeypatch.setenv("TMPDIR", str(tmp_path))
+
+
 def _node(plugin: str, *args: str, cwd=None, env=None) -> dict:
     node = shutil.which("node")
     assert node, "node is required to exercise the OpenCode loader"
@@ -160,6 +166,25 @@ def test_prompt_file_never_written(tmp_path: Path):
                      {"hook": "execute.after", "event": {**SKILL_CALL, "sessionID": session}}]
             _node(plugin, json.dumps(fires), cwd=tmp_path, env=env)
     assert not (tmp_path / "loom-opencode").exists()
+
+
+def test_load_removes_prompt_files_left_by_earlier_versions(tmp_path: Path):
+    left = tmp_path / "loom-opencode"
+    left.mkdir()
+    (left / "ses_1.jsonl").write_text("{}\n", encoding="utf-8")
+    _node("loom-code", env={**os.environ, "TMPDIR": str(tmp_path)})
+    assert not left.exists()
+    _node("loom-code", env={**os.environ, "TMPDIR": str(tmp_path)})  # absent: still loads
+
+
+def test_load_removes_a_linked_prompt_folder_not_its_target(tmp_path: Path):
+    target = tmp_path / "elsewhere"
+    target.mkdir()
+    (target / "keep.jsonl").write_text("{}\n", encoding="utf-8")
+    (tmp_path / "loom-opencode").symlink_to(target)
+    _node("loom-code", env={**os.environ, "TMPDIR": str(tmp_path)})
+    assert not (tmp_path / "loom-opencode").is_symlink()
+    assert (target / "keep.jsonl").read_text(encoding="utf-8") == "{}\n"
 
 
 SKILL_CALL = {"tool": "skill", "sessionID": "root", "id": "c4", "status": "completed",
