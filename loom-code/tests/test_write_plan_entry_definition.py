@@ -19,7 +19,7 @@ AFFIRMATIVE_PIN = re.compile(
     r"\b(?:is|are|means|marks|names|calls?)\b[^.]*\b(?:(?:other|another) modules?|outside (?:the|its) module)\b",
     re.IGNORECASE,
 )
-NEGATION = re.compile(r"\b(?:not|never|no|none|without)\b|n't\b", re.IGNORECASE)
+NEGATION = re.compile(r"\b(?:not|cannot|never|no|none|without)\b|n['’]t\b", re.IGNORECASE)
 
 
 def _task_size_paragraph(text: str) -> str:
@@ -29,10 +29,12 @@ def _task_size_paragraph(text: str) -> str:
 
 
 def _pins_outside_callers(paragraph: str) -> bool:
-    sentences = re.split(r"(?<=\.)\s+", " ".join(paragraph.split()))
+    # Judge clause by clause: a negation in a sibling ";" clause must not veto
+    # an affirmative pin in its own clause.
+    clauses = re.split(r"(?<=[.;])\s+", " ".join(paragraph.split()))
     return any(
-        "entry" in s.lower() and AFFIRMATIVE_PIN.search(s) and not NEGATION.search(s)
-        for s in sentences
+        "entry" in c.lower() and AFFIRMATIVE_PIN.search(c) and not NEGATION.search(c)
+        for c in clauses
     )
 
 
@@ -47,6 +49,13 @@ def test_entrypin_negatedexample_rejected() -> None:
     """A negated sentence naming outside callers is rejected."""
     assert not _pins_outside_callers(
         "Files marks the entry, not the function other modules call."
+    )
+
+
+def test_entrypin_cannotnegatedexample_rejected() -> None:
+    """A "cannot"-negated sentence naming outside callers is rejected."""
+    assert not _pins_outside_callers(
+        "Files marks the entry, which cannot be the function other modules call."
     )
 
 
