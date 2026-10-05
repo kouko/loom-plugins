@@ -279,7 +279,7 @@ PASS.
 - Decision: Feathers 2004 characterization path chosen over rewrite-from-scratch because code is inherited, not own-violation — loom-code's tdd-iron-law §Legitimate legacy-code backfill explicitly authorizes this path
 - Decision: async wrappers ship BEFORE deleting completion-handler implementations — phased callsite migration is safer than big-bang switch
 - Learning: continuation cancel-then-resume order matters under CPU pressure (intermittent on CI < 5% before fix; 0% after)
-- Gotcha: future async wrapper additions should reuse the extracted continuation helper (introduced in Task 2's REFACTOR step) to avoid Rule-of-Three re-fire
+- Gotcha: future async wrapper additions should reuse the extracted continuation helper (introduced in Task 2's REFACTOR step), since a cancellation or resume handling change must reach every wrapper together
 
 ---
 
