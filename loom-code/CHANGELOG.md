@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.34.1] — 2026-10-05 — the tests lens asks for a marked entry only when a task adds or changes a function's behaviour
+## [3.35.0] — 2026-10-05 — the tests lens asks for a marked entry only when a task adds or changes a function's behaviour
 
 - The closing-review `tests` lens now says a task adding or changing a function's behaviour whose plan Files line marks no entry is a finding. It used to say any task changing non-test code, so a version-bump-, config- or docs-only task is no longer asked to mark an entry.
 - `test_write_plan_entry_definition.py` now judges the write-plan entry definition clause by clause, splitting on `.` and `;`, and treats `cannot` and curly-apostrophe contractions such as `can’t` as negations, so an entry definition negated with `cannot` fails the pin.
