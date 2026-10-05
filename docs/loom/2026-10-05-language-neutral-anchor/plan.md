@@ -4,7 +4,7 @@ charter: 1.1
 
 ## Current State Evidence
 - Forward: `loom-code/hooks/language-anchor.py` calls `lang_detect.conversation_language()` and emits `_ANCHOR_TEXT[zh|ja]`; any other result prints nothing.
-- Reverse: `loom-code/tests/test_language_anchor_hook.py`, `test_lang_detect.py` and three graduated adversarial tests pin per-language output and detector votes.
+- Reverse: `loom-code/tests/test_language_anchor_hook.py`, `test_lang_detect.py` and four graduated adversarial tests pin per-language output and detector votes.
 - Error: `lang_detect.detect_script` counts each ASCII letter as one vote, so zh dense with English terms resolves `en` and the anchor stays silent.
 - Data: `loom-code/hooks/agy_adapter.py:254-263` reuses `_ANCHOR_TEXT` and `lang_detect.majority_language`; OpenCode runs `language-anchor.py` through `hooks-opencode.json`.
 - Boundary: `lang_detect.py` has no runtime consumer outside `language-anchor.py` and `agy_adapter.py`; `transcript_path` is read only by them, the OpenCode prompt file existing for them alone; Codex wires no anchor.
