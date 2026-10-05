@@ -47,6 +47,8 @@ def test_affirms_selftest_negated_example_rejected() -> None:
 
 
 def test_ship_risk_placeholder_cites_agent_decided_doors() -> None:
-    """The PR risk placeholder affirmatively cites agent-decided door answers."""
+    """The PR risk placeholder affirmatively cites agent-decided door answers
+    and names the one-way-door classes that pick the one-way ones out."""
     block = _risk_placeholder(SHIP.read_text(encoding="utf-8"))
     assert _affirms(block, "agent-decided"), block
+    assert _affirms(block, "one-way-door.md"), block
