@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.34.0] — 2026-10-05 — review lenses flag tests that bypass the module entry, forward-only modules and length-only splits, and plan tasks name the module entry their tests go through
+
+- The closing-review `tests` lens now says a new or changed test that calls an internal (non-entry) function is a finding when that behaviour is reachable from the module's entry, whether or not entry tests already cover it, and the fix moves the test to the entry; a test through the entry is never asked to add internal tests, and logic the entry cannot reach that became its own module with its own entry, tested at that entry, is not a finding.
+- The `naming` lens keeps function length (20 lines soft, 50 hard) only as a prompt to look, not a finding: a split finding names a concrete problem, such as a function doing several unrelated things, and length alone is never the finding. It used to say 100 lines was a finding on its own.
+- The `refactoring` lens now treats three sites doing the same thing as an extraction candidate, extracted only when the three change for the same reason; a split or extraction defaults to a non-exported function inside the module, and becomes its own module with an entry only when another module needs to call it or its behaviour is unreachable from the existing entry — wanting to test it alone is no reason for a new entry. A shared extraction across modules stays acceptable.
+- The `deletion-first` lens now says a new module or function that only forwards — no branching, transformation, validation, error handling, resource-boundary handling or policy choice, just a call elsewhere returning its result — is a finding; one hiding any of those is not.
+- Write-plan's task shape now says code tasks mark in Files the module entry their tests call, case-ids name behaviour seen there and never internals, and logic the entry cannot reach becomes its own module; docs and metadata tasks mark none. No checker rule changed.
+
 ## [3.33.0] — 2026-10-05 — the tests lens names tests that cannot fail, and the ship PR risk section states door, blast radius and rollback
 
 - The closing-review `tests` lens now says a test that cannot fail for the behaviour it names is a finding, and names three shapes: a test restating a constant or the implementation; a test reading source text to assert code structure (prose-pin tests that meet `loom-code/references/engineering-baseline.md` §5 item 8 excepted); a mock or stub replacing the very seam it claims to cover.
