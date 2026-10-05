@@ -27,6 +27,11 @@ Wave 1 replaces detection with one fixed reminder per host, then deletes what on
 - Test: A4 positive: opencode-skill-result-still-gets-anchor-without-prompt-file; negative: prompt-file-never-written.
 - Risk: agent-decided — delete transcript(), spoken(), the keepsTranscript append and transcript_path payload fields (no reader left, verified by git grep); copies synced by sync_codex_manifests.py; loader test narrowed.
 
+**W1-05 OpenCode loader removes prompt files left by earlier versions**  after: W1-03  acceptance: 4
+- Files: scripts/opencode/loader.js, loom-code/opencode/loader.js, loom-design/opencode/loader.js, loom-workflow/opencode/loader.js, loom-code/tests/test_opencode_loader.py
+- Test: A4 positive: leftover-loom-opencode-dir-removed-on-load; negative: load-succeeds-when-dir-absent-or-unremovable.
+- Risk: user-decided — closing review raised leftover prompt files from earlier versions; user chose removal; only the loader-owned tmpdir folder, fail-open.
+
 **W1-04 Delete the language detector**  after: W1-02, W1-03  acceptance: 6
 - Files: loom-code/hooks/lang_detect.py, loom-code/tests/test_lang_detect.py, loom-code/tests/test_hooks_json.py, loom-code/scripts/check_mechanisms.py, loom-code/tests/test_check_mechanisms.py
 - Test: A6 positive: package-suite-passes-without-detector; negative: no-runtime-file-names-lang-detect.
@@ -50,6 +55,8 @@ Wave 1 replaces detection with one fixed reminder per host, then deletes what on
 ① — what — 語言判斷：A 改計分方式／E 不判斷、每次送同一句中性提醒 → 「走 E 吧」
 ① — what — 覆述 intent（含自動發布授權） → 「對」
 ① — consequence — 提醒用英文／中文／中英各一句 → 「英文」
+③ — consequence — 舊版 OpenCode 留下的輸入暫存檔這次一起刪，或留給系統清 → 「暫存檔一起清」
+③ — consequence — 英文對話每次觸發也多一行提醒，可以嗎 → 「英文提醒可以」
 
 ## Risks
 1. user-decided — reminder written in English: neutral across languages; its pull on a non-English conversation is weaker than a native-language reminder, which acceptance testing measures live.
