@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.34.1] — 2026-10-05 — the tests lens asks for a marked entry only when a task changes a function's behaviour
+
+- The closing-review `tests` lens now says a task changing a function's behaviour whose plan Files line marks no entry is a finding. It used to say any task changing non-test code, so a version-bump-, config- or docs-only task is no longer asked to mark an entry.
+- `test_write_plan_entry_definition.py` now judges the write-plan entry definition clause by clause, splitting on `.` and `;`, and treats `cannot` as a negation, so an entry definition negated with `cannot` fails the pin.
+- The `docs/examples/swift-network-layer.md` review note now recommends extracting a non-exported wrapper helper because the four wrappers change for the same reason, not because of their count. No checker rule changed.
+
 ## [3.34.0] — 2026-10-05 — review lenses flag tests that bypass the module entry, forward-only modules and length-only splits, and plan tasks name the entry other modules call
 
 - The closing-review `tests` lens now defines a module's entry as what other modules call, never whatever its tests call, and says a task changing non-test code whose plan Files line marks no entry is a finding. A new or changed test that calls an internal (non-entry) function is a finding when that behaviour is reachable from the module's entry, whether or not entry tests already cover it, and the fix moves the test to the entry, or deletes it when an entry test already covers that behaviour; a test through the entry is never asked to add internal tests, and logic the entry cannot reach that became its own module with its own entry, tested at that entry, is not a finding.
