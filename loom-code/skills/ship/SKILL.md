@@ -67,7 +67,9 @@ do not depend on conversation recall. Use these headings exactly once:
 <review, tests, attestation, available CI evidence, and known limits>
 
 ## Risks and rollback
-<remaining risks and a concrete recovery path>
+<one-way or two-way door, citing the door answers in the plan's Risks or
+Questions asked when recorded; blast radius: what could break and for whom;
+a concrete rollback or recovery path; remaining risks>
 
 ## Follow-ups
 <deferred work, or "None">
