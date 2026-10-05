@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[2]
 SKILL = REPO / "loom-code/skills/write-plan/SKILL.md"
 
 AFFIRMATIVE_PIN = re.compile(
