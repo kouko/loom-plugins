@@ -103,7 +103,8 @@ def test_missing_transcript_still_emits():
 
 
 def test_machine_artifact_clause_kept():
-    _, text = emitted({"hook_event_name": "SessionStart", "source": "resume"})
+    event, text = emitted({"hook_event_name": "SessionStart", "source": "resume"})
+    assert event == "SessionStart"
     assert "machine-facing artifacts (brief/verdict/commit) keep their own language" in text
 
 

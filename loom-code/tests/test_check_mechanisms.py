@@ -494,13 +494,13 @@ class TestClassValidation:
 
     def test_host_hygiene_id_found_in_skill_recompute_is_accepted(self, tmp_path):
         mechs = FULL_MECHANISMS + [
-            {"id": "lang_detect", "class": "host-hygiene", "eval": "tests/test_hook.py"}
+            {"id": "language-anchor", "class": "host-hygiene", "eval": "tests/test_hook.py"}
         ]
         repo = _build_repo(tmp_path, mechanisms=mechs)
-        (repo / "loom-code" / "skills" / "lang_detect").mkdir(parents=True)
-        (repo / "loom-code" / "skills" / "lang_detect" / "SKILL.md").write_text("# lang_detect\n")
+        (repo / "loom-code" / "skills" / "language-anchor").mkdir(parents=True)
+        (repo / "loom-code" / "skills" / "language-anchor" / "SKILL.md").write_text("# language-anchor\n")
         result = cm.run_checks(repo)
-        assert not any(f.rule in ("R0", "R1", "R2") and f.mechanism_id == "lang_detect"
+        assert not any(f.rule in ("R0", "R1", "R2") and f.mechanism_id == "language-anchor"
                        for f in result.findings), result.findings
 
     def test_host_hygiene_printed_as_exempt_line(self, tmp_path):

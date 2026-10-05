@@ -40,7 +40,7 @@ REMOVED_HOOK_FILES = [
     "family-relay.md",
     "plain-relay.md",
 ]
-KEPT_HOOK_FILES = ["session-start", "language-anchor.py", "lang_detect.py", "hooks.json"]
+KEPT_HOOK_FILES = ["session-start", "language-anchor.py", "hooks.json"]
 
 
 @pytest.fixture(scope="module")
