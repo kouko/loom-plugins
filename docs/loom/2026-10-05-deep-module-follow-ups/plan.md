@@ -40,6 +40,13 @@ Wave 2 — release metadata.
 - Test: A4 positive: readme-version-matches-manifest; negative: stale-3.34.0-absent-outside-changelog-and-docs.
 - Risk: grep for 3.34.0 outside docs/ lists exactly these four plus W2-01's files; historical CHANGELOG sections keep old strings.
 
+Wave 3 — probe graduation (closing-review gate review.probe-graduation).
+
+**W3-01 Graduate the curly-contraction probe into the package suite**  after: W2-02  acceptance: 2
+- Files: docs/loom/2026-10-05-deep-module-follow-ups/evidence/probes/test_entrypin_curlycontraction.py, loom-code/tests/test_write_plan_entry_definition_curly.py
+- Test: A2 positive: graduated-probe-collected-and-green-in-package-suite; negative: probe-red-against-5993c4ca-ascii-only-negation.
+- Risk: git mv plus repo-root path fix only; agent-decided: loom-code/tests/ per AGENTS.md Test Location; the probe caught the U+2019 contraction gap fixed in 0a02bffa.
+
 ## Simplicity check
 - none found
 
