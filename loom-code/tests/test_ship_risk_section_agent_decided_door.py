@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[5]
+ROOT = Path(__file__).resolve().parents[2]
 SHIP = ROOT / "loom-code" / "skills" / "ship" / "SKILL.md"
 
 AFFIRMATIVE = re.compile(r"\b(cit(e|es|ing)|nam(e|es|ing)|includ(e|es|ing)|stat(e|es|ing)|list(s|ing)?)\b", re.I)
