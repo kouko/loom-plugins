@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SHIP = ROOT / "loom-code" / "skills" / "ship" / "SKILL.md"
 
 AFFIRMATIVE = re.compile(r"\b(cit(e|es|ing)|nam(e|es|ing)|includ(e|es|ing)|stat(e|es|ing)|list(s|ing)?)\b", re.I)
-NEGATION = re.compile(r"\b(not|never|no|without|except|omit|skip|ignore)\b|n't", re.I)
+NEGATION = re.compile(r"\b(not|never|no|without|except|exclud\w*|omit\w*|drop\w*|skip\w*|ignor\w*)\b|n't", re.I)
 
 
 def _risk_placeholder(text: str) -> str:
@@ -43,6 +43,7 @@ def test_affirms_selftest_affirmative_example_accepted() -> None:
 def test_affirms_selftest_negated_example_rejected() -> None:
     """A sentence that cites agent-decided answers under a negation is rejected."""
     assert not _affirms("<door, citing user-decided lines, not agent-decided ones>", "agent-decided")
+    assert not _affirms("<door, citing recorded lines, excluding agent-decided ones>", "agent-decided")
 
 
 def test_ship_risk_placeholder_cites_agent_decided_doors() -> None:
