@@ -1,6 +1,7 @@
 # The language reminder no longer judges the user's language — acceptance test evidence
 
-Tried on 2026-10-05, in a clean copy of the project at 1b5a7bcc
+Tried on 2026-10-05, in a clean copy of the project at 1b5a7bcc; re-run
+after the fix round at d48fa7ea (last section)
 (`git worktree add <scratch>/at-clean 1b5a7bcc`; branch base 8f082f0e,
 also checked out clean as `<scratch>/at-base` for before/after contrast).
 `<scratch>` = `/Users/kouko/.claude/jobs/b66b8c5a/tmp`; nothing under it is
@@ -198,9 +199,96 @@ installed into any shared env).
 - Evidence: outputs above.
 
 ## Data the user already had
-- The OpenCode loader at base appended each user prompt to
-  `<tmpdir>/loom-opencode/<session>.jsonl`; HEAD no longer writes it and
-  does not delete existing files. On this machine
-  `/var/folders/…/T/loom-opencode` holds 2 files (8 KB), left in place.
+- First run (1b5a7bcc): the OpenCode loader at base appended each user
+  prompt to `<tmpdir>/loom-opencode/<session>.jsonl`; 1b5a7bcc no longer
+  wrote it and did not delete existing files. On this machine
+  `/var/folders/…/T/loom-opencode` holds 2 files (2,401 + 100 bytes;
+  8 KB on disk).
+- Re-run (d48fa7ea): the loader now removes `<tmpdir>/loom-opencode`
+  (recursive, force, errors swallowed) every time any of the three
+  plugins' OpenCode entry loads; a symlink there is unlinked, its target
+  kept (re-run row 4). The user chose this on 2026-10-05 (「暫存檔一起清」,
+  plan Questions asked ③). No backup is made; nothing reads these files.
+  The user's real folder was never given to the loader during testing:
+  before and after every run it still lists
+  `ses_f0a837e6dffeTx1sWrCRca7fSC.jsonl` and
+  `ses_f0a8554b9ffewhVulvYhw6bqjn.jsonl`; they go when the user's own
+  OpenCode first loads the new version.
 - Antigravity's per-conversation state files under the temp dir keep the
   same format and name (`loom-code-agy-anchor-<uid>/…`).
+
+## Re-run on 2026-10-05, at d48fa7ea
+
+Fix range 38d1d26c..d48fa7ea: `plan.md` (W1-05, two ③ answers), the four
+byte-identical `opencode/loader.js` copies (+`rmSync(join(tmpdir(),
+"loom-opencode"), {recursive, force})` in `setup`, wrapped in try/catch),
+three CHANGELOGs, `test_opencode_loader.py` (+2 tests, autouse TMPDIR
+fixture), `test_adversarial_agy_adapter.py` (one assertion tightened). No
+hook script, hook wiring, station/agent/reference text or manifest changed
+(`git diff --name-only 38d1d26c..d48fa7ea`).
+
+Clean copy: `git worktree add <scratch>/at-rerun d48fa7ea`. Scratch
+scripts live in `<scratch>/rerun/` (not committed). All four loader copies
+hash `5a7a663a…` (`shasum`).
+
+- Setup: re-tested — `claude plugin validate` in the clean copy: loom-code
+  `✔ Validation passed`; loom-design, loom-workflow `✔ Validation passed
+  with warnings` (same warning as the first run).
+- 1: carried over — the fix changes only the OpenCode loader; the Claude
+  Code hook (`language-anchor.py`), its triggers (`hooks.json`) and its
+  text are byte-unchanged, so the first run's direct and live results
+  stand. (The row-2 re-run below incidentally pushed the zh-with-terms
+  transcript through all five triggers again: anchor every time.)
+- 2: re-tested — `rerun/hosts/row2.py`: the 7 transcripts (en, fr, ja, ko,
+  ru, zh_terms, missing file) × 5 triggers (SessionStart compact, resume;
+  PostToolUse Skill, Agent; UserPromptSubmit) into the clean copy's hook:
+  `runs=35 distinct_texts=1`; the one text is the `ANCHOR_TEXT` quoted in
+  row 2 above — no language or script named. English wording confirmed by
+  the user on 2026-10-05 (「英文提醒可以」, plan Questions asked ③), in
+  addition to the intent's Constraints.
+- 3: carried over — the live trials ran in Claude Code, whose hook,
+  wiring and text the fix does not touch; nothing in the fix range runs
+  in a Claude Code session.
+- 4: re-tested on all three hosts.
+  - Claude Code: `rerun/hosts/drive_hosts.py` sent zh_terms, en, ko, fr
+    through UserPromptSubmit, PostToolUse Agent and SessionStart compact
+    → `additionalContext == ANCHOR_TEXT` in all 12.
+  - Antigravity: same script, `agy_adapter.py pre-invocation` with a
+    USER_INPUT step then a `view_file` of a loom-code SKILL.md, TMPDIR in
+    scratch → invocation 1 injects exactly one `ephemeralMessage` equal to
+    `ANCHOR_TEXT`, invocation 2 none, for all four languages.
+  - OpenCode: `rerun/run_loader.py` loads each plugin's `index.js` under
+    node with a stub ctx (`rerun/harness.mjs`, same shape as
+    `test_opencode_loader.py`), TMPDIR set to a fresh scratch folder and
+    asserted (`os.tmpdir()` checked to start with the scratch path before
+    each run):
+
+    | Case | Plugin | Result |
+    |---|---|---|
+    | leftover `loom-opencode/ses_fake.jsonl` | loom-code | exit 0, 6 skills, Skill result carries the anchor, folder gone |
+    | leftover | loom-design | exit 0, 6 skills, folder gone |
+    | leftover | loom-workflow | exit 0, 12 skills, folder gone |
+    | folder absent | loom-code | exit 0, anchor appended, temp folder still empty |
+    | `loom-opencode` → symlink to `elsewhere/` | loom-code | exit 0, link gone, `elsewhere/keep.jsonl` still `keep me\n` |
+    | folder present but mode 555 (unremovable) | loom-code | exit 0, anchor appended, file left in place, no stderr |
+
+    Real `$TMPDIR/loom-opencode` before and after: the same 2 files.
+  - Named tests: `test_load_removes_prompt_files_left_by_earlier_versions`,
+    `test_load_removes_a_linked_prompt_folder_not_its_target`,
+    `test_anchor_nonstring_user_content_anchors_not_crash` in the 223-pass
+    run under row 6.
+- 5: carried over — no station, agent or reference file in the fix range;
+  the reminder's machine-artifact clause is unchanged (row 2 text above).
+- 6: re-tested — same criterion files as the first run, in the clean copy
+  with `TMPDIR=<scratch>/rerun/pytest-tmp/`: loom-code → `223 passed in
+  13.62s` (221 + the 2 new loader tests); loom-design
+  `test_capture_intent_contract.py` + loom-workflow
+  `test_release_metadata.py` → `27 passed`; `sync_codex_manifests.py
+  --check --all` → exit 0. Versions: loom-code 3.32.0 ×4, loom-design
+  2.12.1 ×4, loom-workflow 5.6.3 ×4 (no bump in the fix range; the new
+  CHANGELOG bullets sit under those unreleased sections). Full suite not
+  run by me: `python3 scripts/run_package_tests.py --loom-family`, run by
+  `finalize-review`, which refuses the attestation on failure.
+- Guard note: two command shapes were refused by the shell guard (`rm -rf`
+  on a variable path; redirect to a variable path); fixtures were then
+  built inside `run_loader.py` with fresh `mkdtemp` folders instead.
