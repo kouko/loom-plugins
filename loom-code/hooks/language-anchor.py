@@ -13,41 +13,14 @@ exit 0 — this hook never blocks.
 """
 from __future__ import annotations
 
-import importlib.util
 import json
 import sys
-from pathlib import Path
-
-_HOOKS_DIR = Path(__file__).resolve().parent
-_LANG_DETECT_PATH = _HOOKS_DIR / "lang_detect.py"
 
 ANCHOR_TEXT = (
     "Write every message to the user in the language and script the user "
     "writes in during this conversation; machine-facing artifacts "
     "(brief/verdict/commit) keep their own language."
 )
-
-# Temporary: read only by agy_adapter.py until it switches to ANCHOR_TEXT
-# (W1-02); removed with lang_detect.py (W1-04).
-_ANCHOR_TEXT = {
-    "zh": (
-        "對使用者的敘述一律使用使用者在對話中所用的語言與文字；"
-        "機器面 artifact（brief/verdict/commit）維持原語言。"
-    ),
-    "ja": (
-        "ユーザー向けの説明は常にユーザーの会話言語（日本語）を使用してください。"
-        "brief/verdict/commit などの機械向けアーティファクトは元の言語のままにします。"
-    ),
-}
-
-
-def _load_lang_detect():
-    # Temporary: read only by agy_adapter.py until W1-02.
-    spec = importlib.util.spec_from_file_location("lang_detect", _LANG_DETECT_PATH)
-    assert spec and spec.loader
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
 
 
 def main() -> int:
