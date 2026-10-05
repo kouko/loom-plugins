@@ -270,15 +270,15 @@ def test_anchor_garbage_lines_still_anchor(tmp_path):
     assert ANCHOR_TEXT in _messages(out), out
 
 
-def test_anchor_nonstring_user_content_silent_not_crash(tmp_path):
-    """USER_INPUT content that is a number or object yields valid JSON, not a crash."""
+def test_anchor_nonstring_user_content_anchors_not_crash(tmp_path):
+    """USER_INPUT content that is a number or object neither crashes nor hides the anchor."""
     transcript = _write_jsonl(tmp_path / "t.jsonl", [
         {"source": "USER_EXPLICIT", "type": "USER_INPUT", "content": 12345},
         {"source": "USER_EXPLICIT", "type": "USER_INPUT", "content": {"x": 1}},
         {"source": "MODEL", "tool_calls": [{"name": "view_file", "args": {"AbsolutePath": LOOM_SKILL}}]},
     ])
     out = _run("pre-invocation", _anchor_payload(transcript), tmp_path)
-    assert out == {} or "injectSteps" in out
+    assert ANCHOR_TEXT in _messages(out), out
 
 
 def test_anchor_huge_transcript_within_hook_timeout(tmp_path):
