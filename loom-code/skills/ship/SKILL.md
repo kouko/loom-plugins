@@ -67,8 +67,9 @@ do not depend on conversation recall. Use these headings exactly once:
 <review, tests, attestation, available CI evidence, and known limits>
 
 ## Risks and rollback
-<one-way or two-way door, citing the door answers in the plan's Risks or
-Questions asked when recorded; blast radius: what could break and for whom;
+<one-way or two-way door, citing the recorded door answers (user-decided
+lines in the spec's Design decision when a spec exists, else in the plan's
+Risks); blast radius: what could break and for whom;
 a concrete rollback or recovery path; remaining risks>
 
 ## Follow-ups
