@@ -1,7 +1,7 @@
 # concern: circular entry definition lets a planner mark whatever its tests call as the module entry, so internal-function tests read as entry tests
 """Adversarial probe for write-plan's Task size entry rule.
 
-The rule reads "Files marks the module entry tests call". Under time
+An earlier draft read "Files marks the module entry tests call". Under time
 pressure a planner marks whichever function its tests call, so an internal
 helper becomes an "entry" and the closing-review `tests` row (internal =
 non-entry) never fires. This probe requires the Task size paragraph to tie
@@ -54,7 +54,7 @@ def test_taskentry_skilltext_definedbyoutsidecallers() -> None:
     """write-plan Task size defines the entry by callers outside the module."""
     paragraph = _task_size_paragraph(SKILL.read_text(encoding="utf-8"))
     assert _pins_outside_callers(paragraph), (
-        "write-plan Task size defines the module entry only as 'the module "
-        "entry tests call'; nothing ties it to callers outside the module, so "
-        "marking a tested internal as the entry looks compliant:\n" + paragraph
+        "write-plan Task size has no affirmative sentence tying the module "
+        "entry to callers outside the module, so marking a tested internal as "
+        "the entry looks compliant:\n" + paragraph
     )
