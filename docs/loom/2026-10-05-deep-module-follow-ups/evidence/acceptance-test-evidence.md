@@ -3,6 +3,22 @@
 Tried on 2026-10-05, in a clean copy of the project at e338a750
 (`git worktree add --detach <scratchpad>/at-wt HEAD`; nobody had worked in it).
 
+Re-run on 2026-10-05 after the fix range a74c974c..cfc59a90, in a second clean
+copy at cfc59a90 (`git worktree add --detach <scratchpad>/at-wt2 cfc59a90`).
+The fix is bea9e95e (docstring of
+`loom-code/tests/test_write_plan_entry_definition_curly.py` only) and cfc59a90
+(release 3.34.1 -> 3.35.0 across manifests, package.json, CHANGELOG heading,
+`CURRENT_VERSION`, READMEs, plan). `git diff --quiet a74c974c cfc59a90 --
+loom-code/skills/closing-review loom-code/docs/examples loom-code/skills/write-plan`
+exits 0, so:
+
+| Acceptance | Re-run |
+|---|---|
+| 1 | carried over — lenses.md untouched by the fix |
+| 2 | re-tested in full — a file in the pin's test pair changed (docstring only) |
+| 3 | carried over — swift-network-layer.md untouched by the fix |
+| 4 | re-tested in full — the release string changed |
+
 ## Setup
 
 - How I tried it: followed the root README's only setup step for working on
@@ -11,6 +27,14 @@ Tried on 2026-10-05, in a clean copy of the project at e338a750
 - What came back: the lock installed and the suite ran to the end, `EXIT=0`.
   The installable surface of the change is prose read by agents plus test
   files; no install step beyond the lock is needed.
+- Re-run setup (cfc59a90): the same lock installed in the clean copy via
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q -p no:cacheprovider <criterion test files>`;
+  the README's Development checks `python3 scripts/sync_codex_manifests.py --check --all`
+  (exit 0, no output), `python3 scripts/check_plugin_boundaries.py loom-code`
+  (`OK: loom-code is filesystem-boundary clean.`) and
+  `python3 loom-code/scripts/check-skill-crossrefs.py` (exit 0). The full suite
+  was not re-run here (a full run was in progress in the main checkout; the
+  finalize-review suite run settles it).
 
 ## Expected answers, written before any reader ran (18:23:21)
 
@@ -96,6 +120,21 @@ base pin control: cannot accepted: True; can't accepted: False; can’t accepted
   (NEGATION now includes `cannot` and `n['’]t`), `:32-38` (clause split on `.` and `;`);
   the current paragraph's legitimate "logic that entry cannot reach" sits in a
   separate `;` clause, which is why the correct text still passes.
+- Re-run at cfc59a90 (steps 1-3 repeated in the second clean copy; inverted
+  copies in scratchpad `a2r-inv-1..3`):
+
+```
+current write-plan text accepted: True
+'cannot'   sentence accepted: False  | inverted write-plan text accepted: False
+"can't"    sentence accepted: False  | inverted write-plan text accepted: False
+'can’t'    sentence accepted: False  | inverted write-plan text accepted: False
+
+== inverted with cannot -> FAILED ...::test_taskentry_skilltext_definedbyoutsidecallers 1 failed, 3 passed
+== inverted with can't  -> FAILED ...::test_taskentry_skilltext_definedbyoutsidecallers 1 failed, 3 passed
+== inverted with can’t  -> FAILED ...::test_taskentry_skilltext_definedbyoutsidecallers 1 failed, 3 passed
+
+unmodified: pytest test_write_plan_entry_definition.py test_write_plan_entry_definition_curly.py -> 6 passed
+```
 
 ## 3. 範例文件中要求抽出共用程式的審查意見，理由改為那幾處會因同一個理由一起改，不再只憑出現次數。
 
@@ -117,22 +156,29 @@ base pin control: cannot accepted: True; can't accepted: False; can’t accepted
 
 ## 4. 完整 package suite 全部通過；三份 manifest、README 的版號字串與 CHANGELOG 新區段一致。
 
-- How I tried it: the full suite command from the Setup section, in the clean
-  copy; then read every version string:
-  `python3 -c "json.load(...)['version']"` on the four manifests,
-  `grep -n "3\.34\.[01]"` on the READMEs and the version pin test,
-  `grep -n -m2 "^## \["` on the CHANGELOG, `git grep -n "3\.34\.0" -- ':!docs' ':!**/CHANGELOG.md'`.
+- First run (e338a750, release then numbered 3.34.1, superseded by the
+  re-run below): the full suite command from the Setup section ran in the
+  clean copy with `EXIT=0`, every pytest group passing and shell-test
+  summaries all `0 FAIL`; all version strings then agreed with each other.
+- Re-run at cfc59a90 — how I tried it: read every version string in the second
+  clean copy: `python3 -c "json.load(...)['version']"` on the four manifests,
+  `grep -n "3\.3[45]\.[01]"` on the READMEs and the version pin test,
+  `grep -n -m2 "^## \["` on the CHANGELOG,
+  `git grep -n "3\.34\.1"` excluding this report and this evidence file; ran the
+  version pin test `loom-code/tests/test_write_plan_station_text.py` (asserts
+  both plugin manifests equal `CURRENT_VERSION`, lines 256-257) and
+  `scripts/sync_codex_manifests.py --check --all`.
 - What came back:
-  - Suite: `EXIT=0`; pytest groups `1906 passed, 2 skipped`, `190 passed, 1 skipped`,
-    `53 passed`, `260 passed`, `121 passed`, `64 passed`, `22 passed`, `13 passed`,
-    `1 passed`, `71 passed, 3 skipped`, `201 passed, 5 skipped`, `12 passed`,
-    `155 passed`; shell-test summaries all `0 FAIL`; no `failed` line anywhere in the log.
   - Versions: loom-code/plugin.json, .claude-plugin/plugin.json,
-    .codex-plugin/plugin.json, package.json all `3.34.1`; README.md:17 and :132,
-    loom-code/README.md:11, README.ja.md:11, README.zh-TW.md:9 all `3.34.1`;
-    CHANGELOG top section `## [3.34.1] — 2026-10-05 — …`; version pin
-    `CURRENT_VERSION = "3.34.1"`. The only leftover `3.34.0` outside docs and
-    changelogs is an unrelated `cytoscape ^3.34.0` dependency in
-    loom-workflow/tests/mermaid/package-lock.json. `.claude-plugin/marketplace.json`
-    carries no version field.
-- Evidence: the suite log and grep outputs above.
+    .codex-plugin/plugin.json, package.json all `3.35.0`; README.md:17 and :132,
+    loom-code/README.md:11, README.ja.md:11, README.zh-TW.md:9 all `3.35.0`;
+    CHANGELOG top section `## [3.35.0] — 2026-10-05 — the tests lens asks for a
+    marked entry only when a task adds or changes a function's behaviour`, next
+    section `## [3.34.0]`; version pin `CURRENT_VERSION = "3.35.0"`.
+    `git grep "3\.34\.1"` outside this report/evidence: no matches.
+    `.claude-plugin/marketplace.json` carries no version field.
+  - `test_write_plan_station_text.py`: `33 passed`; manifest sync check exit 0.
+  - Full suite: not run by me on cfc59a90. Command for the finalize-review run:
+    `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+    finalize-review executes it and refuses the attestation on failure.
+- Evidence: the outputs above.
