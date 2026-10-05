@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.33.0] — 2026-10-05 — the tests lens names tests that cannot fail, and the ship PR risk section states door, blast radius and rollback
+
+- The closing-review `tests` lens now says a test that cannot fail for the behaviour it names is a finding, and names three shapes: a test restating a constant or the implementation; a test reading source text to assert code structure (prose-pin tests under engineering-baseline rule 8 excepted); a mock or stub replacing the very seam it claims to cover.
+- Ship's `## Risks and rollback` PR section now states whether the change is a one-way or two-way door, citing the recorded door answers (user-decided lines in the spec's Design decision when a spec exists, else in the plan's Risks); its blast radius (what could break and for whom); a concrete rollback or recovery path; and the remaining risks. It used to ask only for remaining risks and a recovery path. No checker rule changed.
+
 ## [3.32.0] — 2026-10-05 — the language anchor sends one fixed reminder instead of detecting the user's language
 
 - The language-anchor hook no longer detects the user's language. On every trigger (Claude Code: SessionStart `compact|resume`, UserPromptSubmit, PostToolUse `Skill|Agent`; OpenCode: after a Skill tool result; Antigravity: once per loom SKILL.md read), all three hosts send one fixed English reminder to write every message to the user in the language and script the user writes in; the replying model identifies the language itself and the hook reads no transcript to pick a language.
