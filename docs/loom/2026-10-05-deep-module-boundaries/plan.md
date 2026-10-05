@@ -35,6 +35,13 @@ Wave 2 — release metadata.
 - Test: A5 positive: readme-version-matches-manifest; negative: stale-3.33.0-absent-outside-changelog-and-docs.
 - Risk: grep for 3.33.0 outside docs/ lists exactly these four plus W2-01's files; historical CHANGELOG sections keep old strings.
 
+Wave 3 — probe graduation (closing-review gate review.probe-graduation).
+
+**W3-01 Graduate the entry-definition probe into the package suite**  after: W2-02  acceptance: 1
+- Files: docs/loom/2026-10-05-deep-module-boundaries/evidence/probes/test_entry_definition_circular.py, loom-code/tests/test_write_plan_entry_definition.py
+- Test: A1 positive: graduated-probe-collected-and-green-in-package-suite; negative: probe-red-against-69eb6ce6-task-size-clause.
+- Risk: git mv only, content unchanged except repo-root path resolution; agent-decided: loom-code/tests/ per AGENTS.md Test Location; the probe caught the circular entry definition fixed in 156db6af.
+
 ## Simplicity check
 - Merge W2-02 into W2-01 as one release-metadata task — declined: the merged Files line would list ten files, over the charter's eight-entry Files cap (plan.field-caps).
 
