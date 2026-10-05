@@ -263,7 +263,7 @@ Phase 1 returns 🟡 bounded conditions: fails when CI runner has CPU > 80%.
 
 ## Stage 6-8 — review + verify + finish
 
-`requesting-code-review` PASS_WITH_NOTES (🟡 the loginAsync wrapper has duplicated continuation-resume pattern vs the 3 other endpoint wrappers — Rule of Three triggered after Task 2 ships 4 wrappers; recommend extract a generic wrapper helper). User extracts; re-review → PASS.
+`requesting-code-review` PASS_WITH_NOTES (🟡 the loginAsync wrapper has duplicated continuation-resume pattern vs the 3 other endpoint wrappers — the 4 wrappers change for the same reason, since any change to cancellation or resume handling must hit all of them together; recommend extract a non-exported generic wrapper helper). User extracts; re-review → PASS.
 
 `verification-before-completion`:
 ```
