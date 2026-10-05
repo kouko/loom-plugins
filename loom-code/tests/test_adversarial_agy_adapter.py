@@ -7,6 +7,7 @@ that passes records an attack the adapter survived.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import shutil
@@ -19,6 +20,11 @@ import pytest
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 ADAPTER = PLUGIN_ROOT / "hooks" / "agy_adapter.py"
+_spec = importlib.util.spec_from_file_location("loom_language_anchor",
+                                               PLUGIN_ROOT / "hooks" / "language-anchor.py")
+_anchor = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_anchor)
+ANCHOR_TEXT = _anchor.ANCHOR_TEXT
 LOOM_SKILL = "/Users/u/.gemini/config/plugins/loom-code/skills/build/SKILL.md"
 JA_TURN = "この変更が仕様に合っているかどうかを確認してください。よろしくお願いします。"
 
@@ -261,18 +267,18 @@ def test_anchor_garbage_lines_still_anchor(tmp_path):
                  {"name": "view_file", "args": {"AbsolutePath": LOOM_SKILL}}]})]
     transcript.write_text("\n".join(lines) + "\n", encoding="utf-8")
     out = _run("pre-invocation", _anchor_payload(transcript), tmp_path)
-    assert any("日本語" in m for m in _messages(out)), out
+    assert ANCHOR_TEXT in _messages(out), out
 
 
-def test_anchor_nonstring_user_content_silent_not_crash(tmp_path):
-    """USER_INPUT content that is a number or object yields valid JSON, not a crash."""
+def test_anchor_nonstring_user_content_anchors_not_crash(tmp_path):
+    """USER_INPUT content that is a number or object neither crashes nor hides the anchor."""
     transcript = _write_jsonl(tmp_path / "t.jsonl", [
         {"source": "USER_EXPLICIT", "type": "USER_INPUT", "content": 12345},
         {"source": "USER_EXPLICIT", "type": "USER_INPUT", "content": {"x": 1}},
         {"source": "MODEL", "tool_calls": [{"name": "view_file", "args": {"AbsolutePath": LOOM_SKILL}}]},
     ])
     out = _run("pre-invocation", _anchor_payload(transcript), tmp_path)
-    assert out == {} or "injectSteps" in out
+    assert ANCHOR_TEXT in _messages(out), out
 
 
 def test_anchor_huge_transcript_within_hook_timeout(tmp_path):
@@ -290,4 +296,4 @@ def test_anchor_huge_transcript_within_hook_timeout(tmp_path):
     out = _run("pre-invocation", _anchor_payload(transcript), tmp_path, timeout=120)
     elapsed = time.monotonic() - started
     assert elapsed < 15, f"pre-invocation took {elapsed:.1f}s on a 120k-step transcript"
-    assert any("日本語" in m for m in _messages(out)), out
+    assert ANCHOR_TEXT in _messages(out), out

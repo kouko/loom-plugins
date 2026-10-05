@@ -13,14 +13,14 @@
 //   <root>/agents/<name>.md       -> subagent "<plugin>:<name>"
 //   <root>/hooks/hooks-opencode.json -> v2 tool and session hooks (registerHooks)
 import { spawn } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const plugin = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).name;
-// Joins a command's typed text to its skill body; the prompt hook cuts there.
+// Joins a command's typed text to its skill body.
 const SKILL_SEPARATOR = "\n\nBase directory for this skill: ";
 
 function unquote(value) {
@@ -143,6 +143,11 @@ async function registerAgents(ctx, found) {
 // Each capability registers in its own step, so a later one (hooks) is one
 // more function and one more line here.
 export async function setup(ctx) {
+  // Earlier loader versions recorded user prompts here; nothing reads them.
+  // A symlink is removed as a link, its target untouched.
+  try {
+    rmSync(join(tmpdir(), "loom-opencode"), { recursive: true, force: true });
+  } catch {}
   const found = skills();
   await registerSkills(ctx, found);
   await registerCommands(ctx, found);
@@ -216,26 +221,6 @@ function note(result, text) {
   if (typeof result?.output === "string") result.output += `\n\n${text}`;
 }
 
-// The per-session user-prompt file lang_detect reads as a Claude transcript.
-function transcript(sessionID) {
-  const name = String(sessionID).replace(/[^A-Za-z0-9_.-]/g, "_");
-  return join(tmpdir(), "loom-opencode", `${name}.jsonl`);
-}
-
-// A command's prompt is the typed `/<ns>:<name> <args>` plus SKILL_SEPARATOR
-// and a base directory ending in `skills/<name>` (or `\` on Windows); only
-// the typed part is the user's words. Any loom plugin's command qualifies,
-// since loom-code alone keeps the transcript. Other text is returned whole.
-function spoken(text) {
-  const name = text.match(/^\/[\w.-]+:([\w.-]+)(?:\s|$)/)?.[1];
-  const cut = text.indexOf(SKILL_SEPARATOR);
-  if (!name || cut < 0) return text;
-  const rest = text.slice(cut + SKILL_SEPARATOR.length);
-  const nl = rest.indexOf("\n");
-  const dir = nl >= 0 ? rest.slice(0, nl) : "";
-  return [`skills/${name}`, `skills\\${name}`].some((end) => dir.endsWith(end)) ? text.slice(0, cut) : text;
-}
-
 async function registerHooks(ctx) {
   const table = hookTable();
   // One session record per session id: its parent and its directory.
@@ -259,7 +244,7 @@ async function registerHooks(ctx) {
     ({ hook_event_name: event, session_id: sessionID, cwd: await dirFor(sessionID), ...extra });
 
   // A session with a parent, or one whose record cannot be read, is a child:
-  // it gets no context, records no prompt, and its handlers run unattended.
+  // it gets no context, runs no prompt hook, and its handlers run unattended.
   const isChild = async (sessionID) => {
     const r = await record(sessionID);
     return !r || Boolean(r.parentID);
@@ -288,24 +273,15 @@ async function registerHooks(ctx) {
     });
   }
 
-  const keepsTranscript = commands(table, "PostToolUse", "Skill").length > 0;
-  if (table.UserPromptSubmit || keepsTranscript) {
+  if (table.UserPromptSubmit) {
     await ctx.session.hook("prompt", async (ev) => {
       const id = ev.sessionID;
       const text = ev.prompt?.text;
       if (typeof text !== "string" || (await isChild(id))) return;
-      const file = transcript(id);
-      if (keepsTranscript) {
-        try {
-          mkdirSync(dirname(file), { recursive: true, mode: 0o700 });
-          // Hooks still get the full text.
-          appendFileSync(file, `${JSON.stringify({ type: "user", message: { role: "user", content: spoken(text) } })}\n`);
-        } catch {} // no transcript only costs the language reminder
-      }
       const added = [];
       for (const hook of commands(table, "UserPromptSubmit")) {
         const result = output(await run(hook, await payload(id, "UserPromptSubmit",
-          { prompt: text, prompt_id: ev.messageID, transcript_path: file })));
+          { prompt: text, prompt_id: ev.messageID })));
         added.push(result.context, result.message);
       }
       turn.set(id, added.filter(Boolean).join("\n\n"));
@@ -336,8 +312,7 @@ async function registerHooks(ctx) {
     if (mapped && ev.status !== "error") {
       const [name, input, cwd = dir] = mapped;
       const env = await envFor(ev.sessionID);
-      const body = await payload(ev.sessionID, "PostToolUse",
-        { tool_name: name, tool_input: input, cwd, transcript_path: transcript(ev.sessionID) });
+      const body = await payload(ev.sessionID, "PostToolUse", { tool_name: name, tool_input: input, cwd });
       for (const hook of commands(table, "PostToolUse", name)) {
         const result = await run(hook, body, env);
         held.push(result.status === 2 ? result.stderr.trim() : output(result).context);

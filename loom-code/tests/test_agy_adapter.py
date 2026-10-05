@@ -4,7 +4,7 @@ Each test runs ``hooks/agy_adapter.py`` the way agy 1.2.2 does: ``sh -c``
 from the plugin root, camelCase event JSON on stdin, one JSON object on
 stdout, exit 0. The adapter translates agy payloads into the existing
 handlers (the loom checker push rule, ``hooks/session-start``,
-``hooks/language-anchor.py`` + ``hooks/lang_detect.py``).
+``hooks/language-anchor.py``'s fixed ``ANCHOR_TEXT``).
 
 External surfaces grounded (live agy 1.2.2 spikes, recorded in this change's
 plan risk notes): PreToolUse ``toolCall.args.CommandLine`` / ``args.Cwd`` and
@@ -15,6 +15,7 @@ and ``{"injectSteps": [{"ephemeralMessage": ...}]}``; transcript JSONL steps
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import shutil
@@ -27,8 +28,11 @@ import pytest
 PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 ADAPTER = PLUGIN_ROOT / "hooks" / "agy_adapter.py"
 
-JA_FRAGMENT = "会話言語（日本語）"
-ZH_FRAGMENT = "使用者在對話中所用的語言"
+_spec = importlib.util.spec_from_file_location("loom_language_anchor",
+                                               PLUGIN_ROOT / "hooks" / "language-anchor.py")
+_anchor = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_anchor)
+ANCHOR_TEXT = _anchor.ANCHOR_TEXT
 JA_TURN = "この変更が仕様に合っているかどうかを確認してください。よろしくお願いします。"
 ZH_TURN = "請幫我確認這個修改是否符合原本的設計規範，並且說明理由。"
 EN_TURN = "Please confirm this change matches the original design specification and explain why."
@@ -287,24 +291,11 @@ def _transcript(tmp_path: Path, steps: list[dict]) -> Path:
     return path
 
 
-def test_ja_skill_read_injects_anchor(tmp_path):
-    transcript = _transcript(tmp_path, [_user(JA_TURN), _view(LOOM_SKILL)])
+@pytest.mark.parametrize("turn", [JA_TURN, ZH_TURN, EN_TURN])
+def test_skill_read_injects_same_fixed_text_in_any_language(tmp_path, turn):
+    transcript = _transcript(tmp_path, [_user(turn), _view(LOOM_SKILL)])
     out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    (message,) = _messages(out)
-    assert JA_FRAGMENT in message
-
-
-def test_zh_skill_read_injects_anchor(tmp_path):
-    transcript = _transcript(tmp_path, [_user(ZH_TURN), _view(LOOM_SKILL)])
-    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    (message,) = _messages(out)
-    assert ZH_FRAGMENT in message
-
-
-def test_english_session_silent(tmp_path):
-    transcript = _transcript(tmp_path, [_user(EN_TURN), _view(LOOM_SKILL)])
-    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    assert out == {}
+    assert _messages(out) == [ANCHOR_TEXT]
 
 
 def test_non_loom_skill_read_silent(tmp_path):
@@ -318,7 +309,7 @@ def test_anchor_fires_once_per_skill_read_step(tmp_path):
     transcript = _transcript(tmp_path, [_user(JA_TURN), _view(LOOM_SKILL)])
     first = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
     second = _run("pre-invocation", _invocation(2, [str(tmp_path)], transcript), tmp_path)
-    assert _messages(first)
+    assert _messages(first) == [ANCHOR_TEXT]
     assert second == {}
 
 
@@ -344,8 +335,7 @@ def test_skill_read_before_tool_result_injects_anchor(tmp_path):
     path.write_text(json.dumps(user, ensure_ascii=False) + "\n" + QUOTED_VIEW_LINE + "\n"
                     + json.dumps(result) + "\n", encoding="utf-8")
     out = _run("pre-invocation", _invocation(1, [str(tmp_path)], path), tmp_path)
-    (message,) = _messages(out)
-    assert JA_FRAGMENT in message
+    assert _messages(out) == [ANCHOR_TEXT]
 
 
 def test_skill_read_in_earlier_user_turn_silent(tmp_path):
@@ -377,17 +367,11 @@ def _quoted_transcript(tmp_path: Path, user_text: str) -> Path:
     return path
 
 
-def test_quoted_transcript_args_ja_injects_anchor(tmp_path):
-    transcript = _quoted_transcript(tmp_path, JA_TURN)
+@pytest.mark.parametrize("turn", [JA_TURN, EN_TURN])
+def test_quoted_transcript_args_inject_anchor(tmp_path, turn):
+    transcript = _quoted_transcript(tmp_path, turn)
     out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    (message,) = _messages(out)
-    assert JA_FRAGMENT in message
-
-
-def test_quoted_transcript_args_english_silent(tmp_path):
-    transcript = _quoted_transcript(tmp_path, EN_TURN)
-    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    assert out == {}
+    assert _messages(out) == [ANCHOR_TEXT]
 
 
 def test_empty_workspace_session_context_asks_for_add_dir(tmp_path):

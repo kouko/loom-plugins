@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.32.0] — 2026-10-05 — the language anchor sends one fixed reminder instead of detecting the user's language
+
+- The language-anchor hook no longer detects the user's language. On every trigger (Claude Code: SessionStart `compact|resume`, UserPromptSubmit, PostToolUse `Skill|Agent`; OpenCode: after a Skill tool result; Antigravity: once per loom SKILL.md read), all three hosts send one fixed English reminder to write every message to the user in the language and script the user writes in; the replying model identifies the language itself and the hook reads no transcript to pick a language.
+- `hooks/lang_detect.py` and its tests are deleted.
+- The OpenCode loader no longer writes user prompts to `tmpdir/loom-opencode/<session>.jsonl` and drops `transcript_path` from hook payloads.
+- The OpenCode loader now deletes the prompt files earlier versions left in `tmpdir/loom-opencode/` when it loads.
+
 ## [3.31.0] — 2026-10-04 — every message to the user, relayed agent results included, uses the user's language
 
 - Build, closing-review and ship now say that every message to the user uses the user's conversation language: relayed agent results, turns with no new user message, and decision point 3 (acceptance test report acceptance).

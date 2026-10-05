@@ -77,7 +77,7 @@ PENDING_RE = re.compile(r"^pending\s*—\s*(\S.*)$")
 # registration gap, so it is spendable only on the named host-infrastructure
 # mechanisms -- otherwise any new mechanism launders itself through it (W3
 # adversary P10). An id qualifies when one of these names appears in it.
-HOST_HYGIENE_ALLOWLIST = ("language-anchor", "lang_detect")
+HOST_HYGIENE_ALLOWLIST = ("language-anchor",)
 
 # An eval only earns its name if it can fail. A bare path must be a test
 # file (or a `cold-read:` evidence file, handled separately); a `<path>::

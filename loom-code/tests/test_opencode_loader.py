@@ -52,6 +52,12 @@ if (process.argv[2]) {
 """
 
 
+@pytest.fixture(autouse=True)
+def _own_tmpdir(tmp_path: Path, monkeypatch):
+    # The loader deletes tmpdir/loom-opencode on load; keep it off the real one.
+    monkeypatch.setenv("TMPDIR", str(tmp_path))
+
+
 def _node(plugin: str, *args: str, cwd=None, env=None) -> dict:
     node = shutil.which("node")
     assert node, "node is required to exercise the OpenCode loader"
@@ -148,39 +154,39 @@ def test_shell_push_routed_to_push_hook(tmp_path: Path):
     assert "loom_checker.py push --hook" in log.read_text(encoding="utf-8")
 
 
-def test_subagent_prompt_entry_token_records_nothing(tmp_path: Path):
-    bin_dir, log = tmp_path / "bin", tmp_path / "python3.log"
-    bin_dir.mkdir()
-    fake = bin_dir / "python3"
-    fake.write_text(f'#!/bin/bash\necho "$*" >> "{log}"\ncat >/dev/null\n', encoding="utf-8")
-    fake.chmod(0o755)
-    env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}", "TMPDIR": str(tmp_path)}
-    for session in ("child-1", "root"):
-        event = {"sessionID": session, "messageID": "m1",
-                 "prompt": {"text": "/loom-code:using-loom-code"}}
-        _fire("loom-code", "prompt", event, tmp_path, env)
-        if session.startswith("child"):
-            assert not log.exists()
-            assert not (tmp_path / "loom-opencode" / f"{session}.jsonl").exists()
-    # the root control: its transcript is kept, and no prompt hook runs a handler
-    assert (tmp_path / "loom-opencode" / "root.jsonl").exists()
-    assert not log.exists()
-
-
-@pytest.mark.parametrize("text, expected", [
-    ("look at this\n\nBase directory for this skill: x", None),
-    ("/loom-code:build x\n\nBase directory for this skill: /elsewhere\n\nrest", None),
-    ("/loom-code:using-loom-code\n\nBase directory for this skill: C:\\p\\skills\\using-loom-code\n\nbody",
-     "/loom-code:using-loom-code"),
-], ids=["not-a-command", "foreign-base-dir", "windows-base-dir"])
-def test_skill_separator_prompt_recorded_whole_or_trimmed(tmp_path: Path, text, expected):
-    event = {"sessionID": "root", "messageID": "m1", "prompt": {"text": text}}
-    _fire("loom-code", "prompt", event, tmp_path, {**os.environ, "TMPDIR": str(tmp_path)})
-    line = (tmp_path / "loom-opencode" / "root.jsonl").read_text(encoding="utf-8").splitlines()[0]
-    assert json.loads(line)["message"]["content"] == (text if expected is None else expected)
-
-
 ZH = "請幫我把這個功能的測試補齊，然後說明一下為什麼之前的版本會失敗，謝謝你。"
+
+
+def test_prompt_file_never_written(tmp_path: Path):
+    env = {**os.environ, "TMPDIR": str(tmp_path)}
+    for plugin in ("loom-code", "loom-workflow"):
+        for session in ("child-1", "root"):
+            fires = [{"hook": "prompt", "event": {"sessionID": session, "messageID": "m1",
+                                                  "prompt": {"text": ZH}}},
+                     {"hook": "execute.after", "event": {**SKILL_CALL, "sessionID": session}}]
+            _node(plugin, json.dumps(fires), cwd=tmp_path, env=env)
+    assert not (tmp_path / "loom-opencode").exists()
+
+
+def test_load_removes_prompt_files_left_by_earlier_versions(tmp_path: Path):
+    left = tmp_path / "loom-opencode"
+    left.mkdir()
+    (left / "ses_1.jsonl").write_text("{}\n", encoding="utf-8")
+    _node("loom-code", env={**os.environ, "TMPDIR": str(tmp_path)})
+    assert not left.exists()
+    _node("loom-code", env={**os.environ, "TMPDIR": str(tmp_path)})  # absent: still loads
+
+
+def test_load_removes_a_linked_prompt_folder_not_its_target(tmp_path: Path):
+    target = tmp_path / "elsewhere"
+    target.mkdir()
+    (target / "keep.jsonl").write_text("{}\n", encoding="utf-8")
+    (tmp_path / "loom-opencode").symlink_to(target)
+    _node("loom-code", env={**os.environ, "TMPDIR": str(tmp_path)})
+    assert not (tmp_path / "loom-opencode").is_symlink()
+    assert (target / "keep.jsonl").read_text(encoding="utf-8") == "{}\n"
+
+
 SKILL_CALL = {"tool": "skill", "sessionID": "root", "id": "c4", "status": "completed",
               "input": {"id": "loom-code:build"}, "result": {"output": "ok", "content": []}}
 
@@ -190,8 +196,7 @@ SKILL_CALL = {"tool": "skill", "sessionID": "root", "id": "c4", "status": "compl
     ("loom-code", [("context", {"sessionID": "child-1", "system": []})], None),
     ("loom-workflow", [("prompt", {"sessionID": "root", "messageID": "m1", "prompt": {"text": "hi"}}),
                        ("context", {"sessionID": "root", "system": []})], "Visualization card (loom-workflow)"),
-    ("loom-code", [("prompt", {"sessionID": "root", "messageID": "m1", "prompt": {"text": ZH}}),
-                   ("execute.after", SKILL_CALL)], "使用者在對話中所用的語言"),
+    ("loom-code", [("execute.after", SKILL_CALL)], "in the language and script the user writes in"),
 ], ids=["session-start", "session-start-child", "visualization-card", "language-anchor"])
 def test_session_and_skill_hooks_feed_text_back(tmp_path: Path, plugin, fires, needle):
     env = {**os.environ, "TMPDIR": str(tmp_path)}

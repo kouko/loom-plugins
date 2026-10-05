@@ -35,7 +35,6 @@ LANGUAGE_ANCHOR = PLUGIN_ROOT / "hooks" / "language-anchor.py"
 # <loom-plugin>/[<version>/]skills/<name>/SKILL.md, as agy, Claude Code and a checkout lay it out.
 LOOM_SKILL_PATH_RE = re.compile(
     r"/loom-(?:code|design|workflow)/(?:[^/]+/)?skills/[^/]+/SKILL\.md$")
-USER_REQUEST_RE = re.compile(r"<USER_REQUEST>(.*?)</USER_REQUEST>", re.DOTALL)
 
 
 def _emit(obj: dict) -> int:
@@ -251,18 +250,7 @@ def _language_anchor(payload: dict) -> str:
     is_int = isinstance(idx, int) and not isinstance(idx, bool)
     step_key = str(idx) if is_int else f"line{line_no}"
 
-    anchor = _load_module("loom_language_anchor", LANGUAGE_ANCHOR)
-    lang_detect = anchor._load_lang_detect()
-    texts = []
-    for s in steps:
-        if s.get("type") != "USER_INPUT":
-            continue
-        content = lang_detect.extract_text(s.get("content"))
-        requests = USER_REQUEST_RE.findall(content)
-        texts.extend(requests if requests else [content])
-    text = anchor._ANCHOR_TEXT.get(lang_detect.majority_language(texts))
-    if not text:
-        return ""
+    text = _load_module("loom_language_anchor", LANGUAGE_ANCHOR).ANCHOR_TEXT
 
     # One anchor per skill-read step: every later invocation in the same turn
     # finds the same read again.

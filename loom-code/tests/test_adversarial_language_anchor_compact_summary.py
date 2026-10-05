@@ -1,13 +1,11 @@
-# concern: the new SessionStart compact trigger reads Claude Code's English
-# compaction summary (a user-role turn) as the user's language and stays silent
-# for a Chinese conversation at exactly the moment it was added to cover.
-"""Adversarial probe for 2026-10-04-relay-results-in-user-language (W1-02).
+# concern: the SessionStart compact trigger fires right after Claude Code writes
+# an English compaction summary (a user-role turn) into a Chinese conversation;
+# the anchor must still be emitted there.
+"""Adversarial probe for the language anchor after compaction.
 
 Claude Code writes each compaction summary into the transcript as a
-main-chain user turn with ``isCompactSummary: true`` whose text is English
-("This session is being continued from a previous conversation ...").
-``lang_detect`` does not filter it, so at a SessionStart compact event the
-summary votes 'en' and the anchor goes silent for a zh user.
+main-chain user turn with ``isCompactSummary: true`` whose text is English.
+The anchor reads no transcript and must emit its fixed reminder anyway.
 """
 import json
 import sys
@@ -18,7 +16,7 @@ import pytest
 
 _TESTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(_TESTS))
-from test_language_anchor_hook import ZH_FRAGMENT, ZH_TURN, run_hook  # noqa: E402
+from test_language_anchor_hook import ANCHOR, ZH_TURN, emitted  # noqa: E402
 
 SUMMARY = (
     "This session is being continued from a previous conversation that ran "
@@ -50,13 +48,9 @@ def _transcript(entries):
     ],
     ids=["one-compaction", "two-auto-compactions-in-one-run"],
 )
-def test_sessionStartAnchor_zhTurnsThenCompactSummary_emitsZhDirective(entries):
-    """A zh conversation that was just compacted still gets the zh anchor."""
-    result = run_hook(
+def test_sessionStartAnchor_zhTurnsThenCompactSummary_emitsFixedText(entries):
+    """A zh conversation that was just compacted still gets the anchor."""
+    assert emitted(
         {"hook_event_name": "SessionStart", "source": "compact",
          "transcript_path": _transcript(entries)}
-    )
-    assert result.returncode == 0
-    assert result.stdout, "anchor stayed silent after compaction of a zh conversation"
-    payload = json.loads(result.stdout)
-    assert ZH_FRAGMENT in payload["hookSpecificOutput"]["additionalContext"]
+    ) == ("SessionStart", ANCHOR)
