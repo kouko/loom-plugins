@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.33.0] — 2026-10-05 — the tests lens names tests that cannot fail, and the ship PR risk section states door, blast radius and rollback
+
+- The closing-review `tests` lens now says a test that cannot fail for the behaviour it names is a finding, and names three shapes: a test restating a constant or the implementation; a test reading source text to assert code structure (prose-pin tests that meet `loom-code/references/engineering-baseline.md` §5 item 8 excepted); a mock or stub replacing the very seam it claims to cover.
+- Ship's `## Risks and rollback` PR section now states whether the change is a one-way or two-way door, citing every recorded one-way door — user-decided lines (the spec's Design decision when a spec exists, else the plan's Risks) and agent-decided ones (the plan's task Risk lines and the acceptance test report's "I decided for you" section), where an agent-decided line counts as a one-way door when it falls in one of the five classes of `loom-code/skills/write-plan/references/one-way-door.md`, checked line by line because none is marked one-way, and calling it two-way only when none is recorded or found; its blast radius (what could break and for whom); a concrete rollback or recovery path; and the remaining risks. It used to ask only for remaining risks and a recovery path. Ship now also lists the spec, when one exists, among the PR body's sources. No checker rule changed.
+
 ## [3.32.0] — 2026-10-05 — the language anchor sends one fixed reminder instead of detecting the user's language
 
 - The language-anchor hook no longer detects the user's language. On every trigger (Claude Code: SessionStart `compact|resume`, UserPromptSubmit, PostToolUse `Skill|Agent`; OpenCode: after a Skill tool result; Antigravity: once per loom SKILL.md read), all three hosts send one fixed English reminder to write every message to the user in the language and script the user writes in; the replying model identifies the language itself and the hook reads no transcript to pick a language.

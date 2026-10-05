@@ -41,8 +41,8 @@ is functional content and an appended line would make the attestation stale.
 ## 2. Prepare publication text
 
 Ship owns one top-level PR body schema. Reconstruct it from the current intent,
-plan, recomputed Git change, generated attestation, and available CI evidence;
-do not depend on conversation recall. Use these headings exactly once:
+the spec when one exists, plan, recomputed Git change, generated attestation,
+and available CI evidence; do not depend on conversation recall. Use these headings exactly once:
 
 ```markdown
 ## Context
@@ -67,7 +67,15 @@ do not depend on conversation recall. Use these headings exactly once:
 <review, tests, attestation, available CI evidence, and known limits>
 
 ## Risks and rollback
-<remaining risks and a concrete recovery path>
+<one-way or two-way door, citing every recorded one-way door: user-decided
+lines (the spec's Design decision when a spec exists, else the plan's Risks)
+and agent-decided ones (the plan's task Risk lines and the acceptance test
+report's "I decided for you" section), where an agent-decided line is a
+one-way door when it falls in one of the five classes of
+`../write-plan/references/one-way-door.md`, checked line by line since none
+is marked one-way; two-way only when none is recorded or found;
+blast radius: what could break and for whom;
+a concrete rollback or recovery path; remaining risks>
 
 ## Follow-ups
 <deferred work, or "None">
