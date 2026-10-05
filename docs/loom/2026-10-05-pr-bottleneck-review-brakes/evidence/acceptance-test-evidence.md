@@ -1,6 +1,6 @@
 # Name lying tests in review and state merge risk in PR bodies — acceptance test evidence
 
-Tried on 2026-10-05, in a clean copy of the project at 30642536.
+Tried on 2026-10-05, in a clean copy of the project at 30642536; re-tested after the fix at e237802e (see "Re-run at e237802e" at the end).
 
 Scratch root below: `$S` = the session scratchpad
 (`/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-fix-pr-bottleneck/6cf584c4-39cf-4288-bff2-5a30741c2ae7/scratchpad`).
@@ -42,3 +42,32 @@ Scratch root below: `$S` = the session scratchpad
 - How I tried it: in the clean copy, `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; then `grep '"version"'` on `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/package.json`; first `## [` heading of `loom-code/CHANGELOG.md`; version strings in `README.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`; `CURRENT_VERSION` in `loom-code/tests/test_write_plan_station_text.py`; `grep -rln 3.32.0` outside docs/.git (excluding CHANGELOG).
 - What came back: suite exit 0; pytest summaries 1900 passed/2 skipped, 190/1, 53, 260, 121, 64, 22, 13, 1, 71/3, 201/5, 12, 155 → 3063 passed, 11 skipped, 0 failed; shell checks all PASS. All four manifests `"version": "3.33.0"`; CHANGELOG top `## [3.33.0] — 2026-10-05 — the tests lens names tests that cannot fail, and the ship PR risk section states door, blast radius and rollback`; README.md:17 and :132, loom-code/README.md:11, README.ja.md:11, README.zh-TW.md:9 all 3.33.0; `CURRENT_VERSION = "3.33.0"`; no stray 3.32.0 outside docs and CHANGELOG history.
 - Evidence: suite log `$S/suite.log` (536 lines, scratch); grep output above. `finalize-review` reruns the same suite before the change is accepted and blocks it on failure.
+
+## Re-run at e237802e (fix range 4c5b383f..e237802e)
+
+Fix diff touched `loom-code/skills/ship/SKILL.md` (risk placeholder: agent-decided lines checked against the five classes of `../write-plan/references/one-way-door.md`; spec added to PR-body sources), `loom-code/skills/closing-review/references/lenses.md` (tests row: "prose-pin tests that meet ... §5 item 8 excepted"), `loom-code/tests/test_ship_risk_section_agent_decided_door.py` (wider NEGATION, second assert on `one-way-door.md`), `loom-code/CHANGELOG.md`. These reach A1, A2 (lenses row), A3 (ship placeholder + pin test) and A4 (suite), so all four were re-tested in full; nothing carried over.
+
+### 0. Setup (re-run)
+- How I tried it: `git worktree add --detach $S/clean3 HEAD` (e237802e, `git status --short` empty); `claude plugin validate loom-code`, `claude plugin validate .`, `python3 scripts/sync_codex_manifests.py --check --all`.
+- What came back: `✔ Validation passed`; `✔ Validation passed with warnings` (same pre-existing `requires-contract` warning); sync exit 0.
+
+### 1 + 2. tests lens: three lying shapes flagged; item-8 prose pin excepted (re-run)
+- How I tried it: one fresh `loom-code:reviewer`, given only `$S/clean3/loom-code/skills/closing-review/references/lenses.md` (`tests` row) and two artifacts treated as changed test files, told nothing about which tests were seeded bad: (A) `$S/clean3/loom-code/tests/test_ship_risk_section_agent_decided_door.py` reading `$S/clean3/loom-code/skills/ship/SKILL.md`; (B) the A1 seeded repo `$S/seeded/tests/test_pricing.py` (unchanged from the first run). Reviewer ran both: A `3 passed`, B `4 passed`.
+- What came back:
+  - A: `tests: PASS`, findings `[]`. `test_ship_risk_placeholder_cites_agent_decided_doors` (:49) — "a prose-pin test that meets engineering-baseline §5 item 8, so it is covered by the row's carve-out" (affirmative verb before literal :33, negation rejected :31, self-tests present). Both self-tests "no finding".
+  - B: `tests: NEEDS_REVISION`. important `test_pricing.py:11` — "restating a constant or the implementation"; important `test_pricing.py:16` — "reading source text to assert code structure (not a prose-pin test)"; important `test_pricing.py:24` — "a mock or stub replacing the very seam it claims to cover"; `test_checkout_total_member_cart` (:30) "no finding".
+
+### 3. ship risk section (re-run)
+- How I tried it: two fresh `general-purpose` (sonnet) drafters, each given only `$S/clean3/loom-code/skills/ship/SKILL.md` §2 (told to follow files it points to) plus inputs:
+  - (i) this change: intent, plan, and the first-run acceptance test report from `$S/clean3`; no spec.
+  - (ii) made-up plan `$S/hypo2/plan.md` + `$S/hypo2/intent.md`: W1-01 Risk `agent-decided — wrote the export as CSV with columns when,event,count rather than JSON, because the user's spreadsheet already opens CSV.` (no one-way label); W1-02 Risk `agent-decided — named the flag --out rather than --output`; plan Risks item 2 `No one-way door in this change.`; no spec, no report.
+- What came back:
+  - (i): "這次改動是 two-way door：沒有任何已記錄的 one-way door（plan 的 Risks 寫明「No one-way door in this change」；plan 裡 … task Risk 的 agent-decided 項目與驗收報告「我替你決定的事」3 項，逐條對照 one-way-door.md 的五類（a）到（e），都不落在其中任何一類）". Per-line table: W1-01, W1-02, W3-01 Risk lines and the three report items each `none` with a reason. Blast radius (closing-review reviewers, ship agents; no user data), rollback (revert + new patch version reaches installed copies), remaining risks present. Followed SKILL.md lines 41-45, 69-78, 83; read one-way-door.md lines 10-32, 66-76.
+  - (ii): "One-way door. … Its Risks section says "No one-way door in this change", but checking the agent-decided lines one by one finds one that falls in class (c) of `one-way-door.md`" — W1-01 CSV `(c) limits what the user can do in future: it fixes the export data format` → Yes; W1-02 `--out` → None. Blast radius (users consuming exported files), rollback (revert the commits; already-exported CSV files stay; later format change needs a new flag or migration), remaining risks present. Followed SKILL.md lines 43-45, 69-78, 83.
+  - Pin test: `uv run --isolated --with pytest python -m pytest -q loom-code/tests/test_ship_risk_section_agent_decided_door.py` in `$S/clean3` → `3 passed`; same test against pre-fix `git show 4c5b383f:loom-code/skills/ship/SKILL.md` in `$S/oldtree3` → `1 failed, 2 passed` (`test_ship_risk_placeholder_cites_agent_decided_doors` fails: the old placeholder has no `one-way-door.md`).
+- Not tried: an actual `ship` run opening a real PR.
+
+### 4. Package suite and version (re-run)
+- How I tried it: in `$S/clean3`, `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q > $S/suite3.log`; then the same version greps as the first run.
+- What came back: exit 0; pytest summaries 1900/2 skipped, 190/1, 53, 260, 121, 64, 22, 13, 1, 71/3, 201/5, 12, 155 → 3063 passed, 11 skipped, 0 failed; no `FAIL`/`failed` line in the log (535 lines). Four manifests `"version": "3.33.0"`; CHANGELOG top `## [3.33.0] — 2026-10-05 — …`; README.md:17, :132, loom-code/README.md:11, README.ja.md:11, README.zh-TW.md:9 all 3.33.0; `CURRENT_VERSION = "3.33.0"`; no `3.32.0` outside docs/.git/CHANGELOG.
+- Evidence: `$S/suite3.log` (scratch). `finalize-review` reruns the same suite before the change is accepted and blocks it on failure.
