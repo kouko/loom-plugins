@@ -1,5 +1,7 @@
 """Tests for loom-code/hooks/language-anchor.py — the language-anchor hook.
 
+concern: a reminder that goes silent on some trigger (an event, the Agent tool, a missing transcript, a mixed-script or non-zh/ja conversation) or that names one language or script again.
+
 The hook detects nothing: on an accepted event (SessionStart,
 UserPromptSubmit, or PostToolUse for the Skill or Agent tool) it emits one
 fixed English reminder, whatever language the transcript holds and whether
