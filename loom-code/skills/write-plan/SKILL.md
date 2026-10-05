@@ -322,8 +322,11 @@ block before the plan exists, plus `intake.confirmed-behavior` when a
 Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 
 **Task size.** Each task owns coherent Acceptance lines, one module boundary,
-declared dependencies, and positive plus negative/boundary cases. Split
-unrelated behaviour; keep scenario detail in the spec and never size by time.
+declared dependencies, positive plus negative/boundary cases. Split unrelated
+behaviour; scenarios stay in the spec; never size by time. Tasks changing
+non-test code: Files marks the entry other modules call; case-ids
+name behaviour seen there; logic that entry cannot reach is its own module,
+tested at its entry.
 
 **Architecture.** When the repository root has `ARCHITECTURE.md` carrying
 `ratified-by: <name> <date>`, read it before writing the Task DAG. Treat an
