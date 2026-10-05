@@ -19,7 +19,7 @@ AFFIRMATIVE_PIN = re.compile(
     r"\b(?:is|are|means|marks|names|calls?)\b[^.]*\b(?:(?:other|another) modules?|outside (?:the|its) module)\b",
     re.IGNORECASE,
 )
-NEGATION = re.compile(r"\b(?:not|cannot|never|no|none|without)\b|n't\b", re.IGNORECASE)
+NEGATION = re.compile(r"\b(?:not|cannot|never|no|none|without)\b|n['’]t\b", re.IGNORECASE)
 
 
 def _task_size_paragraph(text: str) -> str:
