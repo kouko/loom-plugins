@@ -99,7 +99,8 @@ Everything else is decided for you, with the reason recorded.
    written by an agent that never touched the change when one was required.
 
 An irreversible fork (deleting data, a public interface, a one-way migration)
-is added to ① for an engineering change or ② for a product change, phrased as
+is added to ① for an engineering change or ② for a product change (① when
+no spec is written), phrased as
 its consequence — never as an extra stop.
 
 ## The contract package

@@ -78,7 +78,7 @@ flowchart TD
 
 1. **① これがやりたいことですか？** — `capture-intent` で。言い直した
    intent に、取り消しにくい選択をその結果の形で織り込む —
-   engineering の変更ならここで、product の変更なら ② で。
+   engineering の変更ならここで、product の変更なら ② で（spec を書かないならここで）。
    `status: confirmed` でない intent は下流のどこも受け取らない。
 2. **② X をすると Y が見える、で合っていますか？** — `write-spec` で、
    product の変更のときだけ。その product の取り消しにくい選択もここで

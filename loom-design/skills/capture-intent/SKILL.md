@@ -41,7 +41,8 @@ points, and a legacy intent at ship or changed requirements can add a stop.
 
 1. **Here:** one message confirms the restated intent, for an engineering
    change every expensive-to-undo choice in consequence form (a product
-   change's wait for item 2), a product's new principles when needed, and —
+   change's wait for item 2, unless no spec will be written), a product's new
+   principles when needed, and —
    only for `second-vendor: ask` — whether to use another vendor.
    `suggest` adds no question at capture-intent; write-plan owns its post-plan
    notice.
@@ -49,7 +50,8 @@ points, and a legacy intent at ship or changed requirements can add a stop.
    carried details ("you type ___ and see ___"), and the product's one-way
    doors in consequence form — at `write-spec`, or at
    `loom-code:write-plan` when `needs-design: no` and carried details force a
-   spec. Engineering changes skip this.
+   spec. Engineering changes skip this; a product change with no spec has its
+   one-way doors asked at item 1 instead.
 3. **At the end:** accept or reject the report showing how each Acceptance
    line was tried and what happened.
 
@@ -195,8 +197,9 @@ twice, and this is the only stop this station makes.
 2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are asked at
    decision point ② of the station writing its spec — `write-spec`, or
-   `loom-code:write-plan` when it writes the spec — never in this message.
-   The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing
+   `loom-code:write-plan` when it writes the spec — when a spec will be
+   written. They are asked in this message instead when no spec will be
+   written. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing
    obligation**; **(c) Limits what the user can do in future**; **(d) Sets the
    ceiling on output quality**; and **(e) An irreversible action on the user's
    existing state**. Class (e) counts without a fork. If Constraints or
@@ -210,7 +213,8 @@ twice, and this is the only stop this station makes.
    then ask about the result, never about assumptions; **threshold** — for
    class (d), any axis differing by at least 20%, or the presence versus
    absence of money, privacy or coverage; **merge** — every engineering
-   one-way door of this change is asked once, here, inside this message.
+   one-way door of this change, and a product one-way door when no spec will
+   be written, is asked once, here, inside this message.
    Never open an extra stop.
 
    State options as user consequences and recommend one with a reason. With no

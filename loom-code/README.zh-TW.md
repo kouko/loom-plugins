@@ -90,7 +90,7 @@ Acceptance 無法機械判定時才會做 acceptance testing。
    agent 寫的那份報告。
 
 不可逆的岔路（刪資料、公開介面、單向遷移）在 engineering 變更時併進 ①、
-product 變更時併進 ②，用後果的形式問 —— 不另開停頓點。
+product 變更時併進 ②（不寫 spec 時併進 ①），用後果的形式問 —— 不另開停頓點。
 
 ## contract package
 

@@ -78,7 +78,8 @@ A change asks its user three things. loom-design owns the first two:
 
 1. **① Is this what you want?** — at `capture-intent`: the restated intent,
    with any choice that is expensive to undo phrased as its consequence —
-   here for an engineering change, at ② for a product change.
+   here for an engineering change, at ② for a product change (here when
+   no spec is written).
    Nothing downstream accepts an intent that is not `status: confirmed`.
 2. **② You do X and you see Y — right?** — at `write-spec`, for product
    changes only, together with the product's expensive-to-undo choices;

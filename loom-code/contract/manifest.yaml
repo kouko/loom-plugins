@@ -37,7 +37,7 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
 actions:             # executable steps inside a station; not skills (§3)
   - name: restate-and-confirm
     owner: write-plan          # also executed by capture-intent when loom-design is installed
-    summary: "decision point ① — restate Problem/Acceptance in plain words; merge one-way doors, any `second-vendor: ask` question and a missing-PRINCIPLES interview into the same dialogue; write `status: confirmed <date>`."
+    summary: "decision point ① — restate Problem/Acceptance in plain words; merge engineering one-way doors (and a product change's when no spec will be written), any `second-vendor: ask` question and a missing-PRINCIPLES interview into the same dialogue; write `status: confirmed <date>`."
   - name: one-way-door
     owner: write-plan
     summary: "classes (a)–(e) — (e) irreversible actions on existing user data, asked even without a fork — and four gates (check / measure / threshold 20% / merge); asked in consequence form inside decision point ① or ②; answers marked user-decided in spec Design decision."

@@ -14,7 +14,7 @@ is the whole record. Their version numbers never continued here —
 
 ## [2.13.0] — 2026-10-06 — capture-intent asks product one-way doors at decision point ②
 
-- `capture-intent` decision point ① now asks only an engineering change's one-way doors; a product change's one-way doors, class (e) actions included, are asked at decision point ② of the station writing its spec — `write-spec`, or `loom-code:write-plan` when it writes the spec — matching `loom-code`.
+- `capture-intent` decision point ① now asks an engineering change's one-way doors; a product change's one-way doors, class (e) actions included, are asked at decision point ② of the station writing its spec — `write-spec`, or `loom-code:write-plan` when it writes the spec — and at ① when no spec will be written, matching `loom-code`. The READMEs (en / ja / zh-TW) state the same fallback.
 - `capture-intent` names the Codex authorisation stop as happening when the plugin is newly installed or updated, not on first use of a repository.
 - The English, Japanese and Traditional Chinese READMEs state the same split.
 

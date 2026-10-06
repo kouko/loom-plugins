@@ -73,7 +73,7 @@ flowchart TD
 
 1. **① 這是你要的嗎？** — 在 `capture-intent`：覆述後的 intent，任何難以
    反悔的選擇都用「之後就會怎樣」的後果形式併進來 —— engineering 變更在這裡，
-   product 變更在 ②。下游沒有任何一站會收
+   product 變更在 ②（不寫 spec 時在這裡）。下游沒有任何一站會收
    非 `status: confirmed` 的 intent。
 2. **② 你做 X 就會看到 Y，對嗎？** — 在 `write-spec`，只在 product 變更問；
    該 product 難以反悔的選擇也在這裡一起問；答案記成 `confirmed-behavior:`。
