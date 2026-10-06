@@ -12,6 +12,12 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.13.0] — 2026-10-06 — capture-intent asks product one-way doors at decision point ②
+
+- `capture-intent` decision point ① now asks only an engineering change's one-way doors; a product change's one-way doors, class (e) actions included, are asked at decision point ② of the station writing its spec — `write-spec`, or `loom-code:write-plan` when it writes the spec — matching `loom-code`.
+- `capture-intent` names the Codex authorisation stop as happening when the plugin is newly installed or updated, not on first use of a repository.
+- The English, Japanese and Traditional Chinese READMEs state the same split.
+
 ## [2.12.1] — 2026-10-05 — OpenCode loader stops recording user prompts
 
 - The synced OpenCode loader copy no longer writes the per-session prompt file under `tmpdir/loom-opencode/`, and drops `transcript_path` from hook payloads, matching `loom-code` 3.32.0.
