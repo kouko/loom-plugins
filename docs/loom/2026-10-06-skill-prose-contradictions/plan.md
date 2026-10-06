@@ -4,7 +4,7 @@ charter: 1.1
 
 ## Current State Evidence
 - Forward: loom-code/skills/write-plan/references/one-way-door.md:44 asks every one-way door once, "① for engineering, ② for product"; loom-code/hooks/session-start:88-89 agrees.
-- Reverse: loom-code/skills/write-plan/references/confirm-intent.md:28 and write-plan/SKILL.md:89 put every one-way door into ①; loom-design/skills/capture-intent/SKILL.md:192,206 do the same with no product exception.
+- Reverse: loom-code/skills/write-plan/references/confirm-intent.md:28 and write-plan/SKILL.md:89 put every one-way door into ①; loom-design/skills/capture-intent/SKILL.md:42-43,192,206, loom-design/README.md:78-79, README.ja.md:79-80, README.zh-TW.md:74-75 and loom-code/skills/write-plan/test-prompts.json:18 do the same with no product exception.
 - Error: write-plan/SKILL.md:86 and capture-intent/SKILL.md:56 call the Codex stop per-repository; write-plan/references/codex-first-contact.md:12-14 keys hook trust to the installed plugin.
 - Data: closing-review/references/adversarial.md:40 says the attack part "writes no new program"; adversarial-code.md:13 says write and run executable cases.
 - Boundary: closing-review/references/lenses.md:35 bans running adversarial programs; lenses.md:54 runs changed test files except evidence/probes/, so a probe graduated into tests/ gets both rules.
@@ -14,12 +14,12 @@ charter: 1.1
 Wave 1 — prose fixes, one task per skill (disjoint files, no shared symbol).
 
 **W1-01 write-plan routes product one-way doors to ② and times the Codex stop by plugin install**  after: none  acceptance: 1, 2
-- Files: loom-code/skills/write-plan/SKILL.md, loom-code/skills/write-plan/references/confirm-intent.md
+- Files: loom-code/skills/write-plan/SKILL.md, loom-code/skills/write-plan/references/confirm-intent.md, loom-code/skills/write-plan/test-prompts.json
 - Test: A1 positive: confirm-intent-holds-product-one-way-doors-for-decision-point-2; negative: engineering-one-way-door-still-asked-at-1. A2 positive: codex-stop-named-at-plugin-install-or-update; negative: first-time-this-repo-wording-absent.
 - Risk: write-plan body is 3749 words under a 3750 cap (test_write_plan_shape_text.py), so SKILL.md edits must be word-neutral; agent-decided: product one-way doors go to the ② of whichever station writes the spec.
 
 **W1-02 capture-intent routes product one-way doors to ② and times the Codex stop by plugin install**  after: none  acceptance: 1, 2
-- Files: loom-design/skills/capture-intent/SKILL.md
+- Files: loom-design/skills/capture-intent/SKILL.md, loom-design/README.md, loom-design/README.ja.md, loom-design/README.zh-TW.md
 - Test: A1 positive: capture-intent-step4-limits-one-way-doors-to-engineering; negative: product-one-way-door-not-merged-into-1. A2 positive: codex-stop-named-at-plugin-install-or-update; negative: first-use-repository-wording-absent.
 - Risk: loom-design/tests/spec/test_capture_intent_contract.py pins capture-intent text; preserve every pinned phrase; class (e) for product also moves to ② per session-start:89.
 
@@ -42,7 +42,7 @@ Wave 2 — release metadata.
 
 **W2-03 Bump README version strings for both plugins**  after: W2-01, W2-02  acceptance: 5
 - Files: README.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md, loom-design/README.md, loom-design/README.ja.md, loom-design/README.zh-TW.md
-- Test: A5 positive: readme-versions-match-manifests; negative: stale-3.36.0-and-2.12.1-absent-outside-changelogs-and-docs.
+- Test: A5 positive: readme-versions-match-manifests; negative: stale-3.36.0-and-2.12.1-absent-outside-changelogs-and-docs; boundary: consistency-recheck-of-write-plan-and-closing-review-lists-none-of-the-four (run by acceptance testing).
 - Risk: README.md carries both plugins' version strings, so one task owns it; historical CHANGELOG sections keep old strings.
 
 ## Simplicity check
