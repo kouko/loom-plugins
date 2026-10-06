@@ -83,13 +83,13 @@ questions in intent; never create a substitute plan.
 
 Give the user this list if they ask what is coming. It is the whole list:
 there are no other **decision points**. On Codex there is also one
-non-decision authorisation stop, the first time this repo is used (step
-0b) — it asks for permission to run, not for a decision about the work.
+non-decision authorisation stop, when the plugin is installed or updated
+(step 0b) — it asks permission to run, not a decision about the work.
 
-1. At ①, restate the wanted outcome; merge any expensive-to-undo choice,
+1. At ①, restate the wanted outcome; merge engineering one-way doors,
    `second-vendor: ask` question, and required principles interview.
-2. At ②, only for a product spec you write: confirm visible behaviour and
-   carried details. Ask nothing about plan structure; record each agent
+2. At ②, only for a product spec you write: confirm visible behaviour,
+   carried details, product one-way doors. Ask nothing about plan structure; record each agent
    decision and reason.
 3. At ③, the user accepts or rejects the report against every Acceptance line.
 

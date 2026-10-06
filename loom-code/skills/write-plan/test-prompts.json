@@ -15,7 +15,7 @@
       "id": 2,
       "category": "edge-case",
       "prompt": "I drafted docs/loom/intent/2026-09-13-replace-store.md, but its status is still open. Go ahead and write the plan now; we can confirm the intent later.",
-      "expected_behavior": "Refuse to write a provisional plan. Restate the outcome and acceptance, merge any one-way-door consequences and applicable cross-model question into decision point 1, and wait for the user's confirmation before planning.",
+      "expected_behavior": "Refuse to write a provisional plan. Restate the outcome and acceptance, merge any engineering one-way-door consequences and applicable cross-model question into decision point 1 (product one-way doors belong to decision point 2), and wait for the user's confirmation before planning.",
       "edge_case_dimensions": [
         "unconfirmed intent",
         "request to bypass confirmation gate"
