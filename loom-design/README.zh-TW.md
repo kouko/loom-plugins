@@ -72,10 +72,11 @@ flowchart TD
 一次變更總共問使用者三件事，前兩件歸 loom-design：
 
 1. **① 這是你要的嗎？** — 在 `capture-intent`：覆述後的 intent，任何難以
-   反悔的選擇都用「之後就會怎樣」的後果形式併進來。下游沒有任何一站會收
+   反悔的選擇都用「之後就會怎樣」的後果形式併進來 —— engineering 變更在這裡，
+   product 變更在 ②。下游沒有任何一站會收
    非 `status: confirmed` 的 intent。
 2. **② 你做 X 就會看到 Y，對嗎？** — 在 `write-spec`，只在 product 變更問；
-   答案記成 `confirmed-behavior:`。
+   該 product 難以反悔的選擇也在這裡一起問；答案記成 `confirmed-behavior:`。
 3. **③ 做到了嗎？** — 在流程最後的 `loom-code`，透過一份說明每條
    Acceptance 怎麼試過的報告。
 

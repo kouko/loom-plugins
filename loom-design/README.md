@@ -77,10 +77,12 @@ own yes.
 A change asks its user three things. loom-design owns the first two:
 
 1. **① Is this what you want?** — at `capture-intent`: the restated intent,
-   with any choice that is expensive to undo phrased as its consequence.
+   with any choice that is expensive to undo phrased as its consequence —
+   here for an engineering change, at ② for a product change.
    Nothing downstream accepts an intent that is not `status: confirmed`.
 2. **② You do X and you see Y — right?** — at `write-spec`, for product
-   changes only; recorded as `confirmed-behavior:`.
+   changes only, together with the product's expensive-to-undo choices;
+   recorded as `confirmed-behavior:`.
 3. **③ Did it work?** — at the end of the flow in `loom-code`, through the
    report showing how each Acceptance line was tried.
 
