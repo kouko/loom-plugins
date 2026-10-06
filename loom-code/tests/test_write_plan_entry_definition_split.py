@@ -1,11 +1,13 @@
-# concern: the entry-definition pin splits sentences at every ". ", so a negation placed after an abbreviation (i.e., e.g.) or an ellipsis escapes the same-sentence negation check and an inverted entry definition passes
+# concern: an entry-definition pin whose splitter ends a sentence at an abbreviation (i.e., e.g.) or an ellipsis lets a negation placed after it escape the same-sentence negation check, so an inverted entry definition passes
 """Adversary probe for 2026-10-05-entry-pin-negation-gaps.
 
 The change makes `_pins_outside_callers` judge whole sentences so a negation
 anywhere in the pinned sentence rejects it (engineering-baseline section 5
-item 8). Its splitter breaks on any "." followed by whitespace, so "i.e.",
-"e.g." and "..." end a "sentence" early: the affirmative fragment before them
-is judged alone and the negation after them is never seen.
+item 8). At 721f0bc5 its splitter broke on any "." followed by whitespace, so
+"i.e.", "e.g." and "..." ended a "sentence" early: the affirmative fragment
+before them was judged alone and the negation after them was never seen.
+ebd3443c fixed this by ending a sentence only at ".", "!" or "?" followed by a
+capitalised word; these cases keep that splitter from regressing.
 """
 from __future__ import annotations
 

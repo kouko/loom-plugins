@@ -2,7 +2,7 @@
 
 ## [3.36.0] — 2026-10-06 — the write-plan entry-definition pin judges whole sentences
 
-- `test_write_plan_entry_definition.py` now judges the write-plan entry definition by whole sentence, splitting on `.` only, so a negation anywhere in the pinned sentence, including a sibling `;` clause, fails the pin.
+- `test_write_plan_entry_definition.py` now judges the write-plan entry definition by whole sentence, where a sentence ends only at `.`, `!` or `?` followed by a capitalised word, so a negation in the pinned sentence fails the pin, including one in a sibling `;` clause or after `i.e.`, `e.g.` or `...`.
 - Write-plan's Task size paragraph now says "logic beyond that entry's reach" instead of "logic that entry cannot reach", with the same meaning and no negation token.
 - The pin's docstring now marks it as a cheap fixed check (a tripwire), not a semantic guarantee: inversions phrased with "rather than", "instead of" or "neither … nor" pass it and are left to closing-review reviewers. No checker rule changed.
 
