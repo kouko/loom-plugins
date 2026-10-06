@@ -325,7 +325,7 @@ Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 declared dependencies, positive plus negative/boundary cases. Split unrelated
 behaviour; scenarios stay in the spec; never size by time. Tasks changing
 non-test code: Files marks the entry other modules call; case-ids
-name behaviour seen there; logic that entry cannot reach is its own module,
+name behaviour seen there; logic beyond that entry's reach is its own module,
 tested at its entry.
 
 **Architecture.** When the repository root has `ARCHITECTURE.md` carrying
