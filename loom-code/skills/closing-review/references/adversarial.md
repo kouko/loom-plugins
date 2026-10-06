@@ -37,10 +37,12 @@ to `none`.
 ## Two parts: attack, then pin
 
 The adversarial step runs in two parts. The first part reads the change and
-attacks it, and it writes no new program: besides its report, it may only add
-a `concern:` line to an existing test it names as its program. The report names
+attacks it, and it commits no new program: it may write and run trial cases to
+make its attacks, but leaves them uncommitted, and besides its report it may
+only add a `concern:` line to an existing test it names as its program. The report names
 every attack point it found and what each one did. Only an attack that succeeded opens the second
-part, where a program is written to pin what that attack exposed. A change the
+part, where a program is written and committed under
+`docs/loom/<change-id>/evidence/probes/` to pin what that attack exposed. A change the
 first part leaves standing ends there, with its report and, when one exists,
 the existing test it names as its program under How many cases.
 
