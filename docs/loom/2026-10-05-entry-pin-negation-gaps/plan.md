@@ -30,6 +30,13 @@ Wave 2 — release metadata.
 - Test: A4 positive: readme-version-matches-manifest; negative: stale-3.35.0-absent-outside-changelog-and-docs.
 - Risk: README.md has two version strings (lines 17 and 132); historical CHANGELOG sections keep old strings.
 
+Wave 3 — probe graduation (closing-review gate review.probe-graduation).
+
+**W3-01 Graduate the sentence-split probe into the package suite**  after: W2-02  acceptance: 1
+- Files: docs/loom/2026-10-05-entry-pin-negation-gaps/evidence/probes/test_abuse_entrypin_sentence_split.py, loom-code/tests/test_write_plan_entry_definition_split.py
+- Test: A1 positive: graduated-probe-collected-and-green-in-package-suite; negative: probe-red-against-721f0bc5-period-split.
+- Risk: git mv plus repo-root path fix only; agent-decided: loom-code/tests/ per AGENTS.md Test Location.
+
 ## Simplicity check
 - drop the executable rather-than case, keep the docstring note — taken
 - merge W2-02 into W2-01 — declined: the union is 10 files, over the plan's 8-entry Files cap

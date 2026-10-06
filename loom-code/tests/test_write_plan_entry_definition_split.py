@@ -12,7 +12,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[2]
 PIN_TEST = REPO / "loom-code/tests/test_write_plan_entry_definition.py"
 
 
