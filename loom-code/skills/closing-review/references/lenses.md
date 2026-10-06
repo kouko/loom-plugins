@@ -37,8 +37,8 @@ literally wrong the text is:
   both run mechanically at the end of Build, and
   `finalize-review` executes them again and records the result. A probe
   graduated out of `evidence/probes/` into the repository's tests (for
-  example `loom-code/tests/`) is no longer an adversarial program but an
-  ordinary changed test file, which reviewers run. Not having
+  example `loom-code/tests/`) is also an ordinary changed test file,
+  which reviewers run. Not having
   run them is not grounds for `PASS_WITH_NOTES`. A dimension whose pass
   rests on a claim you could check — by reading a source or by running a
   changed test file — and did not, scores `PASS_WITH_NOTES`, naming what was
