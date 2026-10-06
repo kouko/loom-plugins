@@ -45,6 +45,13 @@ Wave 2 — release metadata.
 - Test: A5 positive: readme-versions-match-manifests; negative: stale-3.36.0-and-2.12.1-absent-outside-changelogs-and-docs; boundary: consistency-recheck-of-write-plan-and-closing-review-lists-none-of-the-four (run by acceptance testing).
 - Risk: README.md carries both plugins' version strings, so one task owns it; historical CHANGELOG sections keep old strings.
 
+Wave 3 — probe graduation (review.probe-graduation).
+
+**W3-01 Graduate the three adversary probes into the loom-code suite**  after: W1-01, W1-02, W1-03, W2-01, W2-02, W2-03  acceptance: 1, 4
+- Files: docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_product_one_way_door_without_spec.py, docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_decision_point_one_restatements.py, docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_graduated_probe_classification.py, loom-code/tests/test_adversarial_product_one_way_door_without_spec.py, loom-code/tests/test_adversarial_decision_point_one_restatements.py, loom-code/tests/test_adversarial_graduated_probe_classification.py
+- Test: A1 positive: graduated-no-spec-route-and-restatement-probes-pass-in-suite; A4 boundary: graduated-classification-probe-passes-at-suite-path.
+- Risk: each probe went red on 70638121 and is green only after the Build fixes for its finding; moving it changes its REPO parents depth, so the path constant must be re-derived; the `concern:` line stays.
+
 ## Simplicity check
 - merge W2-03 into W2-01 and W2-02 — declined: README.md carries both versions, so splitting it across two tasks creates a shared-file conflict
 - add executable prose-pin tests for the four fixes — declined: lenses.md tests row says a prose-only change needs no new executable test file
