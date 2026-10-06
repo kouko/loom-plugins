@@ -55,3 +55,4 @@ Wave 2 — release metadata.
 ## Risks
 1. user-decided — a probe graduated into the package suite is an ordinary changed test file that reviewers run; Codex preferred keeping all adversarial programs mechanical-only, and the user chose the proposal before ①.
 2. No one-way door; every edit is prose or release metadata and reverts with git revert.
+3. user-decided — second-vendor selection-confirmed: codex
