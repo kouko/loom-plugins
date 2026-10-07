@@ -1,4 +1,4 @@
-"""Adversary probe for 2026-10-06-skill-prose-contradictions.
+"""Graduated adversary probe for 2026-10-06-skill-prose-contradictions; guards against regression.
 concern: a product change that writes no spec loses every one-way-door question, because the ① message routes product one-way doors to a ② that never runs.
 
 The change tells the ① message (write-plan confirm-intent.md item 2 and
@@ -16,7 +16,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[2]
 FIRST_MESSAGE_COPIES = [
     REPO / "loom-code/skills/write-plan/references/confirm-intent.md",
     REPO / "loom-design/skills/capture-intent/SKILL.md",

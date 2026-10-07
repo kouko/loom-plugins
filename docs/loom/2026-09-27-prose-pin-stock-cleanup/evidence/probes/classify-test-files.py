@@ -1490,6 +1490,14 @@ MANUAL_OVERRIDES = {
         "`design-conformance` lens name, and the bucket names craft, "
         "domain-convention and project-local",
     ),
+    # 2026-10-06-skill-prose-contradictions (W3-01): a graduated adversary probe.
+    "loom-code/tests/test_adversarial_decision_point_one_restatements.py": (
+        "structure",
+        "qualifier scan: where the manifest restate-and-confirm summary or the "
+        "AGENTS.md decision-point-1 segment names a one-way door, the concept "
+        "term `engineering` must also appear; plus two synthetic self-tests; "
+        "no sentence asserted present",
+    ),
 }
 
 

@@ -1,4 +1,4 @@
-"""Adversary probe for 2026-10-06-skill-prose-contradictions.
+"""Graduated adversary probe for 2026-10-06-skill-prose-contradictions; guards against regression.
 concern: the fix for contradiction 4 opens a new one by declaring a graduated probe no adversarial program while the adversarial protocol keeps it in the adversarial record.
 
 lenses.md now says a probe graduated into the repository's tests "is no
@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[2]
 REFS = REPO / "loom-code/skills/closing-review/references"
 
 

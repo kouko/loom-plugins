@@ -1,4 +1,4 @@
-"""Adversary probe for 2026-10-06-skill-prose-contradictions.
+"""Graduated adversary probe for 2026-10-06-skill-prose-contradictions; guards against regression.
 concern: a restated decision-point-1 rule outside the edited skills still merges every one-way door into ①, so contradiction 1 survives in a second copy.
 
 The change narrowed the ① message to engineering one-way doors in
@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[2]
 
 
 def _manifest_restate_summary() -> str:
