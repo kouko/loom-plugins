@@ -125,6 +125,9 @@ def test_product_gate_and_merge_gate_skip_doors_asked_at_one() -> None:
     assert _says_no_reask(gate)
     merge = ONE_WAY_DOOR.read_text(encoding="utf-8").split("**Merge.**", 1)[1]
     assert _says_no_reask(merge.split("\n## ", 1)[0])
+    asked = _text().split("## What you will be asked", 1)[1]
+    item2 = re.sub(r"\s+", " ", asked.split("\n2. ", 1)[1].split("\n3. ", 1)[0])
+    assert "product one-way doors ① skips" in item2
 
 
 def test_template_placeholder_names_table_and_diagram() -> None:
