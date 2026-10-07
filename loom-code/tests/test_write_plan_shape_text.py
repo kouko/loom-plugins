@@ -3,6 +3,10 @@
 import re
 from pathlib import Path
 
+import pytest
+
+from prose_pin import has_negation
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WRITE_PLAN = ROOT / "loom-code/skills/write-plan/SKILL.md"
@@ -58,7 +62,12 @@ def test_write_plan_readback_has_no_mermaid() -> None:
 
 _DOORS = re.compile(r"\bproduct one-way doors\b", re.IGNORECASE)
 _PRESENT = re.compile(r"\bpresent\b", re.IGNORECASE)
-_NEGATION = re.compile(r"\b(?:never|not|nothing|nor)\b|n't\b", re.IGNORECASE)
+_NOTHING = re.compile(r"\bnothing\b", re.IGNORECASE)
+
+
+def _negated(sentence: str) -> bool:
+    """The shared prose-pin negation words, plus `nothing`."""
+    return has_negation(sentence) or bool(_NOTHING.search(sentence))
 
 
 def _presents_doors(text: str) -> bool:
@@ -68,7 +77,7 @@ def _presents_doors(text: str) -> bool:
     """
     for sentence in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text)):
         doors = _DOORS.search(sentence)
-        if doors and not _NEGATION.search(sentence) \
+        if doors and not _negated(sentence) \
                 and _PRESENT.search(sentence[: doors.start()]):
             return True
     return False
@@ -78,6 +87,19 @@ def test_doors_detector_affirmative_accepted_negated_rejected() -> None:
     """Self-test: the detector accepts the affirmative form, rejects the negated one."""
     assert _presents_doors("Present the Requirements and product one-way doors in plain words.")
     assert not _presents_doors("Never present the Requirements or product one-way doors here.")
+
+
+@pytest.mark.parametrize("sentence", [
+    "Present no Requirements and no product one-way doors here.",
+    "You cannot present the product one-way doors here.",
+    "Present the Requirements without the product one-way doors.",
+    "Neither agent may present the product one-way doors.",
+    "Nobody may present the product one-way doors here.",
+    "Present nothing about the product one-way doors.",
+])
+def test_doors_detector_rejects_shared_negation_words(sentence: str) -> None:
+    """Self-test: every shared negation word, and `nothing`, defeats the pin."""
+    assert not _presents_doors(sentence)
 
 
 def test_product_gate_presents_product_one_way_doors() -> None:
