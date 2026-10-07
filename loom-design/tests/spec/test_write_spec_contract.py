@@ -41,7 +41,7 @@ MECHANISMS = REPO / "docs/loom/evidence/mechanisms.yaml"
 WORD_CAP = 3500
 DESCRIPTION_CAP = 400
 SPEC_FORMS_CAP = 900
-UI_FLOWS_CAP = 725
+UI_FLOWS_CAP = 700
 
 # Vocabulary the redesign deletes (concept-model §10) plus the two terms
 # this station's own predecessors carried (`expansion`, and the critic
@@ -249,13 +249,16 @@ def test_one_way_door_asked_at_decision_point_one_is_not_asked_again() -> None:
     exception = "already asked at decision point ①, because no spec was going to be written then, is not asked again at ②"
     step3 = _flat(_section(_text(), _STEP3))
     flows = _flat(_flows())
-    assert exception in step3 and exception in flows
+    assert exception in step3
     assert "A one-way door, class (e) included, already asked at decision point ①" in step3
     assert "every one-way door of this change not already asked at ① is asked once" in step3
     asked = _flat(_section(_text(), "## What you will be asked, in plain words"))
     assert "One already asked when your intent was confirmed is not asked again." in asked
     assert "asked **even when there is no fork at all**" in step3
-    assert "it is asked even when there is no alternative design" in flows
+    assert (
+        "it is asked even when there is no alternative design, "
+        "unless ① already asked it because no spec was planned." in flows
+    )
 
 
 def test_plugin_declares_requires_contract() -> None:

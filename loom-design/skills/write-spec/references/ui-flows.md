@@ -56,13 +56,12 @@ dead end. Both are findings before the closing-review station raises them.
 
 ## Irreversible steps get a sentence of their own
 
-Where a flow rewrites, deletes or sends the user's existing data, the
-line says so and names the safeguard: `todo migrate → rewrites
-todos.json into the new format; the old program cannot read it; a copy
-is kept at todos.json.bak`. That sentence is what decision point ② asks
-about — it is asked even when there is no alternative design. One
-already asked at decision point ①, because no spec was going to be written
-then, is not asked again at ②.
+Where a flow rewrites, deletes or sends existing user data, the line
+says so, naming the safeguard: `todo migrate → rewrites todos.json to a
+format the old program cannot read; backup at todos.json.bak`.
+Decision point ② asks about that sentence; it is asked even when there
+is no alternative design, unless ① already asked it because no spec was
+planned.
 
 ## When there is no interface
 
