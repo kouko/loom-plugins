@@ -120,4 +120,80 @@ All pytest runs used
 - Nit: `loom-code/CHANGELOG.md:6` says the tests "use the shared `prose_pin`
   negation matcher, which also catches `nothing`"; the shared matcher
   (`prose_pin.py:30`) does not include `nothing` — the two tests add it
-  locally. Readable as either; wording only.
+  locally. Readable as either; wording only. (Fixed in 9046f576 — see re-run.)
+
+## Re-run after closing-review fix (d679d0c2..f859a992)
+
+Tried on 2026-10-07, in a fresh clean copy at f859a992
+(`git worktree add --detach <scratch>/at-pin-rerun f859a992`; `git status --short` empty).
+Fix commits: 9046f576 (loom-code CHANGELOG wording), b47abfaa
+(write-plan SKILL.md item 2 "product one-way doors not asked at ①", item 3
+"per Acceptance line", item 1 drops "the"), f859a992 (ui-flows.md exception
+folded into the irreversible-step sentence; `UI_FLOWS_CAP` 725 → 700; test
+pins the new clause). Files touched: `loom-code/CHANGELOG.md`,
+`loom-code/skills/write-plan/SKILL.md`, `loom-code/tests/test_write_plan_shape_text.py`,
+`loom-design/skills/write-spec/references/ui-flows.md`,
+`loom-design/tests/spec/test_write_spec_contract.py`.
+
+### Setup (re-run)
+
+- `claude plugin validate .` / `./loom-code` / `./loom-design`: same as first
+  run (`Validation passed`; the two others `passed with warnings`, only
+  `requires-contract: Unknown field`). `bash loom-code/hooks/session-start </dev/null`
+  emits JSON with key `hookSpecificOutput`.
+
+### Line 1 — carried over
+
+Reason, checked against the diff: the fix range changes no negation detector
+(`has_negation` callers, local `nothing`), no self-test, and none of the three
+mutated sentences (write-plan "Present the Requirements, UI flows and
+product …", confirm-intent.md / capture-intent "They are asked in this
+message instead"). The only test edit in `test_write_plan_shape_text.py` is
+the item-2 substring assertion (line 147), which line 2 re-tests.
+
+### Line 2 — re-tested in full
+
+- Sweep at f859a992: `grep -rlnE "②|decision point 2"` over `loom-code/skills`,
+  `loom-design/skills`, `loom-workflow/skills`, agents → same file set as the
+  first run; the loom-workflow hits (`git-memory/protocols/recall.md:17,33,49`,
+  `dbt-model-style/SKILL.md:159`) are unrelated list numbering.
+  `git diff --stat 83f2fd7f..HEAD -- */skills` touches only write-plan
+  SKILL.md and ui-flows.md.
+- The 7 ② procedure texts at f859a992:
+  - `loom-code/skills/write-plan/SKILL.md:91-92` item 2: "At ②, … carried
+    details, product one-way doors not asked at ①."
+  - `loom-code/skills/write-plan/SKILL.md:297`: "Doors asked at ① are not asked again at ②."
+  - `loom-code/skills/write-plan/references/one-way-door.md:44-48`: unchanged.
+  - `loom-design/skills/write-spec/SKILL.md:54-55`, `:197-199`, `:207-208`: unchanged.
+  - `loom-design/skills/write-spec/references/ui-flows.md:59-64`: "Decision
+    point ② asks about that sentence; it is asked even when there is no
+    alternative design, unless ① already asked it because no spec was planned."
+- ①'s wording unchanged (`confirm-intent.md:36-38`, `capture-intent/SKILL.md:201-202`:
+  "a spec written later does not ask them again at ②"). The two reworded
+  texts say the same thing (asked at ① → not asked at ②).
+- `pytest -q` on `test_write_plan_shape_text.py`,
+  `test_adversarial_no_reask_pin_flipped_polarity.py`, `test_write_spec_contract.py`,
+  `test_adversarial_write_spec_no_reask_unpinned_sentences.py`,
+  `test_adversarial_product_one_way_door_without_spec.py`: `50 passed`.
+  `-rA -k "skip_doors_asked_at_one or asked_at_decision_point_one or word_cap or within_caps or noReask or no_reask"`:
+  `12 passed`, incl. `test_product_gate_and_merge_gate_skip_doors_asked_at_one`,
+  `test_one_way_door_asked_at_decision_point_one_is_not_asked_again`,
+  `test_reference_files_exist_within_caps` (ui-flows under the restored 700 cap),
+  `test_body_within_word_cap`, `test_noReaskPin_reaskRewrite_fails[2]`,
+  `test_writeSpecNoReaskPin_sentenceRemovedOrReversed_fails[3]`.
+
+### Line 3 — re-tested
+
+- Versions at f859a992: loom-code four manifests `3.38.0`, loom-design four
+  `2.14.0`; `loom-code/CHANGELOG.md:3` `[3.38.0]`, `loom-design/CHANGELOG.md:15`
+  `[2.14.0]`, each newest. `python3 scripts/sync_codex_manifests.py --all --check`:
+  exit 0. `pytest -q loom-code/tests/test_write_plan_station_text.py loom-design/tests/spec/test_capture_intent_contract.py`:
+  `51 passed`.
+- `loom-code/CHANGELOG.md:6` now reads "…use the shared `prose_pin` negation
+  matcher, and each also rejects `nothing`, which the shared matcher leaves
+  out." — matches `prose_pin.py:30-31`. The first run's nit is closed.
+- Full suite: not run here (left to finalize-review). Command as above.
+- Finding: `loom-design/CHANGELOG.md:17` still says "The `ui-flows.md` word
+  cap rises from 700 to 725."; f859a992 set `UI_FLOWS_CAP = 700`
+  (`test_write_spec_contract.py:44`). The release note now states something
+  false.
