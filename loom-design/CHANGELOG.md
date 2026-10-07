@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.14.0] — 2026-10-07 — write-spec does not re-ask a one-way door already asked at ①
+
+- `write-spec` Step 3, its merge gate, its "what you'll be asked" list and `references/ui-flows.md` state the same exception as `loom-code` 3.38.0: a product one-way door already asked at decision point ① is not asked again at ②. The `ui-flows.md` word cap rises from 700 to 725.
+
 ## [2.13.0] — 2026-10-06 — capture-intent asks product one-way doors at decision point ②
 
 - `capture-intent` decision point ① now asks an engineering change's one-way doors; a product change's one-way doors, class (e) actions included, are asked at decision point ② of the station writing its spec — `write-spec`, or `loom-code:write-plan` when it writes the spec — and at ① when no spec will be written, matching `loom-code`. The READMEs (en / ja / zh-TW) state the same fallback.
