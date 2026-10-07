@@ -108,6 +108,25 @@ def test_product_gate_presents_product_one_way_doors() -> None:
     assert _presents_doors(gate)
 
 
+ONE_WAY_DOOR = ROOT / "loom-code/skills/write-plan/references/one-way-door.md"
+
+
+def _says_no_reask(text: str) -> bool:
+    """A sentence says a door already asked at ① is not asked again at ②."""
+    for sentence in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text)):
+        if "①" in sentence and "again at ②" in sentence and has_negation(sentence):
+            return True
+    return False
+
+
+def test_product_gate_and_merge_gate_skip_doors_asked_at_one() -> None:
+    """Acceptance 2: a product door asked at ① is not asked again at ②."""
+    gate = _section(_STEP4).split(_PRODUCT_GATE, 1)[1].split("### ", 1)[0]
+    assert _says_no_reask(gate)
+    merge = ONE_WAY_DOOR.read_text(encoding="utf-8").split("**Merge.**", 1)[1]
+    assert _says_no_reask(merge.split("\n## ", 1)[0])
+
+
 def test_template_placeholder_names_table_and_diagram() -> None:
     """A4 boundary: the spec-minimal UI flows section is one placeholder line."""
     text = SPEC_MINIMAL.read_text(encoding="utf-8")
