@@ -199,7 +199,7 @@ twice, and this is the only stop this station makes.
    decision point ② of the station writing its spec — `write-spec`, or
    `loom-code:write-plan` when it writes the spec — when a spec will be
    written. They are asked in this message instead when no spec will be
-   written. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing
+   written; a spec written later does not ask them again at ②. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing
    obligation**; **(c) Limits what the user can do in future**; **(d) Sets the
    ceiling on output quality**; and **(e) An irreversible action on the user's
    existing state**. Class (e) counts without a fork. If Constraints or

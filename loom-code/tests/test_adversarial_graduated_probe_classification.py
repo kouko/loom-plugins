@@ -1,7 +1,7 @@
 """Graduated adversary probe for 2026-10-06-skill-prose-contradictions; guards against regression.
 concern: the fix for contradiction 4 opens a new one by declaring a graduated probe no adversarial program while the adversarial protocol keeps it in the adversarial record.
 
-lenses.md now says a probe graduated into the repository's tests "is no
+An earlier draft of lenses.md said a probe graduated into the repository's tests "is no
 longer an adversarial program but an ordinary changed test file".
 adversarial.md's Recording section still lists the graduated probe as an
 `adversarial` entry ("the same probe after graduation, named where the

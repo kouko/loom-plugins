@@ -34,7 +34,8 @@ twice.
    are asked at decision point ② of the station writing its spec —
    `write-spec`, or this station (step 4) — when a spec will be written.
    They are asked in this message instead when no spec will be written
-   (step 4 forces none). Class (e) still yields to the **check** gate: when the intent's
+   (step 4 forces none); a spec written later in step 4 does not ask them
+   again at ②. Class (e) still yields to the **check** gate: when the intent's
    Constraints or `PRINCIPLES.md` already pin how that existing data is
    handled, do **not** ask — restate the handling in consequence form
    inside this same message ("this will rewrite your ___, I am doing it the
