@@ -3,7 +3,7 @@
 ## [3.38.0] — 2026-10-07 — a product one-way door asked at ① is not asked again at ②
 
 - Write-plan's ② gate, its "what you will be asked" item 2 and `one-way-door.md`'s merge gate now state that a product one-way door already asked at decision point ① is not asked again at ②.
-- The two prose-pin tests now use the shared `prose_pin` negation matcher, which also catches `nothing`.
+- The two prose-pin tests now use the shared `prose_pin` negation matcher, and each also rejects `nothing`, which the shared matcher leaves out.
 
 ## [3.37.0] — 2026-10-06 — write-plan asks product one-way doors at decision point ②, and adversary trial cases stay uncommitted
 
