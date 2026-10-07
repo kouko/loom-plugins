@@ -25,12 +25,17 @@ twice.
    `publication: automatic — authorized <date> by <name>` only after that
    informed yes; an opt-out leaves the field absent.
 
-2. **The one-way doors found so far**, in consequence form, per
+2. **The engineering one-way doors found so far**, in consequence form, per
    `one-way-door.md` — load that file before deciding whether a
    fork is one; the five classes and the four gates (check, measure,
    threshold, merge) are there, and a class (e) action — anything
    irreversible to the user's existing data — is asked even when there is
-   no fork. Class (e) still yields to the **check** gate: when the intent's
+   no fork. A product change's one-way doors, class (e) actions included,
+   are asked at decision point ② of the station writing its spec —
+   `write-spec`, or this station (step 4) — when a spec will be written.
+   They are asked in this message instead when no spec will be written
+   (step 4 forces none); a spec written later in step 4 does not ask them
+   again at ②. Class (e) still yields to the **check** gate: when the intent's
    Constraints or `PRINCIPLES.md` already pin how that existing data is
    handled, do **not** ask — restate the handling in consequence form
    inside this same message ("this will rewrite your ___, I am doing it the

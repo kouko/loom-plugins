@@ -120,7 +120,7 @@ repository's development records under `docs/`.
 
 ### loom 1.0 flow
 - 七站：capture-intent → write-spec →（write-plan → build → review → ship），maintain 回頭開 intent
-- 三個人類決策點：①覆述並確認 intent（含單向門問法）②product 的可見行為確認（spec）③acceptance test report 驗收
+- 三個人類決策點：①覆述並確認 intent（含 engineering 單向門；不寫 spec 的 product 單向門也在此問）②product 的可見行為與單向門確認（spec）③acceptance test report 驗收
 - 入口與完整站序：`docs/loom/README.md`；概念模型：`docs/loom/2026-09-02-simple-loom-flow/concept-model.md`
 
 ### Agent Behavioral Rules

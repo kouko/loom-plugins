@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.37.0] — 2026-10-06 — write-plan asks product one-way doors at decision point ②, and adversary trial cases stay uncommitted
+
+- Write-plan's decision point ① now merges engineering one-way doors; a product change's one-way doors, class (e) actions included, are asked at decision point ② of the station writing its spec — `loom-design:write-spec`, or write-plan itself when it writes the spec — and, when no spec will be written, in the decision point ① message as before, so no irreversible action goes unasked; write-plan's own ② gate now lists those product one-way doors. It used to merge any expensive-to-undo choice at ①. The `restate-and-confirm` summary in `contract/manifest.yaml`, the SessionStart hook's decision-point lines, `one-way-door.md`'s merge gate, the repo's `AGENTS.md` flow line and the READMEs (en / ja / zh-TW) state the same split. The `test-prompts.json` edge case for an unconfirmed intent now expects the same split.
+- Write-plan names its Codex authorisation stop as happening when the plugin is installed or updated, not the first time a repository is used.
+- The closing-review adversarial attack part may write and run trial cases but leaves them uncommitted; only an attack that succeeded opens the second part, whose program is committed under `docs/loom/<change-id>/evidence/probes/`.
+- Reviewers still never run adversarial programs under `evidence/probes/`, but a probe graduated out of it into the repository's tests (for example `loom-code/tests/`) is an ordinary changed test file, which the reviewer runs under the `tests` lens. No checker rule changed.
+
 ## [3.36.0] — 2026-10-06 — the write-plan entry-definition pin judges whole sentences
 
 - `test_write_plan_entry_definition.py` now judges the write-plan entry definition by whole sentence, where a sentence ends only at `.`, `!` or `?` followed by a capitalised word, so a negation in the pinned sentence fails the pin, including one in a sibling `;` clause, or one after `i.e.`, `e.g.` or `...` when a lowercase word follows. A capitalised word there (e.g. "i.e. Never") still starts a new sentence, so that negation escapes the pin.

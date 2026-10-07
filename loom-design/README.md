@@ -6,7 +6,7 @@
 > never grades. Every verdict on what it produces is rendered by
 > `loom-code:closing-review`, by an agent that did not write the draft.
 
-**Version**: 2.12.1 — 5 skills + 1 optional router. See
+**Version**: 2.13.0 — 5 skills + 1 optional router. See
 [CHANGELOG.md](CHANGELOG.md) for releases.
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -77,10 +77,13 @@ own yes.
 A change asks its user three things. loom-design owns the first two:
 
 1. **① Is this what you want?** — at `capture-intent`: the restated intent,
-   with any choice that is expensive to undo phrased as its consequence.
+   with any choice that is expensive to undo phrased as its consequence —
+   here for an engineering change, at ② for a product change (here when
+   no spec is written).
    Nothing downstream accepts an intent that is not `status: confirmed`.
 2. **② You do X and you see Y — right?** — at `write-spec`, for product
-   changes only; recorded as `confirmed-behavior:`.
+   changes only, together with the product's expensive-to-undo choices;
+   recorded as `confirmed-behavior:`.
 3. **③ Did it work?** — at the end of the flow in `loom-code`, through the
    report showing how each Acceptance line was tried.
 

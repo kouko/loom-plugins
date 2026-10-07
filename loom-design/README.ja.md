@@ -6,7 +6,7 @@
 > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
 > `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
 
-**Version**: 2.12.1 — 5 skills + 任意のルーター 1 個。リリースは
+**Version**: 2.13.0 — 5 skills + 任意のルーター 1 個。リリースは
 [CHANGELOG.md](CHANGELOG.md) を参照。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -77,10 +77,12 @@ flowchart TD
 1 つの変更がユーザーに尋ねることは 3 つ。最初の 2 つが loom-design の担当：
 
 1. **① これがやりたいことですか？** — `capture-intent` で。言い直した
-   intent に、取り消しにくい選択をその結果の形で織り込む。
+   intent に、取り消しにくい選択をその結果の形で織り込む —
+   engineering の変更ならここで、product の変更なら ② で（spec を書かないならここで）。
    `status: confirmed` でない intent は下流のどこも受け取らない。
 2. **② X をすると Y が見える、で合っていますか？** — `write-spec` で、
-   product の変更のときだけ。`confirmed-behavior:` として記録される。
+   product の変更のときだけ。その product の取り消しにくい選択もここで
+   尋ねる。`confirmed-behavior:` として記録される。
 3. **③ うまくいきましたか？** — フローの最後、`loom-code` で。各
    Acceptance 行をどう試したかを示すレポートを通して。
 

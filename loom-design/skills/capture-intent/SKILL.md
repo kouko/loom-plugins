@@ -39,21 +39,26 @@ preserve the required shapes.
 Give the user this list if they ask what is coming. These are the decision
 points, and a legacy intent at ship or changed requirements can add a stop.
 
-1. **Here:** one message confirms the restated intent, every expensive-to-undo
-   choice in consequence form, a product's new principles when needed, and —
+1. **Here:** one message confirms the restated intent, for an engineering
+   change every expensive-to-undo choice in consequence form (a product
+   change's wait for item 2, unless no spec will be written), a product's new
+   principles when needed, and —
    only for `second-vendor: ask` — whether to use another vendor.
    `suggest` adds no question at capture-intent; write-plan owns its post-plan
    notice.
 2. **Where the product spec is written:** confirm visible behaviour and any
-   carried details ("you type ___ and see ___") — at `write-spec`, or at
+   carried details ("you type ___ and see ___"), and the product's one-way
+   doors in consequence form — at `write-spec`, or at
    `loom-code:write-plan` when `needs-design: no` and carried details force a
-   spec. Engineering changes skip this.
+   spec. Engineering changes skip this; a product change with no spec has its
+   one-way doors asked at item 1 instead.
 3. **At the end:** accept or reject the report showing how each Acceptance
    line was tried and what happened.
 
 Nothing about task splitting, review mechanics, or verification is put to the
 user. With `loom-code` alone, `write-plan` performs this station's questions;
-Codex may also need one first-use repository authorisation stop.
+Codex may also need one authorisation stop when the plugin is newly installed
+or updated.
 
 ## Step 1 — Interview
 
@@ -189,8 +194,12 @@ twice, and this is the only stop this station makes.
    `publication: automatic — authorized <date> by <name>` only after that
    informed yes; an opt-out leaves the field absent.
 
-2. **Every one-way door found so far**, in consequence form. The five classes
-   are: **(a) Hard to swap later**; **(b) Creates money or a standing
+2. **The engineering one-way doors found so far**, in consequence form. A
+   product change's one-way doors, class (e) actions included, are asked at
+   decision point ② of the station writing its spec — `write-spec`, or
+   `loom-code:write-plan` when it writes the spec — when a spec will be
+   written. They are asked in this message instead when no spec will be
+   written; a spec written later does not ask them again at ②. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing
    obligation**; **(c) Limits what the user can do in future**; **(d) Sets the
    ceiling on output quality**; and **(e) An irreversible action on the user's
    existing state**. Class (e) counts without a fork. If Constraints or
@@ -203,9 +212,10 @@ twice, and this is the only stop this station makes.
    when the candidates can be compared quickly on the user's own samples,
    then ask about the result, never about assumptions; **threshold** — for
    class (d), any axis differing by at least 20%, or the presence versus
-   absence of money, privacy or coverage; **merge** — every one-way door of
-   this change is asked once, here, inside this message. Never open an
-   extra stop.
+   absence of money, privacy or coverage; **merge** — every engineering
+   one-way door of this change, and a product one-way door when no spec will
+   be written, is asked once, here, inside this message.
+   Never open an extra stop.
 
    State options as user consequences and recommend one with a reason. With no
    fork, state the irreversible consequence and safeguard (for example, what

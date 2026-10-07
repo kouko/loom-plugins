@@ -43,7 +43,8 @@ Any one of these makes it a one-way door:
    choice is the agent's.
 4. **Merge.** All the one-way doors of one change are asked **once**,
    inside a decision point that already exists — ① for engineering, ② for
-   product. Never open an extra stop.
+   product where its spec is written, ① for product when no spec will be
+   written. Never open an extra stop.
 
 ## The consequence form
 

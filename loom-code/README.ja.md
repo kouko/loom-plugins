@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.36.0 · **Skills**: 5 ステーション + 1 ルーター · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.37.0 · **Skills**: 5 ステーション + 1 ルーター · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -100,7 +100,7 @@ reviewer-count` がブランチ全体の差分から計算します — 狭く�
    その変更に一切触れていない agent が書いたレポートを読みます。
 
 不可逆な分岐（データの削除、公開インターフェース、片道のマイグレーション）は、
-engineering の変更なら ①、product の変更なら ② に、結果の形で足されます —
+engineering の変更なら ①、product の変更なら ②（spec を書かないなら ①）に、結果の形で足されます —
 余分な停止点は増やしません。
 
 ## contract package
