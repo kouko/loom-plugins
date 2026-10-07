@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-REPO = Path(__file__).resolve().parents[5]
+REPO = Path(__file__).resolve().parents[3]
 _SPEC = importlib.util.spec_from_file_location(
     "write_spec_contract", REPO / "loom-design/tests/spec/test_write_spec_contract.py"
 )
