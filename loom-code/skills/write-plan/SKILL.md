@@ -87,11 +87,11 @@ non-decision authorisation stop, when the plugin is installed or updated
 (step 0b) — it asks permission to run, not a decision about the work.
 
 1. At ①, restate intent; merge one-way doors ② skips,
-   the `second-vendor: ask` question, and required principles interview.
+   `second-vendor: ask` question, and required principles interview.
 2. At ②, only for a product spec you write: confirm visible behaviour,
-   carried details, product one-way doors ① skips. Ask nothing about plan structure; record agent
-   decisions with reasons.
-3. At ③, the user accepts or rejects the report against every Acceptance line.
+   carried details, product one-way doors not asked at ①. Ask nothing
+   about plan structure; record agent decisions with reasons.
+3. At ③, the user accepts or rejects the report per Acceptance line.
 
 `second-vendor: suggest` only emits a non-blocking notice after the plan exists.
 
