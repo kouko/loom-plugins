@@ -56,6 +56,12 @@ def test_write_plan_readback_has_no_mermaid() -> None:
     assert "Mermaid" not in gate
 
 
+def test_product_gate_presents_product_one_way_doors() -> None:
+    """Decision point ② lists the product one-way doors routed to it from ①."""
+    gate = _section(_STEP4).split(_PRODUCT_GATE, 1)[1].split("### ", 1)[0]
+    assert "product one-way doors" in re.sub(r"\s+", " ", gate)
+
+
 def test_template_placeholder_names_table_and_diagram() -> None:
     """A4 boundary: the spec-minimal UI flows section is one placeholder line."""
     text = SPEC_MINIMAL.read_text(encoding="utf-8")
