@@ -2,6 +2,9 @@
 
 Tried on 2026-10-07, in a clean copy of the project at cdde0ea2
 (`git worktree add --detach <scratch>/at-wt cdde0ea2`; branch base main a27baaf9).
+Re-run the same day at 0c36aa69 after the fix range 6b70043e..0c36aa69 — see
+"Re-run on 2026-10-07, at 0c36aa69" at the end; the report describes 0c36aa69.
+Sections 1-5 below are the first run at cdde0ea2.
 
 ## Setup
 
@@ -56,7 +59,8 @@ Tried on 2026-10-07, in a clean copy of the project at cdde0ea2
   product one-way doors that `SKILL.md:92` and `confirm-intent.md:30-32` route
   to "this station (step 4)". The recheck detector raised the same tension as
   low-confidence wp finding 8. A literal reader of step 4 alone could skip them;
-  the overview list at `SKILL.md:92` says to ask them.
+  the overview list at `SKILL.md:92` says to ask them. (Resolved at 27fd1031 —
+  see the re-run section.)
 
 ## 2. 所有提到 Codex 授權停頓的地方，都說它在 plugin 新裝或更新時出現，不再說是每個 repo 第一次使用時。
 
@@ -139,3 +143,109 @@ Tried on 2026-10-07, in a clean copy of the project at cdde0ea2
   `loom-code/CHANGELOG.md` top section `[3.37.0] — 2026-10-06` and
   `loom-design/CHANGELOG.md` top section `[2.13.0] — 2026-10-06` describe the
   four fixes (loom-design: the first two, which are the only ones touching it).
+
+## Re-run on 2026-10-07, at 0c36aa69
+
+Fix range 6b70043e..0c36aa69 (26b452d6 plan record; 27fd1031 write-plan ② gate
+lists product one-way doors; 0c36aa69 nits). Files touched outside
+`docs/loom/`: `loom-code/CHANGELOG.md`, `closing-review/references/lenses.md`,
+`write-plan/SKILL.md`, `write-plan/references/confirm-intent.md`,
+`write-plan/test-prompts.json`,
+`loom-code/tests/test_adversarial_graduated_probe_classification.py` (docstring
+only), `loom-code/tests/test_write_plan_shape_text.py` (one new test),
+`loom-design/CHANGELOG.md`, `loom-design/skills/capture-intent/SKILL.md`.
+
+- Setup (clean copy `git worktree add --detach <scratch>/at-wt-0c36 0c36aa69`,
+  `git status --short` empty): `claude plugin validate .` / `./loom-code` /
+  `./loom-design` all `✔ Validation passed` (root and loom-design "with
+  warnings"). Warnings: `requires-contract: Unknown field` (present at base,
+  see Setup above) and, at the root, `No marketplace description provided` —
+  `.claude-plugin/marketplace.json` is unchanged on the branch and has no
+  `description` key at a27baaf9 either, so this is pre-existing (new CLI,
+  2.1.290). `bash loom-code/hooks/session-start </dev/null` emits valid JSON;
+  its ① line reads "(engineering changes, or product changes with no spec)
+  any one-way-door choice" and its ② line "product one-way-door choices and
+  irreversible actions on existing data are asked here, not in ①, when a spec
+  is written".
+- 1: re-tested — read every surface at 0c36aa69:
+  - `write-plan/SKILL.md:89-93` overview: ① merges "one-way doors ② skips";
+    ② "only for a product spec you write: confirm visible behaviour, carried
+    details, product one-way doors".
+  - `write-plan/SKILL.md:291-301` ② gate (changed in 27fd1031): "Present the
+    Requirements, UI flows and product one-way doors in plain words … and
+    nothing from `## Design decision` down, ever." The earlier residual nit is
+    closed; new test `test_product_gate_presents_product_one_way_doors` pins it.
+  - `write-plan/references/confirm-intent.md:28-38` item 2: product doors at ②
+    of the spec-writing station; "asked in this message instead when no spec
+    will be written (step 4 forces none); a spec written later in step 4 does
+    not ask them again at ②."
+  - `write-plan/references/one-way-door.md:44-46` merge gate unchanged: "① for
+    engineering, ② for product where its spec is written, ① for product when
+    no spec will be written."
+  - `loom-design/skills/capture-intent/SKILL.md:42-54` decision-point list and
+    `:197-217` item 2 + merge gate: same split, now also "a spec written later
+    does not ask them again at ②" — same wording as confirm-intent.md.
+  - `write-plan/test-prompts.json:18` edge case now expects "product one-way
+    doors belong to decision point 2 when a spec will be written, else to
+    decision point 1" (file parses as JSON).
+  - `loom-design/skills/write-spec/SKILL.md:178` ② item 2 unchanged.
+  - Manifest, `AGENTS.md`, READMEs: not in the fix range; first-run reading
+    stands for them.
+  - Criterion tests (clean copy): `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_adversarial_product_one_way_door_without_spec.py loom-code/tests/test_adversarial_decision_point_one_restatements.py loom-code/tests/test_adversarial_graduated_probe_classification.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_write_plan_shape_text.py loom-design/tests/spec/test_capture_intent_contract.py`
+    → `67 passed in 0.17s`.
+  - Residual (nit, rare path): the "not asked again at ②" exception lives only
+    in the ① texts (confirm-intent.md, capture-intent); the ② texts that would
+    run later (`write-plan/SKILL.md:294-296`, `write-spec/SKILL.md:178`) list
+    the product one-way doors unconditionally. Only reachable when ① predicted
+    no spec and a spec was written anyway; worst case a door is shown twice,
+    never skipped. Related advisory scc3/wp #10 (low): `write-plan/SKILL.md:432-435`
+    defaults a door "that surfaces now — after decision point ① closed", text
+    unchanged since a27baaf9.
+- 2: carried over — no line of the fix diff mentions Codex or the
+  authorisation stop (`git diff 6b70043e..0c36aa69 | grep -i '^[+-].*\(authoris\|codex\)'`
+  → no hits); the two stop sentences (`write-plan/SKILL.md:85-87`,
+  `capture-intent/SKILL.md:59-61`) are outside the changed hunks and read the
+  same at 0c36aa69. scc3/wp has no per-repo finding.
+- 3: carried over — `adversarial.md`, `adversarial-code.md` and
+  `agents/adversary.md` are not in the fix range; the only adversary-adjacent
+  change is the docstring of a graduated probe test. scc3/cr has no
+  attack-part trial-case finding.
+- 4: re-tested — `lenses.md:35-45` at 0c36aa69: reviewers never run "the
+  adversarial programs still under `docs/loom/<change-id>/evidence/probes/`
+  … Not having run them is not grounds for `PASS_WITH_NOTES`. A probe
+  graduated out of `evidence/probes/` into the repository's tests … is also an
+  ordinary changed test file, which reviewers run." The reorder puts the
+  no-penalty sentence directly after the two things not run, so it no longer
+  sits after the graduated-probe sentence. `lenses.md:58` `tests` row
+  unchanged and agreeing; `agents/reviewer.md` and `closing-review/SKILL.md`
+  carry no competing instruction (grep "graduat|evidence/probes" → only the
+  `review.probe-graduation` gate at `SKILL.md:245-250`). Criterion test
+  `test_adversarial_graduated_probe_classification.py` in the 67 above.
+- 5: re-tested —
+  - Consistency recheck at 0c36aa69 run by me with
+    `skill-dev-toolkit:skill-consistency-check` 0.5.1 (planner ungrouped, not
+    over limit; 4 fresh detectors, Agent model `sonnet`; merge run with
+    `--model "claude-sonnet (Agent model: sonnet)"`):
+    `<scratchpad>/scc3/wp/consistency-report.md` verdict **pass**, 0 high, 10
+    advisory; `<scratchpad>/scc3/cr/consistency-report.md` verdict **pass**,
+    0 high, 7 advisory. Original wp-1, wp-2, cr-1, cr-2 all absent. The earlier
+    scc2/wp #8 (product doors at ② vs "nothing from Design decision") is gone.
+    Remaining advisories are other topics (principles interview vs confirmed
+    intent, `no` branch vs carried details, second-vendor question type,
+    finalize-review on skipped steps, etc.), plus wp #10 noted under row 1.
+    capture-intent (loom-design) is outside the check; verified by reading,
+    row 1.
+  - Package suite (clean copy):
+    `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+    → exit 0 in 2:04.61; 13 pytest runs totalling 3084 passed, 11 skipped,
+    0 failed (largest `1921 passed, 2 skipped in 70.71s`; +1 versus cdde0ea2
+    is the new shape test); all 17 shell-script `Summary:` lines `0 FAIL`;
+    `11/11 mermaid blocks parsed`. Matches the orchestrator's exit 0 on the
+    same sha. `finalize-review` runs this suite again before the change is
+    accepted and blocks it on failure.
+  - Versions: the eight manifest files still read `3.37.0` (loom-code ×4) and
+    `2.13.0` (loom-design ×4). `loom-code/CHANGELOG.md` `[3.37.0]` first
+    bullet now adds "write-plan's own ② gate now lists those product one-way
+    doors"; `loom-design/CHANGELOG.md` `[2.13.0]` lost only the duplicate
+    README bullet — the first bullet still says "The READMEs (en / ja /
+    zh-TW) state the same fallback."
