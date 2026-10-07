@@ -196,4 +196,15 @@ the item-2 substring assertion (line 147), which line 2 re-tests.
 - Finding: `loom-design/CHANGELOG.md:17` still says "The `ui-flows.md` word
   cap rises from 700 to 725."; f859a992 set `UI_FLOWS_CAP = 700`
   (`test_write_spec_contract.py:44`). The release note now states something
-  false.
+  false. (Fixed in a1d81644 — see below.)
+
+## Line 3 re-check after a1d81644 (851d76a7..a1d81644)
+
+- Diff: only `loom-design/CHANGELOG.md:17`, the sentence "The `ui-flows.md`
+  word cap rises from 700 to 725." deleted. Lines 1 and 2 carried over: no
+  skill text, test or detector changed.
+- Fresh clean copy at a1d81644 (`git worktree add --detach <scratch>/at-pin-rerun2 a1d81644`):
+  `grep -n 725 loom-design/CHANGELOG.md` → no match; `[2.14.0]` still the
+  newest section, manifests still `2.14.0`; `sync_codex_manifests.py --all --check`
+  exit 0; `pytest -q loom-code/tests/test_write_plan_station_text.py loom-design/tests/spec/test_capture_intent_contract.py`:
+  `51 passed`. Full suite still left to finalize-review.
