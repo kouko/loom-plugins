@@ -111,12 +111,29 @@ def test_product_gate_presents_product_one_way_doors() -> None:
 ONE_WAY_DOOR = ROOT / "loom-code/skills/write-plan/references/one-way-door.md"
 
 
+_NO_REASK = re.compile(r"\b(?:not asked|does not ask (?:them|it))\s+again at ②")
+
+
 def _says_no_reask(text: str) -> bool:
-    """A sentence says a door already asked at ① is not asked again at ②."""
+    """A sentence says a door already asked at ① is not asked again at ②.
+
+    The negation is tied to the verb right before "again at ②"; a negation
+    elsewhere in the sentence ("asked again at ②, never skipped") flips it.
+    """
     for sentence in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text)):
-        if "①" in sentence and "again at ②" in sentence and has_negation(sentence):
+        if "①" in sentence and _NO_REASK.search(sentence):
             return True
     return False
+
+
+@pytest.mark.parametrize("sentence, expected", [
+    ("Doors asked at ① are not asked again at ②.", True),
+    ("Doors at ① are asked again at ②, never skipped.", False),
+    ("a spec written later asks them again at ②, not trusting ①.", False),
+])
+def test_no_reask_detector_ties_negation_to_verb(sentence: str, expected: bool) -> None:
+    """Self-test: only a negated verb before "again at ②" counts as no-reask."""
+    assert _says_no_reask(sentence) is expected
 
 
 def test_product_gate_and_merge_gate_skip_doors_asked_at_one() -> None:

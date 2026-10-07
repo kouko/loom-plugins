@@ -250,6 +250,10 @@ def test_one_way_door_asked_at_decision_point_one_is_not_asked_again() -> None:
     step3 = _flat(_section(_text(), _STEP3))
     flows = _flat(_flows())
     assert exception in step3 and exception in flows
+    assert "A one-way door, class (e) included, already asked at decision point ①" in step3
+    assert "every one-way door of this change not already asked at ① is asked once" in step3
+    asked = _flat(_section(_text(), "## What you will be asked, in plain words"))
+    assert "One already asked when your intent was confirmed is not asked again." in asked
     assert "asked **even when there is no fork at all**" in step3
     assert "it is asked even when there is no alternative design" in flows
 
