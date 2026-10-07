@@ -56,10 +56,34 @@ def test_write_plan_readback_has_no_mermaid() -> None:
     assert "Mermaid" not in gate
 
 
+_DOORS = re.compile(r"\bproduct one-way doors\b", re.IGNORECASE)
+_PRESENT = re.compile(r"\bpresent\b", re.IGNORECASE)
+_NEGATION = re.compile(r"\b(?:never|not|nothing|nor)\b|n't\b", re.IGNORECASE)
+
+
+def _presents_doors(text: str) -> bool:
+    """A sentence affirmatively presents the product one-way doors.
+
+    Sentences split after `.` or `;`, as in the graduated adversary probes.
+    """
+    for sentence in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text)):
+        doors = _DOORS.search(sentence)
+        if doors and not _NEGATION.search(sentence) \
+                and _PRESENT.search(sentence[: doors.start()]):
+            return True
+    return False
+
+
+def test_doors_detector_affirmative_accepted_negated_rejected() -> None:
+    """Self-test: the detector accepts the affirmative form, rejects the negated one."""
+    assert _presents_doors("Present the Requirements and product one-way doors in plain words.")
+    assert not _presents_doors("Never present the Requirements or product one-way doors here.")
+
+
 def test_product_gate_presents_product_one_way_doors() -> None:
-    """Decision point ② lists the product one-way doors routed to it from ①."""
+    """Decision point ② presents the product one-way doors routed to it from ①."""
     gate = _section(_STEP4).split(_PRODUCT_GATE, 1)[1].split("### ", 1)[0]
-    assert "product one-way doors" in re.sub(r"\s+", " ", gate)
+    assert _presents_doors(gate)
 
 
 def test_template_placeholder_names_table_and_diagram() -> None:
