@@ -16,7 +16,7 @@ Wave 1 — prose fixes, one task per skill (disjoint files, no shared symbol).
 **W1-01 write-plan routes product one-way doors to ② and times the Codex stop by plugin install**  after: none  acceptance: 1, 2
 - Files: loom-code/skills/write-plan/SKILL.md, loom-code/skills/write-plan/references/confirm-intent.md, loom-code/skills/write-plan/test-prompts.json
 - Test: A1 positive: confirm-intent-holds-product-one-way-doors-for-decision-point-2; negative: engineering-one-way-door-still-asked-at-1. A2 positive: codex-stop-named-at-plugin-install-or-update; negative: first-time-this-repo-wording-absent.
-- Risk: write-plan body is 3749 words under a 3750 cap (test_write_plan_shape_text.py), so SKILL.md edits must be word-neutral; agent-decided: product one-way doors go to the ② of whichever station writes the spec.
+- Risk: write-plan body is 3749 words under a 3750 cap (test_write_plan_shape_text.py), so SKILL.md edits must be word-neutral; agent-decided: product one-way doors go to the ② of whichever station writes the spec, else ① (86e7bc2a).
 
 **W1-02 capture-intent routes product one-way doors to ② and times the Codex stop by plugin install**  after: none  acceptance: 1, 2
 - Files: loom-design/skills/capture-intent/SKILL.md, loom-design/README.md, loom-design/README.ja.md, loom-design/README.zh-TW.md
@@ -48,7 +48,7 @@ Wave 2 — release metadata.
 Wave 3 — probe graduation (review.probe-graduation).
 
 **W3-01 Graduate the three adversary probes into the loom-code suite**  after: W1-01, W1-02, W1-03, W2-01, W2-02, W2-03  acceptance: 1, 4
-- Files: docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_product_one_way_door_without_spec.py, docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_decision_point_one_restatements.py, docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_graduated_probe_classification.py, loom-code/tests/test_adversarial_product_one_way_door_without_spec.py, loom-code/tests/test_adversarial_decision_point_one_restatements.py, loom-code/tests/test_adversarial_graduated_probe_classification.py
+- Files: docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_product_one_way_door_without_spec.py, docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_decision_point_one_restatements.py, docs/loom/2026-10-06-skill-prose-contradictions/evidence/probes/test_graduated_probe_classification.py, loom-code/tests/test_adversarial_product_one_way_door_without_spec.py, loom-code/tests/test_adversarial_decision_point_one_restatements.py, loom-code/tests/test_adversarial_graduated_probe_classification.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py
 - Test: A1 positive: graduated-no-spec-route-and-restatement-probes-pass-in-suite; A4 boundary: graduated-classification-probe-passes-at-suite-path.
 - Risk: each probe went red on 70638121 and is green only after the Build fixes for its finding; moving it changes its REPO parents depth, so the path constant must be re-derived; the `concern:` line stays.
 
