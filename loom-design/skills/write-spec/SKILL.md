@@ -51,7 +51,8 @@ This station makes **one** stop, and only for a product change:
    branches, and you say yes or correct me. There is no limit on how many
    sentences; there is a limit on what they may be about.
 2. **Any choice that is expensive to undo**, folded into that same message
-   as a consequence — never as jargon, never as an extra stop.
+   as a consequence — never as jargon, never as an extra stop. One already
+   asked when your intent was confirmed is not asked again.
 
 An engineering change is not stopped here at all: everything below the
 Requirements is decided by me, with the reason written down, and you can
@@ -193,7 +194,9 @@ turns a behaviour confirmation into a quality review the user cannot do.
    `PRINCIPLES.md` already pin how that existing data is handled, do **not**
    ask — restate the handling in consequence form inside this same message
    ("this will rewrite your ___, I am doing it the way you said: ___"), so
-   the user sees it without being stopped for it.
+   the user sees it without being stopped for it. A one-way door, class (e)
+   included, already asked at decision point ①, because no spec was going to
+   be written then, is not asked again at ②.
 
    Four gates, in order: **check** the intent's Acceptance and Constraints
    and `PRINCIPLES.md` first — an axis already pinned there is not asked,
@@ -202,7 +205,8 @@ turns a behaviour confirmation into a quality review the user cannot do.
    then ask about the result, never about assumptions; **threshold** — for
    class (d), any axis differing by at least 20%, or the presence versus
    absence of money, privacy or coverage; **merge** — every one-way door of
-   this change is asked once, inside this message. Never open an extra stop.
+   this change not already asked at ① is asked once, inside this message.
+   Never open an extra stop.
 
    The shape is fixed and carries no mechanism vocabulary:
 

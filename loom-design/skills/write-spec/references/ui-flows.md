@@ -60,7 +60,9 @@ Where a flow rewrites, deletes or sends the user's existing data, the
 line says so and names the safeguard: `todo migrate → rewrites
 todos.json into the new format; the old program cannot read it; a copy
 is kept at todos.json.bak`. That sentence is what decision point ② asks
-about — it is asked even when there is no alternative design.
+about — it is asked even when there is no alternative design. One
+already asked at decision point ①, because no spec was going to be written
+then, is not asked again at ②.
 
 ## When there is no interface
 
