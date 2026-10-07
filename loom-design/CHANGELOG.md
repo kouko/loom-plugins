@@ -14,7 +14,7 @@ is the whole record. Their version numbers never continued here —
 
 ## [2.14.0] — 2026-10-07 — write-spec does not re-ask a one-way door already asked at ①
 
-- `write-spec` Step 3, its merge gate, its "what you'll be asked" list and `references/ui-flows.md` state the same exception as `loom-code` 3.38.0: a product one-way door already asked at decision point ① is not asked again at ②. The `ui-flows.md` word cap rises from 700 to 725.
+- `write-spec` Step 3, its merge gate, its "what you'll be asked" list and `references/ui-flows.md` state the same exception as `loom-code` 3.38.0: a product one-way door already asked at decision point ① is not asked again at ②.
 
 ## [2.13.0] — 2026-10-06 — capture-intent asks product one-way doors at decision point ②
 
