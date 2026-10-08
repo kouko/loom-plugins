@@ -92,6 +92,20 @@ def test_codex_discovery_probe_and_review_observe_exact_profile():
     assert calls[1][1]["timeout"] < calls[2][1]["timeout"]
 
 
+def test_codex_app_server_initialize_has_required_client_info():
+    def runner(argv, **kwargs):
+        requests = [json.loads(line) for line in kwargs["input"].splitlines()]
+        assert requests[0]["method"] == "initialize"
+        assert requests[0]["params"]["clientInfo"] == {
+            "name": "loom-external-review", "title": "Loom External Review",
+            "version": "1",
+        }
+        return completed(argv, json.dumps({"id": 2, "result": {"data": []}}))
+
+    result = review.discover("codex", "/repo", consent(), runner=runner)
+    assert result["status"] == "completed"
+
+
 def test_codex_stdout_profile_claim_cannot_override_stderr_header():
     def runner(argv, **kwargs):
         if argv[:2] == ["codex", "app-server"]:
@@ -151,9 +165,10 @@ def test_agy_model_list_and_explicit_pair():
         calls.append(argv)
         if argv == ["agy", "models"]:
             return completed(argv, "gemini-2.5-pro\nclaude-sonnet-4-5\n")
-        assert argv[:3] == ["agy", "-p",
+        assert argv[:5] == ["agy", "--add-dir", "/repo", "-p",
                             review.PROBE_PROMPT if len(calls) == 2 else "review"]
         assert kwargs["input"] == ""
+        assert kwargs["cwd"] == "/repo"
         assert "--sandbox" in argv
         assert "--disable-slash-commands" in argv
         assert argv[argv.index("--mode") + 1] == "plan"
@@ -166,6 +181,13 @@ def test_agy_model_list_and_explicit_pair():
     assert result["evidence_level"] == "accepted-explicit-settings"
     assert result["observed_model"] is None
     assert len(calls) == 3
+
+
+def test_agy_relative_review_root_stops_before_discovery():
+    result = review.execute("agy", "gemini-2.5-pro", "high", "google", "repo",
+                            "review", consent("agy", scope="repo"),
+                            runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "scope-must-be-absolute"
 
 
 def test_agy_cross_family_selection_is_refused_before_probe():

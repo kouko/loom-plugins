@@ -117,7 +117,10 @@ count a failed leg as a completed review.
 
 The execution asks Codex for a read-only command sandbox, Claude Code for plan
 mode with only `Read`, `Glob`, and `Grep` model tools, and Antigravity for plan
-mode with its terminal sandbox. These flags constrain model actions but do not
+mode with its terminal sandbox. For each Antigravity probe and review, the
+script also attaches the absolute review root with `--add-dir`; setting the
+process working directory alone does not attach that workspace in print mode.
+These flags constrain model actions but do not
 prove host-wide read or write confinement. In particular, a review root is
 only a working directory. The result reports this filesystem limit; the
 owning skill must carry it into the user-facing report. Do not describe the

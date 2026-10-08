@@ -82,7 +82,7 @@ def _run(runner: Runner, argv: list[str], prompt: str, timeout: int, scope: str)
 
 def _codex_candidates(runner: Runner, scope: str) -> list[str]:
     requests = (
-        {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"clientInfo": {"name": "loom-external-review", "version": "1"}}},
+        {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"clientInfo": {"name": "loom-external-review", "title": "Loom External Review", "version": "1"}}},
         {"jsonrpc": "2.0", "method": "initialized"},
         {"jsonrpc": "2.0", "id": 2, "method": "model/list", "params": {}},
     )
@@ -187,7 +187,8 @@ def _claude_observation(output: str, model: str, family: str) -> tuple[str, str]
     return names[0], result
 
 
-def _command(executor: str, model: str, effort: str, prompt: str) -> list[str]:
+def _command(executor: str, model: str, effort: str, prompt: str,
+             scope: str) -> list[str]:
     if executor == "codex":
         return ["codex", "exec", "--sandbox", "read-only", "--skip-git-repo-check",
                 "--ephemeral", "-m", model, "-c", f"model_reasoning_effort={effort}", "-"]
@@ -196,7 +197,8 @@ def _command(executor: str, model: str, effort: str, prompt: str) -> list[str]:
                 "--permission-mode", "plan", "--tools", "Read,Glob,Grep",
                 "--permission-prompts", "none", "--output-format", "json",
                 "--no-session-persistence"]
-    return ["agy", "-p", prompt, "--model", model, "--effort", effort,
+    return ["agy", "--add-dir", scope, "-p", prompt,
+            "--model", model, "--effort", effort,
             "--mode", "plan", "--sandbox", "--disable-slash-commands",
             "--output-format", "text"]
 
@@ -247,7 +249,7 @@ def execute(
                                       "claude": "alias-or-explicit-id"}[executor]
         for stage, text, timeout in (("probe", PROBE_PROMPT, probe_timeout),
                                      ("review", prompt, review_timeout)):
-            argv = _command(executor, model, effort, text)
+            argv = _command(executor, model, effort, text, scope)
             response = _run(runner, argv, "" if executor == "agy" else text,
                             timeout, scope)
             if stage == "probe":

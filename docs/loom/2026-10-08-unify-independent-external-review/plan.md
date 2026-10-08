@@ -67,8 +67,8 @@ charter: 1.1
 
 **W5-02 Ground and correct outside CLI execution**  after: W5-01  acceptance: 4, 5
 - Files: loom-code/scripts/external_review.py, loom-code/tests/test_external_review.py, loom-code/skills/external-review/SKILL.md, docs/loom/2026-10-08-unify-independent-external-review/evidence/cli-grounding.md
-- Test: A4 positive: agy-absolute-workspace-and-explicit-profile; negative: missing-workspace. A5 positive: supported-command-grounding; negative: rejected-pair-stops.
-- Risk: agent-decided — Claude Code's outside review identified missing `agy --add-dir`; local CLI help and the repository's Antigravity instructions establish that print mode needs an absolute workspace path.
+- Test: A4 positive: agy-absolute-workspace-and-explicit-profile plus Codex initialize clientInfo title; negative: missing-workspace-or-title. A5 positive: supported-command-grounding; negative: rejected-pair-stops.
+- Risk: agent-decided — Claude Code's outside review identified missing `agy --add-dir`; local CLI help and the repository's Antigravity instructions establish that print mode needs an absolute workspace path. Official Codex app-server guidance also requires a clientInfo title in initialize.
 
 **W5-03 Recompute outside receipt consistency**  after: W5-02  acceptance: 2, 5
 - Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/skills/closing-review/SKILL.md
