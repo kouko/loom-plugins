@@ -100,6 +100,17 @@ def test_named_external_review_handoff_preserves_owning_contract_and_consent():
     assert "loom-code:external-review" in dispatch
 
 
+def test_bounded_consent_allows_discovery_before_exact_model_selection():
+    skill = SKILL.read_text(encoding="utf-8")
+    handoff = DETECTION.read_text(encoding="utf-8")
+    assert "bounded model selection after consent" in skill
+    assert "provider family and effort bound" in skill
+    assert "explicit model and effort" in handoff
+    assert "within the recorded bounds" in handoff
+    assert "any unknown choice resolved before recording consent" not in skill
+    assert "A different executor, model," not in handoff
+
+
 def test_readmes_and_prompts_cover_outside_reviews():
     import json
 

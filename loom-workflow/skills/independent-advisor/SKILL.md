@@ -30,13 +30,15 @@ is a separately attributed failure, never a completed independent review.
 Prepare the complete single checkpoint below and obtain a recorded consent
 record before invoking `loom-code:external-review` for discovery, probe or
 dispatch. Give that skill the consent record, authorized scope, requested
-executor and review packet; it owns candidate selection, explicit model and
-effort, bounded pre-review execution, CLI invocation and execution evidence.
+executor and review packet. The consent may authorize bounded model selection after consent
+within one provider family and effort bound, or name an exact model and effort.
+The named skill owns candidate selection, explicit model and effort in the
+pre-review execution and review, CLI invocation and execution evidence.
 Do not read or run a `loom-code` file from this plugin at runtime. Accept only
 the named skill's JSON evidence/status and then apply the owning review skill's
-checks to any review output. A changed executor, model, vendor family or
-readable scope voids the consent record and requires the whole checkpoint
-again. An unsolicited second-vendor notice remains a suggestion; it never
+checks to any review output. A changed executor, provider family, readable
+scope or model/effort outside the recorded bounds voids consent and requires
+the whole checkpoint again. An unsolicited second-vendor notice remains a suggestion; it never
 starts discovery, probe or dispatch without the user's request or consent.
 
 For open-ended second-opinion consultations, continue with the `explore` and
@@ -87,8 +89,9 @@ any network-backed discovery, probe, dispatch, transmission, or **any money is s
 - for consultations, `mode`, verbatim `mode_basis`, and any conflict or override;
   for explicit reviews, the owning task type and review skill;
 - leg count and every executor-to-leg assignment;
-- selected model, effort, provider family and readable scope for each outside
-  leg, with any unknown choice resolved before recording consent;
+- for each outside leg, either an exact model and effort or explicit permission
+  to select a model after consent within a named provider family and allowed
+  effort levels; always record the readable scope;
 - estimated cost per leg (`unknown, with the reason`, **never as zero and never omitted** when unknowable; a **genuinely zero** cost stays zero, not unknown); and
 - the full egress and local-execution disclosure below.
 

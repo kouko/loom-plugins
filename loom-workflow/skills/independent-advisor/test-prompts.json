@@ -74,6 +74,17 @@
         "unapproved probe",
         "prompt-only notice"
       ]
+    },
+    {
+      "id": 8,
+      "category": "edge-case",
+      "prompt": "I approve an outside plan review with Codex, the OpenAI model family, high effort, this readable scope, cost and data transfer, but let the agent pick an available model after consent.",
+      "expected_behavior": "Use the one complete checkpoint to record bounded family and effort authorization, then invoke loom-code:external-review for candidate discovery. Select an eligible model within those bounds without a second checkpoint and explicitly pass model and effort to preflight and review; renew consent for any material change outside the bounds.",
+      "edge_case_dimensions": [
+        "bounded model selection",
+        "post-consent discovery",
+        "single checkpoint"
+      ]
     }
   ]
 }

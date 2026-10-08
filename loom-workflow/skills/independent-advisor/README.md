@@ -65,8 +65,9 @@ decision routes through `loom-code:external-review`. The original reviewer
 remains and its review rules still decide whether the outside verdict is valid.
 The outside result or failure is shown separately. The advisor obtains one
 complete approval for cost, vendor, data sent, readable files and local setup
-before model discovery or execution. A changed model, vendor or scope needs a
-fresh approval. An ordinary second-vendor suggestion does not start a review.
+before model discovery or execution. You may approve model selection within one vendor family and effort limit;
+the exact model is then chosen after discovery. A choice outside those limits,
+or a changed vendor or scope, needs fresh approval. An ordinary second-vendor suggestion does not start a review.
 
 ---
 
