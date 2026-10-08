@@ -59,8 +59,8 @@ def test_external_dispatch_gate_is_registered_with_executable_eval() -> None:
     assert review.count("<!-- /gate -->", review.find(f"<!-- gate: {gate_id} -->")) >= 1
     assert f'- id: "{gate_id}"' in mechanisms
     assert (
-        "eval: loom-code/tests/test_external_review.py::"
-        "test_consent_blocks_all_subprocesses"
+        "eval: loom-code/tests/test_loom_attestation.py::"
+        "test_external_dispatch_gate_integrates_runner_verdict_and_attestation"
     ) in mechanisms
 
 

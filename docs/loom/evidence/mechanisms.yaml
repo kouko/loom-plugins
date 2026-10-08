@@ -358,7 +358,7 @@ mechanisms:
     eval: loom-code/tests/test_selection_finalize.py::test_finalize_accepts_a_graduated_program_the_suite_already_runs
   - id: "review.external-dispatch"
     class: prose-gate
-    eval: loom-code/tests/test_external_review.py::test_consent_blocks_all_subprocesses
+    eval: loom-code/tests/test_loom_attestation.py::test_external_dispatch_gate_integrates_runner_verdict_and_attestation
   - id: "goal-create.session-activation"
     class: prose-gate
     eval: loom-workflow/tests/goal-create/test_skill_md.py::test_session_activation_rules_are_one_registered_gate

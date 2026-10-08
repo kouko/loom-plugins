@@ -9,6 +9,7 @@ import sys
 from io import StringIO
 from pathlib import Path
 
+import external_review
 from loom_checker import attestation as attestation_module
 from loom_checker import digest, probes, reviewers
 from loom_checker.command_handlers import finalize, reviewer_count
@@ -307,7 +308,13 @@ def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path
     plan.parent.mkdir(parents=True, exist_ok=True)
     plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: claude\n")
     commit(repo, "select outside review")
-    raw = "verdict: PASS\nlens: docs\nfindings: []\n"
+    raw = (
+        "verdict: PASS\nlens: docs\nreviewed_sha: HEAD\n"
+        "dimension_scores:\n"
+        "  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n"
+        "  incorrect-fact: PASS\n  missing-population: PASS\n"
+        "  deletion-first: PASS\nfindings: []\nnotes: []\n"
+    )
     review_input = tmp_path / "review-input.json"
     review_input.write_text(json.dumps({
         "verdicts": [
@@ -337,6 +344,91 @@ def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path
     assert any("outside execution" in reason for _, reason in
                attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
                                                        CHANGE, attestation, manifest()))
+
+
+def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-08)\n")
+    commit(repo, "declare fast suite")
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: codex\n")
+    commit(repo, "select outside provider")
+    packet = ("lens: docs\nreviewed_sha: HEAD\nchanged paths: docs/loom/"
+              f"{CHANGE}/plan.md\nground truth: intent and plan\n"
+              "dimensions: loom-code/skills/closing-review/references/lenses.md\n"
+              "output: agents/reviewer.md YAML contract\n")
+    raw = "verdict: PASS\nlens: docs\nfindings: []\n"
+    header = "model: gpt-6.1-sol\nreasoning effort: high\n"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        if argv[:2] == ["codex", "app-server"]:
+            return subprocess.CompletedProcess(
+                argv, 0, json.dumps({"id": 2, "result": {"data": [{"id": "gpt-6.1-sol"}]}}), ""
+            )
+        assert argv[:2] == ["codex", "exec"]
+        assert argv[argv.index("-m") + 1] == "gpt-6.1-sol"
+        assert "model_reasoning_effort=high" in argv
+        if len(calls) == 3:
+            assert kwargs["input"] == packet
+            return subprocess.CompletedProcess(argv, 0, raw, header)
+        return subprocess.CompletedProcess(argv, 0, "ok", header)
+
+    consent = {
+        "approved": True, "executor": "codex", "review_root": str(repo),
+        "model": "gpt-6.1-sol", "effort": "high",
+        "disclosures": {
+            "cost": True, "vendor_egress": True, "local_execution": True,
+            "filesystem_access_outside_root": True,
+            "filesystem_write_not_guaranteed": True,
+        },
+    }
+    stale = dict(consent, review_root=str(tmp_path))
+    assert external_review.execute(
+        "codex", "gpt-6.1-sol", "high", "openai", str(repo), packet, stale,
+        runner=runner,
+    )["status"] == "failed"
+    assert external_review.execute(
+        "codex", "gpt-6.1-sol", "medium", "openai", str(repo), packet, consent,
+        runner=runner,
+    )["status"] == "failed"
+    assert calls == []
+    result = external_review.execute(
+        "codex", "gpt-6.1-sol", "high", "openai", str(repo), packet, consent,
+        runner=runner,
+    )
+    assert result["status"] == "completed"
+    assert result["evidence_level"] == "observed-model-and-effort"
+    assert len(calls) == 3
+
+    verdicts = [
+        {"reviewer": "native", "vendor": "anthropic", "model": "sonnet",
+         "lens": "docs", "verdict": "PASS", "findings": []},
+        {"reviewer": "outside", "vendor": "openai", "model": "gpt-6.1-sol",
+         "lens": "docs", "verdict": "PASS", "findings": [], "external_review": result},
+    ]
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()) == []
+    attestation = json.loads((repo / f"docs/loom/{CHANGE}/attestation.json").read_text())
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    ) == []
+    receipt = attestation["verdicts"][1]["external_review"]
+    assert receipt["output_digest"] == hashlib.sha256(raw.encode()).hexdigest()
+    assert "review_output" not in receipt
+
+    (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
+    verdicts[1]["lens"] = "skill"
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert any("output differs from its verdict" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
 
 
 def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:
