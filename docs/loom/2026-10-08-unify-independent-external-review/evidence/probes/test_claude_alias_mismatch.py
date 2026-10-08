@@ -14,6 +14,9 @@ from loom_checker import reviewers
 def test_sonnet_alias_cannot_accept_opus_observation():
     record = {
         "approved": True, "executor": "claude", "review_root": "/repo",
+        "authorization_source": {
+            "kind": "direct-user-request", "quote": "Use Claude to review this change",
+            "target": "this change"},
         "model": "sonnet", "effort": "high",
         "disclosures": {key: True for key in (
             "cost", "vendor_egress", "local_execution",

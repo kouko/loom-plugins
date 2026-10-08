@@ -13,6 +13,9 @@ import external_review
 def test_model_list_error_is_failed_discovery():
     record = {
         "approved": True, "executor": "codex", "review_root": "/repo",
+        "authorization_source": {
+            "kind": "direct-user-request", "quote": "Use Codex to review this change",
+            "target": "this change"},
         "disclosures": {key: True for key in (
             "cost", "vendor_egress", "local_execution",
             "filesystem_access_outside_root", "filesystem_write_not_guaranteed")},
