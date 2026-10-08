@@ -8,12 +8,6 @@ REFERENCES = (
     "references/dispatch-protocol.md",
     "references/report-contract.md",
 )
-EXCLUSION_REASONS = [
-    "`binary-missing`",
-    "`binary-not-executable`",
-    "`credential-missing`",
-    "`credential-unusable`",
-]
 STRUCTURAL_TOKENS = [
     "name: independent-advisor",
     "version: 0.1.0",
@@ -21,12 +15,17 @@ STRUCTURAL_TOKENS = [
     "`audit`",
     "`mode_basis`",
     "`mode_override`",
-    *EXCLUSION_REASONS,
+    "`loom-code:external-review`",
+    "owning review skill",
+    "incumbent",
+    "recorded consent",
+    "`review_root`",
+    "`allowed_families`",
+    "`filesystem_access_outside_root`",
+    "`filesystem_write_not_guaranteed`",
     "`proposer`",
     "`normalizer`",
     "`blind judge`",
-    "`verified_model`",
-    "`verified_effort`",
     "`actual_cost`",
     "`corroborated_by`",
     "`coverage_disclaimer`",
@@ -38,14 +37,15 @@ STRUCTURAL_TOKENS = [
 ]
 REFERENCE_TOKENS = {
     "references/executor-detection.md": [
-        *EXCLUSION_REASONS,
-        "sh -c 'command -v codex'",
-        "sh -c 'command -v claude'",
-        "codex exec",
-        "--sandbox read-only",
-        "--skip-git-repo-check",
-        "model_reasoning_effort=",
-        "< /dev/null",
+        "`loom-code:external-review`",
+        "owning review skill",
+        "complete consent record",
+        "`review_root`",
+        "`allowed_families`",
+        "`filesystem_access_outside_root`",
+        "`filesystem_write_not_guaranteed`",
+        "explicit model and effort",
+        "evidence level",
     ],
     "references/dispatch-protocol.md": ["`normalized_by_is_incumbent_author`"],
     "references/report-contract.md": [
@@ -53,6 +53,7 @@ REFERENCE_TOKENS = {
         "known_weaknesses",
         "coverage_disclaimer",
         "degraded_legs",
+        "`evidence_level`",
         "`refusal`",
         "`empty-output`",
         "`missing-field`",
@@ -75,8 +76,7 @@ def test_entrypoint_points_to_references_that_resolve():
 
 
 def test_entrypoint_and_references_keep_structural_tokens():
-    """Frontmatter fields, mode, role, exclusion-reason and report field names,
-    and the probe commands stay. The prose wording is review-only."""
+    """Keep consultation roles and reports alongside the named outside handoff."""
     text = SKILL_PATH.read_text(encoding="utf-8")
 
     missing = [token for token in STRUCTURAL_TOKENS if token not in text]
@@ -85,6 +85,21 @@ def test_entrypoint_and_references_keep_structural_tokens():
         reference_text = (SKILL_PATH.parent / reference).read_text(encoding="utf-8")
         missing = [token for token in tokens if token not in reference_text]
         assert not missing, f"{reference} no longer names: {missing}"
+
+
+def test_advisor_does_not_reintroduce_its_retired_cli_probe():
+    """The shared executor owns CLI-specific commands and credential checks."""
+    entrypoint = SKILL_PATH.read_text(encoding="utf-8")
+    detection = (SKILL_PATH.parent / REFERENCES[0]).read_text(encoding="utf-8")
+    for stale_token in (
+        "`credential-missing`",
+        "`credential-unusable`",
+        "codex exec",
+        "model_reasoning_effort=",
+        "--skip-git-repo-check",
+    ):
+        assert stale_token not in entrypoint
+        assert stale_token not in detection
 
 
 def test_skill_body_stays_under_the_repo_word_cap():
