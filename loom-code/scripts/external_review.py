@@ -48,15 +48,23 @@ def _consent_valid(record: Mapping[str, Any] | None, executor: str, scope: str,
                  "filesystem_access_outside_root", "filesystem_write_not_guaranteed"))
     )
     allowed_families = record.get("allowed_families")
+    record_family = record.get("family")
+    if record_family is not None and (
+            not isinstance(record_family, str) or record_family not in FAMILIES):
+        return False
     if allowed_families is not None:
         if (not isinstance(allowed_families, list) or not allowed_families
                 or any(not isinstance(item, str) or item not in FAMILIES
                        for item in allowed_families)):
             return False
+        if record_family is not None and record_family not in allowed_families:
+            return False
     if not base or model is None or effort is None:
         return base
+    if record_family is not None and record_family != family:
+        return False
     exact = record.get("model") == model and record.get("effort") == effort
-    family_allowed = (record.get("family") == family if allowed_families is None
+    family_allowed = (record_family == family if allowed_families is None
                       else family in allowed_families)
     if allowed_families is not None and not family_allowed:
         return False
@@ -86,6 +94,8 @@ def _codex_candidates(runner: Runner, scope: str) -> list[str]:
         try:
             message = json.loads(line)
         except json.JSONDecodeError:
+            continue
+        if not isinstance(message, dict):
             continue
         if message.get("id") != 2:
             continue
@@ -147,10 +157,10 @@ def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
 
 
 def _codex_observation(output: str, model: str, effort: str) -> tuple[str | None, str | None]:
-    observed_model = re.search(r"(?m)^model:\s*(\S+)\s*$", output)
-    observed_effort = re.search(r"(?m)^reasoning effort:\s*(\S+)\s*$", output)
-    found_model = observed_model.group(1) if observed_model else None
-    found_effort = observed_effort.group(1) if observed_effort else None
+    observed_models = re.findall(r"(?m)^model:\s*(\S+)\s*$", output)
+    observed_efforts = re.findall(r"(?m)^reasoning effort:\s*(\S+)\s*$", output)
+    found_model = observed_models[0] if len(observed_models) == 1 else None
+    found_effort = observed_efforts[0] if len(observed_efforts) == 1 else None
     if found_model != model or found_effort != effort:
         raise ValueError("codex observable model/effort mismatch or missing")
     return found_model, found_effort
@@ -161,6 +171,8 @@ def _claude_observation(output: str, model: str, family: str) -> tuple[str, str]
         data = json.loads(output)
     except json.JSONDecodeError as exc:
         raise ValueError("claude JSON result missing") from exc
+    if not isinstance(data, dict):
+        raise ValueError("claude JSON result is not an object")
     usage = data.get("modelUsage")
     if not isinstance(usage, dict) or not usage:
         raise ValueError("claude modelUsage missing")
@@ -248,7 +260,7 @@ def execute(
                 return fail(f"{stage}-exit-{response.returncode}: {response.stderr.strip()[:300]}")
             if executor == "codex":
                 observed_model, observed_effort = _codex_observation(
-                    response.stdout + "\n" + response.stderr, model, effort)
+                    response.stderr, model, effort)
                 result["observed_model"] = observed_model
                 result["observed_effort"] = observed_effort
                 result["evidence_level"] = "observed-model-and-effort"

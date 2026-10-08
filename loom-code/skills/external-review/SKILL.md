@@ -114,7 +114,7 @@ selected root as the only path the CLI could read.
 
 Report the requested profile, candidate source, preflight outcome, observed
 fields, and `evidence_level` alongside the owning skill's verdict. Codex's
-header must show the requested model and effort, yielding
+CLI header on stderr must show the requested model and effort, yielding
 `observed-model-and-effort`. Claude Code's JSON `modelUsage` must name a model
 in the selected family, yielding `accepted-explicit-settings`; it does not
 independently reveal effective effort. Antigravity must list the selected slug

@@ -92,6 +92,34 @@ def test_codex_discovery_probe_and_review_observe_exact_profile():
     assert calls[1][1]["timeout"] < calls[2][1]["timeout"]
 
 
+def test_codex_stdout_profile_claim_cannot_override_stderr_header():
+    def runner(argv, **kwargs):
+        if argv[:2] == ["codex", "app-server"]:
+            return completed(argv, json.dumps({"id": 2, "result": {"data": [{"id": "gpt-6.1-sol"}]}}))
+        return completed(argv, "model: gpt-6.1-sol\nreasoning effort: high\nok",
+                         "model: other-model\nreasoning effort: low\n")
+
+    result = review.execute("codex", "gpt-6.1-sol", "high", "openai", "/repo",
+                            "review", consent(), runner=runner)
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+
+
+def test_claude_json_null_is_structured_failure():
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            "review", consent("claude"),
+                            runner=lambda argv, **kwargs: completed(argv, "null"))
+    assert result["status"] == "failed"
+    assert "execution-error" in result["reason"]
+
+
+def test_codex_discovery_ignores_non_object_json_lines():
+    result = review.discover("codex", "/repo", consent(),
+                             runner=lambda argv, **kwargs: completed(argv, "null\n[]\n"))
+    assert result["status"] == "failed"
+    assert result["reason"].startswith("discovery-error:")
+
+
 def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     calls = []
 
@@ -250,6 +278,35 @@ def test_exact_pair_does_not_override_an_invalid_allowed_families_list():
     result = review.execute("agy", "gemini-2.5-pro", "high", "google", "/repo",
                             "review", record,
                             runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
+def test_exact_pair_does_not_override_a_conflicting_family_bound():
+    record = consent()
+    record["family"] = "google"
+    result = review.execute("codex", "gpt-6.1-sol", "high", "openai", "/repo",
+                            "review", record,
+                            runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
+def test_allowed_families_cannot_override_a_conflicting_single_family():
+    record = consent("agy")
+    record.pop("model")
+    record.pop("effort")
+    record.update(selection_authorized=True, family="anthropic",
+                  allowed_families=["google"], allowed_efforts=["high"])
+    result = review.execute("agy", "gemini-2.5-pro", "high", "google", "/repo",
+                            "review", record,
+                            runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
+def test_malformed_single_family_fails_before_discovery():
+    record = consent()
+    record["family"] = []
+    result = review.discover("codex", "/repo", record,
+                             runner=lambda *a, **k: pytest.fail("spawned"))
     assert result["reason"] == "consent-missing-or-stale"
 
 
