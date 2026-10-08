@@ -121,6 +121,13 @@ charter: 1.1
 - Test: A6 positive: the direct-request skip sentence is affirmative; negative: a negated replacement fails even if the same keywords remain.
 - Risk: agent-decided — keyword-presence assertions can pass when the operative sentence is reversed; reuse the established prose matcher rather than invent another semantic rule.
 
+### Wave 9 — Reconcile the outside review target with the reviewer contract
+
+**W9-01 Bind the reviewed target without changing the diff base**  after: W8-02  acceptance: 1, 2, 5
+- Files: loom-code/agents/reviewer.md, loom-code/skills/closing-review/SKILL.md, loom-code/scripts/loom_checker/reviewers.py, loom-code/scripts/loom_checker/attestation.py, loom-code/scripts/loom_checker/command_handlers/finalize.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_external_review_adversarial.py
+- Test: A1 positive: diff base and target are distinct; negative: stale target fails finalization. A2 positive: publication commit stays valid; negative: changed content fails. A5 positive: YAML and verdict targets agree; negative: missing or mismatched target fails.
+- Risk: agent-decided — Round 2 found `reviewed_sha` means diff base, while validation runs after attestation commit. A separate target and content check preserve both contracts.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
