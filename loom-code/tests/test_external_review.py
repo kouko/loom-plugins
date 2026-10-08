@@ -151,7 +151,9 @@ def test_agy_model_list_and_explicit_pair():
         calls.append(argv)
         if argv == ["agy", "models"]:
             return completed(argv, "gemini-2.5-pro\nclaude-sonnet-4-5\n")
-        assert argv[:3] == ["agy", "-p", "--model"]
+        assert argv[:3] == ["agy", "-p",
+                            review.PROBE_PROMPT if len(calls) == 2 else "review"]
+        assert kwargs["input"] == ""
         assert "--sandbox" in argv
         assert "--disable-slash-commands" in argv
         assert argv[argv.index("--mode") + 1] == "plan"

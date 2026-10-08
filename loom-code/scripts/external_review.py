@@ -187,7 +187,7 @@ def _claude_observation(output: str, model: str, family: str) -> tuple[str, str]
     return names[0], result
 
 
-def _command(executor: str, model: str, effort: str) -> list[str]:
+def _command(executor: str, model: str, effort: str, prompt: str) -> list[str]:
     if executor == "codex":
         return ["codex", "exec", "--sandbox", "read-only", "--skip-git-repo-check",
                 "--ephemeral", "-m", model, "-c", f"model_reasoning_effort={effort}", "-"]
@@ -196,7 +196,7 @@ def _command(executor: str, model: str, effort: str) -> list[str]:
                 "--permission-mode", "plan", "--tools", "Read,Glob,Grep",
                 "--permission-prompts", "none", "--output-format", "json",
                 "--no-session-persistence"]
-    return ["agy", "-p", "--model", model, "--effort", effort,
+    return ["agy", "-p", prompt, "--model", model, "--effort", effort,
             "--mode", "plan", "--sandbox", "--disable-slash-commands",
             "--output-format", "text"]
 
@@ -245,10 +245,11 @@ def execute(
             return fail("selected-model-not-in-current-candidates")
         result["candidate_source"] = {"codex": "model/list", "agy": "agy models",
                                       "claude": "alias-or-explicit-id"}[executor]
-        argv = _command(executor, model, effort)
         for stage, text, timeout in (("probe", PROBE_PROMPT, probe_timeout),
                                      ("review", prompt, review_timeout)):
-            response = _run(runner, argv, text, timeout, scope)
+            argv = _command(executor, model, effort, text)
+            response = _run(runner, argv, "" if executor == "agy" else text,
+                            timeout, scope)
             if stage == "probe":
                 result["probe"] = {
                     "returncode": response.returncode,
