@@ -14,9 +14,19 @@ Write the fields in this order. Divergence comes before anything summarising.
 3. `verdict` — one of `challenger-preferred`, `incumbent-preferred`,
    `inconclusive`.
 4. `leg_count`, `early_stopped`, `degraded_legs` — the run as it actually ran.
-5. `actual_cost` — a figure in the stated unit, or `unknown` with its reason.
-6. `known_weaknesses` — the standing note below.
-7. `coverage_disclaimer` — what was consulted, in the words below.
+5. `executor_provenance` — for each outside leg, identify the CLI, requested
+   model and effort, selected model provider family, candidate source, bounded
+   probe result, observed model and effort where present, and `evidence_level`.
+   State whether settings were merely accepted by the CLI or independently
+   observed. Codex can report observed model and effort; Claude Code reports
+   an observed model family with accepted explicit settings; Antigravity CLI
+   reports accepted explicit settings and a listed model slug. Do not label
+   the latter two as independently observed effort, or `agy` as an observed
+   effective model. An unknown or mismatched family, failed probe, or rejected
+   explicit setting makes the leg failed rather than a completed verdict.
+6. `actual_cost` — a figure in the stated unit, or `unknown` with its reason.
+7. `known_weaknesses` — the standing note below.
+8. `coverage_disclaimer` — what was consulted, in the words below.
 
 ## The six rejection keys
 
