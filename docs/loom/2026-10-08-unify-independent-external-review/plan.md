@@ -87,6 +87,18 @@ charter: 1.1
 - Test: A6 negative: no authorization blocks subprocess. A4 negative: alias and JSON-RPC errors fail. A5 negative: inconsistent receipt fails. Run graduated tests through the package suite.
 - Risk: agent-decided — each new probe caught a real defect, so retaining it under the package test root keeps the regression check active after this change.
 
+### Wave 7 — Close final review routing gaps
+
+**W7-01 Record an outside reviewer when the plan is skipped**  after: W6-01  acceptance: 1, 6
+- Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_selection_finalize.py, loom-code/skills/closing-review/SKILL.md
+- Test: A1 positive: skipped-plan intent selection raises reviewer floor and requires an outside receipt; negative: no selection retains the floor. A6 positive: direct request remains sufficient.
+- Risk: agent-decided — the skill accepts a skipped plan but the checker currently reads selections only from a plan or standing defaults; a committed intent selection keeps the gate recomputable.
+
+**W7-02 Avoid repeating an already named outside choice**  after: W7-01  acceptance: 3, 6
+- Files: loom-code/skills/write-plan/references/confirm-intent.md, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md, loom-code/skills/write-plan/SKILL.md, loom-code/tests/test_write_plan_station_text.py
+- Test: A6 positive: direct named agent and target bypass per-change ask; negative: suggestion-only still asks under `second-vendor: ask`. A3 positive: notice stays nonblocking.
+- Risk: agent-decided — the standing ask path can duplicate the user's named choice; it should reuse the explicit instruction while retaining a visible disclosure before execution.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
