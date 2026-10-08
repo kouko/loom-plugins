@@ -80,6 +80,13 @@ charter: 1.1
 - Test: A6 negative: missing authorization source blocks discovery. A4 negative: Claude alias tier mismatch fails; Codex model/list error fails. A5 negative: contradictory Claude receipt fails; legitimate profiles pass.
 - Risk: agent-decided — committed adversarial probes exposed three reachable false-success paths; reject them at the shared execution and receipt boundaries.
 
+### Wave 6 — Retain caught W5 probes
+
+**W6-01 Graduate authorization and CLI adversarial probes**  after: W5-04  acceptance: 3, 4, 5, 6
+- Files: docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_authorization_source.py, docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_claude_alias_mismatch.py, docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_codex_error_listing.py, loom-code/tests/test_external_review_adversarial.py
+- Test: A6 negative: no authorization blocks subprocess. A4 negative: alias and JSON-RPC errors fail. A5 negative: inconsistent receipt fails. Run graduated tests through the package suite.
+- Risk: agent-decided — each new probe caught a real defect, so retaining it under the package test root keeps the regression check active after this change.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
