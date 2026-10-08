@@ -4,16 +4,19 @@ Referenced from `SKILL.md`. The binding rules for the three roles, for
 blindness, and for the two bias controls live in `SKILL.md`; this file carries
 the packet's required sections and the normalisation template.
 
-For an explicit outside code, plan, or decision review, the owning review skill
-assembles the review packet and defines the verdict contract. Select that
+For an explicit outside code, plan, or decision review, select the applicable
 owner before outside execution: `loom-code:closing-review` for code branch
 review, `loom-code:write-plan` for its implementation-plan lens, or
-`loom-workflow:critique` for its proposal/complexity decision lens. With no
-applicable owner, use the advisor's `audit` consultation contract. Pass the
-owner's packet to
-`loom-code:external-review` by skill name; do not replace its criteria or
-result checks with this consultation's shared-card template. This file's four
-sections and cards apply to `explore`/`audit` consultations only.
+`loom-workflow:critique` for its proposal/complexity decision lens. That
+owning review skill assembles the packet and defines the verdict contract.
+For code, plan, or decision with no applicable owner, including an uncommitted
+file review, use the advisor's `audit` consultation report contract and keep
+the incumbent's result separately attributable. Do not call its result a
+formal owner verdict. Pass the resulting packet to
+`loom-code:external-review` by skill name; an existing owner's criteria and
+result checks are never replaced with this consultation's shared-card
+template. This file's four sections and cards apply to `explore`/`audit`
+consultations only.
 
 ## The dispatch packet
 

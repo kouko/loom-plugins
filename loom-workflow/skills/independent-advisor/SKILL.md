@@ -27,11 +27,16 @@ or decision, identify the review owner before invoking
 - Loom implementation plan review: `loom-code:write-plan` owns the fresh
   `plan`-lens review before Build.
 - A proposal or complexity decision: `loom-workflow:critique` owns the
-  applicable `proposal` or `complexity` criteria. If no existing Loom review
-  contract fits the decision, use an advisor audit consultation and its report
-  contract; do not present it as a verdict from a nonexistent owner.
+  applicable `proposal` or `complexity` criteria.
 
-The selected owner assembles the review packet with its requirements and
+For code, plan, or decision without an applicable Loom review owner (including
+file-level or uncommitted code review outside branch closing review), use the
+advisor audit consultation report contract. Assemble its full-context packet,
+run the outside leg after consent, and report it separately from the incumbent.
+This is not a formal owner verdict; do not invent an owning skill or claim its
+formal review checks ran.
+
+When an owner exists, it assembles the review packet with its requirements and
 validates the returned verdict against its own format and checks. Keep the
 incumbent reviewer and its result separately attributable. The advisor does
 not substitute its `explore`/`audit` comparison verdict or report template for
@@ -50,7 +55,8 @@ The named skill owns candidate selection, explicit model and effort in the
 pre-review execution and review, CLI invocation and execution evidence.
 Do not read or run a `loom-code` file from this plugin at runtime. Accept only
 the named skill's JSON evidence/status and then apply the owning review skill's
-checks to any review output. A changed executor or `review_root`, or a
+checks to any owner-governed review output, or the advisor audit report checks
+to an unowned consultation. A changed executor or `review_root`, or a
 model, effort or provider family outside the recorded bounds, voids consent and requires
 the whole checkpoint again. An unsolicited second-vendor notice remains a suggestion; it never
 starts discovery, probe or dispatch without the user's request or consent.
@@ -60,8 +66,9 @@ For open-ended second-opinion consultations, continue with the `explore` and
 
 ## Consultation mode routing
 
-This section applies to open-ended consultations. An explicit outside review
-uses the owning review skill's task type and verdict contract instead.
+This section applies to open-ended consultations and explicit reviews without
+an applicable owner. An owner-governed outside review uses that skill's task
+type and verdict contract instead.
 
 - `explore`: the solution space is open; run proposer, normalizer, and blind judge roles.
 - `audit`: an incumbent exists; **a single leg with full context runs**, with

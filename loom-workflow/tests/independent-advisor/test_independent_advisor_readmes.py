@@ -151,6 +151,18 @@ def test_explicit_review_selects_a_real_owner_before_external_execution():
     assert "owning review skill" in dispatch
 
 
+def test_unowned_code_plan_or_decision_uses_advisor_audit_without_formal_verdict():
+    skill = SKILL.read_text(encoding="utf-8")
+    dispatch = DISPATCH.read_text(encoding="utf-8")
+    assert "code, plan, or decision without an applicable Loom review owner" in skill
+    assert "uncommitted code" in skill
+    assert "advisor audit consultation report" in skill
+    assert "separately from the incumbent" in skill
+    assert "not a formal owner verdict" in skill
+    assert "code, plan, or decision" in dispatch
+    assert "advisor's `audit` consultation report contract" in dispatch
+
+
 def test_coverage_disclaimer_does_not_claim_unobserved_file_access():
     report = REPORT.read_text(encoding="utf-8")
     assert "dispatch packet" in report.lower()
