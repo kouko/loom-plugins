@@ -48,6 +48,11 @@ charter: 1.1
 - Test: A4 positive: stderr-header-and-valid-list; negative: spoofed-header-and-null-list. A5 positive: consented-family; negative: contradictory-family.
 - Risk: agent-decided — move the three RED-then-GREEN adversarial cases into the package suite before finalization; retain their concern anchors and avoid another harness.
 
+**W4-02 Register the new skill and release metadata**  after: W4-01  acceptance: 1, 4, 5
+- Files: tests/test_loom_skill_description_catalog.py, loom-code/skills/using-loom-code/SKILL.md, docs/loom/evidence/mechanisms.yaml, loom-code/scripts/check_mechanisms.py, loom-code/tests/test_check_mechanisms.py, loom-code/CHANGELOG.md, loom-code/package.json, loom-code/skills/external-review/SKILL.md
+- Test: A1 positive: router-target-present; negative: missing-leaf-accounting. A4 positive: manifest-sync; negative: derived-package-drift. A5 positive: mechanism-registered; negative: undeclared-budget-increase.
+- Risk: agent-decided — declare one counted skill budget exception for the shared handoff; registration and evaluation are necessary to keep repo gates recomputable.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
