@@ -196,6 +196,71 @@ def test_bounded_selection_rejects_effort_outside_consent():
     assert result["reason"] == "consent-missing-or-stale"
 
 
+def test_agy_consent_can_select_family_after_consented_discovery():
+    record = consent("agy")
+    record.pop("model")
+    record.pop("effort")
+    record.update(selection_authorized=True,
+                  allowed_families=["anthropic", "google"],
+                  allowed_efforts=["high"])
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        if argv == ["agy", "models"]:
+            return completed(argv, "gemini-2.5-pro\nclaude-sonnet-4-5\n")
+        return completed(argv, "ok")
+
+    assert review.discover("agy", "/repo", record, runner=runner)["status"] == "completed"
+    result = review.execute("agy", "claude-sonnet-4-5", "high", "anthropic",
+                            "/repo", "review", record, runner=runner)
+    assert result["status"] == "completed"
+    assert len(calls) == 4
+
+
+@pytest.mark.parametrize("families", [[], ["unknown"], ["google", "unknown"],
+                                      ["Google"], "google"])
+def test_unknown_or_empty_allowed_families_fail_before_subprocess(families):
+    record = consent("agy")
+    record.pop("model")
+    record.pop("effort")
+    record.update(selection_authorized=True, allowed_families=families,
+                  allowed_efforts=["high"])
+    result = review.execute("agy", "gemini-2.5-pro", "high", "google", "/repo",
+                            "review", record,
+                            runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
+def test_selected_family_outside_consented_set_fails_before_subprocess():
+    record = consent("agy")
+    record.pop("model")
+    record.pop("effort")
+    record.update(selection_authorized=True, allowed_families=["anthropic"],
+                  allowed_efforts=["high"])
+    result = review.execute("agy", "gemini-2.5-pro", "high", "google", "/repo",
+                            "review", record,
+                            runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
+def test_exact_pair_does_not_override_an_invalid_allowed_families_list():
+    record = consent("agy")
+    record["allowed_families"] = ["unknown"]
+    result = review.execute("agy", "gemini-2.5-pro", "high", "google", "/repo",
+                            "review", record,
+                            runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
+def test_invalid_allowed_families_blocks_network_discovery():
+    record = consent("agy")
+    record["allowed_families"] = []
+    result = review.discover("agy", "/repo", record,
+                             runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
 def test_claude_model_usage_family_mismatch_rejects_review():
     calls = []
 

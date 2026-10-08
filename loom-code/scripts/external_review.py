@@ -16,6 +16,7 @@ from typing import Any, Callable, Mapping, TextIO
 
 
 EFFORTS = {"low", "medium", "high", "xhigh", "max"}
+FAMILIES = {"openai", "anthropic", "google"}
 PROBE_PROMPT = "Reply with the single word ok. Do not inspect files."
 Runner = Callable[..., subprocess.CompletedProcess[str]]
 
@@ -46,11 +47,21 @@ def _consent_valid(record: Mapping[str, Any] | None, executor: str, scope: str,
                 ("cost", "vendor_egress", "local_execution",
                  "filesystem_access_outside_root", "filesystem_write_not_guaranteed"))
     )
+    allowed_families = record.get("allowed_families")
+    if allowed_families is not None:
+        if (not isinstance(allowed_families, list) or not allowed_families
+                or any(not isinstance(item, str) or item not in FAMILIES
+                       for item in allowed_families)):
+            return False
     if not base or model is None or effort is None:
         return base
     exact = record.get("model") == model and record.get("effort") == effort
+    family_allowed = (record.get("family") == family if allowed_families is None
+                      else family in allowed_families)
+    if allowed_families is not None and not family_allowed:
+        return False
     bounded = (record.get("selection_authorized") is True
-               and record.get("family") == family
+               and family_allowed
                and isinstance(record.get("allowed_efforts"), list)
                and effort in record["allowed_efforts"])
     return exact or bounded
@@ -202,7 +213,7 @@ def execute(
     if not Path(scope).is_absolute():
         return fail("scope-must-be-absolute")
     if (executor not in {"codex", "claude", "agy"} or not model or
-            effort not in EFFORTS or family not in {"openai", "anthropic", "google"} or
+            effort not in EFFORTS or family not in FAMILIES or
             not 0 < probe_timeout <= 120 or
             not probe_timeout < review_timeout <= 1800):
         return fail("invalid-explicit-profile")

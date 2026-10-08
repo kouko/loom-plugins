@@ -55,6 +55,15 @@ current candidates without a second user question. Either form must be tied
 to the same executor, review root, and disclosures. A change outside the authorized
 bounds needs the owning flow's existing checkpoint again.
 
+For Antigravity, the model's provider family may be unknown until the
+consented `agy models` result arrives. A bounded record may replace `family`
+with `"allowed_families": ["anthropic", "google"]`, using only normalized
+`anthropic`, `openai`, and `google` names. The owning review flow excludes the
+incumbent's provider family when recording this set. After discovery, select
+one listed model and pass its concrete family with `--family`. The executor
+rejects an empty set, an unknown family, or a selected family outside the
+recorded set before starting the probe.
+
 After this consent, list candidates with:
 
 ```sh
