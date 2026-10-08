@@ -138,8 +138,10 @@ instruction, dispatch no
 reviewer and pass no `verdicts`.
 - Unless reviewers are skipped, resolve a selected second vendor from the
   standing fixed CLI, the per-change `ask` answer, or a committed
-  `user-decided — second-vendor selection-confirmed: <vendor>` plan line.
-  Record an accepted `ask` answer with that same line before reviewing, so
+  `user-decided — second-vendor selection-confirmed: <vendor>` plan line, or a
+  direct user request naming an outside coding agent for the active code branch.
+  Record an accepted `ask` answer or direct request with that same line before
+  reviewing, so
   `reviewer-count`, finalization and attestation validation can recompute it.
   With no selection, do not start external execution. Compare the selected
   model's provider family with the current host model's family when that
@@ -170,12 +172,17 @@ after rejection.
 Before any network-backed discovery, probe or review, give the user the
 cost, vendor-egress, `review_root` working directory, local-execution,
 `filesystem_access_outside_root`, and `filesystem_write_not_guaranteed`
-disclosures and retain their approval in the
-external skill's JSON consent record. The working directory does not confine
+disclosures and retain `authorization_source` in the external skill's complete
+JSON consent record. A direct user request naming the outside coding agent
+and an unambiguous active branch authorizes one review without a second yes/no
+checkpoint; quote that request, show the disclosures, and record their flags
+as shown rather than separately acknowledged. The working directory does not confine
 the CLI's file reads or guarantee it cannot write files. An earlier fixed
 setting without these disclosures is insufficient; resolve its confirmation
-at the existing intent decision point. A changed executor or `review_root`
-requires fresh approval. Pass the consent record and exact root to the shared
+at the existing intent decision point. If the provider or target is ambiguous,
+or material scope expands beyond the active task, obtain the missing choice
+before dispatch. A changed executor or `review_root` requires renewed
+authorization. Pass the consent record and exact root to the shared
 runner. A missing or stale record prevents execution. On Codex, run the
 installed runner outside the sandbox with narrowly scoped host approval when
 the selected CLI requires the existing host login; denial is an authorization

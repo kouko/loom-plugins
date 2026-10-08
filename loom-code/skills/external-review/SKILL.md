@@ -18,16 +18,22 @@ is the directory two levels above this SKILL.md.
 
 ## Before discovery
 
-Require a recorded user opt-in for this executor and review root. The root is
+Require a complete consent record for this executor and review root. The root is
 the CLI's starting directory, **not a filesystem read boundary**. The CLI may
 read files outside it through host tools or configuration; CLI startup,
 plugins, and caches may write files even when model tools are restricted. The
-record must state that the user accepted those limits, cost, vendor data
-transfer, and local CLI execution. Do not run network-backed model discovery,
+record must identify `authorization_source`: either a quoted direct user request
+naming the outside coding agent and an unambiguous active review target, or a
+separate accepted selection. A direct user request authorizes one bounded
+review without a second yes/no checkpoint. Show cost, vendor data transfer,
+the actual filesystem limits, and local CLI execution before discovery, probe
+or dispatch; for a
+direct request, disclosure booleans mean these facts were shown, not that the
+user separately acknowledged each one. Do not run network-backed model discovery,
 a preflight, or a review until this record exists. If the selected executor or root changes,
-obtain a new record at the owning flow's existing user checkpoint. Never infer
+obtain a new choice at the owning flow's authorization point. Never infer
 consent from a prior fixed setting alone. Static local binary checks can occur
-before that checkpoint.
+before authorization is recorded.
 
 The JSON record passed to the script has this shape when the user authorizes
 selection within one provider family and effort bound:
@@ -35,6 +41,7 @@ selection within one provider family and effort bound:
 ```json
 {
   "approved": true,
+  "authorization_source": {"kind": "direct-user-request", "quote": "<verbatim request>", "target": "<active review target>"},
   "executor": "codex",
   "review_root": "/absolute/review/root",
   "selection_authorized": true,
@@ -54,7 +61,10 @@ An exact user selection can instead record `"model": "<id>"` and
 `"effort": "<level>"`. The bounded form lets the agent select a model from
 current candidates without a second user question. Either form must be tied
 to the same executor, review root, and disclosures. A change outside the authorized
-bounds needs the owning flow's existing checkpoint again.
+bounds needs a new choice. A provider or review target that cannot be determined
+from the direct request and active task also needs a choice before dispatch;
+material scope beyond that task is not covered by the request. A suggestion
+alone supplies no `authorization_source`.
 
 For Antigravity, the model's provider family may be unknown until the
 consented `agy models` result arrives. A bounded record may replace `family`

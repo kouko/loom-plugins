@@ -10,7 +10,7 @@ description: |
 Consult a **different executor** about the user's code, plan, or decision.
 This changes WHO answers, not the critique lens. For a same-executor lens change,
 use `loom-workflow:critique`. This skill spends money, sends material off the
-machine, and may run repository setup, so those effects require approval.
+machine, and may run repository setup, so those effects require authorization.
 
 For consultation comparisons, describe capability as model tier `economy` /
 `standard` / `frontier` plus effort `low` / `medium` / `high`. The outside
@@ -32,7 +32,8 @@ or decision, identify the review owner before invoking
 For code, plan, or decision without an applicable Loom review owner (including
 file-level or uncommitted code review outside branch closing review), use the
 advisor audit consultation report contract. Assemble its full-context packet,
-run the outside leg after consent, and report it separately from the incumbent.
+run the outside leg after authorization and disclosure, and report it
+separately from the incumbent.
 This is not a formal owner verdict; do not invent an owning skill or claim its
 formal review checks ran.
 
@@ -43,9 +44,14 @@ not substitute its `explore`/`audit` comparison verdict or report template for
 the owning review skill's contract. A failed or unverified outside execution
 is a separately attributed failure, never a completed independent review.
 
-Prepare the complete single checkpoint below and obtain a recorded consent
-record before invoking `loom-code:external-review` for discovery, probe or
-dispatch. Give that skill the consent record, `review_root` (CLI starting
+Before invoking `loom-code:external-review` for discovery, probe or dispatch,
+show the full disclosure below and prepare the runner's complete consent
+record. A direct user request naming the outside coding agent and an explicit
+or unambiguous active code, plan or decision target authorizes one bounded
+review without a second yes/no checkpoint. Record `authorization_source` as
+the verbatim user request and the active target used to resolve it; disclosure
+fields record what was shown before execution, not separate acknowledgments.
+Give the named skill that record, `review_root` (CLI starting
 directory), requested executor and review packet. `review_root` is not a filesystem read boundary.
 The consent may authorize bounded model selection after consent within one
 provider family and effort bound, a set of `allowed_families` for Antigravity,
@@ -57,9 +63,11 @@ Do not read or run a `loom-code` file from this plugin at runtime. Accept only
 the named skill's JSON evidence/status and then apply the owning review skill's
 checks to any owner-governed review output, or the advisor audit report checks
 to an unowned consultation. A changed executor or `review_root`, or a
-model, effort or provider family outside the recorded bounds, voids consent and requires
-the whole checkpoint again. An unsolicited second-vendor notice remains a suggestion; it never
-starts discovery, probe or dispatch without the user's request or consent.
+model, effort or provider family outside the recorded bounds, voids that
+authorization. If the provider or target is ambiguous, or material scope expands
+beyond the active task, ask for the missing choice before dispatch. An
+unsolicited second-vendor notice remains a suggestion; it never starts
+discovery, probe or dispatch without a request or accepted selection.
 
 For open-ended second-opinion consultations, continue with the `explore` and
 `audit` modes below and their existing packet and report rules.
@@ -92,18 +100,25 @@ Use `references/executor-detection.md` for the named skill handoff and its
 failure mapping. Local, non-network capability observations may inform the
 checkpoint, but neither an installed binary nor credentials establish model
 availability. The named skill owns selection and pre-review verification after
-consent. Never present an unverified candidate as a verified capability.
+authorization and disclosure. Never present an unverified candidate as a
+verified capability.
 
 The candidate set must support a genuinely independent opinion. No permitted
-outside provider family means stop and report the failed precondition. A same-family option
-requires an explicit checkpoint decision, never a silent fallback. In
+outside provider family means stop and report the failed precondition. A
+same-family option cannot be counted as independent; ask for a different
+provider if the user still wants an independent review, never silently swap. In
 `explore`, one eligible candidate cannot serve as both proposer and judge;
 surface the degraded choices at the checkpoint.
 
-## The single checkpoint
+## Authorization and the single checkpoint
 
-**Exactly one checkpoint exists**, after routing and any local capability observations and before
-any network-backed discovery, probe, dispatch, transmission, or **any money is spent**. One ask carries
+For a qualifying direct user request, give this disclosure without asking the
+user to confirm the same review again. The direct request is the authorization
+source for one leg and the active task target; it does not approve a different
+provider, new target or broader material scope. For an ambiguous request or
+other opt-in, use a single checkpoint after routing and local observations,
+before any network-backed discovery, probe, dispatch, transmission, or money
+is spent. One ask carries
 **the leg count**, **which executor runs which leg**, **the estimated cost**, and
 **the egress disclosure** together, specifically:
 
@@ -118,9 +133,14 @@ any network-backed discovery, probe, dispatch, transmission, or **any money is s
 - estimated cost per leg (`unknown, with the reason`, **never as zero and never omitted** when unknowable; a **genuinely zero** cost stays zero, not unknown); and
 - the full egress and local-execution disclosure below.
 
-Require recorded confirmation of all dimensions. **splitting** these into separate questions, dispatching **without a recorded user confirmation**, or treating a **partial answer as approval** are violations. Ask for each missing item and **never fill it with a default**. If the executor
-set changes, **the prior approval is void**: repeat local observations and cost
-estimation, then present the whole checkpoint again. **Never carry a previous observation or cost figure** into the changed set.
+Record `authorization_source` as either the direct request quotation or the
+answer at that checkpoint. For a direct request, do not mark the cost, egress,
+filesystem and local setup disclosures as individually acknowledged; record
+that they were shown before execution. For a checkpoint answer, require the
+missing choices explicitly and do not treat a partial answer as approval. If
+the executor set or material scope changes, renew authorization and repeat
+cost estimation and disclosure. Never carry a previous observation or cost
+figure into the changed set.
 
 ### The egress disclosure
 
@@ -129,7 +149,7 @@ vendor for post-consent Antigravity selection), packet categories, and the
 `review_root`. Enumerate known wider paths and explain that the CLI may read
 outside that root through host tools or configuration. Approval of the
 **cost only** never authorizes either data transfer
-or local execution. Before accepting approval, say plainly:
+or local execution. Before dispatch, say plainly:
 
 1. The inspected packet is smaller than what the executor may read:
    **`scope_boundary` includes reachable paths outside `review_root`**.
@@ -146,19 +166,19 @@ or local execution. Before accepting approval, say plainly:
 4. If the audit record retains **material verbatim rather than references and summaries**, **state its location at this checkpoint** and give it the **same restrictions as the dispatch packet**.
 
 Record `filesystem_access_outside_root` and `filesystem_write_not_guaranteed`
-as acknowledged disclosures. Refuse dispatch until the user acknowledges cost,
-egress, the actual filesystem limits and local setup. If cancellation follows an external call, report that material was
+as disclosures shown. A named direct request needs no second confirmation;
+otherwise require the missing authorization before dispatch. If cancellation follows an external call, report that material was
 already transmitted to the named vendor and cannot be recalled.
 
 ## External execution evidence
 
-After complete approval, hand each selected leg to `loom-code:external-review`
+After the complete record and disclosure, hand each selected leg to `loom-code:external-review`
 using the same consent record and `review_root`. That named skill owns
 candidate discovery, explicit model and effort selection, pre-review execution,
 CLI-specific evidence levels and failure status. Record its JSON evidence and
 never turn an unavailable, mismatched, timed-out or unverified result into a
-completed leg. A materially different profile returns to the complete
-checkpoint. A frontier request cannot silently downgrade.
+completed leg. A materially different profile needs renewed authorization and
+disclosure. A frontier request cannot silently downgrade.
 
 The blind judge and proposer must differ, and both opposite-order judge runs
 use identical accepted executor, model and effort settings. Each run uses a

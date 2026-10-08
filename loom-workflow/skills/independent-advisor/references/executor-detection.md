@@ -17,16 +17,24 @@ status; the owning review skill still judges whether its verdict is valid.
 
 The advisor may make local, non-network observations to explain the available
 choices. Such observations do not verify a model or effort. Never run model
-discovery, a live probe, or a review before the single complete consent
-checkpoint. Record the consent for cost, vendor and packet egress, `review_root`,
-local setup and every leg assignment. The record must acknowledge
+discovery, a live probe, or a review before a complete authorization record
+and visible disclosure. A direct user request that names the outside coding
+agent and an unambiguous active review target authorizes one review without a second
+yes/no checkpoint. Quote it under `authorization_source`; for ambiguous
+provider or target, or expanded material scope, obtain the missing choice
+before dispatch. A suggestion alone supplies no authorization. Record cost,
+vendor and packet egress, `review_root`, local setup and every leg assignment.
+The record must include disclosures for
 `filesystem_access_outside_root` and `filesystem_write_not_guaranteed`:
 `review_root` only selects the CLI's working directory, not a read boundary;
 startup, plugins and caches may write despite restrictions on model tools.
+For `authorization_source: direct user request`, disclosure flags mean these
+facts were shown before execution; they do not claim the user separately
+acknowledged each fact. Keep the runner's complete recorded consent shape.
 Exact model selection before
 discovery is optional when bounded selection was approved. A different
 executor or root, or a model/effort/family outside the recorded bounds,
-invalidates consent and requires a new complete checkpoint. A model selected
+invalidates that authorization and requires a new choice. A model selected
 within the recorded bounds does not require another question.
 
 If no outside family is permitted after excluding the incumbent, stop. If
@@ -43,4 +51,4 @@ effective setting. A rejected model or effort, unavailable candidate,
 unidentified provider family, timeout, nonzero exit or observed mismatch is
 a failed outside leg. Show the concrete reason and keep that leg separate
 from the incumbent result. Do not retry with a default model or another
-executor without renewing the complete checkpoint.
+executor without renewed authorization and disclosure.

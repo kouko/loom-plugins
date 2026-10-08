@@ -18,7 +18,7 @@ STRUCTURAL_TOKENS = [
     "`loom-code:external-review`",
     "owning review skill",
     "incumbent",
-    "recorded consent",
+    "consent record",
     "`review_root`",
     "`allowed_families`",
     "`filesystem_access_outside_root`",

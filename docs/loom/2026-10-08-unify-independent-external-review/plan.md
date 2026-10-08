@@ -61,7 +61,7 @@ charter: 1.1
 ### Wave 5 — Close live outside-review findings and remove duplicate consent
 
 **W5-01 Direct-request authorization**  after: W4-03  acceptance: 3, 6
-- Files: loom-workflow/skills/independent-advisor/SKILL.md, loom-workflow/skills/independent-advisor/references/executor-detection.md, loom-code/skills/external-review/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-workflow/skills/independent-advisor/test-prompts.json, loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py
+- Files: loom-workflow/skills/independent-advisor/SKILL.md, loom-workflow/skills/independent-advisor/references/executor-detection.md, loom-workflow/skills/independent-advisor/README*.md, loom-code/skills/external-review/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-workflow/skills/independent-advisor/test-prompts.json, loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py, loom-workflow/tests/scripts/test_independent_advisor_compaction.py
 - Test: A6 positive: named-agent-with-active-task-target-runs-after-disclosure; negative: suggestion-or-expanded-scope-stops. A3 negative: notice-does-not-authorize.
 - Risk: user-decided — a direct named request authorizes one bounded review without a second confirmation; disclosure remains visible, and missing or expanded choices stop dispatch.
 

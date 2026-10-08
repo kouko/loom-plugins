@@ -22,6 +22,8 @@ DETECTION = SKILL_DIR / "references" / "executor-detection.md"
 DISPATCH = SKILL_DIR / "references" / "dispatch-protocol.md"
 REPORT = SKILL_DIR / "references" / "report-contract.md"
 PROMPTS = SKILL_DIR / "test-prompts.json"
+EXTERNAL_REVIEW = SKILL_DIR.parents[2] / "loom-code/skills/external-review/SKILL.md"
+CLOSING_REVIEW = SKILL_DIR.parents[2] / "loom-code/skills/closing-review/SKILL.md"
 
 READMES = [
     (README_EN, "README.md (EN)"),
@@ -168,3 +170,41 @@ def test_coverage_disclaimer_does_not_claim_unobserved_file_access():
     assert "dispatch packet" in report.lower()
     assert "cannot attest which other files the CLI accessed" in report
     assert "Anything outside that list was not looked at" not in report
+
+
+def test_named_direct_request_authorizes_one_review_without_repeat_confirmation():
+    skill = SKILL.read_text(encoding="utf-8")
+    handoff = DETECTION.read_text(encoding="utf-8")
+    external = EXTERNAL_REVIEW.read_text(encoding="utf-8")
+    closing = CLOSING_REVIEW.read_text(encoding="utf-8")
+    for text in (skill, handoff, external, closing):
+        assert "authorization_source" in text
+        assert "direct user request" in text
+        assert "without a second" in text
+    assert "consent record" in external
+    assert "disclose" in skill
+    assert "provider or target is ambiguous" in skill
+    assert "material scope expands" in skill
+
+
+def test_readmes_describe_direct_request_and_nonblocking_disclosure():
+    markers = {
+        README_EN: "no second confirmation",
+        README_JA: "二度目の確認",
+        README_ZHTW: "第二次確認",
+    }
+    for path, label in READMES:
+        body = path.read_text(encoding="utf-8")
+        assert "loom-code:external-review" in body, label
+        assert markers[path] in body.lower(), label
+
+
+def test_prompt_cases_cover_direct_request_and_ambiguous_boundaries():
+    import json
+
+    cases = json.loads(PROMPTS.read_text(encoding="utf-8"))["prompts"]
+    by_id = {case["id"]: case for case in cases}
+    assert "without a second confirmation" in by_id[10]["expected_behavior"]
+    assert "ambiguous target" in by_id[11]["expected_behavior"]
+    assert "expanded scope" in by_id[12]["expected_behavior"]
+    assert "suggestion alone" in by_id[13]["expected_behavior"]
