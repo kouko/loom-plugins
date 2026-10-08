@@ -75,6 +75,16 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
     notes = parsed.get("notes", [])
     if not isinstance(notes, list) or len(notes) > 3 or any(not isinstance(n, str) for n in notes):
         return "selected outside execution has malformed reviewer notes"
+    severity = [finding["severity"] for finding in findings]
+    if ("NEEDS_REVISION" in scores.values() or "fatal" in severity or
+            severity.count("important") >= 2):
+        expected_verdict = "NEEDS_REVISION"
+    elif "PASS_WITH_NOTES" in scores.values() or "important" in severity:
+        expected_verdict = "PASS_WITH_NOTES"
+    else:
+        expected_verdict = "PASS"
+    if parsed.get("verdict") != expected_verdict:
+        return "selected outside execution overall verdict contradicts scores or findings"
     return None
 
 

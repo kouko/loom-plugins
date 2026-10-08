@@ -463,6 +463,27 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
                                         "adversarial": []}), encoding="utf-8")
     assert any("malformed reviewer findings" in reason for _, reason in
                finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    verdicts[1]["findings"] = []
+    result["review_output"] = raw.replace("  omission: PASS", "  omission: NEEDS_REVISION")
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert any("overall verdict" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    for severities in (("fatal",), ("important", "important")):
+        findings = [
+            {"severity": severity, "dimension": "omission",
+             "anchor": f"docs/guide.md:{index}", "text": "issue: missing fact",
+             "fix": "add the fact"}
+            for index, severity in enumerate(severities, 1)
+        ]
+        verdicts[1]["findings"] = findings
+        result["review_output"] = raw.replace(
+            "findings: []", yaml.safe_dump({"findings": findings}).strip()
+        )
+        review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                            "adversarial": []}), encoding="utf-8")
+        assert any("overall verdict" in reason for _, reason in
+                   finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
 
 
 def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:
