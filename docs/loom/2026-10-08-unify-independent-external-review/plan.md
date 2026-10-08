@@ -53,6 +53,11 @@ charter: 1.1
 - Test: A1 positive: router-target-present; negative: missing-leaf-accounting. A4 positive: manifest-sync; negative: derived-package-drift. A5 positive: mechanism-registered; negative: undeclared-budget-increase.
 - Risk: agent-decided — declare one counted skill budget exception for the shared handoff; registration and evaluation are necessary to keep repo gates recomputable.
 
+**W4-03 Align advisor structure pin with the shared executor**  after: W4-02  acceptance: 1, 4, 5
+- Files: loom-workflow/tests/scripts/test_independent_advisor_compaction.py, loom-workflow/skills/independent-advisor/SKILL.md, loom-workflow/skills/independent-advisor/references/executor-detection.md
+- Test: A1 positive: named-external-review-route; negative: lost-incumbent-contract. A4 positive: explicit-pair-evidence; negative: stale-advisor-probe-pin. A5 positive: complete-consent; negative: old-credential-assumption.
+- Risk: agent-decided — the old structure test pins deleted advisor-side probe commands; replace those assertions with the current single handoff and consent contract.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
