@@ -120,7 +120,9 @@ def selected_outside_family(repo: Path, change_id: str, head_sha: str | None = N
     return _OUTSIDE_FAMILIES[match.group(1)] if match else None
 
 
-def outside_verdict_failure(verdicts: list[dict], family: str | None) -> str | None:
+def outside_verdict_failure(
+    verdicts: list[dict], family: str | None, head_sha: str,
+) -> str | None:
     """A selected outside opinion must coexist with an incumbent opinion."""
     if family is None:
         return None
@@ -139,6 +141,8 @@ def outside_verdict_failure(verdicts: list[dict], family: str | None) -> str | N
     if len(matched) != 1:
         return "selected outside execution needs exactly one attributed verdict"
     verdict = matched[0]
+    if verdict.get("reviewed_sha") != head_sha:
+        return "selected outside execution reviewed SHA does not match attested HEAD"
     receipt = verdict.get("external_review")
     if not isinstance(receipt, dict) or set(receipt) != {
         "status", "executor", "model", "effort", "family", "evidence_level",
@@ -185,7 +189,9 @@ def outside_verdict_failure(verdicts: list[dict], family: str | None) -> str | N
     return None
 
 
-def attach_outside_receipt(verdicts: list[dict], family: str | None) -> tuple[list[dict], str | None]:
+def attach_outside_receipt(
+    verdicts: list[dict], family: str | None, head_sha: str,
+) -> tuple[list[dict], str | None]:
     """Verify the runner output and keep only a digest-bound receipt."""
     if family is None:
         return verdicts, None
@@ -222,7 +228,7 @@ def attach_outside_receipt(verdicts: list[dict], family: str | None) -> tuple[li
         "output_digest": hashlib.sha256(output.encode("utf-8")).hexdigest(),
         "reviewer": verdict.get("reviewer"),
     }
-    return prepared, outside_verdict_failure(prepared, family)
+    return prepared, outside_verdict_failure(prepared, family, head_sha)
 
 
 _REVIEW_PROTECTED_PARTS = frozenset(

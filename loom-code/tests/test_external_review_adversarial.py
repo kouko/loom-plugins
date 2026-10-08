@@ -131,6 +131,7 @@ def test_sonnet_alias_receipt_cannot_claim_opus_observation():
     verdicts = [
         {"vendor": "openai", "lens": "code"},
         {"vendor": "anthropic", "lens": "code", "model": "sonnet",
+         "reviewed_sha": "b" * 40,
          "reviewer": "outside-1", "external_review": {
              "status": "completed", "executor": "claude", "model": "sonnet",
              "effort": "high", "family": "anthropic",
@@ -138,8 +139,8 @@ def test_sonnet_alias_receipt_cannot_claim_opus_observation():
              "observed_model": "claude-opus-4-1", "observed_effort": None,
              "output_digest": "a" * 64, "reviewer": "outside-1"}},
     ]
-    failure = reviewers.outside_verdict_failure(verdicts, "anthropic")
-    assert failure is not None
+    failure = reviewers.outside_verdict_failure(verdicts, "anthropic", "b" * 40)
+    assert failure == "selected outside execution receipt has impossible executor evidence"
 
 
 def test_model_list_error_is_failed_discovery():

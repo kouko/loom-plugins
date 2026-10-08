@@ -92,7 +92,7 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         needed = "two" if reviewer_floor == 2 else "one"
         return [("finalize.verdicts", f"{needed} distinct reviewers are required")]
     verdicts, outside_failure = attach_outside_receipt(
-        verdicts, selected_outside_family(repo, change_id, head_sha)
+        verdicts, selected_outside_family(repo, change_id, head_sha), head_sha
     )
     if outside_failure:
         return [("finalize.verdicts", outside_failure)]
