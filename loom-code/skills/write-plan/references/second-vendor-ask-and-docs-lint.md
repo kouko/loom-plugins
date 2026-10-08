@@ -110,9 +110,8 @@ default. No reply means no second vendor for this change.
 ## `second-vendor: ask`
 
 `ask` is a standing choice that puts one cross-model review question to the
-user on each change that lacks a qualifying direct user request. A direct user
-request naming an outside coding agent and an explicit or unambiguous active
-review target authorizes one review without a second per-change ask. Quote
+user on each change that lacks a qualifying direct user request. Skip the per-change question when a direct user request names an outside coding agent and an unambiguous active review target.
+That request authorizes one review without a second question. Quote
 that request and target in JSON `authorization_source` at dispatch; record the
 provider family in the separate machine line above. Do not add a question to
 `## Questions asked`. Show cost, vendor

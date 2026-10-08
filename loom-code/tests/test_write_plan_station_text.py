@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from prose_pin import NEGATION_RE
+from prose_pin import NEGATION_RE, affirms
 
 REPO = Path(__file__).resolve().parents[2]
 SKILL = REPO / "loom-code" / "skills" / "write-plan" / "SKILL.md"
@@ -182,6 +182,23 @@ def test_suggestion_only_keeps_ask_and_suggest_does_not_block() -> None:
     assert "suggestion alone" in ask
     assert "ask one" in ask
     assert "continue without waiting" in suggest
+
+
+def test_direct_request_skip_is_affirmative_and_negation_is_rejected() -> None:
+    ask = _section(
+        SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8"),
+        "## `second-vendor: ask`",
+    )
+    sentence = (
+        "Skip the per-change question when a direct user request names an "
+        "outside coding agent and an unambiguous active review target."
+    )
+    assert sentence in " ".join(ask.split())
+    assert affirms(ask, "Skip", "per-change question", "direct user request")
+    reversed_ask = ask.replace(sentence, "Do not " + sentence, 1)
+    assert not affirms(
+        reversed_ask, "Skip", "per-change question", "direct user request"
+    )
 
 
 # --- typed-branch-names W1-02 -- the branch is `<type>/<change-id>` -------

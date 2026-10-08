@@ -105,7 +105,7 @@ charter: 1.1
 - Risk: agent-decided — two review rounds exposed one surviving skipped-plan gap; an exact shared selection line and narrow intent exception must converge within the terminal digest.
 
 **W7-04 Pin no-repeat wording and sync capture-intent routing**  after: W7-03  acceptance: 3, 4, 6
-- Files: loom-code/tests/test_write_plan_station_text.py, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md, loom-design/skills/capture-intent/references/second-vendor.md, loom-design/tests/spec/test_capture_intent_contract.py
+- Files: loom-code/tests/test_write_plan_station_text.py, loom-code/skills/write-plan/SKILL.md, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md, loom-design/skills/capture-intent/SKILL.md, loom-design/skills/capture-intent/references/second-vendor.md, loom-design/tests/spec/test_capture_intent_contract.py
 - Test: A6 positive: affirmative direct request skips ask; negative: reversed wording fails the prose pin. A3 negative: suggestion does not dispatch. A4 positive: Antigravity path is no longer described as unsupported.
 - Risk: agent-decided — the old capture-intent reference and substring-only test can reintroduce duplicate questions or misstate executor support despite a passing package suite.
 

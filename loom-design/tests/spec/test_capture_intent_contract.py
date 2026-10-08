@@ -24,6 +24,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 
 SKILL = REPO / "loom-design/skills/capture-intent/SKILL.md"
+SECOND_VENDOR = REPO / "loom-design/skills/capture-intent/references/second-vendor.md"
 WRITE_PLAN = REPO / "loom-code/skills/write-plan/SKILL.md"
 WRITE_SPEC = REPO / "loom-design/skills/write-spec/SKILL.md"
 TOOL_SKILLS = (
@@ -136,6 +137,21 @@ def test_description_within_cap() -> None:
 def test_body_within_word_cap() -> None:
     words = len(_body(_text()).split())
     assert words <= WORD_CAP, words
+
+
+def test_second_vendor_direct_request_and_antigravity_route() -> None:
+    routing = SECOND_VENDOR.read_text(encoding="utf-8")
+    station = _text()
+    assert "direct user request" in routing
+    assert "unambiguous active review target" in routing
+    assert "Skip the per-change question" in routing
+    assert "suggestion alone" in routing
+    assert "continue without asking" in routing
+    assert "agy" in routing
+    assert "selected model's provider family" in _flat(routing)
+    assert "On Antigravity CLI, probe nothing" not in routing
+    assert "cannot run on Antigravity CLI" not in routing
+    assert "direct user request" in station
 
 
 def test_station_summary_is_byte_identical_to_write_plan() -> None:

@@ -43,7 +43,8 @@ points, and a legacy intent at ship or changed requirements can add a stop.
    change every expensive-to-undo choice in consequence form (a product
    change's wait for item 2, unless no spec will be written), a product's new
    principles when needed, and —
-   only for `second-vendor: ask` — whether to use another vendor.
+   only for `second-vendor: ask` without a direct user request naming the
+   outside agent and an unambiguous active target — whether to use another vendor.
    `suggest` adds no question at capture-intent; write-plan owns its post-plan
    notice.
 2. **Where the product spec is written:** confirm visible behaviour and any
@@ -221,7 +222,8 @@ twice, and this is the only stop this station makes.
    fork, state the irreversible consequence and safeguard (for example, what
    is rewritten, what stops reading it, and where the backup is kept).
 
-3. **The cross-model review question, only for `second-vendor: ask`.** Read
+3. **The cross-model review question, only for `second-vendor: ask` without
+   a qualifying direct user request.** Read
    `references/second-vendor.md` for mode routing and the availability
    probe. A missing line is initialized as `second-vendor: suggest`; it
    adds no question here. The downstream notice may explain that reviewing
@@ -229,8 +231,10 @@ twice, and this is the only stop this station makes.
    serious problems in this system's own spec review were found by
    only one of the two vendors. When the defaults carry `second-vendor: ask`,
    use the reference's host-aware native question or fallback in this same
-   message; the answer governs this change only. A fixed CLI also adds no
-   question.
+   message only if the user has not already named an outside coding agent
+   and unambiguous active review target. That direct user request supplies
+   one review's authorization without a second question; disclose cost,
+   egress and local execution before dispatch. A fixed CLI adds no question.
 
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
