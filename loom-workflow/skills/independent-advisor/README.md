@@ -64,10 +64,13 @@ An explicit request for an outside coding agent to review code, a plan, or a
 decision routes through `loom-code:external-review`. The original reviewer
 remains and its review rules still decide whether the outside verdict is valid.
 The outside result or failure is shown separately. The advisor obtains one
-complete approval for cost, vendor, data sent, readable files and local setup
-before model discovery or execution. You may approve model selection within one vendor family and effort limit;
-the exact model is then chosen after discovery. A choice outside those limits,
-or a changed vendor or scope, needs fresh approval. An ordinary second-vendor suggestion does not start a review.
+complete approval for cost, possible receiving vendors, data sent, the CLI
+starting directory, and local execution before model discovery. That directory
+does not limit file reads; startup, plugins and caches may write files. You
+may approve a vendor family and effort limit, or an Antigravity set of allowed
+non-incumbent families. The exact model and family are then chosen after
+discovery. A choice outside those limits, or a changed executor or starting
+directory, needs fresh approval. An ordinary second-vendor suggestion does not start a review.
 
 ---
 

@@ -111,6 +111,19 @@ def test_bounded_consent_allows_discovery_before_exact_model_selection():
     assert "A different executor, model," not in handoff
 
 
+def test_review_root_is_not_a_read_boundary_and_agy_family_is_selected_later():
+    skill = SKILL.read_text(encoding="utf-8")
+    handoff = DETECTION.read_text(encoding="utf-8")
+    for text in (skill, handoff):
+        assert "review_root" in text
+        assert "filesystem_access_outside_root" in text
+        assert "filesystem_write_not_guaranteed" in text
+        assert "allowed_families" in text
+    assert "not a filesystem read boundary" in skill
+    assert "readable scope" not in handoff
+    assert "authorized scope" not in skill
+
+
 def test_readmes_and_prompts_cover_outside_reviews():
     import json
 

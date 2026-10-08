@@ -29,15 +29,18 @@ is a separately attributed failure, never a completed independent review.
 
 Prepare the complete single checkpoint below and obtain a recorded consent
 record before invoking `loom-code:external-review` for discovery, probe or
-dispatch. Give that skill the consent record, authorized scope, requested
-executor and review packet. The consent may authorize bounded model selection after consent
-within one provider family and effort bound, or name an exact model and effort.
+dispatch. Give that skill the consent record, `review_root` (CLI starting
+directory), requested executor and review packet. `review_root` is not a filesystem read boundary.
+The consent may authorize bounded model selection after consent within one
+provider family and effort bound, a set of `allowed_families` for Antigravity,
+or an exact model and effort. Exclude the incumbent's provider family from
+that Antigravity set; choose a concrete family and model after discovery.
 The named skill owns candidate selection, explicit model and effort in the
 pre-review execution and review, CLI invocation and execution evidence.
 Do not read or run a `loom-code` file from this plugin at runtime. Accept only
 the named skill's JSON evidence/status and then apply the owning review skill's
-checks to any review output. A changed executor, provider family, readable
-scope or model/effort outside the recorded bounds voids consent and requires
+checks to any review output. A changed executor or `review_root`, or a
+model, effort or provider family outside the recorded bounds, voids consent and requires
 the whole checkpoint again. An unsolicited second-vendor notice remains a suggestion; it never
 starts discovery, probe or dispatch without the user's request or consent.
 
@@ -73,8 +76,8 @@ checkpoint, but neither an installed binary nor credentials establish model
 availability. The named skill owns selection and pre-review verification after
 consent. Never present an unverified candidate as a verified capability.
 
-The candidate set must support a genuinely independent opinion. No eligible
-candidate means stop and report the failed precondition. A same-family option
+The candidate set must support a genuinely independent opinion. No permitted
+outside provider family means stop and report the failed precondition. A same-family option
 requires an explicit checkpoint decision, never a silent fallback. In
 `explore`, one eligible candidate cannot serve as both proposer and judge;
 surface the degraded choices at the checkpoint.
@@ -91,7 +94,9 @@ any network-backed discovery, probe, dispatch, transmission, or **any money is s
 - leg count and every executor-to-leg assignment;
 - for each outside leg, either an exact model and effort or explicit permission
   to select a model after consent within a named provider family and allowed
-  effort levels; always record the readable scope;
+  effort levels; Antigravity may instead record `allowed_families` excluding
+  the incumbent's family, with the concrete family chosen after discovery;
+  always record `review_root`, the CLI starting directory;
 - estimated cost per leg (`unknown, with the reason`, **never as zero and never omitted** when unknowable; a **genuinely zero** cost stays zero, not unknown); and
 - the full egress and local-execution disclosure below.
 
@@ -101,29 +106,36 @@ estimation, then present the whole checkpoint again. **Never carry a previous ob
 
 ### The egress disclosure
 
-For every leg, name **the vendor that receives material**, packet categories,
-and **the file paths the executor will be authorised to read**. Approval of the
+For every leg, name **the vendor that receives material** (or every permitted
+vendor for post-consent Antigravity selection), packet categories, and the
+`review_root`. Enumerate known wider paths and explain that the CLI may read
+outside that root through host tools or configuration. Approval of the
 **cost only** never authorizes either data transfer
 or local execution. Before accepting approval, say plainly:
 
-1. The inspected packet is smaller than the readable scope: **`scope_boundary` is the larger of the two**. Always **enumerate what** the wider
-   paths and what they cover: “I checked the text I am sending; the other model
-   can additionally open files under `<paths>`.”
+1. The inspected packet is smaller than what the executor may read:
+   **`scope_boundary` includes reachable paths outside `review_root`**.
+   Enumerate the known wider paths and what they cover, and say that paths
+   outside the root may also be reachable. Do not promise a filesystem read
+   limit from the selected working directory.
 2. A no-hit scan may say **the packet was checked and nothing matched**; it is
    not a safety claim or wording that **carries that meaning** about the readable scope or what leaves.
 3. Answering also runs **third-party code in the user's repository** on this
    machine—its **instructions, hooks, skills and MCP servers**—even if nobody
-   read it first. If a pinned executor's setup is unknown, **state that it cannot be enumerated in advance**.
+   read it first. CLI startup, plugins and caches may write files even when
+   model tools are restricted. If a pinned executor's setup is unknown,
+   **state that it cannot be enumerated in advance**.
 4. If the audit record retains **material verbatim rather than references and summaries**, **state its location at this checkpoint** and give it the **same restrictions as the dispatch packet**.
 
-Refuse dispatch until the user acknowledges cost, egress, readable scope, and
-local setup. If cancellation follows an external call, report that material was
+Record `filesystem_access_outside_root` and `filesystem_write_not_guaranteed`
+as acknowledged disclosures. Refuse dispatch until the user acknowledges cost,
+egress, the actual filesystem limits and local setup. If cancellation follows an external call, report that material was
 already transmitted to the named vendor and cannot be recalled.
 
 ## External execution evidence
 
 After complete approval, hand each selected leg to `loom-code:external-review`
-using the same consent record and authorized scope. That named skill owns
+using the same consent record and `review_root`. That named skill owns
 candidate discovery, explicit model and effort selection, pre-review execution,
 CLI-specific evidence levels and failure status. Record its JSON evidence and
 never turn an unavailable, mismatched, timed-out or unverified result into a
@@ -203,7 +215,7 @@ wording. The rules below remain binding wherever the report is stored.
 Blindness concerns the **packet**, not everything the proposer could read. Before
 claiming it, ask whether `scope_boundary` could contain the incumbent. If yes or
 unknown, make no **unconditional blindness claim**; qualify it in place: the packet omitted the incumbent, but the
-authorized paths may describe it, so the answer is not guaranteed blind. Claim
+reachable files may describe it, so the answer is not guaranteed blind. Claim
 full blindness only when that boundary cannot reach incumbent material and state
 the basis. Wherever this applies, **state the qualification** where blindness is claimed.
 
