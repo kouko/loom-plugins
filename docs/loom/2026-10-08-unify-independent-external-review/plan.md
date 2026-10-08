@@ -1,0 +1,53 @@
+# Unified independent external review — plan
+intent: 2026-10-08-unify-independent-external-review@34ece76cee1980a8c4391b6401e7cafb528b8445
+spec: docs/loom/2026-10-08-unify-independent-external-review/spec.md@10fe4937
+charter: 1.1
+
+## Task DAG
+
+### Wave 1 — Shared outside execution boundary
+
+**W1-01 Explicit outside executor profile**  after: none  acceptance: 4, 5
+- Files: loom-code/skills/external-review/SKILL.md, loom-code/scripts/external_review.py, loom-code/tests/test_external_review.py
+- Test: A4 positive: explicit-codex-claude-agy; boundary: discovery-unavailable. A5 positive: accepted-evidence-level; negative: mismatch-timeout-no-fallback.
+- Risk: agent-decided — the named loom-code skill owns one executor boundary for every task; REQ-4/5 require explicit settings and truthful CLI-specific evidence.
+
+### Wave 2 — Route review tasks without changing their criteria
+
+**W2-01 Independent-advisor routing and consent**  after: W1-01  acceptance: 1, 2, 3
+- Files: loom-workflow/skills/independent-advisor/SKILL.md, loom-workflow/skills/independent-advisor/references/executor-detection.md, loom-workflow/skills/independent-advisor/references/dispatch-protocol.md, loom-workflow/skills/independent-advisor/test-prompts.json, loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py, loom-workflow/skills/independent-advisor/README.md, loom-workflow/skills/independent-advisor/README.ja.md, loom-workflow/skills/independent-advisor/README.zh-TW.md
+- Test: A1 positive: named-code-plan-decision-review; negative: failed-outside-distinct. A2 positive: owning-contract-verdict; negative: advisor-verdict-substitution. A3 positive: prompt-only-notice; negative: unapproved-probe.
+- Risk: agent-decided — invoke loom-code:external-review by skill name and retire duplicated probes; REQ-1/2/3 keep the incumbent review and opt-in boundary.
+
+**W2-02 Closing review retains incumbent and uses shared profile**  after: W1-01  acceptance: 1, 2, 5
+- Files: loom-code/skills/closing-review/SKILL.md, loom-code/scripts/loom_checker/reviewers.py, loom-code/scripts/loom_checker/attestation.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_claude_reviewer.py
+- Test: A1 positive: floor-one-adds-outside; negative: no-incumbent. A2 positive: same-lens-yaml; negative: invalid-verdict. A5 positive: explicit-pair-required; negative: default-fallback.
+- Risk: agent-decided — recompute a two-reviewer minimum for opted-in outside review and remove default-model fallback; REQ-1/2/5 preserve judgment and finalization integrity.
+
+### Wave 3 — Selection, integration and release
+
+**W3-01 Vendor selection and notice alignment**  after: W2-01, W2-02  acceptance: 3, 4, 5
+- Files: loom-code/scripts/second_vendor_policy.py, loom-code/tests/test_second_vendor_policy.py, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md, loom-workflow/skills/independent-advisor/references/report-contract.md
+- Test: A3 positive: opt-in-selection; negative: pending-no-execution. A4 positive: agy-selected-family; boundary: cross-family-CLI. A5 positive: provenance-disclosed; negative: unknown-family.
+- Risk: agent-decided — model provider family decides independence, not CLI branding; REQ-3/4/5 keep suggestion non-blocking.
+
+**W3-02 Loom-code release metadata**  after: W3-01  acceptance: 1, 2, 3, 4, 5
+- Files: loom-code/plugin.json, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/CHANGELOG.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md
+- Test: A1 positive: route-activation; negative: failed-leg. A2 positive: same-contract; negative: substituted-format. A3 positive: notice-only; negative: implicit-dispatch. A4 positive: explicit-pair; boundary: stale-candidate. A5 positive: visible-limitation; negative: silent-fallback.
+- Risk: agent-decided — sync the loom-code release mirrors after behavior stabilizes; REQ-1–5 need package and acceptance evidence.
+
+**W3-03 Loom-workflow release metadata**  after: W3-02  acceptance: 1, 2, 3, 4, 5
+- Files: loom-workflow/plugin.json, loom-workflow/.claude-plugin/plugin.json, loom-workflow/.codex-plugin/plugin.json, loom-workflow/CHANGELOG.md, loom-workflow/README.md, loom-workflow/README.ja.md, loom-workflow/README.zh-TW.md, README.md
+- Test: A1 positive: route-activation; negative: failed-leg. A2 positive: same-contract; negative: substituted-format. A3 positive: notice-only; negative: implicit-dispatch. A4 positive: explicit-pair; boundary: stale-candidate. A5 positive: visible-limitation; negative: silent-fallback.
+- Risk: agent-decided — sync workflow mirrors and root version pins before final review; REQ-1–5 need package and acceptance evidence.
+
+## Simplicity check
+- Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
+- Split release metadata by plugin while retaining all manifest and README mirrors — taken
+
+## Questions asked
+① — what — 上述問題與驗收條件是你要的嗎？ 回答「是」也會授權通過審查與發布檢查後，自動推送分支並建立 Ready PR；合併仍由你另行決定，你也可以在發布前明確取消自動發布。
+
+## Risks
+1. CLI discovery and result JSON may drift; bounded probes must fail clearly and cannot establish account entitlement for a future run.
+2. The current Claude and Antigravity outputs do not independently reveal every effective setting; report requested, accepted and observed evidence separately.
