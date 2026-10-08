@@ -75,6 +75,11 @@ charter: 1.1
 - Test: A5 negative: impossible-executor-family-or-evidence-pair-rejected; boundary: observed-model-and-effort-mismatch. A2 positive: legitimate-Claude-receipt-remains-valid.
 - Risk: agent-decided — the outside reviewer found that a forged receipt can claim Codex-only observation for Claude; the checker must reject impossible combinations rather than trust caller-supplied fields.
 
+**W5-04 Reject adversarial authorization and CLI contradictions**  after: W5-03  acceptance: 3, 4, 5, 6
+- Files: loom-code/scripts/external_review.py, loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_external_review.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_external_review_adversarial.py, loom-code/skills/external-review/SKILL.md
+- Test: A6 negative: missing authorization source blocks discovery. A4 negative: Claude alias tier mismatch fails; Codex model/list error fails. A5 negative: contradictory Claude receipt fails; legitimate profiles pass.
+- Risk: agent-decided — committed adversarial probes exposed three reachable false-success paths; reject them at the shared execution and receipt boundaries.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
