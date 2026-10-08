@@ -61,7 +61,7 @@ charter: 1.1
 ### Wave 5 — Close live outside-review findings and remove duplicate consent
 
 **W5-01 Direct-request authorization**  after: W4-03  acceptance: 3, 6
-- Files: loom-workflow/skills/independent-advisor/SKILL.md, loom-workflow/skills/independent-advisor/references/executor-detection.md, loom-code/skills/external-review/SKILL.md, loom-code/scripts/external_review.py, loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py, loom-code/tests/test_external_review.py
+- Files: loom-workflow/skills/independent-advisor/SKILL.md, loom-workflow/skills/independent-advisor/references/executor-detection.md, loom-code/skills/external-review/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-workflow/skills/independent-advisor/test-prompts.json, loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py
 - Test: A6 positive: named-agent-with-active-task-target-runs-after-disclosure; negative: suggestion-or-expanded-scope-stops. A3 negative: notice-does-not-authorize.
 - Risk: user-decided — a direct named request authorizes one bounded review without a second confirmation; disclosure remains visible, and missing or expanded choices stop dispatch.
 
@@ -87,4 +87,4 @@ charter: 1.1
 1. CLI discovery and result JSON may drift; bounded probes must fail clearly and cannot establish account entitlement for a future run.
 2. The current Claude and Antigravity outputs do not independently reveal every effective setting; report requested, accepted and observed evidence separately.
 3. CLI working directory does not confine file reads or prove that setup cannot write; the approval record discloses both limits before execution.
-4. An explicit user request now supplies the authorization that the old second confirmation supplied; the task must quote that request and stop if the provider or review target cannot be determined from it and active context, or the material scope widens.
+4. An explicit user request supplies authorization without second confirmation; quote that request and stop if the provider or review target cannot be determined from it and active context, or the material scope widens.
