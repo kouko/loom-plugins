@@ -11,6 +11,7 @@ from io import StringIO
 from pathlib import Path
 
 import external_review
+import pytest
 from loom_checker import attestation as attestation_module
 from loom_checker import digest, probes, reviewers
 from loom_checker.command_handlers import finalize, reviewer_count
@@ -345,6 +346,57 @@ def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path
     assert any("outside execution" in reason for _, reason in
                attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
                                                        CHANGE, attestation, manifest()))
+
+
+@pytest.mark.parametrize("selected,executor,model,family,level,observed_model,observed_effort", [
+    ("claude", "claude", "sonnet", "anthropic", "accepted-explicit-settings", "claude-sonnet-4-5", None),
+    ("codex", "codex", "gpt-6.1-sol", "openai", "observed-model-and-effort", "gpt-6.1-sol", "high"),
+    ("gemini", "agy", "gemini-2.5-pro", "google", "accepted-explicit-settings", None, None),
+])
+def test_outside_receipt_rejects_impossible_field_combinations(
+    tmp_path: Path, selected: str, executor: str, model: str, family: str,
+    level: str, observed_model: str | None, observed_effort: str | None,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(f"## Risks\nuser-decided — second-vendor selection-confirmed: {selected}\n")
+    commit(repo, "select outside review")
+    evidence = matching_attestation(repo)
+    outside = evidence["verdicts"][1]
+    outside.update(vendor=family, model=model)
+    evidence["verdicts"][0]["vendor"] = "anthropic" if family != "anthropic" else "openai"
+    receipt = {
+        "status": "completed", "executor": executor, "model": model,
+        "effort": "high", "family": family, "evidence_level": level,
+        "observed_model": observed_model, "observed_effort": observed_effort,
+        "output_digest": "a" * 64, "reviewer": outside["reviewer"],
+    }
+    outside["external_review"] = receipt
+    head = git(repo, "rev-parse", "HEAD")
+    assert attestation_module.validate_attestation(repo, head, CHANGE, evidence, manifest()) == []
+
+    alien_model = "sonnet" if family != "anthropic" else "gpt-6.1-sol"
+    impossible = [
+        {"evidence_level": "accepted-explicit-settings" if executor == "codex"
+         else "observed-model-and-effort"},
+        {"observed_model": None if executor != "agy" else "gemini-2.5-pro"},
+        {"observed_effort": None if executor == "codex" else "high"},
+        {"model": alien_model},
+        {"effort": "unsupported"},
+        {"executor": "claude" if executor != "claude" else "codex"},
+    ]
+    if executor == "claude":
+        impossible.append({"model": "claude-opus-4", "observed_model": "claude-sonnet-4-5"})
+    for fields in impossible:
+        receipt.update(fields)
+        outside["model"] = receipt["model"]
+        assert any("outside execution" in reason for _, reason in
+                   attestation_module.validate_attestation(repo, head, CHANGE, evidence, manifest()))
+        receipt.update(model=model, effort="high", executor=executor, evidence_level=level,
+                       observed_model=observed_model, observed_effort=observed_effort)
+        outside["model"] = model
 
 
 def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_path: Path) -> None:

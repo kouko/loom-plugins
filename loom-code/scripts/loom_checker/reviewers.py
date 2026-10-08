@@ -141,6 +141,34 @@ def outside_verdict_failure(verdicts: list[dict], family: str | None) -> str | N
                 "observed-model-and-effort", "accepted-explicit-settings"
             } or not re.fullmatch(r"[0-9a-f]{64}", str(receipt["output_digest"]))):
         return "selected outside execution receipt does not match its verdict"
+    # Reuse the runner's model-family classifier; a receipt is caller supplied
+    # evidence and must not claim observations that its executor cannot emit.
+    from external_review import EFFORTS, provider_family
+
+    executor = receipt["executor"]
+    model = receipt["model"]
+    effort = receipt["effort"]
+    observed_model = receipt["observed_model"]
+    observed_effort = receipt["observed_effort"]
+    if (not isinstance(model, str) or provider_family(model) != family or
+            effort not in EFFORTS):
+        return "selected outside execution receipt has an impossible model profile"
+    if executor == "codex":
+        valid = (family == "openai" and
+                 receipt["evidence_level"] == "observed-model-and-effort" and
+                 observed_model == model and observed_effort == effort)
+    elif executor == "claude":
+        valid = (family == "anthropic" and
+                 receipt["evidence_level"] == "accepted-explicit-settings" and
+                 isinstance(observed_model, str) and
+                 provider_family(observed_model) == family and
+                 (model in {"opus", "sonnet", "haiku"} or observed_model == model) and
+                 observed_effort is None)
+    else:  # Antigravity lists the selected model but does not report effective settings.
+        valid = (receipt["evidence_level"] == "accepted-explicit-settings" and
+                 observed_model is None and observed_effort is None)
+    if not valid:
+        return "selected outside execution receipt has impossible executor evidence"
     return None
 
 
