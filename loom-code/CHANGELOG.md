@@ -4,6 +4,8 @@
 
 - Add `external-review` as the shared outside execution boundary for Codex, Claude Code and Antigravity CLI. It requires recorded consent, an explicit model and effort, a bounded preflight, and a separately reported failure when execution or verification fails.
 - Closing review keeps its incumbent reviewer and its own verdict checks when an opted-in outside reviewer joins it. Candidate discovery and reported evidence reflect the selected model family and each CLI's observable limits.
+- Raise the counted-skill ceiling from 22 to 23 for the shared `external-review` handoff; a twenty-fourth counted skill still fails the measurement.
+- budget-exception: external-review — one shared executor boundary replaces duplicated outside-review probes while preserving each owning skill's verdict checks; eval loom-code/tests/test_external_review.py::test_consent_blocks_all_subprocesses.
 
 ## [3.38.0] — 2026-10-07 — a product one-way door asked at ① is not asked again at ②
 

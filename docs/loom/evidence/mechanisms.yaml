@@ -44,11 +44,14 @@ counting: >
   is not host-hygiene.
 
 mechanisms:
-  # --- skill (22; 7 stations + 12 non-standalone tools + 3 optional routers;
+  # --- skill (23; 7 stations + 13 non-standalone tools + 3 optional routers;
   #     the 2 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
     eval: tests/test_loom_skill_description_catalog.py
+  - id: external-review
+    class: skill
+    eval: loom-code/tests/test_external_review.py::test_consent_blocks_all_subprocesses
   - id: using-loom-design
     class: skill
     eval: tests/test_loom_skill_description_catalog.py

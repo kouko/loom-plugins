@@ -1,6 +1,7 @@
 ---
 name: external-review
-description: Execute one consented independent review through Codex, Claude Code, or Antigravity CLI with an explicit model and effort. The calling review skill keeps its own criteria and verdict checks.
+description: |
+  Execute one consented independent review through Codex, Claude Code, or Antigravity CLI with an explicit model and effort. The calling review skill keeps its own criteria and verdict checks.
 version: 1.0.0
 ---
 
