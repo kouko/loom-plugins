@@ -65,6 +65,11 @@ bounds needs a new choice. A provider or review target that cannot be determined
 from the direct request and active task also needs a choice before dispatch;
 material scope beyond that task is not covered by the request. A suggestion
 alone supplies no `authorization_source`.
+An accepted suggestion or `ask` answer uses
+`{"kind":"accepted-selection","selection":"<executor>","target":"<review target>"}`
+as its source. For a direct request, the quoted text must name the selected
+executor and the target must be nonempty. The script checks this record's
+shape; it cannot independently verify the user's words or acceptance.
 
 For Antigravity, the model's provider family may be unknown until the
 consented `agy models` result arrives. A bounded record may replace `family`

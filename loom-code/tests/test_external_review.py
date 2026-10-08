@@ -12,6 +12,10 @@ def consent(executor="codex", scope="/repo", model=None, effort="high"):
                       "agy": "gemini-2.5-pro"}[executor]
     return {
         "approved": True, "executor": executor, "review_root": scope,
+        "authorization_source": {
+            "kind": "direct-user-request", "quote": f"Use {executor} to review this change",
+            "target": "this change",
+        },
         "model": model, "effort": effort,
         "disclosures": {"cost": True, "vendor_egress": True,
                         "local_execution": True,
@@ -39,6 +43,43 @@ def test_consent_blocks_all_subprocesses(record):
     assert result["status"] == "failed"
     assert result["reason"] == "consent-missing-or-stale"
     assert calls == []
+
+
+@pytest.mark.parametrize("source", [None, {},
+    {"kind": "direct-user-request", "quote": "", "target": "this change"},
+    {"kind": "direct-user-request", "quote": "review this", "target": ""},
+    {"kind": "direct-user-request", "quote": "review this change", "target": "this change"},
+    {"kind": "suggestion", "quote": "Use codex", "target": "this change"},
+    {"kind": "accepted-selection", "selection": "", "target": "this change"},
+])
+def test_authorization_source_must_name_real_request_or_selection(source):
+    record = consent()
+    if source is None:
+        del record["authorization_source"]
+    else:
+        record["authorization_source"] = source
+    calls = []
+
+    def runner(*args, **kwargs):
+        calls.append(args)
+        raise AssertionError("outside process started")
+
+    result = review.discover("codex", "/repo", record, runner=runner)
+    assert result["reason"] == "consent-missing-or-stale"
+    assert calls == []
+
+
+def test_accepted_selection_source_allows_discovery():
+    record = consent()
+    record["authorization_source"] = {
+        "kind": "accepted-selection", "selection": "codex", "target": "this change",
+    }
+    result = review.discover(
+        "codex", "/repo", record,
+        runner=lambda argv, **kwargs: completed(
+            argv, json.dumps({"id": 2, "result": {"data": []}})),
+    )
+    assert result["status"] == "completed"
 
 
 def test_missing_host_read_disclosure_blocks_discovery():
@@ -134,6 +175,18 @@ def test_codex_discovery_ignores_non_object_json_lines():
     assert result["reason"].startswith("discovery-error:")
 
 
+def test_codex_model_list_error_is_discovery_failure():
+    response = {"jsonrpc": "2.0", "id": 2,
+                "error": {"code": -32000, "message": "not initialized"}}
+    result = review.discover(
+        "codex", "/repo", consent(),
+        runner=lambda argv, **kwargs: completed(argv, json.dumps(response)),
+    )
+    assert result["status"] == "failed"
+    assert result["reason"].startswith("discovery-error:")
+    assert "not initialized" in result["reason"]
+
+
 def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     calls = []
 
@@ -156,6 +209,21 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     assert result["observed_model"] == "claude-sonnet-4-5"
     assert result["observed_effort"] is None
     assert len(calls) == 2
+
+
+def test_claude_alias_rejects_observed_other_tier():
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        output = {"result": "ok", "modelUsage": {"claude-opus-4-1": {}}}
+        return completed(argv, json.dumps(output))
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            "review", consent("claude"), runner=runner)
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+    assert len(calls) == 1
 
 
 def test_agy_model_list_and_explicit_pair():

@@ -389,6 +389,7 @@ def test_outside_receipt_rejects_impossible_field_combinations(
     ]
     if executor == "claude":
         impossible.append({"model": "claude-opus-4", "observed_model": "claude-sonnet-4-5"})
+        impossible.append({"observed_model": "claude-opus-4-1"})
     for fields in impossible:
         receipt.update(fields)
         outside["model"] = receipt["model"]
@@ -433,6 +434,7 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
 
     consent = {
         "approved": True, "executor": "codex", "review_root": str(repo),
+        "authorization_source": {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change"},
         "model": "gpt-6.1-sol", "effort": "high",
         "disclosures": {
             "cost": True, "vendor_egress": True, "local_execution": True,

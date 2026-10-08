@@ -32,6 +32,33 @@ def provider_family(model: str) -> str | None:
     return None
 
 
+def claude_model_matches(requested: str, observed: str) -> bool:
+    """An alias may vary by version, but never by Opus/Sonnet/Haiku tier."""
+    if requested in {"opus", "sonnet", "haiku"}:
+        return bool(re.search(rf"(?:^|[-/]){requested}(?:[-/]|$)", observed.lower()))
+    return observed == requested
+
+
+def _authorization_valid(source: object, executor: str) -> bool:
+    if not isinstance(source, Mapping):
+        return False
+    target = source.get("target")
+    if not isinstance(target, str) or not target.strip():
+        return False
+    names = {"codex": r"(?<![A-Za-z])codex(?![A-Za-z])",
+             "claude": r"(?<![A-Za-z])claude(?![A-Za-z])",
+             "agy": r"(?<![A-Za-z])(?:agy|antigravity)(?![A-Za-z])"}
+    if source.get("kind") == "direct-user-request":
+        quote = source.get("quote")
+        return (isinstance(quote, str) and bool(quote.strip()) and
+                bool(re.search(names.get(executor, r"$^"), quote, re.IGNORECASE)))
+    if source.get("kind") == "accepted-selection":
+        selection = source.get("selection")
+        return (isinstance(selection, str) and
+                bool(re.fullmatch(names.get(executor, r"$^"), selection.strip(), re.IGNORECASE)))
+    return False
+
+
 def _consent_valid(record: Mapping[str, Any] | None, executor: str, scope: str,
                    model: str | None = None, effort: str | None = None,
                    family: str | None = None) -> bool:
@@ -40,6 +67,7 @@ def _consent_valid(record: Mapping[str, Any] | None, executor: str, scope: str,
     disclosures = record.get("disclosures")
     base = (
         record.get("approved") is True
+        and _authorization_valid(record.get("authorization_source"), executor)
         and record.get("executor") == executor
         and record.get("review_root") == scope
         and isinstance(disclosures, Mapping)
@@ -99,8 +127,14 @@ def _codex_candidates(runner: Runner, scope: str) -> list[str]:
             continue
         if message.get("id") != 2:
             continue
-        result = message.get("result", {})
-        rows = result.get("data", []) if isinstance(result, dict) else []
+        if "error" in message:
+            error = message["error"]
+            detail = error.get("message") if isinstance(error, dict) else str(error)
+            raise ValueError(f"codex model/list error: {detail}")
+        result = message.get("result")
+        rows = result.get("data") if isinstance(result, dict) else None
+        if not isinstance(rows, list):
+            raise ValueError("codex model/list result missing data array")
         return [row["id"] for row in rows if isinstance(row, dict) and isinstance(row.get("id"), str)]
     raise ValueError("codex model/list response missing")
 
@@ -179,7 +213,7 @@ def _claude_observation(output: str, model: str, family: str) -> tuple[str, str]
     names = list(usage)
     if any(provider_family(name) != family for name in names):
         raise ValueError("claude observed provider family mismatch")
-    if model not in {"opus", "sonnet", "haiku"} and any(name != model for name in names):
+    if any(not claude_model_matches(model, name) for name in names):
         raise ValueError("claude observed model mismatch")
     result = data.get("result")
     if not isinstance(result, str) or not result.strip():

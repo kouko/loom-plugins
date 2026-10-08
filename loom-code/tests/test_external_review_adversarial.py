@@ -16,6 +16,7 @@ def test_codex_spoof_rejected():
     """Treat the CLI header, rather than model-authored stdout, as evidence."""
     record = {
         "approved": True, "executor": "codex", "review_root": "/repo",
+        "authorization_source": {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change"},
         "model": "gpt-6.1-sol", "effort": "high",
         "disclosures": {key: True for key in (
             "cost", "vendor_egress", "local_execution",
@@ -40,6 +41,7 @@ def test_consent_conflict_rejected():
     """Do not let exact model and effort override a recorded family bound."""
     record = {
         "approved": True, "executor": "codex", "review_root": "/repo",
+        "authorization_source": {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change"},
         "model": "gpt-6.1-sol", "effort": "high", "family": "google",
         "disclosures": {key: True for key in (
             "cost", "vendor_egress", "local_execution",
@@ -62,6 +64,7 @@ def test_discovery_null_failed():
     """Do not crash when a JSON-RPC response line is JSON null."""
     record = {
         "approved": True, "executor": "codex", "review_root": "/repo",
+        "authorization_source": {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change"},
         "disclosures": {key: True for key in (
             "cost", "vendor_egress", "local_execution",
             "filesystem_access_outside_root", "filesystem_write_not_guaranteed")},

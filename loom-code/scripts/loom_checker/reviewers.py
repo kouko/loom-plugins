@@ -143,7 +143,7 @@ def outside_verdict_failure(verdicts: list[dict], family: str | None) -> str | N
         return "selected outside execution receipt does not match its verdict"
     # Reuse the runner's model-family classifier; a receipt is caller supplied
     # evidence and must not claim observations that its executor cannot emit.
-    from external_review import EFFORTS, provider_family
+    from external_review import EFFORTS, claude_model_matches, provider_family
 
     executor = receipt["executor"]
     model = receipt["model"]
@@ -162,7 +162,7 @@ def outside_verdict_failure(verdicts: list[dict], family: str | None) -> str | N
                  receipt["evidence_level"] == "accepted-explicit-settings" and
                  isinstance(observed_model, str) and
                  provider_family(observed_model) == family and
-                 (model in {"opus", "sonnet", "haiku"} or observed_model == model) and
+                 claude_model_matches(model, observed_model) and
                  observed_effort is None)
     else:  # Antigravity lists the selected model but does not report effective settings.
         valid = (receipt["evidence_level"] == "accepted-explicit-settings" and
