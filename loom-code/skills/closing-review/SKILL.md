@@ -168,10 +168,11 @@ the external CLI's default model or effort and never substitute another pair
 after rejection.
 
 Before any network-backed discovery, probe or review, give the user the
-cost, vendor-egress, `review_root` working directory, local-execution, and
-filesystem-access-outside-root disclosures and retain their approval in the
+cost, vendor-egress, `review_root` working directory, local-execution,
+`filesystem_access_outside_root`, and `filesystem_write_not_guaranteed`
+disclosures and retain their approval in the
 external skill's JSON consent record. The working directory does not confine
-the CLI's file reads. An earlier fixed
+the CLI's file reads or guarantee it cannot write files. An earlier fixed
 setting without these disclosures is insufficient; resolve its confirmation
 at the existing intent decision point. A changed executor or `review_root`
 requires fresh approval. Pass the consent record and exact root to the shared

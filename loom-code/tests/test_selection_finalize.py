@@ -485,6 +485,26 @@ def test_reviewers_skipped_in_plain_words_leave_the_change_unattested(tmp_path: 
     assert verification.verification_status(repo, CHANGE) == "absent"
 
 
+def test_selected_outside_review_with_skipped_reviewers_stays_unattested(
+    tmp_path: Path,
+) -> None:
+    repo = make_repo(tmp_path)
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(
+        "## Risks\nuser-decided — second-vendor selection-confirmed: claude\n",
+        encoding="utf-8",
+    )
+    commit_all(repo, "select outside review")
+
+    refused = finalize(repo, review_input(tmp_path, [], []))
+
+    assert refused.returncode == 1
+    assert "finalize.verdicts" in refused.stderr
+    assert not (repo / f"docs/loom/{CHANGE}/attestation.json").exists()
+    assert verification.verification_status(repo, CHANGE) == "absent"
+
+
 def test_v2_without_selection_keeps_every_floor(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     write_probes(repo, 1)
