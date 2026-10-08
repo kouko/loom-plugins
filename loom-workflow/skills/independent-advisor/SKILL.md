@@ -19,10 +19,21 @@ execution record also needs the actual selected model ID and provider family.
 ## Explicit outside review
 
 When the user explicitly requests an outside coding agent to review code, plan,
-or decision, route that review through `loom-code:external-review` by skill
-name. Keep the incumbent reviewer and its result separately attributable. The
-owning review skill supplies its task packet, criteria, verdict format and
-result checks; it accepts or rejects the returned verdict. The advisor does
+or decision, identify the review owner before invoking
+`loom-code:external-review` by skill name:
+
+- Code branch review: `loom-code:closing-review` owns its code lens,
+  reviewer YAML and finalization checks.
+- Loom implementation plan review: `loom-code:write-plan` owns the fresh
+  `plan`-lens review before Build.
+- A proposal or complexity decision: `loom-workflow:critique` owns the
+  applicable `proposal` or `complexity` criteria. If no existing Loom review
+  contract fits the decision, use an advisor audit consultation and its report
+  contract; do not present it as a verdict from a nonexistent owner.
+
+The selected owner assembles the review packet with its requirements and
+validates the returned verdict against its own format and checks. Keep the
+incumbent reviewer and its result separately attributable. The advisor does
 not substitute its `explore`/`audit` comparison verdict or report template for
 the owning review skill's contract. A failed or unverified outside execution
 is a separately attributed failure, never a completed independent review.

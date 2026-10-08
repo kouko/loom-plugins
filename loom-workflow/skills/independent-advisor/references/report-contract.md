@@ -51,8 +51,10 @@ Record exactly one key per rejected leg output:
 
 `coverage_disclaimer`:
 
-> This consultation covers the material listed in `evidence paths` as of the
-> pinned revision. Anything outside that list was not looked at.
+> The dispatch packet was assembled from the listed `evidence paths` at the
+> pinned revision. That describes the prepared material, not every file the
+> outside CLI may have read. The CLI can access files beyond `review_root`;
+> this consultation cannot attest which other files the CLI accessed.
 
 A degraded run's disclosure, in the report body rather than a footnote:
 

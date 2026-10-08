@@ -20,6 +20,7 @@ README_ZHTW = SKILL_DIR / "README.zh-TW.md"
 SKILL = SKILL_DIR / "SKILL.md"
 DETECTION = SKILL_DIR / "references" / "executor-detection.md"
 DISPATCH = SKILL_DIR / "references" / "dispatch-protocol.md"
+REPORT = SKILL_DIR / "references" / "report-contract.md"
 PROMPTS = SKILL_DIR / "test-prompts.json"
 
 READMES = [
@@ -137,3 +138,21 @@ def test_readmes_and_prompts_cover_outside_reviews():
                    "external-review" in case["expected_behavior"]
                    for case in prompts)
     assert len(cases) == len(prompts)
+
+
+def test_explicit_review_selects_a_real_owner_before_external_execution():
+    skill = SKILL.read_text(encoding="utf-8")
+    dispatch = DISPATCH.read_text(encoding="utf-8")
+    for owner in ("loom-code:closing-review", "loom-code:write-plan", "loom-workflow:critique"):
+        assert owner in skill
+    assert "advisor audit consultation" in skill
+    assert "assembles the review packet" in skill
+    assert "validates the returned verdict" in skill
+    assert "owning review skill" in dispatch
+
+
+def test_coverage_disclaimer_does_not_claim_unobserved_file_access():
+    report = REPORT.read_text(encoding="utf-8")
+    assert "dispatch packet" in report.lower()
+    assert "cannot attest which other files the CLI accessed" in report
+    assert "Anything outside that list was not looked at" not in report

@@ -5,7 +5,12 @@ blindness, and for the two bias controls live in `SKILL.md`; this file carries
 the packet's required sections and the normalisation template.
 
 For an explicit outside code, plan, or decision review, the owning review skill
-defines the review packet and verdict contract. Pass that packet to
+assembles the review packet and defines the verdict contract. Select that
+owner before outside execution: `loom-code:closing-review` for code branch
+review, `loom-code:write-plan` for its implementation-plan lens, or
+`loom-workflow:critique` for its proposal/complexity decision lens. With no
+applicable owner, use the advisor's `audit` consultation contract. Pass the
+owner's packet to
 `loom-code:external-review` by skill name; do not replace its criteria or
 result checks with this consultation's shared-card template. This file's four
 sections and cards apply to `explore`/`audit` consultations only.
@@ -17,7 +22,8 @@ Every dispatch carries these four sections, written out in this order:
 1. `decision statement` — what is being decided, in one sentence.
 2. `rejected options` — the options already ruled out, each with the reason it
    was rejected.
-3. `evidence paths` — the file paths the executor may open.
+3. `evidence paths` — the file paths supplied for the task; this list does
+   not restrict which other files the CLI can open.
 4. `incumbent proposal` — the current answer being challenged. The `proposer`
    leg's packet is assembled without this section; see `SKILL.md`.
 
