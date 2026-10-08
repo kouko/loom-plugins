@@ -16,6 +16,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
+from prose_pin import has_negation
+
 REPO = Path(__file__).resolve().parents[2]
 FIRST_MESSAGE_COPIES = [
     REPO / "loom-code/skills/write-plan/references/confirm-intent.md",
@@ -23,7 +27,12 @@ FIRST_MESSAGE_COPIES = [
 ]
 LITERAL = re.compile(r"\bno spec\b|\bwithout a spec\b", re.IGNORECASE)
 AFFIRMATIVE_VERB = re.compile(r"\bask(?:ed|s)?\b", re.IGNORECASE)
-NEGATION = re.compile(r"\b(?:never|not|nothing|nor)\b|n't\b", re.IGNORECASE)
+NOTHING = re.compile(r"\bnothing\b", re.IGNORECASE)
+
+
+def _negated(sentence: str) -> bool:
+    """The shared prose-pin negation words, plus `nothing`."""
+    return has_negation(sentence) or bool(NOTHING.search(sentence))
 
 
 def _sentences(text: str) -> list[str]:
@@ -44,7 +53,9 @@ def _affirms_no_spec_route(paragraph: str) -> bool:
         literal = LITERAL.search(sentence)
         if not literal:
             continue
-        if NEGATION.search(sentence):
+        # The pinned literal itself ("no spec", "without a spec") is masked,
+        # or its own negation word would reject every affirmative sentence.
+        if _negated(sentence[: literal.start()] + sentence[literal.end():]):
             continue
         if AFFIRMATIVE_VERB.search(sentence[: literal.start()]):
             return True
@@ -58,6 +69,7 @@ def test_detector_affirmative_example_accepted() -> None:
         "They are asked here instead when no spec is written."
     )
     assert _affirms_no_spec_route(sample)
+    assert _affirms_no_spec_route("They are asked here when the change goes without a spec.")
 
 
 def test_detector_negated_example_rejected() -> None:
@@ -67,6 +79,19 @@ def test_detector_negated_example_rejected() -> None:
         "They are never asked here, even when no spec is written."
     )
     assert not _affirms_no_spec_route(sample)
+
+
+@pytest.mark.parametrize("sentence", [
+    "No one has them asked here when no spec is written.",
+    "They cannot be asked here when no spec is written.",
+    "Without a review they are asked nowhere when no spec is written.",
+    "Neither copy has them asked here when no spec is written.",
+    "Nobody has them asked here when no spec is written.",
+    "Nothing is asked here when no spec is written.",
+])
+def test_detector_rejects_shared_negation_words(sentence: str) -> None:
+    """Every shared negation word, and `nothing`, defeats the pin."""
+    assert not _affirms_no_spec_route(sentence)
 
 
 def test_first_message_product_door_without_spec_has_a_stop() -> None:

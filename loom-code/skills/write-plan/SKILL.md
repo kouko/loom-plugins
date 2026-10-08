@@ -86,12 +86,12 @@ there are no other **decision points**. On Codex there is also one
 non-decision authorisation stop, when the plugin is installed or updated
 (step 0b) — it asks permission to run, not a decision about the work.
 
-1. At ①, restate the intent; merge one-way doors ② skips,
-   the `second-vendor: ask` question, and required principles interview.
+1. At ①, restate intent; merge one-way doors ② skips,
+   `second-vendor: ask` question, and required principles interview.
 2. At ②, only for a product spec you write: confirm visible behaviour,
-   carried details, product one-way doors. Ask nothing about plan structure; record agent
-   decisions with reasons.
-3. At ③, the user accepts or rejects the report against every Acceptance line.
+   carried details, product one-way doors not asked at ①. Ask nothing
+   about plan structure; record agent decisions with reasons.
+3. At ③, the user accepts or rejects the report per Acceptance line.
 
 `second-vendor: suggest` only emits a non-blocking notice after the plan exists.
 
@@ -290,14 +290,15 @@ code.
 
 <!-- gate: write-plan.product-spec-needs-confirmed-behavior -->
 **A product spec needs `confirmed-behavior:` before it becomes a plan.**
-When `kind: product`, decision point ② belongs to whoever wrote the spec:
-if you wrote it, you run it. Present the Requirements, UI flows and product
+When `kind: product`, decision point ② belongs to whoever wrote the spec.
+Present the Requirements, UI flows and product
 one-way doors in plain words — "you type ___ and you see ___; when ___
-happens it will ___" — and nothing from `## Design decision` down, ever. On
+happens it will ___" — and nothing from `## Design decision` down, ever.
+Doors asked at ① are not asked again at ②. On
 "yes", write `confirmed-behavior: <date> @<spec sha7>` into the spec
 frontmatter, where `<spec sha7>` is the first seven characters of
 `git hash-object docs/loom/<change-id>/spec.md` after the spec's last
-edit — it pins which text the user said yes to. On a correction, rewrite,
+edit, pinning the text the user approved. On a correction, rewrite,
 present again, and recompute the hash. Engineering changes skip this.
 
 ### The intake check — both branches, every time

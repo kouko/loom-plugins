@@ -3,6 +3,10 @@
 import re
 from pathlib import Path
 
+import pytest
+
+from prose_pin import has_negation
+
 
 ROOT = Path(__file__).resolve().parents[2]
 WRITE_PLAN = ROOT / "loom-code/skills/write-plan/SKILL.md"
@@ -58,7 +62,12 @@ def test_write_plan_readback_has_no_mermaid() -> None:
 
 _DOORS = re.compile(r"\bproduct one-way doors\b", re.IGNORECASE)
 _PRESENT = re.compile(r"\bpresent\b", re.IGNORECASE)
-_NEGATION = re.compile(r"\b(?:never|not|nothing|nor)\b|n't\b", re.IGNORECASE)
+_NOTHING = re.compile(r"\bnothing\b", re.IGNORECASE)
+
+
+def _negated(sentence: str) -> bool:
+    """The shared prose-pin negation words, plus `nothing`."""
+    return has_negation(sentence) or bool(_NOTHING.search(sentence))
 
 
 def _presents_doors(text: str) -> bool:
@@ -68,7 +77,7 @@ def _presents_doors(text: str) -> bool:
     """
     for sentence in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text)):
         doors = _DOORS.search(sentence)
-        if doors and not _NEGATION.search(sentence) \
+        if doors and not _negated(sentence) \
                 and _PRESENT.search(sentence[: doors.start()]):
             return True
     return False
@@ -80,10 +89,62 @@ def test_doors_detector_affirmative_accepted_negated_rejected() -> None:
     assert not _presents_doors("Never present the Requirements or product one-way doors here.")
 
 
+@pytest.mark.parametrize("sentence", [
+    "Present no Requirements and no product one-way doors here.",
+    "You cannot present the product one-way doors here.",
+    "Present the Requirements without the product one-way doors.",
+    "Neither agent may present the product one-way doors.",
+    "Nobody may present the product one-way doors here.",
+    "Present nothing about the product one-way doors.",
+])
+def test_doors_detector_rejects_shared_negation_words(sentence: str) -> None:
+    """Self-test: every shared negation word, and `nothing`, defeats the pin."""
+    assert not _presents_doors(sentence)
+
+
 def test_product_gate_presents_product_one_way_doors() -> None:
     """Decision point ② presents the product one-way doors routed to it from ①."""
     gate = _section(_STEP4).split(_PRODUCT_GATE, 1)[1].split("### ", 1)[0]
     assert _presents_doors(gate)
+
+
+ONE_WAY_DOOR = ROOT / "loom-code/skills/write-plan/references/one-way-door.md"
+
+
+_NO_REASK = re.compile(r"\b(?:not asked|does not ask (?:them|it))\s+again at ②")
+
+
+def _says_no_reask(text: str) -> bool:
+    """A sentence says a door already asked at ① is not asked again at ②.
+
+    The negation is tied to the verb right before "again at ②"; a negation
+    elsewhere in the sentence ("asked again at ②, never skipped") flips it.
+    """
+    for sentence in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text)):
+        if "①" in sentence and _NO_REASK.search(sentence):
+            return True
+    return False
+
+
+@pytest.mark.parametrize("sentence, expected", [
+    ("Doors asked at ① are not asked again at ②.", True),
+    ("Doors at ① are asked again at ②, never skipped.", False),
+    ("a spec written later asks them again at ②, not trusting ①.", False),
+])
+def test_no_reask_detector_ties_negation_to_verb(sentence: str, expected: bool) -> None:
+    """Self-test: only a negated verb before "again at ②" counts as no-reask."""
+    assert _says_no_reask(sentence) is expected
+
+
+def test_product_gate_and_merge_gate_skip_doors_asked_at_one() -> None:
+    """Acceptance 2: a product door asked at ① is not asked again at ②."""
+    gate = _section(_STEP4).split(_PRODUCT_GATE, 1)[1].split("### ", 1)[0]
+    assert _says_no_reask(gate)
+    merge = ONE_WAY_DOOR.read_text(encoding="utf-8").split("**Merge.**", 1)[1]
+    assert _says_no_reask(merge.split("\n## ", 1)[0])
+    asked = _text().split("## What you will be asked", 1)[1]
+    item2 = re.sub(r"\s+", " ", asked.split("\n2. ", 1)[1].split("\n3. ", 1)[0])
+    assert "product one-way doors not asked at ①" in item2
 
 
 def test_template_placeholder_names_table_and_diagram() -> None:

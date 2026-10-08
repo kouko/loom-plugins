@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.38.0] — 2026-10-07 — a product one-way door asked at ① is not asked again at ②
+
+- Write-plan's ② gate, its "what you will be asked" item 2 and `one-way-door.md`'s merge gate now state that a product one-way door already asked at decision point ① is not asked again at ②.
+- The two prose-pin tests now use the shared `prose_pin` negation matcher, and each also rejects `nothing`, which the shared matcher leaves out.
+
 ## [3.37.0] — 2026-10-06 — write-plan asks product one-way doors at decision point ②, and adversary trial cases stay uncommitted
 
 - Write-plan's decision point ① now merges engineering one-way doors; a product change's one-way doors, class (e) actions included, are asked at decision point ② of the station writing its spec — `loom-design:write-spec`, or write-plan itself when it writes the spec — and, when no spec will be written, in the decision point ① message as before, so no irreversible action goes unasked; write-plan's own ② gate now lists those product one-way doors. It used to merge any expensive-to-undo choice at ①. The `restate-and-confirm` summary in `contract/manifest.yaml`, the SessionStart hook's decision-point lines, `one-way-door.md`'s merge gate, the repo's `AGENTS.md` flow line and the READMEs (en / ja / zh-TW) state the same split. The `test-prompts.json` edge case for an unconfirmed intent now expects the same split.
