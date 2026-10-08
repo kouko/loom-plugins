@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import sys
+import yaml
 from io import StringIO
 from pathlib import Path
 
@@ -321,7 +322,7 @@ def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path
             {"reviewer": "native", "vendor": "openai", "model": "test",
              "lens": "docs", "verdict": "PASS", "findings": []},
             {"reviewer": "outside-1", "vendor": "anthropic", "model": "sonnet",
-             "lens": "docs", "verdict": "PASS", "findings": [],
+             "lens": "docs", "reviewed_sha": "HEAD", "verdict": "PASS", "findings": [],
              "external_review": {
                  "status": "completed", "reason": None, "executor": "claude",
                  "requested_model": "sonnet", "requested_effort": "high",
@@ -409,9 +410,23 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
         {"reviewer": "native", "vendor": "anthropic", "model": "sonnet",
          "lens": "docs", "verdict": "PASS", "findings": []},
         {"reviewer": "outside", "vendor": "openai", "model": "gpt-6.1-sol",
-         "lens": "docs", "verdict": "PASS", "findings": [], "external_review": result},
+         "lens": "docs", "reviewed_sha": "HEAD", "verdict": "PASS",
+         "findings": [], "external_review": result},
     ]
     review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert any("required reviewer YAML" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+
+    raw = (
+        "verdict: PASS\nlens: docs\nreviewed_sha: HEAD\n"
+        "dimension_scores:\n"
+        "  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n"
+        "  incorrect-fact: PASS\n  missing-population: PASS\n"
+        "  deletion-first: PASS\nfindings: []\nnotes: []\n"
+    )
+    result["review_output"] = raw
     review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
                                         "adversarial": []}), encoding="utf-8")
     assert finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()) == []
@@ -428,6 +443,25 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
     review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
                                         "adversarial": []}), encoding="utf-8")
     assert any("output differs from its verdict" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    verdicts[1]["lens"] = "docs"
+    for malformed in (
+        raw.replace("  deletion-first: PASS\n", ""),
+        raw.replace("  omission: PASS", "  omission: UNKNOWN"),
+        raw.replace("reviewed_sha: HEAD", "reviewed_sha: OTHER"),
+    ):
+        result["review_output"] = malformed
+        review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                            "adversarial": []}), encoding="utf-8")
+        assert any("required reviewer YAML" in reason for _, reason in
+                   finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    finding = {"severity": "important", "dimension": "omission", "anchor": "",
+               "text": "issue: missing fact", "fix": "add it"}
+    verdicts[1]["findings"] = [finding]
+    result["review_output"] = raw.replace("findings: []", yaml.safe_dump({"findings": [finding]}).strip())
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert any("malformed reviewer findings" in reason for _, reason in
                finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
 
 

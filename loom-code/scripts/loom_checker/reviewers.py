@@ -17,6 +17,65 @@ import yaml
 
 _LOW_RISK_DOC_EXTENSIONS = frozenset({".md", ".mdx", ".rst", ".txt"})
 _OUTSIDE_FAMILIES = {"claude": "anthropic", "codex": "openai", "gemini": "google"}
+_DOC_DIMENSIONS = frozenset({
+    "omission", "ambiguity", "inconsistency", "incorrect-fact",
+    "missing-population", "deletion-first",
+})
+_REVIEW_DIMENSIONS = {
+    "docs": _DOC_DIMENSIONS,
+    "skill": _DOC_DIMENSIONS | {"user-judgment-leak"},
+    "spec": _DOC_DIMENSIONS | {"spec-conformance", "design-conformance",
+                               "principles-conformance", "user-judgment-leak"},
+    "spec+adversarial": _DOC_DIMENSIONS | {"spec-conformance", "design-conformance",
+                                           "principles-conformance", "user-judgment-leak"},
+    "code": frozenset({
+        "security", "architecture", "correctness", "naming", "tests",
+        "refactoring", "cross-task-coherence", "external-surface-grounding",
+        "principles-conformance", "architecture-conformance",
+        "deliberate-simplification", "deletion-first",
+    }),
+    "design": frozenset({"design-conformance"}),
+    "principles": frozenset({"principles-conformance"}),
+    "plan": frozenset({"deletion-first"}),
+}
+
+
+def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
+    """Check the required owning-reviewer fields before accepting outside YAML."""
+    if not isinstance(parsed, dict):
+        return "selected outside execution lacks required reviewer YAML"
+    if any(parsed.get(key) != verdict.get(key) for key in ("verdict", "lens", "findings")):
+        return "selected outside execution output differs from its verdict"
+    lens = verdict.get("lens")
+    expected = _REVIEW_DIMENSIONS.get(lens) if isinstance(lens, str) else None
+    scores = parsed.get("dimension_scores")
+    if (expected is None or not isinstance(scores, dict) or set(scores) != expected or
+            any(not isinstance(score, str) or
+                (score not in {"PASS", "PASS_WITH_NOTES", "NEEDS_REVISION"}
+                 and not re.fullmatch(r"N/A — .+", score))
+                for score in scores.values()) or
+            not isinstance(parsed.get("reviewed_sha"), str) or
+            not parsed["reviewed_sha"].strip() or
+            parsed["reviewed_sha"] != verdict.get("reviewed_sha")):
+        return "selected outside execution lacks required reviewer YAML"
+    findings = parsed.get("findings")
+    if not isinstance(findings, list):
+        return "selected outside execution lacks required reviewer YAML"
+    for finding in findings:
+        if (not isinstance(finding, dict) or
+                finding.get("severity") not in {"fatal", "important", "nit"} or
+                not isinstance(finding.get("dimension"), str) or
+                finding["dimension"] not in expected or
+                not isinstance(finding.get("anchor"), str) or
+                not re.search(r":\d+$| :: .+", finding["anchor"]) or
+                not isinstance(finding.get("text"), str) or
+                not re.match(r"^(praise|nitpick|suggestion|issue|todo|question|thought|chore|note)(?:\s*\([^)]*\))?:", finding["text"]) or
+                not isinstance(finding.get("fix"), str) or not finding["fix"].strip()):
+            return "selected outside execution has malformed reviewer findings"
+    notes = parsed.get("notes", [])
+    if not isinstance(notes, list) or len(notes) > 3 or any(not isinstance(n, str) for n in notes):
+        return "selected outside execution has malformed reviewer notes"
+    return None
 
 
 def selected_outside_family(repo: Path, change_id: str, head_sha: str | None = None) -> str | None:
@@ -96,9 +155,9 @@ def attach_outside_receipt(verdicts: list[dict], family: str | None) -> tuple[li
         parsed = yaml.safe_load(output)
     except yaml.YAMLError:
         return prepared, "selected outside execution output is invalid YAML"
-    if not isinstance(parsed, dict) or any(parsed.get(key) != verdict.get(key) for key in
-                                           ("verdict", "lens", "findings")):
-        return prepared, "selected outside execution output differs from its verdict"
+    yaml_failure = _review_yaml_failure(parsed, verdict)
+    if yaml_failure:
+        return prepared, yaml_failure
     if result.get("status") != "completed" or result.get("reason") is not None:
         return prepared, "selected outside execution did not complete"
     verdict["external_review"] = {
