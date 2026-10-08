@@ -93,10 +93,15 @@ def selected_outside_family(repo: Path, change_id: str, head_sha: str | None = N
     head = head_sha or git_maybe(repo, "rev-parse", "HEAD")
     if not head:
         return None
-    plan = git_maybe(repo, "show", f"{head}:docs/loom/{change_id}/plan.md") or ""
+    plan = git_maybe(repo, "show", f"{head}:docs/loom/{change_id}/plan.md")
+    # A skipped plan has no Risks section. Its confirmed intent carries the
+    # same explicit selection in Constraints, so the gate can still recompute it.
+    record = plan if plan is not None else (
+        git_maybe(repo, "show", f"{head}:docs/loom/intent/{change_id}.md") or ""
+    )
     matches = re.findall(
         r"(?m)^\s*(?:\d+\.\s*)?user-decided\s+—\s+second-vendor "
-        r"selection-confirmed:\s*(claude|codex|gemini)\s*$", plan,
+        r"selection-confirmed:\s*(claude|codex|gemini)\s*$", record,
     )
     if matches:
         return _OUTSIDE_FAMILIES[matches[-1]]

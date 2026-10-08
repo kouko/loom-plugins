@@ -256,6 +256,55 @@ def test_matching_low_risk_attestation_accepts_one_reviewer(tmp_path: Path) -> N
     ) == []
 
 
+def test_skipped_plan_intent_selection_requires_outside_reviewer(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "## Constraints\nuser-decided — second-vendor selection-confirmed: claude\n",
+        encoding="utf-8",
+    )
+    commit(repo, "record outside choice without plan")
+    assert not (repo / f"docs/loom/{CHANGE}/plan.md").exists()
+    monkeypatch.chdir(repo)
+    out = StringIO()
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, StringIO()) == 0
+    assert out.getvalue() == "2\n"
+
+    evidence = matching_attestation(repo)
+    evidence["verdicts"] = evidence["verdicts"][:1]
+    head = git(repo, "rev-parse", "HEAD")
+    assert any("two distinct reviewers" in reason for _, reason in
+               attestation_module.validate_attestation(repo, head, CHANGE,
+                                                       evidence, manifest()))
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": evidence["verdicts"],
+                                        "findings": [], "adversarial": []}),
+                            encoding="utf-8")
+    assert any("two distinct reviewers" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    evidence["verdicts"].append({"reviewer": "second", "vendor": "anthropic",
+                                 "model": "sonnet", "lens": "code",
+                                 "verdict": "PASS", "findings": []})
+    assert any("outside execution" in reason for _, reason in
+               attestation_module.validate_attestation(repo, head, CHANGE,
+                                                       evidence, manifest()))
+    review_input.write_text(json.dumps({"verdicts": evidence["verdicts"],
+                                        "findings": [], "adversarial": []}),
+                            encoding="utf-8")
+    assert any("outside execution" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: codex\n")
+    commit(repo, "plan overrides intent selection")
+    assert reviewers.selected_outside_family(repo, CHANGE) == "openai"
+
+
 def test_selected_outside_review_raises_narrow_floor_and_requires_both_families(
     tmp_path: Path, monkeypatch,
 ) -> None:

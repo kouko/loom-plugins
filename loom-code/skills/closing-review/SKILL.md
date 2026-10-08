@@ -140,8 +140,10 @@ reviewer and pass no `verdicts`.
   standing fixed CLI, the per-change `ask` answer, or a committed
   `user-decided — second-vendor selection-confirmed: <vendor>` plan line, or a
   direct user request naming an outside coding agent for the active code branch.
-  Record an accepted `ask` answer or direct request with that same line before
-  reviewing, so
+  Record an accepted `ask` answer or direct request with that same line in
+  the plan's `## Risks`, or in the confirmed intent's `## Constraints` when
+  plan is skipped, before reviewing. The committed plan selection takes
+  precedence when both records exist, so
   `reviewer-count`, finalization and attestation validation can recompute it.
   With no selection, do not start external execution. Compare the selected
   model's provider family with the current host model's family when that
