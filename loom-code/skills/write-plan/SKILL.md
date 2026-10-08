@@ -81,17 +81,13 @@ questions in intent; never create a substitute plan.
 
 ## What you will be asked, in plain words
 
-Give the user this list if they ask what is coming. It is the whole list:
-there are no other **decision points**. On Codex there is also one
-non-decision authorisation stop, when the plugin is installed or updated
-(step 0b) — it asks permission to run, not a decision about the work.
+If asked, give this complete decision-point list. Codex's plugin-install
+authorisation (step 0b) permits execution; it is not a work decision.
 
-1. At ①, restate intent; merge one-way doors ② skips, the
-   `second-vendor: ask` question when no qualifying direct user request
-   already names the outside coding agent and an unambiguous review target,
-   and the required principles interview. That direct user request authorizes
-   one review without a second question; show non-blocking disclosures before
-   execution.
+1. At ①, restate intent; merge one-way doors ② skips, any unanswered
+   `second-vendor: ask` choice, and the required principles interview.
+   A direct user request naming an outside agent and unambiguous target
+   runs without a second question; disclose before execution.
 2. At ②, only for a product spec you write: confirm visible behaviour,
    carried details, product one-way doors not asked at ①. Ask nothing
    about plan structure; record agent decisions with reasons.
@@ -426,12 +422,9 @@ exactly these keys: `contract_version` (integer 1), `configured_mode`,
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/second_vendor_policy.py
 ```
 
-On any other host, use the `<loom-code>` root defined in step 0. Treat the
-JSON result as the decision: render its `notice_kind`, `notice_vendor`, and
-`recommendation_reasons`; do not reproduce the risk mapping in prose. A
-notice is commentary, not a decision point, and work continues without
-waiting. The reference owns response timing and the
-no-listener boundary.
+Treat the JSON result as the decision: render its `notice_kind`,
+`notice_vendor`, and `recommendation_reasons`; do not repeat risk mapping.
+The reference owns notice timing and the no-listener boundary.
 
 **Forks you decided yourself.** Every one gets a one-line reason on its
 task: what you chose and why. Any one-way door that surfaces now — after
