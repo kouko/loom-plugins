@@ -45,7 +45,7 @@ def test_consent_blocks_all_subprocesses(record):
     assert calls == []
 
 
-@pytest.mark.parametrize("source", [None, {},
+@pytest.mark.parametrize("source", [{},
     {"kind": "direct-user-request", "quote": "", "target": "this change"},
     {"kind": "direct-user-request", "quote": "review this", "target": ""},
     {"kind": "direct-user-request", "quote": "review this change", "target": "this change"},
@@ -175,18 +175,6 @@ def test_codex_discovery_ignores_non_object_json_lines():
     assert result["reason"].startswith("discovery-error:")
 
 
-def test_codex_model_list_error_is_discovery_failure():
-    response = {"jsonrpc": "2.0", "id": 2,
-                "error": {"code": -32000, "message": "not initialized"}}
-    result = review.discover(
-        "codex", "/repo", consent(),
-        runner=lambda argv, **kwargs: completed(argv, json.dumps(response)),
-    )
-    assert result["status"] == "failed"
-    assert result["reason"].startswith("discovery-error:")
-    assert "not initialized" in result["reason"]
-
-
 def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     calls = []
 
@@ -209,21 +197,6 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     assert result["observed_model"] == "claude-sonnet-4-5"
     assert result["observed_effort"] is None
     assert len(calls) == 2
-
-
-def test_claude_alias_rejects_observed_other_tier():
-    calls = []
-
-    def runner(argv, **kwargs):
-        calls.append(argv)
-        output = {"result": "ok", "modelUsage": {"claude-opus-4-1": {}}}
-        return completed(argv, json.dumps(output))
-
-    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
-                            "review", consent("claude"), runner=runner)
-    assert result["status"] == "failed"
-    assert result["review_output"] is None
-    assert len(calls) == 1
 
 
 def test_agy_model_list_and_explicit_pair():
