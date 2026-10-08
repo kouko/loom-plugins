@@ -76,7 +76,40 @@ def test_agy_local_presence_without_model_gives_unverified_nonblocking_notice() 
     assert result["wait_for_user"] is False
 
 
-def test_unverified_agy_cannot_be_accepted_as_a_vendor() -> None:
+def test_unverified_agy_opt_in_authorizes_bounded_discovery_only() -> None:
+    result = second_vendor_policy.resolve(packet(
+        host_vendor="claude", usable_vendors=[{"executor": "agy"}],
+        response="accept",
+    ))
+
+    assert result["notice_kind"] == "discovery-authorized"
+    assert result["reason_code"] == "model-discovery-authorized"
+    assert result["effective_vendor"] is None
+    assert result["effective_executor"] == "agy"
+    assert result["allowed_vendors"] == ["codex", "gemini"]
+    assert result["wait_for_user"] is False
+
+    confirmed = second_vendor_policy.resolve(packet(
+        host_vendor="claude", usable_vendors=[
+            candidate("agy", "gemini-2.5-pro", "gemini")],
+        response="accept", response_vendor="gemini",
+    ))
+    assert confirmed["notice_kind"] == "selection-confirmed"
+    assert confirmed["effective_vendor"] == "gemini"
+    assert confirmed["effective_model"] == "gemini-2.5-pro"
+
+
+def test_unverified_agy_late_opt_in_is_next_change_only() -> None:
+    result = second_vendor_policy.resolve(packet(
+        usable_vendors=[{"executor": "agy"}], response="accept",
+        review_started=True,
+    ))
+    assert result["notice_kind"] == "next-change-only"
+    assert result["effective_vendor"] is None
+    assert "effective_executor" not in result
+
+
+def test_unverified_agy_cannot_claim_vendor_before_discovery() -> None:
     with pytest.raises(second_vendor_policy.InputError):
         second_vendor_policy.resolve(packet(
             usable_vendors=[{"executor": "agy"}], response="accept",

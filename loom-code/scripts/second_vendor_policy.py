@@ -162,9 +162,13 @@ def resolve(packet: dict[str, Any]) -> dict[str, object]:
 
     response_vendor = packet.get("response_vendor")
     if response == "accept":
-        accepted = _require_string(response_vendor, "response_vendor", set(VENDORS))
-        if accepted not in vendors:
-            raise InputError("response_vendor must identify a usable vendor")
+        if response_vendor is None:
+            if vendors or not unverified:
+                raise InputError("response_vendor required unless only an unverified executor is available")
+        else:
+            accepted = _require_string(response_vendor, "response_vendor", set(VENDORS))
+            if accepted not in vendors:
+                raise InputError("response_vendor must identify a usable vendor")
     elif response_vendor is not None:
         raise InputError("response_vendor is valid only for accept")
 
@@ -178,7 +182,21 @@ def resolve(packet: dict[str, Any]) -> dict[str, object]:
 
     if mode != "suggest":
         return _result(reason_code="mode-not-suggest")
-    if not vendors and unverified and response == "pending" and not review_started:
+    if not vendors and unverified:
+        if response == "decline":
+            return _result(reason_code="selection-declined")
+        if review_started:
+            if response == "accept":
+                return _result(notice_kind="next-change-only",
+                               reason_code="response-too-late")
+            return _result(reason_code="no-response")
+        if response == "accept":
+            result = _result(notice_kind="discovery-authorized",
+                             reason_code="model-discovery-authorized")
+            result["effective_executor"] = unverified[0]
+            result["allowed_vendors"] = [vendor for vendor in VENDORS
+                                         if vendor != host_vendor]
+            return result
         result = _result(notice_kind="availability-unverified", eligible=True,
                          reason_code="model-family-unverified")
         result["notice_executor"] = unverified[0]
