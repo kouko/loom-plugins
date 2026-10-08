@@ -29,6 +29,9 @@ SECOND_VENDOR_REFERENCE = (
     / "references"
     / "second-vendor-ask-and-docs-lint.md"
 )
+CONFIRM_INTENT_REFERENCE = (
+    REPO / "loom-code" / "skills" / "write-plan" / "references" / "confirm-intent.md"
+)
 
 
 def _section(text: str, heading: str) -> str:
@@ -157,6 +160,28 @@ def test_reference_has_no_none_mode_or_per_change_none_answer() -> None:
     text = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
     assert "second-vendor: <cli> | none" not in text
     assert "`<cli>` / `none`" not in text
+
+
+def test_named_direct_request_bypasses_duplicate_second_vendor_ask() -> None:
+    confirm = CONFIRM_INTENT_REFERENCE.read_text(encoding="utf-8")
+    routing = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
+    station = SKILL.read_text(encoding="utf-8")
+    for text in (confirm, routing, station):
+        assert "direct user request" in text
+        assert "unambiguous" in text
+        assert "without a second" in text
+    assert "authorization_source" in routing
+    assert "## Questions asked" in routing
+    assert "disclosure" in routing
+
+
+def test_suggestion_only_keeps_ask_and_suggest_does_not_block() -> None:
+    routing = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
+    ask = _section(routing, "## `second-vendor: ask`")
+    suggest = _section(routing, "## `second-vendor: suggest`")
+    assert "suggestion alone" in ask
+    assert "ask one" in ask
+    assert "continue without waiting" in suggest
 
 
 # --- typed-branch-names W1-02 -- the branch is `<type>/<change-id>` -------

@@ -104,10 +104,21 @@ default. No reply means no second vendor for this change.
 ## `second-vendor: ask`
 
 `ask` is a standing choice that puts one cross-model review question to the
-user on every change. The answer governs only that change and never
-rewrites the KICKOFF line. Check local executable availability first, but defer
-model discovery and execution until the consent checkpoint has authorized the
-specific executor and readable scope.
+user on each change that lacks a qualifying direct user request. A direct user
+request naming an outside coding agent and an explicit or unambiguous active
+review target authorizes one review without a second per-change ask. Quote
+that request and target as `authorization_source` in the intent decision
+record; do not add a question to `## Questions asked`. Show cost, vendor
+egress, `review_root`, outside-root access and local-execution disclosure
+before any network-backed discovery or execution, without asking for the same
+review again. The execution record keeps the complete disclosure fields;
+they state what was shown, not separate acknowledgments. If provider or target
+is ambiguous, or material scope expands beyond the active task, ask for the
+missing choice. A suggestion alone does not authorize review, so under `ask`
+ask one per-change question as below. The answer governs only that change
+and never rewrites the KICKOFF line. Check local executable availability
+first, but defer model discovery and execution until authorization and
+disclosure are recorded for the specific executor and review root.
 
 With a runnable candidate or an unverified `agy`, prefer the current host's
 native question tool.

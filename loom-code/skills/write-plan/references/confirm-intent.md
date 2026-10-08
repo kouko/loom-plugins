@@ -41,13 +41,21 @@ twice.
    inside this same message ("this will rewrite your ___, I am doing it the
    way you said: ___"), so the user sees it without being stopped for it.
 
-3. **The cross-model review question, only for `second-vendor: ask`.** Load
+3. **The cross-model review question, only for `second-vendor: ask` without
+   a qualifying direct user request.** Load
    `second-vendor-ask-and-docs-lint.md` before composing this
    message. A missing line is initialized as `second-vendor: suggest`; it
-   does not add a question. `ask` puts its per-change
-   host-aware question here using the native interface or documented fallback,
-   and records the answer in the intent decision record. A fixed CLI and
-   `suggest` add no question here.
+   does not add a question. When the user already named an outside coding
+   agent and the review target is explicit or unambiguous from the active
+   task, use that direct user request without a second per-change question.
+   Quote it as `authorization_source` in the intent decision record; it is not
+   a question and does not enter `## Questions asked`. Otherwise `ask` puts
+   its host-aware question here using the native interface or documented
+   fallback and records the answer. A fixed CLI and `suggest` add no
+   question here. Before outside discovery or execution, show the cost,
+   egress, `review_root` and local-execution disclosure without blocking
+   on another yes/no answer; an ambiguous choice or expanded material scope
+   still needs the missing choice.
 
 4. **The principles interview**, if step 2 demanded it.
 
