@@ -41,6 +41,13 @@ charter: 1.1
 - Test: A1 positive: route-activation; negative: failed-leg. A2 positive: same-contract; negative: substituted-format. A3 positive: notice-only; negative: implicit-dispatch. A4 positive: explicit-pair; boundary: stale-candidate. A5 positive: visible-limitation; negative: silent-fallback.
 - Risk: agent-decided — sync workflow mirrors and root version pins before final review; REQ-1–5 need package and acceptance evidence.
 
+### Wave 4 — Retain adversarial regressions
+
+**W4-01 Graduate caught probe programs**  after: W3-03  acceptance: 4, 5
+- Files: docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_codex_header_spoof.py, docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_codex_malformed_listing.py, docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_consent_family_mismatch.py, loom-code/tests/test_external_review_adversarial.py
+- Test: A4 positive: stderr-header-and-valid-list; negative: spoofed-header-and-null-list. A5 positive: consented-family; negative: contradictory-family.
+- Risk: agent-decided — move the three RED-then-GREEN adversarial cases into the package suite before finalization; retain their concern anchors and avoid another harness.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
