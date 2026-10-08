@@ -103,8 +103,8 @@ def selected_outside_family(repo: Path, change_id: str, head_sha: str | None = N
         if next_heading:
             body = body[:next_heading.start()]
         matches = re.findall(
-            r"(?m)^(?:- )?user-decided — second-vendor "
-            r"selection-confirmed: (claude|codex|gemini)$", body,
+            r"(?m)^(?:(?:-|[0-9]+\.)[ \t]+)?user-decided — second-vendor "
+            r"selection-confirmed: (claude|codex|gemini)[ \t]*$", body,
         )
         return matches[-1] if matches else None
 

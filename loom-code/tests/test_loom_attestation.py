@@ -326,6 +326,53 @@ def test_outside_selection_is_only_read_from_owning_sections(tmp_path: Path) -> 
     assert reviewers.selected_outside_family(repo, CHANGE) is None
 
 
+def test_numbered_plan_selection_sets_floor_and_requires_outside_receipt(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "## Constraints\n- user-decided — second-vendor selection-confirmed: claude\n",
+        encoding="utf-8",
+    )
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(
+        "## Risks\n3. user-decided — second-vendor selection-confirmed: codex\n",
+        encoding="utf-8",
+    )
+    commit(repo, "numbered plan selection overrides intent")
+
+    assert reviewers.selected_outside_family(repo, CHANGE) == "openai"
+    monkeypatch.chdir(repo)
+    out = StringIO()
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, StringIO()) == 0
+    assert out.getvalue() == "2\n"
+    evidence = matching_attestation(repo)
+    evidence["verdicts"][0]["vendor"] = "anthropic"
+    evidence["verdicts"][1].update(vendor="openai", model="gpt-6.1-sol")
+    head = git(repo, "rev-parse", "HEAD")
+    assert any("outside execution" in reason for _, reason in
+               attestation_module.validate_attestation(repo, head, CHANGE,
+                                                       evidence, manifest()))
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": evidence["verdicts"],
+                                        "findings": [], "adversarial": []}),
+                            encoding="utf-8")
+    assert any("outside execution" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+
+    plan.write_text(
+        "## Questions asked\n3. user-decided — second-vendor selection-confirmed: codex\n"
+        "## Risks\n3. user-decided — second-vendor selection-confirmed: gemini (draft)\n",
+        encoding="utf-8",
+    )
+    commit(repo, "nonfinal selections do not override intent")
+    assert reviewers.selected_outside_family(repo, CHANGE) == "anthropic"
+
+
 def test_selected_outside_review_raises_narrow_floor_and_requires_both_families(
     tmp_path: Path, monkeypatch,
 ) -> None:

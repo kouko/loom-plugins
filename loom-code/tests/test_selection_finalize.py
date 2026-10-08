@@ -485,14 +485,19 @@ def test_reviewers_skipped_in_plain_words_leave_the_change_unattested(tmp_path: 
     assert verification.verification_status(repo, CHANGE) == "absent"
 
 
+@pytest.mark.parametrize("selection", [
+    "user-decided — second-vendor selection-confirmed: claude",
+    "3. user-decided — second-vendor selection-confirmed: claude",
+])
 def test_selected_outside_review_with_skipped_reviewers_stays_unattested(
     tmp_path: Path,
+    selection: str,
 ) -> None:
     repo = make_repo(tmp_path)
     plan = repo / f"docs/loom/{CHANGE}/plan.md"
     plan.parent.mkdir(parents=True, exist_ok=True)
     plan.write_text(
-        "## Risks\nuser-decided — second-vendor selection-confirmed: claude\n",
+        f"## Risks\n{selection}\n",
         encoding="utf-8",
     )
     commit_all(repo, "select outside review")

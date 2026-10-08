@@ -19,9 +19,13 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "loom-code/scripts"))
+
+from prose_pin import affirms  # noqa: E402
 
 SKILL = REPO / "loom-design/skills/capture-intent/SKILL.md"
 SECOND_VENDOR = REPO / "loom-design/skills/capture-intent/references/second-vendor.md"
@@ -144,7 +148,7 @@ def test_second_vendor_direct_request_and_antigravity_route() -> None:
     station = _text()
     assert "direct user request" in routing
     assert "unambiguous active review target" in routing
-    assert "Skip the per-change question" in routing
+    assert affirms(routing, "Skip", "per-change question", "direct user request")
     assert "suggestion alone" in routing
     assert "continue without asking" in routing
     assert "agy" in routing
@@ -152,6 +156,19 @@ def test_second_vendor_direct_request_and_antigravity_route() -> None:
     assert "On Antigravity CLI, probe nothing" not in routing
     assert "cannot run on Antigravity CLI" not in routing
     assert "direct user request" in station
+
+
+def test_second_vendor_direct_request_negation_is_rejected() -> None:
+    routing = SECOND_VENDOR.read_text(encoding="utf-8")
+    sentence = (
+        "Skip the per-change question when a direct user request names an "
+        "outside coding agent and an unambiguous active review target."
+    )
+    assert sentence in _flat(routing)
+    reversed_routing = routing.replace(sentence, "Do not " + sentence, 1)
+    assert not affirms(
+        reversed_routing, "Skip", "per-change question", "direct user request"
+    )
 
 
 def test_station_summary_is_byte_identical_to_write_plan() -> None:
