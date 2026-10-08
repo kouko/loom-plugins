@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.39.0] — 2026-10-08 — consented external review uses an explicit executor profile
+
+- Add `external-review` as the shared outside execution boundary for Codex, Claude Code and Antigravity CLI. It requires recorded consent, an explicit model and effort, a bounded preflight, and a separately reported failure when execution or verification fails.
+- Closing review keeps its incumbent reviewer and its own verdict checks when an opted-in outside reviewer joins it. Candidate discovery and reported evidence reflect the selected model family and each CLI's observable limits.
+
 ## [3.38.0] — 2026-10-07 — a product one-way door asked at ① is not asked again at ②
 
 - Write-plan's ② gate, its "what you will be asked" item 2 and `one-way-door.md`'s merge gate now state that a product one-way door already asked at decision point ① is not asked again at ②.
