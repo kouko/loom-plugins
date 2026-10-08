@@ -1,0 +1,41 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-08-unify-independent-external-review",
+  "content_digest": "43d517eb6adc57bec63352c9461acd071a81dd90",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_external_review_adversarial.py -q",
+      "artifact": "loom-code/tests/test_external_review_adversarial.py",
+      "result": "pass",
+      "command_digest": "e4097f85e6f309dab45fc0cc64e2cd32b6189872463e88de4885e2e59ad5e756"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "closing_code_reviewer",
+      "vendor": "openai",
+      "model": "inherited-host-model",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "closing_skill_reviewer",
+      "vendor": "openai",
+      "model": "inherited-host-model",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
