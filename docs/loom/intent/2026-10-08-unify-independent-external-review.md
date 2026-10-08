@@ -5,6 +5,7 @@ needs-design: yes — 獨立意見與正式審查跨越多種任務、執行器�
 status: confirmed 2026-10-08
 publication: automatic — authorized 2026-10-08 by kouko
 amendment: confirmed 2026-10-08 by kouko — an explicit named outside-review request needs no second consent confirmation
+amendment: confirmed 2026-10-08 by kouko — continue after terminal review to repair numbered outside-review selections and the negation-blind capture-intent test under Acceptance 1 and 6
 
 ## Problem
 要求另一個 coding agent 獨立審查時，Loom 的意見諮詢與正式審查各走不同接點。使用者無法確定要求獨立 code review、plan review 或決策意見時，原本的審查標準會不會保留，也無法依賴一致的外部 agent 選擇方式。外部 CLI 的預設模型或帳號環境若失效，審查可能在開始前失敗，或無法證明實際使用了要求的模型。

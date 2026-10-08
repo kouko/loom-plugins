@@ -62,7 +62,7 @@ charter: 1.1
 
 **W5-01 Direct-request authorization**  after: W4-03  acceptance: 3, 6
 - Files: loom-workflow/skills/independent-advisor/SKILL.md, loom-workflow/skills/independent-advisor/references/executor-detection.md, loom-workflow/skills/independent-advisor/README*.md, loom-code/skills/external-review/SKILL.md, loom-code/skills/closing-review/SKILL.md, loom-workflow/skills/independent-advisor/test-prompts.json, loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py, loom-workflow/tests/scripts/test_independent_advisor_compaction.py
-- Test: A6 positive: named-agent-with-active-task-target-runs-after-disclosure; negative: suggestion-or-expanded-scope-stops. A3 negative: notice-does-not-authorize.
+- Test: A6 positive: named-agent-with-active-task-target-runs-after-disclosure; negative: suggestion-or-expanded-scope-stops. A3 positive: direct-choice-authorizes-one-review; negative: notice-does-not-authorize.
 - Risk: user-decided — a direct named request authorizes one bounded review without a second confirmation; disclosure remains visible, and missing or expanded choices stop dispatch.
 
 **W5-02 Ground and correct outside CLI execution**  after: W5-01  acceptance: 4, 5
@@ -72,42 +72,54 @@ charter: 1.1
 
 **W5-03 Recompute outside receipt consistency**  after: W5-02  acceptance: 2, 5
 - Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/skills/closing-review/SKILL.md
-- Test: A5 negative: impossible-executor-family-or-evidence-pair-rejected; boundary: observed-model-and-effort-mismatch. A2 positive: legitimate-Claude-receipt-remains-valid.
+- Test: A5 positive: consistent-executor-family-and-evidence-pair-accepted; negative: impossible-executor-family-or-evidence-pair-rejected; boundary: observed-model-and-effort-mismatch. A2 positive: legitimate-Claude-receipt-remains-valid; negative: substituted-receipt-is-rejected.
 - Risk: agent-decided — the outside reviewer found that a forged receipt can claim Codex-only observation for Claude; the checker must reject impossible combinations rather than trust caller-supplied fields.
 
 **W5-04 Reject adversarial authorization and CLI contradictions**  after: W5-03  acceptance: 3, 4, 5, 6
 - Files: loom-code/scripts/external_review.py, loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_external_review.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_external_review_adversarial.py, loom-code/skills/external-review/SKILL.md, docs/loom/2026-10-08-unify-independent-external-review/spec.md
-- Test: A6 negative: missing authorization source blocks discovery. A4 negative: Claude alias tier mismatch fails; Codex model/list error fails. A5 negative: contradictory Claude receipt fails; legitimate profiles pass.
+- Test: A3 positive: explicit-choice-proceeds; negative: missing-authorization-source-blocks-discovery. A4 positive: matching-Claude-alias-and-valid-Codex-list-pass; negative: Claude alias tier mismatch fails; Codex model/list error fails. A5 positive: legitimate profiles pass; negative: contradictory Claude receipt fails. A6 positive: quoted-direct-request-proceeds; negative: missing authorization source blocks discovery.
 - Risk: agent-decided — committed adversarial probes exposed three reachable false-success paths; reject them at the shared execution and receipt boundaries.
 
 ### Wave 6 — Retain caught W5 probes
 
 **W6-01 Graduate authorization and CLI adversarial probes**  after: W5-04  acceptance: 3, 4, 5, 6
 - Files: docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_authorization_source.py, docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_claude_alias_mismatch.py, docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_codex_error_listing.py, loom-code/tests/test_external_review_adversarial.py, loom-code/tests/test_external_review.py
-- Test: A6 negative: no authorization blocks subprocess. A4 negative: alias and JSON-RPC errors fail. A5 negative: inconsistent receipt fails. Run graduated tests through the package suite.
+- Test: A3 positive: explicit-selection-proceeds; negative: no authorization blocks subprocess. A4 positive: matching-alias-and-valid-JSON-RPC-pass; negative: alias and JSON-RPC errors fail. A5 positive: consistent-receipt-passes; negative: inconsistent receipt fails. A6 positive: quoted-direct-request-proceeds; negative: no authorization blocks subprocess. Run graduated tests through the package suite.
 - Risk: agent-decided — each new probe caught a real defect, so retaining it under the package test root keeps the regression check active after this change.
 
 ### Wave 7 — Close final review routing gaps
 
 **W7-01 Record an outside reviewer when the plan is skipped**  after: W6-01  acceptance: 1, 6
 - Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_selection_finalize.py, loom-code/skills/closing-review/SKILL.md
-- Test: A1 positive: skipped-plan intent selection raises reviewer floor and requires an outside receipt; negative: no selection retains the floor. A6 positive: direct request remains sufficient.
+- Test: A1 positive: skipped-plan intent selection raises reviewer floor and requires an outside receipt; negative: no selection retains the floor. A6 positive: direct request remains sufficient; negative: suggestion-only-does-not-authorize.
 - Risk: agent-decided — the skill accepts a skipped plan but the checker currently reads selections only from a plan or standing defaults; a committed intent selection keeps the gate recomputable.
 
 **W7-02 Avoid repeating an already named outside choice**  after: W7-01  acceptance: 3, 6
 - Files: loom-code/skills/write-plan/references/confirm-intent.md, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md, loom-code/skills/write-plan/SKILL.md, loom-code/tests/test_write_plan_station_text.py
-- Test: A6 positive: direct named agent and target bypass per-change ask; negative: suggestion-only still asks under `second-vendor: ask`. A3 positive: notice stays nonblocking.
+- Test: A6 positive: direct named agent and target bypass per-change ask; negative: suggestion-only still asks under `second-vendor: ask`. A3 positive: notice stays nonblocking; negative: notice-alone-does-not-dispatch.
 - Risk: agent-decided — the standing ask path can duplicate the user's named choice; it should reuse the explicit instruction while retaining a visible disclosure before execution.
 
 **W7-03 Canonicalize skipped-plan selection in the terminal fix**  after: W7-02  acceptance: 1, 6
 - Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/skills/closing-review/SKILL.md, loom-code/skills/write-plan/SKILL.md, loom-design/skills/capture-intent/SKILL.md, loom-code/skills/write-plan/references/confirm-intent.md, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md
-- Test: A1 positive: bulleted intent selection raises the floor and binds finalization; boundary: a later plan copies it into Risks before review and plan selection wins. A6 positive: quote source and machine selection line have distinct carriers.
+- Test: A1 positive: bulleted intent selection raises the floor and binds finalization; boundary: a later plan copies it into Risks before review and plan selection wins. A6 positive: quote source and machine selection line have distinct carriers; negative: missing-source-does-not-authorize.
 - Risk: agent-decided — two review rounds exposed one surviving skipped-plan gap; an exact shared selection line and narrow intent exception must converge within the terminal digest.
 
 **W7-04 Pin no-repeat wording and sync capture-intent routing**  after: W7-03  acceptance: 3, 4, 6
 - Files: loom-code/tests/test_write_plan_station_text.py, loom-code/skills/write-plan/SKILL.md, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md, loom-design/skills/capture-intent/SKILL.md, loom-design/skills/capture-intent/references/second-vendor.md, loom-design/tests/spec/test_capture_intent_contract.py
-- Test: A6 positive: affirmative direct request skips ask; negative: reversed wording fails the prose pin. A3 negative: suggestion does not dispatch. A4 positive: Antigravity path is no longer described as unsupported.
+- Test: A6 positive: affirmative direct request skips ask; negative: reversed wording fails the prose pin. A3 positive: explicit-choice-dispatches; negative: suggestion does not dispatch. A4 positive: Antigravity path is no longer described as unsupported; negative: unsupported-model-does-not-dispatch.
 - Risk: agent-decided — the old capture-intent reference and substring-only test can reintroduce duplicate questions or misstate executor support despite a passing package suite.
+
+### Wave 8 — Repair terminal review findings under the reconfirmed intent
+
+**W8-01 Parse historical numbered outside selections**  after: W7-04  acceptance: 1
+- Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_selection_finalize.py
+- Test: A1 positive: numbered `3. user-decided` in plan Risks raises the reviewer floor and requires outside evidence; negative: selection outside the owning section or with draft suffix does not count. Preserve plan-over-intent precedence.
+- Risk: agent-decided — historical committed plans use numbered selection lines, while the current exact parser accepts only bare and dashed lines.
+
+**W8-02 Pin affirmative capture-intent routing**  after: W8-01  acceptance: 6
+- Files: loom-design/tests/spec/test_capture_intent_contract.py
+- Test: A6 positive: the direct-request skip sentence is affirmative; negative: a negated replacement fails even if the same keywords remain.
+- Risk: agent-decided — keyword-presence assertions can pass when the operative sentence is reversed; reuse the established prose matcher rather than invent another semantic rule.
 
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
