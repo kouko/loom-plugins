@@ -4,6 +4,12 @@ Referenced from `SKILL.md`. The binding rules for the three roles, for
 blindness, and for the two bias controls live in `SKILL.md`; this file carries
 the packet's required sections and the normalisation template.
 
+For an explicit outside code, plan, or decision review, the owning review skill
+defines the review packet and verdict contract. Pass that packet to
+`loom-code:external-review` by skill name; do not replace its criteria or
+result checks with this consultation's shared-card template. This file's four
+sections and cards apply to `explore`/`audit` consultations only.
+
 ## The dispatch packet
 
 Every dispatch carries these four sections, written out in this order:

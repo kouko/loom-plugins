@@ -2,20 +2,50 @@
 name: independent-advisor
 version: 0.1.0
 description: |
-  Get a second opinion on a plan or decision. Use when asked to consult another model, higher effort, or another vendor.
+  Route an explicitly requested outside coding-agent review of code, plan, or decision while preserving its review contract. Also get a second opinion from another model, higher effort, or vendor.
 ---
 
 # Independent Advisor
 
-Consult a **different executor** about the user's current plan or decision.
+Consult a **different executor** about the user's code, plan, or decision.
 This changes WHO answers, not the critique lens. For a same-executor lens change,
 use `loom-workflow:critique`. This skill spends money, sends material off the
 machine, and may run repository setup, so those effects require approval.
 
-Record capability as model tier `economy` / `standard` / `frontier` plus effort
-`low` / `medium` / `high`; use no other tier vocabulary or vendor marketing name.
+For consultation comparisons, describe capability as model tier `economy` /
+`standard` / `frontier` plus effort `low` / `medium` / `high`. The outside
+execution record also needs the actual selected model ID and provider family.
 
-## Mode routing
+## Explicit outside review
+
+When the user explicitly requests an outside coding agent to review code, plan,
+or decision, route that review through `loom-code:external-review` by skill
+name. Keep the incumbent reviewer and its result separately attributable. The
+owning review skill supplies its task packet, criteria, verdict format and
+result checks; it accepts or rejects the returned verdict. The advisor does
+not substitute its `explore`/`audit` comparison verdict or report template for
+the owning review skill's contract. A failed or unverified outside execution
+is a separately attributed failure, never a completed independent review.
+
+Prepare the complete single checkpoint below and obtain a recorded consent
+record before invoking `loom-code:external-review` for discovery, probe or
+dispatch. Give that skill the consent record, authorized scope, requested
+executor and review packet; it owns candidate selection, explicit model and
+effort, bounded pre-review execution, CLI invocation and execution evidence.
+Do not read or run a `loom-code` file from this plugin at runtime. Accept only
+the named skill's JSON evidence/status and then apply the owning review skill's
+checks to any review output. A changed executor, model, vendor family or
+readable scope voids the consent record and requires the whole checkpoint
+again. An unsolicited second-vendor notice remains a suggestion; it never
+starts discovery, probe or dispatch without the user's request or consent.
+
+For open-ended second-opinion consultations, continue with the `explore` and
+`audit` modes below and their existing packet and report rules.
+
+## Consultation mode routing
+
+This section applies to open-ended consultations. An explicit outside review
+uses the owning review skill's task type and verdict contract instead.
 
 - `explore`: the solution space is open; run proposer, normalizer, and blind judge roles.
 - `audit`: an incumbent exists; **a single leg with full context runs**, with
@@ -33,43 +63,38 @@ No incumbent yet is valid in `explore` and **distinct from an incomplete packet*
 run a single blind proposal or state that this consultation shape does not apply.
 An incumbent that exists but was not supplied is instead a missing packet section.
 
-## Static detection
+## Candidate selection
 
-Before asking the user anything, test every candidate's binary and credential
-file and record each command's output. Follow
-`references/executor-detection.md` for the exact checks, reason mapping, fixes,
-record shape, and live-probe mechanics.
+Use `references/executor-detection.md` for the named skill handoff and its
+failure mapping. Local, non-network capability observations may inform the
+checkpoint, but neither an installed binary nor credentials establish model
+availability. The named skill owns selection and pre-review verification after
+consent. Never present an unverified candidate as a verified capability.
 
-An excluded candidate **never appears in the option list**: it is **absent from the list, not shown as an unavailable option**. If the user names
-one, **refuse and state that exclusion reason** with its recorded command output:
-`binary-missing`, `binary-not-executable`, `credential-missing`, or
-`credential-unusable`; **never collapse them into one** generic status. A static pass
-means only **statically available, not yet verified**: it is **permission to attempt a live probe**, and **never report a static pass downstream as a verified capability**.
-
-The candidate set must support a genuinely independent opinion:
-
-- No passing candidate: **stop the run**, state the failed precondition, and list
-  each exclusion reason; never substitute this controller because **a second opinion from the same executor is not a second opinion**.
-- Only same-family candidates: stop and name them as `same-family`. Proceeding
-  requires the user's checkpoint decision, never a silent fallback.
-- When **exactly one candidate passes** in `explore`, **surface the conflict at the checkpoint**: it cannot be both proposer and judge. List the degraded choices; never assign
-  the same executor to both silently.
+The candidate set must support a genuinely independent opinion. No eligible
+candidate means stop and report the failed precondition. A same-family option
+requires an explicit checkpoint decision, never a silent fallback. In
+`explore`, one eligible candidate cannot serve as both proposer and judge;
+surface the degraded choices at the checkpoint.
 
 ## The single checkpoint
 
-**Exactly one checkpoint exists**, after routing and static detection and before
-any probe, dispatch, transmission, or **any money is spent**. One ask carries
+**Exactly one checkpoint exists**, after routing and any local capability observations and before
+any network-backed discovery, probe, dispatch, transmission, or **any money is spent**. One ask carries
 **the leg count**, **which executor runs which leg**, **the estimated cost**, and
 **the egress disclosure** together, specifically:
 
-- `mode`, verbatim `mode_basis`, and any conflict or override;
+- for consultations, `mode`, verbatim `mode_basis`, and any conflict or override;
+  for explicit reviews, the owning task type and review skill;
 - leg count and every executor-to-leg assignment;
+- selected model, effort, provider family and readable scope for each outside
+  leg, with any unknown choice resolved before recording consent;
 - estimated cost per leg (`unknown, with the reason`, **never as zero and never omitted** when unknowable; a **genuinely zero** cost stays zero, not unknown); and
 - the full egress and local-execution disclosure below.
 
 Require recorded confirmation of all dimensions. **splitting** these into separate questions, dispatching **without a recorded user confirmation**, or treating a **partial answer as approval** are violations. Ask for each missing item and **never fill it with a default**. If the executor
-set changes, **the prior approval is void**: repeat static detection and cost
-estimation, then present the whole checkpoint again. **Never carry a previous static result or cost figure** into the changed set.
+set changes, **the prior approval is void**: repeat local observations and cost
+estimation, then present the whole checkpoint again. **Never carry a previous observation or cost figure** into the changed set.
 
 ### The egress disclosure
 
@@ -92,21 +117,19 @@ Refuse dispatch until the user acknowledges cost, egress, readable scope, and
 local setup. If cancellation follows an external call, report that material was
 already transmitted to the named vendor and cannot be recalled.
 
-## The live probe
+## External execution evidence
 
-After complete approval, probe **only for an executor the user selected**; never
-probe the candidate list speculatively. If the user cancelled, **no probe runs at all**. Give the probe no write access. Judge its **own exit status**, never a pipeline's; a timeout **is a probe failure, not a pass**. It passes only when its header
-self-reports both `verified_model` and `verified_effort`: **a missing effort value is a failure**, and missing either leaves it **treated as unverified** even after exit zero.
+After complete approval, hand each selected leg to `loom-code:external-review`
+using the same consent record and authorized scope. That named skill owns
+candidate discovery, explicit model and effort selection, pre-review execution,
+CLI-specific evidence levels and failure status. Record its JSON evidence and
+never turn an unavailable, mismatched, timed-out or unverified result into a
+completed leg. A materially different profile returns to the complete
+checkpoint. A frontier request cannot silently downgrade.
 
-`frontier` **fails loud** and is **never auto-downgraded**: a failed probe must
-**stop and surface the reason**; a lower verified tier is an **unavailable capability**.
-A lower tier may run **only on explicit user confirmation** after disclosure. A
-non-frontier mismatch must **return to the checkpoint** and **is still disclosed** in the report.
-
-Therefore **the verified executor is the executor you dispatch**; an alias swap
-requires another probe. The blind **judge and the proposer** must differ, and
-both opposite-order runs use **identical settings**—executor, model, and effort—or
-their verdicts are invalid.
+The blind judge and proposer must differ, and both opposite-order judge runs
+use identical accepted executor, model and effort settings. Each run uses a
+fresh process and is verified separately.
 
 ## Three roles and blind judging
 

@@ -17,6 +17,10 @@ SKILL_DIR = Path(__file__).resolve().parents[2] / "skills" / "independent-adviso
 README_EN = SKILL_DIR / "README.md"
 README_JA = SKILL_DIR / "README.ja.md"
 README_ZHTW = SKILL_DIR / "README.zh-TW.md"
+SKILL = SKILL_DIR / "SKILL.md"
+DETECTION = SKILL_DIR / "references" / "executor-detection.md"
+DISPATCH = SKILL_DIR / "references" / "dispatch-protocol.md"
+PROMPTS = SKILL_DIR / "test-prompts.json"
 
 READMES = [
     (README_EN, "README.md (EN)"),
@@ -77,3 +81,35 @@ def test_all_three_language_readmes_exist_and_agree():
             f"{label}: coverage overclaim {overclaim.group(0)!r} — the skill's "
             "honest framing forbids describing coverage as complete."
         )
+
+
+def test_named_external_review_handoff_preserves_owning_contract_and_consent():
+    skill = SKILL.read_text(encoding="utf-8")
+    detection = DETECTION.read_text(encoding="utf-8")
+    dispatch = DISPATCH.read_text(encoding="utf-8")
+    assert "code, plan, or decision" in skill
+    assert "loom-code:external-review" in skill
+    assert "owning review skill" in skill
+    assert "incumbent" in skill
+    assert "consent record" in skill
+    assert "single checkpoint" in skill
+    assert "loom-code:external-review" in detection
+    assert "loom-code/scripts/" not in detection
+    assert "codex exec" not in detection
+    assert "owning review skill" in dispatch
+    assert "loom-code:external-review" in dispatch
+
+
+def test_readmes_and_prompts_cover_outside_reviews():
+    import json
+
+    for path, label in READMES:
+        body = path.read_text(encoding="utf-8")
+        assert "loom-code:external-review" in body, label
+    prompts = json.loads(PROMPTS.read_text(encoding="utf-8"))["prompts"]
+    cases = {case["id"]: case for case in prompts}
+    for review_type in ("code", "plan", "decision"):
+        assert any(review_type in case["prompt"].lower() and
+                   "external-review" in case["expected_behavior"]
+                   for case in prompts)
+    assert len(cases) == len(prompts)

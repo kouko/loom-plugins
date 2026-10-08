@@ -58,6 +58,18 @@ sibling READMEs.
 
 ---
 
+## Outside coding-agent reviews
+
+An explicit request for an outside coding agent to review code, a plan, or a
+decision routes through `loom-code:external-review`. The original reviewer
+remains and its review rules still decide whether the outside verdict is valid.
+The outside result or failure is shown separately. The advisor obtains one
+complete approval for cost, vendor, data sent, readable files and local setup
+before model discovery or execution. A changed model, vendor or scope needs a
+fresh approval. An ordinary second-vendor suggestion does not start a review.
+
+---
+
 ## Honest framing — what this does NOT give you
 
 Read these before you rely on a result:
