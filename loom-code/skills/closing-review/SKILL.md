@@ -128,7 +128,7 @@ content, run:
 python3 <loom-code>/scripts/loom_checker.py reviewer-count <change-id>
 ```
 
-The output is the computed reviewer floor: dispatch exactly that many
+The output is the computed reviewer floor: dispatch that many
 fresh-context reviewers with distinct agent identities. The checker derives the
 floor from the cumulative branch delta and fails closed to two when it cannot
 classify the whole change. `finalize-review` recomputes the same policy, and
@@ -136,13 +136,16 @@ the PR's verification status reports a mismatch as `stale`; the orchestrator
 never declares or overrides it. When `reviewers` is skipped by the user's plain-words
 instruction, dispatch no
 reviewer and pass no `verdicts`.
-- Unless reviewers are skipped, a selected second vendor remains required.
-  Resolve it from the standing
-  fixed CLI, the per-change `ask` answer, or a `selection-confirmed` line
-  naming the second vendor in the plan's `## Risks` section; the
-  last form is write-plan's active-task handoff for a timely `suggest` opt-in.
-  The selected vendor fills one computed reviewer slot; it does not add a
-  reviewer beyond the floor.
+- Unless reviewers are skipped, resolve a selected second vendor from the
+  standing fixed CLI, the per-change `ask` answer, or a committed
+  `user-decided — second-vendor selection-confirmed: <vendor>` plan line.
+  Record an accepted `ask` answer with that same line before reviewing, so
+  `reviewer-count`, finalization and attestation validation can recompute it.
+  With no selection, do not start external execution. With a selection, retain
+  at least one incumbent reviewer and dispatch an additional outside reviewer.
+  A floor of one rises to two; at a higher floor, the outside reviewer may
+  occupy one slot, but cannot replace the incumbent. Finalization requires
+  both vendor families in distinct passing verdicts.
 
 Reviewer independence is a quality requirement, not a ledger field. Give each
 reviewer the branch base, changed paths, intent, spec when present, plan, and
@@ -150,61 +153,36 @@ the applicable lens from `references/lenses.md`. Reviewers return the
 structured YAML required by `agents/reviewer.md`; the orchestrator converts
 the accepted fields to the temporary JSON consumed by finalization.
 
-<!-- gate: review.atomic-claude-dispatch -->
-On Codex, when the selected second vendor is Claude Code, send that complete
-reviewer prompt on stdin to one installed-plugin invocation:
+<!-- gate: review.external-dispatch -->
+For the selected outside reviewer, invoke the named
+[`loom-code:external-review`](../external-review/SKILL.md) skill. Give it the
+complete reviewer packet, including the same lens from `references/lenses.md`
+and the same `agents/reviewer.md` YAML contract used by incumbent reviewers.
+Supply an explicit executor, model, effort and model-provider family. A
+resolver result of `overrides: null` does not select an outside profile;
+choose and verify a complete pair or report `EXECUTION_FAILED`. Never use
+the external CLI's default model or effort and never substitute another pair
+after rejection.
 
-```text
-python3 <loom-code>/scripts/claude_reviewer.py [--model <model> --effort <effort>] --timeout-seconds 600
-```
+Before any network-backed discovery, probe or review, give the user the
+cost, vendor-egress, readable-scope and local-execution disclosures and retain
+their approval in the external skill's JSON consent record. An earlier fixed
+setting without these disclosures is insufficient; resolve its confirmation
+at the existing intent decision point. Changed executor or readable scope
+requires fresh approval. Pass the consent record and exact scope to the shared
+runner. A missing or stale record prevents execution. On Codex, run the
+installed runner outside the sandbox with narrowly scoped host approval when
+the selected CLI requires the existing host login; denial is an authorization
+blocker, never a login diagnosis.
 
-When the resolver returns a complete `overrides` pair, pass both flags. When
-it returns `null`, invoke the runner with neither flag so Claude Code uses its
-host defaults. The runner rejects a partial pair before starting Claude; the
-caller must never reconstruct a missing half.
-
-Run this invocation outside the Codex sandbox with reusable host approval
-scoped to the installed `python3 <loom-code>/scripts/claude_reviewer.py`
-command. This is the standard Codex-to-Claude path because the sandbox can
-hide an existing Claude login that the same runner can use outside it. If that
-narrowly scoped permission is denied or unavailable, report an authorization
-blocker. Do not fall back to a sandboxed Claude invocation, infer that the user
-logged out, run a separate authentication preflight, or request broader Python
-or shell access. Do not read, copy, or move Claude credentials into the
-sandbox. Only an unauthenticated result from this outside-sandbox invocation
-produces the Claude login diagnosis; stop without treating it as transient.
-
-The runner executes one Claude attempt and does not retry. Exit 0 carries the
-raw non-empty reviewer output, which must still satisfy `agents/reviewer.md`.
-The runner must never parse or validate reviewer YAML. The `closing-review` orchestrator
-enforces its stricter one-retry limit and owns that validation even when the
-shared resolver still has more completed-redispatch budget available.
-Its JSON stderr names `empty-output` for blank stdout and `timeout` when the
-attempt exceeds the bound. Do not run a model-backed preflight. Treat either
-result as the transient executor failure already governed below: invoke the
-runner at most once more for the same functional-content digest and reviewer
-identity. If that attempt also fails before a conforming verdict exists, report
-both diagnostics and end the episode as `EXECUTION_FAILED`.
-
-A model rejection before task execution follows the shared
-host-rejection path instead: feed the rejection to the resolver and invoke its
-override-free replacement in the same task attempt. If that replacement is
-also rejected, feed back `rejection_retried: true`, accept
-`execution-failed`, and stop. The rejected replacement must not enter the
-generic transient-executor retry, so the two policies cannot create a third
-Claude invocation.
-
-The override-free replacement consumes the one same-digest transient-retry
-slot. After it, no further Claude invocation occurs for that digest regardless
-of failure kind.
-
-The runner reports `host-rejection` only for a non-zero Claude result carrying
-the exact `[claude-code:unrecognized_model]` marker. A partial pair or an effort
-outside Claude Code's grounded five-value CLI set is `input-error` and exits 2
-before launch; it is not host rejection. Every other non-zero exit remains a
-generic executor failure; the caller must not infer routing rejection from
-free-form provider text. Route on the stderr JSON `kind`, not exit status
-alone; a plain-text exit 2 is caller misuse rather than a routing signal.
+The shared runner returns execution status, evidence and raw review output;
+it does not judge the review. A failed probe or review is a distinct outside
+failure and supplies no verdict. On completion, this station validates the
+raw YAML against `agents/reviewer.md`, attributes it to the selected model
+family, and accepts only a conforming verdict. One transient executor or
+malformed-output retry is allowed for the same digest and reviewer identity;
+a second failure ends the episode as `EXECUTION_FAILED`. A rejected explicit
+model or effort never triggers a default-model retry.
 <!-- /gate -->
 
 ## 3. Run acceptance testing

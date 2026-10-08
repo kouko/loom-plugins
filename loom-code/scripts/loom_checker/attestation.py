@@ -8,6 +8,8 @@ from loom_checker.probes import declared_test_command
 from loom_checker.probes import missing_adversarial_execution
 from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
+from loom_checker.reviewers import outside_verdict_failure
+from loom_checker.reviewers import selected_outside_family
 from pathlib import Path
 import hashlib
 
@@ -109,6 +111,11 @@ def validate_attestation(
             "PASS", "PASS_WITH_NOTES"
         }:
             return [(rule, "attestation contains a malformed or non-passing reviewer verdict")]
+    outside_failure = outside_verdict_failure(
+        verdicts, selected_outside_family(repo, change_id, head_sha)
+    )
+    if outside_failure:
+        return [(rule, outside_failure)]
     if not isinstance(attestation.get("findings"), list):
         return [(rule, "attestation findings must be a list")]
     return []

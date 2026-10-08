@@ -10,9 +10,48 @@ from loom_checker.helpers import git_text
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import tree_programs
 from pathlib import Path
+import re
 
 
 _LOW_RISK_DOC_EXTENSIONS = frozenset({".md", ".mdx", ".rst", ".txt"})
+_OUTSIDE_FAMILIES = {"claude": "anthropic", "codex": "openai", "gemini": "google"}
+
+
+def selected_outside_family(repo: Path, change_id: str, head_sha: str | None = None) -> str | None:
+    """Read an explicit outside selection from the committed review inputs."""
+    head = head_sha or git_maybe(repo, "rev-parse", "HEAD")
+    if not head:
+        return None
+    plan = git_maybe(repo, "show", f"{head}:docs/loom/{change_id}/plan.md") or ""
+    matches = re.findall(
+        r"(?m)^\s*(?:\d+\.\s*)?user-decided\s+—\s+second-vendor "
+        r"selection-confirmed:\s*(claude|codex|gemini)\s*$", plan,
+    )
+    if matches:
+        return _OUTSIDE_FAMILIES[matches[-1]]
+    defaults = git_maybe(repo, "show", f"{head}:docs/loom/KICKOFF-DEFAULTS.md") or ""
+    match = re.search(
+        r"(?m)^- second-vendor:\s*(claude|codex|gemini)(?:\s+—|\s*$)", defaults,
+    )
+    return _OUTSIDE_FAMILIES[match.group(1)] if match else None
+
+
+def outside_verdict_failure(verdicts: list[dict], family: str | None) -> str | None:
+    """A selected outside opinion must coexist with an incumbent opinion."""
+    if family is None:
+        return None
+    vendors = {str(v.get("vendor", "")).casefold() for v in verdicts}
+    aliases = {"anthropic": {"anthropic", "claude"},
+               "openai": {"openai", "codex"}, "google": {"google", "gemini"}}
+    outside = aliases[family]
+    if not vendors.intersection(outside):
+        return "selected outside vendor has no reviewer verdict"
+    if not vendors.difference(outside):
+        return "outside verdict has no distinct incumbent vendor verdict"
+    lenses = {str(v.get("lens", "")).strip() for v in verdicts}
+    if len(lenses) != 1 or not next(iter(lenses)):
+        return "outside and incumbent verdicts must use the same review lens"
+    return None
 
 
 _REVIEW_PROTECTED_PARTS = frozenset(
@@ -223,4 +262,5 @@ def required_reviewer_count(
     if delta is None:
         return 2
     paths, removed, _added = delta
-    return reviewer_floor_for_paths(paths, change_id, removed)
+    floor = reviewer_floor_for_paths(paths, change_id, removed)
+    return max(floor, 2) if selected_outside_family(repo, change_id, head_sha) else floor

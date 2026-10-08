@@ -253,6 +253,50 @@ def test_matching_low_risk_attestation_accepts_one_reviewer(tmp_path: Path) -> N
     ) == []
 
 
+def test_selected_outside_review_raises_narrow_floor_and_requires_both_families(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(
+        "## Risks\nuser-decided — second-vendor selection-confirmed: claude\n",
+        encoding="utf-8",
+    )
+    commit(repo, "select outside reviewer")
+    monkeypatch.chdir(repo)
+    out, err = StringIO(), StringIO()
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, err) == 0
+    assert out.getvalue() == "2\n"
+
+    evidence = matching_attestation(repo)
+    evidence["verdicts"] = evidence["verdicts"][:1]
+    assert any("two distinct reviewers" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, evidence, manifest()))
+    evidence["verdicts"].append({**evidence["verdicts"][0],
+                                 "reviewer": "reviewer-2", "vendor": "openai"})
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": evidence["verdicts"],
+                                        "findings": [], "adversarial": []}),
+                            encoding="utf-8")
+    assert any("outside" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    assert any("outside" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, evidence, manifest()))
+    evidence["verdicts"][1]["vendor"] = "anthropic"
+    evidence["verdicts"][1]["lens"] = "docs"
+    assert any("same review lens" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, evidence, manifest()))
+    evidence["verdicts"][1]["lens"] = "code"
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, evidence, manifest()
+    ) == []
+
+
 def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
 
