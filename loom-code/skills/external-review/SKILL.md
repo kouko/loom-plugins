@@ -17,10 +17,13 @@ is the directory two levels above this SKILL.md.
 
 ## Before discovery
 
-Require a recorded user opt-in for this executor and readable scope. The
-record must state that the user accepted cost, vendor data transfer, and local
-CLI execution. Do not run network-backed model discovery, a preflight, or a
-review until this record exists. If the selected executor or scope changes,
+Require a recorded user opt-in for this executor and review root. The root is
+the CLI's starting directory, **not a filesystem read boundary**. The CLI may
+read files outside it through host tools or configuration; CLI startup,
+plugins, and caches may write files even when model tools are restricted. The
+record must state that the user accepted those limits, cost, vendor data
+transfer, and local CLI execution. Do not run network-backed model discovery,
+a preflight, or a review until this record exists. If the selected executor or root changes,
 obtain a new record at the owning flow's existing user checkpoint. Never infer
 consent from a prior fixed setting alone. Static local binary checks can occur
 before that checkpoint.
@@ -32,14 +35,16 @@ selection within one provider family and effort bound:
 {
   "approved": true,
   "executor": "codex",
-  "readable_scope": "/absolute/review/scope",
+  "review_root": "/absolute/review/root",
   "selection_authorized": true,
   "family": "openai",
   "allowed_efforts": ["high"],
   "disclosures": {
     "cost": true,
     "vendor_egress": true,
-    "local_execution": true
+    "local_execution": true,
+    "filesystem_access_outside_root": true,
+    "filesystem_write_not_guaranteed": true
   }
 }
 ```
@@ -47,14 +52,14 @@ selection within one provider family and effort bound:
 An exact user selection can instead record `"model": "<id>"` and
 `"effort": "<level>"`. The bounded form lets the agent select a model from
 current candidates without a second user question. Either form must be tied
-to the same executor, scope, and disclosures. A change outside the authorized
+to the same executor, review root, and disclosures. A change outside the authorized
 bounds needs the owning flow's existing checkpoint again.
 
 After this consent, list candidates with:
 
 ```sh
 python3 <loom-code>/scripts/external_review.py --list-candidates \
-  --executor <codex|claude|agy> --scope <absolute-review-scope> \
+  --executor <codex|claude|agy> --scope <absolute-review-root> \
   --consent-record <path-to-record>
 ```
 
@@ -78,7 +83,7 @@ python3 <loom-code>/scripts/external_review.py \
   --executor <codex|claude|agy> \
   --model <selected-model> --effort <selected-effort> \
   --family <openai|anthropic|google> \
-  --scope <absolute-review-scope> \
+  --scope <absolute-review-root> \
   --consent-record <path-to-record> < <review-packet-file>
 ```
 
@@ -90,6 +95,14 @@ validates that text. Any other status is a failed outside leg. Never reuse a
 preflight as the review, call a default model, downgrade effort, switch CLI, or
 count a failed leg as a completed review.
 
+The execution asks Codex for a read-only command sandbox, Claude Code for plan
+mode with only `Read`, `Glob`, and `Grep` model tools, and Antigravity for plan
+mode with its terminal sandbox. These flags constrain model actions but do not
+prove host-wide read or write confinement. In particular, a review root is
+only a working directory. The result reports this filesystem limit; the
+owning skill must carry it into the user-facing report. Do not describe the
+selected root as the only path the CLI could read.
+
 Report the requested profile, candidate source, preflight outcome, observed
 fields, and `evidence_level` alongside the owning skill's verdict. Codex's
 header must show the requested model and effort, yielding
@@ -100,4 +113,4 @@ and accept both flags, also yielding `accepted-explicit-settings`; it does not
 independently reveal effective model or effort. A stale candidate, failed
 flag, timeout, missing observation, or family mismatch remains a failure with
 its concrete reason. A later capability change requires a fresh preflight and,
-if the executor or scope changes, fresh consent.
+if the executor or review root changes, fresh consent.

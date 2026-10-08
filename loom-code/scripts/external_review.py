@@ -40,10 +40,11 @@ def _consent_valid(record: Mapping[str, Any] | None, executor: str, scope: str,
     base = (
         record.get("approved") is True
         and record.get("executor") == executor
-        and record.get("readable_scope") == scope
+        and record.get("review_root") == scope
         and isinstance(disclosures, Mapping)
         and all(disclosures.get(key) is True for key in
-                ("cost", "vendor_egress", "local_execution"))
+                ("cost", "vendor_egress", "local_execution",
+                 "filesystem_access_outside_root", "filesystem_write_not_guaranteed"))
     )
     if not base or model is None or effort is None:
         return base
@@ -166,12 +167,15 @@ def _claude_observation(output: str, model: str, family: str) -> tuple[str, str]
 def _command(executor: str, model: str, effort: str) -> list[str]:
     if executor == "codex":
         return ["codex", "exec", "--sandbox", "read-only", "--skip-git-repo-check",
-                "-m", model, "-c", f"model_reasoning_effort={effort}", "-"]
+                "--ephemeral", "-m", model, "-c", f"model_reasoning_effort={effort}", "-"]
     if executor == "claude":
         return ["claude", "-p", "--model", model, "--effort", effort,
-                "--output-format", "json", "--no-session-persistence"]
+                "--permission-mode", "plan", "--tools", "Read,Glob,Grep",
+                "--permission-prompts", "none", "--output-format", "json",
+                "--no-session-persistence"]
     return ["agy", "-p", "--model", model, "--effort", effort,
-            "--mode", "plan", "--output-format", "text"]
+            "--mode", "plan", "--sandbox", "--disable-slash-commands",
+            "--output-format", "text"]
 
 
 def execute(
@@ -186,6 +190,7 @@ def execute(
         "requested_effort": effort, "requested_family": family,
         "observed_model": None, "observed_effort": None,
         "evidence_level": "none", "review_output": None,
+        "filesystem_boundary": "working-root-only; outside-root reads and CLI writes not excluded",
     }
 
     def fail(reason: str) -> dict[str, Any]:

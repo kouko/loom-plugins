@@ -11,9 +11,12 @@ def consent(executor="codex", scope="/repo", model=None, effort="high"):
     model = model or {"codex": "gpt-6.1-sol", "claude": "sonnet",
                       "agy": "gemini-2.5-pro"}[executor]
     return {
-        "approved": True, "executor": executor, "readable_scope": scope,
+        "approved": True, "executor": executor, "review_root": scope,
         "model": model, "effort": effort,
-        "disclosures": {"cost": True, "vendor_egress": True, "local_execution": True},
+        "disclosures": {"cost": True, "vendor_egress": True,
+                        "local_execution": True,
+                        "filesystem_access_outside_root": True,
+                        "filesystem_write_not_guaranteed": True},
     }
 
 
@@ -38,6 +41,30 @@ def test_consent_blocks_all_subprocesses(record):
     assert calls == []
 
 
+def test_missing_host_read_disclosure_blocks_discovery():
+    record = consent()
+    del record["disclosures"]["filesystem_access_outside_root"]
+    result = review.discover("codex", "/repo", record,
+                             runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
+def test_missing_host_write_disclosure_blocks_discovery():
+    record = consent()
+    del record["disclosures"]["filesystem_write_not_guaranteed"]
+    result = review.discover("codex", "/repo", record,
+                             runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
+def test_old_readable_scope_field_is_not_treated_as_confinement_consent():
+    record = consent()
+    record["readable_scope"] = record.pop("review_root")
+    result = review.discover("codex", "/repo", record,
+                             runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["reason"] == "consent-missing-or-stale"
+
+
 def test_codex_discovery_probe_and_review_observe_exact_profile():
     calls = []
     model_list = {"id": 2, "result": {"data": [{"id": "gpt-6.1-sol"}]}}
@@ -49,6 +76,8 @@ def test_codex_discovery_probe_and_review_observe_exact_profile():
             assert '"method": "model/list"' in kwargs["input"]
             return completed(argv, json.dumps(model_list))
         assert argv[:2] == ["codex", "exec"]
+        assert "--sandbox" in argv and argv[argv.index("--sandbox") + 1] == "read-only"
+        assert "--ephemeral" in argv
         assert "-m" in argv and argv[argv.index("-m") + 1] == "gpt-6.1-sol"
         assert "model_reasoning_effort=high" in argv
         return completed(argv, "ok" if len(calls) == 2 else "review verdict", header)
@@ -57,6 +86,7 @@ def test_codex_discovery_probe_and_review_observe_exact_profile():
                             "review", consent(), runner=runner)
     assert result["status"] == "completed"
     assert result["evidence_level"] == "observed-model-and-effort"
+    assert "outside-root reads" in result["filesystem_boundary"]
     assert result["review_output"] == "review verdict"
     assert len(calls) == 3
     assert calls[1][1]["timeout"] < calls[2][1]["timeout"]
@@ -68,6 +98,9 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     def runner(argv, **kwargs):
         calls.append(argv)
         assert argv[:2] == ["claude", "-p"]
+        assert argv[argv.index("--permission-mode") + 1] == "plan"
+        assert argv[argv.index("--tools") + 1] == "Read,Glob,Grep"
+        assert argv[argv.index("--permission-prompts") + 1] == "none"
         assert argv[argv.index("--model") + 1] == "sonnet"
         assert argv[argv.index("--effort") + 1] == "high"
         output = {"result": "ok" if len(calls) == 1 else "verdict: PASS",
@@ -91,6 +124,9 @@ def test_agy_model_list_and_explicit_pair():
         if argv == ["agy", "models"]:
             return completed(argv, "gemini-2.5-pro\nclaude-sonnet-4-5\n")
         assert argv[:3] == ["agy", "-p", "--model"]
+        assert "--sandbox" in argv
+        assert "--disable-slash-commands" in argv
+        assert argv[argv.index("--mode") + 1] == "plan"
         assert argv[argv.index("--effort") + 1] == "high"
         return completed(argv, "ok" if len(calls) == 2 else "verdict: PASS")
 
