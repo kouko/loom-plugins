@@ -264,7 +264,7 @@ def test_skipped_plan_intent_selection_requires_outside_reviewer(
     intent = repo / f"docs/loom/intent/{CHANGE}.md"
     intent.parent.mkdir(parents=True, exist_ok=True)
     intent.write_text(
-        "## Constraints\nuser-decided — second-vendor selection-confirmed: claude\n",
+        "## Constraints\n- user-decided — second-vendor selection-confirmed: claude\n",
         encoding="utf-8",
     )
     commit(repo, "record outside choice without plan")
@@ -300,9 +300,30 @@ def test_skipped_plan_intent_selection_requires_outside_reviewer(
 
     plan = repo / f"docs/loom/{CHANGE}/plan.md"
     plan.parent.mkdir(parents=True, exist_ok=True)
-    plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: codex\n")
+    plan.write_text("## Risks\n- user-decided — second-vendor selection-confirmed: codex (draft)\n")
+    commit(repo, "create plan without changing outside choice")
+    assert reviewers.selected_outside_family(repo, CHANGE) == "anthropic"
+    out = StringIO()
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, StringIO()) == 0
+    assert out.getvalue() == "2\n"
+    plan.write_text("## Risks\n- user-decided — second-vendor selection-confirmed: codex\n")
     commit(repo, "plan overrides intent selection")
     assert reviewers.selected_outside_family(repo, CHANGE) == "openai"
+
+
+def test_outside_selection_is_only_read_from_owning_sections(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "## Questions asked\n"
+        "user-decided — second-vendor selection-confirmed: claude\n"
+        "## Constraints\n- no outside reviewer selected\n",
+        encoding="utf-8",
+    )
+    commit(repo, "record unrelated question text")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
 
 
 def test_selected_outside_review_raises_narrow_floor_and_requires_both_families(

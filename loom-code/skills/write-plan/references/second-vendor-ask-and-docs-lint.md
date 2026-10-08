@@ -59,7 +59,8 @@ discovery for `effective_executor` within `allowed_vendors`. It is not a
 selected reviewer and must not produce a `selection-confirmed` plan line.
 After consented discovery, identify a concrete model and verify its family;
 reevaluate with that candidate and `response_vendor` under the same approval.
-Only `selection-confirmed` then records the provider family in the plan. Do
+Only `selection-confirmed` then records the provider family in plan Risks, or
+in intent Constraints when plan is skipped. Do
 not ask a second time unless executor, readable scope, cost/egress disclosure,
 or allowed model-family bounds change. If discovery finds no eligible model,
 report the limitation and do not record a reviewer.
@@ -90,6 +91,11 @@ the result supplies them. Add no second column or decorative row.
 Only when the concrete-candidate reevaluation returns `selection-confirmed`, append
 `user-decided — second-vendor selection-confirmed: <vendor>` to the plan's
 `## Risks` section and commit that plan edit before Closing Review starts.
+When plan is skipped, append the exact Markdown bullet
+`- user-decided — second-vendor selection-confirmed: <vendor>` to the
+confirmed intent's `## Constraints` instead. If a plan is created later, copy
+the unbulleted line into its Risks before review. The checker reads plan Risks
+first and intent Constraints when plan is absent or has no selection.
 Here `<vendor>` is the selected model's provider family, not the executable;
 the selected executor and model remain in the approved execution record.
 The plan charter's `plan-maintained` edits-after rule authorizes this update
@@ -107,8 +113,9 @@ default. No reply means no second vendor for this change.
 user on each change that lacks a qualifying direct user request. A direct user
 request naming an outside coding agent and an explicit or unambiguous active
 review target authorizes one review without a second per-change ask. Quote
-that request and target as `authorization_source` in the intent decision
-record; do not add a question to `## Questions asked`. Show cost, vendor
+that request and target in JSON `authorization_source` at dispatch; record the
+provider family in the separate machine line above. Do not add a question to
+`## Questions asked`. Show cost, vendor
 egress, `review_root`, outside-root access and local-execution disclosure
 before any network-backed discovery or execution, without asking for the same
 review again. The execution record keeps the complete disclosure fields;

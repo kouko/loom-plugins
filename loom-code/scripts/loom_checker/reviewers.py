@@ -93,18 +93,28 @@ def selected_outside_family(repo: Path, change_id: str, head_sha: str | None = N
     head = head_sha or git_maybe(repo, "rev-parse", "HEAD")
     if not head:
         return None
-    plan = git_maybe(repo, "show", f"{head}:docs/loom/{change_id}/plan.md")
-    # A skipped plan has no Risks section. Its confirmed intent carries the
-    # same explicit selection in Constraints, so the gate can still recompute it.
-    record = plan if plan is not None else (
-        git_maybe(repo, "show", f"{head}:docs/loom/intent/{change_id}.md") or ""
-    )
-    matches = re.findall(
-        r"(?m)^\s*(?:\d+\.\s*)?user-decided\s+—\s+second-vendor "
-        r"selection-confirmed:\s*(claude|codex|gemini)\s*$", record,
-    )
-    if matches:
-        return _OUTSIDE_FAMILIES[matches[-1]]
+
+    def selection_in(record: str, section: str) -> str | None:
+        heading = re.search(rf"(?m)^## {section}[ \t]*$", record)
+        if heading is None:
+            return None
+        body = record[heading.end():]
+        next_heading = re.search(r"(?m)^## ", body)
+        if next_heading:
+            body = body[:next_heading.start()]
+        matches = re.findall(
+            r"(?m)^(?:- )?user-decided — second-vendor "
+            r"selection-confirmed: (claude|codex|gemini)$", body,
+        )
+        return matches[-1] if matches else None
+
+    plan = git_maybe(repo, "show", f"{head}:docs/loom/{change_id}/plan.md") or ""
+    selected = selection_in(plan, "Risks")
+    if selected is None:
+        intent = git_maybe(repo, "show", f"{head}:docs/loom/intent/{change_id}.md") or ""
+        selected = selection_in(intent, "Constraints")
+    if selected is not None:
+        return _OUTSIDE_FAMILIES[selected]
     defaults = git_maybe(repo, "show", f"{head}:docs/loom/KICKOFF-DEFAULTS.md") or ""
     match = re.search(
         r"(?m)^- second-vendor:\s*(claude|codex|gemini)(?:\s+—|\s*$)", defaults,

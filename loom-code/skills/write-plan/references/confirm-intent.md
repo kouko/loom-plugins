@@ -48,8 +48,10 @@ twice.
    does not add a question. When the user already named an outside coding
    agent and the review target is explicit or unambiguous from the active
    task, use that direct user request without a second per-change question.
-   Quote it as `authorization_source` in the intent decision record; it is not
-   a question and does not enter `## Questions asked`. Otherwise `ask` puts
+   Store its verbatim quote and target in JSON `authorization_source` at
+   dispatch; the selected provider family uses the separate machine line in
+   plan Risks or, when plan is skipped, bulleted intent Constraints. The direct
+   request is not a question and does not enter `## Questions asked`. Otherwise `ask` puts
    its host-aware question here using the native interface or documented
    fallback and records the answer. A fixed CLI and `suggest` add no
    question here. Before outside discovery or execution, show the cost,

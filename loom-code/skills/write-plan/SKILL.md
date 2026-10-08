@@ -160,9 +160,12 @@ neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
 plan, and unsupported detail is deleted. This pass creates no field, ID,
 requirement, scenario, product behaviour, or review loop.
 Publication and second-reviewer authorisation never enter Problem, Proposed
-outcome, Acceptance, Constraints, or Out of scope. Keep publication
-authorisation in the intent's `publication:` frontmatter line and preserve the
-question list for this plan's `## Questions asked` section.
+outcome, Acceptance, or Out of scope. Keep publication authorisation in the
+intent's `publication:` frontmatter line. The sole Constraints exception is
+`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
+skipped; it records the selected family, not the user's quoted request. Keep
+that verbatim quote and target in JSON `authorization_source` at dispatch, and
+preserve only actual questions for this plan's `## Questions asked` section.
 Visible effects with an unknown surface and no spec require
 `needs-design: yes` with a surface-neutral reason; internal files alone do not.
 Complete the code-only altitude pass before confirmation. A material outcome
@@ -391,6 +394,10 @@ restatement stays in the user's language.
   there is no spec, this section is also where the answers to one-way-door
   questions live: one `user-decided — <what they chose and why>` line each,
   because with no spec there is no `## Design decision` to hold them.
+  If a previously skipped plan's intent Constraints carries
+  `- user-decided — second-vendor selection-confirmed: <vendor>`, copy the
+  unbulleted machine line into Risks before review. Risks is authoritative
+  when it has a selection; otherwise review falls back to intent Constraints.
 
 **Simplicity check.** After the draft exists, follow
 [`references/plan-simplicity.md`](references/plan-simplicity.md). Planned

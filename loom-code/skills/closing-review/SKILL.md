@@ -140,10 +140,15 @@ reviewer and pass no `verdicts`.
   standing fixed CLI, the per-change `ask` answer, or a committed
   `user-decided — second-vendor selection-confirmed: <vendor>` plan line, or a
   direct user request naming an outside coding agent for the active code branch.
-  Record an accepted `ask` answer or direct request with that same line in
-  the plan's `## Risks`, or in the confirmed intent's `## Constraints` when
-  plan is skipped, before reviewing. The committed plan selection takes
-  precedence when both records exist, so
+  Record an accepted `ask` answer or direct request with that exact line in
+  the plan's `## Risks`; when plan is skipped, record
+  `- user-decided — second-vendor selection-confirmed: <vendor>` in the
+  confirmed intent's `## Constraints` before reviewing. If a plan is created
+  later, copy the selection into its Risks before review. The checker reads
+  plan Risks first, then intent Constraints when the plan is absent or has no
+  selection. Keep a direct request's verbatim quote and target in the JSON
+  `authorization_source` at dispatch; the request is not an asked question in
+  `## Questions asked`. Thus
   `reviewer-count`, finalization and attestation validation can recompute it.
   With no selection, do not start external execution. Compare the selected
   model's provider family with the current host model's family when that
