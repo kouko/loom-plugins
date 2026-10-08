@@ -18,6 +18,9 @@ REQ-4 — Explicit executor profile
 REQ-5 — No false verification
   IF the selected CLI, explicitly accepted model-and-effort pair, or required selected-model vendor family cannot be established, or execution fails, THEN Loom shall report the concrete limitation and shall not accept that outside verdict as a completed independent review → Acceptance #5
 
+REQ-6 — No duplicate confirmation for an explicit request
+  WHEN a user explicitly names an outside coding agent and the review target is named or unambiguous from the active task, Loom shall disclose the cost and execution scope then proceed without a second yes/no checkpoint; when the provider or target is ambiguous, or the material scope expands beyond the task, Loom shall ask for the missing choice before dispatch → Acceptance #6
+
 ## Design decision
 - agent-decided — Keep review criteria, task packet and result validation with the owning Loom review skill. Independent-advisor routes a requested independent task and the common external-execution contract owns CLI selection, explicit model/effort flags, bounded execution and provenance. This lets plan, code and decision reviews share execution without importing the advisor's explore-mode proposer and blind-judge protocol into every review.
 - agent-decided — An explicitly requested external opinion is additional to the incumbent review. In formal closing review, if the computed reviewer floor is one and a second vendor is selected, the checker raises the required count to two; the incumbent occupies one slot and the outside reviewer occupies the other. At higher floors the outside reviewer may occupy one slot, but never the incumbent's only slot. The checker and finalization must recompute the same rule rather than trust a declared count.
@@ -26,12 +29,15 @@ REQ-5 — No false verification
 - agent-decided — Both entry paths require recorded consent before network-backed discovery, probe or dispatch: independent-advisor uses its existing single checkpoint; formal review's `ask`, `suggest` acceptance or fixed setting must already carry the same cost, vendor-egress, readable-scope and local-execution disclosures. A prior fixed setting without that recorded scope is insufficient, so its user confirmation belongs in the existing intent decision point, not an extra review-time question. The selected executor or scope changing invalidates that consent.
 - agent-decided — Run the actual review with the same explicit model and effort pair accepted by the pre-review execution. Evidence levels remain separate: Codex's run header must report the requested model and effort; Claude Code must succeed under `--model` and `--effort`, with its `modelUsage` naming a model in the requested family; Antigravity must list the selected slug via `agy models` and succeed under `--model` and `--effort`. The latter two establish accepted explicit settings, not independent observation of the effective effort or (for Antigravity) the effective model. Their reports say so. A rejected flag, unexpected observable model, missing candidate, nonzero exit, timeout, or unidentifiable vendor family is a failure, not a completed review.
 - agent-decided — Do not silently downgrade to an executor default or another model after a failed explicit selection. Surface unsupported combinations and exhausted credentials as execution failures; any materially different vendor or capability needs the existing user checkpoint again.
+- user-decided — A direct request naming the outside coding agent and review target authorizes that review without a duplicate consent question. Keep a non-blocking cost, egress and local-execution disclosure before dispatch; a suggestion alone or a materially broader provider or data scope is not authorized by that request.
+- agent-decided — Validate the runner receipt's model, effort, provider family and evidence level against the executor-specific facts; the receipt is a consistency check of reported execution, not independent proof that a process ran.
 
 ## Alternatives considered
 - A scheduled complete model table inside independent-advisor was rejected because a repository update cannot establish account entitlement, quota or current CLI support between updates.
 - Automating `/model` interactive pickers was rejected because their display and controls are not a stable machine-readable interface.
 - Routing every review through the advisor's full explore-mode comparison was rejected because it duplicates the owning review skill's judgment and expands leg count, cost and data transfer.
 - Making loom-code call a loom-workflow runtime file was rejected because the repository's ratified plugin dependency goes in the opposite direction.
+- Requiring the user to confirm a direct named-agent review request a second time was rejected because the request already authorizes that specific transfer and the duplicate prompt delays execution without adding a new choice.
 
 ## Current state evidence
 - Forward: `loom-workflow/skills/independent-advisor/SKILL.md` — description and mode routing accept a plan or decision, then call executor detection.

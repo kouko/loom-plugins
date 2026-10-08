@@ -58,9 +58,27 @@ charter: 1.1
 - Test: A1 positive: named-external-review-route; negative: lost-incumbent-contract. A4 positive: explicit-pair-evidence; negative: stale-advisor-probe-pin. A5 positive: complete-consent; negative: old-credential-assumption.
 - Risk: agent-decided — the old structure test pins deleted advisor-side probe commands; replace those assertions with the current single handoff and consent contract.
 
+### Wave 5 — Close live outside-review findings and remove duplicate consent
+
+**W5-01 Direct-request authorization**  after: W4-03  acceptance: 3, 6
+- Files: loom-workflow/skills/independent-advisor/SKILL.md, loom-workflow/skills/independent-advisor/references/executor-detection.md, loom-code/skills/external-review/SKILL.md, loom-code/scripts/external_review.py, loom-workflow/tests/independent-advisor/test_independent_advisor_readmes.py, loom-code/tests/test_external_review.py
+- Test: A6 positive: named-agent-with-active-task-target-runs-after-disclosure; negative: suggestion-or-expanded-scope-stops. A3 negative: notice-does-not-authorize.
+- Risk: user-decided — a direct named request authorizes one bounded review without a second confirmation; disclosure remains visible, and missing or expanded choices stop dispatch.
+
+**W5-02 Ground and correct outside CLI execution**  after: W5-01  acceptance: 4, 5
+- Files: loom-code/scripts/external_review.py, loom-code/tests/test_external_review.py, loom-code/skills/external-review/SKILL.md, docs/loom/2026-10-08-unify-independent-external-review/evidence/cli-grounding.md
+- Test: A4 positive: agy-absolute-workspace-and-explicit-profile; negative: missing-workspace. A5 positive: supported-command-grounding; negative: rejected-pair-stops.
+- Risk: agent-decided — Claude Code's outside review identified missing `agy --add-dir`; local CLI help and the repository's Antigravity instructions establish that print mode needs an absolute workspace path.
+
+**W5-03 Recompute outside receipt consistency**  after: W5-02  acceptance: 2, 5
+- Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/skills/closing-review/SKILL.md
+- Test: A5 negative: impossible-executor-family-or-evidence-pair-rejected; boundary: observed-model-and-effort-mismatch. A2 positive: legitimate-Claude-receipt-remains-valid.
+- Risk: agent-decided — the outside reviewer found that a forged receipt can claim Codex-only observation for Claude; the checker must reject impossible combinations rather than trust caller-supplied fields.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
+- Reuse the existing disclosure and receipt fields; add only the checks needed to distinguish an explicit request from a suggestion and to reject impossible execution claims — taken
 
 ## Questions asked
 ① — what — 上述問題與驗收條件是你要的嗎？ 回答「是」也會授權通過審查與發布檢查後，自動推送分支並建立 Ready PR；合併仍由你另行決定，你也可以在發布前明確取消自動發布。
@@ -69,3 +87,4 @@ charter: 1.1
 1. CLI discovery and result JSON may drift; bounded probes must fail clearly and cannot establish account entitlement for a future run.
 2. The current Claude and Antigravity outputs do not independently reveal every effective setting; report requested, accepted and observed evidence separately.
 3. CLI working directory does not confine file reads or prove that setup cannot write; the approval record discloses both limits before execution.
+4. An explicit user request now supplies the authorization that the old second confirmation supplied; the task must quote that request and stop if the provider or review target cannot be determined from it and active context, or the material scope widens.
