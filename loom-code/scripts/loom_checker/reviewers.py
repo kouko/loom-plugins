@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from loom_checker.artifact_types import _TEST_NAME_RE
+from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import _is_host_plumbing
 from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_maybe
+from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import tree_programs
@@ -57,7 +59,9 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
                 for score in scores.values()) or
             not isinstance(parsed.get("reviewed_sha"), str) or
             not parsed["reviewed_sha"].strip() or
-            parsed["reviewed_sha"] != verdict.get("reviewed_sha")):
+            parsed["reviewed_sha"] != verdict.get("reviewed_sha") or
+            parsed.get("review_target_sha") != verdict.get("review_target_sha") or
+            not isinstance(parsed.get("review_target_sha"), str)):
         return "selected outside execution lacks required reviewer YAML"
     findings = parsed.get("findings")
     if not isinstance(findings, list):
@@ -121,7 +125,9 @@ def selected_outside_family(repo: Path, change_id: str, head_sha: str | None = N
 
 
 def outside_verdict_failure(
-    verdicts: list[dict], family: str | None, head_sha: str,
+    verdicts: list[dict], family: str | None, head_sha: str, *,
+    repo: Path | None = None, change_id: str | None = None,
+    content_digest: str | None = None, manifest: dict | None = None,
 ) -> str | None:
     """A selected outside opinion must coexist with an incumbent opinion."""
     if family is None:
@@ -141,14 +147,25 @@ def outside_verdict_failure(
     if len(matched) != 1:
         return "selected outside execution needs exactly one attributed verdict"
     verdict = matched[0]
-    if verdict.get("reviewed_sha") != head_sha:
-        return "selected outside execution reviewed SHA does not match attested HEAD"
+    target = verdict.get("review_target_sha")
+    if not isinstance(target, str) or not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", target):
+        return "selected outside execution has no concrete review target SHA"
     receipt = verdict.get("external_review")
     if not isinstance(receipt, dict) or set(receipt) != {
         "status", "executor", "model", "effort", "family", "evidence_level",
         "observed_model", "observed_effort", "output_digest", "reviewer",
+        "review_target_sha",
     }:
         return "selected outside execution receipt is missing or malformed"
+    if receipt["review_target_sha"] != target:
+        return "selected outside execution review target differs from its receipt"
+    if repo is None:
+        if target != head_sha:
+            return "selected outside execution review target does not match finalization HEAD"
+    elif (change_id is None or content_digest is None or
+          not git_ok(repo, "merge-base", "--is-ancestor", target, head_sha) or
+          functional_content_digest(repo, target, change_id, manifest) != content_digest):
+        return "selected outside execution review target is stale or outside validation ancestry"
     if (receipt["status"] != "completed" or receipt["family"] != family or
             receipt["model"] != verdict.get("model") or
             receipt["reviewer"] != verdict.get("reviewer") or
@@ -227,6 +244,7 @@ def attach_outside_receipt(
         "observed_effort": result.get("observed_effort"),
         "output_digest": hashlib.sha256(output.encode("utf-8")).hexdigest(),
         "reviewer": verdict.get("reviewer"),
+        "review_target_sha": verdict.get("review_target_sha"),
     }
     return prepared, outside_verdict_failure(prepared, family, head_sha)
 

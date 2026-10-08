@@ -164,6 +164,12 @@ reviewer the branch base, changed paths, intent, spec when present, plan, and
 the applicable lens from `references/lenses.md`. Reviewers return the
 structured YAML required by `agents/reviewer.md`; the orchestrator converts
 the accepted fields to the temporary JSON consumed by finalization.
+For branch-end review, send both `reviewed_sha` (the diff base) and
+`review_target_sha` (the committed HEAD being judged). Preserve the target in
+the outside review's raw YAML and attributed verdict. Finalization requires it
+to equal HEAD; later attestation validation allows publication-only commits
+after that target while requiring the target to be an ancestor with the same
+functional content digest.
 
 <!-- gate: review.external-dispatch -->
 For the selected outside reviewer, invoke the named

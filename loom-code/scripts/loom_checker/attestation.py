@@ -112,7 +112,8 @@ def validate_attestation(
         }:
             return [(rule, "attestation contains a malformed or non-passing reviewer verdict")]
     outside_failure = outside_verdict_failure(
-        verdicts, selected_outside_family(repo, change_id, head_sha), head_sha
+        verdicts, selected_outside_family(repo, change_id, head_sha), head_sha,
+        repo=repo, change_id=change_id, content_digest=expected, manifest=manifest,
     )
     if outside_failure:
         return [(rule, outside_failure)]

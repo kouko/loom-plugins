@@ -13,7 +13,7 @@ from pathlib import Path
 import external_review
 import pytest
 from loom_checker import attestation as attestation_module
-from loom_checker import digest, probes, reviewers
+from loom_checker import digest, probes, reviewers, verification
 from loom_checker.command_handlers import finalize, reviewer_count
 
 
@@ -482,9 +482,10 @@ def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path
     plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: claude\n")
     commit(repo, "select outside review")
     head = git(repo, "rev-parse", "HEAD")
-    stale_sha = git(repo, "rev-parse", "HEAD^")
+    base_sha = git(repo, "rev-parse", "HEAD^")
     raw = (
-        f"verdict: PASS\nlens: docs\nreviewed_sha: {head}\n"
+        f"verdict: PASS\nlens: docs\nreviewed_sha: {base_sha}\n"
+        f"review_target_sha: {head}\n"
         "dimension_scores:\n"
         "  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n"
         "  incorrect-fact: PASS\n  missing-population: PASS\n"
@@ -496,7 +497,8 @@ def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path
             {"reviewer": "native", "vendor": "openai", "model": "test",
              "lens": "docs", "verdict": "PASS", "findings": []},
             {"reviewer": "outside-1", "vendor": "anthropic", "model": "sonnet",
-             "lens": "docs", "reviewed_sha": head, "verdict": "PASS", "findings": [],
+             "lens": "docs", "reviewed_sha": base_sha,
+             "review_target_sha": head, "verdict": "PASS", "findings": [],
              "external_review": {
                  "status": "completed", "reason": None, "executor": "claude",
                  "requested_model": "sonnet", "requested_effort": "high",
@@ -515,23 +517,51 @@ def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path
     assert attestation_module.validate_attestation(
         repo, head, CHANGE, attestation, manifest()
     ) == []
-    attestation["verdicts"][1]["reviewed_sha"] = stale_sha
-    assert any("reviewed SHA" in reason for _, reason in
+    assert receipt["review_target_sha"] == head
+    attestation["verdicts"][1]["review_target_sha"] = base_sha
+    attestation["verdicts"][1]["external_review"]["review_target_sha"] = base_sha
+    assert any("review target" in reason for _, reason in
                attestation_module.validate_attestation(repo, head, CHANGE,
                                                        attestation, manifest()))
-    attestation["verdicts"][1]["reviewed_sha"] = head
+    attestation["verdicts"][1]["review_target_sha"] = head
+    attestation["verdicts"][1]["external_review"]["review_target_sha"] = head
 
     (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
     stale_input = json.loads(review_input.read_text(encoding="utf-8"))
-    stale_input["verdicts"][1]["reviewed_sha"] = stale_sha
+    stale_input["verdicts"][1]["review_target_sha"] = base_sha
     stale_input["verdicts"][1]["external_review"]["review_output"] = raw.replace(
-        head, stale_sha)
+        f"review_target_sha: {head}", f"review_target_sha: {base_sha}")
     review_input.write_text(json.dumps(stale_input), encoding="utf-8")
-    assert any("reviewed SHA" in reason for _, reason in
+    assert any("review target" in reason for _, reason in
                finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+
+    (repo / f"docs/loom/{CHANGE}/attestation.json").write_text(
+        json.dumps(attestation), encoding="utf-8")
+    publication_head = commit(repo, "publish attestation")
+    assert publication_head != head
+    assert verification.verification_status(
+        repo, CHANGE, base=base_sha
+    ) == "valid"
+    git(repo, "switch", "-q", "-c", "alien", base_sha)
+    (repo / "alien.txt").write_text("another branch\n", encoding="utf-8")
+    alien_sha = commit(repo, "unrelated review target")
+    git(repo, "switch", "-q", "feature")
+    attestation["verdicts"][1]["review_target_sha"] = alien_sha
+    attestation["verdicts"][1]["external_review"]["review_target_sha"] = alien_sha
+    assert any("validation ancestry" in reason for _, reason in
+               attestation_module.validate_attestation(
+                   repo, publication_head, CHANGE, attestation, manifest()))
+    attestation["verdicts"][1]["review_target_sha"] = head
+    attestation["verdicts"][1]["external_review"]["review_target_sha"] = head
+    src = repo / "src.py"
+    src.write_text("VALUE = 2\n", encoding="utf-8")
+    commit(repo, "functional content after review")
+    assert verification.verification_status(
+        repo, CHANGE, base=base_sha
+    ).startswith("stale (attestation functional content digest")
     receipt["reviewer"] = "native"
     assert any("outside execution" in reason for _, reason in
-               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+               attestation_module.validate_attestation(repo, head,
                                                        CHANGE, attestation, manifest()))
 
 
@@ -555,12 +585,14 @@ def test_outside_receipt_rejects_impossible_field_combinations(
     outside.update(vendor=family, model=model)
     evidence["verdicts"][0]["vendor"] = "anthropic" if family != "anthropic" else "openai"
     head = git(repo, "rev-parse", "HEAD")
-    outside["reviewed_sha"] = head
+    outside["reviewed_sha"] = git(repo, "rev-parse", "HEAD^")
+    outside["review_target_sha"] = head
     receipt = {
         "status": "completed", "executor": executor, "model": model,
         "effort": "high", "family": family, "evidence_level": level,
         "observed_model": observed_model, "observed_effort": observed_effort,
         "output_digest": "a" * 64, "reviewer": outside["reviewer"],
+        "review_target_sha": head,
     }
     outside["external_review"] = receipt
     assert attestation_module.validate_attestation(repo, head, CHANGE, evidence, manifest()) == []
@@ -599,7 +631,9 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
     plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: codex\n")
     commit(repo, "select outside provider")
     head = git(repo, "rev-parse", "HEAD")
-    packet = (f"lens: docs\nreviewed_sha: {head}\nchanged paths: docs/loom/"
+    base_sha = git(repo, "rev-parse", "HEAD^")
+    packet = (f"lens: docs\nreviewed_sha: {base_sha}\nreview_target_sha: {head}\n"
+              "changed paths: docs/loom/"
               f"{CHANGE}/plan.md\nground truth: intent and plan\n"
               "dimensions: loom-code/skills/closing-review/references/lenses.md\n"
               "output: agents/reviewer.md YAML contract\n")
@@ -653,7 +687,8 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
         {"reviewer": "native", "vendor": "anthropic", "model": "sonnet",
          "lens": "docs", "verdict": "PASS", "findings": []},
         {"reviewer": "outside", "vendor": "openai", "model": "gpt-6.1-sol",
-         "lens": "docs", "reviewed_sha": head, "verdict": "PASS",
+         "lens": "docs", "reviewed_sha": base_sha,
+         "review_target_sha": head, "verdict": "PASS",
          "findings": [], "external_review": result},
     ]
     review_input = tmp_path / "review-input.json"
@@ -663,7 +698,8 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
                finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
 
     raw = (
-        f"verdict: PASS\nlens: docs\nreviewed_sha: {head}\n"
+        f"verdict: PASS\nlens: docs\nreviewed_sha: {base_sha}\n"
+        f"review_target_sha: {head}\n"
         "dimension_scores:\n"
         "  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n"
         "  incorrect-fact: PASS\n  missing-population: PASS\n"
@@ -691,7 +727,8 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
     for malformed in (
         raw.replace("  deletion-first: PASS\n", ""),
         raw.replace("  omission: PASS", "  omission: UNKNOWN"),
-        raw.replace(head, "OTHER"),
+        raw.replace(f"reviewed_sha: {base_sha}", "reviewed_sha: OTHER"),
+        raw.replace(f"review_target_sha: {head}", "review_target_sha: OTHER"),
     ):
         result["review_output"] = malformed
         review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
