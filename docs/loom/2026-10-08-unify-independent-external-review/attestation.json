@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-08-unify-independent-external-review",
-  "content_digest": "43d517eb6adc57bec63352c9461acd071a81dd90",
+  "content_digest": "90035295361e0cd38f9b5a8d2a2fb48af349f05b",
   "executions": [
     {
       "kind": "package-tests",
@@ -12,28 +12,53 @@
     },
     {
       "kind": "adversarial",
-      "command": "python3 -m pytest loom-code/tests/test_external_review_adversarial.py -q",
-      "artifact": "loom-code/tests/test_external_review_adversarial.py",
+      "command": "python3 -m pytest docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_fenced_numbered_selection.py -c /dev/null -q -p no:cacheprovider",
+      "artifact": "docs/loom/2026-10-08-unify-independent-external-review/evidence/probes/test_fenced_numbered_selection.py",
       "result": "pass",
-      "command_digest": "e4097f85e6f309dab45fc0cc64e2cd32b6189872463e88de4885e2e59ad5e756"
+      "command_digest": "74ac0c7ff2ae735c3bece1ccfb57e0625f80d57e9c8cd6ddd661e069347bb862"
     }
   ],
   "verdicts": [
     {
-      "reviewer": "closing_code_reviewer",
+      "reviewer": "codex-code-w8",
       "vendor": "openai",
-      "model": "inherited-host-model",
+      "model": "host-inherited-unverified",
       "lens": "code",
-      "verdict": "PASS",
+      "reviewed_sha": "dc4014e909f548d94391935f6694c77252d5e9be",
+      "review_target_sha": "a586e4b0e23a315d9a7202029f38fc9fda6af4e0",
+      "verdict": "PASS_WITH_NOTES",
       "findings": []
     },
     {
-      "reviewer": "closing_skill_reviewer",
-      "vendor": "openai",
-      "model": "inherited-host-model",
-      "lens": "skill",
-      "verdict": "PASS",
-      "findings": []
+      "reviewer": "claude-code-w8",
+      "vendor": "anthropic",
+      "model": "sonnet",
+      "lens": "code",
+      "reviewed_sha": "dc4014e909f548d94391935f6694c77252d5e9be",
+      "review_target_sha": "a586e4b0e23a315d9a7202029f38fc9fda6af4e0",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "anchor": "loom-code/scripts/loom_checker/reviewers.py :: parsed.get(\"review_target_sha\") != verdict.get(\"review_target_sha\")",
+          "text": "suggestion (non-blocking): Now that `reviewed_sha` is the diff base, the checker only requires it to be a non-empty string that matches between the raw YAML and the verdict. It is not checked to be a concrete SHA, or a strict ancestor of `review_target_sha`. A degenerate base (for example equal to the target) would pass. The target is bound by ancestry and content digest, so neither Round 2 fatal reopens. Native verdicts have no such check either.",
+          "fix": "In `outside_verdict_failure`, when `repo` is given, also require that `reviewed_sha` is a full hex SHA and that `git merge-base --is-ancestor reviewed_sha review_target_sha` holds with the two unequal. Add one case to `test_finalize_binds_selected_outside_runner_output_to_verdict` that sets `reviewed_sha` to the alien SHA (or to the target) and expects a failure."
+        }
+      ],
+      "external_review": {
+        "status": "completed",
+        "executor": "claude",
+        "model": "sonnet",
+        "effort": "high",
+        "family": "anthropic",
+        "evidence_level": "accepted-explicit-settings",
+        "observed_model": "claude-sonnet-5-5",
+        "observed_effort": null,
+        "output_digest": "c57da7cdc57bcd4fa2e7dd432d883c3bd1d739c48ff72b2d0087cc338f219c71",
+        "reviewer": "claude-code-w8",
+        "review_target_sha": "a586e4b0e23a315d9a7202029f38fc9fda6af4e0"
+      }
     }
   ],
   "findings": [],
