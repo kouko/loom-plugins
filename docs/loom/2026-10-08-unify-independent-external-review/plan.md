@@ -99,6 +99,16 @@ charter: 1.1
 - Test: A6 positive: direct named agent and target bypass per-change ask; negative: suggestion-only still asks under `second-vendor: ask`. A3 positive: notice stays nonblocking.
 - Risk: agent-decided — the standing ask path can duplicate the user's named choice; it should reuse the explicit instruction while retaining a visible disclosure before execution.
 
+**W7-03 Canonicalize skipped-plan selection in the terminal fix**  after: W7-02  acceptance: 1, 6
+- Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/skills/closing-review/SKILL.md, loom-code/skills/write-plan/SKILL.md, loom-design/skills/capture-intent/SKILL.md, loom-code/skills/write-plan/references/confirm-intent.md, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md
+- Test: A1 positive: bulleted intent selection raises the floor and binds finalization; boundary: a later plan copies it into Risks before review and plan selection wins. A6 positive: quote source and machine selection line have distinct carriers.
+- Risk: agent-decided — two review rounds exposed one surviving skipped-plan gap; an exact shared selection line and narrow intent exception must converge within the terminal digest.
+
+**W7-04 Pin no-repeat wording and sync capture-intent routing**  after: W7-03  acceptance: 3, 4, 6
+- Files: loom-code/tests/test_write_plan_station_text.py, loom-code/skills/write-plan/references/second-vendor-ask-and-docs-lint.md, loom-design/skills/capture-intent/references/second-vendor.md, loom-design/tests/spec/test_capture_intent_contract.py
+- Test: A6 positive: affirmative direct request skips ask; negative: reversed wording fails the prose pin. A3 negative: suggestion does not dispatch. A4 positive: Antigravity path is no longer described as unsupported.
+- Risk: agent-decided — the old capture-intent reference and substring-only test can reintroduce duplicate questions or misstate executor support despite a passing package suite.
+
 ## Simplicity check
 - Named loom-code skill is the sole executable external-review boundary; duplicated probes and default-model fallback are superseded — taken
 - Split release metadata by plugin while retaining all manifest and README mirrors — taken
@@ -107,9 +117,8 @@ charter: 1.1
 ## Questions asked
 ① — what — 上述問題與驗收條件是你要的嗎？ 回答「是」也會授權通過審查與發布檢查後，自動推送分支並建立 Ready PR；合併仍由你另行決定，你也可以在發布前明確取消自動發布。
 
-user-decided — second-vendor selection-confirmed: claude
-
 ## Risks
+user-decided — second-vendor selection-confirmed: claude
 1. CLI discovery and result JSON may drift; bounded probes must fail clearly and cannot establish account entitlement for a future run.
 2. The current Claude and Antigravity outputs do not independently reveal every effective setting; report requested, accepted and observed evidence separately.
 3. CLI working directory does not confine file reads or prove that setup cannot write; the approval record discloses both limits before execution.
