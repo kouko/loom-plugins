@@ -4,7 +4,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 
 > 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.6.3 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.7.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 這是什麼
 
@@ -12,9 +12,10 @@ Loom 讓一個變更依序走過各站：`loom-design` 整理 intent 與 spec，
 負責 plan、build、review、ship。`loom-workflow` 收的是圍繞這些站使用的工具。
 工具本身不是站：每個工具都在特定時機接上，或在需要時呼叫，而且每個工具都能直接以名稱呼叫。
 
-每個工具只裝 `loom-workflow` 就能運作。唯一的例外是 `decision-map` 的 delivery
-步驟：它依 `loom-code` 的 contract template 寫出 intent，因此需要 `loom-code`；
-開地圖與推進 ticket 則不需要。
+多數工具只裝 `loom-workflow` 就能運作。`decision-map` 的 delivery 步驟依
+`loom-code` 的 contract template 寫出 intent，因此需要 `loom-code`；開地圖與
+推進 ticket 則不需要。明確要求外部 agent 審查 code、plan 或決策時，執行也需要
+`loom-code:external-review`。
 
 ## 收錄準則（Admission rule）
 
@@ -112,7 +113,7 @@ flowchart TD
 | [`git-memory`](skills/git-memory/) | 在每次 `git commit`、`gh pr create`、`gh pr merge` 之前分類 Decision、Learning、Gotcha memory；也能找回過去某個 Git 決策的理由。 |
 | [`handoff`](skills/handoff/) | 把 session 狀態存成 `.claude/handoffs/` 下的 HANDOFF 檔，或在新 session 中從它接續。 |
 | [`distill-sessions`](skills/distill-sessions/) | 挖掘過去的 Claude Code 與 Codex session（可用時加上 `/insights` facets），產出依 skill 排序的 friction 與可審閱的 SKILL.md 提案。 |
-| [`independent-advisor`](skills/independent-advisor/) | 對 plan 或決策，向另一個 executor——另一個 model tier、更高的 effort，或另一家廠商——取得 second opinion。花錢或把資料送出本機需經同意。 |
+| [`independent-advisor`](skills/independent-advisor/) | 明確要求外部 agent 審查 code、plan 或決策時，交由 `loom-code:external-review` 執行並保留原審查標準；也能向不同 model tier、effort 或廠商取得開放式 second opinion。花錢或把資料送出本機需經同意。 |
 | [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。plain-language reference 收錄寫法指引、選項判斷規則、八種對話情境表格與表格規則，另有軟體、設計、商業三份表格集。不用於 Obsidian 筆記。 |
 | [`goal-create`](skills/goal-create/) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
@@ -155,7 +156,8 @@ loom-workflow/
 ## 安裝
 
 這個 repository 是名為 `loom` 的 plugin marketplace。`loom-workflow` 可以單獨安裝；
-只有要用 `decision-map` 的 delivery 步驟時才需要再加裝 `loom-code`。
+要用 `decision-map` 的 delivery 步驟，或明確要求外部 agent 審查 code、plan
+或決策時，才需要再加裝 `loom-code`。
 
 ### Claude Code
 
