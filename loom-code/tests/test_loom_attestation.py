@@ -292,9 +292,51 @@ def test_selected_outside_review_raises_narrow_floor_and_requires_both_families(
                attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
                                                        CHANGE, evidence, manifest()))
     evidence["verdicts"][1]["lens"] = "code"
+    assert any("outside execution" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, evidence, manifest()))
+
+
+def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-08)\n")
+    commit(repo, "declare fast suite")
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: claude\n")
+    commit(repo, "select outside review")
+    raw = "verdict: PASS\nlens: docs\nfindings: []\n"
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({
+        "verdicts": [
+            {"reviewer": "native", "vendor": "openai", "model": "test",
+             "lens": "docs", "verdict": "PASS", "findings": []},
+            {"reviewer": "outside-1", "vendor": "anthropic", "model": "sonnet",
+             "lens": "docs", "verdict": "PASS", "findings": [],
+             "external_review": {
+                 "status": "completed", "reason": None, "executor": "claude",
+                 "requested_model": "sonnet", "requested_effort": "high",
+                 "requested_family": "anthropic", "evidence_level": "accepted-explicit-settings",
+                 "observed_model": "claude-sonnet-4-5", "observed_effort": None,
+                 "review_output": raw,
+             }},
+        ], "findings": [], "adversarial": [],
+    }), encoding="utf-8")
+    output = StringIO()
+    assert finalize._finalize(repo, CHANGE, ["--input", str(review_input)], output) == []
+    attestation = json.loads((repo / f"docs/loom/{CHANGE}/attestation.json").read_text())
+    receipt = attestation["verdicts"][1]["external_review"]
+    assert receipt["output_digest"] == hashlib.sha256(raw.encode()).hexdigest()
+    assert "review_output" not in receipt
     assert attestation_module.validate_attestation(
-        repo, git(repo, "rev-parse", "HEAD"), CHANGE, evidence, manifest()
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
     ) == []
+    receipt["reviewer"] = "native"
+    assert any("outside execution" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, attestation, manifest()))
 
 
 def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:

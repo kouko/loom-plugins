@@ -10,7 +10,9 @@ from loom_checker.helpers import git_text
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import tree_programs
 from pathlib import Path
+import hashlib
 import re
+import yaml
 
 
 _LOW_RISK_DOC_EXTENSIONS = frozenset({".md", ".mdx", ".rst", ".txt"})
@@ -51,7 +53,66 @@ def outside_verdict_failure(verdicts: list[dict], family: str | None) -> str | N
     lenses = {str(v.get("lens", "")).strip() for v in verdicts}
     if len(lenses) != 1 or not next(iter(lenses)):
         return "outside and incumbent verdicts must use the same review lens"
+    matched = [v for v in verdicts if str(v.get("vendor", "")).casefold() in outside]
+    if len(matched) != 1:
+        return "selected outside execution needs exactly one attributed verdict"
+    verdict = matched[0]
+    receipt = verdict.get("external_review")
+    if not isinstance(receipt, dict) or set(receipt) != {
+        "status", "executor", "model", "effort", "family", "evidence_level",
+        "observed_model", "observed_effort", "output_digest", "reviewer",
+    }:
+        return "selected outside execution receipt is missing or malformed"
+    if (receipt["status"] != "completed" or receipt["family"] != family or
+            receipt["model"] != verdict.get("model") or
+            receipt["reviewer"] != verdict.get("reviewer") or
+            receipt["executor"] not in {"codex", "claude", "agy"} or
+            not isinstance(receipt["effort"], str) or not receipt["effort"] or
+            receipt["evidence_level"] not in {
+                "observed-model-and-effort", "accepted-explicit-settings"
+            } or not re.fullmatch(r"[0-9a-f]{64}", str(receipt["output_digest"]))):
+        return "selected outside execution receipt does not match its verdict"
     return None
+
+
+def attach_outside_receipt(verdicts: list[dict], family: str | None) -> tuple[list[dict], str | None]:
+    """Verify the runner output and keep only a digest-bound receipt."""
+    if family is None:
+        return verdicts, None
+    prepared = [item.copy() for item in verdicts]
+    aliases = {"anthropic": {"anthropic", "claude"},
+               "openai": {"openai", "codex"}, "google": {"google", "gemini"}}
+    outside = [v for v in prepared if str(v.get("vendor", "")).casefold() in aliases[family]]
+    if len(outside) != 1:
+        return prepared, "selected outside execution needs exactly one attributed verdict"
+    verdict = outside[0]
+    result = verdict.get("external_review")
+    if not isinstance(result, dict):
+        return prepared, "selected outside execution result is missing"
+    output = result.get("review_output")
+    if not isinstance(output, str) or not output.strip():
+        return prepared, "selected outside execution has no raw review output"
+    try:
+        parsed = yaml.safe_load(output)
+    except yaml.YAMLError:
+        return prepared, "selected outside execution output is invalid YAML"
+    if not isinstance(parsed, dict) or any(parsed.get(key) != verdict.get(key) for key in
+                                           ("verdict", "lens", "findings")):
+        return prepared, "selected outside execution output differs from its verdict"
+    if result.get("status") != "completed" or result.get("reason") is not None:
+        return prepared, "selected outside execution did not complete"
+    verdict["external_review"] = {
+        "status": result["status"], "executor": result.get("executor"),
+        "model": result.get("requested_model"),
+        "effort": result.get("requested_effort"),
+        "family": result.get("requested_family"),
+        "evidence_level": result.get("evidence_level"),
+        "observed_model": result.get("observed_model"),
+        "observed_effort": result.get("observed_effort"),
+        "output_digest": hashlib.sha256(output.encode("utf-8")).hexdigest(),
+        "reviewer": verdict.get("reviewer"),
+    }
+    return prepared, outside_verdict_failure(prepared, family)
 
 
 _REVIEW_PROTECTED_PARTS = frozenset(

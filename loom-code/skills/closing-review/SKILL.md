@@ -141,7 +141,10 @@ reviewer and pass no `verdicts`.
   `user-decided — second-vendor selection-confirmed: <vendor>` plan line.
   Record an accepted `ask` answer with that same line before reviewing, so
   `reviewer-count`, finalization and attestation validation can recompute it.
-  With no selection, do not start external execution. With a selection, retain
+  With no selection, do not start external execution. Compare the selected
+  model's provider family with the current host model's family when that
+  family is known; if they match, the selection is not independent and must
+  not run as the outside reviewer. With a valid selection, retain
   at least one incumbent reviewer and dispatch an additional outside reviewer.
   A floor of one rises to two; at a higher floor, the outside reviewer may
   occupy one slot, but cannot replace the incumbent. Finalization requires
@@ -165,11 +168,13 @@ the external CLI's default model or effort and never substitute another pair
 after rejection.
 
 Before any network-backed discovery, probe or review, give the user the
-cost, vendor-egress, readable-scope and local-execution disclosures and retain
-their approval in the external skill's JSON consent record. An earlier fixed
+cost, vendor-egress, `review_root` working directory, local-execution, and
+filesystem-access-outside-root disclosures and retain their approval in the
+external skill's JSON consent record. The working directory does not confine
+the CLI's file reads. An earlier fixed
 setting without these disclosures is insufficient; resolve its confirmation
-at the existing intent decision point. Changed executor or readable scope
-requires fresh approval. Pass the consent record and exact scope to the shared
+at the existing intent decision point. A changed executor or `review_root`
+requires fresh approval. Pass the consent record and exact root to the shared
 runner. A missing or stale record prevents execution. On Codex, run the
 installed runner outside the sandbox with narrowly scoped host approval when
 the selected CLI requires the existing host login; denial is an authorization
@@ -183,6 +188,11 @@ family, and accepts only a conforming verdict. One transient executor or
 malformed-output retry is allowed for the same digest and reviewer identity;
 a second failure ends the episode as `EXECUTION_FAILED`. A rejected explicit
 model or effort never triggers a default-model retry.
+The accepted outside verdict carries the completed runner result to
+`finalize-review`; it checks the raw YAML against the attributed lens,
+verdict and findings, then stores only a digest-bound receipt with executor,
+model, effort, family and reviewer identity in the attestation. A vendor label
+without this receipt is not a completed outside review.
 <!-- /gate -->
 
 ## 3. Run acceptance testing
