@@ -20,9 +20,9 @@ charter: 1.1
 - Risk: agent-decided — invoke loom-code:external-review by skill name and retire duplicated probes; REQ-1/2/3 keep the incumbent review and opt-in boundary.
 
 **W2-02 Closing review retains incumbent and uses shared profile**  after: W1-01  acceptance: 1, 2, 5
-- Files: loom-code/skills/closing-review/SKILL.md, loom-code/scripts/loom_checker/reviewers.py, loom-code/scripts/loom_checker/attestation.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_claude_reviewer.py
+- Files: loom-code/skills/closing-review/SKILL.md, loom-code/scripts/loom_checker/reviewers.py, loom-code/scripts/loom_checker/attestation.py, loom-code/scripts/loom_checker/command_handlers/finalize.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_selection_finalize.py, loom-code/tests/test_contract_manifest.py, docs/loom/evidence/mechanisms.yaml
 - Test: A1 positive: floor-one-adds-outside; negative: no-incumbent. A2 positive: same-lens-yaml; negative: invalid-verdict. A5 positive: explicit-pair-required; negative: default-fallback.
-- Risk: agent-decided — recompute a two-reviewer minimum for opted-in outside review and remove default-model fallback; REQ-1/2/5 preserve judgment and finalization integrity.
+- Risk: agent-decided — recompute reviewer count and bind outside verdict to a runner receipt; the old gate metadata and its dispatch-profile pin are updated with REQ-1/2/5.
 
 ### Wave 3 — Selection, integration and release
 
@@ -32,12 +32,12 @@ charter: 1.1
 - Risk: agent-decided — model provider family decides independence, not CLI branding; REQ-3/4/5 keep suggestion non-blocking.
 
 **W3-02 Loom-code release metadata**  after: W3-01  acceptance: 1, 2, 3, 4, 5
-- Files: loom-code/plugin.json, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/CHANGELOG.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md
+- Files: loom-code/plugin.json, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/CHANGELOG.md, loom-code/README*.md, loom-code/package.json, loom-code/tests/test_write_plan_station_text.py
 - Test: A1 positive: route-activation; negative: failed-leg. A2 positive: same-contract; negative: substituted-format. A3 positive: notice-only; negative: implicit-dispatch. A4 positive: explicit-pair; boundary: stale-candidate. A5 positive: visible-limitation; negative: silent-fallback.
 - Risk: agent-decided — sync the loom-code release mirrors after behavior stabilizes; REQ-1–5 need package and acceptance evidence.
 
 **W3-03 Loom-workflow release metadata**  after: W3-02  acceptance: 1, 2, 3, 4, 5
-- Files: loom-workflow/plugin.json, loom-workflow/.claude-plugin/plugin.json, loom-workflow/.codex-plugin/plugin.json, loom-workflow/CHANGELOG.md, loom-workflow/README.md, loom-workflow/README.ja.md, loom-workflow/README.zh-TW.md, README.md
+- Files: loom-workflow/plugin.json, loom-workflow/.claude-plugin/plugin.json, loom-workflow/.codex-plugin/plugin.json, loom-workflow/CHANGELOG.md, loom-workflow/README*.md, loom-workflow/package.json, loom-workflow/tests/scripts/test_release_metadata.py, README.md
 - Test: A1 positive: route-activation; negative: failed-leg. A2 positive: same-contract; negative: substituted-format. A3 positive: notice-only; negative: implicit-dispatch. A4 positive: explicit-pair; boundary: stale-candidate. A5 positive: visible-limitation; negative: silent-fallback.
 - Risk: agent-decided — sync workflow mirrors and root version pins before final review; REQ-1–5 need package and acceptance evidence.
 
@@ -51,3 +51,4 @@ charter: 1.1
 ## Risks
 1. CLI discovery and result JSON may drift; bounded probes must fail clearly and cannot establish account entitlement for a future run.
 2. The current Claude and Antigravity outputs do not independently reveal every effective setting; report requested, accepted and observed evidence separately.
+3. CLI working directory does not confine file reads or prove that setup cannot write; the approval record discloses both limits before execution.
