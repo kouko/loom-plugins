@@ -113,8 +113,8 @@ charter: 1.1
 
 **W8-01 Parse historical numbered outside selections**  after: W7-04  acceptance: 1
 - Files: loom-code/scripts/loom_checker/reviewers.py, loom-code/tests/test_loom_attestation.py, loom-code/tests/test_selection_finalize.py
-- Test: A1 positive: numbered `3. user-decided` in plan Risks raises the reviewer floor and requires outside evidence; negative: selection outside the owning section or with draft suffix does not count. Preserve plan-over-intent precedence.
-- Risk: agent-decided — historical committed plans use numbered selection lines, while the current exact parser accepts only bare and dashed lines.
+- Test: A1 positive: numbered `3. user-decided` in plan Risks raises the reviewer floor and requires outside evidence; negative: selection outside the owning section, with a draft suffix, or inside a fenced example does not count. Preserve plan-over-intent precedence.
+- Risk: agent-decided — historical committed plans use numbered selection lines, while the current exact parser accepts only bare and dashed lines; executable adversarial evidence also shows that fenced examples can be mistaken for confirmed choices.
 
 **W8-02 Pin affirmative capture-intent routing**  after: W8-01  acceptance: 6
 - Files: loom-design/tests/spec/test_capture_intent_contract.py

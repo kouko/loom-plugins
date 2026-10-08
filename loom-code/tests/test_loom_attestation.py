@@ -373,6 +373,60 @@ def test_numbered_plan_selection_sets_floor_and_requires_outside_receipt(
     assert reviewers.selected_outside_family(repo, CHANGE) == "anthropic"
 
 
+@pytest.mark.parametrize("selection", [
+    "user-decided — second-vendor selection-confirmed: codex",
+    "3. user-decided — second-vendor selection-confirmed: codex",
+])
+def test_fenced_selection_and_heading_are_not_authoritative(
+    tmp_path: Path, selection: str,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(f"## Risks\n```text\n{selection}\n```\n", encoding="utf-8")
+    commit(repo, "selection in fenced example")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+    plan.write_text(f"~~~text\n## Risks\n{selection}\n~~~\n", encoding="utf-8")
+    commit(repo, "heading and selection in fenced example")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+    plan.write_text(f"## Risks\n~~~text\n{selection}\n~~~\n{selection}\n".replace(
+        "\n", "\r\n"), encoding="utf-8")
+    commit(repo, "real CRLF choice after fenced example")
+    assert reviewers.selected_outside_family(repo, CHANGE) == "openai"
+
+
+def test_fenced_intent_constraints_do_not_select_outside_reviewer(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "```text\n## Constraints\n"
+        "- user-decided — second-vendor selection-confirmed: claude\n```\n",
+        encoding="utf-8",
+    )
+    commit(repo, "intent selection only in fenced example")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+
+def test_commented_selection_does_not_select_outside_reviewer(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(
+        "## Risks\n<!--\n"
+        "3. user-decided — second-vendor selection-confirmed: codex\n"
+        "-->\n",
+        encoding="utf-8",
+    )
+    commit(repo, "selection in HTML comment")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+
 def test_selected_outside_review_raises_narrow_floor_and_requires_both_families(
     tmp_path: Path, monkeypatch,
 ) -> None:

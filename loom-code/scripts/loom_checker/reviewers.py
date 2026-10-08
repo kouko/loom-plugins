@@ -9,6 +9,7 @@ from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_text
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import tree_programs
+from loom_checker.rule_checks.publish import _body_sections
 from pathlib import Path
 import hashlib
 import re
@@ -95,18 +96,15 @@ def selected_outside_family(repo: Path, change_id: str, head_sha: str | None = N
         return None
 
     def selection_in(record: str, section: str) -> str | None:
-        heading = re.search(rf"(?m)^## {section}[ \t]*$", record)
-        if heading is None:
-            return None
-        body = record[heading.end():]
-        next_heading = re.search(r"(?m)^## ", body)
-        if next_heading:
-            body = body[:next_heading.start()]
-        matches = re.findall(
-            r"(?m)^(?:(?:-|[0-9]+\.)[ \t]+)?user-decided — second-vendor "
-            r"selection-confirmed: (claude|codex|gemini)[ \t]*$", body,
-        )
-        return matches[-1] if matches else None
+        for heading, lines in _body_sections(record, strip_comments=True)[0]:
+            if heading.rstrip(" \t") != section:
+                continue
+            matches = [match.group(1) for line in lines if (match := re.fullmatch(
+                r"(?:(?:-|[0-9]+\.)[ \t]+)?user-decided — second-vendor "
+                r"selection-confirmed: (claude|codex|gemini)[ \t]*", line,
+            ))]
+            return matches[-1] if matches else None
+        return None
 
     plan = git_maybe(repo, "show", f"{head}:docs/loom/{change_id}/plan.md") or ""
     selected = selection_in(plan, "Risks")
