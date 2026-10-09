@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import errno
 import json
 import subprocess
 
@@ -192,6 +193,59 @@ def test_discovery_and_execution_exceptions_do_not_echo_private_text(error_type,
     assert executed["reason"] == f"execution-error: {expected}"
     assert secret not in json.dumps(discovered)
     assert secret not in json.dumps(executed)
+
+
+@pytest.mark.parametrize("executor", ["codex", "agy"])
+def test_discovery_missing_review_root_reports_root_without_leaking_path(
+        executor, tmp_path):
+    scope = str(tmp_path / "PRIVATE_MISSING_REVIEW_ROOT")
+    secret = "PRIVATE_DIAGNOSTIC_DO_NOT_ECHO"
+
+    def runner(argv, **kwargs):
+        assert kwargs["cwd"] == scope
+        raise FileNotFoundError(errno.ENOENT, secret, scope)
+
+    result = review.discover(executor, scope, consent(executor, scope), runner=runner)
+    assert result["status"] == "failed"
+    assert result["reason"] == "discovery-error: review-root-not-found"
+    assert result["candidates"] == []
+    assert scope not in json.dumps(result)
+    assert secret not in json.dumps(result)
+
+
+def test_execution_missing_review_root_reports_root_without_completing(tmp_path):
+    scope = str(tmp_path / "PRIVATE_MISSING_REVIEW_ROOT")
+    secret = "PRIVATE_DIAGNOSTIC_DO_NOT_ECHO"
+
+    def runner(argv, **kwargs):
+        assert kwargs["cwd"] == scope
+        raise FileNotFoundError(errno.ENOENT, secret, scope)
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", scope,
+                            "review", consent("claude", scope), runner=runner)
+    assert result["status"] == "failed"
+    assert result["reason"] == "execution-error: review-root-not-found"
+    assert result["review_output"] is None
+    assert result["evidence_level"] == "none"
+    assert scope not in json.dumps(result)
+    assert secret not in json.dumps(result)
+
+
+def test_valid_review_root_with_missing_executable_keeps_cli_reason(tmp_path):
+    scope = str(tmp_path)
+
+    def runner(argv, **kwargs):
+        assert kwargs["cwd"] == scope
+        raise FileNotFoundError(errno.ENOENT, "PRIVATE_DIAGNOSTIC_DO_NOT_ECHO", argv[0])
+
+    discovered = review.discover("codex", scope, consent(scope=scope), runner=runner)
+    executed = review.execute("claude", "sonnet", "high", "anthropic", scope,
+                              "review", consent("claude", scope), runner=runner)
+    assert discovered["status"] == executed["status"] == "failed"
+    assert discovered["reason"] == "discovery-error: executor-not-installed"
+    assert executed["reason"] == "execution-error: executor-not-installed"
+    assert executed["review_output"] is None
+    assert "PRIVATE_DIAGNOSTIC_DO_NOT_ECHO" not in json.dumps((discovered, executed))
 
 
 def test_discovery_json_rpc_error_does_not_echo_private_text():
