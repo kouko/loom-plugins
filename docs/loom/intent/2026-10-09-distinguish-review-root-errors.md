@@ -2,7 +2,7 @@
 originator: kouko
 kind: engineering
 needs-design: no — 既有外部審查規格已涵蓋失敗狀態，此次只修正錯誤原因分類
-status: open
+status: confirmed 2026-10-10
 
 ## Problem
 外部審查開始時，若指定的本機審查目錄不存在，使用者會看到「外部 CLI 未安裝」，因此可能檢查錯誤的地方，無法判斷審查為何沒有完成。
