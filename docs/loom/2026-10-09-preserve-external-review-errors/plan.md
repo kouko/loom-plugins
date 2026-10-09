@@ -16,6 +16,11 @@ charter: 1.1
 - Test: A1 positive: claude-structured-429; negative: untrusted-stdout. A2 positive: empty-diagnostic; boundary: failed-review-no-verdict. A3 positive: unchanged-success; negative: no-prompt-echo.
 - Risk: agent-decided — use CLI-owned JSON error fields and a bounded message; arbitrary stdout can contain review material, so never echo it wholesale.
 
+**W0-02 Retain defect-catching probes in the package suite**  acceptance: 1, 3
+- Files: `loom-code/tests/test_external_review.py`, `docs/loom/2026-10-09-preserve-external-review-errors/evidence/probes/test_external_failure_probe_output_privacy.py`, `docs/loom/2026-10-09-preserve-external-review-errors/evidence/probes/test_external_failure_terminal_envelope.py`
+- Test: both adversarial cases remain green in the package suite after relocation; the original probe paths are removed.
+- Risk: agent-decided — relocate only the two cases that caught actual defects; preserve their assertions and synthetic data.
+
 ## Simplicity check
 - none found
 
