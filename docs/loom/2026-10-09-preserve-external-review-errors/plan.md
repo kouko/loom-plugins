@@ -21,6 +21,11 @@ charter: 1.1
 - Test: both adversarial cases remain green in the package suite after relocation; the original probe paths are removed.
 - Risk: agent-decided — relocate only the two cases that caught actual defects; preserve their assertions and synthetic data.
 
+**W0-03 Classify every external CLI failure without exposing its text**  acceptance: 1, 2, 3
+- Files: `loom-code/scripts/external_review.py`, `loom-code/tests/test_external_review.py`, `docs/loom/2026-10-09-preserve-external-review-errors/evidence/claude-failure-envelope.json`
+- Test: Claude readable stderr with empty stdout identifies a bounded category; Codex and Agy echoed secrets remain absent from result; the observed Claude API error envelope is documented and covered; unknown diagnostics stay unknown.
+- Risk: agent-decided — CLI stderr and JSON result text are untrusted and may echo review material; map only verified diagnostic shapes to fixed categories.
+
 ## Simplicity check
 - none found
 
