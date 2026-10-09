@@ -129,7 +129,8 @@ def _codex_candidates(runner: Runner, scope: str) -> list[str]:
             continue
         if "error" in message:
             error = message["error"]
-            detail = error.get("message") if isinstance(error, dict) else str(error)
+            detail = error.get("message") if isinstance(error, dict) else None
+            detail = "not initialized" if detail == "not initialized" else "unknown error"
             raise ValueError(f"codex model/list error: {detail}")
         result = message.get("result")
         rows = result.get("data") if isinstance(result, dict) else None
@@ -183,7 +184,13 @@ def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
         result["reason"] = f"discovery-timeout: {exc.timeout}s"
         return result
     except (OSError, ValueError, TypeError, KeyError) as exc:
-        result["reason"] = f"discovery-error: {exc}"
+        known = {"codex model/list failed", "codex model/list error: not initialized",
+                 "codex model/list error: unknown error",
+                 "codex model/list result missing data array",
+                 "codex model/list response missing", "agy models failed",
+                 "unknown executor"}
+        detail = str(exc) if isinstance(exc, ValueError) and str(exc) in known else "unknown error"
+        result["reason"] = f"discovery-error: {detail}"
         return result
     result["status"] = "completed"
     result["candidates"] = models
@@ -221,20 +228,32 @@ def _claude_observation(output: str, model: str, family: str) -> tuple[str, str]
     return names[0], result
 
 
+def _stderr_failure_reason(executor: str, stderr: str) -> str:
+    line = stderr.strip().splitlines()[0].lower() if stderr.strip() else ""
+    line = re.sub(r"^error:\s*", "", line)
+    if re.match(r"unsupported effort\b", line):
+        return "unsupported effort"
+    if re.match(r"(?:authentication (?:required|failed)|not logged in|unauthorized)\b", line):
+        return "authentication error"
+    if line.startswith(("you've hit your session limit", "session limit reached")):
+        return "Claude session limit" if executor == "claude" else "session limit"
+    return "unknown error"
+
+
 def _execution_failure_reason(executor: str, output: str, stderr: str) -> str:
     if executor != "claude":
-        return stderr.strip()[:300] or "unknown error"
+        return _stderr_failure_reason(executor, stderr)
     try:
         data = json.loads(output)
     except json.JSONDecodeError:
-        return "unknown error"
+        return _stderr_failure_reason(executor, stderr)
     if (not isinstance(data, dict) or data.get("type") != "result"
             or data.get("is_error") is not True
             or data.get("terminal_reason") != "api_error"):
-        return "unknown error"
+        return _stderr_failure_reason(executor, stderr)
     status = data.get("api_error_status")
     if type(status) is not int or not 400 <= status <= 599:
-        return "unknown error"
+        return _stderr_failure_reason(executor, stderr)
     message = data.get("result")
     if status == 429 and isinstance(message, str) and "session limit" in message.lower():
         return "Claude session limit (HTTP 429)"
@@ -273,6 +292,9 @@ def execute(
     }
 
     def fail(reason: str) -> dict[str, Any]:
+        if "probe" in result:
+            result["probe"].pop("stdout", None)
+            result["probe"].pop("stderr", None)
         result["reason"] = reason
         return result
 
@@ -341,7 +363,12 @@ def execute(
     except subprocess.TimeoutExpired as exc:
         return fail(f"execution-timeout: {exc.timeout}s")
     except (OSError, ValueError, TypeError, KeyError) as exc:
-        return fail(f"execution-error: {exc}")
+        known = {"codex observable model/effort mismatch or missing",
+                 "claude JSON result missing", "claude JSON result is not an object",
+                 "claude modelUsage missing", "claude observed provider family mismatch",
+                 "claude observed model mismatch", "claude result empty"}
+        detail = str(exc) if isinstance(exc, ValueError) and str(exc) in known else "unknown error"
+        return fail(f"execution-error: {detail}")
     result["status"] = "completed"
     return result
 

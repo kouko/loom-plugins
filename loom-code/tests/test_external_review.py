@@ -175,6 +175,30 @@ def test_codex_discovery_ignores_non_object_json_lines():
     assert result["reason"].startswith("discovery-error:")
 
 
+def test_discovery_and_execution_exceptions_do_not_echo_private_text():
+    secret = "PRIVATE_DIAGNOSTIC_DO_NOT_ECHO"
+
+    def runner(*args, **kwargs):
+        raise OSError(secret)
+
+    discovered = review.discover("codex", "/repo", consent(), runner=runner)
+    executed = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                              "review", consent("claude"), runner=runner)
+    assert discovered["reason"] == "discovery-error: unknown error"
+    assert executed["reason"] == "execution-error: unknown error"
+    assert secret not in json.dumps(discovered)
+    assert secret not in json.dumps(executed)
+
+
+def test_discovery_json_rpc_error_does_not_echo_private_text():
+    secret = "PRIVATE_JSON_RPC_ERROR_DO_NOT_ECHO"
+    response = {"id": 2, "error": {"code": -32000, "message": secret}}
+    result = review.discover("codex", "/repo", consent(),
+                             runner=lambda argv, **kwargs: completed(argv, json.dumps(response)))
+    assert result["reason"] == "discovery-error: codex model/list error: unknown error"
+    assert secret not in json.dumps(result)
+
+
 def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     calls = []
 
@@ -234,7 +258,7 @@ def test_nonzero_untrusted_stdout_does_not_become_failure_reason():
     def runner(argv, **kwargs):
         calls.append(argv)
         if len(calls) == 1:
-            return completed(argv, json.dumps({"result": "ok", "modelUsage":
+            return completed(argv, json.dumps({"result": "ok " + prompt, "modelUsage":
                                                {"claude-sonnet-4-5": {}}}))
         return completed(argv, json.dumps({"type": "assistant", "is_error": True,
                                            "terminal_reason": "api_error",
@@ -248,6 +272,22 @@ def test_nonzero_untrusted_stdout_does_not_become_failure_reason():
     assert result["review_output"] is None
     assert result["reason"] == "review-exit-1: unknown error"
     assert prompt not in json.dumps(result)
+
+
+@pytest.mark.parametrize("stderr, expected", [
+    ("Error: unsupported effort high", "unsupported effort"),
+    ("Error: authentication required", "authentication error"),
+    ("Error: You've hit your session limit · resets 4am", "Claude session limit"),
+    ("unrecognized diagnostic", "unknown error"),
+])
+def test_claude_empty_stdout_classifies_only_known_stderr(stderr, expected):
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            "review", consent("claude"),
+                            runner=lambda argv, **kwargs: completed(argv, "", stderr, rc=2))
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+    assert result["reason"] == f"probe-exit-2: {expected}"
+    assert stderr not in json.dumps(result)
 
 
 def test_nonzero_empty_diagnostic_is_explicitly_unknown():
@@ -343,13 +383,14 @@ def test_agy_nonzero_stderr_reason_stays_bounded():
     def runner(argv, **kwargs):
         if argv == ["agy", "models"]:
             return completed(argv, "gemini-2.5-pro\n")
-        return completed(argv, "", "x" * 301, rc=2)
+        return completed(argv, "", "Error: unsupported effort high " + "x" * 301, rc=2)
 
     result = review.execute("agy", "gemini-2.5-pro", "high", "google", "/repo",
                             "review", consent("agy"), runner=runner)
     assert result["status"] == "failed"
     assert result["review_output"] is None
-    assert result["reason"] == "probe-exit-2: " + "x" * 300
+    assert result["reason"] == "probe-exit-2: unsupported effort"
+    assert "x" * 301 not in json.dumps(result)
 
 
 def test_agy_relative_review_root_stops_before_discovery():
@@ -551,7 +592,7 @@ def test_failed_selection_or_execution_never_falls_back(case):
         if case == "timeout":
             raise subprocess.TimeoutExpired(argv, kwargs["timeout"])
         if case == "rejected":
-            return completed(argv, "", "unsupported effort", 2)
+            return completed(argv, "", "unsupported effort high PRIVATE_CODEX_ERROR", 2)
         model = "other-model" if case == "header-mismatch" else "gpt-6.1-sol"
         return completed(argv, "ok", f"model: {model}\nreasoning effort: high\n")
 
@@ -562,4 +603,5 @@ def test_failed_selection_or_execution_never_falls_back(case):
     assert result["review_output"] is None
     if case == "rejected":
         assert result["reason"] == "probe-exit-2: unsupported effort"
+        assert "PRIVATE_CODEX_ERROR" not in json.dumps(result)
     assert len(calls) <= 2
