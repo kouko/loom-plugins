@@ -211,9 +211,10 @@ a second failure ends the episode as `EXECUTION_FAILED`. A rejected explicit
 model or effort never triggers a default-model retry.
 The accepted outside verdict carries the completed runner result to
 `finalize-review`; it checks the raw YAML against the attributed lens,
-verdict and findings, then stores only a digest-bound receipt with executor,
-model, effort, family and reviewer identity in the attestation. A vendor label
-without this receipt is not a completed outside review.
+verdict, dimension scores, findings and notes, then stores only a digest-bound
+receipt with executor, model, effort, family and reviewer identity in the
+attestation. A vendor label without this receipt is not a completed outside
+review.
 <!-- /gate -->
 
 ## 3. Run acceptance testing
@@ -367,6 +368,9 @@ hand-off to a temporary JSON input outside the repository:
 
 The `findings` input carries every unresolved adversarial finding that Build's
 hand-off lists.
+For a selected outside reviewer, copy its `dimension_scores` and `notes` into
+the attributed verdict as well as the fields shown above; finalization compares
+them with the raw YAML.
 
 Then run:
 

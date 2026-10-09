@@ -47,7 +47,9 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
     """Check the required owning-reviewer fields before accepting outside YAML."""
     if not isinstance(parsed, dict):
         return "selected outside execution lacks required reviewer YAML"
-    if any(parsed.get(key) != verdict.get(key) for key in ("verdict", "lens", "findings")):
+    if (any(parsed.get(key) != verdict.get(key) for key in
+            ("verdict", "lens", "findings", "dimension_scores")) or
+            parsed.get("notes", []) != verdict.get("notes", [])):
         return "selected outside execution output differs from its verdict"
     lens = verdict.get("lens")
     expected = _REVIEW_DIMENSIONS.get(lens) if isinstance(lens, str) else None

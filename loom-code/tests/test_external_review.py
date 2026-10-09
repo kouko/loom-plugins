@@ -83,6 +83,42 @@ def test_accepted_selection_source_allows_discovery():
     assert result["status"] == "completed"
 
 
+@pytest.mark.parametrize("executor, quote", [
+    ("claude", "Do not use Claude to review this change"),
+    ("codex", "Don't use Codex to review this change"),
+    ("agy", "Never use Agy to review this change"),
+    ("claude", "不要用 Claude 審查這個變更"),
+    ("codex", "別用 Codex 審查這個變更"),
+    ("claude", "Claude を使わないで、この変更を確認して"),
+    ("claude", "Do not review with Claude"),
+    ("claude", "I don't want Claude"),
+    ("claude", "Claude can review this change"),
+    ("claude", "I did not say to use Claude"),
+])
+def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
+        executor, quote):
+    record = consent(executor)
+    record["authorization_source"]["quote"] = quote
+    no_spawn = lambda *a, **k: pytest.fail("spawned")
+    discovered = review.discover(executor, "/repo", record, runner=no_spawn)
+    executed = review.execute(executor, record["model"], "high",
+                              {"claude": "anthropic", "codex": "openai", "agy": "google"}[executor],
+                              "/repo", "review", record, runner=no_spawn)
+    assert discovered["reason"] == "consent-missing-or-stale"
+    assert executed["reason"] == "consent-missing-or-stale"
+
+
+@pytest.mark.parametrize("executor, quote", [
+    ("codex", "Use Codex to review this change"),
+    ("claude", "請用 Claude 審查這個變更"),
+    ("agy", "Agy を使ってこの変更をレビューして"),
+])
+def test_affirmative_direct_request_remains_valid(executor, quote):
+    record = consent(executor)
+    record["authorization_source"]["quote"] = quote
+    assert review._authorization_valid(record["authorization_source"], executor)
+
+
 def test_missing_host_read_disclosure_blocks_discovery():
     record = consent()
     del record["disclosures"]["filesystem_access_outside_root"]
@@ -180,15 +216,17 @@ def test_codex_discovery_ignores_non_object_json_lines():
     (OSError, "unknown error"),
     (FileNotFoundError, "executor-not-installed"),
 ])
-def test_discovery_and_execution_exceptions_do_not_echo_private_text(error_type, expected):
+def test_discovery_and_execution_exceptions_do_not_echo_private_text(
+        error_type, expected, tmp_path):
     secret = "PRIVATE_DIAGNOSTIC_DO_NOT_ECHO"
+    scope = str(tmp_path)
 
     def runner(*args, **kwargs):
         raise error_type(secret)
 
-    discovered = review.discover("codex", "/repo", consent(), runner=runner)
-    executed = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
-                              "review", consent("claude"), runner=runner)
+    discovered = review.discover("codex", scope, consent(scope=scope), runner=runner)
+    executed = review.execute("claude", "sonnet", "high", "anthropic", scope,
+                              "review", consent("claude", scope), runner=runner)
     assert discovered["reason"] == f"discovery-error: {expected}"
     assert executed["reason"] == f"execution-error: {expected}"
     assert secret not in json.dumps(discovered)
@@ -211,6 +249,74 @@ def test_discovery_missing_review_root_reports_root_without_leaking_path(
     assert result["candidates"] == []
     assert scope not in json.dumps(result)
     assert secret not in json.dumps(result)
+
+
+@pytest.mark.parametrize("executor", ["codex", "agy"])
+def test_missing_root_is_rejected_before_real_discovery_spawn(executor, tmp_path,
+                                                              monkeypatch):
+    scope = str(tmp_path / "PRIVATE_MISSING_REVIEW_ROOT")
+    monkeypatch.setattr(subprocess, "Popen", lambda *a, **k: pytest.fail("spawned"))
+    result = review.discover(executor, scope, consent(executor, scope))
+    assert result["reason"] == "discovery-error: review-root-not-found"
+    assert result["status"] == "failed"
+    assert scope not in json.dumps(result)
+
+
+@pytest.mark.parametrize("executor, family", [
+    ("codex", "openai"), ("agy", "google"), ("claude", "anthropic"),
+])
+def test_missing_root_is_rejected_before_real_execution_spawn(
+        executor, family, tmp_path, monkeypatch):
+    scope = str(tmp_path / "PRIVATE_MISSING_REVIEW_ROOT")
+    monkeypatch.setattr(subprocess, "Popen", lambda *a, **k: pytest.fail("spawned"))
+    record = consent(executor, scope)
+    result = review.execute(executor, record["model"], "high", family, scope,
+                            "review", record)
+    assert result["reason"] == "execution-error: review-root-not-found"
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+    assert scope not in json.dumps(result)
+
+
+@pytest.mark.parametrize("executor", ["codex", "agy"])
+@pytest.mark.parametrize("filename", ["executable", "unspecified"])
+def test_discovery_rechecks_root_after_enoent(executor, filename, tmp_path):
+    scope_dir = tmp_path / "review-root"
+    scope_dir.mkdir()
+    scope = str(scope_dir)
+
+    def runner(argv, **kwargs):
+        scope_dir.rmdir()
+        raise FileNotFoundError(errno.ENOENT, "private diagnostic",
+                                argv[0] if filename == "executable" else None)
+
+    result = review.discover(executor, scope, consent(executor, scope), runner=runner)
+    assert result["reason"] == "discovery-error: review-root-not-found"
+    assert result["status"] == "failed"
+    assert "private diagnostic" not in json.dumps(result)
+
+
+@pytest.mark.parametrize("executor, family", [
+    ("codex", "openai"), ("agy", "google"), ("claude", "anthropic"),
+])
+@pytest.mark.parametrize("filename", ["executable", "unspecified"])
+def test_execution_rechecks_root_after_enoent(executor, family, filename, tmp_path):
+    scope_dir = tmp_path / "review-root"
+    scope_dir.mkdir()
+    scope = str(scope_dir)
+
+    def runner(argv, **kwargs):
+        scope_dir.rmdir()
+        raise FileNotFoundError(errno.ENOENT, "private diagnostic",
+                                argv[0] if filename == "executable" else None)
+
+    record = consent(executor, scope)
+    result = review.execute(executor, record["model"], "high", family, scope,
+                            "review", record, runner=runner)
+    assert result["reason"] == "execution-error: review-root-not-found"
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+    assert "private diagnostic" not in json.dumps(result)
 
 
 def test_claude_discovery_returns_documented_aliases_for_existing_root(tmp_path):

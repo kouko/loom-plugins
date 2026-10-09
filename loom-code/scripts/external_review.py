@@ -7,6 +7,7 @@ It never substitutes a model, an effort, or an executor after failure.
 from __future__ import annotations
 
 import argparse
+import errno
 import json
 import re
 import subprocess
@@ -50,8 +51,22 @@ def _authorization_valid(source: object, executor: str) -> bool:
              "agy": r"(?<![A-Za-z])(?:agy|antigravity)(?![A-Za-z])"}
     if source.get("kind") == "direct-user-request":
         quote = source.get("quote")
-        return (isinstance(quote, str) and bool(quote.strip()) and
-                bool(re.search(names.get(executor, r"$^"), quote, re.IGNORECASE)))
+        name = names.get(executor, r"$^")
+        if not isinstance(quote, str):
+            return False
+        refusals = (
+            rf"\b(?:do\s+not|don't|never)\s+"
+            rf"(?:use|run|ask|invoke|want|review\s+with)\s+{name}",
+            rf"(?:不要|別|别)\s*(?:用|使用)?\s*{name}",
+            rf"{name}\s*を?\s*(?:使わないで?|使用しないで?)",
+        )
+        affirmations = (
+            rf"^\s*(?:please\s+)?(?:use|run|ask|invoke)\s+{name}",
+            rf"^\s*(?:請|请)?\s*(?:用|使用|讓|让)\s*{name}",
+            rf"^\s*{name}\s*(?:を\s*(?:使って|使用して|利用して)|で\s*レビューして)",
+        )
+        return (not any(re.search(pattern, quote, re.IGNORECASE) for pattern in refusals)
+                and any(re.search(pattern, quote, re.IGNORECASE) for pattern in affirmations))
     if source.get("kind") == "accepted-selection":
         selection = source.get("selection")
         return (isinstance(selection, str) and
@@ -104,6 +119,9 @@ def _consent_valid(record: Mapping[str, Any] | None, executor: str, scope: str,
 
 
 def _run(runner: Runner, argv: list[str], prompt: str, timeout: int, scope: str):
+    # Injected runners simulate subprocess behavior; preflight real launches.
+    if runner is subprocess.run and not Path(scope).is_dir():
+        raise FileNotFoundError(errno.ENOENT, "missing review root", scope)
     return runner(argv, input=prompt, capture_output=True, text=True,
                   timeout=timeout, check=False, cwd=scope)
 
@@ -187,7 +205,8 @@ def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
         result["reason"] = f"discovery-timeout: {exc.timeout}s"
         return result
     except FileNotFoundError as exc:
-        category = "review-root-not-found" if exc.filename == scope else "executor-not-installed"
+        missing_root = exc.filename == scope or not Path(scope).is_dir()
+        category = "review-root-not-found" if missing_root else "executor-not-installed"
         result["reason"] = f"discovery-error: {category}"
         return result
     except (OSError, ValueError, TypeError, KeyError) as exc:
@@ -370,7 +389,8 @@ def execute(
     except subprocess.TimeoutExpired as exc:
         return fail(f"execution-timeout: {exc.timeout}s")
     except FileNotFoundError as exc:
-        category = "review-root-not-found" if exc.filename == scope else "executor-not-installed"
+        missing_root = exc.filename == scope or not Path(scope).is_dir()
+        category = "review-root-not-found" if missing_root else "executor-not-installed"
         return fail(f"execution-error: {category}")
     except (OSError, ValueError, TypeError, KeyError) as exc:
         known = {"codex observable model/effort mismatch or missing",

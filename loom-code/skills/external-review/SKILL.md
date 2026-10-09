@@ -19,7 +19,7 @@ is the directory two levels above this SKILL.md.
 ## Before discovery
 
 Require a complete consent record for this executor and review root. The root is
-the CLI's starting directory, **not a filesystem read boundary**. The CLI may
+the CLI's existing starting directory, **not a filesystem read boundary**. The CLI may
 read files outside it through host tools or configuration; CLI startup,
 plugins, and caches may write files even when model tools are restricted. The
 record must identify `authorization_source`: either a quoted direct user request
@@ -68,8 +68,10 @@ alone supplies no `authorization_source`.
 An accepted suggestion or `ask` answer uses
 `{"kind":"accepted-selection","selection":"<executor>","target":"<review target>"}`
 as its source. For a direct request, the quoted text must name the selected
-executor and the target must be nonempty. The script checks this record's
-shape; it cannot independently verify the user's words or acceptance.
+executor and the target must be nonempty. The script accepts only a few
+explicit request forms and rejects matching refusal forms; it cannot
+independently verify the user's words or acceptance. If a request does not
+fit those forms, obtain a separate accepted selection.
 
 For Antigravity, the model's provider family may be unknown until the
 consented `agy models` result arrives. A bounded record may replace `family`

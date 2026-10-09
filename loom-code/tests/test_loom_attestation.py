@@ -471,6 +471,25 @@ def test_selected_outside_review_raises_narrow_floor_and_requires_both_families(
                                                        CHANGE, evidence, manifest()))
 
 
+def test_outside_yaml_scores_and_notes_must_match_attributed_verdict() -> None:
+    scores = {dimension: "PASS" for dimension in (
+        "omission", "ambiguity", "inconsistency", "incorrect-fact",
+        "missing-population", "deletion-first")}
+    parsed = {"verdict": "PASS", "lens": "docs", "reviewed_sha": "a" * 40,
+              "review_target_sha": "b" * 40, "dimension_scores": scores,
+              "findings": [], "notes": []}
+    verdict = {**parsed, "dimension_scores": scores.copy()}
+    assert reviewers._review_yaml_failure(parsed, verdict) is None
+
+    verdict["dimension_scores"]["omission"] = "N/A — outside scope"
+    assert reviewers._review_yaml_failure(parsed, verdict) == (
+        "selected outside execution output differs from its verdict")
+    verdict["dimension_scores"]["omission"] = "PASS"
+    verdict["notes"] = ["different note"]
+    assert reviewers._review_yaml_failure(parsed, verdict) == (
+        "selected outside execution output differs from its verdict")
+
+
 def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
     kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
@@ -499,6 +518,7 @@ def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path
             {"reviewer": "outside-1", "vendor": "anthropic", "model": "sonnet",
              "lens": "docs", "reviewed_sha": base_sha,
              "review_target_sha": head, "verdict": "PASS", "findings": [],
+             "dimension_scores": yaml.safe_load(raw)["dimension_scores"], "notes": [],
              "external_review": {
                  "status": "completed", "reason": None, "executor": "claude",
                  "requested_model": "sonnet", "requested_effort": "high",
@@ -706,6 +726,8 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
         "  deletion-first: PASS\nfindings: []\nnotes: []\n"
     )
     result["review_output"] = raw
+    verdicts[1]["dimension_scores"] = yaml.safe_load(raw)["dimension_scores"]
+    verdicts[1]["notes"] = []
     review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
                                         "adversarial": []}), encoding="utf-8")
     assert finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()) == []
@@ -733,7 +755,8 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
         result["review_output"] = malformed
         review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
                                             "adversarial": []}), encoding="utf-8")
-        assert any("required reviewer YAML" in reason for _, reason in
+        assert any("required reviewer YAML" in reason or
+                   "output differs from its verdict" in reason for _, reason in
                    finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
     finding = {"severity": "important", "dimension": "omission", "anchor": "",
                "text": "issue: missing fact", "fix": "add it"}
@@ -745,10 +768,12 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
                finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
     verdicts[1]["findings"] = []
     result["review_output"] = raw.replace("  omission: PASS", "  omission: NEEDS_REVISION")
+    verdicts[1]["dimension_scores"]["omission"] = "NEEDS_REVISION"
     review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
                                         "adversarial": []}), encoding="utf-8")
     assert any("overall verdict" in reason for _, reason in
                finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    verdicts[1]["dimension_scores"]["omission"] = "PASS"
     for severities in (("fatal",), ("important", "important")):
         findings = [
             {"severity": severity, "dimension": "omission",
