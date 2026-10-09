@@ -183,6 +183,9 @@ def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
     except subprocess.TimeoutExpired as exc:
         result["reason"] = f"discovery-timeout: {exc.timeout}s"
         return result
+    except FileNotFoundError:
+        result["reason"] = "discovery-error: executor-not-installed"
+        return result
     except (OSError, ValueError, TypeError, KeyError) as exc:
         known = {"codex model/list failed", "codex model/list error: not initialized",
                  "codex model/list error: unknown error",
@@ -362,6 +365,8 @@ def execute(
                 result["review_output"] = body
     except subprocess.TimeoutExpired as exc:
         return fail(f"execution-timeout: {exc.timeout}s")
+    except FileNotFoundError:
+        return fail("execution-error: executor-not-installed")
     except (OSError, ValueError, TypeError, KeyError) as exc:
         known = {"codex observable model/effort mismatch or missing",
                  "claude JSON result missing", "claude JSON result is not an object",
