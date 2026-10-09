@@ -68,10 +68,12 @@ alone supplies no `authorization_source`.
 An accepted suggestion or `ask` answer uses
 `{"kind":"accepted-selection","selection":"<executor>","target":"<review target>"}`
 as its source. For a direct request, the quoted text must name the selected
-executor and the target must be nonempty. The script accepts only a few
-explicit request forms and rejects matching refusal forms; it cannot
-independently verify the user's words or acceptance. If a request does not
-fit those forms, obtain a separate accepted selection.
+executor and the target must be nonempty. The owning review flow interprets
+the full request and records its authorized executor and target. The script
+checks the record's structure and blocks obvious refusals or corrections
+against the selected executor; it cannot independently verify the user's
+words or acceptance. Route ambiguous requests to the owning flow's choice
+point before setting `approved`.
 
 For Antigravity, the model's provider family may be unknown until the
 consented `agy models` result arrives. A bounded record may replace `family`

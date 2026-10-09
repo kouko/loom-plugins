@@ -52,21 +52,20 @@ def _authorization_valid(source: object, executor: str) -> bool:
     if source.get("kind") == "direct-user-request":
         quote = source.get("quote")
         name = names.get(executor, r"$^")
-        if not isinstance(quote, str):
+        if not isinstance(quote, str) or not re.search(name, quote, re.IGNORECASE):
+            return False
+        correction = re.search(r"\bno,\s*(?:please\s+)?use\s+", quote, re.IGNORECASE)
+        if correction and not re.match(name, quote[correction.end():], re.IGNORECASE):
             return False
         refusals = (
             rf"\b(?:do\s+not|don't|never)\s+"
             rf"(?:use|run|ask|invoke|want|review\s+with)\s+{name}",
+            rf"\b(?:did\s+not|didn't)\s+say\s+to\s+(?:use|run|ask|invoke)\s+{name}",
             rf"(?:不要|別|别)\s*(?:用|使用)?\s*{name}",
             rf"{name}\s*を?\s*(?:使わないで?|使用しないで?)",
+            rf"^\s*{name}\s+can\s+review\b",
         )
-        affirmations = (
-            rf"^\s*(?:please\s+)?(?:use|run|ask|invoke)\s+{name}",
-            rf"^\s*(?:請|请)?\s*(?:用|使用|讓|让)\s*{name}",
-            rf"^\s*{name}\s*(?:を\s*(?:使って|使用して|利用して)|で\s*レビューして)",
-        )
-        return (not any(re.search(pattern, quote, re.IGNORECASE) for pattern in refusals)
-                and any(re.search(pattern, quote, re.IGNORECASE) for pattern in affirmations))
+        return not any(re.search(pattern, quote, re.IGNORECASE) for pattern in refusals)
     if source.get("kind") == "accepted-selection":
         selection = source.get("selection")
         return (isinstance(selection, str) and
