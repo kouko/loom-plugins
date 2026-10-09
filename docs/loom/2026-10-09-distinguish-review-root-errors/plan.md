@@ -16,6 +16,11 @@ charter: 1.1
 - Test: A1 positive: missing-root-error; negative: failed-no-verdict. A2 positive: missing-executor-error; boundary: valid-root-missing-executable. A3 positive: no-raw-path-or-exception; boundary: existing-success.
 - Risk: agent-decided — compare exception filename with the selected root without returning it; retain existing error categories for other failures and existing test coverage.
 
+**W0-02 Retain the defect-catching Claude discovery probe in the package suite**  acceptance: 1, 3
+- Files: `docs/loom/2026-10-09-distinguish-review-root-errors/evidence/probes/test_claude_missing_review_root.py`, `loom-code/tests/test_claude_missing_review_root.py`
+- Test: A1 positive: graduated-probe-green; negative: missing-root-not-completed. A3 positive: no-root-path-in-result; boundary: existing-root-aliases.
+- Risk: agent-decided — move the proven probe intact with its `concern:` header so the package suite and final adversarial checker both retain it.
+
 ## Simplicity check
 - none found
 
