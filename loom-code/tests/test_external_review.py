@@ -260,6 +260,60 @@ def test_nonzero_empty_diagnostic_is_explicitly_unknown():
     assert result["probe"] == {"returncode": 2, "timeout_seconds": 45}
 
 
+# concern: Failed Claude probe output must not expose unrelated private material.
+def test_claude_failedprobe_sanitized():
+    """A CLI error can echo private text even when its API status is useful."""
+    secret = "PRIVATE_REVIEW_MATERIAL_DO_NOT_ECHO"
+    consent = {
+        "approved": True, "executor": "claude", "review_root": "/repo",
+        "authorization_source": {"kind": "direct-user-request",
+                                 "quote": "Use Claude to review this change",
+                                 "target": "this change"},
+        "model": "sonnet", "effort": "high",
+        "disclosures": {key: True for key in (
+            "cost", "vendor_egress", "local_execution",
+            "filesystem_access_outside_root", "filesystem_write_not_guaranteed")},
+    }
+
+    def runner(argv, **kwargs):
+        output = {"type": "result", "is_error": True,
+                  "terminal_reason": "api_error", "api_error_status": 429,
+                  "result": f"Session limit reached. {secret}"}
+        return subprocess.CompletedProcess(argv, 1, json.dumps(output), secret)
+
+    result = review.execute("claude", "sonnet", "high", "anthropic",
+                            "/repo", "review", consent, runner=runner)
+    assert result["status"] == "failed"
+    assert result["reason"] == "probe-exit-1: Claude session limit (HTTP 429)"
+    assert secret not in json.dumps(result)
+
+
+# concern: Nonterminal Claude JSON must not impersonate a trusted API failure.
+def test_claude_assistantenvelope_unknown():
+    """An assistant message carrying error-like keys is not CLI error evidence."""
+    consent = {
+        "approved": True, "executor": "claude", "review_root": "/repo",
+        "authorization_source": {"kind": "direct-user-request",
+                                 "quote": "Use Claude to review this change",
+                                 "target": "this change"},
+        "model": "sonnet", "effort": "high",
+        "disclosures": {key: True for key in (
+            "cost", "vendor_egress", "local_execution",
+            "filesystem_access_outside_root", "filesystem_write_not_guaranteed")},
+    }
+
+    def runner(argv, **kwargs):
+        output = {"type": "assistant", "is_error": True,
+                  "terminal_reason": "api_error", "api_error_status": 429,
+                  "result": "session limit"}
+        return subprocess.CompletedProcess(argv, 1, json.dumps(output), "")
+
+    result = review.execute("claude", "sonnet", "high", "anthropic",
+                            "/repo", "review", consent, runner=runner)
+    assert result["status"] == "failed"
+    assert result["reason"] == "probe-exit-1: unknown error"
+
+
 def test_agy_model_list_and_explicit_pair():
     calls = []
 
