@@ -213,6 +213,15 @@ def test_discovery_missing_review_root_reports_root_without_leaking_path(
     assert secret not in json.dumps(result)
 
 
+def test_claude_discovery_returns_documented_aliases_for_existing_root(tmp_path):
+    scope = str(tmp_path)
+    result = review.discover("claude", scope, consent("claude", scope),
+                             runner=lambda *a, **k: pytest.fail("spawned"))
+    assert result["status"] == "completed"
+    assert result["reason"] is None
+    assert result["candidates"] == ["opus", "sonnet", "haiku"]
+
+
 def test_execution_missing_review_root_reports_root_without_completing(tmp_path):
     scope = str(tmp_path / "PRIVATE_MISSING_REVIEW_ROOT")
     secret = "PRIVATE_DIAGNOSTIC_DO_NOT_ECHO"

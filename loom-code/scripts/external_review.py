@@ -176,6 +176,9 @@ def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
             models = _agy_candidates(runner, scope)
             result["source"] = "agy models"
         elif executor == "claude":
+            if not Path(scope).is_dir():
+                result["reason"] = "discovery-error: review-root-not-found"
+                return result
             models = ["opus", "sonnet", "haiku"]
             result["source"] = "documented aliases; explicit IDs also accepted"
         else:
