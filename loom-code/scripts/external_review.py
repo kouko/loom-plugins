@@ -228,7 +228,8 @@ def _execution_failure_reason(executor: str, output: str, stderr: str) -> str:
         data = json.loads(output)
     except json.JSONDecodeError:
         return "unknown error"
-    if (not isinstance(data, dict) or data.get("is_error") is not True
+    if (not isinstance(data, dict) or data.get("type") != "result"
+            or data.get("is_error") is not True
             or data.get("terminal_reason") != "api_error"):
         return "unknown error"
     status = data.get("api_error_status")
@@ -308,10 +309,11 @@ def execute(
             if stage == "probe":
                 result["probe"] = {
                     "returncode": response.returncode,
-                    "stdout": response.stdout,
-                    "stderr": response.stderr,
                     "timeout_seconds": timeout,
                 }
+                if response.returncode == 0:
+                    result["probe"].update(stdout=response.stdout,
+                                           stderr=response.stderr)
             if response.returncode != 0:
                 detail = _execution_failure_reason(executor, response.stdout,
                                                    response.stderr)

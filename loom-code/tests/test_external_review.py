@@ -196,6 +196,7 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     assert result["evidence_level"] == "accepted-explicit-settings"
     assert result["observed_model"] == "claude-sonnet-4-5"
     assert result["observed_effort"] is None
+    assert json.loads(result["probe"]["stdout"])["result"] == "ok"
     assert len(calls) == 2
 
 
@@ -221,8 +222,7 @@ def test_claude_structured_api_error_reports_bounded_reason_without_review_mater
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == f"probe-exit-1: {expected}"
-    assert result["probe"]["returncode"] == 1
-    assert json.loads(result["probe"]["stdout"])["api_error_status"] == http_status
+    assert result["probe"] == {"returncode": 1, "timeout_seconds": 45}
     assert secret not in json.dumps(result)
     assert len(calls) == 1
 
@@ -236,8 +236,10 @@ def test_nonzero_untrusted_stdout_does_not_become_failure_reason():
         if len(calls) == 1:
             return completed(argv, json.dumps({"result": "ok", "modelUsage":
                                                {"claude-sonnet-4-5": {}}}))
-        return completed(argv, json.dumps({"result": prompt,
-                                          "errors": [{"message": prompt}]}),
+        return completed(argv, json.dumps({"type": "assistant", "is_error": True,
+                                           "terminal_reason": "api_error",
+                                           "api_error_status": 429,
+                                           "result": "session limit " + prompt}),
                          prompt, rc=1)
 
     result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
@@ -255,8 +257,7 @@ def test_nonzero_empty_diagnostic_is_explicitly_unknown():
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == "probe-exit-2: unknown error"
-    assert result["probe"] == {"returncode": 2, "stdout": "", "stderr": "",
-                                "timeout_seconds": 45}
+    assert result["probe"] == {"returncode": 2, "timeout_seconds": 45}
 
 
 def test_agy_model_list_and_explicit_pair():
