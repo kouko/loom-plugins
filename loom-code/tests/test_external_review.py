@@ -199,6 +199,66 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     assert len(calls) == 2
 
 
+@pytest.mark.parametrize("http_status, message, expected", [
+    (429, "You've hit your session limit · resets 4am (Asia/Taipei)",
+     "Claude session limit (HTTP 429)"),
+    (503, "Service unavailable", "Claude API HTTP 503"),
+])
+def test_claude_structured_api_error_reports_bounded_reason_without_review_material(
+        http_status, message, expected):
+    secret = "private review prompt and verdict: PASS"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        failure = {"type": "result", "is_error": True,
+                   "api_error_status": http_status, "terminal_reason": "api_error",
+                   "result": message}
+        return completed(argv, json.dumps(failure), rc=1)
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            secret, consent("claude"), runner=runner)
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+    assert result["reason"] == f"probe-exit-1: {expected}"
+    assert result["probe"]["returncode"] == 1
+    assert json.loads(result["probe"]["stdout"])["api_error_status"] == http_status
+    assert secret not in json.dumps(result)
+    assert len(calls) == 1
+
+
+def test_nonzero_untrusted_stdout_does_not_become_failure_reason():
+    prompt = "secret prompt"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        if len(calls) == 1:
+            return completed(argv, json.dumps({"result": "ok", "modelUsage":
+                                               {"claude-sonnet-4-5": {}}}))
+        return completed(argv, json.dumps({"result": prompt,
+                                          "errors": [{"message": prompt}]}),
+                         prompt, rc=1)
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            prompt, consent("claude"), runner=runner)
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+    assert result["reason"] == "review-exit-1: unknown error"
+    assert prompt not in json.dumps(result)
+
+
+def test_nonzero_empty_diagnostic_is_explicitly_unknown():
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            "review", consent("claude"),
+                            runner=lambda argv, **kwargs: completed(argv, "", rc=2))
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+    assert result["reason"] == "probe-exit-2: unknown error"
+    assert result["probe"] == {"returncode": 2, "stdout": "", "stderr": "",
+                                "timeout_seconds": 45}
+
+
 def test_agy_model_list_and_explicit_pair():
     calls = []
 
@@ -222,6 +282,19 @@ def test_agy_model_list_and_explicit_pair():
     assert result["evidence_level"] == "accepted-explicit-settings"
     assert result["observed_model"] is None
     assert len(calls) == 3
+
+
+def test_agy_nonzero_stderr_reason_stays_bounded():
+    def runner(argv, **kwargs):
+        if argv == ["agy", "models"]:
+            return completed(argv, "gemini-2.5-pro\n")
+        return completed(argv, "", "x" * 301, rc=2)
+
+    result = review.execute("agy", "gemini-2.5-pro", "high", "google", "/repo",
+                            "review", consent("agy"), runner=runner)
+    assert result["status"] == "failed"
+    assert result["review_output"] is None
+    assert result["reason"] == "probe-exit-2: " + "x" * 300
 
 
 def test_agy_relative_review_root_stops_before_discovery():
@@ -432,4 +505,6 @@ def test_failed_selection_or_execution_never_falls_back(case):
                             "review", consent(), runner=runner)
     assert result["status"] == "failed"
     assert result["review_output"] is None
+    if case == "rejected":
+        assert result["reason"] == "probe-exit-2: unsupported effort"
     assert len(calls) <= 2

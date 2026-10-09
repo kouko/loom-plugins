@@ -221,6 +221,25 @@ def _claude_observation(output: str, model: str, family: str) -> tuple[str, str]
     return names[0], result
 
 
+def _execution_failure_reason(executor: str, output: str, stderr: str) -> str:
+    if executor != "claude":
+        return stderr.strip()[:300] or "unknown error"
+    try:
+        data = json.loads(output)
+    except json.JSONDecodeError:
+        return "unknown error"
+    if (not isinstance(data, dict) or data.get("is_error") is not True
+            or data.get("terminal_reason") != "api_error"):
+        return "unknown error"
+    status = data.get("api_error_status")
+    if type(status) is not int or not 400 <= status <= 599:
+        return "unknown error"
+    message = data.get("result")
+    if status == 429 and isinstance(message, str) and "session limit" in message.lower():
+        return "Claude session limit (HTTP 429)"
+    return f"Claude API HTTP {status}"
+
+
 def _command(executor: str, model: str, effort: str, prompt: str,
              scope: str) -> list[str]:
     if executor == "codex":
@@ -294,7 +313,9 @@ def execute(
                     "timeout_seconds": timeout,
                 }
             if response.returncode != 0:
-                return fail(f"{stage}-exit-{response.returncode}: {response.stderr.strip()[:300]}")
+                detail = _execution_failure_reason(executor, response.stdout,
+                                                   response.stderr)
+                return fail(f"{stage}-exit-{response.returncode}: {detail}")
             if executor == "codex":
                 observed_model, observed_effort = _codex_observation(
                     response.stderr, model, effort)
