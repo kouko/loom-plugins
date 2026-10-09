@@ -26,6 +26,11 @@ charter: 1.1
 - Test: Claude readable stderr with empty stdout identifies a bounded category; Codex and Agy echoed secrets remain absent from result; the observed Claude API error envelope is documented and covered; unknown diagnostics stay unknown.
 - Risk: agent-decided — CLI stderr and JSON result text are untrusted and may echo review material; map only verified diagnostic shapes to fixed categories.
 
+**W0-04 Keep missing executors actionable and graduate probe artifacts**  acceptance: 1, 2, 3
+- Files: `loom-code/scripts/external_review.py`, `loom-code/tests/test_external_review.py`, `loom-code/tests/test_external_failure_probe_output_privacy.py`, `loom-code/tests/test_external_failure_terminal_envelope.py`
+- Test: missing executable is identified by a fixed category in discovery and execution; each defect-catching probe is its own suite-collected file with a `concern:` header and passes the adversarial checker.
+- Risk: agent-decided — the file name is safe to classify from `FileNotFoundError` type, never from its text; finalization counts the graduated probe file as the executed artifact.
+
 ## Simplicity check
 - none found
 
