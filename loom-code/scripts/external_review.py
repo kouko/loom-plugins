@@ -54,11 +54,17 @@ def _authorization_valid(source: object, executor: str) -> bool:
         name = names.get(executor, r"$^")
         if not isinstance(quote, str):
             return False
-        corrections = list(re.finditer(r"\b(?:actually|wait|no)\s*,?\s+", quote,
-                                       re.IGNORECASE))
+        corrections = list(re.finditer(
+            r"\b(?:actually|wait|no)\s*,?\s+"
+            r"(?=(?:please\s+)?(?:use|run|ask|invoke|review\s+with|cancel|"
+            r"do\s+not\s+use|don't\s+use)\b)", quote, re.IGNORECASE))
         final_choice = quote[corrections[-1].end():] if corrections else quote
         if (source.get("selected_executor") != executor
                 or not re.search(name, final_choice, re.IGNORECASE)):
+            return False
+        if corrections and not re.match(
+                rf"(?:please\s+)?(?:use|run|ask|invoke|review\s+with)\s+{name}",
+                final_choice, re.IGNORECASE):
             return False
         if re.match(r"\s*(?:maybe|perhaps)\b", final_choice, re.IGNORECASE):
             return False

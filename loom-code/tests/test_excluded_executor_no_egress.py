@@ -100,6 +100,7 @@ def test_later_blanket_cancellation_blocks_discovery_and_execution():
     "Use Codex to review this change. Actually, cancel all outside reviews.",
     "I refuse to use Codex for this change; use Claude instead.",
     "Use Codex to review this change. Wait, use Claude instead.",
+    "Use Codex? Actually, use Claude to review this change; Codex can wait.",
 ])
 def test_later_refusal_or_replacement_blocks_discovery_and_execution(quote):
     record = _record()

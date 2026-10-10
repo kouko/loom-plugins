@@ -14,7 +14,7 @@ charter: 1.1
 **W0-01 Bind outside execution to the user's final selected executor**  acceptance: 1, 2, 3
 - Files: `loom-code/scripts/external_review.py`, `loom-code/skills/external-review/SKILL.md`, `loom-code/tests/test_external_review.py`, `loom-workflow/skills/independent-advisor/SKILL.md`, `loom-code/skills/closing-review/SKILL.md`
 - Test: A1 positive: excluded-executor-blocked; negative: no-discovery-on-refusal. A2 positive: direct-request-runs; boundary: no-second-choice. A3 positive: selected-executor-bound; negative: ambiguous-scope-blocked.
-- Risk: agent-decided — make the owning flow record the final selection and have the runner verify it before egress; resolve the last explicit correction clause before applying bounded refusal checks, so an earlier refusal cannot veto a later affirmative choice. The runner's patterns do not replace the owning flow's interpretation of the full request.
+- Risk: agent-decided — make the owning flow record the final selection and have the runner verify it before egress; consider only a correction marker followed by a selection or cancellation verb, and require that correction to select the dispatched executor explicitly. This keeps ordinary "no need" or "wait for the result" wording from changing the choice. The bounded runner patterns do not replace the owning flow's interpretation of the full request.
 
 **W0-02 Retain the defect-catching exclusion probe in the package suite**  after: W0-01  acceptance: 1, 3
 - Files: `docs/loom/2026-10-10-external-review-consent/evidence/probes/test_excluded_executor_no_egress.py`, `loom-code/tests/test_excluded_executor_no_egress.py`

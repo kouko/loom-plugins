@@ -105,6 +105,7 @@ def test_accepted_selection_source_allows_discovery():
     ("codex", "Use Codex to review this change. Actually, cancel all outside reviews."),
     ("codex", "I refuse to use Codex for this change; use Claude instead."),
     ("codex", "Use Codex to review this change. Wait, use Claude instead."),
+    ("codex", "Use Codex? Actually, use Claude to review this change; Codex can wait."),
 ])
 def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
         executor, quote):
@@ -132,6 +133,9 @@ def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
     ("codex", "Use Claude? Actually use Codex to review this change."),
     ("codex", "Do not use Codex. Actually, please use Codex to review this change."),
     ("codex", "Do not use any external coding agent. Actually, use Codex to review this change."),
+    ("codex", "Use Codex to review this change, no need to ask again."),
+    ("codex", "Use Codex to review this change. No need to use Claude."),
+    ("codex", "Use Codex to review this change. Wait for the result."),
 ])
 def test_affirmative_direct_request_remains_valid(executor, quote):
     record = consent(executor)
@@ -142,6 +146,9 @@ def test_affirmative_direct_request_remains_valid(executor, quote):
 @pytest.mark.parametrize("quote", [
     "Do not use Codex. Actually, please use Codex to review this change.",
     "Do not use any external coding agent. Actually, use Codex to review this change.",
+    "Use Codex to review this change, no need to ask again.",
+    "Use Codex to review this change. No need to use Claude.",
+    "Use Codex to review this change. Wait for the result.",
 ])
 def test_final_reselection_allows_discovery(quote):
     record = consent("codex")
