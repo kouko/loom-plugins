@@ -98,6 +98,9 @@ def test_accepted_selection_source_allows_discovery():
     ("claude", "Use Claude? No, use Codex to review this change."),
     ("claude", "Please review with Codex, not Claude."),
     ("claude", "不要用 Claude，改用 Codex 審查這個變更"),
+    ("codex", "Please use Claude instead of Codex to review this change"),
+    ("codex", "Use Codex? Actually use Claude to review this change"),
+    ("codex", "Maybe Codex can review this change"),
 ])
 def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
         executor, quote):
@@ -121,6 +124,8 @@ def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
     ("codex", "Use Claude? No, use Codex to review this change."),
     ("codex", "Please review with Codex, not Claude."),
     ("codex", "不要用 Claude，改用 Codex 審查這個變更"),
+    ("codex", "Can you use Codex to review this change?"),
+    ("codex", "Use Claude? Actually use Codex to review this change."),
 ])
 def test_affirmative_direct_request_remains_valid(executor, quote):
     record = consent(executor)
