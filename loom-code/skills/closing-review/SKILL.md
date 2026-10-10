@@ -192,7 +192,14 @@ and an unambiguous active branch authorizes one review without a second yes/no
 checkpoint; interpret the full request, including any refusal or correction,
 then quote it, bind `selected_executor` and `executor` to the final choice,
 show the disclosures, and record their flags as shown rather than separately
-acknowledged. The working directory does not confine
+acknowledged. Immediately before each owner call for outside discovery or
+execution, re-evaluate the latest user choice across all conversation turns
+available then. Refresh the final-choice record, or invalidate a stale approved
+record after cancellation, replacement, or ambiguity; a clear direct request
+needs no second confirmation. One execution call runs discovery, preflight,
+and review consecutively. Handle a new user turn received during that call
+before the next outside call; material already sent cannot be recalled. The
+working directory does not confine
 the CLI's file reads or guarantee it cannot write files. An earlier fixed
 setting without these disclosures is insufficient; resolve its confirmation
 at the existing intent decision point. If the provider or target is ambiguous,

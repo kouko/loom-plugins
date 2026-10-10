@@ -187,6 +187,21 @@ def test_named_direct_request_authorizes_one_review_without_repeat_confirmation(
     assert "material scope expands" in skill
 
 
+def test_outside_authorization_is_refreshed_at_each_external_boundary():
+    surfaces = {
+        "advisor": SKILL.read_text(encoding="utf-8"),
+        "external": EXTERNAL_REVIEW.read_text(encoding="utf-8"),
+        "closing": CLOSING_REVIEW.read_text(encoding="utf-8"),
+    }
+    for name, body in surfaces.items():
+        prose = " ".join(body.split()).lower()
+        assert "all conversation turns" in prose, name
+        assert "immediately before each owner call" in prose, name
+        assert "discovery, preflight, and review consecutively" in prose, name
+        assert "stale approved record" in prose, name
+        assert "without a second" in prose, name
+
+
 def test_readmes_describe_direct_request_and_nonblocking_disclosure():
     markers = {
         README_EN: "no second confirmation",

@@ -77,6 +77,16 @@ evidence. The owning flow withholds approval when the full request cancels,
 replaces, or leaves the choice ambiguous. Route ambiguous requests to that
 flow's choice point before setting `approved`.
 
+Immediately before each owner call to the script for discovery or execution,
+re-evaluate the latest user choice across all conversation turns available
+then. Refresh the record for the current executor and target, or invalidate a
+stale approved record when the user cancels, changes executor, or leaves the
+choice ambiguous. A clear direct request still proceeds without a second
+yes/no checkpoint after disclosure. One execution call runs discovery,
+preflight, and review consecutively; a new user turn during that call can be
+handled before the next outside call, and transmitted material cannot be
+recalled.
+
 For Antigravity, the model's provider family may be unknown until the
 consented `agy models` result arrives. A bounded record may replace `family`
 with `"allowed_families": ["anthropic", "google"]`, using only normalized

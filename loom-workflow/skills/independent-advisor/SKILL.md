@@ -53,6 +53,13 @@ including refusals and corrections. Record `authorization_source` with the
 verbatim user request, active target and `selected_executor` set to the final
 user choice; it must equal the dispatched `executor`. Disclosure
 fields record what was shown before execution, not separate acknowledgments.
+Immediately before each owner call for outside discovery or execution,
+re-evaluate the latest user choice across all conversation turns available
+then. Refresh the final-choice record, or invalidate a stale approved record
+after cancellation, replacement, or ambiguity; a clear direct request needs
+no second confirmation. One execution call runs discovery, preflight, and
+review consecutively. Handle a new user turn received during that call before
+the next outside call; material already sent cannot be recalled.
 Give the named skill that record, `review_root` (CLI starting
 directory), requested executor and review packet. `review_root` is not a filesystem read boundary.
 The consent may authorize bounded model selection after consent within one

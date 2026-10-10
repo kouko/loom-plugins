@@ -144,10 +144,17 @@ def test_owner_excludes_codex_before_discovery_or_execution(quote, owner_selecti
     ("codex", "Use Codex to review this change. No need to use Claude."),
     ("codex", "Use Codex to review this change. Wait for the result."),
 ])
-def test_owner_selected_direct_request_remains_valid(executor, quote):
-    record = consent(executor)
+def test_owner_selected_direct_request_remains_valid(executor, quote, tmp_path):
+    scope = str(tmp_path)
+    record = consent(executor, scope)
     record["authorization_source"]["quote"] = quote
-    assert review._authorization_valid(record["authorization_source"], executor)
+    if executor == "claude":
+        runner = lambda *a, **k: pytest.fail("Claude discovery must be local")
+    else:
+        runner = lambda argv, **kwargs: completed(
+            argv, json.dumps({"id": 2, "result": {"data": []}})
+            if executor == "codex" else "[]")
+    assert review.discover(executor, scope, record, runner=runner)["status"] == "completed"
 
 
 @pytest.mark.parametrize("quote", [
