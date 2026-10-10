@@ -46,15 +46,16 @@ def test_consent_blocks_all_subprocesses(record):
     assert calls == []
 
 
-@pytest.mark.parametrize("source", [{},
+@pytest.mark.parametrize("source", [None, {},
     {"kind": "direct-user-request", "quote": "", "target": "this change"},
     {"kind": "direct-user-request", "quote": "review this", "target": ""},
     {"kind": "direct-user-request", "quote": "review this change", "target": "this change"},
     {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change"},
+    {"kind": "direct-user-request", "quote": "Use Claude to review this change", "target": "this change", "selected_executor": "codex"},
     {"kind": "suggestion", "quote": "Use codex", "target": "this change"},
     {"kind": "accepted-selection", "selection": "", "target": "this change"},
 ])
-def test_authorization_source_must_name_real_request_or_selection(source):
+def test_authorization_source_requires_complete_owner_record(source):
     record = consent()
     if source is None:
         del record["authorization_source"]
@@ -84,37 +85,43 @@ def test_accepted_selection_source_allows_discovery():
     assert result["status"] == "completed"
 
 
-@pytest.mark.parametrize("executor, quote", [
-    ("claude", "Do not use Claude to review this change"),
-    ("codex", "Don't use Codex to review this change"),
-    ("agy", "Never use Agy to review this change"),
-    ("claude", "不要用 Claude 審查這個變更"),
-    ("codex", "別用 Codex 審查這個變更"),
-    ("claude", "Claude を使わないで、この変更を確認して"),
-    ("claude", "Do not review with Claude"),
-    ("claude", "I don't want Claude"),
-    ("claude", "Claude can review this change"),
-    ("claude", "I did not say to use Claude"),
-    ("claude", "Use Claude? No, use Codex to review this change."),
-    ("claude", "Please review with Codex, not Claude."),
-    ("claude", "不要用 Claude，改用 Codex 審查這個變更"),
-    ("codex", "Please use Claude instead of Codex to review this change"),
-    ("codex", "Use Codex? Actually use Claude to review this change"),
-    ("codex", "Maybe Codex can review this change"),
-    ("codex", "Use Codex to review this change. Actually, do not use any external coding agent."),
-    ("codex", "Use Codex to review this change. Actually, cancel all outside reviews."),
-    ("codex", "I refuse to use Codex for this change; use Claude instead."),
-    ("codex", "Use Codex to review this change. Wait, use Claude instead."),
-    ("codex", "Use Codex? Actually, use Claude to review this change; Codex can wait."),
+def test_accepted_selection_source_allows_execution():
+    record = consent()
+    record["authorization_source"] = {
+        "kind": "accepted-selection", "selection": "codex", "target": "this change",
+    }
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        if argv[:2] == ["codex", "app-server"]:
+            return completed(argv, json.dumps({"id": 2, "result": {
+                "data": [{"id": "gpt-6.1-sol"}]}}))
+        return completed(argv, "ok" if len(calls) == 2 else "review verdict",
+                         "model: gpt-6.1-sol\nreasoning effort: high\n")
+
+    result = review.execute("codex", "gpt-6.1-sol", "high", "openai", "/repo",
+                            "review", record, runner=runner)
+    assert result["status"] == "completed"
+    assert len(calls) == 3
+
+
+@pytest.mark.parametrize("quote, owner_selection", [
+    ("Use Codex? Actually use Claude to review this change.", "claude"),
+    ("Please use Claude instead of Codex to review this change.", "claude"),
+    ("Use Codex to review this change. Actually, cancel all outside reviews.", None),
+    ("Maybe Codex can review this change.", None),
 ])
-def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
-        executor, quote):
-    record = consent(executor)
+def test_owner_excludes_codex_before_discovery_or_execution(quote, owner_selection):
+    record = consent("codex")
     record["authorization_source"]["quote"] = quote
+    if owner_selection is None:
+        record["approved"] = False
+    else:
+        record["authorization_source"]["selected_executor"] = owner_selection
     no_spawn = lambda *a, **k: pytest.fail("spawned")
-    discovered = review.discover(executor, "/repo", record, runner=no_spawn)
-    executed = review.execute(executor, record["model"], "high",
-                              {"claude": "anthropic", "codex": "openai", "agy": "google"}[executor],
+    discovered = review.discover("codex", "/repo", record, runner=no_spawn)
+    executed = review.execute("codex", record["model"], "high", "openai",
                               "/repo", "review", record, runner=no_spawn)
     assert discovered["reason"] == "consent-missing-or-stale"
     assert executed["reason"] == "consent-missing-or-stale"
@@ -137,7 +144,7 @@ def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
     ("codex", "Use Codex to review this change. No need to use Claude."),
     ("codex", "Use Codex to review this change. Wait for the result."),
 ])
-def test_affirmative_direct_request_remains_valid(executor, quote):
+def test_owner_selected_direct_request_remains_valid(executor, quote):
     record = consent(executor)
     record["authorization_source"]["quote"] = quote
     assert review._authorization_valid(record["authorization_source"], executor)
@@ -159,6 +166,30 @@ def test_final_reselection_allows_discovery(quote):
             argv, json.dumps({"id": 2, "result": {"data": []}})),
     )
     assert result["status"] == "completed"
+
+
+@pytest.mark.parametrize("quote", [
+    "Do not use Codex. Actually, can you use Codex to review this change?",
+    "Actually, don't use Claude; use Codex to review this change.",
+    "Actually, use the Codex CLI to review this change.",
+])
+def test_owner_final_codex_choice_allows_discovery_and_execution(quote):
+    record = consent("codex")
+    record["authorization_source"]["quote"] = quote
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        if argv[:2] == ["codex", "app-server"]:
+            return completed(argv, json.dumps({"id": 2, "result": {
+                "data": [{"id": "gpt-6.1-sol"}]}}))
+        return completed(argv, "ok" if len(calls) == 3 else "review verdict",
+                         "model: gpt-6.1-sol\nreasoning effort: high\n")
+
+    assert review.discover("codex", "/repo", record, runner=runner)["status"] == "completed"
+    assert review.execute("codex", "gpt-6.1-sol", "high", "openai", "/repo",
+                          "review", record, runner=runner)["status"] == "completed"
+    assert len(calls) == 4
 
 
 def test_direct_request_selected_executor_must_match_dispatch():

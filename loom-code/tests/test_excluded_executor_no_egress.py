@@ -1,5 +1,5 @@
 # concern: A superseded executor must not reach vendor discovery or execution.
-"""An explicit replacement choice must block every outside runner entry point."""
+"""Owner records excluding Codex block every outside runner entry point."""
 
 import json
 import subprocess
@@ -21,7 +21,7 @@ def _record():
             "kind": "direct-user-request",
             "quote": "Please use Claude instead of Codex to review this change",
             "target": "this change",
-            "selected_executor": "codex",
+            "selected_executor": "claude",
         },
         "model": "gpt-6.1-sol",
         "effort": "high",
@@ -43,7 +43,7 @@ def _runner(calls):
 
 
 def test_discovery_excluded_blocks():
-    """Reject a superseded Codex choice before model discovery."""
+    """Reject an owner record selecting Claude before model discovery."""
     calls = []
     result = external_review.discover("codex", "/repo", _record(), runner=_runner(calls))
     assert result["reason"] == "consent-missing-or-stale"
@@ -51,7 +51,7 @@ def test_discovery_excluded_blocks():
 
 
 def test_execution_excluded_blocks():
-    """Reject a superseded Codex choice before any execution stage."""
+    """Reject an owner record selecting Claude before any execution stage."""
     calls = []
     result = external_review.execute("codex", "gpt-6.1-sol", "high", "openai",
                                      "/repo", "review", _record(), runner=_runner(calls))
@@ -60,7 +60,7 @@ def test_execution_excluded_blocks():
 
 
 def test_discovery_corrected_blocks():
-    """Reject a later choice of Claude after Codex was only proposed."""
+    """The owner records the final Claude choice after a correction."""
     record = _record()
     record["authorization_source"]["quote"] = (
         "Use Codex? Actually use Claude to review this change")
@@ -71,9 +71,10 @@ def test_discovery_corrected_blocks():
 
 
 def test_discovery_suggestion_blocks():
-    """A tentative suggestion is not a direct request to run Codex."""
+    """The owner leaves a tentative suggestion unapproved."""
     record = _record()
     record["authorization_source"]["quote"] = "Maybe Codex can review this change"
+    record["approved"] = False
     calls = []
     result = external_review.discover("codex", "/repo", record, runner=_runner(calls))
     assert result["reason"] == "consent-missing-or-stale"
@@ -81,10 +82,11 @@ def test_discovery_suggestion_blocks():
 
 
 def test_later_blanket_cancellation_blocks_discovery_and_execution():
-    """A later cancellation of every outside agent revokes a named request."""
+    """The owner removes authorization after a blanket cancellation."""
     record = _record()
     record["authorization_source"]["quote"] = (
         "Use Codex to review this change. Actually, do not use any external coding agent.")
+    record["approved"] = False
     calls = []
     discovered = external_review.discover("codex", "/repo", record,
                                           runner=_runner(calls))
@@ -105,6 +107,8 @@ def test_later_blanket_cancellation_blocks_discovery_and_execution():
 def test_later_refusal_or_replacement_blocks_discovery_and_execution(quote):
     record = _record()
     record["authorization_source"]["quote"] = quote
+    if "cancel all" in quote:
+        record["approved"] = False
     calls = []
     discovered = external_review.discover("codex", "/repo", record,
                                           runner=_runner(calls))

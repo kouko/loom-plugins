@@ -52,39 +52,9 @@ def _authorization_valid(source: object, executor: str) -> bool:
     if source.get("kind") == "direct-user-request":
         quote = source.get("quote")
         name = names.get(executor, r"$^")
-        if not isinstance(quote, str):
-            return False
-        corrections = list(re.finditer(
-            r"\b(?:actually|wait|no)\s*,?\s+"
-            r"(?=(?:please\s+)?(?:use|run|ask|invoke|review\s+with|cancel|"
-            r"do\s+not\s+use|don't\s+use)\b)", quote, re.IGNORECASE))
-        final_choice = quote[corrections[-1].end():] if corrections else quote
-        if (source.get("selected_executor") != executor
-                or not re.search(name, final_choice, re.IGNORECASE)):
-            return False
-        if corrections and not re.match(
-                rf"(?:please\s+)?(?:use|run|ask|invoke|review\s+with)\s+{name}",
-                final_choice, re.IGNORECASE):
-            return False
-        if re.match(r"\s*(?:maybe|perhaps)\b", final_choice, re.IGNORECASE):
-            return False
-        refusals = (
-            r"\b(?:cancel|stop)\s+(?:all|any)\s+"
-            r"(?:external|outside)\s+reviews?\b",
-            r"\b(?:do\s+not|don't|never)\s+(?:use|run|ask|invoke)\s+"
-            r"(?:any|an)\s+(?:external|outside)\s+(?:coding\s+)?agent\b",
-            rf"\b(?:do\s+not|don't|never)\s+"
-            rf"(?:use|run|ask|invoke|want|review\s+with)\s+{name}",
-            rf"\b(?:did\s+not|didn't)\s+say\s+to\s+(?:use|run|ask|invoke)\s+{name}",
-            rf"\brefuse\s+to\s+use\s+{name}",
-            rf"\b(?:not|no)\s+{name}",
-            rf"\b(?:instead\s+of|rather\s+than)\s+{name}",
-            rf"(?:不要|別|别)\s*(?:用|使用)?\s*{name}",
-            rf"{name}\s*を?\s*(?:使わないで?|使用しないで?)",
-            rf"^\s*{name}\s+can\s+review\b",
-        )
-        return not any(re.search(pattern, final_choice, re.IGNORECASE)
-                       for pattern in refusals)
+        return (isinstance(quote, str) and bool(quote.strip())
+                and source.get("selected_executor") == executor
+                and bool(re.search(name, quote, re.IGNORECASE)))
     if source.get("kind") == "accepted-selection":
         selection = source.get("selection")
         return (isinstance(selection, str) and
