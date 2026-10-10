@@ -1,0 +1,13 @@
+{
+  "source": "locally retained external review result",
+  "source_sha256": "38c0d9e3f86c8b169187a5c48a3c1bb81322cd6ffff91ab391a3b51dee908252",
+  "capture_cli_version": "not recorded",
+  "probe_stdout_observed": {
+    "type": "result",
+    "is_error": true,
+    "terminal_reason": "api_error",
+    "api_error_status": 429,
+    "result_contains_session_limit": true
+  },
+  "excluded": "Raw result text, stdout, stderr, prompt, and identifiers are not retained here."
+}

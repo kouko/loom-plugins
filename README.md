@@ -14,8 +14,8 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.14.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/) | 3.38.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.6.3 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
+| [`loom-code`](loom-code/) | 3.39.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/) | 5.7.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -129,7 +129,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.38.0. Five stations carry one change from plan to PR with
+Version 3.39.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -146,9 +146,9 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.6.3. Workflow tools used around the stations; all work without
-`loom-code`; only `decision-map`'s delivery step, which writes an intent,
-needs it. See
+Version 5.7.0. Workflow tools used around the stations; most work without
+`loom-code`. `decision-map`'s intent delivery and explicitly requested outside
+code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
 attach to the flow.
 

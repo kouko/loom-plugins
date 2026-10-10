@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.7.0] — 2026-10-08 — independent reviews use the shared outside executor
+
+- An explicitly requested outside code, plan or decision review now routes through `loom-code:external-review`, preserving the owning review's criteria and verdict format while reporting outside results separately from the incumbent review.
+- The single consent checkpoint precedes model discovery, pre-review execution and dispatch. The shared executor requires an explicit model and effort and reports failures or unverifiable settings without silently substituting a default.
+
 ## [5.6.3] — 2026-10-05 — OpenCode loader stops recording user prompts
 
 - The synced OpenCode loader copy no longer writes the per-session prompt file under `tmpdir/loom-opencode/`, and drops `transcript_path` from hook payloads, matching `loom-code` 3.32.0.

@@ -2,20 +2,90 @@
 name: independent-advisor
 version: 0.1.0
 description: |
-  Get a second opinion on a plan or decision. Use when asked to consult another model, higher effort, or another vendor.
+  Route an explicitly requested outside coding-agent review of code, plan, or decision while preserving its review contract. Also get a second opinion from another model, higher effort, or vendor.
 ---
 
 # Independent Advisor
 
-Consult a **different executor** about the user's current plan or decision.
+Consult a **different executor** about the user's code, plan, or decision.
 This changes WHO answers, not the critique lens. For a same-executor lens change,
 use `loom-workflow:critique`. This skill spends money, sends material off the
-machine, and may run repository setup, so those effects require approval.
+machine, and may run repository setup, so those effects require authorization.
 
-Record capability as model tier `economy` / `standard` / `frontier` plus effort
-`low` / `medium` / `high`; use no other tier vocabulary or vendor marketing name.
+For consultation comparisons, describe capability as model tier `economy` /
+`standard` / `frontier` plus effort `low` / `medium` / `high`. The outside
+execution record also needs the actual selected model ID and provider family.
 
-## Mode routing
+## Explicit outside review
+
+When the user explicitly requests an outside coding agent to review code, plan,
+or decision, identify the review owner before invoking
+`loom-code:external-review` by skill name:
+
+- Code branch review: `loom-code:closing-review` owns its code lens,
+  reviewer YAML and finalization checks.
+- Loom implementation plan review: `loom-code:write-plan` owns the fresh
+  `plan`-lens review before Build.
+- A proposal or complexity decision: `loom-workflow:critique` owns the
+  applicable `proposal` or `complexity` criteria.
+
+For code, plan, or decision without an applicable Loom review owner (including
+file-level or uncommitted code review outside branch closing review), use the
+advisor audit consultation report contract. Assemble its full-context packet,
+run the outside leg after authorization and disclosure, and report it
+separately from the incumbent.
+This is not a formal owner verdict; do not invent an owning skill or claim its
+formal review checks ran.
+
+When an owner exists, it assembles the review packet with its requirements and
+validates the returned verdict against its own format and checks. Keep the
+incumbent reviewer and its result separately attributable. The advisor does
+not substitute its `explore`/`audit` comparison verdict or report template for
+the owning review skill's contract. A failed or unverified outside execution
+is a separately attributed failure, never a completed independent review.
+
+Before invoking `loom-code:external-review` for discovery, probe or dispatch,
+show the full disclosure below and prepare the runner's complete consent
+record. A direct user request naming the outside coding agent and an explicit
+or unambiguous active code, plan or decision target authorizes one bounded
+review without a second yes/no checkpoint. Interpret the full request,
+including refusals and corrections. Record `authorization_source` with the
+verbatim user request, active target and `selected_executor` set to the final
+user choice; it must equal the dispatched `executor`. Disclosure
+fields record what was shown before execution, not separate acknowledgments.
+Immediately before each owner call for outside discovery or execution,
+re-evaluate the latest user choice across all conversation turns available
+then. Refresh the final-choice record, or invalidate a stale approved record
+after cancellation, replacement, or ambiguity; a clear direct request needs
+no second confirmation. One execution call runs discovery, preflight, and
+review consecutively. Handle a new user turn received during that call before
+the next outside call; material already sent cannot be recalled.
+Give the named skill that record, `review_root` (CLI starting
+directory), requested executor and review packet. `review_root` is not a filesystem read boundary.
+The consent may authorize bounded model selection after consent within one
+provider family and effort bound, a set of `allowed_families` for Antigravity,
+or an exact model and effort. Exclude the incumbent's provider family from
+that Antigravity set; choose a concrete family and model after discovery.
+The named skill owns candidate selection, explicit model and effort in the
+pre-review execution and review, CLI invocation and execution evidence.
+Do not read or run a `loom-code` file from this plugin at runtime. Accept only
+the named skill's JSON evidence/status and then apply the owning review skill's
+checks to any owner-governed review output, or the advisor audit report checks
+to an unowned consultation. A changed executor or `review_root`, or a
+model, effort or provider family outside the recorded bounds, voids that
+authorization. If the provider or target is ambiguous, or material scope expands
+beyond the active task, ask for the missing choice before dispatch. An
+unsolicited second-vendor notice remains a suggestion; it never starts
+discovery, probe or dispatch without a request or accepted selection.
+
+For open-ended second-opinion consultations, continue with the `explore` and
+`audit` modes below and their existing packet and report rules.
+
+## Consultation mode routing
+
+This section applies to open-ended consultations and explicit reviews without
+an applicable owner. An owner-governed outside review uses that skill's task
+type and verdict contract instead.
 
 - `explore`: the solution space is open; run proposer, normalizer, and blind judge roles.
 - `audit`: an incumbent exists; **a single leg with full context runs**, with
@@ -33,80 +103,96 @@ No incumbent yet is valid in `explore` and **distinct from an incomplete packet*
 run a single blind proposal or state that this consultation shape does not apply.
 An incumbent that exists but was not supplied is instead a missing packet section.
 
-## Static detection
+## Candidate selection
 
-Before asking the user anything, test every candidate's binary and credential
-file and record each command's output. Follow
-`references/executor-detection.md` for the exact checks, reason mapping, fixes,
-record shape, and live-probe mechanics.
+Use `references/executor-detection.md` for the named skill handoff and its
+failure mapping. Local, non-network capability observations may inform the
+checkpoint, but neither an installed binary nor credentials establish model
+availability. The named skill owns selection and pre-review verification after
+authorization and disclosure. Never present an unverified candidate as a
+verified capability.
 
-An excluded candidate **never appears in the option list**: it is **absent from the list, not shown as an unavailable option**. If the user names
-one, **refuse and state that exclusion reason** with its recorded command output:
-`binary-missing`, `binary-not-executable`, `credential-missing`, or
-`credential-unusable`; **never collapse them into one** generic status. A static pass
-means only **statically available, not yet verified**: it is **permission to attempt a live probe**, and **never report a static pass downstream as a verified capability**.
+The candidate set must support a genuinely independent opinion. No permitted
+outside provider family means stop and report the failed precondition. A
+same-family option cannot be counted as independent; ask for a different
+provider if the user still wants an independent review, never silently swap. In
+`explore`, one eligible candidate cannot serve as both proposer and judge;
+surface the degraded choices at the checkpoint.
 
-The candidate set must support a genuinely independent opinion:
+## Authorization and the single checkpoint
 
-- No passing candidate: **stop the run**, state the failed precondition, and list
-  each exclusion reason; never substitute this controller because **a second opinion from the same executor is not a second opinion**.
-- Only same-family candidates: stop and name them as `same-family`. Proceeding
-  requires the user's checkpoint decision, never a silent fallback.
-- When **exactly one candidate passes** in `explore`, **surface the conflict at the checkpoint**: it cannot be both proposer and judge. List the degraded choices; never assign
-  the same executor to both silently.
-
-## The single checkpoint
-
-**Exactly one checkpoint exists**, after routing and static detection and before
-any probe, dispatch, transmission, or **any money is spent**. One ask carries
+For a qualifying direct user request, give this disclosure without asking the
+user to confirm the same review again. The direct request is the authorization
+source for one leg and the active task target; it does not approve a different
+provider, new target or broader material scope. For an ambiguous request or
+other opt-in, use a single checkpoint after routing and local observations,
+before any network-backed discovery, probe, dispatch, transmission, or money
+is spent. One ask carries
 **the leg count**, **which executor runs which leg**, **the estimated cost**, and
 **the egress disclosure** together, specifically:
 
-- `mode`, verbatim `mode_basis`, and any conflict or override;
+- for consultations, `mode`, verbatim `mode_basis`, and any conflict or override;
+  for explicit reviews, the owning task type and review skill;
 - leg count and every executor-to-leg assignment;
+- for each outside leg, either an exact model and effort or explicit permission
+  to select a model after consent within a named provider family and allowed
+  effort levels; Antigravity may instead record `allowed_families` excluding
+  the incumbent's family, with the concrete family chosen after discovery;
+  always record `review_root`, the CLI starting directory;
 - estimated cost per leg (`unknown, with the reason`, **never as zero and never omitted** when unknowable; a **genuinely zero** cost stays zero, not unknown); and
 - the full egress and local-execution disclosure below.
 
-Require recorded confirmation of all dimensions. **splitting** these into separate questions, dispatching **without a recorded user confirmation**, or treating a **partial answer as approval** are violations. Ask for each missing item and **never fill it with a default**. If the executor
-set changes, **the prior approval is void**: repeat static detection and cost
-estimation, then present the whole checkpoint again. **Never carry a previous static result or cost figure** into the changed set.
+Record `authorization_source` as either the direct request quotation, target and
+final `selected_executor`, or the answer at that checkpoint. For a direct
+request, do not mark the cost, egress,
+filesystem and local setup disclosures as individually acknowledged; record
+that they were shown before execution. For a checkpoint answer, require the
+missing choices explicitly and do not treat a partial answer as approval. If
+the executor set or material scope changes, renew authorization and repeat
+cost estimation and disclosure. Never carry a previous observation or cost
+figure into the changed set.
 
 ### The egress disclosure
 
-For every leg, name **the vendor that receives material**, packet categories,
-and **the file paths the executor will be authorised to read**. Approval of the
+For every leg, name **the vendor that receives material** (or every permitted
+vendor for post-consent Antigravity selection), packet categories, and the
+`review_root`. Enumerate known wider paths and explain that the CLI may read
+outside that root through host tools or configuration. Approval of the
 **cost only** never authorizes either data transfer
-or local execution. Before accepting approval, say plainly:
+or local execution. Before dispatch, say plainly:
 
-1. The inspected packet is smaller than the readable scope: **`scope_boundary` is the larger of the two**. Always **enumerate what** the wider
-   paths and what they cover: “I checked the text I am sending; the other model
-   can additionally open files under `<paths>`.”
+1. The inspected packet is smaller than what the executor may read:
+   **`scope_boundary` includes reachable paths outside `review_root`**.
+   Enumerate the known wider paths and what they cover, and say that paths
+   outside the root may also be reachable. Do not promise a filesystem read
+   limit from the selected working directory.
 2. A no-hit scan may say **the packet was checked and nothing matched**; it is
    not a safety claim or wording that **carries that meaning** about the readable scope or what leaves.
 3. Answering also runs **third-party code in the user's repository** on this
    machine—its **instructions, hooks, skills and MCP servers**—even if nobody
-   read it first. If a pinned executor's setup is unknown, **state that it cannot be enumerated in advance**.
+   read it first. CLI startup, plugins and caches may write files even when
+   model tools are restricted. If a pinned executor's setup is unknown,
+   **state that it cannot be enumerated in advance**.
 4. If the audit record retains **material verbatim rather than references and summaries**, **state its location at this checkpoint** and give it the **same restrictions as the dispatch packet**.
 
-Refuse dispatch until the user acknowledges cost, egress, readable scope, and
-local setup. If cancellation follows an external call, report that material was
+Record `filesystem_access_outside_root` and `filesystem_write_not_guaranteed`
+as disclosures shown. A named direct request needs no second confirmation;
+otherwise require the missing authorization before dispatch. If cancellation follows an external call, report that material was
 already transmitted to the named vendor and cannot be recalled.
 
-## The live probe
+## External execution evidence
 
-After complete approval, probe **only for an executor the user selected**; never
-probe the candidate list speculatively. If the user cancelled, **no probe runs at all**. Give the probe no write access. Judge its **own exit status**, never a pipeline's; a timeout **is a probe failure, not a pass**. It passes only when its header
-self-reports both `verified_model` and `verified_effort`: **a missing effort value is a failure**, and missing either leaves it **treated as unverified** even after exit zero.
+After the complete record and disclosure, hand each selected leg to `loom-code:external-review`
+using the same consent record and `review_root`. That named skill owns
+candidate discovery, explicit model and effort selection, pre-review execution,
+CLI-specific evidence levels and failure status. Record its JSON evidence and
+never turn an unavailable, mismatched, timed-out or unverified result into a
+completed leg. A materially different profile needs renewed authorization and
+disclosure. A frontier request cannot silently downgrade.
 
-`frontier` **fails loud** and is **never auto-downgraded**: a failed probe must
-**stop and surface the reason**; a lower verified tier is an **unavailable capability**.
-A lower tier may run **only on explicit user confirmation** after disclosure. A
-non-frontier mismatch must **return to the checkpoint** and **is still disclosed** in the report.
-
-Therefore **the verified executor is the executor you dispatch**; an alias swap
-requires another probe. The blind **judge and the proposer** must differ, and
-both opposite-order runs use **identical settings**—executor, model, and effort—or
-their verdicts are invalid.
+The blind judge and proposer must differ, and both opposite-order judge runs
+use identical accepted executor, model and effort settings. Each run uses a
+fresh process and is verified separately.
 
 ## Three roles and blind judging
 
@@ -177,7 +263,7 @@ wording. The rules below remain binding wherever the report is stored.
 Blindness concerns the **packet**, not everything the proposer could read. Before
 claiming it, ask whether `scope_boundary` could contain the incumbent. If yes or
 unknown, make no **unconditional blindness claim**; qualify it in place: the packet omitted the incumbent, but the
-authorized paths may describe it, so the answer is not guaranteed blind. Claim
+reachable files may describe it, so the answer is not guaranteed blind. Claim
 full blindness only when that boundary cannot reach incumbent material and state
 the basis. Wherever this applies, **state the qualification** where blindness is claimed.
 

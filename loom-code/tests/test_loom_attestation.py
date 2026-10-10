@@ -6,11 +6,14 @@ import hashlib
 import json
 import os
 import sys
+import yaml
 from io import StringIO
 from pathlib import Path
 
+import external_review
+import pytest
 from loom_checker import attestation as attestation_module
-from loom_checker import digest, probes, reviewers
+from loom_checker import digest, probes, reviewers, verification
 from loom_checker.command_handlers import finalize, reviewer_count
 
 
@@ -251,6 +254,541 @@ def test_matching_low_risk_attestation_accepts_one_reviewer(tmp_path: Path) -> N
     assert attestation_module.validate_attestation(
         repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
     ) == []
+
+
+def test_skipped_plan_intent_selection_requires_outside_reviewer(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "## Constraints\n- user-decided — second-vendor selection-confirmed: claude\n",
+        encoding="utf-8",
+    )
+    commit(repo, "record outside choice without plan")
+    assert not (repo / f"docs/loom/{CHANGE}/plan.md").exists()
+    monkeypatch.chdir(repo)
+    out = StringIO()
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, StringIO()) == 0
+    assert out.getvalue() == "2\n"
+
+    evidence = matching_attestation(repo)
+    evidence["verdicts"] = evidence["verdicts"][:1]
+    head = git(repo, "rev-parse", "HEAD")
+    assert any("two distinct reviewers" in reason for _, reason in
+               attestation_module.validate_attestation(repo, head, CHANGE,
+                                                       evidence, manifest()))
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": evidence["verdicts"],
+                                        "findings": [], "adversarial": []}),
+                            encoding="utf-8")
+    assert any("two distinct reviewers" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    evidence["verdicts"].append({"reviewer": "second", "vendor": "anthropic",
+                                 "model": "sonnet", "lens": "code",
+                                 "verdict": "PASS", "findings": []})
+    assert any("outside execution" in reason for _, reason in
+               attestation_module.validate_attestation(repo, head, CHANGE,
+                                                       evidence, manifest()))
+    review_input.write_text(json.dumps({"verdicts": evidence["verdicts"],
+                                        "findings": [], "adversarial": []}),
+                            encoding="utf-8")
+    assert any("outside execution" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text("## Risks\n- user-decided — second-vendor selection-confirmed: codex (draft)\n")
+    commit(repo, "create plan without changing outside choice")
+    assert reviewers.selected_outside_family(repo, CHANGE) == "anthropic"
+    out = StringIO()
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, StringIO()) == 0
+    assert out.getvalue() == "2\n"
+    plan.write_text("## Risks\n- user-decided — second-vendor selection-confirmed: codex\n")
+    commit(repo, "plan overrides intent selection")
+    assert reviewers.selected_outside_family(repo, CHANGE) == "openai"
+
+
+def test_outside_selection_is_only_read_from_owning_sections(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "## Questions asked\n"
+        "user-decided — second-vendor selection-confirmed: claude\n"
+        "## Constraints\n- no outside reviewer selected\n",
+        encoding="utf-8",
+    )
+    commit(repo, "record unrelated question text")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+
+def test_numbered_plan_selection_sets_floor_and_requires_outside_receipt(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "## Constraints\n- user-decided — second-vendor selection-confirmed: claude\n",
+        encoding="utf-8",
+    )
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(
+        "## Risks\n3. user-decided — second-vendor selection-confirmed: codex\n",
+        encoding="utf-8",
+    )
+    commit(repo, "numbered plan selection overrides intent")
+
+    assert reviewers.selected_outside_family(repo, CHANGE) == "openai"
+    monkeypatch.chdir(repo)
+    out = StringIO()
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, StringIO()) == 0
+    assert out.getvalue() == "2\n"
+    evidence = matching_attestation(repo)
+    evidence["verdicts"][0]["vendor"] = "anthropic"
+    evidence["verdicts"][1].update(vendor="openai", model="gpt-6.1-sol")
+    head = git(repo, "rev-parse", "HEAD")
+    assert any("outside execution" in reason for _, reason in
+               attestation_module.validate_attestation(repo, head, CHANGE,
+                                                       evidence, manifest()))
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": evidence["verdicts"],
+                                        "findings": [], "adversarial": []}),
+                            encoding="utf-8")
+    assert any("outside execution" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+
+    plan.write_text(
+        "## Questions asked\n3. user-decided — second-vendor selection-confirmed: codex\n"
+        "## Risks\n3. user-decided — second-vendor selection-confirmed: gemini (draft)\n",
+        encoding="utf-8",
+    )
+    commit(repo, "nonfinal selections do not override intent")
+    assert reviewers.selected_outside_family(repo, CHANGE) == "anthropic"
+
+
+@pytest.mark.parametrize("selection", [
+    "user-decided — second-vendor selection-confirmed: codex",
+    "3. user-decided — second-vendor selection-confirmed: codex",
+])
+def test_fenced_selection_and_heading_are_not_authoritative(
+    tmp_path: Path, selection: str,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(f"## Risks\n```text\n{selection}\n```\n", encoding="utf-8")
+    commit(repo, "selection in fenced example")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+    plan.write_text(f"~~~text\n## Risks\n{selection}\n~~~\n", encoding="utf-8")
+    commit(repo, "heading and selection in fenced example")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+    plan.write_text(f"## Risks\n~~~text\n{selection}\n~~~\n{selection}\n".replace(
+        "\n", "\r\n"), encoding="utf-8")
+    commit(repo, "real CRLF choice after fenced example")
+    assert reviewers.selected_outside_family(repo, CHANGE) == "openai"
+
+
+def test_fenced_intent_constraints_do_not_select_outside_reviewer(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "```text\n## Constraints\n"
+        "- user-decided — second-vendor selection-confirmed: claude\n```\n",
+        encoding="utf-8",
+    )
+    commit(repo, "intent selection only in fenced example")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+
+def test_commented_selection_does_not_select_outside_reviewer(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(
+        "## Risks\n<!--\n"
+        "3. user-decided — second-vendor selection-confirmed: codex\n"
+        "-->\n",
+        encoding="utf-8",
+    )
+    commit(repo, "selection in HTML comment")
+    assert reviewers.selected_outside_family(repo, CHANGE) is None
+
+
+def test_selected_outside_review_raises_narrow_floor_and_requires_both_families(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(
+        "## Risks\nuser-decided — second-vendor selection-confirmed: claude\n",
+        encoding="utf-8",
+    )
+    commit(repo, "select outside reviewer")
+    monkeypatch.chdir(repo)
+    out, err = StringIO(), StringIO()
+    assert reviewer_count.cmd_reviewer_count([CHANGE], out, err) == 0
+    assert out.getvalue() == "2\n"
+
+    evidence = matching_attestation(repo)
+    evidence["verdicts"] = evidence["verdicts"][:1]
+    assert any("two distinct reviewers" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, evidence, manifest()))
+    evidence["verdicts"].append({**evidence["verdicts"][0],
+                                 "reviewer": "reviewer-2", "vendor": "openai"})
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": evidence["verdicts"],
+                                        "findings": [], "adversarial": []}),
+                            encoding="utf-8")
+    assert any("outside" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    assert any("outside" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, evidence, manifest()))
+    evidence["verdicts"][1]["vendor"] = "anthropic"
+    evidence["verdicts"][1]["lens"] = "docs"
+    assert any("same review lens" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, evidence, manifest()))
+    evidence["verdicts"][1]["lens"] = "code"
+    assert any("outside execution" in reason for _, reason in
+               attestation_module.validate_attestation(repo, git(repo, "rev-parse", "HEAD"),
+                                                       CHANGE, evidence, manifest()))
+
+
+def test_outside_yaml_scores_and_notes_must_match_attributed_verdict() -> None:
+    scores = {dimension: "PASS" for dimension in (
+        "omission", "ambiguity", "inconsistency", "incorrect-fact",
+        "missing-population", "deletion-first")}
+    parsed = {"verdict": "PASS", "lens": "docs", "reviewed_sha": "a" * 40,
+              "review_target_sha": "b" * 40, "dimension_scores": scores,
+              "findings": [], "notes": []}
+    verdict = {**parsed, "dimension_scores": scores.copy()}
+    assert reviewers._review_yaml_failure(parsed, verdict) is None
+
+    verdict["dimension_scores"]["omission"] = "N/A — outside scope"
+    assert reviewers._review_yaml_failure(parsed, verdict) == (
+        "selected outside execution output differs from its verdict")
+    verdict["dimension_scores"]["omission"] = "PASS"
+    verdict["notes"] = ["different note"]
+    assert reviewers._review_yaml_failure(parsed, verdict) == (
+        "selected outside execution output differs from its verdict")
+
+
+def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-08)\n")
+    commit(repo, "declare fast suite")
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: claude\n")
+    commit(repo, "select outside review")
+    head = git(repo, "rev-parse", "HEAD")
+    base_sha = git(repo, "rev-parse", "HEAD^")
+    raw = (
+        f"verdict: PASS\nlens: docs\nreviewed_sha: {base_sha}\n"
+        f"review_target_sha: {head}\n"
+        "dimension_scores:\n"
+        "  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n"
+        "  incorrect-fact: PASS\n  missing-population: PASS\n"
+        "  deletion-first: PASS\nfindings: []\nnotes: []\n"
+    )
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({
+        "verdicts": [
+            {"reviewer": "native", "vendor": "openai", "model": "test",
+             "lens": "docs", "verdict": "PASS", "findings": []},
+            {"reviewer": "outside-1", "vendor": "anthropic", "model": "sonnet",
+             "lens": "docs", "reviewed_sha": base_sha,
+             "review_target_sha": head, "verdict": "PASS", "findings": [],
+             "dimension_scores": yaml.safe_load(raw)["dimension_scores"], "notes": [],
+             "external_review": {
+                 "status": "completed", "reason": None, "executor": "claude",
+                 "requested_model": "sonnet", "requested_effort": "high",
+                 "requested_family": "anthropic", "evidence_level": "accepted-explicit-settings",
+                 "observed_model": "claude-sonnet-4-5", "observed_effort": None,
+                 "review_output": raw,
+             }},
+        ], "findings": [], "adversarial": [],
+    }), encoding="utf-8")
+    output = StringIO()
+    assert finalize._finalize(repo, CHANGE, ["--input", str(review_input)], output) == []
+    attestation = json.loads((repo / f"docs/loom/{CHANGE}/attestation.json").read_text())
+    receipt = attestation["verdicts"][1]["external_review"]
+    assert receipt["output_digest"] == hashlib.sha256(raw.encode()).hexdigest()
+    assert "review_output" not in receipt
+    assert attestation_module.validate_attestation(
+        repo, head, CHANGE, attestation, manifest()
+    ) == []
+    assert receipt["review_target_sha"] == head
+    attestation["verdicts"][1]["review_target_sha"] = base_sha
+    attestation["verdicts"][1]["external_review"]["review_target_sha"] = base_sha
+    assert any("review target" in reason for _, reason in
+               attestation_module.validate_attestation(repo, head, CHANGE,
+                                                       attestation, manifest()))
+    attestation["verdicts"][1]["review_target_sha"] = head
+    attestation["verdicts"][1]["external_review"]["review_target_sha"] = head
+
+    (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
+    stale_input = json.loads(review_input.read_text(encoding="utf-8"))
+    stale_input["verdicts"][1]["review_target_sha"] = base_sha
+    stale_input["verdicts"][1]["external_review"]["review_output"] = raw.replace(
+        f"review_target_sha: {head}", f"review_target_sha: {base_sha}")
+    review_input.write_text(json.dumps(stale_input), encoding="utf-8")
+    assert any("review target" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+
+    (repo / f"docs/loom/{CHANGE}/attestation.json").write_text(
+        json.dumps(attestation), encoding="utf-8")
+    publication_head = commit(repo, "publish attestation")
+    assert publication_head != head
+    assert verification.verification_status(
+        repo, CHANGE, base=base_sha
+    ) == "valid"
+    git(repo, "switch", "-q", "-c", "alien", base_sha)
+    (repo / "alien.txt").write_text("another branch\n", encoding="utf-8")
+    alien_sha = commit(repo, "unrelated review target")
+    git(repo, "switch", "-q", "feature")
+    attestation["verdicts"][1]["review_target_sha"] = alien_sha
+    attestation["verdicts"][1]["external_review"]["review_target_sha"] = alien_sha
+    assert any("validation ancestry" in reason for _, reason in
+               attestation_module.validate_attestation(
+                   repo, publication_head, CHANGE, attestation, manifest()))
+    attestation["verdicts"][1]["review_target_sha"] = head
+    attestation["verdicts"][1]["external_review"]["review_target_sha"] = head
+    src = repo / "src.py"
+    src.write_text("VALUE = 2\n", encoding="utf-8")
+    commit(repo, "functional content after review")
+    assert verification.verification_status(
+        repo, CHANGE, base=base_sha
+    ).startswith("stale (attestation functional content digest")
+    receipt["reviewer"] = "native"
+    assert any("outside execution" in reason for _, reason in
+               attestation_module.validate_attestation(repo, head,
+                                                       CHANGE, attestation, manifest()))
+
+
+@pytest.mark.parametrize("selected,executor,model,family,level,observed_model,observed_effort", [
+    ("claude", "claude", "sonnet", "anthropic", "accepted-explicit-settings", "claude-sonnet-4-5", None),
+    ("codex", "codex", "gpt-6.1-sol", "openai", "observed-model-and-effort", "gpt-6.1-sol", "high"),
+    ("gemini", "agy", "gemini-2.5-pro", "google", "accepted-explicit-settings", None, None),
+])
+def test_outside_receipt_rejects_impossible_field_combinations(
+    tmp_path: Path, selected: str, executor: str, model: str, family: str,
+    level: str, observed_model: str | None, observed_effort: str | None,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(f"## Risks\nuser-decided — second-vendor selection-confirmed: {selected}\n")
+    commit(repo, "select outside review")
+    evidence = matching_attestation(repo)
+    outside = evidence["verdicts"][1]
+    outside.update(vendor=family, model=model)
+    evidence["verdicts"][0]["vendor"] = "anthropic" if family != "anthropic" else "openai"
+    head = git(repo, "rev-parse", "HEAD")
+    outside["reviewed_sha"] = git(repo, "rev-parse", "HEAD^")
+    outside["review_target_sha"] = head
+    receipt = {
+        "status": "completed", "executor": executor, "model": model,
+        "effort": "high", "family": family, "evidence_level": level,
+        "observed_model": observed_model, "observed_effort": observed_effort,
+        "output_digest": "a" * 64, "reviewer": outside["reviewer"],
+        "review_target_sha": head,
+    }
+    outside["external_review"] = receipt
+    assert attestation_module.validate_attestation(repo, head, CHANGE, evidence, manifest()) == []
+
+    alien_model = "sonnet" if family != "anthropic" else "gpt-6.1-sol"
+    impossible = [
+        {"evidence_level": "accepted-explicit-settings" if executor == "codex"
+         else "observed-model-and-effort"},
+        {"observed_model": None if executor != "agy" else "gemini-2.5-pro"},
+        {"observed_effort": None if executor == "codex" else "high"},
+        {"model": alien_model},
+        {"effort": "unsupported"},
+        {"executor": "claude" if executor != "claude" else "codex"},
+    ]
+    if executor == "claude":
+        impossible.append({"model": "claude-opus-4", "observed_model": "claude-sonnet-4-5"})
+        impossible.append({"observed_model": "claude-opus-4-1"})
+    for fields in impossible:
+        receipt.update(fields)
+        outside["model"] = receipt["model"]
+        assert any("outside execution" in reason for _, reason in
+                   attestation_module.validate_attestation(repo, head, CHANGE, evidence, manifest()))
+        receipt.update(model=model, effort="high", executor=executor, evidence_level=level,
+                       observed_model=observed_model, observed_effort=observed_effort)
+        outside["model"] = model
+
+
+def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.write_text("- package-tests: python3 -c pass — fixture (2026-09-08)\n")
+    commit(repo, "declare fast suite")
+    git(repo, "switch", "-q", "-c", "feature")
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text("## Risks\nuser-decided — second-vendor selection-confirmed: codex\n")
+    commit(repo, "select outside provider")
+    head = git(repo, "rev-parse", "HEAD")
+    base_sha = git(repo, "rev-parse", "HEAD^")
+    packet = (f"lens: docs\nreviewed_sha: {base_sha}\nreview_target_sha: {head}\n"
+              "changed paths: docs/loom/"
+              f"{CHANGE}/plan.md\nground truth: intent and plan\n"
+              "dimensions: loom-code/skills/closing-review/references/lenses.md\n"
+              "output: agents/reviewer.md YAML contract\n")
+    raw = "verdict: PASS\nlens: docs\nfindings: []\n"
+    header = "model: gpt-6.1-sol\nreasoning effort: high\n"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        if argv[:2] == ["codex", "app-server"]:
+            return subprocess.CompletedProcess(
+                argv, 0, json.dumps({"id": 2, "result": {"data": [{"id": "gpt-6.1-sol"}]}}), ""
+            )
+        assert argv[:2] == ["codex", "exec"]
+        assert argv[argv.index("-m") + 1] == "gpt-6.1-sol"
+        assert "model_reasoning_effort=high" in argv
+        if len(calls) == 3:
+            assert kwargs["input"] == packet
+            return subprocess.CompletedProcess(argv, 0, raw, header)
+        return subprocess.CompletedProcess(argv, 0, "ok", header)
+
+    consent = {
+        "approved": True, "executor": "codex", "review_root": str(repo),
+        "authorization_source": {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change", "selected_executor": "codex"},
+        "model": "gpt-6.1-sol", "effort": "high",
+        "disclosures": {
+            "cost": True, "vendor_egress": True, "local_execution": True,
+            "filesystem_access_outside_root": True,
+            "filesystem_write_not_guaranteed": True,
+        },
+    }
+    stale = dict(consent, review_root=str(tmp_path))
+    assert external_review.execute(
+        "codex", "gpt-6.1-sol", "high", "openai", str(repo), packet, stale,
+        runner=runner,
+    )["status"] == "failed"
+    assert external_review.execute(
+        "codex", "gpt-6.1-sol", "medium", "openai", str(repo), packet, consent,
+        runner=runner,
+    )["status"] == "failed"
+    assert calls == []
+    result = external_review.execute(
+        "codex", "gpt-6.1-sol", "high", "openai", str(repo), packet, consent,
+        runner=runner,
+    )
+    assert result["status"] == "completed"
+    assert result["evidence_level"] == "observed-model-and-effort"
+    assert len(calls) == 3
+
+    verdicts = [
+        {"reviewer": "native", "vendor": "anthropic", "model": "sonnet",
+         "lens": "docs", "verdict": "PASS", "findings": []},
+        {"reviewer": "outside", "vendor": "openai", "model": "gpt-6.1-sol",
+         "lens": "docs", "reviewed_sha": base_sha,
+         "review_target_sha": head, "verdict": "PASS",
+         "findings": [], "external_review": result},
+    ]
+    review_input = tmp_path / "review-input.json"
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert any("required reviewer YAML" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+
+    raw = (
+        f"verdict: PASS\nlens: docs\nreviewed_sha: {base_sha}\n"
+        f"review_target_sha: {head}\n"
+        "dimension_scores:\n"
+        "  omission: PASS\n  ambiguity: PASS\n  inconsistency: PASS\n"
+        "  incorrect-fact: PASS\n  missing-population: PASS\n"
+        "  deletion-first: PASS\nfindings: []\nnotes: []\n"
+    )
+    result["review_output"] = raw
+    verdicts[1]["dimension_scores"] = yaml.safe_load(raw)["dimension_scores"]
+    verdicts[1]["notes"] = []
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()) == []
+    attestation = json.loads((repo / f"docs/loom/{CHANGE}/attestation.json").read_text())
+    assert attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    ) == []
+    receipt = attestation["verdicts"][1]["external_review"]
+    assert receipt["output_digest"] == hashlib.sha256(raw.encode()).hexdigest()
+    assert "review_output" not in receipt
+
+    (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
+    verdicts[1]["lens"] = "skill"
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert any("output differs from its verdict" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    verdicts[1]["lens"] = "docs"
+    for malformed in (
+        raw.replace("  deletion-first: PASS\n", ""),
+        raw.replace("  omission: PASS", "  omission: UNKNOWN"),
+        raw.replace(f"reviewed_sha: {base_sha}", "reviewed_sha: OTHER"),
+        raw.replace(f"review_target_sha: {head}", "review_target_sha: OTHER"),
+    ):
+        result["review_output"] = malformed
+        review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                            "adversarial": []}), encoding="utf-8")
+        assert any("required reviewer YAML" in reason or
+                   "output differs from its verdict" in reason for _, reason in
+                   finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    finding = {"severity": "important", "dimension": "omission", "anchor": "",
+               "text": "issue: missing fact", "fix": "add it"}
+    verdicts[1]["findings"] = [finding]
+    result["review_output"] = raw.replace("findings: []", yaml.safe_dump({"findings": [finding]}).strip())
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert any("malformed reviewer findings" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    verdicts[1]["findings"] = []
+    result["review_output"] = raw.replace("  omission: PASS", "  omission: NEEDS_REVISION")
+    verdicts[1]["dimension_scores"]["omission"] = "NEEDS_REVISION"
+    review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                        "adversarial": []}), encoding="utf-8")
+    assert any("overall verdict" in reason for _, reason in
+               finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
+    verdicts[1]["dimension_scores"]["omission"] = "PASS"
+    for severities in (("fatal",), ("important", "important")):
+        findings = [
+            {"severity": severity, "dimension": "omission",
+             "anchor": f"docs/guide.md:{index}", "text": "issue: missing fact",
+             "fix": "add the fact"}
+            for index, severity in enumerate(severities, 1)
+        ]
+        verdicts[1]["findings"] = findings
+        result["review_output"] = raw.replace(
+            "findings: []", yaml.safe_dump({"findings": findings}).strip()
+        )
+        review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
+                                            "adversarial": []}), encoding="utf-8")
+        assert any("overall verdict" in reason for _, reason in
+                   finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
 
 
 def test_reviewer_floor_fails_closed_when_branch_base_is_unknown(tmp_path: Path) -> None:

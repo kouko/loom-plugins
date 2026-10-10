@@ -81,13 +81,13 @@ questions in intent; never create a substitute plan.
 
 ## What you will be asked, in plain words
 
-Give the user this list if they ask what is coming. It is the whole list:
-there are no other **decision points**. On Codex there is also one
-non-decision authorisation stop, when the plugin is installed or updated
-(step 0b) — it asks permission to run, not a decision about the work.
+If asked, give this complete decision-point list. Codex's plugin-install
+authorisation (step 0b) permits execution; it is not a work decision.
 
-1. At ①, restate intent; merge one-way doors ② skips,
-   `second-vendor: ask` question, and required principles interview.
+1. At ①, restate intent; merge one-way doors ② skips, any unanswered
+   `second-vendor: ask` choice, and the required principles interview.
+   A direct user request naming an outside agent and unambiguous target
+   runs without a second question; disclose before execution.
 2. At ②, only for a product spec you write: confirm visible behaviour,
    carried details, product one-way doors not asked at ①. Ask nothing
    about plan structure; record agent decisions with reasons.
@@ -160,9 +160,13 @@ neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
 plan, and unsupported detail is deleted. This pass creates no field, ID,
 requirement, scenario, product behaviour, or review loop.
 Publication and second-reviewer authorisation never enter Problem, Proposed
-outcome, Acceptance, Constraints, or Out of scope. Keep publication
-authorisation in the intent's `publication:` frontmatter line and preserve the
-question list for this plan's `## Questions asked` section.
+outcome, Acceptance, or Out of scope. Keep publication authorisation in the
+intent's `publication:` frontmatter line. The sole Constraints exception is
+`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
+skipped; it records the selected family, not the user's quoted request. Keep
+that verbatim quote, target and final `selected_executor` in JSON
+`authorization_source` at dispatch, and preserve only actual questions for
+this plan's `## Questions asked` section.
 Visible effects with an unknown surface and no spec require
 `needs-design: yes` with a surface-neutral reason; internal files alone do not.
 Complete the code-only altitude pass before confirmation. A material outcome
@@ -310,12 +314,10 @@ plan:
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py intake write-plan <change-id>
 ```
 
-Fix and re-run until it exits 0. At this point it checks
-`intake.confirmed`, `intake.spec-ready`, and `intake.confirmed-behavior` —
-whether the intent, spec declaration, and visible-behaviour confirmation are
-ready. When `needs-design: no`, only intent readiness can
-block before the plan exists, plus `intake.confirmed-behavior` when a
-`kind: product` spec exists.
+Fix and re-run until exit 0. It checks `intake.confirmed`,
+`intake.spec-ready`, and `intake.confirmed-behavior`. With
+`needs-design: no`, only intent readiness blocks before the plan, plus
+`intake.confirmed-behavior` for a `kind: product` spec.
 
 ## Step 5 — Write the plan
 
@@ -328,15 +330,13 @@ non-test code: Files marks the entry other modules call; case-ids
 name behaviour seen there; logic beyond that entry's reach is its own module,
 tested at its entry.
 
-**Architecture.** When the repository root has `ARCHITECTURE.md` carrying
-`ratified-by: <name> <date>`, read it before writing the Task DAG. Treat an
-unratified draft as advisory; it cannot require changes or block planning.
-Place every added or moved file by the ratified rules,
-and name the rule id you followed on that task's Risk line (`FP-2`). When a
-task must break a rule, the planner runs the loom-design `architecture-design`
-tool's re-design mode with the user before Build starts, and lists
-`ARCHITECTURE.md` and the rule's guard in that task's Files; an implementer
-never changes a rule on its own. With no `ARCHITECTURE.md`, nothing changes.
+**Architecture.** Read root `ARCHITECTURE.md` before the Task DAG when it
+carries `ratified-by: <name> <date>`; unratified drafts are advisory. Place
+added or moved files by its rules and cite each rule id in the task's Risk
+line (`FP-2`). To break a rule, run loom-design `architecture-design` in
+re-design mode with the user before Build; list `ARCHITECTURE.md` and its
+guard in Files. An implementer never changes a rule alone. With no
+`ARCHITECTURE.md`, this check does not apply.
 
 A task that removes or materially rewrites a function, recognizer, or rule
 that already has tests names the existing test file on its Risk line and
@@ -391,6 +391,10 @@ restatement stays in the user's language.
   there is no spec, this section is also where the answers to one-way-door
   questions live: one `user-decided — <what they chose and why>` line each,
   because with no spec there is no `## Design decision` to hold them.
+  If a previously skipped plan's intent Constraints carries
+  `- user-decided — second-vendor selection-confirmed: <vendor>`, copy the
+  unbulleted machine line into Risks before review. Risks is authoritative
+  when it has a selection; otherwise review falls back to intent Constraints.
 
 **Simplicity check.** After the draft exists, follow
 [`references/plan-simplicity.md`](references/plan-simplicity.md). Planned
@@ -422,12 +426,9 @@ exactly these keys: `contract_version` (integer 1), `configured_mode`,
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/second_vendor_policy.py
 ```
 
-On any other host, use the `<loom-code>` root defined in step 0. Treat the
-JSON result as the decision: render its `notice_kind`, `notice_vendor`, and
-`recommendation_reasons`; do not reproduce the risk mapping in prose. A
-notice is commentary, not a decision point, and work continues without
-waiting. The reference owns response timing and the
-no-listener boundary.
+Treat the JSON result as the decision: render its `notice_kind`,
+`notice_vendor`, and `recommendation_reasons`; do not repeat risk mapping.
+The reference owns notice timing and the no-listener boundary.
 
 **Forks you decided yourself.** Every one gets a one-line reason on its
 task: what you chose and why. Any one-way door that surfaces now — after
@@ -447,24 +448,19 @@ obvious it looks.
 
 ## Step 6 — Commit and hand off
 
-**Branch first, if you are still on the trunk.** `git branch --show-current`
-naming the trunk means the plan would land there, and every later
-checkpoint measures its delta from the branch base — which would then be
-the plan commit itself:
+**Branch first, if still on trunk.** Otherwise the plan lands there and later
+checkpoints measure their delta from the plan commit rather than the branch base:
 
 ```
 git switch -c <type>/<change-id>
 ```
 
-For example `feat/2026-09-14-push-reason`. You pick `<type>` from `feat`,
-`fix`, `docs`, `refactor`, `test`, `chore` or `ci` to match what the change
-does, and use the same type in the PR title, which becomes the change's
-squash-merge commit on the trunk. Individual task commits keep their own
-Conventional Commits type as the implementer contract sets it, and the
-`docs(loom):` intent and plan commits keep their fixed form.
+For example `feat/2026-09-14-push-reason`. Pick `<type>` from `feat`,
+`fix`, `docs`, `refactor`, `test`, `chore` or `ci`; use it in the PR title,
+which becomes the trunk squash commit. Task commits keep their implementer
+contract type; `docs(loom):` intent and plan commits keep their fixed form.
 
-An intent already committed on the trunk stays there; the plan and
-everything after it belong on the branch.
+An intent on trunk stays; plan and later work use the branch.
 
 Commit the plan with the message `docs(loom): plan <change-id>`. Then hand
 the change to the build station — `loom-code:build` — which dispatches one
