@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-10-redesign-external-review-authorization",
-  "content_digest": "21c7bc366f4dd3c15943b956fa33cd8273113971",
+  "content_digest": "5ce755a75a3c959f08facc02901ee4fa4c15509f",
   "executions": [
     {
       "kind": "package-tests",
@@ -26,10 +26,26 @@
       "lens": "code",
       "verdict": "PASS_WITH_NOTES",
       "reviewed_sha": "d311e27030a691ee74b7ef8c051cc5246e966c1a",
-      "review_target_sha": "a18717e1648d55741f7196eee6a93c246115e39d",
+      "review_target_sha": "2b786b466e950ced39952f8c09c1601a0b1d7e39",
+      "dimension_scores": {
+        "security": "PASS_WITH_NOTES",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS_WITH_NOTES",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
       "findings": [],
       "notes": [
-        "Live owner interpretation remains unverified; stale-record limit is disclosed."
+        "The acceptance-report correction matches the previous suite and review evidence; its stale-record and live-owner limits remain explicit.",
+        "This delta changes no tests or authorization behavior. No external CLI was run.",
+        "The old-target attestation must be regenerated for this digest."
       ]
     },
     {
@@ -39,10 +55,25 @@
       "lens": "code",
       "verdict": "PASS",
       "reviewed_sha": "d311e27030a691ee74b7ef8c051cc5246e966c1a",
-      "review_target_sha": "a18717e1648d55741f7196eee6a93c246115e39d",
+      "review_target_sha": "2b786b466e950ced39952f8c09c1601a0b1d7e39",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
       "findings": [],
       "notes": [
-        "The prose-pin test finding is fixed; 131 focused tests passed."
+        "The acceptance report now accurately states that the prior package suite and closing review passed; it still identifies the local-only tests and partly verified acceptance results.",
+        "No test file changed after the previous target. The attestation still names that target and needs regeneration for this digest."
       ]
     },
     {
@@ -52,10 +83,20 @@
       "lens": "skill",
       "verdict": "PASS",
       "reviewed_sha": "d311e27030a691ee74b7ef8c051cc5246e966c1a",
-      "review_target_sha": "a18717e1648d55741f7196eee6a93c246115e39d",
+      "review_target_sha": "2b786b466e950ced39952f8c09c1601a0b1d7e39",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
       "findings": [],
       "notes": [
-        "The latest-turn recheck ambiguity remains fixed."
+        "The report correction preserves the disclosed stale-record and live-execution limits; no skill contract changed.",
+        "Target functional digest: 5ce755a75a3c959f08facc02901ee4fa4c15509f. The committed attestation has an older digest and needs refresh."
       ]
     }
   ],
