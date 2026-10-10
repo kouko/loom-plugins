@@ -677,7 +677,7 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
 
     consent = {
         "approved": True, "executor": "codex", "review_root": str(repo),
-        "authorization_source": {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change"},
+        "authorization_source": {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change", "selected_executor": "codex"},
         "model": "gpt-6.1-sol", "effort": "high",
         "disclosures": {
             "cost": True, "vendor_egress": True, "local_execution": True,

@@ -112,8 +112,9 @@ default. No reply means no second vendor for this change.
 `ask` is a standing choice that puts one cross-model review question to the
 user on each change that lacks a qualifying direct user request. Skip the per-change question when a direct user request names an outside coding agent and an unambiguous active review target.
 That request authorizes one review without a second question. Quote
-that request and target in JSON `authorization_source` at dispatch; record the
-provider family in the separate machine line above. Do not add a question to
+that request, target and final `selected_executor` in JSON
+`authorization_source` at dispatch; record the provider family in the separate
+machine line above. Do not add a question to
 `## Questions asked`. Show cost, vendor
 egress, `review_root`, outside-root access and local-execution disclosure
 before any network-backed discovery or execution, without asking for the same

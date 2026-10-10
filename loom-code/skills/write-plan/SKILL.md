@@ -164,8 +164,9 @@ outcome, Acceptance, or Out of scope. Keep publication authorisation in the
 intent's `publication:` frontmatter line. The sole Constraints exception is
 `- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
 skipped; it records the selected family, not the user's quoted request. Keep
-that verbatim quote and target in JSON `authorization_source` at dispatch, and
-preserve only actual questions for this plan's `## Questions asked` section.
+that verbatim quote, target and final `selected_executor` in JSON
+`authorization_source` at dispatch, and preserve only actual questions for
+this plan's `## Questions asked` section.
 Visible effects with an unknown surface and no spec require
 `needs-design: yes` with a surface-neutral reason; internal files alone do not.
 Complete the code-only altitude pass before confirmation. A material outcome

@@ -298,9 +298,10 @@ Publication and second-reviewer authorisation never enter Problem, Proposed
 outcome, Acceptance, or Out of scope. Keep publication authorisation in the
 intent's `publication:` frontmatter line. The sole Constraints exception is
 `- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
-skipped. It records the selected family; a direct request's verbatim quote and
-target belong in JSON `authorization_source` at dispatch, never this machine
-line. Keep only actual questions in the step-5 hand-off.
+skipped. It records the selected family; a direct request's verbatim quote,
+target and final `selected_executor` belong in JSON `authorization_source`
+at dispatch, never this machine line. Keep only actual questions in the step-5
+hand-off.
 
 Visible effects with an unknown surface and no spec require
 `needs-design: yes` with a surface-neutral reason; internal files alone do not.

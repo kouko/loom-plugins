@@ -20,8 +20,9 @@ choices. Such observations do not verify a model or effort. Never run model
 discovery, a live probe, or a review before a complete authorization record
 and visible disclosure. A direct user request that names the outside coding
 agent and an unambiguous active review target authorizes one review without a second
-yes/no checkpoint. Quote it under `authorization_source`; for ambiguous
-provider or target, or expanded material scope, obtain the missing choice
+yes/no checkpoint. Interpret refusals and corrections, then quote the full
+request and record its final `selected_executor` under `authorization_source`;
+for ambiguous provider or target, or expanded material scope, obtain the missing choice
 before dispatch. A suggestion alone supplies no authorization. Record cost,
 vendor and packet egress, `review_root`, local setup and every leg assignment.
 The record must include disclosures for

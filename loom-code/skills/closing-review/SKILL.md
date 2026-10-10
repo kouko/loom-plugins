@@ -147,8 +147,9 @@ reviewer and pass no `verdicts`.
   later, copy the selection into its Risks before review. The checker reads
   plan Risks first, then intent Constraints when the plan is absent or has no
   selection. Keep a direct request's verbatim quote and target in the JSON
-  `authorization_source` at dispatch; the request is not an asked question in
-  `## Questions asked`. Thus
+  `authorization_source` at dispatch, with `selected_executor` set to the final
+  user choice; a refused or superseded agent cannot fill the outside slot. The
+  request is not an asked question in `## Questions asked`. Thus
   `reviewer-count`, finalization and attestation validation can recompute it.
   With no selection, do not start external execution. Compare the selected
   model's provider family with the current host model's family when that
@@ -188,8 +189,10 @@ cost, vendor-egress, `review_root` working directory, local-execution,
 disclosures and retain `authorization_source` in the external skill's complete
 JSON consent record. A direct user request naming the outside coding agent
 and an unambiguous active branch authorizes one review without a second yes/no
-checkpoint; quote that request, show the disclosures, and record their flags
-as shown rather than separately acknowledged. The working directory does not confine
+checkpoint; interpret the full request, including any refusal or correction,
+then quote it, bind `selected_executor` and `executor` to the final choice,
+show the disclosures, and record their flags as shown rather than separately
+acknowledged. The working directory does not confine
 the CLI's file reads or guarantee it cannot write files. An earlier fixed
 setting without these disclosures is insufficient; resolve its confirmation
 at the existing intent decision point. If the provider or target is ambiguous,

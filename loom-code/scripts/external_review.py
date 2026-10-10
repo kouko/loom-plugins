@@ -52,7 +52,9 @@ def _authorization_valid(source: object, executor: str) -> bool:
     if source.get("kind") == "direct-user-request":
         quote = source.get("quote")
         name = names.get(executor, r"$^")
-        if not isinstance(quote, str) or not re.search(name, quote, re.IGNORECASE):
+        if (source.get("selected_executor") != executor
+                or not isinstance(quote, str)
+                or not re.search(name, quote, re.IGNORECASE)):
             return False
         correction = re.search(r"\bno,\s*(?:please\s+)?use\s+", quote, re.IGNORECASE)
         if correction and not re.match(name, quote[correction.end():], re.IGNORECASE):
@@ -61,6 +63,7 @@ def _authorization_valid(source: object, executor: str) -> bool:
             rf"\b(?:do\s+not|don't|never)\s+"
             rf"(?:use|run|ask|invoke|want|review\s+with)\s+{name}",
             rf"\b(?:did\s+not|didn't)\s+say\s+to\s+(?:use|run|ask|invoke)\s+{name}",
+            rf"\b(?:not|no)\s+{name}",
             rf"(?:不要|別|别)\s*(?:用|使用)?\s*{name}",
             rf"{name}\s*を?\s*(?:使わないで?|使用しないで?)",
             rf"^\s*{name}\s+can\s+review\b",

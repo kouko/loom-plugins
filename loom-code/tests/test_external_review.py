@@ -15,7 +15,7 @@ def consent(executor="codex", scope="/repo", model=None, effort="high"):
         "approved": True, "executor": executor, "review_root": scope,
         "authorization_source": {
             "kind": "direct-user-request", "quote": f"Use {executor} to review this change",
-            "target": "this change",
+            "target": "this change", "selected_executor": executor,
         },
         "model": model, "effort": effort,
         "disclosures": {"cost": True, "vendor_egress": True,
@@ -50,6 +50,7 @@ def test_consent_blocks_all_subprocesses(record):
     {"kind": "direct-user-request", "quote": "", "target": "this change"},
     {"kind": "direct-user-request", "quote": "review this", "target": ""},
     {"kind": "direct-user-request", "quote": "review this change", "target": "this change"},
+    {"kind": "direct-user-request", "quote": "Use Codex to review this change", "target": "this change"},
     {"kind": "suggestion", "quote": "Use codex", "target": "this change"},
     {"kind": "accepted-selection", "selection": "", "target": "this change"},
 ])
@@ -95,6 +96,8 @@ def test_accepted_selection_source_allows_discovery():
     ("claude", "Claude can review this change"),
     ("claude", "I did not say to use Claude"),
     ("claude", "Use Claude? No, use Codex to review this change."),
+    ("claude", "Please review with Codex, not Claude."),
+    ("claude", "不要用 Claude，改用 Codex 審查這個變更"),
 ])
 def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
         executor, quote):
@@ -116,11 +119,22 @@ def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
     ("claude", "Can you use Claude to review this change?"),
     ("codex", "I want Codex to review this change"),
     ("codex", "Use Claude? No, use Codex to review this change."),
+    ("codex", "Please review with Codex, not Claude."),
+    ("codex", "不要用 Claude，改用 Codex 審查這個變更"),
 ])
 def test_affirmative_direct_request_remains_valid(executor, quote):
     record = consent(executor)
     record["authorization_source"]["quote"] = quote
     assert review._authorization_valid(record["authorization_source"], executor)
+
+
+def test_direct_request_selected_executor_must_match_dispatch():
+    record = consent("claude")
+    record["authorization_source"]["selected_executor"] = "codex"
+    no_spawn = lambda *a, **k: pytest.fail("spawned")
+    assert review.discover("claude", "/repo", record, runner=no_spawn)["reason"] == "consent-missing-or-stale"
+    assert review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                          "review", record, runner=no_spawn)["reason"] == "consent-missing-or-stale"
 
 
 def test_missing_host_read_disclosure_blocks_discovery():

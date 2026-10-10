@@ -48,8 +48,10 @@ Before invoking `loom-code:external-review` for discovery, probe or dispatch,
 show the full disclosure below and prepare the runner's complete consent
 record. A direct user request naming the outside coding agent and an explicit
 or unambiguous active code, plan or decision target authorizes one bounded
-review without a second yes/no checkpoint. Record `authorization_source` as
-the verbatim user request and the active target used to resolve it; disclosure
+review without a second yes/no checkpoint. Interpret the full request,
+including refusals and corrections. Record `authorization_source` with the
+verbatim user request, active target and `selected_executor` set to the final
+user choice; it must equal the dispatched `executor`. Disclosure
 fields record what was shown before execution, not separate acknowledgments.
 Give the named skill that record, `review_root` (CLI starting
 directory), requested executor and review packet. `review_root` is not a filesystem read boundary.
@@ -133,8 +135,9 @@ is spent. One ask carries
 - estimated cost per leg (`unknown, with the reason`, **never as zero and never omitted** when unknowable; a **genuinely zero** cost stays zero, not unknown); and
 - the full egress and local-execution disclosure below.
 
-Record `authorization_source` as either the direct request quotation or the
-answer at that checkpoint. For a direct request, do not mark the cost, egress,
+Record `authorization_source` as either the direct request quotation, target and
+final `selected_executor`, or the answer at that checkpoint. For a direct
+request, do not mark the cost, egress,
 filesystem and local setup disclosures as individually acknowledged; record
 that they were shown before execution. For a checkpoint answer, require the
 missing choices explicitly and do not treat a partial answer as approval. If

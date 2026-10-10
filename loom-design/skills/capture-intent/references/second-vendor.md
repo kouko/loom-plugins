@@ -27,8 +27,9 @@ reimplement its risk mapping. That executable belongs to loom-code.
 
 **`ask`** puts one cross-model review question into decision point ① only when
 the user has not already made a qualifying choice. Skip the per-change question when a direct user request names an outside coding agent and an unambiguous active review target.
-Quote that request and target as `authorization_source` in the downstream
-execution record; a direct request authorizes one bounded review without a
+Quote that request, target and final `selected_executor` as
+`authorization_source` in the downstream execution record; a direct request
+authorizes one bounded review without a
 second confirmation. Show cost, vendor-egress, `review_root`, outside-root
 read and local-execution disclosures before discovery or dispatch. If the
 provider or target is ambiguous, or material scope expands, ask for the

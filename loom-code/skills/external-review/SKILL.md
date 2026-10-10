@@ -23,7 +23,7 @@ the CLI's existing starting directory, **not a filesystem read boundary**. The C
 read files outside it through host tools or configuration; CLI startup,
 plugins, and caches may write files even when model tools are restricted. The
 record must identify `authorization_source`: either a quoted direct user request
-naming the outside coding agent and an unambiguous active review target, or a
+with the final selected executor and an unambiguous active review target, or a
 separate accepted selection. A direct user request authorizes one bounded
 review without a second yes/no checkpoint. Show cost, vendor data transfer,
 the actual filesystem limits, and local CLI execution before discovery, probe
@@ -41,7 +41,7 @@ selection within one provider family and effort bound:
 ```json
 {
   "approved": true,
-  "authorization_source": {"kind": "direct-user-request", "quote": "<verbatim request>", "target": "<active review target>"},
+  "authorization_source": {"kind": "direct-user-request", "quote": "<verbatim request>", "target": "<active review target>", "selected_executor": "codex"},
   "executor": "codex",
   "review_root": "/absolute/review/root",
   "selection_authorized": true,
@@ -67,10 +67,11 @@ material scope beyond that task is not covered by the request. A suggestion
 alone supplies no `authorization_source`.
 An accepted suggestion or `ask` answer uses
 `{"kind":"accepted-selection","selection":"<executor>","target":"<review target>"}`
-as its source. For a direct request, the quoted text must name the selected
-executor and the target must be nonempty. The owning review flow interprets
-the full request and records its authorized executor and target. The script
-checks the record's structure and blocks obvious refusals or corrections
+as its source. For a direct request, the quoted text must name the final
+selected executor, `selected_executor` must equal `executor`, and the target
+must be nonempty. The owning review flow interprets the full request, including
+refusals and corrections, and records its final authorized executor and target.
+The script checks the record's structure and blocks obvious refusals or corrections
 against the selected executor; it cannot independently verify the user's
 words or acceptance. Route ambiguous requests to the owning flow's choice
 point before setting `approved`.

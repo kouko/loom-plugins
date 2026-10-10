@@ -21,7 +21,7 @@ def test_claude_discovery_reports_missing_review_root(tmp_path: Path) -> None:
         "authorization_source": {
             "kind": "direct-user-request",
             "quote": "Use Claude to review this change",
-            "target": "this change",
+            "target": "this change", "selected_executor": "claude",
         },
         "disclosures": {key: True for key in (
             "cost", "vendor_egress", "local_execution",
