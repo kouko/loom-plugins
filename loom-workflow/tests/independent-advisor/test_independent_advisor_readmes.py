@@ -11,6 +11,7 @@ and the native invocation phrases is left to review.
 """
 
 import re
+import sys
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parents[2] / "skills" / "independent-advisor"
@@ -24,6 +25,8 @@ REPORT = SKILL_DIR / "references" / "report-contract.md"
 PROMPTS = SKILL_DIR / "test-prompts.json"
 EXTERNAL_REVIEW = SKILL_DIR.parents[2] / "loom-code/skills/external-review/SKILL.md"
 CLOSING_REVIEW = SKILL_DIR.parents[2] / "loom-code/skills/closing-review/SKILL.md"
+sys.path.insert(0, str(SKILL_DIR.parents[2] / "loom-code/scripts"))
+from prose_pin import affirms  # noqa: E402
 
 READMES = [
     (README_EN, "README.md (EN)"),
@@ -193,13 +196,29 @@ def test_outside_authorization_is_refreshed_at_each_external_boundary():
         "external": EXTERNAL_REVIEW.read_text(encoding="utf-8"),
         "closing": CLOSING_REVIEW.read_text(encoding="utf-8"),
     }
+    pins = (
+        ("re-evaluate", "all conversation turns", "Immediately before each owner call"),
+        ("Refresh", "stale approved record", "invalidate"),
+        ("runs", "discovery, preflight, and review consecutively"),
+    )
     for name, body in surfaces.items():
-        prose = " ".join(body.split()).lower()
-        assert "all conversation turns" in prose, name
-        assert "immediately before each owner call" in prose, name
-        assert "discovery, preflight, and review consecutively" in prose, name
-        assert "stale approved record" in prose, name
-        assert "without a second" in prose, name
+        prose = " ".join(body.split())
+        for verb, literal, *extras in pins:
+            assert affirms(prose, verb, literal, *extras), (name, literal)
+
+    positive = (
+        "Immediately before each owner call, re-evaluate all conversation turns. "
+        "Refresh the record or invalidate a stale approved record. "
+        "One execution call runs discovery, preflight, and review consecutively."
+    )
+    negated = (
+        "Immediately before each owner call, do not re-evaluate all conversation turns. "
+        "Refresh the record but never invalidate a stale approved record. "
+        "One execution call never runs discovery, preflight, and review consecutively."
+    )
+    for verb, literal, *extras in pins:
+        assert affirms(positive, verb, literal, *extras)
+        assert not affirms(negated, verb, literal, *extras)
 
 
 def test_readmes_describe_direct_request_and_nonblocking_disclosure():
