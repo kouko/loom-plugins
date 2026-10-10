@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-10-redesign-external-review-authorization",
-  "content_digest": "6c3ac5e5ea7c31e7872fe182ebe77ebe356188e8",
+  "content_digest": "21c7bc366f4dd3c15943b956fa33cd8273113971",
   "executions": [
     {
       "kind": "package-tests",
