@@ -71,10 +71,11 @@ as its source. For a direct request, the quoted text must name the final
 selected executor, `selected_executor` must equal `executor`, and the target
 must be nonempty. The owning review flow interprets the full request, including
 refusals and corrections, and records its final authorized executor and target.
-The script checks the record's structure and blocks obvious refusals or corrections
-against the selected executor; it cannot independently verify the user's
-words or acceptance. Route ambiguous requests to the owning flow's choice
-point before setting `approved`.
+The script checks required source fields and their binding to the selected
+executor, review root, disclosures, model, and effort; the quote remains audit
+evidence. The owning flow withholds approval when the full request cancels,
+replaces, or leaves the choice ambiguous. Route ambiguous requests to that
+flow's choice point before setting `approved`.
 
 For Antigravity, the model's provider family may be unknown until the
 consented `agy models` result arrives. A bounded record may replace `family`
