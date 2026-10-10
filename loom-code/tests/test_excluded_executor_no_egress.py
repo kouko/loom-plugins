@@ -76,3 +76,19 @@ def test_discovery_suggestion_blocks():
     result = external_review.discover("codex", "/repo", record, runner=_runner(calls))
     assert result["reason"] == "consent-missing-or-stale"
     assert calls == []
+
+
+def test_later_blanket_cancellation_blocks_discovery_and_execution():
+    """A later cancellation of every outside agent revokes a named request."""
+    record = _record()
+    record["authorization_source"]["quote"] = (
+        "Use Codex to review this change. Actually, do not use any external coding agent.")
+    calls = []
+    discovered = external_review.discover("codex", "/repo", record,
+                                          runner=_runner(calls))
+    executed = external_review.execute("codex", "gpt-6.1-sol", "high", "openai",
+                                       "/repo", "review", record,
+                                       runner=_runner(calls))
+    assert discovered["reason"] == "consent-missing-or-stale"
+    assert executed["reason"] == "consent-missing-or-stale"
+    assert calls == []

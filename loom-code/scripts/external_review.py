@@ -64,6 +64,8 @@ def _authorization_valid(source: object, executor: str) -> bool:
         if correction and not re.match(name, quote[correction.end():], re.IGNORECASE):
             return False
         refusals = (
+            r"\b(?:do\s+not|don't|never)\s+(?:use|run|ask|invoke)\s+"
+            r"(?:any|an)\s+(?:external|outside)\s+(?:coding\s+)?agent\b",
             rf"\b(?:do\s+not|don't|never)\s+"
             rf"(?:use|run|ask|invoke|want|review\s+with)\s+{name}",
             rf"\b(?:did\s+not|didn't)\s+say\s+to\s+(?:use|run|ask|invoke)\s+{name}",

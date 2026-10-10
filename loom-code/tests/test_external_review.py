@@ -101,6 +101,7 @@ def test_accepted_selection_source_allows_discovery():
     ("codex", "Please use Claude instead of Codex to review this change"),
     ("codex", "Use Codex? Actually use Claude to review this change"),
     ("codex", "Maybe Codex can review this change"),
+    ("codex", "Use Codex to review this change. Actually, do not use any external coding agent."),
 ])
 def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
         executor, quote):
