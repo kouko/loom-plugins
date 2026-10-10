@@ -14,9 +14,9 @@ charter: 1.1
 ### Wave 1
 
 **W1-01 Keep authorization semantics with the owner**  after: none  acceptance: 1, 2, 3
-- Files: `loom-code/scripts/external_review.py`, `loom-code/tests/test_external_review.py`, `loom-code/tests/test_excluded_executor_no_egress.py`
+- Files: `loom-code/scripts/external_review.py`, `loom-code/tests/test_external_review.py`, `loom-code/tests/test_excluded_executor_no_egress.py`, `loom-code/skills/external-review/SKILL.md`
 - Test: A1 positive: owner-cancellation-probe; negative: stale-record-no-spawn; A2 positive: owner-correction-probe; boundary: corrected-direct-request; A3 positive: complete-record; negative: omitted-or-mismatched-record-no-spawn.
-- Risk: agent-decided — narrow semantic coverage in `test_external_review.py` and `test_excluded_executor_no_egress.py` to owner-record boundaries; retain their cancellation, replacement and ambiguous cases in synthetic owner probes.
+- Risk: agent-decided — narrow semantic coverage in `test_external_review.py` and `test_excluded_executor_no_egress.py` to owner-record boundaries; correct the external-review skill's stale parser claim.
 
 ## Simplicity check
 - Delete runner phrase parsing without adding a new parser or consent field — taken
