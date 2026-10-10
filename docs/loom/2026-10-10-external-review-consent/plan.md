@@ -16,6 +16,11 @@ charter: 1.1
 - Test: A1 positive: excluded-executor-blocked; negative: no-discovery-on-refusal. A2 positive: direct-request-runs; boundary: no-second-choice. A3 positive: selected-executor-bound; negative: ambiguous-scope-blocked.
 - Risk: agent-decided — make the owning flow record the final selection and have the runner verify it before egress; preserve existing tested direct requests and avoid treating keyword matching as semantic proof.
 
+**W0-02 Retain the defect-catching exclusion probe in the package suite**  after: W0-01  acceptance: 1, 3
+- Files: `docs/loom/2026-10-10-external-review-consent/evidence/probes/test_excluded_executor_no_egress.py`, `loom-code/tests/test_excluded_executor_no_egress.py`
+- Test: A1 positive: graduated-probe-green; negative: excluded-executor-no-egress. A3 positive: package-suite-collects; boundary: retained-concern-header.
+- Risk: agent-decided — move the proven probe intact with its concern header so every later package suite and finalization run retains the regression case.
+
 ## Simplicity check
 - none found
 
