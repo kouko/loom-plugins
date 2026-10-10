@@ -1,6 +1,6 @@
 # 修正外部審查授權判定 — 驗收結果
 
-2026-10-10 在固定於 `d43a2bfd` 的乾淨專案複本初驗，並在固定於 `6fb29888` 的另一份乾淨複本複驗。各項操作和輸出見 `docs/loom/2026-10-10-redesign-external-review-authorization/evidence/acceptance-test-evidence.md`。
+2026-10-10 在固定於 `d43a2bfd` 的乾淨專案複本初驗，並在 `6fb29888`、`c1d4962c` 的乾淨複本複驗。各項操作和輸出見 `docs/loom/2026-10-10-redesign-external-review-authorization/evidence/acceptance-test-evidence.md`。
 
 ## 你要求的結果
 
