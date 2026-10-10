@@ -52,30 +52,33 @@ def _authorization_valid(source: object, executor: str) -> bool:
     if source.get("kind") == "direct-user-request":
         quote = source.get("quote")
         name = names.get(executor, r"$^")
+        if not isinstance(quote, str):
+            return False
+        corrections = list(re.finditer(r"\b(?:actually|wait|no)\s*,?\s+", quote,
+                                       re.IGNORECASE))
+        final_choice = quote[corrections[-1].end():] if corrections else quote
         if (source.get("selected_executor") != executor
-                or not isinstance(quote, str)
-                or not re.search(name, quote, re.IGNORECASE)):
+                or not re.search(name, final_choice, re.IGNORECASE)):
             return False
-        if re.match(r"\s*(?:maybe|perhaps)\b", quote, re.IGNORECASE):
-            return False
-        correction = re.search(
-            r"\b(?:no,\s*|actually,?\s+)(?:please\s+)?use\s+",
-            quote, re.IGNORECASE)
-        if correction and not re.match(name, quote[correction.end():], re.IGNORECASE):
+        if re.match(r"\s*(?:maybe|perhaps)\b", final_choice, re.IGNORECASE):
             return False
         refusals = (
+            r"\b(?:cancel|stop)\s+(?:all|any)\s+"
+            r"(?:external|outside)\s+reviews?\b",
             r"\b(?:do\s+not|don't|never)\s+(?:use|run|ask|invoke)\s+"
             r"(?:any|an)\s+(?:external|outside)\s+(?:coding\s+)?agent\b",
             rf"\b(?:do\s+not|don't|never)\s+"
             rf"(?:use|run|ask|invoke|want|review\s+with)\s+{name}",
             rf"\b(?:did\s+not|didn't)\s+say\s+to\s+(?:use|run|ask|invoke)\s+{name}",
+            rf"\brefuse\s+to\s+use\s+{name}",
             rf"\b(?:not|no)\s+{name}",
             rf"\b(?:instead\s+of|rather\s+than)\s+{name}",
             rf"(?:不要|別|别)\s*(?:用|使用)?\s*{name}",
             rf"{name}\s*を?\s*(?:使わないで?|使用しないで?)",
             rf"^\s*{name}\s+can\s+review\b",
         )
-        return not any(re.search(pattern, quote, re.IGNORECASE) for pattern in refusals)
+        return not any(re.search(pattern, final_choice, re.IGNORECASE)
+                       for pattern in refusals)
     if source.get("kind") == "accepted-selection":
         selection = source.get("selection")
         return (isinstance(selection, str) and

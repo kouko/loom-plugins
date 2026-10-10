@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import external_review  # noqa: E402
 
@@ -83,6 +85,25 @@ def test_later_blanket_cancellation_blocks_discovery_and_execution():
     record = _record()
     record["authorization_source"]["quote"] = (
         "Use Codex to review this change. Actually, do not use any external coding agent.")
+    calls = []
+    discovered = external_review.discover("codex", "/repo", record,
+                                          runner=_runner(calls))
+    executed = external_review.execute("codex", "gpt-6.1-sol", "high", "openai",
+                                       "/repo", "review", record,
+                                       runner=_runner(calls))
+    assert discovered["reason"] == "consent-missing-or-stale"
+    assert executed["reason"] == "consent-missing-or-stale"
+    assert calls == []
+
+
+@pytest.mark.parametrize("quote", [
+    "Use Codex to review this change. Actually, cancel all outside reviews.",
+    "I refuse to use Codex for this change; use Claude instead.",
+    "Use Codex to review this change. Wait, use Claude instead.",
+])
+def test_later_refusal_or_replacement_blocks_discovery_and_execution(quote):
+    record = _record()
+    record["authorization_source"]["quote"] = quote
     calls = []
     discovered = external_review.discover("codex", "/repo", record,
                                           runner=_runner(calls))

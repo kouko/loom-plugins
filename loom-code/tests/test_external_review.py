@@ -102,6 +102,9 @@ def test_accepted_selection_source_allows_discovery():
     ("codex", "Use Codex? Actually use Claude to review this change"),
     ("codex", "Maybe Codex can review this change"),
     ("codex", "Use Codex to review this change. Actually, do not use any external coding agent."),
+    ("codex", "Use Codex to review this change. Actually, cancel all outside reviews."),
+    ("codex", "I refuse to use Codex for this change; use Claude instead."),
+    ("codex", "Use Codex to review this change. Wait, use Claude instead."),
 ])
 def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
         executor, quote):
@@ -127,11 +130,28 @@ def test_refusal_or_ambiguous_quote_cannot_authorize_discovery_or_execution(
     ("codex", "不要用 Claude，改用 Codex 審查這個變更"),
     ("codex", "Can you use Codex to review this change?"),
     ("codex", "Use Claude? Actually use Codex to review this change."),
+    ("codex", "Do not use Codex. Actually, please use Codex to review this change."),
+    ("codex", "Do not use any external coding agent. Actually, use Codex to review this change."),
 ])
 def test_affirmative_direct_request_remains_valid(executor, quote):
     record = consent(executor)
     record["authorization_source"]["quote"] = quote
     assert review._authorization_valid(record["authorization_source"], executor)
+
+
+@pytest.mark.parametrize("quote", [
+    "Do not use Codex. Actually, please use Codex to review this change.",
+    "Do not use any external coding agent. Actually, use Codex to review this change.",
+])
+def test_final_reselection_allows_discovery(quote):
+    record = consent("codex")
+    record["authorization_source"]["quote"] = quote
+    result = review.discover(
+        "codex", "/repo", record,
+        runner=lambda argv, **kwargs: completed(
+            argv, json.dumps({"id": 2, "result": {"data": []}})),
+    )
+    assert result["status"] == "completed"
 
 
 def test_direct_request_selected_executor_must_match_dispatch():
