@@ -1,0 +1,22 @@
+{
+  "verdicts": [
+    {
+      "reviewer": "reviewer-1",
+      "vendor": "openai",
+      "model": "test",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-2", 
+      "vendor": "anthropic",
+      "model": "test",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "adversarial": []
+}
