@@ -36,6 +36,11 @@ charter: 1.1
 - Test: A1 positive: runnerless suite finalizes with configured `-q`; negative: uncollected file remains refused. A3 positive: runner-collected file accepted with configured `-q`; negative: configured ignore remains refused. The existing Conda test also covers the shared collection path.
 - Risk: agent-decided — ask pytest's collection hook for selected item paths through a temporary plugin, while retaining configured selection, the collection timeout, and fail-closed errors.
 
+**W3-03 Preserve collection evidence across package environments and failures**  after: W3-02  acceptance: 1,2,3,4
+- Files: `loom-code/scripts/loom_checker/probes.py`, `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/tests/test_adversarial_probe_cap_coverage.py`, `loom-code/tests/test_selection_finalize.py`
+- Test: A1/A2 positive: over-cap graduated probes remain counted when collection fails; negative: genuinely uncollected files remain refused. A3 positive: runner collection uses the declared Conda environment; negative: pytest configuration still excludes an ignored file. A4: retain Conda execution and no-op refusal tests.
+- Risk: agent-decided — use the declared package command's recognized Python launcher for runner inventory and collection; distinguish unavailable collection from uncollected files, report collection stderr in finalization, and count concern-bearing additions conservatively on unavailable collection. Unsupported launcher shapes remain fail closed.
+
 ## Simplicity check
 - none found
 

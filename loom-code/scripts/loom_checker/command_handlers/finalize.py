@@ -21,7 +21,7 @@ from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
 from loom_checker.probes import missing_adversarial_execution
 from loom_checker.probes import probe_directory
-from loom_checker.probes import suite_collects
+from loom_checker.probes import suite_collection
 from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import committed_branch_delta
 from loom_checker.reviewers import required_reviewer_count
@@ -121,18 +121,18 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             return [("finalize.adversarial", "command must execute the artifact directly")]
         if not git_ok(repo, "cat-file", "-e", f"{head_sha}:{artifact}"):
             return [("finalize.adversarial", "artifact must exist in the selected commit")]
-        if not artifact.startswith(probe_directory(change_id)) and not suite_collects(repo, artifact):
-            # A probe program has two legal homes. In this change's probe
-            # directory it is counted by `adversarial.proportionate`, which
-            # reads that directory only. Graduated into the package suite it
-            # is an ordinary permanent test: the suite runs it on every later
-            # change and reviewers read it, so it escapes neither the cap nor
-            # review by leaving the store. An artifact in neither home is a
-            # program that gets executed and is answerable to nothing.
-            return [("finalize.adversarial",
-                     f"adversarial artifact must be committed under "
-                     f"{probe_directory(change_id)} or be a program the "
-                     f"package suite already runs")]
+        if not artifact.startswith(probe_directory(change_id)):
+            collected, collection_error = suite_collection(repo, artifact)
+            if collected is None:
+                return [("finalize.adversarial",
+                         f"package suite collection unavailable: {collection_error}")]
+            if not collected:
+                # A graduated test must be collected by the package suite
+                # and counted against the adversarial cap.
+                return [("finalize.adversarial",
+                         f"adversarial artifact must be committed under "
+                         f"{probe_directory(change_id)} or be a program the "
+                         f"package suite already runs")]
         work.append(("adversarial", command, artifact))
 
     # Every artifact is now in a legal home, so the cap can count them: what

@@ -186,6 +186,9 @@ def test_new_probes_are_counted_and_over_the_cap_refused() -> None:
     head = _commit_branch(repo)
     assert len(graduated_probe_programs(repo, head, CHANGE_ID)) == MOVED
     assert check_adversarial_proportionate(repo, head, CHANGE_ID) != []
+    _write(repo, {f"{SUITE}/conftest.py": "raise RuntimeError('collection broken')\n"})
+    head = _commit_branch(repo)
+    assert check_adversarial_proportionate(repo, head, CHANGE_ID) != []
 
 
 def test_a_copied_probe_under_a_new_name_is_counted() -> None:

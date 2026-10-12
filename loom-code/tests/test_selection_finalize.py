@@ -455,6 +455,52 @@ def test_runnerless_pytest_refuses_uncollected_and_broken_suites(tmp_path: Path)
     ]))
     assert refused.returncode == 1
     assert "BLOCK finalize.adversarial" in refused.stderr
+    assert "collection unavailable" in refused.stderr
+    assert "collection broken" in refused.stderr
+
+
+def test_runner_collection_uses_declared_package_environment(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    env_only = tmp_path / "env-only"
+    env_only.mkdir()
+    (env_only / "suite_dependency.py").write_text("VALUE = True\n", encoding="utf-8")
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    conda = binary / "conda"
+    conda.write_text(
+        "#!/bin/sh\nshift 3\n"
+        f"export PYTHONPATH='{env_only}':\"$PYTHONPATH\"\n"
+        "exec \"$@\"\n", encoding="utf-8",
+    )
+    conda.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{binary}{os.pathsep}{os.environ['PATH']}")
+    repo = make_repo(
+        tmp_path,
+        "conda run -n loom-test python3 scripts/run_package_tests.py --loom-family",
+    )
+    runner = repo / "scripts/run_package_tests.py"
+    runner.parent.mkdir()
+    runner.write_text(
+        "import suite_dependency\n"
+        "def loom_family_commands(repo):\n"
+        "    return [['python3', '-m', 'pytest', 'tests']]\n",
+        encoding="utf-8",
+    )
+    tests = repo / "tests"
+    tests.mkdir()
+    (tests / "test_kept.py").write_text(
+        "import suite_dependency\n"
+        "def test_kept():\n    assert suite_dependency.VALUE\n", encoding="utf-8",
+    )
+    (tests / "test_ignored.py").write_text(
+        "def test_ignored():\n    assert True\n", encoding="utf-8",
+    )
+    (repo / "pytest.ini").write_text(
+        "[pytest]\naddopts = --ignore=tests/test_ignored.py\n", encoding="utf-8",
+    )
+    assert suite_collects(repo, "tests/test_kept.py")
+    assert not suite_collects(repo, "tests/test_ignored.py")
 
 
 def graduate_many(repo: Path, count: int, concern: bool = True) -> list[str]:

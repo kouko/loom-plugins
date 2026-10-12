@@ -73,31 +73,95 @@ def pytest_collection_finish(session):
 '''
 
 
-def _declared_suite_commands(repo: Path) -> list[list[str]]:
+def _runner_launcher(repo: Path) -> list[str] | None:
+    """Python launcher used by a declared package command for this runner."""
+    declared, _source = declared_test_command(repo)
+    try:
+        tokens = argv_for(declared) if declared else []
+    except ValueError:
+        return None
+    runner = SUITE_RUNNER
+    if _conda_python_argv(tokens) and len(tokens) > 5 and os.path.normpath(tokens[5]) == runner:
+        return tokens[:5]
+    if len(tokens) > 1 and Path(tokens[0]).name.startswith("python") and os.path.normpath(tokens[1]) == runner:
+        return tokens[:1]
+    if tokens[:2] == ["uv", "run"]:
+        index = 2
+        while index < len(tokens):
+            if tokens[index] in {"--isolated", "--no-project", "--offline"}:
+                index += 1
+            elif tokens[index] in {"--with-requirements", "--with"} and index + 1 < len(tokens):
+                index += 2
+            else:
+                break
+        if (index + 1 < len(tokens) and Path(tokens[index]).name.startswith("python")
+                and os.path.normpath(tokens[index + 1]) == runner):
+            return tokens[:index + 1]
+    return None
+
+
+def _declared_suite_commands(repo: Path) -> tuple[list[list[str]] | None, str, list[str] | None]:
     """The commands the repository's own test runner declares it runs."""
     runner = repo / SUITE_RUNNER
     if not runner.is_file():
-        return []
+        return [], "", None
+    launcher = _runner_launcher(repo)
+    declared, _source = declared_test_command(repo)
+    if declared and SUITE_RUNNER in declared and launcher is None:
+        return None, "unsupported package-tests runner launcher", None
+    if launcher:
+        code = (
+            "import importlib.util,json,os,sys; from pathlib import Path; "
+            "path=Path(sys.argv[1]); repo=Path(sys.argv[2]); "
+            "sys.path.insert(0,str(path.parent)); "
+            "spec=importlib.util.spec_from_file_location('_loom_suite_inventory',path); "
+            "module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module); "
+            "Path(os.environ['LOOM_SUITE_INVENTORY']).write_text("
+            "json.dumps(module.loom_family_commands(repo)),encoding='utf-8')"
+        )
+        try:
+            with tempfile.TemporaryDirectory(prefix="loom-suite-inventory-") as directory:
+                output = Path(directory) / "commands.json"
+                env = dict(os.environ, LOOM_SUITE_INVENTORY=str(output))
+                result = subprocess.run(
+                    [*launcher, "-c", code, str(runner), str(repo)], cwd=repo,
+                    env=env, capture_output=True, text=True, timeout=60,
+                )
+                if result.returncode != 0:
+                    return None, _collection_error(result.stderr), launcher
+                commands = json.loads(output.read_text(encoding="utf-8"))
+                if not isinstance(commands, list) or not all(
+                    isinstance(command, list) and all(isinstance(token, str) for token in command)
+                    for command in commands
+                ):
+                    return None, "runner inventory is malformed", launcher
+                return commands, "", launcher
+        except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+            return None, str(exc), launcher
     spec = importlib.util.spec_from_file_location("_loom_suite_inventory", runner)
     if spec is None or spec.loader is None:
-        return []
+        return None, "runner inventory could not be loaded", None
     try:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        return list(module.loom_family_commands(repo))
-    except (OSError, AttributeError, ImportError, SyntaxError, TypeError, ValueError):
-        return []
+        return list(module.loom_family_commands(repo)), "", None
+    except (OSError, AttributeError, ImportError, SyntaxError, TypeError, ValueError) as exc:
+        return None, str(exc), None
 
 
-def _direct_pytest_collects(repo: Path, artifact: str) -> bool:
+def _collection_error(stderr: str) -> str:
+    return " ".join(stderr.strip().splitlines()[-4:])[-500:] or "pytest exited without collection"
+
+
+def _direct_pytest_collects(repo: Path, artifact: str) -> tuple[bool | None, str]:
     """Ask a direct package pytest command which tests it actually collects."""
     declared, _source = declared_test_command(repo)
     if not declared:
-        return False
+        return False, ""
     try:
         tokens = argv_for(declared)
     except ValueError:
-        return False
+        return False, ""
     if _conda_pytest_argv(tokens):
         pytest_command = tokens[:7]
         args = tokens[7:]
@@ -109,13 +173,13 @@ def _direct_pytest_collects(repo: Path, artifact: str) -> bool:
         pytest_command = tokens[:3]
         args = tokens[3:]
     else:
-        return False
+        return False, ""
     if pytest_positionals(args) is None:
-        return False
+        return False, ""
     return _pytest_collects(repo, artifact, pytest_command, args)
 
 
-def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[str]) -> bool:
+def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[str]) -> tuple[bool | None, str]:
     """Check actual pytest collection under the repository's configuration."""
     # Worker count changes collection cost, not which files pytest selects.
     args = [arg for index, arg in enumerate(args)
@@ -135,19 +199,25 @@ def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[s
                 [*command, *args, "--collect-only", "-p", "_loom_pytest_collection"],
                 cwd=repo, env=env, capture_output=True, text=True, timeout=60,
             )
+            # Current conda CLI returns the child response.rc; do not infer a
+            # cross-platform guarantee: https://github.com/conda/conda/blob/main/conda/cli/main_run.py
             if result.returncode != 0:
-                return False
+                return None, _collection_error(result.stderr)
             collected = json.loads(output.read_text(encoding="utf-8"))
-    except (OSError, subprocess.TimeoutExpired, ValueError):
-        return False
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        return None, str(exc)
+    if not isinstance(collected, list) or not all(isinstance(path, str) for path in collected):
+        return None, "pytest collection output is malformed"
     wanted = (repo / artifact).resolve()
-    return isinstance(collected, list) and any(
-        isinstance(path, str) and Path(path).resolve() == wanted for path in collected
-    )
+    return any(Path(path).resolve() == wanted for path in collected), ""
 
 
 def suite_collects(repo: Path, artifact: str) -> bool:
-    """True when the declared package suite already runs `artifact`.
+    return suite_collection(repo, artifact)[0] is True
+
+
+def suite_collection(repo: Path, artifact: str) -> tuple[bool | None, str]:
+    """Whether the declared suite collects `artifact`, or cannot determine it.
 
     A graduated probe program -- one carried out of a change's store into the
     permanent suite -- is collected by the direct or runner-backed pytest
@@ -161,7 +231,11 @@ def suite_collects(repo: Path, artifact: str) -> bool:
     wanted_path = (repo / wanted).resolve()
     if not (repo / SUITE_RUNNER).is_file():
         return _direct_pytest_collects(repo, artifact)
-    for command in _declared_suite_commands(repo):
+    commands, error, launcher = _declared_suite_commands(repo)
+    if commands is None:
+        return None, error
+    unavailable = ""
+    for command in commands:
         if not command:
             continue
         runs_pytest = "pytest" in command[:4]
@@ -176,7 +250,7 @@ def suite_collects(repo: Path, artifact: str) -> bool:
                 continue
             if target == wanted:
                 if runs_shell:
-                    return True
+                    return True, ""
                 break
             if not (runs_pytest and (repo / target).is_dir()):
                 continue
@@ -188,9 +262,19 @@ def suite_collects(repo: Path, artifact: str) -> bool:
             continue
         if runs_pytest:
             prefix = 3 if len(command) >= 3 and command[1:3] == ["-m", "pytest"] else 1
-            if _pytest_collects(repo, artifact, command[:prefix], command[prefix:]):
-                return True
-    return False
+            pytest_command = command[:prefix]
+            args = command[prefix:]
+            if launcher:
+                if prefix == 3 or Path(command[0]).name == "pytest":
+                    pytest_command = [*launcher, "-m", "pytest"]
+                else:
+                    return None, "unsupported runner pytest command"
+            collected, reason = _pytest_collects(repo, artifact, pytest_command, args)
+            if collected is True:
+                return True, ""
+            if collected is None:
+                unavailable = reason
+    return (None, unavailable) if unavailable else (False, "")
 
 
 def committed_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[str]:
@@ -257,7 +341,8 @@ def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
     """Probe programs this branch adds straight into the package suite.
 
     A probe that earned its place graduates: it leaves the change's store for
-    a path the repository's own runner collects. Counting only the store
+    a path the repository's own runner collects or cannot currently verify.
+    Counting only the store
     therefore counted zero for exactly the change that produced the most
     programs, because the graduation gate empties that directory before
     finalize-review runs. These are counted with the store.
@@ -283,7 +368,7 @@ def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
         path for path in added
         if path not in moved
         and is_program_path(path)
-        and suite_collects(repo, path)
+        and suite_collection(repo, path)[0] is not False
         and _carries_concern(repo, head_sha, path)
     )
 
@@ -422,13 +507,18 @@ def argv_for(command: str) -> list[str]:
     return tokens
 
 
-def _conda_pytest_argv(tokens: list[str]) -> bool:
-    """Recognize only `conda run -n ENV python -m pytest ...`."""
-    return (len(tokens) >= 7 and Path(tokens[0]).name == "conda"
+def _conda_python_argv(tokens: list[str]) -> bool:
+    # -n selects the environment; the following executable and arguments run
+    # there: https://docs.conda.io/projects/conda/en/stable/commands/run.html
+    return (len(tokens) >= 5 and Path(tokens[0]).name == "conda"
             and tokens[1:3] == ["run", "-n"]
             and bool(tokens[3]) and not tokens[3].startswith("-")
-            and Path(tokens[4]).name.startswith("python")
-            and tokens[5:7] == ["-m", "pytest"])
+            and Path(tokens[4]).name.startswith("python"))
+
+
+def _conda_pytest_argv(tokens: list[str]) -> bool:
+    """Recognize only `conda run -n ENV python -m pytest ...`."""
+    return _conda_python_argv(tokens) and tokens[5:7] == ["-m", "pytest"]
 
 
 def command_executes_artifact(command: str, artifact: str) -> bool:
