@@ -62,6 +62,22 @@ RULES: list[tuple[str, str]] = [
         "independence is enforced by the write-spec station, not persisted in a ledger.",
     ),
     (
+        "intake.attestation-coverage",
+        "Acceptance test report must have a row for each intent Acceptance line with valid Verdict status (works/partly/not_verified/fails)."
+    ),
+    (
+        "intake.commit-identity",
+        "Functional content diff between tested_commit and reviewed_commit in attestation must be limited to evidence files only."
+    ),
+    (
+        "intake.intent-version",
+        "Intent Acceptance lines must match those recorded at confirmation time (intent_confirmed_sha)."
+    ),
+    (
+        "intake.plan-boundary-tests",
+        "Each Risk line in plan (charter 1.1+) should have a corresponding boundary test task."
+    ),
+    (
         "intent.kind-recompute",
         "kind: engineering is rejected when the diff touches a declared interface-surface glob.",
     ),
@@ -90,7 +106,7 @@ RULES: list[tuple[str, str]] = [
         "and each `## Current State Evidence` bullet at 30 words -- CJK runs with no internal "
         "whitespace count as one word by len(text.split()); a task missing its Files, Test or "
         "Risk line blocks too. A plan whose `charter:` is 1.1 or later also needs a non-empty "
-        "`## Simplicity check` section: lines `- <simpler shape> — taken` or `- <simpler shape> "
+        "## Simplicity check` section: lines `- <simpler shape> — taken` or `- <simpler shape> "
         "— declined: <reason>`, or the single line `- none found`; the single line `- skipped — "
         "narrow change` passes only when every task's Files paths form a narrow delta. "
         "A plan with no `charter:` line is skipped entirely.",
@@ -126,72 +142,58 @@ RULES: list[tuple[str, str]] = [
         "standing.warn",
         "A missing PRINCIPLES.md, DESIGN.md or ARCHITECTURE.md prints the fixed three-line WARN and never blocks.",
     ),
+    (
+        "publish.preconditions",
+        "publish pushes HEAD and opens or updates its one pull request only when the change "
+        "is identified, publication is authorized, any generated attestation is committed, "
+        "git and gh resolve to trusted executables, "
+        "origin is a literal GitHub URL, and HEAD, the remote branch and the PR identity stay "
+        "unchanged across every network step; the verification status is disclosed, never "
+        "a refusal.",
+    ),
+    (
+        "push.contextual-body",
+        "The exact pull-request body carries Ship's nine top-level contextual headings "
+        "exactly once and in order, with no competing Memory heading or explicit claim "
+        "to expose private or hidden chain-of-thought, and any `Verification status:` "
+        "line states exactly the status publish computes.",
+    ),
+    (
+        "ci.pr-floor",
+        "The pr-floor CI check fails only when the pull-request body lacks Ship's nine "
+        "contextual headings in order, naming the heading; the verification status is "
+        "recomputed from git and published as a notice, and every status passes.",
+    ),
+    (
+        "land.merge",
+        "land merges nothing unless every precondition holds: the change identified from the "
+        "branch name or its one intent file, an --accepted-by name equal to the intent's "
+        "originator or publication authorizer, a live PR body with the nine contextual "
+        "headings, one open PR whose head is HEAD, every check passed (not only required "
+        "ones), and a MERGEABLE state other than BLOCKED, DIRTY, BEHIND, UNSTABLE, or DRAFT. "
+        "No attestation is required; an absent or stale one is printed after the merge.",
+    ),
+    (
+        "land.verify",
+        "After land merges, the squash commit read back from the trunk carries the PR title "
+        "and the PR body; otherwise land stops before trunk sync and cleanup.",
+    ),
+    (
+        "land.cleanup",
+        "land removes a change's worktree and branches only when its PR is merged, the "
+        "worktree is clean apart from regenerable caches, and each branch tip equals the "
+        "merged PR head, selected by exact branch name; a changed sweep list removes nothing.",
+    ),
+    (
+        "review.sync",
+        "sync-trunk merges the freshly fetched origin trunk into the change branch before "
+        "closing review, never rebasing or forcing: it refuses a trunk checkout, a detached "
+        "HEAD or a dirty worktree untouched; adds no commit when HEAD already contains the "
+        "trunk tip; on conflict names every conflicting file and leaves HEAD and the "
+        "worktree untouched (detected in memory, or merged then aborted when git cannot); "
+        "an unreachable remote only warns.",
+    ),
 ]
-
-
-RULES.append((
-    "publish.preconditions",
-    "publish pushes HEAD and opens or updates its one pull request only when the change "
-    "is identified, publication is authorized, any generated attestation is committed, "
-    "git and gh resolve to trusted executables, "
-    "origin is a literal GitHub URL, and HEAD, the remote branch and the PR identity stay "
-    "unchanged across every network step; the verification status is disclosed, never "
-    "a refusal.",
-))
-
-
-RULES.append((
-    "push.contextual-body",
-    "The exact pull-request body carries Ship's nine top-level contextual headings "
-    "exactly once and in order, with no competing Memory heading or explicit claim "
-    "to expose private or hidden chain-of-thought, and any `Verification status:` "
-    "line states exactly the status publish computes.",
-))
-
-
-RULES.append((
-    "ci.pr-floor",
-    "The pr-floor CI check fails only when the pull-request body lacks Ship's nine "
-    "contextual headings in order, naming the heading; the verification status is "
-    "recomputed from git and published as a notice, and every status passes.",
-))
-
-
-RULES.append((
-    "land.merge",
-    "land merges nothing unless every precondition holds: the change identified from the "
-    "branch name or its one intent file, an --accepted-by name equal to the intent's "
-    "originator or publication authorizer, a live PR body with the nine contextual "
-    "headings, one open PR whose head is HEAD, every check passed (not only required "
-    "ones), and a MERGEABLE state other than BLOCKED, DIRTY, BEHIND, UNSTABLE, or DRAFT. "
-    "No attestation is required; an absent or stale one is printed after the merge.",
-))
-
-
-RULES.append((
-    "land.verify",
-    "After land merges, the squash commit read back from the trunk carries the PR title "
-    "and the PR body; otherwise land stops before trunk sync and cleanup.",
-))
-
-
-RULES.append((
-    "land.cleanup",
-    "land removes a change's worktree and branches only when its PR is merged, the "
-    "worktree is clean apart from regenerable caches, and each branch tip equals the "
-    "merged PR head, selected by exact branch name; a changed sweep list removes nothing.",
-))
-
-
-RULES.append((
-    "review.sync",
-    "sync-trunk merges the freshly fetched origin trunk into the change branch before "
-    "closing review, never rebasing or forcing: it refuses a trunk checkout, a detached "
-    "HEAD or a dirty worktree untouched; adds no commit when HEAD already contains the "
-    "trunk tip; on conflict names every conflicting file and leaves HEAD and the "
-    "worktree untouched (detected in memory, or merged then aborted when git cannot); "
-    "an unreachable remote only warns.",
-))
 
 
 def list_rules(out=sys.stdout) -> int:

@@ -27,6 +27,9 @@ from loom_checker.reviewers import committed_branch_delta
 from loom_checker.reviewers import required_reviewer_count
 from loom_checker.reviewers import attach_outside_receipt
 from loom_checker.reviewers import selected_outside_family
+from loom_checker.rule_checks.evidence_coverage import check_attestation_coverage
+from loom_checker.rule_checks.commit_identity import check_commit_identity
+from loom_checker.rule_checks.intent_version import check_intent_version
 from pathlib import Path
 import json
 import subprocess
@@ -61,14 +64,6 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     if status_before:
         return [("finalize.clean-tree", "commit functional content before finalizing review")]
     if committed_branch_delta(repo, change_id, head_sha) is None:
-        # `auto_skipped_steps` answers "every auto-skippable step is skipped"
-        # when the delta cannot be recomputed, and that permissive reading is
-        # correct exactly once: in `attestation.py`, re-validating evidence
-        # that already exists and is bound to the commit's content. Here the
-        # evidence does not exist yet — finalize is making it — so the same
-        # answer would let a change that touches production code waive the
-        # adversarial step by being finalized in a checkout that cannot see
-        # the trunk. Finalize therefore fails closed, and says why.
         return [("finalize.delta",
                  "cannot recompute this branch's committed delta, so which "
                  "steps a narrow change would skip cannot be established; "
@@ -122,22 +117,12 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         if not git_ok(repo, "cat-file", "-e", f"{head_sha}:{artifact}"):
             return [("finalize.adversarial", "artifact must exist in the selected commit")]
         if not artifact.startswith(probe_directory(change_id)) and not suite_collects(repo, artifact):
-            # A probe program has two legal homes. In this change's probe
-            # directory it is counted by `adversarial.proportionate`, which
-            # reads that directory only. Graduated into the package suite it
-            # is an ordinary permanent test: the suite runs it on every later
-            # change and reviewers read it, so it escapes neither the cap nor
-            # review by leaving the store. An artifact in neither home is a
-            # program that gets executed and is answerable to nothing.
             return [("finalize.adversarial",
                      f"adversarial artifact must be committed under "
                      f"{probe_directory(change_id)} or be a program the "
                      f"package suite already runs")]
         work.append(("adversarial", command, artifact))
 
-    # Every artifact is now in a legal home, so the cap can count them: what
-    # finalize-review is about to execute is this change's adversarial output
-    # wherever graduation has since moved it.
     proportionate = check_adversarial_proportionate(
         repo, head_sha, change_id,
         [artifact for kind, _command, artifact in work if kind == "adversarial"],
@@ -172,6 +157,32 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         return [("finalize.stable-tree", "working tree or index changed during functional verification")]
     if git_text(repo, "config", "--list", "--null") != config_before:
         return [("finalize.stable-tree", "git configuration changed during functional verification")]
+
+    # ===== EVIDENCE DRIFT GUARD CHECKS =====
+    # These run after successful Build and before attestation generation
+    
+    # Parse intent for sections needed by checks
+    intent_path = artifact_path(manifest, "intent", change_id, repo)
+    if intent_path.is_file():
+        intent_text = read_text(intent_path)
+        from loom_checker.parsing import parse_document
+        _intent_front, intent_sections = parse_document(intent_text)
+        
+        # Evidence drift guard checks
+        failures: list[tuple[str, str]] = []
+        
+        # Check acceptance test report coverage
+        failures += check_attestation_coverage(manifest, repo, change_id, intent_sections, {})
+        
+        # Check commit identity (tested vs reviewed commit)
+        failures += check_commit_identity(manifest, repo, change_id, intent_sections, {})
+        
+        # Check intent version (intent unchanged since confirmation)
+        failures += check_intent_version(manifest, repo, change_id, intent_sections, {})
+        
+        if failures:
+            return failures
+    # ===== END EVIDENCE DRIFT GUARD CHECKS =====
 
     digest = functional_content_digest(repo, head_sha, change_id, manifest)
     if digest is None:

@@ -1,6 +1,6 @@
 # Loom evidence drift guards
 originator: kouko
-kind: engineering
+kind: product
 needs-design: no — internal checker, attestation and station-text changes to loom-code; no user-facing interface surface per the repo's interface-surfaces default
 evidence: [docs/loom/intent/2026-10-12-codex-evaluation-option-A.md]
 status: confirmed 2026-10-12

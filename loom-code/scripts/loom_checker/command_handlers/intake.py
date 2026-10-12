@@ -19,6 +19,10 @@ from loom_checker.rule_checks.intake import check_ui_flows_recompute
 from loom_checker.rule_checks.intake import prose_lines
 from loom_checker.rule_checks.intent import check_kind_recompute
 from loom_checker.rule_checks.intent import touched_interface_surfaces
+from loom_checker.rule_checks.evidence_coverage import check_attestation_coverage
+from loom_checker.rule_checks.commit_identity import check_commit_identity
+from loom_checker.rule_checks.intent_version import check_intent_version
+from loom_checker.rule_checks.plan_boundary_tests import check_plan_boundary_tests
 from pathlib import Path
 import re
 import sys
@@ -87,4 +91,12 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         # forces a spec and write-plan runs decision point 2 on it. With no
         # spec there is nothing to confirm and the rule returns nothing.
         failures += check_confirmed_behavior(manifest, repo, change_id, err)
+    
+    # New evidence drift guard checks at write-plan intake
+    if station == "write-plan" and "plan" not in skipped:
+        # Check plan boundary test hint (Acceptance 7)
+        failures += check_plan_boundary_tests(manifest, repo, change_id, sections, {})
+        # Note: attestation-based checks (coverage, commit-identity, intent-version)
+        # are deferred to finalize-review since attestation doesn't exist at intake time
+
     return report(failures, err)

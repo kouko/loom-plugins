@@ -141,6 +141,19 @@ mechanisms:
   - id: intake.spec-ready
     class: checker-rule
     eval: loom-code/tests/test_loom_checker_intake.py::test_invalid_pre_build_review_declaration_is_blocked
+  - id: intake.attestation-coverage
+    class: checker-rule
+    eval: loom-code/tests/test_loom_checker_intake.py
+  - id: intake.commit-identity
+    class: checker-rule
+    eval: loom-code/tests/test_loom_checker_intake.py
+  - id: intake.intent-version
+    class: checker-rule
+    eval: loom-code/tests/test_loom_checker_intake.py
+  - id: intake.plan-boundary-tests
+    class: checker-rule
+    eval: loom-code/tests/test_loom_checker_intake.py
+
   - id: intent.kind-recompute
     class: checker-rule
     eval: loom-code/tests/test_loom_checker_intent.py::test_engineering_kind_over_an_interface_diff_is_blocked

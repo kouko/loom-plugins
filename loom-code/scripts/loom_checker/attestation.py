@@ -119,4 +119,48 @@ def validate_attestation(
         return [(rule, outside_failure)]
     if not isinstance(attestation.get("findings"), list):
         return [(rule, "attestation findings must be a list")]
+
+    # Validate new optional v2 fields
+    if schema == ATTESTATION_SCHEMA:
+        # intent_confirmed_sha: optional, but if present must be valid SHA
+        if "intent_confirmed_sha" in attestation:
+            val = attestation["intent_confirmed_sha"]
+            if val is not None:
+                if not isinstance(val, str) or not val:
+                    return [(rule, "attestation intent_confirmed_sha must be a non-empty string if present")]
+                if not all(c in "0123456789abcdef" for c in val.lower()):
+                    return [(rule, "attestation intent_confirmed_sha must be a valid hex SHA")]
+
+        # tested_commit: optional, but if present must be valid SHA
+        if "tested_commit" in attestation:
+            val = attestation["tested_commit"]
+            if val is not None:
+                if not isinstance(val, str) or not val:
+                    return [(rule, "attestation tested_commit must be a non-empty string if present")]
+                if not all(c in "0123456789abcdef" for c in val.lower()):
+                    return [(rule, "attestation tested_commit must be a valid hex SHA")]
+
+        # reviewed_commit: optional, but if present must be valid SHA
+        if "reviewed_commit" in attestation:
+            val = attestation["reviewed_commit"]
+            if val is not None:
+                if not isinstance(val, str) or not val:
+                    return [(rule, "attestation reviewed_commit must be a non-empty string if present")]
+                if not all(c in "0123456789abcdef" for c in val.lower()):
+                    return [(rule, "attestation reviewed_commit must be a valid hex SHA")]
+
+        # acceptance_status: optional array
+        if "acceptance_status" in attestation:
+            val = attestation["acceptance_status"]
+            if val is not None:
+                if not isinstance(val, list):
+                    return [(rule, "attestation acceptance_status must be an array if present")]
+                for item in val:
+                    if not isinstance(item, dict):
+                        return [(rule, "attestation acceptance_status items must be objects")]
+                    if "acceptance" not in item or "status" not in item:
+                        return [(rule, "attestation acceptance_status items must have 'acceptance' and 'status' fields")]
+                    if item["status"] not in {"works", "partly", "not_verified", "fails"}:
+                        return [(rule, f"attestation acceptance_status has invalid status: {item['status']!r}")]
+
     return []
