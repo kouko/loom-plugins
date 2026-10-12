@@ -1,1 +1,1 @@
-    assert len(run_checker("--list-rules").stdout.splitlines()) == 30
+assert len(run_checker("--list-rules").stdout.splitlines()) == 30
