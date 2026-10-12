@@ -1,0 +1,105 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-10-redesign-external-review-authorization",
+  "content_digest": "5ce755a75a3c959f08facc02901ee4fa4c15509f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_excluded_executor_no_egress.py",
+      "artifact": "loom-code/tests/test_excluded_executor_no_egress.py",
+      "result": "pass",
+      "command_digest": "866bfe77d67c7b0da86d6a9dbfe28abf72ecf92dbe71be1f700962c9ce0a1590"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "authorization_code_reviewer_a_1010",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "d311e27030a691ee74b7ef8c051cc5246e966c1a",
+      "review_target_sha": "2b786b466e950ced39952f8c09c1601a0b1d7e39",
+      "dimension_scores": {
+        "security": "PASS_WITH_NOTES",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS_WITH_NOTES",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The acceptance-report correction matches the previous suite and review evidence; its stale-record and live-owner limits remain explicit.",
+        "This delta changes no tests or authorization behavior. No external CLI was run.",
+        "The old-target attestation must be regenerated for this digest."
+      ]
+    },
+    {
+      "reviewer": "authorization_code_reviewer_b_1010",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "d311e27030a691ee74b7ef8c051cc5246e966c1a",
+      "review_target_sha": "2b786b466e950ced39952f8c09c1601a0b1d7e39",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The acceptance report now accurately states that the prior package suite and closing review passed; it still identifies the local-only tests and partly verified acceptance results.",
+        "No test file changed after the previous target. The attestation still names that target and needs regeneration for this digest."
+      ]
+    },
+    {
+      "reviewer": "authorization_skill_reviewer_1010",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "d311e27030a691ee74b7ef8c051cc5246e966c1a",
+      "review_target_sha": "2b786b466e950ced39952f8c09c1601a0b1d7e39",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The report correction preserves the disclosed stale-record and live-execution limits; no skill contract changed.",
+        "Target functional digest: 5ce755a75a3c959f08facc02901ee4fa4c15509f. The committed attestation has an older digest and needs refresh."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

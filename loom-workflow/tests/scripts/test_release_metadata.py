@@ -16,12 +16,12 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 PLUGIN = REPO / "loom-workflow"
-CURRENT = "5.6.3"
+CURRENT = "5.7.0"
 
 
 @pytest.mark.parametrize(
     "manifest",
-    ["plugin.json", ".claude-plugin/plugin.json", ".codex-plugin/plugin.json"],
+    ["plugin.json", ".claude-plugin/plugin.json", ".codex-plugin/plugin.json", "package.json"],
 )
 def test_manifest_version_is_current(manifest: str) -> None:
     data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))

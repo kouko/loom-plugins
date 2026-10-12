@@ -50,8 +50,8 @@ def test_stations_do_not_restate_the_resolver_invocation() -> None:
             assert phrase.lower() not in flat, f"{station.parent.name} restates: {phrase}"
 
 
-def test_atomic_claude_dispatch_gate_is_registered_with_executable_eval() -> None:
-    gate_id = "review.atomic-claude-dispatch"
+def test_external_dispatch_gate_is_registered_with_executable_eval() -> None:
+    gate_id = "review.external-dispatch"
     review = (PLUGIN / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8")
     mechanisms = MECHANISMS.read_text(encoding="utf-8")
 
@@ -59,8 +59,8 @@ def test_atomic_claude_dispatch_gate_is_registered_with_executable_eval() -> Non
     assert review.count("<!-- /gate -->", review.find(f"<!-- gate: {gate_id} -->")) >= 1
     assert f'- id: "{gate_id}"' in mechanisms
     assert (
-        "eval: loom-code/tests/test_claude_reviewer.py::"
-        "test_main_rejects_partial_override_before_spawn"
+        "eval: loom-code/tests/test_loom_attestation.py::"
+        "test_external_dispatch_gate_integrates_runner_verdict_and_attestation"
     ) in mechanisms
 
 

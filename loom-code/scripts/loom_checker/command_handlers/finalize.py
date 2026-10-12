@@ -25,6 +25,8 @@ from loom_checker.probes import suite_collects
 from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import committed_branch_delta
 from loom_checker.reviewers import required_reviewer_count
+from loom_checker.reviewers import attach_outside_receipt
+from loom_checker.reviewers import selected_outside_family
 from pathlib import Path
 import json
 import subprocess
@@ -89,6 +91,11 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     if len(reviewers) < reviewer_floor:
         needed = "two" if reviewer_floor == 2 else "one"
         return [("finalize.verdicts", f"{needed} distinct reviewers are required")]
+    verdicts, outside_failure = attach_outside_receipt(
+        verdicts, selected_outside_family(repo, change_id, head_sha), head_sha
+    )
+    if outside_failure:
+        return [("finalize.verdicts", outside_failure)]
     if not isinstance(findings, list) or not isinstance(adversarial, list):
         return [("finalize.schema", "findings and adversarial must be lists")]
     missing = missing_adversarial_execution(len(adversarial), skip)

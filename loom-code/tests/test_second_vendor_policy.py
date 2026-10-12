@@ -33,6 +33,118 @@ def risk(signal: str, *anchors: str) -> dict[str, object]:
     return {"signal": signal, "anchors": list(anchors)}
 
 
+def candidate(executor: str, model: str, vendor: str) -> dict[str, str]:
+    return {"executor": executor, "model": model, "vendor": vendor}
+
+
+def test_agy_candidate_uses_model_family_and_keeps_notice_nonblocking() -> None:
+    result = second_vendor_policy.resolve(packet(
+        host_vendor="codex", usable_vendors=[
+            candidate("agy", "claude-sonnet-4-5", "claude"),
+            candidate("agy", "gemini-2.5-pro", "gemini"),
+        ],
+    ))
+
+    assert result["notice_vendor"] == "claude"
+    assert result["notice_executor"] == "agy"
+    assert result["notice_model"] == "claude-sonnet-4-5"
+    assert result["effective_vendor"] is None
+    assert result["wait_for_user"] is False
+
+
+def test_agy_same_family_is_excluded_even_though_cli_differs() -> None:
+    result = second_vendor_policy.resolve(packet(
+        host_vendor="claude", usable_vendors=[
+            candidate("agy", "claude-sonnet-4-5", "claude"),
+            candidate("agy", "gemini-2.5-pro", "gemini"),
+        ],
+    ))
+
+    assert result["notice_vendor"] == "gemini"
+    assert result["notice_executor"] == "agy"
+
+
+def test_agy_local_presence_without_model_gives_unverified_nonblocking_notice() -> None:
+    result = second_vendor_policy.resolve(packet(
+        host_vendor="claude", usable_vendors=[{"executor": "agy"}],
+    ))
+
+    assert result["notice_kind"] == "availability-unverified"
+    assert result["notice_vendor"] is None
+    assert result["notice_executor"] == "agy"
+    assert result["effective_vendor"] is None
+    assert result["wait_for_user"] is False
+
+
+def test_unverified_agy_opt_in_authorizes_bounded_discovery_only() -> None:
+    result = second_vendor_policy.resolve(packet(
+        host_vendor="claude", usable_vendors=[{"executor": "agy"}],
+        response="accept",
+    ))
+
+    assert result["notice_kind"] == "discovery-authorized"
+    assert result["reason_code"] == "model-discovery-authorized"
+    assert result["effective_vendor"] is None
+    assert result["effective_executor"] == "agy"
+    assert result["allowed_vendors"] == ["codex", "gemini"]
+    assert result["wait_for_user"] is False
+
+    confirmed = second_vendor_policy.resolve(packet(
+        host_vendor="claude", usable_vendors=[
+            candidate("agy", "gemini-2.5-pro", "gemini")],
+        response="accept", response_vendor="gemini",
+    ))
+    assert confirmed["notice_kind"] == "selection-confirmed"
+    assert confirmed["effective_vendor"] == "gemini"
+    assert confirmed["effective_model"] == "gemini-2.5-pro"
+
+
+def test_unverified_agy_late_opt_in_is_next_change_only() -> None:
+    result = second_vendor_policy.resolve(packet(
+        usable_vendors=[{"executor": "agy"}], response="accept",
+        review_started=True,
+    ))
+    assert result["notice_kind"] == "next-change-only"
+    assert result["effective_vendor"] is None
+    assert "effective_executor" not in result
+
+
+def test_unverified_agy_cannot_claim_vendor_before_discovery() -> None:
+    with pytest.raises(second_vendor_policy.InputError):
+        second_vendor_policy.resolve(packet(
+            usable_vendors=[{"executor": "agy"}], response="accept",
+            response_vendor="gemini",
+        ))
+
+
+def test_agy_acceptance_records_executor_model_and_obeys_cutoff() -> None:
+    options = [candidate("agy", "gemini-2.5-pro", "gemini")]
+    accepted = second_vendor_policy.resolve(packet(
+        usable_vendors=options, response="accept", response_vendor="gemini",
+    ))
+    late = second_vendor_policy.resolve(packet(
+        usable_vendors=options, response="accept", response_vendor="gemini",
+        review_started=True,
+    ))
+
+    assert accepted["effective_vendor"] == "gemini"
+    assert accepted["effective_executor"] == "agy"
+    assert accepted["effective_model"] == "gemini-2.5-pro"
+    assert late["effective_vendor"] is None
+    assert late["notice_kind"] == "next-change-only"
+
+
+@pytest.mark.parametrize("options", [
+    [candidate("agy", "unknown-model", "gemini")],
+    [candidate("agy", "claude-sonnet-4-5", "gemini")],
+    [candidate("agy", "gemini-2.5-pro", "unknown")],
+    [candidate("unknown", "gemini-2.5-pro", "gemini")],
+])
+def test_candidate_requires_known_matching_family(options: list[dict[str, str]]) -> None:
+    with pytest.raises(second_vendor_policy.InputError):
+        second_vendor_policy.resolve(packet(usable_vendors=options))
+
+
 def test_resolve_available_returns_nonblocking_notice() -> None:
     result = second_vendor_policy.resolve(packet())
 

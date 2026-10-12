@@ -56,15 +56,13 @@ def test_seven_stations_with_owner(manifest):
 
 
 def test_loom_code_station_names_match_skill_dirs(manifest):
-    """The five lifecycle stations match their skill directories; the
-    optional discovery router exists on disk but stays outside the lifecycle
-    contract."""
+    """Lifecycle stations exclude the optional router and outside executor."""
     declared = {s["name"] for s in manifest["stations"] if s["owner"] == "loom-code"}
     on_disk = {p.name for p in (REPO / "loom-code" / "skills").iterdir() if p.is_dir()}
-    router = "using-loom-code"
-    assert router not in declared
-    assert router in on_disk
-    assert declared == on_disk - {router}
+    nonstations = {"using-loom-code", "external-review"}
+    assert not declared.intersection(nonstations)
+    assert nonstations <= on_disk
+    assert declared == on_disk - nonstations
 
 
 def test_every_action_names_one_owner_station(manifest):
@@ -267,5 +265,5 @@ def test_finalize_review_command_and_gate_ids_unchanged():
     checker = (REPO / "loom-code" / "scripts" / "loom_checker.py").read_text(encoding="utf-8")
     assert '"finalize-review": cmd_finalize_review' in checker
     station = (REPO / "loom-code" / "skills" / "closing-review" / "SKILL.md").read_text(encoding="utf-8")
-    for marker in ("review.atomic-claude-dispatch", "review.bounded-episode"):
+    for marker in ("review.external-dispatch", "review.bounded-episode"):
         assert f"<!-- gate: {marker} -->" in station
