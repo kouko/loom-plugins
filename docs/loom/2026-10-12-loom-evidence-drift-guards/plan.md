@@ -1,4 +1,4 @@
-# Loom evidence drift guards — plan
+# Loom evidence drift guards — plan (reshaped per complexity critique)
 intent: 2026-10-12-loom-evidence-drift-guards@71bb82d9
 charter: 1.1
 
@@ -14,8 +14,8 @@ charter: 1.1
 ### Wave 1
 
 **W1-01 Extend attestation schema and add checker rules**  after: none  acceptance: 1,2,3,4
-- Files: `contract/templates/attestation.json`, `loom-checker/attestation.py`, `loom-checker/rule_checks/intake.py`, `loom-checker/rules.py`, `loom-checker/__init__.py`
-- Test: A1 positive: schema extended rules registered; negative: invalid schema rejected. A2 positive: tested-reviewed diff evidence-only; boundary: functional changes fail. A3 positive: intent sha matches confirmation; boundary: post-confirmation fail. A4 positive: Risk lines have boundary tests; boundary: missing test fails.
+- Files: `contract/templates/attestation.json`, `loom-checker/attestation.py`, `loom-checker/rule_checks/evidence_coverage.py`, `loom-checker/rule_checks/commit_identity.py`, `loom-checker/rule_checks/intent_version.py`, `loom-checker/rules.py`, `loom-checker/__init__.py`
+- Test: A1 positive: coverage rule registers; negative: invalid schema rejected. A2 positive: commit diff limited to evidence; negative: functional changes fail. A3 positive: intent sha matches confirmation; negative: post-confirmation fail. A4 positive: Risk lines have boundary tests; negative: missing test fails.
 - Risk: new checker rules must not break existing intake; agent-decided
 - Risk: attestation schema extension v1-compatible; agent-decided
 
@@ -32,7 +32,27 @@ charter: 1.1
 
 ### Wave 2
 
-**W2-01 Update plan template with boundary test hint**  after: W1-03  acceptance: 7
+**W2-01 Update evidence file whitelist in digest**  after: W1-03  acceptance: 2
+- Files: `loom-checker/digest.py`, `loom-code/contract/manifest.yaml`
+- Test: A2 positive: publication_only_paths extended with evidence files; boundary: non-evidence files still counted as functional content
+- Risk: only necessary output files excluded; agent-decided
+
+**W2-02 Update capture-intent to record intent_confirmed_sha**  after: W2-01  acceptance: 3
+- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-design/skills/capture-intent/templates/intent.md`
+- Test: A3 positive: intent gains intent_confirmed_sha after confirmation; boundary: field missing or invalid
+- Risk: follows spec's confirmed-behavior pattern; agent-decided
+
+**W2-03 Update acceptance-tester to record tested_commit**  after: W2-02  acceptance: 2
+- Files: `agents/acceptance-tester.md`, `skills/closing-review/references/acceptance-test-report.md`
+- Test: A2 positive: acceptance-tester report includes tested_commit field; boundary: missing field fails
+- Risk: direct recording avoids parsing fallback; agent-decided
+
+**W2-04 Update closing-review to populate attestation from report**  after: W2-03  acceptance: 5
+- Files: `skills/closing-review/SKILL.md`, `loom-checker/attestation.py`
+- Test: A5 positive: attestation acceptance_status populated from report Verdict column; boundary: mismatched status fails
+- Risk: no duplicate storage of acceptance status; agent-decided
+
+**W2-05 Update plan template with boundary test hint**  after: W2-04  acceptance: 7
 - Files: `contract/templates/plan.md`
 - Test: A7 positive: Risk section hints boundary test requirement; boundary: template renders correctly
 - Risk: template affects new plans only; agent-decided
@@ -47,8 +67,10 @@ charter: 1.1
 ## Risks
 1. Attestation schema extension must stay compatible with v1 attestations and existing finalize-review flow
 2. Checker rules must distinguish functional content diff from publication-only diff (evidence files)
-3. Closing-review must correctly parse acceptance test report to populate attestation acceptance_status
-4. Plan boundary test rule applies only to new plans (charter 1.1+); legacy plans exempt per existing policy
+3. Closing-review must correctly parse acceptance test report to populate attestation acceptance_status from Verdict column
+4. Plan boundary test rule separated as independent concern; this change only adds template hint
 5. Verdict filing location change must not break reviewer agent contract (loom-code:reviewer)
 6. Second-vendor suggest is non-blocking; opt-in required before closing-review per KICKOFF-DEFAULTS
-7. Claude recommendation: review verification and publication mechanism evidence suggests getting Claude review for added confidence in the evidence drift guard mechanism
+7. Intent_confirmed_sha excludes status line (matches spec confirmed-behavior pattern)
+8. Tested_commit recorded directly at acceptance-test time (no report parsing fallback)
+9. Evidence whitelist only covers necessary output files (report, evidence, probes)
