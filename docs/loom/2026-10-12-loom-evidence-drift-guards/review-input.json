@@ -20,7 +20,7 @@
   "findings": [],
   "adversarial": [
     {
-      "command": "echo 'test'",
+      "command": "cat docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md",
       "artifact": "docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md"
     }
   ]
