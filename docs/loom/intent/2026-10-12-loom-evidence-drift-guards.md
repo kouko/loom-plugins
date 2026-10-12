@@ -55,6 +55,7 @@ loom 流程機械化地偵測證據覆蓋缺口、證據過時與 intent 漂移�
 - none
 
 ## Decisions
-
-- 範圍：選項 A（重塑為單一 evidence-binding 機制，延伸既有 attestation）— user-decided 2026-10-12（codex 第二 vendor 評估後確認）。
-- 第二 vendor 評估：使用者於決策點①主動要求 codex 評估選項 A；評估檔案見 evidence。
+- **intent_confirmed_sha**: In capture-intent station, after confirming intent, compute blob SHA of intent file (without status line) and add `intent_confirmed_sha: <sha>` to intent frontmatter. This matches spec's confirmed-behavior approach.
+- **tested_commit parsing**: Extract from acceptance test report's "Tried on ... at <short sha>" line using regex `r'at ([0-9a-f]{7,40})'`. If not found, fall back to first 7 chars of HEAD at acceptance-test time.
+- **Evidence file diff whitelist**: Extend manifest.yaml publication_only_paths to include `docs/loom/<change-id>/evidence/**` and `docs/loom/<change-id>/acceptance-test-report.md`.
+- **Checker modularization**: Split 4 new rules into separate files under loom-checker/rule_checks/ (evidence_coverage.py, commit_identity.py, intent_version.py, plan_boundary_tests.py) and register in rules.py.
