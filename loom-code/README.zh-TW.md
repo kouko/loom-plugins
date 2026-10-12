@@ -6,7 +6,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.38.0 · **Skills**：5 個站 + 1 個入口路由 · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.39.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -63,6 +63,7 @@ flowchart TD
 | [`ship`](skills/ship/SKILL.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
 | [`maintain`](skills/maintain/SKILL.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
+| [`external-review`](skills/external-review/SKILL.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
 
 ## Agents
 

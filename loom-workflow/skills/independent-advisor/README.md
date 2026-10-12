@@ -58,6 +58,23 @@ sibling READMEs.
 
 ---
 
+## Outside coding-agent reviews
+
+An explicit request for an outside coding agent to review code, a plan, or a
+decision routes through `loom-code:external-review`. The original reviewer
+remains and its review rules still decide whether the outside verdict is valid.
+The outside result or failure is shown separately. A direct request naming the
+outside agent and an unambiguous active target authorizes one review: the
+advisor shows cost, possible receiving vendors, data sent, the CLI starting
+directory and local execution before discovery, with no second confirmation.
+The record quotes that request as its authorization source; it does not claim
+you separately acknowledged each disclosure. The starting directory does not
+limit file reads, and startup, plugins or caches may write. A missing provider
+or target, a broader scope or a changed executor requires a new choice. An
+ordinary second-vendor suggestion does not start a review.
+
+---
+
 ## Honest framing — what this does NOT give you
 
 Read these before you rely on a result:

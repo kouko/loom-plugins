@@ -4,7 +4,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat の図表と推論ページ、second opinion。
 
-**Version**：5.6.3 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.7.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 概要
 
@@ -14,9 +14,11 @@ Loom は 1 つの変更を station に沿って運びます：`loom-design` が 
 ではありません。それぞれ決まったタイミングで使うか、必要な時に呼び出すもので、
 どのツールも名前で直接呼び出せます。
 
-どのツールも `loom-workflow` 単体のインストールで動きます。唯一の例外は
-`decision-map` の delivery ステップで、`loom-code` の contract template から
+ほとんどのツールは `loom-workflow` 単体のインストールで動きます。
+`decision-map` の delivery ステップは `loom-code` の contract template から
 intent を書くため `loom-code` が必要です。地図の作成と ticket の推進には不要です。
+明示的に依頼された外部の code・plan・decision review の実行にも
+`loom-code:external-review` が必要です。
 
 ## 収録基準（Admission rule）
 
@@ -117,7 +119,7 @@ flowchart TD
 | [`git-memory`](skills/git-memory/) | 毎回の `git commit`・`gh pr create`・`gh pr merge` の前に Decision・Learning・Gotcha の memory を分類する。過去の Git 上の決定の理由も呼び出せる。 |
 | [`handoff`](skills/handoff/) | session 状態を `.claude/handoffs/` の HANDOFF ファイルに保存し、あるいは新しい session でそこから再開する。 |
 | [`distill-sessions`](skills/distill-sessions/) | 過去の Claude Code と Codex の session（利用可能なら `/insights` facets も）を掘り、skill ごとに順位付けした friction とレビュー可能な SKILL.md 提案を出す。 |
-| [`independent-advisor`](skills/independent-advisor/) | plan や決定について、別の executor——別の model tier、より高い effort、あるいは別ベンダー——から second opinion を取る。費用の発生やマシン外への送信には承認が必要。 |
+| [`independent-advisor`](skills/independent-advisor/) | 明示的に依頼された code・plan・decision の外部 review を `loom-code:external-review` に渡し、元の review 基準を保つ。別の model tier・effort・ベンダーから自由形式の second opinion も取れる。費用の発生やマシン外への送信には承認が必要。 |
 | [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |
 | [`goal-create`](skills/goal-create/) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
@@ -160,8 +162,8 @@ loom-workflow/
 ## インストール
 
 このリポジトリは `loom` という名前の plugin marketplace です。`loom-workflow`
-は単体でインストールできます。`decision-map` の delivery ステップを使う場合のみ
-`loom-code` を追加してください。
+は単体でインストールできます。`decision-map` の delivery ステップ、または
+明示的に依頼された外部 review を使う場合は `loom-code` も追加してください。
 
 ### Claude Code
 

@@ -6,7 +6,7 @@ instead of restating its caps or its edits-after policy list.
 from __future__ import annotations
 
 # Version sync constant - updated only on releases
-CURRENT_VERSION = "3.38.0"
+CURRENT_VERSION = "3.39.0"
 
 # One literal is load-bearing and pinned here: the SKILL.md sentence naming
 # `artifacts.plan.charter`.
@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from prose_pin import NEGATION_RE
+from prose_pin import NEGATION_RE, affirms
 
 REPO = Path(__file__).resolve().parents[2]
 SKILL = REPO / "loom-code" / "skills" / "write-plan" / "SKILL.md"
@@ -28,6 +28,9 @@ SECOND_VENDOR_REFERENCE = (
     / "write-plan"
     / "references"
     / "second-vendor-ask-and-docs-lint.md"
+)
+CONFIRM_INTENT_REFERENCE = (
+    REPO / "loom-code" / "skills" / "write-plan" / "references" / "confirm-intent.md"
 )
 
 
@@ -159,6 +162,45 @@ def test_reference_has_no_none_mode_or_per_change_none_answer() -> None:
     assert "`<cli>` / `none`" not in text
 
 
+def test_named_direct_request_bypasses_duplicate_second_vendor_ask() -> None:
+    confirm = CONFIRM_INTENT_REFERENCE.read_text(encoding="utf-8")
+    routing = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
+    station = SKILL.read_text(encoding="utf-8")
+    for text in (confirm, routing, station):
+        assert "direct user request" in text
+        assert "unambiguous" in text
+        assert "without a second" in text
+    assert "authorization_source" in routing
+    assert "## Questions asked" in routing
+    assert "disclosure" in routing
+
+
+def test_suggestion_only_keeps_ask_and_suggest_does_not_block() -> None:
+    routing = SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8")
+    ask = _section(routing, "## `second-vendor: ask`")
+    suggest = _section(routing, "## `second-vendor: suggest`")
+    assert "suggestion alone" in ask
+    assert "ask one" in ask
+    assert "continue without waiting" in suggest
+
+
+def test_direct_request_skip_is_affirmative_and_negation_is_rejected() -> None:
+    ask = _section(
+        SECOND_VENDOR_REFERENCE.read_text(encoding="utf-8"),
+        "## `second-vendor: ask`",
+    )
+    sentence = (
+        "Skip the per-change question when a direct user request names an "
+        "outside coding agent and an unambiguous active review target."
+    )
+    assert sentence in " ".join(ask.split())
+    assert affirms(ask, "Skip", "per-change question", "direct user request")
+    reversed_ask = ask.replace(sentence, "Do not " + sentence, 1)
+    assert not affirms(
+        reversed_ask, "Skip", "per-change question", "direct user request"
+    )
+
+
 # --- typed-branch-names W1-02 -- the branch is `<type>/<change-id>` -------
 
 
@@ -253,9 +295,13 @@ def test_current_release_metadata_is_synchronized() -> None:
     agy_manifest = json.loads(
         (REPO / "loom-code/plugin.json").read_text(encoding="utf-8")
     )
+    package = json.loads(
+        (REPO / "loom-code/package.json").read_text(encoding="utf-8")
+    )
     assert claude_manifest["version"] == CURRENT_VERSION
     assert codex_manifest["version"] == CURRENT_VERSION
     assert agy_manifest["version"] == CURRENT_VERSION
+    assert package["version"] == CURRENT_VERSION
     assert f"## [{CURRENT_VERSION}]" in changelog
 
 

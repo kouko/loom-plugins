@@ -44,11 +44,14 @@ counting: >
   is not host-hygiene.
 
 mechanisms:
-  # --- skill (22; 7 stations + 12 non-standalone tools + 3 optional routers;
+  # --- skill (23; 7 stations + 13 non-standalone tools + 3 optional routers;
   #     the 2 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
     eval: tests/test_loom_skill_description_catalog.py
+  - id: external-review
+    class: skill
+    eval: loom-code/tests/test_external_review.py::test_consent_blocks_all_subprocesses
   - id: using-loom-design
     class: skill
     eval: tests/test_loom_skill_description_catalog.py
@@ -353,9 +356,9 @@ mechanisms:
   - id: "review.probe-graduation"
     class: prose-gate
     eval: loom-code/tests/test_selection_finalize.py::test_finalize_accepts_a_graduated_program_the_suite_already_runs
-  - id: "review.atomic-claude-dispatch"
+  - id: "review.external-dispatch"
     class: prose-gate
-    eval: loom-code/tests/test_claude_reviewer.py::test_main_rejects_partial_override_before_spawn
+    eval: loom-code/tests/test_loom_attestation.py::test_external_dispatch_gate_integrates_runner_verdict_and_attestation
   - id: "goal-create.session-activation"
     class: prose-gate
     eval: loom-workflow/tests/goal-create/test_skill_md.py::test_session_activation_rules_are_one_registered_gate

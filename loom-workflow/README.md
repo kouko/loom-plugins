@@ -4,7 +4,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, session distill, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.6.3 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.7.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## What it is
 
@@ -14,10 +14,10 @@ intent and spec, and `loom-code` plans, builds, reviews and ships it.
 themselves: each one attaches at a specific moment or runs on demand, and every
 tool can be invoked directly by name.
 
-Every tool works with `loom-workflow` installed alone. The one exception is
-`decision-map`'s delivery step, which writes an intent from `loom-code`'s
-contract template and so needs `loom-code`; charting a map and working its
-tickets do not.
+Most tools work with `loom-workflow` installed alone. `decision-map`'s delivery
+step needs `loom-code` to write an intent from its contract template; charting
+a map and working its tickets do not. An explicitly requested outside code,
+plan or decision review also needs `loom-code:external-review` for execution.
 
 ## Admission rule
 
@@ -122,7 +122,7 @@ Twelve skills: eleven tools and one optional router.
 | [`git-memory`](skills/git-memory/) | Classify Decision, Learning and Gotcha memory before every `git commit`, `gh pr create` and `gh pr merge`; recall why a past Git decision was made. |
 | [`handoff`](skills/handoff/) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
 | [`distill-sessions`](skills/distill-sessions/) | Mine past Claude Code and Codex sessions, with `/insights` facets when available, for friction ranked by skill and reviewable SKILL.md proposals. |
-| [`independent-advisor`](skills/independent-advisor/) | Get a second opinion on a plan or decision from a different executor: another model tier, higher effort or another vendor. Spending money or sending material off the machine needs approval. |
+| [`independent-advisor`](skills/independent-advisor/) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
 | [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
 | [`goal-create`](skills/goal-create/) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
 
@@ -166,7 +166,8 @@ loom-workflow/
 ## Install
 
 This repository is a plugin marketplace named `loom`. `loom-workflow` installs
-on its own; add `loom-code` only if you use `decision-map`'s delivery step.
+on its own; add `loom-code` for `decision-map`'s delivery step or an explicitly
+requested outside code, plan or decision review.
 
 ### Claude Code
 

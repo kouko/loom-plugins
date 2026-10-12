@@ -34,12 +34,15 @@ ground truth:
 ```
 lens: code | docs | spec | spec+adversarial | design | principles | skill | plan
 reviewed_sha: <sha>            # the delta is `git diff <reviewed_sha>..HEAD`; lens plan: the draft plan's path
+review_target_sha: <sha>       # branch-end review only: committed HEAD whose content is judged
 changed paths: <list>          # lens plan: the draft plan's path
 ground truth: intent, and the spec and plan when they exist
 dimensions: loom-code/skills/closing-review/references/lenses.md
 ```
 
-For lens `plan`, `reviewed_sha` and `changed paths` carry the draft plan's
+`reviewed_sha` remains the diff base. At branch-end review, echo the separate
+`review_target_sha` from the packet; it is the committed target of the verdict.
+Other checkpoints do not require that field. For lens `plan`, `reviewed_sha` and `changed paths` carry the draft plan's
 path, not a sha. If any of these is missing, say so and stop; do not guess a lens or invent
 a base. Read `loom-code/skills/closing-review/references/lenses.md` before scoring — it defines every
 dimension named below and every severity and verdict rule.
@@ -124,6 +127,7 @@ checkpoint again):
 verdict: PASS | PASS_WITH_NOTES | NEEDS_REVISION
 lens: <the lens you were given>
 reviewed_sha: <echoed verbatim>
+review_target_sha: <echoed verbatim, branch-end review only>
 dimension_scores:
   <dimension>: PASS | PASS_WITH_NOTES | NEEDS_REVISION | "N/A — <reason>"
 findings:
