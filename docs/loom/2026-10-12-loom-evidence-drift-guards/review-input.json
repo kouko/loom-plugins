@@ -18,5 +18,13 @@
     }
   ],
   "findings": [],
-  "adversarial": []
+  "adversarial": [
+    {
+      "kind": "adversarial",
+      "command": "echo 'adversarial test'",
+      "artifact": "docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md",
+      "result": "pass",
+      "command_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ]
 }
