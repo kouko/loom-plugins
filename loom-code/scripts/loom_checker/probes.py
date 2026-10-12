@@ -96,12 +96,21 @@ def _direct_pytest_collects(repo: Path, artifact: str) -> bool:
         return False
     if pytest_positionals(args) is None:
         return False
+    return _pytest_collects(repo, artifact, pytest_command, args)
+
+
+def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[str]) -> bool:
+    """Check actual pytest collection under the repository's configuration."""
     # Keep selection and ignore options, but force one quiet level so node IDs
     # remain visible even when the declared command itself uses -q.
     args = [arg for arg in args if arg not in {"-q", "--quiet", "-v", "--verbose"}]
+    # Worker count changes collection cost, not which files pytest selects.
+    args = [arg for index, arg in enumerate(args)
+            if arg not in {"-n", "--numprocesses"} and
+            (index == 0 or args[index - 1] not in {"-n", "--numprocesses"})]
     try:
         result = subprocess.run(
-            [*pytest_command, *args, "--collect-only", "-q"],
+            [*command, *args, "--collect-only", "-q"],
             cwd=repo, capture_output=True, text=True, timeout=60,
         )
     except (OSError, subprocess.TimeoutExpired):
@@ -116,25 +125,13 @@ def _direct_pytest_collects(repo: Path, artifact: str) -> bool:
     return False
 
 
-def _ignored(repo: Path, command: list[str], wanted: Path) -> bool:
-    """True when one of the command's pytest `--ignore=` paths holds `wanted`."""
-    for token in command[1:]:
-        if not token.startswith("--ignore="):
-            continue
-        ignored = Path(token.partition("=")[2])
-        ignored = (ignored if ignored.is_absolute() else repo / ignored).resolve()
-        if wanted == ignored or ignored in wanted.parents:
-            return True
-    return False
-
-
 def suite_collects(repo: Path, artifact: str) -> bool:
     """True when the declared package suite already runs `artifact`.
 
     A graduated probe program -- one carried out of a change's store into the
-    permanent suite -- is collected by the direct pytest command, or named by
-    a pytest path the repository's runner declares. A neighbour the suite
-    would never collect is not in the suite, nor is an ignored file.
+    permanent suite -- is collected by the direct or runner-backed pytest
+    command, or named by a shell test the repository's runner declares. A
+    neighbour the suite would never collect is not in the suite.
 
     Known limitation (user-decided 2026-09-25): a committed symlink into an
     ignored folder makes pytest collect its files again, and they go uncounted.
@@ -150,8 +147,6 @@ def suite_collects(repo: Path, artifact: str) -> bool:
         runs_shell = Path(command[0]).name in {"bash", "sh"}
         if not (runs_pytest or runs_shell):
             continue
-        if runs_pytest and _ignored(repo, command, wanted_path):
-            continue
         for token in command[1:]:
             if token.startswith("-") or token == "pytest":
                 continue
@@ -159,12 +154,20 @@ def suite_collects(repo: Path, artifact: str) -> bool:
             if not (repo / target).exists():
                 continue
             if target == wanted:
-                return True
+                if runs_shell:
+                    return True
+                break
             if not (runs_pytest and (repo / target).is_dir()):
                 continue
             if (repo / target).resolve() in wanted_path.parents and any(
                 fnmatch(Path(wanted).name, pattern) for pattern in PYTEST_FILE_PATTERNS
             ):
+                break
+        else:
+            continue
+        if runs_pytest:
+            prefix = 3 if len(command) >= 3 and command[1:3] == ["-m", "pytest"] else 1
+            if _pytest_collects(repo, artifact, command[:prefix], command[prefix:]):
                 return True
     return False
 

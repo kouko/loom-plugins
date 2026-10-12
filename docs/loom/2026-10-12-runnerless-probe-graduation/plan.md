@@ -26,6 +26,11 @@ charter: 1.1
 - Test: A1 positive: packaged-runnerless-finalizes; negative: packaged-uncollected-refused. A2 positive: packaged-ignored-refused; negative: packaged-selected-accepted. A3 positive: packaged-dot-accepted; negative: packaged-dot-ignored. A4 positive: packaged-conda-accepted; negative: packaged-noop-rejected.
 - Risk: agent-decided — bump the patch version after functional work and before finalization, so its content-bound review remains valid.
 
+**W3-01 Respect configured collection in runner-backed suites**  after: W2-01  acceptance: 3
+- Files: `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_runner_ignored_refused.py`, `loom-code/tests/test_adversarial_probe_cap_coverage.py`, `loom-code/tests/test_selection_finalize.py`; move `docs/loom/2026-10-12-runnerless-probe-graduation/evidence/probes/test_runner_ignored_refused.py` into the permanent suite.
+- Test: A3 positive: runner-collected-file-accepted; negative: runner-file-ignored-by-pytest.ini-refused. Run the graduated adversarial probe and focused suite from the locked offline environment.
+- Risk: agent-decided — use bounded pytest collection for runner-backed pytest commands while retaining the runner's target inventory and shell-test handling.
+
 ## Simplicity check
 - none found
 

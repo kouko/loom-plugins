@@ -6,7 +6,7 @@ import subprocess
 import sys
 
 
-ROOT = Path(__file__).resolve().parents[5]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "loom-code/scripts"))
 
 from loom_checker.probes import suite_collects  # noqa: E402
@@ -41,4 +41,5 @@ def test_runner_ignored_refused(tmp_path: Path) -> None:
     )
     assert "test_kept.py::test_kept" in collected.stdout
     assert "test_ignored.py::test_ignored" not in collected.stdout
+    assert suite_collects(repo, "tests/test_kept.py")
     assert not suite_collects(repo, "tests/test_ignored.py")
