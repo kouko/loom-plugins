@@ -210,6 +210,24 @@ def test_a_program_under_tests_local_is_not_graduated() -> None:
     assert graduated_probe_programs(repo, head, CHANGE_ID) == [kept]
 
 
+def test_runner_root_target_collects_tests_but_respects_ignore() -> None:
+    repo = _branch({})
+    runner = repo / "scripts/run_package_tests.py"
+    runner.write_text(
+        "def loom_family_commands(repo):\n"
+        "    return [['python3', '-m', 'pytest', '.', '--ignore=tests/local']]\n",
+        encoding="utf-8",
+    )
+    kept = "tests/test_probe.py"
+    ignored = "tests/local/test_probe.py"
+    _write(repo, {kept: _probe(1), ignored: _probe(2)})
+    head = _commit_branch(repo)
+
+    assert suite_collects(repo, kept)
+    assert not suite_collects(repo, ignored)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == [kept]
+
+
 PLAIN_TEST = "def test_plain() -> None:\n" + "".join(
     f"    assert {n} + {n} == {2 * n}\n" for n in range(1, 30)
 )

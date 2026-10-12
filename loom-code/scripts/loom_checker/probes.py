@@ -15,6 +15,7 @@ import importlib.util
 import os
 import re
 import shlex
+import subprocess
 
 
 TEST_COMMAND_MARKERS: tuple[tuple[tuple[str, ...], str], ...] = (
@@ -57,13 +58,7 @@ PYTEST_FILE_PATTERNS = ("test_*.py", "*_test.py")
 
 
 def _declared_suite_commands(repo: Path) -> list[list[str]]:
-    """The commands the repository's own test runner declares it runs.
-
-    Which programs the package suite covers is the repository's answer, not a
-    list kept here: `scripts/run_package_tests.py` is the single inventory the
-    declared package command drives, so it is read rather than mirrored. A
-    repository without that runner declares nothing, and nothing is collected.
-    """
+    """The commands the repository's own test runner declares it runs."""
     runner = repo / SUITE_RUNNER
     if not runner.is_file():
         return []
@@ -76,6 +71,46 @@ def _declared_suite_commands(repo: Path) -> list[list[str]]:
         return list(module.loom_family_commands(repo))
     except (OSError, AttributeError, ImportError, SyntaxError, TypeError, ValueError):
         return []
+
+
+def _direct_pytest_collects(repo: Path, artifact: str) -> bool:
+    """Ask a direct package pytest command which tests it actually collects."""
+    declared, _source = declared_test_command(repo)
+    if not declared:
+        return False
+    try:
+        tokens = argv_for(declared)
+    except ValueError:
+        return False
+    if tokens[0] == "pytest":
+        pytest_command = tokens[:1]
+        args = tokens[1:]
+    elif (len(tokens) >= 3 and Path(tokens[0]).name.startswith("python")
+          and tokens[1:3] == ["-m", "pytest"]):
+        pytest_command = tokens[:3]
+        args = tokens[3:]
+    else:
+        return False
+    if pytest_positionals(args) is None:
+        return False
+    # Keep selection and ignore options, but force one quiet level so node IDs
+    # remain visible even when the declared command itself uses -q.
+    args = [arg for arg in args if arg not in {"-q", "--quiet", "-v", "--verbose"}]
+    try:
+        result = subprocess.run(
+            [*pytest_command, *args, "--collect-only", "-q"],
+            cwd=repo, capture_output=True, text=True, timeout=60,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    if result.returncode != 0:
+        return False
+    wanted = (repo / artifact).resolve()
+    for line in result.stdout.splitlines():
+        node = line.split("::", 1)
+        if len(node) == 2 and (repo / node[0]).resolve() == wanted:
+            return True
+    return False
 
 
 def _ignored(repo: Path, command: list[str], wanted: Path) -> bool:
@@ -94,18 +129,17 @@ def suite_collects(repo: Path, artifact: str) -> bool:
     """True when the declared package suite already runs `artifact`.
 
     A graduated probe program -- one carried out of a change's store into the
-    permanent suite -- is named by a pytest path the runner declares, either
-    as that path itself or as a file pytest collects under a declared
-    directory. A neighbour the suite would never collect is not in the suite,
-    and neither is a file under a folder the command passes to pytest as
-    `--ignore=` -- that is how the runner skips every `tests/local/` folder,
-    so the runner's own rule is honoured rather than restated here.
+    permanent suite -- is collected by the direct pytest command, or named by
+    a pytest path the repository's runner declares. A neighbour the suite
+    would never collect is not in the suite, nor is an ignored file.
 
     Known limitation (user-decided 2026-09-25): a committed symlink into an
     ignored folder makes pytest collect its files again, and they go uncounted.
     """
     wanted = os.path.normpath(artifact)
     wanted_path = (repo / wanted).resolve()
+    if not (repo / SUITE_RUNNER).is_file():
+        return _direct_pytest_collects(repo, artifact)
     for command in _declared_suite_commands(repo):
         if not command:
             continue
@@ -125,7 +159,7 @@ def suite_collects(repo: Path, artifact: str) -> bool:
                 return True
             if not (runs_pytest and (repo / target).is_dir()):
                 continue
-            if wanted.startswith(target + os.sep) and any(
+            if (repo / target).resolve() in wanted_path.parents and any(
                 fnmatch(Path(wanted).name, pattern) for pattern in PYTEST_FILE_PATTERNS
             ):
                 return True

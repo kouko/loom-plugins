@@ -17,6 +17,7 @@ from pathlib import Path
 from loom_checker import attestation as attestation_module
 from loom_checker import verification
 from loom_checker.probes import MAX_PROBE_PROGRAMS
+from loom_checker.probes import suite_collects
 
 import pytest
 
@@ -360,6 +361,62 @@ def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
     assert [run["artifact"] for run in executions if run["kind"] == "adversarial"] == [
         graduated
     ]
+
+
+def test_runnerless_pytest_suite_finalizes_a_collected_probe(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, "python3 -m pytest -q tests")
+    graduated = repo / "tests/test_graduated_probe.py"
+    graduated.parent.mkdir()
+    graduated.write_text(
+        "# concern: a defect now covered on every change\n"
+        "def test_graduated() -> None:\n    assert True\n", encoding="utf-8"
+    )
+    commit_all(repo, "graduate into direct pytest suite")
+
+    result = finalize(repo, review_input(tmp_path, PASSING, [
+        {"command": "python3 -m pytest -q tests/test_graduated_probe.py",
+         "artifact": "tests/test_graduated_probe.py"},
+    ]))
+
+    assert result.returncode == 0, result.stderr
+    assert [run["artifact"] for run in written(repo)["executions"]
+            if run["kind"] == "adversarial"] == ["tests/test_graduated_probe.py"]
+
+
+def test_runnerless_pytest_refuses_uncollected_and_broken_suites(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, "python3 -m pytest -q tests")
+    tests = repo / "tests"
+    tests.mkdir()
+    (tests / "test_kept.py").write_text(
+        "def test_kept() -> None:\n    assert True\n", encoding="utf-8"
+    )
+    ignored = tests / "helper_probe.py"
+    ignored.write_text("# concern: uncollected\nassert True\n", encoding="utf-8")
+    commit_all(repo, "add uncollected neighbour")
+    artifact = "tests/helper_probe.py"
+    input_path = review_input(tmp_path, PASSING, [
+        {"command": f"python3 {artifact}", "artifact": artifact},
+    ])
+
+    refused = finalize(repo, input_path)
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+
+    ignored.rename(tests / "test_ignored.py")
+    (tests / "test_ignored.py").write_text(
+        "# concern: collection must succeed\n"
+        "def test_ignored() -> None:\n    assert True\n", encoding="utf-8"
+    )
+    assert suite_collects(repo, "tests/test_ignored.py")
+    (tests / "conftest.py").write_text("raise RuntimeError('collection broken')\n", encoding="utf-8")
+    commit_all(repo, "break collection")
+    artifact = "tests/test_ignored.py"
+    assert not suite_collects(repo, artifact)
+    refused = finalize(repo, review_input(tmp_path, PASSING, [
+        {"command": f"python3 {artifact}", "artifact": artifact},
+    ]))
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
 
 
 def graduate_many(repo: Path, count: int, concern: bool = True) -> list[str]:
