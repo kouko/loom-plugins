@@ -82,7 +82,10 @@ def _direct_pytest_collects(repo: Path, artifact: str) -> bool:
         tokens = argv_for(declared)
     except ValueError:
         return False
-    if tokens[0] == "pytest":
+    if _conda_pytest_argv(tokens):
+        pytest_command = tokens[:7]
+        args = tokens[7:]
+    elif tokens[0] == "pytest":
         pytest_command = tokens[:1]
         args = tokens[1:]
     elif (len(tokens) >= 3 and Path(tokens[0]).name.startswith("python")
@@ -395,12 +398,23 @@ def argv_for(command: str) -> list[str]:
     return tokens
 
 
+def _conda_pytest_argv(tokens: list[str]) -> bool:
+    """Recognize only `conda run -n ENV python -m pytest ...`."""
+    return (len(tokens) >= 7 and Path(tokens[0]).name == "conda"
+            and tokens[1:3] == ["run", "-n"]
+            and bool(tokens[3]) and not tokens[3].startswith("-")
+            and Path(tokens[4]).name.startswith("python")
+            and tokens[5:7] == ["-m", "pytest"])
+
+
 def command_executes_artifact(command: str, artifact: str) -> bool:
     """True when argv directly executes the named Python, shell, or executable file."""
     tokens = argv_for(command)
     wanted = os.path.normpath(artifact)
     suffix = Path(artifact).suffix.lower()
     if suffix == ".py":
+        if _conda_pytest_argv(tokens):
+            tokens = tokens[4:]
         # `uv run [opts] python ...` is checked as the python argv it wraps.
         if tokens[:2] == ["uv", "run"]:
             tokens = next((tokens[i:] for i in range(2, len(tokens))

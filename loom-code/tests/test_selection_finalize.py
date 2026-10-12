@@ -383,6 +383,39 @@ def test_runnerless_pytest_suite_finalizes_a_collected_probe(tmp_path: Path) -> 
             if run["kind"] == "adversarial"] == ["tests/test_graduated_probe.py"]
 
 
+def test_conda_pytest_suite_accepts_execution_and_refuses_noop(tmp_path: Path) -> None:
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    conda = binary / "conda"
+    conda.write_text("#!/bin/sh\nshift 3\nexec \"$@\"\n", encoding="utf-8")
+    conda.chmod(0o755)
+    env = {"PATH": f"{binary}{os.pathsep}{os.environ['PATH']}"}
+    repo = make_repo(tmp_path, "conda run -n loom-test python3 -m pytest -q tests")
+    graduated = repo / "tests/test_graduated_probe.py"
+    graduated.parent.mkdir()
+    graduated.write_text(
+        "# concern: a defect now covered on every change\n"
+        "def test_graduated() -> None:\n    assert True\n", encoding="utf-8",
+    )
+    commit_all(repo, "graduate into conda pytest suite")
+    artifact = "tests/test_graduated_probe.py"
+
+    refused = finalize(repo, review_input(tmp_path, PASSING, [{
+        "command": f"conda run -n loom-test python3 -c 0 {artifact}",
+        "artifact": artifact,
+    }]), env)
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+
+    accepted = finalize(repo, review_input(tmp_path, PASSING, [{
+        "command": f"conda run -n loom-test python3 -m pytest -q {artifact}",
+        "artifact": artifact,
+    }]), env)
+    assert accepted.returncode == 0, accepted.stderr
+    assert [run["artifact"] for run in written(repo)["executions"]
+            if run["kind"] == "adversarial"] == [artifact]
+
+
 def test_runnerless_pytest_refuses_uncollected_and_broken_suites(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, "python3 -m pytest -q tests")
     tests = repo / "tests"

@@ -884,6 +884,30 @@ def test_pytest_runner_directly_executes_named_artifact() -> None:
         assert not probes.command_executes_artifact(command, "tests/probe.py")
 
 
+def test_conda_adversarial_attestation_revalidates_execution(tmp_path: Path) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    command = "conda run -n loom-test python3 -m pytest -q src.py"
+    attestation["executions"][1].update({
+        "command": command,
+        "command_digest": hashlib.sha256(command.encode()).hexdigest(),
+    })
+    head = git(repo, "rev-parse", "HEAD")
+    assert attestation_module.validate_attestation(
+        repo, head, CHANGE, attestation, manifest()
+    ) == []
+
+    command = "conda run -n loom-test python3 -c 0 src.py"
+    attestation["executions"][1].update({
+        "command": command,
+        "command_digest": hashlib.sha256(command.encode()).hexdigest(),
+    })
+    failures = attestation_module.validate_attestation(
+        repo, head, CHANGE, attestation, manifest()
+    )
+    assert any("execute the artifact directly" in reason for _, reason in failures)
+
+
 def bare_repo(tmp_path: Path) -> Path:
     """A repository with no test-command marker and no KICKOFF-DEFAULTS, so
     that `declared_test_command` falls through to the test-file scan."""
