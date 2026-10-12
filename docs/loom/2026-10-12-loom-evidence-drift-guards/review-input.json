@@ -20,8 +20,8 @@
   "findings": [],
   "adversarial": [
     {
-      "command": "cat docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md",
-      "artifact": "docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md"
+      "command": "python3 docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/probes/test_adversarial.py",
+      "artifact": "docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/probes/test_adversarial.py"
     }
   ]
 }
