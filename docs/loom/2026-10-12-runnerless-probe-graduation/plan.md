@@ -31,6 +31,11 @@ charter: 1.1
 - Test: A3 positive: runner-collected-file-accepted; negative: runner-file-ignored-by-pytest.ini-refused. Run the graduated adversarial probe and focused suite from the locked offline environment.
 - Risk: agent-decided — use bounded pytest collection for runner-backed pytest commands while retaining the runner's target inventory and shell-test handling.
 
+**W3-02 Read pytest collection independently of output verbosity**  after: W3-01  acceptance: 1,2,3
+- Files: `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_selection_finalize.py`, `loom-code/tests/test_runner_ignored_refused.py`
+- Test: A1 positive: runnerless suite finalizes with configured `-q`; negative: uncollected file remains refused. A3 positive: runner-collected file accepted with configured `-q`; negative: configured ignore remains refused. The existing Conda test also covers the shared collection path.
+- Risk: agent-decided — ask pytest's collection hook for selected item paths through a temporary plugin, while retaining configured selection, the collection timeout, and fail-closed errors.
+
 ## Simplicity check
 - none found
 

@@ -12,10 +12,12 @@ from pathlib import Path
 from typing import Iterable
 from repo_files import repository_files
 import importlib.util
+import json
 import os
 import re
 import shlex
 import subprocess
+import tempfile
 
 
 TEST_COMMAND_MARKERS: tuple[tuple[tuple[str, ...], str], ...] = (
@@ -55,6 +57,20 @@ SUITE_RUNNER = "scripts/run_package_tests.py"
 
 
 PYTEST_FILE_PATTERNS = ("test_*.py", "*_test.py")
+
+
+# pytest loads -p plugins before collection, and this hook sees session.items
+# after selection: https://docs.pytest.org/en/stable/how-to/writing_plugins.html
+# https://docs.pytest.org/en/stable/reference/reference.html
+PYTEST_COLLECTION_PLUGIN = '''import json
+import os
+from pathlib import Path
+
+def pytest_collection_finish(session):
+    Path(os.environ["LOOM_PYTEST_COLLECTION"]).write_text(
+        json.dumps([str(item.path) for item in session.items]), encoding="utf-8"
+    )
+'''
 
 
 def _declared_suite_commands(repo: Path) -> list[list[str]]:
@@ -101,28 +117,33 @@ def _direct_pytest_collects(repo: Path, artifact: str) -> bool:
 
 def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[str]) -> bool:
     """Check actual pytest collection under the repository's configuration."""
-    # Keep selection and ignore options, but force one quiet level so node IDs
-    # remain visible even when the declared command itself uses -q.
-    args = [arg for arg in args if arg not in {"-q", "--quiet", "-v", "--verbose"}]
     # Worker count changes collection cost, not which files pytest selects.
     args = [arg for index, arg in enumerate(args)
             if arg not in {"-n", "--numprocesses"} and
             (index == 0 or args[index - 1] not in {"-n", "--numprocesses"})]
     try:
-        result = subprocess.run(
-            [*command, *args, "--collect-only", "-q"],
-            cwd=repo, capture_output=True, text=True, timeout=60,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return False
-    if result.returncode != 0:
+        with tempfile.TemporaryDirectory(prefix="loom-pytest-collect-") as directory:
+            scratch = Path(directory)
+            (scratch / "_loom_pytest_collection.py").write_text(
+                PYTEST_COLLECTION_PLUGIN, encoding="utf-8"
+            )
+            output = scratch / "collected.json"
+            env = dict(os.environ)
+            env["PYTHONPATH"] = directory + os.pathsep + env.get("PYTHONPATH", "")
+            env["LOOM_PYTEST_COLLECTION"] = str(output)
+            result = subprocess.run(
+                [*command, *args, "--collect-only", "-p", "_loom_pytest_collection"],
+                cwd=repo, env=env, capture_output=True, text=True, timeout=60,
+            )
+            if result.returncode != 0:
+                return False
+            collected = json.loads(output.read_text(encoding="utf-8"))
+    except (OSError, subprocess.TimeoutExpired, ValueError):
         return False
     wanted = (repo / artifact).resolve()
-    for line in result.stdout.splitlines():
-        node = line.split("::", 1)
-        if len(node) == 2 and (repo / node[0]).resolve() == wanted:
-            return True
-    return False
+    return isinstance(collected, list) and any(
+        isinstance(path, str) and Path(path).resolve() == wanted for path in collected
+    )
 
 
 def suite_collects(repo: Path, artifact: str) -> bool:

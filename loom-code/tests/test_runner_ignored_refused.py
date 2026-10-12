@@ -25,7 +25,7 @@ def test_runner_ignored_refused(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     (repo / "pytest.ini").write_text(
-        "[pytest]\naddopts = --ignore=tests/test_ignored.py\n",
+        "[pytest]\naddopts = -q --ignore=tests/test_ignored.py\n",
         encoding="utf-8",
     )
     (tests / "test_kept.py").write_text(
@@ -39,7 +39,7 @@ def test_runner_ignored_refused(tmp_path: Path) -> None:
         [sys.executable, "-m", "pytest", ".", "--collect-only", "-q"],
         cwd=repo, capture_output=True, text=True, check=True,
     )
-    assert "test_kept.py::test_kept" in collected.stdout
+    assert "tests/test_kept.py: 1" in collected.stdout
     assert "test_ignored.py::test_ignored" not in collected.stdout
     assert suite_collects(repo, "tests/test_kept.py")
     assert not suite_collects(repo, "tests/test_ignored.py")

@@ -363,8 +363,12 @@ def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
     ]
 
 
-def test_runnerless_pytest_suite_finalizes_a_collected_probe(tmp_path: Path) -> None:
+def test_runnerless_pytest_suite_finalizes_a_collected_probe(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     repo = make_repo(tmp_path, "python3 -m pytest -q tests")
+    (repo / "pytest.ini").write_text("[pytest]\naddopts = -q\n", encoding="utf-8")
+    monkeypatch.setenv("PYTEST_ADDOPTS", "-q")
     graduated = repo / "tests/test_graduated_probe.py"
     graduated.parent.mkdir()
     graduated.write_text(
@@ -391,6 +395,7 @@ def test_conda_pytest_suite_accepts_execution_and_refuses_noop(tmp_path: Path) -
     conda.chmod(0o755)
     env = {"PATH": f"{binary}{os.pathsep}{os.environ['PATH']}"}
     repo = make_repo(tmp_path, "conda run -n loom-test python3 -m pytest -q tests")
+    (repo / "pytest.ini").write_text("[pytest]\naddopts = -q\n", encoding="utf-8")
     graduated = repo / "tests/test_graduated_probe.py"
     graduated.parent.mkdir()
     graduated.write_text(
