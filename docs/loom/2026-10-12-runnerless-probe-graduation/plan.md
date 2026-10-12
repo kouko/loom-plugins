@@ -35,3 +35,4 @@ charter: 1.1
 ## Risks
 1. Running collection adds startup and import work before finalization; a bounded timeout and a failed-closed result must protect the gate.
 2. The reported iCHEF repository and its Conda environment are unavailable here; clean fixture repositories must cover its command shape without claiming a live-host run.
+user-decided — second-vendor selection-confirmed: claude
