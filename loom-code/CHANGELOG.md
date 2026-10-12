@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.39.1] — 2026-10-12 — recognize graduated probes in runnerless pytest suites
+
+- Finalization recognizes adversarial tests collected by a declared pytest package suite, including projects without a package runner and runners targeting the repository root. Uncollected files remain refused.
+- Explicit `conda run -n <env> python -m pytest` commands can prove execution of a graduated test; commands that do not execute the artifact remain refused.
+
 ## [3.39.0] — 2026-10-08 — consented external review uses an explicit executor profile
 
 - Add `external-review` as the shared outside execution boundary for Codex, Claude Code and Antigravity CLI. It requires recorded consent, an explicit model and effort, a bounded preflight, and a separately reported failure when execution or verification fails.

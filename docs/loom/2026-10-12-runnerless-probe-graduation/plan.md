@@ -22,7 +22,7 @@ charter: 1.1
 - Risk: agent-decided — recognize only an explicit `conda run` Python pytest argv; refuse ambiguous options and preserve attestation revalidation.
 
 **W2-01 Synchronize the patch release**  after: W1-01,W1-02  acceptance: 1,2,3,4
-- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/README*.md`, `loom-code/tests/test_write_plan_station_text.py`
+- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/README*.md`, `README.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A1 positive: packaged-runnerless-finalizes; negative: packaged-uncollected-refused. A2 positive: packaged-ignored-refused; negative: packaged-selected-accepted. A3 positive: packaged-dot-accepted; negative: packaged-dot-ignored. A4 positive: packaged-conda-accepted; negative: packaged-noop-rejected.
 - Risk: agent-decided — bump the patch version after functional work and before finalization, so its content-bound review remains valid.
 
