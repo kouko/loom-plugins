@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-13-complete-runnerless-probe-graduation",
-  "content_digest": "9c5e315d7e3b658645fe7bddc79a01b82e1a5cb7",
+  "content_digest": "204fb0d6b40205dd4a9a483348987a3821fc5de6",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,13 +20,41 @@
   ],
   "verdicts": [
     {
+      "reviewer": "pr89_codex_re_review",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "0eb8411bfa0d0dfe1f0ff0abe3ce0d421e44766c",
+      "review_target_sha": "290897c52aa629417114463f05504b469d58b81b",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Prior fatal custom-filename finding fixed: root-runner reproduction changed from (False, '') to (True, '').",
+        "Finalization regression accepts the custom file and rejects it when ignored; changed test file 25 passed."
+      ]
+    },
+    {
       "reviewer": "closing_review_a",
       "vendor": "codex",
       "model": "inherited",
       "lens": "code",
       "verdict": "PASS",
-      "reviewed_sha": "0cfa37efa071fed3de5e88c78ff272a9232639e8",
-      "review_target_sha": "b240cece0cc89cb9746b4366bbec8c316b44424f",
+      "reviewed_sha": "b240cece0cc89cb9746b4366bbec8c316b44424f",
+      "review_target_sha": "290897c52aa629417114463f05504b469d58b81b",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
@@ -45,51 +73,14 @@
         {
           "severity": "nit",
           "dimension": "tests",
-          "anchor": "loom-code/tests/test_selection_finalize.py:502",
-          "text": "nitpick: This new runner-environment test asserts only the internal suite_collects helper. Finalization is the production entry that must accept the collected file and reject the ignored file.",
-          "fix": "Extend the existing finalization fixture to assert both outcomes through finalize, then remove the helper-only assertions."
+          "anchor": "loom-code/tests/test_selection_finalize.py:550",
+          "text": "nitpick: The prior finding remains unfixed. This runner-environment test still checks only the internal suite_collects helper, rather than finalization's acceptance and refusal.",
+          "fix": "Extend this fixture to assert both outcomes through finalize, then remove the helper-only assertions."
         }
       ],
       "notes": [
-        "All five changed test files ran: 113 passed, 0 skipped. The working tree remained clean.",
-        "The cited command forms and collection hook agree with official uv, Conda, and pytest references."
-      ]
-    },
-    {
-      "reviewer": "closing_review_b",
-      "vendor": "codex",
-      "model": "inherited",
-      "lens": "code",
-      "verdict": "PASS",
-      "reviewed_sha": "0cfa37efa071fed3de5e88c78ff272a9232639e8",
-      "review_target_sha": "b240cece0cc89cb9746b4366bbec8c316b44424f",
-      "dimension_scores": {
-        "security": "PASS",
-        "architecture": "PASS",
-        "correctness": "PASS",
-        "naming": "PASS",
-        "tests": "PASS_WITH_NOTES",
-        "refactoring": "PASS",
-        "cross-task-coherence": "PASS",
-        "external-surface-grounding": "PASS",
-        "principles-conformance": "PASS",
-        "architecture-conformance": "N/A — no ARCHITECTURE.md exists",
-        "deliberate-simplification": "PASS",
-        "deletion-first": "PASS"
-      },
-      "findings": [
-        {
-          "severity": "nit",
-          "dimension": "tests",
-          "anchor": "loom-code/tests/test_runner_ignored_refused.py:44",
-          "text": "nitpick: The new test calls suite_collects, which now only forwards to suite_collection and has no production caller. The test should exercise the entry used by finalization.",
-          "fix": "Call suite_collection in this test and assert its collected result."
-        }
-      ],
-      "notes": [
-        "All five changed test files ran: 113 passed, none skipped.",
-        "Verified cited uv, Conda, and pytest behavior against official documentation.",
-        "The cumulative diff matches five Acceptance outcomes; independent acceptance records 5/5 working."
+        "Fatal custom-filename refusal closed by deferring runner directory matching to pytest collection.",
+        "Changed test file passed: 25 passed, 0 skipped; worktree clean."
       ]
     }
   ],
