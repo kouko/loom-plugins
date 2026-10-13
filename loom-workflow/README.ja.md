@@ -262,7 +262,8 @@ UserPromptSubmit hook で、メッセージを送るたびに agent に届ける
 「これから commit する」                       → git-memory
 「デシジョンマップを開く」/「開地圖」           → decision-map
 「wrap up」/「save state」                     → handoff
-「今どこだっけ」/「振り返り」                   → recap-state
+「今どこだっけ」/「今の進捗を振り返って」         → recap-state
+「開発の進め方を振り返って改善点を探して」       → retro
 「second opinion」/「別のモデルに聞いて」       → independent-advisor
 ```
 

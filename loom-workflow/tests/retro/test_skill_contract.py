@@ -51,3 +51,11 @@ def test_read_only_shell_inspection_remains_available() -> None:
     text = skill_text()
     assert "write-capable tool" not in text
     assert "Do not modify files" in text
+
+
+def test_sensitive_transcript_handling_names_model_context_boundary() -> None:
+    text = skill_text()
+    assert "Keep sensitive transcript text local" not in text
+    assert "tool output enters the model context" in text
+    assert "redact secrets locally before any excerpt appears in tool output" in text
+    assert "redacted excerpt" in text

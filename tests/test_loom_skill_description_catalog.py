@@ -19,9 +19,9 @@ LOOM_PLUGINS = ("loom-code", "loom-design", "loom-workflow")
 BASELINE_LEAF_COUNT = 20
 BASELINE_RENDERED_DESCRIPTION_CHARS = 6_746
 DESCRIPTION_BUDGET = 4_047
-# The new standalone retro leaf adds 232 rendered characters. Keep the old
+# The new standalone retro leaf adds 229 rendered characters. Keep the old
 # 60% budget on the pre-existing catalog; grant only the new leaf's own size.
-RETRO_DESCRIPTION_CHARS = 232
+RETRO_DESCRIPTION_CHARS = 229
 ROUTER_NAMES = {
     "loom-code": "using-loom-code",
     "loom-design": "using-loom-design",

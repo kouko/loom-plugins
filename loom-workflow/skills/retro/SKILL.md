@@ -1,9 +1,9 @@
 ---
 name: retro
 description: |
-  Review one current or specified coding session for source-backed improvements
-  to the project's development environment. Use only when the user asks for a
-  session retrospective or invokes retro; not for mining recurring skill issues.
+  Review one current or specified coding session for source-backed project
+  development improvements. Use for a requested retrospective, including
+  振り返り seeking improvements; not for current-progress recaps or recurring skill mining.
 user-invocable: true
 ---
 
@@ -11,21 +11,26 @@ user-invocable: true
 
 Review one coding session at the user's request. This is read-only advice about
 the project's development environment, not a Loom station or quality gate.
-Do not modify files, create issues, or dispatch session content to another
-service as part of this skill. Use local tools for inspection only; do not
-run commands that mutate the project or session records.
+Do not modify files, create issues, or send session content to an additional
+service or agent as part of this skill. Use tools for inspection only;
+do not run commands that mutate the project or session records.
 
 ## Select and read the session
 
 1. Use the specified session when the user identifies one; otherwise use the
    current session. Do not combine sessions. If the target is ambiguous, ask
    which session they mean before drawing conclusions.
-2. Read the available primary source locally: the visible conversation and
-   tool events for the current session, or the identified transcript for a
+2. Inspect the available primary source: the visible conversation and tool
+   events for the current session, or the identified transcript for a
    specified session. Include enough surrounding events to distinguish a
    genuine obstacle from an intentional choice or changed user priority.
-   Exclude hidden reasoning and encrypted content. Keep sensitive transcript
-   text local and quote only the minimum necessary evidence in the response.
+   Exclude hidden reasoning and encrypted content. Reading a local transcript
+   through a tool does not isolate it: tool output enters the model context
+   and may be processed by the host service. For specified transcripts,
+   redact secrets locally before any excerpt appears in tool output when
+   feasible. If sensitive source cannot be safely inspected, ask for a
+   redacted excerpt or state the limitation. The current conversation is
+   already visible to the model; minimize quotations in the response.
 3. Inspect relevant project instructions, documentation, check commands, and
    CI configuration before recommending a new pointer or automated check.
    Identify existing checks that are absent from the workflow, broken, or
