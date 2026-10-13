@@ -1,8 +1,8 @@
-"""loom-workflow ships twelve skills: eight counted tools, two standalone
+"""loom-workflow ships thirteen skills: eight counted tools, three standalone
 tools, out-of-contract loom-memory, and one optional discovery router.
 
 The loom 1.0 budget counts eight tools in loom-code's contract manifest.
-`goal-create` and `dbt-model-style` sit outside the loom flow and are marked
+`goal-create`, `dbt-model-style`, and `retro` sit outside the loom flow and are marked
 `standalone: true` there, so they ship here but are not counted
 (user-decided 2026-09-02). `loom-memory` joined this plugin's skill
 directory when the independent `loom-memory` plugin retired into
@@ -11,7 +11,7 @@ retired from [loom-code's] contract ... owned solely by the independent
 `loom-memory` plugin" (test_contract_manifest.py) — survives the move: the
 manifest still does not name it, counted or standalone. This test pins all
 boundaries: the directory set on disk, the manifest's agreement on its own
-ten tools, and the deliberate absence of `loom-memory` and the optional
+eleven tools, and the deliberate absence of `loom-memory` and the optional
 `using-loom-workflow` discovery router from that manifest. Adding discovery
 does not change the lifecycle tool budget.
 """
@@ -31,7 +31,7 @@ COUNTED = {
     "loom-visualization",
     "recap-state",
 }
-STANDALONE = {"goal-create", "dbt-model-style"}
+STANDALONE = {"goal-create", "dbt-model-style", "retro"}
 # Ships in loom-workflow/skills/ but is deliberately absent from loom-code's
 # contract manifest — carried over unchanged from when `loom-memory` was its
 # own independent plugin (REQ-24 of 2026-09-10-okf-compatible-loom-memory).
@@ -61,11 +61,11 @@ def _manifest_tools() -> dict[str, bool]:
     return tools
 
 
-def test_twelve_skill_directories_ship():
+def test_thirteen_skill_directories_ship():
     on_disk = {p.name for p in SKILLS_DIR.iterdir() if p.is_dir()}
 
     assert on_disk == COUNTED | STANDALONE | OUT_OF_CONTRACT | OPTIONAL_ROUTERS
-    assert len(on_disk) == 12
+    assert len(on_disk) == 13
 
 
 def test_every_skill_has_a_skill_md():
@@ -73,7 +73,7 @@ def test_every_skill_has_a_skill_md():
         assert (directory / "SKILL.md").is_file(), directory
 
 
-def test_manifest_agrees_on_the_two_standalone_skills():
+def test_manifest_agrees_on_the_three_standalone_skills():
     tools = _manifest_tools()
 
     assert set(tools) == COUNTED | STANDALONE
