@@ -16,6 +16,11 @@ charter: 1.1
 - Test: A1 positive: runnerless-finalizes; negative: broken-collection-refused. A2 positive: selected-accepted; negative: unselected-refused. A3 positive: runner-root-accepted; negative: ignored-refused. A4 positive: conda-executes; negative: conda-noop-refused. A5 positive: official-uv-syntax-matches; negative: unsupported-launcher-refused.
 - Risk: agent-decided — cite the official `uv run` option reference beside the existing parser; preserve its behavior and all existing test coverage in `test_selection_finalize.py`.
 
+**W2-01 Honor configured pytest file names**  after: W1-01  acceptance: 3
+- Files: `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_selection_finalize.py`
+- Test: A3 positive: configured-name-finalizes; negative: configured-name-ignored-refused.
+- Risk: agent-decided — remove the fixed filename prefilter because pytest collection is authoritative; preserve the existing root, ignored-path, and direct-command coverage in `test_selection_finalize.py` and `test_adversarial_probe_cap_coverage.py`.
+
 ## Simplicity check
 - none found
 
@@ -25,3 +30,4 @@ charter: 1.1
 ## Risks
 1. The original functional behavior already passed the full package suite and clean-copy acceptance, but content-bound review must run again on the new confirmed intent.
 2. Claude Code's session limit blocked the previous outside review; this plan does not alter that executor or assume its current availability.
+3. An additional Codex review of PR #89 reproduced a runner-backed false refusal when `python_files` changes pytest's file naming; W2-01 closes that Acceptance #3 defect in the same branch.
