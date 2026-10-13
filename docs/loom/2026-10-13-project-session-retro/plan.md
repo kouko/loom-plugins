@@ -21,10 +21,15 @@ charter: 1.1
 - Test: A3 positive: retro-and-distill-routes; negative: distill-contract-unchanged.
 - Risk: agent-decided — register retro as standalone outside the station budget; keep mechanism counts unchanged because standalone tools are excluded.
 
-**W2-02 Document the tool and release**  after: W2-01  acceptance: 3
-- Files: `loom-workflow/README.md`, `loom-workflow/README.zh-TW.md`, `loom-workflow/README.ja.md`, `README.md`, `loom-workflow/plugin.json`, `loom-workflow/CHANGELOG.md`
+**W2-02 Document the tool**  after: W2-01  acceptance: 3
+- Files: `loom-workflow/README.md`, `loom-workflow/README.zh-TW.md`, `loom-workflow/README.ja.md`, `README.md`
 - Test: A3 positive: published-skill-catalog; boundary: existing-distill-entry.
-- Risk: agent-decided — name this user-approved single-session project review as an explicit standalone admission exception; bump the plugin minor version before finalization.
+- Risk: agent-decided — name this user-approved single-session project review as an explicit standalone admission exception and set the new plugin version in all four READMEs.
+
+**W3-01 Synchronize release metadata**  after: W2-02  acceptance: 3
+- Files: `loom-workflow/plugin.json`, `loom-workflow/.claude-plugin/plugin.json`, `loom-workflow/.codex-plugin/plugin.json`, `loom-workflow/package.json`, `loom-workflow/CHANGELOG.md`, `loom-workflow/tests/scripts/test_release_metadata.py`
+- Test: A3 positive: version-and-changelog-sync; boundary: prior-distill-version-record.
+- Risk: agent-decided — bump loom-workflow minor version for new skill and keep historical distill entries unchanged.
 
 ## Simplicity check
 - Omit a log-ingestion program — taken
