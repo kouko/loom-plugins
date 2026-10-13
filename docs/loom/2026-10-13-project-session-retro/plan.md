@@ -1,5 +1,5 @@
 # Project session retro — plan
-intent: 2026-10-13-project-session-retro@6ee4b4e0
+intent: 2026-10-13-project-session-retro@cbc82996
 charter: 1.1
 
 ## Current State Evidence
