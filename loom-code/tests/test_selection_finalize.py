@@ -17,6 +17,7 @@ from pathlib import Path
 from loom_checker import attestation as attestation_module
 from loom_checker import verification
 from loom_checker.probes import MAX_PROBE_PROGRAMS
+from loom_checker.probes import suite_collects
 
 import pytest
 
@@ -360,6 +361,194 @@ def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
     assert [run["artifact"] for run in executions if run["kind"] == "adversarial"] == [
         graduated
     ]
+
+
+def test_runner_honors_configured_pytest_file_names_and_ignores(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, "python3 scripts/run_package_tests.py --loom-family")
+    runner = repo / "scripts/run_package_tests.py"
+    runner.parent.mkdir()
+    runner.write_text(
+        "import subprocess\nimport sys\n"
+        "def loom_family_commands(repo):\n"
+        "    return [[sys.executable, '-m', 'pytest', 'tests']]\n"
+        "if __name__ == '__main__':\n"
+        "    raise SystemExit(subprocess.call(loom_family_commands(None)[0]))\n",
+        encoding="utf-8",
+    )
+    tests = repo / "tests"
+    tests.mkdir()
+    (tests / "check_kept.py").write_text(
+        "def test_kept():\n    assert True\n", encoding="utf-8",
+    )
+    graduated = tests / "check_graduated_probe.py"
+    graduated.write_text(
+        "# concern: a defect now covered on every change\n"
+        "def test_graduated():\n    assert True\n", encoding="utf-8",
+    )
+    config = repo / "pytest.ini"
+    config.write_text("[pytest]\npython_files = check_*.py\n", encoding="utf-8")
+    commit_all(repo, "graduate a configured pytest file")
+    artifact = "tests/check_graduated_probe.py"
+    input_path = review_input(tmp_path, PASSING, [
+        {"command": f"python3 {artifact}", "artifact": artifact},
+    ])
+
+    assert suite_collects(repo, artifact)
+    accepted = finalize(repo, input_path)
+    assert accepted.returncode == 0, accepted.stderr
+    assert [run["artifact"] for run in written(repo)["executions"]
+            if run["kind"] == "adversarial"] == [artifact]
+
+    config.write_text(
+        f"[pytest]\npython_files = check_*.py\naddopts = --ignore={artifact}\n",
+        encoding="utf-8",
+    )
+    commit_all(repo, "ignore the configured pytest file")
+    assert not suite_collects(repo, artifact)
+    refused = finalize(repo, input_path)
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    assert "package suite already runs" in refused.stderr
+
+
+def test_runnerless_pytest_suite_finalizes_a_collected_probe(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repo = make_repo(tmp_path, "python3 -m pytest -q tests")
+    (repo / "pytest.ini").write_text("[pytest]\naddopts = -q\n", encoding="utf-8")
+    monkeypatch.setenv("PYTEST_ADDOPTS", "-q")
+    graduated = repo / "tests/test_graduated_probe.py"
+    graduated.parent.mkdir()
+    graduated.write_text(
+        "# concern: a defect now covered on every change\n"
+        "def test_graduated() -> None:\n    assert True\n", encoding="utf-8"
+    )
+    commit_all(repo, "graduate into direct pytest suite")
+
+    result = finalize(repo, review_input(tmp_path, PASSING, [
+        {"command": "python3 -m pytest -q tests/test_graduated_probe.py",
+         "artifact": "tests/test_graduated_probe.py"},
+    ]))
+
+    assert result.returncode == 0, result.stderr
+    assert [run["artifact"] for run in written(repo)["executions"]
+            if run["kind"] == "adversarial"] == ["tests/test_graduated_probe.py"]
+
+
+def test_conda_pytest_suite_accepts_execution_and_refuses_noop(tmp_path: Path) -> None:
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    conda = binary / "conda"
+    conda.write_text("#!/bin/sh\nshift 3\nexec \"$@\"\n", encoding="utf-8")
+    conda.chmod(0o755)
+    env = {"PATH": f"{binary}{os.pathsep}{os.environ['PATH']}"}
+    repo = make_repo(tmp_path, "conda run -n loom-test python3 -m pytest -q tests")
+    (repo / "pytest.ini").write_text("[pytest]\naddopts = -q\n", encoding="utf-8")
+    graduated = repo / "tests/test_graduated_probe.py"
+    graduated.parent.mkdir()
+    graduated.write_text(
+        "# concern: a defect now covered on every change\n"
+        "def test_graduated() -> None:\n    assert True\n", encoding="utf-8",
+    )
+    commit_all(repo, "graduate into conda pytest suite")
+    artifact = "tests/test_graduated_probe.py"
+
+    refused = finalize(repo, review_input(tmp_path, PASSING, [{
+        "command": f"conda run -n loom-test python3 -c 0 {artifact}",
+        "artifact": artifact,
+    }]), env)
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+
+    accepted = finalize(repo, review_input(tmp_path, PASSING, [{
+        "command": f"conda run -n loom-test python3 -m pytest -q {artifact}",
+        "artifact": artifact,
+    }]), env)
+    assert accepted.returncode == 0, accepted.stderr
+    assert [run["artifact"] for run in written(repo)["executions"]
+            if run["kind"] == "adversarial"] == [artifact]
+
+
+def test_runnerless_pytest_refuses_uncollected_and_broken_suites(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, "python3 -m pytest -q tests")
+    tests = repo / "tests"
+    tests.mkdir()
+    (tests / "test_kept.py").write_text(
+        "def test_kept() -> None:\n    assert True\n", encoding="utf-8"
+    )
+    ignored = tests / "helper_probe.py"
+    ignored.write_text("# concern: uncollected\nassert True\n", encoding="utf-8")
+    commit_all(repo, "add uncollected neighbour")
+    artifact = "tests/helper_probe.py"
+    input_path = review_input(tmp_path, PASSING, [
+        {"command": f"python3 {artifact}", "artifact": artifact},
+    ])
+
+    refused = finalize(repo, input_path)
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+
+    ignored.rename(tests / "test_ignored.py")
+    (tests / "test_ignored.py").write_text(
+        "# concern: collection must succeed\n"
+        "def test_ignored() -> None:\n    assert True\n", encoding="utf-8"
+    )
+    assert suite_collects(repo, "tests/test_ignored.py")
+    (tests / "conftest.py").write_text("raise RuntimeError('collection broken')\n", encoding="utf-8")
+    commit_all(repo, "break collection")
+    artifact = "tests/test_ignored.py"
+    assert not suite_collects(repo, artifact)
+    refused = finalize(repo, review_input(tmp_path, PASSING, [
+        {"command": f"python3 {artifact}", "artifact": artifact},
+    ]))
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    assert "collection unavailable" in refused.stderr
+    assert "collection broken" in refused.stderr
+
+
+def test_runner_collection_uses_declared_package_environment(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    env_only = tmp_path / "env-only"
+    env_only.mkdir()
+    (env_only / "suite_dependency.py").write_text("VALUE = True\n", encoding="utf-8")
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    conda = binary / "conda"
+    conda.write_text(
+        "#!/bin/sh\nshift 3\n"
+        f"export PYTHONPATH='{env_only}':\"$PYTHONPATH\"\n"
+        "exec \"$@\"\n", encoding="utf-8",
+    )
+    conda.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{binary}{os.pathsep}{os.environ['PATH']}")
+    repo = make_repo(
+        tmp_path,
+        "conda run -n loom-test python3 scripts/run_package_tests.py --loom-family",
+    )
+    runner = repo / "scripts/run_package_tests.py"
+    runner.parent.mkdir()
+    runner.write_text(
+        "import suite_dependency\n"
+        "def loom_family_commands(repo):\n"
+        "    return [['python3', '-m', 'pytest', 'tests']]\n",
+        encoding="utf-8",
+    )
+    tests = repo / "tests"
+    tests.mkdir()
+    (tests / "test_kept.py").write_text(
+        "import suite_dependency\n"
+        "def test_kept():\n    assert suite_dependency.VALUE\n", encoding="utf-8",
+    )
+    (tests / "test_ignored.py").write_text(
+        "def test_ignored():\n    assert True\n", encoding="utf-8",
+    )
+    (repo / "pytest.ini").write_text(
+        "[pytest]\naddopts = --ignore=tests/test_ignored.py\n", encoding="utf-8",
+    )
+    assert suite_collects(repo, "tests/test_kept.py")
+    assert not suite_collects(repo, "tests/test_ignored.py")
 
 
 def graduate_many(repo: Path, count: int, concern: bool = True) -> list[str]:

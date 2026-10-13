@@ -1,0 +1,89 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-13-complete-runnerless-probe-graduation",
+  "content_digest": "204fb0d6b40205dd4a9a483348987a3821fc5de6",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_runner_ignored_refused.py",
+      "artifact": "loom-code/tests/test_runner_ignored_refused.py",
+      "result": "pass",
+      "command_digest": "07d57f01acd20bce44573cb8ef710d0c7ab90da007ea457ded893d3b0faace9d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "pr89_codex_re_review",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "0eb8411bfa0d0dfe1f0ff0abe3ce0d421e44766c",
+      "review_target_sha": "290897c52aa629417114463f05504b469d58b81b",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Prior fatal custom-filename finding fixed: root-runner reproduction changed from (False, '') to (True, '').",
+        "Finalization regression accepts the custom file and rejects it when ignored; changed test file 25 passed."
+      ]
+    },
+    {
+      "reviewer": "closing_review_a",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "b240cece0cc89cb9746b4366bbec8c316b44424f",
+      "review_target_sha": "290897c52aa629417114463f05504b469d58b81b",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/tests/test_selection_finalize.py:550",
+          "text": "nitpick: The prior finding remains unfixed. This runner-environment test still checks only the internal suite_collects helper, rather than finalization's acceptance and refusal.",
+          "fix": "Extend this fixture to assert both outcomes through finalize, then remove the helper-only assertions."
+        }
+      ],
+      "notes": [
+        "Fatal custom-filename refusal closed by deferring runner directory matching to pytest collection.",
+        "Changed test file passed: 25 passed, 0 skipped; worktree clean."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
