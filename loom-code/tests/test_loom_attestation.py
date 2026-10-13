@@ -47,7 +47,13 @@ def repo_with_content(tmp_path: Path) -> Path:
 
 
 def manifest() -> dict:
-    return {"publication_only_paths": ["docs/loom/<change-id>/attestation.json"]}
+    return {
+        "publication_only_paths": [
+            "docs/loom/<change-id>/attestation.json",
+            "docs/loom/<change-id>/acceptance-test-report.md",
+            "docs/loom/<change-id>/evidence/**",
+        ]
+    }
 
 
 PROBE = f"docs/loom/{CHANGE}/evidence/probes/test_probe.py"

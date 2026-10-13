@@ -6,8 +6,14 @@ version: 2.3.1
 
 # Paths matched here are publication metadata. They do not change the
 # functional content identity that executions and reviews attest to.
+# Evidence files (the acceptance test report and its evidence store) are
+# publication metadata too: they describe what was tested, they are not
+# functional content themselves, so a difference between the tested and the
+# reviewed tree that is confined to them does not invalidate the attestation.
 publication_only_paths:
   - docs/loom/<change-id>/attestation.json
+  - docs/loom/<change-id>/acceptance-test-report.md
+  - docs/loom/<change-id>/evidence/**
 
 stations:            # produce one per-change artifact each (§3)
   - {name: capture-intent, owner: loom-design, produces: intent,  decision_point: 1}

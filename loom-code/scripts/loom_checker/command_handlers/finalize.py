@@ -158,32 +158,6 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     if git_text(repo, "config", "--list", "--null") != config_before:
         return [("finalize.stable-tree", "git configuration changed during functional verification")]
 
-    # ===== EVIDENCE DRIFT GUARD CHECKS =====
-    # These run after successful Build and before attestation generation
-    
-    # Parse intent for sections needed by checks
-    intent_path = artifact_path(manifest, "intent", change_id, repo)
-    if intent_path.is_file():
-        intent_text = read_text(intent_path)
-        from loom_checker.parsing import parse_document
-        _intent_front, intent_sections = parse_document(intent_text)
-        
-        # Evidence drift guard checks
-        failures: list[tuple[str, str]] = []
-        
-        # Check acceptance test report coverage
-        failures += check_attestation_coverage(manifest, repo, change_id, intent_sections, {})
-        
-        # Check commit identity (tested vs reviewed commit)
-        failures += check_commit_identity(manifest, repo, change_id, intent_sections, {})
-        
-        # Check intent version (intent unchanged since confirmation)
-        failures += check_intent_version(manifest, repo, change_id, intent_sections, {})
-        
-        if failures:
-            return failures
-    # ===== END EVIDENCE DRIFT GUARD CHECKS =====
-
     digest = functional_content_digest(repo, head_sha, change_id, manifest)
     if digest is None:
         return [("finalize.digest", "cannot compute functional content digest")]
@@ -191,7 +165,45 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         "schema": ATTESTATION_SCHEMA, "change_id": change_id,
         "content_digest": digest, "executions": executions,
         "verdicts": verdicts, "findings": findings, "selection": None,
+        "intent_confirmed_sha": None, "tested_commit": None,
+        "reviewed_commit": head_sha, "acceptance_status": [],
     }
+
+    # ===== EVIDENCE DRIFT GUARD CHECKS =====
+    # The bookkeeping fields above are bound to the change's own artifacts:
+    # intent_confirmed_sha from the intent frontmatter (recorded by
+    # capture-intent at confirmation), tested_commit from the acceptance
+    # test report's fixed "Tried on ... at <sha>" line. Each check is
+    # skipped when the field is absent, so pre-bookkeeping attestations
+    # stay valid; a new change is checked.
+    from loom_checker.parsing import parse_document
+    import re as _re
+    intent_path = artifact_path(manifest, "intent", change_id, repo)
+    if intent_path.is_file():
+        intent_text = read_text(intent_path)
+        _intent_front, intent_sections = parse_document(intent_text)
+        _sha = _re.search(
+            r"^intent_confirmed_sha:\s*([0-9a-f]{7,64})\s*$",
+            intent_text, _re.IGNORECASE | _re.MULTILINE,
+        )
+        if _sha:
+            attestation["intent_confirmed_sha"] = _sha.group(1).lower()
+        report_path = artifact_path(manifest, "acceptance-test-report", change_id, repo)
+        if report_path.is_file():
+            _tested = _re.search(
+                r"at\s+([0-9a-f]{7,40})", read_text(report_path)
+            )
+            if _tested:
+                attestation["tested_commit"] = _tested.group(1).lower()
+
+        failures: list[tuple[str, str]] = []
+        failures += check_attestation_coverage(manifest, repo, change_id, intent_sections, attestation)
+        failures += check_commit_identity(manifest, repo, change_id, intent_sections, attestation)
+        failures += check_intent_version(manifest, repo, change_id, intent_sections, attestation)
+        if failures:
+            return failures
+    # ===== END EVIDENCE DRIFT GUARD CHECKS =====
+
     target = artifact_path(manifest, "attestation", change_id, repo)
     target.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(

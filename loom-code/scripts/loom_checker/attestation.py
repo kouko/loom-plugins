@@ -21,7 +21,15 @@ ATTESTATION_SCHEMA = "loom-attestation/v2"
 ATTESTATION_KEYS_V1 = {
     "schema", "change_id", "content_digest", "executions", "verdicts", "findings"
 }
-ATTESTATION_KEYS = ATTESTATION_KEYS_V1 | {"selection"}
+# v2 bookkeeping fields: the tree the evidence was produced at, the tree it
+# was reviewed at, the intent version it was verified against, and the
+# per-Acceptance coverage status. They live on the attestation because it is
+# publication metadata (excluded from the functional digest), so recording
+# them never invalidates the content they describe.
+ATTESTATION_BOOKKEEPING = {
+    "intent_confirmed_sha", "tested_commit", "reviewed_commit", "acceptance_status",
+}
+ATTESTATION_KEYS = ATTESTATION_KEYS_V1 | {"selection"} | ATTESTATION_BOOKKEEPING
 KEYS_BY_SCHEMA = {ATTESTATION_SCHEMA_V1: ATTESTATION_KEYS_V1, ATTESTATION_SCHEMA: ATTESTATION_KEYS}
 
 
