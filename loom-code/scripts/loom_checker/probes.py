@@ -86,6 +86,9 @@ def _runner_launcher(repo: Path) -> list[str] | None:
     if len(tokens) > 1 and Path(tokens[0]).name.startswith("python") and os.path.normpath(tokens[1]) == runner:
         return tokens[:1]
     if tokens[:2] == ["uv", "run"]:
+        # uv run defines --isolated, --no-project, and --offline as switches;
+        # --with-requirements and --with each consume the following value.
+        # https://docs.astral.sh/uv/reference/cli/#uv-run
         index = 2
         while index < len(tokens):
             if tokens[index] in {"--isolated", "--no-project", "--offline"}:
