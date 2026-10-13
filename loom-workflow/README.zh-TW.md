@@ -2,9 +2,9 @@
 
 Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
-> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat 圖表與推理頁，以及 second opinion。
+> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、單次 session 回顧、session distill、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.7.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.8.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 這是什麼
 
@@ -22,6 +22,9 @@ Loom 讓一個變更依序走過各站：`loom-design` 整理 intent 與 spec，
 一個 skill 屬於這裡，條件是它跨站協調工作，或跨 session 攜帶狀態；只是被好幾個
 plugin 用到並不算數。`decision-map` 是這條規則的第一個實例。這條規則只 gate
 新收錄，plugin 裡既有的 utility skill 維持不動。
+
+`retro` 是使用者明確核准的例外：依要求唯讀回顧一次開發 session，找出專案開發環境的改善點。
+它不是 Loom 站，也不是品質閘。
 
 ## 什麼時候用哪個工具
 
@@ -56,9 +59,10 @@ flowchart TD
         record["loom-workflow:loom-memory<br/>branch 關閉前 Record，<br/>依要求或 agent 判斷；<br/>沒有任何站會呼叫它"]
     end
 
-    subgraph sessions["跨 session"]
+    subgraph sessions["Session 工作"]
         handoff["loom-workflow:handoff<br/>session 結束時存下狀態，<br/>下一個 session 接續"]
         distill["loom-workflow:distill-sessions<br/>從過去的 session<br/>挖出 skill 改進點"]
+        retro["loom-workflow:retro<br/>回顧一次 session 的<br/>專案改善點"]
     end
 
     subgraph anytime["隨時"]
@@ -92,15 +96,16 @@ flowchart TD
 - **commit / PR / merge 時** — `git-memory` 在任何站的每次 commit 前、建立 PR
   時，以及 `ship` 之後才進行的 PR merge 之前執行。`loom-memory` 在 branch
   關閉前，依要求或 agent 判斷 Record 持久的教訓；沒有任何站會呼叫它。
-- **跨 session** — `handoff` 在 session 結束時存下狀態，並在下一個 session
-  接續。`distill-sessions` 從過去的 session 挖出 skill 改進提案。
+- **Session 工作** — `handoff` 在 session 結束時存下狀態，並在下一個 session
+  接續。`distill-sessions` 從過去的 session 挖出 skill 改進提案。`retro` 依要求
+  回顧目前或指定的一次 session，根據原始紀錄提出專案改善建議；skill 問題只列為候選。
 - **隨時** — `independent-advisor` 向另一個 executor 取得 second opinion，
   `loom-visualization` 把比較、流程與推理呈現成表格或圖（也能做成推理頁），`goal-create` 只在指名呼叫時執行，
   `using-loom-workflow` 在不確定該用哪個工具時分派請求。
 
 ## Skills
 
-共 12 個 skills：11 個工具與 1 個可選入口。
+共 13 個 skills：12 個工具與 1 個可選入口。
 
 | Skill | 角色 |
 |---|---|
@@ -113,12 +118,13 @@ flowchart TD
 | [`git-memory`](skills/git-memory/) | 在每次 `git commit`、`gh pr create`、`gh pr merge` 之前分類 Decision、Learning、Gotcha memory；也能找回過去某個 Git 決策的理由。 |
 | [`handoff`](skills/handoff/) | 把 session 狀態存成 `.claude/handoffs/` 下的 HANDOFF 檔，或在新 session 中從它接續。 |
 | [`distill-sessions`](skills/distill-sessions/) | 挖掘過去的 Claude Code 與 Codex session（可用時加上 `/insights` facets），產出依 skill 排序的 friction 與可審閱的 SKILL.md 提案。 |
+| [`retro`](skills/retro/) | 依要求唯讀回顧目前或指定的一次開發 session，以可追溯的原始紀錄提出專案改善建議；skill 問題另列為候選，不修改檔案。 |
 | [`independent-advisor`](skills/independent-advisor/) | 明確要求外部 agent 審查 code、plan 或決策時，交由 `loom-code:external-review` 執行並保留原審查標準；也能向不同 model tier、effort 或廠商取得開放式 second opinion。花錢或把資料送出本機需經同意。 |
 | [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。plain-language reference 收錄寫法指引、選項判斷規則、八種對話情境表格與表格規則，另有軟體、設計、商業三份表格集。不用於 Obsidian 筆記。 |
 | [`goal-create`](skills/goal-create/) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
 Loom 的契約計入其中八個工具。`goal-create` 與 `dbt-model-style` 是 Loom
-流程之外的 standalone skill，`loom-memory` 與入口路由則維持在契約之外。
+流程之外的 standalone skill；`retro` 也是獨立工具，`loom-memory` 與入口路由則維持在契約之外。
 
 ## Repository 結構
 
@@ -145,6 +151,7 @@ loom-workflow/
 │   ├── loom-memory/
 │   ├── loom-visualization/
 │   ├── recap-state/
+│   ├── retro/
 │   └── using-loom-workflow/
 ├── tests/                 git-memory、loom-memory 與 loom-visualization 的測試
 ├── CHANGELOG.md
