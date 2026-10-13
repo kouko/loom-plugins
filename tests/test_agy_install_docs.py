@@ -185,7 +185,8 @@ START_COMMANDS = {
     "loom-code": ("/loom-code:using-loom-code",),
     "loom-design": ("/loom-design:using-loom-design",),
     "loom-workflow": ("/loom-workflow:using-loom-workflow", "/loom-workflow:handoff",
-                      "/loom-workflow:recap-state", "/loom-workflow:goal-create"),
+                      "/loom-workflow:recap-state", "/loom-workflow:goal-create",
+                      "/loom-workflow:retro"),
 }
 
 
