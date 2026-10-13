@@ -394,6 +394,18 @@ attestation bound to the functional-content digest. Commit the generated file
 with any remaining publication metadata; publication validates that single
 attestation directly.
 
+The generated attestation is the change's verdict record: its `verdicts` field
+is the filed verdict artifact, digest-bound and read by Ship, publication and
+the PR-floor check. The review input JSON above is temporary — it is not a
+record and nothing reads it after finalization — so verdict and attestation
+stay one artifact instead of two copies that can drift. Its bookkeeping fields
+are bound from the change's own artifacts, not re-typed here: `reviewed_commit`
+is the HEAD that was verified, `tested_commit` is the acceptance test report's
+fixed "Tried on ... at <short sha>" line, `intent_confirmed_sha` is the intent's
+frontmatter pin (when capture-intent recorded one), and `acceptance_status`
+records which Acceptance lines the report covers. Each field is optional:
+an attestation produced before the field existed validates unchanged.
+
 When a step that `finalize-review` needs (reviewers, adversarial, package-tests)
 was skipped by the user's plain-words instruction, skip `finalize-review` and leave the change unattested: tell the
 user in one line that the PR will show `verification absent`, and hand the

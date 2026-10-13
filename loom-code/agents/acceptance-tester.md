@@ -29,7 +29,10 @@ its reason.
 
 1. **Start clean.** `git worktree add <path> HEAD`, or a fresh clone —
    never a tree someone has worked in, where a stale artefact or
-   uncommitted file hides a broken change.
+   uncommitted file hides a broken change. The `<short sha>` you put in the
+   report's "Tried on" line is the tested commit: write the exact HEAD you
+   tested at, because `finalize-review` binds it into the attestation and
+   rejects a change whose acceptance evidence ran on other code.
 2. **Follow the project's own setup instructions**, from its README. If
    they do not work, that is the first finding — a change nobody else can
    run has not shipped. This setup check — the change installs or loads in

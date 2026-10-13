@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import yaml
+import hashlib
 
 
 def _contract_dir() -> Path:
@@ -54,6 +55,17 @@ def is_real_date(value: str) -> bool:
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="surrogateescape")
+
+
+def blob_sha(data: bytes) -> str:
+    """`git hash-object` without shelling out -- the same value git stores."""
+    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+
+
+def sha_agrees(recorded: str, current: str) -> bool:
+    """Either abbreviation is a prefix of the other; git shortens freely."""
+    recorded, current = recorded.strip().lower(), current.strip().lower()
+    return bool(recorded) and (current.startswith(recorded) or recorded.startswith(current))
 
 
 def manifest_path_in_effect() -> Path:

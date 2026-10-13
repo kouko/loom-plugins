@@ -27,7 +27,7 @@ from loom_checker.reviewers import committed_branch_delta
 from loom_checker.reviewers import required_reviewer_count
 from loom_checker.reviewers import attach_outside_receipt
 from loom_checker.reviewers import selected_outside_family
-from loom_checker.rule_checks.evidence_coverage import check_attestation_coverage
+from loom_checker.rule_checks.evidence_coverage import acceptance_coverage, check_attestation_coverage
 from loom_checker.rule_checks.commit_identity import check_commit_identity
 from loom_checker.rule_checks.intent_version import check_intent_version
 from pathlib import Path
@@ -190,11 +190,15 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             attestation["intent_confirmed_sha"] = _sha.group(1).lower()
         report_path = artifact_path(manifest, "acceptance-test-report", change_id, repo)
         if report_path.is_file():
+            _report_text = read_text(report_path)
             _tested = _re.search(
-                r"at\s+([0-9a-f]{7,40})", read_text(report_path)
+                r"at\s+([0-9a-f]{7,40})", _report_text
             )
             if _tested:
                 attestation["tested_commit"] = _tested.group(1).lower()
+            attestation["acceptance_status"] = acceptance_coverage(
+                intent_sections, _report_text,
+            )
 
         failures: list[tuple[str, str]] = []
         failures += check_attestation_coverage(manifest, repo, change_id, intent_sections, attestation)

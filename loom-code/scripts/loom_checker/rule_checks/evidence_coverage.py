@@ -35,6 +35,22 @@ def _get_report_acceptance_numbers(report_text: str) -> set[int]:
     return numbers
 
 
+def acceptance_coverage(
+    intent_sections: dict[str, str], report_text: str,
+) -> list[dict]:
+    """The per-line coverage snapshot: one entry per intent Acceptance
+    number, `covered` when the report carries a row for it and `missing`
+    otherwise. This is the record the attestation's `acceptance_status`
+    field holds; the row-identity parsing lives here, one source for both
+    the coverage check and the bookkeeping field."""
+    intent_numbers = sorted(_get_intent_acceptance_numbers(intent_sections))
+    report_numbers = _get_report_acceptance_numbers(report_text)
+    return [
+        {"line": number, "status": "covered" if number in report_numbers else "missing"}
+        for number in intent_numbers
+    ]
+
+
 def check_attestation_coverage(
     manifest, repo: Path, change_id: str, intent_sections: dict[str, str],
     attestation: dict,

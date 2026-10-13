@@ -322,7 +322,12 @@ the intent and restate again; there is no limit on rounds here.
 
 **On "yes":**
 
-1. Write `status: confirmed <date>` into the intent. When the confirmed
+1. Write `status: confirmed <date>` into the intent. Also write
+   `intent_confirmed_sha: <sha7>` — the output of
+   `git hash-object <(grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent>)`,
+   i.e. the blob sha over the intent the user confirmed, excluding the
+   workflow-status line and the pin line itself (the same convention the
+   spec's `confirmed-behavior:` pin follows). When the confirmed
    restatement explicitly authorizes automatic publication, also write
    `publication: automatic — authorized <date> by <name>`; never derive it
    from status or prose. When step 3 ran, write

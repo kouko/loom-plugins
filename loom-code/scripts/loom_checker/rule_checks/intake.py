@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import blob_sha
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import is_real_date
 from loom_checker.helpers import read_text
+from loom_checker.helpers import sha_agrees
 from loom_checker.intent_state import STATUS
 from loom_checker.intent_state import _status_closed_descriptor
 from loom_checker.intent_state import _status_closed_info
@@ -13,7 +15,6 @@ from loom_checker.parsing import LIST_ITEM
 from loom_checker.parsing import _squeeze
 from loom_checker.parsing import parse_document
 from pathlib import Path
-import hashlib
 import re
 import sys
 
@@ -377,11 +378,6 @@ CONFIRMED_BEHAVIOR_GRAMMAR = re.compile(
 CONFIRMED_BEHAVIOR_LINE = re.compile(rb"^confirmed-behavior:.*\n?", re.MULTILINE)
 
 
-def blob_sha(data: bytes) -> str:
-    """`git hash-object` without shelling out -- the same value git stores."""
-    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
-
-
 def spec_identity(spec_path: Path) -> str:
     """The one blob sha both freshness rules compare against: the spec WITHOUT
     its `confirmed-behavior:` line.
@@ -399,12 +395,6 @@ def recompute_command(relative: str) -> str:
         "recompute it with `git hash-object <(grep -v '^confirmed-behavior:' "
         f"{relative})`"
     )
-
-
-def sha_agrees(recorded: str, current: str) -> bool:
-    """Either abbreviation is a prefix of the other; git shortens freely."""
-    recorded, current = recorded.strip().lower(), current.strip().lower()
-    return bool(recorded) and (current.startswith(recorded) or recorded.startswith(current))
 
 
 TASK_LINE = re.compile(

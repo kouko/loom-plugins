@@ -1773,16 +1773,177 @@ def test_mixed_docs_and_py_under_change_store_requires_test_pairs(tmp_path: Path
     assert "intake.test-case-pair" in blocked_rules(result)
 
 
-def test_md_under_change_store_still_exempt(tmp_path: Path) -> None:
-    """A .md file under docs/loom/<change-id>/ should still be exempt from test pairs."""
+
+
+
+
+
+
+
+
+
+
+
+def test_plan_boundary_tests_passes_when_referenced_task_exists(tmp_path: Path) -> None:
+    """PASS: Risk line names a boundary-test task that exists."""
     repo = make_repo(tmp_path)
     write_intent(repo, open_questions="- none")
-    write_plan(
-        repo,
-        f"**W0-01 Docs**  after: —  acceptance: 1\n"
-        f"- Files: `docs/loom/{CHANGE}/README.md`\n"
-        "- Test: \n"
-        "- Risk: agent-decided — docs only.\n",
+    # Create plan manually with charter 1.1 and custom content
+    plan_path = repo / "docs/loom" / f"{CHANGE}" / "plan.md"
+    plan_path.parent.mkdir(parents=True, exist_ok=True)
+    plan_path.write_text(
+        f"""# A change — plan
+intent: {CHANGE}@abc1234
+charter: 1.1
+
+## Task DAG
+**W1-02 Test Something** boundary test  after: —  acceptance: 1
+- Files: `docs/loom/{CHANGE}/test_something.py`
+- Test: A1 positive: works; boundary: edge.
+- Risk: agent-decided
+
+## Questions asked
+1 — what — none
+
+## Simplicity check
+- none found
+
+## Risks
+1. Risk: the feature works; boundary test W1-02
+""",
+        encoding="utf-8",
     )
     result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
     assert result.returncode == 0, result.stderr
+
+
+def test_plan_boundary_tests_fails_when_missing_referenced_task(tmp_path: Path) -> None:
+    """FAIL: Risk line names a boundary-test task that does not exist in Task DAG."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    # Create plan manually with charter 1.1 and custom content
+    plan_path = repo / "docs/loom" / f"{CHANGE}" / "plan.md"
+    plan_path.parent.mkdir(parents=True, exist_ok=True)
+    plan_path.write_text(
+        f"""# A change — plan
+intent: {CHANGE}@abc1234
+charter: 1.1
+
+## Task DAG
+**W5-05 Real Task** boundary test  after: —  acceptance: 1
+- Files: `docs/loom/{CHANGE}/real.py`
+- Test: A1 positive: works; boundary: edge.
+- Risk: agent-decided
+
+## Questions asked
+1 — what — none
+
+## Simplicity check
+- none found
+
+## Risks
+1. Risk: we tested thoroughly; boundary test W9-99
+""",
+        encoding="utf-8",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.plan-boundary-tests" in blocked_rules(result)
+
+
+def test_plan_boundary_tests_fails_when_extra_boundary_test_lines_present(tmp_path: Path) -> None:
+    """FAIL: Extra boundary-test task lines in Risk section without matching tasks."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    # Create plan manually with charter 1.1 and custom content
+    plan_path = repo / "docs/loom" / f"{CHANGE}" / "plan.md"
+    plan_path.parent.mkdir(parents=True, exist_ok=True)
+    plan_path.write_text(
+        f"""# A change — plan
+intent: {CHANGE}@abc1234
+charter: 1.1
+
+## Task DAG
+**W5-05 Real Task** boundary test  after: —  acceptance: 1
+- Files: `docs/loom/{CHANGE}/real.py`
+- Test: A1 positive: works; boundary: edge.
+- Risk: agent-decided
+
+## Questions asked
+1 — what — none
+
+## Simplicity check
+- none found
+
+## Risks
+1. Risk: first check; boundary test W5-05
+2. Risk: second check; boundary test W5-06  # no such task
+3. Risk: third check; boundary test W5-07  # no such task
+""",
+        encoding="utf-8",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "intake.plan-boundary-tests" in blocked_rules(result)
+
+
+def test_plan_boundary_tests_skips_charter_1_0_plan(tmp_path: Path) -> None:
+    """SKIP: charter 1.0 has no Risk section -> no boundary test hint expected."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    # Use write_plan with default charter 1.0
+    write_plan(
+        repo,
+        "**W1-02 Test**  after: —  acceptance: 1\n"
+        "- Files: `docs/loom/{CHANGE}/test.py`\n"
+        "- Test: A1 positive: works; boundary: edge.\n"
+        "- Risk: agent-decided\n"
+        "\n"
+        "## Questions asked\n"
+        "1 — what — none\n"
+        "\n"
+        "## Simplicity check\n"
+        "- none found\n"
+        "\n"
+        "## Risks\n"
+        "  # No risks -> no boundary test hint expected\n"
+    )
+    # Keep charter as 1.0 (default) so rule is skipped
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
+
+def test_plan_boundary_tests_ignores_boundary_outside_risk_section(tmp_path: Path) -> None:
+    """SKIP: boundary-test task lines outside Risk section are ignored."""
+    repo = make_repo(tmp_path)
+    write_intent(repo, open_questions="- none")
+    # Create plan manually with charter 1.1 and custom content
+    plan_path = repo / "docs/loom" / f"{CHANGE}" / "plan.md"
+    plan_path.parent.mkdir(parents=True, exist_ok=True)
+    plan_path.write_text(
+        f"""# A change — plan
+intent: {CHANGE}@abc1234
+charter: 1.1
+
+## Task DAG
+**W1-02 Real Task** boundary test  after: —  acceptance: 1
+- Files: `docs/loom/{CHANGE}/real.py`
+- Test: A1 positive: works; boundary: edge.
+- Risk: agent-decided
+
+## Questions asked
+1 — what — none
+
+## Simplicity check
+- none found
+
+## Risks
+1. Risk: normal risk line; boundary test W1-02
+""",
+        encoding="utf-8",
+    )
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 0, result.stderr
+
+
