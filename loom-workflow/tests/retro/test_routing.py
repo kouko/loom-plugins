@@ -1,5 +1,7 @@
 """Retro and distill-sessions remain separate discovery routes."""
 
+# concern: single-session project retrospectives must not displace recurring skill mining.
+
 from pathlib import Path
 
 
