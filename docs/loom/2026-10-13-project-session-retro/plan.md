@@ -17,12 +17,12 @@ charter: 1.1
 - Risk: agent-decided — keep the skill read-only and on-demand; do not import Matt's repo-specific document assumptions or build a log-ingestion pipeline.
 
 **W2-01 Register and route the standalone tool**  after: W1-01  acceptance: 3
-- Files: `loom-workflow/skills/using-loom-workflow/SKILL.md`, `loom-code/contract/manifest.yaml`, `loom-workflow/tests/scripts/test_skill_count.py`, `loom-code/tests/test_contract_manifest.py`, `tests/test_loom_skill_description_catalog.py`, `loom-workflow/tests/retro/test_routing.py`
+- Files: `loom-workflow/skills/using-loom-workflow/SKILL.md`, `loom-code/contract/manifest.yaml`, `loom-workflow/tests/scripts/test_skill_count.py`, `loom-code/tests/test_contract_manifest.py`, `tests/test_loom_skill_description_catalog.py`, `loom-workflow/tests/retro/test_routing.py`, `loom-code/tests/test_opencode_loader.py`
 - Test: A3 positive: retro-and-distill-routes; negative: distill-contract-unchanged.
 - Risk: agent-decided — register retro as standalone outside the station budget; keep mechanism counts unchanged because standalone tools are excluded.
 
 **W2-02 Document the tool**  after: W2-01  acceptance: 3
-- Files: `loom-workflow/README.md`, `loom-workflow/README.zh-TW.md`, `loom-workflow/README.ja.md`, `README.md`
+- Files: `loom-workflow/README.md`, `loom-workflow/README.zh-TW.md`, `loom-workflow/README.ja.md`, `README.md`, `tests/test_agy_install_docs.py`
 - Test: A3 positive: published-skill-catalog; boundary: existing-distill-entry.
 - Risk: agent-decided — name this user-approved single-session project review as an explicit standalone admission exception and set the new plugin version in all four READMEs.
 
