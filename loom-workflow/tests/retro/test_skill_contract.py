@@ -45,3 +45,9 @@ def test_project_advice_is_separate_from_skill_candidates_and_read_only() -> Non
     assert "do not modify" in text.lower()
     assert "single session" in text.lower()
     assert "distill-sessions" in text
+
+
+def test_read_only_shell_inspection_remains_available() -> None:
+    text = skill_text()
+    assert "write-capable tool" not in text
+    assert "Do not modify files" in text

@@ -161,7 +161,7 @@ loom-workflow/
 │   ├── recap-state/
 │   ├── retro/
 │   └── using-loom-workflow/
-├── tests/                 git-memory・loom-memory・loom-visualization のテスト
+├── tests/                 git-memory・loom-memory・loom-visualization・retro のテスト
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md           (このファイル)

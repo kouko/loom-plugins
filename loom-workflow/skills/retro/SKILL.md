@@ -5,15 +5,15 @@ description: |
   to the project's development environment. Use only when the user asks for a
   session retrospective or invokes retro; not for mining recurring skill issues.
 user-invocable: true
-disable-model-invocation: true
 ---
 
 # Retro
 
 Review one coding session at the user's request. This is read-only advice about
 the project's development environment, not a Loom station or quality gate.
-Do not modify files, create issues, invoke a write-capable tool, or dispatch
-session content to another service as part of this skill.
+Do not modify files, create issues, or dispatch session content to another
+service as part of this skill. Use local tools for inspection only; do not
+run commands that mutate the project or session records.
 
 ## Select and read the session
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.40.0] — 2026-10-13 — register the standalone project-session retro
+
+- Add `loom-workflow:retro` to the versioned contract manifest as a standalone tool outside the Loom station and mechanism counts. The workflow plugin owns the skill and its on-demand behaviour.
+
 ## [3.39.1] — 2026-10-12 — recognize graduated probes in runnerless pytest suites
 
 - Finalization recognizes adversarial tests collected by a declared pytest package suite, including projects without a package runner and runners targeting the repository root. Uncollected files remain refused.

@@ -153,7 +153,7 @@ loom-workflow/
 │   ├── recap-state/
 │   ├── retro/
 │   └── using-loom-workflow/
-├── tests/                 git-memory、loom-memory 與 loom-visualization 的測試
+├── tests/                 git-memory、loom-memory、loom-visualization 與 retro 的測試
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md

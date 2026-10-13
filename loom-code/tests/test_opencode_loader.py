@@ -99,6 +99,10 @@ def test_skills_registered_plugin_qualified():
             assert skill["content"].strip() and skill["description"].strip() not in ("", "|")
 
 
+def test_retro_is_discoverable_as_an_opencode_model_skill():
+    assert "loom-workflow:retro" in {s["id"] for s in _register("loom-workflow")["skills"]}
+
+
 def test_loom_code_registers_only_its_router_command():
     seen = _register("loom-code")
     assert [c["name"] for c in seen["commands"]] == ["loom-code:using-loom-code"]

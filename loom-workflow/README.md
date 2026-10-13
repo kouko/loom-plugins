@@ -164,7 +164,7 @@ loom-workflow/
 │   ├── recap-state/
 │   ├── retro/
 │   └── using-loom-workflow/
-├── tests/                 git-memory, loom-memory and loom-visualization tests
+├── tests/                 git-memory, loom-memory, loom-visualization and retro tests
 ├── CHANGELOG.md
 ├── README.md              (this file)
 ├── README.ja.md
