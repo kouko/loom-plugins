@@ -39,5 +39,5 @@ charter: 1.1
 ① — what — 這正是你要的嗎？
 
 ## Risks
-1. Session logs may contain sensitive text; the skill must keep source reading local and present only necessary evidence.
+1. Session logs may contain secrets. Local tool output enters the current model context and may reach its host. For specified transcripts, redact before tool output when feasible; otherwise request a redacted excerpt or state the limit. Quote minimally.
 2. Release metadata and documentation must be synchronized before closing review; W2-02 owns the bump.
