@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-13-project-session-retro",
-  "content_digest": "0c84efb8b17ff473918488c81f902458752b7584",
+  "content_digest": "15a1bf0670abe79d8b93c604159b5f28ad08692e",
   "executions": [
     {
       "kind": "package-tests",
@@ -24,7 +24,7 @@
       "vendor": "openai",
       "lens": "skill",
       "reviewed_sha": "7b8f58531d423cb2a4a6cf88abeb921fe9c5ed92",
-      "review_target_sha": "fbb68642a5224988165f0311d979f835807b2224",
+      "review_target_sha": "ea628ed03c18a9222f6260e22ae592700a64bcef",
       "verdict": "PASS",
       "dimension_scores": {
         "omission": "PASS",
@@ -42,7 +42,7 @@
       "vendor": "openai",
       "lens": "code",
       "reviewed_sha": "7b8f58531d423cb2a4a6cf88abeb921fe9c5ed92",
-      "review_target_sha": "fbb68642a5224988165f0311d979f835807b2224",
+      "review_target_sha": "ea628ed03c18a9222f6260e22ae592700a64bcef",
       "verdict": "PASS",
       "dimension_scores": {
         "security": "PASS",
@@ -62,9 +62,9 @@
         {
           "severity": "nit",
           "dimension": "tests",
-          "anchor": "loom-workflow/tests/retro/test_skill_contract.py:49",
-          "text": "nitpick: The new phrase-absence test repeats the existing no-write assertion and does not verify read-only shell inspection.",
-          "fix": "Delete the redundant test; independent acceptance already exercises local read-only inspection."
+          "anchor": "loom-workflow/tests/retro/test_routing.py:27",
+          "text": "nitpick: The Japanese routing test checks description wording, not actual model selection; the acceptance report discloses that limit.",
+          "fix": "Rename the test to describe its wording check in a future cleanup."
         }
       ]
     }
