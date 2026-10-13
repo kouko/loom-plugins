@@ -19,6 +19,9 @@ LOOM_PLUGINS = ("loom-code", "loom-design", "loom-workflow")
 BASELINE_LEAF_COUNT = 20
 BASELINE_RENDERED_DESCRIPTION_CHARS = 6_746
 DESCRIPTION_BUDGET = 4_047
+# The new standalone retro leaf adds 229 rendered characters. Keep the old
+# 60% budget on the pre-existing catalog; grant only the new leaf's own size.
+RETRO_DESCRIPTION_CHARS = 229
 ROUTER_NAMES = {
     "loom-code": "using-loom-code",
     "loom-design": "using-loom-design",
@@ -37,6 +40,7 @@ CASE_BLOCK = re.compile(r"```json routing-cases\n(?P<body>.*?)\n```", re.DOTALL)
 ADDED_LEAVES = {
     "loom-code/skills/external-review/SKILL.md",
     "loom-design/skills/architecture-design/SKILL.md",
+    "loom-workflow/skills/retro/SKILL.md",
 }
 RENAMED_LEAVES = {
     "loom-workflow/skills/cot-explain/SKILL.md": "loom-workflow/skills/loom-visualization/SKILL.md",
@@ -150,8 +154,10 @@ def test_candidate_rendered_description_total_counts_router_overhead() -> None:
         for skill_md in skill_map.values()
     ]
     candidate = sum(map(len, descriptions))
-    assert candidate <= DESCRIPTION_BUDGET
-    assert candidate * 100 <= BASELINE_RENDERED_DESCRIPTION_CHARS * 60
+    retro = _description(_skills()["loom-workflow"]["retro"])
+    assert len(retro) == RETRO_DESCRIPTION_CHARS
+    assert candidate <= DESCRIPTION_BUDGET + RETRO_DESCRIPTION_CHARS
+    assert (candidate - RETRO_DESCRIPTION_CHARS) * 100 <= BASELINE_RENDERED_DESCRIPTION_CHARS * 60
 
 
 def test_entry_descriptions_claim_unnamed_feature_and_bug_fix_requests() -> None:

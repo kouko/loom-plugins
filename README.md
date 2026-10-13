@@ -14,8 +14,8 @@ Codex, Antigravity CLI and OpenCode:
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.14.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/) | 3.39.1 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.7.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
+| [`loom-code`](loom-code/) | 3.40.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/) | 5.8.0 | 13 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -100,6 +100,7 @@ points or run on demand.
 | `git-memory` | Before every commit at any station (intent, plan, build, attestation); at `ship` when the PR is created; and before the PR is merged, which happens after `ship` | Classifies decision, learning and gotcha memory for commits and the PR body. |
 | `loom-memory` | Before the branch closes, when a lesson is worth keeping (on request or by agent judgment; no station calls it) | Records a durable lesson the branch taught in the repository memory store. |
 | `independent-advisor`, `handoff`, `recap-state` | On demand, not tied to a station | Second opinions, cross-session handoff and in-session recaps. |
+| `retro`, `distill-sessions` | On demand, not tied to a station | `retro` reviews one coding session for project development improvements; `distill-sessions` mines multiple sessions for skill improvement proposals. |
 
 `decision-map` is for work whose whole route cannot be listed up front; its
 loop is the `loom-workflow:decision-map` group in the flow diagram above.
@@ -129,7 +130,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.39.1. Five stations carry one change from plan to PR with
+Version 3.40.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -146,7 +147,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.7.0. Workflow tools used around the stations; most work without
+Version 5.8.0. Workflow tools used around the stations; most work without
 `loom-code`. `decision-map`'s intent delivery and explicitly requested outside
 code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
@@ -162,6 +163,7 @@ attach to the flow.
 | `recap-state` | In-session recap of where the work stands. |
 | `handoff` | Save or resume state across sessions. |
 | `distill-sessions` | Mine past Claude Code or Codex sessions for skill improvement proposals. |
+| `retro` | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
 | `loom-visualization` | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
 | `goal-create` | Create a session goal or draft a repository purpose (invoked by name only). |
 | `dbt-model-style` | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
@@ -252,7 +254,7 @@ Then restart OpenCode (`opencode service restart`): until it restarts, `opencode
 
 The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
-Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model. Start loom with `/loom-code:using-loom-code`, `/loom-design:using-loom-design` or `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state` and `/loom-workflow:goal-create` are also commands, and each of these stays a skill too.
+Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model. Start loom with `/loom-code:using-loom-code`, `/loom-design:using-loom-design` or `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state`, `/loom-workflow:goal-create` and `/loom-workflow:retro` are also commands, and each of these stays a skill too.
 
 On OpenCode, the session context, the publication reminder, the language reminder (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
 

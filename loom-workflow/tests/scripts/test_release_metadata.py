@@ -16,7 +16,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 PLUGIN = REPO / "loom-workflow"
-CURRENT = "5.7.0"
+CURRENT = "5.8.0"
 
 
 @pytest.mark.parametrize(
@@ -56,3 +56,15 @@ def test_root_readme_section_line_is_current() -> None:
     line = re.search(r"^Version (\d+\.\d+\.\d+)\.", section, re.M)
     assert line, "README.md ## loom-workflow: version line missing"
     assert line.group(1) == CURRENT
+
+
+def test_discovery_metadata_names_retro() -> None:
+    for manifest in ("plugin.json", ".claude-plugin/plugin.json",
+                     ".codex-plugin/plugin.json", "package.json"):
+        data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
+        assert "retro" in data["description"], manifest
+    for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json"):
+        data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
+        assert "retro" in data["keywords"], manifest
+    codex = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+    assert "retro" in codex["interface"]["longDescription"]
