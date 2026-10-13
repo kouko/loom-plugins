@@ -1,0 +1,98 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-13-complete-runnerless-probe-graduation",
+  "content_digest": "9c5e315d7e3b658645fe7bddc79a01b82e1a5cb7",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_runner_ignored_refused.py",
+      "artifact": "loom-code/tests/test_runner_ignored_refused.py",
+      "result": "pass",
+      "command_digest": "07d57f01acd20bce44573cb8ef710d0c7ab90da007ea457ded893d3b0faace9d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "closing_review_a",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "0cfa37efa071fed3de5e88c78ff272a9232639e8",
+      "review_target_sha": "b240cece0cc89cb9746b4366bbec8c316b44424f",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/tests/test_selection_finalize.py:502",
+          "text": "nitpick: This new runner-environment test asserts only the internal suite_collects helper. Finalization is the production entry that must accept the collected file and reject the ignored file.",
+          "fix": "Extend the existing finalization fixture to assert both outcomes through finalize, then remove the helper-only assertions."
+        }
+      ],
+      "notes": [
+        "All five changed test files ran: 113 passed, 0 skipped. The working tree remained clean.",
+        "The cited command forms and collection hook agree with official uv, Conda, and pytest references."
+      ]
+    },
+    {
+      "reviewer": "closing_review_b",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "0cfa37efa071fed3de5e88c78ff272a9232639e8",
+      "review_target_sha": "b240cece0cc89cb9746b4366bbec8c316b44424f",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-code/tests/test_runner_ignored_refused.py:44",
+          "text": "nitpick: The new test calls suite_collects, which now only forwards to suite_collection and has no production caller. The test should exercise the entry used by finalization.",
+          "fix": "Call suite_collection in this test and assert its collected result."
+        }
+      ],
+      "notes": [
+        "All five changed test files ran: 113 passed, none skipped.",
+        "Verified cited uv, Conda, and pytest behavior against official documentation.",
+        "The cumulative diff matches five Acceptance outcomes; independent acceptance records 5/5 working."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
