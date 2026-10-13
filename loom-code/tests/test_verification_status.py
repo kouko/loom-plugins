@@ -90,6 +90,10 @@ def attestation(repo: Path, *, skip: list[str] | None = None) -> dict:
     if skip is not None:
         payload["selection"] = {"confirmations": [], "skip": skip, "source": "user-typed",
                                 "prior_failures": []}
+        payload["intent_confirmed_sha"] = None
+        payload["tested_commit"] = None
+        payload["reviewed_commit"] = head
+        payload["acceptance_status"] = []
     return payload
 
 
