@@ -131,7 +131,8 @@ def test_plugin_without_agents_registers_no_agents_and_its_entry_commands():
     expected = {
         "loom-design": ["loom-design:using-loom-design"],
         "loom-workflow": ["loom-workflow:goal-create", "loom-workflow:handoff",
-                          "loom-workflow:recap-state", "loom-workflow:using-loom-workflow"],
+                          "loom-workflow:recap-state", "loom-workflow:retro",
+                          "loom-workflow:using-loom-workflow"],
     }
     for plugin, commands in expected.items():
         seen = _register(plugin)
