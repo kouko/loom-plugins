@@ -42,3 +42,34 @@ PYTHONDONTWRITEBYTECODE=1 python -m pytest loom-workflow/tests/distill-sessions 
 ```
 
 The full package suite was not run here. The planned `finalize-review` gate will run `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` and block its attestation if that suite fails. Its result is not claimed in this report.
+
+## Re-run on 2026-10-13, at `f4fc4d34`
+
+The fix range was `8b858bae..f4fc4d34`. It removed `disable-model-invocation: true` from retro, retained read-only local inspection, added an OpenCode discoverability test, and synchronized release metadata. Because the skill contract and routing surface changed, all three Acceptance lines were re-tested in full.
+
+### Clean setup and focused checks
+
+- `git clone --no-local --no-checkout /private/tmp/loom-retro-20261013 /private/tmp/loom-retro-acceptance-rerun-20261013`, then `git checkout --detach f4fc4d34129a851813e78a9e1a56e0e76a83a649`: succeeded; `git status --short --branch` printed only `## HEAD (no branch)`.
+- `agy plugin validate ./loom-workflow`: `[ok]`, `skills: 13 processed`, `hooks: 1 processed`.
+- With fresh isolated `HOME=/private/tmp/loom-retro-rerun-home` and `XDG_CONFIG_HOME=/private/tmp/loom-retro-rerun-config`, `agy plugin install ./loom-workflow` returned `[ok]` and `agy plugin list` named `loom-workflow` with `skills` and `hooks`. `cmp` confirmed the installed retro skill exactly matched the fresh clone.
+- Focused command: `PYTHONDONTWRITEBYTECODE=1 python -m pytest loom-workflow/tests/retro/test_skill_contract.py loom-workflow/tests/retro/test_routing.py loom-workflow/tests/scripts/test_skill_count.py loom-workflow/tests/scripts/test_release_metadata.py loom-code/tests/test_contract_manifest.py tests/test_loom_skill_description_catalog.py tests/test_agy_install_docs.py loom-code/tests/test_opencode_loader.py loom-code/tests/test_write_plan_station_text.py -q` → `118 passed in 9.05s`.
+- Existing tool command: `PYTHONDONTWRITEBYTECODE=1 python -m pytest loom-workflow/tests/distill-sessions -q` → `121 passed in 1.14s`.
+- The full package suite remains the later `finalize-review` check and was not run by this tester.
+
+### 1. Current and specified single sessions
+
+- I made a fictional local fixture with `README.md` and `session.md`. Its seven numbered events show a failed guessed lint command, a successful documented lint command, a failed guessed test path, and a successful corrected test path. The README documents lint and the test directory but omits the test command. The fixture contains no private transcript or credential.
+- Explicit Codex trial: `gtimeout 75s /Users/kouko/.local/bin/codex exec --sandbox read-only --ephemeral --ignore-user-config --skip-git-repo-check -C /private/tmp/retro-acceptance-fixture 'Read /private/tmp/loom-retro-acceptance-rerun-20261013/loom-workflow/skills/retro/SKILL.md and follow it exactly. The user explicitly asks for retro of the one fictional coding session in session.md. Read only session.md and README.md from this fixture as needed. Give the retro result in Traditional Chinese. Cite E-number events as source pointers. Do not edit any file. This is synthetic test data only.'`. The default outer sandbox blocked Codex's in-process app-server initialization with `Operation not permitted`; an elevated retry of the same bounded, inner read-only command completed in 26.6 seconds. Codex reported `sandbox: read-only` and read the skill, fixture README, and session with `cat`.
+- Captured specified-session answer: `1. **在 README.md 補上明確的測試指令。**` It cited `E3、E5、E6`, explained the failed guess and corrected result, and gave medium confidence because the directory was already documented. It did not propose a duplicate check because existing lint and tests succeeded. This is one ranked recommendation; behavior with multiple ranks was not exercised.
+- Current-session trial: `gtimeout 60s /Users/kouko/.local/bin/codex exec --sandbox read-only --ephemeral --ignore-user-config --skip-git-repo-check -C /private/tmp/retro-acceptance-fixture 'Read /private/tmp/loom-retro-acceptance-rerun-20261013/loom-workflow/skills/retro/SKILL.md and follow it exactly. Review only this current conversation as a coding session. Do not read session.md or infer earlier events. This current conversation contains only this request and your subsequent tool calls. Give the result in Traditional Chinese. Do not edit files.'` completed in 57.7 seconds. The answer said `沒有足夠證據支持任何專案改善建議` because only the request and skill read existed. It did not borrow the specified fixture's earlier events.
+- Both trials explicitly named the fresh-clone skill file. They prove behavior after explicit loading, not automatic skill selection by the host.
+
+### 2. Separate sections and no writes
+
+- The specified-session answer had `### 專案建議` and `### 技能候選`. The candidate cited `E2、E3、E5`, explicitly said the record did not identify a skill or prove a recurring defect, and did not promote it to a skill edit. The current-session answer had both sections and said neither had supporting evidence.
+- Both Codex runs reported `sandbox: read-only`; their visible tool calls were `cat` reads. After the trials, the fresh clone still reported `## HEAD (no branch)` with no changed files. `rg --files --hidden /private/tmp/retro-acceptance-fixture` found only the original `README.md` and `session.md`; their SHA-256 values were `19122c2c3c584099a3c2c5e80ea9d188683ab20833c801302813f60db0ffe9b3` and `4d2428ecb4ba323af302b1c762a41f60eab6be51dab72195d76aeb6f305d5414` respectively.
+
+### 3. Existing distill-sessions and routing
+
+- The installed plugin retained both `retro` and `distill-sessions`. The focused route tests and the OpenCode loader test passed; `test_retro_is_discoverable_as_an_opencode_model_skill` found `loom-workflow:retro` in registered skills. The `121` existing distill-sessions tests passed. The full package suite will run later at `finalize-review` and is not claimed here.
+- The live Codex trials loaded retro by an explicit absolute path. They did not exercise automatic host selection for an unnamed one-session request or for a cross-session skill-mining request. Therefore this line remains `partly`.
