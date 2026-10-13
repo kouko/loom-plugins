@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.8.0] — 2026-10-13 — review one coding session for project improvements
+
+- Add `retro`, an on-demand, read-only review of one coding session that ranks project development improvements with source evidence and separates single-session skill issue candidates from project recommendations.
+- Route general single-session review requests to `retro`; keep `distill-sessions` for improvement proposals drawn from multiple sessions.
+
 ## [5.7.0] — 2026-10-08 — independent reviews use the shared outside executor
 
 - An explicitly requested outside code, plan or decision review now routes through `loom-code:external-review`, preserving the owning review's criteria and verdict format while reporting outside results separately from the incumbent review.
