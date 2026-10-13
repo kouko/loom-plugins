@@ -363,6 +363,54 @@ def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
     ]
 
 
+def test_runner_honors_configured_pytest_file_names_and_ignores(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path, "python3 scripts/run_package_tests.py --loom-family")
+    runner = repo / "scripts/run_package_tests.py"
+    runner.parent.mkdir()
+    runner.write_text(
+        "import subprocess\nimport sys\n"
+        "def loom_family_commands(repo):\n"
+        "    return [[sys.executable, '-m', 'pytest', 'tests']]\n"
+        "if __name__ == '__main__':\n"
+        "    raise SystemExit(subprocess.call(loom_family_commands(None)[0]))\n",
+        encoding="utf-8",
+    )
+    tests = repo / "tests"
+    tests.mkdir()
+    (tests / "check_kept.py").write_text(
+        "def test_kept():\n    assert True\n", encoding="utf-8",
+    )
+    graduated = tests / "check_graduated_probe.py"
+    graduated.write_text(
+        "# concern: a defect now covered on every change\n"
+        "def test_graduated():\n    assert True\n", encoding="utf-8",
+    )
+    config = repo / "pytest.ini"
+    config.write_text("[pytest]\npython_files = check_*.py\n", encoding="utf-8")
+    commit_all(repo, "graduate a configured pytest file")
+    artifact = "tests/check_graduated_probe.py"
+    input_path = review_input(tmp_path, PASSING, [
+        {"command": f"python3 {artifact}", "artifact": artifact},
+    ])
+
+    assert suite_collects(repo, artifact)
+    accepted = finalize(repo, input_path)
+    assert accepted.returncode == 0, accepted.stderr
+    assert [run["artifact"] for run in written(repo)["executions"]
+            if run["kind"] == "adversarial"] == [artifact]
+
+    config.write_text(
+        f"[pytest]\npython_files = check_*.py\naddopts = --ignore={artifact}\n",
+        encoding="utf-8",
+    )
+    commit_all(repo, "ignore the configured pytest file")
+    assert not suite_collects(repo, artifact)
+    refused = finalize(repo, input_path)
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    assert "package suite already runs" in refused.stderr
+
+
 def test_runnerless_pytest_suite_finalizes_a_collected_probe(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

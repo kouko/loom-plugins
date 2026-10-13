@@ -56,9 +56,6 @@ def probe_directory(change_id: str) -> str:
 SUITE_RUNNER = "scripts/run_package_tests.py"
 
 
-PYTEST_FILE_PATTERNS = ("test_*.py", "*_test.py")
-
-
 # pytest loads -p plugins before collection, and this hook sees session.items
 # after selection: https://docs.pytest.org/en/stable/how-to/writing_plugins.html
 # https://docs.pytest.org/en/stable/reference/reference.html
@@ -257,9 +254,7 @@ def suite_collection(repo: Path, artifact: str) -> tuple[bool | None, str]:
                 break
             if not (runs_pytest and (repo / target).is_dir()):
                 continue
-            if (repo / target).resolve() in wanted_path.parents and any(
-                fnmatch(Path(wanted).name, pattern) for pattern in PYTEST_FILE_PATTERNS
-            ):
+            if (repo / target).resolve() in wanted_path.parents:
                 break
         else:
             continue
