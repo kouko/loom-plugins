@@ -447,7 +447,11 @@ def command_names_artifact(command: str, artifact: str) -> bool:
     except ValueError as exc:
         raise ValueError(str(exc)) from exc
     wanted = os.path.normpath(artifact)
-    return any(os.path.normpath(token) == wanted for token in tokens)
+    if any(os.path.normpath(token) == wanted for token in tokens):
+        return True
+    # `cargo test --test <name>` runs tests/<name>.rs without naming its path.
+    name = _cargo_test_target(tokens)
+    return name is not None and os.path.normpath(f"tests/{name}.rs") == wanted
 
 
 SHELL_METACHARACTERS = re.compile(r"[;&|<>()$`*?\[\]{}\n]")
@@ -519,11 +523,85 @@ def _conda_pytest_argv(tokens: list[str]) -> bool:
     return _conda_python_argv(tokens) and tokens[5:7] == ["-m", "pytest"]
 
 
+GO_TEST_FLAGS = frozenset({"-v", "-race"})
+GO_TEST_VALUE_FLAGS = frozenset({"-count", "-timeout", "-tags"})
+NODE_SUFFIXES = frozenset({".js", ".mjs", ".cjs", ".ts"})
+NODE_FLAGS = frozenset({"--test", "--experimental-strip-types"})
+CARGO_TEST_FLAGS = frozenset({"--release", "-q", "--quiet"})
+
+
+def _go_test_runs(tokens: list[str], wanted: str) -> bool:
+    """`go test [flags] <files>`: every positional a `.go` file, one of them
+    the artifact, every flag on the allowlist -- `-run`, `-list`, `-c`, `-n`
+    and `-vet` can exit 0 without running the file's tests."""
+    if tokens[:2] != ["go", "test"]:
+        return False
+    positionals, rest = [], tokens[2:]
+    while rest:
+        arg = rest.pop(0)
+        if not arg.startswith("-"):
+            positionals.append(arg)
+        elif arg in GO_TEST_FLAGS:
+            continue
+        elif arg in GO_TEST_VALUE_FLAGS:
+            if not rest or rest[0].startswith("-"):
+                return False
+            rest.pop(0)
+        elif "=" in arg and arg.split("=", 1)[0] in GO_TEST_VALUE_FLAGS and arg.split("=", 1)[1]:
+            continue
+        else:
+            return False
+    return (bool(positionals) and all(arg.endswith(".go") for arg in positionals)
+            and wanted in {os.path.normpath(arg) for arg in positionals})
+
+
+def _node_test_runs(tokens: list[str], wanted: str) -> bool:
+    """`node [--test] [--experimental-strip-types] X`, `npx vitest run X`,
+    or `npx jest X` -- the artifact the only positional, no other option."""
+    if not tokens or os.path.normpath(tokens[-1]) != wanted:
+        return False
+    head = tokens[:-1]
+    if head in (["npx", "vitest", "run"], ["npx", "jest"]):
+        return True
+    options = head[1:]
+    return (head[:1] == ["node"] and len(set(options)) == len(options)
+            and set(options) <= NODE_FLAGS)
+
+
+def _cargo_test_target(tokens: list[str]) -> str | None:
+    """`<name>` of `cargo test [--release] [-q|--quiet] --test <name>`, or
+    None for any other argv -- a test-name filter, `--` arguments, or
+    `--no-run` can exit 0 without running the file's tests."""
+    if tokens[:2] != ["cargo", "test"]:
+        return None
+    names, rest = [], tokens[2:]
+    while rest:
+        arg = rest.pop(0)
+        if arg in CARGO_TEST_FLAGS:
+            continue
+        if arg == "--test" and rest and not rest[0].startswith("-"):
+            names.append(rest.pop(0))
+        elif arg.startswith("--test=") and len(arg) > len("--test="):
+            names.append(arg[len("--test="):])
+        else:
+            return None
+    return names[0] if len(names) == 1 else None
+
+
 def command_executes_artifact(command: str, artifact: str) -> bool:
-    """True when argv directly executes the named Python, shell, or executable file."""
+    """True when argv directly executes the named Python, shell, Go, Node,
+    Rust, or executable file."""
     tokens = argv_for(command)
     wanted = os.path.normpath(artifact)
     suffix = Path(artifact).suffix.lower()
+    if wanted.endswith("_test.go") and _go_test_runs(tokens, wanted):
+        return True
+    if suffix in NODE_SUFFIXES and _node_test_runs(tokens, wanted):
+        return True
+    if suffix == ".rs":
+        name = _cargo_test_target(tokens)
+        if name is not None and os.path.normpath(f"tests/{name}.rs") == wanted:
+            return True
     if suffix == ".py":
         if _conda_pytest_argv(tokens):
             tokens = tokens[4:]
