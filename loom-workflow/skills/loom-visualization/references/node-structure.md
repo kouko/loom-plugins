@@ -39,8 +39,11 @@ explicit `width` payload field. Width budget does not widen the box
 without limit (see `SKILL.md` width table).
 
 ## Scope A
-Applies to box-drawn nodes:
+Applies to box-drawn ASCII nodes:
 - Flow steps
+- Branching decisions
+- Reasoning chains
+- State lifecycles
 - Architecture layer names  
 - Tree continuation
 - Hierarchy connectors
