@@ -20,6 +20,7 @@ Locked decision Q-v0.3-1 = A (Filter):
 """
 
 import copy
+import re
 import string
 from collections import defaultdict
 from pathlib import Path
@@ -27,6 +28,22 @@ from pathlib import Path
 # Characters stripped from the leading/trailing positions of normalized strings.
 # Internal punctuation is preserved (e.g. hyphens in compound words).
 _STRIP_CHARS = set(".,;:!?'\"" + string.whitespace)
+
+
+def skill_identity_from_path(path: str) -> str:
+    """Return plugin:skill for source and versioned installed skill paths."""
+    parts = Path(path).parts
+    if "skills" not in parts:
+        return ""
+    index = len(parts) - 1 - parts[::-1].index("skills")
+    if index < 1 or index + 1 >= len(parts) - 1:
+        return ""
+    plugin = parts[index - 1]
+    if re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.]+)?", plugin):
+        if index < 2:
+            return ""
+        plugin = parts[index - 2]
+    return f"{plugin}:{parts[index + 1]}"
 
 
 def _normalize(text: str) -> str:
@@ -125,12 +142,7 @@ def cluster_memory_items(
     for item in items:
         norm_title = _normalize(item.get("title", ""))
         path = str(item.get("target_skill_path") or "")
-        parts = Path(path).parts if path else ()
-        if "skills" in parts:
-            index = len(parts) - 1 - parts[::-1].index("skills")
-            identity = f"{parts[index - 1]}:{parts[index + 1]}" if index > 0 and index + 1 < len(parts) - 1 else path
-        else:
-            identity = path or str(item.get("target_skill") or "")
+        identity = skill_identity_from_path(path) or path or str(item.get("target_skill") or "")
         if item.get("issue_surface") == "plugin-integration":
             key = (
                 _normalize(identity),

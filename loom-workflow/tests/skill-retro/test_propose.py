@@ -778,6 +778,13 @@ def test_extract_memory_items_filters_by_target_skill_path() -> None:
     foreign = [{**named[0], "target_skill": "other:skill-A"}]
     assert extract_memory_items(foreign, target_skill_path="/plugins/plug/skills/skill-A/SKILL.md") == []
 
+    installed = "/plugins/cache/loom/loom-code/3.40.0/skills/build/SKILL.md"
+    exact = {**results[0], "target_skill_path": installed, "target_skill": "legacy:build"}
+    routed = {**exact, "target_skill_path": "", "target_skill": "loom-code:build"}
+    foreign_routed = {**routed, "target_skill": "other:build"}
+    selected = extract_memory_items([exact, routed, foreign_routed], installed)
+    assert [item["title"] for item in selected] == ["A item 1", "A item 2"] * 2
+
 
 def test_filter_collision_rejected() -> None:
     """A name-only alpha skill must not enter a beta plugin's proposal."""

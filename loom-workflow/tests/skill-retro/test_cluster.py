@@ -73,6 +73,22 @@ def test_cluster_does_not_promote_identical_instruction_titles_across_target_ski
     assert len(pending) == 2
 
 
+def test_cluster_installed_versions_share_identity_without_crossing_plugins():
+    base = "/plugins/cache/loom/{plugin}/{version}/skills/build/SKILL.md"
+    items = [
+        _make_item("Same failure", "Usage", "session_a", target_skill_path=base.format(
+            plugin="loom-code", version="3.40.0")),
+        _make_item("Same failure", "Usage", "session_b", target_skill_path=base.format(
+            plugin="loom-code", version="3.41.0")),
+        _make_item("Same failure", "Usage", "session_c", target_skill_path=base.format(
+            plugin="other", version="3.41.0")),
+    ]
+    promoted, pending = cluster_memory_items(items)
+    assert len(promoted) == 1
+    assert promoted[0]["supporting_sessions"] == ["session_a", "session_b"]
+    assert [item["session_id"] for item in pending] == ["session_c"]
+
+
 # ---------------------------------------------------------------------------
 # Recommended additional tests
 # ---------------------------------------------------------------------------

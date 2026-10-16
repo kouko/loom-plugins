@@ -15,7 +15,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from cluster import cluster_memory_items
+from cluster import cluster_memory_items, skill_identity_from_path
 
 # ---------------------------------------------------------------------------
 # Constants.
@@ -121,20 +121,13 @@ def extract_memory_items(
     A path without that structure cannot safely use the name fallback.
     """
     flat: list[dict] = []
-    target_parts = Path(target_skill_path).parts if target_skill_path else ()
-    expected_name = ""
-    if "skills" in target_parts:
-        index = len(target_parts) - 1 - target_parts[::-1].index("skills")
-        if index > 0 and index + 1 < len(target_parts) - 1:
-            expected_name = f"{target_parts[index - 1]}:{target_parts[index + 1]}"
+    expected_name = skill_identity_from_path(target_skill_path) if target_skill_path else ""
     for entry in results:
         if target_skill_path is not None:
             entry_path = entry.get("target_skill_path")
             entry_name = str(entry.get("target_skill") or "")
             by_name = not entry_path and bool(expected_name) and entry_name == expected_name
             if entry_path != target_skill_path and not by_name:
-                continue
-            if entry_name and expected_name and entry_name != expected_name:
                 continue
         session_id = entry.get("session_id", "unknown")
         for raw_item in entry.get("memory_items", []):
