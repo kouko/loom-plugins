@@ -150,6 +150,7 @@ def test_ascii_blocks_pass_ported_checks():
             assert drift(block) == [], f"{name}: {drift(block)}"
 
 
+# concern: Example JSON drifting from the ASCII diagram shown to users.
 def test_generator_examples_reproduce_their_output():
     for name, (_, shape) in EXPECTED.items():
         examples = generator_examples(_read(name))
