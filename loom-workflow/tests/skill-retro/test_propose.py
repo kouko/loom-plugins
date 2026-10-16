@@ -13,6 +13,9 @@ Per Plan Part 2 §Task 7 acceptance:
    committed fixture_expected_proposals.md baseline.
 """
 
+# concern: name-routed evidence from another plugin can contaminate a target skill proposal
+# concern: a deferred reference-file item bypasses the two-session promotion threshold
+
 from __future__ import annotations
 
 import json
@@ -776,7 +779,6 @@ def test_extract_memory_items_filters_by_target_skill_path() -> None:
     assert extract_memory_items(foreign, target_skill_path="/plugins/plug/skills/skill-A/SKILL.md") == []
 
 
-# concern: name-routed evidence from another plugin can contaminate a target skill proposal
 def test_filter_collision_rejected() -> None:
     """A name-only alpha skill must not enter a beta plugin's proposal."""
     results = [{
@@ -795,7 +797,6 @@ def test_filter_collision_rejected() -> None:
     assert extract_memory_items(results, "/plugins/beta/skills/build/SKILL.md") == []
 
 
-# concern: a deferred reference-file item bypasses the two-session promotion threshold
 def test_deferred_single_pending() -> None:
     """A lone deferred item remains pending regardless of its file scope."""
     item = normalize_memory_item({
