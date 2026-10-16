@@ -17,6 +17,16 @@ charter: 1.1
 - Test: A1 positive: both-retros-contract; boundary: no-old-alias. A2 positive: formal-suite-and-finalize; negative: missing-concern-rejected. A3 positive: ready-pr-verification; boundary: no-merge.
 - Risk: agent-decided — add only the existing cases' concern metadata near the file start; Closing Review owns fresh verdicts and attestation, while Ship owns PR publication.
 
+**W1-02 Preserve installed-skill identity**  after: W1-01  acceptance: 1, 2
+- Files: `loom-workflow/skills/skill-retro/scripts/propose.py`, `loom-workflow/skills/skill-retro/scripts/cluster.py`, `loom-workflow/tests/skill-retro/test_propose.py`, `loom-workflow/tests/skill-retro/test_cluster.py`
+- Test: A1 positive: versioned installed path accepts exact-path and name-routed records and clusters the same skill across versions; boundary: foreign plugin with the same skill name stays separate. A2 positive: focused tests and full declared package suite.
+- Risk: agent-decided — fix the path-derived plugin identity defect class in both proposal filtering and clustering; keep exact-path records authoritative and avoid widening the retrospective target.
+
+**W1-03 Correct the Japanese project route**  after: W1-02  acceptance: 1
+- Files: `loom-workflow/README.ja.md`
+- Test: A1 positive: the Japanese development-retro example names `project-retro`; boundary: migration table still identifies the retired name.
+- Risk: agent-decided — update only the incorrect usage example found in the first review.
+
 ## Simplicity check
 
 - none found
