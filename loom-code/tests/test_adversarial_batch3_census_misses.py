@@ -23,9 +23,9 @@ _SPEC.loader.exec_module(ctf)
 
 # Test file -> the production markdown whose sentences it reads (through a helper the census treats as output).
 RESIDUAL = {
-    "loom-workflow/tests/distill-sessions/test_prompts_parseable.py": (
-        "loom-workflow/skills/distill-sessions/agents/prompt-failure-analysis.md",
-        "loom-workflow/skills/distill-sessions/agents/prompt-success-analysis.md",
+    "loom-workflow/tests/skill-retro/test_prompts_parseable.py": (
+        "loom-workflow/skills/skill-retro/agents/prompt-failure-analysis.md",
+        "loom-workflow/skills/skill-retro/agents/prompt-success-analysis.md",
     ),
     "tests/test_loom_plugin_install_layout.py": ("loom-code/skills/write-plan/SKILL.md",),
 }

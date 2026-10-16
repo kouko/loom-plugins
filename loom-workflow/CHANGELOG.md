@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.9.0] — 2026-10-15 — separate project and installed-skill retrospectives
+
+- Rename the one-session project review from `retro` to `project-retro`, and the cross-session installed-skill review from `distill-sessions` to `skill-retro`. The old names are no longer callable.
+- Route requests by improvement target; both reviews provide source-linked proposals for an independent implementation workflow. `skill-retro` also covers directly related plugin integration issues.
+- Migration: `retro` → `project-retro`; `distill-sessions` → `skill-retro`. Update installed plugins to 5.9.0 before invoking the new names.
+
 ## [5.8.0] — 2026-10-13 — review one coding session for project improvements
 
 - Add `retro`, an on-demand, read-only review of one coding session that ranks project development improvements with source evidence and separates single-session skill issue candidates from project recommendations.

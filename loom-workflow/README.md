@@ -2,9 +2,18 @@
 
 Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
-> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, session distill, chat visualizations and reasoning pages, and second opinions.
+> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, installed-skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.8.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.9.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+
+## Name migration
+
+| Before 5.9.0 | From 5.9.0 | Use for |
+|---|---|---|
+| `retro` | `project-retro` | One project development session. |
+| `distill-sessions` | `skill-retro` | Recurring behavior of an installed skill across sessions. |
+
+The old names are no longer callable. Update the installed plugin to 5.9.0 to use the new names. Both skills return proposals for a separate implementation workflow; neither applies changes.
 
 ## What it is
 
@@ -26,7 +35,7 @@ across sessions, not merely because several plugins use it. `decision-map` is
 the rule's first instance. The rule gates new admissions only; the utility
 skills already in the plugin stay.
 
-`retro` is an explicit, user-approved exception: an on-demand, read-only review
+`project-retro` is an explicit, user-approved exception: an on-demand, read-only review
 of one coding session for project development improvements. It does not become
 a Loom station or quality gate.
 
@@ -66,8 +75,8 @@ flowchart TD
 
     subgraph sessions["Session work"]
         handoff["loom-workflow:handoff<br/>save state when a session ends,<br/>resume it in the next one"]
-        distill["loom-workflow:distill-sessions<br/>mine past sessions<br/>for skill improvements"]
-        retro["loom-workflow:retro<br/>review one session for<br/>project improvements"]
+        distill["loom-workflow:skill-retro<br/>mine past sessions<br/>for skill improvements"]
+        retro["loom-workflow:project-retro<br/>review one session for<br/>project improvements"]
     end
 
     subgraph anytime["Anytime"]
@@ -105,8 +114,8 @@ flowchart TD
   after `ship`. `loom-memory` records a durable lesson before the branch
   closes, on request or by agent judgment; no station calls it.
 - **Session work** — `handoff` saves state at the end of a session and
-  resumes it in the next. `distill-sessions` mines past sessions for skill
-  improvement proposals. `retro` reviews the current or one specified session
+  resumes it in the next. `skill-retro` mines past sessions for skill
+  improvement proposals. `project-retro` reviews the current or one specified session
   for source-backed project improvements; it leaves skill issues as candidates.
 - **Anytime** — `independent-advisor` asks a different executor for a second
   opinion, `loom-visualization` shows comparisons, flows and reasoning as tables or diagrams (or a reasoning page),
@@ -127,14 +136,14 @@ Thirteen skills: twelve tools and one optional router.
 | [`dbt-model-style`](skills/dbt-model-style/) | Apply dbt + Redshift model style and structure (CTE roles, a zero-logic final CTE, naming, comments) when writing, editing or reviewing a model; calculation logic is out of scope. |
 | [`git-memory`](skills/git-memory/) | Classify Decision, Learning and Gotcha memory before every `git commit`, `gh pr create` and `gh pr merge`; recall why a past Git decision was made. |
 | [`handoff`](skills/handoff/) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
-| [`distill-sessions`](skills/distill-sessions/) | Mine past Claude Code and Codex sessions, with `/insights` facets when available, for friction ranked by skill and reviewable SKILL.md proposals. |
-| [`retro`](skills/retro/) | On request, review the current or one specified coding session for source-backed project development improvements. Report possible skill issues separately as candidates; do not edit files. |
+| [`skill-retro`](skills/skill-retro/) | Review multiple Claude Code and Codex sessions for recurring issues in an installed skill's instructions or related plugin integration; return source-linked proposals without applying changes. |
+| [`project-retro`](skills/project-retro/) | On request, review the current or one specified coding session for source-backed project development improvements. Report possible skill issues separately as candidates; do not edit files. |
 | [`independent-advisor`](skills/independent-advisor/) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
 | [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
 | [`goal-create`](skills/goal-create/) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
 
 Loom's contract counts eight of these tools. `goal-create` and
-`dbt-model-style` and `retro` are standalone skills outside the Loom flow, and
+`dbt-model-style` and `project-retro` are standalone skills outside the Loom flow, and
 `loom-memory` and the router stay outside the contract.
 
 ## Repository structure
@@ -154,15 +163,15 @@ loom-workflow/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
-│   ├── distill-sessions/
 │   ├── git-memory/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
 │   ├── loom-visualization/
+│   ├── project-retro/
 │   ├── recap-state/
-│   ├── retro/
+│   ├── skill-retro/
 │   └── using-loom-workflow/
 ├── tests/                 git-memory, loom-memory, loom-visualization and retro tests
 ├── CHANGELOG.md
@@ -199,7 +208,7 @@ review and trust it again: its event changed.
 ### Antigravity CLI
 
 Install from a clone of the repository. Install `loom-code` first. `critique`,
-`decision-map` and `distill-sessions` refer to it. Before installing, check
+`decision-map` and `skill-retro` refer to it. Before installing, check
 `agy plugin list` for a plugin of the same name imported from Claude Code:
 installing replaces that imported copy, and a later `agy plugin uninstall`
 removes it.
@@ -235,7 +244,7 @@ Then restart OpenCode (`opencode service restart`): until it restarts, `opencode
 
 The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
 
-Skills are offered as `loom-workflow:<skill>`. Start loom with the command `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state`, `/loom-workflow:goal-create` and `/loom-workflow:retro` are also commands, and each of these stays a skill too.
+Skills are offered as `loom-workflow:<skill>`. Start loom with the command `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state`, `/loom-workflow:goal-create` and `/loom-workflow:project-retro` are also commands, and each of these stays a skill too.
 
 On OpenCode, the visualization card and the skill-folder rule run through the plugin's v2 hooks.
 

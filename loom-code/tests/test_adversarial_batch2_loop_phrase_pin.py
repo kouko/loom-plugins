@@ -49,7 +49,7 @@ BATCH_2 = [
     "loom-design/tests/spec/test_write_spec_contract.py",
     "loom-workflow/tests/goal-create/test_skill_md.py",
     "loom-workflow/tests/scripts/test_critique_compaction.py",
-    "loom-workflow/tests/scripts/test_distill_sessions_compaction.py",
+    "loom-workflow/tests/scripts/test_skill_retro_compaction.py",
 ]
 
 

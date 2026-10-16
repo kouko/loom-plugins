@@ -2,9 +2,18 @@
 
 Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
-> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、単一 session の振り返り、session distill、chat の図表と推論ページ、second opinion。
+> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.8.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.9.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+
+## 名前の移行
+
+| 5.9.0 より前 | 5.9.0 以降 | 対象 |
+|---|---|---|
+| `retro` | `project-retro` | 1 回のプロジェクト開発 session。 |
+| `distill-sessions` | `skill-retro` | 複数 session に現れるインストール済み skill の問題。 |
+
+旧名は呼び出せません。新名を使うには、インストール済み plugin を 5.9.0 に更新してください。両方とも提案のみを出し、変更は別の実装フローで行います。
 
 ## 概要
 
@@ -27,7 +36,7 @@ skill がここに属するのは、station をまたいで作業を調整する
 `decision-map` がこのルールの最初の実例です。このルールは新規の収録のみを
 gate し、plugin にすでにある utility skill はそのまま残ります。
 
-`retro` はユーザーが明示的に承認した例外です。依頼に応じて 1 回の開発 session を
+`project-retro` はユーザーが明示的に承認した例外です。依頼に応じて 1 回の開発 session を
 読み取り専用で振り返り、プロジェクトの開発環境の改善点を示します。Loom の station
 にも品質 gate にもなりません。
 
@@ -66,8 +75,8 @@ flowchart TD
 
     subgraph sessions["session に関する作業"]
         handoff["loom-workflow:handoff<br/>session 終了時に状態を保存し、<br/>次の session で再開"]
-        distill["loom-workflow:distill-sessions<br/>過去の session から<br/>skill の改善点を掘り出す"]
-        retro["loom-workflow:retro<br/>1 回の session から<br/>プロジェクトの改善点を探す"]
+        distill["loom-workflow:skill-retro<br/>過去の session から<br/>skill の改善点を掘り出す"]
+        retro["loom-workflow:project-retro<br/>1 回の session から<br/>プロジェクトの改善点を探す"]
     end
 
     subgraph anytime["いつでも"]
@@ -104,8 +113,8 @@ flowchart TD
   は branch を閉じる前に、依頼または agent の判断で永続的な教訓を Record します。
   station からは呼ばれません。
 - **session に関する作業** — `handoff` は session の終わりに状態を保存し、次の
-  session で再開します。`distill-sessions` は過去の session から skill の改善提案を掘り出します。
-  `retro` は依頼に応じて現在または指定された 1 回の session を振り返り、根拠のある
+  session で再開します。`skill-retro` は過去の session から skill の改善提案を掘り出します。
+  `project-retro` は依頼に応じて現在または指定された 1 回の session を振り返り、根拠のある
   プロジェクト改善案を示します。skill の問題は候補として分けて示します。
 - **いつでも** — `independent-advisor` は別の executor に second opinion を求め、
   `loom-visualization` は比較・フロー・推論を table や図で示し、推論ページも作ります。`goal-create` は名前で呼んだ時だけ動き、
@@ -125,14 +134,14 @@ flowchart TD
 | [`dbt-model-style`](skills/dbt-model-style/) | dbt model を書く・編集する・review する時に、dbt + Redshift の style と structure（CTE の役割、zero-logic な final CTE、命名、comment）を適用する。計算ロジックは対象外。 |
 | [`git-memory`](skills/git-memory/) | 毎回の `git commit`・`gh pr create`・`gh pr merge` の前に Decision・Learning・Gotcha の memory を分類する。過去の Git 上の決定の理由も呼び出せる。 |
 | [`handoff`](skills/handoff/) | session 状態を `.claude/handoffs/` の HANDOFF ファイルに保存し、あるいは新しい session でそこから再開する。 |
-| [`distill-sessions`](skills/distill-sessions/) | 過去の Claude Code と Codex の session（利用可能なら `/insights` facets も）を掘り、skill ごとに順位付けした friction とレビュー可能な SKILL.md 提案を出す。 |
-| [`retro`](skills/retro/) | 依頼に応じて現在または指定された 1 回の開発 session を読み取り専用で振り返り、出典をたどれるプロジェクト改善案を示す。skill の問題は候補として分け、ファイルは変更しない。 |
+| [`skill-retro`](skills/skill-retro/) | 複数の Claude Code と Codex の session から、インストール済み skill の指示や関連 plugin 統合に繰り返し現れる問題を調べ、出典付きの提案を示す。変更は適用しない。 |
+| [`project-retro`](skills/project-retro/) | 依頼に応じて現在または指定された 1 回の開発 session を読み取り専用で振り返り、出典をたどれるプロジェクト改善案を示す。skill の問題は候補として分け、ファイルは変更しない。 |
 | [`independent-advisor`](skills/independent-advisor/) | 明示的に依頼された code・plan・decision の外部 review を `loom-code:external-review` に渡し、元の review 基準を保つ。別の model tier・effort・ベンダーから自由形式の second opinion も取れる。費用の発生やマシン外への送信には承認が必要。 |
 | [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |
 | [`goal-create`](skills/goal-create/) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
 Loom の契約で数えるツールはこのうち 8 個です。`goal-create` と `dbt-model-style`
-と `retro` は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。
+と `project-retro` は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。
 
 ## Repository 構成
 
@@ -151,15 +160,15 @@ loom-workflow/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
-│   ├── distill-sessions/
 │   ├── git-memory/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
 │   ├── loom-visualization/
+│   ├── project-retro/
 │   ├── recap-state/
-│   ├── retro/
+│   ├── skill-retro/
 │   └── using-loom-workflow/
 ├── tests/                 git-memory・loom-memory・loom-visualization・retro のテスト
 ├── CHANGELOG.md
@@ -193,7 +202,7 @@ Codex では loom-visualization の visualization card を plugin の UserPrompt
 ### Antigravity CLI
 
 repo を clone し、`loom-code` を先にインストールする。`critique`・`decision-map`・
-`distill-sessions` が loom-code を参照する。インストール前に `agy plugin list` で
+`skill-retro` が loom-code を参照する。インストール前に `agy plugin list` で
 Claude Code から取り込まれた同名の plugin がないか確認する。install はその取り込み済みの
 コピーを置き換え、後の `agy plugin uninstall` はそれを削除する。
 
@@ -227,7 +236,7 @@ opencode plugin list
 
 OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を `opencode.json`（`plugin add` が OpenCode の設定フォルダ `~/.config/opencode/` に書き込むファイル）の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
 
-skill は `loom-workflow:<skill>` として提供されます。loom はコマンド `/loom-workflow:using-loom-workflow` で始めます。`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:goal-create`、`/loom-workflow:retro` もコマンドで、いずれも skill としても引き続き提供されます。
+skill は `loom-workflow:<skill>` として提供されます。loom はコマンド `/loom-workflow:using-loom-workflow` で始めます。`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:goal-create`、`/loom-workflow:project-retro` もコマンドで、いずれも skill としても引き続き提供されます。
 
 OpenCode では、visualization card とスキルフォルダのルールが plugin の v2 hook で動きます。
 

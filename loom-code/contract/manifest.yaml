@@ -26,14 +26,14 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
   - {name: handoff,             owner: loom-workflow}
   - {name: recap-state,         owner: loom-workflow}
   - {name: loom-visualization,  owner: loom-workflow}
-  - {name: distill-sessions,    owner: loom-workflow}
+  - {name: skill-retro,    owner: loom-workflow}
   - {name: git-memory,          owner: loom-workflow}
   - {name: independent-advisor, owner: loom-workflow}
   - {name: critique,            owner: loom-workflow}   # mode: proposal | complexity
   # standalone: outside the loom flow; not counted toward the skill budget (user-decided 2026-09-02)
   - {name: goal-create,         owner: loom-workflow, standalone: true}
   - {name: dbt-model-style,     owner: loom-workflow, standalone: true}
-  - {name: retro,               owner: loom-workflow, standalone: true}
+  - {name: project-retro,               owner: loom-workflow, standalone: true}
 
 actions:             # executable steps inside a station; not skills (§3)
   - name: restate-and-confirm
