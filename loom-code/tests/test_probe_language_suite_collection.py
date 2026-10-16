@@ -43,11 +43,13 @@ def test_cargo_tests_dir_collected(tmp_path: Path, kickoff: str | None) -> None:
     (PACKAGE, None, "tests/probe.txt"),
     (PACKAGE, None, "tests/missing.rs"),
     (PACKAGE, "cargo test --manifest-path Cargo.toml", "tests/probe.rs"),
+    ('[workspace]\nmembers = ["crates/a"]\n', None, "tests/probe.rs"),
 ], ids=["cargo-autotests-off-or-subdir-refused-autotests",
         "cargo-autotests-off-or-subdir-refused-subdir",
         "cargo-autotests-off-or-subdir-refused-non-rs",
         "cargo-autotests-off-or-subdir-refused-missing",
-        "cargo-autotests-off-or-subdir-refused-other-option"])
+        "cargo-autotests-off-or-subdir-refused-other-option",
+        "cargo-autotests-off-or-subdir-refused-virtual-workspace"])
 def test_cargo_autotests_off_or_subdir_refused(
     tmp_path: Path, cargo_toml: str, kickoff: str | None, artifact: str
 ) -> None:

@@ -226,7 +226,8 @@ def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
     except (OSError, tomllib.TOMLDecodeError) as exc:
         return None, f"Cargo.toml could not be read: {exc}"
     package = manifest.get("package")
-    if isinstance(package, dict) and package.get("autotests") is False:
+    # A virtual workspace root (no [package]) tests its members, never tests/.
+    if not isinstance(package, dict) or package.get("autotests") is False:
         return False, ""
     return True, ""
 
