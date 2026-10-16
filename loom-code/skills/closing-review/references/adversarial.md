@@ -140,6 +140,27 @@ and observed result in the generated attestation:
 The first entry is a probe still in this change's store; the second is the
 same probe after graduation, named where the selected commit holds it.
 
+In a Go, JavaScript/TypeScript or Rust repo the command takes one of these forms:
+
+```json
+{"command": "go test docs/loom/<change-id>/evidence/probes/empty_input_test.go",
+ "artifact": "docs/loom/<change-id>/evidence/probes/empty_input_test.go"}
+{"command": "node --test docs/loom/<change-id>/evidence/probes/empty_input.test.mjs",
+ "artifact": "docs/loom/<change-id>/evidence/probes/empty_input.test.mjs"}
+{"command": "cargo test --test adversarial_empty_input",
+ "artifact": "tests/adversarial_empty_input.rs"}
+```
+
+- Go runs the probe in file-list mode, so it compiles as its own package and
+  reaches only the code's exported identifiers.
+- Node also accepts `npx vitest run <file>` and `npx jest <file>`.
+- Rust cannot run a probe from the change store, so the probe graduates to
+  `tests/<name>.rs` and is recorded as `cargo test --test <name>`.
+
+A filter that can select zero tests (`go test -run`, a cargo test-name filter)
+and any option the checker does not list are refused; the `concern:` line may
+use the language's line comment (`//`).
+
 - Record every attempt that failed to break anything, for every artifact
   type — that is what makes the attempts an eval rather than an anecdote.
 - `command` must be re-runnable by someone else in a clean tree.
