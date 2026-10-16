@@ -1,0 +1,438 @@
+"""test_prompts_parseable.py — structural guard for Trace2Skill prompt files.
+
+Per loom-workflow/skills/skill-retro Plan Part 2 §Task 6.
+
+The two prompt files at agents/prompt-{failure,success}-analysis.md are
+bundled subagent prompts the v0.1 Stage 3 orchestrator dispatches via
+``loom-code:dispatching-parallel-agents``. The files are markdown with
+YAML frontmatter (``role / model / input_contract / output_contract /
+hard_constraints``) plus a 4-step body that mirrors Trace2Skill's
+``analysis/error_analysis_system_llm.txt`` and
+``analysis/success_analysis_system_llm.txt``.
+
+This test is a STRUCTURAL guard, not a content review. It asserts:
+
+- Both files exist at the expected paths.
+- Each file's frontmatter parses and carries the required keys.
+- Each file's body contains the 4 numbered workflow steps.
+- Each file documents the Memory Item schema (``Title / Description /
+  Content``).
+- Success-side carries the Lean Solution Path section and a dead-end
+  stripping marker.
+- Both carry the no-memory-citation rule in frontmatter hard_constraints.
+- Both reference Sonnet 4.6 as the dispatch model (v0.4 swap from prior Haiku-locked model; see v0.4 brief Q-v0.4-1).
+
+Why intent-grounded (Rule 9): if the Trace2Skill constraints stop being
+encoded in our prompts, the v0.1 Stage 3 subagents lose their
+hindsight-bias protection (failure side) or solution-path-distillation
+discipline (success side) — the prompts would become free-form review
+templates, undermining the architecture's borrowed grounding.
+"""
+
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+import pytest
+
+try:
+    import yaml  # PyYAML
+except ImportError:  # pragma: no cover — environment guard
+    yaml = None
+
+
+SKILL_ROOT = Path(__file__).resolve().parents[2] / "skills" / "skill-retro"
+AGENTS_DIR = SKILL_ROOT / "agents"
+FAILURE_PATH = AGENTS_DIR / "prompt-failure-analysis.md"
+SUCCESS_PATH = AGENTS_DIR / "prompt-success-analysis.md"
+ADVISORY_PATH = AGENTS_DIR / "prompt-advisory-analyst.md"
+
+# Canonical subagent model ID expected in frontmatter (v0.4: Sonnet 4.6 1M-context).
+EXPECTED_MODEL = "claude-sonnet-4-6"
+
+# Required frontmatter keys per Plan T6 §Implementation notes.
+REQUIRED_FRONTMATTER_KEYS = {
+    "role",
+    "model",
+    "input_contract",
+    "output_contract",
+    "hard_constraints",
+}
+
+# Advisory-analyst (v0.5) frontmatter requires an additional `language` key
+# (locale variable for prose; paste-ready text requires input language evidence).
+ADVISORY_REQUIRED_FRONTMATTER_KEYS = REQUIRED_FRONTMATTER_KEYS | {"language"}
+
+# 4-step workflow per Trace2Skill error_analysis_system_llm.txt §Required Workflow.
+REQUIRED_STEP_MARKERS = [
+    "1.",  # Understand the task
+    "2.",  # Identify what went wrong / went right
+    "3.",  # Trace to behavior
+    "4.",  # Write structured Memory Items
+]
+
+# Memory Item schema fields (Trace2Skill OUTPUT FORMAT (STRICT)).
+MEMORY_ITEM_FIELDS = ["Title", "Description", "Content"]
+
+
+def _split_frontmatter(text: str) -> tuple[dict, str]:
+    """Return (parsed_frontmatter_dict, body_text).
+
+    Raises pytest.fail if frontmatter delimiters missing or YAML parse fails.
+    """
+    if yaml is None:  # pragma: no cover
+        pytest.skip("PyYAML not available")
+    if not text.startswith("---\n"):
+        pytest.fail("file does not start with YAML frontmatter delimiter '---'")
+    rest = text[len("---\n") :]
+    end_idx = rest.find("\n---\n")
+    if end_idx == -1:
+        pytest.fail("closing frontmatter delimiter '---' not found")
+    fm_text = rest[:end_idx]
+    body = rest[end_idx + len("\n---\n") :]
+    parsed = yaml.safe_load(fm_text)
+    if not isinstance(parsed, dict):
+        pytest.fail(f"frontmatter did not parse to a dict; got {type(parsed).__name__}")
+    return parsed, body
+
+
+def _assert_common_shape(path: Path) -> tuple[dict, str]:
+    """Common structural assertions for both prompt files.
+
+    Returns (frontmatter_dict, body_text) for side-specific assertions.
+    """
+    assert path.is_file(), f"missing prompt file: {path}"
+    text = path.read_text(encoding="utf-8")
+    fm, body = _split_frontmatter(text)
+
+    missing = REQUIRED_FRONTMATTER_KEYS - set(fm.keys())
+    assert not missing, f"{path.name}: frontmatter missing keys: {sorted(missing)}"
+
+    assert fm["model"] == EXPECTED_MODEL, (
+        f"{path.name}: model is {fm['model']!r}, expected {EXPECTED_MODEL!r}"
+    )
+
+    # 4 numbered steps must be present in body (in order, even if other
+    # text intervenes).
+    last_pos = -1
+    for marker in REQUIRED_STEP_MARKERS:
+        idx = body.find(marker, last_pos + 1)
+        assert idx != -1, f"{path.name}: workflow step marker {marker!r} not found"
+        last_pos = idx
+
+    # Memory Item schema section.
+    assert "Memory Item" in body, (
+        f"{path.name}: 'Memory Item' schema heading missing from body"
+    )
+    for field_name in MEMORY_ITEM_FIELDS:
+        assert field_name in body, (
+            f"{path.name}: Memory Item field {field_name!r} not documented in body"
+        )
+
+    # Dispatch section.
+    assert "## How the orchestrator dispatches this prompt" in body, (
+        f"{path.name}: dispatch section heading missing"
+    )
+
+    return fm, body
+
+
+def test_failure_prompt_structure() -> None:
+    """prompt-failure-analysis.md passes the common shape and names the failure side."""
+    fm, _ = _assert_common_shape(FAILURE_PATH)
+
+    # Role should signal failure-analysis side.
+    assert "failure" in fm["role"].lower(), (
+        f"failure-prompt role {fm['role']!r} doesn't mention failure"
+    )
+
+
+def test_success_prompt_structure() -> None:
+    """prompt-success-analysis.md passes the common shape and has a Lean Solution Path heading."""
+    fm, body = _assert_common_shape(SUCCESS_PATH)
+
+    # Role should signal success-analysis side.
+    assert "success" in fm["role"].lower(), (
+        f"success-prompt role {fm['role']!r} doesn't mention success"
+    )
+
+    # Lean Solution Path section (heading).
+    assert "## Lean Solution Path" in body, (
+        "success-prompt must carry a 'Lean Solution Path' section heading"
+    )
+
+
+def test_both_prompt_files_have_required_sections() -> None:
+    """Top-level GREEN assertion — both files exist and pass common shape."""
+    assert FAILURE_PATH.is_file(), f"missing: {FAILURE_PATH}"
+    assert SUCCESS_PATH.is_file(), f"missing: {SUCCESS_PATH}"
+    # Re-run common shape; if the two side-specific tests above passed,
+    # this is belt-and-suspenders. Failure here means the file flipped
+    # shape between tests (shouldn't happen in one run).
+    _assert_common_shape(FAILURE_PATH)
+    _assert_common_shape(SUCCESS_PATH)
+
+
+def test_advisory_prompt_structure() -> None:
+    """prompt-advisory-analyst.md (v0.5) must define the 7-section advisory schema.
+
+    Per v0.5 plan T1 + brief §Smallest End State, the Sonnet advisory analyst
+    replaces v0.4.1's heuristic ``cluster_by_title_keyword`` +
+    ``extract_claude_md_candidates`` + ``_render_*`` template renderers. The
+    prompt drives:
+
+    - semantic clustering of Memory Items (≤5 distinct anti-patterns; reject
+      surface-word transitive merges that produced v0.4.1's 31/33 false cluster);
+    - ≤5 real cross-skill CLAUDE.md candidates (semantic dedup vs generic-keyword
+      noise like 'all' / 'open' / 'start');
+    - code-block wrapping for all copy-pasteable suggested edits / command
+      lines / pasted file path references;
+    - explanatory prose in user's working language via ``{{lang}}`` (one of
+      ``zh-TW``, ``en``, ``ja``); paste-ready text is conditional on
+      source-language and exact-text evidence in ``merged_data``.
+
+    Why intent-grounded (Rule 9): if these constraints stop being encoded in
+    the prompt, the analyst regresses to v0.4.1's surface-word clustering OR
+    drops the code-block wrapping (forcing user to re-format copy-pasteable
+    edits) OR mixes prose languages (breaking the locale contract). All three
+    are the failure modes v0.5 exists to fix. This test checks the headings,
+    the ``{{lang}}`` variable and the summary header; the clustering cap, the
+    code-block rule and the merged input are left to review.
+    """
+    assert ADVISORY_PATH.is_file(), f"missing prompt file: {ADVISORY_PATH}"
+    text = ADVISORY_PATH.read_text(encoding="utf-8")
+    fm, body = _split_frontmatter(text)
+
+    missing = ADVISORY_REQUIRED_FRONTMATTER_KEYS - set(fm.keys())
+    assert not missing, (
+        f"{ADVISORY_PATH.name}: frontmatter missing keys: {sorted(missing)}"
+    )
+
+    assert fm["model"] == EXPECTED_MODEL, (
+        f"{ADVISORY_PATH.name}: model is {fm['model']!r}, expected {EXPECTED_MODEL!r}"
+    )
+
+    # Role should signal advisory-analyst side.
+    assert "advisory" in fm["role"].lower() or "analyst" in fm["role"].lower(), (
+        f"advisory-prompt role {fm['role']!r} doesn't mention advisory/analyst"
+    )
+
+    # The 7 section headings must appear in the body's output template (in order).
+    # These are English headings per spec; explanatory prose under them is in {{lang}}.
+    required_section_headings = [
+        "skill-mining advisory report",  # H1 (§1)
+        "Top anti-patterns",  # §2
+        "Per-target proposals",  # §3
+        "CLAUDE.md candidates",  # §4
+        "New-skill candidates",  # §5
+        "Summary numbers",  # §6; required headings stay English
+        "Action steps",
+    ]
+    last_pos = -1
+    for heading in required_section_headings:
+        # Anchor at a real markdown heading line (a run of `#` at line
+        # start) so an earlier prose mention of the same phrase (e.g. the
+        # §5 fallback instruction above the actual "## New-skill
+        # candidates" heading) can't satisfy this in place of the heading.
+        m = re.search(
+            r"^#{1,6}[ \t]*.*?" + re.escape(heading),
+            body[last_pos + 1:],
+            re.MULTILINE,
+        )
+        idx = (last_pos + 1 + m.start()) if m else -1
+        assert idx != -1, (
+            f"{ADVISORY_PATH.name}: required section heading "
+            f"{heading!r} not found in body output template"
+        )
+        last_pos = idx
+
+    assert "## Summary numbers" in body
+
+    # Language rule: prose follows {{lang}}; paste-ready text needs input evidence.
+    assert "{{lang}}" in body, (
+        f"{ADVISORY_PATH.name}: body must reference the {{{{lang}}}} variable"
+    )
+
+
+def test_advisory_prompt_forbids_orchestrator_memory_reference() -> None:
+    """Same regression guard as sibling prompts (v0.2 Finding #3).
+
+    The advisory analyst runs in the same orchestrator process and inherits the
+    auto-loaded ``~/.claude/projects/.../memory/MEMORY.md``. Without an explicit
+    hard constraint, advisory report copy could cite ``[feedback_X](project
+    memory)`` / ``[[name]]`` / ``feedback_*.md`` — which leak into the rendered
+    advisory and onward into SKILL.md edits the user copies. Pin the no-memory-
+    citation rule here so silent removal fails CI.
+    """
+    fm, body = _split_frontmatter(ADVISORY_PATH.read_text(encoding="utf-8"))
+
+    constraints = fm.get("hard_constraints", []) or []
+    joined = " ".join(str(c) for c in constraints).lower()
+    # Advisory prompt's hard constraints differ in shape from sibling prompts
+    # (analyst over merged.json, not per-trajectory); the no-memory-citation
+    # rule appears in the body §"What you must NOT do" section.
+    body_lower = body.lower()
+    assert "feedback_" in body_lower or "project_" in body_lower, (
+        f"{ADVISORY_PATH.name}: body must forbid orchestrator memory citations "
+        f"(no [feedback_X](project memory), no [[name]], no feedback_*.md / "
+        f"project_*.md references in rendered advisory output)"
+    )
+    # joined is allowed to be empty for advisory; the body assertion above is
+    # the authoritative check. Touch `joined` to keep linters quiet.
+    _ = joined
+
+
+def test_advisory_prompt_defines_skill_dir_before_first_use() -> None:
+    """The advisory prompt's first ``<skill-dir>`` must sit in its definition.
+
+    The analyst's command examples use ``<skill-dir>/scripts/...``. An
+    undefined placeholder gets copied literally into the report the user
+    pastes from, so the paragraph holding the first occurrence must name
+    SKILL.md, the file whose folder it is. Its wording is left to review.
+    """
+    _, body = _split_frontmatter(ADVISORY_PATH.read_text(encoding="utf-8"))
+    first = body.find("<skill-dir>")
+    assert first != -1, f"{ADVISORY_PATH.name}: expected a <skill-dir> use"
+    start = body.rfind("\n\n", 0, first)
+    end = body.find("\n\n", first)
+    paragraph = body[start if start != -1 else 0 : end if end != -1 else len(body)]
+    paragraph_lower = " ".join(paragraph.split()).lower()
+    assert "skill.md" in paragraph_lower, (
+        f"{ADVISORY_PATH.name}: the first <skill-dir> must appear in a sentence "
+        f"defining it (the folder holding SKILL.md); "
+        f"got paragraph: {paragraph.strip()!r}"
+    )
+
+
+def test_advisory_prompt_declares_skill_dir_input() -> None:
+    """``skill_dir`` must be a named input, not a value the orchestrator guesses.
+
+    The prompt tells the analyst to replace ``<skill-dir>`` with a resolved
+    path, so that path has to arrive as an input: in the frontmatter
+    ``input_contract``, in the "Context you will receive" list, and in the
+    input count. A stale "three inputs" sentence contradicts the list.
+    """
+    fm, body = _split_frontmatter(ADVISORY_PATH.read_text(encoding="utf-8"))
+    assert "skill_dir" in (fm.get("input_contract") or {}), (
+        f"{ADVISORY_PATH.name}: input_contract must declare skill_dir"
+    )
+    start = body.find("## Context you will receive")
+    assert start != -1, f"{ADVISORY_PATH.name}: missing context section"
+    end = body.find("\n## ", start + 1)
+    section = body[start : end if end != -1 else len(body)]
+    assert re.search(r"^- `skill_dir`", section, re.MULTILINE), (
+        f"{ADVISORY_PATH.name}: context list must include a `skill_dir` bullet"
+    )
+    flat = " ".join(body.split()).lower()
+    assert "three inputs" not in flat, (
+        f"{ADVISORY_PATH.name}: input count must match the four declared inputs"
+    )
+
+
+def test_advisory_prompt_has_no_bare_relative_pytest_path() -> None:
+    """Command examples must root script paths at ``<skill-dir>``."""
+    text = ADVISORY_PATH.read_text(encoding="utf-8")
+    assert not re.search(r"pytest scripts/", text), (
+        f"{ADVISORY_PATH.name}: use `pytest <skill-dir>/scripts/...`"
+    )
+
+
+def test_skill_md_advisory_dispatch_names_skill_dir_key() -> None:
+    """SKILL.md's advisory dispatch step must name the payload's skill_dir key."""
+    text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
+    start = text.find("## Optional advisory report")
+    assert start != -1, "SKILL.md: missing advisory report section"
+    end = text.find("\n## ", start + 1)
+    section = " ".join(text[start : end if end != -1 else len(text)].split())
+    assert "`skill_dir`" in section and "dispatch_payload.input" in section, (
+        "SKILL.md: advisory dispatch step must name `skill_dir` from "
+        "dispatch_payload.input"
+    )
+
+
+@pytest.mark.parametrize("host_file", ["claude-code-tools.md", "codex-tools.md"])
+def test_host_advisory_dispatch_template_passes_skill_dir(host_file: str) -> None:
+    """Each host's Stage 5c template must pass skill_dir to the analyst."""
+    text = (SKILL_ROOT / "references" / host_file).read_text(encoding="utf-8")
+    start = text.find("## Stage 5c single dispatch")
+    assert start != -1, f"{host_file}: missing Stage 5c dispatch section"
+    end = text.find("\n## ", start + 1)
+    section = text[start : end if end != -1 else len(text)]
+    assert "skill_dir" in section and "dispatch_payload.input" in section, (
+        f"{host_file}: Stage 5c dispatch must pass dispatch_payload.input "
+        "including `skill_dir`"
+    )
+
+
+def test_both_prompts_forbid_orchestrator_memory_reference() -> None:
+    """Regression guard for v0.2 Finding #3 (orchestrator memory leak).
+
+    The orchestrator runs with ``~/.claude/projects/.../memory/MEMORY.md`` auto-
+    loaded into context; that bleeds into dispatched subagents that share the
+    same project. v0.1 dogfood (2026-05-25) showed subagents citing memory
+    entries like ``[feedback_X](project memory)`` inside Memory Item bodies,
+    which then propagated into proposed SKILL.md text — invalid because
+    SKILL.md is consumed by future sessions / other operators who have no
+    such memory directory. The fix is a hard constraint in both prompt files
+    (body §Hard constraints + frontmatter hard_constraints). This test
+    checks the frontmatter one; the body wording is left to review.
+    """
+    for path in (FAILURE_PATH, SUCCESS_PATH):
+        fm, _ = _split_frontmatter(path.read_text(encoding="utf-8"))
+
+        # Frontmatter list must include the no-memory-citation constraint.
+        constraints = fm.get("hard_constraints", []) or []
+        joined = " ".join(str(c) for c in constraints).lower()
+        assert "project memory" in joined, (
+            f"{path.name}: frontmatter hard_constraints must forbid orchestrator "
+            f"project memory references"
+        )
+
+
+def test_advisory_prompt_routes_integration_without_skill_md_edit() -> None:
+    text = ADVISORY_PATH.read_text(encoding='utf-8')
+    assert 'issue_surface' in text
+    assert 'plugin-integration' in text
+    assert 'source_pointer' in text
+    assert 'do not fabricate a skill.md edit' in text.lower()
+
+
+def test_codex_dispatch_reference_uses_available_lifecycle_and_model_controls() -> None:
+    text = (SKILL_ROOT / 'references' / 'codex-tools.md').read_text(encoding='utf-8')
+    assert 'spawn_agent' in text and 'wait_agent' in text
+    assert 'close_agent' not in text
+    assert 'model' in text and 'fork_turns' in text
+    assert 'Sonnet generation' not in text
+
+
+def test_advisory_language_contract_preserves_target_source_language() -> None:
+    text = ADVISORY_PATH.read_text(encoding='utf-8')
+    fm, _ = _split_frontmatter(text)
+    constraints = ' '.join(fm['hard_constraints'])
+    assert 'section titles' not in constraints.lower()
+    assert 'source language' in constraints.lower()
+    assert 'literal syntax' in constraints.lower()
+    for stale in (
+        'Code blocks stay English',
+        'SKILL.md — English',
+        'CLAUDE.md candidate — English',
+        'concrete command — English',
+        'paste-into-English-files',
+    ):
+        assert stale not in text
+    assert 'Section headings' in text and 'stay English' in text
+    assert '## 數字摘要' not in text and '## 数値サマリ' not in text
+
+
+def test_advisory_paste_ready_requires_input_language_evidence() -> None:
+    text = ADVISORY_PATH.read_text(encoding='utf-8')
+    fm, body = _split_frontmatter(text)
+    constraints = ' '.join(fm['hard_constraints']).lower()
+    assert 'merged_data' in constraints and 'paste-ready' in constraints
+    assert 'source-language evidence' in constraints
+    assert 'for implementer adaptation' in body.lower()
+    assert 'only label' in body.lower() and 'paste-ready' in body.lower()
+    assert 'exact text to paste into SKILL.md' not in body
+    assert 'one-line CLAUDE.md candidate — preserve that file' not in body
+    assert 'You do not have file-system access' in body

@@ -16,7 +16,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 PLUGIN = REPO / "loom-workflow"
-CURRENT = "5.8.0"
+CURRENT = "5.9.0"
 
 
 @pytest.mark.parametrize(
@@ -58,13 +58,30 @@ def test_root_readme_section_line_is_current() -> None:
     assert line.group(1) == CURRENT
 
 
-def test_discovery_metadata_names_retro() -> None:
+def test_discovery_metadata_names_both_retros() -> None:
     for manifest in ("plugin.json", ".claude-plugin/plugin.json",
                      ".codex-plugin/plugin.json", "package.json"):
         data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
-        assert "retro" in data["description"], manifest
+        assert "project-retro" in data["description"], manifest
+        assert "skill-retro" in data["description"], manifest
     for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json"):
         data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
-        assert "retro" in data["keywords"], manifest
+        assert "project-retro" in data["keywords"], manifest
+        assert "skill-retro" in data["keywords"], manifest
+        assert "retro" not in data["keywords"], manifest
+        assert "distill-sessions" not in data["keywords"], manifest
     codex = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
-    assert "retro" in codex["interface"]["longDescription"]
+    assert "project-retro" in codex["interface"]["longDescription"]
+    assert "skill-retro" in codex["interface"]["longDescription"]
+    skills = PLUGIN / "skills"
+    assert (skills / "project-retro" / "SKILL.md").is_file()
+    assert (skills / "skill-retro" / "SKILL.md").is_file()
+    assert not (skills / "retro").exists()
+    assert not (skills / "distill-sessions").exists()
+
+
+@pytest.mark.parametrize("readme", ["README.md", "README.ja.md", "README.zh-TW.md"])
+def test_readmes_explain_direct_name_migration(readme: str) -> None:
+    text = (PLUGIN / readme).read_text(encoding="utf-8")
+    assert "`retro` | `project-retro`" in text
+    assert "`distill-sessions` | `skill-retro`" in text

@@ -2,7 +2,7 @@
 tools, out-of-contract loom-memory, and one optional discovery router.
 
 The loom 1.0 budget counts eight tools in loom-code's contract manifest.
-`goal-create`, `dbt-model-style`, and `retro` sit outside the loom flow and are marked
+`goal-create`, `dbt-model-style`, and `project-retro` sit outside the loom flow and are marked
 `standalone: true` there, so they ship here but are not counted
 (user-decided 2026-09-02). `loom-memory` joined this plugin's skill
 directory when the independent `loom-memory` plugin retired into
@@ -24,14 +24,14 @@ MANIFEST = REPO_ROOT / "loom-code" / "contract" / "manifest.yaml"
 COUNTED = {
     "critique",
     "decision-map",
-    "distill-sessions",
+    "skill-retro",
     "git-memory",
     "handoff",
     "independent-advisor",
     "loom-visualization",
     "recap-state",
 }
-STANDALONE = {"goal-create", "dbt-model-style", "retro"}
+STANDALONE = {"goal-create", "dbt-model-style", "project-retro"}
 # Ships in loom-workflow/skills/ but is deliberately absent from loom-code's
 # contract manifest — carried over unchanged from when `loom-memory` was its
 # own independent plugin (REQ-24 of 2026-09-10-okf-compatible-loom-memory).

@@ -45,7 +45,7 @@ counting: >
 
 mechanisms:
   # --- skill (23; 7 stations + 13 non-standalone tools + 3 optional routers;
-  #     the 2 standalone tools are excluded from this population) ---
+  #     the 3 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
     eval: tests/test_loom_skill_description_catalog.py
@@ -100,9 +100,9 @@ mechanisms:
   - id: loom-visualization
     class: skill
     eval: "loom-workflow/tests/scripts/test_loom_visualization_compaction.py"
-  - id: distill-sessions
+  - id: skill-retro
     class: skill
-    eval: "loom-workflow/tests/distill-sessions/test_apply.py::test_refuses_without_approved_flag"
+    eval: "loom-workflow/tests/skill-retro/test_issue_surface.py"
   - id: git-memory
     class: skill
     eval: "loom-workflow/tests/scripts/test_git_memory_compaction.py"
@@ -261,7 +261,7 @@ mechanisms:
   - {id: "tool:handoff",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:recap-state",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:loom-visualization",  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
-  - {id: "tool:distill-sessions",    class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:skill-retro",    class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:git-memory",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:independent-advisor", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:critique",            class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}

@@ -18,19 +18,19 @@ LOOM_CODE_SKILLS = REPO_ROOT / "loom-code" / "skills"
 SCANNED = (
     "loom-workflow/skills/git-memory/protocols/recall.md",
     "loom-workflow/skills/git-memory/protocols/compose-commit.md",
-    "loom-workflow/skills/distill-sessions/agents/prompt-failure-analysis.md",
-    "loom-workflow/skills/distill-sessions/agents/prompt-success-analysis.md",
+    "loom-workflow/skills/skill-retro/agents/prompt-failure-analysis.md",
+    "loom-workflow/skills/skill-retro/agents/prompt-success-analysis.md",
 )
 
 # Host maps and READMEs name skills in plain prose and sample output, so a
 # retired name is rejected there even without backticks. Scoped to these
 # files: elsewhere "brainstorming" is an ordinary English word.
 SCANNED_UNQUOTED = (
-    "loom-workflow/skills/distill-sessions/references/claude-code-tools.md",
-    "loom-workflow/skills/distill-sessions/references/codex-tools.md",
-    "loom-workflow/skills/distill-sessions/README.md",
-    "loom-workflow/skills/distill-sessions/README.ja.md",
-    "loom-workflow/skills/distill-sessions/README.zh-TW.md",
+    "loom-workflow/skills/skill-retro/references/claude-code-tools.md",
+    "loom-workflow/skills/skill-retro/references/codex-tools.md",
+    "loom-workflow/skills/skill-retro/README.md",
+    "loom-workflow/skills/skill-retro/README.ja.md",
+    "loom-workflow/skills/skill-retro/README.zh-TW.md",
 )
 
 RETIRED = (

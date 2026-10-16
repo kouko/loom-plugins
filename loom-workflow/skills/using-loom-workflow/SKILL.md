@@ -16,7 +16,7 @@ The selected skill owns its procedure, permissions, and output contract.
 | Judge a proposal, choose what to keep, or assess a simpler implementation | [critique](../critique/SKILL.md) |
 | Write, edit, or review dbt + Redshift model style and structure | [dbt-model-style](../dbt-model-style/SKILL.md) |
 | Open, advance, resume, or assess a persistent Outcome Map across sessions | [decision-map](../decision-map/SKILL.md) |
-| Mine past agent sessions or skill-activation telemetry for improvement evidence | [distill-sessions](../distill-sessions/SKILL.md) |
+| Review several sessions for recurring issues in an installed skill or its related plugin integration | [skill-retro](../skill-retro/SKILL.md) |
 | Commit, create/merge a PR, or recall a decision bound to Git history | [git-memory](../git-memory/SKILL.md) |
 | Explicitly invoke `goal-create` by name for a session goal or repository purpose | [goal-create](../goal-create/SKILL.md) |
 | Save state for another session or resume a saved HANDOFF | [handoff](../handoff/SKILL.md) |
@@ -24,7 +24,7 @@ The selected skill owns its procedure, permissions, and output contract.
 | Remember, recall, reconcile, or forget a durable repository lesson; or a task needs a prior lesson | [loom-memory](../loom-memory/SKILL.md) |
 | Show a comparison, flow, decision, state, or reasoning chain as a table, ASCII, or Mermaid diagram in coding chat, or render documented reasoning as a standalone page | [loom-visualization](../loom-visualization/SKILL.md) |
 | Re-orient within this conversation: 'where were we', '剛剛講到哪', or 振り返り when asking where the current conversation stands | [recap-state](../recap-state/SKILL.md) |
-| Review the current or one specified coding session for project development improvements, or 振り返り seeking project development improvements | [retro](../retro/SKILL.md) |
+| Review the current or one specified coding session for project development improvements, or 振り返り seeking project development improvements | [project-retro](../project-retro/SKILL.md) |
 
 Do not select `goal-create` from an inferred need or an unnamed goal request.
 Changing a critique lens selects `critique`; changing who answers selects

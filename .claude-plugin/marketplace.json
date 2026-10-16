@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "loom-workflow",
-      "description": "Optional using-loom-workflow discovery routing and Loom workflow tools around the loom stations — persistent Outcome Maps, git memory, loom-memory (recall / record / reconcile / retire durable repository lessons), critique (proposal | complexity), recap, handoff, session distill, CoT explainers, cross-executor second opinion, plus the standalone goal-create and dbt-model-style skills.",
+      "description": "Optional using-loom-workflow discovery routing and Loom workflow tools around the loom stations — persistent Outcome Maps, git memory, loom-memory (recall / record / reconcile / retire durable repository lessons), critique (proposal | complexity), recap, handoff, project-retro and skill-retro, CoT explainers, cross-executor second opinion, plus the standalone goal-create and dbt-model-style skills.",
       "source": "./loom-workflow/"
     },
     {
