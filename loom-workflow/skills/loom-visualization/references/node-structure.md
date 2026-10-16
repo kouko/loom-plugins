@@ -24,9 +24,14 @@ Two forms are supported:
 Title and body are left-aligned inside the box (users 2026-09-27 selected).
 
 ## Container rule / content rule
-A node with only one word to say is expanded into an informative phrase
-or removed from the diagram — never drawn with an empty separator.
-This rule avoids padding nodes to satisfy a format.
+Use a short title that identifies the node's action, role, state, or claim
+without requiring the body to explain what the node is. Add a body only when
+it contributes a distinct condition, evidence, output, or other detail that
+the title, edge labels, and adjacent cells do not already convey.
+A node that needs no such detail stays title-only, with no separator. If its
+title is too vague to stand alone, expand it into an informative phrase or
+remove the node; never add an empty separator or filler body to satisfy a
+format.
 
 ## Width budget
 Long prose wraps in-box at the default width budget (40 cells) or an

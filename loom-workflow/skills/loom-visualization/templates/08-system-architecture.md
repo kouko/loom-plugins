@@ -29,7 +29,7 @@ in `SKILL.md`) with this input on stdin. The layer
 bands carry no arrows; state the dependencies in the table or below the diagram.
 
 ```json
-{"layers": [{"name": {"title": "プレゼンテーション層", "body": ["* Web UI", "* CLI"]}, "components": ["Web UI", "CLI"]}, {"name": "アプリケーション層", "components": ["API サーバー", "ワーカー"]}, {"name": "データ層", "components": ["PostgreSQL", "Redis"]}]}
+{"layers": [{"name": {"title": "プレゼンテーション層", "body": ["* validates user input"]}, "components": ["Web UI", "CLI"]}, {"name": "アプリケーション層", "components": ["API サーバー", "ワーカー"]}, {"name": "データ層", "components": ["PostgreSQL", "Redis"]}]}
 ```
 
 Output:
@@ -38,8 +38,7 @@ Output:
 ┌─────────────────────────┐
 │ プレゼンテーション層    │
 ├─────────────────────────┤
-│ * Web UI                │
-│ * CLI                   │
+│ * validates user input  │
 ├─────────────┬───────────┤
 │ Web UI      │ CLI       │
 └─────────────┴───────────┘
@@ -61,7 +60,7 @@ Container level: one subgraph per layer.
 
 ```mermaid
 flowchart TB
-    subgraph P["<div style='text-align:left'>プレゼンテーション層<br/>━━━━━━━━━━━━━━━━━━━━━━━<br/>• Web UI<br/>• CLI</div>"]
+    subgraph P["<div style='text-align:left'>プレゼンテーション層<br/>━━━━━━━━━━━━━━━━━━━━━━━<br/>• validates user input</div>"]
         UI["Web UI"]
         CLI["CLI"]
     end
