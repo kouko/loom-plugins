@@ -4,6 +4,8 @@ Acceptance 2 (every shape has table, ASCII and Mermaid forms) and
 acceptance 7 (no Obsidian-only syntax; the skill declines vault targets).
 """
 
+# concern: Example JSON drifting from the ASCII diagram shown to users.
+
 import json
 import re
 import subprocess
@@ -150,7 +152,6 @@ def test_ascii_blocks_pass_ported_checks():
             assert drift(block) == [], f"{name}: {drift(block)}"
 
 
-# concern: Example JSON drifting from the ASCII diagram shown to users.
 def test_generator_examples_reproduce_their_output():
     for name, (_, shape) in EXPECTED.items():
         examples = generator_examples(_read(name))
