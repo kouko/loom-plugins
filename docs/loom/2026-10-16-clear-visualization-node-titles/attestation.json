@@ -1,0 +1,43 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-16-clear-visualization-node-titles",
+  "content_digest": "41c58e7cbc2143934dc5e5fab69359fd26f2b8d8",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/loom-visualization/test_templates.py -q",
+      "artifact": "loom-workflow/tests/loom-visualization/test_templates.py",
+      "result": "pass",
+      "command_digest": "d6348e5e5587fb1454eae3b1c722ecdf553deb7eae84f4cd2d85248944ea2e43"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "title_reviewer_skill",
+      "vendor": "openai",
+      "model": "inherited-host-model",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [],
+      "review_target_sha": "4a8084ad111aeb410a9131d58d7d20cfa6a5cd83"
+    },
+    {
+      "reviewer": "title_reviewer_spec",
+      "vendor": "openai",
+      "model": "inherited-host-model",
+      "lens": "spec+adversarial",
+      "verdict": "PASS",
+      "findings": [],
+      "review_target_sha": "4a8084ad111aeb410a9131d58d7d20cfa6a5cd83"
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
