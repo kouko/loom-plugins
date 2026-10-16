@@ -18,6 +18,7 @@ import re
 import shlex
 import subprocess
 import tempfile
+import tomllib
 
 
 TEST_COMMAND_MARKERS: tuple[tuple[tuple[str, ...], str], ...] = (
@@ -212,6 +213,24 @@ def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[s
     return any(Path(path).resolve() == wanted for path in collected), ""
 
 
+def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
+    """Plain `cargo test` at the root builds each `tests/<name>.rs` as an
+    integration test unless `[package] autotests = false`:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#target-auto-discovery"""
+    parts = Path(wanted).parts
+    if not (len(parts) == 2 and parts[0] == "tests" and wanted.endswith(".rs")
+            and (repo / wanted).is_file()):
+        return False, ""
+    try:
+        manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        return None, f"Cargo.toml could not be read: {exc}"
+    package = manifest.get("package")
+    if isinstance(package, dict) and package.get("autotests") is False:
+        return False, ""
+    return True, ""
+
+
 def suite_collects(repo: Path, artifact: str) -> bool:
     return suite_collection(repo, artifact)[0] is True
 
@@ -230,6 +249,13 @@ def suite_collection(repo: Path, artifact: str) -> tuple[bool | None, str]:
     wanted = os.path.normpath(artifact)
     wanted_path = (repo / wanted).resolve()
     if not (repo / SUITE_RUNNER).is_file():
+        declared, _source = declared_test_command(repo)
+        try:
+            tokens = argv_for(declared) if declared else []
+        except ValueError:
+            tokens = []
+        if tokens[:2] == ["cargo", "test"] and set(tokens[2:]) <= CARGO_TEST_FLAGS:
+            return _cargo_collects(repo, wanted)
         return _direct_pytest_collects(repo, artifact)
     commands, error, launcher = _declared_suite_commands(repo)
     if commands is None:
