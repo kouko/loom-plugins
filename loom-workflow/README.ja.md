@@ -272,7 +272,7 @@ UserPromptSubmit hook で、メッセージを送るたびに agent に届ける
 「デシジョンマップを開く」/「開地圖」           → decision-map
 「wrap up」/「save state」                     → handoff
 「今どこだっけ」/「今の進捗を振り返って」         → recap-state
-「開発の進め方を振り返って改善点を探して」       → retro
+「開発の進め方を振り返って改善点を探して」       → project-retro
 「second opinion」/「別のモデルに聞いて」       → independent-advisor
 ```
 
