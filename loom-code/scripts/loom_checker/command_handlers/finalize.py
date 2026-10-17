@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from loom_checker.attestation import ATTESTATION_SCHEMA
 from loom_checker.attestation import _command_digest
+from loom_checker.attestation import adversarial_route
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
 from loom_checker.helpers import load_manifest
@@ -16,8 +18,6 @@ from loom_checker.probes import NO_PACKAGE_TESTS
 from loom_checker.probes import PROBE_RUN_TIMEOUT
 from loom_checker.probes import argv_for
 from loom_checker.probes import check_adversarial_proportionate
-from loom_checker.probes import command_executes_artifact
-from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
 from loom_checker.probes import missing_adversarial_execution
 from loom_checker.probes import probe_directory
@@ -29,9 +29,73 @@ from loom_checker.reviewers import attach_outside_receipt
 from loom_checker.reviewers import selected_outside_family
 from pathlib import Path
 import json
+import re
 import subprocess
 import sys
 import tempfile
+
+
+def _quotes_whole_lines(quote: str, output: str, stem: str) -> bool:
+    """`quote` is one or more complete, non-blank lines that appear in a row
+    in `output` and together name the artifact's file stem."""
+    wanted = [line.strip() for line in quote.splitlines()]
+    if not wanted or any(not line for line in wanted) or stem not in quote:
+        return False
+    lines = [line.strip() for line in output.splitlines()]
+    return any(lines[start:start + len(wanted)] == wanted
+               for start in range(len(lines) - len(wanted) + 1))
+
+
+def _runner_evidence(
+    repo: Path, change_id: str, head_sha: str, manifest: dict, reviewers: set[str],
+    command: str, artifact: str, how: dict, output: str,
+) -> tuple[dict, str | None]:
+    """The `evidence` fields for a passing non-pytest/shell adversarial run, or
+    the reason it is refused: a listed row's own count of passing tests, else
+    a verdict reviewer's confirmation bound to this content and this output."""
+    row = how["row"]
+    if how["route"] == "parsed":
+        passed = row.passed(output, artifact)
+        if passed is not None and passed >= 1:
+            return {"evidence": "parsed", "passed": passed}, None
+        if passed == 0:
+            return {}, (f"`{command}` exited 0, but its {row.name} output shows no passing, "
+                        f"non-skipped test from {artifact} (zero tests, all skipped, or tests "
+                        f"from another file); a reviewer confirmation cannot stand in for it")
+        reason = f"loom cannot read its {row.name} output"
+    else:
+        reason = "no listed runner claims it, so loom cannot read its result"
+    stem = Path(artifact).stem
+    needed = (f"`{command}` exited 0, but {reason}; attesting it needs a reviewer "
+              f"confirmation on its adversarial input item, `confirmation: {{reviewer, "
+              f"reviewed_sha, quote}}`, from one of this round's verdict reviewers who read "
+              f"this run's output at HEAD's content, quoting one or more whole lines of the "
+              f"output below that name `{stem}`")
+    confirmation = how["confirmation"]
+    if confirmation is None:
+        return {}, needed
+    if (not isinstance(confirmation, dict)
+            or any(not isinstance(confirmation.get(key), str) or not confirmation[key].strip()
+                   for key in ("reviewer", "reviewed_sha", "quote"))):
+        return {}, f"the reviewer confirmation is malformed. {needed}"
+    reviewer = confirmation["reviewer"].strip()
+    if reviewer not in reviewers:
+        return {}, f"the confirmation's reviewer {reviewer!r} gave no verdict this round. {needed}"
+    head_digest = functional_content_digest(repo, head_sha, change_id, manifest)
+    sha = confirmation["reviewed_sha"].strip()
+    resolved = (git_maybe(repo, "rev-parse", "--verify", "--quiet", f"{sha}^{{commit}}")
+                if re.fullmatch(r"[0-9a-f]{7,64}", sha) else None)
+    if (head_digest is None or not resolved
+            or functional_content_digest(repo, resolved, change_id, manifest) != head_digest):
+        return {}, (f"the confirmation's reviewed_sha {sha} does not have HEAD's functional "
+                    f"content, so it confirms another run. {needed}")
+    if not _quotes_whole_lines(confirmation["quote"], output, stem):
+        return {}, (f"the confirmation's quote is not one or more whole, non-blank lines of "
+                    f"this run's output naming `{stem}`. {needed}")
+    return {"evidence": "reviewer", "confirmation": {
+        "reviewer": reviewer, "reviewed_sha": sha,
+        "content_digest": head_digest, "quote": confirmation["quote"],
+    }}, None
 
 
 def cmd_finalize_review(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
@@ -102,12 +166,12 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     if missing:
         return [("finalize.adversarial", missing)]
     config_before = git_text(repo, "config", "--list", "--null")
-    work: list[tuple[str, str, str]] = []
+    work: list[tuple[str, str, str, dict]] = []
     if "package-tests" not in skip:
         package_command, source = declared_test_command(repo)
         if package_command is None or package_command.strip().lower() == NO_PACKAGE_TESTS:
             return [("finalize.package-tests", f"no executable package command ({source})")]
-        work.append(("package-tests", package_command, ""))
+        work.append(("package-tests", package_command, "", {}))
     for item in adversarial:
         if not isinstance(item, dict):
             return [("finalize.adversarial", "malformed adversarial input")]
@@ -115,10 +179,17 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         artifact = str(item.get("artifact", "")).strip()
         if not command or not artifact:
             return [("finalize.adversarial", "adversarial input needs command and artifact")]
-        if not command_names_artifact(command, artifact):
+        route, row = adversarial_route(command, artifact, repo)
+        if route == "unnamed":
             return [("finalize.adversarial", "command must name its artifact argument")]
-        if not command_executes_artifact(command, artifact):
+        if route == "not-executed":
             return [("finalize.adversarial", "command must execute the artifact directly")]
+        if route == "not-accepted":
+            return [("finalize.adversarial",
+                     f"`{command}` is a {row.name} command but not in its accepted form "
+                     f"for {artifact}: it must run that one file alone with the runner's "
+                     f"machine-readable output and no filter; a reviewer confirmation "
+                     f"cannot stand in for it")]
         if not git_ok(repo, "cat-file", "-e", f"{head_sha}:{artifact}"):
             return [("finalize.adversarial", "artifact must exist in the selected commit")]
         if not artifact.startswith(probe_directory(change_id)):
@@ -133,38 +204,49 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
                          f"adversarial artifact must be committed under "
                          f"{probe_directory(change_id)} or be a program the "
                          f"package suite already runs")]
-        work.append(("adversarial", command, artifact))
+        work.append(("adversarial", command, artifact,
+                     {"route": route, "row": row, "confirmation": item.get("confirmation")}))
 
     # Every artifact is now in a legal home, so the cap can count them: what
     # finalize-review is about to execute is this change's adversarial output
     # wherever graduation has since moved it.
     proportionate = check_adversarial_proportionate(
         repo, head_sha, change_id,
-        [artifact for kind, _command, artifact in work if kind == "adversarial"],
+        [artifact for kind, _command, artifact, _how in work if kind == "adversarial"],
     )
     if proportionate:
         return proportionate
 
     executions: list[dict] = []
-    for kind, command, artifact in work:
+    for kind, command, artifact, how in work:
         try:
             completed = subprocess.run(
-                argv_for(command), cwd=str(repo), capture_output=True, text=True,
-                timeout=PROBE_RUN_TIMEOUT,
+                argv_for(command), cwd=str(repo), stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT, text=True, timeout=PROBE_RUN_TIMEOUT,
             )
         except (ValueError, OSError, subprocess.TimeoutExpired) as exc:
             return [(f"finalize.{kind}", f"execution failed: {exc}")]
+        output = completed.stdout or ""
+        detail = output.strip()
+        suffix = f"\n{detail[-4000:]}" if detail else ""
         if completed.returncode != 0:
-            detail = (completed.stdout + completed.stderr).strip()
-            suffix = f"\n{detail[-4000:]}" if detail else ""
             return [(
                 f"finalize.{kind}",
                 f"`{command}` exited {completed.returncode}{suffix}",
             )]
-        executions.append({
+        execution = {
             "kind": kind, "command": command, "artifact": artifact,
             "result": "pass", "command_digest": _command_digest(command),
-        })
+        }
+        if kind == "adversarial" and how["route"] != "direct":
+            evidence, failure = _runner_evidence(
+                repo, change_id, head_sha, manifest, reviewers, command, artifact,
+                how, output,
+            )
+            if failure:
+                return [("finalize.adversarial", f"{failure}{suffix}")]
+            execution.update(evidence)
+        executions.append(execution)
 
     if git_text(repo, "rev-parse", "HEAD") != head_sha:
         return [("finalize.stable-tree", "HEAD moved during functional verification")]
