@@ -208,3 +208,86 @@ Tried on 2026-10-17, in a clean copy of the project at 0e4fb975
   `test_loom_attestation.py`, `test_adversarial_pytest_option_order.py`)
   passed in the clean copy.
 - Evidence: captured driver output above.
+
+## Re-run on 2026-10-17, at 850693a3
+
+Fix range 74afd4a8..850693a3 (9ec32860 spec; c61c656f go/deno/bun/cargo
+rows claim every subcommand; 850693a3 finalize masks duration values on
+quote and output before the whole-line match). Fresh clean copy:
+`git worktree add --detach <scratchpad>/clean2 850693a3`; `--list-rules`
+exit 0; `loom-code/plugin.json` `3.41.0`. The same toolchains and the same
+sample repos as above, each copied into `scratchpad/at/rerun/` with its
+earlier attestation commit dropped. `driver.py` now takes the clean copy
+from `AT_CLEAN=<scratchpad>/clean2`; all runs used
+`env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID`, plus a temporary
+`GEM_HOME` for rspec. Every row is re-tested; none is carried over, because
+c61c656f changes which row claims go, deno, bun and cargo commands (lines
+1, 2, 3) and 850693a3 changes the confirmation match (line 4); line 5 was
+cheap to repeat.
+
+- 1: re-tested — `go test -json <P>attack_test.go`, no confirmation →
+  `finalize exit: 0`, adversarial execution `"evidence": "parsed", "passed": 1`,
+  `validator (verification_status at HEAD): valid` (`scratchpad/at/pos-rerun.txt`).
+- 2: re-tested — all 12 combinations with the same recorded commands as the
+  line-2 table above (`scratchpad/at/pos.py`): every one `finalize exit: 0`,
+  `"evidence": "parsed", "passed": 1` (13 such executions counting go), and
+  `valid`. go, deno, bun, cargo test and nextest — the rows c61c656f
+  touched — all still accepted in their accepted forms.
+- 3: re-tested — the 20 earlier scenarios plus `bun build --target=bun ./<P>attack.test.ts`
+  (`scratchpad/at/neg.py`, output `scratchpad/at/neg-output-rerun.txt`):
+  all 21 `finalize exit: 1`, `attestation written: no`. The four that
+  previously went to the confirmation path now read:
+  ```
+  BLOCK finalize.adversarial: `go vet <P>attack_test.go` is a go command but not in its accepted form ...; a reviewer confirmation cannot stand in for it
+  BLOCK finalize.adversarial: `deno check <P>attack_test.ts` is a deno command but not in its accepted form ...
+  BLOCK finalize.adversarial: `cargo build --test attack` is a cargo test command but not in its accepted form for tests/attack.rs ...
+  BLOCK finalize.adversarial: `bun build --target=bun ./<P>attack.test.ts` is a bun command but not in its accepted form ...
+  ```
+  The other 17 refuse with the same messages as before. `bun build` with
+  the earlier run's confirmation (`r1`, HEAD, quote
+  `// docs/loom/2026-10-17-sample/evidence/probes/attack.test.ts`) is now
+  refused with the same BLOCK line ("a reviewer confirmation cannot stand
+  in for it"); before the fix it was attested.
+- 4: re-tested — real Maven, sample re-made in `scratchpad/at/rerun/maven`
+  (`scratchpad/at/mvn_rerun.py`, output `scratchpad/at/maven-rerun.txt`).
+  The probe now sleeps 50–450 ms at random so no two runs share a timing.
+  Commit A `a98db1d`; three separate earlier runs at A printed `Time elapsed:`
+  0.463, 0.142, 0.110 s; the quote is the first,
+  `[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.463 s -- in AttackTest`.
+
+  | Case | Confirmation | Result |
+  |---|---|---|
+  | none | — | refused: "no listed runner claims it ... needs a reviewer confirmation" (that run: 0.074 s) |
+  | honest quote from a separate earlier run | r1, A, the 0.463 s line | `finalize exit: 0`, `"evidence": "reviewer", "confirmation": {"reviewer": "r1", "reviewed_sha": "a98db1d…", "content_digest": "662ed538…", "quote": "[INFO] Tests run: 1, …"}`; validator `valid` |
+  | count differs | the same line with `Tests run: 2` | refused: "the confirmation's quote is not one or more whole, non-blank lines of this run's output naming `AttackTest`" (that run: 0.253 s) |
+  | count differs | the same line with `Skipped: 1` | refused: quote not whole lines of this run (that run: 0.444 s) |
+  | reviewer who gave no verdict | r3 | refused: "the confirmation's reviewer 'r3' gave no verdict this round" |
+  | part of a line | `Tests run: 1, Failures: 0` | refused: quote not whole lines |
+  | line not naming the file | `[INFO] BUILD SUCCESS` | refused: quote not whole lines naming `AttackTest` |
+  | old content (fix commit B `5a6f3e2` changed `Sample.java`) | r1, A, the 0.463 s line | refused: "the confirmation's reviewed_sha a98db1dd… does not have HEAD's functional content, so it confirms another run" |
+  | current content | r1, B, the 0.161 s line from a separate earlier run at B | `finalize exit: 0`, confirmation recorded; validator `valid`; three later runs at B printed 0.109, 0.121, 0.279 s |
+  | hand-edited attestation, confirming reviewer swapped to r9 | — | validator: `stale (adversarial confirmation reviewer is not one of the verdict reviewers)` |
+
+  The finalize run's own timing is not printed on success; the refused
+  neighbouring runs (0.074, 0.253, 0.444, 0.392, 0.241, 0.114, 0.455 s)
+  show the timing differs from run to run, so the accepted 0.463 s quote
+  matched with a different timing. Unreadable output from a listed runner:
+  not reproducible with real tools (earlier five attempts); settled by the
+  change's own tests, re-run in the clean copy:
+  `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q -p no:cacheprovider loom-code/tests/test_probe_language_commands.py loom-code/tests/test_probe_confirmation_finalize.py loom-code/tests/test_probe_language_suite_collection.py loom-code/tests/test_probe_bun_absolute_outside_repo.py loom-code/tests/test_probe_deno_ignored_steps.py loom-code/tests/test_loom_attestation.py loom-code/tests/test_adversarial_pytest_option_order.py loom-code/tests/test_selection_finalize.py`
+  → `197 passed in 79.21s`, including `test_unreadable_output_needs_confirmation`,
+  `test_unlisted_maven_with_confirmation_attested`,
+  `test_other_content_or_partial_line_quote_refused` and the new
+  `test_quote_ignores_durations_but_not_counts`.
+- 5: re-tested — Python sample: `python3 -c pass <P>test_attack_pytest.py` →
+  `BLOCK finalize.adversarial: command must execute the artifact directly`;
+  `python3 -m pytest <P>test_attack_pytest.py -q` and `bash <P>attack.sh` →
+  `finalize exit: 0`, both executions with no `evidence` field, validator
+  `valid`. The 3.40.0-produced attestation in `scratchpad/at/repos/pyshell-old`
+  checked by the fixed validator: `valid`. Package suite not run here;
+  `finalize-review` runs
+  `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+  and refuses the attestation when it fails. The criterion's own tests: the
+  197 above, passed.
+- Nit seen while re-testing: the `cargo build` refusal calls the command
+  "a cargo test command" — the row's name, not the subcommand typed.
