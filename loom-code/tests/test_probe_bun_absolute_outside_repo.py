@@ -3,14 +3,12 @@
 
 from __future__ import annotations
 
-import sys
 import tempfile
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[5]
-sys.path.insert(0, str(REPO / "loom-code/scripts"))
+from loom_checker.attestation import adversarial_route
 
-from loom_checker.attestation import adversarial_route  # noqa: E402
+REPO = Path(__file__).resolve().parents[2]
 
 ARTIFACT = "docs/loom/2026-10-16-accept-non-python-probes/evidence/probes/x.test.ts"
 

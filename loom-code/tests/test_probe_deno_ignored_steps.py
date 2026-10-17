@@ -3,13 +3,7 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-REPO = Path(__file__).resolve().parents[5]
-sys.path.insert(0, str(REPO / "loom-code/scripts"))
-
-from loom_checker.probe_results import claiming_row  # noqa: E402
+from loom_checker.probe_results import claiming_row
 
 ARTIFACT = "p/ign.test.ts"
 
