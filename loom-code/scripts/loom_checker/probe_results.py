@@ -26,9 +26,9 @@ from xml.etree import ElementTree
 import json
 import os
 import re
-import tomllib
 
 from loom_checker.probes import CARGO_TEST_FLAGS
+from loom_checker.probes import cargo_test_targets
 from loom_checker.probes import _conda_python_argv
 
 
@@ -509,21 +509,14 @@ def _cargo_target_name(args: list[str], flags: frozenset[str]) -> str | None:
 def _cargo_test_path(repo: Path | None, name: str) -> str | None:
     """The file `--test <name>` builds: the Cargo.toml `[[test]]` entry of
     that name (named, or named by its path's stem), else `tests/<name>.rs`.
-    None when the manifest cannot be read."""
+    An explicit `--test` runs a `test = false` target too. None when the
+    manifest cannot be read."""
     if repo is None:
         return None
-    try:
-        manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
+    targets, _error = cargo_test_targets(repo)
+    if targets is None:
         return None
-    targets = manifest.get("test")
-    for target in targets if isinstance(targets, list) else []:
-        if not isinstance(target, dict):
-            continue
-        path = os.path.normpath(target["path"]) if isinstance(target.get("path"), str) else None
-        if (target.get("name") or (path and Path(path).stem)) == name:
-            return path or f"tests/{name}.rs"
-    return f"tests/{name}.rs"
+    return next((path for target, path, _runs in targets if target == name), f"tests/{name}.rs")
 
 
 def _cargo_names(name: str | None, artifact: str, repo: Path | None) -> bool:

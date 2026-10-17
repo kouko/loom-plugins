@@ -44,8 +44,10 @@ def test_cargo_tests_dir_collected(tmp_path: Path, kickoff: str | None) -> None:
     (PACKAGE + '[[test]]\nname = "attack"\npath = "tests/a/b.rs"\n', "tests/a/b.rs"),
     (PACKAGE + 'autotests = false\n[[test]]\nname = "probe"\npath = "tests/probe.rs"\n',
      "tests/probe.rs"),
+    (PACKAGE + 'autotests = false\n[[test]]\nname = "probe"\n', "tests/probe.rs"),
 ], ids=["cargo-declared-test-target-collected-outside-autodiscovery",
-        "cargo-declared-test-target-collected-autotests-off"])
+        "cargo-declared-test-target-collected-autotests-off",
+        "cargo-declared-test-target-collected-name-only"])
 def test_cargo_declared_test_target_collected(tmp_path: Path, cargo_toml: str, artifact: str) -> None:
     repo = make_rust_repo(tmp_path, cargo_toml, None)
     assert suite_collection(repo, artifact) == (True, "")
@@ -60,13 +62,21 @@ def test_cargo_declared_test_target_collected(tmp_path: Path, cargo_toml: str, a
     (PACKAGE, "cargo test --manifest-path Cargo.toml", "tests/probe.rs"),
     ('[workspace]\nmembers = ["crates/a"]\n', None, "tests/probe.rs"),
     (PACKAGE, "cargo nextest run --workspace", "tests/probe.rs"),
+    (PACKAGE + '[[test]]\nname = "b"\npath = "tests/a/b.rs"\ntest = false\n', None, "tests/a/b.rs"),
+    (PACKAGE + '[[test]]\nname = "b"\npath = "tests/a/b.rs"\nrequired-features = ["x"]\n', None,
+     "tests/a/b.rs"),
+    (PACKAGE + '[[test]]\nname = "probe"\npath = "tests/probe.rs"\ntest = false\n', None,
+     "tests/probe.rs"),
 ], ids=["cargo-autotests-off-or-subdir-refused-autotests",
         "cargo-autotests-off-or-subdir-refused-subdir",
         "cargo-autotests-off-or-subdir-refused-non-rs",
         "cargo-autotests-off-or-subdir-refused-missing",
         "cargo-autotests-off-or-subdir-refused-other-option",
         "cargo-autotests-off-or-subdir-refused-virtual-workspace",
-        "cargo-autotests-off-or-subdir-refused-nextest-other-option"])
+        "cargo-autotests-off-or-subdir-refused-nextest-other-option",
+        "cargo-autotests-off-or-subdir-refused-test-false",
+        "cargo-autotests-off-or-subdir-refused-required-features",
+        "cargo-autotests-off-or-subdir-refused-test-false-overrides-autodiscovery"])
 def test_cargo_autotests_off_or_subdir_refused(
     tmp_path: Path, cargo_toml: str, kickoff: str | None, artifact: str
 ) -> None:

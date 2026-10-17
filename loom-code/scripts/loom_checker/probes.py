@@ -213,32 +213,58 @@ def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[s
     return any(Path(path).resolve() == wanted for path in collected), ""
 
 
-def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
-    """Plain `cargo test` at the root builds the `path` of each `[[test]]`
-    target the root Cargo.toml declares, even under `autotests = false`:
+def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, str]:
+    """The root Cargo.toml's test targets as `(name, path, runs)`, or None
+    and the reason when the manifest cannot be read. Each `[[test]]` entry is
+    a target even under `autotests = false`; its `path` defaults to
+    `tests/<name>.rs` and its name to the path's stem:
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#test-targets
-    It also builds each `tests/<name>.rs` as an integration test unless
-    `[package] autotests = false`:
-    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#target-auto-discovery"""
-    if not (wanted.endswith(".rs") and (repo / wanted).is_file()):
-        return False, ""
+    An undeclared `tests/<name>.rs` is a target unless `[package]
+    autotests = false`; a declared entry of the same path replaces it:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#target-auto-discovery
+    `runs` is whether plain `cargo test` runs it: not `test = false`, no
+    `required-features`:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-test-field
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-required-features-field"""
     try:
         manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
-    except (OSError, tomllib.TOMLDecodeError) as exc:
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
         return None, f"Cargo.toml could not be read: {exc}"
     package = manifest.get("package")
     # A virtual workspace root (no [package]) tests its members, never tests/.
     if not isinstance(package, dict):
+        return [], ""
+    targets = []
+    declared = manifest.get("test")
+    for entry in declared if isinstance(declared, list) else []:
+        if not isinstance(entry, dict):
+            continue
+        name, path = entry.get("name"), entry.get("path")
+        if isinstance(path, str):
+            path = os.path.normpath(path)
+        elif isinstance(name, str):
+            path = f"tests/{name}.rs"
+        else:
+            continue
+        name = name if isinstance(name, str) else Path(path).stem
+        targets.append((name, path, entry.get("test") is not False and not entry.get("required-features")))
+    if package.get("autotests") is not False:
+        known = {path for _name, path, _runs in targets}
+        for file in sorted((repo / "tests").glob("*.rs")):
+            if f"tests/{file.name}" not in known:
+                targets.append((file.stem, f"tests/{file.name}", True))
+    return targets, ""
+
+
+def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
+    """Plain `cargo test` at the root runs `wanted` when it is the path of a
+    test target `cargo_test_targets` says it runs."""
+    if not (wanted.endswith(".rs") and (repo / wanted).is_file()):
         return False, ""
-    targets = manifest.get("test")
-    for target in targets if isinstance(targets, list) else []:
-        path = target.get("path") if isinstance(target, dict) else None
-        if isinstance(path, str) and os.path.normpath(path) == wanted:
-            return True, ""
-    parts = Path(wanted).parts
-    if len(parts) == 2 and parts[0] == "tests" and package.get("autotests") is not False:
-        return True, ""
-    return False, ""
+    targets, error = cargo_test_targets(repo)
+    if targets is None:
+        return None, error
+    return any(path == wanted and runs for _name, path, runs in targets), ""
 
 
 def suite_collects(repo: Path, artifact: str) -> bool:
