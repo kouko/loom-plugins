@@ -20,11 +20,17 @@ charter: 1.1
 - Test: A3 positive: current-version-pins; boundary: historical-migration-mentions.
 - Risk: agent-decided — change current version pins only; existing recap descriptions and migration history stay intact.
 
+**W4-01 Reconcile old six-section consumers**  after: W3-01  acceptance: 1, 3
+- Files: `loom-workflow/tests/scripts/test_recap_state_compaction.py`, `loom-workflow/skills/recap-state/README.md`, `loom-workflow/skills/recap-state/README.zh-TW.md`, `loom-workflow/skills/recap-state/README.ja.md`, `loom-workflow/tests/recap-state/test_readmes.py`
+- Test: A1 positive: purpose-first-documentation; negative: old-fixed-six-section-claim. A3 positive: flexible-localized-recap; boundary: existing-trigger-and-handoff-scope.
+- Risk: agent-decided — update stale skill-local guidance and the forgotten cross-suite test; preserve historical evidence but remove the fixed six-section Mermaid flow.
+
 ## Simplicity check
 - Replace the six-section runtime rules in place — taken
 - Keep historical lineage in the existing reference bundle — taken
 - Extend existing recap tests instead of adding a duplicate contract test — taken
 - Omit separate plugin README copy changes; update only release pins — taken
+- Update skill-local READMEs only after the package suite exposed stale six-section claims — taken
 
 ## Questions asked
 ① — what — 若符合你的意思，請回覆「確認」。
