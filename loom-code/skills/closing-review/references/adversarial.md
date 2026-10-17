@@ -162,7 +162,7 @@ launcher, or `bundle exec` for rspec and minitest):
 
 Every runner except cargo test and nextest runs the probe from the change's
 store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs`
-(or the `[[test]]` path Cargo.toml names) through a plan task and is
+(or the `[[test]]` path Cargo.toml names) through a task of the change and is
 recorded at that path. Any option not shown, a test-name filter, or a
 claimed runner in another form is refused. Any other command (for example
 `node X.mjs` without `--test`, `mvn ...`) is accepted only with a reviewer
