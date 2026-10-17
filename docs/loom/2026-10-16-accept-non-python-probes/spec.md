@@ -21,7 +21,7 @@ REQ-5 — pytest, shell and graduation unchanged
 | unittest | `python -m unittest` (same python/uv/conda launchers as pytest) | `python -m unittest [-v] [-q] <A>` |
 | node | `node --test` | `node --test --test-reporter=junit [--experimental-strip-types] <A>` |
 | deno | `deno test` | `deno test --reporter=junit [-A] [--allow-*] <A>` |
-| bun | `bun test` | `bun test ./<A>` or absolute `<A>` |
+| bun | `bun test` | `bun test ./<A>` or absolute `<A>` resolving to `<A>` in this repository |
 | jest | `jest` via `[npx|pnpm exec|yarn]` | `[w] jest --json --runTestsByPath <A>` |
 | vitest | `vitest` via `[npx|pnpm exec|yarn]` | `[w] vitest run --reporter=json --outputFile=/dev/stdout <A>` (vitest 5 writes JSON to a file unless `--outputFile` points at stdout) |
 | mocha | `mocha` via `[npx|pnpm exec|yarn]` | `[w] mocha --reporter json <A>` |
@@ -29,14 +29,14 @@ REQ-5 — pytest, shell and graduation unchanged
 | nextest | `cargo nextest` | `cargo nextest run [--release] [--no-tests=fail] --test <n>`, `<n>` resolving to `<A>` |
 | rspec | `rspec` via `[bundle exec]` | `[w] rspec --format json <A>` |
 | minitest | `ruby` with `<A>` named `*_test.rb` or `test_*.rb`, via `[bundle exec]` | `[w] ruby [-I<dir>]... <A>` |
-| phpunit | `phpunit` or `vendor/bin/phpunit` | `<phpunit> <A>` |
+| phpunit | `phpunit` at any path (e.g. `vendor/bin/phpunit`) | `<phpunit> <A>` |
 
-Any other argv (for example `node X.mjs` without `--test`, `java X.java`, `mvn ...`) is claimed by no row and goes to REQ-4; a directly executed artifact stays under REQ-5.
+Runner and launcher names in the Claims column match the file name of the argv element, so a full path such as `/opt/homebrew/bin/go` is claimed as `go`. Any other argv (for example `node X.mjs` without `--test`, `java X.java`, `mvn ...`) is claimed by no row and goes to REQ-4; a directly executed artifact stays under REQ-5.
 
 ## Design decision
 - agent-decided: a new module `loom_checker/probe_results.py` holds the row table; each row has `claims(argv)`, `accepts(argv, artifact)` and `passed(output, artifact) -> int | None`. Adding a runner is one row plus its fixtures; `probes.py` keeps the pytest/shell rules.
 - agent-decided: the recorded command carries the machine-readable output flag where the runner has one built in; the checker never rewrites a user's command. Rows without a built-in per-test format read the console summary.
-- agent-decided: one-file attribution — node, deno, jest, vitest, mocha, rspec refuse any test from another file; bun counts only when its summary says `across 1 file`; unittest, cargo test, nextest and phpunit are held to one file by their single module, test target or file positional; minitest and unittest run only what the file loads (residual: tests defined in a helper it requires, or a TestCase it imports, are counted). A node file-level case (name equals the base name, no subtests) is not a test.
+- agent-decided: one-file attribution — node, deno, jest, vitest, mocha, rspec refuse any test from another file; bun counts only when its summary says `across 1 file`; unittest, cargo test, nextest and phpunit are held to one file by their single module, test target or file positional; minitest and unittest run only what the file loads (residual: tests defined in a helper it requires, or a TestCase it imports, are counted). A node file-level case (name equals the base name, no subtests) is not a test; go and deno count only leaf tests, so a parent whose subtests or steps were all skipped is not a test.
 - agent-decided: `passed` returns None for output it cannot read, routing to REQ-4 instead of refusing; a readable zero refuses.
 - agent-decided: cargo — `<n>` resolves through Cargo.toml `[[test]]` `path`, defaulting to `tests/<n>.rs`; nextest is refused when `--no-tests` is anything other than `fail`.
 - agent-decided: confirmation is `confirmation: {reviewer, reviewed_sha, quote}` on the adversarial input item. `reviewed_sha` binds it to content (a fix round's new content invalidates it); the quote must match whole lines of this finalize run's output, which binds it to this execution. Quote and line match are checked in finalize-review only.

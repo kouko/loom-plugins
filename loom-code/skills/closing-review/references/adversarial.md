@@ -142,7 +142,9 @@ same probe after graduation, named where the selected commit holds it.
 
 For another runner, record the command in exactly one of these forms
 (`<A>` = the artifact; `[w]` = an optional `npx`, `pnpm exec` or `yarn`
-launcher, or `bundle exec` for rspec and minitest):
+launcher, or `bundle exec` for rspec and minitest; a runner or launcher is
+recognised by its file name, so a full path such as `/opt/homebrew/bin/go`
+counts as `go`):
 
 | Runner | Accepted command |
 |---|---|
@@ -150,7 +152,7 @@ launcher, or `bundle exec` for rspec and minitest):
 | unittest | `python -m unittest [-v] [-q] <A>` (pytest's python/uv/conda launchers) |
 | node | `node --test --test-reporter=junit [--experimental-strip-types] <A>` |
 | deno | `deno test --reporter=junit [-A] [--allow-*] <A>` |
-| bun | `bun test ./<A>` or `bun test` with absolute `<A>` |
+| bun | `bun test ./<A>` or `bun test` with the absolute path of `<A>` in this repository |
 | jest | `[w] jest --json --runTestsByPath <A>` |
 | vitest | `[w] vitest run --reporter=json --outputFile=/dev/stdout <A>` |
 | mocha | `[w] mocha --reporter json <A>` |
@@ -158,7 +160,7 @@ launcher, or `bundle exec` for rspec and minitest):
 | nextest | `cargo nextest run [--release] [--no-tests=fail] --test <n>`, `<n>` resolving to `<A>` |
 | rspec | `[w] rspec --format json <A>` |
 | minitest | `[w] ruby [-I<dir>]... <A>`, `<A>` named `*_test.rb` or `test_*.rb` |
-| phpunit | `phpunit <A>` or `vendor/bin/phpunit <A>` |
+| phpunit | `phpunit <A>` (any path to `phpunit`, such as `vendor/bin/phpunit`) |
 
 Every runner except cargo test and nextest runs the probe from the change's
 store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs`
