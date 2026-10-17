@@ -137,7 +137,25 @@ findings:
     text: "<label> (<decoration>): <what is wrong, in one or two sentences>"
     fix: "<the concrete change that would close it>"
 notes: []                        # optional, at most three bullets
+probe_confirmations:             # optional, only when probe output was handed to you
+  - artifact: "<path of the probe program>"
+    reviewed_sha: <the commit the probe output ran at, as handed; at branch-end, review_target_sha, never the diff base>
+    quote: "<complete output lines, copied verbatim>"
 ```
+
+**Probe confirmations.** When the orchestrator hands you the output files of
+adversarial programs together with the commit they ran at, do not run any
+probe yourself and judge only that handed output. A confirmation's
+`reviewed_sha` is that commit, not the packet's diff base: at branch-end
+review it is the packet's `review_target_sha` (HEAD), and `finalize-review`
+refuses a sha whose functional content differs from HEAD. Confirm an artifact only when whole output lines show that
+at least one test from that artifact actually ran and passed. `quote` must be
+complete lines from the handed output, together containing the artifact's file
+stem. Output that does not show this gets no entry. The quote is later
+compared with a fresh run of the probe, with duration values such as
+`0.013 s` or `time="0.002"` ignored and every other character, counts
+included, matched exactly; prefer the line that shows the pass and names the
+file.
 
 **Every finding carries an anchor and a fix.** A finding without an anchor
 cannot be located and a finding without a fix cannot be closed; what an

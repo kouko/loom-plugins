@@ -18,6 +18,7 @@ import re
 import shlex
 import subprocess
 import tempfile
+import tomllib
 
 
 TEST_COMMAND_MARKERS: tuple[tuple[tuple[str, ...], str], ...] = (
@@ -212,6 +213,60 @@ def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[s
     return any(Path(path).resolve() == wanted for path in collected), ""
 
 
+def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, str]:
+    """The root Cargo.toml's test targets as `(name, path, runs)`, or None
+    and the reason when the manifest cannot be read. Each `[[test]]` entry is
+    a target even under `autotests = false`; its `path` defaults to
+    `tests/<name>.rs` and its name to the path's stem:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#test-targets
+    An undeclared `tests/<name>.rs` is a target unless `[package]
+    autotests = false`; a declared entry of the same path replaces it:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#target-auto-discovery
+    `runs` is whether plain `cargo test` runs it: not `test = false`, no
+    `required-features`:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-test-field
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-required-features-field"""
+    try:
+        manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        return None, f"Cargo.toml could not be read: {exc}"
+    package = manifest.get("package")
+    # A virtual workspace root (no [package]) tests its members, never tests/.
+    if not isinstance(package, dict):
+        return [], ""
+    targets = []
+    declared = manifest.get("test")
+    for entry in declared if isinstance(declared, list) else []:
+        if not isinstance(entry, dict):
+            continue
+        name, path = entry.get("name"), entry.get("path")
+        if isinstance(path, str):
+            path = os.path.normpath(path)
+        elif isinstance(name, str):
+            path = f"tests/{name}.rs"
+        else:
+            continue
+        name = name if isinstance(name, str) else Path(path).stem
+        targets.append((name, path, entry.get("test") is not False and not entry.get("required-features")))
+    if package.get("autotests") is not False:
+        known = {path for _name, path, _runs in targets}
+        for file in sorted((repo / "tests").glob("*.rs")):
+            if f"tests/{file.name}" not in known:
+                targets.append((file.stem, f"tests/{file.name}", True))
+    return targets, ""
+
+
+def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
+    """Plain `cargo test` at the root runs `wanted` when it is the path of a
+    test target `cargo_test_targets` says it runs."""
+    if not (wanted.endswith(".rs") and (repo / wanted).is_file()):
+        return False, ""
+    targets, error = cargo_test_targets(repo)
+    if targets is None:
+        return None, error
+    return any(path == wanted and runs for _name, path, runs in targets), ""
+
+
 def suite_collects(repo: Path, artifact: str) -> bool:
     return suite_collection(repo, artifact)[0] is True
 
@@ -230,6 +285,15 @@ def suite_collection(repo: Path, artifact: str) -> tuple[bool | None, str]:
     wanted = os.path.normpath(artifact)
     wanted_path = (repo / wanted).resolve()
     if not (repo / SUITE_RUNNER).is_file():
+        declared, _source = declared_test_command(repo)
+        try:
+            tokens = argv_for(declared) if declared else []
+        except ValueError:
+            tokens = []
+        # `cargo nextest run` builds and runs the same test targets.
+        if ((tokens[:2] == ["cargo", "test"] and set(tokens[2:]) <= CARGO_TEST_FLAGS)
+                or (tokens[:3] == ["cargo", "nextest", "run"] and set(tokens[3:]) <= {"--release"})):
+            return _cargo_collects(repo, wanted)
         return _direct_pytest_collects(repo, artifact)
     commands, error, launcher = _declared_suite_commands(repo)
     if commands is None:
@@ -519,8 +583,12 @@ def _conda_pytest_argv(tokens: list[str]) -> bool:
     return _conda_python_argv(tokens) and tokens[5:7] == ["-m", "pytest"]
 
 
+CARGO_TEST_FLAGS = frozenset({"--release", "-q", "--quiet"})
+
+
 def command_executes_artifact(command: str, artifact: str) -> bool:
-    """True when argv directly executes the named Python, shell, or executable file."""
+    """True when argv directly executes the named Python, shell, or
+    executable file. Other runners' rows live in `probe_results`."""
     tokens = argv_for(command)
     wanted = os.path.normpath(artifact)
     suffix = Path(artifact).suffix.lower()
