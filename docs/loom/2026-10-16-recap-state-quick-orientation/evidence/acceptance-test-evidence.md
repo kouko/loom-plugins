@@ -126,3 +126,58 @@ The re-run used a new clean local clone at `/private/tmp/recap-state-acceptance-
 ### UI flow 10, dependency or branch — carried over
 
 - Diff check: diagram-selection guidance did not change. No live diagram or output test became available, so the first-run `not verified` verdict remains.
+
+## Re-run on 2026-10-17, at 46794ef6
+
+The re-run used a new clean clone at `/private/tmp/recap-state-acceptance-46794ef6`. `git rev-parse HEAD` returned `46794ef699876c260a38a3a95916b0e225e624d0`; `git status --short` returned no changes. The fix range `c79b8c4e..46794ef6` adds diagram examples and their tests in the recap reference bundle; it does not change the skill entrypoint. No plugin from this clone was loaded into a live host chat, so rendering and model choice remain unobserved.
+
+- Setup check: `agy plugin validate ./loom-workflow` returned `[ok]`, `skills: 13 processed`, `hooks: 1 processed`.
+- Focused command: `pytest -q loom-workflow/tests/recap-state/test_seven_block_schema.py loom-workflow/tests/scripts/test_recap_state_compaction.py`.
+- Output: `...... [100%]`, `6 passed in 0.14s`.
+- Alignment check: each of the four diagrams was extracted from its fenced example and piped into `loom-workflow/skills/loom-visualization/scripts/align.py -`; all four returned exit 0 and `no drift`. The four heading frames also returned exit 0. The tool uses Unicode display-cell widths, including CJK characters.
+- Structure check: the worked recap contains only the decision-context diagram; the argument map, decision tree and flowchart occur after it in `## 6 — Other diagram examples`. The worked recap retains three fullwidth-space-only separator lines, a situation sentence immediately before its table, and four framed headings. Both the active selection rule and the examples say to draw a diagram only when the relationship adds understanding.
+- Full package suite: left to `finalize-review`; no result claimed here.
+
+### Acceptance 1 — carried over
+
+- Diff check: the new decision-context diagram is inserted inside the existing middle section. The grounded-purpose and unknown-purpose branches, first section and proposed-next-step guidance are unchanged. The prior partial verdict remains.
+
+### Acceptance 2 — re-tested
+
+- The worked recap still states the original goal, current position, completed imports and verification, and unresolved refund rule. Its new decision-context diagram connects the goal to an earlier order-total-only proposal, then explains why the proposal was dropped in favor of including refunds. This is a stated tradeoff, not a claim about hidden reasoning. The named worked-example test passed.
+- Anchors: `loom-workflow/skills/recap-state/references/seven-block-schema.md:116-185`. No live long-session recap was captured.
+
+### Acceptance 3 — re-tested
+
+- Four distinct relationships were checked: the worked recap's decision-context diagram gives a rationale for an earlier choice; the argument map separates a confirmed fictional observation from an unresolved rule in support of asking the user; the decision tree branches on the user's future answer; the flowchart orders three steps after the rule is settled. The three mini examples are explicitly alternatives, not additional diagrams for the worked recap.
+- All four diagrams and all four heading frames passed `align.py -`. The worked recap has three fullwidth-space-only section separators and a brief situation sentence before its table. The active rule reserves diagrams for useful dependency, branch or merge topology and keeps flat progress in prose or a table. The named reference tests passed.
+- Anchors: `loom-workflow/skills/recap-state/references/seven-block-schema.md:20-44`, `:116-185`, `:200-250`. Actual host rendering and automatic diagram selection were not observed.
+
+### Acceptance 4 — carried over
+
+- Diff check: the new argument map explicitly says to suppose a fictional confirmed observation. It is an illustrative case, while the active fact, assumption, unknown and exact-wording requirements are unchanged. The prior partial verdict remains.
+
+### Acceptance 5 — carried over
+
+- Diff check: the worked recap still ends with the same directed question, and neither pause instruction changed. The prior partial verdict remains.
+
+### Acceptance 6 — carried over
+
+- Diff check: the new material is confined to the skill's reference examples. The chat-only, no-file, handoff and built-in-recap boundaries are unchanged. The prior partial verdict remains.
+
+### UI flow 7, long conversation — re-tested
+
+- The complete worked recap keeps purpose, position, decisions, completed work, unknown, pending action and its final alignment question. It now has one decision-context diagram in the decision section and no argument-map, decision-tree or flowchart insert. The named worked-example test passed. No host run was captured.
+
+### UI flow 8, short conversation — carried over
+
+- Diff check: the additions are to the long-session worked example and separate mini examples; the short-session omission rule is unchanged. The prior partial verdict remains.
+
+### UI flow 9, table — carried over
+
+- Diff check: the worked table and its situation sentence are unchanged. The same sentence was checked while testing Acceptance 3; the prior partial verdict remains.
+
+### UI flow 10, dependency or branch — re-tested
+
+- The new decision tree visibly forks between original payment week and actual refund week, each with a different calculation action. The flowchart shows ordered steps, and the argument and decision-context examples express other relationships. All four diagrams passed the width-aware alignment check. This gives partial evidence for the graph flow; no live agent selected or rendered a diagram, so full behavior remains unverified.
+- Anchors: `loom-workflow/skills/recap-state/references/seven-block-schema.md:200-250`.
