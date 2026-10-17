@@ -31,7 +31,7 @@ REQ-5 — pytest, shell and graduation unchanged
 | minitest | `ruby` with `<A>` named `*_test.rb` or `test_*.rb`, via `[bundle exec]` | `[w] ruby [-I<dir>]... <A>` |
 | phpunit | `phpunit` at any path (e.g. `vendor/bin/phpunit`) | `<phpunit> <A>` |
 
-Runner and launcher names in the Claims column match the file name of the argv element, so a full path such as `/opt/homebrew/bin/go` is claimed as `go`. The go, deno, bun and cargo rows claim the runner whatever its subcommand, so a non-test subcommand (`go vet`, `deno check`, `bun build`, `cargo build`) is claimed and refused rather than routed to REQ-4. `--flag value` and `--flag=value` spellings of a listed option, and `--quiet` for `-q`, are accepted alike. Any other argv (for example `node X.mjs` without `--test`, `java X.java`, `mvn ...`) is claimed by no row and goes to REQ-4; a directly executed artifact stays under REQ-5.
+Runner and launcher names in the Claims column match the file name of the argv element, so a full path such as `/opt/homebrew/bin/go` is claimed as `go`. The go, deno, bun and cargo rows claim the runner whatever its subcommand, so a non-test subcommand (`go vet`, `deno check`, `bun build`, `cargo build`) is claimed and refused rather than routed to REQ-4. Any other argv (for example `node X.mjs` without `--test`, `java X.java`, `mvn ...`) is claimed by no row and goes to REQ-4; a directly executed artifact stays under REQ-5.
 
 ## Design decision
 - agent-decided: a new module `loom_checker/probe_results.py` holds the row table; each row has `claims(argv)`, `accepts(argv, artifact)` and `passed(output, artifact) -> int | None`. Adding a runner is one row plus its fixtures; `probes.py` keeps the pytest/shell rules.
