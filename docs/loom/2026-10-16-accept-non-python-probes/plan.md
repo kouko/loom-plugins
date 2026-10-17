@@ -36,6 +36,11 @@ charter: 1.1
 - Test: A5 positive: release-metadata-synchronized; negative: stale-version-refused.
 - Risk: agent-decided — minor bump because an attestation field and station guidance change; CHANGELOG entry, pin rewrite and README version strings are deliverables.
 
+**W3-02 Graduate the two red adversarial probes**  after: W3-01  acceptance: 2,3
+- Files: `loom-code/tests/test_probe_bun_absolute_outside_repo.py`, `loom-code/tests/test_probe_deno_ignored_steps.py`, `docs/loom/2026-10-16-accept-non-python-probes/evidence/probes/`
+- Test: A2 positive: in-repo-absolute-bun-target-accepted; negative: none-move-only. A3 positive: outside-repo-bun-target-refused; boundary: deno-all-ignored-steps-count-zero.
+- Risk: agent-decided — both probes caught defects (fixed in dee9268a), so they move into the package suite unchanged apart from imports and paths; the store copies are deleted.
+
 ## Simplicity check
 - Reviewer-only for all new runners — declined: user chose industry-style parsing with reviewer fallback after seeing both
 - Parse console summaries where a runner has no native per-test output, instead of requiring report plugins — taken
