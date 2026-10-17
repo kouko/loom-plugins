@@ -148,7 +148,11 @@ adversarial programs run at `reviewed_sha`, do not run any probe yourself and
 judge only that handed output. Confirm an artifact only when whole output lines show that
 at least one test from that artifact actually ran and passed. `quote` must be
 complete lines from the handed output, each containing the artifact's file
-stem. Output that does not show this gets no entry.
+stem. Output that does not show this gets no entry. The quote is later
+compared with a fresh run of the probe, with duration values such as
+`0.013 s` or `time="0.002"` ignored and every other character, counts
+included, matched exactly; prefer the line that shows the pass and names the
+file.
 
 **Every finding carries an anchor and a fix.** A finding without an anchor
 cannot be located and a finding without a fix cannot be closed; what an

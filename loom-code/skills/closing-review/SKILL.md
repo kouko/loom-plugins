@@ -408,9 +408,10 @@ was skipped by the user's plain-words instruction, skip `finalize-review` and le
 user in one line that the PR will show `verification absent`, and hand the
 change to Ship.
 
-When `finalize-review` refuses only for a missing confirmation and the
-functional content is unchanged, obtain the confirmation from the round's
-reviewers and re-run `finalize-review`; that is not a Build round.
+When `finalize-review` refuses only for a missing confirmation, or only
+because a confirmation's quote does not match its own run of the probe, and
+the functional content is unchanged, obtain a fresh confirmation from the
+round's reviewers and re-run `finalize-review`; that is not a Build round.
 When `finalize-review` fails for any other cause than these two cases,
 return the fix to Build, which repeats its
 end-of-Build mechanical checks, and the fixed content, a new functional-content

@@ -35,13 +35,30 @@ import sys
 import tempfile
 
 
+_DURATIONS = (
+    (re.compile(r"""(\btime=)(["'])[^"']*\2"""), r"\1\2<duration>\2"),
+    (re.compile(r"""(\bduration_ms["']?\s*[:=]\s*)\d+(?:\.\d+)?"""), r"\1<duration>"),
+    (re.compile(r"\b\d{1,2}:\d{2}(?::\d{2})?(?:\.\d+)?\b"), "<duration>"),
+    (re.compile(r"\b\d+(?:\.\d+)?\s*(?:ms|seconds?|secs?|s)\b"), "<duration>"),
+)
+
+
+def _without_durations(line: str) -> str:
+    """`line` with every duration value replaced by one placeholder: the
+    probe's output was quoted from an earlier run, and only timings differ."""
+    for pattern, placeholder in _DURATIONS:
+        line = pattern.sub(placeholder, line)
+    return line
+
+
 def _quotes_whole_lines(quote: str, output: str, stem: str) -> bool:
     """`quote` is one or more complete, non-blank lines that appear in a row
-    in `output` and together name the artifact's file stem."""
-    wanted = [line.strip() for line in quote.splitlines()]
+    in `output` and together name the artifact's file stem. Duration values
+    are ignored; every other character, counts included, must match."""
+    wanted = [_without_durations(line.strip()) for line in quote.splitlines()]
     if not wanted or any(not line for line in wanted) or stem not in quote:
         return False
-    lines = [line.strip() for line in output.splitlines()]
+    lines = [_without_durations(line.strip()) for line in output.splitlines()]
     return any(lines[start:start + len(wanted)] == wanted
                for start in range(len(lines) - len(wanted) + 1))
 

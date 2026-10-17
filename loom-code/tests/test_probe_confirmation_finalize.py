@@ -192,6 +192,25 @@ def test_other_content_or_partial_line_quote_refused(tmp_path: Path) -> None:
     assert validate(repo, attestation)
 
 
+def test_quote_ignores_durations_but_not_counts(tmp_path: Path) -> None:
+    repo = probe_repo(tmp_path, JAVA)
+    item = {"command": "mvn -q test -Dtest=AttackTest", "artifact": JAVA}
+    quoted = MAVEN_LINE.replace("0.02 s", "0.013 s")
+    rerun = MAVEN_OUTPUT.replace("0.02 s", "0.016 s")
+    phpunit = "OK AttackTest\nTime: 00:00.012, Memory: 4.00 MB"
+    for quote, output, accepted in (
+        (quoted, rerun, True),  # an honest quote from the earlier run
+        (quoted.replace("Tests run: 1", "Tests run: 0"), rerun, False),  # a count differs
+        (phpunit, phpunit.replace("00:00.012", "00:00.019") + "\n", True),
+    ):
+        item["confirmation"] = confirmation(repo, quote=quote)
+        result = run(repo, tmp_path, item, output)
+        assert (result.returncode == 0) is accepted, (quote, result.stderr)
+        if accepted:
+            assert adversarial(written(repo))["confirmation"]["quote"] == quote
+            (repo / f"docs/loom/{CHANGE}/attestation.json").unlink()
+
+
 def test_outside_reviewer_yaml_carries_probe_confirmations() -> None:
     from loom_checker.reviewers import _review_yaml_failure
 
