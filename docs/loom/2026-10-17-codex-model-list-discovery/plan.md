@@ -22,6 +22,11 @@ charter: 1.1
 - Test: A3 positive: release-metadata-synchronized at 3.40.1; boundary: package-suite-passes.
 - Risk: agent-decided — patch bump (bug fix, no field, rule id or contract change); rewrite the version pin only where the synchronization test pins it.
 
+**W1-03 Graduate the descendant-pipe timeout probe**  after: W1-01  acceptance: 2
+- Files: `docs/loom/2026-10-17-codex-model-list-discovery/evidence/probes/test_abuse_codex_app_server_timeout.py`, `loom-code/tests/test_external_review_adversarial.py`
+- Test: A2 positive: descendant-holds-stdout-times-out runs in the package suite; boundary: probe file removed from the change store.
+- Risk: agent-decided — move the red-then-green probe into the existing graduated external-review regression file with its concern line in the header block.
+
 ## Simplicity check
 
 - drop the stdin-closed negative case; the positive case's RED run already shows the EOF failure — taken
