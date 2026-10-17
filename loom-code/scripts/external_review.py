@@ -12,6 +12,7 @@ import json
 import re
 import subprocess
 import sys
+import threading
 from pathlib import Path
 from typing import Any, Callable, Mapping, TextIO
 
@@ -114,14 +115,58 @@ def _run(runner: Runner, argv: list[str], prompt: str, timeout: int, scope: str)
                   timeout=timeout, check=False, cwd=scope)
 
 
+CODEX_DISCOVERY_TIMEOUT = 15
+
+
+def _codex_app_server(argv: list[str], requests: str, timeout: int, scope: str):
+    # app-server exits on stdin EOF before answering, so keep stdin open
+    # until the model/list (id 2) reply arrives or the timeout elapses.
+    if not Path(scope).is_dir():
+        raise FileNotFoundError(errno.ENOENT, "missing review root", scope)
+    proc = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                            stderr=subprocess.DEVNULL, text=True, cwd=scope)
+    lines: list[str] = []
+
+    def read() -> None:
+        for line in proc.stdout:
+            lines.append(line)
+            try:
+                if json.loads(line).get("id") == 2:
+                    return
+            except (json.JSONDecodeError, AttributeError):
+                continue
+
+    reader = threading.Thread(target=read, daemon=True)
+    try:
+        proc.stdin.write(requests)
+        proc.stdin.flush()
+        reader.start()
+        reader.join(timeout)
+        if reader.is_alive():
+            raise subprocess.TimeoutExpired(argv, timeout)
+    finally:
+        proc.kill()
+        proc.wait()
+        for stream in (proc.stdin, proc.stdout):
+            try:
+                stream.close()
+            except OSError:
+                pass
+    return subprocess.CompletedProcess(argv, 0, "".join(lines), "")
+
+
 def _codex_candidates(runner: Runner, scope: str) -> list[str]:
     requests = (
         {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"clientInfo": {"name": "loom-external-review", "title": "Loom External Review", "version": "1"}}},
         {"jsonrpc": "2.0", "method": "initialized"},
         {"jsonrpc": "2.0", "id": 2, "method": "model/list", "params": {}},
     )
-    response = _run(runner, ["codex", "app-server"],
-                    "".join(json.dumps(item) + "\n" for item in requests), 15, scope)
+    payload = "".join(json.dumps(item) + "\n" for item in requests)
+    if runner is subprocess.run:
+        response = _codex_app_server(["codex", "app-server"], payload,
+                                     CODEX_DISCOVERY_TIMEOUT, scope)
+    else:
+        response = _run(runner, ["codex", "app-server"], payload, 15, scope)
     if response.returncode != 0:
         raise ValueError("codex model/list failed")
     for line in response.stdout.splitlines():
