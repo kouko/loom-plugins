@@ -1,6 +1,8 @@
 """
 Tests for loom-workflow/skills/recap-state/references/seven-block-schema.md
 
+concern: orientation contract drift -- a padded or ungrounded L3 recap replaces the purpose-first schema
+
 Asserts:
   - 7 historical blocks remain mapped to L3 and future L2
   - 5 shared-core-principle anchors present: structured-schema, quote-not-paraphrase,
