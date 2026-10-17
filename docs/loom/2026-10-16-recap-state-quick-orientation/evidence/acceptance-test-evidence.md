@@ -71,3 +71,58 @@ Tested on 2026-10-17 in a fresh local clone at `ce8f7cd4e463297caab89753c03afe24
 - How I tried it: inspected diagram-selection instructions.
 - What came back: the contract says to use a diagram only when it clarifies real dependency, branch or merge topology. There is no named output test or live rendered example for this flow; no behavior verdict is available.
 - Evidence: `loom-workflow/skills/recap-state/references/seven-block-schema.md:31-36`, `:64-69`.
+
+## Re-run on 2026-10-17, at d4f5a706
+
+The re-run used a new clean local clone at `/private/tmp/recap-state-acceptance-d4f5a706`. `git rev-parse HEAD` returned `d4f5a7067b37733c80577d5c5a430e702868d4f1`; `git status --short` returned no changes. The fix range `d3fe984a..d4f5a706` changes only the skill entrypoint, its reference, and two focused test modules. It conditions next-step guidance on a grounded original purpose. The host still could not load this clone into an observed chat, so the live-renderer and live-pause limitations remain.
+
+- Setup check: `agy plugin validate ./loom-workflow` returned `[ok]`, `skills: 13 processed`, `hooks: 1 processed`.
+- Focused command: `pytest -q loom-workflow/tests/recap-state/test_seven_block_schema.py::test_l3_contract_defines_goal_grounded_natural_output loom-workflow/tests/recap-state/test_seven_block_schema.py::test_good_example_demonstrates_long_session_orientation loom-workflow/tests/scripts/test_recap_state_compaction.py::test_entrypoint_routes_to_purpose_first_variable_length_recap loom-workflow/tests/recap-state/test_readmes.py::test_tri_lang_readmes_describe_flexible_recap_and_pause_without_six_section_claim`.
+- Output: `.... [100%]`, `4 passed in 0.13s`.
+- Independent branch check: both active instruction files contain the unknown-purpose-only question, prohibition on an invented next step, grounded-purpose next-step branch, and wait condition. The known-purpose example still ends with a directed question. All six checks returned `True`.
+- Full package suite: left to `finalize-review` as on the first run; no result claimed here.
+
+### Acceptance 1 — re-tested
+
+- Known-purpose branch: the reference leads with grounded original purpose and position, allows a next step only when grounded, and retains the fictional known-purpose example. The named reference and example tests passed.
+- Unknown-purpose branch: the entrypoint says to ask only for original purpose and not invent a work step; the reference repeats both instructions and says to wait for clarification. The updated entrypoint test checks these in both files and passed.
+- Anchors: `loom-workflow/skills/recap-state/SKILL.md:21-37`; `loom-workflow/skills/recap-state/references/seven-block-schema.md:14-24`, `:116-167`. Live conversation behavior remains unverified.
+
+### Acceptance 2 — carried over
+
+- Diff check: the fix changes purpose and final-question wording but does not change the reference's decisions, completed-work and remaining-gap guidance or its worked trajectory. The first-run partial verdict remains.
+
+### Acceptance 3 — carried over
+
+- Diff check: heading frame, fullwidth-space line, table preface and diagram-selection instructions are unchanged. The first-run width check and rendered-host limitation remain.
+
+### Acceptance 4 — carried over
+
+- Diff check: the fix reinforces unknown-purpose handling but does not change the requirements to distinguish facts, assumptions and unknowns or preserve consequential user wording. The first-run partial verdict remains.
+
+### Acceptance 5 — re-tested
+
+- Unknown-purpose branch: both active instructions direct the final question solely to the missing purpose, forbid proposing a work step, and require waiting for the user to state or clarify it. The updated entrypoint test passed.
+- Known-purpose branch: the example still asks whether the proposed next sequence matches the user's direction; the reference requires a pause and the named example test passed.
+- Anchors: `loom-workflow/skills/recap-state/SKILL.md:32-37`, `:46-55`; `loom-workflow/skills/recap-state/references/seven-block-schema.md:20-33`, `:99-106`, `:161-167`. Live post-question pause remains unverified.
+
+### Acceptance 6 — carried over
+
+- Diff check: the chat-only, no-file, handoff and built-in-recap boundaries did not change. The first-run partial verdict remains.
+
+### UI flow 7, long conversation — re-tested
+
+- Known-purpose trajectory: the existing example still covers original purpose, current position, decisions, completed work, remaining gap and an alignment question; its named test passed.
+- Unknown-purpose trajectory: active entrypoint and reference require asking only for purpose, with no invented next work step; the updated entrypoint test passed. No host run was captured.
+
+### UI flow 8, short conversation — re-tested
+
+- The reference still says to omit sections with no useful content. Its unknown-purpose branch asks only for purpose, including in a short session. The reference and localized README tests passed. No host run was captured.
+
+### UI flow 9, table — carried over
+
+- Diff check: neither the table preface guidance nor the worked table changed. The first-run partial verdict remains.
+
+### UI flow 10, dependency or branch — carried over
+
+- Diff check: diagram-selection guidance did not change. No live diagram or output test became available, so the first-run `not verified` verdict remains.
