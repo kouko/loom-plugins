@@ -214,12 +214,13 @@ def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[s
 
 
 def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
-    """Plain `cargo test` at the root builds each `tests/<name>.rs` as an
-    integration test unless `[package] autotests = false`:
+    """Plain `cargo test` at the root builds the `path` of each `[[test]]`
+    target the root Cargo.toml declares, even under `autotests = false`:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#test-targets
+    It also builds each `tests/<name>.rs` as an integration test unless
+    `[package] autotests = false`:
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#target-auto-discovery"""
-    parts = Path(wanted).parts
-    if not (len(parts) == 2 and parts[0] == "tests" and wanted.endswith(".rs")
-            and (repo / wanted).is_file()):
+    if not (wanted.endswith(".rs") and (repo / wanted).is_file()):
         return False, ""
     try:
         manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
@@ -227,9 +228,17 @@ def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
         return None, f"Cargo.toml could not be read: {exc}"
     package = manifest.get("package")
     # A virtual workspace root (no [package]) tests its members, never tests/.
-    if not isinstance(package, dict) or package.get("autotests") is False:
+    if not isinstance(package, dict):
         return False, ""
-    return True, ""
+    targets = manifest.get("test")
+    for target in targets if isinstance(targets, list) else []:
+        path = target.get("path") if isinstance(target, dict) else None
+        if isinstance(path, str) and os.path.normpath(path) == wanted:
+            return True, ""
+    parts = Path(wanted).parts
+    if len(parts) == 2 and parts[0] == "tests" and package.get("autotests") is not False:
+        return True, ""
+    return False, ""
 
 
 def suite_collects(repo: Path, artifact: str) -> bool:

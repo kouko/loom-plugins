@@ -1,6 +1,7 @@
 """A graduated Rust probe counts as suite-collected only where plain
 `cargo test` (or `cargo nextest run`, which builds the same test targets)
-auto-discovers it: `tests/<name>.rs` at the repository root."""
+builds it: a root Cargo.toml `[[test]]` target's `path`, or `tests/<name>.rs`
+at the repository root when autotests is on."""
 # concern: A Rust probe graduated to tests/ must not be refused as uncollected.
 from __future__ import annotations
 
@@ -39,8 +40,20 @@ def test_cargo_tests_dir_collected(tmp_path: Path, kickoff: str | None) -> None:
     assert suite_collection(repo, "tests/probe.rs") == (True, "")
 
 
+@pytest.mark.parametrize("cargo_toml, artifact", [
+    (PACKAGE + '[[test]]\nname = "attack"\npath = "tests/a/b.rs"\n', "tests/a/b.rs"),
+    (PACKAGE + 'autotests = false\n[[test]]\nname = "probe"\npath = "tests/probe.rs"\n',
+     "tests/probe.rs"),
+], ids=["cargo-declared-test-target-collected-outside-autodiscovery",
+        "cargo-declared-test-target-collected-autotests-off"])
+def test_cargo_declared_test_target_collected(tmp_path: Path, cargo_toml: str, artifact: str) -> None:
+    repo = make_rust_repo(tmp_path, cargo_toml, None)
+    assert suite_collection(repo, artifact) == (True, "")
+
+
 @pytest.mark.parametrize("cargo_toml, kickoff, artifact", [
-    (PACKAGE + "autotests = false\n", None, "tests/probe.rs"),
+    (PACKAGE + 'autotests = false\n[[test]]\nname = "b"\npath = "tests/a/b.rs"\n', None,
+     "tests/probe.rs"),
     (PACKAGE, None, "tests/a/b.rs"),
     (PACKAGE, None, "tests/probe.txt"),
     (PACKAGE, None, "tests/missing.rs"),

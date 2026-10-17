@@ -89,7 +89,7 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
         for entry in confirmations
     ):
         return "selected outside execution has malformed probe confirmations"
-    severity =[finding["severity"] for finding in findings]
+    severity = [finding["severity"] for finding in findings]
     if ("NEEDS_REVISION" in scores.values() or "fatal" in severity or
             severity.count("important") >= 2):
         expected_verdict = "NEEDS_REVISION"
