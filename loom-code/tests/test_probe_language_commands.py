@@ -577,7 +577,7 @@ def test_go_json_passing_test_accepted() -> None:
     ("cargo test --test attack", RUST, CARGO_IGNORED),
     ("cargo nextest run --test attack", RUST, NEXTEST_IGNORED),
 ])
-def test_go_all_skipped_refused(command: str, artifact: str, output: str, repo: Path) -> None:
+def test_listed_runner_no_passing_test_counts_zero(command: str, artifact: str, output: str, repo: Path) -> None:
     """A readable run with no passing test of the artifact -- all skipped, or
     a bun summary covering more than one file -- counts 0, a refusal."""
     assert row_for(command, artifact, repo).passed(output, artifact) == 0
@@ -636,13 +636,13 @@ def test_nextest_no_tests_not_fail_refused(command: str, repo: Path) -> None:
     assert row is not None and not row.accepts(argv, RUST, repo), command
 
 
-def test_bun_absolute_target_bound_to_repo(repo: Path, tmp_path: Path) -> None:
-    """An absolute bun target is accepted only at the repository's own artifact."""
+def test_bun_absolute_target_refused(repo: Path, tmp_path: Path) -> None:
+    """An absolute bun target is refused inside the repository or out: the
+    recorded command must re-run from another checkout."""
     inside = ["bun", "test", str(repo / BUN)]
-    assert row_for(shlex.join(inside), BUN, repo).passed(BUN_PASS, BUN) == 1
     row = claiming_row(inside)
+    assert not row.accepts(inside, BUN, repo)
     assert not row.accepts(["bun", "test", str(tmp_path / "other-checkout" / BUN)], BUN, repo)
-    assert not row.accepts(inside, BUN, None)
 
 
 def test_node_empty_file_level_case_refused() -> None:

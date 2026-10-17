@@ -152,7 +152,7 @@ counts as `go`):
 | unittest | `python -m unittest [-v] [-q] <A>` (pytest's python/uv/conda launchers) |
 | node | `node --test --test-reporter=junit [--experimental-strip-types] <A>` |
 | deno | `deno test --reporter=junit [-A] [--allow-*] <A>` |
-| bun | `bun test ./<A>` or `bun test` with the absolute path of `<A>` in this repository |
+| bun | `bun test ./<A>` |
 | jest | `[w] jest --json --runTestsByPath <A>` |
 | vitest | `[w] vitest run --reporter=json --outputFile=/dev/stdout <A>` |
 | mocha | `[w] mocha --reporter json <A>` |

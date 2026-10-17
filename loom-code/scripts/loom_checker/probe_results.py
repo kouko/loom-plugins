@@ -221,15 +221,12 @@ def _bun_claims(argv: list[str]) -> bool:
 
 
 def _bun_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
-    """`bun test ./<A>` or `<A>`'s absolute path in `repo`: bun reads any
-    other positional as a substring filter over every test file it finds."""
-    if len(argv) != 3 or argv[1] != "test":
+    """`bun test ./<A>` only: bun reads any other positional as a substring
+    filter over every test file it finds, and an absolute path names one
+    machine's checkout, so the recorded command could not re-run elsewhere."""
+    if len(argv) != 3 or argv[1] != "test" or not argv[2].startswith("./"):
         return False
-    target = argv[2]
-    if target.startswith("./"):
-        return os.path.normpath(target) == os.path.normpath(artifact)
-    return (os.path.isabs(target) and repo is not None
-            and os.path.realpath(target) == os.path.realpath(Path(repo) / artifact))
+    return os.path.normpath(argv[2]) == os.path.normpath(artifact)
 
 
 def _bun_passed(output: str, artifact: str) -> int | None:
