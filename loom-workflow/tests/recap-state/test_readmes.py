@@ -172,9 +172,9 @@ def test_tri_lang_readmes_consistent():
 
 def test_tri_lang_readmes_show_localized_goal_grounded_alignment_loop():
     readmes = {
-        "en": (_read(README_EN), ("Purpose and current position", "Align purpose and next step")),
-        "ja": (_read(README_JA), ("目的と現在地", "目的と次の一歩をそろえる")),
-        "zh-TW": (_read(README_ZHTW), ("目的與現在的位置", "對齊目的與下一步")),
+        "en": (_read(README_EN), ("Purpose and current position", "Ask about the next step")),
+        "ja": (_read(README_JA), ("目的と現在地", "次の一歩を確認する")),
+        "zh-TW": (_read(README_ZHTW), ("目的與現在位置", "確認下一步")),
     }
 
     for language, (text, labels) in readmes.items():
@@ -189,3 +189,22 @@ def test_tri_lang_readmes_show_localized_goal_grounded_alignment_loop():
     for language, (text, _) in readmes.items():
         assert "recap-state/" in text, f"{language} README uses a stale directory root"
         assert "\nrecap/\n" not in text, f"{language} README names a nonexistent directory"
+
+
+def test_tri_lang_readmes_describe_flexible_recap_and_pause_without_six_section_claim():
+    localized_contract = {
+        "en": (_read(README_EN), ("purpose", "only the sections", "waits for your answer", "writes nothing to disk")),
+        "ja": (_read(README_JA), ("目的", "必要なセクションだけ", "返答を待つ", "ファイルには何も書かない")),
+        "zh-TW": (_read(README_ZHTW), ("目的", "只保留有用的段落", "等待你的回答", "不會寫入任何檔案")),
+    }
+    stale_claims = {
+        "en": ("six-section", "six sections", "fixed six-section"),
+        "ja": ("6 つの", "6 セクション", "同じ 6"),
+        "zh-TW": ("六個段落", "六段結構", "六個自然段落"),
+    }
+
+    for language, (text, required) in localized_contract.items():
+        for phrase in required:
+            assert phrase in text, f"{language} README lacks: {phrase}"
+        for claim in stale_claims[language]:
+            assert claim not in text, f"{language} README retains fixed-format claim: {claim}"

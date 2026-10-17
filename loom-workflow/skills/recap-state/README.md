@@ -3,7 +3,7 @@
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > When you lose the thread mid-conversation, this skill stops and
-> produces a clear six-section summary so you can read yourself back
+> produces a clear recap so you can read yourself back
 > into the work in under a minute.
 
 ---
@@ -14,28 +14,28 @@ You are in the middle of a conversation. A long tool output just ran,
 or you stepped away for a moment, or the agent asked something whose
 premise you can no longer place. You are lost.
 
-This skill fires when you say so. It reads back the current session
-as a structured six-section recap — our purpose, where the work stands,
-what shaped it, the remaining gap, and what is still pending — and
-then asks you to confirm the next step before anything continues.
+This skill fires when you say so. It starts with our purpose and current
+position, then includes only the sections that help explain what shaped the
+work, the remaining gap, and the next step. It asks you to confirm that step
+and waits for your answer before continuing.
 
 It writes nothing to disk. The recap appears in chat and nowhere else.
 
 ## Goal-Grounded Alignment Loop
 
-The recap treats purpose as the anchor for every later section. It does not
-merely report recent activity: it checks whether the current position and next
-step still serve the purpose you established.
+The recap treats purpose as the anchor. Relevant history appears when it helps
+explain the current position; a short conversation needs fewer sections. The
+final question checks whether the proposed next step still serves the purpose
+you established.
 
 ```mermaid
 graph TB
-    Purpose["Purpose and current position"] -->|"Purpose selects relevant context"| Background["Essential background"]
-    Background -->|"Context supports the assessment"| Assessment["Gap and current assessment"]
-    Assessment -->|"Unknowns create a decision need"| Question["Why confirmation is needed now"]
-    Question -->|"The decision shapes remaining work"| Pending["Pending work"]
-    Pending -->|"Remaining work yields a next step"| Alignment["Align purpose and next step"]
-    Alignment -.->|"Purpose or direction is wrong"| Purpose
-    Alignment -->|"The user confirms alignment"| Continue["Continue the work"]
+    Purpose["Purpose and current position"] --> Next["Ask about the next step"]
+    Purpose -.->|"When useful"| History["Relevant decisions and remaining gap"]
+    History --> Next
+    Next --> Wait["Wait for the user's answer"]
+    Wait -.->|"The user redirects"| Purpose
+    Wait -->|"The user confirms"| Continue["Continue the work"]
 ```
 
 The current purpose must come from the conversation. Broader purposes appear
@@ -88,8 +88,8 @@ confirm the next step. Answer it (or redirect) and the work continues.
 These are deliberate omissions from v0.1:
 
 - **Per-task variants** — a debug-mode recap, a design-mode recap,
-  a research-mode recap. v0.1 uses one fixed six-section schema for all
-  conversation types.
+  a research-mode recap. v0.1 adapts its sections to the conversation
+  without separate task-specific formats.
 - **Auto-trigger** — detecting confusion without the user saying so.
   v0.1 requires explicit invocation.
 - **`test-prompts.json`** — eval prompts for testing recap quality.
