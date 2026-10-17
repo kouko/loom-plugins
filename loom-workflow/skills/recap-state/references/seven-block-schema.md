@@ -1,515 +1,250 @@
 # Recap Alignment Schema — Reference Bundle
 
 > **SSOT for `loom-workflow:recap-state` v0.1**
-> This file is the authoritative source for the L3 Goal-Grounded Alignment Loop,
-> the historical seven-block lineage shared with L2, and the 5
-> shared core principles. SKILL.md routes here; do not duplicate content in
-> SKILL.md.
-> Source research: `AI Agent Recap 框架研究` (2026-05-25) + `對話接續綜論` (2026-05-25)
-> + `2026-05-26-recap-v0.1-brief.md` (5th principle).
+> This file owns the L3 orientation contract and retains the historical
+> seven-block lineage for the possible L2 HANDOFF sister skill.
+> Source research: `AI Agent Recap 框架研究` (2026-05-25),
+> `對話接續綜論` (2026-05-25), and `2026-05-26-recap-v0.1-brief.md`.
 
----
-
-The L3 renderer keeps planning private. Never output `<thinking>` or `<recap>` tags
-or their closing forms. Never expose `Block N` labels. The numbered model below
-records the source lineage and L2 mapping; its identifiers are not L3 headings.
+The renderer keeps planning private. Never output `<thinking>` or `<recap>`
+tags, their closing forms, or numbered `Block N` labels.
 
 ## L3 user-visible template
 
-Use six natural headings in the conversation language, in this order:
+Use an orientation-first, variable-length recap in the conversation language.
+For a long conversation, lead with the conversation-grounded original purpose
+when available and the current position. Show a proposed next step only when
+the purpose is grounded. Explain how key decisions and completed work led here,
+then name the remaining gap. Mark assumptions and unknown facts as such; never
+infer a purpose or completed work from silence.
+If the original purpose is unknown, ask only for the purpose. Do not invent a
+proposed work step when the purpose is unknown. When the original purpose is
+grounded, ask about the proposed next step. If asking for purpose, wait for the
+user to state or clarify it. In a short session, omit sections with no useful
+content; never pad a history or invent a pending question to fill a template.
 
-### Purpose and current position
+Use clear section headings for content that warrants sections. Frame each
+heading in an ASCII box with `■ ` before the heading text. Use
+`loom-visualization` to generate or verify CJK alignment rather than eyeballing
+cell widths. Put one fullwidth-space-only line between sections, and inspect
+the rendered chat spacing; do not use visible HTML break tags. Keep the first
+section focused on purpose and position, and the final section focused on a
+directed question about purpose when unknown, or the grounded next step.
+Stop until the user responds.
 
-State the current purpose and where the work stands relative to it. The current
-purpose is mandatory and comes from explicit conversation evidence. State a
-broader purpose only when explicitly established by the user or a confirmed
-goal or intent; never invent short-, medium-, or long-term goals. If the purpose
-cannot be grounded, say the purpose is not yet aligned.
+Use bullets for a short path through decisions and work. Put a short
+situation sentence before each table. A table earns its place by comparing
+information or compressing meaningful metadata. Draw a relationship diagram
+only for real dependency, branch, or merge topology; a flat status list needs
+no diagram. Route the form and any ASCII alignment through
+`loom-visualization`; follow its client-specific renderer guidance. Preserve
+the user's exact wording when a phrase changes subsequent behavior, including
+paths, errors, constraints, tools, and commands. Keep confirmed facts,
+assumptions, and unknowns distinct. Answer in the current chat only; do not
+write a recap file or replace HANDOFF or the built-in `/recap`.
 
-### Essential background
+## 1 — The Seven Blocks (historical lineage)
 
-Give 3–5 bullets covering decisions, rejected options and reasons, and exact
-spec-critical strings. Quote paths, errors, constraints, tools, and commands;
-do not normalize them.
+The V1 model used seven blocks. The map records why each mattered and how a
+future L2 HANDOFF might use it. It is not the L3 display format.
 
-### Gap and current assessment
+| # | Block | Original purpose | L3 treatment | Future L2 |
+|---|---|---|---|---|
+| 1 | Situation | Open at the present moment | Lead with purpose and position | Render |
+| 2 | Background | Preserve the reasoning trail | Include key decisions when relevant | Render |
+| 3 | Assessment | Expose assumption, confidence, and unknowns | Distinguish facts from assumptions | Render |
+| 4 | User messages | Preserve all user intent for a cold reader | Skip the full message dump | Render verbatim |
+| 5 | Why-this-question | Explain a pending agent question | Include its stakes only when one exists | Skip |
+| 6 | Pending | Show remaining work | Name the gap and useful next work | Render |
+| 7 | Synthesis-check | Catch a direction mismatch | Ask a directed final question and wait | Render with L2-specific strength |
 
-State the gap between the current position and purpose, the working assumption,
-confidence, and unknown or blocker. Default to a two-column key:value table.
+The original Block 2 guidance used 3–5 bullets and the original L3 renderer
+used six natural sections. Those limits are history, not current requirements.
+The full message dump was dropped at L3 because an in-session reader already
+has their turns; consequential phrases still require exact quotation. L2 has
+a different reader and may need every turn. HANDOFF-specific additions belong
+to HANDOFF, not this recap.
 
-### Why confirmation is needed now
+## 2 — Visual aids
 
-Explain the most recent question, why it matters, and any options and trade-offs.
-When no question is pending, say so briefly instead of inventing one.
+Use a table to compare alternatives or compress meaningful metadata, and put
+a short situation sentence before it. A single row or unrelated items rarely
+earn a table. Use a relationship diagram only for dependency, branch, or merge
+topology that is easier to understand spatially. Follow `loom-visualization`
+for client rendering choice, ASCII frames, and alignment verification. An
+ordinary status snapshot works as prose or bullets. An explicit user format
+request wins where the client can render it.
 
-### Pending work
-
-List only unfinished work that closes the stated gap.
-
-### Align purpose and next step
-
-Restate the purpose, current position, and proposed next step. Ask the user to
-confirm or redirect, and do not continue until they respond. If the purpose is
-unknown, ask only for the purpose.
-
-## 1 — The Seven Blocks
-
-Each block has a one-line WHY. The WHY is sourced from the V1 template in the
-Recap research note (§我的 Recap Prompt 模板（V1）) and the Claude Code 9-segment
-compaction schema analysis.
-
-### Block ↔ Audience map
-
-This bundle is the SSOT for both L3 (in-session, human warm reader — this skill)
-and the future L2 HANDOFF sister skill (cross-session, AI cold reader). Not
-every block fires for every reader. SKILL.md routes the L3 subset; future
-HANDOFF SKILL.md will route the L2 subset.
-
-| # | Block | L3 (Recap, this skill) | L2 (HANDOFF, future) |
-|---|---|---|---|
-| 1 | Situation | Purpose and current position | ✅ render |
-| 2 | Background | Essential background | ✅ render |
-| 3 | Assessment | Gap and current assessment | ✅ render |
-| 4 | User messages | ❌ **skip** — see Block 4 WHY | ✅ render verbatim |
-| 5 | Why-this-question | Why confirmation is needed now | ❌ skip (no "agent's recent question" in cross-session) |
-| 6 | Pending | Pending work | ✅ render |
-| 7 | Synthesis-check | Align purpose and next step | ✅ render (different strength — HANDOFF uses init-prompt synthesis) |
-
-**L3 ships 6 natural sections**; it does not render these numbers or internal names.
-**L2 will ship 6 blocks** (1, 2, 3, 4, 6, 7) plus HANDOFF-specific additions per the HANDOFF research v1.1 schema (Interruption Snapshot, Confidence Flags, Do Not Touch, Verification Commands, etc. — those are HANDOFF-only and not in this bundle).
-
----
-
-## 1.5 — Visual aids (tables / Mermaid / ASCII)
-
-**Rule**: Use tables or diagrams **only when they compress information** —
-not as decoration. The recap exists to be scanned, not admired. A table that
-flattens 3 sub-bullets into 3 rows wins; a table with 1 row or a chart for 3
-unrelated items adds framing without compressing.
-
-Per-section guidance — adapted from the 2026-05-27 dogfood finding that
-some blocks (especially Block 3 Assessment, Block 5 Why-this-question,
-Block 6 Pending) read meaningfully better with a small table:
-
-| Section | Default form | Upgrade to table / diagram when… |
-|---|---|---|
-| Purpose and current position | concise prose or bullets | Never solely for formatting. |
-| Essential background | bullet list | Comparing 2+ alternatives → 2-col table (option / why-rejected) |
-| Gap and current assessment | **default is table** | Always: 2-col key:value (gap / assumption / confidence / unknown) |
-| Why confirmation is needed now | prose | 2+ options present → option-comparison table (option / cost / benefit) |
-| Pending work | `- [ ]` checklist | Items carry metadata (priority, blocked-by, owner, due-date) → multi-col table |
-| Align purpose and next step | one statement + one question | Never. The whole point is a single direct ask. |
-
-**Diagrams**: useful only when there is real topology — a pipeline, dependency
-graph, or state machine the human needs to see spatially. Use Mermaid only when
-the client is known to render it; otherwise use a markdown table by default, and
-ASCII only where the destination cannot render markdown.
-An explicit user format request wins. Support counts as known only when the
-user or current runtime instructions explicitly state Mermaid rendering
-support; never infer it from a product name. Most recaps are flat state
-snapshots, so the six sections normally need no diagram.
-
-**Anti-pattern**: a 1-row table, a 2-row table whose rows are unrelated, or
-an ASCII chart for a 3-item list. These add boxes around text without
-reducing parsing cost — net negative for the 60-second-read principle.
-
----
-
-### Block 1 — Situation
-
-**Prompt instruction**: One sentence — what are we doing right now? Where are we stuck?
-
-**WHY**: Opens with the present moment so the human can orient immediately
-before reading any history. Mirrors SBAR's S-block and Claude Code segment 8
-("Current work"). Without this, the reader starts in the middle of a story.
-
----
-
-### Block 2 — Background
-
-**Prompt instruction**: 3–5 bullets covering:
-- Key decisions made to get here
-- Options that were rejected and why
-- Important file names / tools / concepts — **quote directly, do not rewrite**
-
-**WHY**: Captures the reasoning trail so the human does not have to reconstruct
-"why did we choose X". Mandatory direct-quote rule stops paraphrase-creep on
-technical strings (file paths, error messages, command names). Sourced from
-Claude Code compaction prompt: "Directly quote key phrases from the original
-text rather than paraphrasing."
-
----
-
-### Block 3 — Assessment
-
-**Prompt instruction**: Three sub-items:
-- Current assumption the agent is operating under
-- Confidence level (high / medium / low)
-- What the agent does not know or is blocked on
-
-**WHY**: Makes the agent's internal model visible to the human. Without this
-block, the human cannot tell whether the agent's next question is well-founded
-or based on a wrong assumption. Sourced from SBAR's A-block and I-PASS
-contingency planning.
-
----
-
-### Block 4 — User messages (L2-only — skipped at L3)
-
-**Prompt instruction (L2 only — for the future HANDOFF sister skill)**: List
-every message the user sent in this session, verbatim. No filtering. No
-paraphrasing. No selection of "important" ones.
-
-**At L3 (this skill): skip this item entirely.** Render the six natural
-sections without block numbers or internal names. Spec-critical user phrases
-(file paths, error messages, named constraints) belong in Essential background
-via the quote-not-paraphrase principle.
-
-**WHY**: This block has different value at L3 (in-session, human warm reader)
-vs L2 (cross-session, AI cold reader). The full verbatim list — inherited from
-Anthropic's compaction prompt rule "Preserve all user messages that are not
-tool results" — is correct for L2 because the next agent has no other source
-of user intent. At L3 the reader is the user themselves; they already remember
-their own turns, so the block adds no signal and dilutes the recap by pushing
-Block 5 (Why-this-question) below the fold. Two rounds of pre-merge dogfood
-(2026-05-27, this PR's own session) confirmed the block was not worth the
-space — even after compressing to one-line-intent + spec-critical-quotes (the
-intermediate v0.1 design from commit `0d6244d0`), the user reported "沒有太大
-必要" / "still not worth it". Final v0.1 design: drop at L3, keep for L2,
-route spec-critical anti-drift duty to Block 2's quote-not-paraphrase rule.
-
----
-
-### Block 5 — Why-this-question (L3-only)
-
-**Prompt instruction**: Explain the agent's most recent question:
-- What is the agent asking?
-- Why does the agent need to know this (what breaks if the user skips it)?
-- What options does the user have, and what are the trade-offs?
-
-**WHY**: This block is L3-specific — it does not appear in HANDOFF (L2) or the
-9-segment compaction schema. It exists because the most common mid-session
-confusion point is: "I don't understand why the agent just asked that." Without
-this block, the human may answer the question without understanding the stakes.
-Sourced from the L3 Recap design in the Continuation Stack 4-layer model. L2
-HANDOFF skips this block because there is no "agent's recent question" in a
-cross-session cold-start context — the cold AI reader is starting fresh, not
-answering a pending question.
-
----
-
-### Block 6 — Pending
-
-**Prompt instruction**: A checklist of tasks not yet completed.
-
-**WHY**: Corresponds to Claude Code compaction segment 7 ("Pending tasks") and
-I-PASS's A (Action list). Gives the human a fast scan of what is left so the
-Synthesis-check question in block 7 has concrete content to confirm or redirect.
-
----
-
-### Block 7 — Synthesis-check
-
-**Prompt instruction**: State in one sentence the direction the agent expects
-the user to confirm. Then ask the user to confirm or redirect before continuing.
-
-Example format:
-> "My read is that we're about to do X. Does that match your intent,
-> or would you like to redirect?"
-
-**WHY**: Sourced from I-PASS's S ("Synthesis by receiver") — the one element
-that SBAR lacks. Forcing a read-back catches the failure mode where the agent
-believed it communicated clearly but the user had a different mental model.
-Without this block the agent continues and the mismatch only surfaces 3 turns
-later. This is a **soft gate**: the agent waits for user confirmation before
-proceeding, but any "yes / 對 / go / continue / 繼続" counts as confirmation.
-
----
-
-## 2 — The Five Shared Core Principles
-
-These 5 principles are the normative contract behind the 7 blocks.
-Each has: name, one-line definition, one-line WHY, one short failure-mode example.
-
-The first 4 are sourced from the synthesis research note §共通核心：四大原則.
-The 5th is skill-specific, added 2026-05-26 per the brief amendment.
-
----
+## 3 — The Five Shared Core Principles
 
 ### structured-schema
 
-**Definition**: Use the fixed six-section L3 structure every time — no
-free-form summary. The numbered lineage remains available for L2 mapping but
-never becomes an L3 display format.
-
-**WHY**: Consistency is the user-visible value. A reader who has seen the schema
-twice can scan it in 30 seconds because they know where each piece of information
-lives ("expected location" principle from information design).
-
-**Failure mode**: Agent produces a "quick summary" paragraph instead of the
-six natural sections. User has to hunt for the assessment and misses that the
-pending list changed.
-
----
+Lead with grounded purpose when available and current position, adapt the
+middle to the conversation, and end with the conditional question above.
+Predictable endpoints help orientation; mandatory empty sections hide useful
+work behind filler.
 
 ### quote-not-paraphrase
 
-**Definition**: In L3 Essential background, reproduce spec-critical strings
-exactly — file paths, error messages, command names, and constraints are quoted
-verbatim. L2 separately preserves user turns in its own handoff contract.
+Reproduce behavior-changing user wording exactly, including paths, error
+messages, named constraints, and tool or command names. For example,
+"kill `config/base.py` and split into `config/db.py` + `config/app.py`"
+cannot be reduced to "restructure the config file" without losing the action.
 
-**WHY**: Every LLM pass introduces small drift. "auth module" becomes "the
-authentication layer" becomes "session management" across three summaries.
-Forcing direct quotes stops that drift at the source. Sourced from Anthropic's
-compaction prompt rule: "Directly quote key phrases from the original text
-rather than paraphrasing."
+### all-user-messages
 
-**Failure mode**: Block 2 says "we decided to restructure the config file."
-The actual user phrase was "kill `config/base.py` and split into
-`config/db.py` + `config/app.py`." The paraphrase drops the specific file names
-that the next session needs.
-
----
-
-### all-user-messages (L2-only principle)
-
-**Definition**: At L2 (cross-session HANDOFF, AI cold reader): Block 4 lists
-every user turn verbatim — no LLM filtering. The cold AI reader has no other
-source of user intent.
-
-**At L3 (this skill): the principle is dormant.** Block 4 is skipped entirely.
-Spec-critical user phrases (file paths, error messages, named constraints, exact
-tool / command names) are preserved by principle 2 (`quote-not-paraphrase`)
-inside Block 2 (Background) — that's where the anti-drift duty lives at L3. If
-the user explicitly wants a verbatim listing of their messages at L3, they ask
-outside the recap schema; the recap stays focused on the six sections the L3 reader
-actually scans.
-
-**WHY**: The user's intent is ground truth — that part of Anthropic's
-compaction prompt ("Preserve all user messages that are not tool results")
-holds for L2 because the next agent has no other source. At L3 the reader is
-the user themselves who lived through the session — verbatim dump is signal-
-zero noise. Two rounds of pre-merge dogfood (this PR's session, 2026-05-27)
-confirmed the principle fired at L3 only because of L2-prompt inheritance, not
-because of L3 reader cost / benefit. v0.1 ships with the principle reduced to
-L2-only at L3-rendering time, while the anchor `all-user-messages` stays in the
-bundle as the canonical SSOT for the future HANDOFF sister skill.
-
-**Failure mode (L2)**: User said "also keep the old endpoint alive for 30
-days." HANDOFF agent drops this turn as "minor." The new agent in the next
-session deletes the old endpoint on day 3.
-
-**Failure mode (L3 — what this v0.1 ships to prevent)**: Block 4 at L3 dumps
-17 verbatim user turns (mostly routine "go" / "好" / "next" confirmations) +
-2 substantive direction-setting turns. The human reader has to scroll past
-the 17 to find the 2. Plain-language principle (#5) violated by structural
-verbosity even if every line is technically plain.
-
----
+This is an L2-only principle for a cold reader. At L3, do not dump all user
+turns. If a user asks for message history, provide that listing separately.
 
 ### synthesis-check
 
-**Definition**: Align purpose and next step always ends with a directed question
-asking the user to confirm the purpose, current position, and next-step direction
-before the agent continues.
-
-**WHY**: Sourced from I-PASS's Synthesis by receiver — the one design element
-SBAR lacks that has the most impact. Without a forced pause, the agent resumes
-from its own assumption of alignment. The user's "yes" costs 2 seconds; the
-misalignment correction costs 20 minutes.
-
-**Failure mode**: Agent delivers the 6-block recap and immediately says "OK,
-I'll proceed with option A." User was going to say option B. The agent has
-already started writing 200 lines of option A code.
-
----
+Finish with one directed question: ask for the original purpose if it is
+unknown; otherwise ask about the grounded next step. Wait for the user's
+answer. When asking about a next step, a clear confirmation opens this soft
+pause; a correction replaces the proposed direction. When purpose is unknown,
+wait for the user to state or clarify it. Do not resume a tool call, edit, or
+analysis on your own.
 
 ### plain-language
 
-**Definition**: Each section of the recap is **an explanation TO the user**, not
-a status report ABOUT the user's work. The agent writes as if speaking
-directly to the user: *"you were debugging the auth flow"* / *"we picked option
-B because option A would have broken the migration"* — not *"Current state:
-debugging auth flow. Decisions made: option B chosen, rationale: migration
-constraint."* The shift from report-style to explanation-style is the lever:
-explanation enters the user's head pre-parsed; status-report tone forces them
-to translate before understanding. Use second-person framing ("you" / "we")
-where natural. Goal: the human reads themselves back into state in under 60
-seconds without parsing jargon. Only use a technical term if the user
-introduced it first in the session (mirrors quote-not-paraphrase on the
-agent's own vocabulary). Acronyms expanded on first mention. Short sentences
-over long. One fact per bullet.
+Explain the situation to the user in the conversation language, as a person
+speaking to them. Define an unfamiliar term when first used. Prefer "We chose
+Y because X would have delayed the migration" to shorthand such as
+"Decision: Y; rationale: migration constraint." Keep sentences short and
+separate facts, assumptions, and unknowns.
 
-*(Reframed 2026-05-29 per kouko dogfood feedback: original v0.1 wording said
-"Recap output uses plain everyday language" — passive, output-centric. The
-agent treated it as "write in plain prose" and still produced status-report
-tone that was technically plain but still felt distant. v0.1.1 reframes as an
-ACTIVE explanation-TO-user behaviour, which pushes the agent toward
-second-person conversational shape.)*
+## 4 — Good Example
 
-**WHY**: The human reader is already cognitively loaded from the work they
-just did — the most absorbable shape is an explanation addressed to them, not
-a report about them. An agent that writes *"Current state: X. Decisions made:
-Y. Open items: Z."* forces the reader to PARSE before understanding. An agent
-that writes *"You were working on X. We decided Y because Z. Still left: a, b,
-c."* is half-understood by the time the reader finishes the sentence. The
-recap exists to remove load, not add it; explanation-style removes more load
-than report-style even when both use the same plain vocabulary. Aligns with
-kouko's global preference: *"Plain language over jargon unless I introduce
-the term first."*
+This fictional long-session recap shows how the user gets back to the original
+purpose and the path to the next decision. The CJK heading frames were checked
+with `loom-visualization`'s alignment tool.
 
-**Failure modes (paraphrase-creep + jargon-creep + status-report-tone)**: See
-§3 Bad Example below. The third mode — status-report-tone — is the v0.1.1
-addition: prose that is grammatically plain but structurally a status dump
-("Hypothesis: X. Confidence: Y. Blocker: Z.") rather than an explanation
-("We think X — fairly confident; only Z is in the way."). Both are "plain
-English" by surface vocabulary; the latter respects the explanation framing
-the principle requires.
+```text
+┌──────────────────────────┐
+│ ■ 目的與目前位置         │
+└──────────────────────────┘
+```
 
----
+你最初要「每週一早上看得到上週的淨銷售額」。目前資料已匯入，報表仍缺
+退款的計算方式；下一步是先確認退款應歸到哪一週，才能完成淨銷售欄位。
 
-## 3 — Good Example
+　
 
-The following is a clean recap from a real SDD session (implementing a Python
-test for a skill bundle). It demonstrates all 5 principles.
+```text
+┌──────────────────────────┐
+│ ■ 關鍵決定與進度         │
+└──────────────────────────┘
+```
 
----
+- 我們決定先用訂單付款日期統計銷售，因為這和現有匯入資料一致。
+- 已完成訂單與退款資料的匯入，也核對了上週的訂單總額。
+- 原先想只列訂單總額，但那會忽略退款；因此改為要計算淨銷售額。
 
-### Purpose and current position
+這些已做的選擇有取捨關係，用決策脈絡圖可看出為何放棄舊方案。
 
-Our current purpose is to make the recap schema testable without losing its
-human-readable guidance. We are writing the RED test; it fails because the
-bundle file does not exist yet.
+```text
+┌──────────────────────────┐
+│ 目的: 每週看淨銷售額     │
+└────────────┬─────────────┘
+             │ 評估
+             ▼
+┌──────────────────────────┐
+│ 舊方案: 只列訂單總額     │
+└────────────┬─────────────┘
+             │ 漏掉退款，故捨棄
+             ▼
+┌──────────────────────────┐
+│ 決定: 計入退款           │
+└──────────────────────────┘
+```
 
-### Essential background
+　
 
-- Decided to put the test in `loom-workflow/skills/recap-state/scripts/` (flat per CLAUDE.md rule)
-- Rejected putting the test at plugin root — that would need a subfolder which the hook blocks
-- Bundle path: `loom-workflow/skills/recap-state/references/seven-block-schema.md`
-- Quote from plan: "RED: `pytest ...::test_all_seven_blocks_and_five_principles_present -v` fails initially because file does not exist"
+```text
+┌──────────────────────────┐
+│ ■ 已知與待辦             │
+└──────────────────────────┘
+```
 
-### Gap and current assessment
+目前可確認的進度與仍需釐清的地方如下。
 
-| | |
+| 項目 | 狀況 |
 |---|---|
-| **Gap** | create the bundle that satisfies the test |
-| **Assumption** | directory structure is correct and pytest can discover the test |
-| **Confidence** | high — ran `ls` to verify paths |
-| **Blocker** | nothing; the test runs and fails cleanly (expected RED state) |
+| 已確認 | 匯入完成；訂單總額已核對。 |
+| 未知 | 退款應歸在原付款週，還是實際退款週。 |
+| 待辦 | 確認規則後計算淨銷售額，再檢查報表。 |
 
-*(2-col key:value table per §1.5 — assessment defaults to this form; reads
-cleaner than 3 separate sub-bullets.)*
+　
 
-### Why confirmation is needed now
+```text
+┌──────────────────────────┐
+│ ■ 下一步                 │
+└──────────────────────────┘
+```
 
-There is no pending question; this is a recap of a completed step.
+我的理解是先確認退款歸屬週，再完成淨銷售欄位。這符合你的方向嗎？
 
-**If a real question with multiple options existed** — e.g., "H2 or H3 for
-block headings?" — per §1.5 the option-comparison reads better as a table:
+## 5 — Bad Example
 
-| Option | Pro | Con |
-|---|---|---|
-| H2 (`##`) | matches top-level convention in bundles | larger visual jump from H1 |
-| H3 (`###`) | tighter under bundle's H2 sections | regex still matches via `^#{2,3}` |
+"Current state: implementation pending. Confidence: high. Next: proceed."
+This hides the user's purpose, treats a guess as a fact, and continues without
+a directed question. Six padded headings or a decorative graph would make the
+same short exchange harder to scan.
 
-Prose is fine when there is one option or a clear narrative; reach for the
-table when the human is comparing alternatives.
+The historical implementation example mentioned
+`loom-workflow/skills/recap-state/scripts/`; it is retained here only as a
+lineage pointer, not as a current test-location instruction.
 
-### Pending work
+## 6 — Other diagram examples
 
-- [ ] Write `seven-block-schema.md` bundle (GREEN step)
-- [ ] Commit GREEN
-- [ ] Return implementer output to orchestrator
+These are alternatives for different questions, not four diagrams in one recap.
+Each uses the same fictional sales and refunds situation. Draw one only when
+the relationship adds understanding; flat progress is clearer in prose or a
+table. The maps summarize stated facts and decisions, without claiming access
+to hidden deliberation.
 
-*(Simple checklist — no per-item metadata, so the `- [ ]` form wins. If items
-carried priority / blocked-by / owner, per §1.5 a multi-col table would fit.)*
+### Argument map
 
-### Align purpose and next step
+An argument map（論證圖）shows what supports a claim. Suppose the fictional
+imported data contains a cross-week refund. That confirmed example and the
+still unknown attribution rule support asking the user to settle the rule
+before finalizing net sales; neither branch is a decision already made.
 
-My read is that our purpose is still to make the schema testable, the RED test
-is complete, and the next step is to write the bundle. Does that match your
-intent, or would you like to redirect?
+```text
+已確認: 有跨週退款 ──支持────┐
+                             ├──► 主張: 先確認退款歸屬週
+未知: 退款歸屬規則 ──待解────┘
+```
 
----
+### Decision tree
 
-## 4 — Bad Example
+A decision tree（決策樹）shows future branches, not the chosen policy. Each
+answer leads to a distinct calculation action after the user decides.
 
-The following is a **bad** recap of the same session. It violates
-paraphrase-creep (principle 2) and jargon-creep (principle 5). Annotations
-mark each problem.
+```text
+退款應歸哪一週？
+│
+├─ 原付款週 ─► 重算原付款週
+└─ 實際退款週 ─► 計入實際退款週
+```
 
----
+### Flowchart
 
-### Purpose and current position
+A flowchart（流程圖）shows an ordered procedure once the rule is confirmed.
+These steps do not branch; the rule must be settled before calculation.
 
-We are engaged in test-driven development activities pursuant to the
-implementation of a schema-validation artifact for the in-session recap skill
-within the loom-workflow plugin ecosystem.
-
-> **jargon-creep**: "test-driven development activities", "schema-validation
-> artifact", "loom-workflow plugin ecosystem" — the human does not need any of
-> these terms to understand "we are writing a test for a reference file."
-> Replace with one plain sentence.
-
-### Essential background
-
-- The project conventions mandate flat subfolder topology for skill directories
-- The implementer elected the `scripts/` subfolder for test collocation
-- The bundle artifact will be materialized at the references layer
-
-> **paraphrase-creep**: "mandate flat subfolder topology" is a paraphrase of
-> "subfolder 內不可再嵌 subfolder" (the actual CLAUDE.md rule). "materialized
-> at the references layer" paraphrases "create the file at
-> `references/seven-block-schema.md`." The actual path is gone.
-> **jargon-creep**: "elected", "collocation", "artifact", "materialized",
-> "references layer" — none of these were in the user's messages.
-
-### Gap and current assessment
-
-| Field |
-|---|
-| Hypothesis: path resolution is nominal. Confidence: sufficient. Concern: no outstanding impediments identified at this juncture. |
-
-> **decorative-table (§1.5 anti-pattern)**: a 1-row, 1-column table is just a
-> box around prose. It adds parsing cost (the reader has to recognize the
-> table structure) without compressing anything. Correct form is the 2-col
-> key:value table — see Good Example Block 3.
-> **jargon-creep (principle 5)**: "path resolution is nominal", "no
-> outstanding impediments at this juncture" — the plain version is "paths are
-> correct, nothing is blocking us."
-
-### Every user message
-
-The user dispatched the implementer with standard SDD task parameters, including
-resource paths and acceptance criteria. The user's primary directive involved
-TDD compliance and conventional commit discipline.
-
-> **structured-schema violation**: an L3 recap must not add an every-message
-> section. The warm human reader already has the conversation; Essential
-> background carries only spec-critical phrases via quote-not-paraphrase.
-> **jargon-creep (principle 5)**: "dispatched", "SDD task parameters", "TDD
-> compliance", "conventional commit discipline" — these are agent-introduced
-> terms. Plain version: "asked me to write the failing test for the bundle file."
-
-### Why confirmation is needed now
-
-No pending agent interrogatives at this time.
-
-> **jargon-creep**: "agent interrogatives" = "questions." Use plain language.
-
-### Pending work
-
-- [ ] GREEN implementation phase execution
-- [ ] Artifact persistence via VCS commit operation
-
-> **jargon-creep**: "GREEN implementation phase execution" = "write the bundle
-> file." "Artifact persistence via VCS commit operation" = "commit to git."
-
-### Align purpose and next step
-
-Confirm alignment on trajectory and authorize continuation of workflow.
-
-> **jargon-creep**: the plain version is "Does this match your plan — should I
-> write the bundle file next?" The bad version makes the user parse two
-> nominalized phrases ("confirm alignment", "authorize continuation") before
-> understanding the question.
+```text
+┌──────────┐
+│ 確認規則 │
+└──────────┘
+      │
+      ▼
+┌──────────┐
+│ 計算淨額 │
+└──────────┘
+      │
+      ▼
+┌──────────┐
+│ 核對報表 │
+└──────────┘
+```
