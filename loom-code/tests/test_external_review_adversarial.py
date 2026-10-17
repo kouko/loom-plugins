@@ -5,14 +5,18 @@
 # concern: A Claude alias must not accept a different observed model tier.
 # concern: A Codex model/list JSON-RPC error must fail discovery.
 # concern: A Claude receipt must not claim an observed tier other than its alias.
+# concern: A codex descendant holding stdout must not defeat the discovery timeout.
 """Graduated external-review regressions from independent review probes."""
 
 import json
+import os
+import stat
 import subprocess
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+sys.path.insert(0, str(SCRIPTS))
 import external_review  # noqa: E402
 from loom_checker import reviewers  # noqa: E402
 
@@ -165,3 +169,31 @@ def test_model_list_error_is_failed_discovery():
     assert result["status"] == "failed"
     assert result["reason"].startswith("discovery-error:")
     assert "not initialized" in result["reason"]
+
+
+DRIVER = """
+import os, subprocess, sys
+sys.path.insert(0, sys.argv[1])
+import external_review as er
+er.CODEX_DISCOVERY_TIMEOUT = 2
+try:
+    er._codex_candidates(subprocess.run, os.getcwd())
+except subprocess.TimeoutExpired:
+    print("timeout-raised")
+"""
+
+
+def test_codex_app_server_descendant_holds_stdout_times_out(tmp_path):
+    """A codex whose child keeps stdout open must still time out promptly."""
+    fake = tmp_path / "bin" / "codex"
+    fake.parent.mkdir()
+    fake.write_text("#!/bin/sh\nsleep 30 &\nsleep 30\n")
+    fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+    env = dict(os.environ, PATH=f"{fake.parent}{os.pathsep}{os.environ['PATH']}")
+    try:
+        out = subprocess.run([sys.executable, "-c", DRIVER, str(SCRIPTS)],
+                             env=env, cwd=tmp_path, capture_output=True,
+                             text=True, timeout=10)
+    except subprocess.TimeoutExpired:
+        raise AssertionError("discovery hung past its 2s timeout")
+    assert "timeout-raised" in out.stdout
