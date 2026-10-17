@@ -141,3 +141,14 @@ def test_frontmatter_and_routing():
     # (f)
     missing = [p for p in FIVE_PRINCIPLES if f"**{p}**" not in body]
     assert not missing, f"Missing principles: {missing}"
+
+
+def test_runtime_routes_to_orientation_schema_without_six_required_sections():
+    _, body = _parse_skill_md()
+    assert "orientation-first" in body
+    assert "long conversation" in body
+    assert "Chat only" in body
+    assert "Wait" in body
+    assert "loom-visualization" in body
+    assert "fixed six-section" not in body
+    assert "following this order" not in body
