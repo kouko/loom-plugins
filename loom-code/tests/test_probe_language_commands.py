@@ -162,6 +162,22 @@ DENO_SKIP = """\
 </testsuites>
 """
 
+# deno 2.9.7, a `t.step` parent whose only step is ignored: the parent case
+# carries no <skipped/> of its own.
+DENO_IGNORED_STEPS = """\
+Check probes/attack_test.ts
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="deno test" tests="2" failures="0" errors="0" time="0.002">
+    <testsuite name="./probes/attack_test.ts" tests="2" disabled="1" errors="0" failures="0">
+        <testcase name="steps" classname="./probes/attack_test.ts" time="0.000" line="1" col="6">
+        </testcase>
+        <testcase name="steps &gt; s" classname="./probes/attack_test.ts" time="0.000" line="1" col="43">
+            <skipped/>
+        </testcase>
+    </testsuite>
+</testsuites>
+"""
+
 DENO_PRETTY = """\
 \x1b[0m\x1b[38;5;245mrunning 1 test from ./probes/attack_test.ts\x1b[0m
 adds ... \x1b[0m\x1b[32mok\x1b[0m \x1b[0m\x1b[38;5;245m(189µs)\x1b[0m
@@ -547,6 +563,8 @@ def test_go_json_passing_test_accepted() -> None:
     (f"go test -json {GO}", GO, GO_SKIP),
     (f"node --test --test-reporter=junit {NODE}", NODE, NODE_SKIP),
     (f"deno test --reporter=junit {DENO}", DENO, DENO_SKIP),
+    (f"deno test --reporter=junit {DENO}", DENO, DENO_IGNORED_STEPS),
+    (f"/opt/homebrew/bin/go test -json {GO}", GO, GO_SKIP),
     (f"bun test ./{BUN}", BUN, BUN_SKIP),
     (f"bun test ./{BUN}", BUN, BUN_MULTI_FILE),
     (f"python3 -m unittest -v {UNITTEST}", UNITTEST, UNITTEST_SKIP),
@@ -569,7 +587,6 @@ def test_go_all_skipped_refused(command: str, artifact: str, output: str, repo: 
     (f"node --test --test-reporter=junit --experimental-strip-types {NODE}", NODE, NODE_PASS),
     (f"deno test --reporter=junit -A --allow-read=. {DENO}", DENO, DENO_PASS),
     (f"bun test ./{BUN}", BUN, BUN_PASS),
-    (f"bun test /work/repo/{BUN}", BUN, BUN_PASS),
     (f"python3 -m unittest -v {UNITTEST}", UNITTEST, UNITTEST_PASS),
     (f"uv run --isolated python -m unittest -q {UNITTEST}", UNITTEST, UNITTEST_PASS),
     (f"conda run -n env python3.12 -m unittest {UNITTEST}", UNITTEST, UNITTEST_PASS),
@@ -586,6 +603,7 @@ def test_node_deno_bun_unittest_passing_accepted(command: str, artifact: str, ou
     (f"bundle exec rspec --format json {RSPEC}", RSPEC, RSPEC_PASS),
     (f"bundle exec ruby -Ilib -Itest {MINITEST}", MINITEST, MINITEST_PASS),
     (f"vendor/bin/phpunit {PHPUNIT}", PHPUNIT, PHPUNIT_PASS),
+    (f"/usr/local/bin/phpunit {PHPUNIT}", PHPUNIT, PHPUNIT_PASS),
     ("cargo test --test attack", RUST, CARGO_PASS),
     ("cargo test --release -q --test=attack", RUST, CARGO_QUIET_PASS),
     ("cargo test --test mapped", RUST_MAPPED, CARGO_PASS),
@@ -618,6 +636,15 @@ def test_nextest_no_tests_not_fail_refused(command: str, repo: Path) -> None:
     assert row is not None and not row.accepts(argv, RUST, repo), command
 
 
+def test_bun_absolute_target_bound_to_repo(repo: Path, tmp_path: Path) -> None:
+    """An absolute bun target is accepted only at the repository's own artifact."""
+    inside = ["bun", "test", str(repo / BUN)]
+    assert row_for(shlex.join(inside), BUN, repo).passed(BUN_PASS, BUN) == 1
+    row = claiming_row(inside)
+    assert not row.accepts(["bun", "test", str(tmp_path / "other-checkout" / BUN)], BUN, repo)
+    assert not row.accepts(inside, BUN, None)
+
+
 def test_node_empty_file_level_case_refused() -> None:
     row = row_for(f"node --test --test-reporter=junit {NODE}", NODE)
     assert row.passed(NODE_EMPTY, NODE) == 0
@@ -627,6 +654,7 @@ def test_node_empty_file_level_case_refused() -> None:
     (f"go test {GO}", GO),
     (f"go test -json {GO} probes/helper_test.go", GO),
     (f"go test -json -run TestNothing {GO}", GO),
+    (f"/opt/homebrew/bin/go test -json -run X {GO}", GO),
     (f"go test -json ./... ", GO),
     (f"node --test {NODE}", NODE),
     (f"node --test --test-reporter=junit {NODE} probes/other.test.mjs", NODE),
@@ -652,6 +680,7 @@ def test_node_empty_file_level_case_refused() -> None:
     (f"ruby -e 1 {MINITEST}", MINITEST),
     (f"phpunit --filter testAdds {PHPUNIT}", PHPUNIT),
     (f"phpunit {PHPUNIT} tests/OtherTest.php", PHPUNIT),
+    (f"/usr/local/bin/phpunit {PHPUNIT} tests/OtherTest.php", PHPUNIT),
     ("cargo test --test attack some_case", RUST),
     ("cargo test --test attack -- --ignored", RUST),
     ("cargo test --no-run --test attack", RUST),

@@ -43,6 +43,12 @@ class Row:
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
 
 
+def _named(argv: list[str]) -> list[str]:
+    """`argv` with its command reduced to its base name, so
+    `/opt/homebrew/bin/go` is `go`."""
+    return [Path(argv[0]).name, *argv[1:]] if argv else argv
+
+
 def _one_positional(args: list[str], artifact: str) -> bool:
     positionals = [arg for arg in args if not arg.startswith("-")]
     return len(positionals) == 1 and os.path.normpath(positionals[0]) == os.path.normpath(artifact)
@@ -66,7 +72,7 @@ GO_VALUE_FLAGS = frozenset({"-count", "-timeout", "-tags"})
 
 
 def _go_claims(argv: list[str]) -> bool:
-    return argv[:2] == ["go", "test"]
+    return _named(argv)[:2] == ["go", "test"]
 
 
 def _go_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
@@ -158,7 +164,7 @@ NODE_ALLOWED = NODE_REQUIRED | {"--experimental-strip-types"}
 
 
 def _node_claims(argv: list[str]) -> bool:
-    return argv[:1] == ["node"] and "--test" in argv[1:]
+    return _named(argv)[:1] == ["node"] and "--test" in argv[1:]
 
 
 def _node_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
@@ -182,7 +188,7 @@ DENO_ALLOW = re.compile(r"--allow-[a-z-]+(=\S+)?")
 
 
 def _deno_claims(argv: list[str]) -> bool:
-    return argv[:2] == ["deno", "test"]
+    return _named(argv)[:2] == ["deno", "test"]
 
 
 def _deno_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
@@ -194,7 +200,11 @@ def _deno_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> b
 
 
 def _deno_passed(output: str, artifact: str) -> int | None:
-    return _junit_passed(output, artifact, lambda case: case.get("classname"), lambda case: False)
+    """Leaf cases only: a `t.step` parent is its own case, beside one case per
+    step named `<parent> > <step>`, and passes even when every step was ignored."""
+    names = [case.get("name", "") for case in _junit_cases(output) or []]
+    return _junit_passed(output, artifact, lambda case: case.get("classname"),
+                         lambda case: any(name.startswith(case.get("name", "") + " > ") for name in names))
 
 
 # bun ------------------------------------------------------------------------
@@ -204,18 +214,19 @@ BUN_PASS = re.compile(r"^\s*(\d+) pass\s*$", re.MULTILINE)
 
 
 def _bun_claims(argv: list[str]) -> bool:
-    return argv[:2] == ["bun", "test"]
+    return _named(argv)[:2] == ["bun", "test"]
 
 
 def _bun_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
-    """`bun test ./<A>` or an absolute `<A>`: bun reads any other positional
-    as a substring filter over every test file it finds."""
+    """`bun test ./<A>` or `<A>`'s absolute path in `repo`: bun reads any
+    other positional as a substring filter over every test file it finds."""
     if len(argv) != 3:
         return False
     target = argv[2]
     if target.startswith("./"):
         return os.path.normpath(target) == os.path.normpath(artifact)
-    return os.path.isabs(target) and _reports_artifact(target, artifact)
+    return (os.path.isabs(target) and repo is not None
+            and os.path.realpath(target) == os.path.realpath(Path(repo) / artifact))
 
 
 def _bun_passed(output: str, artifact: str) -> int | None:
@@ -281,10 +292,12 @@ RUBY_LAUNCHERS = (("bundle", "exec"),)
 
 
 def _launched(argv: list[str], launchers: tuple[tuple[str, ...], ...]) -> list[str]:
-    """`argv` without the one allowed launcher prefix it starts with."""
+    """`argv` without the one allowed launcher prefix it starts with, its
+    launcher and the runner it reaches both named by base name."""
+    argv = _named(argv)
     for launcher in launchers:
         if tuple(argv[:len(launcher)]) == launcher:
-            return argv[len(launcher):]
+            return _named(argv[len(launcher):])
     return argv
 
 
@@ -442,14 +455,14 @@ def _minitest_passed(output: str, artifact: str) -> int | None:
     return max(runs - failures - errors - skips, 0)
 
 
-PHPUNIT_COMMANDS = frozenset({"phpunit", "vendor/bin/phpunit"})
 PHPUNIT_OK = re.compile(r"^OK \((\d+) tests?, \d+ assertions?\)\s*$", re.MULTILINE)
 PHPUNIT_COUNTS = re.compile(r"^Tests: (\d+), Assertions: \d+((?:, [A-Za-z ]+: \d+)*)\.\s*$", re.MULTILINE)
 PHPUNIT_NOT_PASSED = ("Errors", "Failures", "Skipped", "Incomplete", "Risky")
 
 
 def _phpunit_claims(argv: list[str]) -> bool:
-    return bool(argv) and os.path.normpath(argv[0]) in PHPUNIT_COMMANDS
+    """`phpunit` by base name: `vendor/bin/phpunit`, `/usr/local/bin/phpunit`."""
+    return _named(argv)[:1] == ["phpunit"]
 
 
 def _phpunit_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
@@ -518,7 +531,7 @@ def _cargo_names(name: str | None, artifact: str, repo: Path | None) -> bool:
 
 
 def _cargo_claims(argv: list[str]) -> bool:
-    return argv[:2] == ["cargo", "test"]
+    return _named(argv)[:2] == ["cargo", "test"]
 
 
 def _cargo_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
@@ -532,7 +545,7 @@ def _cargo_passed(output: str, artifact: str) -> int | None:
 
 
 def _nextest_claims(argv: list[str]) -> bool:
-    return argv[:2] == ["cargo", "nextest"]
+    return _named(argv)[:2] == ["cargo", "nextest"]
 
 
 def _nextest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
