@@ -29,7 +29,7 @@ charter: 1.1
 **W2-02 Document runner commands and the confirmation hand-off**  after: W2-01  acceptance: 2,4
 - Files: `loom-code/skills/closing-review/references/adversarial.md`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/agents/reviewer.md`
 - Test: A2 positive: per-runner-command-forms-documented; negative: none-docs-only. A4 positive: reviewer-confirmation-handoff-documented; negative: none-docs-only.
-- Risk: agent-decided — closing-review runs each non-pytest/shell probe once, hands its output path to the round's reviewers, and copies each reviewer's `probe_confirmations` entry as `{reviewer, reviewed_sha, quote}` into the finalize input, so no extra round is needed; replaces the earlier per-language Recording examples.
+- Risk: agent-decided — closing-review hands each non-pytest/shell probe's output to the round's reviewers and copies each reviewer's `probe_confirmations` entry as `{reviewer, reviewed_sha, quote}` into the finalize input, so no extra round is needed; replaces the earlier per-language Recording examples.
 
 **W3-01 Release 3.41.0**  after: W2-02  acceptance: 5
 - Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/tests/test_write_plan_station_text.py`, `README.md`, `loom-code/README*.md`
