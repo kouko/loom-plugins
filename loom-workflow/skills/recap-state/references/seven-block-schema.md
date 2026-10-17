@@ -140,6 +140,24 @@ with `loom-visualization`'s alignment tool.
 - 已完成訂單與退款資料的匯入，也核對了上週的訂單總額。
 - 原先想只列訂單總額，但那會忽略退款；因此改為要計算淨銷售額。
 
+這些已做的選擇有取捨關係，用決策脈絡圖可看出為何放棄舊方案。
+
+```text
+┌──────────────────────────┐
+│ 目的: 每週看淨銷售額     │
+└────────────┬─────────────┘
+             │ 評估
+             ▼
+┌──────────────────────────┐
+│ 舊方案: 只列訂單總額     │
+└────────────┬─────────────┘
+             │ 漏掉退款，故捨棄
+             ▼
+┌──────────────────────────┐
+│ 決定: 計入退款           │
+└──────────────────────────┘
+```
+
 　
 
 ```text
@@ -176,3 +194,57 @@ same short exchange harder to scan.
 The historical implementation example mentioned
 `loom-workflow/skills/recap-state/scripts/`; it is retained here only as a
 lineage pointer, not as a current test-location instruction.
+
+## 6 — Other diagram examples
+
+These are alternatives for different questions, not four diagrams in one recap.
+Each uses the same fictional sales and refunds situation. Draw one only when
+the relationship adds understanding; flat progress is clearer in prose or a
+table. The maps summarize stated facts and decisions, without claiming access
+to hidden deliberation.
+
+### Argument map
+
+An argument map（論證圖）shows what supports a claim. Suppose the fictional
+imported data contains a cross-week refund. That confirmed example and the
+still unknown attribution rule support asking the user to settle the rule
+before finalizing net sales; neither branch is a decision already made.
+
+```text
+已確認: 有跨週退款 ──支持────┐
+                             ├──► 主張: 先確認退款歸屬週
+未知: 退款歸屬規則 ──待解────┘
+```
+
+### Decision tree
+
+A decision tree（決策樹）shows future branches, not the chosen policy. Each
+answer leads to a distinct calculation action after the user decides.
+
+```text
+退款應歸哪一週？
+│
+├─ 原付款週 ─► 重算原付款週
+└─ 實際退款週 ─► 計入實際退款週
+```
+
+### Flowchart
+
+A flowchart（流程圖）shows an ordered procedure once the rule is confirmed.
+These steps do not branch; the rule must be settled before calculation.
+
+```text
+┌──────────┐
+│ 確認規則 │
+└──────────┘
+      │
+      ▼
+┌──────────┐
+│ 計算淨額 │
+└──────────┘
+      │
+      ▼
+┌──────────┐
+│ 核對報表 │
+└──────────┘
+```

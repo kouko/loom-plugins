@@ -182,12 +182,33 @@ def test_good_example_demonstrates_long_session_orientation() -> None:
         assert required in example, f"Good Example missing: {required}"
 
     assert example.count("\n　\n") == 3  # one separator between four sections
-    assert example.count("┌") == example.count("┘") == 4
-    assert example.count("│ ■ ") == 4
+    assert len(re.findall(r"^│ ■ .+ │$", example, re.MULTILINE)) == 4
+    assert "決策脈絡圖" in example
+    assert "漏掉退款" in example
+    assert "計入退款" in example
+    for other_diagram in ("論證圖", "決策樹", "流程圖"):
+        assert other_diagram not in example
     assert "+----------------" not in example
     assert re.search(r"[^\n]+。\n\n\| 項目 \|", example), (
         "A situation sentence must introduce the comparison table"
     )
+
+
+def test_separate_diagram_examples_cover_arguments_branches_and_steps() -> None:
+    text = load_bundle()
+    assert "## 6 — Other diagram examples" in text
+    examples = text.split("## 6 — Other diagram examples", 1)[1]
+    for heading, labels in (
+        ("Argument map", ("論證圖", "主張", "已確認", "未知")),
+        ("Decision tree", ("決策樹", "原付款週", "實際退款週")),
+        ("Flowchart", ("流程圖", "確認規則", "計算淨額", "核對報表")),
+    ):
+        section = examples.split(f"### {heading}", 1)[1].split("### ", 1)[0]
+        assert "```text" in section
+        for label in labels:
+            assert label in section, f"{heading} missing {label}"
+    assert "not four diagrams in one recap" in examples
+    assert "private model reasoning" not in examples
 
 
 def test_english_reference_keeps_localized_text_to_explicit_quotations() -> None:
