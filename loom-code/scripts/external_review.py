@@ -9,7 +9,9 @@ from __future__ import annotations
 import argparse
 import errno
 import json
+import os
 import re
+import signal
 import subprocess
 import sys
 import threading
@@ -124,7 +126,8 @@ def _codex_app_server(argv: list[str], requests: str, timeout: int, scope: str):
     if not Path(scope).is_dir():
         raise FileNotFoundError(errno.ENOENT, "missing review root", scope)
     proc = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                            stderr=subprocess.DEVNULL, text=True, cwd=scope)
+                            stderr=subprocess.DEVNULL, text=True, cwd=scope,
+                            start_new_session=True)
     lines: list[str] = []
 
     def read() -> None:
@@ -145,9 +148,17 @@ def _codex_app_server(argv: list[str], requests: str, timeout: int, scope: str):
         if reader.is_alive():
             raise subprocess.TimeoutExpired(argv, timeout)
     finally:
-        proc.kill()
+        # A descendant (e.g. an MCP server) can hold stdout open; kill the
+        # whole group, and never close stdout under a still-blocked reader.
+        try:
+            os.killpg(proc.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
         proc.wait()
-        for stream in (proc.stdin, proc.stdout):
+        if reader.ident is not None:
+            reader.join(1)
+        streams = (proc.stdin,) if reader.is_alive() else (proc.stdin, proc.stdout)
+        for stream in streams:
             try:
                 stream.close()
             except OSError:
