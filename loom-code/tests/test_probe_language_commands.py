@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-from loom_checker.probe_results import claiming_row
+from loom_checker.probe_results import ROWS, claiming_row
 
 GO = "probes/add_test.go"
 NODE = "probes/attack.test.mjs"
@@ -690,13 +690,24 @@ def test_node_empty_file_level_case_refused() -> None:
     ("cargo test --test mapped", "tests/mapped.rs"),
     ("cargo nextest list --test attack", RUST),
     ("cargo nextest run --test attack -E all()", RUST),
+    (f"go vet -json {GO}", GO),
+    (f"go run {GO}", GO),
+    (f"deno check --reporter=junit {DENO}", DENO),
+    (f"deno run {DENO}", DENO),
+    (f"bun build --target=bun ./{BUN}", BUN),
+    (f"bun ./{BUN}", BUN),
+    ("cargo build --test attack", RUST),
+    ("cargo run", RUST),
 ])
 def test_listed_runner_without_output_flag_or_extra_file_refused(
     command: str, artifact: str, repo: Path
 ) -> None:
+    """Any other subcommand of go, deno, bun or cargo is that runner in
+    another form: claimed by exactly one row, and refused."""
     argv = shlex.split(command)
     row = claiming_row(argv)
     assert row is not None, command
+    assert [r.name for r in ROWS if r.claims(argv)] == [row.name], command
     assert not row.accepts(argv, artifact, repo), command
 
 

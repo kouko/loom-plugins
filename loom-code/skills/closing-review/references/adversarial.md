@@ -166,7 +166,9 @@ Every runner except cargo test and nextest runs the probe from the change's
 store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs`
 (or the `[[test]]` path Cargo.toml names) through a task of the change and is
 recorded at that path. Any option not shown, a test-name filter, or a
-claimed runner in another form is refused. Any other command (for example
+claimed runner in another form is refused. Any other subcommand of go, deno,
+bun or cargo (such as `go vet`, `deno check`, `bun build` or `cargo build`)
+is a claimed runner in another form. Any other command (for example
 `node X.mjs` without `--test`, `mvn ...`) is accepted only with a reviewer
 confirmation that closing review obtains. The `concern:` line may use the
 language's line comment (`//`).

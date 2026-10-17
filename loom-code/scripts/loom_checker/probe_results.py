@@ -72,12 +72,13 @@ GO_VALUE_FLAGS = frozenset({"-count", "-timeout", "-tags"})
 
 
 def _go_claims(argv: list[str]) -> bool:
-    return _named(argv)[:2] == ["go", "test"]
+    """`go` with any subcommand: `go vet` or `go run` is go in another form."""
+    return _named(argv)[:1] == ["go"]
 
 
 def _go_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`go test -json [-v] [-race] [-count N] [-timeout D] [-tags T] <A>`."""
-    if not os.path.normpath(artifact).endswith("_test.go"):
+    if argv[1:2] != ["test"] or not os.path.normpath(artifact).endswith("_test.go"):
         return False
     options, positionals, rest = [], [], argv[2:]
     while rest:
@@ -188,13 +189,14 @@ DENO_ALLOW = re.compile(r"--allow-[a-z-]+(=\S+)?")
 
 
 def _deno_claims(argv: list[str]) -> bool:
-    return _named(argv)[:2] == ["deno", "test"]
+    """`deno` with any subcommand: `deno check` or `deno run` is deno in another form."""
+    return _named(argv)[:1] == ["deno"]
 
 
 def _deno_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`deno test --reporter=junit [-A] [--allow-*] <A>`."""
     options = [arg for arg in argv[2:] if arg.startswith("-")]
-    return (_distinct(options) and "--reporter=junit" in options
+    return (argv[1:2] == ["test"] and _distinct(options) and "--reporter=junit" in options
             and all(arg in {"--reporter=junit", "-A"} or DENO_ALLOW.fullmatch(arg) for arg in options)
             and _one_positional(argv[2:], artifact))
 
@@ -214,13 +216,14 @@ BUN_PASS = re.compile(r"^\s*(\d+) pass\s*$", re.MULTILINE)
 
 
 def _bun_claims(argv: list[str]) -> bool:
-    return _named(argv)[:2] == ["bun", "test"]
+    """`bun` with any subcommand: `bun build` or `bun <file>` is bun in another form."""
+    return _named(argv)[:1] == ["bun"]
 
 
 def _bun_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`bun test ./<A>` or `<A>`'s absolute path in `repo`: bun reads any
     other positional as a substring filter over every test file it finds."""
-    if len(argv) != 3:
+    if len(argv) != 3 or argv[1] != "test":
         return False
     target = argv[2]
     if target.startswith("./"):
@@ -531,12 +534,14 @@ def _cargo_names(name: str | None, artifact: str, repo: Path | None) -> bool:
 
 
 def _cargo_claims(argv: list[str]) -> bool:
-    return _named(argv)[:2] == ["cargo", "test"]
+    """`cargo` with any subcommand but `nextest`, the nextest row's: `cargo
+    build` or `cargo run` is cargo in another form."""
+    return _named(argv)[:1] == ["cargo"] and argv[1:2] != ["nextest"]
 
 
 def _cargo_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`cargo test [--release] [-q] --test <n>`, `<n>` resolving to `<A>`."""
-    return _cargo_names(_cargo_target_name(argv[2:], CARGO_TEST_FLAGS), artifact, repo)
+    return argv[1:2] == ["test"] and _cargo_names(_cargo_target_name(argv[2:], CARGO_TEST_FLAGS), artifact, repo)
 
 
 def _cargo_passed(output: str, artifact: str) -> int | None:
