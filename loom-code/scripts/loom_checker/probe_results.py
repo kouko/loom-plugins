@@ -343,11 +343,24 @@ def _vitest_claims(argv: list[str]) -> bool:
     return _launched(argv, JS_LAUNCHERS)[:1] == ["vitest"]
 
 
+VITEST_STDOUT = "--outputFile=/dev/stdout"
+
+
 def _vitest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
-    """`[w] vitest run --reporter=json <A>`."""
+    """`[w] vitest run --reporter=json --outputFile=/dev/stdout <A>` (or
+    `--outputFile /dev/stdout`): vitest 5 writes the JSON report to a file
+    unless the output file is stdout."""
     args = _launched(argv, JS_LAUNCHERS)[1:]
-    return (args[:1] == ["run"] and [arg for arg in args[1:] if arg.startswith("-")] == ["--reporter=json"]
-            and _one_positional(args[1:], artifact))
+    if args[:1] != ["run"]:
+        return False
+    rest = args[1:]
+    if rest.count("--outputFile") == 1:
+        index = rest.index("--outputFile")
+        if rest[index + 1:index + 2] != ["/dev/stdout"]:
+            return False
+        rest = rest[:index] + [VITEST_STDOUT] + rest[index + 2:]
+    options = sorted(arg for arg in rest if arg.startswith("-"))
+    return options == [VITEST_STDOUT, "--reporter=json"] and _one_positional(rest, artifact)
 
 
 def _assertions_passed(result: dict) -> int:

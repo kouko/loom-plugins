@@ -254,7 +254,13 @@ VITEST_OTHER = """\
 {"numTotalTestSuites":1,"numPassedTestSuites":1,"numFailedTestSuites":0,"numPendingTestSuites":0,"numTotalTests":1,"numPassedTests":1,"numFailedTests":0,"numPendingTests":0,"numTodoTests":0,"snapshot":{"added":0,"failure":false,"filesAdded":0,"filesRemoved":0,"filesRemovedList":[],"filesUnmatched":0,"filesUpdated":0,"matched":0,"total":0,"unchecked":0,"uncheckedKeysByFile":[],"unmatched":0,"updated":0,"didUpdate":false},"startTime":1792213287647,"success":true,"testResults":[{"assertionResults":[{"ancestorTitles":[],"fullName":"other","status":"passed","title":"other","duration":0.5883329999999987,"failureMessages":[],"meta":{},"tags":[]}],"startTime":1792213287794,"endTime":1792213287794.5884,"status":"passed","message":"","name":"/work/repo/probes/other.test.mjs"}]}
 """
 
-# vitest 5 writes the JSON report to a file and prints only where it went.
+# vitest 5 with `--outputFile=/dev/stdout`: the report, then where it went.
+VITEST5_PASS = """\
+{"numTotalTestSuites":1,"numPassedTestSuites":1,"numFailedTestSuites":0,"numPendingTestSuites":0,"numTotalTests":1,"numPassedTests":1,"numFailedTests":0,"numPendingTests":0,"numTodoTests":0,"snapshot":{"added":0,"failure":false,"filesAdded":0,"filesRemoved":0,"filesRemovedList":[],"filesUnmatched":0,"filesUpdated":0,"matched":0,"total":0,"unchecked":0,"uncheckedKeysByFile":[],"unmatched":0,"updated":0,"didUpdate":false},"startTime":1792213936659,"success":true,"testResults":[{"assertionResults":[{"ancestorTitles":[],"fullName":"adds","status":"passed","title":"adds","duration":0.5542919999999967,"failureMessages":[],"meta":{},"tags":[],"benchmarks":[]}],"startTime":1792213936815,"endTime":1792213936815.5542,"status":"passed","message":"","name":"/work/repo/probes/attack.test.mjs"}]}JSON report written to /dev/stdout
+"""
+
+# vitest 5 without `--outputFile` writes the JSON report to a file and prints
+# only where it went.
 VITEST5_FILE_REPORT = "JSON report written to /work/repo/.vitest/json/output.json\n"
 
 MOCHA_PASS = """\
@@ -545,7 +551,7 @@ def test_go_json_passing_test_accepted() -> None:
     (f"bun test ./{BUN}", BUN, BUN_MULTI_FILE),
     (f"python3 -m unittest -v {UNITTEST}", UNITTEST, UNITTEST_SKIP),
     (f"npx jest --json --runTestsByPath {JS}", JS, JEST_SKIP),
-    (f"vitest run --reporter=json {VITEST}", VITEST, VITEST_SKIP),
+    (f"vitest run --reporter=json --outputFile=/dev/stdout {VITEST}", VITEST, VITEST_SKIP),
     (f"mocha --reporter json {JS}", JS, MOCHA_SKIP),
     (f"rspec --format json {RSPEC}", RSPEC, RSPEC_SKIP),
     (f"ruby {MINITEST}", MINITEST, MINITEST_SKIP),
@@ -574,7 +580,8 @@ def test_node_deno_bun_unittest_passing_accepted(command: str, artifact: str, ou
 
 @pytest.mark.parametrize(("command", "artifact", "output"), [
     (f"npx jest --json --runTestsByPath {JS}", JS, JEST_PASS),
-    (f"pnpm exec vitest run --reporter=json {VITEST}", VITEST, VITEST_PASS),
+    (f"pnpm exec vitest run --reporter=json --outputFile=/dev/stdout {VITEST}", VITEST, VITEST_PASS),
+    (f"npx vitest run --outputFile /dev/stdout --reporter=json {VITEST}", VITEST, VITEST5_PASS),
     (f"yarn mocha --reporter json {JS}", JS, MOCHA_PASS),
     (f"bundle exec rspec --format json {RSPEC}", RSPEC, RSPEC_PASS),
     (f"bundle exec ruby -Ilib -Itest {MINITEST}", MINITEST, MINITEST_PASS),
@@ -591,7 +598,7 @@ def test_js_ruby_php_rust_passing_accepted(command: str, artifact: str, output: 
 
 @pytest.mark.parametrize(("command", "artifact", "output"), [
     (f"jest --json --runTestsByPath {JS}", JS, JEST_OTHER),
-    (f"npx vitest run --reporter=json {VITEST}", VITEST, VITEST_OTHER),
+    (f"npx vitest run --reporter=json --outputFile=/dev/stdout {VITEST}", VITEST, VITEST_OTHER),
     (f"npx mocha --reporter json {JS}", JS, MOCHA_OTHER),
     (f"rspec --format json {RSPEC}", RSPEC, RSPEC_OTHER),
 ])
@@ -633,8 +640,10 @@ def test_node_empty_file_level_case_refused() -> None:
     (f"npx jest --runTestsByPath {JS}", JS),
     (f"npx jest --json {JS}", JS),
     (f"npx jest --json --runTestsByPath {JS} -t adds", JS),
-    (f"vitest --reporter=json {VITEST}", VITEST),
-    (f"vitest run --reporter=json {VITEST} probes/other.test.mjs", VITEST),
+    (f"vitest --reporter=json --outputFile=/dev/stdout {VITEST}", VITEST),
+    (f"vitest run --reporter=json --outputFile=/dev/stdout {VITEST} probes/other.test.mjs", VITEST),
+    (f"vitest run --reporter=json {VITEST}", VITEST),
+    (f"vitest run --reporter=json --outputFile=out.json {VITEST}", VITEST),
     (f"mocha {JS}", JS),
     (f"mocha --reporter json --grep adds {JS}", JS),
     (f"rspec {RSPEC}", RSPEC),
@@ -669,7 +678,7 @@ def test_listed_runner_without_output_flag_or_extra_file_refused(
     (f"bun test ./{BUN}", BUN, BUN_NO_SUMMARY),
     (f"python3 -m unittest {UNITTEST}", UNITTEST, UNITTEST_TRUNCATED),
     (f"npx jest --json --runTestsByPath {JS}", JS, JEST_PLAIN),
-    (f"npx vitest run --reporter=json {VITEST}", VITEST, VITEST5_FILE_REPORT),
+    (f"npx vitest run --reporter=json --outputFile=/dev/stdout {VITEST}", VITEST, VITEST5_FILE_REPORT),
     (f"npx mocha --reporter json {JS}", JS, MOCHA_SPEC_REPORTER),
     (f"rspec --format json {RSPEC}", RSPEC, RSPEC_PROGRESS),
     (f"ruby {MINITEST}", MINITEST, MINITEST_NO_AUTORUN),
