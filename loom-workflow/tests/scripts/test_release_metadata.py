@@ -16,7 +16,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 PLUGIN = REPO / "loom-workflow"
-CURRENT = "5.9.0"
+CURRENT = "5.10.0"
 
 
 @pytest.mark.parametrize(
@@ -31,6 +31,8 @@ def test_manifest_version_is_current(manifest: str) -> None:
 def test_changelog_has_current_entry() -> None:
     changelog = (PLUGIN / "CHANGELOG.md").read_text(encoding="utf-8")
     assert f"## [{CURRENT}]" in changelog
+    assert "## [5.9.0]" in changelog
+    assert "Migration: `retro` → `project-retro`; `distill-sessions` → `skill-retro`." in changelog
 
 
 @pytest.mark.parametrize("readme", ["README.md", "README.ja.md", "README.zh-TW.md"])
