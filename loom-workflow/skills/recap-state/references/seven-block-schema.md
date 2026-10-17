@@ -12,13 +12,16 @@ tags, their closing forms, or numbered `Block N` labels.
 ## L3 user-visible template
 
 Use an orientation-first, variable-length recap in the conversation language.
-For a long conversation, lead with the conversation-grounded original purpose,
-current position, and proposed next step. Explain how key decisions and
-completed work led here, then name the remaining gap. Mark assumptions and
-unknown facts as such; never infer a purpose or completed work from silence.
-If the purpose is unknown, say so and ask for it in the final question. In a
-short session, omit sections with no useful content; never pad a history or
-invent a pending question to fill a template.
+For a long conversation, lead with the conversation-grounded original purpose
+when available and the current position. Show a proposed next step only when
+the purpose is grounded. Explain how key decisions and completed work led here,
+then name the remaining gap. Mark assumptions and unknown facts as such; never
+infer a purpose or completed work from silence.
+If the original purpose is unknown, ask only for the purpose. Do not invent a
+proposed work step when the purpose is unknown. When the original purpose is
+grounded, ask about the proposed next step. If asking for purpose, wait for the
+user to state or clarify it. In a short session, omit sections with no useful
+content; never pad a history or invent a pending question to fill a template.
 
 Use clear section headings for content that warrants sections. Frame each
 heading in an ASCII box with `■ ` before the heading text. Use
@@ -26,7 +29,8 @@ heading in an ASCII box with `■ ` before the heading text. Use
 cell widths. Put one fullwidth-space-only line between sections, and inspect
 the rendered chat spacing; do not use visible HTML break tags. Keep the first
 section focused on purpose and position, and the final section focused on a
-directed question about the next step. Stop until the user responds.
+directed question about purpose when unknown, or the grounded next step.
+Stop until the user responds.
 
 Use bullets for a short path through decisions and work. Put a short
 situation sentence before each table. A table earns its place by comparing
@@ -75,9 +79,10 @@ request wins where the client can render it.
 
 ### structured-schema
 
-Lead with grounded purpose and current position, adapt the middle to the
-conversation, and end with a directed question. Predictable endpoints help
-orientation; mandatory empty sections hide useful work behind filler.
+Lead with grounded purpose when available and current position, adapt the
+middle to the conversation, and end with the conditional question above.
+Predictable endpoints help orientation; mandatory empty sections hide useful
+work behind filler.
 
 ### quote-not-paraphrase
 
@@ -93,9 +98,12 @@ turns. If a user asks for message history, provide that listing separately.
 
 ### synthesis-check
 
-Finish with one directed next-step question and wait for the user's answer.
-Any clear confirmation opens this soft pause; a correction replaces the
-proposed direction. Do not resume a tool call, edit, or analysis on your own.
+Finish with one directed question: ask for the original purpose if it is
+unknown; otherwise ask about the grounded next step. Wait for the user's
+answer. When asking about a next step, a clear confirmation opens this soft
+pause; a correction replaces the proposed direction. When purpose is unknown,
+wait for the user to state or clarify it. Do not resume a tool call, edit, or
+analysis on your own.
 
 ### plain-language
 

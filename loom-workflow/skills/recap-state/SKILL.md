@@ -18,17 +18,21 @@ This is **in-session re-orientation**. The built-in `/recap` is an
    Its L3 user-visible template is the authoritative orientation-first
    contract. The numbered seven blocks record historical lineage, not required
    headings.
-2. Keep planning internal. In a long conversation, find the original purpose,
-   current position, decisions that brought the work here, completed work,
-   remaining gap, and proposed next step. Ground each in the conversation;
-   label unavailable facts unknown. In a short session, include only what helps
-   the user regain their place. Use the user's conversation language and explain
-   unfamiliar terms plainly.
+2. Keep planning internal. In a long conversation, find the original purpose
+   when available, current position, decisions that brought the work here,
+   completed work, remaining gap, and, only when the purpose is grounded, a
+   proposed next step. Ground each in the conversation; label unavailable facts
+   unknown. In a short session, include only what helps the user regain their
+   place. Use the user's conversation language and explain unfamiliar terms
+   plainly.
 3. Render the reference's variable-length sections and visual rules. Preserve
    behavior-changing user wording exactly. Use `loom-visualization` to choose
    and verify any meaningful table or relationship diagram and to frame section
    headings. Never expose planning tags or numbered block labels.
-4. End with a directed question about the next step. Wait for the user's answer
+4. If the original purpose is unknown, ask only for the purpose. Do not invent
+   a proposed work step when the purpose is unknown. When the original purpose
+   is grounded, ask about the proposed next step. If asking for purpose, wait
+   for the user to state or clarify it. Otherwise, wait for the user's answer
    before continuing work; a clear confirmation is enough, and a correction
    becomes the current direction.
 
@@ -39,7 +43,8 @@ This is **in-session re-orientation**. The built-in `/recap` is an
 - **quote-not-paraphrase**: preserve exact user wording when it changes what
   happens next, including paths, errors, constraints, tools, and commands.
 - **all-user-messages**: dormant at L3. Do not dump every user turn.
-- **synthesis-check**: ask a directed final question and wait for the answer.
+- **synthesis-check**: direct the final question to the purpose when unknown,
+  or to the grounded next step, then wait for the answer.
 - **plain-language**: explain the situation to the user in familiar words.
 
 ## Hard boundaries

@@ -145,6 +145,9 @@ def test_frontmatter_and_routing():
 
 def test_runtime_routes_to_orientation_schema_without_six_required_sections():
     _, body = _parse_skill_md()
+    reference = (SKILL_MD.parent / "references" / "seven-block-schema.md").read_text(
+        encoding="utf-8"
+    )
     assert "orientation-first" in body
     assert "long conversation" in body
     assert "Chat only" in body
@@ -152,3 +155,12 @@ def test_runtime_routes_to_orientation_schema_without_six_required_sections():
     assert "loom-visualization" in body
     assert "fixed six-section" not in body
     assert "following this order" not in body
+    for contract in (body, reference):
+        normalized = " ".join(contract.split())
+        assert "If the original purpose is unknown, ask only for the purpose." in normalized
+        assert (
+            "When the original purpose is grounded, ask about the proposed next step."
+            in normalized
+        )
+        assert "Do not invent a proposed work step when the purpose is unknown." in normalized
+        assert "If asking for purpose, wait for the user to state or clarify it." in normalized
