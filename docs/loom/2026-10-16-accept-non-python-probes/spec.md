@@ -23,7 +23,7 @@ REQ-5 — pytest, shell and graduation unchanged
 | deno | `deno test` | `deno test --reporter=junit [-A] [--allow-*] <A>` |
 | bun | `bun test` | `bun test ./<A>` or absolute `<A>` |
 | jest | `jest` via `[npx|pnpm exec|yarn]` | `[w] jest --json --runTestsByPath <A>` |
-| vitest | `vitest` via `[npx|pnpm exec|yarn]` | `[w] vitest run --reporter=json <A>` |
+| vitest | `vitest` via `[npx|pnpm exec|yarn]` | `[w] vitest run --reporter=json --outputFile=/dev/stdout <A>` (vitest 5 writes JSON to a file unless `--outputFile` points at stdout) |
 | mocha | `mocha` via `[npx|pnpm exec|yarn]` | `[w] mocha --reporter json <A>` |
 | cargo test | `cargo test` | `cargo test [--release] [-q] --test <n>`, `<n>` resolving to `<A>` |
 | nextest | `cargo nextest` | `cargo nextest run [--release] [--no-tests=fail] --test <n>`, `<n>` resolving to `<A>` |
