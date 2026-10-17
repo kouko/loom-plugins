@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.40.1] — 2026-10-17 — keep Codex model discovery open until it answers
+
+- Codex external-review discovery keeps `codex app-server` stdin open until the `model/list` reply arrives, bounded by the 15 s discovery timeout, so the model list is no longer lost to an early EOF.
+
 ## [3.40.0] — 2026-10-13 — register the standalone project-session retro
 
 - Add `loom-workflow:retro` to the versioned contract manifest as a standalone tool outside the Loom station and mechanism counts. The workflow plugin owns the skill and its on-demand behaviour.
