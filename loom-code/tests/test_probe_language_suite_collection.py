@@ -1,5 +1,6 @@
 """A graduated Rust probe counts as suite-collected only where plain
-`cargo test` auto-discovers it: `tests/<name>.rs` at the repository root."""
+`cargo test` (or `cargo nextest run`, which builds the same test targets)
+auto-discovers it: `tests/<name>.rs` at the repository root."""
 # concern: A Rust probe graduated to tests/ must not be refused as uncollected.
 from __future__ import annotations
 
@@ -29,9 +30,10 @@ def make_rust_repo(tmp_path: Path, cargo_toml: str, kickoff: str | None) -> Path
 PACKAGE = '[package]\nname = "demo"\nversion = "0.1.0"\n'
 
 
-@pytest.mark.parametrize("kickoff", [None, "cargo test --release -q"],
+@pytest.mark.parametrize("kickoff", [None, "cargo test --release -q", "cargo nextest run --release"],
                          ids=["cargo-tests-dir-collected-marker",
-                              "cargo-tests-dir-collected-kickoff"])
+                              "cargo-tests-dir-collected-kickoff",
+                              "cargo-tests-dir-collected-nextest"])
 def test_cargo_tests_dir_collected(tmp_path: Path, kickoff: str | None) -> None:
     repo = make_rust_repo(tmp_path, PACKAGE, kickoff)
     assert suite_collection(repo, "tests/probe.rs") == (True, "")
@@ -44,12 +46,14 @@ def test_cargo_tests_dir_collected(tmp_path: Path, kickoff: str | None) -> None:
     (PACKAGE, None, "tests/missing.rs"),
     (PACKAGE, "cargo test --manifest-path Cargo.toml", "tests/probe.rs"),
     ('[workspace]\nmembers = ["crates/a"]\n', None, "tests/probe.rs"),
+    (PACKAGE, "cargo nextest run --workspace", "tests/probe.rs"),
 ], ids=["cargo-autotests-off-or-subdir-refused-autotests",
         "cargo-autotests-off-or-subdir-refused-subdir",
         "cargo-autotests-off-or-subdir-refused-non-rs",
         "cargo-autotests-off-or-subdir-refused-missing",
         "cargo-autotests-off-or-subdir-refused-other-option",
-        "cargo-autotests-off-or-subdir-refused-virtual-workspace"])
+        "cargo-autotests-off-or-subdir-refused-virtual-workspace",
+        "cargo-autotests-off-or-subdir-refused-nextest-other-option"])
 def test_cargo_autotests_off_or_subdir_refused(
     tmp_path: Path, cargo_toml: str, kickoff: str | None, artifact: str
 ) -> None:

@@ -255,7 +255,9 @@ def suite_collection(repo: Path, artifact: str) -> tuple[bool | None, str]:
             tokens = argv_for(declared) if declared else []
         except ValueError:
             tokens = []
-        if tokens[:2] == ["cargo", "test"] and set(tokens[2:]) <= CARGO_TEST_FLAGS:
+        # `cargo nextest run` builds and runs the same test targets.
+        if ((tokens[:2] == ["cargo", "test"] and set(tokens[2:]) <= CARGO_TEST_FLAGS)
+                or (tokens[:3] == ["cargo", "nextest", "run"] and set(tokens[3:]) <= {"--release"})):
             return _cargo_collects(repo, wanted)
         return _direct_pytest_collects(repo, artifact)
     commands, error, launcher = _declared_suite_commands(repo)
@@ -474,11 +476,7 @@ def command_names_artifact(command: str, artifact: str) -> bool:
     except ValueError as exc:
         raise ValueError(str(exc)) from exc
     wanted = os.path.normpath(artifact)
-    if any(os.path.normpath(token) == wanted for token in tokens):
-        return True
-    # `cargo test --test <name>` runs tests/<name>.rs without naming its path.
-    name = _cargo_test_target(tokens)
-    return name is not None and os.path.normpath(f"tests/{name}.rs") == wanted
+    return any(os.path.normpath(token) == wanted for token in tokens)
 
 
 SHELL_METACHARACTERS = re.compile(r"[;&|<>()$`*?\[\]{}\n]")
@@ -553,36 +551,12 @@ def _conda_pytest_argv(tokens: list[str]) -> bool:
 CARGO_TEST_FLAGS = frozenset({"--release", "-q", "--quiet"})
 
 
-def _cargo_test_target(tokens: list[str]) -> str | None:
-    """`<name>` of `cargo test [--release] [-q|--quiet] --test <name>`, or
-    None for any other argv -- a test-name filter, `--` arguments, or
-    `--no-run` can exit 0 without running the file's tests."""
-    if tokens[:2] != ["cargo", "test"]:
-        return None
-    names, rest = [], tokens[2:]
-    while rest:
-        arg = rest.pop(0)
-        if arg in CARGO_TEST_FLAGS:
-            continue
-        if arg == "--test" and rest and not rest[0].startswith("-"):
-            names.append(rest.pop(0))
-        elif arg.startswith("--test=") and len(arg) > len("--test="):
-            names.append(arg[len("--test="):])
-        else:
-            return None
-    return names[0] if len(names) == 1 else None
-
-
 def command_executes_artifact(command: str, artifact: str) -> bool:
-    """True when argv directly executes the named Python, shell, Rust, or
+    """True when argv directly executes the named Python, shell, or
     executable file. Other runners' rows live in `probe_results`."""
     tokens = argv_for(command)
     wanted = os.path.normpath(artifact)
     suffix = Path(artifact).suffix.lower()
-    if suffix == ".rs":
-        name = _cargo_test_target(tokens)
-        if name is not None and os.path.normpath(f"tests/{name}.rs") == wanted:
-            return True
     if suffix == ".py":
         if _conda_pytest_argv(tokens):
             tokens = tokens[4:]

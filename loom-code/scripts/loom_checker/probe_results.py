@@ -5,8 +5,10 @@ passing.
 Each row answers three questions:
 
 - `claims(argv)` -- is this argv that runner (runner identity only);
-- `accepts(argv, artifact)` -- is it the row's accepted form, running the
-  artifact alone with the runner's machine-readable output where it has one;
+- `accepts(argv, artifact, repo=None)` -- is it the row's accepted form,
+  running the artifact alone with the runner's machine-readable output where
+  it has one; only the cargo rows read `repo` (its Cargo.toml maps a test
+  target name to a file) and refuse without it;
 - `passed(output, artifact)` -- passing, non-skipped tests from the artifact
   in the combined stdout+stderr, 0 when the output is readable but shows none
   (or shows tests from another file), None when the row cannot read it.
@@ -24,7 +26,9 @@ from xml.etree import ElementTree
 import json
 import os
 import re
+import tomllib
 
+from loom_checker.probes import CARGO_TEST_FLAGS
 from loom_checker.probes import _conda_python_argv
 
 
@@ -32,7 +36,7 @@ from loom_checker.probes import _conda_python_argv
 class Row:
     name: str
     claims: Callable[[list[str]], bool]
-    accepts: Callable[[list[str], str], bool]
+    accepts: Callable[[list[str], str, Path | None], bool]
     passed: Callable[[str, str], int | None]
 
 
@@ -65,7 +69,7 @@ def _go_claims(argv: list[str]) -> bool:
     return argv[:2] == ["go", "test"]
 
 
-def _go_accepts(argv: list[str], artifact: str) -> bool:
+def _go_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`go test -json [-v] [-race] [-count N] [-timeout D] [-tags T] <A>`."""
     if not os.path.normpath(artifact).endswith("_test.go"):
         return False
@@ -157,7 +161,7 @@ def _node_claims(argv: list[str]) -> bool:
     return argv[:1] == ["node"] and "--test" in argv[1:]
 
 
-def _node_accepts(argv: list[str], artifact: str) -> bool:
+def _node_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`node --test --test-reporter=junit [--experimental-strip-types] <A>`."""
     options = [arg for arg in argv[1:] if arg.startswith("-")]
     return (_distinct(options) and NODE_REQUIRED <= set(options) <= NODE_ALLOWED
@@ -181,7 +185,7 @@ def _deno_claims(argv: list[str]) -> bool:
     return argv[:2] == ["deno", "test"]
 
 
-def _deno_accepts(argv: list[str], artifact: str) -> bool:
+def _deno_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`deno test --reporter=junit [-A] [--allow-*] <A>`."""
     options = [arg for arg in argv[2:] if arg.startswith("-")]
     return (_distinct(options) and "--reporter=junit" in options
@@ -203,7 +207,7 @@ def _bun_claims(argv: list[str]) -> bool:
     return argv[:2] == ["bun", "test"]
 
 
-def _bun_accepts(argv: list[str], artifact: str) -> bool:
+def _bun_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`bun test ./<A>` or an absolute `<A>`: bun reads any other positional
     as a substring filter over every test file it finds."""
     if len(argv) != 3:
@@ -242,7 +246,7 @@ def _unittest_claims(argv: list[str]) -> bool:
     return _python_argv(argv)[1:3] == ["-m", "unittest"]
 
 
-def _unittest_accepts(argv: list[str], artifact: str) -> bool:
+def _unittest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
     """`python -m unittest [-v] [-q] <A>`."""
     args = _python_argv(argv)[3:]
     options = [arg for arg in args if arg.startswith("-")]
@@ -270,12 +274,287 @@ def _unittest_passed(output: str, artifact: str) -> int | None:
     return max(int(ran[-1]) - not_passed, 0)
 
 
+# JSON reports (jest, vitest, mocha, rspec) -------------------------------------
+
+JS_LAUNCHERS = (("npx",), ("pnpm", "exec"), ("yarn",))
+RUBY_LAUNCHERS = (("bundle", "exec"),)
+
+
+def _launched(argv: list[str], launchers: tuple[tuple[str, ...], ...]) -> list[str]:
+    """`argv` without the one allowed launcher prefix it starts with."""
+    for launcher in launchers:
+        if tuple(argv[:len(launcher)]) == launcher:
+            return argv[len(launcher):]
+    return argv
+
+
+def _only_pair_and_artifact(args: list[str], flag: str, value: str, artifact: str) -> bool:
+    """`args` is exactly `flag value` plus the artifact, in any order."""
+    if args.count(flag) != 1:
+        return False
+    index = args.index(flag)
+    if args[index + 1:index + 2] != [value]:
+        return False
+    rest = args[:index] + args[index + 2:]
+    return len(rest) == 1 and _one_positional(rest, artifact)
+
+
+def _json_report(output: str, key: str) -> dict | None:
+    """The first JSON object starting a line of `output` that carries `key`."""
+    decoder = json.JSONDecoder()
+    for match in re.finditer(r"^\{", output, re.MULTILINE):
+        try:
+            report, _end = decoder.raw_decode(output, match.start())
+        except ValueError:
+            continue
+        if isinstance(report, dict) and key in report:
+            return report
+    return None
+
+
+def _per_file(entries: object, artifact: str, file_key: str,
+              counted: Callable[[dict], int]) -> int | None:
+    """Sum `counted` over report entries that each name their file; 0 as soon
+    as one names another file, None when an entry is not readable."""
+    if not isinstance(entries, list):
+        return None
+    total = 0
+    for entry in entries:
+        if not isinstance(entry, dict) or not isinstance(entry.get(file_key), str):
+            return None
+        if not _reports_artifact(entry[file_key], artifact):
+            return 0
+        total += counted(entry)
+    return total
+
+
+def _jest_claims(argv: list[str]) -> bool:
+    return _launched(argv, JS_LAUNCHERS)[:1] == ["jest"]
+
+
+def _jest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """`[w] jest --json --runTestsByPath <A>`."""
+    args = _launched(argv, JS_LAUNCHERS)[1:]
+    options = sorted(arg for arg in args if arg.startswith("-"))
+    return options == ["--json", "--runTestsByPath"] and _one_positional(args, artifact)
+
+
+def _vitest_claims(argv: list[str]) -> bool:
+    return _launched(argv, JS_LAUNCHERS)[:1] == ["vitest"]
+
+
+def _vitest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """`[w] vitest run --reporter=json <A>`."""
+    args = _launched(argv, JS_LAUNCHERS)[1:]
+    return (args[:1] == ["run"] and [arg for arg in args[1:] if arg.startswith("-")] == ["--reporter=json"]
+            and _one_positional(args[1:], artifact))
+
+
+def _assertions_passed(result: dict) -> int:
+    cases = result.get("assertionResults")
+    return sum(1 for case in cases if isinstance(case, dict) and case.get("status") == "passed") \
+        if isinstance(cases, list) else 0
+
+
+def _jest_passed(output: str, artifact: str) -> int | None:
+    """jest's (and vitest's jest-shaped) report: one result per test file."""
+    report = _json_report(output, "testResults")
+    return None if report is None else _per_file(report["testResults"], artifact, "name", _assertions_passed)
+
+
+def _mocha_claims(argv: list[str]) -> bool:
+    return _launched(argv, JS_LAUNCHERS)[:1] == ["mocha"]
+
+
+def _mocha_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """`[w] mocha --reporter json <A>`."""
+    return _only_pair_and_artifact(_launched(argv, JS_LAUNCHERS)[1:], "--reporter", "json", artifact)
+
+
+def _mocha_passed(output: str, artifact: str) -> int | None:
+    report = _json_report(output, "passes")
+    if report is None:
+        return None
+    tests = _per_file(report.get("tests"), artifact, "file", lambda test: 1)
+    passes = _per_file(report["passes"], artifact, "file", lambda test: 1)
+    if tests is None or passes is None:
+        return None
+    return passes if tests else 0
+
+
+def _rspec_claims(argv: list[str]) -> bool:
+    return _launched(argv, RUBY_LAUNCHERS)[:1] == ["rspec"]
+
+
+def _rspec_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """`[w] rspec --format json <A>`. A `--dry-run` from an `.rspec` file
+    reports every example `passed` in the same JSON; that stays a residual
+    risk, since the argv cannot show it."""
+    return _only_pair_and_artifact(_launched(argv, RUBY_LAUNCHERS)[1:], "--format", "json", artifact)
+
+
+def _rspec_passed(output: str, artifact: str) -> int | None:
+    report = _json_report(output, "examples")
+    return None if report is None else _per_file(
+        report["examples"], artifact, "file_path", lambda example: int(example.get("status") == "passed"))
+
+
+# minitest, phpunit (console summary; one file by their positional) -----------
+
+MINITEST_FILE = re.compile(r"(?:.+_test|test_.+)\.rb")
+MINITEST_SUMMARY = re.compile(
+    r"^(\d+) runs, \d+ assertions, (\d+) failures, (\d+) errors, (\d+) skips\s*$", re.MULTILINE)
+
+
+def _minitest_claims(argv: list[str]) -> bool:
+    args = _launched(argv, RUBY_LAUNCHERS)
+    return args[:1] == ["ruby"] and any(
+        not arg.startswith("-") and MINITEST_FILE.fullmatch(Path(arg).name) for arg in args[1:])
+
+
+def _minitest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """`[w] ruby [-I<dir>]... <A>`: nothing after the file, where minitest
+    would read `-n`/`-e` filters."""
+    args = _launched(argv, RUBY_LAUNCHERS)[1:]
+    return (bool(args) and bool(MINITEST_FILE.fullmatch(Path(artifact).name))
+            and os.path.normpath(args[-1]) == os.path.normpath(artifact)
+            and all(arg.startswith("-I") and len(arg) > 2 for arg in args[:-1]))
+
+
+def _minitest_passed(output: str, artifact: str) -> int | None:
+    summary = MINITEST_SUMMARY.findall(ANSI.sub("", output))
+    if not summary:
+        return None
+    runs, failures, errors, skips = map(int, summary[-1])
+    return max(runs - failures - errors - skips, 0)
+
+
+PHPUNIT_COMMANDS = frozenset({"phpunit", "vendor/bin/phpunit"})
+PHPUNIT_OK = re.compile(r"^OK \((\d+) tests?, \d+ assertions?\)\s*$", re.MULTILINE)
+PHPUNIT_COUNTS = re.compile(r"^Tests: (\d+), Assertions: \d+((?:, [A-Za-z ]+: \d+)*)\.\s*$", re.MULTILINE)
+PHPUNIT_NOT_PASSED = ("Errors", "Failures", "Skipped", "Incomplete", "Risky")
+
+
+def _phpunit_claims(argv: list[str]) -> bool:
+    return bool(argv) and os.path.normpath(argv[0]) in PHPUNIT_COMMANDS
+
+
+def _phpunit_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """`<phpunit> <A>`."""
+    return len(argv) == 2 and os.path.normpath(argv[1]) == os.path.normpath(artifact)
+
+
+def _phpunit_passed(output: str, artifact: str) -> int | None:
+    text = ANSI.sub("", output)
+    if ok := PHPUNIT_OK.findall(text):
+        return int(ok[-1])
+    if counts := PHPUNIT_COUNTS.findall(text):
+        tests, details = counts[-1]
+        found = dict(item.split(": ") for item in details.split(", ")[1:])
+        return max(int(tests) - sum(int(found.get(key, 0)) for key in PHPUNIT_NOT_PASSED), 0)
+    return 0 if "No tests executed!" in text else None
+
+
+# cargo test, cargo nextest (one test target by --test <n>) ---------------------
+
+NEXTEST_FLAGS = frozenset({"--release", "--no-tests=fail"})
+CARGO_RESULT = re.compile(r"^test result: \w+\. (\d+) passed; ", re.MULTILINE)
+NEXTEST_SUMMARY = re.compile(r"^\s*Summary \[[^\]]*\] \d+ tests? run: (\d+) passed", re.MULTILINE)
+
+
+def _cargo_target_name(args: list[str], flags: frozenset[str]) -> str | None:
+    """`<n>` of the one `--test <n>` (or `--test=<n>`) among `flags`, or None
+    for any other argument -- a test-name filter, `--` arguments, or
+    `--no-run` can exit 0 without running the file's tests."""
+    names, rest = [], list(args)
+    while rest:
+        arg = rest.pop(0)
+        if arg in flags:
+            continue
+        if arg == "--test" and rest and not rest[0].startswith("-"):
+            names.append(rest.pop(0))
+        elif arg.startswith("--test=") and len(arg) > len("--test="):
+            names.append(arg[len("--test="):])
+        else:
+            return None
+    return names[0] if len(names) == 1 else None
+
+
+def _cargo_test_path(repo: Path | None, name: str) -> str | None:
+    """The file `--test <name>` builds: the Cargo.toml `[[test]]` entry of
+    that name (named, or named by its path's stem), else `tests/<name>.rs`.
+    None when the manifest cannot be read."""
+    if repo is None:
+        return None
+    try:
+        manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
+        return None
+    targets = manifest.get("test")
+    for target in targets if isinstance(targets, list) else []:
+        if not isinstance(target, dict):
+            continue
+        path = os.path.normpath(target["path"]) if isinstance(target.get("path"), str) else None
+        if (target.get("name") or (path and Path(path).stem)) == name:
+            return path or f"tests/{name}.rs"
+    return f"tests/{name}.rs"
+
+
+def _cargo_names(name: str | None, artifact: str, repo: Path | None) -> bool:
+    return name is not None and _cargo_test_path(repo, name) == os.path.normpath(artifact)
+
+
+def _cargo_claims(argv: list[str]) -> bool:
+    return argv[:2] == ["cargo", "test"]
+
+
+def _cargo_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """`cargo test [--release] [-q] --test <n>`, `<n>` resolving to `<A>`."""
+    return _cargo_names(_cargo_target_name(argv[2:], CARGO_TEST_FLAGS), artifact, repo)
+
+
+def _cargo_passed(output: str, artifact: str) -> int | None:
+    results = CARGO_RESULT.findall(ANSI.sub("", output))
+    return sum(map(int, results)) if results else None
+
+
+def _nextest_claims(argv: list[str]) -> bool:
+    return argv[:2] == ["cargo", "nextest"]
+
+
+def _nextest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """`cargo nextest run [--release] [--no-tests=fail] --test <n>`; any other
+    `--no-tests` value lets an empty run pass."""
+    if argv[2:3] != ["run"]:
+        return False
+    args, rest = [], argv[3:]
+    while rest:
+        arg = rest.pop(0)
+        if arg == "--no-tests" and rest[:1] == ["fail"]:
+            arg = "--no-tests=" + rest.pop(0)
+        args.append(arg)
+    return _cargo_names(_cargo_target_name(args, NEXTEST_FLAGS), artifact, repo)
+
+
+def _nextest_passed(output: str, artifact: str) -> int | None:
+    summary = NEXTEST_SUMMARY.findall(ANSI.sub("", output))
+    return int(summary[-1]) if summary else None
+
+
 ROWS: tuple[Row, ...] = (
     Row("go", _go_claims, _go_accepts, _go_passed),
     Row("unittest", _unittest_claims, _unittest_accepts, _unittest_passed),
     Row("node", _node_claims, _node_accepts, _node_passed),
     Row("deno", _deno_claims, _deno_accepts, _deno_passed),
     Row("bun", _bun_claims, _bun_accepts, _bun_passed),
+    Row("jest", _jest_claims, _jest_accepts, _jest_passed),
+    Row("vitest", _vitest_claims, _vitest_accepts, _jest_passed),
+    Row("mocha", _mocha_claims, _mocha_accepts, _mocha_passed),
+    Row("cargo test", _cargo_claims, _cargo_accepts, _cargo_passed),
+    Row("nextest", _nextest_claims, _nextest_accepts, _nextest_passed),
+    Row("rspec", _rspec_claims, _rspec_accepts, _rspec_passed),
+    Row("minitest", _minitest_claims, _minitest_accepts, _minitest_passed),
+    Row("phpunit", _phpunit_claims, _phpunit_accepts, _phpunit_passed),
 )
 
 
