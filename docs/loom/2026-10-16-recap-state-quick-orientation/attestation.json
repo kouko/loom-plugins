@@ -1,0 +1,75 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-16-recap-state-quick-orientation",
+  "content_digest": "469a3edcab517255ffe28a29b93707b2e1b297fe",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/recap-state/test_seven_block_schema.py -c /dev/null -q -p no:cacheprovider",
+      "artifact": "loom-workflow/tests/recap-state/test_seven_block_schema.py",
+      "result": "pass",
+      "command_digest": "eba377a1f1c665536696c3442d098cfd278fc9e0ad0095045871070455ff10ba"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "review_skill",
+      "vendor": "openai",
+      "model": "host-inherited (GPT-6 family; exact profile unobserved)",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "e78493943c3c931df54b6538eb440c9f854f59ba",
+      "review_target_sha": "7d69516ab0ddc45ede3955ccaeb25984069aa911",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Round 1 purpose-unknown finding fixed; fix delta added no skill-lens finding."
+      ]
+    },
+    {
+      "reviewer": "review_code",
+      "vendor": "openai",
+      "model": "host-inherited (GPT-6 family; exact profile unobserved)",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "e78493943c3c931df54b6538eb440c9f854f59ba",
+      "review_target_sha": "7d69516ab0ddc45ede3955ccaeb25984069aa911",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Round 1 duplicate test finding fixed; 8 focused tests passed.",
+        "Live host output remains outside observed acceptance evidence."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
