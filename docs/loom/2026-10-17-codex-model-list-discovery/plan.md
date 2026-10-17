@@ -18,7 +18,7 @@ charter: 1.1
 - Risk: agent-decided — real launches use a Popen reader that stops at the id-2 response or timeout; injected runners stay `run`-shaped, preserving existing test coverage in test_external_review.py.
 
 **W1-02 Release metadata patch bump**  after: W1-01  acceptance: 3
-- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `README.md`, `loom-code/README.md`, `loom-code/tests/test_write_plan_station_text.py`
+- Files: `loom-code/plugin.json` (+ `.claude-plugin`, `.codex-plugin` copies), `loom-code/package.json`, `loom-code/CHANGELOG.md`, `README.md` (+ ja, zh-TW), `loom-code/README.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A3 positive: release-metadata-synchronized at 3.40.1; boundary: package-suite-passes.
 - Risk: agent-decided — patch bump (bug fix, no field, rule id or contract change); rewrite the version pin only where the synchronization test pins it.
 
