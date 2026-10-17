@@ -12,24 +12,24 @@ charter: 1.1
 ## Task DAG
 
 **W1-01 Runner table with result parsers for Go, Node, Deno, Bun and unittest**  after: none  acceptance: 1,2,3
-- Files: `loom-code/scripts/loom_checker/probe_results.py`, `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_probe_runner_results.py`, `loom-code/tests/test_probe_language_commands.py`
+- Files: `loom-code/scripts/loom_checker/probe_results.py`, `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_probe_language_commands.py`
 - Test: A1 positive: go-json-passing-test-accepted; negative: go-all-skipped-refused. A2 positive: node-deno-bun-unittest-passing-accepted; negative: node-empty-file-level-case-refused. A3 positive: listed-runner-without-output-flag-or-extra-file-refused; boundary: unreadable-output-needs-confirmation.
-- Risk: agent-decided — row table per spec Design decision; fixtures are real captured outputs. Folding `_go_test_runs`/`_node_test_runs` narrows `test_probe_language_commands.py`; preserves pytest/shell cases in `test_adversarial_pytest_option_order.py`, `test_loom_attestation.py`.
+- Risk: agent-decided — row table per spec Design decision; fixtures are real captured outputs. `test_probe_language_commands.py` is rewritten as the row-table module, removing its shape-only cases; pytest/shell coverage stays in `test_adversarial_pytest_option_order.py`, `test_loom_attestation.py`.
 
 **W1-02 Rows for jest, vitest, mocha, rspec, minitest, phpunit, cargo test and nextest**  after: W1-01  acceptance: 2,3
-- Files: `loom-code/scripts/loom_checker/probe_results.py`, `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_probe_runner_results.py`, `loom-code/tests/test_probe_language_suite_collection.py`
+- Files: `loom-code/scripts/loom_checker/probe_results.py`, `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_probe_language_commands.py`, `loom-code/tests/test_probe_language_suite_collection.py`
 - Test: A2 positive: js-ruby-php-rust-passing-accepted; negative: results-from-another-file-refused. A3 positive: nextest-no-tests-not-fail-refused; boundary: bun-multi-file-summary-refused.
 - Risk: agent-decided — npm/gem installs only in temporary directories; cargo target path via Cargo.toml `[[test]]` narrows the fixed mapping; preserves `test_probe_language_suite_collection.py`. An `.rspec` dry-run that real JSON cannot distinguish stays a residual risk.
 
-**W2-01 Finalize and validate by parsed result or bound reviewer confirmation**  after: W1-02  acceptance: 3,4,5
+**W2-01 Finalize and validate by parsed result or bound reviewer confirmation**  after: W1-02  acceptance: 1,3,4,5
 - Files: `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/reviewers.py`, `loom-code/contract/manifest.yaml`, `loom-code/tests/test_probe_confirmation_finalize.py`
-- Test: A3 positive: listed-zero-passed-refused-even-with-confirmation; negative: claimed-but-untargeted-refused. A4 positive: unlisted-maven-with-confirmation-attested; negative: other-content-or-partial-line-quote-refused. A5 positive: pytest-shell-attestation-unchanged; negative: python-noop-still-refused.
+- Test: A1 positive: go-parsed-probe-finalized-and-validated; negative: parsed-evidence-zero-passed-invalid. A3 positive: listed-zero-passed-refused-even-with-confirmation; negative: claimed-but-untargeted-refused. A4 positive: unlisted-maven-with-confirmation-attested; negative: other-content-or-partial-line-quote-refused. A5 positive: pytest-shell-attestation-unchanged; negative: python-noop-still-refused.
 - Risk: agent-decided — confirmation binding and the `evidence` execution field follow spec Design decision; the contract manifest grammar changes with them. Widens; preserves `test_loom_attestation.py` and `test_selection_finalize.py` coverage.
 
 **W2-02 Document runner commands and the confirmation hand-off**  after: W2-01  acceptance: 2,4
-- Files: `loom-code/skills/closing-review/references/adversarial.md`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/agents/reviewer.md`, `loom-code/agents/adversary.md`
+- Files: `loom-code/skills/closing-review/references/adversarial.md`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/agents/reviewer.md`
 - Test: A2 positive: per-runner-command-forms-documented; negative: none-docs-only. A4 positive: reviewer-confirmation-handoff-documented; negative: none-docs-only.
-- Risk: agent-decided — closing-review runs each non-pytest/shell probe once, hands its output path to the round's reviewers, and copies each reviewer's `{artifact, quote}` into the finalize input, so no extra round is needed; replaces the earlier per-language Recording examples.
+- Risk: agent-decided — closing-review runs each non-pytest/shell probe once, hands its output path to the round's reviewers, and copies each reviewer's `probe_confirmations` entry as `{reviewer, reviewed_sha, quote}` into the finalize input, so no extra round is needed; replaces the earlier per-language Recording examples.
 
 **W3-01 Release 3.41.0**  after: W2-02  acceptance: 5
 - Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/tests/test_write_plan_station_text.py`, `README.md`, `loom-code/README*.md`
