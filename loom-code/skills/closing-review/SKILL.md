@@ -378,6 +378,15 @@ hand-off to a temporary JSON input outside the repository:
 
 The `findings` input carries every unresolved adversarial finding that Build's
 hand-off lists.
+
+Before dispatching the round's reviewers, run once at HEAD each adversarial
+program whose command is not pytest, shell or direct execution, writing its
+combined output to a temporary directory outside the repository; hand the
+reviewers those paths with HEAD as `reviewed_sha`. Copy each returned
+`probe_confirmations` entry into that probe's `adversarial` item as
+`"confirmation": {"reviewer": "<id>", "reviewed_sha": "<sha>", "quote": "<lines>"}`.
+`finalize-review` uses a confirmation only for a run whose runner is unlisted
+or whose output it cannot read.
 For a selected outside reviewer, copy its `dimension_scores` and `notes` into
 the attributed verdict as well as the fields shown above; finalization compares
 them with the raw YAML.
@@ -399,7 +408,10 @@ was skipped by the user's plain-words instruction, skip `finalize-review` and le
 user in one line that the PR will show `verification absent`, and hand the
 change to Ship.
 
-When `finalize-review` fails for any cause other than the plain-words case above,
+When `finalize-review` refuses only for a missing confirmation and the
+functional content is unchanged, obtain the confirmation from the round's
+reviewers and re-run `finalize-review`; that is not a Build round.
+When `finalize-review` fails for any other cause than these two cases,
 return the fix to Build, which repeats its
 end-of-Build mechanical checks, and the fixed content, a new functional-content
 digest, must pass the next review round (§4) before `finalize-review` runs

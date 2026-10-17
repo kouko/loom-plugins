@@ -137,7 +137,18 @@ findings:
     text: "<label> (<decoration>): <what is wrong, in one or two sentences>"
     fix: "<the concrete change that would close it>"
 notes: []                        # optional, at most three bullets
+probe_confirmations:             # optional, only when probe output was handed to you
+  - artifact: "<path of the probe program>"
+    reviewed_sha: <echoed verbatim>
+    quote: "<complete output lines, copied verbatim>"
 ```
+
+**Probe confirmations.** When the orchestrator hands you the output files of
+adversarial programs run at `reviewed_sha`, do not run any probe yourself and
+judge only that handed output. Confirm an artifact only when whole output lines show that
+at least one test from that artifact actually ran and passed. `quote` must be
+complete lines from the handed output, each containing the artifact's file
+stem. Output that does not show this gets no entry.
 
 **Every finding carries an anchor and a fix.** A finding without an anchor
 cannot be located and a finding without a fix cannot be closed; what an

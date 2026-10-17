@@ -140,26 +140,34 @@ and observed result in the generated attestation:
 The first entry is a probe still in this change's store; the second is the
 same probe after graduation, named where the selected commit holds it.
 
-In a Go, JavaScript/TypeScript or Rust repo the command takes one of these forms:
+For another runner, record the command in exactly one of these forms
+(`<A>` = the artifact; `[w]` = an optional `npx`, `pnpm exec` or `yarn`
+launcher, or `bundle exec` for rspec and minitest):
 
-```json
-{"command": "go test docs/loom/<change-id>/evidence/probes/empty_input_test.go",
- "artifact": "docs/loom/<change-id>/evidence/probes/empty_input_test.go"}
-{"command": "node --test docs/loom/<change-id>/evidence/probes/empty_input.test.mjs",
- "artifact": "docs/loom/<change-id>/evidence/probes/empty_input.test.mjs"}
-{"command": "cargo test --test adversarial_empty_input",
- "artifact": "tests/adversarial_empty_input.rs"}
-```
+| Runner | Accepted command |
+|---|---|
+| go | `go test -json [-v] [-race] [-count N] [-timeout D] [-tags T] <A>`, `<A>` ending `_test.go` |
+| unittest | `python -m unittest [-v] [-q] <A>` (pytest's python/uv/conda launchers) |
+| node | `node --test --test-reporter=junit [--experimental-strip-types] <A>` |
+| deno | `deno test --reporter=junit [-A] [--allow-*] <A>` |
+| bun | `bun test ./<A>` or `bun test` with absolute `<A>` |
+| jest | `[w] jest --json --runTestsByPath <A>` |
+| vitest | `[w] vitest run --reporter=json --outputFile=/dev/stdout <A>` |
+| mocha | `[w] mocha --reporter json <A>` |
+| cargo test | `cargo test [--release] [-q] --test <n>`, `<n>` resolving to `<A>` |
+| nextest | `cargo nextest run [--release] [--no-tests=fail] --test <n>`, `<n>` resolving to `<A>` |
+| rspec | `[w] rspec --format json <A>` |
+| minitest | `[w] ruby [-I<dir>]... <A>`, `<A>` named `*_test.rb` or `test_*.rb` |
+| phpunit | `phpunit <A>` or `vendor/bin/phpunit <A>` |
 
-- Go runs the probe in file-list mode, so it compiles as its own package and
-  reaches only the code's exported identifiers.
-- Node also accepts `npx vitest run <file>` and `npx jest <file>`.
-- Rust cannot run a probe from the change store, so the probe graduates to
-  `tests/<name>.rs` and is recorded as `cargo test --test <name>`.
-
-A filter that can select zero tests (`go test -run`, a cargo test-name filter)
-and any option the checker does not list are refused; the `concern:` line may
-use the language's line comment (`//`).
+Every runner except cargo test and nextest runs the probe from the change's
+store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs`
+(or the `[[test]]` path Cargo.toml names) through a plan task and is
+recorded at that path. Any option not shown, a test-name filter, or a
+claimed runner in another form is refused. Any other command (for example
+`node X.mjs` without `--test`, `mvn ...`) is accepted only with a reviewer
+confirmation that closing review obtains. The `concern:` line may use the
+language's line comment (`//`).
 
 - Record every attempt that failed to break anything, for every artifact
   type — that is what makes the attempts an eval rather than an anecdote.
