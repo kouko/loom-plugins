@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-16-recap-state-quick-orientation",
-  "content_digest": "469a3edcab517255ffe28a29b93707b2e1b297fe",
+  "content_digest": "c10a06aa8bcddcea7cfb1d7d3e66688f24fe2d58",
   "executions": [
     {
       "kind": "package-tests",
@@ -26,7 +26,7 @@
       "lens": "skill",
       "verdict": "PASS",
       "reviewed_sha": "e78493943c3c931df54b6538eb440c9f854f59ba",
-      "review_target_sha": "7d69516ab0ddc45ede3955ccaeb25984069aa911",
+      "review_target_sha": "5647b138f0285b421cd7e5dea621d1734d139252",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -38,7 +38,8 @@
       },
       "findings": [],
       "notes": [
-        "Round 1 purpose-unknown finding fixed; fix delta added no skill-lens finding."
+        "Four examples show distinct decision, argument, branch, and ordered-step relationships; the complete recap contains one diagram.",
+        "Six focused tests passed. Live chat rendering remains unverified."
       ]
     },
     {
@@ -48,7 +49,7 @@
       "lens": "code",
       "verdict": "PASS_WITH_NOTES",
       "reviewed_sha": "e78493943c3c931df54b6538eb440c9f854f59ba",
-      "review_target_sha": "7d69516ab0ddc45ede3955ccaeb25984069aa911",
+      "review_target_sha": "5647b138f0285b421cd7e5dea621d1734d139252",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
@@ -63,10 +64,19 @@
         "deliberate-simplification": "PASS",
         "deletion-first": "PASS"
       },
-      "findings": [],
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-workflow/tests/recap-state/test_seven_block_schema.py:207",
+          "text": "nitpick: The new test checks for a text fence and labels anywhere in each section, so an emptied diagram with labels moved into prose would still pass.",
+          "fix": "Inspect each fenced diagram body and assert the convergent argument, two labeled branches, and ordered steps."
+        }
+      ],
       "notes": [
-        "Round 1 duplicate test finding fixed; 8 focused tests passed.",
-        "Live host output remains outside observed acceptance evidence."
+        "Prior duplicate-test finding remains fixed.",
+        "Five changed schema tests and eight alignment checks passed.",
+        "Live host rendering remains unverified."
       ]
     }
   ],
