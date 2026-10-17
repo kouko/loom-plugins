@@ -107,28 +107,56 @@ separate facts, assumptions, and unknowns.
 
 ## 4 — Good Example
 
-The following short-session example uses only the sections it needs. The
-heading frames shown here are ASCII; generate or verify CJK frames with
-`loom-visualization` when the actual heading uses CJK characters.
+This fictional long-session recap shows how the user gets back to the original
+purpose and the path to the next decision. The CJK heading frames were checked
+with `loom-visualization`'s alignment tool.
 
 ```text
-+--------------------------+
-| ■ Purpose and position   |
-+--------------------------+
+┌──────────────────────────┐
+│ ■ 目的與目前位置         │
+└──────────────────────────┘
 ```
 
-You asked us to make the recap easier to scan. We agreed on the behavior,
-and the next step is to update its instructions. We have not edited them yet.
+你最初要「每週一早上看得到上週的淨銷售額」。目前資料已匯入，報表仍缺
+退款的計算方式；下一步是先確認退款應歸到哪一週，才能完成淨銷售欄位。
 
 　
 
 ```text
-+--------------------------+
-| ■ Next step              |
-+--------------------------+
+┌──────────────────────────┐
+│ ■ 關鍵決定與進度         │
+└──────────────────────────┘
 ```
 
-Should I update the instructions now, or change the scope first?
+- 我們決定先用訂單付款日期統計銷售，因為這和現有匯入資料一致。
+- 已完成訂單與退款資料的匯入，也核對了上週的訂單總額。
+- 原先想只列訂單總額，但那會忽略退款；因此改為要計算淨銷售額。
+
+　
+
+```text
+┌──────────────────────────┐
+│ ■ 已知與待辦             │
+└──────────────────────────┘
+```
+
+目前可確認的進度與仍需釐清的地方如下。
+
+| 項目 | 狀況 |
+|---|---|
+| 已確認 | 匯入完成；訂單總額已核對。 |
+| 未知 | 退款應歸在原付款週，還是實際退款週。 |
+| 待辦 | 確認規則後計算淨銷售額，再檢查報表。 |
+
+　
+
+```text
+┌──────────────────────────┐
+│ ■ 下一步                 │
+└──────────────────────────┘
+```
+
+我的理解是先確認退款歸屬週，再完成淨銷售欄位。這符合你的方向嗎？
 
 ## 5 — Bad Example
 

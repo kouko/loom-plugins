@@ -161,6 +161,33 @@ def test_l3_contract_defines_goal_grounded_natural_output() -> None:
     assert "loom-workflow/skills/recap-state/scripts/" in text
 
 
+def test_good_example_demonstrates_long_session_orientation() -> None:
+    text = load_bundle()
+    example = text.split("## 4 — Good Example", 1)[1].split("## 5 — Bad Example", 1)[0]
+
+    # A long-session example must make the path to the next question visible.
+    for required in (
+        "你最初要",
+        "目前",
+        "下一步",
+        "決定",
+        "完成",
+        "待辦",
+        "已確認",
+        "未知",
+        "這符合你的方向嗎？",
+    ):
+        assert required in example, f"Good Example missing: {required}"
+
+    assert example.count("\n　\n") == 3  # one separator between four sections
+    assert example.count("┌") == example.count("┘") == 4
+    assert example.count("│ ■ ") == 4
+    assert "+----------------" not in example
+    assert re.search(r"[^\n]+。\n\n\| 項目 \|", example), (
+        "A situation sentence must introduce the comparison table"
+    )
+
+
 def test_english_reference_keeps_localized_text_to_explicit_quotations() -> None:
     text = load_bundle()
 
