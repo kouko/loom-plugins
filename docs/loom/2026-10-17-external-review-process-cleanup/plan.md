@@ -22,6 +22,11 @@ charter: 1.1
 - Test: A4 positive: release-metadata-synchronized at 3.41.1; boundary: package-suite-passes.
 - Risk: agent-decided — patch bump (bug fix, no field, rule id or contract change); rewrite the version pin only where the synchronization test pins it.
 
+**W1-03 Graduate the stdin-backpressure probe**  after: W1-01  acceptance: 1
+- Files: `docs/loom/2026-10-17-external-review-process-cleanup/evidence/probes/test_launch_stdin_backpressure.py`, `loom-code/tests/test_external_review_adversarial.py`
+- Test: A1 positive: large-prompt-to-non-reading-child-times-out runs in the package suite; boundary: probe file removed from the change store.
+- Risk: agent-decided — move the red-then-green probe into the existing graduated external-review regression file with its concern line in the header block.
+
 ## Simplicity check
 
 - merge the 30-minute default into W1-01; same files, two literals, no separate risk — taken
