@@ -1,5 +1,5 @@
 # sync-trunk rebases a change branch that has never been pushed — plan
-intent: 2026-10-18-sync-trunk-rebase-before-push@11c6ebf8
+intent: 2026-10-18-sync-trunk-rebase-before-push@ee62f5ce
 charter: 1.1
 
 ## Current State Evidence

@@ -8,6 +8,8 @@ any of it is pushed to any remote, or the branch has a configured upstream or
 push remote (or that cannot be told), trunk is merged instead, so
 pushed history is never rewritten. A branch whose own commits touch an
 ignored or untracked local path also merges, so the replay cannot delete it.
+A rebase gives the branch's commits new ids, so its output says to re-pin
+any commit-sha reference recorded on the branch.
 A rebase that fails without a conflict is
 aborted and, once the restore is verified, the merge is tried instead. Never
 force. A conflict is named, never resolved: detected in memory before the
@@ -312,6 +314,10 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         new_head = _oid(git, repo, "HEAD")
         if rebase:
             out.write(f"sync-trunk: rebased {branch} onto origin/{trunk} ({tip}); HEAD is now {new_head}.\n")
+            out.write(
+                "sync-trunk: the branch's commit ids changed -- re-pin any commit-sha reference "
+                "recorded on this branch (for example a plan's intent: line).\n"
+            )
         else:
             out.write(f"sync-trunk: merged origin/{trunk} ({tip}) into {branch}; HEAD is now {new_head}.\n")
         out.write(

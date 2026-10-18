@@ -124,6 +124,7 @@ def test_behind_branch_merges_fetched_trunk_tip_and_says_content_changed(tmp_pat
     assert git(change, "status", "--porcelain") == ""
     assert trunk_tip in result.stdout
     assert head in result.stdout
+    assert "commit ids changed" not in result.stdout
     assert "content changed" in result.stdout
 
 
@@ -142,6 +143,7 @@ def test_unpushed_behind_rebases_linear(tmp_path: Path) -> None:
     assert git(change, "symbolic-ref", "--short", "HEAD") == "feature"
     assert git(change, "status", "--porcelain") == ""
     assert f"rebased feature onto origin/main ({trunk_tip})" in result.stdout
+    assert "commit ids changed -- re-pin any commit-sha reference" in result.stdout.splitlines()[1]
     assert "content changed" in result.stdout
 
 
