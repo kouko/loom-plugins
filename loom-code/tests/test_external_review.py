@@ -874,6 +874,10 @@ if mode == "codex-exit":
     sys.exit(3)
 if mode == "codex-exit0":
     sys.exit(0)
+if mode == "codex-exit-orphan":
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    open({pidfile!r}, "w").write(str(child.pid))
+    sys.exit(3)
 text = sys.stdin.read()
 if mode == "claude" and "single word ok" in text:
     print(json.dumps({{"result": "ok", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}))
@@ -944,14 +948,20 @@ def test_review_stage_times_out_when_descendant_holds_stdout(tmp_path, monkeypat
     _assert_descendant_gone(pidfile)
 
 
-@pytest.mark.parametrize("mode,code", [("codex-exit", 3), ("codex-exit0", 0)])
+@pytest.mark.parametrize("mode,code", [("codex-exit", 3), ("codex-exit0", 0),
+                                       ("codex-exit-orphan", 3)])
 def test_codex_exit_before_answer_reports_exit_code(tmp_path, monkeypatch, mode, code):
-    _fake_cli(tmp_path, monkeypatch, "codex", mode)
+    import time
+    pidfile = _fake_cli(tmp_path, monkeypatch, "codex", mode)
+    start = time.monotonic()
     result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
     assert result["reason"] == f"discovery-error: codex model/list failed: exit {code}"
     executed = review.execute("codex", "gpt-a", "high", "openai", str(tmp_path), "review",
                               consent(scope=str(tmp_path), model="gpt-a"))
     assert executed["reason"] == f"execution-error: codex model/list failed: exit {code}"
+    assert time.monotonic() - start < review.CODEX_DISCOVERY_TIMEOUT
+    if pidfile.exists():  # an exited codex's lingering descendant is killed too
+        _assert_descendant_gone(pidfile)
 
 
 def test_review_timeout_default_is_thirty_minutes(monkeypatch):

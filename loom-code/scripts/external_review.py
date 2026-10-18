@@ -15,6 +15,7 @@ import signal
 import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 from typing import Any, Callable, Mapping, TextIO
 
@@ -116,7 +117,8 @@ def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
     Without until_response_id, stdin is closed after input and output is
     collected until the process exits; a descendant still holding a pipe is
     given a short grace, then killed. With until_response_id, stdin stays
-    open and reading stops at the JSON line carrying that id.
+    open and reading stops at the JSON line carrying that id, or once the
+    process exits without it (the same grace applies).
     """
     if not Path(cwd).is_dir():
         raise FileNotFoundError(errno.ENOENT, "missing review root", cwd)
@@ -169,9 +171,17 @@ def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
             for reader in readers:
                 reader.join(1)  # grace for a descendant still holding a pipe
         else:
-            readers[0].join(timeout)
-            if readers[0].is_alive():
-                raise subprocess.TimeoutExpired(argv, timeout)
+            # Wait for the reply or the direct process's exit, whichever is
+            # first; a descendant holding stdout must not turn exit into timeout.
+            deadline = time.monotonic() + timeout
+            while readers[0].is_alive():
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise subprocess.TimeoutExpired(argv, timeout)
+                if proc.poll() is not None:
+                    readers[0].join(1)  # same grace as the branch above
+                    break
+                readers[0].join(min(remaining, 0.05))
     finally:
         try:
             os.killpg(proc.pid, signal.SIGKILL)
