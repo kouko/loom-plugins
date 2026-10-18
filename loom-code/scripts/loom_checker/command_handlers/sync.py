@@ -4,7 +4,8 @@ before closing review dispatches reviewers (rule `review.sync`).
 The attestation digest covers the whole tree, so a sync after review
 invalidates it; this runs first. While the branch has never been pushed its
 own commits are rebased onto the trunk tip, keeping the history linear; once
-any of it is pushed (or that cannot be told) trunk is merged instead, so
+any of it is pushed to any remote, or the branch has a configured upstream or
+push remote (or that cannot be told), trunk is merged instead, so
 pushed history is never rewritten. A rebase that fails without a conflict is
 aborted and, once the restore is verified, the merge is tried instead. Never
 force. A conflict is named, never resolved: detected in memory before the
@@ -37,7 +38,8 @@ import sys
 # git rev-parse --verify --quiet <ref>^{commit}: https://git-scm.com/docs/git-rev-parse
 # git rebase --merge --no-autostash --no-autosquash --no-update-refs --no-rebase-merges / --abort: https://git-scm.com/docs/git-rebase
 # git ls-remote --heads <remote> <pattern> (tail match, so lines are compared exactly): https://git-scm.com/docs/git-ls-remote
-# git rev-list --count / --merges / --not --remotes=<remote>: https://git-scm.com/docs/git-rev-list
+# git rev-list --count / --merges / --not --remotes: https://git-scm.com/docs/git-rev-list
+# git config --get, exit 1 when the key is unset: https://git-scm.com/docs/git-config
 
 
 RULE = "review.sync"
@@ -134,14 +136,38 @@ def _count(git: str, repo: Path, *args: str) -> int | None:
     return int(stdout.strip()) if code == 0 and stdout.strip().isdigit() else None
 
 
-def _may_rebase(git: str, repo: Path, branch: str, tip: str) -> bool:
+def _config(git: str, repo: Path, key: str) -> str | None:
+    """The value, "" when unset, None when the lookup failed."""
+    code, stdout, _detail = _git(git, repo, "config", "--get", key)
+    return stdout.strip() if code == 0 else "" if code == 1 else None
+
+
+def _has_push_target(git: str, repo: Path, branch: str, trunk: str) -> bool:
+    """A configured upstream or pushRemote means the branch went to some
+    remote. An upstream of origin's trunk itself (a branch started from
+    origin/<trunk>) is not a push of this branch. A failed lookup is True."""
+    push_remote = _config(git, repo, f"branch.{branch}.pushRemote")
+    remote = _config(git, repo, f"branch.{branch}.remote")
+    merge = _config(git, repo, f"branch.{branch}.merge")
+    if push_remote is None or remote is None or merge is None:
+        return True
+    if push_remote:
+        return True
+    return bool(remote) and (remote, merge) != ("origin", f"refs/heads/{trunk}")
+
+
+def _may_rebase(git: str, repo: Path, branch: str, trunk: str, tip: str) -> bool:
     """True only when the branch is provably unpushed and its own commits hold
-    no merge commit; every failed lookup answers False, so the caller merges."""
+    no merge commit; every failed lookup answers False, so the caller merges.
+    Pushed means: origin lists the branch (origin is where loom publishes), a
+    push target is configured, or an own commit is on any remote-tracking ref."""
     code, stdout, _detail = _git(git, repo, "ls-remote", "--heads", "origin", f"refs/heads/{branch}")
     if code != 0 or any(line.endswith(f"\trefs/heads/{branch}") for line in stdout.splitlines()):
         return False
+    if _has_push_target(git, repo, branch, trunk):
+        return False
     own = _count(git, repo, f"{tip}..HEAD")
-    unpushed = _count(git, repo, "HEAD", "--not", tip, "--remotes=origin")
+    unpushed = _count(git, repo, "HEAD", "--not", tip, "--remotes")
     merges = _count(git, repo, "--merges", f"{tip}..HEAD")
     return own is not None and own == unpushed and merges == 0
 
@@ -229,7 +255,7 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
 
     # The fetched commit id, never the name `origin/<trunk>`: a local branch or
     # tag of that name would shadow the remote-tracking ref.
-    rebase = _may_rebase(git, repo, branch, tip)
+    rebase = _may_rebase(git, repo, branch, trunk, tip)
     if rebase:
         # Explicit flags override user rebase.* config (backend, autoStash,
         # autoSquash, updateRefs, rebaseMerges); only unpushed commits move.

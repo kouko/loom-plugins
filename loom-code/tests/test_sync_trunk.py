@@ -172,6 +172,23 @@ def test_commits_pushed_under_other_name_merge(tmp_path: Path) -> None:
     assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
 
 
+def test_branch_with_configured_upstream_merges(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    fork = tmp_path / "fork.git"
+    subprocess.run(["git", "init", "-q", "--bare", str(fork)], check=True)
+    git(change, "remote", "add", "fork", str(fork))
+    own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    git(change, "push", "-q", "-u", "fork", "feature")
+    # Only the upstream config still records the push.
+    git(change, "update-ref", "-d", "refs/remotes/fork/feature")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
+
+
 def test_unpushed_conflict_names_paths_restores(tmp_path: Path) -> None:
     _origin, change, teammate = repos(tmp_path)
     # Edit then revert: the merged result is clean (merge-tree sees no conflict),
