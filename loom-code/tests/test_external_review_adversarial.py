@@ -6,6 +6,7 @@
 # concern: A Codex model/list JSON-RPC error must fail discovery.
 # concern: A Claude receipt must not claim an observed tier other than its alias.
 # concern: A codex descendant holding stdout must not defeat the discovery timeout.
+# concern: the time limit is bypassed when the outside CLI does not read a large prompt from stdin
 """Graduated external-review regressions from independent review probes."""
 
 import json
@@ -197,3 +198,18 @@ def test_codex_app_server_descendant_holds_stdout_times_out(tmp_path):
     except subprocess.TimeoutExpired:
         raise AssertionError("discovery hung past its 2s timeout")
     assert "timeout-raised" in out.stdout
+
+
+def test_launch_unreadPromptOverPipeBuffer_timesOutAtLimit(tmp_path):
+    """A CLI that never reads stdin must still be stopped at the time limit.
+
+    The prompt (1 MiB) exceeds the pipe buffer, so writing it blocks until
+    the child reads or exits. The child sleeps 6 s; the limit is 0.5 s.
+    """
+    import time
+    import pytest
+    argv = [sys.executable, "-c", "import time; time.sleep(6)"]
+    start = time.monotonic()
+    with pytest.raises(subprocess.TimeoutExpired):
+        external_review._launch(argv, input="x" * (1 << 20), timeout=0.5, cwd=str(tmp_path))
+    assert time.monotonic() - start < 3
