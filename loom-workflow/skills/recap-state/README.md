@@ -16,26 +16,31 @@ premise you can no longer place. You are lost.
 
 This skill fires when you say so. It starts with our purpose and current
 position, then includes only the sections that help explain what shaped the
-work, the remaining gap, and the next step. It asks you to confirm that step
-and waits for your answer before continuing.
+work and the remaining gap. If the purpose is unknown, it asks only for that
+purpose and waits. If the purpose is grounded, it proposes a next step, asks
+you to confirm it, and waits for your answer before continuing.
 
 It writes nothing to disk. The recap appears in chat and nowhere else.
 
 ## Goal-Grounded Alignment Loop
 
 The recap treats purpose as the anchor. Relevant history appears when it helps
-explain the current position; a short conversation needs fewer sections. The
-final question checks whether the proposed next step still serves the purpose
-you established.
+explain the current position; a short conversation needs fewer sections. When
+the purpose is unknown, the final question asks for it. When the purpose is
+grounded, the final question checks the proposed next step against it.
 
 ```mermaid
 graph TB
-    Purpose["Purpose and current position"] --> Next["Ask about the next step"]
+    Purpose["Purpose and current position"] --> Check{"Purpose grounded?"}
     Purpose -.->|"When useful"| History["Relevant decisions and remaining gap"]
-    History --> Next
-    Next --> Wait["Wait for the user's answer"]
-    Wait -.->|"The user redirects"| Purpose
-    Wait -->|"The user confirms"| Continue["Continue the work"]
+    History --> Check
+    Check -->|"Unknown"| AskPurpose["Ask for the original purpose"]
+    Check -->|"Grounded"| Next["Ask about the next step"]
+    AskPurpose --> WaitPurpose["Wait for purpose or clarification"]
+    Next --> WaitNext["Wait for the user's answer"]
+    WaitPurpose -->|"Purpose supplied"| Purpose
+    WaitNext -.->|"The user redirects"| Purpose
+    WaitNext -->|"The user confirms"| Continue["Continue the work"]
 ```
 
 The current purpose must come from the conversation. Broader purposes appear
@@ -78,8 +83,9 @@ Say any of these and the skill fires:
 - "I lost track"
 - "remind me where we are"
 
-After the recap, the skill ends with a single question asking you to
-confirm the next step. Answer it (or redirect) and the work continues.
+After the recap, the skill asks only for the purpose if it is unknown, and
+waits for you to state or clarify it. With a grounded purpose, it asks one
+question about the next step and waits for your answer or correction.
 
 ---
 

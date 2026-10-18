@@ -172,9 +172,9 @@ def test_tri_lang_readmes_consistent():
 
 def test_tri_lang_readmes_show_localized_goal_grounded_alignment_loop():
     readmes = {
-        "en": (_read(README_EN), ("Purpose and current position", "Ask about the next step")),
-        "ja": (_read(README_JA), ("目的と現在地", "次の一歩を確認する")),
-        "zh-TW": (_read(README_ZHTW), ("目的與現在位置", "確認下一步")),
+        "en": (_read(README_EN), ("Purpose and current position", "Ask for the original purpose", "Ask about the next step")),
+        "ja": (_read(README_JA), ("目的と現在地", "元の目的を尋ねる", "次の一歩を確認する")),
+        "zh-TW": (_read(README_ZHTW), ("目的與現在位置", "詢問原始目的", "確認下一步")),
     }
 
     for language, (text, labels) in readmes.items():
@@ -189,6 +189,29 @@ def test_tri_lang_readmes_show_localized_goal_grounded_alignment_loop():
     for language, (text, _) in readmes.items():
         assert "recap-state/" in text, f"{language} README uses a stale directory root"
         assert "\nrecap/\n" not in text, f"{language} README names a nonexistent directory"
+
+
+def test_tri_lang_readmes_keep_final_question_conditional() -> None:
+    readmes = {
+        "en": (_read(README_EN), "purpose is unknown", "purpose is grounded", "Ask for the original purpose"),
+        "ja": (_read(README_JA), "目的が不明", "目的が確認できる", "元の目的を尋ねる"),
+        "zh-TW": (_read(README_ZHTW), "目的不明", "目的已確認", "詢問原始目的"),
+    }
+    for language, (text, unknown, grounded, ask_purpose) in readmes.items():
+        prose, diagram = text.split("```mermaid", 1)
+        diagram = diagram.split("```", 1)[0]
+        assert unknown in prose, f"{language} README omits unknown-purpose behavior"
+        assert grounded in prose, f"{language} README omits grounded-purpose behavior"
+        assert ask_purpose in diagram, f"{language} diagram omits purpose question"
+        assert "WaitPurpose" in diagram and "WaitNext" in diagram, (
+            f"{language} diagram must keep the two waiting states separate"
+        )
+        assert re.search(r"Check\s+-->[^\n]*AskPurpose", diagram)
+        assert re.search(r"Check\s+-->[^\n]*Next", diagram)
+        assert "AskPurpose --> WaitPurpose" in diagram
+        assert "Next --> WaitNext" in diagram
+        assert "WaitPurpose -->" in diagram and "| Purpose" in diagram
+        assert not re.search(r"WaitPurpose\s+-->[^\n]*Continue", diagram)
 
 
 def test_tri_lang_readmes_describe_flexible_recap_and_pause_without_six_section_claim():
