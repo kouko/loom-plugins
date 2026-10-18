@@ -13,7 +13,7 @@ charter: 1.1
 ## Task DAG
 
 **W1-01 One bounded launcher for every outside CLI, 30-minute review default**  after: none  acceptance: 1, 2, 3, 4
-- Files: `loom-code/scripts/external_review.py`, `loom-code/tests/test_external_review.py`
+- Files: `loom-code/scripts/external_review.py` (entry: `main`), `loom-code/tests/test_external_review.py`
 - Test: A1 positive: agy-models-descendant-holds-stdout-times-out-no-process-left (RED today: hangs); boundary: review-stage-descendant-holds-stdout-reports-execution-timeout. A3 positive: fake-codex-exits-before-answer-reports-failed-with-exit-status; negative: answering-fake-codex-still-lists-models. A2 positive: execute-and-cli-default-review-timeout-is-1800; boundary: review-timeout-1801-still-rejected. A4 positive: existing-injected-runner-tests-stay-green; boundary: package-suite-passes.
 - Risk: agent-decided — default `runner` becomes a module `run`-shaped launcher (own session, group kill on timeout); Codex passes `until_response_id=2`, removing both identity checks; review default 1800 is the validated upper bound; preserves test_external_review.py coverage.
 

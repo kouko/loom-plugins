@@ -965,8 +965,18 @@ def test_codex_exit_before_answer_reports_exit_code(tmp_path, monkeypatch, mode,
 
 
 def test_review_timeout_default_is_thirty_minutes(monkeypatch):
-    import inspect
-    assert inspect.signature(review.execute).parameters["review_timeout"].default == 1800
+    timeouts = []
+
+    def runner(argv, **kwargs):
+        timeouts.append(kwargs["timeout"])
+        if argv[:2] == ["codex", "app-server"]:
+            return completed(argv, json.dumps({"id": 2, "result": {"data": [{"id": "gpt-6.1-sol"}]}}))
+        return completed(argv, "ok", "model: gpt-6.1-sol\nreasoning effort: high\n")
+
+    result = review.execute("codex", "gpt-6.1-sol", "high", "openai", "/repo", "review",
+                            consent(), runner=runner)
+    assert result["status"] == "completed", result
+    assert timeouts[-1] == 1800
     execute, seen = review.execute, {}
     monkeypatch.setattr(review, "execute", lambda *a, **k: seen.update(k) or {"status": "failed"})
     review.main(["--executor", "codex", "--scope", "/repo", "--consent-record", "/nonexistent",
