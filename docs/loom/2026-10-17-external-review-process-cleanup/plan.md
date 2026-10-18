@@ -39,3 +39,4 @@ charter: 1.1
 1. A descendant that starts its own session escapes the group kill; the launcher still returns at the limit, but that process can outlive the step.
 2. When the main process exits normally while a descendant keeps stdout open, the launcher must stop reading once the main process has exited plus a short grace, or a finished review would be reported as a timeout.
 3. `loom-code/scripts/claude_reviewer.py` calls `subprocess.run` with a timeout and has the same descendant exposure; it is a separate script outside this intent's named steps and is left as a follow-up.
+4. user-decided — second-vendor selection-confirmed: codex
