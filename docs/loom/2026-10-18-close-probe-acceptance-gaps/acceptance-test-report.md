@@ -1,0 +1,32 @@
+# 補上找漏洞測試接受判斷剩下的缺口 — 我試了什麼、結果如何
+
+2026-10-18 在專案的乾淨副本（c1cb34a4）上試。每條怎麼試、回來什麼：`docs/loom/2026-10-18-close-probe-acceptance-gaps/evidence/acceptance-test-evidence.md`。
+
+## 你要的，一條一條看
+
+| # | 你要的 | 結果 | 實際發生 | 重跑 |
+|---|---|---|---|---|
+| 1 | pytest 找漏洞測試的指令只能列這一支檔；執行後 pytest 的總結若顯示有測試被略過（deselected），或沒有任何測試通過，`finalize-review` 一律拒收，不論過濾來自指令、設定檔還是外掛；不帶過濾、只列這支檔的指令照舊接受。判斷畢業測試是否收進測試套件時，套件指令本身帶的過濾照舊允許。 | works | 在乾淨範例 repo 裡，過濾放在指令（`-k`、`-m`、`--deselect`）、設定檔、外掛三處都被拒收，多列一支檔、全部跳過也被拒收；只列這支檔照舊產生有效審查證明，套件指令自帶 `-m` 過濾時畢業測試照舊接受；這次加做的部分也成立：定義了 test 函式或 Test class 的檔案用 `python3 檔案` 直接跑會被拒收，沒有 test 的一般腳本照舊接受。 | — |
+| 2 | 找漏洞測試的檔案路徑含 `..` 或其他寫法、實際上不在這次變更的 store 也不在測試套件裡時，`finalize-review` 與 validator 都拒收。 | works | `..`、`./` 開頭、`//` 三種寫法 `finalize-review` 都拒收，把已產生的審查證明改成這種路徑後 validator 也拒收；store 外、套件也不跑的一般路徑同樣拒收。 | — |
+| 3 | 在乾淨範例 repo 裡，`env go test -json …`（含 `env 變數=值 go test -json …`）、`npx --yes jest …`、`pnpm jest …`（pnpm 直接接工具名）這幾種寫法，與原本清單寫法一樣，不需 reviewer 確認就讀結果產生審查證明；讀到零支通過時一樣拒收。 | works | 用真的 go 與 jest 跑，四種寫法都直接讀結果產生有效審查證明（記錄「通過 1 支」）；測試全部跳過時一律拒收；`env -i` 這類帶選項的寫法和 `pnpm test` 這種腳本名照舊要 reviewer 確認。 | — |
+| 4 | 在乾淨 Rust 範例 repo 裡，`required-features` 每一項都直接列在 `[features] default` 裡的測試目標，以及 `tests/<資料夾>/main.rs`，畢業成測試後被判定為已收進測試套件；`cargo test` 不會跑的目標仍被拒收。 | works | 直接列在預設 feature 的目標、`tests/<資料夾>/main.rs`（自動發現的與在 Cargo.toml 宣告的都試了）都被接受；feature 沒開、`test = false` 的目標都被拒收。 | — |
+| 5 | 在乾淨範例 repo 用真的工具重試：Bun 的 `bun test ./<檔案>` 寫法產生有效審查證明、其他 Bun 路徑寫法被拒收；Rust 畢業測試的接受與拒收結果符合 cargo 實際行為。 | works | Bun 1.4.3：`./` 寫法產生有效審查證明，不帶 `./`、絕對路徑、兩支檔、少了 `test` 都被拒收；Rust 用 cargo 1.99 實跑比對，每個目標的接受／拒收都和 `cargo test` 實際有沒有跑它一致，唯一例外是範圍外的「預設 feature 再間接開啟的 feature」：cargo 會跑，工具拒收（照你的範圍設定，屬於安全方向）。 | — |
+| 6 | repo 的完整 package suite 通過。 | works | 我在乾淨副本跑了完整 package suite，全部通過（3501 支通過、0 失敗）；`finalize-review` 產生審查證明前會再跑一次自動測試套件，失敗就擋下。 | — |
+
+## 對你既有的資料做了什麼
+
+沒有。這次只改了審查證明工具判斷「要不要接受一支找漏洞測試」的規則，不讀也不寫你既有的檔案；之前已經產生的審查證明不受影響。所有試驗都在 repo 外另建的範例 repo 裡進行。
+
+## 我替你決定的
+
+- **用範例 reviewer 判定驅動工具** — 範例 repo 裡沒有真的審查，我放了兩筆「通過」的範例 reviewer 判定，好讓 `finalize-review` 走到找漏洞測試那一步。這只影響範例 repo，不代表這次變更的真實審查。
+- **pnpm 安裝 jest 時的警告不算失敗** — `pnpm install` 因為略過兩個套件的 build script 而回傳失敗碼，但 jest 本身正常執行，我照常試下去。
+- **把 store 內指向 store 外的捷徑（symlink）也試了一次** — 它被拒收，但拒收理由是「缺少 concern 說明行」，不是「路徑跳出 store」。結果正確，只是訊息不直接。
+
+## 你叫我跳過的步驟
+
+沒有，沒有跳過任何步驟。
+
+## 我不確定你要不要的
+
+- store 裡的 symlink 指向 store 外時，現在是被別條規則順帶擋下；要不要讓拒收訊息直接說「路徑跳出 store」？
