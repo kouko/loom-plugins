@@ -214,8 +214,16 @@ def test_unpushed_conflict_names_paths_restores(tmp_path: Path) -> None:
     assert not (git_dir / "rebase-merge").exists() and not (git_dir / "rebase-apply").exists()
 
 
+@pytest.mark.parametrize(
+    ("returncode", "detail"),
+    [
+        (1, "error: rebase refused for a reason that is not a conflict"),
+        (129, "error: unknown option `no-update-refs'"),
+    ],
+    ids=["not-a-conflict", "old-git-no-update-refs"],
+)
 def test_rebase_failing_without_conflict_falls_back_to_merge(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, returncode: int, detail: str
 ) -> None:
     from io import StringIO
 
@@ -228,7 +236,7 @@ def test_rebase_failing_without_conflict_falls_back_to_merge(
 
     def failing_rebase(git_exe, repo, *args, **kwargs):
         if args and args[0] == "rebase" and "--abort" not in args:
-            return 1, "", "error: rebase refused for a reason that is not a conflict"
+            return returncode, "", detail
         return real_git(git_exe, repo, *args, **kwargs)
 
     monkeypatch.setattr(sync_handler, "_git", failing_rebase)

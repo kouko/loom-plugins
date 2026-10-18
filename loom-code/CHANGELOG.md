@@ -3,7 +3,8 @@
 ## [3.42.1] — 2026-10-18 — sync-trunk rebases a never-pushed change branch
 
 - `sync-trunk` now rebases a change branch that has never been pushed onto the fetched trunk tip, so no merge commit is created.
-- A branch that has been pushed (the live remote lists it, or any of its commits is on an origin ref), whose lookup fails, or that already holds a merge commit keeps the merge path. It never forces a push.
+- A branch that has been pushed (the live origin lists it, any of its commits is on any remote-tracking ref, or it has a configured upstream or pushRemote other than origin's trunk) keeps the merge path, as does a branch that already holds a merge commit, whose history touches a local ignored or untracked file, or whose lookup fails. It never forces a push.
+- After a rebase, `sync-trunk` says the branch's commit ids changed, so any commit-sha reference recorded on the branch must be re-pinned.
 
 ## [3.42.0] — 2026-10-18 — close the remaining adversarial-probe acceptance gaps
 

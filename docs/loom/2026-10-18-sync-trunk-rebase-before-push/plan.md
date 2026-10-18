@@ -15,7 +15,7 @@ Wave 1 — one module boundary (`cmd_sync_trunk`), then release metadata.
 **W1-01 Rebase a never-pushed branch, merge a pushed one**  after: none  acceptance: 1, 2, 3, 4
 - Files: loom-code/scripts/loom_checker/command_handlers/sync.py (entry: `cmd_sync_trunk`), loom-code/tests/test_sync_trunk.py
 - Test: A1 positive: unpushed_behind_rebases_linear; negative: test_current_branch_adds_no_commit. A2 positive: pushed_behind_merges_then_plain_push_accepted; boundary: commits_pushed_under_other_name_merge. A3 positive: unpushed_conflict_names_paths_restores; negative: unpushed_with_prior_merge_commit_merges. A4 positive: test_branch_ahead_of_trunk_adds_no_commit; negative: test_dirty_worktree_or_trunk_checkout_refused_untouched.
-- Risk: agent-decided: pushed = remote lists branch, or branch commit on any origin ref; lookup failure or a branch already holding a merge commit takes merge. Collision guard runs before the choice; existing tests in test_sync_trunk.py preserved.
+- Risk: agent-decided: pushed = origin lists branch, a branch commit on any remote-tracking ref, or an upstream/pushRemote other than origin's trunk; a merge commit, a local ignored/untracked path the branch touches, or failed lookup also merges. Collision guard runs first.
 
 **W1-02 Release 3.42.1**  after: W1-01  acceptance: 4
 - Files: loom-code/plugin.json (+ .claude-plugin, .codex-plugin copies), loom-code/package.json, loom-code/CHANGELOG.md, README.md, loom-code/README.md (+ ja, zh-TW), loom-code/tests/test_write_plan_station_text.py
@@ -24,7 +24,7 @@ Wave 1 — one module boundary (`cmd_sync_trunk`), then release metadata.
 
 **W1-03 Graduate the adversarial programs into the suite**  after: W1-01  acceptance: 1, 2
 - Files: loom-code/tests/test_adversarial_sync_trunk_rebase.py, docs/loom/2026-10-18-sync-trunk-rebase-before-push/evidence/probes/
-- Test: A1 positive: test_sync_ignoredhistory_succeeds; boundary: test_sync_oldgit_succeeds. A2 positive: test_sync_otherremote_keepscommits; negative: test_branch_with_configured_upstream_merges.
+- Test: A1 positive: test_sync_ignoredhistory_succeeds; boundary: test_rebase_failing_without_conflict_falls_back_to_merge[old-git-no-update-refs]. A2 positive: test_sync_otherremote_keepscommits; negative: test_branch_with_configured_upstream_merges.
 - Risk: agent-decided: move the three red-then-green probes unchanged in behaviour so every later change runs them; the probe store keeps no copy.
 
 ## Simplicity check
