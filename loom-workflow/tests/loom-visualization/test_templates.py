@@ -4,6 +4,8 @@ Acceptance 2 (every shape has table, ASCII and Mermaid forms) and
 acceptance 7 (no Obsidian-only syntax; the skill declines vault targets).
 """
 
+# concern: Example JSON drifting from the ASCII diagram shown to users.
+
 import json
 import re
 import subprocess

@@ -26,40 +26,40 @@ Run `python3 <skill-dir>/scripts/generate.py flow` (`<skill-dir>` is defined
 in `SKILL.md`) with this input on stdin:
 
 ```json
-{"steps": ["git pull", "uv sync", {"title": "pytest", "body": ["* run unit tests", "* run integration tests"]}, "git push"]}
+{"steps": ["git pull", "uv sync", {"title": "Run test suites", "body": ["* unit tests", "* integration tests"]}, "git push"]}
 ```
 
 Output:
 
 ```
-┌─────────────────────────┐
-│        git pull         │
-└─────────────────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│         uv sync         │
-└─────────────────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│ pytest                  │
-├─────────────────────────┤
-│ * run unit tests        │
-│ * run integration tests │
-└─────────────────────────┘
-             │
-             ▼
-┌─────────────────────────┐
-│        git push         │
-└─────────────────────────┘
+┌─────────────────────┐
+│      git pull       │
+└─────────────────────┘
+           │
+           ▼
+┌─────────────────────┐
+│       uv sync       │
+└─────────────────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ Run test suites     │
+├─────────────────────┤
+│ * unit tests        │
+│ * integration tests │
+└─────────────────────┘
+           │
+           ▼
+┌─────────────────────┐
+│      git push       │
+└─────────────────────┘
 ```
 
 ## Mermaid
 
 ```mermaid
 flowchart LR
-    A["git pull"] --> B["uv sync"] --> C[<div style='text-align:left'>pytest<br/>━━━━━━━━━━━━━━━━━━━━━━━<br/>• run unit tests<br/>• run integration tests</div>] --> D["git push"]
+    A["git pull"] --> B["uv sync"] --> C[<div style='text-align:left'>Run test suites<br/>━━━━━━━━━━━━━━━━━━━━━━━<br/>• unit tests<br/>• integration tests</div>] --> D["git push"]
 ```
 
 ## Common mistakes

@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.11.0] — 2026-10-18 — make diagram node titles understandable on their own
+
+- Guide ASCII and Mermaid diagram authors to use short titles that name each node's action or role without needing its body. Add a body only when it contributes distinct information.
+- Refine existing engineering and process examples so titles stand alone and bodies do not repeat branch labels or child nodes; keep single-line nodes valid.
+
 ## [5.10.0] — 2026-10-17 — orient in-session recaps around purpose and progress
 
 - Lead recaps with the conversation-grounded purpose, current position, and next step; show the decisions and completed work that explain the current position without padding short sessions.
