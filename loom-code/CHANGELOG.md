@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.41.1] — 2026-10-18 — bound every outside review CLI by its time limit
+
+- Every outside CLI launch (Antigravity listing, probe and review) now runs in its own process group and is killed as a group at its time limit.
+- A Codex that exits before answering `model/list` is reported as `discovery-error: codex model/list failed: exit <n>`.
+- The review time-limit default rises from 600 to 1800 seconds; the allowed range is unchanged.
+- The launcher is now the explicit default runner instead of an identity check on `subprocess.run`.
+
+## [3.41.0] — 2026-10-17 — attest adversarial probes run by non-Python test runners
+
+- Finalization attests an adversarial probe run by one of 13 listed runners — `go test`, `python -m unittest`, `node --test`, `deno test`, `bun test`, jest, vitest, mocha, `cargo test`, `cargo nextest run`, rspec, minitest and phpunit — by running it and parsing that run's own test results: at least one passing, non-skipped test from the probe's artifact. A readable zero is refused, and an argv a runner claims must be in that runner's accepted form.
+- A probe run by an unlisted runner, or one whose output its runner cannot read, needs a verdict reviewer's confirmation bound to the reviewed content digest and quoting whole output lines that name the artifact; refusals say which part is missing and print the output tail.
+- Attestation executions gain optional `evidence`, `passed` and `confirmation` fields in the contract manifest grammar; the schema stays `loom-attestation/v2`. Reviewer output gains optional `probe_confirmations`, and the closing-review station, its adversarial reference and the reviewer agent document the accepted commands and confirmations.
+- pytest, shell and direct-execution probes keep their existing rules.
+
 ## [3.40.1] — 2026-10-17 — keep Codex model discovery open until it answers
 
 - Codex external-review discovery keeps `codex app-server` stdin open until the `model/list` reply arrives, bounded by the 15 s discovery timeout, so the model list is no longer lost to an early EOF.

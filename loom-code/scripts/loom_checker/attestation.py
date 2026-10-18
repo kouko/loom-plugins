@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import git_ok
+from loom_checker.probe_results import Row
+from loom_checker.probe_results import claiming_row
+from loom_checker.probes import argv_for
 from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
@@ -27,6 +30,58 @@ KEYS_BY_SCHEMA = {ATTESTATION_SCHEMA_V1: ATTESTATION_KEYS_V1, ATTESTATION_SCHEMA
 
 def _command_digest(command: str) -> str:
     return hashlib.sha256(command.encode("utf-8")).hexdigest()
+
+
+def adversarial_route(command: str, artifact: str, repo: Path) -> tuple[str, Row | None]:
+    """How an adversarial argv is decided, as one of:
+
+    - `direct`: a Python/pytest or bash/sh program, or a directly executed
+      artifact -- today's rules, no runner evidence;
+    - `parsed`: a listed runner row in its accepted form (the row returned);
+    - `reviewer`: an argv no row claims, which needs a reviewer confirmation;
+    - `unnamed` / `not-executed`: today's refusals of a `direct` argv;
+    - `not-accepted`: a row claims it but does not accept it (the row
+      returned) -- refused whether or not a confirmation is supplied.
+    """
+    try:
+        argv = argv_for(command)
+    except ValueError:
+        argv = None
+    row = claiming_row(argv) if argv else None
+    if row is not None:
+        return ("parsed" if row.accepts(argv, artifact, repo) else "not-accepted"), row
+    if (argv is None or Path(artifact).suffix.lower() in {".py", ".sh"}
+            or command_executes_artifact(command, artifact)):
+        if not command_names_artifact(command, artifact):
+            return "unnamed", None
+        if not command_executes_artifact(command, artifact):
+            return "not-executed", None
+        return "direct", None
+    return "reviewer", None
+
+
+def _evidence_failure(execution: dict, route: str, reviewers: set[str], digest: str) -> str | None:
+    """Recompute what an adversarial execution's `evidence` may say."""
+    evidence = execution.get("evidence")
+    if route == "direct":
+        return None if evidence is None else "a pytest, shell or direct execution carries runner evidence"
+    passed = execution.get("passed")
+    if route == "parsed" and evidence == "parsed":
+        if isinstance(passed, int) and not isinstance(passed, bool) and passed >= 1:
+            return None
+        return "parsed adversarial evidence shows no passing test"
+    if evidence != "reviewer":
+        return "adversarial execution records neither a parsed passing result nor a reviewer confirmation"
+    confirmation = execution.get("confirmation")
+    if (not isinstance(confirmation, dict)
+            or set(confirmation) != {"reviewer", "reviewed_sha", "content_digest", "quote"}
+            or any(not isinstance(value, str) or not value.strip() for value in confirmation.values())):
+        return "adversarial reviewer confirmation is malformed"
+    if confirmation["reviewer"].strip() not in reviewers:
+        return "adversarial confirmation reviewer is not one of the verdict reviewers"
+    if confirmation["content_digest"] != digest:
+        return "adversarial confirmation was given for other functional content"
+    return None
 
 
 def validate_attestation(
@@ -63,6 +118,10 @@ def validate_attestation(
         return [(rule, "attestation records no successful functional executions")]
     package_runs = 0
     adversarial_runs = 0
+    recorded = attestation.get("verdicts")
+    verdict_reviewers = {str(v.get("reviewer", "")).strip() for v in recorded
+                         if isinstance(v, dict)} if isinstance(recorded, list) else set()
+    verdict_reviewers.discard("")
     for execution in executions:
         if not isinstance(execution, dict):
             return [(rule, "attestation contains a malformed execution")]
@@ -83,10 +142,17 @@ def validate_attestation(
             artifact = execution.get("artifact")
             if not isinstance(artifact, str) or not artifact.strip():
                 return [(rule, "adversarial execution names no artifact")]
-            if not command_names_artifact(command, artifact):
+            route, row = adversarial_route(command, artifact, repo)
+            if route == "unnamed":
                 return [(rule, "adversarial command does not name its artifact")]
-            if not command_executes_artifact(command, artifact):
+            if route == "not-executed":
                 return [(rule, "adversarial command must execute the artifact directly")]
+            if route == "not-accepted":
+                return [(rule, f"adversarial command is a {row.name} command but not in its "
+                               f"accepted form for its artifact")]
+            evidence_failure = _evidence_failure(execution, route, verdict_reviewers, expected)
+            if evidence_failure:
+                return [(rule, evidence_failure)]
             if not git_ok(repo, "cat-file", "-e", f"{head_sha}:{artifact}"):
                 return [(rule, "adversarial execution names no committed artifact")]
         else:
