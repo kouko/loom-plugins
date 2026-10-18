@@ -287,3 +287,46 @@ This re-run used a new clean clone at `/private/tmp/recap-state-acceptance-0b120
 ### UI flow 10, dependency or branch — re-tested
 
 - `spec.md:22`, `:41` and reference `:40-43`, `:73-81` permit a diagram for real dependency/branch relationships when it helps. The decision-tree and process examples at reference `:219-251` remain, and all four diagram text blocks passed the alignment checker. A live agent's selection and client rendering remain unverified.
+
+## Re-run on 2026-10-18, at 6b8cf5e2
+
+This focused re-run used a new clean clone at `/private/tmp/recap-state-acceptance-6b8cf5e2`, created with `git clone --no-hardlinks --quiet . /private/tmp/recap-state-acceptance-6b8cf5e2`. Before checking it, `git rev-parse HEAD` returned `6b8cf5e2e4d4a0f48f1c652193574e71d607ce8c` and `git status --short` was empty. `git diff bfe412cc..6b8cf5e2` changes only the long-session UI-flow sentence at `docs/loom/2026-10-16-recap-state-quick-orientation/spec.md:38`. No runtime skill, schema, README, test, or other spec sentence changed.
+
+### Clean-copy setup and focused checks
+
+- `agy plugin validate ./loom-workflow` returned `[ok] ./loom-workflow`, `skills: 13 processed`, `hooks: 1 processed`.
+- `pytest -q loom-workflow/tests/recap-state/test_skill_md.py loom-workflow/tests/recap-state/test_seven_block_schema.py loom-workflow/tests/recap-state/test_readmes.py loom-workflow/tests/scripts/test_recap_state_compaction.py` returned `20 passed in 0.19s`.
+- The full package suite was left to `finalize-review`. Its README command remains `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; that automated test suite runs before acceptance and blocks a failing change. No full-suite result is claimed here.
+- The earlier Codex CLI escalation was rejected by automatic approval review due to possible transmission of private repository content to an external model, with an explicit no-workaround instruction. No Codex CLI command was retried and no Claude Code was used. Current-HEAD model output, rendered chat, and post-question pause remain unobserved.
+
+### Acceptance 1 — re-tested
+
+- Checked the entire long-conversation path in both purpose branches. `spec.md:7` requires original purpose and position, unknown labeling, and a next step only for a grounded purpose. The fixed UI flow at `spec.md:38` now says `grounded original purpose or an explicit unknown`, then asks only for the purpose and waits when unknown, while proposing a next step and asking for alignment when grounded. This matches `SKILL.md:21-40`, reference `:14-27`, and the three local README descriptions. The known-purpose worked example still covers original purpose, current position, work history, completed work, gap, unknown refund rule and proposed next action. Focused tests passed. No current-HEAD live recap was obtained, so result remains `partly`.
+
+### Acceptance 2 — carried over
+
+- Diff check: only `spec.md:38` changed, and its new purpose/final-question branches do not alter REQ-2, historical-decision source checking, completed work, or remaining-gap requirements. Prior `partly` verdict and live-output limit remain.
+
+### Acceptance 3 — carried over
+
+- Diff check: only the long-session purpose/final-question sentence changed. Section frames, spacing, table preface, diagram eligibility and short-session economy did not change. Prior alignment and focused-test evidence, plus the rendered-client limit, remain.
+
+### Acceptance 4 — carried over
+
+- Diff check: fact/assumption/unknown classification, exact consequential quotation and past-decision provenance rules were untouched. Prior `partly` verdict remains.
+
+### Acceptance 5 — re-tested
+
+- Checked both final-question paths and the wait condition in full. Fixed `spec.md:38` now requires the unknown-purpose question and wait, or the grounded next-step alignment question and wait; it agrees with `spec.md:15`, `SKILL.md:35-40`, `:49-59`, and reference `:23-36`, `:103-111`. Focused tests passed. The earlier important finding at `spec.md:38` is resolved in the source contract. A real model question and pause were not observed, so result remains `partly`.
+
+### Acceptance 6 — carried over
+
+- Diff check: only `spec.md:38` changed; chat-only/no-file, handoff and built-in-recap boundaries did not change. Prior `partly` verdict remains because live file effects were not observed.
+
+### UI flow 7, long conversation — re-tested
+
+- Checked every named part of the UI flow: grounded purpose or explicit unknown, current position, concise history, completed and pending work, and the two conditional final-question branches with a wait. The fixed `spec.md:38` now matches REQ-1 and REQ-5 and the unchanged runtime instructions. The worked example demonstrates the grounded branch; the unknown branch is specified in the runtime and three local READMEs. Focused tests passed. No current-HEAD host output was captured.
+
+### UI flows 8–10 — carried over
+
+- Diff check: `git diff bfe412cc..6b8cf5e2` has only the long-session UI-flow line. The short-session, table and dependency/branch UI-flow lines at `spec.md:39-41` are unchanged, as are their runtime guidance, examples and focused tests. Their prior `partly` verdicts and live-rendering limitations remain.
