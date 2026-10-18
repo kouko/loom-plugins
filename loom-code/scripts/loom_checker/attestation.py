@@ -15,6 +15,7 @@ from loom_checker.reviewers import outside_verdict_failure
 from loom_checker.reviewers import selected_outside_family
 from pathlib import Path
 import hashlib
+import posixpath
 
 
 ATTESTATION_SCHEMA_V1 = "loom-attestation/v1"
@@ -30,6 +31,19 @@ KEYS_BY_SCHEMA = {ATTESTATION_SCHEMA_V1: ATTESTATION_KEYS_V1, ATTESTATION_SCHEMA
 
 def _command_digest(command: str) -> str:
     return hashlib.sha256(command.encode("utf-8")).hexdigest()
+
+
+ARTIFACT_PATH_FORM = "adversarial artifact must be a plain repository path (no `./`, `..` or `//`)"
+
+
+def artifact_path_form_failure(artifact: str) -> str | None:
+    """Refuse an artifact path whose spelling could leave the change's store:
+    `git cat-file` normalises `./a/../b`, so a store `startswith` check alone
+    would accept a path that resolves outside it."""
+    if (artifact.startswith(("./", "../")) or ".." in artifact.split("/")
+            or posixpath.normpath(artifact) != artifact):
+        return ARTIFACT_PATH_FORM
+    return None
 
 
 def adversarial_route(command: str, artifact: str, repo: Path) -> tuple[str, Row | None]:
@@ -142,6 +156,9 @@ def validate_attestation(
             artifact = execution.get("artifact")
             if not isinstance(artifact, str) or not artifact.strip():
                 return [(rule, "adversarial execution names no artifact")]
+            path_failure = artifact_path_form_failure(artifact)
+            if path_failure:
+                return [(rule, path_failure)]
             route, row = adversarial_route(command, artifact, repo)
             if route == "unnamed":
                 return [(rule, "adversarial command does not name its artifact")]

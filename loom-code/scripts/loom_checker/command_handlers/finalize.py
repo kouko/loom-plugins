@@ -3,6 +3,7 @@ from __future__ import annotations
 from loom_checker.attestation import ATTESTATION_SCHEMA
 from loom_checker.attestation import _command_digest
 from loom_checker.attestation import adversarial_route
+from loom_checker.attestation import artifact_path_form_failure
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
@@ -227,6 +228,9 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         artifact = str(item.get("artifact", "")).strip()
         if not command or not artifact:
             return [("finalize.adversarial", "adversarial input needs command and artifact")]
+        path_failure = artifact_path_form_failure(artifact)
+        if path_failure:
+            return [("finalize.adversarial", path_failure)]
         route, row = adversarial_route(command, artifact, repo)
         if route == "unnamed":
             return [("finalize.adversarial", "command must name its artifact argument")]
