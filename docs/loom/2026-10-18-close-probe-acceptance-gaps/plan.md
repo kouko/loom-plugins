@@ -49,6 +49,7 @@ charter: 1.1
 ① — what — 要怎麼處理這些剩下的問題？（答：先合併，再開新變更 (Recommended)）
 ① — what — 覆述的需求對嗎？（答：對）
 ① — what — 要改用 B 嗎？（答：Ｂ）
+① — consequence — `python3 檔案.py` 直接執行只定義 test 函式的找漏洞測試會被當成通過，這次要一起修，還是另開一個變更？（答：這次一起修 (Recommended)；asked during Build after the adversary's finding, user-decided scope widening）
 
 ## Risks
 1. A conftest hook that drops items without reporting them as deselected stays invisible to the summary check; intent Out of scope covers deliberate forgery only, so this is a disclosed residual.
