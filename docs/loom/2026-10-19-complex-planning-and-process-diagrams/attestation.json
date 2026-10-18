@@ -1,0 +1,78 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-19-complex-planning-and-process-diagrams",
+  "content_digest": "0932274749bc5e398f5a08f322d7d16ad32b7cfe",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/loom-visualization/test_templates.py",
+      "artifact": "loom-workflow/tests/loom-visualization/test_templates.py",
+      "result": "pass",
+      "command_digest": "b61e23622efe78f151ebc419f9b92203edf941c36a28274f225e5d57cb555470"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "complex-code-reviewer",
+      "vendor": "openai",
+      "model": "inherited-host-profile",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "ba092534c7424f304b2250271f0bf701d6e2b5fa",
+      "review_target_sha": "1a175d482249a3d236b51e31a73afe749731b078",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous finding fixed: the cross-role test now checks each Mermaid owner and both labeled handoffs.",
+        "Changed test files passed: 21 template tests and 25 ASCII CLI tests.",
+        "The new alignment checks reject the recorded displaced join and handoff while accepting corrected examples."
+      ]
+    },
+    {
+      "reviewer": "complex-skill-reviewer",
+      "vendor": "openai",
+      "model": "inherited-host-profile",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "ba092534c7424f304b2250271f0bf701d6e2b5fa",
+      "review_target_sha": "1a175d482249a3d236b51e31a73afe749731b078",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "fixed: The ASCII test now includes both new unboxed diagrams, and the acceptance evidence accurately identifies the initial coverage gap and subsequent reruns.",
+        "The focused template and command-line checks passed. The command-line checker rejects the reproduced misaligned join and handoff while accepting their corrected forms.",
+        "Actual Mermaid rendering remains unverified and is disclosed as a limitation in the acceptance report."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
