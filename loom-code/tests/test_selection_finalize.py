@@ -426,7 +426,8 @@ def test_runnerless_pytest_suite_finalizes_a_collected_probe(
     commit_all(repo, "graduate into direct pytest suite")
 
     result = finalize(repo, review_input(tmp_path, PASSING, [
-        {"command": "python3 -m pytest -q tests/test_graduated_probe.py",
+        # -v offsets the two configured -q, so pytest still prints its summary.
+        {"command": "python3 -m pytest -v tests/test_graduated_probe.py",
          "artifact": "tests/test_graduated_probe.py"},
     ]))
 
@@ -461,7 +462,7 @@ def test_conda_pytest_suite_accepts_execution_and_refuses_noop(tmp_path: Path) -
     assert "BLOCK finalize.adversarial" in refused.stderr
 
     accepted = finalize(repo, review_input(tmp_path, PASSING, [{
-        "command": f"conda run -n loom-test python3 -m pytest -q {artifact}",
+        "command": f"conda run -n loom-test python3 -m pytest {artifact}",
         "artifact": artifact,
     }]), env)
     assert accepted.returncode == 0, accepted.stderr

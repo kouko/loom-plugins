@@ -586,6 +586,23 @@ def _conda_pytest_argv(tokens: list[str]) -> bool:
 CARGO_TEST_FLAGS = frozenset({"--release", "-q", "--quiet"})
 
 
+def _python_argv(tokens: list[str]) -> list[str]:
+    """The python argv a conda-run pytest or `uv run` command wraps."""
+    if _conda_pytest_argv(tokens):
+        tokens = tokens[4:]
+    # `uv run [opts] python ...` is checked as the python argv it wraps.
+    if tokens[:2] == ["uv", "run"]:
+        tokens = next((tokens[i:] for i in range(2, len(tokens))
+                       if Path(tokens[i]).name.startswith("python")), [""])
+    return tokens
+
+
+def runs_pytest(command: str) -> bool:
+    """True when argv is a (wrapped) `python -m pytest` command."""
+    tokens = _python_argv(argv_for(command))
+    return Path(tokens[0]).name.startswith("python") and tokens[1:3] == ["-m", "pytest"]
+
+
 def command_executes_artifact(command: str, artifact: str) -> bool:
     """True when argv directly executes the named Python, shell, or
     executable file. Other runners' rows live in `probe_results`."""
@@ -593,17 +610,15 @@ def command_executes_artifact(command: str, artifact: str) -> bool:
     wanted = os.path.normpath(artifact)
     suffix = Path(artifact).suffix.lower()
     if suffix == ".py":
-        if _conda_pytest_argv(tokens):
-            tokens = tokens[4:]
-        # `uv run [opts] python ...` is checked as the python argv it wraps.
-        if tokens[:2] == ["uv", "run"]:
-            tokens = next((tokens[i:] for i in range(2, len(tokens))
-                           if Path(tokens[i]).name.startswith("python")), [""])
+        tokens = _python_argv(tokens)
         args = tokens[1:]
         # `python -m pytest ... X ...`: every option, in any position, must be
-        # on the allowlist, and the first positional argument must be X.
+        # on the allowlist, and X must be the sole positional argument, so no
+        # other file runs in the probe's place.
         if args[:2] == ["-m", "pytest"]:
             args = pytest_positionals(args[2:]) or []
+            if len(args) != 1:
+                return False
         return (Path(tokens[0]).name.startswith("python") and bool(args)
                 and os.path.normpath(args[0]) == wanted)
     if suffix == ".sh":

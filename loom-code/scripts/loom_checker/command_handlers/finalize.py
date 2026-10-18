@@ -21,6 +21,7 @@ from loom_checker.probes import check_adversarial_proportionate
 from loom_checker.probes import declared_test_command
 from loom_checker.probes import missing_adversarial_execution
 from loom_checker.probes import probe_directory
+from loom_checker.probes import runs_pytest
 from loom_checker.probes import suite_collection
 from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import committed_branch_delta
@@ -61,6 +62,36 @@ def _quotes_whole_lines(quote: str, output: str, stem: str) -> bool:
     lines = [_without_durations(line.strip()) for line in output.splitlines()]
     return any(lines[start:start + len(wanted)] == wanted
                for start in range(len(lines) - len(wanted) + 1))
+
+
+_ANSI = re.compile(r"\x1b\[[0-9;]*m")
+_PYTEST_SUMMARY = re.compile(
+    r"^=*\s*((?:\d+ \w+)(?:, \d+ \w+)*) in \d+(?:\.\d+)?s\b.*$"
+)
+
+
+def _pytest_summary_failure(command: str, output: str) -> str | None:
+    """Why a pytest probe that exited 0 is not shown to have run its own
+    tests, read from pytest's final summary line (`2 passed, 1 deselected in
+    0.01s`): a deselecting filter (argv, config or plugin), no passed test, or
+    no summary line at all -- an unreadable run is refused, never attested."""
+    lines = [_ANSI.sub("", line).strip() for line in output.splitlines()]
+    summary = next((match for line in reversed(lines)
+                    if (match := _PYTEST_SUMMARY.match(line))), None)
+    if summary is None:
+        return (f"`{command}` exited 0, but its output has no pytest summary line "
+                f"(such as `1 passed in 0.01s`), so loom cannot tell that the probe's "
+                f"tests ran; drop `-qq` or any option that hides the summary")
+    counts = {word: int(number) for number, word in
+              (part.split(" ", 1) for part in summary.group(1).split(", "))}
+    if counts.get("deselected", 0):
+        return (f"`{command}` exited 0, but pytest deselected {counts['deselected']} "
+                f"test(s) (`{summary.group(1)}`); a filter from the command, config or a "
+                f"plugin kept the probe's own tests from running")
+    if not counts.get("passed", 0):
+        return (f"`{command}` exited 0, but its pytest summary (`{summary.group(1)}`) "
+                f"shows no passed test")
+    return None
 
 
 def _runner_evidence(
@@ -263,6 +294,10 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             if failure:
                 return [("finalize.adversarial", f"{failure}{suffix}")]
             execution.update(evidence)
+        elif kind == "adversarial" and runs_pytest(command):
+            failure = _pytest_summary_failure(command, output)
+            if failure:
+                return [("finalize.adversarial", f"{failure}{suffix}")]
         executions.append(execution)
 
     if git_text(repo, "rev-parse", "HEAD") != head_sha:
