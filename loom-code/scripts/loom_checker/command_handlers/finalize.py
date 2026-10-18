@@ -20,6 +20,7 @@ from loom_checker.probes import PROBE_RUN_TIMEOUT
 from loom_checker.probes import argv_for
 from loom_checker.probes import check_adversarial_proportionate
 from loom_checker.probes import declared_test_command
+from loom_checker.probes import direct_pytest_style_failure
 from loom_checker.probes import missing_adversarial_execution
 from loom_checker.probes import probe_directory
 from loom_checker.probes import runs_pytest
@@ -318,6 +319,13 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     )
     if proportionate:
         return proportionate
+    # finalize only: attestations already written are not re-judged.
+    for kind, command, artifact, how in work:
+        if kind == "adversarial" and how["route"] == "direct":
+            source = git_maybe(repo, "show", f"{head_sha}:{artifact}") or ""
+            pytest_style = direct_pytest_style_failure(command, artifact, source)
+            if pytest_style:
+                return [("finalize.adversarial", pytest_style)]
 
     executions: list[dict] = []
     for kind, command, artifact, how in work:

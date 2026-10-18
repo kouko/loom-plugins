@@ -11,6 +11,7 @@ from loom_checker.reviewers import committed_branch_delta
 from pathlib import Path
 from typing import Iterable
 from repo_files import repository_files
+import ast
 import importlib.util
 import json
 import os
@@ -615,6 +616,28 @@ def runs_pytest(command: str) -> bool:
     """True when argv is a (wrapped) `python -m pytest` command."""
     tokens = _python_argv(argv_for(command))
     return Path(tokens[0]).name.startswith("python") and tokens[1:3] == ["-m", "pytest"]
+
+
+def direct_pytest_style_failure(command: str, artifact: str, source: str) -> str | None:
+    """Why a bare `python <artifact>` run of a pytest-style file proves
+    nothing, or None. Such a run imports the module and exits 0 without
+    calling a test, so a file whose top-level statements define a `test*`
+    function or a `Test*` class (pytest's default collection prefixes) must
+    run under `python -m pytest`; a file that does not parse is refused
+    rather than trusted."""
+    if Path(artifact).suffix.lower() != ".py" or runs_pytest(command):
+        return None
+    try:
+        body = ast.parse(source).body
+    except (SyntaxError, ValueError):
+        return f"{artifact} does not parse; record `python -m pytest {artifact}` for a test file"
+    if any((isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name.startswith("test"))
+           or (isinstance(node, ast.ClassDef) and node.name.startswith("Test"))
+           for node in body):
+        return (f"{artifact} defines pytest tests that a bare python run never calls; "
+                f"record `python -m pytest {artifact}`")
+    return None
 
 
 def command_executes_artifact(command: str, artifact: str) -> bool:

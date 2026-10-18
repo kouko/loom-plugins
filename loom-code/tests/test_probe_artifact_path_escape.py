@@ -35,9 +35,9 @@ def repo_with(tmp_path: Path, package: str, *paths: str) -> Path:
     return repo
 
 
-def run(repo: Path, tmp_path: Path, artifact: str):
+def run(repo: Path, tmp_path: Path, artifact: str, runner: str = "python3"):
     return finalize(repo, review_input(tmp_path, PASSING, [
-        {"command": f"python3 {artifact}", "artifact": artifact},
+        {"command": f"{runner} {artifact}", "artifact": artifact},
     ]))
 
 
@@ -54,9 +54,11 @@ def test_store_and_graduated_artifacts_accepted(tmp_path: Path, package: str,
             "# concern: a defect now covered on every change\n"
             "def test_graduated() -> None:\n    assert True\n", encoding="utf-8")
         commit_all(repo, "graduated probe")
+        runner = "python3 -m pytest"  # a test file is refused as a bare python run
     else:
         repo = repo_with(tmp_path, package, artifact)
-    result = run(repo, tmp_path, artifact)
+        runner = "python3"
+    result = run(repo, tmp_path, artifact, runner)
     assert result.returncode == 0, result.stderr
     assert validate(repo, written(repo)) == []
 

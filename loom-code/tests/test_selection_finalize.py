@@ -353,7 +353,7 @@ def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
 
     result = finalize(repo, review_input(
         tmp_path, PASSING,
-        [{"command": f"python3 {graduated}", "artifact": graduated}],
+        [{"command": f"python3 -m pytest {graduated}", "artifact": graduated}],
     ))
 
     assert result.returncode == 0, result.stderr
@@ -390,7 +390,7 @@ def test_runner_honors_configured_pytest_file_names_and_ignores(tmp_path: Path) 
     commit_all(repo, "graduate a configured pytest file")
     artifact = "tests/check_graduated_probe.py"
     input_path = review_input(tmp_path, PASSING, [
-        {"command": f"python3 {artifact}", "artifact": artifact},
+        {"command": f"python3 -m pytest {artifact}", "artifact": artifact},
     ])
 
     assert suite_collects(repo, artifact)
@@ -578,7 +578,7 @@ def test_a_graduated_program_spends_against_the_cap(tmp_path: Path) -> None:
 
     accepted = finalize(repo, review_input(
         tmp_path, PASSING,
-        [{"command": f"python3 {graduated[0]}", "artifact": graduated[0]}],
+        [{"command": f"python3 -m pytest {graduated[0]}", "artifact": graduated[0]}],
     ))
     assert accepted.returncode == 0, accepted.stderr
 

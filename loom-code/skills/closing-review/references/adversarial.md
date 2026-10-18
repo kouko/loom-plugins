@@ -142,6 +142,9 @@ same probe after graduation, named where the selected commit holds it.
 A pytest probe's command names only its artifact: `finalize-review` refuses a
 run whose pytest summary shows deselected tests, no passed test, or no
 summary at all (for example `-q` stacked with a config file's `-q` into `-qq`).
+A probe file that defines test functions or test classes must be recorded as
+`python -m pytest <artifact>`: `finalize-review` refuses a bare
+`python3 <artifact>` run of it, because that run calls none of its tests.
 
 For another runner, record the command in exactly one of these forms
 (`<A>` = the artifact; `[w]` = an optional `npx`, `npx --yes`, `pnpm exec`,
