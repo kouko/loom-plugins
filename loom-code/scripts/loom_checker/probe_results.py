@@ -41,6 +41,20 @@ class Row:
 
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
+ENV_ASSIGNMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=.*")
+
+
+def _env_stripped(argv: list[str]) -> list[str]:
+    """`argv` without a leading `env NAME=value...`; `[]` when no command
+    follows. Any `env` option keeps the argv whole, so no row claims it."""
+    if not argv or Path(argv[0]).name != "env":
+        return argv
+    index = 1
+    while index < len(argv) and ENV_ASSIGNMENT.fullmatch(argv[index]):
+        index += 1
+    if index < len(argv) and argv[index].startswith("-"):
+        return argv
+    return argv[index:]
 
 
 def _named(argv: list[str]) -> list[str]:
@@ -287,7 +301,8 @@ def _unittest_passed(output: str, artifact: str) -> int | None:
 
 # JSON reports (jest, vitest, mocha, rspec) -------------------------------------
 
-JS_LAUNCHERS = (("npx",), ("pnpm", "exec"), ("yarn",))
+# Longer prefixes first: the first launcher an argv starts with is stripped.
+JS_LAUNCHERS = (("npx", "--yes"), ("npx",), ("pnpm", "exec"), ("pnpm",), ("yarn",))
 RUBY_LAUNCHERS = (("bundle", "exec"),)
 
 
@@ -562,20 +577,28 @@ def _nextest_passed(output: str, artifact: str) -> int | None:
     return int(summary[-1]) if summary else None
 
 
+def _row(name: str, claims: Callable[[list[str]], bool],
+         accepts: Callable[[list[str], str, Path | None], bool],
+         passed: Callable[[str, str], int | None]) -> Row:
+    """A row that sees every argv without its `env NAME=value...` prefix."""
+    return Row(name, lambda argv: claims(_env_stripped(argv)),
+               lambda argv, artifact, repo=None: accepts(_env_stripped(argv), artifact, repo), passed)
+
+
 ROWS: tuple[Row, ...] = (
-    Row("go", _go_claims, _go_accepts, _go_passed),
-    Row("unittest", _unittest_claims, _unittest_accepts, _unittest_passed),
-    Row("node", _node_claims, _node_accepts, _node_passed),
-    Row("deno", _deno_claims, _deno_accepts, _deno_passed),
-    Row("bun", _bun_claims, _bun_accepts, _bun_passed),
-    Row("jest", _jest_claims, _jest_accepts, _jest_passed),
-    Row("vitest", _vitest_claims, _vitest_accepts, _jest_passed),
-    Row("mocha", _mocha_claims, _mocha_accepts, _mocha_passed),
-    Row("cargo test", _cargo_claims, _cargo_accepts, _cargo_passed),
-    Row("nextest", _nextest_claims, _nextest_accepts, _nextest_passed),
-    Row("rspec", _rspec_claims, _rspec_accepts, _rspec_passed),
-    Row("minitest", _minitest_claims, _minitest_accepts, _minitest_passed),
-    Row("phpunit", _phpunit_claims, _phpunit_accepts, _phpunit_passed),
+    _row("go", _go_claims, _go_accepts, _go_passed),
+    _row("unittest", _unittest_claims, _unittest_accepts, _unittest_passed),
+    _row("node", _node_claims, _node_accepts, _node_passed),
+    _row("deno", _deno_claims, _deno_accepts, _deno_passed),
+    _row("bun", _bun_claims, _bun_accepts, _bun_passed),
+    _row("jest", _jest_claims, _jest_accepts, _jest_passed),
+    _row("vitest", _vitest_claims, _vitest_accepts, _jest_passed),
+    _row("mocha", _mocha_claims, _mocha_accepts, _mocha_passed),
+    _row("cargo test", _cargo_claims, _cargo_accepts, _cargo_passed),
+    _row("nextest", _nextest_claims, _nextest_accepts, _nextest_passed),
+    _row("rspec", _rspec_claims, _rspec_accepts, _rspec_passed),
+    _row("minitest", _minitest_claims, _minitest_accepts, _minitest_passed),
+    _row("phpunit", _phpunit_claims, _phpunit_accepts, _phpunit_passed),
 )
 
 

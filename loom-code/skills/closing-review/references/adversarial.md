@@ -139,12 +139,17 @@ and observed result in the generated attestation:
 
 The first entry is a probe still in this change's store; the second is the
 same probe after graduation, named where the selected commit holds it.
+A pytest probe's command names only its artifact: `finalize-review` refuses a
+run whose pytest summary shows deselected tests, no passed test, or no
+summary at all (for example `-q` stacked with a config file's `-q` into `-qq`).
 
 For another runner, record the command in exactly one of these forms
-(`<A>` = the artifact; `[w]` = an optional `npx`, `pnpm exec` or `yarn`
-launcher, or `bundle exec` for rspec and minitest; a runner or launcher is
-recognised by its file name, so a full path such as `/opt/homebrew/bin/go`
-counts as `go`):
+(`<A>` = the artifact; `[w]` = an optional `npx`, `npx --yes`, `pnpm exec`,
+`pnpm` or `yarn` launcher, or `bundle exec` for rspec and minitest; a runner
+or launcher is recognised by its file name, so a full path such as
+`/opt/homebrew/bin/go` counts as `go`; any form may start with
+`env NAME=value...`, while an `env` option such as `env -i` makes the command
+one no row claims, so it needs a reviewer confirmation):
 
 | Runner | Accepted command |
 |---|---|
@@ -161,6 +166,7 @@ counts as `go`):
 | rspec | `[w] rspec --format json <A>` |
 | minitest | `[w] ruby [-I<dir>]... <A>`, `<A>` named `*_test.rb` or `test_*.rb` |
 | phpunit | `phpunit <A>` (any path to `phpunit`, such as `vendor/bin/phpunit`) |
+| any of the above | `env NAME=value... <form>`, only `NAME=value` tokens between `env` and the form |
 
 Every runner except cargo test and nextest runs the probe from the change's
 store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs`

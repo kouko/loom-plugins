@@ -615,6 +615,31 @@ def test_js_ruby_php_rust_passing_accepted(command: str, artifact: str, output: 
 
 
 @pytest.mark.parametrize(("command", "artifact", "output"), [
+    (f"env go test -json {GO}", GO, GO_PASS),
+    (f"env A=1 B=2 go test -json {GO}", GO, GO_PASS),
+    (f"npx --yes jest --json --runTestsByPath {JS}", JS, JEST_PASS),
+    (f"env CI=1 pnpm jest --json --runTestsByPath {JS}", JS, JEST_PASS),
+])
+def test_env_go_npx_yes_pnpm_jest_parsed(command: str, artifact: str, output: str) -> None:
+    """A leading `env NAME=value...` and the `npx --yes` / bare `pnpm`
+    launchers reach the row the bare runner would."""
+    assert row_for(command, artifact).passed(output, artifact) == 1
+
+
+@pytest.mark.parametrize("command", [
+    f"env -i go test -json {GO}",
+    f"env -u HOME A=1 go test -json {GO}",
+    "env",
+    "env A=1",
+    f"pnpm test {JS}",
+])
+def test_env_option_or_pnpm_script_name_refused_or_confirmed(command: str) -> None:
+    """An `env` option, an `env` with no command, or a pnpm script name is
+    claimed by no row: a reviewer confirms it."""
+    assert claiming_row(shlex.split(command)) is None, command
+
+
+@pytest.mark.parametrize(("command", "artifact", "output"), [
     (f"jest --json --runTestsByPath {JS}", JS, JEST_OTHER),
     (f"npx vitest run --reporter=json --outputFile=/dev/stdout {VITEST}", VITEST, VITEST_OTHER),
     (f"npx mocha --reporter json {JS}", JS, MOCHA_OTHER),
