@@ -1,5 +1,8 @@
 """Adversarial programs for `sync-trunk` rebasing a never-pushed branch.
 
+concern: a rebase that rewrites commits already on some remote, or replays
+history over a local ignored file and deletes or blocks on it.
+
 Graduated from the 2026-10-18-sync-trunk-rebase-before-push change store:
 a replayed history that trips over a now-ignored local file and a branch
 pushed only to a non-origin remote. The git without `--no-update-refs` case
