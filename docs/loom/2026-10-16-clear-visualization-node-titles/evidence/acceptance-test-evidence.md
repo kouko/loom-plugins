@@ -99,3 +99,21 @@ Tried on 2026-10-16 in a fresh local clone at `87fe724c` (`/private/tmp/loom-tit
   ```
 
   The complete package command is `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; it is reserved for `finalize-review` and was not run here.
+
+## Re-run on 2026-10-18, at `d5375adf`
+
+- Clean setup: `git clone --no-hardlinks --shared /Users/kouko/GitHub/loom-plugins /private/tmp/loom-title-acceptance-tree.UUoOVW/repo` created a fresh copy. `git rev-parse HEAD` returned `d5375adff3b785b27650dd7925949ed60b893f66`; `git status --short` was empty before testing. Following the README's local validation route, `agy plugin validate ./loom-workflow` returned `[ok] ./loom-workflow`, `skills: 13 processed`, and `hooks: 1 processed`. No product source was edited in the clone.
+- Fix diff checked: `git diff --stat 91be35a1..d5375adf` showed one file, `loom-workflow/skills/loom-visualization/references/node-structure.md`, with 19 insertions and 19 deletions. The exact diff distinguishes boxed ASCII nodes, whose title and body have a separator, from unboxed tree labels, whose body uses continuation lines. It also says the title/body content rule covers both forms, while box separators and left alignment apply only to boxed nodes. No diagram example, generator, parser, or test changed.
+- 1: re-tested — Read the complete structure, body-form, separator, content, width, scope, and Mermaid sections at `references/node-structure.md:6-61`. The title must identify an action, role, state, or claim on its own; body detail must not repeat the title, edge labels, or adjacent cells. Title-only nodes remain valid. For boxed nodes, a body has a separator and a title-only node does not; for unboxed trees, a body is a continuation line without a separator. Ran `printf '%s\n' '{"steps":["git pull",{"title":"Run test suites","body":["* unit tests","* integration tests"]}]}' | python3 loom-workflow/skills/loom-visualization/scripts/generate.py flow`; captured result included a `git pull` box without a separator and a `Run test suites` box with a separator and distinct unit/integration bullets. Ran `printf '%s\n' '{"node":{"label":"root","children":[{"label":{"title":"skills","body":["* reusable workflows"]},"children":[{"label":"handoff"}]},{"label":"hooks"}]}}' | python3 loom-workflow/skills/loom-visualization/scripts/generate.py tree`; captured output:
+
+  ```text
+  root
+  ├─ skills
+  │  * reusable workflows
+  │  └─ handoff
+  └─ hooks
+  ```
+
+  `hooks` is title-only, while `skills` has a distinct continuation body and no box separator, matching the revised guidance.
+- 2: re-tested — Read the complete Table, ASCII, Mermaid, and Common mistakes sections in all six edited templates: `02-linear-steps.md`, `03-branching-decision.md`, `04-reasoning-chain.md`, `05-state-lifecycle.md`, `07-hierarchy.md`, and `08-system-architecture.md`. Linear steps give the test action an independent title and list test types only in its body; branching questions and actions stand alone, with the one body naming the CI inspection source rather than repeating the yes/no edges; reasoning titles state a symptom, cause, or fix, with measurement and implementation detail below; lifecycle titles name states and bodies give actor abilities; hierarchy's unboxed `skills` title names the category, its body describes the role, and child nodes name members; architecture's layer body gives its input-validation role while the adjacent cells name components. No body merely restates its title or adjacent visible text. Ran `pytest -q -p no:cacheprovider loom-workflow/tests/loom-visualization/test_templates.py`; captured result: `17 passed in 0.28s`.
+- 3: carried over — The exact fix diff changed only prose in `node-structure.md`, clarifying the box/tree distinction. The six ASCII and Mermaid examples, documented JSON payloads, generators, parser, and tests are unchanged. The 2026-10-18 re-run at `d3ac19a7` recorded `6 passed` targeted alignment/generator tests, `6/6 mermaid blocks parsed`, and working plain-string and structured-node flow/tree CLI outputs; those results still apply to these unchanged surfaces. The template suite also passed again while testing line 2. The full package suite remains reserved for `finalize-review` and was not run here.
