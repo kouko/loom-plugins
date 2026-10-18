@@ -1,0 +1,71 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-16-recap-state-quick-orientation",
+  "content_digest": "19c04b48a97f085fa13beba464929732296f5ba6",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/recap-state/test_seven_block_schema.py -q",
+      "artifact": "loom-workflow/tests/recap-state/test_seven_block_schema.py",
+      "result": "pass",
+      "command_digest": "a542dc5061ce0f67f9533e29f9c60e8486138e631fd7a897200aadc1128cc6d9"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "recap-final-a",
+      "vendor": "openai",
+      "model": "host-inherited (GPT-6 family; exact profile unobserved)",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "96fad6f1d3bdc4feeec268a96041bd97fe152dd9",
+      "review_target_sha": "eddae038f9328de44f8b11b690f3eb561d296745",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS_WITH_NOTES",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Final fix verification: every section heading is framed; acceptance evidence matches Codex CLI outputs.",
+        "Raw CLI JSONL was retained in local test scratch, while the two final text outputs are embedded in committed evidence."
+      ]
+    },
+    {
+      "reviewer": "recap-final-b",
+      "vendor": "openai",
+      "model": "host-inherited (GPT-6 family; exact profile unobserved)",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "96fad6f1d3bdc4feeec268a96041bd97fe152dd9",
+      "review_target_sha": "eddae038f9328de44f8b11b690f3eb561d296745",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Final fix verification: every section heading is framed; acceptance evidence matches Codex CLI outputs.",
+        "Raw CLI JSONL was retained in local test scratch, while the two final text outputs are embedded in committed evidence."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
