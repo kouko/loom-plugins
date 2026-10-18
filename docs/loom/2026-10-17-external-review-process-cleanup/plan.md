@@ -19,7 +19,7 @@ charter: 1.1
 
 **W1-02 Release metadata patch bump**  after: W1-01  acceptance: 4
 - Files: `loom-code/plugin.json` (+ `.claude-plugin`, `.codex-plugin` copies), `loom-code/package.json`, `loom-code/CHANGELOG.md`, `README.md` (+ ja, zh-TW), `loom-code/README.md`, `loom-code/tests/test_write_plan_station_text.py`
-- Test: A4 positive: release-metadata-synchronized at 3.40.2; boundary: package-suite-passes.
+- Test: A4 positive: release-metadata-synchronized at 3.41.1; boundary: package-suite-passes.
 - Risk: agent-decided — patch bump (bug fix, no field, rule id or contract change); rewrite the version pin only where the synchronization test pins it.
 
 ## Simplicity check
