@@ -1,0 +1,30 @@
+# 外部審查步驟能準時結束、回報正確原因 — 我試了什麼、結果如何
+
+2026-10-18 在專案的乾淨副本（4f9faa9e）上試的。每條怎麼試、回來什麼：`docs/loom/2026-10-17-external-review-process-cleanup/evidence/acceptance-test-evidence.md`。
+
+## 你要的東西，逐條
+
+| # | 你要的 | 結果 | 發生了什麼 | 重跑 |
+|---|---|---|---|---|
+| 1 | 外部 CLI 在 Antigravity 列模型、probe 或 review 時，到了時限還在跑、且有子程序佔著輸出，這一步會在時限後不久結束、回報 timeout，且不留下任何程序 | works | 用會卡住的假 CLI 試了 Codex、Claude Code、Antigravity 三家的 probe 和 review，以及 Antigravity 列模型，共 8 種情況：每次都在時限後 0.1 秒內結束並回報 timeout，CLI 本身和它的子程序都被清掉了 | — |
+| 2 | 沒指定時限的 review 有 30 分鐘才會被判 timeout | works | 不加時限參數時，實際交給 review 的時限是 1800 秒（30 分鐘），改版前是 600 秒；設 1801 秒會被拒絕。沒有真的等滿 30 分鐘，因為協調方要求停掉 | — |
+| 3 | Codex 在回答列模型請求前就退出時，回報的原因寫明 Codex 失敗並附上它的 exit status，而不是「response missing」 | partly | 單獨列模型時正確回報「Codex 列模型失敗：exit 3」；但在一次 review 流程裡碰到同樣的情況，回報的仍是「unknown error」，看不出是 Codex 失敗，也沒有 exit status | — |
+| 4 | Codex、Claude Code、Antigravity 在 CLI 正常回應時，列模型、probe、review 都跟以前一樣，且完整 package suite 通過 | works | 三家用正常回應的假 CLI 都完整跑完並拿到 review 內容；真的 Codex 列模型也成功列出 7 個模型；外部審查相關的 127 個測試全過。完整 suite 由接受改動前必跑的自動測試執行，失敗就會擋下 | — |
+
+## 對你既有的資料做了什麼
+
+沒有 — 它只動了這次改動自己建立的檔案。
+
+## 我替你決定的事
+
+- **第 2 條沒有真的等 30 分鐘** — 協調方要求停掉實際等待，所以我改為記錄沒加參數時真正交給 review 的時限（1800 秒），並確認 1801 秒會被拒絕。沒有親眼看到第 30 分鐘時 timeout 觸發；但第 1 條已證明時限到了步驟就會準時結束。
+- **第 3 條判 partly 而不是 works** — 你的這條沒限定只在「單獨列模型」時成立，而 review 流程開頭也會送同一個列模型請求，那裡的回報還沒修。如果你本來就只指單獨列模型，這條可以算 works。
+- **卡住、提早退出的情況用假 CLI 模擬** — 依指示沒有對任何廠商送出真正的 probe 或 review，只做了一次真的 Codex 列模型。
+
+## 你要我跳過的步驟
+
+沒有 — 沒有跳過任何步驟。
+
+## 不確定你要不要的事
+
+- 第 3 條：review 流程中 Codex 提早退出時，也要回報「Codex 失敗＋exit status」嗎？（我認為要，目前沒做到）
