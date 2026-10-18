@@ -36,6 +36,11 @@ charter: 1.1
 - Test: A6 positive: full-package-suite-passes; negative: release-metadata-pin-catches-stale-version.
 - Risk: agent-decided — minor bump because station guidance (`adversarial.md`) and acceptance rules change; CHANGELOG entry, pin rewrite and README version strings are deliverables.
 
+**W2-02 Graduate the three red adversarial probes**  after: W2-01  acceptance: 1,4
+- Files: `loom-code/tests/test_probe_pytest_config_added_file.py`, `loom-code/tests/test_probe_cargo_declared_dir_main.py`, `loom-code/tests/test_probe_direct_python_pytest_file.py`, `docs/loom/2026-10-18-close-probe-acceptance-gaps/evidence/probes/`
+- Test: A1 positive: none-move-only; negative: config-added-file-pass-refused. A1 boundary: direct-python-test-only-file-refused. A4 positive: declared-no-path-dir-main-collected; negative: none-move-only.
+- Risk: agent-decided — all three probes caught defects (fixed in dd462efa, be8a0e57, 2ac8743b), so they move into the package suite unchanged apart from paths; the store copies are deleted.
+
 ## Simplicity check
 - Remove `-k`/`-m`/`--deselect` from the shared pytest allowlist — declined: misses config, plugin and conftest filters, and breaks suite commands that filter
 - Make pytest a parsed row with per-test output — declined: rewrites existing recorded pytest commands, breaking the unchanged-acceptance constraint
