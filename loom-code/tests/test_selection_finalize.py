@@ -353,7 +353,7 @@ def test_finalize_accepts_a_graduated_program_the_suite_already_runs(
 
     result = finalize(repo, review_input(
         tmp_path, PASSING,
-        [{"command": f"python3 {graduated}", "artifact": graduated}],
+        [{"command": f"python3 -m pytest {graduated}", "artifact": graduated}],
     ))
 
     assert result.returncode == 0, result.stderr
@@ -390,7 +390,7 @@ def test_runner_honors_configured_pytest_file_names_and_ignores(tmp_path: Path) 
     commit_all(repo, "graduate a configured pytest file")
     artifact = "tests/check_graduated_probe.py"
     input_path = review_input(tmp_path, PASSING, [
-        {"command": f"python3 {artifact}", "artifact": artifact},
+        {"command": f"python3 -m pytest {artifact}", "artifact": artifact},
     ])
 
     assert suite_collects(repo, artifact)
@@ -426,7 +426,8 @@ def test_runnerless_pytest_suite_finalizes_a_collected_probe(
     commit_all(repo, "graduate into direct pytest suite")
 
     result = finalize(repo, review_input(tmp_path, PASSING, [
-        {"command": "python3 -m pytest -q tests/test_graduated_probe.py",
+        # -v offsets the two configured -q, so pytest still prints its summary.
+        {"command": "python3 -m pytest -v tests/test_graduated_probe.py",
          "artifact": "tests/test_graduated_probe.py"},
     ]))
 
@@ -461,7 +462,7 @@ def test_conda_pytest_suite_accepts_execution_and_refuses_noop(tmp_path: Path) -
     assert "BLOCK finalize.adversarial" in refused.stderr
 
     accepted = finalize(repo, review_input(tmp_path, PASSING, [{
-        "command": f"conda run -n loom-test python3 -m pytest -q {artifact}",
+        "command": f"conda run -n loom-test python3 -m pytest {artifact}",
         "artifact": artifact,
     }]), env)
     assert accepted.returncode == 0, accepted.stderr
@@ -577,7 +578,7 @@ def test_a_graduated_program_spends_against_the_cap(tmp_path: Path) -> None:
 
     accepted = finalize(repo, review_input(
         tmp_path, PASSING,
-        [{"command": f"python3 {graduated[0]}", "artifact": graduated[0]}],
+        [{"command": f"python3 -m pytest {graduated[0]}", "artifact": graduated[0]}],
     ))
     assert accepted.returncode == 0, accepted.stderr
 

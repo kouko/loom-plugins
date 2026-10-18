@@ -131,20 +131,30 @@ executes each one and records the command, artifact, functional-content digest
 and observed result in the generated attestation:
 
 ```json
-{"command": "python3 -m pytest docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py -q",
+{"command": "python3 -m pytest docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py",
  "artifact": "docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py"}
-{"command": "python3 -m pytest tests/test_adversarial_empty_input.py -q",
+{"command": "python3 -m pytest tests/test_adversarial_empty_input.py",
  "artifact": "tests/test_adversarial_empty_input.py"}
 ```
 
 The first entry is a probe still in this change's store; the second is the
 same probe after graduation, named where the selected commit holds it.
+A pytest probe's command names only its artifact: `finalize-review` refuses a
+run whose pytest summary shows deselected tests, no passed test, or no
+summary at all (for example `-q` stacked with a config file's `-q` into `-qq`).
+A probe file that defines test functions or test classes must be recorded as
+`python -m pytest <artifact>`: `finalize-review` refuses a bare
+`python3 <artifact>` run of it, because that run calls none of its tests.
 
 For another runner, record the command in exactly one of these forms
-(`<A>` = the artifact; `[w]` = an optional `npx`, `pnpm exec` or `yarn`
-launcher, or `bundle exec` for rspec and minitest; a runner or launcher is
-recognised by its file name, so a full path such as `/opt/homebrew/bin/go`
-counts as `go`):
+(`<A>` = the artifact; `[w]` = an optional `npx`, `npx --yes`, `pnpm exec`,
+`pnpm` or `yarn` launcher, or `bundle exec` for rspec and minitest; a runner
+or launcher is recognised by its file name, so a full path such as
+`/opt/homebrew/bin/go` counts as `go`; any form may start with
+`env NAME=value...`, except that an assignment to a runner-configuration
+variable such as `GOFLAGS`, `NODE_OPTIONS` or `PYTEST_ADDOPTS` is refused,
+while an `env` option such as `env -i` makes the command one no row claims,
+so it needs a reviewer confirmation):
 
 | Runner | Accepted command |
 |---|---|
@@ -163,8 +173,9 @@ counts as `go`):
 | phpunit | `phpunit <A>` (any path to `phpunit`, such as `vendor/bin/phpunit`) |
 
 Every runner except cargo test and nextest runs the probe from the change's
-store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs`
-(or the `[[test]]` path Cargo.toml names) through a task of the change and is
+store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs` or `tests/<n>/main.rs`
+(or the `[[test]]` path Cargo.toml names; each `required-features` entry
+must be listed directly in `[features] default`) through a task of the change and is
 recorded at that path. Any option not shown, a test-name filter, or a
 claimed runner in another form is refused. Any other subcommand of go, deno,
 bun or cargo (such as `go vet`, `deno check`, `bun build` or `cargo build`)

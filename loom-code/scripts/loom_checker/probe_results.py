@@ -41,6 +41,42 @@ class Row:
 
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
+ENV_ASSIGNMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=.*")
+# Variables a runner reads as options or test filters. A denylist: a variable
+# it misses is a residual risk, bounded by the per-file result parsing.
+RUNNER_ENV = re.compile(
+    r"(?:GOFLAGS|NODE_OPTIONS|NODE_TEST_\w*|JEST_\w*|VITEST_\w*|MOCHA_\w*|BUN_\w*"
+    r"|DENO_\w*|CARGO_\w*|RUSTFLAGS|RUSTDOCFLAGS|NEXTEST_\w*|SPEC_OPTS|TESTOPTS"
+    r"|RUBYOPT|PHPUNIT_\w*|PYTEST_ADDOPTS)=.*")
+
+
+def _env_split(argv: list[str]) -> tuple[list[str], list[str]]:
+    """The `NAME=value` assignments of a leading `env` and the argv after
+    them; `[]` when no command follows. Any `env` option keeps the argv
+    whole, so no row claims it.
+
+    Relied on from POSIX `env`: `env [-i] [name=value]... [utility [argument...]]`,
+    so name=value operands come first and the next word is the utility:
+    https://pubs.opengroup.org/onlinepubs/9799919799/utilities/env.html"""
+    if not argv or Path(argv[0]).name != "env":
+        return [], argv
+    index = 1
+    while index < len(argv) and ENV_ASSIGNMENT.fullmatch(argv[index]):
+        index += 1
+    if index < len(argv) and argv[index].startswith("-"):
+        return [], argv
+    return argv[1:index], argv[index:]
+
+
+def _env_stripped(argv: list[str]) -> list[str]:
+    return _env_split(argv)[1]
+
+
+def _env_accepts(accepts: Callable[[list[str], str, Path | None], bool],
+                 argv: list[str], artifact: str, repo: Path | None) -> bool:
+    """`accepts` on the argv after `env`, refusing a runner-configuration assignment."""
+    assignments, rest = _env_split(argv)
+    return not any(RUNNER_ENV.fullmatch(arg) for arg in assignments) and accepts(rest, artifact, repo)
 
 
 def _named(argv: list[str]) -> list[str]:
@@ -287,7 +323,14 @@ def _unittest_passed(output: str, artifact: str) -> int | None:
 
 # JSON reports (jest, vitest, mocha, rspec) -------------------------------------
 
-JS_LAUNCHERS = (("npx",), ("pnpm", "exec"), ("yarn",))
+# Longer prefixes first: the first launcher an argv starts with is stripped.
+# Relied on: `npx --yes` answers the install prompt so npx runs the package
+# non-interactively (https://docs.npmjs.com/cli/v10/commands/npx); `pnpm exec`
+# runs a local binary (https://pnpm.io/cli/exec). Residual: bare `pnpm jest`
+# runs a package.json script named `jest` before a same-named bin, so such a
+# script can run something other than the jest binary
+# (https://pnpm.io/cli/run, https://pnpm.io/cli/exec).
+JS_LAUNCHERS = (("npx", "--yes"), ("npx",), ("pnpm", "exec"), ("pnpm",), ("yarn",))
 RUBY_LAUNCHERS = (("bundle", "exec"),)
 
 
@@ -508,7 +551,8 @@ def _cargo_target_name(args: list[str], flags: frozenset[str]) -> str | None:
 
 def _cargo_test_path(repo: Path | None, name: str) -> str | None:
     """The file `--test <name>` builds: the Cargo.toml `[[test]]` entry of
-    that name (named, or named by its path's stem), else `tests/<name>.rs`.
+    that name (named, or named by its path's stem) or the auto-discovered
+    `tests/<name>/main.rs`, else `tests/<name>.rs`.
     An explicit `--test` runs a `test = false` target too. None when the
     manifest cannot be read."""
     if repo is None:
@@ -562,20 +606,28 @@ def _nextest_passed(output: str, artifact: str) -> int | None:
     return int(summary[-1]) if summary else None
 
 
+def _row(name: str, claims: Callable[[list[str]], bool],
+         accepts: Callable[[list[str], str, Path | None], bool],
+         passed: Callable[[str, str], int | None]) -> Row:
+    """A row that sees every argv without its `env NAME=value...` prefix."""
+    return Row(name, lambda argv: claims(_env_stripped(argv)),
+               lambda argv, artifact, repo=None: _env_accepts(accepts, argv, artifact, repo), passed)
+
+
 ROWS: tuple[Row, ...] = (
-    Row("go", _go_claims, _go_accepts, _go_passed),
-    Row("unittest", _unittest_claims, _unittest_accepts, _unittest_passed),
-    Row("node", _node_claims, _node_accepts, _node_passed),
-    Row("deno", _deno_claims, _deno_accepts, _deno_passed),
-    Row("bun", _bun_claims, _bun_accepts, _bun_passed),
-    Row("jest", _jest_claims, _jest_accepts, _jest_passed),
-    Row("vitest", _vitest_claims, _vitest_accepts, _jest_passed),
-    Row("mocha", _mocha_claims, _mocha_accepts, _mocha_passed),
-    Row("cargo test", _cargo_claims, _cargo_accepts, _cargo_passed),
-    Row("nextest", _nextest_claims, _nextest_accepts, _nextest_passed),
-    Row("rspec", _rspec_claims, _rspec_accepts, _rspec_passed),
-    Row("minitest", _minitest_claims, _minitest_accepts, _minitest_passed),
-    Row("phpunit", _phpunit_claims, _phpunit_accepts, _phpunit_passed),
+    _row("go", _go_claims, _go_accepts, _go_passed),
+    _row("unittest", _unittest_claims, _unittest_accepts, _unittest_passed),
+    _row("node", _node_claims, _node_accepts, _node_passed),
+    _row("deno", _deno_claims, _deno_accepts, _deno_passed),
+    _row("bun", _bun_claims, _bun_accepts, _bun_passed),
+    _row("jest", _jest_claims, _jest_accepts, _jest_passed),
+    _row("vitest", _vitest_claims, _vitest_accepts, _jest_passed),
+    _row("mocha", _mocha_claims, _mocha_accepts, _mocha_passed),
+    _row("cargo test", _cargo_claims, _cargo_accepts, _cargo_passed),
+    _row("nextest", _nextest_claims, _nextest_accepts, _nextest_passed),
+    _row("rspec", _rspec_claims, _rspec_accepts, _rspec_passed),
+    _row("minitest", _minitest_claims, _minitest_accepts, _minitest_passed),
+    _row("phpunit", _phpunit_claims, _phpunit_accepts, _phpunit_passed),
 )
 
 

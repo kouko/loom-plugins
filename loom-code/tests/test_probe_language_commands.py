@@ -49,9 +49,12 @@ path = "probes/mapped.rs"
 
 @pytest.fixture(scope="module")
 def repo(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    """A repository root whose Cargo.toml maps `--test mapped` to a non-default path."""
+    """A repository root whose Cargo.toml maps `--test mapped` to a non-default
+    path, with an auto-discovered `tests/dir/main.rs` target named `dir`."""
     root = tmp_path_factory.mktemp("repo")
     (root / "Cargo.toml").write_text(CARGO_TOML, encoding="utf-8")
+    (root / "tests/dir").mkdir(parents=True)
+    (root / "tests/dir/main.rs").write_text("#[test]\nfn t() {}\n", encoding="utf-8")
     return root
 
 GO_PASS = """\
@@ -607,11 +610,49 @@ def test_node_deno_bun_unittest_passing_accepted(command: str, artifact: str, ou
     ("cargo test --test attack", RUST, CARGO_PASS),
     ("cargo test --release -q --test=attack", RUST, CARGO_QUIET_PASS),
     ("cargo test --test mapped", RUST_MAPPED, CARGO_PASS),
+    ("cargo test --test dir", "tests/dir/main.rs", CARGO_PASS),
     ("cargo nextest run --release --no-tests=fail --test attack", RUST, NEXTEST_PASS),
     ("cargo nextest run --no-tests fail --test mapped", RUST_MAPPED, NEXTEST_PASS),
 ])
 def test_js_ruby_php_rust_passing_accepted(command: str, artifact: str, output: str, repo: Path) -> None:
     assert row_for(command, artifact, repo).passed(output, artifact) == 1
+
+
+@pytest.mark.parametrize(("command", "artifact", "output"), [
+    (f"env go test -json {GO}", GO, GO_PASS),
+    (f"env A=1 B=2 go test -json {GO}", GO, GO_PASS),
+    (f"npx --yes jest --json --runTestsByPath {JS}", JS, JEST_PASS),
+    (f"env CI=1 pnpm jest --json --runTestsByPath {JS}", JS, JEST_PASS),
+])
+def test_env_go_npx_yes_pnpm_jest_parsed(command: str, artifact: str, output: str) -> None:
+    """A leading `env NAME=value...` and the `npx --yes` / bare `pnpm`
+    launchers reach the row the bare runner would."""
+    assert row_for(command, artifact).passed(output, artifact) == 1
+
+
+@pytest.mark.parametrize("command", [
+    f"env -i go test -json {GO}",
+    f"env -u HOME A=1 go test -json {GO}",
+    "env",
+    "env A=1",
+    f"pnpm test {JS}",
+])
+def test_env_option_or_pnpm_script_name_refused_or_confirmed(command: str) -> None:
+    """An `env` option, an `env` with no command, or a pnpm script name is
+    claimed by no row: a reviewer confirms it."""
+    assert claiming_row(shlex.split(command)) is None, command
+
+
+@pytest.mark.parametrize(("command", "artifact"), [
+    (f"env GOFLAGS=-run=X go test -json {GO}", GO),
+    (f"env CI=1 NODE_OPTIONS=--test-name-pattern=x node --test --test-reporter=junit {NODE}", NODE),
+])
+def test_env_runner_configuration_variable_refused(command: str, artifact: str) -> None:
+    """A runner-configuration assignment can filter what the form refuses:
+    claimed by the row, and refused."""
+    argv = shlex.split(command)
+    row = claiming_row(argv)
+    assert row is not None and not row.accepts(argv, artifact), command
 
 
 @pytest.mark.parametrize(("command", "artifact", "output"), [
