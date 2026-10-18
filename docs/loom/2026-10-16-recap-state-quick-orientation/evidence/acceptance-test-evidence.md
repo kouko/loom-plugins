@@ -181,3 +181,56 @@ The re-run used a new clean clone at `/private/tmp/recap-state-acceptance-46794e
 
 - The new decision tree visibly forks between original payment week and actual refund week, each with a different calculation action. The flowchart shows ordered steps, and the argument and decision-context examples express other relationships. All four diagrams passed the width-aware alignment check. This gives partial evidence for the graph flow; no live agent selected or rendered a diagram, so full behavior remains unverified.
 - Anchors: `loom-workflow/skills/recap-state/references/seven-block-schema.md:200-250`.
+
+## Re-run on 2026-10-18, at fdf5738b
+
+This re-run used a fresh local clone at `/private/tmp/recap-state-acceptance-fdf5738b`, made with `git clone --no-hardlinks --quiet . /private/tmp/recap-state-acceptance-fdf5738b`. Before probe setup, `git rev-parse HEAD` returned `fdf5738bdde7930babace10525e10fc46ac061ba` and `git status --short` was empty. The source range was `e4e8c626..fdf5738b`; the relevant edits change historical-decision provenance and diagram eligibility in the active skill/reference, plus the conditional final question in all three skill-local READMEs. A merge also brought unrelated loom-code work from main. The previous Codex CLI dogfood at `e4e8c626` is historical evidence only and is **not** used to verify this fixed source.
+
+### Clean-copy setup and focused checks
+
+- README setup: `README.md:174-230` documents installation and local plugin validation; `README.md:272-283` gives the package suite command. A global install would change the user's installed plugin, so the local validator was used for setup. Command: `agy plugin validate ./loom-workflow`. Output: `[ok] ./loom-workflow`; `skills: 13 processed`; `hooks: 1 processed`.
+- Focused command: `pytest -q loom-workflow/tests/recap-state/test_skill_md.py loom-workflow/tests/recap-state/test_seven_block_schema.py loom-workflow/tests/recap-state/test_readmes.py loom-workflow/tests/scripts/test_recap_state_compaction.py`. Output: `20 passed in 0.17s`.
+- Alignment check: a Python reader extracted all eight fenced text blocks from `loom-workflow/skills/recap-state/references/seven-block-schema.md` and passed each to `python3 loom-workflow/skills/loom-visualization/scripts/align.py -`; each exited 0 with `✓ no drift`. This includes four section-heading frames and four diagrams. The complete worked recap has three fullwidth-space-only separator lines and the situation sentence immediately before its table.
+- The package suite was not run by this witness. Its README command is `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. `finalize-review` will execute that suite as an automated check before acceptance and block the change if it fails; no suite result is claimed here.
+- Codex-only behavior setup: copied the current `recap-state` and `loom-visualization` skill folders into the clone's `.agents/skills/`. SHA-256 showed the copied recap `SKILL.md` and reference matched the source (`f1468372...` and `72b99c97...`). The copy was untracked probe setup, made only after the clean-clone check.
+- Attempted read-only natural-language probe: `command codex exec -C /private/tmp/recap-state-acceptance-fdf5738b --ephemeral --json -s read-only '我跟丟了，幫我回顧目前進度。'`. The sandbox returned `failed to initialize in-process app-server client: Operation not permitted (os error 1)` before any model output. A host escalation request for the same read-only command was rejected by automatic approval review because private repository content might be sent to an external model service without specific authorization; the rejection explicitly forbade a workaround. The explicit `$recap-state` probe was therefore not attempted. No current-HEAD model output, rendered client view, or post-question pause exists. The redirected natural-language JSONL file is empty.
+
+### Acceptance 1 — re-tested
+
+- Checked both branches of `SKILL.md:21-40` and `references/seven-block-schema.md:14-27`: grounded purpose leads to position and proposed next step; unknown purpose is labeled and leads only to a purpose question. The complete example at reference `:118-195` still covers the grounded branch. All three local READMEs now describe both branches (`README.md:17-43`, `README.ja.md:18-41`, `README.zh-TW.md:15-38`). The four-module focused command passed. No long-session output from the fixed version was obtained.
+
+### Acceptance 2 — re-tested
+
+- `SKILL.md:21-28` and reference `:14-22` now require an identifiable user turn or prior action before calling something a historical decision, and exclude this recap's formatting choices. The worked example at reference `:118-195` still shows the fictional order-total choice, rejected alternative, completed imports and reconciliation, refund gap and next action. `test_skill_requires_source_for_past_decisions`, `test_past_decisions_require_identifiable_conversation_evidence`, and the worked-example test passed in the focused command. Whether a live recap obeys the provenance rule remains unobserved.
+
+### Acceptance 3 — re-tested
+
+- Reference `:29-48` and `:73-81` now admit useful rationale, evidence and sequence diagrams as well as dependency, branch and merge relationships, while excluding flat status decoration. The worked recap has one decision-context diagram; the other three are separate alternatives (`:198-251`). All eight framed text blocks passed `align.py`; there are three separator lines and a brief table preface. The focused tests, including `test_diagram_rule_covers_meaningful_reasoning_without_status_decoration`, passed. Chat rendering and autonomous format choice remain unverified.
+
+### Acceptance 4 — re-tested
+
+- The new source-check rule at `SKILL.md:24-27` and reference `:18-22` addresses unsupported past decisions. The existing exact-quotation and fact/assumption/unknown rules remain at `SKILL.md:31-47` and reference `:44-47`, `:91-107`. The fictional example quotes the stated goal and labels the refund rule unknown. Focused tests passed; a live model's exact quoting and evidence classification were not observed.
+
+### Acceptance 5 — re-tested
+
+- `SKILL.md:35-40`, `:49-59` and reference `:23-36`, `:103-111` require the purpose-only question when purpose is unknown, otherwise a grounded next-step question, then a wait. Each updated local README now states these two branches in prose and in a two-wait-state flow (`README.md:17-43`, `:86-88`; `README.ja.md:18-41`, `:81-82`; `README.zh-TW.md:15-38`, `:77-78`). `test_tri_lang_readmes_keep_final_question_conditional` and routing tests passed. No live question or pause was observed.
+
+### Acceptance 6 — carried over
+
+- Diff check: `git diff e4e8c626..fdf5738b -- loom-workflow/skills/recap-state` changes only decision provenance, diagram permission and README question wording. `SKILL.md:53-59` and reference `:47-48` still set chat-only/no-file and handoff/built-in-recap boundaries; the README no-disk sentences are unchanged. Prior `partly` verdict remains because a live invocation's file effects were never observed.
+
+### UI flow 7, long conversation — re-tested
+
+- The complete example at reference `:118-195` still provides purpose, current position, a stated choice with tradeoff, completed work, remaining gap, unknown rule and one directed final question. The new provenance rule was checked against the whole flow. The worked-example and decision-source tests passed. No current-HEAD long-session model run was obtained.
+
+### UI flow 8, short conversation — re-tested
+
+- Reference `:23-27` still omits useless sections, while all three changed READMEs now give the unknown-purpose-only question and separate waiting branch. Focused README and schema tests passed. No current-HEAD short-session model run was obtained.
+
+### UI flow 9, table — re-tested
+
+- Reference `:38-43`, `:73-81` still prefers a table for comparison and a plain sentence before it, while excluding diagrams for flat status. The worked recap at `:166-180` has the preface directly before its table. Focused schema tests passed; live table selection and rendering remain unverified.
+
+### UI flow 10, dependency or branch — re-tested
+
+- Reference `:40-43`, `:73-81` includes genuine dependency and branch relationships, and `:219-251` shows a future decision branch and ordered process. All four diagram blocks passed `align.py`. No current-HEAD model selection or client rendering was observed.
