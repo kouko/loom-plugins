@@ -1,10 +1,12 @@
 """`sync-trunk`: bring the change branch up to date with the remote trunk
 before closing review dispatches reviewers (rule `review.sync`).
 
-The attestation digest covers the whole tree, so a merge after review
-invalidates it; this runs first. Merge only -- never rebase, never force --
-so pushed history is never rewritten, and a conflict is named, never
-resolved: detected in memory before the merge when git can, else aborted.
+The attestation digest covers the whole tree, so a sync after review
+invalidates it; this runs first. While the branch has never been pushed its
+own commits are rebased onto the trunk tip, keeping the history linear; once
+any of it is pushed (or that cannot be told) trunk is merged instead, so
+pushed history is never rewritten. Never force. A conflict is named, never
+resolved: detected in memory before the sync when git can, else aborted.
 """
 from __future__ import annotations
 
@@ -31,6 +33,9 @@ import sys
 # git status --porcelain -z --untracked-files=all --ignored: https://git-scm.com/docs/git-status
 # git symbolic-ref --quiet [--short], nonzero when not a symbolic ref: https://git-scm.com/docs/git-symbolic-ref
 # git rev-parse --verify --quiet <ref>^{commit}: https://git-scm.com/docs/git-rev-parse
+# git rebase --merge --no-autostash --no-autosquash --no-update-refs --no-rebase-merges / --abort: https://git-scm.com/docs/git-rebase
+# git ls-remote --heads <remote> <pattern> (tail match, so lines are compared exactly): https://git-scm.com/docs/git-ls-remote
+# git rev-list --count / --merges / --not --remotes=<remote>: https://git-scm.com/docs/git-rev-list
 
 
 RULE = "review.sync"
@@ -122,6 +127,23 @@ def _preflight_conflicts(git: str, repo: Path, tip: str) -> list[str] | None:
     return list(dict.fromkeys(path for path in stdout.split("\0")[1:] if path))
 
 
+def _count(git: str, repo: Path, *args: str) -> int | None:
+    code, stdout, _detail = _git(git, repo, "rev-list", "--count", *args)
+    return int(stdout.strip()) if code == 0 and stdout.strip().isdigit() else None
+
+
+def _may_rebase(git: str, repo: Path, branch: str, tip: str) -> bool:
+    """True only when the branch is provably unpushed and its own commits hold
+    no merge commit; every failed lookup answers False, so the caller merges."""
+    code, stdout, _detail = _git(git, repo, "ls-remote", "--heads", "origin", f"refs/heads/{branch}")
+    if code != 0 or any(line.endswith(f"\trefs/heads/{branch}") for line in stdout.splitlines()):
+        return False
+    own = _count(git, repo, f"{tip}..HEAD")
+    unpushed = _count(git, repo, "HEAD", "--not", tip, "--remotes=origin")
+    merges = _count(git, repo, "--merges", f"{tip}..HEAD")
+    return own is not None and own == unpushed and merges == 0
+
+
 def _block(err, *reasons: str) -> int:
     for reason in reasons:
         err.write(f"BLOCK {RULE}: {reason}\n")
@@ -204,15 +226,30 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         return _block(err, *reasons)
 
     # The fetched commit id, never the name `origin/<trunk>`: a local branch or
-    # tag of that name would shadow the remote-tracking ref. `--ff` overrides a
-    # user `merge.ff=only`; a merge commit or fast-forward never rewrites history.
-    code, _stdout, detail = _git(
-        git, repo, "merge", "--ff", "--no-edit", "-m", f"Merge origin/{trunk} into {branch}", tip,
-        timeout=SYNC_WRITE_TIMEOUT,
-    )
+    # tag of that name would shadow the remote-tracking ref.
+    rebase = _may_rebase(git, repo, branch, tip)
+    if rebase:
+        # Explicit flags override user rebase.* config (backend, autoStash,
+        # autoSquash, updateRefs, rebaseMerges); only unpushed commits move.
+        verb = "rebase"
+        code, _stdout, detail = _git(
+            git, repo, "rebase", "--merge", "--no-autostash", "--no-autosquash", "--no-update-refs",
+            "--no-rebase-merges", tip, timeout=SYNC_WRITE_TIMEOUT,
+        )
+    else:
+        # `--ff` overrides a user `merge.ff=only`; a merge commit or
+        # fast-forward never rewrites history.
+        verb = "merge"
+        code, _stdout, detail = _git(
+            git, repo, "merge", "--ff", "--no-edit", "-m", f"Merge origin/{trunk} into {branch}", tip,
+            timeout=SYNC_WRITE_TIMEOUT,
+        )
     if code == 0:
         new_head = _oid(git, repo, "HEAD")
-        out.write(f"sync-trunk: merged origin/{trunk} ({tip}) into {branch}; HEAD is now {new_head}.\n")
+        if rebase:
+            out.write(f"sync-trunk: rebased {branch} onto origin/{trunk} ({tip}); HEAD is now {new_head}.\n")
+        else:
+            out.write(f"sync-trunk: merged origin/{trunk} ({tip}) into {branch}; HEAD is now {new_head}.\n")
         out.write(
             "sync-trunk: content changed -- re-run the package suite and adversarial programs "
             "before dispatching reviewers.\n"
@@ -221,21 +258,25 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
 
     _code, unmerged, _detail = _git(git, repo, "diff", "--name-only", "--diff-filter=U", "-z")
     conflicts = [path for path in unmerged.split("\0") if path]
-    if _oid(git, repo, "MERGE_HEAD"):
+    if rebase:
+        # Abort unconditionally: a rebase that stopped early leaves state too.
+        _git(git, repo, "rebase", "--abort", timeout=SYNC_WRITE_TIMEOUT)
+    elif _oid(git, repo, "MERGE_HEAD"):
         _git(git, repo, "merge", "--abort", timeout=SYNC_WRITE_TIMEOUT)
     reasons = [f"conflict: {_show(path)}" for path in conflicts]
     if not conflicts:
-        reason = detail if code is None else _git_reason(detail, "merge failed")
-        reasons.append(f"merging origin/{trunk} failed without a conflict: {_show(reason)}")
+        reason = detail if code is None else _git_reason(detail, f"{verb} failed")
+        action = f"rebasing {branch} onto" if rebase else "merging"
+        reasons.append(f"{action} origin/{trunk} failed without a conflict: {_show(reason)}")
     after = _snapshot(git, repo)
     if _oid(git, repo, "HEAD") == head and before is not None and after == before:
-        restored = f"the merge was aborted; {branch} is back at {head} with a clean worktree."
+        restored = f"the {verb} was aborted; {branch} is back at {head} with a clean worktree."
         if conflicts:
             restored += " Conflicts are never resolved automatically -- resolve them in a new build round."
         reasons.append(restored)
     else:
         reasons.append(
-            f"the aborted merge did not restore {branch} to {head} with a clean worktree; "
+            f"the aborted {verb} did not restore {branch} to {head} with a clean worktree; "
             f"inspect {repo} by hand before anything else runs."
         )
     return _block(err, *reasons)
