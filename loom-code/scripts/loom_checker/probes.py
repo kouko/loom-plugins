@@ -217,11 +217,12 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
     """The root Cargo.toml's test targets as `(name, path, runs)`, or None
     and the reason when the manifest cannot be read. Each `[[test]]` entry is
     a target even under `autotests = false`; its `path` defaults to
-    `tests/<name>.rs` and its name to the path's stem:
+    `tests/<name>.rs`, or `tests/<name>/main.rs` when only that exists, and
+    its name to the path's stem:
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#test-targets
     An undeclared `tests/<name>.rs` or `tests/<name>/main.rs` is a target
     named `<name>` unless `[package] autotests = false`; a declared entry of
-    the same path replaces it:
+    the same path or the same name replaces it:
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#target-auto-discovery
     `runs` is whether plain `cargo test` runs it: not `test = false`, and
     every `required-features` entry listed directly in `[features] default`
@@ -251,6 +252,8 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
             path = os.path.normpath(path)
         elif isinstance(name, str):
             path = f"tests/{name}.rs"
+            if not (repo / path).is_file() and (repo / f"tests/{name}/main.rs").is_file():
+                path = f"tests/{name}/main.rs"
         else:
             continue
         name = name if isinstance(name, str) else Path(path).stem
@@ -259,11 +262,11 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
             isinstance(item, str) and item in default for item in required)
         targets.append((name, path, entry.get("test") is not False and enabled))
     if package.get("autotests") is not False:
-        known = {path for _name, path, _runs in targets}
+        known = {item for name, path, _runs in targets for item in (name, path)}
         found = [(file.stem, f"tests/{file.name}") for file in sorted((repo / "tests").glob("*.rs"))]
         found += [(file.parent.name, f"tests/{file.parent.name}/main.rs")
                   for file in sorted((repo / "tests").glob("*/main.rs"))]
-        targets += [(name, path, True) for name, path in found if path not in known]
+        targets += [(name, path, True) for name, path in found if name not in known and path not in known]
     return targets, ""
 
 
