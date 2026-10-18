@@ -6,7 +6,9 @@ invalidates it; this runs first. While the branch has never been pushed its
 own commits are rebased onto the trunk tip, keeping the history linear; once
 any of it is pushed to any remote, or the branch has a configured upstream or
 push remote (or that cannot be told), trunk is merged instead, so
-pushed history is never rewritten. A rebase that fails without a conflict is
+pushed history is never rewritten. A branch whose own commits touch an
+ignored or untracked local path also merges, so the replay cannot delete it.
+A rebase that fails without a conflict is
 aborted and, once the restore is verified, the merge is tried instead. Never
 force. A conflict is named, never resolved: detected in memory before the
 sync when git can, else aborted.
@@ -39,6 +41,7 @@ import sys
 # git rebase --merge --no-autostash --no-autosquash --no-update-refs --no-rebase-merges / --abort: https://git-scm.com/docs/git-rebase
 # git ls-remote --heads <remote> <pattern> (tail match, so lines are compared exactly): https://git-scm.com/docs/git-ls-remote
 # git rev-list --count / --merges / --not --remotes: https://git-scm.com/docs/git-rev-list
+# git log --format= --name-only -z --no-renames: https://git-scm.com/docs/git-log
 # git config --get, exit 1 when the key is unset: https://git-scm.com/docs/git-config
 
 
@@ -116,10 +119,29 @@ def _collisions(git: str, repo: Path, tip: str) -> tuple[list[str], str | None]:
     if code != 0:
         return [], detail
     incoming = [path for path in added.split("\0") if path]
+    return _overlap(local, incoming), None
+
+
+def _overlap(local: list[str], tracked: list[str]) -> list[str]:
+    """Local paths equal to, inside, or containing a tracked path."""
     return sorted({
-        path for path in local for new in incoming
+        path for path in local for new in tracked
         if path == new or path.startswith(new + "/") or new.startswith(path + "/")
-    }), None
+    })
+
+
+def _history_touches_local(git: str, repo: Path, tip: str) -> bool:
+    """True when an ignored or untracked local path matches a path the
+    branch's own commits touch -- replaying them could delete or overwrite
+    it, where a merge keeps it -- or when that cannot be told."""
+    code, stdout, _detail = _git(git, repo, "ls-files", "-z", "--others")
+    if code != 0:
+        return True
+    local = [path for path in stdout.split("\0") if path]
+    code, touched, _detail = _git(git, repo, "log", "--format=", "--name-only", "-z", "--no-renames", f"{tip}..HEAD")
+    if code != 0:
+        return True
+    return bool(_overlap(local, [path for path in touched.split("\0") if path]))
 
 
 def _preflight_conflicts(git: str, repo: Path, tip: str) -> list[str] | None:
@@ -158,7 +180,8 @@ def _has_push_target(git: str, repo: Path, branch: str, trunk: str) -> bool:
 
 def _may_rebase(git: str, repo: Path, branch: str, trunk: str, tip: str) -> bool:
     """True only when the branch is provably unpushed and its own commits hold
-    no merge commit; every failed lookup answers False, so the caller merges.
+    no merge commit and touch no ignored or untracked local path; every
+    failed lookup answers False, so the caller merges.
     Pushed means: origin lists the branch (origin is where loom publishes), a
     push target is configured, or an own commit is on any remote-tracking ref."""
     code, stdout, _detail = _git(git, repo, "ls-remote", "--heads", "origin", f"refs/heads/{branch}")
@@ -169,7 +192,9 @@ def _may_rebase(git: str, repo: Path, branch: str, trunk: str, tip: str) -> bool
     own = _count(git, repo, f"{tip}..HEAD")
     unpushed = _count(git, repo, "HEAD", "--not", tip, "--remotes")
     merges = _count(git, repo, "--merges", f"{tip}..HEAD")
-    return own is not None and own == unpushed and merges == 0
+    if own is None or own != unpushed or merges != 0:
+        return False
+    return not _history_touches_local(git, repo, tip)
 
 
 def _block(err, *reasons: str) -> int:

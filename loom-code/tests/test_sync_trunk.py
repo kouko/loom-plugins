@@ -328,6 +328,25 @@ def test_ignored_file_trunk_starts_tracking_is_refused_and_kept(tmp_path: Path) 
     assert (change / "secret.env").read_text(encoding="utf-8") == "LOCAL=keep-me\n"
 
 
+def test_unpushed_branch_touching_local_ignored_file_merges_and_keeps_it(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    (Path(git(change, "rev-parse", "--absolute-git-dir")) / "info" / "exclude").write_text(".env\n")
+    (change / ".env").write_text("SECRET=committed\n", encoding="utf-8")
+    git(change, "add", "-f", ".env")
+    git(change, "commit", "-q", "-m", "add env by mistake")
+    git(change, "rm", "-q", ".env")
+    git(change, "commit", "-q", "-m", "remove env")
+    own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    (change / ".env").write_text("SECRET=local-only\n", encoding="utf-8")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
+    assert (change / ".env").read_text(encoding="utf-8") == "SECRET=local-only\n"
+
+
 @pytest.mark.parametrize("failing", ["ls-files", "diff"])
 def test_untracked_collision_check_failure_blocks_before_merge(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failing: str
