@@ -1,6 +1,6 @@
 # sync-trunk rebases a change branch that has never been pushed — acceptance test evidence
 
-Tried on 2026-10-19, in a clean copy of the project at 50799c24 (`git worktree add --detach <scratch>/at-clean 50799c24`; `git status --short` empty). The pre-change behaviour was measured from a second clean copy at the branch base ba092534 (`<scratch>/at-base`).
+Tried on 2026-10-19, in a clean copy of the project at 50799c24, and re-run after a fix at 7ea44a94 (see "Re-run on 2026-10-19, at 7ea44a94" at the end). First run: (`git worktree add --detach <scratch>/at-clean 50799c24`; `git status --short` empty). The pre-change behaviour was measured from a second clean copy at the branch base ba092534 (`<scratch>/at-base`).
 
 ## Setup
 
@@ -31,7 +31,7 @@ worktree status: []; rebase in progress: no
 
 - Extra (X3, `extra.log`): with the user's `rebase.autosquash=true`, a `fixup! feat: add c` commit stayed a separate commit after the sync — the user's rebase settings did not leak in.
 - Note: after the rebase `.git/AUTO_MERGE` and an empty `.git/MERGE_RR` remain; a manual `git rebase --merge origin/trunk` in an identical repo leaves the same two files (git's own bookkeeping, `rerere.enabled=true`); `git status` is clean and `git rebase --continue` says `no rebase in progress`.
-- Evidence: `a1.log`; tests `test_unpushed_behind_rebases_linear`, `test_sync_ignoredhistory_succeeds`, `test_sync_oldgit_succeeds` passed (see "Tests run").
+- Evidence: `a1.log`; tests `test_unpushed_behind_rebases_linear`, `test_sync_ignoredhistory_succeeds`, `test_sync_oldgit_succeeds` passed (see "Tests run"); the last one was folded into `test_rebase_failing_without_conflict_falls_back_to_merge[old-git-no-update-refs]` by the fix.
 
 ## 2. On a change branch that has already been pushed and is behind trunk, `sync-trunk` merges as today: the pushed commits are still in the branch unchanged, and the next non-forced publish of the branch is accepted by the remote.
 
@@ -120,3 +120,40 @@ env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requiremen
 ```
 
 Included: test_current_branch_adds_no_commit, test_branch_ahead_of_trunk_adds_no_commit, test_behind_branch_merges_fetched_trunk_tip_and_says_content_changed, test_unpushed_behind_rebases_linear, test_pushed_behind_merges_then_plain_push_accepted, test_commits_pushed_under_other_name_merge, test_branch_with_configured_upstream_merges, test_unpushed_conflict_names_paths_restores, test_rebase_failing_without_conflict_falls_back_to_merge, test_unpushed_with_prior_merge_commit_merges, test_trunk_name_resolves_without_origin_head, test_conflict_names_every_file_and_restores_head, test_ref_named_origin_trunk_does_not_shadow_fetched_tip (4), test_ignored_file_trunk_starts_tracking_is_refused_and_kept, test_untracked_collision_check_failure_blocks_before_merge (2), test_control_character_conflict_path_cannot_forge_a_block_line, test_merge_tree_unavailable_falls_back_to_merge_then_abort, test_merge_ff_only_config_does_not_block_clean_merge, test_dirty_worktree_or_trunk_checkout_refused_untouched (4), test_control_character_untracked_path_cannot_forge_a_warn_line, test_unreachable_remote_warns_exit_zero, test_unreachable_remote_creates_no_commit, test_sync_ignoredhistory_succeeds, test_sync_oldgit_succeeds, test_sync_otherremote_keepscommits, test_current_release_metadata_is_synchronized. The clean copy's `git status --short` stayed empty afterwards.
+
+## Re-run on 2026-10-19, at 7ea44a94
+
+Fix range 89802d0d..7ea44a94: (1) a never-pushed branch whose own commits touch a path that exists locally as an ignored or untracked file takes the merge path (`command_handlers/sync.py` `_history_touches_local`, called last in `_may_rebase`); (2) after a rebase, one extra output line says commit ids changed and commit-sha references must be re-pinned; (3) test folding, CHANGELOG and plan wording.
+
+Setup, re-checked: fresh `git worktree add --detach <scratch>/at-clean 7ea44a94` (`git status --short` empty); `--list-rules` printed the rule list; `sync-trunk extra` printed `sync-trunk takes no arguments; run it from the change worktree.` exit 2. Also `<scratch>/at-base` (ba092534, before the change) and `<scratch>/at-prefix` (89802d0d, before the fix). Same user global git config as the first run (git 2.54.0). Scripts `r2-a1.sh`, `r2-extra.sh` (new), `a3.sh`, `a4.sh` (unchanged, now pointing at 7ea44a94); logs `r2-a1.log`, `r2-extra.log`, `r2-a3.log`, `r2-a4.log`.
+
+- 1: re-tested — every surface of the line (own commits directly on the trunk tip, zero merge commits, "content changed" reported):
+  - Both first-run variants (branch from `origin/trunk`, branch from local `trunk`): same linear graph and same ids as the first run (`b247dc7` on `e1f3286` on trunk tip `cbbaceb`), merge commits 0, clean worktree, no rebase in progress. Output is now three lines, the new one between the two old ones:
+
+    ```
+    sync-trunk: rebased feat onto origin/trunk (cbbacebd44f7ee77a7c6ab9648296faa4a12d6ff); HEAD is now b247dc7e85fbe2cc283c065f5d7914efe60b60ae.
+    sync-trunk: the branch's commit ids changed -- re-pin any commit-sha reference recorded on this branch (for example a plan's intent: line).
+    sync-trunk: content changed -- re-run the package suite and adversarial programs before dispatching reviewers.
+    exit=0
+    ```
+  - Ignored local `.env` the branch never touched (branch only adds `.gitignore` with `.env`): still rebased, merge commits 0, `.env` still `SECRET=keep-me`, `!! .env`. The new guard does not over-trigger on an ignored file outside the branch's history.
+  - The `.env` scenario with a real local ignored file: branch commits `.gitignore` (`.env`), force-adds `.env` (`git add -f`), then `git rm --cached .env` and commits, then `feat: add c`; local `.env` = `SECRET=hunter2`, status `!! .env`; trunk advances.
+    - Before the fix (89802d0d): `rebased feat onto origin/trunk ...`, exit 0, and afterwards `cat: .env: No such file or directory`, status empty — the replay deleted the user's file.
+    - After the fix (7ea44a94): `merged origin/trunk (cbbaceb...) into feat; HEAD is now ddc79b3...`, `content changed`, exit 0, no re-pin line; merge commits 1; `.env` still `SECRET=hunter2`, `!! .env`; no operation in progress.
+    - Pre-change version (ba092534) on the same repository: byte-identical output, exit, HEAD and status to the fixed version (`r2y1.OLD` vs `r2y1.NEW`).
+  - Verdict stays works: a branch whose history touches a local ignored file is a deliberate exception that merges to protect the file (listed as a decision in the report).
+  - Tests: `test_unpushed_behind_rebases_linear`, `test_unpushed_branch_touching_local_ignored_file_merges_and_keeps_it`, `test_sync_ignoredhistory_succeeds`, `test_rebase_failing_without_conflict_falls_back_to_merge[not-a-conflict|old-git-no-update-refs]` passed.
+- 2: carried over — the fix's new condition runs inside `_may_rebase` only after every pushed check has already answered "merge", and the new output line is written only on the rebase branch of `cmd_sync_trunk`; the merge path and its output are untouched by 89802d0d..7ea44a94. Its tests (`test_pushed_behind_merges_then_plain_push_accepted`, `test_commits_pushed_under_other_name_merge`, `test_branch_with_configured_upstream_merges`, `test_sync_otherremote_keepscommits`) passed again at 7ea44a94.
+- 3: re-tested — the fix changes which path a never-pushed branch takes, so both first-run variants were re-run in full (named paths, HEAD, every own commit id, `git status --porcelain --ignored --untracked-files=all`, `a.txt` and ignored `notes.local` contents, stash list, operation in progress). Whole-branch conflict: `conflict: a.txt`, "the merge was not attempted", exit 1, snapshots identical. Replay-only conflict: `conflict: a.txt`, "the rebase was aborted; feat is back at 496b95a...", exit 1, snapshots identical. New variant Y2 (`r2-extra.log`): the `.env` branch plus a line-2 conflict with trunk: `conflict: a.txt`, "the merge was not attempted; feat is still at fdc7490...", exit 1; HEAD, all four own commit ids, `.env` = `SECRET=hunter2`, `!! .env` and empty stash identical before and after; no operation in progress. Tests `test_unpushed_conflict_names_paths_restores`, `test_conflict_names_every_file_and_restores_head` passed.
+- 4: re-tested — `a4.sh` re-run: all 12 cases (up_to_date, ahead_only, pushed_up_to_date, dirty_tree, untracked_file, detached, on_trunk, fetch_fails, ignored_collision, conflict_unpushed, conflict_pushed, extra_argument) give byte-identical output, exit code, HEAD and `git status --porcelain --ignored` between ba092534 and 7ea44a94. Plus Y1 above (`.env` branch, now merge) identical to the pre-change version. Package suite: not run here; finalize-review executes it and refuses the attestation when it fails. Suite command: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+
+Tests run at 7ea44a94 (only those covering these criteria), in `<scratch>/at-clean`:
+
+```
+env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock \
+  python -m pytest loom-code/tests/test_sync_trunk.py loom-code/tests/test_adversarial_sync_trunk_rebase.py \
+  "loom-code/tests/test_write_plan_station_text.py::test_current_release_metadata_is_synchronized" -q -p no:cacheprovider
+34 passed in 36.84s
+```
+
+The 33 of the first run, minus `test_sync_oldgit_succeeds`, plus its replacement case `test_rebase_failing_without_conflict_falls_back_to_merge[old-git-no-update-refs]` (the old single case is now `[not-a-conflict]`) and the new `test_unpushed_branch_touching_local_ignored_file_merges_and_keeps_it`: 33 - 1 + 1 + 1 = 34. The clean copy's `git status --short` stayed empty afterwards.
