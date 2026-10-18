@@ -52,7 +52,7 @@ Widened scope (bare `python3` run):
 Criterion tests also run (subset, not the suite):
 `loom-code/tests/test_probe_pytest_summary.py`,
 `test_probe_pytest_config_added_file.py`,
-`test_probe_direct_python_pytest_file.py` — included in the 160-passed
+`test_probe_direct_python_pytest_file.py` — included in the 163-passed
 subset run listed under 6.
 
 ## 2. Artifact path that escapes the store is refused by finalize-review and the validator
@@ -70,6 +70,28 @@ subset run listed under 6.
 
 Note: the symlink case is refused, but by the concern-line rule, not by a
 path rule naming the escape.
+
+### Re-run at 63a02aa9 (after review fix round 745f092d..63a02aa9)
+
+Clean copy: `git worktree add --detach <scratch>/clean 63a02aa9`;
+`python3 loom-code/scripts/loom_checker.py --list-rules` exit 0. Driver
+`<scratch>/at_row2.py` (re-runs every scenario above except the symlink one,
+then edits a valid attestation; `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID`).
+
+| Scenario | Result |
+|---|---|
+| in store | attested, validator: valid |
+| `..`, `./`+`..`, `//` (finalize-review) | each `BLOCK finalize.adversarial: adversarial artifact must be a plain repository path (no ./, .. or //)` |
+| plain `outside_probe.py`, not in suite (finalize-review) | `BLOCK finalize.adversarial: adversarial artifact must be committed under <S> or be a program the package suite already runs` |
+| validator, attestation edited to `..` / `./`+`..` | `('push.attestation', 'adversarial artifact must be a plain repository path ...')` |
+| validator, attestation edited to plain `outside_probe.py` (committed, outside store, not in suite; command digest recomputed) | **VALID (accepted)** |
+| validator, attestation edited to plain `nowhere/never.py` (not committed) | `('push.attestation', 'adversarial execution names no committed artifact')` |
+
+Result: the validator checks the artifact's spelling (normal form) and that
+it is committed, not whether it lies in the store or the suite; only
+finalize-review refuses a plain out-of-store path. This is plan Risk 2's
+disclosed residual (`docs/loom/2026-10-18-close-probe-acceptance-gaps/plan.md`
+Risks item 2). Acceptance 2 requires both to refuse, so the row is `partly`.
 
 ## 3. `env go test -json`, `npx --yes jest`, `pnpm jest` read without reviewer confirmation; zero passed refused
 
@@ -141,7 +163,15 @@ except the out-of-scope indirect-feature target (refused, cargo runs it).
   `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
 - Exit 0, 2m42s; 14 pytest summaries totalling 3501 passed, none failed;
   shell checks all PASS.
-- Criterion subset: `python -m pytest -q` over the seven
-  `loom-code/tests/test_probe_*` files this change touched → 160 passed.
+- Criterion subset: `python -m pytest -q` over the eight
+  `loom-code/tests/test_probe_*` files this change touched (`git diff
+  --name-only <merge-base>..HEAD -- 'loom-code/tests/test_probe_*'`) → 163
+  passed (recounted at 63a02aa9; the earlier "seven / 160" was a miscount).
+- Re-run at 63a02aa9 (fix range 745f092d..63a02aa9 touched prose and checker
+  comments only): the 24 test files under `loom-code/tests` and `tests` that
+  read `adversarial.md`, `closing-review/SKILL.md` or a CHANGELOG →
+  574 passed, 1 skipped, exit 0;
+  `python3 loom-code/scripts/check_contract_citations.py` → OK, exit 0.
+  The full suite was not re-run here; finalize-review runs it before attesting.
 - `finalize-review` runs the same suite again before attesting and refuses
   on failure.
