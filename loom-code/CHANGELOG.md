@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.42.0] — 2026-10-18 — close the remaining adversarial-probe acceptance gaps
+
+- A pytest probe must name only its artifact, and a run is refused when its summary shows deselected tests, no passed test, or no summary at all (for example under `-qq`).
+- Finalize-review and the validator refuse artifact paths with `./`, `../` or `..` parts.
+- `env NAME=value` prefixes, `npx --yes` and bare `pnpm` launchers are parsed, and runner-configuration variables are refused.
+- Cargo targets whose required features are all directly in `[features] default`, and `tests/<dir>/main.rs`, now count as suite-collected.
+
 ## [3.41.0] — 2026-10-17 — attest adversarial probes run by non-Python test runners
 
 - Finalization attests an adversarial probe run by one of 13 listed runners — `go test`, `python -m unittest`, `node --test`, `deno test`, `bun test`, jest, vitest, mocha, `cargo test`, `cargo nextest run`, rspec, minitest and phpunit — by running it and parsing that run's own test results: at least one passing, non-skipped test from the probe's artifact. A readable zero is refused, and an argv a runner claims must be in that runner's accepted form.
