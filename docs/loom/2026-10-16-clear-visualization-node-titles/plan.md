@@ -17,7 +17,7 @@ Wave 2 — release metadata after examples settle
 **W2-01 Publish synchronized minor metadata**  after: W1-01  acceptance: 3
 - Files: loom-workflow/plugin.json, loom-workflow/.claude-plugin/plugin.json, loom-workflow/.codex-plugin/plugin.json, loom-workflow/CHANGELOG.md, loom-workflow/README.md, loom-workflow/README.ja.md, loom-workflow/README.zh-TW.md
 - Test: A3 positive: synchronized-release-version; negative: stale-manifest-or-readme-pin.
-- Risk: agent-decided — bump to 5.10.0 after the final wording fix; guidance changes require a minor release, and metadata must precede attestation.
+- Risk: agent-decided — bump to 5.11.0 after the final wording fix (5.10.0 was taken on trunk by #93 before ship); guidance changes require a minor release, and metadata must precede attestation.
 
 ## Simplicity check
 - Existing template tests plus independent semantic review instead of new wording-pin tests — taken
