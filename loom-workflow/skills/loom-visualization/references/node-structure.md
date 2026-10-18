@@ -4,7 +4,7 @@ Structure, body forms, separator and bullet marks, alignment, content rule,
 width budget, scope A, Mermaid counterpart.
 
 ## Structure
-A structured ASCII node label has a title and, when needed, a body
+A structured ASCII node label has a title line and, when needed, a body
 (wrapped prose or `* `-prefixed bullet lines). Box-drawn nodes separate
 the title and body with an in-box row (`├───┤`). Unboxed tree labels use
 continuation lines without a separator (see `templates/07-hierarchy.md`).
