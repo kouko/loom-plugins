@@ -330,3 +330,103 @@ This focused re-run used a new clean clone at `/private/tmp/recap-state-acceptan
 ### UI flows 8–10 — carried over
 
 - Diff check: `git diff bfe412cc..6b8cf5e2` has only the long-session UI-flow line. The short-session, table and dependency/branch UI-flow lines at `spec.md:39-41` are unchanged, as are their runtime guidance, examples and focused tests. Their prior `partly` verdicts and live-rendering limitations remain.
+
+## Codex CLI behavioral verification — 2026-10-18
+
+The user then explicitly authorized a Codex-only live test. `command codex --version` returned `codex-cli 0.163.0`. The test used `codex exec` with `-s read-only` in `/private/tmp/recap-state-codex-current-20261018`; only the branch's `SKILL.md` and `references/seven-block-schema.md` were copied into its local `.agents/skills/recap-state/`. The final copies had SHA-256 values `c4b9b155119af989c2852933cb5924a979fcc88c6601e3e9fcadef1f8194737f` and `1151a33d9dbe3a1265322b9a40127c7e462ee42a2f88c5202ce8c6c24edd2e03`, respectively. Codex still loaded its global user configuration and installed `loom-visualization` 5.9.0, so this was a local skill copy in a normal Codex environment, not a fully isolated configuration.
+
+The synthetic conversation began with a weekly net-sales report goal using orders and refunds. Subsequent user turns said that sales use the order payment date; orders/refunds were imported; last week's order total was checked; test orders were excluded; duplicate orders use order ID; refund transaction IDs were checked; 12 cross-week refunds await classification. The user said the suggestion to assign them to the original order week was not adopted, and set the exact constraint: 「先不要算淨額，等規則確認。」 Each setup turn requested acknowledgment only; the agent did no calculation or file edit. The final two tests forked from the same five-turn session (`01a14e22-8ef5-76c3-9048-cfe357b73af0`).
+
+| Probe | Request | Trace | Observed result |
+|---|---|---|---|
+| Empty context, natural language | `我跟丟了。請回顧這段對話原本想做什麼、目前完成什麼、還缺什麼。` | `natural.jsonl` | Read the local `SKILL.md` and reference; said original task unknown, asked for it, and invented no project step. This ran before the final wording edits. |
+| Empty context, explicit | `$recap-state` | `explicit.jsonl` | Read the local reference; said no concrete task existed and asked what the user wanted to resume. No `SKILL.md` read command was visible, so the trace alone proves reference use, not host injection of the main file. This ran before the final wording edits. |
+| Five-turn context, natural language | `我跟丟了。請回顧原本要做什麼、哪些已決定或完成、哪些仍未知，以及接下來應該先確認什麼。` | `final2-natural.jsonl`, thread `01a14e2c-8b75-7f60-9e83-f1b544a49702` | Read both local skill files; used four framed headings, fullwidth-space separators, an immediate table preface, grounded status, exact constraint, and a directed final question. |
+| Same context, explicit | `$recap-state` | `final2-explicit.jsonl`, thread `01a14e2d-7340-7112-8b7c-25408599eef6` | Read the local reference; used three framed headings, fullwidth-space separators, an immediate table preface, grounded status, exact constraint, and a directed final question. No main-file read command was visible. |
+
+Both final JSONL streams end with `agent_message` followed immediately by `turn.completed`, without a later tool call. The CLI does not prove how the user's chat client renders the frames or whitespace, and one observed completion does not guarantee every future completion will follow the layout. Neither final prompt contained a dependency that warranted a relationship diagram; diagram selection remains untested.
+All six final heading frames passed `python3 /Users/kouko/.codex/plugins/cache/monkey-skills/ascii-graph-toolkit/0.6.1/skills/ascii-graph/scripts/align.py -` with `✓ no drift`.
+The package command `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q` exited 0 after the final instruction edits. Its first group reported `2256 passed, 2 skipped`; the runner continued through the remaining groups and shell checks without a failure. An initial sandbox attempt could not create a temporary lock file in `~/.cache/uv`; the permitted retry completed.
+
+Two independent Codex blind auditors checked the earlier long-output traces against the synthetic turns. Both found grounded content, the exact consequential quote, and no action after the final question. They also found format inconsistency: one natural-language output omitted frames and one explicit output compressed a complex state into a paragraph. The main skill and reference were clarified; an intermediate explicit run then exposed a missing sentence before its table. The final two runs above are the retest after those edits. The current focused recap suite returned `20 passed in 0.22s`.
+
+### Final natural-language output (verbatim)
+
+````markdown
+每週淨銷售額報表的準備工作已完成一部分；目前須先決定跨週退款歸哪一週，才能計算淨額。
+
+```text
+┌──────────────────┐
+│ ■ 目的與目前位置 │
+└──────────────────┘
+```
+
+這是虛構測試專案。原本要用訂單與退款資料製作每週淨銷售額報表。目前仍遵守你的限制：「先不要算淨額，等規則確認。」
+
+　
+
+```text
+┌──────────────────┐
+│ ■ 已決定與已完成 │
+└──────────────────┘
+```
+
+以下進度依據你先前的說明；我沒有重新檢查資料。
+
+| 項目 | 目前狀態 |
+|---|---|
+| 銷售統計 | 已決定按訂單付款日期歸週。 |
+| 訂單處理 | 已排除測試訂單；重複訂單按訂單編號去重。 |
+| 資料核對 | 訂單與退款已匯入；上週訂單總額、退款交易編號欄位已核對。 |
+
+　
+
+```text
+┌──────────────────┐
+│ ■ 待確認與下一步 │
+└──────────────────┘
+```
+
+有 **12 筆跨週退款**尚未核對歸屬。「算在原訂單週」只是尚未採納的提議，退款歸週規則仍未決定。因此尚未計算淨額，也尚未整理報表。
+
+接下來先由你確認跨週退款應歸哪一週，再核對這 12 筆的歸屬；這符合你的方向嗎？
+````
+
+### Final explicit-call output (verbatim)
+
+````markdown
+```text
+┌──────────────────┐
+│ ■ 目標與目前位置 │
+└──────────────────┘
+```
+
+這個虛構測試專案的目標是製作每週淨銷售額報表；目前要等你確認跨週退款的歸屬規則，才能計算淨額。你設定的限制是：「先不要算淨額，等規則確認。」
+
+　
+
+```text
+┌────────────────────┐
+│ ■ 已確認與未決事項 │
+└────────────────────┘
+```
+
+以下是你在這段對話中提供的進度；我沒有另外核對資料。
+
+| 項目 | 目前狀態 |
+|---|---|
+| 銷售統計 | 已決定用訂單付款日期；上週訂單總額已核對 |
+| 資料處理 | 訂單與退款已匯入；已排除測試訂單，並以訂單編號去除重複訂單 |
+| 退款資料 | 交易編號欄位已核對；12 筆跨週退款仍待分類，歸屬尚未核對 |
+| 跨週退款規則 | 「算在原訂單週」只是提議，尚未採納 |
+
+　
+
+```text
+┌──────────┐
+│ ■ 下一步 │
+└──────────┘
+```
+
+接下來維持暫停，等你確認跨週退款規則後，才處理那 12 筆的歸屬、計算淨額並整理報表；這符合你的方向嗎？
+````

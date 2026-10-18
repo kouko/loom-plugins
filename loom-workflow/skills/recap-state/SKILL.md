@@ -31,7 +31,15 @@ This is **in-session re-orientation**. The built-in `/recap` is an
 3. Render the reference's variable-length sections and visual rules. Preserve
    behavior-changing user wording exactly. Use `loom-visualization` to choose
    and verify any meaningful table or relationship diagram and to frame section
-   headings. Never expose planning tags or numbered block labels.
+   headings. Apply the same visual rules to natural-language requests and
+   explicit skill calls. When the recap needs a table or multiple sections,
+   frame at least the purpose/current-position and final-question headings.
+   A long recap with several decisions, completed items, and an open gap needs
+   those sections; do not compress it into one dense paragraph.
+   If it contains a table, put one short situation sentence immediately before
+   the table, in the same section. Nothing except a blank line may separate
+   that sentence from the table; the heading alone does not serve as the sentence.
+   Never expose planning tags or numbered block labels.
 4. If the original purpose is unknown, ask only for the purpose. Do not invent
    a proposed work step when the purpose is unknown. When the original purpose
    is grounded, ask about the proposed next step. If asking for purpose, wait

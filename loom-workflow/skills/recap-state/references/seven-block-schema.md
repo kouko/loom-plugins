@@ -33,10 +33,17 @@ cell widths. Put one fullwidth-space-only line between sections, and inspect
 the rendered chat spacing; do not use visible HTML break tags. Keep the first
 section focused on purpose and position, and the final section focused on a
 directed question about purpose when unknown, or the grounded next step.
+Apply the same layout to natural-language requests and explicit skill calls.
+When a recap needs a table or multiple sections, frame at least the first and
+final headings. A long recap with several decisions, completed items, and an
+open gap needs those sections rather than one dense paragraph. A genuinely
+short one-paragraph recap needs no headings.
 Stop until the user responds.
 
 Use bullets for a short path through decisions and work. Put a short
-situation sentence before each table. A table earns its place by comparing
+situation sentence before each table, immediately after its section heading;
+only a blank line may separate that sentence from the table. The heading alone
+is not that sentence. A table earns its place by comparing
 information or compressing meaningful metadata. Draw a relationship diagram
 when it clarifies a real dependency, branch, merge, rationale, evidence, or
 sequence relationship; a flat status list needs no diagram. Route the form and
