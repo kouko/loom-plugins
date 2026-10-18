@@ -639,6 +639,18 @@ def test_env_option_or_pnpm_script_name_refused_or_confirmed(command: str) -> No
     assert claiming_row(shlex.split(command)) is None, command
 
 
+@pytest.mark.parametrize(("command", "artifact"), [
+    (f"env GOFLAGS=-run=X go test -json {GO}", GO),
+    (f"env CI=1 NODE_OPTIONS=--test-name-pattern=x node --test --test-reporter=junit {NODE}", NODE),
+])
+def test_env_runner_configuration_variable_refused(command: str, artifact: str) -> None:
+    """A runner-configuration assignment can filter what the form refuses:
+    claimed by the row, and refused."""
+    argv = shlex.split(command)
+    row = claiming_row(argv)
+    assert row is not None and not row.accepts(argv, artifact), command
+
+
 @pytest.mark.parametrize(("command", "artifact", "output"), [
     (f"jest --json --runTestsByPath {JS}", JS, JEST_OTHER),
     (f"npx vitest run --reporter=json --outputFile=/dev/stdout {VITEST}", VITEST, VITEST_OTHER),

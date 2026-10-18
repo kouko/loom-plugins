@@ -42,19 +42,37 @@ class Row:
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
 ENV_ASSIGNMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=.*")
+# Variables a runner reads as options or test filters. A denylist: a variable
+# it misses is a residual risk, bounded by the per-file result parsing.
+RUNNER_ENV = re.compile(
+    r"(?:GOFLAGS|NODE_OPTIONS|NODE_TEST_\w*|JEST_\w*|VITEST_\w*|MOCHA_\w*|BUN_\w*"
+    r"|DENO_\w*|CARGO_\w*|RUSTFLAGS|RUSTDOCFLAGS|NEXTEST_\w*|SPEC_OPTS|TESTOPTS"
+    r"|RUBYOPT|PHPUNIT_\w*|PYTEST_ADDOPTS)=.*")
 
 
-def _env_stripped(argv: list[str]) -> list[str]:
-    """`argv` without a leading `env NAME=value...`; `[]` when no command
-    follows. Any `env` option keeps the argv whole, so no row claims it."""
+def _env_split(argv: list[str]) -> tuple[list[str], list[str]]:
+    """The `NAME=value` assignments of a leading `env` and the argv after
+    them; `[]` when no command follows. Any `env` option keeps the argv
+    whole, so no row claims it."""
     if not argv or Path(argv[0]).name != "env":
-        return argv
+        return [], argv
     index = 1
     while index < len(argv) and ENV_ASSIGNMENT.fullmatch(argv[index]):
         index += 1
     if index < len(argv) and argv[index].startswith("-"):
-        return argv
-    return argv[index:]
+        return [], argv
+    return argv[1:index], argv[index:]
+
+
+def _env_stripped(argv: list[str]) -> list[str]:
+    return _env_split(argv)[1]
+
+
+def _env_accepts(accepts: Callable[[list[str], str, Path | None], bool],
+                 argv: list[str], artifact: str, repo: Path | None) -> bool:
+    """`accepts` on the argv after `env`, refusing a runner-configuration assignment."""
+    assignments, rest = _env_split(argv)
+    return not any(RUNNER_ENV.fullmatch(arg) for arg in assignments) and accepts(rest, artifact, repo)
 
 
 def _named(argv: list[str]) -> list[str]:
@@ -582,7 +600,7 @@ def _row(name: str, claims: Callable[[list[str]], bool],
          passed: Callable[[str, str], int | None]) -> Row:
     """A row that sees every argv without its `env NAME=value...` prefix."""
     return Row(name, lambda argv: claims(_env_stripped(argv)),
-               lambda argv, artifact, repo=None: accepts(_env_stripped(argv), artifact, repo), passed)
+               lambda argv, artifact, repo=None: _env_accepts(accepts, argv, artifact, repo), passed)
 
 
 ROWS: tuple[Row, ...] = (

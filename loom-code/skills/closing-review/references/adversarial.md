@@ -148,8 +148,10 @@ For another runner, record the command in exactly one of these forms
 `pnpm` or `yarn` launcher, or `bundle exec` for rspec and minitest; a runner
 or launcher is recognised by its file name, so a full path such as
 `/opt/homebrew/bin/go` counts as `go`; any form may start with
-`env NAME=value...`, while an `env` option such as `env -i` makes the command
-one no row claims, so it needs a reviewer confirmation):
+`env NAME=value...`, except that an assignment to a runner-configuration
+variable such as `GOFLAGS`, `NODE_OPTIONS` or `PYTEST_ADDOPTS` is refused,
+while an `env` option such as `env -i` makes the command one no row claims,
+so it needs a reviewer confirmation):
 
 | Runner | Accepted command |
 |---|---|
