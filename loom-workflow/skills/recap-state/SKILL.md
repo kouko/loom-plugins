@@ -33,7 +33,8 @@ This is **in-session re-orientation**. The built-in `/recap` is an
    and verify any meaningful table or relationship diagram and to frame section
    headings. Apply the same visual rules to natural-language requests and
    explicit skill calls. When the recap needs a table or multiple sections,
-   frame at least the purpose/current-position and final-question headings.
+   frame every section heading, including purpose/current-position and the
+   final question.
    A long recap with several decisions, completed items, and an open gap needs
    those sections; do not compress it into one dense paragraph.
    If it contains a table, put one short situation sentence immediately before

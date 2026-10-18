@@ -34,8 +34,8 @@ the rendered chat spacing; do not use visible HTML break tags. Keep the first
 section focused on purpose and position, and the final section focused on a
 directed question about purpose when unknown, or the grounded next step.
 Apply the same layout to natural-language requests and explicit skill calls.
-When a recap needs a table or multiple sections, frame at least the first and
-final headings. A long recap with several decisions, completed items, and an
+When a recap needs a table or multiple sections, frame every section heading.
+A long recap with several decisions, completed items, and an
 open gap needs those sections rather than one dense paragraph. A genuinely
 short one-paragraph recap needs no headings.
 Stop until the user responds.
