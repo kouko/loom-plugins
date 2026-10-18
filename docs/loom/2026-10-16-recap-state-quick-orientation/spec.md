@@ -35,7 +35,7 @@ REQ-6 — Remain in-session
 - Boundary: `loom-workflow/skills/recap-state/SKILL.md` "Chat only" and "Wait" preserve in-session scope and the final pause.
 
 ## UI flows
-- User requests a recap after a long session → sees original purpose, current position, concise history, completed and pending work, unknowns, proposed next step, and a final alignment question.
+- User requests a recap after a long session → sees the grounded original purpose or an explicit unknown, current position, concise history, completed and pending work; if purpose is unknown, the final question asks only for it and waits; if grounded, the recap proposes a next step, asks for alignment, and waits.
 - User requests a short recap → sees only relevant sections without filler.
 - Recap includes a table → sees a short situation sentence before the table.
 - Recap contains a real dependency or branch → sees a diagram only when it clarifies that relationship; `loom-visualization` chooses the rendered form.
