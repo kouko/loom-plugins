@@ -5,8 +5,10 @@ The attestation digest covers the whole tree, so a sync after review
 invalidates it; this runs first. While the branch has never been pushed its
 own commits are rebased onto the trunk tip, keeping the history linear; once
 any of it is pushed (or that cannot be told) trunk is merged instead, so
-pushed history is never rewritten. Never force. A conflict is named, never
-resolved: detected in memory before the sync when git can, else aborted.
+pushed history is never rewritten. A rebase that fails without a conflict is
+aborted and, once the restore is verified, the merge is tried instead. Never
+force. A conflict is named, never resolved: detected in memory before the
+sync when git can, else aborted.
 """
 from __future__ import annotations
 
@@ -236,7 +238,18 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
             git, repo, "rebase", "--merge", "--no-autostash", "--no-autosquash", "--no-update-refs",
             "--no-rebase-merges", tip, timeout=SYNC_WRITE_TIMEOUT,
         )
-    else:
+        if code != 0:
+            conflicts = _unmerged(git, repo)
+            # Abort unconditionally: a rebase that stopped early leaves state too.
+            _git(git, repo, "rebase", "--abort", timeout=SYNC_WRITE_TIMEOUT)
+            restored = _restored(git, repo, head, before)
+            if conflicts or not restored:
+                return _refuse(err, verb, branch, trunk, repo, head, code, detail, conflicts, restored)
+            # No conflict and a verified restore: replaying commits failed
+            # where a merge need not (an older git, an ignored file a branch
+            # commit once tracked), so take the merge path instead.
+            rebase = False
+    if not rebase:
         # `--ff` overrides a user `merge.ff=only`; a merge commit or
         # fast-forward never rewrites history.
         verb = "merge"
@@ -256,24 +269,36 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         )
         return 0
 
-    _code, unmerged, _detail = _git(git, repo, "diff", "--name-only", "--diff-filter=U", "-z")
-    conflicts = [path for path in unmerged.split("\0") if path]
-    if rebase:
-        # Abort unconditionally: a rebase that stopped early leaves state too.
-        _git(git, repo, "rebase", "--abort", timeout=SYNC_WRITE_TIMEOUT)
-    elif _oid(git, repo, "MERGE_HEAD"):
+    conflicts = _unmerged(git, repo)
+    if _oid(git, repo, "MERGE_HEAD"):
         _git(git, repo, "merge", "--abort", timeout=SYNC_WRITE_TIMEOUT)
+    return _refuse(err, verb, branch, trunk, repo, head, code, detail, conflicts, _restored(git, repo, head, before))
+
+
+def _unmerged(git: str, repo: Path) -> list[str]:
+    _code, unmerged, _detail = _git(git, repo, "diff", "--name-only", "--diff-filter=U", "-z")
+    return [path for path in unmerged.split("\0") if path]
+
+
+def _restored(git: str, repo: Path, head: str, before: str | None) -> bool:
+    """HEAD and the status snapshot, ignored files included, match the start."""
+    return _oid(git, repo, "HEAD") == head and before is not None and _snapshot(git, repo) == before
+
+
+def _refuse(
+    err, verb: str, branch: str, trunk: str, repo: Path, head: str,
+    code: int | None, detail: str, conflicts: list[str], restored: bool,
+) -> int:
     reasons = [f"conflict: {_show(path)}" for path in conflicts]
     if not conflicts:
         reason = detail if code is None else _git_reason(detail, f"{verb} failed")
-        action = f"rebasing {branch} onto" if rebase else "merging"
+        action = f"rebasing {branch} onto" if verb == "rebase" else "merging"
         reasons.append(f"{action} origin/{trunk} failed without a conflict: {_show(reason)}")
-    after = _snapshot(git, repo)
-    if _oid(git, repo, "HEAD") == head and before is not None and after == before:
-        restored = f"the {verb} was aborted; {branch} is back at {head} with a clean worktree."
+    if restored:
+        line = f"the {verb} was aborted; {branch} is back at {head} with a clean worktree."
         if conflicts:
-            restored += " Conflicts are never resolved automatically -- resolve them in a new build round."
-        reasons.append(restored)
+            line += " Conflicts are never resolved automatically -- resolve them in a new build round."
+        reasons.append(line)
     else:
         reasons.append(
             f"the aborted {verb} did not restore {branch} to {head} with a clean worktree; "

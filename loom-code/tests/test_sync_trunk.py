@@ -195,6 +195,34 @@ def test_unpushed_conflict_names_paths_restores(tmp_path: Path) -> None:
     assert not (git_dir / "rebase-merge").exists() and not (git_dir / "rebase-apply").exists()
 
 
+def test_rebase_failing_without_conflict_falls_back_to_merge(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from io import StringIO
+
+    from loom_checker.command_handlers import sync as sync_handler
+
+    _origin, change, teammate = repos(tmp_path)
+    own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+    real_git = sync_handler._git
+
+    def failing_rebase(git_exe, repo, *args, **kwargs):
+        if args and args[0] == "rebase" and "--abort" not in args:
+            return 1, "", "error: rebase refused for a reason that is not a conflict"
+        return real_git(git_exe, repo, *args, **kwargs)
+
+    monkeypatch.setattr(sync_handler, "_git", failing_rebase)
+    monkeypatch.chdir(change)
+    out, err = StringIO(), StringIO()
+
+    code = sync_handler.cmd_sync_trunk([], out=out, err=err)
+
+    assert code == 0, out.getvalue() + err.getvalue()
+    assert f"merged origin/main ({trunk_tip}) into feature" in out.getvalue()
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
+
+
 def test_unpushed_with_prior_merge_commit_merges(tmp_path: Path) -> None:
     _origin, change, teammate = repos(tmp_path)
     commit_file(change, "feature.txt", "feature\n", "feature work")
