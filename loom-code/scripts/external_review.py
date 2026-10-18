@@ -255,6 +255,18 @@ def _agy_candidates(runner: Runner, scope: str) -> list[str]:
             if line.split() and provider_family(line.split()[0])]
 
 
+_DISCOVERY_REASONS = {"codex model/list error: not initialized",
+                      "codex model/list error: unknown error",
+                      "codex model/list result missing data array",
+                      "agy models failed"}
+
+
+def _is_discovery_reason(text: str) -> bool:
+    """Whether text is a known discovery failure reason safe to report verbatim."""
+    return text in _DISCOVERY_REASONS or bool(
+        re.fullmatch(r"codex model/list failed: exit -?\d+", text))
+
+
 def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
              *, runner: Runner = _launch) -> dict[str, Any]:
     """List observed candidates after scope and egress consent, before pair approval."""
@@ -290,13 +302,8 @@ def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
         result["reason"] = f"discovery-error: {category}"
         return result
     except (OSError, ValueError, TypeError, KeyError) as exc:
-        known = {"codex model/list error: not initialized",
-                 "codex model/list error: unknown error",
-                 "codex model/list result missing data array",
-                 "agy models failed",
-                 "unknown executor"}
         detail = str(exc) if isinstance(exc, ValueError) and (
-            str(exc) in known or re.fullmatch(r"codex model/list failed: exit -?\d+", str(exc))
+            _is_discovery_reason(str(exc)) or str(exc) == "unknown executor"
         ) else "unknown error"
         result["reason"] = f"discovery-error: {detail}"
         return result
@@ -479,7 +486,9 @@ def execute(
                  "claude JSON result missing", "claude JSON result is not an object",
                  "claude modelUsage missing", "claude observed provider family mismatch",
                  "claude observed model mismatch", "claude result empty"}
-        detail = str(exc) if isinstance(exc, ValueError) and str(exc) in known else "unknown error"
+        detail = str(exc) if isinstance(exc, ValueError) and (
+            str(exc) in known or _is_discovery_reason(str(exc))
+        ) else "unknown error"
         return fail(f"execution-error: {detail}")
     result["status"] = "completed"
     return result

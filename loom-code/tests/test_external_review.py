@@ -949,6 +949,9 @@ def test_codex_exit_before_answer_reports_exit_code(tmp_path, monkeypatch, mode,
     _fake_cli(tmp_path, monkeypatch, "codex", mode)
     result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
     assert result["reason"] == f"discovery-error: codex model/list failed: exit {code}"
+    executed = review.execute("codex", "gpt-a", "high", "openai", str(tmp_path), "review",
+                              consent(scope=str(tmp_path), model="gpt-a"))
+    assert executed["reason"] == f"execution-error: codex model/list failed: exit {code}"
 
 
 def test_review_timeout_default_is_thirty_minutes(monkeypatch):
