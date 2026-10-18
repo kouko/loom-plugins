@@ -55,6 +55,7 @@ charter: 1.1
 ① — what — 覆述的需求對嗎？（答：對）
 ① — what — 要改用 B（只列這支檔、讀 pytest 總結拒收 deselected／零通過）嗎？（答：Ｂ）
 ① — consequence — `python3 檔案.py` 直接執行只定義 test 函式的找漏洞測試會被當成通過，這次要一起修，還是另開一個變更？（答：這次一起修 (Recommended)；asked during Build after the adversary's finding, user-decided scope widening）
+③ — consequence — validator 只檢查路徑寫法，手改審查證明換成普通 store 外檔名不會被發現，要接受為已知風險，還是 validator 也檢查位置？（答：接受為已知風險 (Recommended)；asked during closing-review Round 1, user-decided, plan Risk 2 stands）
 
 ## Risks
 1. A conftest hook that drops items without reporting them as deselected stays invisible to the summary check; intent Out of scope covers deliberate forgery only, so this is a disclosed residual.
