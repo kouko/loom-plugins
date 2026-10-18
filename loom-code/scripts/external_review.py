@@ -15,6 +15,7 @@ import signal
 import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 from typing import Any, Callable, Mapping, TextIO
 
@@ -109,61 +110,107 @@ def _consent_valid(record: Mapping[str, Any] | None, executor: str, scope: str,
     return exact or bounded
 
 
-def _run(runner: Runner, argv: list[str], prompt: str, timeout: int, scope: str):
-    # Injected runners simulate subprocess behavior; preflight real launches.
-    if runner is subprocess.run and not Path(scope).is_dir():
-        raise FileNotFoundError(errno.ENOENT, "missing review root", scope)
-    return runner(argv, input=prompt, capture_output=True, text=True,
-                  timeout=timeout, check=False, cwd=scope)
+def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
+            until_response_id: int | None = None, **_: Any):
+    """Run argv bounded by timeout, killing its whole process group.
 
-
-CODEX_DISCOVERY_TIMEOUT = 15
-
-
-def _codex_app_server(argv: list[str], requests: str, timeout: int, scope: str):
-    # app-server exits on stdin EOF before answering, so keep stdin open
-    # until the model/list (id 2) reply arrives or the timeout elapses.
-    if not Path(scope).is_dir():
-        raise FileNotFoundError(errno.ENOENT, "missing review root", scope)
+    Without until_response_id, stdin is closed after input and output is
+    collected until the process exits; a descendant still holding a pipe is
+    given a short grace, then killed. With until_response_id, stdin stays
+    open and reading stops at the JSON line carrying that id, or once the
+    process exits without it (the same grace applies).
+    """
+    if not Path(cwd).is_dir():
+        raise FileNotFoundError(errno.ENOENT, "missing review root", cwd)
     proc = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                            stderr=subprocess.DEVNULL, text=True, cwd=scope,
+                            stderr=subprocess.PIPE, text=True, cwd=cwd,
                             start_new_session=True)
-    lines: list[str] = []
+    out: list[str] = []
+    err: list[str] = []
+    answered = threading.Event()
 
-    def read() -> None:
+    def read_out() -> None:
         for line in proc.stdout:
-            lines.append(line)
+            out.append(line)
+            if until_response_id is None:
+                continue
             try:
-                if json.loads(line).get("id") == 2:
+                if json.loads(line).get("id") == until_response_id:
+                    answered.set()
                     return
             except (json.JSONDecodeError, AttributeError):
                 continue
 
-    reader = threading.Thread(target=read, daemon=True)
+    def read_err() -> None:
+        for line in proc.stderr:
+            err.append(line)
+
+    def write_in() -> None:
+        # A child that never reads blocks this write once input exceeds the
+        # pipe buffer, so it runs off the main thread, inside the deadline.
+        try:
+            proc.stdin.write(input)
+            proc.stdin.flush()
+            if until_response_id is None:
+                proc.stdin.close()
+        except (OSError, ValueError):
+            pass
+
+    readers = [threading.Thread(target=read_out, daemon=True),
+               threading.Thread(target=read_err, daemon=True)]
+    writer = threading.Thread(target=write_in, daemon=True)
     try:
-        proc.stdin.write(requests)
-        proc.stdin.flush()
-        reader.start()
-        reader.join(timeout)
-        if reader.is_alive():
-            raise subprocess.TimeoutExpired(argv, timeout)
+        for reader in readers:
+            reader.start()
+        writer.start()
+        if until_response_id is None:
+            try:
+                proc.wait(timeout)
+            except subprocess.TimeoutExpired:
+                raise subprocess.TimeoutExpired(argv, timeout) from None
+            for reader in readers:
+                reader.join(1)  # grace for a descendant still holding a pipe
+        else:
+            # Wait for the reply or the direct process's exit, whichever is
+            # first; a descendant holding stdout must not turn exit into timeout.
+            deadline = time.monotonic() + timeout
+            while readers[0].is_alive():
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise subprocess.TimeoutExpired(argv, timeout)
+                if proc.poll() is not None:
+                    readers[0].join(1)  # same grace as the branch above
+                    break
+                readers[0].join(min(remaining, 0.05))
     finally:
-        # A descendant (e.g. an MCP server) can hold stdout open; kill the
-        # whole group, and never close stdout under a still-blocked reader.
         try:
             os.killpg(proc.pid, signal.SIGKILL)
-        except ProcessLookupError:
+        except (ProcessLookupError, PermissionError):
             pass
         proc.wait()
-        if reader.ident is not None:
-            reader.join(1)
-        streams = (proc.stdin,) if reader.is_alive() else (proc.stdin, proc.stdout)
+        for thread in (*readers, writer):
+            if thread.ident is not None:
+                thread.join(1)
+        # Never close a stream under a still-blocked reader or writer.
+        streams = [s for s, t in zip((proc.stdin, proc.stdout, proc.stderr),
+                                     (writer, *readers)) if not t.is_alive()]
         for stream in streams:
             try:
                 stream.close()
             except OSError:
                 pass
-    return subprocess.CompletedProcess(argv, 0, "".join(lines), "")
+    returncode = 0 if answered.is_set() else proc.returncode
+    return subprocess.CompletedProcess(argv, returncode, "".join(out), "".join(err))
+
+
+def _run(runner: Runner, argv: list[str], prompt: str, timeout: int, scope: str,
+         **kwargs: Any):
+    return runner(argv, input=prompt, capture_output=True, text=True,
+                  timeout=timeout, check=False, cwd=scope, **kwargs)
+
+
+CODEX_DISCOVERY_TIMEOUT = 15
+AGY_DISCOVERY_TIMEOUT = 15
 
 
 def _codex_candidates(runner: Runner, scope: str) -> list[str]:
@@ -173,13 +220,12 @@ def _codex_candidates(runner: Runner, scope: str) -> list[str]:
         {"jsonrpc": "2.0", "id": 2, "method": "model/list", "params": {}},
     )
     payload = "".join(json.dumps(item) + "\n" for item in requests)
-    if runner is subprocess.run:
-        response = _codex_app_server(["codex", "app-server"], payload,
-                                     CODEX_DISCOVERY_TIMEOUT, scope)
-    else:
-        response = _run(runner, ["codex", "app-server"], payload, 15, scope)
+    # app-server exits on stdin EOF before answering, so stdin stays open
+    # until the model/list (id 2) reply arrives.
+    response = _run(runner, ["codex", "app-server"], payload,
+                    CODEX_DISCOVERY_TIMEOUT, scope, until_response_id=2)
     if response.returncode != 0:
-        raise ValueError("codex model/list failed")
+        raise ValueError(f"codex model/list failed: exit {response.returncode}")
     for line in response.stdout.splitlines():
         try:
             message = json.loads(line)
@@ -199,11 +245,11 @@ def _codex_candidates(runner: Runner, scope: str) -> list[str]:
         if not isinstance(rows, list):
             raise ValueError("codex model/list result missing data array")
         return [row["id"] for row in rows if isinstance(row, dict) and isinstance(row.get("id"), str)]
-    raise ValueError("codex model/list response missing")
+    raise ValueError(f"codex model/list failed: exit {response.returncode}")
 
 
 def _agy_candidates(runner: Runner, scope: str) -> list[str]:
-    response = _run(runner, ["agy", "models"], "", 15, scope)
+    response = _run(runner, ["agy", "models"], "", AGY_DISCOVERY_TIMEOUT, scope)
     if response.returncode != 0:
         raise ValueError("agy models failed")
     try:
@@ -219,8 +265,20 @@ def _agy_candidates(runner: Runner, scope: str) -> list[str]:
             if line.split() and provider_family(line.split()[0])]
 
 
+_DISCOVERY_REASONS = {"codex model/list error: not initialized",
+                      "codex model/list error: unknown error",
+                      "codex model/list result missing data array",
+                      "agy models failed"}
+
+
+def _is_discovery_reason(text: str) -> bool:
+    """Whether text is a known discovery failure reason safe to report verbatim."""
+    return text in _DISCOVERY_REASONS or bool(
+        re.fullmatch(r"codex model/list failed: exit -?\d+", text))
+
+
 def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
-             *, runner: Runner = subprocess.run) -> dict[str, Any]:
+             *, runner: Runner = _launch) -> dict[str, Any]:
     """List observed candidates after scope and egress consent, before pair approval."""
     result: dict[str, Any] = {"status": "failed", "reason": None,
                               "executor": executor, "candidates": []}
@@ -254,12 +312,9 @@ def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
         result["reason"] = f"discovery-error: {category}"
         return result
     except (OSError, ValueError, TypeError, KeyError) as exc:
-        known = {"codex model/list failed", "codex model/list error: not initialized",
-                 "codex model/list error: unknown error",
-                 "codex model/list result missing data array",
-                 "codex model/list response missing", "agy models failed",
-                 "unknown executor"}
-        detail = str(exc) if isinstance(exc, ValueError) and str(exc) in known else "unknown error"
+        detail = str(exc) if isinstance(exc, ValueError) and (
+            _is_discovery_reason(str(exc)) or str(exc) == "unknown executor"
+        ) else "unknown error"
         result["reason"] = f"discovery-error: {detail}"
         return result
     result["status"] = "completed"
@@ -349,8 +404,8 @@ def _command(executor: str, model: str, effort: str, prompt: str,
 def execute(
     executor: str, model: str, effort: str, family: str, scope: str,
     prompt: str, consent: Mapping[str, Any] | None, *,
-    runner: Runner = subprocess.run, probe_timeout: int = 45,
-    review_timeout: int = 600,
+    runner: Runner = _launch, probe_timeout: int = 45,
+    review_timeout: int = 1800,
 ) -> dict[str, Any]:
     """Return provenance and raw review text; never infer a reviewer verdict."""
     result: dict[str, Any] = {
@@ -441,7 +496,9 @@ def execute(
                  "claude JSON result missing", "claude JSON result is not an object",
                  "claude modelUsage missing", "claude observed provider family mismatch",
                  "claude observed model mismatch", "claude result empty"}
-        detail = str(exc) if isinstance(exc, ValueError) and str(exc) in known else "unknown error"
+        detail = str(exc) if isinstance(exc, ValueError) and (
+            str(exc) in known or _is_discovery_reason(str(exc))
+        ) else "unknown error"
         return fail(f"execution-error: {detail}")
     result["status"] = "completed"
     return result
@@ -458,7 +515,7 @@ def main(argv: list[str] | None = None, *, stdin: TextIO = sys.stdin,
     parser.add_argument("--scope", required=True)
     parser.add_argument("--consent-record", required=True, type=Path)
     parser.add_argument("--probe-timeout-seconds", type=int, default=45)
-    parser.add_argument("--review-timeout-seconds", type=int, default=600)
+    parser.add_argument("--review-timeout-seconds", type=int, default=1800)
     args = parser.parse_args(argv)
     try:
         consent = json.loads(args.consent_record.read_text())
