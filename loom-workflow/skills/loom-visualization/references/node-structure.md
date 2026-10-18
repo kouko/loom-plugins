@@ -4,50 +4,50 @@ Structure, body forms, separator and bullet marks, alignment, content rule,
 width budget, scope A, Mermaid counterpart.
 
 ## Structure
-A structured node consists of three parts:
-- Title line
-- In-box separator row (`├───┤`)
-- Body (wrapped prose or `* `-prefixed bullet lines)
-
-Title and body are left-aligned.
+A structured ASCII node label has a title and, when needed, a body
+(wrapped prose or `* `-prefixed bullet lines). Box-drawn nodes separate
+the title and body with an in-box row (`├───┤`). Unboxed tree labels use
+continuation lines without a separator (see `templates/07-hierarchy.md`).
 
 ## Body forms
 Two forms are supported:
-1. **Wrapped prose**: Long text wraps inside the box at the width budget
+1. **Wrapped prose**: Long text in a box wraps at the width budget
 2. **Bullet lines**: Each line prefixed with `* `, wrapped independently
 
 ## Separator and bullet marks
-- Separator: full-width `├───┤` row
+- Boxed nodes: full-width `├───┤` separator row between title and body
+- Unboxed tree labels: body on continuation lines, with no separator
 - Bullets: `* ` prefix (ASCII); Mermaid uses `• ` per `references/mermaid-cot-spec.md`
 
 ## Left alignment
-Title and body are left-aligned inside the box (users 2026-09-27 selected).
+Boxed titles and bodies are left-aligned (users 2026-09-27 selected).
 
 ## Container rule / content rule
 Use a short title that identifies the node's action, role, state, or claim
 without requiring the body to explain what the node is. Add a body only when
 it contributes a distinct condition, evidence, output, or other detail that
 the title, edge labels, and adjacent cells do not already convey.
-A node that needs no such detail stays title-only, with no separator. If its
-title is too vague to stand alone, expand it into an informative phrase or
-remove the node; never add an empty separator or filler body to satisfy a
-format.
+A node that needs no such detail stays title-only; a boxed title-only node
+has no separator. If the title is too vague to stand alone, expand it into
+an informative phrase or remove the node; never add an empty separator or
+filler body to satisfy a format.
 
 ## Width budget
-Long prose wraps in-box at the default width budget (40 cells) or an
+Long prose in a box wraps at the default width budget (40 cells) or an
 explicit `width` payload field. Width budget does not widen the box
 without limit (see `SKILL.md` width table).
 
 ## Scope A
-Applies to box-drawn ASCII nodes:
+The title/body content rule applies to ASCII node labels in:
 - Flow steps
 - Branching decisions
 - Reasoning chains
 - State lifecycles
-- Architecture layer names  
-- Tree continuation
-- Hierarchy connectors
-Not to non-box text slots (which stay single-line):
+- Architecture layer names
+- Tree continuations and hierarchy labels (unboxed in the tree template)
+
+Box separators and left alignment apply only to boxed nodes. This rule
+does not apply to other text slots (which stay single-line):
 - Edge labels / arrow labels
 - Table cells
 - Bar labels  
