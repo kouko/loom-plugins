@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.10.0] — 2026-10-17 — orient in-session recaps around purpose and progress
+
+- Lead recaps with the conversation-grounded purpose, current position, and next step; show the decisions and completed work that explain the current position without padding short sessions.
+- Use distinct section headings and spacing, explain tables before showing them, and reserve diagrams for relationships they clarify. Preserve exact user wording when it affects the next action, distinguish unknowns from facts, and end with a directed alignment question.
+
 ## [5.9.0] — 2026-10-15 — separate project and installed-skill retrospectives
 
 - Rename the one-session project review from `retro` to `project-retro`, and the cross-session installed-skill review from `distill-sessions` to `skill-retro`. The old names are no longer callable.
