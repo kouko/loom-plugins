@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-16-recap-state-quick-orientation",
-  "content_digest": "c10a06aa8bcddcea7cfb1d7d3e66688f24fe2d58",
+  "content_digest": "8ba79c23c09ce3ae2553ca4fd35b00a95818b9f4",
   "executions": [
     {
       "kind": "package-tests",
@@ -12,21 +12,21 @@
     },
     {
       "kind": "adversarial",
-      "command": "python3 -m pytest loom-workflow/tests/recap-state/test_seven_block_schema.py -c /dev/null -q -p no:cacheprovider",
+      "command": "python3 -m pytest loom-workflow/tests/recap-state/test_seven_block_schema.py -q",
       "artifact": "loom-workflow/tests/recap-state/test_seven_block_schema.py",
       "result": "pass",
-      "command_digest": "eba377a1f1c665536696c3442d098cfd278fc9e0ad0095045871070455ff10ba"
+      "command_digest": "a542dc5061ce0f67f9533e29f9c60e8486138e631fd7a897200aadc1128cc6d9"
     }
   ],
   "verdicts": [
     {
-      "reviewer": "review_skill",
+      "reviewer": "recap-reviewer-a",
       "vendor": "openai",
       "model": "host-inherited (GPT-6 family; exact profile unobserved)",
       "lens": "skill",
       "verdict": "PASS",
-      "reviewed_sha": "e78493943c3c931df54b6538eb440c9f854f59ba",
-      "review_target_sha": "5647b138f0285b421cd7e5dea621d1734d139252",
+      "reviewed_sha": "937f885f56bd32e3c8ea2e67361fcb533818f5e4",
+      "review_target_sha": "b1be4d8b67f36440510b23a1b317673b07175aaf",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -38,45 +38,32 @@
       },
       "findings": [],
       "notes": [
-        "Four examples show distinct decision, argument, branch, and ordered-step relationships; the complete recap contains one diagram.",
-        "Six focused tests passed. Live chat rendering remains unverified."
+        "Previous findings: none. The fix delta aligns REQ-1, REQ-5, the diagram decision, and the long-session flow with the runtime contract.",
+        "Focused recap tests: 20 passed in 0.15s. Live output, rendering, and pause behavior remain explicitly unverified."
       ]
     },
     {
-      "reviewer": "review_code",
+      "reviewer": "recap-reviewer-b",
       "vendor": "openai",
       "model": "host-inherited (GPT-6 family; exact profile unobserved)",
-      "lens": "code",
-      "verdict": "PASS_WITH_NOTES",
-      "reviewed_sha": "e78493943c3c931df54b6538eb440c9f854f59ba",
-      "review_target_sha": "5647b138f0285b421cd7e5dea621d1734d139252",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "937f885f56bd32e3c8ea2e67361fcb533818f5e4",
+      "review_target_sha": "b1be4d8b67f36440510b23a1b317673b07175aaf",
       "dimension_scores": {
-        "security": "PASS",
-        "architecture": "PASS",
-        "correctness": "PASS_WITH_NOTES",
-        "naming": "PASS",
-        "tests": "PASS_WITH_NOTES",
-        "refactoring": "PASS",
-        "cross-task-coherence": "PASS",
-        "external-surface-grounding": "PASS",
-        "principles-conformance": "PASS",
-        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
-        "deliberate-simplification": "PASS",
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
         "deletion-first": "PASS"
       },
-      "findings": [
-        {
-          "severity": "nit",
-          "dimension": "tests",
-          "anchor": "loom-workflow/tests/recap-state/test_seven_block_schema.py:207",
-          "text": "nitpick: The new test checks for a text fence and labels anywhere in each section, so an emptied diagram with labels moved into prose would still pass.",
-          "fix": "Inspect each fenced diagram body and assert the convergent argument, two labeled branches, and ordered steps."
-        }
-      ],
+      "findings": [],
       "notes": [
-        "Prior duplicate-test finding remains fixed.",
-        "Five changed schema tests and eight alignment checks passed.",
-        "Live host rendering remains unverified."
+        "Fixed: the spec now permits the user-authorized diagram types when they clarify a real relationship.",
+        "Fixed: REQ-5 and the long-session UI flow now distinguish unknown-purpose and grounded-purpose questions, both followed by a wait.",
+        "The five focused test files passed: 34 tests. The acceptance report accurately retains the live-host verification limit."
       ]
     }
   ],
