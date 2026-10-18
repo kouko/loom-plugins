@@ -1,15 +1,15 @@
 # 外部審查步驟能準時結束、回報正確原因 — 我試了什麼、結果如何
 
-2026-10-18 在專案的乾淨副本上試的：第一輪在 4f9faa9e；修正後在 0c5bb1eb 重跑第 3、4 條。每條怎麼試、回來什麼：`docs/loom/2026-10-17-external-review-process-cleanup/evidence/acceptance-test-evidence.md`。
+2026-10-18 在專案的乾淨副本上試的：第一輪在 4f9faa9e；第一次修正後在 0c5bb1eb 重跑第 3、4 條；第二次修正後在 24dda528 重跑第 1、3、4 條。每條怎麼試、回來什麼：`docs/loom/2026-10-17-external-review-process-cleanup/evidence/acceptance-test-evidence.md`。
 
 ## 你要的東西，逐條
 
 | # | 你要的 | 結果 | 發生了什麼 | 重跑 |
 |---|---|---|---|---|
-| 1 | 外部 CLI 在 Antigravity 列模型、probe 或 review 時，到了時限還在跑、且有子程序佔著輸出，這一步會在時限後不久結束、回報 timeout，且不留下任何程序 | works | 用會卡住的假 CLI 試了 Codex、Claude Code、Antigravity 三家的 probe 和 review，以及 Antigravity 列模型，共 8 種情況：每次都在時限後 0.1 秒內結束並回報 timeout，CLI 本身和它的子程序都被清掉了 | carried over — 這次修正只改了失敗原因的文字，沒動到時限和結束程序的部分 |
-| 2 | 沒指定時限的 review 有 30 分鐘才會被判 timeout | works | 不加時限參數時，實際交給 review 的時限是 1800 秒（30 分鐘），改版前是 600 秒；設 1801 秒會被拒絕。沒有真的等滿 30 分鐘，因為協調方要求停掉 | carried over — 這次修正沒動到任何時限的預設值或上限 |
-| 3 | Codex 在回答列模型請求前就退出時，回報的原因寫明 Codex 失敗並附上它的 exit status，而不是「response missing」 | works | 不管是單獨列模型，還是在一次 review 流程裡碰到，Codex 以 exit 3 或 exit 0 提早退出時，回報都寫「Codex 列模型失敗：exit 3」或「exit 0」 | re-tested |
-| 4 | Codex、Claude Code、Antigravity 在 CLI 正常回應時，列模型、probe、review 都跟以前一樣，且完整 package suite 通過 | works | 三家用正常回應的假 CLI 都完整跑完並拿到 review 內容；真的 Codex 列模型也成功列出 7 個模型；外部審查相關的 127 個測試全過。完整 suite 由接受改動前必跑的自動測試執行，失敗就會擋下 | re-tested |
+| 1 | 外部 CLI 在 Antigravity 列模型、probe 或 review 時，到了時限還在跑、且有子程序佔著輸出，這一步會在時限後不久結束、回報 timeout，且不留下任何程序 | works | 用會卡住的假 CLI 試了 Codex、Claude Code、Antigravity 三家的 probe 和 review，以及 Antigravity 列模型，共 8 種情況；這輪另外加試 Codex 列模型卡住的 2 種情況（第二次修正改的正是這段等待）。10 種情況每次都在時限後 0.1 秒內結束並回報 timeout，CLI 本身和它的子程序都被清掉了 | re-tested |
+| 2 | 沒指定時限的 review 有 30 分鐘才會被判 timeout | works | 不加時限參數時，實際交給 review 的時限是 1800 秒（30 分鐘），改版前是 600 秒；設 1801 秒會被拒絕。沒有真的等滿 30 分鐘，因為協調方要求停掉 | carried over — 兩次修正都沒動到任何時限的預設值或上限；第二次修正只改了等 Codex 回覆模型清單的方式，而該步驟仍用原本的 15 秒時限 |
+| 3 | Codex 在回答列模型請求前就退出時，回報的原因寫明 Codex 失敗並附上它的 exit status，而不是「response missing」 | works | 不管是單獨列模型，還是在一次 review 流程裡碰到，Codex 以 exit 3 或 exit 0 提早退出時，回報都寫「Codex 列模型失敗：exit 3」或「exit 0」。這輪加試 Codex 退出時留下子程序佔著輸出的情況：也在約 1 秒內回報同樣的失敗原因，子程序被清掉；修正前同一情況要等 15 秒、回報成 timeout | re-tested |
+| 4 | Codex、Claude Code、Antigravity 在 CLI 正常回應時，列模型、probe、review 都跟以前一樣，且完整 package suite 通過 | works | 三家用正常回應的假 CLI 都完整跑完並拿到 review 內容；真的 Codex 列模型也成功列出 7 個模型；外部審查相關的 128 個測試全過。完整 suite 由接受改動前必跑的自動測試執行，失敗就會擋下 | re-tested |
 
 ## 對你既有的資料做了什麼
 
@@ -19,7 +19,8 @@
 
 - **第 2 條沒有真的等 30 分鐘** — 協調方要求停掉實際等待，所以我改為記錄沒加參數時真正交給 review 的時限（1800 秒），並確認 1801 秒會被拒絕。沒有親眼看到第 30 分鐘時 timeout 觸發；但第 1 條已證明時限到了步驟就會準時結束。
 - **第 3 條也要求在 review 流程裡成立** — 你的這條沒限定只在「單獨列模型」時成立，而 review 流程開頭也會送同一個列模型請求，所以兩處都試了。第一輪 review 流程裡回報的是「unknown error」，修正後兩處都正確。
-- **卡住、提早退出的情況用假 CLI 模擬** — 依指示沒有對任何廠商送出真正的 probe 或 review，只做了真的 Codex 列模型（兩輪各一次）。
+- **卡住、提早退出的情況用假 CLI 模擬** — 依指示沒有對任何廠商送出真正的 probe 或 review，只做了真的 Codex 列模型（三輪各一次）。
+- **第 3 條也算進「退出時留下子程序」的情況** — 你的這條沒排除這種退出方式，而它在修正前會被誤報成 timeout，所以這輪把它當成第 3 條的一部分來試。
 
 ## 你要我跳過的步驟
 
