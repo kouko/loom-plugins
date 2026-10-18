@@ -68,6 +68,11 @@ def _quotes_whole_lines(quote: str, output: str, stem: str) -> bool:
 
 
 _ANSI = re.compile(r"\x1b\[[0-9;]*m")
+# pytest's final summary line wording (`N passed, M deselected in 0.01s`, with
+# `=` rules unless `-q`). pytest documents the outcome words but not this line
+# as a stable format, so re-check on a pytest upgrade; last checked against
+# pytest 9.1.1:
+# https://docs.pytest.org/en/stable/how-to/output.html#producing-a-detailed-summary-report
 _PYTEST_SUMMARY = re.compile(
     r"^=*\s*((?:\d+ \w+)(?:, \d+ \w+)*) in \d+(?:\.\d+)?s\b.*$"
 )
@@ -104,6 +109,13 @@ def _pytest_summary_failure(command: str, output: str) -> str | None:
 # cannot be told apart from another file of the same name; `item.path` can.
 _PASSES_PLUGIN = "_loom_probe_passes"
 _PASSES_ENV = "LOOM_PROBE_PASSES_FILE"
+# Relied on from pytest: the `pytest_runtest_makereport(item, call)` hook as a
+# `hookwrapper` whose `yield` gives an outcome with `get_result()` returning the
+# TestReport (`when`, `passed`, and `wasxfail` set only for xfail/xpass), and
+# `item.path` (a pathlib.Path; `item.fspath` is the legacy fallback):
+# https://docs.pytest.org/en/stable/reference/reference.html#pytest.hookspec.pytest_runtest_makereport
+# https://docs.pytest.org/en/stable/reference/reference.html#pytest.TestReport
+# https://docs.pytest.org/en/stable/reference/reference.html#pytest.Item
 _PASSES_SOURCE = f'''import os
 import pytest
 
@@ -120,7 +132,13 @@ def pytest_runtest_makereport(item, call):
 
 def _pytest_probe_env(directory: Path) -> dict[str, str]:
     """The environment a pytest probe runs under: the caller's, plus the
-    passes plugin on PYTHONPATH and in PYTEST_ADDOPTS (both appended)."""
+    passes plugin on PYTHONPATH and in PYTEST_ADDOPTS (both appended).
+
+    Relied on from pytest: `PYTEST_ADDOPTS` is split like a shell line and
+    prepended to the command-line arguments, and `-p NAME` imports plugin
+    module NAME (found through PYTHONPATH) early:
+    https://docs.pytest.org/en/stable/reference/reference.html#envvar-PYTEST_ADDOPTS
+    https://docs.pytest.org/en/stable/how-to/plugins.html#requiring-loading-plugins-in-a-test-module-or-conftest-file"""
     (directory / f"{_PASSES_PLUGIN}.py").write_text(_PASSES_SOURCE, encoding="utf-8")
     env = dict(os.environ)
     env["PYTHONPATH"] = os.pathsep.join(

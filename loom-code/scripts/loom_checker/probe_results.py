@@ -53,7 +53,11 @@ RUNNER_ENV = re.compile(
 def _env_split(argv: list[str]) -> tuple[list[str], list[str]]:
     """The `NAME=value` assignments of a leading `env` and the argv after
     them; `[]` when no command follows. Any `env` option keeps the argv
-    whole, so no row claims it."""
+    whole, so no row claims it.
+
+    Relied on from POSIX `env`: `env [-i] [name=value]... [utility [argument...]]`,
+    so name=value operands come first and the next word is the utility:
+    https://pubs.opengroup.org/onlinepubs/9799919799/utilities/env.html"""
     if not argv or Path(argv[0]).name != "env":
         return [], argv
     index = 1
@@ -320,6 +324,12 @@ def _unittest_passed(output: str, artifact: str) -> int | None:
 # JSON reports (jest, vitest, mocha, rspec) -------------------------------------
 
 # Longer prefixes first: the first launcher an argv starts with is stripped.
+# Relied on: `npx --yes` answers the install prompt so npx runs the package
+# non-interactively (https://docs.npmjs.com/cli/v10/commands/npx); `pnpm exec`
+# runs a local binary (https://pnpm.io/cli/exec). Residual: bare `pnpm jest`
+# runs a package.json script named `jest` before a same-named bin, so such a
+# script can run something other than the jest binary
+# (https://pnpm.io/cli/run, https://pnpm.io/cli/exec).
 JS_LAUNCHERS = (("npx", "--yes"), ("npx",), ("pnpm", "exec"), ("pnpm",), ("yarn",))
 RUBY_LAUNCHERS = (("bundle", "exec"),)
 

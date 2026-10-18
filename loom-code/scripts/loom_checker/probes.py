@@ -602,7 +602,12 @@ CARGO_TEST_FLAGS = frozenset({"--release", "-q", "--quiet"})
 
 
 def _python_argv(tokens: list[str]) -> list[str]:
-    """The python argv a conda-run pytest or `uv run` command wraps."""
+    """The python argv a conda-run pytest or `uv run` command wraps.
+
+    Relied on: `conda run -n ENV CMD...` runs CMD in that environment
+    (https://docs.conda.io/projects/conda/en/stable/commands/run.html) and
+    `uv run [OPTIONS] COMMAND` runs COMMAND in the project environment
+    (https://docs.astral.sh/uv/reference/cli/#uv-run)."""
     if _conda_pytest_argv(tokens):
         tokens = tokens[4:]
     # `uv run [opts] python ...` is checked as the python argv it wraps.
@@ -624,7 +629,11 @@ def direct_pytest_style_failure(command: str, artifact: str, source: str) -> str
     calling a test, so a file whose top-level statements define a `test*`
     function or a `Test*` class (pytest's default collection prefixes) must
     run under `python -m pytest`; a file that does not parse is refused
-    rather than trusted."""
+    rather than trusted.
+
+    Relied on: pytest's default `python_functions = test*` and
+    `python_classes = Test*`:
+    https://docs.pytest.org/en/stable/explanation/goodpractices.html#conventions-for-python-test-discovery"""
     if Path(artifact).suffix.lower() != ".py" or runs_pytest(command):
         return None
     try:

@@ -39,7 +39,11 @@ ARTIFACT_PATH_FORM = "adversarial artifact must be a plain repository path (no `
 def artifact_path_form_failure(artifact: str) -> str | None:
     """Refuse an artifact path whose spelling could leave the change's store:
     `git cat-file` normalises `./a/../b`, so a store `startswith` check alone
-    would accept a path that resolves outside it."""
+    would accept a path that resolves outside it.
+
+    Relied on: git resolves a `<rev>:<path>` object name's path relative to
+    the tree, so `.`/`..` segments are not literal names:
+    https://git-scm.com/docs/gitrevisions#_specifying_revisions"""
     if (artifact.startswith(("./", "../")) or ".." in artifact.split("/")
             or posixpath.normpath(artifact) != artifact):
         return ARTIFACT_PATH_FORM
