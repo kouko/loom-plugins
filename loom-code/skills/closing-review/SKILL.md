@@ -377,7 +377,7 @@ hand-off to a temporary JSON input outside the repository:
   ],
   "findings": [],
   "adversarial": [
-    {"command":"python3 <path>","artifact":"<path>"}
+    {"command":"python3 -m pytest <path>","artifact":"<path>"}
   ]
 }
 ```

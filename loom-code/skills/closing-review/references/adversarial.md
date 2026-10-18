@@ -131,9 +131,9 @@ executes each one and records the command, artifact, functional-content digest
 and observed result in the generated attestation:
 
 ```json
-{"command": "python3 -m pytest docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py -q",
+{"command": "python3 -m pytest docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py",
  "artifact": "docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py"}
-{"command": "python3 -m pytest tests/test_adversarial_empty_input.py -q",
+{"command": "python3 -m pytest tests/test_adversarial_empty_input.py",
  "artifact": "tests/test_adversarial_empty_input.py"}
 ```
 
@@ -171,11 +171,11 @@ so it needs a reviewer confirmation):
 | rspec | `[w] rspec --format json <A>` |
 | minitest | `[w] ruby [-I<dir>]... <A>`, `<A>` named `*_test.rb` or `test_*.rb` |
 | phpunit | `phpunit <A>` (any path to `phpunit`, such as `vendor/bin/phpunit`) |
-| any of the above | `env NAME=value... <form>`, only `NAME=value` tokens between `env` and the form |
 
 Every runner except cargo test and nextest runs the probe from the change's
-store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs`
-(or the `[[test]]` path Cargo.toml names) through a task of the change and is
+store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs` or `tests/<n>/main.rs`
+(or the `[[test]]` path Cargo.toml names; each `required-features` entry
+must be listed directly in `[features] default`) through a task of the change and is
 recorded at that path. Any option not shown, a test-name filter, or a
 claimed runner in another form is refused. Any other subcommand of go, deno,
 bun or cargo (such as `go vet`, `deno check`, `bun build` or `cargo build`)
