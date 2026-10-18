@@ -45,6 +45,8 @@ The title/body content rule applies to ASCII node labels in:
 - State lifecycles
 - Architecture layer names
 - Tree continuations and hierarchy labels (unboxed in the tree template)
+- Task dependency steps (including a step with multiple prerequisites)
+- Cross-role workflow steps (with the owner named in the title or lane)
 
 Box separators and left alignment apply only to boxed nodes. This rule
 does not apply to other text slots (which stay single-line):

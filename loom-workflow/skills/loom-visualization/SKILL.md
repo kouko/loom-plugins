@@ -67,6 +67,8 @@ reader must act on, and state the other in a sentence.
 | Reasoning chain | causes or inferences leading to a conclusion | `templates/04-reasoning-chain.md` | none |
 | State lifecycle | named states changed by named events | `templates/05-state-lifecycle.md` | none |
 | Actor sequence | actors exchanging messages in time order | `templates/06-actor-sequence.md` | `seq` |
+| Task dependencies | parallel prerequisites feeding a required join | `templates/12-task-dependencies.md` | none |
+| Cross-role workflow | steps with different work ownership and handoffs | `templates/13-cross-role-workflow.md` | none |
 | Hierarchy | parent-child, no cross-links | `templates/07-hierarchy.md` | `tree` |
 | System architecture | components in layers with dependencies | `templates/08-system-architecture.md` | `arch` |
 | Data model | entities, fields, cardinality | `templates/09-data-model.md` | none (table substitute) |
@@ -107,7 +109,8 @@ Which of the two forms to send:
   plain-text destination.
 - Data model and quantity need only the markdown table.
 - A flow, a branch, a reasoning chain, a state machine, a sequence, a
-  hierarchy, an architecture or a timeline may still be drawn in the reply
+  hierarchy, an architecture, a timeline, task dependencies or a cross-role
+  workflow may still be drawn in the reply
   when a table would lose what the reader needs: there the shape is the
   information. Draw it, verify it, and keep a table beside it when exact
   values matter.
@@ -128,7 +131,8 @@ break request rather than a raw newline. `seq` and `bar` labels must be
 single-line.
 
 Where there is no generator (branching decision, reasoning chain, state
-lifecycle, timeline), adapt the template's ASCII by hand. The data model has
+lifecycle, timeline, task dependencies, cross-role workflow), adapt the
+template's ASCII by hand. The data model has
 no ASCII form; use its table substitute.
 
 For how a node's text is structured and verified, see
