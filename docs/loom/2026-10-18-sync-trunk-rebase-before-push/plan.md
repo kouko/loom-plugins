@@ -22,6 +22,11 @@ Wave 1 — one module boundary (`cmd_sync_trunk`), then release metadata.
 - Test: A4 positive: test_current_release_metadata_is_synchronized at 3.42.1; negative: same test fails if any manifest stays 3.42.0.
 - Risk: agent-decided patch bump: no station guidance, field, rule id or manifest change; pin test rewrite and CHANGELOG entry are deliverables.
 
+**W1-03 Graduate the adversarial programs into the suite**  after: W1-01  acceptance: 1, 2
+- Files: loom-code/tests/test_adversarial_sync_trunk_rebase.py, docs/loom/2026-10-18-sync-trunk-rebase-before-push/evidence/probes/
+- Test: A1 positive: test_sync_ignoredhistory_succeeds; boundary: test_sync_oldgit_succeeds. A2 positive: test_sync_otherremote_keepscommits; negative: test_branch_with_configured_upstream_merges.
+- Risk: agent-decided: move the three red-then-green probes unchanged in behaviour so every later change runs them; the probe store keeps no copy.
+
 ## Simplicity check
 - reuse existing up-to-date, refusal and fetch-failure tests instead of four new duplicates — taken
 
