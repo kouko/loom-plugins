@@ -4,7 +4,6 @@ finalize-review reads pytest's summary line, refusing a run that deselected
 tests, passed none, or printed no summary. The declared package-suite command
 keeps its filters.
 """
-# concern: A probe whose tests never ran must not be attested as having run.
 from __future__ import annotations
 
 from pathlib import Path

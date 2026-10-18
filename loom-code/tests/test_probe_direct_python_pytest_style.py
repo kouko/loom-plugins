@@ -2,7 +2,6 @@
 a bare `python3 <probe>` imports it and exits 0 without calling one test, so
 finalize-review refuses that run. Attestations already written are not
 re-judged, so the validator keeps accepting them."""
-# concern: A pytest-style probe run as a bare script must not be attested as passing.
 from __future__ import annotations
 
 import sys

@@ -4,7 +4,6 @@ that starts with `./` or `../`, has a `..` part, or has any part `normpath`
 would change -- `git cat-file` normalises `./a/../b`, so the store
 `startswith` check alone would accept a path that resolves outside it.
 """
-# concern: A probe path spelled with `..` must not escape the change's store.
 from __future__ import annotations
 
 from pathlib import Path
