@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-16-clear-visualization-node-titles",
-  "content_digest": "41c58e7cbc2143934dc5e5fab69359fd26f2b8d8",
+  "content_digest": "81f3faca65ba009331560e539cfd487a3694329e",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,22 +20,31 @@
   ],
   "verdicts": [
     {
-      "reviewer": "title_reviewer_skill",
+      "reviewer": "rebased_skill_review",
       "vendor": "openai",
       "model": "inherited-host-model",
       "lens": "skill",
       "verdict": "PASS",
       "findings": [],
-      "review_target_sha": "4a8084ad111aeb410a9131d58d7d20cfa6a5cd83"
+      "review_target_sha": "643d696a501954a5e1bb8375a38c505de8d23221"
     },
     {
-      "reviewer": "title_reviewer_spec",
+      "reviewer": "rebased_spec_review",
       "vendor": "openai",
       "model": "inherited-host-model",
       "lens": "spec+adversarial",
       "verdict": "PASS",
       "findings": [],
-      "review_target_sha": "4a8084ad111aeb410a9131d58d7d20cfa6a5cd83"
+      "review_target_sha": "643d696a501954a5e1bb8375a38c505de8d23221"
+    },
+    {
+      "reviewer": "rebased_code_review",
+      "vendor": "openai",
+      "model": "inherited-host-model",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [],
+      "review_target_sha": "643d696a501954a5e1bb8375a38c505de8d23221"
     }
   ],
   "findings": [],
