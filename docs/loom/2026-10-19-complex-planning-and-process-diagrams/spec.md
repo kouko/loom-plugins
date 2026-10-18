@@ -10,14 +10,14 @@ REQ-2 — Cross-role work handoffs
   WHEN an agent depicts a process involving work performed by different roles, the visualization guidance shall route it to an example that identifies the owner of each step and the handoff between owners without treating a message exchange as the whole work process → Acceptance #2
 
 REQ-3 — Valid forms and compatibility
-  The two new examples shall provide distinguishable table, ASCII, and Mermaid forms whose stated relationships agree, pass the repository's applicable alignment and Mermaid checks, and leave existing shapes and generator input forms usable → Acceptance #3
+  The two new examples shall provide distinguishable table, ASCII, and Mermaid forms whose stated relationships agree, use standalone node titles with bodies adding only distinct information, pass the repository's applicable alignment and Mermaid checks, and leave existing shapes and generator input forms usable → Acceptance #3
 
 ## Design decision
 - agent-decided — Add one task-dependency DAG template and one cross-role workflow template to the existing shape list because the current linear, branch, and actor-sequence templates answer different questions; do not rewrite those templates.
 - agent-decided — In the dependency example, direct each arrow from a prerequisite to the task it enables; a join means every incoming prerequisite is required, not a conditional choice. State this distinction in the template's usage and mistakes sections.
 - agent-decided — In the cross-role example, make each work step's owner explicit and label owner changes as handoffs; the existing actor-sequence template remains for ordered messages rather than work ownership.
 - agent-decided — Keep the established table, ASCII, and Mermaid template structure. Hand-author and verify compact ASCII examples as the existing branch and state templates do; add no generator unless their forms cannot express the confirmed outcomes.
-- agent-decided — Retain the standalone-title rule and existing generator schema. A new template and routing row change the skill's published guidance, so synchronize the loom-workflow minor release metadata before final review.
+- agent-decided — Extend `references/node-structure.md`'s scope and the corresponding checks to both new shapes so every new node follows the standalone-title rule; retain the existing generator schema. New templates and routing rows change the skill's published guidance, so synchronize the loom-workflow minor release metadata before final review.
 
 ## Alternatives considered
 - Expand the linear-steps template alone — rejected because one fixed sequence cannot show tasks that are concurrently available and later join.
