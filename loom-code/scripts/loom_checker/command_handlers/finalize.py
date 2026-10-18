@@ -31,6 +31,7 @@ from loom_checker.reviewers import attach_outside_receipt
 from loom_checker.reviewers import selected_outside_family
 from pathlib import Path
 import json
+import os
 import re
 import subprocess
 import sys
@@ -93,6 +94,55 @@ def _pytest_summary_failure(command: str, output: str) -> str | None:
         return (f"`{command}` exited 0, but its pytest summary (`{summary.group(1)}`) "
                 f"shows no passed test")
     return None
+
+
+# A pytest plugin loaded into the probe run (`-p`, appended to PYTEST_ADDOPTS)
+# that records the absolute file of every test that passed (not skipped, not
+# xfailed/xpassed). Nodeids are relative to a rootdir pytest picks from the
+# nearest ini file and does not print under `-q`, so a nodeid's file part
+# cannot be told apart from another file of the same name; `item.path` can.
+_PASSES_PLUGIN = "_loom_probe_passes"
+_PASSES_ENV = "LOOM_PROBE_PASSES_FILE"
+_PASSES_SOURCE = f'''import os
+import pytest
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+    if report.when == "call" and report.passed and not hasattr(report, "wasxfail"):
+        with open(os.environ["{_PASSES_ENV}"], "a", encoding="utf-8") as handle:
+            handle.write(str(getattr(item, "path", None) or item.fspath) + "\\n")
+'''
+
+
+def _pytest_probe_env(directory: Path) -> dict[str, str]:
+    """The environment a pytest probe runs under: the caller's, plus the
+    passes plugin on PYTHONPATH and in PYTEST_ADDOPTS (both appended)."""
+    (directory / f"{_PASSES_PLUGIN}.py").write_text(_PASSES_SOURCE, encoding="utf-8")
+    env = dict(os.environ)
+    env["PYTHONPATH"] = os.pathsep.join(
+        part for part in (str(directory), env.get("PYTHONPATH", "")) if part)
+    env["PYTEST_ADDOPTS"] = f"{env.get('PYTEST_ADDOPTS', '')} -p {_PASSES_PLUGIN}".strip()
+    env[_PASSES_ENV] = str(directory / "passes.txt")
+    return env
+
+
+def _pytest_own_pass_failure(command: str, repo: Path, artifact: str, directory: Path) -> str | None:
+    """Why a pytest probe run shows no passing test from the artifact's own
+    file: the plugin's record names none, or is missing (refused, not guessed)."""
+    record = directory / "passes.txt"
+    target = (repo / artifact).resolve()
+    try:
+        files = record.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        files = []
+    if any(Path(line).resolve() == target for line in files if line.strip()):
+        return None
+    return (f"`{command}` exited 0, but it shows no passed test from {artifact}: every "
+            f"pass came from another file (added by the command, config or a plugin), "
+            f"or loom could not record which tests passed")
 
 
 def _runner_evidence(
@@ -271,13 +321,22 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
 
     executions: list[dict] = []
     for kind, command, artifact, how in work:
+        pytest_probe = (kind == "adversarial" and how["route"] == "direct"
+                        and runs_pytest(command))
+        scratch = tempfile.TemporaryDirectory() if pytest_probe else None
         try:
             completed = subprocess.run(
                 argv_for(command), cwd=str(repo), stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT, text=True, timeout=PROBE_RUN_TIMEOUT,
+                env=_pytest_probe_env(Path(scratch.name)) if scratch else None,
             )
+            own_pass = (_pytest_own_pass_failure(command, repo, artifact, Path(scratch.name))
+                        if scratch else None)
         except (ValueError, OSError, subprocess.TimeoutExpired) as exc:
             return [(f"finalize.{kind}", f"execution failed: {exc}")]
+        finally:
+            if scratch:
+                scratch.cleanup()
         output = completed.stdout or ""
         detail = output.strip()
         suffix = f"\n{detail[-4000:]}" if detail else ""
@@ -298,8 +357,8 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             if failure:
                 return [("finalize.adversarial", f"{failure}{suffix}")]
             execution.update(evidence)
-        elif kind == "adversarial" and runs_pytest(command):
-            failure = _pytest_summary_failure(command, output)
+        elif pytest_probe:
+            failure = _pytest_summary_failure(command, output) or own_pass
             if failure:
                 return [("finalize.adversarial", f"{failure}{suffix}")]
         executions.append(execution)

@@ -104,6 +104,31 @@ def test_suite_filter_still_collects_graduated_probe(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stderr
 
 
+SKIPPED = ("# concern: x\nimport pytest\n"
+           "@pytest.mark.skip\ndef test_attack() -> None:\n    assert True\n")
+
+
+@pytest.mark.parametrize("body, ini, other, accepted", [
+    (TWO_TESTS, "pytest.ini", "test_other.py", True),
+    (SKIPPED, "pytest.ini", "test_other.py", False),
+    # Same basename elsewhere; the probe's own ini makes its nodeid `test_attack.py`.
+    (SKIPPED, f"docs/loom/{CHANGE}/evidence/probes/pytest.ini", "test_attack.py", False),
+], ids=["own-pass", "config-added-file-only", "same-basename"])
+def test_pass_must_come_from_probe_file(tmp_path: Path, body: str, ini: str, other: str,
+                                        accepted: bool) -> None:
+    repo = probe_repo(tmp_path, body)
+    (repo / ini).write_text(f"[pytest]\naddopts = --import-mode=importlib {other}\n",
+                            encoding="utf-8")
+    (repo / other).write_text("def test_other() -> None:\n    assert True\n", encoding="utf-8")
+    commit_all(repo, "a config positional adds another passing file")
+    result = run(repo, tmp_path, f"python3 -m pytest {PROBE}")
+    assert (result.returncode == 0) is accepted, result.stderr
+    if accepted:
+        assert validate(repo, written(repo)) == []
+    else:
+        assert "no passed test from" in result.stderr
+
+
 @pytest.mark.parametrize("body, flags, reason", [
     (TWO_TESTS, "-qq ", "summary"),  # -qq prints no summary line
     ("# concern: x\nimport pytest\n"
