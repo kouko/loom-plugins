@@ -17,6 +17,9 @@ when available and the current position. Show a proposed next step only when
 the purpose is grounded. Explain how key decisions and completed work led here,
 then name the remaining gap. Mark assumptions and unknown facts as such; never
 infer a purpose or completed work from silence.
+Before reporting a historical decision, identify the user turn or prior action
+that establishes it. A formatting choice made for this recap is not a
+historical decision; omit unsupported decision claims.
 If the original purpose is unknown, ask only for the purpose. Do not invent a
 proposed work step when the purpose is unknown. When the original purpose is
 grounded, ask about the proposed next step. If asking for purpose, wait for the
@@ -35,8 +38,9 @@ Stop until the user responds.
 Use bullets for a short path through decisions and work. Put a short
 situation sentence before each table. A table earns its place by comparing
 information or compressing meaningful metadata. Draw a relationship diagram
-only for real dependency, branch, or merge topology; a flat status list needs
-no diagram. Route the form and any ASCII alignment through
+when it clarifies a real dependency, branch, merge, rationale, evidence, or
+sequence relationship; a flat status list needs no diagram. Route the form and
+any ASCII alignment through
 `loom-visualization`; follow its client-specific renderer guidance. Preserve
 the user's exact wording when a phrase changes subsequent behavior, including
 paths, errors, constraints, tools, and commands. Keep confirmed facts,
@@ -69,11 +73,11 @@ to HANDOFF, not this recap.
 
 Use a table to compare alternatives or compress meaningful metadata, and put
 a short situation sentence before it. A single row or unrelated items rarely
-earn a table. Use a relationship diagram only for dependency, branch, or merge
-topology that is easier to understand spatially. Follow `loom-visualization`
-for client rendering choice, ASCII frames, and alignment verification. An
-ordinary status snapshot works as prose or bullets. An explicit user format
-request wins where the client can render it.
+earn a table. Use a relationship diagram for meaningful rationale, evidence,
+sequence, dependency, branch, or merge relationships when spatial layout helps.
+Follow `loom-visualization` for client rendering choice, ASCII frames, and
+alignment verification. An ordinary status snapshot works as prose or bullets.
+An explicit user format request wins where the client can render it.
 
 ## 3 — The Five Shared Core Principles
 

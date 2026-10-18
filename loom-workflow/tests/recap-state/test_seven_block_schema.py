@@ -150,7 +150,6 @@ def test_l3_contract_defines_goal_grounded_natural_output() -> None:
         "■ ",
         "situation sentence before each table",
         "loom-visualization",
-        "dependency, branch, or merge topology",
     ):
         assert required in l3_template, f"L3 contract missing: {required}"
     assert "Use six natural headings" not in l3_template
@@ -161,6 +160,24 @@ def test_l3_contract_defines_goal_grounded_natural_output() -> None:
     assert "instead of the 7 blocks" not in text
     assert "`loom-workflow:recap-state`" in text
     assert "loom-workflow/skills/recap-state/scripts/" in text
+
+
+def test_diagram_rule_covers_meaningful_reasoning_without_status_decoration() -> None:
+    text = load_bundle()
+    template = text.split("## L3 user-visible template", 1)[1].split("## 1 —", 1)[0]
+    guidance = text.split("## 2 — Visual aids", 1)[1].split("## 3 —", 1)[0]
+    for section in (template, guidance):
+        for relationship in ("rationale", "evidence", "sequence", "dependency", "branch", "merge"):
+            assert relationship in section.lower(), f"Diagram rule omits {relationship}"
+        assert "flat status" in section.lower() or "status snapshot" in section.lower()
+        assert "only for dependency" not in section.lower()
+
+
+def test_past_decisions_require_identifiable_conversation_evidence() -> None:
+    text = load_bundle()
+    template = text.split("## L3 user-visible template", 1)[1].split("## 1 —", 1)[0]
+    for requirement in ("user turn", "prior action", "formatting choice", "historical decision", "omit"):
+        assert requirement in template.lower(), f"Decision evidence rule omits {requirement}"
 
 
 def test_good_example_demonstrates_long_session_orientation() -> None:

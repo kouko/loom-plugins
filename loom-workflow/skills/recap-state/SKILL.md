@@ -22,7 +22,10 @@ This is **in-session re-orientation**. The built-in `/recap` is an
    when available, current position, decisions that brought the work here,
    completed work, remaining gap, and, only when the purpose is grounded, a
    proposed next step. Ground each in the conversation; label unavailable facts
-   unknown. In a short session, include only what helps the user regain their
+   unknown. Before calling something a historical decision, identify the user
+   turn or prior action that establishes it; omit an unsupported claim. A
+   formatting choice made for this recap is not a historical decision. In a
+   short session, include only what helps the user regain their
    place. Use the user's conversation language and explain unfamiliar terms
    plainly.
 3. Render the reference's variable-length sections and visual rules. Preserve
