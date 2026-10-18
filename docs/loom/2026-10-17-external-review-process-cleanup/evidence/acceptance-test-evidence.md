@@ -38,3 +38,14 @@ Setup: no install step is needed for the script; `python3 loom-code/scripts/exte
 - How I tried it: `FAKE_MODE=normal` full review runs for all three; a live Codex model-list discovery (`external_review.discover("codex", <abs root>, consent)`, codex-cli 0.163.0, model/list request only, no review content sent); the external-review tests.
 - What came back: all three runs gave `status: completed` with review output `REVIEW: looks fine`, probe returncode 0, and codex observed model and effort `gpt-5.4`/`high`. Live Codex: `status: completed`, candidates `gpt-6.1-sol, gpt-6-astra, gpt-6-sol, gpt-6-luna, gpt-5.6-sol, gpt-5.6-terra, gpt-5.6-luna`, source `model/list`. `pytest loom-code/tests/test_external_review.py loom-code/tests/test_external_review_adversarial.py`: 127 passed.
 - Not run here: live probe or review against any vendor (forbidden, since it would send content and use quota); the full package suite, which finalize-review runs: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+
+## Re-run on 2026-10-18, at 0c5bb1eb
+Fix range b99dd759..0c5bb1eb: only `external_review.py` (a new `_DISCOVERY_REASONS` set and `_is_discovery_reason()`, used by both `discover()` and `execute()`'s error branch) plus 3 test lines. Fresh `git worktree add --detach` at 0c5bb1eb; `--help` ran. The fake CLI gained `FAKE_EXIT` (the exit code for `exit_early`, default 3).
+- 1: carried over — the diff does not touch `_launch`, the timeouts, or the process-group kill; it only changes how a `ValueError` message becomes a reason string.
+- 2: carried over — the diff changes no timeout default, no range check, and no parser default.
+- 3: re-tested — both surfaces, with exit 3 and exit 0:
+  - `--list-candidates`, exit 3: `discovery-error: codex model/list failed: exit 3`
+  - review run, exit 3: `execution-error: codex model/list failed: exit 3`
+  - `--list-candidates`, exit 0: `discovery-error: codex model/list failed: exit 0`
+  - review run, exit 0: `execution-error: codex model/list failed: exit 0`
+- 4: re-tested — `FAKE_MODE=normal` full review runs: codex, claude and agy each `status: completed`, exit 0. Live `discover("codex", ...)` (model/list only): `completed`, the same 7 candidates. `pytest test_external_review.py test_external_review_adversarial.py`: 127 passed. The full suite is left to finalize-review (command above). The coordinator reported a full-suite rerun after the fix with exit 0, but I did not see that run myself, so it is not counted as my evidence.
