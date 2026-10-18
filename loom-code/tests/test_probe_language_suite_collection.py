@@ -1,7 +1,8 @@
 """A graduated Rust probe counts as suite-collected only where plain
 `cargo test` (or `cargo nextest run`, which builds the same test targets)
-builds it: a root Cargo.toml `[[test]]` target's `path`, or `tests/<name>.rs`
-at the repository root when autotests is on."""
+builds it: a root Cargo.toml `[[test]]` target's `path` whose
+`required-features` are all in `[features] default`, or `tests/<name>.rs` or
+`tests/<name>/main.rs` at the repository root when autotests is on."""
 # concern: A Rust probe graduated to tests/ must not be refused as uncollected.
 from __future__ import annotations
 
@@ -22,7 +23,7 @@ def make_rust_repo(tmp_path: Path, cargo_toml: str, kickoff: str | None) -> Path
         path = repo / "docs/loom/KICKOFF-DEFAULTS.md"
         path.parent.mkdir(parents=True)
         path.write_text(f"- package-tests: {kickoff} — fixture (2026-10-16)\n", encoding="utf-8")
-    for name in ("tests/probe.rs", "tests/a/b.rs", "tests/probe.txt"):
+    for name in ("tests/probe.rs", "tests/a/b.rs", "tests/probe.txt", "tests/d/main.rs"):
         (repo / name).parent.mkdir(parents=True, exist_ok=True)
         (repo / name).write_text("#[test]\nfn t() {}\n", encoding="utf-8")
     return repo
@@ -45,9 +46,14 @@ def test_cargo_tests_dir_collected(tmp_path: Path, kickoff: str | None) -> None:
     (PACKAGE + 'autotests = false\n[[test]]\nname = "probe"\npath = "tests/probe.rs"\n',
      "tests/probe.rs"),
     (PACKAGE + 'autotests = false\n[[test]]\nname = "probe"\n', "tests/probe.rs"),
+    (PACKAGE + '[features]\ndefault = ["x"]\nx = []\n[[test]]\nname = "b"\npath = "tests/a/b.rs"\n'
+     'required-features = ["x"]\n', "tests/a/b.rs"),
+    (PACKAGE, "tests/d/main.rs"),
 ], ids=["cargo-declared-test-target-collected-outside-autodiscovery",
         "cargo-declared-test-target-collected-autotests-off",
-        "cargo-declared-test-target-collected-name-only"])
+        "cargo-declared-test-target-collected-name-only",
+        "cargo-declared-test-target-collected-default-feature",
+        "cargo-declared-test-target-collected-dir-main"])
 def test_cargo_declared_test_target_collected(tmp_path: Path, cargo_toml: str, artifact: str) -> None:
     repo = make_rust_repo(tmp_path, cargo_toml, None)
     assert suite_collection(repo, artifact) == (True, "")
@@ -67,6 +73,12 @@ def test_cargo_declared_test_target_collected(tmp_path: Path, cargo_toml: str, a
      "tests/a/b.rs"),
     (PACKAGE + '[[test]]\nname = "probe"\npath = "tests/probe.rs"\ntest = false\n', None,
      "tests/probe.rs"),
+    (PACKAGE + '[features]\ndefault = ["y"]\nx = []\ny = []\n[[test]]\nname = "b"\npath = "tests/a/b.rs"\n'
+     'required-features = ["x", "y"]\n', None, "tests/a/b.rs"),
+    (PACKAGE + '[features]\ndefault = ["a"]\na = ["x"]\nx = []\n[[test]]\nname = "b"\n'
+     'path = "tests/a/b.rs"\nrequired-features = ["x"]\n', None, "tests/a/b.rs"),
+    (PACKAGE + '[[test]]\nname = "d"\npath = "tests/d/main.rs"\ntest = false\n', None, "tests/d/main.rs"),
+    (PACKAGE + 'autotests = false\n', None, "tests/d/main.rs"),
 ], ids=["cargo-autotests-off-or-subdir-refused-autotests",
         "cargo-autotests-off-or-subdir-refused-subdir",
         "cargo-autotests-off-or-subdir-refused-non-rs",
@@ -76,7 +88,11 @@ def test_cargo_declared_test_target_collected(tmp_path: Path, cargo_toml: str, a
         "cargo-autotests-off-or-subdir-refused-nextest-other-option",
         "cargo-autotests-off-or-subdir-refused-test-false",
         "cargo-autotests-off-or-subdir-refused-required-features",
-        "cargo-autotests-off-or-subdir-refused-test-false-overrides-autodiscovery"])
+        "cargo-autotests-off-or-subdir-refused-test-false-overrides-autodiscovery",
+        "cargo-autotests-off-or-subdir-refused-feature-not-default",
+        "cargo-autotests-off-or-subdir-refused-transitive-feature",
+        "cargo-autotests-off-or-subdir-refused-test-false-dir-main",
+        "cargo-autotests-off-or-subdir-refused-autotests-dir-main"])
 def test_cargo_autotests_off_or_subdir_refused(
     tmp_path: Path, cargo_toml: str, kickoff: str | None, artifact: str
 ) -> None:

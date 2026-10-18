@@ -49,9 +49,12 @@ path = "probes/mapped.rs"
 
 @pytest.fixture(scope="module")
 def repo(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    """A repository root whose Cargo.toml maps `--test mapped` to a non-default path."""
+    """A repository root whose Cargo.toml maps `--test mapped` to a non-default
+    path, with an auto-discovered `tests/dir/main.rs` target named `dir`."""
     root = tmp_path_factory.mktemp("repo")
     (root / "Cargo.toml").write_text(CARGO_TOML, encoding="utf-8")
+    (root / "tests/dir").mkdir(parents=True)
+    (root / "tests/dir/main.rs").write_text("#[test]\nfn t() {}\n", encoding="utf-8")
     return root
 
 GO_PASS = """\
@@ -607,6 +610,7 @@ def test_node_deno_bun_unittest_passing_accepted(command: str, artifact: str, ou
     ("cargo test --test attack", RUST, CARGO_PASS),
     ("cargo test --release -q --test=attack", RUST, CARGO_QUIET_PASS),
     ("cargo test --test mapped", RUST_MAPPED, CARGO_PASS),
+    ("cargo test --test dir", "tests/dir/main.rs", CARGO_PASS),
     ("cargo nextest run --release --no-tests=fail --test attack", RUST, NEXTEST_PASS),
     ("cargo nextest run --no-tests fail --test mapped", RUST_MAPPED, NEXTEST_PASS),
 ])

@@ -541,7 +541,8 @@ def _cargo_target_name(args: list[str], flags: frozenset[str]) -> str | None:
 
 def _cargo_test_path(repo: Path | None, name: str) -> str | None:
     """The file `--test <name>` builds: the Cargo.toml `[[test]]` entry of
-    that name (named, or named by its path's stem), else `tests/<name>.rs`.
+    that name (named, or named by its path's stem) or the auto-discovered
+    `tests/<name>/main.rs`, else `tests/<name>.rs`.
     An explicit `--test` runs a `test = false` target too. None when the
     manifest cannot be read."""
     if repo is None:

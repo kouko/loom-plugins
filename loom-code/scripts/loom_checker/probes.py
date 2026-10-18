@@ -219,13 +219,17 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
     a target even under `autotests = false`; its `path` defaults to
     `tests/<name>.rs` and its name to the path's stem:
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#test-targets
-    An undeclared `tests/<name>.rs` is a target unless `[package]
-    autotests = false`; a declared entry of the same path replaces it:
+    An undeclared `tests/<name>.rs` or `tests/<name>/main.rs` is a target
+    named `<name>` unless `[package] autotests = false`; a declared entry of
+    the same path replaces it:
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#target-auto-discovery
-    `runs` is whether plain `cargo test` runs it: not `test = false`, no
-    `required-features`:
+    `runs` is whether plain `cargo test` runs it: not `test = false`, and
+    every `required-features` entry listed directly in `[features] default`
+    (a feature another default feature enables is not followed, so such a
+    target is refused):
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-test-field
-    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-required-features-field"""
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-required-features-field
+    https://doc.rust-lang.org/cargo/reference/features.html#the-default-feature"""
     try:
         manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
@@ -235,6 +239,9 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
     if not isinstance(package, dict):
         return [], ""
     targets = []
+    features = manifest.get("features")
+    default = features.get("default") if isinstance(features, dict) else None
+    default = {item for item in default if isinstance(item, str)} if isinstance(default, list) else set()
     declared = manifest.get("test")
     for entry in declared if isinstance(declared, list) else []:
         if not isinstance(entry, dict):
@@ -247,12 +254,16 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
         else:
             continue
         name = name if isinstance(name, str) else Path(path).stem
-        targets.append((name, path, entry.get("test") is not False and not entry.get("required-features")))
+        required = entry.get("required-features") or []
+        enabled = isinstance(required, list) and all(
+            isinstance(item, str) and item in default for item in required)
+        targets.append((name, path, entry.get("test") is not False and enabled))
     if package.get("autotests") is not False:
         known = {path for _name, path, _runs in targets}
-        for file in sorted((repo / "tests").glob("*.rs")):
-            if f"tests/{file.name}" not in known:
-                targets.append((file.stem, f"tests/{file.name}", True))
+        found = [(file.stem, f"tests/{file.name}") for file in sorted((repo / "tests").glob("*.rs"))]
+        found += [(file.parent.name, f"tests/{file.parent.name}/main.rs")
+                  for file in sorted((repo / "tests").glob("*/main.rs"))]
+        targets += [(name, path, True) for name, path in found if path not in known]
     return targets, ""
 
 
