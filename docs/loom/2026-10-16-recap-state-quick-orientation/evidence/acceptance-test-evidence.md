@@ -234,3 +234,56 @@ This re-run used a fresh local clone at `/private/tmp/recap-state-acceptance-fdf
 ### UI flow 10, dependency or branch — re-tested
 
 - Reference `:40-43`, `:73-81` includes genuine dependency and branch relationships, and `:219-251` shows a future decision branch and ordered process. All four diagram blocks passed `align.py`. No current-HEAD model selection or client rendering was observed.
+
+## Re-run on 2026-10-18, at 0b120aa0
+
+This re-run used a new clean clone at `/private/tmp/recap-state-acceptance-0b120aa0`, created with `git clone --no-hardlinks --quiet . /private/tmp/recap-state-acceptance-0b120aa0`. Before checks, `git rev-parse HEAD` returned `0b120aa0d55c86667adf17327652cb69e349ebad`; `git status --short` was empty. `git diff 937f885f..0b120aa0` changed only three lines in `docs/loom/2026-10-16-recap-state-quick-orientation/spec.md`: conditional next-step wording in REQ-1, conditional final-question wording in REQ-5, and diagram eligibility in one design decision. No runtime skill, schema, README, or test changed. This is a spec-conformance re-run, not a new live behavior trial.
+
+### Clean-copy setup and focused checks
+
+- Followed `README.md:174-230`'s local validation path: `agy plugin validate ./loom-workflow` returned `[ok] ./loom-workflow`, `skills: 13 processed`, and `hooks: 1 processed`.
+- Ran the focused recap checks: `pytest -q loom-workflow/tests/recap-state/test_skill_md.py loom-workflow/tests/recap-state/test_seven_block_schema.py loom-workflow/tests/recap-state/test_readmes.py loom-workflow/tests/scripts/test_recap_state_compaction.py`. Output: `20 passed in 0.19s`.
+- Re-extracted eight fenced text blocks from the unchanged runtime reference and ran each through `python3 loom-workflow/skills/loom-visualization/scripts/align.py -`: eight of eight returned exit 0 and `no drift`. The worked recap still has three fullwidth-space-only section separators and a situation sentence directly before its table.
+- The full package suite was left to `finalize-review`. The README command is `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; that automated suite runs before acceptance and blocks a failing change. No result for the full suite is claimed here.
+- The previous attempt to run the current skill through Codex CLI was rejected by automatic approval review because it could transmit private repository content to an external model. The rejection explicitly forbade a workaround. No Codex CLI command was retried, no Claude Code was used, and no output or client rendering at `0b120aa0` was observed. The older `e4e8c626` dogfood does not verify this source.
+
+### Acceptance 1 — re-tested
+
+- Full scope checked: known purpose, unknown purpose, long-session output guidance, current position, and next-step condition. The changed `spec.md:7` now agrees with `SKILL.md:21-40` and reference `:14-27`: a proposed next step requires a grounded purpose; otherwise the recap labels it unknown and asks for purpose. The known-purpose worked example remains at reference `:118-195`, and all three unchanged local READMEs still describe both branches. Focused tests passed.
+- Finding: `spec.md:38` still says the long-session UI flow shows a `proposed next step` without a purpose condition. In the unknown-purpose case, that line conflicts with REQ-1 and the runtime prohibition on inventing a work step. No live long-session output was obtained; result remains `partly`.
+
+### Acceptance 2 — carried over
+
+- Diff check: the only source change is `spec.md:7`, `:16`, `:22`. REQ-2 and the runtime decision-source, completed-work and remaining-gap rules did not change. The prior `partly` verdict and its no-live-output limit remain.
+
+### Acceptance 3 — re-tested
+
+- Full scope checked: heading frames, separator spacing, table preface, information-bearing diagrams, flat-status exclusion and short-session economy. The changed design decision at `spec.md:22` now names rationale, evidence, sequence, dependency, branch and merge, matching reference `:38-43`, `:73-81`. The eight alignment checks, three fullwidth separators, table-preface check and relevant focused tests passed. Actual client spacing and autonomous diagram choice remain unobserved; result is `partly`.
+
+### Acceptance 4 — carried over
+
+- Diff check: REQ-4, runtime fact/assumption/unknown and exact-quotation rules, and worked example were untouched. The prior `partly` verdict remains because no live output was observed.
+
+### Acceptance 5 — re-tested
+
+- Full scope checked: unknown-purpose question, grounded-purpose next-step question, and stop/wait. Changed `spec.md:16` now matches `SKILL.md:35-40`, `:49-59` and reference `:23-36`, `:103-111`; three local READMEs still show separate waiting states. Focused tests passed. The contradictory long-session UI flow at `spec.md:38` remains, and no live question or post-question pause was observed; result is `partly`.
+
+### Acceptance 6 — carried over
+
+- Diff check: REQ-6, runtime chat-only/no-file, handoff and built-in-recap boundaries were untouched. The prior `partly` verdict remains because live file effects were never observed.
+
+### UI flow 7, long conversation — re-tested
+
+- Checked both purpose branches and every named surface. The worked example still covers purpose, current position, history, completed and pending work, unknown refund rule, a grounded next step and final alignment question. `spec.md:38` remains unqualified about next step, conflicting with `spec.md:7`, `:16` for an unknown-purpose long session. Worked-example and routing tests passed; no host run was obtained.
+
+### UI flow 8, short conversation — re-tested
+
+- The changed REQ-5 applies to short sessions too: reference `:23-27` still omits useless sections and asks only for the original purpose when unknown. Three local READMEs retain this branch. Focused schema and README tests passed; no host output was obtained.
+
+### UI flow 9, table — re-tested
+
+- The changed diagram decision at `spec.md:22` excludes flat status diagrams, leaving the table rule in `spec.md:40` and reference `:38-43`, `:73-81` aligned. The worked table still has its situation sentence immediately before it. Focused tests passed; live selection and rendering remain unverified.
+
+### UI flow 10, dependency or branch — re-tested
+
+- `spec.md:22`, `:41` and reference `:40-43`, `:73-81` permit a diagram for real dependency/branch relationships when it helps. The decision-tree and process examples at reference `:219-251` remain, and all four diagram text blocks passed the alignment checker. A live agent's selection and client rendering remain unverified.
