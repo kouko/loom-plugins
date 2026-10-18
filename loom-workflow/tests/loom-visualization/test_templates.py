@@ -20,7 +20,7 @@ from checks_kink import find_issues as kink_issues  # noqa: E402
 from checks_seam import find_issues as seam_issues  # noqa: E402
 from checks_table import find_issues as table_issues  # noqa: E402
 from generate import render  # noqa: E402
-from glyphs import CORNERS, HORIZONTALS, TEES, VERTICALS  # noqa: E402
+from width import display_width  # noqa: E402
 
 SKILL_DIR = SCRIPTS.parent
 TEMPLATES = SKILL_DIR / "templates"
@@ -45,7 +45,6 @@ EXPECTED = {
     "13-cross-role-workflow.md": ("flowchart LR", None),
 }
 
-BOX_GLYPHS = VERTICALS | HORIZONTALS | CORNERS | TEES
 FENCE = re.compile(r"^```([\w-]*)[^\n]*\n(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
 CJK = re.compile(r"[぀-ヿ㐀-鿿]")
 
@@ -143,8 +142,11 @@ def test_ascii_blocks_pass_ported_checks():
     for name, (_, shape) in EXPECTED.items():
         text = _read(name)
         generated = {out for s, _, out in generator_examples(text)}
-        for lang, block in fences(sections(text)["ASCII"]):
-            if lang in ("json", "mermaid") or not set(block) & BOX_GLYPHS:
+        ascii_blocks = fences(sections(text)["ASCII"])
+        if name in ("12-task-dependencies.md", "13-cross-role-workflow.md"):
+            assert len([block for lang, block in ascii_blocks if lang == ""]) == 1, name
+        for lang, block in ascii_blocks:
+            if lang in ("json", "mermaid"):
                 continue
             if shape == "seq" and block in generated:
                 # gen_seq is correct by construction; its blank off-span
@@ -152,6 +154,17 @@ def test_ascii_blocks_pass_ported_checks():
                 # verified by regeneration below instead.
                 continue
             assert drift(block) == [], f"{name}: {drift(block)}"
+            # Ported checks alone miss connector drift in these unboxed examples.
+            lines = block.splitlines()
+            if name == "12-task-dependencies.md":
+                join_columns = [display_width(line.rsplit(mark, 1)[0])
+                                for line, mark in ((lines[2], "+"), (lines[3], "|"), (lines[4], "+"))]
+                assert len(set(join_columns)) == 1, name
+            if name == "13-cross-role-workflow.md":
+                handoff_columns = {display_width(line[:line.index(mark)])
+                                   for line, mark in ((lines[1], "|"), (lines[2], "|"), (lines[3], "v"),
+                                                      (lines[5], "|"), (lines[6], "|"), (lines[7], "v"))}
+                assert len(handoff_columns) == 1, name
 
 
 def test_generator_examples_reproduce_their_output():
@@ -218,8 +231,12 @@ def test_cross_role_workflow_routes_owned_steps_and_handoffs():
         assert f"[{owner}]" in sections(text)["ASCII"]
         assert step in sections(text)["ASCII"]
     (mermaid,) = [b for lang, b in fences(sections(text)["Mermaid"]) if lang == "mermaid"]
-    assert len(re.findall(r"\bsubgraph\b", mermaid)) >= 2
-    assert "handoff" in mermaid.lower()
+    for owner, role, node, step in (("Product", "產品", "A", "提出需求"),
+                                   ("Design", "設計", "B", "擬定流程"),
+                                   ("Engineering", "工程", "C", "實作流程")):
+        assert re.search(rf'subgraph {owner}\["{role}"\]\s+{node}\["{node}: {step}"\]\s+end', mermaid)
+    assert re.search(r'A -->\|"handoff: 需求說明"\| B', mermaid)
+    assert re.search(r'B -->\|"handoff: 流程稿"\| C', mermaid)
 
 
 def test_cross_role_workflow_is_not_message_only_sequence():
