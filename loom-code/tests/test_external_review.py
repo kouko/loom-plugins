@@ -865,3 +865,99 @@ def test_codex_discovery_times_out_when_app_server_never_answers(tmp_path, monke
     result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
     assert result["reason"] == "discovery-timeout: 1s"
     _assert_reaped(pidfile)
+
+
+_FAKE_CLI = """#!{python}
+import json, os, subprocess, sys, time
+mode = {mode!r}
+if mode == "codex-exit":
+    sys.exit(3)
+text = sys.stdin.read()
+if mode == "claude" and "single word ok" in text:
+    print(json.dumps({{"result": "ok", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}))
+    sys.exit(0)
+print("gemini-2.5-pro", flush=True)
+child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(5)"])
+open({pidfile!r}, "w").write(str(child.pid))
+if mode != "exit-early":
+    time.sleep(5)
+"""
+
+
+def _fake_cli(tmp_path, monkeypatch, name, mode):
+    import sys
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    pidfile = tmp_path / "pid"
+    script = bin_dir / name
+    script.write_text(_FAKE_CLI.format(python=sys.executable, pidfile=str(pidfile), mode=mode))
+    script.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
+    return pidfile
+
+
+def _assert_descendant_gone(pidfile):
+    import os
+    import time
+    pid = int(pidfile.read_text())
+    for _ in range(50):
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return
+        time.sleep(0.05)
+    pytest.fail("descendant still running")
+
+
+def test_agy_discovery_times_out_when_descendant_holds_stdout(tmp_path, monkeypatch):
+    import time
+    pidfile = _fake_cli(tmp_path, monkeypatch, "agy", "hang")
+    monkeypatch.setattr(review, "AGY_DISCOVERY_TIMEOUT", 1)
+    start = time.monotonic()
+    result = review.discover("agy", str(tmp_path), consent("agy", scope=str(tmp_path)))
+    assert result["reason"] == "discovery-timeout: 1s"
+    assert time.monotonic() - start < 4
+    _assert_descendant_gone(pidfile)
+
+
+def test_agy_discovery_exit_with_lingering_descendant_is_not_timeout(tmp_path, monkeypatch):
+    import time
+    pidfile = _fake_cli(tmp_path, monkeypatch, "agy", "exit-early")
+    start = time.monotonic()
+    result = review.discover("agy", str(tmp_path), consent("agy", scope=str(tmp_path)))
+    assert result["candidates"] == ["gemini-2.5-pro"], result
+    assert time.monotonic() - start < 4
+    _assert_descendant_gone(pidfile)
+
+
+def test_review_stage_times_out_when_descendant_holds_stdout(tmp_path, monkeypatch):
+    import time
+    pidfile = _fake_cli(tmp_path, monkeypatch, "claude", "claude")
+    start = time.monotonic()
+    result = review.execute("claude", "sonnet", "high", "anthropic", str(tmp_path),
+                            "review", consent("claude", scope=str(tmp_path)),
+                            probe_timeout=1, review_timeout=2)
+    assert result["reason"] == "execution-timeout: 2s", result
+    assert time.monotonic() - start < 4.5
+    _assert_descendant_gone(pidfile)
+
+
+def test_codex_exit_before_answer_reports_exit_code(tmp_path, monkeypatch):
+    _fake_cli(tmp_path, monkeypatch, "codex", "codex-exit")
+    result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
+    assert result["reason"] == "discovery-error: codex model/list failed: exit 3"
+
+
+def test_review_timeout_default_is_thirty_minutes(monkeypatch):
+    import inspect
+    assert inspect.signature(review.execute).parameters["review_timeout"].default == 1800
+    execute, seen = review.execute, {}
+    monkeypatch.setattr(review, "execute", lambda *a, **k: seen.update(k) or {"status": "failed"})
+    review.main(["--executor", "codex", "--scope", "/repo", "--consent-record", "/nonexistent",
+                 "--model", "m", "--effort", "high", "--family", "openai"],
+                stdin=__import__("io").StringIO(""), out=__import__("io").StringIO())
+    assert seen["review_timeout"] == 1800
+    result = execute("codex", "gpt-6.1-sol", "high", "openai", "/repo", "review",
+                            consent(), runner=lambda *a, **k: pytest.fail("spawned"),
+                            review_timeout=1801)
+    assert result["reason"] == "invalid-explicit-profile"

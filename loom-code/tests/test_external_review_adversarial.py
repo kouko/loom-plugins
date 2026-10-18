@@ -177,7 +177,7 @@ sys.path.insert(0, sys.argv[1])
 import external_review as er
 er.CODEX_DISCOVERY_TIMEOUT = 2
 try:
-    er._codex_candidates(subprocess.run, os.getcwd())
+    er._codex_candidates(er._launch, os.getcwd())
 except subprocess.TimeoutExpired:
     print("timeout-raised")
 """
