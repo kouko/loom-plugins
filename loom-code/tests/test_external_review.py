@@ -872,6 +872,8 @@ import json, os, subprocess, sys, time
 mode = {mode!r}
 if mode == "codex-exit":
     sys.exit(3)
+if mode == "codex-exit0":
+    sys.exit(0)
 text = sys.stdin.read()
 if mode == "claude" and "single word ok" in text:
     print(json.dumps({{"result": "ok", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}))
@@ -942,10 +944,11 @@ def test_review_stage_times_out_when_descendant_holds_stdout(tmp_path, monkeypat
     _assert_descendant_gone(pidfile)
 
 
-def test_codex_exit_before_answer_reports_exit_code(tmp_path, monkeypatch):
-    _fake_cli(tmp_path, monkeypatch, "codex", "codex-exit")
+@pytest.mark.parametrize("mode,code", [("codex-exit", 3), ("codex-exit0", 0)])
+def test_codex_exit_before_answer_reports_exit_code(tmp_path, monkeypatch, mode, code):
+    _fake_cli(tmp_path, monkeypatch, "codex", mode)
     result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
-    assert result["reason"] == "discovery-error: codex model/list failed: exit 3"
+    assert result["reason"] == f"discovery-error: codex model/list failed: exit {code}"
 
 
 def test_review_timeout_default_is_thirty_minutes(monkeypatch):

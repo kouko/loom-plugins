@@ -143,18 +143,24 @@ def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
         for line in proc.stderr:
             err.append(line)
 
-    readers = [threading.Thread(target=read_out, daemon=True),
-               threading.Thread(target=read_err, daemon=True)]
-    try:
-        for reader in readers:
-            reader.start()
+    def write_in() -> None:
+        # A child that never reads blocks this write once input exceeds the
+        # pipe buffer, so it runs off the main thread, inside the deadline.
         try:
             proc.stdin.write(input)
             proc.stdin.flush()
             if until_response_id is None:
                 proc.stdin.close()
-        except BrokenPipeError:
+        except (OSError, ValueError):
             pass
+
+    readers = [threading.Thread(target=read_out, daemon=True),
+               threading.Thread(target=read_err, daemon=True)]
+    writer = threading.Thread(target=write_in, daemon=True)
+    try:
+        for reader in readers:
+            reader.start()
+        writer.start()
         if until_response_id is None:
             try:
                 proc.wait(timeout)
@@ -172,12 +178,12 @@ def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
         except (ProcessLookupError, PermissionError):
             pass
         proc.wait()
-        for reader in readers:
-            if reader.ident is not None:
-                reader.join(1)
-        # Never close a stream under a still-blocked reader.
-        streams = [proc.stdin] + [s for s, r in zip((proc.stdout, proc.stderr), readers)
-                                  if not r.is_alive()]
+        for thread in (*readers, writer):
+            if thread.ident is not None:
+                thread.join(1)
+        # Never close a stream under a still-blocked reader or writer.
+        streams = [s for s, t in zip((proc.stdin, proc.stdout, proc.stderr),
+                                     (writer, *readers)) if not t.is_alive()]
         for stream in streams:
             try:
                 stream.close()
@@ -229,7 +235,7 @@ def _codex_candidates(runner: Runner, scope: str) -> list[str]:
         if not isinstance(rows, list):
             raise ValueError("codex model/list result missing data array")
         return [row["id"] for row in rows if isinstance(row, dict) and isinstance(row.get("id"), str)]
-    raise ValueError("codex model/list response missing")
+    raise ValueError(f"codex model/list failed: exit {response.returncode}")
 
 
 def _agy_candidates(runner: Runner, scope: str) -> list[str]:
@@ -287,7 +293,7 @@ def discover(executor: str, scope: str, consent: Mapping[str, Any] | None,
         known = {"codex model/list error: not initialized",
                  "codex model/list error: unknown error",
                  "codex model/list result missing data array",
-                 "codex model/list response missing", "agy models failed",
+                 "agy models failed",
                  "unknown executor"}
         detail = str(exc) if isinstance(exc, ValueError) and (
             str(exc) in known or re.fullmatch(r"codex model/list failed: exit -?\d+", str(exc))
