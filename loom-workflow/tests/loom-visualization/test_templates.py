@@ -179,6 +179,7 @@ def test_at_least_three_templates_use_cjk_labels():
     assert len(cjk) >= 3, cjk
 
 
+# concern: A parallel task join silently losing one required prerequisite.
 def test_task_dependencies_route_and_show_parallel_join():
     skill = SKILL_MD.read_text(encoding="utf-8")
     text = _read("12-task-dependencies.md")
