@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.42.1] — 2026-10-18 — sync-trunk rebases a never-pushed change branch
+
+- `sync-trunk` now rebases a change branch that has never been pushed onto the fetched trunk tip, so no merge commit is created.
+- A branch that has been pushed (the live origin lists it, any of its commits is on any remote-tracking ref, or it has a configured upstream or pushRemote other than origin's trunk) keeps the merge path, as does a branch that already holds a merge commit, whose history touches a local ignored or untracked file, or whose lookup fails. It never forces a push.
+- After a rebase, `sync-trunk` says the branch's commit ids changed, so any commit-sha reference recorded on the branch must be re-pinned.
+
 ## [3.42.0] — 2026-10-18 — close the remaining adversarial-probe acceptance gaps
 
 - A pytest probe must name only its artifact, and a run is refused when its summary shows deselected tests, no passed test, or no summary at all (for example under `-qq`). At least one passing test must come from the probe's own file, so a file added by configuration cannot supply the pass.
