@@ -4,6 +4,15 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.11.1] — 2026-10-19 — shared node rendering helpers
+
+- `width.py` gains the shared structured-node rendering helpers
+  (`render_structured_node`, `center`, `EMPTY_BODY`,
+  `require_single_line`); flow, arch, tree, seq and bar generators
+  consume them instead of carrying inline copies.
+- No behaviour change: generator output is byte-identical (golden-diff
+  evidence in `docs/loom/2026-09-28-structured-node-shared-helper/evidence/`).
+
 ## [5.11.0] — 2026-10-18 — make diagram node titles understandable on their own
 
 - Guide ASCII and Mermaid diagram authors to use short titles that name each node's action or role without needing its body. Add a body only when it contributes distinct information.

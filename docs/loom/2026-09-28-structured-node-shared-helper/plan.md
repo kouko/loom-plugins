@@ -44,7 +44,7 @@ charter: 1.1
 **W2-02 Release metadata bump**  after: W2-01  acceptance: 3
 - Files: loom-workflow/plugin.json, loom-workflow/.claude-plugin/plugin.json, loom-workflow/.codex-plugin/plugin.json, loom-workflow/CHANGELOG.md, loom-workflow/README.md, loom-workflow/README.ja.md, loom-workflow/README.zh-TW.md, README.md
 - Test: A3 positive: synchronized-release-metadata test green after bump; negative: stale version strings detected by grep pins.
-- Risk: patch bump 5.5.1 per repo versioning rule; test_release_metadata pins must move in lockstep, agent-decided.
+- Risk: patch bump 5.11.1 per repo versioning rule (re-bumped from 5.5.1 after trunk sync on 2026-10-19); test_release_metadata pins must move in lockstep, agent-decided.
 
 ## Simplicity check
 - Add shared helpers to the existing width.py — taken
