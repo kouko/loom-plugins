@@ -1026,3 +1026,18 @@ def test_gen_flow_structured_node_width_budget():
     assert len(widths_w10) == 1, f"lines misaligned with width=10: {sorted(widths_w10)}"
     _report, issues = analyze(out_w10)
     assert issues == [], f"oracle found drift with width=10: {issues}"
+
+
+def test_string_node_with_empty_body_keeps_its_error_text():
+    # WHY: flow steps and arch layer names given as "title\n" strings have no
+    # body. Both generators must reject them with the same message they used
+    # before the shared-helper refactor, so callers matching it keep working.
+    import pytest
+
+    expected = "Body cannot be empty for structured node from string with \\n"
+    with pytest.raises(ValueError) as flow_error:
+        render_flow(["Title\n"])
+    with pytest.raises(ValueError) as arch_error:
+        render_arch([{"name": "Title\n", "components": ["a"]}])
+    assert str(flow_error.value) == expected
+    assert str(arch_error.value) == expected

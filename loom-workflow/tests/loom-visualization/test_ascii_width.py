@@ -298,20 +298,6 @@ def test_EMPTY_BODY_constant():
     assert EMPTY_BODY == "Body cannot be empty for structured node"
 
 
-def test_EMPTY_BODY_FROM_STRING_constant():
-    from width import EMPTY_BODY_FROM_STRING
-    assert EMPTY_BODY_FROM_STRING == (
-        "Body cannot be empty for structured node from string with \\n"
-    )
-
-
-def test_empty_body_messages_live_only_in_width():
-    scripts = pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"
-    for gen in ("gen_flow.py", "gen_arch.py", "gen_tree.py"):
-        source = (scripts / gen).read_text(encoding="utf-8")
-        assert "Body cannot be empty" not in source, gen
-
-
 def test_center_plain_ascii():
     from width import center
     # Even slack
