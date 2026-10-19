@@ -26,7 +26,7 @@ from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines, center, EMPTY_BODY, render_structured_node
+from width import display_width, split_lines, center, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
 
 
 def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> str:
@@ -111,7 +111,7 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
 
                 # Validate body is not empty
                 if not body:
-                    raise ValueError("Body cannot be empty for structured node from string with \\n")
+                    raise ValueError(EMPTY_BODY_FROM_STRING)
 
                 block.extend(render_structured_node(title, body, interior))
             else:

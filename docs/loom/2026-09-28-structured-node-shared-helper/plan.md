@@ -60,3 +60,4 @@ charter: 1.1
 1. A helper that drifts from the four blocks' exact output breaks A2 silently — golden diff (W2-01) is the guard; port behaviour, never re-imagine it.
 2. `gen_seq`/`gen_bar` error message wording is a fixed string in existing tests — the shared guard must accept a per-call message so text survives.
 3. Version pins move in three manifests plus tests — W2-02 bumps patch and syncs all in one commit; stale-string grep is the backstop.
+4. agent-decided (2026-10-19, after acceptance re-run found 2 inline empty-body messages) — the string-input variant becomes `EMPTY_BODY_FROM_STRING = EMPTY_BODY + " from string with \\n"` in `width.py`, so all 5 sites derive from the one `EMPTY_BODY` constant; a single literal for all 5 would change error text and break A2.

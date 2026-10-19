@@ -153,8 +153,12 @@ EMPTY_BODY = "Body cannot be empty for structured node"
 """Error message for empty structured node body.
 
 Used by gen_flow, gen_arch, and gen_tree when a structured node's body is empty.
-The longer variant "Body cannot be empty for structured node from string with \n"
-is specific to string-input paths and remains at those call sites.
+"""
+
+EMPTY_BODY_FROM_STRING = EMPTY_BODY + " from string with \\n"
+"""Error message for an empty body in a structured node given as a string.
+
+Used by gen_flow and gen_arch on their string-input paths.
 """
 
 
