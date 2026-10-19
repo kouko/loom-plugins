@@ -11,4 +11,4 @@ loom_checker.py reads this file. Absent key = default. -->
 - interface-surfaces: **/cli/**, **/api/**, **/commands/**, **/*.tsx, **/templates/** — manifest default; SKILL.md and hooks are the `skill`/`gate` artifact types, not user interfaces, so skill edits stay engineering (2026-09-03)
 - docs-lint: none — no lint adopted yet; internal loom docs are English from 2026-09-05 — see intent 2026-09-03-artifact-language-policy (2026-09-05)
 
-Removed `default-lane` — no checker code read it once the reviewer floor became path-computed, and per-change step selection replaces lanes; see intent 2026-09-14-expert-mode-step-selection (2026-09-14)
+Removed `default-lane` — no checker code read it once the reviewer floor became path-computed, and per-change step selection replaces lanes; see intent 2026-09-14-expert-mode-step-selection (2026-09-14); step selection was itself removed by intent 2026-10-01-remove-expert-mode, so skipping a step in plain words is the only skip route (2026-10-01)

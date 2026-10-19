@@ -5,9 +5,11 @@ prose has to spell out row by row; a form that carries one item is padding.
 
 ## Requirement identifiers
 
-The grammar itself is declared once, in `loom-code`'s contract manifest
-(`artifacts.spec.fields`, the `Requirements` entry). What that grammar
-does not say, and what holds anyway:
+Each line of the `Requirements` section follows this grammar:
+
+Grammar: `REQ-<n> — <name> … → Acceptance #<n>`
+
+What that grammar does not say, and what holds anyway:
 
 - **Authored, never derived.** You type the number. It is never slugified
   or hashed from the name — a derived id desyncs from its requirement the

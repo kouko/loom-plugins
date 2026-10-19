@@ -2,18 +2,16 @@ from __future__ import annotations
 
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
-from loom_checker.helpers import changed_paths
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
-from loom_checker.helpers import glob_to_regex
 from loom_checker.helpers import is_real_date
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
 from loom_checker.parsing import parse_document
 from loom_checker.rule_checks.publish import validate_contextual_pr_body
-from loom_checker.rule_checks.publish import validate_selection_disclosure
+from loom_checker.rule_checks.publish import validate_stated_status
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
 from loom_checker.rule_checks.push import github_repo_from_origin
 from loom_checker.verification import identify_change
@@ -29,12 +27,6 @@ import subprocess
 import sys
 import tempfile
 import time
-
-
-# Named so callers that derive the publication identity can tell "no
-# attestation on this branch" from the other derivation failures, and say what
-# to do about it. The text itself is unchanged.
-MISSING_ATTESTATION = "branch must carry exactly one attested change; found "
 
 
 PUBLISH_REDIRECT_ENV = {
@@ -154,32 +146,6 @@ def _publish_args(args: list[str]) -> tuple[str, Path, Path | None, bool] | str:
         if not intent_file.is_file() or not os.access(intent_file, os.R_OK):
             return f"--intent is not a readable file: {intent_file}"
     return title, body_file, intent_file, authorized
-
-
-def _publication_attestation(repo: Path) -> tuple[str | None, dict | None, str | None]:
-    """The sole attested change in the branch and its attestation at HEAD."""
-    manifest = load_manifest()
-    template = manifest.get("artifacts", {}).get("attestation", {}).get("path")
-    if not template:
-        return None, None, "contract manifest declares no attestation artifact"
-    matcher = glob_to_regex(template.replace("<change-id>", "*"))
-    candidates = sorted(path for path in changed_paths(repo) if matcher.fullmatch(path))
-    if len(candidates) != 1:
-        return None, None, f"{MISSING_ATTESTATION}{len(candidates)}"
-    match = re.fullmatch(
-        re.escape(template).replace(re.escape("<change-id>"), r"(?P<change_id>[^/]+)"),
-        candidates[0],
-    )
-    if match is None:
-        return None, None, "cannot derive attested change id"
-    change_id = match.group("change_id")
-    try:
-        payload = json.loads(git_text(repo, "show", f"HEAD:{candidates[0]}"))
-    except (UsageError, json.JSONDecodeError):
-        return None, None, "attestation must be committed at HEAD"
-    if not isinstance(payload, dict) or payload.get("change_id") != change_id:
-        return None, None, "attestation change_id does not match its path"
-    return change_id, payload, None
 
 
 def _intent_authorizes_publication(
@@ -419,19 +385,19 @@ def _cmd_publish_trusted(
         return _publish_block("literal origin is not a supported GitHub repository URL", err)
     env = _publish_env(identity, repo, (trusted_git, trusted_gh))
 
-    # The `Skipped steps:` disclosure is owed only for a selection the
-    # attestation binds; without one the body's skip lines are Ship's own.
-    try:
-        _attested_id, attested, _error = _publication_attestation(repo)
-    except UsageError:
-        attested = None
-    if attested and isinstance(attested.get("selection"), dict):
-        disclosure_error = validate_selection_disclosure(
-            body_file.read_text(encoding="utf-8"), attested
-        )
-        if disclosure_error:
-            return report([("push.contextual-body", disclosure_error)], err)
-    status = verification_status(repo, change_id, depth="local", head=head)
+    attestation_file = artifact_path(load_manifest(), "attestation", change_id, repo)
+    attestation_rel = attestation_file.relative_to(repo).as_posix()
+    # Ceiling: a gitignored attestation is invisible to git status; a git failure fails closed as 'not committed'.
+    # git status --porcelain -- <pathspec> prints nothing for a clean tracked path: https://git-scm.com/docs/git-status
+    if attestation_file.exists() and git_maybe(
+        repo, "status", "--porcelain", "--", attestation_rel
+    ) != "":
+        return report([("publish.preconditions", f"{attestation_rel} is not committed — "
+                                                 "commit it, then publish again")], err)
+    status = verification_status(repo, change_id, head=head)
+    stated_error = validate_stated_status(body_file.read_text(encoding="utf-8"), status)
+    if stated_error:
+        return report([("push.contextual-body", stated_error)], err)
     out.write(f"Verification {status} for {head}\n")
     if status != "valid":
         clause = missing_clause(missing_records(repo, change_id, status, head))
@@ -542,7 +508,11 @@ def _cmd_publish_trusted(
         except (KeyError, TypeError, AttributeError):
             matches = False
         if not matches:
-            return _publish_block("existing pull request identity does not match origin, HEAD, and base", err)
+            return _publish_block(
+                "existing pull request identity does not match origin, HEAD, and base; "
+                "right after a push GitHub may not yet show the new commit, so "
+                "retry once, and stop if it is refused again", err,
+            )
         candidate_matches.append((candidate_url, bool(candidate.get("draft", False))))
     if len(candidate_matches) > 1:
         return _publish_block("multiple open pull requests match the current branch", err)

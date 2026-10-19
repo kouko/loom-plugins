@@ -6,7 +6,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.22.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個使用者呼叫 · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.42.1 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -24,7 +24,7 @@ flowchart TD
     attest[["產生 attestation<br/>由 loom-code:closing-review"]]
     ship["loom-code:ship<br/>push + PR + checks<br/>③ 你驗收結果<br/>需要時透過 acceptance test report"]
     merged(["合併是另一步<br/>在 loom-code:ship 之後，由你另外授權"])
-    maintain["loom-code:maintain<br/>bug、告警、回歸或事故"]
+    maintain["loom-code:maintain<br/>告警、CI 或回歸失敗、事故"]
 
     intent --> plan
     intent -.->|"needs-design: yes"| spec
@@ -49,8 +49,9 @@ flowchart TD
   綁定受審功能內容的 attestation。
 - **Ship** —— push 分支、開 PR、確認必要的 checks（③）。Ship 從不合併：合併是
   另一步，需要你另外明確授權。
-- **Maintain** —— 在進行中未合併變更之外發生的 bug 回報、告警、回歸或事故，
-  會掛到相符的 open intent 上，沒有就新建一份，再交給 `write-plan`。
+- **Maintain** —— 在進行中未合併變更之外發生、且不是使用者要求修 bug 的告警、
+  CI 或回歸失敗、事故，會掛到相符的 open intent 上，沒有就新建一份，再交給
+  `write-plan`。使用者要求修 bug 時從入口站開始。
 
 ## Skills
 
@@ -62,7 +63,7 @@ flowchart TD
 | [`ship`](skills/ship/SKILL.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
 | [`maintain`](skills/maintain/SKILL.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
-| [`expert-mode`](skills/expert-mode/SKILL.md) | 僅限使用者主動呼叫：為單一變更選擇要執行或略過的 Loom 步驟；以使用者輸入的確認才生效。 |
+| [`external-review`](skills/external-review/SKILL.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
 
 ## Agents
 
@@ -90,16 +91,16 @@ Acceptance 無法機械判定時才會做 acceptance testing。
    agent 寫的那份報告。
 
 不可逆的岔路（刪資料、公開介面、單向遷移）在 engineering 變更時併進 ①、
-product 變更時併進 ②，用後果的形式問 —— 不另開停頓點。
+product 變更時併進 ②（不寫 spec 時併進 ①），用後果的形式問 —— 不另開停頓點。
 
 ## contract package
 
 `contract/manifest.yaml` 宣告站、工具、action，以及每一種 artifact ——
 intent、spec、plan、attestation、acceptance test report、`KICKOFF-DEFAULTS.md` —— 的
 charter 與欄位，還有 standing document。空白範本在 `contract/templates/`。
-只有 loom-code 寫它。`loom-design` 讀它並宣告 `requires-contract`；
-`loom-workflow` 不宣告——只有它的 `decision-map` skill 在一次 delivery 前跑
-`contract --require`。
+只有 loom-code 寫它。`loom-design` 保留它要填的範本的逐位元組相同副本（由
+repo 測試保持一致）並宣告 `requires-contract`；兩個 sibling 執行時都不讀這個
+package。
 
 ## checker
 
@@ -122,8 +123,8 @@ hook 在 `git push` 與 `gh pr create` 之前再跑一次：重算內容 digest�
 - **loom-workflow** 在各站周圍加上工具，例如 `ship` 用
   `loom-workflow:git-memory` 為 PR 內文分類 memory。
 
-相接處只有帶 plugin 名的 skill 名（例如 `loom-design:write-spec`）、contract
-package，以及專案自己的 `docs/loom/` 產物 —— 不會去讀別的 plugin 的
+相接處只有帶 plugin 名的 skill 名（例如 `loom-design:write-spec`）
+以及專案自己的 `docs/loom/` 產物 —— 不會去讀別的 plugin 的
 `hooks/`、`skills/`、`scripts/`。
 
 ## 安裝
@@ -189,6 +190,32 @@ context 與語言提醒）只在 `agy` CLI 執行，Antigravity 桌面 app 與 I
 上，loom 的角色（implementer、reviewer、adversary、acceptance-tester）以 agy 的
 `self` subagent 執行，遵循 loom 的 agent 契約，使用 Gemini 模型。審查站在所有
 host 上都叫 `closing-review`，舊名 `review` 已移除，沒有別名。
+
+### OpenCode
+
+OpenCode v2（已在 2.0.18 驗證；從 CLI 安裝的 plugin 在 TUI 裡也會載入）從 GitHub 安裝 plugin。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
+opencode plugin list
+```
+
+接著重啟 OpenCode（`opencode service restart`）；重啟之前，`opencode plugin list` 可能只列出部分 plugin。
+
+OpenCode 的 TUI（2.0.18–2.0.20）沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 `opencode.json`（`plugin add` 寫入 OpenCode 設定資料夾 `~/.config/opencode/` 的那個檔案）的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+
+skill 以 `loom-code:<skill>` 提供。loom 的角色以 OpenCode subagent `loom-code:<role>` 透過 `subagent` 工具執行，使用 session 的模型。以指令 `/loom-code:using-loom-code` 開始使用 loom（它同時仍是 skill）。
+
+在 OpenCode 上，session context、發布提醒與語言提醒透過 plugin 的 v2 hook 執行。
+
+OpenCode 的限制：
+
+- 背景服務剛啟動時，plugin 最多約 40 秒才會出現在 `opencode plugin list`。
+- loom-code 的 subagent 從 plugin 快取讀取 loom 自己的檔案時，可能停在 `external_directory` 權限提示；`opencode run --auto` 也不涵蓋 subagent 的 session。請允許讀取 loom 的 plugin 目錄。
+- 不加 `--auto` 的 `opencode run` 會停在第一個權限提示或模型提問，長時間的 loom 執行請從 TUI 進行。
+- OpenCode 在專案以外執行 shell 指令前不會詢問，模型可能改動整台機器（實測：系統層級的 `pip install --break-system-packages`）；請檢查它的指令，或收緊 OpenCode 的權限設定。
+- OpenCode 桌面 app 與 IDE 整合不在涵蓋範圍。
+- 使用這些 plugin 不需要 Node。
 
 ## 授權
 

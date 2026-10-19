@@ -1,8 +1,9 @@
 # Codex first contact
 
-Codex uses the installed `loom-code` plugin's `PreToolUse` publication hook
-from `hooks/hooks-codex.json`. The Codex manifest selects that file, so Codex
-does not also load `hooks/hooks.json`; its command uses Codex's native
+Codex uses the installed `loom-code` plugin's two hooks from
+`hooks/hooks-codex.json`: the `SessionStart` hook `session-start` and the
+`PreToolUse` publication hook. The Codex manifest selects that file, so Codex
+does not also load `hooks/hooks.json`; their commands use Codex's native
 `${PLUGIN_ROOT}` hook variable rather than Claude Code's compatibility name.
 There is no repository-local checker scaffold, copied contract, or firing
 ledger to approve and synchronize.
@@ -23,13 +24,13 @@ At the start of a change:
    `python3 <plugin-root>/scripts/loom_checker.py contract --require 2.1`.
 2. Confirm `python3 <plugin-root>/scripts/loom_checker.py --list-rules`
    includes `push.contextual-body`.
-3. If Codex presents a trust prompt for a new or modified installed definition,
-   ask the user to review that single installed definition. Never edit Codex
+3. For each new or modified installed definition that Codex presents a trust
+   prompt for, ask the user to review that installed definition. Never edit Codex
    trust state, use `--dangerously-bypass-hook-trust`, or write hook files into
    the adopting repository to suppress the host decision.
 <!-- /gate -->
 
-The hook activates only for publication-shaped Bash commands. Normal shell
+The publication hook activates only for publication-shaped Bash commands. Normal shell
 commands pass through without running repository verification. Canonical push
 validation pins the selected repository, HEAD, remote, and refspec before the
 fast attestation check.

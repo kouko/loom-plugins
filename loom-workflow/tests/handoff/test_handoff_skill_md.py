@@ -10,8 +10,8 @@ Assertions (a-h) per plan T2 Acceptance.RED:
      AND from OpenAI-style agent-handoff (cross-session + not-agent-to-agent / not-delegation)
   d) body relative-path references 'references/handoff-schema.md'
   e) body token count ≤6500 (chars/4 proxy)
-  f) body cites all 5 共通核心原則 by name (including technical-precision)
-  g) body contains BOTH 'prepare' mode AND 'resume' mode language
+  f) body cites all 5 共通核心原則 by name as bold labels (including technical-precision)
+  g) body has BOTH the '## Prepare mode' and '## Resume mode' headings
   h) body contains the literal path '.claude/handoffs/'
 """
 
@@ -107,19 +107,19 @@ class TestFrontmatterAndRouting:
         )
 
     def test_f_five_principles_named(self):
-        """(f) body cites all 5 共通核心原則 including technical-precision."""
-        missing = [p for p in FIVE_PRINCIPLES if p not in self.body]
+        """(f) body cites all 5 共通核心原則 as bold labels, including technical-precision."""
+        missing = [p for p in FIVE_PRINCIPLES if f"**{p}**" not in self.body]
         assert not missing, (
             f"SKILL.md body missing 共通核心原則: {missing}"
         )
 
     def test_g_prepare_and_resume_modes(self):
-        """(g) body contains BOTH 'prepare' mode AND 'resume' mode language."""
-        assert "prepare" in self.body.lower(), (
-            "SKILL.md body must contain 'prepare' mode"
+        """(g) body has BOTH the Prepare mode and Resume mode headings."""
+        assert "## Prepare mode" in self.body, (
+            "SKILL.md body must have the '## Prepare mode' heading"
         )
-        assert "resume" in self.body.lower(), (
-            "SKILL.md body must contain 'resume' mode"
+        assert "## Resume mode" in self.body, (
+            "SKILL.md body must have the '## Resume mode' heading"
         )
 
     def test_h_handoffs_path(self):
@@ -157,12 +157,12 @@ def test_frontmatter_and_routing():
     assert approx_tokens <= 6500, f"body token estimate {approx_tokens:.0f} exceeds 6500"
 
     # (f)
-    missing = [p for p in FIVE_PRINCIPLES if p not in body]
+    missing = [p for p in FIVE_PRINCIPLES if f"**{p}**" not in body]
     assert not missing, f"Missing principles: {missing}"
 
     # (g)
-    assert "prepare" in body.lower()
-    assert "resume" in body.lower()
+    assert "## Prepare mode" in body
+    assert "## Resume mode" in body
 
     # (h)
     assert ".claude/handoffs/" in body, "Missing literal path '.claude/handoffs/'"

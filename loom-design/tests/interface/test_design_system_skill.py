@@ -1,8 +1,8 @@
 """Structural grep-test guarding the design-system SKILL.md (loom 1.0,
 W2-03): the interview -> DESIGN.md -> ratify -> commit tool shape.
 
-Checks assert on load-bearing PHRASES (intent), tolerant of wording
-variation. Never weakens the key-schema assertion: the SKILL.md must cite
+Checks assert on structure (paths, headings, gate marker, fields, rule
+ids), not prose wording. Never weakens the key-schema assertion: the SKILL.md must cite
 `design_md_spec_keys.py`'s `TOKEN_GROUPS` as the source of truth for its
 YAML token groups rather than retyping a second, driftable list.
 
@@ -79,9 +79,7 @@ def test_gate_marker_registered():
     assert "<!-- gate: design-system.never-blocks -->" in _text()
 
 
-def test_never_blocks_language_present():
-    low = _text().lower()
-    assert "never required" in low or "never blocks" in low
+def test_names_product_principles_reject_rule():
     assert "standing.product-principles-reject" in _text()
 
 

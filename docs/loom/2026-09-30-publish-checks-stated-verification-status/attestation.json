@@ -1,0 +1,67 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-30-publish-checks-stated-verification-status",
+  "content_digest": "9655d598bcebb7eab5897263751cb5a1ddcf31e6",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_decorated_status_line.py -q",
+      "artifact": "loom-code/tests/test_adversarial_decorated_status_line.py",
+      "result": "pass",
+      "command_digest": "b66df5f17c0146de52a9662e1dc67d13ad2fc188bf05da0485e716084745988d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "ad7c5d5d0c319b527",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "a7e3314b3a8474fa8",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "anchor": "docs/loom/2026-09-30-publish-checks-stated-verification-status/evidence/acceptance-test-evidence.md :: 4: carried over",
+          "text": "The row-4 carry-over note says git diff --stat cf17c38e..f7a5bd7c touches only two code files; it also lists this change's own report and evidence. The conclusion holds: no README, spec or old report changed."
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "dimension": "correctness",
+      "anchor": "loom-code/scripts/loom_checker/command_handlers/publish.py :: uncommitted attestation check",
+      "text": "An attestation path ignored by git is invisible to git status --porcelain, so it is not refused; publish still computes and discloses stale for it."
+    },
+    {
+      "severity": "nit",
+      "dimension": "correctness",
+      "anchor": "loom-code/scripts/loom_checker/rule_checks/publish.py :: validate_stated_status",
+      "text": "A '<!--' inside a stale reason can hide later body lines from the visible-line scan; the refusal remedy prints the exact line."
+    },
+    {
+      "severity": "nit",
+      "dimension": "correctness",
+      "anchor": "loom-code/scripts/loom_checker/rule_checks/publish.py :: validate_stated_status",
+      "text": "An unclosed code fence hides every following line, including a misstated status line, from the check."
+    }
+  ],
+  "selection": null
+}

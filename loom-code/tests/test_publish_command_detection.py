@@ -133,8 +133,8 @@ def _checker_cli():
     return module
 
 
-def test_cli_push_hook_crash_outside_guard_allows(tmp_path, monkeypatch):
-    """REQ-4: an unexpected failure in `push --hook` after the guard allows."""
+def test_cli_push_hook_crash_allows(tmp_path, monkeypatch):
+    """REQ-4: an unexpected failure in `push --hook` allows."""
     repo = _repo(tmp_path)
     monkeypatch.setattr(push_handler, "read_hook_payload",
                         lambda: _payload(repo, PUSH + " origin HEAD"))
@@ -143,18 +143,6 @@ def test_cli_push_hook_crash_outside_guard_allows(tmp_path, monkeypatch):
 
     assert _checker_cli().main(["push", "--hook"], StringIO(), err) == 0
     assert err.getvalue() == "loom: publication hook failed (RuntimeError: boom); allowing.\n"
-
-
-def test_cli_push_hook_guard_crash_still_refuses(tmp_path, monkeypatch):
-    """A guard that cannot judge never loosens selection.guard."""
-    repo = _repo(tmp_path)
-    monkeypatch.setattr(push_handler, "read_hook_payload",
-                        lambda: _payload(repo, PUSH + " origin HEAD"))
-    monkeypatch.setattr(push_handler, "selection_guard_reason", _boom)
-    err = StringIO()
-
-    assert _checker_cli().main(["push", "--hook"], StringIO(), err) == 2
-    assert err.getvalue().startswith("BLOCK selection.guard: ")
 
 
 def test_cli_other_subcommand_crash_keeps_exit_two(monkeypatch):

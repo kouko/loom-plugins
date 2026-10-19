@@ -26,21 +26,9 @@ Schema and operation authority lives in `references/map-format.md`. The
 prototype boundary lives in `references/prototype-contract.md`. Read both
 before charting or mutating a Map.
 
-## Requires loom-code
-
-This is the only loom-workflow skill that depends on loom-code: starting a
-delivery writes an intent from loom-code's contract template, and the
-checker validates it. Every other loom-workflow tool works with
-loom-workflow installed alone. Before the first delivery operation on a
-repo, run the contract check and stop on anything but exit 0:
-
-```
-python3 <installed loom-code>/scripts/loom_checker.py contract --require 2.0
-```
-
-Exit 1 means loom-code is missing or does not support contract 2.0 — tell the
-user to install or update loom-code; charting, grilling, research and
-prototype tickets do not need it.
+Starting a delivery writes an intent stub with this skill's own script and
+hands it to the loom-code stations by skill name; charting, grilling,
+research and prototype tickets work with loom-workflow alone.
 
 ## Store and lifecycle
 
@@ -117,8 +105,8 @@ rewrites it. Hand the intent to `loom-design:capture-intent` when loom-design
 is installed, otherwise to `loom-code:write-plan`; that station owns the
 intent, spec, plan, implementation, review, and PR thereafter. The stub is a
 skeleton, not checker-clean — fill `kind:` and `needs-design:` and put the
-needs-design line in that commit's message before running
-`loom_checker.py intent`.
+needs-design line in that commit's message; `loom-code:write-plan` runs the
+intent check.
 
 ### Delivery state
 

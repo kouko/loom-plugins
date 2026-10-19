@@ -4,6 +4,91 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.11.0] — 2026-10-18 — make diagram node titles understandable on their own
+
+- Guide ASCII and Mermaid diagram authors to use short titles that name each node's action or role without needing its body. Add a body only when it contributes distinct information.
+- Refine existing engineering and process examples so titles stand alone and bodies do not repeat branch labels or child nodes; keep single-line nodes valid.
+
+## [5.10.0] — 2026-10-17 — orient in-session recaps around purpose and progress
+
+- Lead recaps with the conversation-grounded purpose, current position, and next step; show the decisions and completed work that explain the current position without padding short sessions.
+- Use distinct section headings and spacing, explain tables before showing them, and reserve diagrams for relationships they clarify. Preserve exact user wording when it affects the next action, distinguish unknowns from facts, and end with a directed alignment question.
+
+## [5.9.0] — 2026-10-15 — separate project and installed-skill retrospectives
+
+- Rename the one-session project review from `retro` to `project-retro`, and the cross-session installed-skill review from `distill-sessions` to `skill-retro`. The old names are no longer callable.
+- Route requests by improvement target; both reviews provide source-linked proposals for an independent implementation workflow. `skill-retro` also covers directly related plugin integration issues.
+- Migration: `retro` → `project-retro`; `distill-sessions` → `skill-retro`. Update installed plugins to 5.9.0 before invoking the new names.
+
+## [5.8.0] — 2026-10-13 — review one coding session for project improvements
+
+- Add `retro`, an on-demand, read-only review of one coding session that ranks project development improvements with source evidence and separates single-session skill issue candidates from project recommendations.
+- Route general single-session review requests to `retro`; keep `distill-sessions` for improvement proposals drawn from multiple sessions.
+
+## [5.7.0] — 2026-10-08 — independent reviews use the shared outside executor
+
+- An explicitly requested outside code, plan or decision review now routes through `loom-code:external-review`, preserving the owning review's criteria and verdict format while reporting outside results separately from the incumbent review.
+- The single consent checkpoint precedes model discovery, pre-review execution and dispatch. The shared executor requires an explicit model and effort and reports failures or unverifiable settings without silently substituting a default.
+
+## [5.6.3] — 2026-10-05 — OpenCode loader stops recording user prompts
+
+- The synced OpenCode loader copy no longer writes the per-session prompt file under `tmpdir/loom-opencode/`, and drops `transcript_path` from hook payloads, matching `loom-code` 3.32.0.
+- The synced OpenCode loader copy now deletes the prompt files earlier versions left in `tmpdir/loom-opencode/` when it loads.
+
+## [5.6.2] — 2026-10-01 — OpenCode loader sync.
+
+- The OpenCode loader no longer guards the selection record store when a hook fails, matching `loom-code`, which removed the store with the `expert-mode` skill.
+
+## [5.6.1] — 2026-09-30 — OpenCode transcript note.
+
+- On OpenCode, a command's skill body is not recorded as the user's words, so the language reminder keeps the user's language (shipped in 5.6.0); a message the user types that contains the skill-body separator is now recorded whole.
+
+## [5.6.0] — 2026-09-30 — OpenCode start commands.
+
+- On OpenCode, `using-loom-workflow`, `handoff`, `recap-state` and `goal-create` are also `/` commands and remain skills; their frontmatter carries `user-invocable: true`.
+- The README OpenCode sections name the start commands.
+
+## [5.5.7] — 2026-09-30 — OpenCode README wording.
+
+- The OpenCode README wording bounds the TUI claim to OpenCode 2.0.18–2.0.20 and names `opencode.json` as the file in the config folder.
+
+## [5.5.6] — 2026-09-29 — OpenCode v2 packaging and hooks.
+
+- OpenCode v2 package: `package.json` plus `opencode/loader.js` register the skills and translate `hooks/hooks-opencode.json` (visualization card, skill-folder-structure rule) into OpenCode hooks; the READMEs carry the install steps.
+- budget-exception: UserPromptSubmit::visualization-card@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+- budget-exception: PostToolUse:Write|Edit:validate-skill-folder-structure.sh@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+
+## [5.5.5] — 2026-09-29 — no runtime reads of loom-code files.
+
+- `decision-map` drops its loom-code contract gate and intent check (write-plan runs it).
+- `distill-sessions` no longer resolves loom-code skill files by repo path; the agent fills the target SKILL.md from the loaded skill.
+
+## [5.5.4] — 2026-09-29 — version sync only
+
+Patch: no content change. Bumped alongside `loom-code` (closing-review polarity check) and `loom-design`.
+
+## [5.5.3] — 2026-09-29 — Prose-pin stock cleanup batch 4 and patch release bump.
+
+Patch: tests only; no skill or reference content changed.
+
+- Batch 4 of the prose-pin stock cleanup: short-phrase and helper-hidden pins removed from `loom-workflow` tests, kept to their structure/behavior checks.
+- `loom-code`, `loom-design` and `loom-workflow` patch versions bumped together so `claude plugin update` refreshes installed copies with the batch 4 test changes.
+
+## [5.5.2] — 2026-09-29 — Prose-pin stock cleanup batches 2-3 and deferred release bump.
+
+Patch: tests, evidence and version metadata only; no station guidance, field, rule id or contract change.
+
+- Batch 2 (PR #65): goal-create and other `loom-workflow` sentence-pin assertions removed; kept structure and behavior checks; the census script's execution count fixed to only count real subprocess/checker calls; the `loom-visualization` A/B rerun script (`run_ab.py`) repaired (base ref, prompts file and output directory now parameters; fails non-zero when every session errors).
+- Batch 3: the known and newly flagged `loom-workflow` files pruned of direct sentence pins the widened census script now sees.
+- Version bump deferred by batch 2 (PR #65 Follow-ups): `loom-code`, `loom-design` and `loom-workflow` patch versions bumped together so `claude plugin update` refreshes installed copies with the batch 2/3 test changes.
+
+## [5.5.1] — 2026-09-28 — Remove goal-create sentence-pin tests (batch 1 of the prose-pin stock cleanup).
+
+Patch: tests only; no station guidance, field, rule id or contract change.
+
+- Goal-create whole-file sentence-pin tests deleted; goal-create tests pruned to structure and behavior checks. The critique test is unchanged: it is a gate's evidence, deferred to batch 2.
+- loom-visualization description hash guard retired (user-decided): description edits are checked by semantic review, no longer by a text hash.
+
 ## [5.5.0] — 2026-09-27 — structured nodes in flow, arch and tree generators
 
 - Flow, arch and tree generators now use structured nodes with title, separator

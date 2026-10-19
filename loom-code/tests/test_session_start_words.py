@@ -46,7 +46,7 @@ def empty_repo(tmp_path_factory) -> Path:
     return repo
 
 
-def _run(cwd: Path) -> str:
+def _run(cwd: Path, env: dict | None = None) -> str:
     # R30-O3: capture bytes and decode explicitly (errors="replace") rather
     # than text=True, so a non-UTF-8 byte in the hook's output cannot raise
     # a UnicodeDecodeError inside subprocess.run itself.
@@ -55,6 +55,7 @@ def _run(cwd: Path) -> str:
         cwd=str(cwd),
         stdin=subprocess.DEVNULL,
         capture_output=True,
+        env=env,
     )
     assert proc.returncode == 0, proc.stderr.decode("utf-8", errors="replace")
     return proc.stdout.decode("utf-8", errors="replace")
@@ -69,11 +70,23 @@ def test_word_count_is_within_budget(empty_repo):
     assert len(_run(empty_repo).split()) <= WORD_CAP
 
 
-def test_emits_the_canonical_and_defensive_context_keys(empty_repo):
+def test_emits_only_the_canonical_context_key(empty_repo):
+    """Codex 0.154 marks a hook Failed when its JSON carries keys beside
+    hookSpecificOutput, so every host gets only that key."""
     payload = json.loads(_run(empty_repo))
     assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
     assert payload["hookSpecificOutput"]["additionalContext"]
-    assert set(payload) == {"hookSpecificOutput", "additional_context", "additionalContext"}
+    assert set(payload) == {"hookSpecificOutput"}
+
+
+def test_routes_software_development_requests_into_loom(empty_repo):
+    """A4: without outside rules, the text alone says which requests enter."""
+    context = _context(_run(empty_repo))
+    assert "adds a feature or fixes a bug starts at capture-intent (write-plan when loom-design is not installed) before you edit any file" in context
+    assert "in any repository, even when the user never says loom and there is no docs/loom folder" in context
+    assert "Outside an active change, a feature or bug-fix request goes through loom however small" in context
+    assert "edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom" in context
+    assert "this repo runs through stations" not in context
 
 
 def test_names_every_station_in_manifest_order(empty_repo, manifest):
@@ -117,6 +130,42 @@ def test_kickoff_defaults_lines_are_injected_when_the_file_exists(empty_repo, tm
     assert "standing-docs: waived — spike repo (2026-09-02)" in context
 
 
+def test_kickoff_defaults_control_characters_do_not_break_the_json(tmp_path, manifest):
+    repo = tmp_path / "repo-with-control-chars"
+    (repo / "docs" / "loom").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
+        "# KICKOFF-DEFAULTS\n\n- second-vendor: codex\f \x1b[31mred\x1b[0m (2026-09-02)\n"
+        "- standing-docs: waived — spike repo (2026-09-02)\n"
+        "-\x1b 語言: 繁體中文 (2026-09-02)\n"
+        "-\fa: one\n-\vb: two\n",
+        encoding="utf-8",
+    )
+    context = _context(_run(repo))
+    assert "- a: one" in context and "- b: two" in context
+    flow = [s["name"] for s in manifest["stations"] if s["name"] != "maintain"]
+    assert " → ".join(flow) in context
+    assert "standing-docs: waived — spike repo (2026-09-02)" in context
+    assert "- 語言: 繁體中文 (2026-09-02)" in context
+    assert "\f" not in context and "\x1b" not in context
+
+
+def test_kickoff_defaults_survive_an_iconv_that_fails_without_reading(tmp_path):
+    repo = tmp_path / "repo-with-broken-iconv"
+    (repo / "docs" / "loom").mkdir(parents=True)
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    (repo / "docs" / "loom" / "KICKOFF-DEFAULTS.md").write_text(
+        "- standing-docs: waived — spike repo (2026-09-02)\n" + "# pad\n" * 20000,
+        encoding="utf-8",
+    )
+    shim = tmp_path / "bin"
+    shim.mkdir()
+    (shim / "iconv").write_text("#!/bin/sh\nexit 127\n", encoding="utf-8")
+    (shim / "iconv").chmod(0o755)
+    env = {**os.environ, "PATH": f"{shim}{os.pathsep}{os.environ['PATH']}"}
+    assert "standing-docs: waived — spike repo (2026-09-02)" in _context(_run(repo, env))
+
+
 def test_no_kickoff_section_when_the_file_is_absent(empty_repo):
     assert "KICKOFF-DEFAULTS" not in _context(_run(empty_repo))
 
@@ -131,7 +180,8 @@ def test_escape_hatch_still_returns_empty_context(empty_repo):
         env={**os.environ, "LOOM_CODE_MODE": "off"},
     )
     assert proc.returncode == 0
-    assert json.loads(proc.stdout)["hookSpecificOutput"]["additionalContext"] == ""
+    payload = json.loads(proc.stdout)
+    assert payload == {"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": ""}}
 
 
 def test_no_deleted_mechanism_is_mentioned(empty_repo):

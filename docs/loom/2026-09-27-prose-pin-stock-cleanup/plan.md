@@ -1,0 +1,101 @@
+# 清理散文釘住測試存量 — plan
+intent: 2026-09-27-prose-pin-stock-cleanup@6f3acd78
+charter: 1.1
+
+## Current State Evidence
+- Forward: `docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py` — 普查腳本定稿（W0-01 完成，五輪修正）：238 檔全樹掃描，13 sentence-pin / 5 grammar-invariant / 41 structure / 111 behavior / 58 not-prose / 10 other。(W0-01 snapshot; superseded — see census-report.md for the final census)
+- Reverse: `docs/loom/intent/2026-09-27-prose-evidence-class.md` — 證據政策已確立：prose 合格證據 = checker 重算 + fresh-context 審查 + 行為變更時的 AT；字面感應測試只留文法級不變量。
+- Error: 最終分類已逐檔 cold-read 覆核；誤判（delivery_binding、skill_contract、prose_pin_rule_text）已修復。
+- Data: 13 檔 sentence-pin 中，僅 `test_module_criteria_text` 被外部執行（test_adversary_routing SUITE_EXTRA）與 SSOT 引用（AGENTS.md:54）；其餘 12 檔僅名字提及（註解/測試名），可整檔刪。(W0-01 snapshot; superseded — see census-report.md for the final census)
+- Boundary: `test_acceptance_test_report_shape`、`test_lenses_deletion_first`、`test_prose_pin_rule_text`、`test_reviewer_mechanical_evidence`、`test_write_plan_shape_text` = grammar-invariant（保留）。
+
+## Task DAG
+
+### Wave 0 — 普查腳本與分類基準
+
+**W0-01 普查腳本定稿與驗證**  after: —  acceptance: 1
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
+- Test: A1 positive: script-classifies-pure-pin-as-sentence-pin; negative: behavior-file-not-misclassified-as-pin.
+- Risk: 分類是 contract surface，reviewer 需冷讀驗證每檔分類與「結構 vs 釘住」邊界；agent-decided。DONE（五輪修正）。
+
+**W0-02 耦合清單**  after: W0-01  acceptance: 1
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
+- Test: A1 positive: protocol-module-coupling-listed; negative: no-coupling-file-not-listed.
+- Risk: 列出每檔被誰 import／引用；決定每檔刪除或保留的依賴；agent-decided。
+
+### Wave 1 — sentence-pin 清理
+
+**W1-01 裁剪 recipe 系 sentence-pin 檔（4 檔）**  after: W0-02  acceptance: 2, 4
+- Files: loom-code/tests/test_adversary_recipe_code.py, loom-code/tests/test_adversary_recipe_shape.py, loom-code/tests/test_adversary_recipe_skill_gate.py, loom-code/tests/test_adversary_recipe_spec.py
+- Test: A2 positive: pinned-sentence-assertions-removed-file-kept; negative: routing-suite-green-after-prune. A4 positive: no-sentence-pin-remains-in-file; boundary: file-still-exists-for-routing.
+- Risk: 此 4 檔是 routing 機制的『每 kind 一測試檔』載體（test_adversary_routing `_reword_candidates`/`recipe_pins` 動態依賴其存在），不能整檔刪；只刪檔內釘住散文句子的斷言與其測試函式，保留檔案、helper、與 routing 需要的 fixture；agent-decided。
+
+**W1-02 裁剪 loom-code 混合 sentence-pin 檔（3 檔裁剪 + 1 檔刪除）**  after: W0-02  acceptance: 2, 4
+- Files: loom-code/tests/test_agy_tool_mapping.py, loom-code/tests/test_build_recovery_rules.py, loom-code/tests/test_closing_review_recovery_rules.py, loom-code/tests/test_dispatch_profile_contract.py
+- Test: A2 positive: mechanism-tests-kept-pins-removed-and-agy-deleted; negative: mechanisms-yaml-evals-resolve. A4 positive: no-sentence-pin-remains-in-file; boundary: gate-marker-checks-kept.
+- Risk: 整檔刪除輪（8d5b465d）誤刪 3 個機制測試檔（dispatch_profile_contract 測 resolver 語義＋4 個 mechanism eval 依附；2 個 recovery 檔測 RL-0x absence-recovery 規則）——classifier 把 gate-marker/機制檢查誤歸 sentence-pin；已恢復並改走裁剪：移除純散文句子釘住斷言，保留機制檢查與 gate-marker 檢查（文法級不變量）。test_agy_tool_mapping 是真 pin，整檔刪；agent-decided。
+
+**W1-03 裁剪 loom-workflow 混合檔（2 檔裁剪 + 2 檔刪除）**  after: W0-02  acceptance: 2, 4
+- Files: loom-workflow/tests/goal-create/test_input_floor.py, loom-workflow/tests/goal-create/test_skill_md.py, loom-workflow/tests/scripts/test_critique_compaction.py, loom-workflow/tests/scripts/test_goal_create_compaction.py
+- Test: A2 positive: eval-target-tests-survive-pins-removed-and-pure-pins-deleted; negative: mechanisms-yaml-evals-resolve. A4 positive: no-sentence-pin-remains-in-file; boundary: gate-marker-checks-kept.
+- Risk: 人審結果（W1-02 誤刪教訓後逐檔檢視）：test_critique_compaction（mechanisms.yaml:110 eval 依附）與 test_skill_md（mechanisms.yaml:348 eval 依附 test_session_activation_rules_are_one_registered_gate）是混合檔——裁剪；test_input_floor 與 test_goal_create_compaction 無機制依附（goal_create_compaction↔skill_md 僅註解提及）——整檔刪；agent-decided。
+
+### Wave 2 — 耦合檔處理
+
+**W2-01 module_criteria_text 遷移後刪除**  after: W0-02  acceptance: 2, 4
+- Files: loom-code/tests/test_module_criteria_text.py, loom-code/tests/test_adversary_routing.py, AGENTS.md
+- Test: A2 positive: routing-SUITE_EXTRA-and-AGENTS-ref-removed-then-file-deleted; negative: module-criteria-checks-still-enforced. A4 positive: file-vanishes-from-census; boundary: no-sentence-pin-left-in-repo.
+- Risk: 此檔釘 AGENTS.md module criteria 散文＋記四條判準由哪支 check 執行；刪除需同步移除 routing SUITE_EXTRA 與 AGENTS.md:54 引用；四條判準的可執行 check 本身（test_adversary_routing/layout 內）保留；agent-decided。
+
+**W2-02 reword 測試語義反轉**  after: W1-01  acceptance: 2, 4
+- Files: loom-code/tests/test_adversary_routing.py
+- Test: A2 positive: reword-plants-nothing-asserted; negative: reintroduced-prose-pin-would-plant. A4 positive: grammar-invariant-guard-lives-in-routing; boundary: helper-synthetic-tests-unchanged.
+- Risk: routing 的 `test_a_reworded_recipe_is_not_blamed_on_the_addition` 以 prose-pin 為『recipe 變紅』偵測器；pins 刪除後偵測器消失。語義反轉為『reword 不讓任何測試紅』（字面感應層已由語意審查取代），未來若 prose-pin 復活此測試即紅——成為 A4 的機制化守護；agent-decided。
+
+### Wave 3 — 驗證
+
+**W3-01 對應表：刪除釘住 → 具名替代證據**  after: W1-01, W1-02, W1-03, W2-01, W2-02  acceptance: 3
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
+- Test: A3 positive: each-deleted-pin-lists-replacement-evidence; negative: deleted-pin-without-replacement-fails. A3 boundary: replacement-names-checker-rule-or-lens-dimension.
+- Risk: 每檔刪除的釘住測試列出具名替代（checker 重算規則 id、結構測試名或 review lens 面向）；agent-decided。
+
+**W3-02 重算普查與行為守護**  after: W1-01, W1-02, W1-03, W2-01, W2-02  acceptance: 1, 4, 5
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
+- Test: A1 positive: census-rerun-matches-report; negative: deleted-file-not-in-census. A4 positive: sentence-pin-zero-grammar-kept; boundary: structure-class-kept-not-deleted. A5 positive: executable-test-count-not-decreased; boundary: count-verified-before-and-after.
+- Risk: 行為測試數守護（A5）以 package suite 測試函式數前後對照（base 6f3acd78 vs HEAD）；agent-decided。分類器新增 `gate-eval` 類：被 mechanisms.yaml `eval:` 指到的檔案單獨列類（A4 修訂後的豁免），報告另列第二批清單（行為類但 has_pins=yes 的 15 檔）；user-decided 2026-09-28。
+
+### Wave 4 — closing review entry
+
+**W4-01 Graduate the adversarial probes that caught defects**  after: W3-02  acceptance: 1, 2
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_census_gaming.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_pruned_guards.py, loom-code/tests/test_adversarial_census_gaming.py, loom-code/tests/test_adversary_recipe_code.py
+- Test: A1 positive: census-class-ignores-comments-in-suite; negative: census-script-absent-skips-with-reason. A2 positive: recipe-row-dropped-goes-red-in-suite; negative: intact-recipe-stays-green.
+- Risk: review.probe-graduation — both caught a defect here (comment-steered census class; vacuous case-class check); graduated copies stay byte copies, path line aside, and skip with a reason when the evidence script is absent; agent-decided.
+
+**W4-02 Classify the unclassified census files; delete pure pins found**  after: W4-01  acceptance: 1, 2, 3, 4
+- Files: docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md, loom-code/tests/test_codex_hook_trust_contract.py, loom-code/tests/test_principles_amendment.py, loom-code/tests/test_ship_guidance_presence.py
+- Test: A1 positive: other-class-count-zero; negative: unlisted-file-fails-census. A4 positive: pure-pin-in-other-deleted; boundary: mixed-file-listed-in-batch-2.
+- Risk: acceptance testing found 12 prose-reading files in an unlisted `other` bucket; each gets a visible reasoned class; pure pins without dependants are deleted, others go to batch 2; agent-decided.
+
+**W4-03 Retire the description hash guard; prune kickoff phrase pins**  after: W4-02  acceptance: 2, 3, 4
+- Files: loom-workflow/tests/scripts/test_loom_visualization_description_ab.py, loom-workflow/tests/scripts/test_adversarial_description_ab_probes.py, tests/test_kickoff_defaults.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/classify-test-files.py, docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/census-report.md
+- Test: A2 positive: hash-guard-file-deleted-runner-probes-kept; negative: suite-green-without-guard. A4 positive: no-override-hides-a-pin; boundary: kickoff-structure-checks-kept.
+- Risk: user-decided 2026-09-28 — description evidence becomes semantic review plus a run_ab.py rerun, never a text hash; nothing flags a description edit automatically any more.
+
+## Simplicity check
+- 用既有 `prose_pin` 分類語意（import + 斷言 pattern）建普查腳本，不另造分類框架 — taken
+- 刪除工作依「無耦合整檔刪 / 有耦合裁剪」二分，避免逐檔客製 — taken
+- 不新增 checker 規則或 gate，只重算既有測試 — taken
+- 單一普查報告作為 SSOT，W1/W2 各 task 不重複寫分類邏輯 — taken
+- plan-lens W1 三批整檔刪合併為單一 task — declined: Files 上限 8 檔/task（plan.field-caps），19 檔無法塞進一個 task；三批維持
+- plan-lens test_acceptance_test_report_shape 重複列於刪與裁剪 — taken
+
+## Questions asked
+① — what — 把上次改機制後遺留的釘住散文句子的舊測試庫存量清掉，以後改散文不會再被舊釘子弄到要連改測試。對嗎？ — 對
+① — consequence — 清理只到「文法級不變量」界線：字面感應測試從 ~40 檔降到僅剩文法不變量；日後發現被刪釘子本可擋下真實缺陷時，依收回條款可還原。接受？ — 對
+① — scope (build 中發現，2026-09-28) — 清理後仍有 5 個 gate eval 檔與 15 個行為混合檔帶釘住斷言；本 PR 當第一批收尾、改寫 A2/A4、其餘另開第二批？ — A
+① — evidence (acceptance testing, 2026-09-28) — the loom-visualization description hash guard: keep, defer, or retire? — retire the hash; test by meaning and results only
+
+## Risks
+1. 分類判定（結構 vs 釘住 vs 文法）有灰色地帶，reviewer 冷讀覆核每檔；誤刪真實行為測試由 W3 行為守護擋下。
+2. module_criteria_text 的四條判準 check（test_adversary_routing/layout 內）必須保留——刪的是「釘散文的映射測試」不是判準本身（A2 negative 覆蓋）。
+3. census 腳本歷經五輪修正（執行判別、語句 pattern 方向、裸 production import、`.stdout` 接收變數、repo-root 排除）；最終分類已 cold-read 覆核，殘餘誤判方向為保守（多留不少刪）。

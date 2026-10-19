@@ -164,6 +164,11 @@ def test_manifest_every_must_not_goes_to_names_another_real_artifact() -> None:
             assert goes_to != name, f"{name}.must_not names itself"
 
 
+
+def test_acceptance_report_charter_requires_skipped_steps_section() -> None:
+    rows = {row[0]: row for row in _data_rows(run_charter().stdout)}
+    assert "Steps you told me to skip" in rows["acceptance-test-report"][3]
+
 if __name__ == "__main__":
     import pytest
 

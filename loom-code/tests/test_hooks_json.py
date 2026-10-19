@@ -4,8 +4,9 @@ entry (concept-model §7, §7a).
 The old mechanism (git-guard, ask-triage, the router card, the family
 reception/relay prose, language-stop-check) is deleted; what remains is
 SessionStart -> hooks/session-start, PreToolUse(Bash) -> the single
-loom checker, PostToolUse(Skill) -> language-anchor (host hygiene, not a
-loom flow mechanism — plan W0-05 risk note).
+loom checker, PostToolUse(Skill|Agent), SessionStart(compact|resume) and
+UserPromptSubmit -> language-anchor (host hygiene, not a loom flow
+mechanism — plan W0-05 risk note).
 
 External surfaces grounded:
 - Claude Code hook config shape (``hooks.<Event>[].matcher`` +
@@ -39,7 +40,7 @@ REMOVED_HOOK_FILES = [
     "family-relay.md",
     "plain-relay.md",
 ]
-KEPT_HOOK_FILES = ["session-start", "language-anchor.py", "lang_detect.py", "hooks.json"]
+KEPT_HOOK_FILES = ["session-start", "language-anchor.py", "hooks.json"]
 
 
 @pytest.fixture(scope="module")
@@ -64,37 +65,34 @@ def test_event_set_is_exact(hooks):
     assert set(hooks) == {"SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit"}
 
 
-def test_codex_event_set_is_publication_interception_and_prompt_capture(codex_hooks):
-    assert set(codex_hooks) == {"PreToolUse", "UserPromptSubmit"}
-
-
-def test_user_prompt_submit_runs_selection_capture_hook(hooks):
-    """W2-01: the prompt capture runs the installed checker in hook mode and
-    must never block the prompt, so a non-zero checker exit is swallowed."""
-    (command,) = _commands(hooks["UserPromptSubmit"])
-    assert command.startswith("python3 ")
-    assert '"${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py" selection capture --hook' in command
-    assert command.rstrip().endswith("|| true")
-
-
-def test_codex_user_prompt_submit_uses_native_root_and_capture_hook(codex_hooks):
-    (command,) = _commands(codex_hooks["UserPromptSubmit"])
-    assert '"${PLUGIN_ROOT}/scripts/loom_checker.py" selection capture --hook' in command
-    assert "${CLAUDE_PLUGIN_ROOT}" not in command
+def test_codex_event_set_is_session_start_and_publication_interception(codex_hooks):
+    assert set(codex_hooks) == {"SessionStart", "PreToolUse"}
+    (command,) = _commands(codex_hooks["SessionStart"])
+    assert command == '"${PLUGIN_ROOT}/hooks/session-start"'
 
 
 def test_session_start_runs_the_rewritten_script(hooks):
-    (command,) = _commands(hooks["SessionStart"])
+    (entry,) = [e for e in hooks["SessionStart"] if e["matcher"] == "startup|clear|compact"]
+    (command,) = _commands([entry])
     assert command.endswith('/hooks/session-start"')
 
 
-def test_pre_tool_use_matcher_set_is_bash_and_file_tools(hooks):
-    """W2-02: the record-store guard judges file-writing tools too."""
-    assert _matchers(hooks["PreToolUse"]) == {"Bash|Write|Edit|MultiEdit|NotebookEdit"}
+def test_session_start_reanchors_language_after_compact_or_resume(hooks):
+    (entry,) = [e for e in hooks["SessionStart"] if e["matcher"] == "compact|resume"]
+    (command,) = _commands([entry])
+    assert "/hooks/language-anchor.py" in command
+
+
+def test_pre_tool_use_matcher_set_is_bash_only(hooks):
+    """`push --hook` reads only shell commands, so no host runs it on a
+    file-editing tool."""
+    assert _matchers(hooks["PreToolUse"]) == {"Bash"}
+    opencode = json.loads((HOOKS_DIR / "hooks-opencode.json").read_text(encoding="utf-8"))
+    assert _matchers(opencode["hooks"]["PreToolUse"]) == {"Bash"}
 
 
 def test_codex_pre_tool_use_uses_native_root_and_bash_matcher(codex_hooks):
-    assert _matchers(codex_hooks["PreToolUse"]) == {"Bash", "apply_patch|Edit|Write"}
+    assert _matchers(codex_hooks["PreToolUse"]) == {"Bash"}
     for command in _commands(codex_hooks["PreToolUse"]):
         assert "${PLUGIN_ROOT}" in command
         assert "${CLAUDE_PLUGIN_ROOT}" not in command
@@ -131,75 +129,42 @@ def test_pre_tool_use_checker_missing_allows_and_says_so(hooks, tmp_path):
     assert str(missing / "scripts" / "loom_checker.py") in result.stderr
 
 
-@pytest.mark.parametrize("tool_name,tool_input", [
-    ("Bash", {"command": "echo x >> .git/loom/selections/c.jsonl"}),
-    ("Bash", {"command": "cd .git/loom && printf x > selections/c.jsonl"}),
-    ("Bash", {"command": "printf x > .git/loom/./selections/c.jsonl"}),
-    ("Write", {"file_path": "/r/.git/loom//selections/c.jsonl", "content": "{}"}),
-    ("Edit", {"file_path": "/r/.git/loom/./selections/c.jsonl", "old_string": "a", "new_string": "b"}),
-])
-def test_pre_tool_use_checker_missing_still_denies_store(hooks, tmp_path, tool_name, tool_input):
-    """A missing checker never loosens selection.guard."""
-    result = _claude_pre_tool_use(hooks, {"tool_name": tool_name, "tool_input": tool_input},
-                                  tmp_path / "removed-version")
-    assert result.returncode == 2, result.stderr
-    assert "BLOCK selection.guard" in result.stderr
-
-
-# Store writes the running guard refuses although their text never spells the
-# store path: a git-directory lookup, a bare selections/ path, or a cwd inside
-# the store that a relative target or command runs from.
-CWD_STORE_WRITES = [
-    ("Bash", {"command": "cd $(git rev-parse --git-dir)/loom; printf x > selections/c.jsonl"}, ""),
-    ("Bash", {"command": "printf x > selections/c.jsonl"}, ".git/loom"),
-    ("Write", {"file_path": "selections/c.jsonl", "content": "{}"}, ".git/loom"),
-    ("apply_patch", {"command": "*** Begin Patch\n*** Add File: selections/c.jsonl\n+{}\n"
-                                "*** End Patch\n"}, ".git/loom"),
-]
-
-
-@pytest.mark.parametrize("tool_name,tool_input,cwd", CWD_STORE_WRITES)
-def test_pre_tool_use_checker_missing_denies_store_write_from_cwd(
-        hooks, tmp_path, tool_name, tool_input, cwd):
-    payload = {"tool_name": tool_name, "tool_input": tool_input,
-               "cwd": str(tmp_path / "repo" / cwd)}
-    result = _claude_pre_tool_use(hooks, payload, tmp_path / "removed-version")
-    assert result.returncode == 2, result.stderr
-    assert "BLOCK selection.guard" in result.stderr
-
-
 def _fallback_program(command: str) -> str:
-    """The `python3 -c '…'` body of a hook command, host name normalised."""
-    import re
-
-    (program,) = re.findall(r"python3 -c '([^']*)'", command)
+    """The checker-missing branch of a hook command, host and root normalised."""
+    program = command.split("; else ", 1)[1]
     return program.replace("restart Claude Code", "restart <host>").replace(
-        "restart Codex", "restart <host>")
+        "restart Codex", "restart <host>").replace("${CLAUDE_PLUGIN_ROOT}", "${PLUGIN_ROOT}")
 
 
 def test_checker_missing_fallback_programs_are_identical(hooks, codex_hooks):
-    """The Claude Code fallback and both Codex fallbacks run one program."""
+    """The Claude Code fallback and the Codex fallback run one program."""
     programs = [_fallback_program(c) for c in _commands(hooks["PreToolUse"])]
     programs += [_fallback_program(c) for c in _commands(codex_hooks["PreToolUse"])]
-    assert len(programs) == 3
+    assert len(programs) == 2
     assert len(set(programs)) == 1
-    from loom_checker.rule_checks import selection_guard as guard
-
-    for pattern in [p for p, _ in guard.ALWAYS_DENIED] + [guard.BARE_SELECTIONS,
-                                                           guard.GIT_DIR_NAMES]:
-        assert f're.compile(r"{pattern.pattern}")' in programs[0], pattern.pattern
 
 
 def test_post_tool_use_keeps_language_anchor(hooks):
-    assert _matchers(hooks["PostToolUse"]) == {"Skill"}
+    assert _matchers(hooks["PostToolUse"]) == {"Skill|Agent"}
     (command,) = _commands(hooks["PostToolUse"])
     assert "/hooks/language-anchor.py" in command
+
+
+def test_user_prompt_submit_runs_language_anchor(hooks):
+    (command,) = _commands(hooks["UserPromptSubmit"])
+    assert command == 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"'
 
 
 def test_no_removed_hook_is_referenced(hooks):
     text = HOOKS_JSON.read_text(encoding="utf-8")
     for name in REMOVED_HOOK_FILES:
         assert name not in text, name
+    # No host captures prompts or guards the selection record store.
+    for path in [HOOKS_JSON, CODEX_HOOKS_JSON, HOOKS_DIR / "hooks-opencode.json",
+                 HOOKS_DIR / "agy_adapter.py", REPO / "scripts" / "opencode" / "loader.js"]:
+        host_text = path.read_text(encoding="utf-8")
+        for needle in ("selection capture", "selections/", "selection.guard"):
+            assert needle not in host_text, (path.name, needle)
 
 
 def test_removed_hook_files_are_gone():

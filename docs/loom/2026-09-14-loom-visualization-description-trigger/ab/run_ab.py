@@ -1,19 +1,32 @@
 #!/usr/bin/env python3
 """A/B the loom-visualization description on Loom station reporting prompts.
 
-Usage (stdlib only):
-  run_ab.py build            # extract A/B plugin copies from HEAD, verify diff
-  run_ab.py run [--runs N]   # run every prompt N times per variant (default 2)
-  run_ab.py report           # parse streams, write results.md
+Variant A is the description at --base-ref; variant B is the description in the
+current working tree. Both plugin copies are `git archive HEAD` and differ only
+in that description (A's is swapped in). Streams and results.md go to --out,
+which may not lie inside this 2026-09-14 change directory.
 
-The prompts are read from protocol.md so the runner cannot drift from it.
+Rerun for the current description (from the repo root; stdlib only). Needs the
+`claude` CLI on PATH, logged in, with quota for 9 prompts x --runs x 2 variants
+sessions (36 at the default --runs 2; 18 at --runs 1).
+If `claude -p` rejects the default model, export ANTHROPIC_MODEL=<model> first; both variants inherit it.
+
+  AB=docs/loom/2026-09-14-loom-visualization-description-trigger/ab/run_ab.py
+  OUT=docs/loom/2026-09-28-prose-pin-stock-cleanup-batch-2/evidence/ab-rerun
+  export AB_SCRATCH=<scratch dir outside the repo>
+  python3 $AB build  --base-ref 6ad80799
+  python3 $AB run    --prompts $OUT/protocol.md --out $OUT --runs 2
+  python3 $AB report --prompts $OUT/protocol.md --out $OUT --runs 2
+
+`run` skips sessions whose stream is already complete, so it can be repeated
+(or capped with --limit N) until every session has a result. `run` exits non-zero
+when every session it started errored.
 """
 
 from __future__ import annotations
 
 import argparse
 import filecmp
-import hashlib
 import json
 import os
 import re
@@ -27,9 +40,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 CHANGE_DIR = HERE.parent
 REPO = CHANGE_DIR.parents[2]
-EVIDENCE = CHANGE_DIR / "evidence"
-PROTOCOL = HERE / "protocol.md"
-RESULTS = HERE / "results.md"
+PROTOCOL = REPO / "docs/loom/2026-09-28-prose-pin-stock-cleanup-batch-2/evidence/ab-rerun/protocol.md"
+EVIDENCE: Path | None = None  # set from --out
+RESULTS: Path | None = None
 
 
 def scratch_dir(env) -> Path:
@@ -37,24 +50,12 @@ def scratch_dir(env) -> Path:
 
 
 SCRATCH = scratch_dir(os.environ)
-BASE_REF = "6ad80799"
 PLUGINS = ("loom-code", "loom-design", "loom-workflow")
 SKILL_REL = "loom-workflow/skills/loom-visualization/SKILL.md"
 SKILL_NAMES = {"loom-visualization", "loom-workflow:loom-visualization"}
 MAX_STREAM_BYTES = 2 * 1024 * 1024
 
-DESCRIPTION_A = (
-    "Show comparisons, flows, decisions, states or reasoning chains as tables, "
-    "ASCII or Mermaid in coding chat; not Obsidian notes."
-)
-DESCRIPTION_B = (
-    "Show comparisons, flows, decisions, states or reasoning chains as tables, "
-    "ASCII or Mermaid in coding chat, including when a Loom station reports to "
-    "the user (intent restatement, choices, blind-run results); not Obsidian notes."
-)
-DESCRIPTION_B_SHA256 = "e98a3ed165415900bf405fe07209dde634cd465ff035fbea4ac2c73f57f6fd45"
-
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "tests"))
 from test_loom_skill_description_catalog import _render_description  # noqa: E402
 
 TABLE = re.compile(r"^\s*\|.*\|\s*\n\s*\|\s*:?-{3,}", re.MULTILINE)
@@ -62,13 +63,19 @@ DIAGRAM = re.compile(r"[─-╿]|```mermaid")
 PROMPT_LINE = re.compile(r"^- \*\*(?P<id>[abc]\d-[a-z0-9-]+)\*\*：(?P<text>.+)$", re.MULTILINE)
 
 
-def sha256_text(text: str) -> str:
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+def current_description() -> str:
+    return _render_description((REPO / SKILL_REL).read_text(encoding="utf-8"))
 
 
-def check_hash(text: str) -> None:
-    if sha256_text(text) != DESCRIPTION_B_SHA256:
-        raise ValueError(f"B description hash mismatch: {sha256_text(text)}")
+def set_output(out: Path) -> Path:
+    """Point streams and results.md at `out`; refuse the old change directory."""
+    global EVIDENCE, RESULTS
+    out = Path(out).resolve()
+    for p in (out, *out.parents):  # samefile: a case variant on a case-insensitive disk is the same dir
+        if p == CHANGE_DIR or (p.exists() and os.path.samefile(p, CHANGE_DIR)):
+            raise SystemExit(f"refusing --out inside the 2026-09-14 change: {out}")
+    EVIDENCE, RESULTS = out, out / "results.md"
+    return out
 
 
 def decide(a_count: int, b_count: int, errors: int = 0) -> str:
@@ -135,30 +142,34 @@ def verify_copies(a: Path, b: Path) -> None:
     differing = sorted(r for r in fa if not filecmp.cmp(a / r, b / r, shallow=False))
     if differing != [SKILL_REL]:
         raise ValueError(f"copies differ beyond the description file: {differing}")
-    da = _render_description((a / SKILL_REL).read_text(encoding="utf-8"))
-    db = _render_description((b / SKILL_REL).read_text(encoding="utf-8"))
-    if da != DESCRIPTION_A or db != DESCRIPTION_B:
-        raise ValueError("rendered descriptions are not A and B")
-    check_hash(db)
-    rest_a = (a / SKILL_REL).read_text(encoding="utf-8").replace(DESCRIPTION_A, "")
-    rest_b = (b / SKILL_REL).read_text(encoding="utf-8").replace(DESCRIPTION_B, "")
-    if rest_a != rest_b:
+    text_a = (a / SKILL_REL).read_text(encoding="utf-8")
+    text_b = (b / SKILL_REL).read_text(encoding="utf-8")
+    da, db = _render_description(text_a), _render_description(text_b)
+    if db != current_description():
+        raise ValueError("rendered B is not the current SKILL.md description")
+    if da == db:
+        raise ValueError("A and B render the same description")
+    if text_a.replace(da, "") != text_b.replace(db, ""):
         raise ValueError("SKILL.md differs outside the description text")
 
 
-def build() -> None:
+def build(base_ref: str) -> None:
     for variant in ("A", "B"):
         dest = SCRATCH / variant
         if dest.exists():
             shutil.rmtree(dest)
         dest.mkdir(parents=True)
-        archive = subprocess.run(["git", "-C", str(REPO), "archive", BASE_REF, *PLUGINS],
+        archive = subprocess.run(["git", "-C", str(REPO), "archive", "HEAD", *PLUGINS],
                                  check=True, capture_output=True).stdout
         subprocess.run(["tar", "-x", "-C", str(dest)], input=archive, check=True)
-    skill = SCRATCH / "B" / SKILL_REL
+    old = subprocess.run(["git", "-C", str(REPO), "show", f"{base_ref}:{SKILL_REL}"],
+                         check=True, capture_output=True, text=True).stdout
+    desc_a, desc_b = _render_description(old), current_description()
+    skill = SCRATCH / "A" / SKILL_REL
     text = skill.read_text(encoding="utf-8")
-    assert text.count("  " + DESCRIPTION_A + "\n") == 1
-    skill.write_text(text.replace("  " + DESCRIPTION_A + "\n", "  " + DESCRIPTION_B + "\n"), encoding="utf-8")
+    if text.count("  " + desc_b + "\n") != 1:
+        raise ValueError("the HEAD description is not a single block line")
+    skill.write_text(text.replace("  " + desc_b + "\n", "  " + desc_a + "\n"), encoding="utf-8")
     verify_copies(SCRATCH / "A", SCRATCH / "B")
     diff = subprocess.run(["diff", "-r", str(SCRATCH / "A"), str(SCRATCH / "B")],
                           capture_output=True, text=True).stdout
@@ -208,6 +219,9 @@ def run(runs: int, workers: int, limit: int | None = None) -> None:
     with ThreadPoolExecutor(max_workers=workers) as pool:
         for line in pool.map(lambda j: _run_one(*j, settings_json), jobs):
             print(line, flush=True)
+    failed = pending_jobs(jobs, EVIDENCE, None)
+    if jobs and len(failed) == len(jobs):  # nothing measured: a setup fault, e.g. a rejected model
+        raise SystemExit(f"every one of the {len(jobs)} sessions errored; see the .stderr.txt files")
 
 
 def report(runs: int) -> None:
@@ -220,15 +234,17 @@ def report(runs: int) -> None:
                 counts[variant] += got["invoked"] and not got["error"]
                 rows.append((variant, pid, r, got))
                 if stream.stat().st_size > MAX_STREAM_BYTES:
-                    dropped.append(f"{stream.relative_to(CHANGE_DIR)} ({stream.stat().st_size} bytes)")
+                    dropped.append(f"{stream.relative_to(EVIDENCE)} ({stream.stat().st_size} bytes)")
                     stream.unlink()
     yn = lambda b: "yes" if b else "no"  # noqa: E731
     total = len(rows) // 2
     lines = [
         "# A/B results — loom-visualization description on Loom station reporting prompts",
         "",
-        f"Protocol: [protocol.md](protocol.md). Runs per prompt per variant: {runs} "
-        f"({total} sessions per variant, {len(rows)} total).",
+        f"Protocol: [{PROTOCOL.name}]({os.path.relpath(PROTOCOL, RESULTS.parent)}). "
+        f"Runs per prompt per variant: {runs} ({total} sessions per variant, {len(rows)} total).",
+        "",
+        f"B (current SKILL.md description): `{current_description()}`",
         "",
         "| variant | prompt | run | invoked | table | diagram | error |",
         "|---|---|---|---|---|---|---|",
@@ -247,9 +263,9 @@ def report(runs: int) -> None:
         "",
         f"**{decide(counts['A'], counts['B'], sum(g['error'] for *_, g in rows))}** — rule: "
         f"SHIP B only if no session errored and B's invocation count "
-        f"({counts['B']}) is strictly greater than A's ({counts['A']}).",
-        "",
-        f"B rendered description SHA-256: `{sha256_text(DESCRIPTION_B)}`",
+        f"({counts['B']}) is strictly greater than A's ({counts['A']}). "
+        "B is already the shipped text, so this is a re-measurement: SHIP means the current "
+        "description still out-invokes A; HOLD or INCOMPLETE is a finding for review, not a revert.",
         "",
         "## Dropped streams (> 2 MB)",
         "",
@@ -261,16 +277,28 @@ def report(runs: int) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("build", "run", "report"))
-    parser.add_argument("--runs", type=int, default=2)
-    parser.add_argument("--workers", type=int, default=4)
-    parser.add_argument("--limit", type=int, default=None,
-                        help="run at most N pending sessions (keeps one call under a tool timeout)")
+    global PROTOCOL
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = parser.add_subparsers(dest="command", required=True)
+    p_build = sub.add_parser("build", help="extract A/B plugin copies from HEAD, verify they differ only in the description")
+    p_build.add_argument("--base-ref", required=True, help="git ref whose description is variant A")
+    for name, text in (("run", "run every prompt --runs times per variant"),
+                       ("report", "parse streams, write <out>/results.md")):
+        p = sub.add_parser(name, help=text)
+        p.add_argument("--prompts", type=Path, required=True, help="protocol.md holding the 9 prompts")
+        p.add_argument("--out", type=Path, required=True, help="output dir (not inside the 2026-09-14 change)")
+        p.add_argument("--runs", type=int, default=2)
+        if name == "run":
+            p.add_argument("--workers", type=int, default=4)
+            p.add_argument("--limit", type=int, default=None,
+                           help="run at most N pending sessions (keeps one call under a tool timeout)")
     args = parser.parse_args()
     if args.command == "build":
-        build()
-    elif args.command == "run":
+        build(args.base_ref)
+        return
+    PROTOCOL = args.prompts.resolve()
+    set_output(args.out)
+    if args.command == "run":
         run(args.runs, args.workers, args.limit)
     else:
         report(args.runs)

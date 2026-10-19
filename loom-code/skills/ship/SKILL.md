@@ -9,8 +9,10 @@ version: 1.1.0
 
 Ship validates publication state; it does not repeat functional verification.
 It does not execute package tests or adversarial probes.
-Write the PR body in the user's conversation language when the host can
-establish it from the confirmed intent or active conversation. Repository
+Write the PR body and every message to the user, including the decision
+point ③ result and acceptance question, in the user's conversation language
+when the host can establish it from the confirmed intent or active
+conversation. Repository
 conventions still govern committed artifacts. Internal publication reports
 remain English.
 
@@ -23,14 +25,11 @@ never implies authorization. A legacy intent without that machine-readable field
 requires one publication decision before anything leaves the machine.
 The user may still explicitly stop publication before the outward action.
 
-At entry, run `loom_checker.py selection show <change-id>` and omit the prose
-steps `selection show` lists as skipped (spec, plan, implementer, tdd,
-acceptance-test), plus any step the user told you to skip in plain words;
-[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
-invoke. Words that ask to skip independent acceptance testing —
+At entry, omit the prose steps the user told you to skip in plain words (spec,
+plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
 `acceptance-test` step. At station entry, keep the full flow unless the user
-selected or instructed a skip. Automatic narrow-change simplification belongs
+instructed a skip. Automatic narrow-change simplification belongs
 to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
@@ -38,13 +37,12 @@ continue. When you honour such a skip, write it straight into the PR body's
 `Skipped by instruction:` line (§2); Ship only reads the intent's and plan's
 `skipped-by-instruction:` lines and leaves both unchanged, because each
 is functional content and an appended line would make the attestation stale.
-Never ask the user for a generated code to skip a step.
 
 ## 2. Prepare publication text
 
 Ship owns one top-level PR body schema. Reconstruct it from the current intent,
-plan, recomputed Git change, generated attestation, and available CI evidence;
-do not depend on conversation recall. Use these headings exactly once:
+the spec when one exists, plan, recomputed Git change, generated attestation,
+and available CI evidence; do not depend on conversation recall. Use these headings exactly once:
 
 ```markdown
 ## Context
@@ -69,7 +67,15 @@ do not depend on conversation recall. Use these headings exactly once:
 <review, tests, attestation, available CI evidence, and known limits>
 
 ## Risks and rollback
-<remaining risks and a concrete recovery path>
+<one-way or two-way door, citing every recorded one-way door: user-decided
+lines (the spec's Design decision when a spec exists, else the plan's Risks)
+and agent-decided ones (the plan's task Risk lines and the acceptance test
+report's "I decided for you" section), where an agent-decided line is a
+one-way door when it falls in one of the five classes of
+`../write-plan/references/one-way-door.md`, checked line by line since none
+is marked one-way; two-way only when none is recorded or found;
+blast radius: what could break and for whom;
+a concrete rollback or recovery path; remaining risks>
 
 ## Follow-ups
 <deferred work, or "None">
@@ -78,9 +84,9 @@ Use a Markdown table for any list‑type or comparison‑type information (optio
 
 Under the Verification heading, write the line `Verification status: <status>`,
 where `<status>` is the status `publish` computes locally and prints on its
-`Verification <status> for <head>` line: `valid`, `valid (skipped: <steps>)`,
-`absent`, or `stale (<reason>)`. When the printed status differs from the
-body, correct the body in place. Build the line
+`Verification <status> for <head>` line: `valid`,
+`absent`, or `stale (<reason>)`. When publish refuses the line, copy the
+`Verification status:` line the refusal prints into the body. Build the line
 `Skipped by instruction: <steps>` from the intent's and plan's `skipped-by-instruction:`
 lines plus any skip decided at Ship (§1), not from conversation recall; with
 none recorded or decided, write no such line,
@@ -91,18 +97,10 @@ List each finding of severity `important` or worse that closing review
 dismissed after the acceptance tester's last dispatch, with its reason, as
 closing review's hand-off reports them.
 
-When the attestation carries a selection, open the Verification section with
-exactly these lines, filled from the attestation's `selection` field: one
-`Skipped steps: <steps> — authority: <source> (<code>, <YYYY-MM-DD>)` line per
-confirmation, then one `Prior failure: <step> <rule> <YYYY-MM-DD>` line per
-prior failure. On a
-mismatch, `publish` prints the expected lines. State that a
-reviewer rejection `closing-review` never handed to the checker is unrecorded.
-
-In the `<steps>` of the `Skipped by instruction:` and `Skipped steps:` lines,
+In the `<steps>` of the `Skipped by instruction:` line,
 write `acceptance-test` as `acceptance-test (independent acceptance testing)`;
-every other step reads as recorded. The `Verification status:` and
-`Skipped as a narrow change:` lines already arrive in that form from the checker.
+every other step reads as recorded. The `Verification status:` line already
+arrives in that form from the checker.
 
 Every decision summary states the chosen option, material alternatives,
 trade-offs, supporting evidence, and observed or expected outcome. This is an
@@ -170,8 +168,9 @@ base, current branch, and exact refspec (destination/refspec safety); performs
 a non-forced push; and opens or reuses one PR. Publishing proceeds without an
 attestation: an absent or stale one is disclosed, not refused. Before pushing,
 beyond authorization and repository safety, it refuses only a malformed body
-(naming the heading), a `Skipped steps:` mismatch against a bound selection,
-and an unidentified change. Do not run a
+(naming the heading), a `Verification status:` line that differs from the computed status (naming
+the line to carry), an attestation left uncommitted, and an unidentified
+change. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
 hand a refused publication command to the user to run; where a refusal names a
 remedy, take it, and where it names none, report the refusal and stop.

@@ -1,7 +1,7 @@
 ---
 name: maintain
 description: |
-  Route bug reports, alerts, regressions, or dogfood incidents into an intent. Use for incidents outside an active unmerged change.
+  Route alerts, CI or regression failures, or dogfood incidents into an intent. Use for incidents outside an active unmerged change that arrive without a user's request to fix a bug; that request starts at the entry station.
 version: 1.1.0
 ---
 

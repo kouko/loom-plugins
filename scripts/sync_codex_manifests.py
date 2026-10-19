@@ -22,6 +22,13 @@ plugin in ``AGY_RULE_SOURCES`` (only loom-workflow: its visualization trigger
 card, prefixed with a one-line generated-file header). Every mode covers it;
 a MISSING or drifted rule fails both ``--check`` and ``--all --check``.
 
+It also generates the OpenCode v2 package: ``<plugin>/package.json`` (derived
+like the agy manifest, plus fixed module keys) and ``<plugin>/opencode/loader.js``,
+a byte-identical copy of the canonical ``scripts/opencode/loader.js``. Every
+mode writes both; single-plugin ``--check`` (the Codex drift edit hook) verifies
+only an existing ``package.json``, and ``--all --check`` fails on a missing or
+drifted ``package.json`` or loader copy.
+
 This engine is REPO-LEVEL (not self-locating to a single plugin): the plugin to
 sync is passed in as a
 directory name or path. The public surface (``sync_plugin`` + a CLI taking a
@@ -297,6 +304,104 @@ def _check_agy_rule(plugin_dir: Path) -> int:
     return 0
 
 
+OPENCODE_PACKAGE = ("package.json",)
+OPENCODE_PACKAGE_FIELDS = ("name", "version", "description")
+OPENCODE_PACKAGE_FIXED = {"private": True, "type": "module", "main": "index.js"}
+OPENCODE_LOADER_SOURCE = ("scripts", "opencode", "loader.js")  # under the repo root
+OPENCODE_LOADER_COPY = ("opencode", "loader.js")  # under each plugin
+
+
+def opencode_package_path(plugin_dir: Path) -> Path:
+    return Path(plugin_dir).joinpath(*OPENCODE_PACKAGE)
+
+
+def derive_opencode_package(source: dict) -> dict:
+    """The OpenCode ``package.json``: SSOT fields, then the fixed module keys."""
+    package = {field: source[field] for field in OPENCODE_PACKAGE_FIELDS if field in source}
+    package.update(OPENCODE_PACKAGE_FIXED)
+    return package
+
+
+def sync_opencode_package(plugin_dir, check: bool = False) -> bool:
+    """Generate (or, with ``check=True``, verify) ``<plugin>/package.json``."""
+    plugin_dir = Path(plugin_dir)
+    derived = derive_opencode_package(_load(claude_manifest_path(plugin_dir)))
+    target_path = opencode_package_path(plugin_dir)
+    try:
+        current = _load(target_path)
+    except (OSError, ValueError):
+        current = None
+
+    if check:
+        return current == derived
+
+    if current != derived:
+        _dump(target_path, derived)
+    return True
+
+
+def _check_opencode_package(plugin_dir: Path, require: bool = True) -> int:
+    """CLI helper: print MISSING/DRIFT for the OpenCode package.json; 0 when clean."""
+    path = opencode_package_path(plugin_dir)
+    fix = f"Run: python3 {Path(__file__).name} {plugin_dir}"
+    if not path.exists():
+        if not require:
+            return 0
+        print(f"MISSING: {path} — {fix}", file=sys.stderr)
+        return 1
+    if not sync_opencode_package(plugin_dir, check=True):
+        print(f"DRIFT: {path} differs from the package derived from "
+              f"{claude_manifest_path(plugin_dir)}. {fix}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def opencode_loader_path(plugin_dir: Path) -> Path:
+    return Path(plugin_dir).joinpath(*OPENCODE_LOADER_COPY)
+
+
+def sync_opencode_loader(plugin_dir, repo_root, check: bool = False) -> bool:
+    """Copy (or, with ``check=True``, verify) the canonical loader byte-identical
+    into ``<plugin>/opencode/loader.js``. A missing canonical loader is never in
+    sync; sync then writes nothing and returns False."""
+    source = Path(repo_root).joinpath(*OPENCODE_LOADER_SOURCE)
+    target_path = opencode_loader_path(plugin_dir)
+    try:
+        canonical = source.read_bytes()
+    except OSError:
+        return False
+    try:
+        current = target_path.read_bytes()
+    except OSError:
+        current = None
+
+    if check:
+        return current == canonical
+
+    if current != canonical:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        target_path.write_bytes(canonical)
+    return True
+
+
+def _check_opencode_loader(plugin_dir: Path, repo_root: Path) -> int:
+    """CLI helper: print MISSING/DRIFT for the loader copy; 0 when clean."""
+    source = Path(repo_root).joinpath(*OPENCODE_LOADER_SOURCE)
+    path = opencode_loader_path(plugin_dir)
+    if not source.is_file():
+        print(f"MISSING: canonical loader {source}", file=sys.stderr)
+        return 1
+    if not path.is_file():
+        print(f"MISSING: {path} — Run: python3 {Path(__file__).name} --all",
+              file=sys.stderr)
+        return 1
+    if not sync_opencode_loader(plugin_dir, repo_root, check=True):
+        print(f"DRIFT: {path} differs from {source}; edit the canonical loader, "
+              f"then run: python3 {Path(__file__).name} --all", file=sys.stderr)
+        return 1
+    return 0
+
+
 def _derive_interface(source: dict) -> dict:
     """Build a fresh Codex ``interface`` block from the Claude SSOT.
 
@@ -423,10 +528,15 @@ def main(argv: list[str] | None = None) -> int:
             if args.check:
                 exit_code |= _check_agy(plugin_dir)
                 exit_code |= _check_agy_rule(plugin_dir)
+                exit_code |= _check_opencode_package(plugin_dir)
+                exit_code |= _check_opencode_loader(plugin_dir, repo_root)
             else:
                 sync_agy_manifest(plugin_dir)
+                sync_opencode_package(plugin_dir)
                 if not sync_agy_rule(plugin_dir):
                     exit_code = 1
+                if not sync_opencode_loader(plugin_dir, repo_root):
+                    exit_code |= _check_opencode_loader(plugin_dir, repo_root)
         return exit_code
 
     if args.plugin is None:
@@ -452,10 +562,16 @@ def main(argv: list[str] | None = None) -> int:
                 file=sys.stderr,
             )
             return 1
-        return _check_agy(args.plugin, require=False) | _check_agy_rule(args.plugin)
+        return (_check_agy(args.plugin, require=False)
+                | _check_agy_rule(args.plugin)
+                | _check_opencode_package(args.plugin, require=False))
 
     sync_plugin(args.plugin)
     sync_agy_manifest(args.plugin)
+    sync_opencode_package(args.plugin)
+    # The canonical loader sits beside the plugin in the repo root; a plugin
+    # outside such a tree (a test fixture) gets no loader copy.
+    sync_opencode_loader(args.plugin, Path(args.plugin).resolve().parent)
     return 0 if sync_agy_rule(args.plugin) else 1
 
 

@@ -2,9 +2,18 @@
 
 Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
-> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat の図表と推論ページ、second opinion。
+> Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.5.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.11.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+
+## 名前の移行
+
+| 5.9.0 より前 | 5.9.0 以降 | 対象 |
+|---|---|---|
+| `retro` | `project-retro` | 1 回のプロジェクト開発 session。 |
+| `distill-sessions` | `skill-retro` | 複数 session に現れるインストール済み skill の問題。 |
+
+旧名は呼び出せません。新名を使うには、インストール済み plugin を 5.9.0 に更新してください。両方とも提案のみを出し、変更は別の実装フローで行います。
 
 ## 概要
 
@@ -14,9 +23,11 @@ Loom は 1 つの変更を station に沿って運びます：`loom-design` が 
 ではありません。それぞれ決まったタイミングで使うか、必要な時に呼び出すもので、
 どのツールも名前で直接呼び出せます。
 
-どのツールも `loom-workflow` 単体のインストールで動きます。唯一の例外は
-`decision-map` の delivery ステップで、`loom-code` の contract template から
+ほとんどのツールは `loom-workflow` 単体のインストールで動きます。
+`decision-map` の delivery ステップは `loom-code` の contract template から
 intent を書くため `loom-code` が必要です。地図の作成と ticket の推進には不要です。
+明示的に依頼された外部の code・plan・decision review の実行にも
+`loom-code:external-review` が必要です。
 
 ## 収録基準（Admission rule）
 
@@ -24,6 +35,10 @@ skill がここに属するのは、station をまたいで作業を調整する
 をまたいで状態を運ぶ場合です。複数の plugin から使われているだけでは条件を満たしません。
 `decision-map` がこのルールの最初の実例です。このルールは新規の収録のみを
 gate し、plugin にすでにある utility skill はそのまま残ります。
+
+`project-retro` はユーザーが明示的に承認した例外です。依頼に応じて 1 回の開発 session を
+読み取り専用で振り返り、プロジェクトの開発環境の改善点を示します。Loom の station
+にも品質 gate にもなりません。
 
 ## どのタイミングでどのツールを使うか
 
@@ -58,9 +73,10 @@ flowchart TD
         record["loom-workflow:loom-memory<br/>branch を閉じる前に Record<br/>依頼または agent の判断で；<br/>station からは呼ばれない"]
     end
 
-    subgraph sessions["session をまたいで"]
+    subgraph sessions["session に関する作業"]
         handoff["loom-workflow:handoff<br/>session 終了時に状態を保存し、<br/>次の session で再開"]
-        distill["loom-workflow:distill-sessions<br/>過去の session から<br/>skill の改善点を掘り出す"]
+        distill["loom-workflow:skill-retro<br/>過去の session から<br/>skill の改善点を掘り出す"]
+        retro["loom-workflow:project-retro<br/>1 回の session から<br/>プロジェクトの改善点を探す"]
     end
 
     subgraph anytime["いつでも"]
@@ -96,15 +112,17 @@ flowchart TD
   前、PR 作成時、そして `ship` の後に行う PR の merge 前に動きます。`loom-memory`
   は branch を閉じる前に、依頼または agent の判断で永続的な教訓を Record します。
   station からは呼ばれません。
-- **session をまたいで** — `handoff` は session の終わりに状態を保存し、次の
-  session で再開します。`distill-sessions` は過去の session から skill の改善提案を掘り出します。
+- **session に関する作業** — `handoff` は session の終わりに状態を保存し、次の
+  session で再開します。`skill-retro` は過去の session から skill の改善提案を掘り出します。
+  `project-retro` は依頼に応じて現在または指定された 1 回の session を振り返り、根拠のある
+  プロジェクト改善案を示します。skill の問題は候補として分けて示します。
 - **いつでも** — `independent-advisor` は別の executor に second opinion を求め、
   `loom-visualization` は比較・フロー・推論を table や図で示し、推論ページも作ります。`goal-create` は名前で呼んだ時だけ動き、
   `using-loom-workflow` は適切なツールが分からない依頼を振り分けます。
 
 ## Skills
 
-12 skills：11 個のツールと任意のルーター 1 個。
+13 skills：12 個のツールと任意のルーター 1 個。
 
 | Skill | 役割 |
 |---|---|
@@ -116,13 +134,14 @@ flowchart TD
 | [`dbt-model-style`](skills/dbt-model-style/) | dbt model を書く・編集する・review する時に、dbt + Redshift の style と structure（CTE の役割、zero-logic な final CTE、命名、comment）を適用する。計算ロジックは対象外。 |
 | [`git-memory`](skills/git-memory/) | 毎回の `git commit`・`gh pr create`・`gh pr merge` の前に Decision・Learning・Gotcha の memory を分類する。過去の Git 上の決定の理由も呼び出せる。 |
 | [`handoff`](skills/handoff/) | session 状態を `.claude/handoffs/` の HANDOFF ファイルに保存し、あるいは新しい session でそこから再開する。 |
-| [`distill-sessions`](skills/distill-sessions/) | 過去の Claude Code と Codex の session（利用可能なら `/insights` facets も）を掘り、skill ごとに順位付けした friction とレビュー可能な SKILL.md 提案を出す。 |
-| [`independent-advisor`](skills/independent-advisor/) | plan や決定について、別の executor——別の model tier、より高い effort、あるいは別ベンダー——から second opinion を取る。費用の発生やマシン外への送信には承認が必要。 |
+| [`skill-retro`](skills/skill-retro/) | 複数の Claude Code と Codex の session から、インストール済み skill の指示や関連 plugin 統合に繰り返し現れる問題を調べ、出典付きの提案を示す。変更は適用しない。 |
+| [`project-retro`](skills/project-retro/) | 依頼に応じて現在または指定された 1 回の開発 session を読み取り専用で振り返り、出典をたどれるプロジェクト改善案を示す。skill の問題は候補として分け、ファイルは変更しない。 |
+| [`independent-advisor`](skills/independent-advisor/) | 明示的に依頼された code・plan・decision の外部 review を `loom-code:external-review` に渡し、元の review 基準を保つ。別の model tier・effort・ベンダーから自由形式の second opinion も取れる。費用の発生やマシン外への送信には承認が必要。 |
 | [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |
 | [`goal-create`](skills/goal-create/) | 名前で呼んだ時のみ動く。SESSION は会話の根拠や確認済み intent/spec から 4 項目の goal prompt を起草し、ホストに受理された場合に有効化し、それ以外は正直な復旧操作を示す。Loom のフロー自体は実行しない。ARC は repository の purpose（`Why` / `Done when`）を起草する。 |
 
 Loom の契約で数えるツールはこのうち 8 個です。`goal-create` と `dbt-model-style`
-は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。
+と `project-retro` は Loom フローの外にある standalone skill で、`loom-memory` とルーターは契約の対象外です。
 
 ## Repository 構成
 
@@ -141,16 +160,17 @@ loom-workflow/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
-│   ├── distill-sessions/
 │   ├── git-memory/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
 │   ├── loom-visualization/
+│   ├── project-retro/
 │   ├── recap-state/
+│   ├── skill-retro/
 │   └── using-loom-workflow/
-├── tests/                 git-memory・loom-memory・loom-visualization のテスト
+├── tests/                 git-memory・loom-memory・loom-visualization・retro のテスト
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md           (このファイル)
@@ -160,8 +180,8 @@ loom-workflow/
 ## インストール
 
 このリポジトリは `loom` という名前の plugin marketplace です。`loom-workflow`
-は単体でインストールできます。`decision-map` の delivery ステップを使う場合のみ
-`loom-code` を追加してください。
+は単体でインストールできます。`decision-map` の delivery ステップ、または
+明示的に依頼された外部 review を使う場合は `loom-code` も追加してください。
 
 ### Claude Code
 
@@ -182,7 +202,7 @@ Codex では loom-visualization の visualization card を plugin の UserPrompt
 ### Antigravity CLI
 
 repo を clone し、`loom-code` を先にインストールする。`critique`・`decision-map`・
-`distill-sessions` が loom-code を参照する。インストール前に `agy plugin list` で
+`skill-retro` が loom-code を参照する。インストール前に `agy plugin list` で
 Claude Code から取り込まれた同名の plugin がないか確認する。install はその取り込み済みの
 コピーを置き換え、後の `agy plugin uninstall` はそれを削除する。
 
@@ -203,9 +223,35 @@ agy plugin install ./loom-workflow
 hook が走るのは `agy` CLI だけで、Antigravity のデスクトップアプリや IDE では走らない。
 agy では loom-visualization の visualization card を plugin rule として届けるため、常に有効になる。
 
+### OpenCode
+
+OpenCode v2（2.0.18 で確認。CLI でインストールした plugin は TUI でも読み込まれる）は GitHub から plugin をインストールします。`loom-code` を先にインストールしてください：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
+opencode plugin list
+```
+
+その後 OpenCode を再起動します（`opencode service restart`）。再起動するまで、`opencode plugin list` には一部の plugin しか出ないことがあります。
+
+OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を `opencode.json`（`plugin add` が OpenCode の設定フォルダ `~/.config/opencode/` に書き込むファイル）の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+
+skill は `loom-workflow:<skill>` として提供されます。loom はコマンド `/loom-workflow:using-loom-workflow` で始めます。`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:goal-create`、`/loom-workflow:project-retro` もコマンドで、いずれも skill としても引き続き提供されます。
+
+OpenCode では、visualization card とスキルフォルダのルールが plugin の v2 hook で動きます。
+
+OpenCode での制限は次のとおりです。
+
+- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで最大 40 秒ほどかかることがあります。
+- loom-code の subagent は、plugin キャッシュにある loom のファイルを読むときに `external_directory` の許可プロンプトで止まることがあります。`opencode run --auto` も subagent のセッションには効きません。loom の plugin ディレクトリの読み取りを許可してください。
+- `--auto` なしの `opencode run` は最初の許可プロンプトかモデルからの質問で止まるため、長い loom の実行は TUI から行ってください。
+- OpenCode はプロジェクト外のシェルコマンドの前に確認しないため、モデルがマシンを変更することがあります（観測例：システム全体への `pip install --break-system-packages`）。コマンドを確認するか、OpenCode の許可設定を厳しくしてください。
+- OpenCode のデスクトップアプリと IDE 連携は対象外です。
+- plugin を使うのに Node は不要です。
+
 ### 毎ターンのリマインダーが届かない環境
 
-Claude Code と Codex では、`loom-workflow` が loom-visualization の visualization card
+Claude Code、Codex、OpenCode では、`loom-workflow` が loom-visualization の visualization card
 （ユーザーの言語で返答、結論を先に、平易な言葉、比喩を使わない文字どおりの表現、表や図）を
 UserPromptSubmit hook で、メッセージを送るたびに agent に届ける。1 ターンあたり最大 181 語
 （英語）増える。次の環境には届かない：
@@ -225,7 +271,8 @@ UserPromptSubmit hook で、メッセージを送るたびに agent に届ける
 「これから commit する」                       → git-memory
 「デシジョンマップを開く」/「開地圖」           → decision-map
 「wrap up」/「save state」                     → handoff
-「今どこだっけ」/「振り返り」                   → recap-state
+「今どこだっけ」/「今の進捗を振り返って」         → recap-state
+「開発の進め方を振り返って改善点を探して」       → project-retro
 「second opinion」/「別のモデルに聞いて」       → independent-advisor
 ```
 

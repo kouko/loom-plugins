@@ -37,15 +37,19 @@ to `none`.
 ## Two parts: attack, then pin
 
 The adversarial step runs in two parts. The first part reads the change and
-attacks it, and it writes nothing but its report: it names every attack point
-it found and what each one did. Only an attack that succeeded opens the second
-part, where a program is written to pin what that attack exposed. A change the
-first part leaves standing ends there, with its report alone.
+attacks it, and it commits no new program: it may write and run trial cases to
+make its attacks, but leaves them uncommitted, and besides its report it may
+only add a `concern:` line to an existing test it names as its program. The report names
+every attack point it found and what each one did. Only an attack that succeeded opens the second
+part, where a program is written and committed under
+`docs/loom/<change-id>/evidence/probes/` to pin what that attack exposed. A change the
+first part leaves standing ends there, with its report and, when one exists,
+the existing test it names as its program under How many cases.
 
 A probe program is committed only when it is red against the change as it
 stands, because a program that is green the moment it is written restates a
 behaviour instead of demonstrating a defect. An attack the change survives is
-reported as an attempt, and the second part writes nothing for it.
+still reported as an attempt, and the second part writes no new program for it.
 
 The report states three numbers: how many attack points the first part found,
 how many of them earned a program, and how many programs were committed.
@@ -65,8 +69,11 @@ skipped, says so in plain words. The checker rule
 Nothing here asks for a number of cases to be reached. Each program earns its
 place by the `concern:` line it carries, which says what kind of defect it
 defends against; a program that cannot name one is a program not worth
-committing, and an attack that found nothing worth a program is reported as
-an attempt rather than padded into one. Reusing a program this change already
+committing. An attack the change survives is still reported as an attempt;
+when no attack earned a new program, the adversary names one existing
+repository test that covers the change as this change's program, adding the
+`concern:` line the reuse rule below describes, when such a test exists,
+rather than padding a new one. Reusing a program this change already
 committed, or a repository test that already covers a case, commits no new
 program and so spends nothing against the ceiling.
 
@@ -124,14 +131,58 @@ executes each one and records the command, artifact, functional-content digest
 and observed result in the generated attestation:
 
 ```json
-{"command": "python3 -m pytest docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py -q",
+{"command": "python3 -m pytest docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py",
  "artifact": "docs/loom/<change-id>/evidence/probes/test_abuse_empty_input.py"}
-{"command": "python3 -m pytest tests/test_adversarial_empty_input.py -q",
+{"command": "python3 -m pytest tests/test_adversarial_empty_input.py",
  "artifact": "tests/test_adversarial_empty_input.py"}
 ```
 
 The first entry is a probe still in this change's store; the second is the
 same probe after graduation, named where the selected commit holds it.
+A pytest probe's command names only its artifact: `finalize-review` refuses a
+run whose pytest summary shows deselected tests, no passed test, or no
+summary at all (for example `-q` stacked with a config file's `-q` into `-qq`).
+A probe file that defines test functions or test classes must be recorded as
+`python -m pytest <artifact>`: `finalize-review` refuses a bare
+`python3 <artifact>` run of it, because that run calls none of its tests.
+
+For another runner, record the command in exactly one of these forms
+(`<A>` = the artifact; `[w]` = an optional `npx`, `npx --yes`, `pnpm exec`,
+`pnpm` or `yarn` launcher, or `bundle exec` for rspec and minitest; a runner
+or launcher is recognised by its file name, so a full path such as
+`/opt/homebrew/bin/go` counts as `go`; any form may start with
+`env NAME=value...`, except that an assignment to a runner-configuration
+variable such as `GOFLAGS`, `NODE_OPTIONS` or `PYTEST_ADDOPTS` is refused,
+while an `env` option such as `env -i` makes the command one no row claims,
+so it needs a reviewer confirmation):
+
+| Runner | Accepted command |
+|---|---|
+| go | `go test -json [-v] [-race] [-count N] [-timeout D] [-tags T] <A>`, `<A>` ending `_test.go` |
+| unittest | `python -m unittest [-v] [-q] <A>` (pytest's python/uv/conda launchers) |
+| node | `node --test --test-reporter=junit [--experimental-strip-types] <A>` |
+| deno | `deno test --reporter=junit [-A] [--allow-*] <A>` |
+| bun | `bun test ./<A>` |
+| jest | `[w] jest --json --runTestsByPath <A>` |
+| vitest | `[w] vitest run --reporter=json --outputFile=/dev/stdout <A>` |
+| mocha | `[w] mocha --reporter json <A>` |
+| cargo test | `cargo test [--release] [-q] --test <n>`, `<n>` resolving to `<A>` |
+| nextest | `cargo nextest run [--release] [--no-tests=fail] --test <n>`, `<n>` resolving to `<A>` |
+| rspec | `[w] rspec --format json <A>` |
+| minitest | `[w] ruby [-I<dir>]... <A>`, `<A>` named `*_test.rb` or `test_*.rb` |
+| phpunit | `phpunit <A>` (any path to `phpunit`, such as `vendor/bin/phpunit`) |
+
+Every runner except cargo test and nextest runs the probe from the change's
+store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs` or `tests/<n>/main.rs`
+(or the `[[test]]` path Cargo.toml names; each `required-features` entry
+must be listed directly in `[features] default`) through a task of the change and is
+recorded at that path. Any option not shown, a test-name filter, or a
+claimed runner in another form is refused. Any other subcommand of go, deno,
+bun or cargo (such as `go vet`, `deno check`, `bun build` or `cargo build`)
+is a claimed runner in another form. Any other command (for example
+`node X.mjs` without `--test`, `mvn ...`) is accepted only with a reviewer
+confirmation that closing review obtains. The `concern:` line may use the
+language's line comment (`//`).
 
 - Record every attempt that failed to break anything, for every artifact
   type — that is what makes the attempts an eval rather than an anecdote.
@@ -150,6 +201,10 @@ same probe after graduation, named where the selected commit holds it.
   accepts exactly these two homes and counts either against the cap and the
   `concern:` line.
 - Anything the adversary found that matters
-  becomes a `finding` with an anchor and a fix. Build fixes every fatal or
+  becomes a `finding` with an anchor and a fix. A finding that only a loom agent or
+  user deliberately defeating one of loom's own internal rules (a budget, a
+  cap, a check) could trigger is rated `nit` and so recorded as a known
+  limitation; a finding reachable by untrusted input, including a deliberate
+  attacker, or without that intent keeps its severity. Build fixes every fatal or
   important finding before hand-off and lists any left unresolved in its
   hand-off, and closing review passes those into the `findings` input of `finalize-review`.

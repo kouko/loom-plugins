@@ -58,6 +58,19 @@ severity important or worse that the main agent dismissed. One bullet each:>
 
 <If there were none: "Nothing — every choice was either yours or forced.">
 
+## Steps you told me to skip
+
+<Every step skipped on the user's instruction, read from the committed
+`skipped-by-instruction: <step> <YYYY-MM-DD>` lines in the plan's
+`## Risks` and the intent's `## Constraints`. One bullet each, with the
+date: describe the step in plain words by what it would have done — "the
+independent code review", "the full test suite", "the deliberate attempt
+to break the change" — not as its record id.>
+
+- <the step, in plain words> — skipped on your instruction, <date>.
+
+<If there were none: "Nothing — no step was skipped.">
+
 ## Things I am not sure you want
 
 <Open questions, in the user's terms, each answerable with a sentence. If

@@ -4,7 +4,7 @@ Each test runs ``hooks/agy_adapter.py`` the way agy 1.2.2 does: ``sh -c``
 from the plugin root, camelCase event JSON on stdin, one JSON object on
 stdout, exit 0. The adapter translates agy payloads into the existing
 handlers (the loom checker push rule, ``hooks/session-start``,
-``hooks/language-anchor.py`` + ``hooks/lang_detect.py``).
+``hooks/language-anchor.py``'s fixed ``ANCHOR_TEXT``).
 
 External surfaces grounded (live agy 1.2.2 spikes, recorded in this change's
 plan risk notes): PreToolUse ``toolCall.args.CommandLine`` / ``args.Cwd`` and
@@ -28,8 +28,11 @@ import pytest
 PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 ADAPTER = PLUGIN_ROOT / "hooks" / "agy_adapter.py"
 
-JA_FRAGMENT = "会話言語（日本語）"
-ZH_FRAGMENT = "會話語言（繁體中文）"
+_spec = importlib.util.spec_from_file_location("loom_language_anchor",
+                                               PLUGIN_ROOT / "hooks" / "language-anchor.py")
+_anchor = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_anchor)
+ANCHOR_TEXT = _anchor.ANCHOR_TEXT
 JA_TURN = "この変更が仕様に合っているかどうかを確認してください。よろしくお願いします。"
 ZH_TURN = "請幫我確認這個修改是否符合原本的設計規範，並且說明理由。"
 EN_TURN = "Please confirm this change matches the original design specification and explain why."
@@ -91,13 +94,6 @@ def test_push_with_running_checker_allows_and_forwards_reminder(change_repo, tmp
     assert out["reason"].startswith("loom: "), out
 
 
-def test_selection_store_write_with_running_checker_denies(change_repo, tmp_path):
-    out = _run("push-gate", _tool_payload("echo x >> .git/loom/selections/c.jsonl", ".",
-                                          [str(change_repo)]), tmp_path)
-    assert out["decision"] == "deny"
-    assert "BLOCK selection.guard" in out["reason"]
-
-
 def test_non_push_command_returns_allow(change_repo, tmp_path):
     out = _run("push-gate", _tool_payload("git status", ".", [str(change_repo)]), tmp_path)
     assert out == {"decision": "allow"}
@@ -124,7 +120,10 @@ def _codex_fallback(payload: dict, tmp_path: Path, matcher: int = 0) -> subproce
 FAILED_ALLOWING = "loom: publication hook failed ("
 
 
-@pytest.mark.parametrize("command", ["git push origin feat", "gh pr create --fill"])
+SELECTION_WRITE = "echo x >> .git/loom/selections/c.jsonl"
+
+
+@pytest.mark.parametrize("command", ["git push origin feat", "gh pr create --fill", SELECTION_WRITE])
 def test_missing_checker_allows_push_on_both_hosts(checkerless_adapter, change_repo, tmp_path, command):
     out = _run("push-gate", _tool_payload(command, ".", [str(change_repo)]), tmp_path,
                adapter=checkerless_adapter)
@@ -133,99 +132,6 @@ def test_missing_checker_allows_push_on_both_hosts(checkerless_adapter, change_r
     codex = _codex_fallback({"tool_name": "Bash", "tool_input": {"command": command}}, tmp_path)
     assert codex.returncode == 0, codex.stderr
     assert FAILED_ALLOWING in codex.stderr and "; allowing." in codex.stderr
-
-
-SELECTION_WRITE = "echo x >> .git/loom/selections/c.jsonl"
-
-
-def test_missing_checker_denies_selection_store_write(checkerless_adapter, change_repo, tmp_path):
-    out = _run("push-gate", _tool_payload(SELECTION_WRITE, ".", [str(change_repo)]), tmp_path,
-               adapter=checkerless_adapter)
-    assert out["decision"] == "deny", out
-    assert "BLOCK selection.guard" in out["reason"]
-    bash = _codex_fallback({"tool_name": "Bash", "tool_input": {"command": SELECTION_WRITE}}, tmp_path)
-    assert bash.returncode == 2 and "BLOCK selection.guard" in bash.stderr
-    for tool_name, tool_input in [
-        ("Write", {"file_path": ".git/loom/selections/c.jsonl", "content": "{}"}),
-        ("Edit", {"file_path": "/r/.git/loom/selections/c.jsonl", "old_string": "a", "new_string": "b"}),
-        ("apply_patch", {"command": "*** Begin Patch\n*** Add File: .git/loom/selections/c.jsonl\n+{}\n"
-                                    "*** End Patch\n"}),
-    ]:
-        result = _codex_fallback({"tool_name": tool_name, "tool_input": tool_input}, tmp_path, matcher=1)
-        assert result.returncode == 2, (tool_name, result.stderr)
-        assert "BLOCK selection.guard" in result.stderr
-
-
-def test_missing_checker_allows_ordinary_file_write_on_codex(tmp_path):
-    """Only a selection-store target is denied: content naming the store is not a target."""
-    result = _codex_fallback({"tool_name": "Write", "tool_input": {
-        "file_path": "notes.md", "content": "see .git/loom/selections/"}}, tmp_path, matcher=1)
-    assert result.returncode == 0, result.stderr
-
-
-# Store writes whose text never spells the literal store path; the running
-# guard's ALWAYS_DENIED patterns (`loom/selections/`, `\.git/loom`) refuse them.
-UNSPELLED_STORE_WRITES = [
-    "cd .git/loom && printf x > selections/c.jsonl",
-    "printf x > .git/loom//selections/c.jsonl",
-    "printf x > .git/loom/./selections/c.jsonl",
-]
-
-
-@pytest.mark.parametrize("command", UNSPELLED_STORE_WRITES)
-def test_missing_checker_denies_unspelled_store_write(checkerless_adapter, change_repo, tmp_path, command):
-    out = _run("push-gate", _tool_payload(command, ".", [str(change_repo)]), tmp_path,
-               adapter=checkerless_adapter)
-    assert out["decision"] == "deny", out
-    codex = _codex_fallback({"tool_name": "Bash", "tool_input": {"command": command}}, tmp_path)
-    assert codex.returncode == 2 and "BLOCK selection.guard" in codex.stderr, codex.stderr
-
-
-# Store writes the running guard refuses although their text never spells the
-# store path: a git-directory lookup, a bare selections/ path, or a cwd inside
-# the store that a relative target or command runs from.
-CWD_STORE_WRITES = [
-    ("Bash", {"command": "cd $(git rev-parse --git-dir)/loom; printf x > selections/c.jsonl"}, "."),
-    ("Bash", {"command": "printf x > selections/c.jsonl"}, ".git/loom"),
-    ("Write", {"file_path": "selections/c.jsonl", "content": "{}"}, ".git/loom"),
-    ("apply_patch", {"command": "*** Begin Patch\n*** Add File: selections/c.jsonl\n+{}\n"
-                                "*** End Patch\n"}, ".git/loom"),
-]
-
-
-@pytest.mark.parametrize("tool_name,tool_input,cwd", CWD_STORE_WRITES)
-def test_missing_checker_denies_store_write_from_cwd(checkerless_adapter, change_repo, tmp_path,
-                                                     tool_name, tool_input, cwd):
-    payload = {"tool_name": tool_name, "tool_input": tool_input,
-               "cwd": os.path.normpath(change_repo / cwd)}
-    codex = _codex_fallback(payload, tmp_path, matcher=0 if tool_name == "Bash" else 1)
-    assert codex.returncode == 2 and "BLOCK selection.guard" in codex.stderr, codex.stderr
-    if tool_name == "Bash":  # agy's push gate sees run_command only
-        out = _run("push-gate", _tool_payload(tool_input["command"], cwd, [str(change_repo)]),
-                   tmp_path, adapter=checkerless_adapter)
-        assert out["decision"] == "deny", out
-        assert "BLOCK selection.guard" in out["reason"]
-
-
-def test_fallback_patterns_mirror_selection_guard():
-    """The agy fallback refuses on exactly the running guard's patterns."""
-    sys.path.insert(0, str(PLUGIN_ROOT / "scripts"))
-    from loom_checker.rule_checks import selection_guard as guard
-
-    spec = importlib.util.spec_from_file_location("agy_adapter", ADAPTER)
-    adapter = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(adapter)
-    assert [p.pattern for p in adapter.SELECTION_STORE] == [p.pattern for p, _ in guard.ALWAYS_DENIED]
-    assert [p.pattern for p in adapter.STORE_COMMAND_TEXT] == [
-        p.pattern for p in adapter.SELECTION_STORE] + [guard.BARE_SELECTIONS.pattern,
-                                                      guard.GIT_DIR_NAMES.pattern]
-
-
-@pytest.mark.parametrize("target", ["/r/.git/loom//selections/c.jsonl", "/r/.git/loom/./selections/c.jsonl"])
-def test_missing_checker_denies_unnormalised_store_file_target_on_codex(tmp_path, target):
-    result = _codex_fallback({"tool_name": "Write", "tool_input": {"file_path": target, "content": "{}"}},
-                             tmp_path, matcher=1)
-    assert result.returncode == 2 and "BLOCK selection.guard" in result.stderr, result.stderr
 
 
 @pytest.mark.parametrize("command", ["git status --short", "git log -3 --oneline", "ls -la"])
@@ -385,24 +291,11 @@ def _transcript(tmp_path: Path, steps: list[dict]) -> Path:
     return path
 
 
-def test_ja_skill_read_injects_anchor(tmp_path):
-    transcript = _transcript(tmp_path, [_user(JA_TURN), _view(LOOM_SKILL)])
+@pytest.mark.parametrize("turn", [JA_TURN, ZH_TURN, EN_TURN])
+def test_skill_read_injects_same_fixed_text_in_any_language(tmp_path, turn):
+    transcript = _transcript(tmp_path, [_user(turn), _view(LOOM_SKILL)])
     out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    (message,) = _messages(out)
-    assert JA_FRAGMENT in message
-
-
-def test_zh_skill_read_injects_anchor(tmp_path):
-    transcript = _transcript(tmp_path, [_user(ZH_TURN), _view(LOOM_SKILL)])
-    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    (message,) = _messages(out)
-    assert ZH_FRAGMENT in message
-
-
-def test_english_session_silent(tmp_path):
-    transcript = _transcript(tmp_path, [_user(EN_TURN), _view(LOOM_SKILL)])
-    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    assert out == {}
+    assert _messages(out) == [ANCHOR_TEXT]
 
 
 def test_non_loom_skill_read_silent(tmp_path):
@@ -416,7 +309,7 @@ def test_anchor_fires_once_per_skill_read_step(tmp_path):
     transcript = _transcript(tmp_path, [_user(JA_TURN), _view(LOOM_SKILL)])
     first = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
     second = _run("pre-invocation", _invocation(2, [str(tmp_path)], transcript), tmp_path)
-    assert _messages(first)
+    assert _messages(first) == [ANCHOR_TEXT]
     assert second == {}
 
 
@@ -442,8 +335,7 @@ def test_skill_read_before_tool_result_injects_anchor(tmp_path):
     path.write_text(json.dumps(user, ensure_ascii=False) + "\n" + QUOTED_VIEW_LINE + "\n"
                     + json.dumps(result) + "\n", encoding="utf-8")
     out = _run("pre-invocation", _invocation(1, [str(tmp_path)], path), tmp_path)
-    (message,) = _messages(out)
-    assert JA_FRAGMENT in message
+    assert _messages(out) == [ANCHOR_TEXT]
 
 
 def test_skill_read_in_earlier_user_turn_silent(tmp_path):
@@ -475,17 +367,11 @@ def _quoted_transcript(tmp_path: Path, user_text: str) -> Path:
     return path
 
 
-def test_quoted_transcript_args_ja_injects_anchor(tmp_path):
-    transcript = _quoted_transcript(tmp_path, JA_TURN)
+@pytest.mark.parametrize("turn", [JA_TURN, EN_TURN])
+def test_quoted_transcript_args_inject_anchor(tmp_path, turn):
+    transcript = _quoted_transcript(tmp_path, turn)
     out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    (message,) = _messages(out)
-    assert JA_FRAGMENT in message
-
-
-def test_quoted_transcript_args_english_silent(tmp_path):
-    transcript = _quoted_transcript(tmp_path, EN_TURN)
-    out = _run("pre-invocation", _invocation(1, [str(tmp_path)], transcript), tmp_path)
-    assert out == {}
+    assert _messages(out) == [ANCHOR_TEXT]
 
 
 def test_empty_workspace_session_context_asks_for_add_dir(tmp_path):

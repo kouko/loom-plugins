@@ -1,0 +1,55 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-18-close-probe-acceptance-gaps",
+  "content_digest": "107a2138349651afe034f32fded8ce8029483936",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_probe_pytest_config_added_file.py",
+      "artifact": "loom-code/tests/test_probe_pytest_config_added_file.py",
+      "result": "pass",
+      "command_digest": "78879babb75a1e3c28df1cd4ba46e2697137bd56cf6a98afacaabd8e68f0651c"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_probe_cargo_declared_dir_main.py",
+      "artifact": "loom-code/tests/test_probe_cargo_declared_dir_main.py",
+      "result": "pass",
+      "command_digest": "09048f8685545d62cc4a9bd2c231e3e46387fa3ddd1674f2e9c23fd7816455b5"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_probe_direct_python_pytest_file.py",
+      "artifact": "loom-code/tests/test_probe_direct_python_pytest_file.py",
+      "result": "pass",
+      "command_digest": "0a2710ea4d5758fa96a89e236a267cf211a56222090f4a937d83ae9f38644254"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-code",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-skill",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

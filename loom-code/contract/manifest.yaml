@@ -26,18 +26,19 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
   - {name: handoff,             owner: loom-workflow}
   - {name: recap-state,         owner: loom-workflow}
   - {name: loom-visualization,  owner: loom-workflow}
-  - {name: distill-sessions,    owner: loom-workflow}
+  - {name: skill-retro,    owner: loom-workflow}
   - {name: git-memory,          owner: loom-workflow}
   - {name: independent-advisor, owner: loom-workflow}
   - {name: critique,            owner: loom-workflow}   # mode: proposal | complexity
   # standalone: outside the loom flow; not counted toward the skill budget (user-decided 2026-09-02)
   - {name: goal-create,         owner: loom-workflow, standalone: true}
   - {name: dbt-model-style,     owner: loom-workflow, standalone: true}
+  - {name: project-retro,               owner: loom-workflow, standalone: true}
 
 actions:             # executable steps inside a station; not skills (§3)
   - name: restate-and-confirm
     owner: write-plan          # also executed by capture-intent when loom-design is installed
-    summary: "decision point ① — restate Problem/Acceptance in plain words; merge one-way doors, any `second-vendor: ask` question and a missing-PRINCIPLES interview into the same dialogue; write `status: confirmed <date>`."
+    summary: "decision point ① — restate Problem/Acceptance in plain words; merge engineering one-way doors (and a product change's when no spec will be written), any `second-vendor: ask` question and a missing-PRINCIPLES interview into the same dialogue; write `status: confirmed <date>`."
   - name: one-way-door
     owner: write-plan
     summary: "classes (a)–(e) — (e) irreversible actions on existing user data, asked even without a fork — and four gates (check / measure / threshold 20% / merge); asked in consequence form inside decision point ① or ②; answers marked user-decided in spec Design decision."
@@ -198,10 +199,10 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       - {name: schema,         kind: json, required: true}
       - {name: change_id,      kind: json, required: true}
       - {name: content_digest, kind: json, required: true}
-      - {name: executions,     kind: json, required: true, grammar: "[{kind, command, artifact, result, command_digest}]"}
+      - {name: executions,     kind: json, required: true, grammar: "[{kind, command, artifact, result, command_digest, evidence?, passed?, confirmation?}]", note: "an adversarial execution run by a listed runner row carries evidence parsed with passed >= 1, or evidence reviewer with confirmation {reviewer, reviewed_sha, content_digest, quote}; one no row claims carries evidence reviewer; pytest, shell and direct executions carry no evidence"}
       - {name: verdicts,       kind: json, required: true, grammar: "[{reviewer, vendor, model, lens, verdict, findings}]"}
       - {name: findings,       kind: json, required: true, grammar: "[{id, anchor, raised_by, resolution} | {severity, dimension, anchor, text}]"}
-      - {name: selection,      kind: json, required: true, grammar: "{confirmations: [{code, skip, source, at}], skip, source, prior_failures: [{step, rule, head_sha, branch, at}]} | null", note: "schema loom-attestation/v2; recomputed from the local selection records, and only steps in skip waive their checks; v1 attestations carry no selection and stay valid"}
+      - {name: selection,      kind: json, required: true, grammar: "null", note: "schema loom-attestation/v2; always null, and any other value is refused because no typed selection can waive a step; v1 attestations carry no selection and stay valid"}
 
   acceptance-test-report:
     path: docs/loom/<change-id>/acceptance-test-report.md
@@ -214,6 +215,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
         - "one line per Acceptance"
         - "What this did to existing data"
         - "I decided for you"
+        - "Steps you told me to skip"
         - "open questions"
       must_not:
         - {kind: "design rationale", goes_to: spec}
@@ -244,20 +246,6 @@ standing_docs:       # not per-change (§2a, §8)
     # its charter (what it answers, must/must-not, sign-off, edits-after)
     # lives at artifacts.kickoff-defaults.charter, not duplicated here --
     # one shape for the checker to read (wave-end:0-05).
-
-step_selection:      # the only step names a user selection may run or skip; the intent (landing requires it), publication, the merge decision and the attestation are deliberately absent; steps carry no dependencies, so any one may be skipped alone
-  # Omitted spec/plan artifacts have no mandatory consumers. Use confirmed
-  # intent and bounded task handoffs; instruction records stay in plan Risks
-  # or intent Constraints when plan is absent or omitted, never a new binding.
-  steps:
-    - {name: spec}
-    - {name: plan}
-    - {name: implementer}
-    - {name: tdd}
-    - {name: reviewers}
-    - {name: adversarial}
-    - {name: acceptance-test}
-    - {name: package-tests}
 
 kickoff_defaults:   # grammar: `- <key>: <value> — <reason> (<date>)`
   - {name: second-vendor,          grammar: "<cli> | ask | suggest", note: "`ask` blocks once per change; `suggest` reports availability without waiting and permits opt-in only before Closing Review"}

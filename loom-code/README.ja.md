@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.22.0 · **Skills**: 5 ステーション + 1 ルーター + 1 ユーザー起動 · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.42.1 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -26,7 +26,7 @@ flowchart TD
     attest[["attestation を生成<br/>loom-code:closing-review による"]]
     ship["loom-code:ship<br/>push + PR + checks<br/>③ 結果を受け入れる<br/>必要なときは acceptance test report で"]
     merged(["マージは別手順<br/>loom-code:ship の後、あなた自身の許可で"])
-    maintain["loom-code:maintain<br/>バグ・アラート・リグレッション・障害"]
+    maintain["loom-code:maintain<br/>アラート・CI やリグレッションの失敗・障害"]
 
     intent --> plan
     intent -.->|"needs-design: yes"| spec
@@ -55,9 +55,10 @@ flowchart TD
   attestation として生成されます。
 - **Ship** — ブランチを push し、PR を開き、必須チェックを確認します（③）。
   Ship はマージしません。マージは、あなた自身の明示的な許可が要る別の手順です。
-- **Maintain** — 進行中の未マージ変更の外で起きたバグ報告・アラート・
-  リグレッション・障害を、一致する open な intent に結び付けるか新しい
-  intent を作り、`write-plan` に渡します。
+- **Maintain** — 進行中の未マージ変更の外で起き、ユーザーからのバグ修正依頼
+  ではないアラート・CI やリグレッションの失敗・障害を、一致する open な
+  intent に結び付けるか新しい intent を作り、`write-plan` に渡します。
+  ユーザーがバグ修正を依頼したときは入口のステーションから始めます。
 
 ## Skills
 
@@ -69,7 +70,7 @@ flowchart TD
 | [`ship`](skills/ship/SKILL.md) | attestation を検証し、push し、PR を開き、必須チェックを確認する（決定点 ③）。マージはしない。 |
 | [`maintain`](skills/maintain/SKILL.md) | 進行中の未マージ変更の外で起きた障害を再現し、一致する open な intent に結び付けるか新しく作り、`write-plan` に渡す。 |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | 一般的な Loom の依頼に合うステーションを選ぶ任意のルーター。各ステーションは引き続き直接呼び出せる。 |
-| [`expert-mode`](skills/expert-mode/SKILL.md) | ユーザーが明示的に呼び出す場合のみ：1 つの変更で実行・スキップする Loom ステップを選ぶ。入力された確認でのみ確定する。 |
+| [`external-review`](skills/external-review/SKILL.md) | 同意を得た外部レビューを明示的なモデルと effort で実行する。呼び出し元の review skill が基準と verdict の検証を保つ。 |
 
 ## Agents
 
@@ -100,7 +101,7 @@ reviewer-count` がブランチ全体の差分から計算します — 狭く�
    その変更に一切触れていない agent が書いたレポートを読みます。
 
 不可逆な分岐（データの削除、公開インターフェース、片道のマイグレーション）は、
-engineering の変更なら ①、product の変更なら ② に、結果の形で足されます —
+engineering の変更なら ①、product の変更なら ②（spec を書かないなら ①）に、結果の形で足されます —
 余分な停止点は増やしません。
 
 ## contract package
@@ -109,9 +110,9 @@ engineering の変更なら ①、product の変更なら ② に、結果の形
 artifact — intent・spec・plan・attestation・acceptance test report・`KICKOFF-DEFAULTS.md` —
 の charter とフィールド、さらに standing document を宣言します。空のひな型は
 `contract/templates/` にあります。書き込むのは loom-code のみ。`loom-design` は
-これを読み `requires-contract` を宣言します。`loom-workflow` はそうではなく
-——配信（delivery）の前に `decision-map` skill だけが `contract --require` を
-実行します。
+自分が埋めるひな型をバイト単位で同一のコピーとして持ち（リポジトリのテストが
+一致を保ちます）、`requires-contract` を宣言します。どちらの sibling も実行時に
+このパッケージを読みません。
 
 ## checker
 
@@ -138,8 +139,8 @@ checker が「問題なし」と言うことはありません。ステーショ
   `loom-workflow:git-memory` は、`ship` が PR 本文の memory を分類するのに
   使います。
 
-接続点は `loom-design:write-spec` のような plugin 名付き skill 名、contract
-package、そしてプロジェクト自身の `docs/loom/` 成果物だけで、他 plugin の
+接続点は `loom-design:write-spec` のような plugin 名付き skill 名と、
+プロジェクト自身の `docs/loom/` 成果物だけで、他 plugin の
 `hooks/`・`skills/`・`scripts/` を直接読むことはありません。
 
 ## インストール
@@ -209,6 +210,32 @@ Antigravity のデスクトップアプリや IDE では走りません。`agy` 
 （implementer・reviewer・adversary・acceptance-tester）は、loom の agent 契約に従う
 agy の `self` subagent として Gemini モデルで動きます。review station は
 どの host でも `closing-review` で、旧名 `review` は別名なしで削除されました。
+
+### OpenCode
+
+OpenCode v2（2.0.18 で確認。CLI でインストールした plugin は TUI でも読み込まれる）は GitHub から plugin をインストールします。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
+opencode plugin list
+```
+
+その後 OpenCode を再起動します（`opencode service restart`）。再起動するまで、`opencode plugin list` には一部の plugin しか出ないことがあります。
+
+OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする項目がありません。`plugin add` の代わりに、同じ spec を `opencode.json`（`plugin add` が OpenCode の設定フォルダ `~/.config/opencode/` に書き込むファイル）の `plugins` リストに追加することもできます。更新するには、`plugin add` や `plugin update` を再実行しても何も起きません（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用します）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動してください：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのままです。plugin 名だけでは `not configured` と返ります）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+
+skill は `loom-code:<skill>` として提供されます。loom の役割は OpenCode の subagent `loom-code:<role>` として `subagent` ツール経由でセッションのモデルで動きます。loom はコマンド `/loom-code:using-loom-code` で始めます（skill としても引き続き提供されます）。
+
+OpenCode では、セッションコンテキスト、公開リマインダー、言語リマインダーが plugin の v2 hook で動きます。
+
+OpenCode での制限は次のとおりです。
+
+- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで最大 40 秒ほどかかることがあります。
+- loom-code の subagent は、plugin キャッシュにある loom のファイルを読むときに `external_directory` の許可プロンプトで止まることがあります。`opencode run --auto` も subagent のセッションには効きません。loom の plugin ディレクトリの読み取りを許可してください。
+- `--auto` なしの `opencode run` は最初の許可プロンプトかモデルからの質問で止まるため、長い loom の実行は TUI から行ってください。
+- OpenCode はプロジェクト外のシェルコマンドの前に確認しないため、モデルがマシンを変更することがあります（観測例：システム全体への `pip install --break-system-packages`）。コマンドを確認するか、OpenCode の許可設定を厳しくしてください。
+- OpenCode のデスクトップアプリと IDE 連携は対象外です。
+- plugin を使うのに Node は不要です。
 
 ## ライセンス
 

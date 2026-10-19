@@ -9,6 +9,7 @@ context never lost. A failing probe is a finding against the change.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import subprocess
@@ -18,7 +19,11 @@ from pathlib import Path
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 ADAPTER = PLUGIN_ROOT / "hooks" / "agy_adapter.py"
-JA_FRAGMENT = "会話言語（日本語）"
+_spec = importlib.util.spec_from_file_location("loom_language_anchor",
+                                               PLUGIN_ROOT / "hooks" / "language-anchor.py")
+_anchor = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_anchor)
+ANCHOR_TEXT = _anchor.ANCHOR_TEXT
 JA_TURN = "この変更が仕様に合っているかどうかを確認してください。よろしくお願いします。"
 EN_TURN = "Please confirm this change matches the original design specification and explain why."
 SKILL_A = "/Users/u/.gemini/config/plugins/loom-code/skills/build/SKILL.md"
@@ -76,13 +81,14 @@ def _payload(transcript: Path, num: int = 1, initial: int = 5) -> dict:
 
 
 def _anchors(out: dict) -> int:
-    return sum(JA_FRAGMENT in s.get("ephemeralMessage", "") for s in out.get("injectSteps", []))
+    return sum(s.get("ephemeralMessage") == ANCHOR_TEXT for s in out.get("injectSteps", []))
 
 
-def test_anchor_no_user_input_no_anchor(tmp_path):
-    """A transcript with skill reads but no USER_INPUT at all stays silent and exits cleanly."""
+def test_anchor_no_user_input_anchors_once(tmp_path):
+    """A transcript with a skill read but no USER_INPUT at all exits cleanly with one anchor:
+    no user text is needed now that nothing is detected."""
     transcript = _write(tmp_path, [_view(SKILL_A, 0), _result(1)])
-    assert _run(_payload(transcript), tmp_path) == {}
+    assert _anchors(_run(_payload(transcript), tmp_path)) == 1
 
 
 def test_anchor_new_turn_after_skill_read_silent(tmp_path):

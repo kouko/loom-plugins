@@ -63,6 +63,7 @@ skills/init/references/v1/spec.md     ← references/ 下開 v1/
 - 不可把測試放在 production code 旁邊（`scripts/` 內）或 skill 資料夾內（含 `probes/`）
 - `tests/local/` 放需要本機安裝 CLI 的測試，package suite 和 CI 都會跳過它
 - Package suite（`scripts/run_package_tests.py --loom-family`）只跑四個 test root：root `tests/`、`loom-code/tests/`、`loom-design/tests/`、`loom-workflow/tests/`，含它們的子資料夾，pytest 檔（`test_*.py`、`*_test.py`）和 shell 測試（`test-*.sh`）都自動探索，新增測試不用改 suite command；CI 也跑同一份 inventory
+- Package suite 需要本機有 `node`（OpenCode plugin 的 loader 測試會執行它）；使用者安裝 plugin 不需要 node
 - 四個 root 定義在 `scripts/run_package_tests.py` 的 `TEST_ROOTS` 常數；新增 plugin 時要把它的 `<plugin>/tests/` 加進這個常數，否則它的測試不會跑，repo-wide guard 也會擋下
 - 例外：`docs/loom/` 底下的 evidence probe 程式留在原處
 - 移除一個 skill 時一併刪掉它的測試（Module Criteria 的 **remove**）：loom-workflow 刪 `tests/<skill>/` 資料夾；loom-code 刪 `loom-code/tests/` 裡以該 skill 命名的檔案
@@ -112,13 +113,14 @@ repository's development records under `docs/`.
 - 三份 manifest（`loom-code/plugin.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`）必須同步
 - `CHANGELOG.md` 必須在同一 commit 加入新區段 `## [X.Y.Z] — <date> — <summary>`
 - README 版號字串同步更新
+- 版號在最後一輪 fix 就 bump，要在 closing-review 的 finalize-review 產生 attestation 之前；在它之後才 bump 會讓 attestation 失效（stale）
 - 理由：`claude plugin update` 只比對版本字串；未 bump 的變更永遠不會發到已安裝副本
 - 機制化：`test_write_plan_station_text.py::test_current_release_metadata_is_synchronized` 斷言版號一致；bump packet 必須列出 CHANGELOG entry、pin test rewrite 為交付項
 - 參考記憶：`docs/loom/memory/version-bump-packets-must-name-changelog-entry.md`、`docs/loom/memory/version-bump-on-every-pr.md`
 
 ### loom 1.0 flow
 - 七站：capture-intent → write-spec →（write-plan → build → review → ship），maintain 回頭開 intent
-- 三個人類決策點：①覆述並確認 intent（含單向門問法）②product 的可見行為確認（spec）③acceptance test report 驗收
+- 三個人類決策點：①覆述並確認 intent（含 engineering 單向門；不寫 spec 的 product 單向門也在此問）②product 的可見行為與單向門確認（spec）③acceptance test report 驗收
 - 入口與完整站序：`docs/loom/README.md`；概念模型：`docs/loom/2026-09-02-simple-loom-flow/concept-model.md`
 
 ### Agent Behavioral Rules

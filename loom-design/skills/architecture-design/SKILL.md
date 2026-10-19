@@ -17,19 +17,6 @@ decisions and the rules only**, write a guard test for every rule that can
 be checked mechanically, restate them, and — on "yes" — write the
 `ratified-by:` line and install the ratified document and guards.
 
-## Step 0 — Check the contract version
-
-Locate the `loom-code` directory as
-`../capture-intent/references/locate-loom-code.md` says, then run, with that
-directory in place of `<loom-code>`:
-
-```
-python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
-```
-
-Exit 0: continue. On any other result, or when the checkout cannot be found,
-follow that reference's failure rule and **stop**.
-
 ## Step 1 — When to run
 
 Run this **on request** only. `ARCHITECTURE.md` is **never required**: an

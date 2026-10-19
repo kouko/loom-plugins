@@ -1,0 +1,81 @@
+# Residual-pin mapping (residual fix before W2-01)
+
+Defect class: a sentence pin left in a pruned batch-2 file. That is an assert that passes only while one literal sentence or phrase of runtime prose keeps its exact wording. It includes a scan that skips or finds exactly one rule sentence by its wording.
+
+Where we searched: every batch-2 file that the census showed as `sentence-pin`, `other` or `has_pins=yes` after W1-01 to W1-06. Each remaining literal assert in those files was read and classified.
+
+All paths are under `loom-code/tests/` unless stated otherwise. "Lens" means `loom-code/skills/closing-review/references/lenses.md`. Every kept test named below exists after this edit, and checker rule ids were checked against `python3 loom-code/scripts/loom_checker.py --list-rules`.
+
+## Removed or re-anchored pins
+
+| file::function(s) | defect class it guarded | named replacement | kind |
+|---|---|---|---|
+| `test_build_mechanical_checks.py::test_no_speculative_preflight_ban_remains` (phrase loop: a negated package-suite sentence must say `does not hand off` or `skipped`) | a station sentence that stops Build from running the complete package suite | skill lens, `inconsistency` (a sentence contradicting Build's suite step); the two absence asserts stay in the same function | review lens dimension |
+| `test_build_mechanical_checks.py::_is_pinned_floor_sentence`, `_FLOOR_PINS`, `RECIPE_PINS`, the `_affirms` import; `test_adversary_routing.py::recipe_pins` and the pin-reader half of `::test_recipe_test_module_and_pin_reader_synthetic` (now `::test_recipe_test_module_synthetic`) | a recipe's own pinned floor sentence was exempt from the implementer-floor scan. This code was dead, because `recipe_pins()` returned `{}` | `test_build_mechanical_checks.py::test_no_added_sentence_overrides_pinned_rules` still runs the implementer-floor scan, and its only exemption is negation | kept structural test |
+| `test_build_mechanical_checks.py::_discard_literals_outside_rule` (it skipped exactly `NO_DISCARD_UNDO`) and the `NO_DISCARD_UNDO` constant in `test_adversary_protocol.py` | a sentence that tells an agent to undo with a discard command (`git restore`, `git clean` …). Rewording the rule sentence turned this scan red | `test_build_mechanical_checks.py::test_no_added_sentence_overrides_pinned_rules`: the scan now skips any negated sentence, not one sentence found by its wording | kept structural test |
+| `test_build_mechanical_checks.py::_other_role_program_edit_sentences` (it skipped exactly `NO_OTHER_ROLE_EDITS_PROGRAM`) | an implementer or the orchestrator told to edit an adversarial program | `test_build_mechanical_checks.py::test_no_other_role_edits_adversarial_program`: the scan now skips any negated sentence | kept structural test |
+| `test_build_mechanical_checks.py::_redispatch_for_caught_defect_sentences` and `ORDINARY_FIX_NO_REDISPATCH` (it skipped the sentence carrying `rather than for a product defect`) | Build re-dispatches the adversary for a program that correctly caught a product defect | skill lens, `inconsistency` on build §3. There is no heading or gate marker to re-anchor on (Risk 4) | review lens dimension |
+| `test_plan_simplicity_text.py::test_a5_plan_step_asks_the_user_nothing` (the presence half: some sentence of the step must mention the user) | the Simplicity check step stops saying that it never asks the user | skill lens, `user-judgment-leak`; the scan that every user sentence of the step is negated stays in the same function | review lens dimension |
+| `test_review_convergence_contract.py::test_finalize_failure_round_requires_no_relook` (`"unless the episode is stuck" in sentence`) | finalize's re-look sentence loses its stuck-episode condition | skill lens, `inconsistency` against §4; the same function keeps the negation scan and the Round 3 absences | review lens dimension |
+| `test_acceptance_test_report_shape.py::test_template_has_one_row_per_criterion_and_evidence_file_path` (the `works / partly / not verified / fails` legend) | the template's verdict vocabulary drifts | the same function keeps the per-row Verdict-column check against the four verdicts | kept structural test |
+| `test_acceptance_test_report_shape.py::test_evidence_file_shape_is_given_and_is_plain_markdown` (`never … \`#!\``) | the template stops forbidding executable evidence | the same function keeps the check that the evidence block does not start with `#!`; the wording of the ban is docs lens `omission` | kept structural test |
+| `test_ship_station_text.py::test_ship_prose_rule_is_not_marked_as_a_gate` (the presence half: `NO_HANDOVER` must occur) | the no-handover rule drops out of ship | checker rule `publish.preconditions` (the refusal is the enforceable carrier); the same function keeps the not-gate-marked half | checker rule id |
+| `test_ship_station_text.py::test_ship_never_runs_setup_unasked`, `AGREES`, `_sentences` (an un-negated setup-run sentence had to carry the `AGREES` phrase) | ship runs the setup command without the user's consent | skill lens, `omission` (a setup run with no consent input). No heading or gate marker isolates the sentence | review lens dimension |
+| `test_sync_before_review_text.py::test_no_op_sync_dispatches_without_rerun` (`_sentence` found one sentence by `reports \`up to date\``) | the `up to date` branch starts a re-run | re-anchored on the `## 2. Compute review depth` heading: `test_sync_before_review_text.py::test_no_op_sync_dispatches_without_rerun` now scans every §2 sentence that names the checker output `` `up to date` `` | kept structural test |
+
+The W1-04 row in `mapping-station.md` named `test_ship_never_runs_setup_unasked` as a kept test. That row now names skill lens `omission`, so no mapping row names a deleted function.
+
+## False positives: code left as it is, with an override row
+
+Each of these files got a `MANUAL_OVERRIDES` row in `classify-test-files.py`. The row says what the file asserts and that no sentence is asserted present:
+
+| file | what its remaining literals are |
+|---|---|
+| `test_acceptance_test_report_shape.py` | table columns and markers, the evidence-block heading, the template path pointer, a full-suite absence scan, the `EVIDENCE_PATH` pointer sitting outside every gate block (the two ungated phrases went in the loop-form fix below) |
+| `test_adversary_protocol.py` | `loom_checker` import for the case-count scan, a one-home absence scan, YAML keys of the return block |
+| `test_adversary_routing.py` | recipe link back to the protocol, exception messages, pytest stdout, `split_sentences` used only to pick a sentence to reword |
+| `test_lenses_deletion_first.py` | lens table rows end with the `deletion-first` token |
+| `test_plan_simplicity_text.py` | absences, the `references/plan-simplicity.md` path pointer, a negation scan |
+| `test_review_convergence_contract.py` | gate-marker presence, heading-anchored sections, absence and negation scans |
+| `test_reviewer_mechanical_evidence.py` | the lenses path pointer count, absence and negation scans |
+| `test_ship_station_text.py` | AST recompute over `publish.py`, headings, absences, gate-region placement |
+| `test_simplified_station_text.py` | checker import, absence and negation scans, summary-table rows, a manifest YAML value |
+| `test_sync_before_review_text.py` | `sync-trunk` stdout and digest on real repositories, §2 absences, a `sync-trunk` count |
+| `test_test_budget_text.py` | no line-number threshold, a gate-marker count |
+
+Two existing rows got more precise reasons: `test_build_recovery_rules.py` (it also cites the three manifest keys) and `loom-workflow/tests/goal-create/test_skill_md.py` (the offer-site number is recomputed from the repository).
+
+## Loop-form pins found by the census fix
+
+Defect class: the loop form of a phrase pin, `for p in (<literals>): assert p in TEXT`, where at least one literal is a phrase of three or more words. The census could not see it before the classifier fix. Where we searched: the full census inventory (`loom-code/tests`, `loom-workflow/tests`, `tests`, `loom-design/tests`). The functions are listed in `deletion-list.md` under "Found by the adversary's loop-form census fix". Paths below are repo-relative.
+
+| file::function(s) | defect class it guarded | named replacement | kind |
+|---|---|---|---|
+| `loom-code/tests/test_acceptance_test_report_shape.py::test_no_new_gate_marker` (the phrases ``"`package-tests` or `finalize-review` is skipped"`` and `"steps 6-7 govern"`) | the station's skip rule or its steps 6-7 rule moved inside a gate block | the same function keeps the `EVIDENCE_PATH` pointer outside every gate block and the no-gate-marker absences in the tester and the template: `loom-code/tests/test_acceptance_test_report_shape.py::test_no_new_gate_marker` | kept structural test |
+| `loom-code/tests/test_sync_codex_manifest.py::test_loom_code_manifest_and_docs_preserve_optional_composition` (`independently installable`, `plugin-qualified skill names`, `N/A with the reason`) | the loom-code README stops saying the plugins install on their own and compose only through qualified names | the same function keeps the check that neither manifest makes loom-design mandatory, and the `docs/loom/` pointer: `loom-code/tests/test_sync_codex_manifest.py::test_loom_code_manifest_and_docs_preserve_optional_composition`; the README wording is docs lens `omission` | kept structural test |
+| `loom-workflow/tests/loom-memory/test_skill_contract.py::test_record_contract_states_when_to_record`, `::test_record_contract_states_how_much_to_record` (deleted, with `TIMING_ELEMENTS` and `SCARCITY_ELEMENTS`) | the Record contract loses its timing or scarcity clauses | `loom-workflow/tests/loom-memory/test_skill_contract.py::test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against` goes red on any edit to the Record section and sends the editor to re-run `loom-workflow/skills/loom-memory/evals/record-timing.md` | kept structural test |
+| `loom-workflow/tests/goal-create/test_goal_shape.py::test_defines_four_fields_budget_and_surfacing` (the three quoted Anthropic bullet labels) | the attribution paragraph stops quoting the source's own labels | the same function keeps the paragraph found by its bold lead label, the field and vendor names, and the `named by both` absence; whether the quotes support the claim is docs lens `incorrect-fact` | review lens dimension |
+| `loom-design/tests/architecture-design/test_architecture_skill.py::test_skill_reads_code_and_proposes_two_options_per_choice` (eight prose words: existing code, at least two options, trade-off and the rest) | the design step stops reading the code or stops offering two options with a recommendation | the same function keeps the `references/design-know-how.md` pointer and the `## decisions` heading; the step's content is skill lens `omission` | review lens dimension |
+| `loom-workflow/tests/loom-visualization/test_references.py::test_guide_has_seven_rules_and_rewrite_steps` (the rule-3 example words, with `METAPHOR_WORDS`) | rule 3 stops listing the metaphor trigger words | the same function keeps `guide_errors` (seven rules, five rewrite steps, the last one a metaphor check) and the rule-3 ban check through `polarity_errors`: `loom-workflow/tests/loom-visualization/test_references.py::test_guide_has_seven_rules_and_rewrite_steps` | kept structural test |
+
+Seven files got a `MANUAL_OVERRIDES` row instead, because their loop-form hit is not prose. The row names the hit: `loom-code/tests/test_adversary_layout.py` (section headings), `loom-code/tests/test_loom_publish.py` (headings in the checker's returned reason), `loom-workflow/tests/decision-map/test_skill_doc.py` (command shapes the test also runs), `loom-workflow/tests/scripts/test_loom_visualization_compaction.py` (`## ` headings), `tests/test_agy_install_docs.py` (command shapes), `loom-design/tests/interface/test_design_system_skill.py` (canonical section names) and `loom-design/tests/architecture-design/test_architecture_skill.py` (the second hit: bold field labels of the schema's Guard failure message section).
+
+## Judged not pins, and kept
+
+- `loom-workflow/tests/goal-create/test_skill_md.py::test_invocation_section_counts_the_offer_sites_that_exist`: the phrase `exactly <n> point(s)` is built from the number of offer sites scanned in the repository. The survey classed it as a recompute, and batch-1 rows cite it. It is a judgment call, and it is listed as a concern.
+- `test_simplified_station_text.py::_selection_only_skip_conditions`: the `"plain words"` exemption is a two-word term for the second skip source, not a rule sentence.
+- Label anchors `**Simplicity check.**` (`test_plan_simplicity_text.py::_step`) and `- **Round 3` (`test_review_convergence_contract.py::_round_three_bullet`): these are step and bullet labels, and the asserts on them are absences.
+- `test_review_convergence_contract.py::test_reviewers_dispatched_after_build_checks`: `_BRANCH_ANTECEDENT` finds sentences by phrase. A rewording makes the scan find nothing, and it does not turn red.
+
+## Count-form and direct presence pins found in closing review round 1
+
+Defect class: a hidden presence pin in a batch-2 file or a file this change edited. It is either `text.count(<prose literal>) == 1`, which goes red when the phrase is reworded, or a direct `assert "<sentence>" in text`. Where we searched: every file in `git diff --name-only 7244374d..HEAD` plus the census inventory. The count form was searched with `grep -n '\.count('` over the changed test files. The direct form was searched with an AST scan for a positive `in` whose left side is a string literal of three or more words. The other `.count(` hits are gate markers, headings, path pointers and tokens. The other direct hits in the 26 batch-2 files locate a sentence or block for an absence scan, or match program output. Paths are repo-relative.
+
+| file::function(s) | defect class it guarded | named replacement | kind |
+|---|---|---|---|
+| `loom-code/tests/test_dispatch_profile_contract.py::test_stations_do_not_restate_the_resolver_invocation` (the presence half: each of the 12 `RESOLVER_INVOCATION_PHRASES` exactly once in the profile) | the dispatch profile loses or repeats a resolver invocation step | the resolver the steps invoke is executed by `loom-code/tests/test_dispatch_profile_resolver.py::test_mechanical_route_computes_each_model_tier`; the profile's wording is skill lens `omission`. The same function keeps the scan that no station restates a phrase | kept structural test |
+| `loom-code/tests/test_expert_mode_skill.py::test_expert_mode_holds_the_suggestion_rules_once` (`count("at most once per change") == 1`, now `<= 1`) | the suggestion rule drops out of expert-mode | skill lens `omission`; the same function keeps the no-duplicate `<= 1` check and the `--origin agent` token count | review lens dimension |
+| `loom-design/tests/architecture-design/test_architecture_skill.py::test_single_answer_proposal_not_allowed` (deleted: `never present a single answer`) | the design step offers one answer instead of options | skill lens `omission`; `loom-design/tests/architecture-design/test_architecture_skill.py::test_skill_reads_code_and_proposes_two_options_per_choice` keeps the `## decisions` heading and the know-how pointer | review lens dimension |
+| `loom-design/tests/architecture-design/test_architecture_skill.py::test_skill_states_redesign_updates_decisions_rules_guards` (five phrases: `decisions, rules and guards`, `same commit`, `keep the ratified root document and its active guards unchanged`, `temporary copy`, `activate the guards only after ratification`) | the re-design procedure loses a step: same-commit update, the ratified root kept until re-ratification, guards activated after it | skill lens `omission`; the same function keeps the `re-design` and `re-ratify` tokens | review lens dimension |
+
+Left for batch 3 on purpose: direct sentence asserts in `loom-workflow/tests/loom-memory/test_skill_contract.py`, `loom-workflow/tests/loom-visualization/test_references.py` and `loom-workflow/tests/goal-create/test_goal_shape.py`. This change edited these files only to remove loop-form pins, and the census follow-up list in `census-report.md` names them.

@@ -33,9 +33,13 @@ literally wrong the text is:
   the whole verdict to `NEEDS_REVISION` however small it is: "naming is off
   somewhere" cannot be located or fixed by anyone.
 - In every round, reviewers never run the complete package suite or the
-  adversarial programs: both run mechanically at the end of Build, and
+  adversarial programs still under `docs/loom/<change-id>/evidence/probes/`:
+  both run mechanically at the end of Build, and
   `finalize-review` executes them again and records the result. Not having
-  run them is not grounds for `PASS_WITH_NOTES`. A dimension whose pass
+  run them is not grounds for `PASS_WITH_NOTES`. A probe
+  graduated out of `evidence/probes/` into the repository's tests (for
+  example `loom-code/tests/`) is also an ordinary changed test file,
+  which reviewers run. A dimension whose pass
   rests on a claim you could check — by reading a source or by running a
   changed test file — and did not, scores `PASS_WITH_NOTES`, naming what was
   not independently checked. Never "could not see it, so it is fine".
@@ -50,15 +54,15 @@ literally wrong the text is:
 | security | Injection, authn/authz, secrets, unsafe deserialization, encoding confusion in every changed path | OWASP ASVS; 徳丸本 Ch.6 for character-encoding attacks |
 | architecture | Does the shape the change produces hold — responsibilities, dependency direction, boundaries | SOLID (Martin) |
 | correctness | Does it do what it claims, at the boundaries as well as the middle; is there RED→GREEN evidence in the history | the changed test files, run by the reviewer |
-| naming | Names say what the thing is; functions stay short — 20 lines soft, 50 hard, 100 is a finding on its own | Clean Code Ch.2–3 (Martin) |
-| tests | Every shipped behaviour has focused RED→GREEN evidence; the reviewer runs the test files the change added or changed, except the adversarial programs under `docs/loom/<change-id>/evidence/probes/`, and a test in a changed test file the reviewer ran that is skipped or never actually executes is a finding, since a green exit code does not show that it ran; committed tests and adversarial artifacts must exercise the changed behavior rather than merely exit successfully; an adversarial artifact whose command is a shell builtin (`true`, `:`), or whose command never names it, exits 0 for unrelated reasons — score `tests` `NEEDS_REVISION` and raise a finding naming that artifact; tests the change adds beyond what the behaviour needs — duplicated cases, a helper set or harness for one case, tests of tests — are a finding that names the smaller shape, and the fix for any finding adds at most one test, extending an existing test first; prose artifacts' qualified evidence = the checker's recomputed rules, fresh-context review, and — only when behavior changes — independent acceptance testing; a prose-only change needs no new executable test file. the carve-out: lens definition rows in this file are executed by closing-review reviewers, not recomputed by checker rules; only paragraphs carrying `<!-- gate: <id> -->` are checker-recomputed. | Beck, *Test-Driven Development* (2002) |
-| refactoring | Duplication and smells; Rule of Three — three sites doing the same thing is an extraction | Fowler, *Refactoring*; the Pragmatic Programmer's DRY |
+| naming | Names say what the thing is; functions stay short — past 20 lines, and again past 50, is a prompt to look, never itself a finding; a split finding names a concrete problem, such as a function doing several unrelated things, and length alone is never the finding | Clean Code Ch.2–3 (Martin) |
+| tests | Every shipped behaviour has focused RED→GREEN evidence; the reviewer runs the test files the change added or changed, except the adversarial programs still under `docs/loom/<change-id>/evidence/probes/` (a probe graduated into the repository's tests is a changed test file the reviewer runs), and a test in a changed test file the reviewer ran that is skipped or never actually executes is a finding, since a green exit code does not show that it ran; committed tests and adversarial artifacts must exercise the changed behavior rather than merely exit successfully; a test that cannot fail for the behaviour it names is a finding — one restating a constant or the implementation, one reading source text to assert code structure (prose-pin tests that meet `../../../references/engineering-baseline.md` §5 item 8 excepted), or a mock or stub replacing the very seam it claims to cover; an adversarial artifact whose command is a shell builtin (`true`, `:`), or whose command never names it, exits 0 for unrelated reasons — score `tests` `NEEDS_REVISION` and raise a finding naming that artifact; tests the change adds beyond what the behaviour needs — duplicated cases, a helper set or harness for one case, tests of tests — are a finding that names the smaller shape, and the fix for any finding adds at most one test, extending an existing test first; a module's entry is what other modules call, never whatever its tests call; a task adding or changing a function's behaviour whose plan Files line marks no entry is a finding; a new or changed test that calls an internal (non-entry) function is a finding when that behaviour is reachable from the module's entry, whether or not entry tests already cover it, and the fix moves the test to the entry, or deletes it when an entry test already covers that behaviour; a test through the entry is never asked to add internal tests, and logic the entry cannot reach that became its own module with its own entry, tested at that entry, is not a finding; prose artifacts' qualified evidence = the checker's recomputed rules, fresh-context review, and — only when behavior changes — independent acceptance testing; a prose-only change needs no new executable test file. the carve-out: lens definition rows in this file are executed by closing-review reviewers, not recomputed by checker rules; only paragraphs carrying `<!-- gate: <id> -->` are checker-recomputed. | Beck, *Test-Driven Development* (2002) |
+| refactoring | Duplication and smells; Rule of Three — three sites doing the same thing are an extraction candidate, extracted only when the three change for the same reason; a split or extraction defaults to a non-exported function inside the module, and becomes its own module with an entry only when another module needs to call it or its behaviour is unreachable from the existing entry — wanting to test it alone is no reason for a new entry; a shared extraction across modules stays acceptable as its own module whose entry its callers import | Fowler, *Refactoring*; the Pragmatic Programmer's DRY |
 | cross-task-coherence | Only a whole-delta reviewer can see this: abstractions that disagree between tasks, logic duplicated because each task saw one slice, a task that quietly did more than its title | — |
 | external-surface-grounding | Every call into a surface the author does not own — HTTP API, SDK package, MCP tool, CLI flag, a sibling team's contract — carries a grounding citation. Missing on the first four is fatal; missing on a sibling contract is important; two tasks calling the same surface with conflicting shapes is important | — |
 | principles-conformance | Does the change violate a falsifiable clause of the repo's `PRINCIPLES.md`? Scored only when that file exists, else `N/A` | the consumer's own `PRINCIPLES.md` |
 | architecture-conformance | Does the diff follow the repo's ratified `ARCHITECTURE.md` rules and decisions — file placement, module boundaries and dependency direction, file size, CI stages? A violation is a finding whose fix is concrete: conform to the rule, or change the rule and its guard together. A violation of a ratified `ARCHITECTURE.md` rule is at least `important`, so the round sends it back to Build. Scored only for ratified rules in a document carrying `ratified-by: <name> <date>`; an absent document or unratified draft is `N/A`, with the draft advisory only | the consumer's own ratified `ARCHITECTURE.md` |
 | deliberate-simplification | A shortcut taken on purpose is annotated with its ceiling and its upgrade path; an annotation saying "later" or "someday" names no ceiling and is a finding | — |
-| deletion-first | Every new abstraction, flag, config or extension point justifies itself with two concrete users now, an explicit request, or a visible motivation. A finding must name the smaller shape that does the same job — no finding without a concrete alternative | — |
+| deletion-first | Every new abstraction, flag, config or extension point justifies itself with two concrete users now, an explicit request, or a visible motivation. A finding must name the smaller shape that does the same job — no finding without a concrete alternative. A new module or function that only forwards — no branching, transformation, validation, error handling, resource-boundary handling or policy choice, just a call elsewhere returning its result — is a finding; one hiding any of those is not, nor is a re-export that declares the module's entry (a package `__init__`, a TS `index` barrel) | — |
 
 ## Docs — five dimensions, plus deletion-first
 
@@ -70,6 +74,17 @@ literally wrong the text is:
 | incorrect-fact | A citation that does not support its claim — open the source and read the cited span before scoring — or a stated number or path that is wrong against the artifact it describes |
 | missing-population | A measured number with no denominator or scope: "0% false positives" without saying over what |
 | deletion-first | See "Deletion-first for docs and skill" below — the same rule as the code lens's `deletion-first`, applied to station text and agent contracts |
+
+**Polarity against the base.** This sharpens `inconsistency` for changed
+against base, in the docs lens and so in the skill lens that scores these
+five dimensions. When the diff deletes or rewrites a sentence carrying a
+polarity word — never, must not, only, always, 不得 and their kin (no, do
+not, may not, forbid, 禁止, 絕不) — read the base version with
+`git show <base>:<path>` and compare each such sentence with its new form.
+A reversed direction (must ↔ may, never ↔ always, forbid ↔ allow), or a
+polarity clause dropped with nothing else in the delta or the unchanged
+tree carrying it, is an `inconsistency` finding, severity by consequence;
+a rewording that keeps the direction is not a finding.
 
 <!-- gate: charter.plan-omission-narrow -->
 **Plan omission, narrowed by the charter.** Omission on a `plan` is

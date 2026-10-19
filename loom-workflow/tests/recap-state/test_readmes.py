@@ -12,7 +12,6 @@ SKILL_ROOT = Path(__file__).resolve().parents[2] / "skills" / "recap-state"  # l
 README_EN   = SKILL_ROOT / "README.md"
 README_JA   = SKILL_ROOT / "README.ja.md"
 README_ZHTW = SKILL_ROOT / "README.zh-TW.md"
-SKILL_MD    = SKILL_ROOT / "SKILL.md"
 
 
 # ---------------------------------------------------------------------------
@@ -88,10 +87,6 @@ def _en_readme_has_trigger_phrase(readme_text: str) -> bool:
     return bool(_EN_TRIGGER_RE.search(readme_text))
 
 
-def _skill_description_contains(skill_text: str, phrase: str) -> bool:
-    return phrase.lower() in skill_text.lower()
-
-
 # ---------------------------------------------------------------------------
 # (d) JA / zh-TW trigger phrases — at least 3 language-native triggers
 #     that also appear in SKILL.md description.
@@ -133,7 +128,6 @@ def test_tri_lang_readmes_consistent():
     en_text   = _read(README_EN)
     ja_text   = _read(README_JA)
     zhtw_text = _read(README_ZHTW)
-    skill_text = _read(SKILL_MD)
 
     # -----------------------------------------------------------------------
     # (b) Each README has 4 required section heading concepts
@@ -154,15 +148,6 @@ def test_tri_lang_readmes_consistent():
         "recognisable in SKILL.md description (e.g. 'where were we', 'I'm lost', "
         "'recap', 'bring me back', 'what are we doing')"
     )
-    # Verify at least one of those triggers actually appears in the skill description
-    found_in_skill = any(
-        _skill_description_contains(skill_text, phrase)
-        for phrase in ["where were we", "I'm lost", "recap", "bring me back",
-                       "what are we doing"]
-    )
-    assert found_in_skill, (
-        "SKILL.md description does not contain any of the expected EN trigger phrases"
-    )
 
     # -----------------------------------------------------------------------
     # (d) JA README: >=3 language-native triggers also in SKILL.md
@@ -172,12 +157,6 @@ def test_tri_lang_readmes_consistent():
         f"JA README must contain >=3 JA trigger phrases that appear in SKILL.md; "
         f"found {ja_in_readme}: "
         f"{[t for t in JA_TRIGGERS_IN_SKILL if t in ja_text]}"
-    )
-    # Verify those triggers also appear in skill description
-    ja_in_skill = sum(1 for t in JA_TRIGGERS_IN_SKILL if t in skill_text)
-    assert ja_in_skill >= 3, (
-        f"SKILL.md description does not contain >=3 JA trigger phrases; "
-        f"found {ja_in_skill}"
     )
 
     # -----------------------------------------------------------------------
@@ -189,18 +168,13 @@ def test_tri_lang_readmes_consistent():
         f"found {zhtw_in_readme}: "
         f"{[t for t in ZHTW_TRIGGERS_IN_SKILL if t in zhtw_text]}"
     )
-    zhtw_in_skill = sum(1 for t in ZHTW_TRIGGERS_IN_SKILL if t in skill_text)
-    assert zhtw_in_skill >= 3, (
-        f"SKILL.md description does not contain >=3 zh-TW trigger phrases; "
-        f"found {zhtw_in_skill}"
-    )
 
 
 def test_tri_lang_readmes_show_localized_goal_grounded_alignment_loop():
     readmes = {
-        "en": (_read(README_EN), ("Purpose and current position", "Align purpose and next step")),
-        "ja": (_read(README_JA), ("目的と現在地", "目的と次の一歩をそろえる")),
-        "zh-TW": (_read(README_ZHTW), ("目的與現在的位置", "對齊目的與下一步")),
+        "en": (_read(README_EN), ("Purpose and current position", "Ask for the original purpose", "Ask about the next step")),
+        "ja": (_read(README_JA), ("目的と現在地", "元の目的を尋ねる", "次の一歩を確認する")),
+        "zh-TW": (_read(README_ZHTW), ("目的與現在位置", "詢問原始目的", "確認下一步")),
     }
 
     for language, (text, labels) in readmes.items():
@@ -215,3 +189,45 @@ def test_tri_lang_readmes_show_localized_goal_grounded_alignment_loop():
     for language, (text, _) in readmes.items():
         assert "recap-state/" in text, f"{language} README uses a stale directory root"
         assert "\nrecap/\n" not in text, f"{language} README names a nonexistent directory"
+
+
+def test_tri_lang_readmes_keep_final_question_conditional() -> None:
+    readmes = {
+        "en": (_read(README_EN), "purpose is unknown", "purpose is grounded", "Ask for the original purpose"),
+        "ja": (_read(README_JA), "目的が不明", "目的が確認できる", "元の目的を尋ねる"),
+        "zh-TW": (_read(README_ZHTW), "目的不明", "目的已確認", "詢問原始目的"),
+    }
+    for language, (text, unknown, grounded, ask_purpose) in readmes.items():
+        prose, diagram = text.split("```mermaid", 1)
+        diagram = diagram.split("```", 1)[0]
+        assert unknown in prose, f"{language} README omits unknown-purpose behavior"
+        assert grounded in prose, f"{language} README omits grounded-purpose behavior"
+        assert ask_purpose in diagram, f"{language} diagram omits purpose question"
+        assert "WaitPurpose" in diagram and "WaitNext" in diagram, (
+            f"{language} diagram must keep the two waiting states separate"
+        )
+        assert re.search(r"Check\s+-->[^\n]*AskPurpose", diagram)
+        assert re.search(r"Check\s+-->[^\n]*Next", diagram)
+        assert "AskPurpose --> WaitPurpose" in diagram
+        assert "Next --> WaitNext" in diagram
+        assert "WaitPurpose -->" in diagram and "| Purpose" in diagram
+        assert not re.search(r"WaitPurpose\s+-->[^\n]*Continue", diagram)
+
+
+def test_tri_lang_readmes_describe_flexible_recap_and_pause_without_six_section_claim():
+    localized_contract = {
+        "en": (_read(README_EN), ("purpose", "only the sections", "waits for your answer", "writes nothing to disk")),
+        "ja": (_read(README_JA), ("目的", "必要なセクションだけ", "返答を待つ", "ファイルには何も書かない")),
+        "zh-TW": (_read(README_ZHTW), ("目的", "只保留有用的段落", "等待你的回答", "不會寫入任何檔案")),
+    }
+    stale_claims = {
+        "en": ("six-section", "six sections", "fixed six-section"),
+        "ja": ("6 つの", "6 セクション", "同じ 6"),
+        "zh-TW": ("六個段落", "六段結構", "六個自然段落"),
+    }
+
+    for language, (text, required) in localized_contract.items():
+        for phrase in required:
+            assert phrase in text, f"{language} README lacks: {phrase}"
+        for claim in stale_claims[language]:
+            assert claim not in text, f"{language} README retains fixed-format claim: {claim}"

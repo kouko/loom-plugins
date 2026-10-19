@@ -1,7 +1,7 @@
 ---
 name: capture-intent
 description: |
-  Capture and confirm a change intent. Use when someone wants a feature or change and no intent file exists yet.
+  Capture and confirm a change intent. Use for any software request to add a feature or fix a bug, before editing files, even when loom is not named or the repo has no loom folder. Skip a typo or a rename that changes no behaviour (unless loom is asked for), skip non-software work, and skip a request inside an active change (its station continues it).
 version: 1.0.0
 ---
 
@@ -19,8 +19,8 @@ confirmed intent onward. Do not design, plan, or ask the user to judge quality.
 `kind: engineering` covers internal work, tooling, tests, and docs.
 `<change-id>` is `<start-date YYYY-MM-DD>-<title-in-kebab-case>`.
 
-`loom-code` owns the file formats and checker; its stations consume this
-output, so preserve the required shapes.
+`loom-code`'s stations consume this output and check its format, so
+preserve the required shapes.
 
 ## Station summary
 
@@ -37,36 +37,29 @@ output, so preserve the required shapes.
 ## What you will be asked, in plain words
 
 Give the user this list if they ask what is coming. These are the decision
-points, and a legacy intent at ship, changed requirements, or an expert-mode
-request can add a stop.
+points, and a legacy intent at ship or changed requirements can add a stop.
 
-1. **Here:** one message confirms the restated intent, every expensive-to-undo
-   choice in consequence form, a product's new principles when needed, and —
-   only for `second-vendor: ask` — whether to use another vendor.
+1. **Here:** one message confirms the restated intent, for an engineering
+   change every expensive-to-undo choice in consequence form (a product
+   change's wait for item 2, unless no spec will be written), a product's new
+   principles when needed, and —
+   only for `second-vendor: ask` without a direct user request naming the
+   outside agent and an unambiguous active target — whether to use another vendor.
    `suggest` adds no question at capture-intent; write-plan owns its post-plan
    notice.
 2. **Where the product spec is written:** confirm visible behaviour and any
-   carried details ("you type ___ and see ___") — at `write-spec`, or at
+   carried details ("you type ___ and see ___"), and the product's one-way
+   doors in consequence form — at `write-spec`, or at
    `loom-code:write-plan` when `needs-design: no` and carried details force a
-   spec. Engineering changes skip this.
+   spec. Engineering changes skip this; a product change with no spec has its
+   one-way doors asked at item 1 instead.
 3. **At the end:** accept or reject the report showing how each Acceptance
    line was tried and what happened.
 
 Nothing about task splitting, review mechanics, or verification is put to the
 user. With `loom-code` alone, `write-plan` performs this station's questions;
-Codex may also need one first-use repository authorisation stop.
-
-## Step 0 — Check the contract version
-
-Locate the `loom-code` directory as `references/locate-loom-code.md` says,
-then run, with that directory in place of `<loom-code>`:
-
-```
-python3 <loom-code>/scripts/loom_checker.py contract --require 2.1
-```
-
-Exit 0 continues. On any other result, or when the checkout cannot be found,
-follow that reference's failure rule and **stop**.
+Codex may also need one authorisation stop when the plugin is newly installed
+or updated.
 
 ## Step 1 — Interview
 
@@ -122,8 +115,7 @@ Write the intent and decision-point dialogue in the user's language; plans,
 specs, reviews, evidence, tests, and commits are English; acceptance test reports
 and PR bodies use the user's language.
 
-Write `docs/loom/intent/<change-id>.md` from the `intent.md` template in
-`loom-code`'s `contract/templates/` directory. Fill in:
+Write `docs/loom/intent/<change-id>.md` from `templates/intent.md`. Fill in:
 
 - `originator: <the user's name>` — or `map:<id>` when a decision map
   raised it.
@@ -155,7 +147,7 @@ The confirmation gate below performs the altitude pass after this list has
 been filled.
 
 <!-- gate: capture-intent.product-problem-plain-words -->
-<!-- The `gate:` markers in this file are prose gates: rules this station must follow, registered in the mechanism population and checked by cold-read evals — not checker rule ids. The checker rules are the `intent.*` / `standing.*` / `contract.*` ids named in the commands. -->
+<!-- The `gate:` markers in this file are prose gates: rules this station must follow, registered in the mechanism population and checked by cold-read evals — not checker rule ids. The checker rules are the `intent.*` / `standing.*` / `contract.*` ids named in this file. -->
 **A product Problem section is written in plain words only.** No file
 paths, no function or class identifiers, no script filenames — the section
 is what the user reads to recognise their own problem, and the checker
@@ -165,19 +157,11 @@ Engineering intents may name paths freely.
 
 ## Step 3 — Standing documents
 
-```
-python3 <loom-code>/scripts/loom_checker.py standing docs/loom/intent/<change-id>.md
-```
-
-Print its WARN lines to the user **verbatim** — do not summarise them, do
-not add to them, do not act on them. They never block.
-
-One outcome does block, `standing.product-principles-reject`: `kind:
-product` in a repo with no ratified `PRINCIPLES.md`. Ratified means the
-file carries a `ratified-by: <name> <date>` line and a `## Non-negotiables`
-section with at least three items. When that happens, run the interview in
-`loom-code`'s `contract/templates/PRINCIPLES-interview.md` **now, in this
-same conversation** — not as a separate stop and not as a question about
+For `kind: product` only, read `PRINCIPLES.md` at the repo root. It is
+ratified when it carries a `ratified-by: <name> <date>` line and a
+`## Non-negotiables` section with at least three items. When it is missing
+or not ratified, run the interview in `templates/PRINCIPLES-interview.md`
+**now, in this same conversation** — not as a separate stop and not as a question about
 whether to do it. Open with the template's opening line, translated into
 the user's language — the template's current English sentence is:
 
@@ -211,8 +195,12 @@ twice, and this is the only stop this station makes.
    `publication: automatic — authorized <date> by <name>` only after that
    informed yes; an opt-out leaves the field absent.
 
-2. **Every one-way door found so far**, in consequence form. The five classes
-   are: **(a) Hard to swap later**; **(b) Creates money or a standing
+2. **The engineering one-way doors found so far**, in consequence form. A
+   product change's one-way doors, class (e) actions included, are asked at
+   decision point ② of the station writing its spec — `write-spec`, or
+   `loom-code:write-plan` when it writes the spec — when a spec will be
+   written. They are asked in this message instead when no spec will be
+   written; a spec written later does not ask them again at ②. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing
    obligation**; **(c) Limits what the user can do in future**; **(d) Sets the
    ceiling on output quality**; and **(e) An irreversible action on the user's
    existing state**. Class (e) counts without a fork. If Constraints or
@@ -225,15 +213,17 @@ twice, and this is the only stop this station makes.
    when the candidates can be compared quickly on the user's own samples,
    then ask about the result, never about assumptions; **threshold** — for
    class (d), any axis differing by at least 20%, or the presence versus
-   absence of money, privacy or coverage; **merge** — every one-way door of
-   this change is asked once, here, inside this message. Never open an
-   extra stop.
+   absence of money, privacy or coverage; **merge** — every engineering
+   one-way door of this change, and a product one-way door when no spec will
+   be written, is asked once, here, inside this message.
+   Never open an extra stop.
 
    State options as user consequences and recommend one with a reason. With no
    fork, state the irreversible consequence and safeguard (for example, what
    is rewritten, what stops reading it, and where the backup is kept).
 
-3. **The cross-model review question, only for `second-vendor: ask`.** Read
+3. **The cross-model review question, only for `second-vendor: ask` without
+   a qualifying direct user request.** Read
    `references/second-vendor.md` for mode routing and the availability
    probe. A missing line is initialized as `second-vendor: suggest`; it
    adds no question here. The downstream notice may explain that reviewing
@@ -241,8 +231,10 @@ twice, and this is the only stop this station makes.
    serious problems in this system's own spec review were found by
    only one of the two vendors. When the defaults carry `second-vendor: ask`,
    use the reference's host-aware native question or fallback in this same
-   message; the answer governs this change only. A fixed CLI also adds no
-   question.
+   message only if the user has not already named an outside coding agent
+   and unambiguous active review target. That direct user request supplies
+   one review's authorization without a second question; disclose cost,
+   egress and local execution before dispatch. A fixed CLI adds no question.
 
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
@@ -254,6 +246,19 @@ twice, and this is the only stop this station makes.
    `write-spec`, or `loom-code:write-plan` when the list forces a spec for a
    change that skips design. A product change's carried details never appear
    in this message.
+
+6. **The complexity check, when the scope adds cost.** When the user's
+   request or an option under discussion would add a mechanism, field, rule
+   or step, run `loom-workflow:critique` in complexity mode before you
+   compose this message. Carry only its verdict and its smaller alternative
+   into this message, in the user's plain words; this adds no stop, and the
+   user still chooses. Never paste critique's full response, its mindset or
+   its question-by-question shape. Answer critique's own questions from the
+   draft intent; never put them to the user. A request that adds no such
+   cost, such as a bug fix or a wording change, does not run it. A wording
+   change that adds a mechanism, field, rule or step still runs it. When
+   loom-workflow is not installed, skip this item; the rest of this message
+   is unchanged.
 
 Questions may only ask what the user wants, what they will see (reserved for
 decision point ②, where the product spec is written), whether acceptance worked (decision point ③
@@ -290,9 +295,13 @@ detail. This self-check creates no fields, IDs, requirements, scenarios, or
 product behaviour.
 
 Publication and second-reviewer authorisation never enter Problem, Proposed
-outcome, Acceptance, Constraints, or Out of scope. Keep publication
-authorisation in the intent's `publication:` frontmatter line and the question
-list in the step-5 hand-off.
+outcome, Acceptance, or Out of scope. Keep publication authorisation in the
+intent's `publication:` frontmatter line. The sole Constraints exception is
+`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
+skipped. It records the selected family; a direct request's verbatim quote,
+target and final `selected_executor` belong in JSON `authorization_source`
+at dispatch, never this machine line. Keep only actual questions in the step-5
+hand-off.
 
 Visible effects with an unknown surface and no spec require
 `needs-design: yes` with a surface-neutral reason; internal files alone do not.
@@ -321,9 +330,8 @@ the intent and restate again; there is no limit on rounds here.
 2. Commit with the message `docs(loom): intent <change-id> confirmed`. Its
    body **must contain the `needs-design:` line verbatim** — the checker
    compares the two strings character for character.
-3. Verify:
-   `python3 <loom-code>/scripts/loom_checker.py intent docs/loom/intent/<change-id>.md`
-   Fix what it names and re-run until it exits 0.
+
+`loom-code:write-plan` runs the intent check on this file before planning.
 <!-- /gate -->
 
 ## Step 5 — Hand off
@@ -353,8 +361,3 @@ will **not** run decision point ① again, because `status:` is already
 written: at `write-spec`, or at `write-plan` when `needs-design: no` and
 carried details force a spec. Engineering changes go from here to a plan with
 no further stop until acceptance.
-
-## On Codex CLI
-
-Every step above is the same. Resolve `<loom-code>` to the installed plugin
-directory; never create or invoke a repository-local checker copy.

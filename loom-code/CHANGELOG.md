@@ -1,5 +1,200 @@
 # Changelog
 
+## [3.42.1] — 2026-10-18 — sync-trunk rebases a never-pushed change branch
+
+- `sync-trunk` now rebases a change branch that has never been pushed onto the fetched trunk tip, so no merge commit is created.
+- A branch that has been pushed (the live origin lists it, any of its commits is on any remote-tracking ref, or it has a configured upstream or pushRemote other than origin's trunk) keeps the merge path, as does a branch that already holds a merge commit, whose history touches a local ignored or untracked file, or whose lookup fails. It never forces a push.
+- After a rebase, `sync-trunk` says the branch's commit ids changed, so any commit-sha reference recorded on the branch must be re-pinned.
+
+## [3.42.0] — 2026-10-18 — close the remaining adversarial-probe acceptance gaps
+
+- A pytest probe must name only its artifact, and a run is refused when its summary shows deselected tests, no passed test, or no summary at all (for example under `-qq`). At least one passing test must come from the probe's own file, so a file added by configuration cannot supply the pass.
+- Finalize-review refuses a bare `python <probe>` run of a file that defines top-level `test*` functions or `Test*` classes; record `python -m pytest <probe>` instead. Existing attestations are not re-judged.
+- Finalize-review and the validator refuse artifact paths that are not in normal form (`./`, `../` or `..` parts, or `//`); the validator checks the spelling only, and finalize-review alone refuses a plain path outside both the store and the suite.
+- `env NAME=value` prefixes, `npx --yes` and bare `pnpm` launchers are parsed, and runner-configuration variables are refused.
+- Cargo targets whose required features are all directly in `[features] default`, and `tests/<dir>/main.rs` (auto-discovered or declared without a path), now count as suite-collected; an auto-discovered target shadowed by a same-named declared target does not.
+
+## [3.41.1] — 2026-10-18 — bound every outside review CLI by its time limit
+
+- Every outside CLI launch (Antigravity listing, probe and review) now runs in its own process group and is killed as a group at its time limit.
+- A Codex that exits before answering `model/list` is reported as `discovery-error: codex model/list failed: exit <n>`.
+- The review time-limit default rises from 600 to 1800 seconds; the allowed range is unchanged.
+- The launcher is now the explicit default runner instead of an identity check on `subprocess.run`.
+
+## [3.41.0] — 2026-10-17 — attest adversarial probes run by non-Python test runners
+
+- Finalization attests an adversarial probe run by one of 13 listed runners — `go test`, `python -m unittest`, `node --test`, `deno test`, `bun test`, jest, vitest, mocha, `cargo test`, `cargo nextest run`, rspec, minitest and phpunit — by running it and parsing that run's own test results: at least one passing, non-skipped test from the probe's artifact. A readable zero is refused, and an argv a runner claims must be in that runner's accepted form.
+- A probe run by an unlisted runner, or one whose output its runner cannot read, needs a verdict reviewer's confirmation bound to the reviewed content digest and quoting whole output lines that name the artifact; refusals say which part is missing and print the output tail.
+- Attestation executions gain optional `evidence`, `passed` and `confirmation` fields in the contract manifest grammar; the schema stays `loom-attestation/v2`. Reviewer output gains optional `probe_confirmations`, and the closing-review station, its adversarial reference and the reviewer agent document the accepted commands and confirmations.
+- pytest, shell and direct-execution probes keep their existing rules.
+
+## [3.40.1] — 2026-10-17 — keep Codex model discovery open until it answers
+
+- Codex external-review discovery keeps `codex app-server` stdin open until the `model/list` reply arrives, bounded by the 15 s discovery timeout, so the model list is no longer lost to an early EOF.
+
+## [3.40.0] — 2026-10-13 — register the standalone project-session retro
+
+- Add `loom-workflow:retro` to the versioned contract manifest as a standalone tool outside the Loom station and mechanism counts. The workflow plugin owns the skill and its on-demand behaviour.
+
+## [3.39.1] — 2026-10-12 — recognize graduated probes in runnerless pytest suites
+
+- Finalization recognizes adversarial tests collected by a declared pytest package suite, including projects without a package runner and runners targeting the repository root. Uncollected files remain refused.
+- Explicit `conda run -n <env> python -m pytest` commands can prove execution of a graduated test; commands that do not execute the artifact remain refused.
+
+## [3.39.0] — 2026-10-08 — consented external review uses an explicit executor profile
+
+- Add `external-review` as the shared outside execution boundary for Codex, Claude Code and Antigravity CLI. It requires recorded consent, an explicit model and effort, a bounded preflight, and a separately reported failure when execution or verification fails.
+- Closing review keeps its incumbent reviewer and its own verdict checks when an opted-in outside reviewer joins it. Candidate discovery and reported evidence reflect the selected model family and each CLI's observable limits.
+- Raise the counted-skill ceiling from 22 to 23 for the shared `external-review` handoff; a twenty-fourth counted skill still fails the measurement.
+- budget-exception: external-review — one shared executor boundary replaces duplicated outside-review probes while preserving each owning skill's verdict checks; eval loom-code/tests/test_external_review.py::test_consent_blocks_all_subprocesses.
+
+## [3.38.0] — 2026-10-07 — a product one-way door asked at ① is not asked again at ②
+
+- Write-plan's ② gate, its "what you will be asked" item 2 and `one-way-door.md`'s merge gate now state that a product one-way door already asked at decision point ① is not asked again at ②.
+- The two prose-pin tests now use the shared `prose_pin` negation matcher, and each also rejects `nothing`, which the shared matcher leaves out.
+
+## [3.37.0] — 2026-10-06 — write-plan asks product one-way doors at decision point ②, and adversary trial cases stay uncommitted
+
+- Write-plan's decision point ① now merges engineering one-way doors; a product change's one-way doors, class (e) actions included, are asked at decision point ② of the station writing its spec — `loom-design:write-spec`, or write-plan itself when it writes the spec — and, when no spec will be written, in the decision point ① message as before, so no irreversible action goes unasked; write-plan's own ② gate now lists those product one-way doors. It used to merge any expensive-to-undo choice at ①. The `restate-and-confirm` summary in `contract/manifest.yaml`, the SessionStart hook's decision-point lines, `one-way-door.md`'s merge gate, the repo's `AGENTS.md` flow line and the READMEs (en / ja / zh-TW) state the same split. The `test-prompts.json` edge case for an unconfirmed intent now expects the same split.
+- Write-plan names its Codex authorisation stop as happening when the plugin is installed or updated, not the first time a repository is used.
+- The closing-review adversarial attack part may write and run trial cases but leaves them uncommitted; only an attack that succeeded opens the second part, whose program is committed under `docs/loom/<change-id>/evidence/probes/`.
+- Reviewers still never run adversarial programs under `evidence/probes/`, but a probe graduated out of it into the repository's tests (for example `loom-code/tests/`) is an ordinary changed test file, which the reviewer runs under the `tests` lens. No checker rule changed.
+
+## [3.36.0] — 2026-10-06 — the write-plan entry-definition pin judges whole sentences
+
+- `test_write_plan_entry_definition.py` now judges the write-plan entry definition by whole sentence, where a sentence ends only at `.`, `!` or `?` followed by a capitalised word, so a negation in the pinned sentence fails the pin, including one in a sibling `;` clause, or one after `i.e.`, `e.g.` or `...` when a lowercase word follows. A capitalised word there (e.g. "i.e. Never") still starts a new sentence, so that negation escapes the pin.
+- Write-plan's Task size paragraph now says "logic beyond that entry's reach" instead of "logic that entry cannot reach", with the same meaning and no negation token.
+- The pin's docstring now marks it as a cheap fixed check (a tripwire), not a semantic guarantee: inversions phrased with "rather than", "instead of" or "neither … nor" pass it and are left to closing-review reviewers. No checker rule changed.
+
+## [3.35.0] — 2026-10-05 — the tests lens asks for a marked entry only when a task adds or changes a function's behaviour
+
+- The closing-review `tests` lens now says a task adding or changing a function's behaviour whose plan Files line marks no entry is a finding. It used to say any task changing non-test code, so a version-bump-, config- or docs-only task is no longer asked to mark an entry.
+- `test_write_plan_entry_definition.py` now judges the write-plan entry definition clause by clause, splitting on `.` and `;`, and treats `cannot` and curly-apostrophe contractions such as `can’t` as negations, so an entry definition negated with `cannot` fails the pin.
+- The `docs/examples/swift-network-layer.md` review note now recommends extracting a non-exported wrapper helper because the four wrappers change for the same reason, not because of their count. No checker rule changed.
+
+## [3.34.0] — 2026-10-05 — review lenses flag tests that bypass the module entry, forward-only modules and length-only splits, and plan tasks name the entry other modules call
+
+- The closing-review `tests` lens now defines a module's entry as what other modules call, never whatever its tests call, and says a task changing non-test code whose plan Files line marks no entry is a finding. A new or changed test that calls an internal (non-entry) function is a finding when that behaviour is reachable from the module's entry, whether or not entry tests already cover it, and the fix moves the test to the entry, or deletes it when an entry test already covers that behaviour; a test through the entry is never asked to add internal tests, and logic the entry cannot reach that became its own module with its own entry, tested at that entry, is not a finding.
+- The `naming` lens keeps function length (past 20 lines, and again past 50) only as a prompt to look, never itself a finding: a split finding names a concrete problem, such as a function doing several unrelated things, and length alone is never the finding. It used to say 100 lines was a finding on its own.
+- The `refactoring` lens now treats three sites doing the same thing as an extraction candidate, extracted only when the three change for the same reason; a split or extraction defaults to a non-exported function inside the module, and becomes its own module with an entry only when another module needs to call it or its behaviour is unreachable from the existing entry — wanting to test it alone is no reason for a new entry. A shared extraction across modules stays acceptable as its own module whose entry its callers import.
+- The `deletion-first` lens now says a new module or function that only forwards — no branching, transformation, validation, error handling, resource-boundary handling or policy choice, just a call elsewhere returning its result — is a finding; one hiding any of those is not, nor is a re-export that declares the module's entry (a package `__init__`, a TS `index` barrel).
+- Write-plan's Task size paragraph now says a task changing non-test code marks in Files the entry other modules call, its case-ids name behaviour seen there, and logic that entry cannot reach is its own module, tested at its entry. No checker rule changed.
+
+## [3.33.0] — 2026-10-05 — the tests lens names tests that cannot fail, and the ship PR risk section states door, blast radius and rollback
+
+- The closing-review `tests` lens now says a test that cannot fail for the behaviour it names is a finding, and names three shapes: a test restating a constant or the implementation; a test reading source text to assert code structure (prose-pin tests that meet `loom-code/references/engineering-baseline.md` §5 item 8 excepted); a mock or stub replacing the very seam it claims to cover.
+- Ship's `## Risks and rollback` PR section now states whether the change is a one-way or two-way door, citing every recorded one-way door — user-decided lines (the spec's Design decision when a spec exists, else the plan's Risks) and agent-decided ones (the plan's task Risk lines and the acceptance test report's "I decided for you" section), where an agent-decided line counts as a one-way door when it falls in one of the five classes of `loom-code/skills/write-plan/references/one-way-door.md`, checked line by line because none is marked one-way, and calling it two-way only when none is recorded or found; its blast radius (what could break and for whom); a concrete rollback or recovery path; and the remaining risks. It used to ask only for remaining risks and a recovery path. Ship now also lists the spec, when one exists, among the PR body's sources. No checker rule changed.
+
+## [3.32.0] — 2026-10-05 — the language anchor sends one fixed reminder instead of detecting the user's language
+
+- The language-anchor hook no longer detects the user's language. On every trigger (Claude Code: SessionStart `compact|resume`, UserPromptSubmit, PostToolUse `Skill|Agent`; OpenCode: after a Skill tool result; Antigravity: once per loom SKILL.md read), all three hosts send one fixed English reminder to write every message to the user in the language and script the user writes in; the replying model identifies the language itself and the hook reads no transcript to pick a language.
+- `hooks/lang_detect.py` and its tests are deleted.
+- The OpenCode loader no longer writes user prompts to `tmpdir/loom-opencode/<session>.jsonl` and drops `transcript_path` from hook payloads.
+- The OpenCode loader now deletes the prompt files earlier versions left in `tmpdir/loom-opencode/` when it loads.
+
+## [3.31.0] — 2026-10-04 — every message to the user, relayed agent results included, uses the user's language
+
+- Build, closing-review and ship now say that every message to the user uses the user's conversation language: relayed agent results, turns with no new user message, and decision point 3 (acceptance test report acceptance).
+- The language-anchor hook now also fires on SessionStart `compact|resume` and on Agent tool results and UserPromptSubmit (which also fires on the turn a background agent's completion starts), and its zh wording no longer hardcodes a script variant.
+- The language detector now ignores harness-written user turns (compaction summaries, skill re-invocation echoes), which had outvoted the user's language after a compaction; and the anchor ignores an unknown hook event name.
+
+## [3.30.0] — 2026-10-04 — engineering baseline states the code-first backfill path
+
+- `engineering-baseline.md` gains a "Code-first backfill" paragraph: when the user instructs a plain-words `tdd` skip for code written before the flow began, the backfill characterises that code first and the plan records which code predates the flow; an uninstructed skip remains a violation, and a compile or import failure is not defect-catching evidence. No checker rule, intent field, manifest entry or station step changes.
+- Build's `tdd`-skip sentence now names its scope: the skip covers only code written before the flow began. The baseline names where the predates-the-flow record goes (the plan's `## Risks` beside the skip line, or the intent's `## Constraints` when plan is absent or skipped), and the legacy paragraph's "violation whatever the code's age" now points to that user-instructed exception.
+
+## [3.29.1] — 2026-10-03 — session-start drops control characters and invalid UTF-8; 3.29.0 checker note corrected.
+
+- The `session-start` hook cleans the repository's KICKOFF-DEFAULTS lines before it matches and prints them: form feed and vertical tab become spaces, and the other control characters except tab and newline (carriage return included) are removed; a form feed or escape character there used to make the hook emit invalid JSON, so the session got no loom guidance. When `iconv` is available, bytes that are not valid UTF-8 are dropped while valid UTF-8 text such as CJK is kept; an invalid byte used to make the hook exit with no output. Without `iconv` such bytes pass through unfiltered, and a missing or failing `iconv` no longer silences the hook.
+- The 3.29.0 entry no longer claims that pytest options which run no tests are always refused: only options passed directly are checked, and a no-run option injected through a configuration override (`-o addopts=--collect-only`) still gets through, a known limitation.
+
+## [3.29.0] — 2026-10-03 — workaround lessons folded into loom guidance and checker.
+
+- The checker accepts an adversarial program command whose pytest options come before the test file, but only options on its allowlist (common value options such as `-p no:cacheprovider` or `--tb=short`, and quiet/verbose-style flags); an unlisted option passed directly, including one that runs no tests (e.g. `--help`, `--collect-only`), is refused in any position, and it still refuses a command that does not run the declared program, including one whose option value names it (`--deselect`). A no-run option injected through a configuration override (`-o addopts=--collect-only`) still gets through; this is a known limitation.
+- The publish refusal for an existing pull request whose identity does not match origin, HEAD and base now says that right after a push GitHub may not yet show the new commit, so retry once and stop if it is refused again; publish itself still never retries.
+- `adversarial.md`: an attack the change survives is still reported as an attempt, and when no attack earned a new program the adversary names an existing repository test that covers the change as its program, with a `concern:` line (the adversary contract says the same); a finding that only a loom agent or user deliberately defeating one of loom's own internal rules (a budget, a cap, a check) could trigger is rated `nit` and recorded as a known limitation, while one reachable by untrusted input, including a deliberate attacker, or without that intent keeps its severity.
+- The implementer contract says the tests that only check a removed behaviour are deleted with it, and that this is not deleting a test to reach green.
+
+## [3.28.0] — 2026-10-02 — software-development requests enter loom on every host.
+
+- The session-start text gains a routing paragraph: any request to add a feature or fix a bug starts at the entry station (write-plan when loom-design is not installed) before any file is edited, in any repository, even when loom is not named; a user's bug-fix request starts there even when it reads as a bug report, while alerts, CI or regression failures and dogfood incidents without a fix request start at the maintain station. Outside an active change, a feature or bug-fix request goes through loom however small; other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) go direct unless the user asks for loom. The loom-design-absent fallback station is derived from the manifest.
+- The `maintain` description, the using-loom-code router row and the READMEs no longer claim plain bug reports for `maintain`.
+- `session-start` prints only `hookSpecificOutput.additionalContext`; the extra `additional_context` and bare `additionalContext` keys are gone, because Codex marks a hook Failed when its JSON carries any other top-level key.
+- Codex gets a SessionStart hook in `hooks/hooks-codex.json`, so it receives the routing text at session start. Codex users must trust the plugin's hooks once before it runs.
+- The `write-plan` description is narrowed: it turns a confirmed intent into tasks, and is the entry for a new feature or bug-fix request only when loom-design is not installed.
+- PR #74 leftovers removed: the ship sentence about `Skipped as a narrow change:`, the no-op `depth` parameter of `verification_status`, and a trailing blank line in a test file.
+- budget-exception: SessionStart::session-start@codex — Codex gets the loom routing text at session start
+
+## [3.27.0] — 2026-10-01 — expert-mode removed; acceptance report lists skipped steps.
+
+- The `expert-mode` skill and its typed skip confirmation are removed; a user still skips a step by saying so in plain words.
+- No hook captures prompts any more, and no hook fallback guards the selection record store.
+- `loom_checker.py selection` is removed; an attestation's `selection` field is always null.
+- The acceptance test report gains a "Steps you told me to skip" section that lists, in plain words, each step the user told the agent to skip.
+
+## [3.26.1] — 2026-09-30 — OpenCode transcript note and README label.
+
+- On OpenCode, a command's skill body is not recorded as the user's words, so the language reminder keeps the user's language (shipped in 3.26.0); a message the user types that contains the skill-body separator is now recorded whole.
+- The README skill count calls `expert-mode` command-only instead of user-invoked.
+
+## [3.26.0] — 2026-09-30 — OpenCode start command.
+
+- On OpenCode, `using-loom-code` is also a `/` command and remains a skill; the loader registers every skill whose frontmatter carries `user-invocable: true` as a command.
+- `expert-mode` stays command-only.
+- The README OpenCode sections name the start command.
+
+## [3.25.0] — 2026-09-30 — publish checks the stated verification status and a committed attestation.
+
+- `loom_checker.py publish` refuses a PR body whose `Verification status:` line differs from the computed status, and names the line the body must carry.
+- `loom_checker.py publish` refuses an attestation left uncommitted.
+- The Ship station lists both refusals.
+- The OpenCode README wording bounds the TUI claim to OpenCode 2.0.18–2.0.20 and names `opencode.json` as the file in the config folder.
+
+## [3.24.0] — 2026-09-29 — OpenCode v2 support.
+
+- OpenCode v2 package: `package.json` plus `opencode/loader.js` register the skills and agents and translate `hooks/hooks-opencode.json` into OpenCode hooks.
+- New `references/opencode-tools.md` maps tool and dispatch names for OpenCode; write-plan, build and closing-review link it.
+- The selection guard recognises `opencode` as a host program.
+- The mechanism census counts both plugins' `hooks-opencode.json` with an `@opencode` qualifier.
+- budget-exception: SessionStart:startup|clear|compact:session-start@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+- budget-exception: PreToolUse:Bash|Write|Edit|apply_patch:loom_checker.py@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+- budget-exception: UserPromptSubmit::loom_checker.py@opencode — Acceptance #5 needs this hook on OpenCode (agent-decided); eval loom-code/tests/test_opencode_loader.py.
+
+## [3.23.0] — 2026-09-29 — write-plan intent check on a confirmed intent; wider repository boundary check.
+
+- `write-plan` runs `loom_checker.py intent` on an intent that arrives already confirmed (after branching off the trunk).
+- The KICKOFF-DEFAULTS template names no loom-code path.
+- The repository boundary check now scans Python scripts and hooks, the `<loom-*>` placeholder, `loom_checker`, and contract/agents paths, and runs for loom-workflow in CI.
+
+## [3.22.4] — 2026-09-29 — Closing-review lenses compare polarity sentences with their base version.
+
+Patch: closing-review docs and skill lenses now compare a rewritten or deleted polarity sentence (never, must not, only, always, 不得) with its base version; a reversed or dropped direction is an inconsistency finding.
+
+- `loom-code`, `loom-design` and `loom-workflow` patch versions bumped together so `claude plugin update` refreshes installed copies.
+
+## [3.22.3] — 2026-09-29 — Prose-pin stock cleanup batch 4 and patch release bump.
+
+Patch: tests only; no skill or reference content changed.
+
+- Batch 4 of the prose-pin stock cleanup: short-phrase and helper-hidden pins removed from `loom-code` tests, kept to their structure/behavior checks, and the batch-4 adversary program graduated to `tests/test_adversarial_batch4_census_lookup_forms.py`.
+- `loom-code`, `loom-design` and `loom-workflow` patch versions bumped together so `claude plugin update` refreshes installed copies with the batch 4 test changes.
+
+## [3.22.2] — 2026-09-29 — Prose-pin stock cleanup batches 2-3 and deferred release bump.
+
+Patch: tests, evidence and version metadata only; no station guidance, field, rule id or contract change.
+
+- Batch 2 (PR #65): sentence-pin assertions removed from 26 test files across the family; `docs/loom/evidence/mechanisms.yaml` re-pointed to existing behavior/structure tests or cold-read records; the census script's execution count now counts only real subprocess/checker calls; the loom-visualization A/B rerun script repaired.
+- Batch 3: the census script widened to see sentence pins written directly (without a prose-helper import); the known and newly flagged files pruned to their structure/behavior/grammar checks.
+- Version bump deferred by batch 2 (PR #65 Follow-ups): loom-code, loom-design and loom-workflow patch versions bumped together so `claude plugin update` refreshes installed copies with the batch 2/3 test changes.
+
+## [3.22.1] — 2026-09-28 — Remove sentence-pin tests (batch 1 of the prose-pin stock cleanup).
+
+Patch: tests only; no station guidance, field, rule id or contract change.
+
+- Whole-file sentence-pin tests deleted (principles amendment, ship guidance); the module-criteria and agy tool-mapping tests pruned to their structure checks.
+- Recipe/routing/dispatch-profile tests pruned to structure and behavior checks.
+- The reword routing test now guards that rewording plants nothing.
+
 ## [3.22.0] — 2026-09-27 — Make prose evidence a definition in the tests lens, exempt docs/release tasks from per-task test pairs, and consolidate version sync to one constant.
 
 Minor: rule text and station guidance changed.

@@ -108,21 +108,6 @@ def test_four_operations_contract() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance A3 boundary: absent-store-empty-recall-and-retire-approval
-# ---------------------------------------------------------------------------
-
-
-def test_absent_store_and_empty_recall_are_normal_no_memory_results() -> None:
-    text = _all_skill_text()
-    assert "normal no-memory result" in text
-
-
-def test_retire_requires_explicit_user_approval_before_deleting() -> None:
-    text = _all_skill_text()
-    assert "explicit user approval before deleting" in text
-
-
-# ---------------------------------------------------------------------------
 # REQ-4: passive activation only, no fixed-station mandatory invocation
 # ---------------------------------------------------------------------------
 
@@ -144,26 +129,6 @@ def test_no_fixed_station_mandatory_invocation() -> None:
     }
     for name in forbidden_station_names:
         assert name not in lowered, f"skill text must not couple to station {name!r}"
-
-
-def test_activation_states_only_explicit_request_or_agent_judgement() -> None:
-    text = _skill_md_text()
-    lowered = text.lower()
-    assert "explicit" in lowered
-    assert "judgement" in lowered or "judgment" in lowered
-
-
-# ---------------------------------------------------------------------------
-# REQ-20: git-memory stays a separate, non-dependent sibling
-# ---------------------------------------------------------------------------
-
-
-def test_git_memory_boundary_is_stated() -> None:
-    text = _skill_md_text()
-    assert "git-memory" in text
-    assert "commit- and pull-request-bound" in text
-    assert "outlive a change" in text
-    assert "runtime dependency of the other" in text.lower()
 
 
 # ---------------------------------------------------------------------------
@@ -205,33 +170,11 @@ def test_no_bare_repo_root_relative_script_path() -> None:
     pairing is checked per blank-line-delimited paragraph, not per physical
     line)."""
     text = _all_skill_text()
-    # `${CLAUDE_PLUGIN_ROOT}` alone is Claude-only: Codex CLI and Antigravity
-    # CLI do not substitute it, so each shipped file that names it must also
-    # carry the hybrid phrase locating the plugin root on any other host.
-    files = [SKILL_MD, *sorted(REFERENCES_DIR.glob("*.md"))]
-    for path in files:
-        flat = " ".join(_read(path).split())
-        if "${CLAUDE_PLUGIN_ROOT}" in flat:
-            assert "on any other host" in flat and "levels above" in flat, (
-                f"{path.name} names ${{CLAUDE_PLUGIN_ROOT}} without the other-host root"
-            )
     for paragraph in re.split(r"\n\s*\n", text):
         if "skills/loom-memory/scripts/" in paragraph:
             assert "${CLAUDE_PLUGIN_ROOT}" in paragraph, (
                 f"bare repo-root-relative script path resurfaced in skill text: {paragraph!r}"
             )
-
-
-# ---------------------------------------------------------------------------
-# REQ-23: migration is not implicit, and this skill is never a legacy reader
-# ---------------------------------------------------------------------------
-
-
-def test_legacy_store_reported_needing_explicit_migration_without_modification() -> None:
-    text = _all_skill_text()
-    assert "explicit migration" in text
-    assert "without modifying any file" in text
-    assert "never reads or writes that legacy format itself" in text
 
 
 # ---------------------------------------------------------------------------
@@ -326,117 +269,19 @@ def test_skills_mount_declared_in_claude_manifest() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Acceptance A4 — the timing and scarcity halves of the Record contract
-#
-# READ THIS BEFORE YOU EDIT OR DELETE ANYTHING BELOW.
-#
-# These assertions pin two clauses of the shipped Record contract. They are
-# not style checks and they are not a snapshot of prose someone liked.
-#
-# History, because it has already happened once: the timing clause was
-# enforced from 2026-07-08 (#515) by five lines inside the
-# `finishing-a-development-branch` skill plus a test pinning them. The
-# loom 1.0 cutover (#780) deleted that skill, and the instruction and its
-# test went out together. Nobody noticed, because nothing was left to go
-# red. The rule survived only as prose in one repository's own store
-# charter, which no project installing this plugin ever reads.
-#
-# WHAT KIND OF TEST THIS IS, stated accurately because the previous wording
-# here overclaimed it: this is a LITERAL-PHRASE pin. Whitespace is flattened
-# first, so the prose may rewrap freely — but the phrases below are matched
-# literally, and a faithful rewrite that says "goes in the commit message"
-# instead of "belongs in its commit message" WILL go red. That is the known
-# cost of the only mechanism available here; it is not a defect, and it is
-# not a reason to delete the pin. The correct response to a red is:
-#
-#   1. check the clause is still in the contract and still says the same;
-#   2. if it is, update the phrase list below in the same commit as the
-#      rewrite, and say in that commit that the meaning was preserved;
-#   3. if it is not, you are removing part of what this plugin promises —
-#      that needs an intent, not an edit here.
-#
-# Step 2 looks like the anti-pattern every reviewer is trained to stop. It is
-# not, provided the commit shows the clause survived. Deleting the assertion
-# is what the 2026-07 cutover did.
-#
-# A literal pin cannot see DILUTION — a clause kept but drained of force
-# passes every assertion here. That half is guarded by `evals/record-timing.md`,
-# a frozen cold-reader run, and by the digest test at the end of this file
-# which makes a clause edit demand that run be repeated.
+# Acceptance A4: in SKILL.md, Record's timing and scarcity clauses are guarded by
+# test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against plus evals/record-timing.md.
 # ---------------------------------------------------------------------------
-
-_A4_WHY = (
-    "This clause is part of the Record contract (timing + scarcity). It was "
-    "lost once already when loom 1.0 deleted the skill carrying it along with "
-    "its test. If the contract was reworded and still says this, update the "
-    "phrase here in the same commit; if the clause is gone, removing it is a "
-    "contract change and needs an intent. See this section's header comment."
-)
-
 
 def _flat(text: str) -> str:
     """Whitespace-flattened, lowercased text — prose wraps, meaning does not."""
     return " ".join(text.split()).lower()
 
 
-TIMING_ELEMENTS = (
-    "before the branch closes",
-    "that same branch",
-    "separate post-merge branch",
-    "pure overhead",
-    "only confirmable by observing",
-    "batched",
-)
-
-SCARCITY_ELEMENTS = (
-    "not a durable lesson",
-    "belongs in its commit",
-    "belongs in the change's evidence",
-    "belongs in an intent",
-    "zero to one durable lesson per change",
-)
-
 # sha256 of the whitespace-flattened Record section of SKILL.md. Its only job
 # is to go red when that section changes at all, so the dilution guard cannot
 # fall silently out of date behind a literal pin that still passes.
 RECORD_SECTION_DIGEST = "945a9cb29dfb5a9090e4ad036e5f980accf19fe94b22ff3014c1c066635ddcc9"
-
-
-def test_record_contract_states_when_to_record() -> None:
-    """Timing half: a fact known before the branch closes lands in that branch.
-
-    Scoped to SKILL.md's own Record section, not the union of the skill text.
-    Against the union an adversarial probe showed the pin staying green while
-    the shipped contract was rewritten, because `references/operations.md`
-    still carried the phrases — the reference copy was propping up a clause
-    that had left the surface a reader actually follows."""
-    flat = _flat(_section(_skill_md_text(), "Record"))
-    for element in TIMING_ELEMENTS:
-        assert element in flat, (
-            f"the Record contract no longer states {element!r}. {_A4_WHY}"
-        )
-
-
-def test_record_contract_states_how_much_to_record() -> None:
-    """Scarcity half: most of what a change surfaces is not a durable lesson.
-
-    Scoped to SKILL.md's Record section for the reason given above."""
-    flat = _flat(_section(_skill_md_text(), "Record"))
-    for element in SCARCITY_ELEMENTS:
-        assert element in flat, (
-            f"the Record contract no longer states {element!r}. {_A4_WHY}"
-        )
-
-
-def test_record_section_routes_unfinished_item_to_intent() -> None:
-    """The backlog is frozen (docs/loom/README.md): a recurring open item
-    comes back as an intent. The Record section routes an unfinished item
-    to an intent and names no other destination."""
-    flat = _flat(_section(_skill_md_text(), "Record"))
-    assert "an unfinished item belongs in an intent." in flat, (
-        "the Record section no longer routes an unfinished item to an intent "
-        "alone. " + _A4_WHY
-    )
 
 
 def test_backlog_entry_routing_sentence_rejected() -> None:
@@ -446,20 +291,6 @@ def test_backlog_entry_routing_sentence_rejected() -> None:
     assert "backlog" not in flat, (
         "the Record section routes a lesson to a backlog entry, but the "
         "backlog is frozen; route unfinished items to an intent."
-    )
-
-
-def test_the_reference_copy_still_carries_both_halves() -> None:
-    """`references/operations.md` restates the rule for the reader who opens
-    the detailed procedure instead of the summary. It is a second surface, so
-    it drifts: pin one phrase from each half there too, and keep the pin above
-    scoped to SKILL.md so neither copy can stand in for the other."""
-    operations = _flat(_read(OPERATIONS))
-    assert "before the branch closes" in operations, (
-        "operations.md no longer states when Record runs. " + _A4_WHY
-    )
-    assert "not a durable lesson" in operations, (
-        "operations.md no longer states the scarcity bar. " + _A4_WHY
     )
 
 

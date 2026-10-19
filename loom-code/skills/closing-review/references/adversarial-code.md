@@ -11,7 +11,10 @@ changed modules and report survivors: a surviving mutant is a test that
 asserts nothing, and a finding against `tests`.
 
 **If it declares none** (the common case), write executable abuse or boundary
-cases against the changed behaviour, run them, and record each one. Write the
+cases against the changed behaviour as uncommitted trial cases, run them, and
+record each one. Only a case whose attack succeeded (red) is committed, as a
+program under `docs/loom/<change-id>/evidence/probes/`, per the two parts in
+[`adversarial.md`](adversarial.md). Write the
 ones the changed behaviour earns, and no others. How many a change may commit
 is in [`adversarial.md`](adversarial.md). Draw them from:
 

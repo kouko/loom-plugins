@@ -130,6 +130,9 @@ def test_agy_rule_all_check_and_single_check_agree_on_drift(tmp_path):
     card = (tmp_path / "loom-workflow").joinpath(*CARD_REL)
     card.parent.mkdir(parents=True)
     card.write_text(CARD_TEXT, encoding="utf-8")
+    loader = tmp_path.joinpath(*m.OPENCODE_LOADER_SOURCE)
+    loader.parent.mkdir(parents=True)
+    shutil.copy(REPO_ROOT.joinpath(*m.OPENCODE_LOADER_SOURCE), loader)
     assert _run(["--all", "--repo-root", str(tmp_path)]).returncode == 0
     assert _run(["--all", "--check", "--repo-root", str(tmp_path)]).returncode == 0
     _rule(tmp_path / "loom-workflow").write_text("tampered\n", encoding="utf-8")

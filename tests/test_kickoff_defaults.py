@@ -1,6 +1,5 @@
 """W1-05 — `docs/loom/KICKOFF-DEFAULTS.md`'s `package-tests` line covers
-loom-design's tests (`loom-design/tests/`), and its trailing note stops
-claiming CI runs the identical path set.
+loom-design's tests (`loom-design/tests/`).
 
 #791 went red in CI twice because the recorded package-tests command
 (the one `push.probes-package-tests` compares a recorded run against) never
@@ -47,13 +46,3 @@ def test_package_test_lock_pins_and_hashes_the_complete_graph() -> None:
         "pluggy", "pygments", "pytest", "pytest-xdist", "pyyaml", "wcwidth",
     }
     assert all("--hash=sha256:" in entry for entry in entries)
-
-
-def test_trailing_note_no_longer_claims_ci_runs_the_same_paths() -> None:
-    _, note = _command_and_note()
-    assert "CI runs the same test paths" not in note
-    assert "single inventory" in note
-    assert "CI selects named groups" in note
-    # the `-n auto` rationale and the dbt-wiki abort note must survive.
-    assert "pytest-xdist" in note
-    assert "dbt-wiki" in note

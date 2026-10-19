@@ -6,7 +6,7 @@
 > never grades. Every verdict on what it produces is rendered by
 > `loom-code:closing-review`, by an agent that did not write the draft.
 
-**Version**: 2.6.0 — 5 skills + 1 optional router. See
+**Version**: 2.14.0 — 5 skills + 1 optional router. See
 [CHANGELOG.md](CHANGELOG.md) for releases.
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -77,10 +77,13 @@ own yes.
 A change asks its user three things. loom-design owns the first two:
 
 1. **① Is this what you want?** — at `capture-intent`: the restated intent,
-   with any choice that is expensive to undo phrased as its consequence.
+   with any choice that is expensive to undo phrased as its consequence —
+   here for an engineering change, at ② for a product change (here when
+   no spec is written).
    Nothing downstream accepts an intent that is not `status: confirmed`.
 2. **② You do X and you see Y — right?** — at `write-spec`, for product
-   changes only; recorded as `confirmed-behavior:`.
+   changes only, together with the product's expensive-to-undo choices;
+   recorded as `confirmed-behavior:`.
 3. **③ Did it work?** — at the end of the flow in `loom-code`, through the
    report showing how each Acceptance line was tried.
 
@@ -91,13 +94,12 @@ the user.
 
 loom-design requires `loom-code`:
 
-- **It reads loom-code's contract.** loom-design never writes
-  `loom-code`'s contract package. `plugin.json` declares
-  `requires-contract: ">=2.1"`, and each station and tool first runs
-  `python3 <loom-code>/scripts/loom_checker.py contract --require 2.1`,
-  stopping on a mismatch instead of drafting against a contract it does not
-  understand. On Codex, `<loom-code>` is the installed plugin directory;
-  never create a repository-local checker copy.
+- **It carries its own copies of loom-code's templates.** loom-design
+  never writes `loom-code`'s contract package and never reads a file inside
+  it at runtime: the templates its skills fill are local copies, and a
+  repository test keeps each copy identical to its loom-code original.
+  `plugin.json` still declares `requires-contract: ">=2.1"`, and
+  `loom-code:write-plan` runs the intent check before planning.
 - **Its verdicts are rendered by loom-code.** The pre-build spec review and
   the closing review both run in `loom-code:closing-review`, with fresh-context
   reviewers; loom-design only names the checker rules, it never runs them.
@@ -107,8 +109,7 @@ loom-design requires `loom-code`:
   runs decision point ① itself.
 
 The plugins compose only through plugin-qualified skill names such as
-`loom-design:write-spec`, the contract package and the project's own
-`docs/loom/` artifacts.
+`loom-design:write-spec` and the project's own `docs/loom/` artifacts.
 
 ## Install
 
@@ -151,6 +152,30 @@ agent may act outside the project; pass it in interactive mode too.
 
 loom-design ships no hooks; loom-code's hooks run only in the `agy` CLI, not
 in the Antigravity desktop app or IDE.
+
+### OpenCode
+
+OpenCode v2 (verified on 2.0.18; plugins installed from the CLI also load in the TUI) installs plugins from GitHub. Install `loom-code` first: `opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`.
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
+opencode plugin list
+```
+
+Then restart OpenCode (`opencode service restart`): until it restarts, `opencode plugin list` may show only some of the plugins.
+
+The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
+
+Skills are offered as `loom-design:<skill>`. Start loom with the command `/loom-design:using-loom-design`, which stays a skill too.
+
+Limits on OpenCode:
+
+- A plugin can take up to about 40 seconds to appear in `opencode plugin list` right after the background service starts.
+- loom-code's subagents can stop on an `external_directory` permission prompt when they read loom's installed files from the plugin cache, even under `opencode run --auto`, which does not cover subagent sessions. Approve reads of the loom plugin directory.
+- `opencode run` without `--auto` stops at the first permission prompt or model question, so drive long loom runs from the TUI.
+- OpenCode does not ask before shell commands outside the project, so a model can change the machine (observed: a system-wide `pip install --break-system-packages`); review its commands or tighten OpenCode's permission settings.
+- The OpenCode desktop app and IDE integrations are not covered.
+- Node is not needed to use the plugins.
 
 ## Tests
 

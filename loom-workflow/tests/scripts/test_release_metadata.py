@@ -1,5 +1,7 @@
 """loom-workflow version pins stay in step with each other.
 
+concern: split-version release -- a manifest, CHANGELOG entry or README version string left behind by a patch bump
+
 The installer only refetches a plugin when its version changes, so a content
 change shipped under a stale or split version never reaches installed copies.
 """
@@ -14,12 +16,12 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 PLUGIN = REPO / "loom-workflow"
-CURRENT = "5.5.0"
+CURRENT = "5.11.0"
 
 
 @pytest.mark.parametrize(
     "manifest",
-    ["plugin.json", ".claude-plugin/plugin.json", ".codex-plugin/plugin.json"],
+    ["plugin.json", ".claude-plugin/plugin.json", ".codex-plugin/plugin.json", "package.json"],
 )
 def test_manifest_version_is_current(manifest: str) -> None:
     data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
@@ -29,6 +31,8 @@ def test_manifest_version_is_current(manifest: str) -> None:
 def test_changelog_has_current_entry() -> None:
     changelog = (PLUGIN / "CHANGELOG.md").read_text(encoding="utf-8")
     assert f"## [{CURRENT}]" in changelog
+    assert "## [5.9.0]" in changelog
+    assert "Migration: `retro` → `project-retro`; `distill-sessions` → `skill-retro`." in changelog
 
 
 @pytest.mark.parametrize("readme", ["README.md", "README.ja.md", "README.zh-TW.md"])
@@ -54,3 +58,32 @@ def test_root_readme_section_line_is_current() -> None:
     line = re.search(r"^Version (\d+\.\d+\.\d+)\.", section, re.M)
     assert line, "README.md ## loom-workflow: version line missing"
     assert line.group(1) == CURRENT
+
+
+def test_discovery_metadata_names_both_retros() -> None:
+    for manifest in ("plugin.json", ".claude-plugin/plugin.json",
+                     ".codex-plugin/plugin.json", "package.json"):
+        data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
+        assert "project-retro" in data["description"], manifest
+        assert "skill-retro" in data["description"], manifest
+    for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json"):
+        data = json.loads((PLUGIN / manifest).read_text(encoding="utf-8"))
+        assert "project-retro" in data["keywords"], manifest
+        assert "skill-retro" in data["keywords"], manifest
+        assert "retro" not in data["keywords"], manifest
+        assert "distill-sessions" not in data["keywords"], manifest
+    codex = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text(encoding="utf-8"))
+    assert "project-retro" in codex["interface"]["longDescription"]
+    assert "skill-retro" in codex["interface"]["longDescription"]
+    skills = PLUGIN / "skills"
+    assert (skills / "project-retro" / "SKILL.md").is_file()
+    assert (skills / "skill-retro" / "SKILL.md").is_file()
+    assert not (skills / "retro").exists()
+    assert not (skills / "distill-sessions").exists()
+
+
+@pytest.mark.parametrize("readme", ["README.md", "README.ja.md", "README.zh-TW.md"])
+def test_readmes_explain_direct_name_migration(readme: str) -> None:
+    text = (PLUGIN / readme).read_text(encoding="utf-8")
+    assert "`retro` | `project-retro`" in text
+    assert "`distill-sessions` | `skill-retro`" in text

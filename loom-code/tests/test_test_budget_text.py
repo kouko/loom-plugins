@@ -1,16 +1,13 @@
-# concern: the test-budget guidance being dropped, negated, or turned into a line cap
-"""Pins the test budget (change 2026-09-25-keep-mechanical-tests-small).
+# concern: the test-budget guidance being turned into a line cap
+"""Test-budget structure checks (change 2026-09-25-keep-mechanical-tests-small).
 
-One assertion per plan case. A4's rule count is already pinned by
-`test_loom_checker_cli.py` (`--list-rules` has 26 lines), so it is not
-repeated here.
+The budget's wording in implementer.md, adversarial.md and the lenses `tests`
+row is review-only; this file keeps the no-line-cap and no-new-gate checks.
 """
 from __future__ import annotations
 
 import re
 from pathlib import Path
-
-from prose_pin import has_negation, split_sentences
 
 REPO = Path(__file__).resolve().parents[2]
 IMPLEMENTER = REPO / "loom-code/agents/implementer.md"
@@ -22,49 +19,8 @@ def _read(path: Path) -> str:
     return " ".join(path.read_text(encoding="utf-8").split())
 
 
-def test_implementer_states_budget_and_net_lines():
-    text = _read(IMPLEMENTER)
-    budget = next(s for s in split_sentences(text) if "stay within a budget" in s)
-    assert not has_negation(budget), budget
-    assert (
-        "at most one positive and one negative or boundary case per Acceptance line;" in text
-        and "a finding's fix adds at most one test, extending an existing test first" in text
-        and "existing helpers and fixtures" in text
-        and "no new test harness" in text
-        and "no tests of tests" in text
-        and "net_test_lines:" in text
-    )
-
-
 def test_budget_not_a_number_threshold():
     assert re.search(r"\b\d+\s+(?:net\s+)?(?:test\s+)?lines\b", _read(IMPLEMENTER)) is None
-
-
-def test_adversarial_probe_small_reuses_helpers():
-    text = _read(ADVERSARIAL)
-    assert (
-        "Each probe program stays small and reuses the repository's existing test helpers"
-        in text
-        and "no harness built for one case" in text
-    )
-
-
-def test_five_program_cap_unchanged():
-    assert "A change commits **at most five** probe programs" in _read(ADVERSARIAL)
-
-
-def test_tests_dimension_overbuilt_is_finding():
-    row = next(line for line in LENSES.read_text(encoding="utf-8").splitlines()
-               if line.startswith("| tests |"))
-    overbuilt = next(s for s in split_sentences(row) if "beyond what the behaviour needs" in s)
-    assert not has_negation(overbuilt), overbuilt
-    assert "tests the change adds beyond what the behaviour needs" in row and "names the smaller shape" in row
-
-
-def test_fix_adds_at_most_one_test():
-    row = next(line for line in LENSES.read_text(encoding="utf-8").splitlines()
-               if line.startswith("| tests |"))
-    assert "adds at most one test, extending an existing test first" in row
 
 
 def test_no_new_gate_marker():
@@ -75,22 +31,3 @@ def test_no_new_gate_marker():
     # the carve-out sentence in the tests dimension referencing the same syntax (1).
     # Total 3; this test ensures no new *actual* gate markers are added beyond these.
     assert count == 3
-
-
-def test_tests_dimension_names_prose_evidence():
-    """A3 positive: tests-dimension-names-prose-evidence"""
-    text = LENSES.read_text(encoding="utf-8")
-    row = next(line for line in text.splitlines() if line.startswith("| tests |"))
-    assert "prose artifacts' qualified evidence = the checker's recomputed rules, fresh-context review" in row
-    assert "a prose-only change needs no new executable test file" in row
-
-
-def test_behaviour_changes_still_require_executable_evidence():
-    """A3 negative: behaviour-changes-still-require-executable-evidence"""
-    text = LENSES.read_text(encoding="utf-8")
-    row = next(line for line in text.splitlines() if line.startswith("| tests |"))
-    # The lens must not say prose needs no behavior evidence at all
-    assert "prose needs no behavior evidence" not in row
-    assert "prose-only change needs no behavior evidence" not in row
-    # Behavior changes still require executable evidence (the original RED→GREEN sentence remains)
-    assert "Every shipped behaviour has focused RED→GREEN evidence" in row

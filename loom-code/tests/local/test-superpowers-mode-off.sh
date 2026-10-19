@@ -77,7 +77,7 @@ else
 fi
 
 # -------------------------------------------------------------------------
-# Check 4 — OFF mode emits all 3 portable keys (Codex/legacy compat)
+# Check 4 — OFF mode emits only hookSpecificOutput (Codex fails extra keys)
 
 OFF_KEY_CHECK=$(echo "${OFF_OUTPUT}" | python3 -c "
 import json, sys
@@ -92,11 +92,11 @@ if 'hookSpecificOutput' in d:
 print(','.join(sorted(keys_present)))
 ")
 
-EXPECTED="additionalContext,additional_context,hookSpecificOutput.additionalContext"
+EXPECTED="hookSpecificOutput.additionalContext"
 if [ "${OFF_KEY_CHECK}" = "${EXPECTED}" ]; then
-  pass "OFF mode emits all 3 portable keys (Claude Code + Codex + legacy)"
+  pass "OFF mode emits only the canonical hookSpecificOutput key"
 else
-  fail "OFF mode missing portable keys. Got: ${OFF_KEY_CHECK}; Expected: ${EXPECTED}"
+  fail "OFF mode key set wrong. Got: ${OFF_KEY_CHECK}; Expected: ${EXPECTED}"
 fi
 
 # -------------------------------------------------------------------------

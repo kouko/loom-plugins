@@ -2,142 +2,72 @@
 name: recap-state
 version: 0.1.0
 description: |
-  Give an in-session recap for 'where were we', '我們剛剛在幹嘛', '剛剛講到哪', '我跟丟了', 'ちょっと振り返って', '今どこだっけ', or '振り返り'. The built-in /recap is an away-summary.
+  Give an in-session recap of current progress for 'where were we', '我們剛剛在幹嘛', '剛剛講到哪', '我跟丟了', 'ちょっと振り返って', '今どこだっけ', or '振り返り'. The built-in /recap is an away-summary.
+user-invocable: true
 ---
 
 # Recap
 
-Re-orient the user inside the current conversation, then pause for confirmation.
+Re-orient the user inside the current conversation, then pause for alignment.
 This is **in-session re-orientation**. The built-in `/recap` is an
-`away-summary`; `HANDOFF` handles cross-session continuation. Do not replace
-either sibling workflow.
+`away-summary`; `HANDOFF` handles cross-session continuation.
 
 ## What to do
 
-1. Read `references/seven-block-schema.md` fully before rendering **every
-   recap**. It contains the full L3 template, the section rules, and the five
-   principles. Do not render from memory.
+1. Read `references/seven-block-schema.md` fully before rendering every recap.
+   Its L3 user-visible template is the authoritative orientation-first
+   contract. The numbered seven blocks record historical lineage, not required
+   headings.
+2. Keep planning internal. In a long conversation, find the original purpose
+   when available, current position, decisions that brought the work here,
+   completed work, remaining gap, and, only when the purpose is grounded, a
+   proposed next step. Ground each in the conversation; label unavailable facts
+   unknown. Before calling something a historical decision, identify the user
+   turn or prior action that establishes it; omit an unsupported claim. A
+   formatting choice made for this recap is not a historical decision. In a
+   short session, include only what helps the user regain their
+   place. Use the user's conversation language and explain unfamiliar terms
+   plainly.
+3. Render the reference's variable-length sections and visual rules. Preserve
+   behavior-changing user wording exactly. Use `loom-visualization` to choose
+   and verify any meaningful table or relationship diagram and to frame section
+   headings. Apply the same visual rules to natural-language requests and
+   explicit skill calls. When the recap needs a table or multiple sections,
+   frame every section heading, including purpose/current-position and the
+   final question.
+   A long recap with several decisions, completed items, and an open gap needs
+   those sections; do not compress it into one dense paragraph.
+   If it contains a table, put one short situation sentence immediately before
+   the table, in the same section. Nothing except a blank line may separate
+   that sentence from the table; the heading alone does not serve as the sentence.
+   Never expose planning tags or numbered block labels.
+4. If the original purpose is unknown, ask only for the purpose. Do not invent
+   a proposed work step when the purpose is unknown. When the original purpose
+   is grounded, ask about the proposed next step. If asking for purpose, wait
+   for the user to state or clarify it. Otherwise, wait for the user's answer
+   before continuing work; a clear confirmation is enough, and a correction
+   becomes the current direction.
 
-2. Keep planning internal. Before writing, identify the current purpose,
-   spec-critical phrases, useful visual forms, the most recent agent question,
-   and the expected next step. Never output `<thinking>` or `<recap>` tags,
-   their closing tags, or any planning scratchpad. Never expose `Block N` labels.
-   Address the user directly under natural headings in the conversation language,
-   following this order:
+## Five principles
 
-   ### Purpose and current position
-   ### Essential background
-   ### Gap and current assessment
-   ### Why confirmation is needed now
-   ### Pending work
-   ### Align purpose and next step
-
-   Adapt these headings naturally rather than translating them word for word.
-   The structure is fixed; its internal names are not user-visible labels.
-
-   The current purpose is mandatory; ground it in explicit conversation evidence.
-   State the broader purpose only when explicitly established by the user or a
-   confirmed goal or intent, and do not invent short-, medium-, or long-term goals
-   to fill a hierarchy. If the evidence does not establish the
-   current purpose, say that the purpose is not yet aligned and make that the
-   only question in the final section.
-
-3. Apply the Goal-Grounded Alignment Loop through the six sections:
-
-   - **Purpose and current position**: state the grounded current purpose,
-     any explicitly established broader purpose, and where the work stands
-     relative to that purpose.
-   - **Essential background**: give 3–5 bullets with decisions, rejected
-     options, and critical strings. Preserve spec-critical user phrases
-     verbatim: file paths, error messages, named constraints, exact tool names and
-     command names.
-   - **Gap and current assessment**: name what remains between the current
-     position and purpose, the working assumption, confidence, and unknown or
-     blocker. Gap and assessment defaults to 2-col key:value form.
-   - **Why confirmation is needed now**: explain the most recent agent
-     question, why it matters, and the options and trade-offs. If there is no
-     pending question, say so briefly; do not invent one.
-   - **Pending work**: list unfinished work that closes the stated gap.
-   - **Align purpose and next step**: restate the purpose, current position, and proposed next step,
-     then ask the user to confirm or redirect.
-
-   A full user-message dump adds no signal for an in-session reader. If a user
-   phrase affects behavior, retain it exactly in Essential background instead.
-
-4. Apply the five principles defined in the schema:
-
-   - **structured-schema**: use the fixed six-section L3 structure, never a
-     free-form substitute.
-   - **quote-not-paraphrase**: Essential background carries original
-     spec-critical strings exactly.
-   - **all-user-messages**: dormant at L3. Do not dump every user turn. If
-     explicitly requested, list messages outside this schema.
-   - **synthesis-check**: finish with a directed question; the agent
-     does not continue until user responds.
-   - **plain-language**: explain TO the user in conversational second-person
-     language, not status-report shorthand. Use technical terms only when the
-     user introduced them; expand acronyms, prefer short sentences, and keep
-     one fact per bullet.
-
-   Plain language changes the relationship, not merely the vocabulary. Prefer
-   “you were debugging X; we chose Y because Z” over “Current state: X.
-   Decision: Y. Rationale: Z.” The latter still makes the user decode a report.
-   Preserve a user-introduced technical term when precision depends on it;
-   plain-language is not permission to paraphrase exact strings.
-
-5. Wait. Do not continue until the user responds to the final alignment check. Any clear
-   confirmation (`yes`, `對`, `go`, `continue`, `繼続`, `はい`, `proceed`) opens
-   this soft gate. If the user redirects, follow the redirect.
-
-The Synthesis-check is a soft gate, not a ritual closing line. Do not render
-the recap and immediately start a tool call, edit, or analysis based on the
-agent's expected direction. A brief confirmation is enough; no special keyword
-is required. A correction replaces the expected direction and should be
-handled as the user's current instruction.
-
-## Visual aids
-
-Use tables or diagrams only when they compress information:
-
-- Gap and assessment defaults to 2-col key:value.
-- Why confirmation is needed now uses a comparison table for 2+ options.
-- Pending work uses a table when items have metadata; otherwise use a checklist.
-- The opening and final sections stay concise prose.
-- Use a diagram only for real topology such as a pipeline, dependency graph,
-  or state machine. When the client is known to render Mermaid, prefer
-  Mermaid; otherwise use a markdown table by default, and ASCII only where
-  the destination cannot render markdown. An explicit user
-  format request overrides this fallback. Support counts as known only when
-  the user or current runtime instructions explicitly state Mermaid rendering
-  support; never infer it from a product name.
-
-Do not add decorative visuals. Tables must flatten ≥3 sub-items or
-compare ≥2 options; a one-row table or boxes around an unrelated list add cost.
-
-Section defaults matter: the opening and alignment check are direct prose;
-Essential background is normally bullets; Gap and current assessment is a
-compact table; the confirmation explanation becomes a table only for a real
-comparison; Pending work remains a checklist unless metadata would be lost.
-Mermaid and ASCII are for spatial relationships, never a list with arrows.
+- **structured-schema**: follow the orientation-first L3 contract; include
+  only sections the conversation needs.
+- **quote-not-paraphrase**: preserve exact user wording when it changes what
+  happens next, including paths, errors, constraints, tools, and commands.
+- **all-user-messages**: dormant at L3. Do not dump every user turn.
+- **synthesis-check**: direct the final question to the purpose when unknown,
+  or to the grounded next step, then wait for the answer.
+- **plain-language**: explain the situation to the user in familiar words.
 
 ## Hard boundaries
 
 - Chat only: do not write the recap to a file.
 - Current session only: cross-session work belongs to HANDOFF.
 - Do not replace the built-in `/recap` away-summary.
-- Do not dump all user messages at L3. Put necessary direct quotes in Essential background.
-- Do not paraphrase spec-critical user phrases in Essential background.
-- Do not continue after the recap; wait for the Synthesis-check response.
-
-A free-form paragraph that covers similar facts is not equivalent to the six
-sections: predictable placement is what makes re-orientation fast. Likewise, do
-not resurrect the user-message dump when the user asks for message history. Supply that
-listing separately, leaving the recap schema unchanged. Never weaken verbatim
-preservation to make the prose sound smoother; invisible drift in a path,
-error, constraint, or command is more damaging than a slightly abrupt quote.
+- Wait after the final alignment question; do not continue with a tool call,
+  edit, or analysis until the user responds.
 
 ## See also
 
-- `references/seven-block-schema.md` — authoritative template, section rules,
-  principles, visual guidance, and examples. Read it before rendering every
-  recap.
+- `references/seven-block-schema.md` — authoritative L3 contract, visual
+  guidance, examples, and historical seven-block lineage.

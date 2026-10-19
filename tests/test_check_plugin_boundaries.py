@@ -329,3 +329,50 @@ def test_ignored_markdown_not_scanned(tmp_path):
         f"{tracked.resolve()}:1: sibling internal path: "
         "loom-code/hooks/family-relay.md"
     ]
+
+
+def test_reports_loom_code_reads_in_python_scripts_and_placeholder_forms(tmp_path):
+    """REQ-3: a planted loom-code read in a Python script, an extensionless
+    python hook, or a `<loom-code>` Markdown path is reported."""
+    import check_plugin_boundaries as checker
+
+    plugin = tmp_path / "loom-workflow"
+    script = _write(plugin / "scripts" / "run.py", 'TARGET = "loom-code/scripts/x.py"\n')
+    hook = _write(
+        plugin / "hooks" / "relay",
+        '#!/usr/bin/env python3\nCONTRACT = "loom-code/contract/manifest.yaml"\n',
+    )
+    shell_hook = _write(
+        plugin / "hooks" / "session-start",
+        '#!/usr/bin/env bash\nexec python3 "${CLAUDE_PLUGIN_ROOT}/../loom-code/scripts/review_context.py"\n',
+    )
+    doc = _write(
+        plugin / "skills" / "router" / "SKILL.md",
+        "Run `python3 <loom-code>/scripts/loom_checker.py`.\n",
+    )
+
+    assert checker.find_boundary_violations(plugin) == [
+        f"{hook}:2: sibling internal path: loom-code/contract/manifest.yaml",
+        f"{shell_hook}:2: sibling internal path: /../loom-code/scripts/review_context.py",
+        f"{script}:1: sibling internal path: loom-code/scripts/x.py",
+        f"{doc}:1: sibling placeholder path: <loom-code>",
+        f"{doc}:1: sibling checker reference: loom_checker",
+    ]
+
+
+def test_python_comments_docstrings_tests_and_skill_names_are_not_flagged(tmp_path):
+    import check_plugin_boundaries as checker
+
+    plugin = tmp_path / "loom-design"
+    _write(
+        plugin / "scripts" / "tool.py",
+        '"""Mirrors loom-code/scripts/x.py and loom_checker."""\n'
+        "# see loom-code/scripts/x.py\n"
+        "def f():\n"
+        '    """Kept equal to <loom-code>/scripts/x.py."""\n'
+        "    return 1  # loom-code/scripts/x.py\n",
+    )
+    _write(plugin / "tests" / "test_tool.py", 'CHECKER = "loom-code/scripts/loom_checker.py"\n')
+    _write(plugin / "SKILL.md", "Hand off to `loom-code:write-plan`.\n")
+
+    assert checker.find_boundary_violations(plugin) == []

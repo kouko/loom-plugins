@@ -11,10 +11,15 @@ from loom_checker.reviewers import committed_branch_delta
 from pathlib import Path
 from typing import Iterable
 from repo_files import repository_files
+import ast
 import importlib.util
+import json
 import os
 import re
 import shlex
+import subprocess
+import tempfile
+import tomllib
 
 
 TEST_COMMAND_MARKERS: tuple[tuple[tuple[str, ...], str], ...] = (
@@ -53,67 +58,268 @@ def probe_directory(change_id: str) -> str:
 SUITE_RUNNER = "scripts/run_package_tests.py"
 
 
-PYTEST_FILE_PATTERNS = ("test_*.py", "*_test.py")
+# pytest loads -p plugins before collection, and this hook sees session.items
+# after selection: https://docs.pytest.org/en/stable/how-to/writing_plugins.html
+# https://docs.pytest.org/en/stable/reference/reference.html
+PYTEST_COLLECTION_PLUGIN = '''import json
+import os
+from pathlib import Path
+
+def pytest_collection_finish(session):
+    Path(os.environ["LOOM_PYTEST_COLLECTION"]).write_text(
+        json.dumps([str(item.path) for item in session.items]), encoding="utf-8"
+    )
+'''
 
 
-def _declared_suite_commands(repo: Path) -> list[list[str]]:
-    """The commands the repository's own test runner declares it runs.
+def _runner_launcher(repo: Path) -> list[str] | None:
+    """Python launcher used by a declared package command for this runner."""
+    declared, _source = declared_test_command(repo)
+    try:
+        tokens = argv_for(declared) if declared else []
+    except ValueError:
+        return None
+    runner = SUITE_RUNNER
+    if _conda_python_argv(tokens) and len(tokens) > 5 and os.path.normpath(tokens[5]) == runner:
+        return tokens[:5]
+    if len(tokens) > 1 and Path(tokens[0]).name.startswith("python") and os.path.normpath(tokens[1]) == runner:
+        return tokens[:1]
+    if tokens[:2] == ["uv", "run"]:
+        # uv run defines --isolated, --no-project, and --offline as switches;
+        # --with-requirements and --with each consume the following value.
+        # https://docs.astral.sh/uv/reference/cli/#uv-run
+        index = 2
+        while index < len(tokens):
+            if tokens[index] in {"--isolated", "--no-project", "--offline"}:
+                index += 1
+            elif tokens[index] in {"--with-requirements", "--with"} and index + 1 < len(tokens):
+                index += 2
+            else:
+                break
+        if (index + 1 < len(tokens) and Path(tokens[index]).name.startswith("python")
+                and os.path.normpath(tokens[index + 1]) == runner):
+            return tokens[:index + 1]
+    return None
 
-    Which programs the package suite covers is the repository's answer, not a
-    list kept here: `scripts/run_package_tests.py` is the single inventory the
-    declared package command drives, so it is read rather than mirrored. A
-    repository without that runner declares nothing, and nothing is collected.
-    """
+
+def _declared_suite_commands(repo: Path) -> tuple[list[list[str]] | None, str, list[str] | None]:
+    """The commands the repository's own test runner declares it runs."""
     runner = repo / SUITE_RUNNER
     if not runner.is_file():
-        return []
+        return [], "", None
+    launcher = _runner_launcher(repo)
+    declared, _source = declared_test_command(repo)
+    if declared and SUITE_RUNNER in declared and launcher is None:
+        return None, "unsupported package-tests runner launcher", None
+    if launcher:
+        code = (
+            "import importlib.util,json,os,sys; from pathlib import Path; "
+            "path=Path(sys.argv[1]); repo=Path(sys.argv[2]); "
+            "sys.path.insert(0,str(path.parent)); "
+            "spec=importlib.util.spec_from_file_location('_loom_suite_inventory',path); "
+            "module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module); "
+            "Path(os.environ['LOOM_SUITE_INVENTORY']).write_text("
+            "json.dumps(module.loom_family_commands(repo)),encoding='utf-8')"
+        )
+        try:
+            with tempfile.TemporaryDirectory(prefix="loom-suite-inventory-") as directory:
+                output = Path(directory) / "commands.json"
+                env = dict(os.environ, LOOM_SUITE_INVENTORY=str(output))
+                result = subprocess.run(
+                    [*launcher, "-c", code, str(runner), str(repo)], cwd=repo,
+                    env=env, capture_output=True, text=True, timeout=60,
+                )
+                if result.returncode != 0:
+                    return None, _collection_error(result.stderr), launcher
+                commands = json.loads(output.read_text(encoding="utf-8"))
+                if not isinstance(commands, list) or not all(
+                    isinstance(command, list) and all(isinstance(token, str) for token in command)
+                    for command in commands
+                ):
+                    return None, "runner inventory is malformed", launcher
+                return commands, "", launcher
+        except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+            return None, str(exc), launcher
     spec = importlib.util.spec_from_file_location("_loom_suite_inventory", runner)
     if spec is None or spec.loader is None:
-        return []
+        return None, "runner inventory could not be loaded", None
     try:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
-        return list(module.loom_family_commands(repo))
-    except (OSError, AttributeError, ImportError, SyntaxError, TypeError, ValueError):
-        return []
+        return list(module.loom_family_commands(repo)), "", None
+    except (OSError, AttributeError, ImportError, SyntaxError, TypeError, ValueError) as exc:
+        return None, str(exc), None
 
 
-def _ignored(repo: Path, command: list[str], wanted: Path) -> bool:
-    """True when one of the command's pytest `--ignore=` paths holds `wanted`."""
-    for token in command[1:]:
-        if not token.startswith("--ignore="):
+def _collection_error(stderr: str) -> str:
+    return " ".join(stderr.strip().splitlines()[-4:])[-500:] or "pytest exited without collection"
+
+
+def _direct_pytest_collects(repo: Path, artifact: str) -> tuple[bool | None, str]:
+    """Ask a direct package pytest command which tests it actually collects."""
+    declared, _source = declared_test_command(repo)
+    if not declared:
+        return False, ""
+    try:
+        tokens = argv_for(declared)
+    except ValueError:
+        return False, ""
+    if _conda_pytest_argv(tokens):
+        pytest_command = tokens[:7]
+        args = tokens[7:]
+    elif tokens[0] == "pytest":
+        pytest_command = tokens[:1]
+        args = tokens[1:]
+    elif (len(tokens) >= 3 and Path(tokens[0]).name.startswith("python")
+          and tokens[1:3] == ["-m", "pytest"]):
+        pytest_command = tokens[:3]
+        args = tokens[3:]
+    else:
+        return False, ""
+    if pytest_positionals(args) is None:
+        return False, ""
+    return _pytest_collects(repo, artifact, pytest_command, args)
+
+
+def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[str]) -> tuple[bool | None, str]:
+    """Check actual pytest collection under the repository's configuration."""
+    # Worker count changes collection cost, not which files pytest selects.
+    args = [arg for index, arg in enumerate(args)
+            if arg not in {"-n", "--numprocesses"} and
+            (index == 0 or args[index - 1] not in {"-n", "--numprocesses"})]
+    try:
+        with tempfile.TemporaryDirectory(prefix="loom-pytest-collect-") as directory:
+            scratch = Path(directory)
+            (scratch / "_loom_pytest_collection.py").write_text(
+                PYTEST_COLLECTION_PLUGIN, encoding="utf-8"
+            )
+            output = scratch / "collected.json"
+            env = dict(os.environ)
+            env["PYTHONPATH"] = directory + os.pathsep + env.get("PYTHONPATH", "")
+            env["LOOM_PYTEST_COLLECTION"] = str(output)
+            result = subprocess.run(
+                [*command, *args, "--collect-only", "-p", "_loom_pytest_collection"],
+                cwd=repo, env=env, capture_output=True, text=True, timeout=60,
+            )
+            # Current conda CLI returns the child response.rc; do not infer a
+            # cross-platform guarantee: https://github.com/conda/conda/blob/main/conda/cli/main_run.py
+            if result.returncode != 0:
+                return None, _collection_error(result.stderr)
+            collected = json.loads(output.read_text(encoding="utf-8"))
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        return None, str(exc)
+    if not isinstance(collected, list) or not all(isinstance(path, str) for path in collected):
+        return None, "pytest collection output is malformed"
+    wanted = (repo / artifact).resolve()
+    return any(Path(path).resolve() == wanted for path in collected), ""
+
+
+def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, str]:
+    """The root Cargo.toml's test targets as `(name, path, runs)`, or None
+    and the reason when the manifest cannot be read. Each `[[test]]` entry is
+    a target even under `autotests = false`; its `path` defaults to
+    `tests/<name>.rs`, or `tests/<name>/main.rs` when only that exists, and
+    its name to the path's stem:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#test-targets
+    An undeclared `tests/<name>.rs` or `tests/<name>/main.rs` is a target
+    named `<name>` unless `[package] autotests = false`; a declared entry of
+    the same path or the same name replaces it:
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#target-auto-discovery
+    `runs` is whether plain `cargo test` runs it: not `test = false`, and
+    every `required-features` entry listed directly in `[features] default`
+    (a feature another default feature enables is not followed, so such a
+    target is refused):
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-test-field
+    https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-required-features-field
+    https://doc.rust-lang.org/cargo/reference/features.html#the-default-feature"""
+    try:
+        manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        return None, f"Cargo.toml could not be read: {exc}"
+    package = manifest.get("package")
+    # A virtual workspace root (no [package]) tests its members, never tests/.
+    if not isinstance(package, dict):
+        return [], ""
+    targets = []
+    features = manifest.get("features")
+    default = features.get("default") if isinstance(features, dict) else None
+    default = {item for item in default if isinstance(item, str)} if isinstance(default, list) else set()
+    declared = manifest.get("test")
+    for entry in declared if isinstance(declared, list) else []:
+        if not isinstance(entry, dict):
             continue
-        ignored = Path(token.partition("=")[2])
-        ignored = (ignored if ignored.is_absolute() else repo / ignored).resolve()
-        if wanted == ignored or ignored in wanted.parents:
-            return True
-    return False
+        name, path = entry.get("name"), entry.get("path")
+        if isinstance(path, str):
+            path = os.path.normpath(path)
+        elif isinstance(name, str):
+            path = f"tests/{name}.rs"
+            if not (repo / path).is_file() and (repo / f"tests/{name}/main.rs").is_file():
+                path = f"tests/{name}/main.rs"
+        else:
+            continue
+        name = name if isinstance(name, str) else Path(path).stem
+        required = entry.get("required-features") or []
+        enabled = isinstance(required, list) and all(
+            isinstance(item, str) and item in default for item in required)
+        targets.append((name, path, entry.get("test") is not False and enabled))
+    if package.get("autotests") is not False:
+        known = {item for name, path, _runs in targets for item in (name, path)}
+        found = [(file.stem, f"tests/{file.name}") for file in sorted((repo / "tests").glob("*.rs"))]
+        found += [(file.parent.name, f"tests/{file.parent.name}/main.rs")
+                  for file in sorted((repo / "tests").glob("*/main.rs"))]
+        targets += [(name, path, True) for name, path in found if name not in known and path not in known]
+    return targets, ""
+
+
+def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
+    """Plain `cargo test` at the root runs `wanted` when it is the path of a
+    test target `cargo_test_targets` says it runs."""
+    if not (wanted.endswith(".rs") and (repo / wanted).is_file()):
+        return False, ""
+    targets, error = cargo_test_targets(repo)
+    if targets is None:
+        return None, error
+    return any(path == wanted and runs for _name, path, runs in targets), ""
 
 
 def suite_collects(repo: Path, artifact: str) -> bool:
-    """True when the declared package suite already runs `artifact`.
+    return suite_collection(repo, artifact)[0] is True
+
+
+def suite_collection(repo: Path, artifact: str) -> tuple[bool | None, str]:
+    """Whether the declared suite collects `artifact`, or cannot determine it.
 
     A graduated probe program -- one carried out of a change's store into the
-    permanent suite -- is named by a pytest path the runner declares, either
-    as that path itself or as a file pytest collects under a declared
-    directory. A neighbour the suite would never collect is not in the suite,
-    and neither is a file under a folder the command passes to pytest as
-    `--ignore=` -- that is how the runner skips every `tests/local/` folder,
-    so the runner's own rule is honoured rather than restated here.
+    permanent suite -- is collected by the direct or runner-backed pytest
+    command, or named by a shell test the repository's runner declares. A
+    neighbour the suite would never collect is not in the suite.
 
     Known limitation (user-decided 2026-09-25): a committed symlink into an
     ignored folder makes pytest collect its files again, and they go uncounted.
     """
     wanted = os.path.normpath(artifact)
     wanted_path = (repo / wanted).resolve()
-    for command in _declared_suite_commands(repo):
+    if not (repo / SUITE_RUNNER).is_file():
+        declared, _source = declared_test_command(repo)
+        try:
+            tokens = argv_for(declared) if declared else []
+        except ValueError:
+            tokens = []
+        # `cargo nextest run` builds and runs the same test targets.
+        if ((tokens[:2] == ["cargo", "test"] and set(tokens[2:]) <= CARGO_TEST_FLAGS)
+                or (tokens[:3] == ["cargo", "nextest", "run"] and set(tokens[3:]) <= {"--release"})):
+            return _cargo_collects(repo, wanted)
+        return _direct_pytest_collects(repo, artifact)
+    commands, error, launcher = _declared_suite_commands(repo)
+    if commands is None:
+        return None, error
+    unavailable = ""
+    for command in commands:
         if not command:
             continue
         runs_pytest = "pytest" in command[:4]
         runs_shell = Path(command[0]).name in {"bash", "sh"}
         if not (runs_pytest or runs_shell):
-            continue
-        if runs_pytest and _ignored(repo, command, wanted_path):
             continue
         for token in command[1:]:
             if token.startswith("-") or token == "pytest":
@@ -122,14 +328,30 @@ def suite_collects(repo: Path, artifact: str) -> bool:
             if not (repo / target).exists():
                 continue
             if target == wanted:
-                return True
+                if runs_shell:
+                    return True, ""
+                break
             if not (runs_pytest and (repo / target).is_dir()):
                 continue
-            if wanted.startswith(target + os.sep) and any(
-                fnmatch(Path(wanted).name, pattern) for pattern in PYTEST_FILE_PATTERNS
-            ):
-                return True
-    return False
+            if (repo / target).resolve() in wanted_path.parents:
+                break
+        else:
+            continue
+        if runs_pytest:
+            prefix = 3 if len(command) >= 3 and command[1:3] == ["-m", "pytest"] else 1
+            pytest_command = command[:prefix]
+            args = command[prefix:]
+            if launcher:
+                if prefix == 3 or Path(command[0]).name == "pytest":
+                    pytest_command = [*launcher, "-m", "pytest"]
+                else:
+                    return None, "unsupported runner pytest command"
+            collected, reason = _pytest_collects(repo, artifact, pytest_command, args)
+            if collected is True:
+                return True, ""
+            if collected is None:
+                unavailable = reason
+    return (None, unavailable) if unavailable else (False, "")
 
 
 def committed_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[str]:
@@ -196,7 +418,8 @@ def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
     """Probe programs this branch adds straight into the package suite.
 
     A probe that earned its place graduates: it leaves the change's store for
-    a path the repository's own runner collects. Counting only the store
+    a path the repository's own runner collects or cannot currently verify.
+    Counting only the store
     therefore counted zero for exactly the change that produced the most
     programs, because the graduation gate empties that directory before
     finalize-review runs. These are counted with the store.
@@ -222,7 +445,7 @@ def graduated_probe_programs(repo: Path, head_sha: str, change_id: str) -> list[
         path for path in added
         if path not in moved
         and is_program_path(path)
-        and suite_collects(repo, path)
+        and suite_collection(repo, path)[0] is not False
         and _carries_concern(repo, head_sha, path)
     )
 
@@ -309,6 +532,42 @@ def command_names_artifact(command: str, artifact: str) -> bool:
 SHELL_METACHARACTERS = re.compile(r"[;&|<>()$`*?\[\]{}\n]")
 
 
+PYTEST_VALUE_OPTIONS = frozenset({
+    "-p", "-k", "-m", "-o", "-c", "-W", "-r", "--deselect", "--ignore",
+    "--ignore-glob", "--rootdir", "--confcutdir", "--basetemp", "--tb",
+    "--maxfail", "--keyword", "--override-ini", "--config-file",
+    "--pythonwarnings",
+})
+PYTEST_FLAGS = frozenset({
+    "--quiet", "--verbose", "--exitfirst", "--no-header", "--strict-markers",
+})
+PYTEST_SHORT_FLAG_CLUSTER = re.compile(r"-[qvxsl]+")
+
+
+def pytest_positionals(args: list[str]) -> list[str] | None:
+    """The positional arguments of a pytest argv, or None when any option is
+    not on the allowlist -- fail-closed, since an unlisted option may run no
+    tests (`--help`, `--collect-only`) or take the artifact as its value."""
+    positionals, rest = [], list(args)
+    while rest:
+        arg = rest.pop(0)
+        if not arg.startswith("-"):
+            positionals.append(arg)
+        elif arg in PYTEST_VALUE_OPTIONS:
+            if not rest:
+                return None
+            rest.pop(0)
+        elif arg in PYTEST_FLAGS or PYTEST_SHORT_FLAG_CLUSTER.fullmatch(arg):
+            continue
+        elif arg.startswith("--") and arg.split("=", 1)[0] in PYTEST_VALUE_OPTIONS and "=" in arg:
+            continue
+        elif not arg.startswith("--") and arg[:2] in PYTEST_VALUE_OPTIONS and len(arg) > 2:
+            continue
+        else:
+            return None
+    return positionals
+
+
 PROBE_RUN_TIMEOUT = int(os.environ.get("LOOM_PROBE_RUN_TIMEOUT", "600"))
 
 
@@ -325,40 +584,89 @@ def argv_for(command: str) -> list[str]:
     return tokens
 
 
+def _conda_python_argv(tokens: list[str]) -> bool:
+    # -n selects the environment; the following executable and arguments run
+    # there: https://docs.conda.io/projects/conda/en/stable/commands/run.html
+    return (len(tokens) >= 5 and Path(tokens[0]).name == "conda"
+            and tokens[1:3] == ["run", "-n"]
+            and bool(tokens[3]) and not tokens[3].startswith("-")
+            and Path(tokens[4]).name.startswith("python"))
+
+
+def _conda_pytest_argv(tokens: list[str]) -> bool:
+    """Recognize only `conda run -n ENV python -m pytest ...`."""
+    return _conda_python_argv(tokens) and tokens[5:7] == ["-m", "pytest"]
+
+
+CARGO_TEST_FLAGS = frozenset({"--release", "-q", "--quiet"})
+
+
+def _python_argv(tokens: list[str]) -> list[str]:
+    """The python argv a conda-run pytest or `uv run` command wraps.
+
+    Relied on: `conda run -n ENV CMD...` runs CMD in that environment
+    (https://docs.conda.io/projects/conda/en/stable/commands/run.html) and
+    `uv run [OPTIONS] COMMAND` runs COMMAND in the project environment
+    (https://docs.astral.sh/uv/reference/cli/#uv-run)."""
+    if _conda_pytest_argv(tokens):
+        tokens = tokens[4:]
+    # `uv run [opts] python ...` is checked as the python argv it wraps.
+    if tokens[:2] == ["uv", "run"]:
+        tokens = next((tokens[i:] for i in range(2, len(tokens))
+                       if Path(tokens[i]).name.startswith("python")), [""])
+    return tokens
+
+
+def runs_pytest(command: str) -> bool:
+    """True when argv is a (wrapped) `python -m pytest` command."""
+    tokens = _python_argv(argv_for(command))
+    return Path(tokens[0]).name.startswith("python") and tokens[1:3] == ["-m", "pytest"]
+
+
+def direct_pytest_style_failure(command: str, artifact: str, source: str) -> str | None:
+    """Why a bare `python <artifact>` run of a pytest-style file proves
+    nothing, or None. Such a run imports the module and exits 0 without
+    calling a test, so a file whose top-level statements define a `test*`
+    function or a `Test*` class (pytest's default collection prefixes) must
+    run under `python -m pytest`; a file that does not parse is refused
+    rather than trusted.
+
+    Relied on: pytest's default `python_functions = test*` and
+    `python_classes = Test*`:
+    https://docs.pytest.org/en/stable/explanation/goodpractices.html#conventions-for-python-test-discovery"""
+    if Path(artifact).suffix.lower() != ".py" or runs_pytest(command):
+        return None
+    try:
+        body = ast.parse(source).body
+    except (SyntaxError, ValueError):
+        return f"{artifact} does not parse; record `python -m pytest {artifact}` for a test file"
+    if any((isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name.startswith("test"))
+           or (isinstance(node, ast.ClassDef) and node.name.startswith("Test"))
+           for node in body):
+        return (f"{artifact} defines pytest tests that a bare python run never calls; "
+                f"record `python -m pytest {artifact}`")
+    return None
+
+
 def command_executes_artifact(command: str, artifact: str) -> bool:
-    """True when argv directly executes the named Python, shell, or executable file."""
+    """True when argv directly executes the named Python, shell, or
+    executable file. Other runners' rows live in `probe_results`."""
     tokens = argv_for(command)
     wanted = os.path.normpath(artifact)
     suffix = Path(artifact).suffix.lower()
     if suffix == ".py":
-        # Handle direct python command or python -m pytest
-        python = Path(tokens[0]).name.startswith("python")
-        direct = len(tokens) >= 2 and os.path.normpath(tokens[1]) == wanted
-        pytest_direct = (
-            len(tokens) >= 4 and tokens[1:3] == ["-m", "pytest"]
-            and os.path.normpath(tokens[3]) == wanted
-        )
-        # Handle uv run ... python ... or uv run ... python -m pytest ...
-        uv_run_python = (
-            len(tokens) >= 3
-            and tokens[0] == "uv"
-            and tokens[1] == "run"
-        )
-        if uv_run_python:
-            # Find the python token after uv run options
-            for i in range(2, len(tokens)):
-                if Path(tokens[i]).name.startswith("python"):
-                    python_tokens = tokens[i:]
-                    python = True
-                    direct = len(python_tokens) >= 2 and os.path.normpath(python_tokens[1]) == wanted
-                    pytest_direct = (
-                        len(python_tokens) >= 4 and python_tokens[1:3] == ["-m", "pytest"]
-                        and os.path.normpath(python_tokens[3]) == wanted
-                    )
-                    if python and (direct or pytest_direct):
-                        return True
-                    break
-        return python and (direct or pytest_direct)
+        tokens = _python_argv(tokens)
+        args = tokens[1:]
+        # `python -m pytest ... X ...`: every option, in any position, must be
+        # on the allowlist, and X must be the sole positional argument, so no
+        # other file runs in the probe's place.
+        if args[:2] == ["-m", "pytest"]:
+            args = pytest_positionals(args[2:]) or []
+            if len(args) != 1:
+                return False
+        return (Path(tokens[0]).name.startswith("python") and bool(args)
+                and os.path.normpath(args[0]) == wanted)
     if suffix == ".sh":
         return len(tokens) >= 2 and Path(tokens[0]).name in {"bash", "sh"} and os.path.normpath(tokens[1]) == wanted
     return os.path.normpath(tokens[0]) in {wanted, os.path.join(".", wanted)}

@@ -198,7 +198,7 @@ HOST_PLUMBING_DIR_PREFIX = ".codex/hooks/contract/"
 # Generic host / runtime artifacts that are never user-authored content and
 # must not drive ritual-scale computation. Distinct from the Codex scaffold
 # plumbing above: these are the host tooling, dependency tree, bytecode,
-# vendored lockfiles and the selection store, not surfaces a user reads.
+# vendored lockfiles and JSON-lines records, not surfaces a user reads.
 HOST_PLUMBING_DIR_NAMES = frozenset(
     {
         ".herdr",
@@ -327,7 +327,7 @@ def changed_paths(repo: Path) -> set[str]:
 
     Generic host and runtime artifacts are excluded too: host tooling under
     `.herdr/`, dependency trees under `node_modules/`, bytecode under
-    `__pycache__/`, vendored lockfiles (`*.lock`) and the selection store
+    `__pycache__/`, vendored lockfiles (`*.lock`) and JSON-lines records
     (`*.jsonl`). None of these is user-authored content, and leaving them in
     the diff would make ritual-scale computation disagree with what reviewers
     and finalize-review actually see."""

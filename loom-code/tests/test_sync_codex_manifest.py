@@ -57,10 +57,4 @@ def test_loom_code_manifest_and_docs_preserve_optional_composition():
         assert "loom-design" not in json.dumps(mandatory, sort_keys=True)
 
     readme = (REPO_ROOT / "loom-code" / "README.md").read_text()
-    for phrase in (
-        "independently installable",
-        "plugin-qualified skill names",
-        "docs/loom/",
-        "N/A with the reason",
-    ):
-        assert phrase in readme
+    assert "docs/loom/" in readme

@@ -3,9 +3,10 @@
 #
 # What it injects, and nothing else:
 #   1. one line naming the station order,
-#   2. the three human decision points in plain words,
-#   3. a pointer to the entry station's SKILL.md for the full summary table,
-#   4. the repo's KICKOFF-DEFAULTS lines when that file exists.
+#   2. one paragraph naming which requests enter loom (in any repo),
+#   3. the three human decision points in plain words,
+#   4. a pointer to the entry station's SKILL.md for the full summary table,
+#   5. the repo's KICKOFF-DEFAULTS lines when that file exists.
 #
 # Station names and decision-point owners are DERIVED at runtime from
 # loom-code/contract/manifest.yaml — the contract package is the single
@@ -17,10 +18,9 @@
 # Python str.split(): BSD and GNU wc disagree on this output in every
 # locale. Guarded by tests/test_session_start_words.py.
 #
-# CANONICAL key (both hosts consume): hookSpecificOutput.additionalContext.
-# DEFENSIVE keys (`additional_context`, bare `additionalContext`) are emitted
-# too, for cross-version/host shape drift; a host that does not read them
-# ignores them.
+# Output key: only hookSpecificOutput.additionalContext, on every host
+# (Claude Code, Codex, agy_adapter.py, the OpenCode loader). Codex marks a
+# hook Failed when its JSON carries any other top-level key.
 #
 # Escape hatch: export LOOM_CODE_MODE=off  # no-op JSON, no injection.
 set -euo pipefail
@@ -29,7 +29,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 MANIFEST="${SCRIPT_DIR}/../contract/manifest.yaml"
 
 emit_empty() {
-  printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":""},"additional_context":"","additionalContext":""}\n'
+  printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":""}}\n'
 }
 
 if [ "${LOOM_CODE_MODE:-on}" = "off" ]; then
@@ -74,27 +74,41 @@ dp2="$(stations_for_dp 2)"
 dp3="$(stations_for_dp 3)"
 
 entry_station="${dp1%% *}"
+# The last decision-point-1 owner runs ① itself when loom-design is absent.
+fallback_station="${dp1##* }"
 
 # --- the injected body ----------------------------------------------------
-body="You have loom-code. Work on this repo runs through stations, one artifact each.
+body="You have loom-code. Software-development work runs through stations, one artifact each.
 
 Station order: ${flow}; ${tail_station} on alerts.
 
+Any software-development request that adds a feature or fixes a bug starts at ${entry_station} (${fallback_station} when loom-design is not installed) before you edit any file — in any repository, even when the user never says loom and there is no docs/loom folder. A user asking for a bug to be fixed starts there too, even when it reads as a bug report; ${tail_station} takes alerts, CI or regression failures and dogfood incidents that arrive outside an active change without a user's fix request. Outside an active change, a feature or bug-fix request goes through loom however small; inside one, the work continues in that change's station. Other edits that add no feature and fix no bug (a typo, a rename that changes no behaviour, comment or doc wording) and work that is not software development (research, notes) go direct unless the user asks for loom.
+
 You ask the user exactly three times. Everything else you decide yourself and record the reason as agent-decided:
-① after the intent is written (${dp1}) — restate the problem and the acceptance conditions in plain words and get \"yes, this is what I want\"; fold a missing-principles interview, any \`second-vendor: ask\` question, and (engineering changes) any one-way-door choice into this same conversation.
-② only for a product change, after the spec is written (${dp2}) — read back the visible behaviour (\"you type X, you see Y\") and get \"yes\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①; never show design rationale.
+① after the intent is written (${dp1}) — restate the problem and the acceptance conditions in plain words and get \"yes, this is what I want\"; fold a missing-principles interview, any \`second-vendor: ask\` question, and (engineering changes, or product changes with no spec) any one-way-door choice into this same conversation.
+② only for a product change, after the spec is written (${dp2}) — read back the visible behaviour (\"you type X, you see Y\") and get \"yes\"; product one-way-door choices and irreversible actions on existing data are asked here, not in ①, when a spec is written; never show design rationale.
 ③ at the end (${dp3}) — the user reads the acceptance test report, one line per acceptance condition, and accepts. They never review a diff.
 
 Never ask the user to judge spec quality, plan shape, or a review verdict — they cannot, and the machines are the reviewers.
 
 With \`second-vendor: suggest\`, after the plan's risk evidence exists, mention an available other-vendor reviewer according to the write-plan policy; work continues without waiting. This is visibility, not a fourth decision point.
 
-The full station summary table (what each station reads, produces, and when the checker and the checkpoints fire) lives in the entry station's SKILL.md: ${entry_station}, or write-plan when loom-design is not installed. Load it there; it is not repeated here."
+The full station summary table (what each station reads, produces, and when the checker and the checkpoints fire) lives in the entry station's SKILL.md: ${entry_station}, or ${fallback_station} when loom-design is not installed. Load it there; it is not repeated here."
 
 # --- repo defaults --------------------------------------------------------
 DEFAULTS_FILE="docs/loom/KICKOFF-DEFAULTS.md"
 if [ -f "${DEFAULTS_FILE}" ]; then
-  defaults="$(sed -n 's/^-[[:space:]]\{1,\}\(.*: .*\)$/- \1/p' "${DEFAULTS_FILE}")"
+  # Turn vertical tab and form feed into spaces, delete the other control
+  # bytes (tab and newline kept), then drop invalid UTF-8, before sed matches.
+  # POSIX iconv -c omits invalid input characters; glibc, libiconv and BSD
+  # may still exit non-zero, and iconv may be missing, so `|| cat` drains
+  # stdin (EOF after -c consumed it) and the hook still exits 0. Without
+  # iconv, invalid bytes pass through unfiltered; sed runs under LC_ALL=C
+  # so such a byte cannot make it fail.
+  defaults="$(LC_ALL=C tr '\013\014' '  ' < "${DEFAULTS_FILE}" \
+    | LC_ALL=C tr -d '\000-\010\015-\037\177' \
+    | { iconv -c -f UTF-8 -t UTF-8 2>/dev/null || cat; } \
+    | LC_ALL=C sed -n 's/^-[[:space:]]\{1,\}\(.*: .*\)$/- \1/p')"
   if [ -n "${defaults}" ]; then
     body="${body}
 
@@ -115,5 +129,4 @@ escape_for_json() {
 }
 context="$(escape_for_json "${body}")"
 
-printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"},"additional_context":"%s","additionalContext":"%s"}\n' \
-  "${context}" "${context}" "${context}"
+printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "${context}"

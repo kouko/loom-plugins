@@ -25,12 +25,6 @@ Sub-commands (the CLI contract other stations depend on):
     loom_checker.py finalize-review <change-id> --input <review-input.json>
     loom_checker.py standing <path-to-intent>
     loom_checker.py contract --require <major.minor>
-    loom_checker.py selection propose <change-id> --origin user|agent [--run <steps>] [--skip <steps>]
-    loom_checker.py selection show <change-id>
-    loom_checker.py selection cancel <change-id>
-    loom_checker.py selection record-failure <change-id> --step <step> --rule <rule>
-    loom_checker.py selection capture --hook
-    loom_checker.py selection skipped-review
 
 Exit codes: 0 pass, 1 a rule failed (`BLOCK <rule.id>: <reason>` on
 stderr), 2 usage or internal error. Any unexpected exception fails
@@ -58,7 +52,6 @@ from loom_checker.command_handlers.publish import cmd_publish
 from loom_checker.command_handlers.pr_floor import cmd_pr_floor
 from loom_checker.command_handlers.push import cmd_push
 from loom_checker.command_handlers.reviewer_count import cmd_reviewer_count
-from loom_checker.command_handlers.selection import cmd_selection
 from loom_checker.command_handlers.standing import cmd_standing
 from loom_checker.command_handlers.sync import cmd_sync_trunk
 from loom_checker.helpers import UsageError
@@ -84,7 +77,6 @@ COMMANDS = {
     "plan": cmd_plan,
     "reviewer-count": cmd_reviewer_count,
     "finalize-review": cmd_finalize_review,
-    "selection": cmd_selection,
 }
 
 

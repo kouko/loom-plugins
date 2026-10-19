@@ -7,6 +7,7 @@ that passes records an attack the adapter survived.
 """
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import shutil
@@ -19,6 +20,11 @@ import pytest
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[1]
 ADAPTER = PLUGIN_ROOT / "hooks" / "agy_adapter.py"
+_spec = importlib.util.spec_from_file_location("loom_language_anchor",
+                                               PLUGIN_ROOT / "hooks" / "language-anchor.py")
+_anchor = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_anchor)
+ANCHOR_TEXT = _anchor.ANCHOR_TEXT
 LOOM_SKILL = "/Users/u/.gemini/config/plugins/loom-code/skills/build/SKILL.md"
 JA_TURN = "この変更が仕様に合っているかどうかを確認してください。よろしくお願いします。"
 
@@ -86,20 +92,6 @@ def test_pushgate_crashing_checker_push_allows_and_says_so(crashing_checker_adap
     assert out["reason"].endswith("; allowing."), out
 
 
-@pytest.mark.parametrize("command", [
-    "echo x >> .git/loom/selections/c.jsonl",
-    "git status\ncp forged .git/loom/selections/c.jsonl",
-    "bash -c 'tee -a /r/.git/loom/selections/c.jsonl < ev'",
-])
-def test_pushgate_crashing_checker_selection_store_denies(crashing_checker_adapter, change_repo, tmp_path,
-                                                          command):
-    """A crashed checker never loosens the selection-store guard."""
-    out = _run("push-gate", _push(command, ".", [str(change_repo)]), tmp_path,
-               adapter=crashing_checker_adapter)
-    assert out["decision"] == "deny", out
-    assert "BLOCK selection.guard" in out["reason"]
-
-
 def test_pushgate_crashing_checker_git_dash_c_status_allows(crashing_checker_adapter, change_repo, tmp_path):
     """The fallback still allows a read-only command (``git -C dir status``)."""
     out = _run("push-gate", _push(f"git -C {change_repo} status --short", ".", [str(change_repo)]),
@@ -136,7 +128,7 @@ def test_pushgate_checker_exit_zero_silent_allows_bare(stub_checker_adapter, cha
 
 
 def test_pushgate_checker_exit_two_passes_its_reason(stub_checker_adapter, change_repo, tmp_path):
-    reason = "BLOCK selection.guard: names the selection record store"
+    reason = "BLOCK example.rule: a refusal reason"
     out = _run("push-gate", _push("ls .git/loom", ".", [str(change_repo)]), tmp_path,
                adapter=stub_checker_adapter(2, stderr=reason))
     assert out == {"decision": "deny", "reason": reason}
@@ -275,18 +267,18 @@ def test_anchor_garbage_lines_still_anchor(tmp_path):
                  {"name": "view_file", "args": {"AbsolutePath": LOOM_SKILL}}]})]
     transcript.write_text("\n".join(lines) + "\n", encoding="utf-8")
     out = _run("pre-invocation", _anchor_payload(transcript), tmp_path)
-    assert any("日本語" in m for m in _messages(out)), out
+    assert ANCHOR_TEXT in _messages(out), out
 
 
-def test_anchor_nonstring_user_content_silent_not_crash(tmp_path):
-    """USER_INPUT content that is a number or object yields valid JSON, not a crash."""
+def test_anchor_nonstring_user_content_anchors_not_crash(tmp_path):
+    """USER_INPUT content that is a number or object neither crashes nor hides the anchor."""
     transcript = _write_jsonl(tmp_path / "t.jsonl", [
         {"source": "USER_EXPLICIT", "type": "USER_INPUT", "content": 12345},
         {"source": "USER_EXPLICIT", "type": "USER_INPUT", "content": {"x": 1}},
         {"source": "MODEL", "tool_calls": [{"name": "view_file", "args": {"AbsolutePath": LOOM_SKILL}}]},
     ])
     out = _run("pre-invocation", _anchor_payload(transcript), tmp_path)
-    assert out == {} or "injectSteps" in out
+    assert ANCHOR_TEXT in _messages(out), out
 
 
 def test_anchor_huge_transcript_within_hook_timeout(tmp_path):
@@ -304,4 +296,4 @@ def test_anchor_huge_transcript_within_hook_timeout(tmp_path):
     out = _run("pre-invocation", _anchor_payload(transcript), tmp_path, timeout=120)
     elapsed = time.monotonic() - started
     assert elapsed < 15, f"pre-invocation took {elapsed:.1f}s on a 120k-step transcript"
-    assert any("日本語" in m for m in _messages(out)), out
+    assert ANCHOR_TEXT in _messages(out), out

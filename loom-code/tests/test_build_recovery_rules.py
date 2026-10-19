@@ -1,35 +1,17 @@
-"""Probes for the Build absence-recovery rule (change 2026-09-19-loom-flow-recovery-loop).
+"""One-home probes for the Build absence-recovery rule (change 2026-09-19-loom-flow-recovery-loop).
 
-A1 positive: RL-01 — the recovery rule is present in build/SKILL.md.
-A1 negative: RL-02 — the recovery paragraph carries no second copy of the
+A1 negative: RL-02 — the recovery passage carries no second copy of the
              artifact-to-station mapping; it cites the contract manifest. The
-             scan covers the whole recovery passage (this paragraph through
-             the bound paragraph and the adversary-update paragraph, up to
-             "## 4."), not one paragraph found by a substring match, and
-             reads inside code spans once known citations are neutralized —
-             a second copy placed in the next paragraph, or hidden in
-             backticks, is still a second copy.
-A2 positive: RL-09 — Build carries the cross-station bound, as a pointer to the
-             station that states it rather than a count of its own, and only
-             an entry made to resolve an absent item counts toward it, never
-             an ordinary review-round fix entry.
-A1 positive: RL-11 — a Build entry with no task to implement is directed to §3,
-             stated before the point where such a run would exit.
-A1 negative: RL-12 — that early pointer is a pointer, not a second copy of the
-             §3 absence rule, and §3 still states the rule exactly once.
-A1 positive: RL-13 — a recovered run names the station sequence entered so
-             far in Build's hand-off to closing-review.
-A3 positive: RL-14 — the manifest lookup is bounded to the three items this
-             change's Acceptance #1 names, not left open over the whole
-             manifest.
+             scan covers the whole `build.absence-recovery` gate block, not
+             one paragraph found by a substring match, and reads inside code
+             spans once known citations are neutralized — a second copy
+             placed in the next paragraph, or hidden in backticks, is still a
+             second copy.
+A1 negative: RL-12 — §1–§2 carry no second copy of the §3 absence rule, and
+             the rule's gate block occurs exactly once.
 
-RL-01 and RL-09 also pin the paragraph's exact closing sentence and, where
-the pinned sentence is itself affirmative, its polarity: a probe that only
-asserts phrase containment is satisfied by a paragraph with a trailing
-sentence appended that reverses the rule, because containment has no
-polarity and does not see past the paragraph it was told to open (see
-docs/loom/memory/a-prose-pin-must-require-an-affirmative-un-negated-sentence.md
-and docs/loom/memory/an-assertion-scoped-wider-than-its-clause-is-about-something-else.md).
+The rule's wording is review-only; the passage is located by its gate
+marker, never by a sentence of its prose.
 """
 
 import re
@@ -38,42 +20,16 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
-from prose_pin import has_negation, split_sentences  # noqa: E402
+from prose_pin import split_sentences  # noqa: E402
 
 SKILL = "loom-code/skills/build/SKILL.md"
 
-# Each rule lives in one paragraph, identified by its opening words.
-PARAGRAPH_OPENER = "Build enters these end-of-Build checks on absence"
-BOUND_OPENER = "A recovery run is bounded across stations"
+GATE_MARKER = "<!-- gate: build.absence-recovery -->"
+GATE_END = "<!-- /gate -->"
 
-# Headings that bound the early sections a no-task run reads before it exits,
-# and the heading that closes the recovery passage RL-02 scans.
+# Headings that bound the early sections a no-task run reads before it exits.
 SCOPE_HEADING = "## 1. Establish scope"
 VERIFY_HEADING = "## 3. Verify integration"
-HANDOFF_HEADING = "## 4. Hand off to closing-review"
-
-# The exact closing sentence of each rule's paragraph, as committed. An
-# appended trailing sentence — ADV-02's attack — changes what the paragraph
-# ends with even though it removes nothing, so the ending is pinned exactly
-# rather than merely required to be present somewhere in the paragraph.
-RL_01_ENDING = "committed programs are re-run, never re-dispatched, exactly as after a fix."
-RL_09_ENDING = "this file keeps no count of its own."
-
-# The exact sentence REQ-1's bounded lookup adds (finding ADV-04): the
-# manifest lookup this rule runs is not open over every manifest key, only
-# over the three items Acceptance #1 names.
-BOUNDED_LOOKUP_SENTENCE = (
-    "This lookup covers only an item this rule names: the adversarial "
-    "programs, the acceptance test report or the attestation."
-)
-
-# The exact phrase Build's §4 hand-off must carry (finding ADV-05): the
-# station sequence a recovery entered, named at the point this rule already
-# requires a report.
-HANDOFF_SEQUENCE_PHRASE = (
-    "the station sequence entered so far when this run recovered from an "
-    "absent item"
-)
 
 # Artifact nouns a restatement of the mapping would have to name. A second copy
 # phrased purely in artifact nouns — "the acceptance test report is produced
@@ -128,33 +84,6 @@ def _normalize(text):
     return " ".join(text.split())
 
 
-def _paragraph(opener):
-    """Return the normalized paragraph carrying these words, or None."""
-    for para in _read().split("\n\n"):
-        normalized = _normalize(para)
-        if opener in normalized:
-            return normalized
-    return None
-
-
-def _require(probe, opener, phrases):
-    para = _paragraph(opener)
-    if para is None:
-        print(f"{probe} FAIL: no paragraph containing {opener!r} in {SKILL}")
-        sys.exit(1)
-    missing = [phrase for phrase in phrases if phrase not in para]
-    if missing:
-        print(f"{probe} FAIL: paragraph {opener!r} is missing {missing}")
-        sys.exit(1)
-    return para
-
-
-def _last_fragment(text):
-    """The final sentence of `text`, the seam where ADV-02 appended text."""
-    fragments = split_sentences(text)
-    return fragments[-1].strip() if fragments else ""
-
-
 def _early_sections():
     """Return §1 and §2 — everything a no-task run reads before it would exit."""
     content = _read()
@@ -164,15 +93,13 @@ def _early_sections():
 
 
 def _recovery_passage():
-    """The full run of paragraphs stating the absence-recovery rule and the
-    paragraphs that continue it — from its opening paragraph through the
-    next heading. A second copy of the mapping one paragraph over (ADV-01)
-    is still inside this passage even though it is outside the one paragraph
-    a substring match on the opener would find."""
+    """The `build.absence-recovery` gate block: the rule and the paragraphs
+    that continue it. A second copy of the mapping one paragraph over
+    (ADV-01) is still inside this block."""
     content = _read()
-    start = content.index(PARAGRAPH_OPENER)
-    end = content.index(HANDOFF_HEADING, start)
-    return _normalize(content[start:end])
+    start = content.index(GATE_MARKER)
+    end = content.index(GATE_END, start)
+    return _normalize(content[start + len(GATE_MARKER):end])
 
 
 def _despan_for_scan(text):
@@ -198,132 +125,23 @@ def _mapping_restatements(text):
     return offenders
 
 
-def test_RL_01_absence_re_enters_end_of_build_checks():
-    """Absence is an antecedent for re-running the end-of-Build checks."""
-    para = _require(
-        "RL-01",
-        PARAGRAPH_OPENER,
-        [
-            # absence, not a fix or a widening, is the antecedent
-            "every planned task already committed",
-            "is absent",
-            # absence is kept distinct from failure
-            "distinct antecedent from a failing check",
-            # the adversary is not re-dispatched merely because Build re-enters
-            "re-run, never re-dispatched",
-        ],
-    )
-
-    # Polarity: the sentence stating the item is absent must itself be
-    # affirmative, not wrapped in a negation that reverses it.
-    absent_sentence = next(s for s in split_sentences(para) if "is absent" in s)
-    if has_negation(absent_sentence):
-        print(f"RL-01 FAIL: the sentence stating the item is absent is negated: {absent_sentence!r}")
-        sys.exit(1)
-
-    # Scope: the paragraph must end exactly where the committed rule ends.
-    # ADV-02 left every required phrase in place and appended a trailing
-    # sentence that permitted skipping recovery under time pressure; that
-    # sentence changes what the paragraph ends with even though every
-    # `_require` phrase above still matches.
-    ending = _last_fragment(para)
-    if ending != RL_01_ENDING:
-        print(f"RL-01 FAIL: the paragraph's closing sentence changed; ends with {ending!r}")
-        sys.exit(1)
-    print("RL-01 PASS: absence re-enters the end-of-Build checks")
-
-
 def test_RL_02_no_second_copy_of_the_artifact_station_mapping():
     """No paragraph in the recovery passage restates the mapping, whether by
     naming a station, by artifact nouns alone, or hidden in a code span."""
-    para = _paragraph(PARAGRAPH_OPENER)
-    if para is None:
-        print(f"RL-02 FAIL: no paragraph containing {PARAGRAPH_OPENER!r} in {SKILL}")
-        sys.exit(1)
+    passage = _recovery_passage()
 
     for citation in ("loom-code/contract/manifest.yaml", "stations[].produces", "actions[].owner"):
-        if citation not in para:
-            print(f"RL-02 FAIL: recovery paragraph does not cite {citation}")
+        if citation not in passage:
+            print(f"RL-02 FAIL: recovery passage does not cite {citation}")
             sys.exit(1)
 
-    # Scan the whole recovery passage, not the one paragraph the opener
-    # matches: ADV-01 placed a second copy in the very next paragraph, and
-    # ADV-09 placed one inside backticks in this paragraph.
-    offenders = _mapping_restatements(_recovery_passage())
+    # Scan the whole gate block: ADV-01 placed a second copy in the very next
+    # paragraph, and ADV-09 placed one inside backticks.
+    offenders = _mapping_restatements(passage)
     if offenders:
         print(f"RL-02 FAIL: the recovery passage states who produces an artifact: {offenders}")
         sys.exit(1)
     print("RL-02 PASS: the producing station is read from the manifest, not restated, anywhere in the recovery passage")
-
-
-def test_RL_09_build_carries_the_cross_station_bound():
-    """Build, the station the 2026-09-19 cycle kept re-entering, reads that a
-    recovery run is bounded — by pointer, never by a count of its own."""
-    para = _require(
-        "RL-09",
-        BOUND_OPENER,
-        [
-            # an entry here is part of the bounded sequence
-            "counts toward",
-            # only an absence-triggered entry counts (reviewer-skill Round 2
-            # finding: an ordinary review-round fix entry must not conflate
-            # with the recovery bound)
-            "made to resolve an absent item counts toward that bound",
-            "an entry made for an ordinary review-round fix never does",
-            # where the single statement of the bound lives
-            "closing-review",
-            # and the record the bound is counted from
-            "record of entered stations",
-        ],
-    )
-    # A pointer, not a second copy: the count itself is stated in one place.
-    if "more than twice" in para:
-        print("RL-09 FAIL: the bound paragraph restates the count instead of pointing at it")
-        sys.exit(1)
-
-    # Polarity: "counts toward" is a literal substring of "does not count
-    # toward", so containment alone is satisfied by the negated rewrite.
-    # The enclosing sentence legitimately contains "not only" (from "not
-    # only within Build") before the colon, so a naive whole-sentence
-    # has_negation call would false-positive on the committed, correct
-    # text; splitting on the colon too isolates the clause after it — the
-    # one that actually states "counts toward" — as its own unit.
-    counts_clause = next(
-        (c for c in split_sentences(para, ends=".:;") if "counts toward" in c),
-        None,
-    )
-    if counts_clause is None:
-        print("RL-09 FAIL: no clause found containing 'counts toward'")
-        sys.exit(1)
-    if has_negation(counts_clause):
-        print(f"RL-09 FAIL: the 'counts toward' clause is negated: {counts_clause!r}")
-        sys.exit(1)
-
-    ending = _last_fragment(para)
-    if ending != RL_09_ENDING:
-        print(f"RL-09 FAIL: the paragraph's closing sentence changed; ends with {ending!r}")
-        sys.exit(1)
-    print("RL-09 PASS: Build points at the cross-station bound without copying it")
-
-
-def test_RL_11_no_task_to_implement_is_directed_to_section_3():
-    """A run that finds nothing to implement is told, before it would exit, that
-    Build does not end there and that §3 still runs."""
-    early = _early_sections()
-
-    required = [
-        # the condition the 2026-09-19 run was in
-        "no task left to implement",
-        # the wrong conclusion, refused
-        "not a reason to end Build",
-        # where the run is sent instead
-        "§3",
-    ]
-    missing = [phrase for phrase in required if phrase not in early]
-    if missing:
-        print(f"RL-11 FAIL: §1–§2 of {SKILL} do not state {missing}")
-        sys.exit(1)
-    print("RL-11 PASS: a no-task entry is directed to §3 before it would exit")
 
 
 def test_RL_12_the_pointer_is_not_a_second_copy_of_the_rule():
@@ -332,9 +150,9 @@ def test_RL_12_the_pointer_is_not_a_second_copy_of_the_rule():
     content = _read()
     early = _early_sections()
 
-    if content.count(PARAGRAPH_OPENER) != 1:
-        print(f"RL-12 FAIL: the absence rule opener appears "
-              f"{content.count(PARAGRAPH_OPENER)} times in {SKILL}, expected 1")
+    if content.count(GATE_MARKER) != 1:
+        print(f"RL-12 FAIL: the absence rule gate marker appears "
+              f"{content.count(GATE_MARKER)} times in {SKILL}, expected 1")
         sys.exit(1)
 
     # Operative content of §3's rule: if any of it is repeated early, the two
@@ -363,60 +181,7 @@ def test_RL_12_the_pointer_is_not_a_second_copy_of_the_rule():
     print("RL-12 PASS: the early pointer points at §3 without restating it")
 
 
-def test_RL_13_recovered_run_names_the_sequence_in_the_handoff():
-    """Acceptance #2's sequence is named at the point this rule already
-    requires a report: Build's hand-off to closing-review, the station that
-    receives the recovered content on the successful-continuation path."""
-    content = _read()
-    handoff = _normalize(content.split(HANDOFF_HEADING, 1)[-1])
-    if HANDOFF_SEQUENCE_PHRASE not in handoff:
-        print(f"RL-13 FAIL: the §4 hand-off does not name the station sequence: missing {HANDOFF_SEQUENCE_PHRASE!r}")
-        sys.exit(1)
-    print("RL-13 PASS: Build's hand-off names the station sequence entered so far")
-
-
-def test_RL_14_lookup_is_bounded_to_the_three_recovery_items():
-    """The manifest lookup this rule runs is bounded to the three items
-    Acceptance #1 names, not left open over every manifest key (ADV-04 found
-    two of eight candidate keys resolve to two stations with no tie-break)."""
-    para = _require("RL-14", PARAGRAPH_OPENER, [BOUNDED_LOOKUP_SENTENCE])
-    del para
-    print("RL-14 PASS: the lookup is bounded to the three recovery items REQ-1 names")
-
-
-def test_self_check_negation_discriminates():
-    """Self-test for the shared negation guard (prose_pin.has_negation) used
-    by RL-01: it accepts the real affirmative sentence and rejects a rewrite
-    of it that keeps the same key words but reverses the meaning — the shape
-    of ADV-02's attack, applied here in place rather than as a trailing
-    append, to prove the guard discriminates rather than just asserting it
-    does."""
-    affirmative = (
-        "when Build is entered with every planned task already committed and "
-        "an item Build owes is absent, it runs this section from step 1 to "
-        "produce that item"
-    )
-    negated = (
-        "when Build is entered with every planned task already committed and "
-        "an item Build owes is absent, it does not run this section from "
-        "step 1 to produce that item"
-    )
-    if has_negation(affirmative):
-        print(f"SELF-TEST FAIL: the real RL-01 sentence was flagged as negated: {affirmative!r}")
-        sys.exit(1)
-    if not has_negation(negated):
-        print(f"SELF-TEST FAIL: a negated rewrite of it was not caught: {negated!r}")
-        sys.exit(1)
-    print("SELF-TEST PASS: the negation guard accepts the affirmative sentence and rejects its negation")
-
-
 if __name__ == "__main__":
-    test_self_check_negation_discriminates()
-    test_RL_01_absence_re_enters_end_of_build_checks()
     test_RL_02_no_second_copy_of_the_artifact_station_mapping()
-    test_RL_09_build_carries_the_cross_station_bound()
-    test_RL_11_no_task_to_implement_is_directed_to_section_3()
     test_RL_12_the_pointer_is_not_a_second_copy_of_the_rule()
-    test_RL_13_recovered_run_names_the_sequence_in_the_handoff()
-    test_RL_14_lookup_is_bounded_to_the_three_recovery_items()
     print("All probes passed.")

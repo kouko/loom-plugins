@@ -77,7 +77,6 @@ that started reaching for a kind's test file by name would fail there.
 """
 from __future__ import annotations
 
-import importlib
 import os
 import re
 import shutil
@@ -87,7 +86,7 @@ from pathlib import Path
 
 import pytest
 
-from prose_pin import has_negation, split_sentences
+from prose_pin import split_sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -102,9 +101,6 @@ CONTRACT_PROTOCOL_PATH = "`loom-code/skills/closing-review/references/adversaria
 ROUTING_HEADING = "## Which recipe to read"
 # What a row says when the kind has no recipe today.
 NO_RECIPE = "none"
-# The verb the contract carries before it names the routing table.
-CONTRACT_ROUTE_VERB = "read"
-CONTRACT_ROUTE_LITERAL = "the recipe file its routing table names for every artifact type"
 
 # Where a kind's own test file lives, by the convention Acceptance 6 fixes:
 # one test file per recipe, named after the kind the recipe attacks.
@@ -144,7 +140,7 @@ _CHANGE_RECORDS = ("docs/loom/",)
 # `--deselect=item` option"); `pytest --help` spells the value `nodeid_prefix`.
 NESTED_TESTS = (
     "test_adding_a_kind_that_has_no_recipe_today_introduces_no_failure",
-    "test_a_reworded_recipe_is_not_blamed_on_the_addition",
+    "test_a_reworded_recipe_plants_no_failure_for_the_addition_to_be_judged_on",
     "test_removing_a_kind_routed_today_leaves_no_reference",
     "test_removal_that_leaves_the_kinds_own_test_file_behind_is_detected",
     "test_removal_that_leaves_the_routing_row_behind_is_detected",
@@ -239,31 +235,6 @@ def recipe_test_module(recipe: str) -> str:
     return f"{RECIPE_TEST_STEM}{recipe_kind(recipe).replace('-', '_')}.py"
 
 
-def recipe_pins() -> dict[str, tuple]:
-    """Every `RECIPE_PINS` entry the routed recipes' own test modules define.
-
-    A cross-document scan that must not flag a recipe's own pinned sentence
-    reads the pin from here. Importing one recipe's test module by name would
-    make that scan a reference the kind's removal leaves dangling; going
-    through the routing table, the scan loses exactly the pins whose recipe
-    went away and keeps the rest.
-
-    A recipe whose module defines no pin table contributes nothing. A pin name
-    two modules define is refused, because the caller looks a pin up by name
-    alone and would otherwise silently get one of the two.
-    """
-    merged: dict[str, tuple] = {}
-    for recipe in routed_recipes():
-        module_name = recipe_test_module(recipe)
-        if not (ROOT / SCRIPTS / module_name).is_file():
-            continue
-        module = importlib.import_module(module_name[:-len(".py")])
-        for name, pin in getattr(module, "RECIPE_PINS", {}).items():
-            assert name not in merged, (name, module_name)
-            merged[name] = pin
-    return merged
-
-
 def _artifact_types() -> set[str]:
     """Every type name of the repository's own artifact-type vocabulary."""
     block = MANIFEST.read_text(encoding="utf-8").split("\nartifact_types:", 1)[1]
@@ -284,18 +255,6 @@ def _add_kind(folder: Path, kind: str, recipe: str, body: str) -> None:
     old = next(line for line in rows if _cell(line.strip().strip("|").split("|")[0]) == kind)
     new = f"| `{kind}` | [`{recipe}`]({recipe}) |"
     protocol.write_text(text.replace(old, new), encoding="utf-8")
-
-
-def _affirms(text: str, verb: str, literal: str) -> bool:
-    """Some sentence carries `verb` before `literal` and no negation.
-
-    The verb is matched case-insensitively so that it may open a sentence;
-    the literal is matched as written."""
-    for sentence in split_sentences(text):
-        v, lit = sentence.lower().find(verb.lower()), sentence.find(literal)
-        if 0 <= v < lit and not has_negation(sentence):
-            return True
-    return False
 
 
 # --- helper self-tests -----------------------------------------------------
@@ -337,30 +296,9 @@ def test_routed_recipe_reader_synthetic() -> None:
     assert recipe_kind(_SYNTHETIC_RECIPE) == "synthetic-one"
 
 
-def test_recipe_test_module_and_pin_reader_synthetic() -> None:
-    """A recipe's test module is named from the recipe, and the pin reader
-    reaches the module of every routed recipe that has one."""
+def test_recipe_test_module_synthetic() -> None:
+    """A recipe's test module is named from the recipe."""
     assert recipe_test_module(_SYNTHETIC_RECIPE) == f"{RECIPE_TEST_STEM}synthetic_one.py"
-    pins = recipe_pins()
-    # Every pin the reader returns comes from a routed recipe's own module,
-    # and every pin such a module defines is in what it returns. Not asserted:
-    # that there is any pin at all -- a repository whose recipes pin nothing
-    # is a repository with nothing for the scans to exempt, which is the state
-    # a removal case reaches when the last recipe carrying a pin table goes.
-    # Nor that a routed recipe has a module at all: requiring one would make
-    # giving a kind a recipe two files rather than the one file and one row
-    # the routing table describes, so a recipe without one contributes
-    # nothing here, exactly as `recipe_pins` reads it.
-    from_modules: dict[str, tuple] = {}
-    for recipe in routed_recipes():
-        path = ROOT / SCRIPTS / recipe_test_module(recipe)
-        if not path.is_file():
-            continue
-        module = importlib.import_module(recipe_test_module(recipe)[:-len(".py")])
-        from_modules.update(getattr(module, "RECIPE_PINS", {}))
-    assert pins == from_modules
-    for name, pin in pins.items():
-        assert len(pin) == 6, (name, pin)
 
 
 def test_cell_helper_synthetic() -> None:
@@ -380,14 +318,6 @@ def test_add_kind_helper_synthetic(tmp_path: Path) -> None:
     rows = _routing_rows((tmp_path / "adversarial.md").read_text(encoding="utf-8"))
     assert rows["plan"] == _SYNTHETIC_OTHER
     assert rows["code"] == _SYNTHETIC_RECIPE
-
-
-def test_affirms_helper_synthetic() -> None:
-    affirmative = f"Read {CONTRACT_ROUTE_LITERAL} the change touched."
-    assert _affirms(affirmative, CONTRACT_ROUTE_VERB, CONTRACT_ROUTE_LITERAL)
-    negated = f"Never read {CONTRACT_ROUTE_LITERAL} the change touched."
-    assert not _affirms(negated, CONTRACT_ROUTE_VERB, CONTRACT_ROUTE_LITERAL)
-    assert not _affirms("Read the protocol.", CONTRACT_ROUTE_VERB, CONTRACT_ROUTE_LITERAL)
 
 
 # --- A4: one new file and one new row, and no existing recipe touched -------
@@ -437,7 +367,6 @@ def test_contract_routes_through_the_protocol_to_each_recipe() -> None:
     contract = " ".join(CONTRACT.read_text(encoding="utf-8").split())
     assert CONTRACT_PROTOCOL_PATH in contract, contract
     assert PROTOCOL.is_file(), PROTOCOL
-    assert _affirms(contract, CONTRACT_ROUTE_VERB, CONTRACT_ROUTE_LITERAL), contract
 
 
 def test_protocol_plus_the_matching_recipe_is_the_whole_procedure() -> None:
@@ -885,24 +814,6 @@ def _reword_candidates(inherited: frozenset[str]) -> list[str]:
     ]
 
 
-def _first_planting(attempts: dict[str, frozenset[str]]) -> tuple[str, frozenset[str]]:
-    """The first reword of `attempts` that really did redden something.
-
-    Raised on when no attempt did: a round of rewords that planted nothing
-    leaves the contamination measurement unexercised, which is a failure and
-    never a quiet pass. Pure, so the sabotaged measurement -- one that reports
-    every reword as harmless -- is provable without copying the repository.
-    """
-    for recipe, planted in attempts.items():
-        if planted:
-            return recipe, planted
-    raise AssertionError(
-        "no reword of a recipe whose own test module was green planted a "
-        "failure, so the contamination measurement was not exercised: "
-        + ", ".join(sorted(attempts))
-    )
-
-
 def _reword_a_recipe_in(root: Path, recipe: str) -> str:
     """Reword one sentence of `recipe` in the copy, and say which sentence.
 
@@ -1098,26 +1009,74 @@ def test_reword_candidates_pass_over_a_recipe_already_red_synthetic() -> None:
     assert _reword_candidates(all_red) == []
 
 
-def test_first_planting_fails_when_nothing_was_planted_synthetic() -> None:
-    """The sabotaged measurement: every reword comes back harmless.
+def test_reword_plants_when_prose_pin_exists_synthetic(tmp_path: Path) -> None:
+    """A2 negative: a pin on the sentence the guard rewords goes red.
 
-    A guard that answered that with a skip, or with a pass, would prove
-    nothing at all -- so this is the one outcome that is raised on. The
-    synthetic recipe names are the ones this module already uses for its
-    fixtures, for the reason given there.
+    It constructs a tiny synthetic repo copy (tmp_path, no full repo copy
+    needed): a fake recipe md + a fake test module that pins its longest
+    sentence, swaps that sentence's first two words the way the guard does,
+    runs pytest on the fake module, and asserts the pin test went red.
+
+    It shows only that the swap disturbs a pin on the longest sentence; a
+    pin on a shorter sentence is outside what the guard or this test checks.
     """
-    try:
-        _first_planting({_SYNTHETIC_RECIPE: frozenset(), _SYNTHETIC_OTHER: frozenset()})
-    except AssertionError as exc:
-        assert "was not exercised" in str(exc), exc
-    else:
-        raise AssertionError("a round of rewords that planted nothing came out clean")
+    # Create a synthetic references folder structure
+    refs = tmp_path / "loom-code/skills/closing-review/references"
+    refs.mkdir(parents=True)
 
-    planted = frozenset({"a/b.py::test_rule[anchor]"})
-    assert _first_planting({_SYNTHETIC_RECIPE: frozenset(), _SYNTHETIC_OTHER: planted}) == (
-        _SYNTHETIC_OTHER, planted
+    # Fake recipe with a sentence we'll pin and reword
+    recipe_name = "adversarial-synthetic-pin.md"
+    recipe_text = (
+        "# Adversarial — synthetic-pin\n\n"
+        "Read [`adversarial.md`](adversarial.md) first.\n\n"
+        "## Synthetic Pin\n\n"
+        "The sentence we will pin is this one right here.\n"
+        "Another sentence that will not be pinned.\n"
     )
-    assert _first_planting({_SYNTHETIC_RECIPE: planted}) == (_SYNTHETIC_RECIPE, planted)
+    (refs / recipe_name).write_text(recipe_text, encoding="utf-8")
+
+    # Fake test module that pins the longest sentence ("The sentence we will pin is this one right here.")
+    test_name = "test_adversary_recipe_synthetic_pin.py"
+    pinned_sentence = "The sentence we will pin is this one right here."
+    test_body = (
+        '"""The synthetic-pin recipe\'s own rules."""\n'
+        "from pathlib import Path\n\n\n"
+        f'RECIPE = Path(__file__).resolve().parents[2] / "loom-code/skills/closing-review/references/{recipe_name}"\n'
+        f'PINNED = "{pinned_sentence}"\n\n\n'
+        "def test_recipe_contains_pinned_sentence() -> None:\n"
+        '    assert PINNED in RECIPE.read_text(encoding="utf-8")\n'
+    )
+    scripts = tmp_path / "loom-code/tests"
+    scripts.mkdir(parents=True)
+    (scripts / test_name).write_text(test_body, encoding="utf-8")
+
+    # Run pytest on the synthetic test module - should pass initially
+    import subprocess
+    env = dict(os.environ)
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    result = subprocess.run(
+        ["python3", "-m", "pytest", "-q", str(scripts / test_name)],
+        cwd=tmp_path, capture_output=True, text=True, env=env,
+    )
+    assert result.returncode == 0, f"initial run failed: {result.stdout}{result.stderr}"
+
+    # Now reword the pinned sentence in the recipe (exchange first two words)
+    # "The sentence we will pin is this one right here." -> "sentence The we will pin is this one right here."
+    reworded = "sentence The we will pin is this one right here."
+    # Use the same pattern matching as _reword_a_recipe_in
+    import re
+    pattern = re.compile(r"\s+".join(re.escape(w) for w in pinned_sentence.split(" ")))
+    assert len(pattern.findall(recipe_text)) == 1
+    new_recipe_text = pattern.sub(lambda _m: reworded, recipe_text)
+    (refs / recipe_name).write_text(new_recipe_text, encoding="utf-8")
+
+    # Run pytest again - the pin test should now FAIL
+    result = subprocess.run(
+        ["python3", "-m", "pytest", "-q", str(scripts / test_name)],
+        cwd=tmp_path, capture_output=True, text=True, env=env,
+    )
+    assert result.returncode != 0, f"expected pin test to fail after reword, but it passed: {result.stdout}"
+    assert "test_recipe_contains_pinned_sentence" in result.stdout or "test_recipe_contains_pinned_sentence" in result.stderr
 
 
 # --- A5 negative: a removal done wrong is caught ---------------------------
@@ -1302,31 +1261,29 @@ def test_adding_a_kind_that_has_no_recipe_today_introduces_no_failure(
     )
 
 
-# --- A3: a reworded recipe is its own test file's business and no one else's --
+# --- A3: a reworded recipe plants no failure -------------------------------
 
-def test_a_reworded_recipe_is_not_blamed_on_the_addition(
+def test_a_reworded_recipe_plants_no_failure_for_the_addition_to_be_judged_on(
     tmp_path: Path, inherited_failures: frozenset[str]
 ) -> None:
-    """The contamination this module used to have, kept out.
+    """Rewording a recipe's prose plants no failure — prose changes are guarded
+    by semantic review + structural checks, NOT literal pins.
 
-    One sentence of one recipe is reworded in a copy -- the edit that belongs
-    to that recipe's own test file and to no other -- and the addition is then
-    performed in the same copy. What is asserted is that the reword really did
-    redden something, that what it reddened is the reworded recipe's own test
-    file, and that the run after the addition names no failure the run before
-    it did not. Held against a copy the reword has already contaminated, which
-    is what an addition case reading only the exit status could not survive:
-    it would fail here, and once per unrouted kind, for an edit that was not
-    its subject.
+    The old premise (intent 2026-09-18-modular-adversary-recipes Acceptance 6)
+    required only that per-kind test files exist; it never required they pin
+    sentences. W1-01 pruned all prose-pin assertions from the four recipe test
+    modules (45bd949d). The new premise — grounded in the current intent
+    (2026-09-27-prose-pin-stock-cleanup) — is that a reword must make NO test
+    red. What it checks is narrower than "no pin anywhere": the reword swaps
+    the first two words of each candidate recipe's longest sentence, so only
+    a pin on that sentence (or a literal opening at its first word) would go
+    red and fail this test. A pin on any other sentence is not disturbed and
+    goes unseen here.
 
-    The recipe reworded is selected, not assumed. This case's premise is that
-    a fresh edit can still plant a failure, and that is false of a recipe
-    whose own test module the working tree is already failing -- the state a
-    branch is in between editing a recipe and updating its test file. So the
-    reword goes to a recipe whose module is green, trying them in routing-table
-    order until one plants something; a tree where every recipe's module is
-    already red is stated as the reason this case is not measuring, rather
-    than passing silently or failing for an edit that was not its subject.
+    The machinery (_reword_candidates, _copy_repository, _reword_a_recipe_in,
+    _run_adversary_tests, caused_by_the_edit) is kept; the assertion flips:
+    for every green candidate recipe, the reword plants nothing, and the
+    addition then introduces no failure attributable to the reword.
     """
     candidates = _reword_candidates(inherited_failures)
     if not candidates:
@@ -1337,32 +1294,32 @@ def test_a_reworded_recipe_is_not_blamed_on_the_addition(
             + ", ".join(sorted(_failing_modules(inherited_failures)))
         )
 
-    # One copy per candidate, and no more: the loop stops at the first reword
-    # that planted something, so the ordinary tree costs exactly one.
+    # One repository copy per green candidate; the assert stops the loop at the
+    # first planting.
+    # Under the new premise, NO reword should plant anything.
     attempts: dict[str, frozenset[str]] = {}
     runs: dict[str, subprocess.CompletedProcess[str]] = {}
-    sentences: dict[str, str] = {}
     for candidate in candidates:
         root = tmp_path / f"repo-{recipe_kind(candidate)}"
         _copy_repository(root)
-        sentences[candidate] = _reword_a_recipe_in(root, candidate)
+        _reword_a_recipe_in(root, candidate)
         runs[candidate] = _run_adversary_tests(root)
         # What the reword did, and not what the working tree was already
-        # failing: this case is itself one of the cases that must survive a
-        # contaminated copy, so it subtracts the same inherited set the others
-        # do.
+        # failing: this case subtracts the same inherited set the others do.
         attempts[candidate] = caused_by_the_edit(runs[candidate], inherited_failures)
-        if attempts[candidate]:
-            break
+        # Under the new premise, every candidate must plant nothing.
+        assert not attempts[candidate], (
+            f"reword of {candidate} planted failures: {sorted(attempts[candidate])}; "
+            "this indicates a prose pin has been reintroduced"
+        )
 
-    # The addition is performed in the copy the planting reword was made in,
-    # named rather than inherited from the loop variable.
-    recipe, planted = _first_planting(attempts)
-    root = tmp_path / f"repo-{recipe_kind(recipe)}"
-    run_before = runs[recipe]
+    # The addition is performed in the copy of the first candidate (any works,
+    # since all are clean). The addition must introduce no failure attributable
+    # to the reword.
+    first_candidate = candidates[0]
+    root = tmp_path / f"repo-{recipe_kind(first_candidate)}"
+    run_before = runs[first_candidate]
     before = failures(run_before)
-    own_test = recipe_test_module(recipe)
-    assert _failing_modules(planted) == {own_test}, (sentences[recipe], sorted(planted))
 
     kind = unrouted_types()[0]
     added_file = _recipe_file(kind)

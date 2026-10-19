@@ -12,6 +12,76 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.14.0] — 2026-10-07 — write-spec does not re-ask a one-way door already asked at ①
+
+- `write-spec` Step 3, its merge gate, its "what you'll be asked" list and `references/ui-flows.md` state the same exception as `loom-code` 3.38.0: a product one-way door already asked at decision point ① is not asked again at ②.
+
+## [2.13.0] — 2026-10-06 — capture-intent asks product one-way doors at decision point ②
+
+- `capture-intent` decision point ① now asks an engineering change's one-way doors; a product change's one-way doors, class (e) actions included, are asked at decision point ② of the station writing its spec — `write-spec`, or `loom-code:write-plan` when it writes the spec — and at ① when no spec will be written, matching `loom-code`. The READMEs (en / ja / zh-TW) state the same fallback.
+- `capture-intent` names the Codex authorisation stop as happening when the plugin is newly installed or updated, not on first use of a repository.
+
+## [2.12.1] — 2026-10-05 — OpenCode loader stops recording user prompts
+
+- The synced OpenCode loader copy no longer writes the per-session prompt file under `tmpdir/loom-opencode/`, and drops `transcript_path` from hook payloads, matching `loom-code` 3.32.0.
+- The synced OpenCode loader copy now deletes the prompt files earlier versions left in `tmpdir/loom-opencode/` when it loads.
+
+## [2.12.0] — 2026-10-04 — capture-intent runs a complexity check before decision point ①
+
+- `capture-intent` Step 4 runs `loom-workflow:critique` in complexity mode when the confirmed scope adds a mechanism, field, rule or step; only its verdict and the smaller alternative go into the one confirmation message, it adds no new stop, and it is skipped when `loom-workflow` is not installed.
+
+## [2.11.0] — 2026-10-03 — capture-intent skips requests inside an active change.
+
+- The `capture-intent` description skips a request inside an active change, because that change's station continues it.
+
+## [2.10.0] — 2026-10-02 — capture-intent claims unnamed feature and bug-fix requests.
+
+- The `capture-intent` description claims any software request to add a feature or fix a bug, before files are edited, even when loom is not named or the repo has no loom folder; a typo or a rename that changes no behaviour (unless loom is asked for) and non-software work stay outside it.
+
+## [2.9.0] — 2026-10-01 — expert-mode removed.
+
+- The capture-intent decision-point list no longer names an expert-mode request as a source of an extra stop; `loom-code` removed the `expert-mode` skill.
+- The OpenCode loader no longer guards the selection record store when a hook fails.
+
+## [2.8.1] — 2026-09-30 — OpenCode transcript note.
+
+- On OpenCode, a command's skill body is not recorded as the user's words, so the language reminder keeps the user's language (shipped in 2.8.0); a message the user types that contains the skill-body separator is now recorded whole.
+
+## [2.8.0] — 2026-09-30 — OpenCode start command.
+
+- On OpenCode, `using-loom-design` is also a `/` command and remains a skill; its frontmatter carries `user-invocable: true`.
+- The README OpenCode sections name the start command.
+
+## [2.7.2] — 2026-09-30 — OpenCode README wording.
+
+- The OpenCode README wording bounds the TUI claim to OpenCode 2.0.18–2.0.20 and names `opencode.json` as the file in the config folder.
+
+## [2.7.1] — 2026-09-29 — OpenCode v2 packaging.
+
+- OpenCode v2 package: `package.json` plus `opencode/loader.js` register the skills for OpenCode; the READMEs carry the install steps.
+
+## [2.7.0] — 2026-09-29 — loom-design no longer reads or runs loom-code files.
+
+- The five skills drop their contract-version checks and `intake` runs; templates are local copies kept identical to loom-code's by a repository test.
+- The principles check reads `PRINCIPLES.md` directly (interview timing unchanged).
+- The locate-loom-code reference is deleted; manifests and READMEs no longer claim to read loom-code's contract package.
+
+## [2.6.3] — 2026-09-29 — version sync only
+
+Patch: no content change. Bumped alongside `loom-code` (closing-review polarity check) and `loom-workflow`.
+
+## [2.6.2] — 2026-09-29 — Prose-pin stock cleanup batch 4 and patch release bump.
+
+Patch: tests only; no skill or reference content changed.
+
+- Batch 4 of the prose-pin stock cleanup: short-phrase and helper-hidden pins removed from four `loom-design` test files, kept to their structure/behavior checks.
+- `loom-code`, `loom-design` and `loom-workflow` patch versions bumped together so `claude plugin update` refreshes installed copies with the batch 4 test changes.
+
+## [2.6.1] — 2026-09-29 — deferred release bump, version sync only
+
+Patch: batches 2-3 pruned sentence pins from loom-design tests only; no
+skill or reference content changed.
+
 ## [2.6.0] — 2026-09-26 — keep architecture drafts advisory
 
 Minor: validate proposed architecture documents and guards in a temporary

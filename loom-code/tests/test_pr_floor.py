@@ -102,11 +102,11 @@ def test_good_body_exit_0(tmp_path: Path, monkeypatch) -> None:
 
 def test_status_in_summary_and_notice(tmp_path: Path, monkeypatch) -> None:
     repo = identified_repo(tmp_path)
-    commit_attestation(repo, attestation(repo, skip=["adversarial"]))
+    commit_attestation(repo, attestation(repo))
     code, out, _err, summary = run(repo, body(), monkeypatch, tmp_path)
     assert code == 0
-    assert "verification: valid (skipped: adversarial)" in summary
-    assert "::notice title=verification::valid (skipped: adversarial)" in out
+    assert "verification: valid" in summary
+    assert "::notice title=verification::valid" in out
 
 
 def test_unparseable_recorded_command_passes_as_stale(tmp_path: Path, monkeypatch) -> None:

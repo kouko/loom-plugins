@@ -6,7 +6,7 @@
 > 書くだけで、採点はしない。ここで作ったものへの verdict はすべて
 > `loom-code:closing-review` が、下書きを書いていない agent の手で下す。
 
-**Version**: 2.6.0 — 5 skills + 任意のルーター 1 個。リリースは
+**Version**: 2.14.0 — 5 skills + 任意のルーター 1 個。リリースは
 [CHANGELOG.md](CHANGELOG.md) を参照。
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
@@ -77,10 +77,12 @@ flowchart TD
 1 つの変更がユーザーに尋ねることは 3 つ。最初の 2 つが loom-design の担当：
 
 1. **① これがやりたいことですか？** — `capture-intent` で。言い直した
-   intent に、取り消しにくい選択をその結果の形で織り込む。
+   intent に、取り消しにくい選択をその結果の形で織り込む —
+   engineering の変更ならここで、product の変更なら ② で（spec を書かないならここで）。
    `status: confirmed` でない intent は下流のどこも受け取らない。
 2. **② X をすると Y が見える、で合っていますか？** — `write-spec` で、
-   product の変更のときだけ。`confirmed-behavior:` として記録される。
+   product の変更のときだけ。その product の取り消しにくい選択もここで
+   尋ねる。`confirmed-behavior:` として記録される。
 3. **③ うまくいきましたか？** — フローの最後、`loom-code` で。各
    Acceptance 行をどう試したかを示すレポートを通して。
 
@@ -90,13 +92,12 @@ flowchart TD
 
 loom-design には `loom-code` が必要：
 
-- **loom-code の contract を読む。** loom-design は `loom-code` の
-  contract package を書かない。`plugin.json` は
-  `requires-contract: ">=2.1"` を宣言し、各ステーションとツールは最初に
-  `python3 <loom-code>/scripts/loom_checker.py contract --require 2.1`
-  を実行する。バージョンが合わなければ、理解できない contract に向けて
-  下書きを書くのではなく止まる。Codex では `<loom-code>` はインストール
-  済みの plugin ディレクトリ。リポジトリ内に checker のコピーを作らない。
+- **loom-code のテンプレートを自前のコピーで持つ。** loom-design は
+  `loom-code` の contract package を書かず、実行時にその中のファイルも
+  読まない。skill が埋めるテンプレートはローカルのコピーで、リポジトリの
+  テストが各コピーと loom-code の原本の一致を保つ。`plugin.json` は引き続き
+  `requires-contract: ">=2.1"` を宣言し、`loom-code:write-plan` が計画前に
+  intent チェックを実行する。
 - **verdict は loom-code が下す。** 計画前の spec review も最後の
   closing review も `loom-code:closing-review` で fresh-context の reviewer が行う。
   loom-design は checker のルール名を挙げるだけで、実行はしない。
@@ -105,9 +106,8 @@ loom-design には `loom-code` が必要：
   `write-spec` から入る。loom-design が入っていなければ、`write-plan` が
   決定ポイント ① を自分で行う。
 
-plugin 同士は `loom-design:write-spec` のような plugin 名付き skill 名、
-contract package、そしてプロジェクト自身の `docs/loom/` の artifact
-だけで繋がる。
+plugin 同士は `loom-design:write-spec` のような plugin 名付き skill 名と、
+プロジェクト自身の `docs/loom/` の artifact だけで繋がる。
 
 ## インストール
 
@@ -150,6 +150,30 @@ agy plugin install ./loom-design
 
 loom-design 自体は hook を持たない。loom-code の hook が走るのは `agy` CLI だけで、
 Antigravity のデスクトップアプリや IDE では走らない。
+
+### OpenCode
+
+OpenCode v2（2.0.18 で確認。CLI でインストールした plugin は TUI でも読み込まれる）は GitHub から plugin をインストールする。`loom-code` を先にインストールする：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
+opencode plugin list
+```
+
+その後 OpenCode を再起動する（`opencode service restart`）。再起動するまで、`opencode plugin list` には一部の plugin しか出ないことがある。
+
+OpenCode の TUI（2.0.18–2.0.20）には plugin をインストールする項目はない。`plugin add` の代わりに、同じ spec を `opencode.json`（`plugin add` が OpenCode の設定フォルダ `~/.config/opencode/` に書き込むファイル）の `plugins` リストに追加してもよい。更新するには、`plugin add` や `plugin update` を再実行しても何も起きない（OpenCode 2.0.18 は `already configured` / `No plugin updates available` と答え、branch 指定はキャッシュ済みのコピーを再利用する）。plugin を削除し、commit に固定して追加し直し、OpenCode を再起動する：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（追加したときの spec そのまま。plugin 名だけでは `not configured` と返る）、続けて `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+
+skill は `loom-design:<skill>` として提供される。loom はコマンド `/loom-design:using-loom-design` で始める（skill としても引き続き提供される）。
+
+OpenCode での制限：
+
+- バックグラウンドサービスの起動直後は、plugin が `opencode plugin list` に現れるまで最大 40 秒ほどかかることがある。
+- loom-code の subagent は、plugin キャッシュにある loom のファイルを読むときに `external_directory` の許可プロンプトで止まることがある。`opencode run --auto` も subagent のセッションには効かない。loom の plugin ディレクトリの読み取りを許可する。
+- `--auto` なしの `opencode run` は最初の許可プロンプトかモデルからの質問で止まるため、長い loom の実行は TUI から行う。
+- OpenCode はプロジェクト外のシェルコマンドの前に確認しないため、モデルがマシンを変更することがある（観測例：システム全体への `pip install --break-system-packages`）。コマンドを確認するか、OpenCode の許可設定を厳しくする。
+- OpenCode のデスクトップアプリと IDE 連携は対象外。
+- plugin を使うのに Node は不要。
 
 ## テスト
 

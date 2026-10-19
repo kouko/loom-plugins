@@ -1,0 +1,72 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-09-27-prose-pin-stock-cleanup",
+  "content_digest": "24688cc1bc15dc1af75c0e7927822d2f0c3b1f49",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_census_gaming.py -q",
+      "artifact": "docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_census_gaming.py",
+      "result": "pass",
+      "command_digest": "4c31cac44930dfdeb1b1ec2cfb885090a1e254806f99d9a147d451b5b992c759"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_pruned_guards.py -q",
+      "artifact": "docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_adversarial_pruned_guards.py",
+      "result": "pass",
+      "command_digest": "23ee9d91d205ebad1dbc80666842025157acb0141cf5b58ffd616ef076aafe06"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_classify_test_files.py -q",
+      "artifact": "docs/loom/2026-09-27-prose-pin-stock-cleanup/evidence/probes/test_classify_test_files.py",
+      "result": "pass",
+      "command_digest": "7b3b2a45035cd0e2f51352b6bdaf17d91f119dbb07454186f7cab82dc7b31572"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a995410c70245fb81",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "loom-code/tests/test_adversary_recipe_spec.py:54",
+          "text": "one-home check passes vacuously if the recipe drops every PROCEDURE_FRAGMENTS entry"
+        },
+        {
+          "severity": "nit",
+          "anchor": "loom-code/tests/test_adversary_routing.py:1083",
+          "text": "reword synthetic test rebuilds the swap inline instead of calling _reword_a_recipe_in"
+        }
+      ]
+    },
+    {
+      "reviewer": "aa95402ee52cf9803",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": [
+        {
+          "severity": "nit",
+          "anchor": "docs/loom/2026-09-27-prose-pin-stock-cleanup/acceptance-test-report.md:11",
+          "text": "35 counts mentions; 33 distinct test functions"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

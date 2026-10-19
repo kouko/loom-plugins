@@ -9,13 +9,13 @@ You are asked only three times: to confirm what the change is, to confirm
 visible product behaviour when there is any, and to accept the result, through the acceptance test report when one is required.
 
 Loom ships as three independently installable plugins for Claude Code,
-Codex and Antigravity CLI:
+Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/) | 2.6.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/) | 3.22.0 | 7 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.5.0 | 12 | Tools around the stations: memory, critique, recap, handoff, second opinions (`independent-advisor`). |
+| [`loom-design`](loom-design/) | 2.14.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
+| [`loom-code`](loom-code/) | 3.42.1 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/) | 5.11.0 | 13 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -45,7 +45,7 @@ flowchart TD
         build["loom-code:build<br/>test-first, one commit per task"]
         review["loom-code:closing-review<br/>fresh-context review<br/>→ attestation"]
         ship["loom-code:ship<br/>push + PR<br/>③ you accept the result (acceptance test report when required)"]
-        maintain["loom-code:maintain<br/>bugs, alerts, regressions"]
+        maintain["loom-code:maintain<br/>alerts, CI or regression failures"]
     end
 
     merged(["Merged PR<br/>merged separately after<br/>loom-code:ship"])
@@ -100,6 +100,7 @@ points or run on demand.
 | `git-memory` | Before every commit at any station (intent, plan, build, attestation); at `ship` when the PR is created; and before the PR is merged, which happens after `ship` | Classifies decision, learning and gotcha memory for commits and the PR body. |
 | `loom-memory` | Before the branch closes, when a lesson is worth keeping (on request or by agent judgment; no station calls it) | Records a durable lesson the branch taught in the repository memory store. |
 | `independent-advisor`, `handoff`, `recap-state` | On demand, not tied to a station | Second opinions, cross-session handoff and in-session recaps. |
+| `project-retro`, `skill-retro` | On demand, not tied to a station | `project-retro` reviews one coding session for project development improvements; `skill-retro` mines multiple sessions for skill improvement proposals. |
 
 `decision-map` is for work whose whole route cannot be listed up front; its
 loop is the `loom-workflow:decision-map` group in the flow diagram above.
@@ -114,9 +115,9 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.6.0. Turns a rough idea into a confirmed intent and a risk-declared
-spec, and provides product-definition tools. Requires `loom-code`, whose
-contract package it reads.
+Version 2.14.0. Turns a rough idea into a confirmed intent and a risk-declared
+spec, and provides product-definition tools. Requires `loom-code` for
+planning onward; intent and spec work alone.
 
 | Skill | Role |
 | --- | --- |
@@ -129,7 +130,7 @@ contract package it reads.
 
 ## loom-code
 
-Version 3.22.0. Five stations carry one change from plan to PR with
+Version 3.42.1. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -138,18 +139,17 @@ content-bound verification, one closing review and a GitHub-enforced PR floor.
 | `build` | Implement the plan test-first, one task at a time, ending with the adversary and the package suite. |
 | `closing-review` | Run the closing review (read, acceptance testing) on Build-checked content and generate an attestation. |
 | `ship` | Publish the reviewed branch, open the PR and verify checks (decision point ③). |
-| `maintain` | Attach bug reports, alerts, regressions or incidents to a matching open intent, or create one, and hand it to write-plan. |
+| `maintain` | Attach alerts, CI or regression failures or incidents that arrive without a user's bug-fix request to a matching open intent, or create one, and hand it to write-plan. |
 | `using-loom-code` | Optional router to the right station. |
-| `expert-mode` | User-invoked only: choose which Loom steps one change runs or skips; binds on a typed confirmation. |
 
 It also ships the `implementer`, `reviewer`, `acceptance-tester` and `adversary`
 agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.5.0. Workflow tools used around the stations; all work without
-`loom-code`; only `decision-map`'s delivery step, which writes an intent,
-needs it. See
+Version 5.11.0. Workflow tools used around the stations; most work without
+`loom-code`. `decision-map`'s intent delivery and explicitly requested outside
+code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
 attach to the flow.
 
@@ -162,11 +162,14 @@ attach to the flow.
 | `independent-advisor` | Get a second opinion from another model, effort level or vendor. |
 | `recap-state` | In-session recap of where the work stands. |
 | `handoff` | Save or resume state across sessions. |
-| `distill-sessions` | Mine past Claude Code or Codex sessions for skill improvement proposals. |
+| `skill-retro` | Mine past Claude Code or Codex sessions for skill improvement proposals. |
+| `project-retro` | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
 | `loom-visualization` | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
 | `goal-create` | Create a session goal or draft a repository purpose (invoked by name only). |
 | `dbt-model-style` | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
 | `using-loom-workflow` | Optional router to the right workflow tool. |
+
+Old names: `retro` → `project-retro`; `distill-sessions` → `skill-retro`. The old names are no longer callable after updating `loom-workflow` to 5.9.0. Both reviews propose changes for a separate implementation workflow.
 
 ## Install
 
@@ -185,8 +188,7 @@ claude plugin install loom-workflow@loom
 The plugins are independently installable: install only the ones you need.
 `loom-code` needs neither sibling; `loom-design` requires `loom-code`. Plugins
 compose only through plugin-qualified skill names such as
-`loom-design:write-spec`, the contract package and the project's own
-`docs/loom/` artifacts.
+`loom-design:write-spec` and the project's own `docs/loom/` artifacts.
 
 ### Codex
 
@@ -202,7 +204,7 @@ codex plugin list
 
 Antigravity CLI (`agy`) installs plugins from a local directory, so clone the
 repository and install each plugin from the clone. Install `loom-code` first:
-the other two use its contract package and checker. Before installing, check
+the other two hand off to its stations by skill name. Before installing, check
 `agy plugin list` for a plugin of the same name imported from Claude Code:
 installing replaces that imported copy, and a later `agy plugin uninstall`
 removes it.
@@ -238,8 +240,34 @@ Limits on Antigravity:
   `self` subagents that follow loom's agent contracts, on Gemini models.
 - The review station is `closing-review` on every host; the old `review` name
   was removed and has no alias.
-- `expert-mode` selections do not take effect: agy captures no prompt, so the
-  full process applies.
+
+### OpenCode
+
+OpenCode v2 (verified on 2.0.18; plugins installed from the CLI also load in the TUI) installs plugins from GitHub.
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-design'
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
+opencode plugin list
+```
+
+Then restart OpenCode (`opencode service restart`): until it restarts, `opencode plugin list` may show only some of the plugins.
+
+The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
+
+Skills are offered as `<plugin>:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model. Start loom with `/loom-code:using-loom-code`, `/loom-design:using-loom-design` or `/loom-workflow:using-loom-workflow`; `/loom-workflow:handoff`, `/loom-workflow:recap-state`, `/loom-workflow:goal-create` and `/loom-workflow:project-retro` are also commands, and each of these stays a skill too.
+
+On OpenCode, the session context, the publication reminder, the language reminder (loom-code) and the skill-folder rule (loom-workflow) run through the plugin's v2 hooks.
+
+Limits on OpenCode:
+
+- A plugin can take up to about 40 seconds to appear in `opencode plugin list` right after the background service starts.
+- loom-code's subagents can stop on an `external_directory` permission prompt when they read loom's installed files from the plugin cache, even under `opencode run --auto`, which does not cover subagent sessions. Approve reads of the loom plugin directory.
+- `opencode run` without `--auto` stops at the first permission prompt or model question, so drive long loom runs from the TUI.
+- OpenCode does not ask before shell commands outside the project, so a model can change the machine (observed: a system-wide `pip install --break-system-packages`); review its commands or tighten OpenCode's permission settings.
+- The OpenCode desktop app and IDE integrations are not covered.
+- Node is not needed to use the plugins.
 
 ## Development
 

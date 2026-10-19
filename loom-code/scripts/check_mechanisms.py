@@ -77,7 +77,7 @@ PENDING_RE = re.compile(r"^pending\s*—\s*(\S.*)$")
 # registration gap, so it is spendable only on the named host-infrastructure
 # mechanisms -- otherwise any new mechanism launders itself through it (W3
 # adversary P10). An id qualifies when one of these names appears in it.
-HOST_HYGIENE_ALLOWLIST = ("language-anchor", "lang_detect")
+HOST_HYGIENE_ALLOWLIST = ("language-anchor",)
 
 # An eval only earns its name if it can fail. A bare path must be a test
 # file (or a `cold-read:` evidence file, handled separately); a `<path>::
@@ -215,8 +215,10 @@ def recompute_hooks(repo: Path) -> set[str]:
     manifests = (
         (repo / "loom-code" / "hooks" / "hooks.json", ""),
         (repo / "loom-code" / "hooks" / "hooks-codex.json", "@codex"),
+        (repo / "loom-code" / "hooks" / "hooks-opencode.json", "@opencode"),
         (repo / "loom-workflow" / "hooks" / "hooks.json", ""),
         (repo / "loom-workflow" / "hooks" / "hooks-codex.json", "@codex"),
+        (repo / "loom-workflow" / "hooks" / "hooks-opencode.json", "@opencode"),
     )
     for path, qualifier in manifests:
         if not path.is_file():
@@ -542,8 +544,10 @@ def compute_baseline_total(repo: Path, ref: str) -> tuple[int, bool]:
     for hook_path in (
         "loom-code/hooks/hooks.json",
         "loom-code/hooks/hooks-codex.json",
+        "loom-code/hooks/hooks-opencode.json",
         "loom-workflow/hooks/hooks.json",
         "loom-workflow/hooks/hooks-codex.json",
+        "loom-workflow/hooks/hooks-opencode.json",
     ):
         hooks_text = _git_show(repo, ref, hook_path)
         if hooks_text is not None:
@@ -679,8 +683,8 @@ def run_measure(repo: Path) -> int:
     print(f"skill count (counted): {skill_count}")
     print(f"artifact-type count (manifest): {artifact_types}")
     # Three optional discovery routers are explicitly admitted in release 3.1.3;
-    # the user-invoked expert-mode skill is explicitly admitted in release 3.4.0;
-    # the loom-design architecture tool is explicitly admitted in release 3.16.0.
+    # the loom-design architecture tool is explicitly admitted in release 3.16.0;
+    # the shared external-review boundary is admitted in release 3.39.0.
     if skill_count > 23:
         print(f"RED: skill count {skill_count} exceeds the loom budget of 23")
     if artifact_types > 8:

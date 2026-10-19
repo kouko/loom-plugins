@@ -2,9 +2,18 @@
 
 Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
-> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、session distill、chat 圖表與推理頁，以及 second opinion。
+> 適用 Claude Code 與 Codex、圍繞 Loom 各站的 workflow 工具：持久化的 Outcome Map、git memory、repository memory、critique、recap、handoff、單次專案回顧與跨次 skill 回顧、chat 圖表與推理頁，以及 second opinion。
 
-**Version**：5.5.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.11.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+
+## 名稱遷移
+
+| 5.9.0 以前 | 5.9.0 起 | 用途 |
+|---|---|---|
+| `retro` | `project-retro` | 回顧一次專案開發 session。 |
+| `distill-sessions` | `skill-retro` | 分析多次 session 中已安裝 skill 的反覆問題。 |
+
+舊名稱不再可呼叫。請先將已安裝 plugin 更新至 5.9.0，再使用新名稱。兩者只提出方案，實作交由獨立流程處理。
 
 ## 這是什麼
 
@@ -12,15 +21,19 @@ Loom 讓一個變更依序走過各站：`loom-design` 整理 intent 與 spec，
 負責 plan、build、review、ship。`loom-workflow` 收的是圍繞這些站使用的工具。
 工具本身不是站：每個工具都在特定時機接上，或在需要時呼叫，而且每個工具都能直接以名稱呼叫。
 
-每個工具只裝 `loom-workflow` 就能運作。唯一的例外是 `decision-map` 的 delivery
-步驟：它依 `loom-code` 的 contract template 寫出 intent，因此需要 `loom-code`；
-開地圖與推進 ticket 則不需要。
+多數工具只裝 `loom-workflow` 就能運作。`decision-map` 的 delivery 步驟依
+`loom-code` 的 contract template 寫出 intent，因此需要 `loom-code`；開地圖與
+推進 ticket 則不需要。明確要求外部 agent 審查 code、plan 或決策時，執行也需要
+`loom-code:external-review`。
 
 ## 收錄準則（Admission rule）
 
 一個 skill 屬於這裡，條件是它跨站協調工作，或跨 session 攜帶狀態；只是被好幾個
 plugin 用到並不算數。`decision-map` 是這條規則的第一個實例。這條規則只 gate
 新收錄，plugin 裡既有的 utility skill 維持不動。
+
+`project-retro` 是使用者明確核准的例外：依要求唯讀回顧一次開發 session，找出專案開發環境的改善點。
+它不是 Loom 站，也不是品質閘。
 
 ## 什麼時候用哪個工具
 
@@ -55,9 +68,10 @@ flowchart TD
         record["loom-workflow:loom-memory<br/>branch 關閉前 Record，<br/>依要求或 agent 判斷；<br/>沒有任何站會呼叫它"]
     end
 
-    subgraph sessions["跨 session"]
+    subgraph sessions["Session 工作"]
         handoff["loom-workflow:handoff<br/>session 結束時存下狀態，<br/>下一個 session 接續"]
-        distill["loom-workflow:distill-sessions<br/>從過去的 session<br/>挖出 skill 改進點"]
+        distill["loom-workflow:skill-retro<br/>從過去的 session<br/>挖出 skill 改進點"]
+        retro["loom-workflow:project-retro<br/>回顧一次 session 的<br/>專案改善點"]
     end
 
     subgraph anytime["隨時"]
@@ -91,15 +105,16 @@ flowchart TD
 - **commit / PR / merge 時** — `git-memory` 在任何站的每次 commit 前、建立 PR
   時，以及 `ship` 之後才進行的 PR merge 之前執行。`loom-memory` 在 branch
   關閉前，依要求或 agent 判斷 Record 持久的教訓；沒有任何站會呼叫它。
-- **跨 session** — `handoff` 在 session 結束時存下狀態，並在下一個 session
-  接續。`distill-sessions` 從過去的 session 挖出 skill 改進提案。
+- **Session 工作** — `handoff` 在 session 結束時存下狀態，並在下一個 session
+  接續。`skill-retro` 從過去的 session 挖出 skill 改進提案。`project-retro` 依要求
+  回顧目前或指定的一次 session，根據原始紀錄提出專案改善建議；skill 問題只列為候選。
 - **隨時** — `independent-advisor` 向另一個 executor 取得 second opinion，
   `loom-visualization` 把比較、流程與推理呈現成表格或圖（也能做成推理頁），`goal-create` 只在指名呼叫時執行，
   `using-loom-workflow` 在不確定該用哪個工具時分派請求。
 
 ## Skills
 
-共 12 個 skills：11 個工具與 1 個可選入口。
+共 13 個 skills：12 個工具與 1 個可選入口。
 
 | Skill | 角色 |
 |---|---|
@@ -111,13 +126,14 @@ flowchart TD
 | [`dbt-model-style`](skills/dbt-model-style/) | 撰寫、編輯或 review dbt model 時，套用 dbt + Redshift 的 style 與 structure（CTE 角色、zero-logic 的 final CTE、命名、註解）；計算邏輯不在範圍內。 |
 | [`git-memory`](skills/git-memory/) | 在每次 `git commit`、`gh pr create`、`gh pr merge` 之前分類 Decision、Learning、Gotcha memory；也能找回過去某個 Git 決策的理由。 |
 | [`handoff`](skills/handoff/) | 把 session 狀態存成 `.claude/handoffs/` 下的 HANDOFF 檔，或在新 session 中從它接續。 |
-| [`distill-sessions`](skills/distill-sessions/) | 挖掘過去的 Claude Code 與 Codex session（可用時加上 `/insights` facets），產出依 skill 排序的 friction 與可審閱的 SKILL.md 提案。 |
-| [`independent-advisor`](skills/independent-advisor/) | 對 plan 或決策，向另一個 executor——另一個 model tier、更高的 effort，或另一家廠商——取得 second opinion。花錢或把資料送出本機需經同意。 |
+| [`skill-retro`](skills/skill-retro/) | 從多次 Claude Code 與 Codex session 分析已安裝 skill 指示或相關 plugin 整合的反覆問題，提出有來源的方案；不直接套用修改。 |
+| [`project-retro`](skills/project-retro/) | 依要求唯讀回顧目前或指定的一次開發 session，以可追溯的原始紀錄提出專案改善建議；skill 問題另列為候選，不修改檔案。 |
+| [`independent-advisor`](skills/independent-advisor/) | 明確要求外部 agent 審查 code、plan 或決策時，交由 `loom-code:external-review` 執行並保留原審查標準；也能向不同 model tier、effort 或廠商取得開放式 second opinion。花錢或把資料送出本機需經同意。 |
 | [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。plain-language reference 收錄寫法指引、選項判斷規則、八種對話情境表格與表格規則，另有軟體、設計、商業三份表格集。不用於 Obsidian 筆記。 |
 | [`goal-create`](skills/goal-create/) | 只在指名呼叫時執行。SESSION 根據對話證據或已確認的 intent/spec 起草四欄 goal prompt，在 host 接受時啟用，否則誠實提供復原操作；不操作 Loom 流程。ARC 起草 repository 的 purpose（`Why` / `Done when`）。 |
 
 Loom 的契約計入其中八個工具。`goal-create` 與 `dbt-model-style` 是 Loom
-流程之外的 standalone skill，`loom-memory` 與入口路由則維持在契約之外。
+流程之外的 standalone skill；`project-retro` 也是獨立工具，`loom-memory` 與入口路由則維持在契約之外。
 
 ## Repository 結構
 
@@ -136,16 +152,17 @@ loom-workflow/
 │   ├── critique/
 │   ├── dbt-model-style/
 │   ├── decision-map/
-│   ├── distill-sessions/
 │   ├── git-memory/
 │   ├── goal-create/
 │   ├── handoff/
 │   ├── independent-advisor/
 │   ├── loom-memory/
 │   ├── loom-visualization/
+│   ├── project-retro/
 │   ├── recap-state/
+│   ├── skill-retro/
 │   └── using-loom-workflow/
-├── tests/                 git-memory、loom-memory 與 loom-visualization 的測試
+├── tests/                 git-memory、loom-memory、loom-visualization 與 retro 的測試
 ├── CHANGELOG.md
 ├── README.md
 ├── README.ja.md
@@ -155,7 +172,8 @@ loom-workflow/
 ## 安裝
 
 這個 repository 是名為 `loom` 的 plugin marketplace。`loom-workflow` 可以單獨安裝；
-只有要用 `decision-map` 的 delivery 步驟時才需要再加裝 `loom-code`。
+要用 `decision-map` 的 delivery 步驟，或明確要求外部 agent 審查 code、plan
+或決策時，才需要再加裝 `loom-code`。
 
 ### Claude Code
 
@@ -176,7 +194,7 @@ codex plugin add loom-workflow@loom
 ### Antigravity CLI
 
 從 repo 的 clone 安裝，先裝 `loom-code`：`critique`、`decision-map`、
-`distill-sessions` 會參照它。安裝前先用 `agy plugin list` 確認有沒有從 Claude Code
+`skill-retro` 會參照它。安裝前先用 `agy plugin list` 確認有沒有從 Claude Code
 匯入的同名 plugin：install 會取代那份匯入的副本，之後的 `agy plugin uninstall`
 也會把它刪掉。
 
@@ -196,9 +214,35 @@ agy 1.2.2 不接受 `.` 這類相對路徑。沒有 `--add-dir` 時，print 模�
 hook 只在 `agy` CLI 執行，Antigravity 桌面 app 與 IDE 裡不會執行。
 在 agy 上，loom-visualization 的 visualization card 以 plugin rule 送達，因此永遠生效。
 
+### OpenCode
+
+OpenCode v2（已在 2.0.18 驗證；從 CLI 安裝的 plugin 在 TUI 裡也會載入）從 GitHub 安裝 plugin。先安裝 `loom-code`：`opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'`。
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-workflow'
+opencode plugin list
+```
+
+接著重啟 OpenCode（`opencode service restart`）；重啟之前，`opencode plugin list` 可能只列出部分 plugin。
+
+OpenCode 的 TUI（2.0.18–2.0.20）沒有安裝 plugin 的選項；除了 `plugin add`，也可以把同一個 spec 加進 `opencode.json`（`plugin add` 寫入 OpenCode 設定資料夾 `~/.config/opencode/` 的那個檔案）的 `plugins` 清單。更新時，重跑 `plugin add` 或 `plugin update` 都不會有作用（OpenCode 2.0.18 回應 `already configured` / `No plugin updates available`，且 branch 指定會沿用快取副本）。請先移除 plugin，再固定到某個 commit 重新加入，並重啟 OpenCode：`opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'`（要用加入時的完整 spec；只寫 plugin 名稱會回應 `not configured`），接著 `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`。
+
+skill 以 `loom-workflow:<skill>` 提供。以指令 `/loom-workflow:using-loom-workflow` 開始使用 loom；`/loom-workflow:handoff`、`/loom-workflow:recap-state`、`/loom-workflow:goal-create`、`/loom-workflow:project-retro` 也是指令，且都同時仍是 skill。
+
+在 OpenCode 上，visualization card 與 skill 資料夾規則透過 plugin 的 v2 hook 執行。
+
+OpenCode 的限制：
+
+- 背景服務剛啟動時，plugin 最多約 40 秒才會出現在 `opencode plugin list`。
+- loom-code 的 subagent 從 plugin 快取讀取 loom 自己的檔案時，可能停在 `external_directory` 權限提示；`opencode run --auto` 也不涵蓋 subagent 的 session。請允許讀取 loom 的 plugin 目錄。
+- 不加 `--auto` 的 `opencode run` 會停在第一個權限提示或模型提問，長時間的 loom 執行請從 TUI 進行。
+- OpenCode 在專案以外執行 shell 指令前不會詢問，模型可能改動整台機器（實測：系統層級的 `pip install --break-system-packages`）；請檢查它的指令，或收緊 OpenCode 的權限設定。
+- OpenCode 桌面 app 與 IDE 整合不在涵蓋範圍。
+- 使用這些 plugin 不需要 Node。
+
 ### 每輪提醒送不到的地方
 
-在 Claude Code 與 Codex 上，`loom-workflow` 透過 UserPromptSubmit hook，在你每次送出訊息時
+在 Claude Code、Codex 與 OpenCode 上，`loom-workflow` 透過 UserPromptSubmit hook，在你每次送出訊息時
 把 loom-visualization 的 visualization card（用使用者的語言回覆、結論先講、白話說明、
 照字面講不用比喻、用表格或圖）送給 agent，每輪最多增加 181 個英文字。以下情況收不到：
 

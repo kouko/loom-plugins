@@ -56,7 +56,6 @@ from pathlib import Path
 import pytest
 
 import test_ship_station_text as ship_text
-from loom_checker.command_handlers.publish import MISSING_ATTESTATION
 from loom_checker.intent_state import remote_default_snapshot
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
@@ -386,7 +385,7 @@ def test_probe_land_always_reports_a_countable_attestation_count(tmp_path) -> No
                           ["land", "--accepted-by", "kouko"])
         (rule, reason), = _blocks(result.stderr)
         assert rule == "land.merge", result.stderr
-        assert not reason.startswith(MISSING_ATTESTATION), reason
+        assert not reason.startswith("branch must carry exactly one attested change"), reason
         assert reason == LAND_UNIDENTIFIED, reason
 
 

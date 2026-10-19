@@ -132,7 +132,8 @@ RULES: list[tuple[str, str]] = [
 RULES.append((
     "publish.preconditions",
     "publish pushes HEAD and opens or updates its one pull request only when the change "
-    "is identified, publication is authorized, git and gh resolve to trusted executables, "
+    "is identified, publication is authorized, any generated attestation is committed, "
+    "git and gh resolve to trusted executables, "
     "origin is a literal GitHub URL, and HEAD, the remote branch and the PR identity stay "
     "unchanged across every network step; the verification status is disclosed, never "
     "a refusal.",
@@ -143,7 +144,8 @@ RULES.append((
     "push.contextual-body",
     "The exact pull-request body carries Ship's nine top-level contextual headings "
     "exactly once and in order, with no competing Memory heading or explicit claim "
-    "to expose private or hidden chain-of-thought.",
+    "to expose private or hidden chain-of-thought, and any `Verification status:` "
+    "line states exactly the status publish computes.",
 ))
 
 

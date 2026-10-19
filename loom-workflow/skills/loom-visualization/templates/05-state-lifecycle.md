@@ -30,8 +30,7 @@ No generator covers states. Hand-author the diagram, then verify it with
 ┌────────────────────┐  submit   ┌────────────────────┐  approve  ┌────────────────────┐
 │ 下書き             │           │ レビュー           │           │ 公開済み           │
 ├────────────────────┤           ├────────────────────┤           ├────────────────────┤
-│ * 作成中           │           │ * レビュー中       │           │ * 公開中           │
-│ * 可能             │           │ * approve / changes│           │ * archive 可能     │
+│ * author can edit  │           │ * reviewer decides │           │ * readers can view │
 └────────────────────┘           └────────────────────┘           └────────────────────┘
       ▲                              │                              │
       │      request changes         │                              │ archive

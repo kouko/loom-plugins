@@ -23,7 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from prose_pin import flat_prose, has_negation, pins_exact_sentence, split_sentences  # noqa: E402
+from prose_pin import flat_prose, split_sentences  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE = (
@@ -71,8 +71,12 @@ def test_template_has_one_row_per_criterion_and_evidence_file_path():
     assert [r[number] for r in rows][:2] == ["1", "2"], "rows are not one per criterion"
     for row in rows:
         assert re.search(r"works|partly|not verified|fails", row[verdict]), row
+    returned = re.search(r"result: ([a-z |-]+?),", TESTER.read_text(encoding="utf-8"))
+    assert returned, "tester contract no longer lists its `result:` values"
+    assert {v.strip() for v in returned.group(1).split("|")} == {
+        "works", "partly", "not verified", "fails"
+    }, returned.group(1)
     report = _report_block()
-    assert "works / partly / not verified / fails" in TEMPLATE.read_text(encoding="utf-8")
     assert not re.search(r"^### \d+\.", report, flags=re.M), "per-criterion blocks remain"
     assert EVIDENCE_PATH in report, "report does not point to the evidence file"
 
@@ -83,7 +87,6 @@ def test_evidence_file_shape_is_given_and_is_plain_markdown():
     evidence = [b for b in blocks if "acceptance test evidence" in b.splitlines()[0].lower()]
     assert evidence, "template gives no shape for the evidence file"
     assert not evidence[0].startswith("#!")
-    assert re.search(r"never[^\n]*`#!`", text), "template does not forbid `#!` evidence"
 
 
 COLUMNS = ["#", "What you asked for", "Verdict", "What happened", "Re-run"]
@@ -144,150 +147,6 @@ def _section3() -> str:
     return text.split("## 3. Run acceptance testing", 1)[1].split("\n## 4.", 1)[0]
 
 
-def _affirmed(sentences: list[str], *phrases: str) -> list[str]:
-    return [
-        s for s in sentences
-        if all(p in s for p in phrases) and not has_negation(re.sub(r"`[^`]*`", "", s))
-    ]
-
-
-def test_suite_criterion_cites_finalize_review_command():
-    """A1 positive: a suite-settled row cites the check, not a result."""
-    sentences = _tester()
-    assert _affirmed(
-        sentences, "names the suite check", "`finalize-review` executes it",
-        "refuses the attestation",
-    ), "tester does not cite finalize-review's suite check"
-    assert _affirmed(sentences, "committed before `finalize-review` runs")
-    assert _affirmed(sentences, "`package-tests` is skipped", "only that criterion's own tests")
-    assert _affirmed(sentences, "setup check", "every run")
-    flat = " ".join(flat_prose(TESTER).split())
-    for phrase in (
-        "The station also says whether `package-tests` is skipped and whether `finalize-review` will run",
-        "When they pass, the row is `works`",
-        "When any of them fails, the row is `fails`.",
-        "When you ran none of them, the row is `not verified`.",
-        "the row reports only their result.",
-    ):
-        assert phrase in flat, phrase
-    section = split_sentences(" ".join(_section3().split()))
-    assert _affirmed(section, "On every dispatch", "`package-tests` or `finalize-review` is skipped")
-    assert _affirmed(section, "steps 6-7 govern the suite row and what is re-tested")
-
-
-DISMISSALS = (
-    "Also hand it every finding of severity `important` or worse that the main agent dismissed."
-)
-
-
-def test_station_hands_tester_its_dismissals():
-    """The tester's dismissal section has a source: §3 hands it every dismissal."""
-    section = " ".join(_section3().split())
-    assert pins_exact_sentence(section, DISMISSALS)
-    sentences = split_sentences(section)
-    assert "On every dispatch" in sentences[sentences.index(DISMISSALS) - 1]
-    for old, new in (
-        (DISMISSALS, ""),
-        ("`important` or worse", "`fatal`"),
-        ("hand it every finding", "hand it one finding"),
-    ):
-        assert not pins_exact_sentence(section.replace(old, new, 1), DISMISSALS), new
-
-
-LATE_DISMISSALS = (
-    "A finding of that severity dismissed after the tester's last dispatch, "
-    "when Ship comes next, is listed in the pull request's Verification section instead."
-)
-
-
-def test_late_dismissals_reach_the_pull_request():
-    """A dismissal decided after the tester's last dispatch still reaches the user."""
-    section = " ".join(_section3().split())
-    assert pins_exact_sentence(section, LATE_DISMISSALS)
-    assert not has_negation(LATE_DISMISSALS)
-    sentences = split_sentences(section)
-    assert sentences[sentences.index(LATE_DISMISSALS) - 1] == DISMISSALS
-    for old, new in (
-        (LATE_DISMISSALS, ""),
-        ("the pull request's Verification section", "the evidence file"),
-        ("after the tester's last dispatch", "before the tester's last dispatch"),
-    ):
-        assert not pins_exact_sentence(section.replace(old, new, 1), LATE_DISMISSALS), new
-
-
-SHIP = REPO_ROOT / "loom-code" / "skills" / "ship" / "SKILL.md"
-SHIP_LATE_DISMISSALS = (
-    "List each finding of severity `important` or worse that closing review "
-    "dismissed after the acceptance tester's last dispatch, with its reason, "
-    "as closing review's hand-off reports them."
-)
-
-
-def _ship_verification_rules() -> str:
-    text = SHIP.read_text(encoding="utf-8")
-    rules = text.split("Under the Verification heading", 1)[1].split("Every decision summary", 1)[0]
-    return " ".join(rules.split())
-
-
-def test_ship_lists_late_dismissals_in_verification():
-    """The station that writes the Verification section carries the late dismissals."""
-    rules = _ship_verification_rules()
-    assert pins_exact_sentence(rules, SHIP_LATE_DISMISSALS)
-    assert not has_negation(SHIP_LATE_DISMISSALS)
-    for old, new in (
-        (SHIP_LATE_DISMISSALS, ""),
-        ("`important` or worse", "`fatal`"),
-        (", with its reason,", ","),
-    ):
-        assert not pins_exact_sentence(rules.replace(old, new, 1), SHIP_LATE_DISMISSALS), new
-
-
-def test_ship_names_handoff_as_late_dismissal_source():
-    """Ship reads the late dismissals from closing review's hand-off, not recall."""
-    rules = _ship_verification_rules()
-    assert pins_exact_sentence(rules, SHIP_LATE_DISMISSALS)
-    weakened = rules.replace(", as closing review's hand-off reports them.", ".", 1)
-    assert not pins_exact_sentence(weakened, SHIP_LATE_DISMISSALS)
-
-
-HANDOFF_LATE_DISMISSALS = (
-    "Also report every finding of severity `important` or worse dismissed after "
-    "the acceptance tester's last dispatch, with its reason."
-)
-
-
-def _closing_review_handoff() -> str:
-    text = STATION.read_text(encoding="utf-8")
-    return " ".join(text.split("\n## Handoff", 1)[1].split())
-
-
-def test_closing_review_handoff_reports_late_dismissals():
-    """The hand-off is the carrier for dismissals Ship lists in Verification."""
-    handoff = _closing_review_handoff()
-    assert pins_exact_sentence(handoff, HANDOFF_LATE_DISMISSALS)
-    assert not has_negation(HANDOFF_LATE_DISMISSALS)
-    assert not pins_exact_sentence(
-        handoff.replace(HANDOFF_LATE_DISMISSALS, "", 1), HANDOFF_LATE_DISMISSALS
-    )
-
-
-TESTER_DISMISSALS = (
-    "The station also hands you every finding of severity `important` or worse "
-    "that the main agent dismissed, with its reason."
-)
-
-
-def test_dismissal_source_agrees_across_tester_and_template():
-    """Tester input list and template both say the main agent dismisses."""
-    given = flat_prose(TESTER).split("## What you are given", 1)[1].split("## What you do", 1)[0]
-    assert pins_exact_sentence(" ".join(given.split()), TESTER_DISMISSALS)
-    template = flat_prose(TEMPLATE)
-    assert "severity important or worse that the main agent dismissed" in template
-    assert "<who> raised <finding>" in template
-    for stale in ("a reviewer dismissed", "<reviewer> raised"):
-        assert stale not in template, stale
-
-
 RUN_VERB = re.compile(r"\b(?:run|runs|running|execute|executes|executing|invoke|invokes)\b", re.I)
 WHOLE_TARGET = re.compile(
     r"\b(?:package|whole|full|complete|entire)\s+(?:package\s+)?(?:suite|package)\b", re.I
@@ -325,42 +184,6 @@ def test_no_full_suite_run_instruction():
     assert "the name of a test you ran" not in flat, "evidence wording still invites named tests"
     offending = _full_suite_instructions(_tester())
     assert offending == [], offending
-    assert [s for s in _tester() if "full package suite" in s and has_negation(s)], (
-        "tester contract does not forbid running the full package suite"
-    )
-
-
-def test_rerun_retests_every_named_surface():
-    """A3 positive: a re-tested criterion is re-tested over every surface."""
-    sentences = _tester()
-    assert _affirmed(sentences, "re-test only the rows the fix could affect", "UI flows", "in full")
-    assert _affirmed(sentences, "every surface its Acceptance line or UI flow names")
-    assert _affirmed(sentences, "`carried over — <one-line reason>`", "Re-run column")
-    assert _affirmed(sentences, "against the fix diff")
-    assert _affirmed(sentences, "any doubt", "in full")
-
-
-def test_partial_surface_retest_forbidden():
-    """A3 negative: re-testing only the part a fix touched is never allowed."""
-    touched = [s for s in _tester() if "the part the fix touched" in s]
-    assert touched, "tester contract does not name the partial re-test trap"
-    assert all(has_negation(s) for s in touched), touched
-
-
-def test_rerun_dispatch_passes_earlier_report_evidence_and_fix_range():
-    """A re-run gets what step 7 needs to check each carried-over reason."""
-    phrases = ("earlier report", "evidence file", "commit range")
-    assert _affirmed(_tester(), *phrases), "tester contract does not list the re-run inputs"
-    assert _affirmed(split_sentences(" ".join(_section3().split())), "re-dispatch", *phrases), (
-        "§3 does not pass the re-run inputs"
-    )
-
-
-def test_identifiers_confined_to_evidence_file_apart_from_pointer():
-    """The report's one path is the line pointing to the evidence file."""
-    assert _affirmed(
-        _tester(), "Identifiers appear only in the evidence file", "the one line that points to it"
-    )
 
 
 def test_rules_live_in_contract_and_template():
@@ -372,7 +195,6 @@ def test_rules_live_in_contract_and_template():
     _column(header, "Re-run")
     section = " ".join(_section3().split())
     assert EVIDENCE_PATH in section
-    assert _affirmed(split_sentences(section), "committed with the report")
 
 
 def test_no_new_gate_marker():
@@ -382,15 +204,38 @@ def test_no_new_gate_marker():
     text = STATION.read_text(encoding="utf-8")
     ungated = re.sub(r"<!-- gate: [\w.-]+ -->.*?<!-- /gate -->", "", text, flags=re.S)
     flat = " ".join(ungated.split())
-    for phrase in ("`package-tests` or `finalize-review` is skipped", "steps 6-7 govern", EVIDENCE_PATH):
-        assert phrase in flat, f"{phrase!r} sits inside a gate block"
+    assert EVIDENCE_PATH in flat, f"{EVIDENCE_PATH!r} sits inside a gate block"
+
+
+# --- plan W2-03: steps the user skipped ------------------------------------
+
+SKIPPED_HEADING = "## Steps you told me to skip"
+
+
+def test_template_lists_steps_the_user_skipped():
+    """A6 positive: the report has a section fed from the skip lines."""
+    report = _report_block()
+    assert SKIPPED_HEADING in report, "report block has no skipped-steps section"
+    section = report.split(SKIPPED_HEADING, 1)[1].split("\n## ", 1)[0]
+    assert "skipped-by-instruction:" in section
+    assert "acceptance-test (independent acceptance testing)" not in section
+    assert "not as its record id" in section
+
+
+def test_section3_tells_user_skipped_steps_when_acceptance_test_skipped():
+    """A6 negative: with no report, the user hears the skipped steps in chat."""
+    section = " ".join(_section3().split())
+    assert re.search(
+        r"When `acceptance-test` is skipped[^.]*tell the user, in the conversation before Ship,"
+        r"[^.]*in plain words",
+        section,
+    ), "§3 has no chat fallback for skipped steps"
 
 
 # --- graduated adversarial probes ---------------------------------------------
 # The build adversary's probes for this change went red on the contract and
-# template as first committed. Each attack is carried here: the matchers the
-# shape checks above use must flag the probes' synthetic bad inputs, and the
-# vocabulary checks must hold on the real files.
+# template as first committed. The attack carried here: the matchers the
+# shape checks above use must flag the probes' synthetic bad inputs.
 
 
 def test_suitecheck_negatedinstruction_exempt():
@@ -404,30 +249,3 @@ def test_suitecheck_negatedinstruction_exempt():
     ])
     assert _full_suite_instructions(["Run the full package suite first, unless it is not installed."])
     assert EVIDENCE_IN_CELL.search("ran `python3 -m pytest -q`: 42 passed; see loom-code/x.py:12")
-
-
-def _norm(word: str) -> str:
-    return word.strip().replace("-", " ").lower()
-
-
-def _template_verdicts() -> set[str]:
-    text = " ".join(TEMPLATE.read_text(encoding="utf-8").split())
-    match = re.search(r"Verdict is one of ([a-z /-]+?)\.", text)
-    assert match, "template no longer lists its verdicts"
-    return {_norm(w) for w in match.group(1).split("/")}
-
-
-def test_verdictvocabulary_returnedset_equalstemplateset():
-    """Every verdict the report may carry has the same name in the tester's return, and no other."""
-    match = re.search(r"result: ([a-z |-]+?),", TESTER.read_text(encoding="utf-8"))
-    assert match, "tester contract no longer lists its returned results"
-    returned = {_norm(w) for w in match.group(1).split("|")}
-    assert returned == _template_verdicts(), f"{sorted(returned)} vs {sorted(_template_verdicts())}"
-
-
-def test_verdictvocabulary_untriedline_usestemplateword():
-    """The contract's word for a line it could not try is one of the template's verdicts."""
-    text = " ".join(TESTER.read_text(encoding="utf-8").split())
-    match = re.search(r"An Acceptance line you could not try is `([^`]+)`", text)
-    assert match, "tester contract no longer names the untried-line verdict"
-    assert _norm(match.group(1)) in _template_verdicts(), match.group(1)

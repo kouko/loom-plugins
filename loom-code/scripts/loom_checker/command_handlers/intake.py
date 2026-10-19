@@ -19,7 +19,6 @@ from loom_checker.rule_checks.intake import check_ui_flows_recompute
 from loom_checker.rule_checks.intake import prose_lines
 from loom_checker.rule_checks.intent import check_kind_recompute
 from loom_checker.rule_checks.intent import touched_interface_surfaces
-from loom_checker.selection import effective_selection
 from pathlib import Path
 import re
 import sys
@@ -48,9 +47,9 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         return report(failures, err)
     intent_path = artifact_path(manifest, "intent", change_id, repo)
     front, sections = parse_document(read_text(intent_path))
-    skipped = set(effective_selection(repo, change_id, manifest)["skip"])
-    # Existing instruction records waive artifact dependencies only; they
-    # never create a bound selection or waive verification evidence.
+    skipped: set[str] = set()
+    # Dated instruction records waive artifact dependencies only; they never
+    # waive verification evidence.
     for artifact, section in (("intent", "Constraints"), ("plan", "Risks")):
         path = artifact_path(manifest, artifact, change_id, repo)
         if path.is_file():

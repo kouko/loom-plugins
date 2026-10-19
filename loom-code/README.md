@@ -8,7 +8,7 @@
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.22.0 · **Skills**: 5 stations + 1 router + 1 user-invoked · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.42.1 · **Skills**: 5 stations + 1 router + 1 external review skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -26,7 +26,7 @@ flowchart TD
     attest[["Attestation generated<br/>by loom-code:closing-review"]]
     ship["loom-code:ship<br/>Push + PR + checks<br/>③ You accept the result<br/>through the acceptance test report when required"]
     merged(["Merged separately<br/>after loom-code:ship, on your own authorization"])
-    maintain["loom-code:maintain<br/>Bug, alert, regression or incident"]
+    maintain["loom-code:maintain<br/>Alert, CI or regression failure, or incident"]
 
     intent --> plan
     intent -.->|"needs-design: yes"| spec
@@ -55,9 +55,10 @@ flowchart TD
 - **Ship** — pushes the branch, opens the PR and verifies required checks
   (③). Ship never merges: merging is a separate step that needs your own
   explicit authorization.
-- **Maintain** — outside an active unmerged change, a bug report, alert,
-  regression or incident is attached to a matching open intent, or a new one
-  is created, and handed to `write-plan`.
+- **Maintain** — outside an active unmerged change, an alert, CI or regression
+  failure, or incident that arrives without a user's request to fix a bug is
+  attached to a matching open intent, or a new one is created, and handed to
+  `write-plan`. A user asking for a bug fix starts at the entry station.
 
 ## Skills
 
@@ -69,7 +70,7 @@ flowchart TD
 | [`ship`](skills/ship/SKILL.md) | Validate the attestation, push, open the PR and verify required checks (decision point ③). Never merges. |
 | [`maintain`](skills/maintain/SKILL.md) | Reproduce an incident outside an active unmerged change, attach it to a matching open intent or create one, and hand it to `write-plan`. |
 | [`using-loom-code`](skills/using-loom-code/SKILL.md) | Optional router that picks the station for a general Loom request; every station stays directly callable. |
-| [`expert-mode`](skills/expert-mode/SKILL.md) | User-invoked only: choose which Loom steps one change runs or skips; binds on a typed confirmation. |
+| [`external-review`](skills/external-review/SKILL.md) | Run a consented outside review with an explicit model and effort; the calling review skill keeps its criteria and verdict checks. |
 
 ## Agents
 
@@ -99,7 +100,8 @@ Everything else is decided for you, with the reason recorded.
    written by an agent that never touched the change when one was required.
 
 An irreversible fork (deleting data, a public interface, a one-way migration)
-is added to ① for an engineering change or ② for a product change, phrased as
+is added to ① for an engineering change or ② for a product change (① when
+no spec is written), phrased as
 its consequence — never as an extra stop.
 
 ## The contract package
@@ -108,9 +110,9 @@ its consequence — never as an extra stop.
 charter and fields of every artifact — intent, spec, plan, attestation,
 acceptance test report and `KICKOFF-DEFAULTS.md` — plus the standing documents.
 `contract/templates/` holds the blank of each. Only loom-code writes it.
-`loom-design` reads it and declares `requires-contract`; `loom-workflow` does
-not — only its `decision-map` skill runs `contract --require` before a
-delivery.
+`loom-design` keeps byte-identical copies of the templates it fills (a
+repository test keeps them equal) and declares `requires-contract`; neither
+sibling reads this package at runtime.
 
 ## The checker
 
@@ -139,7 +141,7 @@ and continues where its own contract allows.
   body.
 
 They compose only through plugin-qualified skill names such as
-`loom-design:write-spec`, the contract package, and the project's own
+`loom-design:write-spec` and the project's own
 `docs/loom/` artifacts — never through another plugin's private `hooks/`,
 `skills/` or `scripts/` paths.
 
@@ -210,6 +212,32 @@ reviewer, adversary, acceptance-tester) run as agy `self` subagents that follow
 loom's agent contracts, on Gemini models. The review station is
 `closing-review` on every host; the old `review` name was removed and has no
 alias.
+
+### OpenCode
+
+OpenCode v2 (verified on 2.0.18; plugins installed from the CLI also load in the TUI) installs plugins from GitHub.
+
+```sh
+opencode plugin add 'github:kouko/loom-plugins#main::path:loom-code'
+opencode plugin list
+```
+
+Then restart OpenCode (`opencode service restart`): until it restarts, `opencode plugin list` may show only some of the plugins.
+
+The OpenCode TUI (2.0.18–2.0.20) has no plugin-install option; instead of `plugin add` you can add the same spec to the `plugins` list in `opencode.json`, the file `plugin add` writes in OpenCode's config folder `~/.config/opencode/`. To update, re-running `plugin add` or `plugin update` does nothing (OpenCode 2.0.18 answers `already configured` / `No plugin updates available`, and a branch spec reuses its cached copy). Remove the plugin, then add it again pinned to a commit, and restart OpenCode: `opencode plugin remove 'github:kouko/loom-plugins#main::path:<plugin>'` (the exact spec you added; the bare name answers `not configured`), then `opencode plugin add 'github:kouko/loom-plugins#<commit>::path:<plugin>'`.
+
+Skills are offered as `loom-code:<skill>`. loom's roles run as OpenCode subagents `loom-code:<role>` through the `subagent` tool, on the session's model. Start loom with the command `/loom-code:using-loom-code`, which stays a skill too.
+
+On OpenCode, the session context, the publication reminder and the language reminder run through the plugin's v2 hooks.
+
+Limits on OpenCode:
+
+- A plugin can take up to about 40 seconds to appear in `opencode plugin list` right after the background service starts.
+- loom-code's subagents can stop on an `external_directory` permission prompt when they read loom's installed files from the plugin cache, even under `opencode run --auto`, which does not cover subagent sessions. Approve reads of the loom plugin directory.
+- `opencode run` without `--auto` stops at the first permission prompt or model question, so drive long loom runs from the TUI.
+- OpenCode does not ask before shell commands outside the project, so a model can change the machine (observed: a system-wide `pip install --break-system-packages`); review its commands or tighten OpenCode's permission settings.
+- The OpenCode desktop app and IDE integrations are not covered.
+- Node is not needed to use the plugins.
 
 ## Licence
 

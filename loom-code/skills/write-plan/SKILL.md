@@ -1,7 +1,7 @@
 ---
 name: write-plan
 description: |
-  Plan an engineering change or turn a confirmed intent into implementation tasks. Use when planning or starting work without a plan.
+  Turn a confirmed intent into implementation tasks. Use when an intent needs a plan; also the entry for a new feature or bug-fix request when loom-design is not installed.
 version: 1.0.1
 ---
 
@@ -36,36 +36,32 @@ on any other host it is the directory two levels above this SKILL.md.
 Commands below show Claude Code; on any other host substitute `<loom-code>`
 for `${CLAUDE_PLUGIN_ROOT}`.
 `${CLAUDE_PLUGIN_ROOT}` is substituted by Claude Code. `PLUGIN_ROOT` is provided to Codex plugin hook commands; it is not a general skill-shell variable.
-On Antigravity CLI, map tool and agent names with
-[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md).
+Antigravity CLI, OpenCode: map tool/agent names via
+[`../../references/antigravity-tools.md`](../../references/antigravity-tools.md),
+[`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
-At entry, run `loom_checker.py selection show <change-id>` and omit the prose
-steps `selection show` lists as skipped (spec, plan, implementer, tdd,
-acceptance-test), plus any step the user told you to skip in plain words;
-[expert-mode](../expert-mode/SKILL.md) stays an optional route the user may
-invoke. Words that ask to skip independent acceptance testing —
+At entry, omit the prose steps the user told you to skip in plain words (spec,
+plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
 `acceptance-test` step. At station entry, keep the full flow unless the user
-selected or instructed a skip. Automatic narrow-change simplification belongs
+instructed a skip. Automatic narrow-change simplification belongs
 to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
 continue. When you honour such a skip, append one line
 `skipped-by-instruction: <step> <YYYY-MM-DD>` to the plan's `## Risks` section,
 or the intent's `## Constraints` section when plan is absent or skipped, and commit it
-before dependent checks. Never ask the user for a generated code to skip a step.
+before dependent checks.
 
 ## Artifact vocabulary
 
 Use the confirmed intent when spec or plan is skipped. Skipped spec waives step 4's
 creation, carried-detail routing, review and behavior-confirmation checks;
-use intent Acceptance directly. Record instructions before intake; bound
-selections already supply exemptions. Skipped plan waives step 5's document,
+use intent Acceptance directly. Record instructions before intake. Skipped plan waives step 5's document,
 plan check, plan review and plan-dependent configuration prompts. Run intake
 for confirmed-intent and non-skipped checks; hand Build intent and retained
 spec paths, omitted steps and bounded implementation scope. Resolve open
-questions in intent; never create a substitute plan or fabricate a selection
-confirmation.
+questions in intent; never create a substitute plan.
 
 `kind: product` changes what a user reads, types, or sees happen;
 `kind: engineering` covers internal work, tooling, tests, and docs.
@@ -85,17 +81,17 @@ confirmation.
 
 ## What you will be asked, in plain words
 
-Give the user this list if they ask what is coming. It is the whole list:
-there are no other **decision points**. On Codex there is also one
-non-decision authorisation stop, the first time this repo is used (step
-0b) — it asks for permission to run, not for a decision about the work.
+If asked, give this complete decision-point list. Codex's plugin-install
+authorisation (step 0b) permits execution; it is not a work decision.
 
-1. At ①, restate the wanted outcome; merge any expensive-to-undo choice,
-   `second-vendor: ask` question, and required principles interview.
-2. At ②, only for a product spec you write: confirm visible behaviour and
-   carried details. Ask nothing about plan structure; record each agent
-   decision and reason.
-3. At ③, the user accepts or rejects the report against every Acceptance line.
+1. At ①, restate intent; merge one-way doors ② skips, any unanswered
+   `second-vendor: ask` choice, and the required principles interview.
+   A direct user request naming an outside agent and unambiguous target
+   runs without a second question; disclose before execution.
+2. At ②, only for a product spec you write: confirm visible behaviour,
+   carried details, product one-way doors not asked at ①. Ask nothing
+   about plan structure; record agent decisions with reasons.
+3. At ③, the user accepts or rejects the report per Acceptance line.
 
 `second-vendor: suggest` only emits a non-blocking notice after the plan exists.
 
@@ -133,7 +129,10 @@ the user named a change, match the slug.
   there **unless** the user wants to describe the change now. If they do,
   run step 3's restate-and-confirm as a short interview instead: ask what
   the problem is, who it hurts, and what they will be able to do when it
-  is done; write the file yourself from their answers. Keep it short — an
+  is done; write the file yourself from their answers. A feature or
+  bug-fix request already describes the change: run the short interview
+  and write the file; offer the template path only when the user asks for
+  it. Keep it short — an
   engineering intent is normally three to five lines, and writing it by
   hand beats interviewing. The user never hand-writes the file. When you
   write it, `## Open questions` must be non-empty — the checker requires
@@ -161,9 +160,13 @@ neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
 plan, and unsupported detail is deleted. This pass creates no field, ID,
 requirement, scenario, product behaviour, or review loop.
 Publication and second-reviewer authorisation never enter Problem, Proposed
-outcome, Acceptance, Constraints, or Out of scope. Keep publication
-authorisation in the intent's `publication:` frontmatter line and preserve the
-question list for this plan's `## Questions asked` section.
+outcome, Acceptance, or Out of scope. Keep publication authorisation in the
+intent's `publication:` frontmatter line. The sole Constraints exception is
+`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
+skipped; it records the selected family, not the user's quoted request. Keep
+that verbatim quote, target and final `selected_executor` in JSON
+`authorization_source` at dispatch, and preserve only actual questions for
+this plan's `## Questions asked` section.
 Visible effects with an unknown surface and no spec require
 `needs-design: yes` with a surface-neutral reason; internal files alone do not.
 Complete the code-only altitude pass before confirmation. A material outcome
@@ -202,12 +205,15 @@ installed, hand this to its `product-principles` tool instead.
 
 ## Step 3 — Decision point ①: restate and confirm
 
-When the intent's `status:` is already `confirmed`, skip this step.
+When `status:` is already `confirmed`, skip confirmation: branch first
+(Step 6), then run
+`loom_checker.py intent docs/loom/intent/<change-id>.md` until it exits 0.
+Fix `needs-design:` with one new commit quoting the changed line verbatim
+in its body.
+
 Otherwise read `references/confirm-intent.md` and follow it fully before step 4,
-in the single message it describes: the restatement, one-way doors, any
-`second-vendor: ask` question, the principles interview, and engineering
-carried details, then the intent's confirmation commit. Step 5 writes the
-question list kept per that reference.
+in the single message it describes, ending with the intent's confirmation
+commit. Step 5 writes the question list kept per that reference.
 
 ## Step 4 — Does this need a spec?
 
@@ -288,16 +294,16 @@ code.
 
 <!-- gate: write-plan.product-spec-needs-confirmed-behavior -->
 **A product spec needs `confirmed-behavior:` before it becomes a plan.**
-When `kind: product`, decision point ② belongs to whoever wrote the spec:
-if you wrote it, you run it. Present the Requirements and the UI flows in
-plain words — "you type ___ and you see ___; when ___ happens it will
-___" — and nothing from `## Design decision` down, ever. On "yes", write
-`confirmed-behavior: <date> @<spec sha7>` into the spec frontmatter, where
-`<spec sha7>` is the first seven characters of
-`git hash-object docs/loom/<change-id>/spec.md` run after the spec's last
-edit — it pins which text the user said yes to. On a correction, rewrite,
-present again, and recompute the hash. Engineering changes skip this
-entirely.
+When `kind: product`, decision point ② belongs to whoever wrote the spec.
+Present the Requirements, UI flows and product
+one-way doors in plain words — "you type ___ and you see ___; when ___
+happens it will ___" — and nothing from `## Design decision` down, ever.
+Doors asked at ① are not asked again at ②. On
+"yes", write `confirmed-behavior: <date> @<spec sha7>` into the spec
+frontmatter, where `<spec sha7>` is the first seven characters of
+`git hash-object docs/loom/<change-id>/spec.md` after the spec's last
+edit, pinning the text the user approved. On a correction, rewrite,
+present again, and recompute the hash. Engineering changes skip this.
 
 ### The intake check — both branches, every time
 
@@ -308,30 +314,29 @@ plan:
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py intake write-plan <change-id>
 ```
 
-Fix and re-run until it exits 0. At this point it checks
-`intake.confirmed`, `intake.spec-ready`, and `intake.confirmed-behavior` —
-whether the intent, spec declaration, and visible-behaviour confirmation are
-ready. When `needs-design: no`, only intent readiness can
-block before the plan exists, plus `intake.confirmed-behavior` when a
-`kind: product` spec exists.
+Fix and re-run until exit 0. It checks `intake.confirmed`,
+`intake.spec-ready`, and `intake.confirmed-behavior`. With
+`needs-design: no`, only intent readiness blocks before the plan, plus
+`intake.confirmed-behavior` for a `kind: product` spec.
 
 ## Step 5 — Write the plan
 
 Write `docs/loom/<change-id>/plan.md` from `contract/templates/plan.md`.
 
 **Task size.** Each task owns coherent Acceptance lines, one module boundary,
-declared dependencies, and positive plus negative/boundary cases. Split
-unrelated behaviour; keep scenario detail in the spec and never size by time.
+declared dependencies, positive plus negative/boundary cases. Split unrelated
+behaviour; scenarios stay in the spec; never size by time. Tasks changing
+non-test code: Files marks the entry other modules call; case-ids
+name behaviour seen there; logic beyond that entry's reach is its own module,
+tested at its entry.
 
-**Architecture.** When the repository root has `ARCHITECTURE.md` carrying
-`ratified-by: <name> <date>`, read it before writing the Task DAG. Treat an
-unratified draft as advisory; it cannot require changes or block planning.
-Place every added or moved file by the ratified rules,
-and name the rule id you followed on that task's Risk line (`FP-2`). When a
-task must break a rule, the planner runs the loom-design `architecture-design`
-tool's re-design mode with the user before Build starts, and lists
-`ARCHITECTURE.md` and the rule's guard in that task's Files; an implementer
-never changes a rule on its own. With no `ARCHITECTURE.md`, nothing changes.
+**Architecture.** Read root `ARCHITECTURE.md` before the Task DAG when it
+carries `ratified-by: <name> <date>`; unratified drafts are advisory. Place
+added or moved files by its rules and cite each rule id in the task's Risk
+line (`FP-2`). To break a rule, run loom-design `architecture-design` in
+re-design mode with the user before Build; list `ARCHITECTURE.md` and its
+guard in Files. An implementer never changes a rule alone. With no
+`ARCHITECTURE.md`, this check does not apply.
 
 A task that removes or materially rewrites a function, recognizer, or rule
 that already has tests names the existing test file on its Risk line and
@@ -345,8 +350,8 @@ this when coverage was dropped.
 - Group tasks into **waves** as dependency and integration boundaries. Waves
   do not schedule formal review; after all tasks and package tests pass,
   Build transitions once to the closing `branch-end` review.
-- Unless `implementer` is skipped (listed by `selection show` or skipped by the
-  user's plain-words instruction), implementer dispatch is mandatory for every
+- Unless `implementer` is skipped by the user's plain-words
+  instruction, implementer dispatch is mandatory for every
   implementation task. Scheduling multiple implementers
   concurrently is optional.
 - Task ids are `W<n>-<nn>` and remain stable once written so hand-offs can
@@ -386,6 +391,10 @@ restatement stays in the user's language.
   there is no spec, this section is also where the answers to one-way-door
   questions live: one `user-decided — <what they chose and why>` line each,
   because with no spec there is no `## Design decision` to hold them.
+  If a previously skipped plan's intent Constraints carries
+  `- user-decided — second-vendor selection-confirmed: <vendor>`, copy the
+  unbulleted machine line into Risks before review. Risks is authoritative
+  when it has a selection; otherwise review falls back to intent Constraints.
 
 **Simplicity check.** After the draft exists, follow
 [`references/plan-simplicity.md`](references/plan-simplicity.md). Planned
@@ -417,12 +426,9 @@ exactly these keys: `contract_version` (integer 1), `configured_mode`,
 python3 ${CLAUDE_PLUGIN_ROOT}/scripts/second_vendor_policy.py
 ```
 
-On any other host, use the `<loom-code>` root defined in step 0. Treat the
-JSON result as the decision: render its `notice_kind`, `notice_vendor`, and
-`recommendation_reasons`; do not reproduce the risk mapping in prose. A
-notice is commentary, not a decision point, and work continues without
-waiting. The reference owns response timing and the
-no-listener boundary.
+Treat the JSON result as the decision: render its `notice_kind`,
+`notice_vendor`, and `recommendation_reasons`; do not repeat risk mapping.
+The reference owns notice timing and the no-listener boundary.
 
 **Forks you decided yourself.** Every one gets a one-line reason on its
 task: what you chose and why. Any one-way door that surfaces now — after
@@ -442,25 +448,19 @@ obvious it looks.
 
 ## Step 6 — Commit and hand off
 
-**Branch first, if you are still on the trunk.** `git branch --show-current`
-naming the trunk means the plan would land there, and every later
-checkpoint measures its delta from the branch base — which would then be
-the plan commit itself:
+**Branch first, if still on trunk.** Otherwise the plan lands there and later
+checkpoints measure their delta from the plan commit rather than the branch base:
 
 ```
 git switch -c <type>/<change-id>
 ```
 
-For example `feat/2026-09-14-push-reason`. You pick `<type>` from `feat`,
-`fix`, `docs`, `refactor`, `test`, `chore` or `ci` to match what the change
-does, and use the same type in the PR title, which becomes the change's
-squash-merge commit on the trunk. Individual task commits keep their own
-Conventional Commits type as the implementer contract sets it, and the
-`docs(loom):` intent and plan commits keep their fixed form.
+For example `feat/2026-09-14-push-reason`. Pick `<type>` from `feat`,
+`fix`, `docs`, `refactor`, `test`, `chore` or `ci`; use it in the PR title,
+which becomes the trunk squash commit. Task commits keep their implementer
+contract type; `docs(loom):` intent and plan commits keep their fixed form.
 
-The intent may already be committed on the trunk; that is fine and nothing
-needs moving. It is the plan and everything after it that belongs on the
-branch.
+An intent on trunk stays; plan and later work use the branch.
 
 Commit the plan with the message `docs(loom): plan <change-id>`. Then hand
 the change to the build station — `loom-code:build` — which dispatches one

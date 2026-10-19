@@ -1,17 +1,15 @@
 """Installation-layout proof for the independently packaged loom plugins.
 
 Each plugin must be usable installed alone, under an arbitrary cache path,
-composing with its siblings only through host-resolved skill names, the
-loom-code contract package and the consumer project's own `docs/loom/`
-artifacts — never through a sibling plugin's private files.
+composing with its siblings only through host-resolved skill names and
+the consumer project's own `docs/loom/` artifacts — never through a sibling plugin's private files.
 
 Loom 1.0 changed what there is to prove on the loom-design side. Its skills
 used to declare `argv:` contracts running validators and verdict-minters out
 of `${CLAUDE_PLUGIN_ROOT}/scripts/`, and most of this file drove each of
 those commands from an isolated install. Those skills and scripts are gone:
-loom-design 1.0 declares no in-plugin station command at all, and its four
-SKILL.md files link one reference that says in prose that no
-`${CLAUDE_PLUGIN_ROOT}` path reaches loom-code. So the command-matrix tests are replaced by one that pins that
+loom-design 1.0 declares no in-plugin station command at all, and its
+skills name no loom-code path. So the command-matrix tests are replaced by one that pins that
 state — an empty command surface, asserted rather than assumed — plus the
 one executable the plugin still ships, exercised from the isolated install.
 """
@@ -427,8 +425,6 @@ def test_isolated_loom_plugins_are_standalone_and_compose_by_public_contract(
     assert "DESIGN.md" in design_system
     assert "docs/loom/<change-id>/" in design_spec
     assert "docs/loom/<change-id>/" in code_planning
-    assert "positive" in code_planning and "negative or boundary" in code_planning
-    assert "closing-review station once at branch end" in " ".join(code_planning.split())
 
 
 def test_isolated_plugins_execute_local_behavior_without_sibling(tmp_path: Path) -> None:
@@ -451,8 +447,14 @@ def test_isolated_codex_install_selects_only_its_native_hook_manifest(
     selected = (code_root / manifest["hooks"]).resolve()
     selected.relative_to(code_root.resolve())
     hooks = json.loads(selected.read_text(encoding="utf-8"))["hooks"]
-    assert set(hooks) == {"PreToolUse", "UserPromptSubmit"}
+    assert set(hooks) == {"SessionStart", "PreToolUse"}
     assert "${PLUGIN_ROOT}" in hooks["PreToolUse"][0]["hooks"][0]["command"]
+    # Codex marks a hook Failed on keys beside hookSpecificOutput.
+    start = _run_hook_command(hooks["SessionStart"][0]["hooks"][0]["command"],
+                              "PLUGIN_ROOT", code_root, tmp_path, tmp_path)
+    assert start.returncode == 0, start.stderr
+    assert set(json.loads(start.stdout)) == {"hookSpecificOutput"}
+    assert "starts at capture-intent (write-plan when loom-design is not installed)" in json.loads(start.stdout)["hookSpecificOutput"]["additionalContext"]
     codex_commands = [
         hook["command"]
         for groups in hooks.values()
@@ -466,7 +468,7 @@ def test_isolated_codex_install_selects_only_its_native_hook_manifest(
     claude = json.loads(
         (code_root / "hooks/hooks.json").read_text(encoding="utf-8")
     )["hooks"]
-    assert {"SessionStart", "PreToolUse", "PostToolUse", "UserPromptSubmit"} <= set(
+    assert {"SessionStart", "PreToolUse", "PostToolUse"} <= set(
         claude
     )
     assert "${CLAUDE_PLUGIN_ROOT}" in json.dumps(claude)
@@ -564,13 +566,14 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
 
     Until 1.0 every design skill ran validators and verdict-minters out of
     `${CLAUDE_PLUGIN_ROOT}/scripts/`, and this file drove each one from an
-    isolated install to prove those paths resolved there. The 1.0 stations
-    call loom-code's checker instead, which they cannot reach by path — so
-    the property to pin flipped: no skill may declare an in-plugin `argv:`
-    command, and none may name a sibling plugin's private directory or its
-    own plugin by repo path (which does not exist in an install). If a
-    station command comes back, this fails, and the driving coverage it
-    replaced has to come back with it.
+    isolated install to prove those paths resolved there. The stations now
+    run no checker at all — loom-code's write-plan runs the checks on what
+    they write — so the property to pin is absence: no skill may declare an
+    in-plugin `argv:` command, and none may name a sibling plugin's private
+    directory or `<loom-code>` placeholder, or its own plugin by repo path
+    (which does not exist in an install). If a station command comes back,
+    this fails, and the driving coverage it replaced has to come back with
+    it.
     """
     design_root = _install_plugin(
         "loom-design", tmp_path / "arbitrarily named design install's root"
@@ -594,6 +597,8 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
                 "loom-code/skills",
                 "loom-code/scripts",
                 "loom-code/hooks",
+                "loom-code/contract",
+                "<loom-code>",
             ):
                 assert sibling not in text, (
                     f"{rel} names the sibling plugin's private path {sibling!r}"
@@ -602,99 +607,6 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
                 f"{rel} names its own plugin by repo path, which does not "
                 "exist in an install"
             )
-
-
-def test_sibling_lookup_allows_version_subdirectory() -> None:
-    """Every design skill that locates `loom-code` by host covers the
-    non-Claude hosts too. Claude and Codex caches hold `<name>/<version>/`;
-    Antigravity CLI installs `<name>/` with no version directory, so the
-    other-host row must allow, not require, one version subdirectory.
-    The five skills share one lookup table in capture-intent's references
-    and each links it from Step 0."""
-    design_skills = REPO_ROOT / "loom-design" / "skills"
-    linking = 0
-    for skill_md in sorted(design_skills.glob("*/SKILL.md")):
-        text = skill_md.read_text(encoding="utf-8")
-        if "## Step 0 — Check the contract version" not in text:
-            continue
-        linking += 1
-        assert "locate-loom-code.md`" in text, skill_md
-        assert "| Where `loom-code` lives |" not in text, skill_md
-    assert linking == 5
-    lookups = 0
-    for skill_md in sorted(
-        [*design_skills.glob("*/SKILL.md"), *design_skills.glob("*/references/*.md")]
-    ):
-        text = skill_md.read_text(encoding="utf-8")
-        if "| Where `loom-code` lives |" not in text:
-            continue
-        lookups += 1
-        rows = [line for line in text.splitlines() if line.startswith("| ")]
-        other = [
-            row
-            for row in rows
-            if "Codex CLI" in row and "Antigravity CLI" in row
-        ]
-        assert len(other) == 1, f"{skill_md} lacks one Codex/Antigravity row"
-        row = " ".join(other[0].split())
-        assert "on any other host" in row, skill_md
-        assert "two levels above this SKILL.md" in row, skill_md
-        assert "may contain one version subdirectory" in row, skill_md
-        assert "use the newest" in row, skill_md
-    assert lookups == 1
-
-
-# The version step every other-host row must carry: Codex installs
-# `<mkt>/loom-design/<version>/`, so two levels above SKILL.md is the version
-# directory, not the plugin root.
-VERSION_STEP = "if its parent directory is named `loom-design`"
-
-
-def _resolve_loom_code_by_row(skill_md: Path) -> Path:
-    """The other-host row, executed: two levels above SKILL.md; step up once
-    when that directory's parent is named `loom-design`; `loom-code` sits next
-    to it and may hold version subdirectories — take the newest."""
-    root = skill_md.parents[2]
-    if root.parent.name == "loom-design":
-        root = root.parent
-    code = root.parent / "loom-code"
-    versions = [p for p in code.iterdir() if p.is_dir() and re.fullmatch(r"\d+(\.\d+)*", p.name)]
-    if not versions:
-        return code
-    return max(versions, key=lambda p: tuple(int(x) for x in p.name.split(".")))
-
-
-def test_sibling_lookup_resolves_flat_and_versioned_installs(tmp_path: Path) -> None:
-    flat = tmp_path / "plugins"
-    versioned = tmp_path / "cache" / "loom"
-    layouts = {
-        flat / "loom-design" / "skills" / "capture-intent" / "SKILL.md": flat / "loom-code",
-        versioned / "loom-design" / "2.1.5" / "skills" / "capture-intent" / "SKILL.md":
-            versioned / "loom-code" / "3.1.4",
-    }
-    for version in ("3.0.0", "3.1.4"):
-        checker = versioned / "loom-code" / version / "scripts" / "loom_checker.py"
-        checker.parent.mkdir(parents=True)
-        checker.write_text("")
-    (flat / "loom-code" / "scripts").mkdir(parents=True)
-    (flat / "loom-code" / "scripts" / "loom_checker.py").write_text("")
-    for skill_md, expected in layouts.items():
-        skill_md.parent.mkdir(parents=True)
-        skill_md.write_text("")
-        resolved = _resolve_loom_code_by_row(skill_md)
-        assert resolved == expected, skill_md
-        assert (resolved / "scripts" / "loom_checker.py").is_file()
-
-    rows = 0
-    design_skills = REPO_ROOT / "loom-design" / "skills"
-    for skill_md in sorted(
-        [*design_skills.glob("*/SKILL.md"), *design_skills.glob("*/references/*.md")]
-    ):
-        for line in skill_md.read_text(encoding="utf-8").splitlines():
-            if line.startswith("| Codex CLI, Antigravity CLI |"):
-                rows += 1
-                assert VERSION_STEP in " ".join(line.split()), skill_md
-    assert rows == 1
 
 
 def test_isolated_loom_workflow_bundle_contains_required_skills_and_executes(
