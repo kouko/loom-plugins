@@ -63,7 +63,13 @@ outcome — step 1 is where that is decided, one candidate at a time.
    `resource`.
 4. Write the body: `Trigger`, `Correct path`, `Why`, and `Limits` only
    for a real non-applicability boundary — see `references/okf-profile.md`.
-5. Run `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py
+5. If the store does not exist, create it from the bundled templates via
+   `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py init
+   <store>` (the `skills/loom-memory/scripts/loom_memory.py` file inside
+   this skill's own directory) — it writes `README.md` and `index.md` from
+   the bundled templates and refuses an existing populated store — then
+   continue.
+6. Run `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py
    regenerate-index <store>` then `validate <store>` (that script is
    `skills/loom-memory/scripts/loom_memory.py` inside this skill's own
    directory). Do not consider Record complete until validation is clean.
