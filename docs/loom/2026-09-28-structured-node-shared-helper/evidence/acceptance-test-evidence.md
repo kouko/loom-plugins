@@ -1,7 +1,7 @@
 # 抽出 loom-visualization 產生器共用的渲染 helper — acceptance test evidence
 
 Tried on 2026-09-28, in a clean copy of the project at 344018e0.
-Re-run on 2026-10-19 after the trunk sync, in a clean copy at ea1f8c77, and again at 32385861 after the empty-body fix — see the last two sections.
+Re-run on 2026-10-19 after the trunk sync, in a clean copy at ea1f8c77, again at 32385861 after the empty-body fix, and at 74595f4f after a test-only change — see the last three sections.
 
 ## 1. 重複區塊全部移除並由共用 helper 取代：
    - `gen_flow.py` 與 `gen_arch.py` 內 4 份結構化節點渲染區塊 → 對同一 helper 的呼叫
@@ -198,3 +198,28 @@ Clean copies again: `git worktree add --detach <scratch>/h2 32385861`,
   is running it separately); `finalize-review` executes
   `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
   and refuses the attestation on failure. Result: works.
+
+## Re-run on 2026-10-19, at 74595f4f
+
+Fix range bd3e5ee5..74595f4f (`test(loom-visualization): check string-input
+empty-body errors at the generator entries`): `git diff --stat` shows only
+`loom-workflow/tests/loom-visualization/test_ascii_generators.py` (+15) and
+`test_ascii_width.py` (−14). The two tests added in 32385861
+(`test_EMPTY_BODY_FROM_STRING_constant`,
+`test_empty_body_messages_live_only_in_width`) were removed and replaced by
+`test_string_node_with_empty_body_keeps_its_error_text`, which drives
+`render_flow(["Title\n"])` and `render_arch([{"name": "Title\n", ...}])`
+and asserts the exact error text. No production code changed.
+
+- 1: carried over — no file under `scripts/` changed in bd3e5ee5..74595f4f;
+  the 32385861 source inspection still describes the code.
+- 2: carried over — generators unchanged, so the 26-case golden diff run at
+  32385861 still applies; the new entry-level test independently pins both
+  string-input error texts (see row 3).
+- 3: re-tested — clean copy at 74595f4f:
+  `pytest loom-workflow/tests/loom-visualization -q` → "212 passed,
+  5 skipped" (same Mermaid/node skips); `test_ascii_width.py` → "41 passed";
+  `test_ascii_generators.py::test_string_node_with_empty_body_keeps_its_error_text`
+  → "1 passed"; release metadata → "1 passed". Full package suite not run
+  here (running separately; `finalize-review` executes it and refuses the
+  attestation on failure). Result: works.
