@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-09-28-structured-node-shared-helper",
-  "content_digest": "d0f8a3d2291d6865732367b26478e73ff1edb6cc",
+  "content_digest": "0c6751f3d5bdceb7ce12c371d244b11e51ddba69",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,20 +20,70 @@
   ],
   "verdicts": [
     {
-      "reviewer": "reviewer-1",
-      "vendor": "claude-code",
-      "model": "sonnet",
+      "reviewer": "reviewer-code-20261019",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
       "lens": "code",
       "verdict": "PASS",
-      "findings": []
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-workflow/tests/loom-visualization/test_ascii_width.py:296",
+          "text": "test_EMPTY_BODY_constant only restates the constant's literal."
+        },
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-workflow/tests/loom-visualization/test_ascii_width.py:382",
+          "text": "test_render_structured_node_wrapped_body does not check wrap width."
+        },
+        {
+          "severity": "nit",
+          "dimension": "naming",
+          "anchor": "loom-workflow/skills/loom-visualization/scripts/width.py:150",
+          "text": "Plan task-id comment and '(4 copies)' note in production code."
+        },
+        {
+          "severity": "nit",
+          "dimension": "deletion-first",
+          "anchor": "loom-workflow/skills/loom-visualization/scripts/width.py:173",
+          "text": "Negative-padding clamps are no-op branches the original blocks never had."
+        },
+        {
+          "severity": "nit",
+          "dimension": "naming",
+          "anchor": "loom-workflow/skills/loom-visualization/scripts/gen_arch.py:29",
+          "text": "Four consecutive blank lines after the width import."
+        }
+      ]
     },
     {
-      "reviewer": "reviewer-2",
-      "vendor": "claude-code",
-      "model": "sonnet",
+      "reviewer": "reviewer-spec-20261019",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
       "lens": "spec-conformance",
       "verdict": "PASS",
-      "findings": []
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "spec-conformance",
+          "anchor": "docs/loom/intent/2026-09-28-structured-node-shared-helper.md:17",
+          "text": "Acceptance 1 read literally asks for one constant; HEAD derives EMPTY_BODY_FROM_STRING from EMPTY_BODY (plan Risk 4)."
+        },
+        {
+          "severity": "nit",
+          "dimension": "spec-conformance",
+          "anchor": "loom-workflow/CHANGELOG.md:11",
+          "text": "5.11.1 entry omits EMPTY_BODY_FROM_STRING from the helper list."
+        },
+        {
+          "severity": "nit",
+          "dimension": "spec-conformance",
+          "anchor": "docs/loom/2026-09-28-structured-node-shared-helper/evidence/golden-diff.md:3",
+          "text": "golden-diff.md still describes the first 10-sample run; the 26-case re-run supersedes it."
+        }
+      ]
     }
   ],
   "findings": [],
