@@ -1,6 +1,7 @@
 # 抽出 loom-visualization 產生器共用的渲染 helper — acceptance test evidence
 
 Tried on 2026-09-28, in a clean copy of the project at 344018e0.
+Re-run on 2026-10-19 after the trunk sync, in a clean copy at ea1f8c77 — see the last section.
 
 ## 1. 重複區塊全部移除並由共用 helper 取代：
    - `gen_flow.py` 與 `gen_arch.py` 內 4 份結構化節點渲染區塊 → 對同一 helper 的呼叫
@@ -39,3 +40,104 @@ Tried on 2026-09-28, in a clean copy of the project at 344018e0.
   - Release metadata tests: 9 passed.
   - The full package suite command is `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; `finalize-review` will execute it and block on failure.
 - Evidence: pytest output for both test runs.
+
+## Re-run on 2026-10-19, at ea1f8c77
+
+Context: trunk 6e59e1ea merged in (f1b74b12), loom-workflow re-bumped to
+5.11.1 (72a4600e, ea1f8c77). Fix/sync range e45ab02e..ea1f8c77 touches no
+file under `loom-workflow/skills/loom-visualization/scripts/`
+(`git diff --stat e45ab02e..ea1f8c77 -- loom-workflow/skills/loom-visualization/scripts` is empty),
+and `git diff --stat 946e06d1 6e59e1ea -- loom-workflow/skills/loom-visualization/scripts`
+is empty, so trunk's generators equal the pre-refactor generators. All
+three rows were still re-tested in full, because the merge changed the
+surrounding package (tests, templates, manifests).
+
+Clean copies: `git worktree add --detach <scratch>/at-head HEAD` (ea1f8c77)
+and `git worktree add --detach <scratch>/at-base 6e59e1ea` (pre-refactor
+generators). Interpreter: uv CPython 3.12.11 (the system `/usr/bin/python3`
+is 3.9.6 and cannot import the generators at either commit — `str | dict`
+annotation in `gen_tree.py:38` — pre-existing, same at base).
+
+Setup check: README "Install" installs from the GitHub marketplace, which
+cannot serve an unpushed branch, so the plugin was validated locally
+instead. `claude plugin validate loom-workflow` and `claude plugin validate .`
+at ea1f8c77: "✔ Validation passed with warnings". The two warnings (unquoted
+`${CLAUDE_PLUGIN_ROOT}` in a PostToolUse hook; unknown field
+`requires-contract` on plugins[2]) appear identically at 6e59e1ea —
+pre-existing. The documented skill entry point works:
+`printf '%s' '{"steps":[{"title":"讀取","body":["read 輸入"]},"完成"]}' | python3 scripts/generate.py flow`
+→ a structured box plus a centered box, exit 0.
+
+- 1: re-tested — source inspection at ea1f8c77, every sub-item:
+  - Structured-node render: `width.py:190` `render_structured_node`; called at
+    `gen_flow.py:116` (string-`\n` path), `gen_flow.py:130` (dict path),
+    `gen_arch.py:190` (string path), `gen_arch.py:206` (dict path). No inline
+    title/separator/body block left in either file (`grep -n "├"` hits only
+    docstrings and `gen_arch.py:208`, the component-seam border, not node
+    rendering). Done.
+  - Centering: `width.py:161` `center`; `def _center` absent from
+    `gen_flow.py` and `gen_arch.py` (present at base `gen_flow.py:32`,
+    `gen_arch.py:31`); used at `gen_flow.py:120`, `gen_arch.py:194`. Done.
+  - Empty-body message — **only 3 of the 5 sites use the constant**.
+    `grep -n "Body cannot be empty\|EMPTY_BODY" gen_*.py`:
+    - base 6e59e1ea, 5 literals: `gen_arch.py:199` and `gen_flow.py:126`
+      ("…for structured node from string with \\n"); `gen_arch.py:227`,
+      `gen_flow.py:152`, `gen_tree.py:57` ("…for structured node").
+    - head ea1f8c77: `raise ValueError(EMPTY_BODY)` at `gen_flow.py:128`,
+      `gen_arch.py:204`, `gen_tree.py:57`; but
+      `gen_flow.py:114` and `gen_arch.py:189` still hold the inline literal
+      `raise ValueError("Body cannot be empty for structured node from string with \\n")`.
+    - `width.py:152-158` docstring records the choice: "The longer variant
+      … is specific to string-input paths and remains at those call sites."
+      The plan (`plan.md` W1-04) names no such exception. The two literals
+      are still a duplicate pair across two generators. Using `EMPTY_BODY`
+      there would change the error text (breaking row 2 / the "error
+      messages unchanged" constraint); a second shared constant would satisfy
+      both. The 2026-09-28 run's statement "No … empty-body error strings …
+      remain" was wrong; this gap predates the sync.
+  - Single-line guard: `width.py:176` `require_single_line`; used at
+    `gen_seq.py:71`, `gen_seq.py:73`, `gen_bar.py:29-32` (bar keeps its own
+    message template). Done.
+  - Result: partly.
+- 2: re-tested — golden comparison, base generators (6e59e1ea) vs head
+  generators (ea1f8c77), 26 cases across all six shapes: plain, CJK,
+  string-`\n` structured, dict structured, narrow width forcing CJK/mixed
+  wrapping, an over-wide title, and every error path (empty body dict and
+  string-`\n` for flow/arch, empty body for tree, line breaks `\n` / `\r\n`
+  / `\r` for seq participant, seq label and bar label). Error cases record
+  `ERROR <type>: <message>` so message text is compared too.
+  - Command: `python3.12 -I render_cases.py <at-base>/…/scripts before`,
+    same for `<at-head>` → `after`, then `diff -r before after` → empty
+    ("DIFF EMPTY"), 26 files each.
+  - `align.py` on all 18 non-error outputs, each with its own commit's
+    checker: 17 "✓ no drift" at both commits; `seq-basic` reports
+    "line 8: col 29: '│' at display-col 29 connects to nothing vertically"
+    identically at base and head — pre-existing, outside this change.
+  - Generator tests at ea1f8c77:
+    `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-visualization -q`
+    → "211 passed, 5 skipped". The 5 skips are
+    `test_adversarial_probes.py:194` "node or tests/mermaid/node_modules
+    absent" (Mermaid rendering, not the ASCII generators). The count is lower
+    than 2026-09-28's 233 because trunk PR #97 shrank `test_references.py`,
+    `test_templates.py`, `test_skill_script_paths.py`; no generator test file
+    changed in the sync.
+  - Case list (script kept in the tester's scratch space, cases verbatim):
+    flow-plain, flow-cjk, flow-str-structured, flow-dict-structured,
+    flow-dict-narrow (width 16), flow-mixed-wide (width 12),
+    flow-err-dict-empty, flow-err-str-empty, arch-plain, arch-cjk,
+    arch-str-structured, arch-dict-structured, arch-dict-narrow (width 18),
+    arch-err-dict-empty, arch-err-str-empty, tree-plain, tree-cjk,
+    tree-structured, tree-err-empty, seq-basic, seq-err-participant,
+    seq-err-label, bar-basic, bar-err-label, table-basic, table-ascii.
+  - Result: works.
+- 3: re-tested — this criterion's own tests at ea1f8c77: the helper tests
+  `pytest loom-workflow/tests/loom-visualization/test_ascii_width.py -q` →
+  "41 passed" (includes `test_EMPTY_BODY_constant`, `test_center_*`,
+  `test_require_single_line_*`, `test_render_structured_node_*`); the
+  loom-visualization folder → "211 passed, 5 skipped" (above); release
+  metadata `pytest loom-code/tests/test_write_plan_station_text.py -k "release_metadata or synchronized"`
+  → "1 passed" (manifests agree on 5.11.1). The full package suite was not
+  run here; it is
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`,
+  executed by `finalize-review`, which refuses the attestation on failure.
+  Result: works.
