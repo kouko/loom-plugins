@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """OKF v0.2-compatible Loom memory profile: validator + `index.md` generator.
 
-One parser serves both operations (`validate` and `regenerate-index`) so the
-two never drift against each other — REQ-26 ("one validator implementation")
-and the plan's own risk note ("one parser serves both").
+One parser serves every operation (`init`, `validate`, and
+`regenerate-index`) so validation and regeneration never drift against each
+other — REQ-26 ("one validator implementation") and the plan's own risk
+note ("one parser serves both").
 
 Compatibility surface this module implements (spec.md's pinned "Normative
 external baseline" paragraph, OKF v0.2 at commit 62432a095456...):
@@ -39,11 +40,14 @@ from is itself broken (mirrors the legacy `build_entries` "raise, never
 launder" contract) — see `LoomMemoryError` and `_collect_index_items_strict`.
 
 CLI:
+    python3 loom_memory.py init <store>
     python3 loom_memory.py validate <store>
     python3 loom_memory.py regenerate-index <store>
 
-Exit codes: 0 = clean / written; 1 = at least one violation, or a structural
-problem that blocks regeneration. Every violation line is printed as
+Exit codes: 0 = clean / written; 1 = at least one violation, a structural
+problem that blocks regeneration, or a refused `init` (the target already
+holds content, or is a legacy store that needs an explicit migration).
+Every violation line is printed as
 `[invariant] file: detail`, and a `validate` run always reports every
 offender it finds, not only the first (REQ-17).
 """
@@ -65,6 +69,14 @@ GUIDE_TYPE = "Memory Store Guide"
 # against must carry those same quote characters, not the bare string.
 INDEX_FRONTMATTER = {"okf_version": '"0.2"'}
 INDEX_LINK_LINE_RE = re.compile(r"^-\s+\[[^\]]*\]\((?P<href>.*?)\)\s+—\s+")
+
+# `init` instantiates the bundled templates; the skill layout fixes them as
+# the sibling of `scripts/`, so they resolve relative to this file and never
+# depend on the caller's working directory.
+TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
+README_TEMPLATE_NAME = "memory-store-README.md"
+INDEX_TEMPLATE_NAME = "memory-store-index.md"
+LEGACY_INDEX_HEADING = "## Index"
 
 
 # ---------------------------------------------------------------------------
@@ -247,7 +259,8 @@ class LoomMemoryError(Exception):
     """Raised instead of laundering broken concept metadata into output.
 
     Carries every offending `Violation` found (REQ-17: name every offender,
-    not just the first), never only one.
+    not just the first), never only one. `init_store` raises it too, for the
+    party it must name when it refuses to create.
     """
 
     def __init__(self, violations: list[Violation]):
@@ -565,6 +578,77 @@ def regenerate_index(store: Path) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Store creation (`init`)
+# ---------------------------------------------------------------------------
+
+
+def is_legacy_readme_indexed(store: Path) -> bool:
+    """True only for the legacy README-indexed shape (operations.md,
+    "Legacy stores"): a README.md carrying a `## Index` heading and no
+    generated index.md present.
+
+    Mirrors `migrate_legacy_store.is_legacy_store` line for line. The
+    migration command alone reads the legacy format, but every operation —
+    `init` included — must detect the shape the same way, so a legacy store
+    is never misreported as merely "not empty"; two copies of this boolean
+    free to drift would send the two commands to different verdicts on the
+    same store."""
+    readme = store / "README.md"
+    if not readme.is_file() or (store / "index.md").exists():
+        return False
+    text = readme.read_text(encoding="utf-8")
+    return any(line.strip() == LEGACY_INDEX_HEADING for line in text.split("\n"))
+
+
+def init_store(store: Path) -> None:
+    """Instantiate the bundled templates into a fresh store.
+
+    Writes only when the target is absent or an empty directory. Anything
+    else raises `LoomMemoryError` naming the offender before a single byte
+    is written, so a refusal always leaves the target untouched:
+
+    - an existing populated store is refused — this script is the single
+      writer of reserved store files, and an existing store is never
+      silently overwritten;
+    - a legacy README-indexed store is refused with an explicit-migration
+      report — migration is its own explicit operation
+      (`migrate_legacy_store.py`), never a side effect of creation.
+    """
+    if store.exists() and not store.is_dir():
+        raise LoomMemoryError(
+            [Violation("store-exists", str(store), "the target path exists and is not a directory")]
+        )
+    if is_legacy_readme_indexed(store):
+        raise LoomMemoryError(
+            [
+                Violation(
+                    "legacy-store",
+                    "README.md",
+                    "legacy README-indexed store (a `## Index` heading and no generated index.md); "
+                    "an explicit migration is required — run migrate_legacy_store.py",
+                )
+            ]
+        )
+    if store.exists() and any(store.iterdir()):
+        raise LoomMemoryError(
+            [
+                Violation(
+                    "store-not-empty",
+                    str(store),
+                    "the store directory already holds content; refusing to touch an existing store",
+                )
+            ]
+        )
+    store.mkdir(parents=True, exist_ok=True)
+    (store / "README.md").write_text(
+        (TEMPLATES_DIR / README_TEMPLATE_NAME).read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    (store / "index.md").write_text(
+        (TEMPLATES_DIR / INDEX_TEMPLATE_NAME).read_text(encoding="utf-8"), encoding="utf-8"
+    )
+
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -584,8 +668,21 @@ def main(argv: list[str] | None = None) -> int:
     regen_p = sub.add_parser("regenerate-index", help="deterministically rewrite index.md")
     regen_p.add_argument("store")
 
+    init_p = sub.add_parser("init", help="create a new store from the bundled templates")
+    init_p.add_argument("store")
+
     args = parser.parse_args(argv)
     store = Path(args.store)
+
+    if args.command == "init":
+        try:
+            init_store(store)
+        except LoomMemoryError as exc:
+            print("loom_memory init: FAIL — nothing was created.\n")
+            _print_violations(exc.violations)
+            return 1
+        print(f"loom_memory init: created {store / 'README.md'} and {store / 'index.md'}")
+        return 0
 
     if args.command == "validate":
         violations = validate_bundle(store)
