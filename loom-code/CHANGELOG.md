@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.43.0] — 2026-10-20 — feat(ship): add durable-lesson routing to loom-memory
+
+- `ship` now routes a qualifying durable repository lesson to `loom-workflow:loom-memory` when loom-workflow is installed; when it is not, the routing is silently skipped. It does not replace or reorder Ship's headings, and zero to one durable lesson per change is the normal outcome. Paired loom-workflow 5.12.0 release.
+
 ## [3.42.1] — 2026-10-18 — sync-trunk rebases a never-pushed change branch
 
 - `sync-trunk` now rebases a change branch that has never been pushed onto the fetched trunk tip, so no merge commit is created.
