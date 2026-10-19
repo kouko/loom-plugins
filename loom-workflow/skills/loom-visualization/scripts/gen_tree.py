@@ -27,7 +27,7 @@ last ancestor contributes "   " (three spaces). The connector for a
 node itself is "├─ " unless it is its parent's last child, then "└─ ".
 """
 
-from width import split_lines
+from width import split_lines, EMPTY_BODY
 
 _TEE = "├─ "
 _ELBOW = "└─ "
@@ -54,7 +54,7 @@ def _process_label(label: str | dict) -> list[str]:
     body = label.get("body", [])
 
     if not body:
-        raise ValueError("Body cannot be empty for structured node")
+        raise ValueError(EMPTY_BODY)
 
     lines = [title]
     for item in body:
