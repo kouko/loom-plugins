@@ -1,7 +1,7 @@
 # 抽出 loom-visualization 產生器共用的渲染 helper — acceptance test evidence
 
 Tried on 2026-09-28, in a clean copy of the project at 344018e0.
-Re-run on 2026-10-19 after the trunk sync, in a clean copy at ea1f8c77 — see the last section.
+Re-run on 2026-10-19 after the trunk sync, in a clean copy at ea1f8c77, and again at 32385861 after the empty-body fix — see the last two sections.
 
 ## 1. 重複區塊全部移除並由共用 helper 取代：
    - `gen_flow.py` 與 `gen_arch.py` 內 4 份結構化節點渲染區塊 → 對同一 helper 的呼叫
@@ -141,3 +141,60 @@ pre-existing. The documented skill entry point works:
   `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`,
   executed by `finalize-review`, which refuses the attestation on failure.
   Result: works.
+
+## Re-run on 2026-10-19, at 32385861
+
+Fix range 1dc85bd1..32385861 (`fix(loom-workflow): route string-input
+empty-body errors through width.py`): `width.py` adds
+`EMPTY_BODY_FROM_STRING = EMPTY_BODY + " from string with \\n"`;
+`gen_flow.py:114` and `gen_arch.py:189` raise it; `test_ascii_width.py`
+gains two tests; `plan.md` gains Risk 4 (agent-decided, line 63). The fix
+touches the shared helper module and two generators, so rows 1, 2 and 3 can
+all be affected; all three re-tested in full.
+
+Clean copies again: `git worktree add --detach <scratch>/h2 32385861`,
+`git worktree add --detach <scratch>/b2 6e59e1ea`. Interpreter uv CPython
+3.12.11. Setup: the documented entry point
+`printf '%s' '<json>' | python3 scripts/generate.py <shape>` still runs.
+
+- 1: re-tested — every sub-item, at 32385861:
+  - Structured-node render: `render_structured_node` called at
+    `gen_flow.py:116`, `gen_flow.py:130`, `gen_arch.py:190`,
+    `gen_arch.py:206`. Done.
+  - Centering: no `def _center` in any generator; `center` used at
+    `gen_flow.py:120`, `gen_arch.py:194`. Done.
+  - Empty-body message: `grep -n "Body cannot be empty\|EMPTY_BODY" gen_*.py width.py`
+    → the literal appears once, at `width.py:152` (`EMPTY_BODY`);
+    `width.py:158` derives `EMPTY_BODY_FROM_STRING` from it. Raises:
+    `gen_flow.py:114` and `gen_arch.py:189` (`EMPTY_BODY_FROM_STRING`),
+    `gen_flow.py:128`, `gen_arch.py:204`, `gen_tree.py:57` (`EMPTY_BODY`).
+    All 5 sites now come from the one shared constant; no inline message
+    is left in any generator. The two-name design (rather than one
+    literal for all 5, which would change error text) is recorded as plan
+    Risk 4. Done.
+  - Single-line guard: `require_single_line` at `gen_seq.py:71`,
+    `gen_seq.py:73`, `gen_bar.py:29`. Done.
+  - Result: works.
+- 2: re-tested — the same 26-case battery, base generators (6e59e1ea)
+  vs 32385861 generators: `diff -r r2/before r2/after` → empty
+  ("DIFF EMPTY"). Both string-input error paths give the identical message
+  at both commits:
+  `flow-err-str-empty` and `arch-err-str-empty` →
+  `ERROR ValueError: Body cannot be empty for structured node from string with \n`.
+  Through the CLI: `printf '%s' '{"steps":["Title\n"]}' | python3 generate.py flow`
+  and `printf '%s' '{"layers":[{"name":"T\n","components":["c"]}]}' | python3 generate.py arch`
+  → `generate.py <shape>: Body cannot be empty for structured node from string with \n`,
+  exit 1, the same at base and head. `align.py` on the 18 non-error
+  outputs: 17 "✓ no drift" at both commits; `seq-basic` reports the same
+  pre-existing "line 8: col 29 … connects to nothing vertically" at both.
+  Generator tests: `pytest loom-workflow/tests/loom-visualization -q` →
+  "213 passed, 5 skipped" (same Mermaid/node skips). Result: works.
+- 3: re-tested — this criterion's own tests at 32385861:
+  `test_ascii_width.py` → "43 passed" (incl. the new
+  `test_EMPTY_BODY_FROM_STRING_constant` and
+  `test_empty_body_messages_live_only_in_width`); loom-visualization →
+  "213 passed, 5 skipped"; release metadata (`-k "release_metadata or synchronized"`)
+  → "1 passed". The full package suite was not run here (the coordinator
+  is running it separately); `finalize-review` executes
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+  and refuses the attestation on failure. Result: works.
