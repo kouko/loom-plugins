@@ -1127,13 +1127,38 @@ def test_arch_single_line_string_name_long_title_unchanged():
     )
 
 
-def test_arch_empty_title_one_cell_body_keeps_trunk_error():
-    # arch-empty-title-one-cell-body-keeps-trunk-error
-    import pytest
+def test_arch_widest_body_line_stays_unbroken():
+    # arch-dict-widest-body-line-unbroken
+    dict_name = {"title": "API", "body": ["handles requests"]}
+    for name, kwargs in ((dict_name, {}), (dict_name, {"width": 40}), ("API\nhandles requests", {})):
+        out = _render_isolated("arch", [{"name": name, "components": ["auth", "db"]}], **kwargs)
+        _assert_aligned(out, "API")
+        assert "handles requests" in out, out
+
+
+def test_arch_dict_body_wider_than_budget_still_wraps():
+    # arch-dict-body-wider-than-budget-still-wraps
+    layers = [{"name": {"title": "API", "body": ["handles requests"]}, "components": ["auth", "db"]}]
+    out = _render_isolated("arch", layers, width=10)
+    _assert_aligned(out, "API")
+    assert "handles requests" not in out and "requests" in out, out
+
+
+def test_arch_empty_name_no_components_aligned():
+    # arch-empty-name-no-components-aligned
+    _assert_aligned(_render_isolated("arch", [{"name": "", "components": []}]), "")
+
+
+def test_arch_one_cell_name_no_components_unchanged():
+    # arch-one-cell-name-no-components-unchanged: trunk 5e850c70 output.
+    assert render_arch([{"name": "A", "components": []}]) == "┌─┐\n│A│\n├─┤\n│ │\n└─┘"
+
+
+def test_arch_empty_title_one_cell_body_aligned():
+    # arch-empty-title-one-cell-body-aligned / -width-1-aligned
     for name in ({"title": "", "body": ["x"]}, "\nx"):
-        with pytest.raises(ValueError) as error:
-            render_arch([{"name": name, "components": []}])
-        assert str(error.value) == "max_width must be positive"
+        for kwargs in ({}, {"width": 1}):
+            _assert_aligned(_render_isolated("arch", [{"name": name, "components": []}], **kwargs), "x")
 
 
 def test_flow_cjk_body_width_0_aligned():

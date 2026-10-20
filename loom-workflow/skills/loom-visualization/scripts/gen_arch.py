@@ -95,7 +95,8 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
         name_width = _name_width(layer["name"])
         # For dict name, apply budget to body width; for string name, body width is 0
         body_width = _body_width(layer["name"])
-        bounded_body_width = min(body_width, budget) if layer["name"] and isinstance(layer["name"], dict) else 0
+        # Body lines draw after one leading space, so the widest needs +1.
+        bounded_body_width = min(body_width + 1, budget) if layer["name"] and isinstance(layer["name"], dict) else 0
         # For dict name, the effective name width is max(title width, bounded body width)
         if isinstance(layer["name"], dict):
             effective_name_width = max(name_width, bounded_body_width)
@@ -106,23 +107,25 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
 
     # A structured name draws its title after one leading space and wraps its
     # body at interior - 1, so the interior must hold the title plus that space
-    # and the widest single body character plus it. The character term applies
-    # only to two-cell characters, so a one-cell body keeps trunk's error.
-    # Single-line string names are centered with no leading space and keep
-    # their sizing.
+    # and the widest single body character plus it. A string name's body is
+    # not budget-capped, so its widest body line plus that space also fits
+    # whole. Single-line string names are centered with no leading space and
+    # keep their sizing.
     def _structured_floor(name: Union[str, dict]) -> int:
         if isinstance(name, dict):
-            title, body = name["title"], name["body"]
+            title, body, widest_line = name["title"], name["body"], 0
         elif '\n' in name:
             title, *body = split_lines(name)
+            widest_line = max((display_width(ln) for ln in body), default=0) + 1
         else:
             return 0
         widest_char = max((char_width(c) for ln in body for c in ln), default=0)
-        return max(display_width(title) + 1, widest_char + 1 if widest_char > 1 else 0)
+        return max(display_width(title) + 1, widest_char + 1, widest_line)
 
-    interior = max(
+    # Floor at 1 so an empty name with no components still lines up.
+    interior = max(1, max(
         get_layer_width(layer) for layer in layers
-    )
+    ))
 
     lines: list[str] = []
     for layer in layers:
