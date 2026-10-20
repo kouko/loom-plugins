@@ -7,7 +7,7 @@ charter: 1.1
 Wave 1 — the runner's progress reporting, then the skill instruction with release metadata.
 
 **W1-01 Progress and closing lines from the outside-review runner**  after: none  acceptance: 1, 2, 4
-- Files: loom-code/scripts/external_review.py (entry: `_launch`), loom-code/tests/test_external_review.py
+- Files: loom-code/scripts/external_review.py (entry: `execute`), loom-code/tests/test_external_review.py
 - Test: A1 positive: review_step_prints_progress_each_interval; negative: step_shorter_than_interval_prints_no_progress. A2 positive: closing_line_reports_longest_silence; boundary: timeout_prints_timed_out_closing_line. A4 positive: json_result_unchanged_with_progress; negative: discovery_prints_no_progress.
 - Risk: agent-decided: no new thread; the wait loop wakes each interval, readers record line times, closing line follows the loop. `execute` passes the stage label; existing test_external_review.py cases preserved.
 

@@ -7,6 +7,7 @@ import subprocess
 
 import external_review as review
 import pytest
+from prose_pin import affirms
 
 
 def consent(executor="codex", scope="/repo", model=None, effort="high"):
@@ -990,51 +991,84 @@ def test_review_timeout_default_is_thirty_minutes(monkeypatch):
     assert result["reason"] == "invalid-explicit-profile"
 
 
-def _py(code):
-    import sys
-    return [sys.executable, "-c", code]
-
-
 def _progress_lines(text):
     return [line for line in text.splitlines() if line.startswith("external-review:")]
 
 
+_FAKE_CLAUDE_STEPS = """#!{python}
+import json, sys
+text = sys.stdin.read()
+exec({probe!r} if "single word ok" in text else {review!r})
+print(json.dumps({{"result": "ok", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}), flush=True)
+"""
+
+
+def _execute_claude(tmp_path, monkeypatch, *, probe_code="", review_code="",
+                    probe_timeout=45, review_timeout=60):
+    """Run review.execute against a fake `claude` CLI; each step runs its code first."""
+    import sys
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    script = bin_dir / "claude"
+    script.write_text(_FAKE_CLAUDE_STEPS.format(python=sys.executable, probe=probe_code,
+                                                review=review_code))
+    script.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
+    return review.execute("claude", "sonnet", "high", "anthropic", str(tmp_path),
+                          "REVIEW-PACKET", consent("claude", scope=str(tmp_path)),
+                          probe_timeout=probe_timeout, review_timeout=review_timeout)
+
+
+def _closing_seconds(line, outcome):
+    """(total, longest silence) in seconds from one step's closing line."""
+    match = re.fullmatch(rf"external-review: {outcome} after (\d+)s · longest silence (\d+)s",
+                         line)
+    assert match, line
+    return int(match.group(1)), int(match.group(2))
+
+
 def test_review_step_prints_progress_each_interval(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(review, "PROGRESS_INTERVAL", 0.3)
-    review._launch(_py("import time; time.sleep(1.1)"), input="", timeout=10,
-                   cwd=str(tmp_path), progress="review")
+    result = _execute_claude(tmp_path, monkeypatch,
+                             review_code="import time; time.sleep(1.1)")
+    assert result["status"] == "completed", result
     lines = _progress_lines(capsys.readouterr().err)
-    running = [line for line in lines if "still running" in line]
+    running = [line for line in lines if "review still running" in line]
     assert len(running) >= 2, lines
     assert all(re.fullmatch(r"external-review: review still running · \d+s elapsed"
                             r" · (last output \d+s ago|no output yet)", line)
                for line in running), running
 
 
-def test_step_shorter_than_interval_prints_no_progress(tmp_path, capsys):
-    review._launch(_py("print('hi')"), input="", timeout=10, cwd=str(tmp_path),
-                   progress="probe")
+def test_step_shorter_than_interval_prints_no_progress(tmp_path, monkeypatch, capsys):
+    result = _execute_claude(tmp_path, monkeypatch)
+    assert result["status"] == "completed", result
     lines = _progress_lines(capsys.readouterr().err)
     assert not [line for line in lines if "still running" in line], lines
-    assert len(lines) == 1 and lines[0].startswith("external-review: probe exited 0 after ")
+    assert [line.split(" after ")[0] for line in lines] == [
+        "external-review: probe exited 0", "external-review: review exited 0"], lines
 
 
-def test_closing_line_reports_longest_silence(tmp_path, capsys):
-    review._launch(_py("import sys, time; print('a', flush=True); time.sleep(1.3);"
-                       " print('b', flush=True); sys.exit(3)"),
-                   input="", timeout=10, cwd=str(tmp_path), progress="review")
+def test_closing_line_reports_longest_silence(tmp_path, monkeypatch, capsys):
+    result = _execute_claude(tmp_path, monkeypatch, review_code=(
+        "import time; print('a', flush=True); time.sleep(1.3);"
+        " print('b', flush=True); sys.exit(3)"))
+    assert result["reason"].startswith("review-exit-3"), result
+    lines = _progress_lines(capsys.readouterr().err)
+    closing = [line for line in lines if line.startswith("external-review: review ")]
+    assert len(closing) == 1, lines
+    total, silence = _closing_seconds(closing[0], "review exited 3")
+    assert total >= 1 and 1 <= silence <= total, closing
+
+
+def test_timeout_prints_timed_out_closing_line(tmp_path, monkeypatch, capsys):
+    result = _execute_claude(tmp_path, monkeypatch, probe_code="import time; time.sleep(10)",
+                             probe_timeout=1, review_timeout=2)
+    assert result["reason"] == "execution-timeout: 1s", result
     lines = _progress_lines(capsys.readouterr().err)
     assert len(lines) == 1, lines
-    assert re.fullmatch(r"external-review: review exited 3 after 1s · longest silence 1s",
-                        lines[0]), lines
-
-
-def test_timeout_prints_timed_out_closing_line(tmp_path, capsys):
-    with pytest.raises(subprocess.TimeoutExpired):
-        review._launch(_py("import time; time.sleep(10)"), input="", timeout=1,
-                       cwd=str(tmp_path), progress="probe")
-    lines = _progress_lines(capsys.readouterr().err)
-    assert lines == ["external-review: probe timed out after 1s · longest silence 1s"]
+    total, silence = _closing_seconds(lines[0], "probe timed out")
+    assert total >= 1 and 1 <= silence <= total, lines
 
 
 _FAKE_CLAUDE_OK = """#!{python}
@@ -1088,14 +1122,26 @@ def _execute_section():
     return " ".join(match.group(0).lower().split())
 
 
+def _affirms_relay(text):
+    return affirms(text, "relay", "progress line", "user", "visible")
+
+
+def _affirms_one_json_stdout(text):
+    return affirms(text, "stdout", "one json result")
+
+
 def test_execute_section_names_progress_relay():
-    text = _execute_section()
-    for concept in ("progress", "closing line", "error stream", "visible",
-                    "background", "relay", "user"):
-        assert concept in text, concept
-    assert "silently" in text
+    assert _affirms_relay(_execute_section())
 
 
 def test_execute_section_still_names_one_json_result():
-    text = _execute_section()
-    assert "one json result" in text and "stdout" in text
+    assert _affirms_one_json_stdout(_execute_section())
+
+
+def test_execute_section_pins_reject_negated_samples():
+    assert _affirms_relay("keep the error stream visible and relay each progress line"
+                          " to the user.")
+    assert not _affirms_relay("keep the error stream visible but do not relay progress"
+                              " lines to the user; wait silently.")
+    assert _affirms_one_json_stdout("stdout remains the one json result.")
+    assert not _affirms_one_json_stdout("stdout no longer remains the one json result.")
