@@ -10,8 +10,11 @@ Versioning follows [Semantic Versioning](https://semver.org/).
   wider than the wrap width; it takes one character per line.
 - `render_arch` widens a structured layer (dict name, or multi-line
   string name) just enough to hold its title after the leading space
-  and its widest body character, so the title no longer overflows the
-  right border and narrow widths no longer hang.
+  and its widest two-cell body character, so the title no longer
+  overflows the right border and narrow widths no longer hang.
+- `render_flow` widens a structured step just enough to hold its widest
+  two-cell body character, so a width budget of zero or less no longer
+  hangs.
 - Other inputs render unchanged.
 
 ## [5.12.1] — 2026-10-20 — structured-node helper cleanup
