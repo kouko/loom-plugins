@@ -16,6 +16,11 @@ Wave 1 — the runner's progress reporting, then the skill instruction with rele
 - Test: A3 positive: execute_section_names_progress_relay; boundary: execute_section_still_names_one_json_result. A4 positive: test_current_release_metadata_is_synchronized at 3.43.0; negative: fails if any manifest stays 3.42.1.
 - Risk: agent-decided minor bump because skill station guidance changes; host-neutral wording (keep the error stream visible, relay each line); no verbatim sentence pin.
 
+**W1-03 Graduate the progress adversarial programs into the suite**  after: W1-01  acceptance: 4
+- Files: loom-code/tests/test_adversarial_external_review_progress.py, docs/loom/2026-10-19-external-review-progress-lines/evidence/probes/
+- Test: A4 positive: test_abuse_progress_closed_stderr keeps stdout pure JSON; negative: test_abuse_progress_broken_stderr keeps a completed review completed.
+- Risk: agent-decided: move both red-then-green probes unchanged in behaviour so every later change runs them; the probe store keeps no copy.
+
 ## Simplicity check
 - agent reports elapsed time itself with no code change — declined: cannot see time since last output or record longest silence, which the user asked for
 - progress inside `_launch`'s wait loop instead of a separate ticker thread from `execute` — taken
