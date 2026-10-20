@@ -120,8 +120,16 @@ def _duration(seconds: float) -> str:
 
 def _say(text: str) -> None:
     # Progress lines carry only step name, outcome and durations: never CLI
-    # or packet text. stdout stays the single JSON result.
-    print(f"external-review: {text}", file=sys.stderr, flush=True)
+    # or packet text. stdout stays the single JSON result. They are
+    # diagnostics: a closed or failing stderr never reaches stdout or the result.
+    if sys.stderr is None:
+        return
+    try:
+        print(f"external-review: {text}", file=sys.stderr, flush=True)
+    except (OSError, ValueError):
+        # Drop the failed stream: its unflushed line would otherwise fail
+        # again at interpreter exit and turn the exit code into 120.
+        sys.stderr = None
 
 
 def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
