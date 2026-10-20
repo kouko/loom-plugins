@@ -9,6 +9,23 @@ Setup check: the skill's documented entry point
 (`printf '%s' '<json>' | python3 <skill-dir>/scripts/generate.py <shape>`, SKILL.md:122)
 ran from the clean copy with no extra install; every sample below went through it.
 
+## Re-run after the release re-application (2026-10-20, HEAD 0a1641b2)
+
+Fix range `bedeeda1..0a1641b2`: 43a71dad (release files aligned to trunk),
+7a650a18 (merge of origin/main 76919786: PR #101 loom-workflow 5.12.0, PR #102),
+0a1641b2 (CHANGELOG edits re-applied, loom-workflow bumped to 5.12.1).
+
+- Setup check: fresh `git worktree add --detach` copies of 0a1641b2 and of
+  trunk 76919786 in the session scratchpad; `generate.py` ran from the clean
+  0a1641b2 copy with no extra install. Both copies removed afterwards
+  (`git worktree list` shows none).
+- Scope check: `git diff --stat bedeeda1..0a1641b2 -- loom-workflow/skills/loom-visualization loom-workflow/tests/loom-visualization docs/loom/2026-09-28-structured-node-shared-helper docs/loom/intent/2026-09-28-structured-node-shared-helper.md`
+  → empty. `git diff --stat f055b428..76919786 -- loom-workflow/skills/loom-visualization`
+  → empty (trunk did not touch the generators). `git merge-base HEAD 76919786` = 76919786.
+- Re-tested: lines 1, 5, 6 (sections marked "Re-run" below).
+- Carried over: line 2 and line 3 (no generator code or visualization test
+  changed in the fix range); line 4 (no generator code changed in the fix range).
+
 ## 1. For the same inputs, including every error path, all five diagram generators produce output and error messages byte-identical to trunk before this change.
 - How I tried it: a scratch harness ran 31 JSON payloads through
   `generate.py` in both clean copies (`python3 -I`, 10 s timeout each) and
@@ -41,6 +58,20 @@ ran from the clean copy with no extra install; every sample below went through i
   this change.
 - Evidence: scratch harness output above; tests named above.
 - Suite check: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+- Re-run (0a1641b2 vs trunk 76919786): a new scratch harness ran 31 payloads
+  of the same classes (flow, arch, tree, seq, bar, unknown shape; plain, CJK,
+  structured dict and string, over-wide titles, wrapping body, every empty-body
+  and line-break error, seq unknown participant) through `generate.py` in both
+  clean copies (`python3 -I`, 10 s timeout), comparing exit code, stdout and
+  stderr with each checkout root replaced by `<ROOT>` in stderr.
+  Result: `samples=31 differing=0`; error texts as listed above plus
+  `generate.py seq: line break not supported in participant name: 'A\nB'` and
+  `unknown shape: 'nosuch' (expected one of (...))`. Helper harness on 11
+  `center` / `render_structured_node` cases (`center("abc", -5)`,
+  `render_structured_node("很寬的標題文字", ["內容"], 6)`, …): `cases=11 identical=11`;
+  `EMPTY_BODY` and `EMPTY_BODY_FROM_STRING` equal. Criterion tests in the clean
+  copy (`test_ascii_generators.py`, `test_ascii_width.py`, plus
+  `loom-workflow/tests/scripts/test_release_metadata.py`): `86 passed`.
 
 ## 2. The structured-node wrapping test fails when the width the body wraps at is changed.
 - How I tried it: in the scratch HEAD copy only, edited
@@ -100,6 +131,18 @@ ran from the clean copy with no extra install; every sample below went through i
 - Evidence: `loom-workflow/CHANGELOG.md:14-21`;
   `docs/loom/2026-09-28-structured-node-shared-helper/evidence/golden-diff.md:13`;
   `docs/loom/intent/2026-09-28-structured-node-shared-helper.md:19`.
+- Re-run (0a1641b2 vs trunk 76919786): `git diff 76919786..HEAD -- loom-workflow/CHANGELOG.md`
+  shows a new `## [5.12.1] — 2026-10-20 — structured-node helper cleanup`
+  entry above 5.12.0 and one changed line in the 5.11.1 entry, which now reads
+  `` `EMPTY_BODY_FROM_STRING`, `require_single_line`); flow, arch, tree, seq and bar generators ``
+  — with `render_structured_node`, `center`, `EMPTY_BODY` on the line above,
+  all five helpers PR #63 added are named. `git diff --numstat 76919786..HEAD`
+  on the two merged records: golden-diff `2 0`, old intent `1 0` (additions
+  only). Every current loom-workflow version string reads 5.12.1 (root
+  `README.md:18,150`, `loom-workflow/plugin.json`, `package.json`,
+  `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, the three
+  READMEs, `CURRENT` in `test_release_metadata.py:19`); that test passed
+  inside the 86-pass run in line 1.
 
 ## 6. The complete package suite passes.
 - How I tried it: from the change worktree
@@ -109,3 +152,7 @@ ran from the clean copy with no extra install; every sample below went through i
   pytest blocks all `passed` (e.g. `161 passed`, `128 passed`), no `failed`.
 - Evidence: command and exit code above. `finalize-review` re-runs this suite
   and refuses the attestation on failure.
+- Re-run: same command from the same worktree path at 0a1641b2 (clean tree,
+  `git status --short` empty) → exit code 0; log 547 lines, no `failed` and
+  no non-zero `FAIL` count; largest pytest block `2320 passed, 2 skipped`,
+  others e.g. `196 passed, 1 skipped`, `260 passed`, `64 passed`.
