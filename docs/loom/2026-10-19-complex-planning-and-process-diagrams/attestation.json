@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-19-complex-planning-and-process-diagrams",
-  "content_digest": "0932274749bc5e398f5a08f322d7d16ad32b7cfe",
+  "content_digest": "50dea7bff8fa4a2373686f8948635fe575654fbf",
   "executions": [
     {
       "kind": "package-tests",
@@ -12,30 +12,30 @@
     },
     {
       "kind": "adversarial",
-      "command": "python3 -m pytest loom-workflow/tests/loom-visualization/test_templates.py",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-visualization/test_templates.py -q",
       "artifact": "loom-workflow/tests/loom-visualization/test_templates.py",
       "result": "pass",
-      "command_digest": "b61e23622efe78f151ebc419f9b92203edf941c36a28274f225e5d57cb555470"
+      "command_digest": "ae44dbc839b113d63be578bd779a299b277311211e29f1be651f4f3daf0aa2d3"
     }
   ],
   "verdicts": [
     {
-      "reviewer": "complex-code-reviewer",
+      "reviewer": "pr99-code-reviewer",
       "vendor": "openai",
       "model": "inherited-host-profile",
       "lens": "code",
-      "verdict": "PASS",
-      "reviewed_sha": "ba092534c7424f304b2250271f0bf701d6e2b5fa",
-      "review_target_sha": "1a175d482249a3d236b51e31a73afe749731b078",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "5e850c702ffef4402e121a17e473ccf71e988628",
+      "review_target_sha": "8ac89d3cd543949e8d588e7e681e1a9ac8630797",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
-        "correctness": "PASS",
+        "correctness": "PASS_WITH_NOTES",
         "naming": "PASS",
         "tests": "PASS",
         "refactoring": "PASS",
         "cross-task-coherence": "PASS",
-        "external-surface-grounding": "PASS",
+        "external-surface-grounding": "PASS_WITH_NOTES",
         "principles-conformance": "PASS",
         "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
         "deliberate-simplification": "PASS",
@@ -43,19 +43,19 @@
       },
       "findings": [],
       "notes": [
-        "Previous finding fixed: the cross-role test now checks each Mermaid owner and both labeled handoffs.",
-        "Changed test files passed: 21 template tests and 25 ASCII CLI tests.",
-        "The new alignment checks reject the recorded displaced join and handoff while accepting corrected examples."
+        "Changed test files passed independently: 60 passed in 1.03s. The focused package environment could not acquire its cache lock; the available pytest executable ran all three changed test files.",
+        "The new Mermaid examples were inspected for relationship consistency, but actual rendering in a Mermaid host remains unverified, as the acceptance report also discloses.",
+        "The release metadata consistently uses 5.13.0 after rebase onto 5.12.2; git diff --check is clean."
       ]
     },
     {
-      "reviewer": "complex-skill-reviewer",
+      "reviewer": "pr99-skill-reviewer",
       "vendor": "openai",
       "model": "inherited-host-profile",
       "lens": "skill",
       "verdict": "PASS",
-      "reviewed_sha": "ba092534c7424f304b2250271f0bf701d6e2b5fa",
-      "review_target_sha": "1a175d482249a3d236b51e31a73afe749731b078",
+      "reviewed_sha": "5e850c702ffef4402e121a17e473ccf71e988628",
+      "review_target_sha": "8ac89d3cd543949e8d588e7e681e1a9ac8630797",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -67,9 +67,8 @@
       },
       "findings": [],
       "notes": [
-        "fixed: The ASCII test now includes both new unboxed diagrams, and the acceptance evidence accurately identifies the initial coverage gap and subsequent reruns.",
-        "The focused template and command-line checks passed. The command-line checker rejects the reproduced misaligned join and handoff while accepting their corrected forms.",
-        "Actual Mermaid rendering remains unverified and is disclosed as a limitation in the acceptance report."
+        "Both new templates state when to use them, distinguish required joins from choices and owned work from message sequences, and provide matching table, ASCII, and Mermaid examples.",
+        "Both ASCII examples passed align.py; all four release manifests report 5.13.0, with matching README pins and a changelog entry after 5.12.2."
       ]
     }
   ],
