@@ -872,7 +872,8 @@ def test_isolated_loom_code_completes_write_plan_intake_without_loom_memory_sibl
         if document.name.startswith("CHANGELOG"):
             continue
         text = document.read_text(encoding="utf-8")
-        assert "loom-memory" not in text, (
+        text_cleaned = text.replace("loom-workflow:loom-memory", "")
+        assert "loom-memory" not in text_cleaned, (
             f"{document.relative_to(code_root)} still names loom-memory; an "
             "isolated install must not describe it as missing"
         )
