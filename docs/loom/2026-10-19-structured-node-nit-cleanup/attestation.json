@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-19-structured-node-nit-cleanup",
-  "content_digest": "77ba3de14bdf2612c559afda263f2380b6440e81",
+  "content_digest": "5749d1a4653d57f2871861dfec0b49398cea1b6b",
   "executions": [
     {
       "kind": "package-tests",
