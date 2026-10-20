@@ -28,8 +28,6 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from width import display_width, split_lines, center, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
 
 
-
-
 def _cell_width(label: str) -> int:
     """Display width of a (possibly multi-line) cell: one pad space each
     side of the WIDEST physical line + that widest line."""

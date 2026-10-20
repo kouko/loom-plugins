@@ -147,7 +147,7 @@ def wrap_label(text: str, max_width: int) -> list[str]:
     return lines
 
 
-# W1-01: Shared helpers for structured node rendering and single-line validation
+# Shared helpers for structured node rendering and single-line validation
 
 EMPTY_BODY = "Body cannot be empty for structured node"
 """Error message for empty structured node body.
@@ -170,8 +170,6 @@ def center(label: str, interior: int) -> str:
     Negative slack (label wider than interior) yields no padding.
     """
     slack = interior - display_width(label)
-    if slack < 0:
-        slack = 0
     left = slack // 2
     right = slack - left
     return " " * left + label + " " * right
@@ -194,7 +192,7 @@ def require_single_line(value: str, phrase: str, *,
 def render_structured_node(title: str, body: list[str], interior: int) -> list[str]:
     """Return the title line, separator line, and wrapped body lines for a structured node.
 
-    This is the shared block used by gen_flow.py and gen_arch.py (4 copies).
+    This is the shared block used by gen_flow.py and gen_arch.py.
     Does NOT validate that body is non-empty; callers own that validation.
     Returns only the inner lines (excludes box top/bottom borders).
 
@@ -210,8 +208,6 @@ def render_structured_node(title: str, body: list[str], interior: int) -> list[s
 
     # Title line (left-aligned): "│ " + title + padding + "│"
     title_padding = interior - display_width(title) - 1
-    if title_padding < 0:
-        title_padding = 0
     lines.append("│ " + title + " " * title_padding + "│")
 
     # Separator line: "├" + "─" * interior + "┤"
@@ -222,8 +218,6 @@ def render_structured_node(title: str, body: list[str], interior: int) -> list[s
         wrapped_lines = wrap_label(body_line, interior - 1)
         for wrapped_line in wrapped_lines:
             body_padding = interior - display_width(wrapped_line) - 1
-            if body_padding < 0:
-                body_padding = 0
             lines.append("│ " + wrapped_line + " " * body_padding + "│")
 
     return lines

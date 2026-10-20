@@ -1041,3 +1041,23 @@ def test_string_node_with_empty_body_keeps_its_error_text():
         render_arch([{"name": "Title\n", "components": ["a"]}])
     assert str(flow_error.value) == expected
     assert str(arch_error.value) == expected
+
+
+def test_dict_node_with_empty_body_keeps_its_error_text():
+    # WHY: flow steps, arch layer names and tree labels given as
+    # {"title", "body"} dicts with an empty body must keep the exact message
+    # they raised before the shared-helper refactor, so callers matching it
+    # keep working.
+    import pytest
+
+    expected = "Body cannot be empty for structured node"
+    empty = {"title": "Title", "body": []}
+    with pytest.raises(ValueError) as flow_error:
+        render_flow([empty])
+    with pytest.raises(ValueError) as arch_error:
+        render_arch([{"name": empty, "components": ["a"]}])
+    with pytest.raises(ValueError) as tree_error:
+        render_tree({"label": empty})
+    assert str(flow_error.value) == expected
+    assert str(arch_error.value) == expected
+    assert str(tree_error.value) == expected
