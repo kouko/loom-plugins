@@ -136,6 +136,14 @@ validates that text. Any other status is a failed outside leg. Never reuse a
 preflight as the review, call a default model, downgrade effort, switch CLI, or
 count a failed leg as a completed review.
 
+While the preflight or review runs, the script writes progress lines to its
+error stream about once a minute (step, elapsed time, time since the CLI last
+produced output) and one closing line when the step ends (total time, longest
+silence). Keep that error stream visible while you wait — for example, run the
+command in the background and watch its output — and relay each progress line
+to the user instead of waiting silently. These lines never carry the packet or
+the review text; stdout remains the one JSON result.
+
 The execution asks Codex for a read-only command sandbox, Claude Code for plan
 mode with only `Read`, `Glob`, and `Grep` model tools, and Antigravity for plan
 mode with its terminal sandbox. For each Antigravity probe and review, the
