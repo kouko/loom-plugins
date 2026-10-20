@@ -1077,3 +1077,25 @@ def test_discovery_prints_no_progress(tmp_path, monkeypatch, capsys):
     result = review.discover("agy", str(tmp_path), consent("agy", scope=str(tmp_path)))
     assert result["candidates"] == ["gemini-2.5-pro"], result
     assert _progress_lines(capsys.readouterr().err) == []
+
+
+def _execute_section():
+    from pathlib import Path
+    skill = (Path(review.__file__).resolve().parents[1] / "skills"
+             / "external-review" / "SKILL.md").read_text()
+    match = re.search(r"^## Execute$.*?(?=^## |\Z)", skill, re.M | re.S)
+    assert match, "## Execute missing"
+    return " ".join(match.group(0).lower().split())
+
+
+def test_execute_section_names_progress_relay():
+    text = _execute_section()
+    for concept in ("progress", "closing line", "error stream", "visible",
+                    "background", "relay", "user"):
+        assert concept in text, concept
+    assert "silently" in text
+
+
+def test_execute_section_still_names_one_json_result():
+    text = _execute_section()
+    assert "one json result" in text and "stdout" in text

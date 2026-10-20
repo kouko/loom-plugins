@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.43.0] — 2026-10-20 — outside review steps report progress while they run
+
+- While an outside preflight or review runs, `external_review.py` writes a progress line to stderr about once a minute: the step, the elapsed time, and the time since the CLI last produced output. When the step ends — exited or timed out — one closing line reports its total time and the longest silence.
+- Progress lines carry only the step name, outcome and durations, never the review packet or CLI output. Discovery prints none. stdout stays the single JSON result, and no time limit, status or outcome changes.
+- The external-review skill's Execute section tells the agent to keep the runner's error stream visible while it waits and relay each progress line to the user instead of waiting silently.
+
 ## [3.42.1] — 2026-10-18 — sync-trunk rebases a never-pushed change branch
 
 - `sync-trunk` now rebases a change branch that has never been pushed onto the fetched trunk tip, so no merge commit is created.
