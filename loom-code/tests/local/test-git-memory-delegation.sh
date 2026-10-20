@@ -45,7 +45,9 @@ fi
 # Check 2 — offline: ship routes a qualifying durable repository lesson to
 # loom-workflow:loom-memory beside the git-memory classification.
 
-if grep -q "loom-workflow:loom-memory" "${SHIP_SKILL}" && grep -q "durable repository lesson" "${SHIP_SKILL}"; then
+if grep -q "^[[:space:]]*Use \`loom-workflow:loom-memory\`" "${SHIP_SKILL}" \
+   && ! grep -q "^[[:space:]]*Never use \`loom-workflow:loom-memory\`" "${SHIP_SKILL}" \
+   && grep -q "durable repository lesson" "${SHIP_SKILL}"; then
   pass "ship routes a qualifying durable repository lesson to loom-workflow:loom-memory"
 else
   fail "ship does NOT route a qualifying durable repository lesson to loom-workflow:loom-memory"

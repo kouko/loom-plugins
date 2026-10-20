@@ -308,8 +308,15 @@ def test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against(
     result, and update the digest here in the same commit. Updating the digest
     without re-running the eval is the one move that defeats the guard — the
     eval takes one dispatch."""
+    # Guard against decoy headings: there must be exactly one Record heading
+    skill_text = _skill_md_text()
+    heading_matches = list(re.finditer(r"^(#{2,3})\s+Record\s*$", skill_text, re.MULTILINE))
+    assert len(heading_matches) == 1, (
+        f"expected exactly one Record heading, found {len(heading_matches)}: "
+        + ", ".join(m.group(0) for m in heading_matches)
+    )
     actual = hashlib.sha256(
-        _flat(_section(_skill_md_text(), "Record")).encode("utf-8")
+        _flat(_section(skill_text, "Record")).encode("utf-8")
     ).hexdigest()
     assert actual == RECORD_SECTION_DIGEST, (
         "the Record section changed since the cold-reader eval was run "
