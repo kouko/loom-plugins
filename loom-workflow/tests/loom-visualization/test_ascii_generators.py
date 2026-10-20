@@ -1154,6 +1154,18 @@ def test_arch_one_cell_name_no_components_unchanged():
     assert render_arch([{"name": "A", "components": []}]) == "┌─┐\n│A│\n├─┤\n│ │\n└─┘"
 
 
+def test_arch_trailing_space_body_matches_trunk():
+    # arch-trailing-space-body-trunk-bytes: trunk 5e850c70 output.
+    short = "┌───┐\n│ T │\n├───┤\n│ ab│\n├───┤\n│   │\n└───┘"
+    words = (
+        "┌─────────────────┐\n│ Layer           │\n├─────────────────┤\n"
+        "│ handles requests│\n├─────────────────┤\n│                 │\n└─────────────────┘"
+    )
+    for name, trunk in (({"title": "T", "body": ["ab "]}, short), ("T\nab ", short),
+                        ({"title": "Layer", "body": ["handles requests "]}, words)):
+        assert render_arch([{"name": name, "components": []}]) == trunk
+
+
 def test_arch_empty_title_one_cell_body_aligned():
     # arch-empty-title-one-cell-body-aligned / -width-1-aligned
     for name in ({"title": "", "body": ["x"]}, "\nx"):

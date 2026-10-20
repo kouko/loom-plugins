@@ -89,14 +89,21 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
                 return 0
             return max(display_width(ln) for ln in name["body"])
 
+    # Widest body line as wrap_label draws it unbroken: trailing ASCII spaces
+    # fall at the break and are dropped, so they take no cell.
+    def _drawn_width(body: list[str]) -> int:
+        return max((display_width(ln.rstrip(' ')) for ln in body), default=0)
+
     # Shared outer interior width = max over all layers of:
     # max(display_width(name), min(_row_natural_width(component), budget))
     def get_layer_width(layer: dict) -> int:
         name_width = _name_width(layer["name"])
         # For dict name, apply budget to body width; for string name, body width is 0
         body_width = _body_width(layer["name"])
-        # Body lines draw after one leading space, so the widest needs +1.
-        bounded_body_width = min(body_width + 1, budget) if layer["name"] and isinstance(layer["name"], dict) else 0
+        # Body lines draw after one leading space, so the widest drawn line
+        # (wrap_label drops trailing spaces at a break) needs +1.
+        drawn_body_width = _drawn_width(layer["name"]["body"]) + 1 if isinstance(layer["name"], dict) else 0
+        bounded_body_width = min(max(body_width, drawn_body_width), budget) if layer["name"] and isinstance(layer["name"], dict) else 0
         # For dict name, the effective name width is max(title width, bounded body width)
         if isinstance(layer["name"], dict):
             effective_name_width = max(name_width, bounded_body_width)
@@ -116,7 +123,7 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
             title, body, widest_line = name["title"], name["body"], 0
         elif '\n' in name:
             title, *body = split_lines(name)
-            widest_line = max((display_width(ln) for ln in body), default=0) + 1
+            widest_line = _drawn_width(body) + 1
         else:
             return 0
         widest_char = max((char_width(c) for ln in body for c in ln), default=0)
