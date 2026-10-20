@@ -43,3 +43,4 @@ charter: 1.1
 2. Existing tests that pin early-wrapped arch output are pinning defect-1 output; the implementer updates them and lists each one in the hand-off.
 3. A dict body line at least as wide as an explicit width budget still wraps, because the budget forces it narrower (Acceptance 1 wording); a string-name body is not budget-capped today and stays uncapped.
 4. user-decided — every empty-title layer with a description line renders at any width (option A, 2026-10-21), rather than a special case keeping trunk's error outside the one-cell shape.
+5. A title or name made only of zero-width marks (e.g. U+0301) counts as empty for Acceptance 2 and 3; HEAD renders it aligned where trunk misaligned or errored (agent-decided, shown at decision point ③).
