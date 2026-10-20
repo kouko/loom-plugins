@@ -110,27 +110,47 @@ def _consent_valid(record: Mapping[str, Any] | None, executor: str, scope: str,
     return exact or bounded
 
 
+PROGRESS_INTERVAL = 60  # seconds between "still running" lines on stderr
+
+
+def _duration(seconds: float) -> str:
+    whole = max(int(seconds), 0)
+    return f"{whole}s" if whole < 60 else f"{whole // 60}m{whole % 60:02d}s"
+
+
+def _say(text: str) -> None:
+    # Progress lines carry only step name, outcome and durations: never CLI
+    # or packet text. stdout stays the single JSON result.
+    print(f"external-review: {text}", file=sys.stderr, flush=True)
+
+
 def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
-            until_response_id: int | None = None, **_: Any):
+            until_response_id: int | None = None, progress: str | None = None,
+            **_: Any):
     """Run argv bounded by timeout, killing its whole process group.
 
     Without until_response_id, stdin is closed after input and output is
     collected until the process exits; a descendant still holding a pipe is
     given a short grace, then killed. With until_response_id, stdin stays
     open and reading stops at the JSON line carrying that id, or once the
-    process exits without it (the same grace applies).
+    process exits without it (the same grace applies). With progress (a step
+    name), a line goes to stderr every PROGRESS_INTERVAL seconds while the
+    step runs, and one closing line when it ends.
     """
     if not Path(cwd).is_dir():
         raise FileNotFoundError(errno.ENOENT, "missing review root", cwd)
     proc = subprocess.Popen(argv, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE, text=True, cwd=cwd,
                             start_new_session=True)
+    start = time.monotonic()
     out: list[str] = []
     err: list[str] = []
+    stamps: list[float] = []  # arrival time of each complete output line
     answered = threading.Event()
 
     def read_out() -> None:
         for line in proc.stdout:
+            stamps.append(time.monotonic())
             out.append(line)
             if until_response_id is None:
                 continue
@@ -143,7 +163,14 @@ def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
 
     def read_err() -> None:
         for line in proc.stderr:
+            stamps.append(time.monotonic())
             err.append(line)
+
+    def close_line(outcome: str, end: float) -> None:
+        marks = [start, *sorted(t for t in stamps if t <= end), end]
+        silence = max(b - a for a, b in zip(marks, marks[1:]))
+        _say(f"{progress} {outcome} after {_duration(end - start)}"
+             f" · longest silence {_duration(silence)}")
 
     def write_in() -> None:
         # A child that never reads blocks this write once input exceeds the
@@ -163,7 +190,29 @@ def _launch(argv: list[str], *, input: str, timeout: int, cwd: str,
         for reader in readers:
             reader.start()
         writer.start()
-        if until_response_id is None:
+        if until_response_id is None and progress is not None:
+            deadline = start + timeout
+            while True:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    close_line("timed out", time.monotonic())
+                    raise subprocess.TimeoutExpired(argv, timeout)
+                try:
+                    proc.wait(min(remaining, PROGRESS_INTERVAL))
+                    break
+                except subprocess.TimeoutExpired:
+                    now = time.monotonic()
+                    if now >= deadline:
+                        continue
+                    last = (f"last output {_duration(now - stamps[-1])} ago"
+                            if stamps else "no output yet")
+                    _say(f"{progress} still running · {_duration(now - start)}"
+                         f" elapsed · {last}")
+            end = time.monotonic()
+            for reader in readers:
+                reader.join(1)  # grace for a descendant still holding a pipe
+            close_line(f"exited {proc.returncode}", end)
+        elif until_response_id is None:
             try:
                 proc.wait(timeout)
             except subprocess.TimeoutExpired:
@@ -452,7 +501,7 @@ def execute(
                                      ("review", prompt, review_timeout)):
             argv = _command(executor, model, effort, text, scope)
             response = _run(runner, argv, "" if executor == "agy" else text,
-                            timeout, scope)
+                            timeout, scope, progress=stage)
             if stage == "probe":
                 result["probe"] = {
                     "returncode": response.returncode,
