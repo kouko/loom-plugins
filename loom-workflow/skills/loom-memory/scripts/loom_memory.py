@@ -639,13 +639,18 @@ def init_store(store: Path) -> None:
                 )
             ]
         )
-    store.mkdir(parents=True, exist_ok=True)
-    (store / "README.md").write_text(
-        (TEMPLATES_DIR / README_TEMPLATE_NAME).read_text(encoding="utf-8"), encoding="utf-8"
-    )
-    (store / "index.md").write_text(
-        (TEMPLATES_DIR / INDEX_TEMPLATE_NAME).read_text(encoding="utf-8"), encoding="utf-8"
-    )
+    try:
+        store.mkdir(parents=True, exist_ok=True)
+        (store / "README.md").write_text(
+            (TEMPLATES_DIR / README_TEMPLATE_NAME).read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        (store / "index.md").write_text(
+            (TEMPLATES_DIR / INDEX_TEMPLATE_NAME).read_text(encoding="utf-8"), encoding="utf-8"
+        )
+    except OSError as e:
+        raise LoomMemoryError(
+            [Violation("init-failed", str(store), f"cannot create store: {e}")]
+        ) from None
 
 
 # ---------------------------------------------------------------------------

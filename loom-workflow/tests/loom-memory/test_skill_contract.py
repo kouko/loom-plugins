@@ -42,6 +42,10 @@ def _skill_md_text() -> str:
     return _read(SKILL_MD)
 
 
+def _operations_md_text() -> str:
+    return _read(OPERATIONS)
+
+
 def _all_skill_text() -> str:
     parts = [_read(SKILL_MD)]
     if REFERENCES_DIR.is_dir():
@@ -343,15 +347,23 @@ def test_record_section_names_create_when_store_absent() -> None:
 def test_recall_absent_store_stays_normal_no_memory() -> None:
     """Acceptance 1 negative `recall-absent-store-unchanged` and Acceptance 3
     boundary `recall-absent-store-still-normal-no-memory`: the Recall section
-    keeps its normal no-memory result for an absent store and gains no
-    creation step — only Record creates."""
-    flat = _flat(_section(_skill_md_text(), "Recall"))
-    assert "normal no-memory" in flat, (
-        "the Recall section must keep reporting an absent store as a normal "
+    in both SKILL.md and operations.md keeps its normal no-memory result for an
+    absent store and gains no creation step — only Record creates."""
+    skill_flat = _flat(_section(_skill_md_text(), "Recall"))
+    assert "normal no-memory" in skill_flat, (
+        "the Recall section in SKILL.md must keep reporting an absent store as a normal "
         "no-memory result"
     )
-    assert not re.search(r"\binit\b", flat), (
-        "the Recall section must not create a store; only Record does"
+    assert not re.search(r"\binit\b", skill_flat), (
+        "the Recall section in SKILL.md must not create a store; only Record does"
+    )
+    ops_flat = _flat(_section(_operations_md_text(), "Recall"))
+    assert "normal no-memory" in ops_flat, (
+        "the Recall section in operations.md must keep reporting an absent store as a normal "
+        "no-memory result"
+    )
+    assert not re.search(r"\binit\b", ops_flat), (
+        "the Recall section in operations.md must not create a store; only Record does"
     )
 
 
