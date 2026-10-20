@@ -26,7 +26,7 @@ from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines, center, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
+from width import char_width, display_width, split_lines, center, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
 
 
 def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> str:
@@ -80,9 +80,22 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
                 natural_body_width = 0  # Will be caught by empty body validation later
             return max(title_width, min(natural_body_width, budget))
 
+    # A structured step wraps its body at interior - 1, so the interior must
+    # hold the widest two-cell body character plus that leading space; one-cell
+    # bodies keep their sizing. The +2 below already covers the title.
+    def body_char_floor(step: Union[str, dict]) -> int:
+        if isinstance(step, dict):
+            body = step["body"]
+        elif '\n' in step:
+            body = split_lines(step)[1:]
+        else:
+            return 0
+        widest_char = max((char_width(c) for ln in body for c in ln), default=0)
+        return widest_char + 1 if widest_char > 1 else 0
+
     interior = max(
-        get_step_width(step) for step in steps
-    ) + 2
+        max(get_step_width(step) + 2, body_char_floor(step)) for step in steps
+    )
 
     # Trunk column = the box's center display-column. Boxes start at
     # column 0; the left border "│" occupies column 0, interior starts

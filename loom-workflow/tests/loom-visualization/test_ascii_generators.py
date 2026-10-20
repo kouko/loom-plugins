@@ -1119,3 +1119,39 @@ def test_arch_single_line_string_name_long_title_unchanged():
         "│ a             │\n"
         "└───────────────┘"
     )
+
+
+def test_arch_empty_title_one_cell_body_keeps_trunk_error():
+    # arch-empty-title-one-cell-body-keeps-trunk-error
+    import pytest
+    for name in ({"title": "", "body": ["x"]}, "\nx"):
+        with pytest.raises(ValueError) as error:
+            render_arch([{"name": name, "components": []}])
+        assert str(error.value) == "max_width must be positive"
+
+
+def _render_flow_isolated(steps, width) -> str:
+    # Same hang guard as _render_arch_isolated.
+    import json
+    import subprocess
+    scripts = pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"
+    code = ("import json, sys; from gen_flow import render_flow; "
+            "a = json.loads(sys.argv[1]); print(render_flow(a['steps'], width=a['width']))")
+    result = subprocess.run(
+        [sys.executable, "-c", code, json.dumps({"steps": steps, "width": width})],
+        cwd=scripts, capture_output=True, text=True, timeout=10,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout.rstrip("\n")
+
+
+def test_flow_cjk_body_width_0_aligned():
+    # flow-cjk-body-width-0-aligned
+    for width in (0, -1):
+        _assert_aligned(_render_flow_isolated([{"title": "", "body": ["中"]}], width), "中")
+
+
+def test_flow_multiline_string_cjk_body_width_0_aligned():
+    # flow-multiline-string-cjk-body-width-0-aligned
+    for width in (0, -1):
+        _assert_aligned(_render_flow_isolated(["\n中"], width), "中")
