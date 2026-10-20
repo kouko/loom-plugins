@@ -24,6 +24,11 @@ Tried on 2026-10-21, in a clean copy of the project at 3f44b26f, compared agains
   └─────────┴───────┘
   ```
   line widths {19}. Trunk drew `handles` / `requests` on two lines (widths {18}). CJK: HEAD `│ 處理所有請求│` on one line, widths {15}; trunk split it `處理所有請` / `求`. Boundary `width:12`: HEAD and trunk identical, still wraps to `handles` / `requests`, widths {14}.
+- Re-run 2026-10-21 at 0fd51596 (after spec-conformance review findings 1 and 3), fresh `git worktree add --detach <scratch>/rerun/at-head 0fd51596` and `.../at-trunk 5e850c70`, both ran with no install step:
+  - all five cases above re-run: HEAD outputs and widths identical to the first run ({19}, {19}, {19}, CJK {15}, `width:12` {14} same as trunk).
+  - Default budget: `render_arch` sets `budget = width if width is not None else 40` (`gen_arch.py:76`). `{"layers":[{"name":{"title":"API","body":["x"*40]},"components":[]}]}` with no width: HEAD and trunk byte-identical, body wraps to 39 `x` then a lone `x`, box 42 cells wide. Same with 39 `x`: HEAD one line, box 42 wide; trunk wraps to 38 + 1, box 41 wide. 40 `x` with `"width":60`: HEAD one line (box 43 wide); trunk wraps to 39 + 1. So with no width, a description line of 40+ cells still wraps, as on trunk.
+  - Multi-layer: `{"layers":[{"name":"Web","components":["ui"]},{"name":{"title":"API","body":["handles requests"]},"components":["auth","db"]}]}` — all layers share one interior width, so the unaffected `Web` box widens from 18 cells (trunk `│      Web       │`) to 19 (HEAD `│       Web       │`); both trees aligned.
+  - Covering tests at 0fd51596: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID python3 -m pytest -q -p no:cacheprovider loom-workflow/tests/loom-visualization/test_ascii_generators.py loom-workflow/tests/scripts/test_release_metadata.py` → `79 passed in 1.72s`.
 - Evidence: scratch `drive.out`, cases "A1 ...". Covering tests passed on HEAD: `test_ascii_generators.py` (incl. the A1 tests named in the plan) — `79 passed in 1.57s` together with `tests/scripts/test_release_metadata.py`.
 
 ## 2. A layer with an empty single-line name and no components draws a box whose borders line up.
@@ -73,5 +78,7 @@ Tried on 2026-10-21, in a clean copy of the project at 3f44b26f, compared agains
 
 ## 6. The complete package suite passes.
 - How I tried it: per the acceptance-tester contract I did not run the full suite; I ran the tests covering this change: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID python3 -m pytest -q -p no:cacheprovider loom-workflow/tests/loom-visualization/test_ascii_generators.py loom-workflow/tests/scripts/test_release_metadata.py` → `79 passed in 1.57s`. Trunk's own copy of the generator tests: `39 passed`.
+- Re-run at 0fd51596: same command → `79 passed in 1.72s`. The full suite passing at Build (3f44b26f) is as reported by the closing-review station; not witnessed by this tester.
+- Rows 2–5 carried over: `git diff --stat 88defa02..0fd51596` → only `docs/loom/2026-10-21-diagram-arch-edge-cases/plan.md` (1 line, Risk 3 wording); no production or test file changed.
 - Full suite command, executed by finalize-review, which refuses the attestation when it fails: `python3 scripts/run_package_tests.py --loom-family`.
 - Evidence: pytest output above.
