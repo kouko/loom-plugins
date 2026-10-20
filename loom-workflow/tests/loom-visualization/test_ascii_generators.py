@@ -1,5 +1,6 @@
 # Ported from ascii-graph-toolkit v0.6.0 (monkey-skills e5b978e0), MIT.
 """Generator tests (consolidated from test_gen_{table,flow,tree,bar,arch,seq}.py)."""
+# concern: narrow-width structured nodes must finish and stay aligned without changing output for any other input
 
 import pathlib
 import sys
@@ -1061,3 +1062,97 @@ def test_dict_node_with_empty_body_keeps_its_error_text():
     assert str(flow_error.value) == expected
     assert str(arch_error.value) == expected
     assert str(tree_error.value) == expected
+
+
+def _render_arch_isolated(layers, width=None) -> str:
+    # A wrap regression loops forever; a child process with a timeout keeps
+    # it from hanging the suite.
+    import json
+    import subprocess
+    scripts = pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"
+    code = ("import json, sys; from gen_arch import render_arch; "
+            "a = json.loads(sys.argv[1]); print(render_arch(a['layers'], width=a['width']))")
+    result = subprocess.run(
+        [sys.executable, "-c", code, json.dumps({"layers": layers, "width": width})],
+        cwd=scripts, capture_output=True, text=True, timeout=10,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout.rstrip("\n")
+
+
+def _assert_aligned(out: str, title: str) -> None:
+    lines = out.split("\n")
+    assert len({display_width(ln) for ln in lines}) == 1, out
+    assert any(title in ln for ln in lines), out
+
+
+def test_arch_cjk_body_at_narrowest_width_is_aligned():
+    # arch-cjk-body-width-1-aligned
+    for width in (1, 2):
+        layers = [{"name": {"title": "T", "body": ["中文"]}, "components": []}]
+        _assert_aligned(_render_arch_isolated(layers, width), "T")
+
+
+def test_arch_multiline_string_name_cjk_body_at_width_1_is_aligned():
+    # arch-multiline-string-name-cjk-body-width-1-aligned
+    _assert_aligned(_render_arch_isolated([{"name": "T\n中", "components": []}], 1), "T")
+
+
+def test_arch_dict_name_long_title_is_aligned():
+    # arch-dict-long-title-aligned
+    title = "Long title here"
+    out = render_arch([{"name": {"title": title, "body": ["x"]}, "components": ["a"]}])
+    _assert_aligned(out, title)
+
+
+def test_arch_multiline_string_name_long_title_is_aligned():
+    # arch-multiline-string-name-long-title-aligned
+    title = "Long title here"
+    _assert_aligned(render_arch([{"name": title + "\nx", "components": ["a"]}]), title)
+
+
+def test_arch_single_line_string_name_long_title_unchanged():
+    # single-line-string-name-long-title-unchanged: trunk 114ad1ce output.
+    assert render_arch([{"name": "Long title here", "components": ["a"]}]) == (
+        "┌───────────────┐\n"
+        "│Long title here│\n"
+        "├───────────────┤\n"
+        "│ a             │\n"
+        "└───────────────┘"
+    )
+
+
+def test_arch_empty_title_one_cell_body_keeps_trunk_error():
+    # arch-empty-title-one-cell-body-keeps-trunk-error
+    import pytest
+    for name in ({"title": "", "body": ["x"]}, "\nx"):
+        with pytest.raises(ValueError) as error:
+            render_arch([{"name": name, "components": []}])
+        assert str(error.value) == "max_width must be positive"
+
+
+def _render_flow_isolated(steps, width) -> str:
+    # Same hang guard as _render_arch_isolated.
+    import json
+    import subprocess
+    scripts = pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"
+    code = ("import json, sys; from gen_flow import render_flow; "
+            "a = json.loads(sys.argv[1]); print(render_flow(a['steps'], width=a['width']))")
+    result = subprocess.run(
+        [sys.executable, "-c", code, json.dumps({"steps": steps, "width": width})],
+        cwd=scripts, capture_output=True, text=True, timeout=10,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout.rstrip("\n")
+
+
+def test_flow_cjk_body_width_0_aligned():
+    # flow-cjk-body-width-0-aligned
+    for width in (0, -1):
+        _assert_aligned(_render_flow_isolated([{"title": "", "body": ["中"]}], width), "中")
+
+
+def test_flow_multiline_string_cjk_body_width_0_aligned():
+    # flow-multiline-string-cjk-body-width-0-aligned
+    for width in (0, -1):
+        _assert_aligned(_render_flow_isolated(["\n中"], width), "中")

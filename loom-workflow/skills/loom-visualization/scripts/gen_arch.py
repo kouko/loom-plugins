@@ -25,7 +25,7 @@ from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines, center, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
+from width import char_width, display_width, split_lines, center, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
 
 
 def _cell_width(label: str) -> int:
@@ -102,7 +102,23 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
         else:
             effective_name_width = name_width
         component_width = _row_natural_width(layer["components"])
-        return max(effective_name_width, component_width)
+        return max(effective_name_width, component_width, _structured_floor(layer["name"]))
+
+    # A structured name draws its title after one leading space and wraps its
+    # body at interior - 1, so the interior must hold the title plus that space
+    # and the widest single body character plus it. The character term applies
+    # only to two-cell characters, so a one-cell body keeps trunk's error.
+    # Single-line string names are centered with no leading space and keep
+    # their sizing.
+    def _structured_floor(name: Union[str, dict]) -> int:
+        if isinstance(name, dict):
+            title, body = name["title"], name["body"]
+        elif '\n' in name:
+            title, *body = split_lines(name)
+        else:
+            return 0
+        widest_char = max((char_width(c) for ln in body for c in ln), default=0)
+        return max(display_width(title) + 1, widest_char + 1 if widest_char > 1 else 0)
 
     interior = max(
         get_layer_width(layer) for layer in layers

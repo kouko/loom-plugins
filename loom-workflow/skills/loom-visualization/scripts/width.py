@@ -98,6 +98,11 @@ def wrap_label(text: str, max_width: int) -> list[str]:
             width_so_far += c_width
             k += 1
 
+        if k == 0:
+            # No character fits (a two-cell char at a one-cell width): take
+            # exactly one character so the loop always makes progress.
+            k = 1
+
         # Now k characters fit, but k+1 would not (if k < len(remaining))
         if k == len(remaining):
             # The whole remaining string fits

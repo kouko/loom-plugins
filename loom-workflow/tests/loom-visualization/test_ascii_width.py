@@ -281,6 +281,24 @@ def test_wrap_label_prefers_ascii_spaces():
     assert wrap_label("  ", 5) == ["  "]  # two spaces fit
 
 
+def test_wrap_label_cjk_at_width_1_returns():
+    # wrap-cjk-at-width-1-returns: a two-cell char at a one-cell width once
+    # looped forever; run it in a child process so a regression cannot hang
+    # the suite.
+    import subprocess
+    scripts = pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"
+    code = "from width import wrap_label; print(wrap_label('中文', 1))"
+    result = subprocess.run([sys.executable, "-c", code], cwd=scripts,
+                            capture_output=True, text=True, timeout=10)
+    assert result.stdout.strip() == "['中', '文']"
+
+
+def test_wrap_label_ascii_at_width_1_unchanged():
+    # wrap-ascii-at-width-1-unchanged: trunk output, pinned.
+    from width import wrap_label
+    assert wrap_label("ab cd", 1) == ["a", "b", "c", "d"]
+
+
 def test_wrap_label_handles_tabs_and_control_chars():
     from width import wrap_label
     # Tabs and other control chars should be treated as 0 width but not as break points
