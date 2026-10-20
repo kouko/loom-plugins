@@ -42,6 +42,10 @@ def _skill_md_text() -> str:
     return _read(SKILL_MD)
 
 
+def _operations_md_text() -> str:
+    return _read(OPERATIONS)
+
+
 def _all_skill_text() -> str:
     parts = [_read(SKILL_MD)]
     if REFERENCES_DIR.is_dir():
@@ -281,7 +285,7 @@ def _flat(text: str) -> str:
 # sha256 of the whitespace-flattened Record section of SKILL.md. Its only job
 # is to go red when that section changes at all, so the dilution guard cannot
 # fall silently out of date behind a literal pin that still passes.
-RECORD_SECTION_DIGEST = "945a9cb29dfb5a9090e4ad036e5f980accf19fe94b22ff3014c1c066635ddcc9"
+RECORD_SECTION_DIGEST = "f2931777d7eba529d54d10781aca10044db90fcd2f8eb7b32f65b8a08b829d32"
 
 
 def test_backlog_entry_routing_sentence_rejected() -> None:
@@ -304,12 +308,77 @@ def test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against(
     result, and update the digest here in the same commit. Updating the digest
     without re-running the eval is the one move that defeats the guard — the
     eval takes one dispatch."""
+    # Guard against decoy headings: there must be exactly one Record heading
+    skill_text = _skill_md_text()
+    heading_matches = list(re.finditer(r"^(#{2,3})\s+Record\s*$", skill_text, re.MULTILINE))
+    assert len(heading_matches) == 1, (
+        f"expected exactly one Record heading, found {len(heading_matches)}: "
+        + ", ".join(m.group(0) for m in heading_matches)
+    )
     actual = hashlib.sha256(
-        _flat(_section(_skill_md_text(), "Record")).encode("utf-8")
+        _flat(_section(skill_text, "Record")).encode("utf-8")
     ).hexdigest()
     assert actual == RECORD_SECTION_DIGEST, (
         "the Record section changed since the cold-reader eval was run "
         f"(expected {RECORD_SECTION_DIGEST}, got {actual}). Re-run "
         "`evals/record-timing.md`'s method against the new text, update that "
         "file's reference run, then set this digest in the same commit."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Auto-create store: Record creates an absent store, Recall never does,
+# Retire's approval requirement is untouched.
+# ---------------------------------------------------------------------------
+
+
+def test_record_section_names_create_when_store_absent() -> None:
+    """Acceptance 1 positive `record-step-names-create-when-absent`: the
+    Record section names running the `init` subcommand when the target store
+    does not exist, writing the store's reserved files from the bundled
+    templates, before regeneration and validation continue."""
+    flat = _flat(_section(_skill_md_text(), "Record"))
+    assert "does not exist" in flat, (
+        "the Record section must name the absent-store case"
+    )
+    assert re.search(r"\binit\b", flat), (
+        "the Record section must name the `init` subcommand as the way an "
+        "absent store gets created"
+    )
+    assert "bundled templates" in flat, (
+        "the Record section must say the created store comes from the "
+        "bundled templates, not agent hand-copying"
+    )
+
+
+def test_recall_absent_store_stays_normal_no_memory() -> None:
+    """Acceptance 1 negative `recall-absent-store-unchanged` and Acceptance 3
+    boundary `recall-absent-store-still-normal-no-memory`: the Recall section
+    in both SKILL.md and operations.md keeps its normal no-memory result for an
+    absent store and gains no creation step — only Record creates."""
+    skill_flat = _flat(_section(_skill_md_text(), "Recall"))
+    assert "normal no-memory" in skill_flat, (
+        "the Recall section in SKILL.md must keep reporting an absent store as a normal "
+        "no-memory result"
+    )
+    assert not re.search(r"\binit\b", skill_flat), (
+        "the Recall section in SKILL.md must not create a store; only Record does"
+    )
+    ops_flat = _flat(_section(_operations_md_text(), "Recall"))
+    assert "normal no-memory" in ops_flat, (
+        "the Recall section in operations.md must keep reporting an absent store as a normal "
+        "no-memory result"
+    )
+    assert not re.search(r"\binit\b", ops_flat), (
+        "the Recall section in operations.md must not create a store; only Record does"
+    )
+
+
+def test_retire_approval_requirement_unchanged() -> None:
+    """Acceptance 4 boundary `retire-approval-sentence-unchanged`: Retire
+    still requires explicit user approval before deleting anything."""
+    flat = _flat(_section(_skill_md_text(), "Retire"))
+    assert "explicit user approval" in flat, (
+        "the Retire section must keep requiring explicit user approval "
+        "before deleting anything"
     )

@@ -112,7 +112,13 @@ record eight things at once means the filter has not been applied yet.
    followed by a body of `Trigger`, `Correct path`, `Why`, and `Limits`
    only when a real non-applicability boundary exists — see
    `references/okf-profile.md`.
-4. Regenerate and validate the index with
+4. If the target store does not exist, run the creation subcommand from
+   `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` (the
+   `skills/loom-memory/scripts/loom_memory.py` file inside this skill's own
+   directory) on it — `init <store>` writes `README.md` and `index.md`
+   from the bundled templates and refuses an existing populated store —
+   then continue with regeneration and validation.
+5. Regenerate and validate the index with
    `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py
    regenerate-index <store>` and `validate <store>` (that script is
    `skills/loom-memory/scripts/loom_memory.py` inside this skill's own
@@ -169,7 +175,8 @@ start, Recall, or any other station.
   Reconcile merge rule in detail.
 - `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` (the
   `skills/loom-memory/scripts/loom_memory.py` file inside this skill's own
-  directory) — `validate <store>` and `regenerate-index <store>`.
+  directory) — `init <store>`, `validate <store>`, and
+  `regenerate-index <store>`.
 - `templates/memory-store-README.md` and `templates/memory-store-index.md`
   — the starting shape for a new store, instantiated as that store's
   `README.md` and `index.md`.

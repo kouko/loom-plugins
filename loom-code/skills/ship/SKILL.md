@@ -122,6 +122,10 @@ Always run its deterministic secrets scan. Known public repository, PR, issue,
 task, and vendor identifiers need no semantic privacy judge; ambiguous
 private-party text does. A semantic false positive needs an audited
 `Privacy-Bypass-Reason`; secret findings cannot be bypassed.
+Use `loom-workflow:loom-memory` to route a qualifying durable repository lesson
+when one is earned. It does not replace or reorder Ship's headings. Zero to one
+durable lesson per change is the normal outcome. When loom-workflow is not
+installed, this routing is silently skipped.
 
 Before publication, reject a body with a missing heading, evidence source that
 was silently ignored, unsupported decision claim, hidden-reasoning claim, or a
