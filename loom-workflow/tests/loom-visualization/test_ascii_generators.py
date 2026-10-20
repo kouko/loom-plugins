@@ -1,5 +1,6 @@
 # Ported from ascii-graph-toolkit v0.6.0 (monkey-skills e5b978e0), MIT.
 """Generator tests (consolidated from test_gen_{table,flow,tree,bar,arch,seq}.py)."""
+# concern: narrow-width structured nodes must finish and stay aligned without changing output for any other input
 
 import pathlib
 import sys
