@@ -1,10 +1,8 @@
 # Changelog
 
-## [3.43.0] — 2026-10-20 — outside review steps report progress while they run
+## [3.43.0] — 2026-10-20 — feat(ship): add durable-lesson routing to loom-memory
 
-- While an outside preflight or review runs, `external_review.py` writes a progress line to stderr about once a minute: the step, the elapsed time, and the time since the CLI last produced output. When the step ends — exited or timed out — one closing line reports its total time and the longest silence.
-- Progress lines carry only the step name, outcome and durations, never the review packet or CLI output. Discovery prints none. stdout stays the single JSON result, and no time limit, status or outcome changes.
-- The external-review skill's Execute section tells the agent to keep the runner's error stream visible while it waits and relay each progress line to the user instead of waiting silently.
+- `ship` now routes a qualifying durable repository lesson to `loom-workflow:loom-memory` when loom-workflow is installed; when it is not, the routing is silently skipped. It does not replace or reorder Ship's headings, and zero to one durable lesson per change is the normal outcome. Paired loom-workflow 5.12.0 release.
 
 ## [3.42.1] — 2026-10-18 — sync-trunk rebases a never-pushed change branch
 
