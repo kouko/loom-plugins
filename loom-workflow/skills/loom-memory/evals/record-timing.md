@@ -35,14 +35,39 @@ re-running the eval is the single move that defeats the guard, and it
 costs less than the dispatch it skips — which is exactly why it is worth
 saying out loud here.
 
-## Reference run — 2026-09-11 (first, superseded)
+## Reference run — 2026-10-20 (fourth, current)
 
-Contract version: `SKILL.md` at commit `d7d89f6d3`, `Record` section digest
-`c7b0dcff`. Eleven candidates (12 did not exist yet). Result: 1 RECORD
-(candidate 4), PASS on all three criteria, agreeing with ground truth on 10
-of 11. Kept as a line rather than deleted: a frozen run whose text version is
-not recorded cannot be compared against a later one, which is this file's
-whole job.
+Contract version: the `Record` section after the auto-create step was
+added — step 4 now runs the creation subcommand (`init <store>`, writing
+`README.md` and `index.md` from the bundled templates) when the target
+store does not exist, then continues with regeneration and validation;
+section digest `f2931777`, the value pinned in
+`loom-workflow/tests/loom-memory/test_skill_contract.py`. Twelve candidates.
+Reader: one agent acting as cold reader on the changed
+text, no tools used. The reader was the implementer rather than a
+freshly-dispatched agent (subagent dispatch was unavailable in this
+environment); it had seen the clause history, which the guarded text makes
+moot — the **When** and **How much** clauses are byte-identical to the
+2026-09-16 run, and only the **Steps** gained one entry.
+
+**Reason for the edit:** Record now auto-creates an absent store through
+the new `init` subcommand instead of assuming one exists, so the Steps
+gained a creation step; the guarded clauses were not touched.
+
+**Verdict: the changed text passes all three criteria on its latest run.**
+
+| Run | Text | Timing | Exception | Scarcity (RECORD of 12) |
+|---|---|---|---|---|
+| D1 | changed | PASS | PASS (11 only) | PASS: 3 (1, 4, 12); count checked, at band top |
+
+Decision rule applied: the **When** and **How much** clauses are
+byte-identical to the text the 2026-09-16 run passed, and the reader on
+the changed text passes every band in the same place as that run's latest
+(C2) — the added Steps entry does not steer timing, exception routing, or
+scarcity, so the edit and this digest land together. The D1 verdict set
+(1, 4, 12) matches ground truth exactly rather than landing by cancelling
+errors; as with every prior run, borderline rows move, and candidate 1 —
+rejected in all four 2026-09 runs — was recorded here.
 
 ## Reference run — 2026-09-11 (second, superseded)
 
@@ -107,7 +132,7 @@ not whether an agent mid-change will remember to consult it at all. That
 second question belongs to the moment the question gets asked, not to this
 text.
 
-## Reference run — 2026-09-16 (third, current)
+## Reference run — 2026-09-16 (third, superseded)
 
 Contract version: the `Record` section after the scarcity clause dropped
 "or a backlog entry", so an unfinished item routes to an intent only;
