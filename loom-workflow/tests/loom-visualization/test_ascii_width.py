@@ -290,13 +290,8 @@ def test_wrap_label_handles_tabs_and_control_chars():
 
 
 # ---------------------------------------------------------------------------
-# W1-01: Shared helpers tests (EMPTY_BODY, center, require_single_line, render_structured_node)
+# Shared helpers tests (center, require_single_line, render_structured_node)
 # ---------------------------------------------------------------------------
-
-def test_EMPTY_BODY_constant():
-    from width import EMPTY_BODY
-    assert EMPTY_BODY == "Body cannot be empty for structured node"
-
 
 def test_center_plain_ascii():
     from width import center
@@ -383,12 +378,22 @@ def test_render_structured_node_wrapped_body():
     from width import render_structured_node
     # Body line that needs wrapping at interior-1
     lines = render_structured_node("Title", ["this is a long body line that wraps"], 20)
-    assert lines[0] == "│ Title              │"
-    assert lines[1] == "├────────────────────┤"
-    # Body should be wrapped at interior-1 = 19 cells
-    # "this is a long body line that wraps" width = 37 chars (ASCII) = 37 cells
-    # Wrapped at 19 cells
-    # All body lines should start with "│ " and end with "│" (no trailing space)
-    for line in lines[2:]:
-        assert line.startswith("│ ")
-        assert line.endswith("│")
+    # Body wraps at interior-1 = 19 cells, breaking at the last ASCII space
+    assert lines == [
+        "│ Title              │",
+        "├────────────────────┤",
+        "│ this is a long body│",
+        "│ line that wraps    │",
+    ]
+
+
+def test_over_wide_labels_render_without_padding():
+    from width import center, render_structured_node
+    # Labels wider than the interior get no padding: center returns the label
+    # as-is, and the title line overflows the box instead of being clamped.
+    assert center("wide", 2) == "wide"
+    assert render_structured_node("Wide title", ["xyz"], 4) == [
+        "│ Wide title│",
+        "├────┤",
+        "│ xyz│",
+    ]

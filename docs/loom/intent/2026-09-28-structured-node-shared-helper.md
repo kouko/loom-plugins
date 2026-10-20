@@ -16,6 +16,7 @@ status: confirmed 2026-09-28
    - `gen_flow.py` 與 `gen_arch.py` 各自的 `_center()` → 同一共用置中函式
    - 空 body 錯誤訊息（`gen_flow.py`、`gen_arch.py`、`gen_tree.py` 共 5 處）→ 同一錯誤常數
    - `gen_seq.py` 與 `gen_bar.py` 的單行標籤驗證 → 同一共用驗證函式
+   - 註（2026-10-20）：實作上 5 處皆源自同一錯誤常數 `EMPTY_BODY`；字串輸入路徑使用由它延伸的 `EMPTY_BODY_FROM_STRING`，錯誤文字不變（PR #63）。
 2. 所有產生器的輸出逐位元組不變：既有 generator 測試（含 CJK 樣本與 `scripts/align.py` 檢查）全數通過，且 refactor 前後對相同輸入的輸出完全一致。
 3. 套件測試全數通過。
 

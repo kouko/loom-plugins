@@ -4,6 +4,13 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.12.1] — 2026-10-20 — structured-node helper cleanup
+
+- `width.py`: plan labels and output-neutral padding clamps removed.
+- Tests pin the exact wrapped output and the empty-body error text at the
+  generator entries instead of restating the constant.
+- No behaviour change.
+
 ## [5.12.0] — 2026-10-20 — record auto-creates the store; ship routes durable lessons to loom-memory
 
 - feat: Record auto-creates the store via init subcommand; ship routes durable lessons to loom-memory.
@@ -14,7 +21,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 - `width.py` gains the shared structured-node rendering helpers
   (`render_structured_node`, `center`, `EMPTY_BODY`,
-  `require_single_line`); flow, arch, tree, seq and bar generators
+  `EMPTY_BODY_FROM_STRING`, `require_single_line`); flow, arch, tree, seq and bar generators
   consume them instead of carrying inline copies.
 - No behaviour change: generator output is byte-identical (golden-diff
   evidence in `docs/loom/2026-09-28-structured-node-shared-helper/evidence/`).
