@@ -1173,6 +1173,21 @@ def test_arch_empty_title_one_cell_body_aligned():
             _assert_aligned(_render_isolated("arch", [{"name": name, "components": []}], **kwargs), "x")
 
 
+def test_arch_empty_title_empty_body_line_aligned():
+    # arch-empty-title-empty-body-line-aligned
+    for kwargs in ({}, {"width": 1}):
+        out = _render_isolated("arch", [{"name": {"title": "", "body": [""]}, "components": []}], **kwargs)
+        _assert_aligned(out, "")
+
+
+def test_arch_empty_title_narrow_widths_aligned():
+    # arch-empty-title-narrow-widths-aligned: "\ń" has a zero-width body.
+    names = [{"title": "", "body": b} for b in ([""], ["x"], ["abc"], ["x", "y"])] + ["\ń"]
+    for name in names:
+        for kwargs in ({}, {"width": 1}, {"width": 0}, {"width": -5}):
+            _assert_aligned(_render_isolated("arch", [{"name": name, "components": []}], **kwargs), "")
+
+
 def test_flow_cjk_body_width_0_aligned():
     # flow-cjk-body-width-0-aligned
     for width in (0, -1):

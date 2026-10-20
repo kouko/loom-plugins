@@ -117,7 +117,9 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
     # and the widest single body character plus it. A string name's body is
     # not budget-capped, so its widest body line plus that space also fits
     # whole. Single-line string names are centered with no leading space and
-    # keep their sizing.
+    # keep their sizing. The floor is at least 2 so the body wrap width
+    # (interior - 1) stays positive even for an empty title and a body of
+    # empty or zero-width lines.
     def _structured_floor(name: Union[str, dict]) -> int:
         if isinstance(name, dict):
             title, body, widest_line = name["title"], name["body"], 0
@@ -127,7 +129,7 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
         else:
             return 0
         widest_char = max((char_width(c) for ln in body for c in ln), default=0)
-        return max(display_width(title) + 1, widest_char + 1, widest_line)
+        return max(2, display_width(title) + 1, widest_char + 1, widest_line)
 
     # Floor at 1 so an empty name with no components still lines up.
     interior = max(1, max(

@@ -9,8 +9,9 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - `render_arch` keeps a structured layer's widest body line unbroken; the
   box widens by the leading-space cell.
 - An empty single-line name with no components draws an aligned box.
-- An empty title with a one-cell body draws aligned instead of failing
-  with `max_width must be positive`, including at width 1.
+- Every layer with an empty title and at least one description line now
+  draws aligned at any width instead of failing with
+  `max_width must be positive`.
 - Tests pin the exact trunk output of all six generators and share one
   hang-guarded render helper.
 
