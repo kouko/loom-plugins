@@ -1061,3 +1061,61 @@ def test_dict_node_with_empty_body_keeps_its_error_text():
     assert str(flow_error.value) == expected
     assert str(arch_error.value) == expected
     assert str(tree_error.value) == expected
+
+
+def _render_arch_isolated(layers, width=None) -> str:
+    # A wrap regression loops forever; a child process with a timeout keeps
+    # it from hanging the suite.
+    import json
+    import subprocess
+    scripts = pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"
+    code = ("import json, sys; from gen_arch import render_arch; "
+            "a = json.loads(sys.argv[1]); print(render_arch(a['layers'], width=a['width']))")
+    result = subprocess.run(
+        [sys.executable, "-c", code, json.dumps({"layers": layers, "width": width})],
+        cwd=scripts, capture_output=True, text=True, timeout=10,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout.rstrip("\n")
+
+
+def _assert_aligned(out: str, title: str) -> None:
+    lines = out.split("\n")
+    assert len({display_width(ln) for ln in lines}) == 1, out
+    assert any(title in ln for ln in lines), out
+
+
+def test_arch_cjk_body_at_narrowest_width_is_aligned():
+    # arch-cjk-body-width-1-aligned
+    for width in (1, 2):
+        layers = [{"name": {"title": "T", "body": ["中文"]}, "components": []}]
+        _assert_aligned(_render_arch_isolated(layers, width), "T")
+
+
+def test_arch_multiline_string_name_cjk_body_at_width_1_is_aligned():
+    # arch-multiline-string-name-cjk-body-width-1-aligned
+    _assert_aligned(_render_arch_isolated([{"name": "T\n中", "components": []}], 1), "T")
+
+
+def test_arch_dict_name_long_title_is_aligned():
+    # arch-dict-long-title-aligned
+    title = "Long title here"
+    out = render_arch([{"name": {"title": title, "body": ["x"]}, "components": ["a"]}])
+    _assert_aligned(out, title)
+
+
+def test_arch_multiline_string_name_long_title_is_aligned():
+    # arch-multiline-string-name-long-title-aligned
+    title = "Long title here"
+    _assert_aligned(render_arch([{"name": title + "\nx", "components": ["a"]}]), title)
+
+
+def test_arch_single_line_string_name_long_title_unchanged():
+    # single-line-string-name-long-title-unchanged: trunk 114ad1ce output.
+    assert render_arch([{"name": "Long title here", "components": ["a"]}]) == (
+        "┌───────────────┐\n"
+        "│Long title here│\n"
+        "├───────────────┤\n"
+        "│ a             │\n"
+        "└───────────────┘"
+    )
