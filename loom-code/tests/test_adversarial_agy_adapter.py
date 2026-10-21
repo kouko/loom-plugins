@@ -33,6 +33,12 @@ def _run_raw(mode: str, stdin: str, tmp_path: Path, adapter: Path = ADAPTER, tim
     environ = {k: v for k, v in os.environ.items()
                if k not in ("LOOM_CODE_MODE", "ANTIGRAVITY_CONVERSATION_ID")}
     environ["TMPDIR"] = str(tmp_path)
+    runtime = tmp_path / "cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin"
+    runtime.mkdir(parents=True, exist_ok=True)
+    python = runtime / "python"
+    if not python.exists():
+        python.symlink_to(sys.executable)
+    environ["XDG_CACHE_HOME"] = str(tmp_path / "cache")
     result = subprocess.run(
         [sys.executable, str(adapter), mode], input=stdin, capture_output=True, text=True,
         cwd=adapter.parent.parent, env=environ, timeout=timeout,
@@ -79,6 +85,7 @@ def crashing_checker_adapter(tmp_path: Path) -> Path:
     (root / "hooks").mkdir(parents=True)
     (root / "scripts").mkdir()
     shutil.copy2(ADAPTER, root / "hooks" / "agy_adapter.py")
+    shutil.copy2(PLUGIN_ROOT / "scripts" / "loom-python", root / "scripts" / "loom-python")
     (root / "scripts" / "loom_checker.py").write_text("import sys\nsys.exit(3)\n")
     return root / "hooks" / "agy_adapter.py"
 
@@ -107,6 +114,7 @@ def stub_checker_adapter(tmp_path: Path):
         (root / "hooks").mkdir(parents=True)
         (root / "scripts").mkdir()
         shutil.copy2(ADAPTER, root / "hooks" / "agy_adapter.py")
+        shutil.copy2(PLUGIN_ROOT / "scripts" / "loom-python", root / "scripts" / "loom-python")
         (root / "scripts" / "loom_checker.py").write_text(
             f"import sys\nsys.stdin.read()\nprint({stdout!r})\n"
             f"print({stderr!r}, file=sys.stderr)\nsys.exit({code})\n")

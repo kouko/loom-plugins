@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.44.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.45.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -125,6 +125,11 @@ checker が「問題なし」と言うことはありません。ステーショ
 生成します。インストール済みの `PreToolUse` hook は `git push` と
 `gh pr create` の前にもう一度走り、内容の digest を再計算して、テストや probe を
 再実行せずにその証拠を検証します。
+
+ステーションは `scripts/loom-python --repair` で checker 専用の Python と依存
+パッケージをユーザーキャッシュに用意し、元のチェックを再実行します。プロジェクトの
+テスト環境は変更しません。hook は `--ready` で準備済みの環境だけを使い、
+使えない場合は修復方法を知らせます。hook 自体はインストールしません。
 
 ## loom-design・loom-workflow との組み合わせ
 

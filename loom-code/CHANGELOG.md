@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.45.0] — 2026-10-21 — fix(loom-code): repair the checker runtime from agent stations
+
+- Agent stations now prepare a plugin-owned Python 3.11 and PyYAML runtime with `loom-python --repair` when the checker environment is missing, then retry the original check. Repair uses a user cache and leaves project test commands on the project's own environment.
+- Claude Code, Codex, Antigravity CLI and OpenCode hooks run against the prepared runtime with `--ready`, without installing packages. When it is unavailable, hooks report the repair path while keeping their existing publication behavior.
+
 ## [3.44.0] — 2026-10-20 — feat(external-review): progress lines while an outside review runs
 
 - While an outside preflight or review runs, `external_review.py` writes a progress line to stderr about once a minute: the step, the elapsed time, and the time since the CLI last produced output. When the step ends — exited or timed out — one closing line reports its total time and the longest silence.

@@ -203,6 +203,13 @@ def _command_basename(command: str) -> str:
     tokens = [a or b for a, b in QUOTED_TOKEN_RE.findall(command)]
     path_tokens = [t for t in tokens if "/" in t]
     target = path_tokens[0] if path_tokens else (tokens[-1] if tokens else command)
+    if Path(target).name == "loom-python" and "--ready" in tokens:
+        if "--script" in tokens:
+            index = tokens.index("--script") + 1
+            if index < len(tokens):
+                return Path(tokens[index].rstrip("; ")).name
+        if "push" in tokens and any(token.rstrip(";") == "--hook" for token in tokens):
+            return "loom_checker.py"
     return Path(target).name
 
 

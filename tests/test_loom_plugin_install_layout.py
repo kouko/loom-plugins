@@ -508,6 +508,10 @@ def test_isolated_codex_hook_uses_copied_root_and_survives_its_removal(
 
 def test_isolated_host_hook_lifecycle_matrix(tmp_path: Path) -> None:
     code_root = _install_plugin("loom-code", tmp_path / "installed-v1")
+    runtime = tmp_path / "cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin"
+    runtime.mkdir(parents=True)
+    (runtime / "python").symlink_to(sys.executable)
+    cache_env = {"XDG_CACHE_HOME": str(tmp_path / "cache")}
     codex_manifest = json.loads(
         (code_root / ".codex-plugin/plugin.json").read_text(encoding="utf-8")
     )
@@ -531,7 +535,7 @@ def test_isolated_host_hook_lifecycle_matrix(tmp_path: Path) -> None:
         )
         return subprocess.run(
             command, shell=True, input=payload, text=True, capture_output=True,
-            env=dict(os.environ, **{root_var: str(root)}),
+            env=dict(os.environ, **cache_env, **{root_var: str(root)}),
         )
 
     codex = invoke(codex_command, "PLUGIN_ROOT", code_root, "git status --short")
@@ -544,7 +548,7 @@ def test_isolated_host_hook_lifecycle_matrix(tmp_path: Path) -> None:
     ):
         malformed = subprocess.run(
             command, shell=True, input="not-json", text=True,
-            capture_output=True, env=dict(os.environ, **{root_var: str(code_root)}),
+            capture_output=True, env=dict(os.environ, **cache_env, **{root_var: str(code_root)}),
         )
         assert malformed.returncode == 2
 
