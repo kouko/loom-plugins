@@ -99,7 +99,7 @@ recorded set before starting the probe.
 After this consent, list candidates with:
 
 ```sh
-python3 <loom-code>/scripts/external_review.py --list-candidates \
+"<loom-code>/scripts/loom-python" --repair --script external_review.py --list-candidates \
   --executor <codex|claude|agy> --scope <absolute-review-root> \
   --consent-record <path-to-record>
 ```
@@ -120,7 +120,7 @@ code, a plan, or a decision review; this boundary does not substitute a new
 rubric or output schema.
 
 ```sh
-python3 <loom-code>/scripts/external_review.py \
+"<loom-code>/scripts/loom-python" --repair --script external_review.py \
   --executor <codex|claude|agy> \
   --model <selected-model> --effort <selected-effort> \
   --family <openai|anthropic|google> \

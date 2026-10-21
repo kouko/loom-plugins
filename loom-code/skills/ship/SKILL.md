@@ -137,11 +137,11 @@ Publication-only edits do not change the functional digest and do not return to
 
 ## 3. Publish once
 
-Before publishing, run `python3 <loom-code>/scripts/loom_checker.py github-rules`
+Before publishing, run `"<loom-code>/scripts/loom-python" --repair github-rules`
 and relay its lines to the user. When it reports a missing rule, ask the user
 in consequence form — from then on <trunk> accepts changes only through a PR
 whose body check passes, for you too — then show the user the setup command
-that `loom_checker.py github-rules --print-setup` prints, and run that setup
+that `"<loom-code>/scripts/loom-python" --repair github-rules --print-setup` prints, and run that setup
 command only after the user explicitly agrees in conversation. Never run the
 setup command unasked. When it reports `template not on <trunk>`, relay the
 printed step to the user; add the template only after the user explicitly
@@ -153,13 +153,13 @@ For an intent carrying automatic-publication authorization, pass its absolute
 path to the installed plugin's one publication command:
 
 ```text
-python3 <loom-code>/scripts/loom_checker.py publish --intent <absolute-intent-path> --title <title> --body-file <absolute-path>
+"<loom-code>/scripts/loom-python" --repair publish --intent <absolute-intent-path> --title <title> --body-file <absolute-path>
 ```
 
 For a legacy intent, obtain one publication decision and acknowledge it with:
 
 ```text
-python3 <loom-code>/scripts/loom_checker.py publish --confirm-authorized --title <title> --body-file <absolute-path>
+"<loom-code>/scripts/loom-python" --repair publish --confirm-authorized --title <title> --body-file <absolute-path>
 ```
 
 The `<title>` is a Conventional Commits subject whose type equals the current
@@ -239,7 +239,7 @@ On that acceptance, take the root of the change branch's worktree —
 task or main checkout — and land the change as one Bash command:
 
 ```text
-cd '<absolute worktree root>' && python3 <loom-code>/scripts/loom_checker.py land --accepted-by <name>
+cd '<absolute worktree root>' && "<loom-code>/scripts/loom-python" --repair land --accepted-by <name>
 ```
 
 `<name>` is the maintainer who accepted; it must match the intent originator or

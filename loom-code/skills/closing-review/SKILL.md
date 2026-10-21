@@ -60,7 +60,7 @@ On Antigravity CLI or OpenCode, map tool and agent names with
 [`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
 Before dispatching reviewers in Round 1, run
-`python3 <loom-code>/scripts/loom_checker.py sync-trunk` from the change
+`"<loom-code>/scripts/loom-python" --repair sync-trunk` from the change
 worktree. When it reports `up to date`, continue. When it reports
 `content changed`, dispatch no reviewer and return to Build §3 to re-run the
 complete package suite and the existing adversarial programs, then start
@@ -125,7 +125,7 @@ dispatching the first reviewers. After Build commits completed functional
 content, run:
 
 ```text
-python3 <loom-code>/scripts/loom_checker.py reviewer-count <change-id>
+"<loom-code>/scripts/loom-python" --repair reviewer-count <change-id>
 ```
 
 The output is the computed reviewer floor: dispatch that many
@@ -397,7 +397,7 @@ them with the raw YAML.
 Then run:
 
 ```text
-python3 <loom-code>/scripts/loom_checker.py finalize-review <change-id> --input <temporary-json>
+"<loom-code>/scripts/loom-python" --repair finalize-review <change-id> --input <temporary-json>
 ```
 
 The checker runs the declared package suite and each adversarial program once.

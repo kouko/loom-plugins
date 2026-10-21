@@ -36,7 +36,7 @@ path plus a bounded task, files, Acceptance references, test command and risks
 directly; create no replacement plan. Remaining dispatch, TDD and verification
 requirements still apply. Resolve open intent questions before implementation.
 
-When plan is retained, run `loom_checker.py plan docs/loom/<change-id>/plan.md`; a
+When plan is retained, run `"<loom-code>/scripts/loom-python" --repair plan docs/loom/<change-id>/plan.md`; a
 BLOCK or any other non-zero exit stops Build until the plan passes.
 
 Finding no task left to implement is not a reason to end Build. It means §2 has
@@ -100,7 +100,7 @@ integration checks once to expose cross-task defects. Then end Build with its
 mechanical checks, in this order:
 
 1. From the change worktree, run
-   `python3 <loom-code>/scripts/loom_checker.py sync-trunk`, so the adversary,
+   `"<loom-code>/scripts/loom-python" --repair sync-trunk`, so the adversary,
    the suite and the programs all see the fetched trunk tip. On
    `BLOCK review.sync`, fix the cause inside Build, where a conflict is resolved as
    implementation work in a new build round, never by the command. On
