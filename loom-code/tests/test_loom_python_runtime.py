@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -62,6 +63,29 @@ def test_repair_then_ready_offline_uses_cached_interpreter(tmp_path: Path) -> No
         repaired.returncode, repaired.stdout, repaired.stderr
     )
     assert (tmp_path / "uv.log").read_text() == log
+
+
+def test_ready_accepts_importable_newer_yaml_but_rejects_missing_yaml(tmp_path: Path) -> None:
+    runtime = tmp_path / "cache" / "loom-code" / "python-3.11-pyyaml-6.0.2-v1"
+    subprocess.run([sys.executable, "-m", "venv", "--without-pip", str(runtime)], check=True)
+    interpreter = runtime / "bin" / "python"
+    site_packages = Path(subprocess.run(
+        [str(interpreter), "-E", "-s", "-c", "import site; print(site.getsitepackages()[0])"],
+        check=True, text=True, capture_output=True,
+    ).stdout.strip())
+    yaml_package = site_packages / "yaml"
+    yaml_package.mkdir()
+    (yaml_package / "__init__.py").write_text("__version__ = '6.0.3'\n")
+    script = tmp_path / "yaml_version.py"
+    script.write_text("import yaml; print(yaml.__version__)\n")
+
+    usable = run_launcher(tmp_path, "--ready", "--script", str(script))
+    assert (usable.returncode, usable.stdout, usable.stderr) == (0, "6.0.3\n", "")
+
+    shutil.rmtree(yaml_package)
+    missing = run_launcher(tmp_path, "--ready", "--script", str(script))
+    assert missing.returncode == 86
+    assert "runtime is missing or invalid" in missing.stderr
 
 
 def test_missing_installer_and_corrupt_cache_are_bootstrap_errors(tmp_path: Path) -> None:

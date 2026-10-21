@@ -38,7 +38,7 @@ runtime=$cache/python-3.11-pyyaml-6.0.2-v1
 python=$runtime/bin/python
 
 ready() {
-    [ -x "$python" ] && "$python" -E -s -c 'import sys, tomllib, yaml; assert sys.version_info >= (3, 11) and yaml.__version__ == "6.0.2"' >/dev/null 2>&1
+    [ -x "$python" ] && "$python" -E -s -c 'import sys, tomllib, yaml; assert sys.version_info >= (3, 11)' >/dev/null 2>&1
 }
 
 if ! ready; then
@@ -88,7 +88,7 @@ if ! ready; then
                 echo 'loom-python: uv could not install Python 3.11 and PyYAML 6.0.2; check network, uv cache, and cache write access, then retry --repair.' >&2
                 exit 2
             fi
-            if ! "$staging/bin/python" -E -s -c 'import sys, tomllib, yaml; assert sys.version_info >= (3, 11) and yaml.__version__ == "6.0.2"' >/dev/null 2>&1; then
+            if ! "$staging/bin/python" -E -s -c 'import sys, tomllib, yaml; assert sys.version_info >= (3, 11)' >/dev/null 2>&1; then
                 echo 'loom-python: installed runtime failed Python/PyYAML validation; check uv cache and retry --repair.' >&2
                 exit 2
             fi
