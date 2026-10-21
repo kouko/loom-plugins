@@ -1,0 +1,74 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-21-reliable-loom-python-runtime",
+  "content_digest": "9c622b1e923ad6faaf14c56a3f8166581b5b9789",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_runtime_readonly_cache.py",
+      "artifact": "loom-code/tests/test_runtime_readonly_cache.py",
+      "result": "pass",
+      "command_digest": "12a114381128e07132dbfd6173238c770ae8c3fb7c2a73cfd403938497dacd1d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "review_code",
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "fc6e9bfc03f17b01566731748b9c0630304dad11",
+      "review_target_sha": "c800f8f40f165147e847dd68c22a506c5127a528",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Cold-cache startup hook, regression test, and uv citation findings fixed in round 2."
+      ]
+    },
+    {
+      "reviewer": "review_skill",
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "fc6e9bfc03f17b01566731748b9c0630304dad11",
+      "review_target_sha": "c800f8f40f165147e847dd68c22a506c5127a528",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Hook contract changes and acceptance rerun passed skill lens in round 2."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
