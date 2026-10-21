@@ -84,6 +84,8 @@ if ! ready; then
         trap cleanup 0
         trap 'exit 2' 1 2 3 15
         if ! ready; then
+            # uv CLI contract for python install, venv --python, and pip install --python:
+            # https://docs.astral.sh/uv/reference/cli/
             if ! uv python install 3.11 1>&2 || ! uv venv --python 3.11 "$staging" 1>&2 || ! uv pip install --python "$staging/bin/python" 'PyYAML==6.0.2' 1>&2; then
                 echo 'loom-python: uv could not install Python 3.11 and PyYAML 6.0.2; check network, uv cache, and cache write access, then retry --repair.' >&2
                 exit 2
