@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${PLUGIN_ROOT}/scripts/loom_checker.py\" push --hook"
+            "command": "\"${PLUGIN_ROOT}/scripts/loom-python\" --ready push --hook; status=$?; if [ \"$status\" -eq 86 ]; then printf '{\"systemMessage\":\"loom: publication hook failed (checker runtime unavailable; run loom-python --repair in an agent station); allowing.\"}\\n'; exit 0; fi; exit \"$status\""
           }
         ]
       }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${PLUGIN_ROOT}/hooks/language-anchor.py\""
+            "command": "\"${PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py"
           }
         ]
       }

@@ -15,6 +15,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -56,6 +57,10 @@ if (process.argv[2]) {
 def _own_tmpdir(tmp_path: Path, monkeypatch):
     # The loader deletes tmpdir/loom-opencode on load; keep it off the real one.
     monkeypatch.setenv("TMPDIR", str(tmp_path))
+    runtime = tmp_path / "cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin"
+    runtime.mkdir(parents=True)
+    (runtime / "python").symlink_to(sys.executable)
+    monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "cache"))
 
 
 def _node(plugin: str, *args: str, cwd=None, env=None) -> dict:
@@ -147,12 +152,12 @@ def test_plugin_without_agents_registers_no_agents_and_its_entry_commands():
 
 
 def test_shell_push_routed_to_push_hook(tmp_path: Path):
-    bin_dir, log = tmp_path / "bin", tmp_path / "python3.log"
-    bin_dir.mkdir()
-    fake = bin_dir / "python3"
-    fake.write_text(f'#!/bin/bash\necho "$*" >> "{log}"\ncat >/dev/null\n', encoding="utf-8")
+    runtime = tmp_path / "cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin"
+    fake, log = runtime / "python", tmp_path / "python.log"
+    fake.unlink()
+    fake.write_text(f'#!/bin/bash\necho "$*" >> "{log}"\nexec "{sys.executable}" "$@"\n', encoding="utf-8")
     fake.chmod(0o755)
-    env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+    env = os.environ.copy()
     write = {"tool": "write", "sessionID": "root", "id": "c0", "input": {"path": "a.md", "content": "x"}}
     assert _fire("loom-code", "execute.before", write, tmp_path, env)["threw"] is None
     assert not log.exists()  # a file tool never reaches the push hook
@@ -217,11 +222,8 @@ def test_session_and_skill_hooks_feed_text_back(tmp_path: Path, plugin, fires, n
 
 
 def test_unreachable_handler_allows(tmp_path: Path):
-    bin_dir = tmp_path / "bin"
-    bin_dir.mkdir()
-    (bin_dir / "python3").write_text("#!/bin/bash\ncat >/dev/null\nexit 1\n", encoding="utf-8")
-    (bin_dir / "python3").chmod(0o755)
-    env = {**os.environ, "PATH": f"{bin_dir}{os.pathsep}{os.environ['PATH']}"}
+    (tmp_path / "cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin/python").unlink()
+    env = os.environ.copy()
     write = {"tool": "write", "sessionID": "root", "id": "c5",
              "input": {"path": ".git/loom/selections/rec", "content": "x"}}
     assert _fire("loom-code", "execute.before", write, tmp_path, env)["threw"] is None

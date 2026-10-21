@@ -74,9 +74,14 @@ def test_missing_installer_and_corrupt_cache_are_bootstrap_errors(tmp_path: Path
     (runtime / "bin").mkdir(parents=True)
     (runtime / "bin" / "python").write_text("broken")
     corrupt = run_launcher(tmp_path, "--ready", "--list-rules")
-    assert corrupt.returncode == 2
+    assert corrupt.returncode == 86
     assert "--repair" in corrupt.stderr
     assert "BLOCK " not in corrupt.stderr
+
+    no_home = subprocess.run(["/bin/sh", str(LAUNCHER), "--ready", "--list-rules"],
+                             env={"PATH": "/bin"}, text=True, capture_output=True)
+    assert no_home.returncode == 86
+    assert "HOME or XDG_CACHE_HOME" in no_home.stderr
 
 
 def test_script_mode_uses_runtime_and_preserves_script_exit(tmp_path: Path) -> None:
@@ -85,6 +90,15 @@ def test_script_mode_uses_runtime_and_preserves_script_exit(tmp_path: Path) -> N
     result = run_launcher(tmp_path, "--repair", "--script", str(script), tools=fake_uv(tmp_path))
     assert result.returncode == 7, result.stderr
     assert "/loom-code/python-3.11-pyyaml-6.0.2-v1/bin/python" in result.stdout
+
+
+def test_launcher_resolves_its_directory_when_called_by_path_name(tmp_path: Path) -> None:
+    assert run_launcher(tmp_path, "--repair", "--list-rules", tools=fake_uv(tmp_path)).returncode == 0
+    env = {**os.environ, "PATH": str(LAUNCHER.parent), "XDG_CACHE_HOME": str(tmp_path / "cache")}
+    result = subprocess.run(["/bin/sh", "-c", "loom-python --ready --list-rules"],
+                            env=env, text=True, capture_output=True)
+    assert result.returncode == 0, result.stderr
+    assert "contract.requires\t" in result.stdout
 
 
 def test_script_keeps_project_environment_without_importing_project_modules(tmp_path: Path) -> None:

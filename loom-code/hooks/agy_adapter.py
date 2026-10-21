@@ -30,6 +30,7 @@ from pathlib import Path
 
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
 CHECKER = PLUGIN_ROOT / "scripts" / "loom_checker.py"
+LAUNCHER = PLUGIN_ROOT / "scripts" / "loom-python"
 SESSION_START = PLUGIN_ROOT / "hooks" / "session-start"
 LANGUAGE_ANCHOR = PLUGIN_ROOT / "hooks" / "language-anchor.py"
 # <loom-plugin>/[<version>/]skills/<name>/SKILL.md, as agy, Claude Code and a checkout lay it out.
@@ -69,7 +70,7 @@ def push_gate(payload: dict) -> int:
     if CHECKER.is_file():
         try:
             result = subprocess.run(
-                [sys.executable, str(CHECKER), "push", "--hook"],
+                [str(LAUNCHER), "--ready", "push", "--hook"],
                 input=json.dumps(claude_payload), capture_output=True, text=True,
                 cwd=str(PLUGIN_ROOT), timeout=25,
             )
@@ -78,6 +79,9 @@ def push_gate(payload: dict) -> int:
                 return _emit({"decision": "allow", "reason": reason} if reason else {"decision": "allow"})
             if result.returncode == 2:
                 return _emit({"decision": "deny", "reason": reason or "BLOCK: checker refused"})
+            if result.returncode == 86:
+                error = "checker runtime unavailable" + (f": {reason}" if reason else "")
+                return _emit({"decision": "allow", "reason": f"loom: publication hook failed ({error}); allowing."})
             error = f"checker exited {result.returncode}" + (f": {reason}" if reason else "")
         except (OSError, subprocess.SubprocessError) as exc:
             error = str(exc)
