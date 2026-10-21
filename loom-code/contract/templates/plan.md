@@ -28,3 +28,8 @@ charter: 1.1
 ## Risks
 <!-- each numbered item ≤40 words (checker rule plan.field-caps) -->
 1. <plan-wide risk>
+<!-- If a risk line names a boundary test, write:
+     1. Risk: description; boundary test Wx-yy
+     The task Wx-yy must exist in the Task DAG and its header must
+     include "boundary test" (e.g., **W1-02 Title** boundary test ...).
+     See intake.plan-boundary-tests rule. -->
