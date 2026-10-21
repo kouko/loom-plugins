@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).resolve().parents[5] / "loom-code/scripts/external_review.py"
+SCRIPT = Path(__file__).resolve().parents[2] / "loom-code/scripts/external_review.py"
 SPEC = importlib.util.spec_from_file_location("external_review", SCRIPT)
 review = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(review)
