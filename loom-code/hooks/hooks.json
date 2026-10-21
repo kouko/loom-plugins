@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; status=$?; if [ \"$status\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$status\""
           }
         ]
       }
@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; status=$?; if [ \"$status\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$status\""
           }
         ]
       }
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py"
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; status=$?; if [ \"$status\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$status\""
           }
         ]
       }

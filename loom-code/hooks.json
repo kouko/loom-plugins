@@ -15,7 +15,7 @@
     "PreInvocation": [
       {
         "type": "command",
-        "command": "./scripts/loom-python --ready --script ../hooks/agy_adapter.py pre-invocation; status=$?; if [ \"$status\" -eq 86 ]; then printf '{}\\n'; exit 0; fi; exit \"$status\"",
+        "command": "./scripts/loom-python --ready --script ../hooks/agy_adapter.py pre-invocation; status=$?; if [ \"$status\" -eq 86 ]; then exec python3 ./hooks/agy_adapter.py pre-invocation; fi; exit \"$status\"",
         "timeout": 20
       }
     ]

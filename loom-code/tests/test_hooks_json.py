@@ -153,7 +153,8 @@ def test_post_tool_use_keeps_language_anchor(hooks):
 
 def test_user_prompt_submit_runs_language_anchor(hooks):
     (command,) = _commands(hooks["UserPromptSubmit"])
-    assert command == '"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --ready --script ../hooks/language-anchor.py'
+    assert command.startswith('"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --ready --script ../hooks/language-anchor.py')
+    assert 'exec python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"' in command
 
 
 def test_no_removed_hook_is_referenced(hooks):
@@ -308,3 +309,49 @@ def test_json_hosts_return_failure_diagnostic_when_runtime_missing(host, tmp_pat
                             text=True, capture_output=True, cwd=root, env=env)
     assert result.returncode == 0, result.stderr
     assert "--repair" in json.dumps(json.loads(result.stdout))
+
+
+@pytest.mark.parametrize("host,event,matcher", [
+    ("claude", "SessionStart", "compact|resume"),
+    ("claude", "PostToolUse", "Skill|Agent"),
+    ("claude", "UserPromptSubmit", ""),
+    ("opencode", "PostToolUse", "Skill"),
+    ("antigravity", "PreInvocation", ""),
+])
+def test_stdlib_hooks_keep_context_with_cold_cache(host, event, matcher, tmp_path):
+    root = REPO / "loom-code"
+    if host == "antigravity":
+        data = json.loads(AGY_HOOKS_JSON.read_text())
+        command = data["loom-code"][event][0]["command"]
+        payload = {"conversationId": "cold", "workspacePaths": [str(tmp_path)],
+                   "invocationNum": 0, "initialNumSteps": 1}
+    else:
+        manifest = HOOKS_JSON if host == "claude" else HOOKS_DIR / "hooks-opencode.json"
+        entries = json.loads(manifest.read_text())["hooks"][event]
+        (entry,) = [item for item in entries if item.get("matcher", "") == matcher]
+        (command,) = _commands([entry])
+        payload = {"hook_event_name": event, "tool_name": "Skill"}
+    env = {**os.environ, "XDG_CACHE_HOME": str(tmp_path / "empty"), "TMPDIR": str(tmp_path),
+           "CLAUDE_PLUGIN_ROOT": str(root), "PLUGIN_ROOT": str(root)}
+    result = subprocess.run(["/bin/sh", "-c", command], input=json.dumps(payload),
+                            text=True, capture_output=True, cwd=root, env=env, timeout=30)
+    assert result.returncode == 0, result.stderr
+    output = json.loads(result.stdout)
+    if host == "antigravity":
+        assert "Station order:" in output["injectSteps"][0]["ephemeralMessage"]
+    else:
+        assert "in the language and script" in output["hookSpecificOutput"]["additionalContext"]
+
+    ready_env = _ready_env(tmp_path)
+    ready_env.update(CLAUDE_PLUGIN_ROOT=str(root), PLUGIN_ROOT=str(root), TMPDIR=str(tmp_path))
+    if host == "antigravity":
+        ready_env["PATH"] = os.environ["PATH"]  # session-start also calls awk/sed
+        payload["conversationId"] = "ready"
+    ready = subprocess.run(["/bin/sh", "-c", command], input=json.dumps(payload),
+                           text=True, capture_output=True, cwd=root, env=ready_env, timeout=30)
+    assert ready.returncode == 0, ready.stderr
+    ready_output = json.loads(ready.stdout)
+    if host == "antigravity":
+        assert "Station order:" in ready_output["injectSteps"][0]["ephemeralMessage"]
+    else:
+        assert "in the language and script" in ready_output["hookSpecificOutput"]["additionalContext"]
