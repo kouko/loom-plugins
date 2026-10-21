@@ -39,14 +39,15 @@ def acceptance_coverage(
     intent_sections: dict[str, str], report_text: str,
 ) -> list[dict]:
     """The per-line coverage snapshot: one entry per intent Acceptance
-    number, `covered` when the report carries a row for it and `missing`
+    number, `works` when the report carries a row for it and `not_verified`
     otherwise. This is the record the attestation's `acceptance_status`
     field holds; the row-identity parsing lives here, one source for both
-    the coverage check and the bookkeeping field."""
+    the coverage check and the bookkeeping field. Status vocabulary matches
+    the validator: `works`, `partly`, `not_verified`, `fails`."""
     intent_numbers = sorted(_get_intent_acceptance_numbers(intent_sections))
     report_numbers = _get_report_acceptance_numbers(report_text)
     return [
-        {"line": number, "status": "covered" if number in report_numbers else "missing"}
+        {"acceptance": number, "status": "works" if number in report_numbers else "not_verified"}
         for number in intent_numbers
     ]
 
