@@ -6,15 +6,15 @@ pre-build-review: required — failure diagnostics touch private review material
 REQ-1 — Complete a healthy review
   WHEN an authorized Claude Code review is requested and the CLI completes both stages successfully, Loom shall return the review text with model provenance rather than treating the preflight as the review → Acceptance #1
 
-REQ-2 — Explain a failed review safely
-  WHEN the Claude Code review stage fails, Loom shall return a bounded failure category and a useful next diagnostic or recovery action without including the review prompt, review text, or raw CLI output in its public result → Acceptance #2
+REQ-2 — Explain an incomplete review safely
+  WHEN Claude Code preflight, full review, process execution, or output validation fails or times out, Loom shall return a bounded failure category or explicitly unknown cause with a useful next diagnostic or recovery action, without including the review prompt, review text, or raw CLI output in its public result → Acceptance #2
 
 REQ-3 — Preserve review boundaries
   WHEN any outside review does not complete, Loom shall leave the review verdict absent, enforce the existing authorization scope, and keep the other executor paths working → Acceptance #3
 
 ## Design decision
 - agent-decided — Classify recognized Claude failures from structured CLI fields and bounded known diagnostics; report only fixed categories and recovery guidance because raw stdout and stderr can contain the review packet.
-- agent-decided — Give unrecognized failures safe stage, exit, and output-shape information plus a local diagnostic action; an unknown cause must stay explicitly unknown rather than be guessed.
+- agent-decided — For an unrecognized CLI failure, permit only a fixed stage enum (`probe` or `review`), the numeric exit code when one exists, and booleans for stdout present, stderr present, and stdout JSON parseable. Do not echo CLI-controlled JSON keys, strings, excerpts, or content-derived lengths; an unknown cause stays explicitly unknown and gets a local diagnostic action.
 - agent-decided — Keep the preflight and full review as separate executions and require the full review's output for completion; a successful preflight proves only short-request viability.
 - agent-decided — Keep consent, selected model and effort, read-only tool restrictions, and the existing result meaning unchanged; this avoids turning a diagnostic repair into a new review policy.
 
@@ -36,7 +36,7 @@ REQ-3 — Preserve review boundaries
 | No authorized request | Requests an outside review without the required selection or consent | No CLI request is sent; the review remains failed with a consent reason and the user can make an explicit selection. |
 | In progress | Starts an authorized Claude Code review | Stage and elapsed-time progress appears while the preflight and full review run. |
 | Success | Receives a completed full review | The result includes the actual review text and observed model; the owning review flow can then validate a verdict. |
-| Recognized failure | Receives a nonzero result from Claude Code | A safe failure category and next action appear; the result has no review text or verdict. |
-| Unrecognized failure | Receives a nonzero result with no recognized cause | The result says the cause is unknown, gives safe stage/exit/output-shape facts and a local diagnostic action, and never prints raw CLI output. |
+| Recognized failure | Receives a preflight or full-review failure, timeout, process error, or invalid or empty result with a known cause | A safe failure category and next action appear; the result has no review text or verdict. |
+| Unrecognized failure | Receives any of those failures with no recognized cause | The result says the cause is unknown and gives a local diagnostic action. For a CLI exit it may also show only the fixed stage, numeric exit code, and stdout-present, stderr-present, and JSON-parseable booleans; it never prints raw CLI output or CLI-controlled fields. |
 
 After a failure, a newly authorized review starts again with a fresh preflight; no failed run is promoted to success or silently retried.
