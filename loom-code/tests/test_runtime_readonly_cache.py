@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 
 
-LAUNCHER = Path(__file__).resolve().parents[5] / "loom-code/scripts/loom-python"
+LAUNCHER = Path(__file__).resolve().parents[1] / "scripts" / "loom-python"
 
 
 def test_repair_readonly_cache_reports_write_barrier(tmp_path: Path) -> None:
