@@ -6,7 +6,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.44.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.45.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -111,6 +111,10 @@ package。
 內容上再跑一次 package 測試與對抗程式，並產生綁定內容的 attestation。已安裝的 `PreToolUse`
 hook 在 `git push` 與 `gh pr create` 之前再跑一次：重算內容 digest，並在不重跑
 測試或 probe 的情況下驗證那份證據。
+
+各站透過 `scripts/loom-python --repair` 在使用者快取中備妥 checker 專用的
+Python 與套件，接著重跑原本的檢查；使用者專案的測試環境不受影響。hook 用
+`--ready` 沿用已備妥的環境，不自行安裝；環境不可用時會顯示修復方式。
 
 ## 與 loom-design、loom-workflow 組合
 
