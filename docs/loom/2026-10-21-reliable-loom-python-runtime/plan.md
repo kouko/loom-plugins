@@ -37,6 +37,11 @@ charter: 1.1
 - Test: A1 positive: fresh-install; negative: blocked-install. A2 positive: hook-reuse; boundary: old-python. A3 positive: clear-error; negative: false-pass. A4 positive: offline-reuse; boundary: no-cache. A5 positive: project-command; negative: env-leak. A6 positive: package-suite; negative: invalid-hook.
 - Risk: agent-decided — bump plugin version before closing review; test a Python 3.9 host path and a ready offline path without mutating the developer's project environment.
 
+**W2-02 Graduate the cache-permission adversarial probe**  after: W0-01  acceptance: 3
+- Files: `docs/loom/2026-10-21-reliable-loom-python-runtime/evidence/probes/test_runtime_readonly_cache.py`, `loom-code/tests/test_runtime_readonly_cache.py`
+- Test: A3 positive: readonly-cache-guidance; negative: false-stale-lock.
+- Risk: agent-decided — the adversary observed RED at 9c013f0a; move its executable case unchanged into the package suite after the launcher fix.
+
 ## Simplicity check
 - Pin the single runtime package in the launcher rather than add a requirements file — taken
 
