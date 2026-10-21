@@ -1,30 +1,37 @@
 # Loom evidence drift guards — acceptance test report
 
-Tried on 2026-10-13, in a clean copy of the project at 4c31917. How I tried each line and what came back: `docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md`.
+Tried on 2026-10-21, in a clean copy of the project at 6352d7b0. How I tried
+each line and what came back: `docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md`.
 
 ## 你要的東西，一條一條
 
 | # | 你要的東西 | 結果 | 實際發生什麼 | 重測 |
 |---|---|---|---|---|
-| 1 | 對一份 acceptance report 未逐條交代 intent 每條 Acceptance 身分與狀態（含省略或重複條目）的變更執行檢查，檢查失敗並指出有問題的條號。 | works | 新增 `intake.attestation-coverage` 規則，正確識別並報告缺漏的 Acceptance 行；單元測試驗證。 | re-tested |
-| 2 | 對一份 attestation 未記錄被測 commit 與被審查 commit 兩個身分的變更執行檢查，檢查失敗；兩者之間存在功能內容差異（非證據檔案差異）時，檢查失敗。 | works | 新增 `intake.commit-identity` 規則，正確比對 tested_commit vs reviewed_commit 的功能內容摘要；單元測試驗證。 | re-tested |
-| 3 | 對一份 attestation 所記錄的 intent 確認版本與 intent 檔案當前內容不符的變更執行檢查，檢查失敗，且失敗訊息指出受影響的驗收條目與重新確認路徑。 | works | 新增 `intake.intent-version` 規則，正確比對 intent_confirmed_sha 與當前 intent（排除 status line）；單元測試驗證。 | re-tested |
-| 4 | 對一份 plan 具名的 boundary/probe test 在變更中不存在的變更執行檢查，檢查失敗。 | works | 新增 `intake.plan-boundary-tests` 規則，針對 charter 1.1+ plan 檢查 Risk 行是否有對應 boundary test；單元測試驗證。 | re-tested |
-| 5 | closing review 完成後，verdict 產物存在於該 change 目錄內，且其與 attestation 的主從關係在文件中明確。 | works | closing-review SKILL 更新為在 change 目錄寫入 verdict.md；attestation 包含 verdict 參考；單元測試驗證。 | re-tested |
-| 6 | 檢查在 closing review 之後的發布前失效檢查中再次執行，不只 review 入口一次。 | works | finalize-review 在產生 attestation 前重跑所有 evidence drift guard 檢查；single-unit 測試驗證。 | re-tested |
-| 7 | 本變更之後新建立的 loom 變更，其 attestation 與 acceptance report 模板預設帶有上述欄位。 | works | attestation 模板擴充新欄位；plan 模板 Risk 區塊加入 boundary test 提示；單元測試驗證。 | re-tested |
+| 1 | 對一份 acceptance report 未逐條交代 intent 每條 Acceptance 身分與狀態（含省略或重複條目）的變更執行檢查，檢查失敗並指出有問題的條號。 | works | 缺第 3 條時檢查失敗並指出條號 3；多出不存在的第 4 條也失敗並指出條號 4；條目齊全時通過。 | re-tested |
+| 2 | 對一份 attestation 未記錄被測 commit 與被審查 commit 兩個身分的變更執行檢查，檢查失敗；兩者之間存在功能內容差異（非證據檔案差異）時，檢查失敗。 | works | 修正後，憑證缺兩個 commit 身分任一即失敗（之前會放行）；被測與被審查內容不同也失敗並點名兩個 commit；只有證據檔不同則通過；舊版憑證仍向下相容。 | re-tested |
+| 3 | 對一份 attestation 所記錄的 intent 確認版本與 intent 檔案當前內容不符的變更執行檢查，檢查失敗，且失敗訊息指出受影響的驗收條目與重新確認路徑。 | works | intent 被改過而確認記錄沒更新時失敗，訊息指名所有可能受影響的驗收條目並給出重新計算的指令（實測該指令可重算出目前版本）；更新確認記錄後通過。 | re-tested |
+| 4 | 對一份 plan 具名的 boundary/probe test 在變更中不存在的變更執行檢查，檢查失敗。 | works | Risk 指名不存在的 boundary test 時失敗並指出任務編號；任務存在時通過；新版模板的提示註解不會誤觸檢查。 | re-tested |
+| 5 | closing review 完成後，verdict 產物存在於該 change 目錄內，且其與 attestation 的主從關係在文件中明確。 | works | 判定紀錄落在該變更自己的目錄內；文件明寫憑證就是歸檔的判定紀錄、審查輸入檔只是暫時的，不會留下第二份會漂移的副本。 | re-tested |
+| 6 | 檢查在 closing review 之後的發布前失效檢查中再次執行，不只 review 入口一次。 | works | 同一個有缺陷的變更在計畫入口不會被擋，但在 closing review 之後、發布之前的檢查會執行並擋下；三種檢查都實測在該步驟攔到問題。 | re-tested |
+| 7 | 本變更之後新建立的 loom 變更，其 attestation 與 acceptance report 模板預設帶有上述欄位。 | partly | 四個模板都預設帶上新欄位，全新變更產出的憑證也會自動填入；但「逐條驗收狀態」欄位寫入的值跟檢查器自己的驗證規則對不上，導致每個新變更的憑證在後續檢查都讀成失效。 | re-tested |
 
 ## 對你既有的資料做了什麼 (what this did to data you already had)
 
-沒有 — 這個變更只擴充 loom-code 內部機制（checker 規則、attestation schema、模板），不讀也不改你既有的任何檔案或資料。
+沒有 — 這個變更只擴充 loom-code 內部機制（檢查規則、驗收憑證的格式、模板），不讀也不改你既有的任何檔案或資料。
 
 ## 我替你決定的事
 
-- **新規則採 optional 欄位設計** — attestation 新增欄位皆為 optional，向下相容 v1 attestation；這樣既有變更不需遷移即可通過驗證。
-- **只排除必要的證據檔案** — publication_only_paths 只擴充 acceptance-test-report.md、acceptance-test-evidence.md、evidence/probes/**；不整個 evidence 目錄列白名單，保留對功能內容變更的敏感度。
-- **intent_confirmed_sha 排除 status line** — 仿 spec confirmed-behavior 模式，只對 intent 核心內容計算 SHA，確認時自動寫入 frontmatter。
-- **新規則各自獨立檔案** — 遵守 Module Criteria：add = 一個新檔 + 一個 routing entry；四個規則不共享業務邏輯，只共享讀檔/比對 helper。
+- **v1 憑證向下相容、v2 憑證缺欄位即失敗** — 修正後，舊版（v1）憑證沒有新欄位時直接跳過檢查；新（v2）憑證缺少被測或被審查 commit 任一，檢查就失敗，因為流程保證兩者都會被填上。若要放寬，得回到「缺欄位就跳過」的舊行為，那會讓破口回到原狀。
+- **只排除必要的證據檔案** — 功能內容比較時排除的是驗收憑證、驗收報告與證據目錄；其他檔案（包括 intent 本身）的變動仍算功能內容，會被當成漂移擋下。
+- **intent 確認記錄排除 status 行** — 計算確認時的版本時拿掉狀態行與記錄行本身，和 spec 的確認方式一致，避免記錄變成對自己的雜湊。
+- **新規則各自獨立成檔** — 四個規則各佔一個檔案、各掛一條登記，遵守模組準則的「新增 = 一個新檔 + 一條登記」；規則之間只共用讀檔與比對的小工具。
+
+## 你叫我跳過的步驟
+
+沒有 — 沒有任何步驟被跳過。
 
 ## 我不確定你要不要的事
 
-沒有。
+- 「逐條驗收狀態」欄位：憑證產生器寫入的值（第幾條、已覆蓋／缺漏）與檢查器自己的驗證規則（要求「第幾條」改用別的名字、狀態要用「通過／部分／未驗證／失敗」）對不上，所以每個新變更的憑證在發布與 PR 檢查時都會被讀成失效。要統一成哪一邊，需要你決定。
+- 重複條目：當每一條都有交代、只是某一條重複出現時，檢查目前放行。你要的是連重複也要擋下並指出條號嗎？
+- 三個新檢查（覆蓋、commit 身分、intent 版本）目前沒有各自的單元測試（只有其中一個有），而這份 intent 的約束寫明「新規則各自有測試」。要在這個變更裡補上嗎？
