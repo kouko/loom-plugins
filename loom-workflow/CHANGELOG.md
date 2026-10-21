@@ -4,6 +4,17 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.12.3] — 2026-10-21 — layered-architecture edge-case fixes
+
+- `render_arch` keeps a structured layer's widest body line unbroken; the
+  box widens by the leading-space cell.
+- An empty single-line name with no components draws an aligned box.
+- Every layer with an empty title and at least one description line now
+  draws aligned at any width instead of failing with
+  `max_width must be positive`.
+- Tests pin the exact trunk output of all six generators and share one
+  hang-guarded render helper.
+
 ## [5.12.2] — 2026-10-21 — layered-architecture narrow-width fixes
 
 - `wrap_label` no longer loops forever when a two-cell character is
