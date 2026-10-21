@@ -1,0 +1,97 @@
+#!/bin/sh
+# Run plugin Python scripts with Loom's own cached interpreter and dependencies.
+set -u
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 2
+mode=${1-}
+case "$mode" in
+    --repair|--ready) shift ;;
+    *) echo 'loom-python: use --repair or --ready before checker arguments.' >&2; exit 2 ;;
+esac
+
+script=$script_dir/loom_checker.py
+if [ "${1-}" = --script ]; then
+    shift
+    if [ "$#" -eq 0 ] || [ -z "$1" ]; then
+        echo 'loom-python: --script needs a plugin script path.' >&2
+        exit 2
+    fi
+    case "$1" in
+        /*) script=$1 ;;
+        *) script=$script_dir/$1 ;;
+    esac
+    shift
+fi
+
+cache_base=${XDG_CACHE_HOME:-${HOME:-}/.cache}
+if [ -z "$cache_base" ] || [ "$cache_base" = /.cache ]; then
+    echo 'loom-python: HOME or XDG_CACHE_HOME is needed for the user-owned runtime cache.' >&2
+    exit 2
+fi
+cache=$cache_base/loom-code
+runtime=$cache/python-3.11-pyyaml-6.0.2-v1
+python=$runtime/bin/python
+
+ready() {
+    [ -x "$python" ] && "$python" -E -s -c 'import sys, tomllib, yaml; assert sys.version_info >= (3, 11) and yaml.__version__ == "6.0.2"' >/dev/null 2>&1
+}
+
+if ! ready; then
+    if [ "$mode" = --ready ]; then
+        echo 'loom-python: checker runtime is missing or invalid; run loom-python --repair with the same arguments in an agent station.' >&2
+        exit 2
+    fi
+    if ! command -v uv >/dev/null 2>&1; then
+        echo 'loom-python: uv is unavailable; install uv and rerun loom-python --repair (or provide a working uv on PATH).' >&2
+        exit 2
+    fi
+    if ! mkdir -p "$cache" 2>/dev/null; then
+        echo "loom-python: cannot write runtime cache $cache; grant user write access or set XDG_CACHE_HOME." >&2
+        exit 2
+    fi
+    lock=$cache/.python-3.11-pyyaml-6.0.2-v1.lock
+    count=0
+    acquired=0
+    while :; do
+        if mkdir "$lock" 2>/dev/null; then
+            acquired=1
+            break
+        fi
+        if ready; then break; fi
+        count=$((count + 1))
+        if [ "$count" -ge 30 ]; then
+            echo "loom-python: runtime cache lock $lock did not clear; check another repair process or remove a stale lock." >&2
+            exit 2
+        fi
+        sleep 1
+    done
+    if [ "$acquired" -eq 1 ]; then
+        staging=$cache/.python-3.11-pyyaml-6.0.2-v1.$$
+        cleanup() { rm -rf "$staging" "$lock"; }
+        trap cleanup 0
+        trap 'exit 2' 1 2 3 15
+        if ! ready; then
+            if ! uv python install 3.11 1>&2 || ! uv venv --python 3.11 "$staging" 1>&2 || ! uv pip install --python "$staging/bin/python" 'PyYAML==6.0.2' 1>&2; then
+                echo 'loom-python: uv could not install Python 3.11 and PyYAML 6.0.2; check network, uv cache, and cache write access, then retry --repair.' >&2
+                exit 2
+            fi
+            if ! "$staging/bin/python" -E -s -c 'import sys, tomllib, yaml; assert sys.version_info >= (3, 11) and yaml.__version__ == "6.0.2"' >/dev/null 2>&1; then
+                echo 'loom-python: installed runtime failed Python/PyYAML validation; check uv cache and retry --repair.' >&2
+                exit 2
+            fi
+            rm -rf "$runtime"
+            if ! mv "$staging" "$runtime"; then
+                echo "loom-python: cannot publish runtime in $cache; check write access and retry --repair." >&2
+                exit 2
+            fi
+        fi
+        rmdir "$lock"
+        trap - 0 1 2 3 15
+    fi
+fi
+
+if ! ready; then
+    echo 'loom-python: runtime is still invalid; rerun --repair and inspect uv output.' >&2
+    exit 2
+fi
+exec "$python" -E -s "$script" "$@"
