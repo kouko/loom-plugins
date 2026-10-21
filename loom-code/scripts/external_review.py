@@ -442,6 +442,27 @@ def _execution_failure_reason(executor: str, output: str, stderr: str) -> str:
     return f"Claude API HTTP {status}"
 
 
+def _claude_failure_action(reason: str) -> str:
+    if "unknown error" in reason:
+        return ("Run claude doctor locally; inspect CLI diagnostics privately, "
+                "then request a new authorized review.")
+    if "authentication error" in reason:
+        return "Sign in to Claude locally, then request a new authorized review."
+    if "session limit" in reason:
+        return "Wait for the Claude session limit to reset, then request a new authorized review."
+    if "unsupported effort" in reason:
+        return "Select a supported Claude effort, then request a new authorized review."
+    if "executor-not-installed" in reason:
+        return "Install Claude CLI locally, then request a new authorized review."
+    if "review-root-not-found" in reason:
+        return "Restore the review root, then request a new authorized review."
+    if reason.startswith("execution-timeout"):
+        return "Check Claude CLI health and timeout settings locally, then request a new authorized review."
+    if "Claude API HTTP" in reason:
+        return "Check Claude API status locally, then request a new authorized review."
+    return "Inspect Claude CLI diagnostics privately, then request a new authorized review."
+
+
 def _command(executor: str, model: str, effort: str, prompt: str,
              scope: str) -> list[str]:
     if executor == "codex":
@@ -473,11 +494,15 @@ def execute(
         "filesystem_boundary": "working-root-only; outside-root reads and CLI writes not excluded",
     }
 
-    def fail(reason: str) -> dict[str, Any]:
+    def fail(reason: str, diagnostic: dict[str, Any] | None = None) -> dict[str, Any]:
         if "probe" in result:
             result["probe"].pop("stdout", None)
             result["probe"].pop("stderr", None)
         result["reason"] = reason
+        if executor == "claude" and reason.startswith(("probe-", "review-", "execution-")):
+            result["next_action"] = _claude_failure_action(reason)
+            if diagnostic is not None:
+                result["diagnostic"] = diagnostic
         return result
 
     if not _consent_valid(consent, executor, scope, model, effort, family):
@@ -521,7 +546,18 @@ def execute(
             if response.returncode != 0:
                 detail = _execution_failure_reason(executor, response.stdout,
                                                    response.stderr)
-                return fail(f"{stage}-exit-{response.returncode}: {detail}")
+                diagnostic = None
+                if executor == "claude" and detail == "unknown error":
+                    try:
+                        json.loads(response.stdout)
+                        parseable = True
+                    except (json.JSONDecodeError, TypeError):
+                        parseable = False
+                    diagnostic = {"stage": stage, "exit_code": response.returncode,
+                                  "stdout_present": bool(response.stdout),
+                                  "stderr_present": bool(response.stderr),
+                                  "stdout_json_parseable": parseable}
+                return fail(f"{stage}-exit-{response.returncode}: {detail}", diagnostic)
             if executor == "codex":
                 observed_model, observed_effort = _codex_observation(
                     response.stderr, model, effort)
