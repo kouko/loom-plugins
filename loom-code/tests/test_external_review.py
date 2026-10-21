@@ -1153,6 +1153,30 @@ def test_execute_section_still_names_one_json_result():
     assert _affirms_one_json_stdout(_execute_section())
 
 
+def test_execute_section_relay_safe_claude_failure_and_recovery():
+    section = _execute_section()
+    assert affirms(section, "relay", "reason", "next_action", "user")
+    assert affirms(section, "run", "claude doctor", "locally", "unknown cause")
+    assert affirms(section, "relay", "fixed", "diagnostic")
+    assert affirms(section, "keep", "raw cli output", "user-facing report")
+    assert "privately" in section
+    assert affirms("relay the bounded reason and next_action to the user.",
+                   "relay", "reason", "next_action", "user")
+    assert not affirms("do not relay the bounded reason and next_action to the user.",
+                       "relay", "reason", "next_action", "user")
+
+
+def test_execute_section_preserves_failed_review_boundary():
+    section = _execute_section()
+    assert affirms(section, "failed", "leg", "verdict")
+    assert "newly authorized review" in section
+    assert "silent retry" in section and "provider fallback" in section
+    assert affirms("record the failed leg with its verdict absent.",
+                   "failed", "leg", "verdict")
+    assert not affirms("do not record the failed leg with its verdict absent.",
+                       "failed", "leg", "verdict")
+
+
 def test_execute_section_pins_reject_negated_samples():
     assert _affirms_relay("keep the error stream visible and relay each progress line"
                           " to the user.")
