@@ -20,6 +20,11 @@ charter: 1.1
 - Test: A2 positive: release_metadata_synchronized; boundary: stale_version_pin.
 - Risk: agent-decided — use a minor bump for changed review guidance and result contract; complete it before final attestation so the published version identifies the fix.
 
+**W3-01 Keep the caught zero-exit error case in the suite**  after: W0-01, W2-01  acceptance: 2, 3
+- Files: docs/loom/2026-10-22-claude-review-diagnostics/evidence/probes/test_claude_error_result.py, loom-code/tests/test_adversarial_claude_error_result.py
+- Test: A2 negative: zero_exit_error_keeps_private_text_out; A3 negative: zero_exit_error_has_no_review_verdict; the graduated program passes both as a standalone unittest and in the package suite.
+- Risk: agent-decided — move the adversary's already RED-then-GREEN case into the package suite before finalization, preserving its `concern:` and adapting only its repository-root lookup.
+
 ## Simplicity check
 - Reuse the existing external-review test module for skill guidance; it already reads this skill — taken
 
