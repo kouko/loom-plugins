@@ -297,6 +297,29 @@ def test_claude_json_null_is_structured_failure():
     assert result["next_action"] == "Inspect Claude CLI diagnostics privately, then request a new authorized review."
 
 
+@pytest.mark.parametrize("stage", ["probe", "review"])
+def test_claude_zero_exit_error_result_never_completes_or_leaks(stage):
+    marker = "SYNTHETIC_PRIVATE_MARKER"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        error = stage == "probe" or len(calls) == 2
+        payload = {"type": "result", "is_error": error,
+                   "result": marker if error else "ok",
+                   "modelUsage": {"claude-sonnet-4-5": {}}}
+        return completed(argv, json.dumps(payload))
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            marker, consent("claude"), runner=runner)
+    assert len(calls) == (1 if stage == "probe" else 2)
+    assert result["status"] == "failed"
+    assert result["reason"] == "execution-error: claude result reports error"
+    assert result["next_action"] == "Inspect Claude CLI diagnostics privately, then request a new authorized review."
+    assert result["review_output"] is None
+    assert marker not in json.dumps(result)
+
+
 def test_codex_discovery_ignores_non_object_json_lines():
     result = review.discover("codex", "/repo", consent(),
                              runner=lambda argv, **kwargs: completed(argv, "null\n[]\n"))

@@ -396,6 +396,8 @@ def _claude_observation(output: str, model: str, family: str) -> tuple[str, str]
         raise ValueError("claude JSON result missing") from exc
     if not isinstance(data, dict):
         raise ValueError("claude JSON result is not an object")
+    if data.get("is_error") is True:
+        raise ValueError("claude result reports error")
     usage = data.get("modelUsage")
     if not isinstance(usage, dict) or not usage:
         raise ValueError("claude modelUsage missing")
@@ -587,6 +589,7 @@ def execute(
     except (OSError, ValueError, TypeError, KeyError) as exc:
         known = {"codex observable model/effort mismatch or missing",
                  "claude JSON result missing", "claude JSON result is not an object",
+                 "claude result reports error",
                  "claude modelUsage missing", "claude observed provider family mismatch",
                  "claude observed model mismatch", "claude result empty"}
         detail = str(exc) if isinstance(exc, ValueError) and (
