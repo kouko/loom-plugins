@@ -21,14 +21,14 @@ charter: 1.1
 ### Wave 1 — route every entry through that boundary
 
 **W1-01 Route station commands through the launcher**  after: W0-01  acceptance: 2, 5, 6
-- Files: `loom-code/skills`, `loom-code/tests/test_loom_runtime_skill_commands.py`
+- Files: `loom-code/skills`, `loom-code/references/dispatch-profile.md`, `loom-code/tests/test_loom_runtime_skill_commands.py`, `loom-code/tests/test_dispatch_profile_resolver.py`, `loom-code/tests/test_ship_worktree_merge.py`
 - Test: A2 positive: station-old-default; negative: stale-command. A5 positive: project-test-env; boundary: isolated-checker. A6 positive: rule-list; negative: bad-input.
 - Risk: agent-decided — replace checker and companion runtime invocations in station prose; retain explicit project test commands unchanged.
 
 **W1-02 Route host hooks through a ready runtime**  after: W0-01  acceptance: 2, 3, 6
-- Files: `loom-code/hooks`, `loom-code/hooks.json`, `loom-code/tests/test_hooks_json.py`, `loom-code/tests/test_codex_stale_hook.py`
+- Files: `loom-code/hooks`, `loom-code/hooks.json`, `loom-code/scripts/loom-python`, `loom-code/scripts/check_mechanisms.py`, `loom-code/tests`, `tests/test_loom_plugin_install_layout.py`
 - Test: A2 positive: four-host-ready; negative: old-default. A3 positive: missing-runtime-diagnostic; boundary: stale-plugin. A6 positive: valid-hook; negative: invalid-payload.
-- Risk: agent-decided — hooks never install packages; preserve each host's existing allow/deny and stale-checker behavior while surfacing repair guidance.
+- Risk: agent-decided — hooks never install packages; preserve each host's allow/deny behavior and keep mechanism inventory tied to the invoked script behind the launcher.
 
 ### Wave 2 — integration and release
 
