@@ -54,6 +54,10 @@ if ! ready; then
         echo "loom-python: cannot write runtime cache $cache; grant user write access or set XDG_CACHE_HOME." >&2
         exit 2
     fi
+    if [ ! -w "$cache" ]; then
+        echo "loom-python: cannot write runtime cache $cache; grant user write access or set XDG_CACHE_HOME." >&2
+        exit 2
+    fi
     lock=$cache/.python-3.11-pyyaml-6.0.2-v1.lock
     count=0
     acquired=0
@@ -63,6 +67,10 @@ if ! ready; then
             break
         fi
         if ready; then break; fi
+        if [ ! -w "$cache" ]; then
+            echo "loom-python: cannot write runtime cache $cache; grant user write access or set XDG_CACHE_HOME." >&2
+            exit 2
+        fi
         count=$((count + 1))
         if [ "$count" -ge 30 ]; then
             echo "loom-python: runtime cache lock $lock did not clear; check another repair process or remove a stale lock." >&2
