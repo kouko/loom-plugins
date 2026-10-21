@@ -123,6 +123,21 @@ task, and vendor identifiers need no semantic privacy judge; ambiguous
 private-party text does. A semantic false positive needs an audited
 `Privacy-Bypass-Reason`; secret findings cannot be bypassed.
 Use `loom-workflow:loom-memory` to route a qualifying durable repository lesson
+
+**Memory write timing:** `loom-workflow:git-memory` routes qualifying durable
+repository lessons to `docs/loom/memory/`. That skill, and
+`loom-workflow/skills/git-memory/SKILL.md:102-111`, require the memory entry
+to land **before** `closing-review`'s `finalize-review` generates the
+attestation, never after. A memory file committed after finalize-review
+changes the functional content digest and invalidates the attestation the
+branch already has -- forcing either another review round (full package suite
+plus two reviewers, bounded by the three-digest episode limit) or publication
+with `Verification status: stale`. Therefore, Ship **does not write memory
+entries** after finalize-review has run; qualifying lessons discovered at or
+after Ship are deferred to the next change's branch (the same rule applies
+in `loom-workflow/skills/loom-memory/SKILL.md:83-92` and its
+`references/operations.md:36-40`).
+
 when one is earned. It does not replace or reorder Ship's headings. Zero to one
 durable lesson per change is the normal outcome. When loom-workflow is not
 installed, this routing is silently skipped.
