@@ -1,5 +1,5 @@
 # Fix the flow diagram's flush body line and string-body splitting — plan
-intent: 2026-10-22-flow-node-edge-cases@53fc7fc8
+intent: 2026-10-22-flow-node-edge-cases@2dd66470
 charter: 1.1
 
 ## Current State Evidence
