@@ -1,5 +1,7 @@
 # Changelog
 
+## [3.46.0] — 2026-10-22 — feat(ship): memory entries land before finalize-review, never after
+
 ## [3.45.0] — 2026-10-21 — fix(loom-code): repair the checker runtime from agent stations
 
 - Agent stations now prepare a plugin-owned Python 3.11 and PyYAML runtime with `loom-python --repair` when the checker environment is missing, then retry the original check. Repair uses a user cache and leaves project test commands on the project's own environment.
