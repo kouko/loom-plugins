@@ -1338,14 +1338,12 @@ _TRUNK_PINS = {
 }
 
 
-@pytest.mark.parametrize("case", sorted(_TRUNK_PINS))
-def test_generator_output_matches_trunk_pin(case):
-    generator, args, kwargs, expected = _TRUNK_PINS[case]
-    assert _render_isolated(generator, *args, **kwargs) == expected
-
-
-def test_trunk_pins_cover_all_six_generators():
-    assert {pin[0] for pin in _TRUNK_PINS.values()} == {"table", "flow", "tree", "bar", "arch", "seq"}
+def test_trunk_pins_draw_expected_output_for_all_six_generators():
+    drawn = {}
+    for case, (generator, args, kwargs, expected) in sorted(_TRUNK_PINS.items()):
+        assert _render_isolated(generator, *args, **kwargs) == expected, case
+        drawn[generator] = case
+    assert set(drawn) == {"table", "flow", "tree", "bar", "arch", "seq"}
 
 
 # Trunk 5e850c70 error text not already pinned above (the empty-body
