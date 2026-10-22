@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.40.0] — 2026-10-22 — evidence drift guards: coverage, commit identity, intent version
+
+- Four new loom_checker rules bind the evidence to what it actually tested. `intake.attestation-coverage` fails when the acceptance report does not state every intent Acceptance line exactly once; `intake.commit-identity` fails when a v2 attestation omits the tested and reviewed commits or when their functional content differs; `intake.intent-version` fails when the confirmed intent changed after the sha its attestation pinned; `intake.plan-boundary-tests` fails when a plan names a boundary test task the change does not carry.
+- The v2 attestation carries the bookkeeping these rules check: `intent_confirmed_sha`, `tested_commit`, `reviewed_commit` and per-line `acceptance_status` (`works` / `partly` / `not_verified` / `fails`). v1 attestations and intents confirmed before the field existed are skipped, not failed.
+- Closing review files its verdicts in the change directory, and finalize-review re-runs the drift checks before writing the attestation, so drift is caught at publication as well as at review entry.
+- `docs/loom/<change-id>/acceptance-test-report.md` and `docs/loom/<change-id>/evidence/**` are publication-only paths: a difference there between the tested and the reviewed tree never fails the identity check, while a functional difference does.
+
 ## [3.39.0] — 2026-10-08 — consented external review uses an explicit executor profile
 
 - Add `external-review` as the shared outside execution boundary for Codex, Claude Code and Antigravity CLI. It requires recorded consent, an explicit model and effort, a bounded preflight, and a separately reported failure when execution or verification fails.
