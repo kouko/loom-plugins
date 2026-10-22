@@ -72,6 +72,14 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
     if not layers:
         return ""
 
+    # A non-empty str body draws as its lines; '' keeps the empty-body error.
+    layers = [
+        {**ly, "name": {**ly["name"], "body": split_lines(ly["name"]["body"])}}
+        if isinstance(ly, dict) and isinstance(ly.get("name"), dict) and isinstance(ly["name"].get("body"), str)
+        and ly["name"]["body"] else ly
+        for ly in layers
+    ]
+
     # Set budget: use provided width or default 40
     budget = width if width is not None else 40
 

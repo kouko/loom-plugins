@@ -48,6 +48,13 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
     if not steps:
         return ""
 
+    # A non-empty str body draws as its lines; '' keeps the empty-body error.
+    steps = [
+        {**s, "body": split_lines(s["body"])}
+        if isinstance(s, dict) and isinstance(s.get("body"), str) and s["body"] else s
+        for s in steps
+    ]
+
     # Set budget: use provided width or default 40
     budget = width if width is not None else 40
 

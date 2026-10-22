@@ -1064,6 +1064,30 @@ def test_dict_node_with_empty_body_keeps_its_error_text():
     assert str(flow_error.value) == expected
     assert str(arch_error.value) == expected
     assert str(tree_error.value) == expected
+    # empty-string-body-keeps-trunk-error
+    blank = {"title": "Title", "body": ""}
+    with pytest.raises(ValueError, match=f"^{expected}$"):
+        render_flow([blank])
+    with pytest.raises(ValueError, match=f"^{expected}$"):
+        render_arch([{"name": blank, "components": ["a"]}])
+
+
+def test_flow_and_arch_string_body_draws_lines():
+    # flow-and-arch-string-body-draws-lines
+    as_str = {"title": "Build", "body": "handles requests"}
+    as_list = {"title": "Build", "body": ["handles requests"]}
+    assert render_flow([as_str, "Ship"]) == render_flow([as_list, "Ship"])
+    assert (render_arch([{"name": as_str, "components": ["a"]}])
+            == render_arch([{"name": as_list, "components": ["a"]}]))
+    assert as_str["body"] == "handles requests"
+
+
+def test_string_with_newlines_matches_list_body():
+    # string-with-newlines-matches-list-body
+    as_str, as_list = {"title": "T", "body": "a\nb"}, {"title": "T", "body": ["a", "b"]}
+    assert render_flow([as_str]) == render_flow([as_list])
+    assert (render_arch([{"name": as_str, "components": []}])
+            == render_arch([{"name": as_list, "components": []}]))
 
 
 def _render_isolated(generator: str, *args, **kwargs) -> str:
