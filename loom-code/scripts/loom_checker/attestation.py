@@ -67,7 +67,17 @@ def adversarial_route(command: str, artifact: str, repo: Path) -> tuple[str, Row
         argv = None
     row = claiming_row(argv) if argv else None
     if row is not None:
-        return ("parsed" if row.accepts(argv, artifact, repo) else "not-accepted"), row
+        if not row.accepts(argv, artifact, repo):
+            return "not-accepted", row
+        if row.name == "go":
+            from dataclasses import replace
+            from loom_checker.probe_results import _env_stripped
+            from loom_checker.probe_results import _go_package_test_name
+            from loom_checker.probe_results import _go_passed
+            name = _go_package_test_name(_env_stripped(argv), artifact, repo)
+            if name is not None:
+                row = replace(row, passed=lambda output, target: _go_passed(output, target, name))
+        return "parsed", row
     if (argv is None or Path(artifact).suffix.lower() in {".py", ".sh"}
             or command_executes_artifact(command, artifact)):
         if not command_names_artifact(command, artifact):

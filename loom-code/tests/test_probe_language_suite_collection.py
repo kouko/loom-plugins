@@ -117,3 +117,25 @@ def test_cargo_manifest_parse_error_is_undeterminable(tmp_path: Path) -> None:
     repo = make_rust_repo(tmp_path, "[package\n", None)
     collected, reason = suite_collection(repo, "tests/probe.rs")
     assert collected is None and reason
+
+
+def test_go_declared_suite_collects_selected_test_file(tmp_path: Path,
+                                                      monkeypatch: pytest.MonkeyPatch) -> None:
+    repo = tmp_path / "go-repo"
+    package = repo / "internal/pipeline"
+    package.mkdir(parents=True)
+    (repo / "go.mod").write_text("module example.test/probe\n\ngo 1.23\n", encoding="utf-8")
+    (package / "adversarial_test.go").write_text(
+        'package pipeline\nimport "testing"\nfunc TestAdversarial(t *testing.T) {}\n',
+        encoding="utf-8")
+    (package / "excluded_test.go").write_text(
+        '//go:build never\n\npackage pipeline\nimport "testing"\n'
+        'func TestExcluded(t *testing.T) {}\n', encoding="utf-8")
+    monkeypatch.setenv("GOCACHE", str(tmp_path / "cache"))
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.parent.mkdir(parents=True)
+    kickoff.write_text("- package-tests: go test ./... — fixture\n", encoding="utf-8")
+    assert suite_collection(repo, "internal/pipeline/adversarial_test.go") == (True, "")
+    assert suite_collection(repo, "internal/pipeline/excluded_test.go") == (False, "")
+    kickoff.write_text("- package-tests: go test ./other — fixture\n", encoding="utf-8")
+    assert suite_collection(repo, "internal/pipeline/adversarial_test.go") == (False, "")

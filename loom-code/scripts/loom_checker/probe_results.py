@@ -26,6 +26,7 @@ from xml.etree import ElementTree
 import json
 import os
 import re
+import subprocess
 
 from loom_checker.probes import CARGO_TEST_FLAGS
 from loom_checker.probes import cargo_test_targets
@@ -105,6 +106,7 @@ def _reports_artifact(reported: str, artifact: str) -> bool:
 
 GO_FLAGS = frozenset({"-json", "-v", "-race"})
 GO_VALUE_FLAGS = frozenset({"-count", "-timeout", "-tags"})
+GO_TEST_DECL = re.compile(r"^func\s+(Test[A-Z_][A-Za-z0-9_]*)\s*\(\s*\w+\s+\*testing\.T\s*\)", re.MULTILINE)
 
 
 def _go_claims(argv: list[str]) -> bool:
@@ -112,30 +114,101 @@ def _go_claims(argv: list[str]) -> bool:
     return _named(argv)[:1] == ["go"]
 
 
-def _go_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
-    """`go test -json [-v] [-race] [-count N] [-timeout D] [-tags T] <A>`."""
-    if argv[1:2] != ["test"] or not os.path.normpath(artifact).endswith("_test.go"):
-        return False
-    options, positionals, rest = [], [], argv[2:]
+def _go_args(argv: list[str]) -> tuple[list[str], dict[str, str], list[str]] | None:
+    """The supported options, values and positionals of one go test command."""
+    options, values, positionals, rest = [], {}, [], argv[2:]
     while rest:
         arg = rest.pop(0)
         if not arg.startswith("-"):
             positionals.append(arg)
         elif arg in GO_FLAGS:
             options.append(arg)
-        elif arg in GO_VALUE_FLAGS:
+        elif arg in GO_VALUE_FLAGS | {"-run"}:
             if not rest or rest[0].startswith("-"):
-                return False
+                return None
             options.append(arg)
-            rest.pop(0)
-        elif "=" in arg and arg.split("=", 1)[0] in GO_VALUE_FLAGS and arg.split("=", 1)[1]:
-            options.append(arg.split("=", 1)[0])
+            values[arg] = rest.pop(0)
+        elif "=" in arg and arg.split("=", 1)[0] in GO_VALUE_FLAGS | {"-run"} and arg.split("=", 1)[1]:
+            option, value = arg.split("=", 1)
+            options.append(option)
+            values[option] = value
         else:
-            return False
-    return "-json" in options and _distinct(options) and _one_positional(positionals, artifact)
+            return None
+    return (options, values, positionals) if _distinct(options) else None
 
 
-def _go_passed(output: str, artifact: str) -> int | None:
+def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None) -> str | None:
+    """Return the sole exact test declared in the committed, selected file."""
+    if repo is None:
+        return None
+    parsed = _go_args(argv)
+    if parsed is None:
+        return None
+    options, values, positionals = parsed
+    if ("-json" not in options or values.get("-count") != "1"
+            or len(positionals) != 1):
+        return None
+    package = positionals[0]
+    parent = Path(artifact).parent
+    expected = "." if parent == Path(".") else "./" + parent.as_posix()
+    if package != expected:
+        return None
+    match = re.fullmatch(r"\^(Test[A-Z_][A-Za-z0-9_]*)\$", values.get("-run", ""))
+    if not match:
+        return None
+    name = match.group(1)
+    try:
+        source = subprocess.run(["git", "show", f"HEAD:{artifact}"], cwd=repo,
+                                capture_output=True, text=True, timeout=10)
+        list_argv = ["go", "list", "-json"]
+        if "-tags" in values:
+            list_argv.append("-tags=" + values["-tags"])
+        selected = subprocess.run([*list_argv, package], cwd=repo,
+                                  capture_output=True, text=True, timeout=30)
+        data = json.loads(selected.stdout) if selected.returncode == 0 else {}
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        return None
+    if source.returncode != 0 or not isinstance(data, dict):
+        return None
+    if Path(data.get("Dir", "")).resolve() != (repo / parent).resolve():
+        return None
+    if Path(artifact).name not in data.get("TestGoFiles", []) + data.get("XTestGoFiles", []):
+        return None
+    if name not in GO_TEST_DECL.findall(source.stdout):
+        return None
+    # Go permits the same test name in package and package_test; JSON names
+    # neither defining file, so a pass cannot be attributed if both declare it.
+    for filename in data.get("TestGoFiles", []) + data.get("XTestGoFiles", []):
+        if filename == Path(artifact).name:
+            continue
+        path = (parent / filename).as_posix()
+        try:
+            other = subprocess.run(["git", "show", f"HEAD:{path}"], cwd=repo,
+                                   capture_output=True, text=True, timeout=10)
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+        if (other.returncode != 0
+                or re.search(r"\bfunc\s+" + re.escape(name) + r"\s*\(", other.stdout)):
+            return None
+    return name
+
+
+def _go_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+    """Accept a single test file, or an exact committed test in its package."""
+    if argv[1:2] != ["test"] or not os.path.normpath(artifact).endswith("_test.go"):
+        return False
+    parsed = _go_args(argv)
+    if parsed is None:
+        return False
+    options, _values, positionals = parsed
+    if "-json" not in options:
+        return False
+    if "-run" in options:
+        return _go_package_test_name(argv, artifact, repo) is not None
+    return _one_positional(positionals, artifact)
+
+
+def _go_passed(output: str, artifact: str, test_name: str | None = None) -> int | None:
     """Leaf tests with a `pass` event; a parent whose subtests all skipped
     passes too, so only tests without subtests count."""
     events = []
@@ -154,7 +227,8 @@ def _go_passed(output: str, artifact: str) -> int | None:
     tests = {event["Test"] for event in events if isinstance(event.get("Test"), str)}
     passed = {event["Test"] for event in events
               if event["Action"] == "pass" and isinstance(event.get("Test"), str)}
-    return sum(1 for name in passed if not any(other.startswith(name + "/") for other in tests))
+    return sum(1 for name in passed if (test_name is None or name == test_name or name.startswith(test_name + "/"))
+               and not any(other.startswith(name + "/") for other in tests))
 
 
 # JUnit XML (node, deno) -----------------------------------------------------
