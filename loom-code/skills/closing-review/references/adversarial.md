@@ -174,6 +174,9 @@ so it needs a reviewer confirmation):
 
 Every runner except cargo test, nextest, and Go package mode runs the probe from the change's
 store. A Go package probe may be a test file that the declared Go package suite selects.
+For Go package mode, use the test's exact Go identifier in `-run`: Go also
+discovers names such as `Test`, `Test1`, and `TestΩ`, and permits an alias for
+the `testing` import. A skipped parent does not count even if a child passes.
 A cargo or nextest probe cannot remain in the store: it graduates to `tests/<n>.rs` or `tests/<n>/main.rs`
 (or the `[[test]]` path Cargo.toml names; each `required-features` entry
 must be listed directly in `[features] default`) through a task of the change and is

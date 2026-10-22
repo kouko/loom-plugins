@@ -626,6 +626,39 @@ def test_go_package_probe_uses_siblings_and_exact_artifact_test(
     assert adversarial_route(command, artifact, root)[0] == "not-accepted"
 
 
+def test_go_package_names_and_skipped_parent_follow_go_discovery(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "go-names"
+    root.mkdir()
+    (root / "go.mod").write_text("module example.test/names\n\ngo 1.23\n", encoding="utf-8")
+    artifact = "adversarial_test.go"
+    (root / artifact).write_text(
+        'package names\nimport tt "testing"\n'
+        'func Test(t *tt.T) {}\n'
+        'func Test1(t *tt.T) {}\n'
+        'func TestΩ(t *tt.T) {}\n'
+        'func TestSkipParent(t *tt.T) {\n'
+        '  t.Run("passed_child", func(t *tt.T) {})\n'
+        '  t.Skip("parent skipped")\n}\n', encoding="utf-8")
+    monkeypatch.setenv("GOCACHE", str(tmp_path / "cache"))
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "fixture"], cwd=root, check=True)
+    for name in ("Test", "Test1", "TestΩ", "TestSkipParent"):
+        command = f"go test -json -count=1 -run '^{name}$' ."
+        route, row = adversarial_route(command, artifact, root)
+        assert route == "parsed" and row is not None, name
+        result = subprocess.run(shlex.split(command), cwd=root, text=True, capture_output=True)
+        assert result.returncode == 0, result.stderr
+        assert row.passed(result.stdout, artifact) == (0 if name == "TestSkipParent" else 1)
+    for pattern in ("^Test1|TestΩ$", "^Test.*$", "^Testicular$"):
+        assert adversarial_route(
+            f"go test -json -count=1 -run '{pattern}' .", artifact, root,
+        )[0] != "parsed"
+
+
 @pytest.mark.parametrize(("command", "artifact", "output"), [
     (f"go test -json {GO}", GO, GO_SKIP),
     (f"node --test --test-reporter=junit {NODE}", NODE, NODE_SKIP),

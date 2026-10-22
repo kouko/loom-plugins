@@ -106,7 +106,10 @@ def _reports_artifact(reported: str, artifact: str) -> bool:
 
 GO_FLAGS = frozenset({"-json", "-v", "-race"})
 GO_VALUE_FLAGS = frozenset({"-count", "-timeout", "-tags"})
-GO_TEST_DECL = re.compile(r"^func\s+(Test[A-Z_][A-Za-z0-9_]*)\s*\(\s*\w+\s+\*testing\.T\s*\)", re.MULTILINE)
+GO_TEST_DECL = re.compile(
+    r"^\s*func\s+(Test\w*)\s*\(\s*(?:\w+\s+)?\*(?:\w+\.)?T\s*\)\s*\{",
+    re.MULTILINE,
+)
 
 
 def _go_claims(argv: list[str]) -> bool:
@@ -153,10 +156,14 @@ def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None) -> 
     expected = "." if parent == Path(".") else "./" + parent.as_posix()
     if package != expected:
         return None
-    match = re.fullmatch(r"\^(Test[A-Z_][A-Za-z0-9_]*)\$", values.get("-run", ""))
-    if not match:
+    pattern = values.get("-run", "")
+    if not (pattern.startswith("^") and pattern.endswith("$")):
         return None
-    name = match.group(1)
+    name = pattern[1:-1]
+    # Go's isTest accepts bare Test and a suffix starting with any rune that
+    # is not lowercase; it does not require an ASCII capital after Test.
+    if not re.fullmatch(r"Test\w*", name) or (len(name) > 4 and name[4].islower()):
+        return None
     try:
         source = subprocess.run(["git", "show", f"HEAD:{artifact}"], cwd=repo,
                                 capture_output=True, text=True, timeout=10)
@@ -227,6 +234,8 @@ def _go_passed(output: str, artifact: str, test_name: str | None = None) -> int 
     tests = {event["Test"] for event in events if isinstance(event.get("Test"), str)}
     passed = {event["Test"] for event in events
               if event["Action"] == "pass" and isinstance(event.get("Test"), str)}
+    if test_name is not None and test_name not in passed:
+        return 0
     return sum(1 for name in passed if (test_name is None or name == test_name or name.startswith(test_name + "/"))
                and not any(other.startswith(name + "/") for other in tests))
 
