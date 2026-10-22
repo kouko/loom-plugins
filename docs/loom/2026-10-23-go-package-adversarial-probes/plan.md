@@ -17,7 +17,7 @@ charter: 1.1
 - Risk: agent-decided — package mode requires `-json -count=1 -run '^TestName$'`, one package, selected artifact, and its declared test; permit literal `$` in argv without shell execution. Widen Go suite collection only; preserve other runners.
 
 **W2-01 Release the corrected Go runner contract**  after: W1-01  acceptance: 3
-- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/tests/test_write_plan_station_text.py`, `loom-code/README.md`, `README.md`
+- Files: `loom-code/plugin.json`, `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/tests/test_write_plan_station_text.py`, `loom-code/README*.md`, `README.md`
 - Test: A3 positive: release-metadata-synchronized; negative: stale-version-pin-refused.
 - Risk: agent-decided — bump loom-code to 3.48.0 because station guidance changes; update CHANGELOG entry, version pin, and README strings before final attestation.
 
