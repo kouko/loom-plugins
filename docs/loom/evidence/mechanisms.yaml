@@ -119,7 +119,7 @@ mechanisms:
   # --- checker-rule (loom_checker.py --list-rules is the count) ---
   - id: adversarial.proportionate
     class: checker-rule
-    eval: loom-code/tests/test_selection_finalize.py::test_five_probe_programs_pass_and_a_sixth_is_refused
+    eval: loom-code/tests/test_selection_finalize.py::test_cap_probe_programs_pass_and_one_more_is_refused
   - id: ci.pr-floor
     class: checker-rule
     eval: loom-code/tests/test_pr_floor.py::test_bad_body_exit_1_names_heading

@@ -6,6 +6,7 @@
 - The v2 attestation carries the bookkeeping these rules check: `intent_confirmed_sha`, `tested_commit`, `reviewed_commit` and per-line `acceptance_status` (`works` / `partly` / `not_verified` / `fails`). v1 attestations and intents confirmed before the field existed are skipped, not failed.
 - Closing review files its verdicts in the change directory, and finalize-review re-runs the drift checks before writing the attestation, so drift is caught at publication as well as at review entry.
 - `docs/loom/<change-id>/acceptance-test-report.md` and `docs/loom/<change-id>/evidence/**` are publication-only paths: a difference there between the tested and the reviewed tree never fails the identity check, while a functional difference does.
+- Raise the probe-program ceiling from 5 to 6 (`adversarial.proportionate`): a branch that carries another unmerged change's graduated probes pays for them out of the same ceiling, so a change with one honest probe program of its own no longer needs a cap exception to finalize.
 
 ## [3.39.0] — 2026-10-08 — consented external review uses an explicit executor profile
 

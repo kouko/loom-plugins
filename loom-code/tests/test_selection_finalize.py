@@ -261,18 +261,19 @@ def run_with_probes(repo: Path, tmp_path: Path) -> subprocess.CompletedProcess:
     ))
 
 
-def test_five_probe_programs_pass_and_a_sixth_is_refused(tmp_path: Path) -> None:
-    """Acceptance 3: at most five committed probe programs for a change."""
+def test_cap_probe_programs_pass_and_one_more_is_refused(tmp_path: Path) -> None:
+    """Acceptance 3: at most `MAX_PROBE_PROGRAMS` committed probe programs for
+    a change, read from the constant so the ceiling has one source."""
     repo = make_repo(tmp_path)
-    write_probes(repo, 5)
+    write_probes(repo, MAX_PROBE_PROGRAMS)
     accepted = run_with_probes(repo, tmp_path)
     assert accepted.returncode == 0, accepted.stderr
 
-    write_probes(repo, 6)
+    write_probes(repo, MAX_PROBE_PROGRAMS + 1)
     refused = run_with_probes(repo, tmp_path)
     assert refused.returncode == 1
     assert "BLOCK adversarial.proportionate" in refused.stderr
-    assert "six" in refused.stderr or "6" in refused.stderr
+    assert f"{MAX_PROBE_PROGRAMS + 1} probe programs" in refused.stderr
 
 
 def test_probe_program_without_a_concern_line_is_refused(tmp_path: Path) -> None:
@@ -304,7 +305,7 @@ def test_a_shell_probe_program_counts_against_the_cap(tmp_path: Path) -> None:
 
     assert refused.returncode == 1
     assert "BLOCK adversarial.proportionate" in refused.stderr
-    assert "6 probe programs" in refused.stderr
+    assert f"{1 + MAX_PROBE_PROGRAMS} probe programs" in refused.stderr
 
 
 def test_an_extension_less_program_is_counted_and_keeps_a_delta_wide(
