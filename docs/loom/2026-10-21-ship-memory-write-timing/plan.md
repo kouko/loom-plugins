@@ -1,10 +1,10 @@
 # 2026-10-21-ship-memory-write-timing — plan
-intent: 2026-10-21-ship-memory-write-timing@a50151ac
+intent: 2026-10-21-ship-memory-write-timing@b83cf75d
 charter: 1.1
 
 ## Current State Evidence
-- Forward: loom-code/skills/ship/SKILL.md:126-139 — Memory write timing rule added
-- Reverse: loom-code/skills/ship/SKILL.md:118-124 — existing git-memory + loom-memory routing
+- Forward: loom-code/skills/ship/SKILL.md:130-140 — Memory write timing rule added
+- Reverse: loom-code/skills/ship/SKILL.md:118-128 — existing git-memory + loom-memory routing
 - Error: attestation.py:124-126 — digest invalidation check on functional content change
 - Data: docs/loom/memory/ — store where git-memory routes qualifying lessons
 - Boundary: git-memory/SKILL.md:102-111 — pre-finalization deadline rule
