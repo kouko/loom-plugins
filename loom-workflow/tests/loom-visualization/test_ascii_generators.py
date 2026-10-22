@@ -1064,6 +1064,42 @@ def test_dict_node_with_empty_body_keeps_its_error_text():
     assert str(flow_error.value) == expected
     assert str(arch_error.value) == expected
     assert str(tree_error.value) == expected
+    # empty-string-body-keeps-trunk-error
+    blank = {"title": "Title", "body": ""}
+    with pytest.raises(ValueError, match=f"^{expected}$"):
+        render_flow([blank])
+    with pytest.raises(ValueError, match=f"^{expected}$"):
+        render_arch([{"name": blank, "components": ["a"]}])
+
+
+def test_flow_and_arch_string_body_draws_lines():
+    # flow-and-arch-string-body-draws-lines
+    as_str = {"title": "Build", "body": "handles requests"}
+    as_list = {"title": "Build", "body": ["handles requests"]}
+    assert render_flow([as_str, "Ship"]) == render_flow([as_list, "Ship"])
+    assert (render_arch([{"name": as_str, "components": ["a"]}])
+            == render_arch([{"name": as_list, "components": ["a"]}]))
+    assert as_str["body"] == "handles requests"
+    # string-body-control-char-draws-as-list-form
+    tab_str, tab_list = {"title": "Build", "body": "a\tb"}, {"title": "Build", "body": ["a\tb"]}
+    assert render_flow([tab_str, "Ship"]) == render_flow([tab_list, "Ship"])
+    assert (render_arch([{"name": tab_str, "components": ["a"]}])
+            == render_arch([{"name": tab_list, "components": ["a"]}]))
+    # one-char-tab-string-body-matches-trunk: trunk fc6e9bfc output.
+    one_tab = {"title": "Build", "body": "\t"}
+    assert render_flow([one_tab, "Ship"]) == (
+        "┌───────┐\n│ Build │\n├───────┤\n│ \t      │\n└───────┘\n"
+        "    │\n    ▼\n┌───────┐\n│ Ship  │\n└───────┘")
+    assert render_arch([{"name": one_tab, "components": ["a"]}]) == (
+        "┌──────┐\n│ Build│\n├──────┤\n│ \t     │\n├──────┤\n│ a    │\n└──────┘")
+
+
+def test_string_with_newlines_matches_list_body():
+    # string-with-newlines-matches-list-body
+    as_str, as_list = {"title": "T", "body": "a\nb"}, {"title": "T", "body": ["a", "b"]}
+    assert render_flow([as_str]) == render_flow([as_list])
+    assert (render_arch([{"name": as_str, "components": []}])
+            == render_arch([{"name": as_list, "components": []}]))
 
 
 def _render_isolated(generator: str, *args, **kwargs) -> str:
@@ -1200,6 +1236,38 @@ def test_flow_multiline_string_cjk_body_width_0_aligned():
         _assert_aligned(_render_isolated("flow", ["\n中"], width=width), "中")
 
 
+def _flow_body_lines(out: str) -> list[str]:
+    body, inside = [], False
+    for line in out.split("\n"):
+        inside = line.startswith("├") or (inside and not line.startswith("└"))
+        if inside and not line.startswith("├"):
+            body.append(line)
+    return body
+
+
+def test_flow_width_10_long_unbroken_body_keeps_right_pad():
+    # flow-width-10-long-unbroken-body-keeps-right-pad
+    for body in ("x" * 11, "x" * 30):
+        lines = _flow_body_lines(render_flow(["Build\n" + body, "Ship"], width=10))
+        assert lines and all(line.endswith(" │") for line in lines), lines
+
+
+def test_flow_two_cell_body_narrow_width_keeps_pad():
+    # flow-two-cell-body-narrow-width-keeps-pad
+    # and the one-cell case: an empty title, body 'a', width <= 0.
+    for steps, width in [([{"title": "", "body": ["中文"]}], w) for w in (0, 1, 2)] + [
+            ([{"title": "", "body": ["a"]}], 0), (["\nab"], -1)]:
+        lines = _flow_body_lines(render_flow(steps, width=width))
+        assert lines and all(line.endswith(" │") for line in lines), (width, lines)
+
+
+def test_flow_empty_title_empty_body_line_unchanged():
+    # flow-empty-title-empty-body-line-unchanged: trunk fc6e9bfc output.
+    for kwargs in ({}, {"width": 1}):
+        out = render_flow([{"title": "", "body": [""]}], **kwargs)
+        assert out == "┌──┐\n│  │\n├──┤\n│  │\n└──┘"
+
+
 # every-generator-pins-trunk-output / pins-cover-all-six-generators: exact
 # trunk 5e850c70 output for inputs that hit none of the arch sizing defects
 # (no structured layer whose body line is its widest element, no empty
@@ -1252,6 +1320,20 @@ _TRUNK_PINS = {
         "┌───────┐\n"
         "│ Done  │\n"
         "└───────┘",
+    ),
+    "flow-width-given-body-fits": (
+        "flow", ([{"title": "Plan", "body": ["- write tests", "- ship it"]}, "Done"],), {"width": 20},
+        "┌───────────────┐\n"
+        "│ Plan          │\n"
+        "├───────────────┤\n"
+        "│ - write tests │\n"
+        "│ - ship it     │\n"
+        "└───────────────┘\n"
+        "        │\n"
+        "        ▼\n"
+        "┌───────────────┐\n"
+        "│     Done      │\n"
+        "└───────────────┘",
     ),
     "tree-cjk": (
         "tree", ({"label": "訂單系統", "children": [
@@ -1338,14 +1420,12 @@ _TRUNK_PINS = {
 }
 
 
-@pytest.mark.parametrize("case", sorted(_TRUNK_PINS))
-def test_generator_output_matches_trunk_pin(case):
-    generator, args, kwargs, expected = _TRUNK_PINS[case]
-    assert _render_isolated(generator, *args, **kwargs) == expected
-
-
-def test_trunk_pins_cover_all_six_generators():
-    assert {pin[0] for pin in _TRUNK_PINS.values()} == {"table", "flow", "tree", "bar", "arch", "seq"}
+def test_trunk_pins_draw_expected_output_for_all_six_generators():
+    drawn = {}
+    for case, (generator, args, kwargs, expected) in sorted(_TRUNK_PINS.items()):
+        assert _render_isolated(generator, *args, **kwargs) == expected, case
+        drawn[generator] = case
+    assert set(drawn) == {"table", "flow", "tree", "bar", "arch", "seq"}
 
 
 # Trunk 5e850c70 error text not already pinned above (the empty-body
