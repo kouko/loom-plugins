@@ -1,6 +1,9 @@
 # Changelog
 
-## [3.46.0] — 2026-10-22 — feat(ship): memory entries land before finalize-review, never after
+## [3.46.0] — 2026-10-22 — fix(external-review): explain incomplete Claude reviews safely
+
+- Claude Code review failures now include a fixed recovery action. Unrecognized CLI exits report only the stage, numeric exit code, and safe presence and parseability flags, so owners can investigate locally without exposing review material.
+- The external-review skill guides owners to relay the safe failure and recovery action while keeping failed attempts out of completed review verdicts.
 
 ## [3.45.0] — 2026-10-21 — fix(loom-code): repair the checker runtime from agent stations
 
