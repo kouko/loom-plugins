@@ -1,12 +1,7 @@
-# Loom evidence drift guards — 我試了什麼、發生了什麼
+# Loom evidence drift guards — 我試了什鵐、發生了什麼
 
-Tried on 2026-10-22, in a clean copy of the project at f155bad5. How I tried
-each line and what came back: `docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md`.
-
-本次是修正後的完整重測：上一輪（在 25a9d92）回報的三個重要缺陷——重複條目被放行、
-憑證只記「有沒有列」而不記報告寫的判定、重算指令在 POSIX 殼層印不出東西、
-以及三條新規則沒有行為測試——修正 commit 都動到了被驗的機制本身，
-所以 7 條全部重跑，沒有任何一條帶過。
+Tried on 2026-10-23, in a clean copy of the project at 5fdd3b36. How I tried
+each line and what came back: .
 
 ## 你要的東西，一條一條
 
