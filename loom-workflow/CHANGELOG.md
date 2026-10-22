@@ -9,8 +9,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - A flow structured node keeps one space before the right border when a
   width is given (re-wraps only a line that would fill the box).
 - A flow step or arch layer whose description is one string draws it as
-  its lines instead of one character per line (an empty string still
-  errors; a control character now raises the named-code-point error).
+  its lines instead of one character per line, exactly as the same lines
+  given as a list would draw (an empty string still errors).
 - The pin-coverage test now checks drawn output.
 
 ## [5.12.3] — 2026-10-21 — layered-architecture edge-case fixes

@@ -1080,6 +1080,18 @@ def test_flow_and_arch_string_body_draws_lines():
     assert (render_arch([{"name": as_str, "components": ["a"]}])
             == render_arch([{"name": as_list, "components": ["a"]}]))
     assert as_str["body"] == "handles requests"
+    # string-body-control-char-draws-as-list-form
+    tab_str, tab_list = {"title": "Build", "body": "a\tb"}, {"title": "Build", "body": ["a\tb"]}
+    assert render_flow([tab_str, "Ship"]) == render_flow([tab_list, "Ship"])
+    assert (render_arch([{"name": tab_str, "components": ["a"]}])
+            == render_arch([{"name": tab_list, "components": ["a"]}]))
+    # one-char-tab-string-body-matches-trunk: trunk fc6e9bfc output.
+    one_tab = {"title": "Build", "body": "\t"}
+    assert render_flow([one_tab, "Ship"]) == (
+        "┌───────┐\n│ Build │\n├───────┤\n│ \t      │\n└───────┘\n"
+        "    │\n    ▼\n┌───────┐\n│ Ship  │\n└───────┘")
+    assert render_arch([{"name": one_tab, "components": ["a"]}]) == (
+        "┌──────┐\n│ Build│\n├──────┤\n│ \t     │\n├──────┤\n│ a    │\n└──────┘")
 
 
 def test_string_with_newlines_matches_list_body():

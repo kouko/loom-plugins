@@ -48,9 +48,11 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
     if not steps:
         return ""
 
-    # A non-empty str body draws as its lines; '' keeps the empty-body error.
+    # A non-empty str body draws as its lines, exactly as the list form would
+    # (str.splitlines, not split_lines: a control char draws, never raises);
+    # '' keeps the empty-body error.
     steps = [
-        {**s, "body": split_lines(s["body"])}
+        {**s, "body": s["body"].splitlines()}
         if isinstance(s, dict) and isinstance(s.get("body"), str) and s["body"] else s
         for s in steps
     ]
