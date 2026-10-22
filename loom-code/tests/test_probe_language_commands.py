@@ -659,6 +659,53 @@ def test_go_package_names_and_skipped_parent_follow_go_discovery(
         )[0] != "parsed"
 
 
+def test_go_package_declarations_ignore_comments_and_accept_comment_separation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "go-comments"
+    root.mkdir()
+    (root / "go.mod").write_text("module example.test/comments\n\ngo 1.23\n", encoding="utf-8")
+    artifact = "attack_test.go"
+    target = root / artifact
+    other = root / "other_test.go"
+    target.write_text(
+        'package comments\n/*\nfunc TestAttack(t *testing.T) {}\n*/\n', encoding="utf-8")
+    other.write_text(
+        'package comments\nimport "testing"\nfunc/**/TestAttack(t *testing.T) {}\n',
+        encoding="utf-8")
+    monkeypatch.setenv("GOCACHE", str(tmp_path / "cache"))
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "fixture"], cwd=root, check=True)
+    command = "go test -json -count=1 -run '^TestAttack$' ."
+    run = subprocess.run(shlex.split(command), cwd=root, text=True, capture_output=True)
+    assert run.returncode == 0, run.stderr
+    assert adversarial_route(command, artifact, root)[0] != "parsed"
+
+    target.write_text(
+        'package comments\nvar decoy = `func TestAttack(t *testing.T) {}`\n',
+        encoding="utf-8")
+    subprocess.run(["git", "add", artifact], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "raw string decoy"], cwd=root, check=True)
+    assert adversarial_route(command, artifact, root)[0] != "parsed"
+
+    target.write_text(
+        'package comments\nimport "testing"\nfunc/**/TestAttack(t *testing.T) {}\n',
+        encoding="utf-8")
+    other.write_text(
+        'package comments\n/*\nfunc TestAttack(t *testing.T) {}\n*/\n', encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "swap declaration"], cwd=root, check=True)
+    route, row = adversarial_route(command, artifact, root)
+    assert route == "parsed" and row is not None
+    run = subprocess.run(shlex.split(command), cwd=root, text=True, capture_output=True)
+    assert run.returncode == 0, run.stderr
+    assert row.passed(run.stdout, artifact) == 1
+
+
 @pytest.mark.parametrize(("command", "artifact", "output"), [
     (f"go test -json {GO}", GO, GO_SKIP),
     (f"node --test --test-reporter=junit {NODE}", NODE, NODE_SKIP),

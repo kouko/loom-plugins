@@ -106,10 +106,18 @@ def _reports_artifact(reported: str, artifact: str) -> bool:
 
 GO_FLAGS = frozenset({"-json", "-v", "-race"})
 GO_VALUE_FLAGS = frozenset({"-count", "-timeout", "-tags"})
+GO_NON_CODE = re.compile(
+    r'''//[^\n]*|/\*[\s\S]*?\*/|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`[^`]*`'''
+)
 GO_TEST_DECL = re.compile(
     r"^\s*func\s+(Test\w*)\s*\(\s*(?:\w+\s+)?\*(?:\w+\.)?T\s*\)\s*\{",
     re.MULTILINE,
 )
+
+
+def _go_code_only(source: str) -> str:
+    """Blank Go comments and literals without joining tokens across them."""
+    return GO_NON_CODE.sub(lambda match: " " * len(match.group()), source)
 
 
 def _go_claims(argv: list[str]) -> bool:
@@ -181,7 +189,7 @@ def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None) -> 
         return None
     if Path(artifact).name not in data.get("TestGoFiles", []) + data.get("XTestGoFiles", []):
         return None
-    if name not in GO_TEST_DECL.findall(source.stdout):
+    if name not in GO_TEST_DECL.findall(_go_code_only(source.stdout)):
         return None
     # Go permits the same test name in package and package_test; JSON names
     # neither defining file, so a pass cannot be attributed if both declare it.
@@ -195,7 +203,8 @@ def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None) -> 
         except (OSError, subprocess.TimeoutExpired):
             return None
         if (other.returncode != 0
-                or re.search(r"\bfunc\s+" + re.escape(name) + r"\s*\(", other.stdout)):
+                or re.search(r"\bfunc\s+" + re.escape(name) + r"\s*\(",
+                             _go_code_only(other.stdout))):
             return None
     return name
 
