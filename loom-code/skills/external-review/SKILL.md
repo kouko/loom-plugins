@@ -144,6 +144,18 @@ command in the background and watch its output — and relay each progress line
 to the user instead of waiting silently. These lines never carry the packet or
 the review text; stdout remains the one JSON result.
 
+For a failed Claude Code execution, relay the bounded `reason` and
+`next_action` to the user. When present, relay only the fixed `diagnostic`
+fields (`stage`, numeric `exit_code`, `stdout_present`, `stderr_present`,
+`stdout_json_parseable`); keep raw CLI output, the prompt, and review text out
+of the user-facing report. For an unknown cause, run
+[`claude doctor`](https://code.claude.com/docs/en/cli-reference) locally
+and inspect any CLI diagnostics privately; the failed review's cause remains
+unknown until local evidence identifies it. Record the failed leg with its
+verdict absent. A retry is a newly authorized review with a fresh preflight;
+prohibit a silent retry or provider fallback. Keep the existing consent scope
+and disclosures for every outside call.
+
 The execution asks Codex for a read-only command sandbox, Claude Code for plan
 mode with only `Read`, `Glob`, and `Grep` model tools, and Antigravity for plan
 mode with its terminal sandbox. For each Antigravity probe and review, the

@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.46.0] — 2026-10-22 — fix(external-review): explain incomplete Claude reviews safely
+
+- Claude Code review failures now include a fixed recovery action. Unrecognized CLI exits report only the stage, numeric exit code, and safe presence and parseability flags, so owners can investigate locally without exposing review material.
+- The external-review skill guides owners to relay the safe failure and recovery action while keeping failed attempts out of completed review verdicts.
+
 ## [3.45.0] — 2026-10-21 — fix(loom-code): repair the checker runtime from agent stations
 
 - Agent stations now prepare a plugin-owned Python 3.11 and PyYAML runtime with `loom-python --repair` when the checker environment is missing, then retry the original check. Repair uses a user cache and leaves project test commands on the project's own environment.
