@@ -1,2 +1,0 @@
-# concern: Adversarial test for evidence drift guard mechanism - validates that new checker rules correctly detect drift in acceptance test reports, commit identity, and intent versioning.
-print("adversarial test passed")
