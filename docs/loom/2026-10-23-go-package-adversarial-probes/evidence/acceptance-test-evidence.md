@@ -1,0 +1,23 @@
+# 讓 Go 套件測試能作為找漏洞測試的審查證據 — acceptance test evidence
+
+Tried on 2026-10-23 in `/private/tmp/go-testing-acceptance-20261023`, a clean local clone of `b80a63e20531acb33e8bf63f4c1252a39e440dff` (`git status --short` was empty). Clone command: `git clone --no-hardlinks --local /Users/kouko/.herdr/worktrees/loom-plugins/go-testing-review-prove /private/tmp/go-testing-acceptance-20261023`.
+
+Setup check: `go version` returned `go version go1.27.2 darwin/arm64`; `python3.13 loom-code/scripts/loom_checker.py --list-rules` exited 0 and listed the checker rules. The README's isolated development command could not be used here: the default uv cache was not writable (`Operation not permitted`), and a writable temporary cache with `--offline` lacked `execnet==2.1.2`. The available Python 3.13 environment had pytest 8.4.1, so the criterion-specific tests below used `python3.13 -m pytest`. This is a test-environment limitation, not a claim about the full package suite.
+
+## 1. 在乾淨的 Go 範例專案中，找漏洞測試需要同一套件的其他程式與測試工具時，已通過的套件測試可讓 Loom 產生審查證明，且證明通過 checker 驗證。
+
+- How I tried it: `python3.13 -m pytest -q loom-code/tests/test_probe_confirmation_finalize.py::test_go_package_probe_finalized_and_validated_with_sibling_helpers loom-code/tests/test_probe_language_commands.py::test_go_package_probe_uses_siblings_and_exact_artifact_test loom-code/tests/test_probe_language_commands.py::test_go_commented_declaration_refuses_other_file_pass loom-code/tests/test_probe_language_suite_collection.py::test_go_declared_suite_collects_selected_test_file loom-code/tests/test_probe_confirmation_finalize.py::test_go_parsed_probe_finalized_and_validated loom-code/tests/test_write_plan_station_text.py::test_current_release_metadata_is_synchronized`.
+- What came back: `6 passed in 11.37s` (exit 0).
+- Evidence: `test_go_package_probe_finalized_and_validated_with_sibling_helpers` constructs a clean Go module with sibling source and test helpers, executes `go test -json -count=1 -run '^TestAttack$' ./internal/pipeline`, then checks that finalization emits parsed evidence and the attestation validator returns no errors (`loom-code/tests/test_probe_confirmation_finalize.py:102`). `test_go_package_probe_uses_siblings_and_exact_artifact_test` also verifies that the old single-file command fails to compile without the siblings (`loom-code/tests/test_probe_language_commands.py:567`).
+
+## 2. Go 套件測試沒有執行指定的找漏洞測試，或指定測試沒有通過時，Loom 不會把該執行認定為有效證據。
+
+- How I tried it: the first command above covers filtered-out names, another file's passing test, excluded test files, and duplicate names. I also ran `python3.13 -m pytest -q loom-code/tests/test_probe_language_commands.py::test_go_package_names_and_skipped_parent_follow_go_discovery loom-code/tests/test_probe_language_commands.py::test_go_package_declarations_ignore_comments_and_accept_comment_separation loom-code/tests/test_probe_confirmation_finalize.py::test_listed_zero_passed_refused_even_with_confirmation loom-code/tests/test_probe_confirmation_finalize.py::test_claimed_but_untargeted_refused`.
+- What came back: `4 passed in 9.32s` (exit 0), in addition to the first command's `6 passed in 11.37s`.
+- Evidence: `test_go_package_probe_uses_siblings_and_exact_artifact_test` rejects a filter naming `TestOther`, a skipped target, a Go build excluded artifact, and duplicate declarations (`loom-code/tests/test_probe_language_commands.py:567`). `test_go_commented_declaration_refuses_other_file_pass` runs a real Go test in another file and verifies that a commented declaration in the artifact cannot claim it (`loom-code/tests/test_probe_language_commands.py:710`). The skipped-test and untargeted-command finalization checks are at `loom-code/tests/test_probe_confirmation_finalize.py:144` and `:157`.
+
+## 3. 現有可被接受的 Go 單檔測試仍可產生有效的審查證明；repo 的完整 package suite 通過。
+
+- How I tried it: the first command above included `test_go_parsed_probe_finalized_and_validated` and `test_current_release_metadata_is_synchronized`. I did not run the full package suite, per the acceptance-tester contract; `finalize-review` will execute the README command: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+- What came back: the criterion-specific checks were among the `6 passed in 11.37s` (exit 0). The full suite has no result in this report.
+- Evidence: the existing `go test -json <single-file>` path finalized and its attestation validated in `loom-code/tests/test_probe_confirmation_finalize.py:94`; the release metadata consistency check passed in `loom-code/tests/test_write_plan_station_text.py:287`. The full suite is the automated test suite that runs before acceptance and blocks acceptance on failure.
