@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.47.0] — 2026-10-22 — feat(ship): memory entries land before finalize-review, never after
+
+- Ship §2 now states the memory-write timing rule: a durable `docs/loom/memory/` entry must land before `closing-review`'s `finalize-review` generates the attestation, never after; a memory file committed later changes the functional content digest and invalidates the attestation.
+- Ship does not write memory entries after finalization; a qualifying lesson discovered at or after Ship rides the next change's branch, as `loom-workflow:loom-memory` already directs. The rule cites only public skill names, keeping loom-code installable alone.
+
 ## [3.46.0] — 2026-10-22 — fix(external-review): explain incomplete Claude reviews safely
 
 - Claude Code review failures now include a fixed recovery action. Unrecognized CLI exits report only the stage, numeric exit code, and safe presence and parseability flags, so owners can investigate locally without exposing review material.
