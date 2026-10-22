@@ -1,0 +1,74 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-12-loom-evidence-drift-guards",
+  "content_digest": "da65411ca1ae3657f710073a0c957c046b20e1a3",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/probes/test_adversarial.py",
+      "artifact": "docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/probes/test_adversarial.py",
+      "result": "pass",
+      "command_digest": "b2c0a3e82f2f3144fc2ac4019c6e95a5f7f7ecd7f844a1f1067b1bd7281bf264"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-1",
+      "vendor": "openai",
+      "model": "test",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-2",
+      "vendor": "anthropic",
+      "model": "test",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": null,
+  "tested_commit": "288d9d58",
+  "reviewed_commit": "e7509a6d7e31efbe2482f34225b12890d03594d7",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    }
+  ]
+}
