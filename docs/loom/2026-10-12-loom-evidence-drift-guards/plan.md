@@ -74,3 +74,4 @@ charter: 1.1
 7. Intent_confirmed_sha excludes status line (matches spec confirmed-behavior pattern)
 8. Tested_commit recorded directly at acceptance-test time (no report parsing fallback)
 9. Evidence whitelist only covers necessary output files (report, evidence, probes)
+10. skipped-by-instruction: adversarial 2026-10-22
