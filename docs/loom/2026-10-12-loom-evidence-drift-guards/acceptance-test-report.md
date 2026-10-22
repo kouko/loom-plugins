@@ -1,15 +1,15 @@
-# Loom evidence drift guards — 我試了什鵐、發生了什麼
+# Loom evidence drift guards — 我試了什麼、發生了什麼
 
-Tried on 2026-10-23, in a clean copy of the project at 5fdd3b36. How I tried
-each line and what came back: .
+Tried on 2026-10-23, in a clean copy of the project at 288d9d58. How I tried
+each line and what came back: docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md.
 
 ## 你要的東西，一條一條
 
 | # | 你要的東西 | 結果 | 實際發生什麼 | 重測 |
 |---|---|---|---|---|
-| 1 | 對一份 acceptance report 未逐條交代 intent 每條 Acceptance 身分與狀態（含省略或重複條目）的變更執行檢查，檢查失敗並指出有問題的條號。 | works | 缺某條、多出 intent 沒有的條目、某條重複出現，三者都失敗並各自點名條號；上一輪放行的「只重複、沒有缺漏」這次被擋下並點名重複的條號。另外判定欄也納入檢查：只寫模板四個詞（works／partly／not verified／fails）以外的報告會失敗並點名條號，而報告寫 fails、partly、not verified 時憑證照實記錄，不再一律記成通過。 | re-tested |
-| 2 | 對一份 attestation 未記錄被測 commit 與被審查 commit 兩個身分的變更執行檢查，檢查失敗；兩者之間存在功能內容差異（非證據檔案差異）時，檢查失敗。 | works | 憑證缺兩個 commit 身分任一就失敗並指出缺哪一個；被測與被審查的內容不同也失敗並點名兩個 commit；兩者只差證據檔案（報告、證據目錄、憑證本身）時通過；舊版憑證仍然放行。 | re-tested |
-| 3 | 對一份 attestation 所記錄的 intent 確認版本與 intent 檔案當前內容不符的變更執行檢查，檢查失敗，且失敗訊息指出受影響的驗收條目與重新確認路徑。 | works | intent 在確認後被改而確認記錄沒更新時失敗，訊息說出記錄與現況兩個版本、所有驗收條目都可能受影響，並給出重算指令；我把指令照抄到最陽春的 POSIX 殼層裡跑，它印出的版本號和訊息說的完全一致（舊版指令在同樣的殼層會直接語法錯誤，對照確認這次的修正是真的）；更新確認記錄後通過；沒有確認記錄或尚未確認的 intent 不會誤擋。 | re-tested |
+| 1 | 對一份 acceptance report 未逐條交代 intent 每條 Acceptance 身分與狀態（含省略或重複條目）的變更執行檢查，檢查失敗並指出有問題的條號。 | works | 缺某條、多出 intent 沒有的條目、某條重複出現，三者都失敗並各自點名條號；判定欄若寫模板四個詞（works/partly/not verified/fails）以外的字也會失敗並點名條號。 | re-tested |
+| 2 | 對一份 attestation 未記錄被測 commit 與被審查 commit 兩個身分的變更執行檢查，檢查失敗；兩者之間存在功能內容差異（非證據檔案差異）時，檢查失敗。 | works | 憑證缺兩個 commit 身分任一就失敗並指出缺哪一個；被測與被審查的功能內容不同也失敗並點名兩個 commit；兩者只差證據檔案（報告、證據目錄、憑證本身）時通過；舊版憑證仍然放行。 | re-tested |
+| 3 | 對一份 attestation 所記錄的 intent 確認版本與 intent 檔案當前內容不符的變更執行檢查，檢查失敗，且失敗訊息指出受影響的驗收條目與重新確認路徑。 | works | intent 在確認後被改而確認記錄沒更新時失敗，訊息說出記錄與現況兩個版本、所有驗收條目都可能受影響，並給出重算指令；更新確認記錄後通過；沒有確認記錄或尚未確認的 intent 不會誤擋。 | re-tested |
 | 4 | 對一份 plan 具名的 boundary/probe test 在變更中不存在的變更執行檢查，檢查失敗。 | works | Risk 指名不存在的 boundary test 時失敗並指出任務編號；任務存在時通過；舊版格式的 plan 不受此規則管；新版模板的提示註解不會誤觸檢查。 | re-tested |
 | 5 | closing review 完成後，verdict 產物存在於該 change 目錄內，且其與 attestation 的主從關係在文件中明確。 | works | 判定紀錄落在該變更自己的目錄內（憑證、驗收報告、證據放在一起），文件明寫憑證的 verdicts 欄位就是歸檔的判定紀錄、審查輸入檔只是暫時的、之後沒有人會再讀它，兩者不會各自留一份而漂移。 | re-tested |
 | 6 | 檢查在 closing review 之後的發布前失效檢查中再次執行，不只 review 入口一次。 | works | 同一個有缺陷的變更在計畫入口不會被擋（那時憑證還不存在），但在 closing review 結束時被擋下；憑證生成後，發布前檢查會再驗一次：內容沒變時報「有效」，之後才改的程式碼讓它報「失效」，連驗收狀態欄位的格式錯誤都會被它抓到。 | re-tested |
