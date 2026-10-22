@@ -289,7 +289,7 @@ def _go_collects(repo: Path, wanted: str, tokens: list[str]) -> tuple[bool | Non
     args = tokens[2:]
     selectors = [arg for arg in args if not arg.startswith("-")]
     if (len(selectors) != 1 or any(arg.startswith("-") for arg in args if arg not in {"-race", "-v", "-count=1"})
-            or not selectors[0].startswith("./")):
+            or (selectors[0] != "." and not selectors[0].startswith("./"))):
         return False, ""
     parent = Path(wanted).parent
     package = "." if parent == Path(".") else "./" + parent.as_posix()
@@ -299,6 +299,8 @@ def _go_collects(repo: Path, wanted: str, tokens: list[str]) -> tuple[bool | Non
         if not selector.endswith("/...") or not package.startswith(subtree + "/"):
             return False, ""
     try:
+        # go list -json reports Dir and selected TestGoFiles/XTestGoFiles;
+        # file lists are names relative to Dir. https://pkg.go.dev/cmd/go#hdr-List_packages_or_modules
         result = subprocess.run(["go", "list", "-json", package], cwd=repo,
                                 capture_output=True, text=True, timeout=30)
         data = json.loads(result.stdout) if result.returncode == 0 else {}

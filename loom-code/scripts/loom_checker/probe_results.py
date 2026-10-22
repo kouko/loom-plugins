@@ -175,6 +175,8 @@ def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None) -> 
     try:
         source = subprocess.run(["git", "show", f"HEAD:{artifact}"], cwd=repo,
                                 capture_output=True, text=True, timeout=10)
+        # go list -json reports Dir and selected TestGoFiles/XTestGoFiles;
+        # file lists are names relative to Dir. https://pkg.go.dev/cmd/go#hdr-List_packages_or_modules
         list_argv = ["go", "list", "-json"]
         if "-tags" in values:
             list_argv.append("-tags=" + values["-tags"])
