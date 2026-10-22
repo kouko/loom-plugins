@@ -4,6 +4,15 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.12.4] — 2026-10-22 — flow node edge-case fixes
+
+- A flow structured node keeps one space before the right border when a
+  width is given (re-wraps only a line that would fill the box).
+- A flow step or arch layer whose description is one string draws it as
+  its lines instead of one character per line (an empty string still
+  errors; a control character now raises the named-code-point error).
+- The pin-coverage test now checks drawn output.
+
 ## [5.12.3] — 2026-10-21 — layered-architecture edge-case fixes
 
 - `render_arch` keeps a structured layer's widest body line unbroken; the
