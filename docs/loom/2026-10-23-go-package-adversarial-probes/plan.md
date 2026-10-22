@@ -21,6 +21,11 @@ charter: 1.1
 - Test: A3 positive: release-metadata-synchronized; negative: stale-version-pin-refused.
 - Risk: agent-decided — bump loom-code to 3.48.0 because station guidance changes; update CHANGELOG entry, version pin, and README strings before final attestation.
 
+**W1-02 Graduate the adversarial Go attribution probe**  after: W1-01  acceptance: 2,3
+- Files: `docs/loom/2026-10-23-go-package-adversarial-probes/evidence/probes/test_go_misattributed_comment.py`, `loom-code/tests/test_probe_language_commands.py`
+- Test: A2 positive: commented declaration cannot claim sibling test pass; negative: the probe turned red before the Go source-scanner fix. A3 boundary: permanent package suite collects the graduated probe.
+- Risk: agent-decided — the adversarial program exposed a real false attribution; move it into the standing suite before final review so later changes rerun it.
+
 ## Simplicity check
 - none found
 
