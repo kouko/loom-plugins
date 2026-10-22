@@ -24,7 +24,7 @@ charter: 1.1
 **W1-03 Keep the flow body line's right padding under a width**  after: W1-02  acceptance: 1, 3
 - Files: loom-workflow/skills/loom-visualization/scripts/gen_flow.py, loom-workflow/tests/loom-visualization/test_ascii_generators.py
 - Test: A1 positive: flow-width-10-long-unbroken-body-keeps-right-pad; boundary: flow-two-cell-body-narrow-width-keeps-pad. A3 positive: new-pin-flow-width-given-body-fits; boundary: flow-empty-title-empty-body-line-unchanged.
-- Risk: gen_flow wraps body at interior-2 before the shared renderer (greedy breaks match where no line filled the old width); two-cell floor rises one; arch unchanged (agent-decided).
+- Risk: gen_flow re-wraps at interior-2 only a line that would fill the interior; wrapping all at interior-2 moved breaks for 20,669/200k non-flush fuzz inputs; char floor rises one; arch unchanged (agent-decided).
 
 **W2-01 Release loom-workflow 5.12.4**  after: W1-01, W1-02, W1-03  acceptance: 5
 - Files: loom-workflow/CHANGELOG.md, loom-workflow/**/plugin.json, loom-workflow/package.json, loom-workflow/README*.md, README.md, loom-workflow/tests/scripts/test_release_metadata.py
@@ -34,7 +34,7 @@ charter: 1.1
 ## Simplicity check
 - Merge the pin-coverage test into the parametrized pin test instead of a second drawing pass — taken
 - Cite existing trunk pins as A3 evidence instead of new per-task A3 cases; add one pin for flow with a width and a fitting body — taken
-- Pre-wrap flow body at interior-2 instead of widening the box by one cell, which left long unbroken bodies flush (reviewer note) — taken
+- Pre-wrap flow body at interior-2 instead of widening the box by one cell, which left long unbroken bodies flush (reviewer note; Build narrowed it to flush lines) — taken
 
 ## Questions asked
 ① — what — 這樣對嗎？
