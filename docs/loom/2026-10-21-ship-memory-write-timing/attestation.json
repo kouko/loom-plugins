@@ -1,0 +1,84 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-21-ship-memory-write-timing",
+  "content_digest": "741c6c9f38ded320b2aac70039a96343da60c9a5",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_ship_memory_timing.py -q",
+      "artifact": "loom-code/tests/test_adversarial_ship_memory_timing.py",
+      "result": "pass",
+      "command_digest": "d27b597e1e3e3b81eba5a4f6f24c65e02005c80ff27ccfe7d6e23ce98f4ce206"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-r1a",
+      "vendor": "anthropic",
+      "model": "claude-fable-5-1",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "aab60494",
+      "review_target_sha": "63aa42c8",
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists in the repo (only PRINCIPLES.md)",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Ship SKILL.md §2 lines 130-140 carry the memory-write-timing rule exactly as intent Acceptance 1 requires.",
+        "No sibling-plugin internal file:line citations remain; only public skill names cited.",
+        "Probe runs green and is cwd-independent; each pin turns RED on its target defect.",
+        "Plan Current State Evidence anchors verified accurate; version 3.46.0 consistent across all manifests, package.json, CHANGELOG top entry, and READMEs."
+      ]
+    },
+    {
+      "reviewer": "reviewer-r1b",
+      "vendor": "anthropic",
+      "model": "claude-fable-5-1",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "aab60494",
+      "review_target_sha": "63aa42c8",
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "N/A — prose-only timing rule; no module/boundary change",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "N/A — no code structure or behavior change",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "N/A — no PRINCIPLES.md governs loom-code",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md in loom-code",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Verified the rule's factual claims by reading the three cited sources in-tree: git-memory pre-finalize deadline, loom-memory ride-next-branch batching, closing-review Convergence batched-passenger deferral.",
+        "docs/loom/memory/** is not in publication_only_paths, so a post-finalize memory file invalidates the functional content digest — the rule's rationale is technically sound.",
+        "Ran test_adversarial_ship_memory_timing.py (5 passed), test_write_plan_station_text.py (36 passed), and the three ship station tests (15 passed)."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
