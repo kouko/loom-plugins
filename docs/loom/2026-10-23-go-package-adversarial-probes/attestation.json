@@ -1,0 +1,68 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-23-go-package-adversarial-probes",
+  "content_digest": "ed3ee60bb777a9eb5a8afbde4dc76e73e8ff05dd",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_probe_language_commands.py",
+      "artifact": "loom-code/tests/test_probe_language_commands.py",
+      "result": "pass",
+      "command_digest": "6b73aa3961cb28d02713008caf63a03655090e84b5495e20dcd39ae0f53ba4a4"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "go_code_reviewer",
+      "vendor": "OpenAI",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "49bd397965671cc92077ccf81bae1338f2d7ae61",
+      "review_target_sha": "ab2519bc40ce5eab819f50102147908fbe3a9e12",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": []
+    },
+    {
+      "reviewer": "go_skill_reviewer",
+      "vendor": "OpenAI",
+      "model": "inherited",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "49bd397965671cc92077ccf81bae1338f2d7ae61",
+      "review_target_sha": "ab2519bc40ce5eab819f50102147908fbe3a9e12",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
