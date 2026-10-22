@@ -13,8 +13,10 @@ closing-review's Convergence passage introduced.
 
 from pathlib import Path
 
-SHIP = Path("loom-code/skills/ship/SKILL.md")
-CLOSE_REVIEW = Path("loom-code/skills/closing-review/SKILL.md")
+SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
+CLOSE_REVIEW = (
+    Path(__file__).resolve().parents[1] / "skills" / "closing-review" / "SKILL.md"
+)
 
 
 def _norm(text: str) -> str:
