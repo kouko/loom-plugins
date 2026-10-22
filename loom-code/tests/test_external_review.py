@@ -294,6 +294,30 @@ def test_claude_json_null_is_structured_failure():
                             runner=lambda argv, **kwargs: completed(argv, "null"))
     assert result["status"] == "failed"
     assert "execution-error" in result["reason"]
+    assert result["next_action"] == "Inspect Claude CLI diagnostics privately, then request a new authorized review."
+
+
+@pytest.mark.parametrize("stage", ["probe", "review"])
+def test_claude_zero_exit_error_result_never_completes_or_leaks(stage):
+    marker = "SYNTHETIC_PRIVATE_MARKER"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        error = stage == "probe" or len(calls) == 2
+        payload = {"type": "result", "is_error": error,
+                   "result": marker if error else "ok",
+                   "modelUsage": {"claude-sonnet-4-5": {}}}
+        return completed(argv, json.dumps(payload))
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            marker, consent("claude"), runner=runner)
+    assert len(calls) == (1 if stage == "probe" else 2)
+    assert result["status"] == "failed"
+    assert result["reason"] == "execution-error: claude result reports error"
+    assert result["next_action"] == "Inspect Claude CLI diagnostics privately, then request a new authorized review."
+    assert result["review_output"] is None
+    assert marker not in json.dumps(result)
 
 
 def test_codex_discovery_ignores_non_object_json_lines():
@@ -320,6 +344,7 @@ def test_discovery_and_execution_exceptions_do_not_echo_private_text(
                               "review", consent("claude", scope), runner=runner)
     assert discovered["reason"] == f"discovery-error: {expected}"
     assert executed["reason"] == f"execution-error: {expected}"
+    assert executed["next_action"]
     assert secret not in json.dumps(discovered)
     assert secret not in json.dumps(executed)
 
@@ -510,6 +535,10 @@ def test_claude_structured_api_error_reports_bounded_reason_without_review_mater
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == f"probe-exit-1: {expected}"
+    action = ("Wait for the Claude session limit to reset, then request a new authorized review."
+              if http_status == 429 else
+              "Check Claude API status locally, then request a new authorized review.")
+    assert result["next_action"] == action
     assert result["probe"] == {"returncode": 1, "timeout_seconds": 45}
     assert secret not in json.dumps(result)
     assert len(calls) == 1
@@ -535,6 +564,10 @@ def test_nonzero_untrusted_stdout_does_not_become_failure_reason():
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == "review-exit-1: unknown error"
+    assert result["next_action"] == "Run claude doctor locally; inspect CLI diagnostics privately, then request a new authorized review."
+    assert result["diagnostic"] == {"stage": "review", "exit_code": 1,
+                                    "stdout_present": True, "stderr_present": True,
+                                    "stdout_json_parseable": True}
     assert prompt not in json.dumps(result)
 
 
@@ -551,6 +584,7 @@ def test_claude_empty_stdout_classifies_only_known_stderr(stderr, expected):
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == f"probe-exit-2: {expected}"
+    assert result["next_action"]
     assert stderr not in json.dumps(result)
 
 
@@ -561,6 +595,10 @@ def test_nonzero_empty_diagnostic_is_explicitly_unknown():
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == "probe-exit-2: unknown error"
+    assert result["next_action"] == "Run claude doctor locally; inspect CLI diagnostics privately, then request a new authorized review."
+    assert result["diagnostic"] == {"stage": "probe", "exit_code": 2,
+                                    "stdout_present": False, "stderr_present": False,
+                                    "stdout_json_parseable": False}
     assert result["probe"] == {"returncode": 2, "timeout_seconds": 45}
 
 
@@ -1136,6 +1174,30 @@ def test_execute_section_names_progress_relay():
 
 def test_execute_section_still_names_one_json_result():
     assert _affirms_one_json_stdout(_execute_section())
+
+
+def test_execute_section_relay_safe_claude_failure_and_recovery():
+    section = _execute_section()
+    assert affirms(section, "relay", "reason", "next_action", "user")
+    assert affirms(section, "run", "claude doctor", "locally", "unknown cause")
+    assert affirms(section, "relay", "fixed", "diagnostic")
+    assert affirms(section, "keep", "raw cli output", "user-facing report")
+    assert "privately" in section
+    assert affirms("relay the bounded reason and next_action to the user.",
+                   "relay", "reason", "next_action", "user")
+    assert not affirms("do not relay the bounded reason and next_action to the user.",
+                       "relay", "reason", "next_action", "user")
+
+
+def test_execute_section_preserves_failed_review_boundary():
+    section = _execute_section()
+    assert affirms(section, "failed", "leg", "verdict")
+    assert "newly authorized review" in section
+    assert "silent retry" in section and "provider fallback" in section
+    assert affirms("record the failed leg with its verdict absent.",
+                   "failed", "leg", "verdict")
+    assert not affirms("do not record the failed leg with its verdict absent.",
+                       "failed", "leg", "verdict")
 
 
 def test_execute_section_pins_reject_negated_samples():
