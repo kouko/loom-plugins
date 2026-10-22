@@ -567,7 +567,10 @@ def test_agy_plugin_validate_accepts_committed_plugin(name):
     out = re.sub(r"\x1b\[[0-9;]*m", "", proc.stdout + proc.stderr)
     assert proc.returncode == 0, out
     skills = len(list((REPO_ROOT / name / "skills").glob("*/SKILL.md")))
-    assert re.search(rf"skills\s*:\s*{skills} processed", out), out
+    # agy used to print "skills : N processed"; newer builds print
+    # "skills N · agents A · ...". Accept both so the test keeps asserting
+    # that every skill folder was processed regardless of the CLI's format.
+    assert re.search(rf"skills\s*:?\s*{skills}\b", out), out
 
 
 # --- agy plugin rule: loom-workflow/rules/AGENTS.md ----------------------------
