@@ -1242,8 +1242,10 @@ def test_flow_width_10_long_unbroken_body_keeps_right_pad():
 
 def test_flow_two_cell_body_narrow_width_keeps_pad():
     # flow-two-cell-body-narrow-width-keeps-pad
-    for width in (0, 1, 2):
-        lines = _flow_body_lines(render_flow([{"title": "", "body": ["中文"]}], width=width))
+    # and the one-cell case: an empty title, body 'a', width <= 0.
+    for steps, width in [([{"title": "", "body": ["中文"]}], w) for w in (0, 1, 2)] + [
+            ([{"title": "", "body": ["a"]}], 0), (["\nab"], -1)]:
+        lines = _flow_body_lines(render_flow(steps, width=width))
         assert lines and all(line.endswith(" │") for line in lines), (width, lines)
 
 

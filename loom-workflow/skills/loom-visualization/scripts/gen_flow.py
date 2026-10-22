@@ -88,9 +88,9 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
             return max(title_width, min(natural_body_width, budget))
 
     # A body line that would sit flush is wrapped at interior - 2, so the
-    # interior must hold the widest two-cell body character plus the leading
-    # space and one right pad; one-cell bodies keep their sizing. The +2 below
-    # already covers the title.
+    # interior must hold the widest body character plus the leading space and
+    # one right pad. A body of only empty or space-only lines has no floor, so
+    # an interior of 2 keeps trunk output. The +2 below already covers the title.
     def body_char_floor(step: Union[str, dict]) -> int:
         if isinstance(step, dict):
             body = step["body"]
@@ -98,8 +98,8 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
             body = split_lines(step)[1:]
         else:
             return 0
-        widest_char = max((char_width(c) for ln in body for c in ln), default=0)
-        return widest_char + 2 if widest_char > 1 else 0
+        widest_char = max((char_width(c) for ln in body for c in ln if c != " "), default=0)
+        return widest_char + 2 if widest_char > 0 else 0
 
     interior = max(
         max(get_step_width(step) + 2, body_char_floor(step)) for step in steps
