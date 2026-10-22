@@ -282,6 +282,37 @@ def _cargo_collects(repo: Path, wanted: str) -> tuple[bool | None, str]:
     return any(path == wanted and runs for _name, path, runs in targets), ""
 
 
+def _go_collects(repo: Path, wanted: str, tokens: list[str]) -> tuple[bool | None, str]:
+    """Whether one declared Go package suite selects this test file."""
+    if not wanted.endswith("_test.go") or not (repo / wanted).is_file():
+        return False, ""
+    args = tokens[2:]
+    selectors = [arg for arg in args if not arg.startswith("-")]
+    if (len(selectors) != 1 or any(arg.startswith("-") for arg in args if arg not in {"-race", "-v", "-count=1"})
+            or (selectors[0] != "." and not selectors[0].startswith("./"))):
+        return False, ""
+    parent = Path(wanted).parent
+    package = "." if parent == Path(".") else "./" + parent.as_posix()
+    selector = selectors[0]
+    if selector not in {"./...", package}:
+        subtree = selector.removesuffix("/...")
+        if not selector.endswith("/...") or not package.startswith(subtree + "/"):
+            return False, ""
+    try:
+        # go list -json reports Dir and selected TestGoFiles/XTestGoFiles;
+        # file lists are names relative to Dir. https://pkg.go.dev/cmd/go#hdr-List_packages_or_modules
+        result = subprocess.run(["go", "list", "-json", package], cwd=repo,
+                                capture_output=True, text=True, timeout=30)
+        data = json.loads(result.stdout) if result.returncode == 0 else {}
+    except (OSError, subprocess.TimeoutExpired, ValueError) as exc:
+        return None, str(exc)
+    if not isinstance(data, dict) or not data:
+        return None, result.stderr.strip() or "go list returned no package"
+    selected = data.get("TestGoFiles", []) + data.get("XTestGoFiles", [])
+    return (Path(data.get("Dir", "")).resolve() == (repo / parent).resolve()
+            and Path(wanted).name in selected), ""
+
+
 def suite_collects(repo: Path, artifact: str) -> bool:
     return suite_collection(repo, artifact)[0] is True
 
@@ -309,6 +340,8 @@ def suite_collection(repo: Path, artifact: str) -> tuple[bool | None, str]:
         if ((tokens[:2] == ["cargo", "test"] and set(tokens[2:]) <= CARGO_TEST_FLAGS)
                 or (tokens[:3] == ["cargo", "nextest", "run"] and set(tokens[3:]) <= {"--release"})):
             return _cargo_collects(repo, wanted)
+        if tokens[:2] == ["go", "test"]:
+            return _go_collects(repo, wanted, tokens)
         return _direct_pytest_collects(repo, artifact)
     commands, error, launcher = _declared_suite_commands(repo)
     if commands is None:
@@ -529,7 +562,9 @@ def command_names_artifact(command: str, artifact: str) -> bool:
     return any(os.path.normpath(token) == wanted for token in tokens)
 
 
-SHELL_METACHARACTERS = re.compile(r"[;&|<>()$`*?\[\]{}\n]")
+# `subprocess.run` receives argv without a shell, so `$` is a literal byte.
+# Go's exact `-run ^TestName$` selection needs that end anchor.
+SHELL_METACHARACTERS = re.compile(r"[;&|<>()`*?\[\]{}\n]")
 
 
 PYTEST_VALUE_OPTIONS = frozenset({

@@ -308,8 +308,8 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         if route == "not-accepted":
             return [("finalize.adversarial",
                      f"`{command}` is a {row.name} command but not in its accepted form "
-                     f"for {artifact}: it must run that one file alone with the runner's "
-                     f"machine-readable output and no filter; a reviewer confirmation "
+                     f"for {artifact}: use the documented artifact-bound command and "
+                     f"machine-readable output; a reviewer confirmation "
                      f"cannot stand in for it")]
         if not git_ok(repo, "cat-file", "-e", f"{head_sha}:{artifact}"):
             return [("finalize.adversarial", "artifact must exist in the selected commit")]

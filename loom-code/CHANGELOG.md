@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.48.0] — 2026-10-23 — fix(closing-review): accept Go package adversarial probes
+
+- Closing review accepts a Go package test run for an adversarial test that depends on sibling package files, while requiring the named test to be declared in the selected artifact and to pass in a fresh JSON result.
+- Package collection and exact test matching keep skipped, cached, filtered-out and unrelated test results from serving as probe evidence. Existing single-file Go probes remain accepted.
+
 ## [3.47.0] — 2026-10-22 — feat(ship): memory entries land before finalize-review, never after
 
 - Ship §2 now states the memory-write timing rule: a durable `docs/loom/memory/` entry must land before `closing-review`'s `finalize-review` generates the attestation, never after; a memory file committed later changes the functional content digest and invalidates the attestation.

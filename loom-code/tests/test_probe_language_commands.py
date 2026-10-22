@@ -1,3 +1,4 @@
+# concern: A package test in another file must not satisfy a commented declaration in the artifact.
 """The runner row table in `loom_checker.probe_results`: a row claims an argv
 by runner identity, accepts only its documented form, and reads the run's own
 output -- a count of passing, non-skipped tests from the artifact, 0 for a
@@ -17,11 +18,13 @@ report goes.
 from __future__ import annotations
 
 import shlex
+import subprocess
 from pathlib import Path
 
 import pytest
 
 from loom_checker.probe_results import ROWS, claiming_row
+from loom_checker.attestation import adversarial_route
 
 GO = "probes/add_test.go"
 NODE = "probes/attack.test.mjs"
@@ -560,6 +563,176 @@ def row_for(command: str, artifact: str, repo: Path | None = None):
 def test_go_json_passing_test_accepted() -> None:
     row = row_for(f"go test -json -v -race -count 1 -timeout=30s -tags integration {GO}", GO)
     assert row.passed(GO_PASS, GO) == 1
+
+
+def test_go_package_probe_uses_siblings_and_exact_artifact_test(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "go-repo"
+    package = root / "internal/pipeline"
+    package.mkdir(parents=True)
+    (root / "go.mod").write_text("module example.test/probe\n\ngo 1.23\n", encoding="utf-8")
+    (package / "extraction.go").write_text(
+        "package pipeline\nfunc extractWithFallback() string { return \"article\" }\n", encoding="utf-8")
+    (package / "extraction_test.go").write_text(
+        'package pipeline\nfunc stubExtractor() string { return extractWithFallback() }\n',
+        encoding="utf-8")
+    artifact = "internal/pipeline/adversarial_test.go"
+    (root / artifact).write_text(
+        'package pipeline\nimport "testing"\n'
+        'func TestAdversarial(t *testing.T) { if stubExtractor() != "article" { t.Fatal("wrong") } }\n',
+        encoding="utf-8")
+    (package / "other_test.go").write_text(
+        'package pipeline\nimport "testing"\nfunc TestOther(t *testing.T) {}\n',
+        encoding="utf-8")
+    monkeypatch.setenv("GOCACHE", str(tmp_path / "go-cache"))
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "fixture"], cwd=root, check=True)
+    command = "go test -json -count=1 -run '^TestAdversarial$' ./internal/pipeline"
+    route, row = adversarial_route(command, artifact, root)
+    assert route == "parsed" and row is not None
+    result = subprocess.run(shlex.split(command), cwd=root, text=True, capture_output=True)
+    assert result.returncode == 0, result.stderr
+    assert row.passed(result.stdout, artifact) == 1
+    single = subprocess.run(["go", "test", artifact], cwd=root, text=True, capture_output=True)
+    assert single.returncode != 0
+    assert "undefined" in single.stdout + single.stderr
+
+    other = 'go test -json -count=1 -run "^TestOther$" ./internal/pipeline'
+    assert adversarial_route(other, artifact, root)[0] == "not-accepted"
+    assert adversarial_route(command.replace("-count=1 ", ""), artifact, root)[0] == "not-accepted"
+    assert adversarial_route(command.replace("./internal/pipeline", "./..."), artifact, root)[0] == "not-accepted"
+    assert row.passed(GO_SKIP.replace("TestAdd", "TestAdversarial"), artifact) == 0
+    assert row.passed(GO_PASS.replace("TestAdd", "TestOther"), artifact) == 0
+
+    original = (root / artifact).read_text(encoding="utf-8")
+    (root / artifact).write_text("//go:build never\n\n" + original, encoding="utf-8")
+    subprocess.run(["git", "add", artifact], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "excluded artifact"], cwd=root, check=True)
+    assert adversarial_route(command, artifact, root)[0] == "not-accepted"
+    (root / artifact).write_text(original, encoding="utf-8")
+    subprocess.run(["git", "add", artifact], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "restore artifact"], cwd=root, check=True)
+
+    (package / "duplicate_test.go").write_text(
+        'package pipeline_test\nimport tt "testing"\nfunc TestAdversarial(t *tt.T) {}\n',
+        encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "duplicate test name"], cwd=root, check=True)
+    assert adversarial_route(command, artifact, root)[0] == "not-accepted"
+
+
+def test_go_package_names_and_skipped_parent_follow_go_discovery(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "go-names"
+    root.mkdir()
+    (root / "go.mod").write_text("module example.test/names\n\ngo 1.23\n", encoding="utf-8")
+    artifact = "adversarial_test.go"
+    (root / artifact).write_text(
+        'package names\nimport tt "testing"\n'
+        'func Test(t *tt.T) {}\n'
+        'func Test1(t *tt.T) {}\n'
+        'func TestΩ(t *tt.T) {}\n'
+        'func TestSkipParent(t *tt.T) {\n'
+        '  t.Run("passed_child", func(t *tt.T) {})\n'
+        '  t.Skip("parent skipped")\n}\n', encoding="utf-8")
+    monkeypatch.setenv("GOCACHE", str(tmp_path / "cache"))
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "fixture"], cwd=root, check=True)
+    for name in ("Test", "Test1", "TestΩ", "TestSkipParent"):
+        command = f"go test -json -count=1 -run '^{name}$' ."
+        route, row = adversarial_route(command, artifact, root)
+        assert route == "parsed" and row is not None, name
+        result = subprocess.run(shlex.split(command), cwd=root, text=True, capture_output=True)
+        assert result.returncode == 0, result.stderr
+        assert row.passed(result.stdout, artifact) == (0 if name == "TestSkipParent" else 1)
+    for pattern in ("^Test1|TestΩ$", "^Test.*$", "^Testicular$"):
+        assert adversarial_route(
+            f"go test -json -count=1 -run '{pattern}' .", artifact, root,
+        )[0] != "parsed"
+
+
+def test_go_package_declarations_ignore_comments_and_accept_comment_separation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "go-comments"
+    root.mkdir()
+    (root / "go.mod").write_text("module example.test/comments\n\ngo 1.23\n", encoding="utf-8")
+    artifact = "attack_test.go"
+    target = root / artifact
+    other = root / "other_test.go"
+    target.write_text(
+        'package comments\n/*\nfunc TestAttack(t *testing.T) {}\n*/\n', encoding="utf-8")
+    other.write_text(
+        'package comments\nimport "testing"\nfunc/**/TestAttack(t *testing.T) {}\n',
+        encoding="utf-8")
+    monkeypatch.setenv("GOCACHE", str(tmp_path / "cache"))
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "fixture"], cwd=root, check=True)
+    command = "go test -json -count=1 -run '^TestAttack$' ."
+    run = subprocess.run(shlex.split(command), cwd=root, text=True, capture_output=True)
+    assert run.returncode == 0, run.stderr
+    assert adversarial_route(command, artifact, root)[0] != "parsed"
+
+    target.write_text(
+        'package comments\nvar decoy = `func TestAttack(t *testing.T) {}`\n',
+        encoding="utf-8")
+    subprocess.run(["git", "add", artifact], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "raw string decoy"], cwd=root, check=True)
+    assert adversarial_route(command, artifact, root)[0] != "parsed"
+
+    target.write_text(
+        'package comments\nimport "testing"\nfunc/**/TestAttack(t *testing.T) {}\n',
+        encoding="utf-8")
+    other.write_text(
+        'package comments\n/*\nfunc TestAttack(t *testing.T) {}\n*/\n', encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", "swap declaration"], cwd=root, check=True)
+    route, row = adversarial_route(command, artifact, root)
+    assert route == "parsed" and row is not None
+    run = subprocess.run(shlex.split(command), cwd=root, text=True, capture_output=True)
+    assert run.returncode == 0, run.stderr
+    assert row.passed(run.stdout, artifact) == 1
+
+
+def test_go_commented_declaration_refuses_other_file_pass(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A selected Go file with only a comment must not own another file's test."""
+    repo = tmp_path / "go"
+    repo.mkdir()
+    (repo / "go.mod").write_text("module example.test/attack\n\ngo 1.23\n")
+    artifact = "attack_test.go"
+    (repo / artifact).write_text(
+        'package attack\n/*\nfunc TestAttack(t *testing.T) {}\n*/\n'
+    )
+    (repo / "other_test.go").write_text(
+        'package attack\nimport "testing"\nfunc/**/TestAttack(t *testing.T) {}\n'
+    )
+    monkeypatch.setenv("GOCACHE", str(tmp_path / "go-cache"))
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+         "commit", "-qm", "fixture"], cwd=repo, check=True,
+    )
+    command = "go test -json -count=1 -run '^TestAttack$' ."
+    run = subprocess.run(shlex.split(command), cwd=repo, text=True, capture_output=True)
+    assert run.returncode == 0, run.stderr
+    route, row = adversarial_route(command, artifact, repo)
+    assert route != "parsed" or row is None or row.passed(run.stdout, artifact) == 0
 
 
 @pytest.mark.parametrize(("command", "artifact", "output"), [

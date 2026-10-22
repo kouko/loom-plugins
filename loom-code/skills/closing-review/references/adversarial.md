@@ -158,7 +158,7 @@ so it needs a reviewer confirmation):
 
 | Runner | Accepted command |
 |---|---|
-| go | `go test -json [-v] [-race] [-count N] [-timeout D] [-tags T] <A>`, `<A>` ending `_test.go` |
+| go | Single file: `go test -json [-v] [-race] [-count N] [-timeout D] [-tags T] <A>`, `<A>` ending `_test.go`. Package with sibling helpers: `go test -json [-v] [-race] -count=1 [-timeout D] [-tags T] -run '^TestName$' ./<package-dir>` (use `.` for a root package), where `TestName` is declared in committed `<A>`, Go selects `<A>` for that package, no other selected file declares the same name, and its JSON result shows that test passing. |
 | unittest | `python -m unittest [-v] [-q] <A>` (pytest's python/uv/conda launchers) |
 | node | `node --test --test-reporter=junit [--experimental-strip-types] <A>` |
 | deno | `deno test --reporter=junit [-A] [--allow-*] <A>` |
@@ -172,11 +172,15 @@ so it needs a reviewer confirmation):
 | minitest | `[w] ruby [-I<dir>]... <A>`, `<A>` named `*_test.rb` or `test_*.rb` |
 | phpunit | `phpunit <A>` (any path to `phpunit`, such as `vendor/bin/phpunit`) |
 
-Every runner except cargo test and nextest runs the probe from the change's
-store. A cargo or nextest probe cannot: it graduates to `tests/<n>.rs` or `tests/<n>/main.rs`
+Every runner except cargo test, nextest, and Go package mode runs the probe from the change's
+store. A Go package probe may be a test file that the declared Go package suite selects.
+For Go package mode, use the test's exact Go identifier in `-run`: Go also
+discovers names such as `Test`, `Test1`, and `TestΩ`, and permits an alias for
+the `testing` import. A skipped parent does not count even if a child passes.
+A cargo or nextest probe cannot remain in the store: it graduates to `tests/<n>.rs` or `tests/<n>/main.rs`
 (or the `[[test]]` path Cargo.toml names; each `required-features` entry
 must be listed directly in `[features] default`) through a task of the change and is
-recorded at that path. Any option not shown, a test-name filter, or a
+recorded at that path. Any option not shown, a test-name filter other than the exact Go package form, or a
 claimed runner in another form is refused. Any other subcommand of go, deno,
 bun or cargo (such as `go vet`, `deno check`, `bun build` or `cargo build`)
 is a claimed runner in another form. Any other command (for example

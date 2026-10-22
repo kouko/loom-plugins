@@ -99,6 +99,35 @@ def test_go_parsed_probe_finalized_and_validated(tmp_path: Path) -> None:
     assert validate(repo, attestation) == []
 
 
+def test_go_package_probe_finalized_and_validated_with_sibling_helpers(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    monkeypatch.setenv("GOCACHE", str(tmp_path / "go-cache"))
+    repo = make_repo(tmp_path, package="go test ./...")
+    (repo / "go.mod").write_text("module example.test/probe\n\ngo 1.23\n", encoding="utf-8")
+    artifact = "internal/pipeline/adversarial_test.go"
+    path = repo / artifact
+    path.parent.mkdir(parents=True, exist_ok=True)
+    (path.parent / "extraction.go").write_text(
+        'package probes\nfunc extractWithFallback() string { return "article" }\n', encoding="utf-8")
+    (path.parent / "extraction_test.go").write_text(
+        'package probes\nfunc stubExtractor() string { return extractWithFallback() }\n',
+        encoding="utf-8")
+    path.write_text(
+        '// concern: a login page is mistaken for an article\npackage probes\nimport "testing"\n'
+        'func TestAttack(t *testing.T) { if stubExtractor() != "article" { t.Fatal("wrong") } }\n',
+        encoding="utf-8")
+    commit_all(repo, "go package probe")
+    command = f"go test -json -count=1 -run '^TestAttack$' ./" + str(Path(artifact).parent)
+    result = finalize(repo, review_input(tmp_path, PASSING, [
+        {"command": command, "artifact": artifact},
+    ]), {"GOCACHE": str(tmp_path / "go-cache")})
+    assert result.returncode == 0, result.stderr
+    attestation = written(repo)
+    assert (adversarial(attestation)["evidence"], adversarial(attestation)["passed"]) == ("parsed", 1)
+    assert validate(repo, attestation) == []
+
+
 def test_parsed_evidence_zero_passed_invalid(tmp_path: Path) -> None:
     repo, attestation = go_attestation(tmp_path)
     for forged in ({"passed": 0}, {"passed": True}, {"evidence": None}):
