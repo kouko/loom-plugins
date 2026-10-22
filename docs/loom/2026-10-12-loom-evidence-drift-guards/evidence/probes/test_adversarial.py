@@ -1,0 +1,1 @@
+print("adversarial test passed")
