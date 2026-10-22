@@ -1224,6 +1224,36 @@ def test_flow_multiline_string_cjk_body_width_0_aligned():
         _assert_aligned(_render_isolated("flow", ["\n中"], width=width), "中")
 
 
+def _flow_body_lines(out: str) -> list[str]:
+    body, inside = [], False
+    for line in out.split("\n"):
+        inside = line.startswith("├") or (inside and not line.startswith("└"))
+        if inside and not line.startswith("├"):
+            body.append(line)
+    return body
+
+
+def test_flow_width_10_long_unbroken_body_keeps_right_pad():
+    # flow-width-10-long-unbroken-body-keeps-right-pad
+    for body in ("x" * 11, "x" * 30):
+        lines = _flow_body_lines(render_flow(["Build\n" + body, "Ship"], width=10))
+        assert lines and all(line.endswith(" │") for line in lines), lines
+
+
+def test_flow_two_cell_body_narrow_width_keeps_pad():
+    # flow-two-cell-body-narrow-width-keeps-pad
+    for width in (0, 1, 2):
+        lines = _flow_body_lines(render_flow([{"title": "", "body": ["中文"]}], width=width))
+        assert lines and all(line.endswith(" │") for line in lines), (width, lines)
+
+
+def test_flow_empty_title_empty_body_line_unchanged():
+    # flow-empty-title-empty-body-line-unchanged: trunk fc6e9bfc output.
+    for kwargs in ({}, {"width": 1}):
+        out = render_flow([{"title": "", "body": [""]}], **kwargs)
+        assert out == "┌──┐\n│  │\n├──┤\n│  │\n└──┘"
+
+
 # every-generator-pins-trunk-output / pins-cover-all-six-generators: exact
 # trunk 5e850c70 output for inputs that hit none of the arch sizing defects
 # (no structured layer whose body line is its widest element, no empty
@@ -1276,6 +1306,20 @@ _TRUNK_PINS = {
         "┌───────┐\n"
         "│ Done  │\n"
         "└───────┘",
+    ),
+    "flow-width-given-body-fits": (
+        "flow", ([{"title": "Plan", "body": ["- write tests", "- ship it"]}, "Done"],), {"width": 20},
+        "┌───────────────┐\n"
+        "│ Plan          │\n"
+        "├───────────────┤\n"
+        "│ - write tests │\n"
+        "│ - ship it     │\n"
+        "└───────────────┘\n"
+        "        │\n"
+        "        ▼\n"
+        "┌───────────────┐\n"
+        "│     Done      │\n"
+        "└───────────────┘",
     ),
     "tree-cjk": (
         "tree", ({"label": "訂單系統", "children": [

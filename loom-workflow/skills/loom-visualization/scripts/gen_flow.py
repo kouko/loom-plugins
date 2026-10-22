@@ -26,7 +26,7 @@ from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import char_width, display_width, split_lines, center, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
+from width import char_width, display_width, split_lines, center, wrap_label, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
 
 
 def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> str:
@@ -87,9 +87,10 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
                 natural_body_width = 0  # Will be caught by empty body validation later
             return max(title_width, min(natural_body_width, budget))
 
-    # A structured step wraps its body at interior - 1, so the interior must
-    # hold the widest two-cell body character plus that leading space; one-cell
-    # bodies keep their sizing. The +2 below already covers the title.
+    # A body line that would sit flush is wrapped at interior - 2, so the
+    # interior must hold the widest two-cell body character plus the leading
+    # space and one right pad; one-cell bodies keep their sizing. The +2 below
+    # already covers the title.
     def body_char_floor(step: Union[str, dict]) -> int:
         if isinstance(step, dict):
             body = step["body"]
@@ -98,7 +99,7 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
         else:
             return 0
         widest_char = max((char_width(c) for ln in body for c in ln), default=0)
-        return widest_char + 1 if widest_char > 1 else 0
+        return widest_char + 2 if widest_char > 1 else 0
 
     interior = max(
         max(get_step_width(step) + 2, body_char_floor(step)) for step in steps
@@ -109,6 +110,23 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
     # at column 1, so the interior center is at 1 + interior // 2.
     trunk_col = 1 + interior // 2
     trunk_pad = " " * trunk_col
+
+    # The shared renderer wraps at interior - 1, which lets a line fill the
+    # interior flush against the right border. Only a line that would do so is
+    # pre-wrapped at interior - 2, keeping one space of right padding; every
+    # other line keeps the shared renderer's breaks (wrapping all lines at
+    # interior - 2 moves word/script-boundary breaks in unaffected bodies).
+    # An interior of 2 has no room (wrap width 0) and keeps trunk output.
+    def pad_body(body: list[str]) -> list[str]:
+        if interior - 2 < 1:
+            return body
+        out = []
+        for line in body:
+            pieces = wrap_label(line, interior - 1)
+            if any(display_width(p) == interior - 1 and not p.endswith(" ") for p in pieces):
+                pieces = wrap_label(line, interior - 2)
+            out.extend(pieces)
+        return out
 
     top = "┌" + "─" * interior + "┐"
     bottom = "└" + "─" * interior + "┘"
@@ -133,7 +151,7 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
                 if not body:
                     raise ValueError(EMPTY_BODY_FROM_STRING)
 
-                block.extend(render_structured_node(title, body, interior))
+                block.extend(render_structured_node(title, pad_body(body), interior))
             else:
                 # Regular string step: centered label, supports \n for multi-line
                 for line in split_lines(step):
@@ -147,7 +165,7 @@ def render_flow(steps: list[Union[str, dict]], width: Optional[int] = None) -> s
             if not body:
                 raise ValueError(EMPTY_BODY)
 
-            block.extend(render_structured_node(title, body, interior))
+            block.extend(render_structured_node(title, pad_body(body), interior))
 
         block.append(bottom)
         blocks.append(block)
