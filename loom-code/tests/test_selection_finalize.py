@@ -129,6 +129,59 @@ def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> 
     assert validate(repo, attestation) == []
 
 
+def make_reported_repo(tmp_path: Path) -> Path:
+    """A narrow delta that also carries a confirmed intent and an acceptance
+    report naming the commit its evidence was produced on."""
+    repo = make_narrow_repo(tmp_path)
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "# A change\n"
+        "originator: tester\n"
+        "kind: engineering\n"
+        "needs-design: no — internal\n"
+        "status: confirmed 2026-09-23\n"
+        "\n## Problem\nx\n\n## Proposed outcome\ny\n\n"
+        "## Acceptance\n1. the guide exists\n\n"
+        "## Constraints\n- none\n\n## Out of scope\n- none\n\n"
+        "## Open questions\n- none\n",
+        encoding="utf-8",
+    )
+    tested = commit_all(repo, "intent")
+    report = repo / f"docs/loom/{CHANGE}/acceptance-test-report.md"
+    report.parent.mkdir(parents=True, exist_ok=True)
+    report.write_text(
+        "# A change — what I tried and what happened\n\n"
+        f"Tried on 2026-09-23, in a clean copy of the project at {tested[:7]}.\n\n"
+        "| # | What you asked for | Verdict | What happened | Re-run |\n"
+        "|---|---|---|---|---|\n"
+        "| 1 | the guide exists | works | it is there | — |\n",
+        encoding="utf-8",
+    )
+    commit_all(repo, "acceptance report")
+    return repo
+
+
+def test_finalize_binds_the_report_verdicts_into_acceptance_status(
+    tmp_path: Path,
+) -> None:
+    """The generated acceptance_status carries the report's Verdict cells in
+    the validator's vocabulary, and the tested/reviewed bookkeeping names
+    the tree the evidence was produced on and the tree being finalized."""
+    repo = make_reported_repo(tmp_path)
+
+    result = finalize(repo, review_input(tmp_path, PASSING[:1], []))
+
+    assert result.returncode == 0, result.stderr
+    attestation = written(repo)
+    tested = git(repo, "rev-parse", "HEAD~1")
+    assert attestation["tested_commit"] == tested[:7]
+    assert attestation["reviewed_commit"] == git(repo, "rev-parse", "HEAD")
+    assert attestation["intent_confirmed_sha"] is None  # no pin in the fixture intent
+    assert attestation["acceptance_status"] == [{"acceptance": 1, "status": "works"}]
+    assert validate(repo, attestation) == []
+
+
 def trunkless_clone(origin: Path, tmp_path: Path, branch: str = "feature") -> Path:
     """The same commit, cloned the way CI fetches one branch: no trunk, so
     the committed delta cannot be recomputed at all."""

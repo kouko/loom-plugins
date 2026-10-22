@@ -23,9 +23,11 @@ def intent_identity(intent_path: Path) -> str:
 
 
 def recompute_command(relative: str) -> str:
+    """A POSIX-safe pipeline: bash process substitution `<(...)` prints
+    nothing under a minimal `sh`, so the printed fix has to survive it."""
     return (
-        "recompute it with `git hash-object <(grep -v -e '^status:' -e "
-        f"'^intent_confirmed_sha:' {relative})`"
+        "recompute it with `grep -v -e '^status:' -e '^intent_confirmed_sha:' "
+        f"{relative} | git hash-object --stdin`"
     )
 
 
