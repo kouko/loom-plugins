@@ -127,6 +127,18 @@ when one is earned. It does not replace or reorder Ship's headings. Zero to one
 durable lesson per change is the normal outcome. When loom-workflow is not
 installed, this routing is silently skipped.
 
+**Memory write timing:** `loom-workflow:git-memory` requires a durable
+`docs/loom/memory/` entry to land **before** `closing-review`'s
+`finalize-review` generates the attestation, never after. A memory file
+committed after finalize-review is itself functional content: it changes the
+functional content digest and invalidates the attestation the branch already
+has, forcing either another review round (full package suite plus two
+reviewers, bounded by the three-digest episode limit) or publication with
+`Verification status: stale`. Therefore Ship **does not write memory
+entries** after finalize-review has run; `loom-workflow:loom-memory` routes
+qualifying lessons discovered at or after Ship to the next change's branch
+instead of reopening this one.
+
 Before publication, reject a body with a missing heading, evidence source that
 was silently ignored, unsupported decision claim, hidden-reasoning claim, or a
 diagram that is required by the relationships above but absent. Retired review
