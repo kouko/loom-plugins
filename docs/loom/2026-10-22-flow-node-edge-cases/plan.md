@@ -43,5 +43,5 @@ charter: 1.1
 ## Risks
 1. A concurrent PR may bump loom-workflow first; check the trunk version before closing review and re-bump to the next free patch if taken.
 2. user-decided — a single-string description is drawn as its lines rather than rejected (option A, 2026-10-22), so an agent's string body renders instead of erroring.
-3. A string body with a control character now raises split_lines' named-code-point error instead of drawing a misaligned box (agent-decided).
+3. A string body is split with str.splitlines, not split_lines, so a control character draws exactly as the list form and as trunk does; the adversary showed the stricter split broke Acceptance 2 and 3 (agent-decided).
 4. Pre-wrapping at interior-2 reaches width 0 when the interior is 2 (empty title, empty body line); that case must keep trunk output rather than raise (agent-decided).
