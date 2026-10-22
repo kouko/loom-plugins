@@ -1,3 +1,4 @@
+# concern: A package test in another file must not satisfy a commented declaration in the artifact.
 """The runner row table in `loom_checker.probe_results`: a row claims an argv
 by runner identity, accepts only its documented form, and reads the run's own
 output -- a count of passing, non-skipped tests from the artifact, 0 for a
@@ -706,7 +707,6 @@ def test_go_package_declarations_ignore_comments_and_accept_comment_separation(
     assert row.passed(run.stdout, artifact) == 1
 
 
-# concern: A package test in another file must not satisfy a commented declaration in the artifact.
 def test_go_commented_declaration_refuses_other_file_pass(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
