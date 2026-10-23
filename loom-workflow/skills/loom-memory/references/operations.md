@@ -39,7 +39,7 @@ branch opened only to write it down is pure overhead. Only a fact
 confirmable by observing real post-merge or installed behavior earns a
 follow-up branch, and those are batched.
 
-Almost nothing reaches step 3. Most of what a change surfaces is not a
+Almost nothing reaches step 4. Most of what a change surfaces is not a
 durable lesson, and zero to one durable lesson per change is the normal
 outcome — step 1 is where that is decided, one candidate at a time.
 
@@ -53,22 +53,25 @@ outcome — step 1 is where that is decided, one candidate at a time.
    - a decision whose relevance is bound to one commit or PR (`git-memory`
      owns that), or
    - a personal preference unrelated to the repository.
-2. Read `index.md` and search matching or nearby entries for one that
+2. Inspect the target store before index access or concept writes.
+   Initialize an absent or empty directory with `init <store>` using
+   `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py`;
+   this creates `README.md` and `index.md` from the bundled templates.
+   Preserve existing populated stores: skip initialization, detect legacy
+   README-indexed stores as described in **Legacy stores** below and stop
+   for explicit migration. For other populated stores, run
+   `validate <store>` first and stop on any violation, including a missing
+   index; continue only with a valid store.
+3. Read `index.md` and search matching or nearby entries for one that
    already says this, or says something this would contradict or narrow.
    A match routes to Reconcile — never create a second concept for the
    same subject.
-3. Choose `type`, a filename (the concept's `name` must equal its stem),
+4. Choose `type`, a filename (the concept's `name` must equal its stem),
    and write the frontmatter: `type`, `name`, `description` (one
    standalone durable relevance rule), `sources` with at least one
    `resource`.
-4. Write the body: `Trigger`, `Correct path`, `Why`, and `Limits` only
+5. Write the body: `Trigger`, `Correct path`, `Why`, and `Limits` only
    for a real non-applicability boundary — see `references/okf-profile.md`.
-5. If the store does not exist, create it from the bundled templates via
-   `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py init
-   <store>` (the `skills/loom-memory/scripts/loom_memory.py` file inside
-   this skill's own directory) — it writes `README.md` and `index.md` from
-   the bundled templates and refuses an existing populated store — then
-   continue.
 6. Run `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py
    regenerate-index <store>` then `validate <store>` (that script is
    `skills/loom-memory/scripts/loom_memory.py` inside this skill's own

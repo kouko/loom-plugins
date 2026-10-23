@@ -105,19 +105,22 @@ record eight things at once means the filter has not been applied yet.
    commit-bound decision (that belongs in `git-memory`), or a personal
    preference. When it fails this classification, do not record it; say
    why.
-2. Read `index.md` and search for an equivalent or contradictory live
+2. Inspect the target store before index access or concept writes.
+   Initialize an absent or empty directory with `init <store>` using
+   `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py`;
+   this creates `README.md` and `index.md` from the bundled templates.
+   Preserve existing populated stores: skip initialization, detect legacy
+   README-indexed stores as described in `references/operations.md` and
+   stop for explicit migration. For other populated stores, run
+   `validate <store>` first and stop on any violation, including a missing
+   index; continue only with a valid store.
+3. Read `index.md` and search for an equivalent or contradictory live
    entry before creating anything. A match routes to Reconcile instead.
-3. Author exactly one concept file: frontmatter (`type`, `name` equal to
+4. Author exactly one concept file: frontmatter (`type`, `name` equal to
    the filename stem, `description`, at least one `sources[].resource`),
    followed by a body of `Trigger`, `Correct path`, `Why`, and `Limits`
    only when a real non-applicability boundary exists — see
    `references/okf-profile.md`.
-4. If the target store does not exist, run the creation subcommand from
-   `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` (the
-   `skills/loom-memory/scripts/loom_memory.py` file inside this skill's own
-   directory) on it — `init <store>` writes `README.md` and `index.md`
-   from the bundled templates and refuses an existing populated store —
-   then continue with regeneration and validation.
 5. Regenerate and validate the index with
    `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py
    regenerate-index <store>` and `validate <store>` (that script is
