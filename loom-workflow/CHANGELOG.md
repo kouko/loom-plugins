@@ -4,6 +4,12 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.13.0] — 2026-10-23 — consistent skill instructions and source-grounded retrospectives
+
+- `dbt-model-style` titles follow the user's working language, matching other descriptive header values; Chinese examples remain illustrative.
+- `loom-memory` initializes absent or empty stores before Record reads the index or writes a concept, and validates populated stores while preserving corruption and explicit legacy-migration refusal paths.
+- `skill-retro` permits read-only inspection of target skill sources and directly related resources, retains bounded session snapshots and source locators, and carries source citations, version evidence and unavailable-source limitations through analysis and proposals. Current files alone do not establish historical loading or causation.
+
 ## [5.12.4] — 2026-10-22 — flow node edge-case fixes
 
 - A flow structured node keeps one space before the right border when a
