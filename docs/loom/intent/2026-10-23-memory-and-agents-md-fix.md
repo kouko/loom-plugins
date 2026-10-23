@@ -3,7 +3,7 @@ change-id: 2026-10-23-memory-and-agents-md-fix
 originator: kouko
 kind: engineering
 needs-design: no — internal documentation/rules change; no user-visible surface
-status: open
+status: confirmed 2026-10-23
 publication: automatic — authorized 2026-10-23 by kouko
 ---
 
