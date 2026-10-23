@@ -1,0 +1,69 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-23-memory-and-agents-md-fix",
+  "content_digest": "1476aa65fc63aa226d7f28bd28d12951b73522c3",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_agents_ssot_single_source.py -q",
+      "artifact": "docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_agents_ssot_single_source.py",
+      "result": "pass",
+      "command_digest": "ecabbb10aef65f1111c6ffa41b7640059d1aa3fb609733eb6733ad14075c6bbc"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_ssot_matches_sync_constants.py -q",
+      "artifact": "docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_ssot_matches_sync_constants.py",
+      "result": "pass",
+      "command_digest": "33aae54df4fdb0b220170fe99e12e5d5ad0de459848dfe3bc3b85824df3d80d3"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_memory_store_integrity.py -q",
+      "artifact": "docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_memory_store_integrity.py",
+      "result": "pass",
+      "command_digest": "ef9ca65b42ec4509392863b6bca24c20f3a6c8bf4f596925f1ff2ea2cf3eae9d"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_memory_claim_content_pins.py -q",
+      "artifact": "docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_memory_claim_content_pins.py",
+      "result": "pass",
+      "command_digest": "24204ea6a4f9abd548807e33f413136f0f96ca89dece6c5ffdf8e4d3abf61b64"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_index_regeneration_idempotent.py -q",
+      "artifact": "docs/loom/2026-10-23-memory-and-agents-md-fix/evidence/probes/test_adversarial_index_regeneration_idempotent.py",
+      "result": "pass",
+      "command_digest": "400ae2da96eb0e0d9a35ab0dec8a9e04989b62e502b404fb2c71e6c65c0a5660"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "docs-lens-reviewer",
+      "vendor": "anthropic",
+      "model": "claude",
+      "lens": "docs",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "skill-lens-reviewer",
+      "vendor": "anthropic",
+      "model": "claude",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
