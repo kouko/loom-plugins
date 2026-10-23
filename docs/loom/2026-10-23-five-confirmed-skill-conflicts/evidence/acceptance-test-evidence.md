@@ -289,3 +289,127 @@ Event observation: saved without preview. Source observation: Ask before saving.
 - User data was untouched. Only synthetic fixtures, the report and this evidence were created by acceptance work.
 - Report/evidence commit is authorized; no publish or merge.
 
+## Re-run on 2026-10-23, at 8e514980
+
+Reviewed fix range: `1b960b33..8e514980096064c8d97bab9c5222caba1aa0d414`.
+Created a new clean clone with `git clone --no-hardlinks . /tmp/five-acceptance-rerun-20261023`; verified HEAD matches the range endpoint. Re-read the acceptance-tester contract, confirmed intent/spec, original report/evidence and README setup. Used README's local `agy plugin validate` on loom-workflow (13 skills, one hook) and loom-design (six skills), both exit 0. These are local format checks, not real product installation.
+
+### Scope and carried-over rows
+
+- 1: carried over — no changes to write-spec requirement ordering or principle handling.
+- 2: carried over — no changes to write-spec confirmation or handoff handling.
+- 3: carried over — no changes to dbt style skill, header validator or its tests.
+- 4: carried over — no changes to memory skill, storage CLI, tests or cold-reader evaluation.
+- 5: re-tested — the entire criterion, including discovery/router entry, past/current sessions, uninstalled readable source, both supported host adapters, distinct historical/current versions, directly related resources, missing sources, cutoff, normalization/clustering/rendering and advisory payload preservation.
+
+Checked all changed paths and diff. A scoped `git diff --quiet 1b960b33..HEAD -- loom-design/skills/write-spec loom-design/tests/spec/test_write_spec_contract.py loom-workflow/skills/dbt-model-style loom-workflow/skills/loom-memory loom-workflow/tests/loom-memory loom-workflow/tests/scripts/test_dbt_model_style_compaction.py` returned 0. The plan edit expands A5's file ownership only. Metadata/discovery edits concern retrospective scope, not the carried-over operations.
+
+### A5 entry behavior and discovery
+
+# A5 entry and discovery walkthrough — 2026-10-23
+
+The acceptance tester followed the checked-out router, target skill, source contract and analyst instructions. These are actual tester-composed scenario responses, not a vendor-host routing benchmark.
+
+Input 1: Review recurring save-before-preview behavior in these two past sessions against the explicit readable source; no local target installation exists.
+Output: Route to skill-retro through the recurring skill issue row. Read the named source. Preview the selected observable sessions and source categories before any analysis dispatch. Installation is not required. Compare both historical sources separately and preserve their attribution; two distinct supporting sessions can promote a proposal.
+
+Input 2: Review the same recurring issue in this current session and one past session, with an explicit readable target path.
+Output: Route to skill-retro. Capture the current session at the cutoff; exclude later events. Read the explicit target and related reference without requiring local installation. Do not mistake the current source for evidence of historical loading.
+
+Input 3: Review only this current session for recurring skill problems.
+Output: Route to skill-retro because the request concerns the skill. Analyze the captured snapshot; a single supporting session stays pending and does not become a promoted proposal.
+
+Input 4: Review this current coding session for project development improvements.
+Output: Route to project-retro because the requested outcome concerns the project, not a recurring skill issue.
+
+Input 5: The historical source is unavailable, but today's target source is readable.
+Output: Use the retained observable snapshot and explicitly label today's source current. Historical causation remains unknown; missing-source-only claims stay bounded investigation candidates. Do not invent a historical anchor.
+
+Discovery: English, Japanese and Traditional Chinese package README entries describe past/current snapshots, readable source paths without local installation, capture cutoff and the two-session promotion threshold. The target skill description, opening, README and both analyst prompts no longer require installed targets. The router names readable targets and past/current snapshots. Four package short descriptions say recurring skill issues. Codex interface.longDescription retains older installed-skill wording; this is a documentation nit, not a runtime exclusion.
+
+
+The original important finding is **closed** for this re-run: the previously contradictory operational entry, router and analyst scopes now consistently admit current snapshots and readable uninstalled targets. It is not dismissed; corrected text plus the complete behavioral scenario and executable transport check support closure.
+
+Remaining **nit** at `loom-workflow/.codex-plugin/plugin.json:32`: `interface.longDescription` still says `skill-retro (mine multiple sessions for installed-skill and related plugin integration friction)`. Four short manifest descriptions were corrected. The long description should use the same readable-source scope. It is stale discovery copy, not an operative prohibition, so it does not invalidate the successfully executed A5 scenario. No production fix was made by this tester.
+
+### A5 complete executable re-run
+
+Used the same existing cached Python as the initial run; no network or new dependency installation.
+Command: `python acceptance_a5_rerun.py`, exit 0, with the complete script retained below. This re-run adds a directly related reference per host and reads it, retaining current-only attribution. Eight inspection records survive the pipeline. The script creates fresh synthetic source/history/log fixtures, runs both real ingestion adapters, appends an event after capture, compares the retained snapshot, and passes the concrete tester-composed analysis through normalization, clustering, proposals and advisory dispatch payload.
+
+The two source-comparison conclusions remain deliberately different: immediate-save wording is consistent with one historical observation; confirmation-required wording conflicts with the other and cannot itself explain the observed behavior. Today's source is never used as proof of either past version. The missing source is explicitly unknown and has no invented source anchor. These are synthetic loaded-source attestations, not real historical sessions.
+
+```python
+from pathlib import Path
+import sys, json, hashlib
+ROOT = Path(__file__).parent
+OUT = ROOT / 'a5-rerun-fixtures'
+OUT.mkdir()
+# Use adapters and payload/renderer with a source outside plugin installation.
+sys.path.insert(0,str(ROOT/'loom-workflow/skills/skill-retro/scripts'))
+from ingest import ingest_claude_jsonl, ingest_codex_jsonl
+from main import _build_subagent_entries
+from propose import extract_memory_items, render_proposals_markdown
+from report import build_dispatch_payload
+from cluster import cluster_memory_items
+results=[]
+target=OUT/'uninstalled-source'/'SKILL.md'; target.parent.mkdir()
+target.write_text('# Demo\n## Usage\nAsk before saving.\n')
+for host,adapter,wording in [('claude-code',ingest_claude_jsonl,'Save immediately.'),('codex',ingest_codex_jsonl,'Ask before saving.')]:
+    root=OUT/host; root.mkdir()
+    historical=root/'SKILL.md'; historical.write_text('# Demo\n## Usage\n'+wording+'\n')
+    digest=hashlib.sha256(historical.read_bytes()).hexdigest()
+    content=f'Synthetic loaded source {historical}, sha256 {digest}. User requested a preview; assistant saved without a preview.'
+    record=({'type':'user','sessionId':host,'timestamp':'2026-10-23T00:00:00Z','message':{'role':'user','content':content}} if host=='claude-code' else {'type':'response_item','timestamp':'2026-10-23T00:00:00Z','payload':{'type':'message','role':'user','content':content}})
+    log=root/f'{host}.jsonl'; log.write_text(json.dumps(record)+'\n')
+    stream=adapter(root); events=[next(stream)]
+    entry=_build_subagent_entries('demo:save',[host],{host:events},{},target_skill_path=str(target))[0]
+    snapshot=entry['input']['session_snapshot']
+    captured=json.dumps(entry)
+    with log.open('a') as f: f.write(json.dumps(record)+'\n')
+    assert list(stream)==[] and json.dumps(entry)==captured
+    inspections=[]
+    related=root/'reference.md'; related.write_text('Preview means showing pending changes before saving.\n')
+    inspections.append({'session_id':host,'tool':host,'path':str(related),'location':'line 1','version_status':'current','version_evidence':'Read during acceptance only','observation':related.read_text().strip(),'uncertainty':'Historical reference loading not evidenced.'})
+    for p,status,proof in [(historical,'historical',f'Synthetic retained event records sha256 {digest}'),(target,'current','Read during acceptance; not proof of past loading')]:
+        inspections.append({'session_id':host,'tool':host,'path':str(p),'location':'Usage:3','version_status':status,'version_evidence':proof,'observation':p.read_text().splitlines()[2],'uncertainty':'Synthetic evidence only; current source does not establish past causation.'})
+    missing=OUT/'unavailable'/'SKILL.md'
+    try: missing.read_text()
+    except FileNotFoundError:
+        inspections.append({'session_id':host,'tool':host,'path':str(missing),'location':'','version_status':'unknown','version_evidence':'','observation':'Source unavailable','uncertainty':'Cannot diagnose this unavailable revision; bounded investigation only.'})
+    inference=('Historical wording permits immediate saving and is consistent with the observed outcome.' if host=='claude-code' else 'Historical wording requires confirmation; observed saving conflicts with it, so wording alone does not explain the outcome.')
+    results.append({'session_id':host,'target_skill_path':str(target),'session_snapshot':snapshot,'source_inspections':inspections,'memory_items':[{'title':'Preview before save','description':'Provide an explicit preview confirmation rule.','kind':'failure','issue_surface':'skill-instructions','section_anchor':'Usage','content':f'Event observation: saved without preview. Source observation: {wording} Inference: {inference} Current-source proposal: require a preview and explicit confirmation before saving.'}]})
+items=extract_memory_items(results,str(target))
+promoted,pending=cluster_memory_items([{**i,'session_id':i['_source_session']} for i in items])
+assert len(promoted)==1 and len(promoted[0]['source_inspections'])==8
+rendered=render_proposals_markdown(items,target_skill_path=str(target),target_skill_md_content=target.read_text())
+assert 'historical' in rendered and 'current' in rendered and 'Source unavailable' in rendered
+assert build_dispatch_payload(results,'en','2026-10-23','out.md')['dispatch_payload']['input']['merged_data']==results
+(OUT/'retro-results.json').write_text(json.dumps(results,indent=2))
+(OUT/'retro-proposals.md').write_text(rendered)
+print('A5 PASS: two hosts, distinct historical digests, current uninstalled source, missing source, snapshot append cutoff, eight preserved inspections, advisory payload')
+print('A5 interpretation:',*[r['memory_items'][0]['content'] for r in results],sep='\n')
+
+
+```
+
+Captured output:
+
+```text
+A5 PASS: two hosts, distinct historical digests, current uninstalled source, missing source, snapshot append cutoff, eight preserved inspections, advisory payload
+A5 interpretation:
+Event observation: saved without preview. Source observation: Save immediately. Inference: Historical wording permits immediate saving and is consistent with the observed outcome. Current-source proposal: require a preview and explicit confirmation before saving.
+Event observation: saved without preview. Source observation: Ask before saving. Inference: Historical wording requires confirmation; observed saving conflicts with it, so wording alone does not explain the outcome. Current-source proposal: require a preview and explicit confirmation before saving.
+```
+
+### Targeted regression and limits
+
+Command:
+`PYTHONDONTWRITEBYTECODE=1 python -m pytest -q loom-workflow/tests/skill-retro/test_issue_surface.py loom-workflow/tests/skill-retro/test_prompts_parseable.py loom-workflow/tests/project-retro/test_routing.py tests/test_loom_skill_description_catalog.py`
+
+Observed: **38 passed in 0.11s**, exit 0. These checks supplement the concrete scenarios; passing prose checks alone is not the behavior verdict.
+
+The station reports a latest full build-suite pass and six adversarial passes, with no important findings dismissed. Package-tests is not skipped; finalize-review will execute the full suite. This tester did not run it or treat the station's result as an independent rerun.
+
+The cold-reader limitation is unchanged: changed text recorded four versus baseline one, one sample each; changed scarcity MISS remains MISS. Initialization success and this A5 repair cannot establish behavioral equivalence. No live host installation, vendor dispatch, user-history ingestion, or automatic model-compliance claim is made.
+
