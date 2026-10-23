@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-23-memory-and-agents-md-fix",
-  "content_digest": "132f840ba879917fc1d21d931b4f1f7cb3e09480",
+  "content_digest": "1476aa65fc63aa226d7f28bd28d12951b73522c3",
   "executions": [
     {
       "kind": "package-tests",
@@ -53,14 +53,7 @@
       "model": "claude",
       "lens": "docs",
       "verdict": "PASS",
-      "findings": [
-        {
-          "severity": "nit",
-          "dimension": "inconsistency",
-          "anchor": "docs/loom/intent/2026-10-23-memory-and-agents-md-fix.md:22",
-          "text": "intent's Proposed outcome #2 names `loom-code/plugin.json` as SSOT, but that file is the derived agy root; the Claude SSOT is `loom-code/.claude-plugin/plugin.json` per scripts/sync_codex_manifests.py:68. The delivered AGENTS.md:113 and the memory entry name the real SSOT, so Acceptance #2 is met."
-        }
-      ]
+      "findings": []
     },
     {
       "reviewer": "skill-lens-reviewer",
