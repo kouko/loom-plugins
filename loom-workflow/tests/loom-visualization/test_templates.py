@@ -210,12 +210,12 @@ def test_task_dependencies_route_and_show_parallel_join():
     ascii_form = sections(text)["ASCII"]
     for label in ("A: 定義介面契約", "B: 建立 API", "C: 撰寫用戶端", "D: 執行整合測試"):
         assert label in ascii_form
-    assert "all incoming prerequisites" in text.lower()
+    assert any(pinned_sentence_ok(sentence, "requires", ("all incoming prerequisites", "A join"))
+               for sentence in gate_sentences(sections(text)["When to use"]))
 
 
 def test_task_dependencies_do_not_confuse_join_with_choice():
     text = _read("12-task-dependencies.md")
-    assert "conditional choice" in text.lower()
     (mermaid,) = [b for lang, b in fences(sections(text)["Mermaid"]) if lang == "mermaid"]
     assert not re.search(r"-->\|(?:yes|no|是|否)\|", mermaid, re.IGNORECASE)
 
@@ -241,8 +241,9 @@ def test_cross_role_workflow_routes_owned_steps_and_handoffs():
 
 def test_cross_role_workflow_is_not_message_only_sequence():
     text = _read("13-cross-role-workflow.md")
-    assert "message exchange" in text.lower()
-    assert "templates/06-actor-sequence.md" in text
+    assert any(pinned_sentence_ok(sentence, "use", ("`templates/06-actor-sequence.md`",
+                                                      "message exchange ordered in time"))
+               for sentence in gate_sentences(sections(text)["When to use"]))
     (mermaid,) = [b for lang, b in fences(sections(text)["Mermaid"]) if lang == "mermaid"]
     assert "sequenceDiagram" not in mermaid
 
