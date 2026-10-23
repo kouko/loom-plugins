@@ -50,8 +50,9 @@ def artifact_path_form_failure(artifact: str) -> str | None:
     return None
 
 
-def adversarial_route(command: str, artifact: str, repo: Path) -> tuple[str, Row | None]:
-    """How an adversarial argv is decided, as one of:
+def adversarial_route(command: str, artifact: str, repo: Path,
+                      revision: str = "HEAD") -> tuple[str, Row | None]:
+    """How an adversarial argv is decided, from commit `revision` alone, as one of:
 
     - `direct`: a Python/pytest or bash/sh program, or a directly executed
       artifact -- today's rules, no runner evidence;
@@ -67,14 +68,15 @@ def adversarial_route(command: str, artifact: str, repo: Path) -> tuple[str, Row
         argv = None
     row = claiming_row(argv) if argv else None
     if row is not None:
-        if not row.accepts(argv, artifact, repo):
+        if not row.accepts(argv, artifact, repo, revision):
             return "not-accepted", row
         if row.name == "go":
             from dataclasses import replace
             from loom_checker.probe_results import _env_stripped
-            from loom_checker.probe_results import _go_package_test_name
             from loom_checker.probe_results import _go_passed
-            name = _go_package_test_name(_env_stripped(argv), artifact, repo)
+            from loom_checker.probe_results import go_package_form_name
+            # Accepted, so the commit declares this name: bind it from the argv.
+            name = go_package_form_name(_env_stripped(argv), artifact)
             if name is not None:
                 row = replace(row, passed=lambda output, target: _go_passed(output, target, name))
         return "parsed", row
@@ -173,7 +175,7 @@ def validate_attestation(
             path_failure = artifact_path_form_failure(artifact)
             if path_failure:
                 return [(rule, path_failure)]
-            route, row = adversarial_route(command, artifact, repo)
+            route, row = adversarial_route(command, artifact, repo, head_sha)
             if route == "unnamed":
                 return [(rule, "adversarial command does not name its artifact")]
             if route == "not-executed":

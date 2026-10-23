@@ -214,7 +214,29 @@ def _pytest_collects(repo: Path, artifact: str, command: list[str], args: list[s
     return any(Path(path).resolve() == wanted for path in collected), ""
 
 
-def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, str]:
+CARGO_TEST_FILE = re.compile(r"tests/[^/]+\.rs|tests/[^/]+/main\.rs")
+
+
+def _cargo_sources(repo: Path, revision: str | None) -> tuple[str | None, set[str], str]:
+    """The root Cargo.toml text (None, with the reason, when unreadable) and
+    the `tests/*.rs` and `tests/*/main.rs` files, from the working tree or,
+    given a revision, from that commit alone."""
+    if revision is not None:
+        text = git_maybe(repo, "show", f"{revision}:Cargo.toml")
+        listed = git_maybe(repo, "ls-tree", "-r", "--name-only", "-z", revision, "--", "tests")
+        files = {path for path in (listed or "").split("\0") if CARGO_TEST_FILE.fullmatch(path)}
+        return text, files, f"Cargo.toml could not be read at {revision}"
+    try:
+        text = (repo / "Cargo.toml").read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        return None, set(), f"Cargo.toml could not be read: {exc}"
+    tests = repo / "tests"
+    files = {f"tests/{file.relative_to(tests).as_posix()}"
+             for file in [*tests.glob("*.rs"), *tests.glob("*/main.rs")] if file.is_file()}
+    return text, files, ""
+
+
+def cargo_test_targets(repo: Path, revision: str | None = None) -> tuple[list[tuple[str, str, bool]] | None, str]:
     """The root Cargo.toml's test targets as `(name, path, runs)`, or None
     and the reason when the manifest cannot be read. Each `[[test]]` entry is
     a target even under `autotests = false`; its `path` defaults to
@@ -231,10 +253,15 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
     target is refused):
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-test-field
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-required-features-field
-    https://doc.rust-lang.org/cargo/reference/features.html#the-default-feature"""
+    https://doc.rust-lang.org/cargo/reference/features.html#the-default-feature
+    Given a `revision`, the manifest and test files are read from that commit
+    and never from the working tree."""
+    text, files, error = _cargo_sources(repo, revision)
+    if text is None:
+        return None, error
     try:
-        manifest = tomllib.loads((repo / "Cargo.toml").read_text(encoding="utf-8"))
-    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        manifest = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as exc:
         return None, f"Cargo.toml could not be read: {exc}"
     package = manifest.get("package")
     # A virtual workspace root (no [package]) tests its members, never tests/.
@@ -253,7 +280,7 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
             path = os.path.normpath(path)
         elif isinstance(name, str):
             path = f"tests/{name}.rs"
-            if not (repo / path).is_file() and (repo / f"tests/{name}/main.rs").is_file():
+            if path not in files and f"tests/{name}/main.rs" in files:
                 path = f"tests/{name}/main.rs"
         else:
             continue
@@ -264,9 +291,8 @@ def cargo_test_targets(repo: Path) -> tuple[list[tuple[str, str, bool]] | None, 
         targets.append((name, path, entry.get("test") is not False and enabled))
     if package.get("autotests") is not False:
         known = {item for name, path, _runs in targets for item in (name, path)}
-        found = [(file.stem, f"tests/{file.name}") for file in sorted((repo / "tests").glob("*.rs"))]
-        found += [(file.parent.name, f"tests/{file.parent.name}/main.rs")
-                  for file in sorted((repo / "tests").glob("*/main.rs"))]
+        found = [(Path(path).stem, path) for path in sorted(files) if path.count("/") == 1]
+        found += [(Path(path).parent.name, path) for path in sorted(files) if path.count("/") == 2]
         targets += [(name, path, True) for name, path in found if name not in known and path not in known]
     return targets, ""
 

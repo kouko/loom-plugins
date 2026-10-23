@@ -5,10 +5,11 @@ passing.
 Each row answers three questions:
 
 - `claims(argv)` -- is this argv that runner (runner identity only);
-- `accepts(argv, artifact, repo=None)` -- is it the row's accepted form,
-  running the artifact alone with the runner's machine-readable output where
-  it has one; only the cargo rows read `repo` (its Cargo.toml maps a test
-  target name to a file) and refuse without it;
+- `accepts(argv, artifact, repo=None, revision="HEAD")` -- is it the row's
+  accepted form, running the artifact alone with the runner's machine-readable
+  output where it has one; only the cargo rows (their Cargo.toml maps a test
+  target name to a file) and go's package form (the artifact must declare the
+  test) read `repo`, from commit `revision` alone, and refuse without it;
 - `passed(output, artifact)` -- passing, non-skipped tests from the artifact
   in the combined stdout+stderr, 0 when the output is readable but shows none
   (or shows tests from another file), None when the row cannot read it.
@@ -26,18 +27,20 @@ from xml.etree import ElementTree
 import json
 import os
 import re
-import subprocess
 
+from loom_checker.helpers import git_maybe
 from loom_checker.probes import CARGO_TEST_FLAGS
 from loom_checker.probes import cargo_test_targets
 from loom_checker.probes import _conda_python_argv
+
+Accepts = Callable[[list[str], str, Path | None, str], bool]
 
 
 @dataclass(frozen=True)
 class Row:
     name: str
     claims: Callable[[list[str]], bool]
-    accepts: Callable[[list[str], str, Path | None], bool]
+    accepts: Accepts
     passed: Callable[[str, str], int | None]
 
 
@@ -73,11 +76,12 @@ def _env_stripped(argv: list[str]) -> list[str]:
     return _env_split(argv)[1]
 
 
-def _env_accepts(accepts: Callable[[list[str], str, Path | None], bool],
-                 argv: list[str], artifact: str, repo: Path | None) -> bool:
+def _env_accepts(accepts: Accepts, argv: list[str], artifact: str, repo: Path | None,
+                 revision: str) -> bool:
     """`accepts` on the argv after `env`, refusing a runner-configuration assignment."""
     assignments, rest = _env_split(argv)
-    return not any(RUNNER_ENV.fullmatch(arg) for arg in assignments) and accepts(rest, artifact, repo)
+    return (not any(RUNNER_ENV.fullmatch(arg) for arg in assignments)
+            and accepts(rest, artifact, repo, revision))
 
 
 def _named(argv: list[str]) -> list[str]:
@@ -148,10 +152,10 @@ def _go_args(argv: list[str]) -> tuple[list[str], dict[str, str], list[str]] | N
     return (options, values, positionals) if _distinct(options) else None
 
 
-def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None) -> str | None:
-    """Return the sole exact test declared in the committed, selected file."""
-    if repo is None:
-        return None
+def go_package_form_name(argv: list[str], artifact: str) -> str | None:
+    """The test name of a package-form argv -- `-json`, `-count=1`, the
+    artifact's own package and `-run '^Name$'` naming one Go test -- from the
+    argv alone; None for any other shape."""
     parsed = _go_args(argv)
     if parsed is None:
         return None
@@ -172,46 +176,41 @@ def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None) -> 
     # is not lowercase; it does not require an ASCII capital after Test.
     if not re.fullmatch(r"Test\w*", name) or (len(name) > 4 and name[4].islower()):
         return None
-    try:
-        source = subprocess.run(["git", "show", f"HEAD:{artifact}"], cwd=repo,
-                                capture_output=True, text=True, timeout=10)
-        # go list -json reports Dir and selected TestGoFiles/XTestGoFiles;
-        # file lists are names relative to Dir. https://pkg.go.dev/cmd/go#hdr-List_packages_or_modules
-        list_argv = ["go", "list", "-json"]
-        if "-tags" in values:
-            list_argv.append("-tags=" + values["-tags"])
-        selected = subprocess.run([*list_argv, package], cwd=repo,
-                                  capture_output=True, text=True, timeout=30)
-        data = json.loads(selected.stdout) if selected.returncode == 0 else {}
-    except (OSError, subprocess.TimeoutExpired, ValueError):
+    return name
+
+
+def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None,
+                          revision: str = "HEAD") -> str | None:
+    """The package-form test name when commit `revision` has the artifact
+    declare it and no other `*_test.go` in its directory declares the same
+    name. Read from that commit alone, without running go: a build-excluded
+    artifact passes here and is refused by its own run, which records no pass
+    of the named test."""
+    name = go_package_form_name(argv, artifact)
+    if repo is None or name is None:
         return None
-    if source.returncode != 0 or not isinstance(data, dict):
+    parent = Path(artifact).parent.as_posix()
+    listed = git_maybe(repo, "ls-tree", "--name-only", "-z", revision, "--",
+                       "." if parent == "." else parent + "/")
+    files = [path for path in (listed or "").split("\0") if path.endswith("_test.go")]
+    if artifact not in files:
         return None
-    if Path(data.get("Dir", "")).resolve() != (repo / parent).resolve():
-        return None
-    if Path(artifact).name not in data.get("TestGoFiles", []) + data.get("XTestGoFiles", []):
-        return None
-    if name not in GO_TEST_DECL.findall(_go_code_only(source.stdout)):
+    source = git_maybe(repo, "show", f"{revision}:{artifact}")
+    if source is None or name not in GO_TEST_DECL.findall(_go_code_only(source)):
         return None
     # Go permits the same test name in package and package_test; JSON names
-    # neither defining file, so a pass cannot be attributed if both declare it.
-    for filename in data.get("TestGoFiles", []) + data.get("XTestGoFiles", []):
-        if filename == Path(artifact).name:
+    # neither defining file, so a pass cannot be attributed if both declare
+    # it. Every sibling is scanned, whatever its build constraints.
+    for path in files:
+        if path == artifact:
             continue
-        path = (parent / filename).as_posix()
-        try:
-            other = subprocess.run(["git", "show", f"HEAD:{path}"], cwd=repo,
-                                   capture_output=True, text=True, timeout=10)
-        except (OSError, subprocess.TimeoutExpired):
-            return None
-        if (other.returncode != 0
-                or re.search(r"\bfunc\s+" + re.escape(name) + r"\s*\(",
-                             _go_code_only(other.stdout))):
+        other = git_maybe(repo, "show", f"{revision}:{path}")
+        if other is None or re.search(r"\bfunc\s+" + re.escape(name) + r"\s*\(", _go_code_only(other)):
             return None
     return name
 
 
-def _go_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _go_accepts(argv: list[str], artifact: str, repo: Path | None = None, revision: str = "HEAD") -> bool:
     """Accept a single test file, or an exact committed test in its package."""
     if argv[1:2] != ["test"] or not os.path.normpath(artifact).endswith("_test.go"):
         return False
@@ -222,7 +221,7 @@ def _go_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> boo
     if "-json" not in options:
         return False
     if "-run" in options:
-        return _go_package_test_name(argv, artifact, repo) is not None
+        return _go_package_test_name(argv, artifact, repo, revision) is not None
     return _one_positional(positionals, artifact)
 
 
@@ -298,7 +297,8 @@ def _node_claims(argv: list[str]) -> bool:
     return _named(argv)[:1] == ["node"] and "--test" in argv[1:]
 
 
-def _node_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _node_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`node --test --test-reporter=junit [--experimental-strip-types] <A>`."""
     options = [arg for arg in argv[1:] if arg.startswith("-")]
     return (_distinct(options) and NODE_REQUIRED <= set(options) <= NODE_ALLOWED
@@ -323,7 +323,8 @@ def _deno_claims(argv: list[str]) -> bool:
     return _named(argv)[:1] == ["deno"]
 
 
-def _deno_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _deno_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`deno test --reporter=junit [-A] [--allow-*] <A>`."""
     options = [arg for arg in argv[2:] if arg.startswith("-")]
     return (argv[1:2] == ["test"] and _distinct(options) and "--reporter=junit" in options
@@ -350,7 +351,8 @@ def _bun_claims(argv: list[str]) -> bool:
     return _named(argv)[:1] == ["bun"]
 
 
-def _bun_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _bun_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`bun test ./<A>` only: bun reads any other positional as a substring
     filter over every test file it finds, and an absolute path names one
     machine's checkout, so the recorded command could not re-run elsewhere."""
@@ -387,7 +389,8 @@ def _unittest_claims(argv: list[str]) -> bool:
     return _python_argv(argv)[1:3] == ["-m", "unittest"]
 
 
-def _unittest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _unittest_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`python -m unittest [-v] [-q] <A>`."""
     args = _python_argv(argv)[3:]
     options = [arg for arg in args if arg.startswith("-")]
@@ -482,7 +485,8 @@ def _jest_claims(argv: list[str]) -> bool:
     return _launched(argv, JS_LAUNCHERS)[:1] == ["jest"]
 
 
-def _jest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _jest_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`[w] jest --json --runTestsByPath <A>`."""
     args = _launched(argv, JS_LAUNCHERS)[1:]
     options = sorted(arg for arg in args if arg.startswith("-"))
@@ -496,7 +500,8 @@ def _vitest_claims(argv: list[str]) -> bool:
 VITEST_STDOUT = "--outputFile=/dev/stdout"
 
 
-def _vitest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _vitest_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`[w] vitest run --reporter=json --outputFile=/dev/stdout <A>` (or
     `--outputFile /dev/stdout`): vitest 5 writes the JSON report to a file
     unless the output file is stdout."""
@@ -529,7 +534,8 @@ def _mocha_claims(argv: list[str]) -> bool:
     return _launched(argv, JS_LAUNCHERS)[:1] == ["mocha"]
 
 
-def _mocha_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _mocha_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`[w] mocha --reporter json <A>`."""
     return _only_pair_and_artifact(_launched(argv, JS_LAUNCHERS)[1:], "--reporter", "json", artifact)
 
@@ -549,7 +555,8 @@ def _rspec_claims(argv: list[str]) -> bool:
     return _launched(argv, RUBY_LAUNCHERS)[:1] == ["rspec"]
 
 
-def _rspec_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _rspec_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`[w] rspec --format json <A>`. A `--dry-run` from an `.rspec` file
     reports every example `passed` in the same JSON; that stays a residual
     risk, since the argv cannot show it."""
@@ -575,7 +582,8 @@ def _minitest_claims(argv: list[str]) -> bool:
         not arg.startswith("-") and MINITEST_FILE.fullmatch(Path(arg).name) for arg in args[1:])
 
 
-def _minitest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _minitest_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`[w] ruby [-I<dir>]... <A>`: nothing after the file, where minitest
     would read `-n`/`-e` filters."""
     args = _launched(argv, RUBY_LAUNCHERS)[1:]
@@ -602,7 +610,8 @@ def _phpunit_claims(argv: list[str]) -> bool:
     return _named(argv)[:1] == ["phpunit"]
 
 
-def _phpunit_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _phpunit_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`<phpunit> <A>`."""
     return len(argv) == 2 and os.path.normpath(argv[1]) == os.path.normpath(artifact)
 
@@ -643,22 +652,22 @@ def _cargo_target_name(args: list[str], flags: frozenset[str]) -> str | None:
     return names[0] if len(names) == 1 else None
 
 
-def _cargo_test_path(repo: Path | None, name: str) -> str | None:
-    """The file `--test <name>` builds: the Cargo.toml `[[test]]` entry of
-    that name (named, or named by its path's stem) or the auto-discovered
-    `tests/<name>/main.rs`, else `tests/<name>.rs`.
+def _cargo_test_path(repo: Path | None, name: str, revision: str = "HEAD") -> str | None:
+    """The file `--test <name>` builds at commit `revision`: the Cargo.toml
+    `[[test]]` entry of that name (named, or named by its path's stem) or the
+    auto-discovered `tests/<name>/main.rs`, else `tests/<name>.rs`.
     An explicit `--test` runs a `test = false` target too. None when the
     manifest cannot be read."""
     if repo is None:
         return None
-    targets, _error = cargo_test_targets(repo)
+    targets, _error = cargo_test_targets(repo, revision)
     if targets is None:
         return None
     return next((path for target, path, _runs in targets if target == name), f"tests/{name}.rs")
 
 
-def _cargo_names(name: str | None, artifact: str, repo: Path | None) -> bool:
-    return name is not None and _cargo_test_path(repo, name) == os.path.normpath(artifact)
+def _cargo_names(name: str | None, artifact: str, repo: Path | None, revision: str) -> bool:
+    return name is not None and _cargo_test_path(repo, name, revision) == os.path.normpath(artifact)
 
 
 def _cargo_claims(argv: list[str]) -> bool:
@@ -667,9 +676,11 @@ def _cargo_claims(argv: list[str]) -> bool:
     return _named(argv)[:1] == ["cargo"] and argv[1:2] != ["nextest"]
 
 
-def _cargo_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _cargo_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`cargo test [--release] [-q] --test <n>`, `<n>` resolving to `<A>`."""
-    return argv[1:2] == ["test"] and _cargo_names(_cargo_target_name(argv[2:], CARGO_TEST_FLAGS), artifact, repo)
+    return argv[1:2] == ["test"] and _cargo_names(
+        _cargo_target_name(argv[2:], CARGO_TEST_FLAGS), artifact, repo, revision)
 
 
 def _cargo_passed(output: str, artifact: str) -> int | None:
@@ -681,7 +692,8 @@ def _nextest_claims(argv: list[str]) -> bool:
     return _named(argv)[:2] == ["cargo", "nextest"]
 
 
-def _nextest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -> bool:
+def _nextest_accepts(argv: list[str], artifact: str, repo: Path | None = None,
+                    revision: str = "HEAD") -> bool:
     """`cargo nextest run [--release] [--no-tests=fail] --test <n>`; any other
     `--no-tests` value lets an empty run pass."""
     if argv[2:3] != ["run"]:
@@ -692,7 +704,7 @@ def _nextest_accepts(argv: list[str], artifact: str, repo: Path | None = None) -
         if arg == "--no-tests" and rest[:1] == ["fail"]:
             arg = "--no-tests=" + rest.pop(0)
         args.append(arg)
-    return _cargo_names(_cargo_target_name(args, NEXTEST_FLAGS), artifact, repo)
+    return _cargo_names(_cargo_target_name(args, NEXTEST_FLAGS), artifact, repo, revision)
 
 
 def _nextest_passed(output: str, artifact: str) -> int | None:
@@ -701,11 +713,11 @@ def _nextest_passed(output: str, artifact: str) -> int | None:
 
 
 def _row(name: str, claims: Callable[[list[str]], bool],
-         accepts: Callable[[list[str], str, Path | None], bool],
-         passed: Callable[[str, str], int | None]) -> Row:
+         accepts: Accepts, passed: Callable[[str, str], int | None]) -> Row:
     """A row that sees every argv without its `env NAME=value...` prefix."""
     return Row(name, lambda argv: claims(_env_stripped(argv)),
-               lambda argv, artifact, repo=None: _env_accepts(accepts, argv, artifact, repo), passed)
+               lambda argv, artifact, repo=None, revision="HEAD":
+                   _env_accepts(accepts, argv, artifact, repo, revision), passed)
 
 
 ROWS: tuple[Row, ...] = (

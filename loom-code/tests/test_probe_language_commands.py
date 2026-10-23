@@ -17,7 +17,9 @@ report goes.
 """
 from __future__ import annotations
 
+import os
 import shlex
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -58,7 +60,19 @@ def repo(tmp_path_factory: pytest.TempPathFactory) -> Path:
     (root / "Cargo.toml").write_text(CARGO_TOML, encoding="utf-8")
     (root / "tests/dir").mkdir(parents=True)
     (root / "tests/dir/main.rs").write_text("#[test]\nfn t() {}\n", encoding="utf-8")
+    _commit(root, "fixture")
     return root
+
+
+def _commit(root: Path, message: str) -> str:
+    """Commit everything in a fixture repository; return the new HEAD."""
+    if not (root / ".git").exists():
+        subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
+                    "commit", "-qm", message], cwd=root, check=True)
+    return subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, check=True,
+                          text=True, capture_output=True).stdout.strip()
 
 GO_PASS = """\
 {"Time":"2026-10-17T12:52:42.771241+08:00","Action":"start","Package":"command-line-arguments"}
@@ -612,7 +626,11 @@ def test_go_package_probe_uses_siblings_and_exact_artifact_test(
     subprocess.run(["git", "add", artifact], cwd=root, check=True)
     subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
                     "commit", "-qm", "excluded artifact"], cwd=root, check=True)
-    assert adversarial_route(command, artifact, root)[0] == "not-accepted"
+    # The route no longer asks go which files the build selects: an excluded
+    # artifact's own fresh run shows no pass of the test, which is refused.
+    route, row = adversarial_route(command, artifact, root)
+    excluded = subprocess.run(shlex.split(command), cwd=root, text=True, capture_output=True)
+    assert route == "parsed" and row.passed(excluded.stdout, artifact) == 0
     (root / artifact).write_text(original, encoding="utf-8")
     subprocess.run(["git", "add", artifact], cwd=root, check=True)
     subprocess.run(["git", "-c", "user.name=Test", "-c", "user.email=test@example.test",
@@ -733,6 +751,86 @@ def test_go_commented_declaration_refuses_other_file_pass(
     assert run.returncode == 0, run.stderr
     route, row = adversarial_route(command, artifact, repo)
     assert route != "parsed" or row is None or row.passed(run.stdout, artifact) == 0
+
+
+ATTACK = 'package attack\nimport "testing"\nfunc TestAttack(t *testing.T) {}\n'
+ATTACK_COMMAND = "go test -json -count=1 -run '^TestAttack$' ."
+
+
+def _go_attack_repo(root: Path, artifact_source: str = ATTACK) -> str:
+    """A committed Go module whose `attack_test.go` holds `artifact_source`."""
+    root.mkdir()
+    (root / "go.mod").write_text("module example.test/attack\n\ngo 1.23\n", encoding="utf-8")
+    (root / "attack_test.go").write_text(artifact_source, encoding="utf-8")
+    return _commit(root, "fixture")
+
+
+def _without_go(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """PATH holds git and nothing else, so no `go` can run."""
+    bin_dir = tmp_path / "git-only-bin"
+    bin_dir.mkdir()
+    (bin_dir / "git").symlink_to(shutil.which("git"))
+    monkeypatch.setenv("PATH", str(bin_dir))
+
+
+def test_go_package_probe_validates_without_go_on_path_or_writable_gocache(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root = tmp_path / "go"
+    _go_attack_repo(root)
+    path = os.environ["PATH"]
+    _without_go(tmp_path, monkeypatch)
+    route, row = adversarial_route(ATTACK_COMMAND, "attack_test.go", root)
+    assert route == "parsed" and row is not None
+    assert row.passed(GO_PASS.replace("TestAdd", "TestAttack"), "attack_test.go") == 1
+    monkeypatch.setenv("PATH", path)
+    locked = tmp_path / "locked"
+    locked.mkdir()
+    locked.chmod(0o500)
+    monkeypatch.setenv("GOCACHE", str(locked / "cache"))
+    try:
+        assert adversarial_route(ATTACK_COMMAND, "attack_test.go", root)[0] == "parsed"
+    finally:
+        locked.chmod(0o700)
+
+
+def test_go_undeclared_test_refused_without_go(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    root = tmp_path / "go"
+    _go_attack_repo(root)
+    _without_go(tmp_path, monkeypatch)
+    missing = ATTACK_COMMAND.replace("TestAttack", "TestMissing")
+    assert adversarial_route(missing, "attack_test.go", root)[0] == "not-accepted"
+
+
+def test_go_artifact_read_at_validated_sha_not_worktree(tmp_path: Path) -> None:
+    root = tmp_path / "go"
+    validated = _go_attack_repo(root)
+    (root / "attack_test.go").unlink()
+    assert adversarial_route(ATTACK_COMMAND, "attack_test.go", root)[0] == "parsed"
+    (root / "attack_test.go").write_text("package attack\n", encoding="utf-8")
+    _commit(root, "drop the test")
+    assert adversarial_route(ATTACK_COMMAND, "attack_test.go", root)[0] == "not-accepted"
+    assert adversarial_route(ATTACK_COMMAND, "attack_test.go", root, revision=validated)[0] == "parsed"
+
+
+def test_go_declaration_only_in_worktree_refused(tmp_path: Path) -> None:
+    root = tmp_path / "go"
+    _go_attack_repo(root, "package attack\n")
+    (root / "attack_test.go").write_text(ATTACK, encoding="utf-8")
+    assert adversarial_route(ATTACK_COMMAND, "attack_test.go", root)[0] == "not-accepted"
+
+
+@pytest.mark.parametrize("sibling", [
+    'package attack_test\nimport "testing"\nfunc TestAttack(t *testing.T) {}\n',
+    '//go:build never\n\npackage attack\nimport "testing"\nfunc TestAttack(t *testing.T) {}\n',
+])
+def test_go_same_name_in_any_sibling_test_file_refused(sibling: str, tmp_path: Path) -> None:
+    """Every `*_test.go` beside the artifact is scanned, build-excluded or not."""
+    root = tmp_path / "go"
+    _go_attack_repo(root)
+    (root / "dup_test.go").write_text(sibling, encoding="utf-8")
+    _commit(root, "duplicate test name")
+    assert adversarial_route(ATTACK_COMMAND, "attack_test.go", root)[0] == "not-accepted"
 
 
 @pytest.mark.parametrize(("command", "artifact", "output"), [
