@@ -109,8 +109,13 @@ def kickoff_defaults(repo: Path) -> dict[str, str]:
     path = repo / "docs/loom/KICKOFF-DEFAULTS.md"
     if not path.is_file():
         return {}
+    return kickoff_defaults_text(read_text(path))
+
+
+def kickoff_defaults_text(text: str) -> dict[str, str]:
+    """`kickoff_defaults` over KICKOFF-DEFAULTS.md content already read."""
     values: dict[str, str] = {}
-    for line in read_text(path).splitlines():
+    for line in text.splitlines():
         stripped = line.strip()
         if not stripped.startswith("- "):
             continue
