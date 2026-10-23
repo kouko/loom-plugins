@@ -12,7 +12,7 @@ charter: 1.1
 ## Task DAG
 
 **W1-01 Decide Go and Cargo acceptance from the validated commit only**  after: none  acceptance: 1,2,3,4
-- Files: `loom-code/scripts/loom_checker/probe_results.py`, `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_probe_language_commands.py`, `loom-code/tests/test_probe_cargo_declared_dir_main.py`
+- Files: `loom-code/scripts/loom_checker/probe_results.py`, `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/probes.py`, `loom-code/scripts/loom_checker/helpers.py`, `loom-code/tests/test_probe_language_commands.py`, `loom-code/tests/test_probe_cargo_declared_dir_main.py`
 - Test: A1 positive: go-package-probe-validates-without-go-on-path-or-writable-gocache; negative: undeclared-test-refused-without-go. A2 positive: go-artifact-and-cargo-manifest-read-at-validated-sha-not-worktree; negative: declaration-or-target-only-in-worktree-refused. A3 positive: sibling-file-duplicate-name-refused; boundary: duplicate-in-build-excluded-file-refused. A4 positive: single-file-go-cargo-nextest-still-accepted; negative: build-excluded-artifact-run-records-zero-passes-refused.
 - Risk: agent-decided — `revision="HEAD"` keyword on route, Row.accepts, go/cargo only; validate passes head_sha; package name computed once; no `go` subprocess; narrows line-615 route refusal into passed>=1.
 
@@ -33,8 +33,11 @@ charter: 1.1
 
 ## Questions asked
 ① — what — 你要的是發布或合併時重新檢查審查證明，結果只看被檢查那個版本裡已 commit 的檔案和證明本身……這樣對嗎？（答：對）
+① — consequence — 改了之後不容易回頭的地方：同一個資料夾裡，如果有一個靠 Go 檔案開頭的條件被排除、不參與編譯的測試檔，剛好也用了同樣的測試名稱，以前會通過，改完會被判成過期……我建議接受這個代價。（同一則訊息，答：對）
 
 ## Risks
 1. user-decided — accept stricter Go duplicate check: a same-name test in a build-excluded file of the same directory now makes the package form stale; workaround is the single-file form.
 2. Build-tag selection is no longer checked at route level; an excluded artifact is refused because its fresh `-count=1` run records zero passes of the named test, which finalize already rejects.
 3. Validation must read the validated revision, not HEAD; finalize keeps the HEAD default on a committed tree. The keyword touches the Row.accepts type, `_env_accepts` and `_row`, shared by all 13 rows; only go and cargo read it.
+4. Adversary fix 0b5805bd: `declared_test_command` also reads KICKOFF-DEFAULTS, markers and the file list at the validated sha (via `helpers.kickoff_defaults_text`); build-time callers keep the working-tree default.
+5. A 3.48.0 attestation whose package-form artifact has a build-excluded same-name sibling now validates as stale (Risk 1).
