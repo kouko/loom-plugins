@@ -30,6 +30,7 @@ import yaml
 
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "loom-code/scripts"))
+from prose_pin import affirms  # noqa: E402
 
 SKILL = REPO / "loom-design/skills/write-spec/SKILL.md"
 CAPTURE_INTENT = REPO / "loom-design/skills/capture-intent/SKILL.md"
@@ -170,6 +171,27 @@ def test_requirement_near_misses_are_not_shown_as_the_form() -> None:
     body = _body(_text())
     for near_miss in (r"\bREQ\d", r"\breq-\d", r"\bR-\d"):
         assert not re.search(near_miss, body), near_miss
+
+
+def test_principles_constrain_content_and_preserve_acceptance_order() -> None:
+    intake = _flat(_section(_text(), "## Step 1 — Intake"))
+    rules = (
+        ("Use", "constrain requirement content", "Design decisions"),
+        ("Preserve", "confirmed Acceptance order", "mapping"),
+    )
+    examples = (
+        "Use non-negotiables to constrain requirement content and Design decisions.",
+        "Preserve confirmed Acceptance order and mapping when applying those constraints.",
+    )
+    for rule, example in zip(rules, examples):
+        assert affirms(example, *rule)
+        assert not affirms("Do not " + example, *rule)
+        assert affirms(intake, *rule), rule
+    assert "They order the Requirements" not in intake
+    assert "non-negotiable comes first" not in intake
+    assert "any design decision that would breach one is not a fork you get to pick" in intake.lower()
+    assert "One requirement per Acceptance line, in that order; do not merge two." in _flat(_text())
+    assert "preserve the exact count, order, and `→ Acceptance #<n>` mapping" in _flat(_text())
 
 
 def test_gate_markers_present() -> None:

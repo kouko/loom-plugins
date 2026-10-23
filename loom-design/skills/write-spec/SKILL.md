@@ -68,9 +68,10 @@ to `loom-design:capture-intent`.
 Then read what exists, because each one changes what you write:
 
 - **`PRINCIPLES.md`** — its `## Non-negotiables` are constraints, not
-  advice. They order the Requirements: a requirement that serves a
-  non-negotiable comes first, and any Design decision that would breach
-  one is not a fork you get to pick — say which line pinned it.
+  advice. Use non-negotiables to constrain requirement content and Design
+  decisions. Preserve confirmed Acceptance order and mapping when applying
+  those constraints. Any Design decision that would breach one is not a
+  fork you get to pick — say which line pinned it.
 - **`DESIGN.md`** — the vocabulary and components the UI flows are written
   in. Name the components it names; do not invent a second word for a
   thing it already calls something.
