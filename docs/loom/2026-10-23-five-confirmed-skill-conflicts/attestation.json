@@ -1,0 +1,78 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-23-five-confirmed-skill-conflicts",
+  "content_digest": "b35949e30634ec3445a23f9b17e619f7d3d20ccd",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/skill-retro/test_issue_surface.py",
+      "artifact": "loom-workflow/tests/skill-retro/test_issue_surface.py",
+      "result": "pass",
+      "command_digest": "6bb6d6a58255d24a55ceba63ee7e482865f7c39f5aaecf2fa18d6b2dd1748d23"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "4c889e23a67257a7a625842a143e7f2a93b1f5f0",
+      "review_target_sha": "48369853aff28e60e67ed78929f94fcc21bee586",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Round 2 reviewed only 4fd6be3d..48369853. Prior findings: selected-session public entry fixed; internal-builder test bypass fixed; W2-01 production entry markers fixed; stale Codex longDescription fixed. No new findings in the fix delta.",
+        "Independently ran test_issue_surface.py and test_main.py: 18 passed in 0.16s, no skips. Reviewed the corrected public-CLI acceptance evidence; did not rerun the full package suite or evidence probes.",
+        "Record scarcity remains changed 4 versus baseline 1, one sample each; behavioral equivalence is not established. Live host installation, vendor-agent execution and general model adherence remain unverified."
+      ],
+      "reviewer": "/root/final_code_five",
+      "vendor": "codex",
+      "model": "inherited (not exposed)"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "4c889e23a67257a7a625842a143e7f2a93b1f5f0",
+      "review_target_sha": "48369853aff28e60e67ed78929f94fcc21bee586",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous nit fixed: loom-workflow/.codex-plugin/plugin.json:32 now describes selected past/current snapshots and readable sources. Reviewed only the previous finding and 4fd6be3..48369853 fix delta; no new findings.",
+        "Explicit selection guidance matches main(): paired exact target/session arguments, missing-ID failure, discovery-cap bypass and isolated transcript roots. Independently ran test_issue_surface.py, test_main.py, test_aggregate.py and project-retro/test_routing.py: 41 passed in 0.08s. HEAD matches the target; working tree clean.",
+        "Updated acceptance evidence explicitly retracts the prior helper-based entry claim and records public main.py/propose.py checks for one-session pending and two-session promotion. No full suite or evidence probes rerun. Live-host compliance remains unverified; the one-sample Record scarcity miss of 4 versus baseline 1 remains disclosed and unresolved."
+      ],
+      "reviewer": "/root/final_skill_five",
+      "vendor": "codex",
+      "model": "inherited (not exposed)"
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
