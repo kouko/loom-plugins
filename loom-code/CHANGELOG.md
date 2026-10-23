@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.48.1] — 2026-10-23 — fix(closing-review): validate attestations without the test toolchain
+
+- Attestation validation decides Go package-form adversarial commands from the validated commit's files only, without running `go`, so publish and land in a sandbox or without Go no longer report a finalize-accepted command as stale. A same-name test in any sibling `_test.go` file, including build-excluded files, is refused.
+- Go and Cargo acceptance read the artifact, sibling test files and `Cargo.toml` at the validated commit instead of HEAD or the working tree.
+
 ## [3.48.0] — 2026-10-23 — fix(closing-review): accept Go package adversarial probes
 
 - Closing review accepts a Go package test run for an adversarial test that depends on sibling package files, while requiring the named test to be declared in the selected artifact and to pass in a fresh JSON result.
