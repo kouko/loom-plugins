@@ -11,7 +11,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 | 5.9.0 より前 | 5.9.0 以降 | 対象 |
 |---|---|---|
 | `retro` | `project-retro` | 1 回のプロジェクト開発 session。 |
-| `distill-sessions` | `skill-retro` | 複数 session に現れるインストール済み skill の問題。 |
+| `distill-sessions` | `skill-retro` | 選択した過去または現在の session に現れる、読み取り可能な対象 skill の反復的な問題。 |
 
 旧名は呼び出せません。新名を使うには、インストール済み plugin を 5.9.0 に更新してください。両方とも提案のみを出し、変更は別の実装フローで行います。
 
@@ -75,7 +75,7 @@ flowchart TD
 
     subgraph sessions["session に関する作業"]
         handoff["loom-workflow:handoff<br/>session 終了時に状態を保存し、<br/>次の session で再開"]
-        distill["loom-workflow:skill-retro<br/>過去の session から<br/>skill の改善点を掘り出す"]
+        distill["loom-workflow:skill-retro<br/>session のスナップショットから<br/>skill の改善点を掘り出す"]
         retro["loom-workflow:project-retro<br/>1 回の session から<br/>プロジェクトの改善点を探す"]
     end
 
@@ -113,7 +113,7 @@ flowchart TD
   は branch を閉じる前に、依頼または agent の判断で永続的な教訓を Record します。
   station からは呼ばれません。
 - **session に関する作業** — `handoff` は session の終わりに状態を保存し、次の
-  session で再開します。`skill-retro` は過去の session から skill の改善提案を掘り出します。
+  session で再開します。`skill-retro` は選択した過去または現在の session のスナップショットから、反復する skill の改善点を調べます。
   `project-retro` は依頼に応じて現在または指定された 1 回の session を振り返り、根拠のある
   プロジェクト改善案を示します。skill の問題は候補として分けて示します。
 - **いつでも** — `independent-advisor` は別の executor に second opinion を求め、
@@ -134,7 +134,7 @@ flowchart TD
 | [`dbt-model-style`](skills/dbt-model-style/) | dbt model を書く・編集する・review する時に、dbt + Redshift の style と structure（CTE の役割、zero-logic な final CTE、命名、comment）を適用する。計算ロジックは対象外。 |
 | [`git-memory`](skills/git-memory/) | 毎回の `git commit`・`gh pr create`・`gh pr merge` の前に Decision・Learning・Gotcha の memory を分類する。過去の Git 上の決定の理由も呼び出せる。 |
 | [`handoff`](skills/handoff/) | session 状態を `.claude/handoffs/` の HANDOFF ファイルに保存し、あるいは新しい session でそこから再開する。 |
-| [`skill-retro`](skills/skill-retro/) | 複数の Claude Code と Codex の session から、インストール済み skill の指示や関連 plugin 統合に繰り返し現れる問題を調べ、出典付きの提案を示す。変更は適用しない。 |
+| [`skill-retro`](skills/skill-retro/) | 選択した過去または現在の Claude Code と Codex の session のスナップショットを、読み取り可能な対象 skill の原文や関連 plugin 統合と照合し、出典付きの提案を示す。取得後のイベントを除外し、原文のローカルインストールは不要。異なる 2 session で提案に昇格し、1 session は保留。変更は適用しない。 |
 | [`project-retro`](skills/project-retro/) | 依頼に応じて現在または指定された 1 回の開発 session を読み取り専用で振り返り、出典をたどれるプロジェクト改善案を示す。skill の問題は候補として分け、ファイルは変更しない。 |
 | [`independent-advisor`](skills/independent-advisor/) | 明示的に依頼された code・plan・decision の外部 review を `loom-code:external-review` に渡し、元の review 基準を保つ。別の model tier・effort・ベンダーから自由形式の second opinion も取れる。費用の発生やマシン外への送信には承認が必要。 |
 | [`loom-visualization`](skills/loom-visualization/) | 比較・フロー・判断・状態遷移・推論の連鎖を、coding harness の chat で読み手の client に実際に表示される table・ASCII 図・Mermaid block として示す。推論ページ mode では、すでにある推論を自己完結型ページに描き出す。plain-language reference に書き方ガイド、選択肢の判断ルール、8 つの会話場面の表、表のルールがあり、ソフトウェア・デザイン・ビジネスの 3 つの表集もある。Obsidian ノートには使わない。 |

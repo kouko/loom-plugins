@@ -16,7 +16,7 @@ The selected skill owns its procedure, permissions, and output contract.
 | Judge a proposal, choose what to keep, or assess a simpler implementation | [critique](../critique/SKILL.md) |
 | Write, edit, or review dbt + Redshift model style and structure | [dbt-model-style](../dbt-model-style/SKILL.md) |
 | Open, advance, resume, or assess a persistent Outcome Map across sessions | [decision-map](../decision-map/SKILL.md) |
-| Review several sessions for recurring issues in an installed skill or its related plugin integration | [skill-retro](../skill-retro/SKILL.md) |
+| Review selected past or current session snapshots for recurring issues in a readable target skill or its related plugin integration | [skill-retro](../skill-retro/SKILL.md) |
 | Commit, create/merge a PR, or recall a decision bound to Git history | [git-memory](../git-memory/SKILL.md) |
 | Explicitly invoke `goal-create` by name for a session goal or repository purpose | [goal-create](../goal-create/SKILL.md) |
 | Save state for another session or resume a saved HANDOFF | [handoff](../handoff/SKILL.md) |

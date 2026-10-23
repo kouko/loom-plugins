@@ -11,7 +11,7 @@ Read this in: [English](README.md) | [日本語](README.ja.md) | **繁體中文*
 | 5.9.0 以前 | 5.9.0 起 | 用途 |
 |---|---|---|
 | `retro` | `project-retro` | 回顧一次專案開發 session。 |
-| `distill-sessions` | `skill-retro` | 分析多次 session 中已安裝 skill 的反覆問題。 |
+| `distill-sessions` | `skill-retro` | 分析所選過去或目前 session 中可讀取目標 skill 的反覆問題。 |
 
 舊名稱不再可呼叫。請先將已安裝 plugin 更新至 5.9.0，再使用新名稱。兩者只提出方案，實作交由獨立流程處理。
 
@@ -70,7 +70,7 @@ flowchart TD
 
     subgraph sessions["Session 工作"]
         handoff["loom-workflow:handoff<br/>session 結束時存下狀態，<br/>下一個 session 接續"]
-        distill["loom-workflow:skill-retro<br/>從過去的 session<br/>挖出 skill 改進點"]
+        distill["loom-workflow:skill-retro<br/>從 session 快照<br/>挖出 skill 改進點"]
         retro["loom-workflow:project-retro<br/>回顧一次 session 的<br/>專案改善點"]
     end
 
@@ -106,7 +106,7 @@ flowchart TD
   時，以及 `ship` 之後才進行的 PR merge 之前執行。`loom-memory` 在 branch
   關閉前，依要求或 agent 判斷 Record 持久的教訓；沒有任何站會呼叫它。
 - **Session 工作** — `handoff` 在 session 結束時存下狀態，並在下一個 session
-  接續。`skill-retro` 從過去的 session 挖出 skill 改進提案。`project-retro` 依要求
+  接續。`skill-retro` 從所選過去或目前 session 快照分析反覆出現的 skill 改進點。`project-retro` 依要求
   回顧目前或指定的一次 session，根據原始紀錄提出專案改善建議；skill 問題只列為候選。
 - **隨時** — `independent-advisor` 向另一個 executor 取得 second opinion，
   `loom-visualization` 把比較、流程與推理呈現成表格或圖（也能做成推理頁），`goal-create` 只在指名呼叫時執行，
@@ -126,7 +126,7 @@ flowchart TD
 | [`dbt-model-style`](skills/dbt-model-style/) | 撰寫、編輯或 review dbt model 時，套用 dbt + Redshift 的 style 與 structure（CTE 角色、zero-logic 的 final CTE、命名、註解）；計算邏輯不在範圍內。 |
 | [`git-memory`](skills/git-memory/) | 在每次 `git commit`、`gh pr create`、`gh pr merge` 之前分類 Decision、Learning、Gotcha memory；也能找回過去某個 Git 決策的理由。 |
 | [`handoff`](skills/handoff/) | 把 session 狀態存成 `.claude/handoffs/` 下的 HANDOFF 檔，或在新 session 中從它接續。 |
-| [`skill-retro`](skills/skill-retro/) | 從多次 Claude Code 與 Codex session 分析已安裝 skill 指示或相關 plugin 整合的反覆問題，提出有來源的方案；不直接套用修改。 |
+| [`skill-retro`](skills/skill-retro/) | 將所選過去或目前 Claude Code 與 Codex session 快照，對照可讀取的目標 skill 原始檔或相關 plugin 整合，提出有來源的方案。排除擷取後新增事件，來源路徑不須在本機安裝。兩次不同 session 才升為提案，單次仍待累積證據；不直接套用修改。 |
 | [`project-retro`](skills/project-retro/) | 依要求唯讀回顧目前或指定的一次開發 session，以可追溯的原始紀錄提出專案改善建議；skill 問題另列為候選，不修改檔案。 |
 | [`independent-advisor`](skills/independent-advisor/) | 明確要求外部 agent 審查 code、plan 或決策時，交由 `loom-code:external-review` 執行並保留原審查標準；也能向不同 model tier、effort 或廠商取得開放式 second opinion。花錢或把資料送出本機需經同意。 |
 | [`loom-visualization`](skills/loom-visualization/) | 在 coding harness 的 chat 裡，把比較、流程、決策、狀態與推理鏈呈現成讀者 client 真的顯示得出來的表格、ASCII 圖或 Mermaid block；推理頁 mode 把已經存在的推理渲染成自包含頁面。plain-language reference 收錄寫法指引、選項判斷規則、八種對話情境表格與表格規則，另有軟體、設計、商業三份表格集。不用於 Obsidian 筆記。 |
