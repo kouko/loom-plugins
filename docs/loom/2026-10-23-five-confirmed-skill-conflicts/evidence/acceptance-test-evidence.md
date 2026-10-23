@@ -1,5 +1,7 @@
 # Five confirmed skill conflicts — acceptance test evidence
 
+**Correction recorded 2026-10-24:** The initial and 8e514980 A5 exercises called `_build_subagent_entries`, bypassing public discovery's minimum of three sessions. Their transport results remain valid, but the 8e514980 `works` conclusion about actual one/two-session entry was overbroad and is withdrawn. The prose-entry walkthrough did not expose this public-entry failure. The complete public-CLI re-run at a0a119de below supersedes that entry conclusion; earlier records are retained as history, not current entry evidence.
+
 Tried on 2026-10-23 in a fresh local clone at `87fe39685baeea052e45275c19a5b82c0e643486`.
 Independent tester: `/root/acceptance_five`; no implementation edits, no child agents.
 Working copy: `/tmp/five-acceptance-clean-20261023`.
@@ -412,4 +414,179 @@ Observed: **38 passed in 0.11s**, exit 0. These checks supplement the concrete s
 The station reports a latest full build-suite pass and six adversarial passes, with no important findings dismissed. Package-tests is not skipped; finalize-review will execute the full suite. This tester did not run it or treat the station's result as an independent rerun.
 
 The cold-reader limitation is unchanged: changed text recorded four versus baseline one, one sample each; changed scarcity MISS remains MISS. Initialization success and this A5 repair cannot establish behavioral equivalence. No live host installation, vendor dispatch, user-history ingestion, or automatic model-compliance claim is made.
+
+## Re-run on 2026-10-24, at a0a119de — public entry through proposal output
+
+Tested HEAD: `a0a119de672fd22b928ecd94d02ef493cc04752d`.
+Fix range: `4fd6be3da3f221f5defe90345c5b8ce6f589dd06..a0a119de`.
+
+### Correction and setup
+
+Formal review exposed that earlier transport probes bypassed automatic discovery's three-session minimum. The old A5 entry conclusion is withdrawn as explained at the top of this file. This re-run uses subprocess invocation of public `main.py` and `propose.py`; it never calls the internal payload builder.
+
+Created a fresh clone: `git clone --no-hardlinks . /tmp/five-acceptance-public-20261024`; verified the exact HEAD. Read updated spec/plan, entry SKILL and runtime protocol. The spec explicitly requires testing selected sessions through the public orchestrator; plan names public entry coverage. README setup again used local `agy plugin validate ./loom-workflow` and `agy plugin validate ./loom-design`, exit 0 (13 skills/one hook and six skills respectively). This remains format validation, not live installation.
+
+Used the same existing read-only cached Python interpreter as earlier runs. All transcript roots and the facets root were explicitly bounded to synthetic directories. No private histories, external services or subagents were used. Analysis prose below is deliberately authored by the independent tester from the retained synthetic events and source reads; it is not a vendor-model compliance test.
+
+### Rows and discovery walkthrough
+
+- 1: carried over — fix diff changes retrospective entry, source-related documentation and metadata, not write-spec ordering/principle handling.
+- 2: carried over — confirmation/handoff procedures are unchanged.
+- 3: carried over — dbt description instructions and validator are unchanged.
+- 4: carried over — memory Record procedure, CLI and evaluations are unchanged.
+- 5: re-tested in full via the actual public entry, source inspection and proposal CLI.
+
+A scoped diff over the first four operations returned no changes. The updated spec adds explicit-session entry coverage and the plan names that test boundary.
+
+Applied the current router and skill to these concrete requests:
+- “Review this current session for recurring demo:activate issues; source is readable but not installed”: route to skill-retro, use explicit target/session arguments, preview scope before external analysis, retain one-session evidence as pending. The command below actually produced one payload and one pending result.
+- “Review the past Claude session and current Codex session for the same issue”: same route, repeat session arguments; the command actually produced two payloads and one promoted modification.
+- “Review one current coding session for project development improvements”: route remains project-retro; skill-retro selection does not replace that distinct purpose.
+- “A source revision is missing”: report unknown historical status and a bounded investigation, while current-source evidence can support only a current recommendation.
+
+Read the router, skill opening/steps, three-language package discovery entries, three-language skill READMEs, runtime protocol and manifest scope. They admit past/current snapshots and readable targets without target installation. Explicit selected-session command is documented; the two-session promotion rule remains. Codex `interface.longDescription` now says selected past/current snapshots against readable target sources and related integration resources: the previous nit is **closed by correction**, not dismissed.
+
+### Actual public command exercise
+
+The retained executable below creates:
+- a synthetic past Claude session and a synthetic current Codex session, with no recorded skill invocation required;
+- an unselected third session carrying a marker that must never enter selected output;
+- distinct historical source texts and SHA-256 evidence in each retained observable event;
+- today's uninstalled target source, a directly related reference, and an unavailable source path.
+
+It invokes public main with one selected ID and then two IDs. Each retained event count is one, below discovery's minimum. It appends a current-session event only after capture and checks that downstream analysis uses the frozen snapshot, excluding the appended marker. It reads actual synthetic sources, distinguishes historical/current/unknown evidence, and emits concrete source-grounded analysis through public propose. It checks single-session pending, two-session promotion, host/version attribution, unavailable-source disclosure and selection isolation. Missing selected ID returns exit 2 with a clear error and no output payload.
+
+A separate discovery invocation remains empty for these fixtures without skill invocation evidence. Preservation of discovery's three-session minimum is additionally covered by the executed aggregate tests, including `test_min_session_count_filters_low_signal_skills`; the selected path did not change the promotion threshold.
+
+Initial test-harness attempt expected a nonexistent “instruction proposal(s)” summary label. Actual renderer labels this category “modification(s)”. Corrected only that temporary assertion and reran in a new fixture directory; no production changes were made. The successful run exited 0.
+
+Command: `/Users/kouko/.cache/uv/archive-v0/utdSjmbwmpv5OstcOQxSj/bin/python public_probe.py`.
+
+```python
+from pathlib import Path
+import json, subprocess, sys, hashlib
+ROOT=Path(__file__).parent
+SCRIPTS=ROOT/'loom-workflow/skills/skill-retro/scripts'
+OUT=ROOT/'public-fixtures-r2'
+for name in ('claude','codex','facets','uninstalled/demo/skills/activate'):
+    (OUT/name).mkdir(parents=True,exist_ok=True)
+target=OUT/'uninstalled/demo/skills/activate/SKILL.md'
+target.write_text('# Activate\n## Usage\nAsk before saving.\n')
+ref=target.parent/'reference.md'
+ref.write_text('A preview shows pending changes before saving.\n')
+historical={}
+logs={}
+for host,sid,wording in [('claude-code','past','Save immediately.'),('codex','current','Ask before saving.')]:
+    source=OUT/f'{sid}-historical.md'; source.write_text('# Activate\n## Usage\n'+wording+'\n')
+    digest=hashlib.sha256(source.read_bytes()).hexdigest()
+    historical[sid]=(source,digest,host)
+    content=f'Synthetic source loaded: {source} sha256 {digest}. Assistant saved without preview.'
+    record=({'type':'user','sessionId':sid,'timestamp':'2026-10-24T00:00:00Z','message':{'role':'user','content':content}} if host=='claude-code' else {'type':'response_item','timestamp':'2026-10-24T00:00:00Z','payload':{'type':'message','role':'user','content':content}})
+    log=OUT/('claude' if host=='claude-code' else 'codex')/f'{sid}.jsonl'
+    log.write_text(json.dumps(record)+'\n'); logs[sid]=(log,record)
+(OUT/'claude/unselected.jsonl').write_text(json.dumps({'type':'user','sessionId':'unselected','timestamp':'2026-10-24T00:00:00Z','message':{'role':'user','content':'DO_NOT_INCLUDE_UNSELECTED'}})+'\n')
+base=['--project-root',str(OUT/'claude'),'--codex-root',str(OUT/'codex'),'--facets-root',str(OUT/'facets')]
+def command(script,args):
+    p=subprocess.run([sys.executable,str(SCRIPTS/script),*args],capture_output=True,text=True)
+    print('COMMAND',script,' '.join(args),'EXIT',p.returncode)
+    return p
+def selected(ids):
+    args=base+['--target-skill','demo:activate']
+    for sid in ids: args+=['--session',sid]
+    p=command('main.py',args)
+    assert p.returncode==0,p.stderr
+    payload=json.loads(p.stdout)
+    assert {e['session_id'] for e in payload['subagent_payload']}==set(ids)
+    assert 'DO_NOT_INCLUDE_UNSELECTED' not in p.stdout
+    (OUT/('top-'+ '-'.join(ids)+'.json')).write_text(p.stdout)
+    print('SELECTED',ids,'entries',len(payload['subagent_payload']))
+    return payload
+one=selected(['current'])
+two=selected(['past','current'])
+frozen=json.dumps(two)
+log,record=logs['current']
+record['payload']['content']='APPENDED_AFTER_CAPTURE'
+with log.open('a') as f: f.write(json.dumps(record)+'\n')
+assert json.dumps(two)==frozen and 'APPENDED_AFTER_CAPTURE' not in frozen
+assert all(e['input']['session_snapshot']['event_count']==1 for e in two['subagent_payload'])
+print('CUTOFF retained snapshots exclude appended events')
+def analyze(payload):
+    results=[]
+    for entry in payload['subagent_payload']:
+        sid=entry['session_id']; source,digest,host=historical[sid]
+        entry['input']['target_skill_path']=str(target)
+        inspections=[]
+        for path,status,proof in [(source,'historical',f'Retained synthetic observable event names SHA-256 {digest}'),(target,'current','Current read only'),(ref,'current','Current related resource read only')]:
+            inspections.append({'session_id':sid,'tool':host,'path':str(path),'location':'line 1' if path==ref else 'Usage:3','version_status':status,'version_evidence':proof,'observation':path.read_text().strip(),'uncertainty':'Synthetic evidence; current reads do not prove historical loading.'})
+        missing=OUT/'missing-source.md'
+        try: missing.read_text()
+        except FileNotFoundError:
+            inspections.append({'session_id':sid,'tool':host,'path':str(missing),'location':'','version_status':'unknown','version_evidence':'','observation':'Source unavailable','uncertainty':'No historical claim or fabricated anchor; investigation only.'})
+        interpretation=('Immediate-save source is consistent with the event.' if sid=='past' else 'Confirmation-required source conflicts with the event; source wording alone does not explain the outcome.')
+        item={'title':'Preview before saving','description':'Require an explicit preview before saving.','kind':'failure','issue_surface':'skill-instructions','section_anchor':'Usage','content':'Event: saved without preview. Source: '+source.read_text().splitlines()[2]+' Inference: '+interpretation+' Current recommendation: show pending changes and obtain confirmation before saving.'}
+        results.append({'session_id':sid,'target_skill':'demo:activate','target_skill_path':str(target),'session_snapshot':entry['input']['session_snapshot'],'source_inspections':inspections,'memory_items':[item]})
+        print('ANALYSIS',sid,item['content'])
+    return results
+for label,payload,count in [('one',one,1),('two',two,2)]:
+    results=analyze(payload)
+    merged=OUT/f'merged-{label}.json'; merged.write_text(json.dumps(results,indent=2))
+    output=OUT/f'proposals-{label}.md'
+    p=command('propose.py',['--input',str(merged),'--target-skill',str(target),'--output',str(output)])
+    assert p.returncode==0,p.stderr
+    rendered=output.read_text()
+    print('SUMMARY',label,rendered.splitlines()[3])
+    assert ('1 pending cross-session evidence' if count==1 else '0 pending cross-session evidence') in rendered
+    assert ('0 modification(s)' if count==1 else '1 modification(s)') in rendered
+    assert 'Source unavailable' in rendered and 'historical' in rendered and 'current' in rendered
+    for r in results: assert historical[r['session_id']][1] in rendered
+    if count==2:
+        assert all(host in rendered for host in ('claude-code','codex'))
+    print('PROPOSAL',label,'PASS', 'pending' if count==1 else 'promoted')
+p=command('main.py',base+['--target-skill','demo:activate','--session','missing'])
+assert p.returncode==2 and 'selected sessions have no observable events: missing' in p.stderr and not p.stdout
+print('MISSING_ID',p.stderr.splitlines()[-1])
+p=command('main.py',base+['--target-skill-pattern','demo:*'])
+assert p.returncode==0 and json.loads(p.stdout)['subagent_payload']==[]
+print('DISCOVERY no invocation evidence remains empty; explicit selection does not change discovery')
+print('PASS public main -> retained snapshots -> synthetic source analysis -> public propose; no internal builder called')
+
+```
+
+Captured successful output:
+
+```text
+COMMAND main.py --project-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/claude --codex-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/codex --facets-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/facets --target-skill demo:activate --session current EXIT 0
+SELECTED ['current'] entries 1
+COMMAND main.py --project-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/claude --codex-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/codex --facets-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/facets --target-skill demo:activate --session past --session current EXIT 0
+SELECTED ['past', 'current'] entries 2
+CUTOFF retained snapshots exclude appended events
+ANALYSIS current Event: saved without preview. Source: Ask before saving. Inference: Confirmation-required source conflicts with the event; source wording alone does not explain the outcome. Current recommendation: show pending changes and obtain confirmation before saving.
+COMMAND propose.py --input /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/merged-one.json --target-skill /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/uninstalled/demo/skills/activate/SKILL.md --output /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/proposals-one.md EXIT 0
+SUMMARY one **Counts**: 0 addition(s), 0 modification(s), 0 integration proposal(s), 0 anchor mismatch(es), 1 pending cross-session evidence, 0 deferred to v0.2.
+PROPOSAL one PASS pending
+ANALYSIS past Event: saved without preview. Source: Save immediately. Inference: Immediate-save source is consistent with the event. Current recommendation: show pending changes and obtain confirmation before saving.
+ANALYSIS current Event: saved without preview. Source: Ask before saving. Inference: Confirmation-required source conflicts with the event; source wording alone does not explain the outcome. Current recommendation: show pending changes and obtain confirmation before saving.
+COMMAND propose.py --input /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/merged-two.json --target-skill /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/uninstalled/demo/skills/activate/SKILL.md --output /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/proposals-two.md EXIT 0
+SUMMARY two **Counts**: 0 addition(s), 1 modification(s), 0 integration proposal(s), 0 anchor mismatch(es), 0 pending cross-session evidence, 0 deferred to v0.2.
+PROPOSAL two PASS promoted
+COMMAND main.py --project-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/claude --codex-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/codex --facets-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/facets --target-skill demo:activate --session missing EXIT 2
+MISSING_ID main: error: selected sessions have no observable events: missing
+COMMAND main.py --project-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/claude --codex-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/codex --facets-root /private/tmp/five-acceptance-public-20261024/public-fixtures-r2/facets --target-skill-pattern demo:* EXIT 0
+DISCOVERY no invocation evidence remains empty; explicit selection does not change discovery
+PASS public main -> retained snapshots -> synthetic source analysis -> public propose; no internal builder called
+
+```
+
+The renderer's default date follows the machine's date source; this acceptance record uses the user environment's Asia/Taipei date, 2026-10-24.
+
+### Regression, unresolved limits and verdict
+
+Targeted command:
+`PYTHONDONTWRITEBYTECODE=1 python -m pytest -q loom-workflow/tests/skill-retro/test_issue_surface.py loom-workflow/tests/skill-retro/test_main.py loom-workflow/tests/skill-retro/test_aggregate.py loom-workflow/tests/project-retro/test_routing.py`.
+
+Observed **41 passed in 0.08s**, exit 0. The station supplies the full build-suite pass and six adversarial passes. No important findings were dismissed. Full suite was not rerun by this tester; package-tests remains enabled and finalize-review will run it.
+
+Current A5 verdict: **works for the public local synthetic workflow actually exercised**. Original public-entry failure and discovery-description nit are closed. Earlier transport evidence is not promoted retroactively into entry evidence.
+
+Cold-reader scarcity remains changed 4 versus baseline 1 with one sample each; the changed sample missed its band. This re-run does not prove equivalence or turn that evaluation into a pass. Live host installation, vendor-agent execution and general model adherence remain unverified.
 
