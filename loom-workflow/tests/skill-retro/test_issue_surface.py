@@ -1,3 +1,4 @@
+# concern: Source provenance or capture bounds may be lost across retrospective stages.
 import pytest
 
 from cluster import cluster_memory_items
