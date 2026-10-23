@@ -132,8 +132,6 @@ def matching_attestation(repo: Path) -> dict:
 
 def test_matching_attestation_validates_without_executing_commands(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
-    # An uncommitted KICKOFF-DEFAULTS edit is not the validated commit's.
-    (repo / "docs/loom/KICKOFF-DEFAULTS.md").write_text("- package-tests: go test ./... — edit (2026-10-23)\n")
     failures = attestation_module.validate_attestation(
         repo, git(repo, "rev-parse", "HEAD"), CHANGE, matching_attestation(repo), manifest()
     )

@@ -223,6 +223,10 @@ def _cargo_sources(repo: Path, revision: str | None) -> tuple[str | None, set[st
     the `tests/*.rs` and `tests/*/main.rs` files, from the working tree or,
     given a revision, from that commit alone."""
     if revision is not None:
+        # `<rev>:<path>` names the blob at that path in the commit:
+        # https://git-scm.com/docs/gitrevisions#_specifying_revisions;
+        # ls-tree -r --name-only -z prints one NUL-terminated path per file:
+        # https://git-scm.com/docs/git-ls-tree#_options
         text = git_maybe(repo, "show", f"{revision}:Cargo.toml")
         listed = git_maybe(repo, "ls-tree", "-r", "--name-only", "-z", revision, "--", "tests")
         files = {path for path in (listed or "").split("\0") if CARGO_TEST_FILE.fullmatch(path)}
@@ -256,7 +260,8 @@ def cargo_test_targets(repo: Path, revision: str | None = None) -> tuple[list[tu
     https://doc.rust-lang.org/cargo/reference/cargo-targets.html#the-required-features-field
     https://doc.rust-lang.org/cargo/reference/features.html#the-default-feature
     Given a `revision`, the manifest and test files are read from that commit
-    and never from the working tree."""
+    and never from the working tree.
+    revision=None reads the working tree (build-time collection checks); validation always passes a sha."""
     text, files, error = _cargo_sources(repo, revision)
     if text is None:
         return None, error
@@ -748,12 +753,16 @@ def declared_test_command(repo: Path, revision: str | None = None) -> tuple[str 
     test command for a suite that is not this repository's.
 
     With `revision`, all three are read from that commit instead of the
-    working tree, so validating a commit never depends on uncommitted files."""
+    working tree, so validating a commit never depends on uncommitted files.
+    revision=None reads the working tree (build-time collection checks); validation always passes a sha."""
     if revision is None:
         defaults = kickoff_defaults(repo)
         has_file = lambda marker: (repo / marker).is_file()  # noqa: E731
         names = None
     else:
+        # `<rev>:<path>` and ls-tree -r --name-only -z, cited at _cargo_sources:
+        # https://git-scm.com/docs/gitrevisions#_specifying_revisions
+        # https://git-scm.com/docs/git-ls-tree#_options
         text = git_maybe(repo, "show", f"{revision}:docs/loom/KICKOFF-DEFAULTS.md")
         defaults = kickoff_defaults_text(text) if text is not None else {}
         listed = (git_maybe(repo, "ls-tree", "-r", "--name-only", "-z", revision) or "").split("\0")

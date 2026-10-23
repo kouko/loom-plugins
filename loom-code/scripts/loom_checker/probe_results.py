@@ -190,12 +190,19 @@ def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None,
     if repo is None or name is None:
         return None
     parent = Path(artifact).parent.as_posix()
+    # git ls-tree -z output: "<mode> SP <type> SP <object> TAB <file>",
+    # NUL-terminated: https://git-scm.com/docs/git-ls-tree#_output_format
     listed = git_maybe(repo, "ls-tree", "-z", revision, "--",
                        "." if parent == "." else parent + "/")
     entries = [entry.partition("\t") for entry in (listed or "").split("\0")]
     tests = [(meta.split(" ")[0], path) for meta, _tab, path in entries if path.endswith("_test.go")]
     # `git show` of a symlink yields its target text, and a submodule or tree
     # is no Go source at all: any such entry makes the declarations unreadable.
+    # Modes 100644/100755 regular file, 120000 symlink (the blob holds the
+    # link target), 160000 gitlink, 040000 tree:
+    # https://git-scm.com/docs/git-fast-import (filemodify modes);
+    # `<rev>:<path>` names the blob at that path:
+    # https://git-scm.com/docs/gitrevisions#_specifying_revisions
     if any(mode not in {"100644", "100755"} for mode, _path in tests):
         return None
     files = [path for _mode, path in tests]
