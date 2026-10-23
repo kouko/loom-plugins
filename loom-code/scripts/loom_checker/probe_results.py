@@ -190,9 +190,15 @@ def _go_package_test_name(argv: list[str], artifact: str, repo: Path | None,
     if repo is None or name is None:
         return None
     parent = Path(artifact).parent.as_posix()
-    listed = git_maybe(repo, "ls-tree", "--name-only", "-z", revision, "--",
+    listed = git_maybe(repo, "ls-tree", "-z", revision, "--",
                        "." if parent == "." else parent + "/")
-    files = [path for path in (listed or "").split("\0") if path.endswith("_test.go")]
+    entries = [entry.partition("\t") for entry in (listed or "").split("\0")]
+    tests = [(meta.split(" ")[0], path) for meta, _tab, path in entries if path.endswith("_test.go")]
+    # `git show` of a symlink yields its target text, and a submodule or tree
+    # is no Go source at all: any such entry makes the declarations unreadable.
+    if any(mode not in {"100644", "100755"} for mode, _path in tests):
+        return None
+    files = [path for _mode, path in tests]
     if artifact not in files:
         return None
     source = git_maybe(repo, "show", f"{revision}:{artifact}")

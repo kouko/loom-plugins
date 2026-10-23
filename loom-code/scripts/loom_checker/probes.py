@@ -6,6 +6,7 @@ from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import kickoff_defaults
+from loom_checker.helpers import kickoff_defaults_text
 from loom_checker.helpers import tree_programs
 from loom_checker.reviewers import committed_branch_delta
 from pathlib import Path
@@ -733,7 +734,7 @@ def command_executes_artifact(command: str, artifact: str) -> bool:
     return os.path.normpath(tokens[0]) in {wanted, os.path.join(".", wanted)}
 
 
-def declared_test_command(repo: Path) -> tuple[str | None, str]:
+def declared_test_command(repo: Path, revision: str | None = None) -> tuple[str | None, str]:
     """The repo's own package-test command, and where it was read from.
 
     A recorded probe is compared against THIS, so that a command which
@@ -744,14 +745,29 @@ def declared_test_command(repo: Path) -> tuple[str | None, str]:
     The test-file scan asks `repo_files.repository_files` which files are
     the repo's own: a walk of the directory also sees a linked worktree
     checked out inside it, or ignored build output, and would report a
-    test command for a suite that is not this repository's."""
-    declared = kickoff_defaults(repo).get("package-tests", "").strip()
+    test command for a suite that is not this repository's.
+
+    With `revision`, all three are read from that commit instead of the
+    working tree, so validating a commit never depends on uncommitted files."""
+    if revision is None:
+        defaults = kickoff_defaults(repo)
+        has_file = lambda marker: (repo / marker).is_file()  # noqa: E731
+        names = None
+    else:
+        text = git_maybe(repo, "show", f"{revision}:docs/loom/KICKOFF-DEFAULTS.md")
+        defaults = kickoff_defaults_text(text) if text is not None else {}
+        listed = (git_maybe(repo, "ls-tree", "-r", "--name-only", "-z", revision) or "").split("\0")
+        committed = {path for path in listed if path}
+        has_file = committed.__contains__
+        names = [Path(path).name for path in committed]
+    declared = defaults.get("package-tests", "").strip()
     if declared:
         return declared, "docs/loom/KICKOFF-DEFAULTS.md"
     for markers, command in TEST_COMMAND_MARKERS:
-        if any((repo / marker).is_file() for marker in markers):
+        if any(has_file(marker) for marker in markers):
             return command, f"detected {markers[0]}"
-    names = [path.name for path in repository_files(repo)]
+    if names is None:
+        names = [path.name for path in repository_files(repo)]
     for pattern in ("test_*.py", "*_test.py"):
         if any(fnmatch(name, pattern) for name in names):
             return "python3 -m pytest -q", f"detected {pattern} files"

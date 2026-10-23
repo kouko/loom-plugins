@@ -833,6 +833,16 @@ def test_go_same_name_in_any_sibling_test_file_refused(sibling: str, tmp_path: P
     assert adversarial_route(ATTACK_COMMAND, "attack_test.go", root)[0] == "not-accepted"
 
 
+def test_go_symlinked_sibling_test_file_refused(tmp_path: Path) -> None:
+    """`git show` of a symlink is its target path, not the Go source go builds."""
+    root = tmp_path / "go"
+    _go_attack_repo(root)
+    (root / "shared.txt").write_text(ATTACK, encoding="utf-8")
+    (root / "dup_test.go").symlink_to("shared.txt")
+    _commit(root, "symlinked duplicate")
+    assert adversarial_route(ATTACK_COMMAND, "attack_test.go", root)[0] == "not-accepted"
+
+
 @pytest.mark.parametrize(("command", "artifact", "output"), [
     (f"go test -json {GO}", GO, GO_SKIP),
     (f"node --test --test-reporter=junit {NODE}", NODE, NODE_SKIP),

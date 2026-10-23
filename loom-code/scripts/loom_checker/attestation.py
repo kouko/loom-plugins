@@ -164,7 +164,7 @@ def validate_attestation(
             return [(rule, "attestation contains a non-passing execution")]
         if execution.get("kind") == "package-tests":
             package_runs += 1
-            declared, _ = declared_test_command(repo)
+            declared, _ = declared_test_command(repo, head_sha)
             if command != declared:
                 return [(rule, "package-tests execution does not match the declared package command")]
         elif execution.get("kind") == "adversarial":
