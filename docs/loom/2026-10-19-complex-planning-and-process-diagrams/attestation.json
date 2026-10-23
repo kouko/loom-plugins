@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-19-complex-planning-and-process-diagrams",
-  "content_digest": "50dea7bff8fa4a2373686f8948635fe575654fbf",
+  "content_digest": "004f77c578a3fae0857193f8bed226b096ed57cb",
   "executions": [
     {
       "kind": "package-tests",
@@ -25,27 +25,27 @@
       "model": "inherited-host-profile",
       "lens": "code",
       "verdict": "PASS_WITH_NOTES",
-      "reviewed_sha": "5e850c702ffef4402e121a17e473ccf71e988628",
-      "review_target_sha": "8ac89d3cd543949e8d588e7e681e1a9ac8630797",
+      "reviewed_sha": "91e89a52b21ed8b59ef4700520704bedb79b781c",
+      "review_target_sha": "d0d6e1f53614169e55b79c80111304d0c49fe95d",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
-        "correctness": "PASS_WITH_NOTES",
+        "correctness": "PASS",
         "naming": "PASS",
         "tests": "PASS",
         "refactoring": "PASS",
         "cross-task-coherence": "PASS",
         "external-surface-grounding": "PASS_WITH_NOTES",
         "principles-conformance": "PASS",
-        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md exists",
         "deliberate-simplification": "PASS",
         "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "Changed test files passed independently: 60 passed in 1.03s. The focused package environment could not acquire its cache lock; the available pytest executable ran all three changed test files.",
-        "The new Mermaid examples were inspected for relationship consistency, but actual rendering in a Mermaid host remains unverified, as the acceptance report also discloses.",
-        "The release metadata consistently uses 5.13.0 after rebase onto 5.12.2; git diff --check is clean."
+        "Previous tests finding fixed: loose prose checks were removed or replaced with affirmative sentence checks.",
+        "Independently reran the changed test file: 21 passed.",
+        "Mermaid rendering in a supported host remains unverified."
       ]
     },
     {
@@ -54,21 +54,28 @@
       "model": "inherited-host-profile",
       "lens": "skill",
       "verdict": "PASS",
-      "reviewed_sha": "5e850c702ffef4402e121a17e473ccf71e988628",
-      "review_target_sha": "8ac89d3cd543949e8d588e7e681e1a9ac8630797",
+      "reviewed_sha": "91e89a52b21ed8b59ef4700520704bedb79b781c",
+      "review_target_sha": "d0d6e1f53614169e55b79c80111304d0c49fe95d",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
-        "inconsistency": "PASS",
+        "inconsistency": "PASS_WITH_NOTES",
         "incorrect-fact": "PASS",
         "missing-population": "PASS",
         "user-judgment-leak": "PASS",
         "deletion-first": "PASS"
       },
-      "findings": [],
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "loom-workflow/skills/loom-visualization/templates/13-cross-role-workflow.md:18",
+          "text": "nitpick: Unfixed. `Completed work` appears in the `Next handoff` column, but the ASCII and Mermaid forms end at C with no further handoff.",
+          "fix": "Mark C next handoff as `none` or `—`."
+        }
+      ],
       "notes": [
-        "Both new templates state when to use them, distinguish required joins from choices and owned work from message sequences, and provide matching table, ASCII, and Mermaid examples.",
-        "Both ASCII examples passed align.py; all four release manifests report 5.13.0, with matching README pins and a changelog entry after 5.12.2."
+        "This round changed only test_templates.py; it did not affect the skill guidance or templates."
       ]
     }
   ],
