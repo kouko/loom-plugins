@@ -27,7 +27,7 @@ charter: 1.1
 
 ### Wave 2 — source-grounded retrospective
 **W2-01 Preserve and inspect retrospective sources** after: W1-04 acceptance: 5
-- Files: loom-workflow/skills/skill-retro/, loom-workflow/skills/using-loom-workflow/SKILL.md, loom-workflow/README*, loom-workflow/tests/skill-retro/, loom-workflow/tests/project-retro/test_routing.py, tests/test_loom_skill_description_catalog.py
+- Files: loom-workflow/skills/skill-retro/ (production entries: scripts/main.py:main, scripts/propose.py:main; ingestion generator entries: scripts/ingest.py:ingest_claude_jsonl and ingest_codex_jsonl), loom-workflow/skills/using-loom-workflow/SKILL.md, loom-workflow/README*, loom-workflow/tests/skill-retro/, loom-workflow/tests/project-retro/test_routing.py, tests/test_loom_skill_description_catalog.py
 - Test: A5 positive: cross-host-source-roundtrip; boundary: unavailable-historical-source-and-cutoff.
 - Risk: REQ-5; agent-decided — widen ingest/main/report/propose/cluster and prompt contract tests while preserving observable-only inputs, target isolation, promotion thresholds and proposal-only behavior; replace only assertions requiring the retired no-read rule.
 
