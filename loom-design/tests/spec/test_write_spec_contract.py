@@ -288,3 +288,22 @@ def test_plugin_declares_requires_contract() -> None:
         (REPO / "loom-design/.claude-plugin/plugin.json").read_text(encoding="utf-8")
     )
     assert data["requires-contract"] == ">=2.1"
+
+
+def test_handoff_reports_confirmation_according_to_change_kind() -> None:
+    handoff = _flat(_section(_text(), "## Step 4 — Commit, conditionally review, hand off"))
+    for kind, outcome in (
+        ("product", "the user's confirmation"),
+        ("engineering", "the engineering exemption"),
+    ):
+        example = f"For `kind: {kind}`, report {outcome} at decision point ②."
+        rule = ("report", outcome, f"For `kind: {kind}`", "decision point ②")
+        assert affirms(example, *rule)
+        assert not affirms(example.replace("report", "do not report"), *rule)
+        assert affirms(handoff, *rule), kind
+    assert "Say that decision point ② has happened" not in handoff
+    assert "decision point ② is not to be run again" in handoff
+    step3 = _flat(_section(_text(), _STEP3))
+    assert "Engineering changes skip this step entirely: no stop" in step3
+    assert "A product spec does not reach a required review or planning before the user has confirmed its visible behaviour." in step3
+    assert "confirmed-behavior: <date> @<spec sha7>" in step3

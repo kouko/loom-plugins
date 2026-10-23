@@ -292,7 +292,9 @@ that section.
    continue directly. This declaration never changes branch-end reviewer
    requirements.
 4. Hand the change to **`loom-code:write-plan`**, naming the change-id and
-   pasting the question list. Say that decision point ② has happened and
-   is not to be run again, and that the plan itself is agent-decided —
-   the user is not asked to approve it. The next stop the user sees is
-   acceptance.
+   pasting the question list. For `kind: product`, report the user's
+   confirmation at decision point ②. For `kind: engineering`, report the
+   engineering exemption from decision point ②. In both cases, say that
+   decision point ② is not to be run again, and that the plan itself is
+   agent-decided — the user is not asked to approve it. The next stop the
+   user sees is acceptance.
