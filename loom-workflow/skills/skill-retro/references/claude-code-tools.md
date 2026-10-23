@@ -17,8 +17,8 @@ Agent({
   description: "<3-5 word task>",
   prompt: "<agents/prompt-failure-analysis.md or
             agents/prompt-success-analysis.md content +
-            session_events / target_skill_path /
-            target_skill_md_content JSON>"
+            session_events / session_snapshot / source_inspections /
+            target_skill / target_skill_path / target_skill_md_content JSON>"
 })
 ```
 
@@ -53,3 +53,11 @@ Sonnet generation (Sonnet 4.6 at time of writing). Passing the literal
 model id `"claude-sonnet-4-6"` (the id the prompt's own YAML frontmatter
 documents) fails `Agent()`'s enum validation — always dispatch with the
 alias, not the literal id.
+
+## Source evidence
+
+Pass the full trajectory input, including `session_snapshot`, `source_inspections`,
+and any explicit `target_skill_path`. Follow [source inspection](source-inspection.md)
+for both dispatch roles: approved read-only source access is permitted across
+folders; current host resolution is not proof of a historical source version.
+Preserve per-session provenance through collection and advisory output.

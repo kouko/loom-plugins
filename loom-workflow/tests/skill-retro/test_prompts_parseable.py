@@ -435,4 +435,11 @@ def test_advisory_paste_ready_requires_input_language_evidence() -> None:
     assert 'only label' in body.lower() and 'paste-ready' in body.lower()
     assert 'exact text to paste into SKILL.md' not in body
     assert 'one-line CLAUDE.md candidate — preserve that file' not in body
-    assert 'You do not have file-system access' in body
+    assert 'source-inspection.md' in body
+    assert 'You do not have file-system access' not in body
+    for path in (FAILURE_PATH, SUCCESS_PATH, ADVISORY_PATH):
+        prompt = path.read_text()
+        assert 'source-inspection.md' in prompt
+        for retired in ('No file system', 'always empty', 'never by a file path',
+                        'resource beyond the three inputs', 'resource beyond the four inputs'):
+            assert retired not in prompt

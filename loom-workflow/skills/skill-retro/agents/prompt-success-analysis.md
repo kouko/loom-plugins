@@ -3,6 +3,9 @@ role: trace2skill-success-analyst
 model: claude-sonnet-4-6
 input_contract:
   session_events: list[Event]
+  session_snapshot: dict  # Optional captured bounds; legacy missing means unknown
+  source_inspections: list[dict]  # Optional per-session inspection records
+  target_skill: str
   target_skill_path: str
   target_skill_md_content: str
 output_contract:
@@ -52,12 +55,12 @@ You will receive (as JSON in the dispatched Agent prompt):
 - `session_events`: a `list[Event]` (see `scripts/event.py`). One
   normalized record per turn / tool call in the low-friction session
   that invoked the target skill.
-- `target_skill`: the target skill's name. Its instructions — the text
-  whose iteration this analysis informs, which this prompt calls
-  `target_skill_md_content` — come through the host's skill mechanism by
-  that name, never by a file path. If the host cannot provide them,
-  analyze from the session events alone and say so.
-- `target_skill_path` and `target_skill_md_content`: always empty.
+- `target_skill`: the selected skill identity.
+- `target_skill_path` and `target_skill_md_content`: optional explicit source
+  locator and supplied text; empty legacy values mean unavailable.
+- `session_snapshot` and `source_inspections`: captured event bounds and
+  per-session source evidence. Read [source inspection](../references/source-inspection.md)
+  before diagnosis, including when these optional fields are absent.
 
 The friction-signal classification (high vs. mid vs. low) already
 happened upstream in Stage 2 — you analyze a session that was
@@ -81,7 +84,7 @@ pre-classified as low-friction. Do not re-question the classification.
 3. **Trace to skill behavior.** For instruction items, cite a real
    SKILL.md section and the observed step it guided. For directly
    related integration items, cite the observed skill behavior and a
-   concrete plugin or connector source path inspected in the events.
+   concrete plugin or connector source path inspected under the approved scope.
    If source is absent, state a bounded investigation candidate outside
    strict Memory Items. Never invent a SKILL.md anchor or source pointer.
 
@@ -141,6 +144,9 @@ Rules:
 ## Source pointer
 <For plugin-integration only: concrete inspected plugin or connector source path and location>
 
+## Source inspections
+<JSON list defined in ../references/source-inspection.md; retain per-session version evidence>
+
 ## Content
 <1–3 sentences describing the strategy / affordance the instructions or integration
 should preserve or strengthen, and why it was effective in the
@@ -178,8 +184,8 @@ A candidate may concern instructions or a directly related plugin integration su
   must not appear in `## Description` / `## Content`. Your Memory Items
   land in a `SKILL.md` consumed by future sessions and other operators
   — they have no access to the orchestrator's
-  `~/.claude/projects/.../memory/` directory. Reason solely from
-  `session_events` + `target_skill_md_content`; if you find yourself
+  `~/.claude/projects/.../memory/` directory. Reason from
+  `session_events` and inspected sources; if you find yourself
   about to cite a memory entry as evidence, drop the citation and
   re-derive the claim from the session events.
 
@@ -197,8 +203,8 @@ the original Trace2Skill adaptation notes
 - **Parallel dispatch**: orchestrator fans out N parallel subagent
   dispatches in one round — one per (target skill, low-friction session)
   pair — using the per-host call shape linked above.
-- **Input passing**: `session_events / target_skill_path /
-  target_skill_md_content` are serialized into the dispatched subagent's
+- **Input passing**: `session_events / session_snapshot / source_inspections /
+  target_skill / target_skill_path / target_skill_md_content` are serialized into the dispatched subagent's
   prompt as JSON. The subagent parses it and runs the workflow above.
 - **Output collection**: orchestrator collects the strict markdown
   Lean Solution Path + Success Memory Items from each parallel
@@ -206,5 +212,5 @@ the original Trace2Skill adaptation notes
   (spec-reviewer + code-quality-reviewer triad).
 
 The subagent does NOT dispatch further subagents, does NOT edit
-SKILL.md directly, and does NOT consult any external resource beyond
-the three inputs listed above.
+reviewed files. It reads sources only under
+`../references/source-inspection.md` and the approved scope.

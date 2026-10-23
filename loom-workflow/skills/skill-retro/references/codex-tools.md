@@ -13,3 +13,11 @@ After separate consent for the optional advisory report, call `spawn_agent` once
 ## Model and effort
 
 The prompt frontmatter's Claude model name is metadata for Claude Code; it does not make Sonnet available in Codex. Prefer the inherited Codex model and effort. If the active `spawn_agent` tool exposes `model` or `reasoning_effort` overrides and the dispatch profile explicitly chooses one, pass that supported Codex option with `fork_turns: "none"` and provide the needed paths and input explicitly. Never invent a Claude model alias for Codex.
+
+## Source evidence
+
+Pass the full trajectory input, including `session_snapshot`, `source_inspections`,
+and any explicit `target_skill_path`. Follow [source inspection](source-inspection.md)
+for both dispatch roles: approved read-only source access is permitted across
+folders; current host resolution is not proof of a historical source version.
+Preserve per-session provenance through collection and advisory output.

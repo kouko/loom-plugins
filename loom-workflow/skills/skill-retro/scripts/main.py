@@ -235,6 +235,7 @@ def _build_subagent_entries(
     session_friction: dict[str, str],
     *,
     session_to_skill: dict[str, str] | None = None,
+    target_skill_path: str = "",
 ) -> list[dict[str, object]]:
     """Build one subagent_payload entry per (session, kind) pair.
 
@@ -266,6 +267,16 @@ def _build_subagent_entries(
         friction_level = session_friction.get(session_id, "low")
         kinds = _kinds_for_session(session_id, sess_events, friction_level=friction_level)
         session_events_dicts = [_event_to_dict(ev) for ev in sess_events]
+        snapshot = {
+            "session_id": session_id,
+            "tools": sorted({ev.agent for ev in sess_events}),
+            "captured_at": datetime.now(timezone.utc).isoformat(),
+            "event_count": len(sess_events),
+            "first_ts": min(ev.ts for ev in sess_events),
+            "last_ts": max(ev.ts for ev in sess_events),
+            "event_locators": [{"path": ev.source_path, "line": ev.source_line}
+                               for ev in sess_events],
+        }
         for kind in kinds:
             prompt_path = (
                 "agents/prompt-failure-analysis.md"
@@ -284,11 +295,13 @@ def _build_subagent_entries(
                     "model": SUBAGENT_MODEL_ID,
                     "input": {
                         "session_events": session_events_dicts,
-                        # Filled by the dispatching agent from the target
-                        # skill's own loaded base directory; no file read here.
+                        # Optional operator/event locator, resolved by the
+                        # dispatching agent; no source file read here.
                         "target_skill": skill_name,
-                        "target_skill_path": "",
+                        "target_skill_path": target_skill_path,
                         "target_skill_md_content": "",
+                        "session_snapshot": snapshot,
+                        "source_inspections": [],
                     },
                 }
             )

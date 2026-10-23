@@ -9,6 +9,7 @@ remains pending. This module writes only the proposal output file.
 from __future__ import annotations
 
 import argparse
+import copy
 import difflib
 import json
 import sys
@@ -78,6 +79,15 @@ def normalize_memory_item(raw: dict) -> dict:
             raise ValueError("plugin-integration requires source_pointer")
         if not mechanism:
             raise ValueError("plugin-integration requires failure_mechanism")
+    for field in ("source_inspections", "session_snapshots"):
+        value = raw.get(field, [])
+        if not isinstance(value, list) or any(not isinstance(record, dict) for record in value):
+            raise ValueError(f"{field} must be a list of records")
+    for record in raw.get("source_inspections", []):
+        if record.get("version_status") not in {"historical", "current", "unknown"}:
+            raise ValueError("source_inspections requires a version_status")
+        if record["version_status"] == "historical" and not str(record.get("version_evidence") or "").strip():
+            raise ValueError("historical source requires version_evidence")
     return {
         "title": str(raw.get("title", "")).strip(),
         "description": str(raw.get("description", "")).strip(),
@@ -95,6 +105,8 @@ def normalize_memory_item(raw: dict) -> dict:
         "_source_session": raw.get("_source_session", ""),
         "target_skill_path": raw.get("target_skill_path", ""),
         "target_skill": raw.get("target_skill", ""),
+        "source_inspections": copy.deepcopy(raw.get("source_inspections", [])),
+        "session_snapshots": copy.deepcopy(raw.get("session_snapshots", [])),
     }
 
 
@@ -131,7 +143,15 @@ def extract_memory_items(
                 continue
         session_id = entry.get("session_id", "unknown")
         for raw_item in entry.get("memory_items", []):
+            inspections = []
+            for owner in (entry, raw_item):
+                records = owner.get("source_inspections", [])
+                if not isinstance(records, list):
+                    raise ValueError("source_inspections must be a list of records")
+                inspections.extend(records)
             item = normalize_memory_item({**raw_item, "_source_session": session_id,
+                "source_inspections": inspections,
+                "session_snapshots": [entry["session_snapshot"]] if entry.get("session_snapshot") else [],
                 "target_skill_path": entry.get("target_skill_path", ""),
                 "target_skill": entry.get("target_skill", "")})
             flat.append(item)
@@ -579,6 +599,17 @@ def render_proposals_markdown(
     )
     parts.append("")
 
+    parts.extend(["## Source evidence and limitations", ""])
+    for item in items:
+        parts.append(f"### {item['title']} — session {item.get('_source_session', 'unknown')}")
+        records = item.get("source_inspections", [])
+        if records:
+            parts.extend(["```json", json.dumps(records, ensure_ascii=False, indent=2), "```"])
+        else:
+            parts.append("Source inspection unavailable; historical version unknown.")
+        if item.get("session_snapshots"):
+            parts.extend(["```json", json.dumps(item['session_snapshots'], ensure_ascii=False, indent=2), "```"])
+        parts.append("")
     parts.append("## Proposed additions")
     parts.append("")
     if additions:

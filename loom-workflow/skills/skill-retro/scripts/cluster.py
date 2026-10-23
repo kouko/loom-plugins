@@ -170,6 +170,9 @@ def cluster_memory_items(
         if len(seen_sessions) >= min_n:
             rep = copy.copy(bucket[0][0])
             rep["supporting_sessions"] = sorted(seen_sessions)
+            for field in ("source_inspections", "session_snapshots"):
+                rep[field] = [copy.deepcopy(record) for item, _ in bucket
+                              for record in item.get(field, [])]
             if rep.get("issue_surface") == "plugin-integration":
                 rep["supporting_source_pointers"] = sorted({
                     item.get("source_pointer", "") for item, _ in bucket

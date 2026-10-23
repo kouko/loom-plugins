@@ -12,10 +12,10 @@ output_contract:
 hard_constraints:
   - "Produce semantically distinct anti-pattern clusters (≤5); reject surface-word transitive merges (e.g. clustering 31 unrelated items because they share generic tokens like 'axis' / 'all' / 'from')"
   - "List ≤5 real cross-skill CLAUDE.md candidates (semantic dedup vs surface-word noise — reject generic-keyword entries like 'all', 'open', 'start', 'code', 'branch')"
-  - "Only label an edit paste-ready when merged_data contains source-language evidence and exact wording for that target; otherwise write a {{lang}} review proposal marked for implementer adaptation"
+  - "Only label an edit paste-ready when merged_data or permitted source inspection provides source-language evidence and exact wording for that target; otherwise write a {{lang}} review proposal marked for implementer adaptation"
   - "Wrap evidenced paste-ready edits and literal commands in fenced code blocks; integration proposals are reviewable handoffs, not guessed patches"
   - "Explanatory prose MUST be in {{lang}}; required section headings stay English; evidenced paste-ready text preserves the target file's source language; commands and identifiers keep their literal syntax"
-  - "Reason from observable evidence in merged_data alone — no speculation, no fabrication"
+  - "Reason from observable evidence in merged_data and inspected sources — no speculation, no fabrication"
   - "Section headings MUST match the 7-section schema exactly (English heading text — translated section body prose into {{lang}})"
 language:
   variable: "{{lang}}"
@@ -56,7 +56,7 @@ patterns are real cross-skill CLAUDE.md rules, and where new skill
 candidates might live.
 
 Your analysis must be **evidence-driven**. Every claim must trace to a
-concrete Memory Item, session, or count visible in `merged_data`. **Do
+concrete Memory Item, session, count, or cited source inspection. **Do
 not speculate**. **Do not fabricate**.
 
 ## Context you will receive
@@ -73,7 +73,7 @@ You will receive (as JSON in the dispatched Agent prompt):
 - `lang`: one of `"zh-TW"`, `"en"`, `"ja"`. This is the locale for
   explanatory prose and proposals that need implementer adaptation.
   Required headings stay English. The target file's language is unknown
-  unless `merged_data` supplies direct evidence of it.
+  unless collected evidence or permitted source inspection supplies direct evidence of it.
 - `date_str`: `YYYY-MM-DD` — the report date. Used in the top-level
   H1 heading.
 - `skill_dir`: the absolute path of the skill-retro skill folder
@@ -84,8 +84,9 @@ skill folder (the directory holding its SKILL.md); every command line in
 your report must use the resolved absolute path given in `skill_dir`
 in its place, never the literal `<skill-dir>` placeholder.
 
-You do not have file-system access, do not run code, and do not
-consult any external resource beyond these four inputs.
+Read [source inspection](../references/source-inspection.md) before diagnosis
+or recommendations. Use permitted evidence-directed read-only source access;
+do not execute reviewed code. Retain per-session version evidence and snapshot bounds.
 Do not infer a target SKILL.md, CLAUDE.md, plugin, or connector file's
 language from its name, path, or the user's report locale.
 
@@ -114,7 +115,7 @@ language from its name, path, or the user's report locale.
 3. **Build per-target proposals by issue surface.** Group Memory Items
    by target skill. For `skill-instructions`, give the real section
    anchor and a `{{lang}}` rationale citing the Items. Only label exact
-   wording paste-ready when `merged_data` contains source-language
+   wording paste-ready when collected evidence or permitted source inspection provides source-language
    evidence and the exact target text; otherwise give a reviewable
    proposal in `{{lang}}` marked **For implementer adaptation**. Apply
    the same condition to CLAUDE.md candidates. For `plugin-integration`, give
@@ -181,7 +182,7 @@ Items concern this skill, and which remain one-session observations.>
 cite the supporting Item and target section:>
 
 `<heading or anchor where the edit lands>`
-<If `merged_data` contains direct source-language evidence for this
+<If collected evidence or permitted source inspection provides direct source-language evidence for this
 target and exact proposed text, label **Paste-ready** and put the
 verbatim insertion or replacement in a fenced code block. Otherwise
 write **For implementer adaptation** followed by a reviewable proposal
@@ -201,7 +202,7 @@ paste-ready plugin patch. If none, state that no integration item qualifies.>
 ## CLAUDE.md candidates
 
 <≤5 real cross-skill rules. For each, cite supporting Items. Only when
-`merged_data` contains direct source-language evidence for the target
+collected evidence or permitted source inspection provides direct source-language evidence for the target
 CLAUDE.md and exact proposed text, label **Paste-ready** and show the
 verbatim candidate in a fenced code block. Otherwise label **For
 implementer adaptation** and describe the candidate in {{lang}}.>
@@ -267,7 +268,7 @@ are explanatory text, not copy-pasteable artifacts.
   to `zh-TW`.
 - **Paste-ready code blocks** preserve the target file's source
   language only when that language and exact text are evidenced in
-  `merged_data`. Otherwise use `{{lang}}` prose marked **For implementer
+  collected records or permitted source inspection. Otherwise use `{{lang}}` prose marked **For implementer
   adaptation**. Commands and identifiers keep their literal syntax;
   plugin and connector targets follow the same evidence rule.
 - **Section headings** stay English as shown in the template above,
@@ -278,7 +279,7 @@ are explanatory text, not copy-pasteable artifacts.
 
 ## What you must NOT do
 
-- **Do NOT speculate beyond `merged_data`.** If an Item is not in the
+- **Do NOT invent observations beyond the collected evidence.** If an Item is not in the
   input list, do not invent it. If a target skill is not represented,
   do not propose edits to it.
 - **Do NOT reference the orchestrator's project memory.** Patterns
@@ -287,14 +288,14 @@ are explanatory text, not copy-pasteable artifacts.
   in the rendered advisory. The advisory is consumed by future
   sessions and other operators who have no access to the
   orchestrator's `~/.claude/projects/.../memory/` directory. Reason
-  solely from `merged_data`; if you find yourself about to cite a
+  from `merged_data` and permitted source inspection; if you find yourself about to cite a
   memory entry, drop it and re-derive the claim from the merged data.
 - **Do NOT produce more than 5 anti-pattern clusters** in §Top
   anti-patterns. The ≤5 cap is a hard constraint, not a soft target.
 - **Do NOT produce more than 5 CLAUDE.md candidates** in §CLAUDE.md
   candidates. Same hard cap.
 - **Do NOT guess a target file's language or label an unsupported draft
-  paste-ready.** When `merged_data` lacks source-language evidence or
+  paste-ready.** When collected records and permitted reads lack source-language evidence or
   exact wording, write the proposal in `{{lang}}` for implementer
   adaptation. Keep commands and identifiers in their literal syntax.
 - **Do NOT omit any of the 7 sections.** If a section has no content
@@ -331,5 +332,5 @@ per the architecture lock in the v0.5 brief:
   `docs/skill-mining/<date_str>-advisory-report.md`).
 
 The subagent does NOT dispatch further subagents, does NOT edit
-SKILL.md / CLAUDE.md directly, and does NOT consult any external
-resource beyond the four inputs listed above.
+reviewed files. It reads sources only under
+`../references/source-inspection.md` and the approved scope.
