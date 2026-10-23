@@ -2,7 +2,7 @@
 
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
-Review completed Claude Code and Codex sessions for recurring problems in an installed skill. Proposals can address its instructions or directly related plugin registration, loading, hooks, bundled scripts, and dependent connectors. This skill produces review artifacts; an independent implementation workflow makes any chosen change.
+Review selected past or current Claude Code and Codex sessions for recurring problems in a readable target skill. Current-session analysis uses only the captured snapshot through its capture cutoff, excluding later appended events. An explicit readable target source path works without installation in the reviewing host. Proposals can address its instructions or directly related plugin registration, loading, hooks, bundled scripts, and dependent connectors. This skill produces review artifacts; an independent implementation workflow makes any chosen change.
 
 The old callable name `distill-sessions` was replaced by `skill-retro`. The operational contract is in [SKILL.md](SKILL.md).
 

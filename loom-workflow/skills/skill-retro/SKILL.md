@@ -1,13 +1,13 @@
 ---
 name: skill-retro
 description: |
-  Review completed Claude Code or Codex sessions for recurring problems in an installed skill's instructions or directly related plugin integration. Produces source-linked proposals without applying changes.
+  Review selected past or current Claude Code or Codex sessions using a captured snapshot and cutoff, comparing readable target skill sources and directly related integration. Produces source-linked proposals without applying changes.
 version: 0.6.0
 ---
 
 # Skill retrospective
 
-Review several completed sessions for recurring behavior of an installed target skill. Produce proposals for its instructions or directly related plugin registration, loading, hooks, bundled scripts, and dependent connectors. This is a review-only workflow. The previous callable name was `distill-sessions`; use `skill-retro` now.
+Review selected past or current Claude Code or Codex sessions for recurring behavior of a readable target skill. For a current session, analyze only its captured snapshot through the capture cutoff; later appended events stay outside this run. The target source may be an explicit readable path without installation in the reviewing host. Produce proposals for its instructions or directly related plugin registration, loading, hooks, bundled scripts, and dependent connectors. This is a review-only workflow. The previous callable name was `distill-sessions`; use `skill-retro` now.
 
 `<skill-dir>` is this skill's folder: `${CLAUDE_SKILL_DIR}` on Claude Code, otherwise the folder containing this file.
 

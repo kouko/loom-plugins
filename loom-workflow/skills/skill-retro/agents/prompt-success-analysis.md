@@ -40,7 +40,7 @@ events plus the target skill's `SKILL.md`, produce two things:
    attempts, wrong turns, dead ends, retries, and self-corrections.
    Keep only the steps that form the winning path.
 2. **Success Memory Items** — generalizable lessons from the solution
-   that, if addressed in the installed skill or its directly related integration,
+   that, if addressed in the readable target skill or its directly related integration,
    would help future agents
    reproduce the smoothness on similar tasks.
 

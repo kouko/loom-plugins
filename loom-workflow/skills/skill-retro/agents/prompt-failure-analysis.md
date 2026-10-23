@@ -87,7 +87,7 @@ pre-classified as high-friction. Do not re-question the classification.
 
 4. **Write structured Memory Items.** Emit 0–3 Failure Memory Items
    using the schema below. Each Item is a generalizable lesson that,
-   if addressed in the installed skill or its directly related integration,
+   if addressed in the readable target skill or its directly related integration,
    would reduce the friction shape you just traced. Items that only apply to this one session are out of scope
    — discard them.
 

@@ -443,3 +443,25 @@ def test_advisory_paste_ready_requires_input_language_evidence() -> None:
         for retired in ('No file system', 'always empty', 'never by a file path',
                         'resource beyond the three inputs', 'resource beyond the four inputs'):
             assert retired not in prompt
+
+
+@pytest.mark.parametrize('surface', ['description', 'opening', 'readme', 'failure', 'success'])
+def test_retrospective_scope_accepts_current_snapshots_and_readable_targets(surface):
+    skill = (SKILL_ROOT / 'SKILL.md').read_text()
+    sections = {
+        'description': _split_frontmatter(skill)[0]['description'],
+        'opening': _split_frontmatter(skill)[1].split('## Privacy', 1)[0],
+        'readme': (SKILL_ROOT / 'README.md').read_text().split('## How it works', 1)[0],
+        'failure': FAILURE_PATH.read_text().split('4. **Write structured Memory Items.**', 1)[1].split('## Memory Item schema', 1)[0],
+        'success': SUCCESS_PATH.read_text().split('2. **Success Memory Items**', 1)[1].split('Your analysis', 1)[0],
+    }
+    text = ' '.join(sections[surface].split())
+    assert 'installed skill' not in text and 'installed target skill' not in text
+    if surface in {'description', 'opening', 'readme'}:
+        sentence = text[text.index('Review '):].split('. ', 1)[0]
+        assert re.search(r'Review selected (?:past|completed) or current Claude Code (?:or|and) Codex sessions', sentence)
+        assert not re.search(r'\b(?:not|never|exclude|forbid)\b', sentence, re.I)
+        assert 'captured snapshot' in text and 'cutoff' in text
+        assert 'readable target' in text
+    else:
+        assert 'addressed in the readable target skill' in text
