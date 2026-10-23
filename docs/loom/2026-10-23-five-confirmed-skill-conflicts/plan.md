@@ -21,9 +21,9 @@ charter: 1.1
 - Risk: REQ-3; agent-decided — preserve compaction and syntax cases, extend language guidance coverage without introducing language detection.
 
 **W1-04 Initialize before first Record** after: W1-03 acceptance: 4
-- Files: loom-workflow/skills/loom-memory/SKILL.md, loom-workflow/skills/loom-memory/references/operations.md, loom-workflow/tests/loom-memory/test_loom_memory.py
+- Files: loom-workflow/skills/loom-memory/SKILL.md, loom-workflow/skills/loom-memory/references/operations.md, loom-workflow/skills/loom-memory/evals/record-timing.md, loom-workflow/tests/loom-memory/test_loom_memory.py, loom-workflow/tests/loom-memory/test_skill_contract.py
 - Test: A4 positive: first-record-roundtrip; boundary: existing-corrupt-legacy-preserved.
-- Risk: REQ-4; agent-decided — preserve initializer refusal tests; use existing CLI, extending coverage to authored Record sequence and completed first concept.
+- Risk: REQ-4; agent-decided — preserve initializer refusal tests; use existing CLI. Refresh the existing Record digest only after its independent cold-reader evaluation; preserve test_skill_contract.py coverage while updating retired wording.
 
 ### Wave 2 — source-grounded retrospective
 **W2-01 Preserve and inspect retrospective sources** after: W1-04 acceptance: 5
