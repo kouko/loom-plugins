@@ -23,8 +23,7 @@ Agent({
 ```
 
 `model: "sonnet"` is required here too — `scripts/main.py` locks the
-Stage 3 subagent model to `claude-sonnet-4-6` (SKILL.md's own Step 2:
-"runs on `claude-sonnet-4-6`"), and per the alias note below, only the
+Stage 3 subagent model to `claude-sonnet-4-6`, and per the alias note below, only the
 harness alias reaches `Agent()` without failing enum validation; the
 `model` field is easy to drop when copying this call shape since the
 literal id in `top.json`'s payload is not directly usable.

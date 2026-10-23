@@ -2,7 +2,7 @@
 
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
-分析多次 Claude Code 與 Codex 開發紀錄，找出已安裝 skill 的反覆問題。提案可以針對其指示，或與該 skill 直接相關的 plugin 註冊、載入、hook、附帶腳本及相依 connector。回顧只產出審閱資料；選定的變更交由獨立實作流程處理。
+分析所選過去或目前 Claude Code 與 Codex session 的已擷取快照，找出可讀取目標 skill 的反覆問題。排除擷取後的新增事件，不須安裝目標。提案可以針對其指示，或與該 skill 直接相關的 plugin 註冊、載入、hook、附帶腳本及相依 connector。回顧只產出審閱資料；選定的變更交由獨立實作流程處理。
 
 舊呼叫名稱 `distill-sessions` 已改為 `skill-retro`。操作規則見 [SKILL.md](SKILL.md)。
 
@@ -51,13 +51,15 @@ python3 loom-workflow/skills/skill-retro/scripts/propose.py \
 
 `propose.py` 讀取目標 SKILL.md，只寫入 `proposals.md`。缺少整合來源的觀察另列為待調查候選，不放入 `merged.json`；單次觀察仍待補證。
 
+選定過去或目前 session 時，以 `--target-skill plugin:skill --session ID` 取代探索參數；可重複指定 `--session`。明確指定目標名稱後，不須有呼叫紀錄或安裝目標。選取模式不受探索的最低筆數與上限限制，找不到 ID 就報錯。單次仍待補證，兩次不同 session 才能升為提案。隔離輸入可指定 `--project-root` 與／或 `--codex-root`，未指定的紀錄來源不會混入；另以 `--facets-root` 限定 facet 來源。
+
 ## Configuration
 
 `main.py` 可用 `--config /path/to/thresholds.json` 載入部分 JSON 門檻設定。六個門檻與含義見[執行協定](references/runtime-protocol.md#configuration-meanings)。常用參數如下：
 
 - `--target-skill-pattern`（預設 `loom-code:*`）
 - `--top-n`（預設 `5`）
-- `--max-trajectories-per-skill`（預設 `5`，計算派遣次數）
+- `--max-trajectories-per-skill`（預設 `5`，探索時的 session 上限）
 - `--project-root`（覆寫 Claude 專案紀錄目錄，主要供測試）
 - `--facets-root`（覆寫 Claude `/insights` facet 目錄，主要供測試）
 

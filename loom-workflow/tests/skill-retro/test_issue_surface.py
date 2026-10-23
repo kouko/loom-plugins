@@ -24,15 +24,18 @@ def test_integration_requires_source_and_does_not_invent_anchor():
         normalize_memory_item({'title': 'unclassified', 'section_anchor': 'Examples'})
 
 
-def test_source_provenance_roundtrip(tmp_path):
+def test_source_provenance_roundtrip(tmp_path, capsys):
     import json
     from ingest import ingest_claude_jsonl, ingest_codex_jsonl
-    from main import _build_subagent_entries
-    from propose import extract_memory_items
+    from main import main
+    from propose import extract_memory_items, main as propose_main
     from report import build_dispatch_payload
 
     results = []
-    target = '/plugins/demo/skills/activate/SKILL.md'
+    target = str(tmp_path / 'demo/skills/activate/SKILL.md')
+    from pathlib import Path
+    Path(target).parent.mkdir(parents=True)
+    Path(target).write_text('# Activate')
     for host, adapter in [('claude-code', ingest_claude_jsonl), ('codex', ingest_codex_jsonl)]:
         root = tmp_path / host
         root.mkdir()
@@ -45,7 +48,14 @@ def test_source_provenance_roundtrip(tmp_path):
         stream_events = adapter(root)
         events = [next(stream_events)]
         assert events[0].source_path == str(path) and events[0].source_line == 1
-        entry = _build_subagent_entries('demo:activate', [host], {host: events}, {}, target_skill_path=target)[0]
+        args = ['--project-root', str(tmp_path / 'claude-code'), '--codex-root', str(tmp_path / 'codex'),
+                '--facets-root', str(tmp_path / 'no-facets'), '--target-skill', 'demo:activate', '--session', host]
+        assert main(args) == 0
+        entries = json.loads(capsys.readouterr().out)['subagent_payload']
+        assert len(entries) == 1 and entries[0]['session_id'] == host
+        entry = entries[0]
+        assert entry['input']['session_events'][0]['source_path'] == str(path)
+        entry['input']['target_skill_path'] = target  # Orchestrator-supplied explicit source.
         captured = json.dumps(entry)
         with path.open('a') as stream:
             stream.write(json.dumps(record) + '\n')
@@ -60,6 +70,11 @@ def test_source_provenance_roundtrip(tmp_path):
         results.append({'session_id': host, 'target_skill_path': target,
                         'session_snapshot': snapshot, 'source_inspections': [evidence],
                         'memory_items': [integration(host)]})
+        merged = tmp_path / 'merged.json'
+        output = tmp_path / 'proposals.md'
+        merged.write_text(json.dumps(results))
+        assert propose_main(['--input', str(merged), '--target-skill', target, '--output', str(output)]) == 0
+        assert ('0 integration proposal(s)' if len(results) == 1 else '1 integration proposal(s)') in output.read_text()
     items = extract_memory_items(results, target)
     promoted, _ = cluster_memory_items([{**i, 'session_id': i['_source_session']} for i in items])
     assert {p['tool'] for p in promoted[0]['source_inspections']} == {'claude-code', 'codex'}
@@ -68,6 +83,15 @@ def test_source_provenance_roundtrip(tmp_path):
     for host in ('claude-code', 'codex'):
         assert f'{host} recorded revision' in rendered
     assert build_dispatch_payload(results, 'en', '2026-10-23', 'out.md')['dispatch_payload']['input']['merged_data'] == results
+    capsys.readouterr()
+    assert main(args + ['--session', 'claude-code', '--top-n', '0', '--max-trajectories-per-skill', '0']) == 0
+    assert {entry['session_id'] for entry in json.loads(capsys.readouterr().out)['subagent_payload']} == {'claude-code', 'codex'}
+    for invalid_args in (args + ['--session', 'absent'], args + ['--target-skill', 'demo:*'],
+                         args + ['--target-skill', 'demo:'], args[:-4] + ['--session', 'codex'], args[:-2]):
+        with pytest.raises(SystemExit) as error:
+            main(invalid_args)
+        assert error.value.code == 2
+        assert not capsys.readouterr().out
 
 
 @pytest.mark.parametrize('status', ['current', 'unknown'])

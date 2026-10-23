@@ -7,6 +7,16 @@ privacy, required artifacts, stop conditions, and final verification.
 
 ## Step 2 dispatch
 
+Produce `top.json` through `main.py`: automatic discovery uses
+`--target-skill-pattern`; explicit selection uses `--target-skill plugin:skill
+--session ID` (repeat `--session`). The exact operator target permits review
+without a recorded invocation or local target installation. Selected IDs bypass
+discovery minimum/count caps; missing observable IDs fail. Proposal promotion
+still needs two distinct sessions. For isolated evidence use `--project-root`
+and/or `--codex-root`; once either is supplied, unspecified transcript roots
+are excluded. Use `--facets-root` separately to bound Claude facet lookup.
+The orchestrator supplies any explicit source path in `input.target_skill_path`.
+
 Read `top.json`, then fan out one subagent for every
 `subagent_payload[]` entry. Select
 `agents/prompt-failure-analysis.md` or

@@ -393,6 +393,12 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         default=None,
         help="optional JSON file overriding thresholds (see friction_signals.load_thresholds)",
     )
+    parser.add_argument("--session", action="append", default=[],
+                        help="Select a session ID explicitly; repeat to select several. Bypasses discovery ranking.")
+    parser.add_argument("--target-skill", default=None,
+                        help="Exact plugin:skill identity required with --session, even without a recorded invocation.")
+    parser.add_argument("--codex-root", default=None,
+                        help="Override Codex transcript root; explicit transcript roots exclude unspecified live roots.")
     parser.add_argument(
         "--top-n",
         type=int,
@@ -426,6 +432,12 @@ def main(argv: list[str] | None = None) -> int:
     """
     parser = _build_arg_parser()
     args = parser.parse_args(argv)
+    if bool(args.session) != bool(args.target_skill):
+        parser.error("--session and --target-skill must be supplied together")
+    if args.target_skill:
+        identity = args.target_skill.split(':')
+        if len(identity) != 2 or any(not part.strip() for part in identity) or any(c in args.target_skill for c in '*?['):
+            parser.error("--target-skill must be an exact plugin:skill identity")
 
     # Step (a) — thresholds (Q5 defaults; --config overrides).
     config_path = Path(args.config).expanduser() if args.config else None
@@ -433,11 +445,14 @@ def main(argv: list[str] | None = None) -> int:
 
     # Step (b) — walk JSONL.
     project_root = Path(args.project_root).expanduser() if args.project_root else None
-    claude_events = ingest_claude_jsonl(root=project_root)
+    explicit_roots = args.project_root is not None or args.codex_root is not None
+    claude_events = ingest_claude_jsonl(root=project_root) if project_root is not None or not explicit_roots else iter(())
     # An explicit Claude fixture root is test/forensics scope, so do not mix
     # the operator's live Codex history into it. The normal no-override
     # preview combines both host transcript sources.
-    codex_events = ingest_codex_jsonl() if project_root is None else iter(())
+    codex_events = ingest_codex_jsonl(root=Path(args.codex_root)) if args.codex_root else (
+        ingest_codex_jsonl() if not explicit_roots else iter(())
+    )
     events_iter = chain(claude_events, codex_events)
 
     # Step (c) — load facets and join.
@@ -447,6 +462,11 @@ def main(argv: list[str] | None = None) -> int:
 
     # Materialize once — Part-1 modules accept list-shaped inputs.
     events: list[Event] = list(joined_iter)
+    if args.session:
+        missing = set(args.session) - {ev.session for ev in events}
+        if missing:
+            parser.error("selected sessions have no observable events: " + ", ".join(sorted(missing)))
+        events = [ev for ev in events if ev.session in args.session]
 
     # Step (d) — extract signals.
     signals: list[Signal] = []
@@ -475,7 +495,7 @@ def main(argv: list[str] | None = None) -> int:
     records = aggregate_by_skill(
         events, signals, target_pattern=args.target_skill_pattern
     )
-    ranked = rank_top_n(records, n=args.top_n)
+    ranked = [] if args.session else rank_top_n(records, n=args.top_n)
 
     # Build per-skill events index for kind classification + payload input.
     events_by_session: dict[str, list[Event]] = {}
@@ -488,6 +508,18 @@ def main(argv: list[str] | None = None) -> int:
 
     top_skills_out: list[dict[str, object]] = []
     subagent_payload: list[dict[str, object]] = []
+    if args.session:
+        selected = list(dict.fromkeys(args.session))
+        friction = {sid: _friction_level_for_session(sid, signals) for sid in selected}
+        top_skills_out.append({
+            "skill": args.target_skill,
+            "sessions": [{"session_id": sid, "friction_level": friction[sid],
+                          "event_count": len(events_by_session[sid])} for sid in selected],
+            "selection": "explicit",
+        })
+        subagent_payload.extend(_build_subagent_entries(
+            args.target_skill, selected, events_by_session, friction,
+        ))
 
     # Compute cross-skill session routing before the per-skill loop so each
     # skill's _build_subagent_entries call can skip sessions attributed away.
@@ -548,7 +580,8 @@ def main(argv: list[str] | None = None) -> int:
 
     config_block: dict[str, object] = {
         "run_id": run_id,
-        "target_pattern": args.target_skill_pattern,
+        "target_pattern": args.target_skill or args.target_skill_pattern,
+        "selected_sessions": list(dict.fromkeys(args.session)),
         "top_n": args.top_n,
         "max_trajectories_per_skill": args.max_trajectories_per_skill,
         "thresholds": thresholds,
