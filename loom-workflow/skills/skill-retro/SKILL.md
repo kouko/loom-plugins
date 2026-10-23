@@ -1,7 +1,7 @@
 ---
 name: skill-retro
 description: |
-  Review selected past or current Claude Code or Codex sessions using a captured snapshot and cutoff, comparing readable target skill sources and directly related integration. Produces source-linked proposals without applying changes.
+  Review selected past or current Claude Code or Codex sessions against readable target skill sources and related integration. Produce source-linked proposals without applying changes.
 version: 0.6.0
 ---
 

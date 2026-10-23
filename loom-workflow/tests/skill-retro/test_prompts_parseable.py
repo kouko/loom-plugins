@@ -461,7 +461,20 @@ def test_retrospective_scope_accepts_current_snapshots_and_readable_targets(surf
         sentence = text[text.index('Review '):].split('. ', 1)[0]
         assert re.search(r'Review selected (?:past|completed) or current Claude Code (?:or|and) Codex sessions', sentence)
         assert not re.search(r'\b(?:not|never|exclude|forbid)\b', sentence, re.I)
-        assert 'captured snapshot' in text and 'cutoff' in text
+        if surface != 'description':
+            assert 'captured snapshot' in text and 'cutoff' in text
         assert 'readable target' in text
     else:
-        assert 'addressed in the readable target skill' in text
+        def permits_readable_target(prose):
+            for sentence in re.split(r'[.!?]', prose):
+                target = re.search(r'\baddress(?:ed)?\s+(?:in|within)\s+(?:the\s+)?readable\s+target\s+skill\b', sentence, re.I)
+                negated = re.search(r"\b(?:no|not|never|cannot|forbid\w*|prohibit\w*)\b|n't\b", sentence, re.I)
+                if target and not negated:
+                    return True
+            return False
+
+        affirmative = 'Lessons may be addressed within the readable target skill.'
+        assert permits_readable_target(affirmative)
+        assert not permits_readable_target(affirmative.replace('may be', 'must not be'))
+        assert not permits_readable_target(affirmative.replace('may be', 'can never be'))
+        assert permits_readable_target(text)
