@@ -16,6 +16,11 @@ charter: 1.1
 - Test: A1 positive: go-package-probe-validates-without-go-on-path-or-writable-gocache; negative: undeclared-test-refused-without-go. A2 positive: go-artifact-and-cargo-manifest-read-at-validated-sha-not-worktree; negative: declaration-or-target-only-in-worktree-refused. A3 positive: sibling-file-duplicate-name-refused; boundary: duplicate-in-build-excluded-file-refused. A4 positive: single-file-go-cargo-nextest-still-accepted; negative: build-excluded-artifact-run-records-zero-passes-refused.
 - Risk: agent-decided — `revision="HEAD"` keyword on route, Row.accepts, go/cargo only; validate passes head_sha; package name computed once; no `go` subprocess; narrows line-615 route refusal into passed>=1.
 
+**W1-02 Graduate the two adversarial probes that caught defects**  after: W1-01  acceptance: 2,3
+- Files: `docs/loom/2026-10-23-validation-without-test-toolchain/evidence/probes/test_go_symlinked_sibling_duplicate.py`, `docs/loom/2026-10-23-validation-without-test-toolchain/evidence/probes/test_validate_worktree_declared_command.py`, `loom-code/tests/test_adversarial_go_symlinked_sibling_duplicate.py`, `loom-code/tests/test_adversarial_validate_worktree_declared_command.py`
+- Test: A2 positive: worktree-kickoff-edit-keeps-attestation-valid; negative: probe-red-before-0b5805bd. A3 positive: symlinked-sibling-duplicate-refused; boundary: package-suite-collects-graduated-probes.
+- Risk: agent-decided — both probes went red before 0b5805bd; move them into the standing suite unchanged (keep `concern:`) so later changes rerun them.
+
 **W2-01 Release loom-code 3.48.1**  after: W1-01  acceptance: 4
 - Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/README*.md`, `README.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A4 positive: release-metadata-synchronized; negative: stale-version-pin-refused.
