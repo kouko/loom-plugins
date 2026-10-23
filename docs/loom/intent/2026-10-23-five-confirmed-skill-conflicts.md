@@ -1,7 +1,7 @@
 # 修正五筆已確認的技能指令矛盾
 originator: kouko
 kind: engineering
-needs-design: yes — 第五項需設計 session 證據、技能來源版本與多階段分析之間的讀取及引用契約，現有規格未涵蓋此來源核對流程。
+needs-design: yes — 第五項需設計 session 證據、技能來源版本與多階段分析之間的讀取及引用契約，現有規格未涵蓋此來源核對與版本辨識流程。
 status: confirmed 2026-10-23
 
 ## Problem
