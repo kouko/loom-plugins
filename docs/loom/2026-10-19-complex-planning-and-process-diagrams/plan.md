@@ -8,8 +8,8 @@ charter: 1.1
 Wave 1 — new shapes and their routing
 
 **W1-01 Add dependency and cross-role templates**  after: none  acceptance: 1, 2, 3
-- Files: loom-workflow/skills/loom-visualization/SKILL.md, loom-workflow/skills/loom-visualization/references/node-structure.md, loom-workflow/skills/loom-visualization/templates/12-task-dependencies.md, loom-workflow/skills/loom-visualization/templates/13-cross-role-workflow.md, loom-workflow/tests/loom-visualization/test_templates.py
-- Test: A1 positive: parallel-prerequisites-join; negative: choice-is-not-join. A2 positive: role-owned-handoff; negative: message-only-sequence. A3 positive: forms-align-and-parse; boundary: existing-eleven-shapes-and-generator-inputs.
+- Files: loom-workflow/skills/loom-visualization/SKILL.md, loom-workflow/skills/loom-visualization/references/node-structure.md, loom-workflow/skills/loom-visualization/scripts/checks_kink.py, loom-workflow/skills/loom-visualization/templates/12-task-dependencies.md, loom-workflow/skills/loom-visualization/templates/13-cross-role-workflow.md, loom-workflow/tests/loom-visualization/test_ascii_cli.py, loom-workflow/tests/loom-visualization/test_templates.py
+- Test: A1 positive: parallel-prerequisites-join; negative: choice-is-not-join. A2 positive: role-owned-handoff; negative: message-only-sequence. A3 positive: forms-align-and-parse; negative: misaligned unboxed join and handoff connectors; boundary: existing-eleven-shapes-and-generator-inputs.
 - Risk: agent-decided — apply REQ-1–3 without adding a generator; preserve existing routing and extend the standalone-title rule to both shapes. Existing template tests protect the old eleven shapes.
 
 Wave 2 — synchronized plugin release metadata
