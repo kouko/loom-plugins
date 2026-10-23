@@ -35,7 +35,55 @@ re-running the eval is the single move that defeats the guard, and it
 costs less than the dispatch it skips — which is exactly why it is worth
 saying out loud here.
 
-## Reference run — 2026-10-20 (fourth, current)
+## Reference run — 2026-10-23 (fifth, current)
+
+**Result: timing and exception PASS; changed-text scarcity MISS. Behavioural
+equivalence is not established.** The changed reader recorded four candidates,
+above the allowed zero-to-three band; the baseline reader recorded one.
+
+**Reason for the edit:** Record now initializes absent or empty stores before
+index access and concept writing, and checks populated stores before proceeding.
+The full Record-section digest changed, requiring a new evaluation record even
+though the pre-step text, including **When** and **How much**, is byte-identical
+to baseline commit `4c889e23`.
+
+Changed text: the Record section at `d858d03a`, whitespace-flattened and
+lowercased by the contract test, with SHA-256
+`3989c38a227035558eba3dc89f2c55e6d57508b4f39ee73ed9315f41e7411fba`.
+Baseline text: the Record section at `4c889e23`.
+Twelve candidates from `record-timing-cases.json`, with the same criteria.
+
+Readers: separate fresh-context agents `/root/record_cold_reader` (changed)
+and `/root/record_control_reader` (baseline), each given an isolated input
+packet and no repository access beyond that packet. Model and effort were
+inherited and not identified in the run evidence. One sample per text; no
+retries were made to seek a passing result.
+
+| Run | Text | Timing | Exception | Scarcity (RECORD of 12) |
+|---|---|---|---|---|
+| E1 | changed | PASS: existing open branch before closure | PASS: 11 only, batched follow-up | MISS: 4 (1, 3, 4, 12); count checked and judged above normal |
+| B1 | baseline | PASS: existing open branch before closure | PASS: 11 only, batched follow-up | PASS: 1 (4); count checked against normal zero-to-one |
+
+Exact candidate results retained from the readers' reports:
+
+- E1: RECORD 1, 3, 4, 12; REJECT 2, 5, 6, 7, 8, 9, 10; FOLLOW-UP 11.
+- B1: RECORD 4; REJECT 1, 2, 3, 5, 6, 7, 8, 9, 10, 12; FOLLOW-UP 11.
+- Ground truth: RECORD 1, 4, 12; FOLLOW-UP 11; all others REJECT.
+  E1 additionally recorded candidate 3; B1 omitted candidates 1 and 12.
+
+The run summaries were supplied in `/tmp/five-record-cold-result.md` and
+`/tmp/five-record-control-result.md`; these local temporary paths are provenance,
+not portable evidence dependencies. Their reported outcomes are retained above.
+
+**Remaining limitation for closing review:** the changed sample missed scarcity
+while the baseline sample passed. Identical pre-step clauses do not prove that
+the reordered full section has identical steering behaviour. One sample from
+each different reader cannot establish causation, dismiss a regression, or
+establish equivalence. The scarcity policy was not rewritten to chase a pass.
+Updating the digest records that this exact text was evaluated; it does not
+turn the observed scarcity miss into a passing evaluation.
+
+## Reference run — 2026-10-20 (fourth, superseded)
 
 Contract version: the `Record` section after the auto-create step was
 added — step 4 now runs the creation subcommand (`init <store>`, writing

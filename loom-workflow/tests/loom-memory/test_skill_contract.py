@@ -18,10 +18,13 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parents[2] / "skills" / "loom-memory"
 REPO_ROOT = SKILL_DIR.parents[2]
+sys.path.insert(0, str(REPO_ROOT / "loom-code/scripts"))
+from prose_pin import affirms  # noqa: E402
 SKILL_MD = SKILL_DIR / "SKILL.md"
 REFERENCES_DIR = SKILL_DIR / "references"
 OKF_PROFILE = REFERENCES_DIR / "okf-profile.md"
@@ -285,7 +288,7 @@ def _flat(text: str) -> str:
 # sha256 of the whitespace-flattened Record section of SKILL.md. Its only job
 # is to go red when that section changes at all, so the dilution guard cannot
 # fall silently out of date behind a literal pin that still passes.
-RECORD_SECTION_DIGEST = "f2931777d7eba529d54d10781aca10044db90fcd2f8eb7b32f65b8a08b829d32"
+RECORD_SECTION_DIGEST = "3989c38a227035558eba3dc89f2c55e6d57508b4f39ee73ed9315f41e7411fba"
 
 
 def test_backlog_entry_routing_sentence_rejected() -> None:
@@ -335,12 +338,15 @@ def test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against(
 def test_record_section_names_create_when_store_absent() -> None:
     """Acceptance 1 positive `record-step-names-create-when-absent`: the
     Record section names running the `init` subcommand when the target store
-    does not exist, writing the store's reserved files from the bundled
-    templates, before regeneration and validation continue."""
+    is absent or empty, writing the store's reserved files from the bundled
+    templates before index access, regeneration and validation continue."""
     flat = _flat(_section(_skill_md_text(), "Record"))
-    assert "does not exist" in flat, (
-        "the Record section must name the absent-store case"
-    )
+    example = "initialize an absent or empty directory with `init <store>`."
+    rule = ("initialize", "absent or empty directory", "`init <store>`")
+    assert affirms(example, *rule)
+    assert not affirms("do not " + example, *rule)
+    assert affirms(flat, *rule), "Record must initialize an absent or empty store"
+    assert flat.index("`init <store>`") < flat.index("read `index.md`")
     assert re.search(r"\binit\b", flat), (
         "the Record section must name the `init` subcommand as the way an "
         "absent store gets created"
