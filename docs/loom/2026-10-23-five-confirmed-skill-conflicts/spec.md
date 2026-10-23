@@ -1,5 +1,5 @@
 # Five confirmed skill conflicts — spec
-intent: 2026-10-23-five-confirmed-skill-conflicts@fd32d9d3
+intent: 2026-10-23-five-confirmed-skill-conflicts@3c775f5f
 pre-build-review: required — Source inspection crosses session/tool/source boundaries and changes consumed dispatch contracts.
 
 ## Requirements
