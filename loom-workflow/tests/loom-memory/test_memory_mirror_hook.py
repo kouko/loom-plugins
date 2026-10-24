@@ -2,7 +2,8 @@
 
 `hooks/memory-mirror-reminder` reads a Claude Code PostToolUse payload and,
 when a Write, Edit or shell command wrote a host auto-memory note, prints one JSON
-reminder to classify it with loom-memory. Path-only: it never reads the note.
+reminder to classify it with loom-memory. It never reads the note; a shell
+command is judged by a recently modified note, not by its text.
 """
 # concern: path-matching boundary and fail-open defects in the host memory reminder hook
 from __future__ import annotations
@@ -11,6 +12,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -33,9 +35,12 @@ def payload(path: str, tool: str = "Write") -> str:
                        "tool_input": {"file_path": path}})
 
 
-def bash(command: str) -> str:
-    return json.dumps({"hook_event_name": "PostToolUse", "tool_name": "Bash",
-                       "tool_input": {"command": command}})
+def bash(command: str, transcript=None) -> str:
+    data = {"hook_event_name": "PostToolUse", "tool_name": "Bash",
+            "tool_input": {"command": command}}
+    if transcript is not None:
+        data["transcript_path"] = transcript
+    return json.dumps(data)
 
 
 def reminder(proc) -> str:
@@ -64,11 +69,38 @@ def test_any_note_type_reminds(tmp_path, body):
     payload("/repo/README.md"), payload(NOTE_DIR + "/note.txt"),
     payload("/home/u/.claude/projects/-r/memory/sub/note.md"),
     payload("/home/u/docs/loom/memory/note.md"),
-    bash("cat > /repo/notes.md <<'EOF'\nx\nEOF"), bash(f"echo x > {NOTE_DIR}/MEMORY.md"),
+    bash("cat > /repo/notes.md <<'EOF'\nx\nEOF"), bash(f"echo x > {NOTE_DIR}/n.md"),
+    bash(f"echo x > {NOTE_DIR}/n.md", transcript=3),
 ])
 def test_non_memory_or_malformed_silent(stdin):
     proc = run(stdin)
     assert (proc.returncode, proc.stdout) == (0, "")
+
+
+@pytest.mark.parametrize("command, name, age, reminds", [
+    ('D=/x/memory; cat > "$D/x.md" <<\'EOF\'\nx\nEOF', "x.md", 0, True),
+    ('D=/x/memory; cat > "$D/x.md" <<\'EOF\'\nx\nEOF', "x.md", 3600, False),
+    ('echo x > "$D/MEMORY.md"', "MEMORY.md", 0, False),
+    ("cat {memdir}/a.md", "a.md", 3600, False),
+    ("grep -l foo {memdir}/a.md", "a.md", 3600, False),
+])
+def test_bash_reminds_on_recently_modified_note(tmp_path, command, name, age, reminds):
+    projects = tmp_path / ".claude" / "projects"
+    memdir = projects / "-x-repo" / "memory"
+    memdir.mkdir(parents=True)
+    note = memdir / name
+    note.write_text("x", encoding="utf-8")
+    t = time.time() - age
+    os.utime(note, (t, t))
+    # Worktree session: the transcript slug differs from the memory slug.
+    transcript = projects / "-x-repo--claude-worktrees-foo" / "s.jsonl"
+    transcript.parent.mkdir()
+    transcript.write_text("", encoding="utf-8")
+    proc = run(bash(command.format(memdir=memdir), transcript=str(transcript)))
+    if reminds:
+        assert "loom-memory" in reminder(proc)
+    else:
+        assert (proc.returncode, proc.stdout) == (0, "")
 
 
 def _post_tool_commands_by_matcher(path: Path) -> dict[str, list[str]]:
@@ -125,8 +157,6 @@ def test_removed_test_coverage_widened(tmp_path):
     assert reminder(run(payload(str(config / "projects/-r/memory/n.md")),
                         {"CLAUDE_CONFIG_DIR": str(config)}))
     assert reminder(run(payload(NOTE_DIR + "/n.md", tool="Edit")))
-    assert reminder(run(bash(f"cat > {NOTE_DIR}/n.md <<'EOF'\nx\nEOF")))
-    assert reminder(run(bash(f"echo x | tee -a {NOTE_DIR}/n.md")))
     # Nonexistent note: path-only, still reminds without crashing.
     assert reminder(run(payload(NOTE_DIR + "/missing.md")))
     unreadable = tmp_path / ".claude/projects/-r/memory/locked.md"

@@ -7,7 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [5.15.0] — 2026-10-24 — loom-memory fires on host memory saves
 
 - `loom-memory`'s description and activation now name the moment the agent saves a lesson to its own host memory. Record classifies repo-wide lessons (those that hold for any contributor on another machine with other tools) apart from personal, machine-specific and agent-tool-specific notes, which stay in host memory. A lesson found after finalize-review stays in host memory until the next change's branch.
-- New Claude Code PostToolUse hook `hooks/memory-mirror-reminder` reminds the agent, on any write to a host auto-memory note regardless of its type, including a write by a shell command that names the note's path, to classify it through `loom-memory`. It is path-only and never reads note content; Codex and OpenCode rely on the description.
+- New Claude Code PostToolUse hook `hooks/memory-mirror-reminder` reminds the agent, on any write to a host auto-memory note regardless of its type, and after a shell command once a host auto-memory note was just modified, to classify it through `loom-memory`. It never parses shell commands and never reads note content; Codex and OpenCode rely on the description.
 
 ## [5.14.0] — 2026-10-24 — consistent skill instructions and source-grounded retrospectives
 
