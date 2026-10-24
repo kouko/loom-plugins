@@ -153,3 +153,76 @@ Counts are samples, not rates.
 - What came back: `154 passed in 2.59s`; citations "OK"; mechanisms "all clear".
 - Full suite: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
   — not run by me; finalize-review runs it and blocks on failure (build reported exit 0 on 5199797f).
+
+## Re-run on 2026-10-24, at aa3e1b22
+
+Fix range c175e64a..aa3e1b22: 30de4b71 (hook matcher `Write|Edit|Bash`,
+`hooks.json:26`; Bash commands split into path tokens,
+`memory-mirror-reminder:53`) and aa3e1b22 (default store `docs/loom/memory/`
+named in SKILL.md, operations.md and the reminder text; test/doc tidy-ups).
+Clean copy: `git worktree add --detach <scratchpad>/at/clean2 HEAD`; new plugin
+export `<scratchpad>/at/new2` from `git archive HEAD loom-workflow`. Runner
+`<scratchpad>/at/trial2.py` = `trial.py` with template `template2` (same
+throwaway repo, **no** `docs/loom/memory/`) and an optional heredoc instruction
+appended to the prompt: "Write the memory note file with a single Bash command
+using a heredoc (cat > <full path of the note> <<'EOF' ... EOF), not with the
+Write or Edit tool." Results in `<scratchpad>/at/results2.jsonl`, logs
+`logs/r2-*.jsonl`. 10 sessions, USD 2.12, model claude-opus-5-5. Setup check
+repeated: init lists only `loom-workflow@inline` 5.15.0 plus builtins.
+
+| Trial | Skill fired | Repo changes | validate | Note written by | Reminder |
+|---|---|---|---|---|---|
+| natural c1 t1-t3 | 3/3 | `?? docs/loom/memory/{README.md,index.md,<lesson>.md}` 3/3 | exit 0 "valid" 3/3 | Bash `M=<dir>` then `cat > $M/<note>.md` 3/3 | 0/3 |
+| heredoc c1 t1 | 1/1 | same, 1/1 | exit 0 1/1 | Bash, path through a shell variable | 0/1 |
+| heredoc c3 t1-t2 | 1/2 | none 2/2 | — | Bash `D=<dir>` then `cat > "$D/<note>.md"` 2/2 | 0/2 |
+| natural c2 t1-t2 | 1/2 | none 2/2 | — | Write tool 2/2 | 2/2 |
+| natural c3 t1-t2 | 1/2 | none 2/2 | — | Write tool 2/2 | 2/2 |
+
+- With `--include-hook-events`, every shell note write shows `hook_response
+  PostToolUse:Bash … "stdout": "", "exit_code": 0` — the hook ran and stayed
+  silent. Shell note writes through a literal path: 0 of 10 sessions; through
+  a variable: 6 of 6 shell-written notes (also the round-1 pilot, `$M`).
+- Spec records this as the ceiling: spec.md:26 "a write through an indirect
+  path (a variable or a script file) is not seen … the loom-memory
+  description remains the fallback." The fallback fired before the write in
+  5 of those 6; the sixth (heredoc c3 t2) was a machine-only fact, kept out
+  of the repo correctly.
+
+- 1: re-tested — 4 sessions in a repo with no store (3 natural, 1 heredoc):
+  store created at `docs/loom/memory/` 4/4 with README.md, index.md and the
+  lesson; `loom_memory.py validate docs/loom/memory` exit 0 4/4; host note
+  saved 4/4. Still user-requested saves only.
+- 2: re-tested — cases 2 and 3, 6 sessions (2 of them heredoc), no store
+  present: `git status --porcelain` empty 6/6 (no store folder created);
+  host note saved 6/6.
+- 3: re-tested — payload drive `python3 -I <scratchpad>/at/hook_probe.py
+  <clean2>/loom-workflow/hooks/memory-mirror-reminder`, 37 payloads, `FAILS 0`:
+  the 21 earlier ones unchanged, plus Bash heredoc note (unquoted, double-,
+  single-quoted path), `echo >>`, `tee`, `mkdir -p && cat >`, `~` path, custom
+  `CLAUDE_CONFIG_DIR` → reminder; Bash MEMORY.md, repo store write, unrelated
+  command, `ls` of memory dir, command not a string, empty command → silent;
+  `M=<dir>; cat > $M/a.md` → silent (ceiling); `cat <note>` → reminder (stated
+  side effect). All exit 0, no stderr. Live: Write-tool notes 4/4 reminded;
+  shell notes 0/6 (table above). Wiring: `hooks/hooks.json:17` Write|Edit for
+  the folder validator, `:26` Write|Edit|Bash for the reminder; Codex and
+  OpenCode hook files unchanged.
+- 4: carried over — `git diff --stat c175e64a..aa3e1b22 --
+  loom-workflow/.codex-plugin loom-workflow/hooks/hooks-codex.json
+  loom-workflow/opencode loom-workflow/index.js` is empty and the SKILL.md
+  frontmatter description line is unchanged.
+- 5: re-tested — same grep at aa3e1b22: one hit, SKILL.md:55-56 (the same
+  exempting sentence); using-loom-workflow routing row now adds "or you are
+  saving a lesson to your own host memory". Loom-code-only session
+  (`logs/r2-loomcode-alone.jsonl`): `loom-code@inline` + builtins, 7 loom-code
+  skills, 0 loom-workflow skills, `is_error: False`, no hook error, repo unchanged.
+- 6: re-tested — SKILL.md:100 "Such a lesson stays in host memory until the
+  next change's branch records it."; reminder text still ends with the
+  finalize-review clause (`memory-mirror-reminder:25`); Ship "Memory write
+  timing" (ship/SKILL.md:130) unchanged. Not tried live.
+- 7: re-tested — `.claude/hooks` / `tests/hooks` contain no mirror file;
+  `git grep -l "remind-memory-mirror\|remind_memory_mirror"`: census-report.md,
+  this change's evidence file, plan.md, spec.md, intent, docs/migration/extraction.json,
+  loom-code/CHANGELOG.md, and the absence-guard test.
+- 8: re-tested — same criterion test command in clean2: `152 passed in 2.60s`;
+  `check_contract_citations.py` "OK"; `check_mechanisms.py` "all clear".
+  Full suite left to finalize-review (build reported exit 0 on aa3e1b22).
