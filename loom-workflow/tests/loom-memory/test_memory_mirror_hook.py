@@ -4,6 +4,7 @@
 when a Write or Edit landed on a host auto-memory note, prints one JSON
 reminder to classify it with loom-memory. Path-only: it never reads the note.
 """
+# concern: path-matching boundary and fail-open defects in the host memory reminder hook
 from __future__ import annotations
 
 import json
