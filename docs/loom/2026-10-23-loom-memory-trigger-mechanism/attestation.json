@@ -1,0 +1,115 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-23-loom-memory-trigger-mechanism",
+  "content_digest": "2c319d3f91898fe5f5d78393767d62191d1aebdf",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/loom-memory/test_memory_mirror_hook.py",
+      "artifact": "loom-workflow/tests/loom-memory/test_memory_mirror_hook.py",
+      "result": "pass",
+      "command_digest": "7d2af52537838e6be1136661b2647b5170ede369b8cf3c01094553dc275dbd2d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "a4bf418307a1b8f9d",
+      "vendor": "anthropic",
+      "model": "opus",
+      "lens": "code+spec-conformance",
+      "verdict": "PASS",
+      "reviewed_sha": "eaf0884857a3523efe61106b92d9afc7ae5ac5cf",
+      "review_target_sha": "f8d3dd909a88dd9a2932d91edc773abbb2908bd5",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS_WITH_NOTES",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md in the repository",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS",
+        "spec-conformance": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "anchor": "loom-workflow/hooks/memory-mirror-reminder:59",
+          "text": "Any Bash call within WINDOW seconds after a note write reminds again; the live re-test saw 3 reminders for one note. Non-blocking: the reminder only adds true context.",
+          "fix": "Optional per-session last-reminder stamp keyed by session_id, or record the same-session repeat as a spec ceiling."
+        }
+      ],
+      "notes": [
+        "External surface: transcript_path and tool_name are grounded by the live acceptance re-test with the real layout, not by a cited host doc.",
+        "Each Bash call runs one scandir per project slug; the 5 s hook timeout bounds a pathological case, where the hook fails open.",
+        "Full package suite not run by the reviewer, by contract."
+      ]
+    },
+    {
+      "reviewer": "a75a09abf8ffb0f1a",
+      "vendor": "anthropic",
+      "model": "opus",
+      "lens": "skill+spec-conformance+docs",
+      "verdict": "PASS",
+      "reviewed_sha": "eaf0884857a3523efe61106b92d9afc7ae5ac5cf",
+      "review_target_sha": "f8d3dd909a88dd9a2932d91edc773abbb2908bd5",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS_WITH_NOTES",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS",
+        "spec-conformance": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "docs/loom/2026-10-23-loom-memory-trigger-mechanism/spec.md :: Design decision ceilings",
+          "text": "The ceilings list the concurrent-session extra reminder but not the same-session repeat within the 10 s window.",
+          "fix": "Append the same-session repeat to the ceiling sentence."
+        },
+        {
+          "severity": "nit",
+          "dimension": "inconsistency",
+          "anchor": "loom-workflow/CHANGELOG.md :: shell-command line",
+          "text": "The CHANGELOG line does not state the 10-second window or the repeat reminder.",
+          "fix": "State the 10-second window and the possible repeat."
+        }
+      ],
+      "notes": [
+        "Coverage is stated honestly in the spec ceilings, the hook docstring and the acceptance test report.",
+        "The acceptance run left 7 throwaway project folders in the user's Claude Code projects list; the user must approve or remove them."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "text": "Declined adversary nit: a symlinked CLAUDE_CONFIG_DIR may not be recognised by is_config_projects, so the hook stays silent there."
+    },
+    {
+      "severity": "nit",
+      "text": "Declined adversary nit: a repository-local .claude/projects/<slug>/memory path can over-match as a host memory folder."
+    },
+    {
+      "severity": "nit",
+      "text": "Declined adversary nit: the 'about to save' timing wording in the loom-memory description precedes the actual host save."
+    }
+  ],
+  "selection": null
+}
