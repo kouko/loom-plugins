@@ -26,6 +26,18 @@ charter: 1.1
 - Test: A3 positive: hostile_model_key_red_then_green; boundary: failed_review_contains_no_probe_text.
 - Risk: agent-decided — move the proven adversarial program into the package suite unchanged so REQ-3 remains guarded on later changes.
 
+### Wave 4 — Closing review findings
+
+**W4-01 Align owner retry authorization**  after: W3-01  acceptance: 3, 4
+- Files: `loom-code/skills/closing-review/SKILL.md`, `loom-code/tests/test_closing_review_recovery_rules.py`
+- Test: A3 positive: rapid_refill_stops; negative: silent_retry. A4 positive: fresh_authorization; boundary: malformed_output_retry.
+- Risk: agent-decided — close the reviewer-found retry contradiction in both owner clauses while preserving the existing bounded episode rule.
+
+**W4-02 Ground the Claude CLI profile**  after: W4-01  acceptance: 1, 2
+- Files: `loom-code/scripts/external_review.py`, `loom-code/tests/test_external_review.py`
+- Test: A1 positive: documented_full_profile; boundary: model_attribution. A2 positive: documented_root_boundary; negative: outside_grant.
+- Risk: agent-decided — cite the official CLI contract beside the existing flags without changing their behavior or adding a new profile.
+
 ## Simplicity check
 
 - Keep the Claude contract and runner in one task — taken
