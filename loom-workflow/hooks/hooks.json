@@ -19,6 +19,11 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-skill-folder-structure.sh"
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/memory-mirror-reminder\"",
+            "timeout": 5
           }
         ]
       }

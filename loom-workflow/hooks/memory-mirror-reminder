@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+"""PostToolUse hook (Write|Edit): remind the agent to classify a host memory note.
+
+A host memory note is a `.md` file directly inside `<config>/projects/<slug>/memory/`
+(config = $CLAUDE_CONFIG_DIR, plus any `.claude` directory). The index
+`MEMORY.md` is silent. Path-only: the note's content is never read.
+Anything else, or any error, prints nothing. Always exits 0. Stdlib only.
+"""
+
+import json
+import os
+import sys
+
+REMINDER = (
+    "You just wrote a host memory note. Host memory is per-machine and not "
+    "committed. Classify it with loom-workflow:loom-memory's Record "
+    "classification: a lesson that holds for any contributor cloning this "
+    "repository on another machine with other tools goes to the repo's "
+    "committed store via loom-memory; personal, machine-specific or "
+    "agent-tool-specific notes stay only in host memory. Zero to one durable "
+    "lesson per change is normal. If this branch's closing review already "
+    "generated its attestation (finalize-review ran), do not write the repo "
+    "store now; keep the lesson in host memory for the next change's branch."
+)
+
+
+def is_memory_note(path):
+    if not path.endswith(".md"):
+        return False
+    path = os.path.normpath(path)
+    parent, name = os.path.split(path)
+    if name == "MEMORY.md" or os.path.basename(parent) != "memory":
+        return False
+    projects = os.path.dirname(os.path.dirname(parent))
+    if os.path.basename(projects) != "projects":
+        return False
+    config = os.path.dirname(projects)
+    if os.path.basename(config) == ".claude":
+        return True
+    env = os.environ.get("CLAUDE_CONFIG_DIR")
+    return bool(env) and os.path.normpath(os.path.expanduser(env)) == config
+
+
+def main():
+    try:
+        data = json.loads(sys.stdin.read())
+        path = data["tool_input"]["file_path"]
+        if isinstance(path, str) and is_memory_note(path):
+            out = {"hookSpecificOutput": {"hookEventName": "PostToolUse",
+                                          "additionalContext": REMINDER}}
+            sys.stdout.write(json.dumps(out) + "\n")
+    except Exception:
+        pass
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
