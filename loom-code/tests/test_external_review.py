@@ -494,7 +494,10 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     def runner(argv, **kwargs):
         calls.append(argv)
         assert argv[:2] == ["claude", "-p"]
-        assert argv[argv.index("--permission-mode") + 1] == "plan"
+        for flag in ("--safe-mode", "--restricted", "--strict-mcp-config"):
+            assert flag in argv
+        assert argv[argv.index("--autocompact") + 1] == "auto"
+        assert "--add-dir" not in argv
         assert argv[argv.index("--tools") + 1] == "Read,Glob,Grep"
         assert argv[argv.index("--permission-prompts") + 1] == "none"
         assert argv[argv.index("--model") + 1] == "sonnet"
@@ -509,7 +512,45 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     assert result["evidence_level"] == "accepted-explicit-settings"
     assert result["observed_model"] == "claude-sonnet-4-5"
     assert result["observed_effort"] is None
+    assert result["filesystem_boundary"] == "Claude model file tools confined to review root; CLI startup writes outside root not excluded"
     assert json.loads(result["probe"]["stdout"])["result"] == "ok"
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize("stage, exit_code", [("probe", 1), ("review", 0)])
+def test_claude_rapid_refill_is_bounded_failed_result(stage, exit_code):
+    secret = "PRIVATE PROMPT AND VERDICT"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        if stage == "review" and len(calls) == 1:
+            return completed(argv, json.dumps({"result": "ok", "modelUsage": {"claude-sonnet-4-5": {}}}))
+        return completed(argv, json.dumps({"type": "result", "is_error": True,
+                                           "terminal_reason": "rapid_refill_breaker",
+                                           "result": secret}), secret, rc=exit_code)
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            secret, consent("claude"), runner=runner)
+    assert result["status"] == "failed"
+    assert result["reason"] == f"{stage}-rapid-refill-breaker"
+    assert result["review_output"] is None
+    assert result["next_action"] == "Inspect Claude CLI diagnostics privately, then request a new authorized review."
+    assert secret not in json.dumps(result)
+    assert len(calls) == (1 if stage == "probe" else 2)
+
+
+def test_claude_optional_budget_applies_to_both_stages():
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        assert float(argv[argv.index("--max-budget-usd") + 1]) == 6
+        return completed(argv, json.dumps({"result": "ok", "modelUsage": {"claude-sonnet-4-5": {}}}))
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            "review", consent("claude"), runner=runner, max_budget_usd=6)
+    assert result["status"] == "completed"
     assert len(calls) == 2
 
 

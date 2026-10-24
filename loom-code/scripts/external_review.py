@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import errno
 import json
+import math
 import os
 import re
 import signal
@@ -432,8 +433,11 @@ def _execution_failure_reason(executor: str, output: str, stderr: str) -> str:
     except json.JSONDecodeError:
         return _stderr_failure_reason(executor, stderr)
     if (not isinstance(data, dict) or data.get("type") != "result"
-            or data.get("is_error") is not True
-            or data.get("terminal_reason") != "api_error"):
+            or data.get("is_error") is not True):
+        return _stderr_failure_reason(executor, stderr)
+    if data.get("terminal_reason") == "rapid_refill_breaker":
+        return "rapid-refill-breaker"
+    if data.get("terminal_reason") != "api_error":
         return _stderr_failure_reason(executor, stderr)
     status = data.get("api_error_status")
     if type(status) is not int or not 400 <= status <= 599:
@@ -466,15 +470,19 @@ def _claude_failure_action(reason: str) -> str:
 
 
 def _command(executor: str, model: str, effort: str, prompt: str,
-             scope: str) -> list[str]:
+             scope: str, max_budget_usd: float | None = None) -> list[str]:
     if executor == "codex":
         return ["codex", "exec", "--sandbox", "read-only", "--skip-git-repo-check",
                 "--ephemeral", "-m", model, "-c", f"model_reasoning_effort={effort}", "-"]
     if executor == "claude":
-        return ["claude", "-p", "--model", model, "--effort", effort,
-                "--permission-mode", "plan", "--tools", "Read,Glob,Grep",
+        command = ["claude", "-p", "--model", model, "--effort", effort,
+                "--safe-mode", "--restricted", "--autocompact", "auto",
+                "--strict-mcp-config", "--tools", "Read,Glob,Grep",
                 "--permission-prompts", "none", "--output-format", "json",
                 "--no-session-persistence"]
+        if max_budget_usd is not None:
+            command.extend(("--max-budget-usd", str(max_budget_usd)))
+        return command
     return ["agy", "--add-dir", scope, "-p", prompt,
             "--model", model, "--effort", effort,
             "--mode", "plan", "--sandbox", "--disable-slash-commands",
@@ -485,7 +493,7 @@ def execute(
     executor: str, model: str, effort: str, family: str, scope: str,
     prompt: str, consent: Mapping[str, Any] | None, *,
     runner: Runner = _launch, probe_timeout: int = 45,
-    review_timeout: int = 1800,
+    review_timeout: int = 1800, max_budget_usd: float | None = None,
 ) -> dict[str, Any]:
     """Return provenance and raw review text; never infer a reviewer verdict."""
     result: dict[str, Any] = {
@@ -493,7 +501,10 @@ def execute(
         "requested_effort": effort, "requested_family": family,
         "observed_model": None, "observed_effort": None,
         "evidence_level": "none", "review_output": None,
-        "filesystem_boundary": "working-root-only; outside-root reads and CLI writes not excluded",
+        "filesystem_boundary": (
+            "Claude model file tools confined to review root; CLI startup writes outside root not excluded"
+            if executor == "claude" else
+            "working-root-only; outside-root reads and CLI writes not excluded"),
     }
 
     def fail(reason: str, diagnostic: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -514,7 +525,11 @@ def execute(
     if (executor not in {"codex", "claude", "agy"} or not model or
             effort not in EFFORTS or family not in FAMILIES or
             not 0 < probe_timeout <= 120 or
-            not probe_timeout < review_timeout <= 1800):
+            not probe_timeout < review_timeout <= 1800 or
+            (max_budget_usd is not None and
+             (executor != "claude" or isinstance(max_budget_usd, bool)
+              or not isinstance(max_budget_usd, (int, float))
+              or not math.isfinite(max_budget_usd) or max_budget_usd <= 0))):
         return fail("invalid-explicit-profile")
     if provider_family(model) != family:
         return fail("selected-provider-family-mismatch-or-unknown")
@@ -534,7 +549,7 @@ def execute(
                                       "claude": "alias-or-explicit-id"}[executor]
         for stage, text, timeout in (("probe", PROBE_PROMPT, probe_timeout),
                                      ("review", prompt, review_timeout)):
-            argv = _command(executor, model, effort, text, scope)
+            argv = _command(executor, model, effort, text, scope, max_budget_usd)
             response = _run(runner, argv, "" if executor == "agy" else text,
                             timeout, scope, progress=stage)
             if stage == "probe":
@@ -545,6 +560,10 @@ def execute(
                 if response.returncode == 0:
                     result["probe"].update(stdout=response.stdout,
                                            stderr=response.stderr)
+            if (executor == "claude" and
+                    _execution_failure_reason(executor, response.stdout,
+                                              response.stderr) == "rapid-refill-breaker"):
+                return fail(f"{stage}-rapid-refill-breaker")
             if response.returncode != 0:
                 detail = _execution_failure_reason(executor, response.stdout,
                                                    response.stderr)
@@ -612,6 +631,7 @@ def main(argv: list[str] | None = None, *, stdin: TextIO = sys.stdin,
     parser.add_argument("--consent-record", required=True, type=Path)
     parser.add_argument("--probe-timeout-seconds", type=int, default=45)
     parser.add_argument("--review-timeout-seconds", type=int, default=1800)
+    parser.add_argument("--max-budget-usd", type=float)
     args = parser.parse_args(argv)
     try:
         consent = json.loads(args.consent_record.read_text())
@@ -625,7 +645,8 @@ def main(argv: list[str] | None = None, *, stdin: TextIO = sys.stdin,
         result = execute(args.executor, args.model, args.effort, args.family,
                          args.scope, stdin.read(), consent,
                          probe_timeout=args.probe_timeout_seconds,
-                         review_timeout=args.review_timeout_seconds)
+                         review_timeout=args.review_timeout_seconds,
+                         max_budget_usd=args.max_budget_usd)
     print(json.dumps(result, ensure_ascii=False), file=out)
     return 0 if result["status"] == "completed" else 1
 
