@@ -226,10 +226,11 @@ family, and accepts only a conforming verdict. One whole-output `yaml` or
 are accepted without changing their content. Every finding still needs a
 nonblank path with a positive line number or nonblank quote; dimension scores
 must meet their findings' severity, and the overall verdict must agree with
-the scores and findings. A transient executor failure
-or malformed outside output may be retried once for the same digest and
-reviewer identity, but every repeat outside execution is a newly authorized
-review with a fresh preflight. The earlier consent does not authorize a silent
+the scores and findings. Duplicate YAML mapping keys at any depth are rejected.
+A transient executor failure or malformed outside output may be retried once
+for the same digest and reviewer identity, but every repeat outside execution
+is a newly authorized review with a fresh preflight. The earlier consent does
+not authorize a silent
 retry. For `probe-rapid-refill-breaker` or `review-rapid-refill-breaker`, report
 an incomplete review and inspect private diagnostics before requesting that
 new authorization. A second outside failure ends the episode as
@@ -239,9 +240,8 @@ The accepted outside verdict carries the completed runner result to
 `finalize-review`; it checks the raw YAML against the attributed lens,
 verdict, dimension scores, findings and notes, then stores a receipt bound to
 the unmodified raw-output digest with executor, model, effort, family and
-reviewer identity in the
-attestation. A vendor label without this receipt is not a completed outside
-review.
+reviewer identity in the attestation. A vendor label without this receipt is
+not a completed outside review.
 <!-- /gate -->
 
 ## 3. Run acceptance testing

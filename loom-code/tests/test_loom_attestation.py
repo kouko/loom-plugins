@@ -584,6 +584,26 @@ def test_outside_receipt_requires_revision_score_in_finding_dimension(
     assert failure is not None and "dimension score" in failure
 
 
+def test_outside_receipt_rejects_duplicate_nested_score_key() -> None:
+    target = "b" * 40
+    raw = (
+        "verdict: PASS\nlens: plan\n"
+        f"reviewed_sha: {'a' * 40}\nreview_target_sha: {target}\n"
+        "dimension_scores:\n"
+        "  deletion-first: NEEDS_REVISION\n"
+        "  deletion-first: PASS\n"
+        "findings: []\nnotes: []\n"
+    )
+    fields = yaml.safe_load(raw)
+    verdict = {**fields, "reviewer": "outside", "vendor": "anthropic",
+               "model": "sonnet", "external_review": {"review_output": raw}}
+
+    _, failure = reviewers.attach_outside_receipt(
+        [{"vendor": "openai", "lens": "plan"}, verdict], "anthropic", target)
+
+    assert failure == "selected outside execution output is invalid YAML"
+
+
 def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
     kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
