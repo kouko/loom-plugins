@@ -50,6 +50,11 @@ charter: 1.1
 - Test: A5 positive: duplicate_verdict_rejected; boundary: nested_duplicate_score_rejected.
 - Risk: agent-decided — move the earned red probe into the normal package suite so future changes cannot silently restore last-key-wins parsing.
 
+**W5-03 Correct the Claude budget disclosure**  after: W5-02  acceptance: 1, 2
+- Files: `loom-code/skills/external-review/SKILL.md`, `loom-code/CHANGELOG.md`, `docs/loom/2026-10-24-claude-independent-review-reliability/spec.md`, `docs/loom/2026-10-24-claude-independent-review-reliability/plan.md`, `docs/loom/2026-10-24-claude-independent-review-reliability/acceptance-test-report.md`, `docs/loom/2026-10-24-claude-independent-review-reliability/evidence/acceptance-test-evidence.md`
+- Test: A1/A2 positive: disclose per-process estimated-spend limit before authorization; boundary: never describe USD 6 as a hard maximum.
+- Risk: agent-decided — align every changed budget statement with Claude's documented estimate-based behavior; do not change the CLI invocation or expand the authorized run.
+
 ## Simplicity check
 
 - Keep the Claude contract and runner in one task — taken
@@ -63,7 +68,7 @@ charter: 1.1
 ## Risks
 
 1. The local private full-size fixture is temporary; the independent acceptance tester runs it during Closing Review and records only hashes, sizes, status, and model attribution.
-2. A live Claude run transmits the authorized packet to Anthropic; use the already confirmed USD 6 cap and do not retry without fresh authorization.
+2. A live Claude run transmits the authorized packet to Anthropic; the confirmed USD 6 estimate-based limit applies separately to preflight and review and may be exceeded. Do not retry without fresh authorization.
 3. Safe and restricted CLI flags are version-dependent; probe the installed CLI and keep synthetic tests separate from the live result.
 4. Build ends with an independent adversary's committed executable cases, followed by the complete package suite before Closing Review.
 5. The earlier review episode used its three digests. The newly confirmed intent starts a new episode. Retained Haiku/low output permits local parser testing, but not Opus/high live acceptance. No new external invocation is authorized.
