@@ -4,6 +4,14 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.13.0] — 2026-10-23 — add complex planning and process diagrams
+
+- Add task-dependency diagrams for parallel prerequisites and required joins,
+  and cross-role workflow diagrams for step ownership and handoffs.
+- Route both shapes from `loom-visualization` with standalone node titles in
+  their table, ASCII, and Mermaid examples.
+- Check alignment of unboxed joins and handoff arrows in ASCII diagrams.
+
 ## [5.12.4] — 2026-10-22 — flow node edge-case fixes
 
 - A flow structured node keeps one space before the right border when a

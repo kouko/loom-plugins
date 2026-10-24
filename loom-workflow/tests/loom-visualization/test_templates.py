@@ -1,4 +1,4 @@
-"""Tests for the eleven shape templates and the Obsidian boundary.
+"""Tests for the shape templates and the Obsidian boundary.
 
 Acceptance 2 (every shape has table, ASCII and Mermaid forms) and
 acceptance 7 (no Obsidian-only syntax; the skill declines vault targets).
@@ -20,7 +20,7 @@ from checks_kink import find_issues as kink_issues  # noqa: E402
 from checks_seam import find_issues as seam_issues  # noqa: E402
 from checks_table import find_issues as table_issues  # noqa: E402
 from generate import render  # noqa: E402
-from glyphs import CORNERS, HORIZONTALS, TEES, VERTICALS  # noqa: E402
+from width import display_width  # noqa: E402
 
 SKILL_DIR = SCRIPTS.parent
 TEMPLATES = SKILL_DIR / "templates"
@@ -41,9 +41,10 @@ EXPECTED = {
     "09-data-model.md": ("erDiagram", None),
     "10-timeline.md": ("timeline", None),
     "11-quantity.md": ("xychart-beta", "bar"),
+    "12-task-dependencies.md": ("flowchart TD", None),
+    "13-cross-role-workflow.md": ("flowchart LR", None),
 }
 
-BOX_GLYPHS = VERTICALS | HORIZONTALS | CORNERS | TEES
 FENCE = re.compile(r"^```([\w-]*)[^\n]*\n(.*?)^```\s*$", re.MULTILINE | re.DOTALL)
 CJK = re.compile(r"[぀-ヿ㐀-鿿]")
 
@@ -112,7 +113,7 @@ def _read(name):
     return (TEMPLATES / name).read_text(encoding="utf-8")
 
 
-def test_eleven_shapes_each_have_table_ascii_mermaid():
+def test_shapes_each_have_table_ascii_mermaid():
     assert sorted(p.name for p in TEMPLATES.glob("*.md")) == sorted(EXPECTED)
     for name, (mermaid_type, _) in EXPECTED.items():
         text = _read(name)
@@ -141,8 +142,11 @@ def test_ascii_blocks_pass_ported_checks():
     for name, (_, shape) in EXPECTED.items():
         text = _read(name)
         generated = {out for s, _, out in generator_examples(text)}
-        for lang, block in fences(sections(text)["ASCII"]):
-            if lang in ("json", "mermaid") or not set(block) & BOX_GLYPHS:
+        ascii_blocks = fences(sections(text)["ASCII"])
+        if name in ("12-task-dependencies.md", "13-cross-role-workflow.md"):
+            assert len([block for lang, block in ascii_blocks if lang == ""]) == 1, name
+        for lang, block in ascii_blocks:
+            if lang in ("json", "mermaid"):
                 continue
             if shape == "seq" and block in generated:
                 # gen_seq is correct by construction; its blank off-span
@@ -150,6 +154,17 @@ def test_ascii_blocks_pass_ported_checks():
                 # verified by regeneration below instead.
                 continue
             assert drift(block) == [], f"{name}: {drift(block)}"
+            # Ported checks alone miss connector drift in these unboxed examples.
+            lines = block.splitlines()
+            if name == "12-task-dependencies.md":
+                join_columns = [display_width(line.rsplit(mark, 1)[0])
+                                for line, mark in ((lines[2], "+"), (lines[3], "|"), (lines[4], "+"))]
+                assert len(set(join_columns)) == 1, name
+            if name == "13-cross-role-workflow.md":
+                handoff_columns = {display_width(line[:line.index(mark)])
+                                   for line, mark in ((lines[1], "|"), (lines[2], "|"), (lines[3], "v"),
+                                                      (lines[5], "|"), (lines[6], "|"), (lines[7], "v"))}
+                assert len(handoff_columns) == 1, name
 
 
 def test_generator_examples_reproduce_their_output():
@@ -175,6 +190,62 @@ def test_mermaid_flowcharts_use_long_arrows_only():
 def test_at_least_three_templates_use_cjk_labels():
     cjk = [n for n in EXPECTED if CJK.search(sections(_read(n))["Mermaid"])]
     assert len(cjk) >= 3, cjk
+
+
+# concern: A parallel task join silently losing one required prerequisite.
+def test_task_dependencies_route_and_show_parallel_join():
+    skill = SKILL_MD.read_text(encoding="utf-8")
+    text = _read("12-task-dependencies.md")
+    assert "`templates/12-task-dependencies.md`" in skill
+    assert "parallel prerequisites" in skill.lower()
+    (mermaid,) = [b for lang, b in fences(sections(text)["Mermaid"]) if lang == "mermaid"]
+    for source, target in (("A", "B"), ("A", "C"), ("B", "D"), ("C", "D")):
+        assert re.search(rf"\b{source}(?:\[.*?\])? --> {target}\b", mermaid)
+    table = sections(text)["Table"]
+    for prerequisite, task in (("定義介面契約", "建立 API"),
+                               ("定義介面契約", "撰寫用戶端"),
+                               ("建立 API", "執行整合測試"),
+                               ("撰寫用戶端", "執行整合測試")):
+        assert re.search(rf"^\| [A-D]: {prerequisite} \| [A-D]: {task} \|", table, re.MULTILINE)
+    ascii_form = sections(text)["ASCII"]
+    for label in ("A: 定義介面契約", "B: 建立 API", "C: 撰寫用戶端", "D: 執行整合測試"):
+        assert label in ascii_form
+    assert any(pinned_sentence_ok(sentence, "requires", ("all incoming prerequisites", "A join"))
+               for sentence in gate_sentences(sections(text)["When to use"]))
+
+
+def test_task_dependencies_do_not_confuse_join_with_choice():
+    text = _read("12-task-dependencies.md")
+    (mermaid,) = [b for lang, b in fences(sections(text)["Mermaid"]) if lang == "mermaid"]
+    assert not re.search(r"-->\|(?:yes|no|是|否)\|", mermaid, re.IGNORECASE)
+
+
+def test_cross_role_workflow_routes_owned_steps_and_handoffs():
+    skill = SKILL_MD.read_text(encoding="utf-8")
+    text = _read("13-cross-role-workflow.md")
+    assert "`templates/13-cross-role-workflow.md`" in skill
+    assert "work ownership" in skill.lower()
+    assert "Owner" in sections(text)["Table"]
+    for owner, step in (("產品", "提出需求"), ("設計", "擬定流程"), ("工程", "實作流程")):
+        assert re.search(rf"^\| [A-C] \| {owner} \| {step} \|", sections(text)["Table"], re.MULTILINE)
+        assert f"[{owner}]" in sections(text)["ASCII"]
+        assert step in sections(text)["ASCII"]
+    (mermaid,) = [b for lang, b in fences(sections(text)["Mermaid"]) if lang == "mermaid"]
+    for owner, role, node, step in (("Product", "產品", "A", "提出需求"),
+                                   ("Design", "設計", "B", "擬定流程"),
+                                   ("Engineering", "工程", "C", "實作流程")):
+        assert re.search(rf'subgraph {owner}\["{role}"\]\s+{node}\["{node}: {step}"\]\s+end', mermaid)
+    assert re.search(r'A -->\|"handoff: 需求說明"\| B', mermaid)
+    assert re.search(r'B -->\|"handoff: 流程稿"\| C', mermaid)
+
+
+def test_cross_role_workflow_is_not_message_only_sequence():
+    text = _read("13-cross-role-workflow.md")
+    assert any(pinned_sentence_ok(sentence, "use", ("`templates/06-actor-sequence.md`",
+                                                      "message exchange ordered in time"))
+               for sentence in gate_sentences(sections(text)["When to use"]))
+    (mermaid,) = [b for lang, b in fences(sections(text)["Mermaid"]) if lang == "mermaid"]
+    assert "sequenceDiagram" not in mermaid
 
 
 def test_skill_declines_vault_target(tmp_path):
