@@ -475,6 +475,8 @@ def _command(executor: str, model: str, effort: str, prompt: str,
         return ["codex", "exec", "--sandbox", "read-only", "--skip-git-repo-check",
                 "--ephemeral", "-m", model, "-c", f"model_reasoning_effort={effort}", "-"]
     if executor == "claude":
+        # CLI flag contract: https://code.claude.com/docs/en/cli-reference
+        # Profile verified with Claude Code 2.1.310; recheck after CLI upgrades.
         command = ["claude", "-p", "--model", model, "--effort", effort,
                 "--safe-mode", "--restricted", "--autocompact", "auto",
                 "--strict-mcp-config", "--tools", "Read,Glob,Grep",
