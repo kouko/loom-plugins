@@ -19,6 +19,13 @@ charter: 1.1
 - Test: A1 positive: released_runner; boundary: version_sync. A2 positive: documented_boundary; negative: stale_disclosure. A3 positive: documented_failure; negative: raw_content. A4 positive: release_tests; negative: unsynced_manifest.
 - Risk: agent-decided — apply a minor bump for the changed runtime contract after implementation so closing-review attests the final release content.
 
+### Wave 3 — Preserve the adversarial regression
+
+**W3-01 Graduate the failed-result privacy probe**  after: W1-01, W2-01  acceptance: 3
+- Files: `docs/loom/2026-10-24-claude-independent-review-reliability/evidence/probes/test_adversarial_claude_probe_model_key_privacy.py`, `loom-code/tests/test_adversarial_claude_probe_model_key_privacy.py`
+- Test: A3 positive: hostile_model_key_red_then_green; boundary: failed_review_contains_no_probe_text.
+- Risk: agent-decided — move the proven adversarial program into the package suite unchanged so REQ-3 remains guarded on later changes.
+
 ## Simplicity check
 
 - Keep the Claude contract and runner in one task — taken
