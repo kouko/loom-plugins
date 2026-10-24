@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-24-claude-independent-review-reliability",
-  "content_digest": "78c20ce68e4ba6b8de8fa2f9dad76ef88aff20b1",
+  "content_digest": "fcda679aed9282d943c3bde6db43811f6c0002e4",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,54 +20,56 @@
   ],
   "verdicts": [
     {
-      "reviewer": "closing-code-1",
+      "reviewer": "live-code-3",
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "code",
       "reviewed_sha": "b1b8cd77ef0c3d245641ace6330795a4abbb77bb",
-      "review_target_sha": "78bab917677198ea8cf12f366cc39529b5cca7e9",
+      "review_target_sha": "d9642b5e96eea68009651fb1cf0ad2d194e3921d",
       "verdict": "PASS",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
-        "correctness": "PASS_WITH_NOTES",
+        "correctness": "PASS",
         "naming": "PASS",
         "tests": "PASS",
         "refactoring": "PASS",
         "cross-task-coherence": "PASS",
         "external-surface-grounding": "PASS",
         "principles-conformance": "PASS",
-        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md",
         "deliberate-simplification": "PASS",
         "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "The retry authorization and CLI citation findings were fixed.",
-        "Full-size live completion and file access remain unverified after host approval rejection."
+        "The live attempt reached review but failed with HTTP 429; the acceptance report correctly leaves full completion and model attribution unverified.",
+        "All five changed test files ran with host pytest: 176 passed. The locked uv run could not fetch dependencies in this sandbox.",
+        "The Claude CLI flags were checked against the official CLI reference; no repository files were edited."
       ]
     },
     {
-      "reviewer": "closing-skill-2",
+      "reviewer": "live-skill-3",
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "skill",
       "reviewed_sha": "b1b8cd77ef0c3d245641ace6330795a4abbb77bb",
-      "review_target_sha": "78bab917677198ea8cf12f366cc39529b5cca7e9",
-      "verdict": "PASS",
+      "review_target_sha": "d9642b5e96eea68009651fb1cf0ad2d194e3921d",
+      "verdict": "PASS_WITH_NOTES",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
         "inconsistency": "PASS",
-        "incorrect-fact": "PASS",
+        "incorrect-fact": "PASS_WITH_NOTES",
         "missing-population": "PASS",
         "user-judgment-leak": "PASS",
         "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "The owner retry clauses now require fresh authorization and preflight.",
-        "A1 is unverified and A2 is partly verified in the acceptance report."
+        "The report correctly marks full-size completion unverified and the read-boundary result partial. It records the .claude.json hash change without attributing its cause or claiming global state was unchanged.",
+        "The runner flags match the skill stated Claude profile and the official CLI contract: https://code.claude.com/docs/en/cli-reference",
+        "The private host logs, baseline hashes, and runner JSON were unavailable to this reviewer, so their reported observations could not be independently replayed. The package suite was reported passed by the orchestrator; this reviewer did not rerun it."
       ]
     }
   ],
