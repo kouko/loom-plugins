@@ -4,6 +4,7 @@
 
 - Claude reviews run with safe and restricted single-run settings, automatic compaction, configured MCP servers disabled, and a Read/Glob/Grep tool allowlist. Model file tools stay within the review root; CLI startup may still access or write outside it.
 - An optional per-invocation Claude budget cap supports authorized runs. Structured `rapid_refill_breaker` results, including zero-exit results, report an incomplete review without exposing raw review material or silently retrying.
+- Completed outside reviews may use one whole-output YAML fence and nonempty findings without classification labels. Receipts still bind the unmodified raw output, while missing anchors, weak dimension scores and contradictory verdicts remain rejected.
 
 ## [3.48.2] — 2026-10-23 — docs(loom): record memory lessons and fix AGENTS.md SSOT description
 

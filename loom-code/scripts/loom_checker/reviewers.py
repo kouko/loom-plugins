@@ -43,6 +43,15 @@ _REVIEW_DIMENSIONS = {
 }
 
 
+def _valid_finding_anchor(anchor: str) -> bool:
+    path, separator, quote = anchor.partition(" :: ")
+    if separator:
+        return bool(path.strip() and quote.strip())
+    match = re.fullmatch(r"(.+):([0-9]+)", anchor)
+    return bool(match and match.group(1).strip() and
+                re.search(r"[1-9]", match.group(2)))
+
+
 def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
     """Check the required owning-reviewer fields before accepting outside YAML."""
     if not isinstance(parsed, dict):
@@ -74,9 +83,9 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
                 not isinstance(finding.get("dimension"), str) or
                 finding["dimension"] not in expected or
                 not isinstance(finding.get("anchor"), str) or
-                not re.search(r":\d+$| :: .+", finding["anchor"]) or
+                not _valid_finding_anchor(finding["anchor"]) or
                 not isinstance(finding.get("text"), str) or
-                not re.match(r"^(praise|nitpick|suggestion|issue|todo|question|thought|chore|note)(?:\s*\([^)]*\))?:", finding["text"]) or
+                not finding["text"].strip() or
                 not isinstance(finding.get("fix"), str) or not finding["fix"].strip()):
             return "selected outside execution has malformed reviewer findings"
     notes = parsed.get("notes", [])
@@ -89,6 +98,14 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
         for entry in confirmations
     ):
         return "selected outside execution has malformed probe confirmations"
+    for dimension, score in scores.items():
+        relevant = [finding["severity"] for finding in findings
+                    if finding["dimension"] == dimension]
+        if (("fatal" in relevant or relevant.count("important") >= 2)
+                and score != "NEEDS_REVISION") or (
+                    "important" in relevant and score not in
+                    {"PASS_WITH_NOTES", "NEEDS_REVISION"}):
+            return "selected outside execution dimension score contradicts findings"
     severity = [finding["severity"] for finding in findings]
     if ("NEEDS_REVISION" in scores.values() or "fatal" in severity or
             severity.count("important") >= 2):
@@ -234,8 +251,10 @@ def attach_outside_receipt(
     output = result.get("review_output")
     if not isinstance(output, str) or not output.strip():
         return prepared, "selected outside execution has no raw review output"
+    fenced = re.fullmatch(r"\s*```(?:yaml|YAML)\r?\n(.*?)\r?\n```\s*", output, re.DOTALL)
+    review_yaml = fenced.group(1) if fenced else output
     try:
-        parsed = yaml.safe_load(output)
+        parsed = yaml.safe_load(review_yaml)
     except yaml.YAMLError:
         return prepared, "selected outside execution output is invalid YAML"
     yaml_failure = _review_yaml_failure(parsed, verdict)

@@ -490,6 +490,100 @@ def test_outside_yaml_scores_and_notes_must_match_attributed_verdict() -> None:
         "selected outside execution output differs from its verdict")
 
 
+def test_outside_receipt_accepts_whole_yaml_fence_and_unlabeled_finding() -> None:
+    target = "b" * 40
+    finding = {"severity": "important", "dimension": "omission",
+               "anchor": "docs/guide.md :: missing passage", "text": "Missing fact",
+               "fix": "Add the fact"}
+    scores = {dimension: "PASS" for dimension in reviewers._DOC_DIMENSIONS}
+    scores["omission"] = "PASS_WITH_NOTES"
+    fields = {"verdict": "PASS_WITH_NOTES", "lens": "docs", "reviewed_sha": "a" * 40,
+              "review_target_sha": target, "dimension_scores": scores,
+              "findings": [finding], "notes": []}
+    raw = "```yaml\n" + yaml.safe_dump(fields, sort_keys=False) + "```\n"
+    verdict = {**fields, "reviewer": "outside", "vendor": "anthropic",
+               "model": "sonnet", "external_review": {
+                   "status": "completed", "reason": None, "executor": "claude",
+                   "requested_model": "sonnet", "requested_effort": "high",
+                   "requested_family": "anthropic",
+                   "evidence_level": "accepted-explicit-settings",
+                   "observed_model": "claude-sonnet-4-5", "observed_effort": None,
+                   "review_output": raw}}
+    incumbent = {"reviewer": "native", "vendor": "openai", "lens": "docs"}
+
+    for label in ("yaml", "YAML"):
+        verdict["external_review"]["review_output"] = raw.replace("```yaml", f"```{label}")
+        prepared, failure = reviewers.attach_outside_receipt(
+            [incumbent, verdict], "anthropic", target)
+        assert failure is None
+        receipt = prepared[1]["external_review"]
+        assert receipt["output_digest"] == hashlib.sha256(
+            verdict["external_review"]["review_output"].encode()).hexdigest()
+        assert "review_output" not in receipt
+        assert prepared[1]["findings"] == [finding]
+
+
+@pytest.mark.parametrize("suffix", ["\nextra prose", "\n```yaml\nverdict: PASS\n```"])
+def test_outside_receipt_rejects_text_around_whole_yaml_fence(suffix: str) -> None:
+    fields = {"verdict": "PASS", "lens": "plan", "reviewed_sha": "a" * 40,
+              "review_target_sha": "b" * 40,
+              "dimension_scores": {"deletion-first": "PASS"},
+              "findings": [], "notes": []}
+    raw = "```yaml\n" + yaml.safe_dump(fields) + "```" + suffix
+    verdict = {**fields, "reviewer": "outside", "vendor": "anthropic",
+               "model": "sonnet", "external_review": {"review_output": raw}}
+    _, failure = reviewers.attach_outside_receipt(
+        [{"vendor": "openai", "lens": "plan"}, verdict], "anthropic", "b" * 40)
+    assert failure == "selected outside execution output is invalid YAML"
+
+
+@pytest.mark.parametrize("finding,score,overall,reason", [
+    ({"anchor": " :1", "text": "Missing fact"}, "PASS_WITH_NOTES", "PASS_WITH_NOTES", "malformed reviewer findings"),
+    ({"anchor": "docs/guide.md:0", "text": "Missing fact"}, "PASS_WITH_NOTES", "PASS_WITH_NOTES", "malformed reviewer findings"),
+    ({"anchor": "docs/guide.md ::  ", "text": "Missing fact"}, "PASS_WITH_NOTES", "PASS_WITH_NOTES", "malformed reviewer findings"),
+    ({"anchor": "docs/guide.md:1"}, "PASS_WITH_NOTES", "PASS_WITH_NOTES", "malformed reviewer findings"),
+    ({"anchor": "docs/guide.md:1", "text": "Missing fact"}, "PASS", "PASS_WITH_NOTES", "dimension score"),
+    ({"anchor": "docs/guide.md:1", "text": "Missing fact"}, "PASS_WITH_NOTES", "PASS", "overall verdict"),
+])
+def test_outside_receipt_rejects_malformed_or_contradictory_findings(
+    finding: dict, score: str, overall: str, reason: str,
+) -> None:
+    item = {"severity": "important", "dimension": "deletion-first",
+            "fix": "Add the fact", **finding}
+    fields = {"verdict": overall, "lens": "plan", "reviewed_sha": "a" * 40,
+              "review_target_sha": "b" * 40,
+              "dimension_scores": {"deletion-first": score},
+              "findings": [item], "notes": []}
+    verdict = {**fields, "reviewer": "outside", "vendor": "anthropic",
+               "model": "sonnet", "external_review": {
+                   "review_output": yaml.safe_dump(fields)}}
+    _, failure = reviewers.attach_outside_receipt(
+        [{"vendor": "openai", "lens": "plan"}, verdict], "anthropic", "b" * 40)
+    assert failure is not None and reason in failure
+
+
+@pytest.mark.parametrize("severities", [("fatal",), ("important", "important")])
+def test_outside_receipt_requires_revision_score_in_finding_dimension(
+    severities: tuple[str, ...],
+) -> None:
+    findings = [
+        {"severity": severity, "dimension": "deletion-first",
+         "anchor": f"docs/guide.md:{line}", "text": "Missing fact",
+         "fix": "Add the fact"}
+        for line, severity in enumerate(severities, 1)
+    ]
+    fields = {"verdict": "NEEDS_REVISION", "lens": "plan",
+              "reviewed_sha": "a" * 40, "review_target_sha": "b" * 40,
+              "dimension_scores": {"deletion-first": "PASS_WITH_NOTES"},
+              "findings": findings, "notes": []}
+    verdict = {**fields, "reviewer": "outside", "vendor": "anthropic",
+               "model": "sonnet", "external_review": {
+                   "review_output": yaml.safe_dump(fields)}}
+    _, failure = reviewers.attach_outside_receipt(
+        [{"vendor": "openai", "lens": "plan"}, verdict], "anthropic", "b" * 40)
+    assert failure is not None and "dimension score" in failure
+
+
 def test_finalize_binds_selected_outside_runner_output_to_verdict(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
     kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
@@ -787,7 +881,7 @@ def test_external_dispatch_gate_integrates_runner_verdict_and_attestation(tmp_pa
         )
         review_input.write_text(json.dumps({"verdicts": verdicts, "findings": [],
                                             "adversarial": []}), encoding="utf-8")
-        assert any("overall verdict" in reason for _, reason in
+        assert any("dimension score" in reason for _, reason in
                    finalize._finalize(repo, CHANGE, ["--input", str(review_input)], StringIO()))
 
 
