@@ -2,7 +2,7 @@
 
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
-複数の Claude Code と Codex セッションを分析し、インストール済み skill で繰り返し起きる問題を調べます。提案対象は指示、または対象 skill に直接関係する plugin の登録、読み込み、hook、同梱スクリプト、依存 connector です。振り返りはレビュー用の成果物だけを作り、採用した変更は別の実装フローに渡します。
+選択した過去または現在の Claude Code と Codex セッションの取得済みスナップショットを分析し、読み取り可能な対象 skill で繰り返し起きる問題を調べます。取得後のイベントは除外し、対象のインストールは不要です。提案対象は指示、または対象 skill に直接関係する plugin の登録、読み込み、hook、同梱スクリプト、依存 connector です。振り返りはレビュー用の成果物だけを作り、採用した変更は別の実装フローに渡します。
 
 旧コマンド名 `distill-sessions` は `skill-retro` に変更されました。運用上の規則は [SKILL.md](SKILL.md) を参照してください。
 
@@ -51,13 +51,15 @@ python3 loom-workflow/skills/skill-retro/scripts/propose.py \
 
 `propose.py` は対象の SKILL.md を読み、`proposals.md` だけを書き込みます。連携のソースがない観察は `merged.json` に入れず、調査候補として示します。単一セッションの項目は保留します。
 
+選択した過去または現在の session は、探索引数の代わりに `--target-skill plugin:skill --session ID` を使います。`--session` は複数指定できます。正確な対象名を指定すれば、呼び出し記録や対象のインストールは不要です。探索の最低件数と上限を適用せず、見つからない ID はエラーにします。1 session は保留、異なる 2 session で提案に昇格できます。入力の隔離には `--project-root` と `--codex-root` を使い、指定しない記録ルートは除外します。facet は別途 `--facets-root` で制限します。
+
 ## Configuration
 
 `main.py` は `--config /path/to/thresholds.json` で部分的な JSON 閾値設定を読み込みます。六つの閾値と意味は [runtime protocol](references/runtime-protocol.md#configuration-meanings) を参照してください。主な引数は次のとおりです。
 
 - `--target-skill-pattern`（既定値 `loom-code:*`）
 - `--top-n`（既定値 `5`）
-- `--max-trajectories-per-skill`（既定値 `5`、派遣数で計算）
+- `--max-trajectories-per-skill`（既定値 `5`、探索時の session 上限）
 - `--project-root`（Claude のプロジェクト記録フォルダーを変更、主にテスト用）
 - `--facets-root`（Claude `/insights` の facet フォルダーを変更、主にテスト用）
 

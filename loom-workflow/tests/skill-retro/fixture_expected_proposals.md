@@ -5,6 +5,20 @@
 
 > Review only. Send approved changes to an independent implementation workflow.
 
+## Source evidence and limitations
+
+### Successful pattern: parallel subagent dispatch — session session-aaa-111
+Source inspection unavailable; historical version unknown.
+
+### Use Read before Edit on existing files — session session-aaa-111
+Source inspection unavailable; historical version unknown.
+
+### Successful pattern: parallel subagent dispatch — session session-bbb-222
+Source inspection unavailable; historical version unknown.
+
+### Add new section: edge-case taxonomy for cross-plugin delegation — session session-bbb-222
+Source inspection unavailable; historical version unknown.
+
 ## Proposed additions
 
 ### Addition 1 [insert into §When to use]

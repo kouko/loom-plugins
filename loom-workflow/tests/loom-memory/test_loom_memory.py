@@ -26,6 +26,8 @@ SCRIPT = SCRIPTS_DIR / "loom_memory.py"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 import loom_memory as lm  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "loom-code/scripts"))
+from prose_pin import affirms  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -671,20 +673,67 @@ def test_created_store_validates_clean(tmp_path):
     assert validate_result.returncode == 0, validate_result.stdout + validate_result.stderr
 
 
-def test_init_refuses_an_existing_nonempty_store(tmp_path):
+@pytest.mark.parametrize("state", ["valid", "corrupt", "legacy"])
+def test_init_refuses_an_existing_nonempty_store(tmp_path, state):
     """A1 negative refuse-existing-nonempty-store: `init` exits non-zero,
     names the offending store, and leaves every existing file byte-identical
     — it writes nothing at all."""
     store = tmp_path / "memory"
     _make_valid_store(store)
+    if state == "corrupt":
+        (store / "index.md").unlink()
+    elif state == "legacy":
+        (store / "index.md").unlink()
+        _write(store, "README.md", "# Legacy store\n\n## Index\n")
     before = {p.name: p.read_bytes() for p in store.iterdir()}
 
+    validation = _run_cli("validate", str(store))
+    assert (validation.returncode == 0) == (state == "valid")
+    assert {p.name: p.read_bytes() for p in store.iterdir()} == before
     result = _run_cli("init", str(store))
 
     assert result.returncode != 0
     assert "Traceback" not in result.stderr
-    assert str(store) in result.stdout + result.stderr
+    if state == "legacy":
+        assert "explicit migration" in result.stdout
+    else:
+        assert str(store) in result.stdout + result.stderr
     assert {p.name: p.read_bytes() for p in store.iterdir()} == before
+
+
+@pytest.mark.parametrize("state", ["absent", "empty-directory"])
+def test_record_initializes_before_index_access_and_completes_first_concept(tmp_path, state):
+    for relative in ("SKILL.md", "references/operations.md"):
+        text = (SCRIPTS_DIR.parent / relative).read_text(encoding="utf-8")
+        record = " ".join(text.split("# Record\n", 1)[1].split("# Reconcile\n", 1)[0].split())
+        rule = ("Initialize", "absent or empty directory", "`init <store>`")
+        example = "Initialize an absent or empty directory with `init <store>`."
+        assert affirms(example, *rule)
+        assert not affirms("Do not " + example, *rule)
+        assert affirms(record, *rule), relative
+        assert record.index("`init <store>`") < record.index("Read `index.md`")
+        assert record.index("Read `index.md`") < record.index("frontmatter")
+        assert "existing populated stores" in record
+        assert "explicit migration" in record
+        assert "validate <store>" in record
+
+    store = tmp_path / "memory"
+    if state == "empty-directory":
+        store.mkdir()
+    result = _run_cli("init", str(store))
+    assert result.returncode == 0, result.stdout + result.stderr
+    readme = (store / "README.md").read_bytes()
+    assert "first-lesson.md" not in (store / "index.md").read_text(encoding="utf-8")
+    concept = _concept("first-lesson", "A durable first lesson.").replace(
+        "The lesson body.", "## Trigger\nOn first use.\n\n## Correct path\nInitialize first.\n\n## Why\nPreserve ordering."
+    )
+    _write(store, "first-lesson.md", concept)
+    for command in ("regenerate-index", "validate"):
+        result = _run_cli(command, str(store))
+        assert result.returncode == 0, result.stdout + result.stderr
+    assert "[first-lesson](first-lesson.md)" in (store / "index.md").read_text(encoding="utf-8")
+    assert (store / "first-lesson.md").read_text(encoding="utf-8") == concept
+    assert (store / "README.md").read_bytes() == readme
 
 
 def test_init_reports_a_legacy_store_as_needing_explicit_migration(tmp_path):

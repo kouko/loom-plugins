@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.15.0] — 2026-10-23 — consistent spec ordering and confirmation handoffs
+
+- `write-spec` preserves confirmed Acceptance order and mapping while applying non-negotiable principles to requirement content and design decisions.
+- Planning handoffs distinguish completed product behaviour confirmation from the engineering exemption at decision point ②.
+
 ## [2.14.0] — 2026-10-07 — write-spec does not re-ask a one-way door already asked at ①
 
 - `write-spec` Step 3, its merge gate, its "what you'll be asked" list and `references/ui-flows.md` state the same exception as `loom-code` 3.38.0: a product one-way door already asked at decision point ① is not asked again at ②.

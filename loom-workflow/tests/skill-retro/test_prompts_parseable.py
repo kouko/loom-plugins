@@ -435,4 +435,46 @@ def test_advisory_paste_ready_requires_input_language_evidence() -> None:
     assert 'only label' in body.lower() and 'paste-ready' in body.lower()
     assert 'exact text to paste into SKILL.md' not in body
     assert 'one-line CLAUDE.md candidate — preserve that file' not in body
-    assert 'You do not have file-system access' in body
+    assert 'source-inspection.md' in body
+    assert 'You do not have file-system access' not in body
+    for path in (FAILURE_PATH, SUCCESS_PATH, ADVISORY_PATH):
+        prompt = path.read_text()
+        assert 'source-inspection.md' in prompt
+        for retired in ('No file system', 'always empty', 'never by a file path',
+                        'resource beyond the three inputs', 'resource beyond the four inputs'):
+            assert retired not in prompt
+
+
+@pytest.mark.parametrize('surface', ['description', 'opening', 'readme', 'failure', 'success'])
+def test_retrospective_scope_accepts_current_snapshots_and_readable_targets(surface):
+    skill = (SKILL_ROOT / 'SKILL.md').read_text()
+    sections = {
+        'description': _split_frontmatter(skill)[0]['description'],
+        'opening': _split_frontmatter(skill)[1].split('## Privacy', 1)[0],
+        'readme': (SKILL_ROOT / 'README.md').read_text().split('## How it works', 1)[0],
+        'failure': FAILURE_PATH.read_text().split('4. **Write structured Memory Items.**', 1)[1].split('## Memory Item schema', 1)[0],
+        'success': SUCCESS_PATH.read_text().split('2. **Success Memory Items**', 1)[1].split('Your analysis', 1)[0],
+    }
+    text = ' '.join(sections[surface].split())
+    assert 'installed skill' not in text and 'installed target skill' not in text
+    if surface in {'description', 'opening', 'readme'}:
+        sentence = text[text.index('Review '):].split('. ', 1)[0]
+        assert re.search(r'Review selected (?:past|completed) or current Claude Code (?:or|and) Codex sessions', sentence)
+        assert not re.search(r'\b(?:not|never|exclude|forbid)\b', sentence, re.I)
+        if surface != 'description':
+            assert 'captured snapshot' in text and 'cutoff' in text
+        assert 'readable target' in text
+    else:
+        def permits_readable_target(prose):
+            for sentence in re.split(r'[.!?]', prose):
+                target = re.search(r'\baddress(?:ed)?\s+(?:in|within)\s+(?:the\s+)?readable\s+target\s+skill\b', sentence, re.I)
+                negated = re.search(r"\b(?:no|not|never|cannot|forbid\w*|prohibit\w*)\b|n't\b", sentence, re.I)
+                if target and not negated:
+                    return True
+            return False
+
+        affirmative = 'Lessons may be addressed within the readable target skill.'
+        assert permits_readable_target(affirmative)
+        assert not permits_readable_target(affirmative.replace('may be', 'must not be'))
+        assert not permits_readable_target(affirmative.replace('may be', 'can never be'))
+        assert permits_readable_target(text)

@@ -72,3 +72,5 @@ class Event:
     facet: "FacetRecord | None" = None  # noqa: F821  forward ref to facets.FacetRecord
     stop_policy_outcome: str | None = None
     stop_policy_reason: str | None = None
+    source_path: str | None = None
+    source_line: int | None = None

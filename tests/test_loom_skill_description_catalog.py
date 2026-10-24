@@ -20,11 +20,11 @@ BASELINE_LEAF_COUNT = 20
 BASELINE_RENDERED_DESCRIPTION_CHARS = 6_746
 DESCRIPTION_BUDGET = 4_047
 # The standalone project retrospective adds 229 characters. The renamed
-# skill retrospective grew by 76 characters to state its plugin integration
-# scope. Keep the 60% limit on the unchanged catalog.
+# skill retrospective grew by 53 characters to state its source and session
+# scope. Keep the 60% limit on the unchanged catalog and its 129-char baseline.
 PROJECT_RETRO_DESCRIPTION_CHARS = 229
-SKILL_RETRO_DESCRIPTION_CHARS = 205
-SKILL_RETRO_DESCRIPTION_DELTA = 76
+SKILL_RETRO_DESCRIPTION_CHARS = 182
+SKILL_RETRO_DESCRIPTION_DELTA = 53
 ROUTER_NAMES = {
     "loom-code": "using-loom-code",
     "loom-design": "using-loom-design",

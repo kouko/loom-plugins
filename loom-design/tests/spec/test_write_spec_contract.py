@@ -30,6 +30,7 @@ import yaml
 
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "loom-code/scripts"))
+from prose_pin import affirms  # noqa: E402
 
 SKILL = REPO / "loom-design/skills/write-spec/SKILL.md"
 CAPTURE_INTENT = REPO / "loom-design/skills/capture-intent/SKILL.md"
@@ -172,6 +173,27 @@ def test_requirement_near_misses_are_not_shown_as_the_form() -> None:
         assert not re.search(near_miss, body), near_miss
 
 
+def test_principles_constrain_content_and_preserve_acceptance_order() -> None:
+    intake = _flat(_section(_text(), "## Step 1 — Intake"))
+    rules = (
+        ("Use", "constrain requirement content", "Design decisions"),
+        ("Preserve", "confirmed Acceptance order", "mapping"),
+    )
+    examples = (
+        "Use non-negotiables to constrain requirement content and Design decisions.",
+        "Preserve confirmed Acceptance order and mapping when applying those constraints.",
+    )
+    for rule, example in zip(rules, examples):
+        assert affirms(example, *rule)
+        assert not affirms("Do not " + example, *rule)
+        assert affirms(intake, *rule), rule
+    assert "They order the Requirements" not in intake
+    assert "non-negotiable comes first" not in intake
+    assert "any design decision that would breach one is not a fork you get to pick" in intake.lower()
+    assert "One requirement per Acceptance line, in that order; do not merge two." in _flat(_text())
+    assert "preserve the exact count, order, and `→ Acceptance #<n>` mapping" in _flat(_text())
+
+
 def test_gate_markers_present() -> None:
     text = _text()
     for gate_id in GATE_IDS:
@@ -266,3 +288,22 @@ def test_plugin_declares_requires_contract() -> None:
         (REPO / "loom-design/.claude-plugin/plugin.json").read_text(encoding="utf-8")
     )
     assert data["requires-contract"] == ">=2.1"
+
+
+def test_handoff_reports_confirmation_according_to_change_kind() -> None:
+    handoff = _flat(_section(_text(), "## Step 4 — Commit, conditionally review, hand off"))
+    for kind, outcome in (
+        ("product", "the user's confirmation"),
+        ("engineering", "the engineering exemption"),
+    ):
+        example = f"For `kind: {kind}`, report {outcome} at decision point ②."
+        rule = ("report", outcome, f"For `kind: {kind}`", "decision point ②")
+        assert affirms(example, *rule)
+        assert not affirms(example.replace("report", "do not report"), *rule)
+        assert affirms(handoff, *rule), kind
+    assert "Say that decision point ② has happened" not in handoff
+    assert "decision point ② is not to be run again" in handoff
+    step3 = _flat(_section(_text(), _STEP3))
+    assert "Engineering changes skip this step entirely: no stop" in step3
+    assert "A product spec does not reach a required review or planning before the user has confirmed its visible behaviour." in step3
+    assert "confirmed-behavior: <date> @<spec sha7>" in step3

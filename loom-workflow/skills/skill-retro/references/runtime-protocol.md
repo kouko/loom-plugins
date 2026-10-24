@@ -7,15 +7,25 @@ privacy, required artifacts, stop conditions, and final verification.
 
 ## Step 2 dispatch
 
+Produce `top.json` through `main.py`: automatic discovery uses
+`--target-skill-pattern`; explicit selection uses `--target-skill plugin:skill
+--session ID` (repeat `--session`). The exact operator target permits review
+without a recorded invocation or local target installation. Selected IDs bypass
+discovery minimum/count caps; missing observable IDs fail. Proposal promotion
+still needs two distinct sessions. For isolated evidence use `--project-root`
+and/or `--codex-root`; once either is supplied, unspecified transcript roots
+are excluded. Use `--facets-root` separately to bound Claude facet lookup.
+The orchestrator supplies any explicit source path in `input.target_skill_path`.
+
 Read `top.json`, then fan out one subagent for every
 `subagent_payload[]` entry. Select
 `agents/prompt-failure-analysis.md` or
 `agents/prompt-success-analysis.md` from the payload `kind`; pass the
-observable session events and the target skill by name (`target_skill`),
-never by a file path; `target_skill_path` and `target_skill_md_content` stay
-empty. If the host cannot provide that skill by name, the subagent analyzes the
-trajectory without it and the summary says so. Sibling dispatches are
-independent because they read disjoint trajectories.
+retained observable session events, `session_snapshot`, `source_inspections`,
+target identity and optional `target_skill_path` / supplied source text.
+Follow [source inspection](source-inspection.md) before diagnosis. Scripts do
+not crawl target sources. Empty legacy values mean unavailable. Capture bounds
+exclude later appended events. Sibling dispatches analyze separate snapshots.
 
 Claude Code uses the dispatch alias `model: "sonnet"`; its tool rejects the
 literal `claude-sonnet-4-6`. Codex has no equivalent per-call Claude alias, so
@@ -48,7 +58,7 @@ Convert each Memory Item block to one JSON entry. The source of truth is
 [{"session_id":"<source session>","target_skill":"<plugin:skill>","target_skill_path":"<SKILL.md>","memory_items":[{"title":"...","description":"...","content":"...","kind":"failure","issue_surface":"skill-instructions","section_anchor":"When to use"},{"title":"...","description":"...","content":"...","kind":"failure","issue_surface":"plugin-integration","integration_subtype":"hook","failure_mechanism":"normalized observed failure","source_pointer":"plugin/hooks/activate.sh"}]}]
 ```
 
-Map `## Title`, `## Description`, and `## Content` directly. Set `kind` from the prompt. Require `issue_surface`. Instruction items need a real SKILL.md `section_anchor`; integration items need a directly related subtype, failure mechanism, and concrete source pointer, with no invented anchor. Missing source becomes a bounded investigation candidate outside `merged.json`. `requires_new_reference_file` is optional and false by default.
+Map `## Title`, `## Description`, and `## Content` directly. Parse `## Source inspections` as a JSON list into each item's `source_inspections`; preserve each record's session/tool/version attribution. Copy the dispatch `session_snapshot` into its result entry. Missing legacy fields default to empty; do not invent evidence. Set `kind` from the prompt. Require `issue_surface`. Instruction items need a real SKILL.md `section_anchor`; integration items need a directly related subtype, failure mechanism, and concrete source pointer, with no invented anchor. Missing source becomes a bounded investigation candidate outside `merged.json`. `requires_new_reference_file` is optional and false by default.
 
 The per-target renderer accepts an exact target path, or a name-routed record whose full `plugin:skill` matches `<plugin>/skills/<skill>/SKILL.md`. A path without that structure cannot use name fallback. Clustering retains target identity. Two distinct sessions promote a cluster, including one requesting a new reference file; a lone observation stays pending with its deferred-file flag visible. Only promoted instruction requests enter the SKILL.md reference-file deferred bucket. Promoted integration requests keep their source pointers and sessions in the integration proposal, with a reference-file caveat. Only instruction items undergo SKILL.md anchor validation.
 
@@ -66,11 +76,11 @@ The per-target renderer accepts an exact target path, or a name-routed record wh
 
 The report is cross-target and independent from `propose.py`.
 Its prose language follows `--lang`; identifiers and commands retain their
-literal syntax. The advisory analyst has only the four payload inputs and no
-target-file access: it labels an edit paste-ready only when `merged_data`
-contains direct source-language evidence and exact target text. Otherwise it
-marks a reviewable `--lang` proposal for implementer adaptation. Source
-snippets already present in the input stay verbatim. The analyst performs semantic clustering;
+literal syntax. The advisory analyst follows [source inspection](source-inspection.md), including
+permitted target reads and per-session version evidence. Paste-ready edits require
+exact target wording and source-language evidence from collected records or
+permitted reads; otherwise mark a `--lang` proposal for implementer adaptation.
+Source snippets already present in the input stay verbatim. The analyst performs semantic clustering;
 there is no heuristic fallback. Historical token-based clustering incorrectly
 merged unrelated items through generic shared tokens, which is why LLM
 judgment is retained here.

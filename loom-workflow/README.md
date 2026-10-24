@@ -2,16 +2,16 @@
 
 Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
-> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, installed-skill retrospective, chat visualizations and reasoning pages, and second opinions.
+> Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.13.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.14.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
 | Before 5.9.0 | From 5.9.0 | Use for |
 |---|---|---|
 | `retro` | `project-retro` | One project development session. |
-| `distill-sessions` | `skill-retro` | Recurring behavior of an installed skill across sessions. |
+| `distill-sessions` | `skill-retro` | Recurring behavior of a readable target skill across selected past or current sessions. |
 
 The old names are no longer callable. Update the installed plugin to 5.9.0 to use the new names. Both skills return proposals for a separate implementation workflow; neither applies changes.
 
@@ -75,7 +75,7 @@ flowchart TD
 
     subgraph sessions["Session work"]
         handoff["loom-workflow:handoff<br/>save state when a session ends,<br/>resume it in the next one"]
-        distill["loom-workflow:skill-retro<br/>mine past sessions<br/>for skill improvements"]
+        distill["loom-workflow:skill-retro<br/>review session snapshots<br/>for skill improvements"]
         retro["loom-workflow:project-retro<br/>review one session for<br/>project improvements"]
     end
 
@@ -114,8 +114,8 @@ flowchart TD
   after `ship`. `loom-memory` records a durable lesson before the branch
   closes, on request or by agent judgment; no station calls it.
 - **Session work** — `handoff` saves state at the end of a session and
-  resumes it in the next. `skill-retro` mines past sessions for skill
-  improvement proposals. `project-retro` reviews the current or one specified session
+  resumes it in the next. `skill-retro` reviews selected past or current session snapshots for recurring
+  skill improvement proposals. `project-retro` reviews the current or one specified session
   for source-backed project improvements; it leaves skill issues as candidates.
 - **Anytime** — `independent-advisor` asks a different executor for a second
   opinion, `loom-visualization` shows comparisons, flows and reasoning as tables or diagrams (or a reasoning page),
@@ -136,7 +136,7 @@ Thirteen skills: twelve tools and one optional router.
 | [`dbt-model-style`](skills/dbt-model-style/) | Apply dbt + Redshift model style and structure (CTE roles, a zero-logic final CTE, naming, comments) when writing, editing or reviewing a model; calculation logic is out of scope. |
 | [`git-memory`](skills/git-memory/) | Classify Decision, Learning and Gotcha memory before every `git commit`, `gh pr create` and `gh pr merge`; recall why a past Git decision was made. |
 | [`handoff`](skills/handoff/) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
-| [`skill-retro`](skills/skill-retro/) | Review multiple Claude Code and Codex sessions for recurring issues in an installed skill's instructions or related plugin integration; return source-linked proposals without applying changes. |
+| [`skill-retro`](skills/skill-retro/) | Review selected past or current Claude Code and Codex session snapshots against readable target skill sources or related plugin integration; return source-linked proposals without applying changes. Current snapshots exclude events after capture; source paths need no local installation. Two distinct sessions promote a proposal; one remains pending. |
 | [`project-retro`](skills/project-retro/) | On request, review the current or one specified coding session for source-backed project development improvements. Report possible skill issues separately as candidates; do not edit files. |
 | [`independent-advisor`](skills/independent-advisor/) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
 | [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |

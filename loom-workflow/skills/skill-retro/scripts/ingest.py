@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import fnmatch
 import json
+import os
 import re
 from collections.abc import Iterator
 from pathlib import Path
@@ -294,8 +295,13 @@ def ingest_claude_jsonl(
             continue
         is_subagent = "/subagents/" in path.as_posix()
         try:
-            with path.open("r", encoding="utf-8") as f:
-                for line in f:
+            with path.open("r", encoding="utf-8", newline="") as f:
+                captured_size = os.fstat(f.fileno()).st_size
+                consumed = 0
+                for line_number, line in enumerate(f, 1):
+                    consumed += len(line.encode("utf-8"))
+                    if consumed > captured_size:
+                        break
                     line = line.strip()
                     if not line:
                         continue
@@ -308,6 +314,8 @@ def ingest_claude_jsonl(
                         continue
                     event = _record_to_event(record, is_subagent)
                     if event is not None:
+                        event.source_path = str(path.resolve())
+                        event.source_line = line_number
                         yield event
         except OSError:
             # Permission / IO error on one file shouldn't kill the
@@ -392,8 +400,13 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
         session = path.stem
         tool_names: dict[str, str] = {}
         try:
-            with path.open("r", encoding="utf-8") as f:
-                for line in f:
+            with path.open("r", encoding="utf-8", newline="") as f:
+                captured_size = os.fstat(f.fileno()).st_size
+                consumed = 0
+                for line_number, line in enumerate(f, 1):
+                    consumed += len(line.encode("utf-8"))
+                    if consumed > captured_size:
+                        break
                     try:
                         record = json.loads(line)
                     except json.JSONDecodeError:
@@ -418,6 +431,7 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                         )
                         yield Event(
                             agent=_CODEX_AGENT_LITERAL,
+                            source_path=str(path.resolve()), source_line=line_number,
                             session=session,
                             ts=timestamp,
                             role=role,
@@ -434,6 +448,7 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                         text = arguments if isinstance(arguments, str) else ""
                         yield Event(
                             agent=_CODEX_AGENT_LITERAL,
+                            source_path=str(path.resolve()), source_line=line_number,
                             session=session,
                             ts=timestamp,
                             role="tool",
@@ -446,6 +461,7 @@ def ingest_codex_jsonl(root: Path | None = None) -> Iterator[Event]:
                         text = _codex_observable_text(payload.get("output"))
                         yield Event(
                             agent=_CODEX_AGENT_LITERAL,
+                            source_path=str(path.resolve()), source_line=line_number,
                             session=session,
                             ts=timestamp,
                             role="tool",

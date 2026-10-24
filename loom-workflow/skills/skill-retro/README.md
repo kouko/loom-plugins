@@ -2,7 +2,7 @@
 
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
-Review completed Claude Code and Codex sessions for recurring problems in an installed skill. Proposals can address its instructions or directly related plugin registration, loading, hooks, bundled scripts, and dependent connectors. This skill produces review artifacts; an independent implementation workflow makes any chosen change.
+Review selected past or current Claude Code and Codex sessions for recurring problems in a readable target skill. Current-session analysis uses only the captured snapshot through its capture cutoff, excluding later appended events. An explicit readable target source path works without installation in the reviewing host. Proposals can address its instructions or directly related plugin registration, loading, hooks, bundled scripts, and dependent connectors. This skill produces review artifacts; an independent implementation workflow makes any chosen change.
 
 The old callable name `distill-sessions` was replaced by `skill-retro`. The operational contract is in [SKILL.md](SKILL.md).
 
@@ -51,13 +51,15 @@ python3 loom-workflow/skills/skill-retro/scripts/propose.py \
 
 `propose.py` reads the target SKILL.md and writes only `proposals.md`. A missing integration source stays an investigation candidate outside `merged.json`; a single-session item remains pending.
 
+For selected sessions, replace the discovery flag with `--target-skill plugin:skill --session ID` and repeat `--session` as needed. This exact operator target permits sessions without a recorded invocation and does not require target installation. Selection bypasses discovery minimum/count caps; absent IDs fail. One session still produces pending observations; two distinct sessions may promote a proposal. For isolated inputs supply `--project-root` and/or `--codex-root`; unspecified transcript roots are then excluded. Use `--facets-root` to bound facet lookup separately.
+
 ## Configuration
 
 `main.py` accepts a partial JSON threshold file with `--config /path/to/thresholds.json`. The six supported thresholds and their meanings are in the [runtime protocol](references/runtime-protocol.md#configuration-meanings). The common command flags are:
 
 - `--target-skill-pattern` (default `loom-code:*`)
 - `--top-n` (default `5`)
-- `--max-trajectories-per-skill` (default `5`, counting dispatches)
+- `--max-trajectories-per-skill` (default `5`, discovery session cap)
 - `--project-root` (override the Claude project log root, mainly for tests)
 - `--facets-root` (override the Claude `/insights` facet root, mainly for tests)
 
