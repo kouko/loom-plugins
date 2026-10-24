@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""PostToolUse hook (Write|Edit): remind the agent to classify a host memory note.
+"""PostToolUse hook (Write|Edit|Bash): remind the agent to classify a host memory note.
 
 A host memory note is a `.md` file directly inside `<config>/projects/<slug>/memory/`
 (config = $CLAUDE_CONFIG_DIR, plus any `.claude` directory). The index
-`MEMORY.md` is silent. Path-only: the note's content is never read.
+`MEMORY.md` is silent. A Bash command counts when one of its whitespace- or
+shell-punctuation-separated tokens is such a path; a write through a variable
+or a script file is not seen. Path-only: the note's content is never read.
 Anything else, or any error, prints nothing. Always exits 0. Stdlib only.
 """
 
 import json
 import os
+import re
 import sys
 
 REMINDER = (
@@ -44,8 +47,13 @@ def is_memory_note(path):
 def main():
     try:
         data = json.loads(sys.stdin.read())
-        path = data["tool_input"]["file_path"]
-        if isinstance(path, str) and is_memory_note(path):
+        tool_input = data["tool_input"]
+        command = tool_input.get("command")
+        if isinstance(command, str):
+            paths = [os.path.expanduser(t) for t in re.split(r"[\s;&|<>()'\"]+", command)]
+        else:
+            paths = [tool_input["file_path"]]
+        if any(isinstance(p, str) and is_memory_note(p) for p in paths):
             out = {"hookSpecificOutput": {"hookEventName": "PostToolUse",
                                           "additionalContext": REMINDER}}
             sys.stdout.write(json.dumps(out) + "\n")
