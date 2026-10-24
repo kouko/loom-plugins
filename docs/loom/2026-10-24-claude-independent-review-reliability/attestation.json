@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-24-claude-independent-review-reliability",
-  "content_digest": "fcda679aed9282d943c3bde6db43811f6c0002e4",
+  "content_digest": "05e8a929c9d3cd9ce916d1d66bb03f45d10479b6",
   "executions": [
     {
       "kind": "package-tests",
@@ -16,60 +16,67 @@
       "artifact": "loom-code/tests/test_adversarial_claude_probe_model_key_privacy.py",
       "result": "pass",
       "command_digest": "595b01404883476d756ec443598cec678ae999803bbbd2ef2aa525a7bb629cb2"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_duplicate_outside_verdict.py",
+      "artifact": "loom-code/tests/test_adversarial_duplicate_outside_verdict.py",
+      "result": "pass",
+      "command_digest": "6ddd44fa0101d5b39dc542c05d4f567ff13ffaf87a942ea2e74f01c85486b25f"
     }
   ],
   "verdicts": [
     {
-      "reviewer": "live-code-3",
+      "reviewer": "pr114-code-revision",
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "code",
-      "reviewed_sha": "b1b8cd77ef0c3d245641ace6330795a4abbb77bb",
-      "review_target_sha": "d9642b5e96eea68009651fb1cf0ad2d194e3921d",
-      "verdict": "PASS",
+      "reviewed_sha": "4c7a83b8448b1538a4a3ccae934485f63e9d5a49",
+      "review_target_sha": "809fba35872b991fff0568beccdef46c6b217ee4",
+      "verdict": "PASS_WITH_NOTES",
       "dimension_scores": {
-        "security": "PASS",
+        "security": "PASS_WITH_NOTES",
         "architecture": "PASS",
-        "correctness": "PASS",
+        "correctness": "PASS_WITH_NOTES",
         "naming": "PASS",
         "tests": "PASS",
         "refactoring": "PASS",
         "cross-task-coherence": "PASS",
         "external-surface-grounding": "PASS",
         "principles-conformance": "PASS",
-        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md exists",
         "deliberate-simplification": "PASS",
         "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "The live attempt reached review but failed with HTTP 429; the acceptance report correctly leaves full completion and model attribution unverified.",
-        "All five changed test files ran with host pytest: 176 passed. The locked uv run could not fetch dependencies in this sandbox.",
-        "The Claude CLI flags were checked against the official CLI reference; no repository files were edited."
+        "The fix delta changes disclosure and evidence wording only; no code or test changes.",
+        "Full-size Opus/high review and live read boundary remain unverified after HTTP 429.",
+        "Historical consent record lacks the exact cost disclosure shown before that run."
       ]
     },
     {
-      "reviewer": "live-skill-3",
+      "reviewer": "pr114-skill-revision",
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "skill",
-      "reviewed_sha": "b1b8cd77ef0c3d245641ace6330795a4abbb77bb",
-      "review_target_sha": "d9642b5e96eea68009651fb1cf0ad2d194e3921d",
-      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "4c7a83b8448b1538a4a3ccae934485f63e9d5a49",
+      "review_target_sha": "809fba35872b991fff0568beccdef46c6b217ee4",
+      "verdict": "PASS",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
         "inconsistency": "PASS",
-        "incorrect-fact": "PASS_WITH_NOTES",
+        "incorrect-fact": "PASS",
         "missing-population": "PASS",
         "user-judgment-leak": "PASS",
         "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "The report correctly marks full-size completion unverified and the read-boundary result partial. It records the .claude.json hash change without attributing its cause or claiming global state was unchanged.",
-        "The runner flags match the skill stated Claude profile and the official CLI contract: https://code.claude.com/docs/en/cli-reference",
-        "The private host logs, baseline hashes, and runner JSON were unavailable to this reviewer, so their reported observations could not be independently replayed. The package suite was reported passed by the orchestrator; this reviewer did not rerun it."
+        "The prior budget-disclosure finding is fixed: the skill requires estimate and possible overrun disclosure before authorization.",
+        "Spec, plan, changelog, and acceptance report use qualified wording.",
+        "Full-size Opus/high completion remains unverified."
       ]
     }
   ],
