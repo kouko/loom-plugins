@@ -15,7 +15,7 @@ charter: 1.1
 ### Wave 2 — Release metadata
 
 **W2-01 Synchronize release metadata**  after: W1-01  acceptance: 1, 2, 3, 4
-- Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/README.md`, `README.md`, `loom-code/tests/test_write_plan_station_text.py`
+- Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/.codex-plugin/plugin.json`, `loom-code/plugin.json`, `loom-code/package.json`, `loom-code/CHANGELOG.md`, `loom-code/README*.md`, `README.md`, `loom-code/tests/test_write_plan_station_text.py`
 - Test: A1 positive: released_runner; boundary: version_sync. A2 positive: documented_boundary; negative: stale_disclosure. A3 positive: documented_failure; negative: raw_content. A4 positive: release_tests; negative: unsynced_manifest.
 - Risk: agent-decided — apply a minor bump for the changed runtime contract after implementation so closing-review attests the final release content.
 
