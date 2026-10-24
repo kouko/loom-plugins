@@ -24,6 +24,11 @@ Wave 2 — release.
 - Test: A8 positive: release-metadata-synchronized; boundary: derived-manifests-match-ssot.
 - Risk: minor bump 5.14.0 to 5.15.0 (new hook); derive via sync_codex_manifests.py --all, never hand-edit derived files. Bump before finalize-review.
 
+**W2-03 register the new hook mechanism and record its budget exception**  after: W1-02  acceptance: 8
+- Files: docs/loom/evidence/mechanisms.yaml, loom-workflow/CHANGELOG.md, loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, loom-code/CHANGELOG.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md, README.md, loom-code/tests/test_write_plan_station_text.py
+- Test: A8 positive: real-repo-mechanism-checks-green; boundary: net-count-rise-needs-budget-exception (CI form `check_mechanisms.py --baseline origin/main`).
+- Risk: added after the end-of-Build suite found R1 (hook unregistered). CI's R3 reads loom-code's CHANGELOG at loom-code's version, so the budget-exception line rides a loom-code patch bump 3.48.2 to 3.48.3, following the precedent of a sibling plugin's mechanism recorded in loom-code's CHANGELOG; agent-decided.
+
 ## Simplicity check
 - merge orphan removal into the hook task (one task and one dependency fewer) — taken
 
