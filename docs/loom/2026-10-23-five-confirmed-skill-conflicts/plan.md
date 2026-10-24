@@ -44,7 +44,6 @@ charter: 1.1
 ① — what — 確認以上就是你要的五筆修正，我就開始；這不包含發布或合併。
 
 ## Risks
-- user-decided — second-vendor selection-confirmed: claude
 1. Source access changes consumed contracts. Preserve optional legacy defaults and evidence attribution; a readable current file never proves historical loading. Synthetic fixtures establish transport and instructed behavior, not every live host's execution.
 2. Current-session scope is the captured event snapshot. The runtime must not silently ingest appended events or internal reasoning; missing locators remain disclosed limitations.
 3. Agent-decided — no new vendor or live user-session dispatch; source categories remain subject to existing approval. Publication and merge are excluded by the confirmed intent.
