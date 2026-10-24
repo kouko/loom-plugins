@@ -52,7 +52,15 @@ outcome — step 1 is where that is decided, one candidate at a time.
    - a verification or test-run record,
    - a decision whose relevance is bound to one commit or PR (`git-memory`
      owns that), or
-   - a personal preference unrelated to the repository.
+   - a personal preference unrelated to the repository,
+   - a fact true only on one machine (local paths, local environments,
+     installed tool versions), or
+   - behavior of one agent host or tool unrelated to the repository.
+
+   Then apply the repo-wide test: would this still hold and help another
+   contributor who clones this repository on a different machine with
+   different tools? A candidate that fails it stays only in host memory;
+   say why it was not recorded.
 2. Inspect the target store before index access or concept writes.
    Initialize an absent or empty directory with `init <store>` using
    `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py`;
