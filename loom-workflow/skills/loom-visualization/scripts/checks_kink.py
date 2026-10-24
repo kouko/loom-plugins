@@ -133,4 +133,47 @@ def find_issues(lines: list[str]) -> list[tuple[int, int, str]]:
                     )
                 )
 
+    # Unboxed task joins use a trailing -+, a | trunk, then -+-->.
+    # Check that specific three-line shape without treating prose pipes or
+    # unrelated ASCII plus signs as connector seams.
+    for idx in range(len(lines) - 2):
+        upper, middle, lower = (line.rstrip() for line in lines[idx:idx + 3])
+        join_at = lower.rfind("-+")
+        if not (
+            upper.endswith("-+")
+            and middle.endswith("|")
+            and middle.count("|") >= 2
+            and join_at >= 0
+            and lower[join_at + 2:join_at + 3] == "-"
+        ):
+            continue
+        cols = (
+            display_width(upper[:-1]),
+            display_width(middle[:-1]),
+            display_width(lower[:join_at + 1]),
+        )
+        if len(set(cols)) != 1:
+            issues.append(
+                (idx + 2, cols[1], f"seam kink: unboxed join drifts across cols {cols}")
+            )
+
+    # Owned-work handoffs use a bare |, a labelled |, and a bare v.
+    for idx in range(len(lines) - 2):
+        upper, middle, lower = lines[idx:idx + 3]
+        if not (
+            upper.strip() == "|"
+            and middle.lstrip().startswith("| handoff:")
+            and lower.strip() == "v"
+        ):
+            continue
+        cols = (
+            display_width(upper[:upper.index("|")]),
+            display_width(middle[:middle.index("|")]),
+            display_width(lower[:lower.index("v")]),
+        )
+        if len(set(cols)) != 1:
+            issues.append(
+                (idx + 3, cols[2], f"seam kink: unboxed handoff drifts across cols {cols}")
+            )
+
     return issues
