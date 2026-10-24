@@ -19,7 +19,7 @@ REMINDER = (
     "committed. Classify it with loom-workflow:loom-memory's Record "
     "classification: a lesson that holds for any contributor cloning this "
     "repository on another machine with other tools goes to the repo's "
-    "committed store via loom-memory; personal, machine-specific or "
+    "committed store (`docs/loom/memory/`) via loom-memory; personal, machine-specific or "
     "agent-tool-specific notes stay only in host memory. Zero to one durable "
     "lesson per change is normal. If this branch's closing review already "
     "generated its attestation (finalize-review ran), do not write the repo "

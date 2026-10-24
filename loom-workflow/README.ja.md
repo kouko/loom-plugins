@@ -153,7 +153,8 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  ガバナンス、監査、テレメトリ、設計メモ
 ├── hooks/
-│   ├── hooks.json         UserPromptSubmit のカードと Write/Edit 後の skill フォルダ構成チェック
+│   ├── hooks.json         UserPromptSubmit のカードと Write/Edit 後の skill フォルダ構成チェック、host memory リマインダー
+│   ├── memory-mirror-reminder PostToolUse の host memory ノートを loom-memory で分類させるリマインダー
 │   └── visualization-card loom-visualization の UserPromptSubmit visualization card
 ├── scripts/               plugin レベルのテストと構成チェック
 ├── skills/

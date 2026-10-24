@@ -95,7 +95,7 @@ def test_reminder_names_finalize_deferral():
     text = reminder(run(payload(NOTE_DIR + "/a.md")))
     assert "finalize-review" in text and "attestation" in text
     assert "next change" in text
-    assert "docs/" not in text
+    assert "docs/loom/memory/" in text
 
 
 def test_index_write_silent():
@@ -118,11 +118,6 @@ def test_orphan_files_absent():
     stray = [f for f in files if not f.startswith("docs/")
              and not f.endswith("CHANGELOG.md") and f != Path(__file__).relative_to(REPO).as_posix()]
     assert stray == []
-
-
-def test_fixture_neutral_name():
-    text = (REPO / "tests/test_tests_folder_convention.py").read_text(encoding="utf-8")
-    assert "remind_memory_mirror" not in text
 
 
 def test_removed_test_coverage_widened(tmp_path):

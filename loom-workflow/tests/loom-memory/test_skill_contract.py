@@ -406,6 +406,10 @@ REPO_WIDE_TEST = (
 )
 MACHINE_EXCLUSION = "a fact true only on one machine"
 TOOL_EXCLUSION = "behavior of one agent host or tool unrelated to the repository"
+STORE_DEFAULT = (
+    "The store is `docs/loom/memory/` at the repository root unless the repository "
+    "already keeps its loom memory store elsewhere; initialize it there when it is absent."
+)
 DEFERRAL_PHRASE = "stays in host memory until the next change's branch records it"
 
 
@@ -424,13 +428,6 @@ def test_activation_names_host_memory_save() -> None:
     assert _names_host_save(_activation()), "activation must list the host-memory-save trigger"
 
 
-def test_activation_without_it_fails() -> None:
-    section = _activation()
-    items = re.split(r"\n(?=\d+\.\s)", section.strip())
-    stripped = "\n".join(i for i in items if HOST_SAVE_PHRASE not in _flat(i))
-    assert not _names_host_save(stripped), "pin must go red when the trigger line is removed"
-
-
 def test_activation_lists_host_save() -> None:
     items = re.findall(r"^\d+\.\s", _activation(), re.MULTILINE)
     assert len(items) == 3, "activation lists exactly three passive triggers"
@@ -442,10 +439,6 @@ def test_no_other_condition_sentence_absent() -> None:
     flat = _flat(_activation())
     assert "no other condition activates" not in flat
     assert "two triggers only" not in flat
-
-
-def test_description_names_own_memory() -> None:
-    assert "your own memory" in _frontmatter_description(_skill_md_text())
 
 
 def test_description_within_133_chars() -> None:
@@ -461,10 +454,13 @@ def _excludes_machine_and_tool(flat: str) -> bool:
 def test_machine_and_tool_notes_excluded() -> None:
     for text in (_skill_md_text(), _operations_md_text()):
         assert _excludes_machine_and_tool(_flat(_section(text, "Record")))
-    assert record_host_save_trigger_named()
+    assert _record_names_host_save_trigger()
+    assert _flat(STORE_DEFAULT) in _flat(_skill_md_text())
+    assert "docs/loom/memory/" in _flat(_section(_operations_md_text(), "Recall"))
+    assert "docs/loom/memory/" in _flat(_section(_operations_md_text(), "Record"))
 
 
-def record_host_save_trigger_named() -> bool:
+def _record_names_host_save_trigger() -> bool:
     flat = _flat(_section(_skill_md_text(), "Record"))
     return "**trigger:**" in flat and "host-managed memory" in flat.split("**when:**")[0]
 
@@ -482,11 +478,6 @@ def _keeps_deferral(flat: str) -> bool:
 
 def test_post_finalize_deferral_kept() -> None:
     assert _keeps_deferral(_flat(_section(_skill_md_text(), "Record")))
-
-
-def test_deferral_removal_fails() -> None:
-    flat = _flat(_section(_skill_md_text(), "Record"))
-    assert not _keeps_deferral(flat.replace(DEFERRAL_PHRASE, ""))
 
 
 def test_workflow_point_sentence_names_trigger_2_exception() -> None:

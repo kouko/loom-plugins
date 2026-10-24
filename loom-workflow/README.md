@@ -156,7 +156,8 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  governance, audit, telemetry and design notes
 ├── hooks/
-│   ├── hooks.json         UserPromptSubmit card and skill folder structure check after Write/Edit
+│   ├── hooks.json         UserPromptSubmit card, skill folder structure check after Write/Edit and host memory reminder
+│   ├── memory-mirror-reminder PostToolUse reminder to classify host memory notes via loom-memory
 │   └── visualization-card UserPromptSubmit visualization card for loom-visualization
 ├── scripts/               plugin-level tests and the structure check
 ├── skills/

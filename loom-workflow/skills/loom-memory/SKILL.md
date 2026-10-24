@@ -9,7 +9,9 @@ description: |
 `loom-memory` is the one public surface over an OKF v0.2-compatible
 repository memory store: a directory of Markdown concept files plus a
 generated `index.md`, holding durable repository lessons that outlive any
-single change. It exposes four operations — **Recall**, **Record**,
+single change. The store is `docs/loom/memory/` at the repository root unless
+the repository already keeps its loom memory store elsewhere; initialize it
+there when it is absent. It exposes four operations — **Recall**, **Record**,
 **Reconcile**, **Retire** — and nothing else. Validation and index
 generation are implemented in
 `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` (the

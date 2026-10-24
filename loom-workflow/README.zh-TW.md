@@ -145,7 +145,8 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  治理、稽核、遙測與設計筆記
 ├── hooks/
-│   ├── hooks.json         UserPromptSubmit 卡片，以及 Write/Edit 後檢查 skill 資料夾結構
+│   ├── hooks.json         UserPromptSubmit 卡片，以及 Write/Edit 後檢查 skill 資料夾結構，以及 host memory 提醒
+│   ├── memory-mirror-reminder PostToolUse 提醒用 loom-memory 分類 host memory 筆記
 │   └── visualization-card loom-visualization 的 UserPromptSubmit visualization card
 ├── scripts/               plugin 層級測試與結構檢查
 ├── skills/

@@ -36,5 +36,17 @@ guaranteed rate.
 
 ## Results
 
-Pending. The run is performed at acceptance testing, and its counts for
-OLD against NEW are recorded here then.
+### Reference run — 2026-10-24
+
+Commit 5199797f, model opus, 3 trials per case per version. Counts are
+samples, not rates. Full table and event order are in the acceptance
+test evidence of the loom-memory trigger mechanism change.
+
+| Case | Version | loom-memory fired | Repo store changed | Hook reminder seen |
+|---|---|---|---|---|
+| 1 repo-wide | old | 3/3 | 3/3 | 0/3 (no hook) |
+| 1 repo-wide | new | 3/3 | 3/3 | 3/3 |
+| 2 personal preference | old | 0/3 | 0/3 | 0/3 |
+| 2 personal preference | new | 1/3 | 0/3 | 3/3 |
+| 3 machine-specific | old | 0/3 | 0/3 | 0/3 |
+| 3 machine-specific | new | 3/3 | 0/3 | 3/3 |
