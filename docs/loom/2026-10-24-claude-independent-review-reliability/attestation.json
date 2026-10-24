@@ -1,0 +1,76 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-24-claude-independent-review-reliability",
+  "content_digest": "78c20ce68e4ba6b8de8fa2f9dad76ef88aff20b1",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_claude_probe_model_key_privacy.py",
+      "artifact": "loom-code/tests/test_adversarial_claude_probe_model_key_privacy.py",
+      "result": "pass",
+      "command_digest": "595b01404883476d756ec443598cec678ae999803bbbd2ef2aa525a7bb629cb2"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "closing-code-1",
+      "vendor": "openai",
+      "model": "host-inherited-unverified",
+      "lens": "code",
+      "reviewed_sha": "b1b8cd77ef0c3d245641ace6330795a4abbb77bb",
+      "review_target_sha": "78bab917677198ea8cf12f366cc39529b5cca7e9",
+      "verdict": "PASS",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The retry authorization and CLI citation findings were fixed.",
+        "Full-size live completion and file access remain unverified after host approval rejection."
+      ]
+    },
+    {
+      "reviewer": "closing-skill-2",
+      "vendor": "openai",
+      "model": "host-inherited-unverified",
+      "lens": "skill",
+      "reviewed_sha": "b1b8cd77ef0c3d245641ace6330795a4abbb77bb",
+      "review_target_sha": "78bab917677198ea8cf12f366cc39529b5cca7e9",
+      "verdict": "PASS",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The owner retry clauses now require fresh authorization and preflight.",
+        "A1 is unverified and A2 is partly verified in the acceptance report."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
