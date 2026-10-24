@@ -45,6 +45,11 @@ charter: 1.1
 - Test: A5 positive: whole_yaml_fence_and_unlabeled_text; boundary: raw_digest_preserved. A5 negative: trailing_prose, missing_or_blank_anchor, zero_line, absent_required_field, weak_dimension_score, contradictory_overall_verdict.
 - Risk: agent-decided — use one bounded normalization at the owning receipt parser; leave semantic fields untouched and reject ambiguous repairs. Keep the already published 3.49.0 minor version, updating its pending changelog entry before renewed finalization.
 
+**W5-02 Graduate the duplicate-key adversarial regression**  after: W5-01  acceptance: 5
+- Files: `docs/loom/2026-10-24-claude-independent-review-reliability/evidence/probes/test_receipt_duplicate_verdict_rejected.py`, `loom-code/tests/test_adversarial_duplicate_outside_verdict.py`
+- Test: A5 positive: duplicate_verdict_rejected; boundary: nested_duplicate_score_rejected.
+- Risk: agent-decided — move the earned red probe into the normal package suite so future changes cannot silently restore last-key-wins parsing.
+
 ## Simplicity check
 
 - Keep the Claude contract and runner in one task — taken
