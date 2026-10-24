@@ -164,7 +164,7 @@ def test_old_test_path_in_a_document_is_detected() -> None:
         "# scripts/test_state_anchor_carrier_inventory.py scans loom-*/",
         "see loom-code/scripts/test_check_mechanisms.py",
         "loom-code/skills/build/probes/test_recovery_rules.py",
-        ".claude/hooks/test_remind_memory_mirror.py",
+        ".claude/hooks/test_sample_reminder_hook.py",
     ):
         assert OLD_TEST_PATH.search(text), text
     assert not OLD_TEST_PATH.search("tests/test_state_anchor_carrier_inventory.py")

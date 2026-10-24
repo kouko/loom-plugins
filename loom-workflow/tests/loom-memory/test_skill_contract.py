@@ -288,7 +288,7 @@ def _flat(text: str) -> str:
 # sha256 of the whitespace-flattened Record section of SKILL.md. Its only job
 # is to go red when that section changes at all, so the dilution guard cannot
 # fall silently out of date behind a literal pin that still passes.
-RECORD_SECTION_DIGEST = "3989c38a227035558eba3dc89f2c55e6d57508b4f39ee73ed9315f41e7411fba"
+RECORD_SECTION_DIGEST = "61f3c8afb88c689d153250e699c1fbab2be18b5f532bc17d173abb869afafa14"
 
 
 def test_backlog_entry_routing_sentence_rejected() -> None:
@@ -388,3 +388,100 @@ def test_retire_approval_requirement_unchanged() -> None:
         "the Retire section must keep requiring explicit user approval "
         "before deleting anything"
     )
+
+
+# ---------------------------------------------------------------------------
+# Host-memory trigger: loom-memory fires when the agent is about to save a
+# lesson to its own host-managed memory, and Record keeps only repo-wide ones.
+# ---------------------------------------------------------------------------
+
+NEW_DESCRIPTION = (
+    "Record repo-wide lessons when saving to your own memory or asked to "
+    "remember; recall, reconcile, or forget them when a task needs it."
+)
+HOST_SAVE_PHRASE = "about to save a lesson to its own host-managed memory"
+REPO_WIDE_TEST = (
+    "would this still hold and help another contributor who clones this "
+    "repository on a different machine with different tools?"
+)
+MACHINE_EXCLUSION = "a fact true only on one machine"
+TOOL_EXCLUSION = "behavior of one agent host or tool unrelated to the repository"
+STORE_DEFAULT = (
+    "The store is `docs/loom/memory/` at the repository root unless the repository "
+    "already keeps its loom memory store elsewhere; initialize it there when it is absent."
+)
+DEFERRAL_PHRASE = "stays in host memory until the next change's branch records it"
+
+
+def _activation() -> str:
+    return _section(_skill_md_text(), "When this skill activates")
+
+
+def _names_host_save(section: str) -> bool:
+    return any(
+        re.match(r"^\d+\.\s", item) and HOST_SAVE_PHRASE in _flat(item)
+        for item in re.split(r"\n(?=\d+\.\s)", section.strip())
+    )
+
+
+def test_activation_names_host_memory_save() -> None:
+    assert _names_host_save(_activation()), "activation must list the host-memory-save trigger"
+
+
+def test_activation_lists_host_save() -> None:
+    items = re.findall(r"^\d+\.\s", _activation(), re.MULTILINE)
+    assert len(items) == 3, "activation lists exactly three passive triggers"
+    flat = _flat(_activation())
+    assert "explicit user request" in flat and "independent agent judgement" in flat
+
+
+def test_no_other_condition_sentence_absent() -> None:
+    flat = _flat(_activation())
+    assert "no other condition activates" not in flat
+    assert "two triggers only" not in flat
+
+
+def test_description_within_133_chars() -> None:
+    assert '\ndescription: |\n' in _skill_md_text()
+    desc = _frontmatter_description(_skill_md_text())
+    assert desc == NEW_DESCRIPTION and len(desc) <= 133
+
+
+def _excludes_machine_and_tool(flat: str) -> bool:
+    return MACHINE_EXCLUSION in flat and TOOL_EXCLUSION in flat and "only in host memory" in flat
+
+
+def test_machine_and_tool_notes_excluded() -> None:
+    for text in (_skill_md_text(), _operations_md_text()):
+        assert _excludes_machine_and_tool(_flat(_section(text, "Record")))
+    assert _record_names_host_save_trigger()
+    assert _flat(STORE_DEFAULT) in _flat(_skill_md_text())
+    assert "docs/loom/memory/" in _flat(_section(_operations_md_text(), "Recall"))
+    assert "docs/loom/memory/" in _flat(_section(_operations_md_text(), "Record"))
+
+
+def _record_names_host_save_trigger() -> bool:
+    flat = _flat(_section(_skill_md_text(), "Record"))
+    return "**trigger:**" in flat and "host-managed memory" in flat.split("**when:**")[0]
+
+
+def test_repo_wide_lesson_kept() -> None:
+    for text in (_skill_md_text(), _operations_md_text()):
+        flat = _flat(_section(text, "Record"))
+        assert REPO_WIDE_TEST in flat, "Record must keep a repo-wide lesson via the clone test"
+        assert "zero to one" in flat and "durable lesson per change" in flat
+
+
+def _keeps_deferral(flat: str) -> bool:
+    return "rides the next change's branch batched" in flat and DEFERRAL_PHRASE in flat
+
+
+def test_post_finalize_deferral_kept() -> None:
+    assert _keeps_deferral(_flat(_section(_skill_md_text(), "Record")))
+
+
+def test_workflow_point_sentence_names_trigger_2_exception() -> None:
+    section = " ".join(_section(_skill_md_text(), "When this skill activates").split())
+    match = re.search(r"[^.]*reaching any particular point in a workflow[^.]*\.", section, re.IGNORECASE)
+    assert match, "activation section must keep the workflow-point sentence"
+    assert "trigger 2" in match.group(0), "workflow-point sentence must exempt the host memory save (trigger 2)"

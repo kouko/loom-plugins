@@ -8,7 +8,8 @@ Code; on any other host it is the directory three levels above this file
 
 ## Recall
 
-1. Locate the store. Its absence is a normal no-memory result — report it
+1. Locate the store: `docs/loom/memory/` at the repository root unless the
+   repository already keeps its loom memory store elsewhere. Its absence is a normal no-memory result — report it
    and move on; never treat a missing store as an error to fix.
 2. If the store exists but has concept files with no `index.md`, that is
    structural corruption, not a normal miss. Stop, name it explicitly, and
@@ -51,9 +52,18 @@ outcome — step 1 is where that is decided, one candidate at a time.
    - a narrative of what changed in this session,
    - a verification or test-run record,
    - a decision whose relevance is bound to one commit or PR (`git-memory`
-     owns that), or
-   - a personal preference unrelated to the repository.
-2. Inspect the target store before index access or concept writes.
+     owns that),
+   - a personal preference unrelated to the repository,
+   - a fact true only on one machine (local paths, local environments,
+     installed tool versions), or
+   - behavior of one agent host or tool unrelated to the repository.
+
+   Then apply the repo-wide test: would this still hold and help another
+   contributor who clones this repository on a different machine with
+   different tools? A candidate that fails it stays only in host memory;
+   say why it was not recorded.
+2. Inspect the target store (default `docs/loom/memory/` at the repository
+   root unless the repository already keeps its store elsewhere) before index access or concept writes.
    Initialize an absent or empty directory with `init <store>` using
    `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py`;
    this creates `README.md` and `index.md` from the bundled templates.

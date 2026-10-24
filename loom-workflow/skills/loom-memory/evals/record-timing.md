@@ -35,7 +35,53 @@ re-running the eval is the single move that defeats the guard, and it
 costs less than the dispatch it skips — which is exactly why it is worth
 saying out loud here.
 
-## Reference run — 2026-10-23 (fifth, current)
+## Reference run — 2026-10-24 (sixth, current)
+
+**Result: timing, exception, and scarcity PASS on both texts. Both readers
+gave identical final verdicts; neither matches ground truth on candidates
+1, 2, 4, and 12.**
+
+**Reason for the edit:** Record now names the host-memory-save trigger, adds
+the repo-wide test with machine-specific and agent-tool-specific exclusions,
+and states that a post-finalize lesson stays in host memory until the next
+change's branch records it.
+
+Changed text: the Record section of the working-tree SKILL.md for this
+change, whitespace-flattened and lowercased by the contract test, with
+SHA-256 `61f3c8afb88c689d153250e699c1fbab2be18b5f532bc17d173abb869afafa14`.
+Baseline text: the Record section at `52f3c765` (unchanged from `88f4a855`).
+Twelve candidates from `record-timing-cases.json`, with the same criteria.
+
+Readers: separate fresh-context `sonnet` agents, each given one isolated
+packet file (contract text verbatim, the situation, and the twelve
+candidates by id and text only, no ground truth) and told to read nothing
+else. One sample per text; no retries.
+
+| Run | Text | Timing | Exception | Scarcity (RECORD of 12) |
+|---|---|---|---|---|
+| E1 | changed | PASS: open branch before closure, cited | PASS: 11 only, batched follow-up; stays in host memory until then | PASS: 1 (2); count checked against zero-to-one |
+| B1 | baseline | PASS | PASS: 11 only, batched follow-up | PASS: 1 (2), after a first pass of 4 (2, 3, 10, 12) self-corrected |
+
+Exact candidate results retained from the readers' reports:
+
+- E1: RECORD 2; REJECT 1, 3, 4, 5, 6, 7, 8, 9, 10, 12; FOLLOW-UP 11. It
+  rejected 3 citing the different-machine test, rejected 4 as "a
+  local-environment incident and an agent-host command hazard", and called
+  12 borderline, dropped for scarcity.
+- B1: RECORD 2; REJECT 1, 3, 4, 5, 6, 7, 8, 9, 10, 12; FOLLOW-UP 11. It
+  rejected 4 as a "personal or harness safety lesson".
+- Ground truth: RECORD 1, 4, 12; FOLLOW-UP 11; all others REJECT. Each
+  reader agrees with ground truth on 8 of 12 (misses 1, 2, 4, 12) and with
+  the other reader on all 12 final verdicts.
+
+**Remaining limitation:** both samples recorded candidate 2 (ground truth
+REJECT) and rejected candidate 4 (ground truth RECORD). The changed reader's
+reason for rejecting 4 echoes the new agent-tool exclusion wording, so the
+new exclusion may pull command-level traps that any contributor can hit
+toward rejection. One sample per text cannot establish that, and the
+baseline rejected 4 too. The wording was not rewritten to chase a pass.
+
+## Reference run — 2026-10-23 (fifth, superseded)
 
 **Result: timing and exception PASS; changed-text scarcity MISS. Behavioural
 equivalence is not established.** The changed reader recorded four candidates,

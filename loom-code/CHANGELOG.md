@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.48.3] — 2026-10-24 — fix(loom-code): register memory-mirror-reminder mechanism
+
+- `docs/loom/evidence/mechanisms.yaml` registers the loom-workflow `PostToolUse:Write|Edit|Bash:memory-mirror-reminder` hook with its eval, so the mechanism checker's R1 and R3 pass.
+- budget-exception: PostToolUse:Write|Edit|Bash:memory-mirror-reminder — Acceptance #3 needs a reminder on every host memory write in repos that install loom-workflow (user-decided); it replaces an unwired repo-local hook that was never a counted mechanism; eval loom-workflow/tests/loom-memory/test_memory_mirror_hook.py.
+
 ## [3.48.2] — 2026-10-23 — docs(loom): record memory lessons and fix AGENTS.md SSOT description
 
 - AGENTS.md now describes the single SSOT (`loom-code/.claude-plugin/plugin.json`) plus three derived manifests, replacing the stale "three manifests must sync" wording.
