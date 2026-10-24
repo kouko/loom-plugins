@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.49.0] — 2026-10-24 — fix(external-review): bound Claude reviews and report compaction stops
+
+- Claude reviews run with safe and restricted single-run settings, automatic compaction, configured MCP servers disabled, and a Read/Glob/Grep tool allowlist. Model file tools stay within the review root; CLI startup may still access or write outside it.
+- An optional per-invocation Claude budget cap supports authorized runs. Structured `rapid_refill_breaker` results, including zero-exit results, report an incomplete review without exposing raw review material or silently retrying.
+
 ## [3.48.2] — 2026-10-23 — docs(loom): record memory lessons and fix AGENTS.md SSOT description
 
 - AGENTS.md now describes the single SSOT (`loom-code/.claude-plugin/plugin.json`) plus three derived manifests, replacing the stale "three manifests must sync" wording.

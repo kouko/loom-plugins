@@ -1,0 +1,53 @@
+# Reliable Claude Code independent review — acceptance test evidence
+
+Tested on 2026-10-24 in a clean local clone at `ebb064448a78ce9afde2b16bee9fe3ef68929e83`. The source branch was not used as the execution tree. The private packet, patch, consent JSON, CLI progress, and runner JSON remain outside the repository. No raw review material or CLI payload is included here.
+
+## 1. Full-size completion and owner-consumable model attribution
+
+- Setup: `git clone --no-hardlinks --local --no-checkout <source> <clean-copy>` followed by `git checkout --detach ebb064448a78ce9afde2b16bee9fe3ef68929e83` succeeded. The clean copy had no modified files. Installed `claude --version` reported `2.1.310`.
+- Fixture verification: the private packet was 3,981 bytes with SHA-256 `09fdc408acd490545941424fbeeb98a266300e4b65f9ba3970376c53d8cb1257`; the patch was 239,215 bytes with SHA-256 `f3e14f2379fcc830a08f3c71268de696f2c106ae24a0347cdd2f80bbeeb93f91`. Both matched the retained spec before use.
+- How tried: invoked the clean-copy `loom-code/scripts/loom-python --repair --script external_review.py` with `--executor claude --model opus --effort high --family anthropic`, the private fixture as `--scope`, a private accepted-selection consent record with every required disclosure true, `--max-budget-usd 6`, and the exact private packet on stdin. Output and progress were captured only in private temporary files.
+- Observed sandbox result: exit 1, `status: failed`, `reason: probe-exit-1: unknown error`, `review_output: null`, `observed_model: null`, `evidence_level: none`; the probe exited after 0 seconds. The public result contained a bounded diagnostic (`stage: probe`, `exit_code: 1`) and recovery action. No review stage began.
+- Environment diagnosis: `claude auth status --json` reported `loggedIn: false` in the sandbox and `loggedIn: true` with narrowly scoped host escalation. Identifying account fields were excluded from this evidence.
+- Host execution: the attempt to run the same formal entry with host escalation was rejected by automatic approval review before process start. Its stated reason was that trusted user content had not explicitly approved sending this private payload to Anthropic from the host. The rejection prohibited indirect execution. No further invocation was attempted.
+- Owner parser: no completed review body exists, so YAML validation and attachment of a model-attributed receipt could not be performed. The completed full-size path remains unverified.
+
+## 2. Authorized material, worktree, and global settings
+
+- How tried: checked the Claude runner profile and ran the targeted external review tests. They exercise restricted mode, `Read,Glob,Grep` only, no extra directory grant, fixed model and effort, and USD 6 on both CLI stages. These are synthetic assertions, not a live file-access audit.
+- Fixture tree: a path-and-content aggregate over 2,189 files was `c349222b025dfe742e9f16b1f8b19415cdfe9d106329698bd32f458167c61ff2` before and after the sandbox attempt. The clean clone remained at the same HEAD with no modified files. Both private input-file SHA-256 values remained unchanged.
+- Global settings: `.claude/settings.json` SHA-256 stayed `b04953b0acf508cae3687bed619f794461be7c1f5095d98c40efda92f0fb860f`; `.claude/settings.local.json` remained absent; `.claude.json` SHA-256 stayed `1e04d2384695b3f7301c9d2dba397dd7838d3ebb1d498c4af65289c55d015400`. No contents were copied.
+- Limit: because authenticated preflight and review did not run, no live assertion about Claude model file-tool reads is possible.
+
+## 3. Rapid refill failure and privacy
+
+- How tried: `pytest -q loom-code/tests/test_external_review.py loom-code/tests/test_external_failure_terminal_envelope.py loom-code/tests/test_adversarial_claude_probe_model_key_privacy.py` in the clean clone.
+- Result: 138 passed in 19.76 seconds. The named cases `test_claude_rapid_refill_is_bounded_failed_result` cover nonzero probe and zero-exit review terminal failures; `test_claude_zero_exit_error_result_never_completes_or_leaks` covers zero-exit `is_error: true` at both stages. `test_claude_hostile_probe_model_key_bounded` checks that a hostile model key does not surface private material.
+- Observed synthetic contract: `status: failed`, stage-specific `rapid-refill-breaker` reason, `review_output: null`, and a fixed private-diagnostics recovery action; simulated private content was absent from serialized public results. No live rapid-refill event occurred in this test.
+- The full package command is `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; the closing review station runs that suite before final attestation. This independent test ran only the criterion-specific cases.
+
+## 4. Authorization and other execution paths
+
+- How tried: the same 138-test targeted command above. Named cases include `test_consent_blocks_all_subprocesses`, `test_authorization_source_requires_complete_owner_record`, `test_accepted_selection_source_allows_execution`, `test_codex_discovery_probe_and_review_observe_exact_profile`, `test_agy_model_list_and_explicit_pair`, `test_claude_alias_uses_explicit_flags_and_reports_accepted_level`, and `test_claude_structured_api_error_reports_bounded_reason_without_review_material`.
+- Result: all named cases passed. Missing or stale consent caused `consent-missing-or-stale` before runner calls in the synthetic tests; Codex, Antigravity, and ordinary Claude success/error examples retained their asserted behavior.
+- Limit: these are controlled runner fixtures. No extra real external process was started for the other executors.
+
+## Re-run on 2026-10-24, at `8129953ae56fb524535bbbb78b75cf7c5d2d2e2b`
+
+- Clean setup: made a second `git clone --no-hardlinks --local --no-checkout` and detached checkout at this commit. Its worktree was clean. `claude --version` was still `2.1.310`; the clean-copy `loom-python --repair --script external_review.py --help` exited 0.
+- Diff checked: `ac9dd250..8129953a` changed both closing-review owner clauses, added two assertions to `test_closing_review_recovery_rules.py`, and added only a CLI documentation comment to `external_review.py`. The review command, consent validation, filesystem profile, and result parser were unchanged.
+- 1: carried over — the runner change was a comment only. The earlier live test never completed, and the prior auto-review rejection remains in force. No new authenticated Claude execution or owner YAML parse was attempted; full-size completion and model attribution remain unverified.
+- 2: carried over — the runner's flags and read boundary were unchanged. The private packet and patch retained their original SHA-256 values. The 2,189-file fixture tree retained digest `c349222b025dfe742e9f16b1f8b19415cdfe9d106329698bd32f458167c61ff2`; global settings hashes remained as in section 2. The new clean copy stayed unmodified. A live authenticated file-access audit remains unavailable.
+- 3: re-tested — `pytest -q loom-code/tests/test_external_review.py loom-code/tests/test_external_failure_terminal_envelope.py loom-code/tests/test_adversarial_claude_probe_model_key_privacy.py loom-code/tests/test_closing_review_recovery_rules.py` gave **140 passed in 16.44 seconds**. This reran the probe and review rapid-refill cases, zero-exit `is_error` cases, public-result privacy cases, and both changed owner clauses. The new owner test asserts a fresh authorized review with preflight and private diagnostics before authorization after rapid refill. No live rapid-refill event was induced.
+- 4: re-tested — the same 140-test run covered consent refusal, accepted selection, Codex and Antigravity paths, ordinary Claude success and error paths, and the new no-silent-retry wording in both owner clauses. These checks were controlled fixtures and text assertions; no additional external executor was launched.
+- The full package command remains `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. The closing review station runs it before final attestation; this independent re-run used only the affected criterion tests.
+
+## One authorized host attempt on 2026-10-24, at PR #114 head `719124c5`
+
+- Authorization: after the cost and data-transfer disclosure, the user explicitly authorized one full-size execution. A private consent record bound Claude, Opus, high effort, Anthropic, the retained review root and this target. The preflight and review each had a USD 6 process cap; no retry was authorized or attempted.
+- Setup: a new local clean clone was detached at `719124c5`. Host `claude auth status` returned `loggedIn: true` (account fields excluded). The retained packet and patch matched the spec's SHA-256 values. The root held 2,189 files before execution.
+- Entry: invoked that clone's `loom-code/scripts/loom-python --repair --script external_review.py` with `--executor claude --model opus --effort high --family anthropic`, the retained root as `--scope`, the private consent record, `--max-budget-usd 6`, and the exact private packet on stdin. Raw runner JSON was written only to a private temporary file; no raw packet, review text or CLI output is reproduced here.
+- Observed result: preflight exited 0 after 2 seconds. Review exited 1 after 15 seconds. The bounded public result was `status: failed`, `reason: review-exit-1: Claude session limit (HTTP 429)`, `review_output: null`, `observed_model: null`, and `evidence_level: none`. The fixed next action is to wait for the session limit to reset and request a new authorized review. There is no completed result to pass to the owner YAML parser.
+- Integrity: the aggregate path-and-content digest of the 2,189-file fixture root, packet SHA-256 and patch SHA-256 were unchanged after the call. The source branch was clean before the report edit; the clean execution clone had only its private consent, baseline and result files as untracked outputs.
+- Global files: `~/.claude/settings.json` retained its before/after SHA-256, and `~/.claude/settings.local.json` remained absent. `~/.claude.json` changed its SHA-256 between the preflight baseline and the post-call check. Only its baseline hash, not its prior content, was captured; the changed fields and cause cannot be established. No file was restored or overwritten.
+- Conclusion: the actual Loom entry and Claude authentication reached the review stage, but the full-size completed review, model-attributed receipt and live file-read boundary remain unverified. The synthetic A3 and A4 results above still apply.
