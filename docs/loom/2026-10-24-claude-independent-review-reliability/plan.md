@@ -1,6 +1,6 @@
 # Reliable Claude Code independent review — plan
-intent: 2026-10-24-claude-independent-review-reliability@43470b27e359b7c87173a2cac28f8e302d76eb2d
-spec: docs/loom/2026-10-24-claude-independent-review-reliability/spec.md@bf89ee1ce7d78e4835c390e626e2c01e672d8d24
+intent: 2026-10-24-claude-independent-review-reliability@0743260432a8ecdfc4dd392b5bf236aeb050c1d0
+spec: docs/loom/2026-10-24-claude-independent-review-reliability/spec.md@0d60f19069f9e7a0db64f778e5042f10f104f233
 charter: 1.1
 
 ## Task DAG
@@ -38,10 +38,18 @@ charter: 1.1
 - Test: A1 positive: documented_full_profile; boundary: model_attribution. A2 positive: documented_root_boundary; negative: outside_grant.
 - Risk: agent-decided — cite the official CLI contract beside the existing flags without changing their behavior or adding a new profile.
 
+### Wave 5 — Recover presentation-only review output drift
+
+**W5-01 Accept safe outside-review formatting**  after: W4-02  acceptance: 5
+- Files: `loom-code/scripts/loom_checker/reviewers.py`, `loom-code/tests/test_loom_attestation.py`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/CHANGELOG.md`
+- Test: A5 positive: whole_yaml_fence_and_unlabeled_text; boundary: raw_digest_preserved. A5 negative: trailing_prose, missing_or_blank_anchor, zero_line, absent_required_field, weak_dimension_score, contradictory_overall_verdict.
+- Risk: agent-decided — use one bounded normalization at the owning receipt parser; leave semantic fields untouched and reject ambiguous repairs. Keep the already published 3.49.0 minor version, updating its pending changelog entry before renewed finalization.
+
 ## Simplicity check
 
 - Keep the Claude contract and runner in one task — taken
 - Move live acceptance to Closing Review — taken
+- Keep the existing YAML carrier — taken
 
 ## Questions asked
 
@@ -53,3 +61,4 @@ charter: 1.1
 2. A live Claude run transmits the authorized packet to Anthropic; use the already confirmed USD 6 cap and do not retry without fresh authorization.
 3. Safe and restricted CLI flags are version-dependent; probe the installed CLI and keep synthetic tests separate from the live result.
 4. Build ends with an independent adversary's committed executable cases, followed by the complete package suite before Closing Review.
+5. The earlier review episode used its three digests. The newly confirmed intent starts a new episode. Retained Haiku/low output permits local parser testing, but not Opus/high live acceptance. No new external invocation is authorized.
