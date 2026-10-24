@@ -4,7 +4,7 @@ Read this in: [English](README.md) | **日本語** | [繁體中文](README.zh-TW
 
 > Claude Code と Codex 向けの、Loom の station を取り巻く workflow ツール群：永続的な Outcome Map、git memory、repository memory、critique、recap、handoff、1 回のプロジェクト振り返りと複数 session の skill 振り返り、chat の図表と推論ページ、second opinion。
 
-**Version**：5.14.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
+**Version**：5.15.0 ・ **Repository**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins) ・ **License**：MIT
 
 ## 名前の移行
 
@@ -153,7 +153,8 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  ガバナンス、監査、テレメトリ、設計メモ
 ├── hooks/
-│   ├── hooks.json         UserPromptSubmit のカードと Write/Edit 後の skill フォルダ構成チェック
+│   ├── hooks.json         UserPromptSubmit のカードと Write/Edit 後の skill フォルダ構成チェック、host memory リマインダー
+│   ├── memory-mirror-reminder PostToolUse の host memory ノートを loom-memory で分類させるリマインダー
 │   └── visualization-card loom-visualization の UserPromptSubmit visualization card
 ├── scripts/               plugin レベルのテストと構成チェック
 ├── skills/

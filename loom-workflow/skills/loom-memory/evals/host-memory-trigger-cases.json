@@ -1,0 +1,31 @@
+{
+  "eval": "host-memory-trigger",
+  "contract_under_test": "SKILL.md frontmatter description, § When this skill activates (host memory save), and § Record step 1 (repo-wide test and exclusions)",
+  "method": "Fresh `claude -p` sessions in a repository with loom-workflow installed. Each session is told about one candidate lesson and asked to save it to its own memory. Run each case with the OLD description and with the NEW description, the same number of times each. Count, per case and per description, how often loom-memory fired and how often it recorded a concept file. Never pass --disable-slash-commands: it disables skills too, so the trial tests nothing. Confirm from the session transcript that the skill actually fired before counting a session.",
+  "old_description": "Manage durable repository lessons when asked to remember, recall, reconcile, or forget; also recall when a task needs a prior lesson.",
+  "new_description": "Record repo-wide lessons when saving to your own memory or asked to remember; recall, reconcile, or forget them when a task needs it.",
+  "candidates": [
+    {
+      "id": 1,
+      "text": "This repository's package suite only discovers tests under the test roots listed in its runner script; a test placed in a new plugin folder silently never runs until that folder is added.",
+      "ground_truth": "RECORD",
+      "rationale": "Repo-wide: any contributor who clones the repository on any machine hits it."
+    },
+    {
+      "id": 2,
+      "text": "I prefer answers that lead with the conclusion and use short bullet lists.",
+      "ground_truth": "HOST_MEMORY_ONLY",
+      "rationale": "A personal preference unrelated to the repository."
+    },
+    {
+      "id": 3,
+      "text": "On this laptop, bare pip3 resolves to an active conda environment, so call the Homebrew python by its full path.",
+      "ground_truth": "HOST_MEMORY_ONLY",
+      "rationale": "A fact true only on one machine: a local environment."
+    }
+  ],
+  "pass_criteria": {
+    "classification": "Only candidate 1 is recorded to the repository memory store; candidates 2 and 3 stay only in host memory, each with a stated reason.",
+    "trigger_rate": "Reported as counts for OLD and NEW per case; the measurement reports a rate, it does not guarantee one."
+  }
+}

@@ -4,7 +4,7 @@ Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.14.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.15.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
@@ -156,7 +156,8 @@ loom-workflow/
 │   └── plugin.json
 ├── docs/                  governance, audit, telemetry and design notes
 ├── hooks/
-│   ├── hooks.json         UserPromptSubmit card and skill folder structure check after Write/Edit
+│   ├── hooks.json         UserPromptSubmit card, skill folder structure check after Write/Edit and host memory reminder
+│   ├── memory-mirror-reminder PostToolUse reminder to classify host memory notes via loom-memory
 │   └── visualization-card UserPromptSubmit visualization card for loom-visualization
 ├── scripts/               plugin-level tests and the structure check
 ├── skills/
