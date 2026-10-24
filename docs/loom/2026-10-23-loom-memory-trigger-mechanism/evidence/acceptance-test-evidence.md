@@ -226,3 +226,96 @@ repeated: init lists only `loom-workflow@inline` 5.15.0 plus builtins.
 - 8: re-tested — same criterion test command in clean2: `152 passed in 2.60s`;
   `check_contract_citations.py` "OK"; `check_mechanisms.py` "all clear".
   Full suite left to finalize-review (build reported exit 0 on aa3e1b22).
+
+## Re-run on 2026-10-24, at e3dd1645
+
+Fix range eaf08848..e3dd1645 (one commit): the hook's Bash branch no longer
+parses the command; it derives `<config>/projects` from `transcript_path`
+and reminds when a non-MEMORY.md `*.md` directly inside any
+`<config>/projects/*/memory/` was modified in the last 10 s
+(`memory-mirror-reminder` `WINDOW = 10`, `recent_note_exists`). Write/Edit
+unchanged. Files changed: the hook, its test, spec.md, loom-workflow/CHANGELOG.md.
+Clean copy `git worktree add --detach <scratchpad>/at/clean3 HEAD`; plugin
+export `<scratchpad>/at/new3`.
+
+### Payload drive
+`python3 -I <scratchpad>/at/hook_probe3.py <clean3>/loom-workflow/hooks/memory-mirror-reminder <scratchpad>/at`
+— 32 payloads, `FAILS 0`, all exit 0, no stderr. Bash cases use a fake
+`<tmp>/home/.claude/projects/<slug>/memory/` tree with set mtimes:
+- reminder: own-slug note 1 s and 9 s old; another slug's note 1 s old
+  (concurrent session, stated side effect); Bash payload with no `tool_input`;
+  scan still succeeds when another slug's memory folder is unreadable (chmod 0).
+- silent: note 11 s old; only MEMORY.md fresh; fresh `.json` in memory;
+  fresh note in `memory/sub/`; fresh `.md` outside `memory/`; read-only `cat`
+  of a 1-hour-old note; no `transcript_path`; `transcript_path` null;
+  transcript outside a config dir; transcript slug dir missing.
+- Write/Edit and malformed-input cases from earlier rounds: unchanged results.
+- Latency on the real `~/.claude/projects` (206 slugs; stat only): 0.01–0.02 s
+  real time over 5 runs, no reminder.
+
+### Live, real memory layout
+Runner `<scratchpad>/at/trial3.py`: same throwaway repo (`template2`, no
+store), no `autoMemoryDirectory` override (`--settings '{"autoMemoryEnabled":true}'`),
+so host memory is `~/.claude/projects/<slug>/memory/`. The slug is the
+repo's real path with non-alphanumerics replaced by `-`; the runner refuses
+to start if that directory already exists. Trials run one at a time so one
+trial's write cannot remind another. 7 sessions, USD 1.17, model claude-opus-5-5.
+Results `<scratchpad>/at/results3.jsonl`, logs `logs/r3-*.jsonl`.
+
+| Trial | Prompt | Event order | Reminders | Repo changes |
+|---|---|---|---|---|
+| shellvar c3 t1 | note via one Bash command, folder in a shell variable, `cat > "$VAR/<name>.md"` | Bash(host) > Bash(host) > REMINDER<PostToolUse:Bash> | 1 | none |
+| shellvar c3 t2 | same | Bash(host) > Bash(host) > REMINDER<PostToolUse:Bash> | 1 | none |
+| shellvar c1 t1 | same, repo-wide lesson | SKILL > Bash(host `MEM=…`) > Bash(host) > REMINDER > Bash(`ls scripts tests plugin-a`) > REMINDER > Bash(host) > REMINDER > Bash(repo) | 3 | `?? docs/loom/memory/{README.md,index.md,test-roots-must-be-registered.md}`; `validate docs/loom/memory` "OK" |
+| write c2 t1 | note via Write tool | Bash(host) > Write(note) > REMINDER<PostToolUse:Write> > Write(MEMORY.md) | 1 | none |
+| write c2 t2 | same | Write(note) > Bash(host) > REMINDER<PostToolUse:Write> > Write(MEMORY.md) | 1 | none |
+| readonly c2 t1 | pre-seeded note + MEMORY.md, mtime set 1 h back; "show the note with one read-only `cat`" | Bash(host) | 0 | none |
+| readonly c2 t2 | same | Bash(host) | 0 | none |
+
+- Repeat reminders: in shellvar c1 t1 one note produced 3 reminders, the
+  2nd after an unrelated `ls` that ran inside the 10 s window, the 3rd after
+  a MEMORY.md update. Nothing failed; the agent recorded the lesson once.
+- write c2 t2: a Bash call within the window after the Write gave no second
+  reminder in the stream (1 total).
+
+### Cleanup of trial-created folders — BLOCKED, pending the user
+Each trial created exactly one directory under `~/.claude/projects/`, holding
+one `<uuid>.jsonl` session transcript and a `memory/` folder of throwaway
+notes. Deleting them was blocked by the shell guard:
+`BLOCKED by dcg … Rule: heredoc.python:shutil_rmtree … To permit this single
+command once, the user can approve it with: dcg allow-once 913948`. I did not
+retry by another route. The 7 directories still to delete:
+
+- `~/.claude/projects/-private-tmp-claude-501--Users-kouko-GitHub-loom-plugins--claude-worktrees-memory-trigger-e65ab225-2760-441a-9215-379dd5acb7e5-scratchpad-at-trials3-r3-shellvar-c3-t1-repo`
+- `~/.claude/projects/-private-tmp-claude-501--Users-kouko-GitHub-loom-plugins--claude-worktrees-memory-trigger-e65ab225-2760-441a-9215-379dd5acb7e5-scratchpad-at-trials3-r3-shellvar-c3-t2-repo`
+- `~/.claude/projects/-private-tmp-claude-501--Users-kouko-GitHub-loom-plugins--claude-worktrees-memory-trigger-e65ab225-2760-441a-9215-379dd5acb7e5-scratchpad-at-trials3-r3-shellvar-c1-t1-repo`
+- `~/.claude/projects/-private-tmp-claude-501--Users-kouko-GitHub-loom-plugins--claude-worktrees-memory-trigger-e65ab225-2760-441a-9215-379dd5acb7e5-scratchpad-at-trials3-r3-write-c2-t1-repo`
+- `~/.claude/projects/-private-tmp-claude-501--Users-kouko-GitHub-loom-plugins--claude-worktrees-memory-trigger-e65ab225-2760-441a-9215-379dd5acb7e5-scratchpad-at-trials3-r3-write-c2-t2-repo`
+- `~/.claude/projects/-private-tmp-claude-501--Users-kouko-GitHub-loom-plugins--claude-worktrees-memory-trigger-e65ab225-2760-441a-9215-379dd5acb7e5-scratchpad-at-trials3-r3-readonly-c2-t1-repo`
+- `~/.claude/projects/-private-tmp-claude-501--Users-kouko-GitHub-loom-plugins--claude-worktrees-memory-trigger-e65ab225-2760-441a-9215-379dd5acb7e5-scratchpad-at-trials3-r3-readonly-c2-t2-repo`
+
+No other project's memory folder was written. The session-transcript
+folders from rounds 1 and 2 (`…-scratchpad-at-trials-*-repo`, 20 transcripts,
+no `memory/`) also remain.
+
+### Rows
+- 1: re-tested — shellvar c1 t1 in a repo with no store, real memory
+  layout: store created at `docs/loom/memory/`, `validate` "OK", host note
+  saved. Together with round 2: 5/5.
+- 2: re-tested — shellvar c3 ×2, write c2 ×2, readonly c2 ×2: `git status
+  --porcelain` empty 6/6.
+- 3: re-tested — payload drive and live table above: shell-variable writes
+  3/3 reminded, Write-tool writes 2/2, read-only `cat` 0/2; malformed input
+  silent, exit 0.
+- 4: carried over — `git diff --stat eaf08848..e3dd1645` over the Codex and
+  OpenCode manifests and hook files, `hooks.json` and `loom-workflow/skills`
+  is empty.
+- 5: carried over — the same diff over `loom-workflow/skills`,
+  `loom-workflow/rules`, `loom-code` and `loom-design` is empty.
+- 6: carried over — rule text unchanged (same diff) and the `REMINDER`
+  string is untouched in the hook diff.
+- 7: carried over — no file added or removed; `git diff eaf08848..e3dd1645 |
+  grep -c "remind-memory-mirror\|remind_memory_mirror"` = 0.
+- 8: re-tested — criterion test command in clean3: `158 passed in 2.17s`;
+  `check_mechanisms.py` "all clear"; `check_contract_citations.py` "OK".
+  Full suite left to finalize-review (build reported exit 0 on e3dd1645).
