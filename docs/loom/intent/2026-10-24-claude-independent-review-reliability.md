@@ -2,7 +2,7 @@
 originator: kouko
 kind: engineering
 needs-design: yes — Claude 審查的失敗原因與恢復指引會呈現給使用者，現有設計文件未涵蓋這種錯誤；審查成功、執行失敗與未完成的結果也需要明確區分
-status: confirmed 2026-10-24
+status: confirmed 2026-10-25
 publication: automatic — authorized 2026-10-24 by kouko
 
 ## Problem
@@ -19,6 +19,7 @@ publication: automatic — authorized 2026-10-24 by kouko
 2. 審查執行時只取得已授權且必要的材料，不修改被審查的工作樹；使用者既有 Claude Code 全域設定不因這次審查而改變。
 3. 當 Claude Code 再次因反覆壓縮中止，Loom 明確回報未完成與可辨識的原因，且對外結果不含原始提示、審查內容或敏感錯誤輸出。
 4. 既有授權檢查仍會阻止未授權的外部審查；其他審查執行器及一般成功、失敗路徑保持可用。
+5. 已完成的獨立審查即使有不改變內容意思的格式差異，仍能交給既有審查流程使用；無法定位發現或結論不一致的結果仍不被當作正式審查。
 
 ## Constraints
 
