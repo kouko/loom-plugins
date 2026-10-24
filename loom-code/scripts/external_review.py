@@ -511,6 +511,9 @@ def execute(
         if "probe" in result:
             result["probe"].pop("stdout", None)
             result["probe"].pop("stderr", None)
+        if executor == "claude":
+            result["observed_model"] = None
+            result["evidence_level"] = "none"
         result["reason"] = reason
         if executor == "claude" and reason.startswith(("probe-", "review-", "execution-")):
             result["next_action"] = _claude_failure_action(reason)
