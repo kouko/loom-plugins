@@ -130,10 +130,12 @@ rubric or output schema.
   --consent-record <path-to-record> < <review-packet-file>
 ```
 
-For a Claude invocation with an authorized cost cap, add
-`--max-budget-usd <positive-amount>`; the CLI applies this cap separately to
-the preflight and review processes. The default invocation has no added budget
-cap.
+For a Claude invocation with an authorized estimated-spend threshold, add
+`--max-budget-usd <positive-amount>` to the entry; the runner applies it
+separately to preflight and review. Before authorization, disclose that Claude
+Code checks its own client-side cost estimate, which may differ from the bill,
+and spend can exceed the threshold. The default invocation has no added budget
+flag.
 
 The script first verifies the consent and explicit selection. It then performs
 bounded discovery, one short preflight, and one bounded review with the same
