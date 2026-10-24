@@ -97,6 +97,12 @@ def test_index_write_silent():
     assert (proc.returncode, proc.stdout) == (0, "")
 
 
+@pytest.mark.parametrize("name", ["Memory.md", "memory.MD"])
+def test_index_write_silent_case_variant(name):
+    proc = run(payload(NOTE_DIR + "/" + name))
+    assert (proc.returncode, proc.stdout) == (0, "")
+
+
 def test_orphan_files_absent():
     assert not (REPO / ".claude/hooks/remind-memory-mirror.sh").exists()
     assert not (REPO / "tests/hooks/test_remind_memory_mirror.py").exists()

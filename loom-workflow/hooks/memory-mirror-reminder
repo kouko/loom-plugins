@@ -29,7 +29,7 @@ def is_memory_note(path):
         return False
     path = os.path.normpath(path)
     parent, name = os.path.split(path)
-    if name == "MEMORY.md" or os.path.basename(parent) != "memory":
+    if name.lower() == "memory.md" or os.path.basename(parent) != "memory":
         return False
     projects = os.path.dirname(os.path.dirname(parent))
     if os.path.basename(projects) != "projects":

@@ -487,3 +487,10 @@ def test_post_finalize_deferral_kept() -> None:
 def test_deferral_removal_fails() -> None:
     flat = _flat(_section(_skill_md_text(), "Record"))
     assert not _keeps_deferral(flat.replace(DEFERRAL_PHRASE, ""))
+
+
+def test_workflow_point_sentence_names_trigger_2_exception() -> None:
+    section = " ".join(_section(_skill_md_text(), "When this skill activates").split())
+    match = re.search(r"[^.]*reaching any particular point in a workflow[^.]*\.", section, re.IGNORECASE)
+    assert match, "activation section must keep the workflow-point sentence"
+    assert "trigger 2" in match.group(0), "workflow-point sentence must exempt the host memory save (trigger 2)"

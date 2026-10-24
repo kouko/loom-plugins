@@ -50,7 +50,7 @@ Three triggers, all passive:
    concrete need for prior repository experience (not a hunch, not a
    completeness ritual).
 
-Reaching any particular point in
+Apart from the host memory save in trigger 2, reaching any particular point in
 a workflow is not, by itself, a reason to invoke it — this skill has no
 fixed-station calling convention and installs no gate on anyone else's
 process.
