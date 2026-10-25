@@ -554,6 +554,8 @@ def test_outside_receipt_accepts_explained_score_without_changing_receipt() -> N
 @pytest.mark.parametrize("score,overall,findings,reason", [
     ("PASS_WITH_NOTES —   ", "PASS_WITH_NOTES", [], "required reviewer YAML"),
     ("PASS_WITH_NOTES — PASS", "PASS_WITH_NOTES", [], "required reviewer YAML"),
+    ("PASS — NEEDS_REVISION: blocking issue", "PASS", [], "required reviewer YAML"),
+    ("PASS —  NEEDS_REVISION blocking issue", "PASS", [], "required reviewer YAML"),
     ("PASS_WITH_NOTES - rationale", "PASS_WITH_NOTES", [], "required reviewer YAML"),
     ("PASS_WITH_NOTES — rationale", "PASS", [], "overall verdict"),
     ("PASS — rationale", "PASS_WITH_NOTES", ["important"], "dimension score"),

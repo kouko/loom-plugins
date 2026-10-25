@@ -80,7 +80,8 @@ def _canonical_score(score: str) -> str | None:
         return score
     token, separator, rationale = score.partition(" — ")
     if (separator and token in _CANONICAL_SCORES and rationale.strip()
-            and rationale.strip() not in _CANONICAL_SCORES):
+            and not re.match(r"(?:PASS_WITH_NOTES|NEEDS_REVISION|PASS)\b",
+                             rationale.strip())):
         return token
     return None
 
