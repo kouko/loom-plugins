@@ -17,6 +17,7 @@ External surfaces grounded:
   so the ``git push`` / ``gh pr create`` / ``gh pr merge`` discrimination
   lives inside ``scripts/loom_checker.py push``, not here.
 """
+# concern: shell-reserved exit-code names can abort host hooks before checker results or fallbacks are handled.
 from __future__ import annotations
 
 import json
