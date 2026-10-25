@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-24-claude-independent-review-reliability",
-  "content_digest": "05e8a929c9d3cd9ce916d1d66bb03f45d10479b6",
+  "content_digest": "49efab1bddf51e807b75c69851a477ddc1276dec",
   "executions": [
     {
       "kind": "package-tests",
@@ -31,8 +31,8 @@
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "code",
-      "reviewed_sha": "4c7a83b8448b1538a4a3ccae934485f63e9d5a49",
-      "review_target_sha": "809fba35872b991fff0568beccdef46c6b217ee4",
+      "reviewed_sha": "809fba35872b991fff0568beccdef46c6b217ee4",
+      "review_target_sha": "1e4b65c11ac4106df62811c9e756fb2ae2f96144",
       "verdict": "PASS_WITH_NOTES",
       "dimension_scores": {
         "security": "PASS_WITH_NOTES",
@@ -50,9 +50,9 @@
       },
       "findings": [],
       "notes": [
-        "The fix delta changes disclosure and evidence wording only; no code or test changes.",
-        "Full-size Opus/high review and live read boundary remain unverified after HTTP 429.",
-        "Historical consent record lacks the exact cost disclosure shown before that run."
+        "The changed hook test file passed: 54 tests; the merge retains both 3.49.0 and 3.48.4 changelog entries.",
+        "The acceptance report carries forward the incomplete Opus/high run; live read boundaries remain unverified.",
+        "The full package suite and adversarial cases passed; the reviewer ran only the changed test file."
       ]
     },
     {
@@ -60,8 +60,8 @@
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "skill",
-      "reviewed_sha": "4c7a83b8448b1538a4a3ccae934485f63e9d5a49",
-      "review_target_sha": "809fba35872b991fff0568beccdef46c6b217ee4",
+      "reviewed_sha": "809fba35872b991fff0568beccdef46c6b217ee4",
+      "review_target_sha": "1e4b65c11ac4106df62811c9e756fb2ae2f96144",
       "verdict": "PASS",
       "dimension_scores": {
         "omission": "PASS",
@@ -74,9 +74,9 @@
       },
       "findings": [],
       "notes": [
-        "The prior budget-disclosure finding is fixed: the skill requires estimate and possible overrun disclosure before authorization.",
-        "Spec, plan, changelog, and acceptance report use qualified wording.",
-        "Full-size Opus/high completion remains unverified."
+        "The prior budget-disclosure finding remains fixed; the merge did not alter that skill text.",
+        "The changelog retains 3.49.0 and the merged 3.48.4 entry; hook variable renames are consistent.",
+        "The acceptance report still marks Opus/high completion unverified."
       ]
     }
   ],
