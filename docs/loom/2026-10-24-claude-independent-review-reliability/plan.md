@@ -62,6 +62,11 @@ charter: 1.1
 - Test: A5 positive: canonical_score_unchanged; boundary: raw_receipt_preserved. A6 positive: dash_explained_score; negative: blank_or_ambiguous_rationale, duplicate_score, severity_or_verdict_conflict.
 - Risk: agent-decided — extend only REQ-6 at the existing receipt parser, preserving W5-01 strict checks and the original review text; tests must cover the protected parser's existing cases.
 
+**W6-02 Graduate the conflicting-score adversarial regression**  after: W6-01  acceptance: 6
+- Files: `docs/loom/2026-10-24-claude-independent-review-reliability/evidence/probes/test_adversarial_explained_score_conflict.py`, `loom-code/tests/test_adversarial_explained_score_conflict.py`
+- Test: A6 positive: conflicting_score_probe_red_then_green; boundary: ordinary_score_rationale_still_accepted.
+- Risk: agent-decided — carry the earned ambiguous-score probe into the package suite so future review receipts cannot treat a contrary score inside the rationale as harmless text.
+
 ## Simplicity check
 
 - Keep the Claude contract and runner in one task — taken
