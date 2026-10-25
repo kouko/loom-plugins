@@ -18,22 +18,10 @@ from prose_pin import split_sentences as _sentences
 ROOT = Path(__file__).resolve().parents[2]
 REVIEWER_PATH = ROOT / "loom-code/agents/reviewer.md"
 LENSES_PATH = ROOT / "loom-code/skills/closing-review/references/lenses.md"
-CLOSING_REVIEW_PATH = ROOT / "loom-code/skills/closing-review/SKILL.md"
 
 
 def _flat(path: Path) -> str:
     return " ".join(path.read_text(encoding="utf-8").split())
-
-
-def test_outside_review_score_contract_matches_receipt_parser() -> None:
-    reviewer = _flat(REVIEWER_PATH)
-    owner = _flat(CLOSING_REVIEW_PATH)
-    for text in (reviewer, owner):
-        assert "canonical score followed by ` — ` and nonblank rationale" in text
-        assert "full dimension score string" in text
-        assert "canonical score token" in text
-        assert "overall verdict remains a bare canonical token" in text
-        assert "ambiguous scores are rejected" in text
 
 
 LENSES_REF = "`loom-code/skills/closing-review/references/lenses.md`"

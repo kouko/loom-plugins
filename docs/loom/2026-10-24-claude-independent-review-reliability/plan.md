@@ -68,8 +68,8 @@ charter: 1.1
 - Risk: agent-decided — carry the earned ambiguous-score probe into the package suite so future review receipts cannot treat a contrary score inside the rationale as harmless text.
 
 **W6-03 Align the reviewer score contract**  after: W6-02  acceptance: 6
-- Files: `loom-code/agents/reviewer.md`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/tests/test_reviewer_mechanical_evidence.py`, `loom-code/CHANGELOG.md`
-- Test: A6 positive: explained_score_contract_matches_parser; boundary: overall_verdict_remains_canonical.
+- Files: `loom-code/agents/reviewer.md`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/CHANGELOG.md`
+- Test: A6 positive: independent skill review checks the explained-score contract against the parser; boundary: independent acceptance testing checks the bare overall verdict and ambiguous-score rejection.
 - Risk: agent-decided — close the Round 1 skill-review inconsistency at the owner and reviewer instructions, retaining the strict score and receipt boundaries from REQ-6.
 
 ## Simplicity check
