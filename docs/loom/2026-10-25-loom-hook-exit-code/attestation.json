@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-25-loom-hook-exit-code",
-  "content_digest": "6c4ccbbc98e12c19a562c7cdca48245b16e76a26",
+  "content_digest": "cc386a2c166ccaaa8f327195cdba325c1e333978",
   "executions": [
     {
       "kind": "package-tests",
