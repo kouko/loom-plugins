@@ -221,16 +221,33 @@ The shared runner returns execution status, evidence and raw review output;
 it does not judge the review. A failed probe or review is a distinct outside
 failure and supplies no verdict. On completion, this station validates the
 raw YAML against `agents/reviewer.md`, attributes it to the selected model
-family, and accepts only a conforming verdict. One transient executor or
-malformed-output retry is allowed for the same digest and reviewer identity;
-a second failure ends the episode as `EXECUTION_FAILED`. A rejected explicit
-model or effort never triggers a default-model retry.
+family, and accepts only a conforming verdict. One whole-output `yaml` or
+`YAML` fence and nonempty finding text without a Conventional Comments label
+are accepted without changing their content. Every finding still needs a
+nonblank path with a positive line number or nonblank quote; dimension scores
+must meet their findings' severity, and the overall verdict must agree with
+the scores and findings. For outside results, a dimension may use an exact
+canonical score followed by ` — ` and nonblank rationale. Copy the full
+dimension score string into the attributed verdict for comparison with the
+raw YAML; use only the canonical score token for finding severity and
+overall-verdict consistency. The overall verdict remains a bare canonical
+token. Blank or ambiguous scores are rejected. Duplicate YAML mapping keys
+at any depth are rejected.
+A transient executor failure or malformed outside output may be retried once
+for the same digest and reviewer identity, but every repeat outside execution
+is a newly authorized review with a fresh preflight. The earlier consent does
+not authorize a silent
+retry. For `probe-rapid-refill-breaker` or `review-rapid-refill-breaker`, report
+an incomplete review and inspect private diagnostics before requesting that
+new authorization. A second outside failure ends the episode as
+`EXECUTION_FAILED`. A rejected explicit model or effort never triggers a
+default-model retry.
 The accepted outside verdict carries the completed runner result to
 `finalize-review`; it checks the raw YAML against the attributed lens,
-verdict, dimension scores, findings and notes, then stores only a digest-bound
-receipt with executor, model, effort, family and reviewer identity in the
-attestation. A vendor label without this receipt is not a completed outside
-review.
+verdict, dimension scores, findings and notes, then stores a receipt bound to
+the unmodified raw-output digest with executor, model, effort, family and
+reviewer identity in the attestation. A vendor label without this receipt is
+not a completed outside review.
 <!-- /gate -->
 
 ## 3. Run acceptance testing
@@ -314,16 +331,21 @@ patching then, and use the next available round only after the technical
 design re-look. The agent owns that re-plan when it preserves requirements,
 visible behavior, and guarantees.
 
-Do not ask the user whether to continue or which technical repair to choose.
+Do not ask the user whether to continue a technical fix or which technical
+repair to choose. Authorization for a repeat outside execution is separate.
 Ask only when resolving the blocker would change requirements, visible
 behavior, or guarantees; that change requires a newly confirmed intent rather
 than another round in this episode.
 
 A malformed response, unavailable executor, or other transient failure before
 a conforming verdict exists may retry once against the same functional-content
-digest. That retry is not a review round. A second executor failure ends the
-episode as `EXECUTION_FAILED`; a conforming `NEEDS_REVISION` always consumes
-the current round.
+digest. For an outside reviewer, that repeat execution requires a newly
+authorized review with a fresh preflight; never retry silently. After
+`probe-rapid-refill-breaker` or `review-rapid-refill-breaker`, inspect private
+diagnostics before requesting authorization. That retry is not a review round.
+A second failed attempt before a conforming verdict ends the episode as
+`EXECUTION_FAILED`; a conforming `NEEDS_REVISION` always consumes the current
+round.
 
 Keep this episode in the active task context. Do not create a review-round
 ledger or committed state schema. Wording-only publication edits do not reopen

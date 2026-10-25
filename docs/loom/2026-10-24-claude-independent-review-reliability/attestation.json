@@ -1,0 +1,88 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-24-claude-independent-review-reliability",
+  "content_digest": "a4d5d404c4e139a49de4f7e863266aaf56e36beb",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_claude_probe_model_key_privacy.py",
+      "artifact": "loom-code/tests/test_adversarial_claude_probe_model_key_privacy.py",
+      "result": "pass",
+      "command_digest": "595b01404883476d756ec443598cec678ae999803bbbd2ef2aa525a7bb629cb2"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_duplicate_outside_verdict.py",
+      "artifact": "loom-code/tests/test_adversarial_duplicate_outside_verdict.py",
+      "result": "pass",
+      "command_digest": "6ddd44fa0101d5b39dc542c05d4f567ff13ffaf87a942ea2e74f01c85486b25f"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_explained_score_conflict.py",
+      "artifact": "loom-code/tests/test_adversarial_explained_score_conflict.py",
+      "result": "pass",
+      "command_digest": "ac51cb632c86b30fad9a21fadf91e26fff859c894c7da3c97a33410be112a1c5"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "pr114-w6-code-review",
+      "vendor": "openai",
+      "model": "host-inherited-unverified",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "f01b0b3d3e7a7cd4db1a98efff909ea04d336d20",
+      "review_target_sha": "d120c3c296fb65ea3eb391d4108eb73b07d94523",
+      "dimension_scores": {
+        "security": "PASS_WITH_NOTES",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Partial evidence for live file reads and the ~/.claude.json change remains."
+      ]
+    },
+    {
+      "reviewer": "pr114-w6-skill-review",
+      "vendor": "openai",
+      "model": "host-inherited-unverified",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "f01b0b3d3e7a7cd4db1a98efff909ea04d336d20",
+      "review_target_sha": "d120c3c296fb65ea3eb391d4108eb73b07d94523",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Earlier contract finding remains fixed."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
