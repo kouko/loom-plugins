@@ -226,7 +226,13 @@ family, and accepts only a conforming verdict. One whole-output `yaml` or
 are accepted without changing their content. Every finding still needs a
 nonblank path with a positive line number or nonblank quote; dimension scores
 must meet their findings' severity, and the overall verdict must agree with
-the scores and findings. Duplicate YAML mapping keys at any depth are rejected.
+the scores and findings. For outside results, a dimension may use an exact
+canonical score followed by ` — ` and nonblank rationale. Copy the full
+dimension score string into the attributed verdict for comparison with the
+raw YAML; use only the canonical score token for finding severity and
+overall-verdict consistency. The overall verdict remains a bare canonical
+token. Blank or ambiguous scores are rejected. Duplicate YAML mapping keys
+at any depth are rejected.
 A transient executor failure or malformed outside output may be retried once
 for the same digest and reviewer identity, but every repeat outside execution
 is a newly authorized review with a fresh preflight. The earlier consent does

@@ -129,7 +129,7 @@ lens: <the lens you were given>
 reviewed_sha: <echoed verbatim>
 review_target_sha: <echoed verbatim, branch-end review only>
 dimension_scores:
-  <dimension>: PASS | PASS_WITH_NOTES | NEEDS_REVISION | "N/A — <reason>"
+  <dimension>: PASS | PASS_WITH_NOTES | NEEDS_REVISION | "<canonical score> — <nonblank rationale>" | "N/A — <reason>"
 findings:
   - severity: fatal | important | nit
     dimension: <one of your lens's dimensions>
@@ -142,6 +142,12 @@ probe_confirmations:             # optional, only when probe output was handed t
     reviewed_sha: <the commit the probe output ran at, as handed; at branch-end, review_target_sha, never the diff base>
     quote: "<complete output lines, copied verbatim>"
 ```
+
+For outside reviews, a dimension may use an exact canonical score followed by
+` — ` and nonblank rationale. Preserve the full dimension score string in the
+attributed verdict for comparison with the raw YAML; use only the canonical
+score token for finding severity and overall-verdict consistency. The overall
+verdict remains a bare canonical token. Blank or ambiguous scores are rejected.
 
 **Probe confirmations.** When the orchestrator hands you the output files of
 adversarial programs together with the commit they ran at, do not run any

@@ -5,7 +5,7 @@
 - Claude reviews run with safe and restricted single-run settings, automatic compaction, configured MCP servers disabled, and a Read/Glob/Grep tool allowlist. Model file tools stay within the review root; CLI startup may still access or write outside it.
 - An optional Claude estimated-spend threshold applies separately to preflight and review; it is not a hard billing maximum. Structured `rapid_refill_breaker` results, including zero-exit results, report an incomplete review without exposing raw review material or silently retrying.
 - Completed outside reviews may use one whole-output YAML fence and nonempty findings without classification labels. Receipts still bind the unmodified raw output, while duplicate YAML keys, missing anchors, weak dimension scores and contradictory verdicts remain rejected.
-- Dimension scores may append a nonblank rationale after ` — `; validation uses the canonical score for finding and overall-verdict checks while preserving the full score and raw-output digest.
+- Outside-review dimension scores may append a nonblank rationale after ` — `; reviewer and closing-review instructions match validation, which uses the canonical score for finding and overall-verdict checks while preserving the full score and raw-output digest.
 
 ## [3.48.4] — 2026-10-25 — fix(loom-code): preserve hook exit codes in zsh
 
