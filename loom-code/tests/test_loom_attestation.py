@@ -523,6 +523,63 @@ def test_outside_receipt_accepts_whole_yaml_fence_and_unlabeled_finding() -> Non
         assert prepared[1]["findings"] == [finding]
 
 
+def test_outside_receipt_accepts_explained_score_without_changing_receipt() -> None:
+    target = "b" * 40
+    score = "PASS_WITH_NOTES — The anchored finding needs follow-up"
+    fields = {"verdict": "PASS_WITH_NOTES", "lens": "plan",
+              "reviewed_sha": "a" * 40, "review_target_sha": target,
+              "dimension_scores": {"deletion-first": score},
+              "findings": [{"severity": "important", "dimension": "deletion-first",
+                            "anchor": "docs/guide.md:1", "text": "Missing fact",
+                            "fix": "Add the fact"}], "notes": []}
+    raw = yaml.safe_dump(fields, sort_keys=False)
+    verdict = {**fields, "reviewer": "outside", "vendor": "anthropic",
+               "model": "sonnet", "external_review": {
+                   "status": "completed", "reason": None, "executor": "claude",
+                   "requested_model": "sonnet", "requested_effort": "high",
+                   "requested_family": "anthropic",
+                   "evidence_level": "accepted-explicit-settings",
+                   "observed_model": "claude-sonnet-4-5", "observed_effort": None,
+                   "review_output": raw}}
+
+    prepared, failure = reviewers.attach_outside_receipt(
+        [{"vendor": "openai", "lens": "plan"}, verdict], "anthropic", target)
+
+    assert failure is None
+    assert prepared[1]["dimension_scores"]["deletion-first"] == score
+    assert prepared[1]["external_review"]["output_digest"] == hashlib.sha256(raw.encode()).hexdigest()
+    assert "review_output" not in prepared[1]["external_review"]
+
+
+@pytest.mark.parametrize("score,overall,findings,reason", [
+    ("PASS_WITH_NOTES —   ", "PASS_WITH_NOTES", [], "required reviewer YAML"),
+    ("PASS_WITH_NOTES — PASS", "PASS_WITH_NOTES", [], "required reviewer YAML"),
+    ("PASS_WITH_NOTES - rationale", "PASS_WITH_NOTES", [], "required reviewer YAML"),
+    ("PASS_WITH_NOTES — rationale", "PASS", [], "overall verdict"),
+    ("PASS — rationale", "PASS_WITH_NOTES", ["important"], "dimension score"),
+    ("PASS_WITH_NOTES — rationale", "NEEDS_REVISION", ["fatal"], "dimension score"),
+])
+def test_outside_receipt_rejects_bad_explained_scores(
+    score: str, overall: str, findings: list[str], reason: str,
+) -> None:
+    target = "b" * 40
+    fields = {"verdict": overall, "lens": "plan", "reviewed_sha": "a" * 40,
+              "review_target_sha": target,
+              "dimension_scores": {"deletion-first": score},
+              "findings": [{"severity": severity, "dimension": "deletion-first",
+                            "anchor": f"docs/guide.md:{line}", "text": "Missing fact",
+                            "fix": "Add the fact"}
+                           for line, severity in enumerate(findings, 1)], "notes": []}
+    verdict = {**fields, "reviewer": "outside", "vendor": "anthropic",
+               "model": "sonnet", "external_review": {
+                   "review_output": yaml.safe_dump(fields)}}
+
+    _, failure = reviewers.attach_outside_receipt(
+        [{"vendor": "openai", "lens": "plan"}, verdict], "anthropic", target)
+
+    assert failure is not None and reason in failure
+
+
 @pytest.mark.parametrize("suffix", ["\nextra prose", "\n```yaml\nverdict: PASS\n```"])
 def test_outside_receipt_rejects_text_around_whole_yaml_fence(suffix: str) -> None:
     fields = {"verdict": "PASS", "lens": "plan", "reviewed_sha": "a" * 40,
@@ -590,8 +647,8 @@ def test_outside_receipt_rejects_duplicate_nested_score_key() -> None:
         "verdict: PASS\nlens: plan\n"
         f"reviewed_sha: {'a' * 40}\nreview_target_sha: {target}\n"
         "dimension_scores:\n"
-        "  deletion-first: NEEDS_REVISION\n"
-        "  deletion-first: PASS\n"
+        "  deletion-first: NEEDS_REVISION — First rationale\n"
+        "  deletion-first: PASS — Second rationale\n"
         "findings: []\nnotes: []\n"
     )
     fields = yaml.safe_load(raw)

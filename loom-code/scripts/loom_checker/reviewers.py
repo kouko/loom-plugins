@@ -72,6 +72,19 @@ def _valid_finding_anchor(anchor: str) -> bool:
                 re.search(r"[1-9]", match.group(2)))
 
 
+_CANONICAL_SCORES = frozenset({"PASS", "PASS_WITH_NOTES", "NEEDS_REVISION"})
+
+
+def _canonical_score(score: str) -> str | None:
+    if score in _CANONICAL_SCORES:
+        return score
+    token, separator, rationale = score.partition(" — ")
+    if (separator and token in _CANONICAL_SCORES and rationale.strip()
+            and rationale.strip() not in _CANONICAL_SCORES):
+        return token
+    return None
+
+
 def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
     """Check the required owning-reviewer fields before accepting outside YAML."""
     if not isinstance(parsed, dict):
@@ -85,7 +98,7 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
     scores = parsed.get("dimension_scores")
     if (expected is None or not isinstance(scores, dict) or set(scores) != expected or
             any(not isinstance(score, str) or
-                (score not in {"PASS", "PASS_WITH_NOTES", "NEEDS_REVISION"}
+                (_canonical_score(score) is None
                  and not re.fullmatch(r"N/A — .+", score))
                 for score in scores.values()) or
             not isinstance(parsed.get("reviewed_sha"), str) or
@@ -118,7 +131,9 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
         for entry in confirmations
     ):
         return "selected outside execution has malformed probe confirmations"
-    for dimension, score in scores.items():
+    canonical_scores = {dimension: _canonical_score(score)
+                        for dimension, score in scores.items()}
+    for dimension, score in canonical_scores.items():
         relevant = [finding["severity"] for finding in findings
                     if finding["dimension"] == dimension]
         if (("fatal" in relevant or relevant.count("important") >= 2)
@@ -127,10 +142,10 @@ def _review_yaml_failure(parsed: object, verdict: dict) -> str | None:
                     {"PASS_WITH_NOTES", "NEEDS_REVISION"}):
             return "selected outside execution dimension score contradicts findings"
     severity = [finding["severity"] for finding in findings]
-    if ("NEEDS_REVISION" in scores.values() or "fatal" in severity or
+    if ("NEEDS_REVISION" in canonical_scores.values() or "fatal" in severity or
             severity.count("important") >= 2):
         expected_verdict = "NEEDS_REVISION"
-    elif "PASS_WITH_NOTES" in scores.values() or "important" in severity:
+    elif "PASS_WITH_NOTES" in canonical_scores.values() or "important" in severity:
         expected_verdict = "PASS_WITH_NOTES"
     else:
         expected_verdict = "PASS"
