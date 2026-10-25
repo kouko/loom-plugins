@@ -1,6 +1,6 @@
 # Reliable Claude Code independent review — plan
-intent: 2026-10-24-claude-independent-review-reliability@0743260432a8ecdfc4dd392b5bf236aeb050c1d0
-spec: docs/loom/2026-10-24-claude-independent-review-reliability/spec.md@0d60f19069f9e7a0db64f778e5042f10f104f233
+intent: 2026-10-24-claude-independent-review-reliability@a6a236b10a9a5373a9c2a046b9fbcb8ad5d1d071
+spec: docs/loom/2026-10-24-claude-independent-review-reliability/spec.md@d8bb2a5af51107701fd1e85e479ed67f0f0cf9be
 charter: 1.1
 
 ## Task DAG
@@ -52,14 +52,22 @@ charter: 1.1
 
 **W5-03 Correct the Claude budget disclosure**  after: W5-02  acceptance: 1, 2
 - Files: `loom-code/skills/external-review/SKILL.md`, `loom-code/CHANGELOG.md`, `docs/loom/2026-10-24-claude-independent-review-reliability/spec.md`, `docs/loom/2026-10-24-claude-independent-review-reliability/plan.md`, `docs/loom/2026-10-24-claude-independent-review-reliability/acceptance-test-report.md`, `docs/loom/2026-10-24-claude-independent-review-reliability/evidence/acceptance-test-evidence.md`
-- Test: A1/A2 positive: disclose per-process estimated-spend limit before authorization; boundary: never describe USD 6 as a hard maximum.
+- Test: A1 positive: disclosed_review_budget; boundary: review_cost_not_hard_capped. A2 positive: disclosed_preflight_budget; boundary: no_global_setting_change.
 - Risk: agent-decided — align every changed budget statement with Claude's documented estimate-based behavior; do not change the CLI invocation or expand the authorized run.
+
+### Wave 6 — Accept the observed completed review
+
+**W6-01 Parse explained dimension scores**  after: W5-03  acceptance: 5, 6
+- Files: `loom-code/scripts/loom_checker/reviewers.py`, `loom-code/tests/test_loom_attestation.py`, `loom-code/CHANGELOG.md`
+- Test: A5 positive: canonical_score_unchanged; boundary: raw_receipt_preserved. A6 positive: dash_explained_score; negative: blank_or_ambiguous_rationale, duplicate_score, severity_or_verdict_conflict.
+- Risk: agent-decided — extend only REQ-6 at the existing receipt parser, preserving W5-01 strict checks and the original review text; tests must cover the protected parser's existing cases.
 
 ## Simplicity check
 
 - Keep the Claude contract and runner in one task — taken
 - Move live acceptance to Closing Review — taken
 - Keep the existing YAML carrier — taken
+- Keep W6-01 after completed W5 work — taken
 
 ## Questions asked
 
@@ -71,4 +79,4 @@ charter: 1.1
 2. A live Claude run transmits the authorized packet to Anthropic; the confirmed USD 6 estimate-based limit applies separately to preflight and review and may be exceeded. Do not retry without fresh authorization.
 3. Safe and restricted CLI flags are version-dependent; probe the installed CLI and keep synthetic tests separate from the live result.
 4. Build ends with an independent adversary's committed executable cases, followed by the complete package suite before Closing Review.
-5. The earlier review episode used its three digests. The newly confirmed intent starts a new episode. Retained Haiku/low output permits local parser testing, but not Opus/high live acceptance. No new external invocation is authorized.
+5. The earlier review episode used its three digests. The revised confirmed intent starts a new episode. The already authorized completed Opus/high output permits local parser replay and acceptance without a new external invocation; no further Claude call is authorized.
