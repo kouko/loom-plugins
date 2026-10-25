@@ -6,6 +6,11 @@
 - An optional Claude estimated-spend threshold applies separately to preflight and review; it is not a hard billing maximum. Structured `rapid_refill_breaker` results, including zero-exit results, report an incomplete review without exposing raw review material or silently retrying.
 - Completed outside reviews may use one whole-output YAML fence and nonempty findings without classification labels. Receipts still bind the unmodified raw output, while duplicate YAML keys, missing anchors, weak dimension scores and contradictory verdicts remain rejected.
 
+## [3.48.4] — 2026-10-25 — fix(loom-code): preserve hook exit codes in zsh
+
+- Claude Code, Codex, OpenCode, and AGY hook commands use a Loom-prefixed exit-code variable so zsh does not abort on its read-only `status` parameter.
+- Hook tests exercise all nine affected commands under zsh and verify that publication hooks preserve a ready checker's refusal code.
+
 ## [3.48.3] — 2026-10-24 — fix(loom-code): register memory-mirror-reminder mechanism
 
 - `docs/loom/evidence/mechanisms.yaml` registers the loom-workflow `PostToolUse:Write|Edit|Bash:memory-mirror-reminder` hook with its eval, so the mechanism checker's R1 and R3 pass.

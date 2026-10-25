@@ -17,6 +17,7 @@ External surfaces grounded:
   so the ``git push`` / ``gh pr create`` / ``gh pr merge`` discrimination
   lives inside ``scripts/loom_checker.py push``, not here.
 """
+# concern: shell-reserved exit-code names can abort host hooks before checker results or fallbacks are handled.
 from __future__ import annotations
 
 import json
@@ -279,6 +280,78 @@ def test_host_hooks_use_ready_runtime_without_host_python(host, tmp_path):
     assert result.returncode == 0, result.stderr
     if host == "antigravity":
         assert json.loads(result.stdout) == {"decision": "allow"}
+
+
+@pytest.mark.parametrize("host,event,matcher", [
+    ("claude", "SessionStart", "compact|resume"),
+    ("claude", "PreToolUse", "Bash"),
+    ("claude", "PostToolUse", "Skill|Agent"),
+    ("claude", "UserPromptSubmit", ""),
+    ("codex", "PreToolUse", "Bash"),
+    ("opencode", "PreToolUse", "Bash"),
+    ("opencode", "PostToolUse", "Skill"),
+    ("antigravity", "PreToolUse", "run_command"),
+    ("antigravity", "PreInvocation", ""),
+])
+@pytest.mark.parametrize("shell", ["/bin/sh", "/bin/zsh"])
+def test_hook_exit_code_capture_avoids_readonly_shell_name(host, event, matcher, shell, tmp_path):
+    if not Path(shell).is_file():
+        pytest.skip(f"{shell} is unavailable")
+    root = REPO / "loom-code"
+    manifests = {"claude": HOOKS_JSON, "codex": CODEX_HOOKS_JSON,
+                 "opencode": HOOKS_DIR / "hooks-opencode.json", "antigravity": AGY_HOOKS_JSON}
+    data = json.loads(manifests[host].read_text(encoding="utf-8"))
+    if host == "antigravity":
+        entries = data["loom-code"][event]
+        (entry,) = [item for item in entries if item.get("matcher", "") == matcher]
+        command = (entry["hooks"][0] if event == "PreToolUse" else entry)["command"]
+        payload = {"workspacePaths": [str(tmp_path)], "toolCall": {"args": {"CommandLine": "git status"}},
+                   "conversationId": "readonly", "invocationNum": 0, "initialNumSteps": 1}
+    else:
+        entries = data["hooks"][event]
+        (entry,) = [item for item in entries if item.get("matcher", "") == matcher]
+        (command,) = _commands([entry])
+        payload = {"hook_event_name": event, "tool_name": "Bash",
+                   "tool_input": {"command": "git status"}}
+    if shell == "/bin/sh":
+        command = "readonly status; " + command
+    env = {**os.environ, "XDG_CACHE_HOME": str(tmp_path / "empty"), "TMPDIR": str(tmp_path),
+           "CLAUDE_PLUGIN_ROOT": str(root), "PLUGIN_ROOT": str(root)}
+    result = subprocess.run([shell, "-c", command], input=json.dumps(payload), text=True,
+                            capture_output=True, cwd=root, env=env, timeout=30)
+    assert result.returncode == 0, (host, event, shell, result.stderr)
+
+
+@pytest.mark.parametrize("host", ["claude", "codex", "opencode", "antigravity"])
+def test_publication_hooks_keep_checker_refusal_in_zsh(host, tmp_path):
+    shell = Path("/bin/zsh")
+    if not shell.is_file():
+        pytest.skip("zsh is unavailable")
+    root = tmp_path / "installed"
+    scripts = root / "scripts"
+    scripts.mkdir(parents=True)
+    (scripts / "loom_checker.py").write_text("raise SystemExit(17)\n", encoding="utf-8")
+    hooks_dir = root / "hooks"
+    hooks_dir.mkdir()
+    (hooks_dir / "agy_adapter.py").write_text("raise SystemExit(17)\n", encoding="utf-8")
+    launcher = scripts / "loom-python"
+    launcher.write_bytes((REPO / "loom-code/scripts/loom-python").read_bytes())
+    launcher.chmod(0o755)
+    env = _ready_env(tmp_path)
+    env.update(CLAUDE_PLUGIN_ROOT=str(root), PLUGIN_ROOT=str(root))
+    manifests = {"claude": HOOKS_JSON, "codex": CODEX_HOOKS_JSON,
+                 "opencode": HOOKS_DIR / "hooks-opencode.json", "antigravity": AGY_HOOKS_JSON}
+    data = json.loads(manifests[host].read_text(encoding="utf-8"))
+    if host == "antigravity":
+        command = data["loom-code"]["PreToolUse"][0]["hooks"][0]["command"]
+        payload = {"workspacePaths": [str(tmp_path)],
+                   "toolCall": {"args": {"CommandLine": "git status"}}}
+    else:
+        command = _commands(data["hooks"]["PreToolUse"])[0]
+        payload = {"tool_name": "Bash", "tool_input": {"command": "git status"}}
+    result = subprocess.run([str(shell), "-c", command], input=json.dumps(payload),
+                            text=True, capture_output=True, cwd=root, env=env, timeout=30)
+    assert result.returncode == 17, (host, result.stderr)
 
 
 def test_missing_ready_runtime_reports_repair_without_checker_refusal(hooks, tmp_path):
