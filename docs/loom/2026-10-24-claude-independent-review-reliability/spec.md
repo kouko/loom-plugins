@@ -1,5 +1,5 @@
 # Reliable Claude Code independent review — spec
-intent: 2026-10-24-claude-independent-review-reliability@d662b3e6f683bd68f5c2ee8de3a09eef6c993c8f
+intent: 2026-10-24-claude-independent-review-reliability@a6a236b10a9a5373a9c2a046b9fbcb8ad5d1d071
 pre-build-review: required — external data transfer, filesystem access, and the public failure contract change
 
 ## Requirements
@@ -20,7 +20,7 @@ REQ-5 — Accept harmless review formatting
   WHEN a completed outside reviewer returns one YAML document in a single whole-output YAML fence or omits only a Conventional Comments label from otherwise complete findings, the owning flow shall accept the unchanged review fields and bind a receipt to the raw output; findings without a nonempty path plus a positive line number or nonblank verbatim quote, missing required fields, dimension scores weaker than their findings require, or contradictory overall scores and verdicts shall remain rejected → Acceptance #5
 
 REQ-6 — Accept explained dimension scores
-  WHEN a completed model-attributed outside review appends nonempty explanation text after an unambiguous dimension score, the owning flow shall retain the unchanged review fields and raw-output receipt while evaluating findings and the overall verdict against that score; ambiguous scores, duplicate keys, and contradictions shall remain rejected without another model execution → Acceptance #6
+  WHEN a completed model-attributed outside review appends nonempty explanation text after an unambiguous dimension score using the observed ` — ` separator, the owning flow shall retain the unchanged review fields and raw-output receipt while evaluating findings and the overall verdict against that score; ambiguous scores, duplicate keys, and contradictions shall remain rejected without another model execution → Acceptance #6
 
 ## Design decision
 
