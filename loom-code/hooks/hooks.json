@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; status=$?; if [ \"$status\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$status\""
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$loom_hook_exit_code\""
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f \"${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py\" ]; then \"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready push --hook; status=$?; if [ \"$status\" -eq 86 ]; then echo 'loom: publication hook failed (checker runtime unavailable; run loom-python --repair in an agent station); allowing.' >&2; exit 0; fi; exit \"$status\"; else cat >/dev/null; echo \"loom: publication hook failed (installed checker is unavailable at ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py; restart Claude Code to load the installed plugin version); allowing.\" >&2; exit 0; fi"
+            "command": "if [ -f \"${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py\" ]; then \"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready push --hook; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then echo 'loom: publication hook failed (checker runtime unavailable; run loom-python --repair in an agent station); allowing.' >&2; exit 0; fi; exit \"$loom_hook_exit_code\"; else cat >/dev/null; echo \"loom: publication hook failed (installed checker is unavailable at ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py; restart Claude Code to load the installed plugin version); allowing.\" >&2; exit 0; fi"
           }
         ]
       }
@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; status=$?; if [ \"$status\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$status\""
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$loom_hook_exit_code\""
           }
         ]
       }
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; status=$?; if [ \"$status\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$status\""
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then exec python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$loom_hook_exit_code\""
           }
         ]
       }
