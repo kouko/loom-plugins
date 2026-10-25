@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[5] / "loom-code" / "scripts"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from loom_checker.reviewers import attach_outside_receipt  # noqa: E402
 
 
