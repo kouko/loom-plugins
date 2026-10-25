@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/loom-python --ready --script ../hooks/agy_adapter.py push-gate; status=$?; if [ \"$status\" -eq 86 ]; then printf '{\"decision\":\"allow\",\"reason\":\"loom: publication hook failed (checker runtime unavailable; run loom-python --repair in an agent station); allowing.\"}\\n'; exit 0; fi; exit \"$status\"",
+            "command": "./scripts/loom-python --ready --script ../hooks/agy_adapter.py push-gate; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then printf '{\"decision\":\"allow\",\"reason\":\"loom: publication hook failed (checker runtime unavailable; run loom-python --repair in an agent station); allowing.\"}\\n'; exit 0; fi; exit \"$loom_hook_exit_code\"",
             "timeout": 30
           }
         ]
@@ -15,7 +15,7 @@
     "PreInvocation": [
       {
         "type": "command",
-        "command": "./scripts/loom-python --ready --script ../hooks/agy_adapter.py pre-invocation; status=$?; if [ \"$status\" -eq 86 ]; then exec python3 ./hooks/agy_adapter.py pre-invocation; fi; exit \"$status\"",
+        "command": "./scripts/loom-python --ready --script ../hooks/agy_adapter.py pre-invocation; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then exec python3 ./hooks/agy_adapter.py pre-invocation; fi; exit \"$loom_hook_exit_code\"",
         "timeout": 20
       }
     ]
