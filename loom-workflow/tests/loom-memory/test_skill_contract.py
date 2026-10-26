@@ -485,3 +485,24 @@ def test_workflow_point_sentence_names_trigger_2_exception() -> None:
     match = re.search(r"[^.]*reaching any particular point in a workflow[^.]*\.", section, re.IGNORECASE)
     assert match, "activation section must keep the workflow-point sentence"
     assert "trigger 2" in match.group(0), "workflow-point sentence must exempt the host memory save (trigger 2)"
+
+
+# Acceptance A3 (five-skill consistency): an equivalent lesson has one named
+# outcome in Reconcile, worded identically in SKILL.md and operations.md.
+EQUIVALENCE_OUTCOME = (
+    "an equivalent lesson keeps the existing entry unchanged and only adds "
+    "its new source to that entry's `sources`"
+)
+NO_SECOND_ENTRY = "never create a second entry for the same subject"
+
+
+def test_reconcile_names_the_equivalence_outcome() -> None:
+    for text in (_skill_md_text(), _operations_md_text()):
+        flat = _flat(_section(text, "Reconcile"))
+        assert "is equivalent to" in flat, "Reconcile's trigger must name equivalence"
+        assert EQUIVALENCE_OUTCOME in flat, "Reconcile must name the equivalence outcome"
+
+
+def test_reconcile_forbids_a_second_entry_for_the_same_subject() -> None:
+    for text in (_skill_md_text(), _operations_md_text()):
+        assert NO_SECOND_ENTRY in _flat(_section(text, "Reconcile"))

@@ -89,16 +89,20 @@ outcome — step 1 is where that is decided, one candidate at a time.
 
 ## Reconcile
 
-1. Reconcile activates when a new lesson contradicts or narrows a current
-   entry found during Recall or Record's search step — never as a
-   separate discovery pass.
+1. Reconcile activates when a new lesson contradicts, narrows, or is
+   equivalent to (same subject, same rule) a current entry found during
+   Recall or Record's search step — never as a separate discovery pass.
 2. Locate the exact current entry through `index.md`; do not guess at a
    filename.
-3. Decide: does the new lesson replace the old one outright, or narrow it
-   (the old lesson still holds in a smaller set of cases)? Either way, the
-   result is exactly one current concept for the subject — editing the
-   existing file in place, or replacing its content wholesale. Never
-   leave both the old and the new as separate live entries.
+3. Decide: is the new lesson equivalent to the old one, does it replace
+   the old one outright, or does it narrow it (the old lesson still holds
+   in a smaller set of cases)? An equivalent lesson keeps the existing
+   entry unchanged and only adds its new source to that entry's
+   `sources`. In every case, the result is exactly one current concept
+   for the subject — keeping the existing file, editing it in place, or
+   replacing its content wholesale. Never create a second entry for the
+   same subject: never leave both the old and the new as separate live
+   entries.
 4. Preserve every `sources[].resource` already on the entry; add the
    source for the new evidence rather than dropping the old provenance.
 5. Regenerate and validate the index.
