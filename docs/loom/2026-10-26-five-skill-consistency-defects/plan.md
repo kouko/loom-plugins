@@ -17,7 +17,7 @@ charter: 1.1
 **W1-01 Adversarial no-program outcome recorded and accepted**  after: none  acceptance: 1
 - Files: `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/intent_state.py`, `loom-code/contract/manifest.yaml`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/tests/test_selection_finalize.py`, `loom-code/tests/test_loom_attestation.py`, `loom-code/tests/test_loom_checker_intake.py`
 - Test: A1 positive: marker row finalizes, revalidates and is delivery-recognized; negative: blank reason, marker plus program, and no record each refused.
-- Risk: agent-decided — marker row instead of a v3 schema; both validators accept it before the program-only checks, and it stays out of execution and cap counting. See Risks 6 and 7.
+- Risk: agent-decided — marker row instead of a v3 schema; both validators accept it before the program-only checks, and it stays out of execution and cap counting. See Risks 6-8.
 
 **W1-02 Adversarial protocol prose matches the checker**  after: W1-01  acceptance: 1, 2, 5
 - Files: `loom-code/skills/closing-review/references/adversarial.md`, `loom-code/agents/adversary.md`, `loom-code/skills/build/SKILL.md`, `loom-code/tests/test_adversary_protocol.py`
@@ -66,3 +66,4 @@ charter: 1.1
 5. user-decided — second-vendor selection-confirmed: codex
 6. agent-decided — the contract manifest `version:` stays 2.3.1: W1-01 adds a row form inside an existing field, no field added or removed. W2-01's CHANGELOG entry states "contract manifest version stays 2.3.1", the wording `test_adversarial_version_metadata_sync.py:163` reads.
 7. W1-01 edits `closing-review/SKILL.md`, which `test_adversary_protocol.py` scans for a case-count floor; its prose gains no wording such as "at least one program", and that test runs after the edit.
+8. agent-decided — W1-01 counts the no-program record only through `missing_adversarial_execution` (`probes.py:566`), which finalize-review and the attestation validator both call, so one place decides what satisfies the adversarial step; `intent_state.py` only admits the row shape.
