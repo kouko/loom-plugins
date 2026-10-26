@@ -5,9 +5,9 @@ charter: 1.1
 ## Current State Evidence
 
 - Forward — an agent following `adversarial.md` with no committed program is refused at `loom-code/scripts/loom_checker/probes.py:566` (`missing_adversarial_execution`), called from `finalize.py:283` and `attestation.py:195`.
-- Reverse — `skills/closing-review/references/adversarial.md:78` says reuse "spends nothing against the ceiling"; the ceiling recomputes over every artifact finalize-review receives (`probes.py:518`, `finalize.py:334`).
-- Error — the attestation `executions` grammar (`loom-code/contract/manifest.yaml:202`) admits only executed rows, and both validators reject an unknown kind (`attestation.py:191`), so a no-program outcome has nowhere to be recorded.
-- Data — separators measured at `templates/02-linear-steps.md:62` (23), `04-reasoning-chain.md:70` (18, 22) and `:74` (25, 23), `08-system-architecture.md:63` (23); spec and verifier require six (`mermaid-cot-spec.md:204`, `verify_cot_html.py:60`).
+- Reverse — `skills/closing-review/references/adversarial.md:78` says reuse "spends nothing against the ceiling"; the ceiling recomputes over distinct paths from stored, graduated and supplied programs (`probes.py:518`, `finalize.py:334`).
+- Error — the `executions` grammar (`manifest.yaml:202`) admits only executed rows, and both validators check command and digest before kind (`attestation.py:158`, `intent_state.py:143`), so a no-program outcome has nowhere to be recorded.
+- Data — six U+2501 runs: 23 (`02-linear-steps.md:62`) and 18/22/25/23 (`04-reasoning-chain.md:70,74`) are node labels in Acceptance 4's scope; 23 (`08-system-architecture.md:63`) heads a `subgraph`, which the node rules do not govern.
 - Boundary — Record routes an equivalent entry to Reconcile (`SKILL.md:130-131`), whose trigger names only contradiction or narrowing (`SKILL.md:143-145`, `references/operations.md:90-95`).
 
 ## Task DAG
@@ -15,40 +15,42 @@ charter: 1.1
 ### Wave 1 — four independent repairs, one per defect
 
 **W1-01 Adversarial no-program outcome recorded and accepted**  after: none  acceptance: 1
-- Files: `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/intent_state.py`, `loom-code/contract/manifest.yaml`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/tests/test_selection_finalize.py`, `loom-code/tests/test_loom_attestation.py`
-- Test: A1 positive: no-program record finalizes and is recorded; negative: no program and no record still refused.
-- Risk: agent-decided — a marker execution row (`no-program` plus reason) instead of a v3 schema; the delivery witness (`intent_state.py:148`) must accept the kind too.
+- Files: `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/intent_state.py`, `loom-code/contract/manifest.yaml`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/tests/test_selection_finalize.py`, `loom-code/tests/test_loom_attestation.py`, `loom-code/tests/test_loom_checker_intake.py`
+- Test: A1 positive: marker row finalizes, revalidates and is delivery-recognized; negative: blank reason, marker plus program, and no record each refused.
+- Risk: agent-decided — marker row instead of a v3 schema; both validators accept it before the program-only checks, and it stays out of execution and cap counting.
 
 **W1-02 Adversarial protocol prose matches the checker**  after: W1-01  acceptance: 1, 2, 5
-- Files: `loom-code/skills/closing-review/references/adversarial.md`, `loom-code/tests/test_adversary_protocol.py`
-- Test: A1 positive: no-program outcome stated; negative: no case-count floor worded. A2 positive: reuse counts toward the ceiling; boundary: own-program reuse stays free. A5 positive: python3 -m pytest accepted; negative: bare run refused.
-- Risk: prose follows the checker on the ceiling and the command form; the protocol gains no case-count floor.
+- Files: `loom-code/skills/closing-review/references/adversarial.md`, `loom-code/agents/adversary.md`, `loom-code/skills/build/SKILL.md`, `loom-code/tests/test_adversary_protocol.py`
+- Test: A1 positive: producer names the record, not a user skip; negative: no skip instruction left. A2 positive: reuse counts distinct paths; boundary: own-path reuse adds none. A5 positive: versioned launchers accepted; negative: bare run refused.
+- Risk: prose follows the checker on the ceiling and the command form; the protocol gains no case-count floor and no second statement of the limit.
 
 **W1-03 loom-memory names the equivalence outcome**  after: none  acceptance: 3
 - Files: `loom-workflow/skills/loom-memory/SKILL.md`, `loom-workflow/skills/loom-memory/references/operations.md`, `loom-workflow/tests/loom-memory/test_skill_contract.py`
 - Test: A3 positive: equivalence routes to Reconcile with one named outcome; negative: a second entry for the same subject stays forbidden.
-- Risk: both files must name the outcome in the same words; no new operation and no second entry.
+- Risk: agent-decided — extend both files' trigger and outcome steps; Record's routing stays untouched because editing it forces a section-digest re-eval.
 
-**W1-04 Template separators normalized to six**  after: none  acceptance: 4
-- Files: `loom-workflow/skills/loom-visualization/templates/02-linear-steps.md`, `loom-workflow/skills/loom-visualization/templates/04-reasoning-chain.md`, `loom-workflow/skills/loom-visualization/templates/08-system-architecture.md`, `loom-workflow/tests/loom-visualization/test_templates.py`
-- Test: A4 positive: every template separator run is six U+2501; negative: a longer or shorter run fails the guard.
-- Risk: separator and heading shape only; node text, bullets, edges and ids stay byte-identical.
+**W1-04 Node-label separators normalized to six**  after: none  acceptance: 4
+- Files: `loom-workflow/skills/loom-visualization/templates/02-linear-steps.md`, `loom-workflow/skills/loom-visualization/templates/04-reasoning-chain.md`, `loom-workflow/tests/loom-visualization/test_templates.py`
+- Test: A4 positive: node separators are six and a page from each changed template verifies; negative: a seven-character run fails the guard.
+- Risk: agent-decided — template 08's subgraph heading stays as it is; `node-structure.md:51-63` governs boxed node slots only.
 
 ### Wave 2 — release packets, one per affected plugin
 
 **W2-01 loom-code minor release packet**  after: W1-01, W1-02  acceptance: 6
-- Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `loom-code/tests/test_write_plan_station_text.py`
-- Test: A6 positive: loom-code manifests and READMEs all read 3.50.0; negative: one unsynchronized derived manifest fails the pin.
-- Risk: derived manifests come from `sync_codex_manifests.py --all`; the bump lands before closing review or the attestation goes stale.
+- Files: `loom-code/.claude-plugin/plugin.json`, `README.md`, `loom-code/CHANGELOG.md`, `loom-code/README.md`, `loom-code/README.ja.md`, `loom-code/README.zh-TW.md`, `loom-code/tests/test_write_plan_station_text.py`
+- Test: A6 positive: loom-code manifests and both README levels read 3.50.0; negative: one unsynchronized derived manifest fails the pin.
+- Risk: `sync_codex_manifests.py --all` writes the three derived manifests; the bump lands before closing review or the attestation goes stale.
 
-**W2-02 loom-workflow minor release packet**  after: W1-03, W1-04  acceptance: 6
-- Files: `loom-workflow/.claude-plugin/plugin.json`, `loom-workflow/CHANGELOG.md`, `loom-workflow/README.md`, `loom-workflow/README.ja.md`, `loom-workflow/README.zh-TW.md`
-- Test: A6 positive: loom-workflow manifests and READMEs all read 5.16.0; negative: an unsynchronized derived manifest fails the sync check.
-- Risk: same release packet as W2-01; a missing CHANGELOG entry or README string fails the version pins.
+**W2-02 loom-workflow minor release packet**  after: W1-03, W1-04, W2-01  acceptance: 6
+- Files: `loom-workflow/.claude-plugin/plugin.json`, `README.md`, `loom-workflow/CHANGELOG.md`, `loom-workflow/README.md`, `loom-workflow/README.ja.md`, `loom-workflow/README.zh-TW.md`, `loom-workflow/tests/scripts/test_release_metadata.py`
+- Test: A6 positive: loom-workflow manifests, READMEs and both root rows read 5.16.0; negative: a stale `CURRENT` pin fails the release test.
+- Risk: shares root `README.md` with W2-01, so it runs after it; its own `CURRENT` pin and root rows are rewritten here.
 
 ## Simplicity check
 
-- W1-04 narrowed to template 04 only — declined: the spec's Layout layer owns every boxed node including 08's subgraph heading, so all four measured runs in 02/04/08 normalize to six in one task.
+- W1-04 includes template 08's subgraph heading — declined: the node rules govern boxed node slots only, and the intent's Out of scope excludes widening template applicability.
+- W1-04 narrowed to templates 02 and 04 with a page-construction check — taken
+- W1-01 carried as a new attestation schema version — declined: a marker row leaves the key set, template and field pins untouched.
 
 ## Questions asked
 
@@ -57,8 +59,8 @@ charter: 1.1
 
 ## Risks
 
-1. Item 1 changes the attestation's recorded execution kinds, so the closing review must re-run the complete package suite and re-read every attestation consumer.
-2. Items 2 and 5 change protocol prose only; acceptance testing must read the prose against `probes.py` rather than look for new runtime behavior.
-3. Derived plugin manifests are regenerated by the sync script, never hand-edited; a hand edit drifts silently and the version pins catch it late.
-4. Upstream `docs/` evidence and intent text stay untouched, so no review lens re-reads them as changed content.
+1. Item 1 changes how an attestation records the adversarial step, so its producer and every consumer land together: adversary contract, Build hand-off and recovery, finalization, validation and delivery recognition.
+2. Acceptance 6 is proved by `scripts/run_package_tests.py --loom-family` at the end of Build; the two release pins check versions only and are not a substitute.
+3. Items 2 and 5 change protocol prose only; acceptance testing must read the prose against `probes.py` rather than look for new runtime behavior.
+4. Derived plugin manifests are regenerated by the sync script, never hand-edited; a hand edit drifts silently and the version pins catch it late.
 5. user-decided — second-vendor selection-confirmed: codex
