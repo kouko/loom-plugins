@@ -73,9 +73,13 @@ committing. An attack the change survives is still reported as an attempt;
 when no attack earned a new program, the adversary names one existing
 repository test that covers the change as this change's program, adding the
 `concern:` line the reuse rule below describes, when such a test exists,
-rather than padding a new one. Reusing a program this change already
-committed, or a repository test that already covers a case, commits no new
-program and so spends nothing against the ceiling.
+rather than padding a new one. When no such test exists either, the adversary
+records one no-program outcome and its reason, and Build's hand-off carries it
+to closing review as the `no_program` record `finalize-review` accepts in place
+of any program. The ceiling counts distinct program paths across this change's
+store, the programs it graduated and the programs supplied to
+`finalize-review`, so re-running a path already counted adds none, while a
+repository test named as this change's program is a path like any other.
 
 ## Reuse first, update with evidence
 
@@ -143,8 +147,10 @@ A pytest probe's command names only its artifact: `finalize-review` refuses a
 run whose pytest summary shows deselected tests, no passed test, or no
 summary at all (for example `-q` stacked with a config file's `-q` into `-qq`).
 A probe file that defines test functions or test classes must be recorded as
-`python -m pytest <artifact>`: `finalize-review` refuses a bare
-`python3 <artifact>` run of it, because that run calls none of its tests.
+any supported Python invocation followed by `-m pytest <artifact>`, such as a
+versioned interpreter (`python3.12`), an interpreter named by its full path,
+or one wrapped in `uv run` or `conda run -n <env>`: `finalize-review` refuses a
+bare `python3 <artifact>` run of it, because that run calls none of its tests.
 
 For another runner, record the command in exactly one of these forms
 (`<A>` = the artifact; `[w]` = an optional `npx`, `npx --yes`, `pnpm exec`,
