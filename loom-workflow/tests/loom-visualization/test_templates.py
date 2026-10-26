@@ -444,3 +444,24 @@ def test_w2_02_templates_adopt_node_structure():
     for name in ("03-branching-decision.md", "05-state-lifecycle.md"):
         mermaid = [b for lang, b in fences(sections(_read(name))["Mermaid"]) if lang == "mermaid"][0]
         assert div_label not in mermaid, f"{name}: Mermaid diamonds/states must stay title-only"
+
+
+DIV_LABEL = re.compile(r"<div style='text-align:left'>.*?</div>")
+
+
+def test_template_div_labels_pass_page_verifier_separator():
+    """Acceptance 4: div labels in 02, 04, 08 use the verifier's six-U+2501 separator."""
+    import verify_cot_html
+
+    for name in ("02-linear-steps.md", "04-reasoning-chain.md", "08-system-architecture.md"):
+        (mermaid,) = [b for lang, b in fences(sections(_read(name))["Mermaid"]) if lang == "mermaid"]
+        labels = DIV_LABEL.findall(mermaid)
+        assert labels, name
+        report = verify_cot_html.Report()
+        for i, label in enumerate(labels):
+            verify_cot_html.check_node_label(f"{name}#{i}", label, report.scoped(name))
+        assert report.fails == [], report.fails
+
+    seven = verify_cot_html.Report()
+    verify_cot_html.check_node_label("n", labels[0].replace("━" * 6, "━" * 7), seven.scoped("neg"))
+    assert any("separator" in msg for msg in seven.fails), seven.fails
