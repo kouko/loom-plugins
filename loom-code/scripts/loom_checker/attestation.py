@@ -9,6 +9,7 @@ from loom_checker.probes import command_executes_artifact
 from loom_checker.probes import command_names_artifact
 from loom_checker.probes import declared_test_command
 from loom_checker.probes import missing_adversarial_execution
+from loom_checker.probes import stored_probe_programs
 from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
 from loom_checker.reviewers import outside_verdict_failure
@@ -198,7 +199,10 @@ def validate_attestation(
             return [(rule, "attestation contains an unknown execution kind")]
     if package_runs > 1 or (package_runs == 0 and "package-tests" not in skip):
         return [(rule, "attestation must record exactly one package-tests execution")]
-    missing = missing_adversarial_execution(adversarial_runs, skip, no_program)
+    missing = missing_adversarial_execution(
+        adversarial_runs, skip, no_program,
+        stored_probe_programs(repo, head_sha, change_id) if no_program else 0,
+    )
     if missing:
         return [(rule, missing)]
 

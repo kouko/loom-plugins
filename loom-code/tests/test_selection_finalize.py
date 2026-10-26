@@ -204,8 +204,8 @@ def test_a_recorded_no_program_outcome_finalizes_and_revalidates(tmp_path: Path)
 
 
 @pytest.mark.parametrize("adversarial", [
-    [{"no_program": "  "}], [NO_PROGRAM, *ADVERSARIAL], [],
-], ids=["blank-reason", "beside-a-program", "no-record"])
+    [{"no_program": "  "}], [NO_PROGRAM, *ADVERSARIAL], [], [NO_PROGRAM],
+], ids=["blank-reason", "beside-a-program", "no-record", "beside-a-stored-program"])
 def test_a_no_program_outcome_needs_a_reason_and_no_program(
     tmp_path: Path, adversarial: list,
 ) -> None:

@@ -563,8 +563,15 @@ def check_adversarial_proportionate(
     return []
 
 
+def stored_probe_programs(repo: Path, head_sha: str, change_id: str) -> int:
+    """How many adversarial programs the change holds outside its records:
+    committed under its probe store, or graduated into the package suite."""
+    return len(set(committed_probe_programs(repo, head_sha, change_id))
+               | set(graduated_probe_programs(repo, head_sha, change_id)))
+
+
 def missing_adversarial_execution(
-    count: int, skip: set[str], no_program: list = (),
+    count: int, skip: set[str], no_program: list = (), stored: int = 0,
 ) -> str | None:
     """The refusal reason when a change records no adversarial execution
     and the adversarial step was not skipped, else None.
@@ -576,9 +583,14 @@ def missing_adversarial_execution(
     `no_program` holds the reasons of recorded no-program outcomes: the
     adversary attacked and found no program worth committing. Exactly one,
     with a non-blank reason and no program beside it, satisfies the step.
+
+    `stored` counts the programs the change holds from another source
+    (`stored_probe_programs`). It is kept apart from `count`, which counts
+    executed records: a stored program does not satisfy the step, but it
+    does contradict a record saying the adversary committed none.
     """
     if no_program:
-        if len(no_program) > 1 or count:
+        if len(no_program) > 1 or count or stored:
             return "a no-program record must be the only adversarial record"
         if not isinstance(no_program[0], str) or not no_program[0].strip():
             return "a no-program record needs a non-blank reason"
