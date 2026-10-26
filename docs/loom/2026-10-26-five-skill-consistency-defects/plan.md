@@ -46,6 +46,13 @@ charter: 1.1
 - Test: A6 positive: loom-workflow manifests, READMEs and both root rows read 5.16.0; negative: a stale `CURRENT` pin fails the release test.
 - Risk: shares root `README.md` with W2-01, so it runs after it; its own `CURRENT` pin and root rows are rewritten here.
 
+### Wave 3 — probe graduation
+
+**W3-01 Graduate the no-program probe into the loom-code suite**  after: W1-01, W2-01  acceptance: 1
+- Files: `docs/loom/2026-10-26-five-skill-consistency-defects/evidence/probes/test_no_program_beside_stored_probe.py`, `loom-code/tests/test_adversarial_no_program_beside_stored.py`
+- Test: A1 positive: the moved probe passes at its suite path and keeps its `concern:` line; negative: the store path no longer exists.
+- Risk: the probe caught a defect on this change, so closing review requires it in the suite before finalize-review; its helper imports follow the new location.
+
 ## Simplicity check
 
 - W1-04 builds a full page from each template — declined: it would require headings, edge labels and columns the templates do not have; a per-label verifier check proves the separator alone.
