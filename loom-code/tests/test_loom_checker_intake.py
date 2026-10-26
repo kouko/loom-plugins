@@ -1061,6 +1061,25 @@ def test_complete_historical_review_note_finding_still_delivers(tmp_path: Path) 
     assert "delivered" in result.stderr
 
 
+def test_recorded_no_program_outcome_still_delivers(tmp_path: Path) -> None:
+    repo = make_repo(tmp_path)
+    commit_intent(repo, "status: confirmed 2026-09-02")
+    git(repo, "checkout", "-q", "-b", "no-program-snapshot")
+    write_attestation(repo)
+    path = repo / "docs/loom" / CHANGE / "attestation.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload["executions"].append({"kind": "adversarial", "no_program": "no attack survived"})
+    write_attestation(repo, payload=payload)
+    git(repo, "add", str(path.relative_to(repo)))
+    git(repo, "commit", "-q", "-m", "delivery with no-program record")
+    git(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
+    git(repo, "checkout", "-q", "work")
+
+    result = run_checker("intake", "write-plan", CHANGE, cwd=repo)
+    assert result.returncode == 1
+    assert "delivered" in result.stderr
+
+
 def test_legacy_closed_on_remote_default_still_blocks_intake(tmp_path: Path) -> None:
     repo = make_repo(tmp_path)
     commit_intent(repo, "status: confirmed 2026-09-02")

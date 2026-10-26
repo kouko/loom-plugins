@@ -188,6 +188,37 @@ def test_finalize_and_attestation_refuse_alike_with_one_message(tmp_path: Path) 
     assert [msg for _, msg in validate(repo, stripped)] == [reason]
 
 
+NO_PROGRAM = {"no_program": "every attack failed and no repository test covers it"}
+
+
+def test_a_recorded_no_program_outcome_finalizes_and_revalidates(tmp_path: Path) -> None:
+    """Intent 2026-10-26 Acceptance 1: no program, a recorded reason, no deadlock."""
+    repo = make_repo(tmp_path)
+
+    accepted = finalize(repo, review_input(tmp_path, PASSING, [NO_PROGRAM]))
+
+    assert accepted.returncode == 0, accepted.stderr
+    attestation = written(repo)
+    assert attestation["executions"][1:] == [{"kind": "adversarial", **NO_PROGRAM}]
+    assert validate(repo, attestation) == []
+
+
+@pytest.mark.parametrize("adversarial", [
+    [{"no_program": "  "}], [NO_PROGRAM, *ADVERSARIAL], [],
+], ids=["blank-reason", "beside-a-program", "no-record"])
+def test_a_no_program_outcome_needs_a_reason_and_no_program(
+    tmp_path: Path, adversarial: list,
+) -> None:
+    repo = make_repo(tmp_path)
+    write_probes(repo, 1)
+
+    refused = finalize(repo, review_input(tmp_path, PASSING, adversarial))
+
+    assert refused.returncode == 1
+    assert "BLOCK finalize.adversarial" in refused.stderr
+    assert not (repo / f"docs/loom/{CHANGE}/attestation.json").exists()
+
+
 def write_probes(repo: Path, count: int, concern: bool = True) -> None:
     """Commit `count` probe programs for this change, replacing any earlier set."""
     directory = repo / f"docs/loom/{CHANGE}/evidence/probes"

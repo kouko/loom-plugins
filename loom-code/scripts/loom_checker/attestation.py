@@ -148,6 +148,7 @@ def validate_attestation(
         return [(rule, "attestation records no successful functional executions")]
     package_runs = 0
     adversarial_runs = 0
+    no_program: list = []
     recorded = attestation.get("verdicts")
     verdict_reviewers = {str(v.get("reviewer", "")).strip() for v in recorded
                          if isinstance(v, dict)} if isinstance(recorded, list) else set()
@@ -155,6 +156,11 @@ def validate_attestation(
     for execution in executions:
         if not isinstance(execution, dict):
             return [(rule, "attestation contains a malformed execution")]
+        if "no_program" in execution:
+            if set(execution) != {"kind", "no_program"} or execution.get("kind") != "adversarial":
+                return [(rule, "attestation contains a malformed no-program record")]
+            no_program.append(execution["no_program"])
+            continue
         command = execution.get("command")
         if not isinstance(command, str) or not command.strip():
             return [(rule, "attestation execution has no command")]
@@ -192,7 +198,7 @@ def validate_attestation(
             return [(rule, "attestation contains an unknown execution kind")]
     if package_runs > 1 or (package_runs == 0 and "package-tests" not in skip):
         return [(rule, "attestation must record exactly one package-tests execution")]
-    missing = missing_adversarial_execution(adversarial_runs, skip)
+    missing = missing_adversarial_execution(adversarial_runs, skip, no_program)
     if missing:
         return [(rule, missing)]
 

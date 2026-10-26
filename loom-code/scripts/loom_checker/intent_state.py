@@ -142,6 +142,13 @@ def _delivery_witness_valid(attestation: object, change_id: str) -> bool:
         return False
     execution_fields = {"kind", "command", "artifact", "result", "command_digest"}
     for item in executions:
+        if isinstance(item, dict) and "no_program" in item:
+            # Shape only: probes.missing_adversarial_execution decides what
+            # satisfies the adversarial step.
+            if (set(item) != {"kind", "no_program"} or item.get("kind") != "adversarial"
+                    or not isinstance(item["no_program"], str)):
+                return False
+            continue
         if not isinstance(item, dict) or not execution_fields <= set(item):
             return False
         kind = item.get("kind")

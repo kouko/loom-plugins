@@ -563,14 +563,26 @@ def check_adversarial_proportionate(
     return []
 
 
-def missing_adversarial_execution(count: int, skip: set[str]) -> str | None:
+def missing_adversarial_execution(
+    count: int, skip: set[str], no_program: list = (),
+) -> str | None:
     """The refusal reason when a change records no adversarial execution
     and the adversarial step was not skipped, else None.
 
     One predicate for both places that ask it -- finalize-review over its
     review input, and the attestation validator over the recorded
     executions -- so the two can never answer with different words.
+
+    `no_program` holds the reasons of recorded no-program outcomes: the
+    adversary attacked and found no program worth committing. Exactly one,
+    with a non-blank reason and no program beside it, satisfies the step.
     """
+    if no_program:
+        if len(no_program) > 1 or count:
+            return "a no-program record must be the only adversarial record"
+        if not isinstance(no_program[0], str) or not no_program[0].strip():
+            return "a no-program record needs a non-blank reason"
+        return None
     if count < 1 and "adversarial" not in skip:
         return "at least one adversarial execution is required"
     return None
