@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.50.0] — 2026-10-27 — feat(closing-review): accept a recorded no-program adversarial outcome
+
+- `finalize-review` accepts one `no_program` adversarial record carrying a nonblank reason in place of an executed program, and the attestation marks it with the row `{kind: adversarial, no_program}`. `missing_adversarial_execution` is the single predicate that decides whether adversarial execution is missing.
+- The adversary records the no-program outcome itself instead of asking the user to skip the adversarial step. The program ceiling counts distinct program paths, any supported `-m pytest` invocation is accepted as the adversarial command, and a bare `python3 <artifact>` is refused.
+- The contract manifest's attestation `executions` grammar gains the marker row; the contract manifest version stays 2.3.1.
+
 ## [3.49.0] — 2026-10-24 — fix(external-review): bound Claude reviews and report compaction stops
 
 - Claude reviews run with safe and restricted single-run settings, automatic compaction, configured MCP servers disabled, and a Read/Glob/Grep tool allowlist. Model file tools stay within the review root; CLI startup may still access or write outside it.
