@@ -148,7 +148,7 @@ current entry (same subject, same rule).
 **Steps:**
 1. Locate the current entry through `index.md`, never by guessing a
    filename.
-2. An equivalent lesson keeps the existing entry unchanged and only adds
+2. An equivalent lesson keeps the existing entry's content unchanged and only adds
    its new source to that entry's `sources`. A contradicting or narrowing
    lesson updates that entry in place, or replaces it with one current
    concept. Never create a second entry for the same subject.

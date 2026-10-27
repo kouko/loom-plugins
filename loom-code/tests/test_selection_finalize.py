@@ -203,19 +203,24 @@ def test_a_recorded_no_program_outcome_finalizes_and_revalidates(tmp_path: Path)
     assert validate(repo, attestation) == []
 
 
-@pytest.mark.parametrize("adversarial", [
-    [{"no_program": "  "}], [NO_PROGRAM, *ADVERSARIAL], [], [NO_PROGRAM],
+@pytest.mark.parametrize("adversarial, stored, reason", [
+    ([{"no_program": "  "}], False, "a no-program record needs a non-blank reason"),
+    ([NO_PROGRAM, *ADVERSARIAL], False, "a no-program record must be the only adversarial record"),
+    ([], False, "at least one adversarial execution is required"),
+    ([NO_PROGRAM], True, "a no-program record must be the only adversarial record"),
 ], ids=["blank-reason", "beside-a-program", "no-record", "beside-a-stored-program"])
 def test_a_no_program_outcome_needs_a_reason_and_no_program(
-    tmp_path: Path, adversarial: list,
+    tmp_path: Path, adversarial: list, stored: bool, reason: str,
 ) -> None:
     repo = make_repo(tmp_path)
-    write_probes(repo, 1)
+    if stored:
+        write_probes(repo, 1)
 
     refused = finalize(repo, review_input(tmp_path, PASSING, adversarial))
 
     assert refused.returncode == 1
     assert "BLOCK finalize.adversarial" in refused.stderr
+    assert reason in refused.stderr
     assert not (repo / f"docs/loom/{CHANGE}/attestation.json").exists()
 
 

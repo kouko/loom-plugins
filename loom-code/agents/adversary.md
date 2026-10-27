@@ -61,6 +61,7 @@ succeeded, and programs committed.
 ```yaml
 attack_points: {found: <n>, earned_a_program: <n>, committed: <n>}
 adversarial: [{command: "<re-runnable command>", artifact: "<where the case now lives>"}]
+# or, when you committed no program: adversarial: [{no_program: "<reason>"}] and probes: []
 probes: [{artifact: "<program or repository test>", status: reused | modified | new, reason: "<one line>"}]
 findings: [{severity: fatal | important | nit, anchor: "<where>", text: "<label> (<decoration>): <what>", fix: "<what would close it>"}]
 ```

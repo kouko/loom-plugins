@@ -97,7 +97,7 @@ outcome — step 1 is where that is decided, one candidate at a time.
 3. Decide: is the new lesson equivalent to the old one, does it replace
    the old one outright, or does it narrow it (the old lesson still holds
    in a smaller set of cases)? An equivalent lesson keeps the existing
-   entry unchanged and only adds its new source to that entry's
+   entry's content unchanged and only adds its new source to that entry's
    `sources`. In every case, the result is exactly one current concept
    for the subject — keeping the existing file, editing it in place, or
    replacing its content wholesale. Never create a second entry for the
