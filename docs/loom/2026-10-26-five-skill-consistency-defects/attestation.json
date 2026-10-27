@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-26-five-skill-consistency-defects",
-  "content_digest": "a597c6d3998dffc6a434c4a731e8910696d0b209",
+  "content_digest": "b5f38fdb2531fb090a0576c1a3a60feebdc6f680",
   "executions": [
     {
       "kind": "package-tests",
@@ -26,51 +26,44 @@
       "lens": "code",
       "verdict": "PASS",
       "reviewed_sha": "755fba06bbd56aa16fd041a5239b91c1cd84ca99",
-      "review_target_sha": "8bb9fdbc2a2a92471527bdc7f5625db9958469c6",
-      "findings": [
-        {
-          "severity": "nit",
-          "anchor": "loom-code/tests/test_adversary_protocol.py:388",
-          "text": "note (non-blocking): no test now pins the producer-side A1 prose (adversary.md:47-49, adversarial.md:76-79); prose correct at HEAD.",
-          "fix": "When the wording is next touched, rephrase without a negation token and pin with affirms()."
-        }
-      ]
+      "review_target_sha": "3b6c96c3383b992f1ce1a3070ccfb7e0277c4926",
+      "findings": []
     },
     {
       "reviewer": "reviewer-codex",
       "vendor": "openai",
       "model": "gpt-6.1-sol",
       "lens": "code",
-      "verdict": "PASS",
+      "verdict": "PASS_WITH_NOTES",
       "reviewed_sha": "755fba06bbd56aa16fd041a5239b91c1cd84ca99",
-      "review_target_sha": "8bb9fdbc2a2a92471527bdc7f5625db9958469c6",
+      "review_target_sha": "3b6c96c3383b992f1ce1a3070ccfb7e0277c4926",
       "findings": [
         {
           "severity": "nit",
-          "dimension": "cross-task-coherence",
-          "anchor": "docs/loom/2026-10-26-five-skill-consistency-defects/plan.md:18",
-          "text": "nitpick (non-blocking): Unfixed from Round 2: W1-01's Files line still omits probes.py, which commit 26616448 changed. Risk 8 identifies the implementation location, so this remains documentation bookkeeping; the rebuttal concerning closing-review/SKILL.md addresses a different file.",
-          "fix": "Add loom-code/scripts/loom_checker/probes.py to W1-01's Files line."
+          "dimension": "tests",
+          "anchor": "docs/loom/2026-10-26-five-skill-consistency-defects/plan.md:60",
+          "text": "nitpick (non-blocking): Round 1 finding 4 remains unfixed. Behavior-changing Files lines name modules without marking their callable entries.",
+          "fix": "Annotate the relevant Files entries with their callable entry points, including command_handlers/publish.py::cmd_publish and command_handlers/finalize.py::cmd_finalize_review."
         }
       ],
       "dimension_scores": {
-        "security": "PASS",
-        "architecture": "PASS",
-        "correctness": "PASS",
+        "security": "PASS — Disclosure validation remains before network calls; the fixes introduce no new external execution.",
+        "architecture": "PASS — Reason admissibility remains centralized in missing_adversarial_execution.",
+        "correctness": "PASS_WITH_NOTES — Source inspection closes the three fatal findings; finalization and stale-status integration cases could not be independently rerun in the read-only sandbox.",
         "naming": "PASS",
-        "tests": "PASS",
-        "refactoring": "PASS",
-        "cross-task-coherence": "PASS — one previously reported documentation nit remains.",
-        "external-surface-grounding": "PASS — the fix introduces no external calls or contract dependencies.",
-        "principles-conformance": "PASS",
-        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists.",
+        "tests": "PASS_WITH_NOTES — The changed section-boundary regression passed; both changed test files collected 106 cases. Full execution was blocked by unavailable writable temporary directories.",
+        "refactoring": "PASS — The fixes preserve the shared parser and avoid duplicating reason validation.",
+        "cross-task-coherence": "PASS — The checker, closing-review instructions, Ship instructions and CHANGELOG agree on the repaired behavior.",
+        "external-surface-grounding": "PASS — The fix delta adds no external API or CLI surface.",
+        "principles-conformance": "PASS — Disclosure is mechanically enforced regardless of verification status.",
+        "architecture-conformance": "N/A — No repository ARCHITECTURE.md exists.",
         "deliberate-simplification": "PASS",
-        "deletion-first": "PASS — removes the three defective assertions without replacement machinery."
+        "deletion-first": "PASS — Restricting reasons at their source resolves the mismatch without adding normalization machinery."
       },
       "notes": [
-        "Round 2 finding 1: fixed. Exactly the three containment-only assertions and their comments were deleted; affirmative assertions, synthetic accepted/rejected examples, absence checks, and runtime coverage remain. The unchanged NO_SECOND_ENTRY prohibition is outside this fix delta.",
-        "Both changed test files ran independently: 37 passed, with no skips. Execution disabled bytecode, pytest caching, plugin autoload, and output capture to accommodate the read-only environment.",
-        "No new finding was introduced by the fix delta. The complete package suite and graduated adversarial program were reported passing by the user; neither was independently rerun in this terminal round."
+        "Round 1 finding 1: fixed. The shared predicate rejects blank or untrimmed reasons, every str.splitlines() boundary, and HTML-comment openers before finalization.",
+        "Round 1 finding 2: fixed; the regression passed for level-1 and indented level-2 boundaries while preserving level-3 subsections. Finding 3: fixed; committed no-program outcomes are checked without the valid-status guard.",
+        "No new defect found in db53bc5902e5affb5b90f83f282cd97501f55dee..3b6c96c3383b992f1ce1a3070ccfb7e0277c4926. Functional fixes require renewed finalization. Reported package-suite and adversarial results were not independently rerun or treated as probe confirmations."
       ],
       "external_review": {
         "status": "completed",
@@ -81,9 +74,9 @@
         "evidence_level": "observed-model-and-effort",
         "observed_model": "gpt-6.1-sol",
         "observed_effort": "high",
-        "output_digest": "dad1fd42a190495f82a5a00f07ee9f4eb2c2253df02abd6e469360680b61d3b2",
+        "output_digest": "4c72847b1b95640daffb1fadb59006975106a9a31d3474f4bb30e52b712ca5fa",
         "reviewer": "reviewer-codex",
-        "review_target_sha": "8bb9fdbc2a2a92471527bdc7f5625db9958469c6"
+        "review_target_sha": "3b6c96c3383b992f1ce1a3070ccfb7e0277c4926"
       }
     }
   ],
@@ -99,6 +92,12 @@
       "anchor": "loom-workflow/skills/loom-memory/SKILL.md:151",
       "text": "note (non-blocking): loom-memory names no outcome for a lesson that broadens an existing entry or adds a sibling rule.",
       "fix": "Name a broaden/sibling outcome in Reconcile when such a lesson is first observed."
+    },
+    {
+      "severity": "nit",
+      "anchor": "docs/loom/2026-10-26-five-skill-consistency-defects/plan.md:60",
+      "text": "nitpick (non-blocking): Round 1 finding 4 remains unfixed. Behavior-changing Files lines name modules without marking their callable entries.",
+      "fix": "Annotate the relevant Files entries with their callable entry points, including command_handlers/publish.py::cmd_publish and command_handlers/finalize.py::cmd_finalize_review."
     }
   ],
   "selection": null
