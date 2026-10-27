@@ -465,3 +465,78 @@ Section 1's and section 6's notes that the disclosure runs only for status
 - 5: carried over. `runs_pytest`, `_python_argv` and
   `direct_pytest_style_failure` are outside the hunk; `adversarial.md` is
   unchanged.
+
+## Re-run on 2026-10-27, at 77b86cf0
+
+Fix range `7c9cb950..77b86cf0`: one commit, 77b86cf0, touching
+`loom-code/scripts/loom_checker/probes.py` (`missing_adversarial_execution`:
+the `"\n" in reason or "\r" in reason` test became
+`len(reason.splitlines()) != 1`, the same split `rule_checks/publish.py:103`
+applies to the body), `loom-code/skills/closing-review/SKILL.md:416-418`
+(the refusal sentence) and `loom-code/tests/test_selection_finalize.py` (two
+parametrized cases). `git diff --stat 7c9cb950..77b86cf0 -- loom-workflow README.md '*/README*' '*plugin.json' '*/package.json' loom-code/CHANGELOG.md loom-code/agents`
+is empty. This section supersedes the 7df38898 section for lines 1, 6 and 7;
+that section's U+2028 / `\x0c` / `\x85` rows (finalize exit 0, publish
+refused) no longer hold.
+
+- Setup: re-tested. Fresh `git clone` of the worktree, checked out at
+  `77b86cf0`, in the session scratch directory. Then
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID loom-code/scripts/loom-python --repair --list-rules`
+  → exit 0, first line `adversarial.proportionate …` (`scratchpad/setup-77b86cf0.log`).
+- 1: re-tested in full. `tools/at_finalize.py <clean> <work> a1` (every case
+  of section 1) plus `tools/at_a1_r4.py <clean> <work>` (the 7df38898 reason
+  shapes plus every `str.splitlines()` boundary and near-misses), real
+  launcher `finalize-review`, status read with the real `verification_status`
+  (`scratchpad/a1-r4.log`, `scratchpad/a1-reasons-r4.log`):
+
+  | case | finalize-review | status |
+  |---|---|---|
+  | positive `[{"no_program": "<reason>"}]` | exit 0 | `valid` |
+  | reason blanked in the committed attestation (tampered) | — | `stale (a no-program outcome needs a reason on one line, with no surrounding whitespace or HTML comment)` |
+  | `[]` | exit 1, `the adversarial step left no outcome: …` | none |
+  | two records / beside a supplied program / beside a stored RED program | exit 1, `a no-program outcome contradicts another adversarial record or a program stored for this change` | none |
+  | extra field | exit 1, `a no-program record carries only its reason` | none |
+  | `"   "`, `""`, leading / trailing space, `\n`, `\r`, `\r\n`, `\x0b`, `\x0c`, `\x1c`, `\x1d`, `\x1e`, `\x85`, U+2028, U+2029 inside, `<!-- x -->`, lone `<!--`, non-string `5` | exit 1, `a no-program outcome needs a reason on one line, with no surrounding whitespace or HTML comment` (18 refusals with this message across both logs) | none |
+  | em dash inside, `\t` inside, `\xa0` inside, U+200B inside, `\x1f` inside, CJK sentence | exit 0 | `valid` |
+
+  Prose: `loom-code/skills/closing-review/SKILL.md:416-418` now reads
+  "`finalize-review` refuses a reason that is blank, is not on one line, has
+  surrounding whitespace or contains an HTML comment, and a no-program record
+  beside any program." — matching `probes.py:600-604`.
+- 6: re-tested in full with `tools/at_a6_r4.py <clean> <work>` (= `at_a6_r3.py`
+  cases 1-5 unchanged, case 6 replaced), same network stub and
+  `subprocess.run` guard; nothing pushed, GitHub never called
+  (`scratchpad/a6-r4.log`). Cases 1-5: every row of the 7df38898 table
+  reproduced (passed / refused identically; the stale fixture printed
+  `stale (attestation functional content digest does not match the selected tree)`).
+  Case 6 — for each reason, finalize-review first, then publish with the
+  exact recorded line under Verification:
+
+  | reason contains | finalize-review | publish |
+  |---|---|---|
+  | U+2028, U+2029, `\x0c`, `\x0b`, `\x1c`, `\x1d`, `\x1e`, `\x85` | exit 1, the one-line refusal; no attestation | not reachable |
+  | `\t`, `\xa0`, U+200B, `\x1f` | exit 0, `valid` | passed (stopped at the stubbed `gh repo view`) |
+  | CJK sentence | exit 0, `valid` | passed; same attestation with the line missing → refused, `push.contextual-body` |
+
+  Every reason finalize-review accepted in this run was disclosable at
+  publish; the accepted-but-undisclosable gap of the 7df38898 run is closed.
+- Criterion tests in the clean clone:
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_publish.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_loom_attestation.py loom-code/tests/test_adversarial_no_program_beside_stored.py`
+  → `170 passed in 64.64s`.
+- 7: re-tested. `loom-code/.claude-plugin/plugin.json` 3.50.0,
+  `loom-workflow/.claude-plugin/plugin.json` 5.16.0, root `README.md` carries
+  `3.50.0` twice; the fix touched no manifest, README or CHANGELOG. The 3.50.0
+  bullet "refuses a no-program reason that is not one trimmed line or that
+  contains an HTML comment" still describes the behaviour. Release pins:
+  `python -m pytest -q loom-code/tests/test_write_plan_station_text.py -k release_metadata loom-workflow/tests/scripts/test_release_metadata.py`
+  → `15 passed, 35 deselected`. Full package suite: not run by me;
+  finalize-review executes it and refuses the attestation when it fails.
+  Suite command:
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+- 2: carried over. The `probes.py` hunk is one condition inside
+  `missing_adversarial_execution`; `check_adversarial_proportionate`,
+  `MAX_PROBE_PROGRAMS` and `references/adversarial.md` are untouched.
+- 3, 4: carried over. The fix touches no `loom-workflow/` file.
+- 5: carried over. `runs_pytest`, `_python_argv` and
+  `direct_pytest_style_failure` are outside the hunk; `adversarial.md` is
+  unchanged; the only prose change is the closing-review refusal sentence.
