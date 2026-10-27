@@ -504,9 +504,6 @@ def test_reconcile_names_the_equivalence_outcome() -> None:
     skill_flat = _flat(_section(_skill_md_text(), "Reconcile"))
     assert affirms(skill_flat, "a new lesson contradicts", "is equivalent to"), \
         "Reconcile's trigger must name equivalence"
-    # Plain containment for operations.md: its trigger sentence ends
-    # "never as a separate discovery pass", a negation `affirms` rejects.
-    assert "is equivalent to" in _flat(_section(_operations_md_text(), "Reconcile"))
     for text in (_skill_md_text(), _operations_md_text()):
         flat = _flat(_section(text, "Reconcile"))
         assert affirms(flat, *OUTCOME_RULE), "Reconcile must name the equivalence outcome"

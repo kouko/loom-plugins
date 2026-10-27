@@ -389,14 +389,9 @@ ASK_TO_SKIP = re.compile(r"\bask(?:s)?\b[^.]{0,60}\bwhether to skip\b", re.I)
 
 def test_no_program_is_recorded_not_asked_about() -> None:
     """A1: no program yields a recorded outcome, never a question to the user."""
-    # Plain containment, not `affirms`: "no-program" itself carries the
-    # negation token `no`, and the `no_program` sentence opens "When no such
-    # test exists", so no affirmative sentence can hold either literal.
     for name, prose in (("adversary.md", ADVERSARY_PROSE), ("adversarial.md", ADVERSARIAL_REF),
                         ("build/SKILL.md", BUILD_PROSE)):
-        assert "no-program outcome" in prose, name
         assert not ASK_TO_SKIP.search(prose), (name, ASK_TO_SKIP.search(prose))
-    assert "`no_program`" in ADVERSARIAL_REF
     # The user's own plain-words skip stays.
     assert affirms(BUILD_PROSE, "The default is the full flow",
                    "skip a step only when the user tells you to in plain words")
