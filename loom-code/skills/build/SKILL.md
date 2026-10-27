@@ -111,7 +111,7 @@ mechanical checks, in this order:
    agent that implemented any part of the change. Give it only the change id,
    `HEAD`, and paths: the intent, the retained plan when present, and the changed paths with their
    artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
-   adversarial programs, or records one no-program outcome and its reason when
+   adversarial programs, or records a no-program outcome and its reason when
    nothing earned a program. It works from the recipes in
    [`adversarial.md`](../closing-review/references/adversarial.md).
 3. Run the repository's complete package suite, then each committed

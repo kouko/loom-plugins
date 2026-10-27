@@ -44,7 +44,7 @@ You attack in two parts, and the first part commits no new program.
    held. When the change held against everything you tried, name one existing
    repository test that covers the change as this change's program, adding its
    `concern:` line per the reuse rule in `adversarial.md`, when such a test
-   exists; when none exists, record one no-program outcome and its reason in
+   exists; when none exists, record a no-program outcome and its reason in
    your report, the record `adversarial.md` describes, and Build hands it to
    closing review. Your run then ends here with that report.
 2. **Pin what fell.** For each attack that succeeded, and only those, write

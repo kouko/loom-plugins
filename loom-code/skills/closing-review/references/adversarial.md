@@ -74,7 +74,7 @@ when no attack earned a new program, the adversary names one existing
 repository test that covers the change as this change's program, adding the
 `concern:` line the reuse rule below describes, when such a test exists,
 rather than padding a new one. When no such test exists either, the adversary
-records one no-program outcome and its reason, and Build's hand-off carries it
+records a no-program outcome and its reason, and Build's hand-off carries it
 to closing review as the `no_program` record `finalize-review` accepts in place
 of any program. The ceiling counts distinct program paths across this change's
 store, the programs it graduated and the programs supplied to

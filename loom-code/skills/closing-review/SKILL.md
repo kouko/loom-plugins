@@ -405,7 +405,7 @@ hand-off to a temporary JSON input outside the repository:
 ```
 
 When Build's hand-off records that the adversary committed no program, the
-`adversarial` list holds that record alone, with its reason:
+`adversarial` list holds the no-program outcome and its reason, with no program beside it:
 
 ```json
   "adversarial": [
