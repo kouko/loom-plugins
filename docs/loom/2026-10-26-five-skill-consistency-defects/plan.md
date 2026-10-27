@@ -15,7 +15,7 @@ charter: 1.1
 ### Wave 1 — four independent repairs, one per defect
 
 **W1-01 Adversarial no-program outcome recorded and accepted**  after: none  acceptance: 1
-- Files: `loom-code/scripts/loom_checker/{command_handlers/finalize,attestation,intent_state,probes}.py`, `loom-code/contract/manifest.yaml`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/tests/test_selection_finalize.py`, `loom-code/tests/test_loom_attestation.py`, `loom-code/tests/test_loom_checker_intake.py`
+- Files: `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/intent_state.py`, `loom-code/contract/manifest.yaml`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/tests/test_selection_finalize.py`, `loom-code/tests/test_loom_attestation.py`, `loom-code/tests/test_loom_checker_intake.py`
 - Test: A1 positive: marker row finalizes, revalidates and is delivery-recognized; negative: blank reason, marker plus program, and no record each refused.
 - Risk: agent-decided — marker row instead of a v3 schema; both validators accept it before the program-only checks, and it stays out of execution and cap counting. See Risks 6-8.
 
