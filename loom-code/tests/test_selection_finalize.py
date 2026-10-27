@@ -204,10 +204,13 @@ def test_a_recorded_no_program_outcome_finalizes_and_revalidates(tmp_path: Path)
 
 
 @pytest.mark.parametrize("adversarial, stored, reason", [
-    ([{"no_program": "  "}], False, "a no-program record needs a non-blank reason"),
-    ([NO_PROGRAM, *ADVERSARIAL], False, "a no-program record must be the only adversarial record"),
-    ([], False, "at least one adversarial execution is required"),
-    ([NO_PROGRAM], True, "a no-program record must be the only adversarial record"),
+    ([{"no_program": "  "}], False, "a no-program outcome needs a non-blank reason"),
+    ([NO_PROGRAM, *ADVERSARIAL], False,
+     "a no-program outcome contradicts another adversarial record or a program stored for this change"),
+    ([], False,
+     "the adversarial step left no outcome: record its programs, or a no-program outcome with its reason"),
+    ([NO_PROGRAM], True,
+     "a no-program outcome contradicts another adversarial record or a program stored for this change"),
 ], ids=["blank-reason", "beside-a-program", "no-record", "beside-a-stored-program"])
 def test_a_no_program_outcome_needs_a_reason_and_no_program(
     tmp_path: Path, adversarial: list, stored: bool, reason: str,

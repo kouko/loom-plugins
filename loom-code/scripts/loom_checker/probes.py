@@ -573,16 +573,17 @@ def stored_probe_programs(repo: Path, head_sha: str, change_id: str) -> int:
 def missing_adversarial_execution(
     count: int, skip: set[str], no_program: list = (), stored: int = 0,
 ) -> str | None:
-    """The refusal reason when a change records no adversarial execution
-    and the adversarial step was not skipped, else None.
+    """The refusal reason when the adversarial step, not skipped, left no
+    outcome -- neither its programs nor a no-program outcome -- else None.
 
     One predicate for both places that ask it -- finalize-review over its
     review input, and the attestation validator over the recorded
     executions -- so the two can never answer with different words.
 
     `no_program` holds the reasons of recorded no-program outcomes: the
-    adversary attacked and found no program worth committing. Exactly one,
-    with a non-blank reason and no program beside it, satisfies the step.
+    adversary attacked and found no program worth committing. A no-program
+    outcome with a non-blank reason, and nothing else recorded or stored
+    beside it, satisfies the step.
 
     `stored` counts the programs the change holds from another source
     (`stored_probe_programs`). It is kept apart from `count`, which counts
@@ -591,12 +592,14 @@ def missing_adversarial_execution(
     """
     if no_program:
         if len(no_program) > 1 or count or stored:
-            return "a no-program record must be the only adversarial record"
+            return ("a no-program outcome contradicts another adversarial "
+                    "record or a program stored for this change")
         if not isinstance(no_program[0], str) or not no_program[0].strip():
-            return "a no-program record needs a non-blank reason"
+            return "a no-program outcome needs a non-blank reason"
         return None
     if count < 1 and "adversarial" not in skip:
-        return "at least one adversarial execution is required"
+        return ("the adversarial step left no outcome: record its programs, "
+                "or a no-program outcome with its reason")
     return None
 
 

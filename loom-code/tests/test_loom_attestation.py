@@ -172,7 +172,7 @@ def test_attestation_requires_two_reviewers_and_adversarial_execution(tmp_path: 
     failures = attestation_module.validate_attestation(
         repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
     )
-    assert any("adversarial execution" in reason for _, reason in failures)
+    assert any("adversarial step left no outcome" in reason for _, reason in failures)
 
 
 @pytest.mark.parametrize("keep_program, reason", [(True, "no attack survived"), (False, " ")])
