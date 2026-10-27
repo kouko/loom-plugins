@@ -142,13 +142,16 @@ record eight things at once means the filter has not been applied yet.
 
 ### Reconcile
 
-**Trigger:** a new lesson contradicts or narrows a current entry.
+**Trigger:** a new lesson contradicts, narrows, or is equivalent to a
+current entry (same subject, same rule).
 
 **Steps:**
 1. Locate the current entry through `index.md`, never by guessing a
    filename.
-2. Update that entry in place, or replace it with one current concept.
-   Never create a second, contradictory sibling for the same subject.
+2. An equivalent lesson keeps the existing entry's content unchanged and only adds
+   its new source to that entry's `sources`. A contradicting or narrowing
+   lesson updates that entry in place, or replaces it with one current
+   concept. Never create a second entry for the same subject.
 3. Preserve every existing `sources[].resource` and add the new source
    rather than discarding provenance.
 4. Regenerate and validate the index.

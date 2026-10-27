@@ -111,7 +111,8 @@ mechanical checks, in this order:
    agent that implemented any part of the change. Give it only the change id,
    `HEAD`, and paths: the intent, the retained plan when present, and the changed paths with their
    artifact types; never pass an implementer's explanation of its own code. The adversary writes and commits its
-   adversarial programs. It works from the recipes in
+   adversarial programs, or records a no-program outcome and its reason when
+   nothing earned a program. It works from the recipes in
    [`adversarial.md`](../closing-review/references/adversarial.md).
 3. Run the repository's complete package suite, then each committed
    adversarial program. The suite command is the `package-tests:` value in
@@ -181,6 +182,6 @@ adversarial program. After the update, Build repeats these end-of-Build checks.
 Commit functional changes normally. Report the branch base, HEAD, the
 `sync-trunk` result with any warning it printed, changed paths, focused test
 results, the complete package suite command and its result,
-each adversarial program's path and command, each adversary re-dispatch with its reason, every unresolved adversary finding, the station sequence entered so far when this run recovered from an absent item, and any unresolved risk. Call `loom-code:closing-review`
+each adversarial program's path and command, or the adversary's no-program outcome and its reason, each adversary re-dispatch with its reason, every unresolved adversary finding, the station sequence entered so far when this run recovered from an absent item, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after `closing-review` generates it.

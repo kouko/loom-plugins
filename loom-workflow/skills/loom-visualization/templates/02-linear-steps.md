@@ -59,7 +59,7 @@ Output:
 
 ```mermaid
 flowchart LR
-    A["git pull"] --> B["uv sync"] --> C[<div style='text-align:left'>Run test suites<br/>━━━━━━━━━━━━━━━━━━━━━━━<br/>• unit tests<br/>• integration tests</div>] --> D["git push"]
+    A["git pull"] --> B["uv sync"] --> C[<div style='text-align:left'>Run test suites<br/>━━━━━━<br/>• unit tests<br/>• integration tests</div>] --> D["git push"]
 ```
 
 ## Common mistakes

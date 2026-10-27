@@ -172,7 +172,21 @@ def test_attestation_requires_two_reviewers_and_adversarial_execution(tmp_path: 
     failures = attestation_module.validate_attestation(
         repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
     )
-    assert any("adversarial execution" in reason for _, reason in failures)
+    assert any("adversarial step left no outcome" in reason for _, reason in failures)
+
+
+@pytest.mark.parametrize("keep_program, reason", [(True, "no attack survived"), (False, " ")])
+def test_recorded_no_program_needs_a_reason_and_no_program(
+    tmp_path: Path, keep_program: bool, reason: str,
+) -> None:
+    repo = repo_with_content(tmp_path)
+    attestation = matching_attestation(repo)
+    kept = attestation["executions"] if keep_program else attestation["executions"][:1]
+    attestation["executions"] = [*kept, {"kind": "adversarial", "no_program": reason}]
+    failures = attestation_module.validate_attestation(
+        repo, git(repo, "rev-parse", "HEAD"), CHANGE, attestation, manifest()
+    )
+    assert any("no-program" in message for _, message in failures), failures
 
 
 def test_reviewer_floor_is_one_only_for_narrow_low_risk_paths() -> None:

@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.16.0] — 2026-10-27 — loom-memory equivalence outcome and six-character label separators
+
+- `loom-memory` Reconcile now also triggers when a new lesson is equivalent to an existing entry. The outcome is to keep the existing entry and add the new source to its `sources`; Reconcile never writes a second entry for an equivalent lesson.
+- `loom-visualization` templates 02, 04 and 08 use label separators of six U+2501 characters, as the page verifier requires.
+
 ## [5.15.0] — 2026-10-24 — loom-memory fires on host memory saves
 
 - `loom-memory`'s description and activation now name the moment the agent saves a lesson to its own host memory. Record classifies repo-wide lessons (those that hold for any contributor on another machine with other tools) apart from personal, machine-specific and agent-tool-specific notes, which stay in host memory. A lesson found after finalize-review stays in host memory until the next change's branch.

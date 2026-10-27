@@ -60,7 +60,7 @@ Container level: one subgraph per layer.
 
 ```mermaid
 flowchart TB
-    subgraph P["<div style='text-align:left'>プレゼンテーション層<br/>━━━━━━━━━━━━━━━━━━━━━━━<br/>• validates user input</div>"]
+    subgraph P["<div style='text-align:left'>プレゼンテーション層<br/>━━━━━━<br/>• validates user input</div>"]
         UI["Web UI"]
         CLI["CLI"]
     end

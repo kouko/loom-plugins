@@ -22,6 +22,7 @@ from loom_checker.probes import check_adversarial_proportionate
 from loom_checker.probes import declared_test_command
 from loom_checker.probes import direct_pytest_style_failure
 from loom_checker.probes import missing_adversarial_execution
+from loom_checker.probes import stored_probe_programs
 from loom_checker.probes import probe_directory
 from loom_checker.probes import runs_pytest
 from loom_checker.probes import suite_collection
@@ -280,7 +281,15 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         return [("finalize.verdicts", outside_failure)]
     if not isinstance(findings, list) or not isinstance(adversarial, list):
         return [("finalize.schema", "findings and adversarial must be lists")]
-    missing = missing_adversarial_execution(len(adversarial), skip)
+    records = [item for item in adversarial if isinstance(item, dict) and "no_program" in item]
+    if any(set(item) != {"no_program"} for item in records):
+        return [("finalize.adversarial", "a no-program record carries only its reason")]
+    adversarial = [item for item in adversarial if item not in records]
+    no_program = [item["no_program"] for item in records]
+    missing = missing_adversarial_execution(
+        len(adversarial), skip, no_program,
+        stored_probe_programs(repo, head_sha, change_id) if no_program else 0,
+    )
     if missing:
         return [("finalize.adversarial", missing)]
     config_before = git_text(repo, "config", "--list", "--null")
@@ -388,6 +397,8 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             if failure:
                 return [("finalize.adversarial", f"{failure}{suffix}")]
         executions.append(execution)
+
+    executions += [{"kind": "adversarial", "no_program": reason} for reason in no_program]
 
     if git_text(repo, "rev-parse", "HEAD") != head_sha:
         return [("finalize.stable-tree", "HEAD moved during functional verification")]
