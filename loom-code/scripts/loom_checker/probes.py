@@ -595,10 +595,11 @@ def missing_adversarial_execution(
             return ("a no-program outcome contradicts another adversarial "
                     "record or a program stored for this change")
         reason = no_program[0]
-        # Publish matches the disclosed line exactly, after stripping the
-        # line and its HTML comments: only a reason that survives both can.
+        # Publish splits the body with str.splitlines() and matches the
+        # disclosed line exactly, after stripping the line and its HTML
+        # comments: only a reason that survives all three can.
         if (not isinstance(reason, str) or not reason or reason != reason.strip()
-                or "\n" in reason or "\r" in reason or "<!--" in reason):
+                or len(reason.splitlines()) != 1 or "<!--" in reason):
             return ("a no-program outcome needs a reason on one line, with no "
                     "surrounding whitespace or HTML comment")
         return None

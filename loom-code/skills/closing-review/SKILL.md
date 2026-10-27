@@ -413,8 +413,9 @@ When Build's hand-off records that the adversary committed no program, the
   ]
 ```
 
-`finalize-review` refuses a blank reason, and a no-program record beside any
-program.
+`finalize-review` refuses a reason that is blank, is not on one line, has
+surrounding whitespace or contains an HTML comment, and a no-program record
+beside any program.
 
 The `findings` input carries every unresolved adversarial finding that Build's
 hand-off lists.
