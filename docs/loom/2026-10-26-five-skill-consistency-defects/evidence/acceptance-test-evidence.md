@@ -13,7 +13,9 @@ Sections Setup and 1-5 record the first run at 02c51607. Section 6 (an
 Acceptance line added when the intent was re-confirmed at 0aa7ec08) and the
 re-run at 0a27f371 are recorded below; the former line 6 is now line 7. Where
 the re-run's output differs from a first-run section (the refusal wording in
-section 1), the re-run section is the current one.
+section 1), the re-run section is the current one. A second re-run at
+a0966dd7 re-tested line 6 only; its section at the end supersedes section 6's
+Follow-ups row and refusal wording.
 
 ## Setup
 
@@ -315,3 +317,54 @@ prose). It touches only `loom-code/` and the change's intent and plan:
   - Full package suite: not run by me in this re-run; finalize-review
     executes it and refuses the attestation when it fails. Suite command:
     `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+
+## Re-run on 2026-10-27, at a0966dd7
+
+Fix range `23a7ff2e..a0966dd7`: one commit, a0966dd7, touching exactly
+`loom-code/scripts/loom_checker/rule_checks/publish.py` (`validate_disclosed_outcome`
+now collects visible lines only from sections whose heading is `Verification`,
+from `_body_sections(...)[0]`, and the refusal says "under the Verification
+heading") and `loom-code/tests/test_loom_publish.py` (one new test).
+`git diff --stat 23a7ff2e..a0966dd7 -- loom-workflow README.md '*/CHANGELOG.md' '*plugin.json' '*/package.json' '*/README*' loom-code/scripts/loom_checker/probes.py loom-code/skills`
+is empty.
+
+- Setup: re-tested. Fresh `git clone` of the worktree, checked out at
+  `a0966dd7`, in the session scratch directory. Then
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID loom-code/scripts/loom-python --repair --list-rules`
+  → exit 0, first line `adversarial.proportionate …` (`scratchpad/setup-a0966dd7.log`).
+- 6: re-tested in full with `tools/at_a6_rerun.py <clean> <work>` (the
+  section-6 driver plus four placement cases), same real code path and same
+  network stub and `subprocess.run` guard as section 6. Nothing was pushed
+  and GitHub was never called (`scratchpad/a6-rerun.log`):
+
+  | case | body | publish result | outward calls attempted |
+  |---|---|---|---|
+  | no-program attestation (real finalize-review exit 0, row `{"kind":"adversarial","no_program":"<reason>"}`), status `valid` | line under Verification | validation passed: `Verification valid for <head>`, then stopped at the stubbed `gh repo view` | `repo view` (stubbed, not made) |
+  | same | line missing | exit 1, `BLOCK push.contextual-body: the attestation records that the adversarial step left no program; the body must carry exactly this bare line under the Verification heading:` + the full recorded line | none |
+  | same | different reason | exit 1, same refusal | none |
+  | same | no reason | exit 1, same refusal | none |
+  | same | inside an HTML comment | exit 1, same refusal | none |
+  | same | inside a code fence | exit 1, same refusal | none |
+  | same | as a bullet | exit 1, same refusal | none |
+  | same | under `## Follow-ups` only | **exit 1, same refusal** (accepted at 0a27f371) | none |
+  | same | under `## Context` only | exit 1, same refusal | none |
+  | same | before the first heading | exit 1, same refusal | none |
+  | same | under Verification and also under Follow-ups | validation passed, stopped at stubbed `gh repo view` | `repo view` (stubbed, not made) |
+  | same | under a `### Adversarial step` sub-heading inside Verification | validation passed, stopped at stubbed `gh repo view` | `repo view` (stubbed, not made) |
+  | programs attestation (`python3 -m pytest <probe>`), status `valid` | no outcome line | validation passed (boundary: no line is needed) | `repo view` (stubbed, not made) |
+
+  The `###` case passes because `_body_sections` opens a section only on a
+  `## ` heading (`publish.py:116`, `## ([^#\n].*)`), so a deeper heading stays
+  inside Verification. Ship's prose (`loom-code/skills/ship/SKILL.md:84-91`)
+  puts the line in the paragraph that begins "Under the Verification heading",
+  which matches the check.
+- Criterion tests in the clean clone:
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_publish.py`
+  → `70 passed in 21.56s` (`scratchpad/a6-rerun-tests.log`), including the new
+  `test_no_program_outcome_line_outside_verification_refused`.
+- 1, 2, 3, 4, 5, 7: carried over. The fix touches neither `probes.py`, the
+  finalize command, any skill or agent prose, `loom-workflow/`, the
+  manifests, CHANGELOGs nor READMEs (the empty `--stat` above).
+  `validate_disclosed_outcome` is called only from publish, so finalize-review
+  (lines 1, 2, 5) cannot see the change. Full package suite: not run by me;
+  finalize-review executes it and refuses the attestation when it fails.
