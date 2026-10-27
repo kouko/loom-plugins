@@ -74,3 +74,4 @@ charter: 1.1
 6. agent-decided — the contract manifest `version:` stays 2.3.1: W1-01 adds a row form inside an existing field, no field added or removed. W2-01's CHANGELOG entry states "contract manifest version stays 2.3.1", the wording `test_adversarial_version_metadata_sync.py:163` reads.
 7. W1-01 edits `closing-review/SKILL.md`, which `test_adversary_protocol.py` scans for a case-count floor; its prose gains no wording such as "at least one program", and that test runs after the edit.
 8. agent-decided — W1-01 counts the no-program record only through `missing_adversarial_execution` (`probes.py:566`), which finalize-review and the attestation validator both call, so one place decides what satisfies the adversarial step; `intent_state.py` only admits the row shape.
+9. user-decided — Acceptance 4 is met by every template label passing `verify_cot_html.check_node_label`; a full page built from a template is not required (2026-10-27).
