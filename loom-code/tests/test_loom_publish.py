@@ -1324,3 +1324,68 @@ def test_uncommitted_attestation_refused_before_network(tmp_path: Path, monkeypa
     assert "publish.preconditions" in err
     assert "docs/loom/change/attestation.json is not committed — commit it" in err
     assert calls.calls == []
+
+
+# --- a valid attestation's no-program adversarial outcome is disclosed --------
+
+NO_PROGRAM_REASON = "every attack failed and no existing test could be named"
+NO_PROGRAM_LINE = f"Adversarial outcome: no program — {NO_PROGRAM_REASON}"
+
+
+def attested_publication(tmp_path: Path, monkeypatch, executions: list, body_text: str):
+    """A committed attestation carrying `executions`, published with status valid."""
+    calls = ExternalCalls("")
+    repo = repository(tmp_path)
+    git(repo, "branch", "main")
+    attestation(repo).write_text(
+        json.dumps({"change_id": "change", "executions": executions}), encoding="utf-8"
+    )
+    git(repo, "add", ".")
+    git(repo, "commit", "-q", "-m", "attest")
+    body = tmp_path / "body.md"
+    body.write_text(body_text, encoding="utf-8")
+    calls.head = git(repo, "rev-parse", "HEAD")
+    monkeypatch.chdir(repo)
+    monkeypatch.setattr(loom_checker, "run_publish_external", calls)
+    identified(monkeypatch)
+    monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
+    out, err = StringIO(), StringIO()
+    rc = loom_checker.cmd_publish([
+        "--confirm-authorized", "--title", "feat(loom): safe", "--body-file", str(body),
+    ], out, err)
+    return rc, err.getvalue(), calls
+
+
+def test_no_program_outcome_line_lets_valid_publication_proceed(
+    tmp_path: Path, monkeypatch
+) -> None:
+    rows = [{"kind": "adversarial", "no_program": NO_PROGRAM_REASON}]
+    rc, err, calls = attested_publication(
+        tmp_path, monkeypatch, rows, disclosed_body(["Verification status: valid", NO_PROGRAM_LINE])
+    )
+
+    assert rc == 0, err
+    assert NO_PROGRAM_LINE in verification_section(calls.published_bodies[-1])
+
+
+def test_undisclosed_no_program_outcome_refused_naming_the_line(
+    tmp_path: Path, monkeypatch
+) -> None:
+    rows = [{"kind": "adversarial", "no_program": NO_PROGRAM_REASON}]
+    rc, err, calls = attested_publication(
+        tmp_path, monkeypatch, rows, disclosed_body(["Verification status: valid"])
+    )
+
+    assert rc == 1
+    assert "push.contextual-body" in err
+    assert NO_PROGRAM_LINE in err
+    assert calls.calls == []
+
+
+def test_adversarial_programs_need_no_outcome_line(tmp_path: Path, monkeypatch) -> None:
+    rows = [{"kind": "adversarial", "command": "python3 -m pytest probe.py", "result": "pass"}]
+    rc, err, _calls = attested_publication(
+        tmp_path, monkeypatch, rows, disclosed_body(["Verification status: valid"])
+    )
+
+    assert rc == 0, err
