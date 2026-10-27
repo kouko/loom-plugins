@@ -9,6 +9,12 @@ back each verdict are reproduced inline below. Every throwaway repository below 
 by a driver script in the scratch directory; nothing in the working tree was
 modified apart from committing this file and the report.
 
+Sections Setup and 1-5 record the first run at 02c51607. Section 6 (an
+Acceptance line added when the intent was re-confirmed at 0aa7ec08) and the
+re-run at 0a27f371 are recorded below; the former line 6 is now line 7. Where
+the re-run's output differs from a first-run section (the refusal wording in
+section 1), the re-run section is the current one.
+
 ## Setup
 
 - How I tried it: followed the README's Install section as far as it applies
@@ -166,7 +172,61 @@ modified apart from committing this file and the report.
   run.
 - Evidence: `scratchpad/a5.log`; `adversarial.md:150-153`; `probes.py:711-714`.
 
-## 6. The complete package suite passes, and both affected plugins land synchronized minor version bumps with CHANGELOG entries.
+## 6. When the recorded adversarial evidence is a no-program outcome, the pull request's Verification section states that no adversarial program ran and gives the recorded reason, and publication refuses a body that leaves it out.
+- How I tried it: tried 2026-10-27 in a fresh `git clone` checked out at
+  `0a27f371`. A driver (`tools/at_a6.py <clean> <work>`) built throwaway git
+  repos on branch `feat/2026-10-27-at-fixture` with a committed intent and an
+  origin of `git@github.com:example/at-fixture.git`, ran the real launcher
+  `loom-code/scripts/loom-python --repair finalize-review 2026-10-27-at-fixture --input <json>`,
+  committed the attestation, read its status with the real
+  `verification_status`, and then called the real
+  `loom_checker.command_handlers.publish.cmd_publish(["--confirm-authorized", "--title", …, "--body-file", <body>])`.
+  Change identification, status computation and body validation were not
+  stubbed. Only the network seam `run_publish_external` was replaced, with a
+  recorder that answers every outward call with a failure. On top of that, a
+  guard on `subprocess.run` refused any `gh`, `push`, `ls-remote` or `fetch`
+  argv. Nothing was pushed and GitHub was never called. Bodies carried the
+  nine contextual headings, with `Verification status: valid` under
+  Verification.
+- What came back (`scratchpad/a6.log`):
+
+  | case | body | publish result | outward calls attempted |
+  |---|---|---|---|
+  | no-program attestation, status `valid` | `Adversarial outcome: no program — <recorded reason>` under Verification | validation passed: printed `Verification valid for <head>`, then stopped at the stubbed `gh repo view` | `repo view` (stubbed, not made) |
+  | same | line missing | exit 1, `BLOCK push.contextual-body: the attestation records that the adversarial step left no program; the body must carry exactly this bare line:` followed by the full line with the recorded reason | none |
+  | same | line with a different reason | exit 1, same refusal printing the recorded line | none |
+  | same | `Adversarial outcome: no program` with no reason | exit 1, same refusal | none |
+  | same | line inside an HTML comment | exit 1, same refusal | none |
+  | same | line inside a code fence | exit 1, same refusal | none |
+  | same | line as a bullet (`- Adversarial outcome: …`) | exit 1, same refusal | none |
+  | same | line under `## Follow-ups`, not under Verification | **accepted**: printed `Verification valid for <head>`, then stopped at the stubbed `gh repo view` | `repo view` (stubbed, not made) |
+  | programs attestation (`python3 -m pytest <probe>`), status `valid` | no outcome line | accepted (boundary: no line is needed) | `repo view` (stubbed, not made) |
+
+- Why the Follow-ups case passes: `validate_disclosed_outcome`
+  (`loom-code/scripts/loom_checker/rule_checks/publish.py:55-64`) collects
+  `visible` from `_body_sections(body, strip_comments=True)[1]` (line 58),
+  which holds every non-fenced line of the whole body, not the lines of the
+  Verification section. So the refusal enforces that the line is somewhere
+  in the body, not that it is in the Verification section the Acceptance line
+  names. Ship's prose (`loom-code/skills/ship/SKILL.md:86-92`) tells the agent
+  to write the line under the Verification heading, so an agent following
+  Ship puts it in the right place. The section is unenforced only for a body
+  written another way.
+- Scope of the check: it runs only when the computed status is `valid`
+  (`command_handlers/publish.py:414-420`). Reasons are read from the
+  attestation committed at `HEAD` (`_no_program_reasons`, line 349). The plan
+  (W4-01 Risk) records this as agent-decided.
+- Criterion tests, run in the clean clone:
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_loom_publish.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_loom_attestation.py loom-code/tests/test_adversarial_no_program_beside_stored.py`
+  → `163 passed in 64.84s` (`scratchpad/a1a6-tests.log`). This includes
+  `test_no_program_outcome_line_lets_valid_publication_proceed`, which checks
+  the line reaches the published body. That test stubs the status rather than
+  computing it.
+- Evidence: `scratchpad/a6.log`, `scratchpad/tools/at_a6.py`,
+  `scratchpad/a1a6-tests.log`.
+
+## 7. The complete package suite passes, and both affected plugins land synchronized minor version bumps with CHANGELOG entries.
+- (First run, recorded when this was line 6.)
 - How I tried it: in the clean clone,
   `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
   (run on the station's explicit instruction; my standing contract otherwise
@@ -192,3 +252,66 @@ modified apart from committing this file and the report.
     contract manifest version stays 2.3.1 with the `executions` grammar gaining
     the `{kind: adversarial, no_program}` row.
 - Evidence: `scratchpad/suite.log`.
+
+## Re-run on 2026-10-27, at 0a27f371
+
+Fix range `7d28c2f1..0a27f371`: intent re-confirm, plan Wave 4, 894a679a
+(publish disclosure), 495ebae0 (refusal wording), 0a27f371 (count-free
+prose). It touches only `loom-code/` and the change's intent and plan:
+`git diff --stat 7d28c2f1..0a27f371 -- loom-workflow README.md` is empty.
+
+- Setup: re-tested. Fresh `git clone` of the branch, checked out at
+  `0a27f371`, outside the repository. Then
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID loom-code/scripts/loom-python --repair --list-rules`
+  → exit 0, rule list printed (first line `adversarial.proportionate …`).
+- 1: re-tested in full, every case of section 1, with
+  `tools/at_finalize.py <clean> <work> a1` against the 0a27f371 clone
+  (`scratchpad/a1-rerun.log`):
+  - The no-program outcome alone → exit 0, attestation row
+    `{'kind': 'adversarial', 'no_program': '<reason>'}`, status `valid`,
+    selection not used. With the reason blanked in the committed attestation
+    → `stale (a no-program outcome needs a non-blank reason)`.
+  - No record → exit 1,
+    `BLOCK finalize.adversarial: the adversarial step left no outcome: record its programs, or a no-program outcome with its reason`.
+  - Blank reason → exit 1, `a no-program outcome needs a non-blank reason`.
+  - Two records, beside a supplied program, or beside a RED program
+    committed in the store → exit 1,
+    `a no-program outcome contradicts another adversarial record or a program stored for this change`.
+  - Extra field → exit 1, `a no-program record carries only its reason`.
+  - In every refusal case, no attestation was written. Every decision is
+    the same as in the first run; only the wording changed
+    (`probes.py:593-603`).
+  - Count-free wording: `grep -rniE "at least one adversarial|one no-program|only adversarial record|must be the only|exactly one no.program|minimum …"`
+    over `loom-code/skills`, `agents`, `scripts` and `contract` → no match.
+  - Prose: `adversary.md:47`, `build/SKILL.md:114` and
+    `adversarial.md:77` now say "a no-program outcome"; closing-review
+    `SKILL.md:408` says "the no-program outcome and its reason, with no
+    program beside it".
+  - Criterion tests: included in the `163 passed` run in section 6.
+- 2: carried over. The fix's `probes.py` hunk is confined to
+  `missing_adversarial_execution` (lines 573-603). `check_adversarial_proportionate`
+  (518-561) and `MAX_PROBE_PROGRAMS` are untouched. The only
+  `adversarial.md` edit is "one" → "a" at line 77, outside the ceiling
+  sentence at 79-82.
+- 3: carried over. The fix range touches no `loom-workflow/` file.
+- 4: carried over. The fix range touches no `loom-workflow/` file (the
+  templates and `verify_cot_html.py`).
+- 5: carried over. `runs_pytest`, `_python_argv` and
+  `direct_pytest_style_failure` (`probes.py:678-740`) are outside the fix
+  hunk. The command-form paragraph `adversarial.md:146-153` is unchanged.
+- 6: re-tested (line new at this re-run). See section 6.
+- 7: re-tested.
+  - Versions read in the 0a27f371 clone: loom-code 3.50.0 in all four
+    manifests; loom-workflow 5.16.0 in all four.
+  - README counts of `3.50.0`: root `README.md` 2,
+    `loom-code/README{,.ja,.zh-TW}.md` 1 each.
+  - CHANGELOG heads: `## [3.50.0] — 2026-10-27 — feat(closing-review): …`,
+    which now carries the bullet "`publish` requires the PR body line
+    `Adversarial outcome: no program — <reason>` …" under the same heading
+    (no new version heading); `## [5.16.0] — 2026-10-27 — …`.
+  - Release pins:
+    `python -m pytest -q loom-code/tests/test_write_plan_station_text.py -k release_metadata loom-workflow/tests/scripts/test_release_metadata.py`
+    → `15 passed, 35 deselected` (`scratchpad/a7-tests.log`).
+  - Full package suite: not run by me in this re-run; finalize-review
+    executes it and refuses the attestation when it fails. Suite command:
+    `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
