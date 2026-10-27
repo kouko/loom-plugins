@@ -1332,8 +1332,9 @@ NO_PROGRAM_REASON = "every attack failed and no existing test could be named"
 NO_PROGRAM_LINE = f"Adversarial outcome: no program — {NO_PROGRAM_REASON}"
 
 
-def attested_publication(tmp_path: Path, monkeypatch, executions: list, body_text: str):
-    """A committed attestation carrying `executions`, published with status valid."""
+def attested_publication(tmp_path: Path, monkeypatch, executions: list, body_text: str,
+                         status: str = "valid"):
+    """A committed attestation carrying `executions`, published with `status`."""
     calls = ExternalCalls("")
     repo = repository(tmp_path)
     git(repo, "branch", "main")
@@ -1347,7 +1348,7 @@ def attested_publication(tmp_path: Path, monkeypatch, executions: list, body_tex
     calls.head = git(repo, "rev-parse", "HEAD")
     monkeypatch.chdir(repo)
     monkeypatch.setattr(loom_checker, "run_publish_external", calls)
-    identified(monkeypatch)
+    identified(monkeypatch, status)
     monkeypatch.setattr(loom_checker, "resolve_publish_executable", trusted_executable)
     out, err = StringIO(), StringIO()
     rc = loom_checker.cmd_publish([
@@ -1391,6 +1392,30 @@ def test_no_program_outcome_line_outside_verification_refused() -> None:
 
     assert refusal is not None and NO_PROGRAM_LINE in refusal
     assert "Verification" in refusal
+    for heading in ("# Separate section", " ## Separate section"):
+        nested = disclosed_body(["Verification status: valid", heading, NO_PROGRAM_LINE])
+        assert publish_rules.validate_disclosed_outcome(nested, [NO_PROGRAM_REASON]), heading
+    sub = disclosed_body(["Verification status: valid", "### Sub", NO_PROGRAM_LINE])
+    assert publish_rules.validate_disclosed_outcome(sub, [NO_PROGRAM_REASON]) is None
+
+
+@pytest.mark.parametrize("disclosed", [False, True], ids=["omitted", "present"])
+def test_no_program_outcome_disclosed_whatever_the_status(
+    tmp_path: Path, monkeypatch, disclosed: bool,
+) -> None:
+    status = "stale (head moved)"
+    lines = [f"Verification status: {status}", *([NO_PROGRAM_LINE] if disclosed else [])]
+    rows = [{"kind": "adversarial", "no_program": NO_PROGRAM_REASON}]
+    rc, err, calls = attested_publication(
+        tmp_path, monkeypatch, rows, disclosed_body(lines), status=status
+    )
+
+    if disclosed:
+        assert rc == 0, err
+    else:
+        assert rc == 1
+        assert "push.contextual-body" in err and NO_PROGRAM_LINE in err
+        assert calls.calls == []
 
 
 def test_adversarial_programs_need_no_outcome_line(tmp_path: Path, monkeypatch) -> None:

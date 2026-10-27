@@ -582,7 +582,7 @@ def missing_adversarial_execution(
 
     `no_program` holds the reasons of recorded no-program outcomes: the
     adversary attacked and found no program worth committing. A no-program
-    outcome with a non-blank reason, and nothing else recorded or stored
+    outcome with a one-line, trimmed, comment-free reason, and nothing else recorded or stored
     beside it, satisfies the step.
 
     `stored` counts the programs the change holds from another source
@@ -594,8 +594,13 @@ def missing_adversarial_execution(
         if len(no_program) > 1 or count or stored:
             return ("a no-program outcome contradicts another adversarial "
                     "record or a program stored for this change")
-        if not isinstance(no_program[0], str) or not no_program[0].strip():
-            return "a no-program outcome needs a non-blank reason"
+        reason = no_program[0]
+        # Publish matches the disclosed line exactly, after stripping the
+        # line and its HTML comments: only a reason that survives both can.
+        if (not isinstance(reason, str) or not reason or reason != reason.strip()
+                or "\n" in reason or "\r" in reason or "<!--" in reason):
+            return ("a no-program outcome needs a reason on one line, with no "
+                    "surrounding whitespace or HTML comment")
         return None
     if count < 1 and "adversarial" not in skip:
         return ("the adversarial step left no outcome: record its programs, "

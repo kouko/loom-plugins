@@ -411,13 +411,12 @@ def _cmd_publish_trusted(
     stated_error = validate_stated_status(body_file.read_text(encoding="utf-8"), status)
     if stated_error:
         return report([("push.contextual-body", stated_error)], err)
-    if status == "valid":
-        outcome_error = validate_disclosed_outcome(
-            body_file.read_text(encoding="utf-8"),
-            _no_program_reasons(repo, head, attestation_rel),
-        )
-        if outcome_error:
-            return report([("push.contextual-body", outcome_error)], err)
+    outcome_error = validate_disclosed_outcome(
+        body_file.read_text(encoding="utf-8"),
+        _no_program_reasons(repo, head, attestation_rel),
+    )
+    if outcome_error:
+        return report([("push.contextual-body", outcome_error)], err)
     out.write(f"Verification {status} for {head}\n")
     if status != "valid":
         clause = missing_clause(missing_records(repo, change_id, status, head))

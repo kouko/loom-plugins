@@ -87,8 +87,8 @@ where `<status>` is the status `publish` computes locally and prints on its
 `Verification <status> for <head>` line: `valid`,
 `absent`, or `stale (<reason>)`. When publish refuses the line, copy the
 `Verification status:` line the refusal prints into the body. When the
-computed status is `valid` and the attestation records that the adversarial
-step's outcome is no program, write the line
+attestation records that the adversarial step's outcome is no program, write
+the line
 `Adversarial outcome: no program — <reason>` with the recorded reason. Build the line
 `Skipped by instruction: <steps>` from the intent's and plan's `skipped-by-instruction:`
 lines plus any skip decided at Ship (§1), not from conversation recall; with
@@ -188,8 +188,9 @@ a non-forced push; and opens or reuses one PR. Publishing proceeds without an
 attestation: an absent or stale one is disclosed, not refused. Before pushing,
 beyond authorization and repository safety, it refuses only a malformed body
 (naming the heading), a `Verification status:` line that differs from the computed status (naming
-the line to carry), a valid publication whose body omits the
-`Adversarial outcome: no program — <reason>` line its attestation records (naming
+the line to carry), a body that omits the
+`Adversarial outcome: no program — <reason>` line when the attestation records
+that the adversarial step's outcome is no program (naming
 the line to carry), an attestation left uncommitted, and an unidentified
 change. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
