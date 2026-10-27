@@ -54,13 +54,19 @@ NO_PROGRAM_LABEL = "Adversarial outcome: no program —"
 
 def validate_disclosed_outcome(body: str, reasons: list[str]) -> str | None:
     """Each recorded no-program reason appears as its own bare visible line
-    `Adversarial outcome: no program — <reason>`."""
-    visible = {line.strip() for line in _body_sections(body, strip_comments=True)[1]}
+    `Adversarial outcome: no program — <reason>` under `## Verification`."""
+    visible = {
+        line.strip()
+        for heading, lines in _body_sections(body, strip_comments=True)[0]
+        if heading == "Verification"
+        for line in lines
+    }
     for reason in reasons:
         line = f"{NO_PROGRAM_LABEL} {reason}"
         if line not in visible:
             return ("the attestation records that the adversarial step left no program; "
-                    f"the body must carry exactly this bare line:\n{line}")
+                    "the body must carry exactly this bare line under the Verification "
+                    f"heading:\n{line}")
     return None
 
 

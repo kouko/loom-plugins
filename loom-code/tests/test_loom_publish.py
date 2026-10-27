@@ -1382,6 +1382,17 @@ def test_undisclosed_no_program_outcome_refused_naming_the_line(
     assert calls.calls == []
 
 
+def test_no_program_outcome_line_outside_verification_refused() -> None:
+    body = contextual_body(overrides={
+        "Verification": "Verification status: valid", "Follow-ups": NO_PROGRAM_LINE,
+    })
+
+    refusal = publish_rules.validate_disclosed_outcome(body, [NO_PROGRAM_REASON])
+
+    assert refusal is not None and NO_PROGRAM_LINE in refusal
+    assert "Verification" in refusal
+
+
 def test_adversarial_programs_need_no_outcome_line(tmp_path: Path, monkeypatch) -> None:
     rows = [{"kind": "adversarial", "command": "python3 -m pytest probe.py", "result": "pass"}]
     rc, err, _calls = attested_publication(
