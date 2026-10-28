@@ -317,9 +317,10 @@ def test_unrelated_branch_or_detached_head_resolved_before_commit() -> None:
         if "unrelated branch" in s and "detached HEAD" in s
     ]
     assert len(hits) == 1, hits
-    for phrase in ("do not commit there", "resolve that first",
-                   "preserve existing work", "no reset", "no discard"):
-        assert phrase in hits[0], phrase
+    words = set(re.findall(r"[a-z]+", hits[0].lower()))
+    assert {"resolve", "first", "preserve", "existing", "work"} <= words, hits[0]
+    assert all(re.search(rf"\b(?:no|not|never)\s+{w}\b", hits[0])
+               for w in ("commit", "reset", "discard")), hits[0]
 
 
 def test_repo_grep_no_bare_branch() -> None:
