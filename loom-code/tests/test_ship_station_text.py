@@ -10,9 +10,38 @@ import ast
 import re
 from pathlib import Path
 
-from prose_pin import has_negation
+from prose_pin import has_negation, split_sentences
 
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
+
+
+def _land_sentences() -> list[str]:
+    text = SHIP.read_text(encoding="utf-8")
+    section = re.search(r"^## 5\. Land after acceptance$(.*?)^## ", text, re.M | re.S)
+    assert section, "ship §5 heading"
+    return split_sentences(" ".join(section.group(1).split()))
+
+
+# ship-reports-trunk-not-updated-and-asks (A3 positive)
+def test_ship_reports_trunk_not_updated_to_the_maintainer() -> None:
+    assert any(
+        "`trunk not updated`" in s and "report" in s and "maintainer" in s
+        and not has_negation(s.replace("`trunk not updated`", ""))
+        for s in _land_sentences()
+    ), "§5 must tell the agent to report land's `trunk not updated` line"
+
+
+# acceptance-is-not-permission-to-discard (A3 negative)
+def test_merge_acceptance_is_not_permission_to_discard_trunk() -> None:
+    rule = [s for s in _land_sentences() if "discard" in s and "trunk" in s]
+    assert rule, "§5 must carry the never-discard-trunk-commits rule"
+    for s in rule:
+        assert has_negation(s), f"affirmative discard instruction: {s}"
+    assert any(
+        "reset" in s and "branch -f" in s and "explicit yes" in s
+        and "③" in s and "not that permission" in s
+        for s in rule
+    ), "the rule names reset/branch -f and denies that acceptance at ③ is permission"
 
 
 # ship-text-separates-authorization-from-acceptance
