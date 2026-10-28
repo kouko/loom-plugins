@@ -52,7 +52,9 @@ Pick `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or
 `ci`; use it in the PR title, which becomes the trunk squash commit. Task
 commits keep their implementer contract type; `docs(loom):` intent and plan
 commits keep their fixed form. If HEAD is already on this change's branch,
-reuse it; on the trunk, create it. On an unrelated branch or a detached HEAD,
+reuse it; on the trunk, create it. If it already exists, switch to it with
+`git switch <type>/<change-id>`; never `-C` or a reset. If another worktree
+has it checked out, work there. On an unrelated branch or a detached HEAD,
 do not commit there: resolve that first and preserve existing work, no reset,
 no discard.
 
@@ -243,16 +245,14 @@ Read the intent's `needs-design:` line. It is `yes` when either holds:
 - **(b)** the behaviour is multi-state or multi-object, and there is no
   spec for it.
 
-Otherwise it is `no`. The same rule applies to every `kind`; product and
-engineering are not judged differently here.
+Otherwise it is `no`. The same rule applies to every `kind`.
 
 You do not get the last word on `no`: the checker recomputes it
 (`intent.needs-design-recompute`) against this repo's declared
 interface-surface globs, and a diff that touches one of them while the
 intent says `no` is blocked.
 
-**`no`** — go to step 5. The plan carries the Current State Evidence
-section instead of a spec.
+**`no`** — go to step 5.
 
 When a task's rationale outgrows its Risk line, write
 `docs/loom/<change-id>/spec.md` from `contract/templates/spec-minimal.md` —
@@ -324,8 +324,7 @@ present again, and recompute the hash. Engineering changes skip this.
 
 ### The intake check — both branches, every time
 
-Whichever branch above you took, `no` included, run this before writing a
-plan:
+Run this before writing a plan:
 
 ```
 "${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id>

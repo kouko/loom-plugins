@@ -274,8 +274,9 @@ failing non-required check, repair it as in §4.
 
 If land prints `trunk not updated`, report that line to the maintainer and
 leave the local trunk as it is. Never discard local trunk commits (`git reset`,
-`git branch -f`, or a forced update) without the maintainer's explicit yes to
-that discard: the acceptance at decision point ③ is not that permission.
+`git branch -f`, or a forced update) or uncommitted changes in the trunk
+checkout (`git stash`, `git restore`, or a checkout discard) without the
+maintainer's explicit yes to that discard: the acceptance at decision point ③ is not that permission.
 
 For one merged change left from earlier work, run `land --cleanup <branch>`
 through the same command. `land --sweep` lists merged changes, removes nothing,

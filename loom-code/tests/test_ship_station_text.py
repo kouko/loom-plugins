@@ -42,6 +42,10 @@ def test_merge_acceptance_is_not_permission_to_discard_trunk() -> None:
         and "③" in s and "not that permission" in s
         for s in rule
     ), "the rule names reset/branch -f and denies that acceptance at ③ is permission"
+    assert any(
+        "uncommitted" in s and "stash" in s and "restore" in s and "explicit yes" in s
+        for s in rule
+    ), "the rule also covers uncommitted changes in the trunk checkout"
 
 
 # ship-text-separates-authorization-from-acceptance

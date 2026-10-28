@@ -331,7 +331,9 @@ the intent and restate again; there is no limit on rounds here.
    HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
    `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
    If HEAD is already on this change's branch, reuse it; on the trunk, create
-   it. On an unrelated branch or a detached HEAD, do not commit there: resolve
+   it. If `<type>/<change-id>` already exists, switch to it with
+   `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.
+   If it is checked out in another worktree, work in that worktree. On an unrelated branch or a detached HEAD, do not commit there: resolve
    that first and preserve existing work, no reset, no discard. Then commit
    with the message `docs(loom): intent <change-id> confirmed`. Its
    body **must contain the `needs-design:` line verbatim** — the checker
