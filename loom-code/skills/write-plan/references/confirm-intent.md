@@ -111,7 +111,8 @@ of your own. It never enters the intent file.
    restatement explicitly authorizes automatic publication, also write
    `publication: automatic — authorized <date> by <name>`; never derive it
    from status or prose.
-2. Commit it. The message is `docs(loom): intent <change-id> confirmed`,
+2. Commit it on the change branch, branching first per SKILL.md's
+   **Branch before the first commit** rule. The message is `docs(loom): intent <change-id> confirmed`,
    and its body **must contain the `needs-design:` line verbatim** — the
    checker compares the two strings character for character.
 3. Verify: `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intent docs/loom/intent/<change-id>.md`

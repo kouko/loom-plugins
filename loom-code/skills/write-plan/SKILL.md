@@ -40,6 +40,22 @@ Antigravity CLI, OpenCode: map tool/agent names via
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md),
 [`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
+**Branch before the first commit.** Before this station's first commit
+(intent confirmation, `needs-design:` fix, `skipped-by-instruction`
+line or plan), make HEAD the change's branch:
+
+```
+git switch -c <type>/<change-id>
+```
+
+Pick `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or
+`ci`; use it in the PR title, which becomes the trunk squash commit. Task
+commits keep their implementer contract type; `docs(loom):` intent and plan
+commits keep their fixed form. If HEAD is already on this change's branch,
+reuse it; on the trunk, create it. On an unrelated branch or a detached HEAD,
+do not commit there: resolve that first and preserve existing work, no reset,
+no discard.
+
 At entry, omit the prose steps the user told you to skip in plain words (spec,
 plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
@@ -206,8 +222,8 @@ installed, hand this to its `product-principles` tool instead.
 
 ## Step 3 — Decision point ①: restate and confirm
 
-When `status:` is already `confirmed`, skip confirmation: branch first
-(Step 6), then run
+When `status:` is already `confirmed`, skip confirmation:
+**Branch before the first commit**, then run
 `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intent docs/loom/intent/<change-id>.md` until it exits 0.
 Fix `needs-design:` with one new commit quoting the changed line verbatim
 in its body.
@@ -449,21 +465,7 @@ obvious it looks.
 
 ## Step 6 — Commit and hand off
 
-**Branch first, if still on trunk.** Otherwise the plan lands there and later
-checkpoints measure their delta from the plan commit rather than the branch base:
-
-```
-git switch -c <type>/<change-id>
-```
-
-For example `feat/2026-09-14-push-reason`. Pick `<type>` from `feat`,
-`fix`, `docs`, `refactor`, `test`, `chore` or `ci`; use it in the PR title,
-which becomes the trunk squash commit. Task commits keep their implementer
-contract type; `docs(loom):` intent and plan commits keep their fixed form.
-
-An intent on trunk stays; plan and later work use the branch.
-
-Commit the plan with the message `docs(loom): plan <change-id>`. Then hand
+Commit the plan (**Branch before the first commit**) with the message `docs(loom): plan <change-id>`. Then hand
 the change to the build station — `loom-code:build` — which dispatches one
 implementer per task, runs task and integration tests, and calls the
 closing-review station once at branch end.
