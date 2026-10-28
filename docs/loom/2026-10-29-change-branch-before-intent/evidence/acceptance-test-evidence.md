@@ -134,4 +134,34 @@ Sandboxes: script `at/r2.sh`, log `at/r2.log` (scratchpad, not committed); every
   ```
   Package suite command (not run in this re-run; finalize-review runs it):
   `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
-- Observation (open reviewer question, not decided here): `write-plan/SKILL.md:59-61` does not say to carry an uncommitted intent draft into the new worktree, while `capture-intent/SKILL.md:338-339` does; with only write-plan's text the new worktree has no intent file to confirm.
+- Observation (open reviewer question, not decided here): `write-plan/SKILL.md:59-61` does not say to carry an uncommitted intent draft into the new worktree, while `capture-intent/SKILL.md:338-339` does; with only write-plan's text the new worktree has no intent file to confirm. (Resolved by 66f30dd2; see the next re-run.)
+
+## Re-run on 2026-10-29, at 66f30dd2
+Fix range 224b7d4f..66f30dd2: `write-plan/SKILL.md:51-52` dropped "; use it in the PR title" (`ship/SKILL.md:180-181` still ties the PR title type to the branch prefix); `write-plan/SKILL.md:59-62` route now reads "..., move any uncommitted intent draft there and continue in that new worktree"; `capture-intent/SKILL.md:337-340` "carry" -> "move the uncommitted intent draft there". Plus test pins and CHANGELOGs.
+
+Setup check: clean `git worktree add --detach <scratch>/at/clean-r3 HEAD` (66f30dd2): loom-code `Validation passed`; loom-design and marketplace `Validation passed with warnings` (same pre-existing warnings as before).
+
+Sandboxes: script `at/r3.sh`, log `at/r3.log` (scratchpad, not committed); same cases as the ea554bea re-run, but for the route both stations now follow their own text: `git worktree add -b fix/<id> ../wt-change main`, then `mv` the draft into `../wt-change`, then continue there. "Unchanged minus the moved draft" compares HEAD sha, branch name, `git diff` hash and the untracked list with the draft path excluded.
+
+- 1: carried over — 66f30dd2 changes only "carry" -> "move" inside the unrelated-branch / detached-HEAD sentence; the trunk route and `write-spec/SKILL.md` are unchanged.
+- 2, 3: carried over — `land` and `ship/SKILL.md` untouched.
+- 4: re-tested (the removed clause sits in the branch-rule paragraph) — same steps as before:
+  ```
+  trunk unchanged: yes | main..branch: plan / record skip / intent ... confirmed
+  first change-owned commit's parent is the trunk tip: yes
+  git switch -c refused (branch exists) -> git switch -> fix commit on fix/<id> | trunk unchanged: yes
+  ```
+- 5: re-tested — every surface, both entries:
+  ```
+  b-ci, b-wp unrelated branch + tracked edit + untracked file + draft:
+       draft in new worktree: yes, same content: yes | draft left in original: no
+       original checkout unchanged minus the moved draft: yes (untracked.txt still there, diff hash 958f24817478)
+       main..fix: intent confirmed (wp: + record skip, plan) | first commit parent is trunk tip: yes
+       trunk ahead of origin: 0 | commits on feat/other since start: 0
+  c-ci, c-wp detached HEAD with an unbranched commit + draft:
+       draft moved: yes, same content: yes | unchanged minus draft: yes | still detached at its commit: yes
+       first commit parent is trunk tip: yes | trunk ahead of origin: 0
+  a own branch reused (branch count 2/2); d `git switch -c` refused, `git switch`, earlier commits kept;
+  e branch in another worktree -> committed there; trunk ahead of origin: 0   (ci and wp)
+  ```
+- Suite row: re-tested — same targeted command as the ea554bea re-run -> `89 passed in 0.33s`. Package suite left to finalize-review (command above).
