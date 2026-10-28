@@ -165,3 +165,65 @@ Sandboxes: script `at/r3.sh`, log `at/r3.log` (scratchpad, not committed); same 
   e branch in another worktree -> committed there; trunk ahead of origin: 0   (ci and wp)
   ```
 - Suite row: re-tested — same targeted command as the ea554bea re-run -> `89 passed in 0.33s`. Package suite left to finalize-review (command above).
+
+## 6. When the change moves to another worktree — a new one, or the one where its branch is already checked out — every uncommitted file the change produced so far (the intent draft, a spec, a `PRINCIPLES.md` edit) ends up committed on the change branch there, and the original checkout keeps exactly its own earlier work. A spec is never left in a checkout the change has left.
+Added by the intent re-confirmation in 30c08e61; first tried in the re-run below.
+
+## Re-run on 2026-10-29, at 910034de
+Fix range 382f0561..910034de (functional: 30c08e61 intent + Acceptance 6, 8f31d1ab plan wave 4, 37f349c5, c1f09203, 910034de changelogs). Prose: `capture-intent/SKILL.md:336-343` (route paragraph rewrapped; "on this or any move to another worktree, first move every uncommitted file this change produced (the intent draft, a `PRINCIPLES.md` edit) there ... so the original checkout keeps exactly its own earlier work"); `write-plan/SKILL.md:51-61` (dropped "Task commits keep their implementer contract type; `docs(loom):` intent and plan commits keep their fixed form."; same move sentence at `:59-61`); `write-spec/SKILL.md:68-71` (Step 1 settles the branch before Step 2 writes, moving uncommitted change files first). Also `attestation.json` and `ae9bd6a2` (reviewer record), not station prose.
+
+Setup check: clean `git worktree add --detach <scratch>/at/clean-r4 HEAD` (910034de): loom-code `Validation passed`; loom-design and marketplace `Validation passed with warnings` (pre-existing warnings, as before).
+
+Sandboxes: `at/r4.sh` -> `at/r4.log`, follow-ups `at/r4b.sh` -> `at/r4b.log` (scratchpad, not committed). Each sandbox starts from `main` holding `app.txt` and `PRINCIPLES.md`. The original checkout's own earlier work is a tracked edit to `app.txt` plus an untracked `notes.txt`. Byte-level fingerprint `fp` = HEAD sha, branch name, `git diff --binary` hash, `git diff --cached --binary` hash, and each untracked file's path + content hash, taken before the change produced anything and again at the end. "Move every uncommitted file this change produced": untracked draft/spec -> `mv`; the `PRINCIPLES.md` ratified-by edit (a tracked file) -> its diff applied in the target worktree, then `git restore -- PRINCIPLES.md` in the original.
+
+- 1: re-tested — write-spec's branch step moved to Step 1 (`write-spec/SKILL.md:68-71`).
+  ```
+  A1  trunk unchanged: yes | ahead of origin: 0 | main..fix: spec | intent confirmed
+  A1b write-spec from the trunk: `git switch -c` refused (exists) -> `git switch fix/<id>` in Step 1, then spec written and committed
+      spec commit on: fix/<id> | trunk unchanged: yes
+  ```
+- 2, 3: carried over — `land` and `ship/SKILL.md` untouched in 382f0561..910034de.
+- 4: re-tested (the branch-rule paragraph lost a sentence) —
+  ```
+  trunk unchanged: yes | main..fix: plan | record skip | intent confirmed | first commit parent is trunk tip: yes
+  A4b `git switch -c` refused -> `git switch` -> fix commit on fix/<id> | trunk unchanged: yes
+  ```
+- 5: re-tested — every surface, ci and wp (r4.log 6b-wp, 6b-ci2 in r4b.log, 5a/5c/5d/5e):
+  ```
+  unrelated branch + own edits (+ draft; ci also PRINCIPLES edit): original byte-identical: yes | feat/other commits since start: 0
+  detached HEAD + unbranched commit + own edits + draft:         original byte-identical: yes | still detached at its commit: yes
+  own branch reused (2/2 branches); branch exists -> `git switch`, earlier commits kept; branch in another worktree -> committed there
+  every case: first change commit's parent is trunk tip: yes | trunk ahead of origin: 0
+  ```
+  Gap (not one of the line's named cases, see finding 1): unrelated branch AND change branch already exists, checked out nowhere (r4.log A6c-2, r4b.log):
+  ```
+  git worktree add -b fix/<id> ../wt-change main  -> fatal: a branch named 'fix/2026-10-29-sandbox-change' already exists (exit 255, no worktree)
+  git switch fix/<id> (the "already exists" sentence) -> Switched; HEAD now fix/<id>; own edits now in the change checkout: M app.txt ?? notes.txt
+  git worktree add ../wt-change fix/<id> (not named by the text) -> spec committed there; original byte-identical: yes
+  ```
+- 6: re-tested —
+  ```
+  6a-ci branch checked out in ../wt-change, original on main with own work + draft + PRINCIPLES ratified-by edit
+        moved draft, moved PRINCIPLES.md edit -> commit on fix/<id>: PRINCIPLES.md + intent draft | ratified-by on branch: 1
+        original byte-identical: yes | change files left in original: draft=no spec=no PRINCIPLES-diff=no
+  6a-wp same, draft only -> intent confirmed, record skip, plan on fix/<id> | original byte-identical: yes
+  6b-ci unrelated branch + own edits, new-worktree route, draft + PRINCIPLES edit (r4b.log)
+        commit on fix/<id>: PRINCIPLES.md + draft | original byte-identical: yes | nothing left behind | feat/other commits: 0
+  6b-wp same, draft only -> three commits on fix/<id> | original byte-identical: yes
+  6c-1 write-spec, original on feat/other with own edits, fix/<id> checked out in ../wt-change
+        Step 1: "checked out in another worktree, work in that worktree" -> Step 2 writes the spec there -> `docs(loom): spec` on fix/<id>
+        original byte-identical: yes | spec left in original: no
+  every case: first change commit's parent is trunk tip: yes | trunk ahead of origin: 0
+  ```
+  Probe (finding 2): feat/other has its own committed `PRINCIPLES.md` line, then the ratified-by edit. Moving the edit: `git apply` -> `patch does not apply`; `git apply -3` -> `Applied patch to 'PRINCIPLES.md' with conflicts` (exit 1). Moving the whole file (cp + restore) -> branch's `PRINCIPLES.md` has ratified-by=1 AND the unrelated branch's `other line`=1.
+- Suite row: re-tested — targeted:
+  ```
+  env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock \
+    python -m pytest -q -p no:cacheprovider loom-design/tests/spec/test_capture_intent_contract.py \
+    loom-design/tests/spec/test_write_spec_contract.py loom-code/tests/test_write_plan_station_text.py \
+    loom-code/tests/test_probe_existing_change_branch.py
+  -> 92 passed in 0.33s
+  ```
+  Package suite left to finalize-review: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+- Finding 1 (important): `capture-intent/SKILL.md:333-343`, `write-plan/SKILL.md:54-61`, and `write-spec/SKILL.md:68-71` by reference: unrelated branch or detached HEAD while `<type>/<change-id>` already exists and is checked out nowhere. The route `git worktree add -b` is refused; the "already exists -> `git switch`" sentence moves the original checkout and its own uncommitted edits onto the change branch. Fix: name `git worktree add <path> <type>/<change-id>` (no `-b`) for an existing branch.
+- Finding 2 (nit): `capture-intent/SKILL.md:340-342`: "move every uncommitted file ... (a `PRINCIPLES.md` edit)" leaves open whole-file vs edit; when the original's base `PRINCIPLES.md` differs from the trunk's, whole-file carries unrelated content and edit-only conflicts. Fix: say to move the edit and stop to ask on conflict.
