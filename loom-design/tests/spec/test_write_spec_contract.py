@@ -290,7 +290,7 @@ def test_write_spec_guard_defers_to_capture_intent_rule() -> None:
     guard = "Commit only on this change's branch"
     assert step4.count(guard) == 1 and step4.index(guard) < step4.index("`docs(loom): spec")
     assert affirms(step4, guard, "the trunk", "unrelated branch", "detached HEAD",
-                   "`loom-design:capture-intent`")
+                   "switch to", "`loom-design:capture-intent`")
     types = {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}
     assert len(set(re.findall(r"`([a-z]+)`", _flat(_text()))) & types) < 3
 
