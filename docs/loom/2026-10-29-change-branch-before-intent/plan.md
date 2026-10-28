@@ -36,6 +36,13 @@ charter: 1.1
 - Test: A4 positive: every loom-code manifest and README reads 3.51.0; negative: an unsynchronized derived manifest fails the pin. A1 positive: loom-design reads 2.16.0 everywhere; negative: a stale changelog heading fails the pin.
 - Risk: `sync_codex_manifests.py --all` writes derived manifests; minor bumps because station guidance changes; the bump lands before finalize-review or the attestation goes stale.
 
+### Wave 3 — probe graduation
+
+**W3-01 Graduate the existing-branch probe into the loom-code suite**  after: W2-01  acceptance: 5
+- Files: `docs/loom/2026-10-29-change-branch-before-intent/evidence/probes/test_probe_existing_change_branch.py`, `loom-code/tests/test_probe_existing_change_branch.py`
+- Test: A5 positive: the moved probe passes at its suite path and keeps its `concern:` line; negative: the store path no longer exists.
+- Risk: the probe caught a defect on this change, so closing review requires it in the suite before finalize-review; it reads both plugins' station text from the repo root, as before.
+
 ## Simplicity check
 
 - Merge the two release tasks into one, removing the ordering edge forced by the shared root README — taken
