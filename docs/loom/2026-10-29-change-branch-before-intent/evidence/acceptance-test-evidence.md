@@ -71,7 +71,7 @@ Sandboxes: every scenario used a local bare `origin.git` plus a clone under the 
      plan commit on: fix/<id> | trunk ahead of origin: 0
   ```
   Side observation (b, not the route taken): in a separate sandbox, `git switch -c fix/alt-demo main` from the dirty unrelated branch succeeds and carries ` M app.txt` and `?? untracked.txt` onto the change branch's working tree — preserved, but now sitting in the change's checkout. The station text says "resolve that first and preserve existing work, no reset, no discard" and names no route.
-- Evidence: scratchpad `a45.log` sections A5a-A5e; `test_own_change_branch_reused`, `test_unrelated_branch_or_detached_head_resolved_before_commit`, `test_own_change_branch_reused_at_capture` passed; adversarial probe `docs/loom/2026-10-29-change-branch-before-intent/evidence/probes/test_probe_existing_change_branch.py` 4 passed.
+- Evidence: scratchpad `a45.log` sections A5a-A5e; `test_own_change_branch_reused`, `test_unrelated_branch_or_detached_head_resolved_before_commit`, `test_own_change_branch_reused_at_capture` passed; adversarial probe `test_probe_existing_change_branch.py` 4 passed (then under `docs/loom/2026-10-29-change-branch-before-intent/evidence/probes/`; graduated by f129421d to `loom-code/tests/test_probe_existing_change_branch.py`).
 
 ## Targeted tests per criterion
 ```
@@ -80,7 +80,7 @@ env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requiremen
   loom-design/tests/spec/test_write_spec_contract.py loom-code/tests/test_write_plan_station_text.py \
   loom-code/tests/test_ship_station_text.py loom-code/tests/test_land_cleanup.py \
   docs/loom/2026-10-29-change-branch-before-intent/evidence/probes/test_probe_existing_change_branch.py
--> 116 passed in 14.71s
+-> 116 passed in 14.71s   (at 52bf2842; the probe now lives at loom-code/tests/test_probe_existing_change_branch.py)
 ```
 
 ## Package suite (run once at the dispatcher's request; finalize-review runs it again and blocks on failure)
@@ -89,3 +89,49 @@ env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requiremen
   python scripts/run_package_tests.py --loom-family -q
 -> exit 0; 14 pytest runs, 3767 passed, 11 skipped, 0 failed; 145 script checks PASS, 0 FAIL
 ```
+
+## Re-run on 2026-10-29, at ea554bea
+Fix range 4520f050..ea554bea: station text changed only in `loom-code/skills/write-plan/SKILL.md:51-66` (route sentence added at `:59-61`; "which becomes the trunk squash commit" and "At station entry, keep the full flow unless the user instructed a skip." removed) and `loom-design/skills/capture-intent/SKILL.md:336-340` (route sentence added). The rest is plan, tests, probe move, CHANGELOGs.
+
+Setup check: `git worktree add --detach <scratch>/at/clean-r2 HEAD` (ea554bea). `claude plugin validate ./loom-code` -> `Validation passed`; `./loom-design` -> `Validation passed with warnings` (`requires-contract` unknown field; plugin-directory `ICON_MISSING`); `.` -> passed with warnings (`plugins[2]` `requires-contract`). No manifest changed since 52bf2842 (`git diff --stat 52bf2842..HEAD -- */.claude-plugin .claude-plugin` empty), so these warnings predate the fix. Versions `3.51.0` / `2.16.0`.
+
+Sandboxes: script `at/r2.sh`, log `at/r2.log` (scratchpad, not committed); every case a local bare `origin.git` plus a clone, no remote. The tester acted as the agent following only the station text at ea554bea. For the route, per both stations: `git worktree add -b fix/<id> ../wt-change main`, then continue in `../wt-change`. capture-intent: "carry the uncommitted intent draft there" -> copied (not moved) the draft. write-plan: its sentence names no draft carry; the new worktree held no intent file (`intent draft present in new worktree before any carry: no`), so the tester copied the draft to make the confirmation commit possible. "Original checkout unchanged" compares HEAD sha, branch name, `git diff` hash and the untracked-file list before and after.
+
+- 1: carried over — the capture-intent edit only appends to the unrelated-branch / detached-HEAD sentence; the trunk route ("on the trunk, create it", `git switch -c`) and `write-spec/SKILL.md` are byte-identical to 52bf2842.
+- 2: carried over — fix touches neither `land.sync_trunk` nor `ship/SKILL.md`.
+- 3: carried over — same as 2.
+- 4: re-tested — fresh sandbox, HEAD on synced `main`; `write-plan/SKILL.md:43-61` (rule before every commit point; first commit point the skip record at `:71`), `references/confirm-intent.md` step 2, Step 6 at `SKILL.md:468`; then Step 3 (`SKILL.md:226-232`) from the trunk with the branch existing.
+  ```
+  trunk unchanged: yes | main..branch: plan / record skip / intent ... confirmed
+  first change-owned commit's parent is the trunk tip: yes
+  fatal: a branch named 'fix/2026-10-29-sandbox-change' already exists   (git switch -c, refused)
+  Switched to branch 'fix/2026-10-29-sandbox-change'                    (git switch)
+  fix commit on: fix/2026-10-29-sandbox-change | trunk unchanged: yes
+  ```
+- 5: re-tested — every surface, for both entries (ci = capture-intent `SKILL.md:330-343`, wp = write-plan `SKILL.md:51-61`):
+  ```
+  b-ci unrelated branch + tracked edit + untracked file + draft:
+       original checkout unchanged: yes | main..fix: intent confirmed | first commit parent is trunk tip: yes
+       trunk unchanged: yes, ahead of origin: 0 | commits on feat/other since start: 0
+  c-ci detached HEAD with an unbranched commit + draft:
+       original checkout unchanged: yes (still detached at 66328c1, no branch contains it — only the detached HEAD)
+       main..fix: intent confirmed | first commit parent is trunk tip: yes | trunk ahead of origin: 0
+  b-wp same as b-ci: unchanged: yes | main..fix: plan / record skip / intent confirmed | parent is trunk tip: yes
+       commits on feat/other since start: 0
+  c-wp same as c-ci: unchanged: yes (still detached at 7e0e0ae) | same three commits | parent is trunk tip: yes
+  a-ci, a-wp own branch: branch count 2/2 | new commit parent is old tip: yes
+  d-ci, d-wp branch exists, HEAD on trunk: `git switch -c` refused, `git switch` -> earlier commits kept: yes, trunk ahead: 0
+  e-ci, e-wp branch in another worktree: fatal: '...' is already used by worktree at '.../wt-other'
+       committed there -> commit on fix/<id> | trunk ahead of origin: 0
+  ```
+- Suite row: re-tested — targeted tests for 4 and 5 only; the package suite is left to finalize-review, which runs it and refuses the attestation on failure.
+  ```
+  env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock \
+    python -m pytest -q -p no:cacheprovider loom-design/tests/spec/test_capture_intent_contract.py \
+    loom-design/tests/spec/test_write_spec_contract.py loom-code/tests/test_write_plan_station_text.py \
+    loom-code/tests/test_probe_existing_change_branch.py
+  -> 89 passed in 0.37s
+  ```
+  Package suite command (not run in this re-run; finalize-review runs it):
+  `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`
+- Observation (open reviewer question, not decided here): `write-plan/SKILL.md:59-61` does not say to carry an uncommitted intent draft into the new worktree, while `capture-intent/SKILL.md:338-339` does; with only write-plan's text the new worktree has no intent file to confirm.
