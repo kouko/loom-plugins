@@ -23,6 +23,8 @@ Every change-owned commit — intent confirmation, corrective and skip-record co
 spec, plan and later — lands on that change's branch, so the change itself never
 diverges the local trunk. When `land` still reports that the trunk was not updated, the
 agent tells the maintainer and does not discard local trunk commits without asking.
+When the change has to move to another worktree, everything it produced and has not
+yet committed moves with it, and nothing it produced is left behind.
 
 ## Acceptance
 1. Running a change from a clean, synchronized trunk through `capture-intent` (and `write-spec` when it runs) adds no commit to the local trunk; the intent commit is on the change branch.
@@ -30,6 +32,7 @@ agent tells the maintainer and does not discard local trunk commits without aski
 3. Given a local-only sentinel commit on the trunk and `land` reporting `trunk not updated`, an agent following the station instructions reports it to the maintainer and leaves the trunk's commit identifier unchanged; merge acceptance does not count as permission to discard it.
 4. A change entered at `write-plan` (loom-design absent) branches before its first change-owned commit, including the intent-confirmation commit.
 5. When HEAD is already on the branch belonging to this change, the station reuses it; on an unrelated branch or a detached HEAD it does not commit there before that is resolved, and existing work is preserved.
+6. When the change moves to another worktree — a new one, or the one where its branch is already checked out — every uncommitted file the change produced so far (the intent draft, a spec, a `PRINCIPLES.md` edit) ends up committed on the change branch there, and the original checkout keeps exactly its own earlier work. A spec is never left in a checkout the change has left.
 
 ## Constraints
 - Prose and existing-checker changes only; no new `land` reconciliation mechanism (critique complexity, confirmed by an outside Codex review: reconciling in `land` adds policy and code for a symptom the earlier branch removes, and cannot substitute for permission to discard history).
