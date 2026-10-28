@@ -334,7 +334,10 @@ the intent and restate again; there is no limit on rounds here.
    it. If `<type>/<change-id>` already exists, switch to it with
    `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.
    If it is checked out in another worktree, work in that worktree. On an unrelated branch or a detached HEAD, do not commit there: resolve
-   that first and preserve existing work, no reset, no discard. Then commit
+   that first and preserve existing work, no reset, no discard. Resolve it
+   with `git worktree add -b <type>/<change-id> <path> <trunk>`, carry the
+   uncommitted intent draft there and continue in that new worktree; the
+   original checkout keeps its work. Then commit
    with the message `docs(loom): intent <change-id> confirmed`. Its
    body **must contain the `needs-design:` line verbatim** — the checker
    compares the two strings character for character.

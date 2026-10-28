@@ -49,20 +49,21 @@ git switch -c <type>/<change-id>
 ```
 
 Pick `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or
-`ci`; use it in the PR title, which becomes the trunk squash commit. Task
+`ci`; use it in the PR title. Task
 commits keep their implementer contract type; `docs(loom):` intent and plan
 commits keep their fixed form. If HEAD is already on this change's branch,
 reuse it; on the trunk, create it. If it already exists, switch to it with
 `git switch <type>/<change-id>`; never `-C` or a reset. If another worktree
 has it checked out, work there. On an unrelated branch or a detached HEAD,
 do not commit there: resolve that first and preserve existing work, no reset,
-no discard.
+no discard. Resolve it with
+`git worktree add -b <type>/<change-id> <path> <trunk>` and continue in that
+new worktree; the original checkout keeps its work.
 
 At entry, omit the prose steps the user told you to skip in plain words (spec,
 plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
-`acceptance-test` step. At station entry, keep the full flow unless the user
-instructed a skip. Automatic narrow-change simplification belongs
+`acceptance-test` step. Automatic narrow-change simplification belongs
 to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
