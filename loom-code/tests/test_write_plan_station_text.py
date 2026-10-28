@@ -306,6 +306,10 @@ def test_own_change_branch_reused() -> None:
     )
     assert affirms(setup, "already on", "this change's branch", "reuse it")
     assert affirms(setup, "on the trunk", "create it")
+    assert affirms(setup, "switch to it", "`git switch <type>/<change-id>`",
+                   "already exists")
+    force = [s for s in re.split(r"(?<=[.;])\s+", setup) if "`-C`" in s]
+    assert force and all(re.search(r"\bnever\b.*`-C`", s) for s in force), force
 
 
 def test_unrelated_branch_or_detached_head_resolved_before_commit() -> None:

@@ -304,6 +304,10 @@ def test_own_change_branch_reused_at_capture() -> None:
     on_yes = _on_yes()
     assert affirms(on_yes, "already on", "this change's branch", "reuse it")
     assert affirms(on_yes, "on the trunk", "create it")
+    assert affirms(on_yes, "switch to it", "`git switch <type>/<change-id>`",
+                   "already exists")
+    force = [s for s in re.split(r"(?<=[.;])\s+", on_yes) if "`-C`" in s]
+    assert force and all(re.search(r"\bnever\b.*`-C`", s) for s in force), force
     hits = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
             if "unrelated branch" in s and "detached HEAD" in s]
     assert len(hits) == 1, hits
