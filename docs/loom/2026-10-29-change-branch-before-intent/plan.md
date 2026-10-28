@@ -1,5 +1,5 @@
 # Change records start on the change branch — plan
-intent: 2026-10-29-change-branch-before-intent@f4b4f3da
+intent: 2026-10-29-change-branch-before-intent@30c08e6173d8deb271a9ca605ed2191664ec0d8e
 charter: 1.1
 
 ## Current State Evidence
@@ -43,6 +43,23 @@ charter: 1.1
 - Test: A5 positive: the moved probe passes at its suite path and keeps its `concern:` line; negative: the store path no longer exists.
 - Risk: the probe caught a defect on this change, so closing review requires it in the suite before finalize-review; it reads both plugins' station text from the repo root, as before.
 
+### Wave 4 — a move to another worktree carries every change-owned file
+
+**W4-01 capture-intent and write-plan carry all uncommitted change files on any worktree move**  after: W3-01  acceptance: 6
+- Files: `loom-design/skills/capture-intent/SKILL.md`, `loom-code/skills/write-plan/SKILL.md`, `loom-design/tests/spec/test_capture_intent_contract.py`, `loom-code/tests/test_write_plan_station_text.py`
+- Test: A6 positive: existing-and-new-worktree-routes-move-every-uncommitted-change-file; negative: draft-only-move-wording-absent.
+- Risk: agent-decided — write-plan sits at its 3750-word cap (user-decided: keep it, refactor later); cut two restated sentences. Existing A5 pins in both test files are preserved or widened.
+
+**W4-02 write-spec settles the branch before writing the spec**  after: W4-01  acceptance: 6
+- Files: `loom-design/skills/write-spec/SKILL.md`, `loom-design/tests/spec/test_write_spec_contract.py`
+- Test: A6 positive: branch-resolved-in-step-1-before-step-2-writes; negative: step-4-is-not-the-first-branch-instruction; boundary: the Step 4 commit sentence still forbids committing off the change branch.
+- Risk: agent-decided — the guard moves into Step 1 intake and Step 4 keeps only the commit message; the existing write-spec guard pin follows the sentence, coverage preserved.
+
+**W4-03 Changelogs name the worktree-move rule**  after: W4-02  acceptance: 6
+- Files: `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Test: A6 positive: both 3.51.0 / 2.16.0 entries mention carrying uncommitted change files; negative: an entry naming only the intent draft is not accepted by the read-back.
+- Risk: versions stay 3.51.0 and 2.16.0 (unreleased in this PR).
+
 ## Simplicity check
 
 - Merge the two release tasks into one, removing the ordering edge forced by the shared root README — taken
@@ -53,6 +70,7 @@ charter: 1.1
 
 ① — what — restatement v1 of the intent (branch before the first commit, plus a ship sentence never discarding trunk commits unasked; automatic publication), ending 「這樣對嗎？」 — answered 「可以幫我用 codex 再獨立 review 一次嗎」
 ① — what — restatement v2 after the Codex review (five Acceptance lines; committing an intent on the trunk for later is removed; automatic publication) — answered 「對」
+① — what — re-confirmation after the outside Codex branch review ended the first episode NON_CONVERGENT (Acceptance 6: any move to another worktree carries every uncommitted change file; write-spec never leaves a spec behind) — answered 「對」
 
 ## Risks
 
