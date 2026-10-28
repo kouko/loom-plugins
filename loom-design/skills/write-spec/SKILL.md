@@ -65,6 +65,11 @@ Read the intent's `status:` line. Unless it reads `confirmed <date>`,
 **stop**: an intent nobody has agreed to is not yours to spec; send it back
 to `loom-design:capture-intent`.
 
+Before Step 2 writes the spec, make HEAD this change's branch as
+`loom-design:capture-intent`'s branch rule says — on any move to another
+worktree, move every uncommitted file this change produced there first, so
+the spec is written on the change branch.
+
 Then read what exists, because each one changes what you write:
 
 - **`PRINCIPLES.md`** — its `## Non-negotiables` are constraints, not

@@ -295,6 +295,23 @@ def test_write_spec_guard_defers_to_capture_intent_rule() -> None:
     assert len(set(re.findall(r"`([a-z]+)`", _flat(_text()))) & types) < 3
 
 
+def test_write_spec_settles_branch_in_intake_before_writing() -> None:
+    """A6 positive: Step 1 settles this change's branch, carrying every
+    uncommitted change file on a worktree move, before Step 2 writes the spec.
+    A6 negative: Step 4 is not the first branch instruction.
+    Boundary: Step 4 still commits only on this change's branch."""
+    text = _text()
+    step1 = _flat(_section(text, "## Step 1 — Intake"))
+    assert affirms(step1, "Before Step 2 writes the spec", "this change's branch",
+                   "`loom-design:capture-intent`",
+                   "every uncommitted file this change produced")
+    flat = _flat(text)
+    first = flat.index("this change's branch")
+    assert flat.index("## Step 1 — Intake") < first < flat.index("## Step 2 — Write the spec")
+    step4 = _flat(_section(text, "## Step 4 — Commit, conditionally review, hand off"))
+    assert affirms(step4, "Commit only on", "this change's branch")
+
+
 def test_plugin_declares_requires_contract() -> None:
     data = json.loads(
         (REPO / "loom-design/.claude-plugin/plugin.json").read_text(encoding="utf-8")
