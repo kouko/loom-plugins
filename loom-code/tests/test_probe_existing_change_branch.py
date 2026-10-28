@@ -14,7 +14,7 @@ that an existing change branch is switched to with
 `git switch <type>/<change-id>` (no `-c`).
 
 Run from the repo root:
-    python3 -m pytest docs/loom/2026-10-29-change-branch-before-intent/evidence/probes/test_probe_existing_change_branch.py
+    python3 -m pytest loom-code/tests/test_probe_existing_change_branch.py
 """
 from __future__ import annotations
 
