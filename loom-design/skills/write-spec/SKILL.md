@@ -279,7 +279,9 @@ that section.
 
 ## Step 4 — Commit, conditionally review, hand off
 
-1. Commit the spec with the message `docs(loom): spec <change-id>`.
+1. Commit only on this change's branch: on the trunk, an unrelated branch or
+   a detached HEAD, first create or resolve it as `loom-design:capture-intent`'s
+   branch rule says. Commit the spec with the message `docs(loom): spec <change-id>`.
 2. If `pre-build-review: required`, dispatch one fresh-context
    **`loom-code:reviewer`** yourself with lens `spec+adversarial`, the
    spec commit's parent (`<spec-commit>^`) as `reviewed_sha`, and the intent

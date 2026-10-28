@@ -263,6 +263,55 @@ def test_capture_intent_bare_branch_absent() -> None:
     assert bare not in _text()
 
 
+# --- change-branch-before-intent W1-02 -- the intent commit lands only on
+# the change's branch ------------------------------------------------------
+
+_SWITCH = "git switch -c <type>/" + "<change" + "-id>"
+_TYPES = {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}
+
+
+def _on_yes() -> str:
+    text = _text()
+    start = text.index('**On "yes":**')
+    return _flat(text[start:text.index("<!-- /gate -->", start)])
+
+
+def test_capture_intent_branches_before_confirmation_commit() -> None:
+    """A1 positive: HEAD becomes the typed change branch before the
+    confirmation commit; the type list appears once in this station."""
+    text, on_yes = _text(), _on_yes()
+    assert text.count(_SWITCH) == 1 and _SWITCH in on_yes
+    assert on_yes.index(_SWITCH) < on_yes.index("`docs(loom): intent")
+    assert affirms(on_yes, "Before the confirmation commit", "make HEAD the change's branch")
+    listed = [
+        s for s in re.split(r"(?<=[.;])\s+", _flat(text))
+        if len(set(re.findall(r"`([a-z]+)`", s)) & _TYPES) >= 3
+    ]
+    assert len(listed) == 1 and _TYPES <= set(re.findall(r"`([a-z]+)`", listed[0])), listed
+
+
+def test_trunk_commit_allowance_absent() -> None:
+    """A1 negative: no sentence lets the intent be committed on the trunk."""
+    text = _flat(_text()).lower()
+    for phrase in ("committed on the trunk", "does " + "not create branches",
+                   "still on the trunk"):
+        assert phrase not in text, phrase
+
+
+def test_own_change_branch_reused_at_capture() -> None:
+    """A5 positive: this change's branch is reused, the trunk gets one created,
+    and an unrelated branch or detached HEAD gets no commit until resolved."""
+    on_yes = _on_yes()
+    assert affirms(on_yes, "already on", "this change's branch", "reuse it")
+    assert affirms(on_yes, "on the trunk", "create it")
+    hits = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
+            if "unrelated branch" in s and "detached HEAD" in s]
+    assert len(hits) == 1, hits
+    for phrase in ("do " + "not commit there", "resolve that first",
+                   "preserve existing work", "no reset", "no discard"):
+        assert phrase in hits[0], phrase
+
+
 def test_plugin_declares_requires_contract() -> None:
     data = json.loads(PLUGIN_JSON.read_text(encoding="utf-8"))
     assert data["requires-contract"] == ">=2.1"

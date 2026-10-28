@@ -327,7 +327,13 @@ the intent and restate again; there is no limit on rounds here.
    `publication: automatic — authorized <date> by <name>`; never derive it
    from status or prose. When step 3 ran, write
    `ratified-by: <name> <date>` into `PRINCIPLES.md`.
-2. Commit with the message `docs(loom): intent <change-id> confirmed`. Its
+2. **Branch before the first commit.** Before the confirmation commit, make
+   HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
+   `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
+   If HEAD is already on this change's branch, reuse it; on the trunk, create
+   it. On an unrelated branch or a detached HEAD, do not commit there: resolve
+   that first and preserve existing work, no reset, no discard. Then commit
+   with the message `docs(loom): intent <change-id> confirmed`. Its
    body **must contain the `needs-design:` line verbatim** — the checker
    compares the two strings character for character.
 
@@ -336,7 +342,7 @@ the intent and restate again; there is no limit on rounds here.
 
 ## Step 5 — Hand off
 
-Branch: the intent may be committed on the trunk or on the change branch — this station does not create branches. `loom-code:write-plan` creates `<type>/<change-id>` from the trunk before the plan commit if HEAD is still on the trunk; everything after the intent lives on that branch.
+Branch: everything after the intent lives on the change branch of Step 4.
 
 Read the `needs-design:` line you wrote:
 

@@ -283,6 +283,18 @@ def test_one_way_door_asked_at_decision_point_one_is_not_asked_again() -> None:
     )
 
 
+def test_write_spec_guard_defers_to_capture_intent_rule() -> None:
+    """A5 boundary: one guard sentence before the spec commit defers to
+    capture-intent's branch rule; no second type list here."""
+    step4 = _flat(_section(_text(), "## Step 4 — Commit, conditionally review, hand off"))
+    guard = "Commit only on this change's branch"
+    assert step4.count(guard) == 1 and step4.index(guard) < step4.index("`docs(loom): spec")
+    assert affirms(step4, guard, "the trunk", "unrelated branch", "detached HEAD",
+                   "`loom-design:capture-intent`")
+    types = {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}
+    assert len(set(re.findall(r"`([a-z]+)`", _flat(_text()))) & types) < 3
+
+
 def test_plugin_declares_requires_contract() -> None:
     data = json.loads(
         (REPO / "loom-design/.claude-plugin/plugin.json").read_text(encoding="utf-8")
