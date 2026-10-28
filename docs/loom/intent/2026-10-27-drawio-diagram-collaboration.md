@@ -2,7 +2,7 @@
 originator: kouko
 kind: engineering
 needs-design: yes — .drawio 圖檔是使用者直接閱讀與編輯的檔案介面，且協作循環（agent 產圖、使用者手改、agent 讀回）是多狀態行為，現有規格未涵蓋
-status: confirmed 2026-10-28
+status: withdrawn 2026-10-29 — 範圍擴大為跨站共享的圖表討論工具（技術架構、流程、UI 等各站討論共用，後端 draw.io／penpot 可抽換），由 2026-10-29-shared-diagram-tool 取代；此條的 spec 與 plan 已刪除，機制與限制（VS Code＋桌面版顯示面、未壓縮 XML、文字投影、機械驗證）併入新 intent
 publication: automatic — authorized 2026-10-28 by kouko
 
 ## Problem
