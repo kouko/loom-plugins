@@ -60,3 +60,4 @@ charter: 1.1
 2. Run suites with `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID`; SKILL.md word caps are pinned in the contract tests (`test_capture_intent_contract.py`, `test_write_spec_contract.py`), so added prose must stay within them.
 3. Implementers add no `# concern:` header to task tests; that header counts against the adversarial probe cap.
 4. Outside review already ran on the intent: Codex gpt-6.1-sol/high, PROCEED-WITH-CAVEAT, six findings folded into the intent before confirmation.
+5. user-decided — second-vendor selection-confirmed: codex
