@@ -28,14 +28,14 @@ REQ-8 — Single shared home for diagram rules
   The generation, projection and validation rules for diagram files shall live in one shared location (the tool's skill), and station documents that use diagrams shall reference that location rather than restating its content → Acceptance #8
 
 ## Design decision
-- New shared tool `loom-workflow:loom-diagram` in the loom-workflow plugin, next to loom-visualization — user-decided (scope B: cross-station shared tool, loom-workflow home)
+- New shared tool `loom-workflow:loom-interactive-diagram` in the loom-workflow plugin, next to loom-visualization — user-decided (scope B: cross-station shared tool, loom-workflow home)
 - Backend registry: `backends/` folder in the skill, one file per backend exposing a minimal contract (extension, generate, project, check); `scripts/diagram.py` discovers backends by directory listing, so adding a backend is one file with no routing edit — agent-decided
 - Backend contract as a plain callable protocol (function-per-capability), not classes or frameworks — data over abstractions; each backend self-contained so a new backend can't reach into another — agent-decided
 - Selection mechanism: each diagram's projection file header carries `backend: <id>`; the tool reads the header to dispatch generation/validation; default `drawio` — the choice lives with the artifact (data over abstractions) — agent-decided
 - Diagram file location: `docs/loom/<change-id>/diagrams/<slug>.<ext>` with `<slug>.projection.md` beside it — a convention, not a new artifact_type glob (artifact_types is reserved and not yet consumed by the checker) — agent-decided
 - drawio backend writes uncompressed pretty-printed XML (mxfile or bare mxGraphModel) per draw.io AI generation rules (cells 0 and 1 mandatory, unique IDs, no XML comments); layout via the desktop CLI `--layout` when available, else fixed coordinates from the agent — agent-decided
 - check_diagram.py is folded into `scripts/diagram.py` (subcommands new / project / check / list-backends); it validates structure (XSD when xmllint is available, else stdlib structural checks), regenerates the projection, diffs it against the committed projection, and reports a difference path; render-to-image verification stays optional via the draw.io CLI — agent-decided
-- Station integration: write-spec SKILL.md gains a short "diagram collaboration" pointer to `loom-workflow:loom-diagram`; architecture-design SKILL.md gains the same pointer; neither restates format or validation rules — agent-decided
+- Station integration: write-spec SKILL.md gains a short "diagram collaboration" pointer to `loom-workflow:loom-interactive-diagram`; architecture-design SKILL.md gains the same pointer; neither restates format or validation rules — agent-decided
 - Mechanism registration: new tool in manifest `tools:` with owner loom-workflow; skill count 23→24 declared via a `budget-exception` CHANGELOG line per PRINCIPLES non-negotiable 4; description catalog and sync manifests updated in the same change — agent-decided
 - A minimal demonstration backend `demo-json` ships to prove registration and selection (writes a JSON description + a projection); Penpot and other real backends are out of scope — agent-decided
 

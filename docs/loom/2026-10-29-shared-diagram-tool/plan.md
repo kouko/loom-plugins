@@ -6,27 +6,27 @@ charter: 1.1
 ## Task DAG
 
 **W0-01 Register the shared tool and its backend contract**  after: —  acceptance: 7
-- Files: loom-workflow/skills/loom-diagram/SKILL.md, loom-workflow/skills/loom-diagram/scripts/diagram.py, loom-workflow/skills/loom-diagram/references/backends.md, loom-code/contract/manifest.yaml
+- Files: loom-workflow/skills/loom-interactive-diagram/SKILL.md, loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py, loom-workflow/skills/loom-interactive-diagram/references/backends.md, loom-code/contract/manifest.yaml
 - Test: A7 positive: registry-lists-two-backends; boundary: registry-empty-lists-nothing
 - Risk: manifest tools entry is counted, so the skill budget rises; default is the declared budget-exception line (agent-decided)
 
 **W0-02 drawio backend**  after: W0-01  acceptance: 1, 4
-- Files: loom-workflow/skills/loom-diagram/backends/drawio.py
+- Files: loom-workflow/skills/loom-interactive-diagram/backends/drawio.py
 - Test: A1 positive: drawio-writes-uncompressed-xml; negative: drawio-refuses-compressed-page
 - Risk: hand-placed coordinates may look poor; default is the desktop CLI --layout when present, fixed grid otherwise (agent-decided)
 
 **W0-03 Projection generate and compare**  after: W0-01  acceptance: 3
-- Files: loom-workflow/skills/loom-diagram/scripts/diagram.py, loom-workflow/skills/loom-diagram/references/projection.md
+- Files: loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py, loom-workflow/skills/loom-interactive-diagram/references/projection.md
 - Test: A3 positive: projection-regenerates-identical; negative: projection-mismatch-names-node
 - Risk: byte comparison may flag cosmetic drift; default is compare on normalised node/edge tuples, not raw bytes (agent-decided)
 
 **W0-04 demo-json backend proves selection**  after: W0-01  acceptance: 7
-- Files: loom-workflow/skills/loom-diagram/backends/demo_json.py, loom-workflow/skills/loom-diagram/references/backends.md
+- Files: loom-workflow/skills/loom-interactive-diagram/backends/demo_json.py, loom-workflow/skills/loom-interactive-diagram/references/backends.md
 - Test: A7 positive: demo-backend-selectable-by-header; negative: unknown-backend-names-registered-ids
 - Risk: a demonstration backend may look like dead weight; default is keep it minimal and name it demo in the docs (agent-decided)
 
 **W0-05 Desktop and VS Code setup documentation**  after: W0-02  acceptance: 5, 6
-- Files: loom-workflow/skills/loom-diagram/references/editor-setup.md, loom-workflow/skills/loom-diagram/SKILL.md
+- Files: loom-workflow/skills/loom-interactive-diagram/references/editor-setup.md, loom-workflow/skills/loom-interactive-diagram/SKILL.md
 - Test: A5 positive: setup-doc-reproduces-loop; A6 positive: desktop-autosave-behaviour-documented
 - Risk: desktop behaviour changes between releases; default is to pin the verified version and date in the doc (agent-decided)
 
@@ -41,7 +41,7 @@ charter: 1.1
 - Risk: mechanism count rises 23 to 24; default is the declared budget-exception CHANGELOG line (agent-decided)
 
 **W0-08 Tests and end-of-Build verification**  after: W0-02, W0-03, W0-04, W0-05, W0-07  acceptance: 1, 2, 3, 4, 5, 6, 7, 8
-- Files: loom-workflow/tests/loom-diagram/test_diagram_tool.py, loom-workflow/tests/loom-diagram/test_backends.py, loom-workflow/tests/loom-diagram/test_projection.py
+- Files: loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py, loom-workflow/tests/loom-interactive-diagram/test_backends.py, loom-workflow/tests/loom-interactive-diagram/test_projection.py
 - Test: A3 boundary: projection-of-empty-diagram; A4 negative: malformed-xml-named; A7 boundary: single-backend-registry
 - Risk: tests need a fixture .drawio; default is a two-node fixture committed under the test folder (agent-decided)
 
