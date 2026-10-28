@@ -2,7 +2,8 @@
 originator: kouko
 kind: engineering
 needs-design: yes — .drawio 圖檔是使用者直接閱讀與編輯的檔案介面，且協作循環（agent 產圖、使用者手改、agent 讀回）是多狀態行為，現有規格未涵蓋
-status: open
+status: confirmed 2026-10-28
+publication: automatic — authorized 2026-10-28 by kouko
 
 ## Problem
 規格與介面設計的討論只能用文字往返：使用者無法直接畫出或修改圖面，對話視窗也顯示不了圖形（Mermaid 在終端機顯示成原始碼），agent 對畫面布局與流程的理解常需要多輪文字修正，而且討論成果無法累積成一份可編輯的圖檔。受影響的是以 loom 進行開發的使用者本人；後果是溝通慢、誤解要反覆澄清。
