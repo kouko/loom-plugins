@@ -317,7 +317,7 @@ def test_own_change_branch_reused_at_capture() -> None:
                for w in ("commit", "reset", "discard")), hits[0]
     assert affirms(on_yes, "Resolve it with",
                    "`git worktree add -b <type>/<change-id> <path> <trunk>`",
-                   "new worktree", "intent draft")
+                   "new worktree", "move", "intent draft")
 
 
 def test_plugin_declares_requires_contract() -> None:

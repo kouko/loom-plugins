@@ -327,7 +327,7 @@ def test_unrelated_branch_or_detached_head_resolved_before_commit() -> None:
                for w in ("commit", "reset", "discard")), hits[0]
     assert affirms(" ".join(setup.split()), "Resolve it with",
                    "`git worktree add -b <type>/<change-id> <path> <trunk>`",
-                   "new worktree")
+                   "new worktree", "move", "intent draft")
 
 
 def test_repo_grep_no_bare_branch() -> None:
