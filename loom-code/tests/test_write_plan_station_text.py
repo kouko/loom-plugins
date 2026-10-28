@@ -330,6 +330,19 @@ def test_unrelated_branch_or_detached_head_resolved_before_commit() -> None:
                    "new worktree", "move", "intent draft")
 
 
+def test_worktree_moves_carry_every_uncommitted_change_file() -> None:
+    """A6 positive: a move to another worktree, existing or new, carries every
+    uncommitted change file, `PRINCIPLES.md` included, onto the change branch.
+    A6 negative: no route moves only the intent draft."""
+    setup = " ".join(
+        _section(SKILL.read_text(encoding="utf-8"), "## Workflow setup").split()
+    )
+    assert affirms(setup, "move", "every uncommitted file this change produced",
+                   "another worktree", "intent draft", "`PRINCIPLES.md`",
+                   "commit", "change branch")
+    assert not re.search(r"move (?:the|any) uncommitted intent draft", setup)
+
+
 def test_repo_grep_no_bare_branch() -> None:
     hits = []
     for plugin in ("loom-code", "loom-design", "loom-workflow"):

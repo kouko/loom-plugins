@@ -320,6 +320,19 @@ def test_own_change_branch_reused_at_capture() -> None:
                    "new worktree", "move", "intent draft")
 
 
+_CARRY = "every uncommitted file this change produced"
+
+
+def test_worktree_moves_carry_every_uncommitted_change_file_at_capture() -> None:
+    """A6 positive: a move to another worktree, existing or new, carries every
+    uncommitted change file, `PRINCIPLES.md` included, onto the change branch.
+    A6 negative: no route moves only the intent draft."""
+    on_yes = _on_yes()
+    assert affirms(on_yes, "move", _CARRY, "another worktree", "intent draft",
+                   "`PRINCIPLES.md`", "commit", "change branch")
+    assert not re.search(r"move (?:the|any) uncommitted intent draft", on_yes)
+
+
 def test_plugin_declares_requires_contract() -> None:
     data = json.loads(PLUGIN_JSON.read_text(encoding="utf-8"))
     assert data["requires-contract"] == ">=2.1"

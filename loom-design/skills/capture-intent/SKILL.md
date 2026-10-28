@@ -333,11 +333,14 @@ the intent and restate again; there is no limit on rounds here.
    If HEAD is already on this change's branch, reuse it; on the trunk, create
    it. If `<type>/<change-id>` already exists, switch to it with
    `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.
-   If it is checked out in another worktree, work in that worktree. On an unrelated branch or a detached HEAD, do not commit there: resolve
-   that first and preserve existing work, no reset, no discard. Resolve it
-   with `git worktree add -b <type>/<change-id> <path> <trunk>`, move the
-   uncommitted intent draft there and continue in that new worktree; the
-   original checkout keeps its work. Then commit
+   If it is checked out in another worktree, work in that worktree. On an
+   unrelated branch or a detached HEAD, do not commit there: resolve that
+   first and preserve existing work, no reset, no discard. Resolve it with
+   `git worktree add -b <type>/<change-id> <path> <trunk>` and continue in
+   that new worktree — on this or any move to another worktree, first move
+   every uncommitted file this change produced (the intent draft, a
+   `PRINCIPLES.md` edit) there, to be committed on the change branch, so the
+   original checkout keeps exactly its own earlier work. Then commit
    with the message `docs(loom): intent <change-id> confirmed`. Its
    body **must contain the `needs-design:` line verbatim** — the checker
    compares the two strings character for character.
