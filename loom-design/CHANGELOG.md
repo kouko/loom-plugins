@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.16.0] — 2026-10-29 — intent and spec commits land only on the change branch
+
+- `capture-intent` creates or reuses the change branch (`git switch -c <type>/<change-id>`) before the confirmation commit: reuse this change's branch, create it when on the trunk, and on an unrelated branch or detached HEAD commit nothing until resolved, preserving existing work. The allowance for committing the intent on the trunk is removed.
+- `write-spec` guards its spec commit with one sentence deferring to `capture-intent`'s branch rule.
+
 ## [2.15.0] — 2026-10-23 — consistent spec ordering and confirmation handoffs
 
 - `write-spec` preserves confirmed Acceptance order and mapping while applying non-negotiable principles to requirement content and design decisions.

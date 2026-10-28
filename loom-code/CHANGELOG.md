@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.51.0] — 2026-10-29 — docs(write-plan, ship): branch before the first commit and never discard trunk unasked
+
+- `write-plan` states one "Branch before the first commit" rule in Workflow setup, ahead of every change-owned commit (intent confirmation, needs-design fix, skipped-by-instruction record, plan): reuse this change's own branch, create it when on the trunk, and on an unrelated branch or detached HEAD commit nothing until that is resolved, without resetting or discarding existing work. Step 3, Step 6 and `confirm-intent.md` point at the rule.
+- `write-plan` drops the allowance for leaving a confirmed intent committed on the trunk; `confirm-intent.md` commits the confirmation on the change branch.
+- `ship` §5 reports land's `trunk not updated` line to the maintainer and leaves the trunk as it is; local trunk commits are never discarded without the maintainer's explicit yes, and merge acceptance at decision point ③ is not that permission. `land.py` is unchanged.
+
 ## [3.50.0] — 2026-10-27 — feat(closing-review): accept a recorded no-program adversarial outcome
 
 - `finalize-review` accepts a no-program adversarial outcome (`no_program`) carrying a nonblank reason in place of an executed program, and the attestation marks it with the row `{kind: adversarial, no_program}`. `missing_adversarial_execution` is the single predicate that decides whether adversarial execution is missing.
