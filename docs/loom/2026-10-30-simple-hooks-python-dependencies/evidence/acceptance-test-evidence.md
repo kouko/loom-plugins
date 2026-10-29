@@ -29,5 +29,5 @@ Tested on 2026-10-30 in a fresh local clone at `f488d6c29010180dce164ae30f2b19c0
 
 ## Findings and data handling
 
-- No acceptance failure or important finding was observed. The closing-review station reported no dismissed finding of important severity or higher and no skipped package tests or finalization.
+- No acceptance failure or important finding was observed. The closing-review station reported no dismissed finding of important severity or higher. The package suite and finalization were not omitted; the suite result above includes individual skipped test cases.
 - The probes used a clean clone and temporary directories. No user project data, real hook installation, or user map was changed.
