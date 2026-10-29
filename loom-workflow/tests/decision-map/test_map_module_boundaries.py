@@ -154,6 +154,12 @@ def test_store_public_write_preserves_legacy_fault_injection(tmp_path, monkeypat
         map_store.atomic_write(tmp_path / "target.md", "candidate")
 
 
+def test_delivery_uses_one_shared_section_editor():
+    delivery = importlib.import_module("start_delivery")
+    assert map_store._append_section_fields is map_store.append_section_fields
+    assert not hasattr(delivery, "_append_note")
+
+
 def test_persistence_unsupported_exchange_preserves_original(tmp_path, monkeypatch):
     persistence = importlib.import_module("map_persistence")
     target = tmp_path / "target.md"
