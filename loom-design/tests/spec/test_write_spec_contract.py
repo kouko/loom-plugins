@@ -283,23 +283,12 @@ def test_one_way_door_asked_at_decision_point_one_is_not_asked_again() -> None:
     )
 
 
-def test_write_spec_guard_defers_to_capture_intent_rule() -> None:
-    """A5 boundary: one guard sentence before the spec commit defers to
-    capture-intent's branch rule; no second type list here."""
-    step4 = _flat(_section(_text(), "## Step 4 — Commit, conditionally review, hand off"))
-    guard = "Commit only on this change's branch"
-    assert step4.count(guard) == 1 and step4.index(guard) < step4.index("`docs(loom): spec")
-    assert affirms(step4, guard, "the trunk", "unrelated branch", "detached HEAD",
-                   "switch to", "`loom-design:capture-intent`")
-    types = {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}
-    assert len(set(re.findall(r"`([a-z]+)`", _flat(_text()))) & types) < 3
-
-
 def test_write_spec_settles_branch_in_intake_before_writing() -> None:
     """A6 positive: Step 1 settles this change's branch, carrying every
     uncommitted change file on a worktree move, before Step 2 writes the spec.
     A6 negative: Step 4 is not the first branch instruction.
-    Boundary: Step 4 still commits only on this change's branch."""
+    Boundary: the branch is settled once, in Step 1; Step 4 restates no guard
+    and the file carries no second branch type list."""
     text = _text()
     step1 = _flat(_section(text, "## Step 1 — Intake"))
     assert affirms(step1, "Before Step 2 writes the spec", "this change's branch",
@@ -309,7 +298,9 @@ def test_write_spec_settles_branch_in_intake_before_writing() -> None:
     first = flat.index("this change's branch")
     assert flat.index("## Step 1 — Intake") < first < flat.index("## Step 2 — Write the spec")
     step4 = _flat(_section(text, "## Step 4 — Commit, conditionally review, hand off"))
-    assert affirms(step4, "Commit only on", "this change's branch")
+    assert "Commit only on this change's branch" not in step4
+    types = {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}
+    assert len(set(re.findall(r"`([a-z]+)`", flat)) & types) < 3
 
 
 def test_plugin_declares_requires_contract() -> None:
