@@ -100,3 +100,55 @@ Test runner used for every pytest line below:
 - Full package suite: not run by me; `finalize-review` executes the declared
   `package-tests` command (docs/loom/KICKOFF-DEFAULTS.md) and refuses the attestation on
   failure. Build reported it passed at 3eb08254.
+
+## Re-run on 2026-10-29, at 7ffa7e4f
+
+Fix range c8dd93cb..7ffa7e4f: two `##` headings removed from
+`loom-code/skills/write-plan/references/self-written-spec.md`; Step 4 `no`-branch pointer
+in `loom-code/skills/write-plan/SKILL.md:212-214` gains "or this station already wrote
+`docs/loom/<change-id>/spec.md`"; CHANGELOG 2780 → 2785; two new tests in
+`loom-code/tests/test_write_plan_shape_text.py`. Clean copy:
+`git worktree add --detach <scratchpad>/at-rerun 7ffa7e4f` (0 untracked/modified files).
+The fix touches the reference, SKILL.md and the pinning tests, so every row is re-tested.
+
+- Setup: re-ran in the clean copy `scripts/check_plugin_boundaries.py loom-code`
+  ("OK: loom-code is filesystem-boundary clean."), `scripts/sync_codex_manifests.py --check --all`
+  (exit 0), `loom-code/scripts/check_mechanisms.py --baseline 129bac7e` ("all clear"),
+  `loom-code/scripts/check_contract_citations.py` ("no new contract citations"),
+  `loom-code/scripts/check-skill-crossrefs.py` ("all relative skill cross-references resolve").
+  All exit 0.
+- 1: re-tested — body words (`str.split` after frontmatter, same rule as `_body_words`):
+  129bac7e 3749, c8dd93cb 2780, 7ffa7e4f 2785 (≤ 2800). Cap assertion `< 3750` unchanged in
+  `test_writePlanBody_under3750Words` (passes). `loom-code/CHANGELOG.md:8` now says
+  "drops from 3749 to 2785 words", matching the shipped body.
+- 2: re-tested — cold read of every loom-design-absent path at 7ffa7e4f:
+  no intent → `SKILL.md:146` → `no-intent-interview.md` → Step 3 → `confirm-intent.md`;
+  unconfirmed intent → Step 3 → `confirm-intent.md`; `yes`, spec missing →
+  `SKILL.md:224-225` → `self-written-spec.md`; `yes`, spec exists (this station wrote it)
+  → `SKILL.md:216-219` "finish what it still requires"; `no`, spec needed →
+  `SKILL.md:212-214` → `self-written-spec.md`; `no`, resumed with this station's
+  `spec.md` already on disk → the new third clause of `SKILL.md:212-214` fires →
+  `self-written-spec.md`, whose last line returns to the intake check.
+  Reference read top to bottom from the `no` branch: `grep -c '^##'` = 0 headings;
+  `diff` of base 129bac7e Step 4 text (from "When a task's rationale outgrows its Risk
+  line, write" to the intake-check heading) against the reference body (after its 5-line
+  preamble) shows only: the two `yes` paragraphs that stay in SKILL.md (spec exists; spec
+  missing with loom-design installed) removed, a leading blank line, and the closing line
+  "When done, return to step 4's intake check." added. So the review-dispatch paragraph and
+  the product gate follow the `no` rules in their 129bac7e order, under no `yes`-only heading.
+  `verbatim_check.py` (base file byte-identical to `git show 129bac7e:...SKILL.md`):
+  "old sentences: 312 missing verbatim: 1" — the same rewritten cross-reference sentence
+  as before.
+- 3: re-tested — `grep -n "no-intent-interview\|self-written-spec" SKILL.md`: lines 146
+  (absent bullet only), 214 (`no` pointer), 218 (spec-exists, "when this station wrote
+  that spec (`loom-design` absent)"), 225 (`yes`, not installed). `no-intent-interview`
+  appears 0 times in `confirm-intent.md` and `self-written-spec.md`. With loom-design
+  installed, the `no` pointer fires only when the station writes or already wrote the spec
+  itself; `yes`, spec missing (`SKILL.md:221-222`) hands to `write-spec` with no pointer.
+- 4: re-tested — same 11 files as row 4 above, in the clean copy: `236 passed in 3.69s`
+  (234 earlier + `test_noBranchSpecPointer_firesOnAlreadyWrittenSpec` and
+  `test_selfWrittenSpec_hasNoBranchHeadings`). Those two plus
+  `test_writePlanBody_under3750Words` and
+  `test_specPointer_onNoAndAbsentBranches_notInstalledYes` run alone: `4 passed`.
+  Full package suite: run by orchestrator at 7ffa7e4f, result pending; `finalize-review`
+  executes it and refuses the attestation on failure.
