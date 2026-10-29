@@ -201,7 +201,18 @@ def recompute_checker_rules(repo: Path) -> set[str]:
 
 def _command_basename(command: str) -> str:
     tokens = [a or b for a, b in QUOTED_TOKEN_RE.findall(command)]
-    path_tokens = [t for t in tokens if "/" in t]
+    path_tokens = []
+    skip_operand = False
+    for token in tokens:
+        if skip_operand:
+            skip_operand = False
+            continue
+        redirection = re.match(r"^\d*(?:>>?|<<?)", token)
+        if redirection:
+            skip_operand = redirection.end() == len(token)
+            continue
+        if "/" in token:
+            path_tokens.append(token)
     target = path_tokens[0] if path_tokens else (tokens[-1] if tokens else command)
     if Path(target).name == "loom-python" and "--ready" in tokens:
         if "--script" in tokens:

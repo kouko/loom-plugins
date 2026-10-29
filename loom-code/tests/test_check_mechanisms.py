@@ -305,6 +305,24 @@ class TestRecompute:
         path.write_text(json.dumps(hooks))
         assert "PreToolUse:Bash:language-anchor.py" in cm.recompute_hooks(repo)
 
+    @pytest.mark.parametrize("redirect", [">/dev/null", "> /dev/null"])
+    def test_hook_id_ignores_redirection_before_conditional_script(self, tmp_path, redirect):
+        repo = _build_repo(tmp_path)
+        path = repo / "loom-code/hooks/hooks.json"
+        hooks = json.loads(path.read_text())
+        hooks["hooks"]["PostToolUse"] = [{
+            "matcher": "Skill",
+            "hooks": [{"type": "command", "command": (
+                f"if python3 -c 'import json,sys' {redirect} 2>&1; "
+                'then exec python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"; fi'
+            )}],
+        }]
+        path.write_text(json.dumps(hooks))
+
+        ids = cm.recompute_hooks(repo)
+        assert "PostToolUse:Skill:language-anchor.py" in ids
+        assert "PostToolUse:Skill:null" not in ids
+
     def test_contract_from_manifest_is_per_field(self, tmp_path):
         """F10: contract recompute registers one id per artifact FIELD
         (`artifact:<name>.<field>`), not one per artifact."""

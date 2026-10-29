@@ -4,6 +4,7 @@
 
 - Language-anchor hooks and Antigravity pre-invocation use an available host Python without requiring the checker runtime or PyYAML cache.
 - Hosts without `python3` retain the existing ready cached interpreter path. Publication gates still require checker readiness and keep their failure behavior.
+- Mechanism counting ignores shell redirection operands before the hook script path, preserving the registered hook identities for conditional commands.
 
 ## [3.52.1] — 2026-10-29 — refactor(write-plan): move loom-design-absent paths to references
 
