@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-29-change-branch-before-intent",
-  "content_digest": "bd9f860763efd1b40a114e0c616549c39158f314",
+  "content_digest": "60a48e33d0b419496db68db0958e01d1fbb6f049",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,28 +20,49 @@
   ],
   "verdicts": [
     {
-      "reviewer": "reviewer-skill-ac65464f",
+      "reviewer": "reviewer-skill-a07aa812",
       "vendor": "anthropic",
       "model": "claude-opus-5-5",
       "lens": "skill",
       "verdict": "PASS",
-      "findings": [
-        {
-          "severity": "nit",
-          "dimension": "omission",
-          "anchor": "loom-design/skills/capture-intent/SKILL.md :: move the uncommitted intent draft there",
-          "text": "nitpick (non-blocking): when step 3 ran, the uncommitted PRINCIPLES.md ratified-by edit is not moved into the new worktree; nothing is lost, it stays in the original checkout.",
-          "fix": "name this change's uncommitted files instead of only the intent draft in a later change."
-        }
-      ]
+      "findings": []
     },
     {
-      "reviewer": "reviewer-code-a91b9d2f",
-      "vendor": "anthropic",
-      "model": "claude-opus-5-5",
-      "lens": "code",
+      "reviewer": "codex-gpt-6.1-sol-e2",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "lens": "skill",
       "verdict": "PASS",
-      "findings": []
+      "findings": [],
+      "reviewed_sha": "051c112adf2513e4a91ede7cb65c5ad885b1c424",
+      "review_target_sha": "7d28ac5519eb33dd8e3c1acc359dc8893a23f19f",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Verified the Round 2 prohibition pins and explicit branch antecedents; cumulative station prose shows no regression.",
+        "Verified that every worktree-move route carries uncommitted change files and write-spec resolves the branch before writing. Previously accepted limitations remain unchanged.",
+        "All five changed test files ran: 55 loom-code tests and 48 loom-design tests passed. Independently counted 3749 write-plan body words. Reviewed acceptance evidence without rerunning its sandboxes, the complete package suite, or evidence probes."
+      ],
+      "external_review": {
+        "status": "completed",
+        "executor": "codex",
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "family": "openai",
+        "evidence_level": "observed-model-and-effort",
+        "observed_model": "gpt-6.1-sol",
+        "observed_effort": "high",
+        "output_digest": "a65d2ebc0d9476f9c3c1c89abe898d440bcd2ae6fe552ad06a56f1ba2503e666",
+        "reviewer": "codex-gpt-6.1-sol-e2",
+        "review_target_sha": "7d28ac5519eb33dd8e3c1acc359dc8893a23f19f"
+      }
     }
   ],
   "findings": [],
