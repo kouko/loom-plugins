@@ -202,6 +202,35 @@ def test_validation_owner_and_facade_delegation(tmp_path, monkeypatch):
     assert calls[0][3] is map_store.read_ticket
 
 
+@pytest.mark.parametrize("module,names", [
+    ("map_ticket_mutations", ("_check_blocked_by",)),
+    ("map_close_transaction", (
+        "V3_TICKET_TYPES", "_check_v3_ticket_frontmatter",
+        "_check_v3_ticket_closure_evidence", "_check_map_structure",
+        "_check_v3_clear_acceptance", "_check_tickets",
+    )),
+])
+def test_transaction_validation_rules_use_their_owner(module, names):
+    owner = importlib.import_module(module)
+    validation = importlib.import_module("map_validation")
+    tree = ast.parse(Path(owner.__file__).read_text(encoding="utf-8"))
+    imports = {
+        alias.name for node in tree.body if isinstance(node, ast.Import)
+        for alias in node.names
+    }
+    assert "map_validation" in imports
+    calls = {
+        (node.value.id, node.attr)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name)
+    }
+    for name in names:
+        assert ("map_validation", name) in calls
+        assert ("map_store", name) not in calls
+        if name != "_check_tickets":
+            assert getattr(map_store, name) is getattr(validation, name)
+
+
 def test_validation_preserves_order_and_legacy_ticket_helpers(tmp_path):
     validation = importlib.import_module("map_validation")
     text = (
