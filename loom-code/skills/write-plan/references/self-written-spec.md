@@ -4,8 +4,6 @@ Loaded by step 4 of `../SKILL.md` when this station writes the spec
 itself. Relative paths here are relative to this file's directory; step
 numbers are that SKILL.md's.
 
-## A `needs-design: no` change that needs a spec
-
 When a task's rationale outgrows its Risk line, write
 `docs/loom/<change-id>/spec.md` from `contract/templates/spec-minimal.md` —
 Requirements one per Acceptance line, Design decision one line per
@@ -18,8 +16,6 @@ using the risk classes below; only a required spec gets a pre-build review.
 A non-empty carried-details list — from `capture-intent`'s hand-off or your
 own intake — forces that spec even when every Risk line fits; record each
 item per the `Record each carried detail` bullet below. An empty list forces no spec.
-
-## `needs-design: yes` without `loom-design`
 
 **`yes`, spec missing, `loom-design` not installed** — you write a minimal
 spec yourself, from `contract/templates/spec-minimal.md`:

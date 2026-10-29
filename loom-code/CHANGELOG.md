@@ -5,7 +5,7 @@
 - The no-intent interview moves to `references/no-intent-interview.md`.
 - The intent-writing rules move to `references/confirm-intent.md`, still loaded at step 3.
 - The self-written minimal spec path and the product-spec gate move to `references/self-written-spec.md`, read when `write-plan` writes a spec itself.
-- `write-plan` SKILL.md body drops from 3749 to 2780 words; the 3750-word cap is unchanged. No rule wording changed.
+- `write-plan` SKILL.md body drops from 3749 to 2785 words; the 3750-word cap is unchanged. No rule wording changed.
 
 ## [3.52.0] — 2026-10-29 — fix(checker): run the detected package suite in a uv project's locked environment
 

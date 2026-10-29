@@ -125,6 +125,21 @@ def test_specPointer_onNoAndAbsentBranches_notInstalledYes() -> None:
     assert _text().count("self-written-spec") == 3
 
 
+def test_noBranchSpecPointer_firesOnAlreadyWrittenSpec() -> None:
+    """A resumed `no` run whose spec is already on disk reaches the reference."""
+    no = _section(_STEP4).split("**`no`**", 1)[1].split("**`yes`", 1)[0]
+    pointer = next(s for s in _flat(no).split(". ") if "self-written-spec" in s)
+    assert "already wrote `docs/loom/<change-id>/spec.md`" in pointer
+    assert "read `references/self-written-spec.md`" in pointer
+    assert not has_negation(pointer), pointer
+
+
+def test_selfWrittenSpec_hasNoBranchHeadings() -> None:
+    """The shared review dispatch and product gate sit under no yes-only heading."""
+    text = SELF_WRITTEN_SPEC.read_text(encoding="utf-8")
+    assert re.findall(r"^#{2,} ", text, re.M) == []
+
+
 def test_write_plan_readback_has_no_mermaid() -> None:
     """A3 negative: no Mermaid in the chat read-back; gate text untouched."""
     assert "```mermaid" not in _text()

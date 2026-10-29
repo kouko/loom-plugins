@@ -209,8 +209,9 @@ intent says `no` is blocked.
 
 **`no`** — go to step 5.
 
-When a task's rationale outgrows its Risk line, or a carried-details list
-is non-empty, read `references/self-written-spec.md` and follow it.
+When a task's rationale outgrows its Risk line, a carried-details list
+is non-empty, or this station already wrote `docs/loom/<change-id>/spec.md`,
+read `references/self-written-spec.md` and follow it.
 
 **`yes`, and `docs/loom/<change-id>/spec.md` already exists** — when this
 station wrote that spec (`loom-design` absent), read
