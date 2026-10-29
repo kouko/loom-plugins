@@ -168,16 +168,15 @@ def _direct_pytest_collects(repo: Path, artifact: str) -> tuple[bool | None, str
         tokens = argv_for(declared)
     except ValueError:
         return False, ""
-    if _conda_pytest_argv(tokens):
-        pytest_command = tokens[:7]
-        args = tokens[7:]
-    elif tokens[0] == "pytest":
+    # Plain, conda-run and `uv run` forms all reduce to `python -m pytest ...`.
+    inner = _python_argv(tokens)
+    if tokens[0] == "pytest":
         pytest_command = tokens[:1]
         args = tokens[1:]
-    elif (len(tokens) >= 3 and Path(tokens[0]).name.startswith("python")
-          and tokens[1:3] == ["-m", "pytest"]):
-        pytest_command = tokens[:3]
-        args = tokens[3:]
+    elif Path(inner[0]).name.startswith("python") and inner[1:3] == ["-m", "pytest"]:
+        cut = len(tokens) - len(inner) + 3
+        pytest_command = tokens[:cut]
+        args = tokens[cut:]
     else:
         return False, ""
     if pytest_positionals(args) is None:

@@ -513,6 +513,43 @@ def test_conda_pytest_suite_accepts_execution_and_refuses_noop(tmp_path: Path) -
             if run["kind"] == "adversarial"] == [artifact]
 
 
+@pytest.mark.parametrize("directory, accepted", [("tests", True), ("checks", False)])
+def test_uv_pytest_suite_finalizes_only_a_collected_graduated_probe(
+    tmp_path: Path, directory: str, accepted: bool
+) -> None:
+    binary = tmp_path / "bin"
+    binary.mkdir()
+    uv = binary / "uv"
+    # Drops `run` and its options, then runs the wrapped python argv.
+    uv.write_text(
+        "#!/bin/sh\nwhile [ $# -gt 0 ]; do case \"$1\" in python*) break;; esac; shift; done\n"
+        "exec \"$@\"\n", encoding="utf-8",
+    )
+    uv.chmod(0o755)
+    env = {"PATH": f"{binary}{os.pathsep}{os.environ['PATH']}"}
+    repo = make_repo(tmp_path, "uv run --locked python3 -m pytest -q tests")
+    artifact = f"{directory}/test_graduated_probe.py"
+    (repo / directory).mkdir()
+    (repo / artifact).write_text(
+        "# concern: a defect now covered on every change\n"
+        "def test_graduated() -> None:\n    assert True\n", encoding="utf-8",
+    )
+    commit_all(repo, "graduate into uv pytest suite")
+
+    result = finalize(repo, review_input(tmp_path, PASSING, [{
+        "command": f"uv run --locked python3 -m pytest {artifact}",
+        "artifact": artifact,
+    }]), env)
+
+    if accepted:
+        assert result.returncode == 0, result.stderr
+        assert [run["artifact"] for run in written(repo)["executions"]
+                if run["kind"] == "adversarial"] == [artifact]
+    else:
+        assert result.returncode == 1
+        assert "BLOCK finalize.adversarial" in result.stderr
+
+
 def test_runnerless_pytest_refuses_uncollected_and_broken_suites(tmp_path: Path) -> None:
     repo = make_repo(tmp_path, "python3 -m pytest -q tests")
     tests = repo / "tests"
