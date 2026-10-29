@@ -194,6 +194,7 @@ def test_reuse_by_its_own_criterion_still_works(tmp_path: Path) -> None:
     assert "reused" in again[1]
 
 
+# concern: a failed public writer must leave MAP bytes intact and create no intent.
 def test_delivery_uses_public_writer_and_preserves_failed_map_bytes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
