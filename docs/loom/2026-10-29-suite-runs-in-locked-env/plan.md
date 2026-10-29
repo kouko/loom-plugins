@@ -43,3 +43,4 @@ charter: 1.1
 1. A machine with `uv.lock` committed but no `uv` installed now fails the suite with "command not found" instead of running bare `python3`; accepted at ① as the clearer failure.
 2. Adversarial programs still record their own command (intent Out of scope); in a uv repo the adversary may need a `uv run` prefix it chooses itself.
 3. An in-flight branch in a uv repo without a declared command sees its detected command change on upgrade, making an existing attestation stale.
+4. user-decided — second-vendor selection-confirmed: codex
