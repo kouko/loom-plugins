@@ -1131,6 +1131,49 @@ def test_test_command_still_detects_own_tests(tmp_path: Path) -> None:
     )
 
 
+UV_LOCKED_PYTEST = "uv run --locked python -m pytest -q"
+
+
+def test_test_command_runs_in_locked_uv_env(tmp_path: Path) -> None:
+    repo = bare_repo(tmp_path)
+    (repo / "pyproject.toml").write_text("[project]\nname = 'x'\n", encoding="utf-8")
+    head = commit(repo, "pyproject only")
+    (repo / "uv.lock").write_text("version = 1\n", encoding="utf-8")
+
+    assert probes.declared_test_command(repo) == (UV_LOCKED_PYTEST, "detected uv.lock")
+    # Not committed at the revision: the lock in the working tree is ignored.
+    assert probes.declared_test_command(repo, head) == (
+        "python3 -m pytest -q", "detected pyproject.toml"
+    )
+
+
+def test_git_ignored_uv_lock_does_not_select_locked_env(tmp_path: Path) -> None:
+    repo = bare_repo(tmp_path)
+    (repo / "pyproject.toml").write_text("[project]\nname = 'x'\n", encoding="utf-8")
+    (repo / ".gitignore").write_text("uv.lock\n", encoding="utf-8")
+    (repo / "uv.lock").write_text("version = 1\n", encoding="utf-8")
+
+    assert probes.declared_test_command(repo) == (
+        "python3 -m pytest -q", "detected pyproject.toml"
+    )
+
+
+def test_declared_package_tests_win_over_uv_lock(tmp_path: Path) -> None:
+    repo = bare_repo(tmp_path)
+    (repo / "pyproject.toml").write_text("[project]\nname = 'x'\n", encoding="utf-8")
+    assert probes.declared_test_command(repo) == (
+        "python3 -m pytest -q", "detected pyproject.toml"
+    )
+    (repo / "uv.lock").write_text("version = 1\n", encoding="utf-8")
+    kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"
+    kickoff.parent.mkdir(parents=True)
+    kickoff.write_text("- package-tests: make test\n", encoding="utf-8")
+
+    assert probes.declared_test_command(repo) == (
+        "make test", "docs/loom/KICKOFF-DEFAULTS.md"
+    )
+
+
 def test_finalize_review_runs_and_writes_matching_attestation(tmp_path: Path) -> None:
     repo = repo_with_content(tmp_path)
     kickoff = repo / "docs/loom/KICKOFF-DEFAULTS.md"

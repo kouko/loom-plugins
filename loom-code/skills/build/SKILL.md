@@ -116,8 +116,9 @@ mechanical checks, in this order:
    [`adversarial.md`](../closing-review/references/adversarial.md).
 3. Run the repository's complete package suite, then each committed
    adversarial program. The suite command is the `package-tests:` value in
-   `docs/loom/KICKOFF-DEFAULTS.md`, or, when absent, the command detected from
-   build markers; when it is `none`, the complete package suite is skipped:
+   `docs/loom/KICKOFF-DEFAULTS.md`, or, when absent, the command of the first
+   `TEST_COMMAND_MARKERS` row in `<loom-code>/scripts/loom_checker/probes.py`
+   whose marker file is committed and not git-ignored; when it is `none`, the complete package suite is skipped:
    the change reaches
    Ship unattested and the PR discloses `absent`.
 
