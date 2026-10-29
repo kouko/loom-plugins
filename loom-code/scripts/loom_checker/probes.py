@@ -23,7 +23,10 @@ import tempfile
 import tomllib
 
 
+# `uv run --locked` runs in the project env and stops on a stale lock
+# without rewriting it: https://docs.astral.sh/uv/reference/cli/#uv-run
 TEST_COMMAND_MARKERS: tuple[tuple[tuple[str, ...], str], ...] = (
+    (("uv.lock",), "uv run --locked python -m pytest -q"),
     (("pyproject.toml", "pytest.ini", "tox.ini", "setup.cfg"), "python3 -m pytest -q"),
     (("package.json",), "npm test"),
     (("Cargo.toml",), "cargo test"),
