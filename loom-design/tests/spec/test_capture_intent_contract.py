@@ -25,7 +25,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "loom-code/scripts"))
 
-from prose_pin import affirms, has_negation  # noqa: E402
+from prose_pin import affirms  # noqa: E402
 
 SKILL = REPO / "loom-design/skills/capture-intent/SKILL.md"
 SECOND_VENDOR = REPO / "loom-design/skills/capture-intent/references/second-vendor.md"
@@ -343,8 +343,7 @@ def test_existing_branch_off_trunk_gets_worktree_without_b_at_capture() -> None:
                    "`git worktree add <path> <type>/<change-id>`", "exists",
                    "`git worktree add -b <type>/<change-id> <path> <trunk>`")
     offers = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
-              if "`git switch <type>/<change-id>`" in s
-              and not has_negation(s)]
+              if "`git switch <type>/<change-id>`" in s]
     assert offers and all("on the trunk" in s for s in offers), offers
     off_trunk = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
                  if "unrelated branch" in s and "detached HEAD" in s]

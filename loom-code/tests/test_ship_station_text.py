@@ -37,6 +37,9 @@ def test_merge_acceptance_is_not_permission_to_discard_trunk() -> None:
     assert rule, "§5 must carry the never-discard-trunk-commits rule"
     for s in rule:
         assert has_negation(s), f"affirmative discard instruction: {s}"
+    # The prohibition must be the clause's own, not a negation elsewhere in
+    # the sentence ("without", "is not that permission").
+    assert any(re.search(r"\bNever discard local trunk commits\b", s) for s in rule), rule
     assert any(
         "reset" in s and "branch -f" in s and "explicit yes" in s
         and "③" in s and "not that permission" in s
@@ -62,6 +65,8 @@ def test_ship_text_has_no_direct_gh_pr_merge() -> None:
     for sentence in re.split(r"(?<=[.!?])\s+", flat):
         if "gh pr merge" in sentence:
             assert has_negation(sentence), f"affirmative merge instruction: {sentence}"
+            clause = next(c for c in re.split(r"[:;,]", sentence) if "gh pr merge" in c)
+            assert has_negation(clause), f"`gh pr merge` clause is affirmative: {sentence}"
 
 
 # ship-text-keeps-no-worktree-instruction (A11 negative)

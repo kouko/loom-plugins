@@ -49,8 +49,8 @@ git switch -c <type>/<change-id>
 ```
 
 Pick `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or
-`ci`. If already on this change's branch, reuse it. Checked out in another
-worktree, work there. Else on the trunk, create it, or if it already exists,
+`ci`. If already on this change's branch, reuse it. Another worktree has that
+branch: work there. Else on the trunk, create it, or if it already exists,
 switch to it with `git switch <type>/<change-id>`; never `-C` or reset. On an
 unrelated branch or detached HEAD, do not commit: resolve that first, preserve
 existing work, no reset, no discard, no `git switch`. Resolve it with a new

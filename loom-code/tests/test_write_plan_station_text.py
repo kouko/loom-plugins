@@ -354,7 +354,7 @@ def test_existing_branch_off_trunk_gets_worktree_without_b() -> None:
                    "`git worktree add <path> <type>/<change-id>`", "exists",
                    "`git worktree add -b <type>/<change-id> <path> <trunk>`")
     offers = [s for s in re.split(r"(?<=[.;])\s+", setup)
-              if "`git switch <type>/<change-id>`" in s and not _has_negation(s)]
+              if "`git switch <type>/<change-id>`" in s]
     assert offers and all("on the trunk" in s for s in offers), offers
     off_trunk = [s for s in _flat_sentences(setup)
                  if "unrelated branch" in s and "detached HEAD" in s]

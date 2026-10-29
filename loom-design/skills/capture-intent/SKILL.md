@@ -330,8 +330,8 @@ the intent and restate again; there is no limit on rounds here.
 2. **Branch before the first commit.** Before the confirmation commit, make
    HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
    `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
-   If HEAD is already on this change's branch, reuse it. If it is checked out
-   in another worktree, work in that worktree. Otherwise, on the trunk, create
+   If HEAD is already on this change's branch, reuse it. If that branch is checked
+   out in another worktree, work in that worktree. Otherwise, on the trunk, create
    it, or if `<type>/<change-id>` already exists, switch to it with
    `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.
    On an unrelated branch or a detached HEAD, do not commit there: resolve
