@@ -4,6 +4,10 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.16.1] — 2026-10-30 — Decision Map Python module boundaries
+
+- Decision Map reading, validation and delivery now call their owning Python modules directly. The existing commands, hooks, file formats and results remain unchanged.
+
 ## [5.16.0] — 2026-10-27 — loom-memory equivalence outcome and six-character label separators
 
 - `loom-memory` Reconcile now also triggers when a new lesson is equivalent to an existing entry. The outcome is to keep the existing entry and add the new source to its `sources`; Reconcile never writes a second entry for an equivalent lesson.
