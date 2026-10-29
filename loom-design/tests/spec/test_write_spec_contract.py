@@ -283,6 +283,26 @@ def test_one_way_door_asked_at_decision_point_one_is_not_asked_again() -> None:
     )
 
 
+def test_write_spec_settles_branch_in_intake_before_writing() -> None:
+    """A6 positive: Step 1 settles this change's branch, carrying every
+    uncommitted change file on a worktree move, before Step 2 writes the spec.
+    A6 negative: Step 4 is not the first branch instruction.
+    Boundary: the branch is settled once, in Step 1; Step 4 restates no guard
+    and the file carries no second branch type list."""
+    text = _text()
+    step1 = _flat(_section(text, "## Step 1 — Intake"))
+    assert affirms(step1, "Before Step 2 writes the spec", "this change's branch",
+                   "`loom-design:capture-intent`",
+                   "every uncommitted file this change produced")
+    flat = _flat(text)
+    first = flat.index("this change's branch")
+    assert flat.index("## Step 1 — Intake") < first < flat.index("## Step 2 — Write the spec")
+    step4 = _flat(_section(text, "## Step 4 — Commit, conditionally review, hand off"))
+    assert "Commit only on this change's branch" not in step4
+    types = {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}
+    assert len(set(re.findall(r"`([a-z]+)`", flat)) & types) < 3
+
+
 def test_plugin_declares_requires_contract() -> None:
     data = json.loads(
         (REPO / "loom-design/.claude-plugin/plugin.json").read_text(encoding="utf-8")

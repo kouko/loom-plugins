@@ -327,7 +327,25 @@ the intent and restate again; there is no limit on rounds here.
    `publication: automatic — authorized <date> by <name>`; never derive it
    from status or prose. When step 3 ran, write
    `ratified-by: <name> <date>` into `PRINCIPLES.md`.
-2. Commit with the message `docs(loom): intent <change-id> confirmed`. Its
+2. **Branch before the first commit.** Before the confirmation commit, make
+   HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
+   `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
+   If HEAD is already on this change's branch, reuse it. If that branch is checked
+   out in another worktree, work in that worktree. Otherwise, on the trunk, create
+   it, or if `<type>/<change-id>` already exists, switch to it with
+   `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.
+   On an unrelated branch or a detached HEAD, do not commit there: resolve
+   that first and preserve existing work, no reset, no discard, no
+   `git switch`. Resolve it with `git worktree add <path> <type>/<change-id>`
+   when the branch already exists, else
+   `git worktree add -b <type>/<change-id> <path> <trunk>`, and continue in
+   that new worktree — on this or any move to another worktree, first move
+   every uncommitted file this change produced (the intent draft, a
+   `PRINCIPLES.md` edit) there, to be committed on the change branch, so the
+   original checkout keeps exactly its own earlier work. Carry a
+   `PRINCIPLES.md` edit as its diff, and if applying it conflicts, stop and
+   ask the maintainer. Then commit
+   with the message `docs(loom): intent <change-id> confirmed`. Its
    body **must contain the `needs-design:` line verbatim** — the checker
    compares the two strings character for character.
 
@@ -336,7 +354,7 @@ the intent and restate again; there is no limit on rounds here.
 
 ## Step 5 — Hand off
 
-Branch: the intent may be committed on the trunk or on the change branch — this station does not create branches. `loom-code:write-plan` creates `<type>/<change-id>` from the trunk before the plan commit if HEAD is still on the trunk; everything after the intent lives on that branch.
+Branch: everything after the intent lives on the change branch of Step 4.
 
 Read the `needs-design:` line you wrote:
 

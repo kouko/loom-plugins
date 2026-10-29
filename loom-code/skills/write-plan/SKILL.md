@@ -40,11 +40,29 @@ Antigravity CLI, OpenCode: map tool/agent names via
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md),
 [`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
+**Branch before the first commit.** Before this station's first commit
+(intent confirmation, `needs-design:` fix, `skipped-by-instruction`
+line or plan), make HEAD the change's branch:
+
+```
+git switch -c <type>/<change-id>
+```
+
+Pick `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or
+`ci`. If already on this change's branch, reuse it. Another worktree has that
+branch: work there. Else on the trunk, create it, or if it already exists,
+switch to it with `git switch <type>/<change-id>`; never `-C` or reset. On an
+unrelated branch or detached HEAD, do not commit: resolve that first, preserve
+existing work, no reset, no discard, no `git switch`. Resolve it with a new
+worktree: `git worktree add <path> <type>/<change-id>` if it exists, else
+`git worktree add -b <type>/<change-id> <path> <trunk>` — on any move to
+another worktree, move every uncommitted file this change produced (intent
+draft, `PRINCIPLES.md` edit) there, to commit on the change branch.
+
 At entry, omit the prose steps the user told you to skip in plain words (spec,
 plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
-`acceptance-test` step. At station entry, keep the full flow unless the user
-instructed a skip. Automatic narrow-change simplification belongs
+`acceptance-test` step. Automatic narrow-change simplification belongs
 to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
@@ -206,8 +224,8 @@ installed, hand this to its `product-principles` tool instead.
 
 ## Step 3 — Decision point ①: restate and confirm
 
-When `status:` is already `confirmed`, skip confirmation: branch first
-(Step 6), then run
+When `status:` is already `confirmed`, skip confirmation:
+**Branch before the first commit**, then run
 `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intent docs/loom/intent/<change-id>.md` until it exits 0.
 Fix `needs-design:` with one new commit quoting the changed line verbatim
 in its body.
@@ -227,16 +245,14 @@ Read the intent's `needs-design:` line. It is `yes` when either holds:
 - **(b)** the behaviour is multi-state or multi-object, and there is no
   spec for it.
 
-Otherwise it is `no`. The same rule applies to every `kind`; product and
-engineering are not judged differently here.
+Otherwise it is `no`. The same rule applies to every `kind`.
 
 You do not get the last word on `no`: the checker recomputes it
 (`intent.needs-design-recompute`) against this repo's declared
 interface-surface globs, and a diff that touches one of them while the
 intent says `no` is blocked.
 
-**`no`** — go to step 5. The plan carries the Current State Evidence
-section instead of a spec.
+**`no`** — go to step 5.
 
 When a task's rationale outgrows its Risk line, write
 `docs/loom/<change-id>/spec.md` from `contract/templates/spec-minimal.md` —
@@ -308,8 +324,7 @@ present again, and recompute the hash. Engineering changes skip this.
 
 ### The intake check — both branches, every time
 
-Whichever branch above you took, `no` included, run this before writing a
-plan:
+Run this before writing a plan:
 
 ```
 "${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id>
@@ -449,21 +464,7 @@ obvious it looks.
 
 ## Step 6 — Commit and hand off
 
-**Branch first, if still on trunk.** Otherwise the plan lands there and later
-checkpoints measure their delta from the plan commit rather than the branch base:
-
-```
-git switch -c <type>/<change-id>
-```
-
-For example `feat/2026-09-14-push-reason`. Pick `<type>` from `feat`,
-`fix`, `docs`, `refactor`, `test`, `chore` or `ci`; use it in the PR title,
-which becomes the trunk squash commit. Task commits keep their implementer
-contract type; `docs(loom):` intent and plan commits keep their fixed form.
-
-An intent on trunk stays; plan and later work use the branch.
-
-Commit the plan with the message `docs(loom): plan <change-id>`. Then hand
+Commit the plan (**Branch before the first commit**) with the message `docs(loom): plan <change-id>`. Then hand
 the change to the build station — `loom-code:build` — which dispatches one
 implementer per task, runs task and integration tests, and calls the
 closing-review station once at branch end.
