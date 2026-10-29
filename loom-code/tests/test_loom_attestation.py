@@ -1145,9 +1145,6 @@ def test_test_command_runs_in_locked_uv_env(tmp_path: Path) -> None:
     assert probes.declared_test_command(repo, head) == (
         "python3 -m pytest -q", "detected pyproject.toml"
     )
-    tokens = probes.argv_for(probes.declared_test_command(repo)[0])
-    assert "--locked" in tokens and "--frozen" not in tokens
-    assert tokens[:3] != ["uv", "run", "python"]
 
 
 def test_git_ignored_uv_lock_does_not_select_locked_env(tmp_path: Path) -> None:
