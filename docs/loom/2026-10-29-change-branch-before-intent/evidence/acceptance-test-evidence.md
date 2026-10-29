@@ -227,3 +227,34 @@ Sandboxes: `at/r4.sh` -> `at/r4.log`, follow-ups `at/r4b.sh` -> `at/r4b.log` (sc
   Package suite left to finalize-review: `env -u FORCE_COLOR -u CLAUDE_CODE_SESSION_ID uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
 - Finding 1 (important): `capture-intent/SKILL.md:333-343`, `write-plan/SKILL.md:54-61`, and `write-spec/SKILL.md:68-71` by reference: unrelated branch or detached HEAD while `<type>/<change-id>` already exists and is checked out nowhere. The route `git worktree add -b` is refused; the "already exists -> `git switch`" sentence moves the original checkout and its own uncommitted edits onto the change branch. Fix: name `git worktree add <path> <type>/<change-id>` (no `-b`) for an existing branch.
 - Finding 2 (nit): `capture-intent/SKILL.md:340-342`: "move every uncommitted file ... (a `PRINCIPLES.md` edit)" leaves open whole-file vs edit; when the original's base `PRINCIPLES.md` differs from the trunk's, whole-file carries unrelated content and edit-only conflicts. Fix: say to move the edit and stop to ask on conflict.
+
+## Re-run on 2026-10-29, at 6af14341
+Fix range a333f6fe..6af14341 (526d1182 prose + tests, 6af14341 changelogs). The branch-rule paragraph is rewritten in `capture-intent/SKILL.md:333-347` and `write-plan/SKILL.md:51-60`: own branch -> reuse; checked out in another worktree -> work there (now before switch); else on the trunk create, or `git switch` an existing branch; unrelated branch / detached HEAD -> "no `git switch`", `git worktree add <path> <type>/<change-id>` when it exists, else `git worktree add -b ... <trunk>`; move change files. capture-intent adds (`:345-347`) "Carry a `PRINCIPLES.md` edit as its diff, and if applying it conflicts, stop and ask the maintainer." write-spec, ship and `land` unchanged in the range (`git diff --stat` empty).
+
+Setup check: clean `git worktree add --detach <scratch>/at/clean-r5 HEAD` (6af14341): loom-code `Validation passed`; loom-design and marketplace `Validation passed with warnings` (pre-existing).
+
+Sandboxes: `at/r5.sh` -> `at/r5.log` (scratchpad, not committed); same fixtures and `fp` byte fingerprint as the 910034de re-run.
+
+- 1: re-tested (capture-intent's trunk route reworded; write-spec defers to it) — A1: trunk unchanged, ahead of origin 0, main..fix: spec | intent confirmed; A1b: `git switch -c` refused, `git switch fix/<id>`, spec commit on fix/<id>, trunk unchanged.
+- 2, 3: carried over — `land` and `ship/SKILL.md` untouched in a333f6fe..6af14341.
+- 4: re-tested (write-plan's paragraph rewritten) — trunk unchanged; main..fix: plan | record skip | intent confirmed; first commit parent is trunk tip: yes; A4b `git switch` to existing branch, fix commit on fix/<id>.
+- 5: re-tested — all earlier cases for ci and wp pass again (own branch 2/2; trunk + exists -> `git switch`, earlier commits kept; trunk + checked out elsewhere -> committed there, now reached by the first-listed route; unrelated + own edits and detached + unbranched commit -> `worktree add -b`, original byte-identical, trunk ahead 0). Finding 1 case, now routed:
+  ```
+  X-ci-unrelated / X-ci-detached / X-wp-unrelated / X-wp-detached
+    (fix/<id> exists with an earlier intent commit, checked out nowhere; own edits + corrected draft (+ ci: ratified-by edit))
+    git worktree add ../wt-change fix/<id> -> Preparing worktree (checking out 'fix/2026-10-29-sandbox-change')
+    moved draft (+ PRINCIPLES.md edit) -> needs-design fix commit (+ wp: plan) on fix/<id>
+    original checkout byte-identical: yes | original HEAD unchanged: yes | earlier intent commit kept: yes | trunk ahead of origin: 0
+  ```
+- 6: re-tested —
+  ```
+  6a-ci, 6a-wp trunk + branch checked out in another worktree -> work there; draft (+ PRINCIPLES edit) moved and committed; original byte-identical: yes
+  6b-ci, 6b-wp unrelated + own edits -> new worktree; all change files committed on fix/<id>; nothing left; original byte-identical: yes
+  6c-1 write-spec, branch checked out elsewhere -> spec written and committed there; spec left in original: no
+  6c-2 write-spec, branch exists checked out nowhere -> git worktree add ../wt-change fix/<id> -> spec committed there; original byte-identical: yes
+  conflict (ci): feat/other has its own PRINCIPLES.md line -> git apply: patch does not apply -> stop, ask
+       commits on fix/<id> beyond trunk: 0 | original (own work + ratified-by edit) unchanged: yes | change worktree PRINCIPLES.md untouched: yes
+  ```
+- Suite row: re-tested — same targeted command -> `94 passed in 0.34s`. Package suite left to finalize-review.
+- Finding 1: closed at 6af14341.
+- Finding 2: closed for capture-intent. Still open for write-plan (nit): `write-plan/SKILL.md:58-60` names a `PRINCIPLES.md` edit among moved files and write-plan writes `ratified-by:` itself (`:222`), but it doesn't say to carry the edit as a diff or stop on conflict.
