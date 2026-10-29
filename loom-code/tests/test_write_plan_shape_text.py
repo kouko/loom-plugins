@@ -12,7 +12,9 @@ ROOT = Path(__file__).resolve().parents[2]
 WRITE_PLAN = ROOT / "loom-code/skills/write-plan/SKILL.md"
 SPEC_MINIMAL = ROOT / "loom-code/contract/templates/spec-minimal.md"
 CONFIRM_INTENT = ROOT / "loom-code/skills/write-plan/references/confirm-intent.md"
+NO_INTENT_INTERVIEW = ROOT / "loom-code/skills/write-plan/references/no-intent-interview.md"
 
+_STEP1 = "## Step 1 — Find the intent"
 _STEP3 = "## Step 3 — Decision point ①: restate and confirm"
 _STEP4 = "## Step 4 — Does this need a spec?"
 _STEP5 = "## Step 5 — Write the plan"
@@ -50,6 +52,53 @@ def test_confirmedIntent_skipsReferenceLoad() -> None:
     the reference it loads is on disk."""
     _section(_STEP3)
     assert CONFIRM_INTENT.is_file()
+
+
+def _flat(text: str) -> str:
+    return re.sub(r"\s+", " ", text)
+
+
+_MOVED_INTAKE_RULES = {
+    "no-intent-interview.md": (
+        "run step 3's restate-and-confirm as a short interview instead",
+        "The user never hand-writes the file.",
+        "with nothing open write exactly `- none` under the heading",
+    ),
+    "confirm-intent.md": (
+        "<!-- gate: write-plan.no-plan-without-confirmed-intent -->",
+        "When this station performs code-only intake, use the same capture boundary:",
+        "**Keep, neutralize, defer, reopen, or delete**",
+        "the intent must remain `open`. <!-- /gate -->",
+        "Any intent section may use a Markdown table or a Mermaid `flowchart`;",
+    ),
+}
+
+
+def test_intakeReferences_holdMovedRules_bodyDoesNot() -> None:
+    """A2 positive (references-hold-moved-rules-verbatim); negative
+    (body-no-longer-holds-moved-rules) -- the gate's first paragraph stays."""
+    body = _flat(_text())
+    for name, rules in _MOVED_INTAKE_RULES.items():
+        ref = _flat((CONFIRM_INTENT.parent / name).read_text(encoding="utf-8"))
+        for rule in rules:
+            assert rule in ref, (name, rule)
+            if "<!--" not in rule:
+                assert rule not in body, rule
+    assert "**No plan is written without a confirmed intent.**" in body
+    assert "When this station performs code-only intake" not in body
+
+
+def test_interviewPointer_onlyOnLoomDesignAbsentBullet() -> None:
+    """A3 positive (pointer-only-on-loom-design-absent-bullet); negative
+    (installed-bullet-and-confirm-intent-never-name-interview-file)."""
+    step1 = _section(_STEP1)
+    absent = step1.split("- `loom-design` is not installed", 1)[1].split("\n<!--", 1)[0]
+    installed = step1.split("- `loom-design` is installed", 1)[1].split("\n- ", 1)[0]
+    assert "references/no-intent-interview.md" in absent
+    assert "no-intent-interview" not in installed
+    assert _text().count("no-intent-interview") == 1
+    assert "no-intent-interview" not in CONFIRM_INTENT.read_text(encoding="utf-8")
+    assert "`confirm-intent.md`" in NO_INTENT_INTERVIEW.read_text(encoding="utf-8")
 
 
 def test_write_plan_readback_has_no_mermaid() -> None:

@@ -143,20 +143,8 @@ the user named a change, match the slug.
 
 - `loom-design` is installed → this is not your station. Tell the user the
   change starts at `capture-intent`, and stop.
-- `loom-design` is not installed → hand the user the template path,
-  `contract/templates/intent.md` inside the `loom-code` plugin, and stop
-  there **unless** the user wants to describe the change now. If they do,
-  run step 3's restate-and-confirm as a short interview instead: ask what
-  the problem is, who it hurts, and what they will be able to do when it
-  is done; write the file yourself from their answers. A feature or
-  bug-fix request already describes the change: run the short interview
-  and write the file; offer the template path only when the user asks for
-  it. Keep it short — an
-  engineering intent is normally three to five lines, and writing it by
-  hand beats interviewing. The user never hand-writes the file. When you
-  write it, `## Open questions` must be non-empty — the checker requires
-  the section to have content, so with nothing open write exactly `- none`
-  under the heading rather than leaving it blank.
+- `loom-design` is not installed → read `references/no-intent-interview.md`
+  and follow it.
 
 <!-- gate: write-plan.no-plan-without-confirmed-intent -->
 **No plan is written without a confirmed intent.** If `status:` is not
@@ -164,40 +152,7 @@ the user named a change, match the slug.
 "provisionally" and you do not confirm on the user's behalf. The checker
 enforces the same rule at step 4 (`intake.confirmed`), so a plan written
 early cannot be shipped anyway.
-When this station performs code-only intake, use the same capture boundary:
-ask only for missing required-field content, never a fixed intake question
-quota; existing decision points remain unchanged.
-Problem holds present pain, who it affects, and the consequence, with no
-diagnosis or fix; Proposed outcome holds the wanted capability;
-Acceptance holds each observable delivery outcome, not value, complete
-scenarios, UI placement, state transitions, test steps, or implementation;
-Constraints are already fixed; product Value case gives beneficiary, urgency,
-and GO/NO-GO, while an engineering intent omits obvious value;
-Out of scope names excluded capability; Open questions contains only unresolved
-outcome or scope choices. After drafting, make one author pass: **Keep,
-neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
-plan, and unsupported detail is deleted. This pass creates no field, ID,
-requirement, scenario, product behaviour, or review loop.
-Publication and second-reviewer authorisation never enter Problem, Proposed
-outcome, Acceptance, or Out of scope. Keep publication authorisation in the
-intent's `publication:` frontmatter line. The sole Constraints exception is
-`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
-skipped; it records the selected family, not the user's quoted request. Keep
-that verbatim quote, target and final `selected_executor` in JSON
-`authorization_source` at dispatch, and preserve only actual questions for
-this plan's `## Questions asked` section.
-Visible effects with an unknown surface and no spec require
-`needs-design: yes` with a surface-neutral reason; internal files alone do not.
-Complete the code-only altitude pass before confirmation. A material outcome
-or scope fork needs an explicit answer; accepting the restatement is
-insufficient; reopen means move it to Open questions, stop confirmation, and
-the intent must remain `open`.
 <!-- /gate -->
-
-Any intent section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
-numbered list, diagrams stay at intent altitude (no UI reactions or state
-transitions), a product Problem holds no identifiers (Mermaid node ids
-included), and chat shows text tables or text diagrams, not Mermaid.
 
 ## Step 2 — Standing documents
 
