@@ -22,8 +22,8 @@ charter: 1.1
 
 **W2-01 Remove private store calls from delivery binding**  after: W1-01  acceptance: 1, 2, 3
 - Files: `loom-workflow/skills/decision-map/scripts/start_delivery.py` (entry `start_delivery`), `loom-workflow/skills/decision-map/scripts/map_store.py` (existing store operations), `loom-workflow/tests/decision-map/test_start_delivery.py`, `loom-workflow/tests/decision-map/test_map_module_boundaries.py`
-- Test: A1 positive: delivery-owner-boundary; boundary: no-extra-public-entry. A2 positive: same-binding-bytes; negative: conflicting-intent-refusal. A3 positive: focused-and-suite-pass; negative: no-forwarder-added.
-- Risk: agent-decided — retain `map_store.py` compatibility and the existing atomic writer seam; `test_start_delivery.py` covers created, reused, and refused bindings.
+- Test: A1 positive: delivery-owner-boundary; boundary: one-shared-editor-entry. A2 positive: same-binding-bytes; negative: conflicting-intent-refusal. A3 positive: focused-and-suite-pass; negative: no-forwarder-added.
+- Risk: agent-decided — expose the existing shared Notes editor as one named store entry; retain its legacy alias and atomic writer seam rather than duplicate its logic.
 
 ### Wave 3 — Release the verified change
 
