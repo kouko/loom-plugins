@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-29-change-branch-before-intent",
-  "content_digest": "60a48e33d0b419496db68db0958e01d1fbb6f049",
+  "content_digest": "5526ac671cd5dbf1c51753e33dd2ff8cf54886d6",
   "executions": [
     {
       "kind": "package-tests",
@@ -28,14 +28,14 @@
       "findings": []
     },
     {
-      "reviewer": "codex-gpt-6.1-sol-e2",
+      "reviewer": "codex-gpt-6.1-sol-e2r3",
       "vendor": "openai",
       "model": "gpt-6.1-sol",
       "lens": "skill",
       "verdict": "PASS",
       "findings": [],
       "reviewed_sha": "051c112adf2513e4a91ede7cb65c5ad885b1c424",
-      "review_target_sha": "7d28ac5519eb33dd8e3c1acc359dc8893a23f19f",
+      "review_target_sha": "4165de4bf0cfaed7db6f152fbaa62e6722b336ed",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
@@ -46,9 +46,9 @@
         "deletion-first": "PASS"
       },
       "notes": [
-        "Verified the Round 2 prohibition pins and explicit branch antecedents; cumulative station prose shows no regression.",
-        "Verified that every worktree-move route carries uncommitted change files and write-spec resolves the branch before writing. Previously accepted limitations remain unchanged.",
-        "All five changed test files ran: 55 loom-code tests and 48 loom-design tests passed. Independently counted 3749 write-plan body words. Reviewed acceptance evidence without rerunning its sandboxes, the complete package suite, or evidence probes."
+        "Round 3 preserves branch safety: write-spec Step 1 unconditionally settles the change branch before Step 2 writes the spec, including when a resumed session re-enters the station. Neither initial submission nor subsequent review-fix commits introduce a branch switch. Removing the Step 4 duplicate therefore leaves no off-branch commit route in the prescribed workflow.",
+        "Verified both earlier fixes: capture-intent and write-plan carry every uncommitted change-owned file on moves to existing or new worktrees; write-spec resolves the branch before writing. Previously accepted limitations remain unchanged.",
+        "All five changed test files ran: 102 passed, none skipped. write-plan body independently counted at 3749 words; git diff --check passed and the checkout remained clean. Verification used source inspection and contract tests; sandbox acceptance scenarios were read, not independently rerun."
       ],
       "external_review": {
         "status": "completed",
@@ -59,9 +59,9 @@
         "evidence_level": "observed-model-and-effort",
         "observed_model": "gpt-6.1-sol",
         "observed_effort": "high",
-        "output_digest": "a65d2ebc0d9476f9c3c1c89abe898d440bcd2ae6fe552ad06a56f1ba2503e666",
-        "reviewer": "codex-gpt-6.1-sol-e2",
-        "review_target_sha": "7d28ac5519eb33dd8e3c1acc359dc8893a23f19f"
+        "output_digest": "4406833dc290055ccca621d121621db3d07d2991b07efc218cc2c1c8743dd606",
+        "reviewer": "codex-gpt-6.1-sol-e2r3",
+        "review_target_sha": "4165de4bf0cfaed7db6f152fbaa62e6722b336ed"
       }
     }
   ],
