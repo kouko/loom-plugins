@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.52.1] — 2026-10-29 — refactor(write-plan): move loom-design-absent paths to references
+
+- The no-intent interview moves to `references/no-intent-interview.md`.
+- The intent-writing rules move to `references/confirm-intent.md`, still loaded at step 3.
+- The self-written minimal spec path and the product-spec gate move to `references/self-written-spec.md`, read when `write-plan` writes a spec itself.
+- `write-plan` SKILL.md body drops from 3749 to 2785 words; the 3750-word cap is unchanged. No rule wording changed.
+
 ## [3.52.0] — 2026-10-29 — fix(checker): run the detected package suite in a uv project's locked environment
 
 - When the repo commits `uv.lock` and declares no `package-tests:`, the detected suite command is `uv run --locked python -m pytest -q` (ahead of the pyproject.toml row), so the suite runs in the project's locked env regardless of the first `python3` on PATH; `--locked` stops on a stale lockfile with a `uv lock` hint and never rewrites it. A declared `package-tests:` keeps precedence.

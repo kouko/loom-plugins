@@ -23,7 +23,7 @@ import test_write_plan_shape_text as shape  # noqa: E402
 
 CASES = {
     "write-plan-gate": (
-        "WRITE_PLAN",
+        "SELF_WRITTEN_SPEC",
         "Doors asked at ① are not asked again at ②.",
         "Doors at ① are asked again at ②, never skipped.",
     ),
