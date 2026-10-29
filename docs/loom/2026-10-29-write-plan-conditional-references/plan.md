@@ -14,10 +14,10 @@ charter: 1.1
 
 ### Wave 1 — move the two conditional paths
 
-**W1-01 Move the no-intent interview and intent-writing rules to `references/no-intent-interview.md`**  after: none  acceptance: 1, 2, 3
+**W1-01 Move the no-intent interview to `references/no-intent-interview.md` and the intent-writing rules to `references/confirm-intent.md`**  after: none  acceptance: 1, 2, 3
 - Files: `loom-code/skills/write-plan/SKILL.md` (entry: Step 1), `loom-code/skills/write-plan/references/no-intent-interview.md`, `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-code/tests/test_write_plan_shape_text.py`
-- Test: A2 positive: no-intent-reference-holds-moved-rules-verbatim; negative: body-no-longer-holds-moved-rules. A3 positive: pointer-only-on-loom-design-absent-bullet; negative: loom-design-installed-bullet-has-no-pointer.
-- Risk: agent-decided — moved gate text keeps its `write-plan.no-plan-without-confirmed-intent` marker in the reference; body keeps the gate's first paragraph; `confirm-intent.md` gains one pointer so hand-written unconfirmed intents still get the rules.
+- Test: A2 positive: references-hold-moved-rules-verbatim; negative: body-no-longer-holds-moved-rules. A3 positive: pointer-only-on-loom-design-absent-bullet; negative: installed-bullet-and-confirm-intent-never-name-interview-file.
+- Risk: agent-decided — intake rules move into `confirm-intent.md` under their own gate marker, so hand-written intents keep them; interview file adds one line applying those rules; body keeps the gate's first paragraph.
 
 **W1-02 Move the self-written spec path and product gate to `references/self-written-spec.md`**  after: W1-01  acceptance: 1, 2, 3, 4
 - Files: `loom-code/skills/write-plan/SKILL.md` (entry: Step 4), `loom-code/skills/write-plan/references/self-written-spec.md`, `loom-code/tests/test_write_plan_shape_text.py`, `loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py`
@@ -32,7 +32,7 @@ charter: 1.1
 - Risk: bump `.claude-plugin/plugin.json`, then `sync_codex_manifests.py --all`; patch bump because no rule changes; lands before finalize-review.
 
 ## Simplicity check
-- Put the intent-writing rules in `confirm-intent.md` instead of a new file — declined: the interview drafts the intent before step 3 loads that file
+- Put the intent-writing rules in `confirm-intent.md`, which step 3 already loads with the interview file pointing to them — taken
 - One combined reference for both paths — declined: a loom-design run writing a `no`-branch spec would then be told to read the interview file (Acceptance 3)
 
 ## Questions asked
