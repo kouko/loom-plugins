@@ -154,7 +154,7 @@ def test_post_tool_use_keeps_language_anchor(hooks):
 
 def test_user_prompt_submit_runs_language_anchor(hooks):
     (command,) = _commands(hooks["UserPromptSubmit"])
-    assert command.startswith('if command -v python3 >/dev/null 2>&1; then exec python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"; fi; ')
+    assert command.startswith('if python3 -c \'import json,sys; assert sys.version_info >= (3,7)\' >/dev/null 2>&1; then exec python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"; fi; ')
     assert '"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --ready --script ../hooks/language-anchor.py' in command
 
 
@@ -233,7 +233,7 @@ def test_agy_hooks_wire_push_gate_and_pre_invocation(agy_hooks):
         ("PreToolUse", "run_command"), ("PreInvocation", "")}
     commands = {event: command for event, _, command in wired}
     assert commands["PreToolUse"].startswith("./scripts/loom-python --ready --script ../hooks/agy_adapter.py push-gate")
-    assert commands["PreInvocation"].startswith("if command -v python3 >/dev/null 2>&1; then exec python3 ./hooks/agy_adapter.py pre-invocation; fi; ")
+    assert commands["PreInvocation"].startswith("if python3 -c 'import json,sys; assert sys.version_info >= (3,7)' >/dev/null 2>&1; then exec python3 ./hooks/agy_adapter.py pre-invocation; fi; ")
     assert "./scripts/loom-python --ready --script ../hooks/agy_adapter.py pre-invocation" in commands["PreInvocation"]
 
 

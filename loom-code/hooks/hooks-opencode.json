@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if command -v python3 >/dev/null 2>&1; then exec python3 \"${PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; \"${PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then exec python3 \"${PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$loom_hook_exit_code\""
+            "command": "if python3 -c 'import json,sys; assert sys.version_info >= (3,7)' >/dev/null 2>&1; then exec python3 \"${PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; \"${PLUGIN_ROOT}/scripts/loom-python\" --ready --script ../hooks/language-anchor.py; loom_hook_exit_code=$?; if [ \"$loom_hook_exit_code\" -eq 86 ]; then exec python3 \"${PLUGIN_ROOT}/hooks/language-anchor.py\"; fi; exit \"$loom_hook_exit_code\""
           }
         ]
       }
