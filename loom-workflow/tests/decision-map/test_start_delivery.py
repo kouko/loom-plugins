@@ -5,6 +5,7 @@ pin the replacement: one intent file under `docs/loom/intent/`, one
 `delivery-intent:` line under the Destination acceptance criterion it
 serves, and refusals that keep a Map from opening an arc it cannot own.
 """
+# concern: a failed public writer must leave MAP bytes intact and create no intent.
 from __future__ import annotations
 
 import sys
@@ -204,7 +205,6 @@ def test_reuse_by_its_own_criterion_still_works(tmp_path: Path) -> None:
     assert "reused" in again[1]
 
 
-# concern: a failed public writer must leave MAP bytes intact and create no intent.
 def test_delivery_uses_public_writer_and_preserves_failed_map_bytes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
