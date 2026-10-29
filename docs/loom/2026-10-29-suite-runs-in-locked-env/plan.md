@@ -31,6 +31,13 @@ charter: 1.1
 - Test: A1 positive: every loom-code manifest and README reads 3.52.0; negative: an unsynchronized derived manifest fails the pin.
 - Risk: bump `.claude-plugin/plugin.json`, then `sync_codex_manifests.py --all`; minor bump because detection behaviour changes; lands before finalize-review.
 
+### Wave 3 — probe graduation
+
+**W3-01 Graduate the ignored-uv.lock probe into the loom-code suite**  after: W2-01  acceptance: 2
+- Files: `docs/loom/2026-10-29-suite-runs-in-locked-env/evidence/probes/test_ignored_uv_lock.py`, `loom-code/tests/test_probe_ignored_uv_lock.py`
+- Test: A2 positive: the moved probe passes at its suite path and keeps its `concern:` line; negative: the store path no longer exists.
+- Risk: the probe caught a defect on this change (fixed in db6ea09c), so closing review requires it in the suite before finalize-review; content unchanged except paths it resolves.
+
 ## Simplicity check
 - One generic `_python_argv`-based branch in `_direct_pytest_collects` replacing the conda-only slice instead of adding a uv branch — taken
 - Merge W1-02 into W1-01 — declined: the merged Test line exceeds the 40-word cap and separate tasks keep one RED test per Acceptance group
