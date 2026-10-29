@@ -59,6 +59,18 @@ def test_no_other_role_edits_adversarial_program() -> None:
         assert _other_role_program_edit_sentences(text) == []
 
 
+def test_suite_command_points_to_checker_marker_table() -> None:
+    step3 = VERIFY.split("3. Run the repository's complete package suite", 1)[1]
+    assert "`TEST_COMMAND_MARKERS`" in step3 and "probes.py" in step3, step3
+
+
+def test_verify_copies_no_marker_command() -> None:
+    from loom_checker.probes import TEST_COMMAND_MARKERS
+
+    for _, command in TEST_COMMAND_MARKERS:
+        assert command not in VERIFY, command
+
+
 def test_returned_change_only_trigger_absent() -> None:
     assert (
         "When closing review or a failed `finalize-review` returns the change to Build"

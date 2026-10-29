@@ -6,6 +6,7 @@
 - Pytest collection for graduated adversarial programs recognizes any `python -m pytest` command wrapped by `conda run -n` or `uv run` through one generic branch (the conda-only branch is gone).
 - Repos without `uv.lock` get the same command as before. A committed `uv.lock` without `uv` installed now fails with "command not found".
 - A git-ignored build marker no longer selects the suite command.
+- Build step 3 now points to the checker's marker table (`TEST_COMMAND_MARKERS` in `scripts/loom_checker/probes.py`) for the suite command when `package-tests:` is absent, instead of leaving "build markers" to the agent. `uv run --locked` creates the project's `.venv` or syncs its locked packages to the lock (extras kept), and never touches committed files.
 
 ## [3.51.0] — 2026-10-29 — docs(write-plan, ship): branch before the first commit and never discard trunk unasked
 
