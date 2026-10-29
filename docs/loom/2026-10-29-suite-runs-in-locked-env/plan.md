@@ -15,12 +15,12 @@ charter: 1.1
 ### Wave 1 — detect the uv command and recognize it
 
 **W1-01 Detect `uv run --locked python -m pytest -q` for a committed uv.lock**  after: none  acceptance: 1, 2, 3
-- Files: `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_loom_attestation.py`
+- Files: `loom-code/scripts/loom_checker/probes.py` (entry: `declared_test_command`), `loom-code/tests/test_loom_attestation.py`
 - Test: A1 positive: uv-lock-with-pyproject-detects-uv-locked-command; boundary: uv-lock-uncommitted-at-revision-detects-python3. A2 positive: pyproject-without-uv-lock-unchanged; negative: declared-package-tests-wins-over-uv-lock. A3 positive: detected-command-carries-locked-flag; negative: no-frozen-or-bare-uv-run.
 - Risk: agent-decided — one marker row ahead of the pyproject row; `--locked` over `--frozen` or plain `uv run` per the Boundary trial; existing detection tests in `test_loom_attestation.py` preserved.
 
 **W1-02 Pytest collection recognizes the `uv run ... python -m pytest` suite form**  after: W1-01  acceptance: 4
-- Files: `loom-code/scripts/loom_checker/probes.py`, `loom-code/tests/test_selection_finalize.py`
+- Files: `loom-code/scripts/loom_checker/probes.py` (entry: `suite_collection`), `loom-code/tests/test_selection_finalize.py`
 - Test: A4 positive: uv-pytest-suite-finalizes-a-collected-graduated-probe; negative: uv-pytest-suite-refuses-a-probe-outside-its-paths.
 - Risk: agent-decided — one generic branch: split the command where `_python_argv` unwraps it, replacing the conda-only slice; shim `uv` on PATH; conda and python cases in `test_selection_finalize.py` preserved.
 
