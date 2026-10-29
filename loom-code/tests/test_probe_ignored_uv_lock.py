@@ -15,7 +15,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-SCRIPTS = Path(__file__).resolve().parents[5] / "loom-code" / "scripts"
+SCRIPTS = Path(__file__).resolve().parents[2] / "loom-code" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from loom_checker import attestation as attestation_module  # noqa: E402
