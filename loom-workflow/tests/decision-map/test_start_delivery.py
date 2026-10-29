@@ -56,6 +56,13 @@ def _map(tmp_path: Path, *, state: str = "active", map_id: str = "demo") -> Path
 
 def test_creates_intent_and_lists_it_under_the_criterion(tmp_path: Path) -> None:
     map_dir = _map(tmp_path)
+    map_path = map_dir / "MAP.md"
+    map_path.write_text(
+        map_path.read_text(encoding="utf-8").replace(
+            "## Notes\n\n", "## Notes\n\nKeep this note.\n\n"
+        ),
+        encoding="utf-8",
+    )
 
     code, message = start_delivery.start_delivery(
         map_dir, "DA-1", "2026-09-03-ship-it", repo_root=tmp_path
@@ -69,7 +76,10 @@ def test_creates_intent_and_lists_it_under_the_criterion(tmp_path: Path) -> None
     assert "status: open" in text
     assert "## Acceptance" in text
     notes = map_store.read_map(map_dir).sections["Notes"]
-    assert "- delivery-intent: DA-1 | docs/loom/intent/2026-09-03-ship-it.md" in notes
+    assert notes == (
+        "Keep this note.\n\n"
+        "- delivery-intent: DA-1 | docs/loom/intent/2026-09-03-ship-it.md"
+    )
 
 
 def test_writes_no_brief_and_no_ticket_binding(tmp_path: Path) -> None:
