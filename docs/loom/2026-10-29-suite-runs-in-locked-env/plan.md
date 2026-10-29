@@ -38,6 +38,13 @@ charter: 1.1
 - Test: A2 positive: the moved probe passes at its suite path and keeps its `concern:` line; negative: the store path no longer exists.
 - Risk: the probe caught a defect on this change (fixed in db6ea09c), so closing review requires it in the suite before finalize-review; content unchanged except paths it resolves.
 
+### Wave 4 — acceptance-test fix
+
+**W4-01 Build step 3 names where the detected suite command comes from**  after: W3-01  acceptance: 1
+- Files: `loom-code/skills/build/SKILL.md`, `loom-code/tests/test_build_mechanical_checks.py`, `loom-code/CHANGELOG.md`
+- Test: A1 positive: build-step-3-points-to-the-checker-marker-table; negative: build-step-3-carries-no-copied-marker-command.
+- Risk: acceptance testing found Build step 3 leaves the detected command to agent judgment; point to `TEST_COMMAND_MARKERS` in `probes.py` rather than copy its rows, so one table stays the source; existing tests in `test_build_mechanical_checks.py` preserved.
+
 ## Simplicity check
 - One generic `_python_argv`-based branch in `_direct_pytest_collects` replacing the conda-only slice instead of adding a uv branch — taken
 - Merge W1-02 into W1-01 — declined: the merged Test line exceeds the 40-word cap and separate tasks keep one RED test per Acceptance group
