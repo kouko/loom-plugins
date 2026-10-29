@@ -25,6 +25,13 @@ charter: 1.1
 - Test: A1 positive: cold-cache host commands; boundary: no cache repair. A2 positive: checker gate unchanged; negative: bypass attempt. A3 positive: package suite; boundary: manifest synchronization.
 - Risk: agent-decided — bump patch version for installed clients after behavior verification; generated manifests follow the canonical release metadata.
 
+### Wave 2 — integration repair
+
+**W2-01 Preserve hook mechanism identities**  after: W0-01, W1-01  acceptance: 3
+- Files: `loom-code/scripts/check_mechanisms.py`, `loom-code/tests/test_check_mechanisms.py`, `loom-code/CHANGELOG.md`
+- Test: A3 positive: conditional hook command keeps its registered identity; negative: redirected path is not misidentified as the hook; boundary: full package suite.
+- Risk: agent-decided — ignore shell redirection operands during hook target recognition; preserve existing mechanism IDs rather than changing the registry for unchanged hook functions.
+
 ## Simplicity check
 - Prefer direct `python3` when present, retaining the ready-cache fallback when absent — taken
 - Keep adapter and launcher tests as verification, not edits — taken
@@ -35,3 +42,4 @@ charter: 1.1
 ## Risks
 1. Host hook commands differ by plugin root syntax; only standard-library paths may bypass the checker runtime. Ready-cache operation without host Python remains supported.
 2. Current tests assert the old launcher command and must be updated with execution evidence, not only string comparisons.
+3. The hook mechanism census derives identities from command text; conditional shell preflights must not turn redirection operands into false hook identities.
