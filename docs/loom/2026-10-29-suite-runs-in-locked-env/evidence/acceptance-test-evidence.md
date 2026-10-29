@@ -1,6 +1,7 @@
 # The detected package suite runs in a uv project's locked environment — acceptance test evidence
 
 Tried on 2026-10-29, in a clean copy of the project at edc30a0b (`git worktree add --detach <scratch>/at1/loom-clean edc30a0b`).
+Re-run on 2026-10-29 after fix c5038e3a..0ffd76e6, in a new clean worktree at 0ffd76e6 (`<scratch>/at2/loom-clean`), row 1 only (see "Re-run" under row 1).
 For before/after comparison a second clean worktree was added at the base 3555782c (`<scratch>/at1/loom-base`).
 `<scratch>` = `/private/tmp/claude-501/-Users-kouko--herdr-worktrees-loom-plugins-consistence-review-2/5b11059c-24eb-4eec-9170-a767ecffcf0e/scratchpad`.
 
@@ -24,7 +25,25 @@ Setup
   - finalize-review → `wrote docs/loom/2026-10-29-at-probe/attestation.json for 64f4a2eb…`, exit 0; executions: `{'kind': 'package-tests', 'command': 'uv run --locked python -m pytest -q', 'result': 'pass'}` and the adversarial program `result: pass`.
   - Build step 3 says only "the command detected from build markers"; no station text names the markers or the `uv.lock` row, and no checker command prints the detected command for Build. The end-of-Build choice of command is left to the Build agent.
 - Evidence: captured output above; attestation saved at `<scratch>/at1/attestation-positive.json`; `loom-code/skills/build/SKILL.md:117-121`; `loom-code/scripts/loom_checker/probes.py` `TEST_COMMAND_MARKERS` first row.
-- Verdict: partly — finalize-review half works; end-of-Build half not verified (no Build run, and the station text does not carry the rule).
+- Verdict (first run, edc30a0b): partly — finalize-review half works; end-of-Build half not verified (no Build run, and the station text does not carry the rule).
+
+### Re-run after fix c5038e3a..0ffd76e6
+- Setup check: `git worktree add --detach <scratch>/at2/loom-clean 0ffd76e6` (`git status --short` empty); `loom-python --repair --list-rules` exit 0. Fresh sample clone `git clone /Users/kouko/GitHub/loom-dogfood-sandbox <scratch>/at2/sandbox`, branch `at2-main` from `origin/main` 66d763b, no `.venv`. `command -v python3` → `/Users/kouko/.conda/envs/dbt-redshift/bin/python3`; PATH unchanged.
+- How I tried it (end-of-Build half, following `loom-code/skills/build/SKILL.md:117-121` at 0ffd76e6 literally):
+  - `grep package-tests docs/loom/KICKOFF-DEFAULTS.md` → none.
+  - Opened `TEST_COMMAND_MARKERS` in `<scratch>/at2/loom-clean/loom-code/scripts/loom_checker/probes.py:29-35`; first row `uv.lock` → `uv run --locked python -m pytest -q`. `git ls-files --error-unmatch uv.lock` → committed; `git check-ignore -q -- uv.lock` → not ignored. So step 3 resolves to `uv run --locked python -m pytest -q`.
+  - Ran it, and for contrast `python3 -m pytest -q`; compared with what finalize-review detects (`detect.py` with the at2 checker, working tree and HEAD).
+  - Ran the fix's own tests: `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest -q loom-code/tests/test_build_mechanical_checks.py` in the clean worktree.
+- What came back:
+  - `python3 -m pytest -q` → `Interrupted: 4 errors during collection`, exit 2.
+  - `uv run --locked python -m pytest -q` → `Built tasknote …`, `Installed 6 packages`, `31 passed in 0.09s`, exit 0. `uv.lock` sha256 `0518640a…b74da2` before and after; `git status --short` empty.
+  - detect: `working-tree: ('uv run --locked python -m pytest -q', 'detected uv.lock')`, `revision HEAD: (same)` — identical to the command Build step 3 resolves to.
+  - `test_build_mechanical_checks.py` → `24 passed in 0.07s` (includes `test_suite_command_points_to_checker_marker_table`, `test_verify_copies_no_marker_command`). The complete package suite is left to finalize-review, which runs it and refuses the attestation on failure.
+  - Counts differ from the first run (25 passed / 3 collection errors were recorded then at the same 66d763b); the outcome (pass via locked env, fail via conda `python3`) is the same.
+  - Not done: no full Build station session was run; the station's step 3 was executed by hand as written.
+  - Gap noted (pre-existing, not uv): `probes.py:819-823` falls back to `python3 -m pytest -q` when no marker row matches but `test_*.py`/`*_test.py` files exist; Build step 3 does not mention this fallback.
+- Verdict (re-run, 0ffd76e6): works.
+- Rows 2-4: carried over. `git diff --stat c5038e3a..0ffd76e6` touches only `plan.md`, `loom-code/CHANGELOG.md`, `loom-code/skills/build/SKILL.md`, `loom-code/tests/test_build_mechanical_checks.py`; no checker code (`loom-code/scripts/`) changed, so detection (2), the locked-run stop (3) and suite collection (4) are unaffected.
 
 ## 2. A Python repository without a uv lockfile, and any repository that declares a package-tests command, gets the same suite command as before.
 - How I tried it (detect.py, new vs base checker, each case committed on its own clone branch):
