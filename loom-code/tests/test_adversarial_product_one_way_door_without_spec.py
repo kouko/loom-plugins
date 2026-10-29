@@ -5,8 +5,9 @@ The change tells the ① message (write-plan confirm-intent.md item 2 and
 capture-intent SKILL.md step-4 item 2) that a product change's one-way
 doors, class (e) included, are asked at decision point ② "never in this
 message". Decision point ② only runs where a spec is written, and
-write-plan SKILL.md step 4 says a product intent with `needs-design: no`
-and an empty carried-details list forces no spec. So an irreversible
+write-plan references/self-written-spec.md (loaded at SKILL.md step 4)
+says a product intent with `needs-design: no` and an empty
+carried-details list forces no spec. So an irreversible
 action on the user's data in such a change is asked nowhere. The probe
 requires each ① copy to say affirmatively where those doors are asked
 when no spec is written.
