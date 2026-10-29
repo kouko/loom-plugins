@@ -38,7 +38,7 @@ def test_broken_host_python_uses_ready_runtime(manifest, event, matcher, payload
     cached.write_text(f'#!/bin/sh\nif [ "$3" = "-c" ]; then exit 0; fi\nexec "{sys.executable}" "$@"\n')
     cached.chmod(0o755)
     payload = {**payload, "workspacePaths": [str(tmp_path)]}
-    env = {**os.environ, "PATH": f"{bin_dir}:/bin", "XDG_CACHE_HOME": str(tmp_path / "cache"),
+    env = {**os.environ, "PATH": f"{bin_dir}:/bin:/usr/bin", "XDG_CACHE_HOME": str(tmp_path / "cache"),
            "TMPDIR": str(tmp_path), "CLAUDE_PLUGIN_ROOT": str(ROOT), "PLUGIN_ROOT": str(ROOT)}
     result = subprocess.run(["/bin/sh", "-c", command], input=json.dumps(payload),
                             text=True, capture_output=True, cwd=ROOT, env=env, timeout=30)
