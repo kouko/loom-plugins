@@ -11,7 +11,7 @@ import sys
 import pytest
 
 
-ROOT = Path(__file__).resolve().parents[5] / "loom-code"
+ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.mark.parametrize("manifest,event,matcher,payload", [
