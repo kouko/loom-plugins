@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.52.2] — 2026-10-30 — fix(hooks): run simple hooks without checker package readiness
+
+- Language-anchor hooks and Antigravity pre-invocation use an available host Python without requiring the checker runtime or PyYAML cache.
+- Hosts without `python3` retain the existing ready cached interpreter path. Publication gates still require checker readiness and keep their failure behavior.
+
 ## [3.52.1] — 2026-10-29 — refactor(write-plan): move loom-design-absent paths to references
 
 - The no-intent interview moves to `references/no-intent-interview.md`.
