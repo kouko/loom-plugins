@@ -117,10 +117,12 @@ def test_specPointer_onNoAndAbsentBranches_notInstalledYes() -> None:
     installed = installed.split("**`yes`", 1)[0]
     absent = step4.split("**`yes`, spec missing, `loom-design` not installed**", 1)[1]
     absent = absent.split("### ", 1)[0]
-    for branch in (no, absent):
+    exists = step4.split("**`yes`, and `docs/loom/<change-id>/spec.md` already exists**", 1)[1]
+    exists = exists.split("**`yes`", 1)[0]
+    for branch in (no, exists, absent):
         assert "`references/self-written-spec.md`" in branch
     assert "self-written-spec" not in installed
-    assert _text().count("self-written-spec") == 2
+    assert _text().count("self-written-spec") == 3
 
 
 def test_write_plan_readback_has_no_mermaid() -> None:

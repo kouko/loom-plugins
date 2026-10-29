@@ -212,8 +212,10 @@ intent says `no` is blocked.
 When a task's rationale outgrows its Risk line, or a carried-details list
 is non-empty, read `references/self-written-spec.md` and follow it.
 
-**`yes`, and `docs/loom/<change-id>/spec.md` already exists** — go to the
-intake check below.
+**`yes`, and `docs/loom/<change-id>/spec.md` already exists** — when this
+station wrote that spec (`loom-design` absent), read
+`references/self-written-spec.md` and finish what it still requires; then go
+to the intake check below.
 
 **`yes`, spec missing, `loom-design` installed** — hand the change to its
 `write-spec` station and stop.
