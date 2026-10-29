@@ -330,17 +330,21 @@ the intent and restate again; there is no limit on rounds here.
 2. **Branch before the first commit.** Before the confirmation commit, make
    HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
    `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
-   If HEAD is already on this change's branch, reuse it; on the trunk, create
-   it. If `<type>/<change-id>` already exists, switch to it with
+   If HEAD is already on this change's branch, reuse it. If it is checked out
+   in another worktree, work in that worktree. Otherwise, on the trunk, create
+   it, or if `<type>/<change-id>` already exists, switch to it with
    `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.
-   If it is checked out in another worktree, work in that worktree. On an
-   unrelated branch or a detached HEAD, do not commit there: resolve that
-   first and preserve existing work, no reset, no discard. Resolve it with
-   `git worktree add -b <type>/<change-id> <path> <trunk>` and continue in
+   On an unrelated branch or a detached HEAD, do not commit there: resolve
+   that first and preserve existing work, no reset, no discard, no
+   `git switch`. Resolve it with `git worktree add <path> <type>/<change-id>`
+   when the branch already exists, else
+   `git worktree add -b <type>/<change-id> <path> <trunk>`, and continue in
    that new worktree — on this or any move to another worktree, first move
    every uncommitted file this change produced (the intent draft, a
    `PRINCIPLES.md` edit) there, to be committed on the change branch, so the
-   original checkout keeps exactly its own earlier work. Then commit
+   original checkout keeps exactly its own earlier work. Carry a
+   `PRINCIPLES.md` edit as its diff, and if applying it conflicts, stop and
+   ask the maintainer. Then commit
    with the message `docs(loom): intent <change-id> confirmed`. Its
    body **must contain the `needs-design:` line verbatim** — the checker
    compares the two strings character for character.

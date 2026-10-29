@@ -25,7 +25,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "loom-code/scripts"))
 
-from prose_pin import affirms  # noqa: E402
+from prose_pin import affirms, has_negation  # noqa: E402
 
 SKILL = REPO / "loom-design/skills/capture-intent/SKILL.md"
 SECOND_VENDOR = REPO / "loom-design/skills/capture-intent/references/second-vendor.md"
@@ -331,6 +331,26 @@ def test_worktree_moves_carry_every_uncommitted_change_file_at_capture() -> None
     assert affirms(on_yes, "move", _CARRY, "another worktree", "intent draft",
                    "`PRINCIPLES.md`", "commit", "change branch")
     assert not re.search(r"move (?:the|any) uncommitted intent draft", on_yes)
+
+
+def test_existing_branch_off_trunk_gets_worktree_without_b_at_capture() -> None:
+    """A5 positive: off the trunk, an existing change branch checked out
+    nowhere gets `git worktree add <path> <type>/<change-id>`; an absent one
+    keeps `-b`; a `PRINCIPLES.md` edit moves as its diff, stopping to ask on
+    a conflict. A5 negative: `git switch` is offered only on the trunk."""
+    on_yes = _on_yes()
+    assert affirms(on_yes, "Resolve it with",
+                   "`git worktree add <path> <type>/<change-id>`", "exists",
+                   "`git worktree add -b <type>/<change-id> <path> <trunk>`")
+    offers = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
+              if "`git switch <type>/<change-id>`" in s
+              and not has_negation(s)]
+    assert offers and all("on the trunk" in s for s in offers), offers
+    off_trunk = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
+                 if "unrelated branch" in s and "detached HEAD" in s]
+    assert all(re.search(r"\bno `git switch`", s) for s in off_trunk), off_trunk
+    assert affirms(on_yes, "`PRINCIPLES.md` edit", "diff", "conflicts",
+                   "stop and ask the maintainer")
 
 
 def test_plugin_declares_requires_contract() -> None:

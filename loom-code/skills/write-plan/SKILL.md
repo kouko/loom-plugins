@@ -49,16 +49,15 @@ git switch -c <type>/<change-id>
 ```
 
 Pick `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or
-`ci`. If HEAD is already on this change's branch,
-reuse it; on the trunk, create it. If it already exists, switch to it with
-`git switch <type>/<change-id>`; never `-C` or a reset. If another worktree
-has it checked out, work there. On an unrelated branch or a detached HEAD,
-do not commit there: resolve that first and preserve existing work, no reset,
-no discard. Resolve it with
-`git worktree add -b <type>/<change-id> <path> <trunk>` and continue in that
-new worktree — on any move to another worktree, move every uncommitted
-file this change produced (the intent draft, a `PRINCIPLES.md` edit) there,
-to be committed on the change branch.
+`ci`. If already on this change's branch, reuse it. Checked out in another
+worktree, work there. Else on the trunk, create it, or if it already exists,
+switch to it with `git switch <type>/<change-id>`; never `-C` or reset. On an
+unrelated branch or detached HEAD, do not commit: resolve that first, preserve
+existing work, no reset, no discard, no `git switch`. Resolve it with a new
+worktree: `git worktree add <path> <type>/<change-id>` if it exists, else
+`git worktree add -b <type>/<change-id> <path> <trunk>` — on any move to
+another worktree, move every uncommitted file this change produced (intent
+draft, `PRINCIPLES.md` edit) there, to commit on the change branch.
 
 At entry, omit the prose steps the user told you to skip in plain words (spec,
 plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —

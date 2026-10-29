@@ -343,6 +343,24 @@ def test_worktree_moves_carry_every_uncommitted_change_file() -> None:
     assert not re.search(r"move (?:the|any) uncommitted intent draft", setup)
 
 
+def test_existing_branch_off_trunk_gets_worktree_without_b() -> None:
+    """A5 positive: off the trunk, an existing change branch checked out
+    nowhere gets `git worktree add <path> <type>/<change-id>`; an absent one
+    keeps `-b`. A5 negative: `git switch` is offered only on the trunk."""
+    setup = " ".join(
+        _section(SKILL.read_text(encoding="utf-8"), "## Workflow setup").split()
+    )
+    assert affirms(setup, "Resolve it with",
+                   "`git worktree add <path> <type>/<change-id>`", "exists",
+                   "`git worktree add -b <type>/<change-id> <path> <trunk>`")
+    offers = [s for s in re.split(r"(?<=[.;])\s+", setup)
+              if "`git switch <type>/<change-id>`" in s and not _has_negation(s)]
+    assert offers and all("on the trunk" in s for s in offers), offers
+    off_trunk = [s for s in _flat_sentences(setup)
+                 if "unrelated branch" in s and "detached HEAD" in s]
+    assert all(re.search(r"\bno `git switch`", s) for s in off_trunk), off_trunk
+
+
 def test_repo_grep_no_bare_branch() -> None:
     hits = []
     for plugin in ("loom-code", "loom-design", "loom-workflow"):
