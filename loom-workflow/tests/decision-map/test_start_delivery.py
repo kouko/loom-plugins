@@ -192,3 +192,25 @@ def test_reuse_by_its_own_criterion_still_works(tmp_path: Path) -> None:
 
     assert again[0] == 0, again
     assert "reused" in again[1]
+
+
+def test_delivery_uses_public_writer_and_preserves_failed_map_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    map_dir = _map(tmp_path)
+    map_path = map_dir / "MAP.md"
+    original = map_path.read_bytes()
+    intent_path = tmp_path / "docs" / "loom" / "intent" / "slice.md"
+    calls = []
+
+    def fail(path, text, *, expected=None):
+        calls.append((path, expected))
+        raise OSError("injected writer failure")
+
+    monkeypatch.setattr(map_store, "atomic_write", fail)
+    result = start_delivery.start_delivery(map_dir, "DA-1", "slice", repo_root=tmp_path)
+
+    assert result == (1, "Start delivery failed: cannot verify transaction lock: injected writer failure")
+    assert calls == [(map_path, original)]
+    assert map_path.read_bytes() == original
+    assert not intent_path.exists()

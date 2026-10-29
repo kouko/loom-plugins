@@ -72,6 +72,22 @@ def _note_line(da_id: str, intent_rel: str) -> str:
     return f"- delivery-intent: {da_id} | {intent_rel}"
 
 
+def _append_note(text: str, line: str) -> str:
+    lines = text.splitlines()
+    matches = [index for index, value in enumerate(lines) if value.strip() == "## Notes"]
+    if len(matches) != 1:
+        raise map_store.SchemaViolation("MAP.md must contain exactly one '## Notes'")
+    start = matches[0] + 1
+    end = next(
+        (index for index in range(start, len(lines)) if lines[index].startswith("## ")),
+        len(lines),
+    )
+    while end > start and not lines[end - 1].strip():
+        end -= 1
+    lines[end:end] = ([] if end == start else [""]) + [line]
+    return "\n".join(lines) + ("\n" if text.endswith("\n") else "")
+
+
 _NOTE_LINE = re.compile(r"^\s*-\s*delivery-intent:\s*(DA-[0-9]+)\s*\|\s*(\S+)\s*$")
 
 
@@ -169,14 +185,14 @@ def start_delivery(
                 )
             line = _note_line(da_id, intent_rel)
             if line not in current.splitlines():
-                map_store._atomic_write(
+                map_store.atomic_write(
                     map_path,
-                    map_store._append_section_fields(current, "Notes", [line]),
+                    _append_note(current, line),
                     expected=current.encode("utf-8"),
                 )
             if not reused:
                 intent_path.parent.mkdir(parents=True, exist_ok=True)
-                map_store._atomic_write(
+                map_store.atomic_write(
                     intent_path,
                     _intent_stub(change_id, map_id, title or change_id.replace("-", " ")),
                 )
