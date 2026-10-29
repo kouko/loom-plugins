@@ -31,6 +31,13 @@ charter: 1.1
 - Test: A1 positive: every loom-code manifest and README reads 3.52.1; negative: an unsynchronized derived manifest fails the pin.
 - Risk: bump `.claude-plugin/plugin.json`, then `sync_codex_manifests.py --all`; patch bump because no rule changes; lands before finalize-review.
 
+### Wave 3 — probe graduation
+
+**W3-01 Graduate the spec-exists resume probe into the loom-code suite**  after: W2-01  acceptance: 2
+- Files: `docs/loom/2026-10-29-write-plan-conditional-references/evidence/probes/test_abuse_spec_exists_product_gate.py`, `loom-code/tests/test_probe_spec_exists_product_gate.py`
+- Test: A2 positive: the moved probe passes at its suite path and keeps its `concern:` line; negative: the store path no longer exists.
+- Risk: the probe caught a defect on this change (fixed in 3d8a6978), so closing review requires it in the suite before finalize-review; content unchanged except paths it resolves.
+
 ## Simplicity check
 - Put the intent-writing rules in `confirm-intent.md`, which step 3 already loads with the interview file pointing to them — taken
 - One combined reference for both paths — declined: a loom-design run writing a `no`-branch spec would then be told to read the interview file (Acceptance 3)
