@@ -29,3 +29,23 @@ Tried on 2026-10-30 in a fresh local clone at `04529711853cd25af8a09fa6ae2c63183
   ```
 
 - Full-suite command reserved for `finalize-review`: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`.
+
+## Re-run on 2026-10-30, at `c303cdb7578b9a23faa148e2e1ec7550fd5cedab`
+
+The fix from `0a02588bae10f3601e83f1fb18c9d2b4939dad15` changed only `test_map_module_boundaries.py`, `test_map_transaction.py`, and `test_start_delivery.py`; no production code changed. The replaced structural assertion concerned ownership (row 1); its replacement transaction refusal and delivery behavior tests concern compatibility (row 2); the changed test inventory concerns the test result (row 3). Therefore all three rows were re-tested in full, with none carried over. The fresh local clone was `/private/tmp/loom-plugins-python-acceptance-rerun`, detached at the SHA above with no uncommitted files.
+
+- 1: Re-tested the full reading, validation, transaction, and delivery boundary by running all Decision Map tests and inspecting `git diff --name-status 45c94746..HEAD -- loom-workflow/skills/decision-map/scripts`. The diff still lists only modified `map_close_transaction.py`, `map_store.py`, `map_ticket_mutations.py`, and `start_delivery.py`; no script was added. The retained boundary tests pass, and the new `test_validation_refusal_leaves_transaction_bytes_unchanged` checks that rejection through the validation owner leaves both map and ticket bytes unchanged. The delivery test now checks exact Notes content after adding a binding to a map with an existing note. The single shared editor entry and legacy alias remain at `loom-workflow/skills/decision-map/scripts/map_store.py:225`, `:243`. Named tests: `loom-workflow/tests/decision-map/test_map_module_boundaries.py:20`, `:37`, `:79`, `:148`, `:205`; `loom-workflow/tests/decision-map/test_map_transaction.py:143`; `loom-workflow/tests/decision-map/test_start_delivery.py:57`.
+- 2: Re-tested valid and invalid map inputs, delivery binding and refusal, transaction refusal and byte preservation by running the complete focused Decision Map tests below. The tests returned success, including `test_validate_accepts_schema_conformant_fixture`, `test_validate_rejects_bad_state_enum`, `test_creates_intent_and_lists_it_under_the_criterion`, `test_delivery_uses_public_writer_and_preserves_failed_map_bytes`, and the new transaction refusal test. Invoked `map_store.py --help` and `start_delivery.py --help` again: both exited 0; the former listed `{validate}`, and the latter retained `map_dir da_id change_id`, `--title`, and `--repo-root`. This remains regression-test evidence, not a byte-for-byte replay of every historical map. Test anchors: `loom-workflow/tests/decision-map/test_map_store.py:1114`, `:1220`; `loom-workflow/tests/decision-map/test_start_delivery.py:57`, `:208`; `loom-workflow/tests/decision-map/test_map_transaction.py:143`.
+- 3: Ran `/Users/kouko/.conda/envs/dbt-redshift/bin/python -m pytest -q loom-workflow/tests/decision-map loom-workflow/tests/scripts/test_release_metadata.py` in the fresh clone. It exited 0 with this captured output:
+
+  ```text
+  ........................................................................ [ 25%]
+  ........................................................................ [ 51%]
+  ........................................................................ [ 77%]
+  ..............................................................           [100%]
+  278 passed in 7.78s
+  ```
+
+  `python3 scripts/sync_codex_manifests.py --check --all` exited 0 with no output. The shared Notes entry is necessary for the existing delivery operation to reuse editing logic; no new script module was added. The full package suite remains owned by `finalize-review` and was not run by this agent.
+
+The README's isolated `uv` test environment was attempted again for the focused command. It stopped before tests because the sandbox denied creating `/Users/kouko/.cache/uv/.tmpPBMDzW` (`Operation not permitted`). I used the existing pytest environment in the fresh source clone; no package was installed and no product file was edited.
