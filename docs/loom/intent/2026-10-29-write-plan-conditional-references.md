@@ -9,12 +9,12 @@ publication: automatic — authorized 2026-10-29 by kouko
 `loom-code/skills/write-plan/SKILL.md` has 3749 body words against the 3750-word cap that the 2026-09-16 rule-text consolidation set (long rule text makes agents miss rules). Every change that has to add a sentence to write-plan must first cut one elsewhere; PR #118 had to drop two restated sentences to fit. About 1300 of those words, Step 1's no-intent interview (~600) and Step 4's self-written spec path (~716), only apply when loom-design is not installed, yet every write-plan run reads them.
 
 ## Proposed outcome
-write-plan's always-read body carries only what every run needs; the two loom-design-absent paths live in `references/` and are read only when that condition holds, with every rule they state unchanged.
+write-plan's always-read body carries only what every run needs; the no-intent interview and the self-written spec path live in `references/` and are read only when the run takes that path, with every rule they state unchanged.
 
 ## Acceptance
 1. write-plan's SKILL.md body is at most 2800 words, under an unchanged 3750-word cap.
 2. A run without loom-design still reaches the no-intent interview and the self-written minimal spec path, and each rule those paths state today is still stated, with the same meaning, in the file the run is sent to.
-3. A run with loom-design installed is not told to read either moved file.
+3. A run with loom-design installed is never told to read the no-intent interview file, and is told to read the self-written spec file only when it writes a spec itself.
 4. Every existing check that pins those rules still runs and passes against the file that now holds them.
 
 ## Constraints
