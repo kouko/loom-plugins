@@ -32,6 +32,13 @@ charter: 1.1
 - Test: A3 positive: conditional hook command keeps its registered identity; negative: redirected path is not misidentified as the hook; boundary: full package suite.
 - Risk: agent-decided — ignore shell redirection operands during hook target recognition; preserve existing mechanism IDs rather than changing the registry for unchanged hook functions.
 
+### Wave 3 — retain the discovered regression
+
+**W3-01 Graduate broken-host-Python probe**  after: W2-01  acceptance: 1, 3
+- Files: `docs/loom/2026-10-30-simple-hooks-python-dependencies/evidence/probes/test_broken_host_python_fallback.py`, `loom-code/tests/test_broken_host_python_fallback.py`
+- Test: A1 positive: cached fallback after a broken host Python; boundary: no checker warning on a usable host Python. A3 positive: graduated probe runs in package suite; negative: original command fails the probe.
+- Risk: agent-decided — retain the adversary's red-then-green case in the permanent suite; adjust only its repository-root path after moving it.
+
 ## Simplicity check
 - Prefer direct `python3` when present, retaining the ready-cache fallback when absent — taken
 - Keep adapter and launcher tests as verification, not edits — taken
