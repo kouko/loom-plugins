@@ -1150,6 +1150,17 @@ def test_test_command_runs_in_locked_uv_env(tmp_path: Path) -> None:
     assert tokens[:3] != ["uv", "run", "python"]
 
 
+def test_git_ignored_uv_lock_does_not_select_locked_env(tmp_path: Path) -> None:
+    repo = bare_repo(tmp_path)
+    (repo / "pyproject.toml").write_text("[project]\nname = 'x'\n", encoding="utf-8")
+    (repo / ".gitignore").write_text("uv.lock\n", encoding="utf-8")
+    (repo / "uv.lock").write_text("version = 1\n", encoding="utf-8")
+
+    assert probes.declared_test_command(repo) == (
+        "python3 -m pytest -q", "detected pyproject.toml"
+    )
+
+
 def test_declared_package_tests_win_over_uv_lock(tmp_path: Path) -> None:
     repo = bare_repo(tmp_path)
     (repo / "pyproject.toml").write_text("[project]\nname = 'x'\n", encoding="utf-8")

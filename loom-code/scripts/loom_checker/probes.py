@@ -4,6 +4,7 @@ from fnmatch import fnmatch
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_maybe
+from loom_checker.helpers import git_ok
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import kickoff_defaults
 from loom_checker.helpers import kickoff_defaults_text
@@ -792,7 +793,12 @@ def declared_test_command(repo: Path, revision: str | None = None) -> tuple[str 
     revision=None reads the working tree (build-time collection checks); validation always passes a sha."""
     if revision is None:
         defaults = kickoff_defaults(repo)
-        has_file = lambda marker: (repo / marker).is_file()  # noqa: E731
+        # A marker git ignores (a local uv.lock) is never committed, so the
+        # commit read would not see it: count only files git would track.
+        # check-ignore exits 0 when ignored: https://git-scm.com/docs/git-check-ignore#_exit_status
+        has_file = lambda marker: (  # noqa: E731
+            (repo / marker).is_file() and not git_ok(repo, "check-ignore", "-q", "--", marker)
+        )
         names = None
     else:
         # `<rev>:<path>` and ls-tree -r --name-only -z, cited at _cargo_sources:

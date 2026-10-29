@@ -5,6 +5,7 @@
 - When the repo commits `uv.lock` and declares no `package-tests:`, the detected suite command is `uv run --locked python -m pytest -q` (ahead of the pyproject.toml row), so the suite runs in the project's locked env regardless of the first `python3` on PATH; `--locked` stops on a stale lockfile with a `uv lock` hint and never rewrites it. A declared `package-tests:` keeps precedence.
 - Pytest collection for graduated adversarial programs recognizes any `python -m pytest` command wrapped by `conda run -n` or `uv run` through one generic branch (the conda-only branch is gone).
 - Repos without `uv.lock` get the same command as before. A committed `uv.lock` without `uv` installed now fails with "command not found".
+- A git-ignored build marker no longer selects the suite command.
 
 ## [3.51.0] — 2026-10-29 — docs(write-plan, ship): branch before the first commit and never discard trunk unasked
 
