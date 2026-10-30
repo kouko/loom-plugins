@@ -13,9 +13,9 @@ Codex, Antigravity CLI and OpenCode:
 
 | Plugin | Version | Skills | Role in the flow |
 | --- | --- | --- | --- |
-| [`loom-design`](loom-design/) | 2.15.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
-| [`loom-code`](loom-code/) | 3.50.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.16.0 | 13 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions (`independent-advisor`). |
+| [`loom-design`](loom-design/) | 2.17.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
+| [`loom-code`](loom-code/) | 3.53.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
+| [`loom-workflow`](loom-workflow/) | 5.17.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions (`independent-advisor`). |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -115,7 +115,7 @@ satisfied, fog is empty, and every ticket is closed or withdrawn.
 
 ## loom-design
 
-Version 2.15.0. Turns a rough idea into a confirmed intent and a risk-declared
+Version 2.17.0. Turns a rough idea into a confirmed intent and a risk-declared
 spec, and provides product-definition tools. Requires `loom-code` for
 planning onward; intent and spec work alone.
 
@@ -130,7 +130,7 @@ planning onward; intent and spec work alone.
 
 ## loom-code
 
-Version 3.50.0. Five stations carry one change from plan to PR with
+Version 3.53.0. Five stations carry one change from plan to PR with
 content-bound verification, one closing review and a GitHub-enforced PR floor.
 
 | Skill | Role |
@@ -147,7 +147,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.16.0. Workflow tools used around the stations; most work without
+Version 5.17.0. Workflow tools used around the stations; most work without
 `loom-code`. `decision-map`'s intent delivery and explicitly requested outside
 code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they

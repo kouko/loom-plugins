@@ -44,7 +44,7 @@ counting: >
   is not host-hygiene.
 
 mechanisms:
-  # --- skill (23; 7 stations + 13 non-standalone tools + 3 optional routers;
+  # --- skill (24; 7 stations + 14 non-standalone tools + 3 optional routers;
   #     the 3 standalone tools are excluded from this population) ---
   - id: using-loom-code
     class: skill
@@ -100,6 +100,9 @@ mechanisms:
   - id: loom-visualization
     class: skill
     eval: "loom-workflow/tests/scripts/test_loom_visualization_compaction.py"
+  - id: loom-interactive-diagram
+    class: skill
+    eval: "loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py"
   - id: skill-retro
     class: skill
     eval: "loom-workflow/tests/skill-retro/test_issue_surface.py"
@@ -264,6 +267,7 @@ mechanisms:
   - {id: "tool:handoff",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:recap-state",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:loom-visualization",  class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
+  - {id: "tool:loom-interactive-diagram", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:skill-retro",    class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:git-memory",          class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}
   - {id: "tool:independent-advisor", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_tools_count_and_owner"}

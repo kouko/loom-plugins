@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.53.0] — 2026-10-30 — register shared diagram tool
+
+- Register `loom-interactive-diagram` as a workflow tool in the contract manifest and pin its contract test count.
+
+
 ## [3.50.0] — 2026-10-27 — feat(closing-review): accept a recorded no-program adversarial outcome
 
 - `finalize-review` accepts a no-program adversarial outcome (`no_program`) carrying a nonblank reason in place of an executed program, and the attestation marks it with the row `{kind: adversarial, no_program}`. `missing_adversarial_execution` is the single predicate that decides whether adversarial execution is missing.

@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.17.0] — 2026-10-30 — point design discussions to shared diagrams
+
+- `write-spec` and `architecture-design` reference the shared editable diagram tool without duplicating its file rules.
+
 ## [2.15.0] — 2026-10-23 — consistent spec ordering and confirmation handoffs
 
 - `write-spec` preserves confirmed Acceptance order and mapping while applying non-negotiable principles to requirement content and design decisions.

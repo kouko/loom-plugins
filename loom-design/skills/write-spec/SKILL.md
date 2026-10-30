@@ -134,6 +134,7 @@ language, since it is spoken to them rather than read by a checker.
   user's words. Grammar, the four variants every surface owes, and the
   `N/A` form are in `references/ui-flows.md`. Apply the gate below before
   presenting them.
+  For a shared editable diagram, use `loom-workflow:loom-interactive-diagram`.
 
 **Carried details.** Read the carried-details list from `capture-intent`'s
 hand-off and record each item in the spec: a visible flow or reaction as a UI

@@ -25,6 +25,7 @@ DESCRIPTION_BUDGET = 4_047
 PROJECT_RETRO_DESCRIPTION_CHARS = 229
 SKILL_RETRO_DESCRIPTION_CHARS = 182
 SKILL_RETRO_DESCRIPTION_DELTA = 53
+INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS = 176
 ROUTER_NAMES = {
     "loom-code": "using-loom-code",
     "loom-design": "using-loom-design",
@@ -44,6 +45,7 @@ ADDED_LEAVES = {
     "loom-code/skills/external-review/SKILL.md",
     "loom-design/skills/architecture-design/SKILL.md",
     "loom-workflow/skills/project-retro/SKILL.md",
+    "loom-workflow/skills/loom-interactive-diagram/SKILL.md",
 }
 RENAMED_LEAVES = {
     "loom-workflow/skills/cot-explain/SKILL.md": "loom-workflow/skills/loom-visualization/SKILL.md",
@@ -160,9 +162,11 @@ def test_candidate_rendered_description_total_counts_router_overhead() -> None:
     candidate = sum(map(len, descriptions))
     project_retro = _description(_skills()["loom-workflow"]["project-retro"])
     skill_retro = _description(_skills()["loom-workflow"]["skill-retro"])
+    interactive_diagram = _description(_skills()["loom-workflow"]["loom-interactive-diagram"])
     assert len(project_retro) == PROJECT_RETRO_DESCRIPTION_CHARS
     assert len(skill_retro) == SKILL_RETRO_DESCRIPTION_CHARS
-    exception = PROJECT_RETRO_DESCRIPTION_CHARS + SKILL_RETRO_DESCRIPTION_DELTA
+    assert len(interactive_diagram) == INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS
+    exception = PROJECT_RETRO_DESCRIPTION_CHARS + SKILL_RETRO_DESCRIPTION_DELTA + INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS
     assert candidate <= DESCRIPTION_BUDGET + exception
     assert (candidate - exception) * 100 <= BASELINE_RENDERED_DESCRIPTION_CHARS * 60
 
