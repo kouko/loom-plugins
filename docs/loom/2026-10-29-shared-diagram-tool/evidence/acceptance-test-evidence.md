@@ -134,3 +134,49 @@ The clean fixture was created with `git archive 9a641891 | tar -x -C /private/tm
 - Command surface: prior full re-test exercised list, new, project, check, mismatch, malformed input and unknown backend. The new wait path did not change these commands. No actual station conversation ran.
 - Path walk: file generation, agent write, editor update, user edit, save, disk read-back, projection, and check were observed. A live station discussion continuing after the read-back was not tested.
 - Active-turn wait surface: `READY`, `CHANGED` for each editor, `TIMEOUT` for unchanged/unrelated changes, and `ERROR /private/tmp/nonexistent-diagram.drawio: No such file or directory` for a missing path were observed. The host conversation text on timeout or error was not tested.
+
+## Re-run on 2026-10-31, at 702e3cbd (Round 1 fix)
+
+This re-run used a **new** source extraction: `git archive 702e3cbd | tar -x -C /private/tmp/loom-diagram-accept-r2-FrIXm2`. It did not reuse the prior fixture or touch the original worktree. The fix since the previous acceptance report changed Markdown link parsing for escaped `]` labels, added a command-level parser test, and revised the shared skill and editor setup to spell out full executable paths and a live-session `READY` handoff. The generator, projection backend, desktop sync, registry, station references and wait script are unchanged. I inspected `git diff ea77d7a3..702e3cbd` before deciding which verdicts to carry over.
+
+### Acceptance 1 — VS Code update, re-tested
+- Ran `python3 /private/tmp/loom-diagram-accept-r2-FrIXm2/loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py new round2` from the archived change directory. It printed `diagrams/round2.drawio` and `diagrams/round2.projection.md`. Inserted a `Round2 Seed` XML node in the disposable diagram, then opened that exact file in VS Code Draw.io Integration. The webview showed the node.
+- After a later manual edit and save, externally changed its disk label from `Round2 Desktop Edit` to `Round2 Agent Update`. The same VS Code webview displayed `Round2 Agent Update` without reopening the tab.
+
+### Acceptance 2 — user edit read-back, re-tested on both surfaces
+- VS Code: double-clicked `Round2 Seed`, replaced selected text with `Round2 VSCode Edit`, clicked outside and pressed Command-S. The webview displayed the new label. `rg -n 'Round2 VSCode Edit|Round2 Seed' diagrams/round2.drawio` returned line 7 with `value="Round2 VSCode Edit"` and no old value.
+- Desktop: opened the same disposable diagram via File > Open, double-clicked `Round2 VSCode Edit`, replaced it with `Round2 Desktop Edit`, clicked outside and pressed Command-S. The app displayed `All changes saved`. The disk readback returned line 7 with `value="Round2 Desktop Edit"`, no prior value.
+
+### Acceptance 3 — projection and linked diagrams, re-tested in full
+- In the **new clean source copy**, ran `pytest -q loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py -k 'escaped_bracket_label or reference_and_balanced_inline_links or malformed_drawio or check_all_diagrams_and_name_mismatch or check_spec_link_outside_diagrams_directory or project_writes_projection_for_named_diagram' loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py` → `15 passed, 9 deselected in 1.11s`. The escaped-bracket cases cover inline, full reference, explicit reference label, collapsed reference and shortcut reference links. The earlier six link forms cover reference, nested parentheses, titled inline, angle-wrapped titled inline, shortcut and collapsed links. Each earlier case verifies valid target, projection mismatch naming the projection and malformed target naming the diagram. The new escaped-bracket cases verify the linked malformed target is actually reached.
+- Ran `pytest -q loom-workflow/tests/loom-interactive-diagram/test_projection.py` → `3 passed in 0.11s`, covering node and edge lists including wrapped cells. The full documented `project` command after each manual edit printed `diagrams/round2.projection.md`; the following full `check` command printed `round2.drawio: projection matches`.
+
+### Acceptance 4 — malformed diagram, re-tested in full
+- The same focused `15 passed` run includes malformed XML in the conventional diagrams folder and malformed targets through every above spec-link form, including all five escaped-bracket forms. The tests assert nonzero exit and the offending diagram path in stderr. The invalid-file cases do not rely on reading the parser source.
+
+### Acceptance 5 — documented setup, re-tested in full
+- Read the revised `references/editor-setup.md` in the clean archive, ran its complete `python3 <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py new`, `project diagrams/round2.drawio`, and `check` command forms (using the archive path as plugin root). The diagram opened in the already installed VS Code extension and draw.io Desktop; both saved manual edits were read from disk. Each project/check sequence passed. This was a clean source fixture with already installed prerequisites, not an OS or extension reinstall.
+
+### Acceptance 6 — desktop synchronization, re-tested
+- In the fresh fixture with Desktop Autosave `0`, the external disk change to `Round2 Agent Update` produced `The file has been modified. Click here to synchronize.` Clicking that link changed the canvas from `Round2 Desktop Edit` to `Round2 Agent Update`.
+- Checked Autosave to `1`, externally changed the disk label to `Round2 Auto Sync`, and observed that canvas text appear without clicking synchronization. Restored Autosave to `0`.
+
+### Acceptance 7 and 8 — carried over
+- The prior full backend selection and two-station reference inspections remain valid. The fix diff does not change the registry, backends, or station documents.
+
+### Acceptance 9 — active-turn save, re-tested in full
+- VS Code: after the last agent file write, started `python3 /private/tmp/loom-diagram-accept-r2-FrIXm2/loom-workflow/skills/loom-interactive-diagram/scripts/wait_for_save.py diagrams/round2.drawio --timeout 120` in a live shell session. It returned a session identifier and `READY` while remaining active. I relayed that ready state to the parent agent, then made the webview edit described above. Polling **the same session** returned `CHANGED`, exit 0. Immediate disk readback showed `Round2 VSCode Edit`; the full executable `project` and `check` commands passed.
+- Desktop: after opening the same archive fixture, started a separate live wait session and observed `READY`. I relayed that state to the parent, then made the Desktop edit described above. Polling **that same session** returned `CHANGED`, exit 0. Immediate disk readback showed `Round2 Desktop Edit`; full executable project and check passed. Neither path required a follow-up user message to resume the tester's turn. The signal itself still does not identify the editor or actor.
+
+### Acceptance 10 — carried over
+- The previous run touched the unchanged diagram and an unrelated file during `READY`, then observed `TIMEOUT` rather than `CHANGED`; its focused wait tests passed. The wait executable is byte-for-byte unchanged in the Round 1 fix; only its operating instructions changed.
+
+### Spec UI flows
+- VS Code surface: fresh fixture opened, external update rendered without reopen, manual edit saved. Error-state webview display remains unobserved.
+- Desktop surface: fresh fixture opened and manual edit saved; Autosave-off prompt/click and Autosave-on silent sync were observed again. Empty-file and stale-write conflict visuals remain unobserved.
+- Command surface: new archive ran the documented full executable forms, checked valid and invalid spec links in focused tests, and ran `list-backends` → `demo-json`, `drawio`; `new missing sample` → exit 1, `unknown backend missing; registered: demo-json, drawio`; `new demo-json round2-demo` → two output paths. After the external `Round2 Agent Update` write, `check` named the projection mismatch (`Round2 Desktop Edit` versus `Round2 Agent Update`); `project diagrams/round2.drawio` then `check` reported both registered diagrams matched. No actual station conversation was conducted.
+- Path walk: new archive completed generate, open, saved editor edits, wait-session return, disk readback, projection and check; continuation in a real station conversation was not tested.
+- Active-turn wait surface: this run specifically verified live session identifier retention, `READY` before each edit, a relay to the parent agent, and `CHANGED` from the same session afterward on both editor surfaces. A separate `--timeout 1 --interval 0.1` run emitted `READY` then `TIMEOUT` with exit 1; a missing diagram emitted `ERROR diagrams/missing.drawio: No such file or directory` with exit 2. Host-generated user-facing prose remains untested.
+
+### Dismissed reviewer finding disclosed in report
+- The reviewer initially raised an important concern that the active-turn paragraph lacked a mechanical quality-gate marker. The parent rebutted that this paragraph is operational guidance for the agent, not an acceptance-quality gate. The reviewer explicitly withdrew the finding. No gate marker or evaluator was added. The report tells the user both the rationale and the consequence if that classification is wrong.
