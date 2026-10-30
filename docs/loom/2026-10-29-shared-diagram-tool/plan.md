@@ -55,6 +55,11 @@ charter: 1.1
 - Test: A9 positive: changed-content-save-returns-without-message; negative: missing-or-unreadable-diagram-is-named; A10 positive: unrelated-file-change-is-ignored; negative: unchanged-content-save-does-not-return-change
 - Risk: event watchers fail with EMFILE inside the sandbox; use a finite Python content poll on one path and state no actor attribution (agent-decided; REQ-9/10)
 
+**W1-02 Graduate the non-finite-duration adversarial case**  after: W1-01  acceptance: 9
+- Files: loom-workflow/tests/loom-interactive-diagram/test_wait_nonfinite_arguments.py; source program: docs/loom/2026-10-29-shared-diagram-tool/evidence/probes/test_wait_nonfinite_arguments.py
+- Test: A9 positive: finite-duration-wait-starts; negative: nan-or-infinite-duration-is-rejected-before-ready
+- Risk: the probe caught a bounded-wait defect, so move it into the permanent suite and keep its concern marker and exact negative cases (agent-decided; REQ-9)
+
 ## Simplicity check
 - One shared tool rather than per-station copies — taken
 - Backend registry driven by directory listing rather than a framework — taken
