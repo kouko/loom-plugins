@@ -2,6 +2,7 @@
 
 import argparse
 import hashlib
+import math
 import sys
 import time
 from pathlib import Path
@@ -20,8 +21,8 @@ def main():
     parser.add_argument("--timeout", type=float, default=120, help="maximum wait in seconds (default: 120)")
     parser.add_argument("--interval", type=float, default=0.2, help="poll interval in seconds (default: 0.2)")
     args = parser.parse_args()
-    if args.timeout <= 0 or args.interval <= 0:
-        parser.error("--timeout and --interval must be positive")
+    if not all(math.isfinite(value) and value > 0 for value in (args.timeout, args.interval)):
+        parser.error("--timeout and --interval must be finite positive numbers")
 
     try:
         baseline = digest(args.diagram)
