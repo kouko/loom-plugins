@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-29-shared-diagram-tool",
-  "content_digest": "db372dc265f9c629640516855c15989e02ae365b",
+  "content_digest": "dbb295d0ea039ebd8c5b5bb785b01ca65640c0db",
   "executions": [
     {
       "kind": "package-tests",
@@ -12,39 +12,78 @@
     },
     {
       "kind": "adversarial",
-      "command": "python3 -m pytest loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py -c /dev/null -q -p no:cacheprovider",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py",
       "artifact": "loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py",
       "result": "pass",
-      "command_digest": "eb17875152ff0e0a0047aab59dd133de1309cd06833cf4e3520bdc17f251cc1b"
+      "command_digest": "396677005fd08e2527730a460f2da6c1057540a7147dc2a3ea6e3f327a467508"
     },
     {
       "kind": "adversarial",
-      "command": "python3 -m pytest loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py -c /dev/null -q -p no:cacheprovider",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py",
       "artifact": "loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py",
       "result": "pass",
-      "command_digest": "a211a47716883b7f5fd6c08e971e7fe0db79a097fa65246398c8460b28e59d6d"
+      "command_digest": "1ca2193ec7e75ecebe121a341e059774641a8c55b7c049199faa40b9bed45d8d"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-interactive-diagram/test_wait_nonfinite_arguments.py",
+      "artifact": "loom-workflow/tests/loom-interactive-diagram/test_wait_nonfinite_arguments.py",
+      "result": "pass",
+      "command_digest": "906d0a109404a9295c26e37d689c6cc0b5118179a2d1cf2ac72053cb29840194"
     }
   ],
   "verdicts": [
     {
-      "reviewer": "/root/diagram_code_review",
+      "reviewer": "/root/diagram_wait_code_review",
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "code",
       "verdict": "PASS",
-      "reviewed_sha": "a505b60583794567010507018a3921713f681370",
-      "review_target_sha": "5893c6410894956a90f46cce10e57eb43edc61ee",
-      "findings": []
+      "reviewed_sha": "b10ae7fca28441d2a733ec28da7b0083694f5358",
+      "review_target_sha": "dbcf88c1d06d97b4fb3a61f0a66336c3d445b562",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES — the escaped-bracket regression now has command-level coverage; the original A9/A10 waiter and its tests landed in one commit, so committed RED evidence remains unavailable",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous fatal finding at diagram.py:55 is fixed: valid links with escaped closing brackets now reach validation.",
+        "Affected test files passed: 24 passed."
+      ]
     },
     {
-      "reviewer": "/root/diagram_skill_review",
+      "reviewer": "/root/diagram_wait_skill_review",
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "skill",
       "verdict": "PASS",
-      "reviewed_sha": "a505b60583794567010507018a3921713f681370",
-      "review_target_sha": "5893c6410894956a90f46cce10e57eb43edc61ee",
-      "findings": []
+      "reviewed_sha": "b10ae7fca28441d2a733ec28da7b0083694f5358",
+      "review_target_sha": "dbcf88c1d06d97b4fb3a61f0a66336c3d445b562",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The live yielding session, READY relay, and same-session polling are now explicit.",
+        "Operational project/check commands now use complete runnable paths.",
+        "The gate-marker finding was dismissed after rebuttal."
+      ]
     }
   ],
   "findings": [],
