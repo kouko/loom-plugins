@@ -32,7 +32,15 @@ Use a local Git checkout. Diagram files live in
    Regenerate and check the projection before committing.
 
 Do not write to the same diagram concurrently in two editors: the final save
-can replace the other editor's work. The desktop and VS Code interactions
-must be observed on installed versions before marking those acceptance lines
-passed. As of 2026-10-30 this worktree has neither the draw.io desktop app
-nor the VS Code extension installed, so these interactions remain unverified.
+can replace the other editor's work.
+
+Observed in a temporary local fixture on 2026-10-30: VS Code Draw.io
+Integration 1.17.0 displayed an externally added `Agent Added` node without
+reopening the file. After the node was changed in the editor to `User Changed`
+and saved through **File > Save**, the disk XML contained that value and
+`diagram.py project` followed by `check` passed. Official draw.io Desktop
+32.6.1 showed **The file has been modified. Click here to synchronize.**
+with Autosave off; clicking displayed `Desktop External`. With Autosave on,
+an external change displayed `Desktop Auto` without a click. Autosave was
+restored to off after the check. A separate clean-environment reproduction
+has not been run.

@@ -7,7 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [5.17.0] — 2026-10-30 — shared editable diagram tool
 
 - Add `loom-interactive-diagram` with draw.io and demo JSON backends, a text projection check, and references from two design stations.
-- Document the editor collaboration procedure; live VS Code and desktop behavior remains to be verified on installed versions.
+- Document the editor collaboration procedure. A 2026-10-30 temporary-fixture check observed live updates and saved edit readback in VS Code Draw.io Integration 1.17.0, plus prompted sync with Autosave off and automatic sync with Autosave on in draw.io Desktop 32.6.1; clean-environment reproduction remains pending.
 - budget-exception: loom-interactive-diagram — adds one shared skill and one contract tool; regression eval `loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py`.
 
 ## [5.16.1] — 2026-10-30 — Decision Map Python module boundaries
