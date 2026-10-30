@@ -44,13 +44,38 @@ def backend_for(diagram, registry):
     return backend
 
 
+def markdown_targets(text):
+    """Yield inline and explicit reference-link destinations from a spec."""
+    definitions = {
+        label.casefold(): target.strip("<>")
+        for label, target in re.findall(
+            r"(?m)^[ \t]{0,3}\[([^\]\n]+)\]:[ \t]*(<[^>\n]+>|\S+)", text
+        )
+    }
+    for match in re.finditer(r"\[[^\]\n]+\]\(", text):
+        start = match.end()
+        depth = 1
+        for index in range(start, len(text)):
+            if text[index] == "(":
+                depth += 1
+            elif text[index] == ")":
+                depth -= 1
+                if depth == 0:
+                    yield text[start:index].strip("<>")
+                    break
+    for match in re.finditer(r"\[([^\]\n]+)\]\[([^\]\n]*)\]", text):
+        label = (match.group(2) or match.group(1)).casefold()
+        if label in definitions:
+            yield definitions[label]
+
+
 def diagrams(registry):
     suffixes = {backend.extension() for backend in registry.values()}
     found = {path.resolve() for path in DIAGRAMS.glob("*") if path.is_file() and path.suffix in suffixes}
     spec = Path("spec.md")
     if spec.is_file():
-        for target in re.findall(r"\]\(([^)]+)\)", spec.read_text(encoding="utf-8")):
-            linked = Path(unquote(target.strip("<>")))
+        for target in markdown_targets(spec.read_text(encoding="utf-8")):
+            linked = Path(unquote(target))
             if linked.suffix in suffixes:
                 found.add((spec.parent / linked).resolve())
     return sorted(found)

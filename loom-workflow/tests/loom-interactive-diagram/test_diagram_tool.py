@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 SCRIPT = Path(__file__).resolve().parents[2] / "skills/loom-interactive-diagram/scripts/diagram.py"
 ROOT = SCRIPT.parents[4]
@@ -97,6 +99,29 @@ def test_spec_link_is_resolved_from_spec_location(tmp_path):
     assert run_tool(tmp_path, "new", "drawio", "linked").returncode == 0
     (tmp_path / "spec.md").write_text("See [graph](diagrams/linked.drawio).\n")
     assert run_tool(tmp_path, "check").returncode == 0
+
+
+@pytest.mark.parametrize(
+    "name,link",
+    [
+        ("referenced", "See [diagram][flow].\n\n[flow]: shared/referenced.drawio\n"),
+        ("nested(test)", "See [diagram](shared/nested(test).drawio).\n"),
+    ],
+)
+def test_reference_and_balanced_inline_links_are_checked(tmp_path, name, link):
+    assert run_tool(tmp_path, "new", "drawio", "source").returncode == 0
+    shared = tmp_path / "shared"
+    shared.mkdir()
+    diagram = shared / f"{name}.drawio"
+    projection = shared / f"{name}.projection.md"
+    diagram.write_text((tmp_path / "diagrams/source.drawio").read_text())
+    projection.write_text((tmp_path / "diagrams/source.projection.md").read_text())
+    (tmp_path / "spec.md").write_text(link)
+    assert run_tool(tmp_path, "check").returncode == 0
+    projection.write_text("backend: drawio\n- stale\n")
+    result = run_tool(tmp_path, "check")
+    assert result.returncode != 0
+    assert str(projection) in result.stderr
 
 
 def test_station_documents_point_to_shared_rules():
