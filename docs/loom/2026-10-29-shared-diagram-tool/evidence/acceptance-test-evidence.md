@@ -92,3 +92,45 @@ I extracted `git archive a63bf8f2` into a new `/private/tmp/loom-diagram-ui-Q6OV
 - 9: re-tested — the empty canvas, externally updated node, and editable node were observed in VS Code. A malformed diagram error was tested by CLI in the previous runs, but its editor UI state was not observed; this UI flow remains partly verified.
 - 10: carried over — desktop app could not be driven to the new fixture after the stalled app binding. Its UI flow remains not verified.
 - 12: re-tested — external agent update, user edit, save, disk read-back, projection, and check all succeeded. No actual station conversation was run, so the full path walk remains partly verified.
+
+## Re-run on 2026-10-31, at ea77d7a3 (UI fixture archived from 9a641891)
+
+The clean fixture was created with `git archive 9a641891 | tar -x -C /private/tmp/loom-diagram-wait-oz40KJ`, before any editor operation. The final verification HEAD is `ea77d7a3`. I compared `a63bf8f2..ea77d7a3`: the runtime addition is the new `wait_for_save.py` and its skill/editor instructions; the later fix rejects non-finite durations and graduates the four adversarial cases into `loom-workflow/tests/loom-interactive-diagram/test_wait_nonfinite_arguments.py`. The diagram generator, backend registry, projection and link checking, and two station references did not change. No source files in the fixture were repaired. The original worktree and its untracked diagrams were not used.
+
+### Acceptance 1 — VS Code external update
+- From the archive's `docs/loom/2026-10-29-shared-diagram-tool`, ran `python3 /private/tmp/loom-diagram-wait-oz40KJ/loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py new wait-accept`; output was `diagrams/wait-accept.drawio` and `diagrams/wait-accept.projection.md`.
+- Opened that absolute file with VS Code Quick Open. Its Draw.io Integration webview (`extensionId=hediet.vscode-drawio`) showed empty Page-1. An external shell write inserted `<mxCell id="n1" value="Agent Seed" ...>`. Without reopening the tab, the webview accessibility state added `text Agent Seed`. This is a clean-buffer case.
+
+### Acceptance 2 — manual edit read-back, both editors
+- In VS Code, double-clicked the visible `Agent Seed` node, replaced selected text with `VSCode Saved Edit`, clicked outside the node and pressed Command-S. The webview displayed `VSCode Saved Edit`; `rg -n 'VSCode Saved Edit|Agent Seed' diagrams/wait-accept.drawio` returned line 7 with `value="VSCode Saved Edit"` and no old label.
+- Opened the same archived file in draw.io Desktop via File > Open. Double-clicked that node, replaced its label with `Desktop Saved Edit`, clicked outside, and pressed Command-S. The app said `All changes saved`; disk line 7 then contained `value="Desktop Saved Edit"`, with no prior label. No follow-up user message was sent in either case.
+
+### Acceptance 3 and 4 — carried over
+- The prior full re-test at `38ae86a7` independently exercised six spec-link forms, wrapped node/edge projection differences, regeneration and valid check, plus malformed XML rejection naming the file. The final diff adds only the wait path and metadata; neither diagram checking path changed. The latest fixture's sequential `diagram.py project diagrams/wait-accept.drawio` then `diagram.py check diagrams/wait-accept.drawio` printed `diagrams/wait-accept.projection.md` and `diagrams/wait-accept.drawio: projection matches`.
+- One initial exploratory `project`/`check` pair was accidentally run in parallel; that `check` raced against projection rewrite and reported a missing header. The immediately repeated sequential check passed. This was a test orchestration race, not an observed product failure.
+
+### Acceptance 5 — clean-source setup
+- Followed `references/editor-setup.md` from the fresh archive. The preinstalled VS Code Draw.io Integration and draw.io Desktop opened the newly generated file, showed external updates, saved manual edits, and supplied disk read-back. `project` then `check` passed. This was a fresh source extraction with installed prerequisites, not a fresh OS or editor installation.
+
+### Acceptance 6 — desktop sync modes
+- With Desktop Autosave checkbox at `0`, changed disk label from `Desktop Saved Edit` to `Desktop External Sync`. The app displayed `The file has been modified. Click here to synchronize.`; clicking that link changed the canvas text to `Desktop External Sync`.
+- Checked Autosave to value `1`, changed disk label to `Desktop Auto Sync`, and observed the canvas text change to `Desktop Auto Sync` without clicking synchronization. Restored Autosave to `0` afterward.
+
+### Acceptance 7 and 8 — carried over
+- Prior clean-source check listed `demo-json` and `drawio`, generated one artifact of each, and validated both. The two station skill documents pointed to `loom-workflow:loom-interactive-diagram` without duplicating format rules. The final diff does not touch the registry, selection, or those station documents.
+
+### Acceptance 9 — active-turn saved edit on both surfaces
+- VS Code: launched `python3 .../wait_for_save.py diagrams/wait-accept.drawio --timeout 120` in a live shell session after the agent's last write. It printed `READY`. Only then changed the node in the VS Code Draw.io Integration webview and saved it. The same process printed `CHANGED` and exited 0. Disk read-back identified `VSCode Saved Edit`; sequential `diagram.py project` and `diagram.py check` ended with `projection matches`.
+- Desktop: launched the same wait command again and observed `READY`. Only then edited the node in draw.io Desktop and saved it. The process printed `CHANGED` and exited 0. Disk read-back identified `Desktop Saved Edit`; sequential project and check again ended with `projection matches`.
+- These are actual editor saves during this acceptance tester's active turn. They show the file signal and immediate read-back, but do not establish actor identity from the signal alone.
+
+### Acceptance 10 — unchanged and unrelated changes
+- Launched `wait_for_save.py diagrams/wait-accept.drawio --timeout 3 --interval 0.1`, observed `READY`, then ran `touch diagrams/wait-accept.drawio diagrams/unrelated.txt`. This changed metadata for the target but no diagram bytes, and created an unrelated file. The wait printed `TIMEOUT` and exited 1, not `CHANGED`.
+- Focused final-tree tests: `pytest -q loom-workflow/tests/loom-interactive-diagram/test_wait_for_save.py loom-workflow/tests/loom-interactive-diagram/test_wait_nonfinite_arguments.py` → `10 passed`. The focused tests cover unchanged content, unrelated file, changed content, missing file, unreadable file, and invalid timeout/interval. The full package suite is reserved for `finalize-review`.
+
+### Spec UI flows
+- VS Code surface: empty canvas, external node appearance, manual edit, save, and read-back observed in this fixture. The malformed XML CLI failure was observed in the earlier re-run; the editor's own error display was not inspected.
+- Desktop surface: manual edit, Autosave-off synchronization prompt/click, and Autosave-on silent update observed in this fixture. Empty open and stale-write conflict modal were not inspected.
+- Command surface: prior full re-test exercised list, new, project, check, mismatch, malformed input and unknown backend. The new wait path did not change these commands. No actual station conversation ran.
+- Path walk: file generation, agent write, editor update, user edit, save, disk read-back, projection, and check were observed. A live station discussion continuing after the read-back was not tested.
+- Active-turn wait surface: `READY`, `CHANGED` for each editor, `TIMEOUT` for unchanged/unrelated changes, and `ERROR /private/tmp/nonexistent-diagram.drawio: No such file or directory` for a missing path were observed. The host conversation text on timeout or error was not tested.
