@@ -3,6 +3,7 @@
 ## [3.53.0] — 2026-10-30 — register shared diagram tool
 
 - Register `loom-interactive-diagram` as a workflow tool in the contract manifest and pin its contract test count.
+- Raise the counted-skill measurement ceiling from 23 to 24 for this declared tool; the separate R3 check still requires the workflow CHANGELOG budget-exception entry.
 
 ## [3.52.2] — 2026-10-30 — fix(hooks): run simple hooks without checker package readiness
 
