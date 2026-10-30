@@ -42,5 +42,14 @@ and saved through **File > Save**, the disk XML contained that value and
 32.6.1 showed **The file has been modified. Click here to synchronize.**
 with Autosave off; clicking displayed `Desktop External`. With Autosave on,
 an external change displayed `Desktop Auto` without a click. Autosave was
-restored to off after the check. A separate clean-environment reproduction
-has not been run.
+restored to off after the check.
+
+Separately on 2026-10-30, a fresh source checkout from `git archive HEAD`
+was unpacked under `/private/tmp/loom-diagram-clean-check`. From
+`docs/loom/2026-10-29-shared-diagram-tool/`, the documented command created
+`clean-check.drawio`. With the already installed VS Code Draw.io Integration
+1.17.0, an external `Clean Agent` node appeared in the open editor without
+reopening it. The node was changed there to `Clean User` and saved; the disk
+XML contained that exact value, and `diagram.py project` followed by `check`
+passed. This verifies the procedure from a fresh source checkout with
+installed prerequisites, not a fresh OS or extension installation.
