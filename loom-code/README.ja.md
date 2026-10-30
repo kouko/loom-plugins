@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.52.1 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.52.2 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -128,7 +128,9 @@ checker が「問題なし」と言うことはありません。ステーショ
 
 ステーションは `scripts/loom-python --repair` で checker 専用の Python と依存
 パッケージをユーザーキャッシュに用意し、元のチェックを再実行します。プロジェクトの
-テスト環境は変更しません。hook は `--ready` で準備済みの環境だけを使い、
+テスト環境は変更しません。標準ライブラリだけを使う簡単な hook は、動作する
+システムの Python を使い、使えなければ準備済みのキャッシュ環境を使います。
+checker を使う公開用 hook は `--ready` で準備済みの環境だけを使い、
 使えない場合は修復方法を知らせます。hook 自体はインストールしません。
 
 ## loom-design・loom-workflow との組み合わせ

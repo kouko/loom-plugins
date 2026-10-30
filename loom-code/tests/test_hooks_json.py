@@ -154,8 +154,8 @@ def test_post_tool_use_keeps_language_anchor(hooks):
 
 def test_user_prompt_submit_runs_language_anchor(hooks):
     (command,) = _commands(hooks["UserPromptSubmit"])
-    assert command.startswith('"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --ready --script ../hooks/language-anchor.py')
-    assert 'exec python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"' in command
+    assert command.startswith('if python3 -c \'import json,sys; assert sys.version_info >= (3,7)\' >/dev/null 2>&1; then exec python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"; fi; ')
+    assert '"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --ready --script ../hooks/language-anchor.py' in command
 
 
 def test_no_removed_hook_is_referenced(hooks):
@@ -185,7 +185,7 @@ def test_hook_dir_commands_resolve_to_existing_files(hooks):
     ``scripts/`` is owned by a parallel task and is not asserted."""
     for entries in hooks.values():
         for command in _commands(entries):
-            rel = command.split("${CLAUDE_PLUGIN_ROOT}/", 1)[1].rstrip('" ')
+            rel = command.split("${CLAUDE_PLUGIN_ROOT}/", 1)[1].split('"', 1)[0]
             if not rel.startswith("hooks/"):
                 continue
             assert (REPO / "loom-code" / rel).is_file(), command
@@ -231,8 +231,10 @@ def test_agy_hooks_wire_push_gate_and_pre_invocation(agy_hooks):
     }
     assert {(event, matcher) for event, matcher, _ in wired} == {
         ("PreToolUse", "run_command"), ("PreInvocation", "")}
-    for _, _, command in wired:
-        assert command.startswith("./scripts/loom-python --ready --script ../hooks/agy_adapter.py ")
+    commands = {event: command for event, _, command in wired}
+    assert commands["PreToolUse"].startswith("./scripts/loom-python --ready --script ../hooks/agy_adapter.py push-gate")
+    assert commands["PreInvocation"].startswith("if python3 -c 'import json,sys; assert sys.version_info >= (3,7)' >/dev/null 2>&1; then exec python3 ./hooks/agy_adapter.py pre-invocation; fi; ")
+    assert "./scripts/loom-python --ready --script ../hooks/agy_adapter.py pre-invocation" in commands["PreInvocation"]
 
 
 def test_agy_hooks_carry_no_host_root_variable(agy_hooks):
@@ -409,6 +411,7 @@ def test_stdlib_hooks_keep_context_with_cold_cache(host, event, matcher, tmp_pat
     result = subprocess.run(["/bin/sh", "-c", command], input=json.dumps(payload),
                             text=True, capture_output=True, cwd=root, env=env, timeout=30)
     assert result.returncode == 0, result.stderr
+    assert "loom-python: checker runtime is missing or invalid" not in result.stderr
     output = json.loads(result.stdout)
     if host == "antigravity":
         assert "Station order:" in output["injectSteps"][0]["ephemeralMessage"]
@@ -420,6 +423,8 @@ def test_stdlib_hooks_keep_context_with_cold_cache(host, event, matcher, tmp_pat
     if host == "antigravity":
         ready_env["PATH"] = os.environ["PATH"]  # session-start also calls awk/sed
         payload["conversationId"] = "ready"
+    else:
+        ready_env["PATH"] = str(tmp_path / "no-host-python")
     ready = subprocess.run(["/bin/sh", "-c", command], input=json.dumps(payload),
                            text=True, capture_output=True, cwd=root, env=ready_env, timeout=30)
     assert ready.returncode == 0, ready.stderr
