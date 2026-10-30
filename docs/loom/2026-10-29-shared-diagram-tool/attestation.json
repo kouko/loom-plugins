@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-29-shared-diagram-tool",
-  "content_digest": "9ae5caba90e9bef2b5b43dfec836abfd164a1bd4",
+  "content_digest": "db372dc265f9c629640516855c15989e02ae365b",
   "executions": [
     {
       "kind": "package-tests",
@@ -33,7 +33,7 @@
       "lens": "code",
       "verdict": "PASS",
       "reviewed_sha": "a505b60583794567010507018a3921713f681370",
-      "review_target_sha": "77f23b301f1b6fcdf047e93163ffcbd35c3f55ca",
+      "review_target_sha": "5893c6410894956a90f46cce10e57eb43edc61ee",
       "findings": []
     },
     {
@@ -43,7 +43,7 @@
       "lens": "skill",
       "verdict": "PASS",
       "reviewed_sha": "a505b60583794567010507018a3921713f681370",
-      "review_target_sha": "77f23b301f1b6fcdf047e93163ffcbd35c3f55ca",
+      "review_target_sha": "5893c6410894956a90f46cce10e57eb43edc61ee",
       "findings": []
     }
   ],
