@@ -101,6 +101,25 @@ def test_spec_link_is_resolved_from_spec_location(tmp_path):
     assert run_tool(tmp_path, "check").returncode == 0
 
 
+@pytest.mark.parametrize("link", [
+    "See [a \\] label](shared/bad.drawio).\n",
+    "See [a \\] label][flow].\n\n[flow]: shared/bad.drawio\n",
+    "See [diagram][a \\] label].\n\n[a \\] label]: shared/bad.drawio\n",
+    "See [a \\] label][].\n\n[a \\] label]: shared/bad.drawio\n",
+    "See [a \\] label].\n\n[a \\] label]: shared/bad.drawio\n",
+])
+def test_escaped_bracket_label_still_checks_linked_diagram(tmp_path, link):
+    shared = tmp_path / "shared"
+    shared.mkdir()
+    bad = shared / "bad.drawio"
+    bad.write_text("<mxfile><diagram>")
+    (shared / "bad.projection.md").write_text("backend: drawio\n")
+    (tmp_path / "spec.md").write_text(link)
+    result = run_tool(tmp_path, "check")
+    assert result.returncode != 0
+    assert str(bad) in result.stderr
+
+
 @pytest.mark.parametrize(
     "name,link",
     [

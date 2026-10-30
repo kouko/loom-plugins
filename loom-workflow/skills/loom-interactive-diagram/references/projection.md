@@ -20,7 +20,9 @@ backend, nodes have `id` and `label`, and edges have `id`, `source`, `target`,
 and `label`. A draw.io `object` wrapping an `mxCell` supplies its visible
 `label` and, when the cell has no ID, its `id` to the projection. The
 projection is text for review and conversation. Edit the diagram first, then
-run `diagram.py project` to regenerate the projection.
-`diagram.py check` includes all registered files under `diagrams/` and
+run `python3 <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py
+project diagrams/<name>.<ext>` to regenerate the projection.
+`python3 <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py check`
+includes all registered files under `diagrams/` and
 Markdown links in `spec.md` that end in a registered diagram extension.
 It compares the projection and names the first differing line for each file.

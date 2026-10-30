@@ -16,8 +16,10 @@ Use a local Git checkout. Diagram files live in
    agent add a node to that same file and save it. Observe whether the open
    editor shows the node without reopening the file.
 5. Add or change a node in the editor and save. Have the agent read the XML
-   from disk and identify that exact change. Run `diagram.py project
-   diagrams/example.drawio`, then `diagram.py check`.
+   from disk and identify that exact change. Run `python3
+   <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py project
+   diagrams/example.drawio`, then `python3
+   <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py check`.
 
 ## draw.io desktop
 
@@ -29,14 +31,19 @@ Use a local Git checkout. Diagram files live in
 3. Disable autosave and repeat. Observe the file modified prompt and click
    **synchronize**; verify the open diagram then shows the new content.
 4. Edit a node manually, save, and have the agent read back the exact change.
-   Run `diagram.py project` to regenerate the projection, then `diagram.py check`.
+   Run `python3 <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py
+   project diagrams/example.drawio` to regenerate the projection, then
+   `python3 <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py check`.
 
 ## Active-turn saved edit check
 
 With either editor, the agent starts `python3
 <plugin-root>/skills/loom-interactive-diagram/scripts/wait_for_save.py
-diagrams/example.drawio --timeout 120` after its last write. Wait for `READY`
-before editing and saving. `CHANGED` means the file content changed and was
+diagrams/example.drawio --timeout 120` after its last write, using a live tool
+session that yields output while the process remains active. The agent keeps
+the session identifier, waits for `READY`, then tells the user to edit and save
+the diagram. It polls that same session during the active turn for `CHANGED`
+or `TIMEOUT`. `CHANGED` means the file content changed and was
 stable across two reads; the agent then reads the file, updates its projection,
 checks it, and describes the edit. `TIMEOUT` means no changed content was
 observed during the wait; a follow-up message can still resume the discussion.

@@ -9,6 +9,7 @@ from urllib.parse import unquote
 
 BACKENDS = Path(__file__).resolve().parent.parent / "backends"
 DIAGRAMS = Path("diagrams")
+LABEL = r"(?:\\.|[^\\\]\n])+"
 
 
 def backends():
@@ -49,10 +50,10 @@ def markdown_targets(text):
     definitions = {
         label.casefold(): target.strip("<>")
         for label, target in re.findall(
-            r"(?m)^[ \t]{0,3}\[([^\]\n]+)\]:[ \t]*(<[^>\n]+>|\S+)", text
+            rf"(?m)^[ \t]{{0,3}}\[({LABEL})\]:[ \t]*(<[^>\n]+>|\S+)", text
         )
     }
-    for match in re.finditer(r"\[[^\]\n]+\]\(", text):
+    for match in re.finditer(rf"\[{LABEL}\]\(", text):
         start = match.end()
         depth = 1
         for index in range(start, len(text)):
@@ -68,11 +69,11 @@ def markdown_targets(text):
                         destination = destination.split(maxsplit=1)[0] if destination else ""
                     yield destination
                     break
-    for match in re.finditer(r"\[([^\]\n]+)\]\[([^\]\n]*)\]", text):
+    for match in re.finditer(rf"\[({LABEL})\]\[({LABEL})?\]", text):
         label = (match.group(2) or match.group(1)).casefold()
         if label in definitions:
             yield definitions[label]
-    for match in re.finditer(r"\[([^\]\n]+)\](?![\[(])", text):
+    for match in re.finditer(rf"\[({LABEL})\](?![\[(])", text):
         if text[match.end():].startswith(":") and not text[text.rfind("\n", 0, match.start()) + 1:match.start()].strip():
             continue
         label = match.group(1).casefold()
