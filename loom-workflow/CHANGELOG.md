@@ -4,6 +4,10 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.17.1] — 2026-10-31 — active-turn diagram save detection
+
+- Add a bounded content poll for one diagram, so an active discussion can read a stable saved edit without another message. Unchanged content and unrelated files do not trigger it; timeout and file errors are explicit.
+
 ## [5.17.0] — 2026-10-30 — shared editable diagram tool
 
 - Add `loom-interactive-diagram` with draw.io and demo JSON backends, a text projection check, and references from two design stations.

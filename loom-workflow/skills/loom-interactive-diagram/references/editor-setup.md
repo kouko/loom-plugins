@@ -31,6 +31,20 @@ Use a local Git checkout. Diagram files live in
 4. Edit a node manually, save, and have the agent read back the exact change.
    Run `diagram.py project` to regenerate the projection, then `diagram.py check`.
 
+## Active-turn saved edit check
+
+With either editor, the agent starts `python3
+<plugin-root>/skills/loom-interactive-diagram/scripts/wait_for_save.py
+diagrams/example.drawio --timeout 120` after its last write. Wait for `READY`
+before editing and saving. `CHANGED` means the file content changed and was
+stable across two reads; the agent then reads the file, updates its projection,
+checks it, and describes the edit. `TIMEOUT` means no changed content was
+observed during the wait; a follow-up message can still resume the discussion.
+`ERROR` names a missing or unreadable file so it can be saved again. A save
+with identical content or a change to another file does not trigger `CHANGED`.
+The signal does not identify the editor or person that made the change, and
+the agent must keep its conversation turn active while waiting.
+
 Do not write to the same diagram concurrently in two editors: the final save
 can replace the other editor's work.
 
