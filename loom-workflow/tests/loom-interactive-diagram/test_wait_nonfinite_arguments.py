@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 
-SCRIPT = Path(__file__).resolve().parents[5] / "loom-workflow/skills/loom-interactive-diagram/scripts/wait_for_save.py"
+SCRIPT = Path(__file__).resolve().parents[2] / "skills/loom-interactive-diagram/scripts/wait_for_save.py"
 
 
 @pytest.mark.parametrize("option,value", [
