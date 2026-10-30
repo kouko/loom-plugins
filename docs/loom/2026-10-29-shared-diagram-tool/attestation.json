@@ -1,0 +1,52 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-29-shared-diagram-tool",
+  "content_digest": "9ae5caba90e9bef2b5b43dfec836abfd164a1bd4",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py -c /dev/null -q -p no:cacheprovider",
+      "artifact": "loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py",
+      "result": "pass",
+      "command_digest": "eb17875152ff0e0a0047aab59dd133de1309cd06833cf4e3520bdc17f251cc1b"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py -c /dev/null -q -p no:cacheprovider",
+      "artifact": "loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py",
+      "result": "pass",
+      "command_digest": "a211a47716883b7f5fd6c08e971e7fe0db79a097fa65246398c8460b28e59d6d"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/diagram_code_review",
+      "vendor": "openai",
+      "model": "host-inherited-unverified",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "a505b60583794567010507018a3921713f681370",
+      "review_target_sha": "77f23b301f1b6fcdf047e93163ffcbd35c3f55ca",
+      "findings": []
+    },
+    {
+      "reviewer": "/root/diagram_skill_review",
+      "vendor": "openai",
+      "model": "host-inherited-unverified",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "a505b60583794567010507018a3921713f681370",
+      "review_target_sha": "77f23b301f1b6fcdf047e93163ffcbd35c3f55ca",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
