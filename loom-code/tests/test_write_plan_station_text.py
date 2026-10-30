@@ -205,11 +205,9 @@ def test_direct_request_skip_is_affirmative_and_negation_is_rejected() -> None:
 
 
 def test_write_plan_names_typed_branch_and_types() -> None:
-    section = _section(
-        SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off"
-    )
-    # The type list in Step 6 matches implementer.md: every sentence listing
-    # branch types lists exactly the implementer's set.
+    section = _section(SKILL.read_text(encoding="utf-8"), "## Workflow setup")
+    # The type list in the branch rule matches implementer.md: every sentence
+    # listing branch types lists exactly the implementer's set.
     types = {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}
     listed = [set(re.findall(r"`([a-z]+)`", s)) for s in _flat_sentences(section)]
     listed = [found for found in listed if len(found & types) >= 3]
@@ -261,10 +259,106 @@ def test_bare_branch_re_ignores_typed_and_path(line: str) -> None:
 
 
 def test_write_plan_bare_switch_absent() -> None:
-    section = _section(
-        SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off"
-    )
+    section = _section(SKILL.read_text(encoding="utf-8"), "## Workflow setup")
     assert not _BARE_BRANCH_RE.search(section), _BARE_BRANCH_RE.search(section)
+
+
+# --- change-branch-before-intent W1-01 -- one branch rule before any
+# change-owned commit ------------------------------------------------------
+
+_SWITCH = "git switch -c <type>/" + _CID
+_RULE = "Branch before the first commit"
+
+
+def test_branch_rule_precedes_confirmation_and_skip_record_commits() -> None:
+    """A4 positive: the rule is stated once, at entry, ahead of the skip
+    record, and names every change-owned commit; Step 3 and confirm-intent
+    point at it."""
+    text = SKILL.read_text(encoding="utf-8")
+    setup = " ".join(_section(text, "## Workflow setup").split())
+    assert text.count(_SWITCH) == 1 and _SWITCH in setup
+    assert setup.index(_SWITCH) < setup.index("`skipped-by-instruction: <step>")
+    assert affirms(
+        setup, "first commit", "make HEAD the change's branch",
+        "intent confirmation", "needs-design:", "skipped-by-instruction", "plan",
+    )
+    assert _RULE in _section(text, "## Step 3 — Decision point ①: restate and confirm")
+    assert _RULE in _section(text, "## Step 6 — Commit and hand off")
+    confirm = CONFIRM_INTENT_REFERENCE.read_text(encoding="utf-8")
+    on_yes = " ".join(
+        confirm[confirm.index('**On "yes":**'):confirm.index('**On "no"')].split()
+    )
+    assert affirms(on_yes, "Commit it", "on the change branch", _RULE)
+
+
+def test_intent_on_trunk_allowance_absent() -> None:
+    """A4 negative: no sentence lets the intent (or anything) stay on trunk."""
+    text = " ".join(SKILL.read_text(encoding="utf-8").split())
+    assert "intent on trunk" not in text.lower()
+    assert "if still on trunk" not in text.lower()
+
+
+def test_own_change_branch_reused() -> None:
+    """A5 positive: HEAD already on this change's branch is reused; on the
+    trunk the branch is created."""
+    setup = " ".join(
+        _section(SKILL.read_text(encoding="utf-8"), "## Workflow setup").split()
+    )
+    assert affirms(setup, "already on", "this change's branch", "reuse it")
+    assert affirms(setup, "on the trunk", "create it")
+    assert affirms(setup, "switch to it", "`git switch <type>/<change-id>`",
+                   "already exists")
+    force = [s for s in re.split(r"(?<=[.;])\s+", setup) if "`-C`" in s]
+    assert force and all(re.search(r"\bnever\b.*`-C`", s) for s in force), force
+
+
+def test_unrelated_branch_or_detached_head_resolved_before_commit() -> None:
+    """A5 boundary: an unrelated branch or detached HEAD gets no commit until
+    resolved, and existing work is preserved."""
+    setup = _section(SKILL.read_text(encoding="utf-8"), "## Workflow setup")
+    hits = [
+        s for s in _flat_sentences(setup)
+        if "unrelated branch" in s and "detached HEAD" in s
+    ]
+    assert len(hits) == 1, hits
+    words = set(re.findall(r"[a-z]+", hits[0].lower()))
+    assert {"resolve", "first", "preserve", "existing", "work"} <= words, hits[0]
+    assert all(re.search(rf"\b(?:no|not|never)\s+{w}\b", hits[0])
+               for w in ("commit", "reset", "discard")), hits[0]
+    assert affirms(" ".join(setup.split()), "Resolve it with",
+                   "`git worktree add -b <type>/<change-id> <path> <trunk>`",
+                   "new worktree", "move", "intent draft")
+
+
+def test_worktree_moves_carry_every_uncommitted_change_file() -> None:
+    """A6 positive: a move to another worktree, existing or new, carries every
+    uncommitted change file, `PRINCIPLES.md` included, onto the change branch.
+    A6 negative: no route moves only the intent draft."""
+    setup = " ".join(
+        _section(SKILL.read_text(encoding="utf-8"), "## Workflow setup").split()
+    )
+    assert affirms(setup, "move", "every uncommitted file this change produced",
+                   "another worktree", "intent draft", "`PRINCIPLES.md`",
+                   "commit", "change branch")
+    assert not re.search(r"move (?:the|any) uncommitted intent draft", setup)
+
+
+def test_existing_branch_off_trunk_gets_worktree_without_b() -> None:
+    """A5 positive: off the trunk, an existing change branch checked out
+    nowhere gets `git worktree add <path> <type>/<change-id>`; an absent one
+    keeps `-b`. A5 negative: `git switch` is offered only on the trunk."""
+    setup = " ".join(
+        _section(SKILL.read_text(encoding="utf-8"), "## Workflow setup").split()
+    )
+    assert affirms(setup, "Resolve it with",
+                   "`git worktree add <path> <type>/<change-id>`", "exists",
+                   "`git worktree add -b <type>/<change-id> <path> <trunk>`")
+    offers = [s for s in re.split(r"(?<=[.;])\s+", setup)
+              if "`git switch <type>/<change-id>`" in s]
+    assert offers and all("on the trunk" in s for s in offers), offers
+    off_trunk = [s for s in _flat_sentences(setup)
+                 if "unrelated branch" in s and "detached HEAD" in s]
+    assert all(re.search(r"\bno `git switch`", s) for s in off_trunk), off_trunk
 
 
 def test_repo_grep_no_bare_branch() -> None:

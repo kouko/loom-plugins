@@ -128,9 +128,11 @@ digest and validates that evidence without replaying tests or probes.
 
 Stations use `scripts/loom-python --repair` to prepare their own checker Python
 and dependencies in a user cache, then rerun the original check. This does not
-change the project's test environment. Hooks use `--ready`: they reuse an
-existing runtime without installing anything and report how to repair it when
-the runtime is unavailable.
+change the project's test environment. Simple standard-library hooks use a
+viable host Python, falling back to a ready cached runtime if one is unavailable.
+Checker-backed publication hooks use `--ready`: they reuse an existing runtime
+without installing anything and report how to repair it when the runtime is
+unavailable.
 
 ## Composing with loom-design and loom-workflow
 

@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 
 import delivery_evidence
 import map_store
+import map_validation
 
 if TYPE_CHECKING:
     from map_transaction import UnknownRoute, CloseResult, DeliveryClosureInputs
@@ -72,7 +73,7 @@ def _validate_routes(transaction: ModuleType, unknowns: list[UnknownRoute]) -> N
                 r"[a-z0-9]+(?:-[a-z0-9]+)*", route.ticket_slug
             ):
                 raise transaction.CloseTransactionError("ticket route requires a safe ticket_slug")
-            if route.ticket_type not in map_store.V3_TICKET_TYPES:
+            if route.ticket_type not in map_validation.V3_TICKET_TYPES:
                 raise transaction.CloseTransactionError(
                     "ticket route requires grilling, research, prototype, or delivery"
                 )
@@ -113,7 +114,7 @@ def _validate_authoritative_ticket(
     ticket: map_store.TicketDocument, *, closed: bool
 ) -> None:
     expected_status = "closed" if closed else "claimed"
-    if ticket.frontmatter.type not in map_store.V3_TICKET_TYPES:
+    if ticket.frontmatter.type not in map_validation.V3_TICKET_TYPES:
         raise transaction.CloseTransactionError(
             "source is not an allowed schema-v3 ticket type"
         )
@@ -122,9 +123,9 @@ def _validate_authoritative_ticket(
             f"source ticket must be {expected_status}"
         )
     try:
-        map_store._check_v3_ticket_frontmatter(ticket)
+        map_validation._check_v3_ticket_frontmatter(ticket)
         if closed:
-            map_store._check_v3_ticket_closure_evidence(ticket)
+            map_validation._check_v3_ticket_closure_evidence(ticket)
     except map_store.SchemaViolation as exc:
         raise transaction.CloseTransactionError(
             f"invalid authoritative schema-v3 source: {exc}"
@@ -190,7 +191,7 @@ def _validate_terminal_candidate(
 ) -> None:
     try:
         candidate = map_store.parse_ticket_document(text, ticket_path)
-        map_store._check_v3_ticket_closure_evidence(candidate)
+        map_validation._check_v3_ticket_closure_evidence(candidate)
     except map_store.SchemaViolation as exc:
         raise transaction.CloseTransactionError(f"invalid closure evidence: {exc}") from exc
 
@@ -236,12 +237,13 @@ def _assess_clear(map_dir: Path) -> bool:
         frontmatter=replace(doc.frontmatter, state="clear"),
     )
     try:
-        map_store._check_map_structure(candidate)
-        map_store._check_v3_clear_acceptance(candidate)
-        map_store._check_tickets(
+        map_validation._check_map_structure(candidate)
+        map_validation._check_v3_clear_acceptance(candidate)
+        map_validation._check_tickets(
             map_dir,
             state="clear",
             schema_version=candidate.frontmatter.schema_version,
+            read_ticket=map_store.read_ticket,
         )
     except (map_store.SchemaViolation, map_store.MapStoreError):
         return False

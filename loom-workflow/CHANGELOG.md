@@ -10,6 +10,10 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - Document the editor collaboration procedure; live VS Code and desktop behavior remains to be verified on installed versions.
 - budget-exception: loom-interactive-diagram — adds one shared skill and one contract tool; regression eval `loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py`.
 
+## [5.16.1] — 2026-10-30 — Decision Map Python module boundaries
+
+- Decision Map reading, validation and delivery now call their owning Python modules directly. The existing commands, hooks, file formats and results remain unchanged.
+
 ## [5.16.0] — 2026-10-27 — loom-memory equivalence outcome and six-character label separators
 
 - `loom-memory` Reconcile now also triggers when a new lesson is equivalent to an existing entry. The outcome is to keep the existing entry and add the new source to its `sources`; Reconcile never writes a second entry for an equivalent lesson.

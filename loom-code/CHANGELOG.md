@@ -4,6 +4,33 @@
 
 - Register `loom-interactive-diagram` as a workflow tool in the contract manifest and pin its contract test count.
 
+## [3.52.2] — 2026-10-30 — fix(hooks): run simple hooks without checker package readiness
+
+- Language-anchor hooks and Antigravity pre-invocation use an available host Python without requiring the checker runtime or PyYAML cache.
+- Hosts without `python3` retain the existing ready cached interpreter path. Publication gates still require checker readiness and keep their failure behavior.
+- Mechanism counting ignores shell redirection operands before the hook script path, preserving the registered hook identities for conditional commands.
+
+## [3.52.1] — 2026-10-29 — refactor(write-plan): move loom-design-absent paths to references
+
+- The no-intent interview moves to `references/no-intent-interview.md`.
+- The intent-writing rules move to `references/confirm-intent.md`, still loaded at step 3.
+- The self-written minimal spec path and the product-spec gate move to `references/self-written-spec.md`, read when `write-plan` writes a spec itself.
+- `write-plan` SKILL.md body drops from 3749 to 2785 words; the 3750-word cap is unchanged. No rule wording changed.
+
+## [3.52.0] — 2026-10-29 — fix(checker): run the detected package suite in a uv project's locked environment
+
+- When the repo commits `uv.lock` and declares no `package-tests:`, the detected suite command is `uv run --locked python -m pytest -q` (ahead of the pyproject.toml row), so the suite runs in the project's locked env regardless of the first `python3` on PATH; `--locked` stops on a stale lockfile with a `uv lock` hint and never rewrites it. A declared `package-tests:` keeps precedence.
+- Pytest collection for graduated adversarial programs recognizes any `python -m pytest` command wrapped by `conda run -n` or `uv run` through one generic branch (the conda-only branch is gone).
+- Repos without `uv.lock` get the same command as before. A committed `uv.lock` without `uv` installed now fails with "command not found".
+- A git-ignored build marker no longer selects the suite command.
+- Build step 3 now points to the checker's marker table (`TEST_COMMAND_MARKERS` in `scripts/loom_checker/probes.py`) for the suite command when `package-tests:` is absent, instead of leaving "build markers" to the agent. `uv run --locked` creates the project's `.venv` or syncs its locked packages to the lock (extras kept), and never touches committed files.
+
+## [3.51.0] — 2026-10-29 — docs(write-plan, ship): branch before the first commit and never discard trunk unasked
+
+- `write-plan` states one "Branch before the first commit" rule in Workflow setup, ahead of every change-owned commit (intent confirmation, needs-design fix, skipped-by-instruction record, plan): reuse this change's own branch, create it when on the trunk, on the trunk switch to an already-existing `<type>/<change-id>` with `git switch <type>/<change-id>` (never re-created, `-C`, or reset), work in the other worktree when one has it checked out, and on an unrelated branch or detached HEAD commit nothing there and never `git switch`: open a new worktree (`git worktree add <path> <type>/<change-id>` when the branch exists, else `git worktree add -b <type>/<change-id> <path> <trunk>`) and continue in it, without resetting or discarding the original checkout's work; on any move to another worktree, existing or new, every uncommitted file this change produced (the intent draft, a `PRINCIPLES.md` edit) moves there, to be committed on the change branch. Step 3, Step 6 and `confirm-intent.md` point at the rule.
+- `write-plan` drops redundant restatements (needs-design kind parity, the Current State Evidence pointer, the intake-check preamble, the PR title becoming the squash commit, the branch type reused as the PR title type, and the station-entry full-flow sentence) to stay within its word cap; behaviour unchanged.
+- `write-plan` drops the allowance for leaving a confirmed intent committed on the trunk; `confirm-intent.md` commits the confirmation on the change branch.
+- `ship` §5 reports land's `trunk not updated` line to the maintainer and leaves the trunk as it is; local trunk commits and uncommitted changes in the trunk checkout (stash, restore, checkout discard) are never discarded without the maintainer's explicit yes, and merge acceptance at decision point ③ is not that permission. `land.py` is unchanged.
 
 ## [3.50.0] — 2026-10-27 — feat(closing-review): accept a recorded no-program adversarial outcome
 

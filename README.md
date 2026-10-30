@@ -165,6 +165,7 @@ attach to the flow.
 | `skill-retro` | Mine past Claude Code or Codex sessions for skill improvement proposals. |
 | `project-retro` | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
 | `loom-visualization` | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
+| `loom-interactive-diagram` | Create and validate editable diagram files shared by the user and agent. |
 | `goal-create` | Create a session goal or draft a repository purpose (invoked by name only). |
 | `dbt-model-style` | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
 | `using-loom-workflow` | Optional router to the right workflow tool. |

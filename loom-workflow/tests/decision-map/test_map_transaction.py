@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "skills" / "decisio
 import map_transaction  # noqa: E402
 import map_lifecycle  # noqa: E402
 import map_lock  # noqa: E402
+import map_validation  # noqa: E402
 
 RESEARCH_RESOLUTION = (
     "factual-answer: slice shipped\n"
@@ -136,6 +137,37 @@ def test_close_records_gist_routes_unknowns_and_terminalizes_last(
     assert "status: closed" in ticket.read_text(encoding="utf-8")
     assert result.map_clear_eligible is False
     assert result.routed == 3
+
+
+@pytest.mark.parametrize("operation", ["blockers", "close"])
+def test_validation_refusal_leaves_transaction_bytes_unchanged(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, operation: str
+) -> None:
+    map_dir, ticket = _make_map(tmp_path)
+    map_path = map_dir / "MAP.md"
+    before = (map_path.read_bytes(), ticket.read_bytes())
+
+    def reject(*args, **kwargs):
+        raise map_transaction.map_store.SchemaViolation("injected validation refusal")
+
+    if operation == "blockers":
+        monkeypatch.setattr(map_validation, "_check_blocked_by", reject)
+        run = lambda: map_transaction.update_blockers(
+            map_dir, "ship-slice", [], operation_id="reject-blockers",
+            expected_revision=map_transaction.capture_revision(map_dir),
+        )
+    else:
+        monkeypatch.setattr(map_transaction.map_store, "validate", lambda _: (0, "valid"))
+        monkeypatch.setattr(map_validation, "_check_v3_ticket_frontmatter", reject)
+        run = lambda: map_transaction.close_and_rechart(
+            map_dir, "ship-slice", gist="Slice shipped.",
+            resolution=RESEARCH_RESOLUTION, unknowns=[],
+        )
+
+    with pytest.raises(map_transaction.CloseTransactionError, match="injected validation refusal"):
+        run()
+    assert (map_path.read_bytes(), ticket.read_bytes()) == before
+    _assert_only_lock_artifact(map_dir)
 
 
 def test_invalid_closure_evidence_is_rejected_before_any_write(

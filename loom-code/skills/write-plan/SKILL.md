@@ -40,11 +40,29 @@ Antigravity CLI, OpenCode: map tool/agent names via
 [`../../references/antigravity-tools.md`](../../references/antigravity-tools.md),
 [`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
+**Branch before the first commit.** Before this station's first commit
+(intent confirmation, `needs-design:` fix, `skipped-by-instruction`
+line or plan), make HEAD the change's branch:
+
+```
+git switch -c <type>/<change-id>
+```
+
+Pick `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or
+`ci`. If already on this change's branch, reuse it. Another worktree has that
+branch: work there. Else on the trunk, create it, or if it already exists,
+switch to it with `git switch <type>/<change-id>`; never `-C` or reset. On an
+unrelated branch or detached HEAD, do not commit: resolve that first, preserve
+existing work, no reset, no discard, no `git switch`. Resolve it with a new
+worktree: `git worktree add <path> <type>/<change-id>` if it exists, else
+`git worktree add -b <type>/<change-id> <path> <trunk>` — on any move to
+another worktree, move every uncommitted file this change produced (intent
+draft, `PRINCIPLES.md` edit) there, to commit on the change branch.
+
 At entry, omit the prose steps the user told you to skip in plain words (spec,
 plan, implementer, tdd, acceptance-test). Words that ask to skip independent acceptance testing —
 "acceptance testing", or the step formerly called "blind run" — mean the
-`acceptance-test` step. At station entry, keep the full flow unless the user
-instructed a skip. Automatic narrow-change simplification belongs
+`acceptance-test` step. Automatic narrow-change simplification belongs
 to finalization and attestation validation. The default is the full flow:
 skip a step only when the user tells you
 to in plain words, then tell the user in one line which step is skipped and
@@ -125,20 +143,8 @@ the user named a change, match the slug.
 
 - `loom-design` is installed → this is not your station. Tell the user the
   change starts at `capture-intent`, and stop.
-- `loom-design` is not installed → hand the user the template path,
-  `contract/templates/intent.md` inside the `loom-code` plugin, and stop
-  there **unless** the user wants to describe the change now. If they do,
-  run step 3's restate-and-confirm as a short interview instead: ask what
-  the problem is, who it hurts, and what they will be able to do when it
-  is done; write the file yourself from their answers. A feature or
-  bug-fix request already describes the change: run the short interview
-  and write the file; offer the template path only when the user asks for
-  it. Keep it short — an
-  engineering intent is normally three to five lines, and writing it by
-  hand beats interviewing. The user never hand-writes the file. When you
-  write it, `## Open questions` must be non-empty — the checker requires
-  the section to have content, so with nothing open write exactly `- none`
-  under the heading rather than leaving it blank.
+- `loom-design` is not installed → read `references/no-intent-interview.md`
+  and follow it.
 
 <!-- gate: write-plan.no-plan-without-confirmed-intent -->
 **No plan is written without a confirmed intent.** If `status:` is not
@@ -146,40 +152,7 @@ the user named a change, match the slug.
 "provisionally" and you do not confirm on the user's behalf. The checker
 enforces the same rule at step 4 (`intake.confirmed`), so a plan written
 early cannot be shipped anyway.
-When this station performs code-only intake, use the same capture boundary:
-ask only for missing required-field content, never a fixed intake question
-quota; existing decision points remain unchanged.
-Problem holds present pain, who it affects, and the consequence, with no
-diagnosis or fix; Proposed outcome holds the wanted capability;
-Acceptance holds each observable delivery outcome, not value, complete
-scenarios, UI placement, state transitions, test steps, or implementation;
-Constraints are already fixed; product Value case gives beneficiary, urgency,
-and GO/NO-GO, while an engineering intent omits obvious value;
-Out of scope names excluded capability; Open questions contains only unresolved
-outcome or scope choices. After drafting, make one author pass: **Keep,
-neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
-plan, and unsupported detail is deleted. This pass creates no field, ID,
-requirement, scenario, product behaviour, or review loop.
-Publication and second-reviewer authorisation never enter Problem, Proposed
-outcome, Acceptance, or Out of scope. Keep publication authorisation in the
-intent's `publication:` frontmatter line. The sole Constraints exception is
-`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
-skipped; it records the selected family, not the user's quoted request. Keep
-that verbatim quote, target and final `selected_executor` in JSON
-`authorization_source` at dispatch, and preserve only actual questions for
-this plan's `## Questions asked` section.
-Visible effects with an unknown surface and no spec require
-`needs-design: yes` with a surface-neutral reason; internal files alone do not.
-Complete the code-only altitude pass before confirmation. A material outcome
-or scope fork needs an explicit answer; accepting the restatement is
-insufficient; reopen means move it to Open questions, stop confirmation, and
-the intent must remain `open`.
 <!-- /gate -->
-
-Any intent section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
-numbered list, diagrams stay at intent altitude (no UI reactions or state
-transitions), a product Problem holds no identifiers (Mermaid node ids
-included), and chat shows text tables or text diagrams, not Mermaid.
 
 ## Step 2 — Standing documents
 
@@ -206,8 +179,8 @@ installed, hand this to its `product-principles` tool instead.
 
 ## Step 3 — Decision point ①: restate and confirm
 
-When `status:` is already `confirmed`, skip confirmation: branch first
-(Step 6), then run
+When `status:` is already `confirmed`, skip confirmation:
+**Branch before the first commit**, then run
 `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intent docs/loom/intent/<change-id>.md` until it exits 0.
 Fix `needs-design:` with one new commit quoting the changed line verbatim
 in its body.
@@ -227,89 +200,33 @@ Read the intent's `needs-design:` line. It is `yes` when either holds:
 - **(b)** the behaviour is multi-state or multi-object, and there is no
   spec for it.
 
-Otherwise it is `no`. The same rule applies to every `kind`; product and
-engineering are not judged differently here.
+Otherwise it is `no`. The same rule applies to every `kind`.
 
 You do not get the last word on `no`: the checker recomputes it
 (`intent.needs-design-recompute`) against this repo's declared
 interface-surface globs, and a diff that touches one of them while the
 intent says `no` is blocked.
 
-**`no`** — go to step 5. The plan carries the Current State Evidence
-section instead of a spec.
+**`no`** — go to step 5.
 
-When a task's rationale outgrows its Risk line, write
-`docs/loom/<change-id>/spec.md` from `contract/templates/spec-minimal.md` —
-Requirements one per Acceptance line, Design decision one line per
-agent-decided fork, Alternatives considered, Current state evidence, UI
-flows (N/A unless a carried detail is visible) — carrying the template's five
-sections and leaving the `confirmed-behavior:` line to product changes.
-Decision point ② stays product-only. Declare `pre-build-review: required|not-required — <reason>`
-using the risk classes below; only a required spec gets a pre-build review.
+When a task's rationale outgrows its Risk line, a carried-details list
+is non-empty, or this station already wrote `docs/loom/<change-id>/spec.md`,
+read `references/self-written-spec.md` and follow it.
 
-A non-empty carried-details list — from `capture-intent`'s hand-off or your
-own intake — forces that spec even when every Risk line fits; record each
-item per the `Record each carried detail` bullet below. An empty list forces no spec.
-
-**`yes`, and `docs/loom/<change-id>/spec.md` already exists** — go to the
-intake check below.
+**`yes`, and `docs/loom/<change-id>/spec.md` already exists** — when this
+station wrote that spec (`loom-design` absent), read
+`references/self-written-spec.md` and finish what it still requires; then go
+to the intake check below.
 
 **`yes`, spec missing, `loom-design` installed** — hand the change to its
 `write-spec` station and stop.
 
-**`yes`, spec missing, `loom-design` not installed** — you write a minimal
-spec yourself, from `contract/templates/spec-minimal.md`:
-
-- Set `intent: <change-id>@<confirmation-sha>` and agent-decide
-  `pre-build-review: required|not-required — <reason>`; require review for
-  security/privacy, irreversible data, public contracts, cross-system
-  architecture, or materially ambiguous requirements.
-- Map each Acceptance line one-to-one to `REQ-<n> — <name> → Acceptance #<n>`.
-- Fill UI flows (action and response, or `N/A`), Design decision,
-  Alternatives considered, and path-anchored Forward/Reverse/Error/Data/Boundary
-  evidence. Do not show those internal sections to the user.
-- UI flows form: a short flow is `<action> → <reaction>` lines; several
-  parallel cases on one surface, a table `case | what the user does | what
-  they see`; states or paths that branch or go back and forth, a Mermaid
-  `stateDiagram-v2` or `flowchart`.
-- Record each carried detail as a UI flows line when visible, else as a clause
-  on a Requirement line — the two parts decision point ② shows; only an
-  engineering change may put one on a Design decision line instead. That
-  clause goes on the Requirement line of the Acceptance line the detail
-  serves, never a new REQ. An agent proposal the user did not agree to is not
-  recorded.
-
-Print one line for the user: installing `loom-design` gets them a fuller
-spec than this one. For `pre-build-review: required`, dispatch one
-fresh-context `loom-code:reviewer` with lens `spec+adversarial`, the spec
-commit's parent (`<spec-commit>^`) as `reviewed_sha`, and the intent and
-spec as ground truth; it must pass before planning, with no acceptance testing, adversary, or
-`finalize-review`. On NEEDS_REVISION, close each finding, commit, and send
-only those fixes back to that reviewer. For `not-required`, proceed without a
-formal spec review; `intake.spec-ready` blocks a spec with no declaration.
-
-Running ② on a product spec you wrote: when a flow has parallel cases or
-branches, lead with a table or a text (ASCII) diagram, then the per-case
-sentences; never put Mermaid in this message — a terminal shows it as raw
-code.
-
-<!-- gate: write-plan.product-spec-needs-confirmed-behavior -->
-**A product spec needs `confirmed-behavior:` before it becomes a plan.**
-When `kind: product`, decision point ② belongs to whoever wrote the spec.
-Present the Requirements, UI flows and product
-one-way doors in plain words — "you type ___ and you see ___; when ___
-happens it will ___" — and nothing from `## Design decision` down, ever.
-Doors asked at ① are not asked again at ②. On
-"yes", write `confirmed-behavior: <date> @<spec sha7>` into the spec
-frontmatter, where `<spec sha7>` is the first seven characters of
-`git hash-object docs/loom/<change-id>/spec.md` after the spec's last
-edit, pinning the text the user approved. On a correction, rewrite,
-present again, and recompute the hash. Engineering changes skip this.
+**`yes`, spec missing, `loom-design` not installed** — read
+`references/self-written-spec.md` and follow it.
 
 ### The intake check — both branches, every time
 
-Whichever branch above you took, `no` included, run this before writing a
-plan:
+Run this before writing a plan:
 
 ```
 "${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id>
@@ -449,21 +366,7 @@ obvious it looks.
 
 ## Step 6 — Commit and hand off
 
-**Branch first, if still on trunk.** Otherwise the plan lands there and later
-checkpoints measure their delta from the plan commit rather than the branch base:
-
-```
-git switch -c <type>/<change-id>
-```
-
-For example `feat/2026-09-14-push-reason`. Pick `<type>` from `feat`,
-`fix`, `docs`, `refactor`, `test`, `chore` or `ci`; use it in the PR title,
-which becomes the trunk squash commit. Task commits keep their implementer
-contract type; `docs(loom):` intent and plan commits keep their fixed form.
-
-An intent on trunk stays; plan and later work use the branch.
-
-Commit the plan with the message `docs(loom): plan <change-id>`. Then hand
+Commit the plan (**Branch before the first commit**) with the message `docs(loom): plan <change-id>`. Then hand
 the change to the build station — `loom-code:build` — which dispatches one
 implementer per task, runs task and integration tests, and calls the
 closing-review station once at branch end.

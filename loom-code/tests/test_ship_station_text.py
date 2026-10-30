@@ -10,9 +10,45 @@ import ast
 import re
 from pathlib import Path
 
-from prose_pin import has_negation
+from prose_pin import has_negation, split_sentences
 
 SHIP = Path(__file__).resolve().parents[1] / "skills" / "ship" / "SKILL.md"
+
+
+def _land_sentences() -> list[str]:
+    text = SHIP.read_text(encoding="utf-8")
+    section = re.search(r"^## 5\. Land after acceptance$(.*?)^## ", text, re.M | re.S)
+    assert section, "ship §5 heading"
+    return split_sentences(" ".join(section.group(1).split()))
+
+
+# ship-reports-trunk-not-updated-and-asks (A3 positive)
+def test_ship_reports_trunk_not_updated_to_the_maintainer() -> None:
+    assert any(
+        "`trunk not updated`" in s and "report" in s and "maintainer" in s
+        and not has_negation(s.replace("`trunk not updated`", ""))
+        for s in _land_sentences()
+    ), "§5 must tell the agent to report land's `trunk not updated` line"
+
+
+# acceptance-is-not-permission-to-discard (A3 negative)
+def test_merge_acceptance_is_not_permission_to_discard_trunk() -> None:
+    rule = [s for s in _land_sentences() if "discard" in s and "trunk" in s]
+    assert rule, "§5 must carry the never-discard-trunk-commits rule"
+    for s in rule:
+        assert has_negation(s), f"affirmative discard instruction: {s}"
+    # The prohibition must be the clause's own, not a negation elsewhere in
+    # the sentence ("without", "is not that permission").
+    assert any(re.search(r"\bNever discard local trunk commits\b", s) for s in rule), rule
+    assert any(
+        "reset" in s and "branch -f" in s and "explicit yes" in s
+        and "③" in s and "not that permission" in s
+        for s in rule
+    ), "the rule names reset/branch -f and denies that acceptance at ③ is permission"
+    assert any(
+        "uncommitted" in s and "stash" in s and "restore" in s and "explicit yes" in s
+        for s in rule
+    ), "the rule also covers uncommitted changes in the trunk checkout"
 
 
 # ship-text-separates-authorization-from-acceptance
@@ -29,6 +65,8 @@ def test_ship_text_has_no_direct_gh_pr_merge() -> None:
     for sentence in re.split(r"(?<=[.!?])\s+", flat):
         if "gh pr merge" in sentence:
             assert has_negation(sentence), f"affirmative merge instruction: {sentence}"
+            clause = next(c for c in re.split(r"[:;,]", sentence) if "gh pr merge" in c)
+            assert has_negation(clause), f"`gh pr merge` clause is affirmative: {sentence}"
 
 
 # ship-text-keeps-no-worktree-instruction (A11 negative)

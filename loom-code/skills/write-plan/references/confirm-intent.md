@@ -6,6 +6,42 @@ numbers are that SKILL.md's. `${CLAUDE_PLUGIN_ROOT}` is substituted by Claude
 Code; on any other host substitute `<loom-code>`, the directory three levels
 above this file.
 
+<!-- gate: write-plan.no-plan-without-confirmed-intent -->
+When this station performs code-only intake, use the same capture boundary:
+ask only for missing required-field content, never a fixed intake question
+quota; existing decision points remain unchanged.
+Problem holds present pain, who it affects, and the consequence, with no
+diagnosis or fix; Proposed outcome holds the wanted capability;
+Acceptance holds each observable delivery outcome, not value, complete
+scenarios, UI placement, state transitions, test steps, or implementation;
+Constraints are already fixed; product Value case gives beneficiary, urgency,
+and GO/NO-GO, while an engineering intent omits obvious value;
+Out of scope names excluded capability; Open questions contains only unresolved
+outcome or scope choices. After drafting, make one author pass: **Keep,
+neutralize, defer, reopen, or delete**. Behaviour defers to spec, method to
+plan, and unsupported detail is deleted. This pass creates no field, ID,
+requirement, scenario, product behaviour, or review loop.
+Publication and second-reviewer authorisation never enter Problem, Proposed
+outcome, Acceptance, or Out of scope. Keep publication authorisation in the
+intent's `publication:` frontmatter line. The sole Constraints exception is
+`- user-decided — second-vendor selection-confirmed: <vendor>` when plan is
+skipped; it records the selected family, not the user's quoted request. Keep
+that verbatim quote, target and final `selected_executor` in JSON
+`authorization_source` at dispatch, and preserve only actual questions for
+this plan's `## Questions asked` section.
+Visible effects with an unknown surface and no spec require
+`needs-design: yes` with a surface-neutral reason; internal files alone do not.
+Complete the code-only altitude pass before confirmation. A material outcome
+or scope fork needs an explicit answer; accepting the restatement is
+insufficient; reopen means move it to Open questions, stop confirmation, and
+the intent must remain `open`.
+<!-- /gate -->
+
+Any intent section may use a Markdown table or a Mermaid `flowchart`; Acceptance stays a
+numbered list, diagrams stay at intent altitude (no UI reactions or state
+transitions), a product Problem holds no identifiers (Mermaid node ids
+included), and chat shows text tables or text diagrams, not Mermaid.
+
 Compose **one message**. Everything below goes in it; you do not stop
 twice.
 
@@ -111,7 +147,8 @@ of your own. It never enters the intent file.
    restatement explicitly authorizes automatic publication, also write
    `publication: automatic — authorized <date> by <name>`; never derive it
    from status or prose.
-2. Commit it. The message is `docs(loom): intent <change-id> confirmed`,
+2. Commit it on the change branch, branching first per SKILL.md's
+   **Branch before the first commit** rule. The message is `docs(loom): intent <change-id> confirmed`,
    and its body **must contain the `needs-design:` line verbatim** — the
    checker compares the two strings character for character.
 3. Verify: `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intent docs/loom/intent/<change-id>.md`
