@@ -45,6 +45,11 @@ charter: 1.1
 - Test: A3 boundary: projection-of-empty-diagram; A4 negative: malformed-xml-named; A7 boundary: single-backend-registry
 - Risk: tests need a fixture .drawio; default is a two-node fixture committed under the test folder (agent-decided)
 
+**W0-09 Graduate defect-catching adversarial probes**  after: W0-08  acceptance: 3, 4
+- Files: loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py; source programs: docs/loom/2026-10-29-shared-diagram-tool/evidence/probes/test_reference_link_invalid_diagram.py, docs/loom/2026-10-29-shared-diagram-tool/evidence/probes/test_parenthesized_link_invalid_diagram.py
+- Test: A3 negative: reference-style link to malformed diagram fails; A4 negative: balanced-parenthesis inline link to malformed diagram fails in the permanent package suite
+- Risk: both probes caught real defects, so graduate their cases before finalization while preserving the adversarial execution evidence required by closing review (agent-decided)
+
 ## Simplicity check
 - One shared tool rather than per-station copies — taken
 - Backend registry driven by directory listing rather than a framework — taken

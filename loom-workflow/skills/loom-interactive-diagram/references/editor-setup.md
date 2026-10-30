@@ -45,8 +45,8 @@ an external change displayed `Desktop Auto` without a click. Autosave was
 restored to off after the check.
 
 Separately on 2026-10-30, a fresh source checkout from `git archive HEAD`
-was unpacked under `/private/tmp/loom-diagram-clean-check`. From
-`docs/loom/2026-10-29-shared-diagram-tool/`, the documented command created
+was unpacked into a temporary directory. From the change directory containing
+`spec.md`, the documented command created
 `clean-check.drawio`. With the already installed VS Code Draw.io Integration
 1.17.0, an external `Clean Agent` node appeared in the open editor without
 reopening it. The node was changed there to `Clean User` and saved; the disk
