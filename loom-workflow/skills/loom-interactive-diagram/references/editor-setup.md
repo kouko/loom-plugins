@@ -29,7 +29,7 @@ Use a local Git checkout. Diagram files live in
 3. Disable autosave and repeat. Observe the file modified prompt and click
    **synchronize**; verify the open diagram then shows the new content.
 4. Edit a node manually, save, and have the agent read back the exact change.
-   Regenerate and check the projection before committing.
+   Run `diagram.py project` to regenerate the projection, then `diagram.py check`.
 
 Do not write to the same diagram concurrently in two editors: the final save
 can replace the other editor's work.

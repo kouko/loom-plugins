@@ -45,7 +45,7 @@ def backend_for(diagram, registry):
 
 
 def markdown_targets(text):
-    """Yield inline and explicit reference-link destinations from a spec."""
+    """Yield inline, explicit, and shortcut reference-link destinations."""
     definitions = {
         label.casefold(): target.strip("<>")
         for label, target in re.findall(
@@ -61,10 +61,21 @@ def markdown_targets(text):
             elif text[index] == ")":
                 depth -= 1
                 if depth == 0:
-                    yield text[start:index].strip("<>")
+                    destination = text[start:index].strip()
+                    if destination.startswith("<"):
+                        destination = destination[1:destination.find(">")] if ">" in destination else ""
+                    else:
+                        destination = destination.split(maxsplit=1)[0] if destination else ""
+                    yield destination
                     break
     for match in re.finditer(r"\[([^\]\n]+)\]\[([^\]\n]*)\]", text):
         label = (match.group(2) or match.group(1)).casefold()
+        if label in definitions:
+            yield definitions[label]
+    for match in re.finditer(r"\[([^\]\n]+)\](?![\[(])", text):
+        if text[match.end():].startswith(":") and not text[text.rfind("\n", 0, match.start()) + 1:match.start()].strip():
+            continue
+        label = match.group(1).casefold()
         if label in definitions:
             yield definitions[label]
 

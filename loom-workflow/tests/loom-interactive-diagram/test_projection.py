@@ -35,3 +35,18 @@ def test_empty_projection_has_both_sections(tmp_path):
     path = tmp_path / "empty.drawio"
     backend.generate(path)
     assert backend.project(path) == "backend: drawio\n# Nodes\n- none\n# Edges\n- none"
+
+
+def test_wrapped_cell_labels_are_projected_for_nodes_and_edges(tmp_path):
+    backend = load("drawio")
+    path = tmp_path / "wrapped.drawio"
+    backend.generate(path)
+    path.write_text(path.read_text().replace(
+        "</root>",
+        '<object label="Visible node" id="n1"><mxCell vertex="1" parent="1"/></object>'
+        '<object label="Visible edge" id="e1"><mxCell edge="1" parent="1" source="n1" target="n1"/></object>'
+        '</root>',
+    ))
+    assert backend.project(path) == (
+        "backend: drawio\n# Nodes\n- n1: Visible node\n# Edges\n- e1: n1 -> n1 | Visible edge"
+    )

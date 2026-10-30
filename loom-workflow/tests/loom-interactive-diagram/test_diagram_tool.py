@@ -106,6 +106,10 @@ def test_spec_link_is_resolved_from_spec_location(tmp_path):
     [
         ("referenced", "See [diagram][flow].\n\n[flow]: shared/referenced.drawio\n"),
         ("nested(test)", "See [diagram](shared/nested(test).drawio).\n"),
+        ("titled", 'See [diagram](shared/titled.drawio "Editable diagram").\n'),
+        ("angle", 'See [diagram](<shared/angle.drawio> "Editable diagram").\n'),
+        ("shortcut", "See [flow].\n\n[flow]: shared/shortcut.drawio\n"),
+        ("collapsed", "See [flow][].\n\n[flow]: shared/collapsed.drawio\n"),
     ],
 )
 def test_reference_and_balanced_inline_links_are_checked(tmp_path, name, link):
@@ -122,6 +126,11 @@ def test_reference_and_balanced_inline_links_are_checked(tmp_path, name, link):
     result = run_tool(tmp_path, "check")
     assert result.returncode != 0
     assert str(projection) in result.stderr
+    projection.write_text((tmp_path / "diagrams/source.projection.md").read_text())
+    diagram.write_text("<mxfile><diagram>")
+    result = run_tool(tmp_path, "check")
+    assert result.returncode != 0
+    assert str(diagram) in result.stderr
 
 
 def test_station_documents_point_to_shared_rules():

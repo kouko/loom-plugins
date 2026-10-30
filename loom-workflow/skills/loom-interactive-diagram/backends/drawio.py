@@ -55,7 +55,12 @@ def _cells(path):
         graph_root = model.find("root")
         if graph_root is None:
             raise ValueError(f"{path}: missing graph root")
+        parents = {child: parent for parent in graph_root.iter() for child in parent}
         cells = list(graph_root.iter("mxCell"))
+        for cell in cells:
+            wrapper = parents.get(cell)
+            if not cell.get("id") and wrapper is not None and wrapper.tag == "object":
+                cell.set("id", wrapper.get("id", ""))
         ids = [cell.get("id") for cell in cells]
         if not all(ids) or len(ids) != len(set(ids)) or "0" not in ids or "1" not in ids:
             raise ValueError(f"{path}: invalid, duplicate or missing cell IDs 0/1")
@@ -68,7 +73,11 @@ def _cells(path):
                 source, target = cell.get("source"), cell.get("target")
                 if not source or not target or source not in known or target not in known:
                     raise ValueError(f"{path}: edge {cell.get('id')} has invalid endpoints")
-            result.append(cell)
+            wrapper = parents.get(cell)
+            label = cell.get("value", "")
+            if wrapper is not None and wrapper.tag == "object":
+                label = wrapper.get("label", wrapper.get("value", label))
+            result.append((cell, label))
     return result
 
 
@@ -81,9 +90,9 @@ def project(path):
     lines = ["backend: drawio", "# Nodes", "# Edges"]
     nodes = []
     edges = []
-    for cell in cells:
+    for cell, label in cells:
         if cell.get("vertex") == "1":
-            nodes.append(f"- {cell.get('id')}: {unescape(cell.get('value', ''))}")
+            nodes.append(f"- {cell.get('id')}: {unescape(label)}")
         elif cell.get("edge") == "1":
-            edges.append(f"- {cell.get('id')}: {cell.get('source')} -> {cell.get('target')} | {unescape(cell.get('value', ''))}")
+            edges.append(f"- {cell.get('id')}: {cell.get('source')} -> {cell.get('target')} | {unescape(label)}")
     return "\n".join([lines[0], lines[1], *(sorted(nodes) or ["- none"]), lines[2], *(sorted(edges) or ["- none"])])

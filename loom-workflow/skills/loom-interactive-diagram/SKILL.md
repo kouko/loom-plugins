@@ -28,8 +28,8 @@ selection is recorded in the projection header. See `references/backends.md`
 for the callable contract and `references/projection.md` for the text format.
 
 After the user edits and saves a diagram, read the file from disk and restate
-what changed. Run `project` to regenerate its projection, then `check` before
-committing.
+what changed. The manual procedure is `project` to regenerate its projection,
+then `check` to validate it.
 For VS Code and desktop setup and the acceptance procedure, follow
 `references/editor-setup.md`. Do not claim live synchronization from a static
 file check.
