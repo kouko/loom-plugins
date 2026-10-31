@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-29-shared-diagram-tool",
-  "content_digest": "742242a0dc8e3e7910ea840481107d09c3a58852",
+  "content_digest": "a7861b84722ff284895fe79da9a68c154e63e21a",
   "executions": [
     {
       "kind": "package-tests",
@@ -34,19 +34,19 @@
   ],
   "verdicts": [
     {
-      "reviewer": "/root/diagram_wait_code_review",
+      "reviewer": "/root/diagram_description_code_review",
       "vendor": "openai",
       "model": "host-inherited-unverified",
       "lens": "code",
       "verdict": "PASS",
-      "reviewed_sha": "dbcf88c1d06d97b4fb3a61f0a66336c3d445b562",
-      "review_target_sha": "61834d132f114c5c611e0b5ed09c9d96bc6129c7",
+      "reviewed_sha": "a505b60583794567010507018a3921713f681370",
+      "review_target_sha": "f991be785470ad477c26b1831d68cb24f903bb14",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
         "correctness": "PASS",
         "naming": "PASS",
-        "tests": "PASS_WITH_NOTES — unchanged from Round 2: the original A9/A10 waiter and its tests landed in one commit, so committed RED evidence remains unavailable",
+        "tests": "PASS_WITH_NOTES — all 225 changed-file tests passed; the earlier A9/A10 waiter and its tests landed together, so committed RED evidence for that behavior remains unavailable",
         "refactoring": "PASS",
         "cross-task-coherence": "PASS",
         "external-surface-grounding": "PASS",
@@ -57,30 +57,33 @@
       },
       "findings": [],
       "notes": [
-        "The new budget-exception line is in loom-code 3.53.0, which R3 reads; its ID and test path match the registered tool.",
-        "The R3 check reported 145 to 147 net mechanisms and all clear."
+        "The focused description assertion passes at HEAD; the pre-fix description fails its positive phrases and retains the forbidden phrase.",
+        "This verifies discovery wording, not actual host skill selection; the acceptance report identifies that limit.",
+        "Git status was clean and git diff --check passed."
       ]
     },
     {
-      "reviewer": "/root/diagram_wait_skill_review",
+      "reviewer": "/root/diagram_description_skill_review",
       "vendor": "openai",
       "model": "host-inherited-unverified",
-      "lens": "docs",
-      "verdict": "PASS_WITH_NOTES",
-      "reviewed_sha": "dbcf88c1d06d97b4fb3a61f0a66336c3d445b562",
-      "review_target_sha": "61834d132f114c5c611e0b5ed09c9d96bc6129c7",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "a505b60583794567010507018a3921713f681370",
+      "review_target_sha": "f991be785470ad477c26b1831d68cb24f903bb14",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
         "inconsistency": "PASS",
-        "incorrect-fact": "PASS_WITH_NOTES — the entry matches the checker pattern, but this reviewer could not independently run the checker in the sandbox",
+        "incorrect-fact": "PASS",
         "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
         "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "The 3.53.0 entry documents the new shared skill and contract tool; no touched-surface defect was found.",
-        "The reviewer could not run the checker independently because system Python lacks PyYAML and the offline uv cache lacked a locked dependency."
+        "The description covers initial creation and saved-edit readback; draw.io remains the default among registered selectable formats.",
+        "Actual natural-language host skill selection remains untested, as the acceptance evidence states.",
+        "The focused test could not be rerun by this reviewer: Python lacks pytest and isolated uv could not reach PyPI; direct source checks and backend-list command passed."
       ]
     }
   ],
