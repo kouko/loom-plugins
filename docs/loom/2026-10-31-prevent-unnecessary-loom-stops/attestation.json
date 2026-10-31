@@ -1,0 +1,77 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-31-prevent-unnecessary-loom-stops",
+  "content_digest": "0df636658bb6b1249c9bc242390a0ba41078c191",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_questionrule_negation_rejected.py",
+      "artifact": "loom-code/tests/test_questionrule_negation_rejected.py",
+      "result": "pass",
+      "command_digest": "e18769f6da1f791f43ae294cbe1f7f69f2bd66c7cf1e06c90c9c138ea06cc8bf"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-skill-overprompting",
+      "vendor": "openai",
+      "model": "host-inherited-unobservable",
+      "lens": "skill",
+      "reviewed_sha": "0edaff6f62a10cd0048203a8c8d8149d6d42fbc6",
+      "review_target_sha": "966e41de41511c2e04f4b7f49d93aea74d619666",
+      "verdict": "PASS",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous late-choice finding fixed",
+        "Previous README nit fixed in all three languages",
+        "Independent acceptance results remain partly without live Claude Code execution"
+      ]
+    },
+    {
+      "reviewer": "reviewer-code-overprompting",
+      "vendor": "openai",
+      "model": "host-inherited-unobservable",
+      "lens": "code",
+      "reviewed_sha": "0edaff6f62a10cd0048203a8c8d8149d6d42fbc6",
+      "review_target_sha": "966e41de41511c2e04f4b7f49d93aea74d619666",
+      "verdict": "PASS",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous late-choice and false-positive-test findings fixed",
+        "Changed tests passed under mixed-root collection"
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
