@@ -6,7 +6,7 @@ charter: 1.1
 ## Task DAG
 
 **W0-01 Keep diagram writes inside the selected change**  after: none  acceptance: 1, 2, 3, 4
-- Files: loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py, loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py, loom-workflow/skills/loom-interactive-diagram/SKILL.md
+- Files: loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py, loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py, loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py, loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py, loom-workflow/skills/loom-interactive-diagram/SKILL.md
 - Test: A1 positive: root-explicit-create; boundary: no-root-diagrams. A2 positive: change-cwd-create; negative: mismatched-change-id. A3 positive: reject-external-project; boundary: symlink-escape. A4 positive: external-read-only-check; boundary: preserve-existing-root-diagrams.
 - Risk: Existing tests assume arbitrary cwd; preserve every linked-diagram check while replacing their fixtures. Follow spec REQ-1 through REQ-4; agent-decided: explicit id from root avoids choosing among concurrent changes.
 
