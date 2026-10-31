@@ -12,6 +12,10 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.17.0] — 2026-10-30 — point design discussions to shared diagrams
+
+- `write-spec` and `architecture-design` reference the shared editable diagram tool without duplicating its file rules.
+
 ## [2.16.0] — 2026-10-29 — intent and spec commits land only on the change branch
 
 - `capture-intent` creates or reuses the change branch (`git switch -c <type>/<change-id>`) before the confirmation commit: reuse this change's branch, create it when on the trunk, on the trunk switch to an already-existing `<type>/<change-id>` with `git switch <type>/<change-id>` (never re-created, `-C`, or reset), work in the other worktree when one has it checked out, and on an unrelated branch or detached HEAD commit nothing there and never `git switch`: open a new worktree (`git worktree add <path> <type>/<change-id>` when the branch exists, else `git worktree add -b <type>/<change-id> <path> <trunk>`) and continue, preserving the original checkout's work; on any move to another worktree, existing or new, every uncommitted file this change produced (the intent draft, a `PRINCIPLES.md` edit) moves there, to be committed on the change branch. A `PRINCIPLES.md` edit is carried as its diff; on a conflict the agent stops and asks the maintainer. The allowance for committing the intent on the trunk is removed.

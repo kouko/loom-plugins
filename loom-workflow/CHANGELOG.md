@@ -4,6 +4,17 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.17.1] — 2026-10-31 — active-turn diagram save detection
+
+- Add a bounded content poll for one diagram, so an active discussion can read a stable saved edit without another message. Unchanged content and unrelated files do not trigger it; timeout and file errors are explicit.
+- Clarify the shared diagram skill's discovery text: draw.io is the default format, and the agent can read back edits saved from an external editor.
+
+## [5.17.0] — 2026-10-30 — shared editable diagram tool
+
+- Add `loom-interactive-diagram` with draw.io and demo JSON backends, a text projection check, and references from two design stations.
+- Document the editor collaboration procedure. A 2026-10-30 temporary-fixture check observed live updates and saved edit readback in VS Code Draw.io Integration 1.17.0, plus prompted sync with Autosave off and automatic sync with Autosave on in draw.io Desktop 32.6.1. The VS Code loop also passed from a fresh `git archive HEAD` source checkout using already installed prerequisites; a fresh OS or extension installation was not tested.
+- budget-exception: loom-interactive-diagram — adds one shared skill and one contract tool; regression eval `loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py`.
+
 ## [5.16.1] — 2026-10-30 — Decision Map Python module boundaries
 
 - Decision Map reading, validation and delivery now call their owning Python modules directly. The existing commands, hooks, file formats and results remain unchanged.

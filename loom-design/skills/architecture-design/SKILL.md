@@ -16,6 +16,8 @@ user — read what exists, propose options with trade-offs, let the user pick
 decisions and the rules only**, write a guard test for every rule that can
 be checked mechanically, restate them, and — on "yes" — write the
 `ratified-by:` line and install the ratified document and guards.
+For a shared editable diagram during discussion, use
+`loom-workflow:loom-interactive-diagram`.
 
 ## Step 1 — When to run
 
