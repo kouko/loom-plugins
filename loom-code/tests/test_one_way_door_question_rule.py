@@ -1,6 +1,7 @@
 """Decision guidance asks for user-owned outcomes and consent, not technical risk."""
 
 import re
+import sys
 from pathlib import Path
 
 import pytest
@@ -66,7 +67,7 @@ def test_three_tradeoffs_reversed_rule_is_rejected(tmp_path: Path, monkeypatch: 
         ),
         encoding="utf-8",
     )
-    monkeypatch.setattr(__import__(__name__), "DOOR", mutated)
+    monkeypatch.setattr(sys.modules[__name__], "DOOR", mutated)
     with pytest.raises(AssertionError):
         test_three_tradeoffs_alone_do_not_ask()
 
