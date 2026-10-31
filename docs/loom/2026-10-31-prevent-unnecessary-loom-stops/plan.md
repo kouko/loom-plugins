@@ -19,9 +19,9 @@ Wave 1 — adjust the existing decision and hand-off guidance; keep each policy 
 - Risk: Agent-decided: retain risk classes as consequence flags, but ask only for unresolved user outcomes or authorization; preserve PRINCIPLES.md non-negotiables 1 and 5.
 
 **W1-02 Align the two loom-design decision points with the narrowed question rule**  after: W1-01  acceptance: 3, 4, 5
-- Files: loom-design/skills/capture-intent/SKILL.md, loom-design/skills/write-spec/SKILL.md, loom-design/tests/spec/test_capture_intent_contract.py, loom-design/tests/spec/test_write_spec_contract.py, loom-code/tests/test_one_way_door_copies.py
+- Files: loom-design/skills/capture-intent/SKILL.md, loom-design/skills/write-spec/SKILL.md, loom-design/skills/write-spec/references/ui-flows.md, loom-design/skills/write-spec/references/spec-forms.md, loom-design/tests/spec/test_capture_intent_contract.py, loom-design/tests/spec/test_write_spec_contract.py, loom-code/tests/test_one_way_door_copies.py
 - Test: A3 positive: measured-choice-is-agent-decided; boundary: hard-to-swap-alone-does-not-ask. A4 positive: unresolved-consequence-asked; negative: pinned-choice-not-asked. A5 positive: consequence-disclosed; boundary: existing-data-action-needs-consent.
-- Risk: Existing tests pin the copied class titles and gates; preserve explicit consent for money, data egress, and irreversible existing-state actions while removing automatic option selection.
+- Risk: Existing tests pin the copied class titles and gates; preserve explicit consent while removing automatic option selection, including stale wording in the two write-spec references.
 
 **W1-03 Execute the next Closing Review action after the required evidence arrives**  after: none  acceptance: 1, 2, 5
 - Files: loom-code/skills/closing-review/SKILL.md, loom-code/tests/test_review_convergence_contract.py
