@@ -11,18 +11,20 @@ Use this tool in any station when a diagram should persist in the change's
 Git history and be editable by the user. The conversation carries the file
 path and a text projection; the user opens the file in an editor.
 
-Work from `docs/loom/<change-id>/`, or pass `--change-id <change-id>` when
-running `new` or `project` from the repository root. The id must name an
-existing `docs/loom/intent/<change-id>.md`; an explicit id inside a change
-directory must match that directory. Generated files go to
+Work from `docs/loom/<change-id>/` for the commands below. If starting at the
+repository root, create the diagram with `new <name> --change-id <change-id>`
+(or `new <backend-id> <name> --change-id <change-id>`), then run
+`cd docs/loom/<change-id>/` before using any relative diagram path. The id must
+name an existing `docs/loom/intent/<change-id>.md`; an explicit id inside a
+change directory must match that directory. Generated files go to
 `docs/loom/<change-id>/diagrams/`. Run
 `python3 <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py`
 with one of these commands:
 
 - `list-backends`: show available formats.
-- `new <name> [--change-id <id>]`: create an empty draw.io diagram and matching projection.
-- `new <backend-id> <name> [--change-id <id>]`: create one with a selected format.
-- `project [diagrams/<name>.<ext>] [--change-id <id>]`: regenerate a managed
+- `new <name>`: create an empty draw.io diagram and matching projection.
+- `new <backend-id> <name>`: create one with a selected format.
+- `project [diagrams/<name>.<ext>]`: regenerate a managed
   projection after an edit. The path must stay inside the selected change's
   `diagrams/` directory, including after resolving symlinks.
 - `check [<diagram-path>]`: validate one diagram or every registered diagram
@@ -34,8 +36,10 @@ The default backend is `drawio`. A backend is one file in `backends/`; the
 selection is recorded in the projection header. See `references/backends.md`
 for the callable contract and `references/projection.md` for the text format.
 
-When the user is editing during the current conversation turn, tell them which
-diagram you are waiting for and keep the turn active. After your last write,
+Run the watcher, `project`, and `check` commands below from
+`docs/loom/<change-id>/`. When the user is editing during the current
+conversation turn, tell them which diagram you are waiting for and keep the
+turn active. After your last write,
 run `python3 <plugin-root>/skills/loom-interactive-diagram/scripts/wait_for_save.py
 diagrams/<name>.<ext> --timeout 120` in a live tool session that yields output
 while the process keeps running; retain its session identifier. Wait for
