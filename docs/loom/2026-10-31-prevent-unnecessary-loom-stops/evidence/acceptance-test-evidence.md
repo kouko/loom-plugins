@@ -76,3 +76,34 @@ Tried on 2026-10-31, in a clean copy of the project at `a24ab73d`.
 - How I tried it: Re-read the consequence and existing-data consent examples, all three README copies, changed write-spec late-choice guidance, and Closing Review's existing consent/stop language; ran both focused test groups above.
 - What came back: The 119 cases in the runner-aligned grouping passed. The README copies disclose material effects and require explicit consent for existing-data change or transfer. `loom-design/skills/write-spec/SKILL.md:246-254` preserves consequence disclosure and prior authorization before a committing action. `loom-code/skills/write-plan/references/one-way-door.md:56-73,83-87` preserves consequence and consent wording. The fix did not modify Closing Review's legitimate stop conditions or fresh authorization for repeated outside review. Real user-visible presentation remains unobserved.
 - Evidence: The two focused test outputs and inspected guidance above.
+
+## Re-run on 2026-10-31, at `ce451484`
+
+- Clean copy: `git worktree add --detach /private/tmp/loom-acceptance-r3.Z3N3UU/checkout ce451484c8343784d57e2ad13d0deae0d93378f1` returned `HEAD is now at ce451484`; `git status --short --branch` returned `## HEAD (no branch)` and no changed files.
+- Setup repeated: `agy plugin validate ./loom-code` returned `[ok]`, `skills: 7 processed`, `agents: 4 processed`, `hooks: 1 processed`; `agy plugin validate ./loom-design` returned `[ok]`, `skills: 6 processed`.
+- Fix range: `git diff --name-status 36170136..ce451484c8343784d57e2ad13d0deae0d93378f1` changed only `loom-code/tests/test_one_way_door_question_rule.py` and the plan. The test now uses `sys.modules[__name__]` instead of `__import__(__name__)` at line 70. No station guidance, README, or other test changed.
+- Repeated the formerly failing mixed-root command: `pytest -q loom-code/tests/test_one_way_door_question_rule.py loom-code/tests/test_one_way_door_copies.py loom-code/tests/test_questionrule_negation_rejected.py loom-code/tests/test_adversarial_product_one_way_door_without_spec.py loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py loom-code/tests/test_write_plan_shape_text.py loom-design/tests/spec/test_adversarial_write_spec_no_reask_unpinned_sentences.py loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_write_spec_contract.py` returned `119 passed in 0.34s`. The previous module-lookup failure did not recur.
+- The package-runner-aligned focused groups also passed separately: the six loom-code files in the command above returned `64 passed in 0.34s`; the three loom-design files returned `55 passed in 0.34s`. The full package suite was not run; `finalize-review` will run it and block attestation on failure.
+- The auto-review-rejected external Codex probe was not retried or bypassed. No controlled model response or real Claude Code station run is available.
+
+### 1. Carried over
+
+- The fix touched only the A3 test's self-module lookup and plan record; Closing Review execution guidance and its prior evidence are unchanged.
+
+### 2. Carried over
+
+- The fix touched only the A3 test's self-module lookup and plan record; Closing Review handoff guidance and its prior evidence are unchanged.
+
+### 3. Re-tested in full
+
+- How I tried it: Re-read the evidence-based technical-choice and three-trade-off guidance in write-plan, capture-intent, write-spec, and the three loom-code README languages. Inspected the one-line self-module fix and repeated the full A3 focused surface: question rule, mutation, negation, cross-copy, no-spec and no-repeat cases, alongside the write-spec decision tests.
+- What came back: The mixed-root invocation passed all 119 tests; the code and design groups separately passed 64 and 55. The reversed three-trade-off sentence was still rejected by the mutation test, now without an import-layout failure. The changed test is `loom-code/tests/test_one_way_door_question_rule.py:42-73`; the policy wording at `loom-code/skills/write-plan/references/one-way-door.md:4-9,15-31,41-51`, `loom-design/skills/capture-intent/SKILL.md:204-224`, `loom-design/skills/write-spec/SKILL.md:190-224`, and the three README paragraphs remains the same as Round 2. No agent was observed making a real decision.
+- Evidence: The three focused test outputs, plugin validations, inspected files and diff above. The Round 2 portability finding is resolved; real-host behavior remains unverified.
+
+### 4. Carried over
+
+- The fix did not alter the unresolved-outcome, authorization or wait-and-continue guidance, or its tests, apart from the A3 test's own module lookup.
+
+### 5. Carried over
+
+- The fix did not alter consequence disclosure, existing-data consent, legitimate stop guidance, or its tests, apart from the A3 test's own module lookup.
