@@ -15,6 +15,11 @@ charter: 1.1
 - Test: A1 positive: synchronized-version-metadata; boundary: old-version-pin-updated.
 - Risk: Bump loom-workflow minor version for changed skill guidance and CLI contract; run manifest sync before finalization.
 
+**W2-01 Graduate the symlink regression**  after: W0-01  acceptance: 3
+- Files: docs/loom/2026-10-31-loom-artifact-paths/evidence/probes/test_internal_diagrams_symlink.py, loom-workflow/tests/loom-interactive-diagram/test_internal_diagrams_symlink.py
+- Test: A3 positive: sibling-symlink-rejected; boundary: diverted-directory-untouched.
+- Risk: Move the adversarial program into the regular suite after it caught a real defect; preserve its concern and assertion while updating its script path for the new home.
+
 ## Simplicity check
 - Omit editor setup edits because its path guidance is already correct — taken
 
