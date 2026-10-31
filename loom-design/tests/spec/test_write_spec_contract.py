@@ -304,6 +304,22 @@ def test_decision_point_two_asks_only_unresolved_outcomes_or_authorization() -> 
     assert "existing data" in step and "explicit consent" in step
 
 
+def test_late_choice_uses_evidence_and_only_stops_dependent_work() -> None:
+    step = _flat(_section(_text(), _STEP3))
+    assert "A technical choice that surfaces **after** this message" in step
+    late = step.split("A technical choice that surfaces **after** this message", 1)[1]
+    late = late.split("<!-- gate: write-spec.product-visible-behaviour-confirmed-before-review -->", 1)[0]
+    assert "decide from evidence" in late and "agent-decided" in late
+    rule = ("Ask", "unresolved user outcome", "missing authorization")
+    assert affirms("Ask for an unresolved user outcome or missing authorization when needed.", *rule)
+    assert not affirms("Do not ask for an unresolved user outcome or missing authorization.", *rule)
+    assert affirms(late, *rule)
+    assert "continue independent work while awaiting the answer" in late
+    assert "if it meets the user's outcome" in late
+    assert "A committing option needs prior authorization" in late
+    assert "consequence form for an unresolved user outcome or authorization" in step
+
+
 def test_write_spec_settles_branch_in_intake_before_writing() -> None:
     """A6 positive: Step 1 settles this change's branch, carrying every
     uncommitted change file on a worktree move, before Step 2 writes the spec.

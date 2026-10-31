@@ -235,20 +235,25 @@ turns a behaviour confirmation into a quality review the user cannot do.
    a backup at ___ first. Is that OK?"
 
 **Every question in this message must be one of three types, or the
-consequence form for one-way doors**: what do you want, what will you see (this
-station's own type), did it work. A question fitting none of them is a
-question the user cannot answer — "should the state live in the store or
-the component?" is not a behaviour question however it is phrased. The
-closing-review station has a dimension for exactly this, `user-judgment-leak`, and
-returns NEEDS_REVISION when it finds one.
+consequence form for an unresolved user outcome or authorization**: what do
+you want, what will you see (this station's own type), did it work. A
+question fitting none of them is a question the user cannot answer —
+"should the state live in the store or the component?" is not a behaviour
+question however it is phrased. The closing-review station has a dimension
+for exactly this, `user-judgment-leak`, and returns NEEDS_REVISION when it
+finds one.
 
-A one-way door that surfaces **after** this message is not a new stop: pick
-a default, tag it `agent-decided`, and let the acceptance test report disclose
-it at decision point ③. For classes (b), (c) and (e) the default is not
-free — take the option with zero obligation, that is reversible, and that
-does not touch the user's existing data, and record
-`agent-decided — no authorisation, conservative option`. If no such option
-exists, that piece of work stops and is reported as not done.
+A technical choice that surfaces **after** this message: check existing
+decisions, project evidence, tests, and applicable external sources; decide
+from evidence, record the reason as `agent-decided`, and disclose material
+consequences in the acceptance test report at decision point ③. Ask for an
+unresolved user outcome or missing authorization when needed; continue
+independent work while awaiting the answer. For classes (b), (c) and (e),
+when authorization is missing, take a zero-obligation, reversible option that
+touches no existing data if it meets the user's outcome. Record
+`agent-decided — not authorised, took the conservative option`. If none
+does, ask for the missing preference or authorization. A committing option
+needs prior authorization.
 
 <!-- gate: write-spec.product-visible-behaviour-confirmed-before-review -->
 Before presenting the behaviour, preserve the exact count, order, and
