@@ -10,6 +10,55 @@ from urllib.parse import unquote
 BACKENDS = Path(__file__).resolve().parent.parent / "backends"
 DIAGRAMS = Path("diagrams")
 LABEL = r"(?:\\.|[^\\\]\n])+"
+CHANGE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*")
+
+
+def change_args(args):
+    """Extract an optional explicit change id without changing positional arguments."""
+    args = list(args)
+    if "--change-id" not in args:
+        return args, None
+    index = args.index("--change-id")
+    if index + 1 >= len(args) or args.count("--change-id") != 1:
+        raise ValueError("--change-id requires one id")
+    change_id = args[index + 1]
+    del args[index:index + 2]
+    return args, change_id
+
+
+def managed_directory(change_id):
+    cwd = Path.cwd()
+    root = next((path for path in (cwd, *cwd.parents) if (path / "docs/loom/intent").is_dir()), None)
+    if root is None:
+        raise ValueError("cannot find docs/loom/intent; run inside the repository")
+    store = root / "docs/loom"
+    if not store.resolve().is_relative_to(store):
+        raise ValueError(f"{store}: managed docs/loom directory escapes repository")
+    relative = cwd.relative_to(store) if cwd.is_relative_to(store) else Path()
+    enclosing = relative.parts[0] if relative.parts and relative.parts[0] != "intent" else None
+    if change_id is None:
+        change_id = enclosing
+    if not change_id:
+        raise ValueError("cannot identify change; use --change-id <id> or run from its docs/loom/<id> directory")
+    if not CHANGE_ID.fullmatch(change_id):
+        raise ValueError(f"invalid change id: {change_id}")
+    if enclosing and enclosing != change_id:
+        raise ValueError(f"--change-id {change_id} mismatches enclosing change {enclosing}")
+    intent = store / "intent" / f"{change_id}.md"
+    if not intent.is_file():
+        raise ValueError(f"missing intent: {intent}")
+    change = store / change_id
+    if not change.resolve().is_relative_to(change):
+        raise ValueError(f"{change}: managed change directory escapes its location")
+    managed = change / "diagrams"
+    if not managed.resolve().is_relative_to(change):
+        raise ValueError(f"{managed}: managed diagrams directory escapes change")
+    return managed
+
+
+def bounded(path, managed):
+    if not path.resolve().is_relative_to(managed.resolve()):
+        raise ValueError(f"{path}: outside managed directory {managed}")
 
 
 def backends():
@@ -94,6 +143,7 @@ def diagrams(registry):
 
 
 def create(args, registry):
+    args, change_id = change_args(args)
     if len(args) == 1:
         identifier, name = "drawio", args[0]
     elif len(args) == 2:
@@ -104,12 +154,15 @@ def create(args, registry):
         raise ValueError(f"unknown backend {identifier}; registered: {', '.join(sorted(registry))}")
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*", name):
         raise ValueError("diagram name must contain only letters, digits, _ or -")
+    managed = managed_directory(change_id)
     backend = registry[identifier]
-    diagram = DIAGRAMS / f"{name}{backend.extension()}"
+    diagram = managed / f"{name}{backend.extension()}"
     projection = projection_path(diagram)
-    if diagram.exists() or projection.exists():
+    bounded(diagram, managed)
+    bounded(projection, managed)
+    if diagram.exists() or projection.exists() or diagram.is_symlink() or projection.is_symlink():
         raise ValueError(f"{diagram}: already exists")
-    DIAGRAMS.mkdir(parents=True, exist_ok=True)
+    managed.mkdir(parents=True, exist_ok=True)
     backend.generate(diagram)
     projection.write_text(backend.project(diagram) + "\n", encoding="utf-8")
     print(diagram)
@@ -128,7 +181,21 @@ def chosen(args, registry):
 
 
 def project(args, registry):
-    for diagram in chosen(args, registry):
+    args, change_id = change_args(args)
+    managed = managed_directory(change_id)
+    if len(args) > 1:
+        raise ValueError("expected at most one diagram path")
+    if args:
+        selected = [Path(args[0])]
+    else:
+        suffixes = {backend.extension() for backend in registry.values()}
+        selected = sorted(path for path in managed.glob("*") if path.is_file() and path.suffix in suffixes)
+        if not selected:
+            raise ValueError(f"{managed}: no diagram files")
+    for diagram in selected:
+        bounded(diagram, managed)
+        bounded(projection_path(diagram), managed)
+    for diagram in selected:
         backend = backend_for(diagram, registry)
         backend.check(diagram)
         projection = projection_path(diagram)

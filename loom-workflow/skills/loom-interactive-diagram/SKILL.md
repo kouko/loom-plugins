@@ -11,17 +11,24 @@ Use this tool in any station when a diagram should persist in the change's
 Git history and be editable by the user. The conversation carries the file
 path and a text projection; the user opens the file in an editor.
 
-Work from `docs/loom/<change-id>/`. Run
+Work from `docs/loom/<change-id>/`, or pass `--change-id <change-id>` when
+running `new` or `project` from the repository root. The id must name an
+existing `docs/loom/intent/<change-id>.md`; an explicit id inside a change
+directory must match that directory. Generated files go to
+`docs/loom/<change-id>/diagrams/`. Run
 `python3 <plugin-root>/skills/loom-interactive-diagram/scripts/diagram.py`
 with one of these commands:
 
 - `list-backends`: show available formats.
-- `new <name>`: create an empty draw.io diagram and matching projection.
-- `new <backend-id> <name>`: create one with a selected format.
-- `project [diagrams/<name>.<ext>]`: regenerate the projection after an edit.
+- `new <name> [--change-id <id>]`: create an empty draw.io diagram and matching projection.
+- `new <backend-id> <name> [--change-id <id>]`: create one with a selected format.
+- `project [diagrams/<name>.<ext>] [--change-id <id>]`: regenerate a managed
+  projection after an edit. The path must stay inside the selected change's
+  `diagrams/` directory, including after resolving symlinks.
 - `check [<diagram-path>]`: validate one diagram or every registered diagram
   under `diagrams/` and every diagram linked from `spec.md`; return nonzero
   and name each invalid file or difference. Spec links resolve from `spec.md`.
+  Read-only checks of diagrams linked outside the managed directory remain supported.
 
 The default backend is `drawio`. A backend is one file in `backends/`; the
 selection is recorded in the projection header. See `references/backends.md`
