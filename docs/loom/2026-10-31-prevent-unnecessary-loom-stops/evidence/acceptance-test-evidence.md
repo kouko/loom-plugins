@@ -1,0 +1,43 @@
+# Prevent unnecessary Loom stops — acceptance test evidence
+
+Tried on 2026-10-31, in a clean copy of the project at `a24ab73d`.
+
+## Setup and boundary
+
+- Clean copy: `git worktree add --detach /private/tmp/loom-acceptance.IAD8Ts/checkout a24ab73d7a99474f99dc0af2d78be3f3a39677b` returned `HEAD is now at a24ab73d`.
+- The clean copy's `git status --short --branch` returned `## HEAD (no branch)` with no changed files.
+- Followed README.md's local plugin validation route: `agy plugin validate ./loom-code` returned `[ok]`, `skills: 7 processed`, `agents: 4 processed`, `hooks: 1 processed`; `agy plugin validate ./loom-design` returned `[ok]`, `skills: 6 processed`.
+- First test command `python3 -m pytest ...` failed before collection because the default Python has no pytest (`No module named pytest`). The available project-independent `pytest` executable was used instead; its focused run passed.
+- Focused command from the clean copy: `pytest -q loom-code/tests/test_one_way_door_question_rule.py loom-code/tests/test_one_way_door_copies.py loom-code/tests/test_questionrule_negation_rejected.py loom-code/tests/test_review_convergence_contract.py loom-code/tests/test_adversarial_product_one_way_door_without_spec.py loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py loom-code/tests/test_write_plan_shape_text.py loom-design/tests/spec/test_adversarial_write_spec_no_reask_unpinned_sentences.py loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_write_spec_contract.py` returned `131 passed in 0.48s`.
+- The full package suite was deliberately left to `finalize-review`, which runs the repository-declared suite and blocks attestation on failure. The repo's suite entry point is `python3 scripts/run_package_tests.py --loom-family`; it was not run here.
+- A controlled Codex probe was attempted with `codex exec --ephemeral --ignore-user-config -s read-only -C /private/tmp/loom-acceptance.IAD8Ts/checkout` and a prompt to read the changed Closing Review guidance and state the next actions without executing them. In the sandbox, the CLI returned `failed to initialize in-process app-server client: Operation not permitted`. The request to run the same read-only probe with host escalation was rejected by automatic approval review: it could transmit private worktree skill content to an external model service without explicit user authorization. The rejection explicitly prohibited bypassing it. No Codex behavioral response was obtained. No real Claude Code station run was performed.
+
+## 1. 在本站已取得必要結果、下一個動作已明定且沒有合法停止條件時，agent 不需使用者再說「請繼續」就會執行該動作；只回報進度不算完成。
+
+- How I tried it: Read the updated Closing Review instructions and ran the focused test command above, including `test_ready_review_continues_through_finalize_and_ship`.
+- What came back: The test passed. The instructions at `loom-code/skills/closing-review/SKILL.md:438-440` say to run `finalize-review` in the current turn once verdicts and probe evidence are ready, and explicitly reject a progress-only update as completion.
+- Evidence: `loom-code/tests/test_review_convergence_contract.py:214-230` asserts both clauses. This is a text-contract check; the controlled Codex probe and real Claude Code execution were unavailable as described above.
+
+## 2. 在本站已完成、下一站已有明定入口且沒有合法停止條件時，agent 不需使用者再說「請繼續」就會啟動下一站。
+
+- How I tried it: Read Closing Review finalization and handoff instructions and ran the same focused test.
+- What came back: The test passed. `loom-code/skills/closing-review/SKILL.md:440-441` says a committed valid attestation leads to Ship in the same turn unless a stated stop applies; `:470-475` retains the Ship handoff.
+- Evidence: `loom-code/tests/test_review_convergence_contract.py:214-230`. No actual attestation was generated or Ship session entered in this acceptance run.
+
+## 3. 對於可由既有決定、專案證據、實測或適用的外部資料判斷的選擇，agent 先查證並記錄理由；「以後難替換」、「影響品質上限」或「有三項以上取捨」本身不會使 agent 停下來要求使用者選方案。
+
+- How I tried it: Read `loom-code/skills/write-plan/references/one-way-door.md`, the write-plan instructions, and both loom-design copies; ran focused question-rule, cross-copy, negation, and decision-point tests in the command above.
+- What came back: All selected tests passed. The reference at `loom-code/skills/write-plan/references/one-way-door.md:4-9,15-31,41-51` makes the risk classes disclosure triggers and directs evidence-based technical decisions; three trade-offs alone do not trigger a question. The two design station copies repeat the narrower rule. The negation probe proves its positive instruction would fail the text test if changed to `do not decide`.
+- Evidence: `loom-code/tests/test_one_way_door_question_rule.py:31-44`, `loom-code/tests/test_questionrule_negation_rejected.py:16-32`, `loom-code/tests/test_one_way_door_copies.py:43-75`, `loom-design/tests/spec/test_capture_intent_contract.py:83-96`, `loom-design/tests/spec/test_write_spec_contract.py:292-304`. No agent was observed making a real choice.
+
+## 4. 當不同做法會實質改變使用者要的結果，且查證後仍無法從既有決定推得偏好，或行動需要尚未取得的明確授權時，agent 才請使用者決定；在等待時繼續不依賴答案的工作。
+
+- How I tried it: Read the unresolved outcome, prior-choice, data-consent, and waiting instructions in all three policy copies; ran the focused tests above, including no-spec and no-repeat adversarial cases.
+- What came back: All selected tests passed. `loom-code/skills/write-plan/references/one-way-door.md:41-54,78-87` narrows questions to unresolved user outcomes or missing authorization, preserves prior decisions, and directs independent work during the wait. `loom-code/skills/write-plan/references/confirm-intent.md:64-87` sends no-spec product questions to the first decision point and avoids asking again after authorization. Both design copies carry the same decision boundary.
+- Evidence: `loom-code/tests/test_one_way_door_question_rule.py:46-64`, `loom-code/tests/test_adversarial_product_one_way_door_without_spec.py:1-110`, `loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py`, `loom-design/tests/spec/test_adversarial_write_spec_no_reask_unpinned_sentences.py`. No agent wait-and-continue behavior was observed in a live station run.
+
+## 5. 對於重大選擇，使用者能看見與自身相關的後果，即使 agent 不需請使用者選方案；需要使用者確認成果、取得授權或遇到其他正當停止條件時，agent 仍依現有規則處理。
+
+- How I tried it: Read the consequence and consent examples, decision-point guidance, and Closing Review stop boundaries; ran the focused tests above.
+- What came back: All selected tests passed. `loom-code/skills/write-plan/references/one-way-door.md:56-73` calls for user-facing consequences even without a question. `:26-36,83-87` keeps existing-data consent. `loom-code/skills/closing-review/SKILL.md:439-452` preserves stated stops and skipped-review behavior; `:242-246` retains fresh authorization for a repeated outside review.
+- Evidence: `loom-code/tests/test_one_way_door_question_rule.py:56-64`, `loom-code/tests/test_review_convergence_contract.py:214-230`, `loom-code/tests/test_one_way_door_copies.py:43-75`. User-visible handling in a real Claude Code conversation remains untested.
