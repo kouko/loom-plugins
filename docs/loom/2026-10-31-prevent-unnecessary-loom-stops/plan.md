@@ -58,6 +58,11 @@ Wave 1 — adjust the existing decision and hand-off guidance; keep each policy 
 - Test: A3 positive: consequential choices disclose effects; negative: hard-to-reverse alone does not force a question. A5 boundary: missing authorization still asks.
 - Risk: Three translated READMEs retain the former automatic-question wording. Keep their decision-point numbers and release version unchanged.
 
+**W1-10 Keep the reversed-rule test valid across pytest import layouts**  after: W1-08  acceptance: 3
+- Files: loom-code/tests/test_one_way_door_question_rule.py
+- Test: A3 negative: the reversed-rule mutation is rejected both alone and in one pytest process collecting code and design tests; positive: the unmodified rule passes.
+- Risk: Acceptance testing found `__import__(__name__)` resolves the wrong module when pytest gives the test a dotted name. Use the already-loaded module object without changing the mutation itself.
+
 Wave 2 — release metadata after the guidance and its tests stabilize.
 
 **W2-01 Bump loom-code minor version and release text**  after: W1-01, W1-03  acceptance: 3
