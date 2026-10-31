@@ -1,6 +1,6 @@
 # 跨站共用的圖表討論工具（draw.io 為首個後端） — plan
-intent: 2026-10-29-shared-diagram-tool@93d7b523f79445d925380c9dcbeda8c289537fd6
-spec: docs/loom/2026-10-29-shared-diagram-tool/spec.md@7532880f
+intent: 2026-10-29-shared-diagram-tool@7b53e207851a4f2afc7dbe6897cf17b10ed4b547
+spec: docs/loom/2026-10-29-shared-diagram-tool/spec.md@abf1c370381d6d28af6c403067cb83a5240df4dd
 charter: 1.1
 
 ## Task DAG
@@ -59,6 +59,11 @@ charter: 1.1
 - Files: loom-workflow/tests/loom-interactive-diagram/test_wait_nonfinite_arguments.py; source program: docs/loom/2026-10-29-shared-diagram-tool/evidence/probes/test_wait_nonfinite_arguments.py
 - Test: A9 positive: finite-duration-wait-starts; negative: nan-or-infinite-duration-is-rejected-before-ready
 - Risk: the probe caught a bounded-wait defect, so move it into the permanent suite and keep its concern marker and exact negative cases (agent-decided; REQ-9)
+
+**W2-01 Clarify the skill discovery description**  after: W1-02  acceptance: 11
+- Files: loom-workflow/skills/loom-interactive-diagram/SKILL.md, tests/test_loom_skill_description_catalog.py
+- Test: A11 positive: description names draw.io as the default format and saved-edit readback; negative: the old "including draw.io files" wording fails the description assertion
+- Risk: the catalog pins description length; update its expected count only after the behavior assertion is RED, then keep the total within its budget (agent-decided; REQ-11)
 
 ## Simplicity check
 - One shared tool rather than per-station copies — taken
