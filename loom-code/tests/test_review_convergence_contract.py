@@ -211,6 +211,24 @@ def test_finalize_failure_round_requires_no_relook() -> None:
             assert has_negation(sentence), sentence
 
 
+def test_ready_review_continues_through_finalize_and_ship() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    assert re.search(
+        r"required reviewer verdicts and probe evidence are available.*"
+        r"run `finalize-review` in this turn",
+        finalize,
+    )
+    assert "A progress update alone does not complete this step." in finalize
+    assert re.search(
+        r"valid attestation is committed.*continue to Ship in this turn.*"
+        r"unless a stated stop condition applies",
+        finalize,
+    )
+    assert "skip `finalize-review` and leave the change unattested" in finalize
+    converge = _flat_section("## 4. Converge within one bounded episode")
+    assert "repeat execution requires a newly authorized review" in converge
+
+
 def test_reviewer_contract_does_not_tie_relook_to_round3() -> None:
     reviewer = " ".join(REVIEWER.split())
     tied = [
