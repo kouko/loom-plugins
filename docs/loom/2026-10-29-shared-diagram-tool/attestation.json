@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-29-shared-diagram-tool",
-  "content_digest": "dbb295d0ea039ebd8c5b5bb785b01ca65640c0db",
+  "content_digest": "742242a0dc8e3e7910ea840481107d09c3a58852",
   "executions": [
     {
       "kind": "package-tests",
@@ -39,14 +39,14 @@
       "model": "host-inherited-unverified",
       "lens": "code",
       "verdict": "PASS",
-      "reviewed_sha": "b10ae7fca28441d2a733ec28da7b0083694f5358",
-      "review_target_sha": "dbcf88c1d06d97b4fb3a61f0a66336c3d445b562",
+      "reviewed_sha": "dbcf88c1d06d97b4fb3a61f0a66336c3d445b562",
+      "review_target_sha": "61834d132f114c5c611e0b5ed09c9d96bc6129c7",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
         "correctness": "PASS",
         "naming": "PASS",
-        "tests": "PASS_WITH_NOTES — the escaped-bracket regression now has command-level coverage; the original A9/A10 waiter and its tests landed in one commit, so committed RED evidence remains unavailable",
+        "tests": "PASS_WITH_NOTES — unchanged from Round 2: the original A9/A10 waiter and its tests landed in one commit, so committed RED evidence remains unavailable",
         "refactoring": "PASS",
         "cross-task-coherence": "PASS",
         "external-surface-grounding": "PASS",
@@ -57,32 +57,30 @@
       },
       "findings": [],
       "notes": [
-        "Previous fatal finding at diagram.py:55 is fixed: valid links with escaped closing brackets now reach validation.",
-        "Affected test files passed: 24 passed."
+        "The new budget-exception line is in loom-code 3.53.0, which R3 reads; its ID and test path match the registered tool.",
+        "The R3 check reported 145 to 147 net mechanisms and all clear."
       ]
     },
     {
       "reviewer": "/root/diagram_wait_skill_review",
       "vendor": "openai",
       "model": "host-inherited-unverified",
-      "lens": "skill",
-      "verdict": "PASS",
-      "reviewed_sha": "b10ae7fca28441d2a733ec28da7b0083694f5358",
-      "review_target_sha": "dbcf88c1d06d97b4fb3a61f0a66336c3d445b562",
+      "lens": "docs",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "dbcf88c1d06d97b4fb3a61f0a66336c3d445b562",
+      "review_target_sha": "61834d132f114c5c611e0b5ed09c9d96bc6129c7",
       "dimension_scores": {
         "omission": "PASS",
         "ambiguity": "PASS",
         "inconsistency": "PASS",
-        "incorrect-fact": "PASS",
+        "incorrect-fact": "PASS_WITH_NOTES — the entry matches the checker pattern, but this reviewer could not independently run the checker in the sandbox",
         "missing-population": "PASS",
-        "user-judgment-leak": "PASS",
         "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "The live yielding session, READY relay, and same-session polling are now explicit.",
-        "Operational project/check commands now use complete runnable paths.",
-        "The gate-marker finding was dismissed after rebuttal."
+        "The 3.53.0 entry documents the new shared skill and contract tool; no touched-surface defect was found.",
+        "The reviewer could not run the checker independently because system Python lacks PyYAML and the offline uv cache lacked a locked dependency."
       ]
     }
   ],
