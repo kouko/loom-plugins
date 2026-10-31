@@ -26,6 +26,7 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
   - {name: handoff,             owner: loom-workflow}
   - {name: recap-state,         owner: loom-workflow}
   - {name: loom-visualization,  owner: loom-workflow}
+  - {name: loom-interactive-diagram, owner: loom-workflow}
   - {name: skill-retro,    owner: loom-workflow}
   - {name: git-memory,          owner: loom-workflow}
   - {name: independent-advisor, owner: loom-workflow}

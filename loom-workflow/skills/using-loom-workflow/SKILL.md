@@ -23,6 +23,7 @@ The selected skill owns its procedure, permissions, and output contract.
 | Ask for a second opinion from another model, higher effort, or another vendor | [independent-advisor](../independent-advisor/SKILL.md) |
 | Remember, recall, reconcile, or forget a durable repository lesson; or a task needs a prior lesson; or you are saving a lesson to your own host memory | [loom-memory](../loom-memory/SKILL.md) |
 | Show a comparison, flow, decision, state, or reasoning chain as a table, ASCII, or Mermaid diagram in coding chat, or render documented reasoning as a standalone page | [loom-visualization](../loom-visualization/SKILL.md) |
+| Create or validate a diagram file that the user and agent edit in an external editor | [loom-interactive-diagram](../loom-interactive-diagram/SKILL.md) |
 | Re-orient within this conversation: 'where were we', '剛剛講到哪', or 振り返り when asking where the current conversation stands | [recap-state](../recap-state/SKILL.md) |
 | Review the current or one specified coding session for project development improvements, or 振り返り seeking project development improvements | [project-retro](../project-retro/SKILL.md) |
 
