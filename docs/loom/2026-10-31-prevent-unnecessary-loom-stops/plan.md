@@ -28,6 +28,11 @@ Wave 1 — adjust the existing decision and hand-off guidance; keep each policy 
 - Test: A1 positive: two-PASS-reviewer-case-runs-finalize; negative: progress-only-end-turn-is-incomplete. A2 positive: completed-review-hands-to-ship; boundary: handoff-waits-for-attestation. A5 positive: authorized-path-continues; boundary: outside-review-retry-needs-authorization.
 - Risk: A single §5 clarification should cover the observed premature stop; preserve bounded review, failed-check repair, and fresh authorization for a repeated outside review.
 
+**W1-04 Reject negated technical-choice prose and graduate the adversarial probe**  after: W1-01, W1-03  acceptance: 3
+- Files: loom-code/tests/test_one_way_door_question_rule.py, docs/loom/2026-10-31-prevent-unnecessary-loom-stops/evidence/probes/test_questionrule_negation_rejected.py, loom-code/tests/test_questionrule_negation_rejected.py
+- Test: A3 positive: affirmative-evidence-based-decision-passes; negative: same-sentence-do-not-decide-fails. The committed adversarial probe is RED before the fix and GREEN after it moves unchanged into the permanent suite.
+- Risk: A broad regex accepted a negated obligation. Search all changed files and A3 surfaces for the same prose-pin class; keep the fix bounded to the affected assertion and preserve the probe's original test logic during graduation.
+
 Wave 2 — release metadata after the guidance and its tests stabilize.
 
 **W2-01 Bump loom-code minor version and release text**  after: W1-01, W1-03  acceptance: 3
