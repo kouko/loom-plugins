@@ -38,6 +38,11 @@ Wave 1 — adjust the existing decision and hand-off guidance; keep each policy 
 - Test: A4 positive: unresolved product outcome or missing authorization routes to ① without a spec; negative: answered question is not repeated at ②. A5 boundary: existing-data action still needs authorization. Keep affirmative/negated detector self-tests.
 - Risk: These tests pin the old automatic one-way-door wording. Update the detector target and mutation text, retaining the missing-consent and no-repeat safeguards rather than reviving automatic technical-choice questions.
 
+**W1-06 Retarget the write-spec no-repeat mutation probe**  after: W1-02  acceptance: 4, 5
+- Files: loom-design/tests/spec/test_adversarial_write_spec_no_reask_unpinned_sentences.py
+- Test: A4 negative: removing the new merge qualifier makes the real write-spec contract test fail; positive: the unchanged qualifier passes. A5 boundary: the other consent and no-repeat mutation cases remain active.
+- Risk: The old probe's exact string no longer exists after narrowing the question rule. Change only its mutation target and keep its RED-on-bad-prose behavior.
+
 Wave 2 — release metadata after the guidance and its tests stabilize.
 
 **W2-01 Bump loom-code minor version and release text**  after: W1-01, W1-03  acceptance: 3
