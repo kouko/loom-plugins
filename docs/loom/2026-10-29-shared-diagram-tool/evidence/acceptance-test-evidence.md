@@ -180,3 +180,60 @@ This re-run used a **new** source extraction: `git archive 702e3cbd | tar -x -C 
 
 ### Dismissed reviewer finding disclosed in report
 - The reviewer initially raised an important concern that the active-turn paragraph lacked a mechanical quality-gate marker. The parent rebutted that this paragraph is operational guidance for the agent, not an acceptance-quality gate. The reviewer explicitly withdrew the finding. No gate marker or evaluator was added. The report tells the user both the rationale and the consequence if that classification is wrong.
+
+## Re-run on 2026-10-31, at 13dbe83c (description correction)
+
+- Clean source: `git worktree add --detach /private/tmp/loom-diagram-description-acceptance-20261031 13dbe83c909d160c1846e77b03024ad4e531369f` produced `HEAD is now at 13dbe83c`. The worktree was clean before these report edits. The original change worktree's untracked `diagrams/` was not accessed or edited.
+- Diff scope: `git diff --name-status a982c9a7..13dbe83c` listed six modified files: intent, spec, plan, CHANGELOG, the shared skill, and the description-catalog test. The sole runtime-facing skill diff is the frontmatter `description` at `loom-workflow/skills/loom-interactive-diagram/SKILL.md:4`; the skill body, backend files, generator, validator, wait script, editor setup, and two station pointers are unchanged. `git diff --check a982c9a7..13dbe83c` exited 0.
+- Clean-copy load smoke check: `python3 loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py list-backends` exited 0 and printed `demo-json` and `drawio`. This verifies the CLI still loads from the clean copy; it does not reinstall the host plugin or prove host skill routing.
+
+### Acceptance 11 — default format and saved-edit readback description
+- Inspected the actual skill frontmatter at `loom-workflow/skills/loom-interactive-diagram/SKILL.md:2-5`. It reads: `Create and check shared editable diagrams during Loom discussions. Use when the user edits a shared diagram in an external editor and the agent needs to read back saved changes; draw.io is the default format.`
+- Compared `git diff a982c9a7..13dbe83c -- loom-workflow/skills/loom-interactive-diagram/SKILL.md`. The removed description ended `including draw.io files`; that wording no longer appears in the new description.
+- Ran `pytest -q tests/test_loom_skill_description_catalog.py -k interactive_diagram_description_names_default_format_and_readback` from the clean worktree. Output: `1 passed, 8 deselected in 0.18s`, exit 0. The focused test reads the discovery description and asserts saved-change readback, default draw.io, and absence of the former incidental-support phrase. The direct frontmatter inspection independently confirms the wording.
+
+### Acceptance 1–10 — carried-over scope check
+- 1 and 5: The generator and the documented editor workflow are unchanged, so prior observed VS Code updates and clean-copy collaboration remain valid as behavior. However, the new explicit `Use when` clause mentions a user edit and readback, not a creation-only request. The first sentence still says `Create and check`, so actual host selection on a creation-only request is uncertain; no live station conversation was run. This limitation is reflected in the report and in the finding below.
+- 2 and 9: File readback, the active-turn wait program, and the skill's operational steps are unchanged. The new description now explicitly mentions external-editor saved-change readback, aligning with the previously observed editor saves; prior verdicts carry over.
+- 3 and 4: Diagram projection, spec-link discovery, malformed-file validation, and error messages are unchanged; prior focused tests and manual mismatch observations carry over.
+- 6: Desktop synchronization comes from the unchanged desktop editor and file workflow; prior Autosave-on and Autosave-off observations carry over.
+- 7: Registry and selection code are unchanged. The clean-copy `list-backends` smoke check also returned both previously tested backends.
+- 8: The two station pointers and the skill's generation, projection, and validation body are unchanged. Only the shared skill's discovery description changed.
+- 10: The wait program and unchanged-content detection are unchanged; the prior `TIMEOUT` observation after unchanged and unrelated saves carries over.
+
+### Spec UI flows — carried-over scope check
+- VS Code diagram surface, desktop diagram surface, and active-turn wait surface: No editor, diagram, or wait implementation changed. The prior partial UI-flow verdicts and their unobserved error/conflict/host-text states carry over.
+- Command and station path-walk surfaces: Commands and operational steps are unchanged, but the discovery description may influence whether a host agent enters the shared tool for an initial creation-only request. Prior partial verdicts remain; no new live host-routing result is claimed.
+
+### Finding for the closing-review station
+- Important, `loom-workflow/skills/loom-interactive-diagram/SKILL.md:4`: The explicit `Use when` clause covers an existing diagram that the user edits, but does not explicitly cover a request to create a new shared diagram. The lead sentence says `Create and check`, so this is a discovery ambiguity rather than a demonstrated runtime failure. A host might fail to select the skill at the start of Acceptance 1/5 or the command/path-walk UI flows. Restore an explicit creation trigger while retaining the confirmed default-format and saved-readback wording, then test routing or document the remaining host-selection limit.
+
+## Re-run on 2026-10-31, at 028bb4b0 (creation trigger fix)
+
+- New clean source: `git worktree add --detach /private/tmp/loom-diagram-description-acceptance-rerun-20261031 028bb4b043faa91c84b518c310384bfb52194c1f` printed `HEAD is now at 028bb4b0`. The earlier report/evidence drafts were copied into this new detached worktree; no implementation file was edited here.
+- Fix scope: `git diff 13dbe83c..028bb4b0 --stat` lists only `loom-workflow/skills/loom-interactive-diagram/SKILL.md` and `tests/test_loom_skill_description_catalog.py`. The skill diff replaces its frontmatter description alone; the body, CLI, wait script, editor setup, and station pointers did not change.
+- Exact current discovery wording at `loom-workflow/skills/loom-interactive-diagram/SKILL.md:4`: `Create and check shared editable diagrams during Loom discussions. Use when the agent needs to create a diagram for the user to edit in an external editor or read back saved changes; draw.io is the default format.` The explicit `Use when` clause now covers both a creation-only request and saved-edit readback. It names draw.io as the default rather than an incidental supported format. This is textual routing evidence, not a live host selection test.
+- Focused description test: `pytest -q tests/test_loom_skill_description_catalog.py -k interactive_diagram_description_names_default_format_and_readback` printed `1 passed, 8 deselected in 0.17s`, exit 0. Direct inspection of the frontmatter independently confirms the same three points. `git diff --check 13dbe83c..028bb4b0` exited 0.
+- Clean-copy load check: `python3 loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py list-backends` printed `demo-json` and `drawio`, exit 0.
+
+### Acceptance 1 — initial creation and VS Code update, re-tested
+- From `/private/tmp/loom-diagram-description-fixture-20261031`, ran `python3 /private/tmp/loom-diagram-description-acceptance-rerun-20261031/loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py new description-rerun`. It printed `diagrams/description-rerun.drawio` and `diagrams/description-rerun.projection.md`, exit 0. This exercised the creation path from the new clean source.
+- In VS Code Quick Open, selected `/private/tmp/loom-diagram-description-fixture-20261031/diagrams/description-rerun.drawio`. The selected tab and Draw.io Integration webview (`extensionId=hediet.vscode-drawio`) showed an empty Page-1 before the external write. The editor had no pending edit.
+- Added an XML vertex with `id="rerun-node"` and `value="Description Agent Update"` to that same temporary file on disk. Without reopening the selected tab, the webview accessibility state contained `text Description Agent Update`. This is a fresh direct observation of the open-editor update, not only a carried-over claim.
+- The revised discovery description explicitly covers the creation step. No live Loom station conversation or actual host skill-dispatch decision was run, so host selection remains outside this observation.
+
+### Acceptance 5 — documented clean-copy collaboration, re-tested
+- Followed the documented VS Code sequence in `loom-workflow/skills/loom-interactive-diagram/references/editor-setup.md`: `new`, open in Draw.io Integration, external node update, manual edit/save, disk readback, `project`, then `check`. The source came from the new detached worktree; the fixture was a separate temporary directory. VS Code and its extension were already installed, not installed from zero in this re-run.
+- In the open webview, double-clicked `Description Agent Update`; the text entry area selected that exact label. Set it to `Description User Saved`, pressed Escape, then Command-S. The webview showed `Description User Saved`. `rg -n 'Description User Saved|Description Agent Update' diagrams/description-rerun.drawio` returned only line 7 with `value="Description User Saved"`, exit 0. This is the exact manual edit read back from disk.
+- Ran `python3 /private/tmp/loom-diagram-description-acceptance-rerun-20261031/loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py project diagrams/description-rerun.drawio` → `diagrams/description-rerun.projection.md`, exit 0. Then ran the same executable with `check diagrams/description-rerun.drawio` → `diagrams/description-rerun.drawio: projection matches`, exit 0.
+- The earlier clean-copy acceptance run covered both VS Code and desktop. This re-run exercised the VS Code loop in full because the fix concerns discovery wording, not desktop behavior; desktop implementation and instructions are byte-for-byte unchanged.
+
+### Acceptance 11 — default format, creation trigger, saved-edit readback
+- The exact frontmatter sentence above contains `agent needs to create a diagram`, `read back saved changes`, and `draw.io is the default format`. `including draw.io files` remains absent. The focused test passed. Verdict: works.
+- The prior important finding about an omitted creation-only `Use when` trigger is fixed by the new wording. This finding is closed on source evidence. Actual host skill selection on a natural-language request remains untested and should not be reported as an observed pass.
+
+### Related spec UI flows
+- VS Code surface (UI 1): Fresh fixture showed empty canvas, external node appearance without reopening, and a manual edit/save/readback. The malformed-diagram webview state remains unobserved, so the flow stays partly verified.
+- Command surface (UI 3): The new clean source listed both backends, created a draw.io artifact, regenerated its projection, and checked it successfully. Earlier runs tested the mismatch, malformed-file, unknown-backend, and demo backend branches; those implementation paths are unchanged. No live station conversation was conducted, so the flow stays partly verified.
+- Station path walk (UI 4): The new fixture completed initial creation, external update, user edit, save, disk readback, projection, and check. The revised description explicitly routes both entry and readback. Actual continuation in a Loom station conversation remains untested, so the flow stays partly verified.
+- Other Acceptance 2–4 and 6–10 and UI 2/5: The fix changes only discovery description and its focused test. The previous carry-over reasons and verdicts remain valid; no relevant runtime or editor surface changed.
