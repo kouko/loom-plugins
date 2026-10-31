@@ -3,6 +3,8 @@
 import re
 from pathlib import Path
 
+import pytest
+
 from prose_pin import has_negation, split_sentences
 
 
@@ -38,9 +40,35 @@ def test_technical_choice_with_evidence_proceeds() -> None:
 
 
 def test_three_tradeoffs_alone_do_not_ask() -> None:
-    door = text(DOOR)
-    assert re.search(r"three or more trade-offs.*?(?:alone|by itself).*?(?:not|never).*?ask", door)
-    assert not re.search(r"three or more trade-offs.*?also put to the user", door)
+    sentences = split_sentences(text(DOOR), ends=".")
+    assert any(
+        re.search(
+            r"three or more trade-offs.*?(?:alone|by itself).*?"
+            r"(?:do not|does not|never) require a user question",
+            sentence,
+        )
+        for sentence in sentences
+    )
+    assert not any(
+        re.search(r"three or more trade-offs.*?also put to the user", sentence)
+        for sentence in sentences
+    )
+
+
+def test_three_tradeoffs_reversed_rule_is_rejected(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    mutated = tmp_path / "one-way-door.md"
+    original = DOOR.read_text(encoding="utf-8")
+    assert "Three or more trade-offs\nalone do not require a user question." in original
+    mutated.write_text(
+        original.replace(
+            "Three or more trade-offs\nalone do not require a user question.",
+            "Three or more trade-offs\nalone require a user question.",
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(__import__(__name__), "DOOR", mutated)
+    with pytest.raises(AssertionError):
+        test_three_tradeoffs_alone_do_not_ask()
 
 
 def test_unresolved_user_outcome_is_asked() -> None:
