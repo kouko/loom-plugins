@@ -33,6 +33,11 @@ Wave 1 — adjust the existing decision and hand-off guidance; keep each policy 
 - Test: A3 positive: affirmative-evidence-based-decision-passes; negative: same-sentence-do-not-decide-fails. The committed adversarial probe is RED before the fix and GREEN after it moves unchanged into the permanent suite.
 - Risk: A broad regex accepted a negated obligation. Search all changed files and A3 surfaces for the same prose-pin class; keep the fix bounded to the affected assertion and preserve the probe's original test logic during graduation.
 
+**W1-05 Align legacy question-route probes with the narrowed rule**  after: W1-01, W1-02  acceptance: 3, 4, 5
+- Files: loom-code/tests/test_adversarial_product_one_way_door_without_spec.py, loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py, loom-code/tests/test_write_plan_shape_text.py
+- Test: A4 positive: unresolved product outcome or missing authorization routes to ① without a spec; negative: answered question is not repeated at ②. A5 boundary: existing-data action still needs authorization. Keep affirmative/negated detector self-tests.
+- Risk: These tests pin the old automatic one-way-door wording. Update the detector target and mutation text, retaining the missing-consent and no-repeat safeguards rather than reviving automatic technical-choice questions.
+
 Wave 2 — release metadata after the guidance and its tests stabilize.
 
 **W2-01 Bump loom-code minor version and release text**  after: W1-01, W1-03  acceptance: 3
