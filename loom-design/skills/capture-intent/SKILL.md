@@ -51,8 +51,9 @@ points, and a legacy intent at ship or changed requirements can add a stop.
    carried details ("you type ___ and see ___"), and the product's one-way
    doors in consequence form — at `write-spec`, or at
    `loom-code:write-plan` when `needs-design: no` and carried details force a
-   spec. Engineering changes skip this; a product change with no spec has its
-   one-way doors asked at item 1 instead.
+   spec. Engineering changes skip this; a product change with no spec has
+   consequences disclosed at item 1, with questions there only
+   for unresolved outcomes or authorization.
 3. **At the end:** accept or reject the report showing how each Acceptance
    line was tried and what happened.
 
@@ -196,31 +197,38 @@ twice, and this is the only stop this station makes.
    informed yes; an opt-out leaves the field absent.
 
 2. **The engineering one-way doors found so far**, in consequence form. A
-   product change's one-way doors, class (e) actions included, are asked at
+   product change's one-way doors, class (e) actions included, are handled at
    decision point ② of the station writing its spec — `write-spec`, or
    `loom-code:write-plan` when it writes the spec — when a spec will be
-   written. They are asked in this message instead when no spec will be
-   written; a spec written later does not ask them again at ②. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing
+   written. Their consequences are disclosed in this message instead when no spec will be
+   written; a spec written later does not ask a settled question again at ②. The five classes are: **(a) Hard to swap later**; **(b) Creates money or a standing
    obligation**; **(c) Limits what the user can do in future**; **(d) Sets the
    ceiling on output quality**; and **(e) An irreversible action on the user's
-   existing state**. Class (e) counts without a fork. If Constraints or
-   `PRINCIPLES.md` already fix handling, do not ask again; restate the pinned
-   handling and consequence so the user still sees it.
+   existing state**. These classes flag a consequence to disclose, not an
+   automatic choice for the user. Hard to swap later alone does not require a user question.
+   Three or more trade-offs alone do not require a user question. Class (e)
+   counts without a fork: rewriting, deleting, or sending the user's existing data
+   off their machine requires explicit consent. If Constraints or
+   `PRINCIPLES.md` already pinned the choice or authorized the action, do not ask again;
+   restate the pinned handling and consequence so the user still sees it.
 
    Four gates, in order: **check** the intent's Acceptance and Constraints
    and `PRINCIPLES.md` first — an axis already pinned there is not asked,
    you pick what complies and say which line pinned it; **measure** first
    when the candidates can be compared quickly on the user's own samples,
-   then ask about the result, never about assumptions; **threshold** — for
+   then make the technical choice `agent-decided` and record the reason; **threshold** — for
    class (d), any axis differing by at least 20%, or the presence versus
-   absence of money, privacy or coverage; **merge** — every engineering
-   one-way door of this change, and a product one-way door when no spec will
-   be written, is asked once, here, inside this message.
+   absence of money, privacy or coverage flags a consequence, not a question;
+   **merge** — ask here only when alternatives materially change the user's outcome
+   and the user's preference remains unresolved after checking, or when an action
+   requires authorization. Fold that question into this message.
    Never open an extra stop.
 
-   State options as user consequences and recommend one with a reason. With no
-   fork, state the irreversible consequence and safeguard (for example, what
-   is rewritten, what stops reading it, and where the backup is kept).
+   Disclose the user-relevant consequence of a major choice and the reason
+   for an agent-decided option. When a user outcome remains unresolved, state
+   the options as consequences and recommend one with a reason. With no fork,
+   state the irreversible consequence and safeguard (for example, what is
+   rewritten, what stops reading it, and where the backup is kept).
 
 3. **The cross-model review question, only for `second-vendor: ask` without
    a qualifying direct user request.** Read

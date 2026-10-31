@@ -59,9 +59,8 @@ dead end. Both are findings before the closing-review station raises them.
 Where a flow rewrites, deletes or sends existing user data, the line
 says so, naming the safeguard: `todo migrate → rewrites todos.json to a
 format the old program cannot read; backup at todos.json.bak`.
-Decision point ② asks about that sentence; it is asked even when there
-is no alternative design, unless ① already asked it because no spec was
-planned.
+At ②, disclose the consequence and request explicit consent if absent,
+even without alternatives. Consent given at ① is not requested again.
 
 ## When there is no interface
 

@@ -12,6 +12,14 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.18.0] — 2026-10-31 — ask for unresolved outcomes and authorization
+
+- `capture-intent` and `write-spec` now check existing decisions and evidence
+  before asking the user to choose. Technical difficulty or multiple trade-offs
+  alone do not require a user decision; consequential choices still disclose
+  their effects, and unresolved outcome preferences or actions requiring consent
+  still stop for the user.
+
 ## [2.17.0] — 2026-10-30 — point design discussions to shared diagrams
 
 - `write-spec` and `architecture-design` reference the shared editable diagram tool without duplicating its file rules.

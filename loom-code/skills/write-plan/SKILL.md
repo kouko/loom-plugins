@@ -102,12 +102,12 @@ questions in intent; never create a substitute plan.
 If asked, give this complete decision-point list. Codex's plugin-install
 authorisation (step 0b) permits execution; it is not a work decision.
 
-1. At ①, restate intent; merge one-way doors ② skips, any unanswered
+1. At ①, restate intent; merge unresolved outcome or authorization questions ② skips, any unanswered
    `second-vendor: ask` choice, and the required principles interview.
    A direct user request naming an outside agent and unambiguous target
    runs without a second question; disclose before execution.
 2. At ②, only for a product spec you write: confirm visible behaviour,
-   carried details, product one-way doors not asked at ①. Ask nothing
+   carried details, unresolved product outcome or authorization questions not asked at ①. Ask nothing
    about plan structure; record agent decisions with reasons.
 3. At ③, the user accepts or rejects the report per Acceptance line.
 
@@ -306,7 +306,7 @@ restatement stays in the user's language.
   one line per question, `<decision point> — <type> — <text>`. The intent's `## Open questions` must be exactly
   `- none` before Build; unresolved choices go back to intent work.
 - A closing **Risks** section for risks that span the whole plan. When
-  there is no spec, this section is also where the answers to one-way-door
+  there is no spec, this section is also where the answers to outcome or authorization
   questions live: one `user-decided — <what they chose and why>` line each,
   because with no spec there is no `## Design decision` to hold them.
   If a previously skipped plan's intent Constraints carries
@@ -349,20 +349,24 @@ Treat the JSON result as the decision: render its `notice_kind`,
 The reference owns notice timing and the no-listener boundary.
 
 **Forks you decided yourself.** Every one gets a one-line reason on its
-task: what you chose and why. Any one-way door that surfaces now — after
-decision point ① closed — is not a reason to go back to the user: take the
-default, mark it `agent-decided`, and list it so the acceptance test report can
-show it at decision point ③.
+task: what you chose and why. Check existing decisions, project evidence,
+tests, and applicable external sources; decide the technical choice and record
+the reason as `agent-decided`. Disclose material user consequences even when
+no question is needed. A late unresolved user outcome or missing authorization
+is asked when needed; continue independent work while awaiting the answer.
+List agent decisions so the acceptance test report can show them at decision
+point ③.
 
 <!-- gate: write-plan.post-decision-conservative-default -->
 **After the decision point, classes (b), (c) and (e) have no free
 default.** For those three classes in `references/one-way-door.md` — money
 or a standing obligation, a limit on what the user can do later, and any
-irreversible action on the user's existing data — you must take the
-zero-obligation, reversible option that touches no existing data, and
-record it as `agent-decided — not authorised, took the conservative
-option`. Choosing a committing option unasked is never allowed, however
-obvious it looks.
+irreversible action on the user's existing data — when authorization is
+missing, take a zero-obligation, reversible option that touches no existing
+data if it meets the user's outcome. Record it as `agent-decided — not
+authorised, took the conservative option`. Choosing a committing option
+without authorization is never allowed. If no viable conservative option
+meets the user outcome, ask for the missing preference or authorization.
 
 ## Step 6 — Commit and hand off
 

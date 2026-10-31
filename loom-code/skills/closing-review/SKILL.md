@@ -435,6 +435,11 @@ Then run:
 "<loom-code>/scripts/loom-python" --repair finalize-review <change-id> --input <temporary-json>
 ```
 
+When the required reviewer verdicts and probe evidence are available and §4
+permits finalization, run `finalize-review` in this turn. A progress update
+alone does not complete this step. Once a valid attestation is committed,
+continue to Ship in this turn unless a stated stop condition applies.
+
 The checker runs the declared package suite and each adversarial program once.
 Only after all executions and verdicts pass does it atomically generate the
 attestation bound to the functional-content digest. Commit the generated file

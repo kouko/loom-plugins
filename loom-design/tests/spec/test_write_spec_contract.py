@@ -267,20 +267,57 @@ def test_no_lane_wording() -> None:
 
 
 def test_one_way_door_asked_at_decision_point_one_is_not_asked_again() -> None:
-    """A2: a door asked at ① (no spec then) is not re-asked at ②; class (e) stays."""
-    exception = "already asked at decision point ①, because no spec was going to be written then, is not asked again at ②"
+    """A4: a decision or consent already obtained at ① is not re-asked at ②."""
+    exception = "already answered at decision point ①, because no spec was going to be written then, is not asked again at ②"
     step3 = _flat(_section(_text(), _STEP3))
     flows = _flat(_flows())
     assert exception in step3
-    assert "A one-way door, class (e) included, already asked at decision point ①" in step3
-    assert "every one-way door of this change not already asked at ① is asked once" in step3
+    assert "A one-way door, class (e) included, already answered at decision point ①" in step3
+    assert "only an unresolved user outcome or missing authorization is asked at ②" in step3
     asked = _flat(_section(_text(), "## What you will be asked, in plain words"))
     assert "One already asked when your intent was confirmed is not asked again." in asked
-    assert "asked **even when there is no fork at all**" in step3
+    assert "explicit consent even when there is no fork at all" in step3
     assert (
-        "it is asked even when there is no alternative design, "
-        "unless ① already asked it because no spec was planned." in flows
+        "At ②, disclose the consequence and request explicit consent if absent, "
+        "even without alternatives." in flows
     )
+    assert "Consent given at ① is not requested again." in flows
+    forms = _flat((SKILL.parent / "references/spec-forms.md").read_text(encoding="utf-8"))
+    assert (
+        "a one-way door is measured in before the agent decides the technical choice "
+        "or asks about an unresolved user outcome." in forms
+    )
+
+
+def test_decision_point_two_decides_measured_technical_choices() -> None:
+    step = _flat(_section(_text(), _STEP3)).lower()
+    assert "measure" in step and "agent-decided" in step
+    assert "hard to swap later alone does not require a user question" in step
+    assert "three or more trade-offs alone do not require a user question" in step
+
+
+def test_decision_point_two_asks_only_unresolved_outcomes_or_authorization() -> None:
+    step = _flat(_section(_text(), _STEP3)).lower()
+    assert "materially change the user's outcome" in step and "preference remains unresolved" in step
+    assert "already pinned" in step and "do not ask again" in step
+    assert "disclose" in step and "consequence" in step
+    assert "existing data" in step and "explicit consent" in step
+
+
+def test_late_choice_uses_evidence_and_only_stops_dependent_work() -> None:
+    step = _flat(_section(_text(), _STEP3))
+    assert "A technical choice that surfaces **after** this message" in step
+    late = step.split("A technical choice that surfaces **after** this message", 1)[1]
+    late = late.split("<!-- gate: write-spec.product-visible-behaviour-confirmed-before-review -->", 1)[0]
+    assert "decide from evidence" in late and "agent-decided" in late
+    rule = ("Ask", "unresolved user outcome", "missing authorization")
+    assert affirms("Ask for an unresolved user outcome or missing authorization when needed.", *rule)
+    assert not affirms("Do not ask for an unresolved user outcome or missing authorization.", *rule)
+    assert affirms(late, *rule)
+    assert "continue independent work while awaiting the answer" in late
+    assert "if it meets the user's outcome" in late
+    assert "A committing option needs prior authorization" in late
+    assert "consequence form for an unresolved user outcome or authorization" in step
 
 
 def test_write_spec_settles_branch_in_intake_before_writing() -> None:

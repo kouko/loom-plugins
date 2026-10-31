@@ -6,7 +6,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.53.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.54.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -90,8 +90,9 @@ Acceptance 無法機械判定時才會做 acceptance testing。
 3. **做到了嗎？** —— 你驗收結果；需要 acceptance test report 時，讀的是從未碰過這次變更的
    agent 寫的那份報告。
 
-不可逆的岔路（刪資料、公開介面、單向遷移）在 engineering 變更時併進 ①、
-product 變更時併進 ②（不寫 spec 時併進 ①），用後果的形式問 —— 不另開停頓點。
+難以回頭的選擇（刪資料、公開介面、單向遷移），在 engineering 變更時於 ①、
+product 變更時於 ②（不寫 spec 時於 ①）說明重大後果。只有使用者想要的結果仍無法從既有決定判斷，
+或缺少明確授權時，才在該決策點提問。變更或傳送既有資料仍需明確同意；不另開停頓點。
 
 ## contract package
 

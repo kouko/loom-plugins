@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.54.0] — 2026-10-31 — docs(loom-code): decide technical choices and continue closing review
+
+- `write-plan` checks existing decisions, project evidence, tests, and applicable external sources before resolving technical choices. A costly-to-reverse choice or three or more trade-offs prompts disclosure of material consequences, not an automatic question; unresolved user outcome preferences and missing authorization still go to the user.
+- `closing-review` runs `finalize-review` when its required verdicts and probe evidence are ready, then continues to Ship after a valid attestation is committed unless a stated stop condition applies. A progress update alone does not complete either step.
+
 ## [3.53.0] — 2026-10-30 — register shared diagram tool
 
 - Register `loom-interactive-diagram` as a workflow tool in the contract manifest and pin its contract test count.
