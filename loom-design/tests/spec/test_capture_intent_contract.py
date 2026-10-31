@@ -257,21 +257,21 @@ def test_loom_design_version_2_17_0_consistent() -> None:
         (REPO / "loom-design/package.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.17.0"
-    assert codex_manifest["version"] == "2.17.0"
-    assert agy_manifest["version"] == "2.17.0"
-    assert package_manifest["version"] == "2.17.0"
-    assert "## [2.17.0]" in changelog
+    assert claude_manifest["version"] == "2.18.0"
+    assert codex_manifest["version"] == "2.18.0"
+    assert agy_manifest["version"] == "2.18.0"
+    assert package_manifest["version"] == "2.18.0"
+    assert "## [2.18.0]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/) | 2.17.0 |",
-        "loom-design/README.md": "**Version**: 2.17.0",
-        "loom-design/README.ja.md": "**Version**: 2.17.0",
-        "loom-design/README.zh-TW.md": "**Version**: 2.17.0",
+        "README.md": "| [`loom-design`](loom-design/) | 2.18.0 |",
+        "loom-design/README.md": "**Version**: 2.18.0",
+        "loom-design/README.ja.md": "**Version**: 2.18.0",
+        "loom-design/README.zh-TW.md": "**Version**: 2.18.0",
     }
     for name, pin in readme_pins.items():
         assert pin in (REPO / name).read_text(encoding="utf-8"), name
-    assert "## loom-design\n\nVersion 2.17.0." in (REPO / "README.md").read_text(encoding="utf-8")
+    assert "## loom-design\n\nVersion 2.18.0." in (REPO / "README.md").read_text(encoding="utf-8")
 
 
 def test_capture_intent_bare_branch_absent() -> None:
