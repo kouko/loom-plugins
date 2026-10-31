@@ -25,7 +25,7 @@ DESCRIPTION_BUDGET = 4_047
 PROJECT_RETRO_DESCRIPTION_CHARS = 229
 SKILL_RETRO_DESCRIPTION_CHARS = 182
 SKILL_RETRO_DESCRIPTION_DELTA = 53
-INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS = 208
+INTERACTIVE_DIAGRAM_DESCRIPTION_CHARS = 213
 ROUTER_NAMES = {
     "loom-code": "using-loom-code",
     "loom-design": "using-loom-design",
@@ -173,7 +173,8 @@ def test_candidate_rendered_description_total_counts_router_overhead() -> None:
 
 def test_interactive_diagram_description_names_default_format_and_readback() -> None:
     description = _description(_skills()["loom-workflow"]["loom-interactive-diagram"])
-    assert "agent needs to read back saved changes" in description
+    assert "agent needs to create a diagram" in description
+    assert "read back saved changes" in description
     assert "draw.io is the default format" in description
     assert "including draw.io files" not in description
 

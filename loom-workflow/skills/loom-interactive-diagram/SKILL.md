@@ -1,7 +1,7 @@
 ---
 name: loom-interactive-diagram
 description: |
-  Create and check shared editable diagrams during Loom discussions. Use when the user edits a shared diagram in an external editor and the agent needs to read back saved changes; draw.io is the default format.
+  Create and check shared editable diagrams during Loom discussions. Use when the agent needs to create a diagram for the user to edit in an external editor or read back saved changes; draw.io is the default format.
 version: 1.0.0
 ---
 
