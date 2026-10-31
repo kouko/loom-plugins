@@ -3,6 +3,8 @@
 import re
 from pathlib import Path
 
+from prose_pin import has_negation, split_sentences
+
 
 ROOT = Path(__file__).resolve().parents[2] / "loom-code" / "skills"
 DOOR = ROOT / "write-plan" / "references" / "one-way-door.md"
@@ -19,9 +21,20 @@ def assert_rule(path: Path, pattern: str) -> None:
     assert re.search(pattern, text(path)), path
 
 
+def assert_affirmative_rule(path: Path, pattern: str) -> None:
+    assert any(
+        re.search(pattern, sentence) and not has_negation(sentence)
+        for sentence in split_sentences(text(path), ends=".")
+    ), path
+
+
 def test_technical_choice_with_evidence_proceeds() -> None:
-    assert_rule(DOOR, r"(?:existing decisions|project evidence).*?(?:tests|measure).*?technical.*?(?:decide|choose)")
-    assert_rule(PLAN, r"decide the technical choice.*?record.*?reason")
+    assert_affirmative_rule(
+        DOOR,
+        r"(?:existing decisions|project evidence).*?(?:tests|measure).*?"
+        r"(?:decide the technical choice|technical choice.*?decide)",
+    )
+    assert_affirmative_rule(PLAN, r"decide the technical choice.*?record.*?reason")
 
 
 def test_three_tradeoffs_alone_do_not_ask() -> None:
