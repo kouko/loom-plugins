@@ -51,8 +51,8 @@ def managed_directory(change_id):
     if not change.resolve().is_relative_to(change):
         raise ValueError(f"{change}: managed change directory escapes its location")
     managed = change / "diagrams"
-    if not managed.resolve().is_relative_to(change):
-        raise ValueError(f"{managed}: managed diagrams directory escapes change")
+    if managed.resolve() != managed:
+        raise ValueError(f"{managed}: managed diagrams directory escapes canonical diagrams location")
     return managed
 
 
