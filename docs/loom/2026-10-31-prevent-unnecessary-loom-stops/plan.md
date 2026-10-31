@@ -43,6 +43,21 @@ Wave 1 — adjust the existing decision and hand-off guidance; keep each policy 
 - Test: A4 negative: removing the new merge qualifier makes the real write-spec contract test fail; positive: the unchanged qualifier passes. A5 boundary: the other consent and no-repeat mutation cases remain active.
 - Risk: The old probe's exact string no longer exists after narrowing the question rule. Change only its mutation target and keep its RED-on-bad-prose behavior.
 
+**W1-07 Align late write-spec choices with the shared question boundary**  after: W1-02  acceptance: 4, 5
+- Files: loom-design/skills/write-spec/SKILL.md, loom-design/tests/spec/test_write_spec_contract.py
+- Test: A4 positive: late evidence-based technical choice proceeds; negative: missing outcome or authorization is asked while independent work continues. A5 boundary: no committing action proceeds without authorization.
+- Risk: Two reviewers found the same stale late-choice paragraph and its broad question wording. Search all changed skill prose and A4/A5 surfaces; retain the conservative option when it meets the outcome.
+
+**W1-08 Reject a reversed three-trade-offs rule in its contract test**  after: W1-01, W1-04  acceptance: 3
+- Files: loom-code/tests/test_one_way_door_question_rule.py
+- Test: A3 positive: the affirmative rule passes; negative: reversing that rule to an automatic question fails the test.
+- Risk: A whole-file regex crosses sentences and hides the reversal. Search all changed tests and A3 surfaces for the same false-positive class; preserve the existing consent checks.
+
+**W1-09 Align release READMEs with the narrowed question rule**  after: W1-01  acceptance: 3, 4, 5
+- Files: loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md
+- Test: A3 positive: consequential choices disclose effects; negative: hard-to-reverse alone does not force a question. A5 boundary: missing authorization still asks.
+- Risk: Three translated READMEs retain the former automatic-question wording. Keep their decision-point numbers and release version unchanged.
+
 Wave 2 — release metadata after the guidance and its tests stabilize.
 
 **W2-01 Bump loom-code minor version and release text**  after: W1-01, W1-03  acceptance: 3
