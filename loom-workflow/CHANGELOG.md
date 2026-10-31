@@ -7,6 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [5.17.1] — 2026-10-31 — active-turn diagram save detection
 
 - Add a bounded content poll for one diagram, so an active discussion can read a stable saved edit without another message. Unchanged content and unrelated files do not trigger it; timeout and file errors are explicit.
+- Clarify the shared diagram skill's discovery text: draw.io is the default format, and the agent can read back edits saved from an external editor.
 
 ## [5.17.0] — 2026-10-30 — shared editable diagram tool
 
