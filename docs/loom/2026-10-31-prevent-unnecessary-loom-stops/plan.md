@@ -60,6 +60,28 @@ Wave 2 — release metadata after the guidance and its tests stabilize.
 - Test: A3 positive: readme-and-version-pins-match-both-manifests; negative: stale-current-version-pins-fail.
 - Risk: Both plugins appear in README.md; update the shared listing only after both source manifests have their final versions.
 
+Wave 3 — integrate the newly fetched trunk release and give this guidance distinct minor versions.
+
+**W3-01 Resolve the trunk release conflicts without losing either change**  after: W2-03  acceptance: 3
+- Files: README.md, loom-code/CHANGELOG.md, loom-design/CHANGELOG.md
+- Test: A3 positive: both the shared-diagram release and this guidance remain documented; boundary: the merge contains trunk content and no conflict markers.
+- Risk: Trunk has already published loom-code 3.53.0 and loom-design 2.17.0. Preserve its release entries and this change's entries; W3-02 through W3-04 assign distinct versions.
+
+**W3-02 Assign loom-code guidance version 3.54.0**  after: W3-01  acceptance: 3
+- Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, loom-code/CHANGELOG.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md
+- Test: A3 positive: source and generated manifests, changelog, and plugin READMEs agree on 3.54.0.
+- Risk: Keep trunk's 3.53.0 shared-diagram entry and derive manifests with scripts/sync_codex_manifests.py.
+
+**W3-03 Assign loom-design guidance version 2.18.0**  after: W3-01  acceptance: 3
+- Files: loom-design/.claude-plugin/plugin.json, loom-design/.codex-plugin/plugin.json, loom-design/plugin.json, loom-design/package.json, loom-design/CHANGELOG.md, loom-design/README.md, loom-design/README.ja.md, loom-design/README.zh-TW.md
+- Test: A3 positive: source and generated manifests, changelog, and plugin READMEs agree on 2.18.0.
+- Risk: Keep trunk's 2.17.0 shared-diagram entry and derive manifests with scripts/sync_codex_manifests.py.
+
+**W3-04 Refresh shared version listing and test pins**  after: W3-02, W3-03  acceptance: 3
+- Files: README.md, loom-code/tests/test_write_plan_station_text.py, loom-design/tests/spec/test_capture_intent_contract.py
+- Test: A3 positive: root listing and pinned tests match 3.54.0 and 2.18.0; negative: stale pins fail.
+- Risk: The root README also contains trunk's shared-diagram documentation; preserve it while changing only the two version strings.
+
 ## Simplicity check
 - none found
 
