@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 
-SCRIPT = Path(__file__).resolve().parents[5] / "loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py"
+SCRIPT = Path(__file__).resolve().parents[2] / "skills/loom-interactive-diagram/scripts/diagram.py"
 
 
 def test_new_symlink_rejected(tmp_path):
