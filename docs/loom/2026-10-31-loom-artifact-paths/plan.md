@@ -11,7 +11,7 @@ charter: 1.1
 - Risk: Existing tests assume arbitrary cwd; preserve every linked-diagram check while replacing their fixtures. Follow spec REQ-1 through REQ-4; agent-decided: explicit id from root avoids choosing among concurrent changes.
 
 **W1-01 Release the changed skill contract**  after: W0-01  acceptance: 1
-- Files: loom-workflow/.claude-plugin/plugin.json, loom-workflow/.codex-plugin/plugin.json, loom-workflow/plugin.json, loom-workflow/package.json, loom-workflow/README.md, loom-workflow/CHANGELOG.md
+- Files: loom-workflow/.claude-plugin/plugin.json, loom-workflow/.codex-plugin/plugin.json, loom-workflow/plugin.json, loom-workflow/package.json, loom-workflow/README*.md, loom-workflow/CHANGELOG.md, README.md, loom-workflow/tests/scripts/test_release_metadata.py
 - Test: A1 positive: synchronized-version-metadata; boundary: old-version-pin-updated.
 - Risk: Bump loom-workflow minor version for changed skill guidance and CLI contract; run manifest sync before finalization.
 
