@@ -33,7 +33,11 @@ REQ-9 — Read a saved user edit during the active turn
 REQ-10 — Ignore unchanged and unrelated saves
   WHILE the agent is waiting for a diagram edit, changes to other files and saves that leave the diagram content unchanged shall not be reported as a diagram edit → Acceptance #10
 
+REQ-11 — Describe the default format accurately
+  The shared skill description shall say that draw.io is the default format and that the agent reads back saved edits from an external editor; it shall not imply draw.io is merely an additional file type → Acceptance #11
+
 ## Design decision
+- Skill discovery text names draw.io as the default format and saved-edit readback as the trigger, while backend selection remains available — user-decided (the user approved the proposed wording correction on 2026-10-31)
 - New shared tool `loom-workflow:loom-interactive-diagram` in the loom-workflow plugin, next to loom-visualization — user-decided (scope B: cross-station shared tool, loom-workflow home)
 - Backend registry: `backends/` folder in the skill, one file per backend exposing a minimal contract (extension, generate, project, check); `scripts/diagram.py` discovers backends by directory listing, so adding a backend is one file with no routing edit — agent-decided
 - Backend contract as a plain callable protocol (function-per-capability), not classes or frameworks — data over abstractions; each backend self-contained so a new backend can't reach into another — agent-decided
