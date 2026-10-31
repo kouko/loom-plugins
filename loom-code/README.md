@@ -99,10 +99,12 @@ Everything else is decided for you, with the reason recorded.
 3. **Did it do it?** — you accept the result, reading the acceptance test report
    written by an agent that never touched the change when one was required.
 
-An irreversible fork (deleting data, a public interface, a one-way migration)
-is added to ① for an engineering change or ② for a product change (① when
-no spec is written), phrased as
-its consequence — never as an extra stop.
+For a hard-to-reverse choice (deleting data, a public interface, a one-way
+migration), disclose its material consequences at ① for an engineering change
+or ② for a product change (① when no spec is written). Ask a question there
+only when the user's outcome preference remains unresolved or explicit
+authorization is missing. Changing or sending existing data still requires
+explicit consent; no extra stop is added.
 
 ## The contract package
 
