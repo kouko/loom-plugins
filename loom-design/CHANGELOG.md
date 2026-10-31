@@ -12,7 +12,7 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
-## [2.17.0] — 2026-10-31 — ask for unresolved outcomes and authorization
+## [2.18.0] — 2026-10-31 — ask for unresolved outcomes and authorization
 
 - `capture-intent` and `write-spec` now check existing decisions and evidence
   before asking the user to choose. Technical difficulty or multiple trade-offs
