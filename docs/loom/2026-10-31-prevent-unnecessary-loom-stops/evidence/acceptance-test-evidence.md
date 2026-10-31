@@ -41,3 +41,38 @@ Tried on 2026-10-31, in a clean copy of the project at `a24ab73d`.
 - How I tried it: Read the consequence and consent examples, decision-point guidance, and Closing Review stop boundaries; ran the focused tests above.
 - What came back: All selected tests passed. `loom-code/skills/write-plan/references/one-way-door.md:56-73` calls for user-facing consequences even without a question. `:26-36,83-87` keeps existing-data consent. `loom-code/skills/closing-review/SKILL.md:439-452` preserves stated stops and skipped-review behavior; `:242-246` retains fresh authorization for a repeated outside review.
 - Evidence: `loom-code/tests/test_one_way_door_question_rule.py:56-64`, `loom-code/tests/test_review_convergence_contract.py:214-230`, `loom-code/tests/test_one_way_door_copies.py:43-75`. User-visible handling in a real Claude Code conversation remains untested.
+
+## Re-run on 2026-10-31, at `4f1c7eec`
+
+- Clean copy: `git worktree add --detach /private/tmp/loom-acceptance-r2.X1arLD/checkout 4f1c7eece8f9637e1e5cd8c47f5daafa6e33c1b3` returned `HEAD is now at 4f1c7eec`; `git status --short --branch` returned `## HEAD (no branch)` and no changed files.
+- Setup repeated from the README: `agy plugin validate ./loom-code` returned `[ok]`, `skills: 7 processed`, `agents: 4 processed`, `hooks: 1 processed`; `agy plugin validate ./loom-design` returned `[ok]`, `skills: 6 processed`.
+- Fix range checked: `git diff --name-status 0edaff6f..4f1c7eece8f9637e1e5cd8c47f5daafa6e33c1b3` changed the question-rule test, write-spec guidance/test, three loom-code READMEs and the plan. Neither Closing Review guidance nor its convergence test changed, so rows 1 and 2 are carried over.
+- A single mixed-root focused command, `pytest -q loom-code/tests/test_one_way_door_question_rule.py loom-code/tests/test_one_way_door_copies.py loom-code/tests/test_questionrule_negation_rejected.py loom-code/tests/test_adversarial_product_one_way_door_without_spec.py loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py loom-code/tests/test_write_plan_shape_text.py loom-design/tests/spec/test_adversarial_write_spec_no_reask_unpinned_sentences.py loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_write_spec_contract.py`, returned `1 failed, 118 passed in 0.50s`. `test_three_tradeoffs_reversed_rule_is_rejected` raised `AttributeError: <module 'private' (namespace) from ['/private']> has no attribute 'DOOR'` at `loom-code/tests/test_one_way_door_question_rule.py:69`. The test also passed when its file ran alone (`7 passed in 0.16s`). This is a portability defect in the new test's module lookup across pytest root layouts; no product guidance was changed by this finding.
+- The project's package runner executes code and design test roots in separate subprocesses (`scripts/run_package_tests.py:122-138`), so the affected focused checks were repeated in that separation: `pytest -q loom-code/tests/test_one_way_door_question_rule.py loom-code/tests/test_one_way_door_copies.py loom-code/tests/test_questionrule_negation_rejected.py loom-code/tests/test_adversarial_product_one_way_door_without_spec.py loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py loom-code/tests/test_write_plan_shape_text.py` returned `64 passed in 0.20s`; `pytest -q loom-design/tests/spec/test_adversarial_write_spec_no_reask_unpinned_sentences.py loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_write_spec_contract.py` returned `55 passed in 0.20s`. These 119 focused cases passed in the package runner's grouping. The full package suite was not run; `finalize-review` will run it and block attestation on failure.
+- The earlier automatic approval review rejected an escalated Codex probe because private skill text might reach an external model service without explicit authorization. It was not retried or bypassed. There is still no controlled model response or real Claude Code station run.
+
+### 1. Carried over
+
+- The fix diff did not touch `loom-code/skills/closing-review/SKILL.md` or `loom-code/tests/test_review_convergence_contract.py`; the prior result and its live-behavior limit remain valid.
+
+### 2. Carried over
+
+- The fix diff did not touch Closing Review finalization or handoff, or the focused test for either; the prior result and its live-handoff limit remain valid.
+
+### 3. Re-tested in full
+
+- How I tried it: Re-read `loom-code/skills/write-plan/references/one-way-door.md`, the write-plan and capture-intent guidance, the changed write-spec guidance, all three changed README language copies, and the rule/cross-copy/negation tests. Ran both focused test groups above, covering evidence-based technical choice, hard-to-swap and output-quality risk, three-trade-off reversal, and prior decisions.
+- What came back: The code group passed 64 cases; the design group passed 55. The updated `loom-code/tests/test_one_way_door_question_rule.py:42-75` now checks the three-trade-off rule by sentence and mutates it to an automatic-question form. `loom-design/skills/write-spec/SKILL.md:238-254` directs late technical choices from evidence. `loom-code/README.md:102-108` and corresponding Japanese/Traditional Chinese paragraphs say hard-to-reverse choices disclose consequences and only unresolved user outcomes or missing authorization prompt a question. The mixed-root invocation's import failure is recorded above and is not a behavioral observation.
+- Evidence: The two focused test outputs and inspected files above. No model was observed making a real choice.
+
+### 4. Re-tested in full
+
+- How I tried it: Re-read the no-spec first-question route, write-plan late-choice rule, capture-intent and write-spec decision points including the changed late-choice paragraph, the no-repeat and consent tests, and all three README copies. Ran both focused test groups above.
+- What came back: The 119 cases in the runner-aligned grouping passed. `loom-design/skills/write-spec/SKILL.md:246-254` now asks for an unresolved user outcome or missing authorization after the visible-behavior message, continues independent work while waiting, and uses a reversible no-obligation option only if it meets the user's outcome. `loom-design/tests/spec/test_write_spec_contract.py:307-323` checks this boundary. The same question boundary appears in `loom-code/skills/write-plan/references/one-way-door.md:41-54,78-87` and the README paragraphs. A live wait-and-continue sequence remains unobserved.
+- Evidence: The two focused test outputs and inspected guidance above.
+
+### 5. Re-tested in full
+
+- How I tried it: Re-read the consequence and existing-data consent examples, all three README copies, changed write-spec late-choice guidance, and Closing Review's existing consent/stop language; ran both focused test groups above.
+- What came back: The 119 cases in the runner-aligned grouping passed. The README copies disclose material effects and require explicit consent for existing-data change or transfer. `loom-design/skills/write-spec/SKILL.md:246-254` preserves consequence disclosure and prior authorization before a committing action. `loom-code/skills/write-plan/references/one-way-door.md:56-73,83-87` preserves consequence and consent wording. The fix did not modify Closing Review's legitimate stop conditions or fresh authorization for repeated outside review. Real user-visible presentation remains unobserved.
+- Evidence: The two focused test outputs and inspected guidance above.
