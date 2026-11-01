@@ -1,0 +1,76 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-19-complex-planning-and-process-diagrams",
+  "content_digest": "6076c7cc3c0b5d0d7857aed0c3bfb049c4062a3b",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-visualization/test_templates.py -q",
+      "artifact": "loom-workflow/tests/loom-visualization/test_templates.py",
+      "result": "pass",
+      "command_digest": "ae44dbc839b113d63be578bd779a299b277311211e29f1be651f4f3daf0aa2d3"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "pr99-rebase-code-reviewer",
+      "vendor": "openai",
+      "model": "inherited-host-profile",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "4c889e23a67257a7a625842a143e7f2a93b1f5f0",
+      "review_target_sha": "d3c8926cd858b395758f7a0b2f3415bd3ad7de08",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS_WITH_NOTES",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous finding fixed: W1-01 now lists checks_kink.py and test_ascii_cli.py and names both misaligned connector cases.",
+        "The fix changes only the two plan lines; git diff --check is clean.",
+        "Mermaid rendering in a supported host remains unverified, as previously disclosed."
+      ]
+    },
+    {
+      "reviewer": "pr99-rebase-skill-reviewer",
+      "vendor": "openai",
+      "model": "inherited-host-profile",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "4c889e23a67257a7a625842a143e7f2a93b1f5f0",
+      "review_target_sha": "d3c8926cd858b395758f7a0b2f3415bd3ad7de08",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The plan now names both changed checker and CLI test files, and its negative cases match the delivered connector checks. This fix introduces no breakage to the skill lens."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-13-project-session-retro",
+  "content_digest": "15a1bf0670abe79d8b93c604159b5f28ad08692e",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "/Users/kouko/.conda/envs/dbt-redshift/bin/python -m pytest loom-workflow/tests/retro/test_routing.py -q",
+      "artifact": "loom-workflow/tests/retro/test_routing.py",
+      "result": "pass",
+      "command_digest": "2cf4c95123cc6a229c1e21553a47d24c5f52599d1fa1c88d06e10dcc51c994b0"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "retro_review_skill",
+      "vendor": "openai",
+      "lens": "skill",
+      "reviewed_sha": "7b8f58531d423cb2a4a6cf88abeb921fe9c5ed92",
+      "review_target_sha": "ea628ed03c18a9222f6260e22ae592700a64bcef",
+      "verdict": "PASS",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": []
+    },
+    {
+      "reviewer": "retro_review_code",
+      "vendor": "openai",
+      "lens": "code",
+      "reviewed_sha": "7b8f58531d423cb2a4a6cf88abeb921fe9c5ed92",
+      "review_target_sha": "ea628ed03c18a9222f6260e22ae592700a64bcef",
+      "verdict": "PASS",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-workflow/tests/retro/test_routing.py:27",
+          "text": "nitpick: The Japanese routing test checks description wording, not actual model selection; the acceptance report discloses that limit.",
+          "fix": "Rename the test to describe its wording check in a future cleanup."
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

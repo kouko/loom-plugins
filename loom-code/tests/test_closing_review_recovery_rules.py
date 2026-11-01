@@ -122,6 +122,18 @@ def test_RL_04_no_second_copy_of_the_artifact_station_mapping():
     print("RL-04 PASS: the recovery passage carries no second copy of the mapping")
 
 
+def test_outside_retry_requires_new_authorization_in_both_owner_clauses():
+    content = _read()
+    for marker in ("review.external-dispatch", "review.bounded-episode"):
+        start = content.index(f"<!-- gate: {marker} -->")
+        end = content.index(GATE_END, start)
+        passage = _normalize(content[start:end])
+        assert re.search(r"malformed.{0,350}newly authorized review with a fresh preflight", passage), marker
+        assert re.search(r"rapid-refill-breaker.{0,200}private diagnostics before requesting", passage), marker
+        assert "retry once" in passage or "retried once" in passage, marker
+
+
 if __name__ == "__main__":
     test_RL_04_no_second_copy_of_the_artifact_station_mapping()
+    test_outside_retry_requires_new_authorization_in_both_owner_clauses()
     print("All probes passed.")

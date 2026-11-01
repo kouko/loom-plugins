@@ -66,6 +66,11 @@ def land_on_main(teammate: Path, name: str, text: str) -> str:
     return sha
 
 
+def push_branch(change: Path, remote_name: str = "feature") -> None:
+    """Publish the change branch, so sync must merge instead of rebasing."""
+    git(change, "push", "-q", "origin", f"feature:{remote_name}")
+
+
 def state(repo: Path) -> tuple[str, str, str]:
     return (
         git(repo, "rev-parse", "HEAD"),
@@ -107,6 +112,7 @@ def test_branch_ahead_of_trunk_adds_no_commit(tmp_path: Path) -> None:
 def test_behind_branch_merges_fetched_trunk_tip_and_says_content_changed(tmp_path: Path) -> None:
     _origin, change, teammate = repos(tmp_path)
     own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    push_branch(change)
     trunk_tip = land_on_main(teammate, "other.txt", "other\n")
 
     result = sync(change)
@@ -118,7 +124,145 @@ def test_behind_branch_merges_fetched_trunk_tip_and_says_content_changed(tmp_pat
     assert git(change, "status", "--porcelain") == ""
     assert trunk_tip in result.stdout
     assert head in result.stdout
+    assert "commit ids changed" not in result.stdout
     assert "content changed" in result.stdout
+
+
+def test_unpushed_behind_rebases_linear(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    commit_file(change, "feature.txt", "feature\n", "feature one")
+    commit_file(change, "feature2.txt", "feature\n", "feature two")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stderr
+    assert git(change, "rev-list", "--merges", "--count", "HEAD") == "0"
+    assert git(change, "rev-parse", "HEAD~2") == trunk_tip
+    assert git(change, "log", "--format=%s", "-2").splitlines() == ["feature two", "feature one"]
+    assert git(change, "symbolic-ref", "--short", "HEAD") == "feature"
+    assert git(change, "status", "--porcelain") == ""
+    assert f"rebased feature onto origin/main ({trunk_tip})" in result.stdout
+    assert "commit ids changed -- re-pin any commit-sha reference" in result.stdout.splitlines()[1]
+    assert "content changed" in result.stdout
+
+
+def test_pushed_behind_merges_then_plain_push_accepted(tmp_path: Path) -> None:
+    origin, change, teammate = repos(tmp_path)
+    own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    push_branch(change)
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stderr
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
+    git(change, "push", "-q", "origin", "feature")
+    assert git(origin, "rev-parse", "feature") == git(change, "rev-parse", "HEAD")
+
+
+def test_commits_pushed_under_other_name_merge(tmp_path: Path) -> None:
+    origin, change, teammate = repos(tmp_path)
+    own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    push_branch(change, remote_name="other-name")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stderr
+    assert git(origin, "for-each-ref", "refs/heads/feature") == ""
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
+
+
+def test_branch_with_configured_upstream_merges(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    fork = tmp_path / "fork.git"
+    subprocess.run(["git", "init", "-q", "--bare", str(fork)], check=True)
+    git(change, "remote", "add", "fork", str(fork))
+    own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    git(change, "push", "-q", "-u", "fork", "feature")
+    # Only the upstream config still records the push.
+    git(change, "update-ref", "-d", "refs/remotes/fork/feature")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
+
+
+def test_unpushed_conflict_names_paths_restores(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    # Edit then revert: the merged result is clean (merge-tree sees no conflict),
+    # but replaying the first commit on the trunk tip conflicts.
+    commit_file(change, "file.txt", "branch side\n", "branch edits file")
+    commit_file(change, "file.txt", "content\n", "branch reverts file")
+    land_on_main(teammate, "file.txt", "trunk side\n")
+    before = state(change)
+    snapshot = git(change, "status", "--porcelain", "--untracked-files=all", "--ignored")
+
+    result = sync(change)
+
+    lines = result.stderr.splitlines()
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "BLOCK review.sync: conflict: file.txt" in lines
+    assert any("the rebase was aborted" in line for line in lines), result.stderr
+    assert state(change)[:2] == before[:2]
+    assert git(change, "status", "--porcelain", "--untracked-files=all", "--ignored") == snapshot
+    assert git(change, "symbolic-ref", "--short", "HEAD") == "feature"
+    git_dir = Path(git(change, "rev-parse", "--absolute-git-dir"))
+    assert not (git_dir / "rebase-merge").exists() and not (git_dir / "rebase-apply").exists()
+
+
+@pytest.mark.parametrize(
+    ("returncode", "detail"),
+    [
+        (1, "error: rebase refused for a reason that is not a conflict"),
+        (129, "error: unknown option `no-update-refs'"),
+    ],
+    ids=["not-a-conflict", "old-git-no-update-refs"],
+)
+def test_rebase_failing_without_conflict_falls_back_to_merge(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, returncode: int, detail: str
+) -> None:
+    from io import StringIO
+
+    from loom_checker.command_handlers import sync as sync_handler
+
+    _origin, change, teammate = repos(tmp_path)
+    own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+    real_git = sync_handler._git
+
+    def failing_rebase(git_exe, repo, *args, **kwargs):
+        if args and args[0] == "rebase" and "--abort" not in args:
+            return returncode, "", detail
+        return real_git(git_exe, repo, *args, **kwargs)
+
+    monkeypatch.setattr(sync_handler, "_git", failing_rebase)
+    monkeypatch.chdir(change)
+    out, err = StringIO(), StringIO()
+
+    code = sync_handler.cmd_sync_trunk([], out=out, err=err)
+
+    assert code == 0, out.getvalue() + err.getvalue()
+    assert f"merged origin/main ({trunk_tip}) into feature" in out.getvalue()
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
+
+
+def test_unpushed_with_prior_merge_commit_merges(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    commit_file(change, "feature.txt", "feature\n", "feature work")
+    land_on_main(teammate, "first.txt", "first\n")
+    git(change, "fetch", "-q", "origin")
+    git(change, "merge", "-q", "--no-edit", "origin/main")
+    prior = git(change, "rev-parse", "HEAD")
+    trunk_tip = land_on_main(teammate, "second.txt", "second\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stderr
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [prior, trunk_tip]
 
 
 def test_trunk_name_resolves_without_origin_head(tmp_path: Path) -> None:
@@ -155,11 +299,14 @@ def test_conflict_names_every_file_and_restores_head(tmp_path: Path) -> None:
     assert (change / "file.txt").read_text(encoding="utf-8") == "branch side\n"
 
 
+@pytest.mark.parametrize("pushed", [False, True], ids=["rebase", "merge"])
 @pytest.mark.parametrize("kind", ["branch", "tag"])
-def test_ref_named_origin_trunk_does_not_shadow_fetched_tip(tmp_path: Path, kind: str) -> None:
+def test_ref_named_origin_trunk_does_not_shadow_fetched_tip(tmp_path: Path, kind: str, pushed: bool) -> None:
     _origin, change, teammate = repos(tmp_path)
     git(change, kind, "origin/main", "main")
     commit_file(change, "feature.txt", "feature\n", "feature work")
+    if pushed:
+        push_branch(change)
     trunk_tip = land_on_main(teammate, "other.txt", "other\n")
 
     result = sync(change)
@@ -189,6 +336,25 @@ def test_ignored_file_trunk_starts_tracking_is_refused_and_kept(tmp_path: Path) 
     assert "conflict: file.txt" in result.stderr
     assert git(change, "rev-parse", "HEAD") == head_before
     assert (change / "secret.env").read_text(encoding="utf-8") == "LOCAL=keep-me\n"
+
+
+def test_unpushed_branch_touching_local_ignored_file_merges_and_keeps_it(tmp_path: Path) -> None:
+    _origin, change, teammate = repos(tmp_path)
+    (Path(git(change, "rev-parse", "--absolute-git-dir")) / "info" / "exclude").write_text(".env\n")
+    (change / ".env").write_text("SECRET=committed\n", encoding="utf-8")
+    git(change, "add", "-f", ".env")
+    git(change, "commit", "-q", "-m", "add env by mistake")
+    git(change, "rm", "-q", ".env")
+    git(change, "commit", "-q", "-m", "remove env")
+    own = commit_file(change, "feature.txt", "feature\n", "feature work")
+    (change / ".env").write_text("SECRET=local-only\n", encoding="utf-8")
+    trunk_tip = land_on_main(teammate, "other.txt", "other\n")
+
+    result = sync(change)
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert git(change, "rev-list", "--parents", "-n", "1", "HEAD").split()[1:] == [own, trunk_tip]
+    assert (change / ".env").read_text(encoding="utf-8") == "SECRET=local-only\n"
 
 
 @pytest.mark.parametrize("failing", ["ls-files", "diff"])
@@ -249,6 +415,7 @@ def test_merge_tree_unavailable_falls_back_to_merge_then_abort(
     _origin, change, teammate = repos(tmp_path)
     commit_file(change, "file.txt", "branch side\n", "branch edits file")
     commit_file(change, "a.txt", "branch a\n", "branch edits a")
+    push_branch(change)
     land_on_main(teammate, "file.txt", "trunk side\n")
     land_on_main(teammate, "a.txt", "trunk a\n")
     before = state(change)
@@ -278,6 +445,7 @@ def test_merge_ff_only_config_does_not_block_clean_merge(tmp_path: Path) -> None
     _origin, change, teammate = repos(tmp_path)
     git(change, "config", "merge.ff", "only")
     commit_file(change, "feature.txt", "feature\n", "feature work")
+    push_branch(change)
     trunk_tip = land_on_main(teammate, "other.txt", "other\n")
 
     result = sync(change)

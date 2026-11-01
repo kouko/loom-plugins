@@ -27,10 +27,10 @@ exactly one observed-state JSON object on standard input:
 
 ```text
 # Claude Code
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair --script dispatch_profile.py
 
 # Codex CLI, Antigravity CLI
-python3 <loom-code>/scripts/dispatch_profile.py
+"<loom-code>/scripts/loom-python" --repair --script dispatch_profile.py
 ```
 
 `<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude Code;

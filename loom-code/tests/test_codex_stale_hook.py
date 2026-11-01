@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -86,7 +87,15 @@ def test_codex_hook_present_root_delegates_every_bash_payload(tmp_path: Path) ->
         "raise SystemExit(17)\n",
         encoding="utf-8",
     )
-    result = _run("git status", root)
+    launcher = root / "scripts/loom-python"
+    launcher.write_bytes((ROOT / "loom-code/scripts/loom-python").read_bytes())
+    launcher.chmod(0o755)
+    runtime = tmp_path / "cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin"
+    runtime.mkdir(parents=True)
+    (runtime / "python").symlink_to(sys.executable)
+    env = dict(os.environ, PLUGIN_ROOT=str(root), XDG_CACHE_HOME=str(tmp_path / "cache"))
+    result = subprocess.run(_command(), shell=True, input=_payload("git status"),
+                            text=True, capture_output=True, env=env)
     assert result.returncode == 17
     assert "delegated:" in result.stdout
 

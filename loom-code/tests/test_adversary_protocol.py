@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 
 from loom_checker.probes import MAX_PROBE_PROGRAMS
-from prose_pin import flat_prose as _flat
+from prose_pin import affirms, flat_prose as _flat
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -375,3 +375,42 @@ def test_no_restatement_contradicts_the_source() -> None:
         if case_counts(text) - allowed
     }
     assert contradicting == {}, contradicting
+
+
+# --- The protocol prose agrees with what finalize-review accepts ------------
+#
+# Acceptance 1, 2 and 5 of
+# `docs/loom/intent/2026-10-26-five-skill-consistency-defects.md`.
+
+BUILD = SKILLS / "build/SKILL.md"
+BUILD_PROSE = _flat(BUILD)
+ASK_TO_SKIP = re.compile(r"\bask(?:s)?\b[^.]{0,60}\bwhether to skip\b", re.I)
+
+
+def test_no_program_is_recorded_not_asked_about() -> None:
+    """A1: no program yields a recorded outcome, never a question to the user."""
+    for name, prose in (("adversary.md", ADVERSARY_PROSE), ("adversarial.md", ADVERSARIAL_REF),
+                        ("build/SKILL.md", BUILD_PROSE)):
+        assert not ASK_TO_SKIP.search(prose), (name, ASK_TO_SKIP.search(prose))
+    # The user's own plain-words skip stays.
+    assert affirms(BUILD_PROSE, "The default is the full flow",
+                   "skip a step only when the user tells you to in plain words")
+
+
+CEILING_RULE = ("The ceiling", "counts distinct program paths")
+
+
+def test_reuse_is_counted_by_distinct_program_paths() -> None:
+    """A2: the ceiling counts distinct paths; reuse is not categorically free."""
+    assert affirms("The ceiling counts distinct program paths.", *CEILING_RULE)
+    assert not affirms("The ceiling never counts distinct program paths.", *CEILING_RULE)
+    assert affirms(ADVERSARIAL_REF, *CEILING_RULE)
+    assert "spends nothing" not in ADVERSARIAL_REF
+
+
+def test_pytest_command_form_matches_the_checker() -> None:
+    """A5: any Python invocation running `-m pytest <artifact>` is accepted;
+    a bare `python3 <artifact>` run of a test file is refused."""
+    assert affirms(ADVERSARIAL_REF, "must be recorded as",
+                   "any supported Python invocation followed by `-m pytest <artifact>`")
+    assert affirms(ADVERSARIAL_REF, "`finalize-review`", "refuses a bare `python3 <artifact>` run")

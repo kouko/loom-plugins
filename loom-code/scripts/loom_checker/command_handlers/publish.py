@@ -11,6 +11,7 @@ from loom_checker.helpers import repo_root
 from loom_checker.helpers import report
 from loom_checker.parsing import parse_document
 from loom_checker.rule_checks.publish import validate_contextual_pr_body
+from loom_checker.rule_checks.publish import validate_disclosed_outcome
 from loom_checker.rule_checks.publish import validate_stated_status
 from loom_checker.rule_checks.push import CANONICAL_PUSH_FLAGS
 from loom_checker.rule_checks.push import github_repo_from_origin
@@ -345,6 +346,18 @@ def cmd_publish(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
             os.environ["PATH"] = previous_path
 
 
+def _no_program_reasons(repo: Path, head: str, attestation_rel: str) -> list[str]:
+    """The no-program reasons the attestation committed at `head` records."""
+    try:
+        executions = json.loads(git_maybe(repo, "show", f"{head}:{attestation_rel}") or "")
+        executions = executions.get("executions")
+    except (ValueError, AttributeError):
+        return []
+    return [row["no_program"] for row in executions if isinstance(row, dict)
+            and row.get("kind") == "adversarial" and isinstance(row.get("no_program"), str)
+            ] if isinstance(executions, list) else []
+
+
 def _cmd_publish_trusted(
     title: str, body_file: Path, intent_file: Path | None, authorized: bool,
     trusted_git: str, trusted_gh: str,
@@ -398,6 +411,12 @@ def _cmd_publish_trusted(
     stated_error = validate_stated_status(body_file.read_text(encoding="utf-8"), status)
     if stated_error:
         return report([("push.contextual-body", stated_error)], err)
+    outcome_error = validate_disclosed_outcome(
+        body_file.read_text(encoding="utf-8"),
+        _no_program_reasons(repo, head, attestation_rel),
+    )
+    if outcome_error:
+        return report([("push.contextual-body", outcome_error)], err)
     out.write(f"Verification {status} for {head}\n")
     if status != "valid":
         clause = missing_clause(missing_records(repo, change_id, status, head))

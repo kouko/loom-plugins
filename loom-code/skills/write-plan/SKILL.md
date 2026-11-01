@@ -28,8 +28,8 @@ Use the installed checker's host-specific prefix:
 
 | Host | Command prefix |
 |---|---|
-| Claude Code | `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py` |
-| Codex CLI, Antigravity CLI | `python3 <loom-code>/scripts/loom_checker.py` |
+| Claude Code | `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair` |
+| Codex CLI, Antigravity CLI | `"<loom-code>/scripts/loom-python" --repair` |
 
 `<loom-code>` (this plugin's root) is `${CLAUDE_PLUGIN_ROOT}` on Claude Code;
 on any other host it is the directory two levels above this SKILL.md.
@@ -100,12 +100,13 @@ authorisation (step 0b) permits execution; it is not a work decision.
 ## Step 0 — Check the contract version
 
 ```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py contract --require 2.1
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair contract --require 2.1
 ```
 
-Exit 0: continue. Anything else, the rule is `contract.requires`: print
-what the checker printed, tell the user to update `loom-code`, and
-**stop**. Do not work around it.
+Exit 0: continue. Only a `contract.requires` result means the plugin contract is outdated:
+print what the checker printed, tell the user to update `loom-code`, and
+**stop**. For a launcher repair failure, report its printed obstacle and remedy
+and stop; do not label it a contract-version failure or work around it.
 
 ## Step 0b — Codex only: installed hook check
 
@@ -183,7 +184,7 @@ included), and chat shows text tables or text diagrams, not Mermaid.
 ## Step 2 — Standing documents
 
 ```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py standing docs/loom/intent/<change-id>.md
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair standing docs/loom/intent/<change-id>.md
 ```
 
 Run this on **every** change, before decision point ①. Print its WARN lines
@@ -207,7 +208,7 @@ installed, hand this to its `product-principles` tool instead.
 
 When `status:` is already `confirmed`, skip confirmation: branch first
 (Step 6), then run
-`loom_checker.py intent docs/loom/intent/<change-id>.md` until it exits 0.
+`"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intent docs/loom/intent/<change-id>.md` until it exits 0.
 Fix `needs-design:` with one new commit quoting the changed line verbatim
 in its body.
 
@@ -311,7 +312,7 @@ Whichever branch above you took, `no` included, run this before writing a
 plan:
 
 ```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py intake write-plan <change-id>
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id>
 ```
 
 Fix and re-run until exit 0. It checks `intake.confirmed`,
@@ -367,8 +368,8 @@ this when coverage was dropped.
 - Each task carries three one-line fields -- Files, Test and Risk -- whose
   content kinds and word caps are set by the plan row of the artifact
   charter (`contract/manifest.yaml`, `artifacts.plan.charter`, rendered by
-  `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py charter`). Run
-  `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py plan
+  `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair charter`). Run
+  `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair plan
   docs/loom/<change-id>/plan.md` before the plan commit. Keep the plan useful
   when implementation changes; no separate plan-history ledger is required.
 
@@ -403,8 +404,8 @@ filenames cannot establish that the completed change will be narrow.
 Then run both commands before committing it:
 
 ```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py plan docs/loom/<change-id>/plan.md
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py intake write-plan <change-id>
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair plan docs/loom/<change-id>/plan.md
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intake write-plan <change-id>
 ```
 
 The second run is when `intake.test-case-pair` can inspect the completed
@@ -423,7 +424,7 @@ exactly these keys: `contract_version` (integer 1), `configured_mode`,
 `fixed_vendor` (only in fixed mode), to:
 
 ```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/second_vendor_policy.py
+"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair --script second_vendor_policy.py
 ```
 
 Treat the JSON result as the decision: render its `notice_kind`,

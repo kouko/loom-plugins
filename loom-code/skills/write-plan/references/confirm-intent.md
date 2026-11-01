@@ -114,7 +114,7 @@ of your own. It never enters the intent file.
 2. Commit it. The message is `docs(loom): intent <change-id> confirmed`,
    and its body **must contain the `needs-design:` line verbatim** — the
    checker compares the two strings character for character.
-3. Verify: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/loom_checker.py intent docs/loom/intent/<change-id>.md`
+3. Verify: `"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair intent docs/loom/intent/<change-id>.md`
    Fix what it names and re-run until it exits 0.
 
 **On "no" or a correction:** rewrite the intent, restate again. There is no

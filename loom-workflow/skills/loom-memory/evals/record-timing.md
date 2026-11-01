@@ -35,14 +35,133 @@ re-running the eval is the single move that defeats the guard, and it
 costs less than the dispatch it skips — which is exactly why it is worth
 saying out loud here.
 
-## Reference run — 2026-09-11 (first, superseded)
+## Reference run — 2026-10-24 (sixth, current)
 
-Contract version: `SKILL.md` at commit `d7d89f6d3`, `Record` section digest
-`c7b0dcff`. Eleven candidates (12 did not exist yet). Result: 1 RECORD
-(candidate 4), PASS on all three criteria, agreeing with ground truth on 10
-of 11. Kept as a line rather than deleted: a frozen run whose text version is
-not recorded cannot be compared against a later one, which is this file's
-whole job.
+**Result: timing, exception, and scarcity PASS on both texts. Both readers
+gave identical final verdicts; neither matches ground truth on candidates
+1, 2, 4, and 12.**
+
+**Reason for the edit:** Record now names the host-memory-save trigger, adds
+the repo-wide test with machine-specific and agent-tool-specific exclusions,
+and states that a post-finalize lesson stays in host memory until the next
+change's branch records it.
+
+Changed text: the Record section of the working-tree SKILL.md for this
+change, whitespace-flattened and lowercased by the contract test, with
+SHA-256 `61f3c8afb88c689d153250e699c1fbab2be18b5f532bc17d173abb869afafa14`.
+Baseline text: the Record section at `52f3c765` (unchanged from `88f4a855`).
+Twelve candidates from `record-timing-cases.json`, with the same criteria.
+
+Readers: separate fresh-context `sonnet` agents, each given one isolated
+packet file (contract text verbatim, the situation, and the twelve
+candidates by id and text only, no ground truth) and told to read nothing
+else. One sample per text; no retries.
+
+| Run | Text | Timing | Exception | Scarcity (RECORD of 12) |
+|---|---|---|---|---|
+| E1 | changed | PASS: open branch before closure, cited | PASS: 11 only, batched follow-up; stays in host memory until then | PASS: 1 (2); count checked against zero-to-one |
+| B1 | baseline | PASS | PASS: 11 only, batched follow-up | PASS: 1 (2), after a first pass of 4 (2, 3, 10, 12) self-corrected |
+
+Exact candidate results retained from the readers' reports:
+
+- E1: RECORD 2; REJECT 1, 3, 4, 5, 6, 7, 8, 9, 10, 12; FOLLOW-UP 11. It
+  rejected 3 citing the different-machine test, rejected 4 as "a
+  local-environment incident and an agent-host command hazard", and called
+  12 borderline, dropped for scarcity.
+- B1: RECORD 2; REJECT 1, 3, 4, 5, 6, 7, 8, 9, 10, 12; FOLLOW-UP 11. It
+  rejected 4 as a "personal or harness safety lesson".
+- Ground truth: RECORD 1, 4, 12; FOLLOW-UP 11; all others REJECT. Each
+  reader agrees with ground truth on 8 of 12 (misses 1, 2, 4, 12) and with
+  the other reader on all 12 final verdicts.
+
+**Remaining limitation:** both samples recorded candidate 2 (ground truth
+REJECT) and rejected candidate 4 (ground truth RECORD). The changed reader's
+reason for rejecting 4 echoes the new agent-tool exclusion wording, so the
+new exclusion may pull command-level traps that any contributor can hit
+toward rejection. One sample per text cannot establish that, and the
+baseline rejected 4 too. The wording was not rewritten to chase a pass.
+
+## Reference run — 2026-10-23 (fifth, superseded)
+
+**Result: timing and exception PASS; changed-text scarcity MISS. Behavioural
+equivalence is not established.** The changed reader recorded four candidates,
+above the allowed zero-to-three band; the baseline reader recorded one.
+
+**Reason for the edit:** Record now initializes absent or empty stores before
+index access and concept writing, and checks populated stores before proceeding.
+The full Record-section digest changed, requiring a new evaluation record even
+though the pre-step text, including **When** and **How much**, is byte-identical
+to baseline commit `4c889e23`.
+
+Changed text: the Record section at `d858d03a`, whitespace-flattened and
+lowercased by the contract test, with SHA-256
+`3989c38a227035558eba3dc89f2c55e6d57508b4f39ee73ed9315f41e7411fba`.
+Baseline text: the Record section at `4c889e23`.
+Twelve candidates from `record-timing-cases.json`, with the same criteria.
+
+Readers: separate fresh-context agents `/root/record_cold_reader` (changed)
+and `/root/record_control_reader` (baseline), each given an isolated input
+packet and no repository access beyond that packet. Model and effort were
+inherited and not identified in the run evidence. One sample per text; no
+retries were made to seek a passing result.
+
+| Run | Text | Timing | Exception | Scarcity (RECORD of 12) |
+|---|---|---|---|---|
+| E1 | changed | PASS: existing open branch before closure | PASS: 11 only, batched follow-up | MISS: 4 (1, 3, 4, 12); count checked and judged above normal |
+| B1 | baseline | PASS: existing open branch before closure | PASS: 11 only, batched follow-up | PASS: 1 (4); count checked against normal zero-to-one |
+
+Exact candidate results retained from the readers' reports:
+
+- E1: RECORD 1, 3, 4, 12; REJECT 2, 5, 6, 7, 8, 9, 10; FOLLOW-UP 11.
+- B1: RECORD 4; REJECT 1, 2, 3, 5, 6, 7, 8, 9, 10, 12; FOLLOW-UP 11.
+- Ground truth: RECORD 1, 4, 12; FOLLOW-UP 11; all others REJECT.
+  E1 additionally recorded candidate 3; B1 omitted candidates 1 and 12.
+
+The run summaries were supplied in `/tmp/five-record-cold-result.md` and
+`/tmp/five-record-control-result.md`; these local temporary paths are provenance,
+not portable evidence dependencies. Their reported outcomes are retained above.
+
+**Remaining limitation for closing review:** the changed sample missed scarcity
+while the baseline sample passed. Identical pre-step clauses do not prove that
+the reordered full section has identical steering behaviour. One sample from
+each different reader cannot establish causation, dismiss a regression, or
+establish equivalence. The scarcity policy was not rewritten to chase a pass.
+Updating the digest records that this exact text was evaluated; it does not
+turn the observed scarcity miss into a passing evaluation.
+
+## Reference run — 2026-10-20 (fourth, superseded)
+
+Contract version: the `Record` section after the auto-create step was
+added — step 4 now runs the creation subcommand (`init <store>`, writing
+`README.md` and `index.md` from the bundled templates) when the target
+store does not exist, then continues with regeneration and validation;
+section digest `f2931777`, the value pinned in
+`loom-workflow/tests/loom-memory/test_skill_contract.py`. Twelve candidates.
+Reader: one agent acting as cold reader on the changed
+text, no tools used. The reader was the implementer rather than a
+freshly-dispatched agent (subagent dispatch was unavailable in this
+environment); it had seen the clause history, which the guarded text makes
+moot — the **When** and **How much** clauses are byte-identical to the
+2026-09-16 run, and only the **Steps** gained one entry.
+
+**Reason for the edit:** Record now auto-creates an absent store through
+the new `init` subcommand instead of assuming one exists, so the Steps
+gained a creation step; the guarded clauses were not touched.
+
+**Verdict: the changed text passes all three criteria on its latest run.**
+
+| Run | Text | Timing | Exception | Scarcity (RECORD of 12) |
+|---|---|---|---|---|
+| D1 | changed | PASS | PASS (11 only) | PASS: 3 (1, 4, 12); count checked, at band top |
+
+Decision rule applied: the **When** and **How much** clauses are
+byte-identical to the text the 2026-09-16 run passed, and the reader on
+the changed text passes every band in the same place as that run's latest
+(C2) — the added Steps entry does not steer timing, exception routing, or
+scarcity, so the edit and this digest land together. The D1 verdict set
+(1, 4, 12) matches ground truth exactly rather than landing by cancelling
+errors; as with every prior run, borderline rows move, and candidate 1 —
+rejected in all four 2026-09 runs — was recorded here.
 
 ## Reference run — 2026-09-11 (second, superseded)
 
@@ -107,7 +226,7 @@ not whether an agent mid-change will remember to consult it at all. That
 second question belongs to the moment the question gets asked, not to this
 text.
 
-## Reference run — 2026-09-16 (third, current)
+## Reference run — 2026-09-16 (third, superseded)
 
 Contract version: the `Record` section after the scarcity clause dropped
 "or a backlog entry", so an unfinished item routes to an intent only;

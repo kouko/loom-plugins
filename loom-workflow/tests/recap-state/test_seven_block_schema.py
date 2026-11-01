@@ -1,9 +1,10 @@
 """
 Tests for loom-workflow/skills/recap-state/references/seven-block-schema.md
 
+concern: orientation contract drift -- a padded or ungrounded L3 recap replaces the purpose-first schema
+
 Asserts:
-  - 7 H2/H3 block headings (Situation, Background, Assessment, User messages,
-    Why-this-question, Pending, Synthesis-check) are present (case-insensitive)
+  - 7 historical blocks remain mapped to L3 and future L2
   - 5 shared-core-principle anchors present: structured-schema, quote-not-paraphrase,
     all-user-messages, synthesis-check, plain-language
   - 1 good-example heading + 1 bad-example heading
@@ -63,15 +64,15 @@ def anchor_present(text: str, anchor: str) -> bool:
 def test_all_seven_blocks_and_five_principles_present() -> None:
     """
     Verify the bundle ships:
-      1. All 7 V1 block headings (case-insensitive; multilingual-friendly)
+      1. All 7 V1 blocks remain in the historical lineage map
       2. All 5 shared-core-principle anchors
       3. A good-example section heading
       4. A bad-example section heading
       What the bad example demonstrates is left to review.
 
     WHY each check matters:
-      Blocks: the fixed schema is the user-visible value; any dropped block
-              silently breaks the agent's output structure.
+      Blocks: the lineage remains available without imposing its old fixed
+              outline on L3 output.
       Principles: the 5 principles are the WHY behind each schema rule;
                   dropping one removes the rationale that makes the rule
                   memorable and enforceable in downstream reviews.
@@ -80,24 +81,19 @@ def test_all_seven_blocks_and_five_principles_present() -> None:
     """
     text = load_bundle()
 
-    # ── 7 block headings ────────────────────────────────────────────────────
-    required_headings = [
+    # ── 7 historical lineage rows ──────────────────────────────────────────
+    required_blocks = [
         "Situation",
         "Background",
         "Assessment",
-        # "User messages" — allow partial match; "User" is the key token
-        "User",
-        # "Why-this-question" — allow partial match; "Why" is the key token
-        "Why",
+        "User messages",
+        "Why-this-question",
         "Pending",
-        "Synthesis",
+        "Synthesis-check",
     ]
-    for keyword in required_headings:
-        assert heading_present(text, keyword), (
-            f"Expected H2/H3 heading containing '{keyword}' not found.\n"
-            f"All 7 V1 blocks (Situation / Background / Assessment / "
-            f"User messages / Why-this-question / Pending / Synthesis-check) "
-            f"must appear as section headings."
+    for number, block in enumerate(required_blocks, start=1):
+        assert re.search(rf"^\| {number} \| {re.escape(block)} \|", text, re.MULTILINE), (
+            f"Historical lineage row {number} ({block}) missing"
         )
 
     # ── 5 shared-core-principle anchors ─────────────────────────────────────
@@ -131,7 +127,7 @@ def test_all_seven_blocks_and_five_principles_present() -> None:
 
 
 def test_l3_contract_defines_goal_grounded_natural_output() -> None:
-    """The L3 template carries its six section headings and no planning tags or block labels."""
+    """L3 gives a variable-length orientation; numbered blocks remain lineage."""
     text = load_bundle()
 
     l3_template_start = text.index("## L3 user-visible template")
@@ -139,23 +135,97 @@ def test_l3_contract_defines_goal_grounded_natural_output() -> None:
     assert next_h2, "L3 template must be followed by another H2 section"
     l3_template_end = l3_template_start + 3 + next_h2.start()
     l3_template = text[l3_template_start:l3_template_end]
-    sections = (
-        "### Purpose and current position",
-        "### Essential background",
-        "### Gap and current assessment",
-        "### Why confirmation is needed now",
-        "### Pending work",
-        "### Align purpose and next step",
-    )
-    missing = [section for section in sections if section not in l3_template]
-    assert not missing, f"L3 template missing section headings: {missing}"
-    for forbidden in ("<thinking>", "</thinking>", "<recap>", "</recap>", "Block "):
-        assert forbidden not in l3_template
+    for required in (
+        "conversation-grounded original purpose",
+        "current position",
+        "proposed next step",
+        "unknown",
+        "long conversation",
+        "short session",
+        "key decisions",
+        "completed work",
+        "remaining gap",
+        "directed question",
+        "fullwidth-space-only line",
+        "■ ",
+        "situation sentence before each table",
+        "loom-visualization",
+    ):
+        assert required in l3_template, f"L3 contract missing: {required}"
+    assert "Use six natural headings" not in l3_template
+    assert "Give 3–5 bullets" not in l3_template
+    assert "fixed six-section" not in l3_template
 
     assert "Renumber the rendered output" not in text
     assert "instead of the 7 blocks" not in text
     assert "`loom-workflow:recap-state`" in text
     assert "loom-workflow/skills/recap-state/scripts/" in text
+
+
+def test_diagram_rule_covers_meaningful_reasoning_without_status_decoration() -> None:
+    text = load_bundle()
+    template = text.split("## L3 user-visible template", 1)[1].split("## 1 —", 1)[0]
+    guidance = text.split("## 2 — Visual aids", 1)[1].split("## 3 —", 1)[0]
+    for section in (template, guidance):
+        for relationship in ("rationale", "evidence", "sequence", "dependency", "branch", "merge"):
+            assert relationship in section.lower(), f"Diagram rule omits {relationship}"
+        assert "flat status" in section.lower() or "status snapshot" in section.lower()
+        assert "only for dependency" not in section.lower()
+
+
+def test_past_decisions_require_identifiable_conversation_evidence() -> None:
+    text = load_bundle()
+    template = text.split("## L3 user-visible template", 1)[1].split("## 1 —", 1)[0]
+    for requirement in ("user turn", "prior action", "formatting choice", "historical decision", "omit"):
+        assert requirement in template.lower(), f"Decision evidence rule omits {requirement}"
+
+
+def test_good_example_demonstrates_long_session_orientation() -> None:
+    text = load_bundle()
+    example = text.split("## 4 — Good Example", 1)[1].split("## 5 — Bad Example", 1)[0]
+
+    # A long-session example must make the path to the next question visible.
+    for required in (
+        "你最初要",
+        "目前",
+        "下一步",
+        "決定",
+        "完成",
+        "待辦",
+        "已確認",
+        "未知",
+        "這符合你的方向嗎？",
+    ):
+        assert required in example, f"Good Example missing: {required}"
+
+    assert example.count("\n　\n") == 3  # one separator between four sections
+    assert len(re.findall(r"^│ ■ .+ │$", example, re.MULTILINE)) == 4
+    assert "決策脈絡圖" in example
+    assert "漏掉退款" in example
+    assert "計入退款" in example
+    for other_diagram in ("論證圖", "決策樹", "流程圖"):
+        assert other_diagram not in example
+    assert "+----------------" not in example
+    assert re.search(r"[^\n]+。\n\n\| 項目 \|", example), (
+        "A situation sentence must introduce the comparison table"
+    )
+
+
+def test_separate_diagram_examples_cover_arguments_branches_and_steps() -> None:
+    text = load_bundle()
+    assert "## 6 — Other diagram examples" in text
+    examples = text.split("## 6 — Other diagram examples", 1)[1]
+    for heading, labels in (
+        ("Argument map", ("論證圖", "主張", "已確認", "未知")),
+        ("Decision tree", ("決策樹", "原付款週", "實際退款週")),
+        ("Flowchart", ("流程圖", "確認規則", "計算淨額", "核對報表")),
+    ):
+        section = examples.split(f"### {heading}", 1)[1].split("### ", 1)[0]
+        assert "```text" in section
+        for label in labels:
+            assert label in section, f"{heading} missing {label}"
+    assert "not four diagrams in one recap" in examples
+    assert "private model reasoning" not in examples
 
 
 def test_english_reference_keeps_localized_text_to_explicit_quotations() -> None:

@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""PostToolUse hook (Write|Edit|Bash): remind the agent to classify a host memory note.
+
+A host memory note is a `.md` file directly inside `<config>/projects/<slug>/memory/`
+(config = $CLAUDE_CONFIG_DIR, plus any `.claude` directory). The index
+`MEMORY.md` is silent. Write/Edit count by their `file_path`. A Bash command
+is never parsed: from the payload's `transcript_path`
+(`<config>/projects/<slug>/<session>.jsonl`) the hook scans every
+`<config>/projects/*/memory/` folder and reminds when a note there was modified
+in the last WINDOW seconds. Only stat is used: note content is never read.
+Anything else, or any error, prints nothing. Always exits 0. Stdlib only.
+"""
+
+import json
+import os
+import sys
+import time
+
+WINDOW = 10
+
+REMINDER = (
+    "You just wrote a host memory note. Host memory is per-machine and not "
+    "committed. Classify it with loom-workflow:loom-memory's Record "
+    "classification: a lesson that holds for any contributor cloning this "
+    "repository on another machine with other tools goes to the repo's "
+    "committed store (`docs/loom/memory/`) via loom-memory; personal, machine-specific or "
+    "agent-tool-specific notes stay only in host memory. Zero to one durable "
+    "lesson per change is normal. If this branch's closing review already "
+    "generated its attestation (finalize-review ran), do not write the repo "
+    "store now; keep the lesson in host memory for the next change's branch."
+)
+
+
+def is_note_name(name):
+    return name.endswith(".md") and name.lower() != "memory.md"
+
+
+def is_config_projects(projects):
+    if os.path.basename(projects) != "projects":
+        return False
+    config = os.path.dirname(projects)
+    if os.path.basename(config) == ".claude":
+        return True
+    env = os.environ.get("CLAUDE_CONFIG_DIR")
+    return bool(env) and os.path.normpath(os.path.expanduser(env)) == config
+
+
+def is_memory_note(path):
+    path = os.path.normpath(path)
+    parent, name = os.path.split(path)
+    if not is_note_name(name) or os.path.basename(parent) != "memory":
+        return False
+    return is_config_projects(os.path.dirname(os.path.dirname(parent)))
+
+
+def recent_note_exists(transcript):
+    projects = os.path.dirname(os.path.dirname(os.path.normpath(transcript)))
+    if not is_config_projects(projects):
+        return False
+    cutoff = time.time() - WINDOW
+    with os.scandir(projects) as slugs:
+        for slug in slugs:
+            try:
+                with os.scandir(os.path.join(slug.path, "memory")) as notes:
+                    for note in notes:
+                        if (is_note_name(note.name) and note.is_file()
+                                and note.stat().st_mtime >= cutoff):
+                            return True
+            except OSError:
+                continue
+    return False
+
+
+def main():
+    try:
+        data = json.loads(sys.stdin.read())
+        if data.get("tool_name") == "Bash":
+            transcript = data.get("transcript_path")
+            hit = isinstance(transcript, str) and recent_note_exists(transcript)
+        else:
+            path = data["tool_input"]["file_path"]
+            hit = isinstance(path, str) and is_memory_note(path)
+        if hit:
+            out = {"hookSpecificOutput": {"hookEventName": "PostToolUse",
+                                          "additionalContext": REMINDER}}
+            sys.stdout.write(json.dumps(out) + "\n")
+    except Exception:
+        pass
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

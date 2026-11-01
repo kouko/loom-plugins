@@ -597,16 +597,19 @@ def test_legacy_validator_and_its_tests_are_retired():
 
 
 def test_loom_memory_cli_has_no_legacy_write_subcommand():
-    """`loom_memory.py`'s own CLI exposes only `validate` and
-    `regenerate-index` — no `--write`-style legacy rewriting subcommand
-    survives outside `migrate_legacy_store.py` (REQ-26)."""
+    """`loom_memory.py`'s CLI exposes `validate` and `regenerate-index` —
+    plus, since the auto-create change, `init`, which writes only the
+    current profile shape from the bundled templates — and no `--write`-style
+    legacy rewriting subcommand survives outside `migrate_legacy_store.py`
+    (REQ-26)."""
     result = subprocess.run(
         [sys.executable, str(SCRIPTS_DIR / "loom_memory.py"), "--help"],
         capture_output=True,
         text=True,
     )
     assert "--write" not in result.stdout
-    assert "{validate,regenerate-index}" in result.stdout
+    assert "validate" in result.stdout
+    assert "regenerate-index" in result.stdout
 
 
 def test_name_stem_mismatch_aborts_before_any_file_is_written(tmp_path: Path) -> None:

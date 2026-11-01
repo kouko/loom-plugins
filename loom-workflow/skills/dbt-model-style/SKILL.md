@@ -160,7 +160,7 @@ refresh: 日更 T+1（依上游 FDW 延遲）
 
 Field requirements are **layered** (staging isn't queried directly by analysts/MCP and is usually 1:1 with its source, so it's relaxed):
 
-- **All layers MUST**: `title` (the Chinese name, replacing the old `# heading`), `summary`, `grain`, `sources`.
+- **All layers MUST**: `title` (use the user's working language for the model name, replacing the old `# heading`), `summary`, `grain`, `sources`.
 - **Consumer layers (intermediate / marts / dash) additionally MUST**: `purpose`, `keys` (`primary` + `join`).
 - **Consumer layers SHOULD**: `related` (joinable dimension tables + `join_on` key + `adds` = what it expands — key to agent analysis efficiency; accept the manual-upkeep / possible-staleness cost), `refresh`.
 - **Staging layer**: the four all-layer MUST fields suffice; `purpose` / `keys` / `related` are usually trivial and may be omitted.

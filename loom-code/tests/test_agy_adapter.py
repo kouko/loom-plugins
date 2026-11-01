@@ -41,7 +41,12 @@ LOOM_SKILL = "/Users/u/.gemini/config/plugins/loom-code/skills/build/SKILL.md"
 
 def _run(mode: str, payload: dict, tmp_path: Path, adapter: Path = ADAPTER, **env):
     environ = {k: v for k, v in os.environ.items() if k != "LOOM_CODE_MODE"}
-    environ.update(TMPDIR=str(tmp_path), **env)
+    runtime = tmp_path / "cache/loom-code/python-3.11-pyyaml-6.0.2-v1/bin"
+    runtime.mkdir(parents=True, exist_ok=True)
+    python = runtime / "python"
+    if not python.exists():
+        python.symlink_to(sys.executable)
+    environ.update(TMPDIR=str(tmp_path), XDG_CACHE_HOME=str(tmp_path / "cache"), **env)
     result = subprocess.run(
         [sys.executable, str(adapter), mode],
         input=json.dumps(payload),

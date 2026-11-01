@@ -1,0 +1,84 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-17-external-review-process-cleanup",
+  "content_digest": "94f662b015add2e7e19b87419afff618ab76698a",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest -q -p no:cacheprovider loom-code/tests/test_external_review_adversarial.py -k test_unreadPromptOverPipeBuffer_timesOutAtLimit",
+      "artifact": "loom-code/tests/test_external_review_adversarial.py",
+      "result": "pass",
+      "command_digest": "69f9cfe1be00c2855b3ded584305a98923aa439aaab4da83c29f057a62fac856"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-a",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "70b1be8fe1ebaa40f5e3d82fff15f7ac83276b8b",
+      "review_target_sha": "2ff0e0a891e996421203e648584b5ab80bce2f83",
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "anchor": "loom-code/scripts/external_review.py:238",
+          "text": "note (non-blocking): exit-0-without-answer reason reads `codex model/list failed: exit 0`, suggesting a clean exit"
+        }
+      ]
+    },
+    {
+      "reviewer": "codex-reviewer-1",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "70b1be8fe1ebaa40f5e3d82fff15f7ac83276b8b",
+      "review_target_sha": "2ff0e0a891e996421203e648584b5ab80bce2f83",
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Finding 1 fixed by inspection: loom-code/scripts/external_review.py:176-184 now observes direct-process exit while awaiting the reply, allowing exit-status reporting after the reader grace period. The descendant case is covered at loom-code/tests/test_external_review.py:951. Runtime verification was blocked by the sandbox; no regression was identified by inspection.",
+        "Findings 2, 3 and 4 fixed: the descendant DRIVER and backpressure regression invoke main in loom-code/tests/test_external_review_adversarial.py (unique strings \"er.main\" and \"external_review.main\"); loom-code/tests/test_external_review.py:976 exercises execute and asserts the review receives 1800 seconds; plan.md's W1-01 Files line declares \"(entry: `main`)\". The behavioural default test passed independently.",
+        "Ran test_external_review.py, test_external_review_adversarial.py and test_write_plan_station_text.py using python3 -m pytest with bytecode and pytest cache disabled: 117 passed, 47 setup errors because the read-only sandbox provides no writable temporary directory. Consequently the process-lifecycle regressions could not execute. A focused rerun of the default-timeout test and station-text file passed all 37 cases. Neither the complete package suite nor stored evidence probes were run."
+      ],
+      "external_review": {
+        "status": "completed",
+        "executor": "codex",
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "family": "openai",
+        "evidence_level": "observed-model-and-effort",
+        "observed_model": "gpt-6.1-sol",
+        "observed_effort": "high",
+        "output_digest": "4655630c745adee92e53d9aed631ce7457eedce99392ed32e3820d5e17f61bac",
+        "reviewer": "codex-reviewer-1",
+        "review_target_sha": "2ff0e0a891e996421203e648584b5ab80bce2f83"
+      }
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

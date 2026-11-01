@@ -25,19 +25,7 @@ from typing import Union, Optional
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines, wrap_label
-
-
-def _center(label: str, interior: int) -> str:
-    """Pad label to `interior` display cells, label roughly centered.
-
-    Padding is computed in display cells (not characters) so CJK labels
-    are not over-padded. Extra odd cell goes to the right.
-    """
-    slack = interior - display_width(label)
-    left = slack // 2
-    right = slack - left
-    return " " * left + label + " " * right
+from width import char_width, display_width, split_lines, center, EMPTY_BODY, EMPTY_BODY_FROM_STRING, render_structured_node
 
 
 def _cell_width(label: str) -> int:
@@ -84,6 +72,16 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
     if not layers:
         return ""
 
+    # A non-empty str body draws as its lines, exactly as the list form would
+    # (str.splitlines, not split_lines: a control char draws, never raises);
+    # '' keeps the empty-body error.
+    layers = [
+        {**ly, "name": {**ly["name"], "body": ly["name"]["body"].splitlines()}}
+        if isinstance(ly, dict) and isinstance(ly.get("name"), dict) and isinstance(ly["name"].get("body"), str)
+        and ly["name"]["body"] else ly
+        for ly in layers
+    ]
+
     # Set budget: use provided width or default 40
     budget = width if width is not None else 40
 
@@ -101,24 +99,52 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
                 return 0
             return max(display_width(ln) for ln in name["body"])
 
+    # Widest body line as wrap_label draws it unbroken: trailing ASCII spaces
+    # fall at the break and are dropped, so they take no cell.
+    def _drawn_width(body: list[str]) -> int:
+        return max((display_width(ln.rstrip(' ')) for ln in body), default=0)
+
     # Shared outer interior width = max over all layers of:
     # max(display_width(name), min(_row_natural_width(component), budget))
     def get_layer_width(layer: dict) -> int:
         name_width = _name_width(layer["name"])
         # For dict name, apply budget to body width; for string name, body width is 0
         body_width = _body_width(layer["name"])
-        bounded_body_width = min(body_width, budget) if layer["name"] and isinstance(layer["name"], dict) else 0
+        # Body lines draw after one leading space, so the widest drawn line
+        # (wrap_label drops trailing spaces at a break) needs +1.
+        drawn_body_width = _drawn_width(layer["name"]["body"]) + 1 if isinstance(layer["name"], dict) else 0
+        bounded_body_width = min(max(body_width, drawn_body_width), budget) if layer["name"] and isinstance(layer["name"], dict) else 0
         # For dict name, the effective name width is max(title width, bounded body width)
         if isinstance(layer["name"], dict):
             effective_name_width = max(name_width, bounded_body_width)
         else:
             effective_name_width = name_width
         component_width = _row_natural_width(layer["components"])
-        return max(effective_name_width, component_width)
+        return max(effective_name_width, component_width, _structured_floor(layer["name"]))
 
-    interior = max(
+    # A structured name draws its title after one leading space and wraps its
+    # body at interior - 1, so the interior must hold the title plus that space
+    # and the widest single body character plus it. A string name's body is
+    # not budget-capped, so its widest body line plus that space also fits
+    # whole. Single-line string names are centered with no leading space and
+    # keep their sizing. The floor is at least 2 so the body wrap width
+    # (interior - 1) stays positive even for an empty title and a body of
+    # empty or zero-width lines.
+    def _structured_floor(name: Union[str, dict]) -> int:
+        if isinstance(name, dict):
+            title, body, widest_line = name["title"], name["body"], 0
+        elif '\n' in name:
+            title, *body = split_lines(name)
+            widest_line = _drawn_width(body) + 1
+        else:
+            return 0
+        widest_char = max((char_width(c) for ln in body for c in ln), default=0)
+        return max(2, display_width(title) + 1, widest_char + 1, widest_line)
+
+    # Floor at 1 so an empty name with no components still lines up.
+    interior = max(1, max(
         get_layer_width(layer) for layer in layers
-    )
+    ))
 
     lines: list[str] = []
     for layer in layers:
@@ -196,25 +222,12 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
                 title = lines_split[0]
                 body = lines_split[1:]
                 if not body:
-                    raise ValueError("Body cannot be empty for structured node from string with \\n")
-
-                # Add title line (left-aligned)
-                name_lines = [
-                    "│ " + title + " " * (interior - display_width(title) - 1) + "│"
-                ]
-
-                # Add separator line
-                name_lines.append("├" + "─" * interior + "┤")
-
-                # Add body lines (left-aligned, wrapped at interior - 1)
-                for body_line in body:
-                    wrapped_lines = wrap_label(body_line, interior - 1)
-                    for wrapped_line in wrapped_lines:
-                        name_lines.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
+                    raise ValueError(EMPTY_BODY_FROM_STRING)
+                name_lines = render_structured_node(title, body, interior)
             else:
                 # String name without \n: current behavior (centered)
                 name_lines = [
-                    "│" + _center(nl, interior) + "│"
+                    "│" + center(nl, interior) + "│"
                     for nl in split_lines(name)
                 ]
         else:
@@ -224,23 +237,9 @@ def render_arch(layers: list[dict], width: Optional[int] = None) -> str:
 
             # Validate body is not empty
             if not body:
-                raise ValueError("Body cannot be empty for structured node")
+                raise ValueError(EMPTY_BODY)
 
-            # Add title line (left-aligned)
-            name_lines = [
-                "│ " + title + " " * (interior - display_width(title) - 1) + "│"
-            ]
-
-            # Add separator line
-            name_lines.append("├" + "─" * interior + "┤")
-
-            # Add body lines (left-aligned, wrapped at interior - 1)
-            for body_line in body:
-                # Wrap the body line at interior - 1 (true content budget)
-                wrapped_lines = wrap_label(body_line, interior - 1)
-                for wrapped_line in wrapped_lines:
-                    # Each wrapped line gets one leading space, then content, then padded to interior
-                    name_lines.append("│ " + wrapped_line + " " * (interior - display_width(wrapped_line) - 1) + "│")
+            name_lines = render_structured_node(title, body, interior)
 
         separator = border("├", "┬", "┤")
         row_lines = [

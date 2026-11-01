@@ -9,34 +9,35 @@ SCHEMA_PATH = (
 )
 
 
-STRUCTURAL_TOKENS = ("HANDOFF", "Synthesis-check", "ASCII")
-
-
-def test_entrypoint_tokens_and_schema_before_the_ordered_six_section_template():
-    """The routing, gate and format tokens stay; the schema pointer precedes the
-    template, whose six headings keep their order and carry no internal tags.
-    The entrypoint's prose wording is review-only."""
+def test_entrypoint_routes_to_purpose_first_variable_length_recap():
     text = SKILL_PATH.read_text(encoding="utf-8")
-
-    missing = [token for token in STRUCTURAL_TOKENS if token not in text]
-    assert not missing, f"entrypoint no longer names: {missing}"
-
-    what_to_do = text.index("## What to do")
-    schema_read = text.index("references/seven-block-schema.md", what_to_do)
-    template_start = text.index("### Purpose and current position", schema_read)
-    template_end = text.index("3. Apply", template_start)
-    rendered_template = text[template_start:template_end]
-    sections = (
-        "### Purpose and current position",
-        "### Essential background",
-        "### Gap and current assessment",
-        "### Why confirmation is needed now",
-        "### Pending work",
-        "### Align purpose and next step",
-    )
-    positions = [text.index(section, template_start) for section in sections]
-    assert positions == sorted(positions)
-    for forbidden in ("<thinking>", "</thinking>", "<recap>", "</recap>", "Block "):
-        assert forbidden not in rendered_template
+    schema = SCHEMA_PATH.read_text(encoding="utf-8")
 
     assert SCHEMA_PATH.is_file()
+    what_to_do = text.split("## What to do", 1)[1].split("## Five principles", 1)[0]
+    assert "references/seven-block-schema.md" in what_to_do
+    assert "original purpose" in what_to_do
+    assert "current position" in what_to_do
+    assert "variable-length sections" in what_to_do
+    assert "Otherwise, wait for the user's answer" in " ".join(what_to_do.split())
+    assert "HANDOFF" in text
+
+    active_template = schema.split("## L3 user-visible template", 1)[1].split(
+        "## 1 — The Seven Blocks", 1
+    )[0]
+    normalized_template = " ".join(active_template.split())
+    assert "lead with the conversation-grounded original purpose" in normalized_template
+    assert "omit sections with no useful content" in normalized_template
+    assert "Stop until the user responds" in active_template
+    assert "six-section" not in active_template
+    assert "six natural sections" not in active_template
+
+    for contract in (text, schema):
+        normalized = " ".join(contract.split())
+        assert "If the original purpose is unknown, ask only for the purpose." in normalized
+        assert (
+            "When the original purpose is grounded, ask about the proposed next step."
+            in normalized
+        )
+        assert "Do not invent a proposed work step when the purpose is unknown." in normalized
+        assert "If asking for purpose, wait for the user to state or clarify it." in normalized

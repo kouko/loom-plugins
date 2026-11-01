@@ -21,8 +21,8 @@ attributing their prompt to Loom.
 At the start of a change:
 
 1. Resolve the injected plugin root and run
-   `python3 <plugin-root>/scripts/loom_checker.py contract --require 2.1`.
-2. Confirm `python3 <plugin-root>/scripts/loom_checker.py --list-rules`
+   `"<plugin-root>/scripts/loom-python" --repair contract --require 2.1`.
+2. Confirm `"<plugin-root>/scripts/loom-python" --repair --list-rules`
    includes `push.contextual-body`.
 3. For each new or modified installed definition that Codex presents a trust
    prompt for, ask the user to review that installed definition. Never edit Codex

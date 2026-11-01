@@ -268,9 +268,6 @@ DEBT_LIST: frozenset[str] = frozenset(
         # place.
         # Pre-existing loom-workflow violations, on the list since the
         # scan set widened to cover that tree (R6). Shrink-only applies.
-        "loom-workflow/skills/distill-sessions/SKILL.md",
-        "loom-workflow/skills/distill-sessions/agents/prompt-failure-analysis.md",
-        "loom-workflow/skills/distill-sessions/agents/prompt-success-analysis.md",
         "loom-workflow/skills/git-memory/protocols/privacy-judge-spec.md",
     }
 )

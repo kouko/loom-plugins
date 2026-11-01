@@ -42,6 +42,18 @@ else
 fi
 
 # -------------------------------------------------------------------------
+# Check 2 — offline: ship routes a qualifying durable repository lesson to
+# loom-workflow:loom-memory beside the git-memory classification.
+
+if grep -q "^[[:space:]]*Use \`loom-workflow:loom-memory\`" "${SHIP_SKILL}" \
+   && ! grep -q "^[[:space:]]*Never use \`loom-workflow:loom-memory\`" "${SHIP_SKILL}" \
+   && grep -q "durable repository lesson" "${SHIP_SKILL}"; then
+  pass "ship routes a qualifying durable repository lesson to loom-workflow:loom-memory"
+else
+  fail "ship does NOT route a qualifying durable repository lesson to loom-workflow:loom-memory"
+fi
+
+# -------------------------------------------------------------------------
 # Check 3b — offline: F4 commit-carrier verify gate present
 # After the close-out commit, finishing must run memory-grep.sh --verify HEAD
 # and STOP a memory-worthy branch whose commit carrier is empty (exit 4).

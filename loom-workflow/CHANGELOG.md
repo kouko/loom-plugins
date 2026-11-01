@@ -4,6 +4,106 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.16.0] — 2026-10-27 — loom-memory equivalence outcome and six-character label separators
+
+- `loom-memory` Reconcile now also triggers when a new lesson is equivalent to an existing entry. The outcome is to keep the existing entry and add the new source to its `sources`; Reconcile never writes a second entry for an equivalent lesson.
+- `loom-visualization` templates 02, 04 and 08 use label separators of six U+2501 characters, as the page verifier requires.
+
+## [5.15.0] — 2026-10-24 — loom-memory fires on host memory saves
+
+- `loom-memory`'s description and activation now name the moment the agent saves a lesson to its own host memory. Record classifies repo-wide lessons (those that hold for any contributor on another machine with other tools) apart from personal, machine-specific and agent-tool-specific notes, which stay in host memory. A lesson found after finalize-review stays in host memory until the next change's branch.
+- New Claude Code PostToolUse hook `hooks/memory-mirror-reminder` reminds the agent, on any write to a host auto-memory note regardless of its type, and after a shell command once a host auto-memory note was just modified, to classify it through `loom-memory`. It never parses shell commands and never reads note content; Codex and OpenCode rely on the description.
+
+## [5.14.0] — 2026-10-24 — consistent skill instructions and source-grounded retrospectives
+
+- `dbt-model-style` titles follow the user's working language, matching other descriptive header values; Chinese examples remain illustrative.
+- `loom-memory` initializes absent or empty stores before Record reads the index or writes a concept, and validates populated stores while preserving corruption and explicit legacy-migration refusal paths.
+- `skill-retro` permits read-only inspection of target skill sources and directly related resources, retains bounded session snapshots and source locators, and carries source citations, version evidence and unavailable-source limitations through analysis and proposals. Current files alone do not establish historical loading or causation.
+
+## [5.13.0] — 2026-10-23 — add complex planning and process diagrams
+
+- Add task-dependency diagrams for parallel prerequisites and required joins,
+  and cross-role workflow diagrams for step ownership and handoffs.
+- Route both shapes from `loom-visualization` with standalone node titles in
+  their table, ASCII, and Mermaid examples.
+- Check alignment of unboxed joins and handoff arrows in ASCII diagrams.
+
+## [5.12.4] — 2026-10-22 — flow node edge-case fixes
+
+- A flow structured node keeps one space before the right border when a
+  width is given (re-wraps only a line that would fill the box).
+- A flow step or arch layer whose description is one string draws it as
+  its lines instead of one character per line, exactly as the same lines
+  given as a list would draw (an empty string still errors).
+- The pin-coverage test now checks drawn output.
+
+## [5.12.3] — 2026-10-21 — layered-architecture edge-case fixes
+
+- `render_arch` keeps a structured layer's widest body line unbroken; the
+  box widens by the leading-space cell.
+- An empty single-line name with no components draws an aligned box.
+- Every layer with an empty title and at least one description line now
+  draws aligned at any width instead of failing with
+  `max_width must be positive`.
+- Tests pin the exact trunk output of all six generators and share one
+  hang-guarded render helper.
+
+## [5.12.2] — 2026-10-21 — layered-architecture narrow-width fixes
+
+- `wrap_label` no longer loops forever when a two-cell character is
+  wider than the wrap width; it takes one character per line.
+- `render_arch` widens a structured layer (dict name, or multi-line
+  string name) just enough to hold its title after the leading space
+  and its widest two-cell body character, so the title no longer
+  overflows the right border and narrow widths no longer hang.
+- `render_flow` widens a structured step just enough to hold its widest
+  two-cell body character, so a width budget of zero or less no longer
+  hangs.
+- Other inputs render unchanged.
+
+## [5.12.1] — 2026-10-20 — structured-node helper cleanup
+
+- `width.py`: plan labels and output-neutral padding clamps removed.
+- Tests pin the exact wrapped output and the empty-body error text at the
+  generator entries instead of restating the constant.
+- No behaviour change.
+
+## [5.12.0] — 2026-10-20 — record auto-creates the store; ship routes durable lessons to loom-memory
+
+- feat: Record auto-creates the store via init subcommand; ship routes durable lessons to loom-memory.
+- `loom-memory:record` now runs the `init` subcommand when the store is absent, so a first record succeeds without a manual init.
+- The paired loom-code release routes durable repository lessons from the `ship` station into `loom-memory`.
+
+## [5.11.1] — 2026-10-19 — shared node rendering helpers
+
+- `width.py` gains the shared structured-node rendering helpers
+  (`render_structured_node`, `center`, `EMPTY_BODY`,
+  `EMPTY_BODY_FROM_STRING`, `require_single_line`); flow, arch, tree, seq and bar generators
+  consume them instead of carrying inline copies.
+- No behaviour change: generator output is byte-identical (golden-diff
+  evidence in `docs/loom/2026-09-28-structured-node-shared-helper/evidence/`).
+
+## [5.11.0] — 2026-10-18 — make diagram node titles understandable on their own
+
+- Guide ASCII and Mermaid diagram authors to use short titles that name each node's action or role without needing its body. Add a body only when it contributes distinct information.
+- Refine existing engineering and process examples so titles stand alone and bodies do not repeat branch labels or child nodes; keep single-line nodes valid.
+
+## [5.10.0] — 2026-10-17 — orient in-session recaps around purpose and progress
+
+- Lead recaps with the conversation-grounded purpose, current position, and next step; show the decisions and completed work that explain the current position without padding short sessions.
+- Use distinct section headings and spacing, explain tables before showing them, and reserve diagrams for relationships they clarify. Preserve exact user wording when it affects the next action, distinguish unknowns from facts, and end with a directed alignment question.
+
+## [5.9.0] — 2026-10-15 — separate project and installed-skill retrospectives
+
+- Rename the one-session project review from `retro` to `project-retro`, and the cross-session installed-skill review from `distill-sessions` to `skill-retro`. The old names are no longer callable.
+- Route requests by improvement target; both reviews provide source-linked proposals for an independent implementation workflow. `skill-retro` also covers directly related plugin integration issues.
+- Migration: `retro` → `project-retro`; `distill-sessions` → `skill-retro`. Update installed plugins to 5.9.0 before invoking the new names.
+
+## [5.8.0] — 2026-10-13 — review one coding session for project improvements
+
+- Add `retro`, an on-demand, read-only review of one coding session that ranks project development improvements with source evidence and separates single-session skill issue candidates from project recommendations.
+- Route general single-session review requests to `retro`; keep `distill-sessions` for improvement proposals drawn from multiple sessions.
+
 ## [5.7.0] — 2026-10-08 — independent reviews use the shared outside executor
 
 - An explicitly requested outside code, plan or decision review now routes through `loom-code:external-review`, preserving the owning review's criteria and verdict format while reporting outside results separately from the incumbent review.

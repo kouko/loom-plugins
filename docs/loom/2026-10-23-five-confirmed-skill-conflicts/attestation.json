@@ -1,0 +1,78 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-23-five-confirmed-skill-conflicts",
+  "content_digest": "1bc1ad02a7ca0fa7ee6af8c09b5ccd23c40d52f3",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-workflow/tests/skill-retro/test_issue_surface.py",
+      "artifact": "loom-workflow/tests/skill-retro/test_issue_surface.py",
+      "result": "pass",
+      "command_digest": "6bb6d6a58255d24a55ceba63ee7e482865f7c39f5aaecf2fa18d6b2dd1748d23"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "1bf9ab1b40335cf03f131c8e9afae3cdb00c3d3f",
+      "review_target_sha": "432c71b0d6ddcdf97260378014ef2991bf3b4e06",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Terminal Round 3 inspected 48369853..432c71b0 and integration against main 1bf9ab1b. All four original findings remain fixed. Repair runtime files and their intent/spec/plan/acceptance evidence are unchanged from the prior approved target; imported visualization runtime and tests match main exactly. Workflow manifests, README pins and release test consistently use 5.14.0; both 5.14.0 repairs and upstream 5.13.0 diagrams retain distinct changelog entries.",
+        "Independently ran test_release_metadata.py, test_ascii_cli.py and test_templates.py: 60 passed in 0.41s, no skips. No complete package suite or evidence probes were rerun by this reviewer.",
+        "Existing acceptance limits remain: Record scarcity changed 4 versus baseline 1 with one sample each does not establish behavioral equivalence; live vendor-host execution remains unverified. User deferred outside Claude review; no such review is claimed."
+      ],
+      "reviewer": "/root/final_code_five",
+      "vendor": "codex",
+      "model": "inherited (not exposed)"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "1bf9ab1b40335cf03f131c8e9afae3cdb00c3d3f",
+      "review_target_sha": "432c71b0d6ddcdf97260378014ef2991bf3b4e06",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Terminal Round 3 checked integration since 48369853. The five repaired skill trees are unchanged from that reviewed target; visualization skill and tests match main at 1bf9ab1b exactly. Previous Codex description nit remains fixed; no new findings.",
+        "Workflow 5.14.0 is synchronized across four manifests, three localized READMEs, root README and the release test. Changelog retains main's 5.13.0 visualization release and places the five-repair release under 5.14.0. Independently ran release metadata, visualization ASCII CLI and template tests: 60 passed in 0.25s.",
+        "Intent/spec/plan/acceptance scope is preserved. Optional Claude review was deferred by explicit user direction, not counted as completed. Synthetic/public-CLI evidence and the unresolved single-sample Record scarcity result (4 versus 1) retain their stated limits; no live-host compliance claim. Full suite and evidence probes were not rerun by this reviewer."
+      ],
+      "reviewer": "/root/final_skill_five",
+      "vendor": "codex",
+      "model": "inherited (not exposed)"
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

@@ -110,7 +110,7 @@ repository's development records under `docs/`.
 
 **MUST：每個合併至 main 的 PR 必須包含 plugin.json 版號 bump**（預設 patch；有 station guidance、field、rule id 或 contract manifest 變更時為 minor）。
 
-- 三份 manifest（`loom-code/plugin.json`、`.claude-plugin/plugin.json`、`.codex-plugin/plugin.json`）必須同步
+- 一份 SSOT：`loom-code/.claude-plugin/plugin.json` 是單一來源真相；`loom-code/.codex-plugin/plugin.json`、`loom-code/plugin.json`、`loom-code/package.json` 皆經 `scripts/sync_codex_manifests.py --all` 衍生而來；勿手動改導出檔以免版本衝突
 - `CHANGELOG.md` 必須在同一 commit 加入新區段 `## [X.Y.Z] — <date> — <summary>`
 - README 版號字串同步更新
 - 版號在最後一輪 fix 就 bump，要在 closing-review 的 finalize-review 產生 attestation 之前；在它之後才 bump 會讓 attestation 失效（stale）

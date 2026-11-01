@@ -1,10 +1,19 @@
 """`sync-trunk`: bring the change branch up to date with the remote trunk
 before closing review dispatches reviewers (rule `review.sync`).
 
-The attestation digest covers the whole tree, so a merge after review
-invalidates it; this runs first. Merge only -- never rebase, never force --
-so pushed history is never rewritten, and a conflict is named, never
-resolved: detected in memory before the merge when git can, else aborted.
+The attestation digest covers the whole tree, so a sync after review
+invalidates it; this runs first. While the branch has never been pushed its
+own commits are rebased onto the trunk tip, keeping the history linear; once
+any of it is pushed to any remote, or the branch has a configured upstream or
+push remote (or that cannot be told), trunk is merged instead, so
+pushed history is never rewritten. A branch whose own commits touch an
+ignored or untracked local path also merges, so the replay cannot delete it.
+A rebase gives the branch's commits new ids, so its output says to re-pin
+any commit-sha reference recorded on the branch.
+A rebase that fails without a conflict is
+aborted and, once the restore is verified, the merge is tried instead. Never
+force. A conflict is named, never resolved: detected in memory before the
+sync when git can, else aborted.
 """
 from __future__ import annotations
 
@@ -31,6 +40,11 @@ import sys
 # git status --porcelain -z --untracked-files=all --ignored: https://git-scm.com/docs/git-status
 # git symbolic-ref --quiet [--short], nonzero when not a symbolic ref: https://git-scm.com/docs/git-symbolic-ref
 # git rev-parse --verify --quiet <ref>^{commit}: https://git-scm.com/docs/git-rev-parse
+# git rebase --merge --no-autostash --no-autosquash --no-update-refs --no-rebase-merges / --abort: https://git-scm.com/docs/git-rebase
+# git ls-remote --heads <remote> <pattern> (tail match, so lines are compared exactly): https://git-scm.com/docs/git-ls-remote
+# git rev-list --count / --merges / --not --remotes: https://git-scm.com/docs/git-rev-list
+# git log --format= --name-only -z --no-renames: https://git-scm.com/docs/git-log
+# git config --get, exit 1 when the key is unset: https://git-scm.com/docs/git-config
 
 
 RULE = "review.sync"
@@ -107,10 +121,29 @@ def _collisions(git: str, repo: Path, tip: str) -> tuple[list[str], str | None]:
     if code != 0:
         return [], detail
     incoming = [path for path in added.split("\0") if path]
+    return _overlap(local, incoming), None
+
+
+def _overlap(local: list[str], tracked: list[str]) -> list[str]:
+    """Local paths equal to, inside, or containing a tracked path."""
     return sorted({
-        path for path in local for new in incoming
+        path for path in local for new in tracked
         if path == new or path.startswith(new + "/") or new.startswith(path + "/")
-    }), None
+    })
+
+
+def _history_touches_local(git: str, repo: Path, tip: str) -> bool:
+    """True when an ignored or untracked local path matches a path the
+    branch's own commits touch -- replaying them could delete or overwrite
+    it, where a merge keeps it -- or when that cannot be told."""
+    code, stdout, _detail = _git(git, repo, "ls-files", "-z", "--others")
+    if code != 0:
+        return True
+    local = [path for path in stdout.split("\0") if path]
+    code, touched, _detail = _git(git, repo, "log", "--format=", "--name-only", "-z", "--no-renames", f"{tip}..HEAD")
+    if code != 0:
+        return True
+    return bool(_overlap(local, [path for path in touched.split("\0") if path]))
 
 
 def _preflight_conflicts(git: str, repo: Path, tip: str) -> list[str] | None:
@@ -120,6 +153,50 @@ def _preflight_conflicts(git: str, repo: Path, tip: str) -> list[str] | None:
     if code != 1:
         return None
     return list(dict.fromkeys(path for path in stdout.split("\0")[1:] if path))
+
+
+def _count(git: str, repo: Path, *args: str) -> int | None:
+    code, stdout, _detail = _git(git, repo, "rev-list", "--count", *args)
+    return int(stdout.strip()) if code == 0 and stdout.strip().isdigit() else None
+
+
+def _config(git: str, repo: Path, key: str) -> str | None:
+    """The value, "" when unset, None when the lookup failed."""
+    code, stdout, _detail = _git(git, repo, "config", "--get", key)
+    return stdout.strip() if code == 0 else "" if code == 1 else None
+
+
+def _has_push_target(git: str, repo: Path, branch: str, trunk: str) -> bool:
+    """A configured upstream or pushRemote means the branch went to some
+    remote. An upstream of origin's trunk itself (a branch started from
+    origin/<trunk>) is not a push of this branch. A failed lookup is True."""
+    push_remote = _config(git, repo, f"branch.{branch}.pushRemote")
+    remote = _config(git, repo, f"branch.{branch}.remote")
+    merge = _config(git, repo, f"branch.{branch}.merge")
+    if push_remote is None or remote is None or merge is None:
+        return True
+    if push_remote:
+        return True
+    return bool(remote) and (remote, merge) != ("origin", f"refs/heads/{trunk}")
+
+
+def _may_rebase(git: str, repo: Path, branch: str, trunk: str, tip: str) -> bool:
+    """True only when the branch is provably unpushed and its own commits hold
+    no merge commit and touch no ignored or untracked local path; every
+    failed lookup answers False, so the caller merges.
+    Pushed means: origin lists the branch (origin is where loom publishes), a
+    push target is configured, or an own commit is on any remote-tracking ref."""
+    code, stdout, _detail = _git(git, repo, "ls-remote", "--heads", "origin", f"refs/heads/{branch}")
+    if code != 0 or any(line.endswith(f"\trefs/heads/{branch}") for line in stdout.splitlines()):
+        return False
+    if _has_push_target(git, repo, branch, trunk):
+        return False
+    own = _count(git, repo, f"{tip}..HEAD")
+    unpushed = _count(git, repo, "HEAD", "--not", tip, "--remotes")
+    merges = _count(git, repo, "--merges", f"{tip}..HEAD")
+    if own is None or own != unpushed or merges != 0:
+        return False
+    return not _history_touches_local(git, repo, tip)
 
 
 def _block(err, *reasons: str) -> int:
@@ -204,38 +281,84 @@ def cmd_sync_trunk(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
         return _block(err, *reasons)
 
     # The fetched commit id, never the name `origin/<trunk>`: a local branch or
-    # tag of that name would shadow the remote-tracking ref. `--ff` overrides a
-    # user `merge.ff=only`; a merge commit or fast-forward never rewrites history.
-    code, _stdout, detail = _git(
-        git, repo, "merge", "--ff", "--no-edit", "-m", f"Merge origin/{trunk} into {branch}", tip,
-        timeout=SYNC_WRITE_TIMEOUT,
-    )
+    # tag of that name would shadow the remote-tracking ref.
+    rebase = _may_rebase(git, repo, branch, trunk, tip)
+    if rebase:
+        # Explicit flags override user rebase.* config (backend, autoStash,
+        # autoSquash, updateRefs, rebaseMerges); only unpushed commits move.
+        verb = "rebase"
+        code, _stdout, detail = _git(
+            git, repo, "rebase", "--merge", "--no-autostash", "--no-autosquash", "--no-update-refs",
+            "--no-rebase-merges", tip, timeout=SYNC_WRITE_TIMEOUT,
+        )
+        if code != 0:
+            conflicts = _unmerged(git, repo)
+            # Abort unconditionally: a rebase that stopped early leaves state too.
+            _git(git, repo, "rebase", "--abort", timeout=SYNC_WRITE_TIMEOUT)
+            restored = _restored(git, repo, head, before)
+            if conflicts or not restored:
+                return _refuse(err, verb, branch, trunk, repo, head, code, detail, conflicts, restored)
+            # No conflict and a verified restore: replaying commits failed
+            # where a merge need not (an older git, an ignored file a branch
+            # commit once tracked), so take the merge path instead.
+            rebase = False
+    if not rebase:
+        # `--ff` overrides a user `merge.ff=only`; a merge commit or
+        # fast-forward never rewrites history.
+        verb = "merge"
+        code, _stdout, detail = _git(
+            git, repo, "merge", "--ff", "--no-edit", "-m", f"Merge origin/{trunk} into {branch}", tip,
+            timeout=SYNC_WRITE_TIMEOUT,
+        )
     if code == 0:
         new_head = _oid(git, repo, "HEAD")
-        out.write(f"sync-trunk: merged origin/{trunk} ({tip}) into {branch}; HEAD is now {new_head}.\n")
+        if rebase:
+            out.write(f"sync-trunk: rebased {branch} onto origin/{trunk} ({tip}); HEAD is now {new_head}.\n")
+            out.write(
+                "sync-trunk: the branch's commit ids changed -- re-pin any commit-sha reference "
+                "recorded on this branch (for example a plan's intent: line).\n"
+            )
+        else:
+            out.write(f"sync-trunk: merged origin/{trunk} ({tip}) into {branch}; HEAD is now {new_head}.\n")
         out.write(
             "sync-trunk: content changed -- re-run the package suite and adversarial programs "
             "before dispatching reviewers.\n"
         )
         return 0
 
-    _code, unmerged, _detail = _git(git, repo, "diff", "--name-only", "--diff-filter=U", "-z")
-    conflicts = [path for path in unmerged.split("\0") if path]
+    conflicts = _unmerged(git, repo)
     if _oid(git, repo, "MERGE_HEAD"):
         _git(git, repo, "merge", "--abort", timeout=SYNC_WRITE_TIMEOUT)
+    return _refuse(err, verb, branch, trunk, repo, head, code, detail, conflicts, _restored(git, repo, head, before))
+
+
+def _unmerged(git: str, repo: Path) -> list[str]:
+    _code, unmerged, _detail = _git(git, repo, "diff", "--name-only", "--diff-filter=U", "-z")
+    return [path for path in unmerged.split("\0") if path]
+
+
+def _restored(git: str, repo: Path, head: str, before: str | None) -> bool:
+    """HEAD and the status snapshot, ignored files included, match the start."""
+    return _oid(git, repo, "HEAD") == head and before is not None and _snapshot(git, repo) == before
+
+
+def _refuse(
+    err, verb: str, branch: str, trunk: str, repo: Path, head: str,
+    code: int | None, detail: str, conflicts: list[str], restored: bool,
+) -> int:
     reasons = [f"conflict: {_show(path)}" for path in conflicts]
     if not conflicts:
-        reason = detail if code is None else _git_reason(detail, "merge failed")
-        reasons.append(f"merging origin/{trunk} failed without a conflict: {_show(reason)}")
-    after = _snapshot(git, repo)
-    if _oid(git, repo, "HEAD") == head and before is not None and after == before:
-        restored = f"the merge was aborted; {branch} is back at {head} with a clean worktree."
+        reason = detail if code is None else _git_reason(detail, f"{verb} failed")
+        action = f"rebasing {branch} onto" if verb == "rebase" else "merging"
+        reasons.append(f"{action} origin/{trunk} failed without a conflict: {_show(reason)}")
+    if restored:
+        line = f"the {verb} was aborted; {branch} is back at {head} with a clean worktree."
         if conflicts:
-            restored += " Conflicts are never resolved automatically -- resolve them in a new build round."
-        reasons.append(restored)
+            line += " Conflicts are never resolved automatically -- resolve them in a new build round."
+        reasons.append(line)
     else:
         reasons.append(
-            f"the aborted merge did not restore {branch} to {head} with a clean worktree; "
+            f"the aborted {verb} did not restore {branch} to {head} with a clean worktree; "
             f"inspect {repo} by hand before anything else runs."
         )
     return _block(err, *reasons)

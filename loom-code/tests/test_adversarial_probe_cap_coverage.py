@@ -186,6 +186,9 @@ def test_new_probes_are_counted_and_over_the_cap_refused() -> None:
     head = _commit_branch(repo)
     assert len(graduated_probe_programs(repo, head, CHANGE_ID)) == MOVED
     assert check_adversarial_proportionate(repo, head, CHANGE_ID) != []
+    _write(repo, {f"{SUITE}/conftest.py": "raise RuntimeError('collection broken')\n"})
+    head = _commit_branch(repo)
+    assert check_adversarial_proportionate(repo, head, CHANGE_ID) != []
 
 
 def test_a_copied_probe_under_a_new_name_is_counted() -> None:
@@ -207,6 +210,24 @@ def test_a_program_under_tests_local_is_not_graduated() -> None:
     head = _commit_branch(repo)
     assert not suite_collects(repo, local)
     assert suite_collects(repo, kept)
+    assert graduated_probe_programs(repo, head, CHANGE_ID) == [kept]
+
+
+def test_runner_root_target_collects_tests_but_respects_ignore() -> None:
+    repo = _branch({})
+    runner = repo / "scripts/run_package_tests.py"
+    runner.write_text(
+        "def loom_family_commands(repo):\n"
+        "    return [['python3', '-m', 'pytest', '.', '--ignore=tests/local']]\n",
+        encoding="utf-8",
+    )
+    kept = "tests/test_probe.py"
+    ignored = "tests/local/test_probe.py"
+    _write(repo, {kept: _probe(1), ignored: _probe(2)})
+    head = _commit_branch(repo)
+
+    assert suite_collects(repo, kept)
+    assert not suite_collects(repo, ignored)
     assert graduated_probe_programs(repo, head, CHANGE_ID) == [kept]
 
 

@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import errno
 import json
+import re
 import subprocess
 
 import external_review as review
 import pytest
+from prose_pin import affirms
 
 
 def consent(executor="codex", scope="/repo", model=None, effort="high"):
@@ -292,6 +294,30 @@ def test_claude_json_null_is_structured_failure():
                             runner=lambda argv, **kwargs: completed(argv, "null"))
     assert result["status"] == "failed"
     assert "execution-error" in result["reason"]
+    assert result["next_action"] == "Inspect Claude CLI diagnostics privately, then request a new authorized review."
+
+
+@pytest.mark.parametrize("stage", ["probe", "review"])
+def test_claude_zero_exit_error_result_never_completes_or_leaks(stage):
+    marker = "SYNTHETIC_PRIVATE_MARKER"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        error = stage == "probe" or len(calls) == 2
+        payload = {"type": "result", "is_error": error,
+                   "result": marker if error else "ok",
+                   "modelUsage": {"claude-sonnet-4-5": {}}}
+        return completed(argv, json.dumps(payload))
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            marker, consent("claude"), runner=runner)
+    assert len(calls) == (1 if stage == "probe" else 2)
+    assert result["status"] == "failed"
+    assert result["reason"] == "execution-error: claude result reports error"
+    assert result["next_action"] == "Inspect Claude CLI diagnostics privately, then request a new authorized review."
+    assert result["review_output"] is None
+    assert marker not in json.dumps(result)
 
 
 def test_codex_discovery_ignores_non_object_json_lines():
@@ -318,6 +344,7 @@ def test_discovery_and_execution_exceptions_do_not_echo_private_text(
                               "review", consent("claude", scope), runner=runner)
     assert discovered["reason"] == f"discovery-error: {expected}"
     assert executed["reason"] == f"execution-error: {expected}"
+    assert executed["next_action"]
     assert secret not in json.dumps(discovered)
     assert secret not in json.dumps(executed)
 
@@ -467,7 +494,10 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     def runner(argv, **kwargs):
         calls.append(argv)
         assert argv[:2] == ["claude", "-p"]
-        assert argv[argv.index("--permission-mode") + 1] == "plan"
+        for flag in ("--safe-mode", "--restricted", "--strict-mcp-config"):
+            assert flag in argv
+        assert argv[argv.index("--autocompact") + 1] == "auto"
+        assert "--add-dir" not in argv
         assert argv[argv.index("--tools") + 1] == "Read,Glob,Grep"
         assert argv[argv.index("--permission-prompts") + 1] == "none"
         assert argv[argv.index("--model") + 1] == "sonnet"
@@ -482,7 +512,45 @@ def test_claude_alias_uses_explicit_flags_and_reports_accepted_level():
     assert result["evidence_level"] == "accepted-explicit-settings"
     assert result["observed_model"] == "claude-sonnet-4-5"
     assert result["observed_effort"] is None
+    assert result["filesystem_boundary"] == "Claude model file tools confined to review root; CLI startup writes outside root not excluded"
     assert json.loads(result["probe"]["stdout"])["result"] == "ok"
+    assert len(calls) == 2
+
+
+@pytest.mark.parametrize("stage, exit_code", [("probe", 1), ("review", 0)])
+def test_claude_rapid_refill_is_bounded_failed_result(stage, exit_code):
+    secret = "PRIVATE PROMPT AND VERDICT"
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        if stage == "review" and len(calls) == 1:
+            return completed(argv, json.dumps({"result": "ok", "modelUsage": {"claude-sonnet-4-5": {}}}))
+        return completed(argv, json.dumps({"type": "result", "is_error": True,
+                                           "terminal_reason": "rapid_refill_breaker",
+                                           "result": secret}), secret, rc=exit_code)
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            secret, consent("claude"), runner=runner)
+    assert result["status"] == "failed"
+    assert result["reason"] == f"{stage}-rapid-refill-breaker"
+    assert result["review_output"] is None
+    assert result["next_action"] == "Inspect Claude CLI diagnostics privately, then request a new authorized review."
+    assert secret not in json.dumps(result)
+    assert len(calls) == (1 if stage == "probe" else 2)
+
+
+def test_claude_optional_budget_applies_to_both_stages():
+    calls = []
+
+    def runner(argv, **kwargs):
+        calls.append(argv)
+        assert float(argv[argv.index("--max-budget-usd") + 1]) == 6
+        return completed(argv, json.dumps({"result": "ok", "modelUsage": {"claude-sonnet-4-5": {}}}))
+
+    result = review.execute("claude", "sonnet", "high", "anthropic", "/repo",
+                            "review", consent("claude"), runner=runner, max_budget_usd=6)
+    assert result["status"] == "completed"
     assert len(calls) == 2
 
 
@@ -508,6 +576,10 @@ def test_claude_structured_api_error_reports_bounded_reason_without_review_mater
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == f"probe-exit-1: {expected}"
+    action = ("Wait for the Claude session limit to reset, then request a new authorized review."
+              if http_status == 429 else
+              "Check Claude API status locally, then request a new authorized review.")
+    assert result["next_action"] == action
     assert result["probe"] == {"returncode": 1, "timeout_seconds": 45}
     assert secret not in json.dumps(result)
     assert len(calls) == 1
@@ -533,6 +605,10 @@ def test_nonzero_untrusted_stdout_does_not_become_failure_reason():
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == "review-exit-1: unknown error"
+    assert result["next_action"] == "Run claude doctor locally; inspect CLI diagnostics privately, then request a new authorized review."
+    assert result["diagnostic"] == {"stage": "review", "exit_code": 1,
+                                    "stdout_present": True, "stderr_present": True,
+                                    "stdout_json_parseable": True}
     assert prompt not in json.dumps(result)
 
 
@@ -549,6 +625,7 @@ def test_claude_empty_stdout_classifies_only_known_stderr(stderr, expected):
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == f"probe-exit-2: {expected}"
+    assert result["next_action"]
     assert stderr not in json.dumps(result)
 
 
@@ -559,6 +636,10 @@ def test_nonzero_empty_diagnostic_is_explicitly_unknown():
     assert result["status"] == "failed"
     assert result["review_output"] is None
     assert result["reason"] == "probe-exit-2: unknown error"
+    assert result["next_action"] == "Run claude doctor locally; inspect CLI diagnostics privately, then request a new authorized review."
+    assert result["diagnostic"] == {"stage": "probe", "exit_code": 2,
+                                    "stdout_present": False, "stderr_present": False,
+                                    "stdout_json_parseable": False}
     assert result["probe"] == {"returncode": 2, "timeout_seconds": 45}
 
 
@@ -813,3 +894,357 @@ def test_failed_selection_or_execution_never_falls_back(case):
         assert result["reason"] == "probe-exit-2: unsupported effort"
         assert "PRIVATE_CODEX_ERROR" not in json.dumps(result)
     assert len(calls) <= 2
+
+
+_FAKE_CODEX = """#!{python}
+import json, os, select, sys, time
+open({pidfile!r}, "w").write(str(os.getpid()))
+for _ in range(3):
+    sys.stdin.readline()
+if {mode!r} == "hang":
+    time.sleep(60)
+ready, _, _ = select.select([sys.stdin], [], [], 0.3)
+if ready and sys.stdin.readline() == "":
+    sys.exit(0)  # real app-server: stdin EOF before model/list answer
+print(json.dumps({{"jsonrpc": "2.0", "id": 1, "result": {{}}}}))
+print(json.dumps({{"jsonrpc": "2.0", "method": "note", "params": {{}}}}))
+print("not json")
+print(json.dumps({{"id": 2, "result": {{"data": [{{"id": "gpt-a"}}, {{"id": "gpt-b"}}]}}}}), flush=True)
+time.sleep(60)
+"""
+
+
+def _fake_codex(tmp_path, monkeypatch, mode):
+    import sys
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    pidfile = tmp_path / "pid"
+    script = bin_dir / "codex"
+    script.write_text(_FAKE_CODEX.format(python=sys.executable, pidfile=str(pidfile), mode=mode))
+    script.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
+    return pidfile
+
+
+def _assert_reaped(pidfile):
+    import os
+    pid = int(pidfile.read_text())
+    with pytest.raises(ProcessLookupError):
+        os.kill(pid, 0)
+
+
+def test_codex_discovery_keeps_stdin_open_for_model_list(tmp_path, monkeypatch):
+    pidfile = _fake_codex(tmp_path, monkeypatch, "answer")
+    result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
+    assert result["candidates"] == ["gpt-a", "gpt-b"], result
+    _assert_reaped(pidfile)
+
+
+def test_codex_discovery_times_out_when_app_server_never_answers(tmp_path, monkeypatch):
+    pidfile = _fake_codex(tmp_path, monkeypatch, "hang")
+    monkeypatch.setattr(review, "CODEX_DISCOVERY_TIMEOUT", 1)
+    result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
+    assert result["reason"] == "discovery-timeout: 1s"
+    _assert_reaped(pidfile)
+
+
+_FAKE_CLI = """#!{python}
+import json, os, subprocess, sys, time
+mode = {mode!r}
+if mode == "codex-exit":
+    sys.exit(3)
+if mode == "codex-exit0":
+    sys.exit(0)
+if mode == "codex-exit-orphan":
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    open({pidfile!r}, "w").write(str(child.pid))
+    sys.exit(3)
+text = sys.stdin.read()
+if mode == "claude" and "single word ok" in text:
+    print(json.dumps({{"result": "ok", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}))
+    sys.exit(0)
+print("gemini-2.5-pro", flush=True)
+child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(5)"])
+open({pidfile!r}, "w").write(str(child.pid))
+if mode != "exit-early":
+    time.sleep(5)
+"""
+
+
+def _fake_cli(tmp_path, monkeypatch, name, mode):
+    import sys
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    pidfile = tmp_path / "pid"
+    script = bin_dir / name
+    script.write_text(_FAKE_CLI.format(python=sys.executable, pidfile=str(pidfile), mode=mode))
+    script.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
+    return pidfile
+
+
+def _assert_descendant_gone(pidfile):
+    import os
+    import time
+    pid = int(pidfile.read_text())
+    for _ in range(50):
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return
+        time.sleep(0.05)
+    pytest.fail("descendant still running")
+
+
+def test_agy_discovery_times_out_when_descendant_holds_stdout(tmp_path, monkeypatch):
+    import time
+    pidfile = _fake_cli(tmp_path, monkeypatch, "agy", "hang")
+    monkeypatch.setattr(review, "AGY_DISCOVERY_TIMEOUT", 1)
+    start = time.monotonic()
+    result = review.discover("agy", str(tmp_path), consent("agy", scope=str(tmp_path)))
+    assert result["reason"] == "discovery-timeout: 1s"
+    assert time.monotonic() - start < 4
+    _assert_descendant_gone(pidfile)
+
+
+def test_agy_discovery_exit_with_lingering_descendant_is_not_timeout(tmp_path, monkeypatch):
+    import time
+    pidfile = _fake_cli(tmp_path, monkeypatch, "agy", "exit-early")
+    start = time.monotonic()
+    result = review.discover("agy", str(tmp_path), consent("agy", scope=str(tmp_path)))
+    assert result["candidates"] == ["gemini-2.5-pro"], result
+    assert time.monotonic() - start < 4
+    _assert_descendant_gone(pidfile)
+
+
+def test_review_stage_times_out_when_descendant_holds_stdout(tmp_path, monkeypatch):
+    import time
+    pidfile = _fake_cli(tmp_path, monkeypatch, "claude", "claude")
+    start = time.monotonic()
+    result = review.execute("claude", "sonnet", "high", "anthropic", str(tmp_path),
+                            "review", consent("claude", scope=str(tmp_path)),
+                            probe_timeout=1, review_timeout=2)
+    assert result["reason"] == "execution-timeout: 2s", result
+    assert time.monotonic() - start < 4.5
+    _assert_descendant_gone(pidfile)
+
+
+@pytest.mark.parametrize("mode,code", [("codex-exit", 3), ("codex-exit0", 0),
+                                       ("codex-exit-orphan", 3)])
+def test_codex_exit_before_answer_reports_exit_code(tmp_path, monkeypatch, mode, code):
+    import time
+    pidfile = _fake_cli(tmp_path, monkeypatch, "codex", mode)
+    start = time.monotonic()
+    result = review.discover("codex", str(tmp_path), consent(scope=str(tmp_path)))
+    assert result["reason"] == f"discovery-error: codex model/list failed: exit {code}"
+    executed = review.execute("codex", "gpt-a", "high", "openai", str(tmp_path), "review",
+                              consent(scope=str(tmp_path), model="gpt-a"))
+    assert executed["reason"] == f"execution-error: codex model/list failed: exit {code}"
+    assert time.monotonic() - start < review.CODEX_DISCOVERY_TIMEOUT
+    if pidfile.exists():  # an exited codex's lingering descendant is killed too
+        _assert_descendant_gone(pidfile)
+
+
+def test_review_timeout_default_is_thirty_minutes(monkeypatch):
+    timeouts = []
+
+    def runner(argv, **kwargs):
+        timeouts.append(kwargs["timeout"])
+        if argv[:2] == ["codex", "app-server"]:
+            return completed(argv, json.dumps({"id": 2, "result": {"data": [{"id": "gpt-6.1-sol"}]}}))
+        return completed(argv, "ok", "model: gpt-6.1-sol\nreasoning effort: high\n")
+
+    result = review.execute("codex", "gpt-6.1-sol", "high", "openai", "/repo", "review",
+                            consent(), runner=runner)
+    assert result["status"] == "completed", result
+    assert timeouts[-1] == 1800
+    execute, seen = review.execute, {}
+    monkeypatch.setattr(review, "execute", lambda *a, **k: seen.update(k) or {"status": "failed"})
+    review.main(["--executor", "codex", "--scope", "/repo", "--consent-record", "/nonexistent",
+                 "--model", "m", "--effort", "high", "--family", "openai"],
+                stdin=__import__("io").StringIO(""), out=__import__("io").StringIO())
+    assert seen["review_timeout"] == 1800
+    result = execute("codex", "gpt-6.1-sol", "high", "openai", "/repo", "review",
+                            consent(), runner=lambda *a, **k: pytest.fail("spawned"),
+                            review_timeout=1801)
+    assert result["reason"] == "invalid-explicit-profile"
+
+
+def _progress_lines(text):
+    return [line for line in text.splitlines() if line.startswith("external-review:")]
+
+
+_FAKE_CLAUDE_STEPS = """#!{python}
+import json, sys
+text = sys.stdin.read()
+exec({probe!r} if "single word ok" in text else {review!r})
+print(json.dumps({{"result": "ok", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}), flush=True)
+"""
+
+
+def _execute_claude(tmp_path, monkeypatch, *, probe_code="", review_code="",
+                    probe_timeout=45, review_timeout=60):
+    """Run review.execute against a fake `claude` CLI; each step runs its code first."""
+    import sys
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    script = bin_dir / "claude"
+    script.write_text(_FAKE_CLAUDE_STEPS.format(python=sys.executable, probe=probe_code,
+                                                review=review_code))
+    script.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
+    return review.execute("claude", "sonnet", "high", "anthropic", str(tmp_path),
+                          "REVIEW-PACKET", consent("claude", scope=str(tmp_path)),
+                          probe_timeout=probe_timeout, review_timeout=review_timeout)
+
+
+def _closing_seconds(line, outcome):
+    """(total, longest silence) in seconds from one step's closing line."""
+    match = re.fullmatch(rf"external-review: {outcome} after (\d+)s · longest silence (\d+)s",
+                         line)
+    assert match, line
+    return int(match.group(1)), int(match.group(2))
+
+
+def test_review_step_prints_progress_each_interval(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(review, "PROGRESS_INTERVAL", 0.3)
+    result = _execute_claude(tmp_path, monkeypatch,
+                             review_code="import time; time.sleep(1.1)")
+    assert result["status"] == "completed", result
+    lines = _progress_lines(capsys.readouterr().err)
+    running = [line for line in lines if "review still running" in line]
+    assert len(running) >= 2, lines
+    assert all(re.fullmatch(r"external-review: review still running · \d+s elapsed"
+                            r" · (last output \d+s ago|no output yet)", line)
+               for line in running), running
+
+
+def test_step_shorter_than_interval_prints_no_progress(tmp_path, monkeypatch, capsys):
+    result = _execute_claude(tmp_path, monkeypatch)
+    assert result["status"] == "completed", result
+    lines = _progress_lines(capsys.readouterr().err)
+    assert not [line for line in lines if "still running" in line], lines
+    assert [line.split(" after ")[0] for line in lines] == [
+        "external-review: probe exited 0", "external-review: review exited 0"], lines
+
+
+def test_closing_line_reports_longest_silence(tmp_path, monkeypatch, capsys):
+    result = _execute_claude(tmp_path, monkeypatch, review_code=(
+        "import time; print('a', flush=True); time.sleep(1.3);"
+        " print('b', flush=True); sys.exit(3)"))
+    assert result["reason"].startswith("review-exit-3"), result
+    lines = _progress_lines(capsys.readouterr().err)
+    closing = [line for line in lines if line.startswith("external-review: review ")]
+    assert len(closing) == 1, lines
+    total, silence = _closing_seconds(closing[0], "review exited 3")
+    assert total >= 1 and 1 <= silence <= total, closing
+
+
+def test_timeout_prints_timed_out_closing_line(tmp_path, monkeypatch, capsys):
+    result = _execute_claude(tmp_path, monkeypatch, probe_code="import time; time.sleep(10)",
+                             probe_timeout=1, review_timeout=2)
+    assert result["reason"] == "execution-timeout: 1s", result
+    lines = _progress_lines(capsys.readouterr().err)
+    assert len(lines) == 1, lines
+    total, silence = _closing_seconds(lines[0], "probe timed out")
+    assert total >= 1 and 1 <= silence <= total, lines
+
+
+_FAKE_CLAUDE_OK = """#!{python}
+import json, sys
+sys.stdin.read()
+print(json.dumps({{"result": "SECRET-REVIEW-TEXT", "modelUsage": {{"claude-sonnet-4-5": {{}}}}}}))
+"""
+
+
+def test_json_result_unchanged_with_progress(tmp_path, monkeypatch, capsys):
+    import io
+    import sys
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    script = bin_dir / "claude"
+    script.write_text(_FAKE_CLAUDE_OK.format(python=sys.executable))
+    script.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{bin_dir}:/usr/bin:/bin")
+    record = tmp_path / "consent.json"
+    record.write_text(json.dumps(consent("claude", scope=str(tmp_path))))
+    out = io.StringIO()
+    code = review.main(["--executor", "claude", "--scope", str(tmp_path),
+                        "--consent-record", str(record), "--model", "sonnet",
+                        "--effort", "high", "--family", "anthropic"],
+                       stdin=io.StringIO("PACKET-TEXT"), out=out)
+    result = json.loads(out.getvalue())
+    assert code == 0 and result["status"] == "completed", result
+    assert result["review_output"] == "SECRET-REVIEW-TEXT"
+    assert "external-review:" not in out.getvalue()
+    err = capsys.readouterr().err
+    lines = _progress_lines(err)
+    assert [line.split(" after ")[0] for line in lines] == [
+        "external-review: probe exited 0", "external-review: review exited 0"], lines
+    assert "PACKET-TEXT" not in err and "SECRET-REVIEW-TEXT" not in err
+
+
+def test_discovery_prints_no_progress(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(review, "PROGRESS_INTERVAL", 0.1)
+    _fake_cli(tmp_path, monkeypatch, "agy", "exit-early")
+    result = review.discover("agy", str(tmp_path), consent("agy", scope=str(tmp_path)))
+    assert result["candidates"] == ["gemini-2.5-pro"], result
+    assert _progress_lines(capsys.readouterr().err) == []
+
+
+def _execute_section():
+    from pathlib import Path
+    skill = (Path(review.__file__).resolve().parents[1] / "skills"
+             / "external-review" / "SKILL.md").read_text()
+    match = re.search(r"^## Execute$.*?(?=^## |\Z)", skill, re.M | re.S)
+    assert match, "## Execute missing"
+    return " ".join(match.group(0).lower().split())
+
+
+def _affirms_relay(text):
+    return affirms(text, "relay", "progress line", "user", "visible")
+
+
+def _affirms_one_json_stdout(text):
+    return affirms(text, "stdout", "one json result")
+
+
+def test_execute_section_names_progress_relay():
+    assert _affirms_relay(_execute_section())
+
+
+def test_execute_section_still_names_one_json_result():
+    assert _affirms_one_json_stdout(_execute_section())
+
+
+def test_execute_section_relay_safe_claude_failure_and_recovery():
+    section = _execute_section()
+    assert affirms(section, "relay", "reason", "next_action", "user")
+    assert affirms(section, "run", "claude doctor", "locally", "unknown cause")
+    assert affirms(section, "relay", "fixed", "diagnostic")
+    assert affirms(section, "keep", "raw cli output", "user-facing report")
+    assert "privately" in section
+    assert affirms("relay the bounded reason and next_action to the user.",
+                   "relay", "reason", "next_action", "user")
+    assert not affirms("do not relay the bounded reason and next_action to the user.",
+                       "relay", "reason", "next_action", "user")
+
+
+def test_execute_section_preserves_failed_review_boundary():
+    section = _execute_section()
+    assert affirms(section, "failed", "leg", "verdict")
+    assert "newly authorized review" in section
+    assert "silent retry" in section and "provider fallback" in section
+    assert affirms("record the failed leg with its verdict absent.",
+                   "failed", "leg", "verdict")
+    assert not affirms("do not record the failed leg with its verdict absent.",
+                       "failed", "leg", "verdict")
+
+
+def test_execute_section_pins_reject_negated_samples():
+    assert _affirms_relay("keep the error stream visible and relay each progress line"
+                          " to the user.")
+    assert not _affirms_relay("keep the error stream visible but do not relay progress"
+                              " lines to the user; wait silently.")
+    assert _affirms_one_json_stdout("stdout remains the one json result.")
+    assert not _affirms_one_json_stdout("stdout no longer remains the one json result.")

@@ -1,0 +1,48 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-16-accept-non-python-probes",
+  "content_digest": "58a388c9ef7e4e24e2083cd3783a2ac290cc8a11",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_probe_bun_absolute_outside_repo.py -q",
+      "artifact": "loom-code/tests/test_probe_bun_absolute_outside_repo.py",
+      "result": "pass",
+      "command_digest": "912e2520b73d80039f88b29044439718ae8fc56ff68c9b5c4baf4bd9cc9cb246"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_probe_deno_ignored_steps.py -q",
+      "artifact": "loom-code/tests/test_probe_deno_ignored_steps.py",
+      "result": "pass",
+      "command_digest": "bf4e8025ea263714da0bd6d10c9e239daadf1f1dc63ad0c9e69da4bfb26131f0"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-a",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "reviewer-b",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

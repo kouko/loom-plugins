@@ -12,7 +12,12 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
-## [2.15.0] — 2026-10-22 — capture-intent pins the confirmed intent version
+## [2.15.0] — 2026-10-23 — consistent spec ordering and confirmation handoffs
+
+- `write-spec` preserves confirmed Acceptance order and mapping while applying non-negotiable principles to requirement content and design decisions.
+- Planning handoffs distinguish completed product behaviour confirmation from the engineering exemption at decision point ②.
+
+## [2.16.0] — 2026-10-28 — capture-intent pins the confirmed intent version
 
 - `capture-intent` now records `intent_confirmed_sha` in the intent's frontmatter at confirmation time: the blob sha of the intent without its `status:` line and without the pin line itself. `loom-code`'s `intake.intent-version` check compares that pin against the intent's current content, so an intent silently reverted after confirmation can no longer pass closing review unnoticed.
 - The intent template carries the field by default, so every new loom change pins its confirmation.

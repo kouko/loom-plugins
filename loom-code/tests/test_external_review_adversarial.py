@@ -5,14 +5,19 @@
 # concern: A Claude alias must not accept a different observed model tier.
 # concern: A Codex model/list JSON-RPC error must fail discovery.
 # concern: A Claude receipt must not claim an observed tier other than its alias.
+# concern: A codex descendant holding stdout must not defeat the discovery timeout.
+# concern: the time limit is bypassed when the outside CLI does not read a large prompt from stdin
 """Graduated external-review regressions from independent review probes."""
 
 import json
+import os
+import stat
 import subprocess
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+sys.path.insert(0, str(SCRIPTS))
 import external_review  # noqa: E402
 from loom_checker import reviewers  # noqa: E402
 
@@ -165,3 +170,79 @@ def test_model_list_error_is_failed_discovery():
     assert result["status"] == "failed"
     assert result["reason"].startswith("discovery-error:")
     assert "not initialized" in result["reason"]
+
+
+def _consent_file(tmp_path, executor, **extra):
+    record = {
+        "approved": True, "executor": executor, "review_root": str(tmp_path),
+        "authorization_source": {
+            "kind": "direct-user-request", "quote": f"Use {executor} to review this change",
+            "target": "this change", "selected_executor": executor},
+        "disclosures": {key: True for key in (
+            "cost", "vendor_egress", "local_execution",
+            "filesystem_access_outside_root", "filesystem_write_not_guaranteed")},
+        **extra,
+    }
+    path = tmp_path / "consent.json"
+    path.write_text(json.dumps(record))
+    return str(path)
+
+
+DRIVER = """
+import io, os, sys
+sys.path.insert(0, sys.argv[1])
+import external_review as er
+er.CODEX_DISCOVERY_TIMEOUT = 2
+out = io.StringIO()
+er.main(["--list-candidates", "--executor", "codex", "--scope", os.getcwd(),
+         "--consent-record", sys.argv[2]], out=out)
+print(out.getvalue())
+"""
+
+
+def test_codex_app_server_descendant_holds_stdout_times_out(tmp_path):
+    """A codex whose child keeps stdout open must still time out promptly."""
+    fake = tmp_path / "bin" / "codex"
+    fake.parent.mkdir()
+    fake.write_text("#!/bin/sh\nsleep 30 &\nsleep 30\n")
+    fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+    env = dict(os.environ, PATH=f"{fake.parent}{os.pathsep}{os.environ['PATH']}")
+    record = _consent_file(tmp_path, "codex")
+    try:
+        out = subprocess.run([sys.executable, "-c", DRIVER, str(SCRIPTS), record],
+                             env=env, cwd=tmp_path, capture_output=True,
+                             text=True, timeout=10)
+    except subprocess.TimeoutExpired:
+        raise AssertionError("discovery hung past its 2s timeout")
+    assert json.loads(out.stdout)["reason"] == "discovery-timeout: 2s", out
+
+
+def test_unreadPromptOverPipeBuffer_timesOutAtLimit(tmp_path, monkeypatch):
+    """A CLI that never reads the review prompt must still stop at the limit.
+
+    The prompt (1 MiB) exceeds the pipe buffer, so writing it blocks until
+    the child reads or exits. The fake answers the probe, then sleeps 10 s
+    without reading the review prompt; the review limit is 2 s.
+    """
+    import io
+    import time
+    fake = tmp_path / "bin" / "claude"
+    fake.parent.mkdir()
+    fake.write_text(
+        f"#!{sys.executable}\nimport json, os, sys, time\n"
+        "if b'single word ok' in os.read(0, 4096):\n"
+        "    print(json.dumps({'result': 'ok', 'modelUsage': {'claude-sonnet-4-5': {}}}))\n"
+        "    sys.exit(0)\n"
+        "time.sleep(10)\n")
+    fake.chmod(fake.stat().st_mode | stat.S_IEXEC)
+    monkeypatch.setenv("PATH", f"{fake.parent}{os.pathsep}{os.environ['PATH']}")
+    record = _consent_file(tmp_path, "claude", model="sonnet", effort="high")
+    out = io.StringIO()
+    start = time.monotonic()
+    external_review.main(
+        ["--executor", "claude", "--model", "sonnet", "--effort", "high",
+         "--family", "anthropic", "--scope", str(tmp_path), "--consent-record", record,
+         "--probe-timeout-seconds", "1", "--review-timeout-seconds", "2"],
+        stdin=io.StringIO("x" * (1 << 20)), out=out)
+    assert json.loads(out.getvalue())["reason"] == "execution-timeout: 2s", out.getvalue()
+    assert time.monotonic() - start < 5

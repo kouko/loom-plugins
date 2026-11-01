@@ -1,0 +1,77 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-16-retro-review-finalization",
+  "content_digest": "3c41a65484cbc7b78a43c6e0f300e0475f932ce9",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "conda run -n base python -m pytest loom-workflow/tests/skill-retro/test_propose.py -q -k 'filter_collision_rejected or deferred_single_pending or extract_memory_items_filters_by_target_skill_path' -p no:cacheprovider",
+      "artifact": "loom-workflow/tests/skill-retro/test_propose.py",
+      "result": "pass",
+      "command_digest": "30e772d3071d25966f65ecd53f736887d3b32cf8e8c67555cc0e14eb2872ae21"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "retro_final_code_reviewer",
+      "vendor": "openai",
+      "model": "inherited-unobservable",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "ba011a41ee919b3a4badd1f22c65d73e8865e68a",
+      "review_target_sha": "a373ed236df7047fb32470dda6ca51884943fee2",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous finding at propose.py:137: fixed. Exact-path and name-routed records for a versioned installed path are retained; a foreign name-routed record is excluded.",
+        "Both changed focused test files ran: 33 passed.",
+        "No repository files were modified."
+      ]
+    },
+    {
+      "reviewer": "retro_final_skill_reviewer",
+      "vendor": "openai",
+      "model": "inherited-unobservable",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "ba011a41ee919b3a4badd1f22c65d73e8865e68a",
+      "review_target_sha": "a373ed236df7047fb32470dda6ca51884943fee2",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous finding fixed: loom-workflow/README.ja.md:275 now routes the example to `project-retro`.",
+        "The fix delta introduced no new skill-lens finding."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

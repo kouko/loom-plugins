@@ -60,7 +60,7 @@ On Antigravity CLI or OpenCode, map tool and agent names with
 [`../../references/opencode-tools.md`](../../references/opencode-tools.md).
 
 Before dispatching reviewers in Round 1, run
-`python3 <loom-code>/scripts/loom_checker.py sync-trunk` from the change
+`"<loom-code>/scripts/loom-python" --repair sync-trunk` from the change
 worktree. When it reports `up to date`, continue. When it reports
 `content changed`, dispatch no reviewer and return to Build §3 to re-run the
 complete package suite and the existing adversarial programs, then start
@@ -125,7 +125,7 @@ dispatching the first reviewers. After Build commits completed functional
 content, run:
 
 ```text
-python3 <loom-code>/scripts/loom_checker.py reviewer-count <change-id>
+"<loom-code>/scripts/loom-python" --repair reviewer-count <change-id>
 ```
 
 The output is the computed reviewer floor: dispatch that many
@@ -171,6 +171,12 @@ the outside review's raw YAML and attributed verdict. Finalization requires it
 to equal HEAD; later attestation validation allows publication-only commits
 after that target while requiring the target to be an ancestor with the same
 functional content digest.
+Before dispatching the round's reviewers, run once at HEAD each adversarial
+program whose command is not pytest, shell or direct execution, writing its
+combined output to a temporary directory outside the repository. Hand the
+reviewers those output paths together with the commit they ran at, HEAD (the
+packet's `review_target_sha`); a returned confirmation's `reviewed_sha` names
+that commit, never the packet's diff base.
 
 <!-- gate: review.external-dispatch -->
 For the selected outside reviewer, invoke the named
@@ -215,16 +221,33 @@ The shared runner returns execution status, evidence and raw review output;
 it does not judge the review. A failed probe or review is a distinct outside
 failure and supplies no verdict. On completion, this station validates the
 raw YAML against `agents/reviewer.md`, attributes it to the selected model
-family, and accepts only a conforming verdict. One transient executor or
-malformed-output retry is allowed for the same digest and reviewer identity;
-a second failure ends the episode as `EXECUTION_FAILED`. A rejected explicit
-model or effort never triggers a default-model retry.
+family, and accepts only a conforming verdict. One whole-output `yaml` or
+`YAML` fence and nonempty finding text without a Conventional Comments label
+are accepted without changing their content. Every finding still needs a
+nonblank path with a positive line number or nonblank quote; dimension scores
+must meet their findings' severity, and the overall verdict must agree with
+the scores and findings. For outside results, a dimension may use an exact
+canonical score followed by ` — ` and nonblank rationale. Copy the full
+dimension score string into the attributed verdict for comparison with the
+raw YAML; use only the canonical score token for finding severity and
+overall-verdict consistency. The overall verdict remains a bare canonical
+token. Blank or ambiguous scores are rejected. Duplicate YAML mapping keys
+at any depth are rejected.
+A transient executor failure or malformed outside output may be retried once
+for the same digest and reviewer identity, but every repeat outside execution
+is a newly authorized review with a fresh preflight. The earlier consent does
+not authorize a silent
+retry. For `probe-rapid-refill-breaker` or `review-rapid-refill-breaker`, report
+an incomplete review and inspect private diagnostics before requesting that
+new authorization. A second outside failure ends the episode as
+`EXECUTION_FAILED`. A rejected explicit model or effort never triggers a
+default-model retry.
 The accepted outside verdict carries the completed runner result to
 `finalize-review`; it checks the raw YAML against the attributed lens,
-verdict, dimension scores, findings and notes, then stores only a digest-bound
-receipt with executor, model, effort, family and reviewer identity in the
-attestation. A vendor label without this receipt is not a completed outside
-review.
+verdict, dimension scores, findings and notes, then stores a receipt bound to
+the unmodified raw-output digest with executor, model, effort, family and
+reviewer identity in the attestation. A vendor label without this receipt is
+not a completed outside review.
 <!-- /gate -->
 
 ## 3. Run acceptance testing
@@ -308,16 +331,21 @@ patching then, and use the next available round only after the technical
 design re-look. The agent owns that re-plan when it preserves requirements,
 visible behavior, and guarantees.
 
-Do not ask the user whether to continue or which technical repair to choose.
+Do not ask the user whether to continue a technical fix or which technical
+repair to choose. Authorization for a repeat outside execution is separate.
 Ask only when resolving the blocker would change requirements, visible
 behavior, or guarantees; that change requires a newly confirmed intent rather
 than another round in this episode.
 
 A malformed response, unavailable executor, or other transient failure before
 a conforming verdict exists may retry once against the same functional-content
-digest. That retry is not a review round. A second executor failure ends the
-episode as `EXECUTION_FAILED`; a conforming `NEEDS_REVISION` always consumes
-the current round.
+digest. For an outside reviewer, that repeat execution requires a newly
+authorized review with a fresh preflight; never retry silently. After
+`probe-rapid-refill-breaker` or `review-rapid-refill-breaker`, inspect private
+diagnostics before requesting authorization. That retry is not a review round.
+A second failed attempt before a conforming verdict ends the episode as
+`EXECUTION_FAILED`; a conforming `NEEDS_REVISION` always consumes the current
+round.
 
 Keep this episode in the active task context. Do not create a review-round
 ledger or committed state schema. Wording-only publication edits do not reopen
@@ -371,13 +399,32 @@ hand-off to a temporary JSON input outside the repository:
   ],
   "findings": [],
   "adversarial": [
-    {"command":"python3 <path>","artifact":"<path>"}
+    {"command":"python3 -m pytest <path>","artifact":"<path>"}
   ]
 }
 ```
 
+When Build's hand-off records that the adversary committed no program, the
+`adversarial` list holds the no-program outcome and its reason, with no program beside it:
+
+```json
+  "adversarial": [
+    {"no_program":"<why no program was worth committing>"}
+  ]
+```
+
+`finalize-review` refuses a reason that is blank, is not on one line, has
+surrounding whitespace or contains an HTML comment, and a no-program record
+beside any program.
+
 The `findings` input carries every unresolved adversarial finding that Build's
 hand-off lists.
+
+Copy each returned `probe_confirmations` entry into that probe's `adversarial` item as
+`"confirmation": {"reviewer": "<id>", "reviewed_sha": "<sha>", "quote": "<lines>"}`.
+`finalize-review` uses a confirmation only for a run whose runner is unlisted
+or whose output it cannot read.
+
 For a selected outside reviewer, copy its `dimension_scores` and `notes` into
 the attributed verdict as well as the fields shown above; finalization compares
 them with the raw YAML.
@@ -385,7 +432,7 @@ them with the raw YAML.
 Then run:
 
 ```text
-python3 <loom-code>/scripts/loom_checker.py finalize-review <change-id> --input <temporary-json>
+"<loom-code>/scripts/loom-python" --repair finalize-review <change-id> --input <temporary-json>
 ```
 
 The checker runs the declared package suite and each adversarial program once.
@@ -394,24 +441,19 @@ attestation bound to the functional-content digest. Commit the generated file
 with any remaining publication metadata; publication validates that single
 attestation directly.
 
-The generated attestation is the change's verdict record: its `verdicts` field
-is the filed verdict artifact, digest-bound and read by Ship, publication and
-the PR-floor check. The review input JSON above is temporary — it is not a
-record and nothing reads it after finalization — so verdict and attestation
-stay one artifact instead of two copies that can drift. Its bookkeeping fields
-are bound from the change's own artifacts, not re-typed here: `reviewed_commit`
-is the HEAD that was verified, `tested_commit` is the acceptance test report's
-fixed "Tried on ... at <short sha>" line, `intent_confirmed_sha` is the intent's
-frontmatter pin (when capture-intent recorded one), and `acceptance_status`
-records which Acceptance lines the report covers. Each field is optional:
-an attestation produced before the field existed validates unchanged.
-
 When a step that `finalize-review` needs (reviewers, adversarial, package-tests)
 was skipped by the user's plain-words instruction, skip `finalize-review` and leave the change unattested: tell the
 user in one line that the PR will show `verification absent`, and hand the
 change to Ship.
 
-When `finalize-review` fails for any cause other than the plain-words case above,
+When `finalize-review` refuses only over a reviewer confirmation, and the
+functional content is unchanged, obtain a fresh confirmation from the round's
+reviewers and re-run `finalize-review`; that is not a Build round. A
+confirmation-only refusal is one of these five: the confirmation is missing;
+it is malformed; its reviewer gave no verdict this round; its `reviewed_sha`
+lacks HEAD's functional content; or its quote does not match its own run of
+the probe.
+When `finalize-review` fails for any other cause than these five,
 return the fix to Build, which repeats its
 end-of-Build mechanical checks, and the fixed content, a new functional-content
 digest, must pass the next review round (§4) before `finalize-review` runs

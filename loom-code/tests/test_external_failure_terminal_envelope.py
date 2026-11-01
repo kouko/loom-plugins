@@ -5,9 +5,11 @@ import json
 import subprocess
 
 import external_review as review
+import pytest
 
 
-def test_claude_assistantenvelope_unknown():
+@pytest.mark.parametrize("terminal_reason", ["api_error", "rapid_refill_breaker"])
+def test_claude_assistantenvelope_unknown(terminal_reason):
     """An assistant message carrying error-like keys is not CLI error evidence."""
     consent = {
         "approved": True, "executor": "claude", "review_root": "/repo",
@@ -22,7 +24,7 @@ def test_claude_assistantenvelope_unknown():
 
     def runner(argv, **kwargs):
         output = {"type": "assistant", "is_error": True,
-                  "terminal_reason": "api_error", "api_error_status": 429,
+                  "terminal_reason": terminal_reason, "api_error_status": 429,
                   "result": "session limit"}
         return subprocess.CompletedProcess(argv, 1, json.dumps(output), "")
 

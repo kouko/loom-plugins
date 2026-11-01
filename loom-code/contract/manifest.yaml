@@ -32,13 +32,14 @@ tools:               # user-invoked, or raised by a station on a mechanical cond
   - {name: handoff,             owner: loom-workflow}
   - {name: recap-state,         owner: loom-workflow}
   - {name: loom-visualization,  owner: loom-workflow}
-  - {name: distill-sessions,    owner: loom-workflow}
+  - {name: skill-retro,    owner: loom-workflow}
   - {name: git-memory,          owner: loom-workflow}
   - {name: independent-advisor, owner: loom-workflow}
   - {name: critique,            owner: loom-workflow}   # mode: proposal | complexity
   # standalone: outside the loom flow; not counted toward the skill budget (user-decided 2026-09-02)
   - {name: goal-create,         owner: loom-workflow, standalone: true}
   - {name: dbt-model-style,     owner: loom-workflow, standalone: true}
+  - {name: project-retro,               owner: loom-workflow, standalone: true}
 
 actions:             # executable steps inside a station; not skills (§3)
   - name: restate-and-confirm
@@ -204,7 +205,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       - {name: schema,         kind: json, required: true}
       - {name: change_id,      kind: json, required: true}
       - {name: content_digest, kind: json, required: true}
-      - {name: executions,     kind: json, required: true, grammar: "[{kind, command, artifact, result, command_digest}]"}
+      - {name: executions,     kind: json, required: true, grammar: "[{kind, command, artifact, result, command_digest, evidence?, passed?, confirmation?} | {kind: adversarial, no_program}]", note: "a {kind: adversarial, no_program: <non-blank reason>} row records that the adversary committed no program; no adversarial program row stands beside it, and it is never executed or counted against the probe-program cap; an adversarial execution run by a listed runner row carries evidence parsed with passed >= 1, or evidence reviewer with confirmation {reviewer, reviewed_sha, content_digest, quote}; one no row claims carries evidence reviewer; pytest, shell and direct executions carry no evidence"}
       - {name: verdicts,       kind: json, required: true, grammar: "[{reviewer, vendor, model, lens, verdict, findings}]"}
       - {name: findings,       kind: json, required: true, grammar: "[{id, anchor, raised_by, resolution} | {severity, dimension, anchor, text}]"}
       - {name: selection,      kind: json, required: true, grammar: "null", note: "schema loom-attestation/v2; always null, and any other value is refused because no typed selection can waive a step; v1 attestations carry no selection and stay valid"}

@@ -141,3 +141,9 @@ def test_frontmatter_and_routing():
     # (f)
     missing = [p for p in FIVE_PRINCIPLES if f"**{p}**" not in body]
     assert not missing, f"Missing principles: {missing}"
+
+
+def test_skill_requires_source_for_past_decisions() -> None:
+    body = _parse_skill_md()[1].lower()
+    for requirement in ("user turn", "prior action", "formatting choice", "historical decision"):
+        assert requirement in body, f"Past-decision source check omits {requirement}"

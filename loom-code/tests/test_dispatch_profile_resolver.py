@@ -462,8 +462,8 @@ def test_unknown_failure_kind_fails_closed() -> None:
 
 def test_contract_defines_the_executable_json_boundary() -> None:
     text = (PLUGIN / "references" / "dispatch-profile.md").read_text(encoding="utf-8")
-    assert "python3 ${CLAUDE_PLUGIN_ROOT}/scripts/dispatch_profile.py" in text
-    assert "python3 <loom-code>/scripts/dispatch_profile.py" in text
+    assert '"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --repair --script dispatch_profile.py' in text
+    assert '"<loom-code>/scripts/loom-python" --repair --script dispatch_profile.py' in text
     assert "injected loom-code plugin root" not in text
     assert '"event": "initial"' in text
     assert '"event": "after-execution"' in text

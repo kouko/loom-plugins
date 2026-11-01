@@ -1,0 +1,85 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-22-claude-review-diagnostics",
+  "content_digest": "3dfaedaaf2c7f3a659e37012d40ec8280927e1d8",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m unittest -v loom-code/tests/test_adversarial_claude_error_result.py",
+      "artifact": "loom-code/tests/test_adversarial_claude_error_result.py",
+      "result": "pass",
+      "command_digest": "7d070001f8aa5b8476178b8e3bef443ce0c4c5e4e12a620c413189e32b55a500",
+      "evidence": "parsed",
+      "passed": 1
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "claude-code-reviewer-round2",
+      "vendor": "openai",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "53c3fde0a5fee2313fa3749a0eca6a80df23dc3b",
+      "review_target_sha": "4dab44b85bcd6473ae6083f67f52a136d258614d",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "fixed — The prior grounding finding at loom-code/skills/external-review/SKILL.md:151 is closed. Line 152 now links the command to the official Claude CLI reference, which documents `claude doctor`.",
+        "The fix changes only the skill citation; no executable code or tests changed."
+      ]
+    },
+    {
+      "reviewer": "claude-skill-reviewer-round2",
+      "vendor": "openai",
+      "lens": "skill",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "53c3fde0a5fee2313fa3749a0eca6a80df23dc3b",
+      "review_target_sha": "4dab44b85bcd6473ae6083f67f52a136d258614d",
+      "dimension_scores": {
+        "omission": "PASS_WITH_NOTES",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "status": "unfixed",
+          "severity": "nit",
+          "dimension": "omission",
+          "anchor": "loom-code/skills/external-review/SKILL.md:147",
+          "text": "nitpick: The failure-handling rule paragraph still lacks the prose-gate marker required by the skill lens.",
+          "fix": "Mark the paragraph as a prose gate and register its ID with the existing failure-relay prose-pin test as its eval."
+        }
+      ],
+      "notes": [
+        "The fix adds only a citation. The [official CLI reference](https://code.claude.com/docs/en/cli-reference) confirms `claude doctor` provides read-only terminal diagnostics.",
+        "The prior nit remains; the citation change introduces no new finding."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

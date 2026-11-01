@@ -284,6 +284,27 @@ class TestRecompute:
 
         assert "PreToolUse:Bash:loom_checker.py" in cm.recompute_hooks(repo)
 
+    def test_hook_id_resolves_ready_launcher_checker(self, tmp_path):
+        repo = _build_repo(tmp_path)
+        path = repo / "loom-code/hooks/hooks.json"
+        hooks = json.loads(path.read_text())
+        hooks["hooks"]["PreToolUse"][0]["hooks"][0]["command"] = (
+            '"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --ready push --hook; exit "$?"'
+        )
+        path.write_text(json.dumps(hooks))
+        assert "PreToolUse:Bash:loom_checker.py" in cm.recompute_hooks(repo)
+
+    def test_hook_id_resolves_ready_launcher_script(self, tmp_path):
+        repo = _build_repo(tmp_path)
+        path = repo / "loom-code/hooks/hooks.json"
+        hooks = json.loads(path.read_text())
+        hooks["hooks"]["PreToolUse"][0]["hooks"][0]["command"] = (
+            '"${CLAUDE_PLUGIN_ROOT}/scripts/loom-python" --ready --script '
+            '../hooks/language-anchor.py; exit "$?"'
+        )
+        path.write_text(json.dumps(hooks))
+        assert "PreToolUse:Bash:language-anchor.py" in cm.recompute_hooks(repo)
+
     def test_contract_from_manifest_is_per_field(self, tmp_path):
         """F10: contract recompute registers one id per artifact FIELD
         (`artifact:<name>.<field>`), not one per artifact."""

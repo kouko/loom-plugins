@@ -18,13 +18,15 @@ is the directory two levels above this SKILL.md.
 
 ## Before discovery
 
-Require a complete consent record for this executor and review root. The root is
-the CLI's existing starting directory, **not a filesystem read boundary**. The CLI may
-read files outside it through host tools or configuration; CLI startup,
-plugins, and caches may write files even when model tools are restricted. The
-record must identify `authorization_source`: either a quoted direct user request
-with the final selected executor and an unambiguous active review target, or a
-separate accepted selection. A direct user request authorizes one bounded
+Require a complete consent record for this executor and review root. For Claude,
+restricted mode confines model file tools to that root; put required review
+evidence there or explicitly include it in the packet. Do not grant additional
+directories based on paths mentioned in the packet. For other executors, the
+root is the CLI's starting directory, not a filesystem read boundary. CLI
+startup and caches may write files outside the root even when model tools are
+restricted. The record must identify `authorization_source`: either a quoted
+direct user request with the final selected executor and an unambiguous active
+review target, or a separate accepted selection. A direct user request authorizes one bounded
 review without a second yes/no checkpoint. Show cost, vendor data transfer,
 the actual filesystem limits, and local CLI execution before discovery, probe
 or dispatch; for a
@@ -99,7 +101,7 @@ recorded set before starting the probe.
 After this consent, list candidates with:
 
 ```sh
-python3 <loom-code>/scripts/external_review.py --list-candidates \
+"<loom-code>/scripts/loom-python" --repair --script external_review.py --list-candidates \
   --executor <codex|claude|agy> --scope <absolute-review-root> \
   --consent-record <path-to-record>
 ```
@@ -120,13 +122,20 @@ code, a plan, or a decision review; this boundary does not substitute a new
 rubric or output schema.
 
 ```sh
-python3 <loom-code>/scripts/external_review.py \
+"<loom-code>/scripts/loom-python" --repair --script external_review.py \
   --executor <codex|claude|agy> \
   --model <selected-model> --effort <selected-effort> \
   --family <openai|anthropic|google> \
   --scope <absolute-review-root> \
   --consent-record <path-to-record> < <review-packet-file>
 ```
+
+For a Claude invocation with an authorized estimated-spend threshold, add
+`--max-budget-usd <positive-amount>` to the entry; the runner applies it
+separately to preflight and review. Before authorization, disclose that Claude
+Code checks its own client-side cost estimate, which may differ from the bill,
+and spend can exceed the threshold. The default invocation has no added budget
+flag.
 
 The script first verifies the consent and explicit selection. It then performs
 bounded discovery, one short preflight, and one bounded review with the same
@@ -136,16 +145,41 @@ validates that text. Any other status is a failed outside leg. Never reuse a
 preflight as the review, call a default model, downgrade effort, switch CLI, or
 count a failed leg as a completed review.
 
-The execution asks Codex for a read-only command sandbox, Claude Code for plan
-mode with only `Read`, `Glob`, and `Grep` model tools, and Antigravity for plan
+While the preflight or review runs, the script writes progress lines to its
+error stream about once a minute (step, elapsed time, time since the CLI last
+produced output) and one closing line when the step ends (total time, longest
+silence). Keep that error stream visible while you wait — for example, run the
+command in the background and watch its output — and relay each progress line
+to the user instead of waiting silently. These lines never carry the packet or
+the review text; stdout remains the one JSON result.
+
+For a failed Claude Code execution, relay the bounded `reason` and
+`next_action` to the user. When present, relay only the fixed `diagnostic`
+fields (`stage`, numeric `exit_code`, `stdout_present`, `stderr_present`,
+`stdout_json_parseable`); keep raw CLI output, the prompt, and review text out
+of the user-facing report. For an unknown cause, run
+[`claude doctor`](https://code.claude.com/docs/en/cli-reference) locally
+and inspect any CLI diagnostics privately; the failed review's cause remains
+unknown until local evidence identifies it. Record the failed leg with its
+verdict absent. A retry is a newly authorized review with a fresh preflight;
+prohibit a silent retry or provider fallback. Keep the existing consent scope
+and disclosures for every outside call.
+
+`probe-rapid-refill-breaker` or `review-rapid-refill-breaker` means the Claude
+CLI stopped after repeated compaction. Report it as an incomplete review and
+ask for a new authorized execution only after private diagnostics are checked.
+
+The execution asks Codex for a read-only command sandbox, Claude Code for safe
+and restricted single-run modes with automatic compaction, no configured MCP
+servers, and only `Read`, `Glob`, and `Grep` model tools, and Antigravity for plan
 mode with its terminal sandbox. For each Antigravity probe and review, the
 script also attaches the absolute review root with `--add-dir`; setting the
 process working directory alone does not attach that workspace in print mode.
-These flags constrain model actions but do not
-prove host-wide read or write confinement. In particular, a review root is
-only a working directory. The result reports this filesystem limit; the
-owning skill must carry it into the user-facing report. Do not describe the
-selected root as the only path the CLI could read.
+These flags constrain model actions but do not prove host-wide read or write
+confinement. Claude's model file tools are confined to the review root; its CLI
+startup may still access or write outside it. For the other executors, the root
+is only a working directory. The result reports this filesystem limit; the
+owning skill must carry it into the user-facing report.
 
 Report the requested profile, candidate source, preflight outcome, observed
 fields, and `evidence_level` alongside the owning skill's verdict. Codex's

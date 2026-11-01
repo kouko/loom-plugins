@@ -128,6 +128,41 @@ def test_subprocess_stdin_drifted_exits_1():
     assert proc.returncode == 1, proc.stderr
 
 
+def test_subprocess_stdin_unboxed_join_alignment():
+    # A task-dependency join must keep both + endpoints and the trunk in one
+    # display column, even when the labels contain wide CJK characters.
+    prefix = "A: 資料格式\n|\n"
+    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
+    for join, expected_rc in (
+        ("+--> B: 匯入器 ----+\n|                   |\n+--> C: 報表 ------+--> D: 端對端驗證\n", 1),
+        ("+--> B: 匯入器 -----+\n|                   |\n+--> C: 報表 -------+--> D: 端對端驗證\n", 0),
+    ):
+        proc = subprocess.run(
+            [sys.executable, str(_SCRIPT), "-"],
+            input=prefix + join,
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        assert proc.returncode == expected_rc, proc.stdout + proc.stderr
+        assert ("seam kink" in proc.stdout) == bool(expected_rc)
+
+
+def test_subprocess_stdin_unboxed_handoff_alignment():
+    prefix = "[客服] A: 收集問題\n        |\n        | handoff: 問題紀錄\n"
+    env = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
+    for arrow, expected_rc in (("         v", 1), ("        v", 0)):
+        proc = subprocess.run(
+            [sys.executable, str(_SCRIPT), "-"],
+            input=prefix + arrow + "\n[工程] B: 修復問題\n",
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        assert proc.returncode == expected_rc, proc.stdout + proc.stderr
+        assert ("seam kink" in proc.stdout) == bool(expected_rc)
+
+
 # ---------------------------------------------------------------------------
 # From ascii-graph tests/test_generate_cli.py
 # Contract tests for the generate.py dispatch CLI.

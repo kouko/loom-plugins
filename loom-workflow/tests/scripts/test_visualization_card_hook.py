@@ -139,6 +139,11 @@ def test_hooks_json_registers_user_prompt_submit_and_keeps_post_tool_use():
         "matcher": "Write|Edit",
         "hooks": [{"type": "command",
                    "command": "${CLAUDE_PLUGIN_ROOT}/scripts/validate-skill-folder-structure.sh"}],
+    }, {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [{"type": "command",
+                   "command": '"${CLAUDE_PLUGIN_ROOT}/hooks/memory-mirror-reminder"',
+                   "timeout": 5}],
     }]
     assert "SessionStart" not in hooks
     (entry,) = hooks["UserPromptSubmit"]

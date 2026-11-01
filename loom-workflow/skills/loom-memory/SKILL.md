@@ -1,7 +1,7 @@
 ---
 name: loom-memory
 description: |
-  Manage durable repository lessons when asked to remember, recall, reconcile, or forget; also recall when a task needs a prior lesson.
+  Record repo-wide lessons when saving to your own memory or asked to remember; recall, reconcile, or forget them when a task needs it.
 ---
 
 # loom-memory
@@ -9,7 +9,9 @@ description: |
 `loom-memory` is the one public surface over an OKF v0.2-compatible
 repository memory store: a directory of Markdown concept files plus a
 generated `index.md`, holding durable repository lessons that outlive any
-single change. It exposes four operations — **Recall**, **Record**,
+single change. The store is `docs/loom/memory/` at the repository root unless
+the repository already keeps its loom memory store elsewhere; initialize it
+there when it is absent. It exposes four operations — **Recall**, **Record**,
 **Reconcile**, **Retire** — and nothing else. Validation and index
 generation are implemented in
 `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` (the
@@ -38,15 +40,19 @@ between them — a commit-bound `Gotcha:` trailer is not itself a
 
 ## When this skill activates
 
-Two triggers only, both passive:
+Three triggers, all passive:
 
 1. **Explicit user request** — the user asks to remember, recall,
    reconcile, or retire repository knowledge, in any language.
-2. **Independent agent judgement** — mid-task, the agent identifies a
+2. **Host memory save** — the agent is about to save a lesson to its own
+   host-managed memory, on any agent host. Run Record's classification
+   first: a repo-wide lesson is recorded here as well; anything else stays
+   only in host memory.
+3. **Independent agent judgement** — mid-task, the agent identifies a
    concrete need for prior repository experience (not a hunch, not a
    completeness ritual).
 
-No other condition activates this skill. Reaching any particular point in
+Apart from the host memory save in trigger 2, reaching any particular point in
 a workflow is not, by itself, a reason to invoke it — this skill has no
 fixed-station calling convention and installs no gate on anyone else's
 process.
@@ -77,8 +83,9 @@ experience is needed for the task at hand.
 
 ### Record
 
-**Trigger:** explicit request, or the agent judges a discovery is worth
-keeping past this change.
+**Trigger:** explicit request, the agent is about to save a lesson to its
+own host-managed memory, or the agent judges a discovery is worth keeping
+past this change.
 
 **When:** before the branch closes. A fact already known while the branch
 is still open — one that did not require the merge to observe — belongs in
@@ -90,6 +97,7 @@ genuinely needs a follow-up branch, and those are batched rather than one
 pull request per discovery. A lesson that surfaces only after a closing
 review has spent its last reviewed content is the same case: it rides the
 next change's branch batched, which is still not a branch opened to record.
+Such a lesson stays in host memory until the next change's branch records it.
 
 **How much:** almost nothing qualifies. Most of what a change surfaces is
 not a durable lesson — a one-off implementation slip belongs in its commit
@@ -103,16 +111,30 @@ record eight things at once means the filter has not been applied yet.
 1. Classify the candidate first. It qualifies only as a durable repository
    lesson — not an open task, a change narrative, a verification record, a
    commit-bound decision (that belongs in `git-memory`), or a personal
-   preference. When it fails this classification, do not record it; say
-   why.
-2. Read `index.md` and search for an equivalent or contradictory live
+   preference. It also fails as a fact true only on one machine (local
+   paths, local environments, installed tool versions), or as behavior of
+   one agent host or tool unrelated to the repository. Then ask: would this
+   still hold and help another contributor who clones this repository on a
+   different machine with different tools? When it fails this
+   classification, do not record it; it stays only in host memory — say
+   why it was not recorded.
+2. Inspect the target store before index access or concept writes.
+   Initialize an absent or empty directory with `init <store>` using
+   `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py`;
+   this creates `README.md` and `index.md` from the bundled templates.
+   Preserve existing populated stores: skip initialization, detect legacy
+   README-indexed stores as described in `references/operations.md` and
+   stop for explicit migration. For other populated stores, run
+   `validate <store>` first and stop on any violation, including a missing
+   index; continue only with a valid store.
+3. Read `index.md` and search for an equivalent or contradictory live
    entry before creating anything. A match routes to Reconcile instead.
-3. Author exactly one concept file: frontmatter (`type`, `name` equal to
+4. Author exactly one concept file: frontmatter (`type`, `name` equal to
    the filename stem, `description`, at least one `sources[].resource`),
    followed by a body of `Trigger`, `Correct path`, `Why`, and `Limits`
    only when a real non-applicability boundary exists — see
    `references/okf-profile.md`.
-4. Regenerate and validate the index with
+5. Regenerate and validate the index with
    `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py
    regenerate-index <store>` and `validate <store>` (that script is
    `skills/loom-memory/scripts/loom_memory.py` inside this skill's own
@@ -120,13 +142,16 @@ record eight things at once means the filter has not been applied yet.
 
 ### Reconcile
 
-**Trigger:** a new lesson contradicts or narrows a current entry.
+**Trigger:** a new lesson contradicts, narrows, or is equivalent to a
+current entry (same subject, same rule).
 
 **Steps:**
 1. Locate the current entry through `index.md`, never by guessing a
    filename.
-2. Update that entry in place, or replace it with one current concept.
-   Never create a second, contradictory sibling for the same subject.
+2. An equivalent lesson keeps the existing entry's content unchanged and only adds
+   its new source to that entry's `sources`. A contradicting or narrowing
+   lesson updates that entry in place, or replaces it with one current
+   concept. Never create a second entry for the same subject.
 3. Preserve every existing `sources[].resource` and add the new source
    rather than discarding provenance.
 4. Regenerate and validate the index.
@@ -169,7 +194,8 @@ start, Recall, or any other station.
   Reconcile merge rule in detail.
 - `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py` (the
   `skills/loom-memory/scripts/loom_memory.py` file inside this skill's own
-  directory) — `validate <store>` and `regenerate-index <store>`.
+  directory) — `init <store>`, `validate <store>`, and
+  `regenerate-index <store>`.
 - `templates/memory-store-README.md` and `templates/memory-store-index.md`
   — the starting shape for a new store, instantiated as that store's
   `README.md` and `index.md`.

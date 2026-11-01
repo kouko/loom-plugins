@@ -26,6 +26,8 @@ SCRIPT = SCRIPTS_DIR / "loom_memory.py"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 import loom_memory as lm  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "loom-code/scripts"))
+from prose_pin import affirms  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
@@ -631,3 +633,140 @@ def test_okf_version_round_trips_without_gaining_a_quote_pair() -> None:
         parsed = parsed[0]
     assert parsed == value
     assert lm.dump_frontmatter(parsed) == dumped
+
+
+# ---------------------------------------------------------------------------
+# Acceptance: A1 `init` creates the store / A5 the created store validates /
+# A6 the existing shape is preserved
+# ---------------------------------------------------------------------------
+
+
+TEMPLATES_DIR = SCRIPTS_DIR.parent / "templates"
+
+
+@pytest.mark.parametrize("starting_shape", ["absent", "empty-directory"])
+def test_init_creates_the_store_from_the_bundled_templates(tmp_path, starting_shape):
+    """A1 positive create-store-from-templates-then-validate: `init` on a path
+    that does not exist — or exists as an empty directory — writes README.md
+    and index.md from the skill's bundled templates."""
+    store = tmp_path / "memory"
+    if starting_shape == "empty-directory":
+        store.mkdir()
+
+    result = _run_cli("init", str(store))
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert (store / "README.md").is_file()
+    assert (store / "index.md").is_file()
+
+
+def test_created_store_validates_clean(tmp_path):
+    """A5 positive validate-exits-zero-on-created-store: the store `init`
+    wrote satisfies the full profile, both in-process and via the CLI."""
+    store = tmp_path / "memory"
+
+    result = _run_cli("init", str(store))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    assert lm.validate_bundle(store) == []
+    validate_result = _run_cli("validate", str(store))
+    assert validate_result.returncode == 0, validate_result.stdout + validate_result.stderr
+
+
+@pytest.mark.parametrize("state", ["valid", "corrupt", "legacy"])
+def test_init_refuses_an_existing_nonempty_store(tmp_path, state):
+    """A1 negative refuse-existing-nonempty-store: `init` exits non-zero,
+    names the offending store, and leaves every existing file byte-identical
+    — it writes nothing at all."""
+    store = tmp_path / "memory"
+    _make_valid_store(store)
+    if state == "corrupt":
+        (store / "index.md").unlink()
+    elif state == "legacy":
+        (store / "index.md").unlink()
+        _write(store, "README.md", "# Legacy store\n\n## Index\n")
+    before = {p.name: p.read_bytes() for p in store.iterdir()}
+
+    validation = _run_cli("validate", str(store))
+    assert (validation.returncode == 0) == (state == "valid")
+    assert {p.name: p.read_bytes() for p in store.iterdir()} == before
+    result = _run_cli("init", str(store))
+
+    assert result.returncode != 0
+    assert "Traceback" not in result.stderr
+    if state == "legacy":
+        assert "explicit migration" in result.stdout
+    else:
+        assert str(store) in result.stdout + result.stderr
+    assert {p.name: p.read_bytes() for p in store.iterdir()} == before
+
+
+@pytest.mark.parametrize("state", ["absent", "empty-directory"])
+def test_record_initializes_before_index_access_and_completes_first_concept(tmp_path, state):
+    for relative in ("SKILL.md", "references/operations.md"):
+        text = (SCRIPTS_DIR.parent / relative).read_text(encoding="utf-8")
+        record = " ".join(text.split("# Record\n", 1)[1].split("# Reconcile\n", 1)[0].split())
+        rule = ("Initialize", "absent or empty directory", "`init <store>`")
+        example = "Initialize an absent or empty directory with `init <store>`."
+        assert affirms(example, *rule)
+        assert not affirms("Do not " + example, *rule)
+        assert affirms(record, *rule), relative
+        assert record.index("`init <store>`") < record.index("Read `index.md`")
+        assert record.index("Read `index.md`") < record.index("frontmatter")
+        assert "existing populated stores" in record
+        assert "explicit migration" in record
+        assert "validate <store>" in record
+
+    store = tmp_path / "memory"
+    if state == "empty-directory":
+        store.mkdir()
+    result = _run_cli("init", str(store))
+    assert result.returncode == 0, result.stdout + result.stderr
+    readme = (store / "README.md").read_bytes()
+    assert "first-lesson.md" not in (store / "index.md").read_text(encoding="utf-8")
+    concept = _concept("first-lesson", "A durable first lesson.").replace(
+        "The lesson body.", "## Trigger\nOn first use.\n\n## Correct path\nInitialize first.\n\n## Why\nPreserve ordering."
+    )
+    _write(store, "first-lesson.md", concept)
+    for command in ("regenerate-index", "validate"):
+        result = _run_cli(command, str(store))
+        assert result.returncode == 0, result.stdout + result.stderr
+    assert "[first-lesson](first-lesson.md)" in (store / "index.md").read_text(encoding="utf-8")
+    assert (store / "first-lesson.md").read_text(encoding="utf-8") == concept
+    assert (store / "README.md").read_bytes() == readme
+
+
+def test_init_reports_a_legacy_store_as_needing_explicit_migration(tmp_path):
+    """A5 boundary legacy-shape-reported-not-touched: a legacy README-indexed
+    store (operations.md's detection rule — a `## Index` heading and no
+    generated index.md) is reported as needing an explicit migration, and
+    `init` modifies nothing."""
+    store = tmp_path / "memory"
+    store.mkdir()
+    legacy_readme = (
+        "---\nname: README\ndescription: A hand-indexed legacy store.\n"
+        "type: Memory Store Guide\n---\n\n# Legacy store\n\n## Index\n\n"
+        "- [one](one.md) — a lesson\n"
+    )
+    _write(store, "README.md", legacy_readme)
+    _write(store, "one.md", _concept("one", "A legacy lesson."))
+
+    result = _run_cli("init", str(store))
+
+    assert result.returncode != 0
+    assert "Traceback" not in result.stderr
+    assert "migration" in result.stdout.lower()
+    assert (store / "README.md").read_text(encoding="utf-8") == legacy_readme
+    assert not (store / "index.md").exists()
+
+
+def test_created_store_is_byte_identical_to_the_templates(tmp_path):
+    """A6 boundary created-store-matches-template-shape: the template is the
+    pinned shape, so what `init` wrote must equal it byte-for-byte."""
+    store = tmp_path / "memory"
+
+    result = _run_cli("init", str(store))
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    assert (store / "README.md").read_bytes() == (TEMPLATES_DIR / "memory-store-README.md").read_bytes()
+    assert (store / "index.md").read_bytes() == (TEMPLATES_DIR / "memory-store-index.md").read_bytes()

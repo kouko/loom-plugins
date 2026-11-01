@@ -32,7 +32,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
-from width import display_width, split_lines
+from width import display_width, require_single_line
 
 # Source the directional arrowheads from the canonical taxonomy rather than
 # hardcoding, so the glyph set stays single-sourced with the check modules.
@@ -68,15 +68,9 @@ def render_seq(participants: list[str], messages: list[dict]) -> str:
     # split_lines(x) != [x] is true for every line break, so reject loudly
     # here, BEFORE any layout, so the failure is a clear ValueError.
     for nm in participants:
-        if split_lines(nm) != [nm]:
-            raise ValueError(
-                f"line break not supported in participant name: {nm!r}"
-            )
+        require_single_line(nm, "participant name")
     for msg in messages:
-        if split_lines(msg["label"]) != [msg["label"]]:
-            raise ValueError(
-                f"line break not supported in message label: {msg['label']!r}"
-            )
+        require_single_line(msg["label"], "message label")
 
     # Per-box interior width = name + one padding space on each side.
     interiors = [display_width(name) + 2 for name in participants]

@@ -18,10 +18,13 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parents[2] / "skills" / "loom-memory"
 REPO_ROOT = SKILL_DIR.parents[2]
+sys.path.insert(0, str(REPO_ROOT / "loom-code/scripts"))
+from prose_pin import affirms  # noqa: E402
 SKILL_MD = SKILL_DIR / "SKILL.md"
 REFERENCES_DIR = SKILL_DIR / "references"
 OKF_PROFILE = REFERENCES_DIR / "okf-profile.md"
@@ -40,6 +43,10 @@ def _read(path: Path) -> str:
 
 def _skill_md_text() -> str:
     return _read(SKILL_MD)
+
+
+def _operations_md_text() -> str:
+    return _read(OPERATIONS)
 
 
 def _all_skill_text() -> str:
@@ -281,7 +288,7 @@ def _flat(text: str) -> str:
 # sha256 of the whitespace-flattened Record section of SKILL.md. Its only job
 # is to go red when that section changes at all, so the dilution guard cannot
 # fall silently out of date behind a literal pin that still passes.
-RECORD_SECTION_DIGEST = "945a9cb29dfb5a9090e4ad036e5f980accf19fe94b22ff3014c1c066635ddcc9"
+RECORD_SECTION_DIGEST = "61f3c8afb88c689d153250e699c1fbab2be18b5f532bc17d173abb869afafa14"
 
 
 def test_backlog_entry_routing_sentence_rejected() -> None:
@@ -304,8 +311,15 @@ def test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against(
     result, and update the digest here in the same commit. Updating the digest
     without re-running the eval is the one move that defeats the guard — the
     eval takes one dispatch."""
+    # Guard against decoy headings: there must be exactly one Record heading
+    skill_text = _skill_md_text()
+    heading_matches = list(re.finditer(r"^(#{2,3})\s+Record\s*$", skill_text, re.MULTILINE))
+    assert len(heading_matches) == 1, (
+        f"expected exactly one Record heading, found {len(heading_matches)}: "
+        + ", ".join(m.group(0) for m in heading_matches)
+    )
     actual = hashlib.sha256(
-        _flat(_section(_skill_md_text(), "Record")).encode("utf-8")
+        _flat(_section(skill_text, "Record")).encode("utf-8")
     ).hexdigest()
     assert actual == RECORD_SECTION_DIGEST, (
         "the Record section changed since the cold-reader eval was run "
@@ -313,3 +327,188 @@ def test_record_section_matches_the_digest_the_cold_reader_eval_was_run_against(
         "`evals/record-timing.md`'s method against the new text, update that "
         "file's reference run, then set this digest in the same commit."
     )
+
+
+# ---------------------------------------------------------------------------
+# Auto-create store: Record creates an absent store, Recall never does,
+# Retire's approval requirement is untouched.
+# ---------------------------------------------------------------------------
+
+
+def test_record_section_names_create_when_store_absent() -> None:
+    """Acceptance 1 positive `record-step-names-create-when-absent`: the
+    Record section names running the `init` subcommand when the target store
+    is absent or empty, writing the store's reserved files from the bundled
+    templates before index access, regeneration and validation continue."""
+    flat = _flat(_section(_skill_md_text(), "Record"))
+    example = "initialize an absent or empty directory with `init <store>`."
+    rule = ("initialize", "absent or empty directory", "`init <store>`")
+    assert affirms(example, *rule)
+    assert not affirms("do not " + example, *rule)
+    assert affirms(flat, *rule), "Record must initialize an absent or empty store"
+    assert flat.index("`init <store>`") < flat.index("read `index.md`")
+    assert re.search(r"\binit\b", flat), (
+        "the Record section must name the `init` subcommand as the way an "
+        "absent store gets created"
+    )
+    assert "bundled templates" in flat, (
+        "the Record section must say the created store comes from the "
+        "bundled templates, not agent hand-copying"
+    )
+
+
+def test_recall_absent_store_stays_normal_no_memory() -> None:
+    """Acceptance 1 negative `recall-absent-store-unchanged` and Acceptance 3
+    boundary `recall-absent-store-still-normal-no-memory`: the Recall section
+    in both SKILL.md and operations.md keeps its normal no-memory result for an
+    absent store and gains no creation step — only Record creates."""
+    skill_flat = _flat(_section(_skill_md_text(), "Recall"))
+    assert "normal no-memory" in skill_flat, (
+        "the Recall section in SKILL.md must keep reporting an absent store as a normal "
+        "no-memory result"
+    )
+    assert not re.search(r"\binit\b", skill_flat), (
+        "the Recall section in SKILL.md must not create a store; only Record does"
+    )
+    ops_flat = _flat(_section(_operations_md_text(), "Recall"))
+    assert "normal no-memory" in ops_flat, (
+        "the Recall section in operations.md must keep reporting an absent store as a normal "
+        "no-memory result"
+    )
+    assert not re.search(r"\binit\b", ops_flat), (
+        "the Recall section in operations.md must not create a store; only Record does"
+    )
+
+
+def test_retire_approval_requirement_unchanged() -> None:
+    """Acceptance 4 boundary `retire-approval-sentence-unchanged`: Retire
+    still requires explicit user approval before deleting anything."""
+    flat = _flat(_section(_skill_md_text(), "Retire"))
+    assert "explicit user approval" in flat, (
+        "the Retire section must keep requiring explicit user approval "
+        "before deleting anything"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Host-memory trigger: loom-memory fires when the agent is about to save a
+# lesson to its own host-managed memory, and Record keeps only repo-wide ones.
+# ---------------------------------------------------------------------------
+
+NEW_DESCRIPTION = (
+    "Record repo-wide lessons when saving to your own memory or asked to "
+    "remember; recall, reconcile, or forget them when a task needs it."
+)
+HOST_SAVE_PHRASE = "about to save a lesson to its own host-managed memory"
+REPO_WIDE_TEST = (
+    "would this still hold and help another contributor who clones this "
+    "repository on a different machine with different tools?"
+)
+MACHINE_EXCLUSION = "a fact true only on one machine"
+TOOL_EXCLUSION = "behavior of one agent host or tool unrelated to the repository"
+STORE_DEFAULT = (
+    "The store is `docs/loom/memory/` at the repository root unless the repository "
+    "already keeps its loom memory store elsewhere; initialize it there when it is absent."
+)
+DEFERRAL_PHRASE = "stays in host memory until the next change's branch records it"
+
+
+def _activation() -> str:
+    return _section(_skill_md_text(), "When this skill activates")
+
+
+def _names_host_save(section: str) -> bool:
+    return any(
+        re.match(r"^\d+\.\s", item) and HOST_SAVE_PHRASE in _flat(item)
+        for item in re.split(r"\n(?=\d+\.\s)", section.strip())
+    )
+
+
+def test_activation_names_host_memory_save() -> None:
+    assert _names_host_save(_activation()), "activation must list the host-memory-save trigger"
+
+
+def test_activation_lists_host_save() -> None:
+    items = re.findall(r"^\d+\.\s", _activation(), re.MULTILINE)
+    assert len(items) == 3, "activation lists exactly three passive triggers"
+    flat = _flat(_activation())
+    assert "explicit user request" in flat and "independent agent judgement" in flat
+
+
+def test_no_other_condition_sentence_absent() -> None:
+    flat = _flat(_activation())
+    assert "no other condition activates" not in flat
+    assert "two triggers only" not in flat
+
+
+def test_description_within_133_chars() -> None:
+    assert '\ndescription: |\n' in _skill_md_text()
+    desc = _frontmatter_description(_skill_md_text())
+    assert desc == NEW_DESCRIPTION and len(desc) <= 133
+
+
+def _excludes_machine_and_tool(flat: str) -> bool:
+    return MACHINE_EXCLUSION in flat and TOOL_EXCLUSION in flat and "only in host memory" in flat
+
+
+def test_machine_and_tool_notes_excluded() -> None:
+    for text in (_skill_md_text(), _operations_md_text()):
+        assert _excludes_machine_and_tool(_flat(_section(text, "Record")))
+    assert _record_names_host_save_trigger()
+    assert _flat(STORE_DEFAULT) in _flat(_skill_md_text())
+    assert "docs/loom/memory/" in _flat(_section(_operations_md_text(), "Recall"))
+    assert "docs/loom/memory/" in _flat(_section(_operations_md_text(), "Record"))
+
+
+def _record_names_host_save_trigger() -> bool:
+    flat = _flat(_section(_skill_md_text(), "Record"))
+    return "**trigger:**" in flat and "host-managed memory" in flat.split("**when:**")[0]
+
+
+def test_repo_wide_lesson_kept() -> None:
+    for text in (_skill_md_text(), _operations_md_text()):
+        flat = _flat(_section(text, "Record"))
+        assert REPO_WIDE_TEST in flat, "Record must keep a repo-wide lesson via the clone test"
+        assert "zero to one" in flat and "durable lesson per change" in flat
+
+
+def _keeps_deferral(flat: str) -> bool:
+    return "rides the next change's branch batched" in flat and DEFERRAL_PHRASE in flat
+
+
+def test_post_finalize_deferral_kept() -> None:
+    assert _keeps_deferral(_flat(_section(_skill_md_text(), "Record")))
+
+
+def test_workflow_point_sentence_names_trigger_2_exception() -> None:
+    section = " ".join(_section(_skill_md_text(), "When this skill activates").split())
+    match = re.search(r"[^.]*reaching any particular point in a workflow[^.]*\.", section, re.IGNORECASE)
+    assert match, "activation section must keep the workflow-point sentence"
+    assert "trigger 2" in match.group(0), "workflow-point sentence must exempt the host memory save (trigger 2)"
+
+
+# Acceptance A3 (five-skill consistency): an equivalent lesson has one named
+# outcome in Reconcile, worded identically in SKILL.md and operations.md.
+EQUIVALENCE_OUTCOME = (
+    "an equivalent lesson keeps the existing entry's content unchanged and only adds "
+    "its new source to that entry's `sources`"
+)
+OUTCOME_RULE = ("an equivalent lesson", "keeps the existing entry's content unchanged",
+                EQUIVALENCE_OUTCOME)
+NO_SECOND_ENTRY = "never create a second entry for the same subject"
+
+
+def test_reconcile_names_the_equivalence_outcome() -> None:
+    assert affirms(EQUIVALENCE_OUTCOME + ".", *OUTCOME_RULE)
+    assert not affirms("never: " + EQUIVALENCE_OUTCOME + ".", *OUTCOME_RULE)
+    skill_flat = _flat(_section(_skill_md_text(), "Reconcile"))
+    assert affirms(skill_flat, "a new lesson contradicts", "is equivalent to"), \
+        "Reconcile's trigger must name equivalence"
+    for text in (_skill_md_text(), _operations_md_text()):
+        flat = _flat(_section(text, "Reconcile"))
+        assert affirms(flat, *OUTCOME_RULE), "Reconcile must name the equivalence outcome"
+
+
+def test_reconcile_forbids_a_second_entry_for_the_same_subject() -> None:
+    for text in (_skill_md_text(), _operations_md_text()):
+        assert NO_SECOND_ENTRY in _flat(_section(text, "Reconcile"))

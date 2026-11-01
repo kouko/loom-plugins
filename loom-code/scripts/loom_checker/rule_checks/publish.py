@@ -49,6 +49,30 @@ def validate_stated_status(body: str, status: str) -> str | None:
     return None
 
 
+NO_PROGRAM_LABEL = "Adversarial outcome: no program —"
+
+
+def validate_disclosed_outcome(body: str, reasons: list[str]) -> str | None:
+    """Each recorded no-program reason appears as its own bare visible line
+    `Adversarial outcome: no program — <reason>` under `## Verification`;
+    any level-1 or level-2 ATX heading ends that section."""
+    visible: set[str] = set()
+    for heading, lines in _body_sections(body, strip_comments=True)[0]:
+        if heading != "Verification":
+            continue
+        for line in lines:
+            if re.match(r"^ {0,3}#{1,2}(?:[ \t]|$)", line):
+                break
+            visible.add(line.strip())
+    for reason in reasons:
+        line = f"{NO_PROGRAM_LABEL} {reason}"
+        if line not in visible:
+            return ("the attestation records that the adversarial step left no program; "
+                    "the body must carry exactly this bare line under the Verification "
+                    f"heading:\n{line}")
+    return None
+
+
 def _visible_part(line: str, in_comment: bool) -> tuple[str, bool]:
     """The line with HTML comment text removed, and whether a comment is
     still open at its end."""

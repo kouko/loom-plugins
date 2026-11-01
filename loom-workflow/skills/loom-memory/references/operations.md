@@ -8,7 +8,8 @@ Code; on any other host it is the directory three levels above this file
 
 ## Recall
 
-1. Locate the store. Its absence is a normal no-memory result — report it
+1. Locate the store: `docs/loom/memory/` at the repository root unless the
+   repository already keeps its loom memory store elsewhere. Its absence is a normal no-memory result — report it
    and move on; never treat a missing store as an error to fix.
 2. If the store exists but has concept files with no `index.md`, that is
    structural corruption, not a normal miss. Stop, name it explicitly, and
@@ -39,7 +40,7 @@ branch opened only to write it down is pure overhead. Only a fact
 confirmable by observing real post-merge or installed behavior earns a
 follow-up branch, and those are batched.
 
-Almost nothing reaches step 3. Most of what a change surfaces is not a
+Almost nothing reaches step 4. Most of what a change surfaces is not a
 durable lesson, and zero to one durable lesson per change is the normal
 outcome — step 1 is where that is decided, one candidate at a time.
 
@@ -51,35 +52,57 @@ outcome — step 1 is where that is decided, one candidate at a time.
    - a narrative of what changed in this session,
    - a verification or test-run record,
    - a decision whose relevance is bound to one commit or PR (`git-memory`
-     owns that), or
-   - a personal preference unrelated to the repository.
-2. Read `index.md` and search matching or nearby entries for one that
+     owns that),
+   - a personal preference unrelated to the repository,
+   - a fact true only on one machine (local paths, local environments,
+     installed tool versions), or
+   - behavior of one agent host or tool unrelated to the repository.
+
+   Then apply the repo-wide test: would this still hold and help another
+   contributor who clones this repository on a different machine with
+   different tools? A candidate that fails it stays only in host memory;
+   say why it was not recorded.
+2. Inspect the target store (default `docs/loom/memory/` at the repository
+   root unless the repository already keeps its store elsewhere) before index access or concept writes.
+   Initialize an absent or empty directory with `init <store>` using
+   `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py`;
+   this creates `README.md` and `index.md` from the bundled templates.
+   Preserve existing populated stores: skip initialization, detect legacy
+   README-indexed stores as described in **Legacy stores** below and stop
+   for explicit migration. For other populated stores, run
+   `validate <store>` first and stop on any violation, including a missing
+   index; continue only with a valid store.
+3. Read `index.md` and search matching or nearby entries for one that
    already says this, or says something this would contradict or narrow.
    A match routes to Reconcile — never create a second concept for the
    same subject.
-3. Choose `type`, a filename (the concept's `name` must equal its stem),
+4. Choose `type`, a filename (the concept's `name` must equal its stem),
    and write the frontmatter: `type`, `name`, `description` (one
    standalone durable relevance rule), `sources` with at least one
    `resource`.
-4. Write the body: `Trigger`, `Correct path`, `Why`, and `Limits` only
+5. Write the body: `Trigger`, `Correct path`, `Why`, and `Limits` only
    for a real non-applicability boundary — see `references/okf-profile.md`.
-5. Run `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py
+6. Run `${CLAUDE_PLUGIN_ROOT}/skills/loom-memory/scripts/loom_memory.py
    regenerate-index <store>` then `validate <store>` (that script is
    `skills/loom-memory/scripts/loom_memory.py` inside this skill's own
    directory). Do not consider Record complete until validation is clean.
 
 ## Reconcile
 
-1. Reconcile activates when a new lesson contradicts or narrows a current
-   entry found during Recall or Record's search step — never as a
-   separate discovery pass.
+1. Reconcile activates when a new lesson contradicts, narrows, or is
+   equivalent to (same subject, same rule) a current entry found during
+   Recall or Record's search step — never as a separate discovery pass.
 2. Locate the exact current entry through `index.md`; do not guess at a
    filename.
-3. Decide: does the new lesson replace the old one outright, or narrow it
-   (the old lesson still holds in a smaller set of cases)? Either way, the
-   result is exactly one current concept for the subject — editing the
-   existing file in place, or replacing its content wholesale. Never
-   leave both the old and the new as separate live entries.
+3. Decide: is the new lesson equivalent to the old one, does it replace
+   the old one outright, or does it narrow it (the old lesson still holds
+   in a smaller set of cases)? An equivalent lesson keeps the existing
+   entry's content unchanged and only adds its new source to that entry's
+   `sources`. In every case, the result is exactly one current concept
+   for the subject — keeping the existing file, editing it in place, or
+   replacing its content wholesale. Never create a second entry for the
+   same subject: never leave both the old and the new as separate live
+   entries.
 4. Preserve every `sources[].resource` already on the entry; add the
    source for the new evidence rather than dropping the old provenance.
 5. Regenerate and validate the index.

@@ -1,8 +1,11 @@
 # Ported from ascii-graph-toolkit v0.6.0 (monkey-skills e5b978e0), MIT.
 """Generator tests (consolidated from test_gen_{table,flow,tree,bar,arch,seq}.py)."""
+# concern: narrow-width structured nodes must finish and stay aligned without changing output for any other input
 
 import pathlib
 import sys
+
+import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"))
 
@@ -1026,3 +1029,434 @@ def test_gen_flow_structured_node_width_budget():
     assert len(widths_w10) == 1, f"lines misaligned with width=10: {sorted(widths_w10)}"
     _report, issues = analyze(out_w10)
     assert issues == [], f"oracle found drift with width=10: {issues}"
+
+
+def test_string_node_with_empty_body_keeps_its_error_text():
+    # WHY: flow steps and arch layer names given as "title\n" strings have no
+    # body. Both generators must reject them with the same message they used
+    # before the shared-helper refactor, so callers matching it keep working.
+    import pytest
+
+    expected = "Body cannot be empty for structured node from string with \\n"
+    with pytest.raises(ValueError) as flow_error:
+        render_flow(["Title\n"])
+    with pytest.raises(ValueError) as arch_error:
+        render_arch([{"name": "Title\n", "components": ["a"]}])
+    assert str(flow_error.value) == expected
+    assert str(arch_error.value) == expected
+
+
+def test_dict_node_with_empty_body_keeps_its_error_text():
+    # WHY: flow steps, arch layer names and tree labels given as
+    # {"title", "body"} dicts with an empty body must keep the exact message
+    # they raised before the shared-helper refactor, so callers matching it
+    # keep working.
+    import pytest
+
+    expected = "Body cannot be empty for structured node"
+    empty = {"title": "Title", "body": []}
+    with pytest.raises(ValueError) as flow_error:
+        render_flow([empty])
+    with pytest.raises(ValueError) as arch_error:
+        render_arch([{"name": empty, "components": ["a"]}])
+    with pytest.raises(ValueError) as tree_error:
+        render_tree({"label": empty})
+    assert str(flow_error.value) == expected
+    assert str(arch_error.value) == expected
+    assert str(tree_error.value) == expected
+    # empty-string-body-keeps-trunk-error
+    blank = {"title": "Title", "body": ""}
+    with pytest.raises(ValueError, match=f"^{expected}$"):
+        render_flow([blank])
+    with pytest.raises(ValueError, match=f"^{expected}$"):
+        render_arch([{"name": blank, "components": ["a"]}])
+
+
+def test_flow_and_arch_string_body_draws_lines():
+    # flow-and-arch-string-body-draws-lines
+    as_str = {"title": "Build", "body": "handles requests"}
+    as_list = {"title": "Build", "body": ["handles requests"]}
+    assert render_flow([as_str, "Ship"]) == render_flow([as_list, "Ship"])
+    assert (render_arch([{"name": as_str, "components": ["a"]}])
+            == render_arch([{"name": as_list, "components": ["a"]}]))
+    assert as_str["body"] == "handles requests"
+    # string-body-control-char-draws-as-list-form
+    tab_str, tab_list = {"title": "Build", "body": "a\tb"}, {"title": "Build", "body": ["a\tb"]}
+    assert render_flow([tab_str, "Ship"]) == render_flow([tab_list, "Ship"])
+    assert (render_arch([{"name": tab_str, "components": ["a"]}])
+            == render_arch([{"name": tab_list, "components": ["a"]}]))
+    # one-char-tab-string-body-matches-trunk: trunk fc6e9bfc output.
+    one_tab = {"title": "Build", "body": "\t"}
+    assert render_flow([one_tab, "Ship"]) == (
+        "┌───────┐\n│ Build │\n├───────┤\n│ \t      │\n└───────┘\n"
+        "    │\n    ▼\n┌───────┐\n│ Ship  │\n└───────┘")
+    assert render_arch([{"name": one_tab, "components": ["a"]}]) == (
+        "┌──────┐\n│ Build│\n├──────┤\n│ \t     │\n├──────┤\n│ a    │\n└──────┘")
+
+
+def test_string_with_newlines_matches_list_body():
+    # string-with-newlines-matches-list-body
+    as_str, as_list = {"title": "T", "body": "a\nb"}, {"title": "T", "body": ["a", "b"]}
+    assert render_flow([as_str]) == render_flow([as_list])
+    assert (render_arch([{"name": as_str, "components": []}])
+            == render_arch([{"name": as_list, "components": []}]))
+
+
+def _render_isolated(generator: str, *args, **kwargs) -> str:
+    # one-shared-isolated-render-helper: a wrap regression loops forever; a
+    # child process with a timeout keeps it from hanging the suite.
+    # `generator` names gen_<generator>.render_<generator>.
+    import json
+    import subprocess
+    scripts = pathlib.Path(__file__).resolve().parents[2] / "skills" / "loom-visualization" / "scripts"
+    code = ("import importlib, json, sys; a = json.loads(sys.argv[1]); "
+            "render = getattr(importlib.import_module('gen_' + a['g']), 'render_' + a['g']); "
+            "print(render(*a['args'], **a['kwargs']))")
+    payload = json.dumps({"g": generator, "args": args, "kwargs": kwargs})
+    result = subprocess.run(
+        [sys.executable, "-c", code, payload],
+        cwd=scripts, capture_output=True, text=True, timeout=10,
+    )
+    assert result.returncode == 0, result.stderr
+    return result.stdout.rstrip("\n")
+
+
+def _assert_aligned(out: str, title: str) -> None:
+    lines = out.split("\n")
+    assert len({display_width(ln) for ln in lines}) == 1, out
+    assert any(title in ln for ln in lines), out
+
+
+def test_arch_cjk_body_at_narrowest_width_is_aligned():
+    # arch-cjk-body-width-1-aligned
+    for width in (1, 2):
+        layers = [{"name": {"title": "T", "body": ["中文"]}, "components": []}]
+        _assert_aligned(_render_isolated("arch", layers, width=width), "T")
+
+
+def test_arch_multiline_string_name_cjk_body_at_width_1_is_aligned():
+    # arch-multiline-string-name-cjk-body-width-1-aligned
+    _assert_aligned(_render_isolated("arch", [{"name": "T\n中", "components": []}], width=1), "T")
+
+
+def test_arch_dict_name_long_title_is_aligned():
+    # arch-dict-long-title-aligned
+    title = "Long title here"
+    out = render_arch([{"name": {"title": title, "body": ["x"]}, "components": ["a"]}])
+    _assert_aligned(out, title)
+
+
+def test_arch_multiline_string_name_long_title_is_aligned():
+    # arch-multiline-string-name-long-title-aligned
+    title = "Long title here"
+    _assert_aligned(render_arch([{"name": title + "\nx", "components": ["a"]}]), title)
+
+
+def test_arch_single_line_string_name_long_title_unchanged():
+    # single-line-string-name-long-title-unchanged: trunk 114ad1ce output.
+    assert render_arch([{"name": "Long title here", "components": ["a"]}]) == (
+        "┌───────────────┐\n"
+        "│Long title here│\n"
+        "├───────────────┤\n"
+        "│ a             │\n"
+        "└───────────────┘"
+    )
+
+
+def test_arch_widest_body_line_stays_unbroken():
+    # arch-dict-widest-body-line-unbroken
+    dict_name = {"title": "API", "body": ["handles requests"]}
+    for name, kwargs in ((dict_name, {}), (dict_name, {"width": 40}), ("API\nhandles requests", {})):
+        out = _render_isolated("arch", [{"name": name, "components": ["auth", "db"]}], **kwargs)
+        _assert_aligned(out, "API")
+        assert "handles requests" in out, out
+
+
+def test_arch_dict_body_wider_than_budget_still_wraps():
+    # arch-dict-body-wider-than-budget-still-wraps
+    layers = [{"name": {"title": "API", "body": ["handles requests"]}, "components": ["auth", "db"]}]
+    out = _render_isolated("arch", layers, width=10)
+    _assert_aligned(out, "API")
+    assert "handles requests" not in out and "requests" in out, out
+
+
+def test_arch_empty_name_no_components_aligned():
+    # arch-empty-name-no-components-aligned
+    _assert_aligned(_render_isolated("arch", [{"name": "", "components": []}]), "")
+
+
+def test_arch_one_cell_name_no_components_unchanged():
+    # arch-one-cell-name-no-components-unchanged: trunk 5e850c70 output.
+    assert render_arch([{"name": "A", "components": []}]) == "┌─┐\n│A│\n├─┤\n│ │\n└─┘"
+
+
+def test_arch_trailing_space_body_matches_trunk():
+    # arch-trailing-space-body-trunk-bytes: trunk 5e850c70 output.
+    short = "┌───┐\n│ T │\n├───┤\n│ ab│\n├───┤\n│   │\n└───┘"
+    words = (
+        "┌─────────────────┐\n│ Layer           │\n├─────────────────┤\n"
+        "│ handles requests│\n├─────────────────┤\n│                 │\n└─────────────────┘"
+    )
+    for name, trunk in (({"title": "T", "body": ["ab "]}, short), ("T\nab ", short),
+                        ({"title": "Layer", "body": ["handles requests "]}, words)):
+        assert render_arch([{"name": name, "components": []}]) == trunk
+
+
+def test_arch_empty_title_one_cell_body_aligned():
+    # arch-empty-title-one-cell-body-aligned / -width-1-aligned
+    for name in ({"title": "", "body": ["x"]}, "\nx"):
+        for kwargs in ({}, {"width": 1}):
+            _assert_aligned(_render_isolated("arch", [{"name": name, "components": []}], **kwargs), "x")
+
+
+def test_arch_empty_title_empty_body_line_aligned():
+    # arch-empty-title-empty-body-line-aligned
+    for kwargs in ({}, {"width": 1}):
+        out = _render_isolated("arch", [{"name": {"title": "", "body": [""]}, "components": []}], **kwargs)
+        _assert_aligned(out, "")
+
+
+def test_arch_empty_title_narrow_widths_aligned():
+    # arch-empty-title-narrow-widths-aligned: "\ń" has a zero-width body.
+    names = [{"title": "", "body": b} for b in ([""], ["x"], ["abc"], ["x", "y"])] + ["\ń"]
+    for name in names:
+        for kwargs in ({}, {"width": 1}, {"width": 0}, {"width": -5}):
+            _assert_aligned(_render_isolated("arch", [{"name": name, "components": []}], **kwargs), "")
+
+
+def test_flow_cjk_body_width_0_aligned():
+    # flow-cjk-body-width-0-aligned
+    for width in (0, -1):
+        _assert_aligned(_render_isolated("flow", [{"title": "", "body": ["中"]}], width=width), "中")
+
+
+def test_flow_multiline_string_cjk_body_width_0_aligned():
+    # flow-multiline-string-cjk-body-width-0-aligned
+    for width in (0, -1):
+        _assert_aligned(_render_isolated("flow", ["\n中"], width=width), "中")
+
+
+def _flow_body_lines(out: str) -> list[str]:
+    body, inside = [], False
+    for line in out.split("\n"):
+        inside = line.startswith("├") or (inside and not line.startswith("└"))
+        if inside and not line.startswith("├"):
+            body.append(line)
+    return body
+
+
+def test_flow_width_10_long_unbroken_body_keeps_right_pad():
+    # flow-width-10-long-unbroken-body-keeps-right-pad
+    for body in ("x" * 11, "x" * 30):
+        lines = _flow_body_lines(render_flow(["Build\n" + body, "Ship"], width=10))
+        assert lines and all(line.endswith(" │") for line in lines), lines
+
+
+def test_flow_two_cell_body_narrow_width_keeps_pad():
+    # flow-two-cell-body-narrow-width-keeps-pad
+    # and the one-cell case: an empty title, body 'a', width <= 0.
+    for steps, width in [([{"title": "", "body": ["中文"]}], w) for w in (0, 1, 2)] + [
+            ([{"title": "", "body": ["a"]}], 0), (["\nab"], -1)]:
+        lines = _flow_body_lines(render_flow(steps, width=width))
+        assert lines and all(line.endswith(" │") for line in lines), (width, lines)
+
+
+def test_flow_empty_title_empty_body_line_unchanged():
+    # flow-empty-title-empty-body-line-unchanged: trunk fc6e9bfc output.
+    for kwargs in ({}, {"width": 1}):
+        out = render_flow([{"title": "", "body": [""]}], **kwargs)
+        assert out == "┌──┐\n│  │\n├──┤\n│  │\n└──┘"
+
+
+# every-generator-pins-trunk-output / pins-cover-all-six-generators: exact
+# trunk 5e850c70 output for inputs that hit none of the arch sizing defects
+# (no structured layer whose body line is its widest element, no empty
+# single-line name without components, no empty title).
+_TRUNK_PINS = {
+    "table-cjk": (
+        "table", (["項目", "狀態"], [["使用者ログイン", "完了"], ["API", "進行中"]]), {},
+        "┌────────────────┬────────┐\n"
+        "│ 項目           │ 狀態   │\n"
+        "├────────────────┼────────┤\n"
+        "│ 使用者ログイン │ 完了   │\n"
+        "│ API            │ 進行中 │\n"
+        "└────────────────┴────────┘",
+    ),
+    "table-ascii-multiline": (
+        "table", (["k", "v"], [["a", "x\ny"]]), {"ascii_only": True},
+        "+---+---+\n"
+        "| k | v |\n"
+        "+---+---+\n"
+        "| a | x |\n"
+        "|   | y |\n"
+        "+---+---+",
+    ),
+    "flow-plain": (
+        "flow", (["Start", "處理", "End"],), {},
+        "┌───────┐\n"
+        "│ Start │\n"
+        "└───────┘\n"
+        "    │\n"
+        "    ▼\n"
+        "┌───────┐\n"
+        "│ 處理  │\n"
+        "└───────┘\n"
+        "    │\n"
+        "    ▼\n"
+        "┌───────┐\n"
+        "│  End  │\n"
+        "└───────┘",
+    ),
+    "flow-structured": (
+        "flow", ([{"title": "Check", "body": ["- a", "- bb"]}, "Done"],), {},
+        "┌───────┐\n"
+        "│ Check │\n"
+        "├───────┤\n"
+        "│ - a   │\n"
+        "│ - bb  │\n"
+        "└───────┘\n"
+        "    │\n"
+        "    ▼\n"
+        "┌───────┐\n"
+        "│ Done  │\n"
+        "└───────┘",
+    ),
+    "flow-width-given-body-fits": (
+        "flow", ([{"title": "Plan", "body": ["- write tests", "- ship it"]}, "Done"],), {"width": 20},
+        "┌───────────────┐\n"
+        "│ Plan          │\n"
+        "├───────────────┤\n"
+        "│ - write tests │\n"
+        "│ - ship it     │\n"
+        "└───────────────┘\n"
+        "        │\n"
+        "        ▼\n"
+        "┌───────────────┐\n"
+        "│     Done      │\n"
+        "└───────────────┘",
+    ),
+    "tree-cjk": (
+        "tree", ({"label": "訂單系統", "children": [
+            {"label": "訂單服務"},
+            {"label": "庫存サービス", "children": [{"label": "預扣"}]},
+        ]},), {},
+        "訂單系統\n"
+        "├─ 訂單服務\n"
+        "└─ 庫存サービス\n"
+        "   └─ 預扣",
+    ),
+    "tree-structured": (
+        "tree", ({"label": {"title": "Root", "body": ["note"]}, "children": [{"label": "leaf"}]},), {},
+        "Root\n"
+        "note\n"
+        "└─ leaf",
+    ),
+    "bar-cjk": (
+        "bar", ([["使用者", 120], ["注文", 80], ["AirPods", 40]],), {},
+        "使用者  ████████████████████ 120\n"
+        "注文    █████████████ 80\n"
+        "AirPods ███████ 40",
+    ),
+    "bar-all-zero": (
+        "bar", ([["a", 0], ["b", 0]],), {"width": 5},
+        "a  0\n"
+        "b  0",
+    ),
+    "arch-single-line-names": (
+        "arch", ([{"name": "Web", "components": ["Frontend", "Backend"]},
+                  {"name": "DB", "components": ["Postgres"]}],), {},
+        "┌────────────────────┐\n"
+        "│        Web         │\n"
+        "├──────────┬─────────┤\n"
+        "│ Frontend │ Backend │\n"
+        "└──────────┴─────────┘\n"
+        "┌────────────────────┐\n"
+        "│         DB         │\n"
+        "├────────────────────┤\n"
+        "│ Postgres           │\n"
+        "└────────────────────┘",
+    ),
+    "arch-structured-components-widest": (
+        "arch", ([{"name": {"title": "API", "body": ["auth"]},
+                   "components": ["Gateway Service", "Worker Pool"]}],), {},
+        "┌───────────────────────────────┐\n"
+        "│ API                           │\n"
+        "├───────────────────────────────┤\n"
+        "│ auth                          │\n"
+        "├─────────────────┬─────────────┤\n"
+        "│ Gateway Service │ Worker Pool │\n"
+        "└─────────────────┴─────────────┘",
+    ),
+    "arch-cjk-components": (
+        "arch", ([{"name": "資料層", "components": ["快取", "資料庫 DB"]}],), {},
+        "┌──────────────────┐\n"
+        "│      資料層      │\n"
+        "├──────┬───────────┤\n"
+        "│ 快取 │ 資料庫 DB │\n"
+        "└──────┴───────────┘",
+    ),
+    "seq-messages": (
+        "seq", (["User", "API サービス", "DB"],
+                [{"from": "User", "to": "DB", "label": "query"},
+                 {"from": "DB", "to": "User", "label": "rows"}]), {},
+        "┌──────┐   ┌──────────────┐   ┌────┐\n"
+        "│ User │   │ API サービス │   │ DB │\n"
+        "└───┬──┘   └───────┬──────┘   └──┬─┘\n"
+        "    │              │             │  \n"
+        "    │              │             │  \n"
+        "    │           query            │  \n"
+        "    │────────────────────────────►  \n"
+        "    │           rows             │  \n"
+        "    ◄────────────────────────────│  ",
+    ),
+    "seq-skeleton": (
+        "seq", (["A", "B"], []), {},
+        "┌───┐   ┌───┐\n"
+        "│ A │   │ B │\n"
+        "└─┬─┘   └─┬─┘\n"
+        "  │       │  \n"
+        "  │       │  ",
+    ),
+}
+
+
+def test_trunk_pins_draw_expected_output_for_all_six_generators():
+    drawn = {}
+    for case, (generator, args, kwargs, expected) in sorted(_TRUNK_PINS.items()):
+        assert _render_isolated(generator, *args, **kwargs) == expected, case
+        drawn[generator] = case
+    assert set(drawn) == {"table", "flow", "tree", "bar", "arch", "seq"}
+
+
+# Trunk 5e850c70 error text not already pinned above (the empty-body
+# messages are pinned by the *_keeps_its_error_text tests).
+_TRUNK_ERROR_PINS = {
+    "table-control-char": (
+        lambda: render_table(["a\tb"], [["c"]]),
+        ValueError, "label 'a\\tb' contains control character U+0009; remove it",
+    ),
+    "tree-non-text-label": (
+        lambda: render_tree({"label": 3}),
+        TypeError, "label must be str or dict, got int",
+    ),
+    "bar-line-break": (
+        lambda: render_bar([("a\nb", 1)]),
+        ValueError, "bar label must be single-line, got line break in 'a\\nb'",
+    ),
+    "seq-self-message": (
+        lambda: render_seq(["A", "B"], [{"from": "A", "to": "A", "label": "x"}]),
+        ValueError, "self-message not supported: 'A' -> 'A'",
+    ),
+    "seq-line-break": (
+        lambda: render_seq(["A\nB", "C"], []),
+        ValueError, "line break not supported in participant name: 'A\\nB'",
+    ),
+}
+
+
+@pytest.mark.parametrize("case", sorted(_TRUNK_ERROR_PINS))
+def test_generator_error_matches_trunk_pin(case):
+    call, error_type, message = _TRUNK_ERROR_PINS[case]
+    with pytest.raises(error_type) as error:
+        call()
+    assert str(error.value) == message

@@ -1,12 +1,118 @@
 # Changelog
 
-## [3.40.0] — 2026-10-22 — evidence drift guards: coverage, commit identity, intent version
+## [3.51.0] — 2026-10-28 — evidence drift guards: coverage, commit identity, intent version
 
 - Four new loom_checker rules bind the evidence to what it actually tested. `intake.attestation-coverage` fails when the acceptance report does not state every intent Acceptance line exactly once; `intake.commit-identity` fails when a v2 attestation omits the tested and reviewed commits or when their functional content differs; `intake.intent-version` fails when the confirmed intent changed after the sha its attestation pinned; `intake.plan-boundary-tests` fails when a plan names a boundary test task the change does not carry.
 - The v2 attestation carries the bookkeeping these rules check: `intent_confirmed_sha`, `tested_commit`, `reviewed_commit` and per-line `acceptance_status` (`works` / `partly` / `not_verified` / `fails`). v1 attestations and intents confirmed before the field existed are skipped, not failed.
 - Closing review files its verdicts in the change directory, and finalize-review re-runs the drift checks before writing the attestation, so drift is caught at publication as well as at review entry.
 - `docs/loom/<change-id>/acceptance-test-report.md` and `docs/loom/<change-id>/evidence/**` are publication-only paths: a difference there between the tested and the reviewed tree never fails the identity check, while a functional difference does.
-- Raise the probe-program ceiling from 5 to 6 (`adversarial.proportionate`): a branch that carries another unmerged change's graduated probes pays for them out of the same ceiling, so a change with one honest probe program of its own no longer needs a cap exception to finalize.
+- Raise the probe-program ceiling from 5 to 6 (`adversarial.proportionate`): a change with one honest probe program of its own could be refused when the branch also carries another change's graduated probes, so the ceiling accommodates the union rather than forcing a cap exception.
+
+## [3.50.0] — 2026-10-27 — feat(closing-review): accept a recorded no-program adversarial outcome
+
+- `finalize-review` accepts a no-program adversarial outcome (`no_program`) carrying a nonblank reason in place of an executed program, and the attestation marks it with the row `{kind: adversarial, no_program}`. `missing_adversarial_execution` is the single predicate that decides whether adversarial execution is missing.
+- The adversary records the no-program outcome itself instead of asking the user to skip the adversarial step. The program ceiling counts distinct program paths, any supported `-m pytest` invocation is accepted as the adversarial command, and a bare `python3 <artifact>` is refused.
+- The contract manifest's attestation `executions` grammar gains the marker row; the contract manifest version stays 2.3.1.
+- `publish` requires the PR body line `Adversarial outcome: no program — <reason>` when the attestation records a no-program adversarial outcome, and refuses a body without it, naming the line to carry.
+- `finalize-review` refuses a no-program reason that is not one trimmed line or that contains an HTML comment.
+
+## [3.49.0] — 2026-10-24 — fix(external-review): bound Claude reviews and report compaction stops
+
+- Claude reviews run with safe and restricted single-run settings, automatic compaction, configured MCP servers disabled, and a Read/Glob/Grep tool allowlist. Model file tools stay within the review root; CLI startup may still access or write outside it.
+- An optional Claude estimated-spend threshold applies separately to preflight and review; it is not a hard billing maximum. Structured `rapid_refill_breaker` results, including zero-exit results, report an incomplete review without exposing raw review material or silently retrying.
+- Completed outside reviews may use one whole-output YAML fence and nonempty findings without classification labels. Receipts still bind the unmodified raw output, while duplicate YAML keys, missing anchors, weak dimension scores and contradictory verdicts remain rejected.
+- Outside-review dimension scores may append a nonblank rationale after ` — `; reviewer and closing-review instructions match validation, which uses the canonical score for finding and overall-verdict checks while preserving the full score and raw-output digest.
+
+## [3.48.4] — 2026-10-25 — fix(loom-code): preserve hook exit codes in zsh
+
+- Claude Code, Codex, OpenCode, and AGY hook commands use a Loom-prefixed exit-code variable so zsh does not abort on its read-only `status` parameter.
+- Hook tests exercise all nine affected commands under zsh and verify that publication hooks preserve a ready checker's refusal code.
+
+## [3.48.3] — 2026-10-24 — fix(loom-code): register memory-mirror-reminder mechanism
+
+- `docs/loom/evidence/mechanisms.yaml` registers the loom-workflow `PostToolUse:Write|Edit|Bash:memory-mirror-reminder` hook with its eval, so the mechanism checker's R1 and R3 pass.
+- budget-exception: PostToolUse:Write|Edit|Bash:memory-mirror-reminder — Acceptance #3 needs a reminder on every host memory write in repos that install loom-workflow (user-decided); it replaces an unwired repo-local hook that was never a counted mechanism; eval loom-workflow/tests/loom-memory/test_memory_mirror_hook.py.
+
+## [3.48.2] — 2026-10-23 — docs(loom): record memory lessons and fix AGENTS.md SSOT description
+
+- AGENTS.md now describes the single SSOT (`loom-code/.claude-plugin/plugin.json`) plus three derived manifests, replacing the stale "three manifests must sync" wording.
+- Two durable memory entries recorded: ship writes no memory entries after finalize-review; version bumps go through the SSOT and sync script.
+
+## [3.48.1] — 2026-10-23 — fix(closing-review): validate attestations without the test toolchain
+
+- Attestation validation decides Go package-form adversarial commands from the validated commit's files only, without running `go`, so publish and land in a sandbox or without Go no longer report a finalize-accepted command as stale. A same-name test in any sibling `_test.go` file, including build-excluded files, is refused, and so is a package form whose artifact or sibling `_test.go` entry is a symlink, submodule or directory rather than a regular file.
+- Go and Cargo acceptance read the artifact, sibling test files and `Cargo.toml` at the validated commit instead of HEAD or the working tree, and attestation validation reads the declared package-test command from the validated commit too.
+
+## [3.48.0] — 2026-10-23 — fix(closing-review): accept Go package adversarial probes
+
+- Closing review accepts a Go package test run for an adversarial test that depends on sibling package files, while requiring the named test to be declared in the selected artifact and to pass in a fresh JSON result.
+- Package collection and exact test matching keep skipped, cached, filtered-out and unrelated test results from serving as probe evidence. Existing single-file Go probes remain accepted.
+
+## [3.47.0] — 2026-10-22 — feat(ship): memory entries land before finalize-review, never after
+
+- Ship §2 now states the memory-write timing rule: a durable `docs/loom/memory/` entry must land before `closing-review`'s `finalize-review` generates the attestation, never after; a memory file committed later changes the functional content digest and invalidates the attestation.
+- Ship does not write memory entries after finalization; a qualifying lesson discovered at or after Ship rides the next change's branch, as `loom-workflow:loom-memory` already directs. The rule cites only public skill names, keeping loom-code installable alone.
+
+## [3.46.0] — 2026-10-22 — fix(external-review): explain incomplete Claude reviews safely
+
+- Claude Code review failures now include a fixed recovery action. Unrecognized CLI exits report only the stage, numeric exit code, and safe presence and parseability flags, so owners can investigate locally without exposing review material.
+- The external-review skill guides owners to relay the safe failure and recovery action while keeping failed attempts out of completed review verdicts.
+
+## [3.45.0] — 2026-10-21 — fix(loom-code): repair the checker runtime from agent stations
+
+- Agent stations now prepare a plugin-owned Python 3.11 and PyYAML runtime with `loom-python --repair` when the checker environment is missing, then retry the original check. Repair uses a user cache and leaves project test commands on the project's own environment.
+- Claude Code, Codex, Antigravity CLI and OpenCode hooks run against the prepared runtime with `--ready`, without installing packages. When it is unavailable, hooks report the repair path while keeping their existing publication behavior.
+
+## [3.44.0] — 2026-10-20 — feat(external-review): progress lines while an outside review runs
+
+- While an outside preflight or review runs, `external_review.py` writes a progress line to stderr about once a minute: the step, the elapsed time, and the time since the CLI last produced output. When the step ends — exited or timed out — one closing line reports its total time and the longest silence.
+- Progress lines carry only the step name, outcome and durations, never the review packet or CLI output. Discovery prints none. stdout stays the single JSON result, and no time limit, status or outcome changes.
+- The external-review skill's Execute section tells the agent to keep the runner's error stream visible while it waits and relay each progress line to the user instead of waiting silently.
+
+## [3.43.0] — 2026-10-20 — feat(ship): add durable-lesson routing to loom-memory
+
+- `ship` now routes a qualifying durable repository lesson to `loom-workflow:loom-memory` when loom-workflow is installed; when it is not, the routing is silently skipped. It does not replace or reorder Ship's headings, and zero to one durable lesson per change is the normal outcome. Paired loom-workflow 5.12.0 release.
+
+## [3.42.1] — 2026-10-18 — sync-trunk rebases a never-pushed change branch
+
+- `sync-trunk` now rebases a change branch that has never been pushed onto the fetched trunk tip, so no merge commit is created.
+- A branch that has been pushed (the live origin lists it, any of its commits is on any remote-tracking ref, or it has a configured upstream or pushRemote other than origin's trunk) keeps the merge path, as does a branch that already holds a merge commit, whose history touches a local ignored or untracked file, or whose lookup fails. It never forces a push.
+- After a rebase, `sync-trunk` says the branch's commit ids changed, so any commit-sha reference recorded on the branch must be re-pinned.
+
+## [3.42.0] — 2026-10-18 — close the remaining adversarial-probe acceptance gaps
+
+- A pytest probe must name only its artifact, and a run is refused when its summary shows deselected tests, no passed test, or no summary at all (for example under `-qq`). At least one passing test must come from the probe's own file, so a file added by configuration cannot supply the pass.
+- Finalize-review refuses a bare `python <probe>` run of a file that defines top-level `test*` functions or `Test*` classes; record `python -m pytest <probe>` instead. Existing attestations are not re-judged.
+- Finalize-review and the validator refuse artifact paths that are not in normal form (`./`, `../` or `..` parts, or `//`); the validator checks the spelling only, and finalize-review alone refuses a plain path outside both the store and the suite.
+- `env NAME=value` prefixes, `npx --yes` and bare `pnpm` launchers are parsed, and runner-configuration variables are refused.
+- Cargo targets whose required features are all directly in `[features] default`, and `tests/<dir>/main.rs` (auto-discovered or declared without a path), now count as suite-collected; an auto-discovered target shadowed by a same-named declared target does not.
+
+## [3.41.1] — 2026-10-18 — bound every outside review CLI by its time limit
+
+- Every outside CLI launch (Antigravity listing, probe and review) now runs in its own process group and is killed as a group at its time limit.
+- A Codex that exits before answering `model/list` is reported as `discovery-error: codex model/list failed: exit <n>`.
+- The review time-limit default rises from 600 to 1800 seconds; the allowed range is unchanged.
+- The launcher is now the explicit default runner instead of an identity check on `subprocess.run`.
+
+## [3.41.0] — 2026-10-17 — attest adversarial probes run by non-Python test runners
+
+- Finalization attests an adversarial probe run by one of 13 listed runners — `go test`, `python -m unittest`, `node --test`, `deno test`, `bun test`, jest, vitest, mocha, `cargo test`, `cargo nextest run`, rspec, minitest and phpunit — by running it and parsing that run's own test results: at least one passing, non-skipped test from the probe's artifact. A readable zero is refused, and an argv a runner claims must be in that runner's accepted form.
+- A probe run by an unlisted runner, or one whose output its runner cannot read, needs a verdict reviewer's confirmation bound to the reviewed content digest and quoting whole output lines that name the artifact; refusals say which part is missing and print the output tail.
+- Attestation executions gain optional `evidence`, `passed` and `confirmation` fields in the contract manifest grammar; the schema stays `loom-attestation/v2`. Reviewer output gains optional `probe_confirmations`, and the closing-review station, its adversarial reference and the reviewer agent document the accepted commands and confirmations.
+- pytest, shell and direct-execution probes keep their existing rules.
+
+## [3.40.1] — 2026-10-17 — keep Codex model discovery open until it answers
+
+- Codex external-review discovery keeps `codex app-server` stdin open until the `model/list` reply arrives, bounded by the 15 s discovery timeout, so the model list is no longer lost to an early EOF.
+
+## [3.40.0] — 2026-10-13 — register the standalone project-session retro
+
+- Add `loom-workflow:retro` to the versioned contract manifest as a standalone tool outside the Loom station and mechanism counts. The workflow plugin owns the skill and its on-demand behaviour.
+
+## [3.39.1] — 2026-10-12 — recognize graduated probes in runnerless pytest suites
+
+- Finalization recognizes adversarial tests collected by a declared pytest package suite, including projects without a package runner and runners targeting the repository root. Uncollected files remain refused.
+- Explicit `conda run -n <env> python -m pytest` commands can prove execution of a graduated test; commands that do not execute the artifact remain refused.
 
 ## [3.39.0] — 2026-10-08 — consented external review uses an explicit executor profile
 

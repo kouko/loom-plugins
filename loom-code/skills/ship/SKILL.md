@@ -86,7 +86,10 @@ Under the Verification heading, write the line `Verification status: <status>`,
 where `<status>` is the status `publish` computes locally and prints on its
 `Verification <status> for <head>` line: `valid`,
 `absent`, or `stale (<reason>)`. When publish refuses the line, copy the
-`Verification status:` line the refusal prints into the body. Build the line
+`Verification status:` line the refusal prints into the body. When the
+attestation records that the adversarial step's outcome is no program, write
+the line
+`Adversarial outcome: no program — <reason>` with the recorded reason. Build the line
 `Skipped by instruction: <steps>` from the intent's and plan's `skipped-by-instruction:`
 lines plus any skip decided at Ship (§1), not from conversation recall; with
 none recorded or decided, write no such line,
@@ -122,6 +125,22 @@ Always run its deterministic secrets scan. Known public repository, PR, issue,
 task, and vendor identifiers need no semantic privacy judge; ambiguous
 private-party text does. A semantic false positive needs an audited
 `Privacy-Bypass-Reason`; secret findings cannot be bypassed.
+Use `loom-workflow:loom-memory` to route a qualifying durable repository lesson
+when one is earned. It does not replace or reorder Ship's headings. Zero to one
+durable lesson per change is the normal outcome. When loom-workflow is not
+installed, this routing is silently skipped.
+
+**Memory write timing:** `loom-workflow:git-memory` requires a durable
+`docs/loom/memory/` entry to land **before** `closing-review`'s
+`finalize-review` generates the attestation, never after. A memory file
+committed after finalize-review is itself functional content: it changes the
+functional content digest and invalidates the attestation the branch already
+has, forcing either another review round (full package suite plus two
+reviewers, bounded by the three-digest episode limit) or publication with
+`Verification status: stale`. Therefore Ship **does not write memory
+entries** after finalize-review has run; `loom-workflow:loom-memory` routes
+qualifying lessons discovered at or after Ship to the next change's branch
+instead of reopening this one.
 
 Before publication, reject a body with a missing heading, evidence source that
 was silently ignored, unsupported decision claim, hidden-reasoning claim, or a
@@ -133,11 +152,11 @@ Publication-only edits do not change the functional digest and do not return to
 
 ## 3. Publish once
 
-Before publishing, run `python3 <loom-code>/scripts/loom_checker.py github-rules`
+Before publishing, run `"<loom-code>/scripts/loom-python" --repair github-rules`
 and relay its lines to the user. When it reports a missing rule, ask the user
 in consequence form — from then on <trunk> accepts changes only through a PR
 whose body check passes, for you too — then show the user the setup command
-that `loom_checker.py github-rules --print-setup` prints, and run that setup
+that `"<loom-code>/scripts/loom-python" --repair github-rules --print-setup` prints, and run that setup
 command only after the user explicitly agrees in conversation. Never run the
 setup command unasked. When it reports `template not on <trunk>`, relay the
 printed step to the user; add the template only after the user explicitly
@@ -149,13 +168,13 @@ For an intent carrying automatic-publication authorization, pass its absolute
 path to the installed plugin's one publication command:
 
 ```text
-python3 <loom-code>/scripts/loom_checker.py publish --intent <absolute-intent-path> --title <title> --body-file <absolute-path>
+"<loom-code>/scripts/loom-python" --repair publish --intent <absolute-intent-path> --title <title> --body-file <absolute-path>
 ```
 
 For a legacy intent, obtain one publication decision and acknowledge it with:
 
 ```text
-python3 <loom-code>/scripts/loom_checker.py publish --confirm-authorized --title <title> --body-file <absolute-path>
+"<loom-code>/scripts/loom-python" --repair publish --confirm-authorized --title <title> --body-file <absolute-path>
 ```
 
 The `<title>` is a Conventional Commits subject whose type equals the current
@@ -169,6 +188,9 @@ a non-forced push; and opens or reuses one PR. Publishing proceeds without an
 attestation: an absent or stale one is disclosed, not refused. Before pushing,
 beyond authorization and repository safety, it refuses only a malformed body
 (naming the heading), a `Verification status:` line that differs from the computed status (naming
+the line to carry), a body that omits the
+`Adversarial outcome: no program — <reason>` line when the attestation records
+that the adversarial step's outcome is no program (naming
 the line to carry), an attestation left uncommitted, and an unidentified
 change. Do not run a
 separate attestation preflight, construct Git push or PR-create commands, or
@@ -235,7 +257,7 @@ On that acceptance, take the root of the change branch's worktree —
 task or main checkout — and land the change as one Bash command:
 
 ```text
-cd '<absolute worktree root>' && python3 <loom-code>/scripts/loom_checker.py land --accepted-by <name>
+cd '<absolute worktree root>' && "<loom-code>/scripts/loom-python" --repair land --accepted-by <name>
 ```
 
 `<name>` is the maintainer who accepted; it must match the intent originator or

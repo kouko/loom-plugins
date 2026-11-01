@@ -1,0 +1,85 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-21-ship-memory-write-timing",
+  "content_digest": "db013eed2c9c7770c6c7306335a9293bd51640e5",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_adversarial_ship_memory_timing.py -q",
+      "artifact": "loom-code/tests/test_adversarial_ship_memory_timing.py",
+      "result": "pass",
+      "command_digest": "d27b597e1e3e3b81eba5a4f6f24c65e02005c80ff27ccfe7d6e23ce98f4ce206"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-r1a",
+      "vendor": "anthropic",
+      "model": "claude-fable-5-1",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "aab60494",
+      "review_target_sha": "f7e3af76",
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists in the repo (only PRINCIPLES.md)",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "The memory-write-timing paragraph (ship/SKILL.md:130-140) is byte-identical to Round 1 — unchanged by the trunk merge; its rule still holds exactly as intent Acceptance 1 requires. No conflict markers anywhere in the tree.",
+        "Version 3.47.0 consistent across all 4 manifests, package.json, all 4 READMEs, CHANGELOG top entry, and the CURRENT_VERSION pin test; trunk's prior [3.46.0] entry preserved intact below it.",
+        "All Round 1 ground-truth citations hold on the merged tree; no sibling-plugin internal file:line citations in ship/SKILL.md.",
+        "Probe test_adversarial_ship_memory_timing.py 5 passed (cwd-independent); ship station tests 51 passed; full --loom-family package suite green."
+      ]
+    },
+    {
+      "reviewer": "reviewer-r1b",
+      "vendor": "anthropic",
+      "model": "claude-fable-5-1",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "aab60494",
+      "review_target_sha": "f7e3af76",
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "N/A — prose-only timing rule; no module/boundary change",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "N/A — no code structure or behavior change",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "N/A — no PRINCIPLES.md governs loom-code",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md in loom-code",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Fix delta verified: trunk merge brought origin/main (external-review failure messages + loom-visualization); f7e3af76 re-resolved version to 3.47.0 because trunk took 3.46.0.",
+        "Memory write timing paragraph ship/SKILL.md:130-140 unchanged by the merge; rule still holds.",
+        "No conflict markers; version 3.47.0 consistent; trunk's [3.46.0] CHANGELOG entry preserved.",
+        "Round 1 ground-truth citations hold verbatim on the merged tree. Probe re-ran green at HEAD (5 passed)."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
