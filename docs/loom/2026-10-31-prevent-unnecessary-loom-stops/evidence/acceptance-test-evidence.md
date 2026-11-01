@@ -107,3 +107,41 @@ Tried on 2026-10-31, in a clean copy of the project at `a24ab73d`.
 ### 5. Carried over
 
 - The fix did not alter consequence disclosure, existing-data consent, legitimate stop guidance, or its tests, apart from the A3 test's own module lookup.
+
+## Re-run on 2026-11-01, at `c561d3ba`
+
+- Clean copy: `git archive c561d3ba | tar -x -C /private/tmp/loom-acceptance-r4.wJVX23` completed with exit 0. The archive contains committed HEAD only; no working-tree or ignored files were copied.
+- Setup repeated from the README's local validation route: `agy plugin validate ./loom-code` returned `[ok]`, `skills: 7 processed`, `agents: 4 processed`, `hooks: 1 processed`; `agy plugin validate ./loom-design` returned `[ok]`, `skills: 6 processed`.
+- Fix range inspected: `git diff ce451484..c561d3ba -- loom-code/skills/build/SKILL.md loom-code/skills/closing-review/SKILL.md loom-code/skills/write-plan/SKILL.md` adds same-turn Build and Review handoffs and explicit matching-attestation re-entry. The range also changes release metadata and a separate diagram feature. The three loom-code README language copies change only their version line; the one-way-door reference, capture-intent, write-spec, and their choice-rule tests are unchanged.
+- Focused code-station command from the clean copy: `pytest -q loom-code/tests/test_review_convergence_contract.py loom-code/tests/test_build_handoff_continuation.py loom-code/tests/test_matching_attestation_reentry_hands_to_ship.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_one_way_door_question_rule.py loom-code/tests/test_one_way_door_copies.py loom-code/tests/test_questionrule_negation_rejected.py loom-code/tests/test_adversarial_product_one_way_door_without_spec.py loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py` returned `103 passed in 0.39s`.
+- Focused design-station command from the clean copy: `pytest -q loom-design/tests/spec/test_adversarial_write_spec_no_reask_unpinned_sentences.py loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_write_spec_contract.py` returned `55 passed in 0.34s`.
+- The package-suite command is `python3 scripts/run_package_tests.py --loom-family`. This acceptance re-run did not execute it; `finalize-review` runs it and blocks attestation on failure. The closing-review handoff supplied a passing full-suite result at HEAD, separate from the clean-copy results above.
+- The prior automatic approval review rejected the network-backed Codex behavior probe because private worktree skill content could be sent to an external model service without explicit authorization. It was not retried or bypassed. No real Claude Code station conversation was observed.
+
+### 1. Re-tested in full
+
+- How I tried it: Inspected the full same-station continuation path in Write Plan, Build, and Closing Review, including check-failure branches, finalization, generated-attestation commit, and matching-attestation re-entry; ran the focused code-station command above.
+- What came back: All 103 focused code cases passed. `loom-code/skills/write-plan/SKILL.md:377-380` requires calling Build in the same turn after a committed, checked plan. `loom-code/skills/build/SKILL.md:189-192` requires calling Closing Review after required checks pass. `loom-code/skills/closing-review/SKILL.md:439-451` requires running finalization, committing a generated valid attestation, and calling Ship in the same turn. Each rejects a progress-only handoff. The matching-attestation re-entry at `:22-26` also rejects a progress-only stop. These are text-contract and test observations, not model behavior.
+- Evidence: `loom-code/tests/test_write_plan_station_text.py::test_committed_passing_plan_enters_build_in_same_turn`, `loom-code/tests/test_build_handoff_continuation.py`, `loom-code/tests/test_review_convergence_contract.py::test_ready_review_continues_through_finalize_and_ship`, `::test_generated_attestation_is_committed_and_shipped_in_same_turn`, and `loom-code/tests/test_matching_attestation_reentry_hands_to_ship.py` in the 103-pass output.
+
+### 2. Re-tested in full
+
+- How I tried it: Followed the named next-station routes from Write Plan to Build, Build to Closing Review, and Closing Review to Ship both after new finalization and on matching-attestation re-entry; checked their stated stop conditions and ran the focused code-station command.
+- What came back: All 103 focused code cases passed. The three routes name the next skill and same-turn call at the lines cited above. `loom-code/skills/closing-review/SKILL.md:22-26` now specifically covers publication-only re-entry with an existing matching attestation. No actual cross-station host handoff was executed.
+- Evidence: The named station tests in the 103-pass output, particularly `test_matching_attestation_reentry_calls_ship_in_same_turn`; source locations in row 1.
+
+### 3. Carried over
+
+- The fix range changed station handoff guidance, version lines, and a separate diagram feature; it did not change the one-way-door choice rule, the capture-intent/write-spec choice language, or their tests. The earlier partial verdict and live-choice limit still apply. The focused choice-rule tests passed again as part of the 103 code and 55 design cases; this incidental run does not substitute for an observed agent choice.
+
+### 4. Re-tested in full
+
+- How I tried it: Re-read unresolved-outcome, existing-decision, data-consent, no-spec, and wait-and-continue guidance across the one-way-door reference, capture-intent, write-spec, and the new Write Plan handoff sentence; ran both focused commands above.
+- What came back: The 103 code and 55 design cases passed. `loom-code/skills/write-plan/SKILL.md:379-380` says an unresolved user decision blocks dependent work while independent work continues. `loom-code/skills/write-plan/references/one-way-door.md:41-54,78-87` and `loom-design/skills/write-spec/SKILL.md:246-256` preserve the narrower question boundary, prior authorization, and work during the wait. No real user-wait sequence was observed.
+- Evidence: `loom-code/tests/test_write_plan_station_text.py::test_committed_passing_plan_enters_build_in_same_turn`, `loom-code/tests/test_one_way_door_question_rule.py`, `loom-code/tests/test_adversarial_product_one_way_door_without_spec.py`, `loom-code/tests/test_adversarial_no_reask_pin_flipped_polarity.py`, and the three named design test files in the focused outputs.
+
+### 5. Re-tested in full
+
+- How I tried it: Re-read user-facing consequence examples and existing-data consent, the three README language copies, the current product decision points, and the modified Closing Review route including legitimate stops, failed finalization, and outside-review reauthorization; ran both focused commands above.
+- What came back: The 103 code and 55 design cases passed. `loom-code/skills/write-plan/references/one-way-door.md:56-73,83-87` still requires consequences and consent; the README choice paragraphs are unchanged. `loom-code/skills/closing-review/SKILL.md:22-26,447-466` preserves stated stop conditions, skipped-check handling, and failure routing; `:344-345` still requires new authorization for repeated outside review. The added same-turn call is conditional on a valid attestation and no stated stop. Real user-visible presentation remains unobserved.
+- Evidence: `loom-code/tests/test_review_convergence_contract.py::test_failed_finalization_keeps_its_existing_routes`, `::test_ready_review_continues_through_finalize_and_ship`, `loom-code/tests/test_one_way_door_question_rule.py`, `loom-code/tests/test_one_way_door_copies.py`, and the design decision tests in the focused outputs.
