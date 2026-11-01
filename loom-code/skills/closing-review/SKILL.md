@@ -20,8 +20,10 @@ compaction.
 
 Resolve the branch base, read the confirmed intent and retained plan when present, and list the
 cumulative diff. If only publication metadata changed and a matching
-attestation already exists, stop: the evidence is still valid and Ship owns
-the remaining work.
+attestation already exists, call `loom-code:ship` in the same turn unless a
+stated stop condition applies. Do not rerun `finalize-review`: the evidence is
+still valid and Ship owns the remaining work. A progress report naming Ship
+does not complete this hand-off.
 
 At entry, omit any step the user told you to skip in plain words; §2 and §3
 say how skipped reviewers, adversarial and acceptance-test are handled. Words that ask to skip independent acceptance testing —
