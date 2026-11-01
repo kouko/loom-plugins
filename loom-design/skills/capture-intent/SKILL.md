@@ -231,18 +231,13 @@ twice, and this is the only stop this station makes.
    rewritten, what stops reading it, and where the backup is kept).
 
 3. **The cross-model review question, only for `second-vendor: ask` without
-   a qualifying direct user request.** Read
-   `references/second-vendor.md` for mode routing and the availability
-   probe. A missing line is initialized as `second-vendor: suggest`; it
-   adds no question here. The downstream notice may explain that reviewing
-   with a second vendor costs a few minutes and some quota, and that five of the seven
-   serious problems in this system's own spec review were found by
-   only one of the two vendors. When the defaults carry `second-vendor: ask`,
-   use the reference's host-aware native question or fallback in this same
-   message only if the user has not already named an outside coding agent
-   and unambiguous active review target. That direct user request supplies
-   one review's authorization without a second question; disclose cost,
-   egress and local execution before dispatch. A fixed CLI adds no question.
+   a qualifying direct user request.** Read `references/second-vendor.md` for
+   mode routing. A missing line is `second-vendor: suggest` and adds no question.
+   When defaults carry `second-vendor: ask`, use the reference's host-aware
+   native question or fallback only if the user hasn't named an outside coding
+   agent and unambiguous review target. That request supplies one review's
+   authorization; disclose cost, egress and local execution before dispatch.
+   A fixed CLI adds no question.
 
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
@@ -341,26 +336,18 @@ the intent and restate again; there is no limit on rounds here.
    from status or prose. When step 3 ran, write
    `ratified-by: <name> <date>` into `PRINCIPLES.md`.
 2. **Branch before the first commit.** Before the confirmation commit, make
-   HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
-   `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
-   If HEAD is already on this change's branch, reuse it. If that branch is checked
-   out in another worktree, work in that worktree. Otherwise, on the trunk, create
-   it, or if `<type>/<change-id>` already exists, switch to it with
-   `git switch <type>/<change-id>`; never re-create it or use `-C` or a reset.
-   On an unrelated branch or a detached HEAD, do not commit there: resolve
-   that first and preserve existing work, no reset, no discard, no
-   `git switch`. Resolve it with `git worktree add <path> <type>/<change-id>`
-   when the branch already exists, else
-   `git worktree add -b <type>/<change-id> <path> <trunk>`, and continue in
-   that new worktree — on this or any move to another worktree, first move
-   every uncommitted file this change produced (the intent draft, a
-   `PRINCIPLES.md` edit) there, to be committed on the change branch, so the
-   original checkout keeps exactly its own earlier work. Carry a
-   `PRINCIPLES.md` edit as its diff, and if applying it conflicts, stop and
-   ask the maintainer. Then commit
-   with the message `docs(loom): intent <change-id> confirmed`. Its
-   body **must contain the `needs-design:` line verbatim** — the checker
-   compares the two strings character for character.
+   HEAD the change's branch with `git switch -c <type>/<change-id>`,
+   picking `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+   or `ci`. If HEAD is on this branch, reuse it; if checked out in another
+   worktree, work there. On the trunk, create it, or switch if it exists;
+   never re-create or use `-C`/reset. On unrelated branch/detached HEAD,
+   do not commit: resolve first, preserve work. Use `git worktree add`
+   with `-b` if needed, and continue there — move every uncommitted file
+   this change produced to be committed on the change branch. Carry a
+   `PRINCIPLES.md` edit as its diff; if conflict, stop and ask the maintainer.
+   Then commit `docs(loom): intent <change-id> confirmed`. Its body **must
+   contain the `needs-design:` line verbatim** — the checker compares the two
+   strings character for character.
 
 `loom-code:write-plan` runs the intent check on this file before planning.
 <!-- /gate -->
