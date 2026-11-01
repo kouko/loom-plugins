@@ -6,7 +6,7 @@ instead of restating its caps or its edits-after policy list.
 from __future__ import annotations
 
 # Version sync constant - updated only on releases
-CURRENT_VERSION = "3.54.0"
+CURRENT_VERSION = "3.55.0"
 
 # One literal is load-bearing and pinned here: the SKILL.md sentence naming
 # `artifacts.plan.charter`.
@@ -403,11 +403,14 @@ def test_current_release_metadata_is_synchronized() -> None:
     package = json.loads(
         (REPO / "loom-code/package.json").read_text(encoding="utf-8")
     )
+    root_readme = (REPO / "README.md").read_text(encoding="utf-8")
     assert claude_manifest["version"] == CURRENT_VERSION
     assert codex_manifest["version"] == CURRENT_VERSION
     assert agy_manifest["version"] == CURRENT_VERSION
     assert package["version"] == CURRENT_VERSION
     assert f"## [{CURRENT_VERSION}]" in changelog
+    assert f"| [`loom-code`](loom-code/) | {CURRENT_VERSION} |" in root_readme
+    assert f"Version {CURRENT_VERSION}. Five stations" in root_readme
 
 
 @pytest.mark.parametrize(
