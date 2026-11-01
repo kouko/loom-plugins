@@ -1,4 +1,5 @@
 """Direct main-branch Git mutation guard in the shared PreToolUse handler."""
+# concern: direct main/master Git mutations can pass through the shared shell hook.
 from __future__ import annotations
 
 import json
