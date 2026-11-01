@@ -1,0 +1,81 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-01-integrate-bash-guard-into-loom-hooks",
+  "content_digest": "26ce91295c77cf52f3b0eafbb065f3d144eb1b68",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_main_branch_hook.py",
+      "artifact": "loom-code/tests/test_main_branch_hook.py",
+      "result": "pass",
+      "command_digest": "4d77496d695523498f773ac310575c068532bf6c4880d3feb80b1e2f06a6bc1e"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "code-reviewer-1",
+      "vendor": "codex",
+      "model": "gpt-6",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "5331bd4ccf287d7dd47a08a46bbcbc0b9ee4aed9",
+      "review_target_sha": "1ffb2022cbacbfba2536158bbe42a423fc58465d",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md"
+      },
+      "findings": [],
+      "notes": [
+        "Official Git flag citations checked; focused changed test passed."
+      ]
+    },
+    {
+      "reviewer": "docs-reviewer-2",
+      "vendor": "codex",
+      "model": "gpt-6",
+      "lens": "docs",
+      "verdict": "PASS",
+      "reviewed_sha": "5331bd4ccf287d7dd47a08a46bbcbc0b9ee4aed9",
+      "review_target_sha": "1ffb2022cbacbfba2536158bbe42a423fc58465d",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS",
+        "incorrect-fact": "PASS_WITH_NOTES"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "anchor": "docs/loom/2026-11-01-integrate-bash-guard-into-loom-hooks/evidence/acceptance-test-evidence.md:49",
+          "text": "nitpick: The cited push.py:72-80 range omits the repo-local opt-out check.",
+          "fix": "Change the cited range to push.py:77-84."
+        }
+      ],
+      "notes": [
+        "Unfixed non-blocking evidence citation range nit from round 1."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}
