@@ -340,7 +340,7 @@ the intent and restate again; there is no limit on rounds here.
    picking `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
    or `ci`. If HEAD is on this branch, reuse it; if checked out in another
    worktree, work there. On the trunk, create it, or switch if it exists;
-   never re-create or use `-C`/reset. On unrelated branch/detached HEAD,
+On unrelated branch/detached HEAD, no `git switch <type>/<change-id>` is offered; do not commit: resolve first, preserve work.
    do not commit: resolve first, preserve work. Use `git worktree add`
    with `-b` if needed, and continue there — move every uncommitted file
    this change produced to be committed on the change branch. Carry a
