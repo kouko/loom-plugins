@@ -54,7 +54,10 @@ def destination_args(args):
             relative = cwd.relative_to(store) if cwd.is_relative_to(store) else Path()
             if relative.parts and (store / "intent" / f"{relative.parts[0]}.md").is_file():
                 raise ValueError("--output-dir cannot be used inside a Loom change")
-        return args, Path(output_dir).absolute(), False
+        directory = Path(output_dir).absolute()
+        if directory.resolve() != directory:
+            raise ValueError(f"{directory}: output directory resolves elsewhere; select resolved path")
+        return args, directory, False
     try:
         return args, managed_directory(change_id), True
     except ValueError as error:

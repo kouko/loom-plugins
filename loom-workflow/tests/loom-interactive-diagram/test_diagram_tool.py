@@ -83,6 +83,23 @@ def test_standalone_copy_preserves_source_and_rejects_existing_destination(chang
     assert (project / "source.drawio").read_bytes() == original
 
 
+def test_standalone_copy_rejects_symlinked_destination(change_dir):
+    assert run_tool(change_dir, "new", "source").returncode == 0
+    source = change_dir / "diagrams/source.drawio"
+    original = source.read_bytes()
+    outside = change_dir.parents[2] / "outside-project"
+    outside.mkdir()
+    alias = change_dir.parents[2] / "project-alias"
+    alias.symlink_to(outside, target_is_directory=True)
+
+    result = run_tool(change_dir.parents[2], "copy", str(source), "--output-dir", str(alias))
+
+    assert result.returncode != 0
+    assert not (outside / "source.drawio").exists()
+    assert not (outside / "source.projection.md").exists()
+    assert source.read_bytes() == original
+
+
 def test_loom_copy_uses_change_store_and_rejects_symlinked_store(change_dir):
     assert run_tool(change_dir, "new", "source").returncode == 0
     source = change_dir / "diagrams/source.drawio"
