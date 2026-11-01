@@ -25,6 +25,13 @@ Wave 1: Remove the duplicate user hook registration and verify host behavior.
 - Test: A4 positive: one-registration; boundary: retained-dcg; A5 positive: all-host-definitions; boundary: stale-checker; A6 positive: personal-repos; boundary: other-user.
 - Risk: agent-decided — use repo-local Git config opt-outs in dotfiles and vault; verify both after installation. Remove only duplicate registration and preserve unrelated changes.
 
+Wave 2: Publish a distinct plugin version so installed hosts can receive the guard.
+
+**W2-01 Bump Loom release metadata**  after: W1-01  acceptance: 4, 5
+- Files: `loom-code/.claude-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-code/README.md`, `README.md`, `loom-code/tests/test_write_plan_station_text.py`, `scripts/sync_codex_manifests.py`
+- Test: A4 positive: distinct-installed-version; boundary: derived-manifests; A5 positive: release-sync; boundary: stale-version-pin.
+- Risk: agent-decided — patch bump because no station guidance, field, rule id, or contract manifest changes; regenerate derived manifests from the single source.
+
 ## Simplicity check
 - Keep publication recognition unchanged; add one exact Git verb check in the existing handler — taken
 - Set and verify both personal repo opt-outs explicitly rather than assuming Loom files configure them — taken
