@@ -2,9 +2,11 @@
 """Create and validate managed or explicitly selected diagram files."""
 
 import importlib.util
+import os
 import re
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -111,6 +113,22 @@ def backends():
 
 def projection_path(diagram):
     return diagram.with_name(f"{diagram.stem}.projection.md")
+
+
+def write_projection(projection, content):
+    """Replace a projection without writing through an existing file alias."""
+    if projection.is_symlink():
+        raise ValueError(f"{projection}: symlinked projection; select a safe destination")
+    descriptor, name = tempfile.mkstemp(prefix=f".{projection.name}.", dir=projection.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as output:
+            output.write(content)
+        if projection.exists():
+            shutil.copymode(projection, temporary)
+        os.replace(temporary, projection)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def backend_for(diagram, registry):
@@ -282,7 +300,7 @@ def project(args, registry):
             raise ValueError(f"{projection}: symlinked projection; select a safe destination")
         if projection.exists():
             backend = backend_for(diagram, registry)
-        projection.write_text(backend.project(diagram) + "\n", encoding="utf-8")
+        write_projection(projection, backend.project(diagram) + "\n")
         print(projection)
         return
     args, change_id = change_args(args)
@@ -303,7 +321,7 @@ def project(args, registry):
         backend = backend_for(diagram, registry)
         backend.check(diagram)
         projection = projection_path(diagram)
-        projection.write_text(backend.project(diagram) + "\n", encoding="utf-8")
+        write_projection(projection, backend.project(diagram) + "\n")
         print(projection)
 
 

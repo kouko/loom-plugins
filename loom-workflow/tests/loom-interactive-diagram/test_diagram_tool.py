@@ -1,6 +1,7 @@
 """The shared diagram command checks every artifact in a change folder."""
 
 import importlib.util
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -174,6 +175,21 @@ def test_project_from_root_with_explicit_change_only_updates_managed_projection(
     assert result.returncode == 0, result.stderr
     assert "- stale" not in projection.read_text()
     assert not (root / "diagrams").exists()
+
+
+def test_managed_projection_hardlink_preserves_unselected(change_dir):
+    assert run_tool(change_dir, "new", "sample").returncode == 0
+    projection = change_dir / "diagrams/sample.projection.md"
+    projection.unlink()
+    protected = change_dir / "unselected.md"
+    protected.write_text("backend: drawio\n# Nodes\n- keep\n")
+    os.link(protected, projection)
+    before = protected.read_bytes()
+
+    result = run_tool(change_dir, "project", "diagrams/sample.drawio")
+
+    assert result.returncode == 0 or "hardlink" in result.stderr.lower()
+    assert protected.read_bytes() == before
 
 
 def test_new_rejects_escaping_diagrams_symlink(change_dir):
