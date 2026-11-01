@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.55.1] — 2026-11-01 — guard direct main-branch Git operations
+
+- The installed Loom `PreToolUse` hooks block `git merge`, `git commit`, and `git push` when the Git command starts the shell input on `main` or `master`, including when `&&` or `;` follows it; normal feature-branch work continues.
+- A prefixed command such as `cd ... && git push`, a wrapper, or a script is outside this guard. The repo-local `loom.protectMain=false` opt-out allows intentional main-branch work in a specific repository.
+- After updating the plugin, users who also register a separate user-level bash-guard should remove that duplicate registration in their dotfiles; installing this version does not change user settings.
+
 ## [3.55.0] — 2026-11-01 — continue through passing Loom stations
 
 - `write-plan` calls Build in the same turn after a committed plan passes its checks; a progress report alone does not complete the hand-off.
