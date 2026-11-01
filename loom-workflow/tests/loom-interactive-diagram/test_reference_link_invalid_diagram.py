@@ -15,9 +15,6 @@ def test_reference_malformed_rejected(tmp_path):
     hidden = tmp_path / "hidden"
     hidden.mkdir()
     (hidden / "broken.drawio").write_text("<broken")
-    created = subprocess.run([sys.executable, str(SCRIPT), "new", "valid"], cwd=tmp_path, capture_output=True, text=True)
-    assert created.returncode == 0, created.stderr
-
     checked = subprocess.run([sys.executable, str(SCRIPT), "check"], cwd=tmp_path, capture_output=True, text=True)
     assert checked.returncode != 0
     assert "broken.drawio" in checked.stderr

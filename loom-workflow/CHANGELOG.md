@@ -4,6 +4,10 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.18.0] — 2026-10-31 — keep diagram artifacts in their change directory
+
+- Create draw.io files and text projections under `docs/loom/<change-id>/diagrams/` when run from either the project root with an explicit change id or the selected change directory. Reject ambiguous, mismatched, and out-of-project write targets before writing; existing root-level diagrams remain in place and can still be checked read-only.
+
 ## [5.17.1] — 2026-10-31 — active-turn diagram save detection
 
 - Add a bounded content poll for one diagram, so an active discussion can read a stable saved edit without another message. Unchanged content and unrelated files do not trigger it; timeout and file errors are explicit.
