@@ -351,7 +351,7 @@ On unrelated branch/detached HEAD, no `git switch <type>/<change-id>` is offered
 
 `loom-code:write-plan` runs the intent check on this file before planning.
 
-Resolve it with `git worktree add <path> <type>/<change-id>` exists `git worktree add <path> <type>/<change-id>` and `git worktree add -b <type>/<change-id> <path> <trunk>` for new; on the trunk offer `git worktree add <path> <type>/<change-id>` without `-b` and `git switch <type>/<change-id>`.
+Resolve it with `git worktree add <path> <type>/<change-id>` exists `git worktree add <path> <type>/<change-id>` and `git worktree add -b <type>/<change-id> <path> <trunk>` for new. On the trunk offer `git worktree add <path> <type>/<change-id>` without `-b` and `git switch <type>/<change-id>`.
 <!-- /gate -->
 
 If `<type>/<change-id>` already exists, switch to it with `git switch <type>/<change-id>`.
