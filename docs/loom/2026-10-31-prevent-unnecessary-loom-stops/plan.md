@@ -135,6 +135,16 @@ Wave 4 — repair the two observed station exits without adding a new stop or re
 - Test: root README retains this change's loom-code 3.55.0 and trunk's loom-workflow 5.18.0 in both listing and prose; sync-trunk and release checks pass.
 - Risk: The 2026-11-01 trunk release changes only the shared workflow version lines that overlap this branch's README edit; retain both releases when resolving the merge.
 
+**W4-07 Continue from a matching attestation into Ship**  after: W4-06  acceptance: 1, 2, 5
+- Files: loom-code/skills/closing-review/SKILL.md, loom-code/tests/test_review_convergence_contract.py
+- Test: A2 positive: a publication-only re-entry with a matching attestation calls Ship in the same turn; negative: a progress-only stop fails; boundary: no new finalization runs when the attestation remains valid.
+- Risk: The Build adversary found that Closing Review §1 still says to stop on this route; preserve the matching-attestation guard while fixing the hand-off.
+
+**W4-08 Graduate the adversarial hand-off probe**  after: W4-07  acceptance: 1, 2
+- Files: docs/loom/2026-10-31-prevent-unnecessary-loom-stops/evidence/probes/test_matching_attestation_reentry_hands_to_ship.py, loom-code/tests/test_matching_attestation_reentry_hands_to_ship.py
+- Test: the committed RED probe becomes GREEN after W4-07 and runs unchanged from the permanent test suite.
+- Risk: Keep the probe's assertion and concern intact while moving it; the final attestation must execute its graduated path.
+
 ## Simplicity check
 - none found
 
