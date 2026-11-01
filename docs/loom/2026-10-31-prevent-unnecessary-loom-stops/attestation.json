@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-31-prevent-unnecessary-loom-stops",
-  "content_digest": "0df636658bb6b1249c9bc242390a0ba41078c191",
+  "content_digest": "45ae25b88e8bba7b5391a18782a6955bdbce9704",
   "executions": [
     {
       "kind": "package-tests",
@@ -12,20 +12,20 @@
     },
     {
       "kind": "adversarial",
-      "command": "python3 -m pytest loom-code/tests/test_questionrule_negation_rejected.py",
-      "artifact": "loom-code/tests/test_questionrule_negation_rejected.py",
+      "command": "python3 -m pytest loom-code/tests/test_matching_attestation_reentry_hands_to_ship.py",
+      "artifact": "loom-code/tests/test_matching_attestation_reentry_hands_to_ship.py",
       "result": "pass",
-      "command_digest": "e18769f6da1f791f43ae294cbe1f7f69f2bd66c7cf1e06c90c9c138ea06cc8bf"
+      "command_digest": "03ceca046a30dce16876f75a216b0559c6cc762f41b1e26091e2afa707de782c"
     }
   ],
   "verdicts": [
     {
-      "reviewer": "reviewer-skill-overprompting",
+      "reviewer": "handoff_reviewer_skill",
       "vendor": "openai",
       "model": "host-inherited-unobservable",
       "lens": "skill",
-      "reviewed_sha": "0edaff6f62a10cd0048203a8c8d8149d6d42fbc6",
-      "review_target_sha": "966e41de41511c2e04f4b7f49d93aea74d619666",
+      "reviewed_sha": "2c89d65fcb9bbffff3ebe675f8c5ef9085edba3b",
+      "review_target_sha": "c0bc6a2dfb2f6a6ad71818f10bc9735ab22e2942",
       "verdict": "PASS",
       "dimension_scores": {
         "omission": "PASS",
@@ -38,18 +38,17 @@
       },
       "findings": [],
       "notes": [
-        "Previous late-choice finding fixed",
-        "Previous README nit fixed in all three languages",
-        "Independent acceptance results remain partly without live Claude Code execution"
+        "Ran the 13 changed test modules: 182 passed.",
+        "The changed handoffs retain failed-check and authorization stops. Prose tests do not establish live host dispatch."
       ]
     },
     {
-      "reviewer": "reviewer-code-overprompting",
+      "reviewer": "handoff_reviewer_code",
       "vendor": "openai",
       "model": "host-inherited-unobservable",
       "lens": "code",
-      "reviewed_sha": "0edaff6f62a10cd0048203a8c8d8149d6d42fbc6",
-      "review_target_sha": "966e41de41511c2e04f4b7f49d93aea74d619666",
+      "reviewed_sha": "2c89d65fcb9bbffff3ebe675f8c5ef9085edba3b",
+      "review_target_sha": "c0bc6a2dfb2f6a6ad71818f10bc9735ab22e2942",
       "verdict": "PASS",
       "dimension_scores": {
         "security": "PASS",
@@ -61,14 +60,15 @@
         "cross-task-coherence": "PASS",
         "external-surface-grounding": "PASS",
         "principles-conformance": "PASS",
-        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists.",
         "deliberate-simplification": "PASS",
         "deletion-first": "PASS"
       },
       "findings": [],
       "notes": [
-        "Previous late-choice and false-positive-test findings fixed",
-        "Changed tests passed under mixed-root collection"
+        "All 13 changed test files ran together: 182 passed in 0.61s.",
+        "The graduated matching-attestation test preserves its adversarial assertion. The worktree remained clean.",
+        "Live host conversation behavior was not observed; the acceptance report explicitly records that limit."
       ]
     }
   ],
