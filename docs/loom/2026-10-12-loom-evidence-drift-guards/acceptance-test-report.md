@@ -1,6 +1,6 @@
 # Loom evidence drift guards — 我試了什麼、發生了什麼
 
-Tried on 2026-11-01, in a clean copy of the project at 81d3f31bde5b7db2d045cdafc68d5fa2998e3420. How I tried
+Tried on 2026-11-01, in a clean copy of the project at 25ac551b. How I tried
 each line and what came back: docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/acceptance-test-evidence.md.
 
 ## 你要的東西，一條一條
