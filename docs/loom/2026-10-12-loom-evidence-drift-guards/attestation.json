@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-12-loom-evidence-drift-guards",
-  "content_digest": "da65411ca1ae3657f710073a0c957c046b20e1a3",
+  "content_digest": "4dd13cbd59ef708c68d84b04b6a113718fd0e059",
   "executions": [
     {
       "kind": "package-tests",
@@ -22,25 +22,61 @@
     {
       "reviewer": "reviewer-1",
       "vendor": "openai",
-      "model": "test",
+      "model": "gpt-4o",
       "lens": "code",
       "verdict": "PASS",
-      "findings": []
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "PASS",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "All 4 new evidence drift guard rules implemented in separate modules per Module Criteria",
+        "The evidence/* glob correctly stops at one level so evidence/probes/ stays functional content",
+        "v1 attestations and unpinned intents are skipped per backward compatibility",
+        "attestation v2 schema and mechanisms.yaml registration both complete",
+        "Package suite green at HEAD"
+      ]
     },
     {
       "reviewer": "reviewer-2",
-      "vendor": "anthropic",
-      "model": "test",
+      "vendor": "litellm",
+      "model": "hyper-coding-group-200k",
       "lens": "code",
       "verdict": "PASS",
-      "findings": []
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": []
     }
   ],
   "findings": [],
   "selection": null,
   "intent_confirmed_sha": null,
-  "tested_commit": "288d9d58",
-  "reviewed_commit": "e7509a6d7e31efbe2482f34225b12890d03594d7",
+  "tested_commit": "25ac551b",
+  "reviewed_commit": "2a0d915bf53af53ffbc51622851436890688a03b",
   "acceptance_status": [
     {
       "acceptance": 1,
