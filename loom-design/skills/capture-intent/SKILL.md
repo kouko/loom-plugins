@@ -351,7 +351,7 @@ the intent and restate again; there is no limit on rounds here.
 
 `loom-code:write-plan` runs the intent check on this file before planning.
 
-Resolve it with `git worktree add <path> <type>/<change-id>` for existing branch and `git worktree add -b <type>/<change-id> <path> <trunk>` for new; on the trunk offer `git worktree add <path> <type>/<change-id>` without `-b`; on unrelated branch or detached HEAD no `git switch <type>/<change-id>` is offered.
+Resolve it with `git worktree add <path> <type>/<change-id>` exists `git worktree add <path> <type>/<change-id>` and `git worktree add -b <type>/<change-id> <path> <trunk>` for new; on the trunk offer `git worktree add <path> <type>/<change-id>` without `-b`; on unrelated branch or detached HEAD no `git switch <type>/<change-id>` is offered.
 <!-- /gate -->
 
 If `<type>/<change-id>` already exists, switch to it with `git switch <type>/<change-id>`.
