@@ -437,14 +437,16 @@ Then run:
 
 When the required reviewer verdicts and probe evidence are available and §4
 permits finalization, run `finalize-review` in this turn. A progress update
-alone does not complete this step. Once a valid attestation is committed,
-continue to Ship in this turn unless a stated stop condition applies.
+alone does not complete this step.
 
 The checker runs the declared package suite and each adversarial program once.
 Only after all executions and verdicts pass does it atomically generate the
-attestation bound to the functional-content digest. Commit the generated file
-with any remaining publication metadata; publication validates that single
-attestation directly.
+attestation bound to the functional-content digest. When `finalize-review`
+generates a valid attestation, commit the generated file with any remaining
+publication metadata in this turn; publication validates that single
+attestation directly. Once a valid attestation is committed, call
+`loom-code:ship` in this turn unless a stated stop condition applies. A
+progress report alone does not complete the hand-off.
 
 When a step that `finalize-review` needs (reviewers, adversarial, package-tests)
 was skipped by the user's plain-words instruction, skip `finalize-review` and leave the change unattested: tell the

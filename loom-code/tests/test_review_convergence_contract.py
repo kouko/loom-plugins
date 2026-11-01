@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-from prose_pin import has_negation, split_sentences
+from prose_pin import affirms, has_negation, split_sentences
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -220,13 +220,37 @@ def test_ready_review_continues_through_finalize_and_ship() -> None:
     )
     assert "A progress update alone does not complete this step." in finalize
     assert re.search(
-        r"valid attestation is committed.*continue to Ship in this turn.*"
+        r"valid attestation is committed.*call `loom-code:ship` in this turn.*"
         r"unless a stated stop condition applies",
         finalize,
     )
     assert "skip `finalize-review` and leave the change unattested" in finalize
     converge = _flat_section("## 4. Converge within one bounded episode")
     assert "repeat execution requires a newly authorized review" in converge
+
+
+def test_generated_attestation_is_committed_and_shipped_in_same_turn() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    assert affirms(
+        finalize, "commit", "the generated file", "valid attestation",
+        "publication metadata", "in this turn",
+    )
+    assert affirms(
+        finalize, "call", "`loom-code:ship`", "valid attestation is committed",
+        "in this turn", "unless a stated stop condition applies",
+    )
+    assert "progress report alone does not complete the hand-off" in finalize
+    assert not affirms(
+        "Once a valid attestation is committed, do not call `loom-code:ship` in this turn.",
+        "call", "`loom-code:ship`", "valid attestation is committed", "in this turn",
+    )
+
+
+def test_failed_finalization_keeps_its_existing_routes() -> None:
+    finalize = _flat_section("## 5. Finalize")
+    assert "obtain a fresh confirmation" in finalize
+    assert "return the fix to Build" in finalize
+    assert "NON_CONVERGENT" in finalize
 
 
 def test_reviewer_contract_does_not_tie_relook_to_round3() -> None:
