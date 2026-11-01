@@ -41,5 +41,7 @@ Wave 2: Publish a distinct plugin version so installed hosts can receive the gua
 - none
 
 ## Risks
+user-decided — Implement the small direct-command guard first; accept that prefixed commands, wrappers, and scripts can bypass this host hook.
+user-decided — Keep Loom's reminder policy for PR merge/close and preserve personal main-branch exceptions without hard-coded paths.
 1. A direct-command check cannot stop shell wrappers or Git operations outside the host; the acceptance report must state this limit.
 2. The dotfiles repository and both repos' local Git config are outside this worktree; cutover must preserve unrelated changes and cannot be called active before the new plugin is installed.
