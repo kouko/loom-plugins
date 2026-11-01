@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 
 
-ROOT = Path(__file__).resolve().parents[5]
+ROOT = Path(__file__).resolve().parents[2]
 REVIEW = ROOT / "loom-code/skills/closing-review/SKILL.md"
 
 
