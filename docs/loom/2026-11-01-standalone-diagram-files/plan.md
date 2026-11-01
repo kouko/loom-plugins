@@ -24,6 +24,18 @@ Wave 2 — teach the chosen user interaction and prepare the release.
 - Test: A6 positive: release-describes-standalone-use; boundary: manifest-versions-match; rewrite the pinned current-version test.
 - Risk: agent-decided — REQ-6: minor release 5.19.0 is needed for changed skill guidance and CLI; generated manifests are synchronized from the plugin source.
 
+Wave 3 — close two demonstrated write-boundary defects.
+
+**W3-01 Protect every projection rewrite and graduate hardlink probe**  after: W2-02  acceptance: 3,5
+- Files: loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py, loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py, docs/loom/2026-11-01-standalone-diagram-files/evidence/probes/test_projection_hardlink_preserves.py, loom-workflow/tests/loom-interactive-diagram/test_projection_hardlink_preserves.py
+- Test: A3 positive: direct-project-safe-replace; boundary: hardlinked-projection. A5 positive: managed-project-safe-replace; boundary: managed-hardlinked-projection.
+- Risk: agent-decided — projection rewrite alias class searched all changed diagram.py writes and related tests; both direct and managed project write sites must avoid changing unselected hard-linked files.
+
+**W3-02 Reject redirecting standalone destinations and graduate symlink probe**  after: W3-01  acceptance: 1,3
+- Files: loom-workflow/skills/loom-interactive-diagram/scripts/diagram.py, loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py, docs/loom/2026-11-01-standalone-diagram-files/evidence/probes/test_destination_symlink_rejected.py, loom-workflow/tests/loom-interactive-diagram/test_destination_symlink_rejected.py
+- Test: A1 positive: canonical-standalone-create; negative: symlinked-output-dir. A3 positive: canonical-standalone-copy; negative: symlinked-copy-output-dir.
+- Risk: agent-decided — redirected destination class searched destination_args, create, copy, and related tests; reject symlinked standalone output directories before either operation writes.
+
 ## Simplicity check
 - One command-and-test task for the shared entrypoint — taken
 
@@ -41,3 +53,4 @@ Wave 2 — teach the chosen user interaction and prepare the release.
 1. In-place editing can change an external original and adjacent projection; each edit requires the user's copy choice, and no automatic backup is promised.
 2. Standalone destinations are selected by the user rather than inferred from the current working directory; missing destinations must stop before writing.
 3. Existing parser and managed-path tests protect PR #125 behavior; the new options must not weaken those boundaries.
+4. Two adversarial RED programs are graduated into the routine diagram suite through W3-01 and W3-02; Build re-runs them after each fix.
