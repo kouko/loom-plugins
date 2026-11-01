@@ -1,7 +1,7 @@
 {
   "schema": "loom-attestation/v2",
   "change_id": "2026-10-31-prevent-unnecessary-loom-stops",
-  "content_digest": "45ae25b88e8bba7b5391a18782a6955bdbce9704",
+  "content_digest": "dd544eae3809b7214344727e23b570288a13444c",
   "executions": [
     {
       "kind": "package-tests",
@@ -20,12 +20,12 @@
   ],
   "verdicts": [
     {
-      "reviewer": "handoff_reviewer_skill",
+      "reviewer": "pr124_merged_skill_review",
       "vendor": "openai",
       "model": "host-inherited-unobservable",
       "lens": "skill",
-      "reviewed_sha": "2c89d65fcb9bbffff3ebe675f8c5ef9085edba3b",
-      "review_target_sha": "c0bc6a2dfb2f6a6ad71818f10bc9735ab22e2942",
+      "reviewed_sha": "5f282b86e1a551927375dbbc876327e33bc125ea",
+      "review_target_sha": "361571ef73b68c1670adfb0a7f6f8592a69084b4",
       "verdict": "PASS",
       "dimension_scores": {
         "omission": "PASS",
@@ -38,24 +38,25 @@
       },
       "findings": [],
       "notes": [
-        "Ran the 13 changed test modules: 182 passed.",
-        "The changed handoffs retain failed-check and authorization stops. Prose tests do not establish live host dispatch."
+        "Reviewed the cumulative diff, final guidance and README merge resolution, and base-to-target polarity changes.",
+        "Ran all 13 changed focused test modules together: 182 passed in 0.60s.",
+        "The acceptance report explicitly limits its claims: live host hand-off behavior remains unobserved."
       ]
     },
     {
-      "reviewer": "handoff_reviewer_code",
+      "reviewer": "pr124_merged_code_review",
       "vendor": "openai",
       "model": "host-inherited-unobservable",
       "lens": "code",
-      "reviewed_sha": "2c89d65fcb9bbffff3ebe675f8c5ef9085edba3b",
-      "review_target_sha": "c0bc6a2dfb2f6a6ad71818f10bc9735ab22e2942",
-      "verdict": "PASS",
+      "reviewed_sha": "5f282b86e1a551927375dbbc876327e33bc125ea",
+      "review_target_sha": "361571ef73b68c1670adfb0a7f6f8592a69084b4",
+      "verdict": "PASS_WITH_NOTES",
       "dimension_scores": {
         "security": "PASS",
         "architecture": "PASS",
-        "correctness": "PASS",
+        "correctness": "PASS_WITH_NOTES — Guidance and focused checks align with the intent, but real host behavior was not observed.",
         "naming": "PASS",
-        "tests": "PASS",
+        "tests": "PASS_WITH_NOTES — All 182 tests in changed test files passed; they verify guidance, not a live station hand-off.",
         "refactoring": "PASS",
         "cross-task-coherence": "PASS",
         "external-surface-grounding": "PASS",
@@ -66,9 +67,8 @@
       },
       "findings": [],
       "notes": [
-        "All 13 changed test files ran together: 182 passed in 0.61s.",
-        "The graduated matching-attestation test preserves its adversarial assertion. The worktree remained clean.",
-        "Live host conversation behavior was not observed; the acceptance report explicitly records that limit."
+        "Reviewed the cumulative diff and final tree. The merged root README retains loom-design 2.18.0, loom-code 3.55.0, and loom-workflow 5.19.0.",
+        "The locked package suite result was supplied as 2489 passed, 2 skipped; I did not rerun it, as the reviewer contract prohibits that."
       ]
     }
   ],
