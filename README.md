@@ -15,7 +15,7 @@ Codex, Antigravity CLI and OpenCode:
 | --- | --- | --- | --- |
 | [`loom-design`](loom-design/) | 2.17.0 | 6 | Front of the flow: intent, specification, product principles, visual design, architecture. |
 | [`loom-code`](loom-code/) | 3.53.0 | 6 | Engineering stations: plan, build, closing-review, ship, maintain. |
-| [`loom-workflow`](loom-workflow/) | 5.18.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions (`independent-advisor`). |
+| [`loom-workflow`](loom-workflow/) | 5.19.0 | 14 | Tools around the stations: memory, critique, recap, handoff, one-session project retro, cross-session skill distillation, second opinions (`independent-advisor`), editable diagrams for standalone or Loom discussions. |
 
 Each plugin keeps its own manifest, version, tests and changelog; its README
 covers usage in depth.
@@ -147,7 +147,7 @@ agents that the stations dispatch.
 
 ## loom-workflow
 
-Version 5.18.0. Workflow tools used around the stations; most work without
+Version 5.19.0. Workflow tools used around the stations; most work without
 `loom-code`. `decision-map`'s intent delivery and explicitly requested outside
 code, plan or decision reviews need it. See
 [Where loom-workflow plugs in](#where-loom-workflow-plugs-in) for how they
@@ -165,7 +165,7 @@ attach to the flow.
 | `skill-retro` | Mine past Claude Code or Codex sessions for skill improvement proposals. |
 | `project-retro` | On request, review the current or one specified coding session for source-backed project development improvements; report possible skill issues separately as candidates without editing files. |
 | `loom-visualization` | Show comparisons, flows, decisions, states or reasoning chains as tables, ASCII or Mermaid in coding chat, with a reasoning page mode; not for Obsidian notes. |
-| `loom-interactive-diagram` | Create and validate editable diagram files shared by the user and agent. |
+| `loom-interactive-diagram` | Create and validate editable diagrams for standalone or Loom discussions; ask before editing an external diagram whether to copy it into the project. |
 | `goal-create` | Create a session goal or draft a repository purpose (invoked by name only). |
 | `dbt-model-style` | Apply dbt and Redshift style when writing or reviewing a dbt SQL model. |
 | `using-loom-workflow` | Optional router to the right workflow tool. |
