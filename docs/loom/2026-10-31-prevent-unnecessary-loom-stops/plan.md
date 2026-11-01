@@ -130,6 +130,11 @@ Wave 4 — repair the two observed station exits without adding a new stop or re
 - Test: root README and current-version test agree with the 3.55.0 manifest.
 - Risk: Preserve the loom-design version and other release entries in the shared README.
 
+**W4-06 Integrate the new trunk workflow release**  after: W4-05  acceptance: 1, 2
+- Files: README.md
+- Test: root README retains this change's loom-code 3.55.0 and trunk's loom-workflow 5.18.0 in both listing and prose; sync-trunk and release checks pass.
+- Risk: The 2026-11-01 trunk release changes only the shared workflow version lines that overlap this branch's README edit; retain both releases when resolving the merge.
+
 ## Simplicity check
 - none found
 
