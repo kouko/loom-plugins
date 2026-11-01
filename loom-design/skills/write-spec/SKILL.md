@@ -195,27 +195,35 @@ turns a behaviour confirmation into a quality review the user cannot do.
    differ on an axis the user feels (accuracy, speed, cost per run,
    coverage, privacy); **(e)** an irreversible action on the user's
    existing state — rewriting or deleting their data in place, changing a
-   file format with no backup, sending their data off their machine, which
-   is asked **even when there is no fork at all**. Class (e) still yields to
+   file format with no backup, sending their data off their machine. These
+   classes flag consequences to disclose, not automatic user questions.
+   Hard to swap later alone does not require a user question. Three or more
+   trade-offs alone do not require a user question. Rewriting, deleting, or
+   sending the user's existing data off their machine requires explicit consent
+   even when there is no fork at all. Class (e) still yields to
    the **check** gate below: when the intent's Constraints or
-   `PRINCIPLES.md` already pin how that existing data is handled, do **not**
+   `PRINCIPLES.md` already pin how that existing data is handled and authorize
+   the action, do **not**
    ask — restate the handling in consequence form inside this same message
    ("this will rewrite your ___, I am doing it the way you said: ___"), so
    the user sees it without being stopped for it. A one-way door, class (e)
-   included, already asked at decision point ①, because no spec was going to
+   included, already answered at decision point ①, because no spec was going to
    be written then, is not asked again at ②.
 
    Four gates, in order: **check** the intent's Acceptance and Constraints
-   and `PRINCIPLES.md` first — an axis already pinned there is not asked,
+   and `PRINCIPLES.md` first — if the choice is already pinned there, do not ask again;
    you pick what complies and say which line pinned it; **measure** first
    when the candidates can be compared quickly on the user's own samples,
-   then ask about the result, never about assumptions; **threshold** — for
+   then make the technical choice `agent-decided` and record the reason; **threshold** — for
    class (d), any axis differing by at least 20%, or the presence versus
-   absence of money, privacy or coverage; **merge** — every one-way door of
-   this change not already asked at ① is asked once, inside this message.
+   absence of money, privacy or coverage flags a consequence, not a question;
+   **merge** — only an unresolved user outcome or missing authorization is asked at ②:
+   ask when alternatives materially change the user's outcome and the user's
+   preference remains unresolved after checking, or when an action requires
+   authorization. Fold that question into this message.
    Never open an extra stop.
 
-   The shape is fixed and carries no mechanism vocabulary:
+   For an unresolved user choice, the shape carries no mechanism vocabulary:
 
    > Option A: from then on it only runs on ___, it costs ___ per month,
    > and swapping it out means rewriting ___. Option B: ___. I suggest A,
@@ -227,20 +235,25 @@ turns a behaviour confirmation into a quality review the user cannot do.
    a backup at ___ first. Is that OK?"
 
 **Every question in this message must be one of three types, or the
-consequence form for one-way doors**: what do you want, what will you see (this
-station's own type), did it work. A question fitting none of them is a
-question the user cannot answer — "should the state live in the store or
-the component?" is not a behaviour question however it is phrased. The
-closing-review station has a dimension for exactly this, `user-judgment-leak`, and
-returns NEEDS_REVISION when it finds one.
+consequence form for an unresolved user outcome or authorization**: what do
+you want, what will you see (this station's own type), did it work. A
+question fitting none of them is a question the user cannot answer —
+"should the state live in the store or the component?" is not a behaviour
+question however it is phrased. The closing-review station has a dimension
+for exactly this, `user-judgment-leak`, and returns NEEDS_REVISION when it
+finds one.
 
-A one-way door that surfaces **after** this message is not a new stop: pick
-a default, tag it `agent-decided`, and let the acceptance test report disclose
-it at decision point ③. For classes (b), (c) and (e) the default is not
-free — take the option with zero obligation, that is reversible, and that
-does not touch the user's existing data, and record
-`agent-decided — no authorisation, conservative option`. If no such option
-exists, that piece of work stops and is reported as not done.
+A technical choice that surfaces **after** this message: check existing
+decisions, project evidence, tests, and applicable external sources; decide
+from evidence, record the reason as `agent-decided`, and disclose material
+consequences in the acceptance test report at decision point ③. Ask for an
+unresolved user outcome or missing authorization when needed; continue
+independent work while awaiting the answer. For classes (b), (c) and (e),
+when authorization is missing, take a zero-obligation, reversible option that
+touches no existing data if it meets the user's outcome. Record
+`agent-decided — not authorised, took the conservative option`. If none
+does, ask for the missing preference or authorization. A committing option
+needs prior authorization.
 
 <!-- gate: write-spec.product-visible-behaviour-confirmed-before-review -->
 Before presenting the behaviour, preserve the exact count, order, and

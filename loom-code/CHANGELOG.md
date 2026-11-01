@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.55.0] — 2026-11-01 — continue through passing Loom stations
+
+- `write-plan` calls Build in the same turn after a committed plan passes its checks; a progress report alone does not complete the hand-off.
+- Build calls Closing Review in the same turn after the required package suite and adversarial programs are satisfied; failed checks remain in Build.
+- Closing Review commits a valid generated attestation with publication metadata, then calls Ship in the same turn; stated stop conditions and failed-finalization routes remain in force.
+
+## [3.54.0] — 2026-10-31 — docs(loom-code): decide technical choices and continue closing review
+
+- `write-plan` checks existing decisions, project evidence, tests, and applicable external sources before resolving technical choices. A costly-to-reverse choice or three or more trade-offs prompts disclosure of material consequences, not an automatic question; unresolved user outcome preferences and missing authorization still go to the user.
+- `closing-review` runs `finalize-review` when its required verdicts and probe evidence are ready, then continues to Ship after a valid attestation is committed unless a stated stop condition applies. A progress update alone does not complete either step.
+
 ## [3.53.0] — 2026-10-30 — register shared diagram tool
 
 - Register `loom-interactive-diagram` as a workflow tool in the contract manifest and pin its contract test count.

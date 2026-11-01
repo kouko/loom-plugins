@@ -1,0 +1,77 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-31-prevent-unnecessary-loom-stops",
+  "content_digest": "dd544eae3809b7214344727e23b570288a13444c",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_matching_attestation_reentry_hands_to_ship.py",
+      "artifact": "loom-code/tests/test_matching_attestation_reentry_hands_to_ship.py",
+      "result": "pass",
+      "command_digest": "03ceca046a30dce16876f75a216b0559c6cc762f41b1e26091e2afa707de782c"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "pr124_merged_skill_review",
+      "vendor": "openai",
+      "model": "host-inherited-unobservable",
+      "lens": "skill",
+      "reviewed_sha": "5f282b86e1a551927375dbbc876327e33bc125ea",
+      "review_target_sha": "361571ef73b68c1670adfb0a7f6f8592a69084b4",
+      "verdict": "PASS",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative diff, final guidance and README merge resolution, and base-to-target polarity changes.",
+        "Ran all 13 changed focused test modules together: 182 passed in 0.60s.",
+        "The acceptance report explicitly limits its claims: live host hand-off behavior remains unobserved."
+      ]
+    },
+    {
+      "reviewer": "pr124_merged_code_review",
+      "vendor": "openai",
+      "model": "host-inherited-unobservable",
+      "lens": "code",
+      "reviewed_sha": "5f282b86e1a551927375dbbc876327e33bc125ea",
+      "review_target_sha": "361571ef73b68c1670adfb0a7f6f8592a69084b4",
+      "verdict": "PASS_WITH_NOTES",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES — Guidance and focused checks align with the intent, but real host behavior was not observed.",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES — All 182 tests in changed test files passed; they verify guidance, not a live station hand-off.",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Reviewed the cumulative diff and final tree. The merged root README retains loom-design 2.18.0, loom-code 3.55.0, and loom-workflow 5.19.0.",
+        "The locked package suite result was supplied as 2489 passed, 2 skipped; I did not rerun it, as the reviewer contract prohibits that."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

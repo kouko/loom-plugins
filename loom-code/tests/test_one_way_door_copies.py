@@ -39,6 +39,20 @@ COPIES = [
 GATE_NAMES = ("check", "measure", "threshold", "merge")
 
 
+@pytest.mark.parametrize("copy", COPIES, ids=lambda p: p.parent.name)
+def test_copies_use_the_narrow_question_rule(copy: Path):
+    text = normalise(copy.read_text(encoding="utf-8"))
+    for phrase in (
+        "hard to swap later alone does not require a user question",
+        "three or more trade-offs alone do not require a user question",
+        "materially change the user's outcome",
+        "preference remains unresolved",
+        "existing data",
+        "explicit consent",
+    ):
+        assert phrase in text, (copy, phrase)
+
+
 def normalise(text: str) -> str:
     """Case-folded, whitespace-collapsed, with markdown emphasis removed."""
     return re.sub(r"\s+", " ", text.replace("*", "")).casefold()

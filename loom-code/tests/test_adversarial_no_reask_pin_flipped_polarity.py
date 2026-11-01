@@ -5,8 +5,8 @@
 sentence holding "①", "again at ②" and some negation word. A rewrite that
 moves the negation off the verb ("are asked again at ②, never skipped")
 flips the rule to re-asking and still satisfies the pin. Each case below
-rewrites one pinned sentence of the committed text, word count unchanged,
-and runs the real repository test against it; the test must fail.
+rewrites one pinned sentence of the committed text and runs the real
+repository test against it; the test must fail.
 """
 from __future__ import annotations
 
@@ -29,10 +29,8 @@ CASES = {
     ),
     "one-way-door-merge": (
         "ONE_WAY_DOOR",
-        "a spec written later does not ask them again at ②, as they\n"
-        "   were already asked at ①.",
-        "a spec written later asks them again at ②, not trusting\n"
-        "   that ① already asked them.",
+        "A spec written later does not ask the same question again at ②.",
+        "A spec written later asks the same question again at ②, not skipped.",
     ),
 }
 

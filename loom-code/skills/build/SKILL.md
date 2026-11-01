@@ -186,3 +186,7 @@ results, the complete package suite command and its result,
 each adversarial program's path and command, or the adversary's no-program outcome and its reason, each adversary re-dispatch with its reason, every unresolved adversary finding, the station sequence entered so far when this run recovered from an absent item, and any unresolved risk. Call `loom-code:closing-review`
 once over the cumulative branch. Build never writes `attestation.json` and
 never edits it after `closing-review` generates it.
+Once functional changes are committed and the required package suite and
+adversarial programs satisfy §3, call `loom-code:closing-review` in the same
+turn. A progress report naming Closing Review does not complete the hand-off.
+A failed required check blocks dependent review; resolve it in Build first.

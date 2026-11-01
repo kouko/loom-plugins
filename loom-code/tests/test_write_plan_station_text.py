@@ -6,7 +6,7 @@ instead of restating its caps or its edits-after policy list.
 from __future__ import annotations
 
 # Version sync constant - updated only on releases
-CURRENT_VERSION = "3.53.0"
+CURRENT_VERSION = "3.55.0"
 
 # One literal is load-bearing and pinned here: the SKILL.md sentence naming
 # `artifacts.plan.charter`.
@@ -291,6 +291,17 @@ def test_branch_rule_precedes_confirmation_and_skip_record_commits() -> None:
     assert affirms(on_yes, "Commit it", "on the change branch", _RULE)
 
 
+def test_committed_passing_plan_enters_build_in_same_turn() -> None:
+    handoff = " ".join(
+        _section(SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off").split()
+    )
+    assert affirms(
+        handoff, "call", "`loom-code:build`", "same turn", "checks pass",
+    )
+    assert "progress report" in handoff and "does not complete the hand-off" in handoff
+    assert "failed check" in handoff and "unresolved user decision" in handoff
+
+
 def test_intent_on_trunk_allowance_absent() -> None:
     """A4 negative: no sentence lets the intent (or anything) stay on trunk."""
     text = " ".join(SKILL.read_text(encoding="utf-8").split())
@@ -392,11 +403,14 @@ def test_current_release_metadata_is_synchronized() -> None:
     package = json.loads(
         (REPO / "loom-code/package.json").read_text(encoding="utf-8")
     )
+    root_readme = (REPO / "README.md").read_text(encoding="utf-8")
     assert claude_manifest["version"] == CURRENT_VERSION
     assert codex_manifest["version"] == CURRENT_VERSION
     assert agy_manifest["version"] == CURRENT_VERSION
     assert package["version"] == CURRENT_VERSION
     assert f"## [{CURRENT_VERSION}]" in changelog
+    assert f"| [`loom-code`](loom-code/) | {CURRENT_VERSION} |" in root_readme
+    assert f"Version {CURRENT_VERSION}. Five stations" in root_readme
 
 
 @pytest.mark.parametrize(

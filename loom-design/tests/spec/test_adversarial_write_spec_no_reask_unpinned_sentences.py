@@ -28,8 +28,8 @@ CASES = {
         "",
     ),
     "merge-qualifier-dropped": (
-        "this change not already asked at ① is asked once",
-        "this change is asked once",
+        "only an unresolved user outcome or missing authorization is asked at ②",
+        "any one-way door is asked at ②",
     ),
     "class-e-excluded": (
         "class (e)\n   included",

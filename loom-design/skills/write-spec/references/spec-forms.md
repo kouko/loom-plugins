@@ -38,7 +38,8 @@ point.
 
 - **Options compared on shared axes** — one row per option, one column
   per axis (cost, coverage, what swapping it out later costs). This is
-  the shape a one-way door is measured in before it is asked.
+  the shape a one-way door is measured in before the agent decides the technical choice
+  or asks about an unresolved user outcome.
 - **Joint states of co-active objects** — one row per combination,
   columns `Surface | Objects | Joint state | Reaction`. Only when a
   pair's joint reaction differs from the union of the individual ones;

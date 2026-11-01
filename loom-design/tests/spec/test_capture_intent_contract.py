@@ -80,6 +80,21 @@ def _section(text: str, heading: str) -> str:
     return m.group(0)
 
 
+def test_decision_point_one_decides_measured_technical_choices() -> None:
+    step = " ".join(_section(_text(), "## Step 4 — Decision point ①: restate and confirm").split())
+    assert "measure" in step and "agent-decided" in step
+    assert "hard to swap later alone does not require a user question" in step.lower()
+    assert "three or more trade-offs alone do not require a user question" in step.lower()
+
+
+def test_decision_point_one_asks_only_unresolved_outcomes_or_authorization() -> None:
+    step = " ".join(_section(_text(), "## Step 4 — Decision point ①: restate and confirm").split()).lower()
+    assert "materially change the user's outcome" in step and "preference remains unresolved" in step
+    assert "already pinned" in step and "do not ask again" in step
+    assert "disclose" in step and "consequence" in step
+    assert "existing data" in step and "explicit consent" in step
+
+
 STEP_4 = "## Step 4 — Decision point ①: restate and confirm"
 
 # Whole sentences, not keyword subsets: a keyword pin lets reversed meaning pass.
@@ -230,7 +245,7 @@ def test_referenced_relative_paths_exist() -> None:
     assert not missing, missing
 
 
-def test_loom_design_version_2_2_0_consistent() -> None:
+def test_loom_design_version_2_17_0_consistent() -> None:
     claude_manifest = json.loads(PLUGIN_JSON.read_text(encoding="utf-8"))
     codex_manifest = json.loads(
         (REPO / "loom-design/.codex-plugin/plugin.json").read_text(encoding="utf-8")
@@ -242,20 +257,21 @@ def test_loom_design_version_2_2_0_consistent() -> None:
         (REPO / "loom-design/package.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.17.0"
-    assert codex_manifest["version"] == "2.17.0"
-    assert agy_manifest["version"] == "2.17.0"
-    assert package_manifest["version"] == "2.17.0"
-    assert "## [2.17.0]" in changelog
+    assert claude_manifest["version"] == "2.18.0"
+    assert codex_manifest["version"] == "2.18.0"
+    assert agy_manifest["version"] == "2.18.0"
+    assert package_manifest["version"] == "2.18.0"
+    assert "## [2.18.0]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/) | 2.17.0 |",
-        "loom-design/README.md": "**Version**: 2.17.0",
-        "loom-design/README.ja.md": "**Version**: 2.17.0",
-        "loom-design/README.zh-TW.md": "**Version**: 2.17.0",
+        "README.md": "| [`loom-design`](loom-design/) | 2.18.0 |",
+        "loom-design/README.md": "**Version**: 2.18.0",
+        "loom-design/README.ja.md": "**Version**: 2.18.0",
+        "loom-design/README.zh-TW.md": "**Version**: 2.18.0",
     }
     for name, pin in readme_pins.items():
         assert pin in (REPO / name).read_text(encoding="utf-8"), name
+    assert "## loom-design\n\nVersion 2.18.0." in (REPO / "README.md").read_text(encoding="utf-8")
 
 
 def test_capture_intent_bare_branch_absent() -> None:

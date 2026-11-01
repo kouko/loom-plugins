@@ -62,20 +62,22 @@ twice.
    informed yes; an opt-out leaves the field absent.
 
 2. **The engineering one-way doors found so far**, in consequence form, per
-   `one-way-door.md` — load that file before deciding whether a
-   fork is one; the five classes and the four gates (check, measure,
-   threshold, merge) are there, and a class (e) action — anything
-   irreversible to the user's existing data — is asked even when there is
-   no fork. A product change's one-way doors, class (e) actions included,
-   are asked at decision point ② of the station writing its spec —
-   `write-spec`, or this station (step 4) — when a spec will be written.
-   They are asked in this message instead when no spec will be written
-   (step 4 forces none); a spec written later in step 4 does not ask them
-   again at ②. Class (e) still yields to the **check** gate: when the intent's
-   Constraints or `PRINCIPLES.md` already pin how that existing data is
-   handled, do **not** ask — restate the handling in consequence form
-   inside this same message ("this will rewrite your ___, I am doing it the
-   way you said: ___"), so the user sees it without being stopped for it.
+   `one-way-door.md` — load that file before deciding whether a question is
+   needed. Check existing decisions and evidence first: ask for the unresolved
+   outcome preference only when alternatives materially change what the user
+   receives, or ask for missing authorization. A pinned user choice is not
+   asked again. Disclose material consequences even when the technical choice
+   is agent-decided. A class (e) action on the user's existing data needs
+   explicit consent even when there is no fork, unless the user already
+   authorized that action. A product change's unresolved outcome or
+   authorization questions are asked at decision point ② of the station
+   writing its spec — `write-spec`, or this station (step 4) — when a spec
+   will be written. They are asked in this message instead when no spec will
+   be written (step 4 forces none); a spec written later in step 4 does not
+   ask them again at ②. When the intent already authorizes how existing
+   data is handled, do **not** ask again — restate the handling in consequence
+   form inside this same message ("this will rewrite your ___, I am doing it
+   the way you said: ___").
 
 3. **The cross-model review question, only for `second-vendor: ask` without
    a qualifying direct user request.** Load
@@ -105,14 +107,14 @@ twice.
    in this message.
 
 **Every question in this message must be one of three types, or the
-consequence form for one-way doors**, and you check the list before
+consequence form for an unresolved user outcome or authorization**, and you check the list before
 sending:
 
 - what do you want (the restatement),
 - what will you see (visible behaviour — product only, and it belongs to
   decision point ②),
 - did it work (acceptance — decision point ③),
-- or the consequence form for a one-way door.
+- or the consequence form for an unresolved user outcome or authorization.
 
 A question that fits none is not the user's decision. If answering requires
 reading code, follow repository precedent, decide it yourself, and record the

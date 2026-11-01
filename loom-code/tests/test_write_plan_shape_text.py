@@ -192,32 +192,35 @@ def test_doors_detector_rejects_shared_negation_words(sentence: str) -> None:
 
 
 def test_product_gate_presents_product_one_way_doors() -> None:
-    """Decision point ② presents the product one-way doors routed to it from ①."""
+    """Decision point ② discloses the product door consequences."""
     assert _presents_doors(_product_gate())
 
 
 ONE_WAY_DOOR = ROOT / "loom-code/skills/write-plan/references/one-way-door.md"
 
 
-_NO_REASK = re.compile(r"\b(?:not asked|does not ask (?:them|it))\s+again at ②")
+_NO_REASK = re.compile(r"\b(?:not asked|does not ask (?:them|it|the same question))\s+again at ②")
 
 
 def _says_no_reask(text: str) -> bool:
-    """A sentence says a door already asked at ① is not asked again at ②.
+    """A question already asked at ① is not asked again at ②.
 
     The negation is tied to the verb right before "again at ②"; a negation
     elsewhere in the sentence ("asked again at ②, never skipped") flips it.
     """
-    for sentence in re.split(r"(?<=[.;])\s+", re.sub(r"\s+", " ", text)):
-        if "①" in sentence and _NO_REASK.search(sentence):
+    flat = re.sub(r"\s+", " ", text)
+    for sentence in re.split(r"(?<=[.;])\s+", flat):
+        if "①" in flat and _NO_REASK.search(sentence):
             return True
     return False
 
 
 @pytest.mark.parametrize("sentence, expected", [
     ("Doors asked at ① are not asked again at ②.", True),
+    ("Questions asked at ① are settled. A spec written later does not ask the same question again at ②.", True),
     ("Doors at ① are asked again at ②, never skipped.", False),
     ("a spec written later asks them again at ②, not trusting ①.", False),
+    ("Questions asked at ① are settled. A spec written later asks the same question again at ②, not skipped.", False),
 ])
 def test_no_reask_detector_ties_negation_to_verb(sentence: str, expected: bool) -> None:
     """Self-test: only a negated verb before "again at ②" counts as no-reask."""
@@ -225,13 +228,13 @@ def test_no_reask_detector_ties_negation_to_verb(sentence: str, expected: bool) 
 
 
 def test_product_gate_and_merge_gate_skip_doors_asked_at_one() -> None:
-    """Acceptance 2: a product door asked at ① is not asked again at ②."""
+    """Acceptance 4: an answered outcome or authorization question is not repeated."""
     assert _says_no_reask(_product_gate())
     merge = ONE_WAY_DOOR.read_text(encoding="utf-8").split("**Merge.**", 1)[1]
     assert _says_no_reask(merge.split("\n## ", 1)[0])
     asked = _text().split("## What you will be asked", 1)[1]
     item2 = re.sub(r"\s+", " ", asked.split("\n2. ", 1)[1].split("\n3. ", 1)[0])
-    assert "product one-way doors not asked at ①" in item2
+    assert "unresolved product outcome or authorization questions not asked at ①" in item2
 
 
 def test_template_placeholder_names_table_and_diagram() -> None:
