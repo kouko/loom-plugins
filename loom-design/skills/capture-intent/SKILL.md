@@ -352,6 +352,7 @@ the intent and restate again; there is no limit on rounds here.
 `loom-code:write-plan` runs the intent check on this file before planning.
 <!-- /gate -->
 
+If `<type>/<change-id>` already exists, switch to it with `git switch <type>/<change-id>`.
 ## Step 5 — Hand off
 
 Branch: everything after the intent lives on the change branch of Step 4.
