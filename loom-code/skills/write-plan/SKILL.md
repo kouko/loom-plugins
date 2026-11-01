@@ -374,3 +374,7 @@ Commit the plan (**Branch before the first commit**) with the message `docs(loom
 the change to the build station — `loom-code:build` — which dispatches one
 implementer per task, runs task and integration tests, and calls the
 closing-review station once at branch end.
+When the plan is committed and required checks pass, call `loom-code:build`
+in the same turn. A progress report naming Build does not complete the
+hand-off. A failed check or unresolved user decision blocks dependent work;
+continue independent work while resolving it.

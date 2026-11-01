@@ -291,6 +291,17 @@ def test_branch_rule_precedes_confirmation_and_skip_record_commits() -> None:
     assert affirms(on_yes, "Commit it", "on the change branch", _RULE)
 
 
+def test_committed_passing_plan_enters_build_in_same_turn() -> None:
+    handoff = " ".join(
+        _section(SKILL.read_text(encoding="utf-8"), "## Step 6 — Commit and hand off").split()
+    )
+    assert affirms(
+        handoff, "call", "`loom-code:build`", "same turn", "checks pass",
+    )
+    assert "progress report" in handoff and "does not complete the hand-off" in handoff
+    assert "failed check" in handoff and "unresolved user decision" in handoff
+
+
 def test_intent_on_trunk_allowance_absent() -> None:
     """A4 negative: no sentence lets the intent (or anything) stay on trunk."""
     text = " ".join(SKILL.read_text(encoding="utf-8").split())
