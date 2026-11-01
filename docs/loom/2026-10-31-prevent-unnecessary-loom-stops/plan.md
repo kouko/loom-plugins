@@ -8,6 +8,7 @@ charter: 1.1
 - Error: loom-code/skills/closing-review/SKILL.md §4 separates technical repair from renewed external-review authorization and changed user requirements.
 - Data: loom-code/skills/write-plan/references/one-way-door.md makes three trade-offs and five door classes reasons to ask; two loom-design skills repeat the rule.
 - Boundary: PRINCIPLES.md non-negotiables 1 and 5 limit user questions and require consent before changing or sending existing data.
+- Observed hand-offs: Claude Code ended after a committed plan named Build (2026-10-24) and after passing tests named Closing Review (2026-10-28). Both required `請繼續`.
 
 ## Task DAG
 
@@ -102,6 +103,33 @@ Wave 3 — integrate the newly fetched trunk release and give this guidance dist
 - Test: A3 positive: root listing and pinned tests match 3.54.0 and 2.18.0; negative: stale pins fail.
 - Risk: The root README also contains trunk's shared-diagram documentation; preserve it while changing only the two version strings.
 
+Wave 4 — repair the two observed station exits without adding a new stop or review mechanism.
+
+**W4-01 Execute the Write Plan to Build hand-off in the same turn**  after: W3-04  acceptance: 1, 2, 5
+- Files: loom-code/skills/write-plan/SKILL.md, loom-code/tests/test_write_plan_station_text.py
+- Test: A2 positive: a committed passing plan calls Build in the same turn; negative: a progress-only hand-off is incomplete; boundary: a failed plan check or unresolved user decision still stops dependent work.
+- Risk: The historical 2026-10-24 pause occurred after the plan and next station were already named. Keep plan confirmation and authorization boundaries intact.
+
+**W4-02 Execute the Build to Closing Review hand-off in the same turn**  after: W4-01  acceptance: 1, 2, 5
+- Files: loom-code/skills/build/SKILL.md, loom-code/tests/test_build_handoff_continuation.py
+- Test: A2 positive: committed content, passing package suite and adversarial programs call Closing Review in the same turn; negative: a progress-only hand-off is incomplete; boundary: failed required checks do not enter review.
+- Risk: The historical 2026-10-28 pause followed a passing focused suite. Preserve the existing complete-suite and adversarial prerequisites.
+
+**W4-03 Complete the generated-attestation hand-off**  after: W4-02  acceptance: 1, 2, 5
+- Files: loom-code/skills/closing-review/SKILL.md, loom-code/tests/test_review_convergence_contract.py
+- Test: A1 positive: generated valid attestation is committed in the same turn; A2 positive: the committed attestation is handed to Ship in that turn; boundary: failed finalization and stated stop conditions retain their existing routes.
+- Risk: The 2026-10-22 pause after attestation generation is a separate gap from the earlier reviewer-verdict pause. Do not claim a valid attestation before it is committed.
+
+**W4-04 Release the expanded loom-code guidance**  after: W4-01, W4-02, W4-03  acceptance: 1, 2
+- Files: loom-code/.claude-plugin/plugin.json, loom-code/.codex-plugin/plugin.json, loom-code/plugin.json, loom-code/package.json, loom-code/CHANGELOG.md, loom-code/README.md, loom-code/README.ja.md, loom-code/README.zh-TW.md
+- Test: source and generated manifests, changelog, and plugin READMEs agree on 3.55.0.
+- Risk: Guidance changes require a minor version; derive exported manifests and bump before finalization so the attestation binds the release tree.
+
+**W4-05 Refresh shared version listing and pin**  after: W4-04  acceptance: 1, 2
+- Files: README.md, loom-code/tests/test_write_plan_station_text.py
+- Test: root README and current-version test agree with the 3.55.0 manifest.
+- Risk: Preserve the loom-design version and other release entries in the shared README.
+
 ## Simplicity check
 - none found
 
@@ -110,6 +138,6 @@ Wave 3 — integrate the newly fetched trunk release and give this guidance dist
 ① — consequence — 你是否同意把這三項從「預設要問」改為「預設由 agent 查證並決定；只在你的結果偏好或授權未定時問」？
 
 ## Risks
-1. The 2026-10-22 Closing Review stop is observed; other station stops are only candidate risks, so this plan changes no other hand-off wording without a failing case.
+1. The 2026-10-22 Closing Review stop and the 2026-10-24 Write Plan and 2026-10-28 Build hand-off stops are observed. Wave 4 touches only these proven paths and preserves every stated stop condition.
 2. Three policy copies can drift; preserve the existing cross-copy test and use behavior-focused cases that distinguish technical choice from consent.
 3. No new reviewer, checker rule, user decision point, or automatic external execution is introduced.
