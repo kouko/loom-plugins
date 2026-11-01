@@ -1,15 +1,16 @@
 """`push --hook`: the PreToolUse hook every host runs before a shell call.
 
-No publication command is refused here. A publication command's most
+Direct Git merge, commit, or push on main/master is refused. A publication command's most
 common shape earns one reminder line naming the branch's verification
 status, every other shape is silent, and a failure inside that path allows
 (spec 2026-09-22-publication-floor-moves-to-github REQ-4, REQ-12). The one
-remaining refusal is an unreadable hook call: a missing, empty, malformed
+other refusal is an unreadable hook call: a missing, empty, malformed
 or non-object payload exits 2.
 """
 from __future__ import annotations
 
 from loom_checker.helpers import UsageError
+from loom_checker.helpers import git_maybe
 from loom_checker.helpers import repo_root
 from loom_checker.rule_checks.push import publication_kind
 from loom_checker.verification import identify_change
@@ -19,7 +20,11 @@ from loom_checker.verification import verification_status
 from pathlib import Path
 import json
 import os
+import re
 import sys
+
+
+DIRECT_GIT_CHANGE = re.compile(r"^\s*git[ \t]+(merge|commit|push)(?=[ \t]|$)")
 
 
 def read_hook_payload(stdin=sys.stdin) -> dict | None:
@@ -52,16 +57,31 @@ def cmd_push(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     if payload is None:
         raise UsageError("push --hook expects a PreToolUse JSON payload on stdin.")
     command = str((payload.get("tool_input") or {}).get("command", ""))
+    cwd = Path(str(payload.get("cwd") or os.getcwd()))
+    if _protect_main(command, cwd):
+        err.write("loom: direct git merge, commit, or push on main/master is blocked. "
+                  "Set repo-local loom.protectMain=false to opt out.\n")
+        return 2
     kind = publication_kind(command)
     if kind is None:
         return 0
     try:
-        line = _reminder(kind, Path(str(payload.get("cwd") or os.getcwd())))
+        line = _reminder(kind, cwd)
     except Exception as exc:  # a reminder that cannot be computed never blocks
         line = f"loom: publication hook failed ({exc}); allowing."
     if line:
         _emit(line, out, err)
     return 0
+
+
+def _protect_main(command: str, cwd: Path) -> bool:
+    """A literal Git verb at the start, including when later shell text follows."""
+    if not DIRECT_GIT_CHANGE.match(command):
+        return False
+    branch = git_maybe(cwd, "symbolic-ref", "--quiet", "--short", "HEAD")
+    if branch not in {"main", "master"}:
+        return False
+    return git_maybe(cwd, "config", "--local", "--bool", "--get", "loom.protectMain") != "false"
 
 
 def _reminder(kind: str, cwd: Path) -> str | None:
