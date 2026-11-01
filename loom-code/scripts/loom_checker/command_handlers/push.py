@@ -78,9 +78,11 @@ def _protect_main(command: str, cwd: Path) -> bool:
     """A literal Git verb at the start, including when later shell text follows."""
     if not DIRECT_GIT_CHANGE.match(command):
         return False
+    # https://git-scm.com/docs/git-symbolic-ref (--quiet for detached HEAD, --short for branch name)
     branch = git_maybe(cwd, "symbolic-ref", "--quiet", "--short", "HEAD")
     if branch not in {"main", "master"}:
         return False
+    # https://git-scm.com/docs/git-config (--local limits scope; --bool normalizes false values)
     return git_maybe(cwd, "config", "--local", "--bool", "--get", "loom.protectMain") != "false"
 
 
