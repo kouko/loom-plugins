@@ -8,7 +8,7 @@
 > from machines checking machines — the agent that writes is never the agent
 > that reviews.
 
-**Version**: 3.55.0 · **Skills**: 5 stations + 1 router + 1 external review skill · [CHANGELOG.md](CHANGELOG.md)
+**Version**: 3.55.1 · **Skills**: 5 stations + 1 router + 1 external review skill · [CHANGELOG.md](CHANGELOG.md)
 **Languages**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -127,6 +127,11 @@ says "fine". Stations call it at intake, for `reviewer-count` and for
 on committed content and generates the content-bound attestation. The installed `PreToolUse` hook
 runs it again before `git push` and `gh pr create`: it recomputes the content
 digest and validates that evidence without replaying tests or probes.
+The same hook blocks `git merge`, `git commit`, and `git push` when the Git
+command starts the shell input on `main` or `master`, even if `&&` or `;`
+follows it. Feature-branch work continues. A prefixed command such as
+`cd ... && git push`, a wrapper, or a script is outside this guard; the
+repo-local `loom.protectMain=false` setting opts out a specific repository.
 
 Stations use `scripts/loom-python --repair` to prepare their own checker Python
 and dependencies in a user cache, then rerun the original check. This does not

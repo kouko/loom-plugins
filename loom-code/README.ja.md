@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.55.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.55.1 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -126,6 +126,11 @@ checker が「問題なし」と言うことはありません。ステーショ
 生成します。インストール済みの `PreToolUse` hook は `git push` と
 `gh pr create` の前にもう一度走り、内容の digest を再計算して、テストや probe を
 再実行せずにその証拠を検証します。
+同じ hook は、シェル入力が `git merge`、`git commit`、`git push` で始まる場合、
+`main` または `master` で止めます。後ろに `&&` や `;` が続いても対象です。
+機能ブランチでの作業は続行できます。`cd ... && git push` のように前に別の
+コマンドがある場合、ラッパー、スクリプトは対象外です。リポジトリ固有の
+`loom.protectMain=false` 設定で保護を無効にできます。
 
 ステーションは `scripts/loom-python --repair` で checker 専用の Python と依存
 パッケージをユーザーキャッシュに用意し、元のチェックを再実行します。プロジェクトの
