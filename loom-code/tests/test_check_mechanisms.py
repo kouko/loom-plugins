@@ -305,6 +305,24 @@ class TestRecompute:
         path.write_text(json.dumps(hooks))
         assert "PreToolUse:Bash:language-anchor.py" in cm.recompute_hooks(repo)
 
+    @pytest.mark.parametrize("redirect", [">/dev/null", "> /dev/null"])
+    def test_hook_id_ignores_redirection_before_conditional_script(self, tmp_path, redirect):
+        repo = _build_repo(tmp_path)
+        path = repo / "loom-code/hooks/hooks.json"
+        hooks = json.loads(path.read_text())
+        hooks["hooks"]["PostToolUse"] = [{
+            "matcher": "Skill",
+            "hooks": [{"type": "command", "command": (
+                f"if python3 -c 'import json,sys' {redirect} 2>&1; "
+                'then exec python3 "${CLAUDE_PLUGIN_ROOT}/hooks/language-anchor.py"; fi'
+            )}],
+        }]
+        path.write_text(json.dumps(hooks))
+
+        ids = cm.recompute_hooks(repo)
+        assert "PostToolUse:Skill:language-anchor.py" in ids
+        assert "PostToolUse:Skill:null" not in ids
+
     def test_contract_from_manifest_is_per_field(self, tmp_path):
         """F10: contract recompute registers one id per artifact FIELD
         (`artifact:<name>.<field>`), not one per artifact."""
@@ -955,18 +973,7 @@ class TestMeasureFailsClosed:
     def test_real_repo_measure_is_green(self):
         assert cm.run_measure(REPO) == 0
 
-    def test_twenty_three_counted_skills_fit_admitted_external_review_budget(self, tmp_path):
-        repo = _measure_repo(tmp_path, words=10,
-                             baseline_line="- session-start-baseline: <sha> 10 — measured")
-        # The fixture already contains two counted skills.
-        for number in range(21):
-            skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
-            skill.parent.mkdir(parents=True, exist_ok=True)
-            skill.write_text("# Skill\n")
-        assert cm.measure_skill_count(repo) == 23
-        assert cm.run_measure(repo) == 0
-
-    def test_twenty_fourth_counted_skill_exceeds_budget(self, tmp_path, capsys):
+    def test_twenty_four_counted_skills_fit_declared_diagram_budget(self, tmp_path):
         repo = _measure_repo(tmp_path, words=10,
                              baseline_line="- session-start-baseline: <sha> 10 — measured")
         # The fixture already contains two counted skills.
@@ -975,5 +982,16 @@ class TestMeasureFailsClosed:
             skill.parent.mkdir(parents=True, exist_ok=True)
             skill.write_text("# Skill\n")
         assert cm.measure_skill_count(repo) == 24
+        assert cm.run_measure(repo) == 0
+
+    def test_twenty_fifth_counted_skill_exceeds_budget(self, tmp_path, capsys):
+        repo = _measure_repo(tmp_path, words=10,
+                             baseline_line="- session-start-baseline: <sha> 10 — measured")
+        # The fixture already contains two counted skills.
+        for number in range(23):
+            skill = repo / "loom-code" / "skills" / f"skill-{number}" / "SKILL.md"
+            skill.parent.mkdir(parents=True, exist_ok=True)
+            skill.write_text("# Skill\n")
+        assert cm.measure_skill_count(repo) == 25
         assert cm.run_measure(repo) == 1
-        assert "skill count 24 exceeds the loom budget of 23" in capsys.readouterr().out
+        assert "skill count 25 exceeds the loom budget of 24" in capsys.readouterr().out

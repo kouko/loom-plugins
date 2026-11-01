@@ -1,0 +1,92 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-29-shared-diagram-tool",
+  "content_digest": "a7861b84722ff284895fe79da9a68c154e63e21a",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py",
+      "artifact": "loom-workflow/tests/loom-interactive-diagram/test_reference_link_invalid_diagram.py",
+      "result": "pass",
+      "command_digest": "396677005fd08e2527730a460f2da6c1057540a7147dc2a3ea6e3f327a467508"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py",
+      "artifact": "loom-workflow/tests/loom-interactive-diagram/test_parenthesized_link_invalid_diagram.py",
+      "result": "pass",
+      "command_digest": "1ca2193ec7e75ecebe121a341e059774641a8c55b7c049199faa40b9bed45d8d"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-interactive-diagram/test_wait_nonfinite_arguments.py",
+      "artifact": "loom-workflow/tests/loom-interactive-diagram/test_wait_nonfinite_arguments.py",
+      "result": "pass",
+      "command_digest": "906d0a109404a9295c26e37d689c6cc0b5118179a2d1cf2ac72053cb29840194"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/diagram_description_code_review",
+      "vendor": "openai",
+      "model": "host-inherited-unverified",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "a505b60583794567010507018a3921713f681370",
+      "review_target_sha": "f991be785470ad477c26b1831d68cb24f903bb14",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES — all 225 changed-file tests passed; the earlier A9/A10 waiter and its tests landed together, so committed RED evidence for that behavior remains unavailable",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The focused description assertion passes at HEAD; the pre-fix description fails its positive phrases and retains the forbidden phrase.",
+        "This verifies discovery wording, not actual host skill selection; the acceptance report identifies that limit.",
+        "Git status was clean and git diff --check passed."
+      ]
+    },
+    {
+      "reviewer": "/root/diagram_description_skill_review",
+      "vendor": "openai",
+      "model": "host-inherited-unverified",
+      "lens": "skill",
+      "verdict": "PASS",
+      "reviewed_sha": "a505b60583794567010507018a3921713f681370",
+      "review_target_sha": "f991be785470ad477c26b1831d68cb24f903bb14",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "The description covers initial creation and saved-edit readback; draw.io remains the default among registered selectable formats.",
+        "Actual natural-language host skill selection remains untested, as the acceptance evidence states.",
+        "The focused test could not be rerun by this reviewer: Python lacks pytest and isolated uv could not reach PyPI; direct source checks and backend-list command passed."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

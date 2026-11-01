@@ -201,7 +201,18 @@ def recompute_checker_rules(repo: Path) -> set[str]:
 
 def _command_basename(command: str) -> str:
     tokens = [a or b for a, b in QUOTED_TOKEN_RE.findall(command)]
-    path_tokens = [t for t in tokens if "/" in t]
+    path_tokens = []
+    skip_operand = False
+    for token in tokens:
+        if skip_operand:
+            skip_operand = False
+            continue
+        redirection = re.match(r"^\d*(?:>>?|<<?)", token)
+        if redirection:
+            skip_operand = redirection.end() == len(token)
+            continue
+        if "/" in token:
+            path_tokens.append(token)
     target = path_tokens[0] if path_tokens else (tokens[-1] if tokens else command)
     if Path(target).name == "loom-python" and "--ready" in tokens:
         if "--script" in tokens:
@@ -691,14 +702,16 @@ def run_measure(repo: Path) -> int:
     print(f"artifact-type count (manifest): {artifact_types}")
     # Three optional discovery routers are explicitly admitted in release 3.1.3;
     # the loom-design architecture tool is explicitly admitted in release 3.16.0;
-    # the shared external-review boundary is admitted in release 3.39.0.
-    if skill_count > 23:
-        print(f"RED: skill count {skill_count} exceeds the loom budget of 23")
+    # the shared external-review boundary is admitted in release 3.39.0;
+    # shared editable diagrams are admitted in release 3.53.0 with an R3
+    # budget-exception entry in loom-workflow 5.17.0.
+    if skill_count > 24:
+        print(f"RED: skill count {skill_count} exceeds the loom budget of 24")
     if artifact_types > 8:
         print(f"RED: artifact-type count {artifact_types} exceeds the per-change budget of 8")
     print(f"session-start word count: {words}")
 
-    exit_code = 1 if (skill_count > 23 or artifact_types > 8) else 0
+    exit_code = 1 if (skill_count > 24 or artifact_types > 8) else 0
     if words < 0:
         print("RED: no loom-code/hooks/session-start to measure; the injection "
               "budget cannot be recomputed")

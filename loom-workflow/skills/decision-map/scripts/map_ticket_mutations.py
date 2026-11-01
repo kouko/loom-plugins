@@ -12,6 +12,7 @@ from types import ModuleType
 from typing import TYPE_CHECKING
 
 import map_store
+import map_validation
 
 if TYPE_CHECKING:
     from map_transaction import StoreRevision, MutationResult
@@ -152,7 +153,7 @@ def _update_blockers_locked(
     }
     graph[ticket_slug] = blockers
     try:
-        map_store._check_blocked_by(graph, map_dir / "tickets")
+        map_validation._check_blocked_by(graph, map_dir / "tickets")
     except map_store.SchemaViolation as exc:
         raise transaction.CloseTransactionError(str(exc)) from exc
     statuses = {

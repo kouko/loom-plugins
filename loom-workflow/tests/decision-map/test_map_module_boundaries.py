@@ -122,10 +122,10 @@ def test_persistence_owner_preserves_exception_identity():
     assert definitions.isdisjoint({"_restore_cas_mismatch", "_commit_exchanged_candidate"})
 
 
-@pytest.mark.parametrize("module", ["map_lifecycle", "map_transaction", "migrate_map_v3"])
+@pytest.mark.parametrize("module", ["map_lifecycle", "map_transaction", "migrate_map_v3", "start_delivery"])
 def test_consumers_have_no_private_store_io_calls(module):
     tree = ast.parse((Path(__file__).resolve().parents[2] / "skills" / "decision-map" / "scripts" / f"{module}.py").read_text())
-    private_io = {"_atomic_write", "_exchange_paths", "_fsync_directory",
+    private_io = {"_atomic_write", "_append_section_fields", "_exchange_paths", "_fsync_directory",
                   "_assert_contained", "_assert_no_symlink_components"}
     calls = {node.attr for node in ast.walk(tree)
              if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name)

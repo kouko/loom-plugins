@@ -10,9 +10,10 @@ adapter maps agy events onto the handlers Claude Code and Codex already use:
     pre-invocation  PreInvocation           -> hooks/session-start (first turn only)
                                                + language-anchor on a loom SKILL.md read
 
-Exit status is always 0; decisions travel in the JSON. The push gate never
-refuses publication: when the checker is missing or cannot answer it allows
-and says so (the same rule as the Codex stale-root fallback).
+Exit status is always 0; decisions travel in the JSON. The checker denies
+direct Git merge, commit, or push on main/master; publication reminders allow.
+When the checker is missing or cannot answer, the adapter allows and says so
+(the same rule as the Codex stale-root fallback).
 """
 from __future__ import annotations
 

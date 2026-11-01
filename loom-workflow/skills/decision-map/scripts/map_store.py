@@ -222,7 +222,7 @@ def atomic_write(path: Path, text: str, *, expected: bytes | None = None) -> Non
     _atomic_write(path, text, expected=expected)
 
 
-def _append_section_fields(text: str, section: str, fields: list[str]) -> str:
+def append_section_fields(text: str, section: str, fields: list[str]) -> str:
     lines = text.splitlines()
     heading = f"## {section}"
     matches = [index for index, line in enumerate(lines) if line.strip() == heading]
@@ -238,6 +238,9 @@ def _append_section_fields(text: str, section: str, fields: list[str]) -> str:
     insertion = ([] if end == start else [""]) + fields
     lines[end:end] = insertion
     return "\n".join(lines) + ("\n" if text.endswith("\n") else "")
+
+
+_append_section_fields = append_section_fields
 
 
 def require_work_mutable(map_dir: Path, operation: str) -> MapDocument:

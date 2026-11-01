@@ -1,12 +1,55 @@
 # Changelog
 
-## [3.51.0] — 2026-10-28 — evidence drift guards: coverage, commit identity, intent version
+## [3.55.1] — 2026-11-01 — guard direct main-branch Git operations
 
-- Four new loom_checker rules bind the evidence to what it actually tested. `intake.attestation-coverage` fails when the acceptance report does not state every intent Acceptance line exactly once; `intake.commit-identity` fails when a v2 attestation omits the tested and reviewed commits or when their functional content differs; `intake.intent-version` fails when the confirmed intent changed after the sha its attestation pinned; `intake.plan-boundary-tests` fails when a plan names a boundary test task the change does not carry.
-- The v2 attestation carries the bookkeeping these rules check: `intent_confirmed_sha`, `tested_commit`, `reviewed_commit` and per-line `acceptance_status` (`works` / `partly` / `not_verified` / `fails`). v1 attestations and intents confirmed before the field existed are skipped, not failed.
-- Closing review files its verdicts in the change directory, and finalize-review re-runs the drift checks before writing the attestation, so drift is caught at publication as well as at review entry.
-- `docs/loom/<change-id>/acceptance-test-report.md` and `docs/loom/<change-id>/evidence/*` are publication-only paths: a difference there between the tested and the reviewed tree never fails the identity check, while a functional difference does. The glob stops at one level so `evidence/probes/` — the change's executable probe programs — stays functional content.
-- Raise the probe-program ceiling from 5 to 6 (`adversarial.proportionate`): a change with one honest probe program of its own could be refused when the branch also carries another change's graduated probes, so the ceiling accommodates the union rather than forcing a cap exception.
+- The installed Loom `PreToolUse` hooks block `git merge`, `git commit`, and `git push` when the Git command starts the shell input on `main` or `master`, including when `&&` or `;` follows it; normal feature-branch work continues.
+- A prefixed command such as `cd ... && git push`, a wrapper, or a script is outside this guard. The repo-local `loom.protectMain=false` opt-out allows intentional main-branch work in a specific repository.
+- After updating the plugin, users who also register a separate user-level bash-guard should remove that duplicate registration in their dotfiles; installing this version does not change user settings.
+
+## [3.55.0] — 2026-11-01 — continue through passing Loom stations
+
+- `write-plan` calls Build in the same turn after a committed plan passes its checks; a progress report alone does not complete the hand-off.
+- Build calls Closing Review in the same turn after the required package suite and adversarial programs are satisfied; failed checks remain in Build.
+- Closing Review commits a valid generated attestation with publication metadata, then calls Ship in the same turn; stated stop conditions and failed-finalization routes remain in force.
+
+## [3.54.0] — 2026-10-31 — docs(loom-code): decide technical choices and continue closing review
+
+- `write-plan` checks existing decisions, project evidence, tests, and applicable external sources before resolving technical choices. A costly-to-reverse choice or three or more trade-offs prompts disclosure of material consequences, not an automatic question; unresolved user outcome preferences and missing authorization still go to the user.
+- `closing-review` runs `finalize-review` when its required verdicts and probe evidence are ready, then continues to Ship after a valid attestation is committed unless a stated stop condition applies. A progress update alone does not complete either step.
+
+## [3.53.0] — 2026-10-30 — register shared diagram tool
+
+- Register `loom-interactive-diagram` as a workflow tool in the contract manifest and pin its contract test count.
+- Raise the counted-skill measurement ceiling from 23 to 24 for this declared tool.
+- budget-exception: loom-interactive-diagram — adds one shared skill and one contract tool; regression eval `loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py`.
+
+## [3.52.2] — 2026-10-30 — fix(hooks): run simple hooks without checker package readiness
+
+- Language-anchor hooks and Antigravity pre-invocation use an available host Python without requiring the checker runtime or PyYAML cache.
+- Hosts without `python3` retain the existing ready cached interpreter path. Publication gates still require checker readiness and keep their failure behavior.
+- Mechanism counting ignores shell redirection operands before the hook script path, preserving the registered hook identities for conditional commands.
+
+## [3.52.1] — 2026-10-29 — refactor(write-plan): move loom-design-absent paths to references
+
+- The no-intent interview moves to `references/no-intent-interview.md`.
+- The intent-writing rules move to `references/confirm-intent.md`, still loaded at step 3.
+- The self-written minimal spec path and the product-spec gate move to `references/self-written-spec.md`, read when `write-plan` writes a spec itself.
+- `write-plan` SKILL.md body drops from 3749 to 2785 words; the 3750-word cap is unchanged. No rule wording changed.
+
+## [3.52.0] — 2026-10-29 — fix(checker): run the detected package suite in a uv project's locked environment
+
+- When the repo commits `uv.lock` and declares no `package-tests:`, the detected suite command is `uv run --locked python -m pytest -q` (ahead of the pyproject.toml row), so the suite runs in the project's locked env regardless of the first `python3` on PATH; `--locked` stops on a stale lockfile with a `uv lock` hint and never rewrites it. A declared `package-tests:` keeps precedence.
+- Pytest collection for graduated adversarial programs recognizes any `python -m pytest` command wrapped by `conda run -n` or `uv run` through one generic branch (the conda-only branch is gone).
+- Repos without `uv.lock` get the same command as before. A committed `uv.lock` without `uv` installed now fails with "command not found".
+- A git-ignored build marker no longer selects the suite command.
+- Build step 3 now points to the checker's marker table (`TEST_COMMAND_MARKERS` in `scripts/loom_checker/probes.py`) for the suite command when `package-tests:` is absent, instead of leaving "build markers" to the agent. `uv run --locked` creates the project's `.venv` or syncs its locked packages to the lock (extras kept), and never touches committed files.
+
+## [3.51.0] — 2026-10-29 — docs(write-plan, ship): branch before the first commit and never discard trunk unasked
+
+- `write-plan` states one "Branch before the first commit" rule in Workflow setup, ahead of every change-owned commit (intent confirmation, needs-design fix, skipped-by-instruction record, plan): reuse this change's own branch, create it when on the trunk, on the trunk switch to an already-existing `<type>/<change-id>` with `git switch <type>/<change-id>` (never re-created, `-C`, or reset), work in the other worktree when one has it checked out, and on an unrelated branch or detached HEAD commit nothing there and never `git switch`: open a new worktree (`git worktree add <path> <type>/<change-id>` when the branch exists, else `git worktree add -b <type>/<change-id> <path> <trunk>`) and continue in it, without resetting or discarding the original checkout's work; on any move to another worktree, existing or new, every uncommitted file this change produced (the intent draft, a `PRINCIPLES.md` edit) moves there, to be committed on the change branch. Step 3, Step 6 and `confirm-intent.md` point at the rule.
+- `write-plan` drops redundant restatements (needs-design kind parity, the Current State Evidence pointer, the intake-check preamble, the PR title becoming the squash commit, the branch type reused as the PR title type, and the station-entry full-flow sentence) to stay within its word cap; behaviour unchanged.
+- `write-plan` drops the allowance for leaving a confirmed intent committed on the trunk; `confirm-intent.md` commits the confirmation on the change branch.
+- `ship` §5 reports land's `trunk not updated` line to the maintainer and leaves the trunk as it is; local trunk commits and uncommitted changes in the trunk checkout (stash, restore, checkout discard) are never discarded without the maintainer's explicit yes, and merge acceptance at decision point ③ is not that permission. `land.py` is unchanged.
 
 ## [3.50.0] — 2026-10-27 — feat(closing-review): accept a recorded no-program adversarial outcome
 

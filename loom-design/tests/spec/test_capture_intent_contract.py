@@ -80,6 +80,21 @@ def _section(text: str, heading: str) -> str:
     return m.group(0)
 
 
+def test_decision_point_one_decides_measured_technical_choices() -> None:
+    step = " ".join(_section(_text(), "## Step 4 — Decision point ①: restate and confirm").split())
+    assert "measure" in step and "agent-decided" in step
+    assert "hard to swap later alone does not require a user question" in step.lower()
+    assert "three or more trade-offs alone do not require a user question" in step.lower()
+
+
+def test_decision_point_one_asks_only_unresolved_outcomes_or_authorization() -> None:
+    step = " ".join(_section(_text(), "## Step 4 — Decision point ①: restate and confirm").split()).lower()
+    assert "materially change the user's outcome" in step and "preference remains unresolved" in step
+    assert "already pinned" in step and "do not ask again" in step
+    assert "disclose" in step and "consequence" in step
+    assert "existing data" in step and "explicit consent" in step
+
+
 STEP_4 = "## Step 4 — Decision point ①: restate and confirm"
 
 # Whole sentences, not keyword subsets: a keyword pin lets reversed meaning pass.
@@ -230,7 +245,7 @@ def test_referenced_relative_paths_exist() -> None:
     assert not missing, missing
 
 
-def test_loom_design_version_2_2_0_consistent() -> None:
+def test_loom_design_version_2_17_0_consistent() -> None:
     claude_manifest = json.loads(PLUGIN_JSON.read_text(encoding="utf-8"))
     codex_manifest = json.loads(
         (REPO / "loom-design/.codex-plugin/plugin.json").read_text(encoding="utf-8")
@@ -242,25 +257,115 @@ def test_loom_design_version_2_2_0_consistent() -> None:
         (REPO / "loom-design/package.json").read_text(encoding="utf-8")
     )
     changelog = (REPO / "loom-design/CHANGELOG.md").read_text(encoding="utf-8")
-    assert claude_manifest["version"] == "2.16.0"
-    assert codex_manifest["version"] == "2.16.0"
-    assert agy_manifest["version"] == "2.16.0"
-    assert package_manifest["version"] == "2.16.0"
-    assert "## [2.16.0]" in changelog
+    assert claude_manifest["version"] == "2.18.0"
+    assert codex_manifest["version"] == "2.18.0"
+    assert agy_manifest["version"] == "2.18.0"
+    assert package_manifest["version"] == "2.18.0"
+    assert "## [2.18.0]" in changelog
     assert "## [2.2.1]" not in changelog
     readme_pins = {
-        "README.md": "| [`loom-design`](loom-design/) | 2.16.0 |",
-        "loom-design/README.md": "**Version**: 2.16.0",
-        "loom-design/README.ja.md": "**Version**: 2.16.0",
-        "loom-design/README.zh-TW.md": "**Version**: 2.16.0",
+        "README.md": "| [`loom-design`](loom-design/) | 2.18.0 |",
+        "loom-design/README.md": "**Version**: 2.18.0",
+        "loom-design/README.ja.md": "**Version**: 2.18.0",
+        "loom-design/README.zh-TW.md": "**Version**: 2.18.0",
     }
     for name, pin in readme_pins.items():
         assert pin in (REPO / name).read_text(encoding="utf-8"), name
+    assert "## loom-design\n\nVersion 2.18.0." in (REPO / "README.md").read_text(encoding="utf-8")
 
 
 def test_capture_intent_bare_branch_absent() -> None:
     bare = "creates " + "`<change-id>`"  # split so the repo sweep grep skips this pin
     assert bare not in _text()
+
+
+# --- change-branch-before-intent W1-02 -- the intent commit lands only on
+# the change's branch ------------------------------------------------------
+
+_SWITCH = "git switch -c <type>/" + "<change" + "-id>"
+_TYPES = {"feat", "fix", "docs", "refactor", "test", "chore", "ci"}
+
+
+def _on_yes() -> str:
+    text = _text()
+    start = text.index('**On "yes":**')
+    return _flat(text[start:text.index("<!-- /gate -->", start)])
+
+
+def test_capture_intent_branches_before_confirmation_commit() -> None:
+    """A1 positive: HEAD becomes the typed change branch before the
+    confirmation commit; the type list appears once in this station."""
+    text, on_yes = _text(), _on_yes()
+    assert text.count(_SWITCH) == 1 and _SWITCH in on_yes
+    assert on_yes.index(_SWITCH) < on_yes.index("`docs(loom): intent")
+    assert affirms(on_yes, "Before the confirmation commit", "make HEAD the change's branch")
+    listed = [
+        s for s in re.split(r"(?<=[.;])\s+", _flat(text))
+        if len(set(re.findall(r"`([a-z]+)`", s)) & _TYPES) >= 3
+    ]
+    assert len(listed) == 1 and _TYPES <= set(re.findall(r"`([a-z]+)`", listed[0])), listed
+
+
+def test_trunk_commit_allowance_absent() -> None:
+    """A1 negative: no sentence lets the intent be committed on the trunk."""
+    text = _flat(_text()).lower()
+    for phrase in ("committed on the trunk", "does " + "not create branches",
+                   "still on the trunk"):
+        assert phrase not in text, phrase
+
+
+def test_own_change_branch_reused_at_capture() -> None:
+    """A5 positive: this change's branch is reused, the trunk gets one created,
+    and an unrelated branch or detached HEAD gets no commit until resolved."""
+    on_yes = _on_yes()
+    assert affirms(on_yes, "already on", "this change's branch", "reuse it")
+    assert affirms(on_yes, "on the trunk", "create it")
+    assert affirms(on_yes, "switch to it", "`git switch <type>/<change-id>`",
+                   "already exists")
+    force = [s for s in re.split(r"(?<=[.;])\s+", on_yes) if "`-C`" in s]
+    assert force and all(re.search(r"\bnever\b.*`-C`", s) for s in force), force
+    hits = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
+            if "unrelated branch" in s and "detached HEAD" in s]
+    assert len(hits) == 1, hits
+    words = set(re.findall(r"[a-z]+", hits[0].lower()))
+    assert {"resolve", "first", "preserve", "existing", "work"} <= words, hits[0]
+    assert all(re.search(rf"\b(?:no|not|never)\s+{w}\b", hits[0])
+               for w in ("commit", "reset", "discard")), hits[0]
+    assert affirms(on_yes, "Resolve it with",
+                   "`git worktree add -b <type>/<change-id> <path> <trunk>`",
+                   "new worktree", "move", "intent draft")
+
+
+_CARRY = "every uncommitted file this change produced"
+
+
+def test_worktree_moves_carry_every_uncommitted_change_file_at_capture() -> None:
+    """A6 positive: a move to another worktree, existing or new, carries every
+    uncommitted change file, `PRINCIPLES.md` included, onto the change branch.
+    A6 negative: no route moves only the intent draft."""
+    on_yes = _on_yes()
+    assert affirms(on_yes, "move", _CARRY, "another worktree", "intent draft",
+                   "`PRINCIPLES.md`", "commit", "change branch")
+    assert not re.search(r"move (?:the|any) uncommitted intent draft", on_yes)
+
+
+def test_existing_branch_off_trunk_gets_worktree_without_b_at_capture() -> None:
+    """A5 positive: off the trunk, an existing change branch checked out
+    nowhere gets `git worktree add <path> <type>/<change-id>`; an absent one
+    keeps `-b`; a `PRINCIPLES.md` edit moves as its diff, stopping to ask on
+    a conflict. A5 negative: `git switch` is offered only on the trunk."""
+    on_yes = _on_yes()
+    assert affirms(on_yes, "Resolve it with",
+                   "`git worktree add <path> <type>/<change-id>`", "exists",
+                   "`git worktree add -b <type>/<change-id> <path> <trunk>`")
+    offers = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
+              if "`git switch <type>/<change-id>`" in s]
+    assert offers and all("on the trunk" in s for s in offers), offers
+    off_trunk = [s for s in re.split(r"(?<=[.;])\s+", on_yes)
+                 if "unrelated branch" in s and "detached HEAD" in s]
+    assert all(re.search(r"\bno `git switch`", s) for s in off_trunk), off_trunk
+    assert affirms(on_yes, "`PRINCIPLES.md` edit", "diff", "conflicts",
+                   "stop and ask the maintainer")
 
 
 def test_plugin_declares_requires_contract() -> None:

@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from prose_pin import (
+    affirms,
     flat_prose as _flat,
     has_negation,
     split_sentences as _sentences,
@@ -57,6 +58,26 @@ def test_other_role_program_edit_helper_synthetic() -> None:
 def test_no_other_role_edits_adversarial_program() -> None:
     for text in (VERIFY, ADVERSARY_PROSE, ADVERSARIAL_REF):
         assert _other_role_program_edit_sentences(text) == []
+
+
+def test_suite_command_points_to_checker_marker_table() -> None:
+    step3 = VERIFY.split("3. Run the repository's complete package suite", 1)[1]
+    # The marker-file qualifier ("committed and not git-ignored") follows
+    # `whose`; the pin covers the pointer before it.
+    pointer = step3.split(" whose marker file", 1)[0]
+    rule = ("The suite command is", "`TEST_COMMAND_MARKERS`", "probes.py")
+    assert affirms(pointer, *rule), pointer
+    assert affirms("The suite command is the first `TEST_COMMAND_MARKERS` row in probes.py.", *rule)
+    assert not affirms(
+        "The suite command is never the first `TEST_COMMAND_MARKERS` row in probes.py.", *rule
+    )
+
+
+def test_verify_copies_no_marker_command() -> None:
+    from loom_checker.probes import TEST_COMMAND_MARKERS
+
+    for _, command in TEST_COMMAND_MARKERS:
+        assert command not in VERIFY, command
 
 
 def test_returned_change_only_trigger_absent() -> None:

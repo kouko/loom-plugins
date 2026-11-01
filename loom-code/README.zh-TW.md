@@ -6,7 +6,7 @@
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.51.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.55.1 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -90,8 +90,9 @@ Acceptance 無法機械判定時才會做 acceptance testing。
 3. **做到了嗎？** —— 你驗收結果；需要 acceptance test report 時，讀的是從未碰過這次變更的
    agent 寫的那份報告。
 
-不可逆的岔路（刪資料、公開介面、單向遷移）在 engineering 變更時併進 ①、
-product 變更時併進 ②（不寫 spec 時併進 ①），用後果的形式問 —— 不另開停頓點。
+難以回頭的選擇（刪資料、公開介面、單向遷移），在 engineering 變更時於 ①、
+product 變更時於 ②（不寫 spec 時於 ①）說明重大後果。只有使用者想要的結果仍無法從既有決定判斷，
+或缺少明確授權時，才在該決策點提問。變更或傳送既有資料仍需明確同意；不另開停頓點。
 
 ## contract package
 
@@ -111,10 +112,17 @@ package。
 內容上再跑一次 package 測試與對抗程式，並產生綁定內容的 attestation。已安裝的 `PreToolUse`
 hook 在 `git push` 與 `gh pr create` 之前再跑一次：重算內容 digest，並在不重跑
 測試或 probe 的情況下驗證那份證據。
+同一個 hook 也會在 Git 專案的 `main` 或 `master` 分支阻止以
+`git merge`、`git commit` 或 `git push` 開頭的 shell 輸入；即使後面接著
+`&&` 或 `;` 也會阻止。功能分支可照常工作。`cd ... && git push` 這類
+前面有其他指令的輸入、包裝命令與腳本不在保護範圍內；特定儲存庫可透過
+`loom.protectMain=false` 本機設定停用保護。
 
 各站透過 `scripts/loom-python --repair` 在使用者快取中備妥 checker 專用的
-Python 與套件，接著重跑原本的檢查；使用者專案的測試環境不受影響。hook 用
-`--ready` 沿用已備妥的環境，不自行安裝；環境不可用時會顯示修復方式。
+Python 與套件，接著重跑原本的檢查；使用者專案的測試環境不受影響。只用標準函式庫
+的簡單 hook 會使用可運作的系統 Python；若無法使用，則改用已備妥的快取環境。
+需要 checker 的發布 hook 以 `--ready` 沿用已備妥的環境，不自行安裝；環境不可用時
+會顯示修復方式。
 
 ## 與 loom-design、loom-workflow 組合
 

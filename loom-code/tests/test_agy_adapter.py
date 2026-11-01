@@ -104,6 +104,13 @@ def test_non_push_command_returns_allow(change_repo, tmp_path):
     assert out == {"decision": "allow"}
 
 
+def test_main_branch_git_commit_returns_deny(change_repo, tmp_path):
+    _git(change_repo, "switch", "-q", "main")
+    out = _run("push-gate", _tool_payload("git commit -m change", ".", [str(change_repo)]), tmp_path)
+    assert out["decision"] == "deny", out
+    assert "main/master" in out["reason"]
+
+
 @pytest.fixture
 def checkerless_adapter(tmp_path: Path) -> Path:
     root = tmp_path / "plugin"

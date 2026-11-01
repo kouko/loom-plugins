@@ -8,7 +8,7 @@
 > 検査することです — 書く agent がレビューする agent になることは決して
 > ありません。
 
-**バージョン**: 3.51.0 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
+**バージョン**: 3.55.1 · **Skills**: 5 ステーション + 1 ルーター + 1 外部レビュー用 skill · [CHANGELOG.md](CHANGELOG.md)
 **言語**: [English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **リポジトリ**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -100,9 +100,10 @@ reviewer-count` がブランチ全体の差分から計算します — 狭く�
 3. **できましたか？** — 結果を受け入れます。acceptance test report が必要だった場合は、
    その変更に一切触れていない agent が書いたレポートを読みます。
 
-不可逆な分岐（データの削除、公開インターフェース、片道のマイグレーション）は、
-engineering の変更なら ①、product の変更なら ②（spec を書かないなら ①）に、結果の形で足されます —
-余分な停止点は増やしません。
+後から戻しにくい選択（データの削除、公開インターフェース、片道のマイグレーション）は、
+engineering の変更なら ①、product の変更なら ②（spec を書かないなら ①）で重大な影響を伝えます。
+そこで質問するのは、ユーザーが望む結果を既存の決定から判断できない場合、または明示的な許可が欠けている場合だけです。
+既存データの変更や送信には引き続き明示的な同意が必要です。余分な停止点は増やしません。
 
 ## contract package
 
@@ -125,10 +126,17 @@ checker が「問題なし」と言うことはありません。ステーショ
 生成します。インストール済みの `PreToolUse` hook は `git push` と
 `gh pr create` の前にもう一度走り、内容の digest を再計算して、テストや probe を
 再実行せずにその証拠を検証します。
+同じ hook は、シェル入力が `git merge`、`git commit`、`git push` で始まる場合、
+`main` または `master` で止めます。後ろに `&&` や `;` が続いても対象です。
+機能ブランチでの作業は続行できます。`cd ... && git push` のように前に別の
+コマンドがある場合、ラッパー、スクリプトは対象外です。リポジトリ固有の
+`loom.protectMain=false` 設定で保護を無効にできます。
 
 ステーションは `scripts/loom-python --repair` で checker 専用の Python と依存
 パッケージをユーザーキャッシュに用意し、元のチェックを再実行します。プロジェクトの
-テスト環境は変更しません。hook は `--ready` で準備済みの環境だけを使い、
+テスト環境は変更しません。標準ライブラリだけを使う簡単な hook は、動作する
+システムの Python を使い、使えなければ準備済みのキャッシュ環境を使います。
+checker を使う公開用 hook は `--ready` で準備済みの環境だけを使い、
 使えない場合は修復方法を知らせます。hook 自体はインストールしません。
 
 ## loom-design・loom-workflow との組み合わせ

@@ -1,0 +1,89 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-30-python-implementation-refactor",
+  "content_digest": "f436010f60846c9321f275a640fb40c92e9ea552",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3.13 -m pytest loom-workflow/tests/decision-map/test_start_delivery.py",
+      "artifact": "loom-workflow/tests/decision-map/test_start_delivery.py",
+      "result": "pass",
+      "command_digest": "4a48877b66f3108b3e94ccf57c9f1f1270b83feaf66cd1ada4eb3ee59f8c01e8"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "closing-code-reviewer",
+      "vendor": "codex",
+      "model": "gpt-6",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "dc1c3f3e2823532230c5358fe8f6c80dcfb2e6b1",
+      "review_target_sha": "dbdd231d92055eb85ceea3b7f31c3058e06183ab",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "tests",
+          "anchor": "loom-workflow/tests/decision-map/test_map_module_boundaries.py:125",
+          "text": "nitpick: Unfixed from Round 1. The added start_delivery case asserts source structure rather than behavior.",
+          "fix": "Remove start_delivery and _append_section_fields from this structural assertion; retain the entry-level delivery tests."
+        }
+      ],
+      "notes": [
+        "The fix delta only moved a comment. Ran the changed test file in locked uv: 12 passed."
+      ]
+    },
+    {
+      "reviewer": "closing-docs-reviewer",
+      "vendor": "codex",
+      "model": "gpt-6",
+      "lens": "docs",
+      "verdict": "PASS",
+      "reviewed_sha": "dc1c3f3e2823532230c5358fe8f6c80dcfb2e6b1",
+      "review_target_sha": "dbdd231d92055eb85ceea3b7f31c3058e06183ab",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS_WITH_NOTES",
+        "missing-population": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "incorrect-fact",
+          "anchor": "docs/loom/2026-10-30-python-implementation-refactor/evidence/acceptance-test-evidence.md:8",
+          "text": "nitpick: Unfixed from Round 1. start_delivery.py already called the Notes editor in map_store before this refactor; no duplicate editor was replaced.",
+          "fix": "Say the change exposes and reuses the existing Notes editor through a named map_store entry."
+        }
+      ],
+      "notes": [
+        "The fix delta only moves a test concern comment. It does not change the finding evidence or any reviewed documentation."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

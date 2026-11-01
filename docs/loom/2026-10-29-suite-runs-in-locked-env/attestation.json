@@ -1,0 +1,124 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-29-suite-runs-in-locked-env",
+  "content_digest": "159aded5b9c67c3cb67b7be1413df4da841b0bdf",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_probe_ignored_uv_lock.py",
+      "artifact": "loom-code/tests/test_probe_ignored_uv_lock.py",
+      "result": "pass",
+      "command_digest": "a69b942911d9191b70cdf30f43fed94a7d2baf47c4126d1f492dd73bcc3fdf88"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-code-acbc47fb",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "3555782ccddea01fda7fa834f1f27be279807db5",
+      "review_target_sha": "d20d2e718d282a930b5bc0d9acb40b78373dae5f",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES — Round 2: I ran the two changed test files (test_build_mechanical_checks.py and test_loom_attestation.py); 89 passed, none skipped. The rewritten pointer test now checks the Build step 3 sentence with `prose_pin.affirms`, which needs the verb before the literal, every extra in the same sentence, and no negation. Its own self-checks show it accepts the affirmative form and rejects the negated one, so it can fail for the behaviour it names. Round 1 test results stand for the files this delta did not touch.",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS_WITH_NOTES — unchanged from Round 1, outside this fix delta: `uv run --locked` may create or sync the project's .venv. That directory is not committed, and CHANGELOG 3.52.0 discloses this. I did not check this against a real uv project.",
+        "architecture-conformance": "N/A — the repository has no ratified ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [
+        {
+          "severity": "nit",
+          "dimension": "correctness",
+          "anchor": "loom-code/skills/build/SKILL.md:121",
+          "text": "nitpick (non-blocking, unfixed): The text says \"whose marker file is committed and not git-ignored\". The working-tree read (probes.py:796-801) also counts an untracked marker that is not ignored. The outcome is harmless, because finalize-review refuses an unclean tree (finalize.py:243-245).",
+          "fix": "Change \"is committed and not git-ignored\" to \"is present and not git-ignored\", or add that finalize-review requires a clean tree."
+        }
+      ],
+      "notes": [
+        "Fixed: the Round 1 tests nit at loom-code/tests/test_loom_attestation.py:1149. Commit d20d2e71 deletes the tokenize line and both asserts, and the full-string equality at line 1143 still pins the command. Unfixed: the SKILL.md:121 wording nit, kept above as recorded.",
+        "The fix delta (fd4ec2fc plan.md task entries; d20d2e71 test rewrites) changes no functional code and breaks nothing it touches. The affirms() pin cuts step 3 at \" whose marker file\", so it does not cover the qualifier after that point. The test's own comment says so, and that is acceptable."
+      ]
+    },
+    {
+      "reviewer": "reviewer-codex-gpt-6.1-sol",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "lens": "code",
+      "verdict": "PASS_WITH_NOTES",
+      "reviewed_sha": "3555782ccddea01fda7fa834f1f27be279807db5",
+      "review_target_sha": "d20d2e718d282a930b5bc0d9acb40b78373dae5f",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS_WITH_NOTES — Fix logic checked by inspection; changed test files could not execute under the read-only sandbox.",
+        "naming": "PASS",
+        "tests": "PASS_WITH_NOTES — Prior test findings are fixed by inspection; independent execution failed before pytest started.",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Previous finding 1 is fixed: the pointer test uses shared prose_pin.affirms with affirmative and rejected-negation self-tests. Ending the pin before 'whose marker file' is acceptable: the excluded 'not git-ignored' qualifies marker eligibility, while the command-source pointer remains checked affirmatively.",
+        "Previous finding 2 is fixed: W1-01 and W1-02 now identify declared_test_command and suite_collection as entries. The incumbent reviewer's redundant-assertion nit is also fixed: the token assertions were removed while the full command assertion remains.",
+        "The permitted test command exited 2 before pytest started: uv could not create /Users/kouko/.cache/uv/.tmp5xsuNK (Operation not permitted). The orchestrator reports 89 passed for these files and complete-package-suite exit 0 at d20d2e71; those results were not independently reproduced."
+      ],
+      "external_review": {
+        "status": "completed",
+        "executor": "codex",
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "family": "openai",
+        "evidence_level": "observed-model-and-effort",
+        "observed_model": "gpt-6.1-sol",
+        "observed_effort": "high",
+        "output_digest": "c78d8c39b822c4729988a902588cd04cc371201cbf41655fd1dc17f715958233",
+        "reviewer": "reviewer-codex-gpt-6.1-sol",
+        "review_target_sha": "d20d2e718d282a930b5bc0d9acb40b78373dae5f"
+      }
+    }
+  ],
+  "findings": [
+    {
+      "severity": "nit",
+      "anchor": "loom-code/skills/build/SKILL.md:121",
+      "text": "nitpick (non-blocking): 'committed and not git-ignored' is stricter than the working-tree read, which also counts an untracked non-ignored marker; harmless because finalize-review requires a clean tree."
+    },
+    {
+      "severity": "nit",
+      "anchor": "loom-code/skills/build/SKILL.md:121",
+      "text": "nitpick (non-blocking, pre-existing): Build step 3 does not mention the checker's python3 fallback when no marker row matches but test_*.py files exist (probes.py:819-823)."
+    },
+    {
+      "severity": "nit",
+      "anchor": "loom-code/scripts/loom_checker/probes.py:163",
+      "text": "nitpick (non-blocking, pre-existing): a declared `uv run --with X python -m pytest` or `uv run --python python3.12 python -m pytest` is not recognized by _direct_pytest_collects; refused safely."
+    },
+    {
+      "severity": "nit",
+      "anchor": "loom-code/scripts/loom_checker/probes.py:30",
+      "text": "nitpick (non-blocking): uv.lock alongside package.json or Cargo.toml with no pyproject now detects pytest (rare)."
+    }
+  ],
+  "selection": null
+}

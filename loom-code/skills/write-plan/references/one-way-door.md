@@ -1,15 +1,18 @@
 # One-way doors
 
 A one-way door is a choice that is expensive or impossible to undo later.
-It is asked **because of what it is**, not because the agent judged it
-hard: no judgement call decides whether to ask. A judgement-shaped fork
-(three or more trade-offs where the choice changes what gets delivered) is
-also put to the user — but, like every one-way door, it is merged into a
-decision point that already exists, never into a new stop of its own.
+Its class flags a consequence to explain, not an automatic user question.
+Check existing decisions, project evidence, tests, and applicable external sources;
+then decide the technical choice and record the reason. Three or more trade-offs
+alone do not require a user question. Ask only when alternatives materially
+change the outcome the user will receive and the user's preference remains
+unresolved after checking, or when an action needs authorization. Merge any
+question into an existing decision point when possible. Continue independent
+work while awaiting an answer.
 
 ## The five classes
 
-Any one of these makes it a one-way door:
+Any one of these flags a consequence to disclose:
 
 - **(a) Hard to swap later** — framework, language, database,
   authentication method, hosting platform, package manager.
@@ -23,34 +26,38 @@ Any one of these makes it a one-way door:
   an axis the user feels (accuracy, speed, cost per run, language or
   format coverage, privacy): any such axis differing by ≥ 20%, or the
   presence versus absence of money, privacy or coverage. Purely internal
-  differences (memory, line count, maintainability) do not count.
+  differences (memory, line count, maintainability) do not count. These
+  thresholds flag consequences, not a reason to ask by themselves.
 - **(e) An irreversible action on the user's existing state** — rewriting
   or deleting the user's data in place, changing an existing file format
-  with no backup, sending the user's data off their machine. This one is
-  asked **even when there is no fork at all** and only one way to do it:
-  independent acceptance testing happens in a clean environment, so it structurally never
-  touches existing data, and asking is the only thing that stops the harm.
+  with no backup, sending the user's data off their machine. Rewriting,
+  deleting, or sending the user's existing data off the machine requires
+  explicit consent, even when there is no fork and only one way to do it.
+  Independent acceptance testing happens in a clean environment, so it
+  structurally never touches existing data.
 
 ## The four gates, in order
 
-1. **Check first.** If the intent's Acceptance or Constraints, or
-   `PRINCIPLES.md`, already pins that axis — do not ask. Pick the option
-   that complies and say which line pinned it.
-2. **Measure first.** If the candidates can be compared quickly on the
-   user's own sample, measure, then ask about the result. Ask about
-   outcomes, never about assumptions.
-3. **Threshold.** Apply the significance test in class (d). Below it, the
-   choice is the agent's.
-4. **Merge.** All the one-way doors of one change are asked **once**,
-   inside a decision point that already exists — ① for engineering, ② for
-   product where its spec is written, ① for product when no spec will be
-   written; a spec written later does not ask them again at ②, as they
-   were already asked at ①. Never open an extra stop.
+1. **Check first.** If an existing user decision, the intent's Acceptance
+   or Constraints, or `PRINCIPLES.md` pins the choice, do not ask again.
+   Follow it and cite the line. Check project evidence and applicable
+   external sources for technical questions; external sources do not supply
+   the user's preference or authorization.
+2. **Measure first.** Compare candidates on the user's sample when feasible.
+   Decide a technical result from the evidence and record why. If the
+   result exposes an unresolved outcome preference, ask about that outcome.
+3. **Threshold.** Apply class (d)'s significance test to decide what to
+   disclose. The threshold alone does not decide whether to ask.
+4. **Merge.** Ask only for an unresolved user outcome or missing authorization,
+   inside an existing decision point when possible — ① for engineering,
+   ② for product where its spec is written, ① for product when no spec will
+   be written. A spec written later does not ask the same question again at ②.
 
 ## The consequence form
 
-Every one-way door is asked in this shape, with no mechanism vocabulary in
-it:
+Disclose the consequences the user will experience for every major choice,
+even when no answer is needed. When an unresolved outcome preference remains,
+ask in this shape, with no mechanism vocabulary in it:
 
 > Option A: from then on it only runs on ___, it costs ___ per month, and
 > swapping it out means rewriting ___. Option B: ___. I suggest A,
@@ -62,17 +69,19 @@ and the safeguard:
 > This will rewrite your ___ into a new format and the old program will not
 > read it. I will keep a backup at ___ first. Is that OK?
 
-The answer goes into the spec's `## Design decision`, marked
-`user-decided`.
+Record an answer in the spec's `## Design decision` as `user-decided`;
+record an evidence-based choice as `agent-decided — <reason>`.
 
 ## After the decision point has closed
 
-A door that only surfaces later does **not** reopen the conversation. Pick
-a default, mark it `agent-decided — <one-line reason>`, and list it in the
-acceptance test report's "I decided for you" section, which is what decision
-point ③ reads.
+A technical choice that surfaces later is decided from evidence, marked
+`agent-decided — <one-line reason>`, and listed in the acceptance test report's
+"I decided for you" section, which decision point ③ reads. An unresolved
+user outcome or missing authorization is asked when needed; continue work
+that does not depend on the answer.
 
-For classes **(b), (c) and (e)** that default is not free. Take the
-zero-obligation, reversible option that touches no existing data, and
-record `agent-decided — not authorised, took the conservative option`.
-Choosing a committing option unasked is never allowed.
+For classes **(b), (c) and (e)**, when authorization is missing, take a
+zero-obligation, reversible option that touches no existing data if it
+still meets the user's outcome. Record `agent-decided — not authorised,
+took the conservative option`. If none does, ask for the missing preference
+or authorization. A committing option needs prior authorization.

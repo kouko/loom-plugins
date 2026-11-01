@@ -1,0 +1,63 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-01-standalone-diagram-files",
+  "content_digest": "3f4768f5bcc2f94ca8e83c4fe59498458af24698",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-interactive-diagram/test_projection_hardlink_preserves.py",
+      "artifact": "loom-workflow/tests/loom-interactive-diagram/test_projection_hardlink_preserves.py",
+      "result": "pass",
+      "command_digest": "4acb43f533bb04c07c5c16ea46e843d179810fcaba49242a89fc12ba06ce7e24"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-workflow/tests/loom-interactive-diagram/test_destination_symlink_rejected.py",
+      "artifact": "loom-workflow/tests/loom-interactive-diagram/test_destination_symlink_rejected.py",
+      "result": "pass",
+      "command_digest": "3ae8eaee8f8407e609dd628ff7eebd84a28fba745274cd2599f18227084a66c5"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/standalone_code_review",
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "/root/standalone_skill_review",
+      "vendor": "openai",
+      "model": "inherited",
+      "lens": "skill",
+      "verdict": "PASS_WITH_NOTES",
+      "findings": [
+        {
+          "severity": "important",
+          "dimension": "completeness",
+          "anchor": "loom-workflow/skills/loom-interactive-diagram/SKILL.md:52",
+          "text": "The ask-before-every-external-edit rule is not marked as a checker-recomputed gate. The guidance test checks wording but cannot verify live agent questioning.",
+          "fix": "Register the rule as a gate and add a checker rule that recomputes the required ask-and-wait obligations."
+        },
+        {
+          "severity": "nit",
+          "dimension": "traceability",
+          "anchor": "docs/loom/2026-11-01-standalone-diagram-files/evidence/acceptance-test-evidence.md:14",
+          "text": "The cited SKILL.md line ranges are stale after the final wording edit.",
+          "fix": "Refresh the line references to the current skill source."
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

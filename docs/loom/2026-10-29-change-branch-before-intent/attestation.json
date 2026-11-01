@@ -1,0 +1,70 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-29-change-branch-before-intent",
+  "content_digest": "5526ac671cd5dbf1c51753e33dd2ff8cf54886d6",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-code/tests/test_probe_existing_change_branch.py",
+      "artifact": "loom-code/tests/test_probe_existing_change_branch.py",
+      "result": "pass",
+      "command_digest": "f4cedfa3fd242e0df4119ea20f5452c2f28d73881b0c31b207bd36b21a27ec9a"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "reviewer-skill-a07aa812",
+      "vendor": "anthropic",
+      "model": "claude-opus-5-5",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": []
+    },
+    {
+      "reviewer": "codex-gpt-6.1-sol-e2r3",
+      "vendor": "openai",
+      "model": "gpt-6.1-sol",
+      "lens": "skill",
+      "verdict": "PASS",
+      "findings": [],
+      "reviewed_sha": "051c112adf2513e4a91ede7cb65c5ad885b1c424",
+      "review_target_sha": "4165de4bf0cfaed7db6f152fbaa62e6722b336ed",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "user-judgment-leak": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "Round 3 preserves branch safety: write-spec Step 1 unconditionally settles the change branch before Step 2 writes the spec, including when a resumed session re-enters the station. Neither initial submission nor subsequent review-fix commits introduce a branch switch. Removing the Step 4 duplicate therefore leaves no off-branch commit route in the prescribed workflow.",
+        "Verified both earlier fixes: capture-intent and write-plan carry every uncommitted change-owned file on moves to existing or new worktrees; write-spec resolves the branch before writing. Previously accepted limitations remain unchanged.",
+        "All five changed test files ran: 102 passed, none skipped. write-plan body independently counted at 3749 words; git diff --check passed and the checkout remained clean. Verification used source inspection and contract tests; sandbox acceptance scenarios were read, not independently rerun."
+      ],
+      "external_review": {
+        "status": "completed",
+        "executor": "codex",
+        "model": "gpt-6.1-sol",
+        "effort": "high",
+        "family": "openai",
+        "evidence_level": "observed-model-and-effort",
+        "observed_model": "gpt-6.1-sol",
+        "observed_effort": "high",
+        "output_digest": "4406833dc290055ccca621d121621db3d07d2991b07efc218cc2c1c8743dd606",
+        "reviewer": "codex-gpt-6.1-sol-e2r3",
+        "review_target_sha": "4165de4bf0cfaed7db6f152fbaa62e6722b336ed"
+      }
+    }
+  ],
+  "findings": [],
+  "selection": null
+}

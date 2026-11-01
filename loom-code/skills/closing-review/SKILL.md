@@ -20,8 +20,10 @@ compaction.
 
 Resolve the branch base, read the confirmed intent and retained plan when present, and list the
 cumulative diff. If only publication metadata changed and a matching
-attestation already exists, stop: the evidence is still valid and Ship owns
-the remaining work.
+attestation already exists, call `loom-code:ship` in the same turn unless a
+stated stop condition applies. Do not rerun `finalize-review`: the evidence is
+still valid and Ship owns the remaining work. A progress report naming Ship
+does not complete this hand-off.
 
 At entry, omit any step the user told you to skip in plain words; §2 and §3
 say how skipped reviewers, adversarial and acceptance-test are handled. Words that ask to skip independent acceptance testing —
@@ -435,11 +437,18 @@ Then run:
 "<loom-code>/scripts/loom-python" --repair finalize-review <change-id> --input <temporary-json>
 ```
 
+When the required reviewer verdicts and probe evidence are available and §4
+permits finalization, run `finalize-review` in this turn. A progress update
+alone does not complete this step.
+
 The checker runs the declared package suite and each adversarial program once.
 Only after all executions and verdicts pass does it atomically generate the
-attestation bound to the functional-content digest. Commit the generated file
-with any remaining publication metadata; publication validates that single
-attestation directly.
+attestation bound to the functional-content digest. When `finalize-review`
+generates a valid attestation, commit the generated file with any remaining
+publication metadata in this turn; publication validates that single
+attestation directly. Once a valid attestation is committed, call
+`loom-code:ship` in this turn unless a stated stop condition applies. A
+progress report alone does not complete the hand-off.
 
 When a step that `finalize-review` needs (reviewers, adversarial, package-tests)
 was skipped by the user's plain-words instruction, skip `finalize-review` and leave the change unattested: tell the

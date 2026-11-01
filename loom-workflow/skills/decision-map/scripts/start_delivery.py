@@ -169,14 +169,14 @@ def start_delivery(
                 )
             line = _note_line(da_id, intent_rel)
             if line not in current.splitlines():
-                map_store._atomic_write(
+                map_store.atomic_write(
                     map_path,
-                    map_store._append_section_fields(current, "Notes", [line]),
+                    map_store.append_section_fields(current, "Notes", [line]),
                     expected=current.encode("utf-8"),
                 )
             if not reused:
                 intent_path.parent.mkdir(parents=True, exist_ok=True)
-                map_store._atomic_write(
+                map_store.atomic_write(
                     intent_path,
                     _intent_stub(change_id, map_id, title or change_id.replace("-", " ")),
                 )

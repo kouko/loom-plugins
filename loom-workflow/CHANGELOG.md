@@ -4,6 +4,30 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.19.0] — 2026-11-01 — standalone diagrams and explicit external edits
+
+- Create diagrams outside Loom at a user-selected directory. Before editing an existing external diagram, ask whether to copy it into the project; an accepted Loom copy stays in the change's diagram directory, while an explicit direct-edit choice updates the original's adjacent projection.
+- Reject missing standalone destinations, existing copy targets and symlinked external write paths. Keep managed Loom creation and read-only external checks.
+
+## [5.18.0] — 2026-10-31 — keep diagram artifacts in their change directory
+
+- Create draw.io files and text projections under `docs/loom/<change-id>/diagrams/` when run from either the project root with an explicit change id or the selected change directory. Reject ambiguous, mismatched, and out-of-project write targets before writing; existing root-level diagrams remain in place and can still be checked read-only.
+
+## [5.17.1] — 2026-10-31 — active-turn diagram save detection
+
+- Add a bounded content poll for one diagram, so an active discussion can read a stable saved edit without another message. Unchanged content and unrelated files do not trigger it; timeout and file errors are explicit.
+- Clarify the shared diagram skill's discovery text: draw.io is the default format, and the agent can read back edits saved from an external editor.
+
+## [5.17.0] — 2026-10-30 — shared editable diagram tool
+
+- Add `loom-interactive-diagram` with draw.io and demo JSON backends, a text projection check, and references from two design stations.
+- Document the editor collaboration procedure. A 2026-10-30 temporary-fixture check observed live updates and saved edit readback in VS Code Draw.io Integration 1.17.0, plus prompted sync with Autosave off and automatic sync with Autosave on in draw.io Desktop 32.6.1. The VS Code loop also passed from a fresh `git archive HEAD` source checkout using already installed prerequisites; a fresh OS or extension installation was not tested.
+- budget-exception: loom-interactive-diagram — adds one shared skill and one contract tool; regression eval `loom-workflow/tests/loom-interactive-diagram/test_diagram_tool.py`.
+
+## [5.16.1] — 2026-10-30 — Decision Map Python module boundaries
+
+- Decision Map reading, validation and delivery now call their owning Python modules directly. The existing commands, hooks, file formats and results remain unchanged.
+
 ## [5.16.0] — 2026-10-27 — loom-memory equivalence outcome and six-character label separators
 
 - `loom-memory` Reconcile now also triggers when a new lesson is equivalent to an existing entry. The outcome is to keep the existing entry and add the new source to its `sources`; Reconcile never writes a second entry for an equivalent lesson.

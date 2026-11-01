@@ -4,6 +4,7 @@ from fnmatch import fnmatch
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import branch_base
 from loom_checker.helpers import git_maybe
+from loom_checker.helpers import git_ok
 from loom_checker.helpers import is_program_path
 from loom_checker.helpers import kickoff_defaults
 from loom_checker.helpers import kickoff_defaults_text
@@ -23,7 +24,10 @@ import tempfile
 import tomllib
 
 
+# `uv run --locked` runs in the project env and stops on a stale lock
+# without rewriting it: https://docs.astral.sh/uv/reference/cli/#uv-run
 TEST_COMMAND_MARKERS: tuple[tuple[tuple[str, ...], str], ...] = (
+    (("uv.lock",), "uv run --locked python -m pytest -q"),
     (("pyproject.toml", "pytest.ini", "tox.ini", "setup.cfg"), "python3 -m pytest -q"),
     (("package.json",), "npm test"),
     (("Cargo.toml",), "cargo test"),
@@ -165,16 +169,15 @@ def _direct_pytest_collects(repo: Path, artifact: str) -> tuple[bool | None, str
         tokens = argv_for(declared)
     except ValueError:
         return False, ""
-    if _conda_pytest_argv(tokens):
-        pytest_command = tokens[:7]
-        args = tokens[7:]
-    elif tokens[0] == "pytest":
+    # Plain, conda-run and `uv run` forms all reduce to `python -m pytest ...`.
+    inner = _python_argv(tokens)
+    if tokens[0] == "pytest":
         pytest_command = tokens[:1]
         args = tokens[1:]
-    elif (len(tokens) >= 3 and Path(tokens[0]).name.startswith("python")
-          and tokens[1:3] == ["-m", "pytest"]):
-        pytest_command = tokens[:3]
-        args = tokens[3:]
+    elif Path(inner[0]).name.startswith("python") and inner[1:3] == ["-m", "pytest"]:
+        cut = len(tokens) - len(inner) + 3
+        pytest_command = tokens[:cut]
+        args = tokens[cut:]
     else:
         return False, ""
     if pytest_positionals(args) is None:
@@ -790,7 +793,12 @@ def declared_test_command(repo: Path, revision: str | None = None) -> tuple[str 
     revision=None reads the working tree (build-time collection checks); validation always passes a sha."""
     if revision is None:
         defaults = kickoff_defaults(repo)
-        has_file = lambda marker: (repo / marker).is_file()  # noqa: E731
+        # A marker git ignores (a local uv.lock) is never committed, so the
+        # commit read would not see it: count only files git would track.
+        # check-ignore exits 0 when ignored: https://git-scm.com/docs/git-check-ignore#_exit_status
+        has_file = lambda marker: (  # noqa: E731
+            (repo / marker).is_file() and not git_ok(repo, "check-ignore", "-q", "--", marker)
+        )
         names = None
     else:
         # `<rev>:<path>` and ls-tree -r --name-only -z, cited at _cargo_sources:

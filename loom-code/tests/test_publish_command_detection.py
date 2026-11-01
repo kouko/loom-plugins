@@ -1,9 +1,9 @@
-"""The publication hook allows and reminds (plan W1-03).
+"""The publication reminder allows on feature branches (plan W1-03).
 
 Spec 2026-09-22-publication-floor-moves-to-github REQ-4 and REQ-12, Design
 decisions "Hook becomes allow-only with shallow recognition" and "Reminder
-content". `push --hook` never refuses a publication command. Only when the
-first simple command, after leading `VAR=value` assignments, is literally
+content". The main/master direct Git guard can deny before this reminder.
+Only when the first simple command, after leading `VAR=value` assignments, is literally
 `git push`, `gh pr create` or `gh pr merge` does it print one reminder line;
 every other shape is silent, and a failure while computing the reminder
 allows. The line reaches Claude Code as a stdout `systemMessage` object and
