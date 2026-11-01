@@ -36,6 +36,11 @@ Wave 3 — close two demonstrated write-boundary defects.
 - Test: A1 positive: canonical-standalone-create; negative: symlinked-output-dir. A3 positive: canonical-standalone-copy; negative: symlinked-copy-output-dir.
 - Risk: agent-decided — redirected destination class searched destination_args, create, copy, and related tests; reject symlinked standalone output directories before either operation writes.
 
+**W3-03 Keep the skill description inside its routing budget**  after: W3-02  acceptance: 6
+- Files: loom-workflow/skills/loom-interactive-diagram/SKILL.md, tests/test_loom_skill_description_catalog.py
+- Test: A6 positive: standalone-create-readback-description; boundary: catalog-description-budget.
+- Risk: agent-decided — description pin drift class searched the changed SKILL.md frontmatter and tests/test_loom_skill_description_catalog.py; retain the established 213-character budget and creation wording.
+
 ## Simplicity check
 - One command-and-test task for the shared entrypoint — taken
 
@@ -54,3 +59,4 @@ Wave 3 — close two demonstrated write-boundary defects.
 2. Standalone destinations are selected by the user rather than inferred from the current working directory; missing destinations must stop before writing.
 3. Existing parser and managed-path tests protect PR #125 behavior; the new options must not weaken those boundaries.
 4. Two adversarial RED programs are graduated into the routine diagram suite through W3-01 and W3-02; Build re-runs them after each fix.
+5. The complete suite found two description-contract failures; W3-03 restores the description budget without weakening the catalog checks.
