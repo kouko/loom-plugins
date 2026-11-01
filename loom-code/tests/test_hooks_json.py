@@ -284,6 +284,31 @@ def test_host_hooks_use_ready_runtime_without_host_python(host, tmp_path):
         assert json.loads(result.stdout) == {"decision": "allow"}
 
 
+@pytest.mark.parametrize("host", ["claude", "codex", "opencode"])
+@pytest.mark.parametrize("branch,expected", [("main", 2), ("feature", 0)])
+def test_shell_host_hook_blocks_direct_main_commit_only(host, branch, expected, tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", branch], cwd=repo, check=True)
+    subprocess.run(["git", "-c", "user.name=T", "-c", "user.email=t@example.com",
+                    "commit", "-q", "--allow-empty", "-m", "initial"], cwd=repo, check=True)
+
+    manifest = {"claude": HOOKS_JSON, "codex": CODEX_HOOKS_JSON,
+                "opencode": HOOKS_DIR / "hooks-opencode.json"}[host]
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    (command,) = _commands(data["hooks"]["PreToolUse"])
+    payload = {"cwd": str(repo), "tool_name": "Bash",
+               "tool_input": {"command": "git commit -m change"}}
+    env = _ready_env(tmp_path)
+    env["PATH"] = "/usr/bin:/bin"
+    env.update(CLAUDE_PLUGIN_ROOT=str(REPO / "loom-code"), PLUGIN_ROOT=str(REPO / "loom-code"))
+    result = subprocess.run(["/bin/sh", "-c", command], input=json.dumps(payload),
+                            text=True, capture_output=True, cwd=repo, env=env, timeout=30)
+    assert result.returncode == expected, (host, branch, result.stderr, result.stdout)
+    if expected == 2:
+        assert "main/master" in result.stderr
+
+
 @pytest.mark.parametrize("host,event,matcher", [
     ("claude", "SessionStart", "compact|resume"),
     ("claude", "PreToolUse", "Bash"),
