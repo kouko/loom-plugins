@@ -10,10 +10,12 @@ version: 2.3.1
 # publication metadata too: they describe what was tested, they are not
 # functional content themselves, so a difference between the tested and the
 # reviewed tree that is confined to them does not invalidate the attestation.
+# The glob stops at one level (`evidence/*`) because `evidence/probes/` holds
+# the change's executable probe programs, which are functional content.
 publication_only_paths:
   - docs/loom/<change-id>/attestation.json
   - docs/loom/<change-id>/acceptance-test-report.md
-  - docs/loom/<change-id>/evidence/**
+  - docs/loom/<change-id>/evidence/*
 
 stations:            # produce one per-change artifact each (§3)
   - {name: capture-intent, owner: loom-design, produces: intent,  decision_point: 1}

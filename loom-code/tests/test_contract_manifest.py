@@ -204,7 +204,7 @@ def test_manifest_declares_publication_only_paths(manifest):
     assert patterns == [
         "docs/loom/<change-id>/attestation.json",
         "docs/loom/<change-id>/acceptance-test-report.md",
-        "docs/loom/<change-id>/evidence/**",
+        "docs/loom/<change-id>/evidence/*",
     ]
 
 
