@@ -1,10 +1,12 @@
 # Editor setup and collaboration check
 
-Use a local Git checkout. Diagram files live in
-`docs/loom/<change-id>/diagrams/` and are committed with their
-`<name>.projection.md` files. The command below is run from
-`docs/loom/<change-id>/`; replace `<plugin-root>` with the installed
-`loom-workflow` directory.
+Use a local Git checkout for the Loom example below. Its diagram and
+`<name>.projection.md` live in `docs/loom/<change-id>/diagrams/` and are
+committed together. Standalone diagrams use the project directory selected by
+the user. Before editing an existing external diagram, follow the copy question
+in `SKILL.md`; for either selected path, the same editor and save-wait
+procedure applies. The commands below run from `docs/loom/<change-id>/`;
+replace `<plugin-root>` with the installed `loom-workflow` directory.
 
 ## VS Code
 
