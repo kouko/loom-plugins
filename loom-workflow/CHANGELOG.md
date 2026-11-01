@@ -4,6 +4,11 @@ All notable changes to the dev-workflow plugin will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [5.19.0] — 2026-11-01 — standalone diagrams and explicit external edits
+
+- Create diagrams outside Loom at a user-selected directory. Before editing an existing external diagram, ask whether to copy it into the project; an accepted Loom copy stays in the change's diagram directory, while an explicit direct-edit choice updates the original's adjacent projection.
+- Reject missing standalone destinations, existing copy targets and symlinked external write paths. Keep managed Loom creation and read-only external checks.
+
 ## [5.18.0] — 2026-10-31 — keep diagram artifacts in their change directory
 
 - Create draw.io files and text projections under `docs/loom/<change-id>/diagrams/` when run from either the project root with an explicit change id or the selected change directory. Reject ambiguous, mismatched, and out-of-project write targets before writing; existing root-level diagrams remain in place and can still be checked read-only.

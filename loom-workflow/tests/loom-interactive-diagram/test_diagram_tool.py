@@ -1,6 +1,7 @@
 """The shared diagram command checks every artifact in a change folder."""
 
 import importlib.util
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -50,6 +51,106 @@ def test_root_create_makes_change_folder_without_root_diagrams(change_dir):
     assert not (root / "diagrams").exists()
 
 
+def test_standalone_create_requires_explicit_destination(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    result = run_tool(tmp_path, "new", "sample", "--output-dir", str(project))
+    assert result.returncode == 0, result.stderr
+    assert (project / "sample.drawio").is_file()
+    assert (project / "sample.projection.md").is_file()
+    assert run_tool(tmp_path, "check", str(project / "sample.drawio")).returncode == 0
+    missing = run_tool(tmp_path, "new", "another")
+    assert missing.returncode == 1
+    assert "destination required outside Loom; use --output-dir DIR" in missing.stderr
+    assert not (tmp_path / "diagrams").exists()
+
+
+def test_standalone_copy_preserves_source_and_rejects_existing_destination(change_dir):
+    assert run_tool(change_dir, "new", "source").returncode == 0
+    source = change_dir / "diagrams/source.drawio"
+    original = source.read_bytes()
+    project = change_dir.parents[2] / "other-project"
+    project.mkdir()
+    copied = run_tool(project, "copy", str(source), "--output-dir", str(project))
+    assert copied.returncode == 0, copied.stderr
+    assert (project / "source.drawio").read_bytes() == original
+    assert (project / "source.projection.md").is_file()
+    assert run_tool(project, "check", str(project / "source.drawio")).returncode == 0
+    occupied = run_tool(project, "copy", str(source), "--output-dir", str(project))
+    assert occupied.returncode == 1
+    assert "already exists" in occupied.stderr
+    assert source.read_bytes() == original
+    assert (project / "source.drawio").read_bytes() == original
+
+
+def test_standalone_copy_rejects_symlinked_destination(change_dir):
+    assert run_tool(change_dir, "new", "source").returncode == 0
+    source = change_dir / "diagrams/source.drawio"
+    original = source.read_bytes()
+    outside = change_dir.parents[2] / "outside-project"
+    outside.mkdir()
+    alias = change_dir.parents[2] / "project-alias"
+    alias.symlink_to(outside, target_is_directory=True)
+
+    result = run_tool(change_dir.parents[2], "copy", str(source), "--output-dir", str(alias))
+
+    assert result.returncode != 0
+    assert not (outside / "source.drawio").exists()
+    assert not (outside / "source.projection.md").exists()
+    assert source.read_bytes() == original
+
+
+def test_loom_copy_uses_change_store_and_rejects_symlinked_store(change_dir):
+    assert run_tool(change_dir, "new", "source").returncode == 0
+    source = change_dir / "diagrams/source.drawio"
+    external = change_dir.parents[2] / "external.drawio"
+    external.write_bytes(source.read_bytes())
+    original = external.read_bytes()
+    copied = run_tool(change_dir, "copy", str(external))
+    assert copied.returncode == 0, copied.stderr
+    assert (change_dir / "diagrams/external.drawio").read_bytes() == original
+    assert (change_dir / "diagrams/external.projection.md").is_file()
+    assert external.read_bytes() == original
+    change_dir.joinpath("diagrams").rename(change_dir / "old-diagrams")
+    outside = change_dir.parents[2] / "outside"
+    outside.mkdir()
+    (change_dir / "diagrams").symlink_to(outside, target_is_directory=True)
+    escaped = run_tool(change_dir, "copy", str(external))
+    assert escaped.returncode == 1
+    assert list(outside.iterdir()) == []
+    explicit_escape = run_tool(change_dir, "new", "wrong", "--output-dir", str(outside))
+    assert explicit_escape.returncode == 1
+    assert list(outside.iterdir()) == []
+
+
+def test_external_projection_requires_in_place_and_rejects_symlinks(change_dir):
+    assert run_tool(change_dir, "new", "source").returncode == 0
+    source = change_dir / "diagrams/source.drawio"
+    external = change_dir.parents[2] / "external.drawio"
+    external.write_bytes(source.read_bytes())
+    without_selection = run_tool(change_dir, "project", str(external))
+    assert without_selection.returncode == 1
+    assert not (external.parent / "external.projection.md").exists()
+    selected = run_tool(change_dir, "project", str(external), "--in-place")
+    assert selected.returncode == 0, selected.stderr
+    projection = external.parent / "external.projection.md"
+    assert projection.is_file()
+    assert run_tool(change_dir, "check", str(external)).returncode == 0
+    projection.unlink()
+    protected = external.parent / "protected.md"
+    protected.write_text("keep")
+    projection.symlink_to(protected)
+    rejected = run_tool(change_dir, "project", str(external), "--in-place")
+    assert rejected.returncode == 1
+    assert "symlinked projection" in rejected.stderr
+    assert protected.read_text() == "keep"
+    alias = external.parent / "alias.drawio"
+    alias.symlink_to(external)
+    rejected_source = run_tool(change_dir, "project", str(alias), "--in-place")
+    assert rejected_source.returncode == 1
+    assert "symlinked diagram" in rejected_source.stderr
+
+
 def test_new_rejects_missing_unknown_and_mismatched_change(change_dir):
     root = change_dir.parents[2]
     for cwd, args in (
@@ -91,6 +192,21 @@ def test_project_from_root_with_explicit_change_only_updates_managed_projection(
     assert result.returncode == 0, result.stderr
     assert "- stale" not in projection.read_text()
     assert not (root / "diagrams").exists()
+
+
+def test_managed_projection_hardlink_preserves_unselected(change_dir):
+    assert run_tool(change_dir, "new", "sample").returncode == 0
+    projection = change_dir / "diagrams/sample.projection.md"
+    projection.unlink()
+    protected = change_dir / "unselected.md"
+    protected.write_text("backend: drawio\n# Nodes\n- keep\n")
+    os.link(protected, projection)
+    before = protected.read_bytes()
+
+    result = run_tool(change_dir, "project", "diagrams/sample.drawio")
+
+    assert result.returncode == 0 or "hardlink" in result.stderr.lower()
+    assert protected.read_bytes() == before
 
 
 def test_new_rejects_escaping_diagrams_symlink(change_dir):
