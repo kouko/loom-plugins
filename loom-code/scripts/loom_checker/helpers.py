@@ -123,6 +123,9 @@ def artifact_text(
 
     None means confirmed absence. A selected-tree read error never falls back
     to the checkout; preserving newlines matters for the intent's blob pin.
+    Git's NUL filename output and blob reads are documented at
+    https://git-scm.com/docs/git-ls-tree and https://git-scm.com/docs/git-show;
+    the commit:path object syntax is at https://git-scm.com/docs/gitrevisions.
     """
     path = artifact_path(manifest, artifact, change_id, repo)
     if commit is None:

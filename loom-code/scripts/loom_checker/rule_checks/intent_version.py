@@ -49,7 +49,11 @@ def check_intent_version(
     intent_text = artifact_text(manifest, "intent", change_id, repo, commit=commit)
     raw = intent_text.encode("utf-8", "surrogateescape") if intent_text is not None else b""
     relative = artifact_path(manifest, "intent", change_id, repo).relative_to(repo).as_posix()
-    history = git_text(repo, "log", "--topo-order", "--format=%H%x00%s", commit or "HEAD", "--", relative)
+    # Full history follows every merge parent despite path simplification;
+    # selected ancestry and topological order keep children before parents:
+    # https://git-scm.com/docs/git-log . Hash/NUL/subject format codes:
+    # https://git-scm.com/docs/pretty-formats (verified 2026-11-02).
+    history = git_text(repo, "log", "--full-history", "--topo-order", "--format=%H%x00%s", commit or "HEAD", "--", relative)
     subject = f"docs(loom): intent {change_id} confirmed"
     for entry in history.splitlines():
         sha, _, title = entry.partition("\0")

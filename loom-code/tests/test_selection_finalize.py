@@ -195,10 +195,11 @@ def test_finalize_binds_the_report_verdicts_into_acceptance_status(
     assert validate(repo, attestation) == []
 
 
-@pytest.mark.parametrize("old_pin", [False, True])
-@pytest.mark.parametrize("restore", [False, True])
+@pytest.mark.parametrize(("old_pin", "restore"), [
+    (False, False), (True, False), (False, True), (True, True), (False, "merge"),
+])
 def test_finalizer_anchors_the_latest_confirmed_intent(
-    tmp_path: Path, old_pin: bool, restore: bool,
+    tmp_path: Path, old_pin: bool, restore: bool | str,
 ) -> None:
     from loom_checker.helpers import load_manifest
     from loom_checker.rule_checks.intent_version import check_intent_version, intent_identity
@@ -215,6 +216,8 @@ def test_finalizer_anchors_the_latest_confirmed_intent(
     old_text = intent.read_text()
     historical = git(repo, "rev-parse", "HEAD")
     historical_pin = intent_identity(intent) if old_pin else None
+    if restore == "merge":
+        git(repo, "branch", "old-intent")
     new_text = "\n".join(line for line in old_text.splitlines() if not line.startswith("intent_confirmed_sha:")) + "\n"
     intent.write_text(new_text.replace("the guide exists", "the updated guide exists"))
     new_pin = intent_identity(intent)
@@ -225,7 +228,15 @@ def test_finalizer_anchors_the_latest_confirmed_intent(
     # The newer confirmation on HEAD cannot change an explicitly older tree.
     assert check_intent_version(load_manifest(), repo, CHANGE, {},
                                 {"intent_confirmed_sha": historical_pin}, commit=historical) == []
-    if restore:
+    if restore == "merge":
+        git(repo, "checkout", "-q", "old-intent")
+        (repo / "other.md").write_text("# unrelated work\n")
+        commit_all(repo, "unrelated work on older intent")
+        git(repo, "checkout", "-q", "feature")
+        git(repo, "merge", "--no-ff", "--no-commit", "old-intent")
+        intent.write_text(old_text)
+        commit_all(repo, "merge with the older intent restored")
+    elif restore:
         intent.write_text(old_text)
         commit_all(repo, "restore the entire older intent")
     assert check_intent_version(load_manifest(), repo, CHANGE, {},

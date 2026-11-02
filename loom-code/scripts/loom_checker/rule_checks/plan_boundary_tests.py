@@ -105,6 +105,8 @@ def check_plan_boundary_tests(
         ]
     
     if require_files:
+        # -t reports the committed object's type, so a tree is not a test file:
+        # https://git-scm.com/docs/git-cat-file (verified 2026-11-02).
         missing_files = []
         for name in sorted(named_files):
             path = PurePosixPath(name)
