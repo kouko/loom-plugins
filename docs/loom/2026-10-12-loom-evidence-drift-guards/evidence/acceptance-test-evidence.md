@@ -1,6 +1,6 @@
 # Loom evidence drift guards — acceptance test evidence
 
-Tried on 2026-11-02, in a clean copy of the project at d7d23e19659088a36a6e6f61d3cf9ea6f06f2b0d. Sections 1–6 retain their original observed provenance at 2938a3bedddae6d53146f6a7e0c97db65237b3db; section 7 was re-tested in full at this new HEAD, as detailed in the final re-run section.
+Tried on 2026-11-02, in a clean copy of the project at 31d0c73ed27f8a6aa77425fbf115f3cfa3ed3a69. Original numbered sections retain their historical observations. The final re-run section is authoritative for current results: rows 1, 2, 3, 5, 6 and 7 were re-tested in full at this HEAD; row 4 retains original provenance at 2938a3bedddae6d53146f6a7e0c97db65237b3db with an explicit unchanged-surface reason.
 
 ## Setup and actual commands
 
@@ -138,3 +138,42 @@ Assertions loaded the actual JSON/report templates and both instruction artifact
 - Updated only the temporary witness defaults program's root to the new clean clone and ran `python3 /private/tmp/loom-acceptance-defaults.py`: exit 0. It again loaded all four default evidence fields, canonical report provenance and per-line result/re-run columns, asserted both confirmation entry paths order publication before hashing, and executed their shell recipe; checker and shell again agreed on `19673070d78e30519d42bffadc486b6eb49b5db9`. Log `/private/tmp/loom-acceptance-d7d-defaults.log`.
 - This incremental run: **44 focused tests passed**, plus executable default/recipe checks. No full suite or unaffected 202-case rerun. Package-tests remain required and finalization will run; supplied Build logs are not independent witness results and are not represented as such.
 - Results remain 1–7 `works`. No new findings or important/fatal dismissals. Real branch attestation remains outside this witness's edits and claims.
+
+## Re-run on 2026-11-02, at 31d0c73ed27f8a6aa77425fbf115f3cfa3ed3a69
+
+### Clean setup, actual delta and scope
+
+- `git clone --no-hardlinks . /private/tmp/loom-acceptance-31d0c73` succeeded, preserving complete history. `git rev-parse HEAD` returned the exact target above. Re-read README Development setup, then reused its declared isolated locked environment.
+- `python3 loom-code/scripts/loom_checker.py --list-rules` and `python3 scripts/sync_codex_manifests.py --check --all` exited 0. Final `git status --short` in the clean clone was empty.
+- Examined `git diff b0673ad0..31d0c73e` including production, tests, contract, registry, station prose and release notes. New confirmation lookup is shared with identity validation and delivered-state checking; old six/seven-key evidence is rejected for selected pinned canonical confirmations, while pre-pin history remains compatible. Invalid status arrays/objects now produce a validation failure rather than an unhashable-value exception. Report-free mechanical verification is supported beyond narrow changes; a present report still must be valid, and absent reports cannot claim independent results. Three evidence citations and recovery-command testing were corrected.
+- Rows 1, 2, 3, 5, 6 and 7: re-tested in full because shared validation/finalization, confirmation lookup and mechanical compatibility changed.
+- Row 4: carried over from 2938a3bedddae6d53146f6a7e0c97db65237b3db. Boundary-file presence, task/reference parsing and planning-versus-implemented stages are unchanged; neither the report-absence branch nor confirmation lookup changes their semantics. The actual lifecycle trial incidentally reconfirmed its missing-file diagnostic, but is not substituted for the full original row.
+
+### Exact commands and totals
+
+In the clean clone:
+
+```text
+uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_evidence_drift_guards.py loom-code/tests/test_adversarial_evidence_drift.py loom-code/tests/test_verification_status.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_contract_manifest.py loom-code/tests/test_review_json_template.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_loom_checker_modules.py -k 'not runner and not conda and not uv_pytest and not graduated and not probe_program and not extension_less and not spends and not executed_artifact and not ordinary_new and not file_the_suite and not selected_outside and not reviewers_skipped and not shell_probe and not program_in_the_store and not adversarial_artifact and not cap_probe and not usage_error and not wide_delta and not no_program' -q -n 0
+```
+
+Exit 0: **139 passed, 33 deselected in 49.43s**. Log `/private/tmp/loom-acceptance-31d-code.log`. The filter excludes unrelated runner/probe-cap/dispatch cases, retaining every coverage, identity, confirmation, publication, compatibility and mechanical-evidence case.
+
+`uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/spec/test_capture_intent_contract.py -q -n 0`: exit 0, **27 passed in 0.03s**. Log `/private/tmp/loom-acceptance-31d-design.log`.
+
+Total: **166 focused tests passed**. No complete package suite executed by this witness. Finalization remains required and will execute that suite; supplied Build logs are not claimed as witness-run results.
+
+Updated only temporary witness programs' source-root pointer and ran `python3 /private/tmp/loom-acceptance-defaults.py` and `python3 /private/tmp/loom-acceptance-lifecycle.py`; both exit 0. Logs `/private/tmp/loom-acceptance-31d-defaults.log` and `/private/tmp/loom-acceptance-31d-lifecycle.log`.
+
+### Re-tested outcomes and UI flows
+
+- **1 — works.** Complete reports, escaped separators and valid statuses pass; missing, duplicate, extra and unreadable rows fail with numbers. Actual CLI returned exit 1 for missing/duplicate/unknown status on Acceptance 1. These cover Empty evidence and Invalid coverage. Mechanical omission is distinct from a present malformed report: all three `test_mechanical_verification_without_a_report_keeps_evidence_boundaries` cases passed, including rejection of claimed statuses without a report and invalid present reports.
+- **2 — works.** All commit-identity tests passed: missing identities and functional changes fail, direct evidence-only changes pass. Six/seven-key downgrade is now blocked for a selected pinned canonical confirmation, including the direct identity rule and full validator. Actual lifecycle finalization recorded tested `ffd05d2` and reviewed `6cfe5542eef6d05087df18c5e5faaba0b7b18fdc`; changing functional plan content emitted `functional content differs between the tested commit ffd05d2 and the reviewed commit 7095335`. This covers commit-side Mismatched content.
+- **3 — works.** All five actual-finalizer canonical-confirmation cases passed, including complete old-file restoration with/without an old pin, merge-hidden restoration and explicitly selected historical commits. All intent-version cases passed. `test_intent_version_fails_after_a_post_confirmation_edit` now extracts and runs the exact shell command from the public rule diagnostic, proving recovery output at its entry point rather than calling its formatting helper. The diagnostic states every Acceptance may be affected and requires reconfirmation. This covers intent-side Mismatched content.
+- **5 — works.** Actual lifecycle CLI exited 0 and wrote `docs/loom/2026-09-14-example/attestation.json`; parsed record retained fixture reviewer r1's PASS, both identities, per-line result and completed package execution. `test_finalize_binds_the_report_verdicts_into_acceptance_status` passed. Station documentation still defines this record as authoritative and external input as temporary. These cover In progress and Success. Fixture reviewer identity is test data, not this branch's reviewer evidence; its real attestation has not been regenerated by this witness.
+- **6 — works.** All eight selected-tree revalidation cases passed, including new `status-list` and `status-object`: malformed values produce stale verification rather than raising TypeError. Earlier valid selected commits remain valid despite a damaged checkout; repairing mutable files cannot hide damaged selected evidence. Actual lifecycle publication was valid after record commitment and a report-only note; missing, duplicate and unknown-result mutations each returned stale with the affected number. Canonical pinned evidence cannot downgrade to old shapes to bypass these checks. This covers Publication.
+- **7 — works.** Templates and declared field consistency passed, as did both entry contracts. Executed both entry recipes against finalized sample frontmatter; checker and shell again agree on `19673070d78e30519d42bffadc486b6eb49b5db9`. Both recipes require publication fields before hashing. Parameterized legacy validation tests passed both branches: pre-pin six/seven-key records remain valid/delivered; after a selected canonical pinned confirmation those shapes fail and remain active, while the complete extension passes. Incomplete extensions and unknown fields fail. Actual report-free mechanical cases pass for no-intent, narrow and executable changes; executable case runs functional package and adversarial commands with required reviewer input, records actual HEAD and empty statuses, and claims no independent acceptance testing. These cover Historical evidence and Mechanical verification.
+
+### Limits and current verdict
+
+All seven rows remain `works`; row 4 is the only carried-over row. No new findings and no important/fatal dismissals. Report absence cannot mechanically establish whether independent acceptance was semantically needed: the station and reviewers retain that decision, now explicitly documented in the report. Existing publication still discloses stale verification rather than universally blocking publication. No production, test, intent, spec, plan or attestation edits; only the two witness artifacts changed. No claim that this branch's real finalization or final whole-repository suite has already completed.
