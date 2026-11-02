@@ -57,6 +57,33 @@ charter: 1.1
 - Test: A7 positive: Risk section hints boundary test requirement; boundary: template renders correctly
 - Risk: template affects new plans only; agent-decided
 
+### Wave 3 — adversarial recovery
+
+**W3-01 Validate concrete boundary programs after implementation**  after: W2-05  acceptance: 4,6,7
+- Files: `loom-code/scripts/loom_checker/rule_checks/plan_boundary_tests.py`, `loom-code/scripts/loom_checker/command_handlers/intake.py`, `loom-code/contract/templates/plan.md`, `loom-code/scripts/loom_checker/rules.py`
+- Test: A4 positive: an existing named program passes; boundary: missing or misspelled program fails. A6 positive: final checks run; boundary: removed program fails. A7 positive: template explains stages; boundary: planned programs need not exist before Build.
+- Risk: agent-decided — distinguish planning readiness from implemented artifact existence; retain existing task-reference checks.
+
+**W3-02 Preserve historical v2 and mechanical verification flows**  after: W3-01  acceptance: 2,7
+- Files: `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/tests/test_verification_status.py`, `loom-code/tests/test_selection_finalize.py`
+- Test: A2 positive: current evidence records commit identities; boundary: historical seven-key v2 stays valid. A7 positive: a confirmed mechanical narrow change finalizes without independent acceptance testing; boundary: required evidence remains enforced for other changes.
+- Risk: agent-decided — compatibility must not turn missing new evidence into an unconditional waiver.
+
+**W3-03 Revalidate evidence on the selected publication tree**  after: W3-02  acceptance: 1,2,3,6
+- Files: `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/scripts/loom_checker/rule_checks/evidence_coverage.py`, `loom-code/scripts/loom_checker/rule_checks/commit_identity.py`, `loom-code/scripts/loom_checker/rule_checks/intent_version.py`, `loom-code/scripts/loom_checker/helpers.py`, `loom-code/skills/closing-review/SKILL.md`, `loom-code/tests/test_verification_status.py`
+- Test: A1 positive: complete coverage passes; boundary: omitted/duplicate rows fail. A2 positive: equivalent commits pass; boundary: invalid identity fails. A3 positive: matching intent passes; boundary: drift fails. A6 positive: publication rechecks selected committed artifacts; boundary: checkout content cannot substitute.
+- Risk: agent-decided — share rule implementations and read the requested commit, preserving valid evidence-only differences and historical applicability.
+
+**W3-04 Graduate the adversary's demonstrated regressions**  after: W3-03  acceptance: 1,2,4,6,7
+- Files: `docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/probes/test_adversarial.py`, `loom-code/tests/test_adversarial_evidence_drift.py`
+- Test: A1/A2/A4/A6/A7 positive: the earned adversarial program runs in the package suite; boundary: its nine demonstrated regression cases fail before their fixes and pass afterwards.
+- Risk: agent-decided — move the unchanged assertions into the permanent suite; only the owning adversary updates its executable program.
+
+**W3-05 Synchronize release metadata and replace stale verification records**  after: W3-04  acceptance: 5,7
+- Files: plugin manifests and READMEs, plugin CHANGELOGs, release-pin tests, existing change handoff and verification records
+- Test: A5 positive: fresh verdicts remain in the generated attestation; boundary: stale temporary review input is not authoritative. A7 positive: release metadata synchronization passes; boundary: a mismatched version is rejected.
+- Risk: agent-decided — release loom-code 3.56.0 and loom-design 2.19.0 before reviewers inspect the final functional content.
+
 ## Simplicity check
 - none found
 
@@ -68,7 +95,7 @@ charter: 1.1
 1. Attestation schema extension must stay compatible with v1 attestations and existing finalize-review flow
 2. Checker rules must distinguish functional content diff from publication-only diff (evidence files)
 3. Closing-review must correctly parse acceptance test report to populate attestation acceptance_status from Verdict column
-4. Plan boundary test rule separated as independent concern; this change only adds template hint
+4. Adversarial recovery checks concrete named boundary programs after Build; planning intake checks task references without requiring unwritten test files.
 5. Verdict filing location change must not break reviewer agent contract (loom-code:reviewer)
 6. Second-vendor suggest is non-blocking; opt-in required before closing-review per KICKOFF-DEFAULTS
 7. Intent_confirmed_sha excludes status line (matches spec confirmed-behavior pattern)
