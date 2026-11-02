@@ -15,6 +15,19 @@ generate publication evidence.
 Read the confirmed intent, retained spec and plan when present, current branch,
 and branch base. Preserve unrelated and untracked work. Work only on scoped paths.
 
+When the user changes requirements during implementation, the main agent must
+obtain renewed intent confirmation before implementing the changed requirements.
+The main agent must record the substantive difference, affected obligations and
+task-continuity rationale in the retained spec, plan and evidence, updating
+affected design and tasks before continuing (or intent Constraints when those
+artifacts are omitted). The main agent must preserve applicable implementation
+and distinguish still-applicable evidence from evidence that needs replacement;
+earlier passing evidence proves only the requirements it tested. Apply
+closing-review's `review.bounded-episode` rule to episode eligibility and retry
+continuity: reconfirmation alone resets neither review rounds nor the same
+failed task's retry count. It requires a concrete changed obligation and recorded
+rationale before treating work as a new task.
+
 At entry, omit the steps the user told you to skip in plain words (spec, plan,
 implementer, tdd, adversarial, package-tests, `acceptance-test` (independent
 acceptance testing)). Words that ask to skip independent acceptance testing —

@@ -2,6 +2,8 @@ from pathlib import Path
 
 import re
 
+from prose_pin import affirms
+
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW = (ROOT / "loom-code/skills/closing-review/SKILL.md").read_text(encoding="utf-8")
@@ -285,3 +287,53 @@ def test_english_artifact_sentences_unchanged() -> None:
     assert "Reviewer findings and generated evidence are written in English." in REVIEW
     assert ("Repository conventions still govern committed artifacts. Internal "
             "publication reports remain English.") in SHIP_PROSE
+
+
+def test_conforming_defect_verdict_completes_review_assignment() -> None:
+    sentence = (
+        "Treat a conforming `NEEDS_REVISION` as a successful review assignment "
+        "that consumes the current review round."
+    )
+    assert affirms(sentence, "Treat", "successful review assignment", "current review round")
+    assert not affirms(sentence.replace("Treat", "Do not treat"), "treat",
+                       "successful review assignment", "current review round")
+    assert affirms(" ".join(REVIEW.split()), "Treat", "successful review assignment",
+                   "conforming `NEEDS_REVISION`", "current review round")
+
+
+def test_excluded_execution_preserves_failure_classification_and_retry_bound() -> None:
+    flat = " ".join(REVIEW.split())
+    assert "An execution-boundary result remains excluded" in flat
+    assert "does not automatically become `malformed-response`" in flat
+    assert "That retry is not a review round" in flat
+    assert "A second failed attempt before a conforming verdict ends the episode" in flat
+
+
+def test_substantive_reconfirmation_assigns_continuation_to_main_agent() -> None:
+    flat = " ".join(BUILD.split())
+    sentence = "The main agent must record the substantive difference in retained spec, plan and evidence."
+    assert affirms(sentence, "must record", "substantive difference", "spec, plan and evidence")
+    assert not affirms(sentence.replace("must record", "must not record"), "record",
+                       "substantive difference", "spec, plan and evidence")
+    assert affirms(flat, "must record", "substantive difference", "affected obligations")
+    assert affirms(flat, "must obtain", "renewed intent confirmation")
+    assert affirms(flat, "must preserve", "applicable implementation")
+    for station in (BUILD, CAPTURE, PLAN_CONFIRM):
+        assert "review.bounded-episode" in station
+    assert "Only a substantive requirements change with renewed intent confirmation" in " ".join(REVIEW.split())
+
+
+def test_reconfirmation_keeps_rounds_and_same_failed_task_counts() -> None:
+    flat = " ".join(REVIEW.split())
+    sentence = "The main agent must retain the retry count for the same failed task."
+    assert affirms(sentence, "must retain", "retry count", "same failed task")
+    assert not affirms(sentence.replace("must retain", "must never retain"), "retain",
+                       "retry count", "same failed task")
+    assert affirms(flat, "must retain", "retry count", "same failed task")
+    assert affirms(flat, "must record", "concrete changed obligation", "new task")
+    assert affirms(flat, "must preserve", "existing review rounds", "Wording-only reconfirmation")
+    for station in (CAPTURE, PLAN_CONFIRM):
+        prose = " ".join(station.split())
+        assert "byte-based confirmation" in prose
+        assert "does not establish a substantive requirements change" in prose
+    assert "Only a newly confirmed intent starts another episode" not in flat
