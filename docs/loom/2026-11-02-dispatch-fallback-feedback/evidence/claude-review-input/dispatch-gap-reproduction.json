@@ -1,0 +1,190 @@
+[
+  {
+    "bundle": "a",
+    "label": "unobservable-initial",
+    "input": {
+      "event": "initial",
+      "main_profile": {
+        "model": "unknown",
+        "effort": "unknown"
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0
+    },
+    "exit_code": 0,
+    "stdout": "{\"completed_redispatches\":0,\"effective_profile\":\"inherited\",\"outcome\":\"dispatch\",\"overrides\":null,\"reason\":\"unobservable-main-profile\",\"requested_profile\":null,\"task_class\":\"ordinary\",\"uncertainty\":null}\n",
+    "stderr": ""
+  },
+  {
+    "bundle": "a",
+    "label": "successful-fallback-feedback",
+    "input": {
+      "event": "after-execution",
+      "main_profile": {
+        "model": "unknown",
+        "effort": "unknown"
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": true,
+        "conforming": true,
+        "profile": "inherited"
+      }
+    },
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+  },
+  {
+    "bundle": "a",
+    "label": "replacement-fallback-feedback",
+    "input": {
+      "event": "after-execution",
+      "main_profile": {
+        "model": "unknown",
+        "effort": "unknown"
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": false,
+        "conforming": false,
+        "profile": "inherited",
+        "failure_kind": "malformed-response"
+      }
+    },
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+  },
+  {
+    "bundle": "a",
+    "label": "portable-schema-control",
+    "input": {
+      "event": "after-execution",
+      "main_profile": {
+        "model": "unknown",
+        "effort": "unknown"
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": true,
+        "conforming": true,
+        "profile": {
+          "model": "standard",
+          "effort": "medium"
+        }
+      }
+    },
+    "exit_code": 0,
+    "stdout": "{\"completed_redispatches\":0,\"effective_profile\":{\"effort\":\"medium\",\"model\":\"standard\"},\"outcome\":\"routed\",\"overrides\":{\"effort\":\"medium\",\"model\":\"standard\"},\"reason\":\"execution-succeeded\",\"requested_profile\":{\"effort\":\"medium\",\"model\":\"standard\"},\"task_class\":null,\"uncertainty\":null}\n",
+    "stderr": ""
+  },
+  {
+    "bundle": "b",
+    "label": "unobservable-initial",
+    "input": {
+      "event": "initial",
+      "main_profile": {
+        "model": "unknown",
+        "effort": "unknown"
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0
+    },
+    "exit_code": 0,
+    "stdout": "{\"completed_redispatches\":0,\"effective_profile\":\"inherited\",\"outcome\":\"dispatch\",\"overrides\":null,\"reason\":\"unobservable-main-profile\",\"requested_profile\":null,\"task_class\":\"ordinary\",\"uncertainty\":null}\n",
+    "stderr": ""
+  },
+  {
+    "bundle": "b",
+    "label": "successful-fallback-feedback",
+    "input": {
+      "event": "after-execution",
+      "main_profile": {
+        "model": "unknown",
+        "effort": "unknown"
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": true,
+        "conforming": true,
+        "profile": "inherited"
+      }
+    },
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+  },
+  {
+    "bundle": "b",
+    "label": "replacement-fallback-feedback",
+    "input": {
+      "event": "after-execution",
+      "main_profile": {
+        "model": "unknown",
+        "effort": "unknown"
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": false,
+        "conforming": false,
+        "profile": "inherited",
+        "failure_kind": "malformed-response"
+      }
+    },
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+  },
+  {
+    "bundle": "b",
+    "label": "portable-schema-control",
+    "input": {
+      "event": "after-execution",
+      "main_profile": {
+        "model": "unknown",
+        "effort": "unknown"
+      },
+      "task_evidence": {},
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": true,
+        "conforming": true,
+        "profile": {
+          "model": "standard",
+          "effort": "medium"
+        }
+      }
+    },
+    "exit_code": 0,
+    "stdout": "{\"completed_redispatches\":0,\"effective_profile\":{\"effort\":\"medium\",\"model\":\"standard\"},\"outcome\":\"routed\",\"overrides\":{\"effort\":\"medium\",\"model\":\"standard\"},\"reason\":\"execution-succeeded\",\"requested_profile\":{\"effort\":\"medium\",\"model\":\"standard\"},\"task_class\":null,\"uncertainty\":null}\n",
+    "stderr": ""
+  }
+]
