@@ -75,7 +75,9 @@ RULES: list[tuple[str, str]] = [
     ),
     (
         "intake.plan-boundary-tests",
-        "Each Risk line in plan (charter 1.1+) should have a corresponding boundary test task."
+        "A Risk line's named boundary-test task must exist in charter 1.1+ plans. "
+        "After Build, concrete backticked boundary/probe filenames in marked "
+        "tasks' Files/Test fields and numbered Risks must exist in the checked tree."
     ),
     (
         "intent.kind-recompute",

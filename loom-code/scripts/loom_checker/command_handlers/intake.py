@@ -94,8 +94,10 @@ def cmd_intake(args: list[str], out=sys.stdout, err=sys.stderr) -> int:
     
     # New evidence drift guard checks at write-plan intake
     if station == "write-plan" and "plan" not in skipped:
-        # Check plan boundary test hint (Acceptance 7)
-        failures += check_plan_boundary_tests(manifest, repo, change_id, sections, {})
+        # Planned task references must resolve; files may be written in Build.
+        failures += check_plan_boundary_tests(
+            manifest, repo, change_id, sections, {}, require_files=False,
+        )
         # Note: attestation-based checks (coverage, commit-identity, intent-version)
         # are deferred to finalize-review since attestation doesn't exist at intake time
 

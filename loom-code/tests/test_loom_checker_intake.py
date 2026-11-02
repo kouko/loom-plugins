@@ -1803,6 +1803,50 @@ def test_mixed_docs_and_py_under_change_store_requires_test_pairs(tmp_path: Path
 
 
 
+@pytest.mark.parametrize("carrier", ["Files", "Test", "Risk"])
+@pytest.mark.parametrize("header", [
+    "**W1-01 Empty input** boundary test", "**W1-01 Boundary test for empty input**",
+])
+def test_named_boundary_file_uses_the_implemented_tree(
+    tmp_path: Path, carrier: str, header: str,
+) -> None:
+    from loom_checker.helpers import load_manifest
+    from loom_checker.rule_checks.plan_boundary_tests import check_plan_boundary_tests
+
+    repo = make_repo(tmp_path)
+    name = "tests/test_edge.py"
+    reference = f"`{name}::test_empty`"
+    plan = repo / f"docs/loom/{CHANGE}/plan.md"
+    plan.parent.mkdir(parents=True, exist_ok=True)
+    plan.write_text(
+        "# Plan\ncharter: 1.1\n\n## Task DAG\n"
+        f"{header} after: none acceptance: 1\n"
+        f"- Files: {reference if carrier == 'Files' else 'implementation'}\n"
+        f"- Test: {reference if carrier == 'Test' else 'empty input'}\n"
+        "- Risk: empty input\n\n## Risks\n"
+        f"1. Empty input; boundary test W1-01 {reference if carrier == 'Risk' else ''}\n",
+        encoding="utf-8",
+    )
+    args = (load_manifest(), repo, CHANGE, {}, {})
+    assert check_plan_boundary_tests(*args)
+    assert check_plan_boundary_tests(*args, require_files=False) == []
+    program = repo / name
+    program.parent.mkdir()
+    program.write_text("def test_empty(): pass\n", encoding="utf-8")
+    assert check_plan_boundary_tests(*args) == []
+    git(repo, "add", str(plan.relative_to(repo)), name)
+    git(repo, "commit", "-qm", "implemented boundary test")
+    implemented = git(repo, "rev-parse", "HEAD")
+    program.unlink()
+    assert check_plan_boundary_tests(*args)
+    assert check_plan_boundary_tests(*args, commit=implemented) == []
+    git(repo, "add", name)
+    git(repo, "commit", "-qm", "remove named test")
+    program.write_text("def test_empty(): pass\n", encoding="utf-8")
+    assert check_plan_boundary_tests(*args) == []
+    assert check_plan_boundary_tests(*args, commit="HEAD")
+
+
 def test_plan_boundary_tests_passes_when_referenced_task_exists(tmp_path: Path) -> None:
     """PASS: Risk line names a boundary-test task that exists."""
     repo = make_repo(tmp_path)
