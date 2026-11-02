@@ -22,6 +22,17 @@ charter: 1.1
 - Test: A5 positive: synchronized-release; boundary: stale-version-pin. Run release metadata and manifest sync checks; end-of-Build package suite; independent isolated acceptance testing validates actual feedback/count continuity before finalization.
 - Risk: agent-decided — REQ-5 bumps loom-code to 3.57.0 and loom-design to 2.20.0 before review. Update existing version assertions if pinned. No installed plugin update or external execution.
 
+### Wave 4 — Repair an earned adversarial finding
+**W4-01 Recheck inheritance for a new retry** after: W3-01 acceptance: 1,3
+- Files: `loom-code/scripts/dispatch_profile.py`, `loom-code/references/dispatch-profile.md`, `loom-code/tests/test_dispatch_profile_resolver.py`
+- Test: A1 positive: past-success-retains-label; boundary: changed-host-guarantee. A3 positive: stable-guarantee-retry; boundary: retry-uses-current-guarantee. Run resolver tests and the adversary's unchanged RED program.
+- Risk: agent-decided — REQ-1/3 distinguish past observation from future invocation; adversary exposed a stale-guarantee overclaim. Preserve existing resolver coverage; update only the retry test's stable-host premise, not assertion strength.
+
+**W4-02 Graduate earned inheritance regression** after: W4-01 acceptance: 5
+- Files: `docs/loom/2026-11-02-dispatch-fallback-feedback/evidence/probes/test_retry_inheritance_truth.py`, `loom-code/tests/test_dispatch_fallback_inheritance.py`
+- Test: A5 positive: byte-identical-suite-program; boundary: original-store-path-absent. Run graduated program and full suite; retain actual RED and move evidence.
+- Risk: agent-decided — REQ-5 moves the adversary's exact program without editing it, before review finalization. No new probe or harness; do not recreate a removed store copy.
+
 ## Simplicity check
 - none found
 
