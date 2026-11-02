@@ -1,0 +1,99 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-02-context-preserving-explanations",
+  "content_digest": "b793a1e5dd2fb984d930be12dd29593593908e8f",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "python3 -m pytest loom-design/tests/spec/test_capture_intent_contract.py",
+      "artifact": "loom-design/tests/spec/test_capture_intent_contract.py",
+      "result": "pass",
+      "command_digest": "87e785e4e8bbbe8d6620550d224c1a3a4f87f9118ca3455478f085b33eeb5a32"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/review_skill",
+      "vendor": "codex",
+      "model": "inherited",
+      "verdict": "PASS",
+      "lens": "skill",
+      "reviewed_sha": "55587449a0473697dee852f0dff69b240ef5d36e",
+      "review_target_sha": "b6f666d70a6937c6c3030cf31e4e0982897513d5",
+      "dimension_scores": {
+        "omission": "PASS — Both confirmation owners require the subject, problem, impact, outcome, confirmation scope and necessary context; this refines the existing registered restatement obligation rather than adding a decision point or gate.",
+        "ambiguity": "PASS — Content requirements are explicit while wording, length, presentation, examples and headings remain flexible; familiar requests stay short.",
+        "inconsistency": "PASS — The two changed restatements match; base polarity against paths, identifiers and mechanism names is preserved, along with one-stop confirmation, authorization disclosure and correction rounds.",
+        "incorrect-fact": "PASS — Evidence accurately bounds the six replies to two source-loaded responder contexts and explicitly excludes installation, host discovery, causal superiority and human-comprehension claims; both changed test files passed independently.",
+        "missing-population": "PASS — The report identifies two responders, three fixtures per owner, six replies and six focused acceptance checks, with execution limitations disclosed.",
+        "user-judgment-leak": "PASS — Both owners ask for outcome confirmation and necessary authorization only; existing evidence-based technical choice and separate merge boundaries remain intact.",
+        "deletion-first": "PASS — The delta replaces the inadequate fill-in example in the existing paragraph; no new runtime mechanism, schema, mandatory section or station is added."
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran both changed ordinary test files: 76 passed in 0.33s. No full package suite or adversarial program was run by this reviewer.",
+        "Reviewed the complete capture-intent skill and code-only confirm-intent reference, both base versions, the intent and plan, and the committed acceptance report and evidence.",
+        "Acceptance establishes bounded sampled replies from two contexts, not six independent sessions, fresh installation, every host's runtime behavior or a controlled before/after improvement."
+      ]
+    },
+    {
+      "reviewer": "/root/review_code",
+      "vendor": "codex",
+      "model": "inherited",
+      "lens": "code",
+      "reviewed_sha": "55587449a0473697dee852f0dff69b240ef5d36e",
+      "review_target_sha": "b6f666d70a6937c6c3030cf31e4e0982897513d5",
+      "verdict": "PASS",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists.",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Independently ran both changed ordinary test modules together: 76 passed in 0.34s, with no skipped tests; prose pins meet engineering-baseline section 5 item 8 via affirmative checks and synthetic negation cases.",
+        "Manifest synchronization check passed; both plugin minor releases, derived manifests, README versions and changelog entries agree. No functional or test changes exist between the acceptance-tested 242ba265 and the review target.",
+        "Acceptance evidence supports six sampled replies from two source-loaded responder contexts, and explicitly excludes installation, host discovery, human comprehension studies and superiority over the baseline. Full-suite and adversarial execution were not repeated, as required by the reviewer contract."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "93aaf16c69c7bb1346bd683889ed6ffb1db2d006",
+  "tested_commit": "242ba265a2a7b648356fd6aa082fc5e5ffe9e93c",
+  "reviewed_commit": "b6f666d70a6937c6c3030cf31e4e0982897513d5",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    }
+  ]
+}
