@@ -1,0 +1,110 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-11-02-dispatch-fallback-feedback",
+  "content_digest": "4aed41ca17639fd0b63d0446db3acb455515d830",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_dispatch_fallback_inheritance.py",
+      "artifact": "loom-code/tests/test_dispatch_fallback_inheritance.py",
+      "result": "pass",
+      "command_digest": "59985a103e32a69289508833d231b65831bd6b4b2699be1fc63f0efe61bcfd66"
+    }
+  ],
+  "verdicts": [
+    {
+      "reviewer": "/root/dispatch_closing_code",
+      "vendor": "codex",
+      "model": "host-default/unverified",
+      "lens": "code",
+      "verdict": "PASS",
+      "reviewed_sha": "55587449a0473697dee852f0dff69b240ef5d36e",
+      "review_target_sha": "639fcee63de6bf2ba64d9a7a0cd60b08e9d76ddf",
+      "dimension_scores": {
+        "security": "PASS — The resolver validates explicit feedback before result branches and introduces no external execution, secret handling or persistent state.",
+        "architecture": "PASS — Existing resolve entry, fallback mechanism and station responsibilities remain intact.",
+        "correctness": "PASS — Symbolic completion preserves historical labels; retries derive their new label from current inheritance guarantees. Explicit validation and terminal bounds match the requirements.",
+        "naming": "PASS — Existing terminology consistently distinguishes completed profiles, requested settings, artifact review rounds and failed execution retries.",
+        "tests": "PASS — Independently ran all four changed ordinary test files: 257 passed without skips. Read the earned regression and handed passing output without executing adversarial programs.",
+        "refactoring": "PASS — The change extends existing branches without introducing unnecessary modules or abstractions.",
+        "cross-task-coherence": "PASS — Resolver behavior, shared dispatch guidance, continuation contracts, release metadata and acceptance evidence agree across the cumulative delta.",
+        "external-surface-grounding": "PASS — No new external API, SDK, tool or CLI surface is introduced; native fallback does not relax external-review invocation requirements.",
+        "principles-conformance": "PASS — The change preserves independent verification, bounded work, user decision boundaries and existing data protections without adding a state store.",
+        "architecture-conformance": "N/A — No ratified ARCHITECTURE.md exists in the repository.",
+        "deliberate-simplification": "PASS — Unknown settings remain symbolic, semantic continuation decisions remain explicit agent responsibilities, and their limits are documented.",
+        "deletion-first": "PASS — Existing profile labels, resolver branches and artifacts cover the requested behavior without a new schema, ledger or production module."
+      },
+      "findings": [],
+      "notes": [
+        "Focused verification: test_dispatch_profile_resolver.py, test_simplified_station_text.py, test_write_plan_station_text.py and test_capture_intent_contract.py; 257 passed.",
+        "Acceptance 5 is supported by two isolated completed workflows and committed-record validation receipts. Acceptance 4 separately demonstrates genuine same-reviewer defect/fix continuation and retained counts; its missing Build prerequisites prevent counting it as a third complete workflow.",
+        "Acceptance 6 uses scripted requirements and declared prior counters, with actual intent edits, pins, commits and actor decisions. This supports the stated continuation boundaries without establishing live user-interface confirmation or backend model identity."
+      ]
+    },
+    {
+      "reviewer": "/root/dispatch_closing_spec",
+      "vendor": "codex",
+      "model": "host-default/unverified",
+      "lens": "spec",
+      "verdict": "PASS",
+      "reviewed_sha": "55587449a0473697dee852f0dff69b240ef5d36e",
+      "review_target_sha": "639fcee63de6bf2ba64d9a7a0cd60b08e9d76ddf",
+      "dimension_scores": {
+        "omission": "PASS",
+        "ambiguity": "PASS",
+        "inconsistency": "PASS",
+        "incorrect-fact": "PASS",
+        "missing-population": "PASS",
+        "deletion-first": "PASS",
+        "spec-conformance": "PASS — REQ-1 through REQ-6 are covered by the resolver, owning station contracts and bounded independent acceptance evidence; no unrequired production mechanism was added.",
+        "design-conformance": "N/A — No DESIGN.md applies; the spec correctly identifies internal resolver and workflow changes without a new user interface.",
+        "principles-conformance": "PASS — Independent verification, truthful evidence, existing retry limits and user decision boundaries remain intact; no persistent ledger or new production schema is introduced.",
+        "user-judgment-leak": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Independently executed changed focused tests: resolver, simplified station and write-plan release tests returned 230 passed; capture-intent contract tests returned 27 passed. Read the graduated adversarial program and handed passing output without executing it, historical programs or the complete package suite.",
+        "A4 works is justified for the stated role/count boundary, not a third complete workflow: the report explicitly discloses missing fixture Build prerequisites. A5 separately has two completed workflows with real distinct reviewers, committed attestations and independent validation records. A6 uses disclosed scripted user turns and synthetic prior-count antecedents; actual changed intent, pins, retained evidence, reviewer feedback and bounded continuation support its semantic decision claims.",
+        "Source changes and isolated acceptance trials remain distinct from installed-plugin activation and cross-host validation. Historical Claude consultation is explicitly problem-discovery evidence, not a closing verdict or authorization for another execution."
+      ]
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": "4454bae6f1eab7fe737c9a7fb49f0299f8034efe",
+  "tested_commit": "7f79a0d4e4345de027bc51171438b8d7ecaba0fe",
+  "reviewed_commit": "639fcee63de6bf2ba64d9a7a0cd60b08e9d76ddf",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    }
+  ]
+}
