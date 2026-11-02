@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from loom_checker.helpers import artifact_text, blob_sha, sha_agrees
+from loom_checker.helpers import artifact_path, artifact_text, blob_sha, git_text, sha_agrees
 from pathlib import Path
 import re
 
@@ -12,6 +12,7 @@ import re
 STATUS_LINE = re.compile(rb"^status:.*\n?", re.MULTILINE)
 INTENT_CONFIRMED_SHA_LINE = re.compile(rb"^intent_confirmed_sha:.*\n?", re.MULTILINE)
 CONFIRMED_STATUS = re.compile(rb"^status:\s*confirmed\s+\d{4}-\d{2}-\d{2}", re.MULTILINE)
+PIN_VALUE = re.compile(rb"^intent_confirmed_sha:[ \t]*([0-9a-f]{7,64})[ \t]*\r?$", re.MULTILINE | re.IGNORECASE)
 
 
 def intent_identity(intent_path: Path) -> str:
@@ -38,18 +39,46 @@ def check_intent_version(
     manifest, repo: Path, change_id: str, intent_sections: dict[str, str],
     attestation: dict, *, commit: str | None = None,
 ) -> list[tuple[str, str]]:
-    """The intent is the text whose confirmation the attestation pins.
+    """A pinned canonical confirmation is the immutable intent baseline.
 
-    `intent_confirmed_sha` is optional bookkeeping: an attestation produced
-    before it existed pins nothing and is not checked, and an intent whose
-    status is not `confirmed <date>` has no confirmation to compare with.
+    Search only the selected tree's ancestry. A confirmation predating pins
+    supplies no new baseline; otherwise retain the existing direct pin checks.
     """
     rule = "intake.intent-version"
 
     intent_text = artifact_text(manifest, "intent", change_id, repo, commit=commit)
+    raw = intent_text.encode("utf-8", "surrogateescape") if intent_text is not None else b""
+    relative = artifact_path(manifest, "intent", change_id, repo).relative_to(repo).as_posix()
+    history = git_text(repo, "log", "--topo-order", "--format=%H%x00%s", commit or "HEAD", "--", relative)
+    subject = f"docs(loom): intent {change_id} confirmed"
+    for entry in history.splitlines():
+        sha, _, title = entry.partition("\0")
+        if title != subject:
+            continue
+        confirmed = artifact_text(manifest, "intent", change_id, repo, commit=sha)
+        baseline = (confirmed or "").encode("utf-8", "surrogateescape")
+        if INTENT_CONFIRMED_SHA_LINE.search(baseline):
+            pin = PIN_VALUE.search(baseline)
+            expected = _content_identity(baseline)
+            if pin is None or not sha_agrees(pin.group(1).decode(), expected):
+                return [(rule, f"confirmation commit {sha[:7]} has an invalid intent pin; re-confirm the intent")]
+            current_pin = PIN_VALUE.search(raw)
+            recorded = attestation.get("intent_confirmed_sha")
+            if (not CONFIRMED_STATUS.search(raw) or _content_identity(raw) != expected
+                    or current_pin is None or not sha_agrees(current_pin.group(1).decode(), expected)
+                    or not isinstance(recorded, str) or not re.fullmatch(r"[0-9a-fA-F]{7,64}", recorded)
+                    or not sha_agrees(recorded, expected)):
+                return [(
+                    rule,
+                    f"the intent no longer matches confirmation commit {sha[:7]} "
+                    f"(confirmed {expected[:7]}, current {_content_identity(raw)[:7]}); "
+                    "every Acceptance line may be affected. "
+                    f"{recompute_command(relative)} and re-confirm the intent before closing review",
+                )]
+            return []
+        break  # The latest canonical confirmation predates pin support.
     if intent_text is None:
         return []
-    raw = intent_text.encode("utf-8", "surrogateescape")
     if not CONFIRMED_STATUS.search(raw):
         return []
 

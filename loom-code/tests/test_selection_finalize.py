@@ -195,6 +195,58 @@ def test_finalize_binds_the_report_verdicts_into_acceptance_status(
     assert validate(repo, attestation) == []
 
 
+@pytest.mark.parametrize("old_pin", [False, True])
+@pytest.mark.parametrize("restore", [False, True])
+def test_finalizer_anchors_the_latest_confirmed_intent(
+    tmp_path: Path, old_pin: bool, restore: bool,
+) -> None:
+    from loom_checker.helpers import load_manifest
+    from loom_checker.rule_checks.intent_version import check_intent_version, intent_identity
+
+    repo = make_reported_repo(tmp_path)
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    message = f"docs(loom): intent {CHANGE} confirmed\n\nneeds-design: no — internal"
+    if old_pin:
+        pin = intent_identity(intent)
+        intent.write_text(intent.read_text().replace(
+            "status: confirmed 2026-09-23\n", f"status: confirmed 2026-09-23\nintent_confirmed_sha: {pin}\n",
+        ))
+        commit_all(repo, message)
+    old_text = intent.read_text()
+    historical = git(repo, "rev-parse", "HEAD")
+    historical_pin = intent_identity(intent) if old_pin else None
+    new_text = "\n".join(line for line in old_text.splitlines() if not line.startswith("intent_confirmed_sha:")) + "\n"
+    intent.write_text(new_text.replace("the guide exists", "the updated guide exists"))
+    new_pin = intent_identity(intent)
+    intent.write_text(intent.read_text().replace(
+        "status: confirmed 2026-09-23\n", f"status: confirmed 2026-09-23\nintent_confirmed_sha: {new_pin}\n",
+    ))
+    confirmed = commit_all(repo, message)
+    # The newer confirmation on HEAD cannot change an explicitly older tree.
+    assert check_intent_version(load_manifest(), repo, CHANGE, {},
+                                {"intent_confirmed_sha": historical_pin}, commit=historical) == []
+    if restore:
+        intent.write_text(old_text)
+        commit_all(repo, "restore the entire older intent")
+    assert check_intent_version(load_manifest(), repo, CHANGE, {},
+                                {"intent_confirmed_sha": new_pin}, commit=confirmed) == []
+    tested = git(repo, "rev-parse", "HEAD")
+    report = repo / f"docs/loom/{CHANGE}/acceptance-test-report.md"
+    report.write_text(
+        f"Tried on 2026-11-02, in a clean copy of the project at {tested}.\n\n"
+        "| 1 | the guide exists | works | observed | re-tested |\n",
+    )
+    commit_all(repo, "test the current intent version")
+    result = finalize(repo, review_input(tmp_path, PASSING[:1], []))
+    if restore:
+        assert result.returncode == 1, result.stdout
+        assert "intake.intent-version" in result.stderr
+    else:
+        assert result.returncode == 0, result.stderr
+        assert written(repo)["intent_confirmed_sha"] == new_pin
+        assert validate(repo, written(repo)) == []
+
+
 def trunkless_clone(origin: Path, tmp_path: Path, branch: str = "feature") -> Path:
     """The same commit, cloned the way CI fetches one branch: no trunk, so
     the committed delta cannot be recomputed at all."""
