@@ -2,7 +2,7 @@
   "skill_name": "capture-intent",
   "schema_version": 1,
   "created": "2026-09-13",
-  "last_reviewed": "2026-09-13",
+  "last_reviewed": "2026-11-02",
   "prompts": [
     {
       "id": 1,
@@ -33,6 +33,27 @@
         "value case",
         "prohibited design questions"
       ]
+    },
+    {
+      "id": 4,
+      "category": "happy-path",
+      "prompt": "Our release notes still show last month's release date, so customers think the latest release is old. Please correct the date shown there. Only the date should change.",
+      "expected_behavior": "Keep confirmation short while connecting the release notes, misleading date, customer confusion and wanted correction. Use natural wording rather than a fixed script or per-element headings. Include the existing publication consequence and single confirmation stop; ask for outcome confirmation, not implementation approval.",
+      "edge_case_dimensions": ["simple familiar request", "concise connected context", "flexible expression"]
+    },
+    {
+      "id": 5,
+      "category": "edge-case",
+      "prompt": "The retry policy is the rule for repeating failed background jobs. The dispatch profile selects which worker handles them. Right now one job uses another job's profile, and failed jobs repeat forever, blocking the queue. I want each job to use its own selection and stop after its configured limit. Keep existing successful jobs unchanged; this is internal behavior, with no new interface.",
+      "expected_behavior": "Explain the two concepts in terms of their roles, link each current problem to its effects and wanted result, and preserve the compatibility boundary. Choose enough context for independent understanding without turning the explanation into implementation design or requesting technical approval. Confirm the requirements and existing authorization consequences together.",
+      "edge_case_dimensions": ["unfamiliar concepts", "multiple connected problems", "intent altitude"]
+    },
+    {
+      "id": 6,
+      "category": "stress",
+      "prompt": "Earlier I said the worker selection is the rule that chooses who runs each job, and jobs are now using another job's selection, producing inconsistent results. Your restatement only said 'fix the profile'. What does profile mean? Please explain the requirement in detail before asking me to confirm again.",
+      "expected_behavior": "Repair the missing context using the supplied meaning, affected jobs, inconsistent results and wanted correct selection. Explain more fully because the user requested detail; do not repeat the unexplained label, guess a diagnosis or ask for implementation approval. Keep any renewed confirmation within the existing correction round, without adding a new decision point.",
+      "edge_case_dimensions": ["detailed follow-up", "unexplained label", "correction round"]
     }
   ]
 }

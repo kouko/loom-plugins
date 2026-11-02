@@ -179,13 +179,14 @@ intent in step 4.
 Compose **one message**. Everything below goes into it; you do not stop
 twice, and this is the only stop this station makes.
 
-1. **The restatement.** Problem and Acceptance in the user's own plain
-   words — no file paths, no identifiers, no mechanism names:
-
-   > 你要的是 ___，做完後你可以 ___、___、___。對嗎？
-   >
-   > (You want ___, and when it is done you will be able to ___, ___ and
-   > ___. Is that right?)
+1. **The restatement.** Restate Problem and Acceptance: subject, problem,
+   impact, outcome and confirmation scope. Use the user's plain words, never paths,
+   identifiers or mechanism names. Supply necessary context for unfamiliar
+   terms and affected people at intent altitude. Choose wording, length and
+   presentation freely, keeping familiar requests short. Examples, scripts and
+   headings are optional. Check these connections and what yes
+   confirms and authorizes; ask about outcomes, never
+   implementation approval.
 
    For the current contract, automatic publication is the default. This same
    restatement explicitly says that answering yes authorizes a later non-forced
