@@ -414,9 +414,9 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     # The bookkeeping fields above are bound to the change's own artifacts:
     # intent_confirmed_sha from the intent frontmatter (recorded by
     # capture-intent at confirmation), tested_commit from the acceptance
-    # test report's fixed "Tried on ... at <sha>" line. Each check is
-    # skipped when the field is absent, so pre-bookkeeping attestations
-    # stay valid; a new change is checked.
+    # test report's fixed "Tried on ... at <sha>" line. A mechanically
+    # narrow change without a report uses the functional executions just
+    # completed at HEAD, without claiming independent acceptance testing.
     from loom_checker.parsing import parse_document
     import re as _re
     intent_path = artifact_path(manifest, "intent", change_id, repo)
@@ -440,9 +440,12 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
             attestation["acceptance_status"] = acceptance_coverage(
                 intent_sections, _report_text,
             )
+        elif "acceptance-test" in skip:
+            attestation["tested_commit"] = head_sha
 
         failures: list[tuple[str, str]] = []
-        failures += check_attestation_coverage(manifest, repo, change_id, intent_sections, attestation)
+        if report_path.is_file() or "acceptance-test" not in skip:
+            failures += check_attestation_coverage(manifest, repo, change_id, intent_sections, attestation)
         failures += check_commit_identity(manifest, repo, change_id, intent_sections, attestation)
         failures += check_intent_version(manifest, repo, change_id, intent_sections, attestation)
         if failures:

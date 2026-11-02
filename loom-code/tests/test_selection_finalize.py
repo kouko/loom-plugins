@@ -117,9 +117,17 @@ PASSING = [
 
 # --- Acceptance 3 -----------------------------------------------------------
 
-def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> None:
+@pytest.mark.parametrize("with_intent", [False, True])
+def test_narrow_delta_finalizes_with_no_adversarial_artifact(
+    tmp_path: Path, with_intent: bool,
+) -> None:
     """A narrow delta auto-skips the adversarial step, with no typed skip."""
-    repo = make_narrow_repo(tmp_path)
+    repo = make_reported_repo(tmp_path) if with_intent else make_narrow_repo(tmp_path)
+    report = repo / f"docs/loom/{CHANGE}/acceptance-test-report.md"
+    if with_intent:
+        report.unlink()
+        commit_all(repo, "mechanical evidence needs no independent report")
+    head = git(repo, "rev-parse", "HEAD")
 
     result = finalize(repo, review_input(tmp_path, PASSING[:1], []))
 
@@ -127,6 +135,10 @@ def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> 
     attestation = written(repo)
     assert [run["kind"] for run in attestation["executions"]] == ["package-tests"]
     assert attestation["selection"] is None  # no typed confirmation was bound
+    if with_intent:
+        assert attestation["tested_commit"] == attestation["reviewed_commit"] == head
+        assert attestation["acceptance_status"] == []  # no independent test claimed
+        assert not report.exists()
     assert validate(repo, attestation) == []
 
 

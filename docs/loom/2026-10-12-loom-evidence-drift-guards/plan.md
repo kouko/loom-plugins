@@ -65,7 +65,7 @@ charter: 1.1
 - Risk: agent-decided — distinguish planning readiness from implemented artifact existence; retain existing task-reference checks.
 
 **W3-02 Preserve historical v2 and mechanical verification flows**  after: W3-01  acceptance: 2,7
-- Files: `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/tests/test_verification_status.py`, `loom-code/tests/test_selection_finalize.py`
+- Files: `loom-code/scripts/loom_checker/attestation.py`, `loom-code/scripts/loom_checker/command_handlers/finalize.py`, `loom-code/scripts/loom_checker/intent_state.py`, `loom-code/tests/test_verification_status.py`, `loom-code/tests/test_selection_finalize.py`
 - Test: A2 positive: current evidence records commit identities; boundary: historical seven-key v2 stays valid. A7 positive: a confirmed mechanical narrow change finalizes without independent acceptance testing; boundary: required evidence remains enforced for other changes.
 - Risk: agent-decided — compatibility must not turn missing new evidence into an unconditional waiver.
 
@@ -83,6 +83,16 @@ charter: 1.1
 - Files: plugin manifests and READMEs, plugin CHANGELOGs, release-pin tests, existing change handoff and verification records
 - Test: A5 positive: fresh verdicts remain in the generated attestation; boundary: stale temporary review input is not authoritative. A7 positive: release metadata synchronization passes; boundary: a mismatched version is rejected.
 - Risk: agent-decided — release loom-code 3.56.0 and loom-design 2.19.0 before reviewers inspect the final functional content.
+
+**W3-06 Populate confirmation pins at both supported entry paths**  after: W3-03  acceptance: 3,7
+- Files: `loom-code/skills/write-plan/references/confirm-intent.md`, `loom-design/skills/capture-intent/SKILL.md`
+- Test: A3 positive: either entry records the confirmed content identity; boundary: later content changes fail. A7 positive: code-only entry replaces the template placeholder; boundary: publication metadata is written before computing the pin.
+- Risk: agent-decided — both entry paths must record the same hash convention after all confirmed frontmatter is written; no extra user question.
+
+**W3-07 Declare the implemented evidence fields in the contract**  after: W3-06  acceptance: 7
+- Files: `loom-code/contract/manifest.yaml`, `docs/loom/evidence/mechanisms.yaml`, `loom-code/CHANGELOG.md`, `loom-code/tests/test_contract_manifest.py`
+- Test: A7 positive: every generated evidence field is declared and counted; boundary: a template field absent from the schema fails the existing consistency check.
+- Risk: agent-decided — declare the five already implemented fields, not a second evidence mechanism; preserve optional historical shapes and the existing contract version convention for compatible additions.
 
 ## Simplicity check
 - none found

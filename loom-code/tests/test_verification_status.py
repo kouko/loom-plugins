@@ -164,6 +164,42 @@ def test_plain_attestation_is_valid(tmp_path: Path) -> None:
     assert verification.verification_status(repo, CHANGE) == "valid"
 
 
+def test_historical_v2_and_complete_extension_keep_exact_shapes(tmp_path: Path) -> None:
+    from loom_checker.attestation import ATTESTATION_BOOKKEEPING, validate_attestation
+    from loom_checker.intent_state import _delivery_witness_valid
+
+    repo = branch_repo(tmp_path)
+    confirmed_intent(repo)
+    write(repo, f"docs/loom/{CHANGE}/acceptance-test-report.md", "Historical report\n")
+    write(repo, f"docs/loom/{CHANGE}/evidence/results.md", "Historical evidence\n")
+    head = commit(repo, "historical intent")
+    legacy = attestation(repo)
+    legacy_manifest = dict(load_manifest(), publication_only_paths=[
+        "docs/loom/<change-id>/attestation.json",
+    ])
+    old_digest = digest.functional_content_digest(repo, head, CHANGE, legacy_manifest)
+    current_digest = legacy["content_digest"]
+    assert old_digest != current_digest
+    legacy.update(schema="loom-attestation/v2", selection=None, content_digest=old_digest)
+    for verdict in legacy["verdicts"]:
+        verdict.update(vendor="test", model="test", lens="code", findings=[])
+    expanded = dict(legacy, intent_confirmed_sha=None, tested_commit=head,
+                    reviewed_commit=head, acceptance_status=[], content_digest=current_digest)
+    v1 = dict(legacy, schema="loom-attestation/v1")
+    del v1["selection"]
+    for payload in (v1, legacy, expanded):
+        assert validate_attestation(repo, head, CHANGE, payload) == []
+        assert _delivery_witness_valid(payload, CHANGE)
+    for field in ATTESTATION_BOOKKEEPING:
+        partial = dict(expanded)
+        del partial[field]
+        assert validate_attestation(repo, head, CHANGE, partial)
+        assert not _delivery_witness_valid(partial, CHANGE)
+    unknown = dict(legacy, unexpected=True)
+    assert validate_attestation(repo, head, CHANGE, unknown)
+    assert not _delivery_witness_valid(unknown, CHANGE)
+
+
 def test_two_attestations_and_bad_json_are_stale(tmp_path: Path) -> None:
     repo = branch_repo(tmp_path)
     confirmed_intent(repo)

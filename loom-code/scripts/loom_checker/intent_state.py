@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from git_exec import run_git
-from loom_checker.attestation import KEYS_BY_SCHEMA
+from loom_checker.attestation import attestation_shape_matches
 from loom_checker.helpers import GIT_TIMEOUT
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import git_maybe
@@ -120,9 +120,7 @@ def _committed_text(repo: Path, commit: str, relative: Path) -> tuple[str, str]:
 
 def _delivery_witness_valid(attestation: object, change_id: str) -> bool:
     """Validate stable witness shape without comparing it to a later tree."""
-    if not isinstance(attestation, dict) or attestation.get("schema") not in KEYS_BY_SCHEMA:
-        return False
-    if set(attestation) != KEYS_BY_SCHEMA[attestation["schema"]] or attestation.get("change_id") != change_id:
+    if not attestation_shape_matches(attestation) or attestation.get("change_id") != change_id:
         return False
     if not isinstance(attestation.get("content_digest"), str) or not attestation["content_digest"].strip():
         return False

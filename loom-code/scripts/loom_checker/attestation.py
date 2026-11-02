@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import git_ok
+from loom_checker.helpers import load_manifest
 from loom_checker.probe_results import Row
 from loom_checker.probe_results import claiming_row
 from loom_checker.probes import argv_for
@@ -34,8 +35,26 @@ ATTESTATION_KEYS_V1 = {
 ATTESTATION_BOOKKEEPING = {
     "intent_confirmed_sha", "tested_commit", "reviewed_commit", "acceptance_status",
 }
-ATTESTATION_KEYS = ATTESTATION_KEYS_V1 | {"selection"} | ATTESTATION_BOOKKEEPING
+ATTESTATION_KEYS_V2_LEGACY = ATTESTATION_KEYS_V1 | {"selection"}
+ATTESTATION_KEYS = ATTESTATION_KEYS_V2_LEGACY | ATTESTATION_BOOKKEEPING
 KEYS_BY_SCHEMA = {ATTESTATION_SCHEMA_V1: ATTESTATION_KEYS_V1, ATTESTATION_SCHEMA: ATTESTATION_KEYS}
+
+
+def attestation_shape_matches(attestation: object) -> bool:
+    """Accept exact v1, historical v2, or complete bookkeeping-v2 shapes.
+
+    Historical v2 predates all four bookkeeping fields. A partial extension
+    is neither historical nor complete and stays invalid.
+    """
+    if not isinstance(attestation, dict):
+        return False
+    schema = attestation.get("schema")
+    if not isinstance(schema, str) or schema not in KEYS_BY_SCHEMA:
+        return False
+    keys = set(attestation)
+    return keys == KEYS_BY_SCHEMA[schema] or (
+        schema == ATTESTATION_SCHEMA and keys == ATTESTATION_KEYS_V2_LEGACY
+    )
 
 
 def _command_digest(command: str) -> str:
@@ -133,15 +152,27 @@ def validate_attestation(
     typed confirmation can waive a step any more, so a recorded selection
     matches nothing. Only the automatic narrow-change simplification skips."""
     rule = "push.attestation"
-    if not isinstance(attestation, dict) or set(attestation) not in KEYS_BY_SCHEMA.values():
+    if not isinstance(attestation, dict):
         return [(rule, "attestation has an unknown or incomplete schema")]
     schema = attestation.get("schema")
-    if schema not in KEYS_BY_SCHEMA:
+    if not isinstance(schema, str) or schema not in KEYS_BY_SCHEMA:
         return [(rule, f"unsupported attestation schema {schema!r}")]
-    if set(attestation) != KEYS_BY_SCHEMA[schema]:
+    if not attestation_shape_matches(attestation):
         return [(rule, "attestation has an unknown or incomplete schema")]
     if attestation.get("change_id") != change_id:
         return [(rule, "attestation change_id does not match its path")]
+    if not ATTESTATION_BOOKKEEPING.intersection(attestation):
+        # Historical v1/v2 records counted reports and evidence as content.
+        # Preserve that policy rather than rewriting their recorded digest.
+        contract = manifest if manifest is not None else load_manifest()
+        added_metadata = {
+            "docs/loom/<change-id>/acceptance-test-report.md",
+            "docs/loom/<change-id>/evidence/*",
+        }
+        manifest = dict(contract, publication_only_paths=[
+            path for path in contract.get("publication_only_paths", [])
+            if path not in added_metadata
+        ])
     expected = functional_content_digest(repo, head_sha, change_id, manifest)
     if expected is None or attestation.get("content_digest") != expected:
         return [(rule, "attestation functional content digest does not match the selected tree")]
