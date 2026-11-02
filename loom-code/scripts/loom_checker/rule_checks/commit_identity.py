@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from loom_checker.digest import functional_content_digest
 from loom_checker.attestation import ATTESTATION_SCHEMA_V1, ATTESTATION_SCHEMA, ATTESTATION_KEYS_V2_LEGACY
+from loom_checker.attestation import NEW_CONFIRMATION_FIELDS
 from loom_checker.helpers import artifact_text, git_maybe
+from loom_checker.rule_checks.intent_version import pinned_confirmation
 from pathlib import Path
 import re
 
@@ -40,6 +42,8 @@ def check_commit_identity(
     if schema == ATTESTATION_SCHEMA_V1 or (
         schema == ATTESTATION_SCHEMA and set(attestation) == ATTESTATION_KEYS_V2_LEGACY
     ):
+        if pinned_confirmation(manifest, repo, change_id, commit=commit) is not None:
+            return [(rule, NEW_CONFIRMATION_FIELDS)]
         return []
 
     # v2 attestations must have both bookkeeping fields.

@@ -117,29 +117,58 @@ PASSING = [
 
 # --- Acceptance 3 -----------------------------------------------------------
 
-@pytest.mark.parametrize("with_intent", [False, True])
-def test_narrow_delta_finalizes_with_no_adversarial_artifact(
-    tmp_path: Path, with_intent: bool,
+@pytest.mark.parametrize("change_kind", ["no-intent", "narrow", "executable"])
+def test_mechanical_verification_without_a_report_keeps_evidence_boundaries(
+    tmp_path: Path, change_kind: str,
 ) -> None:
-    """A narrow delta auto-skips the adversarial step, with no typed skip."""
+    """Report omission is distinct from the automatically narrow step skips."""
+    with_intent = change_kind != "no-intent"
+    executable = change_kind == "executable"
     repo = make_reported_repo(tmp_path) if with_intent else make_narrow_repo(tmp_path)
     report = repo / f"docs/loom/{CHANGE}/acceptance-test-report.md"
     if with_intent:
         report.unlink()
+    if executable:
+        (repo / "feature.py").write_text(
+            "from pathlib import Path\nENABLED = True\n"
+            "assert ENABLED and Path('docs/guide.md').is_file()\n",
+        )
+        (repo / "docs/loom/KICKOFF-DEFAULTS.md").write_text(
+            "- package-tests: python3 feature.py — fixture (2026-11-02)\n",
+        )
+        write_probes(repo, 1)
+    elif with_intent:
         commit_all(repo, "mechanical evidence needs no independent report")
     head = git(repo, "rev-parse", "HEAD")
 
-    result = finalize(repo, review_input(tmp_path, PASSING[:1], []))
+    if executable:
+        from loom_checker.reviewers import auto_skipped_steps
+        assert "acceptance-test" not in auto_skipped_steps(repo, CHANGE, head)
+    verdicts = PASSING if executable else PASSING[:1]
+    probes = ADVERSARIAL if executable else []
+    result = finalize(repo, review_input(tmp_path, verdicts, probes))
 
     assert result.returncode == 0, result.stderr
     attestation = written(repo)
-    assert [run["kind"] for run in attestation["executions"]] == ["package-tests"]
+    expected_runs = ["package-tests", "adversarial"] if executable else ["package-tests"]
+    assert [run["kind"] for run in attestation["executions"]] == expected_runs
     assert attestation["selection"] is None  # no typed confirmation was bound
     if with_intent:
         assert attestation["tested_commit"] == attestation["reviewed_commit"] == head
         assert attestation["acceptance_status"] == []  # no independent test claimed
         assert not report.exists()
     assert validate(repo, attestation) == []
+    claimed = dict(attestation, acceptance_status=[{"acceptance": 1, "status": "works"}])
+    assert validate(repo, claimed)
+    if with_intent:
+        report.write_text(
+            f"Tried on 2026-11-02, in a clean copy of the project at {head}.\n\n"
+            "| 1 | the guide exists | maybe | incomplete | re-tested |\n",
+        )
+        commit_all(repo, "a present report still needs valid evidence")
+        refused = finalize(repo, review_input(tmp_path, verdicts, probes))
+        assert refused.returncode == 1
+        assert "intake.attestation-coverage" in refused.stderr
 
 
 def make_reported_repo(tmp_path: Path) -> Path:

@@ -9,6 +9,7 @@ test_loom_checker_intake.py.
 """
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
@@ -23,7 +24,6 @@ from loom_checker.rule_checks.evidence_coverage import (
 from loom_checker.rule_checks.intent_version import (
     check_intent_version,
     intent_identity,
-    recompute_command,
 )
 
 CHANGE = "2026-10-12-drift"
@@ -327,6 +327,13 @@ def test_intent_version_fails_after_a_post_confirmation_edit(tmp_path: Path) -> 
     )
     failures = check_intent_version(load_manifest(), repo, CHANGE, {}, attestation)
     assert failures and "re-confirm the intent" in failures[0][1]
+    commands = re.findall(r"`([^`]+)`", failures[0][1])
+    assert commands, "the public diagnostic must give the recovery command"
+    result = subprocess.run(
+        ["sh", "-c", commands[0]], cwd=repo, capture_output=True, text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == intent_identity(path)
 
 
 def test_intent_version_recovers_by_re_pinning(tmp_path: Path) -> None:
@@ -366,17 +373,3 @@ def test_intent_version_accepts_an_abbreviated_pin(tmp_path: Path) -> None:
     path = write_pinned_intent(repo)
     attestation = {"intent_confirmed_sha": intent_identity(path)[:7]}
     assert check_intent_version(load_manifest(), repo, CHANGE, {}, attestation) == []
-
-
-def test_recompute_command_works_under_posix_sh(tmp_path: Path) -> None:
-    """The printed fix must survive a minimal shell: no bash-only
-    process substitution."""
-    repo = make_repo(tmp_path)
-    path = write_pinned_intent(repo)
-    relative = f"docs/loom/intent/{CHANGE}.md"
-    command = recompute_command(relative).split("`")[1]
-    result = subprocess.run(
-        ["sh", "-c", command], cwd=repo, capture_output=True, text=True
-    )
-    assert result.returncode == 0, result.stderr
-    assert result.stdout.strip() == intent_identity(path)

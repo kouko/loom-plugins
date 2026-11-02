@@ -255,6 +255,12 @@ not a completed outside review.
 ## 3. Run acceptance testing
 
 Use acceptance testing when an Acceptance line cannot be settled mechanically.
+When every Acceptance is settled mechanically, omit the independent report
+even for executable, non-narrow changes; this differs from a user skip or
+automatic narrow simplification. Finalization and publication still require
+passing functional executions and reviews, record the actual tested commit,
+and check any report present. Report absence cannot prove that semantic
+decision: the station and reviewers must require independent evidence when needed.
 Acceptance testing means dispatching the `loom-code:acceptance-tester` agent
 fresh-context, never an agent that touched any part of the change. It writes
 the report to `docs/loom/<change-id>/acceptance-test-report.md` and detailed

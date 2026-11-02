@@ -35,6 +35,26 @@ def recompute_command(relative: str) -> str:
     )
 
 
+def pinned_confirmation(
+    manifest, repo: Path, change_id: str, *, commit: str | None = None,
+) -> tuple[str, bytes] | None:
+    """The selected ancestry's latest canonical confirmation, when pinned."""
+    relative = artifact_path(manifest, "intent", change_id, repo).relative_to(repo).as_posix()
+    # Full history follows every merge parent despite path simplification;
+    # selected ancestry and topological order keep children before parents:
+    # https://git-scm.com/docs/git-log . Hash/NUL/subject format codes:
+    # https://git-scm.com/docs/pretty-formats (verified 2026-11-02).
+    history = git_text(repo, "log", "--full-history", "--topo-order", "--format=%H%x00%s", commit or "HEAD", "--", relative)
+    subject = f"docs(loom): intent {change_id} confirmed"
+    for entry in history.splitlines():
+        sha, _, title = entry.partition("\0")
+        if title == subject:
+            confirmed = artifact_text(manifest, "intent", change_id, repo, commit=sha)
+            raw = (confirmed or "").encode("utf-8", "surrogateescape")
+            return (sha, raw) if INTENT_CONFIRMED_SHA_LINE.search(raw) else None
+    return None
+
+
 def check_intent_version(
     manifest, repo: Path, change_id: str, intent_sections: dict[str, str],
     attestation: dict, *, commit: str | None = None,
@@ -49,38 +69,27 @@ def check_intent_version(
     intent_text = artifact_text(manifest, "intent", change_id, repo, commit=commit)
     raw = intent_text.encode("utf-8", "surrogateescape") if intent_text is not None else b""
     relative = artifact_path(manifest, "intent", change_id, repo).relative_to(repo).as_posix()
-    # Full history follows every merge parent despite path simplification;
-    # selected ancestry and topological order keep children before parents:
-    # https://git-scm.com/docs/git-log . Hash/NUL/subject format codes:
-    # https://git-scm.com/docs/pretty-formats (verified 2026-11-02).
-    history = git_text(repo, "log", "--full-history", "--topo-order", "--format=%H%x00%s", commit or "HEAD", "--", relative)
-    subject = f"docs(loom): intent {change_id} confirmed"
-    for entry in history.splitlines():
-        sha, _, title = entry.partition("\0")
-        if title != subject:
-            continue
-        confirmed = artifact_text(manifest, "intent", change_id, repo, commit=sha)
-        baseline = (confirmed or "").encode("utf-8", "surrogateescape")
-        if INTENT_CONFIRMED_SHA_LINE.search(baseline):
-            pin = PIN_VALUE.search(baseline)
-            expected = _content_identity(baseline)
-            if pin is None or not sha_agrees(pin.group(1).decode(), expected):
-                return [(rule, f"confirmation commit {sha[:7]} has an invalid intent pin; re-confirm the intent")]
-            current_pin = PIN_VALUE.search(raw)
-            recorded = attestation.get("intent_confirmed_sha")
-            if (not CONFIRMED_STATUS.search(raw) or _content_identity(raw) != expected
-                    or current_pin is None or not sha_agrees(current_pin.group(1).decode(), expected)
-                    or not isinstance(recorded, str) or not re.fullmatch(r"[0-9a-fA-F]{7,64}", recorded)
-                    or not sha_agrees(recorded, expected)):
-                return [(
-                    rule,
-                    f"the intent no longer matches confirmation commit {sha[:7]} "
-                    f"(confirmed {expected[:7]}, current {_content_identity(raw)[:7]}); "
-                    "every Acceptance line may be affected. "
-                    f"{recompute_command(relative)} and re-confirm the intent before closing review",
-                )]
-            return []
-        break  # The latest canonical confirmation predates pin support.
+    confirmation = pinned_confirmation(manifest, repo, change_id, commit=commit)
+    if confirmation is not None:
+        sha, baseline = confirmation
+        pin = PIN_VALUE.search(baseline)
+        expected = _content_identity(baseline)
+        if pin is None or not sha_agrees(pin.group(1).decode(), expected):
+            return [(rule, f"confirmation commit {sha[:7]} has an invalid intent pin; re-confirm the intent")]
+        current_pin = PIN_VALUE.search(raw)
+        recorded = attestation.get("intent_confirmed_sha")
+        if (not CONFIRMED_STATUS.search(raw) or _content_identity(raw) != expected
+                or current_pin is None or not sha_agrees(current_pin.group(1).decode(), expected)
+                or not isinstance(recorded, str) or not re.fullmatch(r"[0-9a-fA-F]{7,64}", recorded)
+                or not sha_agrees(recorded, expected)):
+            return [(
+                rule,
+                f"the intent no longer matches confirmation commit {sha[:7]} "
+                f"(confirmed {expected[:7]}, current {_content_identity(raw)[:7]}); "
+                "every Acceptance line may be affected. "
+                f"{recompute_command(relative)} and re-confirm the intent before closing review",
+            )]
+        return []
     if intent_text is None:
         return []
     if not CONFIRMED_STATUS.search(raw):

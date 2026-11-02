@@ -3,11 +3,13 @@ from __future__ import annotations
 from git_exec import run_git
 from loom_checker.attestation import attestation_shape_matches
 from loom_checker.helpers import GIT_TIMEOUT
+from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import load_manifest
 from loom_checker.helpers import read_text
 from loom_checker.parsing import parse_document
+from loom_checker.rule_checks.intent_version import pinned_confirmation
 from pathlib import Path
 import json
 import re
@@ -227,6 +229,13 @@ def intent_delivery_state(
         return "active", "canonical attestation is malformed JSON"
     if not _delivery_witness_valid(attestation, change_id):
         return "active", "canonical attestation has an unsupported or incomplete witness shape"
+    if "tested_commit" not in attestation:
+        try:
+            confirmation = pinned_confirmation(contract, repo, change_id, commit=snapshot)
+        except UsageError as exc:
+            return "indeterminate", str(exc)
+        if confirmation is not None:
+            return "active", "a pinned canonical confirmation requires bookkeeping evidence"
     return "delivered", default_ref
 
 

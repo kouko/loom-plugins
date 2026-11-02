@@ -16,6 +16,7 @@ from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
 from loom_checker.reviewers import outside_verdict_failure
 from loom_checker.reviewers import selected_outside_family
+from loom_checker.rule_checks.intent_version import pinned_confirmation
 from pathlib import Path
 import hashlib
 import posixpath
@@ -39,6 +40,7 @@ ATTESTATION_BOOKKEEPING = {
 ATTESTATION_KEYS_V2_LEGACY = ATTESTATION_KEYS_V1 | {"selection"}
 ATTESTATION_KEYS = ATTESTATION_KEYS_V2_LEGACY | ATTESTATION_BOOKKEEPING
 KEYS_BY_SCHEMA = {ATTESTATION_SCHEMA_V1: ATTESTATION_KEYS_V1, ATTESTATION_SCHEMA: ATTESTATION_KEYS}
+NEW_CONFIRMATION_FIELDS = "a pinned canonical intent confirmation requires the complete v2 bookkeeping fields"
 
 
 def attestation_shape_matches(attestation: object) -> bool:
@@ -152,7 +154,11 @@ def check_attestation_evidence(
     Exact historical shapes keep their original validation and digest policy;
     complete bookkeeping records use these same checks at both real callers.
     """
+    # Existing validation callers may override digest policy alone.
+    contract = dict(load_manifest(), **(manifest or {}))
     if not ATTESTATION_BOOKKEEPING.intersection(attestation):
+        if pinned_confirmation(contract, repo, change_id, commit=head_sha) is not None:
+            return [("intake.commit-identity", NEW_CONFIRMATION_FIELDS)]
         return []
     # Local imports keep capability modules independently importable: the
     # commit-identity capability also consumes the schema constants above.
@@ -162,13 +168,14 @@ def check_attestation_evidence(
     from loom_checker.rule_checks.intent_version import check_intent_version
     from loom_checker.rule_checks.plan_boundary_tests import check_plan_boundary_tests
 
-    # Existing validation callers may override digest policy alone.
-    contract = dict(load_manifest(), **(manifest or {}))
     intent = artifact_text(contract, "intent", change_id, repo, commit=head_sha)
     _, sections = parse_document(intent or "")
     failures = check_attestation_coverage(
         contract, repo, change_id, sections, attestation, commit=head_sha,
-        allow_missing_report="acceptance-test" in auto_skipped_steps(repo, change_id, head_sha),
+        # Both callers already require successful functional executions and
+        # reviewer evidence. The station decides whether independent testing
+        # is needed; absence alone cannot recompute that semantic decision.
+        allow_missing_report=True,
     )
     failures += check_commit_identity(contract, repo, change_id, sections, attestation, commit=head_sha)
     failures += check_intent_version(contract, repo, change_id, sections, attestation, commit=head_sha)
@@ -196,6 +203,9 @@ def validate_attestation(
     if attestation.get("change_id") != change_id:
         return [(rule, "attestation change_id does not match its path")]
     if not ATTESTATION_BOOKKEEPING.intersection(attestation):
+        contract = dict(load_manifest(), **(manifest or {}))
+        if pinned_confirmation(contract, repo, change_id, commit=head_sha) is not None:
+            return [(rule, NEW_CONFIRMATION_FIELDS)]
         # Historical v1/v2 records counted reports and evidence as content.
         # Preserve that policy rather than rewriting their recorded digest.
         contract = manifest if manifest is not None else load_manifest()
@@ -342,7 +352,7 @@ def validate_attestation(
                         return [(rule, "attestation acceptance_status items must be objects")]
                     if "acceptance" not in item or "status" not in item:
                         return [(rule, "attestation acceptance_status items must have 'acceptance' and 'status' fields")]
-                    if item["status"] not in {"works", "partly", "not_verified", "fails"}:
+                    if not isinstance(item["status"], str) or item["status"] not in {"works", "partly", "not_verified", "fails"}:
                         return [(rule, f"attestation acceptance_status has invalid status: {item['status']!r}")]
 
     return check_attestation_evidence(repo, head_sha, change_id, attestation, manifest)

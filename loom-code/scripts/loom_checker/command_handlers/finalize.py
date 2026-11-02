@@ -415,8 +415,8 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     # The bookkeeping fields above are bound to the change's own artifacts:
     # intent_confirmed_sha from the intent frontmatter (recorded by
     # capture-intent at confirmation), tested_commit from the acceptance
-    # test report's fixed "Tried on ... at <sha>" line. A mechanically
-    # narrow change without a report uses the functional executions just
+    # test report's fixed "Tried on ... at <sha>" line. Mechanical verification
+    # without an independent report uses the functional executions just
     # completed at HEAD, without claiming independent acceptance testing.
     from loom_checker.parsing import parse_document
     import re as _re
@@ -434,7 +434,7 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         if attestation["tested_commit"] is None:
             return [("intake.commit-identity", "acceptance report needs one canonical Tried-on commit line")]
         attestation["acceptance_status"] = acceptance_coverage(intent_sections, report_text)
-    elif "acceptance-test" in skip or not acceptance_coverage(intent_sections, ""):
+    else:
         attestation["tested_commit"] = head_sha
 
     failures = check_attestation_evidence(repo, head_sha, change_id, attestation, manifest)
