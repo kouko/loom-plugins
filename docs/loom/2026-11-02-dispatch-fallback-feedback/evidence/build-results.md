@@ -29,5 +29,13 @@
 - W4-01 implementer `/root/dispatch_resolver_build`, commit `4123ff56`: searched fallback calls, shared retry wording and profile tests. Existing retry test gained both lost/restored-guarantee cases; net test lines +6, no new implementer test function. Resolver tests plus unchanged earned program: 154 passed.
 - Native feedback for the adversary and each completed implementation task returned `routed`, count 0, with unknown effective settings and no invented overrides. Finding a product defect was successful adversarial work, not a failed agent attempt.
 
+## Graduation and integration hand-off
+- W4-02 moved the adversary's program byte-identically to `loom-code/tests/test_dispatch_fallback_inheritance.py` in commit `c9dfca15`; old store path absent. SHA256 before and after: `0d021ba8578de873670ad9efc4163e21b0374d8f7e182f93eb70eed60d033aae`. Actual suite-path execution: 1 passed.
+- Initial complete package run found the existing early-Build one-home reference check rejecting the added redundant station name. The W2 implementer cited the unique `review.bounded-episode` rule directly and clarified the new-task subject; commit `7f79a0d4`, relevant checks 52 passed, existing test unchanged.
+- Final Build source: `7f79a0d4e4345de027bc51171438b8d7ecaba0fe`; sync-trunk up to date with `origin/main` at `55587449a0473697dee852f0dff69b240ef5d36e`.
+- Complete locked isolated package suite exited 0: 4,107 pytest passes and six skips, plus all discovered shell checks. Raw local output `/tmp/loom-dispatch-build-suite-final.log`. Skips are the suite's existing conditions, not user-requested omissions.
+- After the suite, the committed permanent adversarial program ran again: 1 passed, `/tmp/loom-dispatch-build-adversarial.log`. The adversary was not dispatched again: the same earned program still catches the same product defect, and subsequent prose fixes did not change its scope.
+- Build hand-off: `/tmp/loom-dispatch-build-handoff.json`; no unresolved adversarial findings, no steps skipped. Closing Review computed reviewer floor 2 and began independent acceptance testing only after these checks passed.
+
 ## Verification boundaries
 Focused tests prove resolver decisions and validation. They do not establish fresh-agent interpretation, complete closing-review behavior, installed cache loading, or Claude Code/OpenCode runtime behavior. Independent isolated acceptance testing and closing review follow Build; historical evidence is not substituted for those checks.
