@@ -1,3 +1,7 @@
+> Historical checkpoint note, superseded by the 2026-11-02 recovery.
+> Claims below are retained as session history, not current verification.
+> For verification, use the acceptance test report and generated attestation, checking the version each names.
+
 ## Loom Evidence Drift Guards - Implementation Complete
 
 The loom mechanism change to prevent evidence drift has been successfully implemented and verified:

@@ -1,3 +1,7 @@
+> Historical checkpoint note, superseded by the 2026-11-02 recovery.
+> Claims below are retained as session history, not current verification.
+> For verification, use the acceptance test report and generated attestation, checking the version each names.
+
 ## Loom Evidence Drift Guards - Build Station Completed
 
 The build station has successfully completed for the change `2026-10-12-loom-evidence-drift-guards`.

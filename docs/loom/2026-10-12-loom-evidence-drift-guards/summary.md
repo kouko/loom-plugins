@@ -1,3 +1,7 @@
+> Historical checkpoint note, superseded by the 2026-11-02 recovery.
+> Claims below are retained as session history, not current verification.
+> For verification, use the acceptance test report and generated attestation, checking the version each names.
+
 ## Loom Mechanism Drift Guards - Flow Complete Through Write-Plan Station
 
 I have successfully completed the loom flow up to the point of being ready for build station:

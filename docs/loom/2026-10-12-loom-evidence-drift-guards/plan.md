@@ -1,13 +1,7 @@
 # Loom evidence drift guards — plan (reshaped per complexity critique)
 intent: 2026-10-12-loom-evidence-drift-guards@71bb82d9
+spec: docs/loom/2026-10-12-loom-evidence-drift-guards/spec.md@e5b02ac
 charter: 1.1
-
-## Current State Evidence
-- Forward: `loom-checker/attestation.py` validates attestation schema and content digest; `digest.py` computes functional content diff excluding publication_only_paths
-- Reverse: `manifest.yaml publication_only_paths` already excludes attestation.json; acceptance test report template requires one row per Acceptance line but lacks checker enforcement
-- Error: Acceptance test report can omit Acceptance lines (youtube-summarize-scraper case); attestation lacks intent version/commit identity; verdict not filed in change directory
-- Data: `manifest.yaml` defines publication_only_paths; `attestation.json` template has fixed schema; `acceptance-test-report.md` template defines table structure
-- Boundary: acceptance-tester allows `not verified` rows with reason; evidence file differences permitted between tested/reviewed commits; incremental re-testing preserves original tested commit reference
 
 ## Task DAG
 
@@ -76,7 +70,7 @@ charter: 1.1
 
 **W3-04 Graduate the adversary's demonstrated regressions**  after: W3-03  acceptance: 1,2,4,6,7
 - Files: `docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/probes/test_adversarial.py`, `loom-code/tests/test_adversarial_evidence_drift.py`
-- Test: A1/A2/A4/A6/A7 positive: the earned adversarial program runs in the package suite; boundary: its nine demonstrated regression cases fail before their fixes and pass afterwards.
+- Test: A1 positive: coverage; boundary: omissions. A2 positive: identities; boundary: drift. A4 positive: existence; boundary: missing. A6 positive: publication; boundary: corruption. A7 positive: supported flows; boundary: incompatibility.
 - Risk: agent-decided — move the unchanged assertions into the permanent suite; only the owning adversary updates its executable program.
 
 **W3-05 Synchronize release metadata and replace stale verification records**  after: W3-04  acceptance: 5,7
@@ -110,6 +104,7 @@ charter: 1.1
 ## Questions asked
 ① — consequence — 你要的是：loom 流程能自己抓出三類破口——假覆蓋被擋下、過時證據被擋下、Intent 被偷偷改掉會被偵測——做完後這三件事都會在檢查時被擋下。對嗎？（含自動發布授權說明，使用者可 opt out） — 確認 2026-10-12
 ① — what — 範圍選項 A / B / C — A 確認 2026-10-12
+② — behaviour — 是否確認上述 7 項行為：漏測、版本不一致、需求退版及缺少具名測試會被指出；發布前重驗證據；新紀錄補齊欄位，舊紀錄與小改動保留相容處理？這是補齊原分支遺漏的行為確認。 — 確認，符合原本需求 2026-11-02
 
 ## Risks
 1. Attestation schema extension must stay compatible with v1 attestations and existing finalize-review flow

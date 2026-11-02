@@ -1,7 +1,7 @@
 # Loom evidence drift guards
 originator: kouko
 kind: product
-needs-design: no — internal checker, attestation and station-text changes to loom-code; no user-facing interface surface per the repo's interface-surfaces default
+needs-design: yes — the attestation JSON template is a declared contract surface; the seven confirmed Acceptance outcomes remain unchanged
 evidence: [docs/loom/intent/2026-10-12-codex-evaluation-option-A.md]
 status: confirmed 2026-10-12
 publication: automatic — authorized 2026-10-12 by kouko
