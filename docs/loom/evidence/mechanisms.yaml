@@ -305,6 +305,7 @@ mechanisms:
   - {id: "artifact:intent.map",                 class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.evidence",            class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.status",              class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.intent_confirmed_sha", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.publication",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_intent_contract_declares_machine_readable_publication_authorization"}
   - {id: "artifact:intent.Problem",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.Proposed outcome",    class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
@@ -333,6 +334,10 @@ mechanisms:
   - {id: "artifact:attestation.verdicts",       class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
   - {id: "artifact:attestation.findings",       class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
   - {id: "artifact:attestation.selection",      class: contract, eval: "loom-code/tests/test_selection_finalize.py::test_v2_without_selection_keeps_every_floor"}
+  - {id: "artifact:attestation.intent_confirmed_sha", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:attestation.tested_commit", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:attestation.reviewed_commit", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:attestation.acceptance_status", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
 
   # --- prose-gate: landed stations mark their real `<!-- gate: … -->`
   #     paragraphs in W1/W2, W3-06 §11 recomputes ---
