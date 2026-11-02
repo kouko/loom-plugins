@@ -256,9 +256,11 @@ not a completed outside review.
 
 Use acceptance testing when an Acceptance line cannot be settled mechanically.
 Acceptance testing means dispatching the `loom-code:acceptance-tester` agent
-fresh-context, never an agent that touched any part of the change. Its
-`docs/loom/<change-id>/acceptance-test-report.md`, direct evidence files and
-`attestation.json` are publication metadata under the manifest; executable
+fresh-context, never an agent that touched any part of the change. It writes
+the report to `docs/loom/<change-id>/acceptance-test-report.md` and detailed
+evidence to `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`.
+Those files, other direct evidence files and `attestation.json` are
+publication metadata under the manifest; executable
 probe programs remain functional content. Commit the report and its evidence
 before `finalize-review`, which records the tested commit from the report's
 canonical `Tried on ... at <sha>` line and rechecks every applicable evidence
