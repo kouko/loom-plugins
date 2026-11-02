@@ -143,13 +143,14 @@ def test_coverage_fails_and_names_a_duplicated_line(tmp_path: Path) -> None:
     assert failures and "duplicate rows for Acceptance lines: 2" in failures[0][1]
 
 
-def test_coverage_fails_and_names_an_unreadable_verdict(tmp_path: Path) -> None:
+@pytest.mark.parametrize("asked", ["a", r"Command prints A \| B", r"Path ends in \\", r"Command \| works "])
+def test_coverage_fails_and_names_an_unreadable_verdict(tmp_path: Path, asked: str) -> None:
     """The template pins the Verdict cell to four words; a row that states
     something else has not stated a status the check can read."""
     repo = make_repo(tmp_path)
     write_report(
         repo,
-        "| 1 | a | maybe | ok | — |\n| 2 | b | works | ok | — |\n"
+        f"| 1 | {asked}| maybe | ok | — |\n| 2 | b | works | ok | — |\n"
         "| 3 | c | works | ok | — |\n",
     )
     failures = check_attestation_coverage(
@@ -158,11 +159,12 @@ def test_coverage_fails_and_names_an_unreadable_verdict(tmp_path: Path) -> None:
     assert failures and "no Verdict" in failures[0][1] and ": 1" in failures[0][1]
 
 
-def test_coverage_passes_a_complete_report(tmp_path: Path) -> None:
+@pytest.mark.parametrize("asked", ["a", r"Command prints A \| B", r"Path ends in \\", r"Command \| works "])
+def test_coverage_passes_a_complete_report(tmp_path: Path, asked: str) -> None:
     repo = make_repo(tmp_path)
     write_report(
         repo,
-        "| 1 | a | works | ok | — |\n| 2 | b | not verified | unrun | — |\n"
+        f"| 1 | {asked}| works | ok | — |\n| 2 | b | not verified | unrun | — |\n"
         "| 3 | c | fails | broke | — |\n",
     )
     assert check_attestation_coverage(

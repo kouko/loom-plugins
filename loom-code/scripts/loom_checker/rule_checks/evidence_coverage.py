@@ -51,7 +51,14 @@ def _report_rows(report_text: str) -> list[tuple[int, str]]:
         match = REPORT_ROW.match(line)
         if not match:
             continue
-        cells = line.split("|")
+        # An odd backslash run escapes a pipe; an even run leaves a separator.
+        cells, start, escaped = [], 0, False
+        for index, character in enumerate(line):
+            if character == "|" and not escaped:
+                cells.append(line[start:index])
+                start = index + 1
+            escaped = character == "\\" and not escaped
+        cells.append(line[start:])
         verdict = cells[3].strip() if len(cells) > 3 else ""
         rows.append((int(match.group(1)), verdict))
     return rows
