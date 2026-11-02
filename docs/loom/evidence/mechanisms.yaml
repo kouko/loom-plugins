@@ -122,7 +122,7 @@ mechanisms:
   # --- checker-rule (loom_checker.py --list-rules is the count) ---
   - id: adversarial.proportionate
     class: checker-rule
-    eval: loom-code/tests/test_selection_finalize.py::test_five_probe_programs_pass_and_a_sixth_is_refused
+    eval: loom-code/tests/test_selection_finalize.py::test_cap_probe_programs_pass_and_one_more_is_refused
   - id: ci.pr-floor
     class: checker-rule
     eval: loom-code/tests/test_pr_floor.py::test_bad_body_exit_1_names_heading
@@ -144,6 +144,18 @@ mechanisms:
   - id: intake.spec-ready
     class: checker-rule
     eval: loom-code/tests/test_loom_checker_intake.py::test_invalid_pre_build_review_declaration_is_blocked
+  - id: intake.attestation-coverage
+    class: checker-rule
+    eval: loom-code/tests/test_evidence_drift_guards.py
+  - id: intake.commit-identity
+    class: checker-rule
+    eval: loom-code/tests/test_evidence_drift_guards.py
+  - id: intake.intent-version
+    class: checker-rule
+    eval: loom-code/tests/test_evidence_drift_guards.py
+  - id: intake.plan-boundary-tests
+    class: checker-rule
+    eval: loom-code/tests/test_loom_checker_intake.py
   - id: intent.kind-recompute
     class: checker-rule
     eval: loom-code/tests/test_loom_checker_intent.py::test_engineering_kind_over_an_interface_diff_is_blocked
@@ -293,6 +305,7 @@ mechanisms:
   - {id: "artifact:intent.map",                 class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.evidence",            class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.status",              class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:intent.intent_confirmed_sha", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.publication",         class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_intent_contract_declares_machine_readable_publication_authorization"}
   - {id: "artifact:intent.Problem",             class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
   - {id: "artifact:intent.Proposed outcome",    class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
@@ -321,6 +334,10 @@ mechanisms:
   - {id: "artifact:attestation.verdicts",       class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
   - {id: "artifact:attestation.findings",       class: contract, eval: "loom-code/tests/test_loom_attestation.py"}
   - {id: "artifact:attestation.selection",      class: contract, eval: "loom-code/tests/test_selection_finalize.py::test_v2_without_selection_keeps_every_floor"}
+  - {id: "artifact:attestation.intent_confirmed_sha", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:attestation.tested_commit", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:attestation.reviewed_commit", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
+  - {id: "artifact:attestation.acceptance_status", class: contract, eval: "loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields"}
 
   # --- prose-gate: landed stations mark their real `<!-- gate: … -->`
   #     paragraphs in W1/W2, W3-06 §11 recomputes ---

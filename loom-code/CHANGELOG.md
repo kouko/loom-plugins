@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.56.0] — 2026-11-02 — detect incomplete and stale verification evidence
+
+- Add four checker rules for missing or repeated Acceptance report rows, mismatched tested and reviewed functional content, changed confirmed intent content, and missing named boundary/probe programs. Planning checks task references; post-Build checks require the concrete named files to exist.
+- Extend generated attestations with `intent_confirmed_sha`, `tested_commit`, `reviewed_commit`, and per-line `acceptance_status`. Finalization and publication recheck report coverage and status agreement, commit identities, confirmation history, and boundary programs against the selected committed tree, without substituting checkout contents.
+- Both intent-entry paths write the confirmation pin after all confirmed frontmatter. The latest pinned canonical confirmation commit anchors the expected version, so restoring an older complete intent cannot erase its baseline.
+- Declare the intent pin and four attestation fields as compatible schema additions; the contract version stays 2.3.1. New generated v2 records carry the complete bookkeeping group; exact historical v1/v2 records keep their shapes and original digest policy, without migration. Mechanical verification without an independent report records its actual execution commit and no independent acceptance results.
+- Treat acceptance reports and direct evidence files as publication metadata while retaining executable probe programs as functional content. Finalization requires canonical report provenance; publication checks recorded identities and any declared provenance. Intent, plan, and attestation templates carry the new bookkeeping and boundary-test guidance.
+- budget-exception: intake.attestation-coverage — adds one checker rule to reject incomplete or duplicate Acceptance coverage; regression eval `loom-code/tests/test_evidence_drift_guards.py`.
+- budget-exception: intake.commit-identity — adds one checker rule to reject functional differences between tested and reviewed commits; regression eval `loom-code/tests/test_evidence_drift_guards.py`.
+- budget-exception: intake.intent-version — adds one checker rule to reject changed confirmed intent content; regression eval `loom-code/tests/test_evidence_drift_guards.py`.
+- budget-exception: intake.plan-boundary-tests — adds one checker rule to reject missing task references during planning and missing named boundary/probe programs after Build; regression eval `loom-code/tests/test_loom_checker_intake.py`.
+- budget-exception: artifact:intent.intent_confirmed_sha — declares the implemented confirmation pin; regression eval `loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields`.
+- budget-exception: artifact:attestation.intent_confirmed_sha — declares the implemented confirmation baseline field; regression eval `loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields`.
+- budget-exception: artifact:attestation.tested_commit — declares the implemented tested-content identity; regression eval `loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields`.
+- budget-exception: artifact:attestation.reviewed_commit — declares the implemented reviewed-content identity; regression eval `loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields`.
+- budget-exception: artifact:attestation.acceptance_status — declares the implemented per-line acceptance results; regression eval `loom-code/tests/test_contract_manifest.py::test_markdown_templates_carry_declared_fields`.
+
 ## [3.55.1] — 2026-11-01 — guard direct main-branch Git operations
 
 - The installed Loom `PreToolUse` hooks block `git merge`, `git commit`, and `git push` when the Git command starts the shell input on `main` or `master`, including when `&&` or `;` follows it; normal feature-branch work continues.

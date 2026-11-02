@@ -4,6 +4,7 @@ declaration of stations / tools / actions / artifact schemas (concept-model
 family must resolve here; mechanisms.yaml (W0-06) recomputes from it."""
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -91,10 +92,12 @@ def test_artifact_schemas_declare_fields_and_templates(manifest):
 
 def test_markdown_templates_carry_declared_fields(manifest):
     """Every frontmatter field / section the schema declares appears in the
-    template, so the template and the schema cannot drift apart. Skips an
+    template; JSON keys and intent frontmatter must also be declared, so
+    template additions cannot silently escape the schema. Skips an
     artifact with no template file at all (`template: null` -- W0-01's
     acceptance-test-report and dispatch, which are prose rather than
     not a template-backed schema)."""
+    undeclared = {}
     for name, schema in manifest["artifacts"].items():
         if schema.get("template") is None:
             continue
@@ -102,6 +105,20 @@ def test_markdown_templates_carry_declared_fields(manifest):
         for f in schema.get("fields", []):
             key = f["name"]
             assert key in tmpl, f"{name}: field {key!r} not in template {schema['template']}"
+        if schema["template"].endswith(".json"):
+            actual = set(json.loads(tmpl))
+            declared = {field["name"] for field in schema["fields"] if field["kind"] == "json"}
+        elif name == "intent":
+            frontmatter = tmpl.split("\n## ", 1)[0]
+            actual = set(re.findall(r"^([a-z][a-z0-9_-]*):", frontmatter, re.MULTILINE))
+            declared = {field["name"] for field in schema["fields"] if field["kind"] == "frontmatter"}
+        else:
+            continue
+        assert not declared - actual, f"{name}: declared fields absent from template: {declared - actual}"
+        missing = actual - declared
+        if missing:
+            undeclared[name] = sorted(missing)
+    assert not undeclared, f"template fields absent from schema: {undeclared}"
 
 
 def test_dispatch_is_not_part_of_generated_attestation(manifest):
@@ -203,6 +220,8 @@ def test_manifest_declares_publication_only_paths(manifest):
     patterns = manifest["publication_only_paths"]
     assert patterns == [
         "docs/loom/<change-id>/attestation.json",
+        "docs/loom/<change-id>/acceptance-test-report.md",
+        "docs/loom/<change-id>/evidence/*",
     ]
 
 
@@ -211,7 +230,10 @@ def test_manifest_declares_generated_attestation(manifest):
     assert schema["path"] == "docs/loom/<change-id>/attestation.json"
     assert schema["template"] == "attestation.json"
     names = [field["name"] for field in schema["fields"]]
-    assert names == ["schema", "change_id", "content_digest", "executions", "verdicts", "findings", "selection"]
+    assert names == [
+        "schema", "change_id", "content_digest", "executions", "verdicts", "findings", "selection",
+        "intent_confirmed_sha", "tested_commit", "reviewed_commit", "acceptance_status",
+    ]
     assert "review" not in manifest["artifacts"]
 
 

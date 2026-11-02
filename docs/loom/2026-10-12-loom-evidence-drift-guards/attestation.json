@@ -1,0 +1,116 @@
+{
+  "schema": "loom-attestation/v2",
+  "change_id": "2026-10-12-loom-evidence-drift-guards",
+  "content_digest": "7e2a31cc0ec367069b9dffbdea20e5ddb2a34f19",
+  "executions": [
+    {
+      "kind": "package-tests",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q",
+      "artifact": "",
+      "result": "pass",
+      "command_digest": "4f8ee1e92fdd95785fd8b3a24ce6cb1914e66c9ac76f8641bbc5ad42cb6f6a62"
+    },
+    {
+      "kind": "adversarial",
+      "command": "uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_adversarial_evidence_drift.py",
+      "artifact": "loom-code/tests/test_adversarial_evidence_drift.py",
+      "result": "pass",
+      "command_digest": "f4ef6278d60ca5c69737f5f9c6ee0d85882dce24fe665b05548051f973b5339e"
+    }
+  ],
+  "verdicts": [
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "6e39bc390000019f2a174cab7c6406e5b11e4f3e",
+      "review_target_sha": "3deb31e0d33e3ee2934a05bcf9c3d4a7bab79521",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists at the repository root",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "Prior fatal findings FIXED: attestation.py:155 shape-only exemption is now guarded by selected canonical pinned_confirmation before exemptions and legacy digest selection, including direct check_commit_identity and intent_delivery_state consumers; the historical-shape test exercises both applicability branches and delivery through its entry. attestation.py:345 malformed statuses are now string-checked before set membership; selected-tree verification tests execute list/object damage and receive stale without exceptions.",
+        "Prior nits FIXED: test_evidence_drift_guards.py:377 helper-only command coverage was removed and merged into the existing check_intent_version diagnostic test, which executes the emitted POSIX command; plan.md:67 and the other behavior-changing task Files now name their actual callable entries and correct stale paths. No prior finding was dismissed or remains unfixed; no new defect caused by the fix delta was identified.",
+        "Bounded round-two verification only: independently ran all three test files changed by the fix with PYTEST_XDIST_AUTO_NUM_WORKERS=4 uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_evidence_drift_guards.py loom-code/tests/test_verification_status.py loom-code/tests/test_selection_finalize.py -q: 94 passed in 73.08s, no skips. Read the updated handoff, acceptance artifacts and supplied mechanical evidence; did not rerun the complete package suite, execute store probes, create probes, or modify repository files."
+      ],
+      "reviewer": "/root/code_review_1",
+      "vendor": "openai",
+      "model": "host-inherited (exact model not exposed)"
+    },
+    {
+      "verdict": "PASS",
+      "lens": "code",
+      "reviewed_sha": "6e39bc390000019f2a174cab7c6406e5b11e4f3e",
+      "review_target_sha": "3deb31e0d33e3ee2934a05bcf9c3d4a7bab79521",
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md exists",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "findings": [],
+      "notes": [
+        "fixed — prior fatal at finalize.py:437: absent reports now record actual verified HEAD and empty acceptance_status for executable non-narrow changes; shared selected-tree validation permits the omission while rejecting independent-result claims without a report and validating present reports. The station/reviewer semantic applicability limit is explicit in closing-review section 3, the manifest and acceptance report. Independently ran all three changed test files: 94 passed in 70.48s, no skips.",
+        "fixed — prior important at mechanisms.yaml:147: coverage, commit-identity and intent-version evals now name test_evidence_drift_guards.py in both the registry and corresponding CHANGELOG budget declarations; the boundary-rule citation remains unchanged.",
+        "fixed — prior nit at test_evidence_drift_guards.py:377: the existing drift-entry test now extracts and executes the exact recovery command from check_intent_version's diagnostic under sh; the separate direct-helper test/import were removed. Review was confined to prior findings and the b0673ad0..3deb31e0 fix delta; no new touched-surface defect found, no repository edits or probes, and no complete-suite rerun."
+      ],
+      "reviewer": "/root/code_review_2",
+      "vendor": "openai",
+      "model": "host-inherited (exact model not exposed)"
+    }
+  ],
+  "findings": [],
+  "selection": null,
+  "intent_confirmed_sha": null,
+  "tested_commit": "31d0c73ed27f8a6aa77425fbf115f3cfa3ed3a69",
+  "reviewed_commit": "3deb31e0d33e3ee2934a05bcf9c3d4a7bab79521",
+  "acceptance_status": [
+    {
+      "acceptance": 1,
+      "status": "works"
+    },
+    {
+      "acceptance": 2,
+      "status": "works"
+    },
+    {
+      "acceptance": 3,
+      "status": "works"
+    },
+    {
+      "acceptance": 4,
+      "status": "works"
+    },
+    {
+      "acceptance": 5,
+      "status": "works"
+    },
+    {
+      "acceptance": 6,
+      "status": "works"
+    },
+    {
+      "acceptance": 7,
+      "status": "works"
+    }
+  ]
+}

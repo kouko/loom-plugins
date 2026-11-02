@@ -231,18 +231,13 @@ twice, and this is the only stop this station makes.
    rewritten, what stops reading it, and where the backup is kept).
 
 3. **The cross-model review question, only for `second-vendor: ask` without
-   a qualifying direct user request.** Read
-   `references/second-vendor.md` for mode routing and the availability
-   probe. A missing line is initialized as `second-vendor: suggest`; it
-   adds no question here. The downstream notice may explain that reviewing
-   with a second vendor costs a few minutes and some quota, and that five of the seven
-   serious problems in this system's own spec review were found by
-   only one of the two vendors. When the defaults carry `second-vendor: ask`,
-   use the reference's host-aware native question or fallback in this same
-   message only if the user has not already named an outside coding agent
-   and unambiguous active review target. That direct user request supplies
-   one review's authorization without a second question; disclose cost,
-   egress and local execution before dispatch. A fixed CLI adds no question.
+   a qualifying direct user request.** Read `references/second-vendor.md` for
+   mode routing. A missing line is `second-vendor: suggest` and adds no question.
+   When defaults carry `second-vendor: ask`, use the reference's host-aware
+   native question or fallback only if the user hasn't named an outside coding
+   agent and unambiguous review target. That request supplies one review's
+   authorization; disclose cost, egress and local execution before dispatch.
+   A fixed CLI adds no question.
 
 4. **The principles confirmation**, if step 3 ran the interview — restated
    in the same message, confirmed by the same yes.
@@ -335,6 +330,11 @@ the intent and restate again; there is no limit on rounds here.
    `publication: automatic — authorized <date> by <name>`; never derive it
    from status or prose. When step 3 ran, write
    `ratified-by: <name> <date>` into `PRINCIPLES.md`.
+   After all confirmed intent frontmatter, including `publication:`, is written,
+   replace the template's `intent_confirmed_sha: <sha7>` with
+   `intent_confirmed_sha: <computed-sha>`, using the output of
+   `grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent> | git hash-object --stdin`.
+   This hashes the confirmed intent excluding its status and pin lines.
 2. **Branch before the first commit.** Before the confirmation commit, make
    HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
    `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.

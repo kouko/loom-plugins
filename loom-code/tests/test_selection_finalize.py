@@ -117,17 +117,174 @@ PASSING = [
 
 # --- Acceptance 3 -----------------------------------------------------------
 
-def test_narrow_delta_finalizes_with_no_adversarial_artifact(tmp_path: Path) -> None:
-    """A narrow delta auto-skips the adversarial step, with no typed skip."""
+@pytest.mark.parametrize("change_kind", ["no-intent", "narrow", "executable"])
+def test_mechanical_verification_without_a_report_keeps_evidence_boundaries(
+    tmp_path: Path, change_kind: str,
+) -> None:
+    """Report omission is distinct from the automatically narrow step skips."""
+    with_intent = change_kind != "no-intent"
+    executable = change_kind == "executable"
+    repo = make_reported_repo(tmp_path) if with_intent else make_narrow_repo(tmp_path)
+    report = repo / f"docs/loom/{CHANGE}/acceptance-test-report.md"
+    if with_intent:
+        report.unlink()
+    if executable:
+        (repo / "feature.py").write_text(
+            "from pathlib import Path\nENABLED = True\n"
+            "assert ENABLED and Path('docs/guide.md').is_file()\n",
+        )
+        (repo / "docs/loom/KICKOFF-DEFAULTS.md").write_text(
+            "- package-tests: python3 feature.py — fixture (2026-11-02)\n",
+        )
+        write_probes(repo, 1)
+    elif with_intent:
+        commit_all(repo, "mechanical evidence needs no independent report")
+    head = git(repo, "rev-parse", "HEAD")
+
+    if executable:
+        from loom_checker.reviewers import auto_skipped_steps
+        assert "acceptance-test" not in auto_skipped_steps(repo, CHANGE, head)
+    verdicts = PASSING if executable else PASSING[:1]
+    probes = ADVERSARIAL if executable else []
+    result = finalize(repo, review_input(tmp_path, verdicts, probes))
+
+    assert result.returncode == 0, result.stderr
+    attestation = written(repo)
+    expected_runs = ["package-tests", "adversarial"] if executable else ["package-tests"]
+    assert [run["kind"] for run in attestation["executions"]] == expected_runs
+    assert attestation["selection"] is None  # no typed confirmation was bound
+    if with_intent:
+        assert attestation["tested_commit"] == attestation["reviewed_commit"] == head
+        assert attestation["acceptance_status"] == []  # no independent test claimed
+        assert not report.exists()
+    assert validate(repo, attestation) == []
+    claimed = dict(attestation, acceptance_status=[{"acceptance": 1, "status": "works"}])
+    assert validate(repo, claimed)
+    if with_intent:
+        report.write_text(
+            f"Tried on 2026-11-02, in a clean copy of the project at {head}.\n\n"
+            "| 1 | the guide exists | maybe | incomplete | re-tested |\n",
+        )
+        commit_all(repo, "a present report still needs valid evidence")
+        refused = finalize(repo, review_input(tmp_path, verdicts, probes))
+        assert refused.returncode == 1
+        assert "intake.attestation-coverage" in refused.stderr
+
+
+def make_reported_repo(tmp_path: Path) -> Path:
+    """A narrow delta that also carries a confirmed intent and an acceptance
+    report naming the commit its evidence was produced on."""
     repo = make_narrow_repo(tmp_path)
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    intent.parent.mkdir(parents=True, exist_ok=True)
+    intent.write_text(
+        "# A change\n"
+        "originator: tester\n"
+        "kind: engineering\n"
+        "needs-design: no — internal\n"
+        "status: confirmed 2026-09-23\n"
+        "\n## Problem\nx\n\n## Proposed outcome\ny\n\n"
+        "## Acceptance\n1. the guide exists\n\n"
+        "## Constraints\n- none\n\n## Out of scope\n- none\n\n"
+        "## Open questions\n- none\n",
+        encoding="utf-8",
+    )
+    tested = commit_all(repo, "intent")
+    report = repo / f"docs/loom/{CHANGE}/acceptance-test-report.md"
+    report.parent.mkdir(parents=True, exist_ok=True)
+    report.write_text(
+        "# A change — what I tried and what happened\n\n"
+        f"Tried on 2026-09-23, in a clean copy of the project at {tested[:7]}.\n\n"
+        "| # | What you asked for | Verdict | What happened | Re-run |\n"
+        "|---|---|---|---|---|\n"
+        "| 1 | the guide exists | works | it is there | — |\n",
+        encoding="utf-8",
+    )
+    commit_all(repo, "acceptance report")
+    return repo
+
+
+def test_finalize_binds_the_report_verdicts_into_acceptance_status(
+    tmp_path: Path,
+) -> None:
+    """The generated acceptance_status carries the report's Verdict cells in
+    the validator's vocabulary, and the tested/reviewed bookkeeping names
+    the tree the evidence was produced on and the tree being finalized."""
+    repo = make_reported_repo(tmp_path)
 
     result = finalize(repo, review_input(tmp_path, PASSING[:1], []))
 
     assert result.returncode == 0, result.stderr
     attestation = written(repo)
-    assert [run["kind"] for run in attestation["executions"]] == ["package-tests"]
-    assert attestation["selection"] is None  # no typed confirmation was bound
+    tested = git(repo, "rev-parse", "HEAD~1")
+    assert attestation["tested_commit"] == tested[:7]
+    assert attestation["reviewed_commit"] == git(repo, "rev-parse", "HEAD")
+    assert attestation["intent_confirmed_sha"] is None  # no pin in the fixture intent
+    assert attestation["acceptance_status"] == [{"acceptance": 1, "status": "works"}]
     assert validate(repo, attestation) == []
+
+
+@pytest.mark.parametrize(("old_pin", "restore"), [
+    (False, False), (True, False), (False, True), (True, True), (False, "merge"),
+])
+def test_finalizer_anchors_the_latest_confirmed_intent(
+    tmp_path: Path, old_pin: bool, restore: bool | str,
+) -> None:
+    from loom_checker.helpers import load_manifest
+    from loom_checker.rule_checks.intent_version import check_intent_version, intent_identity
+
+    repo = make_reported_repo(tmp_path)
+    intent = repo / f"docs/loom/intent/{CHANGE}.md"
+    message = f"docs(loom): intent {CHANGE} confirmed\n\nneeds-design: no — internal"
+    if old_pin:
+        pin = intent_identity(intent)
+        intent.write_text(intent.read_text().replace(
+            "status: confirmed 2026-09-23\n", f"status: confirmed 2026-09-23\nintent_confirmed_sha: {pin}\n",
+        ))
+        commit_all(repo, message)
+    old_text = intent.read_text()
+    historical = git(repo, "rev-parse", "HEAD")
+    historical_pin = intent_identity(intent) if old_pin else None
+    if restore == "merge":
+        git(repo, "branch", "old-intent")
+    new_text = "\n".join(line for line in old_text.splitlines() if not line.startswith("intent_confirmed_sha:")) + "\n"
+    intent.write_text(new_text.replace("the guide exists", "the updated guide exists"))
+    new_pin = intent_identity(intent)
+    intent.write_text(intent.read_text().replace(
+        "status: confirmed 2026-09-23\n", f"status: confirmed 2026-09-23\nintent_confirmed_sha: {new_pin}\n",
+    ))
+    confirmed = commit_all(repo, message)
+    # The newer confirmation on HEAD cannot change an explicitly older tree.
+    assert check_intent_version(load_manifest(), repo, CHANGE, {},
+                                {"intent_confirmed_sha": historical_pin}, commit=historical) == []
+    if restore == "merge":
+        git(repo, "checkout", "-q", "old-intent")
+        (repo / "other.md").write_text("# unrelated work\n")
+        commit_all(repo, "unrelated work on older intent")
+        git(repo, "checkout", "-q", "feature")
+        git(repo, "merge", "--no-ff", "--no-commit", "old-intent")
+        intent.write_text(old_text)
+        commit_all(repo, "merge with the older intent restored")
+    elif restore:
+        intent.write_text(old_text)
+        commit_all(repo, "restore the entire older intent")
+    assert check_intent_version(load_manifest(), repo, CHANGE, {},
+                                {"intent_confirmed_sha": new_pin}, commit=confirmed) == []
+    tested = git(repo, "rev-parse", "HEAD")
+    report = repo / f"docs/loom/{CHANGE}/acceptance-test-report.md"
+    report.write_text(
+        f"Tried on 2026-11-02, in a clean copy of the project at {tested}.\n\n"
+        "| 1 | the guide exists | works | observed | re-tested |\n",
+    )
+    commit_all(repo, "test the current intent version")
+    result = finalize(repo, review_input(tmp_path, PASSING[:1], []))
+    if restore:
+        assert result.returncode == 1, result.stdout
+        assert "intake.intent-version" in result.stderr
+    else:
+        assert result.returncode == 0, result.stderr
+        assert written(repo)["intent_confirmed_sha"] == new_pin
+        assert validate(repo, written(repo)) == []
 
 
 def trunkless_clone(origin: Path, tmp_path: Path, branch: str = "feature") -> Path:
@@ -252,8 +409,8 @@ def run_with_probes(repo: Path, tmp_path: Path) -> subprocess.CompletedProcess:
     ))
 
 
-def test_five_probe_programs_pass_and_a_sixth_is_refused(tmp_path: Path) -> None:
-    """Acceptance 3: at most five committed probe programs for a change."""
+def test_cap_probe_programs_pass_and_one_more_is_refused(tmp_path: Path) -> None:
+    """Policy boundary: five probe programs pass and a sixth is refused."""
     repo = make_repo(tmp_path)
     write_probes(repo, 5)
     accepted = run_with_probes(repo, tmp_path)
@@ -263,7 +420,7 @@ def test_five_probe_programs_pass_and_a_sixth_is_refused(tmp_path: Path) -> None
     refused = run_with_probes(repo, tmp_path)
     assert refused.returncode == 1
     assert "BLOCK adversarial.proportionate" in refused.stderr
-    assert "six" in refused.stderr or "6" in refused.stderr
+    assert "6 probe programs" in refused.stderr
 
 
 def test_probe_program_without_a_concern_line_is_refused(tmp_path: Path) -> None:
@@ -295,7 +452,7 @@ def test_a_shell_probe_program_counts_against_the_cap(tmp_path: Path) -> None:
 
     assert refused.returncode == 1
     assert "BLOCK adversarial.proportionate" in refused.stderr
-    assert "6 probe programs" in refused.stderr
+    assert f"{1 + MAX_PROBE_PROGRAMS} probe programs" in refused.stderr
 
 
 def test_an_extension_less_program_is_counted_and_keeps_a_delta_wide(

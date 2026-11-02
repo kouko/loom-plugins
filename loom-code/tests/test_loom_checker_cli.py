@@ -20,8 +20,12 @@ EXPECTED_RULE_IDS = [
     "ci.pr-floor",
     "contract.charter-complete",
     "contract.requires",
+    "intake.attestation-coverage",
+    "intake.commit-identity",
     "intake.confirmed",
     "intake.confirmed-behavior",
+    "intake.intent-version",
+    "intake.plan-boundary-tests",
     "intake.spec-ready",
     "intake.test-case-pair",
     "intent.kind-recompute",
@@ -309,8 +313,8 @@ def test_hooks_probe_is_gone() -> None:
     assert "hooks-probe" not in CHECKER.read_text(encoding="utf-8").split('"""')[1]
 
 
-def test_the_rule_population_is_twenty_six() -> None:
-    assert len(run_checker("--list-rules").stdout.splitlines()) == 26
+def test_the_rule_population_is_thirty() -> None:
+    assert len(run_checker("--list-rules").stdout.splitlines()) == 30
 
 
 # --- contract --require (spec G) -------------------------------------------

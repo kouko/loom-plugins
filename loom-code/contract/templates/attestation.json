@@ -5,5 +5,9 @@
   "executions": [],
   "verdicts": [],
   "findings": [],
-  "selection": null
+  "selection": null,
+  "intent_confirmed_sha": "<intent-confirmed-sha>",
+  "tested_commit": "<tested-commit>",
+  "reviewed_commit": "<reviewed-commit>",
+  "acceptance_status": []
 }

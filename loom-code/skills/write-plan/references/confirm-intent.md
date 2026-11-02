@@ -149,6 +149,11 @@ of your own. It never enters the intent file.
    restatement explicitly authorizes automatic publication, also write
    `publication: automatic — authorized <date> by <name>`; never derive it
    from status or prose.
+   After all confirmed intent frontmatter, including `publication:`, is written,
+   replace the template's `intent_confirmed_sha: <sha7>` with
+   `intent_confirmed_sha: <computed-sha>`, using the output of
+   `grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent> | git hash-object --stdin`.
+   This hashes the confirmed intent excluding its status and pin lines.
 2. Commit it on the change branch, branching first per SKILL.md's
    **Branch before the first commit** rule. The message is `docs(loom): intent <change-id> confirmed`,
    and its body **must contain the `needs-design:` line verbatim** — the

@@ -4,10 +4,12 @@ from loom_checker.attestation import ATTESTATION_SCHEMA
 from loom_checker.attestation import _command_digest
 from loom_checker.attestation import adversarial_route
 from loom_checker.attestation import artifact_path_form_failure
+from loom_checker.attestation import check_attestation_evidence
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import artifact_text
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
@@ -31,6 +33,8 @@ from loom_checker.reviewers import committed_branch_delta
 from loom_checker.reviewers import required_reviewer_count
 from loom_checker.reviewers import attach_outside_receipt
 from loom_checker.reviewers import selected_outside_family
+from loom_checker.rule_checks.evidence_coverage import acceptance_coverage
+from loom_checker.rule_checks.commit_identity import report_tested_commit
 from pathlib import Path
 import json
 import os
@@ -244,14 +248,6 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     if status_before:
         return [("finalize.clean-tree", "commit functional content before finalizing review")]
     if committed_branch_delta(repo, change_id, head_sha) is None:
-        # `auto_skipped_steps` answers "every auto-skippable step is skipped"
-        # when the delta cannot be recomputed, and that permissive reading is
-        # correct exactly once: in `attestation.py`, re-validating evidence
-        # that already exists and is bound to the commit's content. Here the
-        # evidence does not exist yet — finalize is making it — so the same
-        # answer would let a change that touches production code waive the
-        # adversarial step by being finalized in a checkout that cannot see
-        # the trunk. Finalize therefore fails closed, and says why.
         return [("finalize.delta",
                  "cannot recompute this branch's committed delta, so which "
                  "steps a narrow change would skip cannot be established; "
@@ -337,9 +333,6 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         work.append(("adversarial", command, artifact,
                      {"route": route, "row": row, "confirmation": item.get("confirmation")}))
 
-    # Every artifact is now in a legal home, so the cap can count them: what
-    # finalize-review is about to execute is this change's adversarial output
-    # wherever graduation has since moved it.
     proportionate = check_adversarial_proportionate(
         repo, head_sha, change_id,
         [artifact for kind, _command, artifact, _how in work if kind == "adversarial"],
@@ -414,7 +407,41 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
         "schema": ATTESTATION_SCHEMA, "change_id": change_id,
         "content_digest": digest, "executions": executions,
         "verdicts": verdicts, "findings": findings, "selection": None,
+        "intent_confirmed_sha": None, "tested_commit": None,
+        "reviewed_commit": head_sha, "acceptance_status": [],
     }
+
+    # ===== EVIDENCE DRIFT GUARD CHECKS =====
+    # The bookkeeping fields above are bound to the change's own artifacts:
+    # intent_confirmed_sha from the intent frontmatter (recorded by
+    # capture-intent at confirmation), tested_commit from the acceptance
+    # test report's fixed "Tried on ... at <sha>" line. Mechanical verification
+    # without an independent report uses the functional executions just
+    # completed at HEAD, without claiming independent acceptance testing.
+    from loom_checker.parsing import parse_document
+    import re as _re
+    intent_text = artifact_text(manifest, "intent", change_id, repo, commit=head_sha)
+    _intent_front, intent_sections = parse_document(intent_text or "")
+    _sha = _re.search(
+        r"^intent_confirmed_sha:\s*([0-9a-f]{7,64})\s*$",
+        intent_text or "", _re.IGNORECASE | _re.MULTILINE,
+    )
+    if _sha:
+        attestation["intent_confirmed_sha"] = _sha.group(1).lower()
+    report_text = artifact_text(manifest, "acceptance-test-report", change_id, repo, commit=head_sha)
+    if report_text is not None:
+        attestation["tested_commit"] = report_tested_commit(report_text)
+        if attestation["tested_commit"] is None:
+            return [("intake.commit-identity", "acceptance report needs one canonical Tried-on commit line")]
+        attestation["acceptance_status"] = acceptance_coverage(intent_sections, report_text)
+    else:
+        attestation["tested_commit"] = head_sha
+
+    failures = check_attestation_evidence(repo, head_sha, change_id, attestation, manifest)
+    if failures:
+        return failures
+    # ===== END EVIDENCE DRIFT GUARD CHECKS =====
+
     target = artifact_path(manifest, "attestation", change_id, repo)
     target.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(

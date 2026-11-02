@@ -6,8 +6,16 @@ version: 2.3.1
 
 # Paths matched here are publication metadata. They do not change the
 # functional content identity that executions and reviews attest to.
+# Evidence files (the acceptance test report and its evidence store) are
+# publication metadata too: they describe what was tested, they are not
+# functional content themselves, so a difference between the tested and the
+# reviewed tree that is confined to them does not invalidate the attestation.
+# The glob stops at one level (`evidence/*`) because `evidence/probes/` holds
+# the change's executable probe programs, which are functional content.
 publication_only_paths:
   - docs/loom/<change-id>/attestation.json
+  - docs/loom/<change-id>/acceptance-test-report.md
+  - docs/loom/<change-id>/evidence/*
 
 stations:            # produce one per-change artifact each (§3)
   - {name: capture-intent, owner: loom-design, produces: intent,  decision_point: 1}
@@ -110,6 +118,7 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       - {name: map,          kind: frontmatter, required: false}
       - {name: evidence,     kind: frontmatter, required: false}
       - {name: status,       kind: frontmatter, required: false, grammar: "open | confirmed <date> | closed <date> — PR #<N> | withdrawn — <reason>"}
+      - {name: intent_confirmed_sha, kind: frontmatter, required: false, grammar: "<intent-blob-sha>", note: "written on new confirmations after all frontmatter; hashes the intent excluding status and pin lines; a pinned canonical confirmation commit anchors the baseline, while confirmations predating pins remain exempt"}
       - {name: publication,  kind: frontmatter, required: false, grammar: "automatic — authorized <YYYY-MM-DD> by <name>", note: "written only from the user's explicit decision; absent means Ship obtains one manual publication decision"}
       - {name: Problem,           kind: section, required: true}
       - {name: Proposed outcome,  kind: section, required: true}
@@ -204,6 +213,10 @@ artifacts:           # per-change AND standing artifact charters (§2a); fields 
       - {name: verdicts,       kind: json, required: true, grammar: "[{reviewer, vendor, model, lens, verdict, findings}]"}
       - {name: findings,       kind: json, required: true, grammar: "[{id, anchor, raised_by, resolution} | {severity, dimension, anchor, text}]"}
       - {name: selection,      kind: json, required: true, grammar: "null", note: "schema loom-attestation/v2; always null, and any other value is refused because no typed selection can waive a step; v1 attestations carry no selection and stay valid"}
+      - {name: intent_confirmed_sha, kind: json, required: false, grammar: "<intent-blob-sha> | null", note: "new generated v2 records carry all four bookkeeping fields together; exact historical seven-key v2 and six-key v1 records retain their shapes and original digest policy; null when the intent confirmation predates pins"}
+      - {name: tested_commit, kind: json, required: false, grammar: "<commit-sha>", note: "new generated records name the report's canonical Tried-on commit, or the actual execution commit when the station and reviewers determine every Acceptance is mechanical; report omission is independent of automatic narrow-change skipping, and absence alone cannot prove that semantic decision"}
+      - {name: reviewed_commit, kind: json, required: false, grammar: "<commit-sha>", note: "new generated records name the reviewed content; publication checks its functional content against the selected committed tree"}
+      - {name: acceptance_status, kind: json, required: false, grammar: "[{acceptance: <number>, status: works|partly|not_verified|fails}]", note: "new generated records agree with every report row; empty when mechanical verification requires no independent acceptance report, without claiming independent acceptance testing"}
 
   acceptance-test-report:
     path: docs/loom/<change-id>/acceptance-test-report.md

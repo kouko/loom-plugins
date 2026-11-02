@@ -28,3 +28,15 @@ charter: 1.1
 ## Risks
 <!-- each numbered item ≤40 words (checker rule plan.field-caps) -->
 1. <plan-wide risk>
+<!-- If a risk line names a boundary test, write:
+     1. Risk: description; boundary test Wx-yy
+     The task Wx-yy must exist in the Task DAG and its header must
+     include "boundary test" or "probe test", in the title or after it
+     (e.g., **W1-02 Boundary test for empty input** after: ...).
+     Write concrete repo-relative test filenames in backticks in the marked
+     task's Files/Test fields or the numbered boundary/probe test risk;
+     `tests/test_edge.py::test_empty` also names `tests/test_edge.py`.
+     Planning intake checks task references without requiring future files.
+     After Build, finalization and publication check that named files exist
+     in the selected committed tree.
+     See intake.plan-boundary-tests rule. -->

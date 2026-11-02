@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import git_ok
+from loom_checker.helpers import load_manifest
+from loom_checker.helpers import artifact_text
 from loom_checker.probe_results import Row
 from loom_checker.probe_results import claiming_row
 from loom_checker.probes import argv_for
@@ -14,6 +16,7 @@ from loom_checker.reviewers import auto_skipped_steps
 from loom_checker.reviewers import required_reviewer_count
 from loom_checker.reviewers import outside_verdict_failure
 from loom_checker.reviewers import selected_outside_family
+from loom_checker.rule_checks.intent_version import pinned_confirmation
 from pathlib import Path
 import hashlib
 import posixpath
@@ -26,8 +29,35 @@ ATTESTATION_SCHEMA = "loom-attestation/v2"
 ATTESTATION_KEYS_V1 = {
     "schema", "change_id", "content_digest", "executions", "verdicts", "findings"
 }
-ATTESTATION_KEYS = ATTESTATION_KEYS_V1 | {"selection"}
+# v2 bookkeeping fields: the tree the evidence was produced at, the tree it
+# was reviewed at, the intent version it was verified against, and the
+# per-Acceptance coverage status. They live on the attestation because it is
+# publication metadata (excluded from the functional digest), so recording
+# them never invalidates the content they describe.
+ATTESTATION_BOOKKEEPING = {
+    "intent_confirmed_sha", "tested_commit", "reviewed_commit", "acceptance_status",
+}
+ATTESTATION_KEYS_V2_LEGACY = ATTESTATION_KEYS_V1 | {"selection"}
+ATTESTATION_KEYS = ATTESTATION_KEYS_V2_LEGACY | ATTESTATION_BOOKKEEPING
 KEYS_BY_SCHEMA = {ATTESTATION_SCHEMA_V1: ATTESTATION_KEYS_V1, ATTESTATION_SCHEMA: ATTESTATION_KEYS}
+NEW_CONFIRMATION_FIELDS = "a pinned canonical intent confirmation requires the complete v2 bookkeeping fields"
+
+
+def attestation_shape_matches(attestation: object) -> bool:
+    """Accept exact v1, historical v2, or complete bookkeeping-v2 shapes.
+
+    Historical v2 predates all four bookkeeping fields. A partial extension
+    is neither historical nor complete and stays invalid.
+    """
+    if not isinstance(attestation, dict):
+        return False
+    schema = attestation.get("schema")
+    if not isinstance(schema, str) or schema not in KEYS_BY_SCHEMA:
+        return False
+    keys = set(attestation)
+    return keys == KEYS_BY_SCHEMA[schema] or (
+        schema == ATTESTATION_SCHEMA and keys == ATTESTATION_KEYS_V2_LEGACY
+    )
 
 
 def _command_digest(command: str) -> str:
@@ -115,6 +145,44 @@ def _evidence_failure(execution: dict, route: str, reviewers: set[str], digest: 
     return None
 
 
+def check_attestation_evidence(
+    repo: Path, head_sha: str, change_id: str, attestation: dict,
+    manifest: dict | None = None,
+) -> list[tuple[str, str]]:
+    """Recompute the new evidence invariants on one explicitly selected tree.
+
+    Exact historical shapes keep their original validation and digest policy;
+    complete bookkeeping records use these same checks at both real callers.
+    """
+    # Existing validation callers may override digest policy alone.
+    contract = dict(load_manifest(), **(manifest or {}))
+    if not ATTESTATION_BOOKKEEPING.intersection(attestation):
+        if pinned_confirmation(contract, repo, change_id, commit=head_sha) is not None:
+            return [("intake.commit-identity", NEW_CONFIRMATION_FIELDS)]
+        return []
+    # Local imports keep capability modules independently importable: the
+    # commit-identity capability also consumes the schema constants above.
+    from loom_checker.parsing import parse_document
+    from loom_checker.rule_checks.evidence_coverage import check_attestation_coverage
+    from loom_checker.rule_checks.commit_identity import check_commit_identity
+    from loom_checker.rule_checks.intent_version import check_intent_version
+    from loom_checker.rule_checks.plan_boundary_tests import check_plan_boundary_tests
+
+    intent = artifact_text(contract, "intent", change_id, repo, commit=head_sha)
+    _, sections = parse_document(intent or "")
+    failures = check_attestation_coverage(
+        contract, repo, change_id, sections, attestation, commit=head_sha,
+        # Both callers already require successful functional executions and
+        # reviewer evidence. The station decides whether independent testing
+        # is needed; absence alone cannot recompute that semantic decision.
+        allow_missing_report=True,
+    )
+    failures += check_commit_identity(contract, repo, change_id, sections, attestation, commit=head_sha)
+    failures += check_intent_version(contract, repo, change_id, sections, attestation, commit=head_sha)
+    failures += check_plan_boundary_tests(contract, repo, change_id, sections, attestation, commit=head_sha)
+    return failures
+
+
 def validate_attestation(
     repo: Path, head_sha: str, change_id: str, attestation: object,
     manifest: dict | None = None,
@@ -125,15 +193,30 @@ def validate_attestation(
     typed confirmation can waive a step any more, so a recorded selection
     matches nothing. Only the automatic narrow-change simplification skips."""
     rule = "push.attestation"
-    if not isinstance(attestation, dict) or set(attestation) not in KEYS_BY_SCHEMA.values():
+    if not isinstance(attestation, dict):
         return [(rule, "attestation has an unknown or incomplete schema")]
     schema = attestation.get("schema")
-    if schema not in KEYS_BY_SCHEMA:
+    if not isinstance(schema, str) or schema not in KEYS_BY_SCHEMA:
         return [(rule, f"unsupported attestation schema {schema!r}")]
-    if set(attestation) != KEYS_BY_SCHEMA[schema]:
+    if not attestation_shape_matches(attestation):
         return [(rule, "attestation has an unknown or incomplete schema")]
     if attestation.get("change_id") != change_id:
         return [(rule, "attestation change_id does not match its path")]
+    if not ATTESTATION_BOOKKEEPING.intersection(attestation):
+        contract = dict(load_manifest(), **(manifest or {}))
+        if pinned_confirmation(contract, repo, change_id, commit=head_sha) is not None:
+            return [(rule, NEW_CONFIRMATION_FIELDS)]
+        # Historical v1/v2 records counted reports and evidence as content.
+        # Preserve that policy rather than rewriting their recorded digest.
+        contract = manifest if manifest is not None else load_manifest()
+        added_metadata = {
+            "docs/loom/<change-id>/acceptance-test-report.md",
+            "docs/loom/<change-id>/evidence/*",
+        }
+        manifest = dict(contract, publication_only_paths=[
+            path for path in contract.get("publication_only_paths", [])
+            if path not in added_metadata
+        ])
     expected = functional_content_digest(repo, head_sha, change_id, manifest)
     if expected is None or attestation.get("content_digest") != expected:
         return [(rule, "attestation functional content digest does not match the selected tree")]
@@ -228,4 +311,48 @@ def validate_attestation(
         return [(rule, outside_failure)]
     if not isinstance(attestation.get("findings"), list):
         return [(rule, "attestation findings must be a list")]
-    return []
+
+    # Validate new optional v2 fields
+    if schema == ATTESTATION_SCHEMA:
+        # intent_confirmed_sha: optional, but if present must be valid SHA
+        if "intent_confirmed_sha" in attestation:
+            val = attestation["intent_confirmed_sha"]
+            if val is not None:
+                if not isinstance(val, str) or not val:
+                    return [(rule, "attestation intent_confirmed_sha must be a non-empty string if present")]
+                if not all(c in "0123456789abcdef" for c in val.lower()):
+                    return [(rule, "attestation intent_confirmed_sha must be a valid hex SHA")]
+
+        # tested_commit: optional, but if present must be valid SHA
+        if "tested_commit" in attestation:
+            val = attestation["tested_commit"]
+            if val is not None:
+                if not isinstance(val, str) or not val:
+                    return [(rule, "attestation tested_commit must be a non-empty string if present")]
+                if not all(c in "0123456789abcdef" for c in val.lower()):
+                    return [(rule, "attestation tested_commit must be a valid hex SHA")]
+
+        # reviewed_commit: optional, but if present must be valid SHA
+        if "reviewed_commit" in attestation:
+            val = attestation["reviewed_commit"]
+            if val is not None:
+                if not isinstance(val, str) or not val:
+                    return [(rule, "attestation reviewed_commit must be a non-empty string if present")]
+                if not all(c in "0123456789abcdef" for c in val.lower()):
+                    return [(rule, "attestation reviewed_commit must be a valid hex SHA")]
+
+        # acceptance_status: optional array
+        if "acceptance_status" in attestation:
+            val = attestation["acceptance_status"]
+            if val is not None:
+                if not isinstance(val, list):
+                    return [(rule, "attestation acceptance_status must be an array if present")]
+                for item in val:
+                    if not isinstance(item, dict):
+                        return [(rule, "attestation acceptance_status items must be objects")]
+                    if "acceptance" not in item or "status" not in item:
+                        return [(rule, "attestation acceptance_status items must have 'acceptance' and 'status' fields")]
+                    if not isinstance(item["status"], str) or item["status"] not in {"works", "partly", "not_verified", "fails"}:
+                        return [(rule, f"attestation acceptance_status has invalid status: {item['status']!r}")]
+
+    return check_attestation_evidence(repo, head_sha, change_id, attestation, manifest)

@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.19.0] — 2026-11-02 — pin the confirmed intent without changing branch protections
+
+- `capture-intent` records `intent_confirmed_sha` at confirmation: the blob SHA of the intent excluding its `status:` line and the pin line itself. The intent template carries the field by default, allowing `loom-code` to detect changes to the content the user confirmed.
+- Preserve the existing change-branch and worktree rules alongside the pin instruction: reuse the change branch, carry every uncommitted change file when moving worktrees, and preserve unrelated work. Remove duplicate and contradictory routing sentences introduced while integrating the pin.
+
 ## [2.18.0] — 2026-10-31 — ask for unresolved outcomes and authorization
 
 - `capture-intent` and `write-spec` now check existing decisions and evidence

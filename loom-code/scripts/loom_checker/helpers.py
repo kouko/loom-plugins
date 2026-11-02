@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import yaml
+import hashlib
 
 
 def _contract_dir() -> Path:
@@ -54,6 +55,17 @@ def is_real_date(value: str) -> bool:
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="surrogateescape")
+
+
+def blob_sha(data: bytes) -> str:
+    """`git hash-object` without shelling out -- the same value git stores."""
+    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+
+
+def sha_agrees(recorded: str, current: str) -> bool:
+    """Either abbreviation is a prefix of the other; git shortens freely."""
+    recorded, current = recorded.strip().lower(), current.strip().lower()
+    return bool(recorded) and (current.startswith(recorded) or recorded.startswith(current))
 
 
 def manifest_path_in_effect() -> Path:
@@ -102,6 +114,34 @@ def repo_root(start: Path) -> Path:
 def artifact_path(manifest, artifact: str, change_id: str, repo: Path) -> Path:
     template = manifest["artifacts"][artifact]["path"]
     return repo / template.replace("<change-id>", change_id)
+
+
+def artifact_text(
+    manifest, artifact: str, change_id: str, repo: Path, *, commit: str | None = None,
+) -> str | None:
+    """Read exact artifact bytes as UTF-8 text, from the checkout or one tree.
+
+    None means confirmed absence. A selected-tree read error never falls back
+    to the checkout; preserving newlines matters for the intent's blob pin.
+    Git's NUL filename output and blob reads are documented at
+    https://git-scm.com/docs/git-ls-tree and https://git-scm.com/docs/git-show;
+    the commit:path object syntax is at https://git-scm.com/docs/gitrevisions.
+    """
+    path = artifact_path(manifest, artifact, change_id, repo)
+    if commit is None:
+        raw = path.read_bytes() if path.is_file() else None
+    else:
+        relative = path.relative_to(repo).as_posix()
+        listing = run_git(repo, "ls-tree", "-z", "--name-only", commit, "--", relative,
+                          timeout=GIT_TIMEOUT, text=False)
+        if listing is None:
+            raise UsageError(f"cannot read {relative} from selected commit {commit}")
+        if not listing:
+            return None
+        raw = run_git(repo, "show", f"{commit}:{relative}", timeout=GIT_TIMEOUT, text=False)
+        if raw is None:
+            raise UsageError(f"cannot read {relative} from selected commit {commit}")
+    return raw.decode("utf-8", "surrogateescape") if raw is not None else None
 
 
 def kickoff_defaults(repo: Path) -> dict[str, str]:

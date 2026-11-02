@@ -14,6 +14,8 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from loom_checker import digest
 from loom_checker import verification
 from loom_checker.helpers import load_manifest
@@ -90,6 +92,10 @@ def attestation(repo: Path, *, skip: list[str] | None = None) -> dict:
     if skip is not None:
         payload["selection"] = {"confirmations": [], "skip": skip, "source": "user-typed",
                                 "prior_failures": []}
+        payload["intent_confirmed_sha"] = None
+        payload["tested_commit"] = None
+        payload["reviewed_commit"] = head
+        payload["acceptance_status"] = []
     return payload
 
 
@@ -158,6 +164,127 @@ def test_plain_attestation_is_valid(tmp_path: Path) -> None:
     commit(repo, "intent")
     commit_attestation(repo, attestation(repo))
     assert verification.verification_status(repo, CHANGE) == "valid"
+
+
+@pytest.mark.parametrize("new_confirmation", [False, True])
+def test_historical_v2_and_complete_extension_keep_exact_shapes(
+    tmp_path: Path, new_confirmation: bool,
+) -> None:
+    from loom_checker.attestation import ATTESTATION_BOOKKEEPING, validate_attestation
+    from loom_checker.intent_state import intent_delivery_state
+    from loom_checker.rule_checks.commit_identity import check_commit_identity
+    from loom_checker.rule_checks.intent_version import intent_identity
+
+    repo = branch_repo(tmp_path)
+    confirmed_intent(repo)
+    pin = None
+    if new_confirmation:
+        pin = intent_identity(repo / INTENT)
+        write(repo, INTENT, (repo / INTENT).read_text().replace(
+            "status: confirmed 2026-09-22\n", f"status: confirmed 2026-09-22\nintent_confirmed_sha: {pin}\n",
+        ))
+    write(repo, f"docs/loom/{CHANGE}/acceptance-test-report.md", "Historical report\n")
+    write(repo, f"docs/loom/{CHANGE}/evidence/results.md", "Historical evidence\n")
+    head = commit(repo, f"docs(loom): intent {CHANGE} confirmed" if new_confirmation else "historical intent")
+    legacy = attestation(repo)
+    legacy_manifest = dict(load_manifest(), publication_only_paths=[
+        "docs/loom/<change-id>/attestation.json",
+    ])
+    old_digest = digest.functional_content_digest(repo, head, CHANGE, legacy_manifest)
+    current_digest = legacy["content_digest"]
+    assert old_digest != current_digest
+    legacy.update(schema="loom-attestation/v2", selection=None, content_digest=old_digest)
+    for verdict in legacy["verdicts"]:
+        verdict.update(vendor="test", model="test", lens="code", findings=[])
+    expanded = dict(legacy, intent_confirmed_sha=pin, tested_commit=head,
+                    reviewed_commit=head, acceptance_status=[], content_digest=current_digest)
+    v1 = dict(legacy, schema="loom-attestation/v1")
+    del v1["selection"]
+    for payload in (v1, legacy, expanded):
+        allowed = payload is expanded or not new_confirmation
+        assert bool(validate_attestation(repo, head, CHANGE, payload)) is not allowed
+        assert bool(check_commit_identity(load_manifest(), repo, CHANGE, {}, payload, commit=head)) is not allowed
+        commit_attestation(repo, payload)
+        git(repo, "update-ref", "refs/remotes/origin/main", "HEAD")
+        git(repo, "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+        state, _ = intent_delivery_state(repo, CHANGE)
+        assert state == ("delivered" if allowed else "active")
+    for field in ATTESTATION_BOOKKEEPING:
+        partial = dict(expanded)
+        del partial[field]
+        assert validate_attestation(repo, head, CHANGE, partial)
+    unknown = dict(legacy, unexpected=True)
+    assert validate_attestation(repo, head, CHANGE, unknown)
+
+
+@pytest.mark.parametrize("mutation", [
+    "status-mismatch", "intent-pin", "reviewed-content", "boundary-file",
+    "report-provenance", "valid-report-edit", "status-list", "status-object",
+])
+def test_evidence_revalidation_reads_the_selected_tree(tmp_path: Path, mutation: str) -> None:
+    from loom_checker.rule_checks.intent_version import intent_identity
+
+    repo = branch_repo(tmp_path)
+    base = git(repo, "rev-parse", "main")
+    report = f"docs/loom/{CHANGE}/acceptance-test-report.md"
+    plan = f"docs/loom/{CHANGE}/plan.md"
+    intent_text = "# Example\nstatus: confirmed 2026-11-02\n\n## Acceptance\n1. Works\n"
+    write(repo, INTENT, intent_text)
+    pin = intent_identity(repo / INTENT)
+    write(repo, INTENT, intent_text.replace(
+        "status: confirmed 2026-11-02\n", f"status: confirmed 2026-11-02\nintent_confirmed_sha: {pin}\n",
+    ))
+    program = "tests/test_edge.py"
+    plan_text = (
+        "# Plan\ncharter: 1.1\n\n## Task DAG\n"
+        "**W1-01 Boundary test for empty input** after: none acceptance: 1\n"
+        f"- Files: `{program}`\n- Test: boundary: `{program}`\n"
+        "- Risk: empty input\n\n## Risks\n1. Empty input; boundary test W1-01\n"
+    )
+    write(repo, plan, plan_text)
+    write(repo, program, "def test_empty(): pass\n")
+    tested = commit(repo, "implemented content")
+    report_text = f"Tried on 2026-11-02, in a clean copy of the project at {tested}.\n\n| 1 | Works | works | tried | — |\n"
+    write(repo, report, report_text)
+    reviewed = commit(repo, "complete evidence")
+    payload = attestation(repo)
+    payload.update(schema="loom-attestation/v2", selection=None,
+                   tested_commit=tested, reviewed_commit=reviewed, intent_confirmed_sha=pin,
+                   acceptance_status=[{"acceptance": 1, "status": "works"}])
+    commit_attestation(repo, payload)
+    valid = git(repo, "rev-parse", "HEAD")
+    assert verification.verification_status(repo, CHANGE, base=base, head=valid) == "valid"
+    if mutation == "status-mismatch":
+        write(repo, report, report_text.replace("| works |", "| partly |"))
+    elif mutation == "intent-pin":
+        payload["intent_confirmed_sha"] = None
+    elif mutation in {"status-list", "status-object"}:
+        payload["acceptance_status"][0]["status"] = [] if mutation == "status-list" else {}
+    elif mutation == "reviewed-content":
+        payload.update(tested_commit=base, reviewed_commit=base)
+    elif mutation == "boundary-file":
+        write(repo, plan, plan_text.replace(program, "tests/test_missing.py"))
+        head = commit(repo, "name an absent boundary program")
+        payload.update(tested_commit=head, reviewed_commit=head,
+                       content_digest=digest.functional_content_digest(repo, head, CHANGE))
+        write(repo, report, report_text.replace(tested, head))
+    elif mutation == "report-provenance":
+        write(repo, report, report_text.replace(tested, "not-a-commit"))
+    else:
+        write(repo, report, report_text + "\nEvidence clarification.\n")
+    write(repo, ATTESTATION, json.dumps(payload))
+    damaged = commit(repo, mutation)
+    assert verification.verification_status(repo, CHANGE, base=base, head=valid) == "valid"
+    # A good mutable checkout cannot replace the selected committed evidence.
+    write(repo, report, report_text)
+    write(repo, plan, plan_text)
+    status = verification.verification_status(repo, CHANGE, base=base, head=damaged)
+    if mutation == "valid-report-edit":
+        assert status == "valid", status
+    else:
+        assert status.startswith("stale ("), status
+        if mutation == "boundary-file":
+            assert "Named boundary/probe test files" in status
 
 
 def test_two_attestations_and_bad_json_are_stale(tmp_path: Path) -> None:

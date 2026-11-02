@@ -255,16 +255,27 @@ not a completed outside review.
 ## 3. Run acceptance testing
 
 Use acceptance testing when an Acceptance line cannot be settled mechanically.
+When every Acceptance is settled mechanically, omit the independent report
+even for executable, non-narrow changes; this differs from a user skip or
+automatic narrow simplification. Finalization and publication still require
+passing functional executions and reviews, record the actual tested commit,
+and check any report present. Report absence cannot prove that semantic
+decision: the station and reviewers must require independent evidence when needed.
 Acceptance testing means dispatching the `loom-code:acceptance-tester` agent
-fresh-context, never an agent that touched any part of the change. Its
-`docs/loom/<change-id>/acceptance-test-report.md` is functional content; only
-`attestation.json` is publication metadata. Finish acceptance testing and commit
-that report on the change branch before the reviewers read the final
-functional-content digest, and so before running `finalize-review`. A report
-committed after their verdicts is new functional content and needs the next
-round. Its evidence file,
-`docs/loom/<change-id>/evidence/acceptance-test-evidence.md`, is functional
-content too and is committed with the report under the same deadline.
+fresh-context, never an agent that touched any part of the change. It writes
+the report to `docs/loom/<change-id>/acceptance-test-report.md` and detailed
+evidence to `docs/loom/<change-id>/evidence/acceptance-test-evidence.md`.
+Those files, other direct evidence files and `attestation.json` are
+publication metadata under the manifest; executable
+probe programs remain functional content. Commit the report and its evidence
+before `finalize-review`, which records the tested commit from the report's
+canonical `Tried on ... at <sha>` line and rechecks every applicable evidence
+rule. Publication rechecks those rules against the selected committed tree;
+valid evidence-only edits keep the functional digest, while missing or invalid
+coverage, commit identity, intent confirmation or named boundary files fails
+validation. Review verdicts persist authoritatively in the change directory's
+`attestation.json` under `verdicts`; the outside-repository review input is
+temporary input, not a second authoritative record.
 When `acceptance-test` is skipped by the user's plain-words
 instruction, run no acceptance testing.
 When `acceptance-test` is skipped and so no report exists, tell the user, in the conversation before Ship,

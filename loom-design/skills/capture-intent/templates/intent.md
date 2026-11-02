@@ -5,6 +5,7 @@ needs-design: yes | no — <reason>
 map: <map-id>                # optional
 evidence: [<paths>]          # optional; write-spec/review must read it
 status: open                 # open | confirmed <date> | closed <date> — PR #<N> | withdrawn — <reason>; absent = open
+intent_confirmed_sha: <sha7> # written at confirmation: `git hash-object` over this file WITHOUT its status: line and WITHOUT this line itself
 publication: automatic — authorized <YYYY-MM-DD> by <name> # optional; only after the user explicitly authorizes automatic publication
 
 ## Problem

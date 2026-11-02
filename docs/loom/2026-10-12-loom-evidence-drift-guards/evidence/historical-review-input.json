@@ -1,0 +1,63 @@
+{
+  "verdicts": [
+    {
+      "reviewer": "reviewer-1",
+      "vendor": "openai",
+      "model": "gpt-4o",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "PASS",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": [
+        "All 4 new evidence drift guard rules implemented in separate modules per Module Criteria",
+        "The evidence/* glob correctly stops at one level so evidence/probes/ stays functional content",
+        "v1 attestations and unpinned intents are skipped per backward compatibility",
+        "attestation v2 schema and mechanisms.yaml registration both complete",
+        "Package suite green at HEAD"
+      ]
+    },
+    {
+      "reviewer": "reviewer-2",
+      "vendor": "litellm",
+      "model": "hyper-coding-group-200k",
+      "lens": "code",
+      "verdict": "PASS",
+      "findings": [],
+      "dimension_scores": {
+        "security": "PASS",
+        "architecture": "PASS",
+        "correctness": "PASS",
+        "naming": "PASS",
+        "tests": "PASS",
+        "refactoring": "PASS",
+        "cross-task-coherence": "PASS",
+        "external-surface-grounding": "PASS",
+        "principles-conformance": "PASS",
+        "architecture-conformance": "N/A — no ratified ARCHITECTURE.md",
+        "deliberate-simplification": "PASS",
+        "deletion-first": "PASS"
+      },
+      "notes": []
+    }
+  ],
+  "findings": [],
+  "adversarial": [
+    {
+      "command": "python3 docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/probes/test_adversarial.py",
+      "artifact": "docs/loom/2026-10-12-loom-evidence-drift-guards/evidence/probes/test_adversarial.py"
+    }
+  ]
+}
