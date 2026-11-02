@@ -1,6 +1,8 @@
 # 保留必要背景的使用者說明 — 試用了什麼、結果如何
 
-2026-11-03，在乾淨專案副本 242ba265 試用。逐項做法與實際回覆：`docs/loom/2026-11-02-context-preserving-explanations/evidence/acceptance-test-evidence.md`。
+Tried on 2026-11-03, in a clean copy of the project at 242ba265a2a7b648356fd6aa082fc5e5ffe9e93c.
+
+逐項做法與實際回覆：`docs/loom/2026-11-02-context-preserving-explanations/evidence/acceptance-test-evidence.md`。
 
 ## 你要求的事，逐項確認
 

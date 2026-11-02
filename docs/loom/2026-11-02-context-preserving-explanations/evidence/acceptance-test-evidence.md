@@ -1,6 +1,6 @@
 # Context-preserving intent confirmation — acceptance test evidence
 
-Tried on 2026-11-03 (Asia/Taipei), at tested commit `242ba265a2a7b648356fd6aa082fc5e5ffe9e93c`.
+Tried on 2026-11-03, in a clean copy of the project at 242ba265a2a7b648356fd6aa082fc5e5ffe9e93c.
 
 ## Setup and execution boundary
 
