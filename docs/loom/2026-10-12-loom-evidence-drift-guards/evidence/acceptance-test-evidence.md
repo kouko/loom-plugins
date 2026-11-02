@@ -1,6 +1,6 @@
 # Loom evidence drift guards — acceptance test evidence
 
-Tried on 2026-11-02, in a clean copy of the project at 2938a3bedddae6d53146f6a7e0c97db65237b3db.
+Tried on 2026-11-02, in a clean copy of the project at d7d23e19659088a36a6e6f61d3cf9ea6f06f2b0d. Sections 1–6 retain their original observed provenance at 2938a3bedddae6d53146f6a7e0c97db65237b3db; section 7 was re-tested in full at this new HEAD, as detailed in the final re-run section.
 
 ## Setup and actual commands
 
@@ -111,3 +111,30 @@ Assertions loaded the actual JSON/report templates and both instruction artifact
 - 1–7: re-tested in full; no old verdicts or reviewer identities carried over. All nine confirmed spec UI cases map to the seven rows above.
 - No important/fatal dismissals supplied. Only the report and this evidence file were edited in the original repository by this witness.
 - Limits: structured checks cannot prove the truth of a prose claim. Historical exemptions do not manufacture missing evidence. No claim is made that this branch's final whole-repository suite or real finalization has already completed.
+
+## Re-run on 2026-11-02, at d7d23e19659088a36a6e6f61d3cf9ea6f06f2b0d
+
+### Clean setup and actual delta
+
+- `git clone --no-hardlinks . /private/tmp/loom-acceptance-d7d23e1` succeeded with full history. `git rev-parse HEAD` returned the exact commit above. Read the same README setup instructions; used the declared isolated locked environment again.
+- `python3 loom-code/scripts/loom_checker.py --list-rules` and `python3 scripts/sync_codex_manifests.py --check --all` both exited 0. The actual checker loads after the three unused intake imports were removed.
+- Examined `git diff 2938a3be..d7d23e19`: only runtime changes are the probe cap restored from six to five and deletion of three unused imports. The associated reference changes six to five and the cap test now explicitly tries five/six. Remaining changes are report/evidence and plan records. All four evidence-check implementations, both confirmation instructions, templates, finalizer, publication revalidation and digest behavior are unchanged.
+
+### Per-row carry-over decision
+
+- 1: carried over from 2938a3bedddae6d53146f6a7e0c97db65237b3db — coverage implementation and report parser unchanged; report-only changes do not change tested parser behavior.
+- 2: carried over from that exact original commit — commit identity, digest classification and bookkeeping generation unchanged.
+- 3: carried over from that exact original commit — canonical confirmation ancestry, rollback detection, pin comparison and recovery text unchanged.
+- 4: carried over from that exact original commit — concrete boundary-file and planning-reference checks unchanged; the cap counts adversarial programs and does not alter boundary-file existence semantics.
+- 5: carried over from that exact original commit — output location, authoritative verdict storage and finalization generation unchanged; previous success used zero adversarial programs and remains below either cap.
+- 6: carried over from that exact original commit — selected-tree publication evidence revalidation unchanged, including coverage, identities, intent and boundary presence; all recorded cases remain unaffected by a five/six program ceiling.
+- 7: re-tested in full — cap affects supported workflow eligibility, so rechecked new defaults, both entry instructions/hash recipes, historical shapes, report-free mechanical verification and actual-finalizer five/six boundary.
+
+### Commands and observed results
+
+- In the new clean clone: `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_selection_finalize.py loom-code/tests/test_verification_status.py loom-code/tests/test_adversarial_evidence_drift.py loom-code/tests/test_contract_manifest.py loom-code/tests/test_review_json_template.py loom-code/tests/test_write_plan_station_text.py loom-code/tests/test_loom_checker_modules.py -k 'cap_probe_programs or narrow_delta_finalizes or finalization_mechanical or compatibility_existingv2 or historical_v2_and_complete_extension or attestation_has_only or markdown_templates_carry or artifact_schemas or decision or current_release_metadata or module' -q -n 0`: exit 0, **17 passed, 124 deselected in 6.70s**. Log `/private/tmp/loom-acceptance-d7d-code.log`.
+- `test_cap_probe_programs_pass_and_one_more_is_refused` invokes the real finalizer, observes five programs exit 0, then a sixth exit 1 with `BLOCK adversarial.proportionate` and `6 probe programs`. Module loading, default schema/template assertions, old six/seven-key records and both report-free mechanical cases passed in that run.
+- `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/spec/test_capture_intent_contract.py -q -n 0`: exit 0, **27 passed in 0.03s**. Log `/private/tmp/loom-acceptance-d7d-design.log`.
+- Updated only the temporary witness defaults program's root to the new clean clone and ran `python3 /private/tmp/loom-acceptance-defaults.py`: exit 0. It again loaded all four default evidence fields, canonical report provenance and per-line result/re-run columns, asserted both confirmation entry paths order publication before hashing, and executed their shell recipe; checker and shell again agreed on `19673070d78e30519d42bffadc486b6eb49b5db9`. Log `/private/tmp/loom-acceptance-d7d-defaults.log`.
+- This incremental run: **44 focused tests passed**, plus executable default/recipe checks. No full suite or unaffected 202-case rerun. Package-tests remain required and finalization will run; supplied Build logs are not independent witness results and are not represented as such.
+- Results remain 1–7 `works`. No new findings or important/fatal dismissals. Real branch attestation remains outside this witness's edits and claims.
