@@ -61,9 +61,9 @@ universal product-model table. A verified host-native effort may appear in the
 selected model's array only so an observed main value can be inherited. The
 resolver never generates such a value.
 
-The station must feed every completed result back as an `after-execution` event
-before any redispatch. After an execution, use `"event": "after-execution"` and
-add `last_attempt`
+The station must feed every completed host-native result, including a successful
+final attempt, back as an `after-execution` event before redispatching or ending
+the task. After an execution, use `"event": "after-execution"` and add `last_attempt`
 with typed `completed`, `success`, and `conforming` observations plus the
 effective `profile`. `success` reports whether the completed work satisfied
 its acceptance conditions. `conforming` reports whether the output is
@@ -72,11 +72,31 @@ structurally usable and contains enough evidence to classify its result;
 escalation. A completed capability-quality or reasoning-depth failure therefore
 uses `success: false` and `conforming: true` plus its `failure_kind`.
 
+Feed back the dispatched `effective_profile`, never an unsupported
+`requested_profile`. `last_attempt.profile` accepts exactly the symbolic labels
+`inherited` and `host-default/unverified`, or an object containing exactly
+`model` and `effort`. An explicit pair requires a portable model tier and a
+nonempty string effort that is either portable or verified in `capabilities`
+for that exact model. Nulls, scalar/list profiles, incomplete pairs and
+unverified native efforts are malformed input, rejected before any result
+branch; they cannot be treated as unknown settings. A successful conforming
+symbolic attempt returns `routed`, null requested/override fields and the exact
+retained label, regardless of current inheritance guarantees or count.
+
 When `failure_kind` identifies completed non-conforming output as
 `malformed-response`, retry the same effective profile without model or effort
 escalation. That retry consumes the shared completed-redispatch budget. A
 missing kind or another known kind returns `execution-failed`; an unknown kind
 is malformed input and exits non-zero.
+
+For a symbolic profile, this legal retry omits both overrides, retains the
+exact label and returns `next_redispatch = completed_redispatches + 1`. Replaying
+an override-free invocation does not establish that the unknown backend model
+stays the same. Symbolic capability-quality or reasoning-depth failures return
+`execution-failed` with `no-legal-escalation`: an unknown baseline cannot justify
+an escalation. Incomplete attempts, exhausted budgets and non-routing failures
+retain their existing terminal behavior; this adds no new failure kind or retry
+policy.
 
 A capability-quality failure means the completed task omitted a checkable
 obligation, produced an oracle-verifiable wrong result, or failed to connect

@@ -35,6 +35,138 @@ def initial(model: str, effort: str, **evidence: bool) -> dict[str, object]:
     }
 
 
+def feedback(profile: object, count: int = 0, **observations: object) -> dict[str, object]:
+    payload = initial("standard", "medium")
+    payload.update({
+        "event": "after-execution",
+        "completed_redispatches": count,
+        "last_attempt": {
+            "completed": True, "success": True, "conforming": True,
+            "profile": profile, **observations,
+        },
+    })
+    return payload
+
+
+@pytest.mark.parametrize("profile", ["inherited", "host-default/unverified"])
+@pytest.mark.parametrize("count", [0, 1, 2])
+def test_fallback_success_retains_exact_symbolic_profile(profile: str, count: int) -> None:
+    result = dispatch_profile.resolve(feedback(profile, count))
+    assert result["outcome"] == "routed"
+    assert result["reason"] == "execution-succeeded"
+    assert result["effective_profile"] == profile
+    assert result["requested_profile"] is result["overrides"] is None
+    assert result["completed_redispatches"] == count
+    assert "next_redispatch" not in result
+
+
+@pytest.mark.parametrize("inheritance", [False, True])
+@pytest.mark.parametrize("origin", [
+    "unknown-main", "unverified-native", "unsupported", "unsupported-redispatch", "host-rejection",
+])
+def test_all_fallback_origins_roundtrip_effective_profile(origin: str, inheritance: bool) -> None:
+    payload = initial("standard", "medium", changed_consumed_interface=True)
+    payload["inheritance_guaranteed"] = inheritance
+    if origin == "unknown-main":
+        payload["main_profile"]["effort"] = None
+    elif origin == "unverified-native":
+        payload["main_profile"]["effort"] = "mystery"
+    elif origin == "unsupported":
+        payload["capabilities"] = {"standard": ["medium"]}
+    elif origin == "unsupported-redispatch":
+        payload = feedback({"model": "standard", "effort": "medium"},
+                           success=False, failure_kind="capability-quality")
+        payload["inheritance_guaranteed"] = inheritance
+        payload["capabilities"] = {"standard": ["medium"]}
+    else:
+        payload["event"] = "host-rejection"
+    dispatched = dispatch_profile.resolve(payload)
+    assert dispatched["overrides"] is None
+    if origin in {"unsupported", "unsupported-redispatch"}:
+        assert dispatched["requested_profile"] == {"model": "frontier", "effort": "medium"}
+    result = dispatch_profile.resolve(feedback(dispatched["effective_profile"]))
+    assert result["outcome"] == "routed"
+    assert result["effective_profile"] == dispatched["effective_profile"]
+    assert result["requested_profile"] is result["overrides"] is None
+
+
+@pytest.mark.parametrize("effort", ["low", "medium", "high", "xhigh", "max", "ultra"])
+def test_valid_feedback_pairs_preserve_portable_and_verified_native_efforts(effort: str) -> None:
+    profile = {"model": "frontier", "effort": effort}
+    payload = feedback(profile)
+    if effort != "ultra":
+        payload["capabilities"] = {}
+    result = dispatch_profile.resolve(payload)
+    assert result["outcome"] == "routed"
+    assert result["requested_profile"] == result["overrides"] == result["effective_profile"] == profile
+
+
+@pytest.mark.parametrize("profile", [
+    None, 3, [], "unknown", {"model": "standard"}, {"effort": "medium"},
+    {"model": "standard", "effort": "medium", "extra": True},
+    {"model": "unknown", "effort": "medium"},
+    *({"model": "standard", "effort": effort} for effort in [None, 3, False, [], {}, "", "mystery", "ultra"]),
+])
+@pytest.mark.parametrize("observations,count", [
+    ({}, 0), ({"completed": False, "success": False}, 0),
+    ({"success": False, "conforming": False, "failure_kind": "malformed-response"}, 0),
+    ({"success": False, "failure_kind": "capability-quality"}, 2),
+])
+def test_malformed_explicit_feedback_is_rejected_before_result_branches(
+    profile: object, observations: dict[str, object], count: int,
+) -> None:
+    with pytest.raises(dispatch_profile.InputError):
+        dispatch_profile.resolve(feedback(profile, count, **observations))
+
+
+@pytest.mark.parametrize("profile", ["inherited", "host-default/unverified"])
+def test_fallback_malformed_retry_retains_label_and_completed_count(profile: str) -> None:
+    for count in (0, 1):
+        result = dispatch_profile.resolve(feedback(
+            profile, count, success=False, conforming=False, failure_kind="malformed-response",
+        ))
+        assert result["outcome"] == "dispatch"
+        assert result["reason"] == "nonconforming-output-redispatch"
+        assert result["effective_profile"] == profile
+        assert result["requested_profile"] is result["overrides"] is None
+        assert result["completed_redispatches"] == count
+        assert result["next_redispatch"] == count + 1
+        profile = result["effective_profile"]
+    completed = dispatch_profile.resolve(feedback(profile, result["next_redispatch"]))
+    assert completed["outcome"] == "routed"
+    assert completed["completed_redispatches"] == 2
+
+
+@pytest.mark.parametrize("profile", ["inherited", "host-default/unverified"])
+@pytest.mark.parametrize("completed,conforming,kind,count,reason", [
+    (False, False, "malformed-response", 0, "no-legal-redispatch"),
+    (True, False, "malformed-response", 2, "no-legal-redispatch"),
+    (True, True, "capability-quality", 0, "no-legal-escalation"),
+    (True, True, "reasoning-depth", 1, "no-legal-escalation"),
+    (True, False, None, 0, "no-legal-redispatch"),
+    *[(True, conforming, kind, 0, "non-routing-failure")
+      for conforming in (False, True) for kind in sorted(dispatch_profile.NON_ROUTING_FAILURES)
+      if conforming or kind != "malformed-response"],
+    (True, False, "unknown", 0, None),
+])
+def test_symbolic_feedback_obeys_terminal_and_failure_boundaries(
+    profile: str, completed: bool, conforming: bool, kind: str | None, count: int, reason: str | None,
+) -> None:
+    payload = feedback(profile, count, completed=completed, success=False,
+                       conforming=conforming, failure_kind=kind)
+    if reason is None:
+        with pytest.raises(dispatch_profile.InputError):
+            dispatch_profile.resolve(payload)
+        return
+    result = dispatch_profile.resolve(payload)
+    assert result["outcome"] == "execution-failed"
+    assert result["reason"] == reason
+    assert result["effective_profile"] == profile
+    assert result["requested_profile"] is result["overrides"] is None
+    assert result["completed_redispatches"] == count
+    assert "next_redispatch" not in result
+
+
 @pytest.mark.parametrize(
     ("model", "expected"),
     [("economy", "economy"), ("standard", "economy"), ("frontier", "standard")],

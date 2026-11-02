@@ -167,14 +167,23 @@ def _after_execution(packet: dict[str, Any], capabilities: dict[str, tuple[str, 
     required = {"completed", "success", "conforming", "profile"}
     if not required.issubset(attempt) or any(type(attempt[key]) is not bool for key in required - {"profile"}):
         raise InputError("last_attempt lacks typed execution observations")
-    profile = _require_object(attempt["profile"], "last_attempt.profile")
-    if set(profile) != {"model", "effort"} or profile["model"] not in MODELS:
-        raise InputError("last_attempt.profile is not a portable model-effort pair")
-    actual = {"model": profile["model"], "effort": profile["effort"]}
+    profile = attempt["profile"]
+    symbolic = isinstance(profile, str) and profile in {"inherited", "host-default/unverified"}
+    if symbolic:
+        actual = profile
+    else:
+        profile = _require_object(profile, "last_attempt.profile")
+        if (set(profile) != {"model", "effort"} or profile["model"] not in MODELS
+                or not isinstance(profile["effort"], str) or not profile["effort"]
+                or (profile["effort"] not in EFFORTS
+                    and profile["effort"] not in capabilities.get(profile["model"], ()))):
+            raise InputError("last_attempt.profile is not a valid model-effort pair")
+        actual = {"model": profile["model"], "effort": profile["effort"]}
     if attempt["completed"] and attempt["success"] and attempt["conforming"]:
         return {
-            "task_class": None, "uncertainty": None, "requested_profile": actual,
-            "overrides": actual.copy(), "effective_profile": actual,
+            "task_class": None, "uncertainty": None,
+            "requested_profile": None if symbolic else actual,
+            "overrides": None if symbolic else actual.copy(), "effective_profile": actual,
             "outcome": "routed", "reason": "execution-succeeded",
             "completed_redispatches": count,
         }
@@ -190,10 +199,15 @@ def _after_execution(packet: dict[str, Any], capabilities: dict[str, tuple[str, 
         }
     if not attempt["conforming"]:
         if kind == "malformed-response":
-            result = _decision(
-                actual, capabilities, inheritance_guaranteed,
-                reason="nonconforming-output-redispatch", count=count,
-            )
+            if symbolic:
+                result = _fallback(
+                    "nonconforming-output-redispatch", actual == "inherited", count=count,
+                )
+            else:
+                result = _decision(
+                    actual, capabilities, inheritance_guaranteed,
+                    reason="nonconforming-output-redispatch", count=count,
+                )
             result["next_redispatch"] = count + 1
             return result
         return {
@@ -216,19 +230,20 @@ def _after_execution(packet: dict[str, Any], capabilities: dict[str, tuple[str, 
             "outcome": "execution-failed", "reason": "non-routing-failure",
             "completed_redispatches": count,
         }
-    model, effort = actual["model"], actual["effort"]
     next_profile: dict[str, str] | None = None
-    if kind == "capability-quality" and model != "frontier":
-        next_profile = {"model": MODELS[MODELS.index(model) + 1], "effort": effort}
-    elif effort == "low" and (
-        kind == "reasoning-depth"
-        or (kind == "capability-quality" and model == "frontier")
-    ):
-        next_profile = {"model": model, "effort": "medium"}
-    elif model == "frontier" and effort == "medium" and attempt.get("failure_trigger") in HIGH_TRIGGERS:
-        next_profile = {"model": model, "effort": "high"}
-    elif model == "frontier" and effort == "high" and attempt.get("failure_trigger") in XHIGH_TRIGGERS:
-        next_profile = {"model": model, "effort": "xhigh"}
+    if not symbolic:
+        model, effort = actual["model"], actual["effort"]
+        if kind == "capability-quality" and model != "frontier":
+            next_profile = {"model": MODELS[MODELS.index(model) + 1], "effort": effort}
+        elif effort == "low" and (
+            kind == "reasoning-depth"
+            or (kind == "capability-quality" and model == "frontier")
+        ):
+            next_profile = {"model": model, "effort": "medium"}
+        elif model == "frontier" and effort == "medium" and attempt.get("failure_trigger") in HIGH_TRIGGERS:
+            next_profile = {"model": model, "effort": "high"}
+        elif model == "frontier" and effort == "high" and attempt.get("failure_trigger") in XHIGH_TRIGGERS:
+            next_profile = {"model": model, "effort": "xhigh"}
 
     if next_profile is None:
         return {
