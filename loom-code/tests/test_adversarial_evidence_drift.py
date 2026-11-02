@@ -1,13 +1,8 @@
 # concern: Missing named boundary programs and post-review coverage loss must be rejected.
 """Executable attacks against boundary existence and publication revalidation."""
 from pathlib import Path
-import sys
 
 import pytest
-
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "loom-code/scripts"))
-sys.path.insert(0, str(ROOT / "loom-code/tests"))
 
 from loom_checker import verification
 from loom_checker.helpers import load_manifest
