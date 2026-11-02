@@ -20,3 +20,8 @@ Both native launches used the current resolver's initial fallback: null requeste
 
 ## Historical material
 The other consultation and crosscheck files in this directory predate implementation. They document problem discovery, limitations and corrected interpretations, not proof that the repaired workflow works. Prior Claude consultation authorization is consumed and is not a closing-review authorization.
+
+## Revised technical decision after adversarial RED
+- Same independent spec reviewer resumed over the delta, lens spec+adversarial, reviewed_sha `9b7d0140`, revised spec commit `a4136c8a`.
+- Verdict PASS, no findings, same dimension scores as the first review. It read the actual RED program and output without executing them.
+- The revised choice separates historical success evidence from the next invocation's current inheritance guarantee, covering both loss and restoration of the guarantee. No confirmed requirement, retry budget, override field or mechanism changed.

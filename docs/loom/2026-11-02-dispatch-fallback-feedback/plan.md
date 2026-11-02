@@ -1,6 +1,6 @@
 # Dispatch fallback feedback — plan
 intent: 2026-11-02-dispatch-fallback-feedback@80861e57
-spec: docs/loom/2026-11-02-dispatch-fallback-feedback/spec.md@6c2de8a7
+spec: docs/loom/2026-11-02-dispatch-fallback-feedback/spec.md@a4136c8a
 charter: 1.1
 
 ## Task DAG

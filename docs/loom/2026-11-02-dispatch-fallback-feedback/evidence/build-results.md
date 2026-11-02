@@ -16,5 +16,18 @@
 - Defect class searched: both intent confirmation paths, Build entry, Closing Review episode/retry passage and station tests. Substantive requirements change, wording-only reconfirmation, same failed task continuity and successful defect-finding reviews now have separate stated handling.
 - Root received the completed conforming implementation report and actually fed back `host-default/unverified`, count 0. The repaired resolver returned `routed/execution-succeeded`, count 0 and null overrides.
 
+## Release packet and word-cap repair
+- W3-01 implementer `/root/dispatch_release_build`, commit `89acd8f7`: loom-code 3.57.0 and loom-design 2.20.0, six translated plugin READMEs, root README, changelogs, derived manifests and existing version assertions.
+- Code release-focused tests: 43 passed. Design-focused tests initially found a genuine integration failure: the W2 capture-intent addition made its body 3,534 words, exceeding the existing 3,500-word cap.
+- The W2 implementer shortened only its newly added repeated paragraphs; no test was weakened. Repair commit `9b7d0140`: design-focused tests 27 passed, station/convergence tests 50 passed, capture-intent body 3,500 words. The release worker did not repair runtime source itself.
+
+## Adversarial execution and W4-01
+- Independent adversary `/root/dispatch_adversary` tried 11 attack points, one earned a new RED program. Synthetic executions covered 348 symbolic states, 216 malformed-pair states, six native-effort bindings and a three-step exhaustion chain. These are stateless program cases, not live sessions. Six temptation checks were textual only; agent behavior remains for independent acceptance testing.
+- Important finding: old `inherited` feedback combined with current `inheritance_guaranteed=false` caused a new malformed-response retry to claim inheritance. The initial design incorrectly preserved a historical label as a new guarantee.
+- Actual RED: `test_retry_inheritance_truth.py`, 1 failed; raw local outputs `/tmp/dispatch-adversary-red.txt` and `/tmp/dispatch-w4-red.log`. The adversary authored the program, root committed its exact bytes in `a37d7bb9`, and the implementer never edited it.
+- Agent-decided correction: spec commit `a4136c8a`, independently re-reviewed PASS. Completed success and terminal outcomes retain their past label; a new fallback dispatch uses the current guarantee. Requirements, override omission and retry limits did not change.
+- W4-01 implementer `/root/dispatch_resolver_build`, commit `4123ff56`: searched fallback calls, shared retry wording and profile tests. Existing retry test gained both lost/restored-guarantee cases; net test lines +6, no new implementer test function. Resolver tests plus unchanged earned program: 154 passed.
+- Native feedback for the adversary and each completed implementation task returned `routed`, count 0, with unknown effective settings and no invented overrides. Finding a product defect was successful adversarial work, not a failed agent attempt.
+
 ## Verification boundaries
 Focused tests prove resolver decisions and validation. They do not establish fresh-agent interpretation, complete closing-review behavior, installed cache loading, or Claude Code/OpenCode runtime behavior. Independent isolated acceptance testing and closing review follow Build; historical evidence is not substituted for those checks.
