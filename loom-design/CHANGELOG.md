@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.19.0] — 2026-11-02 — pin the confirmed intent without changing branch protections
+
+- `capture-intent` records `intent_confirmed_sha` at confirmation: the blob SHA of the intent excluding its `status:` line and the pin line itself. The intent template carries the field by default, allowing `loom-code` to detect changes to the content the user confirmed.
+- Preserve the existing change-branch and worktree rules alongside the pin instruction: reuse the change branch, carry every uncommitted change file when moving worktrees, and preserve unrelated work. Remove duplicate and contradictory routing sentences introduced while integrating the pin.
+
 ## [2.18.0] — 2026-10-31 — ask for unresolved outcomes and authorization
 
 - `capture-intent` and `write-spec` now check existing decisions and evidence
@@ -33,11 +38,6 @@ is the whole record. Their version numbers never continued here —
 
 - `write-spec` preserves confirmed Acceptance order and mapping while applying non-negotiable principles to requirement content and design decisions.
 - Planning handoffs distinguish completed product behaviour confirmation from the engineering exemption at decision point ②.
-
-## [2.16.0] — 2026-10-28 — capture-intent pins the confirmed intent version
-
-- `capture-intent` now records `intent_confirmed_sha` in the intent's frontmatter at confirmation time: the blob sha of the intent without its `status:` line and without the pin line itself. `loom-code`'s `intake.intent-version` check compares that pin against the intent's current content, so an intent silently reverted after confirmation can no longer pass closing review unnoticed.
-- The intent template carries the field by default, so every new loom change pins its confirmation.
 
 ## [2.14.0] — 2026-10-07 — write-spec does not re-ask a one-way door already asked at ①
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.56.0] — 2026-11-02 — detect incomplete and stale verification evidence
+
+- Add four checker rules for missing or repeated Acceptance report rows, mismatched tested and reviewed functional content, changed confirmed intent content, and missing boundary-test tasks named by a plan's Risks section.
+- Extend generated attestations with `intent_confirmed_sha`, `tested_commit`, `reviewed_commit`, and per-line `acceptance_status`; populate them from the intent and acceptance report, and rerun evidence checks during finalization and publication validation. Legacy evidence keeps its compatibility path.
+- Treat acceptance reports and direct evidence files as publication metadata while retaining executable probe programs as functional content. Intent, plan, and attestation templates carry the new bookkeeping and boundary-test guidance.
+- budget-exception: intake.attestation-coverage — adds one checker rule to reject incomplete or duplicate Acceptance coverage; regression eval `loom-code/tests/test_loom_checker_intake.py`.
+- budget-exception: intake.commit-identity — adds one checker rule to reject functional differences between tested and reviewed commits; regression eval `loom-code/tests/test_loom_checker_intake.py`.
+- budget-exception: intake.intent-version — adds one checker rule to reject changed confirmed intent content; regression eval `loom-code/tests/test_loom_checker_intake.py`.
+- budget-exception: intake.plan-boundary-tests — adds one checker rule to reject missing boundary-test tasks referenced by plan risks; regression eval `loom-code/tests/test_loom_checker_intake.py`.
+
 ## [3.55.1] — 2026-11-01 — guard direct main-branch Git operations
 
 - The installed Loom `PreToolUse` hooks block `git merge`, `git commit`, and `git push` when the Git command starts the shell input on `main` or `master`, including when `&&` or `;` follows it; normal feature-branch work continues.
