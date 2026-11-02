@@ -116,6 +116,31 @@ def artifact_path(manifest, artifact: str, change_id: str, repo: Path) -> Path:
     return repo / template.replace("<change-id>", change_id)
 
 
+def artifact_text(
+    manifest, artifact: str, change_id: str, repo: Path, *, commit: str | None = None,
+) -> str | None:
+    """Read exact artifact bytes as UTF-8 text, from the checkout or one tree.
+
+    None means confirmed absence. A selected-tree read error never falls back
+    to the checkout; preserving newlines matters for the intent's blob pin.
+    """
+    path = artifact_path(manifest, artifact, change_id, repo)
+    if commit is None:
+        raw = path.read_bytes() if path.is_file() else None
+    else:
+        relative = path.relative_to(repo).as_posix()
+        listing = run_git(repo, "ls-tree", "-z", "--name-only", commit, "--", relative,
+                          timeout=GIT_TIMEOUT, text=False)
+        if listing is None:
+            raise UsageError(f"cannot read {relative} from selected commit {commit}")
+        if not listing:
+            return None
+        raw = run_git(repo, "show", f"{commit}:{relative}", timeout=GIT_TIMEOUT, text=False)
+        if raw is None:
+            raise UsageError(f"cannot read {relative} from selected commit {commit}")
+    return raw.decode("utf-8", "surrogateescape") if raw is not None else None
+
+
 def kickoff_defaults(repo: Path) -> dict[str, str]:
     """`- <key>: <value> — <reason> (<date>)`, one line per key."""
     path = repo / "docs/loom/KICKOFF-DEFAULTS.md"

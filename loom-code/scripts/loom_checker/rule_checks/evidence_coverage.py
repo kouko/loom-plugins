@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from loom_checker.helpers import artifact_path, read_text
+from loom_checker.helpers import artifact_path, artifact_text
 from pathlib import Path
 import re
 
@@ -85,27 +85,30 @@ def acceptance_coverage(
 
 def check_attestation_coverage(
     manifest, repo: Path, change_id: str, intent_sections: dict[str, str],
-    attestation: dict,
+    attestation: dict, *, commit: str | None = None, allow_missing_report: bool = False,
 ) -> list[tuple[str, str]]:
     """Every intent Acceptance line has exactly one report row, and that row
     states a Verdict the template allows.
 
     The check is on the row identities and the Verdict vocabulary, not on
     whether acceptance passed: `not verified` and `fails` are legal row
-    statuses and do not block here -- that judgement is the reviewer's and
-    the user's, not this rule's.
+    statuses. A recorded acceptance_status must agree with those rows.
+    Mechanical verification may explicitly allow an absent report, but then
+    the record carries no independent acceptance results.
     """
     rule = "intake.attestation-coverage"
 
     intent_numbers = _get_intent_acceptance_numbers(intent_sections)
-    if not intent_numbers:
-        return []
-
     report_path = artifact_path(manifest, "acceptance-test-report", change_id, repo)
-    if not report_path.is_file():
+    report_text = artifact_text(manifest, "acceptance-test-report", change_id, repo, commit=commit)
+    if report_text is None:
+        if attestation.get("acceptance_status", []) != []:
+            return [(rule, "acceptance_status claims report results but no report exists")]
+        if allow_missing_report or not intent_numbers:
+            return []
         return [(rule, f"acceptance test report missing at {report_path.relative_to(repo)}")]
 
-    rows = _report_rows(read_text(report_path))
+    rows = _report_rows(report_text)
     counts: dict[int, int] = {}
     for number, _cell in rows:
         counts[number] = counts.get(number, 0) + 1
@@ -142,4 +145,9 @@ def check_attestation_coverage(
             "not verified / fails) for Acceptance lines: "
             f"{', '.join(map(str, unreadable))}",
         ))
+    if "acceptance_status" in attestation:
+        recorded = attestation["acceptance_status"]
+        expected = acceptance_coverage(intent_sections, report_text)
+        if recorded != expected or any(type(row.get("acceptance")) is not int for row in recorded):
+            failures.append((rule, "attestation acceptance_status does not match the current report"))
     return failures

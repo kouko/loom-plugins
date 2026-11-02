@@ -94,6 +94,16 @@ charter: 1.1
 - Test: A7 positive: every generated evidence field is declared and counted; boundary: a template field absent from the schema fails the existing consistency check.
 - Risk: agent-decided — declare the five already implemented fields, not a second evidence mechanism; preserve optional historical shapes and the existing contract version convention for compatible additions.
 
+**W3-08 Preserve escaped content pipes in report cells**  after: W3-03  acceptance: 1
+- Files: `loom-code/scripts/loom_checker/rule_checks/evidence_coverage.py`, `loom-code/tests/test_evidence_drift_guards.py`
+- Test: A1 positive: a valid report containing an escaped pipe in the requested outcome passes; boundary: an unreadable Verdict remains rejected.
+- Risk: agent-decided — split only actual table separators; preserve the narrow fixed-column report format.
+
+**W3-09 Anchor new confirmations in committed history**  after: W3-06  acceptance: 3,6
+- Files: `loom-code/scripts/loom_checker/rule_checks/intent_version.py`, `loom-code/tests/test_selection_finalize.py`
+- Test: A3 positive: a newly confirmed intent finalizes; boundary: restoring an older confirmed file cannot erase its confirmation baseline. A6 positive: publication uses the same baseline; boundary: a removed or reverted pin remains detectable.
+- Risk: agent-decided — use the existing confirmation commit rather than trusting only the mutable file; confirmations predating pin support remain exempt.
+
 ## Simplicity check
 - none found
 
@@ -111,3 +121,4 @@ charter: 1.1
 7. Intent_confirmed_sha excludes status line (matches spec confirmed-behavior pattern)
 8. Tested_commit recorded directly at acceptance-test time (no report parsing fallback)
 9. Evidence whitelist only covers necessary output files (report, evidence, probes)
+10. agent-decided — supersede the initial HEAD fallback: finalization requires canonical report provenance; publication checks recorded identities and any declared provenance. A headerless existing report alone cannot prove when testing ran.

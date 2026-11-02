@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from loom_checker.helpers import artifact_path, blob_sha, read_text, sha_agrees
+from loom_checker.helpers import artifact_text, blob_sha, sha_agrees
 from pathlib import Path
 import re
 
@@ -18,7 +18,10 @@ def intent_identity(intent_path: Path) -> str:
     """The one blob sha the intent-version check compares against: the
     intent WITHOUT its status line and WITHOUT its `intent_confirmed_sha:`
     line -- the same convention the spec's confirmed-behavior pin follows."""
-    raw = intent_path.read_bytes()
+    return _content_identity(intent_path.read_bytes())
+
+
+def _content_identity(raw: bytes) -> str:
     return blob_sha(INTENT_CONFIRMED_SHA_LINE.sub(b"", STATUS_LINE.sub(b"", raw), count=1))
 
 
@@ -33,7 +36,7 @@ def recompute_command(relative: str) -> str:
 
 def check_intent_version(
     manifest, repo: Path, change_id: str, intent_sections: dict[str, str],
-    attestation: dict,
+    attestation: dict, *, commit: str | None = None,
 ) -> list[tuple[str, str]]:
     """The intent is the text whose confirmation the attestation pins.
 
@@ -43,17 +46,20 @@ def check_intent_version(
     """
     rule = "intake.intent-version"
 
-    intent_path = artifact_path(manifest, "intent", change_id, repo)
-    if not intent_path.is_file():
+    intent_text = artifact_text(manifest, "intent", change_id, repo, commit=commit)
+    if intent_text is None:
         return []
-    if not CONFIRMED_STATUS.search(intent_path.read_bytes()):
+    raw = intent_text.encode("utf-8", "surrogateescape")
+    if not CONFIRMED_STATUS.search(raw):
         return []
 
     recorded = attestation.get("intent_confirmed_sha")
     if not isinstance(recorded, str) or not recorded.strip():
+        if "intent_confirmed_sha" in attestation and INTENT_CONFIRMED_SHA_LINE.search(raw):
+            return [(rule, "attestation is missing the intent's confirmation pin; re-confirm the intent")]
         return []
 
-    current = intent_identity(intent_path)
+    current = _content_identity(raw)
     if not sha_agrees(recorded, current):
         return [(
             rule,

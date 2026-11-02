@@ -3,6 +3,7 @@ from __future__ import annotations
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import load_manifest
+from loom_checker.helpers import artifact_text
 from loom_checker.probe_results import Row
 from loom_checker.probe_results import claiming_row
 from loom_checker.probes import argv_for
@@ -140,6 +141,39 @@ def _evidence_failure(execution: dict, route: str, reviewers: set[str], digest: 
     if confirmation["content_digest"] != digest:
         return "adversarial confirmation was given for other functional content"
     return None
+
+
+def check_attestation_evidence(
+    repo: Path, head_sha: str, change_id: str, attestation: dict,
+    manifest: dict | None = None,
+) -> list[tuple[str, str]]:
+    """Recompute the new evidence invariants on one explicitly selected tree.
+
+    Exact historical shapes keep their original validation and digest policy;
+    complete bookkeeping records use these same checks at both real callers.
+    """
+    if not ATTESTATION_BOOKKEEPING.intersection(attestation):
+        return []
+    # Local imports keep capability modules independently importable: the
+    # commit-identity capability also consumes the schema constants above.
+    from loom_checker.parsing import parse_document
+    from loom_checker.rule_checks.evidence_coverage import check_attestation_coverage
+    from loom_checker.rule_checks.commit_identity import check_commit_identity
+    from loom_checker.rule_checks.intent_version import check_intent_version
+    from loom_checker.rule_checks.plan_boundary_tests import check_plan_boundary_tests
+
+    # Existing validation callers may override digest policy alone.
+    contract = dict(load_manifest(), **(manifest or {}))
+    intent = artifact_text(contract, "intent", change_id, repo, commit=head_sha)
+    _, sections = parse_document(intent or "")
+    failures = check_attestation_coverage(
+        contract, repo, change_id, sections, attestation, commit=head_sha,
+        allow_missing_report="acceptance-test" in auto_skipped_steps(repo, change_id, head_sha),
+    )
+    failures += check_commit_identity(contract, repo, change_id, sections, attestation, commit=head_sha)
+    failures += check_intent_version(contract, repo, change_id, sections, attestation, commit=head_sha)
+    failures += check_plan_boundary_tests(contract, repo, change_id, sections, attestation, commit=head_sha)
+    return failures
 
 
 def validate_attestation(
@@ -311,4 +345,4 @@ def validate_attestation(
                     if item["status"] not in {"works", "partly", "not_verified", "fails"}:
                         return [(rule, f"attestation acceptance_status has invalid status: {item['status']!r}")]
 
-    return []
+    return check_attestation_evidence(repo, head_sha, change_id, attestation, manifest)

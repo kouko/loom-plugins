@@ -4,10 +4,12 @@ from loom_checker.attestation import ATTESTATION_SCHEMA
 from loom_checker.attestation import _command_digest
 from loom_checker.attestation import adversarial_route
 from loom_checker.attestation import artifact_path_form_failure
+from loom_checker.attestation import check_attestation_evidence
 from loom_checker.digest import functional_content_digest
 from loom_checker.helpers import TRUNK_BRANCH_NAMES
 from loom_checker.helpers import UsageError
 from loom_checker.helpers import artifact_path
+from loom_checker.helpers import artifact_text
 from loom_checker.helpers import git_maybe
 from loom_checker.helpers import git_ok
 from loom_checker.helpers import git_text
@@ -31,9 +33,8 @@ from loom_checker.reviewers import committed_branch_delta
 from loom_checker.reviewers import required_reviewer_count
 from loom_checker.reviewers import attach_outside_receipt
 from loom_checker.reviewers import selected_outside_family
-from loom_checker.rule_checks.evidence_coverage import acceptance_coverage, check_attestation_coverage
-from loom_checker.rule_checks.commit_identity import check_commit_identity
-from loom_checker.rule_checks.intent_version import check_intent_version
+from loom_checker.rule_checks.evidence_coverage import acceptance_coverage
+from loom_checker.rule_checks.commit_identity import report_tested_commit
 from pathlib import Path
 import json
 import os
@@ -419,37 +420,26 @@ def _finalize(repo: Path, change_id: str, rest: list[str], out) -> list[tuple[st
     # completed at HEAD, without claiming independent acceptance testing.
     from loom_checker.parsing import parse_document
     import re as _re
-    intent_path = artifact_path(manifest, "intent", change_id, repo)
-    if intent_path.is_file():
-        intent_text = read_text(intent_path)
-        _intent_front, intent_sections = parse_document(intent_text)
-        _sha = _re.search(
-            r"^intent_confirmed_sha:\s*([0-9a-f]{7,64})\s*$",
-            intent_text, _re.IGNORECASE | _re.MULTILINE,
-        )
-        if _sha:
-            attestation["intent_confirmed_sha"] = _sha.group(1).lower()
-        report_path = artifact_path(manifest, "acceptance-test-report", change_id, repo)
-        if report_path.is_file():
-            _report_text = read_text(report_path)
-            _tested = _re.search(
-                r"at\s+([0-9a-f]{7,40})", _report_text
-            )
-            if _tested:
-                attestation["tested_commit"] = _tested.group(1).lower()
-            attestation["acceptance_status"] = acceptance_coverage(
-                intent_sections, _report_text,
-            )
-        elif "acceptance-test" in skip:
-            attestation["tested_commit"] = head_sha
+    intent_text = artifact_text(manifest, "intent", change_id, repo, commit=head_sha)
+    _intent_front, intent_sections = parse_document(intent_text or "")
+    _sha = _re.search(
+        r"^intent_confirmed_sha:\s*([0-9a-f]{7,64})\s*$",
+        intent_text or "", _re.IGNORECASE | _re.MULTILINE,
+    )
+    if _sha:
+        attestation["intent_confirmed_sha"] = _sha.group(1).lower()
+    report_text = artifact_text(manifest, "acceptance-test-report", change_id, repo, commit=head_sha)
+    if report_text is not None:
+        attestation["tested_commit"] = report_tested_commit(report_text)
+        if attestation["tested_commit"] is None:
+            return [("intake.commit-identity", "acceptance report needs one canonical Tried-on commit line")]
+        attestation["acceptance_status"] = acceptance_coverage(intent_sections, report_text)
+    elif "acceptance-test" in skip or not acceptance_coverage(intent_sections, ""):
+        attestation["tested_commit"] = head_sha
 
-        failures: list[tuple[str, str]] = []
-        if report_path.is_file() or "acceptance-test" not in skip:
-            failures += check_attestation_coverage(manifest, repo, change_id, intent_sections, attestation)
-        failures += check_commit_identity(manifest, repo, change_id, intent_sections, attestation)
-        failures += check_intent_version(manifest, repo, change_id, intent_sections, attestation)
-        if failures:
-            return failures
+    failures = check_attestation_evidence(repo, head_sha, change_id, attestation, manifest)
+    if failures:
+        return failures
     # ===== END EVIDENCE DRIFT GUARD CHECKS =====
 
     target = artifact_path(manifest, "attestation", change_id, repo)
