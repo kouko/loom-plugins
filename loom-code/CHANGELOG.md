@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.57.0] — 2026-11-02 — preserve context in intent confirmation
+
+- Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Wording, length and presentation remain flexible; the existing single stop, publication disclosure and outcome-only decision boundary remain unchanged.
+
 ## [3.56.0] — 2026-11-02 — detect incomplete and stale verification evidence
 
 - Add four checker rules for missing or repeated Acceptance report rows, mismatched tested and reviewed functional content, changed confirmed intent content, and missing named boundary/probe programs. Planning checks task references; post-Build checks require the concrete named files to exist.

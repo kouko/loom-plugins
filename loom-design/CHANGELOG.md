@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.20.0] — 2026-11-02 — preserve context in intent confirmation
+
+- `capture-intent` connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Wording, length and presentation remain flexible; the existing single stop, publication disclosure and outcome-only decision boundary remain unchanged.
+- Add behavioral prompts for a short familiar request, unfamiliar concepts and a detailed follow-up, for independent conversational exercises.
+
 ## [2.19.0] — 2026-11-02 — pin the confirmed intent without changing branch protections
 
 - `capture-intent` records `intent_confirmed_sha` at confirmation: the blob SHA of the intent excluding its `status:` line and the pin line itself. The intent template carries the field by default, allowing `loom-code` to detect changes to the content the user confirmed.
