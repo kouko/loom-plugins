@@ -1,194 +1,113 @@
 # Loom evidence drift guards — acceptance test evidence
 
-Tried on 2026-11-01, in a clean copy of the project at
-81d3f31bde5b7db2d045cdafc68d5fa2998e3420 (`git worktree add <tmp> HEAD`,
-detached at that exact commit; every exercise below ran inside that clean
-copy or in a second worktree at 771d9d91, never in the working repo).
+Tried on 2026-11-02, in a clean copy of the project at 2938a3bedddae6d53146f6a7e0c97db65237b3db.
 
-HEAD at test time: `81d3f31bde5b7db2d045cdafc68d5fa2998e3420`
-(feat/2026-10-12-loom-evidence-drift-guards post-merge: merge of
-origin/main into the branch at 13bd8e52, then the fix commit 81d3f31b).
+## Setup and actual commands
 
-Registration check (line 1/6 prerequisite):
-```
-$ python3 loom-code/scripts/loom_checker.py --list-rules
-intake.attestation-coverage  Acceptance test report must have a row for each intent Acceptance line with valid Verdict status (works/partly/not_verified/fails).
-intake.commit-identity       Functional content diff between tested_commit and reviewed_commit in attestation must be limited to evidence files only.
-intake.intent-version        Intent Acceptance lines must match those recorded at confirmation time (intent_confirmed_sha).
-intake.plan-boundary-tests   Each Risk line in plan (charter 1.1+) should have a corresponding boundary test task.
-```
-The four rules are registered in loom-code/scripts/loom_checker/rules.py,
-wired into intake at command_handlers/intake.py:95-100 and re-run by the
-finalize block at command_handlers/finalize.py:444-449.
+- `git clone --no-hardlinks . /private/tmp/loom-acceptance-2938a3b`: exit 0, full history retained. `git rev-parse HEAD` returned the exact commit above. Final clean-clone `git status --short` was empty.
+- Read README Development instructions and confirmed intent/spec/plan. Used its isolated locked environment with focused pytest inventory, as required by the acceptance-tester contract.
+- `python3 loom-code/scripts/loom_checker.py --list-rules`: exit 0, including all four evidence rules. `python3 scripts/sync_codex_manifests.py --check --all`: exit 0. Local checker and manifests load; this does not claim a new global plugin installation.
+- Initial sandboxed uv failed to create a cache lock. Approved cache access resolved that. An initial mixed code/design-root command then failed collection with `ModuleNotFoundError: test_verification_status` (zero tests executed); reran separately, consistent with the package inventory's isolated roots. No repairs were made.
+- Code command: `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_evidence_drift_guards.py loom-code/tests/test_adversarial_evidence_drift.py loom-code/tests/test_verification_status.py loom-code/tests/test_selection_finalize.py loom-code/tests/test_contract_manifest.py loom-code/tests/test_review_json_template.py loom-code/tests/test_write_plan_station_text.py -q -n 0`. Exit 0, **164 passed in 75.16s**. Log `/private/tmp/loom-acceptance-code.log`.
+- Design command: `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-design/tests/spec/test_capture_intent_contract.py -q -n 0`. Exit 0, **27 passed in 0.02s**. Log `/private/tmp/loom-acceptance-design.log`.
+- Boundary command: `uv run --isolated --with-requirements requirements-package-tests.lock python -m pytest loom-code/tests/test_loom_checker_intake.py -k 'named_boundary_file or plan_boundary_tests' -q -n 0`. Exit 0, **11 passed, 137 deselected in 2.97s**. Log `/private/tmp/loom-acceptance-boundary.log`.
+- **202 focused tests passed**. Full package suite left to finalization, not run by this witness. Its command is `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`; no future result is claimed.
+- Additional witness-owned temporary programs: `python3 /private/tmp/loom-acceptance-lifecycle.py` and `python3 /private/tmp/loom-acceptance-defaults.py`, both exit 0. They used temporary Git repositories, existing source helpers, and actual checker CLI execution. Relevant captured outputs are preserved below; fixture reviewer identities are test data only.
 
-Unit tests (run in the clean copy):
-```
-$ python3 -m pytest loom-code/tests/test_evidence_drift_guards.py -q
-22 passed in 1.93s
-$ python3 -m pytest loom-code/tests/test_loom_checker_intake.py loom-code/tests/test_selection_finalize.py -q
-177 passed in 85.80s
+## 1. Complete, uniquely identified acceptance results
+
+Passed tests: `test_coverage_fails_and_names_a_missing_line`, `test_coverage_fails_and_names_an_extra_line`, `test_coverage_fails_and_names_a_duplicated_line`, `test_coverage_fails_and_names_an_unreadable_verdict`, and complete-report cases, including escaped content pipes. `test_acceptance_status_records_not_verified_for_a_missing_row` verifies omission is not passing.
+
+Witness lifecycle trial committed each report mutation and ran actual finalization:
+
+```text
+missing 1 BLOCK intake.attestation-coverage: acceptance test report has no row for Acceptance lines: 1
+duplicate 1 BLOCK intake.attestation-coverage: acceptance test report carries duplicate rows for Acceptance lines: 1
+unreadable 1 BLOCK intake.attestation-coverage: acceptance test report states no Verdict in (works / partly / not verified / fails) for Acceptance lines: 1
 ```
 
-## 1. acceptance report 未逐條交代身分與狀態 → 檢查失敗並指出條號
+These cover spec Empty evidence and Invalid coverage flows. Complete evidence reached execution and output generation in section 5. Failed attempts did not produce a replacement record.
 
-Exercised `check_attestation_coverage` (rule_checks/evidence_coverage.py,
-the intake.attestation-coverage rule) against a synthetic three-line intent
-(1/2/3), writing each broken report to the change's real report path:
+## 2. Tested and reviewed commit identity
 
-| report shape | result |
-|---|---|
-| rows 1,2 only (line 3 missing) | BLOCK `intake.attestation-coverage: acceptance test report has no row for Acceptance lines: 3` |
-| row 2 duplicated | BLOCK `... duplicate rows for Acceptance lines: 2` |
-| extra row 8 | BLOCK `... rows for Acceptance lines the intent does not have: 8` |
-| row 2 verdict cell `OK I guess` | BLOCK `... states no Verdict in (works / partly / not verified / fails) for Acceptance lines: 2` |
-| rows 1..3, verdicts works/not verified/fails | no failures |
+Passed `test_commit_identity_fails_when_a_v2_field_is_missing`, `test_commit_identity_fails_on_functional_drift`, `test_commit_identity_ignores_evidence_only_drift`, and `test_commit_identity_passes_identical_functional_content`. Functional-drift assertions require both commit abbreviations in the diagnostic. Publication attacks include null and unresolved tested identities; selected-tree tests include unrelated functional content and invalid provenance.
 
-Then the real change's own report at this HEAD (7 rows for 7 lines, all
-`works`): `check_attestation_coverage(...)` → no failures.
+Actual lifecycle success output contained `tested_commit: db41300`, `reviewed_commit: d389aa66aa43583df4e8da40527b60da4f89323b`, and `acceptance_status: [{acceptance: 1, status: works}]`. After functional plan content changed, actual finalization returned:
 
-## 2. attestation 未記錄被測/被審查 commit、兩者功能內容不同 → 檢查失敗
-
-Exercised `check_commit_identity` (rule_checks/commit_identity.py, the
-intake.commit-identity rule) against four real commits made inside the
-clean copy (whole-tree digests via loom_checker/digest.py, the publication
-whitelist from loom-code/contract/manifest.yaml):
-
-- T 99a178f7 — synthetic baseline ("tested commit")
-- E 3dc3854f — T plus one line changed in
-  docs/loom/2026-10-12-drift-synthetic/evidence/acceptance-test-evidence.md only
-- P d5223792 — T plus one new file
-  docs/loom/2026-10-12-drift-synthetic/evidence/probes/probe_a.py
-- F 90d8a9b3 — T plus a functional edit to synthetic-src/module.py
-
-| attestation | result |
-|---|---|
-| v2, tested_commit missing | BLOCK `v2 attestation is missing required bookkeeping fields: tested_commit=None reviewed_commit='99a178f...'; the acceptance test report and closing review must supply them` |
-| v2, reviewed_commit missing | BLOCK same message, naming the missing reviewed_commit |
-| tested T, reviewed E (evidence file only) | no failures |
-| tested T, reviewed P (probe program only) | BLOCK `functional content differs between the tested commit 99a178f and the reviewed commit d522379; the acceptance evidence was produced on other code than what is being reviewed` — this is the corrected whitelist (`evidence/*`, not `evidence/**`) working: evidence/probes/ stays functional content |
-| tested T, reviewed F (source change) | BLOCK same message naming 99a178f and 90d8a9b |
-| v1 schema, no bookkeeping fields | no failures (exempt) |
-
-## 3. intent 確認版本與現況不符 → 檢查失敗並指出受影響條目與重確認路徑
-
-Exercised `check_intent_version` (rule_checks/intent_version.py, the
-intake.intent-version rule) on the synthetic intent:
-
-- pin = intent_identity(intent) = 6d3bc70ae00d; attestation carrying it → no failures.
-- attestation with `intent_confirmed_sha: None` → no failures (optional field).
-- after editing Acceptance line 2, same attestation → BLOCK:
-  `the intent has changed since the attestation pinned its confirmation
-  (recorded 6d3bc70, current e907f1f); every Acceptance line of the intent
-  may be affected. recompute it with `grep -v -e '^status:' -e
-  '^intent_confirmed_sha:' docs/loom/intent/2026-10-12-drift-synthetic.md |
-  git hash-object --stdin` and re-confirm the intent before closing review`
-  — names both versions, all acceptance lines, and the recompute path.
-- after recomputing the pin → no failures.
-- status line changed to `status: open`, stale pin → no failures (nothing
-  confirmed to compare with).
-
-## 4. plan 具名的 boundary test 不存在 → 檢查失敗
-
-Exercised through the real CLI in the clean copy:
-
-```
-$ python3 loom-code/scripts/loom_checker.py intake write-plan 2026-10-12-drift-synthetic
-BLOCK intake.plan-boundary-tests: Risk lines reference boundary test tasks that don't exist: W9-99
-exit=1
-```
-(the plan's Risks item 1 named `a boundary test in W9-99`; no such task).
-
-Pass case — same plan with the risk naming W1-01, whose header carries the
-suffix marker the plan template documents (`**W1-01 Boundary test for the
-risky path**  after: none  boundary test  acceptance: 1`):
-```
-$ python3 loom-code/scripts/loom_checker.py intake write-plan 2026-10-12-drift-synthetic
-exit=0
-```
-Exemptions (direct rule call): plan without a charter line → []; charter
-1.0 → []. Plan template (loom-code/contract/templates/plan.md lines 31-35)
-documents the required suffix marker, so the template hint does not misfire.
-
-Observed quirk (reported as an open question): a task whose title alone
-says "Boundary test ..." but whose suffix lacks the marker is NOT
-recognized — `**W1-01 Boundary test for the risky path**  after: none
-acceptance: 1` still BLOCKs `... don't exist: W1-01`.
-
-## 5. verdict 產物在 change 目錄內、與 attestation 的主從關係明確
-
-- The change's own store holds docs/loom/2026-10-12-loom-evidence-drift-guards/
-  attestation.json with `verdicts: [reviewer-1, reviewer-2]` (both PASS) —
-  the filed verdict artifact lives inside the change directory.
-- loom-code/skills/closing-review/SKILL.md at this HEAD, section "5.
-  Finalize" (lines ~390-441): reviewer output goes to "a temporary JSON
-  input outside the repository"; `finalize-review` "atomically generate[s]
-  the attestation bound to the functional-content digest"; "publication
-  validates that single attestation directly" (line ~441). The master
-  artifact is the attestation; the input is explicitly temporary.
-- No verdict artifact exists at the repo root.
-
-Observation (reported as an open question): the change's own store still
-contains a committed review-input.json (from earlier rounds) whose verdicts
-duplicate the attestation's; validate_attestation never reads it, so it
-cannot drift the record, but the current document calls such input
-temporary and outside the repository.
-
-## 6. 檢查在發布前失效檢查中再次執行
-
-(a) Review entrance is not where the attestation-based checks run:
-```
-$ python3 loom-code/scripts/loom_checker.py intake write-plan 2026-10-12-loom-evidence-drift-guards
-exit=0
+```text
+BLOCK intake.commit-identity: functional content differs between the tested commit db41300 and the reviewed commit 90ca987; the acceptance evidence was produced on other code than what is being reviewed
 ```
 
-(b) The finalize block (command_handlers/finalize.py lines 413-450, the
-EVIDENCE DRIFT GUARD CHECKS) re-runs all three rules when the attestation
-is written. Reproduced verbatim on the synthetic change:
-- report missing row 3 → BLOCK `intake.attestation-coverage: ... no row for
-  Acceptance lines: 3`;
-- complete report (Tried-on line naming tested commit 99a178f) → no
-  failures; the block's regex extracted tested_commit from the report's
-  `Tried on ... at <sha>` line and built acceptance_status from the rows.
+This and section 3 cover spec Mismatched content. Evidence-only changes pass; executable probes retain functional binding.
 
-(c) Pre-publication invalidation check (`verification_status` →
-`validate_attestation`, loom-code/scripts/loom_checker/verification.py,
-run by publish/land/hooks/CI) re-validates the committed attestation:
-- in a worktree at 771d9d91 (the commit that wrote the v2 attestation),
-  delta scoped to that change (`base=771d9d91^`): `valid`;
-- `validate_attestation` on the untouched attestation there → [];
-- at the new HEAD 81d3f31b: `stale (attestation functional content digest
-  does not match the selected tree)` — the merged functional content
-  (30+ commits plus the fix) invalidates the earlier attestation;
-- acceptance_status element rewritten to `"ship-it"` → `push.attestation:
-  attestation acceptance_status has invalid status: 'ship-it'` — the
-  pre-publication validator catches a malformed status cell.
+## 3. Confirmed intent, rollback and recovery
 
-## 7. 新變更的模板預設帶有上述欄位
+All five cases of `test_finalizer_anchors_the_latest_confirmed_intent` passed. Actual finalization succeeds for unchanged newly confirmed content and rejects restoring the entire older unpinned file, restoring an older pinned file, and a merge carrying the older intent. Explicit historical and confirmation commits remain readable despite newer checkout history.
 
-- loom-code/contract/templates/attestation.json carries schema
-  loom-attestation/v2 with keys: acceptance_status, change_id,
-  content_digest, executions, findings, intent_confirmed_sha,
-  reviewed_commit, selection, tested_commit, verdicts.
-- loom-code/skills/closing-review/references/acceptance-test-report.md
-  pins the `Tried on <date>, in a clean copy of the project at <short sha>`
-  line and the one-row-per-Acceptance table with the fixed Verdict words.
-- loom-design/skills/capture-intent/templates/intent.md line 8 pre-writes
-  `intent_confirmed_sha: <sha7>` with the recompute recipe.
-- Population is exercised: the finalize block (line 6b above) filled
-  tested_commit from the report's Tried-on line and acceptance_status from
-  the rows; the real change's own committed attestation shows the fields
-  populated (tested_commit 288d9d58, reviewed_commit e7509a6d,
-  intent_confirmed_sha null because this change predates the mechanism,
-  acceptance_status 7 x works).
+Matching/abbreviated pins, post-confirmation editing, recovery and POSIX-shell recipe tests passed. An additional direct mutation trial printed:
 
-## Package suite
-
-Command (run once, in the clean copy, `uv` 0.13.4, node v22.23.1):
+```text
+intake.intent-version: the intent has changed since the attestation pinned its confirmation (recorded 98dbcf1, current 0ad4a49); every Acceptance line of the intent may be affected. recompute it with `grep -v -e '^status:' -e '^intent_confirmed_sha:' docs/loom/intent/2026-10-12-drift.md | git hash-object --stdin` and re-confirm the intent before closing review
 ```
-$ uv run --isolated --with-requirements requirements-package-tests.lock \
-    python scripts/run_package_tests.py --loom-family -q
-exit=0
+
+The diagnostic conservatively identifies every Acceptance line as potentially affected, rather than pretending to determine semantic impact precisely. Both entry recipes were executed and matched checker identity (section 7).
+
+## 4. Concrete named boundary programs
+
+Eleven focused intake/boundary cases passed. `test_named_boundary_file_uses_the_implemented_tree` exercises Files/Test/Risk carriers, planning with `require_files=False`, file presence, and selected committed tree versus mutable checkout. Missing task references are independently rejected; historical charter handling is retained. Both absent-program adversarial cases passed, including `.pY` spelling.
+
+Actual finalization of a plan naming an absent program returned exit 1:
+
+```text
+BLOCK intake.plan-boundary-tests: Named boundary/probe test files do not exist: tests/test_missing.py
 ```
-Result: 1005 pytest tests passed across the four test roots, shell tests
-all PASS, no FAILED/ERROR anywhere in the log
-(553 lines, saved at <tmp>/at-drift-scratch/package-suite.log).
+
+This covers spec Missing boundary program. That trial also correctly reported functional drift because its plan changed after testing; the independent missing-program diagnostic was present.
+
+## 5. Persisted verdict and authoritative output
+
+Witness trial finalized a temporary adopting repository using fixture package command `python3 -c pass` and review input outside the repository. Actual CLI exit 0:
+
+```text
+wrote docs/loom/2026-09-14-example/attestation.json for 6dadf6a4c5f1127fdb8e2d460ee35461bf256ce9
+```
+
+Parsed output retained `verdicts: [{reviewer: r1, vendor: openai, model: m, lens: code, verdict: PASS, findings: []}]`, both commit identities, per-line acceptance, and successful package execution. Fixture identities are not actual reviewer claims. `test_finalize_binds_the_report_verdicts_into_acceptance_status` independently passed. These cover spec In progress and Success with real subprocess execution before output generation.
+
+`loom-code/skills/closing-review/SKILL.md:270` explicitly assigns authoritative verdicts to the change directory's attestation and defines outside review input as temporary. This branch's real attestation has NOT been regenerated by this witness; closing-review must generate it after report commitment and fresh review.
+
+## 6. Publication checks selected committed artifacts again
+
+Lifecycle trial committed its generated record: verification returned `valid`. A committed report-only observational note remained `valid`. Subsequent damage returned:
+
+```text
+missing publication stale (acceptance test report has no row for Acceptance lines: 1)
+duplicate publication stale (acceptance test report carries duplicate rows for Acceptance lines: 1)
+unreadable publication stale (acceptance test report states no Verdict in (works / partly / not verified / fails) for Acceptance lines: 1)
+```
+
+All six `test_evidence_revalidation_reads_the_selected_tree` cases passed: status mismatch, intent pin, reviewed content, boundary file, provenance, and valid report edit. They recheck an earlier valid commit while HEAD is damaged, then repair mutable files and still reject the selected damaged commit. Five publication-damage attacks passed too. Full-history rollback/merge checks are recorded in section 3.
+
+This covers spec Publication. Verification discloses `stale`; existing publication authorization may still publish while disclosing it. No network publication or merge was attempted.
+
+## 7. Defaults, old shapes and mechanical verification
+
+Witness default-check output:
+
+```text
+attestation default fields ['acceptance_status', 'intent_confirmed_sha', 'reviewed_commit', 'tested_commit']
+confirmation ordering and executable hash recipe loom-design/skills/capture-intent/SKILL.md
+confirmation ordering and executable hash recipe loom-code/skills/write-plan/references/confirm-intent.md
+both recipes match checker intent identity 19673070d78e30519d42bffadc486b6eb49b5db9
+report defaults canonical provenance and per-line verdict/re-run
+```
+
+Assertions loaded the actual JSON/report templates and both instruction artifacts. Both entry paths require replacing the placeholder after writing all confirmed frontmatter, including publication authorization. Their literal hash recipe was run under `sh` and matched checker identity. Successful finalization also exercised report provenance/default record population. Manifest/template declaration consistency tests passed.
+
+`test_historical_v2_and_complete_extension_keep_exact_shapes` passed for six-key v1, seven-key v2 and complete extended v2, using their respective digest policies; incomplete extensions and unknown keys were rejected. `test_compatibility_existingv2_accepted` passed. Report-free mechanical finalization passed, records actual tested/reviewed HEAD, leaves acceptance status empty and claims no independent acceptance testing. These cover spec Historical evidence and Mechanical verification.
+
+## Re-run on 2026-11-02, at 2938a3bedddae6d53146f6a7e0c97db65237b3db
+
+- 1–7: re-tested in full; no old verdicts or reviewer identities carried over. All nine confirmed spec UI cases map to the seven rows above.
+- No important/fatal dismissals supplied. Only the report and this evidence file were edited in the original repository by this witness.
+- Limits: structured checks cannot prove the truth of a prose claim. Historical exemptions do not manufacture missing evidence. No claim is made that this branch's final whole-repository suite or real finalization has already completed.
