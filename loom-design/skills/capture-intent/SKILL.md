@@ -325,16 +325,16 @@ the intent and restate again; there is no limit on rounds here.
 
 **On "yes":**
 
-1. Write `status: confirmed <date>` into the intent. Also write
-   `intent_confirmed_sha: <sha7>` — the output of
-   `git hash-object <(grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent>)`,
-   i.e. the blob sha over the intent the user confirmed, excluding the
-   workflow-status line and the pin line itself (the same convention the
-   spec's `confirmed-behavior:` pin follows). When the confirmed
+1. Write `status: confirmed <date>` into the intent. When the confirmed
    restatement explicitly authorizes automatic publication, also write
    `publication: automatic — authorized <date> by <name>`; never derive it
    from status or prose. When step 3 ran, write
    `ratified-by: <name> <date>` into `PRINCIPLES.md`.
+   After all confirmed intent frontmatter, including `publication:`, is written,
+   replace the template's `intent_confirmed_sha: <sha7>` with
+   `intent_confirmed_sha: <computed-sha>`, using the output of
+   `grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent> | git hash-object --stdin`.
+   This hashes the confirmed intent excluding its status and pin lines.
 2. **Branch before the first commit.** Before the confirmation commit, make
    HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
    `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
