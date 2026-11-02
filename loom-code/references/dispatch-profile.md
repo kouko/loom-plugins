@@ -84,15 +84,21 @@ symbolic attempt returns `routed`, null requested/override fields and the exact
 retained label, regardless of current inheritance guarantees or count.
 
 When `failure_kind` identifies completed non-conforming output as
-`malformed-response`, retry the same effective profile without model or effort
-escalation. That retry consumes the shared completed-redispatch budget. A
+`malformed-response`, retry without model or effort escalation, preserving an
+explicit effective pair or omitting both overrides for a symbolic profile.
+That retry consumes the shared completed-redispatch budget. A
 missing kind or another known kind returns `execution-failed`; an unknown kind
 is malformed input and exits non-zero.
 
-For a symbolic profile, this legal retry omits both overrides, retains the
-exact label and returns `next_redispatch = completed_redispatches + 1`. Replaying
-an override-free invocation does not establish that the unknown backend model
-stays the same. Symbolic capability-quality or reasoning-depth failures return
+For a symbolic profile, this legal retry omits both overrides, derives its new
+effective label from the current `inheritance_guaranteed` value and returns
+`next_redispatch = completed_redispatches + 1`. A completed attempt's retained
+label describes past execution; success and terminal failure preserve that
+historical label. A new invocation records `inherited` only when the host
+currently guarantees inheritance, otherwise `host-default/unverified`.
+Replaying an override-free invocation does not establish that the unknown
+backend model stays the same. Symbolic capability-quality or reasoning-depth
+failures return
 `execution-failed` with `no-legal-escalation`: an unknown baseline cannot justify
 an escalation. Incomplete attempts, exhausted budgets and non-routing failures
 retain their existing terminal behavior; this adds no new failure kind or retry

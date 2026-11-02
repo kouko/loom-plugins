@@ -201,7 +201,7 @@ def _after_execution(packet: dict[str, Any], capabilities: dict[str, tuple[str, 
         if kind == "malformed-response":
             if symbolic:
                 result = _fallback(
-                    "nonconforming-output-redispatch", actual == "inherited", count=count,
+                    "nonconforming-output-redispatch", inheritance_guaranteed, count=count,
                 )
             else:
                 result = _decision(

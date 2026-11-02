@@ -120,14 +120,20 @@ def test_malformed_explicit_feedback_is_rejected_before_result_branches(
 
 
 @pytest.mark.parametrize("profile", ["inherited", "host-default/unverified"])
-def test_fallback_malformed_retry_retains_label_and_completed_count(profile: str) -> None:
+@pytest.mark.parametrize("inheritance", [False, True])
+def test_fallback_malformed_retry_uses_current_guarantee_and_completed_count(
+    profile: str, inheritance: bool,
+) -> None:
+    expected_profile = "inherited" if inheritance else "host-default/unverified"
     for count in (0, 1):
-        result = dispatch_profile.resolve(feedback(
+        payload = feedback(
             profile, count, success=False, conforming=False, failure_kind="malformed-response",
-        ))
+        )
+        payload["inheritance_guaranteed"] = inheritance
+        result = dispatch_profile.resolve(payload)
         assert result["outcome"] == "dispatch"
         assert result["reason"] == "nonconforming-output-redispatch"
-        assert result["effective_profile"] == profile
+        assert result["effective_profile"] == expected_profile
         assert result["requested_profile"] is result["overrides"] is None
         assert result["completed_redispatches"] == count
         assert result["next_redispatch"] == count + 1
