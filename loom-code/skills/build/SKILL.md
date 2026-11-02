@@ -23,10 +23,10 @@ affected design and tasks before continuing (or intent Constraints when those
 artifacts are omitted). The main agent must preserve applicable implementation
 and distinguish still-applicable evidence from evidence that needs replacement;
 earlier passing evidence proves only the requirements it tested. Apply
-closing-review's `review.bounded-episode` rule to episode eligibility and retry
+the `review.bounded-episode` rule to episode eligibility and retry
 continuity: reconfirmation alone resets neither review rounds nor the same
-failed task's retry count. It requires a concrete changed obligation and recorded
-rationale before treating work as a new task.
+failed task's retry count. Treating work as a new task requires a concrete
+changed obligation and recorded rationale.
 
 At entry, omit the steps the user told you to skip in plain words (spec, plan,
 implementer, tdd, adversarial, package-tests, `acceptance-test` (independent
