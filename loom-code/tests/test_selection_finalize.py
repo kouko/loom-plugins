@@ -381,18 +381,17 @@ def run_with_probes(repo: Path, tmp_path: Path) -> subprocess.CompletedProcess:
 
 
 def test_cap_probe_programs_pass_and_one_more_is_refused(tmp_path: Path) -> None:
-    """Acceptance 3: at most `MAX_PROBE_PROGRAMS` committed probe programs for
-    a change, read from the constant so the ceiling has one source."""
+    """Policy boundary: five probe programs pass and a sixth is refused."""
     repo = make_repo(tmp_path)
-    write_probes(repo, MAX_PROBE_PROGRAMS)
+    write_probes(repo, 5)
     accepted = run_with_probes(repo, tmp_path)
     assert accepted.returncode == 0, accepted.stderr
 
-    write_probes(repo, MAX_PROBE_PROGRAMS + 1)
+    write_probes(repo, 6)
     refused = run_with_probes(repo, tmp_path)
     assert refused.returncode == 1
     assert "BLOCK adversarial.proportionate" in refused.stderr
-    assert f"{MAX_PROBE_PROGRAMS + 1} probe programs" in refused.stderr
+    assert "6 probe programs" in refused.stderr
 
 
 def test_probe_program_without_a_concern_line_is_refused(tmp_path: Path) -> None:

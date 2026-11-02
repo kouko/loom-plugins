@@ -61,7 +61,7 @@ recipe, a station, an agent contract or a README may point here; none of them
 states a number of its own.
 
 The count is a ceiling and there is no minimum. A change commits **at most
-six** probe programs, whatever its artifact types are, and that ceiling has
+five** probe programs, whatever its artifact types are, and that ceiling has
 no written-reason escape: a user who wants more programs, or wants this step
 skipped, says so in plain words. The checker rule
 `adversarial.proportionate` recomputes the ceiling from the committed tree.

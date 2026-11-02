@@ -98,6 +98,16 @@ charter: 1.1
 - Test: A3 positive: a newly confirmed intent finalizes; boundary: restoring an older confirmed file cannot erase its confirmation baseline. A6 positive: publication uses the same baseline; boundary: a removed or reverted pin remains detectable.
 - Risk: agent-decided — use the existing confirmation commit rather than trusting only the mutable file; confirmations predating pin support remain exempt.
 
+**W3-10 Restore the unrelated global adversarial budget**  after: W3-09  acceptance: 7
+- Files: `loom-code/scripts/loom_checker/probes.py`, `loom-code/skills/closing-review/references/adversarial.md`, `loom-code/tests/test_selection_finalize.py`
+- Test: A7 positive: five programs are accepted; boundary: a sixth is refused through actual finalization, independently of the implementation constant.
+- Risk: agent-decided — remove the inherited global increase identified by the independent value assessment; this change has one earned program and needs no larger budget.
+
+**W3-11 Remove unused intake dependencies**  after: W3-10  acceptance: 6
+- Files: `loom-code/scripts/loom_checker/command_handlers/intake.py`
+- Test: A6 positive: existing intake and module-entry checks pass; boundary: malformed intake still fails through the existing checks.
+- Risk: agent-decided — remove three branch-added imports left unused when evidence checks moved to the shared finalization/publication entry; behavior is unchanged.
+
 ## Simplicity check
 - none found
 
@@ -117,3 +127,4 @@ charter: 1.1
 8. Tested_commit recorded directly at acceptance-test time (no report parsing fallback)
 9. Evidence whitelist only covers necessary output files (report, evidence, probes)
 10. agent-decided — supersede the initial HEAD fallback: finalization requires canonical report provenance; publication checks recorded identities and any declared provenance. A headerless existing report alone cannot prove when testing ran.
+11. agent-decided — the independent value assessment found the global probe-cap increase unrelated to the seven outcomes; restore the original five-program budget and remove unused intake imports before shipping.
