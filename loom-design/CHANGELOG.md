@@ -12,6 +12,11 @@ as the `## Predecessor plugin histories` section at the end, so this file
 is the whole record. Their version numbers never continued here —
 `loom-design` started fresh at 0.1.0.
 
+## [2.20.0] — 2026-11-03 — preserve applicable work after changed requirements
+
+- `capture-intent` requires renewed confirmation after substantive requirements changes during implementation and routes affected design, plan and evidence back through their owning stations while carrying applicable work forward.
+- Keep confirmation validity separate from eligibility for a new review episode. Wording-only edits, technical repairs and reviewer changes preserve review rounds; the same failed task retains its retry count under the existing closing-review contract.
+
 ## [2.19.0] — 2026-11-02 — pin the confirmed intent without changing branch protections
 
 - `capture-intent` records `intent_confirmed_sha` at confirmation: the blob SHA of the intent excluding its `status:` line and the pin line itself. The intent template carries the field by default, allowing `loom-code` to detect changes to the content the user confirmed.

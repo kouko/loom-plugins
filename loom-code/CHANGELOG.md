@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.57.0] — 2026-11-03 — preserve fallback feedback and bounded continuation
+
+- Accept completed execution feedback for the existing `inherited` and `host-default/unverified` profiles without inventing model or effort overrides. Validate explicit profile pairs before every result branch; preserve legal malformed-response retries, completed-redispatch counts and stops when an unknown baseline cannot justify escalation.
+- Require feedback for every completed host-native execution. Treat a conforming defect verdict as successful review work, separate artifact fix rounds from failed reviewer retries, and retain existing review-round and retry limits.
+- After a substantive requirements change, require renewed intent confirmation and reassess affected design, plan and evidence while retaining applicable work. Wording-only confirmation, technical repairs and reviewer changes do not reset review rounds; retries of the same failed task retain their count.
+
 ## [3.56.0] — 2026-11-02 — detect incomplete and stale verification evidence
 
 - Add four checker rules for missing or repeated Acceptance report rows, mismatched tested and reviewed functional content, changed confirmed intent content, and missing named boundary/probe programs. Planning checks task references; post-Build checks require the concrete named files to exist.

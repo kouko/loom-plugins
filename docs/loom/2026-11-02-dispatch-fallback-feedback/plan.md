@@ -18,7 +18,7 @@ charter: 1.1
 
 ### Wave 3 — Release the verified contract
 **W3-01 Synchronize release metadata** after: W2-01 acceptance: 5
-- Files: `loom-code/.claude-plugin/plugin.json`, `loom-design/.claude-plugin/plugin.json`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`, `README.md`, `loom-code/README.md`, `loom-design/README.md`, derived manifests via `scripts/sync_codex_manifests.py`
+- Files: `loom-code/{.claude-plugin/plugin.json,CHANGELOG.md,README*.md}`, `loom-design/{.claude-plugin/plugin.json,CHANGELOG.md,README*.md}`, `README.md`, `loom-code/tests/test_write_plan_station_text.py`, `loom-design/tests/spec/test_capture_intent_contract.py`, derived manifests via `scripts/sync_codex_manifests.py`
 - Test: A5 positive: synchronized-release; boundary: stale-version-pin. Run release metadata and manifest sync checks; end-of-Build package suite; independent isolated acceptance testing validates actual feedback/count continuity before finalization.
 - Risk: agent-decided — REQ-5 bumps loom-code to 3.57.0 and loom-design to 2.20.0 before review. Update existing version assertions if pinned. No installed plugin update or external execution.
 
