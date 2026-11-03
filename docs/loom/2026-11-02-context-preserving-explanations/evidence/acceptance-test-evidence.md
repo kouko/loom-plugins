@@ -233,3 +233,73 @@ The two owners now explicitly say: `Keep own-rule isolation separate from same-w
 - Important: some replies replace the existing informed-yes publication default or defer its disclosure. Preserve the existing confirmation consequence without extra decision points.
 - Capture-6's repeated-run sentence is ambiguous after its causal qualifier; it is not independently classified as a material deterministic guarantee. No important finding is dismissed merely because tests pass.
 - No source repair, external message, new model run, commit, publication, or modification of user-owned data occurred in this independent run. Existing evidence above and original CLI failure samples are retained as history; current verdicts supersede the earlier all-works report.
+
+## Re-run on 2026-11-03, at aa9c8d1e58dba50a999f7e0e47f4e369002addb2 — authorized iteration 4
+
+### Clean setup and provenance
+
+This independent witness did not implement source or tests. All four rows were re-tested because fix range `1d481a17..aa9c8d1e` changes both intake owners, example loading and composition. No spec exists by the confirmed `needs-design: no` decision. This is candidate 4 of the user's additional five-iteration allowance; failed history above is retained, not reset. No user-directed skip or dismissed important finding was supplied.
+
+Commands run:
+
+```text
+git clone --no-hardlinks --quiet . /tmp/loom-context-acceptance-i4-clean
+git -C /tmp/loom-context-acceptance-i4-clean rev-parse HEAD
+aa9c8d1e58dba50a999f7e0e47f4e369002addb2
+```
+
+The following ran in that clean clone, all exiting zero:
+
+```text
+python3 scripts/sync_codex_manifests.py --check --all
+(no output)
+/Users/kouko/.conda/envs/dbt-redshift/bin/python3 loom-code/scripts/loom_checker.py contract --require 2.1
+contract 2.3.1 satisfies requires-contract >=2.1
+/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_intent_drafting_fidelity.py -q
+57 passed in 0.13s
+/Users/kouko/.local/bin/claude plugin validate /tmp/loom-context-acceptance-i4-clean/loom-code
+Validation passed
+/Users/kouko/.local/bin/claude plugin validate /tmp/loom-context-acceptance-i4-clean/loom-design
+Validation passed with warnings
+```
+
+Validator warnings: both plugin directories lack a listing icon; Claude ignores design's `requires-contract` field. The separate checker above accepts the contract. README's Claude setup installs from the marketplace; doing that would install remote content and mutate installed state, not test this candidate. Local validation plus the actual inline-plugin initialization below establishes candidate loading only. Normal marketplace installation, automatic triggering, live hooks and other hosts remain unverified.
+
+Independent SHA256 recomputation found **376/376** export-manifest entries identical in both clean HEAD and `/tmp/loom-context-claude-dogfood-retest/candidate-bundle`. Manifest `export-manifest-i4.json` names the exact tested HEAD. Thus the already executed behavioral payload matches this clean source across all exported files, not merely two owner files.
+
+Read `blind-packet-i4.json`, all ten original `{case}-i4.jsonl` result records, their initialization/tool traces and summaries, `run_authorized_i4.py`, both detailed-repair prompts and `settings-run.json`. All ten packet replies exactly equal raw `type: result` text; all ten have exit 0, `is_error: false`, no permission denials and model `claude-sonnet-5-5`. Init lists inline code 3.58.0/workflow 5.19.0, and design 2.21.0 for capture cases. The runner explicitly selects medium effort. Tools request the examples in all ten cases; Bash `cat`/`sed` also counts as reading. Code-h2 initially looks in a nonexistent `loom-code/references` directory, receives a tool error, then successfully reads the correct `skills/write-plan/references` files; this recovered navigation error is not a permission denial or behavioral pass. No fixture commit was produced. Settings disable hooks/memory, restrict network, and deny bundle writes. These are ten actual executions made before this witness, not ten new calls or ten semantic passes. No model was called by this witness.
+
+### 1. Context, outcome, scope and consequences — partly
+
+- Tested both owners on unknown-date intake (code-4/capture-4), multiple background-job issues (code-5/capture-5), detailed shorthand repair (code-6/capture-6), plus capture-7 randomness, code-8 explicitly unknown date, capture-h1 currency and code-h2 known command correction.
+- All preserve the central subject, reported issue and target. Multiissue cases retain own-rule selection, configured retry limit, blocked queue, successful-job preservation and no new interface. Both detailed repairs now connect `profile` to the already supplied rule and explicitly avoid a same-worker/same-result guarantee. The earlier deterministic guarantee and label-returning failures were not reproduced.
+- However code-6 says `如果原本的選擇有隨機性,隨機性會保留,改的只是從哪份清單挑。` The conditional randomness clause itself is legitimate preservation, but `從哪份清單挑` concretizes an unverified mechanism: this request says a rule chooses who executes a job; unlike capture-7, it never supplies eligible lists. The repair introduces another mechanism the user would have to accept or correct. Both case-6 replies also add unchanged-interface constraints not stated in those requests. Preserving unrelated behavior is a defensible narrow default, so this witness does not independently elevate that alone to a material scope failure. Code-6 additionally discusses internal helpers; that is unnecessary implementation exposition, not a demonstrated request to approve a design.
+- Capture-h1 preserves the currency owner, legitimate amount variation, unchanged export format and no rewriting existing exports. Code-h2 preserves the verified replacement command and other guide content.
+- All seven ready confirmations bind yes to scope plus non-forced upload/PR, offer opt-out and separate merge. Code-5, capture-5, code-6, capture-7 and code-h2 explicitly put checks before both upload and PR. Capture-6 and capture-h1 place the checks grammatically before PR after mentioning upload; this leaves timing less clear, but does not explicitly promise unchecked upload. Capture-h1 says `如果你不想自動發佈，在回答前告訴我就好`; it offers an early opt-out without explicitly removing later opt-out, so this is not independently classified as a reversal of authorization policy. There was no actual publication. The three pending date interviews legitimately defer full confirmation disclosure; code-8's eventual authorization wording is not counted as an added confirmation stop.
+- Important finding: the detailed code repair substitutes an unsupported list mechanism for the supplied selection rule. Close by preserving the supplied abstraction and checking actual replies, without borrowing case-7 facts. Verdict partly, not the previous deterministic failure.
+
+### 2. Flexible expression — works
+
+- Both owners and their references explicitly permit optional headings, wording, grouping and length. All ten actual replies were read: unknown facts use prose plus short source choices; detailed repairs use explanations and lists; capture-7 uses connected paragraphs; other replies use headings and numbered lists. No fixed fill-in script is imposed.
+- Fifty-seven narrowly related tests passed in the clean copy, covering optional composition, drafting fidelity, example boundaries and polarity guards. These source checks supplement actual output; they do not prove brevity or comprehension.
+- The full suite belongs to the automated test suite, which runs before the change is accepted and blocks it on failure: `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. The witness did not run it. The station reports a prior Build pass in `/tmp/context-outline-i4-suite.log`; this is not substituted for independent behavioral acceptance. Final verification is not skipped, but unresolved semantic findings preclude promising its future success.
+
+### 3. Proportionate explanation and concept repair — partly
+
+- Both date-only interviews now explain the missing actual date, ask for it or a record, and do not invent today's date. These are valid pending interviews, not ready confirmations. They still include private status narration, but are materially shorter and more focused than the earlier samples. Code-8 likewise preserves unknown facts.
+- Both detailed repairs now define the assistant's own shorthand from the user's supplied meaning, acknowledging the omission rather than making the user define it. Capture-7 explains own eligible-list selection while preserving randomness. Both multiissue replies connect worker selection, failed retries and queue blockage; the currency variation uses the supplied domain terms accurately.
+- Important remaining brevity issue: capture-h1 repeats the unchanged-format/no-existing-file-write and amount-variation scope under acceptance, scope and out-of-scope headings. It then adds `這是內部修正（engineering），不需要另外寫設計規格，確認後會直接進入規劃。我不會問你任何實作做法的問題。`, `另外兩點`, assertions about no irreversible design choice and not guessing workaround/frequency, plus open/confirmed status, branch and commit inventory. These are exactly the internal inventory and repeated field labels the candidate's final-message check says to remove, not needed explanations of currency ownership. Its request asks what is confirmed, not for a station report.
+- The known simple correction code-h2 repeats the same one-line command change through Problem, Goal, Acceptance and Scope, quotes an unrelated unchanged troubleshooting paragraph, then appends the draft path, open status, commit/branch/plan inventory. Necessary authorization disclosure is not counted as excess. A simple correction is correctly understood but still fails to remain concise in content. Capture-5 similarly repeats outcome bullets as acceptance bullets and opens with status/path bookkeeping; capture-6 appends status/path/branch inventory after an otherwise useful detailed repair.
+- No arbitrary word/character cap was applied, and use of headings alone is not a failure. The finding concerns repeated information and pure internal work exposition after the necessary scope and consent are already available. Close by observing actual concise known-fact confirmations across both owners, retaining required disclosures and detailed explanations where requested. Verdict partly: concept repair improves, proportional brevity is not yet consistent.
+
+### 4. Requirements and necessary authority only — works
+
+- Across all ten results, requested decisions are missing factual dates/records, correctness of the intended outcome, and upload/PR authorization with separate merge. No request asks the user to rate implementation, specification quality or reviewer verdicts.
+- Capture-7 no longer expands no-interface into a ban on every function. Code-6 explicitly says private helper functions may be added; that exposition is unnecessary, but it is not a requirement that the user choose or approve a helper design. Its unsupported list description is recorded under row 1 rather than misclassified as a user-judgment demand.
+- No extra implementation-choice acceptance line or missing-setting policy request appears in this batch. This is a sampled behavioral result, not proof that every future intake will respect the boundary.
+
+### Current boundary and return to the station
+
+- Acceptance: 1 partly; 2 works; 3 partly; 4 works. All rows re-tested; no carried-over verdict.
+- Important findings remain: code-6's unverified list mechanism; repeated scope and internal bookkeeping especially capture-h1/code-h2. No finding is waived because tests or execution exits pass. Do not declare a global dogfood pass or unconditional readiness for finalization.
+- No new source/test edit, model run, external message, commit, remote write or publication. Only report/evidence changed. Prior failures remain above. Human understanding, ordinary installed-plugin loading/triggering, other hosts, future reliability and causal superiority over an unchanged baseline remain unproven.

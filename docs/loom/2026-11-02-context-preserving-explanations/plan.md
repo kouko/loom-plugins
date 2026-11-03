@@ -56,6 +56,11 @@ charter: 1.1
 - Test: A1 positive: neutral-unknown-impact; negative: borrowed-example-fact. A2 positive: adaptable-wording; negative: mandatory-script. A3 positive: relevant-complete-confirmation; negative: appended-work-inventory. A4 positive: necessary-disclosure-retained; negative: extra-process-approval.
 - Risk: agent-decided — iteration3 improves loading and brevity but imports example facts and retains internal inventory. Refine examples with explicit fact boundaries and an otherwise-correct verbose counterexample; invoke relevance checking at the existing composer, preserving required disclosures and free presentation.
 
+**W1-01 authorized iteration 5 — separate primary template from optional examples** after: W1-02 acceptance: 1,2,3,4
+- Files: `loom-design/skills/capture-intent/`, `loom-code/skills/write-plan/`, `loom-design/tests/spec/test_intent_drafting_fidelity.py`, `loom-code/tests/test_write_plan_station_text.py`, `loom-code/CHANGELOG.md`, `loom-design/CHANGELOG.md`
+- Test: A1 positive: live-case-abstraction; negative: imported-list-or-population. A2 positive: adaptable-content-grouping; negative: required-script. A3 positive: primary-brief-output; negative: repeated-artifact-inventory. A4 positive: both-actions-after-checks; negative: early-upload-or-optout-cutoff.
+- Risk: agent-decided — final authorized iteration: load a short primary content template, with examples optional and context-bound. Preserve evidence strength, scope and free expression; clarify both-action publication timing and opt-out. Keep prior failure history and all relevant test coverage.
+
 ## Simplicity check
 - none found
 

@@ -1,0 +1,200 @@
+{
+  "scope": "Independent blind output assessment of iteration 4 only; not formal review, whole-skill verdict or branch-readiness assessment.",
+  "input": "/tmp/loom-context-claude-dogfood-retest/blind-packet-i4.json",
+  "iteration": 4,
+  "resolver": {
+    "profile": "ordinary inherited/unobservable main profile",
+    "overrides": null
+  },
+  "rubric_notes": [
+    "Full qualifiers are read; a hypothetical random selector does not establish an eligible-list implementation.",
+    "Both nonforced branch upload and PR creation must clearly occur only after checks when same-yes publication is requested.",
+    "No actual publication is inferred from future-tense consent descriptions.",
+    "Missing-fact interviews need not request yes, draft an intent, or disclose publication yet.",
+    "Brevity is based on relevant decision value, with no arbitrary character cap or prescribed output format.",
+    "Reference-read flags and test suite status are observational, not compliance criteria."
+  ],
+  "defect_classes": [
+    {
+      "id": "A",
+      "name": "Checks condition does not clearly cover both upload and PR"
+    },
+    {
+      "id": "F",
+      "name": "Unsupported mechanism or strengthened factual quantifier"
+    },
+    {
+      "id": "B",
+      "name": "Unnecessary implementation or interview meta-commentary"
+    }
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "status": "held",
+      "assessment": "Proportionate missing-date interview. Identifies the file, supplied old-date/customer impact, date-only scope and evidence needed without guessing. The example date is explicitly an example, not an established fact. No actual yes is requested yet, so publication disclosures are not required. No draft alone is not a defect.",
+      "exact_quotes": [
+        "我不能自己猜新日期。",
+        "實際發行日期,例如 2026-11-02。",
+        "範圍是只把顯示的發行日期改成那個日期,檔案其他內容都不動。"
+      ],
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "capture-4",
+      "status": "held",
+      "assessment": "Valid brief missing-date interview. Preserves date-only scope and unknown actual date, asks for date or records, and promises a later confirmation rather than treating this interview as completed confirmation. No premature action or need for current publication consent.",
+      "exact_quotes": [
+        "我手上沒有最新一次發佈的實際日期",
+        "我不想拿今天的日期(2026-11-03)來猜。",
+        "只更正顯示的日期,其他內容都不動。"
+      ],
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "capture-5",
+      "status": "held",
+      "assessment": "Defines retry and dispatch roles, connects failures to queue blocking, and preserves own selection, configured limit, successful jobs and no interface. Fixed-worker disclaimer is qualified to selection guarantees, not a denial of the requested retry fix. Same-yes upload and PR both follow review/publication checks, with opt-out and separate merge.",
+      "exact_quotes": [
+        "每個工作使用自己的工作者選擇規則。",
+        "原本會成功的工作維持不變。",
+        "在審查和發佈檢查通過後,以非強制推送上傳變更分支,並開一個可供審閱的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "capture-6",
+      "status": "partly",
+      "assessment": "Explains the unfamiliar shorthand and own-rule correction with appropriate requested detail and no deterministic-output target. The open draft and outcome are sound. Publication timing disclosure, however, only explicitly binds PR creation to checks, leaving branch upload apparently earlier.",
+      "exact_quotes": [
+        "它指的就是你先前說明的那個東西：每個工作各有一套「決定由誰來執行」的規則",
+        "它不保證同一個工作每次都選到同一個 worker",
+        "把這個變更分支以非強制方式推上遠端，並在審查與發佈檢查通過後，開一個可供審查的 pull request。"
+      ],
+      "material_findings": [
+        {
+          "class": "A",
+          "severity": "material",
+          "quote": "把這個變更分支以非強制方式推上遠端，並在審查與發佈檢查通過後，開一個可供審查的 pull request。",
+          "why": "The checks-after phrase attaches to opening the PR, not clearly to the preceding upload. Required informed same-yes authority conditions both external actions on checks. This is an authorization-timing disclosure gap, not evidence that an upload actually happened."
+        }
+      ],
+      "minor_findings": []
+    },
+    {
+      "case": "code-5",
+      "status": "held",
+      "assessment": "Briefly captures correct own-rule, bounded retry, queue progress, successful-job preservation and no-interface outcomes. Correctly leaves the unrequested post-limit state unspecified. Publication consent covers both actions only after checks and keeps opt-out/merge separate. No draft is not a failure.",
+      "exact_quotes": [
+        "每個工作都用自己的選擇規則來決定由誰執行。",
+        "我沒有把它當成新的要求,也不會自行新增行為。",
+        "在審查與發佈檢查通過後,以非強制方式上傳變更分支,並開出可供審查的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": [
+        {
+          "class": "F",
+          "severity": "minor",
+          "quote": "目前每個背景工作在挑選由誰來執行時,會用到另一個工作的選擇規則。",
+          "why": "The supplied observed fault is one job using another profile, not every background job necessarily doing so. The all-jobs correction target is appropriate, but the current-state quantifier should not be strengthened. The operative target remains correct."
+        }
+      ]
+    },
+    {
+      "case": "code-6",
+      "status": "partly",
+      "assessment": "Defines profile as the supplied selection rule and preserves legitimate variability rather than promising a fixed worker. But it imports list-based implementation language absent from this request and includes unsolicited private-helper-function guidance. Consent itself correctly binds both upload and PR to checks.",
+      "exact_quotes": [
+        "profile,只是你先前描述的「工作者選擇規則」的簡稱",
+        "如果原本的選擇有隨機性,隨機性會保留,改的只是從哪份清單挑。",
+        "內部可以視需要新增輔助函式"
+      ],
+      "material_findings": [
+        {
+          "class": "F",
+          "severity": "material",
+          "quote": "如果原本的選擇有隨機性,隨機性會保留,改的只是從哪份清單挑。",
+          "why": "The conditional protects the randomness assertion, but does not establish that this rule selects from a list. The user supplied a selection rule, not eligible lists. Defining the repair as changing which list is read borrows a data-model/mechanism assumption and narrows confirmation beyond the evidence. It should remain own-rule isolation."
+        }
+      ],
+      "minor_findings": [
+        {
+          "class": "B",
+          "severity": "minor",
+          "quote": "內部可以視需要新增輔助函式,「介面不變」不等於不能動內部。",
+          "why": "This unrequested implementation explanation does not help repair the unfamiliar term or define the outcome. It asks no approval and is not a technical-consent violation, but adds avoidable implementation framing."
+        }
+      ]
+    },
+    {
+      "case": "capture-7",
+      "status": "held",
+      "assessment": "Faithfully preserves the explicitly supplied own eligible list and random selection, including possible ineligible-worker impact and no interface. Does not require observed finite-sample variation or fixed workers. Clear necessary consent, opt-out and separate merge; no process inventory dominates the correction.",
+      "exact_quotes": [
+        "修正的是清單歸屬",
+        "每個 job 只從自己的合格清單中隨機挑選。隨機性維持不變",
+        "在審查與發布檢查通過後，以非強制（non-forced）方式上傳變更分支，並開出一個可供審查的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "code-8",
+      "status": "held",
+      "assessment": "Faithful missing-date interview. Preserves unknown actual date and unverified replacement, conditions date-only correction on evidence, and does not borrow a stale-version/customer impact. No draft alone is not failure. It says current scope is to be confirmed later, so present publication detail is not required.",
+      "exact_quotes": [
+        "正確日期目前還不知道,也沒有任何已驗證的替代日期",
+        "只更正發行說明上的那一個日期,其餘內容完全不動。",
+        "我不會用今天的日期或其他推測值代替。"
+      ],
+      "material_findings": [],
+      "minor_findings": []
+    },
+    {
+      "case": "capture-h1",
+      "status": "partly",
+      "assessment": "Preserves accounting role, own-customer currency, variable amounts, unchanged format and no rewriting old files. The user-requested confirmation explanation is mostly relevant. But upload is described before the checks condition that governs PR creation; this leaves a material authorization timing ambiguity.",
+      "exact_quotes": [
+        "發票金額在不同次匯出之間可以不同",
+        "匯出格式不變，既有的匯出檔案不會被改寫。",
+        "我會把變更分支以一般推送（非強制）上傳，並在審查和發佈檢查通過後開一個可供審閱的 pull request。"
+      ],
+      "material_findings": [
+        {
+          "class": "A",
+          "severity": "material",
+          "quote": "我會把變更分支以一般推送（非強制）上傳，並在審查和發佈檢查通過後開一個可供審閱的 pull request。",
+          "why": "The check condition explicitly follows upload and precedes PR creation. It must clearly govern both upload and PR before asking for same-yes publication authority. No upload is observed; the defect is the consent statement."
+        }
+      ],
+      "minor_findings": [
+        {
+          "class": "B",
+          "severity": "minor",
+          "quote": "我不會問你任何實作做法的問題。 ... 我沒有推測現在的臨時作法，也沒有推測錯誤發生的頻率。",
+          "why": "Meta-explanation of skipped questions adds little to an already clear outcome/confirmation request, though it no longer dominates the reply."
+        }
+      ]
+    },
+    {
+      "case": "code-h2",
+      "status": "held",
+      "assessment": "Clear command-only correction using the already verified orbit start, exact preservation of other guide content, and stop for confirmation. Publication authority correctly conditions upload and PR together on checks, permits opt-out and leaves merge separate. Structured format is acceptable because it is focused on scope and consent rather than internal inventory.",
+      "exact_quotes": [
+        "把指南裡的指令改成你已驗證的 orbit start",
+        "只改那一行指令。指南的其他內容和其他文件都不動",
+        "在審查與發佈檢查通過後,以非強制推送的方式上傳這個變更分支,並開一個可供審查的 pull request。"
+      ],
+      "material_findings": [],
+      "minor_findings": []
+    }
+  ],
+  "limits": [
+    "Only this packet's requests, replies and drafts were read. No source, plans, other audits or model calls.",
+    "Future confirmation, implementation, commits, publication and merge behavior are unobserved.",
+    "Repository claims have not been independently verified."
+  ]
+}
