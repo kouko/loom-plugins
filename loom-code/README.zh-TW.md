@@ -1,12 +1,16 @@
 # loom-code
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md)
+
+技能詳細頁有同語言翻譯時連至該版本，其餘連至英文版。
+
 > **五個站把一次變更從確認過的 intent 送到已發布的 pull request；任何東西
 > 離開本機之前，決定性的 checker 會重算一次證據。** loom-code 假設你具備
 > 基本軟體工程知識，而不是熟悉這個 plugin：每次變更最多問你三個問題，其餘
 > 自己決定並記下理由。品質的來源是機器檢查機器 —— 寫的 agent 永遠不會是
 > 審的 agent。
 
-**版本**：3.57.0 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
+**版本**：3.57.1 · **Skills**：5 個站 + 1 個入口路由 + 1 個外部審查 skill · [CHANGELOG.md](CHANGELOG.md)
 **語言**：[English](README.md) | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 **儲存庫**：[kouko/loom-plugins](https://github.com/kouko/loom-plugins)
 
@@ -16,28 +20,27 @@
 
 ```mermaid
 flowchart TD
-    intent["① 你確認 intent<br/>loom-design:capture-intent<br/>沒裝 loom-design 時由 loom-code:write-plan"]
-    spec["只在 needs-design: yes 時<br/>loom-design:write-spec<br/>② product 變更：你確認可見的行為"]
-    plan["loom-code:write-plan<br/>plan.md 裡的任務 DAG"]
-    build["loom-code:build<br/>測試先行，每個任務一個 implementer<br/>最後跑 adversary 與完整 package 測試"]
-    review["loom-code:closing-review<br/>fresh-context 審查者<br/>需要時加 independent acceptance testing"]
-    attest[["產生 attestation<br/>由 loom-code:closing-review"]]
-    ship["loom-code:ship<br/>push + PR + checks<br/>③ 你驗收結果<br/>需要時透過 acceptance test report"]
-    merged(["合併是另一步<br/>在 loom-code:ship 之後，由你另外授權"])
-    maintain["loom-code:maintain<br/>告警、CI 或回歸失敗、事故"]
+    intent["① 確認要解決的問題<br/>capture-intent"]
+    design{"需要設計？"}
+    spec["寫出設計<br/>write-spec<br/>② 僅確認產品可見行為"]
+    plan["規劃工作<br/>write-plan"]
+    build["實作與測試<br/>build"]
+    review["審查與驗證<br/>closing-review"]
+    ship["③ 發布 PR 並驗收結果<br/>ship"]
 
-    intent --> plan
-    intent -.->|"needs-design: yes"| spec
-    spec -.-> plan
+    intent --> design
+    design -->|"需要"| spec
+    design -->|"不需要"| plan
+    spec --> plan
     plan --> build
     build --> review
-    review -->|"NEEDS_REVISION"| build
-    review -->|"PASS / PASS_WITH_NOTES"| attest
-    attest --> ship
-    ship --> merged
-    merged -.-> maintain
-    maintain -->|"相符或新的 intent"| plan
+    review -->|"需要修改"| build
+    review -->|"檢查通過"| ship
 ```
+
+圖中的技能由 `loom-code` 提供；`capture-intent` 與 `write-spec` 則由
+`loom-design` 提供。沒裝 `loom-design` 時，由 `write-plan` 確認需求並在需要時
+寫出最小規格。合併與維護不放進這次變更的主流程，詳見下方說明。
 
 - **Intent** —— 裝了 `loom-design` 時由 `capture-intent` 確認 intent（①）；
   沒裝時，`write-plan` 自己覆述這次變更並問 ①。
@@ -57,13 +60,13 @@ flowchart TD
 
 | Skill | 角色 |
 |---|---|
-| [`write-plan`](skills/write-plan/SKILL.md) | 把確認過的 intent 變成 `docs/loom/<change-id>/plan.md`：分 wave 的任務，各帶檔案、負責的 Acceptance 行、測試案例與風險。沒裝 `loom-design` 時自己跑 ①。 |
-| [`build`](skills/build/SKILL.md) | 每個任務派一個 implementer，以測試先行實作 plan，最後跑 adversary 與完整 package 測試，全數通過才交出。 |
-| [`closing-review`](skills/closing-review/SKILL.md) | 對通過 Build 檢查的內容跑收尾審查——審查者，視需要加 acceptance testing——並產生 `docs/loom/<change-id>/attestation.json`。 |
-| [`ship`](skills/ship/SKILL.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
-| [`maintain`](skills/maintain/SKILL.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
-| [`using-loom-code`](skills/using-loom-code/SKILL.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
-| [`external-review`](skills/external-review/SKILL.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
+| [`write-plan`](skills/write-plan/README.md) | 把確認過的 intent 變成 `docs/loom/<change-id>/plan.md`：分 wave 的任務，各帶檔案、負責的 Acceptance 行、測試案例與風險。沒裝 `loom-design` 時自己跑 ①。 |
+| [`build`](skills/build/README.md) | 每個任務派一個 implementer，以測試先行實作 plan，最後跑 adversary 與完整 package 測試，全數通過才交出。 |
+| [`closing-review`](skills/closing-review/README.md) | 對通過 Build 檢查的內容跑收尾審查——審查者，視需要加 acceptance testing——並產生 `docs/loom/<change-id>/attestation.json`。 |
+| [`ship`](skills/ship/README.md) | 驗證 attestation、push、開 PR、確認必要的 checks（決策點 ③）。從不合併。 |
+| [`maintain`](skills/maintain/README.md) | 重現發生在進行中未合併變更之外的事故，掛到相符的 open intent 或新建一份，再交給 `write-plan`。 |
+| [`using-loom-code`](skills/using-loom-code/README.md) | 選配的入口路由，替一般 Loom 請求挑站；每個站仍可直接呼叫。 |
+| [`external-review`](skills/external-review/README.md) | 經同意後，以明確的模型與 effort 執行外部審查；呼叫它的審查 skill 保留自己的標準與 verdict 檢查。 |
 
 ## Agents
 

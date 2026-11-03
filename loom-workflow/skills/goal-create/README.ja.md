@@ -1,5 +1,7 @@
 # Goal Create
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.ja.md) / goal-create
+
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
 > ゴール条件を作成する。**SESSION** はホストに受理された場合に 4 項目ゴールを
@@ -65,3 +67,10 @@ goal-create/
 └── scripts/
     └── goal_lint.py        <- SESSION の機械的な下限チェック
 ```
+
+## 関連スキル
+
+- [loom-workflow:handoff](../handoff/README.ja.md)
+- [loom-design:capture-intent](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/capture-intent/README.md)
+
+実行時の手順: [SKILL.md](SKILL.md).

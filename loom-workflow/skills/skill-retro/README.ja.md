@@ -1,5 +1,7 @@
 # skill-retro
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.ja.md) / skill-retro
+
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
 選択した過去または現在の Claude Code と Codex セッションの取得済みスナップショットを分析し、読み取り可能な対象 skill で繰り返し起きる問題を調べます。取得後のイベントは除外し、対象のインストールは不要です。提案対象は指示、または対象 skill に直接関係する plugin の登録、読み込み、hook、同梱スクリプト、依存 connector です。振り返りはレビュー用の成果物だけを作り、採用した変更は別の実装フローに渡します。
@@ -70,3 +72,10 @@ python3 loom-workflow/skills/skill-retro/scripts/propose.py \
 ### 第三者帰属
 
 `agents/` の失敗・成功分析 prompt は、Apache 2.0 で公開された [Trace2Skill](https://github.com/Qwen-Applications/Trace2Skill)（[論文](https://arxiv.org/abs/2603.25158)）を改作したものです。再配布時には上流の帰属を保持してください。
+
+## 関連スキル
+
+- [loom-workflow:project-retro](../project-retro/README.md)
+- [loom-workflow:critique](../critique/README.ja.md)
+
+実行時の手順: [SKILL.md](SKILL.md).

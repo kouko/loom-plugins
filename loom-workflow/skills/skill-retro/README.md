@@ -1,5 +1,7 @@
 # skill-retro
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.md) / skill-retro
+
 **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 Review selected past or current Claude Code and Codex sessions for recurring problems in a readable target skill. Current-session analysis uses only the captured snapshot through its capture cutoff, excluding later appended events. An explicit readable target source path works without installation in the reviewing host. Proposals can address its instructions or directly related plugin registration, loading, hooks, bundled scripts, and dependent connectors. This skill produces review artifacts; an independent implementation workflow makes any chosen change.
@@ -70,3 +72,10 @@ This skill is part of the [loom-plugins](https://github.com/kouko/loom-plugins) 
 ### Third-party attributions
 
 The failure and success analyst prompts in `agents/` adapt [Trace2Skill](https://github.com/Qwen-Applications/Trace2Skill) ([paper](https://arxiv.org/abs/2603.25158)), published under Apache 2.0. Preserve the upstream attribution when redistributing those adaptations.
+
+## Related skills
+
+- [loom-workflow:project-retro](../project-retro/README.md)
+- [loom-workflow:critique](../critique/README.md)
+
+Runtime instructions: [SKILL.md](SKILL.md).

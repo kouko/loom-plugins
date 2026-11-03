@@ -54,7 +54,7 @@ def test_referenced_relative_paths_exist():
         assert "`architecture-design`" in text, readme
         assert "`architecture`" not in text, readme
         if readme.parent == plugin:
-            assert "[`architecture-design`](skills/architecture-design/SKILL.md)" in text
+            assert "[`architecture-design`](skills/architecture-design/README.md)" in text
         for target in re.findall(r"\]\((skills/[^)]+)\)", text):
             assert (readme.parent / target).is_file(), (readme, target)
 

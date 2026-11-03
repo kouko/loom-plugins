@@ -584,7 +584,7 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
     )
     _assert_isolated_design_install_has_no_code_sibling(design_root)
 
-    skills = sorted((design_root / "skills").iterdir())
+    skills = sorted(path.parent for path in (design_root / "skills").glob("*/SKILL.md"))
     assert {skill.name for skill in skills} == DESIGN_SKILLS
 
     for skill in skills:
@@ -597,6 +597,8 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
             assert "${CLAUDE_PLUGIN_ROOT}/scripts/" not in text, (
                 f"{rel} reaches a script by plugin-root path again"
             )
+            # Public documentation URLs are not installed filesystem paths.
+            filesystem_text = re.sub(r"https?://[^\s<>]+", "", text)
             for sibling in (
                 "loom-code/skills",
                 "loom-code/scripts",
@@ -604,7 +606,7 @@ def test_design_declares_no_in_plugin_station_command(tmp_path: Path) -> None:
                 "loom-code/contract",
                 "<loom-code>",
             ):
-                assert sibling not in text, (
+                assert sibling not in filesystem_text, (
                     f"{rel} names the sibling plugin's private path {sibling!r}"
                 )
             assert "loom-design/scripts" not in text, (
@@ -896,7 +898,7 @@ def test_isolated_loom_design_keeps_complete_surface_without_loom_memory_sibling
     assert not (design_root.parent / "loom-memory").exists()
     assert not (design_root.parent / "loom-code").exists()
 
-    skills = sorted((design_root / "skills").iterdir())
+    skills = sorted(path.parent for path in (design_root / "skills").glob("*/SKILL.md"))
     assert {skill.name for skill in skills} == DESIGN_SKILLS
     assert (design_root / DESIGN_EXECUTABLE).is_file()
 

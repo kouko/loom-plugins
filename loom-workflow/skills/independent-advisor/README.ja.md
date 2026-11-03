@@ -1,5 +1,7 @@
 # Independent Advisor
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.ja.md) / independent-advisor
+
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
 > 今の計画や意思決定について、**別の実行者**（より強いモデル、より高い
@@ -90,14 +92,16 @@
 
 ---
 
-## Files
+## 詳細資料
 
-```
-independent-advisor/
-├── README.md            <- English
-├── README.ja.md         <- 日本語（このファイル）
-├── README.zh-TW.md      <- 繁體中文
-├── SKILL.md             <- 実運用ファイル（Claude 用）
-└── scripts/
-    └── test_independent_advisor_readmes.py
-```
+- [実行者の選定](references/executor-detection.md)
+- [実行手順](references/dispatch-protocol.md)
+- [報告の要件](references/report-contract.md)
+- [README の検証](../../tests/independent-advisor/test_independent_advisor_readmes.py)
+
+## 関連スキル
+
+- [loom-workflow:critique](../critique/README.ja.md)
+- [loom-code:external-review](https://github.com/kouko/loom-plugins/blob/main/loom-code/skills/external-review/README.md)
+
+実行時の手順: [SKILL.md](SKILL.md).

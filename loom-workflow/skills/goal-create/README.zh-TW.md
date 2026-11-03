@@ -1,5 +1,7 @@
 # Goal Create
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.zh-TW.md) / goal-create
+
 [English](README.md) | [日本語](README.ja.md) | **繁體中文**
 
 > 建立一個目標條件。**SESSION** 在 host 接受時啟用四欄 Goal，否則提供
@@ -57,3 +59,10 @@ goal-create/
 └── scripts/
     └── goal_lint.py        <- SESSION 的機械式下限檢查
 ```
+
+## 相關技能
+
+- [loom-workflow:handoff](../handoff/README.zh-TW.md)
+- [loom-design:capture-intent](https://github.com/kouko/loom-plugins/blob/main/loom-design/skills/capture-intent/README.md)
+
+執行規則: [SKILL.md](SKILL.md).

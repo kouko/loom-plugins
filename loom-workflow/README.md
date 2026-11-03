@@ -1,10 +1,14 @@
 # loom-workflow
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md)
+
+Skill guides open in English unless a matching translation is available.
+
 Read this in: **English** | [日本語](README.ja.md) | [繁體中文](README.zh-TW.md)
 
 > Workflow tools around the Loom stations for Claude Code and Codex: persistent Outcome Maps, git memory, repository memory, critique, recap, handoff, single-session retro, recurring skill retrospective, chat visualizations and reasoning pages, and second opinions.
 
-**Version**: 5.19.0 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
+**Version**: 5.19.1 · **Repository**: [kouko/loom-plugins](https://github.com/kouko/loom-plugins) · **License**: MIT
 
 ## Name migration
 
@@ -41,86 +45,45 @@ a Loom station or quality gate.
 
 ## When you reach for which tool
 
-This is not one sequential flow. The tools are grouped by the moment you reach
-for them; the only arrows are `decision-map`'s own loop and its hand-off into
-the stations.
+These tools are selected by need; the rows are not steps to execute in order.
+
+| When you need help | Tool | What it does |
+|---|---|---|
+| The route to the outcome is still unclear | `decision-map` | Investigate unknowns and deliver a ready slice as an intent. |
+| A proposal needs a critical check | `critique` | Judge whether the proposed work is necessary or can be simpler. |
+| You lose track during a session | `recap-state` | Explain the current position and wait for your confirmation. |
+| A prior lesson matters, or a new one should be kept | `loom-memory` | Recall on demand; record durable lessons before the branch closes, on request or by agent judgment. No station calls it. |
+| You write, edit or review a dbt model | `dbt-model-style` | Apply model style and structure; calculation logic stays out of scope. |
+| You commit, create a PR or merge | `git-memory` | Classify memory before every commit at any station, at PR creation and before merge. |
+| You end a session or resume in another | `handoff` | Save state to a file or verify it before resuming. |
+| You want to learn from sessions | `project-retro`, `skill-retro` | Review one session for project improvements, or selected snapshots for recurring skill issues. Propose changes without applying them. |
+| You want another executor's review | `independent-advisor` | Get a second opinion with authorization for cost and material sent off the machine. |
+| A relationship needs a visual explanation | `loom-visualization`, `loom-interactive-diagram` | Show a chat table or diagram, or create an editable diagram. |
+| You explicitly ask for a goal | `goal-create` | Draft a session goal or repository purpose; runs only when named. |
+| You are unsure which tool to use | `using-loom-workflow` | Route your request; each tool can also be invoked directly. |
+
+### Decision-map loop
+
+Only `decision-map` has the exploration loop below. The map lives at
+`docs/loom/maps/<map-id>/` and persists across sessions. Charting and working
+its tickets do not require `loom-code`; delivering an intent does.
 
 ```mermaid
-%%{init: {"flowchart": {"wrappingWidth": 320}}}%%
 flowchart TD
-    subgraph before["Before a change"]
-        direction TB
-        subgraph dm["loom-workflow:decision-map"]
-            direction TB
-            dest["Destination<br/>where the map should end up"]
-            fog["Fog<br/>what is still unknown"]
-            ticket["Ticket<br/>grill, research or prototype one unknown"]
-            log["Decisions so far"]
-            slice["Intent with map:<br/>written by the delivery step,<br/>which needs loom-code"]
-        end
-        station["loom-design:capture-intent<br/>or loom-code:write-plan<br/>without loom-design"]
-        critique["loom-workflow:critique<br/>judge a proposal before it is built"]
-    end
-
-    subgraph working["While working"]
-        recap["loom-workflow:recap-state<br/>where the work stands in this session"]
-        recall["loom-workflow:loom-memory<br/>Recall on request or when<br/>a task needs a prior lesson"]
-        dbt["loom-workflow:dbt-model-style<br/>whenever a dbt model is<br/>written, edited or reviewed"]
-    end
-
-    subgraph commit["At commit / PR / merge"]
-        gitmem["loom-workflow:git-memory<br/>before every commit at any station,<br/>at PR creation and before merge"]
-        record["loom-workflow:loom-memory<br/>Record before the branch closes,<br/>on request or by agent judgment;<br/>no station calls it"]
-    end
-
-    subgraph sessions["Session work"]
-        handoff["loom-workflow:handoff<br/>save state when a session ends,<br/>resume it in the next one"]
-        distill["loom-workflow:skill-retro<br/>review session snapshots<br/>for skill improvements"]
-        retro["loom-workflow:project-retro<br/>review one session for<br/>project improvements"]
-    end
-
-    subgraph anytime["Anytime"]
-        advisor["loom-workflow:independent-advisor<br/>second opinion from<br/>another executor"]
-        cot["loom-workflow:loom-visualization<br/>show comparisons, flows<br/>and reasoning as visuals"]
-        goal["loom-workflow:goal-create<br/>session goal or repository purpose,<br/>invoked by name only"]
-        router["loom-workflow:using-loom-workflow<br/>unsure which tool:<br/>route to one"]
-    end
-
-    dest --> fog
-    fog -->|"pick one"| ticket
-    ticket -->|"record the answer"| log
-    ticket -.->|"new unknowns"| fog
-    log -->|"a slice is ready"| slice
-    slice -->|"hand off"| station
-
-    before ~~~ working
-    working ~~~ commit
-    commit ~~~ sessions
-    sessions ~~~ anytime
+    dest["Define the outcome"] --> fog["Identify what is unknown"]
+    fog --> ticket["Investigate one unknown<br/>grill, research or prototype"]
+    ticket --> log["Record the answer and decisions"]
+    log --> ready{"A slice is ready to build?"}
+    ready -->|"No: investigate the next unknown"| fog
+    ready -->|"Yes"| intent["Write an intent<br/>requires loom-code"]
+    intent --> entry["Confirm the change<br/>loom-design:capture-intent<br/>or loom-code:write-plan"]
 ```
 
-- **Before a change** — `decision-map` is for work whose whole route cannot be
-  listed up front. The Outcome Map lives at `docs/loom/maps/<map-id>/` and
-  persists across sessions. When a slice is ready, its delivery step writes an
-  intent carrying `map:` and hands it to `loom-design:capture-intent`, or to
-  `loom-code:write-plan` without `loom-design`; that station owns the change
-  from then on. `critique` judges a proposal before anything is built.
-- **While working** — `recap-state` re-orients you inside the current
-  conversation. `loom-memory` recalls a prior lesson when asked or when the
-  task needs one. `dbt-model-style` applies whenever a dbt model is written,
-  edited or reviewed.
-- **At commit / PR / merge** — `git-memory` runs before every commit at any
-  station, when the PR is created, and before the PR is merged, which happens
-  after `ship`. `loom-memory` records a durable lesson before the branch
-  closes, on request or by agent judgment; no station calls it.
-- **Session work** — `handoff` saves state at the end of a session and
-  resumes it in the next. `skill-retro` reviews selected past or current session snapshots for recurring
-  skill improvement proposals. `project-retro` reviews the current or one specified session
-  for source-backed project improvements; it leaves skill issues as candidates.
-- **Anytime** — `independent-advisor` asks a different executor for a second
-  opinion, `loom-visualization` shows comparisons, flows and reasoning as tables or diagrams (or a reasoning page),
-  `goal-create` runs only when invoked by name, and `using-loom-workflow`
-  routes a request when the right tool is unclear.
+A grilling ticket hands its discussion to `loom-design:capture-intent` when
+available. Delivery writes an intent carrying `map:`; the entry station then
+owns that change and the map only reads its status. This loop is not the
+completion condition for the whole map: completion requires all Destination
+acceptance criteria met, fog empty, and every ticket closed or withdrawn.
 
 ## Skills
 
@@ -128,20 +91,20 @@ Fourteen skills: thirteen tools and one optional router.
 
 | Skill | Role |
 |---|---|
-| [`using-loom-workflow`](skills/using-loom-workflow/) | Optional router: picks the matching tool for a broad or unclear request and loads its instructions. Every tool stays directly invocable. |
-| [`decision-map`](skills/decision-map/) | Chart or advance a persistent Outcome Map at `docs/loom/maps/<map-id>/`: a Destination, fog, typed tickets and a Decisions-so-far log; its delivery step writes an intent. |
-| [`critique`](skills/critique/) | Judge a proposal before it is built: `mode: proposal` sorts a list or plan into KEEP / DEFER / DROP; `mode: complexity` weighs one specific change deletion-first. |
-| [`recap-state`](skills/recap-state/) | In-session recap of where the work stands, then a pause for confirmation. Not the built-in `/recap` away-summary. |
-| [`loom-memory`](skills/loom-memory/) | Recall, record, reconcile or retire durable repository lessons in the committed memory store. |
-| [`dbt-model-style`](skills/dbt-model-style/) | Apply dbt + Redshift model style and structure (CTE roles, a zero-logic final CTE, naming, comments) when writing, editing or reviewing a model; calculation logic is out of scope. |
-| [`git-memory`](skills/git-memory/) | Classify Decision, Learning and Gotcha memory before every `git commit`, `gh pr create` and `gh pr merge`; recall why a past Git decision was made. |
-| [`handoff`](skills/handoff/) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
-| [`skill-retro`](skills/skill-retro/) | Review selected past or current Claude Code and Codex session snapshots against readable target skill sources or related plugin integration; return source-linked proposals without applying changes. Current snapshots exclude events after capture; source paths need no local installation. Two distinct sessions promote a proposal; one remains pending. |
-| [`project-retro`](skills/project-retro/) | On request, review the current or one specified coding session for source-backed project development improvements. Report possible skill issues separately as candidates; do not edit files. |
-| [`independent-advisor`](skills/independent-advisor/) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
-| [`loom-visualization`](skills/loom-visualization/) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
-| [`loom-interactive-diagram`](skills/loom-interactive-diagram/) | Create and validate editable draw.io diagrams during Loom changes or standalone discussions. Ask before editing an existing external diagram whether to copy it into the project; report the selected file path. |
-| [`goal-create`](skills/goal-create/) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
+| [`using-loom-workflow`](skills/using-loom-workflow/README.md) | Optional router: picks the matching tool for a broad or unclear request and loads its instructions. Every tool stays directly invocable. |
+| [`decision-map`](skills/decision-map/README.md) | Chart or advance a persistent Outcome Map at `docs/loom/maps/<map-id>/`: a Destination, fog, typed tickets and a Decisions-so-far log; its delivery step writes an intent. |
+| [`critique`](skills/critique/README.md) | Judge a proposal before it is built: `mode: proposal` sorts a list or plan into KEEP / DEFER / DROP; `mode: complexity` weighs one specific change deletion-first. |
+| [`recap-state`](skills/recap-state/README.md) | In-session recap of where the work stands, then a pause for confirmation. Not the built-in `/recap` away-summary. |
+| [`loom-memory`](skills/loom-memory/README.md) | Recall, record, reconcile or retire durable repository lessons in the committed memory store. |
+| [`dbt-model-style`](skills/dbt-model-style/README.md) | Apply dbt + Redshift model style and structure (CTE roles, a zero-logic final CTE, naming, comments) when writing, editing or reviewing a model; calculation logic is out of scope. |
+| [`git-memory`](skills/git-memory/README.md) | Classify Decision, Learning and Gotcha memory before every `git commit`, `gh pr create` and `gh pr merge`; recall why a past Git decision was made. |
+| [`handoff`](skills/handoff/README.md) | Save session state to a HANDOFF file under `.claude/handoffs/`, or resume from one in a new session. |
+| [`skill-retro`](skills/skill-retro/README.md) | Review selected past or current Claude Code and Codex session snapshots against readable target skill sources or related plugin integration; return source-linked proposals without applying changes. Current snapshots exclude events after capture; source paths need no local installation. Two distinct sessions promote a proposal; one remains pending. |
+| [`project-retro`](skills/project-retro/README.md) | On request, review the current or one specified coding session for source-backed project development improvements. Report possible skill issues separately as candidates; do not edit files. |
+| [`independent-advisor`](skills/independent-advisor/README.md) | Route an explicitly requested outside code, plan or decision review through `loom-code:external-review`, preserving the owning review's criteria; also get an open-ended second opinion from another model tier, effort or vendor. Spending money or sending material off the machine needs approval. |
+| [`loom-visualization`](skills/loom-visualization/README.md) | Show comparisons, flows, decisions, states, or reasoning chains in coding-harness chat as a table, ASCII diagram, or Mermaid block that actually displays in the reader's client; a reasoning page mode renders documented reasoning as a standalone page. Its plain-language reference holds a writing guide, a decision-option rule, eight conversation-situation tables and table rules; three table collections cover software, design and business. Not for Obsidian notes. |
+| [`loom-interactive-diagram`](skills/loom-interactive-diagram/README.md) | Create and validate editable draw.io diagrams during Loom changes or standalone discussions. Ask before editing an existing external diagram whether to copy it into the project; report the selected file path. |
+| [`goal-create`](skills/goal-create/README.md) | Invoked by name only. SESSION drafts a four-field goal prompt from conversation evidence or confirmed intent/spec and activates it when accepted by the host, with an honest recovery action otherwise. It does not operate the Loom workflow. ARC drafts the repository purpose (`Why` / `Done when`). |
 
 Loom's contract counts eight of these tools. `goal-create` and
 `dbt-model-style` and `project-retro` are standalone skills outside the Loom flow, and

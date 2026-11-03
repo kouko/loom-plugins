@@ -1,5 +1,7 @@
 # Recap
 
+[Loom](https://github.com/kouko/loom-plugins/blob/main/README.md) / [loom-workflow](../../README.ja.md) / recap-state
+
 [English](README.md) | **日本語** | [繁體中文](README.zh-TW.md)
 
 > 会話の途中で流れを見失ったとき、このスキルが止まって
@@ -111,3 +113,10 @@ recap-state/
 └── references/
     └── seven-block-schema.md  <- 対応テンプレート + 系譜 + 5 共通核心原則
 ```
+
+## 関連スキル
+
+- [loom-workflow:handoff](../handoff/README.ja.md)
+- [loom-workflow:project-retro](../project-retro/README.md)
+
+実行時の手順: [SKILL.md](SKILL.md).
