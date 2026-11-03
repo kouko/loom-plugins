@@ -1,0 +1,66 @@
+{
+  "trial": "graduated-pytest-a",
+  "status": "BLOCKED",
+  "stage_reached": "closing-review: genuine reviews and initial finalization completed; replacement reviewer dispatch blocked before attestation commit",
+  "station_sequence": ["closing-review"],
+  "initial_head": "bcf15cf32755f81bf50d1c831628091433925412",
+  "final_head": "bcf15cf32755f81bf50d1c831628091433925412",
+  "functional_content_digest": "c6b159150e86f78509dac4154b529f9922a9cc7b",
+  "file_changes": [
+    {"path": "repo/docs/loom/2026-11-02-command-groups/attestation.json", "status": "untracked, generated, excluded non-deliverable; never committed"}
+  ],
+  "untouched_test_path": "repo/tests/test_empty_groups.py",
+  "functional_files_changed_by_executor": [],
+  "sync_trunk": {"exit_code": 0, "result": "up to date"},
+  "package_suite": {"command": "/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest tests -q", "exit_code": 0, "result": "2 passed"},
+  "adversarial_program": {"artifact": "tests/test_empty_groups.py", "command": "/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest tests/test_empty_groups.py", "exit_code": 0, "result": "1 passed"},
+  "reviewer_floor": 2,
+  "accepted_reviewers": ["/root/flow_graduated_a/review_one"],
+  "excluded_reviewers": [{
+    "reviewer": "/root/flow_graduated_a/review_two",
+    "verdict": "PASS",
+    "output": "reviewer-two.yaml",
+    "reason": "The reviewer replayed the historical store-probe source against historical groups.py in memory, exceeding the explicit packet prohibition on running store probes. It disclosed this execution; no repo edit occurred. This output is retained as excluded evidence."
+  }],
+  "acceptance_report": {"status": "omitted under closing-review section 3", "reason": "All acceptance predicates are mechanical; both genuine reviewers independently agreed."},
+  "dispatch_packets": {
+    "initial": {
+      "event": "initial", "main_profile": {"model": null, "effort": null}, "task_evidence": {}, "capabilities": {}, "inheritance_guaranteed": true, "completed_redispatches": 0
+    },
+    "initial_result": {
+      "completed_redispatches": 0, "effective_profile": "inherited", "outcome": "dispatch", "overrides": null, "reason": "unobservable-main-profile", "requested_profile": null, "task_class": "ordinary", "uncertainty": null
+    },
+    "after_execution_attempt_1": {
+      "packet": {"event": "after-execution", "main_profile": {"model": null, "effort": null}, "task_evidence": {}, "capabilities": {}, "inheritance_guaranteed": true, "completed_redispatches": 0, "last_attempt": {"completed": true, "success": false, "conforming": false, "profile": "inherited", "failure_kind": "malformed-response"}},
+      "exit_code": 2,
+      "output": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    "after_execution_attempt_2": {
+      "packet": {"event": "after-execution", "main_profile": {"model": null, "effort": null}, "task_evidence": {}, "capabilities": {}, "inheritance_guaranteed": true, "completed_redispatches": 0, "last_attempt": {"completed": true, "success": false, "conforming": false, "profile": {"model": null, "effort": null}, "failure_kind": "malformed-response"}},
+      "exit_code": 2,
+      "output": "dispatch-profile: last_attempt.profile is not a portable model-effort pair\n"
+    }
+  },
+  "blockers": [{
+    "item": "replacement reviewer dispatch",
+    "reason": "The initial resolver returns an inherited unobservable effective profile, but after-execution accepts only a portable model-effort pair. The actual inherited values are unknown. Supplying such a pair would fabricate observation; relabeling a replacement as a new initial task would bypass feedback requirements. No replacement was spawned.",
+    "source_anchors": [
+      "/tmp/loom-flow-20261102/bundle-a/loom-code/references/dispatch-profile.md:64",
+      "/tmp/loom-flow-20261102/bundle-a/loom-code/scripts/dispatch_profile.py:62",
+      "/tmp/loom-flow-20261102/bundle-a/loom-code/scripts/dispatch_profile.py:134",
+      "/tmp/loom-flow-20261102/bundle-a/loom-code/scripts/dispatch_profile.py:170"
+    ]
+  }],
+  "attestation": {
+    "path": "repo/docs/loom/2026-11-02-command-groups/attestation.json",
+    "generated": true,
+    "generation_exit_code": 0,
+    "committed": false,
+    "deliverable": false,
+    "excluded_reason": "Generated before protocol repair and contains the disallowed reviewer output. It cannot establish a conforming floor of two reviewers.",
+    "validate_attestation": {"executed": true, "exit_code": 0, "failures": [], "head": "bcf15cf32755f81bf50d1c831628091433925412", "limitation": "Structural validation of uncommitted generated evidence passes; it does not cure the known reviewer execution-boundary violation or establish a completed station."}
+  },
+  "privacy_scan": {"exit_code": 0, "result": "clean", "commit_message": "commit-message.txt", "classification": "Routine fixture attestation carrier; no earned memory trailer; no ambiguous private-party text. No commit occurred."},
+  "evidence_paths": ["command-log.jsonl", "decision-log.json", "reviewer-one.yaml", "reviewer-one-commands.jsonl", "reviewer-two.yaml", "reviewer-two-commands.jsonl", "review-input.json", "validate.py"],
+  "stop": "Stopped at actual dispatch-profile limitation as instructed. No commit, Ship, publish, merge, network, source-plugin edits, or bundle rule changes."
+}

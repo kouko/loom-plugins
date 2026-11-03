@@ -1,8 +1,14 @@
 # Changelog
 
-## [3.57.0] — 2026-11-02 — preserve context in intent confirmation
+## [3.58.0] — 2026-11-03 — preserve context in intent confirmation
 
 - Code-only intent confirmation connects the subject, present problem and impact, wanted outcome and confirmation scope, explaining unfamiliar terms as needed. Preserve supplied facts and outcome strength, leave unknown facts unresolved, and explain concrete publication effects with proportionate workflow detail. Wording, length and presentation remain flexible; the existing single stop, publication authorization and outcome-only decision boundary remain unchanged.
+
+## [3.57.0] — 2026-11-03 — preserve fallback feedback and bounded continuation
+
+- Accept completed execution feedback for the existing `inherited` and `host-default/unverified` profiles without inventing model or effort overrides. Validate explicit profile pairs before every result branch; preserve legal malformed-response retries, completed-redispatch counts and stops when an unknown baseline cannot justify escalation.
+- Require feedback for every completed host-native execution. Treat a conforming defect verdict as successful review work, separate artifact fix rounds from failed reviewer retries, and retain existing review-round and retry limits.
+- After a substantive requirements change, require renewed intent confirmation and reassess affected design, plan and evidence while retaining applicable work. Wording-only confirmation, technical repairs and reviewer changes do not reset review rounds; retries of the same failed task retain their count.
 
 ## [3.56.0] — 2026-11-02 — detect incomplete and stale verification evidence
 

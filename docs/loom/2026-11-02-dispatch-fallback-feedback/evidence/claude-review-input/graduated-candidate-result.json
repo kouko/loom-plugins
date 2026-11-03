@@ -1,0 +1,31 @@
+{
+  "trial": "graduated-pytest-b",
+  "status": "stopped",
+  "stage": "closing-review/round-1/mandatory-after-execution-feedback",
+  "station_sequence": ["closing-review"],
+  "initial_head": "835e474ca7e3734b428bd72c693caf8b66d98abe",
+  "final_head": "835e474ca7e3734b428bd72c693caf8b66d98abe",
+  "repo_clean": true,
+  "file_actions": {
+    "repo": [],
+    "outside_repo_created": ["run_logged.py", "command-log.jsonl", "reviewer-one.yaml", "reviewer-two.yaml", "reviewer-one-after-execution.json", "reviewer-two-after-execution.json", "result.json"]
+  },
+  "sync_trunk": {"actual": true, "repair": true, "exit_code": 0, "result": "up to date"},
+  "reviewer_count": {"actual": true, "repair": true, "exit_code": 0, "floor": 2},
+  "acceptance_testing": {"independent_report_required": false, "reason": "Acceptance 1 is settled mechanically by regular and repeated/edge separator tests; station section 3 permits omission. No instruction skip was recorded."},
+  "package_suite": {"actual": true, "command": "/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest tests -q", "exit_code": 0, "result": "2 passed"},
+  "adversarial_program": {"artifact": "tests/test_empty_groups.py", "classification": "new-graduated", "actual": true, "command": "/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest tests/test_empty_groups.py", "exit_code": 0, "result": "1 passed", "historical_red_read_only": true, "graduation_git_history_checked": true},
+  "reviewers": [
+    {"identity": "/root/flow_graduated_b/review_one", "fresh_context": true, "verdict": "PASS", "raw": "reviewer-one.yaml", "current_graduated_pytest_executed": true, "model_override": null, "effort_override": null, "effective_profile": "inherited", "feedback_packet": "reviewer-one-after-execution.json", "feedback_exit": 2},
+    {"identity": "/root/flow_graduated_b/review_two", "fresh_context": true, "verdict": "PASS", "raw": "reviewer-two.yaml", "current_graduated_pytest_executed": true, "model_override": null, "effort_override": null, "effective_profile": "inherited", "feedback_packet": "reviewer-two-after-execution.json", "feedback_exit": 2}
+  ],
+  "blockers": [{"type": "dispatch-profile-feedback-unrepresentable", "exact_error": "dispatch-profile: last_attempt.profile is not a portable model-effort pair", "exit_code": 2, "reason": "Both real initial resolutions returned effective_profile inherited with overrides null because main model and effort were unobservable and capabilities empty. Mandatory completed feedback cannot truthfully supply a portable effective pair. Null/null packets preserve unknown values; the real resolver rejects them. No profile was invented and no replacement task was relabeled as new work."}],
+  "finalize_review": {"attempted": false, "reason": "Stopped at mandatory dispatch feedback failure as instructed."},
+  "attestation": {"generated": false, "committed": false, "validated_at_final_head": false, "absence_checked": true},
+  "commits_created": [],
+  "privacy_scan": {"performed": false, "reason": "No fixture commit was attempted."},
+  "ship_publish_merge": {"attempted": false},
+  "unresolved_product_findings": [],
+  "command_log": "command-log.jsonl",
+  "logging_limit": "Opening packet/handoff/skill/contract/routing reads before run_logged.py existed are in actual tool outputs, not command-log.jsonl. Reviewer two also reported opening contract/packet reads before using wrapper. Subsequent repository review, tests, routing and final status commands are logged."
+}

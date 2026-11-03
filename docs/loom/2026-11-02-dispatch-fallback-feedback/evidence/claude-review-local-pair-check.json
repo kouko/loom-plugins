@@ -1,0 +1,62 @@
+[
+  {
+    "input": {
+      "event": "after-execution",
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": true,
+        "conforming": true,
+        "profile": {
+          "model": "standard",
+          "effort": null
+        }
+      }
+    },
+    "exit_code": 0,
+    "stdout": "{\"completed_redispatches\":0,\"effective_profile\":{\"effort\":null,\"model\":\"standard\"},\"outcome\":\"routed\",\"overrides\":{\"effort\":null,\"model\":\"standard\"},\"reason\":\"execution-succeeded\",\"requested_profile\":{\"effort\":null,\"model\":\"standard\"},\"task_class\":null,\"uncertainty\":null}\n",
+    "stderr": ""
+  },
+  {
+    "input": {
+      "event": "after-execution",
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": true,
+        "conforming": true,
+        "profile": {
+          "model": "standard",
+          "effort": 17
+        }
+      }
+    },
+    "exit_code": 0,
+    "stdout": "{\"completed_redispatches\":0,\"effective_profile\":{\"effort\":17,\"model\":\"standard\"},\"outcome\":\"routed\",\"overrides\":{\"effort\":17,\"model\":\"standard\"},\"reason\":\"execution-succeeded\",\"requested_profile\":{\"effort\":17,\"model\":\"standard\"},\"task_class\":null,\"uncertainty\":null}\n",
+    "stderr": ""
+  },
+  {
+    "input": {
+      "event": "after-execution",
+      "capabilities": {},
+      "inheritance_guaranteed": true,
+      "completed_redispatches": 0,
+      "last_attempt": {
+        "completed": true,
+        "success": true,
+        "conforming": true,
+        "profile": {
+          "model": "standard",
+          "effort": "medium"
+        }
+      }
+    },
+    "exit_code": 0,
+    "stdout": "{\"completed_redispatches\":0,\"effective_profile\":{\"effort\":\"medium\",\"model\":\"standard\"},\"outcome\":\"routed\",\"overrides\":{\"effort\":\"medium\",\"model\":\"standard\"},\"reason\":\"execution-succeeded\",\"requested_profile\":{\"effort\":\"medium\",\"model\":\"standard\"},\"task_class\":null,\"uncertainty\":null}\n",
+    "stderr": ""
+  }
+]

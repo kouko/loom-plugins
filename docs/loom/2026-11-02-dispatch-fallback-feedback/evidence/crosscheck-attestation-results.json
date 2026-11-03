@@ -1,0 +1,38 @@
+[
+  {
+    "trial": "missing-result-a",
+    "models": [
+      "inherited/unobservable",
+      "inherited/unobservable"
+    ],
+    "shape_valid": true,
+    "attestation_failures": []
+  },
+  {
+    "trial": "missing-result-b",
+    "models": [
+      "inherited",
+      "inherited"
+    ],
+    "shape_valid": true,
+    "attestation_failures": []
+  },
+  {
+    "trial": "stale-new-program-a",
+    "models": [
+      "inherited",
+      "inherited"
+    ],
+    "shape_valid": true,
+    "attestation_failures": []
+  },
+  {
+    "trial": "stale-new-program-b",
+    "models": [
+      "inherited",
+      "inherited"
+    ],
+    "shape_valid": true,
+    "attestation_failures": []
+  }
+]

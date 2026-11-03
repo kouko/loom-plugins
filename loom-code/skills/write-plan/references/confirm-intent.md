@@ -156,6 +156,9 @@ of your own. It never enters the intent file.
    `intent_confirmed_sha: <computed-sha>`, using the output of
    `grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent> | git hash-object --stdin`.
    This hashes the confirmed intent excluding its status and pin lines.
+   Changes require reconfirmation with matching pin; byte-based
+   confirmation does not establish a substantive requirements change;
+   closing-review's `review.bounded-episode` owns episode/task continuity.
 2. Commit it on the change branch, branching first per SKILL.md's
    **Branch before the first commit** rule. The message is `docs(loom): intent <change-id> confirmed`,
    and its body **must contain the `needs-design:` line verbatim** — the

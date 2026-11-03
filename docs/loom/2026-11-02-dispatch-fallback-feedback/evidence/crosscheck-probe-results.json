@@ -1,0 +1,1782 @@
+{
+  "source_head": "55587449a0473697dee852f0dff69b240ef5d36e",
+  "resolver_sha256": "07b6d78efeb76c7d027433515926e50acbe65ce4355231584ae1f93fe34b3dd1",
+  "scope": "Actual stateless CLI calls on synthetic state packets; not live agent/host executions or independent incident samples. Direct symbolic feedback tests do not exclude truthful use of a separately observed known inherited pair.",
+  "rows": [
+    {
+      "label": "unknown-main-inherit-True",
+      "packet": {
+        "event": "initial",
+        "main_profile": {
+          "model": "unknown",
+          "effort": "unknown"
+        },
+        "task_evidence": {},
+        "capabilities": {},
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": "inherited",
+        "outcome": "dispatch",
+        "overrides": null,
+        "reason": "unobservable-main-profile",
+        "requested_profile": null,
+        "task_class": "ordinary",
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "unknown-main-inherit-True -> success",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": "inherited"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "unknown-main-inherit-True -> malformed-retry",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": "inherited",
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "unsupported-known-inherit-True",
+      "packet": {
+        "event": "initial",
+        "main_profile": {
+          "model": "standard",
+          "effort": "medium"
+        },
+        "task_evidence": {},
+        "capabilities": {
+          "standard": [
+            "low"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": "inherited",
+        "outcome": "dispatch",
+        "overrides": null,
+        "reason": "unsupported-profile",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": "ordinary",
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "unsupported-known-inherit-True -> success",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": "inherited"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "unsupported-known-inherit-True -> malformed-retry",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": "inherited",
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "host-rejection-inherit-True",
+      "packet": {
+        "event": "host-rejection",
+        "main_profile": {
+          "model": "standard",
+          "effort": "medium"
+        },
+        "task_evidence": {},
+        "capabilities": {
+          "standard": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0,
+        "rejection_retried": false
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": "inherited",
+        "outcome": "dispatch",
+        "overrides": null,
+        "reason": "host-rejection-replacement",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "host-rejection-inherit-True -> success",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": "inherited"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "host-rejection-inherit-True -> malformed-retry",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": "inherited",
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "unknown-main-inherit-False",
+      "packet": {
+        "event": "initial",
+        "main_profile": {
+          "model": "unknown",
+          "effort": "unknown"
+        },
+        "task_evidence": {},
+        "capabilities": {},
+        "inheritance_guaranteed": false,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": "host-default/unverified",
+        "outcome": "dispatch",
+        "overrides": null,
+        "reason": "unobservable-main-profile",
+        "requested_profile": null,
+        "task_class": "ordinary",
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "unknown-main-inherit-False -> success",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": "host-default/unverified"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "unknown-main-inherit-False -> malformed-retry",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": "host-default/unverified",
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "unsupported-known-inherit-False",
+      "packet": {
+        "event": "initial",
+        "main_profile": {
+          "model": "standard",
+          "effort": "medium"
+        },
+        "task_evidence": {},
+        "capabilities": {
+          "standard": [
+            "low"
+          ]
+        },
+        "inheritance_guaranteed": false,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": "host-default/unverified",
+        "outcome": "dispatch",
+        "overrides": null,
+        "reason": "unsupported-profile",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": "ordinary",
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "unsupported-known-inherit-False -> success",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": "host-default/unverified"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "unsupported-known-inherit-False -> malformed-retry",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": "host-default/unverified",
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "host-rejection-inherit-False",
+      "packet": {
+        "event": "host-rejection",
+        "main_profile": {
+          "model": "standard",
+          "effort": "medium"
+        },
+        "task_evidence": {},
+        "capabilities": {
+          "standard": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": false,
+        "completed_redispatches": 0,
+        "rejection_retried": false
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": "host-default/unverified",
+        "outcome": "dispatch",
+        "overrides": null,
+        "reason": "host-rejection-replacement",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "host-rejection-inherit-False -> success",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": "host-default/unverified"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "host-rejection-inherit-False -> malformed-retry",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": "host-default/unverified",
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "retry-known-unsupported",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {},
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": "inherited",
+        "next_redispatch": 1,
+        "outcome": "dispatch",
+        "overrides": null,
+        "reason": "unsupported-profile",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "retry-known-unsupported -> success",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": "inherited"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 1
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "retry-known-unsupported -> malformed-retry",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": "inherited",
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 1
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "escalation-unsupported",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "capability-quality"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": "inherited",
+        "next_redispatch": 1,
+        "outcome": "dispatch",
+        "overrides": null,
+        "reason": "unsupported-profile",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "frontier"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "escalation-unsupported -> success",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": "inherited"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 1
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "escalation-unsupported -> malformed-retry",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": "inherited",
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 1
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile must be an object\n"
+    },
+    {
+      "label": "success-effort-None",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": null
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": null,
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": null,
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": null,
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-effort-17",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": 17
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": 17,
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": 17,
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": 17,
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-effort-True",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": true
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": true,
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": true,
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": true,
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-effort-{}",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": {}
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": {},
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": {},
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": {},
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-effort-[]",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": []
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": [],
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": [],
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": [],
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-effort-''",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": ""
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "",
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": "",
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": "",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-effort-'unverified-effort'",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": "unverified-effort"
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "unverified-effort",
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": "unverified-effort",
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": "unverified-effort",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-effort-'medium'",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-model-'unknown'",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "unknown",
+            "effort": "medium"
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile is not a portable model-effort pair\n"
+    },
+    {
+      "label": "success-model-None",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": null,
+            "effort": "medium"
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 2,
+      "decision": null,
+      "stderr": "dispatch-profile: last_attempt.profile is not a portable model-effort pair\n"
+    },
+    {
+      "label": "verified-native-effort-control",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "frontier",
+            "effort": "ultra"
+          }
+        },
+        "capabilities": {
+          "frontier": [
+            "ultra"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "ultra",
+          "model": "frontier"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": "ultra",
+          "model": "frontier"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": "ultra",
+          "model": "frontier"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-malformed-response-completed-True",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "next_redispatch": 1,
+        "outcome": "dispatch",
+        "overrides": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "reason": "nonconforming-output-redispatch",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-malformed-response-completed-False",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": false,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "no-legal-redispatch",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-host-unavailable-completed-True",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "host-unavailable"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "non-routing-failure",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-host-unavailable-completed-False",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": false,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "host-unavailable"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "no-legal-redispatch",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-timeout-completed-True",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "timeout"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "non-routing-failure",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-timeout-completed-False",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": false,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "timeout"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "no-legal-redispatch",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-missing-input-completed-True",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "missing-input"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "non-routing-failure",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-missing-input-completed-False",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": false,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "missing-input"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "no-legal-redispatch",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-transient-executor-completed-True",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "transient-executor"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "non-routing-failure",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "failure-transient-executor-completed-False",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": false,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "transient-executor"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "no-legal-redispatch",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "malformed-count-0",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "next_redispatch": 1,
+        "outcome": "dispatch",
+        "overrides": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "reason": "nonconforming-output-redispatch",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "malformed-count-1",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 1
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 1,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "next_redispatch": 2,
+        "outcome": "dispatch",
+        "overrides": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "reason": "nonconforming-output-redispatch",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "malformed-count-2",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": false,
+          "conforming": false,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          },
+          "failure_kind": "malformed-response"
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 2
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 2,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "execution-failed",
+        "overrides": null,
+        "reason": "no-legal-redispatch",
+        "requested_profile": null,
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-count-0",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 0
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 0,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    },
+    {
+      "label": "success-count-2",
+      "packet": {
+        "event": "after-execution",
+        "last_attempt": {
+          "completed": true,
+          "success": true,
+          "conforming": true,
+          "profile": {
+            "model": "standard",
+            "effort": "medium"
+          }
+        },
+        "capabilities": {
+          "standard": [
+            "medium"
+          ],
+          "frontier": [
+            "medium"
+          ]
+        },
+        "inheritance_guaranteed": true,
+        "completed_redispatches": 2
+      },
+      "exit_code": 0,
+      "decision": {
+        "completed_redispatches": 2,
+        "effective_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "outcome": "routed",
+        "overrides": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "reason": "execution-succeeded",
+        "requested_profile": {
+          "effort": "medium",
+          "model": "standard"
+        },
+        "task_class": null,
+        "uncertainty": null
+      },
+      "stderr": ""
+    }
+  ]
+}

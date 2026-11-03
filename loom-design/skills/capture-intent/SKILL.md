@@ -179,23 +179,22 @@ intent in step 4.
 Compose **one message**. Everything below goes into it; you do not stop
 twice, and this is the only stop this station makes.
 
-1. **The restatement.** Restate Problem and Acceptance: subject, problem,
+1. Restate Problem and Acceptance: subject, problem,
    impact, outcome and confirmation scope. Use the user's plain words, never paths,
    identifiers or mechanism names. Supply necessary context for unfamiliar
    terms and affected people at intent altitude. Choose wording, length and
    presentation freely, keeping familiar requests short. Examples, scripts and
    headings are optional. Preserve supplied facts and outcome strength. Leave
-   unknown facts unresolved until user answers or evidence establish them. Lead with the user's
-   problem or missing fact, limiting workflow labels and bookkeeping to necessary
-   consequences. Check these connections and what yes confirms and
-   authorizes; ask about outcomes, never implementation approval.
+   unknown facts unresolved pending user answers/evidence. Lead with the user's
+   problem or missing fact, minimizing workflow labels and bookkeeping.
+   Check these connections and what yes confirms and
+   authorizes; outcomes only, never implementation approval.
 
-   Explain that yes authorizes uploading the change branch (non-forced push)
-   and opening a pull request ready for review after review and publication
-   checks pass, with a separate merge decision. Publication defaults to
-   automatic; explicitly offer opt-out before publication. Disclose before
-   the answer. Record `publication: automatic — authorized <date> by <name>`
-   only after informed yes; opt-out leaves it absent.
+   Explain yes authorizes uploading the change branch (non-forced push)
+   and opening a pull request ready for review after review/publication
+   checks pass, with a separate merge decision. Disclose automatic publication
+   and offer opt-out before answering. Record `publication: automatic — authorized <date> by <name>`
+   after informed yes only; otherwise omit.
 
 2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
@@ -335,6 +334,9 @@ the intent and restate again; there is no limit on rounds here.
    `intent_confirmed_sha: <computed-sha>`, using the output of
    `grep -v -e '^status:' -e '^intent_confirmed_sha:' <intent> | git hash-object --stdin`.
    This hashes the confirmed intent excluding its status and pin lines.
+   Changes require reconfirmation with matching pin; byte-based
+   confirmation does not establish a substantive requirements change;
+   `loom-code:closing-review`'s `review.bounded-episode` owns episode/task continuity.
 2. **Branch before the first commit.** Before the confirmation commit, make
    HEAD the change's branch with `git switch -c <type>/<change-id>`, picking
    `<type>` from `feat`, `fix`, `docs`, `refactor`, `test`, `chore` or `ci`.
