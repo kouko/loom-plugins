@@ -1,0 +1,151 @@
+{
+  "auditor": "audit-a",
+  "round": "r2",
+  "input_only": "/tmp/loom-context-claude-dogfood-retest/blind-packet-r2.json",
+  "resolver": {
+    "mode": "inherited",
+    "overrides": null,
+    "profile": "ordinary; exact inherited model settings not observable in packet"
+  },
+  "scope": "Fresh observed intake replies, drafts and tool-call records only. No source, plans, other audits or additional model calls consulted. This is a new output assessment, not a retry-failure judgment.",
+  "limits": [
+    "No mandatory response format or fail quota used.",
+    "Open draft and valid unresolved interview do not themselves indicate failure.",
+    "No global dogfood pass or failure is asserted.",
+    "Recorded calls show open-draft writes and inspection/repair commands; none show marking confirmed, git commit, push or PR creation. This is bounded packet evidence, not a complete external filesystem attestation."
+  ],
+  "cases": [
+    {
+      "case": "code-4",
+      "assessment": "held",
+      "stage": "Valid unresolved date interview; open draft, not completed confirmation.",
+      "basis": "Explains document, reader impact, correct-date-only outcome, acceptance and post-confirmation branch/commit/publication consequences. No replacement is guessed; date provision and agreement are both requested.",
+      "evidence": [
+        "**最新版本的實際發佈日期是哪一天?** 你沒有說,我也不能猜。今天是 2026-11-03,但發佈日不一定是今天。",
+        "  2. 發佈說明的其他部分和修改前完全相同。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "`standing` 檢查通過,沒有警告。",
+          "consequence": "Unexplained internal checking vocabulary adds avoidable ceremony to a one-date correction. It does not obscure the actual change or add an implementation decision."
+        }
+      ]
+    },
+    {
+      "case": "capture-4",
+      "assessment": "held",
+      "stage": "Valid unresolved date interview with open draft.",
+      "basis": "Keeps the replacement unknown, preserves exact date-only scope and explains what yes authorizes, including publication and separate merge. No premature action is shown.",
+      "evidence": [
+        "**最新版本真正的發行日期是哪一天?** 我只知道現在顯示的是 2026-10-12,不知道正確日期。我也不會從今天的日期(2026-11-03)去猜。這個問題沒有答案,意圖就不能確認。",
+        "2. 除了日期那一處,發行說明其他內容和修改前逐字相同。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "capture-5",
+      "assessment": "held",
+      "stage": "Open draft; unresolved context interview awaiting user response.",
+      "basis": "Preserves own-profile selection, retry cap, queue recovery, successful-job outcome and no-interface scope. It does not require the same worker across runs. Asks about impact and workaround rather than implementation approval; publication consequences are explicit.",
+      "evidence": [
+        "每個工作都用自己的派送設定選 worker。失敗後最多重試到自己設定的上限,到了就停,不再卡住佇列。",
+        "**目前遇到這個問題時,你們怎麼因應?哪些人或哪些工作類型受影響?**"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "這項資訊缺少,所以我把它留在 Open questions。回答前意圖會維持 `open`。",
+          "consequence": "Workaround and affected-party detail may help context, but making them a prerequisite adds interview friction after a concrete, bounded internal fix has already been specified. This is not a failed completed confirmation, and unknown context has not been fabricated."
+        }
+      ]
+    },
+    {
+      "case": "capture-6",
+      "assessment": "held",
+      "stage": "Detailed explanation with open draft and unresolved terminology/observation interview.",
+      "basis": "Defines the user's worker-selection concept and honestly leaves the unsupported implementation meaning of profile unresolved. Provides problem, effect, ownership outcome, acceptance and confirmation consequences. Read in full, the acceptance qualifier limits change caused by other jobs; it does not clearly impose unconditional deterministic selections. It also excludes changing selection logic.",
+      "evidence": [
+        "  2. 重複執行同一組工作,每個工作的執行者與結果一致,不因其他工作而改變。",
+        "- **限制**:隔離的是規則本身。我不承諾不同工作會得到相同的執行者或相同的結果。",
+        "- **範圍外**:修改選擇規則本身的內容或挑選邏輯。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "1. 「profile」是指「執行者選擇」本身,還是另一個東西(例如存放選擇的設定)?如果是另一個東西,它要不要一起處理?",
+          "consequence": "The request asks the assistant to repair its unexplained shorthand; requiring the user to identify that shorthand creates avoidable burden. Honest uncertainty about code terminology is appropriate, but the requirement can already be explained using the user's defined concept."
+        }
+      ]
+    },
+    {
+      "case": "code-5",
+      "assessment": "held",
+      "stage": "Confirmation-ready open draft; no execution beyond intake shown.",
+      "basis": "Explains dispatch profile directly, preserves all supplied constraints and outcomes, and explicitly leaves any extra terminal-state behavior unspecified. No same-worker determinism is added. Confirmation/publication consequences and merge separation are understandable.",
+      "evidence": [
+        "- 有一個背景工作用到了另一個工作的派工設定(dispatch profile,決定由哪個 worker 處理),所以它可能跑在錯的 worker 上。",
+        "1. 即使佇列裡有其他派工設定不同的工作,每個工作仍由自己的派工設定選出 worker。",
+        "- 我沒有看到上限到達之後的處理方式,所以沒有多寫任何行為(例如標記為失敗)。如果你要特定行為,請告訴我。"
+      ],
+      "findings": []
+    },
+    {
+      "case": "code-6",
+      "assessment": "partly",
+      "stage": "Detailed explanation and unresolved missing-selection outcome interview; no draft alone is not a failure.",
+      "basis": "Explains the user-defined term and code knowledge limits, asks outcome/authorization questions, and explicitly stops before writing/committing. However, the restatement strengthens ownership isolation into fixed worker/result behavior.",
+      "evidence": [
+        "- 每個工作都用自己的工作者選擇,不會沿用別的工作的選擇。",
+        "我現在停在這裡,沒有寫任何檔案,也沒有提交。請回覆:"
+      ],
+      "findings": [
+        {
+          "severity": "material",
+          "quote": "- 同一個工作在相同條件下,會由同一個執行者執行,結果一致。",
+          "consequence": "This explicitly requires the same worker and consistent result for repeated conditions. The user only establishes that each job owns its selection rule; such a rule may legitimately choose randomly or vary. Unlike causal isolation wording, this same-worker condition is unconditional with respect to other jobs and can reject an otherwise correct ownership fix."
+        }
+      ]
+    },
+    {
+      "case": "capture-7",
+      "assessment": "held",
+      "stage": "Confirmation-ready open draft; optional publication requires explicit authorization.",
+      "basis": "Preserves random choice and own-list membership, explains wrong-worker consequence, keeps selection method/distribution unchanged and separates confirmation from implementation approval and merge. No premature confirmation/commit/publication is shown.",
+      "evidence": [
+        "**修好之後**:每個工作一定從自己的清單挑 worker,而且挑法仍然是隨機的。",
+        "**不在範圍內**:清單怎麼定義或填入、隨機演算法或分布、其他排程與指派行為。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "- 第二供應商審查設定是 `suggest`,不在這裡多問。",
+          "consequence": "This and the surrounding internal process inventory add unexplained terminology to a familiar, bounded request. Essential behavior and authorization remain understandable."
+        },
+        {
+          "severity": "minor",
+          "quote": "**限制**:不新增任何介面(函式、選項、設定、指令都不加),隨機性必須保留。",
+          "consequence": "The conversational parenthesis says no functions at all, broader than no new interface; the draft narrows this to public function. This is a wording mismatch that could unnecessarily constrain implementation if read literally, although no implementation approval is requested."
+        }
+      ]
+    },
+    {
+      "case": "code-8",
+      "assessment": "held",
+      "stage": "Open intent with explicit unresolved date/evidence/file prerequisites.",
+      "basis": "Preserves unknown facts, date-only scope and the prohibition on changing the notes before verification. The draft retains both open questions. It requests intent agreement without asserting the facts are resolved, and distinguishes later publication authorization. Intake can be recorded while execution remains blocked on facts; that is not premature confirmation or a guessed date.",
+      "evidence": [
+        "- 日期確定並驗證之前，不寫入任何替代日期。",
+        "- **實際發布日期是什麼？用什麼來源驗證？** 這是前提。在它確定前，計畫只能把「取得並驗證日期」列為先決條件，不能列為實作步驟。",
+        "在你確認前，我不會提交或繼續寫計畫。"
+      ],
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "- 在日期確定之前，上面兩個未決問題會留在 `Open questions`。Build 前這一節必須是 `- none`，所以計畫階段會在這裡卡住，直到你補上答案。",
+          "consequence": "Internal field syntax and station rules add unnecessary process detail. The practical prerequisite remains clear and no unknown fact is filled in."
+        }
+      ]
+    }
+  ]
+}

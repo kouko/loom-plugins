@@ -1,5 +1,7 @@
 # Context-preserving intent confirmation — acceptance test evidence
 
+Historical evidence below is retained verbatim. Its all-works conclusion is superseded by the dated renewed assessment at the end of this file.
+
 Tried on 2026-11-03, in a clean copy of the project at 242ba265a2a7b648356fd6aa082fc5e5ffe9e93c.
 
 ## Setup and execution boundary
@@ -148,3 +150,86 @@ No full package suite was run by the acceptance tester. The station reported its
 - Six bounded fixture replies from two fresh source-loaded contexts establish sampled behavior. They do not prove every host's runtime loading, marketplace installation, human comprehension, future response consistency, or causal superiority over an unchanged baseline.
 - No installation, publication, remote write or change to the user's real data was performed. The archive and report/evidence are the only test artifacts created.
 - The station supplied no dismissed finding of severity important or worse. No acceptance step was skipped by user instruction.
+
+## Re-run on 2026-11-03, at 1d481a176e624657bfe2b2aa7bcb36305378c502
+
+### Clean setup and provenance
+
+This independent tester did not implement the change and made no source/test edits. The fix range `b6f666d7..1d481a17` changes both first-confirmation owners, including drafting fidelity, brevity and publication wording; therefore all four rows were re-tested, none carried over. The confirmed intent has `needs-design: no`; no omitted spec flows exist. No user-directed skip or dismissed important finding was supplied. The retained Build report explicitly leaves semantic failures open.
+
+Commands independently executed:
+
+```text
+git clone --no-hardlinks --no-checkout . /tmp/loom-context-renewed-acceptance-1d481a17
+git -C /tmp/loom-context-renewed-acceptance-1d481a17 checkout --detach 1d481a176e624657bfe2b2aa7bcb36305378c502
+HEAD is now at 1d481a17 docs(loom): record drafting-boundary verification and remaining risk
+```
+
+The following commands ran inside that clean clone:
+
+```text
+python3 scripts/sync_codex_manifests.py --check --all
+exit 0, no output
+/Users/kouko/.conda/envs/dbt-redshift/bin/python3 loom-code/scripts/loom_checker.py contract --require 2.1
+contract 2.3.1 satisfies requires-contract >=2.1
+/Users/kouko/.conda/envs/dbt-redshift/bin/python3 -m pytest loom-design/tests/spec/test_capture_intent_contract.py loom-design/tests/spec/test_intent_drafting_fidelity.py -q
+42 passed in 0.13s
+```
+
+The system `python3` checker attempt failed importing `yaml`; rerunning with the available project-compatible interpreter succeeded. No package installation or full package suite was run. README setup points to marketplace installation; that would install remote content and change the user's installed plugins. Instead this run checked candidate manifest consistency and checker loading locally, and verified the already-executed candidate CLI loading evidence described next. This does not establish normal marketplace discovery, a fresh installed-plugin launch, or loading on other hosts.
+
+Behavioral inputs: `/tmp/loom-context-claude-dogfood-retest/blind-packet-r2.json`, all eight `{case}-r2.jsonl` raw transcripts, their summaries, `export-manifest-r2.json`, and `settings-run.json`. These are actual prior first-party Claude Code executions, not tester-authored sample replies. This tester did not call an external model or execute a new native responder. Each packet reply was independently compared to its raw JSONL `type: result` text: eight exact matches; all eight raw initializations say `claude-sonnet-5-5`, all eight result records have `is_error: false` and zero permission denials. Those are execution results, not eight behavioral passes. The raw init reports inline code 3.58.0/design 2.21.0; code-only tool output loads the candidate confirmation resource. Settings disable hooks and memory, restrict network and deny candidate-bundle writes. This is the candidate inline-plugin boundary, not ordinary installed-plugin behavior.
+
+The export manifest identifies source `4d4d12cdf56073482d8091306b022ddc747d4f05`. Independently computed SHA256 of each owner in the clean tested HEAD and the candidate bundle matches both each other and the manifest:
+
+| Owner | SHA256 |
+|---|---|
+| `loom-design/skills/capture-intent/SKILL.md` | `e77d6c46aa7ae5cb4551cd9135533ac8ac165ef6690b24badf168646b639460d` |
+| `loom-code/skills/write-plan/references/confirm-intent.md` | `2b0bd9c175994dc211b81f656b584e7e45c90df514b5868a0aac1346a8a757cd` |
+
+The two owners now explicitly say: `Keep own-rule isolation separate from same-worker or same-result guarantees.` Passing source checks and this strengthened instruction do not erase a contrary actual reply.
+
+### 1. Context, intended outcome, scope and consequences — partly
+
+- How tried: compared both owners' simple (4), multiissue (5), and detailed correction (6) replies and saved drafts against the original user requests; also assessed capture random-choice (7) and code unknown-date (8). Inspected raw replies, not audit votes.
+- Simple: both identify release notes, incorrect displayed date, customer confusion and date-only correction. Asking the true date is legitimate missing-fact intake, not a failure.
+- Multiissue: both preserve own-rule selection, configured retry limit, blocked queue, successful-job compatibility and no new interface. Capture's `各自由自己指定的 worker 處理` is stronger wording than selecting by a rule; it should not be treated as proof of deterministic selection without more evidence. Code's `每個工作仍由自己的派工設定選出 worker` preserves rule ownership.
+- Correction: code-6 explicitly changes the outcome to `同一個工作在相同條件下,會由同一個執行者執行,結果一致。` User said the rule chooses who runs each job and the bug uses another job's rule; they did not promise deterministic worker/output across runs. This is a material unsupported guarantee, even though the reply later says the selection rule itself will not change. It also substitutes `選擇結果` for the supplied selection rule.
+- Capture-6 is more qualified: `重複執行同一組工作,每個工作的執行者與結果一致,不因其他工作而改變。` Its limit says `隔離的是規則本身。我不承諾不同工作會得到相同的執行者或相同的結果。` The causal tail plausibly intends only cross-job isolation. Accordingly this is recorded as ambiguity, not the same explicit deterministic guarantee as code-6. However the limitation addresses different jobs, not one job's legitimate variation across runs; the repeated-execution acceptance remains ambiguous. Code-6 alone establishes the material failure; no need to overstate capture-6.
+- Random-choice counterexample capture-7 preserves own-list random choice and expressly disallows fixing one worker; it does not rescue code-6's unstated determinism. Unknown-date code-8 leaves the date unverified and does not substitute today.
+- Consequences: code-4, capture-4, capture-5 and code-5 disclose automatic publication/opt-out and separate merge. Capture-6 says `我預設不記錄這項授權`; capture-7 requires explicit extra authorization; code-8 promises a later authorization question. These differ from the unchanged default informed-yes publication contract, even though no unauthorized publication occurred.
+- Exact contract comparison: capture-intent Step 4 says `Disclose automatic publication and offer opt-out before answering.` and `after informed yes only; otherwise omit.` Code-only confirmation says `Publication defaults to automatic; explicitly offer opt-out before publication. Disclose before the answer.` By contrast capture-7 says `你也可以選擇授權**自動發佈**` and `沒有明說的話,我就不記錄這項授權。`; code-8 says `確認前我會問你，之後是否允許` while already asking `請確認、修正`. The defect is altered/deferred disclosure and an added choice, not absence of authorization metadata in an unconfirmed draft. Severity important because the task explicitly preserves existing confirmation/authorization conditions. Capture-6's `我預設不記錄這項授權` likewise changes the stated default; no actual unauthorized write is alleged.
+- Result: partly. Core context often survives, but scope strength and confirmation consequences are not consistently faithful.
+
+### 2. Flexible expression — works
+
+- How tried: read both tested owners and all eight actual replies; independently ran the two narrowly related test modules (42 passed), including flexible first-confirmation and fidelity guards.
+- What came back: owners permit optional examples/headings and free wording. Actual replies vary between prose, numbered/bulleted lists and a comparison table (capture-6); no fixed fill-in wording is required. The many headings in actual replies are a brevity problem, not evidence that the contract mandates a fixed format.
+- Result: works for the permitted flexibility and observed sample formats. Text checks supplement actual behavior; they do not establish semantic reliability. The full suite command is `uv run --isolated --with-requirements requirements-package-tests.lock python scripts/run_package_tests.py --loom-family -q`. The station reports a previous Build pass at functional `765c50d6`; this tester did not run that suite. Final verification is not skipped but is held while material semantic failures remain; no successful future attestation is promised.
+
+### 3. Proportional length and explained concepts — fails
+
+- How tried: assessed both owners across all three core scenarios and the two counterexamples, including first sentence, necessary background, and amount of workflow bookkeeping.
+- Simple code-4 is 846 characters and capture-4 747 characters (Python Unicode `len` of packet result), with multiple headings, artifact status/path, classification, next-station steps and branch/commit details for a date-only request. The true-date question and publication disclosure are necessary; the surrounding workflow inventory is not. This independently contradicts the requirement to keep familiar requests short.
+- Multiissue replies explain dispatch/profile and queue blockage, but capture-5 leaves `worker` in English without defining it and mostly demonstrates what it does rather than its name. This alone is not the decisive failure.
+- Correction capture-6 opens `那個詞不是你說的,我也無法告訴你它指什麼。` and sends `profile` back as an unresolved equivalence question even though the user supplies the role of worker selection and asks to repair the assistant's earlier shorthand. Code-6 likewise declines to connect its own label to the supplied meaning. Both do explain the user-supplied rule afterward, so this is not total absence of context; it is incomplete repair with unnecessary uncertainty about the assistant's word.
+- Random and date counterexamples keep key supplied qualifications. None makes the simple replies short or removes the correction guarantee.
+- Result: fails. Pending interviews and incomplete factual values are not counted as failures; excessive workflow narration and the unresolved repair are the relevant observations.
+
+### 4. Confirm requirements and necessary authority only — partly
+
+- How tried: inspected every requested decision in all eight replies, with particular attention to added user choices and implementation restrictions.
+- Most questions concern requirement accuracy, missing facts and publication; no reply asks the user to judge a spec or reviewer verdict.
+- Code-6 adds `一個工作自己沒有設定選擇時,該用預設值,還是報錯?` and an acceptance line for missing selection, although the request concerns using another job's existing rule. This creates a new outcome/scope decision before establishing that the case belongs to the requested fix. Merely asking a question is not the violation; elevating the unsupported case into Acceptance is.
+- This missing-setting question concerns visible outcomes, not implementation approval; it supports the row-1 scope-fidelity concern rather than independently proving a row-4 failure. The row-4 partial verdict rests on the unqualified no-function restriction below.
+- Capture-7 asks confirmation of `不新增任何介面(函式、選項、設定、指令都不加)` while the request only says no new interface. Its written draft says `no new public function`, a narrower and defensible interface restriction. The spoken unqualified `函式` can prohibit internal helper functions and therefore asks the user to endorse an unnecessary implementation restriction. This mismatch must be repaired; it is not proof that every no-interface interpretation is wrong.
+- Result: partly. No implementation proposal review is requested, but capture-7's spoken confirmation includes an unsupported restriction on implementation. A missing-fact interview alone would not fail this row.
+
+### Current findings and boundary
+
+- Important: code-6 adds deterministic same-worker/same-result guarantees. Close by preserving rule ownership and supplied qualifiers without adding temporal consistency, then observe actual corrected intake behavior.
+- Important: both simple replies are dominated by workflow bookkeeping; correction replies fail to cleanly repair the assistant's unexplained label. Close with actual concise simple confirmations and contextual correction samples.
+- Important: added missing-selection Acceptance and unqualified no-function restriction expand confirmation scope; remove unsupported obligations and retest the affected surfaces.
+- Important: some replies replace the existing informed-yes publication default or defer its disclosure. Preserve the existing confirmation consequence without extra decision points.
+- Capture-6's repeated-run sentence is ambiguous after its causal qualifier; it is not independently classified as a material deterministic guarantee. No important finding is dismissed merely because tests pass.
+- No source repair, external message, new model run, commit, publication, or modification of user-owned data occurred in this independent run. Existing evidence above and original CLI failure samples are retained as history; current verdicts supersede the earlier all-works report.
