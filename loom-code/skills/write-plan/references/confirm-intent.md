@@ -10,7 +10,7 @@ above this file.
 When this station performs code-only intake, use the same capture boundary:
 ask only for missing required-field content, never a fixed intake question
 quota; existing decision points remain unchanged.
-Read `confirmation-examples.md` before drafting or replying.
+Read `confirmation-template.md` before drafting or replying.
 Before drafting: Preserve supplied facts and outcome strength, including
 qualifiers. Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
@@ -53,8 +53,7 @@ included), and chat shows text tables or text diagrams, not Mermaid.
 
 ### Private preparation
 
-Prepare applicable consequences and questions privately; only their user-relevant
-content enters the message.
+Privately prepare applicable consequences/questions for the user message.
 
 2. **The engineering one-way doors found so far**, in consequence form, per
    `one-way-door.md` — load that file before deciding whether a question is
@@ -134,12 +133,11 @@ keeping familiar requests short. Examples, scripts and headings are optional.
 Check these connections and what yes confirms and authorizes; ask about outcomes,
 never implementation approval.
 
-Explain that yes authorizes uploading the change branch (non-forced push) and
-opening a pull request ready for review after review and publication checks
-pass, with a separate merge decision. Publication defaults to automatic;
-explicitly offer opt-out before publication. Disclose before the answer.
+Explain that only after review AND publication checks pass does yes authorize
+BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
+with opt-out available anytime before publication and a separate merge decision.
 
-Apply `confirmation-examples.md` final-message check before sending;
+Apply `confirmation-template.md` final-message check before sending;
 then ask and wait.
 
 ### Private records and reply handling

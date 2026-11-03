@@ -65,7 +65,8 @@ or updated.
 ## Step 1 — Interview
 
 Read `references/interview.md`; ask only for missing required-field content.
-Read `references/confirmation-examples.md` before drafting or replying.
+Read `references/confirmation-template.md` before drafting or replying.
+Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed.
 Before drafting: Preserve supplied facts and outcome strength, including
 qualifiers. Leave unknown facts unresolved pending user answers/evidence.
 Keep own-rule isolation separate from same-worker or same-result guarantees.
@@ -187,8 +188,7 @@ intent in step 4.
 
 ### Private preparation
 
-Prepare applicable consequences and questions privately; only their user-relevant
-content enters the message.
+Privately prepare applicable consequences/questions for the user message.
 
 2. **The engineering one-way doors found so far**, in consequence form. A
    product change's one-way doors, class (e) actions included, are handled at
@@ -278,12 +278,11 @@ keeping familiar requests short. Examples, scripts and headings are optional.
 Check these connections and what yes confirms and authorizes; outcomes only,
 never implementation approval.
 
-Explain yes authorizes uploading the change branch (non-forced push) and opening
-a pull request ready for review after review/publication checks pass, with a
-separate merge decision. Disclose automatic publication and offer opt-out before
-answering.
+Explain that only after review AND publication checks pass does yes authorize
+BOTH uploading the change branch (non-forced push) AND opening a pull request ready for review,
+with opt-out available anytime before publication and a separate merge decision.
 
-Apply `references/confirmation-examples.md` final-message check before sending;
+Apply `references/confirmation-template.md` final-message check before sending;
 then ask and wait.
 
 ### Private records and reply handling

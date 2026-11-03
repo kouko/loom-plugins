@@ -17,6 +17,7 @@ RULES = (
     ("Keep", "missing required facts", "existing interview", "needed fact and why"),
 )
 EXAMPLE_RULES = (
+    ("Write", "user's conversation language"),
     ("Use", "outline as content connections", "optional", "grouping", "length"),
     ("Repair", "assistant shorthand", "already supplied role"),
     ("Preserve", "interface boundary", "private helpers"),
@@ -25,9 +26,17 @@ EXAMPLE_RULES = (
     ("Require", "actual-request support or evidence", "date, role, impact and constraint"),
     ("Check", "each sentence", "scope", "outcome", "required decision or consent"),
     ("Retain", "required disclosures", "WARN", "cost/egress", "one-way-door", "carried details"),
+    ("Ground", "every factual clause", "this request/current evidence"),
+    ("Preserve", "abstraction", "present-versus-desired quantifiers"),
+    ("Treat", "rule role separately from", "unverified representation", "list, file, cache, algorithm or UI"),
+    ("Keep", "present affected population distinct from desired coverage"),
+    ("Include", "only supplied boundaries"),
 )
-LOAD_RULE = ("Read", "confirmation-examples.md", "before drafting or replying")
-FINAL_CHECK = ("Apply", "confirmation-examples.md", "final-message check", "before sending")
+LOAD_RULE = ("Read", "confirmation-template.md", "before drafting or replying")
+FINAL_CHECK = ("Apply", "confirmation-template.md", "final-message check", "before sending")
+AUTH_RULE = ("Explain", "only after review AND publication checks pass",
+             "BOTH uploading the change branch", "AND opening a pull request ready for review",
+             "anytime before publication", "separate merge decision")
 
 
 @pytest.mark.parametrize(("path", "draft_boundary"), [
@@ -40,7 +49,7 @@ def test_fidelity_precedes_first_drafting_instruction(path: str, draft_boundary:
     for verb, literal, *extras in RULES:
         assert affirms(before_draft, verb, literal, *extras), (path, literal)
     assert affirms(before_draft, *LOAD_RULE), path
-    link = re.search(r"Read `([^`]*confirmation-examples\.md)` before drafting or replying", before_draft)
+    link = re.search(r"Read `([^`]*confirmation-template\.md)` before drafting or replying", before_draft)
     assert link, path
     owner = REPO / path
     target = owner.parent / link.group(1)
@@ -48,16 +57,19 @@ def test_fidelity_precedes_first_drafting_instruction(path: str, draft_boundary:
     assert target.is_file() and target.resolve().parent == local_dir.resolve(), target
 
 
-def test_local_confirmation_examples_are_portable_and_identical() -> None:
-    paths = [REPO / root / "confirmation-examples.md" for root in (
+@pytest.mark.parametrize("filename", ["confirmation-template.md", "confirmation-examples.md"])
+def test_local_confirmation_examples_are_portable_and_identical(filename: str) -> None:
+    paths = [REPO / root / filename for root in (
         "loom-design/skills/capture-intent/references",
         "loom-code/skills/write-plan/references",
     )]
     text = paths[0].read_text(encoding="utf-8")
     assert text == paths[1].read_text(encoding="utf-8")
     assert "loom-design/" not in text and "loom-code/" not in text
-    for rule in EXAMPLE_RULES:
-        assert affirms(" ".join(text.split()), *rule), rule
+    if filename == "confirmation-template.md":
+        for rule in (*EXAMPLE_RULES, AUTH_RULE):
+            assert affirms(" ".join(text.split()), *rule), rule
+        return
     for case in ("Unknown date", "Known correction", "Multiple problems", "Repairing shorthand", "Interface boundary"):
         example = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
         assert "Good:" in example and "Bad:" in example
@@ -70,6 +82,12 @@ def test_local_confirmation_examples_are_portable_and_identical() -> None:
     good = " ".join(line[2:] for line in good.splitlines() if line.startswith("> "))
     bad = " ".join(line[2:] for line in bad.splitlines() if line.startswith("> "))
     assert bad.startswith(good) and bad != good
+    for case in ("Known correction", "Multiple problems", "Repairing shorthand", "Interface boundary"):
+        section = text.split(f"## {case}", 1)[1].split("\n## ", 1)[0]
+        positive = " ".join(section.split("Good:", 1)[1].split("Bad:", 1)[0].replace("> ", "").split())
+        assert "Only after review and publication checks pass" in positive
+        assert "both a non-forced branch upload and a pull request ready for review" in positive
+        assert "anytime before publication" in positive
 
 
 @pytest.mark.parametrize("path", [
@@ -88,7 +106,8 @@ def test_user_composer_is_separate_from_private_work(path: str) -> None:
     assert "**Write down every question" not in message and "`decision_point" not in message
     assert "**The complexity check" not in message and "`second-vendor:" not in message
     assert affirms(" ".join(message.split()), *FINAL_CHECK)
-    final_link = re.search(r"Apply .*?`([^`]*confirmation-examples\.md)`", message)
+    assert affirms(" ".join(message.split()), *AUTH_RULE)
+    final_link = re.search(r"Apply .*?`([^`]*confirmation-template\.md)`", message)
     assert final_link and ((REPO / path).parent / final_link.group(1)).is_file()
 
 
@@ -99,18 +118,23 @@ def test_main_code_entry_loads_examples_before_both_intake_routes() -> None:
     no_intent = step1.split("- `loom-design` is not installed", 1)[1]
     step3 = text.split("## Step 3 — Decision point ①: restate and confirm", 1)[1].split("\n## ", 1)[0]
     confirmed, open_intent = step3.split("Otherwise", 1)
-    assert "confirmation-examples.md" not in confirmed
+    assert "confirmation-template.md" not in confirmed and "confirmation-examples.md" not in confirmed
     for route, child in ((no_intent, "references/no-intent-interview.md"),
                          (open_intent, "references/confirm-intent.md")):
-        load = route.index("references/confirmation-examples.md")
+        load = route.index("references/confirmation-template.md")
         assert load < route.index(child)
         assert affirms(" ".join(route.split()), *LOAD_RULE)
     reader = owner.parent / "references/no-intent-interview.md"
     before_draft = reader.read_text(encoding="utf-8").split("When you write the intent", 1)[0]
     assert affirms(" ".join(before_draft.split()), *LOAD_RULE)
+    for entry in (text, (REPO / "loom-design/skills/capture-intent/SKILL.md").read_text()):
+        assert re.search(r"Optional illustrations: read relevant sections of `references/confirmation-examples.md` only when needed", " ".join(entry.split()))
+        assert not re.search(r"Read `[^`]*confirmation-examples\.md` before drafting or replying", entry)
+    for child in (reader, owner.parent / "references/confirm-intent.md"):
+        assert not re.search(r"Read `[^`]*confirmation-examples\.md`.*before drafting or replying", child.read_text())
 
 
-@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, FINAL_CHECK, *EXAMPLE_RULES))
+@pytest.mark.parametrize("rule", (*RULES, LOAD_RULE, FINAL_CHECK, AUTH_RULE, *EXAMPLE_RULES))
 def test_drafting_rule_polarity_and_late_placement(rule: tuple[str, ...]) -> None:
     verb, literal, *extras = rule
     sentence = f"{verb} {literal}, {', '.join(extras)}."
